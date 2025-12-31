@@ -1,6 +1,12 @@
 import 'package:get_it/get_it.dart';
 
+import '../../data/datasources/local/secure_storage_datasource.dart';
+import '../../data/datasources/matrix/matrix_auth_datasource.dart';
+import '../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../data/repositories/auth_repository_impl.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../../n42_chat_config.dart';
+import '../../presentation/blocs/auth/auth_bloc.dart';
 
 /// 全局GetIt实例
 final GetIt getIt = GetIt.instance;
@@ -30,22 +36,37 @@ Future<void> configureDependencies(N42ChatConfig config) async {
 
 /// 注册服务
 Future<void> _registerServices() async {
-  // TODO: 注册LoggerService
-  // TODO: 注册StorageService
-  // TODO: 注册EncryptionService
-  // TODO: 注册NotificationService
+  // Matrix客户端管理器
+  getIt.registerLazySingleton<MatrixClientManager>(
+    () => MatrixClientManager.instance,
+  );
 }
 
 /// 注册数据源
 Future<void> _registerDataSources() async {
-  // TODO: 注册MatrixClientManager
-  // TODO: 注册LocalDatabase
-  // TODO: 注册SecureStorage
+  // 安全存储
+  getIt.registerLazySingleton<SecureStorageDataSource>(
+    () => SecureStorageDataSource(),
+  );
+
+  // Matrix认证数据源
+  getIt.registerLazySingleton<MatrixAuthDataSource>(
+    () => MatrixAuthDataSource(
+      clientManager: getIt<MatrixClientManager>(),
+    ),
+  );
 }
 
 /// 注册仓库
 void _registerRepositories() {
-  // TODO: 注册AuthRepository
+  // 认证仓库
+  getIt.registerLazySingleton<IAuthRepository>(
+    () => AuthRepositoryImpl(
+      authDataSource: getIt<MatrixAuthDataSource>(),
+      secureStorage: getIt<SecureStorageDataSource>(),
+    ),
+  );
+
   // TODO: 注册ConversationRepository
   // TODO: 注册MessageRepository
   // TODO: 注册ContactRepository
@@ -58,7 +79,12 @@ void _registerUseCases() {
 
 /// 注册BLoC
 void _registerBlocs() {
-  // TODO: 注册各种BLoC
+  // 认证BLoC - 使用Factory模式，每次获取新实例
+  getIt.registerFactory<AuthBloc>(
+    () => AuthBloc(authRepository: getIt<IAuthRepository>()),
+  );
+
+  // TODO: 注册其他BLoC
 }
 
 /// 重置依赖（用于测试）
