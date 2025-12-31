@@ -12,17 +12,21 @@ import '../../data/repositories/contact_repository_impl.dart';
 import '../../data/repositories/conversation_repository_impl.dart';
 import '../../data/repositories/group_repository_impl.dart';
 import '../../data/repositories/message_repository_impl.dart';
+import '../../data/repositories/transfer_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/contact_repository.dart';
 import '../../domain/repositories/conversation_repository.dart';
 import '../../domain/repositories/group_repository.dart';
 import '../../domain/repositories/message_repository.dart';
+import '../../domain/repositories/transfer_repository.dart';
+import '../../integration/wallet_bridge.dart';
 import '../../n42_chat_config.dart';
 import '../../presentation/blocs/auth/auth_bloc.dart';
 import '../../presentation/blocs/chat/chat_bloc.dart';
 import '../../presentation/blocs/contact/contact_bloc.dart';
 import '../../presentation/blocs/conversation/conversation_bloc.dart';
 import '../../presentation/blocs/group/group_bloc.dart';
+import '../../presentation/blocs/transfer/transfer_bloc.dart';
 
 /// 全局GetIt实例
 final GetIt getIt = GetIt.instance;
@@ -30,9 +34,14 @@ final GetIt getIt = GetIt.instance;
 /// 配置依赖注入
 ///
 /// 在N42Chat.initialize()中调用
-Future<void> configureDependencies(N42ChatConfig config) async {
+Future<void> configureDependencies(N42ChatConfig config, {IWalletBridge? walletBridge}) async {
   // 注册配置
   getIt.registerSingleton<N42ChatConfig>(config);
+
+  // 注册钱包桥接
+  getIt.registerSingleton<IWalletBridge>(
+    walletBridge ?? MockWalletBridge(),
+  );
 
   // 注册服务
   await _registerServices();
@@ -128,6 +137,15 @@ void _registerRepositories() {
       getIt<MatrixClientManager>(),
     ),
   );
+
+  // 转账仓库
+  getIt.registerLazySingleton<ITransferRepository>(
+    () => TransferRepositoryImpl(
+      getIt<IWalletBridge>(),
+      getIt<MatrixMessageDataSource>(),
+      getIt<MatrixClientManager>(),
+    ),
+  );
 }
 
 /// 注册用例
@@ -164,6 +182,14 @@ void _registerBlocs() {
   // 群聊BLoC
   getIt.registerFactory<GroupBloc>(
     () => GroupBloc(getIt<IGroupRepository>()),
+  );
+
+  // 转账BLoC
+  getIt.registerFactory<TransferBloc>(
+    () => TransferBloc(
+      getIt<ITransferRepository>(),
+      getIt<IWalletBridge>(),
+    ),
   );
 }
 
