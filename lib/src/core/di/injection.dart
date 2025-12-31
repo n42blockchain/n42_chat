@@ -3,13 +3,17 @@ import 'package:get_it/get_it.dart';
 import '../../data/datasources/local/secure_storage_datasource.dart';
 import '../../data/datasources/matrix/matrix_auth_datasource.dart';
 import '../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../data/datasources/matrix/matrix_message_datasource.dart';
 import '../../data/datasources/matrix/matrix_room_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/conversation_repository_impl.dart';
+import '../../data/repositories/message_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/conversation_repository.dart';
+import '../../domain/repositories/message_repository.dart';
 import '../../n42_chat_config.dart';
 import '../../presentation/blocs/auth/auth_bloc.dart';
+import '../../presentation/blocs/chat/chat_bloc.dart';
 import '../../presentation/blocs/conversation/conversation_bloc.dart';
 
 /// 全局GetIt实例
@@ -64,6 +68,11 @@ Future<void> _registerDataSources() async {
   getIt.registerLazySingleton<MatrixRoomDataSource>(
     () => MatrixRoomDataSource(getIt<MatrixClientManager>()),
   );
+
+  // Matrix消息数据源
+  getIt.registerLazySingleton<MatrixMessageDataSource>(
+    () => MatrixMessageDataSource(getIt<MatrixClientManager>()),
+  );
 }
 
 /// 注册仓库
@@ -81,7 +90,14 @@ void _registerRepositories() {
     () => ConversationRepositoryImpl(getIt<MatrixRoomDataSource>()),
   );
 
-  // TODO: 注册MessageRepository
+  // 消息仓库
+  getIt.registerLazySingleton<IMessageRepository>(
+    () => MessageRepositoryImpl(
+      getIt<MatrixMessageDataSource>(),
+      getIt<MatrixClientManager>(),
+    ),
+  );
+
   // TODO: 注册ContactRepository
 }
 
@@ -101,6 +117,13 @@ void _registerBlocs() {
   getIt.registerFactory<ConversationBloc>(
     () => ConversationBloc(
       conversationRepository: getIt<IConversationRepository>(),
+    ),
+  );
+
+  // 聊天BLoC
+  getIt.registerFactory<ChatBloc>(
+    () => ChatBloc(
+      messageRepository: getIt<IMessageRepository>(),
     ),
   );
 

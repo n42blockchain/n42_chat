@@ -8,6 +8,8 @@ enum MessageType {
   image,
   /// 语音消息
   voice,
+  /// 音频消息（别名）
+  audio,
   /// 视频消息
   video,
   /// 文件消息
@@ -84,6 +86,9 @@ class MessageEntity extends Equatable {
 
   /// 是否是当前用户发送
   final bool isFromMe;
+
+  /// 别名：isMe
+  bool get isMe => isFromMe;
 
   /// 回复的消息ID
   final String? replyToId;
