@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/utils/date_utils.dart';
+import '../../../core/utils/date_utils.dart' as chat_date;
 import '../../../domain/entities/search_result_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 
@@ -189,7 +189,7 @@ class SearchResultTile extends StatelessWidget {
         // 时间
         if (item.timestamp != null)
           Text(
-            ChatDateUtils.formatConversationTime(item.timestamp!),
+            chat_date.N42DateUtils.formatConversationTime(item.timestamp!),
             style: TextStyle(
               fontSize: 12,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
