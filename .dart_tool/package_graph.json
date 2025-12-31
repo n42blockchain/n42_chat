@@ -51,7 +51,8 @@
         "flutter_test",
         "injectable_generator",
         "json_serializable",
-        "mockito"
+        "mockito",
+        "mocktail"
       ]
     },
     {
@@ -63,6 +64,15 @@
         "meta",
         "mocktail",
         "test"
+      ]
+    },
+    {
+      "name": "mocktail",
+      "version": "1.0.4",
+      "dependencies": [
+        "collection",
+        "matcher",
+        "test_api"
       ]
     },
     {
@@ -591,15 +601,6 @@
       ]
     },
     {
-      "name": "mocktail",
-      "version": "1.0.4",
-      "dependencies": [
-        "collection",
-        "matcher",
-        "test_api"
-      ]
-    },
-    {
       "name": "meta",
       "version": "1.17.0",
       "dependencies": []
@@ -625,6 +626,17 @@
       ]
     },
     {
+      "name": "matcher",
+      "version": "0.12.17",
+      "dependencies": [
+        "async",
+        "meta",
+        "stack_trace",
+        "term_glyph",
+        "test_api"
+      ]
+    },
+    {
       "name": "source_gen",
       "version": "4.1.1",
       "dependencies": [
@@ -637,17 +649,6 @@
         "pub_semver",
         "source_span",
         "yaml"
-      ]
-    },
-    {
-      "name": "matcher",
-      "version": "0.12.17",
-      "dependencies": [
-        "async",
-        "meta",
-        "stack_trace",
-        "term_glyph",
-        "test_api"
       ]
     },
     {
