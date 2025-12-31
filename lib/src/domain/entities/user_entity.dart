@@ -1,0 +1,98 @@
+import 'package:equatable/equatable.dart';
+
+/// 用户实体
+///
+/// 表示Matrix用户的基本信息
+class UserEntity extends Equatable {
+  /// Matrix用户ID (格式: @user:server.com)
+  final String userId;
+
+  /// 显示名称
+  final String displayName;
+
+  /// 头像URL
+  final String? avatarUrl;
+
+  /// 状态消息
+  final String? statusMessage;
+
+  /// 是否当前登录用户
+  final bool isCurrentUser;
+
+  const UserEntity({
+    required this.userId,
+    required this.displayName,
+    this.avatarUrl,
+    this.statusMessage,
+    this.isCurrentUser = false,
+  });
+
+  /// 获取用户名部分 (@user:server.com -> user)
+  String get username {
+    if (userId.startsWith('@')) {
+      final colonIndex = userId.indexOf(':');
+      if (colonIndex > 1) {
+        return userId.substring(1, colonIndex);
+      }
+      return userId.substring(1);
+    }
+    return userId;
+  }
+
+  /// 获取服务器部分 (@user:server.com -> server.com)
+  String get server {
+    final colonIndex = userId.indexOf(':');
+    if (colonIndex > 0 && colonIndex < userId.length - 1) {
+      return userId.substring(colonIndex + 1);
+    }
+    return '';
+  }
+
+  /// 获取显示名称（如果为空则使用用户名）
+  String get effectiveDisplayName {
+    return displayName.isNotEmpty ? displayName : username;
+  }
+
+  /// 获取名称首字母（用于头像）
+  String get initials {
+    final name = effectiveDisplayName;
+    if (name.isEmpty) return '?';
+
+    final words = name.trim().split(RegExp(r'\s+'));
+    if (words.length == 1) {
+      return name.substring(0, name.length.clamp(0, 2)).toUpperCase();
+    }
+
+    return words
+        .where((w) => w.isNotEmpty)
+        .take(2)
+        .map((w) => w[0].toUpperCase())
+        .join();
+  }
+
+  @override
+  List<Object?> get props => [
+        userId,
+        displayName,
+        avatarUrl,
+        statusMessage,
+        isCurrentUser,
+      ];
+
+  UserEntity copyWith({
+    String? userId,
+    String? displayName,
+    String? avatarUrl,
+    String? statusMessage,
+    bool? isCurrentUser,
+  }) {
+    return UserEntity(
+      userId: userId ?? this.userId,
+      displayName: displayName ?? this.displayName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      statusMessage: statusMessage ?? this.statusMessage,
+      isCurrentUser: isCurrentUser ?? this.isCurrentUser,
+    );
+  }
+}
+
