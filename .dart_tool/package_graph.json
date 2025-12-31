@@ -1019,6 +1019,13 @@
       ]
     },
     {
+      "name": "qr",
+      "version": "3.0.2",
+      "dependencies": [
+        "meta"
+      ]
+    },
+    {
       "name": "scrollable_positioned_list",
       "version": "0.2.3",
       "dependencies": [
@@ -2000,13 +2007,6 @@
         "ffi",
         "meta",
         "path"
-      ]
-    },
-    {
-      "name": "qr",
-      "version": "3.0.2",
-      "dependencies": [
-        "meta"
       ]
     }
   ],
