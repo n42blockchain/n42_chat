@@ -10,6 +10,9 @@ class MessageItem extends StatelessWidget {
   /// 消息实体
   final MessageEntity message;
 
+  /// 是否高亮显示（搜索结果）
+  final bool isHighlighted;
+
   /// 点击回调
   final VoidCallback? onTap;
 
@@ -25,6 +28,7 @@ class MessageItem extends StatelessWidget {
   const MessageItem({
     super.key,
     required this.message,
+    this.isHighlighted = false,
     this.onTap,
     this.onLongPress,
     this.onAvatarTap,
@@ -46,7 +50,7 @@ class MessageItem extends StatelessWidget {
   Widget _buildMessageBubble(BuildContext context) {
     final status = _mapStatus(message.status);
 
-    return MessageBubble(
+    Widget bubble = MessageBubble(
       isSelf: message.isFromMe,
       status: status,
       timestamp: message.timestamp,
@@ -59,6 +63,19 @@ class MessageItem extends StatelessWidget {
       onResend: onResend,
       child: _buildMessageContent(context),
     );
+
+    // 高亮显示搜索结果
+    if (isHighlighted) {
+      return Container(
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: bubble,
+      );
+    }
+
+    return bubble;
   }
 
   Widget _buildMessageContent(BuildContext context) {
