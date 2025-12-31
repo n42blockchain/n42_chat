@@ -193,6 +193,21 @@ class MatrixMessageDataSource {
     });
   }
 
+  /// 发送自定义消息
+  Future<String> sendCustomMessage({
+    required String roomId,
+    required String msgType,
+    required Map<String, dynamic> content,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      throw Exception('房间不存在');
+    }
+
+    final eventId = await room.sendEvent(content);
+    return eventId ?? '';
+  }
+
   /// 重发消息
   Future<bool> resendMessage(String roomId, String eventId) async {
     final room = _client?.getRoomById(roomId);
