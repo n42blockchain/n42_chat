@@ -1,0 +1,118 @@
+name: n42_chat
+description: >
+  A Matrix-based chat module with WeChat-style UI for N42 Wallet integration.
+  可独立运行或作为package嵌入其他Flutter应用的聊天模块。
+version: 0.1.0
+homepage: https://github.com/n42/n42_chat
+repository: https://github.com/n42/n42_chat
+issue_tracker: https://github.com/n42/n42_chat/issues
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ============================================
+  # Matrix Protocol - 核心通信协议
+  # ============================================
+  # Apache 2.0 License - 商业友好
+  matrix: ^0.24.0
+
+  # ============================================
+  # State Management - 状态管理
+  # ============================================
+  # MIT License
+  flutter_bloc: ^8.1.0
+  bloc: ^8.1.0
+
+  # ============================================
+  # Dependency Injection - 依赖注入
+  # ============================================
+  # MIT License
+  get_it: ^7.6.0
+  injectable: ^2.3.0
+
+  # ============================================
+  # Routing - 路由管理
+  # ============================================
+  # BSD-3-Clause License
+  go_router: ^13.0.0
+
+  # ============================================
+  # Local Storage - 本地存储
+  # ============================================
+  # MIT License
+  drift: ^2.15.0
+  sqlite3_flutter_libs: ^0.5.0
+  # BSD-3-Clause License
+  flutter_secure_storage: ^9.0.0
+  path_provider: ^2.1.0
+  path: ^1.8.0
+
+  # ============================================
+  # Network - 网络请求
+  # ============================================
+  # MIT License
+  dio: ^5.4.0
+
+  # ============================================
+  # UI Components - UI组件
+  # ============================================
+  # MIT License
+  cached_network_image: ^3.3.0
+  shimmer: ^3.0.0
+  flutter_slidable: ^3.0.1
+  pull_to_refresh: ^2.0.0
+
+  # ============================================
+  # Image & Media - 图片和媒体
+  # ============================================
+  # Apache 2.0 / MIT License
+  image_picker: ^1.0.7
+  photo_view: ^0.14.0
+  video_player: ^2.8.0
+  audioplayers: ^5.2.0
+  record: ^5.0.4
+  permission_handler: ^11.2.0
+
+  # ============================================
+  # Utils - 工具库
+  # ============================================
+  # MIT / BSD-3-Clause License
+  equatable: ^2.0.5
+  json_annotation: ^4.8.1
+  intl: ^0.18.1
+  uuid: ^4.3.3
+  collection: ^1.18.0
+  rxdart: ^0.27.7
+  logger: ^2.0.2
+  
+  # ============================================
+  # UI Helpers
+  # ============================================
+  flutter_svg: ^2.0.9
+  badges: ^3.1.2
+  pinyin: ^3.0.0
+  azlistview: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.8
+  json_serializable: ^6.7.1
+  injectable_generator: ^2.4.1
+  drift_dev: ^2.15.0
+  mockito: ^5.4.4
+  bloc_test: ^9.1.5
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/

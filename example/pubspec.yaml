@@ -1,0 +1,26 @@
+name: n42_chat_example
+description: Example app demonstrating N42 Chat integration.
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # 引用父目录的n42_chat包
+  n42_chat:
+    path: ../
+  
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
