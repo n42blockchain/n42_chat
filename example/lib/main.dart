@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:n42_chat/n42_chat.dart';
 
+import 'server_test_page.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -451,6 +453,21 @@ class ProfilePage extends StatelessWidget {
                     icon: Icons.settings,
                     title: '设置',
                     onTap: () {},
+                  ),
+                ]),
+                const SizedBox(height: 10),
+                _buildSection([
+                  _ProfileItem(
+                    icon: Icons.science,
+                    title: '服务器测试',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ServerTestPage(),
+                        ),
+                      );
+                    },
                   ),
                 ]),
                 const SizedBox(height: 10),
