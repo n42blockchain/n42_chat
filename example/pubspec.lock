@@ -673,7 +673,7 @@ packages:
     source: hosted
     version: "0.11.1"
   matrix:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: matrix
       sha256: "7a524ba09793aaf5358f107189d35baa94247149089f63c2ce7822197c170cea"
