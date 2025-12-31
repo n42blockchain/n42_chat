@@ -127,6 +127,13 @@ class ContactEntity extends Equatable {
     return '#';
   }
 
+  /// 排序键（用于联系人列表排序）
+  ///
+  /// 返回小写的有效显示名称，用于字母排序
+  String get sortKey {
+    return effectiveDisplayName.toLowerCase();
+  }
+
   /// 是否在线
   bool get isOnline => presence == PresenceStatus.online;
 
