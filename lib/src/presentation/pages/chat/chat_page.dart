@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/chat/chat_state.dart';
+import '../../blocs/search/search_bloc.dart';
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../search/chat_search_bar.dart';
 import 'message_item.dart';
 
 /// 聊天页面
@@ -39,6 +42,8 @@ class _ChatPageState extends State<ChatPage> {
   final FocusNode _inputFocusNode = FocusNode();
 
   bool _showScrollToBottom = false;
+  bool _showSearchBar = false;
+  String? _highlightedMessageId;
 
   @override
   void initState() {
@@ -125,6 +130,17 @@ class _ChatPageState extends State<ChatPage> {
       appBar: _buildAppBar(isDark),
       body: Column(
         children: [
+          // 聊天内搜索栏
+          if (_showSearchBar)
+            BlocProvider(
+              create: (_) => getIt<SearchBloc>(),
+              child: ChatSearchBar(
+                roomId: widget.conversation.id,
+                onClose: _toggleSearch,
+                onNavigateToMessage: _navigateToMessage,
+              ),
+            ),
+
           // 消息列表
           Expanded(
             child: Stack(
@@ -146,7 +162,7 @@ class _ChatPageState extends State<ChatPage> {
           _buildReplyPreview(),
 
           // 输入栏
-          _buildInputBar(),
+          if (!_showSearchBar) _buildInputBar(),
         ],
       ),
     );
@@ -167,7 +183,7 @@ class _ChatPageState extends State<ChatPage> {
           if (widget.conversation.type == ConversationType.group)
             Text(
               '${widget.conversation.memberCount}人',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
               ),
@@ -177,11 +193,44 @@ class _ChatPageState extends State<ChatPage> {
       onBackPressed: widget.onBack ?? () => Navigator.of(context).pop(),
       actions: [
         IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: _toggleSearch,
+        ),
+        IconButton(
           icon: const Icon(Icons.more_horiz),
           onPressed: widget.onMorePressed,
         ),
       ],
     );
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _showSearchBar = !_showSearchBar;
+      if (!_showSearchBar) {
+        _highlightedMessageId = null;
+      }
+    });
+  }
+
+  void _navigateToMessage(String eventId) {
+    setState(() {
+      _highlightedMessageId = eventId;
+    });
+
+    // 滚动到指定消息
+    final chatBloc = context.read<ChatBloc>();
+    final state = chatBloc.state;
+    final index = state.messages.indexWhere((m) => m.id == eventId);
+
+    if (index != -1) {
+      // 使用 jumpTo 滚动到消息位置
+      _scrollController.animateTo(
+        index * 80.0, // 估算每条消息高度
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   Widget _buildMessageList() {
@@ -239,6 +288,7 @@ class _ChatPageState extends State<ChatPage> {
                   TimeSeparator(dateTime: message.timestamp),
                 MessageItem(
                   message: message,
+                  isHighlighted: message.id == _highlightedMessageId,
                   onTap: () => _onMessageTap(message),
                   onLongPress: () => _onMessageLongPress(message),
                   onAvatarTap: () => _onAvatarTap(message),

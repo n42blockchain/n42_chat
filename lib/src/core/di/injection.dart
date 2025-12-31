@@ -7,17 +7,20 @@ import '../../data/datasources/matrix/matrix_contact_datasource.dart';
 import '../../data/datasources/matrix/matrix_group_datasource.dart';
 import '../../data/datasources/matrix/matrix_message_datasource.dart';
 import '../../data/datasources/matrix/matrix_room_datasource.dart';
+import '../../data/datasources/matrix/matrix_search_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/contact_repository_impl.dart';
 import '../../data/repositories/conversation_repository_impl.dart';
 import '../../data/repositories/group_repository_impl.dart';
 import '../../data/repositories/message_repository_impl.dart';
+import '../../data/repositories/search_repository_impl.dart';
 import '../../data/repositories/transfer_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/contact_repository.dart';
 import '../../domain/repositories/conversation_repository.dart';
 import '../../domain/repositories/group_repository.dart';
 import '../../domain/repositories/message_repository.dart';
+import '../../domain/repositories/search_repository.dart';
 import '../../domain/repositories/transfer_repository.dart';
 import '../../integration/wallet_bridge.dart';
 import '../../n42_chat_config.dart';
@@ -26,6 +29,7 @@ import '../../presentation/blocs/chat/chat_bloc.dart';
 import '../../presentation/blocs/contact/contact_bloc.dart';
 import '../../presentation/blocs/conversation/conversation_bloc.dart';
 import '../../presentation/blocs/group/group_bloc.dart';
+import '../../presentation/blocs/search/search_bloc.dart';
 import '../../presentation/blocs/transfer/transfer_bloc.dart';
 
 /// 全局GetIt实例
@@ -100,6 +104,11 @@ Future<void> _registerDataSources() async {
   getIt.registerLazySingleton<MatrixGroupDataSource>(
     () => MatrixGroupDataSource(getIt<MatrixClientManager>()),
   );
+
+  // Matrix搜索数据源
+  getIt.registerLazySingleton<MatrixSearchDataSource>(
+    () => MatrixSearchDataSource(getIt<MatrixClientManager>()),
+  );
 }
 
 /// 注册仓库
@@ -143,6 +152,14 @@ void _registerRepositories() {
     () => TransferRepositoryImpl(
       getIt<IWalletBridge>(),
       getIt<MatrixMessageDataSource>(),
+      getIt<MatrixClientManager>(),
+    ),
+  );
+
+  // 搜索仓库
+  getIt.registerLazySingleton<ISearchRepository>(
+    () => SearchRepositoryImpl(
+      getIt<MatrixSearchDataSource>(),
       getIt<MatrixClientManager>(),
     ),
   );
@@ -190,6 +207,11 @@ void _registerBlocs() {
       getIt<ITransferRepository>(),
       getIt<IWalletBridge>(),
     ),
+  );
+
+  // 搜索BLoC
+  getIt.registerFactory<SearchBloc>(
+    () => SearchBloc(getIt<ISearchRepository>()),
   );
 }
 
