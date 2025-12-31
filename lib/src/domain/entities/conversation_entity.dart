@@ -38,6 +38,9 @@ class ConversationEntity extends Equatable {
   /// 未读消息数量
   final int unreadCount;
 
+  /// 高亮未读数（@提及）
+  final int highlightCount;
+
   /// 会话类型
   final ConversationType type;
 
@@ -58,6 +61,12 @@ class ConversationEntity extends Equatable {
 
   /// 成员数量
   final int memberCount;
+
+  /// 群成员头像URL列表（用于九宫格头像）
+  final List<String?>? memberAvatarUrls;
+
+  /// 群成员名称列表（用于九宫格头像）
+  final List<String>? memberNames;
 
   /// 是否有人正在输入
   final bool hasTypingUsers;
@@ -83,6 +92,7 @@ class ConversationEntity extends Equatable {
     this.lastMessageSenderId,
     this.lastMessageSenderName,
     this.unreadCount = 0,
+    this.highlightCount = 0,
     this.type = ConversationType.direct,
     this.isEncrypted = false,
     this.isPinned = false,
@@ -90,6 +100,8 @@ class ConversationEntity extends Equatable {
     this.isMarkedAsRead = false,
     this.topic,
     this.memberCount = 0,
+    this.memberAvatarUrls,
+    this.memberNames,
     this.hasTypingUsers = false,
     this.typingUsers = const [],
     this.draft,
@@ -165,6 +177,7 @@ class ConversationEntity extends Equatable {
         lastMessageSenderId,
         lastMessageSenderName,
         unreadCount,
+        highlightCount,
         type,
         isEncrypted,
         isPinned,
@@ -172,6 +185,8 @@ class ConversationEntity extends Equatable {
         isMarkedAsRead,
         topic,
         memberCount,
+        memberAvatarUrls,
+        memberNames,
         hasTypingUsers,
         typingUsers,
         draft,
@@ -188,6 +203,7 @@ class ConversationEntity extends Equatable {
     String? lastMessageSenderId,
     String? lastMessageSenderName,
     int? unreadCount,
+    int? highlightCount,
     ConversationType? type,
     bool? isEncrypted,
     bool? isPinned,
@@ -195,6 +211,8 @@ class ConversationEntity extends Equatable {
     bool? isMarkedAsRead,
     String? topic,
     int? memberCount,
+    List<String?>? memberAvatarUrls,
+    List<String>? memberNames,
     bool? hasTypingUsers,
     List<String>? typingUsers,
     String? draft,
@@ -210,6 +228,7 @@ class ConversationEntity extends Equatable {
       lastMessageSenderId: lastMessageSenderId ?? this.lastMessageSenderId,
       lastMessageSenderName: lastMessageSenderName ?? this.lastMessageSenderName,
       unreadCount: unreadCount ?? this.unreadCount,
+      highlightCount: highlightCount ?? this.highlightCount,
       type: type ?? this.type,
       isEncrypted: isEncrypted ?? this.isEncrypted,
       isPinned: isPinned ?? this.isPinned,
@@ -217,6 +236,8 @@ class ConversationEntity extends Equatable {
       isMarkedAsRead: isMarkedAsRead ?? this.isMarkedAsRead,
       topic: topic ?? this.topic,
       memberCount: memberCount ?? this.memberCount,
+      memberAvatarUrls: memberAvatarUrls ?? this.memberAvatarUrls,
+      memberNames: memberNames ?? this.memberNames,
       hasTypingUsers: hasTypingUsers ?? this.hasTypingUsers,
       typingUsers: typingUsers ?? this.typingUsers,
       draft: draft ?? this.draft,
