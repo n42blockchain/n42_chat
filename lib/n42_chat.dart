@@ -52,3 +52,7 @@ export 'src/domain/entities/user_entity.dart';
 // ============================================
 export 'src/integration/wallet_bridge.dart';
 
+// ============================================
+// UI组件导出
+// ============================================
+export 'src/presentation/widgets/widgets.dart';
