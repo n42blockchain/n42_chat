@@ -77,8 +77,11 @@ abstract class AppColors {
   /// 主要文字 - 深色模式
   static const Color textPrimaryDark = Color(0xFFE5E5E5);
 
-  /// 次要文字
+  /// 次要文字 - 浅色模式
   static const Color textSecondary = Color(0xFF888888);
+
+  /// 次要文字 - 深色模式
+  static const Color textSecondaryDark = Color(0xFFAAAAAA);
 
   /// 辅助文字
   static const Color textTertiary = Color(0xFFB2B2B2);
@@ -88,6 +91,9 @@ abstract class AppColors {
 
   /// 链接文字
   static const Color textLink = Color(0xFF576B95);
+
+  /// 链接颜色
+  static const Color link = Color(0xFF576B95);
 
   // ============================================
   // 消息气泡
@@ -110,6 +116,15 @@ abstract class AppColors {
 
   /// 消息文字 - 接收方
   static const Color messageTextReceived = Color(0xFF000000);
+
+  /// 自己发送的消息气泡
+  static const Color bubbleSelf = Color(0xFF95EC69);
+
+  /// 对方发送的消息气泡 - 浅色
+  static const Color bubbleOther = Color(0xFFFFFFFF);
+
+  /// 对方发送的消息气泡 - 深色
+  static const Color bubbleOtherDark = Color(0xFF2C2C2C);
 
   // ============================================
   // 状态颜色
@@ -153,6 +168,12 @@ abstract class AppColors {
   /// 搜索框背景
   static const Color searchBackground = Color(0xFFEDEDED);
 
+  /// 输入栏背景 - 浅色
+  static const Color inputBar = Color(0xFFF7F7F7);
+
+  /// 输入栏背景 - 深色
+  static const Color inputBarDark = Color(0xFF2C2C2C);
+
   // ============================================
   // 遮罩/覆盖层
   // ============================================
@@ -187,5 +208,8 @@ abstract class AppColors {
 
   /// 红包
   static const Color redPacket = Color(0xFFFD9B2D);
+
+  /// 时间分隔器背景
+  static const Color timeSeparator = Color(0xCCCCCCCC);
 }
 
