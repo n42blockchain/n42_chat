@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
 import 'domain/entities/user_entity.dart';
+import 'domain/repositories/auth_repository.dart';
+import 'presentation/blocs/auth/auth_bloc.dart';
+import 'presentation/blocs/auth/auth_event.dart';
+import 'presentation/blocs/auth/auth_state.dart';
+import 'presentation/blocs/conversation/conversation_bloc.dart';
+import 'presentation/pages/auth/login_page.dart';
+import 'presentation/pages/auth/welcome_page.dart';
+import 'presentation/pages/conversation/conversation_list_page.dart';
 
 /// N42 Chat 模块主入口类
 ///
@@ -35,6 +44,9 @@ class N42Chat {
   static N42ChatConfig? _config;
   static ThemeMode _themeMode = ThemeMode.system;
   static final List<void Function(ThemeMode)> _themeListeners = [];
+  
+  /// 全局 AuthBloc 实例（单例）
+  static AuthBloc? _authBloc;
 
   /// 获取当前配置
   static N42ChatConfig? get config => _config;
@@ -115,17 +127,33 @@ class N42Chat {
     // 初始化依赖注入
     await configureDependencies(config);
 
-    // TODO: 初始化Matrix客户端
-    // TODO: 恢复上次登录会话
-    // TODO: 初始化推送通知
+    // 创建全局 AuthBloc 并尝试恢复会话
+    _authBloc = getIt<AuthBloc>();
+    _authBloc!.add(const AuthRestoreSessionRequested());
+
+    // 初始化推送通知（如果启用）
+    if (config.enablePushNotifications) {
+      debugPrint('N42Chat: Push notifications enabled');
+      // TODO: 注册推送通知
+    }
 
     _initialized = true;
     debugPrint('N42Chat: Initialized successfully');
+  }
+  
+  /// 获取全局 AuthBloc
+  static AuthBloc get authBloc {
+    _ensureInitialized();
+    return _authBloc!;
   }
 
   /// 获取聊天主Widget
   ///
   /// 返回会话列表页面，可直接嵌入TabView或Navigator
+  /// 
+  /// 根据登录状态自动显示：
+  /// - 已登录：显示会话列表页面
+  /// - 未登录：显示欢迎页面，可登录/注册
   ///
   /// ```dart
   /// TabBarView(
@@ -138,8 +166,7 @@ class N42Chat {
   /// ```
   static Widget chatWidget() {
     _ensureInitialized();
-    // TODO: 返回包装了必要Provider的ConversationListPage
-    return const _ChatPlaceholder();
+    return const _N42ChatEntryWidget();
   }
 
   /// 获取路由配置
@@ -208,15 +235,23 @@ class N42Chat {
   /// 是否已登录
   static bool get isLoggedIn {
     if (!_initialized) return false;
-    // TODO: 检查Matrix客户端登录状态
-    return false;
+    try {
+      final authRepo = getIt<IAuthRepository>();
+      return authRepo.isLoggedIn;
+    } catch (e) {
+      return false;
+    }
   }
 
   /// 当前登录用户
   static UserEntity? get currentUser {
-    if (!_initialized || !isLoggedIn) return null;
-    // TODO: 返回当前用户信息
-    return null;
+    if (!_initialized) return null;
+    try {
+      final authRepo = getIt<IAuthRepository>();
+      return authRepo.currentUser;
+    } catch (e) {
+      return null;
+    }
   }
 
   /// 未读消息数量流
@@ -296,44 +331,128 @@ class N42Chat {
   }
 }
 
-/// 聊天占位Widget (开发中)
-class _ChatPlaceholder extends StatelessWidget {
-  const _ChatPlaceholder();
+/// N42 Chat 入口Widget
+/// 
+/// 根据登录状态自动切换页面：
+/// - 检查中：显示加载页
+/// - 已登录：显示会话列表
+/// - 未登录：显示欢迎页面
+class _N42ChatEntryWidget extends StatefulWidget {
+  const _N42ChatEntryWidget();
+
+  @override
+  State<_N42ChatEntryWidget> createState() => _N42ChatEntryWidgetState();
+}
+
+class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
+  @override
+  void initState() {
+    super.initState();
+    // 检查当前登录状态
+    N42Chat.authBloc.add(const AuthCheckRequested());
+  }
+
+  void _navigateToLogin(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: N42Chat.authBloc,
+          child: const LoginPage(),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToRegister(BuildContext context) {
+    // TODO: 实现注册页面导航
+    _navigateToLogin(context);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('消息'),
-        backgroundColor: const Color(0xFFF7F7F7),
-        foregroundColor: const Color(0xFF181818),
-        elevation: 0,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: N42Chat.authBloc),
+        BlocProvider<ConversationBloc>(
+          create: (_) => getIt<ConversationBloc>(),
+        ),
+      ],
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          // 检查中或初始状态 - 显示加载
+          if (state.status == AuthStatus.initial || 
+              state.status == AuthStatus.checking) {
+            return const _LoadingPage();
+          }
+
+          // 已登录 - 显示会话列表
+          if (state.isAuthenticated) {
+            return ConversationListPage(
+              onConversationTap: (conversation) {
+                // TODO: 导航到聊天页面
+                debugPrint('N42Chat: Open conversation ${conversation.id}');
+              },
+              onSearchTap: () {
+                // TODO: 导航到搜索页面
+                debugPrint('N42Chat: Open search');
+              },
+            );
+          }
+
+          // 未登录 - 显示欢迎页面
+          return WelcomePage(
+            onLogin: () => _navigateToLogin(context),
+            onRegister: () => _navigateToRegister(context),
+          );
+        },
       ),
-      backgroundColor: const Color(0xFFEDEDED),
-      body: const Center(
+    );
+  }
+}
+
+/// 加载页面
+class _LoadingPage extends StatelessWidget {
+  const _LoadingPage();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEDEDED),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.chat_bubble_outline,
-              size: 64,
-              color: Color(0xFF888888),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: const Color(0xFF07C160),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Icon(
+                Icons.chat_bubble_rounded,
+                color: Colors.white,
+                size: 40,
+              ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               'N42 Chat',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF181818),
+                color: isDark ? Colors.white : const Color(0xFF181818),
               ),
             ),
-            SizedBox(height: 8),
-            Text(
-              '聊天模块开发中...',
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF888888),
+            const SizedBox(height: 16),
+            const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF07C160)),
               ),
             ),
           ],
