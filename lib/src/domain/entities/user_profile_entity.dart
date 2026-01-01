@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart' show ThemeMode;
 
 /// 用户资料实体
 class UserProfileEntity extends Equatable {
@@ -347,14 +348,8 @@ class AppearanceSettings extends Equatable {
 }
 
 /// 主题模式
-enum ThemeMode {
-  /// 跟随系统
-  system,
-  /// 浅色
-  light,
-  /// 深色
-  dark,
-}
+/// 使用 Flutter 的 ThemeMode，从 material.dart 导入
+/// 如需使用，请导入 'package:flutter/material.dart' 并使用 ThemeMode.system/light/dark
 
 /// 字体大小
 enum FontSize {
