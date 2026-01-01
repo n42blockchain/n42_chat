@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../blocs/contact/contact_bloc.dart';
+import '../../blocs/contact/contact_state.dart';
 import '../../widgets/chat/message_status_indicator.dart' as indicator;
 import '../../widgets/chat/chat_widgets.dart';
 
@@ -25,6 +29,12 @@ class MessageItem extends StatelessWidget {
   /// 重发回调
   final VoidCallback? onResend;
 
+  /// 是否是群聊消息
+  final bool isGroupChat;
+
+  /// 是否显示发送者名称
+  final bool showSenderName;
+
   const MessageItem({
     super.key,
     required this.message,
@@ -33,6 +43,8 @@ class MessageItem extends StatelessWidget {
     this.onLongPress,
     this.onAvatarTap,
     this.onResend,
+    this.isGroupChat = false,
+    this.showSenderName = false,
   });
 
   @override
@@ -47,8 +59,38 @@ class MessageItem extends StatelessWidget {
     return _buildMessageBubble(context);
   }
 
+  /// 获取发送者显示名称（优先使用备注名）
+  String _getSenderDisplayName(BuildContext context) {
+    if (message.isFromMe) {
+      return message.senderName;
+    }
+
+    try {
+      final contactBloc = context.read<ContactBloc>();
+      final state = contactBloc.state;
+      if (state is ContactLoaded) {
+        final contact = state.contacts.cast<ContactEntity?>().firstWhere(
+          (c) => c?.userId == message.senderId,
+          orElse: () => null,
+        );
+        if (contact != null && contact.remark != null && contact.remark!.isNotEmpty) {
+          return contact.remark!;
+        }
+      }
+    } catch (e) {
+      // ContactBloc 可能不可用，使用原始名称
+    }
+
+    return message.senderName;
+  }
+
   Widget _buildMessageBubble(BuildContext context) {
     final status = _mapStatus(message.status);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final displayName = _getSenderDisplayName(context);
+
+    // 是否显示发送者名称（群聊中非自己的消息）
+    final shouldShowSenderName = isGroupChat && !message.isFromMe && showSenderName;
 
     Widget bubble = MessageBubble(
       isSelf: message.isFromMe,
@@ -56,13 +98,33 @@ class MessageItem extends StatelessWidget {
       timestamp: message.timestamp,
       showTimestamp: false,
       avatarUrl: message.senderAvatarUrl,
-      avatarName: message.senderName,
+      avatarName: displayName,
       onTap: onTap,
       onLongPress: onLongPress,
       onAvatarTap: onAvatarTap,
       onResend: onResend,
       child: _buildMessageContent(context),
     );
+
+    // 如果需要显示发送者名称，添加名称标签
+    if (shouldShowSenderName) {
+      bubble = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 56, bottom: 2),
+            child: Text(
+              displayName,
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              ),
+            ),
+          ),
+          bubble,
+        ],
+      );
+    }
 
     // 高亮显示搜索结果
     if (isHighlighted) {

@@ -145,7 +145,10 @@ void _registerRepositories() {
 
   // 联系人仓库
   getIt.registerLazySingleton<IContactRepository>(
-    () => ContactRepositoryImpl(getIt<MatrixContactDataSource>()),
+    () => ContactRepositoryImpl(
+      getIt<MatrixContactDataSource>(),
+      getIt<SecureStorageDataSource>(),
+    ),
   );
 
   // 群聊仓库

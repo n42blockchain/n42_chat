@@ -4,16 +4,29 @@ import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/contact_entity.dart';
 import '../../domain/repositories/contact_repository.dart';
+import '../datasources/local/secure_storage_datasource.dart';
 import '../datasources/matrix/matrix_contact_datasource.dart';
 
 /// 联系人仓库实现
 class ContactRepositoryImpl implements IContactRepository {
   final MatrixContactDataSource _contactDataSource;
+  final SecureStorageDataSource _storageDataSource;
 
-  ContactRepositoryImpl(this._contactDataSource);
+  /// 备注缓存
+  Map<String, String> _remarkCache = {};
+
+  ContactRepositoryImpl(this._contactDataSource, this._storageDataSource);
+
+  /// 加载备注缓存
+  Future<void> _loadRemarkCache() async {
+    _remarkCache = await _storageDataSource.getContactRemarks();
+  }
 
   @override
   Future<List<ContactEntity>> getContacts() async {
+    // 先加载备注缓存
+    await _loadRemarkCache();
+    
     final users = _contactDataSource.getDirectChatContacts();
     return users.map(_mapUserToEntity).toList()
       ..sort((a, b) => a.sortKey.compareTo(b.sortKey));
@@ -185,6 +198,7 @@ class ContactRepositoryImpl implements IContactRepository {
 
   ContactEntity _mapUserToEntity(matrix.User user) {
     final avatarUrl = _contactDataSource.getUserAvatarUrl(user);
+    final remark = _remarkCache[user.id];
 
     return ContactEntity(
       userId: user.id,
@@ -192,11 +206,13 @@ class ContactRepositoryImpl implements IContactRepository {
       avatarUrl: avatarUrl?.toString(),
       // 在线状态需要异步获取，这里默认离线
       presence: PresenceStatus.offline,
+      remark: remark,
     );
   }
 
   ContactEntity _mapProfileToEntity(String userId, matrix.Profile profile) {
     final avatarUrl = _contactDataSource.getProfileAvatarUrl(profile);
+    final remark = _remarkCache[userId];
 
     return ContactEntity(
       userId: userId,
@@ -204,7 +220,35 @@ class ContactRepositoryImpl implements IContactRepository {
       avatarUrl: avatarUrl?.toString(),
       // 在线状态需要异步获取，这里默认离线
       presence: PresenceStatus.offline,
+      remark: remark,
     );
+  }
+
+  @override
+  Future<void> setContactRemark(String userId, String? remark) async {
+    await _storageDataSource.setContactRemark(userId, remark);
+    // 更新缓存
+    if (remark == null || remark.isEmpty) {
+      _remarkCache.remove(userId);
+    } else {
+      _remarkCache[userId] = remark;
+    }
+  }
+
+  @override
+  Future<String?> getContactRemark(String userId) async {
+    // 先检查缓存
+    if (_remarkCache.containsKey(userId)) {
+      return _remarkCache[userId];
+    }
+    // 从存储中读取
+    return await _storageDataSource.getContactRemark(userId);
+  }
+
+  @override
+  Future<Map<String, String>> getContactRemarks() async {
+    await _loadRemarkCache();
+    return Map.from(_remarkCache);
   }
 }
 

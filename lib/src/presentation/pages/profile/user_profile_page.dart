@@ -474,7 +474,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void _setRemark() {
     showDialog<void>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         final controller = TextEditingController(text: _contact?.remark);
         return AlertDialog(
           title: const Text('设置备注'),
@@ -488,15 +488,27 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text('取消'),
             ),
             TextButton(
               onPressed: () {
-                // TODO: 保存备注
-                Navigator.pop(context);
-                ScaffoldMessenger.of(this.context).showSnackBar(
-                  const SnackBar(content: Text('备注功能开发中...')),
+                final remark = controller.text.trim();
+                Navigator.pop(dialogContext);
+                
+                // 保存备注
+                context.read<ContactBloc>().add(SetContactRemark(
+                  widget.userId,
+                  remark.isEmpty ? null : remark,
+                ));
+                
+                // 更新本地状态
+                setState(() {
+                  _contact = _contact?.copyWith(remark: remark.isEmpty ? null : remark);
+                });
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(remark.isEmpty ? '已清除备注' : '备注已保存')),
                 );
               },
               child: const Text('确定'),

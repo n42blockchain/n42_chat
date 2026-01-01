@@ -114,3 +114,14 @@ class OnlineStatusUpdated extends ContactEvent {
   List<Object?> get props => [statusMap];
 }
 
+/// 设置联系人备注
+class SetContactRemark extends ContactEvent {
+  final String userId;
+  final String? remark;
+
+  const SetContactRemark(this.userId, this.remark);
+
+  @override
+  List<Object?> get props => [userId, remark];
+}
+
