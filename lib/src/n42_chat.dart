@@ -33,12 +33,64 @@ class N42Chat {
 
   static bool _initialized = false;
   static N42ChatConfig? _config;
+  static ThemeMode _themeMode = ThemeMode.system;
+  static final List<void Function(ThemeMode)> _themeListeners = [];
 
   /// 获取当前配置
   static N42ChatConfig? get config => _config;
 
   /// 是否已初始化
   static bool get isInitialized => _initialized;
+
+  /// 获取当前主题模式
+  static ThemeMode get themeMode => _themeMode;
+
+  /// 设置主题模式
+  /// 
+  /// 用于与主应用同步主题设置
+  /// 
+  /// [mode] Flutter 的 ThemeMode (system/light/dark)
+  /// 
+  /// ```dart
+  /// // 在主应用中同步主题
+  /// ref.listen(themeModeProvider, (previous, next) {
+  ///   N42Chat.setThemeMode(next);
+  /// });
+  /// ```
+  static void setThemeMode(ThemeMode mode) {
+    if (_themeMode != mode) {
+      _themeMode = mode;
+      // 通知所有监听器
+      for (final listener in _themeListeners) {
+        listener(mode);
+      }
+      debugPrint('N42Chat: Theme mode changed to $mode');
+    }
+  }
+
+  /// 添加主题变化监听器
+  static void addThemeListener(void Function(ThemeMode) listener) {
+    _themeListeners.add(listener);
+  }
+
+  /// 移除主题变化监听器
+  static void removeThemeListener(void Function(ThemeMode) listener) {
+    _themeListeners.remove(listener);
+  }
+
+  /// 判断当前是否为深色模式
+  /// 
+  /// 需要传入 BuildContext 来判断系统主题
+  static bool isDarkMode(BuildContext context) {
+    switch (_themeMode) {
+      case ThemeMode.dark:
+        return true;
+      case ThemeMode.light:
+        return false;
+      case ThemeMode.system:
+        return MediaQuery.of(context).platformBrightness == Brightness.dark;
+    }
+  }
 
   /// 初始化聊天模块
   ///
