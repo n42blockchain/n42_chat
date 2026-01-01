@@ -3,11 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/chat/chat_state.dart';
+import '../../blocs/contact/contact_bloc.dart';
+import '../../blocs/contact/contact_state.dart';
 import '../../blocs/search/search_bloc.dart';
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -173,7 +176,7 @@ class _ChatPageState extends State<ChatPage> {
       titleWidget: Column(
         children: [
           Text(
-            widget.conversation.name,
+            _getDisplayName(),
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w600,
@@ -202,6 +205,34 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ],
     );
+  }
+
+  /// 获取显示名称，私聊优先使用备注名
+  String _getDisplayName() {
+    // 群聊直接返回群名称
+    if (widget.conversation.type == ConversationType.group) {
+      return widget.conversation.name;
+    }
+
+    // 私聊尝试获取备注名
+    try {
+      final contactBloc = context.read<ContactBloc>();
+      final state = contactBloc.state;
+      if (state is ContactLoaded) {
+        // 查找对应的联系人
+        final contact = state.contacts.cast<ContactEntity?>().firstWhere(
+          (c) => c?.directRoomId == widget.conversation.id,
+          orElse: () => null,
+        );
+        if (contact != null && contact.remark != null && contact.remark!.isNotEmpty) {
+          return contact.remark!;
+        }
+      }
+    } catch (e) {
+      // ContactBloc 可能不可用，使用默认名称
+    }
+
+    return widget.conversation.name;
   }
 
   void _toggleSearch() {
@@ -282,6 +313,15 @@ class _ChatPageState extends State<ChatPage> {
               previousMessage,
             );
 
+            // 群聊中判断是否需要显示发送者名称
+            // 如果与上一条消息发送者不同，或者时间间隔较大，则显示名称
+            final isGroupChat = widget.conversation.type == ConversationType.group;
+            final showSenderName = isGroupChat && !message.isFromMe && (
+              previousMessage == null ||
+              previousMessage.senderId != message.senderId ||
+              _shouldShowTimeSeparator(message, previousMessage)
+            );
+
             return Column(
               children: [
                 if (showTimeSeparator)
@@ -293,6 +333,8 @@ class _ChatPageState extends State<ChatPage> {
                   onLongPress: () => _onMessageLongPress(message),
                   onAvatarTap: () => _onAvatarTap(message),
                   onResend: () => _onResend(message),
+                  isGroupChat: isGroupChat,
+                  showSenderName: showSenderName,
                 ),
               ],
             );

@@ -28,6 +28,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     on<RejectFriendRequest>(_onRejectFriendRequest);
     on<ContactsUpdated>(_onContactsUpdated);
     on<OnlineStatusUpdated>(_onOnlineStatusUpdated);
+    on<SetContactRemark>(_onSetContactRemark);
   }
 
   Future<void> _onLoadContacts(
@@ -290,6 +291,23 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
       filteredContacts:
           currentState.searchQuery.isEmpty ? updatedContacts : currentState.filteredContacts,
     ));
+  }
+
+  Future<void> _onSetContactRemark(
+    SetContactRemark event,
+    Emitter<ContactState> emit,
+  ) async {
+    try {
+      await _contactRepository.setContactRemark(event.userId, event.remark);
+      
+      // 发送成功状态
+      emit(ContactRemarkUpdated(userId: event.userId, remark: event.remark));
+      
+      // 刷新联系人列表以更新备注
+      add(const RefreshContacts());
+    } catch (e) {
+      emit(ContactError(e.toString()));
+    }
   }
 
   /// 按首字母分组联系人
