@@ -5,38 +5,50 @@ import '../../../core/theme/app_colors.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
-import 'register_page.dart';
 
-/// 登录页面
+/// 注册页面
 ///
-/// 微信风格的登录界面
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+/// 微信风格的注册界面
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _homeserverController = TextEditingController(text: 'https://m.si46.world');
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   bool _obscurePassword = true;
-  bool _rememberMe = true;
+  bool _obscureConfirmPassword = true;
+  bool _agreeToTerms = false;
 
   @override
   void dispose() {
     _homeserverController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  void _onLogin() {
+  void _onRegister() {
+    if (!_agreeToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('请先阅读并同意服务协议和隐私政策'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
     if (_formKey.currentState?.validate() ?? false) {
-      context.read<AuthBloc>().add(AuthLoginRequested(
+      context.read<AuthBloc>().add(AuthRegisterRequested(
             homeserver: _homeserverController.text.trim(),
             username: _usernameController.text.trim(),
             password: _passwordController.text,
@@ -59,11 +71,11 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: const Text(
-          '登录',
+          '注册',
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 17,
@@ -77,14 +89,14 @@ class _LoginPageState extends State<LoginPage> {
           if (state.hasError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? '登录失败'),
+                content: Text(state.errorMessage ?? '注册失败'),
                 backgroundColor: AppColors.error,
               ),
             );
           }
 
           if (state.isAuthenticated) {
-            // 登录成功，返回上一页或跳转到主页
+            // 注册成功，返回上一页或跳转到主页
             Navigator.of(context).maybePop(true);
           }
         },
@@ -101,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                   // Logo
                   _buildLogo(),
 
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 40),
 
                   // 服务器输入
                   _buildServerInput(state),
@@ -118,23 +130,25 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 16),
 
-                  // 记住登录
-                  _buildRememberMe(),
+                  // 确认密码输入
+                  _buildConfirmPasswordInput(),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
-                  // 登录按钮
-                  _buildLoginButton(state),
+                  // 同意协议
+                  _buildAgreementCheckbox(),
 
                   const SizedBox(height: 24),
 
-                  // 其他选项
-                  _buildOtherOptions(),
+                  // 注册按钮
+                  _buildRegisterButton(state),
 
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 24),
 
-                  // 底部协议
-                  _buildAgreement(),
+                  // 已有账号
+                  _buildLoginLink(),
+
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
@@ -148,30 +162,30 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       children: [
         Container(
-          width: 80,
-          height: 80,
+          width: 72,
+          height: 72,
           decoration: BoxDecoration(
             color: AppColors.primary,
             borderRadius: BorderRadius.circular(16),
           ),
           child: const Icon(
-            Icons.chat_bubble_rounded,
+            Icons.person_add_rounded,
             color: Colors.white,
-            size: 40,
+            size: 36,
           ),
         ),
         const SizedBox(height: 16),
         const Text(
-          'N42 Chat',
+          '创建账号',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 22,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 4),
         const Text(
-          '安全、去中心化的即时通讯',
+          '加入 N42 Chat 开始聊天',
           style: TextStyle(
             fontSize: 14,
             color: AppColors.textSecondary,
@@ -269,7 +283,7 @@ class _LoginPageState extends State<LoginPage> {
         TextFormField(
           controller: _usernameController,
           decoration: InputDecoration(
-            hintText: '请输入用户名',
+            hintText: '请输入用户名（字母、数字、下划线）',
             filled: true,
             fillColor: AppColors.inputBackground,
             border: OutlineInputBorder(
@@ -289,6 +303,12 @@ class _LoginPageState extends State<LoginPage> {
           validator: (value) {
             if (value == null || value.isEmpty) {
               return '请输入用户名';
+            }
+            if (value.length < 3) {
+              return '用户名至少3个字符';
+            }
+            if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+              return '用户名只能包含字母、数字和下划线';
             }
             return null;
           },
@@ -312,7 +332,7 @@ class _LoginPageState extends State<LoginPage> {
         TextFormField(
           controller: _passwordController,
           decoration: InputDecoration(
-            hintText: '请输入密码',
+            hintText: '请输入密码（至少8位）',
             filled: true,
             fillColor: AppColors.inputBackground,
             border: OutlineInputBorder(
@@ -340,11 +360,13 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           obscureText: _obscurePassword,
-          textInputAction: TextInputAction.done,
-          onFieldSubmitted: (_) => _onLogin(),
+          textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return '请输入密码';
+            }
+            if (value.length < 8) {
+              return '密码至少8位';
             }
             return null;
           },
@@ -353,17 +375,77 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildRememberMe() {
+  Widget _buildConfirmPasswordInput() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '确认密码',
+          style: TextStyle(
+            fontSize: 14,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _confirmPasswordController,
+          decoration: InputDecoration(
+            hintText: '请再次输入密码',
+            filled: true,
+            fillColor: AppColors.inputBackground,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
+            prefixIcon: const Icon(
+              Icons.lock_outline,
+              color: AppColors.textSecondary,
+            ),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                color: AppColors.textSecondary,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                });
+              },
+            ),
+          ),
+          obscureText: _obscureConfirmPassword,
+          textInputAction: TextInputAction.done,
+          onFieldSubmitted: (_) => _onRegister(),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return '请再次输入密码';
+            }
+            if (value != _passwordController.text) {
+              return '两次输入的密码不一致';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAgreementCheckbox() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
           width: 24,
           height: 24,
           child: Checkbox(
-            value: _rememberMe,
+            value: _agreeToTerms,
             onChanged: (value) {
               setState(() {
-                _rememberMe = value ?? true;
+                _agreeToTerms = value ?? false;
               });
             },
             activeColor: AppColors.primary,
@@ -373,17 +455,36 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         const SizedBox(width: 8),
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              _rememberMe = !_rememberMe;
-            });
-          },
-          child: const Text(
-            '记住登录状态',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                _agreeToTerms = !_agreeToTerms;
+              });
+            },
+            child: Text.rich(
+              TextSpan(
+                text: '我已阅读并同意',
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
+                children: [
+                  TextSpan(
+                    text: '《服务协议》',
+                    style: TextStyle(
+                      color: AppColors.textLink,
+                    ),
+                  ),
+                  const TextSpan(text: '和'),
+                  TextSpan(
+                    text: '《隐私政策》',
+                    style: TextStyle(
+                      color: AppColors.textLink,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -391,13 +492,13 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLoginButton(AuthState state) {
-    final isEnabled = !state.isLoading;
+  Widget _buildRegisterButton(AuthState state) {
+    final isEnabled = !state.isLoading && _agreeToTerms;
 
     return SizedBox(
       height: 48,
       child: ElevatedButton(
-        onPressed: isEnabled ? _onLogin : null,
+        onPressed: isEnabled ? _onRegister : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
@@ -416,7 +517,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               )
             : const Text(
-                '登录',
+                '注册',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
@@ -427,79 +528,31 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildOtherOptions() {
+  Widget _buildLoginLink() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => BlocProvider.value(
-                  value: context.read<AuthBloc>(),
-                  child: const RegisterPage(),
-                ),
-              ),
-            );
-          },
-          child: const Text(
-            '注册账号',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textLink,
-            ),
-          ),
-        ),
         const Text(
-          '|',
+          '已有账号？',
           style: TextStyle(
-            color: AppColors.textTertiary,
+            fontSize: 14,
+            color: AppColors.textSecondary,
           ),
         ),
         TextButton(
           onPressed: () {
-            // TODO: 忘记密码
+            Navigator.of(context).pop();
           },
           child: const Text(
-            '忘记密码',
+            '立即登录',
             style: TextStyle(
               fontSize: 14,
               color: AppColors.textLink,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildAgreement() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Text.rich(
-        TextSpan(
-          text: '登录即表示同意',
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.textTertiary,
-          ),
-          children: [
-            TextSpan(
-              text: '《服务协议》',
-              style: TextStyle(
-                color: AppColors.textLink.withValues(alpha: 0.8),
-              ),
-            ),
-            const TextSpan(text: '和'),
-            TextSpan(
-              text: '《隐私政策》',
-              style: TextStyle(
-                color: AppColors.textLink.withValues(alpha: 0.8),
-              ),
-            ),
-          ],
-        ),
-        textAlign: TextAlign.center,
-      ),
     );
   }
 }

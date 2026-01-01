@@ -132,7 +132,7 @@ class N42ChatConfig {
   final String? databaseName;
 
   const N42ChatConfig({
-    this.defaultHomeserver = 'https://matrix.org',
+    this.defaultHomeserver = 'https://m.si46.world',
     this.enableEncryption = true,
     this.enablePushNotifications = true,
     this.syncTimeout = const Duration(seconds: 30),
