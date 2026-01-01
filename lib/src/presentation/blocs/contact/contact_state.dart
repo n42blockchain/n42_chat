@@ -124,3 +124,17 @@ class ChatStarted extends ContactState {
   List<Object?> get props => [roomId, userId];
 }
 
+/// 备注设置成功
+class ContactRemarkUpdated extends ContactState {
+  final String userId;
+  final String? remark;
+
+  const ContactRemarkUpdated({
+    required this.userId,
+    this.remark,
+  });
+
+  @override
+  List<Object?> get props => [userId, remark];
+}
+
