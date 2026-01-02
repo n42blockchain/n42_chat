@@ -78,7 +78,7 @@ class ChatMorePanel extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 220,
+          height: 200, // 减小高度避免溢出
           child: PageView(
             children: [
               // 第一页
