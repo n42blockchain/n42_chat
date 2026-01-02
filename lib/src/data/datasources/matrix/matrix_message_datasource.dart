@@ -98,17 +98,43 @@ class MatrixMessageDataSource {
     required String filename,
     String? mimeType,
   }) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) return null;
+    try {
+      final room = _client?.getRoomById(roomId);
+      if (room == null) {
+        debugPrint('Room not found: $roomId');
+        return null;
+      }
 
-    // 上传图片
-    final matrixFile = matrix.MatrixImageFile(
-      bytes: imageBytes,
-      name: filename,
-      mimeType: mimeType ?? 'image/jpeg',
-    );
+      // 确定正确的 MIME 类型
+      String actualMimeType = mimeType ?? 'image/jpeg';
+      final lowerFilename = filename.toLowerCase();
+      if (lowerFilename.endsWith('.png')) {
+        actualMimeType = 'image/png';
+      } else if (lowerFilename.endsWith('.gif')) {
+        actualMimeType = 'image/gif';
+      } else if (lowerFilename.endsWith('.webp')) {
+        actualMimeType = 'image/webp';
+      } else if (lowerFilename.endsWith('.heic') || lowerFilename.endsWith('.heif')) {
+        actualMimeType = 'image/jpeg';
+      }
 
-    return await room.sendFileEvent(matrixFile);
+      debugPrint('Sending image: $filename, size: ${imageBytes.length}, mimeType: $actualMimeType');
+
+      // 上传图片
+      final matrixFile = matrix.MatrixImageFile(
+        bytes: imageBytes,
+        name: filename,
+        mimeType: actualMimeType,
+      );
+
+      final result = await room.sendFileEvent(matrixFile);
+      debugPrint('Image sent: $result');
+      return result;
+    } catch (e, stackTrace) {
+      debugPrint('Send image error: $e');
+      debugPrint('Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   /// 发送语音消息
