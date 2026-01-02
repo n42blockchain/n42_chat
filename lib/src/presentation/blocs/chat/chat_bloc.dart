@@ -38,6 +38,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendTypingNotification>(_onSendTypingNotification);
     on<MessagesUpdated>(_onMessagesUpdated);
     on<DisposeChat>(_onDisposeChat);
+    on<SendSystemNotice>(_onSendSystemNotice);
+    on<SendPokeMessage>(_onSendPokeMessage);
   }
 
   @override
@@ -420,6 +422,60 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _messagesSubscription = null;
     _currentRoomId = null;
     emit(ChatState.initial());
+  }
+  
+  /// 发送系统通知/拍一拍消息
+  Future<void> _onSendSystemNotice(
+    SendSystemNotice event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+    
+    try {
+      await _messageRepository.sendNoticeMessage(
+        roomId: _currentRoomId!,
+        notice: event.notice,
+      );
+      debugPrint('ChatBloc: System notice sent: ${event.notice}');
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to send system notice: $e');
+    }
+  }
+  
+  /// 发送拍一拍消息
+  Future<void> _onSendPokeMessage(
+    SendPokeMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+    
+    try {
+      // 微信拍一拍逻辑：统一使用"拍人者"设置的后缀
+      // 例如：拍人者设置后缀"的头"，则无论拍谁都显示"XXX 拍了拍 YYY 的头"
+      String? pokeText = event.pokerPokeText;
+      
+      debugPrint('ChatBloc: Using poker\'s pokeText: $pokeText');
+      
+      // 构造拍一拍消息
+      String pokeMessage;
+      if (pokeText != null && pokeText.isNotEmpty) {
+        pokeMessage = '「${event.pokerName}」拍了拍「${event.targetName}」$pokeText';
+      } else {
+        pokeMessage = '「${event.pokerName}」拍了拍「${event.targetName}」';
+      }
+      
+      debugPrint('ChatBloc: Sending poke message: $pokeMessage');
+      
+      // 发送系统消息
+      await _messageRepository.sendNoticeMessage(
+        roomId: _currentRoomId!,
+        notice: pokeMessage,
+      );
+      
+      debugPrint('ChatBloc: Poke message sent successfully');
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to send poke message: $e');
+    }
   }
 }
 

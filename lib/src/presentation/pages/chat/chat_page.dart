@@ -16,6 +16,9 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/repositories/group_repository.dart';
+import '../../../domain/repositories/message_action_repository.dart';
+import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/chat/chat_state.dart';
@@ -159,6 +162,93 @@ class _ChatPageState extends State<ChatPage> {
   void _onAvatarTap(MessageEntity message) {
     // 点击头像查看用户资料
     // TODO: 跳转到用户资料页
+  }
+  
+  /// 双击头像拍一拍
+  void _onAvatarDoubleTap(MessageEntity message) {
+    try {
+      String myDisplayName = '我';
+      String? myPokeText;
+      String? myUserId;
+      
+      try {
+        final authBloc = context.read<AuthBloc>();
+        final currentUser = authBloc.state.user;
+        myDisplayName = currentUser?.displayName ?? '我';
+        myPokeText = currentUser?.pokeText;
+        myUserId = currentUser?.userId;
+      } catch (e) {
+        // AuthBloc 不可用，使用默认名称
+        debugPrint('AuthBloc not available: $e');
+      }
+      
+      // 获取被拍用户的显示名和拍一拍后缀
+      final targetName = message.senderName;
+      final targetUserId = message.senderId;
+      
+      // 微信风格的拍一拍效果
+      // 1. 触发震动反馈
+      HapticFeedback.mediumImpact();
+      
+      // 2. 发送拍一拍系统消息
+      // 始终传递自己的 pokeText，让 ChatBloc 决定使用哪个
+      // （优先使用被拍人在房间状态中的 pokeText，如果没有则使用拍人者的）
+      _sendPokeMessage(
+        pokerName: myDisplayName,
+        targetName: targetName,
+        targetUserId: targetUserId,
+        pokeText: myPokeText, // 始终传递自己的 pokeText 作为备用
+      );
+      
+      // 3. 显示头像震动效果
+      _showPokeAnimation(message, myPokeText: myPokeText);
+    } catch (e) {
+      debugPrint('Poke error: $e');
+    }
+  }
+  
+  /// 发送拍一拍消息
+  void _sendPokeMessage({
+    required String pokerName,
+    required String targetName,
+    required String targetUserId,
+    String? pokeText,
+  }) {
+    debugPrint('Sending poke message: pokerName=$pokerName, targetName=$targetName, pokeText=$pokeText');
+    
+    // 使用新的 SendPokeMessage 事件，让 ChatBloc 处理 pokeText 的获取
+    context.read<ChatBloc>().add(SendPokeMessage(
+      pokerName: pokerName,
+      targetUserId: targetUserId,
+      targetName: targetName,
+      pokerPokeText: pokeText,
+    ));
+  }
+  
+  /// 显示拍一拍动画效果
+  void _showPokeAnimation(MessageEntity message, {String? myPokeText}) {
+    // 显示一个简短的提示（使用自己设置的后缀）
+    final displayText = myPokeText != null && myPokeText.isNotEmpty
+        ? '拍了拍「${message.senderName}」$myPokeText'
+        : '拍了拍「${message.senderName}」';
+    
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.touch_app, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Flexible(child: Text(displayText)),
+          ],
+        ),
+        duration: const Duration(milliseconds: 1500),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.black87,
+        margin: const EdgeInsets.only(bottom: 80, left: 20, right: 20),
+      ),
+    );
   }
 
   void _onResend(MessageEntity message) {
@@ -729,7 +819,179 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  /// 显示位置选项菜单（微信风格）
   Future<void> _sendLocation() async {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 发送位置
+              ListTile(
+                leading: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.location_on,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
+                ),
+                title: const Text(
+                  '发送位置',
+                  style: TextStyle(fontSize: 16),
+                ),
+                subtitle: const Text(
+                  '选择地点并发送给对方',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _openLocationPicker();
+                },
+              ),
+              const Divider(height: 1),
+              // 共享实时位置
+              ListTile(
+                leading: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.share_location,
+                    color: Colors.green,
+                    size: 24,
+                  ),
+                ),
+                title: const Text(
+                  '共享实时位置',
+                  style: TextStyle(fontSize: 16),
+                ),
+                subtitle: const Text(
+                  '与好友共享1小时实时位置',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _shareRealTimeLocation();
+                },
+              ),
+              const SizedBox(height: 8),
+              // 取消按钮
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.grey[100],
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    '取消',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  /// 打开位置选择页面
+  Future<void> _openLocationPicker() async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const _LocationPickerPage(),
+      ),
+    );
+    
+    if (result != null && mounted) {
+      final latitude = result['latitude'] as double;
+      final longitude = result['longitude'] as double;
+      final address = result['address'] as String? ?? '我的位置';
+      final name = result['name'] as String?;
+      
+      // 发送位置消息
+      context.read<ChatBloc>().add(SendLocationMessage(
+        latitude: latitude,
+        longitude: longitude,
+        description: name ?? address,
+      ));
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('位置发送成功'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+  
+  /// 共享实时位置
+  Future<void> _shareRealTimeLocation() async {
+    // 检查位置服务和权限
+    if (!await _checkLocationPermission()) return;
+    
+    // 显示共享确认对话框
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('共享实时位置'),
+        content: const Text(
+          '开始共享后，对方将能看到你的实时位置，共享时长为1小时。',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('开始共享'),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirmed == true && mounted) {
+      // TODO: 实现实时位置共享功能
+      // 需要建立 WebSocket 连接，持续发送位置更新
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('实时位置共享功能开发中...'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+  
+  /// 检查位置权限
+  Future<bool> _checkLocationPermission() async {
     try {
       // 检查位置服务是否启用
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -739,7 +1001,7 @@ class _ChatPageState extends State<ChatPage> {
             context: context,
             builder: (context) => AlertDialog(
               title: const Text('位置服务未开启'),
-              content: const Text('请开启位置服务以发送位置'),
+              content: const Text('请开启位置服务以使用位置功能'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
@@ -756,7 +1018,7 @@ class _ChatPageState extends State<ChatPage> {
             await Geolocator.openLocationSettings();
           }
         }
-        return;
+        return false;
       }
       
       // 检查权限
@@ -767,12 +1029,12 @@ class _ChatPageState extends State<ChatPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('需要位置权限才能发送位置'),
+                content: Text('需要位置权限才能使用此功能'),
                 backgroundColor: AppColors.error,
               ),
             );
           }
-          return;
+          return false;
         }
       }
       
@@ -785,70 +1047,13 @@ class _ChatPageState extends State<ChatPage> {
             ),
           );
         }
-        return;
+        return false;
       }
       
-      // 显示加载提示
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Row(
-              children: [
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                SizedBox(width: 16),
-                Text('正在获取位置...'),
-              ],
-            ),
-            duration: Duration(seconds: 10),
-          ),
-        );
-      }
-      
-      // 获取当前位置
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 15),
-        ),
-      );
-      
-      // 隐藏加载提示
-      if (mounted) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      }
-      
-      debugPrint('Location: ${position.latitude}, ${position.longitude}');
-      
-      // 发送位置消息
-      context.read<ChatBloc>().add(SendLocationMessage(
-        latitude: position.latitude,
-        longitude: position.longitude,
-        description: '我的位置',
-      ));
-      
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('位置发送成功'),
-            duration: Duration(seconds: 1),
-          ),
-        );
-      }
+      return true;
     } catch (e) {
-      debugPrint('Send location error: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('获取位置失败: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
+      debugPrint('Check location permission error: $e');
+      return false;
     }
   }
 
@@ -951,10 +1156,41 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  void _sendContactCard() {
-    // TODO: 实现发送名片功能
+  /// 发送名片
+  Future<void> _sendContactCard() async {
     debugPrint('Send contact card');
-    _showFeatureToast('名片功能');
+    
+    // 显示联系人选择对话框
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _ContactCardSelectSheet(
+        isDark: Theme.of(context).brightness == Brightness.dark,
+      ),
+    );
+    
+    if (result != null && mounted) {
+      final contactId = result['id'] as String;
+      final contactName = result['name'] as String;
+      final contactAvatar = result['avatar'] as String?;
+      
+      // 发送名片消息（作为自定义消息类型）
+      // 名片消息格式：[名片] 联系人名称
+      final cardContent = '''[名片]
+联系人：$contactName
+ID：$contactId''';
+      
+      // 使用文本消息发送名片信息（后续可改为专门的名片消息类型）
+      context.read<ChatBloc>().add(SendTextMessage(cardContent));
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('已发送 $contactName 的名片'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    }
   }
 
   Future<void> _startVideoCall() async {
@@ -1015,10 +1251,82 @@ class _ChatPageState extends State<ChatPage> {
     _showFeatureToast('收藏');
   }
 
-  void _shareMusic() {
-    // TODO: 实现分享音乐功能
+  /// 分享音乐
+  Future<void> _shareMusic() async {
     debugPrint('Share music');
-    _showFeatureToast('音乐分享');
+    
+    // 显示音乐选择对话框
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _MusicSelectSheet(
+        isDark: Theme.of(context).brightness == Brightness.dark,
+      ),
+    );
+    
+    if (result != null && mounted) {
+      final songName = result['name'] as String;
+      final artist = result['artist'] as String;
+      final url = result['url'] as String?;
+      final isLocal = result['isLocal'] == true;
+      final isNetwork = result['isNetwork'] == true;
+      
+      if (isLocal && url != null && url.isNotEmpty) {
+        // 本地音频文件 - 作为文件发送
+        try {
+          final file = File(url);
+          if (await file.exists()) {
+            final bytes = await file.readAsBytes();
+            final mimeType = lookupMimeType(url) ?? 'audio/mpeg';
+            final filename = url.split('/').last.split('\\').last;
+            
+            context.read<ChatBloc>().add(SendFileMessage(
+              bytes: bytes,
+              filename: filename,
+              mimeType: mimeType,
+            ));
+            
+            // 同时发送文本说明
+            final musicContent = '🎵 分享本地音乐\n歌曲：$songName\n歌手：$artist';
+            context.read<ChatBloc>().add(SendTextMessage(musicContent));
+            
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('已分享 $songName'),
+                duration: const Duration(seconds: 1),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('文件不存在'), backgroundColor: Colors.red),
+            );
+          }
+        } catch (e) {
+          debugPrint('Error sending local music: $e');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('发送失败: $e'), backgroundColor: Colors.red),
+          );
+        }
+      } else {
+        // 网络链接或推荐歌曲 - 发送文本消息
+        String musicContent;
+        if (isNetwork) {
+          musicContent = '🎵 分享音乐\n歌曲：$songName\n歌手：$artist\n🔗 $url';
+        } else {
+          musicContent = '🎵 分享音乐\n歌曲：$songName\n歌手：$artist${url != null ? '\n🔗 $url' : ''}';
+        }
+        
+        context.read<ChatBloc>().add(SendTextMessage(musicContent));
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('已分享 $songName'),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+    }
   }
 
   void _selectCoupon() {
@@ -1327,6 +1635,7 @@ class _ChatPageState extends State<ChatPage> {
                           onTap: () => _onMessageTap(message),
                           onLongPress: () => _showWeChatMessageMenu(message, messageKey),
                           onAvatarTap: () => _onAvatarTap(message),
+                          onAvatarDoubleTap: () => _onAvatarDoubleTap(message),
                           onResend: () => _onResend(message),
                           isGroupChat: isGroupChat,
                           showSenderName: showSenderName,
@@ -1884,20 +2193,42 @@ class _ChatPageState extends State<ChatPage> {
   }
   
   /// 执行转发
-  void _doForwardMessage(MessageEntity message, String targetRoomId) {
-    // 根据消息类型转发
-    switch (message.type) {
-      case MessageType.text:
-        // 发送文本到目标房间
-        // 注意：这里需要创建一个新的 ChatBloc 或直接调用 repository
+  Future<void> _doForwardMessage(MessageEntity message, String targetRoomId) async {
+    try {
+      // 使用 MessageActionRepository 执行转发
+      final repository = getIt<IMessageActionRepository>();
+      final result = await repository.forwardMessage(
+        widget.conversation.id, // 源房间ID
+        message.id, // 事件ID
+        targetRoomId, // 目标房间ID
+      );
+      
+      if (result != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('消息已转发'), duration: Duration(seconds: 1)),
+          const SnackBar(
+            content: Text('消息已转发'),
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.green,
+          ),
         );
-        break;
-      default:
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('消息已转发'), duration: Duration(seconds: 1)),
+          const SnackBar(
+            content: Text('转发失败'),
+            duration: Duration(seconds: 2),
+            backgroundColor: Colors.red,
+          ),
         );
+      }
+    } catch (e) {
+      debugPrint('Forward message error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('转发失败: $e'),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
   
@@ -2126,18 +2457,45 @@ class _ChatPageState extends State<ChatPage> {
       return;
     }
     
-    // 在输入框中添加 @
+    // 显示群成员选择器
+    _showMemberPicker(message);
+  }
+  
+  /// 显示群成员选择器（@某人）
+  Future<void> _showMemberPicker(MessageEntity message) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => _MemberPickerSheet(
+        roomId: widget.conversation.id,
+        isDark: isDark,
+        onMemberSelected: (memberName, memberId) {
+          Navigator.pop(ctx);
+          _insertMention(memberName, memberId);
+        },
+      ),
+    );
+  }
+  
+  /// 插入@提及
+  void _insertMention(String memberName, String memberId) {
     final currentText = _inputController.text;
     final cursorPos = _inputController.selection.baseOffset;
+    
+    // 微信风格：@用户名 后面有空格
+    final mention = '@$memberName ';
     
     String newText;
     int newCursorPos;
     
     if (cursorPos >= 0) {
-      newText = '${currentText.substring(0, cursorPos)}@${currentText.substring(cursorPos)}';
-      newCursorPos = cursorPos + 1;
+      newText = '${currentText.substring(0, cursorPos)}$mention${currentText.substring(cursorPos)}';
+      newCursorPos = cursorPos + mention.length;
     } else {
-      newText = '$currentText@';
+      newText = '$currentText$mention';
       newCursorPos = newText.length;
     }
     
@@ -2146,14 +2504,6 @@ class _ChatPageState extends State<ChatPage> {
       TextPosition(offset: newCursorPos),
     );
     _inputFocusNode.requestFocus();
-    
-    // TODO: 显示群成员选择器
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('请输入要@的人的名字'),
-        duration: Duration(seconds: 1),
-      ),
-    );
   }
   
   /// 搜一搜
@@ -3019,5 +3369,1249 @@ class _ChatItem {
     this.avatar,
     required this.isGroup,
   });
+}
+
+/// 位置选择页面（微信风格）
+class _LocationPickerPage extends StatefulWidget {
+  const _LocationPickerPage();
+
+  @override
+  State<_LocationPickerPage> createState() => _LocationPickerPageState();
+}
+
+class _LocationPickerPageState extends State<_LocationPickerPage> {
+  Position? _currentPosition;
+  String _currentAddress = '正在获取位置...';
+  bool _isLoading = true;
+  String? _errorMessage;
+  
+  // 附近地点列表
+  List<_NearbyPlace> _nearbyPlaces = [];
+  int _selectedPlaceIndex = 0;
+  
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+  
+  Future<void> _getCurrentLocation() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+      
+      // 检查位置服务
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = '位置服务未开启';
+        });
+        return;
+      }
+      
+      // 检查权限
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          setState(() {
+            _isLoading = false;
+            _errorMessage = '位置权限被拒绝';
+          });
+          return;
+        }
+      }
+      
+      if (permission == LocationPermission.deniedForever) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = '位置权限已被永久拒绝';
+        });
+        return;
+      }
+      
+      // 获取当前位置
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+      
+      setState(() {
+        _currentPosition = position;
+      });
+      
+      // 获取地址
+      await _getAddressFromPosition(position);
+      
+      // 生成附近地点
+      _generateNearbyPlaces(position);
+      
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = '获取位置失败: $e';
+      });
+    }
+  }
+  
+  Future<void> _getAddressFromPosition(Position position) async {
+    try {
+      // 使用简单的坐标显示，因为 geocoding 可能需要 API key
+      setState(() {
+        _currentAddress = '${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}';
+      });
+      
+      // 尝试使用 geocoding 获取地址
+      // 注意：这可能需要配置 API key
+      // final placemarks = await placemarkFromCoordinates(
+      //   position.latitude,
+      //   position.longitude,
+      // );
+      // if (placemarks.isNotEmpty) {
+      //   final place = placemarks.first;
+      //   _currentAddress = '${place.locality ?? ''} ${place.street ?? ''}';
+      // }
+    } catch (e) {
+      debugPrint('Get address error: $e');
+    }
+  }
+  
+  void _generateNearbyPlaces(Position position) {
+    // 生成模拟的附近地点
+    // 实际应用中应该使用地图 API 获取真实的 POI 数据
+    _nearbyPlaces = [
+      _NearbyPlace(
+        name: '我的位置',
+        address: _currentAddress,
+        latitude: position.latitude,
+        longitude: position.longitude,
+        icon: Icons.my_location,
+        iconColor: AppColors.primary,
+      ),
+      _NearbyPlace(
+        name: '当前位置',
+        address: '${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}',
+        latitude: position.latitude,
+        longitude: position.longitude,
+        icon: Icons.location_on,
+        iconColor: Colors.red,
+      ),
+      // 模拟附近地点（实际应从地图 API 获取）
+      _NearbyPlace(
+        name: '附近地点 1',
+        address: '约 100m',
+        latitude: position.latitude + 0.001,
+        longitude: position.longitude + 0.001,
+        icon: Icons.place,
+        iconColor: Colors.orange,
+      ),
+      _NearbyPlace(
+        name: '附近地点 2',
+        address: '约 200m',
+        latitude: position.latitude - 0.001,
+        longitude: position.longitude + 0.002,
+        icon: Icons.place,
+        iconColor: Colors.orange,
+      ),
+      _NearbyPlace(
+        name: '附近地点 3',
+        address: '约 500m',
+        latitude: position.latitude + 0.002,
+        longitude: position.longitude - 0.002,
+        icon: Icons.place,
+        iconColor: Colors.orange,
+      ),
+    ];
+  }
+  
+  void _confirmLocation() {
+    if (_currentPosition == null) return;
+    
+    final selectedPlace = _nearbyPlaces.isNotEmpty 
+        ? _nearbyPlaces[_selectedPlaceIndex]
+        : null;
+    
+    Navigator.pop(context, {
+      'latitude': selectedPlace?.latitude ?? _currentPosition!.latitude,
+      'longitude': selectedPlace?.longitude ?? _currentPosition!.longitude,
+      'address': _currentAddress,
+      'name': selectedPlace?.name ?? '我的位置',
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+      appBar: AppBar(
+        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.close,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          '位置',
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: _currentPosition != null ? _confirmLocation : null,
+            child: Text(
+              '发送',
+              style: TextStyle(
+                color: _currentPosition != null 
+                    ? AppColors.primary 
+                    : Colors.grey,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: _isLoading
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('正在获取位置...'),
+                ],
+              ),
+            )
+          : _errorMessage != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.location_off,
+                        size: 64,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _errorMessage!,
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: _getCurrentLocation,
+                        child: const Text('重试'),
+                      ),
+                    ],
+                  ),
+                )
+              : Column(
+                  children: [
+                    // 地图预览区域
+                    Container(
+                      height: 200,
+                      width: double.infinity,
+                      color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF2F2F7),
+                      child: Stack(
+                        children: [
+                          // 地图占位符
+                          Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.map,
+                                  size: 48,
+                                  color: isDark ? Colors.white38 : Colors.black26,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '地图预览',
+                                  style: TextStyle(
+                                    color: isDark ? Colors.white38 : Colors.black26,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _currentAddress,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? Colors.white54 : Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // 中心标记
+                          const Center(
+                            child: Icon(
+                              Icons.location_on,
+                              color: Colors.red,
+                              size: 40,
+                            ),
+                          ),
+                          // 重新定位按钮
+                          Positioned(
+                            right: 16,
+                            bottom: 16,
+                            child: FloatingActionButton.small(
+                              onPressed: _getCurrentLocation,
+                              backgroundColor: Colors.white,
+                              child: const Icon(
+                                Icons.my_location,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // 搜索框
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: '搜索地点',
+                          prefixIcon: const Icon(Icons.search),
+                          filled: true,
+                          fillColor: isDark 
+                              ? const Color(0xFF3A3A3C) 
+                              : const Color(0xFFF2F2F7),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                        onChanged: (value) {
+                          // TODO: 实现地点搜索
+                        },
+                      ),
+                    ),
+                    // 附近地点列表
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _nearbyPlaces.length,
+                        itemBuilder: (context, index) {
+                          final place = _nearbyPlaces[index];
+                          final isSelected = index == _selectedPlaceIndex;
+                          
+                          return ListTile(
+                            leading: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: place.iconColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                place.icon,
+                                color: place.iconColor,
+                                size: 22,
+                              ),
+                            ),
+                            title: Text(
+                              place.name,
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontWeight: isSelected 
+                                    ? FontWeight.w600 
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                            subtitle: Text(
+                              place.address,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark ? Colors.white54 : Colors.black54,
+                              ),
+                            ),
+                            trailing: isSelected
+                                ? const Icon(
+                                    Icons.check_circle,
+                                    color: AppColors.primary,
+                                  )
+                                : null,
+                            onTap: () {
+                              setState(() {
+                                _selectedPlaceIndex = index;
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+    );
+  }
+}
+
+/// 附近地点数据类
+class _NearbyPlace {
+  final String name;
+  final String address;
+  final double latitude;
+  final double longitude;
+  final IconData icon;
+  final Color iconColor;
+  
+  _NearbyPlace({
+    required this.name,
+    required this.address,
+    required this.latitude,
+    required this.longitude,
+    required this.icon,
+    required this.iconColor,
+  });
+}
+
+/// 联系人名片选择底部弹窗
+class _ContactCardSelectSheet extends StatefulWidget {
+  final bool isDark;
+  
+  const _ContactCardSelectSheet({required this.isDark});
+  
+  @override
+  State<_ContactCardSelectSheet> createState() => _ContactCardSelectSheetState();
+}
+
+class _ContactCardSelectSheetState extends State<_ContactCardSelectSheet> {
+  String _searchQuery = '';
+  
+  // 模拟联系人列表（实际应用中应从 ContactBloc 获取）
+  final List<Map<String, dynamic>> _contacts = [
+    {'id': '@user1:matrix.org', 'name': '张三', 'avatar': null},
+    {'id': '@user2:matrix.org', 'name': '李四', 'avatar': null},
+    {'id': '@user3:matrix.org', 'name': '王五', 'avatar': null},
+    {'id': '@user4:matrix.org', 'name': '赵六', 'avatar': null},
+    {'id': '@user5:matrix.org', 'name': '小明', 'avatar': null},
+    {'id': '@user6:matrix.org', 'name': '小红', 'avatar': null},
+  ];
+  
+  List<Map<String, dynamic>> get _filteredContacts {
+    if (_searchQuery.isEmpty) return _contacts;
+    return _contacts.where((c) => 
+      (c['name'] as String).toLowerCase().contains(_searchQuery.toLowerCase())
+    ).toList();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.7,
+      decoration: BoxDecoration(
+        color: widget.isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: Column(
+        children: [
+          // 顶部标题栏
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: widget.isDark ? Colors.white12 : Colors.black12,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  '选择联系人',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: widget.isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: widget.isDark ? Colors.white : Colors.black,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ),
+          // 搜索框
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: '搜索联系人',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: widget.isDark 
+                    ? const Color(0xFF3A3A3C) 
+                    : const Color(0xFFF2F2F7),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+          ),
+          // 联系人列表
+          Expanded(
+            child: _filteredContacts.isEmpty
+                ? Center(
+                    child: Text(
+                      '没有找到联系人',
+                      style: TextStyle(
+                        color: widget.isDark ? Colors.white54 : Colors.black54,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: _filteredContacts.length,
+                    itemBuilder: (context, index) {
+                      final contact = _filteredContacts[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: AppColors.primary,
+                          child: Text(
+                            (contact['name'] as String)[0],
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        title: Text(
+                          contact['name'] as String,
+                          style: TextStyle(
+                            color: widget.isDark ? Colors.white : Colors.black,
+                          ),
+                        ),
+                        subtitle: Text(
+                          contact['id'] as String,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: widget.isDark ? Colors.white54 : Colors.black54,
+                          ),
+                        ),
+                        onTap: () => Navigator.pop(context, contact),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 音乐选择底部弹窗
+class _MusicSelectSheet extends StatefulWidget {
+  final bool isDark;
+  
+  const _MusicSelectSheet({required this.isDark});
+  
+  @override
+  State<_MusicSelectSheet> createState() => _MusicSelectSheetState();
+}
+
+class _MusicSelectSheetState extends State<_MusicSelectSheet> {
+  String _searchQuery = '';
+  int _selectedTab = 0; // 0: 最近播放, 1: 我喜欢, 2: 网络链接, 3: 本地文件
+  
+  final TextEditingController _linkController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _artistController = TextEditingController();
+  
+  // 模拟音乐列表
+  final List<Map<String, dynamic>> _recentSongs = [
+    {'name': '晴天', 'artist': '周杰伦', 'url': 'https://music.163.com/#/song?id=186016'},
+    {'name': '稻香', 'artist': '周杰伦', 'url': 'https://music.163.com/#/song?id=185813'},
+    {'name': '青花瓷', 'artist': '周杰伦', 'url': 'https://music.163.com/#/song?id=185805'},
+    {'name': '七里香', 'artist': '周杰伦', 'url': 'https://music.163.com/#/song?id=186001'},
+    {'name': '告白气球', 'artist': '周杰伦', 'url': 'https://music.163.com/#/song?id=418603077'},
+  ];
+  
+  final List<Map<String, dynamic>> _favoriteSongs = [
+    {'name': '起风了', 'artist': '买辣椒也用券', 'url': 'https://music.163.com/#/song?id=1330348068'},
+    {'name': '年少有为', 'artist': '李荣浩', 'url': 'https://music.163.com/#/song?id=1293886117'},
+    {'name': '光年之外', 'artist': 'G.E.M.邓紫棋', 'url': 'https://music.163.com/#/song?id=449818741'},
+  ];
+  
+  List<Map<String, dynamic>> get _currentSongs {
+    final songs = _selectedTab == 0 ? _recentSongs : _favoriteSongs;
+    if (_searchQuery.isEmpty) return songs;
+    return songs.where((s) => 
+      (s['name'] as String).toLowerCase().contains(_searchQuery.toLowerCase()) ||
+      (s['artist'] as String).toLowerCase().contains(_searchQuery.toLowerCase())
+    ).toList();
+  }
+  
+  @override
+  void dispose() {
+    _linkController.dispose();
+    _titleController.dispose();
+    _artistController.dispose();
+    super.dispose();
+  }
+  
+  /// 选择本地音频文件
+  Future<void> _pickLocalAudio() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.audio,
+        allowMultiple: false,
+      );
+      
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.first;
+        final fileName = file.name;
+        // 从文件名中提取歌曲名和歌手（假设格式为 "歌手 - 歌曲名.mp3"）
+        String songName = fileName;
+        String artist = '未知歌手';
+        
+        // 去掉扩展名
+        if (fileName.contains('.')) {
+          songName = fileName.substring(0, fileName.lastIndexOf('.'));
+        }
+        
+        // 尝试分离歌手和歌曲名
+        if (songName.contains(' - ')) {
+          final parts = songName.split(' - ');
+          artist = parts[0].trim();
+          songName = parts[1].trim();
+        }
+        
+        // 返回结果，包含文件路径
+        Navigator.pop(context, {
+          'name': songName,
+          'artist': artist,
+          'url': file.path ?? '',
+          'isLocal': true,
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking audio file: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('选择文件失败: $e')),
+      );
+    }
+  }
+  
+  /// 分享网络链接
+  void _shareNetworkLink() {
+    final link = _linkController.text.trim();
+    final title = _titleController.text.trim();
+    final artist = _artistController.text.trim();
+    
+    if (link.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请输入音乐链接')),
+      );
+      return;
+    }
+    
+    // 验证链接格式
+    if (!link.startsWith('http://') && !link.startsWith('https://')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请输入有效的网络链接')),
+      );
+      return;
+    }
+    
+    Navigator.pop(context, {
+      'name': title.isNotEmpty ? title : '分享歌曲',
+      'artist': artist.isNotEmpty ? artist : '未知歌手',
+      'url': link,
+      'isNetwork': true,
+    });
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.75,
+      decoration: BoxDecoration(
+        color: widget.isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: Column(
+        children: [
+          // 顶部标题栏
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: widget.isDark ? Colors.white12 : Colors.black12,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  '分享音乐',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: widget.isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: widget.isDark ? Colors.white : Colors.black,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ),
+          // Tab 切换
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildTab(0, '最近播放', Icons.history),
+                _buildTab(1, '我喜欢', Icons.favorite),
+                _buildTab(2, '网络链接', Icons.link),
+                _buildTab(3, '本地文件', Icons.folder),
+              ],
+            ),
+          ),
+          // 内容区域
+          Expanded(
+            child: _buildContent(),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildTab(int index, String label, IconData icon) {
+    final isSelected = _selectedTab == index;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedTab = index),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: isSelected ? AppColors.primary : Colors.transparent,
+              width: 2,
+            ),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected 
+                  ? AppColors.primary 
+                  : (widget.isDark ? Colors.white54 : Colors.black54),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected 
+                    ? AppColors.primary 
+                    : (widget.isDark ? Colors.white54 : Colors.black54),
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildContent() {
+    switch (_selectedTab) {
+      case 0:
+      case 1:
+        return _buildMusicList();
+      case 2:
+        return _buildNetworkLinkInput();
+      case 3:
+        return _buildLocalFilePicker();
+      default:
+        return _buildMusicList();
+    }
+  }
+  
+  Widget _buildMusicList() {
+    return Column(
+      children: [
+        // 搜索框
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: '搜索歌曲或歌手',
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: widget.isDark 
+                  ? const Color(0xFF3A3A3C) 
+                  : const Color(0xFFF2F2F7),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+            ),
+            onChanged: (value) {
+              setState(() {
+                _searchQuery = value;
+              });
+            },
+          ),
+        ),
+        // 音乐列表
+        Expanded(
+          child: _currentSongs.isEmpty
+              ? Center(
+                  child: Text(
+                    '没有找到歌曲',
+                    style: TextStyle(
+                      color: widget.isDark ? Colors.white54 : Colors.black54,
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: _currentSongs.length,
+                  itemBuilder: (context, index) {
+                    final song = _currentSongs[index];
+                    return ListTile(
+                      leading: Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.music_note,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      title: Text(
+                        song['name'] as String,
+                        style: TextStyle(
+                          color: widget.isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      subtitle: Text(
+                        song['artist'] as String,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: widget.isDark ? Colors.white54 : Colors.black54,
+                        ),
+                      ),
+                      trailing: const Icon(
+                        Icons.send,
+                        color: AppColors.primary,
+                      ),
+                      onTap: () => Navigator.pop(context, song),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildNetworkLinkInput() {
+    final textColor = widget.isDark ? Colors.white : Colors.black;
+    final hintColor = widget.isDark ? Colors.white54 : Colors.black54;
+    final fillColor = widget.isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7);
+    
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 提示
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline, color: AppColors.primary, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '支持网易云、QQ音乐、酷狗、酷我等平台的歌曲链接',
+                    style: TextStyle(fontSize: 13, color: textColor),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          // 音乐链接
+          Text('音乐链接 *', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _linkController,
+            style: TextStyle(color: textColor),
+            decoration: InputDecoration(
+              hintText: '粘贴音乐链接',
+              hintStyle: TextStyle(color: hintColor),
+              prefixIcon: Icon(Icons.link, color: hintColor),
+              filled: true,
+              fillColor: fillColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // 歌曲名称
+          Text('歌曲名称（可选）', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _titleController,
+            style: TextStyle(color: textColor),
+            decoration: InputDecoration(
+              hintText: '输入歌曲名称',
+              hintStyle: TextStyle(color: hintColor),
+              prefixIcon: Icon(Icons.music_note, color: hintColor),
+              filled: true,
+              fillColor: fillColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // 歌手名称
+          Text('歌手名称（可选）', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _artistController,
+            style: TextStyle(color: textColor),
+            decoration: InputDecoration(
+              hintText: '输入歌手名称',
+              hintStyle: TextStyle(color: hintColor),
+              prefixIcon: Icon(Icons.person, color: hintColor),
+              filled: true,
+              fillColor: fillColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          // 分享按钮
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _shareNetworkLink,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text('分享音乐', style: TextStyle(fontSize: 16)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildLocalFilePicker() {
+    final textColor = widget.isDark ? Colors.white : Colors.black;
+    final subtextColor = widget.isDark ? Colors.white54 : Colors.black54;
+    
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.audio_file,
+                size: 50,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              '选择本地音频文件',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '支持 MP3、M4A、WAV、FLAC 等格式',
+              style: TextStyle(
+                fontSize: 14,
+                color: subtextColor,
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: _pickLocalAudio,
+              icon: const Icon(Icons.folder_open),
+              label: const Text('选择文件'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 群成员选择器底部弹窗（用于@提醒）
+class _MemberPickerSheet extends StatefulWidget {
+  final String roomId;
+  final bool isDark;
+  final void Function(String memberName, String memberId) onMemberSelected;
+
+  const _MemberPickerSheet({
+    required this.roomId,
+    required this.isDark,
+    required this.onMemberSelected,
+  });
+
+  @override
+  State<_MemberPickerSheet> createState() => _MemberPickerSheetState();
+}
+
+class _MemberPickerSheetState extends State<_MemberPickerSheet> {
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, String>> _members = [];
+  List<Map<String, String>> _filteredMembers = [];
+  bool _isLoading = true;
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMembers();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadMembers() async {
+    try {
+      final groupRepository = getIt<IGroupRepository>();
+      final members = await groupRepository.getGroupMembers(widget.roomId);
+      
+      setState(() {
+        _members = members.map((m) => {
+          'id': m.userId,
+          'name': m.displayName ?? m.userId,
+          'avatarUrl': m.avatarUrl ?? '',
+        }).toList();
+        _filteredMembers = _members;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading members: $e');
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _filterMembers(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        _filteredMembers = _members;
+      } else {
+        _filteredMembers = _members.where((m) {
+          final name = m['name']?.toLowerCase() ?? '';
+          return name.contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bgColor = widget.isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final textColor = widget.isDark ? Colors.white : Colors.black;
+    final subtextColor = widget.isDark ? Colors.white54 : Colors.black54;
+    
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.6,
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: Column(
+        children: [
+          // 拖拽指示器
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // 标题
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.close, color: textColor),
+                ),
+                Expanded(
+                  child: Text(
+                    '选择成员',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 48), // 平衡布局
+              ],
+            ),
+          ),
+          // 搜索框
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _filterMembers,
+              style: TextStyle(color: textColor),
+              decoration: InputDecoration(
+                hintText: '搜索成员',
+                hintStyle: TextStyle(color: subtextColor),
+                prefixIcon: Icon(Icons.search, color: subtextColor),
+                filled: true,
+                fillColor: widget.isDark 
+                    ? Colors.white.withOpacity(0.1) 
+                    : Colors.grey[200],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ),
+          // 成员列表
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _filteredMembers.isEmpty
+                    ? Center(
+                        child: Text(
+                          _searchQuery.isEmpty ? '没有成员' : '未找到匹配的成员',
+                          style: TextStyle(color: subtextColor),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _filteredMembers.length,
+                        itemBuilder: (context, index) {
+                          final member = _filteredMembers[index];
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: _getColorFromName(member['name'] ?? ''),
+                              child: Text(
+                                (member['name'] ?? '?')[0].toUpperCase(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            title: Text(
+                              member['name'] ?? '未知',
+                              style: TextStyle(color: textColor),
+                            ),
+                            subtitle: Text(
+                              member['id'] ?? '',
+                              style: TextStyle(fontSize: 12, color: subtextColor),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            onTap: () => widget.onMemberSelected(
+                              member['name'] ?? '未知',
+                              member['id'] ?? '',
+                            ),
+                          );
+                        },
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getColorFromName(String name) {
+    final colors = [
+      const Color(0xFF1AAD19),
+      const Color(0xFF576B95),
+      const Color(0xFFFA9D3B),
+      const Color(0xFFE64340),
+    ];
+    if (name.isEmpty) return colors[0];
+    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
+    return colors[index];
+  }
 }
 

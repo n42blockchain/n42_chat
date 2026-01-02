@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -190,8 +192,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   _buildListTile(
                     isDark: isDark,
                     title: '拍一拍',
-                    value: user?.pokeText ?? '你',
-                    onTap: _editPokeText,
+                    value: user?.pokeText?.isNotEmpty == true ? user!.pokeText! : '未设置',
+                    onTap: () => _editPokeText(user?.pokeText),
                   ),
                   _buildDivider(isDark),
                   
@@ -634,25 +636,41 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     return cityData[province] ?? [province];
   }
 
-  Future<void> _editPokeText() async {
-    final controller = TextEditingController();
+  Future<void> _editPokeText(String? currentPokeText) async {
+    final controller = TextEditingController(text: currentPokeText);
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('设置拍一拍'),
-        content: Row(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('朋友拍了拍我'),
-            Expanded(
-              child: TextField(
-                controller: controller,
-                autofocus: true,
-                maxLength: 10,
-                decoration: const InputDecoration(
-                  hintText: '的肩膀',
-                  counterText: '',
-                  border: InputBorder.none,
-                ),
+            Text(
+              '朋友拍了拍我',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              maxLength: 10,
+              decoration: const InputDecoration(
+                hintText: '输入拍一拍后缀，如：的肩膀',
+                counterText: '',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '示例：朋友拍了拍我${controller.text.isNotEmpty ? controller.text : "的肩膀"}',
+              style: TextStyle(
+                color: AppColors.textTertiary,
+                fontSize: 12,
               ),
             ),
           ],
@@ -670,11 +688,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       ),
     );
 
-    if (result != null && result.isNotEmpty && mounted) {
+    if (result != null && mounted) {
       context.read<AuthBloc>().add(UpdateUserProfile(pokeText: result));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('拍一拍已设置为: 拍了拍我$result'),
+          content: Text(result.isEmpty ? '拍一拍已清除' : '拍一拍已设置为: 拍了拍我$result'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -770,78 +788,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
 
   Future<void> _selectRingtone(String? currentRingtone) async {
-    final ringtones = [
-      '默认铃声',
-      '清脆',
-      '电话铃声',
-      '古典',
-      '柔和',
-      '振动',
-      '静音',
-    ];
-    
-    final selectedRingtone = currentRingtone ?? '默认铃声';
-    
-    final result = await showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        return SafeArea(
-          child: Container(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.6,
-            ),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      const Text(
-                        '选择来电铃声',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(height: 1, color: isDark ? AppColors.dividerDark : AppColors.divider),
-                Flexible(
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: ringtones.map((ringtone) => ListTile(
-                      leading: Icon(
-                        ringtone == '振动' ? Icons.vibration 
-                            : ringtone == '静音' ? Icons.volume_off
-                            : Icons.music_note,
-                        color: AppColors.primary,
-                      ),
-                      title: Text(ringtone),
-                      trailing: ringtone == selectedRingtone 
-                          ? Icon(Icons.check, color: AppColors.primary)
-                          : null,
-                      onTap: () => Navigator.pop(context, ringtone),
-                    )).toList(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+    final result = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (context) => _RingtoneSelectPage(
+          currentRingtone: currentRingtone ?? '默认铃声',
+        ),
+      ),
     );
 
     if (result != null && result != currentRingtone && mounted) {
@@ -1833,5 +1785,284 @@ class _InvoiceItem {
     this.companyPhone,
     this.isDefault = false,
   });
+}
+
+/// 铃声选择页面
+class _RingtoneSelectPage extends StatefulWidget {
+  final String currentRingtone;
+  
+  const _RingtoneSelectPage({required this.currentRingtone});
+  
+  @override
+  State<_RingtoneSelectPage> createState() => _RingtoneSelectPageState();
+}
+
+class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
+  late String _selectedRingtone;
+  String? _playingRingtone;
+  AudioPlayer? _audioPlayer;
+  
+  // 铃声列表（使用系统默认铃声 URL 或本地资源）
+  final List<Map<String, dynamic>> _ringtones = [
+    {'name': '默认铃声', 'icon': Icons.music_note, 'url': 'https://www.soundjay.com/phone/sounds/telephone-ring-01a.mp3'},
+    {'name': '清脆', 'icon': Icons.music_note, 'url': 'https://www.soundjay.com/phone/sounds/telephone-ring-02.mp3'},
+    {'name': '电话铃声', 'icon': Icons.phone_in_talk, 'url': 'https://www.soundjay.com/phone/sounds/telephone-ring-03a.mp3'},
+    {'name': '古典', 'icon': Icons.piano, 'url': 'https://www.soundjay.com/phone/sounds/telephone-ring-04.mp3'},
+    {'name': '柔和', 'icon': Icons.music_note, 'url': 'https://www.soundjay.com/phone/sounds/telephone-ring-05.mp3'},
+    {'name': '振动', 'icon': Icons.vibration, 'url': null},
+    {'name': '静音', 'icon': Icons.volume_off, 'url': null},
+  ];
+  
+  @override
+  void initState() {
+    super.initState();
+    _selectedRingtone = widget.currentRingtone;
+    _audioPlayer = AudioPlayer();
+  }
+  
+  @override
+  void dispose() {
+    _stopRingtone();
+    _audioPlayer?.dispose();
+    super.dispose();
+  }
+  
+  /// 播放铃声
+  Future<void> _playRingtone(String ringtoneName) async {
+    // 先停止当前播放
+    await _stopRingtone();
+    
+    final ringtone = _ringtones.firstWhere(
+      (r) => r['name'] == ringtoneName,
+      orElse: () => _ringtones.first,
+    );
+    
+    // 如果是振动，触发振动
+    if (ringtoneName == '振动') {
+      HapticFeedback.heavyImpact();
+      await Future.delayed(const Duration(milliseconds: 100));
+      HapticFeedback.heavyImpact();
+      await Future.delayed(const Duration(milliseconds: 100));
+      HapticFeedback.heavyImpact();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('振动模式'),
+            duration: Duration(milliseconds: 800),
+          ),
+        );
+      }
+      return;
+    }
+    
+    // 如果是静音，不播放
+    if (ringtoneName == '静音') {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('静音模式'),
+            duration: Duration(milliseconds: 800),
+          ),
+        );
+      }
+      return;
+    }
+    
+    // 如果没有 URL，显示提示
+    final url = ringtone['url'] as String?;
+    if (url == null) {
+      return;
+    }
+    
+    setState(() {
+      _playingRingtone = ringtoneName;
+    });
+    
+    try {
+      // 播放铃声
+      await _audioPlayer?.play(UrlSource(url));
+      
+      // 显示播放提示
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.play_arrow, color: Colors.white, size: 18),
+                const SizedBox(width: 8),
+                Text('正在播放: $ringtoneName'),
+              ],
+            ),
+            duration: const Duration(seconds: 3),
+            action: SnackBarAction(
+              label: '停止',
+              textColor: Colors.white,
+              onPressed: _stopRingtone,
+            ),
+          ),
+        );
+      }
+      
+      // 5秒后自动停止
+      await Future.delayed(const Duration(seconds: 5));
+      if (mounted && _playingRingtone == ringtoneName) {
+        await _stopRingtone();
+      }
+    } catch (e) {
+      debugPrint('播放铃声失败: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('播放失败: $ringtoneName'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 1),
+          ),
+        );
+        setState(() {
+          _playingRingtone = null;
+        });
+      }
+    }
+  }
+  
+  /// 停止铃声
+  Future<void> _stopRingtone() async {
+    try {
+      await _audioPlayer?.stop();
+    } catch (e) {
+      debugPrint('停止铃声失败: $e');
+    }
+    if (mounted && _playingRingtone != null) {
+      setState(() {
+        _playingRingtone = null;
+      });
+    }
+  }
+  
+  /// 确认保存
+  void _confirmSave() {
+    Navigator.pop(context, _selectedRingtone);
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Scaffold(
+      backgroundColor: isDark ? AppColors.backgroundDark : const Color(0xFFF5F5F5),
+      appBar: AppBar(
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+          onPressed: () => Navigator.pop(context), // 取消不保存
+        ),
+        title: Text(
+          '选择来电铃声',
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: _confirmSave,
+            child: Text(
+              '确定',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemCount: _ringtones.length,
+        itemBuilder: (context, index) {
+          final ringtone = _ringtones[index];
+          final name = ringtone['name'] as String;
+          final icon = ringtone['icon'] as IconData;
+          final isSelected = name == _selectedRingtone;
+          final isPlaying = name == _playingRingtone;
+          
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.surfaceDark : Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: isSelected 
+                  ? Border.all(color: AppColors.primary, width: 2)
+                  : null,
+            ),
+            child: ListTile(
+              leading: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: isPlaying 
+                      ? AppColors.primary.withValues(alpha: 0.2)
+                      : (isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  isPlaying ? Icons.pause : icon,
+                  color: isPlaying ? AppColors.primary : (isDark ? Colors.white70 : Colors.black54),
+                ),
+              ),
+              title: Text(
+                name,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 试听按钮
+                  if (ringtone['file'] != null || name == '振动')
+                    IconButton(
+                      icon: Icon(
+                        isPlaying ? Icons.stop : Icons.play_circle_outline,
+                        color: AppColors.primary,
+                      ),
+                      onPressed: () {
+                        if (isPlaying) {
+                          _stopRingtone();
+                        } else {
+                          _playRingtone(name);
+                        }
+                      },
+                    ),
+                  // 选中标记
+                  if (isSelected)
+                    Icon(
+                      Icons.check_circle,
+                      color: AppColors.primary,
+                    ),
+                ],
+              ),
+              onTap: () {
+                setState(() {
+                  _selectedRingtone = name;
+                });
+                // 选中后自动试听
+                _playRingtone(name);
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 

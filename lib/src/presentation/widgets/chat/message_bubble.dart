@@ -46,6 +46,9 @@ class MessageBubble extends StatelessWidget {
 
   /// 头像点击回调
   final VoidCallback? onAvatarTap;
+  
+  /// 头像双击回调（拍一拍）
+  final VoidCallback? onAvatarDoubleTap;
 
   /// 最大宽度占比
   final double maxWidthFactor;
@@ -55,6 +58,9 @@ class MessageBubble extends StatelessWidget {
 
   /// 重发回调
   final VoidCallback? onResend;
+
+  /// 是否不显示气泡背景（用于图片/视频消息）
+  final bool noBubble;
 
   const MessageBubble({
     super.key,
@@ -69,9 +75,11 @@ class MessageBubble extends StatelessWidget {
     this.avatarName,
     this.showAvatar = true,
     this.onAvatarTap,
+    this.onAvatarDoubleTap,
     this.maxWidthFactor = 0.7,
     this.bubbleColor,
     this.onResend,
+    this.noBubble = false,
   });
 
   @override
@@ -121,10 +129,10 @@ class MessageBubble extends StatelessWidget {
                       const SizedBox(width: 4),
                     ],
 
-                    // 气泡
+                    // 气泡或无气泡内容
                     ConstrainedBox(
                       constraints: BoxConstraints(maxWidth: maxWidth),
-                      child: _buildBubble(isDark),
+                      child: noBubble ? _buildNoBubbleContent() : _buildBubble(isDark),
                     ),
 
                     // 发送中指示器（自己的消息，在气泡右侧）
@@ -156,6 +164,7 @@ class MessageBubble extends StatelessWidget {
     
     return GestureDetector(
       onTap: onAvatarTap,
+      onDoubleTap: onAvatarDoubleTap,
       child: Container(
         width: 40,
         height: 40,
@@ -197,6 +206,15 @@ class MessageBubble extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  /// 无气泡内容（用于图片/视频消息）
+  Widget _buildNoBubbleContent() {
+    return GestureDetector(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: child,
     );
   }
 

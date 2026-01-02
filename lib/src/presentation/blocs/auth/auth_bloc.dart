@@ -299,16 +299,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      // 先加载 Matrix 账户数据中的自定义资料
-      await _authRepository.getUserProfileData();
+      debugPrint('AuthBloc: Loading user profile data...');
       
-      // 刷新用户信息
-      final user = _authRepository.currentUser;
+      // 获取最新的用户资料（包含头像和显示名）
+      final user = await _authRepository.getCurrentUserProfile();
+      
       if (user != null) {
+        debugPrint('AuthBloc: User profile loaded - displayName: ${user.displayName}, avatarUrl: ${user.avatarUrl}');
         emit(state.copyWith(
           status: AuthStatus.authenticated,
           user: user,
         ));
+      } else {
+        debugPrint('AuthBloc: Failed to load user profile, user is null');
       }
     } catch (e) {
       // 加载失败不影响整体状态
