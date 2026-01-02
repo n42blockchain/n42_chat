@@ -413,11 +413,38 @@ class MatrixClientManager {
     _ensureInitialized();
     _ensureLoggedIn();
 
-    final file = MatrixImageFile(
-      bytes: avatarBytes,
-      name: filename,
-    );
-    await _client!.setAvatar(file);
+    debugPrint('MatrixClientManager: Setting avatar, size: ${avatarBytes.length} bytes, filename: $filename');
+    
+    // 根据文件名确定 MIME 类型
+    String mimeType = 'image/jpeg';
+    final lowerFilename = filename.toLowerCase();
+    if (lowerFilename.endsWith('.png')) {
+      mimeType = 'image/png';
+    } else if (lowerFilename.endsWith('.gif')) {
+      mimeType = 'image/gif';
+    } else if (lowerFilename.endsWith('.webp')) {
+      mimeType = 'image/webp';
+    } else if (lowerFilename.endsWith('.heic') || lowerFilename.endsWith('.heif')) {
+      mimeType = 'image/jpeg'; // HEIC 需要转换，这里先用 jpeg
+    }
+    
+    debugPrint('MatrixClientManager: Avatar mimeType: $mimeType');
+    
+    try {
+      final file = MatrixImageFile(
+        bytes: avatarBytes,
+        name: filename,
+        mimeType: mimeType,
+      );
+      
+      debugPrint('MatrixClientManager: Uploading avatar to server...');
+      await _client!.setAvatar(file);
+      debugPrint('MatrixClientManager: Avatar uploaded successfully');
+    } catch (e, stackTrace) {
+      debugPrint('MatrixClientManager: Avatar upload failed - $e');
+      debugPrint('MatrixClientManager: Stack trace - $stackTrace');
+      rethrow;
+    }
   }
 
   // ============================================
