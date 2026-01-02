@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/conversation_entity.dart';
+import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
 import '../../blocs/conversation/conversation_event.dart';
 import '../../blocs/conversation/conversation_state.dart';
+import '../../blocs/group/group_bloc.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../widgets/animations/fade_animation.dart';
+import '../contact/add_friend_page.dart';
+import '../group/create_group_page.dart';
 import 'conversation_tile.dart';
 
 /// 会话列表页面
@@ -206,25 +211,60 @@ class _ConversationListPageState extends State<ConversationListPage> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => _AddMenuSheet(
-        onCreateGroup: _showCreateGroupDialog,
-        onAddFriend: _showAddFriendDialog,
+      builder: (ctx) => _AddMenuSheet(
+        onCreateGroup: () => _navigateToCreateGroup(ctx),
+        onAddFriend: () => _navigateToAddFriend(ctx),
         onScanQR: () {
-          Navigator.pop(context);
-          // TODO: 实现扫码功能
+          Navigator.pop(ctx);
+          _showScanQRNotAvailable();
         },
       ),
     );
   }
 
-  void _showCreateGroupDialog() {
-    Navigator.pop(context);
-    // TODO: 跳转到创建群聊页面
+  void _navigateToCreateGroup(BuildContext sheetContext) {
+    Navigator.pop(sheetContext);
+    
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (_) => getIt<GroupBloc>()),
+            BlocProvider(create: (_) => getIt<ContactBloc>()),
+          ],
+          child: const CreateGroupPage(),
+        ),
+      ),
+    ).then((roomId) {
+      if (roomId != null && roomId is String) {
+        // 刷新会话列表
+        context.read<ConversationBloc>().add(const RefreshConversations());
+      }
+    });
   }
 
-  void _showAddFriendDialog() {
-    Navigator.pop(context);
-    // TODO: 跳转到添加好友页面
+  void _navigateToAddFriend(BuildContext sheetContext) {
+    Navigator.pop(sheetContext);
+    
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const AddFriendPage(),
+      ),
+    ).then((roomId) {
+      if (roomId != null && roomId is String) {
+        // 刷新会话列表
+        context.read<ConversationBloc>().add(const RefreshConversations());
+      }
+    });
+  }
+
+  void _showScanQRNotAvailable() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('扫一扫功能即将推出'),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   void _showConversationMenu(
