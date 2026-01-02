@@ -6,11 +6,14 @@ import '../../../core/theme/app_colors.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
 import '../../blocs/conversation/conversation_event.dart';
+import '../contact/add_friend_page.dart';
 import '../contact/contact_list_page.dart';
 import '../conversation/conversation_list_page.dart';
 import '../discover/discover_page.dart';
+import '../group/create_group_page.dart';
 import '../profile/profile_page.dart';
 import '../qrcode/scan_qr_page.dart';
+import '../transfer/receive_page.dart';
 
 /// 聊天模块主框架页面
 /// 
@@ -82,6 +85,122 @@ class _ChatMainPageState extends State<ChatMainPage> {
     });
   }
 
+  /// 显示微信风格的 "+" 弹出菜单
+  void _showAddMenu(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final RenderBox button = context.findRenderObject() as RenderBox;
+    final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
+    
+    // 计算菜单位置 - 右上角
+    final position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        button.localToGlobal(Offset(button.size.width - 160, 50), ancestor: overlay),
+        button.localToGlobal(Offset(button.size.width, 50), ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+
+    showMenu<String>(
+      context: context,
+      position: position,
+      color: isDark ? const Color(0xFF4C4C4C) : Colors.white,
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      items: [
+        _buildPopupMenuItem(
+          value: 'group',
+          icon: Icons.chat_bubble_outline,
+          text: '发起群聊',
+          isDark: isDark,
+        ),
+        _buildPopupMenuItem(
+          value: 'add_friend',
+          icon: Icons.person_add_outlined,
+          text: '添加朋友',
+          isDark: isDark,
+        ),
+        _buildPopupMenuItem(
+          value: 'scan',
+          icon: Icons.qr_code_scanner,
+          text: '扫一扫',
+          isDark: isDark,
+        ),
+        _buildPopupMenuItem(
+          value: 'payment',
+          icon: Icons.payment_outlined,
+          text: '收付款',
+          isDark: isDark,
+        ),
+      ],
+    ).then((value) {
+      if (value == null) return;
+      switch (value) {
+        case 'group':
+          _navigateToCreateGroup();
+          break;
+        case 'add_friend':
+          _navigateToAddFriend();
+          break;
+        case 'scan':
+          _openScanQR();
+          break;
+        case 'payment':
+          _navigateToPayment();
+          break;
+      }
+    });
+  }
+
+  PopupMenuItem<String> _buildPopupMenuItem({
+    required String value,
+    required IconData icon,
+    required String text,
+    required bool isDark,
+  }) {
+    final textColor = isDark ? Colors.white : Colors.black87;
+    return PopupMenuItem<String>(
+      value: value,
+      height: 48,
+      child: Row(
+        children: [
+          Icon(icon, color: textColor, size: 22),
+          const SizedBox(width: 14),
+          Text(
+            text,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToCreateGroup() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const CreateGroupPage()),
+    ).then((_) {
+      _conversationBloc.add(const RefreshConversations());
+    });
+  }
+
+  void _navigateToAddFriend() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const AddFriendPage()),
+    ).then((_) {
+      _conversationBloc.add(const RefreshConversations());
+    });
+  }
+
+  void _navigateToPayment() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ReceivePage()),
+    );
+  }
+
   void _handleBack() {
     if (widget.onBackToMain != null) {
       widget.onBackToMain!();
@@ -149,15 +268,17 @@ class _ChatMainPageState extends State<ChatMainPage> {
                   debugPrint('Open search');
                 },
               ),
-              IconButton(
-                icon: Icon(Icons.add_circle_outline, color: textColor, size: 22),
-                onPressed: _openScanQR,
+              Builder(
+                builder: (ctx) => IconButton(
+                  icon: Icon(Icons.add_circle_outline, color: textColor, size: 22),
+                  onPressed: () => _showAddMenu(ctx),
+                ),
               ),
             ],
             if (_currentIndex == 1)
               IconButton(
                 icon: Icon(Icons.person_add_outlined, color: textColor, size: 22),
-                onPressed: _openScanQR,
+                onPressed: _navigateToAddFriend,
               ),
             const SizedBox(width: 8),
           ],
