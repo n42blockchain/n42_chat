@@ -433,10 +433,12 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         TextButton(
           onPressed: () {
+            // 先获取 AuthBloc 引用，避免在 builder 中使用错误的 context
+            final authBloc = context.read<AuthBloc>();
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => BlocProvider.value(
-                  value: context.read<AuthBloc>(),
+                builder: (_) => BlocProvider.value(
+                  value: authBloc,
                   child: const RegisterPage(),
                 ),
               ),
