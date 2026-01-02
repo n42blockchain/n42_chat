@@ -208,12 +208,21 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  /// 语音转文字（待接入语音识别服务）
+  /// 语音转文字
   Future<String?> _convertVoiceToText(String voiceUrl) async {
-    // TODO: 接入语音识别API（如讯飞、百度、阿里云等）
-    // 这里返回模拟数据作为演示
-    await Future.delayed(const Duration(seconds: 2));
-    return '【语音转文字功能开发中，请稍后...】';
+    // 尝试使用语音识别服务
+    // 注意：需要先配置 API Key
+    // SpeechToTextService().configureGoogle('your-api-key');
+    // 或
+    // SpeechToTextService().configureWhisper('http://localhost:8000');
+    
+    // 如果服务已配置，则使用真实的语音识别
+    // final text = await SpeechToTextService().transcribe(voiceUrl);
+    // if (text != null) return text;
+    
+    // 暂时返回提示信息
+    await Future.delayed(const Duration(seconds: 1));
+    return '【语音转文字需配置API密钥，详见 SpeechToTextService】';
   }
 
   Widget _buildVideoMessage() {

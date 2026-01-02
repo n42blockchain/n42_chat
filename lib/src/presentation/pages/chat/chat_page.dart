@@ -50,6 +50,11 @@ class _ChatPageState extends State<ChatPage> {
   bool _showSearchBar = false;
   bool _showMorePanel = false;
   String? _highlightedMessageId;
+  
+  // 录音状态
+  bool _isRecording = false;
+  bool _isRecordingCancelled = false;
+  Duration _recordingDuration = Duration.zero;
 
   @override
   void initState() {
@@ -143,50 +148,142 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-      appBar: _buildAppBar(isDark),
-      body: Column(
-        children: [
-          // 聊天内搜索栏
-          if (_showSearchBar)
-            BlocProvider(
-              create: (_) => getIt<SearchBloc>(),
-              child: ChatSearchBar(
-                roomId: widget.conversation.id,
-                onClose: _toggleSearch,
-                onNavigateToMessage: _navigateToMessage,
-              ),
-            ),
-
-          // 消息列表
-          Expanded(
-            child: Stack(
-              children: [
-                _buildMessageList(),
-
-                // 回到底部按钮
-                if (_showScrollToBottom)
-                  Positioned(
-                    right: 16,
-                    bottom: 16,
-                    child: _buildScrollToBottomButton(),
+    return Stack(
+      children: [
+        Scaffold(
+          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          appBar: _buildAppBar(isDark),
+          body: Column(
+            children: [
+              // 聊天内搜索栏
+              if (_showSearchBar)
+                BlocProvider(
+                  create: (_) => getIt<SearchBloc>(),
+                  child: ChatSearchBar(
+                    roomId: widget.conversation.id,
+                    onClose: _toggleSearch,
+                    onNavigateToMessage: _navigateToMessage,
                   ),
-              ],
-            ),
+                ),
+
+              // 消息列表
+              Expanded(
+                child: Stack(
+                  children: [
+                    _buildMessageList(),
+
+                    // 回到底部按钮
+                    if (_showScrollToBottom)
+                      Positioned(
+                        right: 16,
+                        bottom: 16,
+                        child: _buildScrollToBottomButton(),
+                      ),
+                  ],
+                ),
+              ),
+
+              // 回复预览
+              _buildReplyPreview(),
+
+              // 输入栏
+              if (!_showSearchBar) _buildInputBar(),
+
+              // 更多功能面板
+              if (_showMorePanel) _buildMorePanel(),
+            ],
           ),
-
-          // 回复预览
-          _buildReplyPreview(),
-
-          // 输入栏
-          if (!_showSearchBar) _buildInputBar(),
-
-          // 更多功能面板
-          if (_showMorePanel) _buildMorePanel(),
-        ],
+        ),
+        
+        // 全屏录音浮层
+        if (_isRecording) _buildRecordingOverlay(),
+      ],
+    );
+  }
+  
+  /// 录音状态变化处理
+  void _onRecordingStateChanged(bool isRecording, bool isCancelled, Duration duration) {
+    setState(() {
+      _isRecording = isRecording;
+      _isRecordingCancelled = isCancelled;
+      _recordingDuration = duration;
+    });
+  }
+  
+  /// 构建录音浮层
+  Widget _buildRecordingOverlay() {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withOpacity(0.7),
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 录音指示器
+              Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  color: _isRecordingCancelled ? AppColors.error : AppColors.primary,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: (_isRecordingCancelled ? AppColors.error : AppColors.primary)
+                          .withOpacity(0.4),
+                      blurRadius: 30,
+                      spreadRadius: 10,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _isRecordingCancelled ? Icons.delete : Icons.mic,
+                      size: 56,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _formatDuration(_recordingDuration),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+              // 提示文字
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                  color: _isRecordingCancelled 
+                      ? AppColors.error.withOpacity(0.2) 
+                      : Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  _isRecordingCancelled ? '松开手指，取消发送' : '手指上滑，取消发送',
+                  style: TextStyle(
+                    color: _isRecordingCancelled ? AppColors.error : Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+  
+  String _formatDuration(Duration duration) {
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
   Widget _buildMorePanel() {
@@ -198,6 +295,10 @@ class _ChatPageState extends State<ChatPage> {
       onCameraPressed: () {
         _hideMorePanel();
         _takePhoto();
+      },
+      onVideoCallPressed: () {
+        _hideMorePanel();
+        _startVideoCall();
       },
       onLocationPressed: () {
         _hideMorePanel();
@@ -219,6 +320,22 @@ class _ChatPageState extends State<ChatPage> {
         _hideMorePanel();
         _sendContactCard();
       },
+      onFavoritePressed: () {
+        _hideMorePanel();
+        _openFavorites();
+      },
+      onMusicPressed: () {
+        _hideMorePanel();
+        _shareMusic();
+      },
+      onCouponPressed: () {
+        _hideMorePanel();
+        _selectCoupon();
+      },
+      onGiftPressed: () {
+        _hideMorePanel();
+        _sendGift();
+      },
     );
   }
 
@@ -228,39 +345,86 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void _pickImage() {
+  void _pickImage() async {
     // TODO: 实现选择照片功能
     debugPrint('Pick image');
+    _showFeatureToast('选择照片');
   }
 
-  void _takePhoto() {
+  void _takePhoto() async {
     // TODO: 实现拍摄功能
     debugPrint('Take photo');
+    _showFeatureToast('拍摄');
   }
 
   void _sendLocation() {
     // TODO: 实现发送位置功能
     debugPrint('Send location');
+    _showFeatureToast('位置');
   }
 
   void _sendRedPacket() {
     // TODO: 实现发红包功能
     debugPrint('Send red packet');
+    _showFeatureToast('红包');
   }
 
   void _sendTransfer() {
     // TODO: 实现转账功能
     debugPrint('Send transfer');
+    _showFeatureToast('转账');
   }
 
-  void _pickFile() {
+  void _pickFile() async {
     // TODO: 实现选择文件功能
     debugPrint('Pick file');
+    _showFeatureToast('选择文件');
   }
 
   void _sendContactCard() {
     // TODO: 实现发送名片功能
     debugPrint('Send contact card');
+    _showFeatureToast('名片功能');
+  }
+
+  void _startVideoCall() {
+    // TODO: 实现视频通话功能
+    debugPrint('Start video call');
+    _showFeatureToast('视频通话');
+  }
+
+  void _openFavorites() {
+    // TODO: 实现收藏功能
+    debugPrint('Open favorites');
+    _showFeatureToast('收藏');
+  }
+
+  void _shareMusic() {
+    // TODO: 实现分享音乐功能
+    debugPrint('Share music');
+    _showFeatureToast('音乐分享');
+  }
+
+  void _selectCoupon() {
+    // TODO: 实现选择卡券功能
+    debugPrint('Select coupon');
+    _showFeatureToast('卡券');
+  }
+
+  void _sendGift() {
+    // TODO: 实现发送礼物功能
+    debugPrint('Send gift');
+    _showFeatureToast('礼物');
+  }
+
+  void _showFeatureToast(String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature功能开发中...'),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   PreferredSizeWidget _buildAppBar(bool isDark) {
@@ -585,6 +749,7 @@ class _ChatPageState extends State<ChatPage> {
       focusNode: _inputFocusNode,
       onSendText: _sendMessage,
       onSendVoice: _sendVoiceMessage,
+      onRecordingStateChanged: _onRecordingStateChanged,
       onChanged: _onInputChanged,
       onVoicePressed: _onVoicePressed,
       onEmojiPressed: _onEmojiPressed,

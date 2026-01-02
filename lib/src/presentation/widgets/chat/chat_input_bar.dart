@@ -8,6 +8,9 @@ import '../../../core/theme/app_colors.dart';
 /// 语音录音结果回调
 typedef VoiceRecordCallback = void Function(String path, Duration duration);
 
+/// 录音状态回调
+typedef RecordingStateCallback = void Function(bool isRecording, bool isCancelled, Duration duration);
+
 /// 聊天输入栏
 ///
 /// 特点：
@@ -23,6 +26,9 @@ class ChatInputBar extends StatefulWidget {
 
   /// 发送语音回调
   final VoiceRecordCallback? onSendVoice;
+
+  /// 录音状态变化回调（用于显示全屏录音浮层）
+  final RecordingStateCallback? onRecordingStateChanged;
 
   /// 语音按钮点击回调（用于切换模式）
   final VoidCallback? onVoicePressed;
@@ -67,6 +73,7 @@ class ChatInputBar extends StatefulWidget {
     super.key,
     this.onSendText,
     this.onSendVoice,
+    this.onRecordingStateChanged,
     this.onVoicePressed,
     this.onEmojiPressed,
     this.onMorePressed,
@@ -116,6 +123,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
         setState(() {
           _recordingDuration = state.duration;
         });
+        // 通知父组件录音状态变化
+        widget.onRecordingStateChanged?.call(_isRecording, _cancelRecording, state.duration);
       }
     });
   }
@@ -172,6 +181,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
         _cancelRecording = false;
         _recordingDuration = Duration.zero;
       });
+      // 通知父组件
+      widget.onRecordingStateChanged?.call(true, false, Duration.zero);
     } else {
       // 显示权限提示
       if (mounted) {
@@ -188,7 +199,12 @@ class _ChatInputBarState extends State<ChatInputBar> {
   Future<void> _stopRecording() async {
     if (!_isRecording) return;
     
-    if (_cancelRecording) {
+    final wasCancelled = _cancelRecording;
+    
+    // 先通知父组件录音结束
+    widget.onRecordingStateChanged?.call(false, wasCancelled, _recordingDuration);
+    
+    if (wasCancelled) {
       await _voiceService.cancelRecording();
       setState(() {
         _isRecording = false;
@@ -224,6 +240,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
       setState(() {
         _cancelRecording = shouldCancel;
       });
+      // 通知父组件
+      widget.onRecordingStateChanged?.call(_isRecording, shouldCancel, _recordingDuration);
     }
   }
 
@@ -231,68 +249,60 @@ class _ChatInputBarState extends State<ChatInputBar> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Stack(
-      children: [
-        // 主输入栏
-        Container(
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
-            border: Border(
-              top: BorderSide(
-                color: isDark ? AppColors.dividerDark : AppColors.divider,
-                width: 0.5,
-              ),
-            ),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  // 语音/键盘切换按钮
-                  if (widget.showVoiceButton)
-                    _buildIconButton(
-                      icon: _isVoiceMode ? Icons.keyboard : Icons.mic,
-                      onPressed: _toggleVoiceMode,
-                      isDark: isDark,
-                    ),
-
-                  // 输入区域
-                  Expanded(
-                    child: _isVoiceMode
-                        ? _buildVoiceButton(isDark)
-                        : _buildTextField(isDark),
-                  ),
-
-                  // 表情按钮
-                  if (widget.showEmojiButton)
-                    _buildIconButton(
-                      icon: Icons.emoji_emotions_outlined,
-                      onPressed: widget.onEmojiPressed,
-                      isDark: isDark,
-                    ),
-
-                  // 更多/发送按钮
-                  _hasText
-                      ? _buildSendButton()
-                      : (widget.showMoreButton
-                          ? _buildIconButton(
-                              icon: Icons.add_circle_outline,
-                              onPressed: widget.onMorePressed,
-                              isDark: isDark,
-                            )
-                          : const SizedBox.shrink()),
-                ],
-              ),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            width: 0.5,
           ),
         ),
-        
-        // 录音浮层
-        if (_isRecording) _buildRecordingOverlay(isDark),
-      ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // 语音/键盘切换按钮
+              if (widget.showVoiceButton)
+                _buildIconButton(
+                  icon: _isVoiceMode ? Icons.keyboard : Icons.mic,
+                  onPressed: _toggleVoiceMode,
+                  isDark: isDark,
+                ),
+
+              // 输入区域
+              Expanded(
+                child: _isVoiceMode
+                    ? _buildVoiceButton(isDark)
+                    : _buildTextField(isDark),
+              ),
+
+              // 表情按钮
+              if (widget.showEmojiButton)
+                _buildIconButton(
+                  icon: Icons.emoji_emotions_outlined,
+                  onPressed: widget.onEmojiPressed,
+                  isDark: isDark,
+                ),
+
+              // 更多/发送按钮
+              _hasText
+                  ? _buildSendButton()
+                  : (widget.showMoreButton
+                      ? _buildIconButton(
+                          icon: Icons.add_circle_outline,
+                          onPressed: widget.onMorePressed,
+                          isDark: isDark,
+                        )
+                      : const SizedBox.shrink()),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -408,60 +418,5 @@ class _ChatInputBarState extends State<ChatInputBar> {
         ),
       ),
     );
-  }
-
-  Widget _buildRecordingOverlay(bool isDark) {
-    return Positioned.fill(
-      child: Container(
-        color: Colors.black54,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 录音指示器
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: _cancelRecording ? AppColors.error : AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    _cancelRecording ? Icons.delete : Icons.mic,
-                    size: 48,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _formatDuration(_recordingDuration),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              _cancelRecording ? '松开手指，取消发送' : '手指上滑，取消发送',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _formatDuration(Duration duration) {
-    final minutes = duration.inMinutes;
-    final seconds = duration.inSeconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 }
