@@ -64,8 +64,12 @@ class ChatMorePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // 获取底部安全区域高度
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Container(
+      // 固定高度 = 内容高度 + 底部安全区域
+      height: 180 + bottomPadding,
       decoration: BoxDecoration(
         color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
         border: Border(
@@ -75,11 +79,11 @@ class ChatMorePanel extends StatelessWidget {
           ),
         ),
       ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 200, // 减小高度避免溢出
-          child: PageView(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 180,
+            child: PageView(
             children: [
               // 第一页
               _buildPage(
@@ -160,16 +164,20 @@ class ChatMorePanel extends StatelessWidget {
             ],
           ),
         ),
+          // 底部安全区域
+          SizedBox(height: MediaQuery.of(context).padding.bottom),
+        ],
       ),
     );
   }
 
   Widget _buildPage(BuildContext context, bool isDark, List<_MoreItem> items) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // 第一行
         Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 20, bottom: 12),
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -183,7 +191,7 @@ class ChatMorePanel extends StatelessWidget {
         ),
         // 第二行
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -196,22 +204,22 @@ class ChatMorePanel extends StatelessWidget {
           ),
         ),
         // 页面指示器
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 6,
-              height: 6,
+              width: 5,
+              height: 5,
               decoration: BoxDecoration(
                 color: AppColors.textSecondary,
                 shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 5),
             Container(
-              width: 6,
-              height: 6,
+              width: 5,
+              height: 5,
               decoration: BoxDecoration(
                 color: AppColors.textTertiary,
                 shape: BoxShape.circle,
