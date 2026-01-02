@@ -46,6 +46,7 @@ class _ChatPageState extends State<ChatPage> {
 
   bool _showScrollToBottom = false;
   bool _showSearchBar = false;
+  bool _showMorePanel = false;
   String? _highlightedMessageId;
 
   @override
@@ -57,12 +58,24 @@ class _ChatPageState extends State<ChatPage> {
 
     // 监听滚动
     _scrollController.addListener(_onScroll);
+
+    // 监听输入框焦点，获取焦点时隐藏更多面板
+    _inputFocusNode.addListener(_onInputFocusChanged);
+  }
+
+  void _onInputFocusChanged() {
+    if (_inputFocusNode.hasFocus && _showMorePanel) {
+      setState(() {
+        _showMorePanel = false;
+      });
+    }
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
     _inputController.dispose();
+    _inputFocusNode.removeListener(_onInputFocusChanged);
     _inputFocusNode.dispose();
 
     // 清理聊天室
@@ -166,9 +179,86 @@ class _ChatPageState extends State<ChatPage> {
 
           // 输入栏
           if (!_showSearchBar) _buildInputBar(),
+
+          // 更多功能面板
+          if (_showMorePanel) _buildMorePanel(),
         ],
       ),
     );
+  }
+
+  Widget _buildMorePanel() {
+    return ChatMorePanel(
+      onPhotoPressed: () {
+        _hideMorePanel();
+        _pickImage();
+      },
+      onCameraPressed: () {
+        _hideMorePanel();
+        _takePhoto();
+      },
+      onLocationPressed: () {
+        _hideMorePanel();
+        _sendLocation();
+      },
+      onRedPacketPressed: () {
+        _hideMorePanel();
+        _sendRedPacket();
+      },
+      onTransferPressed: () {
+        _hideMorePanel();
+        _sendTransfer();
+      },
+      onFilePressed: () {
+        _hideMorePanel();
+        _pickFile();
+      },
+      onContactCardPressed: () {
+        _hideMorePanel();
+        _sendContactCard();
+      },
+    );
+  }
+
+  void _hideMorePanel() {
+    setState(() {
+      _showMorePanel = false;
+    });
+  }
+
+  void _pickImage() {
+    // TODO: 实现选择照片功能
+    debugPrint('Pick image');
+  }
+
+  void _takePhoto() {
+    // TODO: 实现拍摄功能
+    debugPrint('Take photo');
+  }
+
+  void _sendLocation() {
+    // TODO: 实现发送位置功能
+    debugPrint('Send location');
+  }
+
+  void _sendRedPacket() {
+    // TODO: 实现发红包功能
+    debugPrint('Send red packet');
+  }
+
+  void _sendTransfer() {
+    // TODO: 实现转账功能
+    debugPrint('Send transfer');
+  }
+
+  void _pickFile() {
+    // TODO: 实现选择文件功能
+    debugPrint('Pick file');
+  }
+
+  void _sendContactCard() {
+    // TODO: 实现发送名片功能
+    debugPrint('Send contact card');
   }
 
   PreferredSizeWidget _buildAppBar(bool isDark) {
@@ -211,7 +301,12 @@ class _ChatPageState extends State<ChatPage> {
   String _getDisplayName() {
     // 群聊直接返回群名称
     if (widget.conversation.type == ConversationType.group) {
-      return widget.conversation.name;
+      final name = widget.conversation.name;
+      // 如果群名为空或为默认值，显示成员数
+      if (name.isEmpty || name == 'Empty Chat' || name == 'empty chat') {
+        return '群聊(${widget.conversation.memberCount})';
+      }
+      return name;
     }
 
     // 私聊尝试获取备注名
@@ -219,20 +314,32 @@ class _ChatPageState extends State<ChatPage> {
       final contactBloc = context.read<ContactBloc>();
       final state = contactBloc.state;
       if (state is ContactLoaded) {
-        // 查找对应的联系人
+        // 查找对应的联系人（通过房间ID或用户ID）
         final contact = state.contacts.cast<ContactEntity?>().firstWhere(
           (c) => c?.directRoomId == widget.conversation.id,
           orElse: () => null,
         );
-        if (contact != null && contact.remark != null && contact.remark!.isNotEmpty) {
-          return contact.remark!;
+        if (contact != null) {
+          // 优先使用备注名
+          if (contact.remark != null && contact.remark!.isNotEmpty) {
+            return contact.remark!;
+          }
+          // 其次使用显示名
+          if (contact.displayName.isNotEmpty) {
+            return contact.displayName;
+          }
         }
       }
     } catch (e) {
       // ContactBloc 可能不可用，使用默认名称
     }
 
-    return widget.conversation.name;
+    // 如果名称为空或为默认值，返回简化的用户ID或默认文本
+    final name = widget.conversation.name;
+    if (name.isEmpty || name == 'Empty Chat' || name == 'empty chat') {
+      return '私聊';
+    }
+    return name;
   }
 
   void _toggleSearch() {
@@ -488,7 +595,12 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _onMorePressed() {
-    // TODO: 实现更多功能菜单
+    // 隐藏键盘
+    _inputFocusNode.unfocus();
+    // 切换更多功能面板
+    setState(() {
+      _showMorePanel = !_showMorePanel;
+    });
   }
 }
 

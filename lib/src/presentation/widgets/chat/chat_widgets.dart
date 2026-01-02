@@ -2,6 +2,7 @@
 library;
 
 export 'chat_input_bar.dart';
+export 'chat_more_panel.dart';
 export 'image_message_widget.dart';
 export 'message_bubble.dart';
 // 导出 DeliveryStatus 别名以避免与 domain 层的 MessageStatus 冲突
