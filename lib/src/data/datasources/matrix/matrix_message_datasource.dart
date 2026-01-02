@@ -895,6 +895,107 @@ class MatrixMessageDataSource {
 
     await room.setTyping(isTyping);
   }
+  
+  /// 发送系统通知/拍一拍消息
+  Future<MessageEntity?> sendNoticeMessage({
+    required String roomId,
+    required String notice,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      return null;
+    }
+
+    try {
+      // 发送 m.notice 类型的消息（系统通知）
+      final eventId = await room.sendEvent({
+        'msgtype': 'm.notice',
+        'body': notice,
+        'format': 'org.matrix.custom.html',
+        'formatted_body': '<em>$notice</em>',
+      });
+
+      debugPrint('MatrixMessageDataSource: Notice sent with eventId: $eventId');
+
+      // 返回临时消息实体
+      return MessageEntity(
+        id: eventId ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        roomId: roomId,
+        senderId: _client?.userID ?? '',
+        senderName: _client?.userID?.localpart ?? '',
+        senderAvatarUrl: null,
+        content: notice,
+        type: MessageType.notice,
+        timestamp: DateTime.now(),
+        status: MessageStatus.sent,
+      );
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to send notice: $e');
+      rethrow;
+    }
+  }
+  
+  /// 获取房间成员的拍一拍后缀
+  /// 
+  /// 尝试从房间成员的自定义状态中获取 pokeText
+  Future<String?> getMemberPokeText({
+    required String roomId,
+    required String userId,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      return null;
+    }
+
+    try {
+      // 尝试从房间成员的自定义状态事件中获取 pokeText
+      // 状态事件类型: n42.member.profile
+      // 状态键: userId
+      final stateEvent = room.getState('n42.member.profile', userId);
+      if (stateEvent != null) {
+        final content = stateEvent.content;
+        if (content is Map<String, dynamic>) {
+          final pokeText = content['pokeText'] as String?;
+          debugPrint('MatrixMessageDataSource: Found pokeText for $userId: $pokeText');
+          return pokeText;
+        }
+      }
+      
+      debugPrint('MatrixMessageDataSource: No pokeText found for $userId in room $roomId');
+      return null;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to get member pokeText: $e');
+      return null;
+    }
+  }
+  
+  /// 设置当前用户在房间中的拍一拍后缀
+  /// 
+  /// 将 pokeText 发布到房间状态中，以便其他成员可以读取
+  Future<void> setMemberPokeText({
+    required String roomId,
+    required String pokeText,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      return;
+    }
+
+    try {
+      await room.client.setRoomStateWithKey(
+        roomId,
+        'n42.member.profile',
+        _client!.userID!,
+        {'pokeText': pokeText},
+      );
+      debugPrint('MatrixMessageDataSource: Set pokeText in room $roomId: $pokeText');
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to set member pokeText: $e');
+    }
+  }
 
   // ============================================
   // 消息监听

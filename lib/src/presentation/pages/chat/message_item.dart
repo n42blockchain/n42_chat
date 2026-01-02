@@ -25,6 +25,9 @@ class MessageItem extends StatelessWidget {
 
   /// 头像点击回调
   final VoidCallback? onAvatarTap;
+  
+  /// 头像双击回调（拍一拍）
+  final VoidCallback? onAvatarDoubleTap;
 
   /// 重发回调
   final VoidCallback? onResend;
@@ -42,6 +45,7 @@ class MessageItem extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.onAvatarTap,
+    this.onAvatarDoubleTap,
     this.onResend,
     this.isGroupChat = false,
     this.showSenderName = false,
@@ -92,6 +96,10 @@ class MessageItem extends StatelessWidget {
     // 是否显示发送者名称（群聊中非自己的消息）
     final shouldShowSenderName = isGroupChat && !message.isFromMe && showSenderName;
 
+    // 图片、视频消息不需要气泡背景（微信风格）
+    final isMediaMessage = message.type == MessageType.image || 
+                          message.type == MessageType.video;
+
     Widget bubble = MessageBubble(
       isSelf: message.isFromMe,
       status: status,
@@ -102,7 +110,10 @@ class MessageItem extends StatelessWidget {
       onTap: onTap,
       onLongPress: onLongPress,
       onAvatarTap: onAvatarTap,
+      onAvatarDoubleTap: onAvatarDoubleTap,
       onResend: onResend,
+      // 图片/视频消息不需要气泡背景
+      noBubble: isMediaMessage,
       child: _buildMessageContent(context),
     );
 

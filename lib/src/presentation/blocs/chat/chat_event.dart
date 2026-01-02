@@ -218,3 +218,31 @@ class DisposeChat extends ChatEvent {
   const DisposeChat();
 }
 
+/// 发送系统通知/拍一拍消息
+class SendSystemNotice extends ChatEvent {
+  final String notice;
+
+  const SendSystemNotice(this.notice);
+
+  @override
+  List<Object?> get props => [notice];
+}
+
+/// 发送拍一拍消息
+class SendPokeMessage extends ChatEvent {
+  final String pokerName;
+  final String targetUserId;
+  final String targetName;
+  final String? pokerPokeText; // 拍人者的 pokeText（用于拍自己时）
+
+  const SendPokeMessage({
+    required this.pokerName,
+    required this.targetUserId,
+    required this.targetName,
+    this.pokerPokeText,
+  });
+
+  @override
+  List<Object?> get props => [pokerName, targetUserId, targetName, pokerPokeText];
+}
+

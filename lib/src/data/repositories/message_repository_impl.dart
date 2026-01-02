@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/message_entity.dart';
@@ -281,6 +282,38 @@ class MessageRepositoryImpl implements IMessageRepository {
       );
       return response?.bodyBytes;
     } catch (e) {
+      return null;
+    }
+  }
+  
+  @override
+  Future<MessageEntity?> sendNoticeMessage({
+    required String roomId,
+    required String notice,
+  }) async {
+    try {
+      return await _messageDataSource.sendNoticeMessage(
+        roomId: roomId,
+        notice: notice,
+      );
+    } catch (e) {
+      debugPrint('MessageRepositoryImpl: Failed to send notice: $e');
+      return null;
+    }
+  }
+  
+  @override
+  Future<String?> getMemberPokeText({
+    required String roomId,
+    required String userId,
+  }) async {
+    try {
+      return await _messageDataSource.getMemberPokeText(
+        roomId: roomId,
+        userId: userId,
+      );
+    } catch (e) {
+      debugPrint('MessageRepositoryImpl: Failed to get member pokeText: $e');
       return null;
     }
   }
