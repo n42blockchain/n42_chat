@@ -30,6 +30,9 @@ class UserEntity extends Equatable {
 
   /// 拍一拍文字
   final String? pokeText;
+  
+  /// 来电铃声
+  final String? ringtone;
 
   const UserEntity({
     required this.userId,
@@ -41,6 +44,7 @@ class UserEntity extends Equatable {
     this.region,
     this.signature,
     this.pokeText,
+    this.ringtone,
   });
 
   /// 获取用户名部分 (@user:server.com -> user)
@@ -97,6 +101,7 @@ class UserEntity extends Equatable {
         region,
         signature,
         pokeText,
+        ringtone,
       ];
 
   UserEntity copyWith({
@@ -109,6 +114,7 @@ class UserEntity extends Equatable {
     String? region,
     String? signature,
     String? pokeText,
+    String? ringtone,
   }) {
     return UserEntity(
       userId: userId ?? this.userId,
@@ -120,6 +126,7 @@ class UserEntity extends Equatable {
       region: region ?? this.region,
       signature: signature ?? this.signature,
       pokeText: pokeText ?? this.pokeText,
+      ringtone: ringtone ?? this.ringtone,
     );
   }
 }
