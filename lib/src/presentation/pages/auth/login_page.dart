@@ -53,19 +53,23 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.textPrimary),
+          icon: Icon(Icons.close, color: textColor),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
-        title: const Text(
+        title: Text(
           '登录',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: textColor,
             fontSize: 17,
             fontWeight: FontWeight.w600,
           ),
@@ -89,6 +93,7 @@ class _LoginPageState extends State<LoginPage> {
           }
         },
         builder: (context, state) {
+          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Form(
@@ -99,27 +104,27 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 32),
 
                   // Logo
-                  _buildLogo(),
+                  _buildLogo(isDarkMode),
 
                   const SizedBox(height: 48),
 
                   // 服务器输入
-                  _buildServerInput(state),
+                  _buildServerInput(state, isDarkMode),
 
                   const SizedBox(height: 16),
 
                   // 用户名输入
-                  _buildUsernameInput(),
+                  _buildUsernameInput(isDarkMode),
 
                   const SizedBox(height: 16),
 
                   // 密码输入
-                  _buildPasswordInput(),
+                  _buildPasswordInput(isDarkMode),
 
                   const SizedBox(height: 16),
 
                   // 记住登录
-                  _buildRememberMe(),
+                  _buildRememberMe(isDarkMode),
 
                   const SizedBox(height: 32),
 
@@ -134,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 48),
 
                   // 底部协议
-                  _buildAgreement(),
+                  _buildAgreement(isDarkMode),
                 ],
               ),
             ),
@@ -144,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLogo() {
+  Widget _buildLogo(bool isDark) {
     return Column(
       children: [
         Container(
@@ -161,44 +166,51 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'N42 Chat',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 4),
-        const Text(
+        Text(
           '安全、去中心化的即时通讯',
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildServerInput(AuthState state) {
+  Widget _buildServerInput(AuthState state, bool isDark) {
+    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '服务器地址',
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: labelColor,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _homeserverController,
+          style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
             hintText: 'https://m.si46.world',
+            hintStyle: TextStyle(color: hintColor),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: inputBgColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
@@ -223,7 +235,7 @@ class _LoginPageState extends State<LoginPage> {
                 : state.isHomeserverValid
                     ? const Icon(Icons.check_circle, color: AppColors.success)
                     : IconButton(
-                        icon: const Icon(Icons.refresh),
+                        icon: Icon(Icons.refresh, color: hintColor),
                         onPressed: _checkHomeserver,
                       ),
           ),
@@ -254,24 +266,31 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildUsernameInput() {
+  Widget _buildUsernameInput(bool isDark) {
+    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '用户名',
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: labelColor,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _usernameController,
+          style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
             hintText: '请输入用户名',
+            hintStyle: TextStyle(color: hintColor),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: inputBgColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
@@ -280,9 +299,9 @@ class _LoginPageState extends State<LoginPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.person_outline,
-              color: AppColors.textSecondary,
+              color: hintColor,
             ),
           ),
           textInputAction: TextInputAction.next,
@@ -297,24 +316,31 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildPasswordInput() {
+  Widget _buildPasswordInput(bool isDark) {
+    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '密码',
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: labelColor,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _passwordController,
+          style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
             hintText: '请输入密码',
+            hintStyle: TextStyle(color: hintColor),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: inputBgColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
@@ -323,14 +349,14 @@ class _LoginPageState extends State<LoginPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.lock_outline,
-              color: AppColors.textSecondary,
+              color: hintColor,
             ),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                color: AppColors.textSecondary,
+                color: hintColor,
               ),
               onPressed: () {
                 setState(() {
@@ -353,7 +379,9 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildRememberMe() {
+  Widget _buildRememberMe(bool isDark) {
+    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
     return Row(
       children: [
         SizedBox(
@@ -367,6 +395,8 @@ class _LoginPageState extends State<LoginPage> {
               });
             },
             activeColor: AppColors.primary,
+            checkColor: Colors.white,
+            side: BorderSide(color: textColor),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
             ),
@@ -379,11 +409,11 @@ class _LoginPageState extends State<LoginPage> {
               _rememberMe = !_rememberMe;
             });
           },
-          child: const Text(
+          child: Text(
             '记住登录状态',
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: textColor,
             ),
           ),
         ),
@@ -474,15 +504,17 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildAgreement() {
+  Widget _buildAgreement(bool isDark) {
+    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textTertiary;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Text.rich(
         TextSpan(
           text: '登录即表示同意',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: AppColors.textTertiary,
+            color: textColor,
           ),
           children: [
             TextSpan(
