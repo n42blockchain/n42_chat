@@ -275,8 +275,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
       }
       
+      // 重新加载用户资料以获取最新数据
+      await _authRepository.getUserProfileData();
+      
       // 刷新用户信息
       final user = _authRepository.currentUser;
+      debugPrint('AuthBloc: Updated user profile - ringtone: ${user?.ringtone}');
       emit(state.copyWith(
         status: AuthStatus.authenticated,
         user: user,
