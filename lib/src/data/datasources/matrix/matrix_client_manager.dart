@@ -409,15 +409,40 @@ class MatrixClientManager {
   }
 
   /// 更新头像
+  /// 
+  /// Matrix 头像上传流程:
+  /// 1. 先上传文件到 Matrix 服务器获取 mxc:// URI
+  /// 2. 然后调用 setAvatar 设置用户头像
   Future<void> setAvatar(Uint8List avatarBytes, String filename) async {
+    debugPrint('=== MatrixClientManager.setAvatar start ===');
+    debugPrint('filename: $filename');
+    debugPrint('avatarBytes.length: ${avatarBytes.length}');
+    
     _ensureInitialized();
     _ensureLoggedIn();
 
-    debugPrint('MatrixClientManager: Setting avatar, size: ${avatarBytes.length} bytes, filename: $filename');
+    // 检查文件是否为空
+    if (avatarBytes.isEmpty) {
+      debugPrint('ERROR: Avatar bytes is empty');
+      throw Exception('头像数据为空');
+    }
+    
+    // 检查文件大小（限制 10MB）
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (avatarBytes.length > maxSize) {
+      debugPrint('ERROR: Avatar too large: ${avatarBytes.length} bytes');
+      throw Exception('头像文件过大，最大支持 10MB');
+    }
+
+    // 处理文件名 - 确保有扩展名
+    String actualFilename = filename;
+    if (!actualFilename.contains('.')) {
+      actualFilename = '$actualFilename.jpg';
+    }
     
     // 根据文件名确定 MIME 类型
     String mimeType = 'image/jpeg';
-    final lowerFilename = filename.toLowerCase();
+    final lowerFilename = actualFilename.toLowerCase();
     if (lowerFilename.endsWith('.png')) {
       mimeType = 'image/png';
     } else if (lowerFilename.endsWith('.gif')) {
@@ -425,24 +450,39 @@ class MatrixClientManager {
     } else if (lowerFilename.endsWith('.webp')) {
       mimeType = 'image/webp';
     } else if (lowerFilename.endsWith('.heic') || lowerFilename.endsWith('.heif')) {
-      mimeType = 'image/jpeg'; // HEIC 需要转换，这里先用 jpeg
+      // HEIC/HEIF 需要转换为 JPEG，因为 Matrix 服务器可能不支持
+      mimeType = 'image/jpeg';
+      actualFilename = actualFilename.replaceAll(RegExp(r'\.(heic|heif)$', caseSensitive: false), '.jpg');
     }
     
-    debugPrint('MatrixClientManager: Avatar mimeType: $mimeType');
+    debugPrint('Final filename: $actualFilename');
+    debugPrint('Final mimeType: $mimeType');
+    debugPrint('User ID: ${_client!.userID}');
     
     try {
+      // 创建 MatrixImageFile
       final file = MatrixImageFile(
         bytes: avatarBytes,
-        name: filename,
+        name: actualFilename,
         mimeType: mimeType,
       );
+      debugPrint('MatrixImageFile created');
       
-      debugPrint('MatrixClientManager: Uploading avatar to server...');
+      // 上传头像
+      debugPrint('Calling _client.setAvatar...');
       await _client!.setAvatar(file);
-      debugPrint('MatrixClientManager: Avatar uploaded successfully');
+      debugPrint('setAvatar completed');
+      
+      // 验证头像是否设置成功
+      final profile = await _client!.getProfileFromUserId(_client!.userID!);
+      debugPrint('New avatar URL: ${profile.avatarUrl}');
+      
+      debugPrint('=== setAvatar completed successfully ===');
     } catch (e, stackTrace) {
-      debugPrint('MatrixClientManager: Avatar upload failed - $e');
-      debugPrint('MatrixClientManager: Stack trace - $stackTrace');
+      debugPrint('=== setAvatar ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Error type: ${e.runtimeType}');
+      debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
   }
