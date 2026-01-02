@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -155,18 +156,13 @@ class MessageBubble extends StatelessWidget {
         ),
         clipBehavior: Clip.antiAlias,
         child: avatarUrl != null && avatarUrl!.isNotEmpty
-            ? Image.network(
-                avatarUrl!,
+            ? CachedNetworkImage(
+                imageUrl: avatarUrl!,
                 fit: BoxFit.cover,
-                // 禁用缓存以获取最新头像
-                cacheWidth: 80,
-                cacheHeight: 80,
-                errorBuilder: (context, error, stackTrace) =>
-                    _buildDefaultAvatar(),
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return _buildDefaultAvatar();
-                },
+                memCacheWidth: 80,
+                memCacheHeight: 80,
+                placeholder: (context, url) => _buildDefaultAvatar(),
+                errorWidget: (context, url, error) => _buildDefaultAvatar(),
               )
             : _buildDefaultAvatar(),
       ),

@@ -173,7 +173,7 @@ class GroupRepositoryImpl implements IGroupRepository {
   // ============================================
 
   GroupEntity _mapRoomToGroupEntity(matrix.Room room, {List<matrix.User>? members}) {
-    final avatarUrl = _groupDataSource.getGroupAvatarUrl(room.id);
+    final avatarUrlStr = _groupDataSource.getGroupAvatarUrl(room.id);
     final myUserId = _clientManager.client?.userID;
 
     GroupRole myRole = GroupRole.member;
@@ -186,7 +186,7 @@ class GroupRepositoryImpl implements IGroupRepository {
     return GroupEntity(
       roomId: room.id,
       name: room.getLocalizedDisplayname(),
-      avatarUrl: avatarUrl?.toString(),
+      avatarUrl: avatarUrlStr,
       topic: room.topic,
       announcement: room.topic,
       memberCount: room.summary.mJoinedMemberCount ?? 0,
@@ -211,24 +211,40 @@ class GroupRepositoryImpl implements IGroupRepository {
       role = GroupRole.admin;
     }
 
-    Uri? avatarUrl;
+    String? avatarUrl;
     final client = _clientManager.client;
     if (user.avatarUrl != null && client != null) {
-      avatarUrl = user.avatarUrl!.getThumbnail(
-        client,
-        width: 96,
-        height: 96,
-        method: matrix.ThumbnailMethod.crop,
-      );
+      avatarUrl = _buildAvatarHttpUrl(user.avatarUrl.toString(), client);
     }
 
     return GroupMember(
       userId: user.id,
       displayName: user.calcDisplayname(),
-      avatarUrl: avatarUrl?.toString(),
+      avatarUrl: avatarUrl,
       role: role,
       powerLevel: powerLevel,
     );
+  }
+  
+  /// 构建头像 HTTP URL
+  String? _buildAvatarHttpUrl(String? mxcUrl, matrix.Client client) {
+    if (mxcUrl == null || mxcUrl.isEmpty) return null;
+    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
+    
+    try {
+      final uri = Uri.parse(mxcUrl);
+      final serverName = uri.host;
+      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+      
+      if (serverName.isEmpty || mediaId.isEmpty) return null;
+      
+      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      if (homeserver.isEmpty) return null;
+      
+      return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
+    } catch (e) {
+      return null;
+    }
   }
 }
 
