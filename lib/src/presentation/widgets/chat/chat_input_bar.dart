@@ -1,11 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
+
+/// 语音录音结果回调
+typedef VoiceRecordCallback = void Function(String path, Duration duration);
 
 /// 聊天输入栏
 ///
 /// 特点：
 /// - 语音/键盘切换
+/// - 按住录音，松开发送
 /// - 表情按钮
 /// - 更多功能按钮
 /// - 发送按钮（有内容时显示）
@@ -14,7 +21,10 @@ class ChatInputBar extends StatefulWidget {
   /// 发送文本回调
   final ValueChanged<String>? onSendText;
 
-  /// 语音按钮点击回调
+  /// 发送语音回调
+  final VoiceRecordCallback? onSendVoice;
+
+  /// 语音按钮点击回调（用于切换模式）
   final VoidCallback? onVoicePressed;
 
   /// 表情按钮点击回调
@@ -56,6 +66,7 @@ class ChatInputBar extends StatefulWidget {
   const ChatInputBar({
     super.key,
     this.onSendText,
+    this.onSendVoice,
     this.onVoicePressed,
     this.onEmojiPressed,
     this.onMorePressed,
@@ -80,6 +91,14 @@ class _ChatInputBarState extends State<ChatInputBar> {
   late FocusNode _focusNode;
   bool _isVoiceMode = false;
   bool _hasText = false;
+  
+  // 录音状态
+  bool _isRecording = false;
+  bool _cancelRecording = false;
+  Duration _recordingDuration = Duration.zero;
+  StreamSubscription<RecordingState>? _recordingSubscription;
+  
+  final VoiceService _voiceService = VoiceService();
 
   @override
   void initState() {
@@ -90,10 +109,20 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
     _controller.addListener(_onTextChanged);
     _focusNode.addListener(_onFocusChanged);
+    
+    // 监听录音状态
+    _recordingSubscription = _voiceService.recordingStateStream.listen((state) {
+      if (mounted) {
+        setState(() {
+          _recordingDuration = state.duration;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
+    _recordingSubscription?.cancel();
     if (widget.controller == null) {
       _controller.dispose();
     }
@@ -123,8 +152,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
     });
     if (_isVoiceMode) {
       _focusNode.unfocus();
-      widget.onVoicePressed?.call();
     }
+    widget.onVoicePressed?.call();
   }
 
   void _sendMessage() {
@@ -135,64 +164,135 @@ class _ChatInputBarState extends State<ChatInputBar> {
     }
   }
 
+  Future<void> _startRecording() async {
+    final started = await _voiceService.startRecording();
+    if (started) {
+      setState(() {
+        _isRecording = true;
+        _cancelRecording = false;
+        _recordingDuration = Duration.zero;
+      });
+    } else {
+      // 显示权限提示
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('请允许使用麦克风权限'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    if (!_isRecording) return;
+    
+    if (_cancelRecording) {
+      await _voiceService.cancelRecording();
+      setState(() {
+        _isRecording = false;
+        _cancelRecording = false;
+      });
+      return;
+    }
+    
+    final result = await _voiceService.stopRecording();
+    setState(() {
+      _isRecording = false;
+    });
+    
+    if (result != null && result.duration.inSeconds >= 1) {
+      widget.onSendVoice?.call(result.path, result.duration);
+    } else if (result != null) {
+      // 录音时间太短
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('录音时间太短'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    }
+  }
+
+  void _updateCancelState(Offset localPosition, Size size) {
+    // 如果手指向上滑动超过一定距离，标记为取消
+    final shouldCancel = localPosition.dy < -50;
+    if (_cancelRecording != shouldCancel) {
+      setState(() {
+        _cancelRecording = shouldCancel;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
-        border: Border(
-          top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
-            width: 0.5,
-          ),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              // 语音/键盘切换按钮
-              if (widget.showVoiceButton)
-                _buildIconButton(
-                  icon: _isVoiceMode ? Icons.keyboard : Icons.mic,
-                  onPressed: _toggleVoiceMode,
-                  isDark: isDark,
-                ),
-
-              // 输入区域
-              Expanded(
-                child: _isVoiceMode
-                    ? _buildVoiceButton(isDark)
-                    : _buildTextField(isDark),
+    return Stack(
+      children: [
+        // 主输入栏
+        Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
+            border: Border(
+              top: BorderSide(
+                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                width: 0.5,
               ),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // 语音/键盘切换按钮
+                  if (widget.showVoiceButton)
+                    _buildIconButton(
+                      icon: _isVoiceMode ? Icons.keyboard : Icons.mic,
+                      onPressed: _toggleVoiceMode,
+                      isDark: isDark,
+                    ),
 
-              // 表情按钮
-              if (widget.showEmojiButton)
-                _buildIconButton(
-                  icon: Icons.emoji_emotions_outlined,
-                  onPressed: widget.onEmojiPressed,
-                  isDark: isDark,
-                ),
+                  // 输入区域
+                  Expanded(
+                    child: _isVoiceMode
+                        ? _buildVoiceButton(isDark)
+                        : _buildTextField(isDark),
+                  ),
 
-              // 更多/发送按钮
-              _hasText
-                  ? _buildSendButton()
-                  : (widget.showMoreButton
-                      ? _buildIconButton(
-                          icon: Icons.add_circle_outline,
-                          onPressed: widget.onMorePressed,
-                          isDark: isDark,
-                        )
-                      : const SizedBox.shrink()),
-            ],
+                  // 表情按钮
+                  if (widget.showEmojiButton)
+                    _buildIconButton(
+                      icon: Icons.emoji_emotions_outlined,
+                      onPressed: widget.onEmojiPressed,
+                      isDark: isDark,
+                    ),
+
+                  // 更多/发送按钮
+                  _hasText
+                      ? _buildSendButton()
+                      : (widget.showMoreButton
+                          ? _buildIconButton(
+                              icon: Icons.add_circle_outline,
+                              onPressed: widget.onMorePressed,
+                              isDark: isDark,
+                            )
+                          : const SizedBox.shrink()),
+                ],
+              ),
+            ),
           ),
         ),
-      ),
+        
+        // 录音浮层
+        if (_isRecording) _buildRecordingOverlay(isDark),
+      ],
     );
   }
 
@@ -250,29 +350,33 @@ class _ChatInputBarState extends State<ChatInputBar> {
   }
 
   Widget _buildVoiceButton(bool isDark) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      height: 40,
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+    return GestureDetector(
+      onLongPressStart: (_) => _startRecording(),
+      onLongPressEnd: (_) => _stopRecording(),
+      onLongPressMoveUpdate: (details) {
+        _updateCancelState(details.localPosition, context.size ?? Size.zero);
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        height: 40,
+        decoration: BoxDecoration(
+          color: _isRecording
+              ? AppColors.primary.withOpacity(0.1)
+              : (isDark ? AppColors.surfaceDark : AppColors.surface),
           borderRadius: BorderRadius.circular(4),
-          onTap: () {
-            // 触发语音录制
-            widget.onVoicePressed?.call();
-          },
-          child: Center(
-            child: Text(
-              '按住 说话',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-              ),
+          border: _isRecording
+              ? Border.all(color: AppColors.primary, width: 1)
+              : null,
+        ),
+        child: Center(
+          child: Text(
+            _isRecording ? '松开发送，上滑取消' : '按住 说话',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: _isRecording
+                  ? AppColors.primary
+                  : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
             ),
           ),
         ),
@@ -305,5 +409,59 @@ class _ChatInputBarState extends State<ChatInputBar> {
       ),
     );
   }
-}
 
+  Widget _buildRecordingOverlay(bool isDark) {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black54,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 录音指示器
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: _cancelRecording ? AppColors.error : AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    _cancelRecording ? Icons.delete : Icons.mic,
+                    size: 48,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _formatDuration(_recordingDuration),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              _cancelRecording ? '松开手指，取消发送' : '手指上滑，取消发送',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+}
