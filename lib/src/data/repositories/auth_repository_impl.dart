@@ -51,6 +51,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       region: profileData['region'] as String?,
       signature: profileData['signature'] as String?,
       pokeText: profileData['pokeText'] as String?,
+      ringtone: profileData['ringtone'] as String?,
     );
   }
 
@@ -386,6 +387,7 @@ class AuthRepositoryImpl implements IAuthRepository {
         region: profileData['region'] as String?,
         signature: profileData['signature'] as String?,
         pokeText: profileData['pokeText'] as String?,
+        ringtone: profileData['ringtone'] as String?,
       );
     } catch (e) {
       debugPrint('AuthRepository: Get profile failed - $e');
@@ -466,6 +468,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     String? region,
     String? signature,
     String? pokeText,
+    String? ringtone,
   }) async {
     if (!isLoggedIn) return false;
 
@@ -482,6 +485,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       if (region != null) newData['region'] = region;
       if (signature != null) newData['signature'] = signature;
       if (pokeText != null) newData['pokeText'] = pokeText;
+      if (ringtone != null) newData['ringtone'] = ringtone;
       
       // 保存到 Matrix 账户数据
       await client.setAccountData(
