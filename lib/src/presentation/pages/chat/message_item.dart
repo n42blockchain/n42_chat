@@ -143,26 +143,99 @@ class MessageItem extends StatelessWidget {
   Widget _buildMessageContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    Widget content;
     switch (message.type) {
       case MessageType.text:
-        return _buildTextMessage(isDark);
+        content = _buildTextMessage(isDark);
+        break;
       case MessageType.image:
-        return _buildImageMessage();
+        content = _buildImageMessage();
+        break;
       case MessageType.audio:
-        return _buildVoiceMessage();
+        content = _buildVoiceMessage();
+        break;
       case MessageType.video:
-        return _buildVideoMessage();
+        content = _buildVideoMessage();
+        break;
       case MessageType.file:
-        return _buildFileMessage(isDark);
+        content = _buildFileMessage(isDark);
+        break;
       case MessageType.location:
-        return _buildLocationMessage(isDark);
+        content = _buildLocationMessage(isDark);
+        break;
       case MessageType.transfer:
-        return _buildTransferMessage();
+        content = _buildTransferMessage();
+        break;
       case MessageType.encrypted:
-        return _buildEncryptedMessage(isDark);
+        content = _buildEncryptedMessage(isDark);
+        break;
       default:
-        return _buildTextMessage(isDark);
+        content = _buildTextMessage(isDark);
     }
+    
+    // 如果有回复，添加回复引用块
+    if (message.hasReply && message.replyToContent != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildReplyQuote(isDark),
+          const SizedBox(height: 4),
+          content,
+        ],
+      );
+    }
+    
+    return content;
+  }
+  
+  /// 构建回复引用块
+  Widget _buildReplyQuote(bool isDark) {
+    final bgColor = message.isFromMe
+        ? Colors.black.withOpacity(0.1)
+        : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05));
+    
+    final textColor = message.isFromMe
+        ? AppColors.messageTextSent.withOpacity(0.8)
+        : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary);
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(4),
+        border: Border(
+          left: BorderSide(
+            color: AppColors.primary,
+            width: 2,
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (message.replyToSender != null)
+            Text(
+              message.replyToSender!,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppColors.primary,
+              ),
+            ),
+          Text(
+            message.replyToContent ?? '',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              color: textColor,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildTextMessage(bool isDark) {
