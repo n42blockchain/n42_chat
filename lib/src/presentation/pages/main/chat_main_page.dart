@@ -19,8 +19,16 @@ import '../qrcode/scan_qr_page.dart';
 /// - 通讯录
 /// - 发现
 /// - 我
+/// 
+/// 左上角有返回按钮，可返回主应用
 class ChatMainPage extends StatefulWidget {
-  const ChatMainPage({super.key});
+  /// 返回主应用的回调
+  final VoidCallback? onBackToMain;
+  
+  const ChatMainPage({
+    super.key,
+    this.onBackToMain,
+  });
 
   @override
   State<ChatMainPage> createState() => _ChatMainPageState();
@@ -74,9 +82,35 @@ class _ChatMainPageState extends State<ChatMainPage> {
     });
   }
 
+  void _handleBack() {
+    if (widget.onBackToMain != null) {
+      widget.onBackToMain!();
+    } else {
+      Navigator.of(context).maybePop();
+    }
+  }
+
+  // 获取当前 Tab 的标题
+  String get _currentTitle {
+    switch (_currentIndex) {
+      case 0:
+        return '消息';
+      case 1:
+        return '通讯录';
+      case 2:
+        return '发现';
+      case 3:
+        return '我';
+      default:
+        return 'N42 Chat';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final textColor = isDark ? Colors.white : AppColors.textPrimary;
     
     return MultiBlocProvider(
       providers: [
@@ -84,27 +118,64 @@ class _ChatMainPageState extends State<ChatMainPage> {
         BlocProvider.value(value: _contactBloc),
       ],
       child: Scaffold(
+        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+        appBar: AppBar(
+          backgroundColor: bgColor,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: textColor,
+              size: 20,
+            ),
+            onPressed: _handleBack,
+          ),
+          title: Text(
+            _currentTitle,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: true,
+          actions: [
+            // 根据当前 Tab 显示不同的操作按钮
+            if (_currentIndex == 0) ...[
+              IconButton(
+                icon: Icon(Icons.search, color: textColor, size: 22),
+                onPressed: () {
+                  debugPrint('Open search');
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.add_circle_outline, color: textColor, size: 22),
+                onPressed: _openScanQR,
+              ),
+            ],
+            if (_currentIndex == 1)
+              IconButton(
+                icon: Icon(Icons.person_add_outlined, color: textColor, size: 22),
+                onPressed: _openScanQR,
+              ),
+            const SizedBox(width: 8),
+          ],
+        ),
         body: PageView(
           controller: _pageController,
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            // 聊天页面
-            ConversationListPage(
-              onConversationTap: (conversation) {
-                debugPrint('Open conversation: ${conversation.id}');
-                // TODO: 导航到聊天详情页
-              },
-              onSearchTap: () {
-                debugPrint('Open search');
-                // TODO: 导航到搜索页
-              },
+            // 聊天页面 - 不需要自带 AppBar
+            _ChatTabContent(
+              conversationBloc: _conversationBloc,
             ),
-            // 通讯录页面
-            const ContactListPage(),
-            // 发现页面
-            const DiscoverPage(),
-            // 我的页面
-            const ProfilePage(),
+            // 通讯录页面 - 不需要自带 AppBar
+            const _ContactTabContent(),
+            // 发现页面 - 不需要自带 AppBar
+            const _DiscoverTabContent(),
+            // 我的页面 - 不需要自带 AppBar
+            const _ProfileTabContent(),
           ],
         ),
         bottomNavigationBar: _buildBottomNavigationBar(isDark),
@@ -238,6 +309,64 @@ class _ChatMainPageState extends State<ChatMainPage> {
         ),
       ),
     );
+  }
+}
+
+// ============================================
+// 各 Tab 的内容 Widget（不带 AppBar）
+// ============================================
+
+/// 聊天 Tab 内容
+class _ChatTabContent extends StatelessWidget {
+  final ConversationBloc conversationBloc;
+  
+  const _ChatTabContent({required this.conversationBloc});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: conversationBloc,
+      child: ConversationListPage(
+        onConversationTap: (conversation) {
+          debugPrint('Open conversation: ${conversation.id}');
+          // TODO: 导航到聊天详情页
+        },
+        onSearchTap: () {
+          debugPrint('Open search');
+        },
+        showAppBar: false, // 不显示 AppBar
+      ),
+    );
+  }
+}
+
+/// 通讯录 Tab 内容
+class _ContactTabContent extends StatelessWidget {
+  const _ContactTabContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return const ContactListPage(showAppBar: false);
+  }
+}
+
+/// 发现 Tab 内容
+class _DiscoverTabContent extends StatelessWidget {
+  const _DiscoverTabContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return const DiscoverPage(showAppBar: false);
+  }
+}
+
+/// 我 Tab 内容
+class _ProfileTabContent extends StatelessWidget {
+  const _ProfileTabContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return const ProfilePage(showAppBar: false);
   }
 }
 

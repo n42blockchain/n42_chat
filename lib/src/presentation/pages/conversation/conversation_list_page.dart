@@ -26,11 +26,15 @@ class ConversationListPage extends StatefulWidget {
   /// 搜索点击回调
   final VoidCallback? onSearchTap;
 
+  /// 是否显示 AppBar（嵌入到主框架时可设为 false）
+  final bool showAppBar;
+
   const ConversationListPage({
     super.key,
     this.onConversationTap,
     this.onAddPressed,
     this.onSearchTap,
+    this.showAppBar = true,
   });
 
   @override
@@ -80,7 +84,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-      appBar: _buildAppBar(isDark),
+      appBar: widget.showAppBar ? _buildAppBar(isDark) : null,
       body: Column(
         children: [
           // 搜索栏

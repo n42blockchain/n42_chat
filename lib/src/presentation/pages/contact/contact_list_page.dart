@@ -12,7 +12,13 @@ import 'contact_index_bar.dart';
 
 /// 通讯录页面
 class ContactListPage extends StatefulWidget {
-  const ContactListPage({super.key});
+  /// 是否显示 AppBar（嵌入到主框架时可设为 false）
+  final bool showAppBar;
+  
+  const ContactListPage({
+    super.key,
+    this.showAppBar = true,
+  });
 
   @override
   State<ContactListPage> createState() => _ContactListPageState();
@@ -80,7 +86,7 @@ class _ContactListPageState extends State<ContactListPage> {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-      appBar: N42AppBar(
+      appBar: widget.showAppBar ? N42AppBar(
         title: '通讯录',
         actions: [
           IconButton(
@@ -98,7 +104,7 @@ class _ContactListPageState extends State<ContactListPage> {
             onPressed: _showAddContactDialog,
           ),
         ],
-      ),
+      ) : null,
       body: Column(
         children: [
           // 搜索栏
