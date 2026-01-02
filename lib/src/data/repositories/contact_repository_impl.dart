@@ -141,7 +141,7 @@ class ContactRepositoryImpl implements IContactRepository {
         userId: inviter ?? '',
         userName: user?.calcDisplayname() ?? inviter ?? '未知用户',
         userAvatarUrl: user?.avatarUrl?.toString(),
-        requestTime: room.getState(matrix.EventTypes.RoomCreate)?.originServerTs,
+        requestTime: null, // StrippedStateEvent doesn't have originServerTs
       );
     }).toList();
   }
