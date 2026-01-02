@@ -65,19 +65,23 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back_ios, color: textColor),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
-        title: const Text(
+        title: Text(
           '注册',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: textColor,
             fontSize: 17,
             fontWeight: FontWeight.w600,
           ),
@@ -101,6 +105,7 @@ class _RegisterPageState extends State<RegisterPage> {
           }
         },
         builder: (context, state) {
+          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Form(
@@ -111,32 +116,32 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 32),
 
                   // Logo
-                  _buildLogo(),
+                  _buildLogo(isDarkMode),
 
                   const SizedBox(height: 40),
 
                   // 服务器输入
-                  _buildServerInput(state),
+                  _buildServerInput(state, isDarkMode),
 
                   const SizedBox(height: 16),
 
                   // 用户名输入
-                  _buildUsernameInput(),
+                  _buildUsernameInput(isDarkMode),
 
                   const SizedBox(height: 16),
 
                   // 密码输入
-                  _buildPasswordInput(),
+                  _buildPasswordInput(isDarkMode),
 
                   const SizedBox(height: 16),
 
                   // 确认密码输入
-                  _buildConfirmPasswordInput(),
+                  _buildConfirmPasswordInput(isDarkMode),
 
                   const SizedBox(height: 20),
 
                   // 同意协议
-                  _buildAgreementCheckbox(),
+                  _buildAgreementCheckbox(isDarkMode),
 
                   const SizedBox(height: 24),
 
@@ -146,7 +151,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 24),
 
                   // 已有账号
-                  _buildLoginLink(),
+                  _buildLoginLink(isDarkMode),
 
                   const SizedBox(height: 32),
                 ],
@@ -158,7 +163,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildLogo() {
+  Widget _buildLogo(bool isDark) {
     return Column(
       children: [
         Container(
@@ -175,44 +180,51 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           '创建账号',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 4),
-        const Text(
+        Text(
           '加入 N42 Chat 开始聊天',
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildServerInput(AuthState state) {
+  Widget _buildServerInput(AuthState state, bool isDark) {
+    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '服务器地址',
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: labelColor,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _homeserverController,
+          style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
             hintText: 'https://m.si46.world',
+            hintStyle: TextStyle(color: hintColor),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: inputBgColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
@@ -237,7 +249,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 : state.isHomeserverValid
                     ? const Icon(Icons.check_circle, color: AppColors.success)
                     : IconButton(
-                        icon: const Icon(Icons.refresh),
+                        icon: Icon(Icons.refresh, color: hintColor),
                         onPressed: _checkHomeserver,
                       ),
           ),
@@ -268,24 +280,31 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildUsernameInput() {
+  Widget _buildUsernameInput(bool isDark) {
+    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '用户名',
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: labelColor,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _usernameController,
+          style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
             hintText: '请输入用户名（字母、数字、下划线）',
+            hintStyle: TextStyle(color: hintColor),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: inputBgColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
@@ -294,9 +313,9 @@ class _RegisterPageState extends State<RegisterPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.person_outline,
-              color: AppColors.textSecondary,
+              color: hintColor,
             ),
           ),
           textInputAction: TextInputAction.next,
@@ -317,24 +336,31 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildPasswordInput() {
+  Widget _buildPasswordInput(bool isDark) {
+    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '密码',
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: labelColor,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _passwordController,
+          style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
             hintText: '请输入密码（至少8位）',
+            hintStyle: TextStyle(color: hintColor),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: inputBgColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
@@ -343,14 +369,14 @@ class _RegisterPageState extends State<RegisterPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.lock_outline,
-              color: AppColors.textSecondary,
+              color: hintColor,
             ),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                color: AppColors.textSecondary,
+                color: hintColor,
               ),
               onPressed: () {
                 setState(() {
@@ -375,24 +401,31 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildConfirmPasswordInput() {
+  Widget _buildConfirmPasswordInput(bool isDark) {
+    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '确认密码',
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: labelColor,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _confirmPasswordController,
+          style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
             hintText: '请再次输入密码',
+            hintStyle: TextStyle(color: hintColor),
             filled: true,
-            fillColor: AppColors.inputBackground,
+            fillColor: inputBgColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
@@ -401,14 +434,14 @@ class _RegisterPageState extends State<RegisterPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.lock_outline,
-              color: AppColors.textSecondary,
+              color: hintColor,
             ),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                color: AppColors.textSecondary,
+                color: hintColor,
               ),
               onPressed: () {
                 setState(() {
@@ -434,7 +467,9 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildAgreementCheckbox() {
+  Widget _buildAgreementCheckbox(bool isDark) {
+    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -449,6 +484,8 @@ class _RegisterPageState extends State<RegisterPage> {
               });
             },
             activeColor: AppColors.primary,
+            checkColor: Colors.white,
+            side: BorderSide(color: textColor),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
             ),
@@ -465,9 +502,9 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Text.rich(
               TextSpan(
                 text: '我已阅读并同意',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.textSecondary,
+                  color: textColor,
                 ),
                 children: [
                   TextSpan(
@@ -528,15 +565,17 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildLoginLink() {
+  Widget _buildLoginLink(bool isDark) {
+    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
+        Text(
           '已有账号？',
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: textColor,
           ),
         ),
         TextButton(
