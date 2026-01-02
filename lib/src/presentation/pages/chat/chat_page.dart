@@ -965,6 +965,7 @@ class _ChatPageState extends State<ChatPage> {
           contactName: widget.conversation.name,
           contactAvatar: widget.conversation.avatarUrl,
           isVideoCall: isVideoCall,
+          roomId: widget.conversation.id, // 传递房间ID用于VoIP
           onEnd: () => Navigator.pop(context),
         ),
       );
@@ -1584,17 +1585,29 @@ class _MessageMenuSheet extends StatelessWidget {
 }
 
 /// 通话对话框
+/// 
+/// 当前为模拟实现，真正的 VoIP 通话需要集成 WebRTC
+/// 
+/// 实现步骤:
+/// 1. 添加 flutter_webrtc 依赖
+/// 2. 配置 STUN/TURN 服务器
+/// 3. 实现 ICE 候选人交换
+/// 4. 管理本地和远程媒体流
+/// 
+/// 参考 FluffyChat 的 VoIP 实现
 class _CallDialog extends StatefulWidget {
   final String contactName;
   final String? contactAvatar;
   final bool isVideoCall;
   final VoidCallback onEnd;
+  final String? roomId; // 可选的房间ID，用于真正的VoIP
 
   const _CallDialog({
     required this.contactName,
     this.contactAvatar,
     required this.isVideoCall,
     required this.onEnd,
+    this.roomId,
   });
 
   @override
@@ -1607,26 +1620,49 @@ class _CallDialogState extends State<_CallDialog> {
   bool _isCameraOff = false;
   int _callDuration = 0;
   bool _isConnecting = true;
+  String _callStatus = '呼叫中...';
   
   @override
   void initState() {
     super.initState();
+    _initCall();
+  }
+  
+  Future<void> _initCall() async {
     // 模拟连接过程
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _isConnecting = false;
-        });
-        // 开始计时
-        _startTimer();
-      }
-    });
+    // TODO: 替换为真正的 VoIP 连接
+    // 使用 VoIPService.startCall(widget.roomId, widget.isVideoCall ? CallType.video : CallType.voice)
+    
+    debugPrint('_CallDialog: Initiating ${widget.isVideoCall ? "video" : "voice"} call');
+    debugPrint('_CallDialog: Contact: ${widget.contactName}');
+    debugPrint('_CallDialog: Room ID: ${widget.roomId ?? "N/A"}');
+    
+    // 模拟呼叫状态变化
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (mounted) {
+      setState(() => _callStatus = '正在连接...');
+    }
+    
+    await Future.delayed(const Duration(seconds: 1));
+    if (mounted) {
+      setState(() => _callStatus = '响铃中...');
+    }
+    
+    await Future.delayed(const Duration(milliseconds: 1500));
+    if (mounted) {
+      setState(() {
+        _isConnecting = false;
+        _callStatus = '通话中';
+      });
+      // 开始计时
+      _startTimer();
+    }
   }
   
   void _startTimer() {
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 1));
-      if (mounted) {
+      if (mounted && !_isConnecting) {
         setState(() {
           _callDuration++;
         });
@@ -1640,6 +1676,30 @@ class _CallDialogState extends State<_CallDialog> {
     final minutes = seconds ~/ 60;
     final secs = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+  }
+  
+  void _toggleMute() {
+    setState(() => _isMuted = !_isMuted);
+    debugPrint('_CallDialog: Mute ${_isMuted ? "on" : "off"}');
+    // TODO: voipService.toggleMute()
+  }
+  
+  void _toggleSpeaker() {
+    setState(() => _isSpeakerOn = !_isSpeakerOn);
+    debugPrint('_CallDialog: Speaker ${_isSpeakerOn ? "on" : "off"}');
+    // TODO: voipService.toggleSpeaker()
+  }
+  
+  void _toggleCamera() {
+    setState(() => _isCameraOff = !_isCameraOff);
+    debugPrint('_CallDialog: Camera ${_isCameraOff ? "off" : "on"}');
+    // TODO: voipService.toggleCamera()
+  }
+  
+  void _endCall() {
+    debugPrint('_CallDialog: Ending call, duration: $_callDuration seconds');
+    // TODO: voipService.hangup()
+    widget.onEnd();
   }
 
   @override
@@ -1688,7 +1748,7 @@ class _CallDialogState extends State<_CallDialog> {
             // 通话状态
             Text(
               _isConnecting 
-                  ? '${widget.isVideoCall ? '视频' : '语音'}通话连接中...'
+                  ? _callStatus
                   : _formatDuration(_callDuration),
               style: TextStyle(
                 color: Colors.white.withOpacity(0.8),
@@ -1707,7 +1767,7 @@ class _CallDialogState extends State<_CallDialog> {
                   icon: _isMuted ? Icons.mic_off : Icons.mic,
                   label: _isMuted ? '取消静音' : '静音',
                   isActive: _isMuted,
-                  onTap: () => setState(() => _isMuted = !_isMuted),
+                  onTap: _toggleMute,
                 ),
                 
                 // 免提
@@ -1715,7 +1775,7 @@ class _CallDialogState extends State<_CallDialog> {
                   icon: _isSpeakerOn ? Icons.volume_up : Icons.volume_down,
                   label: _isSpeakerOn ? '关闭免提' : '免提',
                   isActive: _isSpeakerOn,
-                  onTap: () => setState(() => _isSpeakerOn = !_isSpeakerOn),
+                  onTap: _toggleSpeaker,
                 ),
                 
                 // 摄像头（仅视频通话）
@@ -1724,7 +1784,7 @@ class _CallDialogState extends State<_CallDialog> {
                     icon: _isCameraOff ? Icons.videocam_off : Icons.videocam,
                     label: _isCameraOff ? '开启摄像头' : '关闭摄像头',
                     isActive: _isCameraOff,
-                    onTap: () => setState(() => _isCameraOff = !_isCameraOff),
+                    onTap: _toggleCamera,
                   ),
               ],
             ),
@@ -1733,7 +1793,7 @@ class _CallDialogState extends State<_CallDialog> {
             
             // 挂断按钮
             GestureDetector(
-              onTap: widget.onEnd,
+              onTap: _endCall,
               child: Container(
                 width: 72,
                 height: 72,
