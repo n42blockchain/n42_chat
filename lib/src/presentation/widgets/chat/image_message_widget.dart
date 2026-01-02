@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 
 /// 图片消息组件
 ///
@@ -88,6 +90,13 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
       return _buildError(size);
     }
 
+    // 获取认证头（用于需要认证的 Matrix 媒体）
+    final accessToken = MatrixClientManager.instance.client?.accessToken;
+    final headers = <String, String>{};
+    if (accessToken != null && accessToken.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $accessToken';
+    }
+
     return GestureDetector(
       onTap: widget.onTap,
       child: ClipRRect(
@@ -99,10 +108,14 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
             key: ValueKey('$url-$_retryCount'),
             imageUrl: url,
             fit: BoxFit.cover,
+            httpHeaders: headers,
             fadeInDuration: const Duration(milliseconds: 200),
             fadeOutDuration: const Duration(milliseconds: 200),
             placeholder: (context, url) => _buildPlaceholder(size),
-            errorWidget: (context, url, error) => _buildError(size, canRetry: _retryCount < _maxRetries),
+            errorWidget: (context, url, error) {
+              debugPrint('ImageMessageWidget: Failed to load image: $url, error: $error');
+              return _buildError(size, canRetry: _retryCount < _maxRetries);
+            },
           ),
         ),
       ),
@@ -219,6 +232,13 @@ class ImageGridWidget extends StatelessWidget {
     final columns = _getColumns(displayImages.length);
     final itemSize = (200 - spacing * (columns - 1)) / columns;
 
+    // 获取认证头（用于需要认证的 Matrix 媒体）
+    final accessToken = MatrixClientManager.instance.client?.accessToken;
+    final headers = <String, String>{};
+    if (accessToken != null && accessToken.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $accessToken';
+    }
+
     return SizedBox(
       width: 200,
       child: Wrap(
@@ -239,6 +259,7 @@ class ImageGridWidget extends StatelessWidget {
                     width: itemSize,
                     height: itemSize,
                     fit: BoxFit.cover,
+                    httpHeaders: headers,
                     placeholder: (context, url) => Container(
                       width: itemSize,
                       height: itemSize,
