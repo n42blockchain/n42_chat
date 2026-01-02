@@ -257,9 +257,11 @@ class MessageItem extends StatelessWidget {
 
   Widget _buildImageMessage() {
     final metadata = message.metadata;
+    // 优先使用 httpUrl，如果没有则使用 mediaUrl
+    final imageUrl = metadata?.httpUrl ?? metadata?.mediaUrl ?? '';
 
     return ImageMessageWidget(
-      imageUrl: metadata?.mediaUrl ?? '',
+      imageUrl: imageUrl,
       thumbnailUrl: metadata?.thumbnailUrl,
       width: metadata?.width,
       height: metadata?.height,
@@ -271,13 +273,15 @@ class MessageItem extends StatelessWidget {
     final metadata = message.metadata;
     // 转换毫秒到秒
     final durationSec = ((metadata?.duration ?? 0) / 1000).round();
+    // 优先使用 httpUrl
+    final voiceUrl = metadata?.httpUrl ?? metadata?.mediaUrl;
 
     return VoiceMessageWidget(
       duration: durationSec > 0 ? durationSec : 1,
       isSelf: message.isFromMe,
-      voiceUrl: metadata?.mediaUrl,
+      voiceUrl: voiceUrl,
       // 语音转文字功能（需要接入语音识别API）
-      onConvertToText: metadata?.mediaUrl != null ? _convertVoiceToText : null,
+      onConvertToText: voiceUrl != null ? _convertVoiceToText : null,
     );
   }
 
