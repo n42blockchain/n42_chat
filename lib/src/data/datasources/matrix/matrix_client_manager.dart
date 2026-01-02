@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' if (dart.library.html) 'dart:html';
 
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -113,19 +114,27 @@ class MatrixClientManager {
             dir.createSync(recursive: true);
             debugPrint('MatrixClientManager: Created database directory');
           }
+          
+          // 初始化 Hive（必须在使用 HiveCollectionsDatabase 之前）
+          debugPrint('MatrixClientManager: Initializing Hive at: $dbPath');
+          Hive.init(dbPath);
+          debugPrint('MatrixClientManager: Hive initialized');
         } catch (e) {
-          debugPrint('MatrixClientManager: Could not create directory: $e');
-          // 继续尝试，让 Hive 自己处理
+          debugPrint('MatrixClientManager: Could not initialize Hive: $e');
+          // 继续尝试，让 Matrix SDK 自己处理
         }
       }
 
+      // 创建 Hive 数据库实例
+      final database = HiveCollectionsDatabase(
+        clientName,
+        dbPath,
+      );
+      
       // 创建客户端
       _client = Client(
         clientName,
-        databaseBuilder: (_) => HiveCollectionsDatabase(
-          clientName,
-          dbPath,
-        ),
+        databaseBuilder: (_) => database,
         supportedLoginTypes: {
           AuthenticationTypes.password,
           AuthenticationTypes.sso,
@@ -133,11 +142,15 @@ class MatrixClientManager {
         logLevel: kDebugMode ? Level.verbose : Level.warning,
       );
 
-      // 初始化客户端
+      // 初始化客户端 - 等待数据库完全加载
+      debugPrint('MatrixClientManager: Starting client init...');
       await _client!.init(
         waitForFirstSync: false,
-        waitUntilLoadCompletedLoaded: false,
+        waitUntilLoadCompletedLoaded: true, // 等待数据库完全加载
       );
+      
+      // 额外等待确保数据库初始化完成
+      await Future.delayed(const Duration(milliseconds: 100));
 
       _isInitialized = true;
       debugPrint('MatrixClientManager: Initialized successfully');
