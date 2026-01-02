@@ -123,7 +123,7 @@ class MatrixGroupDataSource {
     return _buildAvatarHttpUrl(avatarMxc, size);
   }
   
-  /// 构建头像 HTTP URL（带认证）
+  /// 构建头像 HTTP URL（不再在 URL 中添加 access_token，改用请求头认证）
   String? _buildAvatarHttpUrl(String? mxcUrl, int size) {
     if (mxcUrl == null || mxcUrl.isEmpty || _client == null) return null;
     if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
@@ -138,17 +138,8 @@ class MatrixGroupDataSource {
       final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) return null;
       
-      // 获取 access_token
-      final accessToken = _client!.accessToken;
-      
-      var url = '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=$size&height=$size&method=crop';
-      
-      // 添加认证
-      if (accessToken != null && accessToken.isNotEmpty) {
-        url = '$url&access_token=$accessToken';
-      }
-      
-      return url;
+      // 使用认证媒体 API (Matrix 1.11+)
+      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=$size&height=$size&method=crop';
     } catch (e) {
       return null;
     }

@@ -1137,19 +1137,15 @@ class MatrixMessageDataSource {
       final accessToken = _client!.accessToken;
       
       // 构建 HTTP URL
+      // Matrix 1.11+ 认证媒体使用 /_matrix/client/v1/media/ 路径
+      // 旧版使用 /_matrix/media/v3/ 路径
       String url;
       if (width != null && height != null) {
-        // 缩略图 URL
-        url = '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$method';
+        // 缩略图 URL - 使用认证媒体 API
+        url = '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$method';
       } else {
-        // 完整下载 URL
-        url = '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
-      }
-      
-      // 如果有 access_token，添加到 URL 以支持认证媒体
-      if (accessToken != null && accessToken.isNotEmpty) {
-        final separator = url.contains('?') ? '&' : '?';
-        url = '$url${separator}access_token=$accessToken';
+        // 完整下载 URL - 使用认证媒体 API
+        url = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
       }
       
       debugPrint('Built media URL: $url');

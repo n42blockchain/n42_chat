@@ -226,7 +226,7 @@ class GroupRepositoryImpl implements IGroupRepository {
     );
   }
   
-  /// 构建头像 HTTP URL（带认证）
+  /// 构建头像 HTTP URL（不再在 URL 中添加 access_token，改用请求头认证）
   String? _buildAvatarHttpUrl(String? mxcUrl, matrix.Client client) {
     if (mxcUrl == null || mxcUrl.isEmpty) return null;
     if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
@@ -241,17 +241,8 @@ class GroupRepositoryImpl implements IGroupRepository {
       final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) return null;
       
-      // 获取 access_token
-      final accessToken = client.accessToken;
-      
-      var url = '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
-      
-      // 添加认证
-      if (accessToken != null && accessToken.isNotEmpty) {
-        url = '$url&access_token=$accessToken';
-      }
-      
-      return url;
+      // 使用认证媒体 API (Matrix 1.11+)
+      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
     } catch (e) {
       return null;
     }
