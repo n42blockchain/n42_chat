@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'matrix_client_manager.dart';
@@ -242,11 +243,20 @@ class MatrixRoomDataSource {
   Future<void> markRoomAsRead(String roomId) async {
     final room = getRoomById(roomId);
     if (room == null) return;
+    
+    final eventId = room.lastEvent?.eventId;
+    // 验证 eventId 格式（Matrix 事件 ID 以 $ 开头）
+    if (eventId == null || eventId.isEmpty || !eventId.startsWith('\$')) {
+      debugPrint('MatrixRoomDataSource: Invalid eventId format for markRoomAsRead: $eventId');
+      return;
+    }
 
-    await room.setReadMarker(
-      room.lastEvent?.eventId ?? '',
-      mRead: room.lastEvent?.eventId,
-    );
+    try {
+      await room.setReadMarker(eventId, mRead: eventId);
+    } catch (e) {
+      debugPrint('MatrixRoomDataSource: markRoomAsRead error: $e');
+      // 忽略标记已读失败，不影响用户体验
+    }
   }
 
   // ============================================
