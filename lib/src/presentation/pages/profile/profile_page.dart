@@ -321,8 +321,16 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _openEditProfile(BuildContext context) {
+    // 获取当前的 AuthBloc
+    final authBloc = context.read<AuthBloc>();
+    
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ProfileEditPage()),
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: authBloc,
+          child: const ProfileEditPage(),
+        ),
+      ),
     ).then((_) {
       // 返回后刷新用户信息
       _loadUserInfo();
