@@ -1100,6 +1100,8 @@ class MatrixMessageDataSource {
   /// 
   /// 格式: https://homeserver/_matrix/media/v3/download/server/mediaId
   /// 或缩略图: https://homeserver/_matrix/media/v3/thumbnail/server/mediaId?width=x&height=y&method=crop
+  /// 
+  /// 对于需要认证的服务器，添加 access_token 参数
   String? _buildHttpUrl(String? mxcUrl, {int? width, int? height, String method = 'scale'}) {
     if (mxcUrl == null || mxcUrl.isEmpty || _client == null) return null;
     
@@ -1131,14 +1133,27 @@ class MatrixMessageDataSource {
         return null;
       }
       
+      // 获取 access_token（用于认证媒体访问）
+      final accessToken = _client!.accessToken;
+      
       // 构建 HTTP URL
+      String url;
       if (width != null && height != null) {
         // 缩略图 URL
-        return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$method';
+        url = '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$method';
       } else {
         // 完整下载 URL
-        return '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
+        url = '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
       }
+      
+      // 如果有 access_token，添加到 URL 以支持认证媒体
+      if (accessToken != null && accessToken.isNotEmpty) {
+        final separator = url.contains('?') ? '&' : '?';
+        url = '$url${separator}access_token=$accessToken';
+      }
+      
+      debugPrint('Built media URL: $url');
+      return url;
     } catch (e) {
       debugPrint('Error building HTTP URL: $e');
       return null;

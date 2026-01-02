@@ -366,7 +366,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     }
   }
   
-  /// 构建头像 HTTP URL
+  /// 构建头像 HTTP URL（带认证）
   String? _buildAvatarHttpUrl(String? mxcUrl, Client client) {
     if (mxcUrl == null || mxcUrl.isEmpty) return null;
     if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
@@ -381,8 +381,18 @@ class AuthRepositoryImpl implements IAuthRepository {
       final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) return null;
       
+      // 获取 access_token
+      final accessToken = client.accessToken;
+      
       // 返回缩略图 URL
-      return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
+      var url = '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
+      
+      // 添加认证
+      if (accessToken != null && accessToken.isNotEmpty) {
+        url = '$url&access_token=$accessToken';
+      }
+      
+      return url;
     } catch (e) {
       debugPrint('AuthRepository: Error building avatar URL: $e');
       return null;
