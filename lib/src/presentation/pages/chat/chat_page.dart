@@ -213,67 +213,85 @@ class _ChatPageState extends State<ChatPage> {
   /// 构建录音浮层
   Widget _buildRecordingOverlay() {
     return Positioned.fill(
-      child: Container(
-        color: Colors.black.withOpacity(0.7),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // 录音指示器
-              Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  color: _isRecordingCancelled ? AppColors.error : AppColors.primary,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: (_isRecordingCancelled ? AppColors.error : AppColors.primary)
-                          .withOpacity(0.4),
-                      blurRadius: 30,
-                      spreadRadius: 10,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      _isRecordingCancelled ? Icons.delete : Icons.mic,
-                      size: 56,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _formatDuration(_recordingDuration),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+      child: GestureDetector(
+        // 点击空白区域可以取消录音（作为紧急退出方式）
+        onTap: () {
+          _onRecordingStateChanged(false, true, _recordingDuration);
+        },
+        child: Container(
+          color: Colors.black.withOpacity(0.7),
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // 录音指示器
+                Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    color: _isRecordingCancelled ? AppColors.error : AppColors.primary,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: (_isRecordingCancelled ? AppColors.error : AppColors.primary)
+                            .withOpacity(0.4),
+                        blurRadius: 30,
+                        spreadRadius: 10,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 40),
-              // 提示文字
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(
-                  color: _isRecordingCancelled 
-                      ? AppColors.error.withOpacity(0.2) 
-                      : Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  _isRecordingCancelled ? '松开手指，取消发送' : '手指上滑，取消发送',
-                  style: TextStyle(
-                    color: _isRecordingCancelled ? AppColors.error : Colors.white,
-                    fontSize: 16,
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        _isRecordingCancelled ? Icons.delete : Icons.mic,
+                        size: 56,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _formatDuration(_recordingDuration),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 40),
+                // 提示文字
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: _isRecordingCancelled 
+                        ? AppColors.error.withOpacity(0.2) 
+                        : Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    _isRecordingCancelled ? '松开手指，取消发送' : '手指上滑，取消发送',
+                    style: TextStyle(
+                      color: _isRecordingCancelled ? AppColors.error : Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // 取消按钮（紧急退出）
+                TextButton.icon(
+                  onPressed: () {
+                    _onRecordingStateChanged(false, true, _recordingDuration);
+                  },
+                  icon: const Icon(Icons.close, color: Colors.white70),
+                  label: const Text(
+                    '点击取消',
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -758,27 +776,82 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _sendVoiceMessage(String path, Duration duration) async {
+    debugPrint('Sending voice message: path=$path, duration=${duration.inSeconds}s');
+    
     try {
       final file = File(path);
       if (!await file.exists()) {
         debugPrint('Voice file not found: $path');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('语音文件不存在'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
+      }
+      
+      final fileSize = await file.length();
+      debugPrint('Voice file size: $fileSize bytes');
+      
+      if (fileSize == 0) {
+        debugPrint('Voice file is empty');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('语音文件为空'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
         return;
       }
       
       final bytes = await file.readAsBytes();
-      final filename = path.split('/').last;
+      final filename = path.split(Platform.pathSeparator).last;
+      
+      // 根据文件扩展名确定 MIME 类型
+      String mimeType = 'audio/mp4';
+      if (filename.endsWith('.m4a')) {
+        mimeType = 'audio/mp4';
+      } else if (filename.endsWith('.ogg')) {
+        mimeType = 'audio/ogg';
+      } else if (filename.endsWith('.wav')) {
+        mimeType = 'audio/wav';
+      } else if (filename.endsWith('.mp3')) {
+        mimeType = 'audio/mpeg';
+      }
+      
+      debugPrint('Sending voice: filename=$filename, mimeType=$mimeType, size=${bytes.length}');
       
       context.read<ChatBloc>().add(SendVoiceMessage(
         audioBytes: bytes,
         filename: filename,
         duration: duration.inMilliseconds,
-        mimeType: 'audio/mp4',
+        mimeType: mimeType,
       ));
       
       // 删除临时文件
-      await file.delete();
-    } catch (e) {
+      try {
+        await file.delete();
+        debugPrint('Temporary voice file deleted');
+      } catch (e) {
+        debugPrint('Failed to delete temp file: $e');
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('语音发送中...'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e, stackTrace) {
       debugPrint('Send voice message error: $e');
+      debugPrint('Stack trace: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
