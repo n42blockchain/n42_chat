@@ -463,16 +463,30 @@ class MatrixClientManager {
     debugPrint('User ID: ${_client!.userID}');
     
     try {
-      // 使用自定义认证上传方法
-      debugPrint('Uploading avatar with authenticated endpoint...');
-      final mxcUri = await _uploadContentAuthenticated(
-        avatarBytes,
-        filename: actualFilename,
-        contentType: mimeType,
-      );
+      // 直接使用 SDK 的 uploadContent 方法（最可靠）
+      debugPrint('Uploading avatar with SDK uploadContent...');
+      Uri? mxcUri;
+      
+      try {
+        mxcUri = await _client!.uploadContent(
+          avatarBytes,
+          filename: actualFilename,
+          contentType: mimeType,
+        );
+        debugPrint('SDK upload successful: $mxcUri');
+      } catch (sdkError) {
+        debugPrint('SDK uploadContent failed: $sdkError');
+        // 尝试手动上传
+        debugPrint('Trying manual upload...');
+        mxcUri = await _uploadContentAuthenticated(
+          avatarBytes,
+          filename: actualFilename,
+          contentType: mimeType,
+        );
+      }
       
       if (mxcUri == null) {
-        throw Exception('上传头像失败：无法获取 MXC URI');
+        throw Exception('上传头像失败');
       }
       
       debugPrint('Avatar uploaded: $mxcUri');
@@ -488,10 +502,8 @@ class MatrixClientManager {
       
       debugPrint('=== setAvatar completed successfully ===');
     } catch (e, stackTrace) {
-      debugPrint('=== setAvatar ERROR ===');
-      debugPrint('Error: $e');
-      debugPrint('Error type: ${e.runtimeType}');
-      debugPrint('Stack trace: $stackTrace');
+      debugPrint('=== setAvatar ERROR: $e ===');
+      debugPrint('Stack: $stackTrace');
       rethrow;
     }
   }

@@ -303,42 +303,27 @@ class MatrixMessageDataSource {
 
   /// 发送图片消息
   /// 
-  /// 使用 Matrix SDK 内置的 sendFileEvent 方法发送图片
-  /// 参考 FluffyChat 的实现
+  /// 简化的实现：直接使用 SDK 的 uploadContent + sendEvent
   Future<String?> sendImageMessage(
     String roomId, {
     required Uint8List imageBytes,
     required String filename,
     String? mimeType,
   }) async {
-    debugPrint('=== MatrixMessageDataSource.sendImageMessage start ===');
-    debugPrint('roomId: $roomId');
-    debugPrint('filename: $filename');
-    debugPrint('mimeType (input): $mimeType');
-    debugPrint('imageBytes.length: ${imageBytes.length}');
+    debugPrint('=== sendImageMessage start ===');
+    debugPrint('roomId: $roomId, filename: $filename, size: ${imageBytes.length}');
     
     try {
-      // 检查客户端
-      if (_client == null) {
-        debugPrint('ERROR: Matrix client is null');
-        throw Exception('Matrix 客户端未初始化');
+      if (_client == null || !_client!.isLogged()) {
+        throw Exception('未登录或客户端未初始化');
       }
       
-      // 检查登录状态
-      if (!_client!.isLogged()) {
-        debugPrint('ERROR: Not logged in');
-        throw Exception('未登录');
-      }
-      
-      // 获取房间
       final room = _client!.getRoomById(roomId);
       if (room == null) {
-        debugPrint('ERROR: Room not found: $roomId');
         throw Exception('房间不存在: $roomId');
       }
-      debugPrint('Room found: ${room.getLocalizedDisplayname()}');
 
-      // 确定正确的 MIME 类型
+      // 确定 MIME 类型
       String actualMimeType = mimeType ?? 'image/jpeg';
       final lowerFilename = filename.toLowerCase();
       if (lowerFilename.endsWith('.png')) {
@@ -349,58 +334,39 @@ class MatrixMessageDataSource {
         actualMimeType = 'image/webp';
       } else if (lowerFilename.endsWith('.heic') || lowerFilename.endsWith('.heif')) {
         actualMimeType = 'image/jpeg';
-      } else if (!lowerFilename.contains('.')) {
-        // 没有扩展名，默认为 jpeg
-        actualMimeType = 'image/jpeg';
       }
 
-      debugPrint('Final mimeType: $actualMimeType');
+      debugPrint('MIME type: $actualMimeType');
 
-      // 方法1: 使用 SDK 内置的 sendFileEvent (推荐, FluffyChat 使用的方式)
-      debugPrint('Trying SDK sendFileEvent...');
-      try {
-        // 创建 MatrixImageFile 对象
-        final matrixFile = matrix.MatrixImageFile(
-          bytes: imageBytes,
-          name: filename,
-          mimeType: actualMimeType,
-        );
-        
-        // 使用 SDK 的 sendFileEvent 方法
-        final result = await room.sendFileEvent(
-          matrixFile,
-          inReplyTo: null,
-          editEventId: null,
-          shrinkImageMaxDimension: null, // 不压缩，保持原图
-          extraContent: null,
-        );
-        
-        debugPrint('sendFileEvent result: $result');
-        debugPrint('=== sendImageMessage completed successfully (SDK method) ===');
-        return result;
-      } catch (sdkError, sdkStack) {
-        debugPrint('SDK sendFileEvent failed: $sdkError');
-        debugPrint('Stack: $sdkStack');
-        
-        // 方法2: 如果 SDK 方法失败，尝试手动上传
-        debugPrint('Falling back to manual upload...');
-      }
+      // 直接使用 SDK 的 uploadContent 方法（最可靠）
+      debugPrint('Uploading with SDK uploadContent...');
+      Uri? mxcUri;
       
-      // 方法2: 手动上传然后发送事件
-      debugPrint('Uploading image with authenticated endpoint...');
-      final mxcUri = await _uploadContentAuthenticated(
-        imageBytes,
-        filename: filename,
-        contentType: actualMimeType,
-      );
+      try {
+        mxcUri = await _client!.uploadContent(
+          imageBytes,
+          filename: filename,
+          contentType: actualMimeType,
+        );
+        debugPrint('SDK upload successful: $mxcUri');
+      } catch (sdkUploadError) {
+        debugPrint('SDK uploadContent failed: $sdkUploadError');
+        // 尝试手动上传
+        debugPrint('Trying manual upload...');
+        mxcUri = await _uploadContentAuthenticated(
+          imageBytes,
+          filename: filename,
+          contentType: actualMimeType,
+        );
+      }
       
       if (mxcUri == null) {
-        throw Exception('上传图片失败：无法获取 MXC URI');
+        throw Exception('上传图片失败');
       }
       
-      debugPrint('Image uploaded: $mxcUri');
+      debugPrint('Upload successful: $mxcUri');
       
-      // 手动发送 m.room.message 事件
+      // 发送消息事件
       final content = <String, dynamic>{
         'msgtype': 'm.image',
         'body': filename,
@@ -411,17 +377,13 @@ class MatrixMessageDataSource {
         },
       };
       
-      debugPrint('Sending message event...');
       final result = await room.sendEvent(content);
       debugPrint('sendEvent result: $result');
-      
-      debugPrint('=== sendImageMessage completed successfully (manual method) ===');
+      debugPrint('=== sendImageMessage completed ===');
       return result;
     } catch (e, stackTrace) {
-      debugPrint('=== sendImageMessage ERROR ===');
-      debugPrint('Error: $e');
-      debugPrint('Error type: ${e.runtimeType}');
-      debugPrint('Stack trace: $stackTrace');
+      debugPrint('=== sendImageMessage ERROR: $e ===');
+      debugPrint('Stack: $stackTrace');
       rethrow;
     }
   }
