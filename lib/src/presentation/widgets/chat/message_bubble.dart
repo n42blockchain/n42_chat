@@ -158,8 +158,15 @@ class MessageBubble extends StatelessWidget {
             ? Image.network(
                 avatarUrl!,
                 fit: BoxFit.cover,
+                // 禁用缓存以获取最新头像
+                cacheWidth: 80,
+                cacheHeight: 80,
                 errorBuilder: (context, error, stackTrace) =>
                     _buildDefaultAvatar(),
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return _buildDefaultAvatar();
+                },
               )
             : _buildDefaultAvatar(),
       ),
