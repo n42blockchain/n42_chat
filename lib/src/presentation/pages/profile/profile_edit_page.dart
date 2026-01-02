@@ -215,8 +215,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   _buildListTile(
                     isDark: isDark,
                     title: '来电铃声',
-                    value: '默认',
-                    onTap: _selectRingtone,
+                    value: user?.ringtone ?? '默认铃声',
+                    onTap: () => _selectRingtone(user?.ringtone),
                   ),
                 ],
               ),
@@ -769,7 +769,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
   }
 
-  Future<void> _selectRingtone() async {
+  Future<void> _selectRingtone(String? currentRingtone) async {
     final ringtones = [
       '默认铃声',
       '清脆',
@@ -779,6 +779,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       '振动',
       '静音',
     ];
+    
+    final selectedRingtone = currentRingtone ?? '默认铃声';
     
     final result = await showModalBottomSheet<String>(
       context: context,
@@ -828,7 +830,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         color: AppColors.primary,
                       ),
                       title: Text(ringtone),
-                      trailing: ringtone == '默认铃声' 
+                      trailing: ringtone == selectedRingtone 
                           ? Icon(Icons.check, color: AppColors.primary)
                           : null,
                       onTap: () => Navigator.pop(context, ringtone),
@@ -842,7 +844,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       },
     );
 
-    if (result != null && mounted) {
+    if (result != null && result != currentRingtone && mounted) {
+      context.read<AuthBloc>().add(UpdateUserProfile(ringtone: result));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('来电铃声已设置为: $result'),
@@ -861,7 +864,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
 
   Future<void> _manageInvoices() async {
-    _showFeatureToast('发票抬头');
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const _InvoiceManagePage(),
+      ),
+    );
   }
 
   void _showFeatureToast(String feature) {
@@ -1306,5 +1313,525 @@ class _AddressItem {
   });
 
   String get fullAddress => '$region $detail';
+}
+
+/// 发票抬头管理页面
+class _InvoiceManagePage extends StatefulWidget {
+  const _InvoiceManagePage();
+
+  @override
+  State<_InvoiceManagePage> createState() => _InvoiceManagePageState();
+}
+
+class _InvoiceManagePageState extends State<_InvoiceManagePage> {
+  List<_InvoiceItem> _invoices = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInvoices();
+  }
+
+  Future<void> _loadInvoices() async {
+    try {
+      final clientManager = getIt<MatrixClientManager>();
+      final client = clientManager.client;
+      
+      if (client != null && client.isLogged()) {
+        try {
+          final data = await client.getAccountData(
+            client.userID!,
+            'n42.user.invoices',
+          );
+          
+          if (data is Map && data['invoices'] != null) {
+            final invoiceList = data['invoices'] as List;
+            setState(() {
+              _invoices = invoiceList.map((item) => _InvoiceItem(
+                type: item['type'] ?? 'personal',
+                title: item['title'] ?? '',
+                taxNumber: item['taxNumber'],
+                bankName: item['bankName'],
+                bankAccount: item['bankAccount'],
+                companyAddress: item['companyAddress'],
+                companyPhone: item['companyPhone'],
+                isDefault: item['isDefault'] ?? false,
+              )).toList();
+              _isLoading = false;
+            });
+            return;
+          }
+        } catch (e) {
+          debugPrint('No saved invoices: $e');
+        }
+      }
+      
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Load invoices error: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _saveInvoices() async {
+    try {
+      final clientManager = getIt<MatrixClientManager>();
+      final client = clientManager.client;
+      
+      if (client != null && client.isLogged()) {
+        final invoiceList = _invoices.map((item) => {
+          'type': item.type,
+          'title': item.title,
+          'taxNumber': item.taxNumber,
+          'bankName': item.bankName,
+          'bankAccount': item.bankAccount,
+          'companyAddress': item.companyAddress,
+          'companyPhone': item.companyPhone,
+          'isDefault': item.isDefault,
+        }).toList();
+        
+        await client.setAccountData(
+          client.userID!,
+          'n42.user.invoices',
+          {'invoices': invoiceList},
+        );
+        debugPrint('Invoices saved successfully');
+      }
+    } catch (e) {
+      debugPrint('Save invoices error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('保存发票抬头失败: $e')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      appBar: AppBar(
+        title: const Text('我的发票抬头'),
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        actions: [
+          TextButton(
+            onPressed: _addInvoice,
+            child: const Text('新增'),
+          ),
+        ],
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _invoices.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.receipt_long_outlined,
+                    size: 64,
+                    color: AppColors.textTertiary,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '暂无发票抬头',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: _addInvoice,
+                    icon: const Icon(Icons.add),
+                    label: const Text('添加发票抬头'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _invoices.length,
+              itemBuilder: (context, index) {
+                final invoice = _invoices[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: invoice.type == 'company' 
+                                    ? AppColors.primary.withOpacity(0.1)
+                                    : Colors.orange.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                invoice.type == 'company' ? '企业' : '个人',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: invoice.type == 'company' 
+                                      ? AppColors.primary 
+                                      : Colors.orange,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                invoice.title,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (invoice.isDefault)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  '默认',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        if (invoice.taxNumber != null && invoice.taxNumber!.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            '税号: ${invoice.taxNumber}',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () => _editInvoice(index),
+                              child: const Text('编辑'),
+                            ),
+                            TextButton(
+                              onPressed: () => _deleteInvoice(index),
+                              child: Text(
+                                '删除',
+                                style: TextStyle(color: AppColors.error),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  Future<void> _addInvoice() async {
+    final result = await _showInvoiceEditor();
+    if (result != null) {
+      if (result.isDefault) {
+        for (int i = 0; i < _invoices.length; i++) {
+          if (_invoices[i].isDefault) {
+            _invoices[i] = _InvoiceItem(
+              type: _invoices[i].type,
+              title: _invoices[i].title,
+              taxNumber: _invoices[i].taxNumber,
+              bankName: _invoices[i].bankName,
+              bankAccount: _invoices[i].bankAccount,
+              companyAddress: _invoices[i].companyAddress,
+              companyPhone: _invoices[i].companyPhone,
+              isDefault: false,
+            );
+          }
+        }
+      }
+      setState(() {
+        _invoices.add(result);
+      });
+      await _saveInvoices();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('发票抬头添加成功'), duration: Duration(seconds: 1)),
+        );
+      }
+    }
+  }
+
+  Future<void> _editInvoice(int index) async {
+    final result = await _showInvoiceEditor(invoice: _invoices[index]);
+    if (result != null) {
+      if (result.isDefault) {
+        for (int i = 0; i < _invoices.length; i++) {
+          if (i != index && _invoices[i].isDefault) {
+            _invoices[i] = _InvoiceItem(
+              type: _invoices[i].type,
+              title: _invoices[i].title,
+              taxNumber: _invoices[i].taxNumber,
+              bankName: _invoices[i].bankName,
+              bankAccount: _invoices[i].bankAccount,
+              companyAddress: _invoices[i].companyAddress,
+              companyPhone: _invoices[i].companyPhone,
+              isDefault: false,
+            );
+          }
+        }
+      }
+      setState(() {
+        _invoices[index] = result;
+      });
+      await _saveInvoices();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('发票抬头更新成功'), duration: Duration(seconds: 1)),
+        );
+      }
+    }
+  }
+
+  void _deleteInvoice(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('删除发票抬头'),
+        content: const Text('确定要删除这个发票抬头吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              setState(() {
+                _invoices.removeAt(index);
+              });
+              await _saveInvoices();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('发票抬头已删除'), duration: Duration(seconds: 1)),
+                );
+              }
+            },
+            child: Text(
+              '删除',
+              style: TextStyle(color: AppColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<_InvoiceItem?> _showInvoiceEditor({_InvoiceItem? invoice}) async {
+    String type = invoice?.type ?? 'personal';
+    final titleController = TextEditingController(text: invoice?.title);
+    final taxNumberController = TextEditingController(text: invoice?.taxNumber);
+    final bankNameController = TextEditingController(text: invoice?.bankName);
+    final bankAccountController = TextEditingController(text: invoice?.bankAccount);
+    final companyAddressController = TextEditingController(text: invoice?.companyAddress);
+    final companyPhoneController = TextEditingController(text: invoice?.companyPhone);
+    bool isDefault = invoice?.isDefault ?? false;
+
+    return await showDialog<_InvoiceItem>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(invoice == null ? '新增发票抬头' : '编辑发票抬头'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 抬头类型
+                Row(
+                  children: [
+                    const Text('抬头类型: '),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: const Text('个人'),
+                      selected: type == 'personal',
+                      onSelected: (selected) {
+                        if (selected) {
+                          setDialogState(() => type = 'personal');
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: const Text('企业'),
+                      selected: type == 'company',
+                      onSelected: (selected) {
+                        if (selected) {
+                          setDialogState(() => type = 'company');
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(
+                    labelText: type == 'company' ? '企业名称' : '个人姓名',
+                    hintText: type == 'company' ? '请输入企业名称' : '请输入姓名',
+                  ),
+                ),
+                if (type == 'company') ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: taxNumberController,
+                    decoration: const InputDecoration(
+                      labelText: '纳税人识别号',
+                      hintText: '请输入纳税人识别号',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: bankNameController,
+                    decoration: const InputDecoration(
+                      labelText: '开户银行（选填）',
+                      hintText: '请输入开户银行',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: bankAccountController,
+                    decoration: const InputDecoration(
+                      labelText: '银行账号（选填）',
+                      hintText: '请输入银行账号',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: companyAddressController,
+                    decoration: const InputDecoration(
+                      labelText: '企业地址（选填）',
+                      hintText: '请输入企业地址',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: companyPhoneController,
+                    decoration: const InputDecoration(
+                      labelText: '企业电话（选填）',
+                      hintText: '请输入企业电话',
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                CheckboxListTile(
+                  value: isDefault,
+                  onChanged: (value) {
+                    setDialogState(() {
+                      isDefault = value ?? false;
+                    });
+                  },
+                  title: const Text('设为默认抬头'),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (titleController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(type == 'company' ? '请输入企业名称' : '请输入姓名')),
+                  );
+                  return;
+                }
+                if (type == 'company' && taxNumberController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('请输入纳税人识别号')),
+                  );
+                  return;
+                }
+                Navigator.pop(
+                  context,
+                  _InvoiceItem(
+                    type: type,
+                    title: titleController.text,
+                    taxNumber: type == 'company' ? taxNumberController.text : null,
+                    bankName: type == 'company' ? bankNameController.text : null,
+                    bankAccount: type == 'company' ? bankAccountController.text : null,
+                    companyAddress: type == 'company' ? companyAddressController.text : null,
+                    companyPhone: type == 'company' ? companyPhoneController.text : null,
+                    isDefault: isDefault,
+                  ),
+                );
+              },
+              child: const Text('保存'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 发票抬头数据模型
+class _InvoiceItem {
+  final String type; // 'personal' or 'company'
+  final String title;
+  final String? taxNumber;
+  final String? bankName;
+  final String? bankAccount;
+  final String? companyAddress;
+  final String? companyPhone;
+  final bool isDefault;
+
+  _InvoiceItem({
+    required this.type,
+    required this.title,
+    this.taxNumber,
+    this.bankName,
+    this.bankAccount,
+    this.companyAddress,
+    this.companyPhone,
+    this.isDefault = false,
+  });
 }
 

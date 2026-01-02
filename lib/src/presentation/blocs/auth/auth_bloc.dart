@@ -258,11 +258,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await _authRepository.updateDisplayName(event.displayName!);
       }
       
-      // 更新自定义资料数据（性别、地区、签名、拍一拍）
+      // 更新自定义资料数据（性别、地区、签名、拍一拍、来电铃声）
       final hasProfileChanges = event.gender != null || 
                                  event.region != null || 
                                  event.signature != null ||
-                                 event.pokeText != null;
+                                 event.pokeText != null ||
+                                 event.ringtone != null;
       
       if (hasProfileChanges) {
         await _authRepository.updateUserProfileData(
@@ -270,6 +271,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           region: event.region,
           signature: event.signature,
           pokeText: event.pokeText,
+          ringtone: event.ringtone,
         );
       }
       

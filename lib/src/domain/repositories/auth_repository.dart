@@ -95,6 +95,7 @@ abstract class IAuthRepository {
     String? region,
     String? signature,
     String? pokeText,
+    String? ringtone,
   });
   
   /// 获取用户自定义资料数据
