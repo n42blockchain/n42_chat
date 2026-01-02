@@ -184,7 +184,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      emit(state.copyWith(isLoading: true));
+      emit(state.copyWith(status: AuthStatus.loading));
       
       final success = await _authRepository.updateAvatar(
         event.avatarBytes,
@@ -195,18 +195,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // 刷新用户信息
         final user = _authRepository.currentUser;
         emit(state.copyWith(
+          status: AuthStatus.authenticated,
           user: user,
-          isLoading: false,
         ));
       } else {
         emit(state.copyWith(
-          isLoading: false,
+          status: AuthStatus.error,
           errorMessage: '头像上传失败',
         ));
       }
     } catch (e) {
       emit(state.copyWith(
-        isLoading: false,
+        status: AuthStatus.error,
         errorMessage: '头像上传失败: $e',
       ));
     }
@@ -218,7 +218,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      emit(state.copyWith(isLoading: true));
+      emit(state.copyWith(status: AuthStatus.loading));
       
       final success = await _authRepository.updateDisplayName(event.displayName);
       
@@ -226,18 +226,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // 刷新用户信息
         final user = _authRepository.currentUser;
         emit(state.copyWith(
+          status: AuthStatus.authenticated,
           user: user,
-          isLoading: false,
         ));
       } else {
         emit(state.copyWith(
-          isLoading: false,
+          status: AuthStatus.error,
           errorMessage: '更新昵称失败',
         ));
       }
     } catch (e) {
       emit(state.copyWith(
-        isLoading: false,
+        status: AuthStatus.error,
         errorMessage: '更新昵称失败: $e',
       ));
     }
@@ -249,7 +249,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      emit(state.copyWith(isLoading: true));
+      emit(state.copyWith(status: AuthStatus.loading));
       
       if (event.displayName != null) {
         await _authRepository.updateDisplayName(event.displayName!);
@@ -258,12 +258,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // 刷新用户信息
       final user = _authRepository.currentUser;
       emit(state.copyWith(
+        status: AuthStatus.authenticated,
         user: user,
-        isLoading: false,
       ));
     } catch (e) {
       emit(state.copyWith(
-        isLoading: false,
+        status: AuthStatus.error,
         errorMessage: '更新资料失败: $e',
       ));
     }
