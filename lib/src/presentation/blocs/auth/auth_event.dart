@@ -40,16 +40,18 @@ class AuthRegisterRequested extends AuthEvent {
   final String username;
   final String password;
   final String? email;
+  final String? registrationToken;
 
   const AuthRegisterRequested({
     required this.homeserver,
     required this.username,
     required this.password,
     this.email,
+    this.registrationToken,
   });
 
   @override
-  List<Object?> get props => [homeserver, username, password, email];
+  List<Object?> get props => [homeserver, username, password, email, registrationToken];
 }
 
 /// 检查Homeserver

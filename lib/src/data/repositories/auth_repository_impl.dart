@@ -215,6 +215,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String username,
     required String password,
     String? email,
+    String? registrationToken,
   }) async {
     try {
       final response = await _authDataSource.register(
@@ -222,6 +223,7 @@ class AuthRepositoryImpl implements IAuthRepository {
         username: username,
         password: password,
         email: email,
+        registrationToken: registrationToken,
       );
 
       final accessToken = response.accessToken ?? '';

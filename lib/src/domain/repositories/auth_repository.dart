@@ -43,11 +43,14 @@ abstract class IAuthRepository {
   Future<void> logout();
 
   /// 注册新用户
+  ///
+  /// [registrationToken] 注册邀请码（某些服务器需要）
   Future<AuthResult> register({
     required String homeserver,
     required String username,
     required String password,
     String? email,
+    String? registrationToken,
   });
 
   /// 检查Homeserver是否有效
