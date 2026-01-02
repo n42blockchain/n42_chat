@@ -370,12 +370,34 @@ class AuthRepositoryImpl implements IAuthRepository {
     if (displayName != null) {
       await _authDataSource.clientManager.setDisplayName(displayName);
     }
+  }
 
-    // TODO: 实现头像上传
-    // if (avatarPath != null) {
-    //   final file = MatrixFile(...);
-    //   await _authDataSource.clientManager.setAvatar(file);
-    // }
+  @override
+  Future<bool> updateAvatar(Uint8List avatarBytes, String filename) async {
+    if (!isLoggedIn) return false;
+
+    try {
+      await _authDataSource.clientManager.setAvatar(avatarBytes, filename);
+      debugPrint('AuthRepository: Avatar updated successfully');
+      return true;
+    } catch (e) {
+      debugPrint('AuthRepository: Update avatar failed - $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> updateDisplayName(String displayName) async {
+    if (!isLoggedIn) return false;
+
+    try {
+      await _authDataSource.clientManager.setDisplayName(displayName);
+      debugPrint('AuthRepository: Display name updated to: $displayName');
+      return true;
+    } catch (e) {
+      debugPrint('AuthRepository: Update display name failed - $e');
+      return false;
+    }
   }
 
   // ============================================

@@ -19,12 +19,28 @@ class UserEntity extends Equatable {
   /// 是否当前登录用户
   final bool isCurrentUser;
 
+  /// 性别 ('male', 'female', null)
+  final String? gender;
+
+  /// 地区
+  final String? region;
+
+  /// 签名
+  final String? signature;
+
+  /// 拍一拍文字
+  final String? pokeText;
+
   const UserEntity({
     required this.userId,
     required this.displayName,
     this.avatarUrl,
     this.statusMessage,
     this.isCurrentUser = false,
+    this.gender,
+    this.region,
+    this.signature,
+    this.pokeText,
   });
 
   /// 获取用户名部分 (@user:server.com -> user)
@@ -77,6 +93,10 @@ class UserEntity extends Equatable {
         avatarUrl,
         statusMessage,
         isCurrentUser,
+        gender,
+        region,
+        signature,
+        pokeText,
       ];
 
   UserEntity copyWith({
@@ -85,6 +105,10 @@ class UserEntity extends Equatable {
     String? avatarUrl,
     String? statusMessage,
     bool? isCurrentUser,
+    String? gender,
+    String? region,
+    String? signature,
+    String? pokeText,
   }) {
     return UserEntity(
       userId: userId ?? this.userId,
@@ -92,6 +116,10 @@ class UserEntity extends Equatable {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       statusMessage: statusMessage ?? this.statusMessage,
       isCurrentUser: isCurrentUser ?? this.isCurrentUser,
+      gender: gender ?? this.gender,
+      region: region ?? this.region,
+      signature: signature ?? this.signature,
+      pokeText: pokeText ?? this.pokeText,
     );
   }
 }
