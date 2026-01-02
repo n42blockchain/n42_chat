@@ -23,6 +23,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthRegisterRequested>(_onRegisterRequested);
     on<AuthHomeserverCheckRequested>(_onHomeserverCheckRequested);
     on<AuthRestoreSessionRequested>(_onRestoreSessionRequested);
+    on<UpdateAvatar>(_onUpdateAvatar);
+    on<UpdateDisplayName>(_onUpdateDisplayName);
+    on<UpdateUserProfile>(_onUpdateUserProfile);
 
     // 监听登录状态变化
     _loginStateSubscription = _authRepository.loginStateStream.listen(
@@ -171,6 +174,97 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } else {
       emit(state.copyWith(
         status: AuthStatus.unauthenticated,
+      ));
+    }
+  }
+
+  /// 更新头像
+  Future<void> _onUpdateAvatar(
+    UpdateAvatar event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(isLoading: true));
+      
+      final success = await _authRepository.updateAvatar(
+        event.avatarBytes,
+        event.filename,
+      );
+      
+      if (success) {
+        // 刷新用户信息
+        final user = _authRepository.currentUser;
+        emit(state.copyWith(
+          user: user,
+          isLoading: false,
+        ));
+      } else {
+        emit(state.copyWith(
+          isLoading: false,
+          errorMessage: '头像上传失败',
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: '头像上传失败: $e',
+      ));
+    }
+  }
+
+  /// 更新显示名
+  Future<void> _onUpdateDisplayName(
+    UpdateDisplayName event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(isLoading: true));
+      
+      final success = await _authRepository.updateDisplayName(event.displayName);
+      
+      if (success) {
+        // 刷新用户信息
+        final user = _authRepository.currentUser;
+        emit(state.copyWith(
+          user: user,
+          isLoading: false,
+        ));
+      } else {
+        emit(state.copyWith(
+          isLoading: false,
+          errorMessage: '更新昵称失败',
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: '更新昵称失败: $e',
+      ));
+    }
+  }
+
+  /// 更新用户资料
+  Future<void> _onUpdateUserProfile(
+    UpdateUserProfile event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(isLoading: true));
+      
+      if (event.displayName != null) {
+        await _authRepository.updateDisplayName(event.displayName!);
+      }
+      
+      // 刷新用户信息
+      final user = _authRepository.currentUser;
+      emit(state.copyWith(
+        user: user,
+        isLoading: false,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: '更新资料失败: $e',
       ));
     }
   }

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
 
 /// 认证事件基类
@@ -92,5 +94,47 @@ class AuthTokenLoginRequested extends AuthEvent {
 /// 清除错误
 class AuthErrorCleared extends AuthEvent {
   const AuthErrorCleared();
+}
+
+/// 更新头像
+class UpdateAvatar extends AuthEvent {
+  final Uint8List avatarBytes;
+  final String filename;
+
+  const UpdateAvatar({
+    required this.avatarBytes,
+    required this.filename,
+  });
+
+  @override
+  List<Object?> get props => [avatarBytes, filename];
+}
+
+/// 更新显示名
+class UpdateDisplayName extends AuthEvent {
+  final String displayName;
+
+  const UpdateDisplayName(this.displayName);
+
+  @override
+  List<Object?> get props => [displayName];
+}
+
+/// 更新用户资料
+class UpdateUserProfile extends AuthEvent {
+  final String? displayName;
+  final String? signature;
+  final String? gender;
+  final String? region;
+
+  const UpdateUserProfile({
+    this.displayName,
+    this.signature,
+    this.gender,
+    this.region,
+  });
+
+  @override
+  List<Object?> get props => [displayName, signature, gender, region];
 }
 
