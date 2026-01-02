@@ -406,21 +406,97 @@ class MatrixMessageDataSource {
   MessageEntity mapEventToMessage(matrix.Event event, matrix.Room room) {
     final sender = room.unsafeGetUserFromMemoryOrFallback(event.senderId);
     
+    // 解析消息内容，处理回复格式
+    final parsedContent = _parseMessageContent(event, room);
+    
     return MessageEntity(
       id: event.eventId,
       roomId: room.id,
       senderId: event.senderId,
       senderName: sender.calcDisplayname(),
       senderAvatarUrl: sender.avatarUrl?.toString(),
-      content: event.body,
+      content: parsedContent.content,
       type: _mapMessageType(event),
       timestamp: event.originServerTs,
       status: _mapMessageStatus(event),
       isFromMe: event.senderId == _client?.userID,
       replyToId: event.relationshipEventId,
+      replyToContent: parsedContent.replyToContent,
+      replyToSender: parsedContent.replyToSender,
       isEdited: false, // 简化处理，后续可通过检查编辑事件实现
       reactions: _extractReactions(event),
       metadata: _extractMetadata(event),
+    );
+  }
+  
+  /// 解析消息内容，处理回复格式
+  /// Matrix 回复格式: "> <@user:server> 原消息内容\n\n实际回复内容"
+  _ParsedContent _parseMessageContent(matrix.Event event, matrix.Room room) {
+    String body = event.body;
+    String? replyToContent;
+    String? replyToSender;
+    
+    // 检查是否是回复消息（有 m.relates_to 或以 > 开头）
+    if (event.relationshipEventId != null || body.startsWith('> ')) {
+      // 尝试从 body 解析回复格式
+      final lines = body.split('\n');
+      final List<String> quotedLines = [];
+      int contentStartIndex = 0;
+      
+      for (int i = 0; i < lines.length; i++) {
+        final line = lines[i];
+        if (line.startsWith('> ')) {
+          quotedLines.add(line);
+          contentStartIndex = i + 1;
+        } else if (line.isEmpty && quotedLines.isNotEmpty) {
+          // 空行分隔引用和实际内容
+          contentStartIndex = i + 1;
+          break;
+        } else if (quotedLines.isNotEmpty) {
+          // 遇到非引用行，停止
+          break;
+        }
+      }
+      
+      // 如果找到了引用内容
+      if (quotedLines.isNotEmpty) {
+        // 解析引用的发送者和内容
+        final firstQuoteLine = quotedLines.first;
+        // 格式: "> <@user:server> 内容" 或 "> * <@user:server> 内容"
+        final userMatch = RegExp(r'> \*? ?<(@[^>]+)>(.*)').firstMatch(firstQuoteLine);
+        if (userMatch != null) {
+          final userId = userMatch.group(1);
+          replyToContent = userMatch.group(2)?.trim();
+          
+          // 如果有多行引用，合并
+          if (quotedLines.length > 1) {
+            final restQuotes = quotedLines.skip(1).map((l) => l.replaceFirst('> ', '')).join('\n');
+            replyToContent = '${replyToContent ?? ''}\n$restQuotes'.trim();
+          }
+          
+          // 获取发送者名称
+          if (userId != null) {
+            try {
+              final replyUser = room.unsafeGetUserFromMemoryOrFallback(userId);
+              replyToSender = replyUser.calcDisplayname();
+            } catch (_) {
+              // 如果获取用户失败，使用 userId 的用户名部分
+              replyToSender = userId.split(':').first.replaceFirst('@', '');
+            }
+          }
+        }
+        
+        // 提取实际回复内容
+        if (contentStartIndex < lines.length) {
+          body = lines.sublist(contentStartIndex).join('\n').trim();
+        }
+      }
+    }
+    
+    return _ParsedContent(
+      content: body,
+      replyToContent: replyToContent,
+      replyToSender: replyToSender,
     );
   }
 
@@ -558,5 +634,18 @@ class MatrixMessageDataSource {
       return null;
     }
   }
+}
+
+/// 解析后的消息内容
+class _ParsedContent {
+  final String content;
+  final String? replyToContent;
+  final String? replyToSender;
+  
+  _ParsedContent({
+    required this.content,
+    this.replyToContent,
+    this.replyToSender,
+  });
 }
 
