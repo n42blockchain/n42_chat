@@ -86,6 +86,19 @@ abstract class IAuthRepository {
   /// 
   /// 返回是否成功
   Future<bool> updateDisplayName(String displayName);
+  
+  /// 更新用户自定义资料
+  /// 
+  /// 使用 Matrix 账户数据存储自定义字段
+  Future<bool> updateUserProfileData({
+    String? gender,
+    String? region,
+    String? signature,
+    String? pokeText,
+  });
+  
+  /// 获取用户自定义资料数据
+  Future<Map<String, dynamic>?> getUserProfileData();
 }
 
 /// 认证结果

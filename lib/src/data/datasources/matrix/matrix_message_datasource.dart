@@ -720,23 +720,21 @@ class MatrixMessageDataSource {
       }
       debugPrint('Room found: ${room.getLocalizedDisplayname()}');
 
-      // 构建 geo URI (标准格式)
-      final geoUri = 'geo:$latitude,$longitude';
+      // 构建 geo URI (标准格式) - 使用固定小数位避免精度问题
+      final latStr = latitude.toStringAsFixed(6);
+      final lonStr = longitude.toStringAsFixed(6);
+      final geoUri = 'geo:$latStr,$lonStr';
       
       // 构建位置消息内容 (遵循 Matrix 规范)
+      // 注意：不在 info 中包含浮点数，某些服务器不支持
       final content = {
         'msgtype': matrix.MessageTypes.Location,
-        'body': description ?? '位置: $latitude, $longitude',
+        'body': description ?? '位置: $latStr, $lonStr',
         'geo_uri': geoUri,
-        'info': {
-          // Matrix org.matrix.msc3488 扩展
-          'latitude': latitude,
-          'longitude': longitude,
-        },
         // Matrix 规范的 m.location 扩展 (可选)
         'org.matrix.msc3488.location': {
           'uri': geoUri,
-          'description': description ?? '位置',
+          'description': description ?? '我的位置',
         },
         // 资产类型
         'org.matrix.msc3488.asset': {
