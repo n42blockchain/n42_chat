@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 
 /// 微信风格头像组件
 ///
@@ -85,11 +87,22 @@ class N42Avatar extends StatelessWidget {
   Widget _buildContent() {
     // 优先显示网络图片
     if (imageUrl != null && imageUrl!.isNotEmpty) {
+      // 获取认证头（用于需要认证的 Matrix 媒体）
+      final accessToken = MatrixClientManager.instance.client?.accessToken;
+      final headers = <String, String>{};
+      if (accessToken != null && accessToken.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $accessToken';
+      }
+      
       return CachedNetworkImage(
         imageUrl: imageUrl!,
         fit: BoxFit.cover,
+        httpHeaders: headers,
         placeholder: (context, url) => _buildPlaceholder(),
-        errorWidget: (context, url, error) => _buildDefaultAvatar(),
+        errorWidget: (context, url, error) {
+          debugPrint('N42Avatar: Failed to load image: $url, error: $error');
+          return _buildDefaultAvatar();
+        },
       );
     }
 
