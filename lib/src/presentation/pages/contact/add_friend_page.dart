@@ -61,16 +61,18 @@ class _AddFriendPageState extends State<AddFriendPage> {
       // 搜索用户
       final response = await client.searchUserDirectory(query, limit: 20);
       
+      final results = response.results.map((user) {
+        // userId 格式: @username:server.com，提取 localpart
+        final localpart = user.userId.split(':').first.replaceFirst('@', '');
+        return <String, dynamic>{
+          'userId': user.userId,
+          'displayName': user.displayName ?? localpart,
+          'avatarUrl': user.avatarUrl?.toString(),
+        };
+      }).toList();
+      
       setState(() {
-        _searchResults = response.results.map((user) => {
-          // userId 格式: @username:server.com，提取 localpart
-          final localpart = user.userId.split(':').first.replaceFirst('@', '');
-          return {
-            'userId': user.userId,
-            'displayName': user.displayName ?? localpart,
-            'avatarUrl': user.avatarUrl?.toString(),
-          };
-        }).toList();
+        _searchResults = results;
         _isLoading = false;
         _isSearching = true;
       });
