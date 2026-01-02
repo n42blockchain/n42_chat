@@ -29,7 +29,21 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return BlocBuilder<AuthBloc, AuthState>(
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        // 监听状态变化
+        if (state.status == AuthStatus.authenticated && _isUploading) {
+          setState(() => _isUploading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('头像更新成功')),
+          );
+        } else if (state.status == AuthStatus.error && state.errorMessage != null) {
+          setState(() => _isUploading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage!)),
+          );
+        }
+      },
       builder: (context, state) {
         final user = state.user;
         
@@ -244,38 +258,49 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            // 左侧标题 - 固定宽度
+            SizedBox(
+              width: 80,
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                ),
               ),
             ),
-            const Spacer(),
-            if (trailing != null)
-              trailing
-            else ...[
-              if (value != null)
-                Flexible(
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.right,
-                  ),
-                ),
-              if (showArrow) ...[
-                const SizedBox(width: 8),
-                Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textTertiary,
-                  size: 20,
-                ),
-              ],
-            ],
+            // 右侧内容
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (trailing != null)
+                    trailing
+                  else ...[
+                    if (value != null)
+                      Expanded(
+                        child: Text(
+                          value,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
+                    if (showArrow) ...[
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.chevron_right,
+                        color: AppColors.textTertiary,
+                        size: 20,
+                      ),
+                    ],
+                  ],
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -347,26 +372,17 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
       final bytes = await image.readAsBytes();
       
-      // 上传头像
+      // 上传头像 - BlocConsumer 会监听状态变化并显示结果
       context.read<AuthBloc>().add(UpdateAvatar(
         avatarBytes: bytes,
         filename: image.name,
       ));
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('头像上传成功')),
-        );
-      }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('头像上传失败: $e')),
-        );
-      }
-    } finally {
-      if (mounted) {
         setState(() => _isUploading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('选择图片失败: $e')),
+        );
       }
     }
   }
