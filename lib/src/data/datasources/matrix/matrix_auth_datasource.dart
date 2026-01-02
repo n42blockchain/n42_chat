@@ -106,13 +106,19 @@ class MatrixAuthDataSource {
 
   /// 注册新用户
   ///
-  /// 注意：大多数公共服务器不允许直接注册，需要通过Web界面
+  /// [homeserver] 服务器地址
+  /// [username] 用户名
+  /// [password] 密码
+  /// [email] 邮箱（可选）
+  /// [deviceName] 设备名称
+  /// [registrationToken] 注册邀请码（某些服务器需要）
   Future<RegisterResponse> register({
     required String homeserver,
     required String username,
     required String password,
     String? email,
     String? deviceName,
+    String? registrationToken,
   }) async {
     if (!_clientManager.isInitialized) {
       await _clientManager.initialize();
@@ -127,13 +133,58 @@ class MatrixAuthDataSource {
     final homeserverUri = Uri.parse(homeserver);
     await client.checkHomeserver(homeserverUri);
 
+    // 构建认证数据
+    AuthenticationData? auth;
+    if (registrationToken != null && registrationToken.isNotEmpty) {
+      auth = AuthenticationData(
+        type: 'm.login.registration_token',
+        session: null,
+        token: registrationToken,
+      );
+    }
+
     // 注册
     // 注意：这个流程可能需要额外的认证步骤（如验证码）
-    return await client.register(
-      username: username,
-      password: password,
-      initialDeviceDisplayName: deviceName ?? 'N42Chat',
-    );
+    try {
+      return await client.register(
+        username: username,
+        password: password,
+        initialDeviceDisplayName: deviceName ?? 'N42Chat',
+        auth: auth,
+      );
+    } on MatrixException catch (e) {
+      // 处理 UIA 流程 - 如果服务器返回 401 且有 session
+      if (e.response?.statusCode == 401) {
+        final body = e.response?.body;
+        if (body != null && body is Map<String, dynamic>) {
+          final session = body['session'] as String?;
+          final flows = body['flows'] as List<dynamic>?;
+          
+          // 检查是否需要 registration_token
+          final needsToken = flows?.any((flow) {
+            final stages = flow['stages'] as List<dynamic>?;
+            return stages?.contains('m.login.registration_token') ?? false;
+          }) ?? false;
+
+          if (needsToken && registrationToken != null && session != null) {
+            // 使用 session 重新尝试注册
+            final authWithSession = AuthenticationData(
+              type: 'm.login.registration_token',
+              session: session,
+              token: registrationToken,
+            );
+            
+            return await client.register(
+              username: username,
+              password: password,
+              initialDeviceDisplayName: deviceName ?? 'N42Chat',
+              auth: authWithSession,
+            );
+          }
+        }
+      }
+      rethrow;
+    }
   }
 
   /// 检查用户名是否可用
