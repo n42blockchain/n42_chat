@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' if (dart.library.html) 'dart:html';
 
 import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 /// Matrix客户端管理器
 ///
@@ -70,23 +71,39 @@ class MatrixClientManager {
     if (_isInitializing) {
       debugPrint('MatrixClientManager: Already initializing, waiting...');
       // 等待初始化完成
-      while (_isInitializing) {
+      int waitCount = 0;
+      while (_isInitializing && waitCount < 100) {
         await Future.delayed(const Duration(milliseconds: 100));
+        waitCount++;
       }
-      return;
+      if (_isInitialized) return;
+      // 如果等待超时且仍未初始化，继续尝试初始化
     }
 
     _isInitializing = true;
 
     try {
       // 获取数据库路径
-      final dbPath = databasePath ?? await _getDefaultDatabasePath();
+      String dbPath;
+      if (databasePath != null) {
+        dbPath = databasePath;
+      } else {
+        dbPath = await _getDefaultDatabasePath();
+      }
 
-      // 确保数据库目录存在
-      if (dbPath.isNotEmpty && !kIsWeb) {
-        final dir = Directory(dbPath);
-        if (!await dir.exists()) {
-          await dir.create(recursive: true);
+      debugPrint('MatrixClientManager: Using database path: $dbPath');
+
+      // 确保数据库目录存在（仅在非 Web 平台）
+      if (!kIsWeb && dbPath.isNotEmpty) {
+        try {
+          final dir = Directory(dbPath);
+          if (!dir.existsSync()) {
+            dir.createSync(recursive: true);
+            debugPrint('MatrixClientManager: Created database directory');
+          }
+        } catch (e) {
+          debugPrint('MatrixClientManager: Could not create directory: $e');
+          // 继续尝试，让 Hive 自己处理
         }
       }
 
@@ -117,7 +134,12 @@ class MatrixClientManager {
       debugPrint('MatrixClientManager: Initialize failed: $e');
       debugPrint('Stack: $stack');
       // 清理失败的初始化
-      _client = null;
+      if (_client != null) {
+        try {
+          await _client!.dispose();
+        } catch (_) {}
+        _client = null;
+      }
       _isInitialized = false;
       rethrow;
     } finally {
@@ -127,12 +149,27 @@ class MatrixClientManager {
 
   /// 获取默认数据库路径
   Future<String> _getDefaultDatabasePath() async {
+    if (kIsWeb) {
+      // Web 平台使用空路径，Hive 会使用 IndexedDB
+      return '';
+    }
+    
     try {
       final dir = await getApplicationDocumentsDirectory();
-      return dir.path;
+      // 使用子目录来存储数据库
+      final dbDir = p.join(dir.path, 'n42_chat_db');
+      return dbDir;
     } catch (e) {
-      // Web平台使用空路径
-      return '';
+      debugPrint('MatrixClientManager: Failed to get documents directory: $e');
+      // 尝试使用应用支持目录
+      try {
+        final supportDir = await getApplicationSupportDirectory();
+        final dbDir = p.join(supportDir.path, 'n42_chat_db');
+        return dbDir;
+      } catch (e2) {
+        debugPrint('MatrixClientManager: Failed to get support directory: $e2');
+        return '';
+      }
     }
   }
 
