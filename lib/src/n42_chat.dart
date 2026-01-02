@@ -355,7 +355,7 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
   void _navigateToLogin(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => BlocProvider.value(
+        builder: (_) => BlocProvider.value(
           value: N42Chat.authBloc,
           child: const LoginPage(),
         ),
@@ -364,7 +364,7 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
   }
 
   void _navigateToRegister(BuildContext context) {
-    // TODO: 实现注册页面导航
+    // 直接导航到登录页面，用户可以在登录页点击"注册"
     _navigateToLogin(context);
   }
 
