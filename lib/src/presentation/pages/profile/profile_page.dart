@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/utils/matrix_utils.dart';
+import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
@@ -54,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
           if (mounted) {
             // 将 mxc:// URL 转换为 HTTP URL
             final avatarMxc = profile.avatarUrl?.toString();
-            final avatarHttpUrl = MatrixUtils.mxcToHttp(
+            final avatarHttpUrl = mx_utils.MatrixUtils.mxcToHttp(
               avatarMxc,
               client: client,
               width: 128,
