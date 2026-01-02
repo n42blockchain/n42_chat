@@ -83,6 +83,8 @@ dependencies:
   # ============================================
   # MIT / BSD-3-Clause License
   equatable: ^2.0.5
+  # MIME 类型检测
+  mime: ^1.0.5
   json_annotation: ^4.8.1
   intl: ">=0.18.1 <0.21.0"
   uuid: ^4.3.3
