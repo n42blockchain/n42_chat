@@ -165,6 +165,19 @@ class _ChatPageState extends State<ChatPage> {
     context.read<ChatBloc>().add(ResendMessage(message.id));
   }
 
+  /// 打开聊天设置页面
+  void _openChatSettings() {
+    // TODO: 实现聊天设置页面
+    // 可以是群设置或私聊设置
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('聊天设置功能开发中...'),
+        duration: Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -1065,7 +1078,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
         IconButton(
           icon: const Icon(Icons.more_horiz),
-          onPressed: widget.onMorePressed,
+          onPressed: widget.onMorePressed ?? _openChatSettings,
         ),
       ],
     );
