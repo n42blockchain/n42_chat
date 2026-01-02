@@ -155,6 +155,7 @@ class N42Chat {
   /// 根据登录状态自动显示：
   /// - 已登录：显示会话列表页面
   /// - 未登录：显示欢迎页面，可登录/注册
+  /// - 未初始化：显示初始化错误页面，提供重试选项
   ///
   /// ```dart
   /// TabBarView(
@@ -166,7 +167,10 @@ class N42Chat {
   /// )
   /// ```
   static Widget chatWidget() {
-    _ensureInitialized();
+    // 如果未初始化，显示错误页面而不是抛出异常
+    if (!_initialized) {
+      return const _NotInitializedPage();
+    }
     return const _N42ChatEntryWidget();
   }
 
@@ -463,6 +467,142 @@ class _LoadingPage extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 未初始化错误页面
+class _NotInitializedPage extends StatefulWidget {
+  const _NotInitializedPage();
+
+  @override
+  State<_NotInitializedPage> createState() => _NotInitializedPageState();
+}
+
+class _NotInitializedPageState extends State<_NotInitializedPage> {
+  bool _isRetrying = false;
+
+  Future<void> _retry() async {
+    if (_isRetrying) return;
+    
+    setState(() {
+      _isRetrying = true;
+    });
+
+    try {
+      // 尝试重新初始化
+      await N42Chat.initialize(N42Chat.config ?? const N42ChatConfig());
+      // 如果成功，触发重建
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      debugPrint('N42Chat retry initialization failed: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRetrying = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 如果已初始化，返回正常的入口Widget
+    if (N42Chat.isInitialized) {
+      return const _N42ChatEntryWidget();
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEDEDED);
+    final textColor = isDark ? Colors.white : const Color(0xFF181818);
+    final subtitleColor = isDark ? Colors.white70 : const Color(0xFF888888);
+    
+    return Scaffold(
+      backgroundColor: bgColor,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  color: Colors.orange,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'N42 Chat',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: textColor,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '聊天模块初始化失败',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: subtitleColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '请检查网络连接后重试',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: subtitleColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: 160,
+                height: 44,
+                child: ElevatedButton(
+                  onPressed: _isRetrying ? null : _retry,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF07C160),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: _isRetrying
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text(
+                          '重试',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
