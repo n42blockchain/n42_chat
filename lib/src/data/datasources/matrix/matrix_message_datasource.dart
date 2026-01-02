@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../domain/entities/message_entity.dart';
@@ -83,6 +85,164 @@ class MatrixMessageDataSource {
   // 消息发送
   // ============================================
 
+  /// 检查服务器是否支持认证媒体上传
+  Future<bool> _supportsAuthenticatedMedia() async {
+    try {
+      final versionsResponse = await _client!.getVersions();
+      // 检查 Matrix 版本是否 >= v1.11 (支持认证媒体)
+      final supportsV111 = versionsResponse.versions.any(
+        (v) => _isVersionGreaterThanOrEqualTo(v, 'v1.11'),
+      );
+      // 或者检查 unstable feature
+      final hasUnstableFeature = 
+          versionsResponse.unstableFeatures?['org.matrix.msc3916.stable'] == true;
+      
+      debugPrint('MatrixMessageDataSource: supportsV111=$supportsV111, hasUnstableFeature=$hasUnstableFeature');
+      return supportsV111 || hasUnstableFeature;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Error checking authenticated media support: $e');
+      return false;
+    }
+  }
+  
+  bool _isVersionGreaterThanOrEqualTo(String version, String target) {
+    // 简单的版本比较，假设格式为 "vX.Y"
+    try {
+      final vParts = version.replaceAll('v', '').split('.');
+      final tParts = target.replaceAll('v', '').split('.');
+      
+      final vMajor = int.tryParse(vParts[0]) ?? 0;
+      final vMinor = vParts.length > 1 ? (int.tryParse(vParts[1]) ?? 0) : 0;
+      final tMajor = int.tryParse(tParts[0]) ?? 0;
+      final tMinor = tParts.length > 1 ? (int.tryParse(tParts[1]) ?? 0) : 0;
+      
+      if (vMajor > tMajor) return true;
+      if (vMajor < tMajor) return false;
+      return vMinor >= tMinor;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// 使用认证端点上传文件
+  /// 
+  /// 这是一个 workaround，因为 Matrix SDK 0.32.x 没有正确实现
+  /// MSC3916 的认证媒体上传端点 (_matrix/client/v1/media/upload)
+  Future<Uri?> _uploadContentAuthenticated(
+    Uint8List content, {
+    String? filename,
+    String? contentType,
+  }) async {
+    final client = _client;
+    if (client == null) {
+      throw Exception('Matrix client not initialized');
+    }
+    if (client.accessToken == null) {
+      throw Exception('No access token available');
+    }
+    if (client.homeserver == null) {
+      throw Exception('No homeserver configured');
+    }
+
+    final supportsAuth = await _supportsAuthenticatedMedia();
+    debugPrint('MatrixMessageDataSource: supportsAuthenticatedMedia=$supportsAuth');
+    
+    // 根据服务器能力选择端点
+    final path = supportsAuth 
+        ? '_matrix/client/v1/media/upload'  // 认证媒体端点 (MSC3916)
+        : '_matrix/media/v3/upload';         // 传统端点
+    
+    final uri = Uri.parse('${client.homeserver}/$path').replace(
+      queryParameters: filename != null ? {'filename': filename} : null,
+    );
+    
+    debugPrint('MatrixMessageDataSource: Uploading to: $uri');
+    debugPrint('MatrixMessageDataSource: Content size: ${content.length} bytes');
+    debugPrint('MatrixMessageDataSource: Content type: $contentType');
+    
+    final request = http.Request('POST', uri);
+    request.headers['Authorization'] = 'Bearer ${client.accessToken}';
+    if (contentType != null) {
+      request.headers['Content-Type'] = contentType;
+    }
+    request.bodyBytes = content;
+    
+    try {
+      final streamedResponse = await http.Client().send(request);
+      final response = await http.Response.fromStream(streamedResponse);
+      
+      debugPrint('MatrixMessageDataSource: Upload response status: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final contentUri = json['content_uri'] as String?;
+        if (contentUri != null) {
+          debugPrint('MatrixMessageDataSource: Upload successful: $contentUri');
+          return Uri.parse(contentUri);
+        }
+      }
+      
+      // 上传失败，尝试显示错误信息
+      debugPrint('MatrixMessageDataSource: Upload failed: ${response.body}');
+      
+      // 如果使用认证端点失败，尝试传统端点
+      if (supportsAuth && response.statusCode == 403) {
+        debugPrint('MatrixMessageDataSource: Auth endpoint failed, trying legacy endpoint...');
+        return _uploadContentLegacy(content, filename: filename, contentType: contentType);
+      }
+      
+      // 解析错误信息
+      try {
+        final errorJson = jsonDecode(response.body);
+        final errcode = errorJson['errcode'] as String?;
+        final error = errorJson['error'] as String?;
+        throw Exception('Upload failed: $errcode - $error');
+      } catch (_) {
+        throw Exception('Upload failed with status ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Upload error: $e');
+      rethrow;
+    }
+  }
+  
+  /// 使用传统端点上传文件（作为 fallback）
+  Future<Uri?> _uploadContentLegacy(
+    Uint8List content, {
+    String? filename,
+    String? contentType,
+  }) async {
+    final client = _client;
+    if (client == null) return null;
+    
+    final uri = Uri.parse('${client.homeserver}/_matrix/media/v3/upload').replace(
+      queryParameters: filename != null ? {'filename': filename} : null,
+    );
+    
+    debugPrint('MatrixMessageDataSource: Uploading (legacy) to: $uri');
+    
+    final request = http.Request('POST', uri);
+    request.headers['Authorization'] = 'Bearer ${client.accessToken}';
+    if (contentType != null) {
+      request.headers['Content-Type'] = contentType;
+    }
+    request.bodyBytes = content;
+    
+    final streamedResponse = await http.Client().send(request);
+    final response = await http.Response.fromStream(streamedResponse);
+    
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final contentUri = json['content_uri'] as String?;
+      if (contentUri != null) {
+        return Uri.parse(contentUri);
+      }
+    }
+    
+    debugPrint('MatrixMessageDataSource: Legacy upload failed: ${response.body}');
+    return null;
+  }
+
   /// 发送文本消息
   Future<String?> sendTextMessage(String roomId, String text) async {
     final room = _client?.getRoomById(roomId);
@@ -117,6 +277,12 @@ class MatrixMessageDataSource {
         throw Exception('未登录');
       }
       
+      // 打印认证信息用于调试
+      debugPrint('User ID: ${_client!.userID}');
+      debugPrint('Homeserver: ${_client!.homeserver}');
+      debugPrint('Access token present: ${_client!.accessToken != null}');
+      debugPrint('Access token length: ${_client!.accessToken?.length ?? 0}');
+      
       // 获取房间
       final room = _client!.getRoomById(roomId);
       if (room == null) {
@@ -142,21 +308,37 @@ class MatrixMessageDataSource {
 
       debugPrint('Final mimeType: $actualMimeType');
 
-      // 创建 Matrix 图片文件
-      final matrixFile = matrix.MatrixImageFile(
-        bytes: imageBytes,
-        name: filename,
-        mimeType: actualMimeType,
+      // 使用自定义认证上传方法
+      debugPrint('Uploading image with authenticated endpoint...');
+      final mxcUri = await _uploadContentAuthenticated(
+        imageBytes,
+        filename: filename,
+        contentType: actualMimeType,
       );
-      debugPrint('MatrixImageFile created: name=${matrixFile.name}, mimeType=${matrixFile.mimeType}');
-
-      // 发送文件事件
-      debugPrint('Calling room.sendFileEvent...');
-      final result = await room.sendFileEvent(matrixFile);
-      debugPrint('sendFileEvent result: $result');
+      
+      if (mxcUri == null) {
+        throw Exception('上传图片失败：无法获取 MXC URI');
+      }
+      
+      debugPrint('Image uploaded: $mxcUri');
+      
+      // 手动发送 m.room.message 事件
+      final content = <String, dynamic>{
+        'msgtype': 'm.image',
+        'body': filename,
+        'url': mxcUri.toString(),
+        'info': {
+          'mimetype': actualMimeType,
+          'size': imageBytes.length,
+        },
+      };
+      
+      debugPrint('Sending message event...');
+      final result = await room.sendEvent(content);
+      debugPrint('sendEvent result: $result');
       
       if (result == null || result.isEmpty) {
-        debugPrint('WARNING: sendFileEvent returned null or empty result');
+        debugPrint('WARNING: sendEvent returned null or empty result');
       }
       
       debugPrint('=== sendImageMessage completed successfully ===');
@@ -225,22 +407,45 @@ class MatrixMessageDataSource {
 
       debugPrint('Final mimeType: $actualMimeType');
 
-      // 创建 Matrix 音频文件
-      final matrixFile = matrix.MatrixAudioFile(
-        bytes: audioBytes,
-        name: filename,
-        mimeType: actualMimeType,
-        duration: duration,
+      // 使用自定义认证上传方法
+      debugPrint('Uploading voice with authenticated endpoint...');
+      final mxcUri = await _uploadContentAuthenticated(
+        audioBytes,
+        filename: filename,
+        contentType: actualMimeType,
       );
-      debugPrint('MatrixAudioFile created: name=${matrixFile.name}, mimeType=${matrixFile.mimeType}');
-
-      // 发送文件事件
-      debugPrint('Calling room.sendFileEvent...');
-      final result = await room.sendFileEvent(matrixFile);
-      debugPrint('sendFileEvent result: $result');
+      
+      if (mxcUri == null) {
+        throw Exception('上传语音失败：无法获取 MXC URI');
+      }
+      
+      debugPrint('Voice uploaded: $mxcUri');
+      
+      // 手动发送 m.room.message 事件（语音消息）
+      // 使用 Matrix 语音消息格式：https://spec.matrix.org/latest/client-server-api/#voice-messages
+      final content = <String, dynamic>{
+        'msgtype': 'm.audio',
+        'body': filename,
+        'url': mxcUri.toString(),
+        'info': {
+          'mimetype': actualMimeType,
+          'size': audioBytes.length,
+          'duration': duration,
+        },
+        // MSC3245 语音消息标记
+        'org.matrix.msc3245.voice': {},
+        // MSC1767 音频消息扩展
+        'org.matrix.msc1767.audio': {
+          'duration': duration,
+        },
+      };
+      
+      debugPrint('Sending voice message event...');
+      final result = await room.sendEvent(content);
+      debugPrint('sendEvent result: $result');
       
       if (result == null || result.isEmpty) {
-        debugPrint('WARNING: sendFileEvent returned null or empty result');
+        debugPrint('WARNING: sendEvent returned null or empty result');
       }
       
       debugPrint('=== sendVoiceMessage completed successfully ===');
@@ -262,16 +467,80 @@ class MatrixMessageDataSource {
     String? mimeType,
     Uint8List? thumbnailBytes,
   }) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) return null;
+    debugPrint('=== MatrixMessageDataSource.sendVideoMessage start ===');
+    debugPrint('roomId: $roomId');
+    debugPrint('filename: $filename');
+    debugPrint('videoBytes.length: ${videoBytes.length}');
+    
+    try {
+      if (_client == null) {
+        throw Exception('Matrix 客户端未初始化');
+      }
+      if (!_client!.isLogged()) {
+        throw Exception('未登录');
+      }
+      
+      final room = _client!.getRoomById(roomId);
+      if (room == null) {
+        throw Exception('房间不存在: $roomId');
+      }
 
-    final matrixFile = matrix.MatrixVideoFile(
-      bytes: videoBytes,
-      name: filename,
-      mimeType: mimeType ?? 'video/mp4',
-    );
-
-    return await room.sendFileEvent(matrixFile);
+      final actualMimeType = mimeType ?? 'video/mp4';
+      
+      // 使用自定义认证上传方法
+      debugPrint('Uploading video with authenticated endpoint...');
+      final mxcUri = await _uploadContentAuthenticated(
+        videoBytes,
+        filename: filename,
+        contentType: actualMimeType,
+      );
+      
+      if (mxcUri == null) {
+        throw Exception('上传视频失败：无法获取 MXC URI');
+      }
+      
+      debugPrint('Video uploaded: $mxcUri');
+      
+      // 上传缩略图（如果有）
+      Uri? thumbnailUri;
+      if (thumbnailBytes != null && thumbnailBytes.isNotEmpty) {
+        thumbnailUri = await _uploadContentAuthenticated(
+          thumbnailBytes,
+          filename: 'thumbnail_$filename.jpg',
+          contentType: 'image/jpeg',
+        );
+        if (thumbnailUri != null) {
+          debugPrint('Thumbnail uploaded: $thumbnailUri');
+        }
+      }
+      
+      // 手动发送 m.room.message 事件
+      final content = <String, dynamic>{
+        'msgtype': 'm.video',
+        'body': filename,
+        'url': mxcUri.toString(),
+        'info': {
+          'mimetype': actualMimeType,
+          'size': videoBytes.length,
+        },
+      };
+      
+      if (thumbnailUri != null) {
+        content['info']['thumbnail_url'] = thumbnailUri.toString();
+      }
+      
+      debugPrint('Sending video message event...');
+      final result = await room.sendEvent(content);
+      debugPrint('sendEvent result: $result');
+      
+      debugPrint('=== sendVideoMessage completed successfully ===');
+      return result;
+    } catch (e, stackTrace) {
+      debugPrint('=== sendVideoMessage ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   /// 发送文件消息
@@ -281,16 +550,64 @@ class MatrixMessageDataSource {
     required String filename,
     String? mimeType,
   }) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) return null;
+    debugPrint('=== MatrixMessageDataSource.sendFileMessage start ===');
+    debugPrint('roomId: $roomId');
+    debugPrint('filename: $filename');
+    debugPrint('fileBytes.length: ${fileBytes.length}');
+    
+    try {
+      if (_client == null) {
+        throw Exception('Matrix 客户端未初始化');
+      }
+      if (!_client!.isLogged()) {
+        throw Exception('未登录');
+      }
+      
+      final room = _client!.getRoomById(roomId);
+      if (room == null) {
+        throw Exception('房间不存在: $roomId');
+      }
 
-    final matrixFile = matrix.MatrixFile(
-      bytes: fileBytes,
-      name: filename,
-      mimeType: mimeType ?? 'application/octet-stream',
-    );
-
-    return await room.sendFileEvent(matrixFile);
+      final actualMimeType = mimeType ?? 'application/octet-stream';
+      
+      // 使用自定义认证上传方法
+      debugPrint('Uploading file with authenticated endpoint...');
+      final mxcUri = await _uploadContentAuthenticated(
+        fileBytes,
+        filename: filename,
+        contentType: actualMimeType,
+      );
+      
+      if (mxcUri == null) {
+        throw Exception('上传文件失败：无法获取 MXC URI');
+      }
+      
+      debugPrint('File uploaded: $mxcUri');
+      
+      // 手动发送 m.room.message 事件
+      final content = <String, dynamic>{
+        'msgtype': 'm.file',
+        'body': filename,
+        'filename': filename,
+        'url': mxcUri.toString(),
+        'info': {
+          'mimetype': actualMimeType,
+          'size': fileBytes.length,
+        },
+      };
+      
+      debugPrint('Sending file message event...');
+      final result = await room.sendEvent(content);
+      debugPrint('sendEvent result: $result');
+      
+      debugPrint('=== sendFileMessage completed successfully ===');
+      return result;
+    } catch (e, stackTrace) {
+      debugPrint('=== sendFileMessage ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   /// 发送位置消息
