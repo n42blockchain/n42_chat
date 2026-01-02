@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:matrix/matrix.dart';
 
 import 'matrix_client_manager.dart';
@@ -136,9 +137,7 @@ class MatrixAuthDataSource {
     // 构建认证数据
     AuthenticationData? auth;
     if (registrationToken != null && registrationToken.isNotEmpty) {
-      auth = AuthenticationData(
-        type: 'm.login.registration_token',
-        session: null,
+      auth = RegistrationTokenAuthenticationData(
         token: registrationToken,
       );
     }
@@ -155,23 +154,37 @@ class MatrixAuthDataSource {
     } on MatrixException catch (e) {
       // 处理 UIA 流程 - 如果服务器返回 401 且有 session
       if (e.response?.statusCode == 401) {
-        final body = e.response?.body;
-        if (body != null && body is Map<String, dynamic>) {
-          final session = body['session'] as String?;
-          final flows = body['flows'] as List<dynamic>?;
+        try {
+          final rawBody = e.response?.body;
+          if (rawBody == null || rawBody.isEmpty) rethrow;
+          
+          // 解析响应体为 Map（body 是 JSON 字符串）
+          final decoded = jsonDecode(rawBody);
+          if (decoded is! Map<String, dynamic>) rethrow;
+          
+          final body = decoded;
+          final session = body['session']?.toString();
+          final flows = body['flows'];
           
           // 检查是否需要 registration_token
-          final needsToken = flows?.any((flow) {
-            final stages = flow['stages'] as List<dynamic>?;
-            return stages?.contains('m.login.registration_token') ?? false;
-          }) ?? false;
+          bool needsToken = false;
+          if (flows is List) {
+            needsToken = flows.any((flow) {
+              if (flow is Map) {
+                final stages = flow['stages'];
+                if (stages is List) {
+                  return stages.contains('m.login.registration_token');
+                }
+              }
+              return false;
+            });
+          }
 
           if (needsToken && registrationToken != null && session != null) {
             // 使用 session 重新尝试注册
-            final authWithSession = AuthenticationData(
-              type: 'm.login.registration_token',
-              session: session,
+            final authWithSession = RegistrationTokenAuthenticationData(
               token: registrationToken,
+              session: session,
             );
             
             return await client.register(
@@ -181,6 +194,8 @@ class MatrixAuthDataSource {
               auth: authWithSession,
             );
           }
+        } catch (_) {
+          // 解析或处理失败，继续抛出原始异常
         }
       }
       rethrow;
@@ -335,5 +350,27 @@ class SessionCredentials {
 
   @override
   String toString() => 'SessionCredentials(userId: $userId, deviceId: $deviceId)';
+}
+
+/// 用于 registration_token 认证的数据类
+/// 
+/// Matrix 规范要求 m.login.registration_token 认证需要提供 token 字段
+class RegistrationTokenAuthenticationData extends AuthenticationData {
+  final String token;
+  
+  RegistrationTokenAuthenticationData({
+    required this.token,
+    String? session,
+  }) : super(
+    type: 'm.login.registration_token',
+    session: session,
+  );
+  
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['token'] = token;
+    return json;
+  }
 }
 
