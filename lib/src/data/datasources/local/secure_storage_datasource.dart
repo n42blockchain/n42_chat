@@ -8,6 +8,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// 使用 flutter_secure_storage 加密存储敏感数据
 class SecureStorageDataSource {
   static const String _keySession = 'n42_chat_session';
+  static const String _keyCredentials = 'n42_chat_credentials';
   static const String _keyAccounts = 'n42_chat_accounts';
   static const String _keySettings = 'n42_chat_settings';
   static const String _keyContactRemarks = 'n42_chat_contact_remarks';
@@ -82,6 +83,61 @@ class SecureStorageDataSource {
   Future<bool> hasSession() async {
     final session = await getSession();
     return session != null;
+  }
+
+  // ============================================
+  // 登录凭据管理（用于自动登录）
+  // ============================================
+
+  /// 保存登录凭据（用于自动登录）
+  Future<void> saveCredentials({
+    required String homeserver,
+    required String username,
+    required String password,
+  }) async {
+    final credentialsData = {
+      'homeserver': homeserver,
+      'username': username,
+      'password': password,
+      'savedAt': DateTime.now().toIso8601String(),
+    };
+
+    await _storage.write(
+      key: _keyCredentials,
+      value: jsonEncode(credentialsData),
+    );
+
+    debugPrint('SecureStorage: Credentials saved for $username');
+  }
+
+  /// 获取保存的登录凭据
+  Future<Map<String, String>?> getCredentials() async {
+    try {
+      final data = await _storage.read(key: _keyCredentials);
+      if (data == null) return null;
+
+      final json = jsonDecode(data) as Map<String, dynamic>;
+      return {
+        'homeserver': json['homeserver'] as String,
+        'username': json['username'] as String,
+        'password': json['password'] as String,
+      };
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read credentials - $e');
+      return null;
+    }
+  }
+
+  /// 清除登录凭据
+  Future<void> clearCredentials() async {
+    await _storage.delete(key: _keyCredentials);
+    debugPrint('SecureStorage: Credentials cleared');
+  }
+
+  /// 检查是否有保存的凭据
+  Future<bool> hasCredentials() async {
+    final credentials = await getCredentials();
+    return credentials != null;
   }
 
   // ============================================
