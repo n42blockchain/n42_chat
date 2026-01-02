@@ -18,15 +18,17 @@ class AuthLoginRequested extends AuthEvent {
   final String homeserver;
   final String username;
   final String password;
+  final bool rememberMe;
 
   const AuthLoginRequested({
     required this.homeserver,
     required this.username,
     required this.password,
+    this.rememberMe = true,
   });
 
   @override
-  List<Object?> get props => [homeserver, username, password];
+  List<Object?> get props => [homeserver, username, password, rememberMe];
 }
 
 /// 登出请求

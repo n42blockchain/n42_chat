@@ -66,6 +66,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       homeserver: event.homeserver,
       username: event.username,
       password: event.password,
+      rememberMe: event.rememberMe,
     );
 
     if (result.success && result.user != null) {
