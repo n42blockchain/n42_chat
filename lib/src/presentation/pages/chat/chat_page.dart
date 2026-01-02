@@ -1,7 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mime/mime.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
@@ -363,16 +366,99 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void _pickImage() async {
-    // TODO: 实现选择照片功能
-    debugPrint('Pick image');
-    _showFeatureToast('选择照片');
+  Future<void> _pickImage() async {
+    try {
+      final picker = ImagePicker();
+      final images = await picker.pickMultiImage(
+        imageQuality: 85,
+        maxWidth: 1920,
+        maxHeight: 1920,
+      );
+      
+      if (images.isEmpty) return;
+      
+      // 发送选中的图片
+      for (final image in images) {
+        await _sendImage(image);
+      }
+    } catch (e) {
+      debugPrint('Pick image error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('选择图片失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
-  void _takePhoto() async {
-    // TODO: 实现拍摄功能
-    debugPrint('Take photo');
-    _showFeatureToast('拍摄');
+  Future<void> _takePhoto() async {
+    try {
+      final picker = ImagePicker();
+      final image = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 85,
+        maxWidth: 1920,
+        maxHeight: 1920,
+      );
+      
+      if (image == null) return;
+      
+      await _sendImage(image);
+    } catch (e) {
+      debugPrint('Take photo error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('拍照失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+  
+  Future<void> _sendImage(XFile image) async {
+    try {
+      final file = File(image.path);
+      if (!await file.exists()) {
+        debugPrint('Image file not found: ${image.path}');
+        return;
+      }
+      
+      final bytes = await file.readAsBytes();
+      final filename = image.name;
+      final mimeType = lookupMimeType(filename) ?? 'image/jpeg';
+      
+      debugPrint('Sending image: $filename, size: ${bytes.length}, mimeType: $mimeType');
+      
+      context.read<ChatBloc>().add(SendImageMessage(
+        imageBytes: bytes,
+        filename: filename,
+        mimeType: mimeType,
+      ));
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('图片发送中...'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Send image error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('发送图片失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   void _sendLocation() {
