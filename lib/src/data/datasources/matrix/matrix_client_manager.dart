@@ -125,11 +125,17 @@ class MatrixClientManager {
         }
       }
 
-      // 创建 Hive 数据库实例
+      // 创建 Hive 数据库实例并先打开它
+      debugPrint('MatrixClientManager: Creating HiveCollectionsDatabase...');
       final database = HiveCollectionsDatabase(
         clientName,
         dbPath,
       );
+      
+      // 先打开数据库，确保所有 boxes 都已初始化
+      debugPrint('MatrixClientManager: Opening database...');
+      await database.open();
+      debugPrint('MatrixClientManager: Database opened successfully');
       
       // 创建客户端
       _client = Client(
@@ -149,8 +155,8 @@ class MatrixClientManager {
         waitUntilLoadCompletedLoaded: true, // 等待数据库完全加载
       );
       
-      // 额外等待确保数据库初始化完成
-      await Future.delayed(const Duration(milliseconds: 100));
+      // 额外等待确保初始化完成
+      await Future.delayed(const Duration(milliseconds: 200));
 
       _isInitialized = true;
       debugPrint('MatrixClientManager: Initialized successfully');
