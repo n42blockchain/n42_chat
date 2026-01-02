@@ -4,8 +4,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
@@ -396,24 +398,120 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _takePhoto() async {
+    // 显示选择菜单：拍照或录像
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('拍照'),
+              onTap: () => Navigator.pop(context, 'photo'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.videocam),
+              title: const Text('录像'),
+              onTap: () => Navigator.pop(context, 'video'),
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(Icons.close),
+              title: const Text('取消'),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      ),
+    );
+    
+    if (choice == null) return;
+    
     try {
       final picker = ImagePicker();
-      final image = await picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 85,
-        maxWidth: 1920,
-        maxHeight: 1920,
-      );
       
-      if (image == null) return;
-      
-      await _sendImage(image);
+      if (choice == 'photo') {
+        final image = await picker.pickImage(
+          source: ImageSource.camera,
+          imageQuality: 85,
+          maxWidth: 1920,
+          maxHeight: 1920,
+        );
+        
+        if (image == null) return;
+        await _sendImage(image);
+      } else if (choice == 'video') {
+        final video = await picker.pickVideo(
+          source: ImageSource.camera,
+          maxDuration: const Duration(minutes: 5),
+        );
+        
+        if (video == null) return;
+        await _sendVideo(video);
+      }
     } catch (e) {
-      debugPrint('Take photo error: $e');
+      debugPrint('Take photo/video error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('拍照失败: $e'),
+            content: Text('拍摄失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+  
+  Future<void> _sendVideo(XFile video) async {
+    try {
+      final file = File(video.path);
+      if (!await file.exists()) {
+        debugPrint('Video file not found: ${video.path}');
+        return;
+      }
+      
+      final bytes = await file.readAsBytes();
+      final filename = video.name;
+      final mimeType = lookupMimeType(filename) ?? 'video/mp4';
+      
+      // 检查文件大小（限制 100MB）
+      const maxSize = 100 * 1024 * 1024; // 100MB
+      if (bytes.length > maxSize) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('视频大小不能超过 100MB'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
+      }
+      
+      debugPrint('Sending video: $filename, size: ${bytes.length}, mimeType: $mimeType');
+      
+      // 使用文件消息发送视频
+      context.read<ChatBloc>().add(SendFileMessage(
+        fileBytes: bytes,
+        filename: filename,
+        mimeType: mimeType,
+      ));
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('视频发送中...'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Send video error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('发送视频失败: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -462,10 +560,127 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  void _sendLocation() {
-    // TODO: 实现发送位置功能
-    debugPrint('Send location');
-    _showFeatureToast('位置');
+  Future<void> _sendLocation() async {
+    try {
+      // 检查位置服务是否启用
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          final shouldOpen = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('位置服务未开启'),
+              content: const Text('请开启位置服务以发送位置'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('取消'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('去设置'),
+                ),
+              ],
+            ),
+          );
+          if (shouldOpen == true) {
+            await Geolocator.openLocationSettings();
+          }
+        }
+        return;
+      }
+      
+      // 检查权限
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('需要位置权限才能发送位置'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+          return;
+        }
+      }
+      
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('位置权限已被永久拒绝，请在设置中开启'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
+      }
+      
+      // 显示加载提示
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                SizedBox(width: 16),
+                Text('正在获取位置...'),
+              ],
+            ),
+            duration: Duration(seconds: 10),
+          ),
+        );
+      }
+      
+      // 获取当前位置
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+      
+      // 隐藏加载提示
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      }
+      
+      debugPrint('Location: ${position.latitude}, ${position.longitude}');
+      
+      // 发送位置消息
+      context.read<ChatBloc>().add(SendLocationMessage(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        description: '我的位置',
+      ));
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('位置发送成功'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Send location error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('获取位置失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   void _sendRedPacket() {
@@ -573,10 +788,55 @@ class _ChatPageState extends State<ChatPage> {
     _showFeatureToast('名片功能');
   }
 
-  void _startVideoCall() {
-    // TODO: 实现视频通话功能
-    debugPrint('Start video call');
-    _showFeatureToast('视频通话');
+  Future<void> _startVideoCall() async {
+    // 显示选择菜单：语音通话或视频通话
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.phone, color: AppColors.primary),
+              title: const Text('语音通话'),
+              onTap: () => Navigator.pop(context, 'voice'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.videocam, color: AppColors.primary),
+              title: const Text('视频通话'),
+              onTap: () => Navigator.pop(context, 'video'),
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(Icons.close),
+              title: const Text('取消'),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      ),
+    );
+    
+    if (choice == null) return;
+    
+    final isVideoCall = choice == 'video';
+    final callType = isVideoCall ? '视频通话' : '语音通话';
+    
+    // 显示通话界面
+    if (mounted) {
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => _CallDialog(
+          contactName: widget.conversation.name,
+          contactAvatar: widget.conversation.avatarUrl,
+          isVideoCall: isVideoCall,
+          onEnd: () => Navigator.pop(context),
+        ),
+      );
+    }
+    
+    debugPrint('$callType ended');
   }
 
   void _openFavorites() {
@@ -1185,6 +1445,237 @@ class _MessageMenuSheet extends StatelessWidget {
       leading: Icon(icon, color: color ?? AppColors.textSecondary),
       title: Text(title, style: TextStyle(color: textColor)),
       onTap: onTap,
+    );
+  }
+}
+
+/// 通话对话框
+class _CallDialog extends StatefulWidget {
+  final String contactName;
+  final String? contactAvatar;
+  final bool isVideoCall;
+  final VoidCallback onEnd;
+
+  const _CallDialog({
+    required this.contactName,
+    this.contactAvatar,
+    required this.isVideoCall,
+    required this.onEnd,
+  });
+
+  @override
+  State<_CallDialog> createState() => _CallDialogState();
+}
+
+class _CallDialogState extends State<_CallDialog> {
+  bool _isMuted = false;
+  bool _isSpeakerOn = false;
+  bool _isCameraOff = false;
+  int _callDuration = 0;
+  bool _isConnecting = true;
+  
+  @override
+  void initState() {
+    super.initState();
+    // 模拟连接过程
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _isConnecting = false;
+        });
+        // 开始计时
+        _startTimer();
+      }
+    });
+  }
+  
+  void _startTimer() {
+    Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 1));
+      if (mounted) {
+        setState(() {
+          _callDuration++;
+        });
+        return true;
+      }
+      return false;
+    });
+  }
+  
+  String _formatDuration(int seconds) {
+    final minutes = seconds ~/ 60;
+    final secs = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog.fullscreen(
+      backgroundColor: Colors.black87,
+      child: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 60),
+            
+            // 联系人头像
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary.withOpacity(0.3),
+                border: Border.all(color: AppColors.primary, width: 3),
+              ),
+              child: widget.contactAvatar != null
+                  ? ClipOval(
+                      child: Image.network(
+                        widget.contactAvatar!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _buildAvatarPlaceholder(),
+                      ),
+                    )
+                  : _buildAvatarPlaceholder(),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // 联系人名字
+            Text(
+              widget.contactName,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            
+            const SizedBox(height: 12),
+            
+            // 通话状态
+            Text(
+              _isConnecting 
+                  ? '${widget.isVideoCall ? '视频' : '语音'}通话连接中...'
+                  : _formatDuration(_callDuration),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.8),
+                fontSize: 16,
+              ),
+            ),
+            
+            const Spacer(),
+            
+            // 控制按钮
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // 静音
+                _buildControlButton(
+                  icon: _isMuted ? Icons.mic_off : Icons.mic,
+                  label: _isMuted ? '取消静音' : '静音',
+                  isActive: _isMuted,
+                  onTap: () => setState(() => _isMuted = !_isMuted),
+                ),
+                
+                // 免提
+                _buildControlButton(
+                  icon: _isSpeakerOn ? Icons.volume_up : Icons.volume_down,
+                  label: _isSpeakerOn ? '关闭免提' : '免提',
+                  isActive: _isSpeakerOn,
+                  onTap: () => setState(() => _isSpeakerOn = !_isSpeakerOn),
+                ),
+                
+                // 摄像头（仅视频通话）
+                if (widget.isVideoCall)
+                  _buildControlButton(
+                    icon: _isCameraOff ? Icons.videocam_off : Icons.videocam,
+                    label: _isCameraOff ? '开启摄像头' : '关闭摄像头',
+                    isActive: _isCameraOff,
+                    onTap: () => setState(() => _isCameraOff = !_isCameraOff),
+                  ),
+              ],
+            ),
+            
+            const SizedBox(height: 40),
+            
+            // 挂断按钮
+            GestureDetector(
+              onTap: widget.onEnd,
+              child: Container(
+                width: 72,
+                height: 72,
+                decoration: const BoxDecoration(
+                  color: AppColors.error,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.call_end,
+                  color: Colors.white,
+                  size: 36,
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            const Text(
+              '挂断',
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            
+            const SizedBox(height: 60),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildAvatarPlaceholder() {
+    return Center(
+      child: Text(
+        widget.contactName.isNotEmpty ? widget.contactName[0].toUpperCase() : '?',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 48,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildControlButton({
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: isActive ? Colors.white : Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: isActive ? Colors.black : Colors.white,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.8),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
