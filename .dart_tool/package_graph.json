@@ -29,6 +29,7 @@
         "json_annotation",
         "logger",
         "matrix",
+        "mobile_scanner",
         "path",
         "path_provider",
         "permission_handler",
@@ -2017,6 +2018,16 @@
         "ffi",
         "meta",
         "path"
+      ]
+    },
+    {
+      "name": "mobile_scanner",
+      "version": "5.2.3",
+      "dependencies": [
+        "flutter",
+        "flutter_web_plugins",
+        "plugin_platform_interface",
+        "web"
       ]
     }
   ],
