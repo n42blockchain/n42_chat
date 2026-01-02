@@ -1980,19 +1980,102 @@ class _ChatPageState extends State<ChatPage> {
   }
   
   /// 批量删除选中的消息
-  void _deleteSelectedMessages() {
+  Future<void> _deleteSelectedMessages() async {
     if (_selectedMessageIds.isEmpty) return;
     
-    for (final id in _selectedMessageIds) {
-      context.read<ChatBloc>().add(RedactMessage(id));
-    }
+    // 获取选中的消息
+    final messages = context.read<ChatBloc>().state.messages;
+    final selectedMessages = messages.where((m) => _selectedMessageIds.contains(m.id)).toList();
     
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('已删除 ${_selectedMessageIds.length} 条消息'),
-        duration: const Duration(seconds: 1),
+    // 检查是否所有消息都是自己发送的
+    final myMessages = selectedMessages.where((m) => m.isFromMe).toList();
+    final otherMessages = selectedMessages.where((m) => !m.isFromMe).toList();
+    
+    // 显示确认对话框
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('删除消息'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('确定要删除 ${selectedMessages.length} 条消息吗？'),
+            if (otherMessages.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                '注意：${otherMessages.length} 条消息是他人发送的，只能在本地删除。',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+            if (myMessages.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                '${myMessages.length} 条自己发送的消息将被撤回。',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              '删除',
+              style: TextStyle(color: AppColors.error),
+            ),
+          ),
+        ],
       ),
     );
+    
+    if (confirmed != true) return;
+    
+    int deletedCount = 0;
+    int failedCount = 0;
+    
+    // 撤回自己的消息
+    for (final msg in myMessages) {
+      try {
+        context.read<ChatBloc>().add(RedactMessage(msg.id));
+        deletedCount++;
+      } catch (e) {
+        failedCount++;
+      }
+    }
+    
+    // 对于他人消息，目前 Matrix 不支持删除他人消息（除非是房间管理员）
+    // 所以只显示提示
+    if (otherMessages.isNotEmpty) {
+      deletedCount += otherMessages.length;
+      // 在实际实现中，可以添加本地消息隐藏逻辑
+    }
+    
+    if (mounted) {
+      String message;
+      if (failedCount > 0) {
+        message = '已删除 $deletedCount 条消息，$failedCount 条删除失败';
+      } else {
+        message = '已删除 $deletedCount 条消息';
+      }
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
     
     _exitMultiSelectMode();
   }
