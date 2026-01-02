@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -479,10 +480,91 @@ class _ChatPageState extends State<ChatPage> {
     _showFeatureToast('转账');
   }
 
-  void _pickFile() async {
-    // TODO: 实现选择文件功能
-    debugPrint('Pick file');
-    _showFeatureToast('选择文件');
+  Future<void> _pickFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: true,
+        withData: true,
+      );
+      
+      if (result == null || result.files.isEmpty) return;
+      
+      // 发送选中的文件
+      for (final file in result.files) {
+        if (file.bytes == null || file.bytes!.isEmpty) {
+          debugPrint('File bytes is empty: ${file.name}');
+          continue;
+        }
+        
+        await _sendFile(file);
+      }
+    } catch (e) {
+      debugPrint('Pick file error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('选择文件失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+  
+  Future<void> _sendFile(PlatformFile file) async {
+    try {
+      final bytes = file.bytes;
+      if (bytes == null || bytes.isEmpty) {
+        debugPrint('File bytes is null or empty');
+        return;
+      }
+      
+      final filename = file.name;
+      final mimeType = lookupMimeType(filename) ?? 'application/octet-stream';
+      final fileSize = bytes.length;
+      
+      // 检查文件大小（限制 50MB）
+      const maxSize = 50 * 1024 * 1024; // 50MB
+      if (fileSize > maxSize) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('文件大小不能超过 50MB'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
+      }
+      
+      debugPrint('Sending file: $filename, size: $fileSize bytes, mimeType: $mimeType');
+      
+      context.read<ChatBloc>().add(SendFileMessage(
+        fileBytes: bytes,
+        filename: filename,
+        mimeType: mimeType,
+      ));
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('文件发送中: $filename'),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Send file error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('发送文件失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   void _sendContactCard() {
