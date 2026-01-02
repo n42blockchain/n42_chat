@@ -126,15 +126,22 @@ class UpdateUserProfile extends AuthEvent {
   final String? signature;
   final String? gender;
   final String? region;
+  final String? pokeText;
 
   const UpdateUserProfile({
     this.displayName,
     this.signature,
     this.gender,
     this.region,
+    this.pokeText,
   });
 
   @override
-  List<Object?> get props => [displayName, signature, gender, region];
+  List<Object?> get props => [displayName, signature, gender, region, pokeText];
+}
+
+/// 加载用户资料数据
+class LoadUserProfileData extends AuthEvent {
+  const LoadUserProfileData();
 }
 

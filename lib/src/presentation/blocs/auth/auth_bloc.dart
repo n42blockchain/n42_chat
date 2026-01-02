@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/repositories/auth_repository.dart';
@@ -26,6 +27,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<UpdateAvatar>(_onUpdateAvatar);
     on<UpdateDisplayName>(_onUpdateDisplayName);
     on<UpdateUserProfile>(_onUpdateUserProfile);
+    on<LoadUserProfileData>(_onLoadUserProfileData);
 
     // 监听登录状态变化
     _loginStateSubscription = _authRepository.loginStateStream.listen(
@@ -251,8 +253,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       emit(state.copyWith(status: AuthStatus.loading));
       
+      // 更新显示名（如果有）
       if (event.displayName != null) {
         await _authRepository.updateDisplayName(event.displayName!);
+      }
+      
+      // 更新自定义资料数据（性别、地区、签名、拍一拍）
+      final hasProfileChanges = event.gender != null || 
+                                 event.region != null || 
+                                 event.signature != null ||
+                                 event.pokeText != null;
+      
+      if (hasProfileChanges) {
+        await _authRepository.updateUserProfileData(
+          gender: event.gender,
+          region: event.region,
+          signature: event.signature,
+          pokeText: event.pokeText,
+        );
       }
       
       // 刷新用户信息
@@ -266,6 +284,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         status: AuthStatus.error,
         errorMessage: '更新资料失败: $e',
       ));
+    }
+  }
+  
+  /// 加载用户资料数据
+  Future<void> _onLoadUserProfileData(
+    LoadUserProfileData event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      // 先加载 Matrix 账户数据中的自定义资料
+      await _authRepository.getUserProfileData();
+      
+      // 刷新用户信息
+      final user = _authRepository.currentUser;
+      if (user != null) {
+        emit(state.copyWith(
+          status: AuthStatus.authenticated,
+          user: user,
+        ));
+      }
+    } catch (e) {
+      // 加载失败不影响整体状态
+      debugPrint('AuthBloc: Load profile data failed - $e');
     }
   }
 
