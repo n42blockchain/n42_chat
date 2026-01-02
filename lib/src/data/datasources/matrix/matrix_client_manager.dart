@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart';
@@ -19,6 +20,7 @@ class MatrixClientManager {
 
   Client? _client;
   bool _isInitialized = false;
+  bool _isInitializing = false;
 
   /// 获取Matrix客户端实例
   Client? get client => _client;
@@ -64,9 +66,29 @@ class MatrixClientManager {
       return;
     }
 
+    // 防止并发初始化
+    if (_isInitializing) {
+      debugPrint('MatrixClientManager: Already initializing, waiting...');
+      // 等待初始化完成
+      while (_isInitializing) {
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+      return;
+    }
+
+    _isInitializing = true;
+
     try {
       // 获取数据库路径
       final dbPath = databasePath ?? await _getDefaultDatabasePath();
+
+      // 确保数据库目录存在
+      if (dbPath.isNotEmpty && !kIsWeb) {
+        final dir = Directory(dbPath);
+        if (!await dir.exists()) {
+          await dir.create(recursive: true);
+        }
+      }
 
       // 创建客户端
       _client = Client(
@@ -94,7 +116,12 @@ class MatrixClientManager {
     } catch (e, stack) {
       debugPrint('MatrixClientManager: Initialize failed: $e');
       debugPrint('Stack: $stack');
+      // 清理失败的初始化
+      _client = null;
+      _isInitialized = false;
       rethrow;
+    } finally {
+      _isInitializing = false;
     }
   }
 

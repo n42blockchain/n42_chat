@@ -22,10 +22,15 @@ class _RegisterPageState extends State<RegisterPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  // 内置邀请码
+  final _inviteCodeController = TextEditingController(
+    text: 'c321fb4d6ce5e93984452cbd11427f5dfc8c02a2c728234ce8d6e5ce317e9a81',
+  );
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _agreeToTerms = false;
+  bool _showInviteCode = false; // 控制是否显示邀请码输入框
 
   @override
   void dispose() {
@@ -33,6 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _usernameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _inviteCodeController.dispose();
     super.dispose();
   }
 
@@ -48,10 +54,12 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     if (_formKey.currentState?.validate() ?? false) {
+      final inviteCode = _inviteCodeController.text.trim();
       context.read<AuthBloc>().add(AuthRegisterRequested(
             homeserver: _homeserverController.text.trim(),
             username: _usernameController.text.trim(),
             password: _passwordController.text,
+            registrationToken: inviteCode.isNotEmpty ? inviteCode : null,
           ));
     }
   }
@@ -137,6 +145,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // 确认密码输入
                   _buildConfirmPasswordInput(isDarkMode),
+
+                  const SizedBox(height: 16),
+
+                  // 邀请码输入（可折叠）
+                  _buildInviteCodeInput(isDarkMode),
 
                   const SizedBox(height: 20),
 
@@ -463,6 +476,88 @@ class _RegisterPageState extends State<RegisterPage> {
             return null;
           },
         ),
+      ],
+    );
+  }
+
+  Widget _buildInviteCodeInput(bool isDark) {
+    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 展开/折叠按钮
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _showInviteCode = !_showInviteCode;
+            });
+          },
+          child: Row(
+            children: [
+              Icon(
+                _showInviteCode ? Icons.expand_less : Icons.expand_more,
+                color: labelColor,
+                size: 20,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '邀请码（已内置）',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: labelColor,
+                ),
+              ),
+              const Spacer(),
+              if (!_showInviteCode)
+                Text(
+                  '已填写',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.success,
+                  ),
+                ),
+            ],
+          ),
+        ),
+        // 邀请码输入框（可折叠）
+        if (_showInviteCode) ...[
+          const SizedBox(height: 8),
+          TextFormField(
+            controller: _inviteCodeController,
+            style: TextStyle(color: textColor, fontSize: 14),
+            maxLines: 2,
+            decoration: InputDecoration(
+              hintText: '请输入邀请码',
+              hintStyle: TextStyle(color: hintColor),
+              filled: true,
+              fillColor: inputBgColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              prefixIcon: Icon(
+                Icons.vpn_key_outlined,
+                color: hintColor,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '邀请码已内置，通常无需修改',
+            style: TextStyle(
+              fontSize: 11,
+              color: hintColor,
+            ),
+          ),
+        ],
       ],
     );
   }
