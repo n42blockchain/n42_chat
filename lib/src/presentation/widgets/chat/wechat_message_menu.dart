@@ -19,6 +19,12 @@ class WeChatMessageMenu extends StatelessWidget {
   // 状态
   final bool isFavorited;
   
+  /// 是否可以撤回消息（2分钟内）
+  final bool canRecall;
+  
+  /// 距离撤回截止还剩多少秒（用于提示）
+  final int? recallRemainingSeconds;
+  
   // 回调函数
   final VoidCallback? onCopy;
   final VoidCallback? onForward;
@@ -36,6 +42,8 @@ class WeChatMessageMenu extends StatelessWidget {
     required this.messageSize,
     required this.onDismiss,
     this.isFavorited = false,
+    this.canRecall = true,
+    this.recallRemainingSeconds,
     this.onCopy,
     this.onForward,
     this.onFavorite,
@@ -96,21 +104,36 @@ class WeChatMessageMenu extends StatelessWidget {
 
   double _calculateTop(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final topPadding = MediaQuery.of(context).padding.top;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     const menuHeight = 130.0;
     const padding = 8.0;
+    
+    // 可用高度（减去键盘高度和安全区域）
+    final availableHeight = screenHeight - keyboardHeight - bottomPadding;
     
     // 默认显示在消息上方
     double top = position.dy - menuHeight - padding;
     
     // 如果上方空间不够，显示在下方
-    if (top < MediaQuery.of(context).padding.top + 60) {
+    if (top < topPadding + 60) {
       top = position.dy + messageSize.height + padding;
     }
     
-    // 如果下方也不够，则显示在屏幕中央
-    if (top + menuHeight > screenHeight - 100) {
-      top = (screenHeight - menuHeight) / 2;
+    // 如果下方被键盘遮挡，调整到键盘上方
+    if (top + menuHeight > availableHeight - 20) {
+      // 优先显示在消息上方
+      top = position.dy - menuHeight - padding;
+      
+      // 如果上方还是不够，显示在可用区域中央
+      if (top < topPadding + 60) {
+        top = (topPadding + 60 + availableHeight - menuHeight) / 2;
+      }
     }
+    
+    // 最终确保不超出可见区域
+    top = top.clamp(topPadding + 20, availableHeight - menuHeight - 20);
     
     return top;
   }
@@ -165,14 +188,7 @@ class WeChatMessageMenu extends StatelessWidget {
                   },
                 ),
                 if (message.isFromMe)
-                  _buildMenuItem(
-                    icon: Icons.undo_outlined,
-                    label: '撤回',
-                    onTap: () {
-                      onDismiss();
-                      onRecall?.call();
-                    },
-                  ),
+                  _buildRecallMenuItem(),
                 _buildMenuItem(
                   icon: Icons.checklist_outlined,
                   label: '多选',
@@ -233,6 +249,52 @@ class WeChatMessageMenu extends StatelessWidget {
     );
   }
 
+  /// 构建撤回菜单项（根据是否可撤回显示不同状态）
+  Widget _buildRecallMenuItem() {
+    // 格式化剩余时间
+    String label = '撤回';
+    if (!canRecall) {
+      label = '已超时';
+    } else if (recallRemainingSeconds != null && recallRemainingSeconds! <= 30) {
+      // 只剩30秒内时显示倒计时
+      label = '撤回(${recallRemainingSeconds}s)';
+    }
+    
+    return GestureDetector(
+      onTap: canRecall ? () {
+        onDismiss();
+        onRecall?.call();
+      } : () {
+        // 不可撤回时显示提示
+        onDismiss();
+        // 触发震动反馈
+        HapticFeedback.lightImpact();
+      },
+      child: Container(
+        width: 52,
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.undo_outlined,
+              color: canRecall ? Colors.white : Colors.white38,
+              size: 22,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: canRecall ? Colors.white : Colors.white38,
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
   Widget _buildMenuItem({
     required IconData icon,
     required String label,
@@ -437,6 +499,8 @@ class MessageMenuHelper {
     required BuildContext context,
     required MessageEntity message,
     required GlobalKey messageKey,
+    bool canRecall = true,
+    int? recallRemainingSeconds,
     VoidCallback? onCopy,
     VoidCallback? onForward,
     VoidCallback? onFavorite,
@@ -466,6 +530,8 @@ class MessageMenuHelper {
         position: position,
         messageSize: size,
         onDismiss: () => overlayEntry.remove(),
+        canRecall: canRecall,
+        recallRemainingSeconds: recallRemainingSeconds,
         onCopy: onCopy,
         onForward: onForward,
         onFavorite: onFavorite,
