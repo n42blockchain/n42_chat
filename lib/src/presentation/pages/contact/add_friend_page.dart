@@ -63,9 +63,13 @@ class _AddFriendPageState extends State<AddFriendPage> {
       
       setState(() {
         _searchResults = response.results.map((user) => {
-          'userId': user.userId,
-          'displayName': user.displayName ?? user.userId.localpart ?? '',
-          'avatarUrl': user.avatarUrl?.toString(),
+          // userId 格式: @username:server.com，提取 localpart
+          final localpart = user.userId.split(':').first.replaceFirst('@', '');
+          return {
+            'userId': user.userId,
+            'displayName': user.displayName ?? localpart,
+            'avatarUrl': user.avatarUrl?.toString(),
+          };
         }).toList();
         _isLoading = false;
         _isSearching = true;
