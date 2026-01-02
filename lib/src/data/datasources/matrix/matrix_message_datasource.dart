@@ -943,12 +943,27 @@ class MatrixMessageDataSource {
     // 解析消息内容，处理回复格式
     final parsedContent = _parseMessageContent(event, room);
     
+    // 转换头像 mxc:// URL 为 HTTP URL
+    String? avatarHttpUrl;
+    if (sender.avatarUrl != null && _client != null) {
+      try {
+        avatarHttpUrl = sender.avatarUrl!.getThumbnail(
+          _client!,
+          width: 80,
+          height: 80,
+          method: matrix.ThumbnailMethod.crop,
+        ).toString();
+      } catch (e) {
+        avatarHttpUrl = sender.avatarUrl.toString();
+      }
+    }
+    
     return MessageEntity(
       id: event.eventId,
       roomId: room.id,
       senderId: event.senderId,
       senderName: sender.calcDisplayname(),
-      senderAvatarUrl: sender.avatarUrl?.toString(),
+      senderAvatarUrl: avatarHttpUrl,
       content: parsedContent.content,
       type: _mapMessageType(event),
       timestamp: event.originServerTs,
@@ -959,7 +974,7 @@ class MatrixMessageDataSource {
       replyToSender: parsedContent.replyToSender,
       isEdited: false, // 简化处理，后续可通过检查编辑事件实现
       reactions: _extractReactions(event),
-      metadata: _extractMetadata(event),
+      metadata: _extractMetadataWithHttpUrl(event),
     );
   }
   
@@ -1088,26 +1103,50 @@ class MatrixMessageDataSource {
     return [];
   }
 
-  /// 提取消息元数据
-  MessageMetadata? _extractMetadata(matrix.Event event) {
+  /// 转换 mxc:// URL 为 HTTP URL
+  String? _convertMxcToHttp(String? mxcUrl, {int? width, int? height}) {
+    if (mxcUrl == null || _client == null) return null;
+    try {
+      final uri = Uri.parse(mxcUrl);
+      if (width != null && height != null) {
+        return uri.getThumbnail(
+          _client!,
+          width: width,
+          height: height,
+          method: matrix.ThumbnailMethod.scale,
+        ).toString();
+      }
+      return uri.getDownloadLink(_client!).toString();
+    } catch (e) {
+      debugPrint('Error converting mxc URL: $e');
+      return mxcUrl; // 返回原始 URL 作为后备
+    }
+  }
+
+  /// 提取消息元数据（带 HTTP URL 转换）
+  MessageMetadata? _extractMetadataWithHttpUrl(matrix.Event event) {
     final info = event.content['info'] as Map<String, dynamic>?;
+    final mxcUrl = event.content['url'] as String?;
+    final thumbnailMxc = info?['thumbnail_url'] as String?;
     
     // 图片信息
     if (event.messageType == matrix.MessageTypes.Image) {
       return MessageMetadata(
-        mediaUrl: event.content['url'] as String?,
+        mediaUrl: mxcUrl,
+        httpUrl: _convertMxcToHttp(mxcUrl),
         width: info?['w'] as int?,
         height: info?['h'] as int?,
         size: info?['size'] as int?,
         mimeType: info?['mimetype'] as String?,
-        thumbnailUrl: (info?['thumbnail_info'] as Map<String, dynamic>?)?['thumbnail_url'] as String?,
+        thumbnailUrl: _convertMxcToHttp(thumbnailMxc, width: 400, height: 400),
       );
     }
 
     // 音频信息
     if (event.messageType == matrix.MessageTypes.Audio) {
       return MessageMetadata(
-        mediaUrl: event.content['url'] as String?,
+        mediaUrl: mxcUrl,
+        httpUrl: _convertMxcToHttp(mxcUrl),
         duration: info?['duration'] as int?,
         size: info?['size'] as int?,
         mimeType: info?['mimetype'] as String?,
@@ -1117,20 +1156,22 @@ class MatrixMessageDataSource {
     // 视频信息
     if (event.messageType == matrix.MessageTypes.Video) {
       return MessageMetadata(
-        mediaUrl: event.content['url'] as String?,
+        mediaUrl: mxcUrl,
+        httpUrl: _convertMxcToHttp(mxcUrl),
         width: info?['w'] as int?,
         height: info?['h'] as int?,
         duration: info?['duration'] as int?,
         size: info?['size'] as int?,
         mimeType: info?['mimetype'] as String?,
-        thumbnailUrl: (info?['thumbnail_info'] as Map<String, dynamic>?)?['thumbnail_url'] as String?,
+        thumbnailUrl: _convertMxcToHttp(thumbnailMxc, width: 400, height: 400),
       );
     }
 
     // 文件信息
     if (event.messageType == matrix.MessageTypes.File) {
       return MessageMetadata(
-        mediaUrl: event.content['url'] as String?,
+        mediaUrl: mxcUrl,
+        httpUrl: _convertMxcToHttp(mxcUrl),
         fileName: (event.content['filename'] as String?) ?? event.body,
         size: info?['size'] as int?,
         mimeType: info?['mimetype'] as String?,
@@ -1139,14 +1180,36 @@ class MatrixMessageDataSource {
 
     // 位置信息
     if (event.messageType == matrix.MessageTypes.Location) {
+      // 解析 geo URI
+      final geoUri = event.content['geo_uri'] as String?;
+      double? latitude;
+      double? longitude;
+      
+      if (geoUri != null && geoUri.startsWith('geo:')) {
+        final coords = geoUri.replaceFirst('geo:', '').split(',');
+        if (coords.length >= 2) {
+          latitude = double.tryParse(coords[0]);
+          longitude = double.tryParse(coords[1].split(';').first);
+        }
+      }
+      
+      // 如果 geo URI 没有坐标，尝试从 info 获取
+      latitude ??= info?['latitude'] as double?;
+      longitude ??= info?['longitude'] as double?;
+      
       return MessageMetadata(
-        latitude: info?['latitude'] as double?,
-        longitude: info?['longitude'] as double?,
+        latitude: latitude,
+        longitude: longitude,
         locationName: event.body,
       );
     }
 
     return null;
+  }
+  
+  /// 提取消息元数据（旧版，保留兼容）
+  MessageMetadata? _extractMetadata(matrix.Event event) {
+    return _extractMetadataWithHttpUrl(event);
   }
 
   /// 获取媒体下载URL
