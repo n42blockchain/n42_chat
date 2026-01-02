@@ -19,12 +19,6 @@ class WeChatMessageMenu extends StatelessWidget {
   // 状态
   final bool isFavorited;
   
-  /// 是否可以撤回消息（2分钟内）
-  final bool canRecall;
-  
-  /// 距离撤回截止还剩多少秒（用于提示）
-  final int? recallRemainingSeconds;
-  
   // 回调函数
   final VoidCallback? onCopy;
   final VoidCallback? onForward;
@@ -42,8 +36,6 @@ class WeChatMessageMenu extends StatelessWidget {
     required this.messageSize,
     required this.onDismiss,
     this.isFavorited = false,
-    this.canRecall = true,
-    this.recallRemainingSeconds,
     this.onCopy,
     this.onForward,
     this.onFavorite,
@@ -188,7 +180,14 @@ class WeChatMessageMenu extends StatelessWidget {
                   },
                 ),
                 if (message.isFromMe)
-                  _buildRecallMenuItem(),
+                  _buildMenuItem(
+                    icon: Icons.undo_outlined,
+                    label: '撤回',
+                    onTap: () {
+                      onDismiss();
+                      onRecall?.call();
+                    },
+                  ),
                 _buildMenuItem(
                   icon: Icons.checklist_outlined,
                   label: '多选',
@@ -249,52 +248,6 @@ class WeChatMessageMenu extends StatelessWidget {
     );
   }
 
-  /// 构建撤回菜单项（根据是否可撤回显示不同状态）
-  Widget _buildRecallMenuItem() {
-    // 格式化剩余时间
-    String label = '撤回';
-    if (!canRecall) {
-      label = '已超时';
-    } else if (recallRemainingSeconds != null && recallRemainingSeconds! <= 30) {
-      // 只剩30秒内时显示倒计时
-      label = '撤回(${recallRemainingSeconds}s)';
-    }
-    
-    return GestureDetector(
-      onTap: canRecall ? () {
-        onDismiss();
-        onRecall?.call();
-      } : () {
-        // 不可撤回时显示提示
-        onDismiss();
-        // 触发震动反馈
-        HapticFeedback.lightImpact();
-      },
-      child: Container(
-        width: 52,
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.undo_outlined,
-              color: canRecall ? Colors.white : Colors.white38,
-              size: 22,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              style: TextStyle(
-                color: canRecall ? Colors.white : Colors.white38,
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
   Widget _buildMenuItem({
     required IconData icon,
     required String label,
@@ -499,8 +452,6 @@ class MessageMenuHelper {
     required BuildContext context,
     required MessageEntity message,
     required GlobalKey messageKey,
-    bool canRecall = true,
-    int? recallRemainingSeconds,
     VoidCallback? onCopy,
     VoidCallback? onForward,
     VoidCallback? onFavorite,
@@ -530,8 +481,6 @@ class MessageMenuHelper {
         position: position,
         messageSize: size,
         onDismiss: () => overlayEntry.remove(),
-        canRecall: canRecall,
-        recallRemainingSeconds: recallRemainingSeconds,
         onCopy: onCopy,
         onForward: onForward,
         onFavorite: onFavorite,

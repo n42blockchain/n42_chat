@@ -2095,15 +2095,6 @@ ID：$contactId''';
     final position = renderBox.localToGlobal(Offset.zero);
     final size = renderBox.size;
     
-    // 计算是否可撤回（2分钟内）
-    final now = DateTime.now();
-    final diff = now.difference(message.timestamp);
-    const recallLimitSeconds = 2 * 60; // 2分钟 = 120秒
-    final canRecall = message.isFromMe && diff.inSeconds <= recallLimitSeconds;
-    final recallRemainingSeconds = message.isFromMe 
-        ? (recallLimitSeconds - diff.inSeconds).clamp(0, recallLimitSeconds) 
-        : null;
-    
     // 震动反馈
     HapticFeedback.mediumImpact();
     
@@ -2117,8 +2108,6 @@ ID：$contactId''';
         position: position,
         messageSize: size,
         isFavorited: _favoritedMessageIds.contains(message.id),
-        canRecall: canRecall,
-        recallRemainingSeconds: recallRemainingSeconds,
         onDismiss: () {
           debugPrint('Menu dismissed');
           overlayEntry.remove();
@@ -2135,19 +2124,9 @@ ID：$contactId''';
           debugPrint('Favorite clicked');
           _favoriteMessage(message);
         },
-        onRecall: canRecall ? () {
+        onRecall: () {
           debugPrint('Recall clicked');
           _recallMessage(message);
-        } : () {
-          // 不可撤回时显示提示
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('消息发送超过2分钟，无法撤回'),
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.orange,
-            ),
-          );
         },
         onMultiSelect: () {
           debugPrint('MultiSelect clicked');
@@ -2365,21 +2344,6 @@ ID：$contactId''';
   /// 撤回消息
   Future<void> _recallMessage(MessageEntity message) async {
     if (!message.isFromMe) return;
-    
-    // 检查是否在 2 分钟内（微信撤回时间限制）
-    final now = DateTime.now();
-    final diff = now.difference(message.timestamp);
-    if (diff.inMinutes > 2) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('消息发送超过2分钟，无法撤回'),
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
     
     // 显示撤回确认对话框
     final confirmed = await showRecallConfirmDialog(context);
