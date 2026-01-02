@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/services/voice_service.dart';
@@ -174,21 +175,34 @@ class _ChatInputBarState extends State<ChatInputBar> {
   }
 
   Future<void> _startRecording() async {
-    final started = await _voiceService.startRecording();
-    if (started) {
-      setState(() {
-        _isRecording = true;
-        _cancelRecording = false;
-        _recordingDuration = Duration.zero;
-      });
-      // 通知父组件
-      widget.onRecordingStateChanged?.call(true, false, Duration.zero);
-    } else {
-      // 显示权限提示
+    try {
+      final started = await _voiceService.startRecording();
+      if (started) {
+        setState(() {
+          _isRecording = true;
+          _cancelRecording = false;
+          _recordingDuration = Duration.zero;
+        });
+        // 通知父组件
+        widget.onRecordingStateChanged?.call(true, false, Duration.zero);
+      } else {
+        // 显示权限提示
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('请允许使用麦克风权限'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Start recording error: $e');
+      _forceResetRecordingState();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('请允许使用麦克风权限'),
+          SnackBar(
+            content: Text('开始录音失败: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -197,40 +211,62 @@ class _ChatInputBarState extends State<ChatInputBar> {
   }
 
   Future<void> _stopRecording() async {
-    if (!_isRecording) return;
-    
-    final wasCancelled = _cancelRecording;
-    
-    // 先通知父组件录音结束
-    widget.onRecordingStateChanged?.call(false, wasCancelled, _recordingDuration);
-    
-    if (wasCancelled) {
-      await _voiceService.cancelRecording();
-      setState(() {
-        _isRecording = false;
-        _cancelRecording = false;
-      });
+    if (!_isRecording) {
+      // 确保状态被重置
+      _forceResetRecordingState();
       return;
     }
     
-    final result = await _voiceService.stopRecording();
-    setState(() {
-      _isRecording = false;
-    });
+    final wasCancelled = _cancelRecording;
     
-    if (result != null && result.duration.inSeconds >= 1) {
-      widget.onSendVoice?.call(result.path, result.duration);
-    } else if (result != null) {
-      // 录音时间太短
+    try {
+      if (wasCancelled) {
+        await _voiceService.cancelRecording();
+        _forceResetRecordingState();
+        return;
+      }
+      
+      final result = await _voiceService.stopRecording();
+      
+      // 先重置状态
+      _forceResetRecordingState();
+      
+      if (result != null && result.duration.inSeconds >= 1) {
+        widget.onSendVoice?.call(result.path, result.duration);
+      } else if (result != null) {
+        // 录音时间太短
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('录音时间太短'),
+              duration: Duration(seconds: 1),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Stop recording error: $e');
+      _forceResetRecordingState();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('录音时间太短'),
-            duration: Duration(seconds: 1),
+          SnackBar(
+            content: Text('停止录音失败: $e'),
+            backgroundColor: AppColors.error,
           ),
         );
       }
     }
+  }
+  
+  /// 强制重置录音状态
+  void _forceResetRecordingState() {
+    setState(() {
+      _isRecording = false;
+      _cancelRecording = false;
+      _recordingDuration = Duration.zero;
+    });
+    // 通知父组件录音结束
+    widget.onRecordingStateChanged?.call(false, false, Duration.zero);
   }
 
   void _updateCancelState(Offset localPosition, Size size) {
