@@ -58,13 +58,25 @@ class MatrixClientManager {
   ///
   /// [clientName] 客户端名称，用于设备识别
   /// [databasePath] 数据库存储路径，为空则使用默认路径
+  /// [forceReinit] 强制重新初始化
   Future<void> initialize({
     String clientName = 'N42Chat',
     String? databasePath,
+    bool forceReinit = false,
   }) async {
-    if (_isInitialized) {
+    if (_isInitialized && !forceReinit) {
       debugPrint('MatrixClientManager: Already initialized');
       return;
+    }
+
+    // 如果强制重新初始化，先清理旧的客户端
+    if (forceReinit && _client != null) {
+      debugPrint('MatrixClientManager: Force reinitializing, disposing old client...');
+      try {
+        await _client!.dispose();
+      } catch (_) {}
+      _client = null;
+      _isInitialized = false;
     }
 
     // 防止并发初始化
