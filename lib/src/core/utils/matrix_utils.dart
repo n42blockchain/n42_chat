@@ -13,6 +13,8 @@ class MatrixUtils {
   /// 参考 FluffyChat 的实现方式，直接构建 URL
   /// 格式: https://homeserver/_matrix/media/v3/download/server/mediaId
   /// 或缩略图: https://homeserver/_matrix/media/v3/thumbnail/server/mediaId?width=x&height=y&method=crop
+  /// 
+  /// 对于需要认证的服务器，添加 access_token 参数
   static String? mxcToHttp(
     String? mxcUrl, {
     required matrix.Client? client,
@@ -52,17 +54,29 @@ class MatrixUtils {
         debugPrint('MatrixUtils: No homeserver configured');
         return null;
       }
+      
+      // 获取 access_token（用于认证媒体访问）
+      final accessToken = client.accessToken;
 
       // 构建 HTTP URL
+      String url;
       if (width != null && height != null) {
         // 缩略图 URL
         final methodStr = method == matrix.ThumbnailMethod.crop ? 'crop' : 'scale';
         final animatedStr = animated ? '&animated=true' : '';
-        return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$methodStr$animatedStr';
+        url = '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$methodStr$animatedStr';
       } else {
         // 完整下载 URL
-        return '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
+        url = '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
       }
+      
+      // 如果有 access_token，添加到 URL 以支持认证媒体
+      if (accessToken != null && accessToken.isNotEmpty) {
+        final separator = url.contains('?') ? '&' : '?';
+        url = '$url${separator}access_token=$accessToken';
+      }
+      
+      return url;
     } catch (e) {
       debugPrint('MatrixUtils: Error converting mxc URL: $e');
       return null;
