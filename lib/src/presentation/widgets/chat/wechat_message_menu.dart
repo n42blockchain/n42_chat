@@ -16,6 +16,9 @@ class WeChatMessageMenu extends StatelessWidget {
   final Size messageSize;
   final VoidCallback onDismiss;
   
+  // 状态
+  final bool isFavorited;
+  
   // 回调函数
   final VoidCallback? onCopy;
   final VoidCallback? onForward;
@@ -32,6 +35,7 @@ class WeChatMessageMenu extends StatelessWidget {
     required this.position,
     required this.messageSize,
     required this.onDismiss,
+    this.isFavorited = false,
     this.onCopy,
     this.onForward,
     this.onFavorite,
@@ -152,8 +156,9 @@ class WeChatMessageMenu extends StatelessWidget {
                   },
                 ),
                 _buildMenuItem(
-                  icon: Icons.star_border_outlined,
-                  label: '收藏',
+                  icon: isFavorited ? Icons.star : Icons.star_border_outlined,
+                  label: isFavorited ? '取消收藏' : '收藏',
+                  isHighlighted: isFavorited,
                   onTap: () {
                     onDismiss();
                     onFavorite?.call();
@@ -232,6 +237,7 @@ class WeChatMessageMenu extends StatelessWidget {
     required IconData icon,
     required String label,
     VoidCallback? onTap,
+    bool isHighlighted = false,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -243,14 +249,14 @@ class WeChatMessageMenu extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: Colors.white,
+              color: isHighlighted ? Colors.amber : Colors.white,
               size: 22,
             ),
             const SizedBox(height: 6),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: isHighlighted ? Colors.amber : Colors.white,
                 fontSize: 11,
               ),
             ),
