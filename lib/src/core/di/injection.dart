@@ -70,8 +70,15 @@ Future<void> configureDependencies(N42ChatConfig config, {IWalletBridge? walletB
 /// 注册服务
 Future<void> _registerServices() async {
   // Matrix客户端管理器
+  final clientManager = MatrixClientManager.instance;
+  
+  // 确保 Matrix 客户端已初始化（包括 Hive 数据库）
+  if (!clientManager.isInitialized) {
+    await clientManager.initialize();
+  }
+  
   getIt.registerLazySingleton<MatrixClientManager>(
-    () => MatrixClientManager.instance,
+    () => clientManager,
   );
 }
 
