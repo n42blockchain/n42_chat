@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import 'message_status_indicator.dart';
 
 /// 消息气泡组件
@@ -145,6 +147,13 @@ class MessageBubble extends StatelessWidget {
   }
 
   Widget _buildAvatar(bool isDark) {
+    // 获取认证头（用于需要认证的 Matrix 媒体）
+    final accessToken = MatrixClientManager.instance.client?.accessToken;
+    final headers = <String, String>{};
+    if (accessToken != null && accessToken.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $accessToken';
+    }
+    
     return GestureDetector(
       onTap: onAvatarTap,
       child: Container(
@@ -161,8 +170,12 @@ class MessageBubble extends StatelessWidget {
                 fit: BoxFit.cover,
                 memCacheWidth: 80,
                 memCacheHeight: 80,
+                httpHeaders: headers,
                 placeholder: (context, url) => _buildDefaultAvatar(),
-                errorWidget: (context, url, error) => _buildDefaultAvatar(),
+                errorWidget: (context, url, error) {
+                  debugPrint('MessageBubble: Failed to load avatar: $url, error: $error');
+                  return _buildDefaultAvatar();
+                },
               )
             : _buildDefaultAvatar(),
       ),
