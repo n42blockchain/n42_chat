@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/matrix_utils.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
@@ -51,11 +52,22 @@ class _ProfilePageState extends State<ProfilePage> {
         try {
           final profile = await client.ownProfile;
           if (mounted) {
+            // 将 mxc:// URL 转换为 HTTP URL
+            final avatarMxc = profile.avatarUrl?.toString();
+            final avatarHttpUrl = MatrixUtils.mxcToHttp(
+              avatarMxc,
+              client: client,
+              width: 128,
+              height: 128,
+            );
             setState(() {
-              _avatarUrl = profile.avatarUrl?.toString();
+              _displayName = profile.displayName ?? _displayName;
+              _avatarUrl = avatarHttpUrl;
             });
           }
-        } catch (_) {}
+        } catch (e) {
+          debugPrint('Failed to get avatar: $e');
+        }
       }
     } catch (e) {
       debugPrint('Failed to load user info: $e');

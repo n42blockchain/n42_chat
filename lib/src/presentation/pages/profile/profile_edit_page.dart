@@ -6,7 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
@@ -780,47 +782,64 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     
     final result = await showModalBottomSheet<String>(
       context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  const Text(
-                    '选择来电铃声',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
+      isScrollControlled: true,
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return SafeArea(
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.6,
             ),
-            Divider(height: 1, color: AppColors.divider),
-            ...ringtones.map((ringtone) => ListTile(
-              leading: Icon(
-                ringtone == '振动' ? Icons.vibration 
-                    : ringtone == '静音' ? Icons.volume_off
-                    : Icons.music_note,
-                color: AppColors.primary,
-              ),
-              title: Text(ringtone),
-              trailing: ringtone == '默认铃声' 
-                  ? Icon(Icons.check, color: AppColors.primary)
-                  : null,
-              onTap: () => Navigator.pop(context, ringtone),
-            )),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      const Text(
+                        '选择来电铃声',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(height: 1, color: isDark ? AppColors.dividerDark : AppColors.divider),
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: ringtones.map((ringtone) => ListTile(
+                      leading: Icon(
+                        ringtone == '振动' ? Icons.vibration 
+                            : ringtone == '静音' ? Icons.volume_off
+                            : Icons.music_note,
+                        color: AppColors.primary,
+                      ),
+                      title: Text(ringtone),
+                      trailing: ringtone == '默认铃声' 
+                          ? Icon(Icons.check, color: AppColors.primary)
+                          : null,
+                      onTap: () => Navigator.pop(context, ringtone),
+                    )).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
 
     if (result != null && mounted) {
@@ -876,10 +895,35 @@ class _AddressManagePageState extends State<_AddressManagePage> {
 
   Future<void> _loadAddresses() async {
     try {
-      final authRepo = context.read<AuthBloc>();
-      // 从 Matrix 账户数据加载地址
-      // 这里简化处理，实际应该从 repository 获取
-      await Future.delayed(const Duration(milliseconds: 300));
+      final clientManager = getIt<MatrixClientManager>();
+      final client = clientManager.client;
+      
+      if (client != null && client.isLogged()) {
+        try {
+          final data = await client.getAccountData(
+            client.userID!,
+            'n42.user.addresses',
+          );
+          
+          if (data is Map && data['addresses'] is List) {
+            final List addressList = data['addresses'];
+            setState(() {
+              _addresses = addressList.map((item) => _AddressItem(
+                name: item['name'] ?? '',
+                phone: item['phone'] ?? '',
+                region: item['region'] ?? '',
+                detail: item['detail'] ?? '',
+                isDefault: item['isDefault'] ?? false,
+              )).toList();
+              _isLoading = false;
+            });
+            return;
+          }
+        } catch (e) {
+          debugPrint('No saved addresses: $e');
+        }
+      }
+      
       setState(() {
         _isLoading = false;
       });
@@ -888,6 +932,37 @@ class _AddressManagePageState extends State<_AddressManagePage> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _saveAddresses() async {
+    try {
+      final clientManager = getIt<MatrixClientManager>();
+      final client = clientManager.client;
+      
+      if (client != null && client.isLogged()) {
+        final addressList = _addresses.map((item) => {
+          'name': item.name,
+          'phone': item.phone,
+          'region': item.region,
+          'detail': item.detail,
+          'isDefault': item.isDefault,
+        }).toList();
+        
+        await client.setAccountData(
+          client.userID!,
+          'n42.user.addresses',
+          {'addresses': addressList},
+        );
+        debugPrint('Addresses saved successfully');
+      }
+    } catch (e) {
+      debugPrint('Save addresses error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('保存地址失败: $e')),
+        );
+      }
     }
   }
 
@@ -1025,18 +1100,58 @@ class _AddressManagePageState extends State<_AddressManagePage> {
   Future<void> _addAddress() async {
     final result = await _showAddressEditor();
     if (result != null) {
+      // 如果新地址设为默认，清除其他默认地址
+      if (result.isDefault) {
+        for (int i = 0; i < _addresses.length; i++) {
+          if (_addresses[i].isDefault) {
+            _addresses[i] = _AddressItem(
+              name: _addresses[i].name,
+              phone: _addresses[i].phone,
+              region: _addresses[i].region,
+              detail: _addresses[i].detail,
+              isDefault: false,
+            );
+          }
+        }
+      }
       setState(() {
         _addresses.add(result);
       });
+      await _saveAddresses();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('地址添加成功'), duration: Duration(seconds: 1)),
+        );
+      }
     }
   }
 
   Future<void> _editAddress(int index) async {
     final result = await _showAddressEditor(address: _addresses[index]);
     if (result != null) {
+      // 如果修改后的地址设为默认，清除其他默认地址
+      if (result.isDefault) {
+        for (int i = 0; i < _addresses.length; i++) {
+          if (i != index && _addresses[i].isDefault) {
+            _addresses[i] = _AddressItem(
+              name: _addresses[i].name,
+              phone: _addresses[i].phone,
+              region: _addresses[i].region,
+              detail: _addresses[i].detail,
+              isDefault: false,
+            );
+          }
+        }
+      }
       setState(() {
         _addresses[index] = result;
       });
+      await _saveAddresses();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('地址更新成功'), duration: Duration(seconds: 1)),
+        );
+      }
     }
   }
 
@@ -1052,11 +1167,17 @@ class _AddressManagePageState extends State<_AddressManagePage> {
             child: const Text('取消'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
               setState(() {
                 _addresses.removeAt(index);
               });
+              await _saveAddresses();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('地址已删除'), duration: Duration(seconds: 1)),
+                );
+              }
             },
             child: Text(
               '删除',
