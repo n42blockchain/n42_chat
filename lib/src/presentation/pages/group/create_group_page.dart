@@ -33,7 +33,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   @override
   void initState() {
     super.initState();
-    context.read<ContactBloc>().add(const LoadContacts());
+    // ContactBloc 已经在导航时提供并加载了联系人
   }
 
   @override
