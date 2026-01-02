@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart';
 
 import 'matrix_client_manager.dart';
@@ -121,18 +122,35 @@ class MatrixAuthDataSource {
     String? deviceName,
     String? registrationToken,
   }) async {
+    // 确保客户端已初始化
+    // 如果未初始化，尝试初始化；如果初始化失败，强制重新初始化
     if (!_clientManager.isInitialized) {
-      await _clientManager.initialize();
+      try {
+        await _clientManager.initialize();
+      } catch (e) {
+        // 如果初始化失败，尝试强制重新初始化
+        debugPrint('MatrixAuthDataSource: Initial init failed: $e, force reinit...');
+        await Future.delayed(const Duration(milliseconds: 500));
+        await _clientManager.initialize(forceReinit: true);
+      }
     }
 
+    // 再次检查客户端状态
     final client = _clientManager.client;
     if (client == null) {
-      throw StateError('Matrix client not initialized');
+      // 最后一次尝试
+      debugPrint('MatrixAuthDataSource: Client still null, final attempt...');
+      await _clientManager.initialize(forceReinit: true);
+    }
+
+    final finalClient = _clientManager.client;
+    if (finalClient == null) {
+      throw StateError('Matrix client not initialized after multiple attempts');
     }
 
     // 设置homeserver
     final homeserverUri = Uri.parse(homeserver);
-    await client.checkHomeserver(homeserverUri);
+    await finalClient.checkHomeserver(homeserverUri);
 
     // 构建认证数据
     AuthenticationData? auth;
@@ -145,7 +163,7 @@ class MatrixAuthDataSource {
     // 注册
     // 注意：这个流程可能需要额外的认证步骤（如验证码）
     try {
-      return await client.register(
+      return await finalClient.register(
         username: username,
         password: password,
         initialDeviceDisplayName: deviceName ?? 'N42Chat',
@@ -187,7 +205,7 @@ class MatrixAuthDataSource {
               session: session,
             );
             
-            return await client.register(
+            return await finalClient.register(
               username: username,
               password: password,
               initialDeviceDisplayName: deviceName ?? 'N42Chat',
