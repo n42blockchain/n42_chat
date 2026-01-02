@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -31,17 +32,29 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
+        debugPrint('ProfileEditPage: AuthState changed - status: ${state.status}, isUploading: $_isUploading');
+        
         // 监听状态变化
-        if (state.status == AuthStatus.authenticated && _isUploading) {
-          setState(() => _isUploading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('头像更新成功')),
-          );
-        } else if (state.status == AuthStatus.error && state.errorMessage != null) {
-          setState(() => _isUploading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage!)),
-          );
+        if (_isUploading) {
+          if (state.status == AuthStatus.authenticated) {
+            debugPrint('ProfileEditPage: Avatar upload succeeded');
+            setState(() => _isUploading = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('头像更新成功'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else if (state.status == AuthStatus.error) {
+            debugPrint('ProfileEditPage: Avatar upload failed - ${state.errorMessage}');
+            setState(() => _isUploading = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.errorMessage ?? '头像上传失败'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
         }
       },
       builder: (context, state) {
@@ -359,6 +372,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     if (source == null) return;
 
     try {
+      debugPrint('ProfileEditPage: Picking image from $source');
+      
       final XFile? image = await _imagePicker.pickImage(
         source: source,
         maxWidth: 512,
@@ -366,22 +381,46 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         imageQuality: 85,
       );
 
-      if (image == null) return;
+      if (image == null) {
+        debugPrint('ProfileEditPage: No image selected');
+        return;
+      }
 
+      debugPrint('ProfileEditPage: Image selected: ${image.path}, name: ${image.name}');
+      
       setState(() => _isUploading = true);
 
       final bytes = await image.readAsBytes();
+      debugPrint('ProfileEditPage: Image bytes: ${bytes.length}');
+      
+      if (bytes.isEmpty) {
+        throw Exception('图片数据为空');
+      }
+      
+      // 确保文件名有正确的扩展名
+      String filename = image.name;
+      if (!filename.contains('.')) {
+        // iOS 相机可能不带扩展名，添加 .jpg
+        filename = '$filename.jpg';
+      }
+      
+      debugPrint('ProfileEditPage: Uploading avatar with filename: $filename');
       
       // 上传头像 - BlocConsumer 会监听状态变化并显示结果
       context.read<AuthBloc>().add(UpdateAvatar(
         avatarBytes: bytes,
-        filename: image.name,
+        filename: filename,
       ));
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('ProfileEditPage: Pick image error: $e');
+      debugPrint('ProfileEditPage: Stack trace: $stackTrace');
       if (mounted) {
         setState(() => _isUploading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('选择图片失败: $e')),
+          SnackBar(
+            content: Text('选择图片失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     }
