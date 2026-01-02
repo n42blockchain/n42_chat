@@ -16,8 +16,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/repositories/conversation_repository.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/message_action_repository.dart';
+import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
@@ -1282,7 +1284,7 @@ ID：$contactId''';
             final filename = url.split('/').last.split('\\').last;
             
             context.read<ChatBloc>().add(SendFileMessage(
-              bytes: bytes,
+              fileBytes: bytes,
               filename: filename,
               mimeType: mimeType,
             ));
@@ -2093,6 +2095,15 @@ ID：$contactId''';
     final position = renderBox.localToGlobal(Offset.zero);
     final size = renderBox.size;
     
+    // 计算是否可撤回（2分钟内）
+    final now = DateTime.now();
+    final diff = now.difference(message.timestamp);
+    const recallLimitSeconds = 2 * 60; // 2分钟 = 120秒
+    final canRecall = message.isFromMe && diff.inSeconds <= recallLimitSeconds;
+    final recallRemainingSeconds = message.isFromMe 
+        ? (recallLimitSeconds - diff.inSeconds).clamp(0, recallLimitSeconds) 
+        : null;
+    
     // 震动反馈
     HapticFeedback.mediumImpact();
     
@@ -2106,15 +2117,54 @@ ID：$contactId''';
         position: position,
         messageSize: size,
         isFavorited: _favoritedMessageIds.contains(message.id),
-        onDismiss: () => overlayEntry.remove(),
-        onCopy: () => _copyMessage(message),
-        onForward: () => _forwardMessage(message),
-        onFavorite: () => _favoriteMessage(message),
-        onRecall: () => _recallMessage(message),
-        onMultiSelect: () => _enterMultiSelectMode(),
-        onQuote: () => _quoteMessage(message),
-        onRemind: () => _remindMessage(message),
-        onSearch: () => _searchMessage(message),
+        canRecall: canRecall,
+        recallRemainingSeconds: recallRemainingSeconds,
+        onDismiss: () {
+          debugPrint('Menu dismissed');
+          overlayEntry.remove();
+        },
+        onCopy: () {
+          debugPrint('Copy clicked');
+          _copyMessage(message);
+        },
+        onForward: () {
+          debugPrint('Forward clicked');
+          _forwardMessage(message);
+        },
+        onFavorite: () {
+          debugPrint('Favorite clicked');
+          _favoriteMessage(message);
+        },
+        onRecall: canRecall ? () {
+          debugPrint('Recall clicked');
+          _recallMessage(message);
+        } : () {
+          // 不可撤回时显示提示
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('消息发送超过2分钟，无法撤回'),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.orange,
+            ),
+          );
+        },
+        onMultiSelect: () {
+          debugPrint('MultiSelect clicked');
+          _enterMultiSelectMode();
+        },
+        onQuote: () {
+          debugPrint('Quote clicked');
+          _quoteMessage(message);
+        },
+        onRemind: () {
+          debugPrint('Remind clicked');
+          _remindMessage(message);
+        },
+        onSearch: () {
+          debugPrint('Search clicked');
+          _searchMessage(message);
+        },
       ),
     );
     
@@ -2195,6 +2245,9 @@ ID：$contactId''';
   /// 执行转发
   Future<void> _doForwardMessage(MessageEntity message, String targetRoomId) async {
     try {
+      debugPrint('Forward message: ${message.id} from ${widget.conversation.id} to $targetRoomId');
+      debugPrint('Message type: ${message.type}, content: ${message.content}');
+      
       // 使用 MessageActionRepository 执行转发
       final repository = getIt<IMessageActionRepository>();
       final result = await repository.forwardMessage(
@@ -2203,30 +2256,80 @@ ID：$contactId''';
         targetRoomId, // 目标房间ID
       );
       
+      debugPrint('Forward result: $result');
+      
       if (result != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('消息已转发'),
-            duration: Duration(seconds: 1),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('消息已转发'),
+              duration: Duration(seconds: 1),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('转发失败'),
-            duration: Duration(seconds: 2),
-            backgroundColor: Colors.red,
-          ),
-        );
+        // 如果返回 null，尝试简单的文本转发作为备用
+        debugPrint('Forward returned null, trying simple text forward...');
+        await _simpleForwardMessage(message, targetRoomId);
       }
     } catch (e) {
       debugPrint('Forward message error: $e');
+      // 如果出错，尝试简单的文本转发作为备用
+      try {
+        await _simpleForwardMessage(message, targetRoomId);
+      } catch (e2) {
+        debugPrint('Simple forward also failed: $e2');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('转发失败: $e'),
+              duration: const Duration(seconds: 2),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+  
+  /// 简单转发消息（作为备用方案）
+  Future<void> _simpleForwardMessage(MessageEntity message, String targetRoomId) async {
+    final messageRepository = getIt<IMessageRepository>();
+    
+    String forwardContent;
+    switch (message.type) {
+      case MessageType.text:
+        forwardContent = message.content;
+        break;
+      case MessageType.image:
+        forwardContent = '[图片] ${message.content}';
+        break;
+      case MessageType.audio:
+        forwardContent = '[语音消息]';
+        break;
+      case MessageType.video:
+        forwardContent = '[视频] ${message.content}';
+        break;
+      case MessageType.file:
+        forwardContent = '[文件] ${message.metadata?.fileName ?? message.content}';
+        break;
+      case MessageType.location:
+        forwardContent = '[位置] ${message.content}';
+        break;
+      default:
+        forwardContent = message.content;
+    }
+    
+    // 发送到目标房间
+    await messageRepository.sendTextMessage(targetRoomId, forwardContent);
+    
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('转发失败: $e'),
-          duration: const Duration(seconds: 2),
-          backgroundColor: Colors.red,
+        const SnackBar(
+          content: Text('消息已转发'),
+          duration: Duration(seconds: 1),
+          backgroundColor: Colors.green,
         ),
       );
     }
@@ -2425,17 +2528,63 @@ ID：$contactId''';
   }
   
   /// 批量转发选中的消息
-  void _forwardSelectedMessages() {
+  Future<void> _forwardSelectedMessages() async {
     if (_selectedMessageIds.isEmpty) return;
     
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('已选择 ${_selectedMessageIds.length} 条消息'),
-        duration: const Duration(seconds: 1),
+    // 获取选中的消息
+    final messages = context.read<ChatBloc>().state.messages;
+    final selectedMessages = messages
+        .where((m) => _selectedMessageIds.contains(m.id))
+        .toList();
+    
+    if (selectedMessages.isEmpty) return;
+    
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // 显示转发目标选择对话框
+    final targetRoomId = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => _MultiForwardSheet(
+        selectedCount: selectedMessages.length,
+        isDark: isDark,
       ),
     );
     
-    // TODO: 显示转发目标选择
+    if (targetRoomId == null || !mounted) return;
+    
+    // 执行批量转发
+    int successCount = 0;
+    int failCount = 0;
+    
+    for (final message in selectedMessages) {
+      try {
+        await _simpleForwardMessage(message, targetRoomId);
+        successCount++;
+      } catch (e) {
+        debugPrint('Forward message failed: $e');
+        failCount++;
+      }
+    }
+    
+    if (mounted) {
+      String resultMsg;
+      if (failCount == 0) {
+        resultMsg = '已转发 $successCount 条消息';
+      } else {
+        resultMsg = '转发完成：成功 $successCount 条，失败 $failCount 条';
+      }
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(resultMsg),
+          duration: const Duration(seconds: 2),
+          backgroundColor: failCount == 0 ? Colors.green : Colors.orange,
+        ),
+      );
+    }
+    
     _exitMultiSelectMode();
   }
   
@@ -3140,6 +3289,32 @@ class _ForwardMessageSheet extends StatefulWidget {
 class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  List<ConversationEntity> _conversations = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadConversations();
+  }
+
+  Future<void> _loadConversations() async {
+    try {
+      final repository = getIt<IConversationRepository>();
+      final conversations = await repository.getConversations();
+      if (mounted) {
+        setState(() {
+          _conversations = conversations;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading conversations: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -3253,14 +3428,7 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
           
           // 最近会话列表
           Expanded(
-            child: BlocBuilder<ChatBloc, ChatState>(
-              builder: (context, state) {
-                // 获取最近会话列表
-                // 这里需要从 ContactBloc 或其他地方获取会话列表
-                // 暂时显示空状态
-                return _buildRecentChats();
-              },
-            ),
+            child: _buildRecentChats(),
           ),
         ],
       ),
@@ -3268,22 +3436,19 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
   }
   
   Widget _buildRecentChats() {
-    // TODO: 从 ContactBloc 获取真实的会话列表
-    final recentChats = <_ChatItem>[
-      _ChatItem(id: '1', name: '文件传输助手', avatar: null, isGroup: false),
-      _ChatItem(id: '2', name: '工作群', avatar: null, isGroup: true),
-      _ChatItem(id: '3', name: '家人群', avatar: null, isGroup: true),
-    ];
-    
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     final filteredChats = _searchQuery.isEmpty
-        ? recentChats
-        : recentChats.where((chat) => 
-            chat.name.toLowerCase().contains(_searchQuery)).toList();
+        ? _conversations
+        : _conversations.where((chat) => 
+            chat.name.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
     
     if (filteredChats.isEmpty) {
       return Center(
         child: Text(
-          '没有找到相关会话',
+          _conversations.isEmpty ? '没有可转发的会话' : '没有找到相关会话',
           style: TextStyle(
             color: widget.isDark ? Colors.white54 : Colors.black54,
           ),
@@ -3296,15 +3461,21 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
       itemCount: filteredChats.length,
       itemBuilder: (context, index) {
         final chat = filteredChats[index];
+        final isGroup = chat.type == ConversationType.group;
         return ListTile(
           leading: CircleAvatar(
             backgroundColor: widget.isDark 
                 ? const Color(0xFF3A3A3C) 
                 : const Color(0xFFE5E5EA),
-            child: Icon(
-              chat.isGroup ? Icons.group : Icons.person,
-              color: widget.isDark ? Colors.white70 : Colors.black54,
-            ),
+            backgroundImage: chat.avatarUrl != null && chat.avatarUrl!.isNotEmpty
+                ? NetworkImage(chat.avatarUrl!)
+                : null,
+            child: chat.avatarUrl == null || chat.avatarUrl!.isEmpty
+                ? Icon(
+                    isGroup ? Icons.group : Icons.person,
+                    color: widget.isDark ? Colors.white70 : Colors.black54,
+                  )
+                : null,
           ),
           title: Text(
             chat.name,
@@ -3312,6 +3483,17 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
               color: widget.isDark ? Colors.white : Colors.black,
             ),
           ),
+          subtitle: chat.lastMessage != null
+              ? Text(
+                  chat.lastMessage!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: widget.isDark ? Colors.white38 : Colors.black38,
+                  ),
+                )
+              : null,
           onTap: () => widget.onForwardToChat(chat.id),
         );
       },
@@ -4593,6 +4775,223 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
                               member['name'] ?? '未知',
                               member['id'] ?? '',
                             ),
+                          );
+                        },
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getColorFromName(String name) {
+    final colors = [
+      const Color(0xFF1AAD19),
+      const Color(0xFF576B95),
+      const Color(0xFFFA9D3B),
+      const Color(0xFFE64340),
+    ];
+    if (name.isEmpty) return colors[0];
+    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
+    return colors[index];
+  }
+}
+
+/// 批量转发选择器底部弹窗
+class _MultiForwardSheet extends StatefulWidget {
+  final int selectedCount;
+  final bool isDark;
+
+  const _MultiForwardSheet({
+    required this.selectedCount,
+    required this.isDark,
+  });
+
+  @override
+  State<_MultiForwardSheet> createState() => _MultiForwardSheetState();
+}
+
+class _MultiForwardSheetState extends State<_MultiForwardSheet> {
+  final TextEditingController _searchController = TextEditingController();
+  List<ConversationEntity> _conversations = [];
+  List<ConversationEntity> _filteredConversations = [];
+  bool _isLoading = true;
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadConversations();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadConversations() async {
+    try {
+      final repository = getIt<IConversationRepository>();
+      final conversations = await repository.getConversations();
+      if (mounted) {
+        setState(() {
+          _conversations = conversations;
+          _filteredConversations = conversations;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading conversations: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _filterConversations(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        _filteredConversations = _conversations;
+      } else {
+        _filteredConversations = _conversations.where((c) {
+          return c.name.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bgColor = widget.isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final textColor = widget.isDark ? Colors.white : Colors.black;
+    final subtextColor = widget.isDark ? Colors.white54 : Colors.black54;
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.7,
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: Column(
+        children: [
+          // 拖拽指示器
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // 标题
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.close, color: textColor),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(
+                        '选择转发对象',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                        ),
+                      ),
+                      Text(
+                        '已选择 ${widget.selectedCount} 条消息',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: subtextColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 48), // 平衡布局
+              ],
+            ),
+          ),
+          // 搜索框
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _filterConversations,
+              style: TextStyle(color: textColor),
+              decoration: InputDecoration(
+                hintText: '搜索联系人或群聊',
+                hintStyle: TextStyle(color: subtextColor),
+                prefixIcon: Icon(Icons.search, color: subtextColor),
+                filled: true,
+                fillColor: widget.isDark 
+                    ? Colors.white.withOpacity(0.1) 
+                    : Colors.grey[200],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ),
+          // 会话列表
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _filteredConversations.isEmpty
+                    ? Center(
+                        child: Text(
+                          _conversations.isEmpty ? '没有可转发的会话' : '未找到匹配的会话',
+                          style: TextStyle(color: subtextColor),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _filteredConversations.length,
+                        itemBuilder: (context, index) {
+                          final chat = _filteredConversations[index];
+                          final isGroup = chat.type == ConversationType.group;
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: _getColorFromName(chat.name),
+                              backgroundImage: chat.avatarUrl != null && chat.avatarUrl!.isNotEmpty
+                                  ? NetworkImage(chat.avatarUrl!)
+                                  : null,
+                              child: chat.avatarUrl == null || chat.avatarUrl!.isEmpty
+                                  ? Icon(
+                                      isGroup ? Icons.group : Icons.person,
+                                      color: Colors.white,
+                                    )
+                                  : null,
+                            ),
+                            title: Text(
+                              chat.name,
+                              style: TextStyle(color: textColor),
+                            ),
+                            subtitle: chat.lastMessage != null
+                                ? Text(
+                                    chat.lastMessage!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: subtextColor,
+                                    ),
+                                  )
+                                : null,
+                            trailing: Icon(
+                              Icons.chevron_right,
+                              color: subtextColor,
+                            ),
+                            onTap: () => Navigator.pop(context, chat.id),
                           );
                         },
                       ),
