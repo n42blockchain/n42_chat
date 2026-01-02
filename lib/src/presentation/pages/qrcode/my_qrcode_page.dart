@@ -26,7 +26,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
     _loadUserInfo();
   }
 
-  void _loadUserInfo() {
+  Future<void> _loadUserInfo() async {
     try {
       final clientManager = getIt<MatrixClientManager>();
       final client = clientManager.client;
@@ -35,10 +35,17 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
         setState(() {
           _userId = client.userID;
           _displayName = client.userID?.split(':').first.replaceFirst('@', '') ?? 'User';
-          // 获取头像URL
-          final profile = client.ownProfile;
-          _avatarUrl = profile.avatarUrl?.toString();
         });
+        
+        // 异步获取头像URL
+        try {
+          final profile = await client.ownProfile;
+          if (mounted) {
+            setState(() {
+              _avatarUrl = profile.avatarUrl?.toString();
+            });
+          }
+        } catch (_) {}
       }
     } catch (e) {
       debugPrint('Failed to load user info: $e');
