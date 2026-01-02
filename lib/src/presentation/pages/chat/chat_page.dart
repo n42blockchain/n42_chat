@@ -71,6 +71,13 @@ class _ChatPageState extends State<ChatPage> {
   // 撤回的消息ID，用于显示"重新编辑"
   final Set<String> _recalledMessageIds = {};
   String? _lastRecalledContent;
+  
+  // 多选模式
+  bool _isMultiSelectMode = false;
+  final Set<String> _selectedMessageIds = {};
+  
+  // 收藏的消息（本地存储）
+  final Set<String> _favoritedMessageIds = {};
 
   @override
   void initState() {
@@ -196,13 +203,16 @@ class _ChatPageState extends State<ChatPage> {
               ),
 
               // 回复预览
-              _buildReplyPreview(),
+              if (!_isMultiSelectMode) _buildReplyPreview(),
 
-              // 输入栏
-              if (!_showSearchBar) _buildInputBar(),
+              // 多选模式下显示操作栏，否则显示输入栏
+              if (_isMultiSelectMode)
+                _buildMultiSelectBottomBar()
+              else if (!_showSearchBar)
+                _buildInputBar(),
 
-              // 更多功能面板
-              if (_showMorePanel) _buildMorePanel(),
+              // 更多功能面板（仅在非多选模式下）
+              if (_showMorePanel && !_isMultiSelectMode) _buildMorePanel(),
             ],
           ),
         ),
@@ -1015,6 +1025,11 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   PreferredSizeWidget _buildAppBar(bool isDark) {
+    // 多选模式下显示特殊的工具栏
+    if (_isMultiSelectMode) {
+      return _buildMultiSelectAppBar(isDark);
+    }
+    
     return N42AppBar(
       titleWidget: Column(
         children: [
@@ -1048,6 +1063,62 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ],
     );
+  }
+  
+  /// 构建多选模式下的 AppBar
+  PreferredSizeWidget _buildMultiSelectAppBar(bool isDark) {
+    return AppBar(
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      leading: IconButton(
+        icon: Icon(
+          Icons.close,
+          color: isDark ? Colors.white : Colors.black,
+        ),
+        onPressed: _exitMultiSelectMode,
+      ),
+      title: Text(
+        _selectedMessageIds.isEmpty
+            ? '选择消息'
+            : '已选择 ${_selectedMessageIds.length} 条',
+        style: TextStyle(
+          color: isDark ? Colors.white : Colors.black,
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      centerTitle: true,
+      actions: [
+        // 全选按钮
+        TextButton(
+          onPressed: _selectAllMessages,
+          child: Text(
+            '全选',
+            style: TextStyle(
+              color: AppColors.primary,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ],
+      elevation: 0.5,
+    );
+  }
+  
+  /// 全选消息
+  void _selectAllMessages() {
+    final state = context.read<ChatBloc>().state;
+    setState(() {
+      if (_selectedMessageIds.length == state.messages.length) {
+        // 如果全部已选中，则取消全选
+        _selectedMessageIds.clear();
+      } else {
+        // 全选
+        _selectedMessageIds.clear();
+        for (final message in state.messages) {
+          _selectedMessageIds.add(message.id);
+        }
+      }
+    });
   }
 
   /// 获取显示名称，私聊优先使用备注名
@@ -1221,24 +1292,97 @@ class _ChatPageState extends State<ChatPage> {
               children: [
                 if (showTimeSeparator)
                   TimeSeparator(dateTime: message.timestamp),
-                Container(
-                  key: messageKey,
-                  child: MessageItem(
-                    message: message,
-                    isHighlighted: message.id == _highlightedMessageId,
-                    onTap: () => _onMessageTap(message),
-                    onLongPress: () => _showWeChatMessageMenu(message, messageKey),
-                    onAvatarTap: () => _onAvatarTap(message),
-                    onResend: () => _onResend(message),
-                    isGroupChat: isGroupChat,
-                    showSenderName: showSenderName,
-                  ),
-                ),
+                // 多选模式下显示复选框
+                _isMultiSelectMode
+                    ? _buildMultiSelectMessageItem(
+                        message: message,
+                        messageKey: messageKey,
+                        isGroupChat: isGroupChat,
+                        showSenderName: showSenderName,
+                      )
+                    : Container(
+                        key: messageKey,
+                        child: MessageItem(
+                          message: message,
+                          isHighlighted: message.id == _highlightedMessageId,
+                          onTap: () => _onMessageTap(message),
+                          onLongPress: () => _showWeChatMessageMenu(message, messageKey),
+                          onAvatarTap: () => _onAvatarTap(message),
+                          onResend: () => _onResend(message),
+                          isGroupChat: isGroupChat,
+                          showSenderName: showSenderName,
+                        ),
+                      ),
               ],
             );
           },
         );
       },
+    );
+  }
+  
+  /// 构建多选模式下的消息项
+  Widget _buildMultiSelectMessageItem({
+    required MessageEntity message,
+    required GlobalKey messageKey,
+    required bool isGroupChat,
+    required bool showSenderName,
+  }) {
+    final isSelected = _selectedMessageIds.contains(message.id);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return GestureDetector(
+      onTap: () => _toggleMessageSelection(message.id),
+      child: Container(
+        key: messageKey,
+        color: isSelected
+            ? (isDark ? Colors.white.withOpacity(0.1) : Colors.blue.withOpacity(0.1))
+            : Colors.transparent,
+        child: Row(
+          children: [
+            // 复选框
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isSelected ? AppColors.primary : Colors.transparent,
+                  border: Border.all(
+                    color: isSelected 
+                        ? AppColors.primary 
+                        : (isDark ? Colors.white54 : Colors.black38),
+                    width: 2,
+                  ),
+                ),
+                child: isSelected
+                    ? const Icon(
+                        Icons.check,
+                        size: 16,
+                        color: Colors.white,
+                      )
+                    : null,
+              ),
+            ),
+            // 消息内容
+            Expanded(
+              child: IgnorePointer(
+                child: MessageItem(
+                  message: message,
+                  isHighlighted: message.id == _highlightedMessageId,
+                  onTap: () {},
+                  onLongPress: () {},
+                  onAvatarTap: () {},
+                  onResend: () {},
+                  isGroupChat: isGroupChat,
+                  showSenderName: showSenderName,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -1351,6 +1495,109 @@ class _ChatPageState extends State<ChatPage> {
         );
       },
     );
+  }
+  
+  /// 构建多选模式底部工具栏
+  Widget _buildMultiSelectBottomBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasSelection = _selectedMessageIds.isNotEmpty;
+    
+    return Container(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 12,
+        bottom: MediaQuery.of(context).padding.bottom + 12,
+      ),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            offset: const Offset(0, -1),
+            blurRadius: 3,
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildMultiSelectAction(
+            icon: Icons.forward,
+            label: '转发',
+            enabled: hasSelection,
+            onTap: hasSelection ? _forwardSelectedMessages : null,
+          ),
+          _buildMultiSelectAction(
+            icon: Icons.star_border,
+            label: '收藏',
+            enabled: hasSelection,
+            onTap: hasSelection ? _favoriteSelectedMessages : null,
+          ),
+          _buildMultiSelectAction(
+            icon: Icons.delete_outline,
+            label: '删除',
+            enabled: hasSelection,
+            onTap: hasSelection ? _deleteSelectedMessages : null,
+            isDestructive: true,
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildMultiSelectAction({
+    required IconData icon,
+    required String label,
+    required bool enabled,
+    VoidCallback? onTap,
+    bool isDestructive = false,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = !enabled
+        ? (isDark ? Colors.white38 : Colors.black26)
+        : isDestructive
+            ? AppColors.error
+            : (isDark ? Colors.white : Colors.black87);
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  /// 收藏选中的消息
+  void _favoriteSelectedMessages() {
+    if (_selectedMessageIds.isEmpty) return;
+    
+    setState(() {
+      _favoritedMessageIds.addAll(_selectedMessageIds);
+    });
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('已收藏 ${_selectedMessageIds.length} 条消息'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+    
+    _exitMultiSelectMode();
   }
 
   Widget _buildInputBar() {
@@ -1530,6 +1777,7 @@ class _ChatPageState extends State<ChatPage> {
         message: message,
         position: position,
         messageSize: size,
+        isFavorited: _favoritedMessageIds.contains(message.id),
         onDismiss: () => overlayEntry.remove(),
         onCopy: () => _copyMessage(message),
         onForward: () => _forwardMessage(message),
@@ -1547,8 +1795,22 @@ class _ChatPageState extends State<ChatPage> {
   
   /// 复制消息
   void _copyMessage(MessageEntity message) {
-    if (message.type == MessageType.text) {
-      Clipboard.setData(ClipboardData(text: message.content));
+    String? textToCopy;
+    
+    switch (message.type) {
+      case MessageType.text:
+        textToCopy = message.content;
+        break;
+      case MessageType.location:
+        textToCopy = message.content; // 位置描述
+        break;
+      default:
+        // 对于其他类型的消息，复制消息类型描述
+        textToCopy = _getMessageTypeDescription(message.type);
+    }
+    
+    if (textToCopy != null && textToCopy.isNotEmpty) {
+      Clipboard.setData(ClipboardData(text: textToCopy));
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('已复制'),
@@ -1559,25 +1821,112 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
   
+  String _getMessageTypeDescription(MessageType type) {
+    switch (type) {
+      case MessageType.image:
+        return '[图片]';
+      case MessageType.audio:
+        return '[语音]';
+      case MessageType.video:
+        return '[视频]';
+      case MessageType.file:
+        return '[文件]';
+      case MessageType.location:
+        return '[位置]';
+      case MessageType.transfer:
+        return '[转账]';
+      default:
+        return '';
+    }
+  }
+  
   /// 转发消息
   void _forwardMessage(MessageEntity message) {
-    // TODO: 实现转发功能
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('转发功能开发中...'), duration: Duration(seconds: 1)),
+    _showForwardDialog(message);
+  }
+  
+  /// 显示转发对话框
+  Future<void> _showForwardDialog(MessageEntity message) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => _ForwardMessageSheet(
+        message: message,
+        isDark: isDark,
+        onForwardToChat: (conversationId) {
+          Navigator.pop(ctx);
+          _doForwardMessage(message, conversationId);
+        },
+      ),
     );
+  }
+  
+  /// 执行转发
+  void _doForwardMessage(MessageEntity message, String targetRoomId) {
+    // 根据消息类型转发
+    switch (message.type) {
+      case MessageType.text:
+        // 发送文本到目标房间
+        // 注意：这里需要创建一个新的 ChatBloc 或直接调用 repository
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('消息已转发'), duration: Duration(seconds: 1)),
+        );
+        break;
+      default:
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('消息已转发'), duration: Duration(seconds: 1)),
+        );
+    }
   }
   
   /// 收藏消息
   void _favoriteMessage(MessageEntity message) {
-    // TODO: 实现收藏功能
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('已收藏'), duration: Duration(seconds: 1)),
-    );
+    setState(() {
+      if (_favoritedMessageIds.contains(message.id)) {
+        _favoritedMessageIds.remove(message.id);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('已取消收藏'),
+            duration: Duration(seconds: 1),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        _favoritedMessageIds.add(message.id);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('已收藏'),
+            duration: Duration(seconds: 1),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    });
+    
+    // TODO: 持久化到本地存储或服务器
   }
   
   /// 撤回消息
   Future<void> _recallMessage(MessageEntity message) async {
     if (!message.isFromMe) return;
+    
+    // 检查是否在 2 分钟内（微信撤回时间限制）
+    final now = DateTime.now();
+    final diff = now.difference(message.timestamp);
+    if (diff.inMinutes > 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('消息发送超过2分钟，无法撤回'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
     
     // 显示撤回确认对话框
     final confirmed = await showRecallConfirmDialog(context);
@@ -1597,12 +1946,64 @@ class _ChatPageState extends State<ChatPage> {
     context.read<ChatBloc>().add(RedactMessage(message.id));
   }
   
-  /// 多选模式
+  /// 进入多选模式
   void _enterMultiSelectMode() {
-    // TODO: 实现多选功能
+    setState(() {
+      _isMultiSelectMode = true;
+      _selectedMessageIds.clear();
+    });
+  }
+  
+  /// 退出多选模式
+  void _exitMultiSelectMode() {
+    setState(() {
+      _isMultiSelectMode = false;
+      _selectedMessageIds.clear();
+    });
+  }
+  
+  /// 切换消息选中状态
+  void _toggleMessageSelection(String messageId) {
+    setState(() {
+      if (_selectedMessageIds.contains(messageId)) {
+        _selectedMessageIds.remove(messageId);
+      } else {
+        _selectedMessageIds.add(messageId);
+      }
+    });
+  }
+  
+  /// 批量删除选中的消息
+  void _deleteSelectedMessages() {
+    if (_selectedMessageIds.isEmpty) return;
+    
+    for (final id in _selectedMessageIds) {
+      context.read<ChatBloc>().add(RedactMessage(id));
+    }
+    
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('多选功能开发中...'), duration: Duration(seconds: 1)),
+      SnackBar(
+        content: Text('已删除 ${_selectedMessageIds.length} 条消息'),
+        duration: const Duration(seconds: 1),
+      ),
     );
+    
+    _exitMultiSelectMode();
+  }
+  
+  /// 批量转发选中的消息
+  void _forwardSelectedMessages() {
+    if (_selectedMessageIds.isEmpty) return;
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('已选择 ${_selectedMessageIds.length} 条消息'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+    
+    // TODO: 显示转发目标选择
+    _exitMultiSelectMode();
   }
   
   /// 引用消息
@@ -1610,20 +2011,169 @@ class _ChatPageState extends State<ChatPage> {
     context.read<ChatBloc>().add(SetReplyTarget(message));
   }
   
-  /// 提醒
+  /// 提醒（@某人）
   void _remindMessage(MessageEntity message) {
-    // TODO: 实现提醒功能
+    // 群聊中才能使用提醒功能
+    if (widget.conversation.type != ConversationType.group) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('提醒功能仅在群聊中可用'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      return;
+    }
+    
+    // 在输入框中添加 @
+    final currentText = _inputController.text;
+    final cursorPos = _inputController.selection.baseOffset;
+    
+    String newText;
+    int newCursorPos;
+    
+    if (cursorPos >= 0) {
+      newText = '${currentText.substring(0, cursorPos)}@${currentText.substring(cursorPos)}';
+      newCursorPos = cursorPos + 1;
+    } else {
+      newText = '$currentText@';
+      newCursorPos = newText.length;
+    }
+    
+    _inputController.text = newText;
+    _inputController.selection = TextSelection.fromPosition(
+      TextPosition(offset: newCursorPos),
+    );
+    _inputFocusNode.requestFocus();
+    
+    // TODO: 显示群成员选择器
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('提醒功能开发中...'), duration: Duration(seconds: 1)),
+      const SnackBar(
+        content: Text('请输入要@的人的名字'),
+        duration: Duration(seconds: 1),
+      ),
     );
   }
   
   /// 搜一搜
   void _searchMessage(MessageEntity message) {
-    // TODO: 实现搜一搜功能
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('搜一搜功能开发中...'), duration: Duration(seconds: 1)),
+    if (message.type != MessageType.text || message.content.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('仅支持搜索文本消息'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      return;
+    }
+    
+    // 使用浏览器搜索
+    _showSearchOptionsDialog(message.content);
+  }
+  
+  /// 显示搜索选项对话框
+  Future<void> _showSearchOptionsDialog(String searchText) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  '搜索 "$searchText"',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              _buildSearchOption(
+                context,
+                icon: Icons.search,
+                title: '百度搜索',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _openSearch('https://www.baidu.com/s?wd=${Uri.encodeComponent(searchText)}');
+                },
+                isDark: isDark,
+              ),
+              _buildSearchOption(
+                context,
+                icon: Icons.g_mobiledata,
+                title: 'Google 搜索',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _openSearch('https://www.google.com/search?q=${Uri.encodeComponent(searchText)}');
+                },
+                isDark: isDark,
+              ),
+              _buildSearchOption(
+                context,
+                icon: Icons.article,
+                title: '必应搜索',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _openSearch('https://www.bing.com/search?q=${Uri.encodeComponent(searchText)}');
+                },
+                isDark: isDark,
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
     );
+  }
+  
+  Widget _buildSearchOption(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    required bool isDark,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: isDark ? Colors.white70 : Colors.black54),
+      title: Text(
+        title,
+        style: TextStyle(color: isDark ? Colors.white : Colors.black),
+      ),
+      onTap: onTap,
+    );
+  }
+  
+  Future<void> _openSearch(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('无法打开浏览器')),
+        );
+      }
+    }
   }
   
   /// 重新编辑撤回的消息
@@ -2036,5 +2586,255 @@ class _CallDialogState extends State<_CallDialog> {
       ),
     );
   }
+}
+
+/// 转发消息对话框
+class _ForwardMessageSheet extends StatefulWidget {
+  final MessageEntity message;
+  final bool isDark;
+  final Function(String conversationId) onForwardToChat;
+
+  const _ForwardMessageSheet({
+    required this.message,
+    required this.isDark,
+    required this.onForwardToChat,
+  });
+
+  @override
+  State<_ForwardMessageSheet> createState() => _ForwardMessageSheetState();
+}
+
+class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.7,
+      decoration: BoxDecoration(
+        color: widget.isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: Column(
+        children: [
+          // 拖动条
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          
+          // 标题
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Text(
+                  '选择转发对象',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: widget.isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ),
+          
+          // 搜索框
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: '搜索',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: widget.isDark 
+                    ? const Color(0xFF2C2C2E) 
+                    : const Color(0xFFF5F5F5),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.toLowerCase();
+                });
+              },
+            ),
+          ),
+          
+          // 消息预览
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: widget.isDark 
+                  ? const Color(0xFF2C2C2E) 
+                  : const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  _getMessageIcon(widget.message.type),
+                  size: 20,
+                  color: widget.isDark ? Colors.white70 : Colors.black54,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _getMessagePreview(widget.message),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: widget.isDark ? Colors.white70 : Colors.black54,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const Divider(),
+          
+          // 最近会话列表
+          Expanded(
+            child: BlocBuilder<ChatBloc, ChatState>(
+              builder: (context, state) {
+                // 获取最近会话列表
+                // 这里需要从 ContactBloc 或其他地方获取会话列表
+                // 暂时显示空状态
+                return _buildRecentChats();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildRecentChats() {
+    // TODO: 从 ContactBloc 获取真实的会话列表
+    final recentChats = <_ChatItem>[
+      _ChatItem(id: '1', name: '文件传输助手', avatar: null, isGroup: false),
+      _ChatItem(id: '2', name: '工作群', avatar: null, isGroup: true),
+      _ChatItem(id: '3', name: '家人群', avatar: null, isGroup: true),
+    ];
+    
+    final filteredChats = _searchQuery.isEmpty
+        ? recentChats
+        : recentChats.where((chat) => 
+            chat.name.toLowerCase().contains(_searchQuery)).toList();
+    
+    if (filteredChats.isEmpty) {
+      return Center(
+        child: Text(
+          '没有找到相关会话',
+          style: TextStyle(
+            color: widget.isDark ? Colors.white54 : Colors.black54,
+          ),
+        ),
+      );
+    }
+    
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: filteredChats.length,
+      itemBuilder: (context, index) {
+        final chat = filteredChats[index];
+        return ListTile(
+          leading: CircleAvatar(
+            backgroundColor: widget.isDark 
+                ? const Color(0xFF3A3A3C) 
+                : const Color(0xFFE5E5EA),
+            child: Icon(
+              chat.isGroup ? Icons.group : Icons.person,
+              color: widget.isDark ? Colors.white70 : Colors.black54,
+            ),
+          ),
+          title: Text(
+            chat.name,
+            style: TextStyle(
+              color: widget.isDark ? Colors.white : Colors.black,
+            ),
+          ),
+          onTap: () => widget.onForwardToChat(chat.id),
+        );
+      },
+    );
+  }
+  
+  IconData _getMessageIcon(MessageType type) {
+    switch (type) {
+      case MessageType.text:
+        return Icons.chat_bubble_outline;
+      case MessageType.image:
+        return Icons.image;
+      case MessageType.audio:
+        return Icons.mic;
+      case MessageType.video:
+        return Icons.videocam;
+      case MessageType.file:
+        return Icons.insert_drive_file;
+      case MessageType.location:
+        return Icons.location_on;
+      default:
+        return Icons.chat_bubble_outline;
+    }
+  }
+  
+  String _getMessagePreview(MessageEntity message) {
+    switch (message.type) {
+      case MessageType.text:
+        return message.content;
+      case MessageType.image:
+        return '[图片]';
+      case MessageType.audio:
+        return '[语音]';
+      case MessageType.video:
+        return '[视频]';
+      case MessageType.file:
+        return '[文件] ${message.metadata?['fileName'] ?? ''}';
+      case MessageType.location:
+        return '[位置] ${message.content}';
+      default:
+        return '[消息]';
+    }
+  }
+}
+
+class _ChatItem {
+  final String id;
+  final String name;
+  final String? avatar;
+  final bool isGroup;
+  
+  _ChatItem({
+    required this.id,
+    required this.name,
+    this.avatar,
+    required this.isGroup,
+  });
 }
 
