@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/message_entity.dart';
@@ -183,22 +184,29 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     SendImageMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    if (_currentRoomId == null) {
+      debugPrint('ChatBloc: Cannot send image - no room ID');
+      return;
+    }
 
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
+      debugPrint('ChatBloc: Sending image ${event.filename}, size: ${event.imageBytes.length}');
       await _messageRepository.sendImageMessage(
         _currentRoomId!,
         imageBytes: event.imageBytes,
         filename: event.filename,
         mimeType: event.mimeType,
       );
+      debugPrint('ChatBloc: Image sent successfully');
       emit(state.copyWith(isSending: false));
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('ChatBloc: Send image error - $e');
+      debugPrint('ChatBloc: Stack trace - $stackTrace');
       emit(state.copyWith(
         isSending: false,
-        error: '发送图片失败',
+        error: '发送图片失败: $e',
       ));
     }
   }
@@ -208,11 +216,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     SendVoiceMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    if (_currentRoomId == null) {
+      debugPrint('ChatBloc: Cannot send voice - no room ID');
+      return;
+    }
 
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
+      debugPrint('ChatBloc: Sending voice ${event.filename}, size: ${event.audioBytes.length}, duration: ${event.duration}ms');
       await _messageRepository.sendVoiceMessage(
         _currentRoomId!,
         audioBytes: event.audioBytes,
@@ -220,11 +232,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         duration: event.duration,
         mimeType: event.mimeType,
       );
+      debugPrint('ChatBloc: Voice sent successfully');
       emit(state.copyWith(isSending: false));
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('ChatBloc: Send voice error - $e');
+      debugPrint('ChatBloc: Stack trace - $stackTrace');
       emit(state.copyWith(
         isSending: false,
-        error: '发送语音失败',
+        error: '发送语音失败: $e',
       ));
     }
   }

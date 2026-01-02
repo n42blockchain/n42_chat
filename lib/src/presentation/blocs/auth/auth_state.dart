@@ -86,8 +86,11 @@ class AuthState extends Equatable {
   bool get isLoading =>
       status == AuthStatus.loading || status == AuthStatus.checking;
 
-  /// 是否已登录
-  bool get isAuthenticated => status == AuthStatus.authenticated;
+  /// 是否已登录（loading 状态下如果有 user 也算已登录）
+  bool get isAuthenticated => 
+      status == AuthStatus.authenticated || 
+      (status == AuthStatus.loading && user != null) ||
+      (status == AuthStatus.error && user != null);
 
   /// 是否有错误
   bool get hasError => status == AuthStatus.error && errorMessage != null;
