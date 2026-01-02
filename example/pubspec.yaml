@@ -15,7 +15,7 @@ dependencies:
     path: ../
   
   # Matrix SDK for server testing
-  matrix: ^0.24.0
+  matrix: ^0.32.0
   
   cupertino_icons: ^1.0.6
 
