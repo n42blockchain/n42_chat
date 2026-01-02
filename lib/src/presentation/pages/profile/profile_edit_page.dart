@@ -905,8 +905,8 @@ class _AddressManagePageState extends State<_AddressManagePage> {
             'n42.user.addresses',
           );
           
-          if (data is Map && data['addresses'] is List) {
-            final List addressList = data['addresses'];
+          if (data is Map && data['addresses'] != null) {
+            final addressList = data['addresses'] as List;
             setState(() {
               _addresses = addressList.map((item) => _AddressItem(
                 name: item['name'] ?? '',
