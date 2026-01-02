@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../data/datasources/local/secure_storage_datasource.dart';
@@ -72,9 +73,17 @@ Future<void> _registerServices() async {
   // Matrix客户端管理器
   final clientManager = MatrixClientManager.instance;
   
-  // 确保 Matrix 客户端已初始化（包括 Hive 数据库）
+  // 尝试初始化 Matrix 客户端（包括 Hive 数据库）
+  // 如果失败，允许后续在登录/注册时再次尝试
   if (!clientManager.isInitialized) {
-    await clientManager.initialize();
+    try {
+      await clientManager.initialize();
+    } catch (e) {
+      // 初始化失败时记录错误，但不阻塞依赖注入
+      // 后续在登录/注册时会再次尝试初始化
+      debugPrint('MatrixClientManager: Initial initialization failed: $e');
+      debugPrint('MatrixClientManager: Will retry on login/register');
+    }
   }
   
   getIt.registerLazySingleton<MatrixClientManager>(
