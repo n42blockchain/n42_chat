@@ -66,8 +66,8 @@ class ChatMorePanel extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // 获取底部安全区域高度
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    // 内容高度（两行图标 + 页面指示器）
-    const contentHeight = 170.0;
+    // 内容高度（两行图标 + 页面指示器）- 增加高度避免溢出
+    const contentHeight = 200.0;
 
     return Container(
       // 固定高度 = 内容高度 + 底部安全区域
@@ -81,154 +81,157 @@ class ChatMorePanel extends StatelessWidget {
           ),
         ),
       ),
-      child: Column(
-        children: [
-          Expanded(
-            child: PageView(
-            children: [
-              // 第一页
-              _buildPage(
-                context,
-                isDark,
-                [
-                  _MoreItem(
-                    icon: Icons.photo_library_outlined,
-                    label: '照片',
-                    onTap: onPhotoPressed,
+      child: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView(
+                children: [
+                  // 第一页
+                  _buildPage(
+                    context,
+                    isDark,
+                    [
+                      _MoreItem(
+                        icon: Icons.photo_library_outlined,
+                        label: '照片',
+                        onTap: onPhotoPressed,
+                      ),
+                      _MoreItem(
+                        icon: Icons.camera_alt_outlined,
+                        label: '拍摄',
+                        onTap: onCameraPressed,
+                      ),
+                      _MoreItem(
+                        icon: Icons.videocam_outlined,
+                        label: '视频通话',
+                        onTap: onVideoCallPressed,
+                      ),
+                      _MoreItem(
+                        icon: Icons.location_on_outlined,
+                        label: '位置',
+                        onTap: onLocationPressed,
+                      ),
+                      _MoreItem(
+                        icon: Icons.card_giftcard,
+                        label: '红包',
+                        onTap: onRedPacketPressed,
+                        iconColor: AppColors.redPacket,
+                      ),
+                      _MoreItem(
+                        icon: Icons.swap_horiz,
+                        label: '转账',
+                        onTap: onTransferPressed,
+                      ),
+                      _MoreItem(
+                        icon: Icons.folder_outlined,
+                        label: '文件',
+                        onTap: onFilePressed,
+                      ),
+                      _MoreItem(
+                        icon: Icons.person_outline,
+                        label: '名片',
+                        onTap: onContactCardPressed,
+                      ),
+                    ],
                   ),
-                  _MoreItem(
-                    icon: Icons.camera_alt_outlined,
-                    label: '拍摄',
-                    onTap: onCameraPressed,
-                  ),
-                  _MoreItem(
-                    icon: Icons.videocam_outlined,
-                    label: '视频通话',
-                    onTap: onVideoCallPressed,
-                  ),
-                  _MoreItem(
-                    icon: Icons.location_on_outlined,
-                    label: '位置',
-                    onTap: onLocationPressed,
-                  ),
-                  _MoreItem(
-                    icon: Icons.card_giftcard,
-                    label: '红包',
-                    onTap: onRedPacketPressed,
-                    iconColor: AppColors.redPacket,
-                  ),
-                  _MoreItem(
-                    icon: Icons.swap_horiz,
-                    label: '转账',
-                    onTap: onTransferPressed,
-                  ),
-                  _MoreItem(
-                    icon: Icons.folder_outlined,
-                    label: '文件',
-                    onTap: onFilePressed,
-                  ),
-                  _MoreItem(
-                    icon: Icons.person_outline,
-                    label: '名片',
-                    onTap: onContactCardPressed,
+                  // 第二页
+                  _buildPage(
+                    context,
+                    isDark,
+                    [
+                      _MoreItem(
+                        icon: Icons.star_outline,
+                        label: '收藏',
+                        onTap: onFavoritePressed,
+                      ),
+                      _MoreItem(
+                        icon: Icons.music_note_outlined,
+                        label: '音乐',
+                        onTap: onMusicPressed,
+                      ),
+                      _MoreItem(
+                        icon: Icons.confirmation_num_outlined,
+                        label: '卡券',
+                        onTap: onCouponPressed,
+                      ),
+                      _MoreItem(
+                        icon: Icons.redeem,
+                        label: '礼物',
+                        onTap: onGiftPressed,
+                        iconColor: AppColors.error,
+                      ),
+                    ],
                   ),
                 ],
               ),
-              // 第二页
-              _buildPage(
-                context,
-                isDark,
-                [
-                  _MoreItem(
-                    icon: Icons.star_outline,
-                    label: '收藏',
-                    onTap: onFavoritePressed,
-                  ),
-                  _MoreItem(
-                    icon: Icons.music_note_outlined,
-                    label: '音乐',
-                    onTap: onMusicPressed,
-                  ),
-                  _MoreItem(
-                    icon: Icons.confirmation_num_outlined,
-                    label: '卡券',
-                    onTap: onCouponPressed,
-                  ),
-                  _MoreItem(
-                    icon: Icons.redeem,
-                    label: '礼物',
-                    onTap: onGiftPressed,
-                    iconColor: AppColors.error,
-                  ),
-                ],
-              ),
-            ],
-          ),
-          ),
-          // 底部安全区域
-          SizedBox(height: bottomPadding),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildPage(BuildContext context, bool isDark, List<_MoreItem> items) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // 第一行
-        Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // 第一行
+          Padding(
+            padding: const EdgeInsets.only(top: 8, bottom: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                for (int i = 0; i < 4; i++)
+                  if (i < items.length)
+                    _buildItem(context, items[i], isDark)
+                  else
+                    const SizedBox(width: 70),
+              ],
+            ),
+          ),
+          // 第二行
+          Padding(
+            padding: const EdgeInsets.only(top: 4, bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                for (int i = 4; i < 8; i++)
+                  if (i < items.length)
+                    _buildItem(context, items[i], isDark)
+                  else
+                    const SizedBox(width: 70),
+              ],
+            ),
+          ),
+          // 页面指示器
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              for (int i = 0; i < 4; i++)
-                if (i < items.length)
-                  _buildItem(context, items[i], isDark)
-                else
-                  const SizedBox(width: 70),
+              Container(
+                width: 5,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: AppColors.textSecondary,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 5),
+              Container(
+                width: 5,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: AppColors.textTertiary,
+                  shape: BoxShape.circle,
+                ),
+              ),
             ],
           ),
-        ),
-        // 第二行
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              for (int i = 4; i < 8; i++)
-                if (i < items.length)
-                  _buildItem(context, items[i], isDark)
-                else
-                  const SizedBox(width: 70),
-            ],
-          ),
-        ),
-        // 页面指示器
-        const SizedBox(height: 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 5,
-              height: 5,
-              decoration: BoxDecoration(
-                color: AppColors.textSecondary,
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(width: 5),
-            Container(
-              width: 5,
-              height: 5,
-              decoration: BoxDecoration(
-                color: AppColors.textTertiary,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 
