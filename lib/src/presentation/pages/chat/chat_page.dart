@@ -9,6 +9,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:flutter/services.dart';
+
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
@@ -21,6 +23,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../blocs/search/search_bloc.dart';
 import '../../widgets/chat/chat_widgets.dart';
+import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../search/chat_search_bar.dart';
 import 'message_item.dart';
@@ -61,6 +64,13 @@ class _ChatPageState extends State<ChatPage> {
   bool _isRecording = false;
   bool _isRecordingCancelled = false;
   Duration _recordingDuration = Duration.zero;
+  
+  // 消息 GlobalKey 映射，用于获取消息气泡位置
+  final Map<String, GlobalKey> _messageKeys = {};
+  
+  // 撤回的消息ID，用于显示"重新编辑"
+  final Set<String> _recalledMessageIds = {};
+  String? _lastRecalledContent;
 
   @override
   void initState() {
@@ -130,10 +140,6 @@ class _ChatPageState extends State<ChatPage> {
   void _onInputChanged(String text) {
     // 发送正在输入状态
     context.read<ChatBloc>().add(SendTypingNotification(text.isNotEmpty));
-  }
-
-  void _onMessageLongPress(MessageEntity message) {
-    _showMessageMenu(message);
   }
 
   void _onMessageTap(MessageEntity message) {
@@ -1191,19 +1197,42 @@ class _ChatPageState extends State<ChatPage> {
               _shouldShowTimeSeparator(message, previousMessage)
             );
 
+            // 检查消息是否被撤回
+            if (_recalledMessageIds.contains(message.id)) {
+              return Column(
+                children: [
+                  if (showTimeSeparator)
+                    TimeSeparator(dateTime: message.timestamp),
+                  RecalledMessageWidget(
+                    isFromMe: message.isFromMe,
+                    onReEdit: message.isFromMe && _lastRecalledContent != null
+                        ? () => _onReEditRecalledMessage()
+                        : null,
+                  ),
+                ],
+              );
+            }
+
+            // 为消息创建/获取 GlobalKey
+            _messageKeys.putIfAbsent(message.id, () => GlobalKey());
+            final messageKey = _messageKeys[message.id]!;
+
             return Column(
               children: [
                 if (showTimeSeparator)
                   TimeSeparator(dateTime: message.timestamp),
-                MessageItem(
-                  message: message,
-                  isHighlighted: message.id == _highlightedMessageId,
-                  onTap: () => _onMessageTap(message),
-                  onLongPress: () => _onMessageLongPress(message),
-                  onAvatarTap: () => _onAvatarTap(message),
-                  onResend: () => _onResend(message),
-                  isGroupChat: isGroupChat,
-                  showSenderName: showSenderName,
+                Container(
+                  key: messageKey,
+                  child: MessageItem(
+                    message: message,
+                    isHighlighted: message.id == _highlightedMessageId,
+                    onTap: () => _onMessageTap(message),
+                    onLongPress: () => _showWeChatMessageMenu(message, messageKey),
+                    onAvatarTap: () => _onAvatarTap(message),
+                    onResend: () => _onResend(message),
+                    isGroupChat: isGroupChat,
+                    showSenderName: showSenderName,
+                  ),
                 ),
               ],
             );
@@ -1448,6 +1477,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _showMessageMenu(MessageEntity message) {
+    // 使用旧的底部菜单作为 fallback
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1455,7 +1485,7 @@ class _ChatPageState extends State<ChatPage> {
         message: message,
         onCopy: () {
           Navigator.pop(ctx);
-          // TODO: 复制消息
+          _copyMessage(message);
         },
         onReply: () {
           Navigator.pop(ctx);
@@ -1468,11 +1498,145 @@ class _ChatPageState extends State<ChatPage> {
         onDelete: message.isFromMe
             ? () {
                 Navigator.pop(ctx);
-                context.read<ChatBloc>().add(RedactMessage(message.id));
+                _recallMessage(message);
               }
             : null,
       ),
     );
+  }
+  
+  /// 显示微信风格的消息菜单
+  void _showWeChatMessageMenu(MessageEntity message, GlobalKey messageKey) {
+    // 获取消息气泡的位置和大小
+    final RenderBox? renderBox = messageKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) {
+      // fallback 到旧菜单
+      _showMessageMenu(message);
+      return;
+    }
+    
+    final position = renderBox.localToGlobal(Offset.zero);
+    final size = renderBox.size;
+    
+    // 震动反馈
+    HapticFeedback.mediumImpact();
+    
+    // 显示菜单
+    final overlay = Overlay.of(context);
+    late OverlayEntry overlayEntry;
+    
+    overlayEntry = OverlayEntry(
+      builder: (ctx) => WeChatMessageMenu(
+        message: message,
+        position: position,
+        messageSize: size,
+        onDismiss: () => overlayEntry.remove(),
+        onCopy: () => _copyMessage(message),
+        onForward: () => _forwardMessage(message),
+        onFavorite: () => _favoriteMessage(message),
+        onRecall: () => _recallMessage(message),
+        onMultiSelect: () => _enterMultiSelectMode(),
+        onQuote: () => _quoteMessage(message),
+        onRemind: () => _remindMessage(message),
+        onSearch: () => _searchMessage(message),
+      ),
+    );
+    
+    overlay.insert(overlayEntry);
+  }
+  
+  /// 复制消息
+  void _copyMessage(MessageEntity message) {
+    if (message.type == MessageType.text) {
+      Clipboard.setData(ClipboardData(text: message.content));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('已复制'),
+          duration: Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+  
+  /// 转发消息
+  void _forwardMessage(MessageEntity message) {
+    // TODO: 实现转发功能
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('转发功能开发中...'), duration: Duration(seconds: 1)),
+    );
+  }
+  
+  /// 收藏消息
+  void _favoriteMessage(MessageEntity message) {
+    // TODO: 实现收藏功能
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('已收藏'), duration: Duration(seconds: 1)),
+    );
+  }
+  
+  /// 撤回消息
+  Future<void> _recallMessage(MessageEntity message) async {
+    if (!message.isFromMe) return;
+    
+    // 显示撤回确认对话框
+    final confirmed = await showRecallConfirmDialog(context);
+    if (!confirmed) return;
+    
+    // 保存撤回的消息内容，用于"重新编辑"
+    if (message.type == MessageType.text) {
+      _lastRecalledContent = message.content;
+    }
+    
+    // 记录撤回的消息 ID
+    setState(() {
+      _recalledMessageIds.add(message.id);
+    });
+    
+    // 调用撤回 API
+    context.read<ChatBloc>().add(RedactMessage(message.id));
+  }
+  
+  /// 多选模式
+  void _enterMultiSelectMode() {
+    // TODO: 实现多选功能
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('多选功能开发中...'), duration: Duration(seconds: 1)),
+    );
+  }
+  
+  /// 引用消息
+  void _quoteMessage(MessageEntity message) {
+    context.read<ChatBloc>().add(SetReplyTarget(message));
+  }
+  
+  /// 提醒
+  void _remindMessage(MessageEntity message) {
+    // TODO: 实现提醒功能
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('提醒功能开发中...'), duration: Duration(seconds: 1)),
+    );
+  }
+  
+  /// 搜一搜
+  void _searchMessage(MessageEntity message) {
+    // TODO: 实现搜一搜功能
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('搜一搜功能开发中...'), duration: Duration(seconds: 1)),
+    );
+  }
+  
+  /// 重新编辑撤回的消息
+  void _onReEditRecalledMessage() {
+    if (_lastRecalledContent != null) {
+      _inputController.text = _lastRecalledContent!;
+      _inputFocusNode.requestFocus();
+      // 移动光标到末尾
+      _inputController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _inputController.text.length),
+      );
+      _lastRecalledContent = null;
+    }
   }
 
   void _onVoicePressed() {
