@@ -98,12 +98,33 @@ class MatrixMessageDataSource {
     required String filename,
     String? mimeType,
   }) async {
+    debugPrint('=== MatrixMessageDataSource.sendImageMessage start ===');
+    debugPrint('roomId: $roomId');
+    debugPrint('filename: $filename');
+    debugPrint('mimeType (input): $mimeType');
+    debugPrint('imageBytes.length: ${imageBytes.length}');
+    
     try {
-      final room = _client?.getRoomById(roomId);
-      if (room == null) {
-        debugPrint('Room not found: $roomId');
-        return null;
+      // 检查客户端
+      if (_client == null) {
+        debugPrint('ERROR: Matrix client is null');
+        throw Exception('Matrix 客户端未初始化');
       }
+      
+      // 检查登录状态
+      if (!_client!.isLogged()) {
+        debugPrint('ERROR: Not logged in');
+        throw Exception('未登录');
+      }
+      
+      // 获取房间
+      final room = _client!.getRoomById(roomId);
+      if (room == null) {
+        debugPrint('ERROR: Room not found: $roomId');
+        debugPrint('Available rooms: ${_client!.rooms.map((r) => r.id).toList()}');
+        throw Exception('房间不存在: $roomId');
+      }
+      debugPrint('Room found: ${room.getLocalizedDisplayname()}');
 
       // 确定正确的 MIME 类型
       String actualMimeType = mimeType ?? 'image/jpeg';
@@ -115,23 +136,35 @@ class MatrixMessageDataSource {
       } else if (lowerFilename.endsWith('.webp')) {
         actualMimeType = 'image/webp';
       } else if (lowerFilename.endsWith('.heic') || lowerFilename.endsWith('.heif')) {
+        // HEIC/HEIF 需要服务器支持，某些服务器可能不支持，尝试作为 jpeg
         actualMimeType = 'image/jpeg';
       }
 
-      debugPrint('Sending image: $filename, size: ${imageBytes.length}, mimeType: $actualMimeType');
+      debugPrint('Final mimeType: $actualMimeType');
 
-      // 上传图片
+      // 创建 Matrix 图片文件
       final matrixFile = matrix.MatrixImageFile(
         bytes: imageBytes,
         name: filename,
         mimeType: actualMimeType,
       );
+      debugPrint('MatrixImageFile created: name=${matrixFile.name}, mimeType=${matrixFile.mimeType}');
 
+      // 发送文件事件
+      debugPrint('Calling room.sendFileEvent...');
       final result = await room.sendFileEvent(matrixFile);
-      debugPrint('Image sent: $result');
+      debugPrint('sendFileEvent result: $result');
+      
+      if (result == null || result.isEmpty) {
+        debugPrint('WARNING: sendFileEvent returned null or empty result');
+      }
+      
+      debugPrint('=== sendImageMessage completed successfully ===');
       return result;
     } catch (e, stackTrace) {
-      debugPrint('Send image error: $e');
+      debugPrint('=== sendImageMessage ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Error type: ${e.runtimeType}');
       debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
