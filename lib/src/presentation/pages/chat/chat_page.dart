@@ -2284,7 +2284,7 @@ class _ChatPageState extends State<ChatPage> {
       },
       onSend: _inputController.text.isNotEmpty
           ? () {
-              _sendMessage();
+              _sendMessage(_inputController.text);
               setState(() {
                 _showEmojiPicker = false;
               });
@@ -2902,7 +2902,7 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
       case MessageType.video:
         return '[视频]';
       case MessageType.file:
-        return '[文件] ${message.metadata?['fileName'] ?? ''}';
+        return '[文件] ${message.metadata?.fileName ?? ''}';
       case MessageType.location:
         return '[位置] ${message.content}';
       default:
