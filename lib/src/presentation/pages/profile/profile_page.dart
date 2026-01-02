@@ -29,7 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadUserInfo();
   }
 
-  void _loadUserInfo() {
+  Future<void> _loadUserInfo() async {
     try {
       final clientManager = getIt<MatrixClientManager>();
       final client = clientManager.client;
@@ -38,9 +38,17 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           _userId = client.userID;
           _displayName = client.userID?.split(':').first.replaceFirst('@', '') ?? 'User';
-          final profile = client.ownProfile;
-          _avatarUrl = profile.avatarUrl?.toString();
         });
+        
+        // 异步获取头像
+        try {
+          final profile = await client.ownProfile;
+          if (mounted) {
+            setState(() {
+              _avatarUrl = profile.avatarUrl?.toString();
+            });
+          }
+        } catch (_) {}
       }
     } catch (e) {
       debugPrint('Failed to load user info: $e');
