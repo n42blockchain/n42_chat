@@ -10,6 +10,7 @@ import '../../data/datasources/matrix/matrix_message_datasource.dart';
 import '../../data/datasources/matrix/matrix_room_datasource.dart';
 import '../../data/datasources/matrix/matrix_reaction_datasource.dart';
 import '../../data/datasources/matrix/matrix_search_datasource.dart';
+import '../services/voice_service.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/contact_repository_impl.dart';
 import '../../data/repositories/conversation_repository_impl.dart';
@@ -89,6 +90,11 @@ Future<void> _registerServices() async {
   getIt.registerLazySingleton<MatrixClientManager>(
     () => clientManager,
   );
+
+  // 语音服务
+  final voiceService = VoiceService();
+  await voiceService.initialize();
+  getIt.registerLazySingleton<VoiceService>(() => voiceService);
 }
 
 /// 注册数据源

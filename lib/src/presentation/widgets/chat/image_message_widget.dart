@@ -10,7 +10,8 @@ import '../../../core/theme/app_colors.dart';
 /// - 加载进度
 /// - 点击查看大图
 /// - 支持长图预览
-class ImageMessageWidget extends StatelessWidget {
+/// - 错误重试
+class ImageMessageWidget extends StatefulWidget {
   /// 图片URL
   final String imageUrl;
 
@@ -52,21 +53,56 @@ class ImageMessageWidget extends StatelessWidget {
   });
 
   @override
+  State<ImageMessageWidget> createState() => _ImageMessageWidgetState();
+}
+
+class _ImageMessageWidgetState extends State<ImageMessageWidget> {
+  int _retryCount = 0;
+  static const int _maxRetries = 3;
+
+  String get _effectiveUrl {
+    // 添加时间戳以强制刷新（仅在重试时）
+    final url = widget.thumbnailUrl ?? widget.imageUrl;
+    if (_retryCount > 0 && url.isNotEmpty) {
+      final separator = url.contains('?') ? '&' : '?';
+      return '$url${separator}_retry=$_retryCount';
+    }
+    return url;
+  }
+
+  void _retry() {
+    if (_retryCount < _maxRetries) {
+      setState(() {
+        _retryCount++;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = _calculateSize();
+    final url = _effectiveUrl;
+
+    // 如果 URL 为空，显示占位符
+    if (url.isEmpty) {
+      return _buildError(size);
+    }
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: BorderRadius.circular(widget.borderRadius),
         child: SizedBox(
           width: size.width,
           height: size.height,
           child: CachedNetworkImage(
-            imageUrl: thumbnailUrl ?? imageUrl,
+            key: ValueKey('$url-$_retryCount'),
+            imageUrl: url,
             fit: BoxFit.cover,
+            fadeInDuration: const Duration(milliseconds: 200),
+            fadeOutDuration: const Duration(milliseconds: 200),
             placeholder: (context, url) => _buildPlaceholder(size),
-            errorWidget: (context, url, error) => _buildError(size),
+            errorWidget: (context, url, error) => _buildError(size, canRetry: _retryCount < _maxRetries),
           ),
         ),
       ),
@@ -74,33 +110,33 @@ class ImageMessageWidget extends StatelessWidget {
   }
 
   Size _calculateSize() {
-    if (width == null || height == null || width == 0 || height == 0) {
+    if (widget.width == null || widget.height == null || widget.width == 0 || widget.height == 0) {
       // 未知尺寸，使用默认正方形
-      return Size(minSize, minSize);
+      return Size(widget.minSize, widget.minSize);
     }
 
-    final aspectRatio = width! / height!;
+    final aspectRatio = widget.width! / widget.height!;
     double w, h;
 
     if (aspectRatio > 1) {
       // 横图
-      w = maxWidth;
+      w = widget.maxWidth;
       h = w / aspectRatio;
-      if (h < minSize) {
-        h = minSize;
+      if (h < widget.minSize) {
+        h = widget.minSize;
         w = h * aspectRatio;
       }
     } else {
       // 竖图或方图
-      h = maxHeight;
+      h = widget.maxHeight;
       w = h * aspectRatio;
-      if (w < minSize) {
-        w = minSize;
+      if (w < widget.minSize) {
+        w = widget.minSize;
         h = w / aspectRatio;
       }
     }
 
-    return Size(w.clamp(minSize, maxWidth), h.clamp(minSize, maxHeight));
+    return Size(w.clamp(widget.minSize, widget.maxWidth), h.clamp(widget.minSize, widget.maxHeight));
   }
 
   Widget _buildPlaceholder(Size size) {
@@ -121,16 +157,34 @@ class ImageMessageWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildError(Size size) {
-    return Container(
-      width: size.width,
-      height: size.height,
-      color: AppColors.placeholder,
-      child: const Center(
-        child: Icon(
-          Icons.broken_image,
-          color: AppColors.textTertiary,
-          size: 32,
+  Widget _buildError(Size size, {bool canRetry = false}) {
+    return GestureDetector(
+      onTap: canRetry ? _retry : null,
+      child: Container(
+        width: size.width,
+        height: size.height,
+        color: AppColors.placeholder,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.broken_image,
+                color: AppColors.textTertiary,
+                size: 32,
+              ),
+              if (canRetry) ...[
+                const SizedBox(height: 8),
+                const Text(
+                  '点击重试',
+                  style: TextStyle(
+                    color: AppColors.textTertiary,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
