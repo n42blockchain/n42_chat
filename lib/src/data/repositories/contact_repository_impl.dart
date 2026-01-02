@@ -79,7 +79,7 @@ class ContactRepositoryImpl implements IContactRepository {
       return ContactEntity(
         userId: profile.userId,
         displayName: profile.displayName ?? profile.userId,
-        avatarUrl: avatarUrl?.toString(),
+        avatarUrl: avatarUrl,
         // 默认离线，实际在线状态可以在UI层异步更新
         presence: PresenceStatus.offline,
       );
@@ -135,12 +135,18 @@ class ContactRepositoryImpl implements IContactRepository {
       final user = inviter != null
           ? room.unsafeGetUserFromMemoryOrFallback(inviter)
           : null;
+      
+      // 手动构建头像 URL
+      String? avatarUrl;
+      if (user?.avatarUrl != null) {
+        avatarUrl = _contactDataSource.getUserAvatarUrl(user!);
+      }
 
       return FriendRequest(
         id: room.id,
         userId: inviter ?? '',
         userName: user?.calcDisplayname() ?? inviter ?? '未知用户',
-        userAvatarUrl: user?.avatarUrl?.toString(),
+        userAvatarUrl: avatarUrl,
         requestTime: null, // StrippedStateEvent doesn't have originServerTs
       );
     }).toList();
@@ -203,7 +209,7 @@ class ContactRepositoryImpl implements IContactRepository {
     return ContactEntity(
       userId: user.id,
       displayName: _contactDataSource.getUserDisplayName(user),
-      avatarUrl: avatarUrl?.toString(),
+      avatarUrl: avatarUrl,
       // 在线状态需要异步获取，这里默认离线
       presence: PresenceStatus.offline,
       remark: remark,
@@ -217,7 +223,7 @@ class ContactRepositoryImpl implements IContactRepository {
     return ContactEntity(
       userId: userId,
       displayName: profile.displayName ?? userId,
-      avatarUrl: avatarUrl?.toString(),
+      avatarUrl: avatarUrl,
       // 在线状态需要异步获取，这里默认离线
       presence: PresenceStatus.offline,
       remark: remark,

@@ -943,20 +943,13 @@ class MatrixMessageDataSource {
     // 解析消息内容，处理回复格式
     final parsedContent = _parseMessageContent(event, room);
     
-    // 转换头像 mxc:// URL 为 HTTP URL
-    String? avatarHttpUrl;
-    if (sender.avatarUrl != null && _client != null) {
-      try {
-        avatarHttpUrl = sender.avatarUrl!.getThumbnail(
-          _client!,
-          width: 80,
-          height: 80,
-          method: matrix.ThumbnailMethod.crop,
-        ).toString();
-      } catch (e) {
-        avatarHttpUrl = sender.avatarUrl.toString();
-      }
-    }
+    // 转换头像 mxc:// URL 为 HTTP URL（使用手动构建方式）
+    final avatarHttpUrl = _buildHttpUrl(
+      sender.avatarUrl?.toString(),
+      width: 80,
+      height: 80,
+      method: 'crop',
+    );
     
     return MessageEntity(
       id: event.eventId,
@@ -1103,24 +1096,58 @@ class MatrixMessageDataSource {
     return [];
   }
 
-  /// 转换 mxc:// URL 为 HTTP URL
-  String? _convertMxcToHttp(String? mxcUrl, {int? width, int? height}) {
-    if (mxcUrl == null || _client == null) return null;
-    try {
-      final uri = Uri.parse(mxcUrl);
-      if (width != null && height != null) {
-        return uri.getThumbnail(
-          _client!,
-          width: width,
-          height: height,
-          method: matrix.ThumbnailMethod.scale,
-        ).toString();
-      }
-      return uri.getDownloadLink(_client!).toString();
-    } catch (e) {
-      debugPrint('Error converting mxc URL: $e');
-      return mxcUrl; // 返回原始 URL 作为后备
+  /// 手动构建 HTTP URL（参考 FluffyChat 实现）
+  /// 
+  /// 格式: https://homeserver/_matrix/media/v3/download/server/mediaId
+  /// 或缩略图: https://homeserver/_matrix/media/v3/thumbnail/server/mediaId?width=x&height=y&method=crop
+  String? _buildHttpUrl(String? mxcUrl, {int? width, int? height, String method = 'scale'}) {
+    if (mxcUrl == null || mxcUrl.isEmpty || _client == null) return null;
+    
+    // 如果已经是 HTTP URL，直接返回
+    if (mxcUrl.startsWith('http://') || mxcUrl.startsWith('https://')) {
+      return mxcUrl;
     }
+    
+    // 验证是否是有效的 mxc:// URL
+    if (!mxcUrl.startsWith('mxc://')) {
+      debugPrint('Invalid mxc URL: $mxcUrl');
+      return null;
+    }
+    
+    try {
+      // 解析 mxc://server/mediaId
+      final uri = Uri.parse(mxcUrl);
+      final serverName = uri.host;
+      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+      
+      if (serverName.isEmpty || mediaId.isEmpty) {
+        debugPrint('Invalid mxc URL format: $mxcUrl');
+        return null;
+      }
+      
+      final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      if (homeserver.isEmpty) {
+        debugPrint('No homeserver configured');
+        return null;
+      }
+      
+      // 构建 HTTP URL
+      if (width != null && height != null) {
+        // 缩略图 URL
+        return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$method';
+      } else {
+        // 完整下载 URL
+        return '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
+      }
+    } catch (e) {
+      debugPrint('Error building HTTP URL: $e');
+      return null;
+    }
+  }
+  
+  /// 转换 mxc:// URL 为 HTTP URL（兼容旧接口）
+  String? _convertMxcToHttp(String? mxcUrl, {int? width, int? height}) {
+    return _buildHttpUrl(mxcUrl, width: width, height: height, method: 'scale');
   }
 
   /// 提取消息元数据（带 HTTP URL 转换）

@@ -349,14 +349,43 @@ class AuthRepositoryImpl implements IAuthRepository {
       final profile =
           await _authDataSource.clientManager.getUserProfile(userId);
 
+      // 手动构建头像 HTTP URL
+      String? avatarHttpUrl;
+      if (profile.avatarUrl != null) {
+        avatarHttpUrl = _buildAvatarHttpUrl(profile.avatarUrl.toString(), client);
+      }
+
       return UserEntity(
         userId: userId,
         displayName: profile.displayName ?? userId.localpart ?? '',
-        avatarUrl: profile.avatarUrl?.toString(),
+        avatarUrl: avatarHttpUrl,
       );
     } catch (e) {
       debugPrint('AuthRepository: Get profile failed - $e');
       return currentUser;
+    }
+  }
+  
+  /// 构建头像 HTTP URL
+  String? _buildAvatarHttpUrl(String? mxcUrl, Client client) {
+    if (mxcUrl == null || mxcUrl.isEmpty) return null;
+    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
+    
+    try {
+      final uri = Uri.parse(mxcUrl);
+      final serverName = uri.host;
+      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+      
+      if (serverName.isEmpty || mediaId.isEmpty) return null;
+      
+      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      if (homeserver.isEmpty) return null;
+      
+      // 返回缩略图 URL
+      return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
+    } catch (e) {
+      debugPrint('AuthRepository: Error building avatar URL: $e');
+      return null;
     }
   }
 

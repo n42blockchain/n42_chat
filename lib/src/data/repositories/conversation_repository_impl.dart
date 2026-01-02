@@ -146,7 +146,7 @@ class ConversationRepositoryImpl implements IConversationRepository {
     return ConversationEntity(
       id: room.id,
       name: _roomDataSource.getRoomDisplayName(room),
-      avatarUrl: avatarUrl?.toString(),
+      avatarUrl: avatarUrl,
       type: room.isDirectChat
           ? ConversationType.direct
           : ConversationType.group,

@@ -89,30 +89,37 @@ class MatrixContactDataSource {
     return user.calcDisplayname();
   }
 
-  /// 获取用户头像URL
-  Uri? getUserAvatarUrl(matrix.User user, {int size = 96}) {
-    final avatarMxc = user.avatarUrl;
-    if (avatarMxc == null || _client == null) return null;
-
-    return avatarMxc.getThumbnail(
-      _client!,
-      width: size,
-      height: size,
-      method: matrix.ThumbnailMethod.crop,
-    );
+  /// 获取用户头像URL（手动构建 HTTP URL）
+  String? getUserAvatarUrl(matrix.User user, {int size = 96}) {
+    final avatarMxc = user.avatarUrl?.toString();
+    return _buildAvatarHttpUrl(avatarMxc, size);
   }
 
-  /// 获取Profile头像URL
-  Uri? getProfileAvatarUrl(matrix.Profile profile, {int size = 96}) {
-    final avatarMxc = profile.avatarUrl;
-    if (avatarMxc == null || _client == null) return null;
-
-    return avatarMxc.getThumbnail(
-      _client!,
-      width: size,
-      height: size,
-      method: matrix.ThumbnailMethod.crop,
-    );
+  /// 获取Profile头像URL（手动构建 HTTP URL）
+  String? getProfileAvatarUrl(matrix.Profile profile, {int size = 96}) {
+    final avatarMxc = profile.avatarUrl?.toString();
+    return _buildAvatarHttpUrl(avatarMxc, size);
+  }
+  
+  /// 构建头像 HTTP URL
+  String? _buildAvatarHttpUrl(String? mxcUrl, int size) {
+    if (mxcUrl == null || mxcUrl.isEmpty || _client == null) return null;
+    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
+    
+    try {
+      final uri = Uri.parse(mxcUrl);
+      final serverName = uri.host;
+      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+      
+      if (serverName.isEmpty || mediaId.isEmpty) return null;
+      
+      final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      if (homeserver.isEmpty) return null;
+      
+      return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=$size&height=$size&method=crop';
+    } catch (e) {
+      return null;
+    }
   }
 
   // ============================================

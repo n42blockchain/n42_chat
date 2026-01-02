@@ -234,22 +234,38 @@ class SearchRepositoryImpl implements ISearchRepository {
   // ============================================
 
   ContactEntity _mapUserToContact(matrix.User user) {
-    Uri? avatarUrl;
+    String? avatarUrl;
     final client = _clientManager.client;
     if (user.avatarUrl != null && client != null) {
-      avatarUrl = user.avatarUrl!.getThumbnail(
-        client,
-        width: 96,
-        height: 96,
-        method: matrix.ThumbnailMethod.crop,
-      );
+      avatarUrl = _buildAvatarHttpUrl(user.avatarUrl.toString(), client);
     }
 
     return ContactEntity(
       userId: user.id,
       displayName: user.calcDisplayname(),
-      avatarUrl: avatarUrl?.toString(),
+      avatarUrl: avatarUrl,
     );
+  }
+  
+  /// 构建头像 HTTP URL
+  String? _buildAvatarHttpUrl(String? mxcUrl, matrix.Client client) {
+    if (mxcUrl == null || mxcUrl.isEmpty) return null;
+    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
+    
+    try {
+      final uri = Uri.parse(mxcUrl);
+      final serverName = uri.host;
+      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+      
+      if (serverName.isEmpty || mediaId.isEmpty) return null;
+      
+      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      if (homeserver.isEmpty) return null;
+      
+      return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
+    } catch (e) {
+      return null;
+    }
   }
 
   ConversationEntity _mapRoomToConversation(matrix.Room room) {
@@ -303,17 +319,10 @@ class SearchRepositoryImpl implements ISearchRepository {
   String? _getRoomAvatarUrl(matrix.Room? room) {
     if (room == null) return null;
     final client = _clientManager.client;
-    final avatarMxc = room.avatar;
+    final avatarMxc = room.avatar?.toString();
     if (avatarMxc == null || client == null) return null;
 
-    return avatarMxc
-        .getThumbnail(
-          client,
-          width: 96,
-          height: 96,
-          method: matrix.ThumbnailMethod.crop,
-        )
-        .toString();
+    return _buildAvatarHttpUrl(avatarMxc, client);
   }
 }
 

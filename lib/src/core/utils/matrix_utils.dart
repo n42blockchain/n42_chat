@@ -4,17 +4,15 @@ import 'package:matrix/matrix.dart' as matrix;
 /// Matrix 工具类
 ///
 /// 提供 Matrix 相关的通用工具方法
+/// 参考 FluffyChat 的实现
 class MatrixUtils {
   MatrixUtils._();
 
   /// 将 mxc:// URL 转换为 HTTP URL
   ///
-  /// [mxcUrl] Matrix 内容 URL (mxc://server/media_id)
-  /// [client] Matrix 客户端实例
-  /// [width] 缩略图宽度（可选）
-  /// [height] 缩略图高度（可选）
-  /// [method] 缩略图方法（默认 scale）
-  /// [animated] 是否保留动画（GIF等）
+  /// 参考 FluffyChat 的实现方式，直接构建 URL
+  /// 格式: https://homeserver/_matrix/media/v3/download/server/mediaId
+  /// 或缩略图: https://homeserver/_matrix/media/v3/thumbnail/server/mediaId?width=x&height=y&method=crop
   static String? mxcToHttp(
     String? mxcUrl, {
     required matrix.Client? client,
@@ -39,23 +37,32 @@ class MatrixUtils {
     }
 
     try {
+      // 解析 mxc://server/mediaId
       final uri = Uri.parse(mxcUrl);
-
-      // 如果需要缩略图
-      if (width != null && height != null) {
-        return uri
-            .getThumbnail(
-              client,
-              width: width,
-              height: height,
-              method: method,
-              animated: animated,
-            )
-            .toString();
+      final serverName = uri.host;
+      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+      
+      if (serverName.isEmpty || mediaId.isEmpty) {
+        debugPrint('MatrixUtils: Invalid mxc URL format: $mxcUrl');
+        return null;
       }
 
-      // 返回完整下载链接
-      return uri.getDownloadLink(client).toString();
+      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      if (homeserver.isEmpty) {
+        debugPrint('MatrixUtils: No homeserver configured');
+        return null;
+      }
+
+      // 构建 HTTP URL
+      if (width != null && height != null) {
+        // 缩略图 URL
+        final methodStr = method == matrix.ThumbnailMethod.crop ? 'crop' : 'scale';
+        final animatedStr = animated ? '&animated=true' : '';
+        return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$methodStr$animatedStr';
+      } else {
+        // 完整下载 URL
+        return '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
+      }
     } catch (e) {
       debugPrint('MatrixUtils: Error converting mxc URL: $e');
       return null;
@@ -66,7 +73,7 @@ class MatrixUtils {
   ///
   /// 专门用于头像的 URL 转换，默认使用裁剪方式
   static String? getAvatarUrl(
-    Uri? avatarMxc, {
+    dynamic avatarMxc, {
     required matrix.Client? client,
     int size = 80,
   }) {
@@ -74,19 +81,36 @@ class MatrixUtils {
       return null;
     }
 
-    try {
-      return avatarMxc
-          .getThumbnail(
-            client,
-            width: size,
-            height: size,
-            method: matrix.ThumbnailMethod.crop,
-          )
-          .toString();
-    } catch (e) {
-      debugPrint('MatrixUtils: Error getting avatar URL: $e');
+    String? mxcUrl;
+    if (avatarMxc is Uri) {
+      mxcUrl = avatarMxc.toString();
+    } else if (avatarMxc is String) {
+      mxcUrl = avatarMxc;
+    }
+
+    if (mxcUrl == null || mxcUrl.isEmpty) {
       return null;
     }
+
+    return mxcToHttp(
+      mxcUrl,
+      client: client,
+      width: size,
+      height: size,
+      method: matrix.ThumbnailMethod.crop,
+    );
+  }
+
+  /// 从 Matrix User 获取头像 URL
+  static String? getUserAvatarUrl(
+    matrix.User? user, {
+    required matrix.Client? client,
+    int size = 80,
+  }) {
+    if (user == null || user.avatarUrl == null || client == null) {
+      return null;
+    }
+    return getAvatarUrl(user.avatarUrl, client: client, size: size);
   }
 
   /// 获取媒体预览 URL（用于图片/视频缩略图）
@@ -285,4 +309,3 @@ class MatrixUtils {
     return 'temp_$timestamp.$extension';
   }
 }
-
