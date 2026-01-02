@@ -3,12 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/entities/conversation_entity.dart';
+import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
 import '../../blocs/conversation/conversation_event.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/transfer/transfer_bloc.dart';
+import '../chat/chat_page.dart';
 import '../contact/add_friend_page.dart';
 import '../contact/contact_list_page.dart';
 import '../conversation/conversation_list_page.dart';
@@ -306,6 +309,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
             // 聊天页面 - 不需要自带 AppBar
             _ChatTabContent(
               conversationBloc: _conversationBloc,
+              contactBloc: _contactBloc,
             ),
             // 通讯录页面 - 不需要自带 AppBar
             const _ContactTabContent(),
@@ -456,18 +460,39 @@ class _ChatMainPageState extends State<ChatMainPage> {
 /// 聊天 Tab 内容
 class _ChatTabContent extends StatelessWidget {
   final ConversationBloc conversationBloc;
+  final ContactBloc contactBloc;
   
-  const _ChatTabContent({required this.conversationBloc});
+  const _ChatTabContent({
+    required this.conversationBloc,
+    required this.contactBloc,
+  });
+
+  void _navigateToChat(BuildContext context, ConversationEntity conversation) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (_) => getIt<ChatBloc>()),
+            BlocProvider.value(value: contactBloc),
+          ],
+          child: ChatPage(
+            conversation: conversation,
+            onBack: () => Navigator.of(context).pop(),
+          ),
+        ),
+      ),
+    ).then((_) {
+      // 返回后刷新会话列表
+      conversationBloc.add(const RefreshConversations());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: conversationBloc,
       child: ConversationListPage(
-        onConversationTap: (conversation) {
-          debugPrint('Open conversation: ${conversation.id}');
-          // TODO: 导航到聊天详情页
-        },
+        onConversationTap: (conversation) => _navigateToChat(context, conversation),
         onSearchTap: () {
           debugPrint('Open search');
         },

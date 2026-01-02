@@ -18,12 +18,14 @@ abstract class IAuthRepository {
   /// [homeserver] Matrix服务器地址
   /// [username] 用户名
   /// [password] 密码
+  /// [rememberMe] 是否记住登录状态（保存凭据用于自动登录）
   ///
   /// 返回登录结果
   Future<AuthResult> login({
     required String homeserver,
     required String username,
     required String password,
+    bool rememberMe = true,
   });
 
   /// 使用Token恢复登录

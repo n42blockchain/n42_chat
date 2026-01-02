@@ -40,6 +40,7 @@ class _LoginPageState extends State<LoginPage> {
             homeserver: _homeserverController.text.trim(),
             username: _usernameController.text.trim(),
             password: _passwordController.text,
+            rememberMe: _rememberMe,
           ));
     }
   }

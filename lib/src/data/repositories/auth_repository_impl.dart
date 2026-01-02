@@ -49,6 +49,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String homeserver,
     required String username,
     required String password,
+    bool rememberMe = true,
   }) async {
     try {
       // 登录
@@ -76,6 +77,19 @@ class AuthRepositoryImpl implements IAuthRepository {
         userId: userId,
         deviceId: deviceId,
       );
+
+      // 如果勾选了"记住我"，保存登录凭据用于自动登录
+      if (rememberMe) {
+        await _secureStorage.saveCredentials(
+          homeserver: homeserver,
+          username: username,
+          password: password,
+        );
+        debugPrint('AuthRepository: Credentials saved for auto-login');
+      } else {
+        // 清除之前保存的凭据
+        await _secureStorage.clearCredentials();
+      }
 
       // 启动同步
       await _authDataSource.clientManager.startSync();
@@ -149,39 +163,67 @@ class AuthRepositoryImpl implements IAuthRepository {
   @override
   Future<AuthResult> restoreSession() async {
     try {
-      // 读取保存的会话
+      // 首先尝试使用保存的 token 恢复会话
       final session = await _secureStorage.getSession();
-      if (session == null) {
-        debugPrint('AuthRepository: No saved session found');
-        return AuthResult.notLoggedIn();
+      if (session != null) {
+        final homeserver = session['homeserver'];
+        final accessToken = session['accessToken'];
+        final userId = session['userId'];
+        final deviceId = session['deviceId'];
+
+        if (homeserver != null &&
+            accessToken != null &&
+            userId != null &&
+            deviceId != null) {
+          debugPrint('AuthRepository: Trying to restore with token...');
+          final result = await loginWithToken(
+            homeserver: homeserver,
+            accessToken: accessToken,
+            userId: userId,
+            deviceId: deviceId,
+          );
+
+          if (result.success) {
+            debugPrint('AuthRepository: Session restored with token');
+            return result;
+          }
+          
+          debugPrint('AuthRepository: Token restore failed, trying credentials...');
+        }
       }
 
-      final homeserver = session['homeserver'];
-      final accessToken = session['accessToken'];
-      final userId = session['userId'];
-      final deviceId = session['deviceId'];
+      // Token 恢复失败，尝试使用保存的凭据重新登录
+      final credentials = await _secureStorage.getCredentials();
+      if (credentials != null) {
+        final homeserver = credentials['homeserver'];
+        final username = credentials['username'];
+        final password = credentials['password'];
 
-      if (homeserver == null ||
-          accessToken == null ||
-          userId == null ||
-          deviceId == null) {
-        await _secureStorage.clearSession();
-        return AuthResult.notLoggedIn();
+        if (homeserver != null && username != null && password != null) {
+          debugPrint('AuthRepository: Trying auto-login with credentials...');
+          final result = await login(
+            homeserver: homeserver,
+            username: username,
+            password: password,
+            rememberMe: true, // 保持记住状态
+          );
+
+          if (result.success) {
+            debugPrint('AuthRepository: Auto-login successful');
+            return result;
+          }
+          
+          debugPrint('AuthRepository: Auto-login failed: ${result.errorMessage}');
+        }
       }
 
-      // 尝试恢复
-      return await loginWithToken(
-        homeserver: homeserver,
-        accessToken: accessToken,
-        userId: userId,
-        deviceId: deviceId,
-      );
+      // 既没有有效的 token，也没有有效的凭据
+      debugPrint('AuthRepository: No valid session or credentials found');
+      return AuthResult.notLoggedIn();
     } catch (e) {
       debugPrint('AuthRepository: Restore session failed - $e');
-      // 清除无效会话
-      await _secureStorage.clearSession();
       return AuthResult.failure(
-        '会话已过期，请重新登录',
+        '会话恢复失败',
         type: AuthErrorType.tokenExpired,
       );
     }
