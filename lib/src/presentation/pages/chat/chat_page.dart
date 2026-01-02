@@ -58,6 +58,7 @@ class _ChatPageState extends State<ChatPage> {
   bool _showScrollToBottom = false;
   bool _showSearchBar = false;
   bool _showMorePanel = false;
+  bool _showEmojiPicker = false;
   String? _highlightedMessageId;
   
   // 录音状态
@@ -94,9 +95,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _onInputFocusChanged() {
-    if (_inputFocusNode.hasFocus && _showMorePanel) {
+    if (_inputFocusNode.hasFocus) {
       setState(() {
         _showMorePanel = false;
+        _showEmojiPicker = false;
       });
     }
   }
@@ -211,6 +213,9 @@ class _ChatPageState extends State<ChatPage> {
               else if (!_showSearchBar)
                 _buildInputBar(),
 
+              // 表情选择器
+              if (_showEmojiPicker && !_isMultiSelectMode) _buildEmojiPicker(),
+              
               // 更多功能面板（仅在非多选模式下）
               if (_showMorePanel && !_isMultiSelectMode) _buildMorePanel(),
             ],
@@ -382,6 +387,7 @@ class _ChatPageState extends State<ChatPage> {
   void _hideMorePanel() {
     setState(() {
       _showMorePanel = false;
+      _showEmojiPicker = false;
     });
   }
 
@@ -2194,7 +2200,13 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _onEmojiPressed() {
-    // TODO: 实现表情选择器
+    // 隐藏键盘
+    _inputFocusNode.unfocus();
+    // 切换表情选择器
+    setState(() {
+      _showEmojiPicker = !_showEmojiPicker;
+      _showMorePanel = false;
+    });
   }
 
   void _onMorePressed() {
@@ -2203,7 +2215,82 @@ class _ChatPageState extends State<ChatPage> {
     // 切换更多功能面板
     setState(() {
       _showMorePanel = !_showMorePanel;
+      _showEmojiPicker = false;
     });
+  }
+  
+  Widget _buildEmojiPicker() {
+    return EmojiPicker(
+      height: 260,
+      onEmojiSelected: (emoji) {
+        // 在当前光标位置插入表情
+        final text = _inputController.text;
+        final selection = _inputController.selection;
+        
+        String newText;
+        int newCursorPos;
+        
+        if (selection.isValid && selection.isCollapsed) {
+          // 有光标位置
+          final cursorPos = selection.baseOffset;
+          newText = text.substring(0, cursorPos) + emoji + text.substring(cursorPos);
+          newCursorPos = cursorPos + emoji.length;
+        } else if (selection.isValid && !selection.isCollapsed) {
+          // 有选中文本，替换选中的文本
+          newText = text.substring(0, selection.start) + emoji + text.substring(selection.end);
+          newCursorPos = selection.start + emoji.length;
+        } else {
+          // 没有光标，添加到末尾
+          newText = text + emoji;
+          newCursorPos = newText.length;
+        }
+        
+        _inputController.text = newText;
+        _inputController.selection = TextSelection.fromPosition(
+          TextPosition(offset: newCursorPos),
+        );
+      },
+      onBackspace: () {
+        // 删除光标前的字符（包括表情）
+        final text = _inputController.text;
+        final selection = _inputController.selection;
+        
+        if (text.isEmpty) return;
+        
+        if (selection.isValid && selection.isCollapsed) {
+          final cursorPos = selection.baseOffset;
+          if (cursorPos > 0) {
+            // 处理 emoji（可能是多个代码单元）
+            final beforeCursor = text.substring(0, cursorPos);
+            final runes = beforeCursor.runes.toList();
+            if (runes.isNotEmpty) {
+              runes.removeLast();
+              final newBeforeCursor = String.fromCharCodes(runes);
+              final newText = newBeforeCursor + text.substring(cursorPos);
+              _inputController.text = newText;
+              _inputController.selection = TextSelection.fromPosition(
+                TextPosition(offset: newBeforeCursor.length),
+              );
+            }
+          }
+        } else if (selection.isValid && !selection.isCollapsed) {
+          // 有选中文本，删除选中的文本
+          final newText = text.substring(0, selection.start) + text.substring(selection.end);
+          _inputController.text = newText;
+          _inputController.selection = TextSelection.fromPosition(
+            TextPosition(offset: selection.start),
+          );
+        }
+      },
+      onSend: _inputController.text.isNotEmpty
+          ? () {
+              _sendMessage();
+              setState(() {
+                _showEmojiPicker = false;
+              });
+            }
+          : null,
+    );
   }
 }
 
