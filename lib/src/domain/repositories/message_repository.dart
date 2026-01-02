@@ -101,6 +101,18 @@ abstract class IMessageRepository {
 
   /// 发送正在输入状态
   Future<void> sendTypingNotification(String roomId, bool isTyping);
+  
+  /// 发送系统通知/拍一拍消息
+  Future<MessageEntity?> sendNoticeMessage({
+    required String roomId,
+    required String notice,
+  });
+  
+  /// 获取房间成员的拍一拍后缀
+  Future<String?> getMemberPokeText({
+    required String roomId,
+    required String userId,
+  });
 
   /// 获取媒体下载URL
   String? getMediaUrl(String? mxcUrl, {int? width, int? height});

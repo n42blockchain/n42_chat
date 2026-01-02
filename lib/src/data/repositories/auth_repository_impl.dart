@@ -454,6 +454,8 @@ class AuthRepositoryImpl implements IAuthRepository {
 
     try {
       await _authDataSource.clientManager.setDisplayName(displayName);
+      // 更新缓存
+      _cachedDisplayName = displayName;
       debugPrint('AuthRepository: Display name updated to: $displayName');
       return true;
     } catch (e) {
@@ -497,11 +499,45 @@ class AuthRepositoryImpl implements IAuthRepository {
       // 更新缓存
       _cachedProfileData = newData;
       
+      // 如果更新了 pokeText，同步到所有已加入的房间
+      if (pokeText != null) {
+        await _syncPokeTextToRooms(pokeText);
+      }
+      
       debugPrint('AuthRepository: Profile data updated: $newData');
       return true;
     } catch (e) {
       debugPrint('AuthRepository: Update profile data failed - $e');
       return false;
+    }
+  }
+  
+  /// 将 pokeText 同步到所有已加入的房间
+  Future<void> _syncPokeTextToRooms(String pokeText) async {
+    final client = _authDataSource.clientManager.client;
+    if (client == null) return;
+    
+    try {
+      // 获取所有已加入的房间
+      final rooms = client.rooms.where((room) => room.membership == Membership.join);
+      
+      for (final room in rooms) {
+        try {
+          // 设置房间状态事件，以便其他成员可以读取
+          await client.setRoomStateWithKey(
+            room.id,
+            'n42.member.profile',
+            client.userID!,
+            {'pokeText': pokeText},
+          );
+          debugPrint('AuthRepository: Synced pokeText to room ${room.id}');
+        } catch (e) {
+          // 某些房间可能没有权限设置状态，忽略错误
+          debugPrint('AuthRepository: Failed to sync pokeText to room ${room.id}: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('AuthRepository: Failed to sync pokeText to rooms: $e');
     }
   }
 
