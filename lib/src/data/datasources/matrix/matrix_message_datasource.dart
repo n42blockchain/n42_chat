@@ -302,6 +302,9 @@ class MatrixMessageDataSource {
   }
 
   /// 发送图片消息
+  /// 
+  /// 使用 Matrix SDK 内置的 sendFileEvent 方法发送图片
+  /// 参考 FluffyChat 的实现
   Future<String?> sendImageMessage(
     String roomId, {
     required Uint8List imageBytes,
@@ -327,17 +330,10 @@ class MatrixMessageDataSource {
         throw Exception('未登录');
       }
       
-      // 打印认证信息用于调试
-      debugPrint('User ID: ${_client!.userID}');
-      debugPrint('Homeserver: ${_client!.homeserver}');
-      debugPrint('Access token present: ${_client!.accessToken != null}');
-      debugPrint('Access token length: ${_client!.accessToken?.length ?? 0}');
-      
       // 获取房间
       final room = _client!.getRoomById(roomId);
       if (room == null) {
         debugPrint('ERROR: Room not found: $roomId');
-        debugPrint('Available rooms: ${_client!.rooms.map((r) => r.id).toList()}');
         throw Exception('房间不存在: $roomId');
       }
       debugPrint('Room found: ${room.getLocalizedDisplayname()}');
@@ -352,13 +348,45 @@ class MatrixMessageDataSource {
       } else if (lowerFilename.endsWith('.webp')) {
         actualMimeType = 'image/webp';
       } else if (lowerFilename.endsWith('.heic') || lowerFilename.endsWith('.heif')) {
-        // HEIC/HEIF 需要服务器支持，某些服务器可能不支持，尝试作为 jpeg
+        actualMimeType = 'image/jpeg';
+      } else if (!lowerFilename.contains('.')) {
+        // 没有扩展名，默认为 jpeg
         actualMimeType = 'image/jpeg';
       }
 
       debugPrint('Final mimeType: $actualMimeType');
 
-      // 使用自定义认证上传方法
+      // 方法1: 使用 SDK 内置的 sendFileEvent (推荐, FluffyChat 使用的方式)
+      debugPrint('Trying SDK sendFileEvent...');
+      try {
+        // 创建 MatrixImageFile 对象
+        final matrixFile = matrix.MatrixImageFile(
+          bytes: imageBytes,
+          name: filename,
+          mimeType: actualMimeType,
+        );
+        
+        // 使用 SDK 的 sendFileEvent 方法
+        final result = await room.sendFileEvent(
+          matrixFile,
+          inReplyTo: null,
+          editEventId: null,
+          shrinkImageMaxDimension: null, // 不压缩，保持原图
+          extraContent: null,
+        );
+        
+        debugPrint('sendFileEvent result: $result');
+        debugPrint('=== sendImageMessage completed successfully (SDK method) ===');
+        return result;
+      } catch (sdkError, sdkStack) {
+        debugPrint('SDK sendFileEvent failed: $sdkError');
+        debugPrint('Stack: $sdkStack');
+        
+        // 方法2: 如果 SDK 方法失败，尝试手动上传
+        debugPrint('Falling back to manual upload...');
+      }
+      
+      // 方法2: 手动上传然后发送事件
       debugPrint('Uploading image with authenticated endpoint...');
       final mxcUri = await _uploadContentAuthenticated(
         imageBytes,
@@ -387,11 +415,7 @@ class MatrixMessageDataSource {
       final result = await room.sendEvent(content);
       debugPrint('sendEvent result: $result');
       
-      if (result == null || result.isEmpty) {
-        debugPrint('WARNING: sendEvent returned null or empty result');
-      }
-      
-      debugPrint('=== sendImageMessage completed successfully ===');
+      debugPrint('=== sendImageMessage completed successfully (manual method) ===');
       return result;
     } catch (e, stackTrace) {
       debugPrint('=== sendImageMessage ERROR ===');
@@ -403,6 +427,8 @@ class MatrixMessageDataSource {
   }
 
   /// 发送语音消息
+  /// 
+  /// 使用 Matrix SDK 内置方法或手动上传
   Future<String?> sendVoiceMessage(
     String roomId, {
     required Uint8List audioBytes,
@@ -414,29 +440,21 @@ class MatrixMessageDataSource {
     debugPrint('roomId: $roomId');
     debugPrint('filename: $filename');
     debugPrint('duration: $duration ms');
-    debugPrint('mimeType (input): $mimeType');
     debugPrint('audioBytes.length: ${audioBytes.length}');
     
     try {
-      // 检查客户端
       if (_client == null) {
-        debugPrint('ERROR: Matrix client is null');
         throw Exception('Matrix 客户端未初始化');
       }
       
-      // 检查登录状态
       if (!_client!.isLogged()) {
-        debugPrint('ERROR: Not logged in');
         throw Exception('未登录');
       }
       
-      // 获取房间
       final room = _client!.getRoomById(roomId);
       if (room == null) {
-        debugPrint('ERROR: Room not found: $roomId');
         throw Exception('房间不存在: $roomId');
       }
-      debugPrint('Room found: ${room.getLocalizedDisplayname()}');
 
       // 确定正确的 MIME 类型
       String actualMimeType = mimeType ?? 'audio/mp4';
@@ -457,8 +475,38 @@ class MatrixMessageDataSource {
 
       debugPrint('Final mimeType: $actualMimeType');
 
-      // 使用自定义认证上传方法
-      debugPrint('Uploading voice with authenticated endpoint...');
+      // 方法1: 使用 SDK 内置的 sendFileEvent
+      debugPrint('Trying SDK sendFileEvent for audio...');
+      try {
+        final matrixFile = matrix.MatrixAudioFile(
+          bytes: audioBytes,
+          name: filename,
+          mimeType: actualMimeType,
+          duration: duration,
+        );
+        
+        final result = await room.sendFileEvent(
+          matrixFile,
+          extraContent: {
+            // MSC3245 语音消息标记
+            'org.matrix.msc3245.voice': {},
+            // MSC1767 音频消息扩展
+            'org.matrix.msc1767.audio': {
+              'duration': duration,
+            },
+          },
+        );
+        
+        debugPrint('sendFileEvent result: $result');
+        debugPrint('=== sendVoiceMessage completed successfully (SDK method) ===');
+        return result;
+      } catch (sdkError, sdkStack) {
+        debugPrint('SDK sendFileEvent for audio failed: $sdkError');
+        debugPrint('Stack: $sdkStack');
+        debugPrint('Falling back to manual upload...');
+      }
+
+      // 方法2: 手动上传
       final mxcUri = await _uploadContentAuthenticated(
         audioBytes,
         filename: filename,
@@ -469,10 +517,6 @@ class MatrixMessageDataSource {
         throw Exception('上传语音失败：无法获取 MXC URI');
       }
       
-      debugPrint('Voice uploaded: $mxcUri');
-      
-      // 手动发送 m.room.message 事件（语音消息）
-      // 使用 Matrix 语音消息格式：https://spec.matrix.org/latest/client-server-api/#voice-messages
       final content = <String, dynamic>{
         'msgtype': 'm.audio',
         'body': filename,
@@ -482,34 +526,26 @@ class MatrixMessageDataSource {
           'size': audioBytes.length,
           'duration': duration,
         },
-        // MSC3245 语音消息标记
         'org.matrix.msc3245.voice': {},
-        // MSC1767 音频消息扩展
         'org.matrix.msc1767.audio': {
           'duration': duration,
         },
       };
       
-      debugPrint('Sending voice message event...');
       final result = await room.sendEvent(content);
-      debugPrint('sendEvent result: $result');
-      
-      if (result == null || result.isEmpty) {
-        debugPrint('WARNING: sendEvent returned null or empty result');
-      }
-      
-      debugPrint('=== sendVoiceMessage completed successfully ===');
+      debugPrint('=== sendVoiceMessage completed successfully (manual method) ===');
       return result;
     } catch (e, stackTrace) {
       debugPrint('=== sendVoiceMessage ERROR ===');
       debugPrint('Error: $e');
-      debugPrint('Error type: ${e.runtimeType}');
       debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
   }
 
   /// 发送视频消息
+  /// 
+  /// 使用 Matrix SDK 内置方法或手动上传
   Future<String?> sendVideoMessage(
     String roomId, {
     required Uint8List videoBytes,
@@ -537,8 +573,27 @@ class MatrixMessageDataSource {
 
       final actualMimeType = mimeType ?? 'video/mp4';
       
-      // 使用自定义认证上传方法
-      debugPrint('Uploading video with authenticated endpoint...');
+      // 方法1: 使用 SDK 内置的 sendFileEvent
+      debugPrint('Trying SDK sendFileEvent for video...');
+      try {
+        final matrixFile = matrix.MatrixVideoFile(
+          bytes: videoBytes,
+          name: filename,
+          mimeType: actualMimeType,
+        );
+        
+        final result = await room.sendFileEvent(matrixFile);
+        
+        debugPrint('sendFileEvent result: $result');
+        debugPrint('=== sendVideoMessage completed successfully (SDK method) ===');
+        return result;
+      } catch (sdkError, sdkStack) {
+        debugPrint('SDK sendFileEvent for video failed: $sdkError');
+        debugPrint('Stack: $sdkStack');
+        debugPrint('Falling back to manual upload...');
+      }
+      
+      // 方法2: 手动上传
       final mxcUri = await _uploadContentAuthenticated(
         videoBytes,
         filename: filename,
@@ -549,8 +604,6 @@ class MatrixMessageDataSource {
         throw Exception('上传视频失败：无法获取 MXC URI');
       }
       
-      debugPrint('Video uploaded: $mxcUri');
-      
       // 上传缩略图（如果有）
       Uri? thumbnailUri;
       if (thumbnailBytes != null && thumbnailBytes.isNotEmpty) {
@@ -559,12 +612,8 @@ class MatrixMessageDataSource {
           filename: 'thumbnail_$filename.jpg',
           contentType: 'image/jpeg',
         );
-        if (thumbnailUri != null) {
-          debugPrint('Thumbnail uploaded: $thumbnailUri');
-        }
       }
       
-      // 手动发送 m.room.message 事件
       final content = <String, dynamic>{
         'msgtype': 'm.video',
         'body': filename,
@@ -579,11 +628,8 @@ class MatrixMessageDataSource {
         content['info']['thumbnail_url'] = thumbnailUri.toString();
       }
       
-      debugPrint('Sending video message event...');
       final result = await room.sendEvent(content);
-      debugPrint('sendEvent result: $result');
-      
-      debugPrint('=== sendVideoMessage completed successfully ===');
+      debugPrint('=== sendVideoMessage completed successfully (manual method) ===');
       return result;
     } catch (e, stackTrace) {
       debugPrint('=== sendVideoMessage ERROR ===');
@@ -594,6 +640,8 @@ class MatrixMessageDataSource {
   }
 
   /// 发送文件消息
+  /// 
+  /// 使用 Matrix SDK 内置方法或手动上传
   Future<String?> sendFileMessage(
     String roomId, {
     required Uint8List fileBytes,
@@ -620,8 +668,27 @@ class MatrixMessageDataSource {
 
       final actualMimeType = mimeType ?? 'application/octet-stream';
       
-      // 使用自定义认证上传方法
-      debugPrint('Uploading file with authenticated endpoint...');
+      // 方法1: 使用 SDK 内置的 sendFileEvent
+      debugPrint('Trying SDK sendFileEvent for file...');
+      try {
+        final matrixFile = matrix.MatrixFile(
+          bytes: fileBytes,
+          name: filename,
+          mimeType: actualMimeType,
+        );
+        
+        final result = await room.sendFileEvent(matrixFile);
+        
+        debugPrint('sendFileEvent result: $result');
+        debugPrint('=== sendFileMessage completed successfully (SDK method) ===');
+        return result;
+      } catch (sdkError, sdkStack) {
+        debugPrint('SDK sendFileEvent for file failed: $sdkError');
+        debugPrint('Stack: $sdkStack');
+        debugPrint('Falling back to manual upload...');
+      }
+      
+      // 方法2: 手动上传
       final mxcUri = await _uploadContentAuthenticated(
         fileBytes,
         filename: filename,
@@ -632,9 +699,6 @@ class MatrixMessageDataSource {
         throw Exception('上传文件失败：无法获取 MXC URI');
       }
       
-      debugPrint('File uploaded: $mxcUri');
-      
-      // 手动发送 m.room.message 事件
       final content = <String, dynamic>{
         'msgtype': 'm.file',
         'body': filename,
@@ -646,11 +710,8 @@ class MatrixMessageDataSource {
         },
       };
       
-      debugPrint('Sending file message event...');
       final result = await room.sendEvent(content);
-      debugPrint('sendEvent result: $result');
-      
-      debugPrint('=== sendFileMessage completed successfully ===');
+      debugPrint('=== sendFileMessage completed successfully (manual method) ===');
       return result;
     } catch (e, stackTrace) {
       debugPrint('=== sendFileMessage ERROR ===');
