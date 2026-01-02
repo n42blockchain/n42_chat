@@ -4,8 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../blocs/contact/contact_bloc.dart';
+import '../../blocs/contact/contact_event.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
 import '../../blocs/conversation/conversation_event.dart';
+import '../../blocs/group/group_bloc.dart';
+import '../../blocs/transfer/transfer_bloc.dart';
 import '../contact/add_friend_page.dart';
 import '../contact/contact_list_page.dart';
 import '../conversation/conversation_list_page.dart';
@@ -181,7 +184,15 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   void _navigateToCreateGroup() {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const CreateGroupPage()),
+      MaterialPageRoute(
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (_) => getIt<ContactBloc>()..add(const LoadContacts())),
+            BlocProvider(create: (_) => getIt<GroupBloc>()),
+          ],
+          child: const CreateGroupPage(),
+        ),
+      ),
     ).then((_) {
       _conversationBloc.add(const RefreshConversations());
     });
@@ -197,7 +208,12 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   void _navigateToPayment() {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ReceivePage()),
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => getIt<TransferBloc>(),
+          child: const ReceivePage(),
+        ),
+      ),
     );
   }
 
