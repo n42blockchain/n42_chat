@@ -190,6 +190,21 @@ class MessageBubble extends StatelessWidget {
             ? AppColors.bubbleSelf
             : (isDark ? AppColors.bubbleOtherDark : AppColors.bubbleOther));
 
+    // 微信风格的气泡圆角 - 发送方右上角小圆角，接收方左上角小圆角
+    final borderRadius = isSelf
+        ? const BorderRadius.only(
+            topLeft: Radius.circular(12),
+            topRight: Radius.circular(4),
+            bottomLeft: Radius.circular(12),
+            bottomRight: Radius.circular(12),
+          )
+        : const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(12),
+            bottomLeft: Radius.circular(12),
+            bottomRight: Radius.circular(12),
+          );
+
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
@@ -197,7 +212,7 @@ class MessageBubble extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: borderRadius,
         ),
         child: child,
       ),
@@ -283,9 +298,10 @@ class TextMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // 微信中绿色气泡的文字是黑色，深色模式下对方的灰色气泡文字是白色
     final textColor = isSelf
-        ? Colors.white
-        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
+        ? AppColors.messageTextSent  // 黑色
+        : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
 
     return MessageBubble(
       isSelf: isSelf,
