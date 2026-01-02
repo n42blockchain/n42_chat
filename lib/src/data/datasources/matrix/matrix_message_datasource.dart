@@ -178,36 +178,77 @@ class MatrixMessageDataSource {
     required int duration,
     String? mimeType,
   }) async {
+    debugPrint('=== MatrixMessageDataSource.sendVoiceMessage start ===');
+    debugPrint('roomId: $roomId');
+    debugPrint('filename: $filename');
+    debugPrint('duration: $duration ms');
+    debugPrint('mimeType (input): $mimeType');
+    debugPrint('audioBytes.length: ${audioBytes.length}');
+    
     try {
-      final room = _client?.getRoomById(roomId);
-      if (room == null) {
-        debugPrint('Room not found: $roomId');
-        return null;
+      // 检查客户端
+      if (_client == null) {
+        debugPrint('ERROR: Matrix client is null');
+        throw Exception('Matrix 客户端未初始化');
       }
+      
+      // 检查登录状态
+      if (!_client!.isLogged()) {
+        debugPrint('ERROR: Not logged in');
+        throw Exception('未登录');
+      }
+      
+      // 获取房间
+      final room = _client!.getRoomById(roomId);
+      if (room == null) {
+        debugPrint('ERROR: Room not found: $roomId');
+        throw Exception('房间不存在: $roomId');
+      }
+      debugPrint('Room found: ${room.getLocalizedDisplayname()}');
 
       // 确定正确的 MIME 类型
       String actualMimeType = mimeType ?? 'audio/mp4';
-      if (filename.endsWith('.m4a')) {
+      final lowerFilename = filename.toLowerCase();
+      if (lowerFilename.endsWith('.m4a')) {
         actualMimeType = 'audio/mp4';
-      } else if (filename.endsWith('.ogg')) {
+      } else if (lowerFilename.endsWith('.ogg') || lowerFilename.endsWith('.opus')) {
         actualMimeType = 'audio/ogg';
-      } else if (filename.endsWith('.mp3')) {
+      } else if (lowerFilename.endsWith('.mp3')) {
         actualMimeType = 'audio/mpeg';
+      } else if (lowerFilename.endsWith('.wav')) {
+        actualMimeType = 'audio/wav';
+      } else if (lowerFilename.endsWith('.aac')) {
+        actualMimeType = 'audio/aac';
+      } else if (lowerFilename.endsWith('.webm')) {
+        actualMimeType = 'audio/webm';
       }
 
+      debugPrint('Final mimeType: $actualMimeType');
+
+      // 创建 Matrix 音频文件
       final matrixFile = matrix.MatrixAudioFile(
         bytes: audioBytes,
         name: filename,
         mimeType: actualMimeType,
         duration: duration,
       );
+      debugPrint('MatrixAudioFile created: name=${matrixFile.name}, mimeType=${matrixFile.mimeType}');
 
-      debugPrint('Sending voice message: $filename, size: ${audioBytes.length}, duration: $duration ms');
+      // 发送文件事件
+      debugPrint('Calling room.sendFileEvent...');
       final result = await room.sendFileEvent(matrixFile);
-      debugPrint('Voice message sent: $result');
+      debugPrint('sendFileEvent result: $result');
+      
+      if (result == null || result.isEmpty) {
+        debugPrint('WARNING: sendFileEvent returned null or empty result');
+      }
+      
+      debugPrint('=== sendVoiceMessage completed successfully ===');
       return result;
     } catch (e, stackTrace) {
-      debugPrint('Send voice message error: $e');
+      debugPrint('=== sendVoiceMessage ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Error type: ${e.runtimeType}');
       debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
@@ -253,26 +294,85 @@ class MatrixMessageDataSource {
   }
 
   /// 发送位置消息
+  /// 
+  /// Matrix 位置消息格式参考:
+  /// https://spec.matrix.org/latest/client-server-api/#mlocation
   Future<String?> sendLocationMessage(
     String roomId, {
     required double latitude,
     required double longitude,
     String? description,
   }) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) return null;
-
-    final geoUri = 'geo:$latitude,$longitude';
+    debugPrint('=== MatrixMessageDataSource.sendLocationMessage start ===');
+    debugPrint('roomId: $roomId');
+    debugPrint('latitude: $latitude');
+    debugPrint('longitude: $longitude');
+    debugPrint('description: $description');
     
-    return await room.sendEvent({
-      'msgtype': matrix.MessageTypes.Location,
-      'body': description ?? '位置',
-      'geo_uri': geoUri,
-      'info': {
-        'latitude': latitude,
-        'longitude': longitude,
-      },
-    });
+    try {
+      // 检查客户端
+      if (_client == null) {
+        debugPrint('ERROR: Matrix client is null');
+        throw Exception('Matrix 客户端未初始化');
+      }
+      
+      // 检查登录状态
+      if (!_client!.isLogged()) {
+        debugPrint('ERROR: Not logged in');
+        throw Exception('未登录');
+      }
+      
+      // 获取房间
+      final room = _client!.getRoomById(roomId);
+      if (room == null) {
+        debugPrint('ERROR: Room not found: $roomId');
+        throw Exception('房间不存在: $roomId');
+      }
+      debugPrint('Room found: ${room.getLocalizedDisplayname()}');
+
+      // 构建 geo URI (标准格式)
+      final geoUri = 'geo:$latitude,$longitude';
+      
+      // 构建位置消息内容 (遵循 Matrix 规范)
+      final content = {
+        'msgtype': matrix.MessageTypes.Location,
+        'body': description ?? '位置: $latitude, $longitude',
+        'geo_uri': geoUri,
+        'info': {
+          // Matrix org.matrix.msc3488 扩展
+          'latitude': latitude,
+          'longitude': longitude,
+        },
+        // Matrix 规范的 m.location 扩展 (可选)
+        'org.matrix.msc3488.location': {
+          'uri': geoUri,
+          'description': description ?? '位置',
+        },
+        // 资产类型
+        'org.matrix.msc3488.asset': {
+          'type': 'm.self', // 表示这是用户自己的位置
+        },
+      };
+      
+      debugPrint('Location content: $content');
+      debugPrint('Calling room.sendEvent...');
+      
+      final result = await room.sendEvent(content);
+      debugPrint('sendEvent result: $result');
+      
+      if (result == null || result.isEmpty) {
+        debugPrint('WARNING: sendEvent returned null or empty result');
+      }
+      
+      debugPrint('=== sendLocationMessage completed successfully ===');
+      return result;
+    } catch (e, stackTrace) {
+      debugPrint('=== sendLocationMessage ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Error type: ${e.runtimeType}');
+      debugPrint('Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   /// 发送自定义消息
