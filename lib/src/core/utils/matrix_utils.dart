@@ -55,25 +55,16 @@ class MatrixUtils {
         return null;
       }
       
-      // 获取 access_token（用于认证媒体访问）
-      final accessToken = client.accessToken;
-
-      // 构建 HTTP URL
+      // 构建 HTTP URL - 使用认证媒体 API (Matrix 1.11+)
       String url;
       if (width != null && height != null) {
         // 缩略图 URL
         final methodStr = method == matrix.ThumbnailMethod.crop ? 'crop' : 'scale';
         final animatedStr = animated ? '&animated=true' : '';
-        url = '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$methodStr$animatedStr';
+        url = '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$methodStr$animatedStr';
       } else {
         // 完整下载 URL
-        url = '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
-      }
-      
-      // 如果有 access_token，添加到 URL 以支持认证媒体
-      if (accessToken != null && accessToken.isNotEmpty) {
-        final separator = url.contains('?') ? '&' : '?';
-        url = '$url${separator}access_token=$accessToken';
+        url = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
       }
       
       return url;
