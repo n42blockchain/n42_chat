@@ -166,9 +166,11 @@ class MessageItem extends StatelessWidget {
   }
 
   Widget _buildTextMessage(bool isDark) {
+    // 微信中绿色气泡的文字是黑色，灰色气泡的文字也是黑色
+    // 深色模式下，对方的灰色气泡文字是白色
     final textColor = message.isFromMe
-        ? Colors.white
-        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
+        ? AppColors.messageTextSent  // 黑色
+        : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
 
     return Text(
       message.content,
@@ -294,10 +296,10 @@ class MessageItem extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     color: message.isFromMe
-                        ? Colors.white
+                        ? AppColors.messageTextSent
                         : (isDark
                             ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary),
+                            : AppColors.messageTextReceived),
                   ),
                 ),
                 if (size != null)
@@ -306,7 +308,7 @@ class MessageItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       color: message.isFromMe
-                          ? Colors.white70
+                          ? AppColors.textSecondary
                           : AppColors.textSecondary,
                     ),
                   ),
@@ -351,10 +353,10 @@ class MessageItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               color: message.isFromMe
-                  ? Colors.white
+                  ? AppColors.messageTextSent
                   : (isDark
                       ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary),
+                      : AppColors.messageTextReceived),
             ),
           ),
           if (latitude != null && longitude != null)
@@ -362,7 +364,7 @@ class MessageItem extends StatelessWidget {
               '${latitude.toStringAsFixed(6)}, ${longitude.toStringAsFixed(6)}',
               style: TextStyle(
                 fontSize: 12,
-                color: message.isFromMe ? Colors.white70 : AppColors.textSecondary,
+                color: AppColors.textSecondary,
               ),
             ),
         ],
@@ -408,14 +410,14 @@ class MessageItem extends StatelessWidget {
         Icon(
           Icons.lock,
           size: 16,
-          color: message.isFromMe ? Colors.white70 : AppColors.textSecondary,
+          color: AppColors.textSecondary,
         ),
         const SizedBox(width: 4),
         Text(
           '[加密消息]',
           style: TextStyle(
             fontSize: 16,
-            color: message.isFromMe ? Colors.white70 : AppColors.textSecondary,
+            color: AppColors.textSecondary,
             fontStyle: FontStyle.italic,
           ),
         ),
