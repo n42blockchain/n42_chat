@@ -12,7 +12,13 @@ import '../settings/settings_page.dart';
 
 /// 我的页面
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  /// 是否显示 AppBar（嵌入到主框架时可设为 false）
+  final bool showAppBar;
+  
+  const ProfilePage({
+    super.key,
+    this.showAppBar = true,
+  });
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -65,10 +71,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: N42AppBar(
+      appBar: widget.showAppBar ? N42AppBar(
         title: '我',
         showBackButton: false,
-      ),
+      ) : null,
       body: ListView(
         children: [
           // 个人资料卡片
