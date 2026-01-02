@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -390,24 +392,39 @@ class _ChatPageState extends State<ChatPage> {
         }
 
         if (state.isEmpty) {
-          return N42EmptyState.noData(
-            title: '暂无消息',
-            description: '发送第一条消息开始聊天',
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildEncryptionNotice(),
+              const SizedBox(height: 16),
+              N42EmptyState.noData(
+                title: '暂无消息',
+                description: '发送第一条消息开始聊天',
+              ),
+            ],
           );
         }
 
+        // 额外项数：加密提示(1) + 加载更多指示器(可选)
+        final extraItems = 1 + (state.isLoadingMore ? 1 : 0);
+        
         return ListView.builder(
           controller: _scrollController,
           reverse: true, // 从底部开始显示
           padding: const EdgeInsets.symmetric(vertical: 8),
-          itemCount: state.messages.length + (state.isLoadingMore ? 1 : 0),
+          itemCount: state.messages.length + extraItems,
           itemBuilder: (context, index) {
-            // 加载更多指示器
-            if (state.isLoadingMore && index == state.messages.length) {
+            // 加载更多指示器（列表顶部，index 最大）
+            if (state.isLoadingMore && index == state.messages.length + 1) {
               return const Padding(
                 padding: EdgeInsets.all(16),
                 child: N42Loading(),
               );
+            }
+            
+            // 端对端加密提示（在所有消息之上）
+            if (index == state.messages.length) {
+              return _buildEncryptionNotice();
             }
 
             final message = state.messages[index];
@@ -448,6 +465,43 @@ class _ChatPageState extends State<ChatPage> {
           },
         );
       },
+    );
+  }
+
+  /// 构建端对端加密提示
+  Widget _buildEncryptionNotice() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.primaryWithOpacity,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.lock_outline,
+              size: 16,
+              color: AppColors.primary,
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                '本聊天已开启端对端加密保护，只有您和对方可以读取消息内容',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.primary,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -530,11 +584,45 @@ class _ChatPageState extends State<ChatPage> {
       controller: _inputController,
       focusNode: _inputFocusNode,
       onSendText: _sendMessage,
+      onSendVoice: _sendVoiceMessage,
       onChanged: _onInputChanged,
       onVoicePressed: _onVoicePressed,
       onEmojiPressed: _onEmojiPressed,
       onMorePressed: _onMorePressed,
     );
+  }
+
+  Future<void> _sendVoiceMessage(String path, Duration duration) async {
+    try {
+      final file = File(path);
+      if (!await file.exists()) {
+        debugPrint('Voice file not found: $path');
+        return;
+      }
+      
+      final bytes = await file.readAsBytes();
+      final filename = path.split('/').last;
+      
+      context.read<ChatBloc>().add(SendVoiceMessage(
+        audioBytes: bytes,
+        filename: filename,
+        duration: duration.inMilliseconds,
+        mimeType: 'audio/mp4',
+      ));
+      
+      // 删除临时文件
+      await file.delete();
+    } catch (e) {
+      debugPrint('Send voice message error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('发送语音失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildScrollToBottomButton() {
