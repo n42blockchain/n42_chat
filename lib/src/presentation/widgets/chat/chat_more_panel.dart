@@ -66,10 +66,12 @@ class ChatMorePanel extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // 获取底部安全区域高度
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    // 内容高度（两行图标 + 页面指示器）
+    const contentHeight = 170.0;
 
     return Container(
       // 固定高度 = 内容高度 + 底部安全区域
-      height: 180 + bottomPadding,
+      height: contentHeight + bottomPadding,
       decoration: BoxDecoration(
         color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
         border: Border(
@@ -81,8 +83,7 @@ class ChatMorePanel extends StatelessWidget {
       ),
       child: Column(
         children: [
-          SizedBox(
-            height: 180,
+          Expanded(
             child: PageView(
             children: [
               // 第一页
@@ -163,9 +164,9 @@ class ChatMorePanel extends StatelessWidget {
               ),
             ],
           ),
-        ),
+          ),
           // 底部安全区域
-          SizedBox(height: MediaQuery.of(context).padding.bottom),
+          SizedBox(height: bottomPadding),
         ],
       ),
     );
