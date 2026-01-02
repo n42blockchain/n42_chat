@@ -69,7 +69,9 @@ class MatrixAuthDataSource {
   }
 
   /// 检查Homeserver是否有效
-  Future<HomeserverSummary> checkHomeserver(String homeserver) async {
+  /// 
+  /// 返回服务器版本信息和支持的登录方式
+  Future<(DiscoveryInformation?, GetVersionsResponse, List<LoginFlow>)> checkHomeserver(String homeserver) async {
     if (!_clientManager.isInitialized) {
       await _clientManager.initialize();
     }

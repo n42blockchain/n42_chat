@@ -193,7 +193,7 @@ class GroupRepositoryImpl implements IGroupRepository {
       members: members?.map((u) => _mapUserToGroupMember(room.id, u)).toList() ?? [],
       isEncrypted: room.encrypted,
       isPublic: room.joinRules == matrix.JoinRules.public,
-      createdAt: room.getState(matrix.EventTypes.RoomCreate)?.originServerTs,
+      createdAt: null, // StrippedStateEvent doesn't have originServerTs
       myRole: myRole,
       canInvite: _groupDataSource.canInviteMembers(room.id),
       canKick: _groupDataSource.canKickMembers(room.id),

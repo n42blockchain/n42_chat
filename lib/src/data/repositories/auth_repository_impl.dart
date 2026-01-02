@@ -310,18 +310,18 @@ class AuthRepositoryImpl implements IAuthRepository {
   @override
   Future<HomeserverInfo> checkHomeserver(String homeserver) async {
     try {
-      final summary = await _authDataSource.checkHomeserver(homeserver);
-      final flows = await _authDataSource.getLoginFlows(homeserver);
+      final (discoveryInfo, versionsResponse, loginFlows) = 
+          await _authDataSource.checkHomeserver(homeserver);
 
-      final baseUrl = summary.discoveryInformation?.mHomeserver?.baseUrl
-              .toString() ??
-          homeserver;
+      final baseUrl = discoveryInfo?.mHomeserver?.baseUrl.toString() ?? homeserver;
 
       return HomeserverInfo(
         serverName: baseUrl,
-        serverVersion: '', // Matrix协议不返回版本
+        serverVersion: versionsResponse.versions.isNotEmpty 
+            ? versionsResponse.versions.last 
+            : '',
         supportedLoginTypes:
-            flows.map((f) => f.type).whereType<String>().toList(),
+            loginFlows.map((f) => f.type).whereType<String>().toList(),
         supportsRegistration: true, // 假设支持，实际需要检查
       );
     } catch (e) {

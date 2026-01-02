@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io' if (dart.library.html) 'dart:html';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -460,18 +463,24 @@ class MatrixClientManager {
     debugPrint('User ID: ${_client!.userID}');
     
     try {
-      // 创建 MatrixImageFile
-      final file = MatrixImageFile(
-        bytes: avatarBytes,
-        name: actualFilename,
-        mimeType: mimeType,
+      // 使用自定义认证上传方法
+      debugPrint('Uploading avatar with authenticated endpoint...');
+      final mxcUri = await _uploadContentAuthenticated(
+        avatarBytes,
+        filename: actualFilename,
+        contentType: mimeType,
       );
-      debugPrint('MatrixImageFile created');
       
-      // 上传头像
-      debugPrint('Calling _client.setAvatar...');
-      await _client!.setAvatar(file);
-      debugPrint('setAvatar completed');
+      if (mxcUri == null) {
+        throw Exception('上传头像失败：无法获取 MXC URI');
+      }
+      
+      debugPrint('Avatar uploaded: $mxcUri');
+      
+      // 设置头像 URL
+      debugPrint('Setting avatar URL...');
+      await _client!.setAvatarUrl(_client!.userID!, mxcUri);
+      debugPrint('Avatar URL set successfully');
       
       // 验证头像是否设置成功
       final profile = await _client!.getProfileFromUserId(_client!.userID!);
@@ -485,6 +494,158 @@ class MatrixClientManager {
       debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
+  }
+  
+  /// 检查服务器是否支持认证媒体上传
+  Future<bool> _supportsAuthenticatedMedia() async {
+    try {
+      final versionsResponse = await _client!.getVersions();
+      // 检查 Matrix 版本是否 >= v1.11 (支持认证媒体)
+      final supportsV111 = versionsResponse.versions.any(
+        (v) => _isVersionGreaterThanOrEqualTo(v, 'v1.11'),
+      );
+      // 或者检查 unstable feature
+      final hasUnstableFeature = 
+          versionsResponse.unstableFeatures?['org.matrix.msc3916.stable'] == true;
+      
+      debugPrint('MatrixClientManager: supportsV111=$supportsV111, hasUnstableFeature=$hasUnstableFeature');
+      return supportsV111 || hasUnstableFeature;
+    } catch (e) {
+      debugPrint('MatrixClientManager: Error checking authenticated media support: $e');
+      return false;
+    }
+  }
+  
+  bool _isVersionGreaterThanOrEqualTo(String version, String target) {
+    try {
+      final vParts = version.replaceAll('v', '').split('.');
+      final tParts = target.replaceAll('v', '').split('.');
+      
+      final vMajor = int.tryParse(vParts[0]) ?? 0;
+      final vMinor = vParts.length > 1 ? (int.tryParse(vParts[1]) ?? 0) : 0;
+      final tMajor = int.tryParse(tParts[0]) ?? 0;
+      final tMinor = tParts.length > 1 ? (int.tryParse(tParts[1]) ?? 0) : 0;
+      
+      if (vMajor > tMajor) return true;
+      if (vMajor < tMajor) return false;
+      return vMinor >= tMinor;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// 使用认证端点上传文件
+  Future<Uri?> _uploadContentAuthenticated(
+    Uint8List content, {
+    String? filename,
+    String? contentType,
+  }) async {
+    if (_client == null) {
+      throw Exception('Matrix client not initialized');
+    }
+    if (_client!.accessToken == null) {
+      throw Exception('No access token available');
+    }
+    if (_client!.homeserver == null) {
+      throw Exception('No homeserver configured');
+    }
+
+    final supportsAuth = await _supportsAuthenticatedMedia();
+    debugPrint('MatrixClientManager: supportsAuthenticatedMedia=$supportsAuth');
+    
+    // 根据服务器能力选择端点
+    final path = supportsAuth 
+        ? '_matrix/client/v1/media/upload'  // 认证媒体端点 (MSC3916)
+        : '_matrix/media/v3/upload';         // 传统端点
+    
+    final uri = Uri.parse('${_client!.homeserver}/$path').replace(
+      queryParameters: filename != null ? {'filename': filename} : null,
+    );
+    
+    debugPrint('MatrixClientManager: Uploading to: $uri');
+    debugPrint('MatrixClientManager: Content size: ${content.length} bytes');
+    debugPrint('MatrixClientManager: Content type: $contentType');
+    
+    final request = http.Request('POST', uri);
+    request.headers['Authorization'] = 'Bearer ${_client!.accessToken}';
+    if (contentType != null) {
+      request.headers['Content-Type'] = contentType;
+    }
+    request.bodyBytes = content;
+    
+    try {
+      final streamedResponse = await http.Client().send(request);
+      final response = await http.Response.fromStream(streamedResponse);
+      
+      debugPrint('MatrixClientManager: Upload response status: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final contentUri = json['content_uri'] as String?;
+        if (contentUri != null) {
+          debugPrint('MatrixClientManager: Upload successful: $contentUri');
+          return Uri.parse(contentUri);
+        }
+      }
+      
+      // 上传失败，打印错误信息
+      debugPrint('MatrixClientManager: Upload failed: ${response.body}');
+      
+      // 如果使用认证端点失败，尝试传统端点
+      if (supportsAuth && response.statusCode == 403) {
+        debugPrint('MatrixClientManager: Auth endpoint failed, trying legacy endpoint...');
+        return _uploadContentLegacy(content, filename: filename, contentType: contentType);
+      }
+      
+      // 解析错误信息
+      try {
+        final errorJson = jsonDecode(response.body);
+        final errcode = errorJson['errcode'] as String?;
+        final error = errorJson['error'] as String?;
+        throw Exception('Upload failed: $errcode - $error');
+      } catch (_) {
+        throw Exception('Upload failed with status ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('MatrixClientManager: Upload error: $e');
+      rethrow;
+    }
+  }
+  
+  /// 使用传统端点上传文件（作为 fallback）
+  Future<Uri?> _uploadContentLegacy(
+    Uint8List content, {
+    String? filename,
+    String? contentType,
+  }) async {
+    if (_client == null) return null;
+    
+    final uri = Uri.parse('${_client!.homeserver}/_matrix/media/v3/upload').replace(
+      queryParameters: filename != null ? {'filename': filename} : null,
+    );
+    
+    debugPrint('MatrixClientManager: Uploading (legacy) to: $uri');
+    
+    final request = http.Request('POST', uri);
+    request.headers['Authorization'] = 'Bearer ${_client!.accessToken}';
+    if (contentType != null) {
+      request.headers['Content-Type'] = contentType;
+    }
+    request.bodyBytes = content;
+    
+    final streamedResponse = await http.Client().send(request);
+    final response = await http.Response.fromStream(streamedResponse);
+    
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final contentUri = json['content_uri'] as String?;
+      if (contentUri != null) {
+        return Uri.parse(contentUri);
+      }
+    }
+    
+    debugPrint('MatrixClientManager: Legacy upload failed: ${response.body}');
+    return null;
   }
 
   // ============================================

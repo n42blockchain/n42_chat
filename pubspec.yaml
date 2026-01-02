@@ -19,7 +19,7 @@ dependencies:
   # Matrix Protocol - 核心通信协议
   # ============================================
   # Apache 2.0 License - 商业友好
-  # 升级到最新版本以支持 Authenticated Media (MSC3916)
+  # 0.32.x 版本支持 Authenticated Media (MSC3916)
   matrix: ^0.32.0
 
   # ============================================
