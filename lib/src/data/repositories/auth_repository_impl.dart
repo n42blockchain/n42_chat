@@ -26,6 +26,9 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   // 缓存用户资料数据
   Map<String, dynamic>? _cachedProfileData;
+  // 缓存的头像 URL 和显示名
+  String? _cachedAvatarUrl;
+  String? _cachedDisplayName;
   
   @override
   UserEntity? get currentUser {
@@ -36,30 +39,14 @@ class AuthRepositoryImpl implements IAuthRepository {
 
     final userId = client.userID;
     if (userId == null) return null;
-
-    // 获取头像 URL
-    String? avatarHttpUrl;
-    final avatarMxc = client.userID != null 
-        ? client.getRoomById(client.directChatRoomId ?? '')?.avatar?.toString()
-        : null;
-    
-    // 尝试从用户资料获取头像
-    try {
-      final ownProfile = client.ownProfile;
-      if (ownProfile.avatarUrl != null) {
-        avatarHttpUrl = _buildAvatarHttpUrl(ownProfile.avatarUrl.toString(), client);
-      }
-    } catch (e) {
-      debugPrint('AuthRepository: Error getting own profile: $e');
-    }
     
     // 从缓存的资料数据中获取额外字段
     final profileData = _cachedProfileData ?? {};
 
     return UserEntity(
       userId: userId,
-      displayName: client.ownProfile.displayName ?? userId.localpart ?? '',
-      avatarUrl: avatarHttpUrl,
+      displayName: _cachedDisplayName ?? userId.localpart ?? '',
+      avatarUrl: _cachedAvatarUrl,
       gender: profileData['gender'] as String?,
       region: profileData['region'] as String?,
       signature: profileData['signature'] as String?,
@@ -123,8 +110,9 @@ class AuthRepositoryImpl implements IAuthRepository {
       // 通知登录状态变化
       _loginStateController.add(true);
 
-      // 返回成功
-      final user = UserEntity(
+      // 加载用户资料（包括头像）
+      final userProfile = await getCurrentUserProfile();
+      final user = userProfile ?? UserEntity(
         userId: userId,
         displayName: username,
       );
@@ -380,11 +368,24 @@ class AuthRepositoryImpl implements IAuthRepository {
       if (profile.avatarUrl != null) {
         avatarHttpUrl = _buildAvatarHttpUrl(profile.avatarUrl.toString(), client);
       }
+      
+      // 缓存头像和显示名
+      _cachedAvatarUrl = avatarHttpUrl;
+      _cachedDisplayName = profile.displayName ?? userId.localpart ?? '';
+      
+      // 加载自定义资料数据
+      await getUserProfileData();
+      
+      final profileData = _cachedProfileData ?? {};
 
       return UserEntity(
         userId: userId,
-        displayName: profile.displayName ?? userId.localpart ?? '',
+        displayName: _cachedDisplayName!,
         avatarUrl: avatarHttpUrl,
+        gender: profileData['gender'] as String?,
+        region: profileData['region'] as String?,
+        signature: profileData['signature'] as String?,
+        pokeText: profileData['pokeText'] as String?,
       );
     } catch (e) {
       debugPrint('AuthRepository: Get profile failed - $e');
@@ -434,6 +435,10 @@ class AuthRepositoryImpl implements IAuthRepository {
     try {
       await _authDataSource.clientManager.setAvatar(avatarBytes, filename);
       debugPrint('AuthRepository: Avatar updated successfully');
+      
+      // 刷新用户资料以更新缓存的头像 URL
+      await getCurrentUserProfile();
+      
       return true;
     } catch (e) {
       debugPrint('AuthRepository: Update avatar failed - $e');
