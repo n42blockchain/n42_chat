@@ -10,4 +10,5 @@ export 'message_status_indicator.dart' hide MessageStatus;
 export 'time_separator.dart';
 export 'transfer_message_widget.dart';
 export 'voice_message_widget.dart';
+export 'wechat_message_menu.dart';
 
