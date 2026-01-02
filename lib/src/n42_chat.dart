@@ -9,11 +9,10 @@ import 'domain/repositories/auth_repository.dart';
 import 'presentation/blocs/auth/auth_bloc.dart';
 import 'presentation/blocs/auth/auth_event.dart';
 import 'presentation/blocs/auth/auth_state.dart';
-import 'presentation/blocs/conversation/conversation_bloc.dart';
 import 'presentation/pages/auth/login_page.dart';
 import 'presentation/pages/auth/register_page.dart';
 import 'presentation/pages/auth/welcome_page.dart';
-import 'presentation/pages/conversation/conversation_list_page.dart';
+import 'presentation/pages/main/chat_main_page.dart';
 
 /// N42 Chat 模块主入口类
 ///
@@ -381,13 +380,8 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: N42Chat.authBloc),
-        BlocProvider<ConversationBloc>(
-          create: (_) => getIt<ConversationBloc>(),
-        ),
-      ],
+    return BlocProvider.value(
+      value: N42Chat.authBloc,
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           // 检查中或初始状态 - 显示加载
@@ -396,18 +390,9 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
             return const _LoadingPage();
           }
 
-          // 已登录 - 显示会话列表
+          // 已登录 - 显示主框架（微信风格底部Tab）
           if (state.isAuthenticated) {
-            return ConversationListPage(
-              onConversationTap: (conversation) {
-                // TODO: 导航到聊天页面
-                debugPrint('N42Chat: Open conversation ${conversation.id}');
-              },
-              onSearchTap: () {
-                // TODO: 导航到搜索页面
-                debugPrint('N42Chat: Open search');
-              },
-            );
+            return const ChatMainPage();
           }
 
           // 未登录 - 显示欢迎页面
