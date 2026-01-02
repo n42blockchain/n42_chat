@@ -392,7 +392,12 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
 
           // 已登录 - 显示主框架（微信风格底部Tab）
           if (state.isAuthenticated) {
-            return const ChatMainPage();
+            return ChatMainPage(
+              onBackToMain: () {
+                // 返回主应用 - 由外部处理
+                Navigator.of(context).maybePop();
+              },
+            );
           }
 
           // 未登录 - 显示欢迎页面

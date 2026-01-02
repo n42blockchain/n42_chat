@@ -6,7 +6,13 @@ import '../qrcode/scan_qr_page.dart';
 
 /// 发现页面
 class DiscoverPage extends StatelessWidget {
-  const DiscoverPage({super.key});
+  /// 是否显示 AppBar（嵌入到主框架时可设为 false）
+  final bool showAppBar;
+  
+  const DiscoverPage({
+    super.key,
+    this.showAppBar = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +24,10 @@ class DiscoverPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: N42AppBar(
+      appBar: showAppBar ? N42AppBar(
         title: '发现',
         showBackButton: false,
-      ),
+      ) : null,
       body: ListView(
         children: [
           const SizedBox(height: 12),
