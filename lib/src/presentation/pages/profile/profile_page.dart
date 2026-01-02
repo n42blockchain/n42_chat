@@ -9,6 +9,7 @@ import '../../blocs/auth/auth_event.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../qrcode/my_qrcode_page.dart';
 import '../settings/settings_page.dart';
+import 'profile_edit_page.dart';
 
 /// 我的页面
 class ProfilePage extends StatefulWidget {
@@ -320,7 +321,12 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _openEditProfile(BuildContext context) {
-    _showComingSoon(context, '编辑资料');
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ProfileEditPage()),
+    ).then((_) {
+      // 返回后刷新用户信息
+      _loadUserInfo();
+    });
   }
 
   void _openMyQRCode(BuildContext context) {

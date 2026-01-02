@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../entities/user_entity.dart';
 
 /// 认证仓库接口
@@ -69,6 +71,21 @@ abstract class IAuthRepository {
     String? displayName,
     String? avatarPath,
   });
+
+  /// 更新头像
+  /// 
+  /// [avatarBytes] 头像图片二进制数据
+  /// [filename] 文件名
+  /// 
+  /// 返回是否成功
+  Future<bool> updateAvatar(Uint8List avatarBytes, String filename);
+
+  /// 更新显示名
+  /// 
+  /// [displayName] 新的显示名
+  /// 
+  /// 返回是否成功
+  Future<bool> updateDisplayName(String displayName);
 }
 
 /// 认证结果

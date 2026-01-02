@@ -409,10 +409,14 @@ class MatrixClientManager {
   }
 
   /// 更新头像
-  Future<void> setAvatar(MatrixFile file) async {
+  Future<void> setAvatar(Uint8List avatarBytes, String filename) async {
     _ensureInitialized();
     _ensureLoggedIn();
 
+    final file = MatrixImageFile(
+      bytes: avatarBytes,
+      name: filename,
+    );
     await _client!.setAvatar(file);
   }
 

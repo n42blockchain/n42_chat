@@ -118,17 +118,39 @@ class MatrixMessageDataSource {
     required int duration,
     String? mimeType,
   }) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) return null;
+    try {
+      final room = _client?.getRoomById(roomId);
+      if (room == null) {
+        debugPrint('Room not found: $roomId');
+        return null;
+      }
 
-    final matrixFile = matrix.MatrixAudioFile(
-      bytes: audioBytes,
-      name: filename,
-      mimeType: mimeType ?? 'audio/ogg',
-      duration: duration,
-    );
+      // 确定正确的 MIME 类型
+      String actualMimeType = mimeType ?? 'audio/mp4';
+      if (filename.endsWith('.m4a')) {
+        actualMimeType = 'audio/mp4';
+      } else if (filename.endsWith('.ogg')) {
+        actualMimeType = 'audio/ogg';
+      } else if (filename.endsWith('.mp3')) {
+        actualMimeType = 'audio/mpeg';
+      }
 
-    return await room.sendFileEvent(matrixFile);
+      final matrixFile = matrix.MatrixAudioFile(
+        bytes: audioBytes,
+        name: filename,
+        mimeType: actualMimeType,
+        duration: duration,
+      );
+
+      debugPrint('Sending voice message: $filename, size: ${audioBytes.length}, duration: $duration ms');
+      final result = await room.sendFileEvent(matrixFile);
+      debugPrint('Voice message sent: $result');
+      return result;
+    } catch (e, stackTrace) {
+      debugPrint('Send voice message error: $e');
+      debugPrint('Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   /// 发送视频消息
