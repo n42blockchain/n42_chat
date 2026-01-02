@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -7,12 +6,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../di/injection.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
-import '../../widgets/common/n42_app_bar.dart';
-import '../../widgets/common/n42_avatar.dart';
+import '../../widgets/common/common_widgets.dart';
 
 /// 个人资料编辑页面
 /// 
@@ -66,7 +63,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         else
                           N42Avatar(
                             name: user?.displayName ?? '',
-                            avatarUrl: user?.avatarUrl,
+                            imageUrl: user?.avatarUrl,
                             size: 60,
                           ),
                         const SizedBox(width: 8),
