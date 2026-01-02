@@ -200,11 +200,20 @@ class MessageItem extends StatelessWidget {
     final durationSec = ((metadata?.duration ?? 0) / 1000).round();
 
     return VoiceMessageWidget(
-      duration: durationSec,
+      duration: durationSec > 0 ? durationSec : 1,
       isSelf: message.isFromMe,
-      isPlaying: false, // TODO: 连接播放状态
-      onTap: onTap,
+      voiceUrl: metadata?.mediaUrl,
+      // 语音转文字功能（需要接入语音识别API）
+      onConvertToText: metadata?.mediaUrl != null ? _convertVoiceToText : null,
     );
+  }
+
+  /// 语音转文字（待接入语音识别服务）
+  Future<String?> _convertVoiceToText(String voiceUrl) async {
+    // TODO: 接入语音识别API（如讯飞、百度、阿里云等）
+    // 这里返回模拟数据作为演示
+    await Future.delayed(const Duration(seconds: 2));
+    return '【语音转文字功能开发中，请稍后...】';
   }
 
   Widget _buildVideoMessage() {
