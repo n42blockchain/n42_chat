@@ -465,15 +465,72 @@ class _ChatPageState extends State<ChatPage> {
   
   Future<void> _sendVideo(XFile video) async {
     try {
-      final file = File(video.path);
-      if (!await file.exists()) {
-        debugPrint('Video file not found: ${video.path}');
+      debugPrint('=== _sendVideo start ===');
+      debugPrint('Video path: ${video.path}');
+      debugPrint('Video name: ${video.name}');
+      
+      // 读取视频字节 - 优先使用 XFile.readAsBytes()
+      Uint8List bytes;
+      try {
+        bytes = await video.readAsBytes();
+      } catch (e) {
+        debugPrint('XFile.readAsBytes failed, trying File: $e');
+        final file = File(video.path);
+        if (!await file.exists()) {
+          debugPrint('Video file not found: ${video.path}');
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('视频文件不存在'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+          return;
+        }
+        bytes = await file.readAsBytes();
+      }
+      
+      if (bytes.isEmpty) {
+        debugPrint('Video bytes is empty');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('视频数据为空'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
         return;
       }
       
-      final bytes = await file.readAsBytes();
-      final filename = video.name;
-      final mimeType = lookupMimeType(filename) ?? 'video/mp4';
+      // 处理文件名
+      String filename = video.name;
+      if (filename.isEmpty) {
+        filename = 'video_${DateTime.now().millisecondsSinceEpoch}.mp4';
+      }
+      
+      // 从路径获取扩展名
+      final pathExt = video.path.split('.').last.toLowerCase();
+      final hasExtInName = filename.contains('.');
+      
+      if (!hasExtInName && pathExt.isNotEmpty && pathExt.length <= 5) {
+        filename = '$filename.$pathExt';
+      }
+      
+      // 确保文件名有扩展名
+      if (!filename.toLowerCase().endsWith('.mp4') && 
+          !filename.toLowerCase().endsWith('.mov') &&
+          !filename.toLowerCase().endsWith('.avi') &&
+          !filename.toLowerCase().endsWith('.mkv') &&
+          !filename.toLowerCase().endsWith('.webm')) {
+        filename = '$filename.mp4';
+      }
+      
+      // 确定 MIME 类型
+      String mimeType = lookupMimeType(filename) ?? 
+                        lookupMimeType(video.path) ?? 
+                        'video/mp4';
       
       // 检查文件大小（限制 100MB）
       const maxSize = 100 * 1024 * 1024; // 100MB
@@ -489,7 +546,10 @@ class _ChatPageState extends State<ChatPage> {
         return;
       }
       
-      debugPrint('Sending video: $filename, size: ${bytes.length}, mimeType: $mimeType');
+      debugPrint('Final filename: $filename');
+      debugPrint('Final mimeType: $mimeType');
+      debugPrint('Video size: ${bytes.length} bytes');
+      debugPrint('=== Sending video to ChatBloc ===');
       
       // 使用文件消息发送视频
       context.read<ChatBloc>().add(SendFileMessage(
@@ -506,8 +566,9 @@ class _ChatPageState extends State<ChatPage> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('Send video error: $e');
+      debugPrint('Stack trace: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -521,17 +582,89 @@ class _ChatPageState extends State<ChatPage> {
   
   Future<void> _sendImage(XFile image) async {
     try {
-      final file = File(image.path);
-      if (!await file.exists()) {
-        debugPrint('Image file not found: ${image.path}');
+      debugPrint('=== _sendImage start ===');
+      debugPrint('Image path: ${image.path}');
+      debugPrint('Image name: ${image.name}');
+      
+      // 读取图片字节 - 优先使用 XFile.readAsBytes() 因为它支持所有平台
+      Uint8List bytes;
+      try {
+        bytes = await image.readAsBytes();
+      } catch (e) {
+        // 如果 XFile.readAsBytes 失败，尝试使用 File
+        debugPrint('XFile.readAsBytes failed, trying File: $e');
+        final file = File(image.path);
+        if (!await file.exists()) {
+          debugPrint('Image file not found: ${image.path}');
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('图片文件不存在'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+          return;
+        }
+        bytes = await file.readAsBytes();
+      }
+      
+      if (bytes.isEmpty) {
+        debugPrint('Image bytes is empty');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('图片数据为空'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
         return;
       }
       
-      final bytes = await file.readAsBytes();
-      final filename = image.name;
-      final mimeType = lookupMimeType(filename) ?? 'image/jpeg';
+      // 处理文件名 - iOS 相机拍照可能没有扩展名
+      String filename = image.name;
+      if (filename.isEmpty) {
+        filename = 'image_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      }
       
-      debugPrint('Sending image: $filename, size: ${bytes.length}, mimeType: $mimeType');
+      // 从路径获取扩展名（更可靠）
+      final pathExt = image.path.split('.').last.toLowerCase();
+      final hasExtInName = filename.contains('.');
+      
+      if (!hasExtInName && pathExt.isNotEmpty && pathExt.length <= 5) {
+        filename = '$filename.$pathExt';
+      }
+      
+      // 确保文件名有扩展名
+      if (!filename.toLowerCase().endsWith('.jpg') && 
+          !filename.toLowerCase().endsWith('.jpeg') &&
+          !filename.toLowerCase().endsWith('.png') &&
+          !filename.toLowerCase().endsWith('.gif') &&
+          !filename.toLowerCase().endsWith('.webp') &&
+          !filename.toLowerCase().endsWith('.heic') &&
+          !filename.toLowerCase().endsWith('.heif')) {
+        filename = '$filename.jpg';
+      }
+      
+      // 确定 MIME 类型
+      String mimeType = lookupMimeType(filename) ?? 
+                        lookupMimeType(image.path) ?? 
+                        'image/jpeg';
+      
+      // 特殊处理 HEIC/HEIF（iOS Live Photo）
+      if (mimeType.contains('heic') || mimeType.contains('heif')) {
+        mimeType = 'image/jpeg';
+        if (!filename.toLowerCase().endsWith('.jpg') && 
+            !filename.toLowerCase().endsWith('.jpeg')) {
+          filename = filename.replaceAll(RegExp(r'\.(heic|heif)$', caseSensitive: false), '.jpg');
+        }
+      }
+      
+      debugPrint('Final filename: $filename');
+      debugPrint('Final mimeType: $mimeType');
+      debugPrint('Image size: ${bytes.length} bytes');
+      debugPrint('=== Sending image to ChatBloc ===');
       
       context.read<ChatBloc>().add(SendImageMessage(
         imageBytes: bytes,
@@ -547,8 +680,9 @@ class _ChatPageState extends State<ChatPage> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('Send image error: $e');
+      debugPrint('Stack trace: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
