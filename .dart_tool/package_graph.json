@@ -321,6 +321,21 @@
       ]
     },
     {
+      "name": "record",
+      "version": "6.1.2",
+      "dependencies": [
+        "flutter",
+        "record_android",
+        "record_ios",
+        "record_linux",
+        "record_macos",
+        "record_platform_interface",
+        "record_web",
+        "record_windows",
+        "uuid"
+      ]
+    },
+    {
       "name": "audioplayers",
       "version": "5.2.1",
       "dependencies": [
@@ -1102,6 +1117,64 @@
       "dependencies": [
         "flutter",
         "permission_handler_platform_interface"
+      ]
+    },
+    {
+      "name": "record_macos",
+      "version": "1.1.2",
+      "dependencies": [
+        "flutter",
+        "record_platform_interface"
+      ]
+    },
+    {
+      "name": "record_ios",
+      "version": "1.1.5",
+      "dependencies": [
+        "flutter",
+        "record_platform_interface"
+      ]
+    },
+    {
+      "name": "record_android",
+      "version": "1.4.5",
+      "dependencies": [
+        "flutter",
+        "record_platform_interface"
+      ]
+    },
+    {
+      "name": "record_linux",
+      "version": "1.2.1",
+      "dependencies": [
+        "flutter",
+        "record_platform_interface"
+      ]
+    },
+    {
+      "name": "record_windows",
+      "version": "1.0.7",
+      "dependencies": [
+        "flutter",
+        "record_platform_interface"
+      ]
+    },
+    {
+      "name": "record_web",
+      "version": "1.2.2",
+      "dependencies": [
+        "flutter",
+        "flutter_web_plugins",
+        "record_platform_interface",
+        "web"
+      ]
+    },
+    {
+      "name": "record_platform_interface",
+      "version": "1.4.0",
+      "dependencies": [
+        "flutter",
+        "plugin_platform_interface"
       ]
     },
     {
@@ -1944,79 +2017,6 @@
         "ffi",
         "meta",
         "path"
-      ]
-    },
-    {
-      "name": "record",
-      "version": "6.1.2",
-      "dependencies": [
-        "flutter",
-        "record_android",
-        "record_ios",
-        "record_linux",
-        "record_macos",
-        "record_platform_interface",
-        "record_web",
-        "record_windows",
-        "uuid"
-      ]
-    },
-    {
-      "name": "record_windows",
-      "version": "1.0.7",
-      "dependencies": [
-        "flutter",
-        "record_platform_interface"
-      ]
-    },
-    {
-      "name": "record_web",
-      "version": "1.2.2",
-      "dependencies": [
-        "flutter",
-        "flutter_web_plugins",
-        "record_platform_interface",
-        "web"
-      ]
-    },
-    {
-      "name": "record_platform_interface",
-      "version": "1.4.0",
-      "dependencies": [
-        "flutter",
-        "plugin_platform_interface"
-      ]
-    },
-    {
-      "name": "record_macos",
-      "version": "1.1.2",
-      "dependencies": [
-        "flutter",
-        "record_platform_interface"
-      ]
-    },
-    {
-      "name": "record_linux",
-      "version": "1.2.1",
-      "dependencies": [
-        "flutter",
-        "record_platform_interface"
-      ]
-    },
-    {
-      "name": "record_android",
-      "version": "1.4.5",
-      "dependencies": [
-        "flutter",
-        "record_platform_interface"
-      ]
-    },
-    {
-      "name": "record_ios",
-      "version": "1.1.5",
-      "dependencies": [
-        "flutter",
-        "record_platform_interface"
       ]
     }
   ],

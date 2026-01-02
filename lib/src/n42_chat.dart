@@ -11,6 +11,7 @@ import 'presentation/blocs/auth/auth_event.dart';
 import 'presentation/blocs/auth/auth_state.dart';
 import 'presentation/blocs/conversation/conversation_bloc.dart';
 import 'presentation/pages/auth/login_page.dart';
+import 'presentation/pages/auth/register_page.dart';
 import 'presentation/pages/auth/welcome_page.dart';
 import 'presentation/pages/conversation/conversation_list_page.dart';
 
@@ -364,8 +365,14 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
   }
 
   void _navigateToRegister(BuildContext context) {
-    // 直接导航到登录页面，用户可以在登录页点击"注册"
-    _navigateToLogin(context);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: N42Chat.authBloc,
+          child: const RegisterPage(),
+        ),
+      ),
+    );
   }
 
   @override
