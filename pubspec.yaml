@@ -98,6 +98,12 @@ dependencies:
   pinyin: ^3.0.0
   azlistview: ^2.0.0
   qr_flutter: ^4.1.0
+  
+  # ============================================
+  # QR Code Scanner - 二维码扫描
+  # ============================================
+  # BSD-3-Clause License
+  mobile_scanner: ^5.1.1
 
 dev_dependencies:
   flutter_test:
