@@ -24,6 +24,9 @@ class AuthRepositoryImpl implements IAuthRepository {
   @override
   bool get isLoggedIn => _authDataSource.isLoggedIn;
 
+  // 缓存用户资料数据
+  Map<String, dynamic>? _cachedProfileData;
+  
   @override
   UserEntity? get currentUser {
     if (!isLoggedIn) return null;
@@ -34,10 +37,33 @@ class AuthRepositoryImpl implements IAuthRepository {
     final userId = client.userID;
     if (userId == null) return null;
 
+    // 获取头像 URL
+    String? avatarHttpUrl;
+    final avatarMxc = client.userID != null 
+        ? client.getRoomById(client.directChatRoomId ?? '')?.avatar?.toString()
+        : null;
+    
+    // 尝试从用户资料获取头像
+    try {
+      final ownProfile = client.ownProfile;
+      if (ownProfile.avatarUrl != null) {
+        avatarHttpUrl = _buildAvatarHttpUrl(ownProfile.avatarUrl.toString(), client);
+      }
+    } catch (e) {
+      debugPrint('AuthRepository: Error getting own profile: $e');
+    }
+    
+    // 从缓存的资料数据中获取额外字段
+    final profileData = _cachedProfileData ?? {};
+
     return UserEntity(
       userId: userId,
-      displayName: userId.localpart ?? '',
-      avatarUrl: null, // TODO: 获取头像
+      displayName: client.ownProfile.displayName ?? userId.localpart ?? '',
+      avatarUrl: avatarHttpUrl,
+      gender: profileData['gender'] as String?,
+      region: profileData['region'] as String?,
+      signature: profileData['signature'] as String?,
+      pokeText: profileData['pokeText'] as String?,
     );
   }
 
@@ -426,6 +452,71 @@ class AuthRepositoryImpl implements IAuthRepository {
     } catch (e) {
       debugPrint('AuthRepository: Update display name failed - $e');
       return false;
+    }
+  }
+
+  @override
+  Future<bool> updateUserProfileData({
+    String? gender,
+    String? region,
+    String? signature,
+    String? pokeText,
+  }) async {
+    if (!isLoggedIn) return false;
+
+    final client = _authDataSource.clientManager.client;
+    if (client == null) return false;
+
+    try {
+      // 获取现有数据
+      final existingData = await getUserProfileData() ?? {};
+      
+      // 合并新数据
+      final newData = Map<String, dynamic>.from(existingData);
+      if (gender != null) newData['gender'] = gender;
+      if (region != null) newData['region'] = region;
+      if (signature != null) newData['signature'] = signature;
+      if (pokeText != null) newData['pokeText'] = pokeText;
+      
+      // 保存到 Matrix 账户数据
+      await client.setAccountData(
+        client.userID!,
+        'n42.user.profile',
+        newData,
+      );
+      
+      // 更新缓存
+      _cachedProfileData = newData;
+      
+      debugPrint('AuthRepository: Profile data updated: $newData');
+      return true;
+    } catch (e) {
+      debugPrint('AuthRepository: Update profile data failed - $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getUserProfileData() async {
+    if (!isLoggedIn) return null;
+
+    final client = _authDataSource.clientManager.client;
+    if (client == null) return null;
+
+    try {
+      final data = await client.getAccountData(
+        client.userID!,
+        'n42.user.profile',
+      );
+      
+      if (data is Map<String, dynamic>) {
+        _cachedProfileData = data;
+        return data;
+      }
+      return null;
+    } catch (e) {
+      debugPrint('AuthRepository: Get profile data failed - $e');
+      return null;
     }
   }
 
