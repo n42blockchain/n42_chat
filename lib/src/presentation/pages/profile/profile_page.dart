@@ -8,6 +8,7 @@ import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../favorite/favorite_list_page.dart';
 import '../qrcode/my_qrcode_page.dart';
 import '../settings/settings_page.dart';
 import 'profile_edit_page.dart';
@@ -120,7 +121,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 icon: Icons.star_rounded,
                 iconColor: const Color(0xFFFF9500),
                 title: '收藏',
-                onTap: () => _showComingSoon(context, '收藏'),
+                onTap: () => _openFavorites(context),
               ),
               _buildDivider(context),
               _buildMenuItem(
@@ -388,6 +389,12 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _openFavorites(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const FavoriteListPage()),
     );
   }
 

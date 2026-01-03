@@ -412,6 +412,27 @@ class MessageRepositoryImpl implements IMessageRepository {
       rethrow;
     }
   }
+  
+  @override
+  Future<String?> sendCustomMessage(
+    String roomId, {
+    required String msgType,
+    required String content,
+    Map<String, dynamic>? additionalData,
+  }) async {
+    try {
+      debugPrint('MessageRepositoryImpl: Sending custom message - type: $msgType');
+      return await _messageDataSource.sendCustomMessage(
+        roomId,
+        msgType: msgType,
+        content: content,
+        additionalData: additionalData,
+      );
+    } catch (e) {
+      debugPrint('MessageRepositoryImpl: Failed to send custom message: $e');
+      rethrow;
+    }
+  }
 
   // ============================================
   // 辅助方法

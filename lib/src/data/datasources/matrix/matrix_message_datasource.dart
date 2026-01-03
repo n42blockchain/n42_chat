@@ -1182,6 +1182,39 @@ class MatrixMessageDataSource {
       return false;
     }
   }
+  
+  /// 发送自定义消息（红包、转账等）
+  Future<String?> sendCustomMessage(
+    String roomId, {
+    required String msgType,
+    required String content,
+    Map<String, dynamic>? additionalData,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      return null;
+    }
+
+    try {
+      debugPrint('MatrixMessageDataSource: Sending custom message - type: $msgType');
+      
+      // 构建自定义消息内容
+      final messageContent = <String, dynamic>{
+        'msgtype': msgType,
+        'body': content,
+        ...?additionalData,
+      };
+
+      final eventId = await room.sendEvent(messageContent);
+      
+      debugPrint('MatrixMessageDataSource: Custom message sent - eventId: $eventId');
+      return eventId;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to send custom message: $e');
+      return null;
+    }
+  }
 
   // ============================================
   // 消息监听

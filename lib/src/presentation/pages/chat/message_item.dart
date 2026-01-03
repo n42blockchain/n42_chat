@@ -241,6 +241,9 @@ class MessageItem extends StatelessWidget {
       case MessageType.transfer:
         content = _buildTransferMessage();
         break;
+      case MessageType.redPacket:
+        content = _buildRedPacketMessage();
+        break;
       case MessageType.poll:
         content = _buildPollMessage(isDark);
         break;
@@ -643,6 +646,33 @@ class MessageItem extends StatelessWidget {
       currency: currency,
       status: transferStatus,
       note: message.content,
+      isSelf: message.isFromMe,
+      onTap: onTap,
+    );
+  }
+  
+  Widget _buildRedPacketMessage() {
+    final metadata = message.metadata;
+    final status = metadata?.transferStatus ?? 'pending';
+    
+    RedPacketStatus redPacketStatus;
+    switch (status) {
+      case 'opened':
+        redPacketStatus = RedPacketStatus.opened;
+        break;
+      case 'expired':
+        redPacketStatus = RedPacketStatus.expired;
+        break;
+      case 'empty':
+        redPacketStatus = RedPacketStatus.empty;
+        break;
+      default:
+        redPacketStatus = RedPacketStatus.pending;
+    }
+    
+    return RedPacketMessageWidget(
+      note: message.content.isNotEmpty ? message.content : '恭喜发财，大吉大利',
+      status: redPacketStatus,
       isSelf: message.isFromMe,
       onTap: onTap,
     );
