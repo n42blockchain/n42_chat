@@ -37,6 +37,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../blocs/search/search_bloc.dart';
 import '../../widgets/chat/chat_widgets.dart';
+import '../../widgets/chat/red_packet_dialogs.dart';
 import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../search/chat_search_bar.dart';
@@ -1357,15 +1358,76 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _sendRedPacket() {
-    // TODO: 实现发红包功能
-    debugPrint('Send red packet');
-    _showFeatureToast('红包');
+    showDialog(
+      context: context,
+      builder: (context) => SendRedPacketDialog(
+        receiverName: widget.conversation.name,
+        isGroup: widget.conversation.isGroup,
+        memberCount: widget.conversation.memberCount ?? 1,
+        onSend: (amount, token, greeting, count, isLucky) {
+          _doSendRedPacket(amount, token, greeting, count, isLucky);
+        },
+      ),
+    );
+  }
+  
+  void _doSendRedPacket(String amount, String token, String greeting, int count, bool isLucky) {
+    // 发送红包消息
+    final metadata = MessageMetadata(
+      amount: amount,
+      token: token,
+      transferStatus: 'pending',
+    );
+    
+    context.read<ChatBloc>().add(SendCustomMessage(
+      content: greeting,
+      type: MessageType.redPacket,
+      metadata: metadata,
+    ));
+    
+    // 显示发送成功提示
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('已发送 $amount $token 红包'),
+        backgroundColor: const Color(0xFFE64340),
+      ),
+    );
   }
 
   void _sendTransfer() {
-    // TODO: 实现转账功能
-    debugPrint('Send transfer');
-    _showFeatureToast('转账');
+    showDialog(
+      context: context,
+      builder: (context) => SendTransferDialog(
+        receiverName: widget.conversation.name,
+        receiverAvatar: widget.conversation.avatarUrl,
+        onSend: (amount, token, memo) {
+          _doSendTransfer(amount, token, memo);
+        },
+      ),
+    );
+  }
+  
+  void _doSendTransfer(String amount, String token, String? memo) {
+    // 发送转账消息
+    final metadata = MessageMetadata(
+      amount: amount,
+      token: token,
+      transferStatus: 'pending',
+    );
+    
+    context.read<ChatBloc>().add(SendCustomMessage(
+      content: memo ?? '转账',
+      type: MessageType.transfer,
+      metadata: metadata,
+    ));
+    
+    // 显示发送成功提示
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('已发送 $amount $token 转账'),
+        backgroundColor: AppColors.primary,
+      ),
+    );
   }
 
   Future<void> _pickFile() async {

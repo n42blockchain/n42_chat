@@ -140,5 +140,13 @@ abstract class IMessageRepository {
     required String pollEventId,
     required List<String> selectedOptionIds,
   });
+  
+  /// 发送自定义消息（红包、转账等）
+  Future<String?> sendCustomMessage(
+    String roomId, {
+    required String msgType,
+    required String content,
+    Map<String, dynamic>? additionalData,
+  });
 }
 

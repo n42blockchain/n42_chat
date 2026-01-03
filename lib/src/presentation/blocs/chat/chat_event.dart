@@ -314,3 +314,19 @@ class VoteOnPoll extends ChatEvent {
   List<Object?> get props => [pollEventId, selectedOptionIds];
 }
 
+/// 发送自定义消息（红包、转账等）
+class SendCustomMessage extends ChatEvent {
+  final String content;
+  final MessageType type;
+  final MessageMetadata? metadata;
+
+  const SendCustomMessage({
+    required this.content,
+    required this.type,
+    this.metadata,
+  });
+
+  @override
+  List<Object?> get props => [content, type, metadata];
+}
+
