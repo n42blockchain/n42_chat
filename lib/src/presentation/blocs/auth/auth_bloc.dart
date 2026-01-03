@@ -79,6 +79,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         status: AuthStatus.authenticated,
         user: result.user,
       ));
+      // 登录成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
+      add(const LoadUserProfileData());
     } else {
       emit(state.copyWith(
         status: AuthStatus.error,
@@ -125,6 +127,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         status: AuthStatus.authenticated,
         user: result.user,
       ));
+      // 注册成功后自动加载完整用户资料
+      add(const LoadUserProfileData());
     } else {
       emit(state.copyWith(
         status: AuthStatus.error,
@@ -173,6 +177,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         status: AuthStatus.authenticated,
         user: result.user,
       ));
+      // 恢复会话成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
+      add(const LoadUserProfileData());
     } else {
       emit(state.copyWith(
         status: AuthStatus.unauthenticated,
