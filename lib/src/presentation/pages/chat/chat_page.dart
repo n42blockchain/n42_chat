@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chewie/chewie.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +10,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
 
 import 'package:flutter/services.dart';
+
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
@@ -157,8 +162,126 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _onMessageTap(MessageEntity message) {
-    // 处理消息点击（如查看图片、播放语音等）
-    // TODO: 实现具体的消息点击处理
+    // 处理消息点击（如查看图片、播放视频、播放语音等）
+    switch (message.type) {
+      case MessageType.image:
+        _viewImage(message);
+        break;
+      case MessageType.video:
+        _playVideo(message);
+        break;
+      case MessageType.audio:
+        // 语音消息在 MessageItem 内部处理
+        break;
+      case MessageType.file:
+        _openFile(message);
+        break;
+      case MessageType.location:
+        _viewLocation(message);
+        break;
+      default:
+        break;
+    }
+  }
+  
+  /// 查看图片
+  void _viewImage(MessageEntity message) {
+    final imageUrl = message.metadata?.httpUrl ?? message.content;
+    if (imageUrl.isEmpty) return;
+    
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _ImageViewerPage(
+          imageUrl: imageUrl,
+          heroTag: message.id,
+        ),
+      ),
+    );
+  }
+  
+  /// 播放视频
+  void _playVideo(MessageEntity message) {
+    final videoUrl = message.metadata?.httpUrl ?? message.content;
+    if (videoUrl.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('视频地址无效'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _VideoPlayerPage(
+          videoUrl: videoUrl,
+          thumbnailUrl: message.metadata?.thumbnailUrl,
+        ),
+      ),
+    );
+  }
+  
+  /// 打开文件
+  void _openFile(MessageEntity message) {
+    final fileUrl = message.metadata?.httpUrl ?? message.content;
+    final fileName = message.metadata?.fileName ?? '未知文件';
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('下载文件: $fileName'),
+        action: SnackBarAction(
+          label: '下载',
+          onPressed: () {
+            // TODO: 实现文件下载
+            debugPrint('Download file: $fileUrl');
+          },
+        ),
+      ),
+    );
+  }
+  
+  /// 查看位置
+  void _viewLocation(MessageEntity message) {
+    final metadata = message.metadata;
+    final lat = metadata?.latitude;
+    final lng = metadata?.longitude;
+    
+    if (lat == null || lng == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('位置信息无效'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
+    // 显示位置信息
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('位置'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('地址: ${message.content}'),
+            const SizedBox(height: 8),
+            Text('纬度: $lat'),
+            Text('经度: $lng'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('关闭'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _onAvatarTap(MessageEntity message) {
@@ -4975,6 +5098,204 @@ class _MultiForwardSheetState extends State<_MultiForwardSheet> {
     if (name.isEmpty) return colors[0];
     final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
     return colors[index];
+  }
+}
+
+/// 图片查看器页面
+class _ImageViewerPage extends StatelessWidget {
+  final String imageUrl;
+  final String heroTag;
+
+  const _ImageViewerPage({
+    required this.imageUrl,
+    required this.heroTag,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+      ),
+      body: Center(
+        child: InteractiveViewer(
+          minScale: 0.5,
+          maxScale: 4.0,
+          child: Hero(
+            tag: heroTag,
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.contain,
+              placeholder: (context, url) => const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+              errorWidget: (context, url, error) => const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error, color: Colors.red, size: 48),
+                  SizedBox(height: 16),
+                  Text('图片加载失败', style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 视频播放器页面
+class _VideoPlayerPage extends StatefulWidget {
+  final String videoUrl;
+  final String? thumbnailUrl;
+
+  const _VideoPlayerPage({
+    required this.videoUrl,
+    this.thumbnailUrl,
+  });
+
+  @override
+  State<_VideoPlayerPage> createState() => _VideoPlayerPageState();
+}
+
+class _VideoPlayerPageState extends State<_VideoPlayerPage> {
+  late VideoPlayerController _controller;
+  ChewieController? _chewieController;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializePlayer();
+  }
+
+  Future<void> _initializePlayer() async {
+    try {
+      debugPrint('Initializing video player with URL: ${widget.videoUrl}');
+      
+      // 获取 access token
+      String? accessToken;
+      try {
+        final matrixManager = getIt<MatrixClientManager>();
+        accessToken = matrixManager.client?.accessToken;
+      } catch (e) {
+        debugPrint('Failed to get access token: $e');
+      }
+      
+      // 创建视频控制器
+      _controller = VideoPlayerController.networkUrl(
+        Uri.parse(widget.videoUrl),
+        httpHeaders: accessToken != null
+            ? {'Authorization': 'Bearer $accessToken'}
+            : {},
+      );
+      
+      await _controller.initialize();
+      
+      _chewieController = ChewieController(
+        videoPlayerController: _controller,
+        autoPlay: true,
+        looping: false,
+        aspectRatio: _controller.value.aspectRatio,
+        placeholder: widget.thumbnailUrl != null
+            ? CachedNetworkImage(
+                imageUrl: widget.thumbnailUrl!,
+                fit: BoxFit.cover,
+              )
+            : Container(color: Colors.black),
+        errorBuilder: (context, errorMessage) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error, color: Colors.red, size: 48),
+              const SizedBox(height: 16),
+              Text(
+                '视频播放失败\n$errorMessage',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+      );
+      
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Video player error: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _error = e.toString();
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _chewieController?.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('视频', style: TextStyle(color: Colors.white)),
+        elevation: 0,
+      ),
+      body: Center(
+        child: _isLoading
+            ? const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: Colors.white),
+                  SizedBox(height: 16),
+                  Text('加载中...', style: TextStyle(color: Colors.white)),
+                ],
+              )
+            : _error != null
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error, color: Colors.red, size: 48),
+                      const SizedBox(height: 16),
+                      Text(
+                        '视频加载失败\n$_error',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _isLoading = true;
+                            _error = null;
+                          });
+                          _initializePlayer();
+                        },
+                        child: const Text('重试'),
+                      ),
+                    ],
+                  )
+                : _chewieController != null
+                    ? Chewie(controller: _chewieController!)
+                    : const Text('播放器初始化失败', style: TextStyle(color: Colors.white)),
+      ),
+    );
   }
 }
 
