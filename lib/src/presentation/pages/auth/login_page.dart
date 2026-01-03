@@ -1,11 +1,16 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../services/auth/auth_methods_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import 'register_page.dart';
+import 'email_otp_page.dart';
 
 /// 登录页面
 ///
@@ -459,50 +464,372 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildOtherOptions() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: [
-        TextButton(
-          onPressed: () {
-            // 先获取 AuthBloc 引用，避免在 builder 中使用错误的 context
-            final authBloc = context.read<AuthBloc>();
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => BlocProvider.value(
-                  value: authBloc,
-                  child: const RegisterPage(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () {
+                final authBloc = context.read<AuthBloc>();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider.value(
+                      value: authBloc,
+                      child: const RegisterPage(),
+                    ),
+                  ),
+                );
+              },
+              child: const Text(
+                '注册账号',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textLink,
                 ),
               ),
-            );
-          },
-          child: const Text(
-            '注册账号',
+            ),
+            const Text(
+              '|',
+              style: TextStyle(
+                color: AppColors.textTertiary,
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // 跳转到邮箱验证码登录
+                final authBloc = context.read<AuthBloc>();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider.value(
+                      value: authBloc,
+                      child: EmailOtpPage(
+                        homeserver: _homeserverController.text.trim(),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              child: const Text(
+                '忘记密码',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textLink,
+                ),
+              ),
+            ),
+          ],
+        ),
+        
+        const SizedBox(height: 32),
+        
+        // 分隔线
+        _buildDivider(),
+        
+        const SizedBox(height: 24),
+        
+        // 其他登录方式
+        _buildAlternativeLoginMethods(),
+      ],
+    );
+  }
+  
+  Widget _buildDivider() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dividerColor = isDark ? Colors.white24 : Colors.black12;
+    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
+    return Row(
+      children: [
+        Expanded(child: Divider(color: dividerColor)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            '其他登录方式',
             style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textLink,
+              fontSize: 12,
+              color: textColor,
             ),
           ),
         ),
-        const Text(
-          '|',
-          style: TextStyle(
-            color: AppColors.textTertiary,
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            // TODO: 忘记密码
-          },
-          child: const Text(
-            '忘记密码',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textLink,
+        Expanded(child: Divider(color: dividerColor)),
+      ],
+    );
+  }
+  
+  Widget _buildAlternativeLoginMethods() {
+    return Column(
+      children: [
+        // 第一行：Passkey 和 邮箱验证码
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildLoginMethodButton(
+              icon: Icons.fingerprint,
+              label: 'Passkey',
+              onTap: _loginWithPasskey,
             ),
-          ),
+            const SizedBox(width: 32),
+            _buildLoginMethodButton(
+              icon: Icons.email_outlined,
+              label: '邮箱验证码',
+              onTap: _loginWithEmailOtp,
+            ),
+          ],
+        ),
+        
+        const SizedBox(height: 20),
+        
+        // 第二行：第三方登录
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildSocialLoginButton(
+              iconPath: null,
+              icon: Icons.g_mobiledata,
+              color: const Color(0xFFDB4437),
+              label: 'Google',
+              onTap: _loginWithGoogle,
+            ),
+            const SizedBox(width: 24),
+            if (!kIsWeb && (Platform.isIOS || Platform.isMacOS))
+              _buildSocialLoginButton(
+                iconPath: null,
+                icon: Icons.apple,
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? Colors.white 
+                    : Colors.black,
+                label: 'Apple',
+                onTap: _loginWithApple,
+              ),
+            if (!kIsWeb && (Platform.isIOS || Platform.isMacOS))
+              const SizedBox(width: 24),
+            _buildSocialLoginButton(
+              iconPath: null,
+              icon: Icons.login,
+              color: AppColors.primary,
+              label: 'SSO',
+              onTap: _loginWithSso,
+            ),
+          ],
         ),
       ],
     );
+  }
+  
+  Widget _buildLoginMethodButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? AppColors.surfaceDark : Colors.grey[100];
+    final iconColor = isDark ? Colors.white70 : Colors.black54;
+    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: iconColor, size: 22),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: textColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildSocialLoginButton({
+    String? iconPath,
+    IconData? icon,
+    required Color color,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final borderColor = isDark ? Colors.white12 : Colors.black12;
+    
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null)
+              Icon(icon, color: color, size: 28),
+            // const SizedBox(height: 2),
+            // Text(
+            //   label,
+            //   style: TextStyle(
+            //     fontSize: 10,
+            //     color: isDark ? Colors.white54 : Colors.black45,
+            //   ),
+            // ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  // ============================================
+  // 登录方法
+  // ============================================
+  
+  void _loginWithPasskey() async {
+    final homeserver = _homeserverController.text.trim();
+    if (homeserver.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('请先输入服务器地址'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+    
+    // TODO: 实现真正的 Passkey 登录
+    // 目前显示提示
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Passkey 登录需要服务端支持'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+    
+    // context.read<AuthBloc>().add(AuthPasskeyLoginRequested(homeserver: homeserver));
+  }
+  
+  void _loginWithEmailOtp() {
+    final authBloc = context.read<AuthBloc>();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: authBloc,
+          child: EmailOtpPage(
+            homeserver: _homeserverController.text.trim(),
+          ),
+        ),
+      ),
+    );
+  }
+  
+  void _loginWithGoogle() async {
+    final homeserver = _homeserverController.text.trim();
+    if (homeserver.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('请先输入服务器地址'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+    
+    try {
+      final authService = AuthMethodsService();
+      final result = await authService.signInWithGoogle();
+      
+      if (result != null && mounted) {
+        // 使用 Google 登录结果进行 Matrix SSO
+        debugPrint('Google login success: ${result.email}');
+        
+        // TODO: 将 Google token 发送到 Matrix 服务器进行验证
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Google 登录成功: ${result.email}'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Google 登录失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+  
+  void _loginWithApple() async {
+    final homeserver = _homeserverController.text.trim();
+    if (homeserver.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('请先输入服务器地址'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+    
+    try {
+      final authService = AuthMethodsService();
+      final result = await authService.signInWithApple();
+      
+      if (result != null && mounted) {
+        debugPrint('Apple login success');
+        
+        // TODO: 将 Apple token 发送到 Matrix 服务器进行验证
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Apple 登录成功'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Apple 登录失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+  
+  void _loginWithSso() async {
+    final homeserver = _homeserverController.text.trim();
+    if (homeserver.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('请先输入服务器地址'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+    
+    context.read<AuthBloc>().add(AuthSsoLoginRequested(homeserver: homeserver));
   }
 
   Widget _buildAgreement(bool isDark) {
