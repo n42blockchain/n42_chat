@@ -202,25 +202,12 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 头像 - 圆角矩形
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.grey[800] : Colors.grey[300],
-                    ),
-                    child: _avatarUrl != null && _avatarUrl!.isNotEmpty
-                        ? Image.network(
-                            _avatarUrl!,
-                            width: 64,
-                            height: 64,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _buildDefaultAvatar(isDark),
-                          )
-                        : _buildDefaultAvatar(isDark),
-                  ),
+                // 头像 - 使用 N42Avatar 组件
+                N42Avatar(
+                  imageUrl: _avatarUrl,
+                  name: _displayName,
+                  size: 64,
+                  borderRadius: 6,
                 ),
                 const SizedBox(width: 16),
                 // 用户信息
@@ -309,24 +296,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDefaultAvatar(bool isDark) {
-    return Container(
-      width: 64,
-      height: 64,
-      color: isDark ? Colors.grey[700] : Colors.grey[400],
-      child: Center(
-        child: Text(
-          (_displayName ?? 'U').substring(0, 1).toUpperCase(),
-          style: const TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
           ),
         ),
       ),
