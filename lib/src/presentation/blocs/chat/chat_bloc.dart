@@ -48,6 +48,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendPokeMessage>(_onSendPokeMessage);
     on<SendPollMessage>(_onSendPollMessage);
     on<VoteOnPoll>(_onVoteOnPoll);
+    on<SendCustomMessage>(_onSendCustomMessage);
   }
 
   @override
@@ -811,6 +812,107 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       debugPrint('ChatBloc: Failed to vote: $e');
       if (!isClosed) {
         emit(state.copyWith(error: '投票失败'));
+      }
+    }
+  }
+  
+  /// 发送自定义消息（红包、转账等）
+  Future<void> _onSendCustomMessage(
+    SendCustomMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+    
+    try {
+      debugPrint('ChatBloc: Sending custom message - type: ${event.type}, content: ${event.content}');
+      
+      // 创建临时消息（用于乐观更新）
+      final tempMessage = MessageEntity(
+        id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
+        roomId: _currentRoomId!,
+        senderId: _authRepository.currentUser?.userId ?? '',
+        senderName: _authRepository.currentUser?.displayName ?? 'Me',
+        content: event.content,
+        type: event.type,
+        timestamp: DateTime.now(),
+        status: MessageStatus.sending,
+        isFromMe: true,
+        metadata: event.metadata,
+      );
+      
+      // 乐观更新 UI
+      if (!isClosed) {
+        emit(state.copyWith(
+          messages: [tempMessage, ...state.messages],
+        ));
+      }
+      
+      // 根据消息类型发送
+      String? eventId;
+      
+      if (event.type == MessageType.redPacket) {
+        // 发送红包消息（使用自定义消息类型）
+        eventId = await _messageRepository.sendCustomMessage(
+          _currentRoomId!,
+          msgType: 'n42.red_packet',
+          content: event.content,
+          additionalData: {
+            'amount': event.metadata?.amount ?? '0',
+            'token': event.metadata?.token ?? 'ETH',
+            'status': 'pending',
+          },
+        );
+      } else if (event.type == MessageType.transfer) {
+        // 发送转账消息
+        eventId = await _messageRepository.sendCustomMessage(
+          _currentRoomId!,
+          msgType: 'n42.transfer',
+          content: event.content,
+          additionalData: {
+            'amount': event.metadata?.amount ?? '0',
+            'token': event.metadata?.token ?? 'ETH',
+            'status': 'pending',
+          },
+        );
+      }
+      
+      if (eventId != null) {
+        debugPrint('ChatBloc: Custom message sent - eventId: $eventId');
+        
+        // 更新消息状态为已发送
+        if (!isClosed) {
+          final updatedMessages = state.messages.map((msg) {
+            if (msg.id == tempMessage.id) {
+              return msg.copyWith(
+                id: eventId,
+                status: MessageStatus.sent,
+              );
+            }
+            return msg;
+          }).toList();
+          
+          emit(state.copyWith(messages: updatedMessages));
+        }
+      } else {
+        // 发送失败，更新状态
+        if (!isClosed) {
+          final updatedMessages = state.messages.map((msg) {
+            if (msg.id == tempMessage.id) {
+              return msg.copyWith(status: MessageStatus.failed);
+            }
+            return msg;
+          }).toList();
+          
+          emit(state.copyWith(
+            messages: updatedMessages,
+            error: '发送失败',
+          ));
+        }
+      }
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to send custom message: $e');
+      if (!isClosed) {
+        emit(state.copyWith(error: '发送失败: $e'));
       }
     }
   }
