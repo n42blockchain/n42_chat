@@ -158,7 +158,26 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final filteredMessages = event.messages
         .where((m) => !_locallyDeletedMessageIds.contains(m.id))
         .toList();
-    emit(state.copyWith(messages: filteredMessages));
+    
+    // 保留本地添加的 reactions（服务器聚合可能需要时间）
+    final currentMessages = state.messages;
+    final mergedMessages = filteredMessages.map((newMsg) {
+      // 查找当前状态中的同一消息
+      final currentMsg = currentMessages.firstWhere(
+        (m) => m.id == newMsg.id,
+        orElse: () => newMsg,
+      );
+      
+      // 如果当前消息有 reactions 但新消息没有，保留当前的 reactions
+      if (currentMsg.reactions.isNotEmpty && newMsg.reactions.isEmpty) {
+        return newMsg.copyWith(reactions: currentMsg.reactions);
+      }
+      
+      // 如果新消息有更多 reactions，使用新消息的（服务器聚合完成）
+      return newMsg;
+    }).toList();
+    
+    emit(state.copyWith(messages: mergedMessages));
   }
 
   /// 发送文本消息
