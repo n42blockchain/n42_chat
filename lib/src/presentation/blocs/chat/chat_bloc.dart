@@ -435,12 +435,72 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (_currentRoomId == null) return;
 
     try {
+      // 先立即更新本地UI，显示表情回应
+      final currentUserId = await _messageRepository.getCurrentUserId();
+      final updatedMessages = state.messages.map((msg) {
+        if (msg.id == event.messageId) {
+          // 查找是否已有该表情的回应
+          final existingReactionIndex = msg.reactions.indexWhere(
+            (r) => r.key == event.emoji,
+          );
+          
+          List<MessageReaction> newReactions;
+          if (existingReactionIndex >= 0) {
+            // 已有该表情，增加计数
+            final existingReaction = msg.reactions[existingReactionIndex];
+            if (existingReaction.userIds.contains(currentUserId)) {
+              // 用户已经回应过，移除回应
+              final newUserIds = existingReaction.userIds
+                  .where((id) => id != currentUserId)
+                  .toList();
+              if (newUserIds.isEmpty) {
+                // 没有人回应了，移除整个表情
+                newReactions = [...msg.reactions]..removeAt(existingReactionIndex);
+              } else {
+                newReactions = [...msg.reactions];
+                newReactions[existingReactionIndex] = MessageReaction(
+                  key: existingReaction.key,
+                  userIds: newUserIds,
+                  isMe: false,
+                );
+              }
+            } else {
+              // 用户没有回应过，添加回应
+              newReactions = [...msg.reactions];
+              newReactions[existingReactionIndex] = MessageReaction(
+                key: existingReaction.key,
+                userIds: [...existingReaction.userIds, currentUserId ?? 'me'],
+                isMe: true,
+              );
+            }
+          } else {
+            // 新的表情回应
+            newReactions = [
+              ...msg.reactions,
+              MessageReaction(
+                key: event.emoji,
+                userIds: [currentUserId ?? 'me'],
+                isMe: true,
+              ),
+            ];
+          }
+          
+          return msg.copyWith(reactions: newReactions);
+        }
+        return msg;
+      }).toList();
+      
+      emit(state.copyWith(messages: updatedMessages));
+      
+      // 发送到服务器
       await _messageRepository.addReaction(
         _currentRoomId!,
         event.messageId,
         event.emoji,
       );
+      debugPrint('ChatBloc: Reaction $event.emoji added to message ${event.messageId}');
     } catch (e) {
+      debugPrint('ChatBloc: Failed to add reaction: $e');
       emit(state.copyWith(error: '添加回应失败'));
     }
   }
