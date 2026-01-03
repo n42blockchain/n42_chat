@@ -29,7 +29,8 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
-  bool _rememberMe = true;
+  // 微信策略：同一设备登录一次后自动保持登录状态，无需用户选择
+  // 登出时才会清除登录凭据
 
   @override
   void dispose() {
@@ -41,11 +42,12 @@ class _LoginPageState extends State<LoginPage> {
 
   void _onLogin() {
     if (_formKey.currentState?.validate() ?? false) {
+      // 微信策略：始终保持登录状态
       context.read<AuthBloc>().add(AuthLoginRequested(
             homeserver: _homeserverController.text.trim(),
             username: _usernameController.text.trim(),
             password: _passwordController.text,
-            rememberMe: _rememberMe,
+            rememberMe: true, // 始终记住登录
           ));
     }
   }
@@ -127,12 +129,9 @@ class _LoginPageState extends State<LoginPage> {
                   // 密码输入
                   _buildPasswordInput(isDarkMode),
 
-                  const SizedBox(height: 16),
-
-                  // 记住登录
-                  _buildRememberMe(isDarkMode),
-
                   const SizedBox(height: 32),
+                  
+                  // 微信策略：移除"记住登录"复选框，默认始终保持登录
 
                   // 登录按钮
                   _buildLoginButton(state),
@@ -385,47 +384,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildRememberMe(bool isDark) {
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
-    return Row(
-      children: [
-        SizedBox(
-          width: 24,
-          height: 24,
-          child: Checkbox(
-            value: _rememberMe,
-            onChanged: (value) {
-              setState(() {
-                _rememberMe = value ?? true;
-              });
-            },
-            activeColor: AppColors.primary,
-            checkColor: Colors.white,
-            side: BorderSide(color: textColor),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              _rememberMe = !_rememberMe;
-            });
-          },
-          child: Text(
-            '记住登录状态',
-            style: TextStyle(
-              fontSize: 14,
-              color: textColor,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  // _buildRememberMe 已移除 - 微信策略默认始终保持登录
 
   Widget _buildLoginButton(AuthState state) {
     final isEnabled = !state.isLoading;
