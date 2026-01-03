@@ -176,20 +176,19 @@ class ConversationRepositoryImpl implements IConversationRepository {
   }
   
   /// 获取群成员头像和名称列表（最多9个，用于九宫格头像）
+  /// 参照微信：包含自己，按加入顺序排列
   (List<String?>, List<String>) _getGroupMemberInfo(matrix.Room room) {
     final client = room.client;
     
     final avatarUrls = <String?>[];
     final names = <String>[];
     
-    // 获取已加入的成员（排除自己，最多取9个）
+    // 获取已加入的成员（包括自己，最多取9个）
     final participants = room.getParticipants();
-    final currentUserId = client.userID;
     
     int count = 0;
     for (final member in participants) {
       if (count >= 9) break;
-      if (member.id == currentUserId) continue; // 跳过自己
       if (member.membership != matrix.Membership.join) continue; // 只取已加入的成员
       
       // 获取头像 URL
@@ -207,23 +206,6 @@ class ConversationRepositoryImpl implements IConversationRepository {
       avatarUrls.add(httpUrl);
       names.add(member.displayName ?? member.id.localpart ?? '');
       count++;
-    }
-    
-    // 如果成员不足，可能需要把自己也加入
-    if (count == 0 && currentUserId != null) {
-      final ownProfile = room.unsafeGetUserFromMemoryOrFallback(currentUserId);
-      final mxcUri = ownProfile.avatarUrl;
-      String? httpUrl;
-      if (mxcUri != null) {
-        httpUrl = MatrixUtils.mxcToHttp(
-          mxcUri.toString(),
-          client: client,
-          width: 64,
-          height: 64,
-        );
-      }
-      avatarUrls.add(httpUrl);
-      names.add(ownProfile.displayName ?? currentUserId.localpart ?? '');
     }
     
     return (avatarUrls, names);

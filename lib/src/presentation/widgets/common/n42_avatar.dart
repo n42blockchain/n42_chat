@@ -267,7 +267,7 @@ class N42GroupAvatar extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: backgroundColor ?? const Color(0xFFE0E0E0), // 微信灰色背景
+          color: backgroundColor ?? const Color(0xFFCCCCCC), // 微信灰色背景
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         clipBehavior: Clip.antiAlias,
@@ -289,8 +289,8 @@ class N42GroupAvatar extends StatelessWidget {
     // 计算每个头像的列数（取最大行的列数）
     final maxCols = layout.reduce((a, b) => a > b ? a : b);
     
-    // 间距和内边距
-    const double gap = 2.0;
+    // 间距和内边距（微信风格：紧凑）
+    const double gap = 1.5;
     const double padding = 2.0;
     
     // 计算每个头像的尺寸（基于最大列数）
@@ -304,63 +304,77 @@ class N42GroupAvatar extends StatelessWidget {
     
     int avatarIndex = 0;
     
-    return Padding(
+    // 构建行列表
+    final rows = <Widget>[];
+    
+    for (int rowIdx = 0; rowIdx < rowCount; rowIdx++) {
+      final itemsInRow = layout[rowIdx];
+      // 计算该行的宽度
+      final rowWidth = itemsInRow * itemSize + (itemsInRow - 1) * gap;
+      // 水平居中偏移
+      final horizontalOffset = (availableSize - rowWidth) / 2;
+      
+      final rowChildren = <Widget>[];
+      
+      for (int colIdx = 0; colIdx < itemsInRow; colIdx++) {
+        if (avatarIndex >= count) break;
+        
+        final avatarUrl = avatarIndex < memberAvatars.length 
+            ? memberAvatars[avatarIndex] 
+            : null;
+        final name = memberNames != null && avatarIndex < memberNames!.length
+            ? memberNames![avatarIndex]
+            : null;
+        
+        if (colIdx > 0) {
+          rowChildren.add(SizedBox(width: gap));
+        }
+        
+        rowChildren.add(
+          ClipRRect(
+            borderRadius: BorderRadius.circular(1),
+            child: SizedBox(
+              width: itemSize,
+              height: itemSize,
+              child: N42Avatar(
+                imageUrl: avatarUrl,
+                name: name,
+                size: itemSize,
+                borderRadius: 1,
+              ),
+            ),
+          ),
+        );
+        
+        avatarIndex++;
+      }
+      
+      if (rowIdx > 0) {
+        rows.add(SizedBox(height: gap));
+      }
+      
+      rows.add(
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (horizontalOffset > 0) SizedBox(width: horizontalOffset),
+            ...rowChildren,
+            if (horizontalOffset > 0) SizedBox(width: horizontalOffset),
+          ],
+        ),
+      );
+    }
+    
+    return Container(
       padding: const EdgeInsets.all(padding),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (verticalOffset > 0) SizedBox(height: verticalOffset),
-          ...List.generate(rowCount, (rowIdx) {
-            final itemsInRow = layout[rowIdx];
-            // 计算该行的宽度
-            final rowWidth = itemsInRow * itemSize + (itemsInRow - 1) * gap;
-            // 水平居中偏移
-            final horizontalOffset = (availableSize - rowWidth) / 2;
-            
-            final rowWidget = Padding(
-              padding: EdgeInsets.only(top: rowIdx > 0 ? gap : 0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (horizontalOffset > 0) SizedBox(width: horizontalOffset),
-                  ...List.generate(itemsInRow, (colIdx) {
-                    if (avatarIndex >= count) {
-                      return SizedBox(width: itemSize, height: itemSize);
-                    }
-                    
-                    final avatarUrl = avatarIndex < memberAvatars.length 
-                        ? memberAvatars[avatarIndex] 
-                        : null;
-                    final name = memberNames != null && avatarIndex < memberNames!.length
-                        ? memberNames![avatarIndex]
-                        : null;
-                    
-                    final widget = Padding(
-                      padding: EdgeInsets.only(left: colIdx > 0 ? gap : 0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(2),
-                        child: SizedBox(
-                          width: itemSize,
-                          height: itemSize,
-                          child: N42Avatar(
-                            imageUrl: avatarUrl,
-                            name: name,
-                            size: itemSize,
-                            borderRadius: 2,
-                          ),
-                        ),
-                      ),
-                    );
-                    
-                    avatarIndex++;
-                    return widget;
-                  }),
-                ],
-              ),
-            );
-            
-            return rowWidget;
-          }),
+          ...rows,
+          if (verticalOffset > 0) SizedBox(height: verticalOffset),
         ],
       ),
     );
