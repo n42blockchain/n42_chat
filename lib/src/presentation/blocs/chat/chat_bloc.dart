@@ -46,6 +46,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<DisposeChat>(_onDisposeChat);
     on<SendSystemNotice>(_onSendSystemNotice);
     on<SendPokeMessage>(_onSendPokeMessage);
+    on<SendPollMessage>(_onSendPollMessage);
+    on<VoteOnPoll>(_onVoteOnPoll);
   }
 
   @override
@@ -654,6 +656,63 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       debugPrint('ChatBloc: Poke message sent successfully');
     } catch (e) {
       debugPrint('ChatBloc: Failed to send poke message: $e');
+    }
+  }
+  
+  /// 发送投票消息
+  Future<void> _onSendPollMessage(
+    SendPollMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+    
+    try {
+      debugPrint('ChatBloc: Sending poll - question: ${event.question}, options: ${event.options}');
+      
+      final message = await _messageRepository.sendPollMessage(
+        _currentRoomId!,
+        question: event.question,
+        options: event.options,
+        maxSelections: event.maxSelections,
+      );
+      
+      if (message != null) {
+        debugPrint('ChatBloc: Poll sent successfully - eventId: ${message.id}');
+        // 消息会通过订阅自动更新
+      }
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to send poll: $e');
+      if (!isClosed) {
+        emit(state.copyWith(error: '发送投票失败'));
+      }
+    }
+  }
+  
+  /// 投票响应
+  Future<void> _onVoteOnPoll(
+    VoteOnPoll event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+    
+    try {
+      debugPrint('ChatBloc: Voting on poll - pollEventId: ${event.pollEventId}, options: ${event.selectedOptionIds}');
+      
+      final success = await _messageRepository.voteOnPoll(
+        _currentRoomId!,
+        pollEventId: event.pollEventId,
+        selectedOptionIds: event.selectedOptionIds,
+      );
+      
+      if (success) {
+        debugPrint('ChatBloc: Vote submitted successfully');
+        // 投票结果会通过消息订阅自动更新
+      }
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to vote: $e');
+      if (!isClosed) {
+        emit(state.copyWith(error: '投票失败'));
+      }
     }
   }
 }
