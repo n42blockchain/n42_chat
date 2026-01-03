@@ -1618,7 +1618,7 @@ class MatrixMessageDataSource {
   }
   
   /// 提取投票消息元数据
-  MessageMetadata? _extractPollMetadata(matrix.Event event) {
+  MessageMetadata? _extractPollMetadata(matrix.Event event, [matrix.Room? room]) {
     try {
       final pollStart = event.content['org.matrix.msc3381.poll.start'] as Map<String, dynamic>?;
       if (pollStart == null) return null;
@@ -1659,61 +1659,59 @@ class MatrixMessageDataSource {
         voteCounts[optionId] = 0;
       }
       
-      // 尝试从聚合事件中获取投票响应
+      // 尝试从 unsigned.m.relations 获取聚合的投票数据
+      // Matrix 服务器会在 poll.start 事件的 unsigned 中聚合投票响应
       try {
-        final room = _client?.getRoomById(event.roomId);
-        if (room != null) {
-          // 获取房间时间线中与该投票相关的响应事件
-          final timeline = room.timeline;
-          if (timeline != null) {
-            // 查找所有投票响应事件
-            for (final timelineEvent in timeline.events) {
-              if (timelineEvent.type == 'org.matrix.msc3381.poll.response') {
-                // 检查是否是针对此投票的响应
-                final relatesTo = timelineEvent.content['m.relates_to'] as Map<String, dynamic>?;
-                if (relatesTo != null && relatesTo['event_id'] == event.eventId) {
-                  final response = timelineEvent.content['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
-                  if (response != null) {
-                    final selectedAnswers = response['answers'] as List<dynamic>?;
-                    if (selectedAnswers != null) {
-                      final senderId = timelineEvent.senderId;
-                      
-                      // 只统计每个用户的最新投票（后投的覆盖先投的）
-                      // 先移除该用户之前的投票
-                      // 注意：这里简化处理，实际应该考虑时间戳
-                      
-                      voters.add(senderId);
-                      
-                      for (final answerId in selectedAnswers) {
-                        if (answerId is String && voteCounts.containsKey(answerId)) {
-                          voteCounts[answerId] = (voteCounts[answerId] ?? 0) + 1;
-                        }
-                      }
-                      
-                      // 检查是否是当前用户的投票
-                      if (senderId == _client?.userID) {
-                        myVotes.clear();
-                        for (final answerId in selectedAnswers) {
-                          if (answerId is String) {
-                            myVotes.add(answerId);
+        final unsigned = event.unsigned;
+        if (unsigned != null) {
+          final relations = unsigned['m.relations'] as Map<String, dynamic>?;
+          if (relations != null) {
+            // 查找 m.reference 关系（投票响应使用 m.reference）
+            final references = relations['m.reference'] as Map<String, dynamic>?;
+            if (references != null) {
+              final chunk = references['chunk'] as List<dynamic>?;
+              if (chunk != null) {
+                for (final item in chunk) {
+                  if (item is Map<String, dynamic>) {
+                    final itemType = item['type'] as String?;
+                    if (itemType == 'org.matrix.msc3381.poll.response') {
+                      final content = item['content'] as Map<String, dynamic>?;
+                      final response = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
+                      if (response != null) {
+                        final selectedAnswers = response['answers'] as List<dynamic>?;
+                        final senderId = item['sender'] as String?;
+                        
+                        if (selectedAnswers != null && senderId != null) {
+                          voters.add(senderId);
+                          
+                          for (final answerId in selectedAnswers) {
+                            if (answerId is String && voteCounts.containsKey(answerId)) {
+                              voteCounts[answerId] = (voteCounts[answerId] ?? 0) + 1;
+                            }
+                          }
+                          
+                          // 检查是否是当前用户的投票
+                          if (senderId == _client?.userID) {
+                            myVotes.clear();
+                            for (final answerId in selectedAnswers) {
+                              if (answerId is String) {
+                                myVotes.add(answerId);
+                              }
+                            }
                           }
                         }
                       }
+                    } else if (itemType == 'org.matrix.msc3381.poll.end') {
+                      pollEnded = true;
                     }
                   }
-                }
-              } else if (timelineEvent.type == 'org.matrix.msc3381.poll.end') {
-                // 检查投票是否已结束
-                final relatesTo = timelineEvent.content['m.relates_to'] as Map<String, dynamic>?;
-                if (relatesTo != null && relatesTo['event_id'] == event.eventId) {
-                  pollEnded = true;
                 }
               }
             }
           }
         }
       } catch (e) {
-        debugPrint('MatrixMessageDataSource: Error parsing poll responses: $e');
+        debugPrint('MatrixMessageDataSource: Error parsing poll aggregation: $e');
       }
       
       return MessageMetadata(
