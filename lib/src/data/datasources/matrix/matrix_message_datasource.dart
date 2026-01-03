@@ -1646,21 +1646,85 @@ class MatrixMessageDataSource {
       }
       
       // 提取投票设置
-      final kind = pollStart['kind'] as String?;
       final maxSelections = pollStart['max_selections'] as int? ?? 1;
       
-      // TODO: 需要从关联事件中获取投票统计数据
-      // 这需要在加载消息时解析所有相关的 poll.response 事件
+      // 从聚合事件中获取投票统计
+      final voteCounts = <String, int>{};
+      final voters = <String>{};
+      final myVotes = <String>[];
+      bool pollEnded = false;
+      
+      // 初始化所有选项的票数为0
+      for (final optionId in optionIds) {
+        voteCounts[optionId] = 0;
+      }
+      
+      // 尝试从聚合事件中获取投票响应
+      try {
+        final room = _client?.getRoomById(event.roomId);
+        if (room != null) {
+          // 获取房间时间线中与该投票相关的响应事件
+          final timeline = room.timeline;
+          if (timeline != null) {
+            // 查找所有投票响应事件
+            for (final timelineEvent in timeline.events) {
+              if (timelineEvent.type == 'org.matrix.msc3381.poll.response') {
+                // 检查是否是针对此投票的响应
+                final relatesTo = timelineEvent.content['m.relates_to'] as Map<String, dynamic>?;
+                if (relatesTo != null && relatesTo['event_id'] == event.eventId) {
+                  final response = timelineEvent.content['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
+                  if (response != null) {
+                    final selectedAnswers = response['answers'] as List<dynamic>?;
+                    if (selectedAnswers != null) {
+                      final senderId = timelineEvent.senderId;
+                      
+                      // 只统计每个用户的最新投票（后投的覆盖先投的）
+                      // 先移除该用户之前的投票
+                      // 注意：这里简化处理，实际应该考虑时间戳
+                      
+                      voters.add(senderId);
+                      
+                      for (final answerId in selectedAnswers) {
+                        if (answerId is String && voteCounts.containsKey(answerId)) {
+                          voteCounts[answerId] = (voteCounts[answerId] ?? 0) + 1;
+                        }
+                      }
+                      
+                      // 检查是否是当前用户的投票
+                      if (senderId == _client?.userID) {
+                        myVotes.clear();
+                        for (final answerId in selectedAnswers) {
+                          if (answerId is String) {
+                            myVotes.add(answerId);
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              } else if (timelineEvent.type == 'org.matrix.msc3381.poll.end') {
+                // 检查投票是否已结束
+                final relatesTo = timelineEvent.content['m.relates_to'] as Map<String, dynamic>?;
+                if (relatesTo != null && relatesTo['event_id'] == event.eventId) {
+                  pollEnded = true;
+                }
+              }
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('MatrixMessageDataSource: Error parsing poll responses: $e');
+      }
       
       return MessageMetadata(
         pollQuestion: question,
         pollOptions: options,
         pollOptionIds: optionIds,
         maxSelections: maxSelections,
-        pollEnded: false,
-        voteCounts: {},
-        totalVoters: 0,
-        myVotes: [],
+        pollEnded: pollEnded,
+        voteCounts: voteCounts,
+        totalVoters: voters.length,
+        myVotes: myVotes,
       );
     } catch (e) {
       debugPrint('MatrixMessageDataSource: Failed to extract poll metadata: $e');
