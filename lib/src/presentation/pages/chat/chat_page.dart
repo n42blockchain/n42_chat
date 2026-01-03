@@ -93,6 +93,9 @@ class _ChatPageState extends State<ChatPage> {
   
   // 收藏的消息（本地存储）
   final Set<String> _favoritedMessageIds = {};
+  
+  // 当前用户ID（用于表情回应高亮）
+  String? _currentUserId;
 
   @override
   void initState() {
@@ -100,6 +103,9 @@ class _ChatPageState extends State<ChatPage> {
 
     // 初始化聊天室
     context.read<ChatBloc>().add(InitializeChat(widget.conversation.id));
+    
+    // 获取当前用户ID
+    _loadCurrentUserId();
 
     // 监听滚动
     _scrollController.addListener(_onScroll);
@@ -114,6 +120,17 @@ class _ChatPageState extends State<ChatPage> {
         _showMorePanel = false;
         _showEmojiPicker = false;
       });
+    }
+  }
+  
+  /// 加载当前用户ID
+  void _loadCurrentUserId() {
+    try {
+      final authRepository = getIt<IAuthRepository>();
+      _currentUserId = authRepository.currentUser?.userId;
+      debugPrint('ChatPage: Loaded current user ID: $_currentUserId');
+    } catch (e) {
+      debugPrint('ChatPage: Failed to load current user ID: $e');
     }
   }
 
@@ -1822,6 +1839,8 @@ ID：$contactId''';
                           onResend: () => _onResend(message),
                           isGroupChat: isGroupChat,
                           showSenderName: showSenderName,
+                          currentUserId: _currentUserId,
+                          onReactionTap: (emoji) => _addReaction(message, emoji),
                         ),
                       ),
               ],
@@ -1888,6 +1907,8 @@ ID：$contactId''';
                   onResend: () {},
                   isGroupChat: isGroupChat,
                   showSenderName: showSenderName,
+                  currentUserId: _currentUserId,
+                  onReactionTap: null, // 多选模式下不响应表情点击
                 ),
               ),
             ),
@@ -2325,6 +2346,10 @@ ID：$contactId''';
           debugPrint('Search clicked');
           _searchMessage(message);
         },
+        onReaction: (emoji) {
+          debugPrint('Reaction clicked: $emoji');
+          _addReaction(message, emoji);
+        },
       ),
     );
     
@@ -2520,6 +2545,33 @@ ID：$contactId''';
     });
     
     // TODO: 持久化到本地存储或服务器
+  }
+  
+  /// 添加表情回应
+  void _addReaction(MessageEntity message, String emoji) {
+    debugPrint('Adding reaction $emoji to message ${message.id}');
+    
+    // 通过 ChatBloc 发送表情回应
+    context.read<ChatBloc>().add(AddReaction(
+      messageId: message.id,
+      emoji: emoji,
+    ));
+    
+    // 显示反馈
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 20)),
+            const SizedBox(width: 8),
+            const Text('已添加表情回应'),
+          ],
+        ),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
   
   /// 撤回消息

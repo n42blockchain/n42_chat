@@ -3,11 +3,16 @@ import 'package:flutter/services.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/message_reaction_entity.dart';
+
+/// 快速表情列表（类似微信/WhatsApp/Element）
+const List<String> _quickReactions = ['😀', '🎁', '❤️', '👍', '😂', '😮'];
 
 /// 微信风格的消息长按菜单
 /// 
 /// 完美复刻微信的消息操作菜单，包括：
 /// - 气泡上方/下方的弹出菜单
+/// - 表情快速回应栏（类似WhatsApp/Element）
 /// - 两行图标按钮布局
 /// - 撤回确认对话框
 class WeChatMessageMenu extends StatelessWidget {
@@ -28,6 +33,9 @@ class WeChatMessageMenu extends StatelessWidget {
   final VoidCallback? onQuote;
   final VoidCallback? onRemind;
   final VoidCallback? onSearch;
+  
+  /// 表情回应回调
+  final Function(String emoji)? onReaction;
 
   const WeChatMessageMenu({
     super.key,
@@ -44,6 +52,7 @@ class WeChatMessageMenu extends StatelessWidget {
     this.onQuote,
     this.onRemind,
     this.onSearch,
+    this.onReaction,
   });
 
   @override
@@ -99,7 +108,8 @@ class WeChatMessageMenu extends StatelessWidget {
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    const menuHeight = 130.0;
+    // 菜单高度增加表情栏的高度（约60）
+    const menuHeight = 190.0;
     const padding = 8.0;
     
     // 可用高度（减去键盘高度和安全区域）
@@ -147,6 +157,15 @@ class WeChatMessageMenu extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // 表情快速回应栏（类似WhatsApp/Element风格）
+          _buildReactionBar(),
+          
+          // 分隔线
+          Container(
+            height: 0.5,
+            color: Colors.white.withOpacity(0.1),
+          ),
+          
           // 第一行按钮
           Padding(
             padding: const EdgeInsets.only(top: 12, left: 8, right: 8),
@@ -244,6 +263,68 @@ class WeChatMessageMenu extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// 构建表情快速回应栏
+  Widget _buildReactionBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          ..._quickReactions.map((emoji) => _buildReactionItem(emoji)),
+          // 更多表情按钮
+          _buildMoreReactionButton(),
+        ],
+      ),
+    );
+  }
+
+  /// 构建单个表情项
+  Widget _buildReactionItem(String emoji) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onDismiss();
+        onReaction?.call(emoji);
+      },
+      child: Container(
+        width: 40,
+        height: 40,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          emoji,
+          style: const TextStyle(fontSize: 26),
+        ),
+      ),
+    );
+  }
+
+  /// 构建更多表情按钮
+  Widget _buildMoreReactionButton() {
+    return GestureDetector(
+      onTap: () {
+        // TODO: 显示完整表情选择器
+        HapticFeedback.lightImpact();
+      },
+      child: Container(
+        width: 36,
+        height: 36,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white70,
+          size: 20,
+        ),
       ),
     );
   }
@@ -461,6 +542,8 @@ class MessageMenuHelper {
     VoidCallback? onQuote,
     VoidCallback? onRemind,
     VoidCallback? onSearch,
+    Function(String emoji)? onReaction,
+    bool isFavorited = false,
   }) {
     // 获取消息气泡的位置和大小
     final RenderBox? renderBox = messageKey.currentContext?.findRenderObject() as RenderBox?;
@@ -481,6 +564,7 @@ class MessageMenuHelper {
         message: message,
         position: position,
         messageSize: size,
+        isFavorited: isFavorited,
         onDismiss: () => overlayEntry.remove(),
         onCopy: onCopy,
         onForward: onForward,
@@ -490,6 +574,7 @@ class MessageMenuHelper {
         onQuote: onQuote,
         onRemind: onRemind,
         onSearch: onSearch,
+        onReaction: onReaction,
       ),
     );
     
