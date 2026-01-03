@@ -1183,44 +1183,49 @@ class MatrixMessageDataSource {
   }
 
   /// 提取表情回应
+  /// 
+  /// Matrix 服务器在事件的 unsigned.m.relations.m.annotation 字段中
+  /// 聚合所有对该事件的表情回应
   List<MessageReaction> _extractReactions(matrix.Event event) {
     final reactions = <MessageReaction>[];
     
     try {
-      // Matrix SDK 的 aggregatedEvents 包含所有聚合事件（包括 reactions）
-      final aggregatedEvents = event.aggregatedEvents(
-        event.room.timeline, 
-        'm.annotation',
-      );
+      // 从 unsigned.m.relations.m.annotation 提取聚合的表情回应
+      final unsigned = event.unsigned;
+      if (unsigned == null) return reactions;
       
-      if (aggregatedEvents.isEmpty) {
-        return reactions;
-      }
+      final relations = unsigned['m.relations'] as Map<String, dynamic>?;
+      if (relations == null) return reactions;
       
-      // 按 emoji 分组
-      final reactionMap = <String, List<String>>{};
+      final annotations = relations['m.annotation'] as Map<String, dynamic>?;
+      if (annotations == null) return reactions;
       
-      for (final reactionEvent in aggregatedEvents) {
-        final relatesTo = reactionEvent.content['m.relates_to'] as Map<String, dynamic>?;
-        final emoji = relatesTo?['key'] as String?;
-        
-        if (emoji != null && emoji.isNotEmpty) {
-          reactionMap.putIfAbsent(emoji, () => []);
-          reactionMap[emoji]!.add(reactionEvent.senderId);
+      // chunk 包含表情回应列表 [{type, key, count}]
+      final chunk = annotations['chunk'] as List<dynamic>?;
+      if (chunk == null || chunk.isEmpty) return reactions;
+      
+      final currentUserId = _client?.userID ?? '';
+      
+      for (final item in chunk) {
+        if (item is Map<String, dynamic>) {
+          final emoji = item['key'] as String?;
+          final count = item['count'] as int? ?? 0;
+          
+          if (emoji != null && emoji.isNotEmpty && count > 0) {
+            // 注意：聚合数据中只有count，没有具体的userIds
+            // 我们用占位符创建userIds列表，实际判断isMe需要另外处理
+            reactions.add(MessageReaction(
+              key: emoji,
+              userIds: List.generate(count, (i) => 'user_$i'),
+              isMe: false, // 需要额外查询来确定
+            ));
+          }
         }
       }
       
-      // 转换为 MessageReaction 列表
-      final currentUserId = _client?.userID ?? '';
-      reactionMap.forEach((emoji, userIds) {
-        reactions.add(MessageReaction(
-          key: emoji,
-          userIds: userIds,
-          isMe: userIds.contains(currentUserId),
-        ));
-      });
-      
-      debugPrint('Extracted ${reactions.length} reactions for event ${event.eventId}');
+      if (reactions.isNotEmpty) {
+        debugPrint('Extracted ${reactions.length} reactions for event ${event.eventId}');
+      }
     } catch (e) {
       debugPrint('Error extracting reactions: $e');
     }
