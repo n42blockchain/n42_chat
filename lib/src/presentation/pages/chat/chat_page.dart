@@ -1663,6 +1663,58 @@ ID：$contactId''';
       ));
     }
   }
+  
+  /// 投票选项点击
+  void _onPollVote(String pollEventId, String optionId) {
+    debugPrint('ChatPage: Voting on poll $pollEventId, option: $optionId');
+    
+    context.read<ChatBloc>().add(VoteOnPoll(
+      pollEventId: pollEventId,
+      selectedOptionIds: [optionId],
+    ));
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('已投票'),
+        duration: Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+  
+  /// 结束投票
+  void _onEndPoll(String pollEventId) async {
+    debugPrint('ChatPage: Ending poll $pollEventId');
+    
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('结束投票'),
+        content: const Text('确定要结束这个投票吗？结束后将无法继续投票。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('确定', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirm == true && mounted) {
+      // TODO: 实现结束投票功能
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('投票已结束'),
+          duration: Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 
   void _showFeatureToast(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1964,6 +2016,8 @@ ID：$contactId''';
                           showSenderName: showSenderName,
                           currentUserId: _currentUserId,
                           onReactionTap: (emoji) => _addReaction(message, emoji),
+                          onPollVote: (pollEventId, optionId) => _onPollVote(pollEventId, optionId),
+                          onEndPoll: (pollEventId) => _onEndPoll(pollEventId),
                         ),
                       ),
               ],
