@@ -70,16 +70,25 @@ class ConversationTile extends StatelessWidget {
   }
 
   Widget _buildAvatar() {
+    // 三人及以上群聊：使用九宫格头像
+    // 条件：是群聊 + 成员数 >= 3 + 有成员信息
     if (conversation.type == ConversationType.group &&
         conversation.memberAvatarUrls != null &&
-        conversation.memberAvatarUrls!.length > 1) {
+        conversation.memberAvatarUrls!.length >= 3) {
+      // 使用成员信息生成唯一 key，确保数据变化时刷新
+      final avatarKey = conversation.memberAvatarUrls!
+          .map((url) => url ?? 'null')
+          .join('_');
       return N42GroupAvatar(
+        key: ValueKey('group_${conversation.id}_$avatarKey'),
         memberAvatars: conversation.memberAvatarUrls!,
         memberNames: conversation.memberNames,
         size: 48,
       );
     }
 
+    // 私聊或两人群聊：使用普通头像
+    // 显示对方头像，如果没有则显示字母头像
     return N42Avatar(
       imageUrl: conversation.avatarUrl,
       name: conversation.name,

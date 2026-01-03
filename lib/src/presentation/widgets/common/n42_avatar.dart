@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -85,6 +86,11 @@ class N42Avatar extends StatelessWidget {
   }
 
   Widget _buildContent() {
+    // 如果有名字但没有图片URL，直接显示字母头像
+    if ((imageUrl == null || imageUrl!.isEmpty) && name != null && name!.isNotEmpty) {
+      return _buildInitialsAvatar();
+    }
+    
     // 优先显示网络图片
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       // 获取认证头（用于需要认证的 Matrix 媒体）
@@ -98,6 +104,14 @@ class N42Avatar extends StatelessWidget {
         imageUrl: imageUrl!,
         fit: BoxFit.cover,
         httpHeaders: headers,
+        // 使用较短的缓存时间确保头像更新
+        cacheManager: CacheManager(
+          Config(
+            'avatar_cache',
+            stalePeriod: const Duration(hours: 1),
+            maxNrOfCacheObjects: 200,
+          ),
+        ),
         placeholder: (context, url) => _buildFallbackAvatar(),
         errorWidget: (context, url, error) {
           debugPrint('N42Avatar: Failed to load image: $url, error: $error');
@@ -339,13 +353,17 @@ class N42GroupAvatar extends StatelessWidget {
           rowChildren.add(SizedBox(width: gap));
         }
         
+        // 使用唯一 key 强制刷新每个成员头像
+        final uniqueKey = '${name ?? ''}_${avatarUrl ?? 'no_avatar'}_$avatarIndex';
         rowChildren.add(
           ClipRRect(
+            key: ValueKey(uniqueKey),
             borderRadius: BorderRadius.circular(1),
             child: SizedBox(
               width: itemSize,
               height: itemSize,
               child: N42Avatar(
+                key: ValueKey('avatar_$uniqueKey'),
                 imageUrl: avatarUrl,
                 name: name,
                 size: itemSize,

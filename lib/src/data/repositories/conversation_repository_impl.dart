@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../core/utils/matrix_utils.dart';
@@ -149,17 +150,28 @@ class ConversationRepositoryImpl implements IConversationRepository {
     List<String>? memberNames;
     
     if (room.isDirectChat) {
-      // 私聊：获取对方用户的真实头像（如果没有则返回 null）
+      // 私聊：获取对方用户的真实头像
       final partner = _roomDataSource.getDirectChatPartner(room);
-      if (partner?.avatarUrl != null) {
-        avatarUrl = MatrixUtils.mxcToHttp(
-          partner!.avatarUrl.toString(),
-          client: room.client,
-          width: 96,
-          height: 96,
-        );
+      final mxcUrl = partner?.avatarUrl?.toString();
+      
+      // 只使用用户明确设置的头像（非空且非默认占位图）
+      if (mxcUrl != null && mxcUrl.isNotEmpty && mxcUrl.startsWith('mxc://')) {
+        // 检查是否是服务器默认头像（跳过 identicon 和其他默认图）
+        // tuwunel/Synapse 可能使用不同的默认头像 URL 模式
+        final isDefaultAvatar = mxcUrl.contains('identicon') ||
+            mxcUrl.contains('default') ||
+            mxcUrl.contains('placeholder');
+        
+        if (!isDefaultAvatar) {
+          avatarUrl = MatrixUtils.mxcToHttp(
+            mxcUrl,
+            client: room.client,
+            width: 96,
+            height: 96,
+          );
+        }
       }
-      // 如果对方没有头像，avatarUrl 为 null，UI 会显示字母头像
+      // avatarUrl 为 null 时，UI 根据 name 显示字母头像
     } else {
       // 群聊：获取房间头像
       avatarUrl = _roomDataSource.getRoomAvatarUrl(room);
@@ -206,20 +218,31 @@ class ConversationRepositoryImpl implements IConversationRepository {
       if (count >= 9) break;
       if (member.membership != matrix.Membership.join) continue; // 只取已加入的成员
       
-      // 获取头像 URL
-      final mxcUri = member.avatarUrl;
+      final memberName = member.displayName ?? member.id.localpart ?? '';
+      
+      // 获取头像 URL - 只使用用户明确设置的头像
+      final mxcUri = member.avatarUrl?.toString();
       String? httpUrl;
-      if (mxcUri != null) {
-        httpUrl = MatrixUtils.mxcToHttp(
-          mxcUri.toString(),
-          client: client,
-          width: 64,
-          height: 64,
-        );
+      
+      // 检查是否是用户自定义头像（排除服务器默认头像）
+      if (mxcUri != null && mxcUri.isNotEmpty && mxcUri.startsWith('mxc://')) {
+        final isDefaultAvatar = mxcUri.contains('identicon') ||
+            mxcUri.contains('default') ||
+            mxcUri.contains('placeholder');
+        
+        if (!isDefaultAvatar) {
+          httpUrl = MatrixUtils.mxcToHttp(
+            mxcUri,
+            client: client,
+            width: 64,
+            height: 64,
+          );
+        }
       }
+      // httpUrl 为 null 时，UI 根据 memberName 显示字母头像
       
       avatarUrls.add(httpUrl);
-      names.add(member.displayName ?? member.id.localpart ?? '');
+      names.add(memberName);
       count++;
     }
     
