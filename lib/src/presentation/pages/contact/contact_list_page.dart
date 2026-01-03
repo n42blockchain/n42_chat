@@ -449,16 +449,253 @@ class _ContactListPageState extends State<ContactListPage> {
   }
 
   void _showFriendRequestsPage() {
-    // TODO: 导航到好友请求页面
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('好友请求页面开发中...')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const _FriendRequestsPage(),
+      ),
     );
   }
 
   void _showGroupsPage() {
-    // TODO: 导航到群聊列表页面
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const _GroupListPage(),
+      ),
+    );
+  }
+}
+
+/// 新的朋友（好友请求）页面
+class _FriendRequestsPage extends StatefulWidget {
+  const _FriendRequestsPage();
+
+  @override
+  State<_FriendRequestsPage> createState() => _FriendRequestsPageState();
+}
+
+class _FriendRequestsPageState extends State<_FriendRequestsPage> {
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('新的朋友'),
+        backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black,
+        elevation: 0.5,
+      ),
+      body: BlocBuilder<ContactBloc, ContactState>(
+        builder: (context, state) {
+          if (state is! ContactLoaded) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          final requests = state.friendRequests;
+          
+          if (requests.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.person_add_disabled,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '暂无好友请求',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          
+          return ListView.separated(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemCount: requests.length,
+            separatorBuilder: (_, __) => Divider(
+              height: 1,
+              indent: 72,
+              color: isDark ? AppColors.dividerDark : AppColors.divider,
+            ),
+            itemBuilder: (context, index) {
+              final request = requests[index];
+              return _buildRequestItem(request, isDark);
+            },
+          );
+        },
+      ),
+    );
+  }
+  
+  Widget _buildRequestItem(ContactEntity request, bool isDark) {
+    return ListTile(
+      leading: CircleAvatar(
+        radius: 24,
+        backgroundColor: _getColorFromName(request.displayName),
+        backgroundImage: request.avatarUrl != null && request.avatarUrl!.isNotEmpty
+            ? NetworkImage(request.avatarUrl!)
+            : null,
+        child: request.avatarUrl == null || request.avatarUrl!.isEmpty
+            ? Text(
+                request.displayName.isNotEmpty 
+                    ? request.displayName[0].toUpperCase() 
+                    : '?',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            : null,
+      ),
+      title: Text(
+        request.displayName,
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          color: isDark ? Colors.white : Colors.black87,
+        ),
+      ),
+      subtitle: Text(
+        request.userId,
+        style: TextStyle(
+          fontSize: 13,
+          color: isDark ? Colors.white54 : Colors.black54,
+        ),
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextButton(
+            onPressed: () => _acceptRequest(request),
+            style: TextButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            child: const Text('接受'),
+          ),
+          const SizedBox(width: 8),
+          TextButton(
+            onPressed: () => _rejectRequest(request),
+            style: TextButton.styleFrom(
+              backgroundColor: isDark ? Colors.grey[700] : Colors.grey[300],
+              foregroundColor: isDark ? Colors.white : Colors.black87,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            child: const Text('拒绝'),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  void _acceptRequest(ContactEntity request) {
+    context.read<ContactBloc>().add(AcceptFriendRequest(request.userId));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('群聊页面开发中...')),
+      SnackBar(
+        content: Text('已接受 ${request.displayName} 的好友请求'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+  
+  void _rejectRequest(ContactEntity request) {
+    context.read<ContactBloc>().add(RejectFriendRequest(request.userId));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('已拒绝 ${request.displayName} 的好友请求'),
+      ),
+    );
+  }
+  
+  Color _getColorFromName(String name) {
+    final colors = [
+      const Color(0xFF1AAD19),
+      const Color(0xFF576B95),
+      const Color(0xFFFA9D3B),
+      const Color(0xFFE64340),
+    ];
+    if (name.isEmpty) return colors[0];
+    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
+    return colors[index];
+  }
+}
+
+/// 群聊列表页面
+class _GroupListPage extends StatelessWidget {
+  const _GroupListPage();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('群聊'),
+        backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black,
+        elevation: 0.5,
+      ),
+      body: BlocBuilder<ContactBloc, ContactState>(
+        builder: (context, state) {
+          if (state is! ContactLoaded) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          // 过滤出群聊（这里需要根据实际数据结构调整）
+          // 目前假设 ContactBloc 中有群聊列表
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.group,
+                  size: 64,
+                  color: Colors.grey[400],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '暂无群聊',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // TODO: 创建群聊
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('创建群聊功能开发中...')),
+                    );
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('发起群聊'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
