@@ -1493,7 +1493,7 @@ ID：$contactId''';
   }
 
   Future<void> _startVideoCall() async {
-    // 显示选择菜单：语音通话或视频通话
+    // 显示选择菜单：语音通话、视频通话或多人会议
     final choice = await showModalBottomSheet<String>(
       context: context,
       builder: (context) => SafeArea(
@@ -1503,13 +1503,24 @@ ID：$contactId''';
             ListTile(
               leading: const Icon(Icons.phone, color: AppColors.primary),
               title: const Text('语音通话'),
+              subtitle: const Text('1对1 语音通话'),
               onTap: () => Navigator.pop(context, 'voice'),
             ),
             ListTile(
               leading: const Icon(Icons.videocam, color: AppColors.primary),
               title: const Text('视频通话'),
+              subtitle: const Text('1对1 视频通话'),
               onTap: () => Navigator.pop(context, 'video'),
             ),
+            if (widget.conversation.isGroup) ...[
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.groups, color: AppColors.primary),
+                title: const Text('多人会议'),
+                subtitle: const Text('邀请群成员参与视频会议'),
+                onTap: () => Navigator.pop(context, 'meeting'),
+              ),
+            ],
             const SizedBox(height: 8),
             ListTile(
               leading: const Icon(Icons.close),
@@ -1523,19 +1534,60 @@ ID：$contactId''';
     
     if (choice == null) return;
     
+    // 获取对方信息
+    final roomId = widget.conversation.id;
+    final peerId = widget.conversation.id; // 对于1对1聊天，roomId即为对方ID
+    final peerName = widget.conversation.name;
+    final peerAvatarUrl = widget.conversation.avatarUrl;
+    
+    if (choice == 'meeting') {
+      // 多人会议 - 需要 LiveKit Token（从服务端获取）
+      // TODO: 实现获取 LiveKit Token 的 API 调用
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('多人会议功能需要配置 LiveKit 服务器'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      debugPrint('Group meeting - requires LiveKit server configuration');
+      return;
+    }
+    
     final isVideoCall = choice == 'video';
     final callType = isVideoCall ? '视频通话' : '语音通话';
     
-    // 显示通话界面
+    // 使用真正的 VoIP 通话（当 CallManager 可用时）
+    // 目前先显示模拟界面，等待服务端参数配置
+    debugPrint('Starting $callType with room: $roomId, peer: $peerName');
+    
+    // 显示通话界面（模拟）
+    // 当服务端配置完成后，替换为：
+    // final callManager = getIt<CallManager>();
+    // if (isVideoCall) {
+    //   await callManager.startVideoCall(
+    //     roomId: roomId,
+    //     peerId: peerId,
+    //     peerName: peerName,
+    //     peerAvatarUrl: peerAvatarUrl,
+    //   );
+    // } else {
+    //   await callManager.startVoiceCall(
+    //     roomId: roomId,
+    //     peerId: peerId,
+    //     peerName: peerName,
+    //     peerAvatarUrl: peerAvatarUrl,
+    //   );
+    // }
+    
     if (mounted) {
       await showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) => _CallDialog(
-          contactName: widget.conversation.name,
-          contactAvatar: widget.conversation.avatarUrl,
+          contactName: peerName,
+          contactAvatar: peerAvatarUrl,
           isVideoCall: isVideoCall,
-          roomId: widget.conversation.id, // 传递房间ID用于VoIP
+          roomId: roomId,
           onEnd: () => Navigator.pop(context),
         ),
       );

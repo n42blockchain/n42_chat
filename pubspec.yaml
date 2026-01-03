@@ -121,6 +121,28 @@ dependencies:
   # ============================================
   # BSD-3-Clause License
   mobile_scanner: ^5.1.1
+  
+  # ============================================
+  # VoIP & WebRTC - 音视频通话
+  # ============================================
+  # MIT License
+  flutter_webrtc: ^1.2.1
+  # LiveKit 多人会议
+  livekit_client: ^2.5.4
+  
+  # ============================================
+  # Push Notifications & Call Kit - 来电推送
+  # ============================================
+  # MIT License
+  flutter_callkit_incoming: ^2.0.4
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.5
+  flutter_local_notifications: ^18.0.1
+  
+  # ============================================
+  # Wakelock - 保持屏幕常亮
+  # ============================================
+  wakelock_plus: ^1.2.8
 
 dev_dependencies:
   flutter_test:
