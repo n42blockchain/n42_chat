@@ -108,6 +108,24 @@ class SendFileMessage extends ChatEvent {
   List<Object?> get props => [fileBytes, filename, mimeType];
 }
 
+/// 发送视频消息（带缩略图）
+class SendVideoMessage extends ChatEvent {
+  final Uint8List videoBytes;
+  final String filename;
+  final String? mimeType;
+  final Uint8List? thumbnailBytes;
+
+  const SendVideoMessage({
+    required this.videoBytes,
+    required this.filename,
+    this.mimeType,
+    this.thumbnailBytes,
+  });
+
+  @override
+  List<Object?> get props => [videoBytes, filename, mimeType, thumbnailBytes];
+}
+
 /// 发送位置消息
 class SendLocationMessage extends ChatEvent {
   final double latitude;

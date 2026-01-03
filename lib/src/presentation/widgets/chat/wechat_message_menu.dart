@@ -412,34 +412,35 @@ class RecalledMessageWidget extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.grey[500] : Colors.grey[600];
     
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      alignment: Alignment.center,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            isFromMe ? '你撤回了一条消息' : '对方撤回了一条消息',
-            style: TextStyle(
-              fontSize: 12,
-              color: textColor,
-            ),
-          ),
-          if (isFromMe && onReEdit != null) ...[
-            const SizedBox(width: 4),
-            GestureDetector(
-              onTap: onReEdit,
-              child: Text(
-                '重新编辑',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isDark ? const Color(0xFF57A5FF) : const Color(0xFF576B95),
-                ),
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              isFromMe ? '你撤回了一条消息' : '对方撤回了一条消息',
+              style: TextStyle(
+                fontSize: 12,
+                color: textColor,
               ),
             ),
+            if (isFromMe && onReEdit != null) ...[
+              const SizedBox(width: 4),
+              GestureDetector(
+                onTap: onReEdit,
+                child: Text(
+                  '重新编辑',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? const Color(0xFF57A5FF) : const Color(0xFF576B95),
+                  ),
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

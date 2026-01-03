@@ -28,6 +28,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendImageMessage>(_onSendImageMessage);
     on<SendVoiceMessage>(_onSendVoiceMessage);
     on<SendFileMessage>(_onSendFileMessage);
+    on<SendVideoMessage>(_onSendVideoMessage);
     on<SendLocationMessage>(_onSendLocationMessage);
     on<ResendMessage>(_onResendMessage);
     on<RedactMessage>(_onRedactMessage);
@@ -268,6 +269,36 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       emit(state.copyWith(
         isSending: false,
         error: '发送文件失败',
+      ));
+    }
+  }
+
+  /// 发送视频消息（带缩略图）
+  Future<void> _onSendVideoMessage(
+    SendVideoMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+
+    emit(state.copyWith(isSending: true, clearError: true));
+
+    try {
+      debugPrint('ChatBloc: Sending video with thumbnail: ${event.thumbnailBytes?.length ?? 0} bytes');
+      await _messageRepository.sendVideoMessage(
+        _currentRoomId!,
+        videoBytes: event.videoBytes,
+        filename: event.filename,
+        mimeType: event.mimeType,
+        thumbnailBytes: event.thumbnailBytes,
+      );
+      debugPrint('ChatBloc: Video sent successfully');
+      emit(state.copyWith(isSending: false));
+    } catch (e, stackTrace) {
+      debugPrint('ChatBloc: Send video error - $e');
+      debugPrint('ChatBloc: Stack trace - $stackTrace');
+      emit(state.copyWith(
+        isSending: false,
+        error: '发送视频失败: $e',
       ));
     }
   }
