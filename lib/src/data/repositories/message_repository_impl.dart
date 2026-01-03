@@ -438,7 +438,8 @@ class MessageRepositoryImpl implements IMessageRepository {
     // 过滤出可显示的消息类型
     return event.type == matrix.EventTypes.Message ||
         event.type == matrix.EventTypes.Encrypted ||
-        event.type == matrix.EventTypes.Sticker;
+        event.type == matrix.EventTypes.Sticker ||
+        event.type == 'org.matrix.msc3381.poll.start';
   }
 
   /// 清理时间线缓存
