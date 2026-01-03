@@ -8,6 +8,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/chat/message_status_indicator.dart' as indicator;
 import '../../widgets/chat/chat_widgets.dart';
+import '../../widgets/chat/wechat_message_menu.dart';
 
 /// 消息列表项
 class MessageItem extends StatelessWidget {
@@ -57,6 +58,14 @@ class MessageItem extends StatelessWidget {
     if (message.type == MessageType.system ||
         message.type == MessageType.notice) {
       return SystemMessageWidget(message: message.content);
+    }
+    
+    // 已撤回的消息 - 显示微信风格的撤回提示
+    if (message.type == MessageType.redacted) {
+      return RecalledMessageWidget(
+        isFromMe: message.isFromMe,
+        onReEdit: null, // 服务器撤回的消息无法重新编辑
+      );
     }
 
     // 普通消息

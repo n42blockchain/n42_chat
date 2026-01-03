@@ -543,21 +543,33 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   @override
   Future<Map<String, dynamic>?> getUserProfileData() async {
-    if (!isLoggedIn) return null;
+    debugPrint('AuthRepository: getUserProfileData called');
+    if (!isLoggedIn) {
+      debugPrint('AuthRepository: Not logged in, returning null');
+      return null;
+    }
 
     final client = _authDataSource.clientManager.client;
-    if (client == null) return null;
+    if (client == null) {
+      debugPrint('AuthRepository: Client is null, returning null');
+      return null;
+    }
 
     try {
+      debugPrint('AuthRepository: Getting account data for ${client.userID}');
       final data = await client.getAccountData(
         client.userID!,
         'n42.user.profile',
       );
       
+      debugPrint('AuthRepository: Got account data: $data');
+      
       if (data is Map<String, dynamic>) {
         _cachedProfileData = data;
+        debugPrint('AuthRepository: Cached profile data - pokeText: ${data['pokeText']}');
         return data;
       }
+      debugPrint('AuthRepository: Data is not a Map, returning null');
       return null;
     } catch (e) {
       debugPrint('AuthRepository: Get profile data failed - $e');
