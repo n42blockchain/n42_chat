@@ -31,6 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? _userId;
   String? _displayName;
   String? _avatarUrl;
+  String? _statusText; // 当前状态
 
   @override
   void initState() {
@@ -80,7 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? Colors.white : AppColors.textPrimary;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
 
     return Scaffold(
@@ -99,10 +100,13 @@ class _ProfilePageState extends State<ProfilePage> {
           // 服务
           _buildGroupCard(
             context,
+            isDark,
             children: [
               _buildMenuItem(
                 context,
-                iconWidget: _buildServiceIcon(),
+                isDark: isDark,
+                icon: Icons.verified_outlined,
+                iconColor: AppColors.primary,
                 title: '服务',
                 onTap: () => _showComingSoon(context, '服务'),
               ),
@@ -114,31 +118,40 @@ class _ProfilePageState extends State<ProfilePage> {
           // 收藏、朋友圈、订单与卡包、表情
           _buildGroupCard(
             context,
+            isDark,
             children: [
               _buildMenuItem(
                 context,
-                iconWidget: _buildFavoriteIcon(),
+                isDark: isDark,
+                icon: Icons.inventory_2_outlined,
+                iconColor: const Color(0xFFFF9F0A),
                 title: '收藏',
                 onTap: () => _openFavorites(context),
               ),
-              _buildDivider(context),
+              _buildDivider(context, isDark),
               _buildMenuItem(
                 context,
-                iconWidget: _buildMomentsIcon(),
+                isDark: isDark,
+                icon: Icons.photo_library_outlined,
+                iconColor: const Color(0xFF007AFF),
                 title: '朋友圈',
                 onTap: () => _showComingSoon(context, '朋友圈'),
               ),
-              _buildDivider(context),
+              _buildDivider(context, isDark),
               _buildMenuItem(
                 context,
-                iconWidget: _buildOrderIcon(),
+                isDark: isDark,
+                icon: Icons.card_giftcard_outlined,
+                iconColor: const Color(0xFFFF6B6B),
                 title: '订单与卡包',
                 onTap: () => _showComingSoon(context, '订单与卡包'),
               ),
-              _buildDivider(context),
+              _buildDivider(context, isDark),
               _buildMenuItem(
                 context,
-                iconWidget: _buildEmojiIcon(),
+                isDark: isDark,
+                icon: Icons.emoji_emotions_outlined,
+                iconColor: const Color(0xFFFFCC00),
                 title: '表情',
                 onTap: () => _showComingSoon(context, '表情'),
               ),
@@ -150,10 +163,13 @@ class _ProfilePageState extends State<ProfilePage> {
           // 设置
           _buildGroupCard(
             context,
+            isDark,
             children: [
               _buildMenuItem(
                 context,
-                iconWidget: _buildSettingsIcon(),
+                isDark: isDark,
+                icon: Icons.settings_outlined,
+                iconColor: const Color(0xFF5E97F6),
                 title: '设置',
                 onTap: () => _openSettings(context),
               ),
@@ -162,120 +178,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
           const SizedBox(height: 32),
         ],
-      ),
-    );
-  }
-
-  /// 服务图标 - 绿色勾选
-  Widget _buildServiceIcon() {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.check,
-          color: Colors.white,
-          size: 18,
-        ),
-      ),
-    );
-  }
-
-  /// 收藏图标 - 橙黄色立方体
-  Widget _buildFavoriteIcon() {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: const Color(0xFFFF9F0A),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.view_in_ar,
-          color: Colors.white,
-          size: 18,
-        ),
-      ),
-    );
-  }
-
-  /// 朋友圈图标 - 蓝色图片
-  Widget _buildMomentsIcon() {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: const Color(0xFF007AFF),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.photo_library_outlined,
-          color: Colors.white,
-          size: 18,
-        ),
-      ),
-    );
-  }
-
-  /// 订单与卡包图标 - 橙红色表情
-  Widget _buildOrderIcon() {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: const Color(0xFFFF6B6B),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.sentiment_satisfied_alt,
-          color: Colors.white,
-          size: 18,
-        ),
-      ),
-    );
-  }
-
-  /// 表情图标 - 黄色笑脸
-  Widget _buildEmojiIcon() {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFCC00),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.sentiment_very_satisfied,
-          color: Colors.white,
-          size: 18,
-        ),
-      ),
-    );
-  }
-
-  /// 设置图标 - 蓝色齿轮
-  Widget _buildSettingsIcon() {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: const Color(0xFF5E97F6),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.settings,
-          color: Colors.white,
-          size: 18,
-        ),
       ),
     );
   }
@@ -302,16 +204,23 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 // 头像 - 圆角矩形
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: _avatarUrl != null && _avatarUrl!.isNotEmpty
-                      ? Image.network(
-                          _avatarUrl!,
-                          width: 64,
-                          height: 64,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => _buildDefaultAvatar(),
-                        )
-                      : _buildDefaultAvatar(),
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey[800] : Colors.grey[300],
+                    ),
+                    child: _avatarUrl != null && _avatarUrl!.isNotEmpty
+                        ? Image.network(
+                            _avatarUrl!,
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => _buildDefaultAvatar(isDark),
+                          )
+                        : _buildDefaultAvatar(isDark),
+                  ),
                 ),
                 const SizedBox(width: 16),
                 // 用户信息
@@ -342,31 +251,36 @@ class _ProfilePageState extends State<ProfilePage> {
                       Row(
                         children: [
                           // + 状态 按钮
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: isDark 
-                                  ? Colors.white.withOpacity(0.1) 
-                                  : Colors.black.withOpacity(0.05),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  size: 14,
-                                  color: subtitleColor,
-                                ),
-                                const SizedBox(width: 2),
-                                Text(
-                                  '状态',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: subtitleColor,
+                          GestureDetector(
+                            onTap: () => _showStatusPicker(context, isDark),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isDark 
+                                    ? Colors.white.withOpacity(0.1) 
+                                    : Colors.black.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (_statusText == null) ...[
+                                    Icon(
+                                      Icons.add,
+                                      size: 14,
+                                      color: subtitleColor,
+                                    ),
+                                    const SizedBox(width: 2),
+                                  ],
+                                  Text(
+                                    _statusText ?? '状态',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: subtitleColor,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -401,11 +315,11 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildDefaultAvatar() {
+  Widget _buildDefaultAvatar(bool isDark) {
     return Container(
       width: 64,
       height: 64,
-      color: AppColors.placeholder,
+      color: isDark ? Colors.grey[700] : Colors.grey[400],
       child: Center(
         child: Text(
           (_displayName ?? 'U').substring(0, 1).toUpperCase(),
@@ -419,8 +333,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildGroupCard(BuildContext context, {required List<Widget> children}) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  Widget _buildGroupCard(BuildContext context, bool isDark, {required List<Widget> children}) {
     return Container(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       child: Column(
@@ -432,13 +345,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildMenuItem(
     BuildContext context, {
-    required Widget iconWidget,
+    required bool isDark,
+    required IconData icon,
+    required Color iconColor,
     required String title,
     String? badge,
     VoidCallback? onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : AppColors.textPrimary;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
     return Material(
       color: Colors.transparent,
@@ -448,7 +362,16 @@ class _ProfilePageState extends State<ProfilePage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
-              iconWidget,
+              // 透明背景的图标
+              SizedBox(
+                width: 28,
+                height: 28,
+                child: Icon(
+                  icon,
+                  color: iconColor,
+                  size: 24,
+                ),
+              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
@@ -486,13 +409,237 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildDivider(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  Widget _buildDivider(BuildContext context, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(left: 58),
       child: Divider(
         height: 1,
         color: isDark ? AppColors.dividerDark : AppColors.divider,
+      ),
+    );
+  }
+
+  /// 显示状态选择器
+  void _showStatusPicker(BuildContext context, bool isDark) {
+    final statusOptions = [
+      {'emoji': '😊', 'text': '开心'},
+      {'emoji': '😴', 'text': '休息中'},
+      {'emoji': '🎮', 'text': '游戏中'},
+      {'emoji': '📚', 'text': '学习中'},
+      {'emoji': '💼', 'text': '工作中'},
+      {'emoji': '🏃', 'text': '运动中'},
+      {'emoji': '🎵', 'text': '听音乐'},
+      {'emoji': '✈️', 'text': '旅行中'},
+      {'emoji': '🍜', 'text': '吃饭中'},
+      {'emoji': '🌙', 'text': '晚安'},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        height: MediaQuery.of(context).size.height * 0.6,
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+          ),
+        ),
+        child: Column(
+          children: [
+            // 拖拽指示器
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[600] : Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            // 标题
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Spacer(),
+                  Text(
+                    '设置状态',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (_statusText != null)
+                    TextButton(
+                      onPressed: () {
+                        setState(() => _statusText = null);
+                        Navigator.pop(ctx);
+                      },
+                      child: Text(
+                        '清除',
+                        style: TextStyle(color: AppColors.error),
+                      ),
+                    )
+                  else
+                    const SizedBox(width: 48),
+                ],
+              ),
+            ),
+            Divider(
+              height: 1,
+              color: isDark ? AppColors.dividerDark : AppColors.divider,
+            ),
+            // 状态列表
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  childAspectRatio: 1,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: statusOptions.length,
+                itemBuilder: (context, index) {
+                  final status = statusOptions[index];
+                  final isSelected = _statusText == '${status['emoji']} ${status['text']}';
+                  
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _statusText = '${status['emoji']} ${status['text']}';
+                      });
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('状态已设置为：${status['emoji']} ${status['text']}'),
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isSelected 
+                            ? AppColors.primary.withOpacity(0.1)
+                            : (isDark ? Colors.grey[800] : Colors.grey[100]),
+                        borderRadius: BorderRadius.circular(12),
+                        border: isSelected 
+                            ? Border.all(color: AppColors.primary, width: 2)
+                            : null,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            status['emoji']!,
+                            style: const TextStyle(fontSize: 28),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            status['text']!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            // 自定义状态
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showCustomStatusDialog(context, isDark),
+                    icon: const Icon(Icons.edit_outlined),
+                    label: const Text('自定义状态'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 自定义状态对话框
+  void _showCustomStatusDialog(BuildContext context, bool isDark) {
+    Navigator.pop(context); // 关闭底部弹窗
+    
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        title: Text(
+          '自定义状态',
+          style: TextStyle(
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 20,
+          decoration: InputDecoration(
+            hintText: '输入你的状态...',
+            hintStyle: TextStyle(
+              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            ),
+          ),
+          style: TextStyle(
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              '取消',
+              style: TextStyle(
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                setState(() {
+                  _statusText = controller.text.trim();
+                });
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('状态已设置为：${controller.text.trim()}'),
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              }
+            },
+            child: Text(
+              '确定',
+              style: TextStyle(color: AppColors.primary),
+            ),
+          ),
+        ],
       ),
     );
   }
