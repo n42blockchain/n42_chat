@@ -664,8 +664,8 @@ class MessageItem extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: message.isFromMe
-            ? AppColors.messageBubbleSent
-            : (isDark ? AppColors.messageBubbleReceivedDark : AppColors.messageBubbleReceived),
+            ? AppColors.messageSent
+            : (isDark ? AppColors.messageReceivedDark : AppColors.messageReceived),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
