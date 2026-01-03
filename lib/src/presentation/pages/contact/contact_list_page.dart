@@ -450,19 +450,27 @@ class _ContactListPageState extends State<ContactListPage> {
   }
 
   void _showFriendRequestsPage() {
+    final contactBloc = context.read<ContactBloc>();
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const _FriendRequestsPage(),
+        builder: (ctx) => BlocProvider.value(
+          value: contactBloc,
+          child: const _FriendRequestsPage(),
+        ),
       ),
     );
   }
 
   void _showGroupsPage() {
+    final contactBloc = context.read<ContactBloc>();
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const _GroupListPage(),
+        builder: (ctx) => BlocProvider.value(
+          value: contactBloc,
+          child: const _GroupListPage(),
+        ),
       ),
     );
   }
