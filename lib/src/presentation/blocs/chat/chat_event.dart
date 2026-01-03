@@ -27,7 +27,7 @@ class LoadMessages extends ChatEvent {
   final String roomId;
   final int limit;
 
-  const LoadMessages(this.roomId, {this.limit = 50});
+  const LoadMessages(this.roomId, {this.limit = 100});
 
   @override
   List<Object?> get props => [roomId, limit];
