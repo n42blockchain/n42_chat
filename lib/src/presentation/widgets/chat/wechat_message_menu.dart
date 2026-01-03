@@ -33,6 +33,8 @@ class WeChatMessageMenu extends StatelessWidget {
   final VoidCallback? onQuote;
   final VoidCallback? onRemind;
   final VoidCallback? onSearch;
+  final VoidCallback? onDelete; // 删除发送失败的消息
+  final VoidCallback? onResend; // 重新发送失败的消息
   
   /// 表情回应回调
   final Function(String emoji)? onReaction;
@@ -52,6 +54,8 @@ class WeChatMessageMenu extends StatelessWidget {
     this.onQuote,
     this.onRemind,
     this.onSearch,
+    this.onDelete,
+    this.onResend,
     this.onReaction,
   });
 
@@ -198,7 +202,26 @@ class WeChatMessageMenu extends StatelessWidget {
                     onFavorite?.call();
                   },
                 ),
-                if (message.isFromMe)
+                // 发送失败的消息显示"重发"和"删除"
+                if (message.isFromMe && message.status == MessageStatus.failed) ...[
+                  _buildMenuItem(
+                    icon: Icons.refresh,
+                    label: '重发',
+                    onTap: () {
+                      onDismiss();
+                      onResend?.call();
+                    },
+                  ),
+                  _buildMenuItem(
+                    icon: Icons.delete_outline,
+                    label: '删除',
+                    isHighlighted: true,
+                    onTap: () {
+                      onDismiss();
+                      onDelete?.call();
+                    },
+                  ),
+                ] else if (message.isFromMe)
                   _buildMenuItem(
                     icon: Icons.undo_outlined,
                     label: '撤回',
@@ -542,6 +565,8 @@ class MessageMenuHelper {
     VoidCallback? onQuote,
     VoidCallback? onRemind,
     VoidCallback? onSearch,
+    VoidCallback? onDelete,
+    VoidCallback? onResend,
     Function(String emoji)? onReaction,
     bool isFavorited = false,
   }) {
@@ -574,6 +599,8 @@ class MessageMenuHelper {
         onQuote: onQuote,
         onRemind: onRemind,
         onSearch: onSearch,
+        onDelete: onDelete,
+        onResend: onResend,
         onReaction: onReaction,
       ),
     );
