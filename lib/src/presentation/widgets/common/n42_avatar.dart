@@ -220,13 +220,13 @@ class N42Avatar extends StatelessWidget {
 
 /// 群组头像（微信风格九宫格样式）
 /// 
-/// 布局规则：
+/// 布局规则（参照微信）：
 /// - 1人：居中显示
-/// - 2人：水平并排
+/// - 2人：左右并排
 /// - 3人：上1下2
 /// - 4人：2x2网格
 /// - 5人：上2下3
-/// - 6人：上2中2下2
+/// - 6人：2x3网格
 /// - 7人：上1中3下3
 /// - 8人：上2中3下3
 /// - 9人：3x3网格
@@ -260,7 +260,7 @@ class N42GroupAvatar extends StatelessWidget {
     this.borderRadius = 4,
     this.onTap,
     this.backgroundColor,
-    this.spacing = 2,
+    this.spacing = 1,
   });
 
   @override
@@ -271,11 +271,10 @@ class N42GroupAvatar extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: backgroundColor ?? const Color(0xFFE8E8E8), // 微信灰色背景
+          color: backgroundColor ?? const Color(0xFFCCCCCC), // 微信灰色背景
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         clipBehavior: Clip.antiAlias,
-        padding: EdgeInsets.all(spacing),
         child: _buildWeChatGrid(),
       ),
     );
@@ -284,60 +283,79 @@ class N42GroupAvatar extends StatelessWidget {
   /// 构建微信风格的九宫格布局
   Widget _buildWeChatGrid() {
     final count = memberAvatars.length.clamp(1, 9);
-    final innerSize = size - spacing * 2;
     
-    // 根据人数计算布局
+    // 根据人数确定网格列数
+    final cols = count <= 1 ? 1 : (count <= 4 ? 2 : 3);
+    // 计算每个头像的大小
+    final gap = spacing;
+    final padding = gap;
+    final availableSize = size - padding * 2 - gap * (cols - 1);
+    final itemSize = availableSize / cols;
+    
+    // 获取布局配置
     final layout = _getLayout(count);
-    final rows = layout.length;
-    final itemSize = (innerSize - spacing * (rows - 1)) / rows;
     
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(rows, (rowIndex) {
-        final rowItems = layout[rowIndex];
-        final rowWidth = rowItems * itemSize + (rowItems - 1) * spacing;
-        
-        return Padding(
-          padding: EdgeInsets.only(top: rowIndex > 0 ? spacing : 0),
-          child: SizedBox(
-            width: innerSize,
-            height: itemSize,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(rowItems, (colIndex) {
-                final index = _getAvatarIndex(layout, rowIndex, colIndex);
-                if (index >= count) return const SizedBox.shrink();
-                
-                final avatarUrl = index < memberAvatars.length ? memberAvatars[index] : null;
-                final name = memberNames != null && index < memberNames!.length
-                    ? memberNames![index]
-                    : null;
-                
-                return Padding(
-                  padding: EdgeInsets.only(left: colIndex > 0 ? spacing : 0),
-                  child: SizedBox(
-                    width: itemSize,
-                    height: itemSize,
-                    child: N42Avatar(
-                      imageUrl: avatarUrl,
-                      name: name,
-                      size: itemSize,
-                      borderRadius: 2,
-                    ),
-                  ),
-                );
-              }),
-            ),
-          ),
-        );
-      }),
+    return Padding(
+      padding: EdgeInsets.all(padding),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: _buildRows(layout, itemSize, gap, count),
+      ),
     );
+  }
+  
+  List<Widget> _buildRows(List<int> layout, double itemSize, double gap, int count) {
+    final rows = <Widget>[];
+    int avatarIndex = 0;
+    
+    for (int rowIdx = 0; rowIdx < layout.length; rowIdx++) {
+      final itemsInRow = layout[rowIdx];
+      
+      if (rowIdx > 0) {
+        rows.add(SizedBox(height: gap));
+      }
+      
+      final rowChildren = <Widget>[];
+      for (int colIdx = 0; colIdx < itemsInRow; colIdx++) {
+        if (colIdx > 0) {
+          rowChildren.add(SizedBox(width: gap));
+        }
+        
+        if (avatarIndex < count) {
+          final avatarUrl = avatarIndex < memberAvatars.length ? memberAvatars[avatarIndex] : null;
+          final name = memberNames != null && avatarIndex < memberNames!.length
+              ? memberNames![avatarIndex]
+              : null;
+          
+          rowChildren.add(
+            SizedBox(
+              width: itemSize,
+              height: itemSize,
+              child: N42Avatar(
+                imageUrl: avatarUrl,
+                name: name,
+                size: itemSize,
+                borderRadius: 1,
+              ),
+            ),
+          );
+          avatarIndex++;
+        }
+      }
+      
+      rows.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: rowChildren,
+        ),
+      );
+    }
+    
+    return rows;
   }
 
   /// 获取每行的成员数量布局
-  /// 返回一个列表，每个元素表示该行的成员数
   List<int> _getLayout(int count) {
     switch (count) {
       case 1:
@@ -360,15 +378,6 @@ class N42GroupAvatar extends StatelessWidget {
       default:
         return [3, 3, 3];
     }
-  }
-
-  /// 根据行列索引获取成员在 memberAvatars 中的索引
-  int _getAvatarIndex(List<int> layout, int rowIndex, int colIndex) {
-    int index = 0;
-    for (int i = 0; i < rowIndex; i++) {
-      index += layout[i];
-    }
-    return index + colIndex;
   }
 }
 
