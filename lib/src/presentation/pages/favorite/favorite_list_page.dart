@@ -485,7 +485,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
             '长按聊天消息可收藏',
             style: TextStyle(
               fontSize: 14,
-              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: AppColors.textTertiary,
             ),
           ),
         ],
