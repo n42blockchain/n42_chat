@@ -141,13 +141,17 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    // 先清理聊天室（在 super.dispose 之前）
+    try {
+      context.read<ChatBloc>().add(const DisposeChat());
+    } catch (e) {
+      debugPrint('ChatPage: Error disposing ChatBloc: $e');
+    }
+    
     _scrollController.dispose();
     _inputController.dispose();
     _inputFocusNode.removeListener(_onInputFocusChanged);
     _inputFocusNode.dispose();
-
-    // 清理聊天室
-    context.read<ChatBloc>().add(const DisposeChat());
 
     super.dispose();
   }
