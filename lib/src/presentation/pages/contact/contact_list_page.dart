@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
+import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
@@ -452,10 +453,21 @@ class _ContactListPageState extends State<ContactListPage> {
         unreadCount: 0,
       );
       
+      final contactBloc = context.read<ContactBloc>();
+      
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (ctx) => ChatPage(conversation: conversation),
+          builder: (ctx) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (_) => getIt<ChatBloc>()),
+              BlocProvider.value(value: contactBloc),
+            ],
+            child: ChatPage(
+              conversation: conversation,
+              onBack: () => Navigator.of(ctx).pop(),
+            ),
+          ),
         ),
       );
     } catch (e) {
