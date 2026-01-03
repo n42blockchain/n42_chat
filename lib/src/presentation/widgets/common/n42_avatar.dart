@@ -98,10 +98,11 @@ class N42Avatar extends StatelessWidget {
         imageUrl: imageUrl!,
         fit: BoxFit.cover,
         httpHeaders: headers,
-        placeholder: (context, url) => _buildPlaceholder(),
+        placeholder: (context, url) => _buildFallbackAvatar(),
         errorWidget: (context, url, error) {
           debugPrint('N42Avatar: Failed to load image: $url, error: $error');
-          return _buildDefaultAvatar();
+          // 加载失败时，如果有名字则显示字母头像，否则显示默认图标
+          return _buildFallbackAvatar();
         },
       );
     }
@@ -111,7 +112,7 @@ class N42Avatar extends StatelessWidget {
       return Image.asset(
         localImagePath!,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
+        errorBuilder: (context, error, stackTrace) => _buildFallbackAvatar(),
       );
     }
 
@@ -121,6 +122,14 @@ class N42Avatar extends StatelessWidget {
     }
 
     // 默认头像
+    return _buildDefaultAvatar();
+  }
+  
+  /// 回退头像：优先显示字母头像，否则显示默认图标
+  Widget _buildFallbackAvatar() {
+    if (name != null && name!.isNotEmpty) {
+      return _buildInitialsAvatar();
+    }
     return _buildDefaultAvatar();
   }
 
