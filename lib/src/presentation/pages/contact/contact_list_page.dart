@@ -1,13 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
+import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../chat/chat_page.dart';
 import 'contact_tile.dart';
 import 'contact_index_bar.dart';
 
@@ -406,8 +410,66 @@ class _ContactListPageState extends State<ContactListPage> {
   }
 
   void _onContactTap(ContactEntity contact) {
-    // 导航到用户资料页
-    Navigator.of(context).pushNamed('/profile/${contact.userId}');
+    // 开始与该联系人聊天
+    _startChatWithContact(contact);
+  }
+  
+  Future<void> _startChatWithContact(ContactEntity contact) async {
+    try {
+      // 显示加载指示
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              ),
+              SizedBox(width: 12),
+              Text('正在打开聊天...'),
+            ],
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      
+      // 获取或创建私聊房间
+      final contactRepository = getIt<IContactRepository>();
+      final roomId = await contactRepository.startDirectChat(contact.userId);
+      
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      
+      // 导航到聊天页面
+      final conversation = ConversationEntity(
+        id: roomId,
+        name: contact.effectiveDisplayName,
+        avatarUrl: contact.avatarUrl,
+        type: ConversationType.direct,
+        lastMessage: null,
+        lastMessageTime: null,
+        unreadCount: 0,
+      );
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (ctx) => ChatPage(conversation: conversation),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Start chat error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('打开聊天失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   void _showAddContactDialog() {

@@ -302,6 +302,8 @@ class _ChatPageState extends State<ChatPage> {
         myDisplayName = currentUser?.displayName ?? '我';
         myPokeText = currentUser?.pokeText;
         myUserId = currentUser?.userId;
+        
+        debugPrint('Poke: myDisplayName=$myDisplayName, myPokeText=$myPokeText, myUserId=$myUserId');
       } catch (e) {
         // AuthBloc 不可用，使用默认名称
         debugPrint('AuthBloc not available: $e');
@@ -311,21 +313,23 @@ class _ChatPageState extends State<ChatPage> {
       final targetName = message.senderName;
       final targetUserId = message.senderId;
       
+      debugPrint('Poke: targetName=$targetName, targetUserId=$targetUserId');
+      
       // 微信风格的拍一拍效果
       // 1. 触发震动反馈
       HapticFeedback.mediumImpact();
       
       // 2. 发送拍一拍系统消息
-      // 始终传递自己的 pokeText，让 ChatBloc 决定使用哪个
-      // （优先使用被拍人在房间状态中的 pokeText，如果没有则使用拍人者的）
+      // 微信规则：使用拍人者自己设置的后缀
+      // 例如：我设置了"的头"，我拍星驰，显示"我 拍了拍 星驰的头"
       _sendPokeMessage(
         pokerName: myDisplayName,
         targetName: targetName,
         targetUserId: targetUserId,
-        pokeText: myPokeText, // 始终传递自己的 pokeText 作为备用
+        pokeText: myPokeText,
       );
       
-      // 3. 显示头像震动效果
+      // 3. 显示拍一拍动画效果（SnackBar）
       _showPokeAnimation(message, myPokeText: myPokeText);
     } catch (e) {
       debugPrint('Poke error: $e');
@@ -353,9 +357,14 @@ class _ChatPageState extends State<ChatPage> {
   /// 显示拍一拍动画效果
   void _showPokeAnimation(MessageEntity message, {String? myPokeText}) {
     // 显示一个简短的提示（使用自己设置的后缀）
+    // 格式：拍了拍「星驰」的头（如果设置了后缀"的头"）
+    debugPrint('ShowPokeAnimation: targetName=${message.senderName}, myPokeText=$myPokeText');
+    
     final displayText = myPokeText != null && myPokeText.isNotEmpty
         ? '拍了拍「${message.senderName}」$myPokeText'
         : '拍了拍「${message.senderName}」';
+    
+    debugPrint('ShowPokeAnimation: displayText=$displayText');
     
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
