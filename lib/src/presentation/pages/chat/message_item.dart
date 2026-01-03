@@ -623,11 +623,5 @@ class MessageItem extends StatelessWidget {
     final secs = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
-
-  String _formatFileSize(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    return '${(bytes / 1024 / 1024).toStringAsFixed(1)} MB';
-  }
 }
 
