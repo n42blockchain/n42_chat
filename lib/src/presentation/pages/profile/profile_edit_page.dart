@@ -297,17 +297,15 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            // 左侧标题 - 固定宽度
-            SizedBox(
-              width: 80,
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                ),
+            // 左侧标题 - 不换行
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
             ),
+            const SizedBox(width: 16),
             // 右侧内容
             Expanded(
               child: Row(
