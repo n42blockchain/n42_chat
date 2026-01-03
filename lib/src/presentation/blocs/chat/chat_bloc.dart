@@ -178,7 +178,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       return newMsg;
     }).toList();
     
-    emit(state.copyWith(messages: mergedMessages));
+    if (!isClosed) {
+      emit(state.copyWith(messages: mergedMessages));
+    }
   }
 
   /// 发送文本消息
@@ -418,22 +420,27 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     if (_currentRoomId == null) return;
     
-    debugPrint('ChatBloc: Deleting failed message: ${event.messageId}');
+    final roomId = _currentRoomId!;
+    final messageId = event.messageId;
+    
+    debugPrint('ChatBloc: Deleting failed message: $messageId');
     
     // 先从 UI 中移除
-    _locallyDeletedMessageIds.add(event.messageId);
+    _locallyDeletedMessageIds.add(messageId);
     final updatedMessages = state.messages
-        .where((m) => m.id != event.messageId)
+        .where((m) => m.id != messageId)
         .toList();
-    emit(state.copyWith(messages: updatedMessages));
     
-    // 然后尝试从服务器/本地数据库中删除
+    if (!isClosed) {
+      emit(state.copyWith(messages: updatedMessages));
+    }
+    
+    // 然后尝试从服务器/本地数据库中删除（不需要 emit，所以可以在 bloc 关闭后继续）
     try {
-      await _messageRepository.deleteFailedMessage(_currentRoomId!, event.messageId);
+      await _messageRepository.deleteFailedMessage(roomId, messageId);
       debugPrint('ChatBloc: Successfully deleted failed message from server/local');
     } catch (e) {
       debugPrint('ChatBloc: Error deleting failed message: $e');
-      // 即使服务器删除失败，UI 已经移除了消息
     }
   }
 
@@ -591,7 +598,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _messagesSubscription = null;
     _currentRoomId = null;
     _locallyDeletedMessageIds.clear(); // 清除已删除消息ID集合
-    emit(ChatState.initial());
+    if (!isClosed) {
+      emit(ChatState.initial());
+    }
   }
   
   /// 发送系统通知/拍一拍消息
