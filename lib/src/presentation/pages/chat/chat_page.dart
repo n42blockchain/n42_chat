@@ -2809,8 +2809,8 @@ ID：$contactId''';
   void _deleteFailedMessage(MessageEntity message) {
     if (message.status != MessageStatus.failed) return;
     
-    // 从本地删除失败的消息
-    context.read<ChatBloc>().add(DeleteMessagesLocally([message.id]));
+    // 从本地和服务器删除失败的消息
+    context.read<ChatBloc>().add(DeleteFailedMessage(message.id));
     
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
