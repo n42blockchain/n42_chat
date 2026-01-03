@@ -12,6 +12,7 @@ import '../favorite/favorite_list_page.dart';
 import '../qrcode/my_qrcode_page.dart';
 import '../settings/settings_page.dart';
 import 'profile_edit_page.dart';
+import 'status_page.dart';
 
 /// 我的页面
 class ProfilePage extends StatefulWidget {
@@ -240,6 +241,37 @@ class _ProfilePageState extends State<ProfilePage> {
                           // + 状态 按钮
                           GestureDetector(
                             onTap: () => _showStatusPicker(context, isDark),
+                            onLongPress: _statusText != null ? () {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('清除状态'),
+                                  content: const Text('确定要清除当前状态吗？'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(ctx),
+                                      child: const Text('取消'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(ctx);
+                                        setState(() => _statusText = null);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('状态已清除'),
+                                            duration: Duration(seconds: 1),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        '清除',
+                                        style: TextStyle(color: AppColors.error),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } : null,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
@@ -389,228 +421,24 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   /// 显示状态选择器
-  void _showStatusPicker(BuildContext context, bool isDark) {
-    final statusOptions = [
-      {'emoji': '😊', 'text': '开心'},
-      {'emoji': '😴', 'text': '休息中'},
-      {'emoji': '🎮', 'text': '游戏中'},
-      {'emoji': '📚', 'text': '学习中'},
-      {'emoji': '💼', 'text': '工作中'},
-      {'emoji': '🏃', 'text': '运动中'},
-      {'emoji': '🎵', 'text': '听音乐'},
-      {'emoji': '✈️', 'text': '旅行中'},
-      {'emoji': '🍜', 'text': '吃饭中'},
-      {'emoji': '🌙', 'text': '晚安'},
-    ];
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (ctx) => Container(
-        height: MediaQuery.of(context).size.height * 0.6,
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
-        ),
-        child: Column(
-          children: [
-            // 拖拽指示器
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[600] : Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            // 标题
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  const Spacer(),
-                  Text(
-                    '设置状态',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                    ),
-                  ),
-                  const Spacer(),
-                  if (_statusText != null)
-                    TextButton(
-                      onPressed: () {
-                        setState(() => _statusText = null);
-                        Navigator.pop(ctx);
-                      },
-                      child: Text(
-                        '清除',
-                        style: TextStyle(color: AppColors.error),
-                      ),
-                    )
-                  else
-                    const SizedBox(width: 48),
-                ],
-              ),
-            ),
-            Divider(
-              height: 1,
-              color: isDark ? AppColors.dividerDark : AppColors.divider,
-            ),
-            // 状态列表
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.all(16),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  childAspectRatio: 1,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                ),
-                itemCount: statusOptions.length,
-                itemBuilder: (context, index) {
-                  final status = statusOptions[index];
-                  final isSelected = _statusText == '${status['emoji']} ${status['text']}';
-                  
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _statusText = '${status['emoji']} ${status['text']}';
-                      });
-                      Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('状态已设置为：${status['emoji']} ${status['text']}'),
-                          duration: const Duration(seconds: 1),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isSelected 
-                            ? AppColors.primary.withOpacity(0.1)
-                            : (isDark ? Colors.grey[800] : Colors.grey[100]),
-                        borderRadius: BorderRadius.circular(12),
-                        border: isSelected 
-                            ? Border.all(color: AppColors.primary, width: 2)
-                            : null,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            status['emoji']!,
-                            style: const TextStyle(fontSize: 28),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            status['text']!,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            // 自定义状态
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () => _showCustomStatusDialog(context, isDark),
-                    icon: const Icon(Icons.edit_outlined),
-                    label: const Text('自定义状态'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+  void _showStatusPicker(BuildContext context, bool isDark) async {
+    final result = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (_) => StatusPage(currentStatus: _statusText),
       ),
     );
-  }
-
-  /// 自定义状态对话框
-  void _showCustomStatusDialog(BuildContext context, bool isDark) {
-    Navigator.pop(context); // 关闭底部弹窗
     
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
-        title: Text(
-          '自定义状态',
-          style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-          ),
+    if (result != null && mounted) {
+      setState(() {
+        _statusText = result;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('状态已设置为：$result'),
+          duration: const Duration(seconds: 1),
         ),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 20,
-          decoration: InputDecoration(
-            hintText: '输入你的状态...',
-            hintStyle: TextStyle(
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-            ),
-          ),
-          style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              '取消',
-              style: TextStyle(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              if (controller.text.trim().isNotEmpty) {
-                setState(() {
-                  _statusText = controller.text.trim();
-                });
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('状态已设置为：${controller.text.trim()}'),
-                    duration: const Duration(seconds: 1),
-                  ),
-                );
-              }
-            },
-            child: Text(
-              '确定',
-              style: TextStyle(color: AppColors.primary),
-            ),
-          ),
-        ],
-      ),
-    );
+      );
+    }
   }
 
   void _openEditProfile(BuildContext context) {
