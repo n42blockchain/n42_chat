@@ -812,36 +812,62 @@ class MatrixMessageDataSource {
       final timeline = await room.getTimeline();
       
       // 查找事件
-      final event = timeline.events.firstWhere(
-        (e) => e.eventId == eventId,
-        orElse: () => throw Exception('Event not found'),
-      );
-      
-      // 如果事件是发送失败状态，尝试取消发送
-      if (event.status == matrix.EventStatus.error || 
-          event.status == matrix.EventStatus.sending) {
-        debugPrint('Canceling send for event: $eventId');
-        // 取消发送并从本地删除
-        await timeline.cancelSend(eventId);
-        debugPrint('Successfully canceled send for event: $eventId');
-        return true;
+      matrix.Event? event;
+      try {
+        event = timeline.events.firstWhere((e) => e.eventId == eventId);
+      } catch (_) {
+        debugPrint('Event not found in timeline: $eventId');
       }
       
-      // 如果事件已发送到服务器，尝试 redact
-      if (event.status == matrix.EventStatus.sent ||
-          event.status == matrix.EventStatus.synced) {
-        debugPrint('Redacting event: $eventId');
-        await room.redactEvent(eventId);
-        return true;
+      if (event != null) {
+        debugPrint('Event status: ${event.status}');
+        
+        // 如果事件是发送失败或正在发送状态
+        if (event.status == matrix.EventStatus.error || 
+            event.status == matrix.EventStatus.sending) {
+          debugPrint('Removing failed/sending event from database: $eventId');
+          
+          // 尝试从本地数据库删除
+          final database = _client?.database;
+          if (database != null) {
+            try {
+              await database.removeEvent(eventId, roomId);
+              debugPrint('Successfully removed event from database');
+              return true;
+            } catch (e) {
+              debugPrint('Error removing from database: $e');
+            }
+          }
+        }
+        
+        // 如果事件已发送到服务器，尝试 redact
+        if (event.status == matrix.EventStatus.sent ||
+            event.status == matrix.EventStatus.synced) {
+          debugPrint('Redacting synced event: $eventId');
+          try {
+            await room.redactEvent(eventId);
+            return true;
+          } catch (e) {
+            debugPrint('Error redacting event: $e');
+          }
+        }
       }
       
-      debugPrint('Event status: ${event.status}, trying to cancel anyway');
-      // 尝试取消发送
-      await timeline.cancelSend(eventId);
-      return true;
+      // 尝试直接从数据库删除（无论是否找到事件）
+      final database = _client?.database;
+      if (database != null) {
+        try {
+          await database.removeEvent(eventId, roomId);
+          debugPrint('Successfully removed event from database (fallback)');
+          return true;
+        } catch (e) {
+          debugPrint('Error removing from database (fallback): $e');
+        }
+      }
+      
+      return false;
     } catch (e) {
       debugPrint('Error deleting failed message: $e');
-      // 即使删除失败，也返回 true 以从 UI 中移除
       return false;
     }
   }
