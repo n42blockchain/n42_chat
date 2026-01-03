@@ -70,6 +70,8 @@ class ConversationTile extends StatelessWidget {
   }
 
   Widget _buildAvatar() {
+    Widget avatarWidget;
+    
     // 三人及以上群聊：使用九宫格头像
     // 条件：是群聊 + 成员数 >= 3 + 有成员信息
     if (conversation.type == ConversationType.group &&
@@ -79,21 +81,49 @@ class ConversationTile extends StatelessWidget {
       final avatarKey = conversation.memberAvatarUrls!
           .map((url) => url ?? 'null')
           .join('_');
-      return N42GroupAvatar(
+      avatarWidget = N42GroupAvatar(
         key: ValueKey('group_${conversation.id}_$avatarKey'),
         memberAvatars: conversation.memberAvatarUrls!,
         memberNames: conversation.memberNames,
         size: 48,
       );
+    } else {
+      // 私聊或两人群聊：使用普通头像
+      // 显示对方头像，如果没有则显示字母头像
+      avatarWidget = N42Avatar(
+        imageUrl: conversation.avatarUrl,
+        name: conversation.name,
+        size: 48,
+      );
     }
-
-    // 私聊或两人群聊：使用普通头像
-    // 显示对方头像，如果没有则显示字母头像
-    return N42Avatar(
-      imageUrl: conversation.avatarUrl,
-      name: conversation.name,
-      size: 48,
-    );
+    
+    // 如果有未读消息，在头像右上角显示红点
+    if (conversation.unreadCount > 0 && !conversation.isMuted) {
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          avatarWidget,
+          Positioned(
+            top: -2,
+            right: -2,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: AppColors.badge,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white,
+                  width: 1.5,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+    
+    return avatarWidget;
   }
 
   Widget _buildContent(bool isDark) {
@@ -194,45 +224,15 @@ class ConversationTile extends StatelessWidget {
   }
 
   Widget _buildTrailing(bool isDark) {
-    // 未读徽章
-    if (conversation.unreadCount > 0) {
-      if (conversation.isMuted) {
-        // 免打扰时显示灰色点
-        return Container(
-          margin: const EdgeInsets.only(left: 8),
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: AppColors.textTertiary,
-            shape: BoxShape.circle,
-          ),
-        );
-      }
-
+    // 免打扰时有未读消息显示灰色点
+    if (conversation.unreadCount > 0 && conversation.isMuted) {
       return Container(
         margin: const EdgeInsets.only(left: 8),
-        padding: EdgeInsets.symmetric(
-          horizontal: conversation.unreadCount > 9 ? 6 : 0,
-        ),
-        constraints: const BoxConstraints(
-          minWidth: 18,
-          minHeight: 18,
-        ),
+        width: 8,
+        height: 8,
         decoration: BoxDecoration(
-          color: AppColors.badge,
-          borderRadius: BorderRadius.circular(9),
-        ),
-        child: Center(
-          child: Text(
-            conversation.unreadCount > 99
-                ? '99+'
-                : conversation.unreadCount.toString(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          color: AppColors.textTertiary,
+          shape: BoxShape.circle,
         ),
       );
     }

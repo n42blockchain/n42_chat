@@ -176,6 +176,12 @@ class N42Avatar extends StatelessWidget {
 
   Widget _buildInitialsAvatar() {
     final initials = _getInitials(name!);
+    
+    // 如果获取不到有效字母，显示默认图标
+    if (initials.isEmpty) {
+      return _buildDefaultAvatar();
+    }
+    
     return Container(
       color: backgroundColor ?? _getColorFromName(name!),
       child: Center(
@@ -212,11 +218,20 @@ class N42Avatar extends StatelessWidget {
   }
 
   String _getInitials(String name) {
-    final parts = name.trim().split(' ');
-    if (parts.length >= 2) {
+    // 过滤掉特殊字符，只保留字母、数字和中文
+    final cleanName = name.replaceAll(RegExp(r'[^\w\u4e00-\u9fa5]'), '').trim();
+    
+    if (cleanName.isEmpty) {
+      return '';
+    }
+    
+    final parts = cleanName.split(RegExp(r'\s+'));
+    if (parts.length >= 2 && parts[0].isNotEmpty && parts[1].isNotEmpty) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
-    return name.substring(0, name.length >= 2 ? 2 : 1).toUpperCase();
+    
+    // 返回第一个字符
+    return cleanName.substring(0, 1).toUpperCase();
   }
 
   Color _getDefaultColor() {
