@@ -162,7 +162,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         .where((m) => !_locallyDeletedMessageIds.contains(m.id))
         .toList();
     
-    // 保留本地添加的 reactions（服务器聚合可能需要时间）
+    // 保留本地添加的 reactions 和投票状态（服务器聚合可能需要时间）
     final currentMessages = state.messages;
     final mergedMessages = filteredMessages.map((newMsg) {
       // 查找当前状态中的同一消息
@@ -173,10 +173,58 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       
       // 如果当前消息有 reactions 但新消息没有，保留当前的 reactions
       if (currentMsg.reactions.isNotEmpty && newMsg.reactions.isEmpty) {
-        return newMsg.copyWith(reactions: currentMsg.reactions);
+        newMsg = newMsg.copyWith(reactions: currentMsg.reactions);
       }
       
-      // 如果新消息有更多 reactions，使用新消息的（服务器聚合完成）
+      // 保留投票消息的本地状态（服务器聚合需要时间）
+      if (newMsg.type == MessageType.poll && 
+          currentMsg.type == MessageType.poll &&
+          currentMsg.metadata != null) {
+        final currentMeta = currentMsg.metadata!;
+        final newMeta = newMsg.metadata;
+        
+        // 如果本地有投票数据但服务器返回的没有，保留本地数据
+        if ((currentMeta.totalVoters ?? 0) > 0 && 
+            (newMeta?.totalVoters ?? 0) == 0) {
+          newMsg = newMsg.copyWith(metadata: currentMeta);
+        }
+        // 如果本地有我的投票但服务器返回的没有，保留本地数据
+        else if ((currentMeta.myVotes?.isNotEmpty ?? false) && 
+                 (newMeta?.myVotes?.isEmpty ?? true)) {
+          newMsg = newMsg.copyWith(
+            metadata: MessageMetadata(
+              pollQuestion: newMeta?.pollQuestion ?? currentMeta.pollQuestion,
+              pollOptions: newMeta?.pollOptions ?? currentMeta.pollOptions,
+              pollOptionIds: newMeta?.pollOptionIds ?? currentMeta.pollOptionIds,
+              maxSelections: newMeta?.maxSelections ?? currentMeta.maxSelections,
+              pollEnded: newMeta?.pollEnded ?? currentMeta.pollEnded,
+              voteCounts: currentMeta.voteCounts,
+              totalVoters: currentMeta.totalVoters,
+              myVotes: currentMeta.myVotes,
+              // 保留其他元数据
+              mediaUrl: newMeta?.mediaUrl,
+              httpUrl: newMeta?.httpUrl,
+              thumbnailUrl: newMeta?.thumbnailUrl,
+              mimeType: newMeta?.mimeType,
+              size: newMeta?.size,
+              width: newMeta?.width,
+              height: newMeta?.height,
+              duration: newMeta?.duration,
+              fileName: newMeta?.fileName,
+              isPlayed: newMeta?.isPlayed,
+              waveform: newMeta?.waveform,
+              latitude: newMeta?.latitude,
+              longitude: newMeta?.longitude,
+              locationName: newMeta?.locationName,
+              amount: newMeta?.amount,
+              token: newMeta?.token,
+              transferStatus: newMeta?.transferStatus,
+              txHash: newMeta?.txHash,
+            ),
+          );
+        }
+      }
+      
       return newMsg;
     }).toList();
     
