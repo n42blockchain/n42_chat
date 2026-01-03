@@ -280,7 +280,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       
       // 刷新用户信息
       final user = _authRepository.currentUser;
-      debugPrint('AuthBloc: Updated user profile - ringtone: ${user?.ringtone}');
+      debugPrint('AuthBloc: Updated user profile - pokeText: ${user?.pokeText}, ringtone: ${user?.ringtone}');
       emit(state.copyWith(
         status: AuthStatus.authenticated,
         user: user,
