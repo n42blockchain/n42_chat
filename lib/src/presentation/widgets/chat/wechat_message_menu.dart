@@ -86,7 +86,7 @@ class WeChatMessageMenu extends StatelessWidget {
 
   double _calculateLeft(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    const menuWidth = 320.0;
+    const menuWidth = 340.0;
     
     // 居中或根据消息位置调整
     double left = (screenWidth - menuWidth) / 2;
@@ -146,7 +146,7 @@ class WeChatMessageMenu extends StatelessWidget {
 
   Widget _buildMenuContent(BuildContext context) {
     return Container(
-      width: 320,
+      width: 340,
       decoration: BoxDecoration(
         color: const Color(0xFF4C4C4C), // 微信深灰色
         borderRadius: BorderRadius.circular(8),
@@ -307,22 +307,25 @@ class WeChatMessageMenu extends StatelessWidget {
 
   /// 构建单个表情项
   Widget _buildReactionItem(String emoji) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onDismiss();
-        onReaction?.call(emoji);
-      },
-      child: Container(
-        width: 40,
-        height: 40,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          emoji,
-          style: const TextStyle(fontSize: 26),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onDismiss();
+          onReaction?.call(emoji);
+        },
+        borderRadius: BorderRadius.circular(22),
+        splashColor: Colors.white.withOpacity(0.2),
+        highlightColor: Colors.white.withOpacity(0.1),
+        child: Container(
+          width: 44,
+          height: 44,
+          alignment: Alignment.center,
+          child: Text(
+            emoji,
+            style: const TextStyle(fontSize: 28),
+          ),
         ),
       ),
     );
@@ -330,23 +333,29 @@ class WeChatMessageMenu extends StatelessWidget {
 
   /// 构建更多表情按钮
   Widget _buildMoreReactionButton() {
-    return GestureDetector(
-      onTap: () {
-        // TODO: 显示完整表情选择器
-        HapticFeedback.lightImpact();
-      },
-      child: Container(
-        width: 36,
-        height: 36,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: const Icon(
-          Icons.add,
-          color: Colors.white70,
-          size: 20,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          // TODO: 显示完整表情选择器
+          HapticFeedback.lightImpact();
+        },
+        borderRadius: BorderRadius.circular(20),
+        splashColor: Colors.white.withOpacity(0.2),
+        highlightColor: Colors.white.withOpacity(0.1),
+        child: Container(
+          width: 40,
+          height: 40,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Icon(
+            Icons.add,
+            color: Colors.white70,
+            size: 22,
+          ),
         ),
       ),
     );
@@ -358,28 +367,34 @@ class WeChatMessageMenu extends StatelessWidget {
     VoidCallback? onTap,
     bool isHighlighted = false,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 52,
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isHighlighted ? Colors.amber : Colors.white,
-              size: 22,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              style: TextStyle(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        splashColor: Colors.white.withOpacity(0.1),
+        highlightColor: Colors.white.withOpacity(0.05),
+        child: Container(
+          width: 58,
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
                 color: isHighlighted ? Colors.amber : Colors.white,
-                fontSize: 11,
+                size: 24,
               ),
-            ),
-          ],
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isHighlighted ? Colors.amber : Colors.white,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
