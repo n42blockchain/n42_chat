@@ -5457,7 +5457,12 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
                     ],
                   )
                 : _chewieController != null
-                    ? Chewie(controller: _chewieController!)
+                    ? AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio > 0 
+                            ? _controller.value.aspectRatio 
+                            : 16 / 9,
+                        child: Chewie(controller: _chewieController!),
+                      )
                     : const Text('播放器初始化失败', style: TextStyle(color: Colors.white)),
       ),
     );
