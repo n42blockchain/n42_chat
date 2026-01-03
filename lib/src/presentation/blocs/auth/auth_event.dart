@@ -147,3 +147,86 @@ class LoadUserProfileData extends AuthEvent {
   const LoadUserProfileData();
 }
 
+// ============================================
+// 多种登录方式事件
+// ============================================
+
+/// Passkey 登录请求
+class AuthPasskeyLoginRequested extends AuthEvent {
+  final String homeserver;
+  
+  const AuthPasskeyLoginRequested({required this.homeserver});
+  
+  @override
+  List<Object?> get props => [homeserver];
+}
+
+/// 注册 Passkey
+class AuthRegisterPasskeyRequested extends AuthEvent {
+  const AuthRegisterPasskeyRequested();
+}
+
+/// 请求邮箱验证码
+class AuthRequestEmailOtpRequested extends AuthEvent {
+  final String homeserver;
+  final String email;
+  
+  const AuthRequestEmailOtpRequested({
+    required this.homeserver,
+    required this.email,
+  });
+  
+  @override
+  List<Object?> get props => [homeserver, email];
+}
+
+/// 邮箱验证码登录请求
+class AuthEmailOtpLoginRequested extends AuthEvent {
+  final String homeserver;
+  final String email;
+  final String otp;
+  
+  const AuthEmailOtpLoginRequested({
+    required this.homeserver,
+    required this.email,
+    required this.otp,
+  });
+  
+  @override
+  List<Object?> get props => [homeserver, email, otp];
+}
+
+/// Google 登录请求
+class AuthGoogleLoginRequested extends AuthEvent {
+  final String homeserver;
+  
+  const AuthGoogleLoginRequested({required this.homeserver});
+  
+  @override
+  List<Object?> get props => [homeserver];
+}
+
+/// Apple 登录请求
+class AuthAppleLoginRequested extends AuthEvent {
+  final String homeserver;
+  
+  const AuthAppleLoginRequested({required this.homeserver});
+  
+  @override
+  List<Object?> get props => [homeserver];
+}
+
+/// SSO 登录请求
+class AuthSsoLoginRequested extends AuthEvent {
+  final String homeserver;
+  final String? providerId;
+  
+  const AuthSsoLoginRequested({
+    required this.homeserver,
+    this.providerId,
+  });
+  
+  @override
+  List<Object?> get props => [homeserver, providerId];
+}
+
