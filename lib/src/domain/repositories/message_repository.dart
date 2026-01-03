@@ -75,6 +75,9 @@ abstract class IMessageRepository {
 
   /// 撤回消息
   Future<bool> redactMessage(String roomId, String messageId, {String? reason});
+  
+  /// 删除发送失败的消息（从本地和服务器）
+  Future<bool> deleteFailedMessage(String roomId, String messageId);
 
   /// 回复消息
   Future<MessageEntity?> replyToMessage(
