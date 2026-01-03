@@ -31,6 +31,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendLocationMessage>(_onSendLocationMessage);
     on<ResendMessage>(_onResendMessage);
     on<RedactMessage>(_onRedactMessage);
+    on<DeleteMessagesLocally>(_onDeleteMessagesLocally);
     on<ReplyToMessage>(_onReplyToMessage);
     on<SetReplyTarget>(_onSetReplyTarget);
     on<AddReaction>(_onAddReaction);
@@ -323,9 +324,27 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         event.messageId,
         reason: event.reason,
       );
+      
+      // 从本地列表中移除消息
+      final updatedMessages = state.messages
+          .where((m) => m.id != event.messageId)
+          .toList();
+      emit(state.copyWith(messages: updatedMessages));
     } catch (e) {
       emit(state.copyWith(error: '撤回失败'));
     }
+  }
+  
+  /// 本地删除消息（不发送到服务器）
+  void _onDeleteMessagesLocally(
+    DeleteMessagesLocally event,
+    Emitter<ChatState> emit,
+  ) {
+    final idsToDelete = event.messageIds.toSet();
+    final updatedMessages = state.messages
+        .where((m) => !idsToDelete.contains(m.id))
+        .toList();
+    emit(state.copyWith(messages: updatedMessages));
   }
 
   /// 回复消息
