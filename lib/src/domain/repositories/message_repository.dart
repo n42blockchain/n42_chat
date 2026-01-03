@@ -119,5 +119,8 @@ abstract class IMessageRepository {
 
   /// 下载媒体文件
   Future<Uint8List?> downloadMedia(String mxcUrl);
+  
+  /// 获取当前用户ID
+  Future<String?> getCurrentUserId();
 }
 
