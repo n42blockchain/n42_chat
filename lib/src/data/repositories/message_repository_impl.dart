@@ -33,11 +33,21 @@ class MessageRepositoryImpl implements IMessageRepository {
     final timeline = await _getOrCreateTimeline(roomId);
     if (timeline == null) return [];
 
-    final events = timeline.events
-        .where((e) => _isDisplayableEvent(e))
-        .take(limit)
-        .toList();
+    // 如果当前事件数量不足，请求更多历史
+    var displayableEvents = timeline.events.where((e) => _isDisplayableEvent(e)).toList();
+    
+    if (displayableEvents.length < limit) {
+      debugPrint('MessageRepositoryImpl: Only ${displayableEvents.length} displayable events, requesting more...');
+      try {
+        await timeline.requestHistory(historyCount: limit * 2);
+        displayableEvents = timeline.events.where((e) => _isDisplayableEvent(e)).toList();
+        debugPrint('MessageRepositoryImpl: After requestHistory, ${displayableEvents.length} displayable events');
+      } catch (e) {
+        debugPrint('MessageRepositoryImpl: Failed to request more history: $e');
+      }
+    }
 
+    final events = displayableEvents.take(limit).toList();
     return events.map((e) => _messageDataSource.mapEventToMessage(e, room)).toList();
   }
 
@@ -93,10 +103,16 @@ class MessageRepositoryImpl implements IMessageRepository {
     final room = _client?.getRoomById(roomId);
     if (room == null) return [];
 
-    final timeline = await _getOrCreateTimeline(roomId);
+    final timeline = await _getOrCreateTimeline(roomId, requestHistory: false);
     if (timeline == null) return [];
 
+    final beforeCount = timeline.events.length;
+    debugPrint('MessageRepositoryImpl: loadMoreMessages - before: $beforeCount events');
+    
     await timeline.requestHistory(historyCount: limit);
+    
+    final afterCount = timeline.events.length;
+    debugPrint('MessageRepositoryImpl: loadMoreMessages - after: $afterCount events (+${afterCount - beforeCount})');
 
     return _getMessagesFromTimeline(timeline, room);
   }
@@ -401,7 +417,7 @@ class MessageRepositoryImpl implements IMessageRepository {
   // 辅助方法
   // ============================================
 
-  Future<matrix.Timeline?> _getOrCreateTimeline(String roomId) async {
+  Future<matrix.Timeline?> _getOrCreateTimeline(String roomId, {bool requestHistory = true}) async {
     if (_timelines.containsKey(roomId)) {
       return _timelines[roomId];
     }
@@ -411,6 +427,18 @@ class MessageRepositoryImpl implements IMessageRepository {
 
     final timeline = await room.getTimeline();
     _timelines[roomId] = timeline;
+    
+    // 自动请求历史消息以确保有足够的消息显示
+    if (requestHistory && timeline.events.length < 50) {
+      debugPrint('MessageRepositoryImpl: Timeline has ${timeline.events.length} events, requesting more history...');
+      try {
+        await timeline.requestHistory(historyCount: 100);
+        debugPrint('MessageRepositoryImpl: After requestHistory, timeline has ${timeline.events.length} events');
+      } catch (e) {
+        debugPrint('MessageRepositoryImpl: Failed to request history: $e');
+      }
+    }
+    
     return timeline;
   }
 
