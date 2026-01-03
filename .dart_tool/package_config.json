@@ -1316,6 +1316,12 @@
       "languageVersion": "3.6"
     },
     {
+      "name": "video_thumbnail",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/video_thumbnail-0.5.6",
+      "packageUri": "lib/",
+      "languageVersion": "2.16"
+    },
+    {
       "name": "vm_service",
       "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/vm_service-15.0.2",
       "packageUri": "lib/",

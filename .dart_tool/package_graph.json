@@ -46,7 +46,8 @@
         "sqlite3_flutter_libs",
         "url_launcher",
         "uuid",
-        "video_player"
+        "video_player",
+        "video_thumbnail"
       ],
       "devDependencies": [
         "bloc_test",
@@ -2189,6 +2190,13 @@
         "ffi",
         "meta",
         "path"
+      ]
+    },
+    {
+      "name": "video_thumbnail",
+      "version": "0.5.6",
+      "dependencies": [
+        "flutter"
       ]
     }
   ],

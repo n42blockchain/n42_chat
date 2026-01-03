@@ -4,11 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/message_reaction_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/chat/message_status_indicator.dart' as indicator;
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/wechat_message_menu.dart';
+import '../../widgets/chat/message_reaction_bar.dart';
 
 /// 消息列表项
 class MessageItem extends StatelessWidget {
@@ -38,6 +40,12 @@ class MessageItem extends StatelessWidget {
 
   /// 是否显示发送者名称
   final bool showSenderName;
+  
+  /// 当前用户ID（用于表情回应高亮）
+  final String? currentUserId;
+  
+  /// 表情回应点击回调
+  final Function(String emoji)? onReactionTap;
 
   const MessageItem({
     super.key,
@@ -50,6 +58,8 @@ class MessageItem extends StatelessWidget {
     this.onResend,
     this.isGroupChat = false,
     this.showSenderName = false,
+    this.currentUserId,
+    this.onReactionTap,
   });
 
   @override
@@ -148,7 +158,7 @@ class MessageItem extends StatelessWidget {
 
     // 高亮显示搜索结果
     if (isHighlighted) {
-      return Container(
+      bubble = Container(
         decoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(8),
@@ -156,8 +166,45 @@ class MessageItem extends StatelessWidget {
         child: bubble,
       );
     }
+    
+    // 如果有表情回应，显示在消息下方
+    if (message.reactions.isNotEmpty) {
+      return Column(
+        crossAxisAlignment: message.isFromMe 
+            ? CrossAxisAlignment.end 
+            : CrossAxisAlignment.start,
+        children: [
+          bubble,
+          _buildReactionBar(context),
+        ],
+      );
+    }
 
     return bubble;
+  }
+  
+  /// 构建表情回应栏
+  Widget _buildReactionBar(BuildContext context) {
+    // 转换 MessageReaction 到 MessageReactionEntity
+    final reactionEntities = message.reactions.map((r) {
+      return MessageReactionEntity(
+        emoji: r.key,
+        userIds: r.userIds,
+      );
+    }).toList();
+    
+    return Padding(
+      padding: EdgeInsets.only(
+        left: message.isFromMe ? 0 : 56, // 头像宽度 + 间距
+        right: message.isFromMe ? 56 : 0,
+        top: 4,
+      ),
+      child: MessageReactionBar(
+        reactions: reactionEntities,
+        currentUserId: currentUserId ?? '',
+        onReactionTap: onReactionTap,
+      ),
+    );
   }
 
   Widget _buildMessageContent(BuildContext context) {
