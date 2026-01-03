@@ -14,6 +14,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   StreamSubscription<List<MessageEntity>>? _messagesSubscription;
   String? _currentRoomId;
+  
+  // 已本地删除的消息ID集合（防止被消息订阅恢复）
+  final Set<String> _locallyDeletedMessageIds = {};
 
   ChatBloc({
     required IMessageRepository messageRepository,
@@ -56,6 +59,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) async {
     _currentRoomId = event.roomId;
+    _locallyDeletedMessageIds.clear(); // 新聊天室，清除已删除消息ID集合
     emit(state.copyWith(roomId: event.roomId, isLoading: true, clearError: true));
 
     // 加载消息并订阅更新
@@ -150,7 +154,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     MessagesUpdated event,
     Emitter<ChatState> emit,
   ) {
-    emit(state.copyWith(messages: event.messages));
+    // 过滤掉已本地删除的消息
+    final filteredMessages = event.messages
+        .where((m) => !_locallyDeletedMessageIds.contains(m.id))
+        .toList();
+    emit(state.copyWith(messages: filteredMessages));
   }
 
   /// 发送文本消息
@@ -372,6 +380,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) {
     final idsToDelete = event.messageIds.toSet();
+    
+    // 将删除的消息ID添加到集合中，防止被消息订阅恢复
+    _locallyDeletedMessageIds.addAll(idsToDelete);
+    debugPrint('ChatBloc: Locally deleted message IDs: $idsToDelete');
+    
     final updatedMessages = state.messages
         .where((m) => !idsToDelete.contains(m.id))
         .toList();
@@ -471,6 +484,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     await _messagesSubscription?.cancel();
     _messagesSubscription = null;
     _currentRoomId = null;
+    _locallyDeletedMessageIds.clear(); // 清除已删除消息ID集合
     emit(ChatState.initial());
   }
   
