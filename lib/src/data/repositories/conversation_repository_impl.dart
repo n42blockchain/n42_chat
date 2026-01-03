@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../core/utils/matrix_utils.dart';
 import '../../domain/entities/conversation_entity.dart';
 import '../../domain/repositories/conversation_repository.dart';
 import '../datasources/matrix/matrix_room_datasource.dart';
@@ -142,6 +143,16 @@ class ConversationRepositoryImpl implements IConversationRepository {
   ConversationEntity _mapRoomToEntity(matrix.Room room) {
     final avatarUrl = _roomDataSource.getRoomAvatarUrl(room);
     final lastMessageTime = _roomDataSource.getLastMessageTime(room);
+    
+    // 获取群成员头像列表（用于九宫格头像）
+    List<String?>? memberAvatarUrls;
+    List<String>? memberNames;
+    
+    if (!room.isDirectChat) {
+      final members = _getGroupMemberInfo(room);
+      memberAvatarUrls = members.$1;
+      memberNames = members.$2;
+    }
 
     return ConversationEntity(
       id: room.id,
@@ -159,7 +170,63 @@ class ConversationRepositoryImpl implements IConversationRepository {
       isPinned: room.isFavourite,
       isEncrypted: _roomDataSource.isEncrypted(room),
       memberCount: _roomDataSource.getMemberCount(room),
+      memberAvatarUrls: memberAvatarUrls,
+      memberNames: memberNames,
     );
+  }
+  
+  /// 获取群成员头像和名称列表（最多9个，用于九宫格头像）
+  (List<String?>, List<String>) _getGroupMemberInfo(matrix.Room room) {
+    final client = room.client;
+    
+    final avatarUrls = <String?>[];
+    final names = <String>[];
+    
+    // 获取已加入的成员（排除自己，最多取9个）
+    final participants = room.getParticipants();
+    final currentUserId = client.userID;
+    
+    int count = 0;
+    for (final member in participants) {
+      if (count >= 9) break;
+      if (member.id == currentUserId) continue; // 跳过自己
+      if (member.membership != matrix.Membership.join) continue; // 只取已加入的成员
+      
+      // 获取头像 URL
+      final mxcUri = member.avatarUrl;
+      String? httpUrl;
+      if (mxcUri != null) {
+        httpUrl = MatrixUtils.mxcToHttp(
+          mxcUri.toString(),
+          client: client,
+          width: 64,
+          height: 64,
+        );
+      }
+      
+      avatarUrls.add(httpUrl);
+      names.add(member.displayName ?? member.id.localpart ?? '');
+      count++;
+    }
+    
+    // 如果成员不足，可能需要把自己也加入
+    if (count == 0 && currentUserId != null) {
+      final ownProfile = room.unsafeGetUserFromMemoryOrFallback(currentUserId);
+      final mxcUri = ownProfile.avatarUrl;
+      String? httpUrl;
+      if (mxcUri != null) {
+        httpUrl = MatrixUtils.mxcToHttp(
+          mxcUri.toString(),
+          client: client,
+          width: 64,
+          height: 64,
+        );
+      }
+      avatarUrls.add(httpUrl);
+      names.add(ownProfile.displayName ?? currentUserId.localpart ?? '');
+    }
+    
+    return (avatarUrls, names);
   }
 }
 
