@@ -8,6 +8,7 @@ import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../blocs/chat/chat_bloc.dart';
+import '../../blocs/chat/chat_event.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
@@ -237,6 +238,7 @@ class _ContactListPageState extends State<ContactListPage> {
                       return ContactTile(
                         contact: contacts[index],
                         onTap: () => _onContactTap(contacts[index]),
+                        onLongPress: () => _showContactMenu(contacts[index]),
                       );
                     },
                     childCount: state.groupedContacts[letter]?.length ?? 0,
@@ -413,6 +415,230 @@ class _ContactListPageState extends State<ContactListPage> {
   void _onContactTap(ContactEntity contact) {
     // 开始与该联系人聊天
     _startChatWithContact(contact);
+  }
+  
+  /// 显示联系人操作菜单
+  void _showContactMenu(ContactEntity contact) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 联系人信息头部
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    N42Avatar(
+                      imageUrl: contact.avatarUrl,
+                      name: contact.effectiveDisplayName,
+                      size: 48,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            contact.effectiveDisplayName,
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          Text(
+                            contact.userId,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isDark ? Colors.white54 : Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              // 发消息
+              ListTile(
+                leading: const Icon(Icons.chat_bubble_outline),
+                title: const Text('发消息'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _startChatWithContact(contact);
+                },
+              ),
+              // 推荐给朋友
+              ListTile(
+                leading: const Icon(Icons.person_add_alt_1_outlined),
+                title: const Text('推荐给朋友'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _recommendToFriend(contact);
+                },
+              ),
+              // 设置备注
+              ListTile(
+                leading: const Icon(Icons.edit_outlined),
+                title: const Text('设置备注'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _setContactRemark(contact);
+                },
+              ),
+              // 添加到桌面
+              ListTile(
+                leading: const Icon(Icons.add_to_home_screen),
+                title: const Text('添加到桌面'),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('功能开发中')),
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
+              // 取消按钮
+              ListTile(
+                leading: const Icon(Icons.close),
+                title: const Text('取消'),
+                onTap: () => Navigator.pop(context),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  /// 推荐给朋友
+  Future<void> _recommendToFriend(ContactEntity contact) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // 显示联系人选择器（选择要推荐给谁）
+    final selectedContact = await showModalBottomSheet<ContactEntity>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _RecommendContactSheet(
+        excludeUserId: contact.userId, // 排除被推荐的联系人
+        isDark: isDark,
+      ),
+    );
+    
+    if (selectedContact == null || !mounted) return;
+    
+    try {
+      // 显示加载提示
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              ),
+              SizedBox(width: 12),
+              Text('正在发送名片...'),
+            ],
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      
+      // 获取或创建与目标联系人的私聊房间
+      final contactRepository = getIt<IContactRepository>();
+      final roomId = await contactRepository.startDirectChat(selectedContact.userId);
+      
+      // 发送名片消息
+      final cardContent = '''[名片]
+联系人：${contact.effectiveDisplayName}
+ID：${contact.userId}''';
+      
+      // 使用 ChatBloc 发送消息
+      final chatBloc = getIt<ChatBloc>();
+      chatBloc.add(InitializeChat(roomId: roomId));
+      
+      // 等待一小段时间确保聊天初始化
+      await Future.delayed(const Duration(milliseconds: 500));
+      chatBloc.add(SendTextMessage(cardContent));
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('已将 ${contact.effectiveDisplayName} 的名片推荐给 ${selectedContact.effectiveDisplayName}'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Recommend to friend error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('推荐失败: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+  
+  /// 设置联系人备注
+  void _setContactRemark(ContactEntity contact) {
+    final controller = TextEditingController(text: contact.remarkName);
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('设置备注'),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: '请输入备注名',
+            border: const OutlineInputBorder(),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () => controller.clear(),
+            ),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // TODO: 保存备注名到本地存储或 Matrix 账户数据
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('已设置备注为: ${controller.text}'),
+                ),
+              );
+            },
+            child: const Text('确定'),
+          ),
+        ],
+      ),
+    );
   }
   
   Future<void> _startChatWithContact(ContactEntity contact) async {
@@ -778,6 +1004,171 @@ class _GroupListPage extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// 推荐联系人选择弹窗
+class _RecommendContactSheet extends StatefulWidget {
+  final String excludeUserId;
+  final bool isDark;
+  
+  const _RecommendContactSheet({
+    required this.excludeUserId,
+    required this.isDark,
+  });
+  
+  @override
+  State<_RecommendContactSheet> createState() => _RecommendContactSheetState();
+}
+
+class _RecommendContactSheetState extends State<_RecommendContactSheet> {
+  String _searchQuery = '';
+  List<ContactEntity> _contacts = [];
+  bool _isLoading = true;
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadContacts();
+  }
+  
+  Future<void> _loadContacts() async {
+    try {
+      final contactRepository = getIt<IContactRepository>();
+      final contacts = await contactRepository.getContacts();
+      if (mounted) {
+        setState(() {
+          // 排除被推荐的联系人
+          _contacts = contacts.where((c) => c.userId != widget.excludeUserId).toList();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Failed to load contacts: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+  
+  List<ContactEntity> get _filteredContacts {
+    if (_searchQuery.isEmpty) return _contacts;
+    return _contacts.where((c) => 
+      c.effectiveDisplayName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+      c.userId.toLowerCase().contains(_searchQuery.toLowerCase())
+    ).toList();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.75,
+      decoration: BoxDecoration(
+        color: widget.isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: Column(
+        children: [
+          // 顶部标题栏
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: widget.isDark ? Colors.white12 : Colors.black12,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  '选择要推荐给的朋友',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: widget.isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: widget.isDark ? Colors.white : Colors.black,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ),
+          // 搜索框
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: '搜索联系人',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: widget.isDark 
+                    ? const Color(0xFF3A3A3C) 
+                    : const Color(0xFFF2F2F7),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+          ),
+          // 联系人列表
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _filteredContacts.isEmpty
+                    ? Center(
+                        child: Text(
+                          '没有找到联系人',
+                          style: TextStyle(
+                            color: widget.isDark ? Colors.white54 : Colors.black54,
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _filteredContacts.length,
+                        itemBuilder: (context, index) {
+                          final contact = _filteredContacts[index];
+                          return ListTile(
+                            leading: N42Avatar(
+                              imageUrl: contact.avatarUrl,
+                              name: contact.effectiveDisplayName,
+                              size: 44,
+                            ),
+                            title: Text(
+                              contact.effectiveDisplayName,
+                              style: TextStyle(
+                                color: widget.isDark ? Colors.white : Colors.black,
+                              ),
+                            ),
+                            subtitle: Text(
+                              contact.userId,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: widget.isDark ? Colors.white54 : Colors.black54,
+                              ),
+                            ),
+                            onTap: () => Navigator.pop(context, contact),
+                          );
+                        },
+                      ),
+          ),
+        ],
       ),
     );
   }
