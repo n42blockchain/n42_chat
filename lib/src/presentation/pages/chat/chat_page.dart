@@ -96,6 +96,11 @@ class _ChatPageState extends State<ChatPage> {
   
   // 当前用户ID（用于表情回应高亮）
   String? _currentUserId;
+  
+  // @ 提醒相关状态
+  bool _showMentionPicker = false;
+  int _mentionTriggerPosition = -1; // @ 符号的位置
+  String _mentionSearchQuery = ''; // @ 后面输入的搜索关键词
 
   @override
   void initState() {
@@ -180,6 +185,89 @@ class _ChatPageState extends State<ChatPage> {
   void _onInputChanged(String text) {
     // 发送正在输入状态
     context.read<ChatBloc>().add(SendTypingNotification(text.isNotEmpty));
+    
+    // 检测 @ 提醒（仅群聊）
+    if (widget.conversation.isGroup) {
+      _checkMentionTrigger(text);
+    }
+  }
+  
+  /// 检测 @ 触发
+  void _checkMentionTrigger(String text) {
+    final cursorPos = _inputController.selection.baseOffset;
+    
+    if (cursorPos < 0) {
+      _hideMentionPicker();
+      return;
+    }
+    
+    // 获取光标前的文本
+    final textBeforeCursor = cursorPos <= text.length 
+        ? text.substring(0, cursorPos) 
+        : text;
+    
+    // 查找最后一个 @ 符号
+    final lastAtIndex = textBeforeCursor.lastIndexOf('@');
+    
+    if (lastAtIndex >= 0) {
+      // 检查 @ 前面是否是空格或行首（确保是新的 @ 提醒）
+      final isValidTrigger = lastAtIndex == 0 || 
+          textBeforeCursor[lastAtIndex - 1] == ' ' || 
+          textBeforeCursor[lastAtIndex - 1] == '\n';
+      
+      if (isValidTrigger) {
+        // 获取 @ 后面的搜索关键词（不包含空格）
+        final searchPart = textBeforeCursor.substring(lastAtIndex + 1);
+        
+        // 如果 @ 后面没有空格，说明用户还在输入中，显示选择器
+        if (!searchPart.contains(' ')) {
+          setState(() {
+            _showMentionPicker = true;
+            _mentionTriggerPosition = lastAtIndex;
+            _mentionSearchQuery = searchPart;
+          });
+          return;
+        }
+      }
+    }
+    
+    // 没有有效的 @ 触发，隐藏选择器
+    _hideMentionPicker();
+  }
+  
+  /// 隐藏 @ 选择器
+  void _hideMentionPicker() {
+    if (_showMentionPicker) {
+      setState(() {
+        _showMentionPicker = false;
+        _mentionTriggerPosition = -1;
+        _mentionSearchQuery = '';
+      });
+    }
+  }
+  
+  /// 选择要 @ 的成员
+  void _onMentionMemberSelected(String memberName, String memberId) {
+    if (_mentionTriggerPosition < 0) return;
+    
+    final text = _inputController.text;
+    final cursorPos = _inputController.selection.baseOffset;
+    
+    // 替换 @搜索词 为 @成员名 
+    final beforeAt = text.substring(0, _mentionTriggerPosition);
+    final afterCursor = cursorPos <= text.length ? text.substring(cursorPos) : '';
+    
+    final mention = '@$memberName ';
+    final newText = beforeAt + mention + afterCursor;
+    final newCursorPos = beforeAt.length + mention.length;
+    
+    _inputController.text = newText;
+    _inputController.selection = TextSelection.fromPosition(
+      TextPosition(offset: newCursorPos),
+    );
+    
+    _hideMentionPicker();
+    _inputFocusNode.requestFocus();
   }
 
   void _onMessageTap(MessageEntity message) {
@@ -470,6 +558,9 @@ class _ChatPageState extends State<ChatPage> {
 
               // 回复预览
               if (!_isMultiSelectMode) _buildReplyPreview(),
+              
+              // @ 提醒成员选择器（群聊时）
+              if (_showMentionPicker && !_isMultiSelectMode) _buildMentionPicker(),
 
               // 多选模式下显示操作栏，否则显示输入栏
               if (_isMultiSelectMode)
@@ -2130,6 +2221,138 @@ ID：$contactId''';
     );
     
     _exitMultiSelectMode();
+  }
+  
+  /// 构建 @ 提醒成员选择器
+  Widget _buildMentionPicker() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF2C2C2E) : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black;
+    final subtextColor = isDark ? Colors.white54 : Colors.black54;
+    final borderColor = isDark ? Colors.white10 : Colors.grey[300]!;
+    
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 200),
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border(
+          top: BorderSide(color: borderColor, width: 0.5),
+        ),
+      ),
+      child: FutureBuilder<List<Map<String, String>>>(
+        future: _loadGroupMembers(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          
+          final members = snapshot.data ?? [];
+          
+          // 过滤成员
+          final filteredMembers = _mentionSearchQuery.isEmpty
+              ? members
+              : members.where((m) {
+                  final name = m['name']?.toLowerCase() ?? '';
+                  return name.contains(_mentionSearchQuery.toLowerCase());
+                }).toList();
+          
+          if (filteredMembers.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                _mentionSearchQuery.isEmpty ? '暂无成员' : '未找到成员',
+                style: TextStyle(color: subtextColor),
+              ),
+            );
+          }
+          
+          return ListView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            itemCount: filteredMembers.length,
+            itemBuilder: (context, index) {
+              final member = filteredMembers[index];
+              final name = member['name'] ?? '';
+              final avatarUrl = member['avatarUrl'] ?? '';
+              final userId = member['id'] ?? '';
+              
+              // 排除自己
+              if (userId == _currentUserId) {
+                return const SizedBox.shrink();
+              }
+              
+              return InkWell(
+                onTap: () => _onMentionMemberSelected(name, userId),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: borderColor, width: 0.5),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      // 头像
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: Colors.grey[300],
+                        backgroundImage: avatarUrl.isNotEmpty 
+                            ? NetworkImage(avatarUrl) 
+                            : null,
+                        child: avatarUrl.isEmpty 
+                            ? Text(
+                                name.isNotEmpty ? name[0].toUpperCase() : '?',
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )
+                            : null,
+                      ),
+                      const SizedBox(width: 12),
+                      // 名称
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 15,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+  
+  /// 加载群成员
+  Future<List<Map<String, String>>> _loadGroupMembers() async {
+    try {
+      final groupRepository = getIt<IGroupRepository>();
+      final members = await groupRepository.getGroupMembers(widget.conversation.id);
+      
+      return members.map((m) => {
+        'id': m.userId,
+        'name': m.displayName ?? m.userId,
+        'avatarUrl': m.avatarUrl ?? '',
+      }).toList();
+    } catch (e) {
+      debugPrint('Error loading group members: $e');
+      return [];
+    }
   }
 
   Widget _buildInputBar() {
