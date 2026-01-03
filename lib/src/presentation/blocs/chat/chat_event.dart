@@ -145,6 +145,16 @@ class RedactMessage extends ChatEvent {
   List<Object?> get props => [messageId, reason];
 }
 
+/// 本地删除消息（不发送到服务器，仅从 UI 中移除）
+class DeleteMessagesLocally extends ChatEvent {
+  final List<String> messageIds;
+
+  const DeleteMessagesLocally(this.messageIds);
+
+  @override
+  List<Object?> get props => [messageIds];
+}
+
 /// 回复消息
 class ReplyToMessage extends ChatEvent {
   final String replyToMessageId;

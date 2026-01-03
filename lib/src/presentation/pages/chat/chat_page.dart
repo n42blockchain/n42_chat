@@ -2575,38 +2575,38 @@ ID：$contactId''';
     
     if (confirmed != true) return;
     
-    int deletedCount = 0;
-    int failedCount = 0;
+    final chatBloc = context.read<ChatBloc>();
+    int redactedCount = 0;
+    int localDeletedCount = 0;
     
-    // 撤回自己的消息
+    // 撤回自己的消息（服务器端删除）
     for (final msg in myMessages) {
-      try {
-        context.read<ChatBloc>().add(RedactMessage(msg.id));
-        deletedCount++;
-      } catch (e) {
-        failedCount++;
-      }
+      chatBloc.add(RedactMessage(msg.id));
+      redactedCount++;
     }
     
-    // 对于他人消息，目前 Matrix 不支持删除他人消息（除非是房间管理员）
-    // 所以只显示提示
+    // 对于他人消息，从本地删除（仅在本地 UI 中移除）
     if (otherMessages.isNotEmpty) {
-      deletedCount += otherMessages.length;
-      // 在实际实现中，可以添加本地消息隐藏逻辑
+      final otherMessageIds = otherMessages.map((m) => m.id).toList();
+      chatBloc.add(DeleteMessagesLocally(otherMessageIds));
+      localDeletedCount = otherMessages.length;
     }
     
     if (mounted) {
       String message;
-      if (failedCount > 0) {
-        message = '已删除 $deletedCount 条消息，$failedCount 条删除失败';
+      if (redactedCount > 0 && localDeletedCount > 0) {
+        message = '已撤回 $redactedCount 条消息，本地删除 $localDeletedCount 条';
+      } else if (redactedCount > 0) {
+        message = '已撤回 $redactedCount 条消息';
       } else {
-        message = '已删除 $deletedCount 条消息';
+        message = '已删除 $localDeletedCount 条消息（仅本地）';
       }
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
           duration: const Duration(seconds: 2),
+          backgroundColor: Colors.green,
         ),
       );
     }
