@@ -570,7 +570,7 @@ ID：${contact.userId}''';
       
       // 使用 ChatBloc 发送消息
       final chatBloc = getIt<ChatBloc>();
-      chatBloc.add(InitializeChat(roomId: roomId));
+      chatBloc.add(InitializeChat(roomId));
       
       // 等待一小段时间确保聊天初始化
       await Future.delayed(const Duration(milliseconds: 500));
@@ -601,7 +601,7 @@ ID：${contact.userId}''';
   
   /// 设置联系人备注
   void _setContactRemark(ContactEntity contact) {
-    final controller = TextEditingController(text: contact.remarkName);
+    final controller = TextEditingController(text: contact.remark);
     
     showDialog(
       context: context,
