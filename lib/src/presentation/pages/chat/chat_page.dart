@@ -21,11 +21,14 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/repositories/auth_repository.dart';
+import '../../../domain/repositories/contact_repository.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/message_action_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/auth/auth_bloc.dart';
+import '../../blocs/auth/auth_event.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/chat/chat_state.dart';
@@ -290,7 +293,7 @@ class _ChatPageState extends State<ChatPage> {
   }
   
   /// 双击头像拍一拍
-  void _onAvatarDoubleTap(MessageEntity message) {
+  void _onAvatarDoubleTap(MessageEntity message) async {
     try {
       String myDisplayName = '我';
       String? myPokeText;
@@ -303,7 +306,25 @@ class _ChatPageState extends State<ChatPage> {
         myPokeText = currentUser?.pokeText;
         myUserId = currentUser?.userId;
         
-        debugPrint('Poke: myDisplayName=$myDisplayName, myPokeText=$myPokeText, myUserId=$myUserId');
+        debugPrint('Poke from AuthBloc: myDisplayName=$myDisplayName, myPokeText=$myPokeText, myUserId=$myUserId');
+        
+        // 如果 pokeText 为空，尝试从仓库直接获取
+        if (myPokeText == null || myPokeText.isEmpty) {
+          debugPrint('Poke: pokeText is null, trying to load from repository...');
+          try {
+            final authRepository = getIt<IAuthRepository>();
+            final profileData = await authRepository.getUserProfileData();
+            myPokeText = profileData?['pokeText'] as String?;
+            debugPrint('Poke from repository: pokeText=$myPokeText');
+            
+            // 如果成功获取到，触发刷新 AuthBloc 状态
+            if (myPokeText != null && myPokeText.isNotEmpty) {
+              authBloc.add(const LoadUserProfileData());
+            }
+          } catch (e) {
+            debugPrint('Poke: Failed to load from repository: $e');
+          }
+        }
       } catch (e) {
         // AuthBloc 不可用，使用默认名称
         debugPrint('AuthBloc not available: $e');
@@ -313,7 +334,7 @@ class _ChatPageState extends State<ChatPage> {
       final targetName = message.senderName;
       final targetUserId = message.senderId;
       
-      debugPrint('Poke: targetName=$targetName, targetUserId=$targetUserId');
+      debugPrint('Poke: targetName=$targetName, targetUserId=$targetUserId, finalPokeText=$myPokeText');
       
       // 微信风格的拍一拍效果
       // 1. 触发震动反馈
@@ -4077,21 +4098,40 @@ class _ContactCardSelectSheet extends StatefulWidget {
 
 class _ContactCardSelectSheetState extends State<_ContactCardSelectSheet> {
   String _searchQuery = '';
+  List<ContactEntity> _contacts = [];
+  bool _isLoading = true;
   
-  // 模拟联系人列表（实际应用中应从 ContactBloc 获取）
-  final List<Map<String, dynamic>> _contacts = [
-    {'id': '@user1:matrix.org', 'name': '张三', 'avatar': null},
-    {'id': '@user2:matrix.org', 'name': '李四', 'avatar': null},
-    {'id': '@user3:matrix.org', 'name': '王五', 'avatar': null},
-    {'id': '@user4:matrix.org', 'name': '赵六', 'avatar': null},
-    {'id': '@user5:matrix.org', 'name': '小明', 'avatar': null},
-    {'id': '@user6:matrix.org', 'name': '小红', 'avatar': null},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadContacts();
+  }
   
-  List<Map<String, dynamic>> get _filteredContacts {
+  Future<void> _loadContacts() async {
+    try {
+      final contactRepository = getIt<IContactRepository>();
+      final contacts = await contactRepository.getContacts();
+      if (mounted) {
+        setState(() {
+          _contacts = contacts;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Failed to load contacts: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+  
+  List<ContactEntity> get _filteredContacts {
     if (_searchQuery.isEmpty) return _contacts;
     return _contacts.where((c) => 
-      (c['name'] as String).toLowerCase().contains(_searchQuery.toLowerCase())
+      c.effectiveDisplayName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+      c.userId.toLowerCase().contains(_searchQuery.toLowerCase())
     ).toList();
   }
   
@@ -4161,44 +4201,56 @@ class _ContactCardSelectSheetState extends State<_ContactCardSelectSheet> {
           ),
           // 联系人列表
           Expanded(
-            child: _filteredContacts.isEmpty
-                ? Center(
-                    child: Text(
-                      '没有找到联系人',
-                      style: TextStyle(
-                        color: widget.isDark ? Colors.white54 : Colors.black54,
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: _filteredContacts.length,
-                    itemBuilder: (context, index) {
-                      final contact = _filteredContacts[index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: AppColors.primary,
-                          child: Text(
-                            (contact['name'] as String)[0],
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        title: Text(
-                          contact['name'] as String,
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _filteredContacts.isEmpty
+                    ? Center(
+                        child: Text(
+                          '没有找到联系人',
                           style: TextStyle(
-                            color: widget.isDark ? Colors.white : Colors.black,
-                          ),
-                        ),
-                        subtitle: Text(
-                          contact['id'] as String,
-                          style: TextStyle(
-                            fontSize: 12,
                             color: widget.isDark ? Colors.white54 : Colors.black54,
                           ),
                         ),
-                        onTap: () => Navigator.pop(context, contact),
-                      );
-                    },
-                  ),
+                      )
+                    : ListView.builder(
+                        itemCount: _filteredContacts.length,
+                        itemBuilder: (context, index) {
+                          final contact = _filteredContacts[index];
+                          return ListTile(
+                            leading: contact.avatarUrl != null
+                                ? CircleAvatar(
+                                    backgroundImage: NetworkImage(contact.avatarUrl!),
+                                  )
+                                : CircleAvatar(
+                                    backgroundColor: AppColors.primary,
+                                    child: Text(
+                                      contact.effectiveDisplayName.isNotEmpty 
+                                          ? contact.effectiveDisplayName[0].toUpperCase()
+                                          : '?',
+                                      style: const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                            title: Text(
+                              contact.effectiveDisplayName,
+                              style: TextStyle(
+                                color: widget.isDark ? Colors.white : Colors.black,
+                              ),
+                            ),
+                            subtitle: Text(
+                              contact.userId,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: widget.isDark ? Colors.white54 : Colors.black54,
+                              ),
+                            ),
+                            onTap: () => Navigator.pop(context, {
+                              'id': contact.userId,
+                              'name': contact.effectiveDisplayName,
+                              'avatar': contact.avatarUrl,
+                            }),
+                          );
+                        },
+                      ),
           ),
         ],
       ),
