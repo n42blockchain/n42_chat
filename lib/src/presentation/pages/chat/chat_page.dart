@@ -299,35 +299,23 @@ class _ChatPageState extends State<ChatPage> {
       String? myPokeText;
       String? myUserId;
       
+      // 直接从仓库获取用户资料（更可靠，不依赖 AuthBloc Provider）
       try {
-        final authBloc = context.read<AuthBloc>();
-        final currentUser = authBloc.state.user;
+        final authRepository = getIt<IAuthRepository>();
+        
+        // 获取当前用户基本信息
+        final currentUser = authRepository.currentUser;
         myDisplayName = currentUser?.displayName ?? '我';
-        myPokeText = currentUser?.pokeText;
         myUserId = currentUser?.userId;
         
-        debugPrint('Poke from AuthBloc: myDisplayName=$myDisplayName, myPokeText=$myPokeText, myUserId=$myUserId');
+        debugPrint('Poke: currentUser.displayName=$myDisplayName, userId=$myUserId');
         
-        // 如果 pokeText 为空，尝试从仓库直接获取
-        if (myPokeText == null || myPokeText.isEmpty) {
-          debugPrint('Poke: pokeText is null, trying to load from repository...');
-          try {
-            final authRepository = getIt<IAuthRepository>();
-            final profileData = await authRepository.getUserProfileData();
-            myPokeText = profileData?['pokeText'] as String?;
-            debugPrint('Poke from repository: pokeText=$myPokeText');
-            
-            // 如果成功获取到，触发刷新 AuthBloc 状态
-            if (myPokeText != null && myPokeText.isNotEmpty) {
-              authBloc.add(const LoadUserProfileData());
-            }
-          } catch (e) {
-            debugPrint('Poke: Failed to load from repository: $e');
-          }
-        }
+        // 从仓库获取 pokeText
+        final profileData = await authRepository.getUserProfileData();
+        myPokeText = profileData?['pokeText'] as String?;
+        debugPrint('Poke from repository: pokeText=$myPokeText, fullData=$profileData');
       } catch (e) {
-        // AuthBloc 不可用，使用默认名称
-        debugPrint('AuthBloc not available: $e');
+        debugPrint('Poke: Failed to get user info: $e');
       }
       
       // 获取被拍用户的显示名和拍一拍后缀
