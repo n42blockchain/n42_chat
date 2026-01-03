@@ -248,9 +248,6 @@ class N42GroupAvatar extends StatelessWidget {
   
   /// 背景色
   final Color? backgroundColor;
-  
-  /// 间距
-  final double spacing;
 
   const N42GroupAvatar({
     super.key,
@@ -260,7 +257,6 @@ class N42GroupAvatar extends StatelessWidget {
     this.borderRadius = 4,
     this.onTap,
     this.backgroundColor,
-    this.spacing = 1,
   });
 
   @override
@@ -271,91 +267,106 @@ class N42GroupAvatar extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: backgroundColor ?? const Color(0xFFCCCCCC), // 微信灰色背景
+          color: backgroundColor ?? const Color(0xFFE0E0E0), // 微信灰色背景
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         clipBehavior: Clip.antiAlias,
-        child: _buildWeChatGrid(),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return _buildWeChatGrid(constraints.maxWidth);
+          },
+        ),
       ),
     );
   }
 
   /// 构建微信风格的九宫格布局
-  Widget _buildWeChatGrid() {
+  Widget _buildWeChatGrid(double containerSize) {
     final count = memberAvatars.length.clamp(1, 9);
-    
-    // 根据人数确定网格列数
-    final cols = count <= 1 ? 1 : (count <= 4 ? 2 : 3);
-    // 计算每个头像的大小
-    final gap = spacing;
-    final padding = gap;
-    final availableSize = size - padding * 2 - gap * (cols - 1);
-    final itemSize = availableSize / cols;
-    
-    // 获取布局配置
     final layout = _getLayout(count);
+    final rowCount = layout.length;
+    
+    // 计算每个头像的列数（取最大行的列数）
+    final maxCols = layout.reduce((a, b) => a > b ? a : b);
+    
+    // 间距和内边距
+    const double gap = 2.0;
+    const double padding = 2.0;
+    
+    // 计算每个头像的尺寸（基于最大列数）
+    final availableSize = containerSize - padding * 2;
+    final itemSize = (availableSize - gap * (maxCols - 1)) / maxCols;
+    
+    // 计算总高度
+    final totalHeight = itemSize * rowCount + gap * (rowCount - 1);
+    // 垂直居中偏移
+    final verticalOffset = (availableSize - totalHeight) / 2;
+    
+    int avatarIndex = 0;
     
     return Padding(
-      padding: EdgeInsets.all(padding),
+      padding: const EdgeInsets.all(padding),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: _buildRows(layout, itemSize, gap, count),
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (verticalOffset > 0) SizedBox(height: verticalOffset),
+          ...List.generate(rowCount, (rowIdx) {
+            final itemsInRow = layout[rowIdx];
+            // 计算该行的宽度
+            final rowWidth = itemsInRow * itemSize + (itemsInRow - 1) * gap;
+            // 水平居中偏移
+            final horizontalOffset = (availableSize - rowWidth) / 2;
+            
+            final rowWidget = Padding(
+              padding: EdgeInsets.only(top: rowIdx > 0 ? gap : 0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (horizontalOffset > 0) SizedBox(width: horizontalOffset),
+                  ...List.generate(itemsInRow, (colIdx) {
+                    if (avatarIndex >= count) {
+                      return SizedBox(width: itemSize, height: itemSize);
+                    }
+                    
+                    final avatarUrl = avatarIndex < memberAvatars.length 
+                        ? memberAvatars[avatarIndex] 
+                        : null;
+                    final name = memberNames != null && avatarIndex < memberNames!.length
+                        ? memberNames![avatarIndex]
+                        : null;
+                    
+                    final widget = Padding(
+                      padding: EdgeInsets.only(left: colIdx > 0 ? gap : 0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: SizedBox(
+                          width: itemSize,
+                          height: itemSize,
+                          child: N42Avatar(
+                            imageUrl: avatarUrl,
+                            name: name,
+                            size: itemSize,
+                            borderRadius: 2,
+                          ),
+                        ),
+                      ),
+                    );
+                    
+                    avatarIndex++;
+                    return widget;
+                  }),
+                ],
+              ),
+            );
+            
+            return rowWidget;
+          }),
+        ],
       ),
     );
   }
-  
-  List<Widget> _buildRows(List<int> layout, double itemSize, double gap, int count) {
-    final rows = <Widget>[];
-    int avatarIndex = 0;
-    
-    for (int rowIdx = 0; rowIdx < layout.length; rowIdx++) {
-      final itemsInRow = layout[rowIdx];
-      
-      if (rowIdx > 0) {
-        rows.add(SizedBox(height: gap));
-      }
-      
-      final rowChildren = <Widget>[];
-      for (int colIdx = 0; colIdx < itemsInRow; colIdx++) {
-        if (colIdx > 0) {
-          rowChildren.add(SizedBox(width: gap));
-        }
-        
-        if (avatarIndex < count) {
-          final avatarUrl = avatarIndex < memberAvatars.length ? memberAvatars[avatarIndex] : null;
-          final name = memberNames != null && avatarIndex < memberNames!.length
-              ? memberNames![avatarIndex]
-              : null;
-          
-          rowChildren.add(
-            SizedBox(
-              width: itemSize,
-              height: itemSize,
-              child: N42Avatar(
-                imageUrl: avatarUrl,
-                name: name,
-                size: itemSize,
-                borderRadius: 1,
-              ),
-            ),
-          );
-          avatarIndex++;
-        }
-      }
-      
-      rows.add(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: rowChildren,
-        ),
-      );
-    }
-    
-    return rows;
-  }
 
-  /// 获取每行的成员数量布局
+  /// 获取每行的成员数量布局（微信风格）
   List<int> _getLayout(int count) {
     switch (count) {
       case 1:
