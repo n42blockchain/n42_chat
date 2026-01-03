@@ -826,12 +826,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     try {
       debugPrint('ChatBloc: Sending custom message - type: ${event.type}, content: ${event.content}');
       
+      // 获取当前用户ID
+      final currentUserId = await _messageRepository.getCurrentUserId() ?? '';
+      
       // 创建临时消息（用于乐观更新）
       final tempMessage = MessageEntity(
         id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
         roomId: _currentRoomId!,
-        senderId: _authRepository.currentUser?.userId ?? '',
-        senderName: _authRepository.currentUser?.displayName ?? 'Me',
+        senderId: currentUserId,
+        senderName: 'Me',
         content: event.content,
         type: event.type,
         timestamp: DateTime.now(),
