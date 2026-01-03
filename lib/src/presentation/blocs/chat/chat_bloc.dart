@@ -36,6 +36,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ResendMessage>(_onResendMessage);
     on<RedactMessage>(_onRedactMessage);
     on<DeleteMessagesLocally>(_onDeleteMessagesLocally);
+    on<DeleteFailedMessage>(_onDeleteFailedMessage);
     on<ReplyToMessage>(_onReplyToMessage);
     on<SetReplyTarget>(_onSetReplyTarget);
     on<AddReaction>(_onAddReaction);
@@ -408,6 +409,32 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         .where((m) => !idsToDelete.contains(m.id))
         .toList();
     emit(state.copyWith(messages: updatedMessages));
+  }
+  
+  /// 删除发送失败的消息（从本地和服务器）
+  Future<void> _onDeleteFailedMessage(
+    DeleteFailedMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+    
+    debugPrint('ChatBloc: Deleting failed message: ${event.messageId}');
+    
+    // 先从 UI 中移除
+    _locallyDeletedMessageIds.add(event.messageId);
+    final updatedMessages = state.messages
+        .where((m) => m.id != event.messageId)
+        .toList();
+    emit(state.copyWith(messages: updatedMessages));
+    
+    // 然后尝试从服务器/本地数据库中删除
+    try {
+      await _messageRepository.deleteFailedMessage(_currentRoomId!, event.messageId);
+      debugPrint('ChatBloc: Successfully deleted failed message from server/local');
+    } catch (e) {
+      debugPrint('ChatBloc: Error deleting failed message: $e');
+      // 即使服务器删除失败，UI 已经移除了消息
+    }
   }
 
   /// 回复消息

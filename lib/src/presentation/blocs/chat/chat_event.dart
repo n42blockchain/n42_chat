@@ -173,6 +173,16 @@ class DeleteMessagesLocally extends ChatEvent {
   List<Object?> get props => [messageIds];
 }
 
+/// 删除发送失败的消息（从本地和服务器）
+class DeleteFailedMessage extends ChatEvent {
+  final String messageId;
+
+  const DeleteFailedMessage(this.messageId);
+
+  @override
+  List<Object?> get props => [messageId];
+}
+
 /// 回复消息
 class ReplyToMessage extends ChatEvent {
   final String replyToMessageId;

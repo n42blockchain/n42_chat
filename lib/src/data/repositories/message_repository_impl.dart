@@ -212,6 +212,11 @@ class MessageRepositoryImpl implements IMessageRepository {
   Future<bool> redactMessage(String roomId, String messageId, {String? reason}) async {
     return await _messageDataSource.redactMessage(roomId, messageId, reason: reason);
   }
+  
+  @override
+  Future<bool> deleteFailedMessage(String roomId, String messageId) async {
+    return await _messageDataSource.deleteFailedMessage(roomId, messageId);
+  }
 
   @override
   Future<MessageEntity?> replyToMessage(

@@ -799,6 +799,52 @@ class MatrixMessageDataSource {
       return false;
     }
   }
+  
+  /// 删除发送失败的消息（从本地和服务器）
+  Future<bool> deleteFailedMessage(String roomId, String eventId) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return false;
+
+    try {
+      debugPrint('Deleting failed message: $eventId in room $roomId');
+      
+      // 获取时间线
+      final timeline = await room.getTimeline();
+      
+      // 查找事件
+      final event = timeline.events.firstWhere(
+        (e) => e.eventId == eventId,
+        orElse: () => throw Exception('Event not found'),
+      );
+      
+      // 如果事件是发送失败状态，尝试取消发送
+      if (event.status == matrix.EventStatus.error || 
+          event.status == matrix.EventStatus.sending) {
+        debugPrint('Canceling send for event: $eventId');
+        // 取消发送并从本地删除
+        await timeline.cancelSend(eventId);
+        debugPrint('Successfully canceled send for event: $eventId');
+        return true;
+      }
+      
+      // 如果事件已发送到服务器，尝试 redact
+      if (event.status == matrix.EventStatus.sent ||
+          event.status == matrix.EventStatus.synced) {
+        debugPrint('Redacting event: $eventId');
+        await room.redactEvent(eventId);
+        return true;
+      }
+      
+      debugPrint('Event status: ${event.status}, trying to cancel anyway');
+      // 尝试取消发送
+      await timeline.cancelSend(eventId);
+      return true;
+    } catch (e) {
+      debugPrint('Error deleting failed message: $e');
+      // 即使删除失败，也返回 true 以从 UI 中移除
+      return false;
+    }
+  }
 
   /// 回复消息
   Future<String?> replyToMessage(
