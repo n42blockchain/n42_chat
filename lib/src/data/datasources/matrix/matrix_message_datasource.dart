@@ -535,27 +535,10 @@ class MatrixMessageDataSource {
 
       final actualMimeType = mimeType ?? 'video/mp4';
       
-      // 方法1: 使用 SDK 内置的 sendFileEvent
-      debugPrint('Trying SDK sendFileEvent for video...');
-      try {
-        final matrixFile = matrix.MatrixVideoFile(
-          bytes: videoBytes,
-          name: filename,
-          mimeType: actualMimeType,
-        );
-        
-        final result = await room.sendFileEvent(matrixFile);
-        
-        debugPrint('sendFileEvent result: $result');
-        debugPrint('=== sendVideoMessage completed successfully (SDK method) ===');
-        return result;
-      } catch (sdkError, sdkStack) {
-        debugPrint('SDK sendFileEvent for video failed: $sdkError');
-        debugPrint('Stack: $sdkStack');
-        debugPrint('Falling back to manual upload...');
-      }
+      // 总是使用手动上传方式，因为SDK方法不支持缩略图上传
+      debugPrint('Using manual upload for video with thumbnail support...');
       
-      // 方法2: 手动上传
+      // 手动上传视频
       final mxcUri = await _uploadContentAuthenticated(
         videoBytes,
         filename: filename,
@@ -588,6 +571,11 @@ class MatrixMessageDataSource {
       
       if (thumbnailUri != null) {
         content['info']['thumbnail_url'] = thumbnailUri.toString();
+        content['info']['thumbnail_info'] = {
+          'mimetype': 'image/jpeg',
+          'w': 400,
+          'h': 400,
+        };
       }
       
       final result = await room.sendEvent(content);
@@ -1196,8 +1184,48 @@ class MatrixMessageDataSource {
 
   /// 提取表情回应
   List<MessageReaction> _extractReactions(matrix.Event event) {
-    // TODO: 实现表情回应提取
-    return [];
+    final reactions = <MessageReaction>[];
+    
+    try {
+      // Matrix SDK 的 aggregatedEvents 包含所有聚合事件（包括 reactions）
+      final aggregatedEvents = event.aggregatedEvents(
+        event.room.timeline, 
+        'm.annotation',
+      );
+      
+      if (aggregatedEvents.isEmpty) {
+        return reactions;
+      }
+      
+      // 按 emoji 分组
+      final reactionMap = <String, List<String>>{};
+      
+      for (final reactionEvent in aggregatedEvents) {
+        final relatesTo = reactionEvent.content['m.relates_to'] as Map<String, dynamic>?;
+        final emoji = relatesTo?['key'] as String?;
+        
+        if (emoji != null && emoji.isNotEmpty) {
+          reactionMap.putIfAbsent(emoji, () => []);
+          reactionMap[emoji]!.add(reactionEvent.senderId);
+        }
+      }
+      
+      // 转换为 MessageReaction 列表
+      final currentUserId = _client?.userID ?? '';
+      reactionMap.forEach((emoji, userIds) {
+        reactions.add(MessageReaction(
+          key: emoji,
+          userIds: userIds,
+          isMe: userIds.contains(currentUserId),
+        ));
+      });
+      
+      debugPrint('Extracted ${reactions.length} reactions for event ${event.eventId}');
+    } catch (e) {
+      debugPrint('Error extracting reactions: $e');
+    }
+    
+    return reactions;
   }
 
   /// 手动构建 HTTP URL（参考 FluffyChat 实现）
