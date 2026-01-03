@@ -58,23 +58,80 @@ class _AddFriendPageState extends State<AddFriendPage> {
         return;
       }
 
-      // 搜索用户
-      final response = await client.searchUserDirectory(query, limit: 20);
+      List<Map<String, dynamic>> results = [];
       
-      final results = response.results.map((user) {
-        // userId 格式: @username:server.com，提取 localpart
-        final localpart = user.userId.split(':').first.replaceFirst('@', '');
-        return <String, dynamic>{
-          'userId': user.userId,
-          'displayName': user.displayName ?? localpart,
-          'avatarUrl': user.avatarUrl?.toString(),
-        };
-      }).toList();
+      // 检查是否是完整的 Matrix ID 格式 (@user:server)
+      if (query.startsWith('@') && query.contains(':')) {
+        // 直接尝试获取该用户的资料
+        try {
+          final profile = await client.getProfileFromUserId(query);
+          final localpart = query.split(':').first.replaceFirst('@', '');
+          results.add({
+            'userId': query,
+            'displayName': profile.displayName ?? localpart,
+            'avatarUrl': profile.avatarUrl?.toString(),
+          });
+        } catch (e) {
+          debugPrint('Failed to get profile for $query: $e');
+        }
+      } else {
+        // 构建可能的 Matrix ID
+        final homeserver = client.homeserver?.host ?? '';
+        String fullUserId = query;
+        
+        // 如果输入不包含 @，添加 @
+        if (!query.startsWith('@')) {
+          fullUserId = '@$query';
+        }
+        
+        // 如果不包含 :server，添加当前服务器
+        if (!fullUserId.contains(':') && homeserver.isNotEmpty) {
+          fullUserId = '$fullUserId:$homeserver';
+        }
+        
+        // 尝试直接获取用户资料
+        if (fullUserId.contains(':')) {
+          try {
+            final profile = await client.getProfileFromUserId(fullUserId);
+            final localpart = fullUserId.split(':').first.replaceFirst('@', '');
+            results.add({
+              'userId': fullUserId,
+              'displayName': profile.displayName ?? localpart,
+              'avatarUrl': profile.avatarUrl?.toString(),
+            });
+          } catch (e) {
+            debugPrint('Failed to get profile for $fullUserId: $e');
+          }
+        }
+        
+        // 同时搜索用户目录
+        try {
+          final response = await client.searchUserDirectory(query, limit: 20);
+          
+          for (final user in response.results) {
+            // 避免重复添加
+            final exists = results.any((r) => r['userId'] == user.userId);
+            if (!exists) {
+              final localpart = user.userId.split(':').first.replaceFirst('@', '');
+              results.add({
+                'userId': user.userId,
+                'displayName': user.displayName ?? localpart,
+                'avatarUrl': user.avatarUrl?.toString(),
+              });
+            }
+          }
+        } catch (e) {
+          debugPrint('Search user directory failed: $e');
+        }
+      }
       
       setState(() {
         _searchResults = results;
         _isLoading = false;
         _isSearching = true;
+        if (results.isEmpty) {
+          _errorMessage = '未找到用户 "$query"\n\n提示：\n• 尝试输入完整用户ID，如 @username:server.com\n• 确认用户名拼写正确';
+        }
       });
     } catch (e) {
       setState(() {
