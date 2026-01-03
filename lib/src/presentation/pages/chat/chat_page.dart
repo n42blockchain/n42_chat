@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 import 'package:flutter/services.dart';
 
@@ -737,6 +738,16 @@ class _ChatPageState extends State<ChatPage> {
       debugPrint('Video path: ${video.path}');
       debugPrint('Video name: ${video.name}');
       
+      // 显示发送中提示
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('正在处理视频...'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      
       // 读取视频字节 - 优先使用 XFile.readAsBytes()
       Uint8List bytes;
       try {
@@ -814,19 +825,48 @@ class _ChatPageState extends State<ChatPage> {
         return;
       }
       
+      // 生成视频缩略图（第一帧）
+      Uint8List? thumbnailBytes;
+      try {
+        debugPrint('Generating video thumbnail...');
+        final thumbnailPath = await VideoThumbnail.thumbnailFile(
+          video: video.path,
+          thumbnailPath: (await Directory.systemTemp.createTemp()).path,
+          imageFormat: ImageFormat.JPEG,
+          maxHeight: 320,
+          quality: 75,
+        );
+        
+        if (thumbnailPath != null) {
+          final thumbnailFile = File(thumbnailPath);
+          if (await thumbnailFile.exists()) {
+            thumbnailBytes = await thumbnailFile.readAsBytes();
+            debugPrint('Thumbnail generated: ${thumbnailBytes.length} bytes');
+            // 清理临时文件
+            await thumbnailFile.delete();
+          }
+        }
+      } catch (e) {
+        debugPrint('Failed to generate thumbnail: $e');
+        // 缩略图生成失败不阻止视频发送
+      }
+      
       debugPrint('Final filename: $filename');
       debugPrint('Final mimeType: $mimeType');
       debugPrint('Video size: ${bytes.length} bytes');
+      debugPrint('Thumbnail size: ${thumbnailBytes?.length ?? 0} bytes');
       debugPrint('=== Sending video to ChatBloc ===');
       
-      // 使用文件消息发送视频
-      context.read<ChatBloc>().add(SendFileMessage(
-        fileBytes: bytes,
+      // 使用视频消息发送（带缩略图）
+      context.read<ChatBloc>().add(SendVideoMessage(
+        videoBytes: bytes,
         filename: filename,
         mimeType: mimeType,
+        thumbnailBytes: thumbnailBytes,
       ));
       
       if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('视频发送中...'),
