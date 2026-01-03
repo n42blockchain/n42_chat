@@ -317,55 +317,127 @@ class MessageItem extends StatelessWidget {
     final metadata = message.metadata;
     final thumbnailUrl = metadata?.thumbnailUrl;
     final durationMs = metadata?.duration;
+    final fileSize = metadata?.size;
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        if (thumbnailUrl != null)
-          ImageMessageWidget(
-            imageUrl: thumbnailUrl,
-            onTap: onTap,
-          )
-        else
-          Container(
-            width: 200,
-            height: 150,
-            color: AppColors.placeholder,
-          ),
-        Container(
-          width: 48,
-          height: 48,
-          decoration: const BoxDecoration(
-            color: Colors.black54,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.play_arrow,
-            color: Colors.white,
-            size: 32,
-          ),
-        ),
-        if (durationMs != null)
-          Positioned(
-            right: 8,
-            bottom: 8,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(2),
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // 视频缩略图或占位图
+            if (thumbnailUrl != null && thumbnailUrl.isNotEmpty)
+              ImageMessageWidget(
+                imageUrl: thumbnailUrl,
+                onTap: onTap,
+              )
+            else
+              // 无缩略图时显示渐变背景和视频图标
+              Container(
+                width: 200,
+                height: 150,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.grey[800]!,
+                      Colors.grey[900]!,
+                    ],
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.videocam,
+                      color: Colors.white.withOpacity(0.6),
+                      size: 48,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '视频',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 14,
+                      ),
+                    ),
+                    if (fileSize != null)
+                      Text(
+                        _formatFileSize(fileSize),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: 12,
+                        ),
+                      ),
+                  ],
+                ),
               ),
-              child: Text(
-                _formatDuration((durationMs / 1000).round()),
-                style: const TextStyle(
-                  fontSize: 11,
+            // 播放按钮
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: const Icon(
+                Icons.play_arrow,
+                color: Colors.white,
+                size: 36,
+              ),
+            ),
+            // 时长标签
+            if (durationMs != null)
+              Positioned(
+                right: 8,
+                bottom: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    _formatDuration((durationMs / 1000).round()),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            // 视频图标标识（左上角）
+            Positioned(
+              left: 8,
+              top: 8,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Icon(
+                  Icons.videocam,
                   color: Colors.white,
+                  size: 16,
                 ),
               ),
             ),
-          ),
-      ],
+          ],
+        ),
+      ),
     );
+  }
+  
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
   Widget _buildFileMessage(bool isDark) {
