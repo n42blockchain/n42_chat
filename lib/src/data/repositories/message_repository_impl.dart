@@ -327,6 +327,65 @@ class MessageRepositoryImpl implements IMessageRepository {
   Future<String?> getCurrentUserId() async {
     return _client?.userID;
   }
+  
+  @override
+  Future<MessageEntity?> sendPollMessage(
+    String roomId, {
+    required String question,
+    required List<String> options,
+    int maxSelections = 1,
+  }) async {
+    try {
+      debugPrint('MessageRepositoryImpl: Sending poll - question: $question, options: $options');
+      final eventId = await _messageDataSource.sendPollMessage(
+        roomId,
+        question: question,
+        options: options,
+        maxSelections: maxSelections,
+      );
+      if (eventId != null) {
+        debugPrint('MessageRepositoryImpl: Poll sent successfully - eventId: $eventId');
+        // 返回一个临时消息实体
+        return MessageEntity(
+          id: eventId,
+          roomId: roomId,
+          senderId: _client?.userID ?? '',
+          senderName: _client?.ownProfile?.displayName ?? '',
+          content: question,
+          type: MessageType.poll,
+          timestamp: DateTime.now(),
+          status: MessageStatus.sent,
+          metadata: MessageMetadata(
+            pollQuestion: question,
+            pollOptions: options,
+          ),
+        );
+      }
+      return null;
+    } catch (e) {
+      debugPrint('MessageRepositoryImpl: Failed to send poll: $e');
+      rethrow;
+    }
+  }
+  
+  @override
+  Future<bool> voteOnPoll(
+    String roomId, {
+    required String pollEventId,
+    required List<String> selectedOptionIds,
+  }) async {
+    try {
+      debugPrint('MessageRepositoryImpl: Voting on poll - pollEventId: $pollEventId, options: $selectedOptionIds');
+      return await _messageDataSource.voteOnPoll(
+        roomId,
+        pollEventId: pollEventId,
+        selectedOptionIds: selectedOptionIds,
+      );
+    } catch (e) {
+      debugPrint('MessageRepositoryImpl: Failed to vote on poll: $e');
+      rethrow;
+    }
+  }
 
   // ============================================
   // 辅助方法

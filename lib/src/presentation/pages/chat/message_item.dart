@@ -46,6 +46,12 @@ class MessageItem extends StatelessWidget {
   
   /// 表情回应点击回调
   final Function(String emoji)? onReactionTap;
+  
+  /// 投票回调
+  final Function(String pollEventId, String optionId)? onPollVote;
+  
+  /// 结束投票回调
+  final Function(String pollEventId)? onEndPoll;
 
   const MessageItem({
     super.key,
@@ -60,6 +66,8 @@ class MessageItem extends StatelessWidget {
     this.showSenderName = false,
     this.currentUserId,
     this.onReactionTap,
+    this.onPollVote,
+    this.onEndPoll,
   });
 
   @override
@@ -232,6 +240,9 @@ class MessageItem extends StatelessWidget {
         break;
       case MessageType.transfer:
         content = _buildTransferMessage();
+        break;
+      case MessageType.poll:
+        content = _buildPollMessage(isDark);
         break;
       case MessageType.encrypted:
         content = _buildEncryptedMessage(isDark);
@@ -634,6 +645,196 @@ class MessageItem extends StatelessWidget {
       note: message.content,
       isSelf: message.isFromMe,
       onTap: onTap,
+    );
+  }
+  
+  Widget _buildPollMessage(bool isDark) {
+    final metadata = message.metadata;
+    final question = metadata?.pollQuestion ?? message.content;
+    final options = metadata?.pollOptions ?? [];
+    final optionIds = metadata?.pollOptionIds ?? [];
+    final myVotes = metadata?.myVotes ?? [];
+    final voteCounts = metadata?.voteCounts ?? {};
+    final totalVoters = metadata?.totalVoters ?? 0;
+    final maxSelections = metadata?.maxSelections ?? 1;
+    final pollEnded = metadata?.pollEnded ?? false;
+    
+    return Container(
+      width: 260,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: message.isFromMe
+            ? AppColors.messageBubbleSent
+            : (isDark ? AppColors.messageBubbleReceivedDark : AppColors.messageBubbleReceived),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 投票标题
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.poll,
+                      size: 12,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      maxSelections == 1 ? '单选' : '多选',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (pollEnded)
+                Container(
+                  margin: const EdgeInsets.only(left: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    '已结束',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          
+          // 问题
+          Text(
+            question,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: message.isFromMe
+                  ? AppColors.messageTextSent
+                  : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived),
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          // 选项
+          ...List.generate(options.length, (index) {
+            final optionText = options[index];
+            final optionId = index < optionIds.length ? optionIds[index] : '$index';
+            final isSelected = myVotes.contains(optionId);
+            final voteCount = voteCounts[optionId] ?? 0;
+            final percentage = totalVoters > 0 ? (voteCount / totalVoters * 100) : 0.0;
+            
+            return GestureDetector(
+              onTap: pollEnded ? null : () => onPollVote?.call(message.id, optionId),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: isSelected 
+                      ? AppColors.primary.withOpacity(0.1)
+                      : (isDark ? Colors.grey[800] : Colors.grey[100]),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isSelected ? AppColors.primary : Colors.transparent,
+                    width: 1.5,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            optionText,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                        if (isSelected)
+                          Icon(
+                            Icons.check_circle,
+                            size: 18,
+                            color: AppColors.primary,
+                          ),
+                      ],
+                    ),
+                    if (totalVoters > 0) ...[
+                      const SizedBox(height: 6),
+                      // 投票进度条
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: LinearProgressIndicator(
+                          value: percentage / 100,
+                          backgroundColor: isDark ? Colors.grey[700] : Colors.grey[300],
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            isSelected ? AppColors.primary : Colors.grey,
+                          ),
+                          minHeight: 4,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$voteCount 票 (${percentage.toStringAsFixed(0)}%)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          }),
+          
+          // 底部统计
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '$totalVoters 人参与',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              if (!pollEnded && message.isFromMe)
+                GestureDetector(
+                  onTap: () => onEndPoll?.call(message.id),
+                  child: Text(
+                    '结束投票',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.error,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

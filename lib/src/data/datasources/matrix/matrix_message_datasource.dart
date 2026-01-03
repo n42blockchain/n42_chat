@@ -1056,6 +1056,132 @@ class MatrixMessageDataSource {
       debugPrint('MatrixMessageDataSource: Failed to set member pokeText: $e');
     }
   }
+  
+  // ============================================
+  // 投票功能 (MSC3381 Polls)
+  // ============================================
+
+  /// 发送投票消息
+  /// 
+  /// 使用 Matrix MSC3381 投票规范
+  Future<String?> sendPollMessage(
+    String roomId, {
+    required String question,
+    required List<String> options,
+    int maxSelections = 1,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      return null;
+    }
+
+    try {
+      // 生成选项ID
+      final pollOptions = options.asMap().entries.map((entry) {
+        final index = entry.key;
+        final text = entry.value;
+        // 使用时间戳+索引生成唯一ID
+        final optionId = '${DateTime.now().millisecondsSinceEpoch}_$index';
+        return {
+          'id': optionId,
+          'org.matrix.msc1767.text': text,
+        };
+      }).toList();
+
+      // MSC3381 投票开始事件
+      final content = {
+        'org.matrix.msc3381.poll.start': {
+          'question': {
+            'org.matrix.msc1767.text': question,
+          },
+          'kind': maxSelections == 1 
+              ? 'org.matrix.msc3381.poll.disclosed' 
+              : 'org.matrix.msc3381.poll.undisclosed',
+          'max_selections': maxSelections == 0 ? options.length : maxSelections,
+          'answers': pollOptions,
+        },
+        'org.matrix.msc1767.text': '$question\n${options.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n')}',
+      };
+
+      final eventId = await room.sendEvent(
+        content,
+        type: 'org.matrix.msc3381.poll.start',
+      );
+
+      debugPrint('MatrixMessageDataSource: Poll sent successfully: $eventId');
+      return eventId;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to send poll: $e');
+      rethrow;
+    }
+  }
+  
+  /// 投票响应
+  /// 
+  /// 发送 MSC3381 投票响应事件
+  Future<bool> voteOnPoll(
+    String roomId, {
+    required String pollEventId,
+    required List<String> selectedOptionIds,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      return false;
+    }
+
+    try {
+      // MSC3381 投票响应事件
+      final content = {
+        'm.relates_to': {
+          'rel_type': 'm.reference',
+          'event_id': pollEventId,
+        },
+        'org.matrix.msc3381.poll.response': {
+          'answers': selectedOptionIds,
+        },
+      };
+
+      await room.sendEvent(
+        content,
+        type: 'org.matrix.msc3381.poll.response',
+      );
+
+      debugPrint('MatrixMessageDataSource: Vote submitted successfully');
+      return true;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to vote: $e');
+      return false;
+    }
+  }
+  
+  /// 结束投票
+  Future<bool> endPoll(String roomId, String pollEventId) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return false;
+
+    try {
+      final content = {
+        'm.relates_to': {
+          'rel_type': 'm.reference',
+          'event_id': pollEventId,
+        },
+        'org.matrix.msc3381.poll.end': {},
+        'org.matrix.msc1767.text': '投票已结束',
+      };
+
+      await room.sendEvent(
+        content,
+        type: 'org.matrix.msc3381.poll.end',
+      );
+
+      return true;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to end poll: $e');
+      return false;
+    }
+  }
 
   // ============================================
   // 消息监听
@@ -1084,13 +1210,15 @@ class MatrixMessageDataSource {
     if (event is matrix.Event) {
       return event.type == matrix.EventTypes.Message ||
           event.type == matrix.EventTypes.Encrypted ||
-          event.type == matrix.EventTypes.Sticker;
+          event.type == matrix.EventTypes.Sticker ||
+          event.type == 'org.matrix.msc3381.poll.start';
     }
     if (event is Map<String, dynamic>) {
       final type = event['type'] as String?;
       return type == matrix.EventTypes.Message ||
           type == matrix.EventTypes.Encrypted ||
-          type == matrix.EventTypes.Sticker;
+          type == matrix.EventTypes.Sticker ||
+          type == 'org.matrix.msc3381.poll.start';
     }
     return false;
   }
@@ -1206,6 +1334,11 @@ class MatrixMessageDataSource {
     // 首先检查消息是否被撤回
     if (event.redactedBecause != null) {
       return MessageType.redacted;
+    }
+    
+    // 检查是否是投票消息
+    if (event.type == 'org.matrix.msc3381.poll.start') {
+      return MessageType.poll;
     }
     
     if (event.type == matrix.EventTypes.Encrypted) {
@@ -1450,6 +1583,11 @@ class MatrixMessageDataSource {
         locationName: event.body,
       );
     }
+    
+    // 投票信息 (MSC3381)
+    if (event.type == 'org.matrix.msc3381.poll.start') {
+      return _extractPollMetadata(event);
+    }
 
     return null;
   }
@@ -1475,6 +1613,57 @@ class MatrixMessageDataSource {
       }
       return uri.getDownloadLink(_client!);
     } catch (e) {
+      return null;
+    }
+  }
+  
+  /// 提取投票消息元数据
+  MessageMetadata? _extractPollMetadata(matrix.Event event) {
+    try {
+      final pollStart = event.content['org.matrix.msc3381.poll.start'] as Map<String, dynamic>?;
+      if (pollStart == null) return null;
+      
+      // 提取问题
+      final questionData = pollStart['question'] as Map<String, dynamic>?;
+      final question = questionData?['org.matrix.msc1767.text'] as String? ?? 
+                       questionData?['body'] as String? ??
+                       event.body;
+      
+      // 提取选项
+      final answers = pollStart['answers'] as List<dynamic>?;
+      final options = <String>[];
+      final optionIds = <String>[];
+      
+      if (answers != null) {
+        for (final answer in answers) {
+          if (answer is Map<String, dynamic>) {
+            final id = answer['id'] as String? ?? '';
+            final text = answer['org.matrix.msc1767.text'] as String? ?? '';
+            optionIds.add(id);
+            options.add(text);
+          }
+        }
+      }
+      
+      // 提取投票设置
+      final kind = pollStart['kind'] as String?;
+      final maxSelections = pollStart['max_selections'] as int? ?? 1;
+      
+      // TODO: 需要从关联事件中获取投票统计数据
+      // 这需要在加载消息时解析所有相关的 poll.response 事件
+      
+      return MessageMetadata(
+        pollQuestion: question,
+        pollOptions: options,
+        pollOptionIds: optionIds,
+        maxSelections: maxSelections,
+        pollEnded: false,
+        voteCounts: {},
+        totalVoters: 0,
+        myVotes: [],
+      );
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to extract poll metadata: $e');
       return null;
     }
   }
