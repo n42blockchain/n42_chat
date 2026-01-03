@@ -284,3 +284,33 @@ class SendPokeMessage extends ChatEvent {
   List<Object?> get props => [pokerName, targetUserId, targetName, pokerPokeText];
 }
 
+/// 发送投票消息
+class SendPollMessage extends ChatEvent {
+  final String question;
+  final List<String> options;
+  final int maxSelections; // 1 = 单选, 0 = 多选（不限）
+
+  const SendPollMessage({
+    required this.question,
+    required this.options,
+    this.maxSelections = 1,
+  });
+
+  @override
+  List<Object?> get props => [question, options, maxSelections];
+}
+
+/// 投票响应事件
+class VoteOnPoll extends ChatEvent {
+  final String pollEventId;
+  final List<String> selectedOptionIds;
+
+  const VoteOnPoll({
+    required this.pollEventId,
+    required this.selectedOptionIds,
+  });
+
+  @override
+  List<Object?> get props => [pollEventId, selectedOptionIds];
+}
+

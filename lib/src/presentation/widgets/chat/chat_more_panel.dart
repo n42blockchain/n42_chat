@@ -44,6 +44,9 @@ class ChatMorePanel extends StatelessWidget {
 
   /// 礼物回调
   final VoidCallback? onGiftPressed;
+  
+  /// 投票回调
+  final VoidCallback? onPollPressed;
 
   const ChatMorePanel({
     super.key,
@@ -59,6 +62,7 @@ class ChatMorePanel extends StatelessWidget {
     this.onMusicPressed,
     this.onCouponPressed,
     this.onGiftPressed,
+    this.onPollPressed,
   });
 
   @override
@@ -161,6 +165,12 @@ class ChatMorePanel extends StatelessWidget {
                         label: '礼物',
                         onTap: onGiftPressed,
                         iconColor: AppColors.error,
+                      ),
+                      _MoreItem(
+                        icon: Icons.poll_outlined,
+                        label: '投票',
+                        onTap: onPollPressed,
+                        iconColor: AppColors.primary,
                       ),
                     ],
                   ),

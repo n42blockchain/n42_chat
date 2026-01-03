@@ -740,6 +740,10 @@ class _ChatPageState extends State<ChatPage> {
         _hideMorePanel();
         _sendGift();
       },
+      onPollPressed: () {
+        _hideMorePanel();
+        _createPoll();
+      },
     );
   }
 
@@ -1634,6 +1638,30 @@ ID：$contactId''';
     // TODO: 实现发送礼物功能
     debugPrint('Send gift');
     _showFeatureToast('礼物');
+  }
+
+  /// 创建投票
+  void _createPoll() async {
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const _PollCreateSheet(),
+    );
+
+    if (result != null && mounted) {
+      final question = result['question'] as String;
+      final options = result['options'] as List<String>;
+      final maxSelections = result['maxSelections'] as int? ?? 1;
+
+      debugPrint('ChatPage: Creating poll - question: $question, options: $options, maxSelections: $maxSelections');
+      
+      context.read<ChatBloc>().add(SendPollMessage(
+        question: question,
+        options: options,
+        maxSelections: maxSelections,
+      ));
+    }
   }
 
   void _showFeatureToast(String feature) {
@@ -5691,6 +5719,364 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
                         child: Chewie(controller: _chewieController!),
                       )
                     : const Text('播放器初始化失败', style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+}
+
+/// 投票创建弹窗
+class _PollCreateSheet extends StatefulWidget {
+  const _PollCreateSheet();
+
+  @override
+  State<_PollCreateSheet> createState() => _PollCreateSheetState();
+}
+
+class _PollCreateSheetState extends State<_PollCreateSheet> {
+  final _questionController = TextEditingController();
+  final List<TextEditingController> _optionControllers = [
+    TextEditingController(),
+    TextEditingController(),
+  ];
+  int _maxSelections = 1; // 1 = 单选, 0 = 多选（不限）
+  bool _isAnonymous = false;
+
+  @override
+  void dispose() {
+    _questionController.dispose();
+    for (final controller in _optionControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _addOption() {
+    if (_optionControllers.length < 10) {
+      setState(() {
+        _optionControllers.add(TextEditingController());
+      });
+    }
+  }
+
+  void _removeOption(int index) {
+    if (_optionControllers.length > 2) {
+      setState(() {
+        _optionControllers[index].dispose();
+        _optionControllers.removeAt(index);
+      });
+    }
+  }
+
+  void _submit() {
+    final question = _questionController.text.trim();
+    if (question.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请输入投票问题')),
+      );
+      return;
+    }
+
+    final options = _optionControllers
+        .map((c) => c.text.trim())
+        .where((o) => o.isNotEmpty)
+        .toList();
+
+    if (options.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('至少需要2个选项')),
+      );
+      return;
+    }
+
+    Navigator.pop(context, {
+      'question': question,
+      'options': options,
+      'maxSelections': _maxSelections,
+      'isAnonymous': _isAnonymous,
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[900] : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // 顶部栏
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    '取消',
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black54,
+                    ),
+                  ),
+                ),
+                const Expanded(
+                  child: Text(
+                    '创建投票',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: _submit,
+                  child: const Text(
+                    '发起',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // 内容区域
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: bottomPadding + 16,
+              ),
+              children: [
+                // 问题输入
+                Text(
+                  '投票问题',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _questionController,
+                  maxLines: 2,
+                  maxLength: 100,
+                  decoration: InputDecoration(
+                    hintText: '请输入投票问题',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 选项输入
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '投票选项',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                      ),
+                    ),
+                    Text(
+                      '${_optionControllers.length}/10',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.white38 : Colors.black38,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                ...List.generate(_optionControllers.length, (index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${index + 1}',
+                            style: const TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _optionControllers[index],
+                            maxLength: 50,
+                            decoration: InputDecoration(
+                              hintText: '选项 ${index + 1}',
+                              counterText: '',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              filled: true,
+                              fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (_optionControllers.length > 2)
+                          IconButton(
+                            onPressed: () => _removeOption(index),
+                            icon: const Icon(Icons.remove_circle_outline),
+                            color: Colors.red,
+                            iconSize: 20,
+                          ),
+                      ],
+                    ),
+                  );
+                }),
+
+                if (_optionControllers.length < 10)
+                  TextButton.icon(
+                    onPressed: _addOption,
+                    icon: const Icon(Icons.add_circle_outline, size: 20),
+                    label: const Text('添加选项'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.green,
+                    ),
+                  ),
+
+                const SizedBox(height: 24),
+
+                // 投票类型
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[850] : Colors.grey[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '投票设置',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      
+                      // 单选/多选
+                      Row(
+                        children: [
+                          const Text('选择类型'),
+                          const Spacer(),
+                          SegmentedButton<int>(
+                            segments: const [
+                              ButtonSegment(value: 1, label: Text('单选')),
+                              ButtonSegment(value: 0, label: Text('多选')),
+                            ],
+                            selected: {_maxSelections},
+                            onSelectionChanged: (value) {
+                              setState(() {
+                                _maxSelections = value.first;
+                              });
+                            },
+                            style: ButtonStyle(
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+                      const Divider(height: 1),
+                      const SizedBox(height: 12),
+
+                      // 匿名投票
+                      Row(
+                        children: [
+                          const Text('匿名投票'),
+                          const Spacer(),
+                          Switch(
+                            value: _isAnonymous,
+                            onChanged: (value) {
+                              setState(() {
+                                _isAnonymous = value;
+                              });
+                            },
+                            activeColor: Colors.green,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 提示信息
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 18,
+                        color: Colors.blue[700],
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '投票发起后将显示在聊天中，群成员可以参与投票',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue[700],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

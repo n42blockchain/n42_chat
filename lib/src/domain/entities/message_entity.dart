@@ -32,6 +32,8 @@ enum MessageType {
   paymentRequest,
   /// 红包
   redPacket,
+  /// 投票
+  poll,
   /// 未知类型
   unknown,
 }
@@ -324,6 +326,34 @@ class MessageMetadata extends Equatable {
   /// 交易哈希
   final String? txHash;
 
+  // ============================================
+  // 投票属性
+  // ============================================
+
+  /// 投票问题
+  final String? pollQuestion;
+
+  /// 投票选项
+  final List<String>? pollOptions;
+
+  /// 投票选项ID列表
+  final List<String>? pollOptionIds;
+
+  /// 已投票的选项ID（用户自己的选择）
+  final List<String>? myVotes;
+
+  /// 每个选项的投票数 {optionId: count}
+  final Map<String, int>? voteCounts;
+
+  /// 总投票人数
+  final int? totalVoters;
+
+  /// 最大可选数量（1=单选，0=不限）
+  final int? maxSelections;
+
+  /// 是否已结束
+  final bool? pollEnded;
+
   const MessageMetadata({
     this.mediaUrl,
     this.httpUrl,
@@ -343,6 +373,14 @@ class MessageMetadata extends Equatable {
     this.token,
     this.transferStatus,
     this.txHash,
+    this.pollQuestion,
+    this.pollOptions,
+    this.pollOptionIds,
+    this.myVotes,
+    this.voteCounts,
+    this.totalVoters,
+    this.maxSelections,
+    this.pollEnded,
   });
 
   /// 格式化文件大小
@@ -387,6 +425,14 @@ class MessageMetadata extends Equatable {
         token,
         transferStatus,
         txHash,
+        pollQuestion,
+        pollOptions,
+        pollOptionIds,
+        myVotes,
+        voteCounts,
+        totalVoters,
+        maxSelections,
+        pollEnded,
       ];
 }
 

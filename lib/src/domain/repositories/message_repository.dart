@@ -125,5 +125,20 @@ abstract class IMessageRepository {
   
   /// 获取当前用户ID
   Future<String?> getCurrentUserId();
+  
+  /// 发送投票消息
+  Future<MessageEntity?> sendPollMessage(
+    String roomId, {
+    required String question,
+    required List<String> options,
+    int maxSelections = 1,
+  });
+  
+  /// 投票响应
+  Future<bool> voteOnPoll(
+    String roomId, {
+    required String pollEventId,
+    required List<String> selectedOptionIds,
+  });
 }
 
