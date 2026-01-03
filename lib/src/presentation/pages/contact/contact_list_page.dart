@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
+import '../../../domain/repositories/contact_repository.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
@@ -536,18 +537,18 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
     );
   }
   
-  Widget _buildRequestItem(ContactEntity request, bool isDark) {
+  Widget _buildRequestItem(FriendRequest request, bool isDark) {
     return ListTile(
       leading: CircleAvatar(
         radius: 24,
-        backgroundColor: _getColorFromName(request.displayName),
-        backgroundImage: request.avatarUrl != null && request.avatarUrl!.isNotEmpty
-            ? NetworkImage(request.avatarUrl!)
+        backgroundColor: _getColorFromName(request.userName),
+        backgroundImage: request.userAvatarUrl != null && request.userAvatarUrl!.isNotEmpty
+            ? NetworkImage(request.userAvatarUrl!)
             : null,
-        child: request.avatarUrl == null || request.avatarUrl!.isEmpty
+        child: request.userAvatarUrl == null || request.userAvatarUrl!.isEmpty
             ? Text(
-                request.displayName.isNotEmpty 
-                    ? request.displayName[0].toUpperCase() 
+                request.userName.isNotEmpty 
+                    ? request.userName[0].toUpperCase() 
                     : '?',
                 style: const TextStyle(
                   color: Colors.white,
@@ -558,7 +559,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
             : null,
       ),
       title: Text(
-        request.displayName,
+        request.userName,
         style: TextStyle(
           fontWeight: FontWeight.w500,
           color: isDark ? Colors.white : Colors.black87,
@@ -604,21 +605,21 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
     );
   }
   
-  void _acceptRequest(ContactEntity request) {
-    context.read<ContactBloc>().add(AcceptFriendRequest(request.userId));
+  void _acceptRequest(FriendRequest request) {
+    context.read<ContactBloc>().add(AcceptFriendRequest(request.id));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('已接受 ${request.displayName} 的好友请求'),
+        content: Text('已接受 ${request.userName} 的好友请求'),
         backgroundColor: Colors.green,
       ),
     );
   }
   
-  void _rejectRequest(ContactEntity request) {
-    context.read<ContactBloc>().add(RejectFriendRequest(request.userId));
+  void _rejectRequest(FriendRequest request) {
+    context.read<ContactBloc>().add(RejectFriendRequest(request.id));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('已拒绝 ${request.displayName} 的好友请求'),
+        content: Text('已拒绝 ${request.userName} 的好友请求'),
       ),
     );
   }
