@@ -81,62 +81,38 @@ class CallNotificationService {
   }
   
   /// 处理 CallKit 事件
-  void _handleCallKitEvent(CallEvent? event) {
+  void _handleCallKitEvent(dynamic event) {
     if (event == null) return;
     
-    debugPrint('CallNotificationService: Event - ${event.event}');
+    final eventName = event.event as String?;
+    debugPrint('CallNotificationService: Event - $eventName');
     
-    final callInfo = event.body != null 
-        ? IncomingCallInfo.fromMap(event.body as Map<String, dynamic>)
-        : null;
+    final body = event.body;
+    if (body == null) return;
     
-    if (callInfo == null) return;
+    final callInfo = IncomingCallInfo.fromMap(body as Map<String, dynamic>);
     
-    switch (event.event) {
-      case Event.actionCallIncoming:
-        // 来电显示
-        debugPrint('CallNotificationService: Incoming call from ${callInfo.callerName}');
-        break;
-        
-      case Event.actionCallAccept:
-        // 接听
-        debugPrint('CallNotificationService: Call accepted');
-        _callActionController.add((CallAction.accept, callInfo));
-        break;
-        
-      case Event.actionCallDecline:
-        // 拒绝
-        debugPrint('CallNotificationService: Call declined');
-        _callActionController.add((CallAction.decline, callInfo));
-        _currentCallId = null;
-        break;
-        
-      case Event.actionCallTimeout:
-        // 超时
-        debugPrint('CallNotificationService: Call timeout');
-        _callActionController.add((CallAction.timeout, callInfo));
-        _currentCallId = null;
-        break;
-        
-      case Event.actionCallCallback:
-        // 回拨
-        debugPrint('CallNotificationService: Callback');
-        _callActionController.add((CallAction.callback, callInfo));
-        break;
-        
-      case Event.actionCallEnded:
-        // 通话结束
-        debugPrint('CallNotificationService: Call ended');
-        _currentCallId = null;
-        break;
-        
-      case Event.actionCallStart:
-        // 开始通话
-        debugPrint('CallNotificationService: Call started');
-        break;
-        
-      default:
-        break;
+    if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_incoming') {
+      debugPrint('CallNotificationService: Incoming call from ${callInfo.callerName}');
+    } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_accept') {
+      debugPrint('CallNotificationService: Call accepted');
+      _callActionController.add((CallAction.accept, callInfo));
+    } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_decline') {
+      debugPrint('CallNotificationService: Call declined');
+      _callActionController.add((CallAction.decline, callInfo));
+      _currentCallId = null;
+    } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_timeout') {
+      debugPrint('CallNotificationService: Call timeout');
+      _callActionController.add((CallAction.timeout, callInfo));
+      _currentCallId = null;
+    } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_callback') {
+      debugPrint('CallNotificationService: Callback');
+      _callActionController.add((CallAction.callback, callInfo));
+    } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_ended') {
+      debugPrint('CallNotificationService: Call ended');
+      _currentCallId = null;
+    } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_start') {
+      debugPrint('CallNotificationService: Call started');
     }
   }
   
