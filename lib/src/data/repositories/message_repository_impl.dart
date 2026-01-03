@@ -317,6 +317,11 @@ class MessageRepositoryImpl implements IMessageRepository {
       return null;
     }
   }
+  
+  @override
+  Future<String?> getCurrentUserId() async {
+    return _client?.userID;
+  }
 
   // ============================================
   // 辅助方法
