@@ -253,15 +253,26 @@ class AuthRepositoryImpl implements IAuthRepository {
       // 登出
       await _authDataSource.logout();
 
-      // 清除保存的会话
+      // 清除保存的会话和凭据
+      // 微信策略：登出后需要重新输入密码登录
       await _secureStorage.clearSession();
+      await _secureStorage.clearCredentials();
+      
+      // 清除缓存的用户资料
+      _cachedProfileData = null;
+      _cachedAvatarUrl = null;
+      _cachedDisplayName = null;
 
       _loginStateController.add(false);
-      debugPrint('AuthRepository: Logout successful');
+      debugPrint('AuthRepository: Logout successful - session and credentials cleared');
     } catch (e) {
       debugPrint('AuthRepository: Logout error - $e');
-      // 即使出错也清除本地会话
+      // 即使出错也清除本地会话和凭据
       await _secureStorage.clearSession();
+      await _secureStorage.clearCredentials();
+      _cachedProfileData = null;
+      _cachedAvatarUrl = null;
+      _cachedDisplayName = null;
       _loginStateController.add(false);
     }
   }
