@@ -1143,6 +1143,11 @@ class MatrixMessageDataSource {
 
   /// 映射消息类型
   MessageType _mapMessageType(matrix.Event event) {
+    // 首先检查消息是否被撤回
+    if (event.redactedBecause != null) {
+      return MessageType.redacted;
+    }
+    
     if (event.type == matrix.EventTypes.Encrypted) {
       return MessageType.encrypted;
     }
