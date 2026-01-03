@@ -141,14 +141,29 @@ class ConversationRepositoryImpl implements IConversationRepository {
 
   /// 将Matrix Room转换为ConversationEntity
   ConversationEntity _mapRoomToEntity(matrix.Room room) {
-    final avatarUrl = _roomDataSource.getRoomAvatarUrl(room);
     final lastMessageTime = _roomDataSource.getLastMessageTime(room);
     
-    // 获取群成员头像列表（用于九宫格头像）
+    // 获取头像和成员信息
+    String? avatarUrl;
     List<String?>? memberAvatarUrls;
     List<String>? memberNames;
     
-    if (!room.isDirectChat) {
+    if (room.isDirectChat) {
+      // 私聊：获取对方用户的真实头像（如果没有则返回 null）
+      final partner = _roomDataSource.getDirectChatPartner(room);
+      if (partner?.avatarUrl != null) {
+        avatarUrl = MatrixUtils.mxcToHttp(
+          partner!.avatarUrl.toString(),
+          client: room.client,
+          width: 96,
+          height: 96,
+        );
+      }
+      // 如果对方没有头像，avatarUrl 为 null，UI 会显示字母头像
+    } else {
+      // 群聊：获取房间头像
+      avatarUrl = _roomDataSource.getRoomAvatarUrl(room);
+      // 获取成员头像列表（用于九宫格头像）
       final members = _getGroupMemberInfo(room);
       memberAvatarUrls = members.$1;
       memberNames = members.$2;
