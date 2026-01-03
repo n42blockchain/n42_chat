@@ -1,14 +1,62 @@
 /// LiveKit 多人会议服务
 /// 
 /// 封装 livekit_client，提供多人音视频会议功能
+/// 
+/// 注意：由于 livekit_client 与 web3dart 存在依赖冲突（pointycastle 版本），
+/// 当前使用存根实现。解决冲突后可启用完整功能。
 library;
 
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:livekit_client/livekit_client.dart';
+// import 'package:livekit_client/livekit_client.dart'; // 暂时禁用
 
 import 'voip_config.dart';
+
+// 存根类型定义
+class Room {
+  Future<void> connect(String url, String token, {dynamic roomOptions, dynamic fastConnectOptions}) async {}
+  Future<void> disconnect() async {}
+  void addListener(void Function() listener) {}
+  void removeListener(void Function() listener) {}
+}
+
+class LocalParticipant {
+  String get identity => '';
+  String? get name => null;
+  Future<void> setMicrophoneEnabled(bool enabled) async {}
+  Future<void> setCameraEnabled(bool enabled) async {}
+  Future<void> setScreenShareEnabled(bool enabled, {dynamic captureScreenAudio}) async {}
+  List<dynamic> get audioTrackPublications => [];
+  List<dynamic> get videoTrackPublications => [];
+}
+
+class RemoteParticipant {
+  String get identity => '';
+  String? get name => null;
+  List<dynamic> get audioTrackPublications => [];
+  List<dynamic> get videoTrackPublications => [];
+}
+
+class ConnectionState {
+  static const connected = ConnectionState._('connected');
+  static const disconnected = ConnectionState._('disconnected');
+  static const reconnecting = ConnectionState._('reconnecting');
+  
+  final String _value;
+  const ConnectionState._(this._value);
+  
+  @override
+  String toString() => _value;
+}
+
+class CameraPosition {
+  static const front = CameraPosition._('front');
+  static const back = CameraPosition._('back');
+  
+  final String _value;
+  const CameraPosition._(this._value);
+}
 
 /// 会议状态
 enum MeetingState {
@@ -173,10 +221,9 @@ class LiveKitService {
         adaptiveStream: true,
         dynacast: true,
         defaultAudioPublishOptions: const AudioPublishOptions(
-          audioBitrate: AudioPresets.music.maxBitrate,
+          audioBitrate: 128000, // 128kbps
         ),
-        defaultVideoPublishOptions: VideoPublishOptions(
-          videoEncoding: VideoParametersPresets.h720_169.encoding,
+        defaultVideoPublishOptions: const VideoPublishOptions(
           simulcast: true,
         ),
         defaultScreenShareCaptureOptions: const ScreenShareCaptureOptions(
@@ -295,8 +342,15 @@ class LiveKitService {
         .firstOrNull?.track as LocalVideoTrack?;
     
     if (videoTrack != null) {
-      await videoTrack.switchCamera();
-      debugPrint('LiveKitService: Camera switched');
+      // 切换摄像头
+      final captureOptions = videoTrack.currentOptions as CameraCaptureOptions?;
+      if (captureOptions != null) {
+        final newPosition = captureOptions.cameraPosition == CameraPosition.front
+            ? CameraPosition.back
+            : CameraPosition.front;
+        await videoTrack.setCameraPosition(newPosition);
+        debugPrint('LiveKitService: Camera switched to $newPosition');
+      }
     }
   }
   

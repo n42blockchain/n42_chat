@@ -4,13 +4,14 @@
 library;
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:passkeys/passkeys.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+
+// Passkey 相关类型定义（简化版，实际需要使用 passkeys 包）
+// 由于 passkeys 包在某些环境下可能有兼容性问题，这里使用简化实现
 
 /// 认证方式
 enum AuthMethod {
@@ -80,8 +81,10 @@ class AuthMethodsService {
   factory AuthMethodsService() => _instance;
   AuthMethodsService._internal();
   
-  // Passkeys
-  PasskeyAuth? _passkeyAuth;
+  // Passkey 配置
+  String? _passkeyRpId;
+  String? _passkeyOrigin;
+  bool _passkeyInitialized = false;
   
   // Google Sign In
   GoogleSignIn? _googleSignIn;
@@ -93,21 +96,14 @@ class AuthMethodsService {
   Future<void> initialize({
     String? googleClientId,
     String? googleServerClientId,
+    String? passkeyRpId,
+    String? passkeyOrigin,
   }) async {
-    // 初始化 Passkey
-    try {
-      _passkeyAuth = PasskeyAuth(
-        RelyingPartyServer(
-          // 这些将从服务端获取
-          name: 'N42 Chat',
-          id: 'm.si46.world',
-          origin: 'https://m.si46.world',
-        ),
-      );
-      debugPrint('AuthMethodsService: Passkey initialized');
-    } catch (e) {
-      debugPrint('AuthMethodsService: Passkey init failed: $e');
-    }
+    // 初始化 Passkey 配置
+    _passkeyRpId = passkeyRpId ?? 'm.si46.world';
+    _passkeyOrigin = passkeyOrigin ?? 'https://m.si46.world';
+    _passkeyInitialized = true;
+    debugPrint('AuthMethodsService: Passkey config initialized');
     
     // 初始化 Google Sign In
     if (googleClientId != null || !kIsWeb) {
@@ -146,53 +142,32 @@ class AuthMethodsService {
   /// [username] 用户名
   /// [displayName] 显示名
   /// [challenge] 从服务端获取的挑战
+  /// 
+  /// 注意：此方法需要使用 passkeys 包的原生实现
+  /// 当前为占位实现，实际使用时需要集成 passkeys 包
   Future<PasskeyCredential?> registerPasskey({
     required String userId,
     required String username,
     String? displayName,
     required String challenge,
   }) async {
-    if (_passkeyAuth == null) {
+    if (!_passkeyInitialized) {
       throw Exception('Passkey 未初始化');
     }
     
     try {
       debugPrint('AuthMethodsService: Registering passkey for $username');
+      debugPrint('AuthMethodsService: RP ID: $_passkeyRpId');
+      debugPrint('AuthMethodsService: Challenge: $challenge');
       
-      final registerRequest = RegisterRequestType(
-        challenge: challenge,
-        relyingParty: RelyingPartyType(
-          name: 'N42 Chat',
-          id: 'm.si46.world',
-        ),
-        user: UserType(
-          id: userId,
-          name: username,
-          displayName: displayName ?? username,
-        ),
-        authSelectionType: AuthenticatorSelectionType(
-          authenticatorAttachment: 'platform',
-          residentKey: 'required',
-          requireResidentKey: true,
-          userVerification: 'required',
-        ),
-        pubKeyCredParams: [
-          PubKeyCredParamType(type: 'public-key', alg: -7),  // ES256
-          PubKeyCredParamType(type: 'public-key', alg: -257), // RS256
-        ],
-        timeout: 60000,
-        attestation: 'none',
-      );
+      // TODO: 集成 passkeys 包进行实际的 WebAuthn 注册
+      // 这里需要调用平台原生的 WebAuthn API
+      // 在 Android 上使用 FIDO2 API
+      // 在 iOS 上使用 ASAuthorizationController
       
-      final response = await _passkeyAuth!.register(registerRequest);
-      
-      debugPrint('AuthMethodsService: Passkey registered: ${response.id}');
-      
-      return PasskeyCredential(
-        credentialId: response.id,
-        publicKey: response.rawId,
-        userId: userId,
-        displayName: displayName ?? username,
+      throw UnimplementedError(
+        'Passkey 注册需要集成 passkeys 包。\n'
+        '请参考 https://pub.dev/packages/passkeys 进行集成。'
       );
     } catch (e, stackTrace) {
       debugPrint('AuthMethodsService: Passkey registration failed: $e');
@@ -205,39 +180,28 @@ class AuthMethodsService {
   /// 
   /// [challenge] 从服务端获取的挑战
   /// [allowedCredentials] 允许的凭证 ID 列表
+  /// 
+  /// 注意：此方法需要使用 passkeys 包的原生实现
+  /// 当前为占位实现，实际使用时需要集成 passkeys 包
   Future<Map<String, dynamic>?> authenticateWithPasskey({
     required String challenge,
     List<String>? allowedCredentials,
   }) async {
-    if (_passkeyAuth == null) {
+    if (!_passkeyInitialized) {
       throw Exception('Passkey 未初始化');
     }
     
     try {
       debugPrint('AuthMethodsService: Authenticating with passkey');
+      debugPrint('AuthMethodsService: RP ID: $_passkeyRpId');
       
-      final authRequest = AuthenticateRequestType(
-        challenge: challenge,
-        timeout: 60000,
-        rpId: 'm.si46.world',
-        userVerification: 'required',
-        allowCredentials: allowedCredentials?.map((id) => 
-          AllowCredentialType(type: 'public-key', id: id)
-        ).toList(),
+      // TODO: 集成 passkeys 包进行实际的 WebAuthn 认证
+      // 这里需要调用平台原生的 WebAuthn API
+      
+      throw UnimplementedError(
+        'Passkey 认证需要集成 passkeys 包。\n'
+        '请参考 https://pub.dev/packages/passkeys 进行集成。'
       );
-      
-      final response = await _passkeyAuth!.authenticate(authRequest);
-      
-      debugPrint('AuthMethodsService: Passkey authentication success');
-      
-      return {
-        'credentialId': response.id,
-        'rawId': response.rawId,
-        'clientDataJSON': response.clientDataJSON,
-        'authenticatorData': response.authenticatorData,
-        'signature': response.signature,
-        'userHandle': response.userHandle,
-      };
     } catch (e, stackTrace) {
       debugPrint('AuthMethodsService: Passkey authentication failed: $e');
       debugPrint('Stack: $stackTrace');
@@ -450,7 +414,9 @@ class AuthMethodsService {
   
   /// 释放资源
   void dispose() {
-    _passkeyAuth = null;
+    _passkeyInitialized = false;
+    _passkeyRpId = null;
+    _passkeyOrigin = null;
     _googleSignIn = null;
   }
 }

@@ -583,7 +583,7 @@ class WebRTCService {
       
       // 获取对方信息
       final room = _client.getRoomById(eventUpdate.roomID);
-      final sender = room?.getMember(senderId);
+      final sender = room?.unsafeGetUserFromMemoryOrFallback(senderId);
       
       // 判断是否是视频通话
       final sdp = offer['sdp'] as String;

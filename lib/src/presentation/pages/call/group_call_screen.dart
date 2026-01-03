@@ -7,7 +7,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:livekit_client/livekit_client.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+// import 'package:livekit_client/livekit_client.dart'; // 暂时禁用
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../services/voip/livekit_service.dart';
@@ -283,7 +284,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   child: Center(
                     child: N42Avatar(
                       name: participant.name,
-                      avatarUrl: participant.avatarUrl,
+                      imageUrl: participant.avatarUrl,
                       size: compact ? 40 : 80,
                       borderRadius: compact ? 20 : 40,
                     ),
@@ -737,7 +738,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     return ListTile(
       leading: N42Avatar(
         name: participant.name,
-        avatarUrl: participant.avatarUrl,
+        imageUrl: participant.avatarUrl,
         size: 40,
         borderRadius: 20,
       ),

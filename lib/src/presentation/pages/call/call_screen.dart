@@ -289,7 +289,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 ),
                 child: N42Avatar(
                   name: _session?.peerName ?? '',
-                  avatarUrl: _session?.peerAvatarUrl,
+                  imageUrl: _session?.peerAvatarUrl,
                   size: 100,
                   borderRadius: 50,
                 ),
