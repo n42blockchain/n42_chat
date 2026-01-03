@@ -2346,6 +2346,14 @@ ID：$contactId''';
           debugPrint('Search clicked');
           _searchMessage(message);
         },
+        onDelete: () {
+          debugPrint('Delete failed message clicked');
+          _deleteFailedMessage(message);
+        },
+        onResend: () {
+          debugPrint('Resend clicked');
+          _onResend(message);
+        },
         onReaction: (emoji) {
           debugPrint('Reaction clicked: $emoji');
           _addReaction(message, emoji);
@@ -2569,6 +2577,22 @@ ID：$contactId''';
           ],
         ),
         duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+  
+  /// 删除发送失败的消息
+  void _deleteFailedMessage(MessageEntity message) {
+    if (message.status != MessageStatus.failed) return;
+    
+    // 从本地删除失败的消息
+    context.read<ChatBloc>().add(DeleteMessagesLocally([message.id]));
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('已删除失败消息'),
+        duration: Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
       ),
     );
