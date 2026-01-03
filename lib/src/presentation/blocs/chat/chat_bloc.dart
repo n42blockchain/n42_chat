@@ -704,9 +704,60 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         selectedOptionIds: event.selectedOptionIds,
       );
       
-      if (success) {
-        debugPrint('ChatBloc: Vote submitted successfully');
-        // 投票结果会通过消息订阅自动更新
+      if (success && !isClosed) {
+        debugPrint('ChatBloc: Vote submitted successfully, updating local state');
+        
+        // 本地更新投票消息以立即显示反馈
+        final updatedMessages = state.messages.map((msg) {
+          if (msg.id == event.pollEventId && msg.metadata != null) {
+            final oldMetadata = msg.metadata!;
+            final newVoteCounts = Map<String, int>.from(oldMetadata.voteCounts ?? {});
+            final myVotes = List<String>.from(event.selectedOptionIds);
+            
+            // 更新选中选项的票数
+            for (final optionId in event.selectedOptionIds) {
+              newVoteCounts[optionId] = (newVoteCounts[optionId] ?? 0) + 1;
+            }
+            
+            // 计算新的总投票人数
+            final totalVoters = (oldMetadata.totalVoters ?? 0) + 1;
+            
+            return msg.copyWith(
+              metadata: MessageMetadata(
+                pollQuestion: oldMetadata.pollQuestion,
+                pollOptions: oldMetadata.pollOptions,
+                pollOptionIds: oldMetadata.pollOptionIds,
+                maxSelections: oldMetadata.maxSelections,
+                pollEnded: oldMetadata.pollEnded,
+                voteCounts: newVoteCounts,
+                totalVoters: totalVoters,
+                myVotes: myVotes,
+                // 保留其他元数据
+                mediaUrl: oldMetadata.mediaUrl,
+                httpUrl: oldMetadata.httpUrl,
+                thumbnailUrl: oldMetadata.thumbnailUrl,
+                mimeType: oldMetadata.mimeType,
+                size: oldMetadata.size,
+                width: oldMetadata.width,
+                height: oldMetadata.height,
+                duration: oldMetadata.duration,
+                fileName: oldMetadata.fileName,
+                isPlayed: oldMetadata.isPlayed,
+                waveform: oldMetadata.waveform,
+                latitude: oldMetadata.latitude,
+                longitude: oldMetadata.longitude,
+                locationName: oldMetadata.locationName,
+                amount: oldMetadata.amount,
+                token: oldMetadata.token,
+                transferStatus: oldMetadata.transferStatus,
+                txHash: oldMetadata.txHash,
+              ),
+            );
+          }
+          return msg;
+        }).toList();
+        
+        emit(state.copyWith(messages: updatedMessages));
       }
     } catch (e) {
       debugPrint('ChatBloc: Failed to vote: $e');
