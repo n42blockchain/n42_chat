@@ -94,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
           // 个人资料卡片
           _buildProfileCard(context, isDark, cardColor, textColor, subtitleColor),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
           // 服务
           _buildGroupCard(
@@ -102,55 +102,50 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               _buildMenuItem(
                 context,
-                icon: Icons.account_balance_wallet_rounded,
-                iconColor: const Color(0xFF07C160),
+                iconWidget: _buildServiceIcon(),
                 title: '服务',
                 onTap: () => _showComingSoon(context, '服务'),
               ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
-          // 收藏、朋友圈等
+          // 收藏、朋友圈、订单与卡包、表情
           _buildGroupCard(
             context,
             children: [
               _buildMenuItem(
                 context,
-                icon: Icons.star_rounded,
-                iconColor: const Color(0xFFFF9500),
+                iconWidget: _buildFavoriteIcon(),
                 title: '收藏',
                 onTap: () => _openFavorites(context),
               ),
               _buildDivider(context),
               _buildMenuItem(
                 context,
-                icon: Icons.photo_library_rounded,
-                iconColor: const Color(0xFF3D7EFF),
+                iconWidget: _buildMomentsIcon(),
                 title: '朋友圈',
                 onTap: () => _showComingSoon(context, '朋友圈'),
               ),
               _buildDivider(context),
               _buildMenuItem(
                 context,
-                icon: Icons.video_library_rounded,
-                iconColor: const Color(0xFFFF3B30),
-                title: '视频号',
-                onTap: () => _showComingSoon(context, '视频号'),
+                iconWidget: _buildOrderIcon(),
+                title: '订单与卡包',
+                onTap: () => _showComingSoon(context, '订单与卡包'),
               ),
               _buildDivider(context),
               _buildMenuItem(
                 context,
-                icon: Icons.emoji_emotions_rounded,
-                iconColor: const Color(0xFFFF9500),
+                iconWidget: _buildEmojiIcon(),
                 title: '表情',
                 onTap: () => _showComingSoon(context, '表情'),
               ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
           // 设置
           _buildGroupCard(
@@ -158,8 +153,7 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               _buildMenuItem(
                 context,
-                icon: Icons.settings_rounded,
-                iconColor: const Color(0xFF5856D6),
+                iconWidget: _buildSettingsIcon(),
                 title: '设置',
                 onTap: () => _openSettings(context),
               ),
@@ -172,6 +166,120 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  /// 服务图标 - 绿色勾选
+  Widget _buildServiceIcon() {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.check,
+          color: Colors.white,
+          size: 18,
+        ),
+      ),
+    );
+  }
+
+  /// 收藏图标 - 橙黄色立方体
+  Widget _buildFavoriteIcon() {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFF9F0A),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.view_in_ar,
+          color: Colors.white,
+          size: 18,
+        ),
+      ),
+    );
+  }
+
+  /// 朋友圈图标 - 蓝色图片
+  Widget _buildMomentsIcon() {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: const Color(0xFF007AFF),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.photo_library_outlined,
+          color: Colors.white,
+          size: 18,
+        ),
+      ),
+    );
+  }
+
+  /// 订单与卡包图标 - 橙红色表情
+  Widget _buildOrderIcon() {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFF6B6B),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.sentiment_satisfied_alt,
+          color: Colors.white,
+          size: 18,
+        ),
+      ),
+    );
+  }
+
+  /// 表情图标 - 黄色笑脸
+  Widget _buildEmojiIcon() {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFCC00),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.sentiment_very_satisfied,
+          color: Colors.white,
+          size: 18,
+        ),
+      ),
+    );
+  }
+
+  /// 设置图标 - 蓝色齿轮
+  Widget _buildSettingsIcon() {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: const Color(0xFF5E97F6),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.settings,
+          color: Colors.white,
+          size: 18,
+        ),
+      ),
+    );
+  }
+
   Widget _buildProfileCard(
     BuildContext context,
     bool isDark,
@@ -179,6 +287,8 @@ class _ProfilePageState extends State<ProfilePage> {
     Color textColor,
     Color subtitleColor,
   ) {
+    final n42Id = _userId?.split(':').first.replaceFirst('@', '') ?? '--';
+    
     return Container(
       color: cardColor,
       child: Material(
@@ -186,47 +296,77 @@ class _ProfilePageState extends State<ProfilePage> {
         child: InkWell(
           onTap: () => _openEditProfile(context),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 40, 16, 20),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 头像
-                N42Avatar(
-                  imageUrl: _avatarUrl,
-                  name: _displayName ?? 'U',
-                  size: 64,
+                // 头像 - 圆角矩形
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: _avatarUrl != null && _avatarUrl!.isNotEmpty
+                      ? Image.network(
+                          _avatarUrl!,
+                          width: 64,
+                          height: 64,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => _buildDefaultAvatar(),
+                        )
+                      : _buildDefaultAvatar(),
                 ),
                 const SizedBox(width: 16),
-                // 名字和ID
+                // 用户信息
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // 用户名
                       Text(
                         _displayName ?? '未登录',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 22,
                           fontWeight: FontWeight.w600,
                           color: textColor,
                         ),
                       ),
                       const SizedBox(height: 6),
+                      // N42号
+                      Text(
+                        'N42号：$n42Id',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: subtitleColor,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // 状态和好友
                       Row(
                         children: [
-                          Text(
-                            'ID: ${_userId?.split(':').first.replaceFirst('@', '') ?? '--'}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: subtitleColor,
+                          // + 状态 按钮
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isDark 
+                                  ? Colors.white.withOpacity(0.1) 
+                                  : Colors.black.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(14),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          // 二维码图标
-                          GestureDetector(
-                            onTap: () => _openMyQRCode(context),
-                            child: Icon(
-                              Icons.qr_code,
-                              size: 16,
-                              color: subtitleColor,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.add,
+                                  size: 14,
+                                  color: subtitleColor,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  '状态',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: subtitleColor,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -234,12 +374,45 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right,
-                  color: subtitleColor,
+                // 右侧二维码图标和箭头
+                Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () => _openMyQRCode(context),
+                      child: Icon(
+                        Icons.qr_code_2,
+                        size: 20,
+                        color: subtitleColor,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    Icon(
+                      Icons.chevron_right,
+                      color: subtitleColor,
+                      size: 24,
+                    ),
+                  ],
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDefaultAvatar() {
+    return Container(
+      width: 64,
+      height: 64,
+      color: AppColors.placeholder,
+      child: Center(
+        child: Text(
+          (_displayName ?? 'U').substring(0, 1).toUpperCase(),
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
       ),
@@ -259,8 +432,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildMenuItem(
     BuildContext context, {
-    required IconData icon,
-    required Color iconColor,
+    required Widget iconWidget,
     required String title,
     String? badge,
     VoidCallback? onTap,
@@ -276,15 +448,7 @@ class _ProfilePageState extends State<ProfilePage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: iconColor,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Icon(icon, color: Colors.white, size: 18),
-              ),
+              iconWidget,
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
@@ -407,4 +571,3 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-
