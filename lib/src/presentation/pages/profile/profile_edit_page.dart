@@ -15,6 +15,7 @@ import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import 'n42_bean_page.dart';
 
 /// 个人资料编辑页面
 /// 
@@ -242,6 +243,20 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     isDark: isDark,
                     title: '我的发票抬头',
                     onTap: _manageInvoices,
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 10),
+              
+              // N42豆区块
+              _buildSection(
+                isDark: isDark,
+                children: [
+                  _buildListTile(
+                    isDark: isDark,
+                    title: 'N42豆',
+                    onTap: _openN42Bean,
                   ),
                 ],
               ),
@@ -819,6 +834,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const _InvoiceManagePage(),
+      ),
+    );
+  }
+
+  Future<void> _openN42Bean() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const N42BeanPage(),
       ),
     );
   }
