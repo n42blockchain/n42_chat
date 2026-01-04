@@ -608,64 +608,65 @@ class _ChatPageState extends State<ChatPage> {
         }
       },
       child: Stack(
-      children: [
-        Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-          appBar: _buildAppBar(isDark),
-          body: Column(
-            children: [
-              // 聊天内搜索栏
-              if (_showSearchBar)
-                BlocProvider(
-                  create: (_) => getIt<SearchBloc>(),
-                  child: ChatSearchBar(
-                    roomId: widget.conversation.id,
-                    onClose: _toggleSearch,
-                    onNavigateToMessage: _navigateToMessage,
+        children: [
+          Scaffold(
+            backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+            appBar: _buildAppBar(isDark),
+            body: Column(
+              children: [
+                // 聊天内搜索栏
+                if (_showSearchBar)
+                  BlocProvider(
+                    create: (_) => getIt<SearchBloc>(),
+                    child: ChatSearchBar(
+                      roomId: widget.conversation.id,
+                      onClose: _toggleSearch,
+                      onNavigateToMessage: _navigateToMessage,
+                    ),
+                  ),
+
+                // 消息列表
+                Expanded(
+                  child: Stack(
+                    children: [
+                      _buildMessageList(),
+
+                      // 回到底部按钮
+                      if (_showScrollToBottom)
+                        Positioned(
+                          right: 16,
+                          bottom: 16,
+                          child: _buildScrollToBottomButton(),
+                        ),
+                    ],
                   ),
                 ),
 
-              // 消息列表
-              Expanded(
-                child: Stack(
-                  children: [
-                    _buildMessageList(),
+                // 回复预览
+                if (!_isMultiSelectMode) _buildReplyPreview(),
+                
+                // @ 提醒成员选择器（群聊时）
+                if (_showMentionPicker && !_isMultiSelectMode) _buildMentionPicker(),
 
-                    // 回到底部按钮
-                    if (_showScrollToBottom)
-                      Positioned(
-                        right: 16,
-                        bottom: 16,
-                        child: _buildScrollToBottomButton(),
-                      ),
-                  ],
-                ),
-              ),
+                // 多选模式下显示操作栏，否则显示输入栏
+                if (_isMultiSelectMode)
+                  _buildMultiSelectBottomBar()
+                else if (!_showSearchBar)
+                  _buildInputBar(),
 
-              // 回复预览
-              if (!_isMultiSelectMode) _buildReplyPreview(),
-              
-              // @ 提醒成员选择器（群聊时）
-              if (_showMentionPicker && !_isMultiSelectMode) _buildMentionPicker(),
-
-              // 多选模式下显示操作栏，否则显示输入栏
-              if (_isMultiSelectMode)
-                _buildMultiSelectBottomBar()
-              else if (!_showSearchBar)
-                _buildInputBar(),
-
-              // 表情选择器
-              if (_showEmojiPicker && !_isMultiSelectMode) _buildEmojiPicker(),
-              
-              // 更多功能面板（仅在非多选模式下）
-              if (_showMorePanel && !_isMultiSelectMode) _buildMorePanel(),
-            ],
+                // 表情选择器
+                if (_showEmojiPicker && !_isMultiSelectMode) _buildEmojiPicker(),
+                
+                // 更多功能面板（仅在非多选模式下）
+                if (_showMorePanel && !_isMultiSelectMode) _buildMorePanel(),
+              ],
+            ),
           ),
-        ),
-        
-        // 全屏录音浮层
-        if (_isRecording) _buildRecordingOverlay(),
-      ],
+          
+          // 全屏录音浮层
+          if (_isRecording) _buildRecordingOverlay(),
+        ],
+      ),
     );
   }
   
