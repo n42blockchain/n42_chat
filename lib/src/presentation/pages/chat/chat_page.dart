@@ -406,16 +406,35 @@ class _ChatPageState extends State<ChatPage> {
       return;
     }
     
+    // 获取当前的 ContactBloc
+    ContactBloc? contactBloc;
+    try {
+      contactBloc = context.read<ContactBloc>();
+    } catch (e) {
+      // ContactBloc 可能不可用
+    }
+    
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ContactDetailPage(
-          userId: message.senderId,
-          displayName: message.senderName,
-          avatarUrl: message.senderAvatarUrl,
-          onSendMessage: () {
-            Navigator.of(context).pop();
-          },
-        ),
+        builder: (ctx) {
+          final page = ContactDetailPage(
+            userId: message.senderId,
+            displayName: message.senderName,
+            avatarUrl: message.senderAvatarUrl,
+            onSendMessage: () {
+              Navigator.of(ctx).pop();
+            },
+          );
+          
+          // 如果有 ContactBloc，传递它
+          if (contactBloc != null) {
+            return BlocProvider.value(
+              value: contactBloc,
+              child: page,
+            );
+          }
+          return page;
+        },
       ),
     );
   }
