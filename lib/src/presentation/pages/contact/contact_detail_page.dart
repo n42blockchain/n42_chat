@@ -456,14 +456,32 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   }
   
   void _openFriendInfo() {
+    // 获取当前的 ContactBloc
+    ContactBloc? contactBloc;
+    try {
+      contactBloc = context.read<ContactBloc>();
+    } catch (e) {
+      // ContactBloc 可能不可用
+    }
+    
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => FriendInfoPage(
-          userId: widget.userId,
-          displayName: widget.displayName,
-          avatarUrl: widget.avatarUrl,
-          remark: _contact?.remark,
-        ),
+        builder: (ctx) {
+          final page = FriendInfoPage(
+            userId: widget.userId,
+            displayName: widget.displayName,
+            avatarUrl: widget.avatarUrl,
+            remark: _contact?.remark,
+          );
+          
+          if (contactBloc != null) {
+            return BlocProvider.value(
+              value: contactBloc,
+              child: page,
+            );
+          }
+          return page;
+        },
       ),
     ).then((_) => _loadContact());
   }
@@ -745,7 +763,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
   }
   
   void _openEditRemark() {
-    Navigator.of(context).push(
+    Navigator.of(context).push<String?>(
       MaterialPageRoute(
         builder: (ctx) {
           // 传递 ContactBloc
@@ -771,8 +789,14 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
           return page;
         },
       ),
-    ).then((_) {
-      // 返回时刷新备注
+    ).then((newRemark) {
+      // 如果有返回值，直接更新显示
+      if (newRemark != null || newRemark == '') {
+        setState(() {
+          _currentRemark = newRemark?.isEmpty == true ? null : newRemark;
+        });
+      }
+      // 同时尝试从 ContactBloc 刷新
       _loadRemark();
     });
   }
@@ -822,16 +846,30 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     final remark = _remarkController.text.trim();
     
     // 尝试保存备注名
+    bool saved = false;
     try {
       context.read<ContactBloc>().add(
         SetContactRemark(widget.userId, remark.isEmpty ? null : remark),
       );
+      saved = true;
+      debugPrint('EditRemarkPage: Remark saved for ${widget.userId}: $remark');
     } catch (e) {
-      // ContactBloc 可能不可用
+      debugPrint('EditRemarkPage: Failed to save remark: $e');
     }
     
-    // 返回到联系人详情页（只返回一级，让调用者决定返回多少级）
-    Navigator.of(context).pop();
+    // 显示保存结果
+    if (saved) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('备注已保存'),
+          duration: Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+    
+    // 返回并传递新的备注值
+    Navigator.of(context).pop(remark.isEmpty ? null : remark);
   }
 
   @override
