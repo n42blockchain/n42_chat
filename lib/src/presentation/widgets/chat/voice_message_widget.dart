@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/services/voice_service.dart';
@@ -123,17 +124,31 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
   }
 
   void _handleTap() {
+    debugPrint('VoiceMessageWidget: _handleTap called, voiceUrl=${widget.voiceUrl}, isSelf=${widget.isSelf}');
+    
     if (widget.onTap != null) {
       widget.onTap!();
       return;
     }
     
     // 默认播放逻辑
-    if (widget.voiceUrl == null) return;
+    if (widget.voiceUrl == null || widget.voiceUrl!.isEmpty) {
+      debugPrint('VoiceMessageWidget: voiceUrl is null or empty, cannot play');
+      // 提示用户
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('语音加载中，请稍后再试'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      return;
+    }
     
     if (_isPlaying) {
+      debugPrint('VoiceMessageWidget: stopping playback');
       _voiceService.stop();
     } else {
+      debugPrint('VoiceMessageWidget: starting playback: ${widget.voiceUrl}');
       _voiceService.play(widget.voiceUrl!);
     }
   }
