@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// 转账消息组件
-///
-/// 特点：
-/// - 显示转账金额
-/// - 显示转账状态（待接收、已接收、已退还、已过期）
-/// - 支持多种加密货币
+/// 转账消息组件（仿微信）
 class TransferMessageWidget extends StatelessWidget {
   /// 转账金额
   final String amount;
@@ -35,6 +30,21 @@ class TransferMessageWidget extends StatelessWidget {
     this.onTap,
   });
 
+  String get _currencySymbol {
+    switch (currency.toUpperCase()) {
+      case 'CNY':
+        return '¥';
+      case 'ETH':
+        return 'Ξ';
+      case 'BTC':
+        return '₿';
+      case 'USDT':
+        return '\$';
+      default:
+        return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -50,48 +60,46 @@ class TransferMessageWidget extends StatelessWidget {
           children: [
             // 主体内容
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  // 货币图标
+                  // 勾选图标
                   Container(
-                    width: 40,
-                    height: 40,
+                    width: 36,
+                    height: 36,
                     decoration: BoxDecoration(
                       color: _getIconBackgroundColor(),
-                      borderRadius: BorderRadius.circular(4),
+                      shape: BoxShape.circle,
                     ),
-                    child: Center(
-                      child: _buildCurrencyIcon(),
+                    child: Icon(
+                      status == TransferStatus.received ? Icons.check : Icons.access_time,
+                      size: 20,
+                      color: _getTextColor().withOpacity(0.8),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
 
-                  // 金额和备注
+                  // 金额和状态
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '$amount $currency',
+                          '$_currencySymbol$amount',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: _getTextColor(),
                           ),
                         ),
-                        if (note != null && note!.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            note!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: _getTextColor().withValues(alpha: 0.8),
-                            ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _getStatusText(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _getTextColor().withOpacity(0.7),
                           ),
-                        ],
+                        ),
                       ],
                     ),
                   ),
@@ -99,34 +107,22 @@ class TransferMessageWidget extends StatelessWidget {
               ),
             ),
 
-            // 底部状态栏
+            // 底部标签
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Colors.black.withOpacity(0.05),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(4),
                   bottomRight: Radius.circular(4),
                 ),
               ),
-              child: Row(
-                children: [
-                  Text(
-                    _getStatusText(),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: _getTextColor().withValues(alpha: 0.6),
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    '加密转账',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: _getTextColor().withValues(alpha: 0.6),
-                    ),
-                  ),
-                ],
+              child: Text(
+                '转账',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: _getTextColor().withOpacity(0.5),
+                ),
               ),
             ),
           ],
@@ -138,61 +134,35 @@ class TransferMessageWidget extends StatelessWidget {
   Color _getBackgroundColor() {
     switch (status) {
       case TransferStatus.pending:
-        return const Color(0xFFF9A825); // 橙黄色
+        return const Color(0xFFF9A825);
       case TransferStatus.received:
-        return const Color(0xFFFAEBCD); // 浅黄色（已领取）
+        return const Color(0xFFF9A825);
       case TransferStatus.refunded:
       case TransferStatus.expired:
-        return const Color(0xFFE0E0E0); // 灰色
+        return const Color(0xFFE0E0E0);
     }
   }
 
   Color _getIconBackgroundColor() {
     switch (status) {
       case TransferStatus.pending:
-        return Colors.white.withValues(alpha: 0.2);
       case TransferStatus.received:
-        return const Color(0xFFF9A825).withValues(alpha: 0.2);
+        return Colors.white.withOpacity(0.25);
       case TransferStatus.refunded:
       case TransferStatus.expired:
-        return Colors.grey.withValues(alpha: 0.2);
+        return Colors.grey.withOpacity(0.2);
     }
   }
 
   Color _getTextColor() {
     switch (status) {
       case TransferStatus.pending:
-        return Colors.white;
       case TransferStatus.received:
-        return const Color(0xFF8B6914);
+        return Colors.white;
       case TransferStatus.refunded:
       case TransferStatus.expired:
         return const Color(0xFF666666);
     }
-  }
-
-  Widget _buildCurrencyIcon() {
-    // 根据货币类型显示不同图标
-    IconData icon;
-    switch (currency.toUpperCase()) {
-      case 'BTC':
-        icon = Icons.currency_bitcoin;
-        break;
-      case 'ETH':
-        icon = Icons.diamond_outlined;
-        break;
-      case 'USDT':
-        icon = Icons.attach_money;
-        break;
-      default:
-        icon = Icons.monetization_on_outlined;
-    }
-
-    return Icon(
-      icon,
-      size: 24,
-      color: _getTextColor(),
-    );
   }
 
   String _getStatusText() {
@@ -200,7 +170,7 @@ class TransferMessageWidget extends StatelessWidget {
       case TransferStatus.pending:
         return isSelf ? '待对方接收' : '点击领取';
       case TransferStatus.received:
-        return isSelf ? '对方已领取' : '已领取';
+        return isSelf ? '已被接收' : '已收款';
       case TransferStatus.refunded:
         return '已退还';
       case TransferStatus.expired:
@@ -211,22 +181,15 @@ class TransferMessageWidget extends StatelessWidget {
 
 /// 转账状态
 enum TransferStatus {
-  /// 待接收
   pending,
-
-  /// 已接收
   received,
-
-  /// 已退还
   refunded,
-
-  /// 已过期
   expired,
 }
 
-/// 红包消息组件
+/// 红包消息组件（仿微信）
 class RedPacketMessageWidget extends StatelessWidget {
-  /// 红包备注
+  /// 红包备注/祝福语
   final String? note;
 
   /// 红包状态
@@ -237,6 +200,9 @@ class RedPacketMessageWidget extends StatelessWidget {
 
   /// 点击回调
   final VoidCallback? onTap;
+  
+  /// 红包封面背景图URL
+  final String? coverImageUrl;
 
   const RedPacketMessageWidget({
     super.key,
@@ -244,6 +210,7 @@ class RedPacketMessageWidget extends StatelessWidget {
     required this.status,
     required this.isSelf,
     this.onTap,
+    this.coverImageUrl,
   });
 
   @override
@@ -255,85 +222,126 @@ class RedPacketMessageWidget extends StatelessWidget {
       child: Container(
         width: 240,
         decoration: BoxDecoration(
-          gradient: isOpened
-              ? null
-              : const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFA9D3B),
-                    Color(0xFFE64340),
-                  ],
-                ),
-          color: isOpened ? const Color(0xFFE8D5B5) : null,
           borderRadius: BorderRadius.circular(4),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
           children: [
-            // 主体内容
+            // 背景
             Container(
-              padding: const EdgeInsets.all(16),
-              child: Row(
+              decoration: BoxDecoration(
+                gradient: isOpened
+                    ? null
+                    : const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFFFA9D3B), Color(0xFFE64340)],
+                      ),
+                color: isOpened ? const Color(0xFFE8D5B5) : null,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 红包图标
+                  // 主体内容
                   Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: isOpened
-                          ? const Color(0xFFD4A853).withValues(alpha: 0.3)
-                          : Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Icon(
-                      Icons.redeem,
-                      size: 24,
-                      color: isOpened
-                          ? const Color(0xFF8B6914)
-                          : Colors.white,
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        // 红包图标
+                        Container(
+                          width: 40,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: isOpened
+                                ? const Color(0xFFD4A853).withOpacity(0.3)
+                                : Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Center(
+                            child: Image.asset(
+                              'assets/images/red_packet_icon.png',
+                              width: 28,
+                              height: 28,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.card_giftcard,
+                                size: 24,
+                                color: isOpened ? const Color(0xFF8B6914) : Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+
+                        // 祝福语
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                note ?? '恭喜发财，大吉大利',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: isOpened
+                                      ? const Color(0xFF8B6914)
+                                      : Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 12),
 
-                  // 备注
-                  Expanded(
-                    child: Text(
-                      note ?? '恭喜发财，大吉大利',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: isOpened
-                            ? const Color(0xFF8B6914)
-                            : Colors.white,
-                      ),
+                  // 底部标签
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.05),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          '红包',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isOpened
+                                ? const Color(0xFF8B6914).withOpacity(0.5)
+                                : Colors.white.withOpacity(0.6),
+                          ),
+                        ),
+                        if (isOpened) ...[
+                          const Spacer(),
+                          Text(
+                            _getStatusText(),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: const Color(0xFF8B6914).withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-
-            // 底部状态栏
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.05),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(4),
-                  bottomRight: Radius.circular(4),
+            
+            // 封面图片覆盖层（如果有）
+            if (coverImageUrl != null && !isOpened)
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.3,
+                  child: Image.network(
+                    coverImageUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  ),
                 ),
               ),
-              child: Text(
-                _getStatusText(),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isOpened
-                      ? const Color(0xFF8B6914).withValues(alpha: 0.6)
-                      : Colors.white.withValues(alpha: 0.7),
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -343,7 +351,7 @@ class RedPacketMessageWidget extends StatelessWidget {
   String _getStatusText() {
     switch (status) {
       case RedPacketStatus.pending:
-        return isSelf ? '发出红包，等待领取' : '红包';
+        return '';
       case RedPacketStatus.opened:
         return '已领取';
       case RedPacketStatus.expired:
@@ -356,16 +364,8 @@ class RedPacketMessageWidget extends StatelessWidget {
 
 /// 红包状态
 enum RedPacketStatus {
-  /// 待领取
   pending,
-
-  /// 已领取
   opened,
-
-  /// 已过期
   expired,
-
-  /// 已被领完
   empty,
 }
-
