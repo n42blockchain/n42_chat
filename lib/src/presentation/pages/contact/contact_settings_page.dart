@@ -284,12 +284,30 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
   }
   
   void _openEditRemark() {
+    // 获取当前的 ContactBloc
+    ContactBloc? contactBloc;
+    try {
+      contactBloc = context.read<ContactBloc>();
+    } catch (e) {
+      // ContactBloc 可能不可用
+    }
+    
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => FriendInfoPage(
-          userId: widget.userId,
-          displayName: widget.displayName,
-        ),
+        builder: (ctx) {
+          final page = FriendInfoPage(
+            userId: widget.userId,
+            displayName: widget.displayName,
+          );
+          
+          if (contactBloc != null) {
+            return BlocProvider.value(
+              value: contactBloc,
+              child: page,
+            );
+          }
+          return page;
+        },
       ),
     );
   }
