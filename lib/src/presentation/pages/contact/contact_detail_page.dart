@@ -761,14 +761,17 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
   void _save() {
     final remark = _remarkController.text.trim();
     
-    // 保存备注名
-    context.read<ContactBloc>().add(
-      SetContactRemark(widget.userId, remark.isEmpty ? null : remark),
-    );
+    // 尝试保存备注名
+    try {
+      context.read<ContactBloc>().add(
+        SetContactRemark(widget.userId, remark.isEmpty ? null : remark),
+      );
+    } catch (e) {
+      // ContactBloc 可能不可用
+    }
     
-    // 返回到上一页
+    // 返回到联系人详情页（只返回一级，让调用者决定返回多少级）
     Navigator.of(context).pop();
-    Navigator.of(context).pop(); // 返回到联系人详情页
   }
 
   @override
@@ -785,13 +788,19 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
       appBar: AppBar(
         backgroundColor: bgColor,
         elevation: 0,
-        leading: TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(
-            '取消',
-            style: TextStyle(
-              fontSize: 16,
-              color: textColor,
+        leadingWidth: 70,
+        leading: Center(
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Text(
+                '取消',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: textColor,
+                ),
+              ),
             ),
           ),
         ),
@@ -806,21 +815,21 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
         centerTitle: true,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: TextButton(
-              onPressed: _save,
-              style: TextButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
+            padding: const EdgeInsets.only(right: 12),
+            child: GestureDetector(
+              onTap: _save,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              ),
-              child: const Text(
-                '完成',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.white,
+                child: const Text(
+                  '完成',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

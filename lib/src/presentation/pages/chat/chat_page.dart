@@ -42,6 +42,7 @@ import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../contact/contact_detail_page.dart';
 import '../search/chat_search_bar.dart';
+import 'chat_detail_page.dart';
 import 'message_item.dart';
 
 /// 聊天页面
@@ -547,13 +548,29 @@ class _ChatPageState extends State<ChatPage> {
 
   /// 打开聊天设置页面
   void _openChatSettings() {
-    // TODO: 实现聊天设置页面
-    // 可以是群设置或私聊设置
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('聊天设置功能开发中...'),
-        duration: Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
+    // 获取当前的 ContactBloc
+    ContactBloc? contactBloc;
+    try {
+      contactBloc = context.read<ContactBloc>();
+    } catch (e) {
+      // ContactBloc 可能不可用
+    }
+    
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) {
+          final page = ChatDetailPage(
+            conversation: widget.conversation,
+          );
+          
+          if (contactBloc != null) {
+            return BlocProvider.value(
+              value: contactBloc,
+              child: page,
+            );
+          }
+          return page;
+        },
       ),
     );
   }
