@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 
 import '../../../core/theme/app_colors.dart';
 
-/// 发红包弹窗
-class SendRedPacketDialog extends StatefulWidget {
+/// 发红包页面（全屏，仿微信）
+class SendRedPacketPage extends StatefulWidget {
   /// 接收者名称
   final String receiverName;
   
@@ -17,7 +17,7 @@ class SendRedPacketDialog extends StatefulWidget {
   /// 发送回调
   final Function(String amount, String token, String greeting, int count, bool isLucky) onSend;
   
-  const SendRedPacketDialog({
+  const SendRedPacketPage({
     super.key,
     required this.receiverName,
     this.isGroup = false,
@@ -26,18 +26,37 @@ class SendRedPacketDialog extends StatefulWidget {
   });
   
   @override
-  State<SendRedPacketDialog> createState() => _SendRedPacketDialogState();
+  State<SendRedPacketPage> createState() => _SendRedPacketPageState();
 }
 
-class _SendRedPacketDialogState extends State<SendRedPacketDialog> {
+class _SendRedPacketPageState extends State<SendRedPacketPage> {
   final _amountController = TextEditingController();
   final _countController = TextEditingController(text: '1');
   final _greetingController = TextEditingController(text: '恭喜发财，大吉大利');
   
-  String _selectedToken = 'ETH';
+  String _selectedToken = 'CNY';
   bool _isLucky = false;
   
-  final List<String> _tokens = ['ETH', 'USDT', 'BTC', 'N'];
+  final List<String> _tokens = ['CNY', 'ETH', 'USDT', 'BTC'];
+  
+  double get _amount {
+    final text = _amountController.text.trim();
+    if (text.isEmpty) return 0.0;
+    return double.tryParse(text) ?? 0.0;
+  }
+  
+  String get _currencySymbol {
+    switch (_selectedToken) {
+      case 'CNY':
+        return '¥';
+      case 'ETH':
+        return 'Ξ';
+      case 'BTC':
+        return '₿';
+      default:
+        return '\$';
+    }
+  }
   
   @override
   void dispose() {
@@ -49,7 +68,7 @@ class _SendRedPacketDialogState extends State<SendRedPacketDialog> {
   
   void _send() {
     final amount = _amountController.text.trim();
-    if (amount.isEmpty) {
+    if (amount.isEmpty || _amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('请输入金额')),
       );
@@ -76,214 +95,279 @@ class _SendRedPacketDialogState extends State<SendRedPacketDialog> {
   
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        width: 320,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFE64340),
-              Color(0xFFD63030),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(12),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 32),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 头部
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(Icons.close, color: Colors.white70, size: 24),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      '发红包',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+        title: const Text(
+          '发红包',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.more_horiz, color: Colors.white),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          const SizedBox(height: 16),
+          
+          // 金额输入
+          _buildMenuItem(
+            label: '金额',
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 代币选择
+                GestureDetector(
+                  onTap: _showTokenPicker,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white10,
+                      borderRadius: BorderRadius.circular(4),
                     ),
-                  ),
-                  const SizedBox(width: 24),
-                ],
-              ),
-            ),
-            
-            // 内容区域
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 接收者
-                  Text(
-                    widget.isGroup ? '发给群聊' : '发给 ${widget.receiverName}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // 金额输入
-                  Row(
-                    children: [
-                      // 代币选择
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: _selectedToken,
-                            isDense: true,
-                            items: _tokens.map((token) {
-                              return DropdownMenuItem(
-                                value: token,
-                                child: Text(token),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() => _selectedToken = value);
-                              }
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      
-                      // 金额
-                      Expanded(
-                        child: TextField(
-                          controller: _amountController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-                          ],
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          decoration: const InputDecoration(
-                            hintText: '0.00',
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  
-                  // 群聊选项：红包数量和类型
-                  if (widget.isGroup) ...[
-                    const Divider(height: 24),
-                    
-                    // 红包类型切换
-                    Row(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildTypeChip('普通红包', !_isLucky, () {
-                          setState(() => _isLucky = false);
-                        }),
-                        const SizedBox(width: 12),
-                        _buildTypeChip('拼手气红包', _isLucky, () {
-                          setState(() => _isLucky = true);
-                        }),
+                        Text(
+                          _selectedToken,
+                          style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                        const Icon(Icons.arrow_drop_down, color: Colors.white70, size: 18),
                       ],
                     ),
-                    
-                    if (_isLucky) ...[
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          const Text('红包个数'),
-                          const Spacer(),
-                          SizedBox(
-                            width: 80,
-                            child: TextField(
-                              controller: _countController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              textAlign: TextAlign.center,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('个'),
-                        ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 120,
+                  child: TextField(
+                    controller: _amountController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                    ],
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                    decoration: const InputDecoration(
+                      hintText: '0.00',
+                      hintStyle: TextStyle(color: Colors.white38),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                    ),
+                    onChanged: (_) => setState(() {}),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // 祝福语输入
+          _buildMenuItem(
+            child: TextField(
+              controller: _greetingController,
+              maxLength: 30,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+              decoration: InputDecoration(
+                hintText: '恭喜发财，大吉大利',
+                hintStyle: const TextStyle(color: Colors.white38),
+                border: InputBorder.none,
+                counterText: '',
+                contentPadding: EdgeInsets.zero,
+                isDense: true,
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.white54),
+                  onPressed: () {},
+                ),
+              ),
+            ),
+          ),
+          
+          // 红包封面
+          _buildMenuItem(
+            onTap: () {},
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '红包封面',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '领个好彩头',
+                        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
                       ),
                     ],
-                  ],
-                  
-                  const Divider(height: 24),
-                  
-                  // 祝福语
-                  TextField(
-                    controller: _greetingController,
-                    maxLength: 30,
-                    decoration: InputDecoration(
-                      hintText: '恭喜发财，大吉大利',
-                      hintStyle: TextStyle(color: Colors.grey[400]),
-                      border: InputBorder.none,
-                      counterText: '',
-                      contentPadding: EdgeInsets.zero,
-                    ),
                   ),
+                ),
+                // 封面预览
+                Container(
+                  width: 60,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFFE64340), Color(0xFFD63030)],
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.card_giftcard, color: Colors.white70, size: 24),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.chevron_right, color: Colors.white38),
+              ],
+            ),
+          ),
+          
+          // 群聊选项
+          if (widget.isGroup) ...[
+            const SizedBox(height: 16),
+            _buildMenuItem(
+              label: '红包类型',
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildTypeChip('普通红包', !_isLucky, () {
+                    setState(() => _isLucky = false);
+                  }),
+                  const SizedBox(width: 8),
+                  _buildTypeChip('拼手气', _isLucky, () {
+                    setState(() => _isLucky = true);
+                  }),
                 ],
               ),
             ),
-            
-            // 发送按钮
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _send,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFD700),
-                    foregroundColor: const Color(0xFFB8860B),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    '塞钱进红包',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+            if (_isLucky)
+              _buildMenuItem(
+                label: '红包个数',
+                trailing: SizedBox(
+                  width: 80,
+                  child: TextField(
+                    controller: _countController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                      suffixText: '个',
+                      suffixStyle: TextStyle(color: Colors.white54, fontSize: 14),
                     ),
                   ),
                 ),
               ),
+          ],
+          
+          const Spacer(),
+          
+          // 金额显示
+          Text(
+            '$_currencySymbol ${_amount.toStringAsFixed(2)}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 48,
+              fontWeight: FontWeight.w300,
             ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // 发送按钮
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 48),
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: _amount > 0 ? _send : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFE85D04),
+                  disabledBackgroundColor: const Color(0xFF4A3020),
+                  foregroundColor: Colors.white,
+                  disabledForegroundColor: Colors.white38,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  '塞钱进红包',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // 底部提示
+          Text(
+            '未领取的红包，将于24小时后发起退款',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.4),
+              fontSize: 12,
+            ),
+          ),
+          
+          const SizedBox(height: 48),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildMenuItem({
+    String? label,
+    Widget? trailing,
+    Widget? child,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1C1C1E),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: child ?? Row(
+          children: [
+            if (label != null)
+              Text(
+                label,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            const Spacer(),
+            if (trailing != null) trailing,
           ],
         ),
       ),
@@ -294,47 +378,102 @@ class _SendRedPacketDialogState extends State<SendRedPacketDialog> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFFE64340) : Colors.grey[200],
-          borderRadius: BorderRadius.circular(20),
+          color: selected ? const Color(0xFFE85D04) : Colors.white10,
+          borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? Colors.white : Colors.grey[600],
+            color: selected ? Colors.white : Colors.white54,
             fontSize: 13,
           ),
         ),
       ),
     );
   }
+  
+  void _showTokenPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF2C2C2E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                '选择币种',
+                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+            ),
+            ..._tokens.map((token) => ListTile(
+              title: Text(token, style: const TextStyle(color: Colors.white)),
+              trailing: _selectedToken == token
+                  ? const Icon(Icons.check, color: Color(0xFFE85D04))
+                  : null,
+              onTap: () {
+                setState(() => _selectedToken = token);
+                Navigator.pop(context);
+              },
+            )),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 发红包弹窗（保留兼容性）
+class SendRedPacketDialog extends StatelessWidget {
+  final String receiverName;
+  final bool isGroup;
+  final int memberCount;
+  final Function(String amount, String token, String greeting, int count, bool isLucky) onSend;
+  
+  const SendRedPacketDialog({
+    super.key,
+    required this.receiverName,
+    this.isGroup = false,
+    this.memberCount = 1,
+    required this.onSend,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    // 使用全屏页面代替弹窗
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.of(context).pop();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => SendRedPacketPage(
+            receiverName: receiverName,
+            isGroup: isGroup,
+            memberCount: memberCount,
+            onSend: onSend,
+          ),
+        ),
+      );
+    });
+    return const SizedBox.shrink();
+  }
 }
 
 /// 开红包弹窗
 class OpenRedPacketDialog extends StatefulWidget {
-  /// 发送者名称
   final String senderName;
-  
-  /// 发送者头像
   final String? senderAvatar;
-  
-  /// 祝福语
   final String greeting;
-  
-  /// 红包状态
   final OpenRedPacketStatus status;
-  
-  /// 已领取金额（如果已领取）
   final String? claimedAmount;
-  
-  /// 代币符号
   final String token;
-  
-  /// 开红包回调
   final VoidCallback? onOpen;
-  
-  /// 查看详情回调
   final VoidCallback? onViewDetails;
   
   const OpenRedPacketDialog({
@@ -344,7 +483,7 @@ class OpenRedPacketDialog extends StatefulWidget {
     this.greeting = '恭喜发财，大吉大利',
     this.status = OpenRedPacketStatus.canOpen,
     this.claimedAmount,
-    this.token = 'ETH',
+    this.token = 'CNY',
     this.onOpen,
     this.onViewDetails,
   });
@@ -357,7 +496,6 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
-  late Animation<double> _rotateAnimation;
   bool _isOpening = false;
   bool _showResult = false;
   
@@ -365,19 +503,14 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
     
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
     
-    _rotateAnimation = Tween<double>(begin: 0, end: 0.1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
-    
-    // 如果已经领取过，直接显示结果
     if (widget.status == OpenRedPacketStatus.opened) {
       _showResult = true;
     }
@@ -393,14 +526,8 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
     if (_isOpening) return;
     
     setState(() => _isOpening = true);
-    
-    // 播放开红包动画
     await _controller.forward();
-    
-    // 调用开红包回调
     widget.onOpen?.call();
-    
-    // 显示结果
     setState(() => _showResult = true);
   }
   
@@ -419,17 +546,13 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFE64340),
-            Color(0xFFD63030),
-          ],
+          colors: [Color(0xFFE64340), Color(0xFFD63030)],
         ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 关闭按钮
           Align(
             alignment: Alignment.topRight,
             child: Padding(
@@ -441,7 +564,6 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
             ),
           ),
           
-          // 发送者信息
           CircleAvatar(
             radius: 32,
             backgroundColor: Colors.white24,
@@ -451,11 +573,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
             child: widget.senderAvatar == null
                 ? Text(
                     widget.senderName.isNotEmpty ? widget.senderName[0] : '?',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                   )
                 : null,
           ),
@@ -463,57 +581,38 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
           
           Text(
             '${widget.senderName}的红包',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
           
           Text(
             widget.greeting,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 32),
           
-          // 开红包按钮
           if (widget.status == OpenRedPacketStatus.canOpen)
             AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
                 return Transform.scale(
                   scale: _scaleAnimation.value,
-                  child: Transform.rotate(
-                    angle: _rotateAnimation.value,
-                    child: GestureDetector(
-                      onTap: _openRedPacket,
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFFFD700),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 8,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Text(
-                            '開',
-                            style: TextStyle(
-                              color: Color(0xFFB8860B),
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                  child: GestureDetector(
+                    onTap: _openRedPacket,
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFFD700),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4)),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Text(
+                          '開',
+                          style: TextStyle(color: Color(0xFFB8860B), fontSize: 28, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -548,13 +647,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
     
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Text(
-        message,
-        style: const TextStyle(
-          color: Colors.white70,
-          fontSize: 16,
-        ),
-      ),
+      child: Text(message, style: const TextStyle(color: Colors.white70, fontSize: 16)),
     );
   }
   
@@ -568,17 +661,13 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 红色头部
           Container(
             padding: const EdgeInsets.symmetric(vertical: 24),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFE64340),
-                  Color(0xFFD63030),
-                ],
+                colors: [Color(0xFFE64340), Color(0xFFD63030)],
               ),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12),
@@ -587,7 +676,6 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
             ),
             child: Column(
               children: [
-                // 关闭按钮
                 Align(
                   alignment: Alignment.topRight,
                   child: Padding(
@@ -601,34 +689,23 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                 
                 Text(
                   '${widget.senderName}的红包',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                 ),
                 const SizedBox(height: 16),
                 
-                // 金额
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
                       widget.claimedAmount ?? '0',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 48, fontWeight: FontWeight.bold),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
                         ' ${widget.token}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
+                        style: const TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ),
                   ],
@@ -637,7 +714,6 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
             ),
           ),
           
-          // 底部操作
           Padding(
             padding: const EdgeInsets.all(20),
             child: TextButton(
@@ -651,27 +727,17 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
   }
 }
 
-/// 开红包状态
 enum OpenRedPacketStatus {
-  /// 可以开
   canOpen,
-  /// 已领取
   opened,
-  /// 已被领完
   empty,
-  /// 已过期
   expired,
 }
 
 /// 发转账弹窗
 class SendTransferDialog extends StatefulWidget {
-  /// 接收者名称
   final String receiverName;
-  
-  /// 接收者头像
   final String? receiverAvatar;
-  
-  /// 发送回调
   final Function(String amount, String token, String? memo) onSend;
   
   const SendTransferDialog({
@@ -689,8 +755,8 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
   final _amountController = TextEditingController();
   final _memoController = TextEditingController();
   
-  String _selectedToken = 'ETH';
-  final List<String> _tokens = ['ETH', 'USDT', 'BTC', 'N'];
+  String _selectedToken = 'CNY';
+  final List<String> _tokens = ['CNY', 'ETH', 'USDT', 'BTC'];
   
   @override
   void dispose() {
@@ -732,9 +798,9 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
             // 头部
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: const BorderRadius.only(
+              decoration: const BoxDecoration(
+                color: Color(0xFFF9A825),
+                borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
                 ),
@@ -749,11 +815,7 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
                     child: Text(
                       '转账',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
                     ),
                   ),
                   const SizedBox(width: 24),
@@ -774,14 +836,8 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
                         : null,
                     child: widget.receiverAvatar == null
                         ? Text(
-                            widget.receiverName.isNotEmpty
-                                ? widget.receiverName[0]
-                                : '?',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            widget.receiverName.isNotEmpty ? widget.receiverName[0] : '?',
+                            style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold),
                           )
                         : null,
                   ),
@@ -790,20 +846,8 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          '转账给',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        Text(
-                          widget.receiverName,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        const Text('转账给', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        Text(widget.receiverName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                       ],
                     ),
                   ),
@@ -819,18 +863,11 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '转账金额',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
+                  const Text('转账金额', style: TextStyle(fontSize: 14, color: Colors.grey)),
                   const SizedBox(height: 12),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // 代币选择
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
@@ -842,22 +879,15 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
                             value: _selectedToken,
                             isDense: true,
                             items: _tokens.map((token) {
-                              return DropdownMenuItem(
-                                value: token,
-                                child: Text(token),
-                              );
+                              return DropdownMenuItem(value: token, child: Text(token));
                             }).toList(),
                             onChanged: (value) {
-                              if (value != null) {
-                                setState(() => _selectedToken = value);
-                              }
+                              if (value != null) setState(() => _selectedToken = value);
                             },
                           ),
                         ),
                       ),
                       const SizedBox(width: 16),
-                      
-                      // 金额
                       Expanded(
                         child: TextField(
                           controller: _amountController,
@@ -865,10 +895,7 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
                           inputFormatters: [
                             FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
                           ],
-                          style: const TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                           decoration: const InputDecoration(
                             hintText: '0.00',
                             border: InputBorder.none,
@@ -881,7 +908,6 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
                   
                   const SizedBox(height: 20),
                   
-                  // 备注
                   TextField(
                     controller: _memoController,
                     maxLength: 50,
@@ -895,10 +921,7 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
                         borderSide: BorderSide.none,
                       ),
                       counterText: '',
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
                   ),
                 ],
@@ -914,20 +937,12 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
                 child: ElevatedButton(
                   onPressed: _send,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: const Color(0xFFF9A825),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    '确认转账',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: const Text('确认转账', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                 ),
               ),
             ),
@@ -940,19 +955,10 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
 
 /// 确认收款弹窗
 class ConfirmReceiveDialog extends StatelessWidget {
-  /// 发送者名称
   final String senderName;
-  
-  /// 金额
   final String amount;
-  
-  /// 代币符号
   final String token;
-  
-  /// 备注
   final String? memo;
-  
-  /// 确认收款回调
   final VoidCallback onConfirm;
   
   const ConfirmReceiveDialog({
@@ -978,7 +984,6 @@ class ConfirmReceiveDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 图标
             Container(
               width: 64,
               height: 64,
@@ -986,55 +991,24 @@ class ConfirmReceiveDialog extends StatelessWidget {
                 color: const Color(0xFFF9A825).withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.account_balance_wallet,
-                size: 32,
-                color: Color(0xFFF9A825),
-              ),
+              child: const Icon(Icons.account_balance_wallet, size: 32, color: Color(0xFFF9A825)),
             ),
             const SizedBox(height: 16),
             
-            // 标题
-            const Text(
-              '收到转账',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            const Text('收到转账', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             
-            Text(
-              '来自 $senderName',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            ),
+            Text('来自 $senderName', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
             const SizedBox(height: 24),
             
-            // 金额
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  amount,
-                  style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFF9A825),
-                  ),
-                ),
+                Text(amount, style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Color(0xFFF9A825))),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 6),
-                  child: Text(
-                    ' $token',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFFF9A825),
-                    ),
-                  ),
+                  child: Text(' $token', style: const TextStyle(fontSize: 16, color: Color(0xFFF9A825))),
                 ),
               ],
             ),
@@ -1047,19 +1021,12 @@ class ConfirmReceiveDialog extends StatelessWidget {
                   color: Colors.grey[100],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
-                  memo!,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
+                child: Text(memo!, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
               ),
             ],
             
             const SizedBox(height: 24),
             
-            // 确认按钮
             SizedBox(
               width: double.infinity,
               height: 44,
@@ -1071,18 +1038,10 @@ class ConfirmReceiveDialog extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFF9A825),
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   elevation: 0,
                 ),
-                child: const Text(
-                  '确认收款',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                child: const Text('确认收款', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ),
           ],
@@ -1091,4 +1050,3 @@ class ConfirmReceiveDialog extends StatelessWidget {
     );
   }
 }
-
