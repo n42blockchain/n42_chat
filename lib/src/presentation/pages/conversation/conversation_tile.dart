@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_utils.dart';
 import '../../../domain/entities/contact_entity.dart';
@@ -34,18 +35,23 @@ class ConversationTile extends StatelessWidget {
       return conversation.name;
     }
     
-    // 私聊尝试获取备注名
+    // 私聊使用 RemarkService 获取备注名
+    final remarkService = RemarkService.instance;
+    final remark = remarkService.getRemark(conversation.id);
+    if (remark != null && remark.isNotEmpty) {
+      return remark;
+    }
+    
+    // 也尝试从 ContactBloc 获取（兼容）
     try {
       final contactBloc = context.read<ContactBloc>();
       final state = contactBloc.state;
       if (state is ContactLoaded) {
-        // 通过名称或房间 ID 匹配联系人
         final contact = state.contacts.cast<ContactEntity?>().firstWhere(
           (c) {
             if (c == null) return false;
-            // 尝试通过房间 ID 匹配
             if (c.directRoomId == conversation.id) return true;
-            // 尝试通过名称匹配
+            if (c.userId == conversation.id) return true;
             if (c.displayName == conversation.name) return true;
             return false;
           },

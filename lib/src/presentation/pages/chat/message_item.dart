@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/message_entity.dart';
@@ -96,6 +97,14 @@ class MessageItem extends StatelessWidget {
       return message.senderName;
     }
 
+    // 使用 RemarkService 获取备注名
+    final remarkService = RemarkService.instance;
+    final remark = remarkService.getRemark(message.senderId);
+    if (remark != null && remark.isNotEmpty) {
+      return remark;
+    }
+
+    // 也尝试从 ContactBloc 获取（兼容）
     try {
       final contactBloc = context.read<ContactBloc>();
       final state = contactBloc.state;

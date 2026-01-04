@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
+import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../contact/contact_detail_page.dart';
 

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/services/remark_service.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import 'contact_event.dart';
@@ -310,8 +311,14 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
   ) async {
     try {
       debugPrint('ContactBloc: Setting remark for ${event.userId} to "${event.remark}"');
+      
+      // 同时保存到 RemarkService（全局本地缓存）
+      await RemarkService.instance.setRemark(event.userId, event.remark);
+      debugPrint('ContactBloc: Remark saved to RemarkService');
+      
+      // 保存到 ContactRepository
       await _contactRepository.setContactRemark(event.userId, event.remark);
-      debugPrint('ContactBloc: Remark saved successfully');
+      debugPrint('ContactBloc: Remark saved to ContactRepository');
       
       // 发送成功状态
       emit(ContactRemarkUpdated(userId: event.userId, remark: event.remark));

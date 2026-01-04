@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 
+import '../services/remark_service.dart';
 import '../../data/datasources/local/secure_storage_datasource.dart';
 import '../../data/datasources/matrix/matrix_auth_datasource.dart';
 import '../../data/datasources/matrix/matrix_client_manager.dart';
@@ -67,6 +68,20 @@ Future<void> configureDependencies(N42ChatConfig config, {IWalletBridge? walletB
 
   // 注册BLoC
   _registerBlocs();
+  
+  // 初始化备注名服务
+  await _initializeRemarkService();
+}
+
+/// 初始化备注名服务
+Future<void> _initializeRemarkService() async {
+  try {
+    final remarkService = RemarkService.instance;
+    await remarkService.initialize();
+    debugPrint('RemarkService initialized successfully');
+  } catch (e) {
+    debugPrint('Failed to initialize RemarkService: $e');
+  }
 }
 
 /// 注册服务
