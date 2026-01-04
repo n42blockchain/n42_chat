@@ -123,9 +123,11 @@ class MessageItem extends StatelessWidget {
     // 是否显示发送者名称（群聊中非自己的消息）
     final shouldShowSenderName = isGroupChat && !message.isFromMe && showSenderName;
 
-    // 图片、视频消息不需要气泡背景（微信风格）
-    final isMediaMessage = message.type == MessageType.image || 
-                          message.type == MessageType.video;
+    // 图片、视频、红包、转账消息不需要气泡背景（微信风格）
+    final noBubbleMessage = message.type == MessageType.image || 
+                            message.type == MessageType.video ||
+                            message.type == MessageType.redPacket ||
+                            message.type == MessageType.transfer;
 
     Widget bubble = MessageBubble(
       isSelf: message.isFromMe,
@@ -139,8 +141,8 @@ class MessageItem extends StatelessWidget {
       onAvatarTap: onAvatarTap,
       onAvatarDoubleTap: onAvatarDoubleTap,
       onResend: onResend,
-      // 图片/视频消息不需要气泡背景
-      noBubble: isMediaMessage,
+      // 图片/视频/红包/转账消息不需要气泡背景
+      noBubble: noBubbleMessage,
       child: _buildMessageContent(context),
     );
 
