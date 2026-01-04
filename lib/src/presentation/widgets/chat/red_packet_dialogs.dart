@@ -95,8 +95,11 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    
     return Scaffold(
       backgroundColor: Colors.black,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
@@ -120,225 +123,271 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 16),
-          
-          // 金额输入
-          _buildMenuItem(
-            label: '金额',
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.only(bottom: bottomInset > 0 ? bottomInset : 48),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height - 
+                       MediaQuery.of(context).padding.top - 
+                       kToolbarHeight - 
+                       (bottomInset > 0 ? bottomInset : 48),
+          ),
+          child: IntrinsicHeight(
+            child: Column(
               children: [
-                // 代币选择
-                GestureDetector(
-                  onTap: _showTokenPicker,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white10,
-                      borderRadius: BorderRadius.circular(4),
+                const SizedBox(height: 16),
+                
+                // 金额输入
+                _buildMenuItem(
+                  label: '金额',
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 代币选择
+                      GestureDetector(
+                        onTap: _showTokenPicker,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white10,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _selectedToken,
+                                style: const TextStyle(color: Colors.white70, fontSize: 14),
+                              ),
+                              const Icon(Icons.arrow_drop_down, color: Colors.white70, size: 18),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 120,
+                        child: TextField(
+                          controller: _amountController,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                          ],
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: '0.00',
+                            hintStyle: TextStyle(color: Colors.white38),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                          ),
+                          onChanged: (_) => setState(() {}),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // 祝福语输入
+                _buildMenuItem(
+                  child: TextField(
+                    controller: _greetingController,
+                    maxLength: 30,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    decoration: InputDecoration(
+                      hintText: '恭喜发财，大吉大利',
+                      hintStyle: const TextStyle(color: Colors.white38),
+                      border: InputBorder.none,
+                      counterText: '',
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.white54),
+                        onPressed: () {},
+                      ),
                     ),
-                    child: Row(
+                  ),
+                ),
+                
+                // 红包封面
+                _buildMenuItem(
+                  onTap: () {},
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '红包封面',
+                              style: TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '领个好彩头',
+                              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // 封面预览
+                      Container(
+                        width: 60,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Color(0xFFE64340), Color(0xFFD63030)],
+                          ),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Center(
+                          child: _buildRedPacketIcon(28, Colors.white70),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.chevron_right, color: Colors.white38),
+                    ],
+                  ),
+                ),
+                
+                // 群聊选项
+                if (widget.isGroup) ...[
+                  const SizedBox(height: 16),
+                  _buildMenuItem(
+                    label: '红包类型',
+                    trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          _selectedToken,
-                          style: const TextStyle(color: Colors.white70, fontSize: 14),
-                        ),
-                        const Icon(Icons.arrow_drop_down, color: Colors.white70, size: 18),
+                        _buildTypeChip('普通红包', !_isLucky, () {
+                          setState(() => _isLucky = false);
+                        }),
+                        const SizedBox(width: 8),
+                        _buildTypeChip('拼手气', _isLucky, () {
+                          setState(() => _isLucky = true);
+                        }),
                       ],
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                SizedBox(
-                  width: 120,
-                  child: TextField(
-                    controller: _amountController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-                    ],
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                    decoration: const InputDecoration(
-                      hintText: '0.00',
-                      hintStyle: TextStyle(color: Colors.white38),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                      isDense: true,
-                    ),
-                    onChanged: (_) => setState(() {}),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // 祝福语输入
-          _buildMenuItem(
-            child: TextField(
-              controller: _greetingController,
-              maxLength: 30,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-              decoration: InputDecoration(
-                hintText: '恭喜发财，大吉大利',
-                hintStyle: const TextStyle(color: Colors.white38),
-                border: InputBorder.none,
-                counterText: '',
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.white54),
-                  onPressed: () {},
-                ),
-              ),
-            ),
-          ),
-          
-          // 红包封面
-          _buildMenuItem(
-            onTap: () {},
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '红包封面',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                  if (_isLucky)
+                    _buildMenuItem(
+                      label: '红包个数',
+                      trailing: SizedBox(
+                        width: 80,
+                        child: TextField(
+                          controller: _countController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
+                            suffixText: '个',
+                            suffixStyle: TextStyle(color: Colors.white54, fontSize: 14),
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '领个好彩头',
-                        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ),
-                // 封面预览
-                Container(
-                  width: 60,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0xFFE64340), Color(0xFFD63030)],
                     ),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.card_giftcard, color: Colors.white70, size: 24),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Icon(Icons.chevron_right, color: Colors.white38),
-              ],
-            ),
-          ),
-          
-          // 群聊选项
-          if (widget.isGroup) ...[
-            const SizedBox(height: 16),
-            _buildMenuItem(
-              label: '红包类型',
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildTypeChip('普通红包', !_isLucky, () {
-                    setState(() => _isLucky = false);
-                  }),
-                  const SizedBox(width: 8),
-                  _buildTypeChip('拼手气', _isLucky, () {
-                    setState(() => _isLucky = true);
-                  }),
                 ],
-              ),
-            ),
-            if (_isLucky)
-              _buildMenuItem(
-                label: '红包个数',
-                trailing: SizedBox(
-                  width: 80,
-                  child: TextField(
-                    controller: _countController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                      isDense: true,
-                      suffixText: '个',
-                      suffixStyle: TextStyle(color: Colors.white54, fontSize: 14),
+                
+                const Spacer(),
+                
+                const SizedBox(height: 24),
+                
+                // 金额显示
+                Text(
+                  '$_currencySymbol ${_amount.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 48,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                
+                const SizedBox(height: 24),
+                
+                // 发送按钮
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 48),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: _amount > 0 ? _send : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE85D04),
+                        disabledBackgroundColor: const Color(0xFF4A3020),
+                        foregroundColor: Colors.white,
+                        disabledForegroundColor: Colors.white38,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        '塞钱进红包',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
-          
-          const Spacer(),
-          
-          // 金额显示
-          Text(
-            '$_currencySymbol ${_amount.toStringAsFixed(2)}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 48,
-              fontWeight: FontWeight.w300,
-            ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // 发送按钮
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 48),
-            child: SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: _amount > 0 ? _send : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE85D04),
-                  disabledBackgroundColor: const Color(0xFF4A3020),
-                  foregroundColor: Colors.white,
-                  disabledForegroundColor: Colors.white38,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  '塞钱进红包',
+                
+                const SizedBox(height: 24),
+                
+                // 底部提示
+                Text(
+                  '未领取的红包，将于24小时后发起退款',
                   style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withOpacity(0.4),
+                    fontSize: 12,
                   ),
                 ),
-              ),
+                
+                const SizedBox(height: 24),
+              ],
             ),
           ),
-          
-          const SizedBox(height: 32),
-          
-          // 底部提示
+        ),
+      ),
+    );
+  }
+  
+  /// 红包图标（红色方形背景，金色¥符号）
+  Widget _buildRedPacketIcon(double size, Color symbolColor) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // 金色圆形背景
+          Container(
+            width: size * 0.6,
+            height: size * 0.6,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFD700),
+              shape: BoxShape.circle,
+            ),
+          ),
+          // ¥符号
           Text(
-            '未领取的红包，将于24小时后发起退款',
+            '¥',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.4),
-              fontSize: 12,
+              fontSize: size * 0.4,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFD4380D),
             ),
           ),
-          
-          const SizedBox(height: 48),
         ],
       ),
     );
