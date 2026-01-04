@@ -3,10 +3,14 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:uuid/uuid.dart';
+
+import '../../data/datasources/matrix/matrix_client_manager.dart';
+import '../di/injection.dart';
 
 /// 语音服务
 /// 
@@ -204,6 +208,8 @@ class VoiceService {
   }
 
   /// 播放语音
+  /// 
+  /// 支持本地文件和 HTTP URL（包括需要认证的 Matrix 媒体 URL）
   Future<void> play(String url) async {
     try {
       // 如果正在播放其他语音，先停止
@@ -214,13 +220,72 @@ class VoiceService {
       _currentPlayingUrl = url;
       
       if (url.startsWith('http')) {
-        await _player.play(UrlSource(url));
+        // 检查是否是 Matrix 媒体 URL（需要认证）
+        if (url.contains('/_matrix/')) {
+          // 下载到本地再播放
+          final localPath = await _downloadWithAuth(url);
+          if (localPath != null) {
+            await _player.play(DeviceFileSource(localPath));
+          } else {
+            debugPrint('Failed to download audio file');
+            _currentPlayingUrl = null;
+          }
+        } else {
+          // 普通 HTTP URL，直接播放
+          await _player.play(UrlSource(url));
+        }
       } else {
         await _player.play(DeviceFileSource(url));
       }
     } catch (e) {
       debugPrint('Play voice error: $e');
       _currentPlayingUrl = null;
+    }
+  }
+  
+  /// 下载需要认证的 Matrix 媒体文件
+  Future<String?> _downloadWithAuth(String url) async {
+    try {
+      // 获取 access token
+      String? accessToken;
+      try {
+        final matrixManager = getIt<MatrixClientManager>();
+        accessToken = matrixManager.client?.accessToken;
+      } catch (e) {
+        debugPrint('Failed to get access token: $e');
+      }
+      
+      // 创建请求
+      final request = http.Request('GET', Uri.parse(url));
+      if (accessToken != null) {
+        request.headers['Authorization'] = 'Bearer $accessToken';
+      }
+      
+      // 发送请求
+      final client = http.Client();
+      try {
+        final response = await client.send(request);
+        
+        if (response.statusCode == 200) {
+          // 保存到临时文件
+          final bytes = await response.stream.toBytes();
+          final dir = await getTemporaryDirectory();
+          final filename = '${_uuid.v4()}.m4a';
+          final file = File('${dir.path}/$filename');
+          await file.writeAsBytes(bytes);
+          
+          debugPrint('Downloaded audio to: ${file.path}');
+          return file.path;
+        } else {
+          debugPrint('Failed to download audio: ${response.statusCode}');
+          return null;
+        }
+      } finally {
+        client.close();
+      }
+    } catch (e) {
+      debugPrint('Download audio error: $e');
+      return null;
     }
   }
 
