@@ -139,6 +139,93 @@ class ClickableText {
   });
 }
 
+/// 红包领取系统消息组件
+/// 
+/// 用于显示 "XXX领取了你的红包" 这类消息
+class RedPacketClaimMessageWidget extends StatelessWidget {
+  /// 领取者名称
+  final String claimerName;
+  
+  /// 是否是自己发的红包被领取
+  final bool isOwnRedPacket;
+  
+  /// 点击回调
+  final VoidCallback? onTap;
+
+  const RedPacketClaimMessageWidget({
+    super.key,
+    required this.claimerName,
+    this.isOwnRedPacket = true,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+      child: Center(
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: const Color(0xFFE64340).withOpacity(0.3),
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 红包小图标
+                Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE64340),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                  child: Center(
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFFD700),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // 消息文本
+                Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                    children: [
+                      TextSpan(text: claimerName),
+                      TextSpan(text: isOwnRedPacket ? '领取了你的' : '领取了'),
+                      TextSpan(
+                        text: '红包',
+                        style: const TextStyle(
+                          color: Color(0xFFE64340),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// 正在输入指示器
 class TypingIndicator extends StatefulWidget {
   /// 用户名
