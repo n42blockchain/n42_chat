@@ -242,7 +242,6 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
             ],
           ),
         ),
-      ),
     );
     
     // 如果有 ContactBloc，用 BlocListener 包装
