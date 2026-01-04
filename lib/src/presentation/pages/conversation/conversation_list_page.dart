@@ -84,7 +84,14 @@ class _ConversationListPageState extends State<ConversationListPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
-    return Scaffold(
+    return BlocListener<ContactBloc, ContactState>(
+      listener: (context, state) {
+        // 当联系人备注更新时，刷新界面显示备注名
+        if (state is ContactRemarkUpdated || state is ContactLoaded) {
+          if (mounted) setState(() {});
+        }
+      },
+      child: Scaffold(
       backgroundColor: bgColor,
       appBar: widget.showAppBar ? _buildAppBar(isDark) : null,
       body: Column(
@@ -130,13 +137,14 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 return RefreshIndicator(
                   onRefresh: _onRefresh,
                   color: AppColors.primary,
-                  child: _buildConversationList(state, isDark),
+                child: _buildConversationList(state, isDark),
                 );
-              },
-            ),
+            },
           ),
-        ],
+        ),
+      ],
       ),
+    ),
     );
   }
 
