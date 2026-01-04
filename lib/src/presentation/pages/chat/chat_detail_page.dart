@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../widgets/common/n42_avatar.dart';
@@ -32,6 +33,33 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     _isPinned = widget.conversation.isPinned;
     _isMuted = widget.conversation.isMuted;
   }
+  
+  /// 获取显示名称（私聊时优先使用备注名）
+  String _getDisplayName() {
+    // 群聊直接使用会话名称
+    if (widget.conversation.type == ConversationType.group) {
+      return widget.conversation.name;
+    }
+    
+    // 私聊尝试获取备注名
+    try {
+      final contactBloc = context.read<ContactBloc>();
+      final state = contactBloc.state;
+      if (state is ContactLoaded) {
+        final contact = state.contacts.cast<ContactEntity?>().firstWhere(
+          (c) => c?.directRoomId == widget.conversation.id || c?.userId == widget.conversation.id,
+          orElse: () => null,
+        );
+        if (contact != null) {
+          return contact.effectiveDisplayName;
+        }
+      }
+    } catch (e) {
+      // ContactBloc 可能不可用
+    }
+    
+    return widget.conversation.name;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +71,17 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
 
     final isGroup = widget.conversation.type == ConversationType.group;
+    
+    // 检查 ContactBloc 是否可用
+    bool hasContactBloc = false;
+    try {
+      context.read<ContactBloc>();
+      hasContactBloc = true;
+    } catch (e) {
+      // ContactBloc 不可用
+    }
 
-    return Scaffold(
+    Widget scaffold = Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: bgColor,
@@ -83,7 +120,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                       if (!isGroup)
                         _buildMemberItem(
                           avatarUrl: widget.conversation.avatarUrl,
-                          name: widget.conversation.name,
+                          name: _getDisplayName(),
                           onTap: () => _openContactDetail(),
                         )
                       else ...[
@@ -276,6 +313,20 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         ),
       ),
     );
+    
+    // 如果有 ContactBloc，用 BlocListener 包装
+    if (hasContactBloc) {
+      return BlocListener<ContactBloc, ContactState>(
+        listener: (context, state) {
+          if (state is ContactRemarkUpdated || state is ContactLoaded) {
+            if (mounted) setState(() {});
+          }
+        },
+        child: scaffold,
+      );
+    }
+    
+    return scaffold;
   }
 
   Widget _buildMemberItem({
@@ -476,7 +527,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         builder: (ctx) {
           final page = ContactDetailPage(
             userId: widget.conversation.id,
-            displayName: widget.conversation.name,
+            displayName: _getDisplayName(),
             avatarUrl: widget.conversation.avatarUrl,
             onSendMessage: () {
               Navigator.of(ctx).pop();
