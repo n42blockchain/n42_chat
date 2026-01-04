@@ -396,32 +396,55 @@ class _ChatInputBarState extends State<ChatInputBar> {
   }
 
   Widget _buildVoiceButton(bool isDark) {
-    return GestureDetector(
-      onLongPressStart: (_) => _startRecording(),
-      onLongPressEnd: (_) => _stopRecording(),
-      onLongPressMoveUpdate: (details) {
-        _updateCancelState(details.localPosition, context.size ?? Size.zero);
+    // 使用 Listener 直接处理 pointer events，比 GestureDetector 更可靠
+    return Listener(
+      onPointerDown: (_) => _startRecording(),
+      onPointerUp: (_) => _stopRecording(),
+      onPointerCancel: (_) {
+        // 取消录音（例如来电打断）
+        if (_isRecording) {
+          _cancelRecording = true;
+          _stopRecording();
+        }
+      },
+      onPointerMove: (event) {
+        if (_isRecording) {
+          // 计算相对于按钮的偏移，向上滑动超过 50 像素取消
+          final dy = event.localPosition.dy;
+          final shouldCancel = dy < -50;
+          if (_cancelRecording != shouldCancel) {
+            setState(() {
+              _cancelRecording = shouldCancel;
+            });
+            widget.onRecordingStateChanged?.call(_isRecording, shouldCancel, _recordingDuration);
+          }
+        }
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
         height: 40,
         decoration: BoxDecoration(
           color: _isRecording
-              ? AppColors.primary.withOpacity(0.1)
+              ? (_cancelRecording ? AppColors.error.withOpacity(0.1) : AppColors.primary.withOpacity(0.1))
               : (isDark ? AppColors.surfaceDark : AppColors.surface),
           borderRadius: BorderRadius.circular(4),
           border: _isRecording
-              ? Border.all(color: AppColors.primary, width: 1)
+              ? Border.all(
+                  color: _cancelRecording ? AppColors.error : AppColors.primary, 
+                  width: 1,
+                )
               : null,
         ),
         child: Center(
           child: Text(
-            _isRecording ? '松开发送，上滑取消' : '按住 说话',
+            _isRecording 
+                ? (_cancelRecording ? '松开取消' : '松开发送，上滑取消')
+                : '按住 说话',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: _isRecording
-                  ? AppColors.primary
+                  ? (_cancelRecording ? AppColors.error : AppColors.primary)
                   : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
             ),
           ),
