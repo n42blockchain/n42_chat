@@ -497,8 +497,8 @@ class _ChatPageState extends State<ChatPage> {
         debugPrint('Poke: Failed to get user info: $e');
       }
       
-      // 获取被拍用户的显示名和拍一拍后缀
-      final targetName = message.senderName;
+      // 获取被拍用户的显示名（优先使用备注名）
+      final targetName = RemarkService.instance.getDisplayName(message.senderId, message.senderName);
       final targetUserId = message.senderId;
       
       debugPrint('Poke: targetName=$targetName, targetUserId=$targetUserId, finalPokeText=$myPokeText');
@@ -546,11 +546,13 @@ class _ChatPageState extends State<ChatPage> {
   void _showPokeAnimation(MessageEntity message, {String? myPokeText}) {
     // 显示一个简短的提示（使用自己设置的后缀）
     // 格式：拍了拍「星驰」的头（如果设置了后缀"的头"）
-    debugPrint('ShowPokeAnimation: targetName=${message.senderName}, myPokeText=$myPokeText');
+    // 优先使用备注名
+    final targetDisplayName = RemarkService.instance.getDisplayName(message.senderId, message.senderName);
+    debugPrint('ShowPokeAnimation: targetName=$targetDisplayName, myPokeText=$myPokeText');
     
     final displayText = myPokeText != null && myPokeText.isNotEmpty
-        ? '拍了拍「${message.senderName}」$myPokeText'
-        : '拍了拍「${message.senderName}」';
+        ? '拍了拍「$targetDisplayName」$myPokeText'
+        : '拍了拍「$targetDisplayName」';
     
     debugPrint('ShowPokeAnimation: displayText=$displayText');
     

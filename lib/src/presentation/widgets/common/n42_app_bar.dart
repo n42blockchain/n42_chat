@@ -103,13 +103,30 @@ class N42AppBar extends StatelessWidget implements PreferredSizeWidget {
     if (leading != null) return leading;
 
     if (showBackButton && Navigator.of(context).canPop()) {
-      return IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          color: fgColor,
-          size: 20,
+      return GestureDetector(
+        onTap: onBackPressed ?? () => Navigator.of(context).pop(),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.arrow_back_ios,
+                color: fgColor,
+                size: 18,
+              ),
+              Text(
+                '返回',
+                style: TextStyle(
+                  color: fgColor,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
         ),
-        onPressed: onBackPressed ?? () => Navigator.of(context).pop(),
       );
     }
 
