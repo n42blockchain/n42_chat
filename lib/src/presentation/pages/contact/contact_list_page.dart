@@ -411,12 +411,12 @@ class _ContactListPageState extends State<ContactListPage> {
                 ),
                 _buildItemDivider(isDark),
                 
-                // 企业微信联系人
+                // 企业联系人
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _EnterpriseContactIcon(),
-                  title: '企业微信联系人',
-                  onTap: () => _showComingSoon('企业微信联系人'),
+                  title: '企业联系人',
+                  onTap: () => _showComingSoon('企业联系人'),
                 ),
               ],
             ),

@@ -155,7 +155,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
           onPressed: () => _showComingSoon('星标消息'),
         ),
         title: Text(
-          '微信',
+          '消息',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
