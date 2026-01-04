@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -160,53 +162,35 @@ class DiscoverPage extends StatelessWidget {
 
   // ==================== 图标组件 ====================
 
-  /// 朋友圈图标 - 彩色蝴蝶/花瓣
+  /// 朋友圈图标 - 四色花瓣
   Widget _buildMomentsIcon() {
     return SizedBox(
-      width: 28,
-      height: 28,
+      width: 24,
+      height: 24,
       child: CustomPaint(
         painter: _MomentsIconPainter(),
       ),
     );
   }
 
-  /// 视频号图标 - 橙色波浪
+  /// 视频号图标 - 橙色无限符号样式
   Widget _buildChannelsIcon() {
-    return const SizedBox(
-      width: 28,
-      height: 28,
-      child: Icon(
-        Icons.slow_motion_video,
-        color: Color(0xFFFF6B00),
-        size: 24,
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: CustomPaint(
+        painter: _ChannelsIconPainter(),
       ),
     );
   }
 
-  /// 直播图标 - 红色圆圈
+  /// 直播图标 - 红色双圆圈
   Widget _buildLiveIcon() {
-    return Container(
-      width: 28,
-      height: 28,
-      alignment: Alignment.center,
-      child: Container(
-        width: 22,
-        height: 22,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFFFF4D4D), width: 2),
-        ),
-        child: Center(
-          child: Container(
-            width: 10,
-            height: 10,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color(0xFFFF4D4D),
-            ),
-          ),
-        ),
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: CustomPaint(
+        painter: _LiveIconPainter(),
       ),
     );
   }
@@ -214,8 +198,8 @@ class DiscoverPage extends StatelessWidget {
   /// 扫一扫图标 - 蓝色扫描框
   Widget _buildScanIcon() {
     return SizedBox(
-      width: 28,
-      height: 28,
+      width: 24,
+      height: 24,
       child: CustomPaint(
         painter: _ScanIconPainter(),
       ),
@@ -225,58 +209,45 @@ class DiscoverPage extends StatelessWidget {
   /// 听一听图标 - 粉红色音符
   Widget _buildMusicIcon() {
     return const SizedBox(
-      width: 28,
-      height: 28,
+      width: 24,
+      height: 24,
       child: Icon(
-        Icons.music_note,
+        Icons.music_note_outlined,
         color: Color(0xFFFF69B4),
         size: 24,
       ),
     );
   }
 
-  /// 看一看图标 - 黄色六边形
+  /// 看一看图标 - 黄色六边形蜂窝
   Widget _buildWatchIcon() {
     return SizedBox(
-      width: 28,
-      height: 28,
+      width: 24,
+      height: 24,
       child: CustomPaint(
         painter: _WatchIconPainter(),
       ),
     );
   }
 
-  /// 搜一搜图标 - 红色放大镜
+  /// 搜一搜图标 - 红色星形放大镜
   Widget _buildSearchIcon() {
     return SizedBox(
-      width: 28,
-      height: 28,
+      width: 24,
+      height: 24,
       child: CustomPaint(
         painter: _SearchIconPainter(),
       ),
     );
   }
 
-  /// 附近的人图标 - 蓝色定位
+  /// 附近的人图标 - 蓝色波纹定位
   Widget _buildNearbyIcon() {
-    return Container(
-      width: 28,
-      height: 28,
-      alignment: Alignment.center,
-      child: Container(
-        width: 22,
-        height: 22,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFF10AEFF), width: 2),
-        ),
-        child: const Center(
-          child: Icon(
-            Icons.person_outline,
-            color: Color(0xFF10AEFF),
-            size: 14,
-          ),
-        ),
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: CustomPaint(
+        painter: _NearbyIconPainter(),
       ),
     );
   }
@@ -284,37 +255,21 @@ class DiscoverPage extends StatelessWidget {
   /// 游戏图标 - 绿色钻石
   Widget _buildGameIcon() {
     return SizedBox(
-      width: 28,
-      height: 28,
+      width: 24,
+      height: 24,
       child: CustomPaint(
         painter: _GameIconPainter(),
       ),
     );
   }
 
-  /// 小程序图标 - 紫色S
+  /// 小程序图标 - 紫色S形
   Widget _buildMiniProgramIcon() {
-    return Container(
-      width: 28,
-      height: 28,
-      alignment: Alignment.center,
-      child: Container(
-        width: 22,
-        height: 22,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFF7B68EE), width: 2),
-        ),
-        child: const Center(
-          child: Text(
-            'S',
-            style: TextStyle(
-              color: Color(0xFF7B68EE),
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: CustomPaint(
+        painter: _MiniProgramIconPainter(),
       ),
     );
   }
@@ -349,7 +304,11 @@ class DiscoverPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
-              iconWidget,
+              SizedBox(
+                width: 28,
+                height: 28,
+                child: Center(child: iconWidget),
+              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
@@ -401,52 +360,92 @@ class DiscoverPage extends StatelessWidget {
 
 // ==================== 自定义图标绘制 ====================
 
-/// 朋友圈图标绘制器 - 彩色花瓣
+/// 朋友圈图标 - 四色花瓣（蓝、橙、绿、红）
 class _MomentsIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width * 0.35;
+    final radius = size.width * 0.22;
+    final offset = size.width * 0.18;
     
-    // 四个花瓣的颜色
     final colors = [
-      const Color(0xFF4FC3F7), // 蓝色
-      const Color(0xFFFFB74D), // 橙色
-      const Color(0xFF81C784), // 绿色
-      const Color(0xFFE57373), // 红色
+      const Color(0xFF4FC3F7), // 上 - 蓝
+      const Color(0xFFFF9800), // 右 - 橙
+      const Color(0xFF66BB6A), // 下 - 绿
+      const Color(0xFFEF5350), // 左 - 红
+    ];
+    
+    final positions = [
+      Offset(center.dx, center.dy - offset), // 上
+      Offset(center.dx + offset, center.dy), // 右
+      Offset(center.dx, center.dy + offset), // 下
+      Offset(center.dx - offset, center.dy), // 左
     ];
     
     for (int i = 0; i < 4; i++) {
       final paint = Paint()
         ..color = colors[i]
         ..style = PaintingStyle.fill;
-      
-      final angle = (i * 90 - 45) * 3.14159 / 180;
-      final petalCenter = Offset(
-        center.dx + radius * 0.5 * cos(angle),
-        center.dy + radius * 0.5 * sin(angle),
-      );
-      
-      canvas.drawCircle(petalCenter, radius * 0.55, paint);
+      canvas.drawCircle(positions[i], radius, paint);
     }
-  }
-  
-  double cos(double radians) => _cos(radians);
-  double sin(double radians) => _sin(radians);
-  
-  double _cos(double x) {
-    return 1 - (x * x) / 2 + (x * x * x * x) / 24 - (x * x * x * x * x * x) / 720;
-  }
-  
-  double _sin(double x) {
-    return x - (x * x * x) / 6 + (x * x * x * x * x) / 120;
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// 扫一扫图标绘制器
+/// 视频号图标 - 橙色波浪/无限符号
+class _ChannelsIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFFF6B00)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round;
+    
+    final w = size.width;
+    final h = size.height;
+    
+    final path = Path();
+    // 画波浪形/M形
+    path.moveTo(w * 0.1, h * 0.6);
+    path.quadraticBezierTo(w * 0.25, h * 0.2, w * 0.4, h * 0.5);
+    path.quadraticBezierTo(w * 0.5, h * 0.7, w * 0.6, h * 0.5);
+    path.quadraticBezierTo(w * 0.75, h * 0.2, w * 0.9, h * 0.6);
+    
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// 直播图标 - 红色双圆圈
+class _LiveIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    
+    // 外圈
+    final outerPaint = Paint()
+      ..color = const Color(0xFFFF4D4D)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    canvas.drawCircle(center, size.width * 0.4, outerPaint);
+    
+    // 内圈实心
+    final innerPaint = Paint()
+      ..color = const Color(0xFFFF4D4D)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, size.width * 0.2, innerPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// 扫一扫图标 - 蓝色扫描框
 class _ScanIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -459,7 +458,7 @@ class _ScanIconPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
     final cornerLen = w * 0.3;
-    final padding = w * 0.1;
+    final padding = w * 0.08;
     
     // 左上角
     canvas.drawLine(Offset(padding, padding + cornerLen), Offset(padding, padding), paint);
@@ -482,23 +481,25 @@ class _ScanIconPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// 看一看图标绘制器 - 黄色六边形
+/// 看一看图标 - 黄色六边形蜂窝
 class _WatchIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = const Color(0xFFFFB300)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5;
+      ..strokeWidth = 2
+      ..strokeJoin = StrokeJoin.round;
     
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width * 0.4;
+    final radius = size.width * 0.38;
     
+    // 画六边形
     final path = Path();
     for (int i = 0; i < 6; i++) {
-      final angle = (i * 60 - 90) * 3.14159 / 180;
-      final x = center.dx + radius * _cos(angle);
-      final y = center.dy + radius * _sin(angle);
+      final angle = (i * 60 - 90) * math.pi / 180;
+      final x = center.dx + radius * math.cos(angle);
+      final y = center.dy + radius * math.sin(angle);
       if (i == 0) {
         path.moveTo(x, y);
       } else {
@@ -514,57 +515,102 @@ class _WatchIconPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
     canvas.drawCircle(center, radius * 0.25, dotPaint);
   }
-  
-  double _cos(double x) {
-    // 简单的余弦近似
-    while (x > 3.14159) x -= 2 * 3.14159;
-    while (x < -3.14159) x += 2 * 3.14159;
-    return 1 - (x * x) / 2 + (x * x * x * x) / 24;
-  }
-  
-  double _sin(double x) {
-    while (x > 3.14159) x -= 2 * 3.14159;
-    while (x < -3.14159) x += 2 * 3.14159;
-    return x - (x * x * x) / 6 + (x * x * x * x * x) / 120;
-  }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// 搜一搜图标绘制器 - 红色放大镜
+/// 搜一搜图标 - 红色星形放大镜
 class _SearchIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = const Color(0xFFFF4757)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
+      ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
     
-    final center = Offset(size.width * 0.4, size.height * 0.4);
-    final radius = size.width * 0.28;
+    final w = size.width;
+    final h = size.height;
     
-    // 圆圈
-    canvas.drawCircle(center, radius, paint);
+    // 画星形/X形
+    final cx = w * 0.4;
+    final cy = h * 0.4;
+    final r = w * 0.22;
     
-    // 手柄（斜线）
-    final handleStart = Offset(
-      center.dx + radius * 0.7,
-      center.dy + radius * 0.7,
+    // 四条线组成星形
+    canvas.drawLine(Offset(cx - r, cy - r), Offset(cx + r, cy + r), paint);
+    canvas.drawLine(Offset(cx + r, cy - r), Offset(cx - r, cy + r), paint);
+    canvas.drawLine(Offset(cx, cy - r * 1.2), Offset(cx, cy + r * 1.2), paint);
+    canvas.drawLine(Offset(cx - r * 1.2, cy), Offset(cx + r * 1.2, cy), paint);
+    
+    // 手柄
+    canvas.drawLine(
+      Offset(cx + r * 0.8, cy + r * 0.8),
+      Offset(w * 0.9, h * 0.9),
+      paint,
     );
-    final handleEnd = Offset(
-      size.width * 0.85,
-      size.height * 0.85,
-    );
-    canvas.drawLine(handleStart, handleEnd, paint);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// 游戏图标绘制器 - 绿色钻石
+/// 附近的人图标 - 蓝色波纹定位
+class _NearbyIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final color = const Color(0xFF10AEFF);
+    
+    // 外圈波纹（左右弧线）
+    final arcPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+    
+    // 左弧
+    canvas.drawArc(
+      Rect.fromCenter(center: center, width: size.width * 0.9, height: size.height * 0.9),
+      math.pi * 0.7,
+      math.pi * 0.6,
+      false,
+      arcPaint,
+    );
+    
+    // 右弧
+    canvas.drawArc(
+      Rect.fromCenter(center: center, width: size.width * 0.9, height: size.height * 0.9),
+      -math.pi * 0.3,
+      math.pi * 0.6,
+      false,
+      arcPaint,
+    );
+    
+    // 中心人形
+    final personPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    
+    // 头
+    canvas.drawCircle(Offset(center.dx, center.dy - size.height * 0.12), size.width * 0.1, personPaint);
+    
+    // 身体
+    canvas.drawLine(
+      Offset(center.dx, center.dy),
+      Offset(center.dx, center.dy + size.height * 0.2),
+      personPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// 游戏图标 - 绿色钻石
 class _GameIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -577,7 +623,7 @@ class _GameIconPainter extends CustomPainter {
     
     final w = size.width;
     final h = size.height;
-    final padding = w * 0.15;
+    final padding = w * 0.1;
     
     // 钻石形状
     final path = Path()
@@ -598,15 +644,45 @@ class _GameIconPainter extends CustomPainter {
     
     // 内部斜线
     canvas.drawLine(
-      Offset(w * 0.3, h * 0.35),
+      Offset(w * 0.32, h * 0.35),
       Offset(w / 2, h - padding),
       paint,
     );
     canvas.drawLine(
-      Offset(w * 0.7, h * 0.35),
+      Offset(w * 0.68, h * 0.35),
       Offset(w / 2, h - padding),
       paint,
     );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// 小程序图标 - 紫色S形双弧
+class _MiniProgramIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF7B68EE)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round;
+    
+    final w = size.width;
+    final h = size.height;
+    
+    // 上弧（向右弯）
+    final path1 = Path();
+    path1.moveTo(w * 0.65, h * 0.15);
+    path1.quadraticBezierTo(w * 0.15, h * 0.15, w * 0.35, h * 0.5);
+    canvas.drawPath(path1, paint);
+    
+    // 下弧（向左弯）
+    final path2 = Path();
+    path2.moveTo(w * 0.35, h * 0.5);
+    path2.quadraticBezierTo(w * 0.85, h * 0.85, w * 0.35, h * 0.85);
+    canvas.drawPath(path2, paint);
   }
 
   @override
