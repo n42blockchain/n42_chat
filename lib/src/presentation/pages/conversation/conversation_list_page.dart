@@ -85,14 +85,16 @@ class _ConversationListPageState extends State<ConversationListPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
-    return BlocListener<ContactBloc, ContactState>(
-      listener: (context, state) {
-        // 当联系人备注更新时，刷新界面显示备注名
-        if (state is ContactRemarkUpdated || state is ContactLoaded) {
-          if (mounted) setState(() {});
-        }
-      },
-      child: Scaffold(
+    // 检查 ContactBloc 是否可用
+    bool hasContactBloc = false;
+    try {
+      context.read<ContactBloc>();
+      hasContactBloc = true;
+    } catch (e) {
+      // ContactBloc 不可用
+    }
+
+    Widget scaffold = Scaffold(
       backgroundColor: bgColor,
       appBar: widget.showAppBar ? _buildAppBar(isDark) : null,
       body: Column(
@@ -145,8 +147,22 @@ class _ConversationListPageState extends State<ConversationListPage> {
         ),
       ],
       ),
-    ),
     );
+    
+    // 如果有 ContactBloc，用 BlocListener 包装来监听备注更新
+    if (hasContactBloc) {
+      return BlocListener<ContactBloc, ContactState>(
+        listener: (context, state) {
+          // 当联系人备注更新时，刷新界面显示备注名
+          if (state is ContactRemarkUpdated || state is ContactLoaded) {
+            if (mounted) setState(() {});
+          }
+        },
+        child: scaffold,
+      );
+    }
+    
+    return scaffold;
   }
 
   PreferredSizeWidget _buildAppBar(bool isDark) {
