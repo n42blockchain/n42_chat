@@ -120,14 +120,23 @@ class N42Badge extends StatelessWidget {
   }
 
   Widget _buildCountBadge() {
-    final displayText = count > maxCount ? '$maxCount+' : count.toString();
+    // 大于999时显示"..."，大于99显示"99+"，否则显示数字
+    String displayText;
+    if (count > 999) {
+      displayText = '...';
+    } else if (count > maxCount) {
+      displayText = '$maxCount+';
+    } else {
+      displayText = count.toString();
+    }
+    
     final isSmall = displayText.length <= 1;
 
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isSmall ? 0 : 5,
       ),
-      constraints: BoxConstraints(
+      constraints: const BoxConstraints(
         minWidth: 18,
         minHeight: 18,
         maxHeight: 18,
@@ -135,6 +144,7 @@ class N42Badge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color ?? AppColors.badge,
         borderRadius: BorderRadius.circular(9),
+        // 微信风格：无白色边框
       ),
       child: Center(
         child: Text(
@@ -142,7 +152,7 @@ class N42Badge extends StatelessWidget {
           style: const TextStyle(
             color: Colors.white,
             fontSize: 11,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             height: 1.2,
           ),
         ),

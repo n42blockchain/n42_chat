@@ -112,18 +112,14 @@ class ConversationTile extends StatelessWidget {
   }
 
   Widget _buildUnreadBadge() {
-    // 免打扰时显示灰色小圆点
+    // 免打扰时显示灰色小圆点（无边框）
     if (conversation.isMuted) {
       return Container(
         width: 8,
         height: 8,
-        decoration: BoxDecoration(
-          color: AppColors.textTertiary,
+        decoration: const BoxDecoration(
+          color: Color(0xFF888888),
           shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white,
-            width: 1,
-          ),
         ),
       );
     }
@@ -133,21 +129,18 @@ class ConversationTile extends StatelessWidget {
     final text = count > 99 ? '99+' : '$count';
     
     // 根据数字位数调整宽度
-    final minWidth = text.length > 2 ? 28.0 : (text.length > 1 ? 22.0 : 18.0);
+    final minWidth = text.length > 2 ? 26.0 : (text.length > 1 ? 20.0 : 18.0);
     
     return Container(
       constraints: BoxConstraints(
         minWidth: minWidth,
         minHeight: 18,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(
         color: AppColors.badge,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: Colors.white,
-          width: 1.5,
-        ),
+        borderRadius: BorderRadius.circular(9),
+        // 微信风格：无白色边框
       ),
       child: Center(
         child: Text(
@@ -155,7 +148,7 @@ class ConversationTile extends StatelessWidget {
           style: const TextStyle(
             color: Colors.white,
             fontSize: 11,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),

@@ -9,6 +9,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
 import '../../blocs/conversation/conversation_event.dart';
+import '../../blocs/conversation/conversation_state.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/transfer/transfer_bloc.dart';
 import '../chat/chat_page.dart';
@@ -21,15 +22,13 @@ import '../profile/profile_page.dart';
 import '../qrcode/scan_qr_page.dart';
 import '../transfer/receive_page.dart';
 
-/// 聊天模块主框架页面
+/// 聊天模块主框架页面（仿微信）
 /// 
 /// 微信风格的底部 Tab 导航，包含：
-/// - 聊天（消息列表）
+/// - 微信（消息列表）
 /// - 通讯录
 /// - 发现
 /// - 我
-/// 
-/// 左上角有返回按钮，可返回主应用
 class ChatMainPage extends StatefulWidget {
   /// 返回主应用的回调
   final VoidCallback? onBackToMain;
@@ -81,10 +80,8 @@ class _ChatMainPageState extends State<ChatMainPage> {
       MaterialPageRoute(builder: (_) => const ScanQRPage()),
     ).then((result) {
       if (result != null && result is Map) {
-        // 扫码结果处理
         final roomId = result['roomId'];
         if (roomId != null) {
-          // 刷新会话列表
           _conversationBloc.add(const RefreshConversations());
         }
       }
@@ -97,7 +94,6 @@ class _ChatMainPageState extends State<ChatMainPage> {
     final RenderBox button = context.findRenderObject() as RenderBox;
     final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
     
-    // 计算菜单位置 - 右上角
     final position = RelativeRect.fromRect(
       Rect.fromPoints(
         button.localToGlobal(Offset(button.size.width - 160, 50), ancestor: overlay),
@@ -228,22 +224,6 @@ class _ChatMainPageState extends State<ChatMainPage> {
     }
   }
 
-  // 获取当前 Tab 的标题
-  String get _currentTitle {
-    switch (_currentIndex) {
-      case 0:
-        return '消息';
-      case 1:
-        return '通讯录';
-      case 2:
-        return '发现';
-      case 3:
-        return '我';
-      default:
-        return 'N42 Chat';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -255,76 +235,104 @@ class _ChatMainPageState extends State<ChatMainPage> {
         BlocProvider.value(value: _conversationBloc),
         BlocProvider.value(value: _contactBloc),
       ],
-      child: Scaffold(
-        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-        appBar: AppBar(
-          backgroundColor: bgColor,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: textColor,
-              size: 20,
-            ),
-            onPressed: _handleBack,
-          ),
-          title: Text(
-            _currentTitle,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          centerTitle: true,
-          actions: [
-            // 根据当前 Tab 显示不同的操作按钮
-            if (_currentIndex == 0) ...[
-              IconButton(
-                icon: Icon(Icons.search, color: textColor, size: 22),
-                onPressed: () {
-                  debugPrint('Open search');
-                },
-              ),
-              Builder(
-                builder: (ctx) => IconButton(
-                  icon: Icon(Icons.add_circle_outline, color: textColor, size: 22),
-                  onPressed: () => _showAddMenu(ctx),
+      child: BlocBuilder<ConversationBloc, ConversationState>(
+        builder: (context, conversationState) {
+          // 计算总未读数
+          final totalUnread = conversationState.totalUnreadCount;
+          
+          // 获取当前 Tab 的标题
+          String currentTitle;
+          switch (_currentIndex) {
+            case 0:
+              currentTitle = totalUnread > 0 ? '微信 ($totalUnread)' : '微信';
+              break;
+            case 1:
+              currentTitle = '通讯录';
+              break;
+            case 2:
+              currentTitle = '发现';
+              break;
+            case 3:
+              currentTitle = '我';
+              break;
+            default:
+              currentTitle = '微信';
+          }
+          
+          return Scaffold(
+            backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+            appBar: AppBar(
+              backgroundColor: bgColor,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              leading: _currentIndex == 0
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.star_border,
+                        color: textColor,
+                        size: 22,
+                      ),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('星标消息功能即将推出')),
+                        );
+                      },
+                    )
+                  : IconButton(
+                      icon: Icon(
+                        Icons.arrow_back_ios,
+                        color: textColor,
+                        size: 20,
+                      ),
+                      onPressed: _handleBack,
+                    ),
+              title: Text(
+                currentTitle,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ],
-            if (_currentIndex == 1)
-              IconButton(
-                icon: Icon(Icons.person_add_outlined, color: textColor, size: 22),
-                onPressed: _navigateToAddFriend,
-              ),
-            const SizedBox(width: 8),
-          ],
-        ),
-        body: PageView(
-          controller: _pageController,
-          physics: const NeverScrollableScrollPhysics(),
-          children: [
-            // 聊天页面 - 不需要自带 AppBar
-            _ChatTabContent(
-              conversationBloc: _conversationBloc,
-              contactBloc: _contactBloc,
+              centerTitle: true,
+              actions: [
+                if (_currentIndex == 0) ...[
+                  Builder(
+                    builder: (ctx) => IconButton(
+                      icon: Icon(Icons.add_circle_outline, color: textColor, size: 22),
+                      onPressed: () => _showAddMenu(ctx),
+                    ),
+                  ),
+                ],
+                if (_currentIndex == 1)
+                  IconButton(
+                    icon: Icon(Icons.person_add_outlined, color: textColor, size: 22),
+                    onPressed: _navigateToAddFriend,
+                  ),
+                const SizedBox(width: 8),
+              ],
             ),
-            // 通讯录页面 - 不需要自带 AppBar
-            const _ContactTabContent(),
-            // 发现页面 - 不需要自带 AppBar
-            const _DiscoverTabContent(),
-            // 我的页面 - 不需要自带 AppBar
-            const _ProfileTabContent(),
-          ],
-        ),
-        bottomNavigationBar: _buildBottomNavigationBar(isDark),
+            body: PageView(
+              controller: _pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                _ChatTabContent(
+                  conversationBloc: _conversationBloc,
+                  contactBloc: _contactBloc,
+                ),
+                const _ContactTabContent(),
+                const _DiscoverTabContent(),
+                const _ProfileTabContent(),
+              ],
+            ),
+            bottomNavigationBar: _buildBottomNavigationBar(isDark, totalUnread),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildBottomNavigationBar(bool isDark) {
+  Widget _buildBottomNavigationBar(bool isDark, int totalUnread) {
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final selectedColor = const Color(0xFF07C160);
     final unselectedColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
@@ -349,11 +357,10 @@ class _ChatMainPageState extends State<ChatMainPage> {
                 index: 0,
                 icon: Icons.chat_bubble_outline,
                 activeIcon: Icons.chat_bubble,
-                label: '聊天',
+                label: '微信',
                 selectedColor: selectedColor,
                 unselectedColor: unselectedColor,
-                // TODO: 实际的未读数
-                badge: 0,
+                badge: totalUnread,
               ),
               _buildTabItem(
                 index: 1,
@@ -415,25 +422,9 @@ class _ChatMainPageState extends State<ChatMainPage> {
                 ),
                 if (badge > 0)
                   Positioned(
-                    right: -8,
-                    top: -4,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: AppColors.error,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      constraints: const BoxConstraints(minWidth: 16),
-                      child: Text(
-                        badge > 99 ? '99+' : '$badge',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+                    right: -10,
+                    top: -6,
+                    child: _buildBadge(badge),
                   ),
               ],
             ),
@@ -447,6 +438,52 @@ class _ChatMainPageState extends State<ChatMainPage> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// 构建未读徽章（微信风格：无白边）
+  Widget _buildBadge(int count) {
+    // 大于999显示"..."
+    String displayText;
+    if (count > 999) {
+      displayText = '...';
+    } else if (count > 99) {
+      displayText = '99+';
+    } else {
+      displayText = '$count';
+    }
+    
+    // 根据文字长度调整宽度
+    double minWidth;
+    if (displayText.length > 2) {
+      minWidth = 24;
+    } else if (displayText.length > 1) {
+      minWidth = 20;
+    } else {
+      minWidth = 16;
+    }
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      constraints: BoxConstraints(
+        minWidth: minWidth,
+        minHeight: 16,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.badge,
+        borderRadius: BorderRadius.circular(8),
+        // 微信风格：无白色边框
+      ),
+      child: Center(
+        child: Text(
+          displayText,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -482,7 +519,6 @@ class _ChatTabContent extends StatelessWidget {
         ),
       ),
     ).then((_) {
-      // 返回后刷新会话列表
       conversationBloc.add(const RefreshConversations());
     });
   }
@@ -496,7 +532,7 @@ class _ChatTabContent extends StatelessWidget {
         onSearchTap: () {
           debugPrint('Open search');
         },
-        showAppBar: false, // 不显示 AppBar
+        showAppBar: false,
       ),
     );
   }
@@ -531,4 +567,3 @@ class _ProfileTabContent extends StatelessWidget {
     return const ProfilePage(showAppBar: false);
   }
 }
-
