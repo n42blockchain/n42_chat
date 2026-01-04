@@ -5,7 +5,7 @@ import '../../../core/utils/date_utils.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 
-/// 会话列表项
+/// 会话列表项（仿微信）
 class ConversationTile extends StatelessWidget {
   /// 会话数据
   final ConversationEntity conversation;
@@ -43,17 +43,14 @@ class ConversationTile extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  // 头像
-                  _buildAvatar(),
+                  // 头像（带未读红点）
+                  _buildAvatar(isDark),
                   const SizedBox(width: 12),
 
                   // 内容
                   Expanded(
                     child: _buildContent(isDark),
                   ),
-
-                  // 右侧信息
-                  _buildTrailing(isDark),
                 ],
               ),
             ),
@@ -69,15 +66,13 @@ class ConversationTile extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar() {
+  Widget _buildAvatar(bool isDark) {
     Widget avatarWidget;
     
     // 三人及以上群聊：使用九宫格头像
-    // 条件：是群聊 + 成员数 >= 3 + 有成员信息
     if (conversation.type == ConversationType.group &&
         conversation.memberAvatarUrls != null &&
         conversation.memberAvatarUrls!.length >= 3) {
-      // 使用成员信息生成唯一 key，确保数据变化时刷新
       final avatarKey = conversation.memberAvatarUrls!
           .map((url) => url ?? 'null')
           .join('_');
@@ -86,38 +81,28 @@ class ConversationTile extends StatelessWidget {
         memberAvatars: conversation.memberAvatarUrls!,
         memberNames: conversation.memberNames,
         size: 48,
+        borderRadius: 8,
       );
     } else {
       // 私聊或两人群聊：使用普通头像
-      // 显示对方头像，如果没有则显示字母头像
       avatarWidget = N42Avatar(
         imageUrl: conversation.avatarUrl,
         name: conversation.name,
         size: 48,
+        borderRadius: 8, // 微信风格圆角
       );
     }
     
-    // 如果有未读消息，在头像右上角显示红点
-    if (conversation.unreadCount > 0 && !conversation.isMuted) {
+    // 未读消息红点/红色数字
+    if (conversation.unreadCount > 0) {
       return Stack(
         clipBehavior: Clip.none,
         children: [
           avatarWidget,
           Positioned(
-            top: -2,
-            right: -2,
-            child: Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                color: AppColors.badge,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.5,
-                ),
-              ),
-            ),
+            top: -4,
+            right: -4,
+            child: _buildUnreadBadge(),
           ),
         ],
       );
@@ -126,12 +111,63 @@ class ConversationTile extends StatelessWidget {
     return avatarWidget;
   }
 
+  Widget _buildUnreadBadge() {
+    // 免打扰时显示灰色小圆点
+    if (conversation.isMuted) {
+      return Container(
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(
+          color: AppColors.textTertiary,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white,
+            width: 1,
+          ),
+        ),
+      );
+    }
+    
+    // 未读数 > 99 显示 99+
+    final count = conversation.unreadCount;
+    final text = count > 99 ? '99+' : '$count';
+    
+    // 根据数字位数调整宽度
+    final minWidth = text.length > 2 ? 28.0 : (text.length > 1 ? 22.0 : 18.0);
+    
+    return Container(
+      constraints: BoxConstraints(
+        minWidth: minWidth,
+        minHeight: 18,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.badge,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Colors.white,
+          width: 1.5,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildContent(bool isDark) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 标题行
+        // 标题行：名称 + 时间
         Row(
           children: [
             // 名称
@@ -173,7 +209,7 @@ class ConversationTile extends StatelessWidget {
                     conversation.lastMessageTime!),
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.textTertiary,
+                  color: isDark ? Colors.white38 : AppColors.textTertiary,
                 ),
               ),
           ],
@@ -181,20 +217,9 @@ class ConversationTile extends StatelessWidget {
 
         const SizedBox(height: 4),
 
-        // 副标题行
+        // 副标题行：消息内容 + 免打扰图标
         Row(
           children: [
-            // 免打扰图标
-            if (conversation.isMuted)
-              Padding(
-                padding: const EdgeInsets.only(right: 4),
-                child: Icon(
-                  Icons.notifications_off,
-                  size: 14,
-                  color: AppColors.muted,
-                ),
-              ),
-
             // 草稿标识
             if (conversation.draft != null && conversation.draft!.isNotEmpty)
               Text(
@@ -213,31 +238,25 @@ class ConversationTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.textSecondary,
+                  color: isDark ? Colors.white38 : AppColors.textSecondary,
                 ),
               ),
             ),
+
+            // 免打扰图标（在右侧）
+            if (conversation.isMuted)
+              Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child: Icon(
+                  Icons.notifications_off,
+                  size: 16,
+                  color: isDark ? Colors.white24 : AppColors.muted,
+                ),
+              ),
           ],
         ),
       ],
     );
-  }
-
-  Widget _buildTrailing(bool isDark) {
-    // 免打扰时有未读消息显示灰色点
-    if (conversation.unreadCount > 0 && conversation.isMuted) {
-      return Container(
-        margin: const EdgeInsets.only(left: 8),
-        width: 8,
-        height: 8,
-        decoration: BoxDecoration(
-          color: AppColors.textTertiary,
-          shape: BoxShape.circle,
-        ),
-      );
-    }
-
-    return const SizedBox.shrink();
   }
 
   String _getLastMessageText() {
@@ -260,4 +279,3 @@ class ConversationTile extends StatelessWidget {
     return conversation.lastMessage!;
   }
 }
-

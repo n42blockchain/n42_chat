@@ -13,9 +13,10 @@ import '../../widgets/common/common_widgets.dart';
 import '../../widgets/animations/fade_animation.dart';
 import '../contact/add_friend_page.dart';
 import '../group/create_group_page.dart';
+import '../qrcode/scan_qr_page.dart';
 import 'conversation_tile.dart';
 
-/// 会话列表页面
+/// 会话列表页面（仿微信）
 class ConversationListPage extends StatefulWidget {
   /// 点击会话回调
   final void Function(ConversationEntity conversation)? onConversationTap;
@@ -81,19 +82,15 @@ class _ConversationListPageState extends State<ConversationListPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: bgColor,
       appBar: widget.showAppBar ? _buildAppBar(isDark) : null,
       body: Column(
         children: [
-          // 搜索栏
-          N42SearchBarContainer(
-            child: N42SearchBar(
-              hintText: '搜索',
-              onTap: widget.onSearchTap,
-            ),
-          ),
+          // 搜索栏（微信风格）
+          _buildSearchBar(isDark),
 
           // 会话列表
           Expanded(
@@ -144,15 +141,72 @@ class _ConversationListPageState extends State<ConversationListPage> {
   }
 
   PreferredSizeWidget _buildAppBar(bool isDark) {
-    return N42AppBar(
-      title: '消息',
-      showBackButton: false,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.add_circle_outline),
-          onPressed: widget.onAddPressed ?? _showAddMenu,
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(56),
+      child: AppBar(
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.star_border,
+            color: isDark ? Colors.white : AppColors.textPrimary,
+          ),
+          onPressed: () => _showComingSoon('星标消息'),
         ),
-      ],
+        title: Text(
+          '微信',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white : AppColors.textPrimary,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.add_circle_outline,
+              color: isDark ? Colors.white : AppColors.textPrimary,
+            ),
+            onPressed: widget.onAddPressed ?? _showAddMenu,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar(bool isDark) {
+    return Container(
+      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: GestureDetector(
+        onTap: widget.onSearchTap,
+        child: Container(
+          height: 36,
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.search,
+                size: 20,
+                color: isDark ? Colors.white54 : Colors.black45,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '搜索',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: isDark ? Colors.white54 : Colors.black45,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -211,18 +265,120 @@ class _ConversationListPageState extends State<ConversationListPage> {
     );
   }
 
+  void _showComingSoon(String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature 功能即将推出'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   void _showAddMenu() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => _AddMenuSheet(
-        onCreateGroup: () => _navigateToCreateGroup(ctx),
-        onAddFriend: () => _navigateToAddFriend(ctx),
-        onScanQR: () {
-          Navigator.pop(ctx);
-          _showScanQRNotAvailable();
-        },
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 拖动指示器
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.black12,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+
+              // 发起群聊
+              _buildAddMenuItem(
+                ctx,
+                icon: Icons.group_add,
+                iconColor: const Color(0xFF57BE6A),
+                title: '发起群聊',
+                onTap: () => _navigateToCreateGroup(ctx),
+              ),
+              
+              // 添加朋友
+              _buildAddMenuItem(
+                ctx,
+                icon: Icons.person_add,
+                iconColor: const Color(0xFF576B95),
+                title: '添加朋友',
+                onTap: () => _navigateToAddFriend(ctx),
+              ),
+              
+              // 扫一扫
+              _buildAddMenuItem(
+                ctx,
+                icon: Icons.qr_code_scanner,
+                iconColor: const Color(0xFF10AEFF),
+                title: '扫一扫',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const ScanQRPage()),
+                  );
+                },
+              ),
+              
+              // 收付款
+              _buildAddMenuItem(
+                ctx,
+                icon: Icons.payment,
+                iconColor: const Color(0xFF09BB07),
+                title: '收付款',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showComingSoon('收付款');
+                },
+              ),
+
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _buildAddMenuItem(
+    BuildContext ctx, {
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return ListTile(
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: iconColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, color: Colors.white, size: 22),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          color: isDark ? Colors.white : Colors.black,
+        ),
+      ),
+      onTap: onTap,
     );
   }
 
@@ -262,47 +418,116 @@ class _ConversationListPageState extends State<ConversationListPage> {
     });
   }
 
-  void _showScanQRNotAvailable() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('扫一扫功能即将推出'),
-        duration: Duration(seconds: 2),
+  void _showConversationMenu(
+      BuildContext context, ConversationEntity conversation) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 拖动指示器
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.black12,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+
+              // 标记已读
+              if (conversation.unreadCount > 0)
+                _buildMenuTile(
+                  ctx,
+                  icon: Icons.done_all,
+                  title: '标记已读',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    context
+                        .read<ConversationBloc>()
+                        .add(MarkConversationAsRead(conversation.id));
+                  },
+                ),
+
+              // 免打扰
+              _buildMenuTile(
+                ctx,
+                icon: conversation.isMuted
+                    ? Icons.notifications_active
+                    : Icons.notifications_off,
+                title: conversation.isMuted ? '取消免打扰' : '消息免打扰',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  context.read<ConversationBloc>().add(SetConversationMuted(
+                        conversationId: conversation.id,
+                        muted: !conversation.isMuted,
+                      ));
+                },
+              ),
+
+              // 置顶
+              _buildMenuTile(
+                ctx,
+                icon: conversation.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
+                title: conversation.isPinned ? '取消置顶' : '置顶',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  context.read<ConversationBloc>().add(SetConversationPinned(
+                        conversationId: conversation.id,
+                        pinned: !conversation.isPinned,
+                      ));
+                },
+              ),
+
+              // 删除
+              _buildMenuTile(
+                ctx,
+                icon: Icons.delete_outline,
+                title: '删除会话',
+                isDestructive: true,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _confirmDeleteConversation(conversation);
+                },
+              ),
+
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  void _showConversationMenu(
-      BuildContext context, ConversationEntity conversation) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => _ConversationMenuSheet(
-        conversation: conversation,
-        onMarkAsRead: () {
-          Navigator.pop(ctx);
-          context
-              .read<ConversationBloc>()
-              .add(MarkConversationAsRead(conversation.id));
-        },
-        onToggleMute: () {
-          Navigator.pop(ctx);
-          context.read<ConversationBloc>().add(SetConversationMuted(
-                conversationId: conversation.id,
-                muted: !conversation.isMuted,
-              ));
-        },
-        onTogglePin: () {
-          Navigator.pop(ctx);
-          context.read<ConversationBloc>().add(SetConversationPinned(
-                conversationId: conversation.id,
-                pinned: !conversation.isPinned,
-              ));
-        },
-        onDelete: () {
-          Navigator.pop(ctx);
-          _confirmDeleteConversation(conversation);
-        },
-      ),
+  Widget _buildMenuTile(
+    BuildContext ctx, {
+    required IconData icon,
+    required String title,
+    bool isDestructive = false,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDestructive 
+        ? AppColors.error 
+        : (isDark ? Colors.white : Colors.black);
+    final iconColor = isDestructive 
+        ? AppColors.error 
+        : (isDark ? Colors.white54 : Colors.black54);
+    
+    return ListTile(
+      leading: Icon(icon, color: iconColor),
+      title: Text(title, style: TextStyle(color: textColor)),
+      onTap: onTap,
     );
   }
 
@@ -332,190 +557,3 @@ class _ConversationListPageState extends State<ConversationListPage> {
     );
   }
 }
-
-/// 添加菜单
-class _AddMenuSheet extends StatelessWidget {
-  final VoidCallback? onCreateGroup;
-  final VoidCallback? onAddFriend;
-  final VoidCallback? onScanQR;
-
-  const _AddMenuSheet({
-    this.onCreateGroup,
-    this.onAddFriend,
-    this.onScanQR,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 拖动指示器
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.divider,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-
-            // 菜单项
-            _buildMenuItem(
-              context,
-              icon: Icons.group_add,
-              title: '发起群聊',
-              onTap: onCreateGroup,
-            ),
-            _buildMenuItem(
-              context,
-              icon: Icons.person_add,
-              title: '添加好友',
-              onTap: onAddFriend,
-            ),
-            _buildMenuItem(
-              context,
-              icon: Icons.qr_code_scanner,
-              title: '扫一扫',
-              onTap: onScanQR,
-            ),
-
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMenuItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    VoidCallback? onTap,
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return ListTile(
-      leading: Icon(icon, color: AppColors.primary),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-        ),
-      ),
-      onTap: onTap,
-    );
-  }
-}
-
-/// 会话操作菜单
-class _ConversationMenuSheet extends StatelessWidget {
-  final ConversationEntity conversation;
-  final VoidCallback? onMarkAsRead;
-  final VoidCallback? onToggleMute;
-  final VoidCallback? onTogglePin;
-  final VoidCallback? onDelete;
-
-  const _ConversationMenuSheet({
-    required this.conversation,
-    this.onMarkAsRead,
-    this.onToggleMute,
-    this.onTogglePin,
-    this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 拖动指示器
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.divider,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-
-            // 标记已读
-            if (conversation.unreadCount > 0)
-              _buildMenuItem(
-                context,
-                icon: Icons.done_all,
-                title: '标记已读',
-                onTap: onMarkAsRead,
-              ),
-
-            // 免打扰
-            _buildMenuItem(
-              context,
-              icon: conversation.isMuted
-                  ? Icons.notifications_active
-                  : Icons.notifications_off,
-              title: conversation.isMuted ? '取消免打扰' : '消息免打扰',
-              onTap: onToggleMute,
-            ),
-
-            // 置顶
-            _buildMenuItem(
-              context,
-              icon: conversation.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
-              title: conversation.isPinned ? '取消置顶' : '置顶',
-              onTap: onTogglePin,
-            ),
-
-            // 删除
-            _buildMenuItem(
-              context,
-              icon: Icons.delete_outline,
-              title: '删除会话',
-              color: AppColors.error,
-              onTap: onDelete,
-            ),
-
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMenuItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    Color? color,
-    VoidCallback? onTap,
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = color ??
-        (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
-
-    return ListTile(
-      leading: Icon(icon, color: color ?? AppColors.textSecondary),
-      title: Text(title, style: TextStyle(color: textColor)),
-      onTap: onTap,
-    );
-  }
-}
-
