@@ -555,17 +555,16 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     final labelColor = isDark ? Colors.white38 : Colors.black38;
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
     
-    return BlocListener<ContactBloc, ContactState>(
-      listener: (context, state) {
-        if (state is ContactRemarkUpdated && state.userId == widget.userId) {
-          setState(() {
-            _currentRemark = state.remark;
-          });
-        } else if (state is ContactLoaded) {
-          _loadRemark();
-        }
-      },
-      child: Scaffold(
+    // 检查 ContactBloc 是否可用
+    bool hasContactBloc = false;
+    try {
+      context.read<ContactBloc>();
+      hasContactBloc = true;
+    } catch (e) {
+      // ContactBloc 不可用
+    }
+    
+    Widget scaffold = Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: bgColor,
@@ -687,8 +686,25 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
           ],
         ),
       ),
-      ),
     );
+    
+    // 如果有 ContactBloc，用 BlocListener 包装
+    if (hasContactBloc) {
+      return BlocListener<ContactBloc, ContactState>(
+        listener: (context, state) {
+          if (state is ContactRemarkUpdated && state.userId == widget.userId) {
+            setState(() {
+              _currentRemark = state.remark;
+            });
+          } else if (state is ContactLoaded) {
+            _loadRemark();
+          }
+        },
+        child: scaffold,
+      );
+    }
+    
+    return scaffold;
   }
   
   Widget _buildSectionLabel(String label, Color color) {
