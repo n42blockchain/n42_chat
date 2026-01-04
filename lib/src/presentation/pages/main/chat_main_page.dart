@@ -265,27 +265,14 @@ class _ChatMainPageState extends State<ChatMainPage> {
               backgroundColor: bgColor,
               elevation: 0,
               scrolledUnderElevation: 0,
-              leading: _currentIndex == 0
-                  ? IconButton(
-                      icon: Icon(
-                        Icons.star_border,
-                        color: textColor,
-                        size: 22,
-                      ),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('星标消息功能即将推出')),
-                        );
-                      },
-                    )
-                  : IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        color: textColor,
-                        size: 20,
-                      ),
-                      onPressed: _handleBack,
-                    ),
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: textColor,
+                  size: 20,
+                ),
+                onPressed: _handleBack,
+              ),
               title: Text(
                 currentTitle,
                 style: TextStyle(
