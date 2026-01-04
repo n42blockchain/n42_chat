@@ -229,8 +229,8 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
       child: Column(
         children: [
           _buildBubbleStyleItem(
-            title: '微信风格',
-            subtitle: '经典的微信消息气泡样式',
+            title: '经典风格',
+            subtitle: '经典的消息气泡样式',
             value: BubbleStyle.wechat,
             isDark: isDark,
           ),

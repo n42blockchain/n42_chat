@@ -22,10 +22,10 @@ import '../profile/profile_page.dart';
 import '../qrcode/scan_qr_page.dart';
 import '../transfer/receive_page.dart';
 
-/// 聊天模块主框架页面（仿微信）
+/// 聊天模块主框架页面
 /// 
-/// 微信风格的底部 Tab 导航，包含：
-/// - 微信（消息列表）
+/// 底部 Tab 导航，包含：
+/// - 消息（消息列表）
 /// - 通讯录
 /// - 发现
 /// - 我
@@ -244,7 +244,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
           String currentTitle;
           switch (_currentIndex) {
             case 0:
-              currentTitle = totalUnread > 0 ? '微信 ($totalUnread)' : '微信';
+              currentTitle = totalUnread > 0 ? '消息（$totalUnread）' : '消息';
               break;
             case 1:
               currentTitle = '通讯录';
@@ -256,7 +256,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
               currentTitle = '我';
               break;
             default:
-              currentTitle = '微信';
+              currentTitle = '消息';
           }
           
           return Scaffold(
@@ -357,7 +357,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
                 index: 0,
                 icon: Icons.chat_bubble_outline,
                 activeIcon: Icons.chat_bubble,
-                label: '微信',
+                label: '消息',
                 selectedColor: selectedColor,
                 unselectedColor: unselectedColor,
                 badge: totalUnread,
