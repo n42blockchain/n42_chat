@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
@@ -863,23 +864,27 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     super.dispose();
   }
   
-  void _save() {
+  void _save() async {
     final remark = _remarkController.text.trim();
     
-    // 尝试保存备注名
-    bool saved = false;
+    // 使用 RemarkService 保存备注名（全局本地存储）
+    await RemarkService.instance.setRemark(
+      widget.userId, 
+      remark.isEmpty ? null : remark,
+    );
+    debugPrint('EditRemarkPage: Remark saved to RemarkService for ${widget.userId}: $remark');
+    
+    // 同时通知 ContactBloc 刷新（如果可用）
     try {
       context.read<ContactBloc>().add(
         SetContactRemark(widget.userId, remark.isEmpty ? null : remark),
       );
-      saved = true;
-      debugPrint('EditRemarkPage: Remark saved for ${widget.userId}: $remark');
     } catch (e) {
-      debugPrint('EditRemarkPage: Failed to save remark: $e');
+      debugPrint('EditRemarkPage: ContactBloc not available, skipping notification');
     }
     
     // 显示保存结果
-    if (saved) {
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('备注已保存'),
@@ -890,7 +895,9 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     }
     
     // 返回并传递新的备注值
-    Navigator.of(context).pop(remark.isEmpty ? null : remark);
+    if (mounted) {
+      Navigator.of(context).pop(remark.isEmpty ? null : remark);
+    }
   }
 
   @override

@@ -18,6 +18,7 @@ import 'package:flutter/services.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 
 import '../../../core/di/injection.dart';
+import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -762,7 +763,8 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
       ),
-      ],
+        ],
+      ),
       ),
     );
   }
@@ -2031,27 +2033,27 @@ ID：$contactId''';
       return name;
     }
 
-    // 私聊尝试获取备注名
+    // 私聊使用 RemarkService 获取备注名
+    final remarkService = RemarkService.instance;
+    final remark = remarkService.getRemark(widget.conversation.id);
+    if (remark != null && remark.isNotEmpty) {
+      return remark;
+    }
+
+    // 也尝试从 ContactBloc 获取（兼容）
     try {
       final contactBloc = context.read<ContactBloc>();
       final state = contactBloc.state;
       if (state is ContactLoaded) {
-        debugPrint('ChatPage._getDisplayName: Searching for contact with id=${widget.conversation.id}');
-        // 查找对应的联系人（先通过房间ID，再通过用户ID）
         final contact = state.contacts.cast<ContactEntity?>().firstWhere(
           (c) => c?.directRoomId == widget.conversation.id || c?.userId == widget.conversation.id,
           orElse: () => null,
         );
         if (contact != null) {
-          debugPrint('ChatPage._getDisplayName: Found contact ${contact.userId}, remark=${contact.remark}, displayName=${contact.displayName}');
-          // 使用 effectiveDisplayName，它已经处理了备注优先逻辑
           return contact.effectiveDisplayName;
-        } else {
-          debugPrint('ChatPage._getDisplayName: No contact found');
         }
       }
     } catch (e) {
-      debugPrint('ChatPage._getDisplayName: Error - $e');
       // ContactBloc 可能不可用，使用默认名称
     }
 
