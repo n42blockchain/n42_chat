@@ -1528,9 +1528,11 @@ class MatrixMessageDataSource {
 
     // 音频信息
     if (event.messageType == matrix.MessageTypes.Audio) {
+      final httpUrl = _convertMxcToHttp(mxcUrl);
+      debugPrint('Audio message metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, senderId=${event.senderId}, status=${event.status}');
       return MessageMetadata(
         mediaUrl: mxcUrl,
-        httpUrl: _convertMxcToHttp(mxcUrl),
+        httpUrl: httpUrl,
         duration: info?['duration'] as int?,
         size: info?['size'] as int?,
         mimeType: info?['mimetype'] as String?,
