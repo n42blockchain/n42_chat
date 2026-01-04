@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/di/injection.dart';
+import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
@@ -44,6 +47,9 @@ class ConversationListPage extends StatefulWidget {
 }
 
 class _ConversationListPageState extends State<ConversationListPage> {
+  // 备注更新订阅
+  StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
+  
   @override
   void initState() {
     super.initState();
@@ -51,11 +57,21 @@ class _ConversationListPageState extends State<ConversationListPage> {
     context.read<ConversationBloc>()
       ..add(const LoadConversations())
       ..add(const SubscribeConversations());
+      
+    // 监听备注更新
+    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
+      // 当备注更新时刷新列表
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
   void dispose() {
-    // 取消订阅
+    // 取消备注更新订阅
+    _remarkSubscription?.cancel();
+    // 取消会话订阅
     context.read<ConversationBloc>().add(const UnsubscribeConversations());
     super.dispose();
   }

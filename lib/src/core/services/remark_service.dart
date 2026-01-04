@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../../data/datasources/local/secure_storage_datasource.dart';
@@ -22,6 +24,12 @@ class RemarkService {
   
   /// 是否已初始化
   bool _initialized = false;
+  
+  /// 备注更新事件流控制器
+  final _remarkUpdateController = StreamController<RemarkUpdateEvent>.broadcast();
+  
+  /// 监听备注更新
+  Stream<RemarkUpdateEvent> get onRemarkUpdated => _remarkUpdateController.stream;
   
   /// 初始化服务，加载所有备注
   Future<void> initialize() async {
@@ -70,6 +78,10 @@ class RemarkService {
       }
       
       debugPrint('RemarkService: Set remark for $userId to "$remark"');
+      
+      // 发出备注更新事件
+      _remarkUpdateController.add(RemarkUpdateEvent(userId: userId, remark: remark));
+      debugPrint('RemarkService: Emitted RemarkUpdateEvent');
     } catch (e) {
       debugPrint('RemarkService: Failed to set remark - $e');
     }
@@ -85,5 +97,21 @@ class RemarkService {
   Map<String, String> getAllRemarks() {
     return Map.from(_remarkCache);
   }
+  
+  /// 释放资源
+  void dispose() {
+    _remarkUpdateController.close();
+  }
+}
+
+/// 备注更新事件
+class RemarkUpdateEvent {
+  final String userId;
+  final String? remark;
+  
+  const RemarkUpdateEvent({
+    required this.userId,
+    this.remark,
+  });
 }
 

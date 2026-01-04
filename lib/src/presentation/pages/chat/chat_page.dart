@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -105,6 +106,9 @@ class _ChatPageState extends State<ChatPage> {
   bool _showMentionPicker = false;
   int _mentionTriggerPosition = -1; // @ 符号的位置
   String _mentionSearchQuery = ''; // @ 后面输入的搜索关键词
+  
+  // 备注更新订阅
+  StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
 
   @override
   void initState() {
@@ -121,6 +125,14 @@ class _ChatPageState extends State<ChatPage> {
 
     // 监听输入框焦点，获取焦点时隐藏更多面板
     _inputFocusNode.addListener(_onInputFocusChanged);
+    
+    // 监听备注更新
+    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
+      // 如果是当前会话的联系人备注更新，刷新界面
+      if (event.userId == widget.conversation.id && mounted) {
+        setState(() {});
+      }
+    });
   }
 
   void _onInputFocusChanged() {
@@ -145,6 +157,9 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    // 取消备注更新订阅
+    _remarkSubscription?.cancel();
+    
     // 先清理聊天室（在 super.dispose 之前）
     try {
       context.read<ChatBloc>().add(const DisposeChat());
