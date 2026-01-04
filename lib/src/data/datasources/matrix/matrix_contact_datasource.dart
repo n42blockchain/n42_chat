@@ -37,6 +37,24 @@ class MatrixContactDataSource {
 
     return contacts.values.toList();
   }
+  
+  /// 获取所有私聊联系人及其房间ID（用于备注名查找）
+  Map<String, String> getDirectChatRoomIdMap() {
+    final roomIdMap = <String, String>{};
+
+    for (final room in _client?.rooms ?? <matrix.Room>[]) {
+      final isDirectChat = room.isDirectChat;
+      final isJoined = room.membership == matrix.Membership.join;
+      if (isDirectChat && isJoined) {
+        final partnerId = room.directChatMatrixID;
+        if (partnerId != null && partnerId != _client?.userID) {
+          roomIdMap[partnerId] = room.id;
+        }
+      }
+    }
+
+    return roomIdMap;
+  }
 
   /// 获取所有已知用户（包括群聊成员）
   List<matrix.User> getAllKnownUsers() {

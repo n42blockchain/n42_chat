@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_utils.dart';
-import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
-import '../../blocs/contact/contact_bloc.dart';
-import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 会话列表项（仿微信）
@@ -29,40 +25,16 @@ class ConversationTile extends StatelessWidget {
   });
   
   /// 获取显示名称（私聊时优先使用备注名）
-  String _getDisplayName(BuildContext context) {
+  String _getDisplayName() {
     // 群聊直接使用会话名称
     if (conversation.type == ConversationType.group) {
       return conversation.name;
     }
     
-    // 私聊使用 RemarkService 获取备注名
-    final remarkService = RemarkService.instance;
-    final remark = remarkService.getRemark(conversation.id);
-    if (remark != null && remark.isNotEmpty) {
-      return remark;
-    }
-    
-    // 也尝试从 ContactBloc 获取（兼容）
-    try {
-      final contactBloc = context.read<ContactBloc>();
-      final state = contactBloc.state;
-      if (state is ContactLoaded) {
-        final contact = state.contacts.cast<ContactEntity?>().firstWhere(
-          (c) {
-            if (c == null) return false;
-            if (c.directRoomId == conversation.id) return true;
-            if (c.userId == conversation.id) return true;
-            if (c.displayName == conversation.name) return true;
-            return false;
-          },
-          orElse: () => null,
-        );
-        if (contact != null && contact.remark != null && contact.remark!.isNotEmpty) {
-          return contact.remark!;
-        }
-      }
-    } catch (e) {
-      // ContactBloc 可能不可用，使用原始名称
+    // 私聊：直接使用 conversation.directUserId 获取备注名
+    final otherUserId = conversation.directUserId;
+    if (otherUserId != null) {
+      return RemarkService.instance.getDisplayName(otherUserId, conversation.name);
     }
     
     return conversation.name;
@@ -201,7 +173,7 @@ class ConversationTile extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context, bool isDark) {
-    final displayName = _getDisplayName(context);
+    final displayName = _getDisplayName();
     
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

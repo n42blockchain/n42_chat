@@ -833,173 +833,503 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
   
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    
     return Dialog(
       backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: 24 + bottomPadding,
+      ),
       child: Container(
         width: 320,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.7,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 头部
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Color(0xFFF9A825),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 头部
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF9A825),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: const Icon(Icons.close, color: Colors.white70, size: 24),
+                    ),
+                    const Expanded(
+                      child: Text(
+                        '转账',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                  ],
                 ),
               ),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(Icons.close, color: Colors.white70, size: 24),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      '转账',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+              
+              // 接收者信息
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: widget.receiverAvatar != null
+                          ? NetworkImage(widget.receiverAvatar!)
+                          : null,
+                      child: widget.receiverAvatar == null
+                          ? Text(
+                              widget.receiverName.isNotEmpty ? widget.receiverName[0] : '?',
+                              style: TextStyle(color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.bold),
+                            )
+                          : null,
                     ),
-                  ),
-                  const SizedBox(width: 24),
-                ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('转账给', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          Text(widget.receiverName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            
-            // 接收者信息
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: Colors.grey[200],
-                    backgroundImage: widget.receiverAvatar != null
-                        ? NetworkImage(widget.receiverAvatar!)
-                        : null,
-                    child: widget.receiverAvatar == null
-                        ? Text(
-                            widget.receiverName.isNotEmpty ? widget.receiverName[0] : '?',
-                            style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold),
-                          )
-                        : null,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              
+              const Divider(height: 1),
+              
+              // 金额输入
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('转账金额', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text('转账给', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                        Text(widget.receiverName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: _selectedToken,
+                              isDense: true,
+                              items: _tokens.map((token) {
+                                return DropdownMenuItem(value: token, child: Text(token));
+                              }).toList(),
+                              onChanged: (value) {
+                                if (value != null) setState(() => _selectedToken = value);
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: _amountController,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                            ],
+                            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                            decoration: const InputDecoration(
+                              hintText: '0.00',
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            
-            const Divider(height: 1),
-            
-            // 金额输入
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('转账金额', style: TextStyle(fontSize: 14, color: Colors.grey)),
-                  const SizedBox(height: 12),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                    
+                    const SizedBox(height: 12),
+                    
+                    TextField(
+                      controller: _memoController,
+                      maxLength: 50,
+                      decoration: InputDecoration(
+                        hintText: '添加转账说明',
+                        hintStyle: TextStyle(color: Colors.grey[400]),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide.none,
                         ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: _selectedToken,
-                            isDense: true,
-                            items: _tokens.map((token) {
-                              return DropdownMenuItem(value: token, child: Text(token));
-                            }).toList(),
-                            onChanged: (value) {
-                              if (value != null) setState(() => _selectedToken = value);
-                            },
-                          ),
-                        ),
+                        counterText: '',
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        isDense: true,
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextField(
-                          controller: _amountController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-                          ],
-                          style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-                          decoration: const InputDecoration(
-                            hintText: '0.00',
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 20),
-                  
-                  TextField(
-                    controller: _memoController,
-                    maxLength: 50,
-                    decoration: InputDecoration(
-                      hintText: '添加转账说明',
-                      hintStyle: TextStyle(color: Colors.grey[400]),
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      counterText: '',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // 转账按钮
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _send,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF9A825),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    elevation: 0,
-                  ),
-                  child: const Text('确认转账', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  ],
                 ),
               ),
-            ),
-          ],
+              
+              // 转账按钮
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: ElevatedButton(
+                    onPressed: _send,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF9A825),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      elevation: 0,
+                    ),
+                    child: const Text('确认转账', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+}
+
+/// 红包详情页面（仿微信）
+class RedPacketDetailPage extends StatelessWidget {
+  /// 发送者名称
+  final String senderName;
+  
+  /// 发送者头像
+  final String? senderAvatar;
+  
+  /// 红包祝福语
+  final String greeting;
+  
+  /// 领取金额
+  final String? claimedAmount;
+  
+  /// 代币类型
+  final String token;
+  
+  /// 是否已领取
+  final bool isClaimed;
+  
+  /// 领取者列表
+  final List<RedPacketClaimer>? claimers;
+  
+  const RedPacketDetailPage({
+    super.key,
+    required this.senderName,
+    this.senderAvatar,
+    this.greeting = '恭喜发财，大吉大利',
+    this.claimedAmount,
+    this.token = 'CNY',
+    this.isClaimed = false,
+    this.claimers,
+  });
+  
+  String get _currencyUnit {
+    switch (token) {
+      case 'CNY':
+        return '元';
+      case 'ETH':
+        return 'ETH';
+      case 'BTC':
+        return 'BTC';
+      default:
+        return token;
+    }
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: CustomScrollView(
+        slivers: [
+          // 顶部红色区域
+          SliverToBoxAdapter(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFFE64340), Color(0xFFD63030), Colors.black],
+                  stops: [0.0, 0.4, 1.0],
+                ),
+              ),
+              child: SafeArea(
+                bottom: false,
+                child: Column(
+                  children: [
+                    // AppBar
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 32),
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.more_horiz, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // 发送者信息
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.white24,
+                          backgroundImage: senderAvatar != null
+                              ? NetworkImage(senderAvatar!)
+                              : null,
+                          child: senderAvatar == null
+                              ? Text(
+                                  senderName.isNotEmpty ? senderName[0] : '?',
+                                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                )
+                              : null,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${senderName}发出的红包',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 12),
+                    
+                    // 祝福语
+                    Text(
+                      greeting,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 15,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // 金额显示
+                    if (isClaimed && claimedAmount != null) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            claimedAmount!,
+                            style: const TextStyle(
+                              color: Color(0xFFFFD700),
+                              fontSize: 56,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Text(
+                              _currencyUnit,
+                              style: const TextStyle(
+                                color: Color(0xFFFFD700),
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      GestureDetector(
+                        onTap: () {},
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '已存入零钱，可直接转账',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.7),
+                                fontSize: 14,
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right,
+                              color: Colors.white.withOpacity(0.7),
+                              size: 18,
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // 表情回复按钮
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Center(child: Text('🐕', style: TextStyle(fontSize: 20))),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              '用此表情回复',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else ...[
+                      const Text(
+                        '红包已过期/已领完',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                    
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          
+          // 领取记录
+          if (claimers != null && claimers!.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Container(
+                color: Colors.black,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Divider(height: 1, color: Colors.white10),
+                    ...claimers!.map((claimer) => _buildClaimerItem(claimer)),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildClaimerItem(RedPacketClaimer claimer) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 22,
+            backgroundColor: Colors.white24,
+            backgroundImage: claimer.avatarUrl != null
+                ? NetworkImage(claimer.avatarUrl!)
+                : null,
+            child: claimer.avatarUrl == null
+                ? Text(
+                    claimer.name.isNotEmpty ? claimer.name[0] : '?',
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  )
+                : null,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  claimer.name,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                if (claimer.claimTime != null)
+                  Text(
+                    claimer.claimTime!,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                      fontSize: 13,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Text(
+            '${claimer.amount}$_currencyUnit',
+            style: const TextStyle(
+              color: Color(0xFFFFD700),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 红包领取者信息
+class RedPacketClaimer {
+  final String name;
+  final String? avatarUrl;
+  final String amount;
+  final String? claimTime;
+  
+  const RedPacketClaimer({
+    required this.name,
+    this.avatarUrl,
+    required this.amount,
+    this.claimTime,
+  });
 }
 
 /// 确认收款弹窗
