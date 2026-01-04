@@ -597,7 +597,12 @@ class _ChatPageState extends State<ChatPage> {
     return BlocListener<ContactBloc, ContactState>(
       listener: (context, state) {
         // 当联系人备注更新时，刷新界面
-        if (state is ContactRemarkUpdated || state is ContactLoaded) {
+        debugPrint('ChatPage: ContactBloc state changed to ${state.runtimeType}');
+        if (state is ContactRemarkUpdated) {
+          debugPrint('ChatPage: Remark updated for ${state.userId} to "${state.remark}"');
+          if (mounted) setState(() {});
+        } else if (state is ContactLoaded) {
+          debugPrint('ChatPage: Contacts loaded, refreshing UI');
           if (mounted) setState(() {});
         }
       },
@@ -2031,17 +2036,22 @@ ID：$contactId''';
       final contactBloc = context.read<ContactBloc>();
       final state = contactBloc.state;
       if (state is ContactLoaded) {
+        debugPrint('ChatPage._getDisplayName: Searching for contact with id=${widget.conversation.id}');
         // 查找对应的联系人（先通过房间ID，再通过用户ID）
         final contact = state.contacts.cast<ContactEntity?>().firstWhere(
           (c) => c?.directRoomId == widget.conversation.id || c?.userId == widget.conversation.id,
           orElse: () => null,
         );
         if (contact != null) {
+          debugPrint('ChatPage._getDisplayName: Found contact ${contact.userId}, remark=${contact.remark}, displayName=${contact.displayName}');
           // 使用 effectiveDisplayName，它已经处理了备注优先逻辑
           return contact.effectiveDisplayName;
+        } else {
+          debugPrint('ChatPage._getDisplayName: No contact found');
         }
       }
     } catch (e) {
+      debugPrint('ChatPage._getDisplayName: Error - $e');
       // ContactBloc 可能不可用，使用默认名称
     }
 
