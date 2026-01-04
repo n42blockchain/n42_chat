@@ -1364,6 +1364,10 @@ class MatrixMessageDataSource {
       case matrix.MessageTypes.Emote:
         return MessageType.text;
       default:
+        // 检查是否是红包消息
+        if (event.content['msgtype'] == 'n42.red_packet') {
+          return MessageType.redPacket;
+        }
         // 检查是否是转账消息
         if (event.content['msgtype'] == 'n42.transfer') {
           return MessageType.transfer;
@@ -1587,6 +1591,24 @@ class MatrixMessageDataSource {
     // 投票信息 (MSC3381)
     if (event.type == 'org.matrix.msc3381.poll.start') {
       return _extractPollMetadata(event);
+    }
+    
+    // 红包信息
+    if (event.content['msgtype'] == 'n42.red_packet') {
+      return MessageMetadata(
+        amount: event.content['amount'] as String?,
+        token: event.content['token'] as String?,
+        transferStatus: event.content['status'] as String?,
+      );
+    }
+    
+    // 转账信息
+    if (event.content['msgtype'] == 'n42.transfer') {
+      return MessageMetadata(
+        amount: event.content['amount'] as String?,
+        token: event.content['token'] as String?,
+        transferStatus: event.content['status'] as String?,
+      );
     }
 
     return null;
