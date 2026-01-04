@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -27,12 +31,41 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   bool _isPinned = false;
   bool _isMuted = false;
   bool _isStrongReminder = false;
+  
+  // 备注更新订阅
+  StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
+  
+  // 缓存对方用户ID
+  String? _cachedOtherUserId;
 
   @override
   void initState() {
     super.initState();
     _isPinned = widget.conversation.isPinned;
     _isMuted = widget.conversation.isMuted;
+    
+    // 使用 conversation.directUserId 初始化
+    _cachedOtherUserId = widget.conversation.directUserId;
+    
+    // 监听备注更新
+    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
+      final targetUserId = widget.conversation.directUserId;
+      if (targetUserId != null && event.userId == targetUserId && mounted) {
+        debugPrint('ChatDetailPage: Remark updated for $targetUserId, refreshing UI');
+        setState(() {});
+      }
+    });
+  }
+  
+  @override
+  void dispose() {
+    _remarkSubscription?.cancel();
+    super.dispose();
+  }
+  
+  /// 获取对方用户ID
+  String? _getOtherUserId() {
+    return widget.conversation.directUserId;
   }
   
   /// 获取显示名称（私聊时优先使用备注名）
@@ -42,21 +75,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       return widget.conversation.name;
     }
     
-    // 私聊尝试获取备注名
-    try {
-      final contactBloc = context.read<ContactBloc>();
-      final state = contactBloc.state;
-      if (state is ContactLoaded) {
-        final contact = state.contacts.cast<ContactEntity?>().firstWhere(
-          (c) => c?.directRoomId == widget.conversation.id || c?.userId == widget.conversation.id,
-          orElse: () => null,
-        );
-        if (contact != null) {
-          return contact.effectiveDisplayName;
-        }
-      }
-    } catch (e) {
-      // ContactBloc 可能不可用
+    // 私聊：直接使用 conversation.directUserId 获取备注名
+    final otherUserId = widget.conversation.directUserId;
+    if (otherUserId != null) {
+      return RemarkService.instance.getDisplayName(otherUserId, widget.conversation.name);
     }
     
     return widget.conversation.name;
@@ -515,6 +537,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   }
 
   void _openContactDetail() {
+    // 获取对方用户ID（私聊时需要真实的用户ID，而不是房间ID）
+    final otherUserId = _getOtherUserId();
+    if (otherUserId == null) {
+      // 无法获取用户ID，使用房间ID作为后备
+      debugPrint('ChatDetailPage: Cannot get other user ID, using room ID as fallback');
+    }
+    
+    final userId = otherUserId ?? widget.conversation.id;
+    
     // 获取当前的 ContactBloc
     ContactBloc? contactBloc;
     try {
@@ -527,7 +558,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       MaterialPageRoute(
         builder: (ctx) {
           final page = ContactDetailPage(
-            userId: widget.conversation.id,
+            userId: userId,
             displayName: _getDisplayName(),
             avatarUrl: widget.conversation.avatarUrl,
             onSendMessage: () {
@@ -545,7 +576,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           return page;
         },
       ),
-    );
+    ).then((_) {
+      // 返回时刷新显示名称
+      if (mounted) setState(() {});
+    });
   }
 
   void _showClearConfirm() {

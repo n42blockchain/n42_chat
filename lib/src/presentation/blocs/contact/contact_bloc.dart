@@ -58,6 +58,11 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
       );
 
       final contacts = await _contactRepository.getContacts();
+      debugPrint('ContactBloc: LoadContacts - Loaded ${contacts.length} contacts');
+      for (final contact in contacts) {
+        debugPrint('ContactBloc: Contact userId=${contact.userId}, directRoomId=${contact.directRoomId}, remark=${contact.remark}');
+      }
+      
       final friendRequests = await _contactRepository.getPendingFriendRequests();
       final grouped = _groupContactsByLetter(contacts);
 

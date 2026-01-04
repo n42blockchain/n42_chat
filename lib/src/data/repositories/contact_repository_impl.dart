@@ -22,10 +22,16 @@ class ContactRepositoryImpl implements IContactRepository {
     _remarkCache = await _storageDataSource.getContactRemarks();
   }
 
+  /// 用户ID到房间ID的映射缓存
+  Map<String, String> _directRoomIdMap = {};
+  
   @override
   Future<List<ContactEntity>> getContacts() async {
     // 先加载备注缓存
     await _loadRemarkCache();
+    
+    // 获取用户ID到房间ID的映射
+    _directRoomIdMap = _contactDataSource.getDirectChatRoomIdMap();
     
     final users = _contactDataSource.getDirectChatContacts();
     return users.map(_mapUserToEntity).toList()
@@ -205,6 +211,8 @@ class ContactRepositoryImpl implements IContactRepository {
   ContactEntity _mapUserToEntity(matrix.User user) {
     final avatarUrl = _contactDataSource.getUserAvatarUrl(user);
     final remark = _remarkCache[user.id];
+    // 从缓存的映射中获取私聊房间ID
+    final directRoomId = _directRoomIdMap[user.id];
 
     return ContactEntity(
       userId: user.id,
@@ -213,12 +221,16 @@ class ContactRepositoryImpl implements IContactRepository {
       // 在线状态需要异步获取，这里默认离线
       presence: PresenceStatus.offline,
       remark: remark,
+      directRoomId: directRoomId,
+      isFriend: directRoomId != null,
     );
   }
 
   ContactEntity _mapProfileToEntity(String userId, matrix.Profile profile) {
     final avatarUrl = _contactDataSource.getProfileAvatarUrl(profile);
     final remark = _remarkCache[userId];
+    // 获取私聊房间ID
+    final directRoomId = _contactDataSource.getDirectChatRoomId(userId);
 
     return ContactEntity(
       userId: userId,
@@ -227,6 +239,8 @@ class ContactRepositoryImpl implements IContactRepository {
       // 在线状态需要异步获取，这里默认离线
       presence: PresenceStatus.offline,
       remark: remark,
+      directRoomId: directRoomId,
+      isFriend: directRoomId != null,
     );
   }
 

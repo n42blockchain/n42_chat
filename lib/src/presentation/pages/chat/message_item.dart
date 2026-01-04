@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
-import '../../blocs/contact/contact_bloc.dart';
-import '../../blocs/contact/contact_state.dart';
 import '../../widgets/chat/message_status_indicator.dart' as indicator;
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/wechat_message_menu.dart';
@@ -53,6 +49,9 @@ class MessageItem extends StatelessWidget {
   
   /// 结束投票回调
   final Function(String pollEventId)? onEndPoll;
+  
+  /// 红包点击回调
+  final Function(MessageEntity message)? onRedPacketTap;
 
   const MessageItem({
     super.key,
@@ -69,6 +68,7 @@ class MessageItem extends StatelessWidget {
     this.onReactionTap,
     this.onPollVote,
     this.onEndPoll,
+    this.onRedPacketTap,
   });
 
   @override
@@ -98,30 +98,7 @@ class MessageItem extends StatelessWidget {
     }
 
     // 使用 RemarkService 获取备注名
-    final remarkService = RemarkService.instance;
-    final remark = remarkService.getRemark(message.senderId);
-    if (remark != null && remark.isNotEmpty) {
-      return remark;
-    }
-
-    // 也尝试从 ContactBloc 获取（兼容）
-    try {
-      final contactBloc = context.read<ContactBloc>();
-      final state = contactBloc.state;
-      if (state is ContactLoaded) {
-        final contact = state.contacts.cast<ContactEntity?>().firstWhere(
-          (c) => c?.userId == message.senderId,
-          orElse: () => null,
-        );
-        if (contact != null && contact.remark != null && contact.remark!.isNotEmpty) {
-          return contact.remark!;
-        }
-      }
-    } catch (e) {
-      // ContactBloc 可能不可用，使用原始名称
-    }
-
-    return message.senderName;
+    return RemarkService.instance.getDisplayName(message.senderId, message.senderName);
   }
 
   Widget _buildMessageBubble(BuildContext context) {
@@ -685,7 +662,7 @@ class MessageItem extends StatelessWidget {
       note: message.content.isNotEmpty ? message.content : '恭喜发财，大吉大利',
       status: redPacketStatus,
       isSelf: message.isFromMe,
-      onTap: onTap,
+      onTap: () => onRedPacketTap?.call(message),
     );
   }
   

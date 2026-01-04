@@ -898,37 +898,25 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
   
   void _save() async {
     final remark = _remarkController.text.trim();
+    final remarkToSave = remark.isEmpty ? null : remark;
+    
+    debugPrint('EditRemarkPage: Saving remark for userId=${widget.userId}, remark=$remark');
     
     // 使用 RemarkService 保存备注名（全局本地存储）
-    await RemarkService.instance.setRemark(
-      widget.userId, 
-      remark.isEmpty ? null : remark,
-    );
-    debugPrint('EditRemarkPage: Remark saved to RemarkService for ${widget.userId}: $remark');
+    await RemarkService.instance.setRemark(widget.userId, remarkToSave);
+    debugPrint('EditRemarkPage: Remark saved to RemarkService');
     
     // 同时通知 ContactBloc 刷新（如果可用）
     try {
-      context.read<ContactBloc>().add(
-        SetContactRemark(widget.userId, remark.isEmpty ? null : remark),
-      );
+      context.read<ContactBloc>().add(SetContactRemark(widget.userId, remarkToSave));
+      debugPrint('EditRemarkPage: ContactBloc notified');
     } catch (e) {
-      debugPrint('EditRemarkPage: ContactBloc not available, skipping notification');
+      debugPrint('EditRemarkPage: ContactBloc not available: $e');
     }
     
-    // 显示保存结果
+    // 先关闭页面，再显示 Toast（避免 ScaffoldMessenger 冲突）
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('备注已保存'),
-          duration: Duration(seconds: 1),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-    
-    // 返回并传递新的备注值
-    if (mounted) {
-      Navigator.of(context).pop(remark.isEmpty ? null : remark);
+      Navigator.of(context).pop(remarkToSave);
     }
   }
 

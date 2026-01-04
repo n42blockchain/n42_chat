@@ -109,6 +109,9 @@ class _ChatPageState extends State<ChatPage> {
   
   // 备注更新订阅
   StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
+  
+  // 私聊对方的用户ID（用于获取备注名）
+  String? _otherUserId;
 
   @override
   void initState() {
@@ -119,6 +122,9 @@ class _ChatPageState extends State<ChatPage> {
     
     // 获取当前用户ID
     _loadCurrentUserId();
+    
+    // 获取私聊对方的用户ID
+    _loadOtherUserId();
 
     // 监听滚动
     _scrollController.addListener(_onScroll);
@@ -129,10 +135,23 @@ class _ChatPageState extends State<ChatPage> {
     // 监听备注更新
     _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
       // 如果是当前会话的联系人备注更新，刷新界面
-      if (event.userId == widget.conversation.id && mounted) {
+      final targetUserId = _otherUserId ?? widget.conversation.id;
+      if (event.userId == targetUserId && mounted) {
+        debugPrint('ChatPage: Remark updated for $targetUserId, refreshing UI');
         setState(() {});
       }
     });
+  }
+  
+  /// 获取私聊对方的用户ID
+  void _loadOtherUserId() {
+    if (widget.conversation.type == ConversationType.group) {
+      return;
+    }
+    
+    // 直接使用 conversation.directUserId
+    _otherUserId = widget.conversation.directUserId;
+    debugPrint('ChatPage: directUserId=$_otherUserId for room ${widget.conversation.id}');
   }
 
   void _onInputFocusChanged() {
@@ -313,6 +332,113 @@ class _ChatPageState extends State<ChatPage> {
         break;
       default:
         break;
+    }
+  }
+  
+  /// 红包消息点击
+  void _onRedPacketTap(MessageEntity message) {
+    final metadata = message.metadata;
+    final status = metadata?.transferStatus ?? 'pending';
+    final greeting = message.content.isNotEmpty ? message.content : '恭喜发财，大吉大利';
+    final amount = metadata?.amount;
+    final token = metadata?.token ?? 'CNY';
+    
+    // 获取发送者显示名称（优先使用备注名）
+    final senderName = RemarkService.instance.getDisplayName(
+      message.senderId, 
+      message.senderName,
+    );
+    
+    // 判断红包状态
+    OpenRedPacketStatus redPacketStatus;
+    switch (status) {
+      case 'opened':
+        redPacketStatus = OpenRedPacketStatus.opened;
+        break;
+      case 'expired':
+        redPacketStatus = OpenRedPacketStatus.expired;
+        break;
+      case 'empty':
+        redPacketStatus = OpenRedPacketStatus.empty;
+        break;
+      default:
+        redPacketStatus = OpenRedPacketStatus.canOpen;
+    }
+    
+    // 如果已经领取，直接显示红包详情页
+    if (redPacketStatus == OpenRedPacketStatus.opened) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => RedPacketDetailPage(
+            senderName: senderName,
+            senderAvatar: message.senderAvatarUrl,
+            greeting: greeting,
+            claimedAmount: amount,
+            token: token,
+            isClaimed: true,
+            claimers: [
+              // 当前用户作为领取者
+              RedPacketClaimer(
+                name: _getDisplayName(),
+                amount: amount ?? '0',
+                claimTime: _formatTime(DateTime.now()),
+              ),
+            ],
+          ),
+        ),
+      );
+      return;
+    }
+    
+    // 显示开红包弹窗
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => OpenRedPacketDialog(
+        senderName: senderName,
+        senderAvatar: message.senderAvatarUrl,
+        greeting: greeting,
+        status: redPacketStatus,
+        claimedAmount: amount,
+        token: token,
+        onOpen: () {
+          // TODO: 调用后端API领取红包
+          debugPrint('Opening red packet: ${message.id}');
+        },
+        onViewDetails: () {
+          Navigator.of(ctx).pop();
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => RedPacketDetailPage(
+                senderName: senderName,
+                senderAvatar: message.senderAvatarUrl,
+                greeting: greeting,
+                claimedAmount: amount,
+                token: token,
+                isClaimed: true,
+                claimers: [
+                  RedPacketClaimer(
+                    name: _getDisplayName(),
+                    amount: amount ?? '0',
+                    claimTime: _formatTime(DateTime.now()),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+  
+  String _formatTime(DateTime time) {
+    final now = DateTime.now();
+    if (now.difference(time).inMinutes < 1) {
+      return '刚刚';
+    } else if (now.day == time.day) {
+      return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+    } else {
+      return '${time.month}/${time.day} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
     }
   }
   
@@ -686,7 +812,11 @@ class _ChatPageState extends State<ChatPage> {
     if (hasContactBloc) {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state is ContactRemarkUpdated || state is ContactLoaded) {
+          if (state is ContactLoaded) {
+            // 联系人加载完成，重新获取对方用户ID
+            _loadOtherUserId();
+            if (mounted) setState(() {});
+          } else if (state is ContactRemarkUpdated) {
             if (mounted) setState(() {});
           }
         },
@@ -2058,28 +2188,10 @@ ID：$contactId''';
       return name;
     }
 
-    // 私聊使用 RemarkService 获取备注名
-    final remarkService = RemarkService.instance;
-    final remark = remarkService.getRemark(widget.conversation.id);
-    if (remark != null && remark.isNotEmpty) {
-      return remark;
-    }
-
-    // 也尝试从 ContactBloc 获取（兼容）
-    try {
-      final contactBloc = context.read<ContactBloc>();
-      final state = contactBloc.state;
-      if (state is ContactLoaded) {
-        final contact = state.contacts.cast<ContactEntity?>().firstWhere(
-          (c) => c?.directRoomId == widget.conversation.id || c?.userId == widget.conversation.id,
-          orElse: () => null,
-        );
-        if (contact != null) {
-          return contact.effectiveDisplayName;
-        }
-      }
-    } catch (e) {
-      // ContactBloc 可能不可用，使用默认名称
+    // 私聊：直接使用 conversation.directUserId 获取备注名
+    final otherUserId = widget.conversation.directUserId;
+    if (otherUserId != null) {
+      return RemarkService.instance.getDisplayName(otherUserId, widget.conversation.name);
     }
 
     // 如果名称为空或为默认值，返回简化的用户ID或默认文本
@@ -2240,6 +2352,7 @@ ID：$contactId''';
                           onReactionTap: (emoji) => _addReaction(message, emoji),
                           onPollVote: (pollEventId, optionId) => _onPollVote(pollEventId, optionId),
                           onEndPoll: (pollEventId) => _onEndPoll(pollEventId),
+                          onRedPacketTap: _onRedPacketTap,
                         ),
                       ),
               ],
@@ -2308,6 +2421,7 @@ ID：$contactId''';
                   showSenderName: showSenderName,
                   currentUserId: _currentUserId,
                   onReactionTap: null, // 多选模式下不响应表情点击
+                  onRedPacketTap: null, // 多选模式下不响应红包点击
                 ),
               ),
             ),

@@ -71,7 +71,7 @@ class ChatMorePanel extends StatelessWidget {
     // 获取底部安全区域高度
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     // 内容高度（两行图标 + 页面指示器）- 增加高度避免溢出
-    const contentHeight = 200.0;
+    const contentHeight = 210.0;
 
     return Container(
       // 固定高度 = 内容高度 + 底部安全区域
@@ -190,55 +190,62 @@ class ChatMorePanel extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // 第一行
-          Padding(
-            padding: const EdgeInsets.only(top: 8, bottom: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                for (int i = 0; i < 4; i++)
-                  if (i < items.length)
-                    _buildItem(context, items[i], isDark)
-                  else
-                    const SizedBox(width: 70),
-              ],
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 6, bottom: 2),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  for (int i = 0; i < 4; i++)
+                    if (i < items.length)
+                      _buildItem(context, items[i], isDark)
+                    else
+                      const SizedBox(width: 70),
+                ],
+              ),
             ),
           ),
           // 第二行
-          Padding(
-            padding: const EdgeInsets.only(top: 4, bottom: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                for (int i = 4; i < 8; i++)
-                  if (i < items.length)
-                    _buildItem(context, items[i], isDark)
-                  else
-                    const SizedBox(width: 70),
-              ],
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2, bottom: 6),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  for (int i = 4; i < 8; i++)
+                    if (i < items.length)
+                      _buildItem(context, items[i], isDark)
+                    else
+                      const SizedBox(width: 70),
+                ],
+              ),
             ),
           ),
           // 页面指示器
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 5,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: AppColors.textSecondary,
-                  shape: BoxShape.circle,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 5,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: AppColors.textSecondary,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 5),
-              Container(
-                width: 5,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: AppColors.textTertiary,
-                  shape: BoxShape.circle,
+                const SizedBox(width: 5),
+                Container(
+                  width: 5,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: AppColors.textTertiary,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

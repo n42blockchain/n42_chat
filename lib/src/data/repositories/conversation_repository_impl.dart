@@ -181,6 +181,12 @@ class ConversationRepositoryImpl implements IConversationRepository {
       memberNames = members.$2;
     }
 
+    // 获取私聊对方的用户ID
+    String? directUserId;
+    if (room.isDirectChat) {
+      directUserId = room.directChatMatrixID;
+    }
+    
     return ConversationEntity(
       id: room.id,
       name: _roomDataSource.getRoomDisplayName(room),
@@ -199,6 +205,7 @@ class ConversationRepositoryImpl implements IConversationRepository {
       memberCount: _roomDataSource.getMemberCount(room),
       memberAvatarUrls: memberAvatarUrls,
       memberNames: memberNames,
+      directUserId: directUserId,
     );
   }
   
