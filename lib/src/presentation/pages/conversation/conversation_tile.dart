@@ -39,20 +39,20 @@ class ConversationTile extends StatelessWidget {
       final contactBloc = context.read<ContactBloc>();
       final state = contactBloc.state;
       if (state is ContactLoaded) {
-        // 从会话的其他成员ID找到联系人
-        final memberId = conversation.memberIds?.firstWhere(
-          (id) => id != conversation.id,
-          orElse: () => '',
+        // 通过名称或房间 ID 匹配联系人
+        final contact = state.contacts.cast<ContactEntity?>().firstWhere(
+          (c) {
+            if (c == null) return false;
+            // 尝试通过房间 ID 匹配
+            if (c.directRoomId == conversation.id) return true;
+            // 尝试通过名称匹配
+            if (c.displayName == conversation.name) return true;
+            return false;
+          },
+          orElse: () => null,
         );
-        
-        if (memberId != null && memberId.isNotEmpty) {
-          final contact = state.contacts.cast<ContactEntity?>().firstWhere(
-            (c) => c?.userId == memberId,
-            orElse: () => null,
-          );
-          if (contact != null && contact.remark != null && contact.remark!.isNotEmpty) {
-            return contact.remark!;
-          }
+        if (contact != null && contact.remark != null && contact.remark!.isNotEmpty) {
+          return contact.remark!;
         }
       }
     } catch (e) {
