@@ -77,6 +77,12 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   }
   
   String get _effectiveDisplayName {
+    // 优先从 RemarkService 获取
+    final remark = RemarkService.instance.getRemark(widget.userId);
+    if (remark != null && remark.isNotEmpty) {
+      return remark;
+    }
+    // 其次从 _contact 获取
     if (_contact?.remark != null && _contact!.remark!.isNotEmpty) {
       return _contact!.remark!;
     }
@@ -528,6 +534,16 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
   }
   
   void _loadRemark() {
+    // 优先从 RemarkService 获取（全局本地缓存）
+    final remark = RemarkService.instance.getRemark(widget.userId);
+    if (remark != null && remark.isNotEmpty && mounted) {
+      setState(() {
+        _currentRemark = remark;
+      });
+      return;
+    }
+    
+    // 备用：从 ContactBloc 获取
     try {
       final contactState = context.read<ContactBloc>().state;
       if (contactState is ContactLoaded) {
