@@ -46,6 +46,14 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadContact();
+    });
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _loadContact();
   }
   
@@ -56,7 +64,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         final contact = contactState.contacts.where(
           (c) => c.userId == widget.userId
         ).firstOrNull;
-        if (contact != null) {
+        if (contact != null && mounted) {
           setState(() {
             _contact = contact;
           });
@@ -249,6 +257,8 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
           if (state is ContactRemarkUpdated && state.userId == widget.userId) {
+            _loadContact();
+          } else if (state is ContactLoaded) {
             _loadContact();
           }
         },
@@ -544,7 +554,17 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     final labelColor = isDark ? Colors.white38 : Colors.black38;
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
     
-    return Scaffold(
+    return BlocListener<ContactBloc, ContactState>(
+      listener: (context, state) {
+        if (state is ContactRemarkUpdated && state.userId == widget.userId) {
+          setState(() {
+            _currentRemark = state.remark;
+          });
+        } else if (state is ContactLoaded) {
+          _loadRemark();
+        }
+      },
+      child: Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: bgColor,
@@ -665,6 +685,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
             const SizedBox(height: 32),
           ],
         ),
+      ),
       ),
     );
   }

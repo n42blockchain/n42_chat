@@ -415,12 +415,27 @@ class _ChatPageState extends State<ChatPage> {
       // ContactBloc 可能不可用
     }
     
+    // 获取备注名
+    String displayName = message.senderName;
+    if (contactBloc != null) {
+      final state = contactBloc.state;
+      if (state is ContactLoaded) {
+        final contact = state.contacts.cast<ContactEntity?>().firstWhere(
+          (c) => c?.userId == message.senderId,
+          orElse: () => null,
+        );
+        if (contact != null) {
+          displayName = contact.effectiveDisplayName;
+        }
+      }
+    }
+    
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) {
           final page = ContactDetailPage(
             userId: message.senderId,
-            displayName: message.senderName,
+            displayName: displayName,
             avatarUrl: message.senderAvatarUrl,
             onSendMessage: () {
               Navigator.of(ctx).pop();
@@ -579,7 +594,14 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Stack(
+    return BlocListener<ContactBloc, ContactState>(
+      listener: (context, state) {
+        // 当联系人备注更新时，刷新界面
+        if (state is ContactRemarkUpdated || state is ContactLoaded) {
+          if (mounted) setState(() {});
+        }
+      },
+      child: Stack(
       children: [
         Scaffold(
           backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
@@ -734,6 +756,8 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
         ),
+      ),
+      ],
       ),
     );
   }
@@ -1414,7 +1438,7 @@ class _ChatPageState extends State<ChatPage> {
     showDialog(
       context: context,
       builder: (context) => SendRedPacketDialog(
-        receiverName: widget.conversation.name,
+        receiverName: _getDisplayName(),
         isGroup: widget.conversation.isGroup,
         memberCount: widget.conversation.memberCount ?? 1,
         onSend: (amount, token, greeting, count, isLucky) {
@@ -1451,7 +1475,7 @@ class _ChatPageState extends State<ChatPage> {
     showDialog(
       context: context,
       builder: (context) => SendTransferDialog(
-        receiverName: widget.conversation.name,
+        receiverName: _getDisplayName(),
         receiverAvatar: widget.conversation.avatarUrl,
         onSend: (amount, token, memo) {
           _doSendTransfer(amount, token, memo);
@@ -2007,20 +2031,14 @@ ID：$contactId''';
       final contactBloc = context.read<ContactBloc>();
       final state = contactBloc.state;
       if (state is ContactLoaded) {
-        // 查找对应的联系人（通过房间ID或用户ID）
+        // 查找对应的联系人（先通过房间ID，再通过用户ID）
         final contact = state.contacts.cast<ContactEntity?>().firstWhere(
-          (c) => c?.directRoomId == widget.conversation.id,
+          (c) => c?.directRoomId == widget.conversation.id || c?.userId == widget.conversation.id,
           orElse: () => null,
         );
         if (contact != null) {
-          // 优先使用备注名
-          if (contact.remark != null && contact.remark!.isNotEmpty) {
-            return contact.remark!;
-          }
-          // 其次使用显示名
-          if (contact.displayName.isNotEmpty) {
-            return contact.displayName;
-          }
+          // 使用 effectiveDisplayName，它已经处理了备注优先逻辑
+          return contact.effectiveDisplayName;
         }
       }
     } catch (e) {
