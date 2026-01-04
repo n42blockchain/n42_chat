@@ -220,9 +220,9 @@ class RedPacketMessageWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 240,
+        width: 260,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(6),
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
@@ -230,99 +230,70 @@ class RedPacketMessageWidget extends StatelessWidget {
             // 背景
             Container(
               decoration: BoxDecoration(
-                gradient: isOpened
-                    ? null
-                    : const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFFFA9D3B), Color(0xFFE64340)],
-                      ),
-                color: isOpened ? const Color(0xFFE8D5B5) : null,
+                color: isOpened 
+                    ? const Color(0xFFE8C98E) // 已领取：浅金色
+                    : const Color(0xFFFA9D3B), // 未领取：橙色
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   // 主体内容
-                  Container(
-                    padding: const EdgeInsets.all(12),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // 红包图标
-                        Container(
-                          width: 40,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: isOpened
-                                ? const Color(0xFFD4A853).withOpacity(0.3)
-                                : Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Center(
-                            child: Image.asset(
-                              'assets/images/red_packet_icon.png',
-                              width: 28,
-                              height: 28,
-                              errorBuilder: (_, __, ___) => Icon(
-                                Icons.card_giftcard,
-                                size: 24,
-                                color: isOpened ? const Color(0xFF8B6914) : Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
+                        // 红包图标（红色方形背景，金色¥符号圆圈）
+                        _buildRedPacketIcon(isOpened),
+                        const SizedBox(width: 12),
 
                         // 祝福语
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                note ?? '恭喜发财，大吉大利',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: isOpened
-                                      ? const Color(0xFF8B6914)
-                                      : Colors.white,
-                                ),
-                              ),
-                            ],
+                          child: Text(
+                            note ?? '恭喜发财，大吉大利',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: isOpened
+                                  ? const Color(0xFF8B6914)
+                                  : Colors.white,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  // 底部标签
+                  // 底部标签分割线和标签区域
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withOpacity(0.06),
                     ),
                     child: Row(
                       children: [
                         Text(
-                          '红包',
+                          'N42红包',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 12,
                             color: isOpened
-                                ? const Color(0xFF8B6914).withOpacity(0.5)
-                                : Colors.white.withOpacity(0.6),
+                                ? const Color(0xFF8B6914).withOpacity(0.6)
+                                : Colors.white.withOpacity(0.7),
                           ),
                         ),
-                        if (isOpened) ...[
-                          const Spacer(),
-                          Text(
-                            _getStatusText(),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: const Color(0xFF8B6914).withOpacity(0.5),
-                            ),
+                        const Spacer(),
+                        Text(
+                          isOpened ? _getStatusText() : '领个好彩头',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isOpened
+                                ? const Color(0xFF8B6914).withOpacity(0.6)
+                                : Colors.white.withOpacity(0.7),
                           ),
-                        ],
+                        ),
                       ],
                     ),
                   ),
@@ -334,7 +305,7 @@ class RedPacketMessageWidget extends StatelessWidget {
             if (coverImageUrl != null && !isOpened)
               Positioned.fill(
                 child: Opacity(
-                  opacity: 0.3,
+                  opacity: 0.25,
                   child: Image.network(
                     coverImageUrl!,
                     fit: BoxFit.cover,
@@ -347,11 +318,47 @@ class RedPacketMessageWidget extends StatelessWidget {
       ),
     );
   }
+  
+  /// 红包图标（红色圆角方形背景，金色¥符号）
+  Widget _buildRedPacketIcon(bool isOpened) {
+    return Container(
+      width: 42,
+      height: 52,
+      decoration: BoxDecoration(
+        color: isOpened 
+            ? const Color(0xFFD4A853).withOpacity(0.5)
+            : const Color(0xFFD4380D),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Center(
+        child: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFD700),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              '¥',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: isOpened 
+                    ? const Color(0xFF8B6914)
+                    : const Color(0xFFD4380D),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   String _getStatusText() {
     switch (status) {
       case RedPacketStatus.pending:
-        return '';
+        return '领个好彩头';
       case RedPacketStatus.opened:
         return '已领取';
       case RedPacketStatus.expired:
