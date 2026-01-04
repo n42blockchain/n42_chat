@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,7 +19,7 @@ import '../chat/chat_page.dart';
 import 'contact_tile.dart';
 import 'contact_index_bar.dart';
 
-/// 通讯录页面
+/// 通讯录页面（仿微信）
 class ContactListPage extends StatefulWidget {
   /// 是否显示 AppBar（嵌入到主框架时可设为 false）
   final bool showAppBar;
@@ -90,19 +92,14 @@ class _ContactListPageState extends State<ContactListPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: bgColor,
       appBar: widget.showAppBar ? N42AppBar(
         title: '通讯录',
+        showBackButton: false,
         actions: [
-          IconButton(
-            icon: Icon(
-              _isSearchMode ? Icons.close : Icons.search,
-              color: isDark ? Colors.white : AppColors.textPrimary,
-            ),
-            onPressed: _toggleSearchMode,
-          ),
           IconButton(
             icon: Icon(
               Icons.person_add_outlined,
@@ -114,36 +111,14 @@ class _ContactListPageState extends State<ContactListPage> {
       ) : null,
       body: Column(
         children: [
-          // 搜索栏
-          if (_isSearchMode)
-            Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: N42SearchBar(
-                      controller: _searchController,
-                      onChanged: _onSearchChanged,
-                      hintText: '搜索联系人',
-                      autofocus: true,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: _onGlobalSearch,
-                    child: const Text('全局搜索'),
-                  ),
-                ],
-              ),
-            ),
+          // 搜索栏（始终显示）
+          _buildSearchBar(isDark),
 
           // 联系人列表
           Expanded(
             child: BlocConsumer<ContactBloc, ContactState>(
               listener: (context, state) {
                 if (state is ChatStarted) {
-                  // 导航到聊天页面
                   Navigator.of(context).pushNamed(
                     '/chat/${state.roomId}',
                   );
@@ -187,19 +162,46 @@ class _ContactListPageState extends State<ContactListPage> {
     );
   }
 
+  Widget _buildSearchBar(bool isDark) {
+    return Container(
+      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Container(
+        height: 36,
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: TextField(
+          controller: _searchController,
+          onChanged: _onSearchChanged,
+          style: TextStyle(
+            fontSize: 15,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+          decoration: InputDecoration(
+            hintText: '搜索',
+            hintStyle: TextStyle(
+              fontSize: 15,
+              color: isDark ? Colors.white54 : Colors.black45,
+            ),
+            prefixIcon: Icon(
+              Icons.search,
+              size: 20,
+              color: isDark ? Colors.white54 : Colors.black45,
+            ),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 8),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildContactList(ContactLoaded state, bool isDark) {
     // 搜索模式
     if (state.searchQuery.isNotEmpty) {
       return _buildSearchResults(state, isDark);
-    }
-
-    // 普通列表模式
-    if (state.contacts.isEmpty) {
-      return const N42EmptyState(
-        icon: Icons.contacts_outlined,
-        title: '暂无联系人',
-        description: '添加好友开始聊天',
-      );
     }
 
     // 准备索引字母的GlobalKey
@@ -207,6 +209,9 @@ class _ContactListPageState extends State<ContactListPage> {
     for (final letter in state.indexLetters) {
       _letterKeys[letter] = GlobalKey();
     }
+
+    // 完整的索引字母列表
+    final fullIndexLetters = ['🔍', '☆', ...state.indexLetters, '#'];
 
     return Stack(
       children: [
@@ -235,10 +240,22 @@ class _ContactListPageState extends State<ContactListPage> {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final contacts = state.groupedContacts[letter]!;
-                      return ContactTile(
-                        contact: contacts[index],
-                        onTap: () => _onContactTap(contacts[index]),
-                        onLongPress: () => _showContactMenu(contacts[index]),
+                      return Column(
+                        children: [
+                          ContactTile(
+                            contact: contacts[index],
+                            onTap: () => _onContactTap(contacts[index]),
+                            onLongPress: () => _showContactMenu(contacts[index]),
+                          ),
+                          if (index < contacts.length - 1)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 72),
+                              child: Divider(
+                                height: 1,
+                                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                              ),
+                            ),
+                        ],
                       );
                     },
                     childCount: state.groupedContacts[letter]?.length ?? 0,
@@ -257,11 +274,25 @@ class _ContactListPageState extends State<ContactListPage> {
         // 右侧字母索引条
         Positioned(
           right: 2,
-          top: 100,
+          top: 0,
           bottom: 50,
-          child: ContactIndexBar(
-            letters: state.indexLetters,
-            onLetterTap: _onLetterTap,
+          child: _WeChatIndexBar(
+            letters: fullIndexLetters,
+            onLetterTap: (letter) {
+              if (letter == '🔍') {
+                _searchController.clear();
+                FocusScope.of(context).unfocus();
+              } else if (letter == '☆') {
+                // 滚动到顶部
+                _scrollController.animateTo(
+                  0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOut,
+                );
+              } else {
+                _onLetterTap(letter);
+              }
+            },
           ),
         ),
       ],
@@ -315,57 +346,152 @@ class _ContactListPageState extends State<ContactListPage> {
   }
 
   Widget _buildFunctionEntries(ContactLoaded state, bool isDark) {
-    return Column(
-      children: [
-        // 新朋友（好友请求）
-        ListTile(
-          leading: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Colors.orange,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.person_add, color: Colors.white),
+    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    
+    return Container(
+      color: surfaceColor,
+      child: Column(
+        children: [
+          // 新的朋友
+          _buildFunctionItem(
+            isDark: isDark,
+            icon: _NewFriendIcon(),
+            title: '新的朋友',
+            badgeCount: state.friendRequests.length,
+            onTap: _showFriendRequestsPage,
           ),
-          title: const Text('新的朋友'),
-          trailing: state.friendRequests.isNotEmpty
-              ? Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          _buildItemDivider(isDark),
+          
+          // 仅聊天的朋友
+          _buildFunctionItem(
+            isDark: isDark,
+            icon: _ChatOnlyFriendIcon(),
+            title: '仅聊天的朋友',
+            onTap: () => _showComingSoon('仅聊天的朋友'),
+          ),
+          
+          const SizedBox(height: 8),
+          Container(
+            color: surfaceColor,
+            child: Column(
+              children: [
+                // 群聊
+                _buildFunctionItem(
+                  isDark: isDark,
+                  icon: _GroupChatIcon(),
+                  title: '群聊',
+                  onTap: _showGroupsPage,
+                ),
+                _buildItemDivider(isDark),
+                
+                // 标签
+                _buildFunctionItem(
+                  isDark: isDark,
+                  icon: _TagIcon(),
+                  title: '标签',
+                  onTap: () => _showComingSoon('标签'),
+                ),
+                _buildItemDivider(isDark),
+                
+                // 公众号
+                _buildFunctionItem(
+                  isDark: isDark,
+                  icon: _OfficialAccountIcon(),
+                  title: '公众号',
+                  onTap: () => _showComingSoon('公众号'),
+                ),
+                _buildItemDivider(isDark),
+                
+                // 服务号
+                _buildFunctionItem(
+                  isDark: isDark,
+                  icon: _ServiceAccountIcon(),
+                  title: '服务号',
+                  onTap: () => _showComingSoon('服务号'),
+                ),
+                _buildItemDivider(isDark),
+                
+                // 企业微信联系人
+                _buildFunctionItem(
+                  isDark: isDark,
+                  icon: _EnterpriseContactIcon(),
+                  title: '企业微信联系人',
+                  onTap: () => _showComingSoon('企业微信联系人'),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFunctionItem({
+    required bool isDark,
+    required Widget icon,
+    required String title,
+    int badgeCount = 0,
+    VoidCallback? onTap,
+  }) {
+    final textColor = isDark ? Colors.white : AppColors.textPrimary;
+    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    
+    return Material(
+      color: bgColor,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 44,
+                height: 44,
+                child: icon,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: textColor,
+                  ),
+                ),
+              ),
+              if (badgeCount > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: AppColors.error,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    '${state.friendRequests.length}',
+                    '$badgeCount',
                     style: const TextStyle(color: Colors.white, fontSize: 12),
                   ),
-                )
-              : null,
-          onTap: _showFriendRequestsPage,
-        ),
-
-        // 群聊
-        ListTile(
-          leading: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.group, color: Colors.white),
+                ),
+              Icon(
+                Icons.chevron_right,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                size: 20,
+              ),
+            ],
           ),
-          title: const Text('群聊'),
-          onTap: _showGroupsPage,
         ),
+      ),
+    );
+  }
 
-        Divider(
-          height: 1,
-          color: isDark ? AppColors.dividerDark : AppColors.divider,
-        ),
-      ],
+  Widget _buildItemDivider(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 72),
+      child: Divider(
+        height: 1,
+        color: isDark ? AppColors.dividerDark : AppColors.divider,
+      ),
     );
   }
 
@@ -412,8 +538,16 @@ class _ContactListPageState extends State<ContactListPage> {
     );
   }
 
+  void _showComingSoon(String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature 功能即将推出'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   void _onContactTap(ContactEntity contact) {
-    // 开始与该联系人聊天
     _startChatWithContact(contact);
   }
   
@@ -527,13 +661,12 @@ class _ContactListPageState extends State<ContactListPage> {
   Future<void> _recommendToFriend(ContactEntity contact) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    // 显示联系人选择器（选择要推荐给谁）
     final selectedContact = await showModalBottomSheet<ContactEntity>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _RecommendContactSheet(
-        excludeUserId: contact.userId, // 排除被推荐的联系人
+        excludeUserId: contact.userId,
         isDark: isDark,
       ),
     );
@@ -541,7 +674,6 @@ class _ContactListPageState extends State<ContactListPage> {
     if (selectedContact == null || !mounted) return;
     
     try {
-      // 显示加载提示
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Row(
@@ -559,20 +691,16 @@ class _ContactListPageState extends State<ContactListPage> {
         ),
       );
       
-      // 获取或创建与目标联系人的私聊房间
       final contactRepository = getIt<IContactRepository>();
       final roomId = await contactRepository.startDirectChat(selectedContact.userId);
       
-      // 发送名片消息
       final cardContent = '''[名片]
 联系人：${contact.effectiveDisplayName}
 ID：${contact.userId}''';
       
-      // 使用 ChatBloc 发送消息
       final chatBloc = getIt<ChatBloc>();
       chatBloc.add(InitializeChat(roomId));
       
-      // 等待一小段时间确保聊天初始化
       await Future.delayed(const Duration(milliseconds: 500));
       chatBloc.add(SendTextMessage(cardContent));
       
@@ -627,7 +755,6 @@ ID：${contact.userId}''';
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              // TODO: 保存备注名到本地存储或 Matrix 账户数据
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('已设置备注为: ${controller.text}'),
@@ -643,7 +770,6 @@ ID：${contact.userId}''';
   
   Future<void> _startChatWithContact(ContactEntity contact) async {
     try {
-      // 显示加载指示
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Row(
@@ -661,14 +787,12 @@ ID：${contact.userId}''';
         ),
       );
       
-      // 获取或创建私聊房间
       final contactRepository = getIt<IContactRepository>();
       final roomId = await contactRepository.startDirectChat(contact.userId);
       
       if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       
-      // 导航到聊天页面
       final conversation = ConversationEntity(
         id: roomId,
         name: contact.effectiveDisplayName,
@@ -739,7 +863,6 @@ ID：${contact.userId}''';
           ),
           TextButton(
             onPressed: () {
-              // 扫码添加
               Navigator.pop(context);
             },
             child: const Text('扫一扫'),
@@ -775,6 +898,427 @@ ID：${contact.userId}''';
     );
   }
 }
+
+// ==================== 微信风格图标组件 ====================
+
+/// 新的朋友图标 - 橙色背景，双人+号
+class _NewFriendIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFA9D3B),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: CustomPaint(
+        size: const Size(44, 44),
+        painter: _NewFriendPainter(),
+      ),
+    );
+  }
+}
+
+class _NewFriendPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    
+    // 主人形
+    canvas.drawCircle(Offset(cx - 4, cy - 6), 6, paint);
+    final bodyPath = Path()
+      ..moveTo(cx - 12, cy + 12)
+      ..quadraticBezierTo(cx - 4, cy + 2, cx + 4, cy + 12);
+    paint.style = PaintingStyle.stroke;
+    paint.strokeWidth = 4;
+    paint.strokeCap = StrokeCap.round;
+    canvas.drawPath(bodyPath, paint);
+    
+    // 加号
+    paint.strokeWidth = 2.5;
+    canvas.drawLine(Offset(cx + 10, cy - 2), Offset(cx + 10, cy + 10), paint);
+    canvas.drawLine(Offset(cx + 4, cy + 4), Offset(cx + 16, cy + 4), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// 仅聊天的朋友图标 - 橙色背景，单人
+class _ChatOnlyFriendIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFA9D3B),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Center(
+        child: Icon(Icons.person, color: Colors.white, size: 26),
+      ),
+    );
+  }
+}
+
+/// 群聊图标 - 绿色背景，双人
+class _GroupChatIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF57BE6A),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Center(
+        child: Icon(Icons.group, color: Colors.white, size: 26),
+      ),
+    );
+  }
+}
+
+/// 标签图标 - 蓝色背景，标签
+class _TagIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF3E7FE1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: CustomPaint(
+        size: const Size(44, 44),
+        painter: _TagPainter(),
+      ),
+    );
+  }
+}
+
+class _TagPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    
+    // 标签形状
+    final path = Path()
+      ..moveTo(cx - 10, cy - 10)
+      ..lineTo(cx + 6, cy - 10)
+      ..lineTo(cx + 12, cy - 4)
+      ..lineTo(cx + 12, cy + 12)
+      ..lineTo(cx - 10, cy + 12)
+      ..close();
+    canvas.drawPath(path, paint);
+    
+    // 小圆孔
+    paint.color = const Color(0xFF3E7FE1);
+    canvas.drawCircle(Offset(cx - 4, cy - 4), 3, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// 公众号图标 - 蓝色背景，文档
+class _OfficialAccountIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF576B95),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: CustomPaint(
+        size: const Size(44, 44),
+        painter: _OfficialAccountPainter(),
+      ),
+    );
+  }
+}
+
+class _OfficialAccountPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    
+    // 文档外框
+    final rect = RRect.fromRectAndRadius(
+      Rect.fromCenter(center: Offset(cx, cy), width: 22, height: 26),
+      const Radius.circular(2),
+    );
+    canvas.drawRRect(rect, paint);
+    
+    // 横线
+    canvas.drawLine(Offset(cx - 6, cy - 6), Offset(cx + 6, cy - 6), paint);
+    canvas.drawLine(Offset(cx - 6, cy), Offset(cx + 6, cy), paint);
+    canvas.drawLine(Offset(cx - 6, cy + 6), Offset(cx + 2, cy + 6), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// 服务号图标 - 红色背景，信封
+class _ServiceAccountIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFE64340),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: CustomPaint(
+        size: const Size(44, 44),
+        painter: _ServiceAccountPainter(),
+      ),
+    );
+  }
+}
+
+class _ServiceAccountPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    
+    // 信封外框
+    final rect = RRect.fromRectAndRadius(
+      Rect.fromCenter(center: Offset(cx, cy), width: 24, height: 18),
+      const Radius.circular(2),
+    );
+    canvas.drawRRect(rect, paint);
+    
+    // 信封V形
+    final path = Path()
+      ..moveTo(cx - 11, cy - 7)
+      ..lineTo(cx, cy + 2)
+      ..lineTo(cx + 11, cy - 7);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// 企业微信联系人图标 - 蓝色背景，对话框
+class _EnterpriseContactIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF3E7FE1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: CustomPaint(
+        size: const Size(44, 44),
+        painter: _EnterpriseContactPainter(),
+      ),
+    );
+  }
+}
+
+class _EnterpriseContactPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    
+    // 左对话框
+    final leftPath = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx - 14, cy - 9, 14, 12),
+        const Radius.circular(3),
+      ));
+    canvas.drawPath(leftPath, paint);
+    
+    // 右对话框
+    final rightPath = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx + 2, cy - 3, 12, 10),
+        const Radius.circular(3),
+      ));
+    canvas.drawPath(rightPath, paint);
+    
+    // 箭头
+    canvas.drawLine(Offset(cx - 6, cy + 3), Offset(cx - 6, cy + 9), paint);
+    canvas.drawLine(Offset(cx + 6, cy + 7), Offset(cx + 6, cy + 11), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// 微信风格字母索引条
+class _WeChatIndexBar extends StatefulWidget {
+  final List<String> letters;
+  final ValueChanged<String> onLetterTap;
+
+  const _WeChatIndexBar({
+    required this.letters,
+    required this.onLetterTap,
+  });
+
+  @override
+  State<_WeChatIndexBar> createState() => _WeChatIndexBarState();
+}
+
+class _WeChatIndexBarState extends State<_WeChatIndexBar> {
+  String? _currentLetter;
+  bool _isDragging = false;
+
+  void _onVerticalDragStart(DragStartDetails details) {
+    setState(() {
+      _isDragging = true;
+    });
+    _updateLetter(details.localPosition);
+  }
+
+  void _onVerticalDragUpdate(DragUpdateDetails details) {
+    _updateLetter(details.localPosition);
+  }
+
+  void _onVerticalDragEnd(DragEndDetails details) {
+    setState(() {
+      _isDragging = false;
+      _currentLetter = null;
+    });
+  }
+
+  void _updateLetter(Offset position) {
+    if (widget.letters.isEmpty) return;
+
+    final box = context.findRenderObject() as RenderBox;
+    final itemHeight = box.size.height / widget.letters.length;
+    final index = (position.dy / itemHeight).floor();
+
+    if (index >= 0 && index < widget.letters.length) {
+      final letter = widget.letters[index];
+      if (letter != _currentLetter) {
+        setState(() {
+          _currentLetter = letter;
+        });
+        widget.onLetterTap(letter);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    if (widget.letters.isEmpty) return const SizedBox.shrink();
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // 字母指示器气泡
+        if (_isDragging && _currentLetter != null)
+          Positioned(
+            right: 40,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  _currentLetter!,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+        // 索引条
+        GestureDetector(
+          onVerticalDragStart: _onVerticalDragStart,
+          onVerticalDragUpdate: _onVerticalDragUpdate,
+          onVerticalDragEnd: _onVerticalDragEnd,
+          child: Container(
+            width: 20,
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            decoration: BoxDecoration(
+              color: _isDragging
+                  ? (isDark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.black.withValues(alpha: 0.05))
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: widget.letters.map((letter) {
+                final isActive = letter == _currentLetter;
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => widget.onLetterTap(letter),
+                    child: Container(
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: isActive ? AppColors.primary : Colors.transparent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        letter,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                          color: isActive
+                              ? Colors.white
+                              : (isDark
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.textSecondary),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ==================== 子页面组件 ====================
 
 /// 新的朋友（好友请求）页面
 class _FriendRequestsPage extends StatefulWidget {
@@ -966,8 +1510,6 @@ class _GroupListPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           
-          // 过滤出群聊（这里需要根据实际数据结构调整）
-          // 目前假设 ContactBloc 中有群聊列表
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -988,7 +1530,6 @@ class _GroupListPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: () {
-                    // TODO: 创建群聊
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('创建群聊功能开发中...')),
                     );
@@ -1040,7 +1581,6 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
       final contacts = await contactRepository.getContacts();
       if (mounted) {
         setState(() {
-          // 排除被推荐的联系人
           _contacts = contacts.where((c) => c.userId != widget.excludeUserId).toList();
           _isLoading = false;
         });
@@ -1173,4 +1713,3 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
     );
   }
 }
-
