@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/contact_entity.dart';
@@ -75,6 +76,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     RefreshContacts event,
     Emitter<ContactState> emit,
   ) async {
+    debugPrint('ContactBloc: RefreshContacts triggered');
     if (state is! ContactLoaded) {
       add(const LoadContacts());
       return;
@@ -82,6 +84,15 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
 
     try {
       final contacts = await _contactRepository.getContacts();
+      debugPrint('ContactBloc: Loaded ${contacts.length} contacts');
+      
+      // 打印备注信息
+      for (final c in contacts) {
+        if (c.remark != null && c.remark!.isNotEmpty) {
+          debugPrint('ContactBloc: Contact ${c.userId} has remark: ${c.remark}');
+        }
+      }
+      
       final friendRequests = await _contactRepository.getPendingFriendRequests();
       final grouped = _groupContactsByLetter(contacts);
       final currentState = state as ContactLoaded;
@@ -298,14 +309,19 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     Emitter<ContactState> emit,
   ) async {
     try {
+      debugPrint('ContactBloc: Setting remark for ${event.userId} to "${event.remark}"');
       await _contactRepository.setContactRemark(event.userId, event.remark);
+      debugPrint('ContactBloc: Remark saved successfully');
       
       // 发送成功状态
       emit(ContactRemarkUpdated(userId: event.userId, remark: event.remark));
+      debugPrint('ContactBloc: Emitted ContactRemarkUpdated');
       
       // 刷新联系人列表以更新备注
       add(const RefreshContacts());
+      debugPrint('ContactBloc: Added RefreshContacts event');
     } catch (e) {
+      debugPrint('ContactBloc: Error setting remark - $e');
       emit(ContactError(e.toString()));
     }
   }
