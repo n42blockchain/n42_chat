@@ -470,7 +470,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
 }
 
 /// 朋友资料页面（图三）
-class FriendInfoPage extends StatelessWidget {
+class FriendInfoPage extends StatefulWidget {
   final String userId;
   final String displayName;
   final String? avatarUrl;
@@ -483,6 +483,38 @@ class FriendInfoPage extends StatelessWidget {
     this.avatarUrl,
     this.remark,
   });
+
+  @override
+  State<FriendInfoPage> createState() => _FriendInfoPageState();
+}
+
+class _FriendInfoPageState extends State<FriendInfoPage> {
+  String? _currentRemark;
+  
+  @override
+  void initState() {
+    super.initState();
+    _currentRemark = widget.remark;
+    _loadRemark();
+  }
+  
+  void _loadRemark() {
+    try {
+      final contactState = context.read<ContactBloc>().state;
+      if (contactState is ContactLoaded) {
+        final contact = contactState.contacts.where(
+          (c) => c.userId == widget.userId
+        ).firstOrNull;
+        if (contact != null && mounted) {
+          setState(() {
+            _currentRemark = contact.remark;
+          });
+        }
+      }
+    } catch (e) {
+      // ContactBloc 可能不可用
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -525,10 +557,10 @@ class FriendInfoPage extends StatelessWidget {
               children: [
                 _buildMenuItem(
                   title: '备注名',
-                  value: remark ?? displayName,
+                  value: _currentRemark ?? widget.displayName,
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () => _openEditRemark(context),
+                  onTap: () => _openEditRemark(),
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
@@ -665,6 +697,7 @@ class FriendInfoPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
+            // 左侧标题
             Text(
               title,
               style: TextStyle(
@@ -672,18 +705,24 @@ class FriendInfoPage extends StatelessWidget {
                 color: textColor,
               ),
             ),
-            const Spacer(),
-            if (value != null)
-              Flexible(
-                child: Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: secondaryTextColor,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
+            // 中间弹性空间
+            Expanded(
+              child: value != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: Text(
+                        value,
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: secondaryTextColor,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            // 右侧箭头
             if (showArrow) ...[
               const SizedBox(width: 4),
               Icon(
@@ -705,16 +744,37 @@ class FriendInfoPage extends StatelessWidget {
     );
   }
   
-  void _openEditRemark(BuildContext context) {
+  void _openEditRemark() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => EditRemarkPage(
-          userId: userId,
-          currentRemark: remark,
-          displayName: displayName,
-        ),
+        builder: (ctx) {
+          // 传递 ContactBloc
+          ContactBloc? contactBloc;
+          try {
+            contactBloc = context.read<ContactBloc>();
+          } catch (e) {
+            // ContactBloc 可能不可用
+          }
+          
+          final page = EditRemarkPage(
+            userId: widget.userId,
+            currentRemark: _currentRemark,
+            displayName: widget.displayName,
+          );
+          
+          if (contactBloc != null) {
+            return BlocProvider.value(
+              value: contactBloc,
+              child: page,
+            );
+          }
+          return page;
+        },
       ),
-    );
+    ).then((_) {
+      // 返回时刷新备注
+      _loadRemark();
+    });
   }
 }
 
