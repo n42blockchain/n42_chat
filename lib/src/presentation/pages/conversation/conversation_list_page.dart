@@ -190,10 +190,11 @@ class _ConversationListPageState extends State<ConversationListPage> {
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
-            Icons.star_border,
+            Icons.arrow_back_ios,
             color: isDark ? Colors.white : AppColors.textPrimary,
+            size: 20,
           ),
-          onPressed: () => _showComingSoon('星标消息'),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           '消息',
