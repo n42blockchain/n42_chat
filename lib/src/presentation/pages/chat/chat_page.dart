@@ -40,6 +40,7 @@ import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/red_packet_dialogs.dart';
 import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../contact/contact_detail_page.dart';
 import '../search/chat_search_bar.dart';
 import 'message_item.dart';
 
@@ -400,7 +401,23 @@ class _ChatPageState extends State<ChatPage> {
 
   void _onAvatarTap(MessageEntity message) {
     // 点击头像查看用户资料
-    // TODO: 跳转到用户资料页
+    if (message.isFromMe) {
+      // 点击自己的头像，可以跳转到个人资料页
+      return;
+    }
+    
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ContactDetailPage(
+          userId: message.senderId,
+          displayName: message.senderName,
+          avatarUrl: message.senderAvatarUrl,
+          onSendMessage: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
+    );
   }
   
   /// 双击头像拍一拍
