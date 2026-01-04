@@ -594,80 +594,90 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // 检查 ContactBloc 是否可用
+    bool hasContactBloc = false;
+    try {
+      context.read<ContactBloc>();
+      hasContactBloc = true;
+    } catch (e) {
+      // ContactBloc 不可用
+    }
 
-    return BlocListener<ContactBloc, ContactState>(
-      listener: (context, state) {
-        // 当联系人备注更新时，刷新界面
-        debugPrint('ChatPage: ContactBloc state changed to ${state.runtimeType}');
-        if (state is ContactRemarkUpdated) {
-          debugPrint('ChatPage: Remark updated for ${state.userId} to "${state.remark}"');
-          if (mounted) setState(() {});
-        } else if (state is ContactLoaded) {
-          debugPrint('ChatPage: Contacts loaded, refreshing UI');
-          if (mounted) setState(() {});
-        }
-      },
-      child: Stack(
-        children: [
-          Scaffold(
-            backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-            appBar: _buildAppBar(isDark),
-            body: Column(
-              children: [
-                // 聊天内搜索栏
-                if (_showSearchBar)
-                  BlocProvider(
-                    create: (_) => getIt<SearchBloc>(),
-                    child: ChatSearchBar(
-                      roomId: widget.conversation.id,
-                      onClose: _toggleSearch,
-                      onNavigateToMessage: _navigateToMessage,
-                    ),
-                  ),
-
-                // 消息列表
-                Expanded(
-                  child: Stack(
-                    children: [
-                      _buildMessageList(),
-
-                      // 回到底部按钮
-                      if (_showScrollToBottom)
-                        Positioned(
-                          right: 16,
-                          bottom: 16,
-                          child: _buildScrollToBottomButton(),
-                        ),
-                    ],
+    Widget content = Stack(
+      children: [
+        Scaffold(
+          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          appBar: _buildAppBar(isDark),
+          body: Column(
+            children: [
+              // 聊天内搜索栏
+              if (_showSearchBar)
+                BlocProvider(
+                  create: (_) => getIt<SearchBloc>(),
+                  child: ChatSearchBar(
+                    roomId: widget.conversation.id,
+                    onClose: _toggleSearch,
+                    onNavigateToMessage: _navigateToMessage,
                   ),
                 ),
 
-                // 回复预览
-                if (!_isMultiSelectMode) _buildReplyPreview(),
-                
-                // @ 提醒成员选择器（群聊时）
-                if (_showMentionPicker && !_isMultiSelectMode) _buildMentionPicker(),
+              // 消息列表
+              Expanded(
+                child: Stack(
+                  children: [
+                    _buildMessageList(),
 
-                // 多选模式下显示操作栏，否则显示输入栏
-                if (_isMultiSelectMode)
-                  _buildMultiSelectBottomBar()
-                else if (!_showSearchBar)
-                  _buildInputBar(),
+                    // 回到底部按钮
+                    if (_showScrollToBottom)
+                      Positioned(
+                        right: 16,
+                        bottom: 16,
+                        child: _buildScrollToBottomButton(),
+                      ),
+                  ],
+                ),
+              ),
 
-                // 表情选择器
-                if (_showEmojiPicker && !_isMultiSelectMode) _buildEmojiPicker(),
-                
-                // 更多功能面板（仅在非多选模式下）
-                if (_showMorePanel && !_isMultiSelectMode) _buildMorePanel(),
-              ],
-            ),
+              // 回复预览
+              if (!_isMultiSelectMode) _buildReplyPreview(),
+              
+              // @ 提醒成员选择器（群聊时）
+              if (_showMentionPicker && !_isMultiSelectMode) _buildMentionPicker(),
+
+              // 多选模式下显示操作栏，否则显示输入栏
+              if (_isMultiSelectMode)
+                _buildMultiSelectBottomBar()
+              else if (!_showSearchBar)
+                _buildInputBar(),
+
+              // 表情选择器
+              if (_showEmojiPicker && !_isMultiSelectMode) _buildEmojiPicker(),
+              
+              // 更多功能面板（仅在非多选模式下）
+              if (_showMorePanel && !_isMultiSelectMode) _buildMorePanel(),
+            ],
           ),
-          
-          // 全屏录音浮层
-          if (_isRecording) _buildRecordingOverlay(),
-        ],
-      ),
+        ),
+        
+        // 全屏录音浮层
+        if (_isRecording) _buildRecordingOverlay(),
+      ],
     );
+    
+    // 如果有 ContactBloc，用 BlocListener 包装来监听备注更新
+    if (hasContactBloc) {
+      return BlocListener<ContactBloc, ContactState>(
+        listener: (context, state) {
+          if (state is ContactRemarkUpdated || state is ContactLoaded) {
+            if (mounted) setState(() {});
+          }
+        },
+        child: content,
+      );
+    }
+    
+    return content;
   }
   
   /// 录音状态变化处理
