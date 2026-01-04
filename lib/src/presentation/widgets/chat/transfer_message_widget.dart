@@ -216,92 +216,92 @@ class RedPacketMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isOpened = status != RedPacketStatus.pending;
+    
+    // 已领取的红包使用浅棕色背景（类似微信）
+    final bgColor = isOpened 
+        ? const Color(0xFFD4B896) // 已领取：浅棕色/米色
+        : const Color(0xFFE64340); // 未领取：红色
+    
+    final textColor = isOpened 
+        ? const Color(0xFF8B7355) // 已领取：深棕色文字
+        : Colors.white; // 未领取：白色文字
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 260,
         decoration: BoxDecoration(
+          color: bgColor,
           borderRadius: BorderRadius.circular(6),
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-            // 背景
-            Container(
-              decoration: BoxDecoration(
-                color: isOpened 
-                    ? const Color(0xFFE8C98E) // 已领取：浅金色
-                    : const Color(0xFFFA9D3B), // 未领取：橙色
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 主体内容
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // 红包图标（红色方形背景，金色¥符号圆圈）
-                        _buildRedPacketIcon(isOpened),
-                        const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 主体内容
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // 红包图标
+                      _buildRedPacketIcon(isOpened),
+                      const SizedBox(width: 12),
 
-                        // 祝福语
-                        Expanded(
-                          child: Text(
-                            note ?? '恭喜发财，大吉大利',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: isOpened
-                                  ? const Color(0xFF8B6914)
-                                  : Colors.white,
+                      // 祝福语和状态
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              note ?? '恭喜发财，大吉大利',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: textColor,
+                              ),
                             ),
-                          ),
+                            if (isOpened) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                _getStatusText(),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: textColor.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
 
-                  // 底部标签分割线和标签区域
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.06),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'N42红包',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isOpened
-                                ? const Color(0xFF8B6914).withOpacity(0.6)
-                                : Colors.white.withOpacity(0.7),
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          isOpened ? _getStatusText() : '领个好彩头',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isOpened
-                                ? const Color(0xFF8B6914).withOpacity(0.6)
-                                : Colors.white.withOpacity(0.7),
-                          ),
-                        ),
-                      ],
+                // 底部标签区域
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.05),
+                  ),
+                  child: Text(
+                    'N42红包',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: textColor.withOpacity(0.6),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             
-            // 封面图片覆盖层（如果有）
+            // 封面图片覆盖层（仅未领取时显示）
             if (coverImageUrl != null && !isOpened)
               Positioned.fill(
                 child: Opacity(
@@ -319,34 +319,48 @@ class RedPacketMessageWidget extends StatelessWidget {
     );
   }
   
-  /// 红包图标（红色圆角方形背景，金色¥符号）
+  /// 红包图标（圆形勾选或红包图标）
   Widget _buildRedPacketIcon(bool isOpened) {
+    // 已领取：显示勾选图标（类似转账消息）
+    if (isOpened) {
+      return Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.25),
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(
+          Icons.check,
+          size: 22,
+          color: Color(0xFF8B7355),
+        ),
+      );
+    }
+    
+    // 未领取：显示红包图标
     return Container(
-      width: 42,
-      height: 52,
+      width: 40,
+      height: 50,
       decoration: BoxDecoration(
-        color: isOpened 
-            ? const Color(0xFFD4A853).withOpacity(0.5)
-            : const Color(0xFFD4380D),
+        color: const Color(0xFFD4380D),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Center(
         child: Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFD700),
+          width: 22,
+          height: 22,
+          decoration: const BoxDecoration(
+            color: Color(0xFFFFD700),
             shape: BoxShape.circle,
           ),
-          child: Center(
+          child: const Center(
             child: Text(
               '¥',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: isOpened 
-                    ? const Color(0xFF8B6914)
-                    : const Color(0xFFD4380D),
+                color: Color(0xFFD4380D),
               ),
             ),
           ),

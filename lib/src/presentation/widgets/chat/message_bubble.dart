@@ -211,9 +211,16 @@ class MessageBubble extends StatelessWidget {
 
   /// 无气泡内容（用于图片/视频消息）
   Widget _buildNoBubbleContent() {
+    // 如果外部没有设置 onTap 和 onLongPress，直接返回 child
+    // 这样让 child 内部的手势可以正常响应（如红包、转账消息）
+    if (onTap == null && onLongPress == null) {
+      return child;
+    }
+    
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
+      behavior: HitTestBehavior.translucent, // 允许子组件也响应点击
       child: child,
     );
   }

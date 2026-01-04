@@ -114,6 +114,10 @@ class MessageItem extends StatelessWidget {
                             message.type == MessageType.video ||
                             message.type == MessageType.redPacket ||
                             message.type == MessageType.transfer;
+    
+    // 红包和转账消息有自己的点击处理，不需要外层的 onTap
+    final hasOwnTapHandler = message.type == MessageType.redPacket ||
+                             message.type == MessageType.transfer;
 
     Widget bubble = MessageBubble(
       isSelf: message.isFromMe,
@@ -122,7 +126,7 @@ class MessageItem extends StatelessWidget {
       showTimestamp: false,
       avatarUrl: message.senderAvatarUrl,
       avatarName: displayName,
-      onTap: onTap,
+      onTap: hasOwnTapHandler ? null : onTap,
       onLongPress: onLongPress,
       onAvatarTap: onAvatarTap,
       onAvatarDoubleTap: onAvatarDoubleTap,

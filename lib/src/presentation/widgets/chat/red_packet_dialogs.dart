@@ -45,6 +45,23 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     return double.tryParse(text) ?? 0.0;
   }
   
+  /// 获取当前币种的小数位数限制
+  int get _decimalPlaces {
+    switch (_selectedToken) {
+      case 'BTC':
+        return 8;  // BTC 最多 8 位小数
+      case 'ETH':
+        return 18; // ETH 最多 18 位小数
+      case 'CNY':
+      case 'USDT':
+      default:
+        return 2;  // CNY/USDT 最多 2 位小数
+    }
+  }
+  
+  /// 获取金额输入的正则表达式
+  String get _amountPattern => r'^\d*\.?\d{0,' + _decimalPlaces.toString() + r'}';
+  
   String get _currencySymbol {
     switch (_selectedToken) {
       case 'CNY':
@@ -55,6 +72,24 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
         return '₿';
       default:
         return '\$';
+    }
+  }
+  
+  /// 切换币种时验证并截断金额小数位
+  void _validateAmountDecimals() {
+    final text = _amountController.text;
+    if (text.isEmpty) return;
+    
+    final dotIndex = text.indexOf('.');
+    if (dotIndex == -1) return; // 没有小数点，不需要处理
+    
+    final decimals = text.length - dotIndex - 1;
+    if (decimals > _decimalPlaces) {
+      // 截断多余的小数位
+      _amountController.text = text.substring(0, dotIndex + 1 + _decimalPlaces);
+      _amountController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _amountController.text.length),
+      );
     }
   }
   
@@ -166,21 +201,21 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                       ),
                       const SizedBox(width: 8),
                       SizedBox(
-                        width: 120,
+                        width: 140,
                         child: TextField(
                           controller: _amountController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                            FilteringTextInputFormatter.allow(RegExp(_amountPattern)),
                           ],
                           textAlign: TextAlign.right,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                           ),
-                          decoration: const InputDecoration(
-                            hintText: '0.00',
-                            hintStyle: TextStyle(color: Colors.white38),
+                          decoration: InputDecoration(
+                            hintText: _decimalPlaces > 2 ? '0.0' : '0.00',
+                            hintStyle: const TextStyle(color: Colors.white38),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
                             isDense: true,
@@ -467,7 +502,11 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                   ? const Icon(Icons.check, color: Color(0xFFE85D04))
                   : null,
               onTap: () {
-                setState(() => _selectedToken = token);
+                setState(() {
+                  _selectedToken = token;
+                  // 切换币种时验证金额小数位
+                  _validateAmountDecimals();
+                });
                 Navigator.pop(context);
               },
             )),
@@ -711,7 +750,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 24),
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -727,37 +766,47 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
               children: [
                 Align(
                   alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
-                      child: const Icon(Icons.close, color: Colors.white70, size: 24),
-                    ),
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: const Icon(Icons.close, color: Colors.white70, size: 24),
                   ),
                 ),
                 
                 Text(
                   '${widget.senderName}的红包',
                   style: const TextStyle(color: Colors.white, fontSize: 14),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 16),
                 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      widget.claimedAmount ?? '0',
-                      style: const TextStyle(color: Colors.white, fontSize: 48, fontWeight: FontWeight.bold),
+                // 金额显示 - 使用 FittedBox 自适应
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          widget.claimedAmount ?? '0',
+                          style: const TextStyle(
+                            color: Colors.white, 
+                            fontSize: 48, 
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            ' ${widget.token}',
+                            style: const TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        ),
+                      ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        ' ${widget.token}',
-                        style: const TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -783,13 +832,13 @@ enum OpenRedPacketStatus {
   expired,
 }
 
-/// 发转账弹窗
-class SendTransferDialog extends StatefulWidget {
+/// 发转账页面（全屏，解决溢出问题）
+class SendTransferPage extends StatefulWidget {
   final String receiverName;
   final String? receiverAvatar;
   final Function(String amount, String token, String? memo) onSend;
   
-  const SendTransferDialog({
+  const SendTransferPage({
     super.key,
     required this.receiverName,
     this.receiverAvatar,
@@ -797,15 +846,50 @@ class SendTransferDialog extends StatefulWidget {
   });
   
   @override
-  State<SendTransferDialog> createState() => _SendTransferDialogState();
+  State<SendTransferPage> createState() => _SendTransferPageState();
 }
 
-class _SendTransferDialogState extends State<SendTransferDialog> {
+class _SendTransferPageState extends State<SendTransferPage> {
   final _amountController = TextEditingController();
   final _memoController = TextEditingController();
   
   String _selectedToken = 'CNY';
   final List<String> _tokens = ['CNY', 'ETH', 'USDT', 'BTC'];
+  
+  /// 获取当前币种的小数位数限制
+  int get _decimalPlaces {
+    switch (_selectedToken) {
+      case 'BTC':
+        return 8;  // BTC 最多 8 位小数
+      case 'ETH':
+        return 18; // ETH 最多 18 位小数
+      case 'CNY':
+      case 'USDT':
+      default:
+        return 2;  // CNY/USDT 最多 2 位小数
+    }
+  }
+  
+  /// 获取金额输入的正则表达式
+  String get _amountPattern => r'^\d*\.?\d{0,' + _decimalPlaces.toString() + r'}';
+  
+  /// 切换币种时验证并截断金额小数位
+  void _validateAmountDecimals() {
+    final text = _amountController.text;
+    if (text.isEmpty) return;
+    
+    final dotIndex = text.indexOf('.');
+    if (dotIndex == -1) return; // 没有小数点，不需要处理
+    
+    final decimals = text.length - dotIndex - 1;
+    if (decimals > _decimalPlaces) {
+      // 截断多余的小数位
+      _amountController.text = text.substring(0, dotIndex + 1 + _decimalPlaces);
+      _amountController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _amountController.text.length),
+      );
+    }
+  }
   
   @override
   void dispose() {
@@ -833,187 +917,224 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
   
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
-    
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 24,
-        bottom: 24 + bottomPadding,
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF9A825),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text(
+          '转账',
+          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        centerTitle: true,
       ),
-      child: Container(
-        width: 320,
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.7,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 头部
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF9A825),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // 接收者信息
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Colors.grey[200],
+                    backgroundImage: widget.receiverAvatar != null
+                        ? NetworkImage(widget.receiverAvatar!)
+                        : null,
+                    child: widget.receiverAvatar == null
+                        ? Text(
+                            widget.receiverName.isNotEmpty ? widget.receiverName[0] : '?',
+                            style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold),
+                          )
+                        : null,
                   ),
-                ),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
-                      child: const Icon(Icons.close, color: Colors.white70, size: 24),
-                    ),
-                    const Expanded(
-                      child: Text(
-                        '转账',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                  ],
-                ),
-              ),
-              
-              // 接收者信息
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.grey[200],
-                      backgroundImage: widget.receiverAvatar != null
-                          ? NetworkImage(widget.receiverAvatar!)
-                          : null,
-                      child: widget.receiverAvatar == null
-                          ? Text(
-                              widget.receiverName.isNotEmpty ? widget.receiverName[0] : '?',
-                              style: TextStyle(color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.bold),
-                            )
-                          : null,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('转账给', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                          Text(widget.receiverName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              const Divider(height: 1),
-              
-              // 金额输入
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('转账金额', style: TextStyle(fontSize: 14, color: Colors.grey)),
-                    const SizedBox(height: 8),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        const Text('转账给', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                        const SizedBox(height: 2),
+                        Text(widget.receiverName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 12),
+            
+            // 金额输入卡片
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('转账金额', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // 币种选择
+                      GestureDetector(
+                        onTap: _showTokenPicker,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
                             color: Colors.grey[100],
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: _selectedToken,
-                              isDense: true,
-                              items: _tokens.map((token) {
-                                return DropdownMenuItem(value: token, child: Text(token));
-                              }).toList(),
-                              onChanged: (value) {
-                                if (value != null) setState(() => _selectedToken = value);
-                              },
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextField(
-                            controller: _amountController,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(_selectedToken, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                              const Icon(Icons.arrow_drop_down, size: 20),
                             ],
-                            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                            decoration: const InputDecoration(
-                              hintText: '0.00',
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.zero,
-                              isDense: true,
-                            ),
                           ),
                         ),
-                      ],
-                    ),
-                    
-                    const SizedBox(height: 12),
-                    
-                    TextField(
-                      controller: _memoController,
-                      maxLength: 50,
-                      decoration: InputDecoration(
-                        hintText: '添加转账说明',
-                        hintStyle: TextStyle(color: Colors.grey[400]),
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide.none,
-                        ),
-                        counterText: '',
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        isDense: true,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              // 转账按钮
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 44,
-                  child: ElevatedButton(
-                    onPressed: _send,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF9A825),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      elevation: 0,
-                    ),
-                    child: const Text('确认转账', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      const SizedBox(width: 16),
+                      // 金额输入
+                      Expanded(
+                        child: TextField(
+                          controller: _amountController,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(_amountPattern)),
+                          ],
+                          style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                          decoration: InputDecoration(
+                            hintText: '0.00',
+                            hintStyle: TextStyle(color: Colors.grey),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  
+                  const SizedBox(height: 16),
+                  const Divider(height: 1),
+                  const SizedBox(height: 16),
+                  
+                  // 转账说明
+                  TextField(
+                    controller: _memoController,
+                    maxLength: 50,
+                    decoration: InputDecoration(
+                      hintText: '添加转账说明',
+                      hintStyle: TextStyle(color: Colors.grey[400]),
+                      border: InputBorder.none,
+                      counterText: '',
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 32),
+            
+            // 转账按钮
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _send,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF9A825),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    elevation: 0,
+                  ),
+                  child: const Text('确认转账', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+  
+  void _showTokenPicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('选择币种', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            ),
+            ..._tokens.map((token) => ListTile(
+              title: Text(token),
+              trailing: _selectedToken == token
+                  ? const Icon(Icons.check, color: Color(0xFFF9A825))
+                  : null,
+              onTap: () {
+                setState(() {
+                  _selectedToken = token;
+                  // 切换币种时验证金额小数位
+                  _validateAmountDecimals();
+                });
+                Navigator.pop(context);
+              },
+            )),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 发转账弹窗（兼容性包装，自动跳转到全屏页面）
+class SendTransferDialog extends StatelessWidget {
+  final String receiverName;
+  final String? receiverAvatar;
+  final Function(String amount, String token, String? memo) onSend;
+  
+  const SendTransferDialog({
+    super.key,
+    required this.receiverName,
+    this.receiverAvatar,
+    required this.onSend,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    // 自动跳转到全屏页面
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.of(context).pop();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => SendTransferPage(
+            receiverName: receiverName,
+            receiverAvatar: receiverAvatar,
+            onSend: onSend,
+          ),
+        ),
+      );
+    });
+    return const SizedBox.shrink();
   }
 }
 
@@ -1149,29 +1270,36 @@ class RedPacketDetailPage extends StatelessWidget {
                     
                     // 金额显示
                     if (isClaimed && claimedAmount != null) ...[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            claimedAmount!,
-                            style: const TextStyle(
-                              color: Color(0xFFFFD700),
-                              fontSize: 56,
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Text(
-                              _currencyUnit,
-                              style: const TextStyle(
-                                color: Color(0xFFFFD700),
-                                fontSize: 20,
+                      // 金额显示 - 使用 FittedBox 自适应长数字
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                claimedAmount!,
+                                style: const TextStyle(
+                                  color: Color(0xFFFFD700),
+                                  fontSize: 56,
+                                  fontWeight: FontWeight.w300,
+                                ),
                               ),
-                            ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Text(
+                                  _currencyUnit,
+                                  style: const TextStyle(
+                                    color: Color(0xFFFFD700),
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                       
                       const SizedBox(height: 16),
