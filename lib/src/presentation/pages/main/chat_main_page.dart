@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -114,25 +115,25 @@ class _ChatMainPageState extends State<ChatMainPage> {
         _buildPopupMenuItem(
           value: 'group',
           icon: Icons.chat_bubble_outline,
-          text: '发起群聊',
+          text: S.of(context)?.startGroupChat ?? 'Start Group Chat',
           isDark: isDark,
         ),
         _buildPopupMenuItem(
           value: 'add_friend',
           icon: Icons.person_add_outlined,
-          text: '添加朋友',
+          text: S.of(context)?.addFriends ?? 'Add Friends',
           isDark: isDark,
         ),
         _buildPopupMenuItem(
           value: 'scan',
           icon: Icons.qr_code_scanner,
-          text: '扫一扫',
+          text: S.of(context)?.scan ?? 'Scan',
           isDark: isDark,
         ),
         _buildPopupMenuItem(
           value: 'payment',
           icon: Icons.payment_outlined,
-          text: '收付款',
+          text: S.of(context)?.paymentAndCollection ?? 'Payment',
           isDark: isDark,
         ),
       ],
@@ -241,22 +242,25 @@ class _ChatMainPageState extends State<ChatMainPage> {
           final totalUnread = conversationState.totalUnreadCount;
           
           // 获取当前 Tab 的标题
+          final l10n = S.of(context);
           String currentTitle;
           switch (_currentIndex) {
             case 0:
-              currentTitle = totalUnread > 0 ? '消息（$totalUnread）' : '消息';
+              currentTitle = totalUnread > 0
+                  ? (l10n?.messagesWithCount(totalUnread) ?? 'Messages($totalUnread)')
+                  : (l10n?.messages ?? 'Messages');
               break;
             case 1:
-              currentTitle = '通讯录';
+              currentTitle = l10n?.contacts ?? 'Contacts';
               break;
             case 2:
-              currentTitle = '发现';
+              currentTitle = l10n?.discover ?? 'Discover';
               break;
             case 3:
-              currentTitle = '我';
+              currentTitle = l10n?.me ?? 'Me';
               break;
             default:
-              currentTitle = '消息';
+              currentTitle = l10n?.messages ?? 'Messages';
           }
           
           return Scaffold(
@@ -337,43 +341,48 @@ class _ChatMainPageState extends State<ChatMainPage> {
       child: SafeArea(
         child: SizedBox(
           height: 56,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildTabItem(
-                index: 0,
-                icon: Icons.chat_bubble_outline,
-                activeIcon: Icons.chat_bubble,
-                label: '消息',
-                selectedColor: selectedColor,
-                unselectedColor: unselectedColor,
-                badge: totalUnread,
-              ),
-              _buildTabItem(
-                index: 1,
-                icon: Icons.contacts_outlined,
-                activeIcon: Icons.contacts,
-                label: '通讯录',
-                selectedColor: selectedColor,
-                unselectedColor: unselectedColor,
-              ),
-              _buildTabItem(
-                index: 2,
-                icon: Icons.explore_outlined,
-                activeIcon: Icons.explore,
-                label: '发现',
-                selectedColor: selectedColor,
-                unselectedColor: unselectedColor,
-              ),
-              _buildTabItem(
-                index: 3,
-                icon: Icons.person_outline,
-                activeIcon: Icons.person,
-                label: '我',
-                selectedColor: selectedColor,
-                unselectedColor: unselectedColor,
-              ),
-            ],
+          child: Builder(
+            builder: (ctx) {
+              final l10n = S.of(ctx);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildTabItem(
+                    index: 0,
+                    icon: Icons.chat_bubble_outline,
+                    activeIcon: Icons.chat_bubble,
+                    label: l10n?.messages ?? 'Messages',
+                    selectedColor: selectedColor,
+                    unselectedColor: unselectedColor,
+                    badge: totalUnread,
+                  ),
+                  _buildTabItem(
+                    index: 1,
+                    icon: Icons.contacts_outlined,
+                    activeIcon: Icons.contacts,
+                    label: l10n?.contacts ?? 'Contacts',
+                    selectedColor: selectedColor,
+                    unselectedColor: unselectedColor,
+                  ),
+                  _buildTabItem(
+                    index: 2,
+                    icon: Icons.explore_outlined,
+                    activeIcon: Icons.explore,
+                    label: l10n?.discover ?? 'Discover',
+                    selectedColor: selectedColor,
+                    unselectedColor: unselectedColor,
+                  ),
+                  _buildTabItem(
+                    index: 3,
+                    icon: Icons.person_outline,
+                    activeIcon: Icons.person,
+                    label: l10n?.me ?? 'Me',
+                    selectedColor: selectedColor,
+                    unselectedColor: unselectedColor,
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
