@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -189,8 +190,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
         // 显示权限提示
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('请允许使用麦克风权限'),
+            SnackBar(
+              content: Text(S.of(context)?.microphonePermissionRequired ?? 'Please allow microphone permission'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -237,9 +238,9 @@ class _ChatInputBarState extends State<ChatInputBar> {
         // 录音时间太短
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('录音时间太短'),
-              duration: Duration(seconds: 1),
+            SnackBar(
+              content: Text(S.of(context)?.recordingTooShort ?? 'Recording too short'),
+              duration: const Duration(seconds: 1),
             ),
           );
         }
@@ -437,9 +438,9 @@ class _ChatInputBarState extends State<ChatInputBar> {
         ),
         child: Center(
           child: Text(
-            _isRecording 
-                ? (_cancelRecording ? '松开取消' : '松开发送，上滑取消')
-                : '按住 说话',
+            _isRecording
+                ? (_cancelRecording ? (S.of(context)?.releaseToCancel ?? 'Release to cancel') : (S.of(context)?.releaseToSend ?? 'Release to send, swipe up to cancel'))
+                : (S.of(context)?.holdToTalk ?? 'Hold to talk'),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -468,9 +469,9 @@ class _ChatInputBarState extends State<ChatInputBar> {
           ),
           elevation: 0,
         ),
-        child: const Text(
-          '发送',
-          style: TextStyle(
+        child: Text(
+          S.of(context)?.send ?? 'Send',
+          style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w500,
           ),

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
@@ -97,7 +98,7 @@ class _ContactListPageState extends State<ContactListPage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: widget.showAppBar ? N42AppBar(
-        title: '通讯录',
+        title: S.of(context)?.contacts ?? 'Contacts',
         showBackButton: false,
         actions: [
           IconButton(
@@ -136,9 +137,9 @@ class _ContactListPageState extends State<ContactListPage> {
                 if (state is ContactError) {
                   return N42EmptyState(
                     icon: Icons.error_outline,
-                    title: '加载失败',
+                    title: S.of(context)?.loadFailed ?? 'Load failed',
                     description: state.message,
-                    buttonText: '重试',
+                    buttonText: S.of(context)?.retry ?? 'Retry',
                     onButtonPressed: () {
                       context.read<ContactBloc>().add(const LoadContacts());
                     },
@@ -149,10 +150,10 @@ class _ContactListPageState extends State<ContactListPage> {
                   return _buildContactList(state, isDark);
                 }
 
-                return const N42EmptyState(
+                return N42EmptyState(
                   icon: Icons.contacts_outlined,
-                  title: '暂无联系人',
-                  description: '添加好友开始聊天',
+                  title: S.of(context)?.noContacts ?? 'No contacts',
+                  description: S.of(context)?.addFriendsToChat ?? 'Add friends to start chatting',
                 );
               },
             ),
@@ -180,7 +181,7 @@ class _ContactListPageState extends State<ContactListPage> {
             color: isDark ? Colors.white : Colors.black,
           ),
           decoration: InputDecoration(
-            hintText: '搜索',
+            hintText: S.of(context)?.search ?? 'Search',
             hintStyle: TextStyle(
               fontSize: 15,
               color: isDark ? Colors.white54 : Colors.black45,
@@ -307,10 +308,10 @@ class _ContactListPageState extends State<ContactListPage> {
         globalResults.isEmpty &&
         !state.isSearching &&
         !state.isGlobalSearching) {
-      return const N42EmptyState(
+      return N42EmptyState(
         icon: Icons.search_off,
-        title: '未找到联系人',
-        description: '尝试搜索其他关键词或全局搜索',
+        title: S.of(context)?.contactNotFound ?? 'Contact not found',
+        description: S.of(context)?.tryOtherKeywords ?? 'Try other keywords or global search',
       );
     }
 
@@ -318,7 +319,7 @@ class _ContactListPageState extends State<ContactListPage> {
       children: [
         // 本地搜索结果
         if (localResults.isNotEmpty) ...[
-          _buildSectionHeader('联系人', isDark),
+          _buildSectionHeader(S.of(context)?.contacts ?? 'Contacts', isDark),
           ...localResults.map((contact) => ContactTile(
                 contact: contact,
                 onTap: () => _onContactTap(contact),
@@ -334,7 +335,7 @@ class _ContactListPageState extends State<ContactListPage> {
 
         // 全局搜索结果
         if (globalResults.isNotEmpty) ...[
-          _buildSectionHeader('搜索结果', isDark),
+          _buildSectionHeader(S.of(context)?.searchResults ?? 'Search Results', isDark),
           ...globalResults.map((contact) => ContactTile(
                 contact: contact,
                 showOnlineStatus: false,
@@ -356,7 +357,7 @@ class _ContactListPageState extends State<ContactListPage> {
           _buildFunctionItem(
             isDark: isDark,
             icon: _NewFriendIcon(),
-            title: '新的朋友',
+            title: S.of(context)?.newFriends ?? 'New Friends',
             badgeCount: state.friendRequests.length,
             onTap: _showFriendRequestsPage,
           ),
@@ -366,8 +367,8 @@ class _ContactListPageState extends State<ContactListPage> {
           _buildFunctionItem(
             isDark: isDark,
             icon: _ChatOnlyFriendIcon(),
-            title: '仅聊天的朋友',
-            onTap: () => _showComingSoon('仅聊天的朋友'),
+            title: S.of(context)?.chatOnlyFriends ?? 'Chat-only Friends',
+            onTap: () => _showComingSoon(S.of(context)?.chatOnlyFriends ?? 'Chat-only Friends'),
           ),
           
           const SizedBox(height: 8),
@@ -379,44 +380,44 @@ class _ContactListPageState extends State<ContactListPage> {
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _GroupChatIcon(),
-                  title: '群聊',
+                  title: S.of(context)?.groupChat ?? 'Group Chat',
                   onTap: _showGroupsPage,
                 ),
                 _buildItemDivider(isDark),
-                
+
                 // 标签
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _TagIcon(),
-                  title: '标签',
-                  onTap: () => _showComingSoon('标签'),
+                  title: S.of(context)?.tags ?? 'Tags',
+                  onTap: () => _showComingSoon(S.of(context)?.tags ?? 'Tags'),
                 ),
                 _buildItemDivider(isDark),
-                
+
                 // 公众号
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _OfficialAccountIcon(),
-                  title: '公众号',
-                  onTap: () => _showComingSoon('公众号'),
+                  title: S.of(context)?.officialAccounts ?? 'Official Accounts',
+                  onTap: () => _showComingSoon(S.of(context)?.officialAccounts ?? 'Official Accounts'),
                 ),
                 _buildItemDivider(isDark),
-                
+
                 // 服务号
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _ServiceAccountIcon(),
-                  title: '服务号',
-                  onTap: () => _showComingSoon('服务号'),
+                  title: S.of(context)?.serviceAccounts ?? 'Service Accounts',
+                  onTap: () => _showComingSoon(S.of(context)?.serviceAccounts ?? 'Service Accounts'),
                 ),
                 _buildItemDivider(isDark),
-                
+
                 // 企业联系人
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _EnterpriseContactIcon(),
-                  title: '企业联系人',
-                  onTap: () => _showComingSoon('企业联系人'),
+                  title: S.of(context)?.enterpriseContacts ?? 'Enterprise Contacts',
+                  onTap: () => _showComingSoon(S.of(context)?.enterpriseContacts ?? 'Enterprise Contacts'),
                 ),
               ],
             ),
@@ -529,7 +530,7 @@ class _ContactListPageState extends State<ContactListPage> {
       padding: const EdgeInsets.all(20),
       alignment: Alignment.center,
       child: Text(
-        '$count位联系人',
+        S.of(context)?.contactCount(count) ?? '$count contacts',
         style: TextStyle(
           fontSize: 14,
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -541,7 +542,7 @@ class _ContactListPageState extends State<ContactListPage> {
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature 功能即将推出'),
+        content: Text(S.of(context)?.featureComingSoon(feature) ?? '$feature coming soon'),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -607,7 +608,7 @@ class _ContactListPageState extends State<ContactListPage> {
               // 发消息
               ListTile(
                 leading: const Icon(Icons.chat_bubble_outline),
-                title: const Text('发消息'),
+                title: Text(S.of(context)?.sendMessage ?? 'Message'),
                 onTap: () {
                   Navigator.pop(context);
                   _startChatWithContact(contact);
@@ -616,7 +617,7 @@ class _ContactListPageState extends State<ContactListPage> {
               // 推荐给朋友
               ListTile(
                 leading: const Icon(Icons.person_add_alt_1_outlined),
-                title: const Text('推荐给朋友'),
+                title: Text(S.of(context)?.recommendToFriend ?? 'Recommend to friend'),
                 onTap: () {
                   Navigator.pop(context);
                   _recommendToFriend(contact);
@@ -625,7 +626,7 @@ class _ContactListPageState extends State<ContactListPage> {
               // 设置备注
               ListTile(
                 leading: const Icon(Icons.edit_outlined),
-                title: const Text('设置备注'),
+                title: Text(S.of(context)?.setRemark ?? 'Set remark'),
                 onTap: () {
                   Navigator.pop(context);
                   _setContactRemark(contact);
@@ -634,11 +635,11 @@ class _ContactListPageState extends State<ContactListPage> {
               // 添加到桌面
               ListTile(
                 leading: const Icon(Icons.add_to_home_screen),
-                title: const Text('添加到桌面'),
+                title: Text(S.of(context)?.addToHomeScreen ?? 'Add to home screen'),
                 onTap: () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('功能开发中')),
+                    SnackBar(content: Text(S.of(context)?.featureInDevelopment ?? 'Feature in development')),
                   );
                 },
               ),
@@ -646,7 +647,7 @@ class _ContactListPageState extends State<ContactListPage> {
               // 取消按钮
               ListTile(
                 leading: const Icon(Icons.close),
-                title: const Text('取消'),
+                title: Text(S.of(context)?.cancel ?? 'Cancel'),
                 onTap: () => Navigator.pop(context),
               ),
               const SizedBox(height: 8),
@@ -675,19 +676,19 @@ class _ContactListPageState extends State<ContactListPage> {
     
     try {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               ),
-              SizedBox(width: 12),
-              Text('正在发送名片...'),
+              const SizedBox(width: 12),
+              Text(S.of(context)?.sendingCard ?? 'Sending card...'),
             ],
           ),
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
       
@@ -708,7 +709,7 @@ ID：${contact.userId}''';
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('已将 ${contact.effectiveDisplayName} 的名片推荐给 ${selectedContact.effectiveDisplayName}'),
+            content: Text(S.of(context)?.recommendedCardTo(contact.effectiveDisplayName, selectedContact.effectiveDisplayName) ?? 'Recommended ${contact.effectiveDisplayName}\'s card to ${selectedContact.effectiveDisplayName}'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -719,7 +720,7 @@ ID：${contact.userId}''';
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('推荐失败: $e'),
+            content: Text(S.of(context)?.recommendFailed(e.toString()) ?? 'Recommend failed: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -730,15 +731,15 @@ ID：${contact.userId}''';
   /// 设置联系人备注
   void _setContactRemark(ContactEntity contact) {
     final controller = TextEditingController(text: contact.remark);
-    
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('设置备注'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.setRemark ?? 'Set remark'),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            hintText: '请输入备注名',
+            hintText: S.of(context)?.enterRemarkName ?? 'Enter remark name',
             border: const OutlineInputBorder(),
             suffixIcon: IconButton(
               icon: const Icon(Icons.clear),
@@ -749,19 +750,19 @@ ID：${contact.userId}''';
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('已设置备注为: ${controller.text}'),
+                  content: Text(S.of(context)?.remarkSetTo(controller.text) ?? 'Remark set to: ${controller.text}'),
                 ),
               );
             },
-            child: const Text('确定'),
+            child: Text(S.of(context)?.confirm ?? 'OK'),
           ),
         ],
       ),
@@ -771,19 +772,19 @@ ID：${contact.userId}''';
   Future<void> _startChatWithContact(ContactEntity contact) async {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               ),
-              SizedBox(width: 12),
-              Text('正在打开聊天...'),
+              const SizedBox(width: 12),
+              Text(S.of(context)?.openingChat ?? 'Opening chat...'),
             ],
           ),
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
       
@@ -826,7 +827,7 @@ ID：${contact.userId}''';
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('打开聊天失败: $e'),
+            content: Text(S.of(context)?.openChatFailed(e.toString()) ?? 'Open chat failed: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -837,19 +838,19 @@ ID：${contact.userId}''';
   void _showAddContactDialog() {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('添加联系人'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.addContact ?? 'Add Contact'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              decoration: const InputDecoration(
-                hintText: '输入用户ID',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: S.of(context)?.enterUserId ?? 'Enter user ID',
+                border: const OutlineInputBorder(),
               ),
               onSubmitted: (value) {
                 if (value.isNotEmpty) {
-                  Navigator.pop(context);
+                  Navigator.pop(dialogContext);
                   context.read<ContactBloc>().add(StartChat(value));
                 }
               },
@@ -858,14 +859,14 @@ ID：${contact.userId}''';
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
             },
-            child: const Text('扫一扫'),
+            child: Text(S.of(context)?.scan ?? 'Scan'),
           ),
         ],
       ),
@@ -1335,7 +1336,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('新的朋友'),
+        title: Text(S.of(context)?.newFriends ?? 'New Friends'),
         backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black,
         elevation: 0.5,
@@ -1345,9 +1346,9 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
           if (state is! ContactLoaded) {
             return const Center(child: CircularProgressIndicator());
           }
-          
+
           final requests = state.friendRequests;
-          
+
           if (requests.isEmpty) {
             return Center(
               child: Column(
@@ -1360,7 +1361,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '暂无好友请求',
+                    S.of(context)?.noFriendRequests ?? 'No friend requests',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -1437,7 +1438,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
-            child: const Text('接受'),
+            child: Text(S.of(context)?.accept ?? 'Accept'),
           ),
           const SizedBox(width: 8),
           TextButton(
@@ -1450,28 +1451,28 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
-            child: const Text('拒绝'),
+            child: Text(S.of(context)?.reject ?? 'Reject'),
           ),
         ],
       ),
     );
   }
-  
+
   void _acceptRequest(FriendRequest request) {
     context.read<ContactBloc>().add(AcceptFriendRequest(request.id));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('已接受 ${request.userName} 的好友请求'),
+        content: Text(S.of(context)?.acceptedFriendRequest(request.userName) ?? 'Accepted ${request.userName}\'s friend request'),
         backgroundColor: Colors.green,
       ),
     );
   }
-  
+
   void _rejectRequest(FriendRequest request) {
     context.read<ContactBloc>().add(RejectFriendRequest(request.id));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('已拒绝 ${request.userName} 的好友请求'),
+        content: Text(S.of(context)?.rejectedFriendRequest(request.userName) ?? 'Rejected ${request.userName}\'s friend request'),
       ),
     );
   }
@@ -1496,10 +1497,10 @@ class _GroupListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('群聊'),
+        title: Text(S.of(context)?.groupChat ?? 'Group Chat'),
         backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black,
         elevation: 0.5,
@@ -1509,7 +1510,7 @@ class _GroupListPage extends StatelessWidget {
           if (state is! ContactLoaded) {
             return const Center(child: CircularProgressIndicator());
           }
-          
+
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1521,7 +1522,7 @@ class _GroupListPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '暂无群聊',
+                  S.of(context)?.noGroups ?? 'No groups',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey[600],
@@ -1531,11 +1532,11 @@ class _GroupListPage extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('创建群聊功能开发中...')),
+                      SnackBar(content: Text(S.of(context)?.createGroupInDevelopment ?? 'Create group feature in development...')),
                     );
                   },
                   icon: const Icon(Icons.add),
-                  label: const Text('发起群聊'),
+                  label: Text(S.of(context)?.createGroup ?? 'Create Group'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -1626,7 +1627,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
             child: Row(
               children: [
                 Text(
-                  '选择要推荐给的朋友',
+                  S.of(context)?.selectFriendToRecommend ?? 'Select friend to recommend',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -1649,7 +1650,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
             padding: const EdgeInsets.all(12),
             child: TextField(
               decoration: InputDecoration(
-                hintText: '搜索联系人',
+                hintText: S.of(context)?.searchContacts ?? 'Search contacts',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: widget.isDark 
@@ -1674,7 +1675,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                 : _filteredContacts.isEmpty
                     ? Center(
                         child: Text(
-                          '没有找到联系人',
+                          S.of(context)?.noContactsFound ?? 'No contacts found',
                           style: TextStyle(
                             color: widget.isDark ? Colors.white54 : Colors.black54,
                           ),

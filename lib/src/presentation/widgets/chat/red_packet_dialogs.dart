@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 发红包页面（全屏，仿微信）
@@ -105,15 +106,15 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     final amount = _amountController.text.trim();
     if (amount.isEmpty || _amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入金额')),
+        SnackBar(content: Text(S.of(context)?.enterAmount ?? 'Enter amount')),
       );
       return;
     }
-    
+
     final count = int.tryParse(_countController.text) ?? 1;
     if (widget.isGroup && _isLucky && count < 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('红包个数至少为1')),
+        SnackBar(content: Text(S.of(context)?.redPacketCountMin ?? 'At least 1 red packet required')),
       );
       return;
     }
@@ -489,11 +490,11 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(16),
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: Text(
-                '选择币种',
-                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                S.of(context)?.selectCurrency ?? 'Select currency',
+                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),
             ..._tokens.map((token) => ListTile(
@@ -960,7 +961,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('转账给', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                        Text(S.of(context)?.transferTo ?? 'Transfer to', style: const TextStyle(fontSize: 13, color: Colors.grey)),
                         const SizedBox(height: 2),
                         Text(widget.receiverName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
                       ],
@@ -1060,7 +1061,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     elevation: 0,
                   ),
-                  child: const Text('确认转账', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                  child: Text(S.of(context)?.confirmTransfer ?? 'Confirm Transfer', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                 ),
               ),
             ),
@@ -1080,9 +1081,9 @@ class _SendTransferPageState extends State<SendTransferPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Text('选择币种', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(S.of(context)?.selectCurrency ?? 'Select currency', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             ),
             ..._tokens.map((token) => ListTile(
               title: Text(token),
@@ -1548,7 +1549,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   elevation: 0,
                 ),
-                child: const Text('确认收款', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                child: Text(S.of(context)?.confirmReceive ?? 'Confirm Receipt', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ),
           ],

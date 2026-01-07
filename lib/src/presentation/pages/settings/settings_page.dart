@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -34,7 +35,7 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: '设置',
+        title: S.of(context)?.settings ?? 'Settings',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -51,14 +52,14 @@ class SettingsPage extends StatelessWidget {
               _SettingsItem(
                 icon: Icons.notifications_outlined,
                 iconColor: Colors.red,
-                title: '消息通知',
+                title: S.of(context)?.notificationSettings ?? 'Notifications',
                 onTap: onNotification,
                 isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.lock_outline,
                 iconColor: Colors.blue,
-                title: '隐私',
+                title: S.of(context)?.privacy ?? 'Privacy',
                 onTap: onPrivacy,
                 isDark: isDark,
               ),
@@ -73,14 +74,14 @@ class SettingsPage extends StatelessWidget {
               _SettingsItem(
                 icon: Icons.palette_outlined,
                 iconColor: Colors.purple,
-                title: '外观',
+                title: S.of(context)?.appearance ?? 'Appearance',
                 onTap: onAppearance,
                 isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.chat_outlined,
                 iconColor: Colors.green,
-                title: '聊天',
+                title: S.of(context)?.chat ?? 'Chat',
                 onTap: onChat,
                 isDark: isDark,
               ),
@@ -95,7 +96,7 @@ class SettingsPage extends StatelessWidget {
               _SettingsItem(
                 icon: Icons.info_outline,
                 iconColor: Colors.orange,
-                title: '关于',
+                title: S.of(context)?.about ?? 'About',
                 onTap: onAbout,
                 isDark: isDark,
               ),
@@ -109,7 +110,7 @@ class SettingsPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: N42Button.danger(
-                text: '退出登录',
+                text: S.of(context)?.logout ?? 'Log Out',
                 onPressed: () => _showLogoutConfirmDialog(context),
               ),
             ),
@@ -200,20 +201,20 @@ class SettingsPage extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('退出登录'),
-        content: const Text('确定要退出登录吗？'),
+        title: Text(S.of(context)?.logout ?? 'Log Out'),
+        content: Text(S.of(context)?.logoutConfirm ?? 'Are you sure you want to log out?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               onLogout?.call();
             },
-            child: const Text(
-              '退出',
+            child: Text(
+              S.of(context)?.logout ?? 'Log Out',
               style: TextStyle(color: AppColors.error),
             ),
           ),

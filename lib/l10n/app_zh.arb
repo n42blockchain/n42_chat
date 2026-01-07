@@ -1,0 +1,910 @@
+{
+  "@@locale": "zh",
+  "chatModuleInitFailed": "聊天模块初始化失败",
+  "checkNetworkRetry": "请检查网络连接后重试",
+  "retry": "重试",
+  "unknownUser": "未知用户",
+  "walletNotConnected": "钱包未连接",
+  "cannotGetWalletAddress": "无法获取钱包地址",
+  "paymentRequestMemo": "支付请求: {requestId}",
+  "@paymentRequestMemo": {
+    "placeholders": {
+      "requestId": {"type": "String"}
+    }
+  },
+  "callServiceNotInitialized": "通话服务未初始化",
+  "alreadyInCall": "当前正在通话中",
+  "meetingServiceNotInitialized": "会议服务未初始化",
+  "livekitNotConfigured": "LiveKit 未配置",
+  "unknownConversation": "未知会话",
+  "startCallFailed": "发起通话失败: {error}",
+  "@startCallFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "answerCallFailed": "接听失败: {error}",
+  "@answerCallFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "connectionFailed": "连接失败",
+  "callRejected": "对方已拒绝",
+  "noAnswer": "对方无应答",
+  "invalidLoginResponse": "登录响应无效",
+  "loginFailed": "登录失败: {error}",
+  "@loginFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "sessionRestoreFailed": "会话恢复失败",
+  "additionalVerificationRequired": "需要完成额外验证",
+  "registrationFailed": "注册失败: {error}",
+  "@registrationFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "cannotConnectServer": "无法连接到服务器: {error}",
+  "@cannotConnectServer": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "wrongUsernamePassword": "用户名或密码错误",
+  "usernameTaken": "用户名已被使用",
+  "invalidUsernameFormat": "用户名格式无效",
+  "rateLimitExceeded": "请求过于频繁，请稍后再试",
+  "loginExpired": "登录已过期",
+  "joinMeetingFailed": "加入会议失败: {error}",
+  "@joinMeetingFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "screenShareFailed": "屏幕共享失败: {error}",
+  "@screenShareFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "answer": "接听",
+  "decline": "拒绝",
+  "missedCall": "未接来电",
+  "callBack": "回拨",
+  "incomingCall": "来电",
+  "missedVideoCall": "未接视频通话",
+  "missedVoiceCall": "未接语音通话",
+  "passkeyNotInitialized": "Passkey 未初始化",
+  "googleSignInNotConfigured": "Google Sign In 未配置",
+  "encryptedMessage": "[加密消息]",
+  "sticker": "[表情]",
+  "groupCreated": "创建了群聊",
+  "groupNameChanged": "修改了群名称",
+  "groupAvatarChanged": "修改了群头像",
+  "groupAnnouncementChanged": "修改了群公告",
+  "image": "[图片]",
+  "video": "[视频]",
+  "voice": "[语音]",
+  "file": "[文件]",
+  "location": "[位置]",
+  "unknownMessage": "[未知消息]",
+  "joinedGroup": "{senderName} 加入了群聊",
+  "@joinedGroup": {
+    "placeholders": {
+      "senderName": {"type": "String"}
+    }
+  },
+  "leftGroup": "{senderName} 离开了群聊",
+  "@leftGroup": {
+    "placeholders": {
+      "senderName": {"type": "String"}
+    }
+  },
+  "invitedToGroup": "{senderName} 被邀请加入",
+  "@invitedToGroup": {
+    "placeholders": {
+      "senderName": {"type": "String"}
+    }
+  },
+  "removedFromGroup": "{senderName} 被移出群聊",
+  "@removedFromGroup": {
+    "placeholders": {
+      "senderName": {"type": "String"}
+    }
+  },
+  "avatarDataEmpty": "头像数据为空",
+  "avatarTooLarge": "头像文件过大，最大支持 10MB",
+  "uploadAvatarFailed": "上传头像失败",
+  "delete": "删除",
+  "notLoggedIn": "未登录",
+  "roomNotExist": "房间不存在: {roomId}",
+  "@roomNotExist": {
+    "placeholders": {
+      "roomId": {"type": "String"}
+    }
+  },
+  "uploadImageFailed": "上传图片失败",
+  "matrixClientNotInitialized": "Matrix 客户端未初始化",
+  "uploadVoiceFailed": "上传语音失败：无法获取 MXC URI",
+  "uploadVideoFailed": "上传视频失败：无法获取 MXC URI",
+  "uploadFileFailed": "上传文件失败：无法获取 MXC URI",
+  "locationWithCoords": "位置: {lat}, {lon}",
+  "@locationWithCoords": {
+    "placeholders": {
+      "lat": {"type": "String"},
+      "lon": {"type": "String"}
+    }
+  },
+  "myLocation": "我的位置",
+  "pollEnded": "投票已结束",
+  "groupChat": "群聊",
+  "search": "搜索",
+  "cancel": "取消",
+  "userCancelled": "用户取消",
+  "noData": "暂无数据",
+  "noSearchResults": "无搜索结果",
+  "tryDifferentKeyword": "换个关键词试试",
+  "loadFailed": "加载失败",
+  "checkNetwork": "请检查网络连接",
+  "networkConnectionFailed": "网络连接失败",
+  "checkNetworkSettings": "请检查网络设置",
+  "messages": "消息",
+  "contacts": "通讯录",
+  "discover": "发现",
+  "me": "我",
+  "voiceLoading": "语音加载中，请稍后再试",
+  "voiceToTextFailed": "语音转文字失败",
+  "converting": "转换中...",
+  "convertToText": "转文字",
+  "convertToTextTitle": "转为文字",
+  "selectEmoji": "选择表情",
+  "frequentlyUsed": "常用",
+  "copy": "复制",
+  "forward": "转发",
+  "unfavorite": "取消收藏",
+  "favorite": "收藏",
+  "resend": "重发",
+  "recall": "撤回",
+  "multiSelect": "多选",
+  "quote": "引用",
+  "remind": "提醒",
+  "searchThis": "搜一搜",
+  "recallMessageConfirm": "撤回该条消息？",
+  "youRecalledMessage": "你撤回了一条消息",
+  "otherRecalledMessage": "对方撤回了一条消息",
+  "reEdit": "重新编辑",
+  "copied": "已复制",
+  "sendMessageHint": "发送消息",
+  "microphonePermissionRequired": "请允许使用麦克风权限",
+  "startRecordingFailed": "开始录音失败: {error}",
+  "@startRecordingFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "recordingTooShort": "录音时间太短",
+  "stopRecordingFailed": "停止录音失败: {error}",
+  "@stopRecordingFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "releaseToCancel": "松开取消",
+  "releaseToSend": "松开发送，上滑取消",
+  "holdToTalk": "按住 说话",
+  "send": "发送",
+  "conversationLabel": "会话: {roomId}",
+  "@conversationLabel": {
+    "placeholders": {
+      "roomId": {"type": "String"}
+    }
+  },
+  "contactLabel": "联系人: {userId}",
+  "@contactLabel": {
+    "placeholders": {
+      "userId": {"type": "String"}
+    }
+  },
+  "addFriend": "添加好友",
+  "settings": "设置",
+  "editProfile": "编辑资料",
+  "login": "登录",
+  "createGroup": "创建群聊",
+  "developing": "{title}\n(开发中)",
+  "@developing": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "error": "错误",
+  "pageNotFound": "页面不存在",
+  "backToHome": "返回首页",
+  "allRead": "全部已读",
+  "readCount": "{count}人已读",
+  "@readCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "transfer": "转账",
+  "pendingReceipt": "待对方接收",
+  "tapToReceive": "点击领取",
+  "received": "已被接收",
+  "paymentReceived": "已收款",
+  "refunded": "已退还",
+  "expired": "已过期",
+  "redPacketGreeting": "恭喜发财，大吉大利",
+  "n42RedPacket": "N42红包",
+  "goodLuck": "领个好彩头",
+  "claimed": "已领取",
+  "allClaimed": "已被领完",
+  "emoji": "表情",
+  "love": "爱心",
+  "animals": "动物",
+  "food": "食物",
+  "travel": "交通",
+  "activities": "活动",
+  "objects": "物品",
+  "symbols": "符号",
+  "reply": "回复",
+  "copiedToClipboard": "已复制到剪贴板",
+  "edit": "编辑",
+  "more": "更多",
+  "selectForwardTarget": "选择转发对象",
+  "sendCount": "发送({count})",
+  "@sendCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "draft": "[草稿] ",
+  "n42Id": "N42号：{id}",
+  "@n42Id": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "friendInfo": "朋友资料",
+  "friendInfoDesc": "添加朋友的备注名、电话、标签、备忘、照片等，并设置朋友权限。",
+  "moments": "朋友圈",
+  "sendMessage": "发消息",
+  "audioVideoCall": "音视频通话",
+  "videoChannel": "视频号",
+  "remark": "备注",
+  "remarkName": "备注名",
+  "phone": "电话",
+  "tags": "标签",
+  "notes": "备忘",
+  "photos": "照片",
+  "permissions": "权限",
+  "chatMomentsEtc": "聊天、朋友圈、运动等",
+  "moreInfo": "更多信息",
+  "commonGroups": "我和他 (她) 的共同群聊",
+  "zeroGroups": "0个",
+  "source": "来源",
+  "notificationSettings": "消息通知",
+  "receiveNotifications": "接收新消息通知",
+  "showPreview": "显示消息预览",
+  "showContentInNotification": "在通知中显示消息内容",
+  "notificationSound": "通知声音",
+  "playSoundOnMessage": "收到消息时播放声音",
+  "vibrate": "震动",
+  "vibrateOnMessage": "收到消息时震动",
+  "doNotDisturb": "免打扰模式",
+  "dndDescription": "在指定时间段内不接收通知",
+  "startTime": "开始时间",
+  "endTime": "结束时间",
+  "privacy": "隐私",
+  "appearance": "外观",
+  "chat": "聊天",
+  "about": "关于",
+  "logout": "退出登录",
+  "logoutConfirm": "确定要退出登录吗？",
+  "exit": "退出",
+  "save": "保存",
+  "nickname": "昵称",
+  "enterNickname": "请输入昵称",
+  "signature": "签名",
+  "addSignature": "添加个性签名",
+  "takePhoto": "拍照",
+  "chooseFromGallery": "从相册选择",
+  "saveFailed": "保存失败: {error}",
+  "@saveFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "secureDecentralizedChat": "安全、去中心化的即时通讯",
+  "endToEndEncryption": "端对端加密",
+  "messagesOnlyYouCanSee": "消息仅你和对方可见",
+  "decentralized": "去中心化",
+  "basedOnMatrix": "基于Matrix开放协议",
+  "walletIntegration": "钱包集成",
+  "easyCryptoTransfer": "轻松进行加密货币转账",
+  "register": "注册",
+  "agreeTerms": "登录即表示同意",
+  "termsOfService": "《服务协议》",
+  "and": "和",
+  "privacyPolicy": "《隐私政策》",
+  "serverAddress": "服务器地址",
+  "enterServerAddress": "请输入服务器地址",
+  "validServerAddress": "请输入有效的服务器地址",
+  "connectedTo": "已连接到 {serverName}",
+  "@connectedTo": {
+    "placeholders": {
+      "serverName": {"type": "String"}
+    }
+  },
+  "username": "用户名",
+  "enterUsername": "请输入用户名",
+  "password": "密码",
+  "enterPassword": "请输入密码",
+  "registerAccount": "注册账号",
+  "forgotPassword": "忘记密码",
+  "otherLoginMethods": "其他登录方式",
+  "emailVerification": "邮箱验证码",
+  "enterServerFirst": "请先输入服务器地址",
+  "passkeyNeedsServer": "Passkey 登录需要服务端支持",
+  "googleLoginSuccess": "Google 登录成功: {email}",
+  "@googleLoginSuccess": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "googleLoginFailed": "Google 登录失败: {error}",
+  "@googleLoginFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "appleLoginSuccess": "Apple 登录成功",
+  "appleLoginFailed": "Apple 登录失败: {error}",
+  "@appleLoginFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "createAccount": "创建账号",
+  "joinN42Chat": "加入 N42 Chat 开始聊天",
+  "usernameHint": "请输入用户名（字母、数字、下划线）",
+  "usernameMinLength": "用户名至少3个字符",
+  "usernameFormat": "用户名只能包含字母、数字和下划线",
+  "passwordHint": "请输入密码（至少8位）",
+  "passwordMinLength": "密码至少8位",
+  "confirmPassword": "确认密码",
+  "reEnterPassword": "请再次输入密码",
+  "passwordsNotMatch": "两次输入的密码不一致",
+  "inviteCode": "邀请码（已内置）",
+  "filled": "已填写",
+  "enterInviteCode": "请输入邀请码",
+  "inviteCodeHint": "邀请码已内置，通常无需修改",
+  "agreeTermsFirst": "请先阅读并同意服务协议和隐私政策",
+  "iAgree": "我已阅读并同意",
+  "alreadyHaveAccount": "已有账号？",
+  "loginNow": "立即登录",
+  "whoCanSee": "谁可以查看",
+  "avatar": "头像",
+  "status": "状态",
+  "lastSeen": "最后上线时间",
+  "messageSettings": "消息",
+  "allowStrangerMessage": "允许陌生人私聊",
+  "receiveNonContact": "接收非联系人的消息",
+  "readReceipts": "已读回执",
+  "letOthersKnowRead": "让对方知道你已阅读消息",
+  "typingStatus": "输入状态",
+  "letOthersKnowTyping": "让对方知道你正在输入",
+  "everyone": "所有人",
+  "contactsOnly": "仅联系人",
+  "nobody": "无人",
+  "whoCanSeeItem": "谁可以查看{title}",
+  "@whoCanSeeItem": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "version": "版本 {version}",
+  "@version": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "checkUpdate": "检查更新",
+  "openSourceLicenses": "开源许可",
+  "feedback": "反馈与建议",
+  "builtOnMatrix": "基于 Matrix 协议构建",
+  "loading": "加载中...",
+  "noConversations": "暂无会话",
+  "tapToChat": "点击右上角开始聊天",
+  "startGroup": "发起群聊",
+  "scan": "扫一扫",
+  "payment": "收付款",
+  "featureComingSoon": "{feature} 功能即将推出",
+  "@featureComingSoon": {
+    "placeholders": {
+      "feature": {"type": "String"}
+    }
+  },
+  "markAsRead": "标记已读",
+  "unmute": "取消免打扰",
+  "mute": "消息免打扰",
+  "unpin": "取消置顶",
+  "pin": "置顶",
+  "deleteConversation": "删除会话",
+  "deleteConversationConfirm": "确定要删除与 {name} 的会话吗？",
+  "@deleteConversationConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "noContacts": "暂无联系人",
+  "addFriendsToChat": "添加好友开始聊天",
+  "contactNotFound": "未找到联系人",
+  "tryOtherKeywords": "尝试搜索其他关键词或全局搜索",
+  "searchResults": "搜索结果",
+  "newFriends": "新的朋友",
+  "chatOnlyFriends": "仅聊天的朋友",
+  "officialAccounts": "公众号",
+  "serviceAccounts": "服务号",
+  "enterpriseContacts": "企业联系人",
+  "contactsCount": "{count}位联系人",
+  "@contactsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "recommendToFriend": "推荐给朋友",
+  "setRemark": "设置备注",
+  "addToHome": "添加到桌面",
+  "sendingCard": "正在发送名片...",
+  "contactCard": "[名片]",
+  "cardSent": "已将 {contact} 的名片推荐给 {friend}",
+  "@cardSent": {
+    "placeholders": {
+      "contact": {"type": "String"},
+      "friend": {"type": "String"}
+    }
+  },
+  "recommendFailed": "推荐失败: {error}",
+  "@recommendFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterRemark": "请输入备注名",
+  "remarkSet": "已设置备注为: {remark}",
+  "@remarkSet": {
+    "placeholders": {
+      "remark": {"type": "String"}
+    }
+  },
+  "openingChat": "正在打开聊天...",
+  "openChatFailed": "打开聊天失败: {error}",
+  "@openChatFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "addContact": "添加联系人",
+  "enterUserId": "输入用户ID",
+  "noFriendRequests": "暂无好友请求",
+  "accept": "接受",
+  "reject": "拒绝",
+  "acceptedRequest": "已接受 {name} 的好友请求",
+  "@acceptedRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "rejectedRequest": "已拒绝 {name} 的好友请求",
+  "@rejectedRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "noGroups": "暂无群聊",
+  "creatingGroup": "创建群聊功能开发中...",
+  "selectFriendToRecommend": "选择要推荐给的朋友",
+  "searchContacts": "搜索联系人",
+  "noContactsFound": "没有找到联系人",
+  "yesterday": "昨天",
+  "monday": "周一",
+  "tuesday": "周二",
+  "wednesday": "周三",
+  "thursday": "周四",
+  "friday": "周五",
+  "saturday": "周六",
+  "sunday": "周日",
+  "justNow": "刚刚",
+  "minutesAgo": "{count}分钟前",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hoursAgo": "{count}小时前",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "daysAgo": "{count}天前",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "online": "在线",
+  "offline": "离线",
+  "minutesAgoOnline": "{count}分钟前在线",
+  "@minutesAgoOnline": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hoursAgoOnline": "{count}小时前在线",
+  "@hoursAgoOnline": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "daysAgoOnline": "{count}天前在线",
+  "@daysAgoOnline": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchContactsGroupsMessages": "搜索联系人、群聊、消息",
+  "searchError": "搜索出错",
+  "searchHint": "搜索联系人、群聊和消息",
+  "enterKeyword": "输入关键词开始搜索",
+  "searchHistory": "搜索历史",
+  "clear": "清除",
+  "noResultsFor": "没有找到 {query} 相关的结果",
+  "@noResultsFor": {
+    "placeholders": {
+      "query": {"type": "String"}
+    }
+  },
+  "all": "全部",
+  "groups": "群聊",
+  "noResults": "无结果",
+  "groupInfo": "群聊资料",
+  "groupMembers": "群成员 ({count})",
+  "@groupMembers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "viewAll": "查看全部",
+  "owner": "群主",
+  "admin": "管理",
+  "invite": "邀请",
+  "groupAnnouncement": "群公告",
+  "notSet": "未设置",
+  "groupDescription": "群简介",
+  "publicGroup": "公开群聊",
+  "allowSearchJoin": "允许其他人搜索并加入",
+  "clearChatHistory": "清空聊天记录",
+  "dissolveGroup": "解散群聊",
+  "leaveGroup": "退出群聊",
+  "changeGroupName": "修改群名称",
+  "enterGroupName": "请输入群名称",
+  "confirm": "确定",
+  "changeGroupDescription": "修改群简介",
+  "enterGroupDescription": "请输入群简介",
+  "editAnnouncement": "编辑群公告",
+  "enterAnnouncement": "请输入群公告",
+  "publish": "发布",
+  "clearHistoryConfirm": "确定要清空聊天记录吗？此操作不可恢复。",
+  "clearAction": "清空",
+  "leaveGroupConfirm": "确定要退出 {name} 吗？",
+  "@leaveGroupConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "dissolveGroupConfirm": "确定要解散 {name} 吗？此操作不可恢复。",
+  "@dissolveGroupConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "dissolve": "解散",
+  "groupQrCode": "群二维码",
+  "searchChatHistory": "查找聊天记录",
+  "groupIdCopied": "群ID已复制",
+  "tapCopyGroupId": "{count}人 · 点击复制群ID",
+  "@tapCopyGroupId": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "featureInDevelopment": "功能开发中...",
+  "receiverAddress": "收款地址",
+  "enterOrPasteAddress": "输入或粘贴钱包地址",
+  "selectToken": "选择代币",
+  "transferAmount": "转账金额",
+  "available": "可用",
+  "allAmount": "全部",
+  "memoOptional": "备注（可选）",
+  "addMemo": "添加备注信息",
+  "confirmTransfer": "确认转账",
+  "invalidAddress": "请输入有效的收款地址",
+  "invalidAmount": "请输入有效的转账金额",
+  "selectTokenPlease": "请选择代币",
+  "addressVerified": "地址已验证",
+  "availableBalance": "可用余额: {balance} {symbol}",
+  "@availableBalance": {
+    "placeholders": {
+      "balance": {"type": "String"},
+      "symbol": {"type": "String"}
+    }
+  },
+  "scanningInDevelopment": "扫描功能开发中...",
+  "enterAmount": "请输入金额",
+  "redPacketCountMin": "红包个数至少为1",
+  "viewRedPacketDetails": "查看红包详情",
+  "enterTransferAmount": "请输入转账金额",
+  "transferTo": "转账给",
+  "selectCurrency": "选择币种",
+  "receiveTransfer": "收到转账",
+  "fromSender": "来自 {senderName}",
+  "@fromSender": {
+    "placeholders": {
+      "senderName": {"type": "String"}
+    }
+  },
+  "confirmReceive": "确认收款",
+  "groupProfile": "群资料",
+  "viewProfile": "查看资料",
+  "removeMember": "移出群聊",
+  "removeMemberConfirm": "确定要将 {name} 移出群聊吗？",
+  "@removeMemberConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "remove": "移出",
+  "clearStatus": "清除状态",
+  "clearStatusConfirm": "确定要清除当前状态吗？",
+  "statusCleared": "状态已清除",
+  "statusSet": "状态已设置为：{result}",
+  "@statusSet": {
+    "placeholders": {
+      "result": {"type": "String"}
+    }
+  },
+  "userNotExist": "用户不存在",
+  "userIdCopied": "用户ID已复制",
+  "voiceCallInDevelopment": "语音通话功能开发中...",
+  "report": "举报",
+  "reportInDevelopment": "举报功能开发中...",
+  "shareCard": "分享名片",
+  "shareInDevelopment": "分享功能开发中...",
+  "qrCode": "二维码",
+  "qrCodeInDevelopment": "二维码功能开发中...",
+  "avatarUpdated": "头像更新成功",
+  "selectImageFailed": "选择图片失败: {error}",
+  "@selectImageFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "changeName": "修改名字",
+  "male": "男",
+  "female": "女",
+  "genderSet": "性别已设置为: {gender}",
+  "@genderSet": {
+    "placeholders": {
+      "gender": {"type": "String"}
+    }
+  },
+  "regionSet": "地区已设置为: {region}",
+  "@regionSet": {
+    "placeholders": {
+      "region": {"type": "String"}
+    }
+  },
+  "setPatText": "设置拍一拍",
+  "changeSignature": "修改签名",
+  "ringtoneSet": "来电铃声已设置为: {result}",
+  "@ringtoneSet": {
+    "placeholders": {
+      "result": {"type": "String"}
+    }
+  },
+  "featureInDev": "{feature}功能开发中...",
+  "@featureInDev": {
+    "placeholders": {
+      "feature": {"type": "String"}
+    }
+  },
+  "saveAddressFailed": "保存地址失败: {error}",
+  "@saveAddressFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "myAddress": "我的地址",
+  "addNew": "新增",
+  "addAddress": "添加地址",
+  "addressAdded": "地址添加成功",
+  "addressUpdated": "地址更新成功",
+  "deleteAddress": "删除地址",
+  "deleteAddressConfirm": "确定要删除这个地址吗？",
+  "addressDeleted": "地址已删除",
+  "setDefaultAddress": "设为默认地址",
+  "fillCompleteInfo": "请填写完整信息",
+  "saveInvoiceFailed": "保存发票抬头失败: {error}",
+  "@saveInvoiceFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "myInvoices": "我的发票抬头",
+  "addInvoice": "添加发票抬头",
+  "invoiceAdded": "发票抬头添加成功",
+  "invoiceUpdated": "发票抬头更新成功",
+  "deleteInvoice": "删除发票抬头",
+  "deleteInvoiceConfirm": "确定要删除这个发票抬头吗？",
+  "invoiceDeleted": "发票抬头已删除",
+  "invoiceType": "抬头类型: ",
+  "personal": "个人",
+  "enterprise": "企业",
+  "setDefaultInvoice": "设为默认抬头",
+  "enterTaxId": "请输入纳税人识别号",
+  "vibrateMode": "振动模式",
+  "silentMode": "静音模式",
+  "playing": "正在播放: {ringtoneName}",
+  "@playing": {
+    "placeholders": {
+      "ringtoneName": {"type": "String"}
+    }
+  },
+  "playFailed": "播放失败: {ringtoneName}",
+  "@playFailed": {
+    "placeholders": {
+      "ringtoneName": {"type": "String"}
+    }
+  },
+  "enterGroupNamePlease": "请输入群名称",
+  "selectAtLeastOne": "请至少选择一位成员",
+  "fillStatus": "填写状态",
+  "fileNotExist": "文件不存在",
+  "sendFailed": "发送失败: {error}",
+  "@sendFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "cannotOpenBrowser": "无法打开浏览器",
+  "selectFileFailed": "选择文件失败: {error}",
+  "@selectFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterMusicLink": "请输入音乐链接",
+  "enterValidLink": "请输入有效的网络链接",
+  "enterPollQuestion": "请输入投票问题",
+  "minTwoOptions": "至少需要2个选项",
+  "crossDeviceEnabled": "跨设备签名已启用",
+  "crossDeviceSet": "跨设备签名设置成功",
+  "setupFailed": "设置失败: {error}",
+  "@setupFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "receiveAmount": "收款金额",
+  "enterValidAmount": "请输入有效的金额",
+  "addressCopied": "地址已复制",
+  "openItem": "打开: {content}",
+  "@openItem": {
+    "placeholders": {
+      "content": {"type": "String"}
+    }
+  },
+  "newNoteComingSoon": "新建笔记功能即将推出",
+  "addLinkComingSoon": "添加链接功能即将推出",
+  "deleted": "已删除",
+  "shareComingSoon": "分享功能即将推出",
+  "saveComingSoon": "保存功能即将推出",
+  "moreStylesComingSoon": "更多样式即将推出",
+  "wallet": "钱包",
+  "walletArea": "钱包功能区域",
+  "recording": "录像",
+  "invalidVideoUrl": "视频地址无效",
+  "downloadFile": "下载文件",
+  "clearChatHistoryTitle": "清空聊天记录",
+  "cannotUndo": "此操作不可恢复",
+  "videoCall": "视频通话",
+  "voiceCall": "语音通话",
+  "leaveMeeting": "离开会议",
+  "chatDetails": "聊天详情",
+  "viewAllGroupMembers": "查看全部群成员",
+  "groupName": "群聊名称",
+  "groupManagement": "群管理",
+  "myNicknameInGroup": "我在本群的昵称",
+  "pinChat": "置顶聊天",
+  "strongReminder": "强提醒",
+  "setChatBackground": "设置当前聊天背景",
+  "unknownFile": "未知文件",
+  "download": "下载",
+  "invalidLocation": "位置信息无效",
+  "address": "地址",
+  "latitude": "纬度",
+  "longitude": "经度",
+  "close": "关闭",
+  "tapToCancel": "点击取消",
+  "captureFailed": "拍摄失败: {error}",
+  "processingVideo": "正在处理视频...",
+  "videoFileNotExist": "视频文件不存在",
+  "videoDataEmpty": "视频数据为空",
+  "videoTooLarge": "视频大小不能超过 100MB",
+  "sendingVideo": "视频发送中...",
+  "sendVideoFailed": "发送视频失败: {error}",
+  "imageFileNotExist": "图片文件不存在",
+  "imageDataEmpty": "图片数据为空",
+  "sendingImage": "图片发送中...",
+  "sendImageFailed": "发送图片失败: {error}",
+  "sendLocation": "发送位置",
+  "selectLocationAndSend": "选择地点并发送给对方",
+  "shareRealTimeLocation": "共享实时位置",
+  "shareLocationForOneHour": "与好友共享1小时实时位置",
+  "locationSent": "位置发送成功",
+  "selectMessages": "选择消息",
+  "selectedCount": "已选择 {count} 条",
+  "selectAll": "全选",
+  "groupChatCount": "群聊({count})",
+  "privateChat": "私聊",
+  "noMessages": "暂无消息",
+  "sendFirstMessage": "发送第一条消息开始聊天",
+  "encryptionNotice": "本聊天已开启端对端加密保护，只有您和对方可以读取消息内容",
+  "replyTo": "回复 {name}",
+  "multiForward": "转发",
+  "collect": "收藏",
+  "noMembers": "暂无成员",
+  "memberNotFound": "未找到成员",
+  "voiceFileNotExist": "语音文件不存在",
+  "voiceFileEmpty": "语音文件为空",
+  "sendingVoice": "语音发送中...",
+  "sendVoiceFailed": "发送语音失败: {error}",
+  "messageCopied": "消息已复制",
+  "messageForwarded": "消息已转发",
+  "forwardFailed": "转发失败: {error}",
+  "unfavorited": "已取消收藏",
+  "favorited": "已收藏",
+  "reactionAdded": "已添加表情回应",
+  "failedMessageDeleted": "已删除失败消息",
+  "deleteMessages": "删除消息",
+  "deleteMessagesConfirm": "确定要删除 {count} 条消息吗？",
+  "noteOtherMessages": "注意：{count} 条消息是他人发送的，只能在本地删除。",
+  "myMessagesWillBeRecalled": "{count} 条自己发送的消息将被撤回。",
+  "recalledCount": "已撤回 {count} 条消息，本地删除 {localCount} 条",
+  "recalledMessages": "已撤回 {count} 条消息",
+  "deletedLocally": "已删除 {count} 条消息（仅本地）",
+  "forwardedCount": "已转发 {count} 条消息",
+  "forwardComplete": "转发完成：成功 {success} 条，失败 {failed} 条",
+  "remindOnlyInGroup": "提醒功能仅在群聊中可用",
+  "onlyTextSearchable": "仅支持搜索文本消息",
+  "searchFor": "搜索 \"{text}\"",
+  "baiduSearch": "百度搜索",
+  "googleSearch": "Google 搜索",
+  "bingSearch": "必应搜索",
+  "cannotOpenBrowser": "无法打开浏览器",
+  "calling": "呼叫中...",
+  "connecting": "正在连接...",
+  "ringing": "响铃中...",
+  "inCall": "通话中",
+  "featureInDevelopment": "{feature}功能开发中...",
+  "collectMessages": "已收藏 {count} 条消息",
+  "voted": "已投票",
+  "endPoll": "结束投票",
+  "endPollConfirm": "确定要结束这个投票吗？结束后将无法继续投票。",
+  "pollEnded": "投票已结束",
+  "memberCount": "{count}人"
+}

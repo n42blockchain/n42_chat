@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
@@ -143,13 +144,13 @@ class _ConversationListPageState extends State<ConversationListPage> {
               },
               builder: (context, state) {
                 if (state.isLoading) {
-                  return const N42Loading(message: '加载中...');
+                  return N42Loading(message: S.of(context)?.loading ?? 'Loading...');
                 }
 
                 if (state.isEmpty) {
                   return N42EmptyState.noData(
-                    title: '暂无会话',
-                    description: '点击右上角开始聊天',
+                    title: S.of(context)?.noConversations ?? 'No conversations',
+                    description: S.of(context)?.tapToChat ?? 'Tap the top right to start chatting',
                   );
                 }
 
@@ -197,7 +198,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          '消息',
+          S.of(context)?.messages ?? 'Messages',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -239,7 +240,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
               ),
               const SizedBox(width: 6),
               Text(
-                '搜索',
+                S.of(context)?.search ?? 'Search',
                 style: TextStyle(
                   fontSize: 15,
                   color: isDark ? Colors.white54 : Colors.black45,
@@ -310,7 +311,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature 功能即将推出'),
+        content: Text(S.of(context)?.featureComingSoon(feature) ?? '$feature coming soon'),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -347,25 +348,25 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 ctx,
                 icon: Icons.group_add,
                 iconColor: const Color(0xFF57BE6A),
-                title: '发起群聊',
+                title: S.of(context)?.startGroup ?? 'Start Group Chat',
                 onTap: () => _navigateToCreateGroup(ctx),
               ),
-              
+
               // 添加朋友
               _buildAddMenuItem(
                 ctx,
                 icon: Icons.person_add,
                 iconColor: const Color(0xFF576B95),
-                title: '添加朋友',
+                title: S.of(context)?.addFriend ?? 'Add Friend',
                 onTap: () => _navigateToAddFriend(ctx),
               ),
-              
+
               // 扫一扫
               _buildAddMenuItem(
                 ctx,
                 icon: Icons.qr_code_scanner,
                 iconColor: const Color(0xFF10AEFF),
-                title: '扫一扫',
+                title: S.of(context)?.scan ?? 'Scan',
                 onTap: () {
                   Navigator.pop(ctx);
                   Navigator.of(context).push(
@@ -373,16 +374,16 @@ class _ConversationListPageState extends State<ConversationListPage> {
                   );
                 },
               ),
-              
+
               // 收付款
               _buildAddMenuItem(
                 ctx,
                 icon: Icons.payment,
                 iconColor: const Color(0xFF09BB07),
-                title: '收付款',
+                title: S.of(context)?.payment ?? 'Payment',
                 onTap: () {
                   Navigator.pop(ctx);
-                  _showComingSoon('收付款');
+                  _showComingSoon(S.of(context)?.payment ?? 'Payment');
                 },
               ),
 
@@ -492,7 +493,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 _buildMenuTile(
                   ctx,
                   icon: Icons.done_all,
-                  title: '标记已读',
+                  title: S.of(context)?.markAsRead ?? 'Mark as read',
                   onTap: () {
                     Navigator.pop(ctx);
                     context
@@ -507,7 +508,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 icon: conversation.isMuted
                     ? Icons.notifications_active
                     : Icons.notifications_off,
-                title: conversation.isMuted ? '取消免打扰' : '消息免打扰',
+                title: conversation.isMuted
+                    ? (S.of(context)?.unmute ?? 'Unmute')
+                    : (S.of(context)?.mute ?? 'Mute'),
                 onTap: () {
                   Navigator.pop(ctx);
                   context.read<ConversationBloc>().add(SetConversationMuted(
@@ -521,7 +524,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
               _buildMenuTile(
                 ctx,
                 icon: conversation.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
-                title: conversation.isPinned ? '取消置顶' : '置顶',
+                title: conversation.isPinned
+                    ? (S.of(context)?.unpin ?? 'Unpin')
+                    : (S.of(context)?.pin ?? 'Pin'),
                 onTap: () {
                   Navigator.pop(ctx);
                   context.read<ConversationBloc>().add(SetConversationPinned(
@@ -535,7 +540,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
               _buildMenuTile(
                 ctx,
                 icon: Icons.delete_outline,
-                title: '删除会话',
+                title: S.of(context)?.deleteConversation ?? 'Delete Conversation',
                 isDestructive: true,
                 onTap: () {
                   Navigator.pop(ctx);
@@ -577,12 +582,13 @@ class _ConversationListPageState extends State<ConversationListPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('删除会话'),
-        content: Text('确定要删除与"${conversation.name}"的会话吗？'),
+        title: Text(S.of(context)?.deleteConversation ?? 'Delete Conversation'),
+        content: Text(S.of(context)?.deleteConversationConfirm(conversation.name) ??
+            'Are you sure you want to delete the conversation with "${conversation.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -592,7 +598,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                   .add(DeleteConversation(conversation.id));
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('删除'),
+            child: Text(S.of(context)?.delete ?? 'Delete'),
           ),
         ],
       ),

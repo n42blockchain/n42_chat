@@ -56,3 +56,8 @@ export 'src/integration/wallet_bridge.dart';
 // UI组件导出
 // ============================================
 export 'src/presentation/widgets/widgets.dart';
+
+// ============================================
+// 国际化导出
+// ============================================
+export 'l10n/app_localizations.dart';
