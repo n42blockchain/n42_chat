@@ -1892,4 +1892,185 @@ class SZh extends S {
   String memberCount(Object count) {
     return '$count人';
   }
+
+  @override
+  String get enterValidServerAddress => '请输入有效的服务器地址';
+
+  @override
+  String get emailOtp => '邮箱验证码';
+
+  @override
+  String get enterServerAddressFirst => '请先输入服务器地址';
+
+  @override
+  String get passkeyRequiresServer => 'Passkey登录需要服务器支持';
+
+  @override
+  String get loginAgreement => '登录即表示您同意';
+
+  @override
+  String get pleaseAgreeToTerms => '请阅读并同意服务条款和隐私政策';
+
+  @override
+  String get registerFailed => '注册失败';
+
+  @override
+  String get enterUsernameFormat => '请输入用户名（字母、数字、下划线）';
+
+  @override
+  String get enterPasswordMinLength => '请输入密码（至少8个字符）';
+
+  @override
+  String get reenterPassword => '请再次输入密码';
+
+  @override
+  String get passwordsDoNotMatch => '两次输入的密码不一致';
+
+  @override
+  String get inviteCodeBuiltIn => '邀请码（内置）';
+
+  @override
+  String get iHaveReadAndAgree => '我已阅读并同意';
+
+  @override
+  String get inviteCodeBuiltInNote => '邀请码已内置，通常无需修改';
+
+  @override
+  String get addToHomeScreen => '添加到主屏幕';
+  @override
+  String get allowOthersToSearchAndJoin => '允许他人搜索并加入';
+  @override
+  String get avatarUploadFailed => '头像上传失败';
+  @override
+  String get confirmClearChatHistory => '确定要清空聊天记录吗？';
+  @override
+  String get confirmDissolveGroup => '确定要解散此群组吗？';
+  @override
+  String get confirmLeaveGroup => '确定要退出此群组吗？';
+  @override
+  String contactCount(int count) => '$count位联系人';
+  @override
+  String get createGroupInDevelopment => '创建群聊（开发中）';
+  @override
+  String get createGroupToChat => '创建群组开始聊天';
+  @override
+  String get defaultRingtone => '默认铃声';
+  @override
+  String done(int count) => '完成($count)';
+  @override
+  String get editGroupAnnouncement => '编辑群公告';
+  @override
+  String get editGroupDescription => '编辑群简介';
+  @override
+  String get editSignature => '编辑签名';
+  @override
+  String get enterGroupAnnouncement => '请输入群公告';
+  @override
+  String get enterPokeSuffix => '请输入拍一拍后缀';
+  @override
+  String get enterRemarkName => '请输入备注名';
+  @override
+  String get example => '示例';
+  @override
+  String get favorites => '收藏';
+  @override
+  String get friendPokedMe => '拍了拍我';
+  @override
+  String get gender => '性别';
+  @override
+  String genderSetTo(String gender) => '性别已设为: $gender';
+  @override
+  String get groupInvites => '群邀请';
+  @override
+  String get introduceYourself => '介绍一下自己';
+  @override
+  String get invitedToJoinGroup => '邀请你加入群聊';
+  @override
+  String get leave => '离开';
+  @override
+  String get memberCountClickToCopy => '位成员（点击复制）';
+  @override
+  String get myAddresses => '我的地址';
+  @override
+  String get myGroups => '我的群聊';
+  @override
+  String get myQrCode => '我的二维码';
+  @override
+  String get name => '名称';
+  @override
+  String get onTheShoulder => '的肩膀';
+  @override
+  String get ordersAndCards => '订单与卡包';
+  @override
+  String get personalProfile => '个人资料';
+  @override
+  String get poke => '拍一拍';
+  @override
+  String get pokeCleared => '拍一拍已清除';
+  @override
+  String pokeSetTo(String poke) => '拍一拍已设为: $poke';
+  @override
+  String recommendedCardTo(String from, String to) => '已将$from的名片推荐给$to';
+  @override
+  String get region => '地区';
+  @override
+  String regionSetTo(String region) => '地区已设为: $region';
+  @override
+  String acceptedFriendRequest(String name) => '已接受$name的好友请求';
+  @override
+  String rejectedFriendRequest(String name) => '已拒绝$name的好友请求';
+  @override
+  String remarkSetTo(String remark) => '备注已设为: $remark';
+  @override
+  String get ringtone => '铃声';
+  @override
+  String ringtoneSetTo(String ringtone) => '铃声已设为: $ringtone';
+  @override
+  String get scanToAddFriend => '扫一扫添加好友';
+  @override
+  String get selectCity => '选择城市';
+  @override
+  String get selectRegion => '选择地区';
+  @override
+  String get services => '服务';
+  @override
+  String get setPoke => '设置拍一拍';
+  @override
+  String get signatureCleared => '签名已清除';
+  @override
+  String get signatureUpdated => '签名已更新';
+  @override
+  String statusSetTo(String status) => '状态已设为: $status';
+  @override
+  String get stickers => '表情包';
+
+  // Additional strings for tabs
+  @override
+  String messagesWithCount(int count) => '消息（$count）';
+
+  // Add menu
+  @override
+  String get startGroupChat => '发起群聊';
+  @override
+  String get addFriends => '添加朋友';
+  @override
+  String get paymentAndCollection => '收付款';
+
+  // Discover page additional
+  @override
+  String get videoChannels => '视频号';
+  @override
+  String get live => '直播';
+  @override
+  String get listen => '听一听';
+  @override
+  String get watch => '看一看';
+  @override
+  String get searchDiscover => '搜一搜';
+  @override
+  String get nearbyPeople => '附近的人';
+  @override
+  String get games => '游戏';
+  @override
+  String get miniPrograms => '小程序';
 }

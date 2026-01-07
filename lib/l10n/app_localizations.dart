@@ -3520,6 +3520,163 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'{count}人'**
   String memberCount(Object count);
+
+  /// No description provided for @enterValidServerAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入有效的服务器地址'**
+  String get enterValidServerAddress;
+
+  /// No description provided for @emailOtp.
+  ///
+  /// In zh, this message translates to:
+  /// **'邮箱验证码'**
+  String get emailOtp;
+
+  /// No description provided for @enterServerAddressFirst.
+  ///
+  /// In zh, this message translates to:
+  /// **'请先输入服务器地址'**
+  String get enterServerAddressFirst;
+
+  /// No description provided for @passkeyRequiresServer.
+  ///
+  /// In zh, this message translates to:
+  /// **'Passkey登录需要服务器支持'**
+  String get passkeyRequiresServer;
+
+  /// No description provided for @loginAgreement.
+  ///
+  /// In zh, this message translates to:
+  /// **'登录即表示您同意'**
+  String get loginAgreement;
+
+  /// No description provided for @pleaseAgreeToTerms.
+  ///
+  /// In zh, this message translates to:
+  /// **'请阅读并同意服务条款和隐私政策'**
+  String get pleaseAgreeToTerms;
+
+  /// No description provided for @registerFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'注册失败'**
+  String get registerFailed;
+
+  /// No description provided for @enterUsernameFormat.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入用户名（字母、数字、下划线）'**
+  String get enterUsernameFormat;
+
+  /// No description provided for @enterPasswordMinLength.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入密码（至少8个字符）'**
+  String get enterPasswordMinLength;
+
+  /// No description provided for @reenterPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'请再次输入密码'**
+  String get reenterPassword;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In zh, this message translates to:
+  /// **'两次输入的密码不一致'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @inviteCodeBuiltIn.
+  ///
+  /// In zh, this message translates to:
+  /// **'邀请码（内置）'**
+  String get inviteCodeBuiltIn;
+
+  /// No description provided for @iHaveReadAndAgree.
+  ///
+  /// In zh, this message translates to:
+  /// **'我已阅读并同意'**
+  String get iHaveReadAndAgree;
+
+  /// No description provided for @inviteCodeBuiltInNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'邀请码已内置，通常无需修改'**
+  String get inviteCodeBuiltInNote;
+
+  String get addToHomeScreen;
+  String get allowOthersToSearchAndJoin;
+  String get avatarUploadFailed;
+  String get confirmClearChatHistory;
+  String get confirmDissolveGroup;
+  String get confirmLeaveGroup;
+  String contactCount(int count);
+  String get createGroupInDevelopment;
+  String get createGroupToChat;
+  String get defaultRingtone;
+  String done(int count);
+  String get editGroupAnnouncement;
+  String get editGroupDescription;
+  String get editSignature;
+  String get enterGroupAnnouncement;
+  String get enterPokeSuffix;
+  String get enterRemarkName;
+  String get example;
+  String get favorites;
+  String get friendPokedMe;
+  String get gender;
+  String genderSetTo(String gender);
+  String get groupInvites;
+  String get introduceYourself;
+  String get invitedToJoinGroup;
+  String get leave;
+  String get memberCountClickToCopy;
+  String get myAddresses;
+  String get myGroups;
+  String get myQrCode;
+  String get name;
+  String get onTheShoulder;
+  String get ordersAndCards;
+  String get personalProfile;
+  String get poke;
+  String get pokeCleared;
+  String pokeSetTo(String poke);
+  String recommendedCardTo(String from, String to);
+  String get region;
+  String regionSetTo(String region);
+  String acceptedFriendRequest(String name);
+  String rejectedFriendRequest(String name);
+  String remarkSetTo(String remark);
+  String get ringtone;
+  String ringtoneSetTo(String ringtone);
+  String get scanToAddFriend;
+  String get selectCity;
+  String get selectRegion;
+  String get services;
+  String get setPoke;
+  String get signatureCleared;
+  String get signatureUpdated;
+  String statusSetTo(String status);
+  String get stickers;
+
+  // Additional strings for tabs
+  String messagesWithCount(int count);
+
+  // Add menu
+  String get startGroupChat;
+  String get addFriends;
+  String get paymentAndCollection;
+
+  // Discover page additional
+  String get videoChannels;
+  String get live;
+  String get listen;
+  String get watch;
+  String get searchDiscover;
+  String get nearbyPeople;
+  String get games;
+  String get miniPrograms;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

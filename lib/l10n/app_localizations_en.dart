@@ -1892,4 +1892,185 @@ class SEn extends S {
   String memberCount(Object count) {
     return '$count members';
   }
+
+  @override
+  String get enterValidServerAddress => 'Please enter a valid server address';
+
+  @override
+  String get emailOtp => 'Email OTP';
+
+  @override
+  String get enterServerAddressFirst => 'Please enter server address first';
+
+  @override
+  String get passkeyRequiresServer => 'Passkey login requires server support';
+
+  @override
+  String get loginAgreement => 'By logging in, you agree to ';
+
+  @override
+  String get pleaseAgreeToTerms => 'Please read and agree to the Terms of Service and Privacy Policy';
+
+  @override
+  String get registerFailed => 'Registration failed';
+
+  @override
+  String get enterUsernameFormat => 'Enter username (letters, numbers, underscores)';
+
+  @override
+  String get enterPasswordMinLength => 'Enter password (at least 8 characters)';
+
+  @override
+  String get reenterPassword => 'Re-enter password';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get inviteCodeBuiltIn => 'Invite code (built-in)';
+
+  @override
+  String get iHaveReadAndAgree => 'I have read and agree to ';
+
+  @override
+  String get inviteCodeBuiltInNote => 'Invite code is built-in, usually no need to modify';
+
+  @override
+  String get addToHomeScreen => 'Add to home screen';
+  @override
+  String get allowOthersToSearchAndJoin => 'Allow others to search and join';
+  @override
+  String get avatarUploadFailed => 'Avatar upload failed';
+  @override
+  String get confirmClearChatHistory => 'Are you sure you want to clear chat history?';
+  @override
+  String get confirmDissolveGroup => 'Are you sure you want to dissolve this group?';
+  @override
+  String get confirmLeaveGroup => 'Are you sure you want to leave this group?';
+  @override
+  String contactCount(int count) => '$count contacts';
+  @override
+  String get createGroupInDevelopment => 'Create group (in development)';
+  @override
+  String get createGroupToChat => 'Create a group to start chatting';
+  @override
+  String get defaultRingtone => 'Default ringtone';
+  @override
+  String done(int count) => 'Done($count)';
+  @override
+  String get editGroupAnnouncement => 'Edit group announcement';
+  @override
+  String get editGroupDescription => 'Edit group description';
+  @override
+  String get editSignature => 'Edit signature';
+  @override
+  String get enterGroupAnnouncement => 'Enter group announcement';
+  @override
+  String get enterPokeSuffix => 'Enter poke suffix';
+  @override
+  String get enterRemarkName => 'Enter remark name';
+  @override
+  String get example => 'Example';
+  @override
+  String get favorites => 'Favorites';
+  @override
+  String get friendPokedMe => 'poked me';
+  @override
+  String get gender => 'Gender';
+  @override
+  String genderSetTo(String gender) => 'Gender set to: $gender';
+  @override
+  String get groupInvites => 'Group invites';
+  @override
+  String get introduceYourself => 'Introduce yourself';
+  @override
+  String get invitedToJoinGroup => 'invited you to join the group';
+  @override
+  String get leave => 'Leave';
+  @override
+  String get memberCountClickToCopy => 'members (click to copy)';
+  @override
+  String get myAddresses => 'My addresses';
+  @override
+  String get myGroups => 'My groups';
+  @override
+  String get myQrCode => 'My QR code';
+  @override
+  String get name => 'Name';
+  @override
+  String get onTheShoulder => 'on the shoulder';
+  @override
+  String get ordersAndCards => 'Orders and cards';
+  @override
+  String get personalProfile => 'Personal profile';
+  @override
+  String get poke => 'Poke';
+  @override
+  String get pokeCleared => 'Poke cleared';
+  @override
+  String pokeSetTo(String poke) => 'Poke set to: $poke';
+  @override
+  String recommendedCardTo(String from, String to) => 'Recommended $from\'s card to $to';
+  @override
+  String get region => 'Region';
+  @override
+  String regionSetTo(String region) => 'Region set to: $region';
+  @override
+  String acceptedFriendRequest(String name) => 'Accepted $name\'s friend request';
+  @override
+  String rejectedFriendRequest(String name) => 'Rejected $name\'s friend request';
+  @override
+  String remarkSetTo(String remark) => 'Remark set to: $remark';
+  @override
+  String get ringtone => 'Ringtone';
+  @override
+  String ringtoneSetTo(String ringtone) => 'Ringtone set to: $ringtone';
+  @override
+  String get scanToAddFriend => 'Scan to add friend';
+  @override
+  String get selectCity => 'Select city';
+  @override
+  String get selectRegion => 'Select region';
+  @override
+  String get services => 'Services';
+  @override
+  String get setPoke => 'Set poke';
+  @override
+  String get signatureCleared => 'Signature cleared';
+  @override
+  String get signatureUpdated => 'Signature updated';
+  @override
+  String statusSetTo(String status) => 'Status set to: $status';
+  @override
+  String get stickers => 'Stickers';
+
+  // Additional strings for tabs
+  @override
+  String messagesWithCount(int count) => 'Messages($count)';
+
+  // Add menu
+  @override
+  String get startGroupChat => 'Start Group Chat';
+  @override
+  String get addFriends => 'Add Friends';
+  @override
+  String get paymentAndCollection => 'Payment';
+
+  // Discover page additional
+  @override
+  String get videoChannels => 'Channels';
+  @override
+  String get live => 'Live';
+  @override
+  String get listen => 'Listen';
+  @override
+  String get watch => 'Watch';
+  @override
+  String get searchDiscover => 'Search';
+  @override
+  String get nearbyPeople => 'Nearby';
+  @override
+  String get games => 'Games';
+  @override
+  String get miniPrograms => 'Mini Programs';
 }

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../qrcode/scan_qr_page.dart';
@@ -21,16 +22,18 @@ class DiscoverPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
+    final l10n = S.of(context);
+
     return Scaffold(
       backgroundColor: bgColor,
       appBar: showAppBar ? N42AppBar(
-        title: '发现',
+        title: l10n?.discover ?? 'Discover',
         showBackButton: false,
       ) : null,
       body: ListView(
         children: [
           const SizedBox(height: 8),
-          
+
           // 朋友圈、视频号、直播
           _buildGroupCard(
             context,
@@ -40,30 +43,30 @@ class DiscoverPage extends StatelessWidget {
                 context,
                 isDark: isDark,
                 iconWidget: _MomentsIcon(),
-                title: '朋友圈',
-                onTap: () => _showComingSoon(context, '朋友圈'),
+                title: l10n?.moments ?? 'Moments',
+                onTap: () => _showComingSoon(context, l10n?.moments ?? 'Moments'),
               ),
               _buildDivider(context, isDark),
               _buildMenuItem(
                 context,
                 isDark: isDark,
                 iconWidget: _ChannelsIcon(),
-                title: '视频号',
-                onTap: () => _showComingSoon(context, '视频号'),
+                title: l10n?.videoChannels ?? 'Channels',
+                onTap: () => _showComingSoon(context, l10n?.videoChannels ?? 'Channels'),
               ),
               _buildDivider(context, isDark),
               _buildMenuItem(
                 context,
                 isDark: isDark,
                 iconWidget: _LiveIcon(),
-                title: '直播',
-                onTap: () => _showComingSoon(context, '直播'),
+                title: l10n?.live ?? 'Live',
+                onTap: () => _showComingSoon(context, l10n?.live ?? 'Live'),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // 扫一扫、听一听
           _buildGroupCard(
             context,
@@ -73,7 +76,7 @@ class DiscoverPage extends StatelessWidget {
                 context,
                 isDark: isDark,
                 iconWidget: _ScanIcon(),
-                title: '扫一扫',
+                title: l10n?.scan ?? 'Scan',
                 onTap: () => _openScanQR(context),
               ),
               _buildDivider(context, isDark),
@@ -81,14 +84,14 @@ class DiscoverPage extends StatelessWidget {
                 context,
                 isDark: isDark,
                 iconWidget: _MusicIcon(),
-                title: '听一听',
-                onTap: () => _showComingSoon(context, '听一听'),
+                title: l10n?.listen ?? 'Listen',
+                onTap: () => _showComingSoon(context, l10n?.listen ?? 'Listen'),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // 看一看、搜一搜
           _buildGroupCard(
             context,
@@ -98,22 +101,22 @@ class DiscoverPage extends StatelessWidget {
                 context,
                 isDark: isDark,
                 iconWidget: _WatchIcon(),
-                title: '看一看',
-                onTap: () => _showComingSoon(context, '看一看'),
+                title: l10n?.watch ?? 'Watch',
+                onTap: () => _showComingSoon(context, l10n?.watch ?? 'Watch'),
               ),
               _buildDivider(context, isDark),
               _buildMenuItem(
                 context,
                 isDark: isDark,
                 iconWidget: _SearchIcon(),
-                title: '搜一搜',
-                onTap: () => _showComingSoon(context, '搜一搜'),
+                title: l10n?.searchDiscover ?? 'Search',
+                onTap: () => _showComingSoon(context, l10n?.searchDiscover ?? 'Search'),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // 附近的人
           _buildGroupCard(
             context,
@@ -123,14 +126,14 @@ class DiscoverPage extends StatelessWidget {
                 context,
                 isDark: isDark,
                 iconWidget: _NearbyIcon(),
-                title: '附近的人',
-                onTap: () => _showComingSoon(context, '附近的人'),
+                title: l10n?.nearbyPeople ?? 'Nearby',
+                onTap: () => _showComingSoon(context, l10n?.nearbyPeople ?? 'Nearby'),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // 游戏、小程序
           _buildGroupCard(
             context,
@@ -140,20 +143,20 @@ class DiscoverPage extends StatelessWidget {
                 context,
                 isDark: isDark,
                 iconWidget: _GameIcon(),
-                title: '游戏',
-                onTap: () => _showComingSoon(context, '游戏'),
+                title: l10n?.games ?? 'Games',
+                onTap: () => _showComingSoon(context, l10n?.games ?? 'Games'),
               ),
               _buildDivider(context, isDark),
               _buildMenuItem(
                 context,
                 isDark: isDark,
                 iconWidget: _MiniProgramIcon(),
-                title: '小程序',
-                onTap: () => _showComingSoon(context, '小程序'),
+                title: l10n?.miniPrograms ?? 'Mini Programs',
+                onTap: () => _showComingSoon(context, l10n?.miniPrograms ?? 'Mini Programs'),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 32),
         ],
       ),
@@ -233,9 +236,10 @@ class DiscoverPage extends StatelessWidget {
   }
 
   void _showComingSoon(BuildContext context, String feature) {
+    final l10n = S.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature 功能即将推出'),
+        content: Text(l10n?.featureComingSoon(feature) ?? '$feature coming soon'),
         duration: const Duration(seconds: 2),
       ),
     );

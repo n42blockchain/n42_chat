@@ -58,6 +58,6 @@ export 'src/integration/wallet_bridge.dart';
 export 'src/presentation/widgets/widgets.dart';
 
 // ============================================
-// 国际化导出
+// 国际化导出 (隐藏S类以避免与主应用冲突)
 // ============================================
-export 'l10n/app_localizations.dart';
+export 'l10n/app_localizations.dart' hide S;

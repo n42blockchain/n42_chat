@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
           if (state.hasError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? (S.of(context)?.loginFailed ?? 'Login failed')),
+                content: Text(state.errorMessage ?? S.of(context)?.loginFailed('') ?? 'Login failed'),
                 backgroundColor: AppColors.error,
               ),
             );

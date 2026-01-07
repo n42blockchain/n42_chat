@@ -639,7 +639,7 @@ class _ContactListPageState extends State<ContactListPage> {
                 onTap: () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(S.of(context)?.featureInDevelopment ?? 'Feature in development')),
+                    SnackBar(content: Text(S.of(context)?.featureInDevelopment('') ?? 'Feature in development')),
                   );
                 },
               ),
