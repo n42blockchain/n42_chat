@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
@@ -45,8 +46,8 @@ class _RegisterPageState extends State<RegisterPage> {
   void _onRegister() {
     if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('请先阅读并同意服务协议和隐私政策'),
+        SnackBar(
+          content: Text(S.of(context)?.pleaseAgreeToTerms ?? 'Please read and agree to the Terms of Service and Privacy Policy'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -87,7 +88,7 @@ class _RegisterPageState extends State<RegisterPage> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
-          '注册',
+          S.of(context)?.register ?? 'Sign Up',
           style: TextStyle(
             color: textColor,
             fontSize: 17,
@@ -101,7 +102,7 @@ class _RegisterPageState extends State<RegisterPage> {
           if (state.hasError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? '注册失败'),
+                content: Text(state.errorMessage ?? (S.of(context)?.registerFailed ?? 'Registration failed')),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -194,7 +195,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         const SizedBox(height: 16),
         Text(
-          '创建账号',
+          S.of(context)?.createAccount ?? 'Create Account',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w600,
@@ -203,7 +204,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         const SizedBox(height: 4),
         Text(
-          '加入 N42 Chat 开始聊天',
+          S.of(context)?.joinN42Chat ?? 'Join N42 Chat to start chatting',
           style: TextStyle(
             fontSize: 14,
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -223,7 +224,7 @@ class _RegisterPageState extends State<RegisterPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '服务器地址',
+          S.of(context)?.serverAddress ?? 'Server Address',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -271,10 +272,10 @@ class _RegisterPageState extends State<RegisterPage> {
           onEditingComplete: _checkHomeserver,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return '请输入服务器地址';
+              return S.of(context)?.enterServerAddress ?? 'Please enter server address';
             }
             if (!value.startsWith('http://') && !value.startsWith('https://')) {
-              return '请输入有效的服务器地址';
+              return S.of(context)?.enterValidServerAddress ?? 'Please enter a valid server address';
             }
             return null;
           },
@@ -282,7 +283,7 @@ class _RegisterPageState extends State<RegisterPage> {
         if (state.isHomeserverValid && state.homeserverInfo != null) ...[
           const SizedBox(height: 4),
           Text(
-            '✓ 已连接到 ${state.homeserverInfo!.serverName}',
+            '✓ ${S.of(context)?.connectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.success,
@@ -298,12 +299,12 @@ class _RegisterPageState extends State<RegisterPage> {
     final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '用户名',
+          S.of(context)?.username ?? 'Username',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -314,7 +315,7 @@ class _RegisterPageState extends State<RegisterPage> {
           controller: _usernameController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: '请输入用户名（字母、数字、下划线）',
+            hintText: S.of(context)?.enterUsernameFormat ?? 'Enter username (letters, numbers, underscores)',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -334,13 +335,13 @@ class _RegisterPageState extends State<RegisterPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return '请输入用户名';
+              return S.of(context)?.enterUsername ?? 'Please enter username';
             }
             if (value.length < 3) {
-              return '用户名至少3个字符';
+              return S.of(context)?.usernameMinLength ?? 'Username must be at least 3 characters';
             }
             if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-              return '用户名只能包含字母、数字和下划线';
+              return S.of(context)?.usernameFormat ?? 'Username can only contain letters, numbers, and underscores';
             }
             return null;
           },
@@ -354,12 +355,12 @@ class _RegisterPageState extends State<RegisterPage> {
     final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '密码',
+          S.of(context)?.password ?? 'Password',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -370,7 +371,7 @@ class _RegisterPageState extends State<RegisterPage> {
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: '请输入密码（至少8位）',
+            hintText: S.of(context)?.enterPasswordMinLength ?? 'Enter password (at least 8 characters)',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -402,10 +403,10 @@ class _RegisterPageState extends State<RegisterPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return '请输入密码';
+              return S.of(context)?.enterPassword ?? 'Please enter password';
             }
             if (value.length < 8) {
-              return '密码至少8位';
+              return S.of(context)?.passwordMinLength ?? 'Password must be at least 8 characters';
             }
             return null;
           },
@@ -419,12 +420,12 @@ class _RegisterPageState extends State<RegisterPage> {
     final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '确认密码',
+          S.of(context)?.confirmPassword ?? 'Confirm Password',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -435,7 +436,7 @@ class _RegisterPageState extends State<RegisterPage> {
           controller: _confirmPasswordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: '请再次输入密码',
+            hintText: S.of(context)?.reenterPassword ?? 'Re-enter password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -468,10 +469,10 @@ class _RegisterPageState extends State<RegisterPage> {
           onFieldSubmitted: (_) => _onRegister(),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return '请再次输入密码';
+              return S.of(context)?.reenterPassword ?? 'Please re-enter password';
             }
             if (value != _passwordController.text) {
-              return '两次输入的密码不一致';
+              return S.of(context)?.passwordsDoNotMatch ?? 'Passwords do not match';
             }
             return null;
           },
@@ -505,7 +506,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(width: 4),
               Text(
-                '邀请码（已内置）',
+                S.of(context)?.inviteCodeBuiltIn ?? 'Invite Code (Built-in)',
                 style: TextStyle(
                   fontSize: 14,
                   color: labelColor,
@@ -514,7 +515,7 @@ class _RegisterPageState extends State<RegisterPage> {
               const Spacer(),
               if (!_showInviteCode)
                 Text(
-                  '已填写',
+                  S.of(context)?.filled ?? 'Filled',
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.success,
@@ -531,7 +532,7 @@ class _RegisterPageState extends State<RegisterPage> {
             style: TextStyle(color: textColor, fontSize: 14),
             maxLines: 2,
             decoration: InputDecoration(
-              hintText: '请输入邀请码',
+              hintText: S.of(context)?.enterInviteCode ?? 'Enter invite code',
               hintStyle: TextStyle(color: hintColor),
               filled: true,
               fillColor: inputBgColor,
@@ -551,7 +552,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            '邀请码已内置，通常无需修改',
+            S.of(context)?.inviteCodeBuiltInNote ?? 'Invite code is built-in, usually no need to modify',
             style: TextStyle(
               fontSize: 11,
               color: hintColor,
@@ -596,21 +597,21 @@ class _RegisterPageState extends State<RegisterPage> {
             },
             child: Text.rich(
               TextSpan(
-                text: '我已阅读并同意',
+                text: S.of(context)?.iHaveReadAndAgree ?? 'I have read and agree to ',
                 style: TextStyle(
                   fontSize: 13,
                   color: textColor,
                 ),
                 children: [
                   TextSpan(
-                    text: '《服务协议》',
+                    text: S.of(context)?.termsOfService ?? 'Terms of Service',
                     style: TextStyle(
                       color: AppColors.textLink,
                     ),
                   ),
-                  const TextSpan(text: '和'),
+                  TextSpan(text: S.of(context)?.and ?? ' and '),
                   TextSpan(
-                    text: '《隐私政策》',
+                    text: S.of(context)?.privacyPolicy ?? 'Privacy Policy',
                     style: TextStyle(
                       color: AppColors.textLink,
                     ),
@@ -648,8 +649,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : const Text(
-                '注册',
+            : Text(
+                S.of(context)?.register ?? 'Sign Up',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
@@ -662,12 +663,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _buildLoginLink(bool isDark) {
     final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          '已有账号？',
+          S.of(context)?.alreadyHaveAccount ?? 'Already have an account?',
           style: TextStyle(
             fontSize: 14,
             color: textColor,
@@ -677,8 +678,8 @@ class _RegisterPageState extends State<RegisterPage> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text(
-            '立即登录',
+          child: Text(
+            S.of(context)?.loginNow ?? 'Log In Now',
             style: TextStyle(
               fontSize: 14,
               color: AppColors.textLink,

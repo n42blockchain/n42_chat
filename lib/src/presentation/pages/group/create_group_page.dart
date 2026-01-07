@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
@@ -68,14 +69,14 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入群名称')),
+        SnackBar(content: Text(S.of(context)?.enterGroupName ?? 'Enter group name')),
       );
       return;
     }
 
     if (_selectedUserIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请至少选择一位成员')),
+        SnackBar(content: Text(S.of(context)?.selectAtLeastOne ?? 'Please select at least one member')),
       );
       return;
     }
@@ -104,7 +105,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
       child: Scaffold(
         backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
         appBar: N42AppBar(
-          title: '发起群聊',
+          title: S.of(context)?.createGroup ?? 'Create Group',
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () => Navigator.pop(context),
@@ -113,7 +114,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
             TextButton(
               onPressed: _selectedUserIds.isNotEmpty ? _createGroup : null,
               child: Text(
-                '完成(${_selectedUserIds.length})',
+                S.of(context)?.done(_selectedUserIds.length) ?? 'Done(${_selectedUserIds.length})',
                 style: TextStyle(
                   color: _selectedUserIds.isNotEmpty
                       ? AppColors.primary
@@ -158,7 +159,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                     child: TextField(
                       controller: _nameController,
                       decoration: InputDecoration(
-                        hintText: '请输入群聊名称',
+                        hintText: S.of(context)?.enterGroupName ?? 'Enter group name',
                         border: InputBorder.none,
                         hintStyle: TextStyle(
                           color: isDark
@@ -210,7 +211,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
               padding: const EdgeInsets.all(12),
               child: N42SearchBar(
                 controller: _searchController,
-                hintText: '搜索联系人',
+                hintText: S.of(context)?.searchContacts ?? 'Search contacts',
                 onChanged: (query) {
                   setState(() {
                     _isSearching = query.isNotEmpty;
@@ -229,9 +230,9 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                   }
 
                   if (state is! ContactLoaded) {
-                    return const N42EmptyState(
+                    return N42EmptyState(
                       icon: Icons.contacts_outlined,
-                      title: '暂无联系人',
+                      title: S.of(context)?.noContacts ?? 'No contacts',
                     );
                   }
 

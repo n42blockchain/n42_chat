@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -136,9 +137,9 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
       debugPrint('VoiceMessageWidget: voiceUrl is null or empty, cannot play');
       // 提示用户
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('语音加载中，请稍后再试'),
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: Text(S.of(context)?.voiceLoading ?? 'Voice loading, please try again later'),
+          duration: const Duration(seconds: 1),
         ),
       );
       return;
@@ -172,8 +173,8 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('语音转文字失败'),
+          SnackBar(
+            content: Text(S.of(context)?.voiceToTextFailed ?? 'Voice to text failed'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -322,7 +323,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                     ),
                   const SizedBox(width: 4),
                   Text(
-                    _isConverting ? '转换中...' : '转文字',
+                    _isConverting ? '...' : (S.of(context)?.convertToText ?? 'To text'),
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
@@ -361,7 +362,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
               if (_convertedText == null)
                 ListTile(
                   leading: const Icon(Icons.text_fields),
-                  title: const Text('转为文字'),
+                  title: Text(S.of(context)?.convertToText ?? 'To text'),
                   onTap: () {
                     Navigator.pop(ctx);
                     _convertToText();
@@ -369,7 +370,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                 ),
               ListTile(
                 leading: const Icon(Icons.cancel),
-                title: const Text('取消'),
+                title: Text(S.of(context)?.cancel ?? 'Cancel'),
                 onTap: () => Navigator.pop(ctx),
               ),
               const SizedBox(height: 8),

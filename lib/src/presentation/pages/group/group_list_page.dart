@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../blocs/group/group_bloc.dart';
@@ -30,7 +31,7 @@ class _GroupListPageState extends State<GroupListPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: '群聊',
+        title: S.of(context)?.groupChat ?? 'Group Chat',
         actions: [
           IconButton(
             icon: Icon(
@@ -62,10 +63,10 @@ class _GroupListPageState extends State<GroupListPage> {
             return _buildGroupList(state, isDark);
           }
 
-          return const N42EmptyState(
+          return N42EmptyState(
             icon: Icons.group_outlined,
-            title: '暂无群聊',
-            description: '创建一个群聊开始聊天吧',
+            title: S.of(context)?.noGroups ?? 'No groups',
+            description: S.of(context)?.createGroupToChat ?? 'Create a group to start chatting',
           );
         },
       ),
@@ -77,9 +78,9 @@ class _GroupListPageState extends State<GroupListPage> {
       return Center(
         child: N42EmptyState(
           icon: Icons.group_outlined,
-          title: '暂无群聊',
-          description: '创建一个群聊开始聊天吧',
-          buttonText: '发起群聊',
+          title: S.of(context)?.noGroups ?? 'No groups',
+          description: S.of(context)?.createGroupToChat ?? 'Create a group to start chatting',
+          buttonText: S.of(context)?.createGroup ?? 'Create Group',
           onButtonPressed: () => _navigateToCreateGroup(),
         ),
       );
@@ -93,13 +94,13 @@ class _GroupListPageState extends State<GroupListPage> {
         children: [
           // 群邀请
           if (state.invites.isNotEmpty) ...[
-            _buildSectionHeader('群邀请', isDark),
+            _buildSectionHeader(S.of(context)?.groupInvites ?? 'Group Invites', isDark),
             ...state.invites.map((invite) => _buildInviteTile(invite, isDark)),
           ],
 
           // 我的群聊
           if (state.groups.isNotEmpty) ...[
-            _buildSectionHeader('我的群聊 (${state.groups.length})', isDark),
+            _buildSectionHeader(S.of(context)?.myGroups(state.groups.length) ?? 'My Groups (${state.groups.length})', isDark),
             ...state.groups.map((group) => _buildGroupTile(group, isDark)),
           ],
         ],
@@ -140,7 +141,7 @@ class _GroupListPageState extends State<GroupListPage> {
           ),
         ),
         subtitle: Text(
-          '${group.memberCount} 人',
+          S.of(context)?.memberCount(group.memberCount) ?? '${group.memberCount} members',
           style: TextStyle(
             fontSize: 13,
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -177,7 +178,7 @@ class _GroupListPageState extends State<GroupListPage> {
           ),
         ),
         subtitle: Text(
-          '邀请你加入群聊',
+          S.of(context)?.invitedToJoinGroup ?? 'Invited to join group',
           style: TextStyle(
             fontSize: 13,
             color: AppColors.primary,
@@ -190,13 +191,13 @@ class _GroupListPageState extends State<GroupListPage> {
               onPressed: () {
                 context.read<GroupBloc>().add(RejectGroupInvite(group.roomId));
               },
-              child: const Text('拒绝'),
+              child: Text(S.of(context)?.reject ?? 'Reject'),
             ),
             TextButton(
               onPressed: () {
                 context.read<GroupBloc>().add(AcceptGroupInvite(group.roomId));
               },
-              child: const Text('接受'),
+              child: Text(S.of(context)?.accept ?? 'Accept'),
             ),
           ],
         ),
@@ -224,7 +225,7 @@ class _GroupListPageState extends State<GroupListPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.info_outline),
-              title: const Text('群资料'),
+              title: Text(S.of(context)?.groupProfile ?? 'Group Info'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.of(this.context).pushNamed('/group/settings/${group.roomId}');
@@ -233,7 +234,7 @@ class _GroupListPageState extends State<GroupListPage> {
             if (group.isOwner)
               ListTile(
                 leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: const Text('解散群聊', style: TextStyle(color: Colors.red)),
+                title: Text(S.of(context)?.dissolveGroup ?? 'Dissolve Group', style: const TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   _confirmDeleteGroup(group);
@@ -242,7 +243,7 @@ class _GroupListPageState extends State<GroupListPage> {
             else
               ListTile(
                 leading: const Icon(Icons.exit_to_app, color: Colors.red),
-                title: const Text('退出群聊', style: TextStyle(color: Colors.red)),
+                title: Text(S.of(context)?.leaveGroup ?? 'Leave Group', style: const TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   _confirmLeaveGroup(group);
@@ -257,20 +258,20 @@ class _GroupListPageState extends State<GroupListPage> {
   void _confirmLeaveGroup(GroupEntity group) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('退出群聊'),
-        content: Text('确定要退出「${group.name}」吗？'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.leaveGroup ?? 'Leave Group'),
+        content: Text(S.of(context)?.confirmLeaveGroup(group.name) ?? 'Are you sure you want to leave "${group.name}"?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               this.context.read<GroupBloc>().add(LeaveGroup(group.roomId));
             },
-            child: const Text('退出', style: TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.leave ?? 'Leave', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -280,20 +281,20 @@ class _GroupListPageState extends State<GroupListPage> {
   void _confirmDeleteGroup(GroupEntity group) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('解散群聊'),
-        content: Text('确定要解散「${group.name}」吗？此操作不可恢复。'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.dissolveGroup ?? 'Dissolve Group'),
+        content: Text(S.of(context)?.confirmDissolveGroup(group.name) ?? 'Are you sure you want to dissolve "${group.name}"? This action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               this.context.read<GroupBloc>().add(DeleteGroup(group.roomId));
             },
-            child: const Text('解散', style: TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.dissolve ?? 'Dissolve', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),

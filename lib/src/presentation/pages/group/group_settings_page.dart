@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../blocs/group/group_bloc.dart';
@@ -49,17 +50,17 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       builder: (context, state) {
         if (state is GroupLoading) {
           return Scaffold(
-            appBar: N42AppBar(title: '群聊资料'),
+            appBar: N42AppBar(title: S.of(context)?.groupProfile ?? 'Group Info'),
             body: const N42Loading(),
           );
         }
 
         if (state is! GroupDetailsLoaded) {
           return Scaffold(
-            appBar: N42AppBar(title: '群聊资料'),
-            body: const N42EmptyState(
+            appBar: N42AppBar(title: S.of(context)?.groupProfile ?? 'Group Info'),
+            body: N42EmptyState(
               icon: Icons.error_outline,
-              title: '加载失败',
+              title: S.of(context)?.loadFailed ?? 'Load failed',
             ),
           );
         }
@@ -76,7 +77,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: '群聊资料',
+        title: S.of(context)?.groupProfile ?? 'Group Info',
         actions: [
           IconButton(
             icon: const Icon(Icons.more_horiz),
@@ -185,11 +186,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: group.roomId));
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('群ID已复制')),
+                      SnackBar(content: Text(S.of(context)?.groupIdCopied ?? 'Group ID copied')),
                     );
                   },
                   child: Text(
-                    '${group.memberCount}人 · 点击复制群ID',
+                    S.of(context)?.memberCountClickToCopy(group.memberCount) ?? '${group.memberCount} members - Click to copy group ID',
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark
@@ -224,7 +225,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '群成员 (${group.memberCount})',
+                S.of(context)?.groupMembers(group.memberCount) ?? 'Group Members (${group.memberCount})',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
@@ -233,7 +234,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               ),
               TextButton(
                 onPressed: () => _navigateToMemberList(group),
-                child: const Text('查看全部'),
+                child: Text(S.of(context)?.viewAll ?? 'View All'),
               ),
             ],
           ),
@@ -276,9 +277,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       color: Colors.orange,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text(
-                      '群主',
-                      style: TextStyle(
+                    child: Text(
+                      S.of(context)?.owner ?? 'Owner',
+                      style: const TextStyle(
                         fontSize: 8,
                         color: Colors.white,
                       ),
@@ -295,9 +296,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text(
-                      '管理',
-                      style: TextStyle(
+                    child: Text(
+                      S.of(context)?.admin ?? 'Admin',
+                      style: const TextStyle(
                         fontSize: 8,
                         color: Colors.white,
                       ),
@@ -337,11 +338,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             child: const Icon(Icons.add, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 4),
-          const SizedBox(
+          SizedBox(
             width: 50,
             child: Text(
-              '邀请',
-              style: TextStyle(fontSize: 11),
+              S.of(context)?.invite ?? 'Invite',
+              style: const TextStyle(fontSize: 11),
               textAlign: TextAlign.center,
             ),
           ),
@@ -357,11 +358,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         children: [
           // 群公告
           ListTile(
-            title: const Text('群公告'),
+            title: Text(S.of(context)?.groupAnnouncement ?? 'Group Announcement'),
             subtitle: Text(
               group.announcement?.isNotEmpty == true
                   ? group.announcement!
-                  : '未设置',
+                  : S.of(context)?.notSet ?? 'Not set',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -373,9 +374,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
           // 群描述
           ListTile(
-            title: const Text('群简介'),
+            title: Text(S.of(context)?.groupDescription ?? 'Group Description'),
             subtitle: Text(
-              group.topic?.isNotEmpty == true ? group.topic! : '未设置',
+              group.topic?.isNotEmpty == true ? group.topic! : S.of(context)?.notSet ?? 'Not set',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -388,8 +389,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
             // 群可见性
             SwitchListTile(
-              title: const Text('公开群聊'),
-              subtitle: const Text('允许其他人搜索并加入'),
+              title: Text(S.of(context)?.publicGroup ?? 'Public Group'),
+              subtitle: Text(S.of(context)?.allowOthersToSearchAndJoin ?? 'Allow others to search and join'),
               value: group.isPublic,
               onChanged: (value) {
                 // TODO: 实现
@@ -408,7 +409,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         children: [
           // 清空聊天记录
           ListTile(
-            title: const Text('清空聊天记录'),
+            title: Text(S.of(context)?.clearChatHistory ?? 'Clear Chat History'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _clearChatHistory(),
           ),
@@ -418,7 +419,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           // 退出/解散群聊
           ListTile(
             title: Text(
-              group.isOwner ? '解散群聊' : '退出群聊',
+              group.isOwner ? (S.of(context)?.dissolveGroup ?? 'Dissolve Group') : (S.of(context)?.leaveGroup ?? 'Leave Group'),
               style: const TextStyle(color: Colors.red),
             ),
             onTap: () {
@@ -447,30 +448,30 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     final controller = TextEditingController(text: group.name);
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('修改群名称'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.changeGroupName ?? 'Change Group Name'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            hintText: '请输入群名称',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: S.of(context)?.enterGroupName ?? 'Enter group name',
+            border: const OutlineInputBorder(),
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
               final name = controller.text.trim();
               if (name.isNotEmpty) {
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
                 this.context.read<GroupBloc>().add(UpdateGroupName(widget.roomId, name));
               }
             },
-            child: const Text('确定'),
+            child: Text(S.of(context)?.confirm ?? 'OK'),
           ),
         ],
       ),
@@ -481,30 +482,30 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     final controller = TextEditingController(text: group.topic);
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('修改群简介'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.editGroupDescription ?? 'Edit Group Description'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            hintText: '请输入群简介',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: S.of(context)?.enterGroupDescription ?? 'Enter group description',
+            border: const OutlineInputBorder(),
           ),
           maxLines: 3,
           autofocus: true,
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               this.context.read<GroupBloc>().add(
                     UpdateGroupTopic(widget.roomId, controller.text.trim()),
                   );
             },
-            child: const Text('确定'),
+            child: Text(S.of(context)?.confirm ?? 'OK'),
           ),
         ],
       ),
@@ -515,31 +516,31 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     final controller = TextEditingController(text: group.announcement);
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('编辑群公告'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.editGroupAnnouncement ?? 'Edit Group Announcement'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            hintText: '请输入群公告',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: S.of(context)?.enterGroupAnnouncement ?? 'Enter group announcement',
+            border: const OutlineInputBorder(),
           ),
           maxLines: 5,
           autofocus: true,
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               // 群公告使用 topic 实现
               this.context.read<GroupBloc>().add(
                     UpdateGroupTopic(widget.roomId, controller.text.trim()),
                   );
             },
-            child: const Text('发布'),
+            child: Text(S.of(context)?.publish ?? 'Publish'),
           ),
         ],
       ),
@@ -557,23 +558,23 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   void _clearChatHistory() {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('清空聊天记录'),
-        content: const Text('确定要清空聊天记录吗？此操作不可恢复。'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.clearChatHistory ?? 'Clear Chat History'),
+        content: Text(S.of(context)?.confirmClearChatHistory ?? 'Are you sure you want to clear chat history? This action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               // TODO: 实现清空聊天记录
               ScaffoldMessenger.of(this.context).showSnackBar(
-                const SnackBar(content: Text('功能开发中...')),
+                SnackBar(content: Text(S.of(context)?.featureInDevelopment ?? 'Feature in development')),
               );
             },
-            child: const Text('清空', style: TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.clear ?? 'Clear', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -583,21 +584,21 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   void _confirmLeaveGroup(GroupEntity group) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('退出群聊'),
-        content: Text('确定要退出「${group.name}」吗？'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.leaveGroup ?? 'Leave Group'),
+        content: Text(S.of(context)?.confirmLeaveGroup(group.name) ?? 'Are you sure you want to leave "${group.name}"?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               this.context.read<GroupBloc>().add(LeaveGroup(widget.roomId));
               Navigator.of(this.context).pop();
             },
-            child: const Text('退出', style: TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.leave ?? 'Leave', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -607,21 +608,21 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   void _confirmDeleteGroup(GroupEntity group) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('解散群聊'),
-        content: Text('确定要解散「${group.name}」吗？此操作不可恢复。'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.dissolveGroup ?? 'Dissolve Group'),
+        content: Text(S.of(context)?.confirmDissolveGroup(group.name) ?? 'Are you sure you want to dissolve "${group.name}"? This action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               this.context.read<GroupBloc>().add(DeleteGroup(widget.roomId));
               Navigator.of(this.context).pop();
             },
-            child: const Text('解散', style: TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.dissolve ?? 'Dissolve', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -631,27 +632,27 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   void _showMoreOptions(GroupEntity group) {
     showModalBottomSheet<void>(
       context: context,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.qr_code),
-              title: const Text('群二维码'),
+              title: Text(S.of(context)?.groupQrCode ?? 'Group QR Code'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(sheetContext);
                 ScaffoldMessenger.of(this.context).showSnackBar(
-                  const SnackBar(content: Text('功能开发中...')),
+                  SnackBar(content: Text(S.of(context)?.featureInDevelopment ?? 'Feature in development')),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: const Text('查找聊天记录'),
+              title: Text(S.of(context)?.searchChatHistory ?? 'Search Chat History'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(sheetContext);
                 ScaffoldMessenger.of(this.context).showSnackBar(
-                  const SnackBar(content: Text('功能开发中...')),
+                  SnackBar(content: Text(S.of(context)?.featureInDevelopment ?? 'Feature in development')),
                 );
               },
             ),

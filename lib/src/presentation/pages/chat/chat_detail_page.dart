@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
@@ -114,7 +115,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          '聊天详情',
+          S.of(context)?.chatDetails ?? 'Chat Details',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
@@ -168,7 +169,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     Row(
                       children: [
                         Text(
-                          '查看全部群成员',
+                          S.of(context)?.viewAllGroupMembers ?? 'View all members',
                           style: TextStyle(
                             fontSize: 13,
                             color: secondaryTextColor,
@@ -203,7 +204,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               children: [
                 if (isGroup) ...[
                   _buildMenuItem(
-                    title: '群聊名称',
+                    title: S.of(context)?.groupName ?? 'Group Name',
                     value: widget.conversation.name,
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
@@ -211,21 +212,21 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
-                    title: '群公告',
+                    title: S.of(context)?.groupAnnouncement ?? 'Group Announcement',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
                     onTap: () {},
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
-                    title: '群管理',
+                    title: S.of(context)?.groupManagement ?? 'Group Management',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
                     onTap: () {},
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
-                    title: '我在本群的昵称',
+                    title: S.of(context)?.myNicknameInGroup ?? 'My Nickname in Group',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
                     onTap: () {},
@@ -233,7 +234,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   _buildDivider(dividerColor),
                 ],
                 _buildMenuItem(
-                  title: '查找聊天记录',
+                  title: S.of(context)?.searchChatHistory ?? 'Search Chat History',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -249,7 +250,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               dividerColor: dividerColor,
               children: [
                 _buildSwitchItem(
-                  title: '消息免打扰',
+                  title: S.of(context)?.mute ?? 'Mute',
                   value: _isMuted,
                   textColor: textColor,
                   onChanged: (value) {
@@ -260,7 +261,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildSwitchItem(
-                  title: '置顶聊天',
+                  title: S.of(context)?.pinChat ?? 'Pin Chat',
                   value: _isPinned,
                   textColor: textColor,
                   onChanged: (value) {
@@ -271,7 +272,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildSwitchItem(
-                  title: '强提醒',
+                  title: S.of(context)?.strongReminder ?? 'Strong Reminder',
                   value: _isStrongReminder,
                   textColor: textColor,
                   onChanged: (value) {
@@ -291,7 +292,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: '设置当前聊天背景',
+                  title: S.of(context)?.setChatBackground ?? 'Set Chat Background',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -307,7 +308,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: '清空聊天记录',
+                  title: S.of(context)?.clearChatHistory ?? 'Clear Chat History',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _showClearConfirm(),
@@ -323,7 +324,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: '投诉',
+                  title: S.of(context)?.report ?? 'Report',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -585,22 +586,22 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   void _showClearConfirm() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('清空聊天记录'),
-        content: const Text('确定要清空所有聊天记录吗？此操作不可恢复。'),
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.clearChatHistoryTitle ?? 'Clear Chat History'),
+        content: Text(S.of(context)?.clearHistoryConfirm ?? 'Are you sure you want to clear all chat history? This action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消'),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(ctx).pop();
               // TODO: 实现清空聊天记录
             },
-            child: const Text(
-              '清空',
-              style: TextStyle(color: Colors.red),
+            child: Text(
+              S.of(context)?.clearAction ?? 'Clear',
+              style: const TextStyle(color: Colors.red),
             ),
           ),
         ],

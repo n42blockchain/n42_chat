@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -52,8 +53,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             debugPrint('ProfileEditPage: Avatar upload succeeded');
             setState(() => _isUploading = false);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('头像更新成功'),
+              SnackBar(
+                content: Text(S.of(context)?.avatarUpdated ?? 'Avatar updated'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -62,7 +63,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             setState(() => _isUploading = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? '头像上传失败'),
+                content: Text(state.errorMessage ?? (S.of(context)?.avatarUploadFailed ?? 'Avatar upload failed')),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -75,7 +76,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         return Scaffold(
           backgroundColor: isDark ? AppColors.backgroundDark : const Color(0xFFF5F5F5),
           appBar: N42AppBar(
-            title: '个人资料',
+            title: S.of(context)?.personalProfile ?? 'Personal Profile',
             backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
           ),
           body: ListView(
@@ -89,7 +90,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 头像
                   _buildListTile(
                     isDark: isDark,
-                    title: '头像',
+                    title: S.of(context)?.avatar ?? 'Avatar',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -119,8 +120,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 名字
                   _buildListTile(
                     isDark: isDark,
-                    title: '名字',
-                    value: user?.displayName ?? '未设置',
+                    title: S.of(context)?.name ?? 'Name',
+                    value: user?.displayName ?? (S.of(context)?.notSet ?? 'Not Set'),
                     onTap: () => _editDisplayName(user?.displayName),
                   ),
                   _buildDivider(isDark),
@@ -128,8 +129,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 性别
                   _buildListTile(
                     isDark: isDark,
-                    title: '性别',
-                    value: _getGenderText(user?.gender),
+                    title: S.of(context)?.gender ?? 'Gender',
+                    value: _getGenderText(context, user?.gender),
                     onTap: _selectGender,
                   ),
                   _buildDivider(isDark),
@@ -137,8 +138,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 地区
                   _buildListTile(
                     isDark: isDark,
-                    title: '地区',
-                    value: user?.region ?? '未设置',
+                    title: S.of(context)?.region ?? 'Region',
+                    value: user?.region ?? (S.of(context)?.notSet ?? 'Not Set'),
                     onTap: _selectRegion,
                   ),
                 ],
@@ -162,7 +163,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 我的二维码
                   _buildListTile(
                     isDark: isDark,
-                    title: '我的二维码',
+                    title: S.of(context)?.myQrCode ?? 'My QR Code',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -192,8 +193,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 拍一拍
                   _buildListTile(
                     isDark: isDark,
-                    title: '拍一拍',
-                    value: user?.pokeText?.isNotEmpty == true ? user!.pokeText! : '未设置',
+                    title: S.of(context)?.poke ?? 'Poke',
+                    value: user?.pokeText?.isNotEmpty == true ? user!.pokeText! : (S.of(context)?.notSet ?? 'Not Set'),
                     onTap: () => _editPokeText(user?.pokeText),
                   ),
                   _buildDivider(isDark),
@@ -201,8 +202,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 签名
                   _buildListTile(
                     isDark: isDark,
-                    title: '签名',
-                    value: user?.signature ?? '未设置',
+                    title: S.of(context)?.signature ?? 'Signature',
+                    value: user?.signature ?? (S.of(context)?.notSet ?? 'Not Set'),
                     onTap: () => _editSignature(user?.signature),
                   ),
                 ],
@@ -217,8 +218,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 来电铃声
                   _buildListTile(
                     isDark: isDark,
-                    title: '来电铃声',
-                    value: user?.ringtone ?? '默认铃声',
+                    title: S.of(context)?.ringtone ?? 'Ringtone',
+                    value: user?.ringtone ?? (S.of(context)?.defaultRingtone ?? 'Default Ringtone'),
                     onTap: () => _selectRingtone(user?.ringtone),
                   ),
                 ],
@@ -233,7 +234,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 我的地址
                   _buildListTile(
                     isDark: isDark,
-                    title: '我的地址',
+                    title: S.of(context)?.myAddresses ?? 'My Addresses',
                     onTap: _manageAddresses,
                   ),
                   _buildDivider(isDark),
@@ -241,7 +242,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 我的发票抬头
                   _buildListTile(
                     isDark: isDark,
-                    title: '我的发票抬头',
+                    title: S.of(context)?.myInvoices ?? 'My Invoices',
                     onTap: _manageInvoices,
                   ),
                 ],
@@ -354,14 +355,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
   }
 
-  String _getGenderText(String? gender) {
+  String _getGenderText(BuildContext context, String? gender) {
     switch (gender) {
       case 'male':
-        return '男';
+        return S.of(context)?.male ?? 'Male';
       case 'female':
-        return '女';
+        return S.of(context)?.female ?? 'Female';
       default:
-        return '未设置';
+        return S.of(context)?.notSet ?? 'Not Set';
     }
   }
 
@@ -374,18 +375,18 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('拍照'),
+              title: Text(S.of(context)?.takePhoto ?? 'Take Photo'),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('从相册选择'),
+              title: Text(S.of(context)?.chooseFromGallery ?? 'Choose from Gallery'),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
             const SizedBox(height: 8),
             ListTile(
               leading: const Icon(Icons.close),
-              title: const Text('取消'),
+              title: Text(S.of(context)?.cancel ?? 'Cancel'),
               onTap: () => Navigator.pop(context),
             ),
           ],
@@ -418,7 +419,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       debugPrint('ProfileEditPage: Image bytes: ${bytes.length}');
       
       if (bytes.isEmpty) {
-        throw Exception('图片数据为空');
+        throw Exception(S.of(context)?.imageDataEmpty ?? 'Image data is empty');
       }
       
       // 确保文件名有正确的扩展名
@@ -442,7 +443,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         setState(() => _isUploading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('选择图片失败: $e'),
+            content: Text('${S.of(context)?.selectImageFailed ?? 'Failed to select image'}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -455,24 +456,24 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('修改名字'),
+        title: Text(S.of(context)?.changeName ?? 'Change Name'),
         content: TextField(
           controller: controller,
           autofocus: true,
           maxLength: 20,
-          decoration: const InputDecoration(
-            hintText: '请输入昵称',
+          decoration: InputDecoration(
+            hintText: S.of(context)?.enterNickname ?? 'Enter nickname',
             counterText: '',
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('确定'),
+            child: Text(S.of(context)?.confirm ?? 'Confirm'),
           ),
         ],
       ),
@@ -491,17 +492,17 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: const Text('男', textAlign: TextAlign.center),
+              title: Text(S.of(context)?.male ?? 'Male', textAlign: TextAlign.center),
               onTap: () => Navigator.pop(context, 'male'),
             ),
             const Divider(height: 1),
             ListTile(
-              title: const Text('女', textAlign: TextAlign.center),
+              title: Text(S.of(context)?.female ?? 'Female', textAlign: TextAlign.center),
               onTap: () => Navigator.pop(context, 'female'),
             ),
             const Divider(height: 1),
             ListTile(
-              title: const Text('取消', textAlign: TextAlign.center),
+              title: Text(S.of(context)?.cancel ?? 'Cancel', textAlign: TextAlign.center),
               onTap: () => Navigator.pop(context),
             ),
           ],
@@ -511,9 +512,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     if (result != null && mounted) {
       context.read<AuthBloc>().add(UpdateUserProfile(gender: result));
+      final genderText = result == 'male' ? (S.of(context)?.male ?? 'Male') : (S.of(context)?.female ?? 'Female');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('性别已设置为: ${result == 'male' ? '男' : '女'}'),
+          content: Text(S.of(context)?.genderSetTo(genderText) ?? 'Gender set to: $genderText'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -548,8 +550,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               ),
               child: Row(
                 children: [
-                  const Text(
-                    '选择地区',
+                  Text(
+                    S.of(context)?.selectRegion ?? 'Select Region',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -592,7 +594,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    '选择城市',
+                    S.of(context)?.selectCity ?? 'Select City',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -613,7 +615,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           context.read<AuthBloc>().add(UpdateUserProfile(region: region));
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('地区已设置为: $region'),
+              content: Text(S.of(context)?.regionSetTo(region) ?? 'Region set to: $region'),
               duration: const Duration(seconds: 1),
             ),
           );
@@ -623,7 +625,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         context.read<AuthBloc>().add(UpdateUserProfile(region: province));
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('地区已设置为: $province'),
+            content: Text(S.of(context)?.regionSetTo(province) ?? 'Region set to: $province'),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -654,13 +656,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('设置拍一拍'),
+        title: Text(S.of(context)?.setPoke ?? 'Set Poke'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '朋友拍了拍我',
+              S.of(context)?.friendPokedMe ?? 'Friend poked me',
               style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 14,
@@ -671,8 +673,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               controller: controller,
               autofocus: true,
               maxLength: 10,
-              decoration: const InputDecoration(
-                hintText: '输入拍一拍后缀，如：的肩膀',
+              decoration: InputDecoration(
+                hintText: S.of(context)?.enterPokeSuffix ?? 'Enter poke suffix, e.g.: on the shoulder',
                 counterText: '',
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -680,7 +682,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              '示例：朋友拍了拍我${controller.text.isNotEmpty ? controller.text : "的肩膀"}',
+              '${S.of(context)?.example ?? 'Example'}: ${S.of(context)?.friendPokedMe ?? 'Friend poked me'}${controller.text.isNotEmpty ? controller.text : (S.of(context)?.onTheShoulder ?? " on the shoulder")}',
               style: TextStyle(
                 color: AppColors.textTertiary,
                 fontSize: 12,
@@ -691,11 +693,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('确定'),
+            child: Text(S.of(context)?.confirm ?? 'Confirm'),
           ),
         ],
       ),
@@ -705,7 +707,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       context.read<AuthBloc>().add(UpdateUserProfile(pokeText: result));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result.isEmpty ? '拍一拍已清除' : '拍一拍已设置为: 拍了拍我$result'),
+          content: Text(result.isEmpty ? (S.of(context)?.pokeCleared ?? 'Poke cleared') : (S.of(context)?.pokeSetTo(result) ?? 'Poke set to: poked me$result')),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -717,24 +719,24 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('修改签名'),
+        title: Text(S.of(context)?.editSignature ?? 'Edit Signature'),
         content: TextField(
           controller: controller,
           autofocus: true,
           maxLength: 50,
           maxLines: 3,
-          decoration: const InputDecoration(
-            hintText: '一句话介绍自己',
+          decoration: InputDecoration(
+            hintText: S.of(context)?.introduceYourself ?? 'A sentence to introduce yourself',
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('确定'),
+            child: Text(S.of(context)?.confirm ?? 'Confirm'),
           ),
         ],
       ),
@@ -744,7 +746,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       context.read<AuthBloc>().add(UpdateUserProfile(signature: result));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result.isEmpty ? '签名已清除' : '签名已更新'),
+          content: Text(result.isEmpty ? (S.of(context)?.signatureCleared ?? 'Signature cleared') : (S.of(context)?.signatureUpdated ?? 'Signature updated')),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -760,8 +762,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                '我的二维码',
+              Text(
+                S.of(context)?.myQrCode ?? 'My QR Code',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -789,8 +791,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                '扫一扫上面的二维码，加我为好友',
+              Text(
+                S.of(context)?.scanToAddFriend ?? 'Scan the QR code above to add me as a friend',
                 style: TextStyle(fontSize: 12),
               ),
             ],
@@ -804,7 +806,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     final result = await Navigator.of(context).push<String>(
       MaterialPageRoute(
         builder: (context) => _RingtoneSelectPage(
-          currentRingtone: currentRingtone ?? '默认铃声',
+          currentRingtone: currentRingtone ?? (S.of(context)?.defaultRingtone ?? 'Default Ringtone'),
         ),
       ),
     );
@@ -813,7 +815,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       context.read<AuthBloc>().add(UpdateUserProfile(ringtone: result));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('来电铃声已设置为: $result'),
+          content: Text(S.of(context)?.ringtoneSetTo(result) ?? 'Ringtone set to: $result'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -847,7 +849,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   void _showFeatureToast(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature功能开发中...'),
+        content: Text(S.of(context)?.featureInDevelopment(feature) ?? '$feature is under development...'),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
       ),

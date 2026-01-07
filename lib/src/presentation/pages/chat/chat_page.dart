@@ -16,6 +16,7 @@ import 'package:video_thumbnail/video_thumbnail.dart';
 
 import 'package:flutter/services.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 
 import '../../../core/di/injection.dart';
@@ -339,7 +340,7 @@ class _ChatPageState extends State<ChatPage> {
   void _onRedPacketTap(MessageEntity message) {
     final metadata = message.metadata;
     final status = metadata?.transferStatus ?? 'pending';
-    final greeting = message.content.isNotEmpty ? message.content : '恭喜发财，大吉大利';
+    final greeting = message.content.isNotEmpty ? message.content : (S.of(context)?.redPacketGreeting ?? 'Best wishes');
     final amount = metadata?.amount;
     final token = metadata?.token ?? 'CNY';
     
@@ -463,8 +464,8 @@ class _ChatPageState extends State<ChatPage> {
     final videoUrl = message.metadata?.httpUrl ?? message.content;
     if (videoUrl.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('视频地址无效'),
+        SnackBar(
+          content: Text(S.of(context)?.invalidVideoUrl ?? 'Invalid video URL'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -485,13 +486,13 @@ class _ChatPageState extends State<ChatPage> {
   /// 打开文件
   void _openFile(MessageEntity message) {
     final fileUrl = message.metadata?.httpUrl ?? message.content;
-    final fileName = message.metadata?.fileName ?? '未知文件';
-    
+    final fileName = message.metadata?.fileName ?? (S.of(context)?.unknownFile ?? 'Unknown file');
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('下载文件: $fileName'),
+        content: Text('${S.of(context)?.downloadFile ?? 'Download file'}: $fileName'),
         action: SnackBarAction(
-          label: '下载',
+          label: S.of(context)?.download ?? 'Download',
           onPressed: () {
             // TODO: 实现文件下载
             debugPrint('Download file: $fileUrl');
@@ -509,8 +510,8 @@ class _ChatPageState extends State<ChatPage> {
     
     if (lat == null || lng == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('位置信息无效'),
+        SnackBar(
+          content: Text(S.of(context)?.invalidLocation ?? 'Invalid location'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -521,21 +522,21 @@ class _ChatPageState extends State<ChatPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('位置'),
+        title: Text(S.of(context)?.location ?? 'Location'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('地址: ${message.content}'),
+            Text('${S.of(context)?.address ?? 'Address'}: ${message.content}'),
             const SizedBox(height: 8),
-            Text('纬度: $lat'),
-            Text('经度: $lng'),
+            Text('${S.of(context)?.latitude ?? 'Latitude'}: $lat'),
+            Text('${S.of(context)?.longitude ?? 'Longitude'}: $lng'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('关闭'),
+            child: Text(S.of(context)?.close ?? 'Close'),
           ),
         ],
       ),
@@ -897,7 +898,9 @@ class _ChatPageState extends State<ChatPage> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    _isRecordingCancelled ? '松开手指，取消发送' : '手指上滑，取消发送',
+                    _isRecordingCancelled
+                        ? (S.of(context)?.releaseToCancel ?? 'Release to cancel')
+                        : (S.of(context)?.releaseToSend ?? 'Release to send, swipe up to cancel'),
                     style: TextStyle(
                       color: _isRecordingCancelled ? AppColors.error : Colors.white,
                       fontSize: 16,
@@ -911,9 +914,9 @@ class _ChatPageState extends State<ChatPage> {
                     _onRecordingStateChanged(false, true, _recordingDuration);
                   },
                   icon: const Icon(Icons.close, color: Colors.white70),
-                  label: const Text(
-                    '点击取消',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                  label: Text(
+                    S.of(context)?.tapToCancel ?? 'Tap to cancel',
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                 ),
               ],
@@ -1014,7 +1017,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('选择图片失败: $e'),
+            content: Text(S.of(context)?.selectImageFailed(e.toString()) ?? 'Failed to select image: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1032,18 +1035,18 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('拍照'),
+              title: Text(S.of(context)?.takePhoto ?? 'Take Photo'),
               onTap: () => Navigator.pop(context, 'photo'),
             ),
             ListTile(
               leading: const Icon(Icons.videocam),
-              title: const Text('录像'),
+              title: Text(S.of(context)?.recording ?? 'Recording'),
               onTap: () => Navigator.pop(context, 'video'),
             ),
             const SizedBox(height: 8),
             ListTile(
               leading: const Icon(Icons.close),
-              title: const Text('取消'),
+              title: Text(S.of(context)?.cancel ?? 'Cancel'),
               onTap: () => Navigator.pop(context),
             ),
           ],
@@ -1080,7 +1083,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('拍摄失败: $e'),
+            content: Text(S.of(context)?.captureFailed(e.toString()) ?? 'Capture failed: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1097,9 +1100,9 @@ class _ChatPageState extends State<ChatPage> {
       // 显示发送中提示
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('正在处理视频...'),
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: Text(S.of(context)?.processingVideo ?? 'Processing video...'),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -1115,8 +1118,8 @@ class _ChatPageState extends State<ChatPage> {
           debugPrint('Video file not found: ${video.path}');
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('视频文件不存在'),
+              SnackBar(
+                content: Text(S.of(context)?.videoFileNotExist ?? 'Video file does not exist'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -1130,8 +1133,8 @@ class _ChatPageState extends State<ChatPage> {
         debugPrint('Video bytes is empty');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('视频数据为空'),
+            SnackBar(
+              content: Text(S.of(context)?.videoDataEmpty ?? 'Video data is empty'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -1172,8 +1175,8 @@ class _ChatPageState extends State<ChatPage> {
       if (bytes.length > maxSize) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('视频大小不能超过 100MB'),
+            SnackBar(
+              content: Text(S.of(context)?.videoTooLarge ?? 'Video size cannot exceed 100MB'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -1224,9 +1227,9 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('视频发送中...'),
-            duration: Duration(seconds: 1),
+          SnackBar(
+            content: Text(S.of(context)?.sendingVideo ?? 'Sending video...'),
+            duration: const Duration(seconds: 1),
           ),
         );
       }
@@ -1236,7 +1239,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('发送视频失败: $e'),
+            content: Text(S.of(context)?.sendVideoFailed(e.toString()) ?? 'Failed to send video: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1262,8 +1265,8 @@ class _ChatPageState extends State<ChatPage> {
           debugPrint('Image file not found: ${image.path}');
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('图片文件不存在'),
+              SnackBar(
+                content: Text(S.of(context)?.imageFileNotExist ?? 'Image file does not exist'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -1277,8 +1280,8 @@ class _ChatPageState extends State<ChatPage> {
         debugPrint('Image bytes is empty');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('图片数据为空'),
+            SnackBar(
+              content: Text(S.of(context)?.imageDataEmpty ?? 'Image data is empty'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -1338,9 +1341,9 @@ class _ChatPageState extends State<ChatPage> {
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('图片发送中...'),
-            duration: Duration(seconds: 1),
+          SnackBar(
+            content: Text(S.of(context)?.sendingImage ?? 'Sending image...'),
+            duration: const Duration(seconds: 1),
           ),
         );
       }
@@ -1350,7 +1353,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('发送图片失败: $e'),
+            content: Text(S.of(context)?.sendImageFailed(e.toString()) ?? 'Failed to send image: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1387,13 +1390,13 @@ class _ChatPageState extends State<ChatPage> {
                     size: 24,
                   ),
                 ),
-                title: const Text(
-                  '发送位置',
-                  style: TextStyle(fontSize: 16),
+                title: Text(
+                  S.of(context)?.sendLocation ?? 'Send Location',
+                  style: const TextStyle(fontSize: 16),
                 ),
-                subtitle: const Text(
-                  '选择地点并发送给对方',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                subtitle: Text(
+                  S.of(context)?.selectLocationAndSend ?? 'Select location and send',
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -1416,13 +1419,13 @@ class _ChatPageState extends State<ChatPage> {
                     size: 24,
                   ),
                 ),
-                title: const Text(
-                  '共享实时位置',
-                  style: TextStyle(fontSize: 16),
+                title: Text(
+                  S.of(context)?.shareRealTimeLocation ?? 'Share Real-time Location',
+                  style: const TextStyle(fontSize: 16),
                 ),
-                subtitle: const Text(
-                  '与好友共享1小时实时位置',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                subtitle: Text(
+                  S.of(context)?.shareLocationForOneHour ?? 'Share real-time location with friend for 1 hour',
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -1443,9 +1446,9 @@ class _ChatPageState extends State<ChatPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
-                    '取消',
-                    style: TextStyle(
+                  child: Text(
+                    S.of(context)?.cancel ?? 'Cancel',
+                    style: const TextStyle(
                       color: Colors.black87,
                       fontSize: 16,
                     ),
@@ -1472,7 +1475,7 @@ class _ChatPageState extends State<ChatPage> {
     if (result != null && mounted) {
       final latitude = result['latitude'] as double;
       final longitude = result['longitude'] as double;
-      final address = result['address'] as String? ?? '我的位置';
+      final address = result['address'] as String? ?? (S.of(context)?.myLocation ?? 'My location');
       final name = result['name'] as String?;
       
       // 发送位置消息
@@ -1483,9 +1486,9 @@ class _ChatPageState extends State<ChatPage> {
       ));
       
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('位置发送成功'),
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: Text(S.of(context)?.locationSent ?? 'Location sent'),
+          duration: const Duration(seconds: 1),
         ),
       );
     }
@@ -2098,7 +2101,7 @@ ID：$contactId''';
           ),
           if (widget.conversation.type == ConversationType.group)
             Text(
-              '${widget.conversation.memberCount}人',
+              S.of(context)?.memberCount(widget.conversation.memberCount ?? 0) ?? '${widget.conversation.memberCount} members',
               style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
@@ -2133,8 +2136,8 @@ ID：$contactId''';
       ),
       title: Text(
         _selectedMessageIds.isEmpty
-            ? '选择消息'
-            : '已选择 ${_selectedMessageIds.length} 条',
+            ? (S.of(context)?.selectMessages ?? 'Select messages')
+            : (S.of(context)?.selectedCount(_selectedMessageIds.length) ?? 'Selected ${_selectedMessageIds.length}'),
         style: TextStyle(
           color: isDark ? Colors.white : Colors.black,
           fontSize: 17,
@@ -2147,7 +2150,7 @@ ID：$contactId''';
         TextButton(
           onPressed: _selectAllMessages,
           child: Text(
-            '全选',
+            S.of(context)?.selectAll ?? 'Select All',
             style: TextStyle(
               color: AppColors.primary,
               fontSize: 14,
@@ -2183,7 +2186,7 @@ ID：$contactId''';
       final name = widget.conversation.name;
       // 如果群名为空或为默认值，显示成员数
       if (name.isEmpty || name == 'Empty Chat' || name == 'empty chat') {
-        return '群聊(${widget.conversation.memberCount})';
+        return S.of(context)?.groupChatCount(widget.conversation.memberCount ?? 0) ?? 'Group Chat(${widget.conversation.memberCount})';
       }
       return name;
     }
@@ -2197,7 +2200,7 @@ ID：$contactId''';
     // 如果名称为空或为默认值，返回简化的用户ID或默认文本
     final name = widget.conversation.name;
     if (name.isEmpty || name == 'Empty Chat' || name == 'empty chat') {
-      return '私聊';
+      return S.of(context)?.privateChat ?? 'Private Chat';
     }
     return name;
   }
@@ -2246,7 +2249,7 @@ ID：$contactId''';
       },
       builder: (context, state) {
         if (state.isLoading) {
-          return const N42Loading(message: '加载中...');
+          return N42Loading(message: S.of(context)?.loading ?? 'Loading...');
         }
 
         if (state.isEmpty) {
@@ -2256,8 +2259,8 @@ ID：$contactId''';
               _buildEncryptionNotice(),
               const SizedBox(height: 16),
               N42EmptyState.noData(
-                title: '暂无消息',
-                description: '发送第一条消息开始聊天',
+                title: S.of(context)?.noMessages ?? 'No messages',
+                description: S.of(context)?.sendFirstMessage ?? 'Send first message to start chatting',
               ),
             ],
           );
@@ -2453,7 +2456,7 @@ ID：$contactId''';
             const SizedBox(width: 8),
             Flexible(
               child: Text(
-                '本聊天已开启端对端加密保护，只有您和对方可以读取消息内容',
+                S.of(context)?.encryptionNotice ?? 'This chat is end-to-end encrypted. Only you and the recipient can read the messages.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
@@ -2569,19 +2572,19 @@ ID：$contactId''';
         children: [
           _buildMultiSelectAction(
             icon: Icons.forward,
-            label: '转发',
+            label: S.of(context)?.multiForward ?? 'Forward',
             enabled: hasSelection,
             onTap: hasSelection ? _forwardSelectedMessages : null,
           ),
           _buildMultiSelectAction(
             icon: Icons.star_border,
-            label: '收藏',
+            label: S.of(context)?.collect ?? 'Collect',
             enabled: hasSelection,
             onTap: hasSelection ? _favoriteSelectedMessages : null,
           ),
           _buildMultiSelectAction(
             icon: Icons.delete_outline,
-            label: '删除',
+            label: S.of(context)?.delete ?? 'Delete',
             enabled: hasSelection,
             onTap: hasSelection ? _deleteSelectedMessages : null,
             isDestructive: true,
@@ -2637,7 +2640,7 @@ ID：$contactId''';
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('已收藏 ${_selectedMessageIds.length} 条消息'),
+        content: Text(S.of(context)?.collectMessages(_selectedMessageIds.length) ?? 'Collected ${_selectedMessageIds.length} messages'),
         duration: const Duration(seconds: 1),
       ),
     );
@@ -2687,7 +2690,9 @@ ID：$contactId''';
             return Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                _mentionSearchQuery.isEmpty ? '暂无成员' : '未找到成员',
+                _mentionSearchQuery.isEmpty
+                    ? (S.of(context)?.noMembers ?? 'No members')
+                    : (S.of(context)?.memberNotFound ?? 'Member not found'),
                 style: TextStyle(color: subtextColor),
               ),
             );
@@ -2800,8 +2805,8 @@ ID：$contactId''';
         debugPrint('Voice file not found: $path');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('语音文件不存在'),
+            SnackBar(
+              content: Text(S.of(context)?.voiceFileNotExist ?? 'Voice file does not exist'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -2816,8 +2821,8 @@ ID：$contactId''';
         debugPrint('Voice file is empty');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('语音文件为空'),
+            SnackBar(
+              content: Text(S.of(context)?.voiceFileEmpty ?? 'Voice file is empty'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -2859,9 +2864,9 @@ ID：$contactId''';
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('语音发送中...'),
-            duration: Duration(seconds: 1),
+          SnackBar(
+            content: Text(S.of(context)?.sendingVoice ?? 'Sending voice...'),
+            duration: const Duration(seconds: 1),
           ),
         );
       }
@@ -2871,7 +2876,7 @@ ID：$contactId''';
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('发送语音失败: $e'),
+            content: Text(S.of(context)?.sendVoiceFailed(e.toString()) ?? 'Failed to send voice: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -3028,9 +3033,9 @@ ID：$contactId''';
     if (textToCopy != null && textToCopy.isNotEmpty) {
       Clipboard.setData(ClipboardData(text: textToCopy));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('已复制'),
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: Text(S.of(context)?.copied ?? 'Copied'),
+          duration: const Duration(seconds: 1),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -3040,17 +3045,17 @@ ID：$contactId''';
   String _getMessageTypeDescription(MessageType type) {
     switch (type) {
       case MessageType.image:
-        return '[图片]';
+        return S.of(context)?.image ?? '[Image]';
       case MessageType.audio:
-        return '[语音]';
+        return S.of(context)?.voice ?? '[Voice]';
       case MessageType.video:
-        return '[视频]';
+        return S.of(context)?.video ?? '[Video]';
       case MessageType.file:
-        return '[文件]';
+        return S.of(context)?.file ?? '[File]';
       case MessageType.location:
-        return '[位置]';
+        return S.of(context)?.location ?? '[Location]';
       case MessageType.transfer:
-        return '[转账]';
+        return S.of(context)?.transfer ?? '[Transfer]';
       default:
         return '';
     }
@@ -3099,9 +3104,9 @@ ID：$contactId''';
       if (result != null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('消息已转发'),
-              duration: Duration(seconds: 1),
+            SnackBar(
+              content: Text(S.of(context)?.messageForwarded ?? 'Message forwarded'),
+              duration: const Duration(seconds: 1),
               backgroundColor: Colors.green,
             ),
           );
@@ -3121,7 +3126,7 @@ ID：$contactId''';
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('转发失败: $e'),
+              content: Text(S.of(context)?.forwardFailed(e.toString()) ?? 'Forward failed: $e'),
               duration: const Duration(seconds: 2),
               backgroundColor: Colors.red,
             ),
@@ -3164,33 +3169,33 @@ ID：$contactId''';
     
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('消息已转发'),
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: Text(S.of(context)?.messageForwarded ?? 'Message forwarded'),
+          duration: const Duration(seconds: 1),
           backgroundColor: Colors.green,
         ),
       );
     }
   }
-  
+
   /// 收藏消息
   void _favoriteMessage(MessageEntity message) {
     setState(() {
       if (_favoritedMessageIds.contains(message.id)) {
         _favoritedMessageIds.remove(message.id);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('已取消收藏'),
-            duration: Duration(seconds: 1),
+          SnackBar(
+            content: Text(S.of(context)?.unfavorited ?? 'Unfavorited'),
+            duration: const Duration(seconds: 1),
             behavior: SnackBarBehavior.floating,
           ),
         );
       } else {
         _favoritedMessageIds.add(message.id);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('已收藏'),
-            duration: Duration(seconds: 1),
+          SnackBar(
+            content: Text(S.of(context)?.favorited ?? 'Favorited'),
+            duration: const Duration(seconds: 1),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -3218,7 +3223,7 @@ ID：$contactId''';
           children: [
             Text(emoji, style: const TextStyle(fontSize: 20)),
             const SizedBox(width: 8),
-            const Text('已添加表情回应'),
+            Text(S.of(context)?.reactionAdded ?? 'Reaction added'),
           ],
         ),
         duration: const Duration(seconds: 1),
@@ -3235,9 +3240,9 @@ ID：$contactId''';
     context.read<ChatBloc>().add(DeleteFailedMessage(message.id));
     
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('已删除失败消息'),
-        duration: Duration(seconds: 1),
+      SnackBar(
+        content: Text(S.of(context)?.failedMessageDeleted ?? 'Failed message deleted'),
+        duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -3308,16 +3313,16 @@ ID：$contactId''';
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('删除消息'),
+        title: Text(S.of(context)?.deleteMessages ?? 'Delete messages'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('确定要删除 ${selectedMessages.length} 条消息吗？'),
+            Text(S.of(context)?.deleteMessagesConfirm(selectedMessages.length) ?? 'Are you sure you want to delete ${selectedMessages.length} messages?'),
             if (otherMessages.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                '注意：${otherMessages.length} 条消息是他人发送的，只能在本地删除。',
+                S.of(context)?.noteOtherMessages(otherMessages.length) ?? 'Note: ${otherMessages.length} messages are from others, can only delete locally.',
                 style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 13,
@@ -3327,7 +3332,7 @@ ID：$contactId''';
             if (myMessages.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                '${myMessages.length} 条自己发送的消息将被撤回。',
+                S.of(context)?.myMessagesWillBeRecalled(myMessages.length) ?? '${myMessages.length} messages from you will be recalled.',
                 style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 13,
@@ -3339,12 +3344,12 @@ ID：$contactId''';
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('取消'),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              '删除',
+              S.of(context)?.delete ?? 'Delete',
               style: TextStyle(color: AppColors.error),
             ),
           ),
@@ -3374,13 +3379,13 @@ ID：$contactId''';
     if (mounted) {
       String message;
       if (redactedCount > 0 && localDeletedCount > 0) {
-        message = '已撤回 $redactedCount 条消息，本地删除 $localDeletedCount 条';
+        message = S.of(context)?.recalledCount(redactedCount, localDeletedCount) ?? 'Recalled $redactedCount messages, deleted $localDeletedCount locally';
       } else if (redactedCount > 0) {
-        message = '已撤回 $redactedCount 条消息';
+        message = S.of(context)?.recalledMessages(redactedCount) ?? 'Recalled $redactedCount messages';
       } else {
-        message = '已删除 $localDeletedCount 条消息（仅本地）';
+        message = S.of(context)?.deletedLocally(localDeletedCount) ?? 'Deleted $localDeletedCount messages (locally)';
       }
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
@@ -3389,7 +3394,7 @@ ID：$contactId''';
         ),
       );
     }
-    
+
     _exitMultiSelectMode();
   }
   
@@ -3437,11 +3442,11 @@ ID：$contactId''';
     if (mounted) {
       String resultMsg;
       if (failCount == 0) {
-        resultMsg = '已转发 $successCount 条消息';
+        resultMsg = S.of(context)?.forwardedCount(successCount) ?? 'Forwarded $successCount messages';
       } else {
-        resultMsg = '转发完成：成功 $successCount 条，失败 $failCount 条';
+        resultMsg = S.of(context)?.forwardComplete(successCount, failCount) ?? 'Forward complete: $successCount succeeded, $failCount failed';
       }
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(resultMsg),
@@ -3450,7 +3455,7 @@ ID：$contactId''';
         ),
       );
     }
-    
+
     _exitMultiSelectMode();
   }
   
@@ -3464,9 +3469,9 @@ ID：$contactId''';
     // 群聊中才能使用提醒功能
     if (widget.conversation.type != ConversationType.group) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('提醒功能仅在群聊中可用'),
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: Text(S.of(context)?.remindOnlyInGroup ?? 'Remind feature is only available in group chat'),
+          duration: const Duration(seconds: 1),
         ),
       );
       return;
@@ -3525,9 +3530,9 @@ ID：$contactId''';
   void _searchMessage(MessageEntity message) {
     if (message.type != MessageType.text || message.content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('仅支持搜索文本消息'),
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: Text(S.of(context)?.onlyTextSearchable ?? 'Only text messages can be searched'),
+          duration: const Duration(seconds: 1),
         ),
       );
       return;
@@ -3565,7 +3570,7 @@ ID：$contactId''';
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  '搜索 "$searchText"',
+                  S.of(context)?.searchFor(searchText) ?? 'Search "$searchText"',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -3578,7 +3583,7 @@ ID：$contactId''';
               _buildSearchOption(
                 context,
                 icon: Icons.search,
-                title: '百度搜索',
+                title: S.of(context)?.baiduSearch ?? 'Baidu Search',
                 onTap: () {
                   Navigator.pop(ctx);
                   _openSearch('https://www.baidu.com/s?wd=${Uri.encodeComponent(searchText)}');
@@ -3588,7 +3593,7 @@ ID：$contactId''';
               _buildSearchOption(
                 context,
                 icon: Icons.g_mobiledata,
-                title: 'Google 搜索',
+                title: S.of(context)?.googleSearch ?? 'Google Search',
                 onTap: () {
                   Navigator.pop(ctx);
                   _openSearch('https://www.google.com/search?q=${Uri.encodeComponent(searchText)}');
@@ -3598,7 +3603,7 @@ ID：$contactId''';
               _buildSearchOption(
                 context,
                 icon: Icons.article,
-                title: '必应搜索',
+                title: S.of(context)?.bingSearch ?? 'Bing Search',
                 onTap: () {
                   Navigator.pop(ctx);
                   _openSearch('https://www.bing.com/search?q=${Uri.encodeComponent(searchText)}');
@@ -3637,7 +3642,7 @@ ID：$contactId''';
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('无法打开浏览器')),
+          SnackBar(content: Text(S.of(context)?.cannotOpenBrowser ?? 'Cannot open browser')),
         );
       }
     }

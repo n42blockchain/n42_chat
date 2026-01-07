@@ -4,6 +4,9 @@ import 'package:n42_chat/n42_chat.dart';
 
 import 'server_test_page.dart';
 
+// 导入本地化支持
+import 'package:n42_chat/l10n/app_localizations.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -44,6 +47,9 @@ class N42ChatExampleApp extends StatelessWidget {
       theme: N42ChatTheme.wechatLight().toThemeData(),
       darkTheme: N42ChatTheme.wechatDark().toThemeData(),
       themeMode: ThemeMode.system,
+      // 国际化配置
+      localizationsDelegates: S.localizationsDelegates,
+      supportedLocales: S.supportedLocales,
       home: const MainScreen(),
     );
   }
@@ -109,25 +115,25 @@ class _MainScreenState extends State<MainScreen> {
           unselectedFontSize: 11,
           iconSize: 24,
           items: [
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance_wallet_outlined),
-              activeIcon: Icon(Icons.account_balance_wallet),
-              label: '钱包',
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.account_balance_wallet_outlined),
+              activeIcon: const Icon(Icons.account_balance_wallet),
+              label: S.of(context)?.wallet ?? 'Wallet',
             ),
             BottomNavigationBarItem(
               icon: _buildChatIcon(false),
               activeIcon: _buildChatIcon(true),
-              label: '消息',
+              label: S.of(context)?.messages ?? 'Messages',
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.explore_outlined),
-              activeIcon: Icon(Icons.explore),
-              label: '发现',
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.explore_outlined),
+              activeIcon: const Icon(Icons.explore),
+              label: S.of(context)?.discover ?? 'Discover',
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: '我',
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.person_outline),
+              activeIcon: const Icon(Icons.person),
+              label: S.of(context)?.me ?? 'Me',
             ),
           ],
         ),
@@ -181,7 +187,7 @@ class WalletPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFEDEDED),
       appBar: AppBar(
-        title: const Text('钱包'),
+        title: Text(S.of(context)?.wallet ?? 'Wallet'),
         backgroundColor: const Color(0xFFF7F7F7),
         foregroundColor: const Color(0xFF181818),
         elevation: 0,
@@ -213,8 +219,8 @@ class WalletPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              '钱包功能区域',
+            Text(
+              S.of(context)?.walletArea ?? 'Wallet area',
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF888888),
@@ -283,7 +289,7 @@ class DiscoverPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFEDEDED),
       appBar: AppBar(
-        title: const Text('发现'),
+        title: Text(S.of(context)?.discover ?? 'Discover'),
         backgroundColor: const Color(0xFFF7F7F7),
         foregroundColor: const Color(0xFF181818),
         elevation: 0,
@@ -295,7 +301,7 @@ class DiscoverPage extends StatelessWidget {
             _DiscoverItem(
               icon: Icons.qr_code_scanner,
               iconColor: const Color(0xFF3D7CF4),
-              title: '扫一扫',
+              title: S.of(context)?.scan ?? 'Scan',
               onTap: () {},
             ),
           ]),
@@ -451,7 +457,7 @@ class ProfilePage extends StatelessWidget {
                 _buildSection([
                   _ProfileItem(
                     icon: Icons.settings,
-                    title: '设置',
+                    title: S.of(context)?.settings ?? 'Settings',
                     onTap: () {},
                   ),
                 ]),
@@ -459,7 +465,7 @@ class ProfilePage extends StatelessWidget {
                 _buildSection([
                   _ProfileItem(
                     icon: Icons.science,
-                    title: '服务器测试',
+                    title: 'Server Test',
                     onTap: () {
                       Navigator.push(
                         context,
@@ -474,7 +480,7 @@ class ProfilePage extends StatelessWidget {
                 _buildSection([
                   _ProfileItem(
                     icon: Icons.info_outline,
-                    title: '关于',
+                    title: S.of(context)?.about ?? 'About',
                     onTap: () {},
                   ),
                 ]),

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/auth/auth_methods_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
@@ -75,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
-          '登录',
+          S.of(context)?.login ?? 'Log In',
           style: TextStyle(
             color: textColor,
             fontSize: 17,
@@ -89,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
           if (state.hasError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? '登录失败'),
+                content: Text(state.errorMessage ?? (S.of(context)?.loginFailed ?? 'Login failed')),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -181,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         const SizedBox(height: 4),
         Text(
-          '安全、去中心化的即时通讯',
+          S.of(context)?.secureDecentralizedChat ?? 'Secure, decentralized instant messaging',
           style: TextStyle(
             fontSize: 14,
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -201,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '服务器地址',
+          S.of(context)?.serverAddress ?? 'Server Address',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -249,10 +250,10 @@ class _LoginPageState extends State<LoginPage> {
           onEditingComplete: _checkHomeserver,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return '请输入服务器地址';
+              return S.of(context)?.enterServerAddress ?? 'Please enter server address';
             }
             if (!value.startsWith('http://') && !value.startsWith('https://')) {
-              return '请输入有效的服务器地址';
+              return S.of(context)?.enterValidServerAddress ?? 'Please enter a valid server address';
             }
             return null;
           },
@@ -260,7 +261,7 @@ class _LoginPageState extends State<LoginPage> {
         if (state.isHomeserverValid && state.homeserverInfo != null) ...[
           const SizedBox(height: 4),
           Text(
-            '✓ 已连接到 ${state.homeserverInfo!.serverName}',
+            '✓ ${S.of(context)?.connectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.success,
@@ -276,12 +277,12 @@ class _LoginPageState extends State<LoginPage> {
     final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '用户名',
+          S.of(context)?.username ?? 'Username',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -292,7 +293,7 @@ class _LoginPageState extends State<LoginPage> {
           controller: _usernameController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: '请输入用户名',
+            hintText: S.of(context)?.enterUsername ?? 'Enter username',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -312,7 +313,7 @@ class _LoginPageState extends State<LoginPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return '请输入用户名';
+              return S.of(context)?.enterUsername ?? 'Please enter username';
             }
             return null;
           },
@@ -326,12 +327,12 @@ class _LoginPageState extends State<LoginPage> {
     final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '密码',
+          S.of(context)?.password ?? 'Password',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -342,7 +343,7 @@ class _LoginPageState extends State<LoginPage> {
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: '请输入密码',
+            hintText: S.of(context)?.enterPassword ?? 'Enter password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -375,7 +376,7 @@ class _LoginPageState extends State<LoginPage> {
           onFieldSubmitted: (_) => _onLogin(),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return '请输入密码';
+              return S.of(context)?.enterPassword ?? 'Please enter password';
             }
             return null;
           },
@@ -410,8 +411,8 @@ class _LoginPageState extends State<LoginPage> {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : const Text(
-                '登录',
+            : Text(
+                S.of(context)?.login ?? 'Log In',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
@@ -440,8 +441,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 );
               },
-              child: const Text(
-                '注册账号',
+              child: Text(
+                S.of(context)?.registerAccount ?? 'Sign Up',
                 style: TextStyle(
                   fontSize: 14,
                   color: AppColors.textLink,
@@ -469,8 +470,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 );
               },
-              child: const Text(
-                '忘记密码',
+              child: Text(
+                S.of(context)?.forgotPassword ?? 'Forgot Password',
                 style: TextStyle(
                   fontSize: 14,
                   color: AppColors.textLink,
@@ -504,7 +505,7 @@ class _LoginPageState extends State<LoginPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            '其他登录方式',
+            S.of(context)?.otherLoginMethods ?? 'Other login methods',
             style: TextStyle(
               fontSize: 12,
               color: textColor,
@@ -531,7 +532,7 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(width: 32),
             _buildLoginMethodButton(
               icon: Icons.email_outlined,
-              label: '邮箱验证码',
+              label: S.of(context)?.emailOtp ?? 'Email OTP',
               onTap: _loginWithEmailOtp,
             ),
           ],
@@ -663,19 +664,19 @@ class _LoginPageState extends State<LoginPage> {
     final homeserver = _homeserverController.text.trim();
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('请先输入服务器地址'),
+        SnackBar(
+          content: Text(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first'),
           backgroundColor: AppColors.error,
         ),
       );
       return;
     }
-    
+
     // TODO: 实现真正的 Passkey 登录
     // 目前显示提示
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Passkey 登录需要服务端支持'),
+      SnackBar(
+        content: Text(S.of(context)?.passkeyRequiresServer ?? 'Passkey login requires server support'),
         backgroundColor: Colors.orange,
       ),
     );
@@ -701,8 +702,8 @@ class _LoginPageState extends State<LoginPage> {
     final homeserver = _homeserverController.text.trim();
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('请先输入服务器地址'),
+        SnackBar(
+          content: Text(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -741,8 +742,8 @@ class _LoginPageState extends State<LoginPage> {
     final homeserver = _homeserverController.text.trim();
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('请先输入服务器地址'),
+        SnackBar(
+          content: Text(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -780,8 +781,8 @@ class _LoginPageState extends State<LoginPage> {
     final homeserver = _homeserverController.text.trim();
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('请先输入服务器地址'),
+        SnackBar(
+          content: Text(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -793,26 +794,26 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildAgreement(bool isDark) {
     final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textTertiary;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Text.rich(
         TextSpan(
-          text: '登录即表示同意',
+          text: S.of(context)?.loginAgreement ?? 'By logging in, you agree to ',
           style: TextStyle(
             fontSize: 12,
             color: textColor,
           ),
           children: [
             TextSpan(
-              text: '《服务协议》',
+              text: S.of(context)?.termsOfService ?? 'Terms of Service',
               style: TextStyle(
                 color: AppColors.textLink.withValues(alpha: 0.8),
               ),
             ),
-            const TextSpan(text: '和'),
+            TextSpan(text: S.of(context)?.and ?? ' and '),
             TextSpan(
-              text: '《隐私政策》',
+              text: S.of(context)?.privacyPolicy ?? 'Privacy Policy',
               style: TextStyle(
                 color: AppColors.textLink.withValues(alpha: 0.8),
               ),

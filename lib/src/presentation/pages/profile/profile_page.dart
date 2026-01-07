@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
@@ -88,7 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: widget.showAppBar ? N42AppBar(
-        title: '我',
+        title: S.of(context)?.me ?? 'Me',
         showBackButton: false,
       ) : null,
       body: ListView(
@@ -108,8 +109,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.verified_outlined,
                 iconColor: AppColors.primary,
-                title: '服务',
-                onTap: () => _showComingSoon(context, '服务'),
+                title: S.of(context)?.services ?? 'Services',
+                onTap: () => _showComingSoon(context, S.of(context)?.services ?? 'Services'),
               ),
             ],
           ),
@@ -126,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.inventory_2_outlined,
                 iconColor: const Color(0xFFFF9F0A),
-                title: '收藏',
+                title: S.of(context)?.favorites ?? 'Favorites',
                 onTap: () => _openFavorites(context),
               ),
               _buildDivider(context, isDark),
@@ -135,8 +136,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.photo_library_outlined,
                 iconColor: const Color(0xFF007AFF),
-                title: '朋友圈',
-                onTap: () => _showComingSoon(context, '朋友圈'),
+                title: S.of(context)?.moments ?? 'Moments',
+                onTap: () => _showComingSoon(context, S.of(context)?.moments ?? 'Moments'),
               ),
               _buildDivider(context, isDark),
               _buildMenuItem(
@@ -144,8 +145,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.card_giftcard_outlined,
                 iconColor: const Color(0xFFFF6B6B),
-                title: '订单与卡包',
-                onTap: () => _showComingSoon(context, '订单与卡包'),
+                title: S.of(context)?.ordersAndCards ?? 'Orders & Cards',
+                onTap: () => _showComingSoon(context, S.of(context)?.ordersAndCards ?? 'Orders & Cards'),
               ),
               _buildDivider(context, isDark),
               _buildMenuItem(
@@ -153,8 +154,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.emoji_emotions_outlined,
                 iconColor: const Color(0xFFFFCC00),
-                title: '表情',
-                onTap: () => _showComingSoon(context, '表情'),
+                title: S.of(context)?.stickers ?? 'Stickers',
+                onTap: () => _showComingSoon(context, S.of(context)?.stickers ?? 'Stickers'),
               ),
             ],
           ),
@@ -171,7 +172,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.settings_outlined,
                 iconColor: const Color(0xFF5E97F6),
-                title: '设置',
+                title: S.of(context)?.settings ?? 'Settings',
                 onTap: () => _openSettings(context),
               ),
             ],
@@ -218,7 +219,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       // 用户名
                       Text(
-                        _displayName ?? '未登录',
+                        _displayName ?? (S.of(context)?.notLoggedIn ?? 'Not Logged In'),
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
@@ -245,26 +246,26 @@ class _ProfilePageState extends State<ProfilePage> {
                               showDialog(
                                 context: context,
                                 builder: (ctx) => AlertDialog(
-                                  title: const Text('清除状态'),
-                                  content: const Text('确定要清除当前状态吗？'),
+                                  title: Text(S.of(context)?.clearStatus ?? 'Clear Status'),
+                                  content: Text(S.of(context)?.clearStatusConfirm ?? 'Are you sure you want to clear your status?'),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(ctx),
-                                      child: const Text('取消'),
+                                      child: Text(S.of(context)?.cancel ?? 'Cancel'),
                                     ),
                                     TextButton(
                                       onPressed: () {
                                         Navigator.pop(ctx);
                                         setState(() => _statusText = null);
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('状态已清除'),
+                                          SnackBar(
+                                            content: Text(S.of(context)?.statusCleared ?? 'Status cleared'),
                                             duration: Duration(seconds: 1),
                                           ),
                                         );
                                       },
                                       child: Text(
-                                        '清除',
+                                        S.of(context)?.clear ?? 'Clear',
                                         style: TextStyle(color: AppColors.error),
                                       ),
                                     ),
@@ -292,7 +293,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     const SizedBox(width: 2),
                                   ],
                                   Text(
-                                    _statusText ?? '状态',
+                                    _statusText ?? (S.of(context)?.status ?? 'Status'),
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: subtitleColor,
@@ -434,7 +435,7 @@ class _ProfilePageState extends State<ProfilePage> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('状态已设置为：$result'),
+          content: Text(S.of(context)?.statusSetTo(result) ?? 'Status set to: $result'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -481,19 +482,19 @@ class _ProfilePageState extends State<ProfilePage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('退出登录'),
-        content: const Text('确定要退出登录吗？'),
+        title: Text(S.of(context)?.logout ?? 'Log Out'),
+        content: Text(S.of(context)?.logoutConfirm ?? 'Are you sure you want to log out?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               context.read<AuthBloc>().add(const AuthLogoutRequested());
             },
-            child: const Text('退出', style: TextStyle(color: AppColors.error)),
+            child: Text(S.of(context)?.logout ?? 'Log Out', style: TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -509,7 +510,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void _showComingSoon(BuildContext context, String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature 功能即将推出'),
+        content: Text(S.of(context)?.featureComingSoon(feature) ?? '$feature coming soon'),
         duration: const Duration(seconds: 2),
       ),
     );
