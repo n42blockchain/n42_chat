@@ -43,7 +43,9 @@ class ContactDetailPage extends StatefulWidget {
 class _ContactDetailPageState extends State<ContactDetailPage> {
   ContactEntity? _contact;
   bool _isStarred = false;
-  
+  bool _isFriend = false;
+  bool _isAddingFriend = false;
+
   @override
   void initState() {
     super.initState();
@@ -65,9 +67,10 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         final contact = contactState.contacts.where(
           (c) => c.userId == widget.userId
         ).firstOrNull;
-        if (contact != null && mounted) {
+        if (mounted) {
           setState(() {
             _contact = contact;
+            _isFriend = contact != null;
           });
         }
       }
@@ -236,23 +239,28 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               ),
               
               const SizedBox(height: 32),
-              
-              // 发消息按钮
-              _buildActionButton(
-                icon: Icons.chat_bubble_outline,
-                label: '发消息',
-                onTap: widget.onSendMessage ?? () => Navigator.of(context).pop(),
-              ),
-              
-              const SizedBox(height: 12),
-              
-              // 音视频通话按钮
-              _buildActionButton(
-                icon: Icons.phone_outlined,
-                label: '音视频通话',
-                onTap: widget.onVideoCall ?? () {},
-              ),
-              
+
+              // 根据是否是好友显示不同按钮
+              if (_isFriend) ...[
+                // 好友：显示发消息和音视频通话按钮
+                _buildActionButton(
+                  icon: Icons.chat_bubble_outline,
+                  label: '发消息',
+                  onTap: widget.onSendMessage ?? () => Navigator.of(context).pop(),
+                ),
+
+                const SizedBox(height: 12),
+
+                _buildActionButton(
+                  icon: Icons.phone_outlined,
+                  label: '音视频通话',
+                  onTap: widget.onVideoCall ?? () {},
+                ),
+              ] else ...[
+                // 非好友：显示添加好友按钮
+                _buildAddFriendButton(),
+              ],
+
               const SizedBox(height: 32),
             ],
           ),
@@ -454,7 +462,86 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       ),
     );
   }
-  
+
+  /// 构建添加好友按钮
+  Widget _buildAddFriendButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ElevatedButton(
+        onPressed: _isAddingFriend ? null : _addFriend,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (_isAddingFriend)
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            else
+              const Icon(Icons.person_add, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              _isAddingFriend ? '添加中...' : '添加到通讯录',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 添加好友
+  Future<void> _addFriend() async {
+    setState(() {
+      _isAddingFriend = true;
+    });
+
+    try {
+      // 通过 StartChat 事件创建私聊（这会自动将对方添加到联系人）
+      final contactBloc = context.read<ContactBloc>();
+      contactBloc.add(StartChat(widget.userId));
+
+      // 等待一小段时间让操作完成
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // 重新加载联系人信息
+      _loadContact();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('已添加到通讯录')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('添加失败: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isAddingFriend = false;
+        });
+      }
+    }
+  }
+
   void _openSettings() {
     Navigator.of(context).push(
       MaterialPageRoute(

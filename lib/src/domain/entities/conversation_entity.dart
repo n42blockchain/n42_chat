@@ -68,6 +68,9 @@ class ConversationEntity extends Equatable {
   /// 群成员名称列表（用于九宫格头像）
   final List<String>? memberNames;
 
+  /// 群成员用户ID列表
+  final List<String>? memberIds;
+
   /// 是否有人正在输入
   final bool hasTypingUsers;
 
@@ -105,6 +108,7 @@ class ConversationEntity extends Equatable {
     this.memberCount = 0,
     this.memberAvatarUrls,
     this.memberNames,
+    this.memberIds,
     this.hasTypingUsers = false,
     this.typingUsers = const [],
     this.draft,
@@ -191,6 +195,7 @@ class ConversationEntity extends Equatable {
         memberCount,
         memberAvatarUrls,
         memberNames,
+        memberIds,
         hasTypingUsers,
         typingUsers,
         draft,
@@ -218,6 +223,7 @@ class ConversationEntity extends Equatable {
     int? memberCount,
     List<String?>? memberAvatarUrls,
     List<String>? memberNames,
+    List<String>? memberIds,
     bool? hasTypingUsers,
     List<String>? typingUsers,
     String? draft,
@@ -244,6 +250,7 @@ class ConversationEntity extends Equatable {
       memberCount: memberCount ?? this.memberCount,
       memberAvatarUrls: memberAvatarUrls ?? this.memberAvatarUrls,
       memberNames: memberNames ?? this.memberNames,
+      memberIds: memberIds ?? this.memberIds,
       hasTypingUsers: hasTypingUsers ?? this.hasTypingUsers,
       typingUsers: typingUsers ?? this.typingUsers,
       draft: draft ?? this.draft,
