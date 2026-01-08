@@ -442,7 +442,44 @@ class _ChatPageState extends State<ChatPage> {
       return '${time.month}/${time.day} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
     }
   }
-  
+
+  /// 名片消息点击 - 跳转到用户资料页添加好友
+  void _onContactCardTap(String contactId, String contactName) {
+    debugPrint('Contact card tapped: $contactName ($contactId)');
+
+    // 获取当前的 ContactBloc
+    ContactBloc? contactBloc;
+    try {
+      contactBloc = context.read<ContactBloc>();
+    } catch (e) {
+      // ContactBloc 可能不可用
+    }
+
+    // 跳转到联系人详情页面
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) {
+          final page = ContactDetailPage(
+            userId: contactId,
+            displayName: contactName,
+            onSendMessage: () {
+              Navigator.of(ctx).pop();
+            },
+          );
+
+          // 如果有 ContactBloc，传递它
+          if (contactBloc != null) {
+            return BlocProvider.value(
+              value: contactBloc,
+              child: page,
+            );
+          }
+          return page;
+        },
+      ),
+    );
+  }
+
   /// 查看图片
   void _viewImage(MessageEntity message) {
     final imageUrl = message.metadata?.httpUrl ?? message.content;
@@ -2356,6 +2393,7 @@ ID：$contactId''';
                           onPollVote: (pollEventId, optionId) => _onPollVote(pollEventId, optionId),
                           onEndPoll: (pollEventId) => _onEndPoll(pollEventId),
                           onRedPacketTap: _onRedPacketTap,
+                          onContactCardTap: _onContactCardTap,
                         ),
                       ),
               ],

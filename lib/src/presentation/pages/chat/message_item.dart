@@ -53,6 +53,9 @@ class MessageItem extends StatelessWidget {
   /// 红包点击回调
   final Function(MessageEntity message)? onRedPacketTap;
 
+  /// 名片点击回调
+  final Function(String contactId, String contactName)? onContactCardTap;
+
   const MessageItem({
     super.key,
     required this.message,
@@ -69,6 +72,7 @@ class MessageItem extends StatelessWidget {
     this.onPollVote,
     this.onEndPoll,
     this.onRedPacketTap,
+    this.onContactCardTap,
   });
 
   @override
@@ -312,6 +316,11 @@ class MessageItem extends StatelessWidget {
   }
 
   Widget _buildTextMessage(bool isDark) {
+    // 检测是否是名片消息
+    if (_isContactCardMessage(message.content)) {
+      return _buildContactCardMessage(isDark);
+    }
+
     // 微信中绿色气泡的文字是黑色，灰色气泡的文字也是黑色
     // 深色模式下，对方的灰色气泡文字是白色
     final textColor = message.isFromMe
@@ -326,6 +335,164 @@ class MessageItem extends StatelessWidget {
         height: 1.4,
       ),
     );
+  }
+
+  /// 检测是否是名片消息
+  bool _isContactCardMessage(String content) {
+    return content.startsWith('[名片]') || content.startsWith('[Contact Card]');
+  }
+
+  /// 解析名片消息内容
+  Map<String, String>? _parseContactCard(String content) {
+    try {
+      final lines = content.split('\n');
+      if (lines.length < 3) return null;
+
+      String? contactName;
+      String? contactId;
+
+      for (final line in lines) {
+        if (line.startsWith('联系人：') || line.startsWith('Contact：')) {
+          contactName = line.replaceFirst(RegExp(r'^(联系人：|Contact：)'), '').trim();
+        } else if (line.startsWith('ID：')) {
+          contactId = line.replaceFirst('ID：', '').trim();
+        }
+      }
+
+      if (contactName != null && contactId != null) {
+        return {'name': contactName, 'id': contactId};
+      }
+    } catch (e) {
+      debugPrint('Parse contact card error: $e');
+    }
+    return null;
+  }
+
+  /// 构建名片消息（微信风格）
+  Widget _buildContactCardMessage(bool isDark) {
+    final cardInfo = _parseContactCard(message.content);
+    final contactName = cardInfo?['name'] ?? '未知联系人';
+    final contactId = cardInfo?['id'] ?? '';
+
+    return GestureDetector(
+      onTap: () {
+        if (contactId.isNotEmpty && onContactCardTap != null) {
+          onContactCardTap!(contactId, contactName);
+        }
+      },
+      child: Container(
+        width: 220,
+        decoration: BoxDecoration(
+          color: message.isFromMe
+              ? AppColors.bubbleSelf
+              : (isDark ? AppColors.bubbleOtherDark : AppColors.bubbleOther),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 名片内容
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  // 头像占位
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: _getColorFromName(contactName),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Center(
+                      child: Text(
+                        contactName.isNotEmpty ? contactName[0].toUpperCase() : '?',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  // 名称
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          contactName,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: message.isFromMe
+                                ? AppColors.messageTextSent
+                                : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'ID: ${contactId.length > 12 ? '${contactId.substring(0, 12)}...' : contactId}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: message.isFromMe
+                                ? AppColors.messageTextSent.withOpacity(0.6)
+                                : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // 底部分隔线和标签
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: message.isFromMe
+                        ? Colors.black.withOpacity(0.1)
+                        : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05)),
+                    width: 0.5,
+                  ),
+                ),
+              ),
+              child: Text(
+                '个人名片',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: message.isFromMe
+                      ? AppColors.messageTextSent.withOpacity(0.5)
+                      : (isDark ? AppColors.textSecondaryDark : AppColors.textTertiary),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 根据名称生成颜色
+  Color _getColorFromName(String name) {
+    final colors = [
+      const Color(0xFF1AAD19),
+      const Color(0xFF576B95),
+      const Color(0xFFFA9D3B),
+      const Color(0xFFE64340),
+    ];
+    if (name.isEmpty) return colors[0];
+    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
+    return colors[index];
   }
 
   Widget _buildImageMessage() {
