@@ -148,6 +148,7 @@ class ConversationRepositoryImpl implements IConversationRepository {
     String? avatarUrl;
     List<String?>? memberAvatarUrls;
     List<String>? memberNames;
+    List<String>? memberIds;
     
     if (room.isDirectChat) {
       // 私聊：获取对方用户的真实头像
@@ -179,6 +180,7 @@ class ConversationRepositoryImpl implements IConversationRepository {
       final members = _getGroupMemberInfo(room);
       memberAvatarUrls = members.$1;
       memberNames = members.$2;
+      memberIds = members.$3;
     }
 
     // 获取私聊对方的用户ID
@@ -205,38 +207,41 @@ class ConversationRepositoryImpl implements IConversationRepository {
       memberCount: _roomDataSource.getMemberCount(room),
       memberAvatarUrls: memberAvatarUrls,
       memberNames: memberNames,
+      memberIds: memberIds,
       directUserId: directUserId,
     );
   }
   
-  /// 获取群成员头像和名称列表（最多9个，用于九宫格头像）
+  /// 获取群成员头像、名称和ID列表（最多17个，用于群详情页显示）
   /// 参照微信：包含自己，按加入顺序排列
-  (List<String?>, List<String>) _getGroupMemberInfo(matrix.Room room) {
+  (List<String?>, List<String>, List<String>) _getGroupMemberInfo(matrix.Room room) {
     final client = room.client;
-    
+
     final avatarUrls = <String?>[];
     final names = <String>[];
-    
-    // 获取已加入的成员（包括自己，最多取9个）
+    final ids = <String>[];
+
+    // 获取已加入的成员（包括自己，最多取17个）
     final participants = room.getParticipants();
-    
+
     int count = 0;
     for (final member in participants) {
-      if (count >= 9) break;
+      if (count >= 17) break;
       if (member.membership != matrix.Membership.join) continue; // 只取已加入的成员
-      
+
       final memberName = member.displayName ?? member.id.localpart ?? '';
-      
+      final memberId = member.id;
+
       // 获取头像 URL - 只使用用户明确设置的头像
       final mxcUri = member.avatarUrl?.toString();
       String? httpUrl;
-      
+
       // 检查是否是用户自定义头像（排除服务器默认头像）
       if (mxcUri != null && mxcUri.isNotEmpty && mxcUri.startsWith('mxc://')) {
         final isDefaultAvatar = mxcUri.contains('identicon') ||
             mxcUri.contains('default') ||
             mxcUri.contains('placeholder');
-        
+
         if (!isDefaultAvatar) {
           httpUrl = MatrixUtils.mxcToHttp(
             mxcUri,
@@ -247,13 +252,14 @@ class ConversationRepositoryImpl implements IConversationRepository {
         }
       }
       // httpUrl 为 null 时，UI 根据 memberName 显示字母头像
-      
+
       avatarUrls.add(httpUrl);
       names.add(memberName);
+      ids.add(memberId);
       count++;
     }
-    
-    return (avatarUrls, names);
+
+    return (avatarUrls, names, ids);
   }
 }
 

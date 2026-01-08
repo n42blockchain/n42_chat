@@ -744,7 +744,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   /// 打开聊天设置页面
-  void _openChatSettings() {
+  void _openChatSettings() async {
     // 获取当前的 ContactBloc
     ContactBloc? contactBloc;
     try {
@@ -752,14 +752,136 @@ class _ChatPageState extends State<ChatPage> {
     } catch (e) {
       // ContactBloc 可能不可用
     }
-    
+
+    // 检查是否可以踢人（群主/管理员）
+    bool canKickMembers = false;
+    if (widget.conversation.isGroup) {
+      try {
+        final groupRepository = getIt<IGroupRepository>();
+        final group = await groupRepository.getGroup(widget.conversation.id);
+        canKickMembers = group?.canKick ?? false;
+      } catch (e) {
+        debugPrint('Failed to get group info: $e');
+      }
+    }
+
+    if (!mounted) return;
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) {
           final page = ChatDetailPage(
             conversation: widget.conversation,
+            canKickMembers: canKickMembers,
+            onAddMember: () => _showAddMemberDialog(ctx),
+            onRemoveMember: (userId) => _removeMemberFromGroup(userId),
+            onMemberTap: (userId, displayName, avatarUrl) {
+              _openMemberProfile(ctx, userId, displayName, avatarUrl);
+            },
           );
-          
+
+          if (contactBloc != null) {
+            return BlocProvider.value(
+              value: contactBloc,
+              child: page,
+            );
+          }
+          return page;
+        },
+      ),
+    );
+  }
+
+  /// 显示添加成员对话框
+  void _showAddMemberDialog(BuildContext ctx) async {
+    // 获取联系人列表
+    List<ContactEntity> contacts = [];
+    try {
+      final contactState = context.read<ContactBloc>().state;
+      if (contactState is ContactLoaded) {
+        contacts = contactState.contacts;
+      }
+    } catch (e) {
+      debugPrint('Failed to get contacts: $e');
+    }
+
+    if (contacts.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('没有可添加的联系人')),
+      );
+      return;
+    }
+
+    // 显示联系人选择对话框
+    final selectedIds = await showDialog<List<String>>(
+      context: context,
+      builder: (dialogCtx) => _ContactSelectDialog(
+        contacts: contacts,
+        title: '添加成员',
+      ),
+    );
+
+    if (selectedIds != null && selectedIds.isNotEmpty) {
+      try {
+        final groupRepository = getIt<IGroupRepository>();
+        await groupRepository.inviteUsers(widget.conversation.id, selectedIds);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('已邀请 ${selectedIds.length} 位成员')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('邀请失败: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  /// 从群中移除成员
+  void _removeMemberFromGroup(String userId) async {
+    try {
+      final groupRepository = getIt<IGroupRepository>();
+      await groupRepository.kickMember(widget.conversation.id, userId);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('已移除成员')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('移除失败: $e')),
+        );
+      }
+    }
+  }
+
+  /// 打开成员资料页
+  void _openMemberProfile(BuildContext ctx, String userId, String displayName, String? avatarUrl) {
+    // 获取当前的 ContactBloc
+    ContactBloc? contactBloc;
+    try {
+      contactBloc = context.read<ContactBloc>();
+    } catch (e) {
+      // ContactBloc 可能不可用
+    }
+
+    Navigator.of(ctx).push(
+      MaterialPageRoute(
+        builder: (navCtx) {
+          final page = ContactDetailPage(
+            userId: userId,
+            displayName: displayName,
+            avatarUrl: avatarUrl,
+            onSendMessage: () {
+              Navigator.of(navCtx).pop();
+              Navigator.of(ctx).pop();
+            },
+          );
+
           if (contactBloc != null) {
             return BlocProvider.value(
               value: contactBloc,
@@ -6512,6 +6634,131 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
         ],
       ),
     );
+  }
+}
+
+/// 联系人选择对话框
+class _ContactSelectDialog extends StatefulWidget {
+  final List<ContactEntity> contacts;
+  final String title;
+
+  const _ContactSelectDialog({
+    required this.contacts,
+    required this.title,
+  });
+
+  @override
+  State<_ContactSelectDialog> createState() => _ContactSelectDialogState();
+}
+
+class _ContactSelectDialogState extends State<_ContactSelectDialog> {
+  final Set<String> _selectedIds = {};
+  String _searchQuery = '';
+
+  List<ContactEntity> get _filteredContacts {
+    if (_searchQuery.isEmpty) return widget.contacts;
+    final query = _searchQuery.toLowerCase();
+    return widget.contacts.where((c) {
+      return c.effectiveDisplayName.toLowerCase().contains(query) ||
+          c.userId.toLowerCase().contains(query);
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black;
+
+    return AlertDialog(
+      backgroundColor: bgColor,
+      title: Text(widget.title, style: TextStyle(color: textColor)),
+      content: SizedBox(
+        width: double.maxFinite,
+        height: 400,
+        child: Column(
+          children: [
+            // 搜索框
+            TextField(
+              onChanged: (value) => setState(() => _searchQuery = value),
+              decoration: InputDecoration(
+                hintText: '搜索联系人',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // 联系人列表
+            Expanded(
+              child: ListView.builder(
+                itemCount: _filteredContacts.length,
+                itemBuilder: (context, index) {
+                  final contact = _filteredContacts[index];
+                  final isSelected = _selectedIds.contains(contact.userId);
+                  return CheckboxListTile(
+                    value: isSelected,
+                    onChanged: (value) {
+                      setState(() {
+                        if (value == true) {
+                          _selectedIds.add(contact.userId);
+                        } else {
+                          _selectedIds.remove(contact.userId);
+                        }
+                      });
+                    },
+                    title: Text(
+                      contact.effectiveDisplayName,
+                      style: TextStyle(color: textColor),
+                    ),
+                    subtitle: Text(
+                      contact.userId,
+                      style: TextStyle(fontSize: 12, color: textColor.withOpacity(0.6)),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    secondary: CircleAvatar(
+                      backgroundColor: _getColorFromName(contact.effectiveDisplayName),
+                      child: Text(
+                        contact.effectiveDisplayName.isNotEmpty
+                            ? contact.effectiveDisplayName[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('取消'),
+        ),
+        TextButton(
+          onPressed: _selectedIds.isEmpty
+              ? null
+              : () => Navigator.of(context).pop(_selectedIds.toList()),
+          child: Text('确定 (${_selectedIds.length})'),
+        ),
+      ],
+    );
+  }
+
+  Color _getColorFromName(String name) {
+    final colors = [
+      const Color(0xFF1AAD19),
+      const Color(0xFF576B95),
+      const Color(0xFFFA9D3B),
+      const Color(0xFFE64340),
+    ];
+    if (name.isEmpty) return colors[0];
+    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
+    return colors[index];
   }
 }
 

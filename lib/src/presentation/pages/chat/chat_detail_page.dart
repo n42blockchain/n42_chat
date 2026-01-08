@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
+import '../../../domain/repositories/group_repository.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/n42_avatar.dart';
@@ -19,9 +21,25 @@ class ChatDetailPage extends StatefulWidget {
   /// 会话信息
   final ConversationEntity conversation;
 
+  /// 是否可以踢人（群主/管理员）
+  final bool canKickMembers;
+
+  /// 添加成员到群的回调
+  final VoidCallback? onAddMember;
+
+  /// 移除成员的回调
+  final Function(String userId)? onRemoveMember;
+
+  /// 点击成员头像的回调（返回true表示是好友，可以直接聊天）
+  final Function(String userId, String displayName, String? avatarUrl)? onMemberTap;
+
   const ChatDetailPage({
     super.key,
     required this.conversation,
+    this.canKickMembers = false,
+    this.onAddMember,
+    this.onRemoveMember,
+    this.onMemberTap,
   });
 
   @override
@@ -154,41 +172,37 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                       // 添加成员按钮
                       _buildAddButton(
                         icon: Icons.add,
-                        onTap: () {},
+                        onTap: () => _addMemberToGroup(),
                       ),
-                      // 删除成员按钮（群聊时显示）
-                      if (isGroup)
+                      // 移除成员按钮（仅群主/管理员显示）
+                      if (isGroup && widget.canKickMembers)
                         _buildAddButton(
                           icon: Icons.remove,
-                          onTap: () {},
+                          onTap: () => _removeMemberFromGroup(),
                         ),
                     ],
                   ),
                   if (isGroup) ...[
                     const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Text(
-                          S.of(context)?.viewAllGroupMembers ?? 'View all members',
-                          style: TextStyle(
-                            fontSize: 13,
+                    GestureDetector(
+                      onTap: () => _openGroupMemberList(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${S.of(context)?.viewAllGroupMembers ?? "更多群成员"} ',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: secondaryTextColor,
+                            ),
+                          ),
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            size: 16,
                             color: secondaryTextColor,
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '(${widget.conversation.memberCount ?? 0})',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: secondaryTextColor,
-                          ),
-                        ),
-                        Icon(
-                          Icons.chevron_right,
-                          size: 16,
-                          color: secondaryTextColor,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ],
@@ -392,16 +406,145 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final members = <Widget>[];
     final avatars = widget.conversation.memberAvatarUrls ?? [];
     final names = widget.conversation.memberNames ?? [];
+    final ids = widget.conversation.memberIds ?? [];
 
-    for (int i = 0; i < avatars.length && i < 8; i++) {
+    // 如果有踢人权限，显示 16 个头像（留空间给 +- 按钮）；否则显示 17 个（只有 + 按钮）
+    final maxMembers = widget.canKickMembers ? 16 : 17;
+
+    for (int i = 0; i < avatars.length && i < maxMembers; i++) {
+      final memberId = ids.length > i ? ids[i] : '';
+      final memberName = names.length > i ? names[i] : '';
+      final memberAvatar = avatars[i];
+
       members.add(_buildMemberItem(
-        avatarUrl: avatars[i],
-        name: names.length > i ? names[i] : '',
-        onTap: () {},
+        avatarUrl: memberAvatar,
+        name: memberName,
+        onTap: () => _onMemberTap(memberId, memberName, memberAvatar),
       ));
     }
 
     return members;
+  }
+
+  /// 点击成员头像
+  void _onMemberTap(String userId, String displayName, String? avatarUrl) {
+    if (userId.isEmpty) return;
+
+    // 如果提供了回调，使用回调
+    if (widget.onMemberTap != null) {
+      widget.onMemberTap!(userId, displayName, avatarUrl);
+      return;
+    }
+
+    // 默认行为：打开联系人详情页
+    _openMemberDetail(userId, displayName, avatarUrl);
+  }
+
+  /// 打开成员详情页
+  void _openMemberDetail(String userId, String displayName, String? avatarUrl) {
+    ContactBloc? contactBloc;
+    try {
+      contactBloc = context.read<ContactBloc>();
+    } catch (e) {
+      // ContactBloc 可能不可用
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) {
+          final page = ContactDetailPage(
+            userId: userId,
+            displayName: displayName,
+            avatarUrl: avatarUrl,
+            onSendMessage: () {
+              Navigator.of(ctx).pop();
+              Navigator.of(context).pop();
+            },
+          );
+
+          if (contactBloc != null) {
+            return BlocProvider.value(
+              value: contactBloc,
+              child: page,
+            );
+          }
+          return page;
+        },
+      ),
+    );
+  }
+
+  /// 打开群成员列表
+  void _openGroupMemberList() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => _GroupMemberListPage(
+          roomId: widget.conversation.id,
+          roomName: widget.conversation.name,
+          onMemberTap: (userId, displayName, avatarUrl) {
+            _onMemberTap(userId, displayName, avatarUrl);
+          },
+        ),
+      ),
+    );
+  }
+
+  /// 添加成员到群
+  void _addMemberToGroup() {
+    if (widget.onAddMember != null) {
+      widget.onAddMember!();
+    } else {
+      // TODO: 默认实现
+      debugPrint('Add member to group');
+    }
+  }
+
+  /// 从群中移除成员
+  void _removeMemberFromGroup() {
+    if (widget.onRemoveMember != null) {
+      // 显示选择成员的对话框
+      _showRemoveMemberDialog();
+    } else {
+      debugPrint('Remove member from group');
+    }
+  }
+
+  /// 显示移除成员的对话框
+  void _showRemoveMemberDialog() {
+    final names = widget.conversation.memberNames ?? [];
+    final ids = widget.conversation.memberIds ?? [];
+
+    if (ids.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('移除成员'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 300,
+          child: ListView.builder(
+            itemCount: ids.length,
+            itemBuilder: (context, index) {
+              final name = names.length > index ? names[index] : ids[index];
+              return ListTile(
+                title: Text(name),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  widget.onRemoveMember?.call(ids[index]);
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('取消'),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildAddButton({
@@ -610,3 +753,209 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   }
 }
 
+/// 群成员列表页面
+class _GroupMemberListPage extends StatefulWidget {
+  final String roomId;
+  final String roomName;
+  final Function(String userId, String displayName, String? avatarUrl)? onMemberTap;
+
+  const _GroupMemberListPage({
+    required this.roomId,
+    required this.roomName,
+    this.onMemberTap,
+  });
+
+  @override
+  State<_GroupMemberListPage> createState() => _GroupMemberListPageState();
+}
+
+class _GroupMemberListPageState extends State<_GroupMemberListPage> {
+  List<Map<String, dynamic>> _members = [];
+  List<Map<String, dynamic>> _filteredMembers = [];
+  bool _isLoading = true;
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMembers();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadMembers() async {
+    try {
+      final groupRepository = getIt<IGroupRepository>();
+      final members = await groupRepository.getGroupMembers(widget.roomId);
+
+      if (mounted) {
+        setState(() {
+          _members = members.map((m) => {
+            'id': m.userId,
+            'name': m.displayName,
+            'avatarUrl': m.avatarUrl,
+            'role': m.role.name,
+          }).toList();
+          _filteredMembers = _members;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading members: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _filterMembers(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        _filteredMembers = _members;
+      } else {
+        _filteredMembers = _members.where((m) {
+          final name = (m['name'] as String?)?.toLowerCase() ?? '';
+          final id = (m['id'] as String?)?.toLowerCase() ?? '';
+          return name.contains(query.toLowerCase()) || id.contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? Colors.black : const Color(0xFFF5F5F5);
+    final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black;
+    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
+
+    return Scaffold(
+      backgroundColor: bgColor,
+      appBar: AppBar(
+        backgroundColor: bgColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          '群成员 (${_members.length})',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: textColor,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          // 搜索框
+          Container(
+            color: cardColor,
+            padding: const EdgeInsets.all(12),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _filterMembers,
+              style: TextStyle(color: textColor),
+              decoration: InputDecoration(
+                hintText: '搜索成员',
+                hintStyle: TextStyle(color: secondaryTextColor),
+                prefixIcon: Icon(Icons.search, color: secondaryTextColor),
+                filled: true,
+                fillColor: isDark ? Colors.white10 : Colors.grey[200],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ),
+          // 成员列表
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _filteredMembers.isEmpty
+                    ? Center(
+                        child: Text(
+                          _searchQuery.isEmpty ? '没有成员' : '未找到匹配的成员',
+                          style: TextStyle(color: secondaryTextColor),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _filteredMembers.length,
+                        itemBuilder: (context, index) {
+                          final member = _filteredMembers[index];
+                          final name = member['name'] as String? ?? '未知';
+                          final id = member['id'] as String? ?? '';
+                          final avatarUrl = member['avatarUrl'] as String?;
+                          final role = member['role'] as String?;
+
+                          return ListTile(
+                            leading: N42Avatar(
+                              imageUrl: avatarUrl,
+                              name: name,
+                              size: 44,
+                              borderRadius: 6,
+                            ),
+                            title: Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    name,
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (role == 'owner') ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Text(
+                                      '群主',
+                                      style: TextStyle(fontSize: 10, color: Colors.orange),
+                                    ),
+                                  ),
+                                ] else if (role == 'admin') ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Text(
+                                      '管理员',
+                                      style: TextStyle(fontSize: 10, color: Colors.blue),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            onTap: () {
+                              widget.onMemberTap?.call(id, name, avatarUrl);
+                            },
+                          );
+                        },
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
+}
