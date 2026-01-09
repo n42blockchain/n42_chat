@@ -243,6 +243,9 @@ class MessageItem extends StatelessWidget {
       case MessageType.poll:
         content = _buildPollMessage(isDark);
         break;
+      case MessageType.music:
+        content = _buildMusicMessage(isDark);
+        break;
       case MessageType.encrypted:
         content = _buildEncryptedMessage(isDark);
         break;
@@ -836,7 +839,103 @@ class MessageItem extends StatelessWidget {
       onTap: () => onRedPacketTap?.call(message),
     );
   }
-  
+
+  Widget _buildMusicMessage(bool isDark) {
+    final metadata = message.metadata;
+    final title = metadata?.musicTitle ?? '未知歌曲';
+    final artist = metadata?.musicArtist ?? '未知艺术家';
+    final cover = metadata?.musicCover;
+    final url = metadata?.musicUrl;
+
+    return GestureDetector(
+      onTap: () {
+        if (url != null && url.isNotEmpty) {
+          onTap?.call();
+        }
+      },
+      child: Container(
+        width: 240,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: message.isFromMe
+              ? AppColors.messageSent
+              : (isDark ? AppColors.messageReceivedDark : AppColors.messageReceived),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            // 专辑封面
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: cover != null && cover.isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        cover,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Icon(
+                          Icons.music_note,
+                          size: 24,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    )
+                  : Icon(
+                      Icons.music_note,
+                      size: 24,
+                      color: AppColors.primary,
+                    ),
+            ),
+            const SizedBox(width: 12),
+            // 歌曲信息
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: message.isFromMe
+                          ? AppColors.messageTextSent
+                          : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    artist,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: message.isFromMe
+                          ? AppColors.messageTextSent.withOpacity(0.7)
+                          : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            // 播放图标
+            Icon(
+              Icons.play_circle_filled,
+              size: 32,
+              color: AppColors.primary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPollMessage(bool isDark) {
     final metadata = message.metadata;
     final question = metadata?.pollQuestion ?? message.content;
