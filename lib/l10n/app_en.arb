@@ -118,6 +118,36 @@
   "conversationLabel": "Conversation: {roomId}",
   "contactLabel": "Contact: {userId}",
   "addFriend": "Add Friend",
+  "chatServiceNotConnected": "Chat service not connected",
+  "userNotFoundHint": "User \"{query}\" not found\n\nTips:\n• Try entering full user ID, e.g. @username:server.com\n• Check the username spelling",
+  "@userNotFoundHint": {
+    "placeholders": {
+      "query": {"type": "String"}
+    }
+  },
+  "createChatFailed": "Failed to create chat: {error}",
+  "@createChatFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "searchFailed": "Search failed: {error}",
+  "@searchFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterUserIdOrUsername": "Enter user ID or username to search",
+  "searching": "Searching...",
+  "searchUserToChat": "Search user to start chatting",
+  "matrixIdExample": "You can enter a full Matrix ID\ne.g. @user:matrix.n42.network",
+  "userNotFound": "User \"{username}\" not found",
+  "@userNotFound": {
+    "placeholders": {
+      "username": {"type": "String"}
+    }
+  },
+  "chat": "Chat",
   "settings": "Settings",
   "editProfile": "Edit Profile",
   "login": "Log In",
@@ -233,10 +263,11 @@
   "appleLoginFailed": "Apple login failed: {error}",
   "createAccount": "Create Account",
   "joinN42Chat": "Join N42 Chat to start chatting",
-  "usernameHint": "Enter username (letters, numbers, underscores)",
+  "usernameHint": "3-20 chars, letters/numbers/_",
   "usernameMinLength": "Username must be at least 3 characters",
+  "usernameMaxLength": "Username must be at most 20 characters",
   "usernameFormat": "Username can only contain letters, numbers, and underscores",
-  "passwordHint": "Enter password (at least 8 characters)",
+  "passwordHint": "Min 8 characters",
   "passwordMinLength": "Password must be at least 8 characters",
   "confirmPassword": "Confirm Password",
   "reEnterPassword": "Re-enter password",
@@ -368,6 +399,7 @@
   "publish": "Publish",
   "clearHistoryConfirm": "Clear all chat history? This cannot be undone.",
   "clearAction": "Clear",
+  "chatHistoryCleared": "Chat history cleared",
   "leaveGroupConfirm": "Leave \"{name}\"?",
   "dissolveGroupConfirm": "Dissolve \"{name}\"? This cannot be undone.",
   "dissolve": "Dissolve",
@@ -574,5 +606,178 @@
   "endPoll": "End Poll",
   "endPollConfirm": "Are you sure you want to end this poll? No more votes can be cast after ending.",
   "pollEnded": "Poll ended",
-  "memberCount": "{count} members"
+  "memberCount": "{count} members",
+  "videoChannels": "Channels",
+  "live": "Live",
+  "listen": "Listen",
+  "watch": "Watch",
+  "searchDiscover": "Search",
+  "nearbyPeople": "Nearby",
+  "games": "Games",
+  "miniPrograms": "Mini Programs",
+  "done": "Done({count})",
+  "@done": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "services": "Services",
+  "favorites": "Favorites",
+  "ordersAndCards": "Orders & Cards",
+  "stickers": "Stickers",
+  "statusSetTo": "Status set to: {status}",
+  "@statusSetTo": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "avatarUploadFailed": "Avatar upload failed",
+  "personalProfile": "Personal Profile",
+  "name": "Name",
+  "gender": "Gender",
+  "region": "Region",
+  "myQrCode": "My QR Code",
+  "poke": "Poke",
+  "ringtone": "Ringtone",
+  "defaultRingtone": "Default Ringtone",
+  "myAddresses": "My Addresses",
+  "genderSetTo": "Gender set to: {gender}",
+  "@genderSetTo": {
+    "placeholders": {
+      "gender": {"type": "String"}
+    }
+  },
+  "selectRegion": "Select Region",
+  "selectCity": "Select City",
+  "regionSetTo": "Region set to: {region}",
+  "@regionSetTo": {
+    "placeholders": {
+      "region": {"type": "String"}
+    }
+  },
+  "setPoke": "Set Poke",
+  "friendPokedMe": "Friend poked me",
+  "enterPokeSuffix": "Enter poke suffix, e.g.: on the shoulder",
+  "example": "Example",
+  "onTheShoulder": " on the shoulder",
+  "pokeCleared": "Poke cleared",
+  "pokeSetTo": "Poke set to: poked me{suffix}",
+  "@pokeSetTo": {
+    "placeholders": {
+      "suffix": {"type": "String"}
+    }
+  },
+  "editSignature": "Edit Signature",
+  "introduceYourself": "A sentence to introduce yourself",
+  "signatureCleared": "Signature cleared",
+  "signatureUpdated": "Signature updated",
+  "scanToAddFriend": "Scan the QR code above to add me as a friend",
+  "ringtoneSetTo": "Ringtone set to: {ringtone}",
+  "@ringtoneSetTo": {
+    "placeholders": {
+      "ringtone": {"type": "String"}
+    }
+  },
+  "confirmDissolveGroup": "Are you sure you want to dissolve",
+  "enterValidServerAddress": "Please enter a valid server address",
+  "emailOtp": "Email OTP",
+  "enterServerAddressFirst": "Please enter server address first",
+  "passkeyRequiresServer": "Passkey login requires server support",
+  "loginAgreement": "By logging in, you agree to ",
+  "pleaseAgreeToTerms": "Please read and agree to the Terms of Service and Privacy Policy",
+  "registerFailed": "Registration failed",
+  "reenterPassword": "Re-enter password",
+  "passwordsDoNotMatch": "Passwords do not match",
+  "inviteCodeBuiltIn": "Invite Code (Built-in)",
+  "inviteCodeBuiltInNote": "Invite code is built-in, usually no need to modify",
+  "iHaveReadAndAgree": "I have read and agree to ",
+  "startGroupChat": "Start Group Chat",
+  "addFriends": "Add Friends",
+  "paymentAndCollection": "Payment",
+  "messagesWithCount": "Messages({count})",
+  "@messagesWithCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "contactCount": "{count} contacts",
+  "@contactCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "addToHomeScreen": "Add to home screen",
+  "recommendedCardTo": "Recommended {contact}'s card to {recipient}",
+  "@recommendedCardTo": {
+    "placeholders": {
+      "contact": {"type": "String"},
+      "recipient": {"type": "String"}
+    }
+  },
+  "enterRemarkName": "Enter remark name",
+  "remarkSetTo": "Remark set to: {remark}",
+  "@remarkSetTo": {
+    "placeholders": {
+      "remark": {"type": "String"}
+    }
+  },
+  "acceptedFriendRequest": "Accepted {name}'s friend request",
+  "@acceptedFriendRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "rejectedFriendRequest": "Rejected {name}'s friend request",
+  "@rejectedFriendRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "groupInvites": "Group Invites",
+  "myGroups": "My Groups",
+  "invitedToJoinGroup": "Invited to join group",
+  "confirmLeaveGroup": "Are you sure you want to leave",
+  "leave": "Leave",
+  "copy": "Copy",
+  "forward": "Forward",
+  "favorite": "Favorite",
+  "unfavorite": "Unfav",
+  "recall": "Recall",
+  "resend": "Resend",
+  "saveMedia": "Save",
+  "selectMessages": "Select",
+  "quote": "Quote",
+  "remind": "Remind",
+  "recallThisMessage": "Recall this message?",
+  "youRecalledMessage": "You recalled a message",
+  "messageRecalled": "Message recalled",
+  "reEdit": "Re-edit",
+  "selectEmoji": "Select Emoji",
+  "frequentlyUsed": "Frequently Used",
+  "savedToGallery": "Saved to gallery",
+  "failedToSave": "Failed to save",
+  "saving": "Saving...",
+  "share": "Share",
+  "saveToGallery": "Save to Gallery",
+  "downloadFailed": "Download failed",
+  "noMediaUrl": "No media URL available",
+  "shareFailed": "Share failed",
+  "failedToLoadImage": "Failed to load image",
+  "failedToLoadMoreMessages": "Failed to load more messages",
+  "failedToSend": "Failed to send",
+  "failedToSendImage": "Failed to send image",
+  "failedToSendVoice": "Failed to send voice",
+  "failedToSendFile": "Failed to send file",
+  "failedToSendVideo": "Failed to send video",
+  "failedToSendLocation": "Failed to send location",
+  "failedToResend": "Failed to resend",
+  "failedToRecall": "Failed to recall",
+  "failedToReply": "Failed to reply",
+  "failedToAddReaction": "Failed to add reaction",
+  "failedToSendPoll": "Failed to send poll",
+  "failedToVote": "Failed to vote",
+  "failedToLoadMessages": "Failed to load messages",
+  "callFeatureComingSoon": "Voice and video call feature coming soon",
+  "cannotForwardRedPacketOrTransfer": "Red envelopes and transfers cannot be forwarded",
+  "videoRecordingFailed": "Video recording failed. Please try again."
 }

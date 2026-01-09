@@ -209,6 +209,36 @@
     }
   },
   "addFriend": "添加好友",
+  "chatServiceNotConnected": "聊天服务未连接",
+  "userNotFoundHint": "未找到用户 \"{query}\"\n\n提示：\n• 尝试输入完整用户ID，如 @username:server.com\n• 确认用户名拼写正确",
+  "@userNotFoundHint": {
+    "placeholders": {
+      "query": {"type": "String"}
+    }
+  },
+  "createChatFailed": "创建会话失败: {error}",
+  "@createChatFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "searchFailed": "搜索失败: {error}",
+  "@searchFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterUserIdOrUsername": "输入用户 ID 或用户名搜索",
+  "searching": "搜索中...",
+  "searchUserToChat": "搜索用户开始聊天",
+  "matrixIdExample": "可以输入完整的 Matrix ID\n例如: @user:matrix.n42.network",
+  "userNotFound": "未找到用户 \"{username}\"",
+  "@userNotFound": {
+    "placeholders": {
+      "username": {"type": "String"}
+    }
+  },
+  "chat": "聊天",
   "settings": "设置",
   "editProfile": "编辑资料",
   "login": "登录",
@@ -369,10 +399,11 @@
   },
   "createAccount": "创建账号",
   "joinN42Chat": "加入 N42 Chat 开始聊天",
-  "usernameHint": "请输入用户名（字母、数字、下划线）",
+  "usernameHint": "3-20字符，字母/数字/_",
   "usernameMinLength": "用户名至少3个字符",
+  "usernameMaxLength": "用户名最多20个字符",
   "usernameFormat": "用户名只能包含字母、数字和下划线",
-  "passwordHint": "请输入密码（至少8位）",
+  "passwordHint": "至少8位",
   "passwordMinLength": "密码至少8位",
   "confirmPassword": "确认密码",
   "reEnterPassword": "请再次输入密码",
@@ -600,6 +631,7 @@
   "publish": "发布",
   "clearHistoryConfirm": "确定要清空聊天记录吗？此操作不可恢复。",
   "clearAction": "清空",
+  "chatHistoryCleared": "聊天记录已清空",
   "leaveGroupConfirm": "确定要退出 {name} 吗？",
   "@leaveGroupConfirm": {
     "placeholders": {
@@ -906,5 +938,178 @@
   "endPoll": "结束投票",
   "endPollConfirm": "确定要结束这个投票吗？结束后将无法继续投票。",
   "pollEnded": "投票已结束",
-  "memberCount": "{count}人"
+  "memberCount": "{count}人",
+  "videoChannels": "视频号",
+  "live": "直播",
+  "listen": "听一听",
+  "watch": "看一看",
+  "searchDiscover": "搜一搜",
+  "nearbyPeople": "附近的人",
+  "games": "游戏",
+  "miniPrograms": "小程序",
+  "done": "完成({count})",
+  "@done": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "services": "服务",
+  "favorites": "收藏",
+  "ordersAndCards": "订单卡券",
+  "stickers": "表情",
+  "statusSetTo": "状态已设置为：{status}",
+  "@statusSetTo": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "avatarUploadFailed": "头像上传失败",
+  "personalProfile": "个人信息",
+  "name": "名字",
+  "gender": "性别",
+  "region": "地区",
+  "myQrCode": "我的二维码",
+  "poke": "拍一拍",
+  "ringtone": "来电铃声",
+  "defaultRingtone": "默认铃声",
+  "myAddresses": "我的地址",
+  "genderSetTo": "性别已设置为：{gender}",
+  "@genderSetTo": {
+    "placeholders": {
+      "gender": {"type": "String"}
+    }
+  },
+  "selectRegion": "选择地区",
+  "selectCity": "选择城市",
+  "regionSetTo": "地区已设置为：{region}",
+  "@regionSetTo": {
+    "placeholders": {
+      "region": {"type": "String"}
+    }
+  },
+  "setPoke": "设置拍一拍",
+  "friendPokedMe": "朋友拍了拍我",
+  "enterPokeSuffix": "输入拍一拍后缀，如：的肩膀",
+  "example": "示例",
+  "onTheShoulder": "的肩膀",
+  "pokeCleared": "拍一拍已清除",
+  "pokeSetTo": "拍一拍已设置为：拍了拍我{suffix}",
+  "@pokeSetTo": {
+    "placeholders": {
+      "suffix": {"type": "String"}
+    }
+  },
+  "editSignature": "编辑个性签名",
+  "introduceYourself": "一句话介绍自己",
+  "signatureCleared": "个性签名已清除",
+  "signatureUpdated": "个性签名已更新",
+  "scanToAddFriend": "扫一扫上面的二维码图案，加我为好友",
+  "ringtoneSetTo": "来电铃声已设置为：{ringtone}",
+  "@ringtoneSetTo": {
+    "placeholders": {
+      "ringtone": {"type": "String"}
+    }
+  },
+  "confirmDissolveGroup": "确定要解散群聊",
+  "enterValidServerAddress": "请输入有效的服务器地址",
+  "emailOtp": "邮箱验证码",
+  "enterServerAddressFirst": "请先输入服务器地址",
+  "passkeyRequiresServer": "Passkey登录需要服务器支持",
+  "loginAgreement": "登录即表示同意",
+  "pleaseAgreeToTerms": "请先阅读并同意服务协议和隐私政策",
+  "registerFailed": "注册失败",
+  "reenterPassword": "请再次输入密码",
+  "passwordsDoNotMatch": "两次输入的密码不一致",
+  "inviteCodeBuiltIn": "邀请码（已内置）",
+  "inviteCodeBuiltInNote": "邀请码已内置，通常无需修改",
+  "iHaveReadAndAgree": "我已阅读并同意",
+  "startGroupChat": "发起群聊",
+  "addFriends": "添加朋友",
+  "paymentAndCollection": "收付款",
+  "messagesWithCount": "消息({count})",
+  "@messagesWithCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "contactCount": "{count}位联系人",
+  "@contactCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "addToHomeScreen": "添加到桌面",
+  "recommendedCardTo": "已将{contact}的名片推荐给{recipient}",
+  "@recommendedCardTo": {
+    "placeholders": {
+      "contact": {"type": "String"},
+      "recipient": {"type": "String"}
+    }
+  },
+  "enterRemarkName": "请输入备注名",
+  "remarkSetTo": "备注已设置为：{remark}",
+  "@remarkSetTo": {
+    "placeholders": {
+      "remark": {"type": "String"}
+    }
+  },
+  "acceptedFriendRequest": "已接受{name}的好友请求",
+  "@acceptedFriendRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "rejectedFriendRequest": "已拒绝{name}的好友请求",
+  "@rejectedFriendRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "groupInvites": "群邀请",
+  "myGroups": "我的群聊",
+  "invitedToJoinGroup": "邀请加入群聊",
+  "confirmLeaveGroup": "确定要退出",
+  "leave": "退出",
+  "copy": "复制",
+  "forward": "转发",
+  "favorite": "收藏",
+  "unfavorite": "取消收藏",
+  "recall": "撤回",
+  "resend": "重发",
+  "saveMedia": "保存",
+  "selectMessages": "多选",
+  "quote": "引用",
+  "remind": "提醒",
+  "recallThisMessage": "撤回该条消息？",
+  "youRecalledMessage": "你撤回了一条消息",
+  "messageRecalled": "对方撤回了一条消息",
+  "reEdit": "重新编辑",
+  "selectEmoji": "选择表情",
+  "frequentlyUsed": "常用",
+  "savedToGallery": "已保存到相册",
+  "failedToSave": "保存失败",
+  "saving": "保存中...",
+  "share": "分享",
+  "saveToGallery": "保存到相册",
+  "downloadFailed": "下载失败",
+  "noMediaUrl": "没有可用的媒体链接",
+  "shareFailed": "分享失败",
+  "failedToLoadImage": "图片加载失败",
+  "failedToLoadMoreMessages": "加载更多消息失败",
+  "failedToSend": "发送失败",
+  "failedToSendImage": "发送图片失败",
+  "failedToSendVoice": "发送语音失败",
+  "failedToSendFile": "发送文件失败",
+  "failedToSendVideo": "发送视频失败",
+  "failedToSendLocation": "发送位置失败",
+  "failedToResend": "重发失败",
+  "failedToRecall": "撤回失败",
+  "failedToReply": "回复失败",
+  "failedToAddReaction": "添加回应失败",
+  "failedToSendPoll": "发送投票失败",
+  "failedToVote": "投票失败",
+  "failedToLoadMessages": "加载消息失败",
+  "callFeatureComingSoon": "语音和视频通话功能即将上线",
+  "cannotForwardRedPacketOrTransfer": "红包和转账不能转发",
+  "videoRecordingFailed": "视频录制失败，请重试"
 }

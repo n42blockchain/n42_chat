@@ -49,6 +49,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendPollMessage>(_onSendPollMessage);
     on<VoteOnPoll>(_onVoteOnPoll);
     on<SendCustomMessage>(_onSendCustomMessage);
+    on<ClearChatHistory>(_onClearChatHistory);
   }
 
   @override
@@ -82,8 +83,38 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         limit: event.limit,
       );
 
+      // 保留之前的 reactions（服务器聚合可能需要时间）
+      final currentMessages = state.messages;
+      final mergedMessages = messages.map((newMsg) {
+        final currentMsg = currentMessages.firstWhere(
+          (m) => m.id == newMsg.id,
+          orElse: () => newMsg,
+        );
+        // 如果当前消息有 reactions 但新消息没有，保留当前的 reactions
+        if (currentMsg.reactions.isNotEmpty && newMsg.reactions.isEmpty) {
+          return newMsg.copyWith(reactions: currentMsg.reactions);
+        }
+        // 合并 reactions（服务器可能有其他用户的 reactions）
+        if (currentMsg.reactions.isNotEmpty && newMsg.reactions.isNotEmpty) {
+          // 使用新消息的 reactions，但保留本地添加的
+          final mergedReactions = <String, MessageReaction>{};
+          // 先添加服务器的 reactions
+          for (final r in newMsg.reactions) {
+            mergedReactions[r.key] = r;
+          }
+          // 再添加本地的 reactions（如果服务器没有）
+          for (final r in currentMsg.reactions) {
+            if (!mergedReactions.containsKey(r.key)) {
+              mergedReactions[r.key] = r;
+            }
+          }
+          return newMsg.copyWith(reactions: mergedReactions.values.toList());
+        }
+        return newMsg;
+      }).toList();
+
       emit(state.copyWith(
-        messages: messages,
+        messages: mergedMessages,
         isLoading: false,
         hasMore: messages.length >= event.limit,
       ));
@@ -95,7 +126,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
-        error: '加载消息失败: ${e.toString()}',
+        error: 'Failed to load messages: ${e.toString()}',
       ));
     }
   }
@@ -123,7 +154,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     } catch (e) {
       emit(state.copyWith(
         isLoadingMore: false,
-        error: '加载更多消息失败',
+        error: 'Failed to load more messages',
       ));
     }
   }
@@ -259,7 +290,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     } catch (e) {
       emit(state.copyWith(
         isSending: false,
-        error: '发送失败',
+        error: 'Failed to send',
       ));
     }
   }
@@ -291,7 +322,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       debugPrint('ChatBloc: Stack trace - $stackTrace');
       emit(state.copyWith(
         isSending: false,
-        error: '发送图片失败: $e',
+        error: 'Failed to send image: $e',
       ));
     }
   }
@@ -324,7 +355,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       debugPrint('ChatBloc: Stack trace - $stackTrace');
       emit(state.copyWith(
         isSending: false,
-        error: '发送语音失败: $e',
+        error: 'Failed to send voice: $e',
       ));
     }
   }
@@ -349,7 +380,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     } catch (e) {
       emit(state.copyWith(
         isSending: false,
-        error: '发送文件失败',
+        error: 'Failed to send file',
       ));
     }
   }
@@ -379,7 +410,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       debugPrint('ChatBloc: Stack trace - $stackTrace');
       emit(state.copyWith(
         isSending: false,
-        error: '发送视频失败: $e',
+        error: 'Failed to send video: $e',
       ));
     }
   }
@@ -404,7 +435,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     } catch (e) {
       emit(state.copyWith(
         isSending: false,
-        error: '发送位置失败',
+        error: 'Failed to send location',
       ));
     }
   }
@@ -419,7 +450,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     try {
       await _messageRepository.resendMessage(_currentRoomId!, event.messageId);
     } catch (e) {
-      emit(state.copyWith(error: '重发失败'));
+      emit(state.copyWith(error: 'Failed to resend'));
     }
   }
 
@@ -443,7 +474,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           .toList();
       emit(state.copyWith(messages: updatedMessages));
     } catch (e) {
-      emit(state.copyWith(error: '撤回失败'));
+      emit(state.copyWith(error: 'Failed to recall'));
     }
   }
   
@@ -514,7 +545,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     } catch (e) {
       emit(state.copyWith(
         isSending: false,
-        error: '回复失败',
+        error: 'Failed to reply',
       ));
     }
   }
@@ -605,7 +636,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       debugPrint('ChatBloc: Reaction $event.emoji added to message ${event.messageId}');
     } catch (e) {
       debugPrint('ChatBloc: Failed to add reaction: $e');
-      emit(state.copyWith(error: '添加回应失败'));
+      emit(state.copyWith(error: 'Failed to add reaction'));
     }
   }
 
@@ -732,7 +763,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     } catch (e) {
       debugPrint('ChatBloc: Failed to send poll: $e');
       if (!isClosed) {
-        emit(state.copyWith(error: '发送投票失败'));
+        emit(state.copyWith(error: 'Failed to send poll'));
       }
     }
   }
@@ -811,7 +842,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     } catch (e) {
       debugPrint('ChatBloc: Failed to vote: $e');
       if (!isClosed) {
-        emit(state.copyWith(error: '投票失败'));
+        emit(state.copyWith(error: 'Failed to vote'));
       }
     }
   }
@@ -908,15 +939,33 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           
           emit(state.copyWith(
             messages: updatedMessages,
-            error: '发送失败',
+            error: 'Failed to send',
           ));
         }
       }
     } catch (e) {
       debugPrint('ChatBloc: Failed to send custom message: $e');
       if (!isClosed) {
-        emit(state.copyWith(error: '发送失败: $e'));
+        emit(state.copyWith(error: 'Failed to send: $e'));
       }
+    }
+  }
+
+  /// 清空聊天记录（本地）
+  Future<void> _onClearChatHistory(
+    ClearChatHistory event,
+    Emitter<ChatState> emit,
+  ) async {
+    debugPrint('ChatBloc: Clearing chat history for room $_currentRoomId');
+
+    // 清空本地消息列表
+    _locallyDeletedMessageIds.addAll(state.messages.map((m) => m.id));
+
+    if (!isClosed) {
+      emit(state.copyWith(
+        messages: [],
+        clearError: true,
+      ));
     }
   }
 }

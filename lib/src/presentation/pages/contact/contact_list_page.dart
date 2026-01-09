@@ -9,14 +9,19 @@ import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
+import '../../../domain/entities/group_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
+import '../../blocs/group/group_bloc.dart';
+import '../../blocs/group/group_event.dart';
+import '../../blocs/group/group_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../chat/chat_page.dart';
+import '../group/create_group_page.dart';
 import 'contact_tile.dart';
 import 'contact_index_bar.dart';
 
@@ -40,17 +45,22 @@ class _ContactListPageState extends State<ContactListPage> {
   final Map<String, GlobalKey> _letterKeys = {};
 
   bool _isSearchMode = false;
+  late final GroupBloc _groupBloc;
 
   @override
   void initState() {
     super.initState();
     context.read<ContactBloc>().add(const LoadContacts());
+    _groupBloc = getIt<GroupBloc>();
+    // Load groups first, which will also load invites
+    _groupBloc.add(const LoadGroups());
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
+    _groupBloc.close();
     super.dispose();
   }
 
@@ -377,11 +387,21 @@ class _ContactListPageState extends State<ContactListPage> {
             child: Column(
               children: [
                 // 群聊
-                _buildFunctionItem(
-                  isDark: isDark,
-                  icon: _GroupChatIcon(),
-                  title: S.of(context)?.groupChat ?? 'Group Chat',
-                  onTap: _showGroupsPage,
+                BlocBuilder<GroupBloc, GroupState>(
+                  bloc: _groupBloc,
+                  builder: (context, groupState) {
+                    int inviteCount = 0;
+                    if (groupState is GroupListLoaded) {
+                      inviteCount = groupState.invites.length;
+                    }
+                    return _buildFunctionItem(
+                      isDark: isDark,
+                      icon: _GroupChatIcon(),
+                      title: S.of(context)?.groupChat ?? 'Group Chat',
+                      badgeCount: inviteCount,
+                      onTap: _showGroupsPage,
+                    );
+                  },
                 ),
                 _buildItemDivider(isDark),
 
@@ -1391,18 +1411,23 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
   }
   
   Widget _buildRequestItem(FriendRequest request, bool isDark) {
+    // Use userId for consistent color generation, userName for display
+    final colorSource = request.userId.isNotEmpty ? request.userId : request.userName;
+    final displayName = request.userName == 'Unknown User'
+        ? (S.of(context)?.unknownUser ?? 'Unknown User')
+        : request.userName;
+    final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : '?';
+
     return ListTile(
       leading: CircleAvatar(
         radius: 24,
-        backgroundColor: _getColorFromName(request.userName),
+        backgroundColor: _getColorFromName(colorSource),
         backgroundImage: request.userAvatarUrl != null && request.userAvatarUrl!.isNotEmpty
             ? NetworkImage(request.userAvatarUrl!)
             : null,
         child: request.userAvatarUrl == null || request.userAvatarUrl!.isEmpty
             ? Text(
-                request.userName.isNotEmpty 
-                    ? request.userName[0].toUpperCase() 
-                    : '?',
+                initial,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -1412,7 +1437,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
             : null,
       ),
       title: Text(
-        request.userName,
+        displayName,
         style: TextStyle(
           fontWeight: FontWeight.w500,
           color: isDark ? Colors.white : Colors.black87,
@@ -1491,61 +1516,385 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
 }
 
 /// 群聊列表页面
-class _GroupListPage extends StatelessWidget {
+class _GroupListPage extends StatefulWidget {
   const _GroupListPage();
+
+  @override
+  State<_GroupListPage> createState() => _GroupListPageState();
+}
+
+class _GroupListPageState extends State<_GroupListPage> {
+  late final GroupBloc _groupBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _groupBloc = getIt<GroupBloc>();
+    _groupBloc.add(const LoadGroups());
+  }
+
+  @override
+  void dispose() {
+    _groupBloc.close();
+    super.dispose();
+  }
+
+  void _navigateToCreateGroup() async {
+    final contactBloc = context.read<ContactBloc>();
+
+    final roomId = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (ctx) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: _groupBloc),
+            BlocProvider.value(value: contactBloc),
+          ],
+          child: const CreateGroupPage(),
+        ),
+      ),
+    );
+
+    if (roomId != null && roomId.isNotEmpty && mounted) {
+      // 创建成功后，跳转到聊天页面
+      _navigateToChat(roomId);
+    }
+  }
+
+  void _navigateToChat(String roomId) {
+    // 获取 ChatBloc
+    ChatBloc? chatBloc;
+    try {
+      chatBloc = context.read<ChatBloc>();
+    } catch (e) {
+      chatBloc = getIt<ChatBloc>();
+    }
+
+    // 构建会话实体
+    final conversation = ConversationEntity(
+      id: roomId,
+      name: '',
+      type: ConversationType.group,
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (ctx) => BlocProvider.value(
+          value: chatBloc!,
+          child: ChatPage(conversation: conversation),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: AppBar(
         title: Text(S.of(context)?.groupChat ?? 'Group Chat'),
         backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black,
         elevation: 0.5,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _navigateToCreateGroup,
+          ),
+        ],
       ),
-      body: BlocBuilder<ContactBloc, ContactState>(
+      body: BlocConsumer<GroupBloc, GroupState>(
+        bloc: _groupBloc,
+        listener: (context, state) {
+          if (state is GroupError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          } else if (state is GroupOperationSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
+        },
         builder: (context, state) {
-          if (state is! ContactLoaded) {
+          if (state is GroupLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.group,
-                  size: 64,
-                  color: Colors.grey[400],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  S.of(context)?.noGroups ?? 'No groups',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(S.of(context)?.createGroupInDevelopment ?? 'Create group feature in development...')),
-                    );
-                  },
-                  icon: const Icon(Icons.add),
-                  label: Text(S.of(context)?.createGroup ?? 'Create Group'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          );
+          if (state is GroupListLoaded) {
+            return _buildGroupList(state, isDark);
+          }
+
+          // 初始状态或其他状态显示空状态
+          return _buildEmptyState(isDark);
         },
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(bool isDark) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.group_outlined,
+            size: 64,
+            color: isDark ? Colors.grey[600] : Colors.grey[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            S.of(context)?.noGroups ?? 'No groups',
+            style: TextStyle(
+              fontSize: 16,
+              color: isDark ? Colors.grey[400] : Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: _navigateToCreateGroup,
+            icon: const Icon(Icons.add),
+            label: Text(S.of(context)?.createGroup ?? 'Create Group'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGroupList(GroupListLoaded state, bool isDark) {
+    if (state.groups.isEmpty && state.invites.isEmpty) {
+      return _buildEmptyState(isDark);
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        _groupBloc.add(const RefreshGroups());
+      },
+      child: ListView(
+        children: [
+          // 群邀请
+          if (state.invites.isNotEmpty) ...[
+            _buildSectionHeader(S.of(context)?.groupInvites ?? 'Group Invites', isDark),
+            ...state.invites.map((invite) => _buildInviteTile(invite, isDark)),
+          ],
+
+          // 我的群聊
+          if (state.groups.isNotEmpty) ...[
+            _buildSectionHeader(
+              '${S.of(context)?.myGroups ?? "My Groups"} (${state.groups.length})',
+              isDark,
+            ),
+            ...state.groups.map((group) => _buildGroupTile(group, isDark)),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      color: isDark ? AppColors.backgroundDark : AppColors.background,
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroupTile(GroupEntity group, bool isDark) {
+    return Material(
+      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      child: ListTile(
+        leading: N42Avatar(
+          imageUrl: group.avatarUrl,
+          name: group.name,
+          size: 48,
+        ),
+        title: Text(
+          group.name,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: isDark ? Colors.white : AppColors.textPrimary,
+          ),
+        ),
+        subtitle: Text(
+          S.of(context)?.memberCount(group.memberCount) ?? '${group.memberCount} members',
+          style: TextStyle(
+            fontSize: 13,
+            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          ),
+        ),
+        trailing: group.isEncrypted
+            ? Icon(
+                Icons.lock,
+                size: 16,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              )
+            : null,
+        onTap: () => _navigateToChat(group.roomId),
+        onLongPress: () => _showGroupOptions(group),
+      ),
+    );
+  }
+
+  Widget _buildInviteTile(GroupEntity group, bool isDark) {
+    return Material(
+      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      child: ListTile(
+        leading: N42Avatar(
+          imageUrl: group.avatarUrl,
+          name: group.name,
+          size: 48,
+        ),
+        title: Text(
+          group.name,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: isDark ? Colors.white : AppColors.textPrimary,
+          ),
+        ),
+        subtitle: Text(
+          S.of(context)?.invitedToJoinGroup ?? 'Invited to join group',
+          style: const TextStyle(
+            fontSize: 13,
+            color: AppColors.primary,
+          ),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton(
+              onPressed: () {
+                _groupBloc.add(RejectGroupInvite(group.roomId));
+              },
+              child: Text(S.of(context)?.reject ?? 'Reject'),
+            ),
+            TextButton(
+              onPressed: () {
+                _groupBloc.add(AcceptGroupInvite(group.roomId));
+              },
+              child: Text(S.of(context)?.accept ?? 'Accept'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showGroupOptions(GroupEntity group) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.chat_bubble_outline),
+              title: Text(S.of(context)?.sendMessage ?? 'Send Message'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _navigateToChat(group.roomId);
+              },
+            ),
+            if (group.isOwner)
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: Colors.red),
+                title: Text(
+                  S.of(context)?.dissolveGroup ?? 'Dissolve Group',
+                  style: const TextStyle(color: Colors.red),
+                ),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _confirmDeleteGroup(group);
+                },
+              )
+            else
+              ListTile(
+                leading: const Icon(Icons.exit_to_app, color: Colors.red),
+                title: Text(
+                  S.of(context)?.leaveGroup ?? 'Leave Group',
+                  style: const TextStyle(color: Colors.red),
+                ),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _confirmLeaveGroup(group);
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _confirmLeaveGroup(GroupEntity group) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.leaveGroup ?? 'Leave Group'),
+        content: Text(
+          '${S.of(context)?.confirmLeaveGroup ?? "Are you sure you want to leave"} "${group.name}"?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _groupBloc.add(LeaveGroup(group.roomId));
+            },
+            child: Text(
+              S.of(context)?.leave ?? 'Leave',
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteGroup(GroupEntity group) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.dissolveGroup ?? 'Dissolve Group'),
+        content: Text(
+          '${S.of(context)?.confirmDissolveGroup ?? "Are you sure you want to dissolve"} "${group.name}"?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _groupBloc.add(DeleteGroup(group.roomId));
+            },
+            child: Text(
+              S.of(context)?.dissolve ?? 'Dissolve',
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
       ),
     );
   }

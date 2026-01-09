@@ -14,10 +14,12 @@ import '../../widgets/common/common_widgets.dart';
 /// 群设置页面
 class GroupSettingsPage extends StatefulWidget {
   final String roomId;
+  final VoidCallback? onClearHistory;
 
   const GroupSettingsPage({
     super.key,
     required this.roomId,
+    this.onClearHistory,
   });
 
   @override
@@ -569,9 +571,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              // TODO: 实现清空聊天记录
+              widget.onClearHistory?.call();
               ScaffoldMessenger.of(this.context).showSnackBar(
-                SnackBar(content: Text(S.of(context)?.featureInDevelopment ?? 'Feature in development')),
+                SnackBar(content: Text(S.of(context)?.chatHistoryCleared ?? 'Chat history cleared')),
               );
             },
             child: Text(S.of(context)?.clear ?? 'Clear', style: const TextStyle(color: Colors.red)),

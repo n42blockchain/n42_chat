@@ -8,8 +8,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'package:saver_gallery/saver_gallery.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -778,6 +781,9 @@ class _ChatPageState extends State<ChatPage> {
             onMemberTap: (userId, displayName, avatarUrl) {
               _openMemberProfile(ctx, userId, displayName, avatarUrl);
             },
+            onClearHistory: () {
+              context.read<ChatBloc>().add(const ClearChatHistory());
+            },
           );
 
           if (contactBloc != null) {
@@ -1229,12 +1235,50 @@ class _ChatPageState extends State<ChatPage> {
         if (image == null) return;
         await _sendImage(image);
       } else if (choice == 'video') {
+        debugPrint('Starting video recording...');
         final video = await picker.pickVideo(
           source: ImageSource.camera,
           maxDuration: const Duration(minutes: 5),
         );
-        
-        if (video == null) return;
+
+        debugPrint('Video picker returned: ${video?.path ?? "null"}');
+
+        if (video == null) {
+          debugPrint('Video is null - user may have cancelled or recording failed');
+          return;
+        }
+
+        // 验证视频文件存在
+        final videoFile = File(video.path);
+        if (!await videoFile.exists()) {
+          debugPrint('Video file does not exist at path: ${video.path}');
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Video recording failed'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+          return;
+        }
+
+        final fileSize = await videoFile.length();
+        debugPrint('Video file exists, size: $fileSize bytes');
+
+        if (fileSize == 0) {
+          debugPrint('Video file is empty');
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Video recording failed'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+          return;
+        }
+
         await _sendVideo(video);
       }
     } catch (e) {
@@ -1956,107 +2000,26 @@ ID：$contactId''';
   }
 
   Future<void> _startVideoCall() async {
-    // 显示选择菜单：语音通话、视频通话或多人会议
-    final choice = await showModalBottomSheet<String>(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.phone, color: AppColors.primary),
-              title: const Text('语音通话'),
-              subtitle: const Text('1对1 语音通话'),
-              onTap: () => Navigator.pop(context, 'voice'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.videocam, color: AppColors.primary),
-              title: const Text('视频通话'),
-              subtitle: const Text('1对1 视频通话'),
-              onTap: () => Navigator.pop(context, 'video'),
-            ),
-            if (widget.conversation.isGroup) ...[
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.groups, color: AppColors.primary),
-                title: const Text('多人会议'),
-                subtitle: const Text('邀请群成员参与视频会议'),
-                onTap: () => Navigator.pop(context, 'meeting'),
+    // 显示功能暂不可用提示
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.info_outline, color: Colors.white),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Voice and video call feature coming soon',
+                ),
               ),
             ],
-            const SizedBox(height: 8),
-            ListTile(
-              leading: const Icon(Icons.close),
-              title: const Text('取消'),
-              onTap: () => Navigator.pop(context),
-            ),
-          ],
-        ),
-      ),
-    );
-    
-    if (choice == null) return;
-    
-    // 获取对方信息
-    final roomId = widget.conversation.id;
-    final peerId = widget.conversation.id; // 对于1对1聊天，roomId即为对方ID
-    final peerName = widget.conversation.name;
-    final peerAvatarUrl = widget.conversation.avatarUrl;
-    
-    if (choice == 'meeting') {
-      // 多人会议 - 需要 LiveKit Token（从服务端获取）
-      // TODO: 实现获取 LiveKit Token 的 API 调用
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('多人会议功能需要配置 LiveKit 服务器'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      debugPrint('Group meeting - requires LiveKit server configuration');
-      return;
-    }
-    
-    final isVideoCall = choice == 'video';
-    final callType = isVideoCall ? '视频通话' : '语音通话';
-    
-    // 使用真正的 VoIP 通话（当 CallManager 可用时）
-    // 目前先显示模拟界面，等待服务端参数配置
-    debugPrint('Starting $callType with room: $roomId, peer: $peerName');
-    
-    // 显示通话界面（模拟）
-    // 当服务端配置完成后，替换为：
-    // final callManager = getIt<CallManager>();
-    // if (isVideoCall) {
-    //   await callManager.startVideoCall(
-    //     roomId: roomId,
-    //     peerId: peerId,
-    //     peerName: peerName,
-    //     peerAvatarUrl: peerAvatarUrl,
-    //   );
-    // } else {
-    //   await callManager.startVoiceCall(
-    //     roomId: roomId,
-    //     peerId: peerId,
-    //     peerName: peerName,
-    //     peerAvatarUrl: peerAvatarUrl,
-    //   );
-    // }
-    
-    if (mounted) {
-      await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => _CallDialog(
-          contactName: peerName,
-          contactAvatar: peerAvatarUrl,
-          isVideoCall: isVideoCall,
-          roomId: roomId,
-          onEnd: () => Navigator.pop(context),
+          ),
+          backgroundColor: AppColors.primary,
+          duration: const Duration(seconds: 2),
         ),
       );
     }
-    
-    debugPrint('$callType ended');
   }
 
   void _openFavorites() {
@@ -2533,11 +2496,12 @@ ID：$contactId''';
     required bool isGroupChat,
     required bool showSenderName,
   }) {
-    final isSelected = _selectedMessageIds.contains(message.id);
+    final isRedacted = message.type == MessageType.redacted;
+    final isSelected = !isRedacted && _selectedMessageIds.contains(message.id);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return GestureDetector(
-      onTap: () => _toggleMessageSelection(message.id),
+      onTap: isRedacted ? null : () => _toggleMessageSelection(message.id),
       child: Container(
         key: messageKey,
         color: isSelected
@@ -2545,7 +2509,7 @@ ID：$contactId''';
             : Colors.transparent,
         child: Row(
           children: [
-            // 复选框
+            // 复选框（已撤回的消息显示禁用状态）
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Container(
@@ -2553,21 +2517,31 @@ ID：$contactId''';
                 height: 24,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isSelected ? AppColors.primary : Colors.transparent,
+                  color: isRedacted
+                      ? (isDark ? Colors.grey.shade800 : Colors.grey.shade300)
+                      : (isSelected ? AppColors.primary : Colors.transparent),
                   border: Border.all(
-                    color: isSelected 
-                        ? AppColors.primary 
-                        : (isDark ? Colors.white54 : Colors.black38),
+                    color: isRedacted
+                        ? (isDark ? Colors.grey.shade600 : Colors.grey.shade400)
+                        : (isSelected
+                            ? AppColors.primary
+                            : (isDark ? Colors.white54 : Colors.black38)),
                     width: 2,
                   ),
                 ),
-                child: isSelected
-                    ? const Icon(
-                        Icons.check,
-                        size: 16,
-                        color: Colors.white,
+                child: isRedacted
+                    ? Icon(
+                        Icons.block,
+                        size: 14,
+                        color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
                       )
-                    : null,
+                    : (isSelected
+                        ? const Icon(
+                            Icons.check,
+                            size: 16,
+                            color: Colors.white,
+                          )
+                        : null),
               ),
             ),
             // 消息内容
@@ -3096,6 +3070,11 @@ ID：$contactId''';
   
   /// 显示微信风格的消息菜单
   void _showWeChatMessageMenu(MessageEntity message, GlobalKey messageKey) {
+    // 已撤回的消息不显示菜单
+    if (message.type == MessageType.redacted) {
+      return;
+    }
+
     // 获取消息气泡的位置和大小
     final RenderBox? renderBox = messageKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) {
@@ -3128,10 +3107,13 @@ ID：$contactId''';
           debugPrint('Copy clicked');
           _copyMessage(message);
         },
-        onForward: () {
-          debugPrint('Forward clicked');
-          _forwardMessage(message);
-        },
+        // 红包和转账消息不能转发
+        onForward: (message.type == MessageType.redPacket || message.type == MessageType.transfer)
+            ? null
+            : () {
+                debugPrint('Forward clicked');
+                _forwardMessage(message);
+              },
         onFavorite: () {
           debugPrint('Favorite clicked');
           _favoriteMessage(message);
@@ -3164,14 +3146,78 @@ ID：$contactId''';
           debugPrint('Resend clicked');
           _onResend(message);
         },
+        onSave: () {
+          debugPrint('Save clicked');
+          _saveMedia(message);
+        },
         onReaction: (emoji) {
           debugPrint('Reaction clicked: $emoji');
           _addReaction(message, emoji);
         },
       ),
     );
-    
+
     overlay.insert(overlayEntry);
+  }
+
+  /// 保存媒体文件（图片/视频）
+  Future<void> _saveMedia(MessageEntity message) async {
+    final imageUrl = message.metadata?.httpUrl ?? message.content;
+    if (imageUrl.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No media URL available')),
+      );
+      return;
+    }
+
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Saving...')),
+      );
+
+      // 下载文件
+      final response = await http.get(
+        Uri.parse(imageUrl),
+        headers: {
+          if (MatrixClientManager.instance.client?.accessToken != null)
+            'Authorization': 'Bearer ${MatrixClientManager.instance.client!.accessToken}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // 保存到相册
+        final result = await SaverGallery.saveImage(
+          response.bodyBytes,
+          name: 'n42_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          androidExistNotSave: false,
+        );
+
+        if (mounted) {
+          if (result.isSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(S.of(context)?.savedToGallery ?? 'Saved to gallery')),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(S.of(context)?.failedToSave ?? 'Failed to save')),
+            );
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Download failed: ${response.statusCode}')),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Save media error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
   }
   
   /// 复制消息
@@ -3247,94 +3293,208 @@ ID：$contactId''';
   
   /// 执行转发
   Future<void> _doForwardMessage(MessageEntity message, String targetRoomId) async {
+    debugPrint('Forward message: ${message.id} from ${widget.conversation.id} to $targetRoomId');
+    debugPrint('Message type: ${message.type}, content: ${message.content}');
+
+    // 直接使用简单转发，避免重复发送问题
+    // （之前的 repository.forwardMessage 可能发送成功但返回 null，导致 fallback 再次发送）
     try {
-      debugPrint('Forward message: ${message.id} from ${widget.conversation.id} to $targetRoomId');
-      debugPrint('Message type: ${message.type}, content: ${message.content}');
-      
-      // 使用 MessageActionRepository 执行转发
-      final repository = getIt<IMessageActionRepository>();
-      final result = await repository.forwardMessage(
-        widget.conversation.id, // 源房间ID
-        message.id, // 事件ID
-        targetRoomId, // 目标房间ID
-      );
-      
-      debugPrint('Forward result: $result');
-      
-      if (result != null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(S.of(context)?.messageForwarded ?? 'Message forwarded'),
-              duration: const Duration(seconds: 1),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-      } else {
-        // 如果返回 null，尝试简单的文本转发作为备用
-        debugPrint('Forward returned null, trying simple text forward...');
-        await _simpleForwardMessage(message, targetRoomId);
-      }
+      await _simpleForwardMessage(message, targetRoomId);
     } catch (e) {
       debugPrint('Forward message error: $e');
-      // 如果出错，尝试简单的文本转发作为备用
-      try {
-        await _simpleForwardMessage(message, targetRoomId);
-      } catch (e2) {
-        debugPrint('Simple forward also failed: $e2');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(S.of(context)?.forwardFailed(e.toString()) ?? 'Forward failed: $e'),
-              duration: const Duration(seconds: 2),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.of(context)?.forwardFailed(e.toString()) ?? 'Forward failed: $e'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
   
   /// 简单转发消息（作为备用方案）
+  /// 对于媒体消息，下载后重新发送以确保正确转发
   Future<void> _simpleForwardMessage(MessageEntity message, String targetRoomId) async {
     final messageRepository = getIt<IMessageRepository>();
-    
-    String forwardContent;
-    switch (message.type) {
-      case MessageType.text:
-        forwardContent = message.content;
-        break;
-      case MessageType.image:
-        forwardContent = '[图片] ${message.content}';
-        break;
-      case MessageType.audio:
-        forwardContent = '[语音消息]';
-        break;
-      case MessageType.video:
-        forwardContent = '[视频] ${message.content}';
-        break;
-      case MessageType.file:
-        forwardContent = '[文件] ${message.metadata?.fileName ?? message.content}';
-        break;
-      case MessageType.location:
-        forwardContent = '[位置] ${message.content}';
-        break;
-      default:
-        forwardContent = message.content;
-    }
-    
-    // 发送到目标房间
-    await messageRepository.sendTextMessage(targetRoomId, forwardContent);
-    
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(S.of(context)?.messageForwarded ?? 'Message forwarded'),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Colors.green,
-        ),
-      );
+
+    try {
+      switch (message.type) {
+        case MessageType.text:
+          await messageRepository.sendTextMessage(targetRoomId, message.content);
+          break;
+
+        case MessageType.image:
+          // 下载图片并重新发送
+          final mediaUrl = message.metadata?.mediaUrl;
+          if (mediaUrl != null) {
+            final imageBytes = await messageRepository.downloadMedia(mediaUrl);
+            if (imageBytes != null) {
+              await messageRepository.sendImageMessage(
+                targetRoomId,
+                imageBytes: imageBytes,
+                filename: message.content.isNotEmpty ? message.content : 'image.jpg',
+                mimeType: message.metadata?.mimeType,
+              );
+            } else {
+              // 下载失败，发送文本提示
+              await messageRepository.sendTextMessage(targetRoomId, '[图片] ${message.content}');
+            }
+          } else {
+            await messageRepository.sendTextMessage(targetRoomId, '[图片] ${message.content}');
+          }
+          break;
+
+        case MessageType.video:
+          // 下载视频并重新发送
+          final videoUrl = message.metadata?.mediaUrl;
+          if (videoUrl != null) {
+            final videoBytes = await messageRepository.downloadMedia(videoUrl);
+            if (videoBytes != null) {
+              await messageRepository.sendVideoMessage(
+                targetRoomId,
+                videoBytes: videoBytes,
+                filename: message.content.isNotEmpty ? message.content : 'video.mp4',
+                mimeType: message.metadata?.mimeType,
+              );
+            } else {
+              await messageRepository.sendTextMessage(targetRoomId, '[视频] ${message.content}');
+            }
+          } else {
+            await messageRepository.sendTextMessage(targetRoomId, '[视频] ${message.content}');
+          }
+          break;
+
+        case MessageType.audio:
+          // 下载音频并重新发送
+          final audioUrl = message.metadata?.mediaUrl;
+          if (audioUrl != null) {
+            final audioBytes = await messageRepository.downloadMedia(audioUrl);
+            if (audioBytes != null) {
+              await messageRepository.sendVoiceMessage(
+                targetRoomId,
+                audioBytes: audioBytes,
+                filename: message.content.isNotEmpty ? message.content : 'audio.m4a',
+                duration: message.metadata?.duration ?? 0,
+                mimeType: message.metadata?.mimeType,
+              );
+            } else {
+              await messageRepository.sendTextMessage(targetRoomId, '[语音消息]');
+            }
+          } else {
+            await messageRepository.sendTextMessage(targetRoomId, '[语音消息]');
+          }
+          break;
+
+        case MessageType.file:
+          // 下载文件并重新发送
+          final fileUrl = message.metadata?.mediaUrl;
+          final httpUrl = message.metadata?.httpUrl;
+          final fileName = message.metadata?.fileName ?? message.content;
+          debugPrint('Forward file: mediaUrl=$fileUrl, httpUrl=$httpUrl, fileName=$fileName');
+
+          // 尝试使用 mediaUrl 或 httpUrl 下载
+          Uint8List? fileBytes;
+          if (fileUrl != null) {
+            debugPrint('Downloading file from mxc URL: $fileUrl');
+            fileBytes = await messageRepository.downloadMedia(fileUrl);
+          }
+
+          if (fileBytes == null && httpUrl != null) {
+            debugPrint('Fallback: downloading from HTTP URL: $httpUrl');
+            try {
+              final response = await http.get(Uri.parse(httpUrl));
+              if (response.statusCode == 200) {
+                fileBytes = response.bodyBytes;
+              }
+            } catch (e) {
+              debugPrint('HTTP download failed: $e');
+            }
+          }
+
+          if (fileBytes != null && fileBytes.isNotEmpty) {
+            debugPrint('File downloaded successfully, size: ${fileBytes.length}');
+            await messageRepository.sendFileMessage(
+              targetRoomId,
+              fileBytes: fileBytes,
+              filename: fileName,
+              mimeType: message.metadata?.mimeType,
+            );
+          } else {
+            debugPrint('File download failed, sending as text');
+            await messageRepository.sendTextMessage(
+              targetRoomId,
+              '[文件] $fileName',
+            );
+          }
+          break;
+
+        case MessageType.location:
+          // 转发位置消息
+          final lat = message.metadata?.latitude;
+          final lon = message.metadata?.longitude;
+          if (lat != null && lon != null) {
+            await messageRepository.sendLocationMessage(
+              targetRoomId,
+              latitude: lat,
+              longitude: lon,
+              description: message.content,
+            );
+          } else {
+            await messageRepository.sendTextMessage(targetRoomId, '[位置] ${message.content}');
+          }
+          break;
+
+        case MessageType.poll:
+          // 转发投票消息 - 创建新的投票
+          final question = message.metadata?.pollQuestion;
+          final options = message.metadata?.pollOptions;
+          final maxSelections = message.metadata?.maxSelections ?? 1;
+
+          if (question != null && options != null && options.isNotEmpty) {
+            debugPrint('Forward poll: question=$question, options=$options');
+            await messageRepository.sendPollMessage(
+              targetRoomId,
+              question: question,
+              options: options,
+              maxSelections: maxSelections,
+            );
+          } else {
+            // 如果无法获取投票信息，发送文本提示
+            await messageRepository.sendTextMessage(
+              targetRoomId,
+              '[投票] ${question ?? message.content}',
+            );
+          }
+          break;
+
+        default:
+          await messageRepository.sendTextMessage(targetRoomId, message.content);
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.of(context)?.messageForwarded ?? 'Message forwarded'),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Simple forward error: $e');
+      // 最后的备用：发送文本描述
+      await messageRepository.sendTextMessage(targetRoomId, message.content);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.of(context)?.messageForwarded ?? 'Message forwarded'),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     }
   }
 
@@ -3460,10 +3620,18 @@ ID：$contactId''';
   /// 批量删除选中的消息
   Future<void> _deleteSelectedMessages() async {
     if (_selectedMessageIds.isEmpty) return;
-    
-    // 获取选中的消息
+
+    // 获取选中的消息（过滤掉已撤回的消息）
     final messages = context.read<ChatBloc>().state.messages;
-    final selectedMessages = messages.where((m) => _selectedMessageIds.contains(m.id)).toList();
+    final selectedMessages = messages.where((m) =>
+      _selectedMessageIds.contains(m.id) && m.type != MessageType.redacted
+    ).toList();
+
+    // 如果过滤后没有可删除的消息，直接返回
+    if (selectedMessages.isEmpty) {
+      _exitMultiSelectMode();
+      return;
+    }
     
     // 检查是否所有消息都是自己发送的
     final myMessages = selectedMessages.where((m) => m.isFromMe).toList();
@@ -3562,13 +3730,23 @@ ID：$contactId''';
   Future<void> _forwardSelectedMessages() async {
     if (_selectedMessageIds.isEmpty) return;
     
-    // 获取选中的消息
+    // 获取选中的消息（过滤掉红包和转账消息，这些不能转发）
     final messages = context.read<ChatBloc>().state.messages;
     final selectedMessages = messages
-        .where((m) => _selectedMessageIds.contains(m.id))
+        .where((m) => _selectedMessageIds.contains(m.id) &&
+            m.type != MessageType.redPacket &&
+            m.type != MessageType.transfer)
         .toList();
-    
-    if (selectedMessages.isEmpty) return;
+
+    if (selectedMessages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Red envelopes and transfers cannot be forwarded'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
     
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
@@ -4322,6 +4500,7 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
   final TextEditingController _searchController = TextEditingController();
   List<ConversationEntity> _conversations = [];
   bool _isLoading = true;
+  bool _isForwarding = false; // 防止重复点击
 
   @override
   void initState() {
@@ -4525,7 +4704,11 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
                   ),
                 )
               : null,
-          onTap: () => widget.onForwardToChat(chat.id),
+          onTap: _isForwarding ? null : () {
+            if (_isForwarding) return;
+            setState(() => _isForwarding = true);
+            widget.onForwardToChat(chat.id);
+          },
         );
       },
     );
@@ -6077,7 +6260,7 @@ class _MultiForwardSheetState extends State<_MultiForwardSheet> {
 }
 
 /// 图片查看器页面
-class _ImageViewerPage extends StatelessWidget {
+class _ImageViewerPage extends StatefulWidget {
   final String imageUrl;
   final String heroTag;
 
@@ -6087,33 +6270,211 @@ class _ImageViewerPage extends StatelessWidget {
   });
 
   @override
+  State<_ImageViewerPage> createState() => _ImageViewerPageState();
+}
+
+class _ImageViewerPageState extends State<_ImageViewerPage> {
+  bool _isSaving = false;
+
+  Future<void> _saveImage() async {
+    if (_isSaving) return;
+
+    setState(() => _isSaving = true);
+
+    try {
+      // 下载图片
+      final response = await http.get(
+        Uri.parse(widget.imageUrl),
+        headers: {
+          if (MatrixClientManager.instance.client?.accessToken != null)
+            'Authorization': 'Bearer ${MatrixClientManager.instance.client!.accessToken}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // 保存到相册
+        final result = await SaverGallery.saveImage(
+          response.bodyBytes,
+          name: 'n42_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          androidExistNotSave: false,
+        );
+
+        if (mounted) {
+          if (result.isSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Saved to gallery'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Failed to save'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Download failed: ${response.statusCode}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Save image error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
+  Future<void> _shareImage() async {
+    try {
+      // 下载图片到临时文件
+      final response = await http.get(
+        Uri.parse(widget.imageUrl),
+        headers: {
+          if (MatrixClientManager.instance.client?.accessToken != null)
+            'Authorization': 'Bearer ${MatrixClientManager.instance.client!.accessToken}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // 创建临时文件
+        final tempDir = await Directory.systemTemp.createTemp('n42_share');
+        final tempFile = File('${tempDir.path}/image.jpg');
+        await tempFile.writeAsBytes(response.bodyBytes);
+
+        // 分享
+        await Share.shareXFiles([XFile(tempFile.path)]);
+
+        // 清理临时文件
+        await tempDir.delete(recursive: true);
+      }
+    } catch (e) {
+      debugPrint('Share image error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Share failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
-      ),
-      body: Center(
-        child: InteractiveViewer(
-          minScale: 0.5,
-          maxScale: 4.0,
-          child: Hero(
-            tag: heroTag,
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.contain,
-              placeholder: (context, url) => const Center(
-                child: CircularProgressIndicator(color: Colors.white),
+        actions: [
+          // 保存按钮
+          IconButton(
+            icon: _isSaving
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Icon(Icons.download),
+            onPressed: _isSaving ? null : _saveImage,
+            tooltip: 'Save',
+          ),
+          // 分享按钮
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: _shareImage,
+            tooltip: 'Share',
+          ),
+          // 更多选项
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            color: Colors.grey[900],
+            onSelected: (value) {
+              switch (value) {
+                case 'save':
+                  _saveImage();
+                  break;
+                case 'share':
+                  _shareImage();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'save',
+                child: Row(
+                  children: [
+                    Icon(Icons.download, color: Colors.white, size: 20),
+                    SizedBox(width: 12),
+                    Text('Save to Gallery', style: TextStyle(color: Colors.white)),
+                  ],
+                ),
               ),
-              errorWidget: (context, url, error) => const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error, color: Colors.red, size: 48),
-                  SizedBox(height: 16),
-                  Text('图片加载失败', style: TextStyle(color: Colors.white)),
-                ],
+              const PopupMenuItem(
+                value: 'share',
+                child: Row(
+                  children: [
+                    Icon(Icons.share, color: Colors.white, size: 20),
+                    SizedBox(width: 12),
+                    Text('Share', style: TextStyle(color: Colors.white)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      body: GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: Center(
+          child: InteractiveViewer(
+            minScale: 0.5,
+            maxScale: 4.0,
+            child: Hero(
+              tag: widget.heroTag,
+              child: CachedNetworkImage(
+                imageUrl: widget.imageUrl,
+                fit: BoxFit.contain,
+                httpHeaders: {
+                  if (MatrixClientManager.instance.client?.accessToken != null)
+                    'Authorization': 'Bearer ${MatrixClientManager.instance.client!.accessToken}',
+                },
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                ),
+                errorWidget: (context, url, error) => const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error, color: Colors.red, size: 48),
+                    SizedBox(height: 16),
+                    Text('Failed to load image', style: TextStyle(color: Colors.white)),
+                  ],
+                ),
               ),
             ),
           ),

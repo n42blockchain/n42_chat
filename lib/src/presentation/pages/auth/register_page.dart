@@ -314,9 +314,10 @@ class _RegisterPageState extends State<RegisterPage> {
         TextFormField(
           controller: _usernameController,
           style: TextStyle(color: textColor, fontSize: 16),
+          maxLength: 20,
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterUsernameFormat ?? 'Enter username (letters, numbers, underscores)',
-            hintStyle: TextStyle(color: hintColor),
+            hintText: S.of(context)?.usernameHint ?? '3-20 chars, letters/numbers/_',
+            hintStyle: TextStyle(color: hintColor, fontSize: 14),
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
@@ -331,6 +332,7 @@ class _RegisterPageState extends State<RegisterPage> {
               Icons.person_outline,
               color: hintColor,
             ),
+            counterText: '',
           ),
           textInputAction: TextInputAction.next,
           validator: (value) {
@@ -339,6 +341,9 @@ class _RegisterPageState extends State<RegisterPage> {
             }
             if (value.length < 3) {
               return S.of(context)?.usernameMinLength ?? 'Username must be at least 3 characters';
+            }
+            if (value.length > 20) {
+              return S.of(context)?.usernameMaxLength ?? 'Username must be at most 20 characters';
             }
             if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
               return S.of(context)?.usernameFormat ?? 'Username can only contain letters, numbers, and underscores';
@@ -371,8 +376,8 @@ class _RegisterPageState extends State<RegisterPage> {
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterPasswordMinLength ?? 'Enter password (at least 8 characters)',
-            hintStyle: TextStyle(color: hintColor),
+            hintText: S.of(context)?.passwordHint ?? 'Min 8 characters',
+            hintStyle: TextStyle(color: hintColor, fontSize: 14),
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(

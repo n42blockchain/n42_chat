@@ -330,3 +330,7 @@ class SendCustomMessage extends ChatEvent {
   List<Object?> get props => [content, type, metadata];
 }
 
+/// 清空聊天记录（本地）
+class ClearChatHistory extends ChatEvent {
+  const ClearChatHistory();
+}

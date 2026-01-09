@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -52,7 +53,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
       
       if (client == null) {
         setState(() {
-          _errorMessage = '聊天服务未连接';
+          _errorMessage = S.of(context)?.chatServiceNotConnected ?? 'Chat service not connected';
           _isLoading = false;
         });
         return;
@@ -130,12 +131,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
         _isLoading = false;
         _isSearching = true;
         if (results.isEmpty) {
-          _errorMessage = '未找到用户 "$query"\n\n提示：\n• 尝试输入完整用户ID，如 @username:server.com\n• 确认用户名拼写正确';
+          _errorMessage = S.of(context)?.userNotFoundHint(query) ?? 'User "$query" not found\n\nTips:\n• Try entering full user ID, e.g. @username:server.com\n• Check the username spelling';
         }
       });
     } catch (e) {
       setState(() {
-        _errorMessage = '搜索失败: $e';
+        _errorMessage = S.of(context)?.searchFailed(e.toString()) ?? 'Search failed: $e';
         _isLoading = false;
       });
     }
@@ -149,7 +150,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
       final client = clientManager.client;
       
       if (client == null) {
-        _showError('聊天服务未连接');
+        _showError(S.of(context)?.chatServiceNotConnected ?? 'Chat service not connected');
         return;
       }
 
@@ -160,7 +161,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         Navigator.of(context).pop(roomId);
       }
     } catch (e) {
-      _showError('创建会话失败: $e');
+      _showError(S.of(context)?.createChatFailed(e.toString()) ?? 'Failed to create chat: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -186,7 +187,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: '添加好友',
+        title: S.of(context)?.addFriend ?? 'Add Friend',
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),
@@ -202,7 +203,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '输入用户 ID 或用户名搜索',
+                  S.of(context)?.enterUserIdOrUsername ?? 'Enter user ID or username to search',
                   style: TextStyle(
                     fontSize: 13,
                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -263,7 +264,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('搜索'),
+                          : Text(S.of(context)?.search ?? 'Search'),
                     ),
                   ],
                 ),
@@ -294,7 +295,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
   Widget _buildContent(bool isDark) {
     if (_isLoading) {
-      return const N42Loading(message: '搜索中...');
+      return N42Loading(message: S.of(context)?.searching ?? 'Searching...');
     }
 
     if (!_isSearching) {
@@ -309,7 +310,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              '搜索用户开始聊天',
+              S.of(context)?.searchUserToChat ?? 'Search user to start chatting',
               style: TextStyle(
                 fontSize: 15,
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -317,7 +318,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              '可以输入完整的 Matrix ID\n例如: @user:matrix.n42.network',
+              S.of(context)?.matrixIdExample ?? 'You can enter a full Matrix ID\ne.g. @user:matrix.n42.network',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
@@ -331,7 +332,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
     if (_searchResults.isEmpty) {
       return N42EmptyState.noSearchResult(
-        description: '未找到用户 "${_searchController.text}"',
+        description: S.of(context)?.userNotFound(_searchController.text) ?? 'User "${_searchController.text}" not found',
       );
     }
 
@@ -376,7 +377,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
           side: const BorderSide(color: AppColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
-        child: const Text('聊天'),
+        child: Text(S.of(context)?.chat ?? 'Chat'),
       ),
     );
   }

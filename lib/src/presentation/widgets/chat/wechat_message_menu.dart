@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
+import 'message_reaction_bar.dart';
 
 /// 快速表情列表（类似微信/WhatsApp/Element）
 const List<String> _quickReactions = ['😀', '🎁', '❤️', '👍', '😂', '😮'];
@@ -35,7 +36,8 @@ class WeChatMessageMenu extends StatelessWidget {
   final VoidCallback? onSearch;
   final VoidCallback? onDelete; // 删除发送失败的消息
   final VoidCallback? onResend; // 重新发送失败的消息
-  
+  final VoidCallback? onSave; // 保存图片/视频
+
   /// 表情回应回调
   final Function(String emoji)? onReaction;
 
@@ -56,6 +58,7 @@ class WeChatMessageMenu extends StatelessWidget {
     this.onSearch,
     this.onDelete,
     this.onResend,
+    this.onSave,
     this.onReaction,
   });
 
@@ -176,18 +179,28 @@ class WeChatMessageMenu extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                // 文本消息显示复制，图片/视频显示保存
                 if (message.type == MessageType.text)
                   _buildMenuItem(
                     icon: Icons.content_copy_outlined,
-                    label: '复制',
+                    label: 'Copy',
                     onTap: () {
                       onDismiss();
                       onCopy?.call();
                     },
+                  )
+                else if (message.type == MessageType.image || message.type == MessageType.video)
+                  _buildMenuItem(
+                    icon: Icons.download_outlined,
+                    label: 'Save',
+                    onTap: () {
+                      onDismiss();
+                      onSave?.call();
+                    },
                   ),
                 _buildMenuItem(
                   icon: Icons.shortcut_outlined,
-                  label: '转发',
+                  label: 'Forward',
                   onTap: () {
                     onDismiss();
                     onForward?.call();
@@ -195,7 +208,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 ),
                 _buildMenuItem(
                   icon: isFavorited ? Icons.star : Icons.star_border_outlined,
-                  label: isFavorited ? '取消收藏' : '收藏',
+                  label: isFavorited ? 'Unfav' : 'Favorite',
                   isHighlighted: isFavorited,
                   onTap: () {
                     onDismiss();
@@ -206,7 +219,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 if (message.isFromMe && message.status == MessageStatus.failed) ...[
                   _buildMenuItem(
                     icon: Icons.refresh,
-                    label: '重发',
+                    label: 'Resend',
                     onTap: () {
                       onDismiss();
                       onResend?.call();
@@ -214,7 +227,7 @@ class WeChatMessageMenu extends StatelessWidget {
                   ),
                   _buildMenuItem(
                     icon: Icons.delete_outline,
-                    label: '删除',
+                    label: 'Delete',
                     isHighlighted: true,
                     onTap: () {
                       onDismiss();
@@ -224,7 +237,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 ] else if (message.isFromMe)
                   _buildMenuItem(
                     icon: Icons.undo_outlined,
-                    label: '撤回',
+                    label: 'Recall',
                     onTap: () {
                       onDismiss();
                       onRecall?.call();
@@ -232,7 +245,7 @@ class WeChatMessageMenu extends StatelessWidget {
                   ),
                 _buildMenuItem(
                   icon: Icons.checklist_outlined,
-                  label: '多选',
+                  label: 'Select',
                   onTap: () {
                     onDismiss();
                     onMultiSelect?.call();
@@ -258,7 +271,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 const SizedBox(width: 8),
                 _buildMenuItem(
                   icon: Icons.format_quote_outlined,
-                  label: '引用',
+                  label: 'Quote',
                   onTap: () {
                     onDismiss();
                     onQuote?.call();
@@ -267,7 +280,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 const SizedBox(width: 20),
                 _buildMenuItem(
                   icon: Icons.notifications_outlined,
-                  label: '提醒',
+                  label: 'Remind',
                   onTap: () {
                     onDismiss();
                     onRemind?.call();
@@ -276,7 +289,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 const SizedBox(width: 20),
                 _buildMenuItem(
                   icon: Icons.search,
-                  label: '搜一搜',
+                  label: 'Search',
                   onTap: () {
                     onDismiss();
                     onSearch?.call();
@@ -333,28 +346,41 @@ class WeChatMessageMenu extends StatelessWidget {
 
   /// 构建更多表情按钮
   Widget _buildMoreReactionButton() {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          // TODO: 显示完整表情选择器
-          HapticFeedback.lightImpact();
-        },
-        borderRadius: BorderRadius.circular(20),
-        splashColor: Colors.white.withOpacity(0.2),
-        highlightColor: Colors.white.withOpacity(0.1),
-        child: Container(
-          width: 40,
-          height: 40,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Icon(
-            Icons.add,
-            color: Colors.white70,
-            size: 22,
+    return Builder(
+      builder: (context) => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            // 先关闭当前菜单
+            onDismiss();
+            // 显示完整表情选择器
+            showModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (ctx) => FullReactionPicker(
+                onReactionSelected: (emoji) {
+                  onReaction?.call(emoji);
+                },
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(20),
+          splashColor: Colors.white.withOpacity(0.2),
+          highlightColor: Colors.white.withOpacity(0.1),
+          child: Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(
+              Icons.add,
+              color: Colors.white70,
+              size: 22,
+            ),
           ),
         ),
       ),
@@ -440,17 +466,17 @@ class _RecallConfirmSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     child: Text(
-                      '撤回该条消息？',
+                      'Recall this message?',
                       style: TextStyle(
                         fontSize: 13,
                         color: isDark ? Colors.grey[400] : Colors.grey[600],
                       ),
                     ),
                   ),
-                  
+
                   // 分隔线
                   Container(height: 0.5, color: separatorColor),
-                  
+
                   // 撤回按钮
                   Material(
                     color: Colors.transparent,
@@ -464,11 +490,11 @@ class _RecallConfirmSheet extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         child: const Text(
-                          '撤回',
+                          'Recall',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 20,
-                            color: Color(0xFFFF3B30), // iOS 红色
+                            color: Color(0xFFFF3B30), // iOS red
                             fontWeight: FontWeight.w400,
                           ),
                         ),
@@ -496,7 +522,7 @@ class _RecallConfirmSheet extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     child: Text(
-                      '取消',
+                      'Cancel',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20,
@@ -539,7 +565,7 @@ class RecalledMessageWidget extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text(
-              isFromMe ? '你撤回了一条消息' : '对方撤回了一条消息',
+              isFromMe ? 'You recalled a message' : 'Message recalled',
               style: TextStyle(
                 fontSize: 12,
                 color: textColor,
@@ -550,7 +576,7 @@ class RecalledMessageWidget extends StatelessWidget {
               GestureDetector(
                 onTap: onReEdit,
                 child: Text(
-                  '重新编辑',
+                  'Re-edit',
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark ? const Color(0xFF57A5FF) : const Color(0xFF576B95),
@@ -582,23 +608,24 @@ class MessageMenuHelper {
     VoidCallback? onSearch,
     VoidCallback? onDelete,
     VoidCallback? onResend,
+    VoidCallback? onSave,
     Function(String emoji)? onReaction,
     bool isFavorited = false,
   }) {
     // 获取消息气泡的位置和大小
     final RenderBox? renderBox = messageKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
-    
+
     final position = renderBox.localToGlobal(Offset.zero);
     final size = renderBox.size;
-    
+
     // 震动反馈
     HapticFeedback.mediumImpact();
-    
+
     // 显示菜单
     final overlay = Overlay.of(context);
     late OverlayEntry overlayEntry;
-    
+
     overlayEntry = OverlayEntry(
       builder: (ctx) => WeChatMessageMenu(
         message: message,
@@ -616,10 +643,11 @@ class MessageMenuHelper {
         onSearch: onSearch,
         onDelete: onDelete,
         onResend: onResend,
+        onSave: onSave,
         onReaction: onReaction,
       ),
     );
-    
+
     overlay.insert(overlayEntry);
   }
   

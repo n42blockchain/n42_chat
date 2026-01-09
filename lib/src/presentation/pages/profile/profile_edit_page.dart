@@ -587,25 +587,37 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       if (cities.isNotEmpty) {
         final city = await showModalBottomSheet<String>(
           context: context,
+          isScrollControlled: true,
           builder: (context) => SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    S.of(context)?.selectCity ?? 'Select City',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.5,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      S.of(context)?.selectCity ?? 'Select City',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                ...cities.map((c) => ListTile(
-                  title: Text(c),
-                  onTap: () => Navigator.pop(context, c),
-                )),
-              ],
+                  Flexible(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: cities.length,
+                      itemBuilder: (context, index) => ListTile(
+                        title: Text(cities[index]),
+                        onTap: () => Navigator.pop(context, cities[index]),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -672,10 +684,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             TextField(
               controller: controller,
               autofocus: true,
-              maxLength: 10,
+              maxLength: 50,
               decoration: InputDecoration(
                 hintText: S.of(context)?.enterPokeSuffix ?? 'Enter poke suffix, e.g.: on the shoulder',
-                counterText: '',
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
@@ -2052,7 +2063,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // 试听按钮
-                  if (ringtone['file'] != null || name == '振动')
+                  if (ringtone['url'] != null || name == '振动')
                     IconButton(
                       icon: Icon(
                         isPlaying ? Icons.stop : Icons.play_circle_outline,

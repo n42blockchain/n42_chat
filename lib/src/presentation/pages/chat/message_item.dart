@@ -929,9 +929,16 @@ class MessageItem extends StatelessWidget {
             final isSelected = myVotes.contains(optionId);
             final voteCount = voteCounts[optionId] ?? 0;
             final percentage = totalVoters > 0 ? (voteCount / totalVoters * 100) : 0.0;
-            
+
+            // 检查是否可以投票
+            // 1. 投票已结束，不能投票
+            // 2. 已经投票过这个选项，不能重复投票
+            // 3. 已达到最大选择数量，不能选择其他选项
+            final hasReachedMaxSelections = myVotes.length >= maxSelections;
+            final canVote = !pollEnded && !isSelected && !hasReachedMaxSelections;
+
             return GestureDetector(
-              onTap: pollEnded ? null : () => onPollVote?.call(message.id, optionId),
+              onTap: canVote ? () => onPollVote?.call(message.id, optionId) : null,
               child: Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(10),

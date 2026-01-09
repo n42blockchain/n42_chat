@@ -10,6 +10,7 @@ import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
+import '../../../domain/repositories/conversation_repository.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
@@ -33,6 +34,9 @@ class ChatDetailPage extends StatefulWidget {
   /// 点击成员头像的回调（返回true表示是好友，可以直接聊天）
   final Function(String userId, String displayName, String? avatarUrl)? onMemberTap;
 
+  /// 清空聊天记录的回调
+  final VoidCallback? onClearHistory;
+
   const ChatDetailPage({
     super.key,
     required this.conversation,
@@ -40,6 +44,7 @@ class ChatDetailPage extends StatefulWidget {
     this.onAddMember,
     this.onRemoveMember,
     this.onMemberTap,
+    this.onClearHistory,
   });
 
   @override
@@ -93,14 +98,48 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     if (widget.conversation.type == ConversationType.group) {
       return widget.conversation.name;
     }
-    
+
     // 私聊：直接使用 conversation.directUserId 获取备注名
     final otherUserId = widget.conversation.directUserId;
     if (otherUserId != null) {
       return RemarkService.instance.getDisplayName(otherUserId, widget.conversation.name);
     }
-    
+
     return widget.conversation.name;
+  }
+
+  /// 更新免打扰状态
+  Future<void> _updateMuteStatus(bool muted) async {
+    try {
+      final repository = getIt<IConversationRepository>();
+      await repository.setMuted(widget.conversation.id, muted);
+      debugPrint('ChatDetailPage: Mute status updated to $muted');
+    } catch (e) {
+      debugPrint('ChatDetailPage: Failed to update mute status: $e');
+      // 恢复原状态
+      if (mounted) {
+        setState(() {
+          _isMuted = !muted;
+        });
+      }
+    }
+  }
+
+  /// 更新置顶状态
+  Future<void> _updatePinnedStatus(bool pinned) async {
+    try {
+      final repository = getIt<IConversationRepository>();
+      await repository.setPinned(widget.conversation.id, pinned);
+      debugPrint('ChatDetailPage: Pin status updated to $pinned');
+    } catch (e) {
+      debugPrint('ChatDetailPage: Failed to update pin status: $e');
+      // 恢复原状态
+      if (mounted) {
+        setState(() {
+          _isPinned = !pinned;
+        });
+      }
+    }
   }
 
   @override
@@ -271,6 +310,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     setState(() {
                       _isMuted = value;
                     });
+                    // 持久化设置
+                    _updateMuteStatus(value);
                   },
                 ),
                 _buildDivider(dividerColor),
@@ -282,6 +323,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     setState(() {
                       _isPinned = value;
                     });
+                    // 持久化设置
+                    _updatePinnedStatus(value);
                   },
                 ),
                 _buildDivider(dividerColor),
@@ -293,6 +336,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     setState(() {
                       _isStrongReminder = value;
                     });
+                    // TODO: 持久化强提醒设置（需要添加相应的存储方法）
                   },
                 ),
               ],
@@ -740,7 +784,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              // TODO: 实现清空聊天记录
+              widget.onClearHistory?.call();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Chat history cleared'),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
             },
             child: Text(
               S.of(context)?.clearAction ?? 'Clear',

@@ -187,13 +187,17 @@ class MatrixReactionDataSource {
       throw Exception('Room not found');
     }
 
-    // 获取原消息
-    final timeline = await fromRoom.getTimeline();
-    matrix.Event? originalEvent;
-    for (final event in timeline.events) {
-      if (event.eventId == eventId) {
-        originalEvent = event;
-        break;
+    // 使用 getEventById 获取原消息（比遍历 timeline 更可靠）
+    matrix.Event? originalEvent = await fromRoom.getEventById(eventId);
+
+    // 如果 getEventById 失败，尝试从 timeline 获取
+    if (originalEvent == null) {
+      final timeline = await fromRoom.getTimeline();
+      for (final event in timeline.events) {
+        if (event.eventId == eventId) {
+          originalEvent = event;
+          break;
+        }
       }
     }
 
@@ -213,13 +217,33 @@ class MatrixReactionDataSource {
       case matrix.MessageTypes.Video:
       case matrix.MessageTypes.Audio:
       case matrix.MessageTypes.File:
-        // 复制媒体消息
-        newEventId = await toRoom.sendEvent({
+        // 复制媒体消息 - 确保包含所有必要的字段
+        final content = <String, dynamic>{
           'msgtype': msgType,
           'body': originalEvent.body,
-          'url': originalEvent.content['url'],
-          'info': originalEvent.content['info'],
-        });
+        };
+
+        // 添加 URL（必须）
+        final url = originalEvent.content['url'];
+        if (url != null) {
+          content['url'] = url;
+        }
+
+        // 添加 info（包含媒体元数据）
+        final info = originalEvent.content['info'];
+        if (info != null) {
+          content['info'] = info;
+        }
+
+        // 对于文件类型，添加 filename
+        if (msgType == matrix.MessageTypes.File) {
+          final filename = originalEvent.content['filename'];
+          if (filename != null) {
+            content['filename'] = filename;
+          }
+        }
+
+        newEventId = await toRoom.sendEvent(content);
         break;
       default:
         // 作为文本转发
