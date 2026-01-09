@@ -297,12 +297,29 @@ class MessageRepositoryImpl implements IMessageRepository {
   @override
   Future<Uint8List?> downloadMedia(String mxcUrl) async {
     try {
+      debugPrint('downloadMedia: Attempting to download from $mxcUrl');
+      if (_client == null) {
+        debugPrint('downloadMedia: Client is null');
+        return null;
+      }
+
       final uri = Uri.parse(mxcUrl);
-      final response = await _client?.httpClient.get(
-        uri.getDownloadLink(_client!),
-      );
-      return response?.bodyBytes;
-    } catch (e) {
+      final downloadLink = uri.getDownloadLink(_client!);
+      debugPrint('downloadMedia: Download link: $downloadLink');
+
+      final response = await _client!.httpClient.get(downloadLink);
+      debugPrint('downloadMedia: Response status: ${response?.statusCode}');
+      debugPrint('downloadMedia: Response body size: ${response?.bodyBytes.length ?? 0}');
+
+      if (response != null && response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
+        return response.bodyBytes;
+      } else {
+        debugPrint('downloadMedia: Download failed - status: ${response?.statusCode}');
+        return null;
+      }
+    } catch (e, stackTrace) {
+      debugPrint('downloadMedia: Error downloading media: $e');
+      debugPrint('downloadMedia: Stack trace: $stackTrace');
       return null;
     }
   }
@@ -412,7 +429,25 @@ class MessageRepositoryImpl implements IMessageRepository {
       rethrow;
     }
   }
-  
+
+  @override
+  Future<Map<String, dynamic>?> getPollAggregations(
+    String roomId,
+    String pollEventId,
+  ) async {
+    try {
+      return await _messageDataSource.getPollAggregations(roomId, pollEventId);
+    } catch (e) {
+      debugPrint('MessageRepositoryImpl: Failed to get poll aggregations: $e');
+      return null;
+    }
+  }
+
+  @override
+  Stream<Map<String, dynamic>>? watchPollResponses(String roomId) {
+    return _messageDataSource.watchPollResponses(roomId);
+  }
+
   @override
   Future<String?> sendCustomMessage(
     String roomId, {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
@@ -535,14 +536,14 @@ class MessageItem extends StatelessWidget {
     // SpeechToTextService().configureGoogle('your-api-key');
     // 或
     // SpeechToTextService().configureWhisper('http://localhost:8000');
-    
+
     // 如果服务已配置，则使用真实的语音识别
     // final text = await SpeechToTextService().transcribe(voiceUrl);
     // if (text != null) return text;
-    
-    // 暂时返回提示信息
+
+    // Speech-to-text API not configured
     await Future.delayed(const Duration(seconds: 1));
-    return '【语音转文字需配置API密钥，详见 SpeechToTextService】';
+    return '[Speech-to-text requires API configuration]';
   }
 
   Widget _buildVideoMessage() {

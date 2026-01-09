@@ -3,12 +3,13 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import 'my_qrcode_page.dart';
 
-/// 扫一扫页面
+/// Scan QR page
 class ScanQRPage extends StatefulWidget {
   const ScanQRPage({super.key});
 
@@ -35,7 +36,6 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // 当应用从后台恢复时，重新检查权限
     if (state == AppLifecycleState.resumed) {
       _checkCameraPermission();
     }
@@ -57,7 +57,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
 
     try {
       final status = await Permission.camera.status;
-      
+
       if (status.isGranted) {
         _initScanner();
         setState(() {
@@ -65,7 +65,6 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
           _isCheckingPermission = false;
         });
       } else if (status.isDenied) {
-        // 请求权限
         final result = await Permission.camera.request();
         if (result.isGranted) {
           _initScanner();
@@ -77,27 +76,27 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
           setState(() {
             _hasPermission = false;
             _isCheckingPermission = false;
-            _permissionError = '需要相机权限才能扫描二维码';
+            _permissionError = S.of(context)?.cameraPermissionRequired ?? 'Camera permission is required to scan QR code';
           });
         }
       } else if (status.isPermanentlyDenied) {
         setState(() {
           _hasPermission = false;
           _isCheckingPermission = false;
-          _permissionError = '相机权限被永久拒绝，请在系统设置中开启';
+          _permissionError = S.of(context)?.cameraPermissionDenied ?? 'Camera permission was permanently denied. Please enable it in system settings.';
         });
       } else {
         setState(() {
           _hasPermission = false;
           _isCheckingPermission = false;
-          _permissionError = '无法获取相机权限';
+          _permissionError = S.of(context)?.cannotGetCameraPermission ?? 'Cannot get camera permission';
         });
       }
     } catch (e) {
       setState(() {
         _hasPermission = false;
         _isCheckingPermission = false;
-        _permissionError = '检查权限时出错: $e';
+        _permissionError = S.of(context)?.permissionCheckError(e.toString()) ?? 'Error checking permission: $e';
       });
     }
   }
@@ -113,7 +112,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
 
   void _onDetect(BarcodeCapture capture) {
     if (_isProcessing) return;
-    
+
     final List<Barcode> barcodes = capture.barcodes;
     for (final barcode in barcodes) {
       final String? rawValue = barcode.rawValue;
@@ -128,26 +127,20 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
 
-    // 暂停扫描
     _scannerController?.stop();
 
     try {
-      // 解析二维码数据
-      // 格式: n42chat://user/@username:server.com
       if (data.startsWith('n42chat://user/')) {
         final userId = data.replaceFirst('n42chat://user/', '');
         await _startChatWithUser(userId);
       } else if (data.startsWith('@') && data.contains(':')) {
-        // 直接是 Matrix ID
         await _startChatWithUser(data);
       } else {
-        _showError('无效的二维码');
-        // 恢复扫描
+        _showError(S.of(context)?.invalidQrCode ?? 'Invalid QR code');
         _scannerController?.start();
       }
     } catch (e) {
-      _showError('处理二维码失败: $e');
-      // 恢复扫描
+      _showError(S.of(context)?.qrCodeProcessFailed(e.toString()) ?? 'Failed to process QR code: $e');
       _scannerController?.start();
     } finally {
       if (mounted) {
@@ -162,19 +155,18 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       final client = clientManager.client;
 
       if (client == null) {
-        _showError('聊天服务未连接');
+        _showError(S.of(context)?.chatServiceNotConnected ?? 'Chat service not connected');
         _scannerController?.start();
         return;
       }
 
-      // 创建私聊
       final roomId = await client.startDirectChat(userId);
-      
+
       if (mounted) {
         Navigator.of(context).pop({'roomId': roomId, 'userId': userId});
       }
     } catch (e) {
-      _showError('无法添加好友: $e');
+      _showError(S.of(context)?.cannotAddFriend(e.toString()) ?? 'Cannot add friend: $e');
       _scannerController?.start();
     }
   }
@@ -234,9 +226,9 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          '扫一扫',
-          style: TextStyle(color: Colors.white, fontSize: 18),
+        title: Text(
+          S.of(context)?.scanQrCode ?? 'Scan QR Code',
+          style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
         centerTitle: true,
         actions: [
@@ -255,26 +247,24 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
   }
 
   Widget _buildBody(Size screenSize, double scanSize) {
-    // 检查权限中
     if (_isCheckingPermission) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
+            const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF07C160)),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
-              '正在检查相机权限...',
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+              S.of(context)?.checkingCameraPermission ?? 'Checking camera permission...',
+              style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),
           ],
         ),
       );
     }
 
-    // 没有权限
     if (!_hasPermission) {
       return Center(
         child: Padding(
@@ -296,9 +286,9 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
-                '需要相机权限',
-                style: TextStyle(
+              Text(
+                S.of(context)?.needCameraPermission ?? 'Camera Permission Required',
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
@@ -306,7 +296,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
               ),
               const SizedBox(height: 12),
               Text(
-                _permissionError ?? '扫描二维码需要使用相机',
+                _permissionError ?? (S.of(context)?.cameraPermissionRequired ?? 'Camera permission is required to scan QR code'),
                 style: const TextStyle(
                   color: Colors.white54,
                   fontSize: 14,
@@ -330,7 +320,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text('重试'),
+                    child: Text(S.of(context)?.retryPermission ?? 'Retry'),
                   ),
                   const SizedBox(width: 16),
                   OutlinedButton(
@@ -346,16 +336,17 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text('打开设置'),
+                    child: Text(S.of(context)?.openSettings ?? 'Open Settings'),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
-              // 手动输入选项
               TextButton(
                 onPressed: _toggleManualInput,
                 child: Text(
-                  _showManualInput ? '关闭手动输入' : '手动输入用户 ID',
+                  _showManualInput
+                      ? (S.of(context)?.closeManualInput ?? 'Close Manual Input')
+                      : (S.of(context)?.manualInputUserId ?? 'Manual Input User ID'),
                   style: const TextStyle(
                     color: Color(0xFF07C160),
                     fontSize: 14,
@@ -369,10 +360,8 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       );
     }
 
-    // 有权限，显示相机扫描
     return Stack(
       children: [
-        // 相机预览
         MobileScanner(
           controller: _scannerController,
           onDetect: _onDetect,
@@ -388,13 +377,13 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '相机启动失败',
-                    style: TextStyle(color: Colors.white),
+                    S.of(context)?.cameraStartFailed ?? 'Camera failed to start',
+                    style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    error.errorDetails?.message ?? '未知错误',
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                    error.errorDetails?.message ?? (S.of(context)?.unknownError ?? 'Unknown error'),
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -402,11 +391,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
             );
           },
         ),
-        
-        // 扫描框遮罩
         _buildScanOverlay(screenSize, scanSize),
-        
-        // 提示文字和底部功能按钮
         Positioned(
           top: (screenSize.height - scanSize) / 2 + scanSize + 16,
           left: 0,
@@ -416,7 +401,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
             child: Column(
               children: [
                 Text(
-                  '将二维码放入框内，即可自动扫描',
+                  S.of(context)?.placeQrCodeInFrame ?? 'Place QR code within the frame to scan',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 14,
@@ -427,7 +412,9 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                 TextButton(
                   onPressed: _toggleManualInput,
                   child: Text(
-                    _showManualInput ? '关闭手动输入' : '手动输入用户 ID',
+                    _showManualInput
+                        ? (S.of(context)?.closeManualInput ?? 'Close Manual Input')
+                        : (S.of(context)?.manualInputUserId ?? 'Manual Input User ID'),
                     style: const TextStyle(
                       color: Color(0xFF07C160),
                       fontSize: 14,
@@ -436,13 +423,12 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                 ),
                 if (_showManualInput) _buildManualInputSection(scanSize),
                 const SizedBox(height: 24),
-                // 底部功能按钮
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _buildBottomButton(
                       icon: Icons.qr_code,
-                      label: '我的二维码',
+                      label: S.of(context)?.myQrCode ?? 'My QR Code',
                       onTap: _showMyQRCode,
                     ),
                   ],
@@ -452,8 +438,6 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
             ),
           ),
         ),
-        
-        // 处理中指示器
         if (_isProcessing)
           Container(
             color: Colors.black54,
@@ -479,7 +463,6 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       painter: _ScanOverlayPainter(scanRect: scanRect),
       child: Stack(
         children: [
-          // 四个角装饰
           Positioned(
             left: scanRect.left,
             top: scanRect.top,
@@ -567,7 +550,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                       color: Colors.white,
                     ),
                   )
-                : const Text('添加'),
+                : Text(S.of(context)?.add ?? 'Add'),
           ),
         ],
       ),
@@ -607,7 +590,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
   }
 }
 
-/// 扫描框遮罩绘制器
+/// Scan overlay painter
 class _ScanOverlayPainter extends CustomPainter {
   final Rect scanRect;
 
@@ -619,7 +602,6 @@ class _ScanOverlayPainter extends CustomPainter {
       ..color = Colors.black.withOpacity(0.5)
       ..style = PaintingStyle.fill;
 
-    // 绘制四周遮罩
     final path = Path()
       ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
       ..addRRect(RRect.fromRectAndRadius(scanRect, const Radius.circular(12)))
@@ -627,7 +609,6 @@ class _ScanOverlayPainter extends CustomPainter {
 
     canvas.drawPath(path, paint);
 
-    // 绘制扫描框边框
     final borderPaint = Paint()
       ..color = Colors.white.withOpacity(0.3)
       ..style = PaintingStyle.stroke

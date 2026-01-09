@@ -12,7 +12,8 @@ class SEn extends S {
   String get chatModuleInitFailed => 'Chat module initialization failed';
 
   @override
-  String get checkNetworkRetry => 'Please check your network connection and try again';
+  String get checkNetworkRetry =>
+      'Please check your network connection and try again';
 
   @override
   String get retry => 'Retry';
@@ -77,7 +78,8 @@ class SEn extends S {
   String get sessionRestoreFailed => 'Session restore failed';
 
   @override
-  String get additionalVerificationRequired => 'Additional verification required';
+  String get additionalVerificationRequired =>
+      'Additional verification required';
 
   @override
   String registrationFailed(String error) {
@@ -304,10 +306,10 @@ class SEn extends S {
   String get convertToTextTitle => 'Convert to Text';
 
   @override
-  String get selectEmoji => 'Select emoji';
+  String get selectEmoji => 'Select Emoji';
 
   @override
-  String get frequentlyUsed => 'Frequently used';
+  String get frequentlyUsed => 'Frequently Used';
 
   @override
   String get copy => 'Copy';
@@ -316,7 +318,7 @@ class SEn extends S {
   String get forward => 'Forward';
 
   @override
-  String get unfavorite => 'Unfavorite';
+  String get unfavorite => 'Unfav';
 
   @override
   String get favorite => 'Favorite';
@@ -358,7 +360,8 @@ class SEn extends S {
   String get sendMessageHint => 'Send a message';
 
   @override
-  String get microphonePermissionRequired => 'Please allow microphone permission';
+  String get microphonePermissionRequired =>
+      'Please allow microphone permission';
 
   @override
   String startRecordingFailed(String error) {
@@ -397,6 +400,45 @@ class SEn extends S {
 
   @override
   String get addFriend => 'Add Friend';
+
+  @override
+  String get chatServiceNotConnected => 'Chat service not connected';
+
+  @override
+  String userNotFoundHint(String query) {
+    return 'User \"$query\" not found\n\nTips:\n• Try entering full user ID, e.g. @username:server.com\n• Check the username spelling';
+  }
+
+  @override
+  String createChatFailed(String error) {
+    return 'Failed to create chat: $error';
+  }
+
+  @override
+  String searchFailed(String error) {
+    return 'Search failed: $error';
+  }
+
+  @override
+  String get enterUserIdOrUsername => 'Enter user ID or username to search';
+
+  @override
+  String get searching => 'Searching...';
+
+  @override
+  String get searchUserToChat => 'Search user to start chatting';
+
+  @override
+  String get matrixIdExample =>
+      'You can enter a full Matrix ID\ne.g. @user:matrix.n42.network';
+
+  @override
+  String userNotFound(String username) {
+    return 'User \"$username\" not found';
+  }
+
+  @override
+  String get chat => 'Chat';
 
   @override
   String get settings => 'Settings';
@@ -524,7 +566,8 @@ class SEn extends S {
   String get friendInfo => 'Friend Info';
 
   @override
-  String get friendInfoDesc => 'Add friend\'s remark, phone, tags, notes, photos and set permissions.';
+  String get friendInfoDesc =>
+      'Add friend\'s remark, phone, tags, notes, photos and set permissions.';
 
   @override
   String get moments => 'Moments';
@@ -584,7 +627,8 @@ class SEn extends S {
   String get showPreview => 'Show message preview';
 
   @override
-  String get showContentInNotification => 'Show message content in notifications';
+  String get showContentInNotification =>
+      'Show message content in notifications';
 
   @override
   String get notificationSound => 'Notification sound';
@@ -615,9 +659,6 @@ class SEn extends S {
 
   @override
   String get appearance => 'Appearance';
-
-  @override
-  String get chat => 'Chat';
 
   @override
   String get about => 'About';
@@ -664,7 +705,8 @@ class SEn extends S {
   String get endToEndEncryption => 'End-to-end encryption';
 
   @override
-  String get messagesOnlyYouCanSee => 'Messages visible only to you and the recipient';
+  String get messagesOnlyYouCanSee =>
+      'Messages visible only to you and the recipient';
 
   @override
   String get decentralized => 'Decentralized';
@@ -762,16 +804,20 @@ class SEn extends S {
   String get joinN42Chat => 'Join N42 Chat to start chatting';
 
   @override
-  String get usernameHint => 'Enter username (letters, numbers, underscores)';
+  String get usernameHint => '3-20 chars, letters/numbers/_';
 
   @override
   String get usernameMinLength => 'Username must be at least 3 characters';
 
   @override
-  String get usernameFormat => 'Username can only contain letters, numbers, and underscores';
+  String get usernameMaxLength => 'Username must be at most 20 characters';
 
   @override
-  String get passwordHint => 'Enter password (at least 8 characters)';
+  String get usernameFormat =>
+      'Username can only contain letters, numbers, and underscores';
+
+  @override
+  String get passwordHint => 'Min 8 characters';
 
   @override
   String get passwordMinLength => 'Password must be at least 8 characters';
@@ -795,10 +841,12 @@ class SEn extends S {
   String get enterInviteCode => 'Enter invite code';
 
   @override
-  String get inviteCodeHint => 'Invite code is built-in, usually no need to modify';
+  String get inviteCodeHint =>
+      'Invite code is built-in, usually no need to modify';
 
   @override
-  String get agreeTermsFirst => 'Please read and agree to the terms and privacy policy first';
+  String get agreeTermsFirst =>
+      'Please read and agree to the terms and privacy policy first';
 
   @override
   String get iAgree => 'I have read and agree to';
@@ -1099,7 +1147,8 @@ class SEn extends S {
   }
 
   @override
-  String get searchContactsGroupsMessages => 'Search contacts, groups, messages';
+  String get searchContactsGroupsMessages =>
+      'Search contacts, groups, messages';
 
   @override
   String get searchError => 'Search error';
@@ -1199,10 +1248,14 @@ class SEn extends S {
   String get publish => 'Publish';
 
   @override
-  String get clearHistoryConfirm => 'Clear all chat history? This cannot be undone.';
+  String get clearHistoryConfirm =>
+      'Clear all chat history? This cannot be undone.';
 
   @override
   String get clearAction => 'Clear';
+
+  @override
+  String get chatHistoryCleared => 'Chat history cleared';
 
   @override
   String leaveGroupConfirm(String name) {
@@ -1712,13 +1765,14 @@ class SEn extends S {
   String get shareRealTimeLocation => 'Share Real-time Location';
 
   @override
-  String get shareLocationForOneHour => 'Share real-time location with friend for 1 hour';
+  String get shareLocationForOneHour =>
+      'Share real-time location with friend for 1 hour';
 
   @override
   String get locationSent => 'Location sent';
 
   @override
-  String get selectMessages => 'Select messages';
+  String get selectMessages => 'Select';
 
   @override
   String selectedCount(Object count) {
@@ -1743,7 +1797,8 @@ class SEn extends S {
   String get sendFirstMessage => 'Send first message to start chatting';
 
   @override
-  String get encryptionNotice => 'This chat is end-to-end encrypted. Only you and the recipient can read the messages.';
+  String get encryptionNotice =>
+      'This chat is end-to-end encrypted. Only you and the recipient can read the messages.';
 
   @override
   String replyTo(Object name) {
@@ -1843,7 +1898,8 @@ class SEn extends S {
   }
 
   @override
-  String get remindOnlyInGroup => 'Remind feature is only available in group chat';
+  String get remindOnlyInGroup =>
+      'Remind feature is only available in group chat';
 
   @override
   String get onlyTextSearchable => 'Only text messages can be searched';
@@ -1886,12 +1942,181 @@ class SEn extends S {
   String get endPoll => 'End Poll';
 
   @override
-  String get endPollConfirm => 'Are you sure you want to end this poll? No more votes can be cast after ending.';
+  String get endPollConfirm =>
+      'Are you sure you want to end this poll? No more votes can be cast after ending.';
 
   @override
   String memberCount(Object count) {
     return '$count members';
   }
+
+  @override
+  String get videoChannels => 'Channels';
+
+  @override
+  String get live => 'Live';
+
+  @override
+  String get listen => 'Listen';
+
+  @override
+  String get watch => 'Watch';
+
+  @override
+  String get searchDiscover => 'Search';
+
+  @override
+  String get nearbyPeople => 'Nearby';
+
+  @override
+  String get games => 'Games';
+
+  @override
+  String get miniPrograms => 'Mini Programs';
+
+  @override
+  String done(int count) {
+    return 'Done($count)';
+  }
+
+  @override
+  String get services => 'Services';
+
+  @override
+  String get favorites => 'Favorites';
+
+  @override
+  String get ordersAndCards => 'Orders & Cards';
+
+  @override
+  String get stickers => 'Stickers';
+
+  @override
+  String statusSetTo(String status) {
+    return 'Status set to: $status';
+  }
+
+  @override
+  String get avatarUploadFailed => 'Avatar upload failed';
+
+  @override
+  String get personalProfile => 'Personal Profile';
+
+  @override
+  String get name => 'Name';
+
+  @override
+  String get gender => 'Gender';
+
+  @override
+  String get region => 'Region';
+
+  @override
+  String get myQrCode => 'My QR Code';
+
+  @override
+  String get poke => 'Poke';
+
+  @override
+  String get ringtone => 'Ringtone';
+
+  @override
+  String get defaultRingtone => 'Default Ringtone';
+
+  @override
+  String get ringtoneClear => 'Clear';
+
+  @override
+  String get ringtonePhone => 'Phone';
+
+  @override
+  String get ringtoneClassic => 'Classic';
+
+  @override
+  String get ringtoneSoft => 'Soft';
+
+  @override
+  String get ringtoneVibrate => 'Vibrate';
+
+  @override
+  String get ringtoneSilent => 'Silent';
+
+  @override
+  String get selectRingtone => 'Select Ringtone';
+
+  @override
+  String get stop => 'Stop';
+
+  @override
+  String get loadingRingtones => 'Loading ringtones...';
+
+  @override
+  String get noPermissionToEditGroupName => 'You do not have permission to edit group name';
+
+  @override
+  String get myAddresses => 'My Addresses';
+
+  @override
+  String genderSetTo(String gender) {
+    return 'Gender set to: $gender';
+  }
+
+  @override
+  String get selectRegion => 'Select Region';
+
+  @override
+  String get selectCity => 'Select City';
+
+  @override
+  String regionSetTo(String region) {
+    return 'Region set to: $region';
+  }
+
+  @override
+  String get setPoke => 'Set Poke';
+
+  @override
+  String get friendPokedMe => 'Friend poked me';
+
+  @override
+  String get enterPokeSuffix => 'Enter poke suffix, e.g.: on the shoulder';
+
+  @override
+  String get example => 'Example';
+
+  @override
+  String get onTheShoulder => ' on the shoulder';
+
+  @override
+  String get pokeCleared => 'Poke cleared';
+
+  @override
+  String pokeSetTo(String suffix) {
+    return 'Poke set to: poked me$suffix';
+  }
+
+  @override
+  String get editSignature => 'Edit Signature';
+
+  @override
+  String get introduceYourself => 'A sentence to introduce yourself';
+
+  @override
+  String get signatureCleared => 'Signature cleared';
+
+  @override
+  String get signatureUpdated => 'Signature updated';
+
+  @override
+  String get scanToAddFriend => 'Scan the QR code above to add me as a friend';
+
+  @override
+  String ringtoneSetTo(String ringtone) {
+    return 'Ringtone set to: $ringtone';
+  }
+
+  @override
+  String get confirmDissolveGroup => 'Are you sure you want to dissolve';
 
   @override
   String get enterValidServerAddress => 'Please enter a valid server address';
@@ -1909,16 +2134,11 @@ class SEn extends S {
   String get loginAgreement => 'By logging in, you agree to ';
 
   @override
-  String get pleaseAgreeToTerms => 'Please read and agree to the Terms of Service and Privacy Policy';
+  String get pleaseAgreeToTerms =>
+      'Please read and agree to the Terms of Service and Privacy Policy';
 
   @override
   String get registerFailed => 'Registration failed';
-
-  @override
-  String get enterUsernameFormat => 'Enter username (letters, numbers, underscores)';
-
-  @override
-  String get enterPasswordMinLength => 'Enter password (at least 8 characters)';
 
   @override
   String get reenterPassword => 'Re-enter password';
@@ -1927,150 +2147,439 @@ class SEn extends S {
   String get passwordsDoNotMatch => 'Passwords do not match';
 
   @override
-  String get inviteCodeBuiltIn => 'Invite code (built-in)';
+  String get inviteCodeBuiltIn => 'Invite Code (Built-in)';
+
+  @override
+  String get inviteCodeBuiltInNote =>
+      'Invite code is built-in, usually no need to modify';
 
   @override
   String get iHaveReadAndAgree => 'I have read and agree to ';
 
   @override
-  String get inviteCodeBuiltInNote => 'Invite code is built-in, usually no need to modify';
-
-  @override
-  String get addToHomeScreen => 'Add to home screen';
-  @override
-  String get allowOthersToSearchAndJoin => 'Allow others to search and join';
-  @override
-  String get avatarUploadFailed => 'Avatar upload failed';
-  @override
-  String get confirmClearChatHistory => 'Are you sure you want to clear chat history?';
-  @override
-  String get confirmDissolveGroup => 'Are you sure you want to dissolve this group?';
-  @override
-  String get confirmLeaveGroup => 'Are you sure you want to leave this group?';
-  @override
-  String contactCount(int count) => '$count contacts';
-  @override
-  String get createGroupInDevelopment => 'Create group (in development)';
-  @override
-  String get createGroupToChat => 'Create a group to start chatting';
-  @override
-  String get defaultRingtone => 'Default ringtone';
-  @override
-  String done(int count) => 'Done($count)';
-  @override
-  String get editGroupAnnouncement => 'Edit group announcement';
-  @override
-  String get editGroupDescription => 'Edit group description';
-  @override
-  String get editSignature => 'Edit signature';
-  @override
-  String get enterGroupAnnouncement => 'Enter group announcement';
-  @override
-  String get enterPokeSuffix => 'Enter poke suffix';
-  @override
-  String get enterRemarkName => 'Enter remark name';
-  @override
-  String get example => 'Example';
-  @override
-  String get favorites => 'Favorites';
-  @override
-  String get friendPokedMe => 'poked me';
-  @override
-  String get gender => 'Gender';
-  @override
-  String genderSetTo(String gender) => 'Gender set to: $gender';
-  @override
-  String get groupInvites => 'Group invites';
-  @override
-  String get introduceYourself => 'Introduce yourself';
-  @override
-  String get invitedToJoinGroup => 'invited you to join the group';
-  @override
-  String get leave => 'Leave';
-  @override
-  String get memberCountClickToCopy => 'members (click to copy)';
-  @override
-  String get myAddresses => 'My addresses';
-  @override
-  String get myGroups => 'My groups';
-  @override
-  String get myQrCode => 'My QR code';
-  @override
-  String get name => 'Name';
-  @override
-  String get onTheShoulder => 'on the shoulder';
-  @override
-  String get ordersAndCards => 'Orders and cards';
-  @override
-  String get personalProfile => 'Personal profile';
-  @override
-  String get poke => 'Poke';
-  @override
-  String get pokeCleared => 'Poke cleared';
-  @override
-  String pokeSetTo(String poke) => 'Poke set to: $poke';
-  @override
-  String recommendedCardTo(String from, String to) => 'Recommended $from\'s card to $to';
-  @override
-  String get region => 'Region';
-  @override
-  String regionSetTo(String region) => 'Region set to: $region';
-  @override
-  String acceptedFriendRequest(String name) => 'Accepted $name\'s friend request';
-  @override
-  String rejectedFriendRequest(String name) => 'Rejected $name\'s friend request';
-  @override
-  String remarkSetTo(String remark) => 'Remark set to: $remark';
-  @override
-  String get ringtone => 'Ringtone';
-  @override
-  String ringtoneSetTo(String ringtone) => 'Ringtone set to: $ringtone';
-  @override
-  String get scanToAddFriend => 'Scan to add friend';
-  @override
-  String get selectCity => 'Select city';
-  @override
-  String get selectRegion => 'Select region';
-  @override
-  String get services => 'Services';
-  @override
-  String get setPoke => 'Set poke';
-  @override
-  String get signatureCleared => 'Signature cleared';
-  @override
-  String get signatureUpdated => 'Signature updated';
-  @override
-  String statusSetTo(String status) => 'Status set to: $status';
-  @override
-  String get stickers => 'Stickers';
-
-  // Additional strings for tabs
-  @override
-  String messagesWithCount(int count) => 'Messages($count)';
-
-  // Add menu
-  @override
   String get startGroupChat => 'Start Group Chat';
+
   @override
   String get addFriends => 'Add Friends';
+
   @override
   String get paymentAndCollection => 'Payment';
 
-  // Discover page additional
   @override
-  String get videoChannels => 'Channels';
+  String messagesWithCount(int count) {
+    return 'Messages($count)';
+  }
+
   @override
-  String get live => 'Live';
+  String contactCount(int count) {
+    return '$count contacts';
+  }
+
   @override
-  String get listen => 'Listen';
+  String get addToHomeScreen => 'Add to home screen';
+
   @override
-  String get watch => 'Watch';
+  String recommendedCardTo(String contact, String recipient) {
+    return 'Recommended $contact\'s card to $recipient';
+  }
+
   @override
-  String get searchDiscover => 'Search';
+  String get enterRemarkName => 'Enter remark name';
+
   @override
-  String get nearbyPeople => 'Nearby';
+  String remarkSetTo(String remark) {
+    return 'Remark set to: $remark';
+  }
+
   @override
-  String get games => 'Games';
+  String acceptedFriendRequest(String name) {
+    return 'Accepted $name\'s friend request';
+  }
+
   @override
-  String get miniPrograms => 'Mini Programs';
+  String rejectedFriendRequest(String name) {
+    return 'Rejected $name\'s friend request';
+  }
+
+  @override
+  String get groupInvites => 'Group Invites';
+
+  @override
+  String get myGroups => 'My Groups';
+
+  @override
+  String get invitedToJoinGroup => 'Invited to join group';
+
+  @override
+  String get confirmLeaveGroup => 'Are you sure you want to leave';
+
+  @override
+  String get leave => 'Leave';
+
+  @override
+  String get saveMedia => 'Save';
+
+  @override
+  String get recallThisMessage => 'Recall this message?';
+
+  @override
+  String get messageRecalled => 'Message recalled';
+
+  @override
+  String get savedToGallery => 'Saved to gallery';
+
+  @override
+  String get failedToSave => 'Failed to save';
+
+  @override
+  String get saving => 'Saving...';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String get saveToGallery => 'Save to Gallery';
+
+  @override
+  String get downloadFailed => 'Download failed';
+
+  @override
+  String get noMediaUrl => 'No media URL available';
+
+  @override
+  String get shareFailed => 'Share failed';
+
+  @override
+  String get failedToLoadImage => 'Failed to load image';
+
+  @override
+  String get failedToLoadMoreMessages => 'Failed to load more messages';
+
+  @override
+  String get failedToSend => 'Failed to send';
+
+  @override
+  String get failedToSendImage => 'Failed to send image';
+
+  @override
+  String get failedToSendVoice => 'Failed to send voice';
+
+  @override
+  String get failedToSendFile => 'Failed to send file';
+
+  @override
+  String get failedToSendVideo => 'Failed to send video';
+
+  @override
+  String get failedToSendLocation => 'Failed to send location';
+
+  @override
+  String get failedToResend => 'Failed to resend';
+
+  @override
+  String get failedToRecall => 'Failed to recall';
+
+  @override
+  String get failedToReply => 'Failed to reply';
+
+  @override
+  String get failedToAddReaction => 'Failed to add reaction';
+
+  @override
+  String get failedToSendPoll => 'Failed to send poll';
+
+  @override
+  String get failedToVote => 'Failed to vote';
+
+  @override
+  String get failedToLoadMessages => 'Failed to load messages';
+
+  @override
+  String get callFeatureComingSoon =>
+      'Voice and video call feature coming soon';
+
+  @override
+  String get cannotForwardRedPacketOrTransfer =>
+      'Red envelopes and transfers cannot be forwarded';
+
+  @override
+  String get videoRecordingFailed =>
+      'Video recording failed. Please try again.';
+
+  @override
+  String get text => 'Text';
+
+  @override
+  String get link => 'Link';
+
+  @override
+  String get note => 'Note';
+
+  @override
+  String get myNotes => 'My Notes';
+
+  @override
+  String get noFavorites => 'No favorites yet';
+
+  @override
+  String get longPressToFavorite => 'Long press message to favorite';
+
+  @override
+  String get newNote => 'New Note';
+
+  @override
+  String get favoriteLink => 'Favorite Link';
+
+  @override
+  String get editTags => 'Edit Tags';
+
+  @override
+  String get deleteFavorite => 'Delete Favorite';
+
+  @override
+  String get deleteFavoriteConfirm => 'Are you sure you want to delete this favorite?';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String daysAgoText(int count) {
+    return '$count days ago';
+  }
+
+  @override
+  String dateFormat(int month, int day) {
+    return 'M$month D$day';
+  }
+
+  @override
+  String get noSearchResultsFound => 'No results found';
+
+  @override
+  String get searchMembers => 'Search members';
+
+  @override
+  String get inviteMembers => 'Invite Members';
+
+  @override
+  String get selectMembers => 'Select Members';
+
+  @override
+  String get noMembersToAdd => 'No members to add';
+
+  @override
+  String get cannotRemoveOwner => 'Cannot remove group owner';
+
+  @override
+  String get memberRemoved => 'Member removed';
+
+  @override
+  String get memberAdded => 'Member added';
+
+  @override
+  String get scanQrCode => 'Scan QR Code';
+
+  @override
+  String get alignQrCode => 'Align QR code within frame';
+
+  @override
+  String get flashlight => 'Flashlight';
+
+  @override
+  String get album => 'Album';
+
+  @override
+  String get invalidQrCode => 'Invalid QR code';
+
+  @override
+  String get qrCodeScanFailed => 'Failed to scan QR code';
+
+  @override
+  String get searchUser => 'Search User';
+
+  @override
+  String get addByIdSearch => 'Add by ID Search';
+
+  @override
+  String get enterN42Id => 'Enter N42 ID';
+
+  @override
+  String get chatRecalled => 'recalled a message';
+
+  @override
+  String get systemMessage => 'System Message';
+
+  @override
+  String get setStatus => 'Set Status';
+
+  @override
+  String get visibleToFriends24h => 'Visible to friends for 24 hours';
+
+  @override
+  String get writeStatus => 'Write Status';
+
+  @override
+  String get moodAndThoughts => 'Mood & Thoughts';
+
+  @override
+  String get workAndStudy => 'Work & Study';
+
+  @override
+  String get rest => 'Rest';
+
+  @override
+  String get enterYourStatus => 'Enter your status...';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get statusHappy => 'Happy';
+
+  @override
+  String get statusCracked => 'Shattered';
+
+  @override
+  String get statusLucky => 'Lucky';
+
+  @override
+  String get statusSunny => 'Sunny';
+
+  @override
+  String get statusTired => 'Tired';
+
+  @override
+  String get statusDaydream => 'Daydream';
+
+  @override
+  String get statusRushing => 'Rushing';
+
+  @override
+  String get statusOverthinking => 'Overthinking';
+
+  @override
+  String get statusEnergized => 'Energized';
+
+  @override
+  String get statusWorking => 'Working';
+
+  @override
+  String get statusStudying => 'Studying';
+
+  @override
+  String get statusBusy => 'Busy';
+
+  @override
+  String get statusSlacking => 'Slacking';
+
+  @override
+  String get statusTraveling => 'Traveling';
+
+  @override
+  String get statusGoingHome => 'Going Home';
+
+  @override
+  String get statusDnd => 'Do Not Disturb';
+
+  @override
+  String get statusHanging => 'Hanging Out';
+
+  @override
+  String get statusCheckIn => 'Check In';
+
+  @override
+  String get statusExercising => 'Exercising';
+
+  @override
+  String get statusCoffee => 'Coffee';
+
+  @override
+  String get statusBubbleTea => 'Bubble Tea';
+
+  @override
+  String get statusEating => 'Eating';
+
+  @override
+  String get statusParenting => 'Parenting';
+
+  @override
+  String get statusSavingWorld => 'Saving World';
+
+  @override
+  String get statusSelfie => 'Selfie';
+
+  @override
+  String get statusRetreat => 'Retreat';
+
+  @override
+  String get statusHome => 'Home';
+
+  @override
+  String get statusSleeping => 'Sleeping';
+
+  @override
+  String get statusCatLover => 'Cat Lover';
+
+  @override
+  String get statusDogWalking => 'Walking Dog';
+
+  @override
+  String get statusGaming => 'Gaming';
+
+  @override
+  String get statusListening => 'Listening';
+
+  @override
+  String get cameraPermissionRequired => 'Camera permission is required to scan QR code';
+
+  @override
+  String get cameraPermissionDenied => 'Camera permission was permanently denied. Please enable it in system settings.';
+
+  @override
+  String get cannotGetCameraPermission => 'Cannot get camera permission';
+
+  @override
+  String permissionCheckError(String error) {
+    return 'Error checking permission: $error';
+  }
+
+  @override
+  String get checkingCameraPermission => 'Checking camera permission...';
+
+  @override
+  String get needCameraPermission => 'Camera Permission Required';
+
+  @override
+  String get retryPermission => 'Retry';
+
+  @override
+  String get openSettings => 'Open Settings';
+
+  @override
+  String get manualInputUserId => 'Manual Input User ID';
+
+  @override
+  String get closeManualInput => 'Close Manual Input';
+
+  @override
+  String get cameraStartFailed => 'Camera failed to start';
+
+  @override
+  String get unknownError => 'Unknown error';
+
+  @override
+  String get placeQrCodeInFrame => 'Place QR code within the frame to scan';
+
+  @override
+  String cannotAddFriend(String error) {
+    return 'Cannot add friend: $error';
+  }
+
+  @override
+  String qrCodeProcessFailed(String error) {
+    return 'Failed to process QR code: $error';
+  }
+
+  @override
+  String get add => 'Add';
 }

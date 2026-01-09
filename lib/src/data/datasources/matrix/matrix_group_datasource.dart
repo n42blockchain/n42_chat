@@ -263,9 +263,29 @@ class MatrixGroupDataSource {
   bool canChangeSettings(String roomId) {
     final room = _client?.getRoomById(roomId);
     if (room == null) return false;
+
     // 检查是否可以发送 m.room.name 状态事件
-    // 如果可以更改名称，通常也可以更改其他设置
-    return room.canSendEvent('m.room.name');
+    final canSendNameEvent = room.canSendEvent('m.room.name');
+    debugPrint('canChangeSettings: roomId=$roomId, canSendEvent(m.room.name)=$canSendNameEvent');
+
+    // 如果 SDK 说可以，直接返回 true
+    if (canSendNameEvent) return true;
+
+    // 作为备选，检查用户的权限级别
+    // 管理员(100)、版主(50+)通常可以修改群设置
+    try {
+      final userId = _client?.userID;
+      if (userId != null) {
+        final powerLevel = room.getPowerLevelByUserId(userId);
+        debugPrint('canChangeSettings: userId=$userId, powerLevel=$powerLevel');
+        // 权限级别 >= 50 通常表示版主或管理员
+        if (powerLevel >= 50) return true;
+      }
+    } catch (e) {
+      debugPrint('canChangeSettings: Error checking power level: $e');
+    }
+
+    return false;
   }
 
   // ============================================

@@ -140,7 +140,16 @@ abstract class IMessageRepository {
     required String pollEventId,
     required List<String> selectedOptionIds,
   });
-  
+
+  /// 获取投票聚合结果
+  Future<Map<String, dynamic>?> getPollAggregations(
+    String roomId,
+    String pollEventId,
+  );
+
+  /// 监听投票响应事件
+  Stream<Map<String, dynamic>>? watchPollResponses(String roomId);
+
   /// 发送自定义消息（红包、转账等）
   Future<String?> sendCustomMessage(
     String roomId, {

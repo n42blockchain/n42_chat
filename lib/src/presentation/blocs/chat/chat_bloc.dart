@@ -13,8 +13,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final IMessageRepository _messageRepository;
 
   StreamSubscription<List<MessageEntity>>? _messagesSubscription;
+  StreamSubscription<Map<String, dynamic>>? _pollResponsesSubscription;
   String? _currentRoomId;
-  
+
   // 已本地删除的消息ID集合（防止被消息订阅恢复）
   final Set<String> _locallyDeletedMessageIds = {};
 
@@ -48,6 +49,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendPokeMessage>(_onSendPokeMessage);
     on<SendPollMessage>(_onSendPollMessage);
     on<VoteOnPoll>(_onVoteOnPoll);
+    on<PollResponseReceived>(_onPollResponseReceived);
+    on<PollEnded>(_onPollEnded);
     on<SendCustomMessage>(_onSendCustomMessage);
     on<ClearChatHistory>(_onClearChatHistory);
   }
@@ -55,6 +58,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   @override
   Future<void> close() {
     _messagesSubscription?.cancel();
+    _pollResponsesSubscription?.cancel();
     return super.close();
   }
 
@@ -70,6 +74,39 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     // 加载消息并订阅更新
     add(LoadMessages(event.roomId));
     add(const SubscribeMessages());
+
+    // 订阅投票响应事件
+    _subscribeToPollResponses(event.roomId);
+  }
+
+  /// 订阅投票响应事件
+  void _subscribeToPollResponses(String roomId) {
+    _pollResponsesSubscription?.cancel();
+    final stream = _messageRepository.watchPollResponses(roomId);
+    if (stream == null) return;
+
+    _pollResponsesSubscription = stream.listen((response) {
+      final type = response['type'] as String?;
+      final pollEventId = response['pollEventId'] as String?;
+
+      if (pollEventId == null) return;
+
+      if (type == 'vote') {
+        final answers = (response['answers'] as List<dynamic>?)
+            ?.cast<String>() ?? [];
+        final senderId = response['senderId'] as String? ?? '';
+        final isCurrentUser = response['isCurrentUser'] as bool? ?? false;
+
+        add(PollResponseReceived(
+          pollEventId: pollEventId,
+          selectedOptionIds: answers,
+          senderId: senderId,
+          isCurrentUser: isCurrentUser,
+        ));
+      } else if (type == 'end') {
+        add(PollEnded(pollEventId: pollEventId));
+      }
+    });
   }
 
   /// 加载消息
@@ -85,7 +122,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
       // 保留之前的 reactions（服务器聚合可能需要时间）
       final currentMessages = state.messages;
-      final mergedMessages = messages.map((newMsg) {
+      var mergedMessages = messages.map((newMsg) {
         final currentMsg = currentMessages.firstWhere(
           (m) => m.id == newMsg.id,
           orElse: () => newMsg,
@@ -113,6 +150,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         return newMsg;
       }).toList();
 
+      // 获取投票消息的聚合结果
+      mergedMessages = await _loadPollAggregations(event.roomId, mergedMessages);
+
       emit(state.copyWith(
         messages: mergedMessages,
         isLoading: false,
@@ -129,6 +169,74 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         error: 'Failed to load messages: ${e.toString()}',
       ));
     }
+  }
+
+  /// 加载投票消息的聚合结果
+  Future<List<MessageEntity>> _loadPollAggregations(
+    String roomId,
+    List<MessageEntity> messages,
+  ) async {
+    final pollMessages = messages.where((m) => m.type == MessageType.poll).toList();
+    if (pollMessages.isEmpty) return messages;
+
+    final updatedMessages = List<MessageEntity>.from(messages);
+
+    for (final pollMsg in pollMessages) {
+      try {
+        final aggregations = await _messageRepository.getPollAggregations(
+          roomId,
+          pollMsg.id,
+        );
+
+        if (aggregations != null) {
+          final voteCounts = (aggregations['voteCounts'] as Map<String, dynamic>?)
+              ?.cast<String, int>() ?? {};
+          final totalVoters = aggregations['totalVoters'] as int? ?? 0;
+          final myVotes = (aggregations['myVotes'] as List<dynamic>?)
+              ?.cast<String>() ?? [];
+          final pollEnded = aggregations['pollEnded'] as bool? ?? false;
+
+          final index = updatedMessages.indexWhere((m) => m.id == pollMsg.id);
+          if (index != -1 && pollMsg.metadata != null) {
+            final oldMetadata = pollMsg.metadata!;
+            updatedMessages[index] = pollMsg.copyWith(
+              metadata: MessageMetadata(
+                pollQuestion: oldMetadata.pollQuestion,
+                pollOptions: oldMetadata.pollOptions,
+                pollOptionIds: oldMetadata.pollOptionIds,
+                maxSelections: oldMetadata.maxSelections,
+                pollEnded: pollEnded,
+                voteCounts: voteCounts,
+                totalVoters: totalVoters,
+                myVotes: myVotes,
+                mediaUrl: oldMetadata.mediaUrl,
+                httpUrl: oldMetadata.httpUrl,
+                thumbnailUrl: oldMetadata.thumbnailUrl,
+                mimeType: oldMetadata.mimeType,
+                size: oldMetadata.size,
+                width: oldMetadata.width,
+                height: oldMetadata.height,
+                duration: oldMetadata.duration,
+                fileName: oldMetadata.fileName,
+                isPlayed: oldMetadata.isPlayed,
+                waveform: oldMetadata.waveform,
+                latitude: oldMetadata.latitude,
+                longitude: oldMetadata.longitude,
+                locationName: oldMetadata.locationName,
+                amount: oldMetadata.amount,
+                token: oldMetadata.token,
+                transferStatus: oldMetadata.transferStatus,
+                txHash: oldMetadata.txHash,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        debugPrint('ChatBloc: Failed to load poll aggregations for ${pollMsg.id}: $e');
+      }
+    }
+
+    return updatedMessages;
   }
 
   /// 加载更多历史消息
@@ -846,7 +954,119 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       }
     }
   }
-  
+
+  /// 处理投票响应接收事件（来自其他用户的投票）
+  Future<void> _onPollResponseReceived(
+    PollResponseReceived event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (isClosed) return;
+
+    // 如果是当前用户的投票，已在 _onVoteOnPoll 中处理
+    if (event.isCurrentUser) return;
+
+    debugPrint('ChatBloc: Poll response received - poll: ${event.pollEventId}, from: ${event.senderId}');
+
+    final updatedMessages = state.messages.map((msg) {
+      if (msg.id == event.pollEventId && msg.metadata != null) {
+        final oldMetadata = msg.metadata!;
+        final newVoteCounts = Map<String, int>.from(oldMetadata.voteCounts ?? {});
+
+        // 更新选中选项的票数
+        for (final optionId in event.selectedOptionIds) {
+          newVoteCounts[optionId] = (newVoteCounts[optionId] ?? 0) + 1;
+        }
+
+        // 计算新的总投票人数
+        final totalVoters = (oldMetadata.totalVoters ?? 0) + 1;
+
+        return msg.copyWith(
+          metadata: MessageMetadata(
+            pollQuestion: oldMetadata.pollQuestion,
+            pollOptions: oldMetadata.pollOptions,
+            pollOptionIds: oldMetadata.pollOptionIds,
+            maxSelections: oldMetadata.maxSelections,
+            pollEnded: oldMetadata.pollEnded,
+            voteCounts: newVoteCounts,
+            totalVoters: totalVoters,
+            myVotes: oldMetadata.myVotes,
+            mediaUrl: oldMetadata.mediaUrl,
+            httpUrl: oldMetadata.httpUrl,
+            thumbnailUrl: oldMetadata.thumbnailUrl,
+            mimeType: oldMetadata.mimeType,
+            size: oldMetadata.size,
+            width: oldMetadata.width,
+            height: oldMetadata.height,
+            duration: oldMetadata.duration,
+            fileName: oldMetadata.fileName,
+            isPlayed: oldMetadata.isPlayed,
+            waveform: oldMetadata.waveform,
+            latitude: oldMetadata.latitude,
+            longitude: oldMetadata.longitude,
+            locationName: oldMetadata.locationName,
+            amount: oldMetadata.amount,
+            token: oldMetadata.token,
+            transferStatus: oldMetadata.transferStatus,
+            txHash: oldMetadata.txHash,
+          ),
+        );
+      }
+      return msg;
+    }).toList();
+
+    emit(state.copyWith(messages: updatedMessages));
+  }
+
+  /// 处理投票结束事件
+  Future<void> _onPollEnded(
+    PollEnded event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (isClosed) return;
+
+    debugPrint('ChatBloc: Poll ended - poll: ${event.pollEventId}');
+
+    final updatedMessages = state.messages.map((msg) {
+      if (msg.id == event.pollEventId && msg.metadata != null) {
+        final oldMetadata = msg.metadata!;
+
+        return msg.copyWith(
+          metadata: MessageMetadata(
+            pollQuestion: oldMetadata.pollQuestion,
+            pollOptions: oldMetadata.pollOptions,
+            pollOptionIds: oldMetadata.pollOptionIds,
+            maxSelections: oldMetadata.maxSelections,
+            pollEnded: true,
+            voteCounts: oldMetadata.voteCounts,
+            totalVoters: oldMetadata.totalVoters,
+            myVotes: oldMetadata.myVotes,
+            mediaUrl: oldMetadata.mediaUrl,
+            httpUrl: oldMetadata.httpUrl,
+            thumbnailUrl: oldMetadata.thumbnailUrl,
+            mimeType: oldMetadata.mimeType,
+            size: oldMetadata.size,
+            width: oldMetadata.width,
+            height: oldMetadata.height,
+            duration: oldMetadata.duration,
+            fileName: oldMetadata.fileName,
+            isPlayed: oldMetadata.isPlayed,
+            waveform: oldMetadata.waveform,
+            latitude: oldMetadata.latitude,
+            longitude: oldMetadata.longitude,
+            locationName: oldMetadata.locationName,
+            amount: oldMetadata.amount,
+            token: oldMetadata.token,
+            transferStatus: oldMetadata.transferStatus,
+            txHash: oldMetadata.txHash,
+          ),
+        );
+      }
+      return msg;
+    }).toList();
+
+    emit(state.copyWith(messages: updatedMessages));
+  }
+
   /// 发送自定义消息（红包、转账等）
   Future<void> _onSendCustomMessage(
     SendCustomMessage event,

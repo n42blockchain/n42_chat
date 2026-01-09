@@ -113,9 +113,12 @@ class _ChatPageState extends State<ChatPage> {
   
   // 备注更新订阅
   StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
-  
+
   // 私聊对方的用户ID（用于获取备注名）
   String? _otherUserId;
+
+  // 投票防抖 - 正在投票的pollId集合
+  final Set<String> _votingPollIds = {};
 
   @override
   void initState() {
@@ -2155,20 +2158,41 @@ ID：$contactId''';
   
   /// 投票选项点击
   void _onPollVote(String pollEventId, String optionId) {
+    // 防止重复投票 - 如果正在处理投票，忽略新的点击
+    if (_votingPollIds.contains(pollEventId)) {
+      debugPrint('ChatPage: Ignoring duplicate vote on poll $pollEventId');
+      return;
+    }
+
     debugPrint('ChatPage: Voting on poll $pollEventId, option: $optionId');
-    
+
+    // 标记正在投票
+    setState(() {
+      _votingPollIds.add(pollEventId);
+    });
+
     context.read<ChatBloc>().add(VoteOnPoll(
       pollEventId: pollEventId,
       selectedOptionIds: [optionId],
     ));
-    
+
+    final s = S.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('已投票'),
-        duration: Duration(seconds: 1),
+      SnackBar(
+        content: Text(s?.voted ?? 'Voted'),
+        duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
       ),
     );
+
+    // 延迟后解除投票锁定
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _votingPollIds.remove(pollEventId);
+        });
+      }
+    });
   }
   
   /// 结束投票
@@ -3065,10 +3089,12 @@ ID：$contactId''';
           Navigator.pop(ctx);
           context.read<ChatBloc>().add(SetReplyTarget(message));
         },
-        onForward: () {
-          Navigator.pop(ctx);
-          // TODO: 转发消息
-        },
+        onForward: (message.type == MessageType.redPacket || message.type == MessageType.transfer)
+            ? null
+            : () {
+                Navigator.pop(ctx);
+                _forwardMessage(message);
+              },
         onDelete: message.isFromMe
             ? () {
                 Navigator.pop(ctx);
@@ -3405,21 +3431,39 @@ ID：$contactId''';
           final fileUrl = message.metadata?.mediaUrl;
           final httpUrl = message.metadata?.httpUrl;
           final fileName = message.metadata?.fileName ?? message.content;
-          debugPrint('Forward file: mediaUrl=$fileUrl, httpUrl=$httpUrl, fileName=$fileName');
+          final originalSize = message.metadata?.size;
+          debugPrint('Forward file: mediaUrl=$fileUrl, httpUrl=$httpUrl, fileName=$fileName, originalSize=$originalSize');
 
           // 尝试使用 mediaUrl 或 httpUrl 下载
           Uint8List? fileBytes;
-          if (fileUrl != null) {
+          if (fileUrl != null && fileUrl.isNotEmpty) {
             debugPrint('Downloading file from mxc URL: $fileUrl');
             fileBytes = await messageRepository.downloadMedia(fileUrl);
+            debugPrint('Download result from mxc: ${fileBytes?.length ?? 0} bytes');
           }
 
-          if (fileBytes == null && httpUrl != null) {
+          if (fileBytes == null && httpUrl != null && httpUrl.isNotEmpty) {
             debugPrint('Fallback: downloading from HTTP URL: $httpUrl');
             try {
-              final response = await http.get(Uri.parse(httpUrl));
+              // Matrix 1.11+ 需要认证的媒体访问，需要添加 Authorization header
+              final headers = <String, String>{};
+              final client = getIt<IMessageRepository>();
+              // 尝试获取 access token
+              try {
+                final matrixClient = getIt<MatrixClientManager>().client;
+                if (matrixClient?.accessToken != null) {
+                  headers['Authorization'] = 'Bearer ${matrixClient!.accessToken}';
+                }
+              } catch (e) {
+                debugPrint('Could not get access token: $e');
+              }
+
+              final response = await http.get(Uri.parse(httpUrl), headers: headers);
               if (response.statusCode == 200) {
                 fileBytes = response.bodyBytes;
+                debugPrint('Download result from http: ${fileBytes.length} bytes');
+              } else {
+                debugPrint('HTTP download failed with status: ${response.statusCode}');
               }
             } catch (e) {
               debugPrint('HTTP download failed: $e');
@@ -3428,6 +3472,10 @@ ID：$contactId''';
 
           if (fileBytes != null && fileBytes.isNotEmpty) {
             debugPrint('File downloaded successfully, size: ${fileBytes.length}');
+            // 验证文件大小是否正确
+            if (originalSize != null && fileBytes.length != originalSize) {
+              debugPrint('Warning: Downloaded file size (${fileBytes.length}) differs from original ($originalSize)');
+            }
             await messageRepository.sendFileMessage(
               targetRoomId,
               fileBytes: fileBytes,
@@ -3435,11 +3483,9 @@ ID：$contactId''';
               mimeType: message.metadata?.mimeType,
             );
           } else {
-            debugPrint('File download failed, sending as text');
-            await messageRepository.sendTextMessage(
-              targetRoomId,
-              '[文件] $fileName',
-            );
+            debugPrint('File download failed, cannot forward file');
+            // 不再发送文本替代，而是抛出异常让用户知道转发失败
+            throw Exception('Unable to download file for forwarding');
           }
           break;
 
@@ -4186,12 +4232,13 @@ class _MessageMenuSheet extends StatelessWidget {
               title: '回复',
               onTap: onReply,
             ),
-            _buildMenuItem(
-              context,
-              icon: Icons.forward,
-              title: '转发',
-              onTap: onForward,
-            ),
+            if (onForward != null)
+              _buildMenuItem(
+                context,
+                icon: Icons.forward,
+                title: '转发',
+                onTap: onForward,
+              ),
             if (onDelete != null)
               _buildMenuItem(
                 context,

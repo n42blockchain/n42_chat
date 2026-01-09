@@ -50,15 +50,19 @@ class ConversationListPage extends StatefulWidget {
 class _ConversationListPageState extends State<ConversationListPage> {
   // 备注更新订阅
   StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
-  
+  // 保存 Bloc 引用，避免在 dispose 中访问 context
+  late ConversationBloc _conversationBloc;
+
   @override
   void initState() {
     super.initState();
+    // 保存 Bloc 引用
+    _conversationBloc = context.read<ConversationBloc>();
     // 加载并订阅会话列表
-    context.read<ConversationBloc>()
+    _conversationBloc
       ..add(const LoadConversations())
       ..add(const SubscribeConversations());
-      
+
     // 监听备注更新
     _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
       // 当备注更新时刷新列表
@@ -72,8 +76,8 @@ class _ConversationListPageState extends State<ConversationListPage> {
   void dispose() {
     // 取消备注更新订阅
     _remarkSubscription?.cancel();
-    // 取消会话订阅
-    context.read<ConversationBloc>().add(const UnsubscribeConversations());
+    // 取消会话订阅（使用保存的引用）
+    _conversationBloc.add(const UnsubscribeConversations());
     super.dispose();
   }
 
