@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 欢迎页面
@@ -29,12 +30,12 @@ class WelcomePage extends StatelessWidget {
               const Spacer(flex: 2),
 
               // Logo和标题
-              _buildHeader(isDark),
+              _buildHeader(context, isDark),
 
               const Spacer(flex: 3),
 
               // 特性列表
-              _buildFeatures(isDark),
+              _buildFeatures(context, isDark),
 
               const Spacer(flex: 2),
 
@@ -44,7 +45,7 @@ class WelcomePage extends StatelessWidget {
               const SizedBox(height: 32),
 
               // 协议
-              _buildAgreement(isDark),
+              _buildAgreement(context, isDark),
 
               const SizedBox(height: 24),
             ],
@@ -54,7 +55,7 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(bool isDark) {
+  Widget _buildHeader(BuildContext context, bool isDark) {
     return Column(
       children: [
         Container(
@@ -95,7 +96,7 @@ class WelcomePage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          '安全、去中心化的即时通讯',
+          S.of(context)?.secureDecentralizedChat ?? 'Secure, decentralized messaging',
           style: TextStyle(
             fontSize: 16,
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -105,27 +106,27 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatures(bool isDark) {
+  Widget _buildFeatures(BuildContext context, bool isDark) {
     return Column(
       children: [
         _FeatureItem(
           icon: Icons.security,
-          title: '端对端加密',
-          description: '消息仅你和对方可见',
+          title: S.of(context)?.endToEndEncryption ?? 'End-to-end encryption',
+          description: S.of(context)?.messagesOnlyYouCanSee ?? 'Messages visible only to you and the recipient',
           isDark: isDark,
         ),
         const SizedBox(height: 20),
         _FeatureItem(
           icon: Icons.public,
-          title: '去中心化',
-          description: '基于Matrix开放协议',
+          title: S.of(context)?.decentralized ?? 'Decentralized',
+          description: S.of(context)?.basedOnMatrix ?? 'Built on the Matrix open protocol',
           isDark: isDark,
         ),
         const SizedBox(height: 20),
         _FeatureItem(
           icon: Icons.account_balance_wallet,
-          title: '钱包集成',
-          description: '轻松进行加密货币转账',
+          title: S.of(context)?.walletIntegration ?? 'Wallet Integration',
+          description: S.of(context)?.easyCryptoTransfer ?? 'Easy cryptocurrency transfers',
           isDark: isDark,
         ),
       ],
@@ -148,9 +149,9 @@ class WelcomePage extends StatelessWidget {
               ),
               elevation: 0,
             ),
-            child: const Text(
-              '登录',
-              style: TextStyle(
+            child: Text(
+              S.of(context)?.login ?? 'Log In',
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
@@ -173,9 +174,9 @@ class WelcomePage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(25),
               ),
             ),
-            child: const Text(
-              '注册',
-              style: TextStyle(
+            child: Text(
+              S.of(context)?.register ?? 'Sign Up',
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,
@@ -187,29 +188,29 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildAgreement(bool isDark) {
+  Widget _buildAgreement(BuildContext context, bool isDark) {
     return Text.rich(
       TextSpan(
-        text: '登录即表示同意',
+        text: S.of(context)?.agreeTerms ?? 'By logging in, you agree to ',
         style: TextStyle(
           fontSize: 12,
           color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
         ),
         children: [
           TextSpan(
-            text: '《服务协议》',
+            text: S.of(context)?.termsOfService ?? 'Terms of Service',
             style: TextStyle(
               color: AppColors.textLink.withValues(alpha: 0.8),
             ),
           ),
           TextSpan(
-            text: '和',
+            text: ' ${S.of(context)?.and ?? 'and'} ',
             style: TextStyle(
               color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
           ),
           TextSpan(
-            text: '《隐私政策》',
+            text: S.of(context)?.privacyPolicy ?? 'Privacy Policy',
             style: TextStyle(
               color: AppColors.textLink.withValues(alpha: 0.8),
             ),

@@ -1183,6 +1183,76 @@ class MatrixMessageDataSource {
     }
   }
 
+  /// 获取投票的聚合结果
+  Future<Map<String, dynamic>?> getPollAggregations(String roomId, String pollEventId) async {
+    try {
+      final room = _client?.getRoomById(roomId);
+      if (room == null) return null;
+
+      // 使用 Matrix API 获取事件关系
+      final response = await _client!.request(
+        matrix.RequestType.GET,
+        '/client/v1/rooms/${Uri.encodeComponent(roomId)}/relations/${Uri.encodeComponent(pollEventId)}/m.reference',
+      );
+
+      if (response is Map<String, dynamic>) {
+        final voteCounts = <String, int>{};
+        final voters = <String>{};
+        final myVotes = <String>[];
+        bool pollEnded = false;
+
+        final chunk = response['chunk'] as List<dynamic>?;
+        if (chunk != null) {
+          for (final item in chunk) {
+            if (item is Map<String, dynamic>) {
+              final itemType = item['type'] as String?;
+              if (itemType == 'org.matrix.msc3381.poll.response') {
+                final content = item['content'] as Map<String, dynamic>?;
+                final pollResponse = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
+                if (pollResponse != null) {
+                  final selectedAnswers = pollResponse['answers'] as List<dynamic>?;
+                  final senderId = item['sender'] as String?;
+
+                  if (selectedAnswers != null && senderId != null) {
+                    voters.add(senderId);
+
+                    for (final answerId in selectedAnswers) {
+                      if (answerId is String) {
+                        voteCounts[answerId] = (voteCounts[answerId] ?? 0) + 1;
+                      }
+                    }
+
+                    if (senderId == _client?.userID) {
+                      myVotes.clear();
+                      for (final answerId in selectedAnswers) {
+                        if (answerId is String) {
+                          myVotes.add(answerId);
+                        }
+                      }
+                    }
+                  }
+                }
+              } else if (itemType == 'org.matrix.msc3381.poll.end') {
+                pollEnded = true;
+              }
+            }
+          }
+        }
+
+        return {
+          'voteCounts': voteCounts,
+          'totalVoters': voters.length,
+          'myVotes': myVotes,
+          'pollEnded': pollEnded,
+        };
+      }
+      return null;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to get poll aggregations: $e');
+      return null;
+    }
+  }
+
   // ============================================
   // 消息监听
   // ============================================
@@ -1195,6 +1265,39 @@ class MatrixMessageDataSource {
     }).map((eventUpdate) {
       final room = _client!.getRoomById(roomId)!;
       return matrix.Event.fromJson(eventUpdate.content, room);
+    });
+  }
+
+  /// 监听投票响应事件
+  Stream<Map<String, dynamic>>? watchPollResponses(String roomId) {
+    return _client?.onEvent.stream.where((eventUpdate) {
+      return eventUpdate.roomID == roomId &&
+          (eventUpdate.content['type'] == 'org.matrix.msc3381.poll.response' ||
+           eventUpdate.content['type'] == 'org.matrix.msc3381.poll.end');
+    }).map((eventUpdate) {
+      final content = eventUpdate.content;
+      final type = content['type'] as String;
+      final relatesTo = content['content']?['m.relates_to'] as Map<String, dynamic>?;
+      final pollEventId = relatesTo?['event_id'] as String?;
+
+      if (type == 'org.matrix.msc3381.poll.response') {
+        final pollResponse = content['content']?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
+        final answers = pollResponse?['answers'] as List<dynamic>?;
+        final senderId = content['sender'] as String?;
+
+        return {
+          'type': 'vote',
+          'pollEventId': pollEventId,
+          'answers': answers ?? [],
+          'senderId': senderId,
+          'isCurrentUser': senderId == _client?.userID,
+        };
+      } else {
+        return {
+          'type': 'end',
+          'pollEventId': pollEventId,
+        };
+      }
     });
   }
 

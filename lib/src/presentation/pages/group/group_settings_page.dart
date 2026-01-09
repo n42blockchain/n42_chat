@@ -156,7 +156,19 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
-                  onTap: group.canChangeSettings ? () => _editGroupName(group) : null,
+                  onTap: () {
+                    debugPrint('Group name tapped: canChangeSettings=${group.canChangeSettings}, myRole=${group.myRole}');
+                    if (group.canChangeSettings) {
+                      _editGroupName(group);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(S.of(context)?.noPermissionToEditGroupName ?? 'You do not have permission to edit group name'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
                   child: Row(
                     children: [
                       Flexible(
@@ -170,16 +182,14 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      if (group.canChangeSettings) ...[
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.edit,
-                          size: 16,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
-                        ),
-                      ],
+                      const SizedBox(width: 4),
+                      Icon(
+                        group.canChangeSettings ? Icons.edit : Icons.lock_outline,
+                        size: 16,
+                        color: isDark
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textSecondary,
+                      ),
                     ],
                   ),
                 ),

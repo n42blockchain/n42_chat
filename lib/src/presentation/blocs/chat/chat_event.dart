@@ -314,6 +314,34 @@ class VoteOnPoll extends ChatEvent {
   List<Object?> get props => [pollEventId, selectedOptionIds];
 }
 
+/// 投票响应接收事件（从其他用户或服务器同步）
+class PollResponseReceived extends ChatEvent {
+  final String pollEventId;
+  final List<String> selectedOptionIds;
+  final String senderId;
+  final bool isCurrentUser;
+
+  const PollResponseReceived({
+    required this.pollEventId,
+    required this.selectedOptionIds,
+    required this.senderId,
+    required this.isCurrentUser,
+  });
+
+  @override
+  List<Object?> get props => [pollEventId, selectedOptionIds, senderId, isCurrentUser];
+}
+
+/// 投票结束事件
+class PollEnded extends ChatEvent {
+  final String pollEventId;
+
+  const PollEnded({required this.pollEventId});
+
+  @override
+  List<Object?> get props => [pollEventId];
+}
+
 /// 发送自定义消息（红包、转账等）
 class SendCustomMessage extends ChatEvent {
   final String content;

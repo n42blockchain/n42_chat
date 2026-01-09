@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
@@ -198,14 +199,15 @@ class WeChatMessageMenu extends StatelessWidget {
                       onSave?.call();
                     },
                   ),
-                _buildMenuItem(
-                  icon: Icons.shortcut_outlined,
-                  label: 'Forward',
-                  onTap: () {
-                    onDismiss();
-                    onForward?.call();
-                  },
-                ),
+                if (onForward != null)
+                  _buildMenuItem(
+                    icon: Icons.shortcut_outlined,
+                    label: 'Forward',
+                    onTap: () {
+                      onDismiss();
+                      onForward?.call();
+                    },
+                  ),
                 _buildMenuItem(
                   icon: isFavorited ? Icons.star : Icons.star_border_outlined,
                   label: isFavorited ? 'Unfav' : 'Favorite',
@@ -541,11 +543,11 @@ class _RecallConfirmSheet extends StatelessWidget {
   }
 }
 
-/// 微信风格的撤回消息提示
+/// WeChat-style recalled message widget
 class RecalledMessageWidget extends StatelessWidget {
   final bool isFromMe;
   final VoidCallback? onReEdit;
-  
+
   const RecalledMessageWidget({
     super.key,
     this.isFromMe = true,
@@ -556,7 +558,8 @@ class RecalledMessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.grey[500] : Colors.grey[600];
-    
+    final s = S.of(context);
+
     return Center(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -565,7 +568,9 @@ class RecalledMessageWidget extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text(
-              isFromMe ? 'You recalled a message' : 'Message recalled',
+              isFromMe
+                  ? (s?.youRecalledMessage ?? 'You recalled a message')
+                  : (s?.messageRecalled ?? 'Message recalled'),
               style: TextStyle(
                 fontSize: 12,
                 color: textColor,
@@ -576,7 +581,7 @@ class RecalledMessageWidget extends StatelessWidget {
               GestureDetector(
                 onTap: onReEdit,
                 child: Text(
-                  'Re-edit',
+                  s?.reEdit ?? 'Re-edit',
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark ? const Color(0xFF57A5FF) : const Color(0xFF576B95),

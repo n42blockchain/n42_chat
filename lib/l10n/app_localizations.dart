@@ -62,7 +62,8 @@ import 'app_localizations_zh.dart';
 /// be consistent with the languages listed in the S.supportedLocales
 /// property.
 abstract class S {
-  S(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  S(String locale)
+      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -82,7 +83,8 @@ abstract class S {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -803,6 +805,66 @@ abstract class S {
   /// **'添加好友'**
   String get addFriend;
 
+  /// No description provided for @chatServiceNotConnected.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天服务未连接'**
+  String get chatServiceNotConnected;
+
+  /// No description provided for @userNotFoundHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到用户 \"{query}\"\n\n提示：\n• 尝试输入完整用户ID，如 @username:server.com\n• 确认用户名拼写正确'**
+  String userNotFoundHint(String query);
+
+  /// No description provided for @createChatFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建会话失败: {error}'**
+  String createChatFailed(String error);
+
+  /// No description provided for @searchFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索失败: {error}'**
+  String searchFailed(String error);
+
+  /// No description provided for @enterUserIdOrUsername.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入用户 ID 或用户名搜索'**
+  String get enterUserIdOrUsername;
+
+  /// No description provided for @searching.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索中...'**
+  String get searching;
+
+  /// No description provided for @searchUserToChat.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索用户开始聊天'**
+  String get searchUserToChat;
+
+  /// No description provided for @matrixIdExample.
+  ///
+  /// In zh, this message translates to:
+  /// **'可以输入完整的 Matrix ID\n例如: @user:matrix.n42.network'**
+  String get matrixIdExample;
+
+  /// No description provided for @userNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到用户 \"{username}\"'**
+  String userNotFound(String username);
+
+  /// No description provided for @chat.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天'**
+  String get chat;
+
   /// No description provided for @settings.
   ///
   /// In zh, this message translates to:
@@ -1223,12 +1285,6 @@ abstract class S {
   /// **'外观'**
   String get appearance;
 
-  /// No description provided for @chat.
-  ///
-  /// In zh, this message translates to:
-  /// **'聊天'**
-  String get chat;
-
   /// No description provided for @about.
   ///
   /// In zh, this message translates to:
@@ -1496,7 +1552,7 @@ abstract class S {
   /// No description provided for @usernameHint.
   ///
   /// In zh, this message translates to:
-  /// **'请输入用户名（字母、数字、下划线）'**
+  /// **'3-20字符，字母/数字/_'**
   String get usernameHint;
 
   /// No description provided for @usernameMinLength.
@@ -1504,6 +1560,12 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'用户名至少3个字符'**
   String get usernameMinLength;
+
+  /// No description provided for @usernameMaxLength.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名最多20个字符'**
+  String get usernameMaxLength;
 
   /// No description provided for @usernameFormat.
   ///
@@ -1514,7 +1576,7 @@ abstract class S {
   /// No description provided for @passwordHint.
   ///
   /// In zh, this message translates to:
-  /// **'请输入密码（至少8位）'**
+  /// **'至少8位'**
   String get passwordHint;
 
   /// No description provided for @passwordMinLength.
@@ -2302,6 +2364,12 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'清空'**
   String get clearAction;
+
+  /// No description provided for @chatHistoryCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天记录已清空'**
+  String get chatHistoryCleared;
 
   /// No description provided for @leaveGroupConfirm.
   ///
@@ -3236,7 +3304,7 @@ abstract class S {
   /// No description provided for @selectMessages.
   ///
   /// In zh, this message translates to:
-  /// **'选择消息'**
+  /// **'多选'**
   String get selectMessages;
 
   /// No description provided for @selectedCount.
@@ -3521,6 +3589,288 @@ abstract class S {
   /// **'{count}人'**
   String memberCount(Object count);
 
+  /// No description provided for @videoChannels.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频号'**
+  String get videoChannels;
+
+  /// No description provided for @live.
+  ///
+  /// In zh, this message translates to:
+  /// **'直播'**
+  String get live;
+
+  /// No description provided for @listen.
+  ///
+  /// In zh, this message translates to:
+  /// **'听一听'**
+  String get listen;
+
+  /// No description provided for @watch.
+  ///
+  /// In zh, this message translates to:
+  /// **'看一看'**
+  String get watch;
+
+  /// No description provided for @searchDiscover.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜一搜'**
+  String get searchDiscover;
+
+  /// No description provided for @nearbyPeople.
+  ///
+  /// In zh, this message translates to:
+  /// **'附近的人'**
+  String get nearbyPeople;
+
+  /// No description provided for @games.
+  ///
+  /// In zh, this message translates to:
+  /// **'游戏'**
+  String get games;
+
+  /// No description provided for @miniPrograms.
+  ///
+  /// In zh, this message translates to:
+  /// **'小程序'**
+  String get miniPrograms;
+
+  /// No description provided for @done.
+  ///
+  /// In zh, this message translates to:
+  /// **'完成({count})'**
+  String done(int count);
+
+  /// No description provided for @services.
+  ///
+  /// In zh, this message translates to:
+  /// **'服务'**
+  String get services;
+
+  /// No description provided for @favorites.
+  ///
+  /// In zh, this message translates to:
+  /// **'收藏'**
+  String get favorites;
+
+  /// No description provided for @ordersAndCards.
+  ///
+  /// In zh, this message translates to:
+  /// **'订单卡券'**
+  String get ordersAndCards;
+
+  /// No description provided for @stickers.
+  ///
+  /// In zh, this message translates to:
+  /// **'表情'**
+  String get stickers;
+
+  /// No description provided for @statusSetTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'状态已设置为：{status}'**
+  String statusSetTo(String status);
+
+  /// No description provided for @avatarUploadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'头像上传失败'**
+  String get avatarUploadFailed;
+
+  /// No description provided for @personalProfile.
+  ///
+  /// In zh, this message translates to:
+  /// **'个人信息'**
+  String get personalProfile;
+
+  /// No description provided for @name.
+  ///
+  /// In zh, this message translates to:
+  /// **'名字'**
+  String get name;
+
+  /// No description provided for @gender.
+  ///
+  /// In zh, this message translates to:
+  /// **'性别'**
+  String get gender;
+
+  /// No description provided for @region.
+  ///
+  /// In zh, this message translates to:
+  /// **'地区'**
+  String get region;
+
+  /// No description provided for @myQrCode.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的二维码'**
+  String get myQrCode;
+
+  /// No description provided for @poke.
+  ///
+  /// In zh, this message translates to:
+  /// **'拍一拍'**
+  String get poke;
+
+  /// No description provided for @ringtone.
+  ///
+  /// In zh, this message translates to:
+  /// **'来电铃声'**
+  String get ringtone;
+
+  /// No description provided for @defaultRingtone.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认铃声'**
+  String get defaultRingtone;
+
+  /// No description provided for @ringtoneClear.
+  String get ringtoneClear;
+
+  /// No description provided for @ringtonePhone.
+  String get ringtonePhone;
+
+  /// No description provided for @ringtoneClassic.
+  String get ringtoneClassic;
+
+  /// No description provided for @ringtoneSoft.
+  String get ringtoneSoft;
+
+  /// No description provided for @ringtoneVibrate.
+  String get ringtoneVibrate;
+
+  /// No description provided for @ringtoneSilent.
+  String get ringtoneSilent;
+
+  /// No description provided for @selectRingtone.
+  String get selectRingtone;
+
+  /// No description provided for @stop.
+  String get stop;
+
+  /// No description provided for @loadingRingtones.
+  String get loadingRingtones;
+
+  /// No description provided for @noPermissionToEditGroupName.
+  String get noPermissionToEditGroupName;
+
+  /// No description provided for @myAddresses.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的地址'**
+  String get myAddresses;
+
+  /// No description provided for @genderSetTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'性别已设置为：{gender}'**
+  String genderSetTo(String gender);
+
+  /// No description provided for @selectRegion.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择地区'**
+  String get selectRegion;
+
+  /// No description provided for @selectCity.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择城市'**
+  String get selectCity;
+
+  /// No description provided for @regionSetTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'地区已设置为：{region}'**
+  String regionSetTo(String region);
+
+  /// No description provided for @setPoke.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置拍一拍'**
+  String get setPoke;
+
+  /// No description provided for @friendPokedMe.
+  ///
+  /// In zh, this message translates to:
+  /// **'朋友拍了拍我'**
+  String get friendPokedMe;
+
+  /// No description provided for @enterPokeSuffix.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入拍一拍后缀，如：的肩膀'**
+  String get enterPokeSuffix;
+
+  /// No description provided for @example.
+  ///
+  /// In zh, this message translates to:
+  /// **'示例'**
+  String get example;
+
+  /// No description provided for @onTheShoulder.
+  ///
+  /// In zh, this message translates to:
+  /// **'的肩膀'**
+  String get onTheShoulder;
+
+  /// No description provided for @pokeCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'拍一拍已清除'**
+  String get pokeCleared;
+
+  /// No description provided for @pokeSetTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'拍一拍已设置为：拍了拍我{suffix}'**
+  String pokeSetTo(String suffix);
+
+  /// No description provided for @editSignature.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑个性签名'**
+  String get editSignature;
+
+  /// No description provided for @introduceYourself.
+  ///
+  /// In zh, this message translates to:
+  /// **'一句话介绍自己'**
+  String get introduceYourself;
+
+  /// No description provided for @signatureCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'个性签名已清除'**
+  String get signatureCleared;
+
+  /// No description provided for @signatureUpdated.
+  ///
+  /// In zh, this message translates to:
+  /// **'个性签名已更新'**
+  String get signatureUpdated;
+
+  /// No description provided for @scanToAddFriend.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫一扫上面的二维码图案，加我为好友'**
+  String get scanToAddFriend;
+
+  /// No description provided for @ringtoneSetTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'来电铃声已设置为：{ringtone}'**
+  String ringtoneSetTo(String ringtone);
+
+  /// No description provided for @confirmDissolveGroup.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要解散群聊'**
+  String get confirmDissolveGroup;
+
   /// No description provided for @enterValidServerAddress.
   ///
   /// In zh, this message translates to:
@@ -3548,13 +3898,13 @@ abstract class S {
   /// No description provided for @loginAgreement.
   ///
   /// In zh, this message translates to:
-  /// **'登录即表示您同意'**
+  /// **'登录即表示同意'**
   String get loginAgreement;
 
   /// No description provided for @pleaseAgreeToTerms.
   ///
   /// In zh, this message translates to:
-  /// **'请阅读并同意服务条款和隐私政策'**
+  /// **'请先阅读并同意服务协议和隐私政策'**
   String get pleaseAgreeToTerms;
 
   /// No description provided for @registerFailed.
@@ -3562,18 +3912,6 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'注册失败'**
   String get registerFailed;
-
-  /// No description provided for @enterUsernameFormat.
-  ///
-  /// In zh, this message translates to:
-  /// **'请输入用户名（字母、数字、下划线）'**
-  String get enterUsernameFormat;
-
-  /// No description provided for @enterPasswordMinLength.
-  ///
-  /// In zh, this message translates to:
-  /// **'请输入密码（至少8个字符）'**
-  String get enterPasswordMinLength;
 
   /// No description provided for @reenterPassword.
   ///
@@ -3590,14 +3928,8 @@ abstract class S {
   /// No description provided for @inviteCodeBuiltIn.
   ///
   /// In zh, this message translates to:
-  /// **'邀请码（内置）'**
+  /// **'邀请码（已内置）'**
   String get inviteCodeBuiltIn;
-
-  /// No description provided for @iHaveReadAndAgree.
-  ///
-  /// In zh, this message translates to:
-  /// **'我已阅读并同意'**
-  String get iHaveReadAndAgree;
 
   /// No description provided for @inviteCodeBuiltInNote.
   ///
@@ -3605,78 +3937,371 @@ abstract class S {
   /// **'邀请码已内置，通常无需修改'**
   String get inviteCodeBuiltInNote;
 
-  String get addToHomeScreen;
-  String get allowOthersToSearchAndJoin;
-  String get avatarUploadFailed;
-  String get confirmClearChatHistory;
-  String get confirmDissolveGroup;
-  String get confirmLeaveGroup;
-  String contactCount(int count);
-  String get createGroupInDevelopment;
-  String get createGroupToChat;
-  String get defaultRingtone;
-  String done(int count);
-  String get editGroupAnnouncement;
-  String get editGroupDescription;
-  String get editSignature;
-  String get enterGroupAnnouncement;
-  String get enterPokeSuffix;
-  String get enterRemarkName;
-  String get example;
-  String get favorites;
-  String get friendPokedMe;
-  String get gender;
-  String genderSetTo(String gender);
-  String get groupInvites;
-  String get introduceYourself;
-  String get invitedToJoinGroup;
-  String get leave;
-  String get memberCountClickToCopy;
-  String get myAddresses;
-  String get myGroups;
-  String get myQrCode;
-  String get name;
-  String get onTheShoulder;
-  String get ordersAndCards;
-  String get personalProfile;
-  String get poke;
-  String get pokeCleared;
-  String pokeSetTo(String poke);
-  String recommendedCardTo(String from, String to);
-  String get region;
-  String regionSetTo(String region);
-  String acceptedFriendRequest(String name);
-  String rejectedFriendRequest(String name);
-  String remarkSetTo(String remark);
-  String get ringtone;
-  String ringtoneSetTo(String ringtone);
-  String get scanToAddFriend;
-  String get selectCity;
-  String get selectRegion;
-  String get services;
-  String get setPoke;
-  String get signatureCleared;
-  String get signatureUpdated;
-  String statusSetTo(String status);
-  String get stickers;
+  /// No description provided for @iHaveReadAndAgree.
+  ///
+  /// In zh, this message translates to:
+  /// **'我已阅读并同意'**
+  String get iHaveReadAndAgree;
 
-  // Additional strings for tabs
-  String messagesWithCount(int count);
-
-  // Add menu
+  /// No description provided for @startGroupChat.
+  ///
+  /// In zh, this message translates to:
+  /// **'发起群聊'**
   String get startGroupChat;
+
+  /// No description provided for @addFriends.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加朋友'**
   String get addFriends;
+
+  /// No description provided for @paymentAndCollection.
+  ///
+  /// In zh, this message translates to:
+  /// **'收付款'**
   String get paymentAndCollection;
 
-  // Discover page additional
-  String get videoChannels;
-  String get live;
-  String get listen;
-  String get watch;
-  String get searchDiscover;
-  String get nearbyPeople;
-  String get games;
-  String get miniPrograms;
+  /// No description provided for @messagesWithCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'消息({count})'**
+  String messagesWithCount(int count);
+
+  /// No description provided for @contactCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}位联系人'**
+  String contactCount(int count);
+
+  /// No description provided for @addToHomeScreen.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加到桌面'**
+  String get addToHomeScreen;
+
+  /// No description provided for @recommendedCardTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'已将{contact}的名片推荐给{recipient}'**
+  String recommendedCardTo(String contact, String recipient);
+
+  /// No description provided for @enterRemarkName.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入备注名'**
+  String get enterRemarkName;
+
+  /// No description provided for @remarkSetTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'备注已设置为：{remark}'**
+  String remarkSetTo(String remark);
+
+  /// No description provided for @acceptedFriendRequest.
+  ///
+  /// In zh, this message translates to:
+  /// **'已接受{name}的好友请求'**
+  String acceptedFriendRequest(String name);
+
+  /// No description provided for @rejectedFriendRequest.
+  ///
+  /// In zh, this message translates to:
+  /// **'已拒绝{name}的好友请求'**
+  String rejectedFriendRequest(String name);
+
+  /// No description provided for @groupInvites.
+  ///
+  /// In zh, this message translates to:
+  /// **'群邀请'**
+  String get groupInvites;
+
+  /// No description provided for @myGroups.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的群聊'**
+  String get myGroups;
+
+  /// No description provided for @invitedToJoinGroup.
+  ///
+  /// In zh, this message translates to:
+  /// **'邀请加入群聊'**
+  String get invitedToJoinGroup;
+
+  /// No description provided for @confirmLeaveGroup.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要退出'**
+  String get confirmLeaveGroup;
+
+  /// No description provided for @leave.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出'**
+  String get leave;
+
+  /// No description provided for @saveMedia.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存'**
+  String get saveMedia;
+
+  /// No description provided for @recallThisMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'撤回该条消息？'**
+  String get recallThisMessage;
+
+  /// No description provided for @messageRecalled.
+  ///
+  /// In zh, this message translates to:
+  /// **'对方撤回了一条消息'**
+  String get messageRecalled;
+
+  /// No description provided for @savedToGallery.
+  ///
+  /// In zh, this message translates to:
+  /// **'已保存到相册'**
+  String get savedToGallery;
+
+  /// No description provided for @failedToSave.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存失败'**
+  String get failedToSave;
+
+  /// No description provided for @saving.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存中...'**
+  String get saving;
+
+  /// No description provided for @share.
+  ///
+  /// In zh, this message translates to:
+  /// **'分享'**
+  String get share;
+
+  /// No description provided for @saveToGallery.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存到相册'**
+  String get saveToGallery;
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载失败'**
+  String get downloadFailed;
+
+  /// No description provided for @noMediaUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有可用的媒体链接'**
+  String get noMediaUrl;
+
+  /// No description provided for @shareFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'分享失败'**
+  String get shareFailed;
+
+  /// No description provided for @failedToLoadImage.
+  ///
+  /// In zh, this message translates to:
+  /// **'图片加载失败'**
+  String get failedToLoadImage;
+
+  /// No description provided for @failedToLoadMoreMessages.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载更多消息失败'**
+  String get failedToLoadMoreMessages;
+
+  /// No description provided for @failedToSend.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送失败'**
+  String get failedToSend;
+
+  /// No description provided for @failedToSendImage.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送图片失败'**
+  String get failedToSendImage;
+
+  /// No description provided for @failedToSendVoice.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送语音失败'**
+  String get failedToSendVoice;
+
+  /// No description provided for @failedToSendFile.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送文件失败'**
+  String get failedToSendFile;
+
+  /// No description provided for @failedToSendVideo.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送视频失败'**
+  String get failedToSendVideo;
+
+  /// No description provided for @failedToSendLocation.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送位置失败'**
+  String get failedToSendLocation;
+
+  /// No description provided for @failedToResend.
+  ///
+  /// In zh, this message translates to:
+  /// **'重发失败'**
+  String get failedToResend;
+
+  /// No description provided for @failedToRecall.
+  ///
+  /// In zh, this message translates to:
+  /// **'撤回失败'**
+  String get failedToRecall;
+
+  /// No description provided for @failedToReply.
+  ///
+  /// In zh, this message translates to:
+  /// **'回复失败'**
+  String get failedToReply;
+
+  /// No description provided for @failedToAddReaction.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加回应失败'**
+  String get failedToAddReaction;
+
+  /// No description provided for @failedToSendPoll.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送投票失败'**
+  String get failedToSendPoll;
+
+  /// No description provided for @failedToVote.
+  ///
+  /// In zh, this message translates to:
+  /// **'投票失败'**
+  String get failedToVote;
+
+  /// No description provided for @failedToLoadMessages.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载消息失败'**
+  String get failedToLoadMessages;
+
+  /// No description provided for @callFeatureComingSoon.
+  ///
+  /// In zh, this message translates to:
+  /// **'语音和视频通话功能即将上线'**
+  String get callFeatureComingSoon;
+
+  /// No description provided for @cannotForwardRedPacketOrTransfer.
+  ///
+  /// In zh, this message translates to:
+  /// **'红包和转账不能转发'**
+  String get cannotForwardRedPacketOrTransfer;
+
+  /// No description provided for @videoRecordingFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频录制失败，请重试'**
+  String get videoRecordingFailed;
+
+  String get text;
+  String get link;
+  String get note;
+  String get myNotes;
+  String get noFavorites;
+  String get longPressToFavorite;
+  String get newNote;
+  String get favoriteLink;
+  String get editTags;
+  String get deleteFavorite;
+  String get deleteFavoriteConfirm;
+  String get today;
+  String daysAgoText(int count);
+  String dateFormat(int month, int day);
+  String get noSearchResultsFound;
+  String get searchMembers;
+  String get inviteMembers;
+  String get selectMembers;
+  String get noMembersToAdd;
+  String get cannotRemoveOwner;
+  String get memberRemoved;
+  String get memberAdded;
+  String get scanQrCode;
+  String get alignQrCode;
+  String get flashlight;
+  String get album;
+  String get invalidQrCode;
+  String get qrCodeScanFailed;
+  String get searchUser;
+  String get addByIdSearch;
+  String get enterN42Id;
+  String get chatRecalled;
+  String get systemMessage;
+  String get setStatus;
+  String get visibleToFriends24h;
+  String get writeStatus;
+  String get moodAndThoughts;
+  String get workAndStudy;
+  String get rest;
+  String get enterYourStatus;
+  String get ok;
+  String get statusHappy;
+  String get statusCracked;
+  String get statusLucky;
+  String get statusSunny;
+  String get statusTired;
+  String get statusDaydream;
+  String get statusRushing;
+  String get statusOverthinking;
+  String get statusEnergized;
+  String get statusWorking;
+  String get statusStudying;
+  String get statusBusy;
+  String get statusSlacking;
+  String get statusTraveling;
+  String get statusGoingHome;
+  String get statusDnd;
+  String get statusHanging;
+  String get statusCheckIn;
+  String get statusExercising;
+  String get statusCoffee;
+  String get statusBubbleTea;
+  String get statusEating;
+  String get statusParenting;
+  String get statusSavingWorld;
+  String get statusSelfie;
+  String get statusRetreat;
+  String get statusHome;
+  String get statusSleeping;
+  String get statusCatLover;
+  String get statusDogWalking;
+  String get statusGaming;
+  String get statusListening;
+  String get cameraPermissionRequired;
+  String get cameraPermissionDenied;
+  String get cannotGetCameraPermission;
+  String permissionCheckError(String error);
+  String get checkingCameraPermission;
+  String get needCameraPermission;
+  String get retryPermission;
+  String get openSettings;
+  String get manualInputUserId;
+  String get closeManualInput;
+  String get cameraStartFailed;
+  String get unknownError;
+  String get placeQrCodeInFrame;
+  String cannotAddFriend(String error);
+  String qrCodeProcessFailed(String error);
+  String get add;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
@@ -3688,25 +4313,25 @@ class _SDelegate extends LocalizationsDelegate<S> {
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_SDelegate old) => false;
 }
 
 S lookupS(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en': return SEn();
-    case 'zh': return SZh();
+    case 'en':
+      return SEn();
+    case 'zh':
+      return SZh();
   }
 
   throw FlutterError(
-    'S.delegate failed to load unsupported locale "$locale". This is likely '
-    'an issue with the localizations generation tool. Please file an issue '
-    'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
-  );
+      'S.delegate failed to load unsupported locale "$locale". This is likely '
+      'an issue with the localizations generation tool. Please file an issue '
+      'on GitHub with a reproducible sample app and the gen-l10n configuration '
+      'that was used.');
 }

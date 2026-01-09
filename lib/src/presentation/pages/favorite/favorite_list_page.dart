@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/favorite_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -95,7 +96,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: N42AppBar(
-        title: '收藏',
+        title: S.of(context)?.favorites ?? 'Favorites',
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -134,21 +135,21 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   
   Widget _buildFilterBar(bool isDark) {
     final types = [
-      null, // 全部
+      null, // All
       FavoriteType.text,
       FavoriteType.image,
       FavoriteType.link,
       FavoriteType.file,
       FavoriteType.note,
     ];
-    
+
     final typeLabels = {
-      null: '全部',
-      FavoriteType.text: '文本',
-      FavoriteType.image: '图片',
-      FavoriteType.link: '链接',
-      FavoriteType.file: '文件',
-      FavoriteType.note: '笔记',
+      null: S.of(context)?.all ?? 'All',
+      FavoriteType.text: S.of(context)?.text ?? 'Text',
+      FavoriteType.image: S.of(context)?.image ?? 'Image',
+      FavoriteType.link: S.of(context)?.link ?? 'Link',
+      FavoriteType.file: S.of(context)?.file ?? 'File',
+      FavoriteType.note: S.of(context)?.note ?? 'Note',
     };
     
     return Container(
@@ -185,7 +186,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                typeLabels[type] ?? '全部',
+                typeLabels[type] ?? (S.of(context)?.all ?? 'All'),
                 style: TextStyle(
                   fontSize: 13,
                   color: isSelected
@@ -262,7 +263,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
                       ],
                     ] else
                       Text(
-                        '我的笔记',
+                        S.of(context)?.myNotes ?? 'My Notes',
                         style: TextStyle(
                           fontSize: 12,
                           color: subtitleColor,
@@ -474,7 +475,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            '暂无收藏内容',
+            S.of(context)?.noFavorites ?? 'No favorites yet',
             style: TextStyle(
               fontSize: 16,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -482,7 +483,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            '长按聊天消息可收藏',
+            S.of(context)?.longPressToFavorite ?? 'Long press message to favorite',
             style: TextStyle(
               fontSize: 14,
               color: AppColors.textTertiary,
@@ -503,23 +504,23 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   void _showAddOptions() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => SafeArea(
+      builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.note_add),
-              title: const Text('新建笔记'),
+              title: Text(S.of(context)?.newNote ?? 'New Note'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(ctx);
                 _createNote();
               },
             ),
             ListTile(
               leading: const Icon(Icons.link),
-              title: const Text('收藏链接'),
+              title: Text(S.of(context)?.favoriteLink ?? 'Favorite Link'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(ctx);
                 _addLink();
               },
             ),
@@ -530,40 +531,37 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   }
   
   void _openFavoriteDetail(FavoriteEntity favorite) {
-    // TODO: 实现详情页面
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('打开: ${favorite.content}')),
+      SnackBar(content: Text(S.of(context)?.openItem(favorite.content) ?? 'Open: ${favorite.content}')),
     );
   }
-  
+
   void _showFavoriteOptions(FavoriteEntity favorite) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => SafeArea(
+      builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.edit),
-              title: const Text('编辑标签'),
+              title: Text(S.of(context)?.editTags ?? 'Edit Tags'),
               onTap: () {
-                Navigator.pop(context);
-                // TODO: 编辑标签
+                Navigator.pop(ctx);
               },
             ),
             ListTile(
               leading: const Icon(Icons.share),
-              title: const Text('转发'),
+              title: Text(S.of(context)?.forward ?? 'Forward'),
               onTap: () {
-                Navigator.pop(context);
-                // TODO: 转发
+                Navigator.pop(ctx);
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('删除', style: TextStyle(color: Colors.red)),
+              title: Text(S.of(context)?.delete ?? 'Delete', style: const TextStyle(color: Colors.red)),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(ctx);
                 _deleteFavorite(favorite);
               },
             ),
@@ -574,41 +572,39 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   }
   
   void _createNote() {
-    // TODO: 实现新建笔记
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('新建笔记功能即将推出')),
+      SnackBar(content: Text(S.of(context)?.newNoteComingSoon ?? 'New note feature coming soon')),
     );
   }
-  
+
   void _addLink() {
-    // TODO: 实现添加链接
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('添加链接功能即将推出')),
+      SnackBar(content: Text(S.of(context)?.addLinkComingSoon ?? 'Add link feature coming soon')),
     );
   }
-  
+
   void _deleteFavorite(FavoriteEntity favorite) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('删除收藏'),
-        content: const Text('确定要删除这条收藏吗？'),
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.deleteFavorite ?? 'Delete Favorite'),
+        content: Text(S.of(context)?.deleteFavoriteConfirm ?? 'Are you sure you want to delete this favorite?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(ctx);
               setState(() {
                 _favorites.removeWhere((f) => f.id == favorite.id);
               });
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('已删除')),
+                SnackBar(content: Text(S.of(context)?.deleted ?? 'Deleted')),
               );
             },
-            child: const Text('删除', style: TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.delete ?? 'Delete', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -618,15 +614,15 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   String _formatTime(DateTime time) {
     final now = DateTime.now();
     final diff = now.difference(time);
-    
+
     if (diff.inDays == 0) {
-      return '今天';
+      return S.of(context)?.today ?? 'Today';
     } else if (diff.inDays == 1) {
-      return '昨天';
+      return S.of(context)?.yesterday ?? 'Yesterday';
     } else if (diff.inDays < 7) {
-      return '${diff.inDays}天前';
+      return S.of(context)?.daysAgoText(diff.inDays) ?? '${diff.inDays} days ago';
     } else {
-      return '${time.month}月${time.day}日';
+      return S.of(context)?.dateFormat(time.month, time.day) ?? '${time.month}/${time.day}';
     }
   }
   
@@ -662,23 +658,23 @@ class _FavoriteSearchDelegate extends SearchDelegate<FavoriteEntity?> {
   
   @override
   Widget buildResults(BuildContext context) {
-    return _buildSearchResults();
+    return _buildSearchResults(context);
   }
-  
+
   @override
   Widget buildSuggestions(BuildContext context) {
-    return _buildSearchResults();
+    return _buildSearchResults(context);
   }
-  
-  Widget _buildSearchResults() {
+
+  Widget _buildSearchResults(BuildContext context) {
     final results = favorites.where((f) =>
       f.content.toLowerCase().contains(query.toLowerCase()) ||
       (f.sourceSenderName?.toLowerCase().contains(query.toLowerCase()) ?? false)
     ).toList();
-    
+
     if (results.isEmpty) {
-      return const Center(
-        child: Text('没有找到相关收藏'),
+      return Center(
+        child: Text(S.of(context)?.noSearchResultsFound ?? 'No results found'),
       );
     }
     
