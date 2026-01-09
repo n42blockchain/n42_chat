@@ -85,72 +85,82 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final maxWidth = screenWidth * maxWidthFactor;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      child: Row(
-        mainAxisAlignment:
-            isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 左侧头像（对方消息）
-          if (!isSelf && showAvatar) _buildAvatar(isDark),
-          if (!isSelf && showAvatar) const SizedBox(width: 8),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // 使用实际可用宽度而非屏幕宽度，以正确处理多选模式
+        final availableWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : MediaQuery.of(context).size.width;
+        final maxWidth = availableWidth * maxWidthFactor;
 
-          // 消息内容
-          Flexible(
-            child: Column(
-              crossAxisAlignment:
-                  isSelf ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                // 时间戳
-                if (showTimestamp && timestamp != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      _formatTime(timestamp!),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textTertiary,
-                      ),
-                    ),
-                  ),
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          child: Row(
+            mainAxisAlignment:
+                isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 左侧头像（对方消息）
+              if (!isSelf && showAvatar) _buildAvatar(isDark),
+              if (!isSelf && showAvatar) const SizedBox(width: 8),
 
-                // 气泡 + 状态
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+              // 消息内容
+              Flexible(
+                child: Column(
+                  crossAxisAlignment:
+                      isSelf ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                   children: [
-                    // 发送失败图标（自己的消息，在气泡左侧）
-                    if (isSelf && status == MessageStatus.failed) ...[
-                      _buildFailedIndicator(),
-                      const SizedBox(width: 4),
-                    ],
+                    // 时间戳
+                    if (showTimestamp && timestamp != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          _formatTime(timestamp!),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textTertiary,
+                          ),
+                        ),
+                      ),
 
-                    // 气泡或无气泡内容
-                    ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: maxWidth),
-                      child: noBubble ? _buildNoBubbleContent() : _buildBubble(isDark),
+                    // 气泡 + 状态
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // 发送失败图标（自己的消息，在气泡左侧）
+                        if (isSelf && status == MessageStatus.failed) ...[
+                          _buildFailedIndicator(),
+                          const SizedBox(width: 4),
+                        ],
+
+                        // 气泡或无气泡内容 - 使用 Flexible 防止溢出
+                        Flexible(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: maxWidth),
+                            child: noBubble ? _buildNoBubbleContent() : _buildBubble(isDark),
+                          ),
+                        ),
+
+                        // 发送中指示器（自己的消息，在气泡右侧）
+                        if (isSelf && status == MessageStatus.sending) ...[
+                          const SizedBox(width: 4),
+                          _buildSendingIndicator(),
+                        ],
+                      ],
                     ),
-
-                    // 发送中指示器（自己的消息，在气泡右侧）
-                    if (isSelf && status == MessageStatus.sending) ...[
-                      const SizedBox(width: 4),
-                      _buildSendingIndicator(),
-                    ],
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          // 右侧头像（自己的消息）
-          if (isSelf && showAvatar) const SizedBox(width: 8),
-          if (isSelf && showAvatar) _buildAvatar(isDark),
-        ],
-      ),
+              // 右侧头像（自己的消息）
+              if (isSelf && showAvatar) const SizedBox(width: 8),
+              if (isSelf && showAvatar) _buildAvatar(isDark),
+            ],
+          ),
+        );
+      },
     );
   }
 

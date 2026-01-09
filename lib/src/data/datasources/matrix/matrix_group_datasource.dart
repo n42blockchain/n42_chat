@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'matrix_client_manager.dart';
@@ -99,8 +100,15 @@ class MatrixGroupDataSource {
   /// 设置群名称
   Future<void> setGroupName(String roomId, String name) async {
     final room = _client?.getRoomById(roomId);
-    if (room == null) return;
-    await room.setName(name);
+    if (room == null) {
+      throw Exception('Room not found');
+    }
+    try {
+      await room.setName(name);
+    } catch (e) {
+      debugPrint('setGroupName error: $e');
+      rethrow;
+    }
   }
 
   /// 获取群话题/描述
@@ -254,7 +262,10 @@ class MatrixGroupDataSource {
   /// 检查当前用户是否可以修改群设置
   bool canChangeSettings(String roomId) {
     final room = _client?.getRoomById(roomId);
-    return room?.canChangePowerLevel ?? false;
+    if (room == null) return false;
+    // 检查是否可以发送 m.room.name 状态事件
+    // 如果可以更改名称，通常也可以更改其他设置
+    return room.canSendEvent('m.room.name');
   }
 
   // ============================================

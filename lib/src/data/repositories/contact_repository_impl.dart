@@ -148,10 +148,20 @@ class ContactRepositoryImpl implements IContactRepository {
         avatarUrl = _contactDataSource.getUserAvatarUrl(user!);
       }
 
+      // Use display name if available, otherwise extract username from userId
+      String displayName = user?.calcDisplayname() ?? '';
+      if (displayName.isEmpty && inviter != null) {
+        // Extract username from Matrix ID format (@username:server)
+        displayName = inviter.split(':').first.replaceFirst('@', '');
+      }
+      if (displayName.isEmpty) {
+        displayName = 'Unknown User';
+      }
+
       return FriendRequest(
         id: room.id,
         userId: inviter ?? '',
-        userName: user?.calcDisplayname() ?? inviter ?? '未知用户',
+        userName: displayName,
         userAvatarUrl: avatarUrl,
         requestTime: null, // StrippedStateEvent doesn't have originServerTs
       );

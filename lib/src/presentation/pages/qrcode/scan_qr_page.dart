@@ -406,51 +406,50 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         // 扫描框遮罩
         _buildScanOverlay(screenSize, scanSize),
         
-        // 提示文字
+        // 提示文字和底部功能按钮
         Positioned(
-          top: (screenSize.height - scanSize) / 2 + scanSize + 24,
+          top: (screenSize.height - scanSize) / 2 + scanSize + 16,
           left: 0,
           right: 0,
-          child: Column(
-            children: [
-              Text(
-                '将二维码放入框内，即可自动扫描',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 14,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: _toggleManualInput,
-                child: Text(
-                  _showManualInput ? '关闭手动输入' : '手动输入用户 ID',
-                  style: const TextStyle(
-                    color: Color(0xFF07C160),
+          bottom: 0,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(
+                  '将二维码放入框内，即可自动扫描',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
                     fontSize: 14,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              if (_showManualInput) _buildManualInputSection(scanSize),
-            ],
-          ),
-        ),
-        
-        // 底部功能按钮
-        Positioned(
-          bottom: 80,
-          left: 0,
-          right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildBottomButton(
-                icon: Icons.qr_code,
-                label: '我的二维码',
-                onTap: _showMyQRCode,
-              ),
-            ],
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: _toggleManualInput,
+                  child: Text(
+                    _showManualInput ? '关闭手动输入' : '手动输入用户 ID',
+                    style: const TextStyle(
+                      color: Color(0xFF07C160),
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                if (_showManualInput) _buildManualInputSection(scanSize),
+                const SizedBox(height: 24),
+                // 底部功能按钮
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildBottomButton(
+                      icon: Icons.qr_code,
+                      label: '我的二维码',
+                      onTap: _showMyQRCode,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
         

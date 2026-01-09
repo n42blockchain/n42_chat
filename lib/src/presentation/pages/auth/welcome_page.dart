@@ -17,8 +17,10 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -27,22 +29,22 @@ class WelcomePage extends StatelessWidget {
               const Spacer(flex: 2),
 
               // Logo和标题
-              _buildHeader(),
+              _buildHeader(isDark),
 
               const Spacer(flex: 3),
 
               // 特性列表
-              _buildFeatures(),
+              _buildFeatures(isDark),
 
               const Spacer(flex: 2),
 
               // 按钮
-              _buildButtons(context),
+              _buildButtons(context, isDark),
 
               const SizedBox(height: 32),
 
               // 协议
-              _buildAgreement(),
+              _buildAgreement(isDark),
 
               const SizedBox(height: 24),
             ],
@@ -52,7 +54,7 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(bool isDark) {
     return Column(
       children: [
         Container(
@@ -83,51 +85,54 @@ class WelcomePage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        const Text(
+        Text(
           'N42 Chat',
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           '安全、去中心化的即时通讯',
           style: TextStyle(
             fontSize: 16,
-            color: AppColors.textSecondary,
+            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildFeatures() {
-    return const Column(
+  Widget _buildFeatures(bool isDark) {
+    return Column(
       children: [
         _FeatureItem(
           icon: Icons.security,
           title: '端对端加密',
           description: '消息仅你和对方可见',
+          isDark: isDark,
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         _FeatureItem(
           icon: Icons.public,
           title: '去中心化',
           description: '基于Matrix开放协议',
+          isDark: isDark,
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         _FeatureItem(
           icon: Icons.account_balance_wallet,
           title: '钱包集成',
           description: '轻松进行加密货币转账',
+          isDark: isDark,
         ),
       ],
     );
   }
 
-  Widget _buildButtons(BuildContext context) {
+  Widget _buildButtons(BuildContext context, bool isDark) {
     return Column(
       children: [
         // 登录按钮
@@ -182,13 +187,13 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildAgreement() {
+  Widget _buildAgreement(bool isDark) {
     return Text.rich(
       TextSpan(
         text: '登录即表示同意',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
-          color: AppColors.textTertiary,
+          color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
         ),
         children: [
           TextSpan(
@@ -197,7 +202,12 @@ class WelcomePage extends StatelessWidget {
               color: AppColors.textLink.withValues(alpha: 0.8),
             ),
           ),
-          const TextSpan(text: '和'),
+          TextSpan(
+            text: '和',
+            style: TextStyle(
+              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+            ),
+          ),
           TextSpan(
             text: '《隐私政策》',
             style: TextStyle(
@@ -215,11 +225,13 @@ class _FeatureItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final String description;
+  final bool isDark;
 
   const _FeatureItem({
     required this.icon,
     required this.title,
     required this.description,
+    required this.isDark,
   });
 
   @override
@@ -246,18 +258,18 @@ class _FeatureItem extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 description,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.textSecondary,
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                 ),
               ),
             ],

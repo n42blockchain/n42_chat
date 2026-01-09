@@ -83,8 +83,11 @@ abstract class AppColors {
   /// 次要文字 - 深色模式
   static const Color textSecondaryDark = Color(0xFFAAAAAA);
 
-  /// 辅助文字
+  /// 辅助文字 - 浅色模式
   static const Color textTertiary = Color(0xFFB2B2B2);
+
+  /// 辅助文字 - 深色模式
+  static const Color textTertiaryDark = Color(0xFF888888);
 
   /// 禁用文字
   static const Color textDisabled = Color(0xFFCCCCCC);
