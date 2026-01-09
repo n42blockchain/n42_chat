@@ -83,6 +83,7 @@ dependencies:
   chewie: ^1.8.5
   file_picker: ^8.1.2
   permission_handler: ^11.2.0
+  saver_gallery: ^3.0.6
 
   # ============================================
   # Utils - 工具库
