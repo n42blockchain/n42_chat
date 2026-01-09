@@ -34,6 +34,8 @@ enum MessageType {
   redPacket,
   /// 投票
   poll,
+  /// 音乐分享
+  music,
   /// 未知类型
   unknown,
 }
@@ -354,6 +356,22 @@ class MessageMetadata extends Equatable {
   /// 是否已结束
   final bool? pollEnded;
 
+  // ============================================
+  // 音乐属性
+  // ============================================
+
+  /// 歌曲名称
+  final String? musicTitle;
+
+  /// 歌手/艺术家
+  final String? musicArtist;
+
+  /// 音乐链接
+  final String? musicUrl;
+
+  /// 专辑封面
+  final String? musicCover;
+
   const MessageMetadata({
     this.mediaUrl,
     this.httpUrl,
@@ -381,6 +399,10 @@ class MessageMetadata extends Equatable {
     this.totalVoters,
     this.maxSelections,
     this.pollEnded,
+    this.musicTitle,
+    this.musicArtist,
+    this.musicUrl,
+    this.musicCover,
   });
 
   /// 格式化文件大小
@@ -433,6 +455,10 @@ class MessageMetadata extends Equatable {
         totalVoters,
         maxSelections,
         pollEnded,
+        musicTitle,
+        musicArtist,
+        musicUrl,
+        musicCover,
       ];
 }
 

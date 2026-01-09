@@ -908,8 +908,21 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
             'status': 'pending',
           },
         );
+      } else if (event.type == MessageType.music) {
+        // 发送音乐分享消息
+        eventId = await _messageRepository.sendCustomMessage(
+          _currentRoomId!,
+          msgType: 'n42.music',
+          content: event.content,
+          additionalData: {
+            'title': event.metadata?.musicTitle ?? '',
+            'artist': event.metadata?.musicArtist ?? '',
+            'url': event.metadata?.musicUrl ?? '',
+            'cover': event.metadata?.musicCover ?? '',
+          },
+        );
       }
-      
+
       if (eventId != null) {
         debugPrint('ChatBloc: Custom message sent - eventId: $eventId');
         

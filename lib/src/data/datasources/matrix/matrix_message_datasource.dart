@@ -1372,6 +1372,10 @@ class MatrixMessageDataSource {
         if (event.content['msgtype'] == 'n42.transfer') {
           return MessageType.transfer;
         }
+        // 检查是否是音乐分享消息
+        if (event.content['msgtype'] == 'n42.music') {
+          return MessageType.music;
+        }
         return MessageType.text;
     }
   }
@@ -1610,6 +1614,16 @@ class MatrixMessageDataSource {
         amount: event.content['amount'] as String?,
         token: event.content['token'] as String?,
         transferStatus: event.content['status'] as String?,
+      );
+    }
+
+    // 音乐分享信息
+    if (event.content['msgtype'] == 'n42.music') {
+      return MessageMetadata(
+        musicTitle: event.content['title'] as String?,
+        musicArtist: event.content['artist'] as String?,
+        musicUrl: event.content['url'] as String?,
+        musicCover: event.content['cover'] as String?,
       );
     }
 

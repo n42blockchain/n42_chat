@@ -334,8 +334,20 @@ class _ChatPageState extends State<ChatPage> {
       case MessageType.location:
         _viewLocation(message);
         break;
+      case MessageType.music:
+        _playMusic(message);
+        break;
       default:
         break;
+    }
+  }
+
+  /// 播放音乐
+  void _playMusic(MessageEntity message) {
+    final url = message.metadata?.musicUrl;
+    if (url != null && url.isNotEmpty) {
+      // 打开音乐链接
+      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     }
   }
   
@@ -2046,28 +2058,25 @@ ID：$contactId''';
       final songName = result['name'] as String;
       final artist = result['artist'] as String;
       final url = result['url'] as String?;
+      final cover = result['cover'] as String?;
       final isLocal = result['isLocal'] == true;
-      final isNetwork = result['isNetwork'] == true;
-      
+
       if (isLocal && url != null && url.isNotEmpty) {
-        // 本地音频文件 - 作为文件发送
+        // 本地音频文件 - 作为文件发送，同时发送音乐卡片
         try {
           final file = File(url);
           if (await file.exists()) {
             final bytes = await file.readAsBytes();
             final mimeType = lookupMimeType(url) ?? 'audio/mpeg';
             final filename = url.split('/').last.split('\\').last;
-            
+
+            // 先发送音频文件
             context.read<ChatBloc>().add(SendFileMessage(
               fileBytes: bytes,
               filename: filename,
               mimeType: mimeType,
             ));
-            
-            // 同时发送文本说明
-            final musicContent = '🎵 分享本地音乐\n歌曲：$songName\n歌手：$artist';
-            context.read<ChatBloc>().add(SendTextMessage(musicContent));
-            
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('已分享 $songName'),
@@ -2086,16 +2095,18 @@ ID：$contactId''';
           );
         }
       } else {
-        // 网络链接或推荐歌曲 - 发送文本消息
-        String musicContent;
-        if (isNetwork) {
-          musicContent = '🎵 分享音乐\n歌曲：$songName\n歌手：$artist\n🔗 $url';
-        } else {
-          musicContent = '🎵 分享音乐\n歌曲：$songName\n歌手：$artist${url != null ? '\n🔗 $url' : ''}';
-        }
-        
-        context.read<ChatBloc>().add(SendTextMessage(musicContent));
-        
+        // 网络链接或推荐歌曲 - 发送音乐卡片消息
+        context.read<ChatBloc>().add(SendCustomMessage(
+          type: MessageType.music,
+          content: '🎵 $songName - $artist',
+          metadata: MessageMetadata(
+            musicTitle: songName,
+            musicArtist: artist,
+            musicUrl: url,
+            musicCover: cover,
+          ),
+        ));
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('已分享 $songName'),
@@ -3262,6 +3273,8 @@ ID：$contactId''';
         return S.of(context)?.location ?? '[Location]';
       case MessageType.transfer:
         return S.of(context)?.transfer ?? '[Transfer]';
+      case MessageType.music:
+        return '[Music]';
       default:
         return '';
     }
@@ -3466,6 +3479,30 @@ ID：$contactId''';
               targetRoomId,
               '[投票] ${question ?? message.content}',
             );
+          }
+          break;
+
+        case MessageType.music:
+          // 转发音乐分享消息
+          final title = message.metadata?.musicTitle;
+          final artist = message.metadata?.musicArtist;
+          final url = message.metadata?.musicUrl;
+          final cover = message.metadata?.musicCover;
+
+          if (title != null) {
+            await messageRepository.sendCustomMessage(
+              targetRoomId,
+              msgType: 'n42.music',
+              content: '🎵 $title - ${artist ?? ''}',
+              additionalData: {
+                'title': title,
+                'artist': artist ?? '',
+                'url': url ?? '',
+                'cover': cover ?? '',
+              },
+            );
+          } else {
+            await messageRepository.sendTextMessage(targetRoomId, message.content);
           }
           break;
 
@@ -4747,6 +4784,8 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
         return '[文件] ${message.metadata?.fileName ?? ''}';
       case MessageType.location:
         return '[位置] ${message.content}';
+      case MessageType.music:
+        return '[音乐] ${message.metadata?.musicTitle ?? ''}';
       default:
         return '[消息]';
     }
