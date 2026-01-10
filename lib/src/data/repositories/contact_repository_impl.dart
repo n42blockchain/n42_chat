@@ -135,13 +135,14 @@ class ContactRepositoryImpl implements IContactRepository {
   @override
   Future<List<FriendRequest>> getPendingFriendRequests() async {
     final invites = _contactDataSource.getPendingInvites();
+    final requests = <FriendRequest>[];
 
-    return invites.map((room) {
+    for (final room in invites) {
       final inviter = room.getState(matrix.EventTypes.RoomMember)?.senderId;
       final user = inviter != null
           ? room.unsafeGetUserFromMemoryOrFallback(inviter)
           : null;
-      
+
       // 手动构建头像 URL
       String? avatarUrl;
       if (user?.avatarUrl != null) {
@@ -150,22 +151,43 @@ class ContactRepositoryImpl implements IContactRepository {
 
       // Use display name if available, otherwise extract username from userId
       String displayName = user?.calcDisplayname() ?? '';
+
+      // If display name is empty or just the user ID, try to fetch from server
+      if ((displayName.isEmpty || displayName == inviter) && inviter != null) {
+        try {
+          final profile = await _contactDataSource.getUserProfile(inviter);
+          if (profile != null) {
+            if (profile.displayName != null && profile.displayName!.isNotEmpty) {
+              displayName = profile.displayName!;
+            }
+            // Also get avatar from profile if not already set
+            if (avatarUrl == null) {
+              avatarUrl = _contactDataSource.getProfileAvatarUrl(profile);
+            }
+          }
+        } catch (e) {
+          // Ignore errors, will use fallback
+        }
+      }
+
+      // Fallback: extract username from Matrix ID format (@username:server)
       if (displayName.isEmpty && inviter != null) {
-        // Extract username from Matrix ID format (@username:server)
         displayName = inviter.split(':').first.replaceFirst('@', '');
       }
       if (displayName.isEmpty) {
         displayName = 'Unknown User';
       }
 
-      return FriendRequest(
+      requests.add(FriendRequest(
         id: room.id,
         userId: inviter ?? '',
         userName: displayName,
         userAvatarUrl: avatarUrl,
         requestTime: null, // StrippedStateEvent doesn't have originServerTs
-      );
-    }).toList();
+      ));
+    }
+
+    return requests;
   }
 
   @override

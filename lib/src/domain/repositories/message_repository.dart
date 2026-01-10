@@ -150,6 +150,12 @@ abstract class IMessageRepository {
   /// 监听投票响应事件
   Stream<Map<String, dynamic>>? watchPollResponses(String roomId);
 
+  /// 获取消息反应聚合结果
+  Future<Map<String, dynamic>?> getReactionAggregations(
+    String roomId,
+    String eventId,
+  );
+
   /// 发送自定义消息（红包、转账等）
   Future<String?> sendCustomMessage(
     String roomId, {

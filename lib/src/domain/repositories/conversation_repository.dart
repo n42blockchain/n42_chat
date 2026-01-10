@@ -42,6 +42,12 @@ abstract class IConversationRepository {
   /// 设置会话置顶
   Future<void> setPinned(String conversationId, bool pinned);
 
+  /// 设置强提醒
+  Future<void> setStrongReminder(String conversationId, bool enabled);
+
+  /// 获取强提醒状态
+  Future<bool> getStrongReminder(String conversationId);
+
   /// 标记会话已读
   Future<void> markAsRead(String conversationId);
 

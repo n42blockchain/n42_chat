@@ -6,13 +6,15 @@ import 'package:matrix/matrix.dart' as matrix;
 import '../../core/utils/matrix_utils.dart';
 import '../../domain/entities/conversation_entity.dart';
 import '../../domain/repositories/conversation_repository.dart';
+import '../datasources/local/secure_storage_datasource.dart';
 import '../datasources/matrix/matrix_room_datasource.dart';
 
 /// 会话仓库实现
 class ConversationRepositoryImpl implements IConversationRepository {
   final MatrixRoomDataSource _roomDataSource;
+  final SecureStorageDataSource _secureStorage;
 
-  ConversationRepositoryImpl(this._roomDataSource);
+  ConversationRepositoryImpl(this._roomDataSource, this._secureStorage);
 
   @override
   Future<List<ConversationEntity>> getConversations() async {
@@ -98,6 +100,16 @@ class ConversationRepositoryImpl implements IConversationRepository {
   @override
   Future<void> setPinned(String conversationId, bool pinned) async {
     await _roomDataSource.setRoomPinned(conversationId, pinned);
+  }
+
+  @override
+  Future<void> setStrongReminder(String conversationId, bool enabled) async {
+    await _secureStorage.setStrongReminder(conversationId, enabled);
+  }
+
+  @override
+  Future<bool> getStrongReminder(String conversationId) async {
+    return await _secureStorage.getStrongReminderStatus(conversationId);
   }
 
   @override

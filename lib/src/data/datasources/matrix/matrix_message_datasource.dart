@@ -1183,6 +1183,66 @@ class MatrixMessageDataSource {
     }
   }
 
+  /// 获取消息的反应聚合结果
+  ///
+  /// 从服务器获取消息的所有 emoji 反应
+  Future<Map<String, dynamic>?> getReactionAggregations(String roomId, String eventId) async {
+    try {
+      final room = _client?.getRoomById(roomId);
+      if (room == null) return null;
+
+      // 使用 Matrix API 获取事件关系（反应使用 m.annotation 类型）
+      final response = await _client!.request(
+        matrix.RequestType.GET,
+        '/client/v1/rooms/${Uri.encodeComponent(roomId)}/relations/${Uri.encodeComponent(eventId)}/m.annotation',
+      );
+
+      if (response is Map<String, dynamic>) {
+        final reactions = <String, Map<String, dynamic>>{};
+        final currentUserId = _client?.userID ?? '';
+
+        final chunk = response['chunk'] as List<dynamic>?;
+        if (chunk != null) {
+          for (final item in chunk) {
+            if (item is Map<String, dynamic>) {
+              final itemType = item['type'] as String?;
+              if (itemType == 'm.reaction') {
+                final content = item['content'] as Map<String, dynamic>?;
+                final relatesTo = content?['m.relates_to'] as Map<String, dynamic>?;
+                final emoji = relatesTo?['key'] as String?;
+                final senderId = item['sender'] as String?;
+
+                if (emoji != null && senderId != null) {
+                  if (!reactions.containsKey(emoji)) {
+                    reactions[emoji] = {
+                      'count': 0,
+                      'userIds': <String>[],
+                      'isMe': false,
+                    };
+                  }
+                  reactions[emoji]!['count'] = (reactions[emoji]!['count'] as int) + 1;
+                  (reactions[emoji]!['userIds'] as List<String>).add(senderId);
+                  if (senderId == currentUserId) {
+                    reactions[emoji]!['isMe'] = true;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        return {
+          'eventId': eventId,
+          'reactions': reactions,
+        };
+      }
+      return null;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to get reaction aggregations: $e');
+      return null;
+    }
+  }
+
   /// 获取投票的聚合结果
   Future<Map<String, dynamic>?> getPollAggregations(String roomId, String pollEventId) async {
     try {
