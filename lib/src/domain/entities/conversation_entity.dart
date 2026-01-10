@@ -53,6 +53,9 @@ class ConversationEntity extends Equatable {
   /// 是否静音
   final bool isMuted;
 
+  /// 是否开启强提醒
+  final bool isStrongReminder;
+
   /// 是否标记为已读
   final bool isMarkedAsRead;
 
@@ -103,6 +106,7 @@ class ConversationEntity extends Equatable {
     this.isEncrypted = false,
     this.isPinned = false,
     this.isMuted = false,
+    this.isStrongReminder = false,
     this.isMarkedAsRead = false,
     this.topic,
     this.memberCount = 0,
@@ -190,6 +194,7 @@ class ConversationEntity extends Equatable {
         isEncrypted,
         isPinned,
         isMuted,
+        isStrongReminder,
         isMarkedAsRead,
         topic,
         memberCount,
@@ -218,6 +223,7 @@ class ConversationEntity extends Equatable {
     bool? isEncrypted,
     bool? isPinned,
     bool? isMuted,
+    bool? isStrongReminder,
     bool? isMarkedAsRead,
     String? topic,
     int? memberCount,
@@ -245,6 +251,7 @@ class ConversationEntity extends Equatable {
       isEncrypted: isEncrypted ?? this.isEncrypted,
       isPinned: isPinned ?? this.isPinned,
       isMuted: isMuted ?? this.isMuted,
+      isStrongReminder: isStrongReminder ?? this.isStrongReminder,
       isMarkedAsRead: isMarkedAsRead ?? this.isMarkedAsRead,
       topic: topic ?? this.topic,
       memberCount: memberCount ?? this.memberCount,

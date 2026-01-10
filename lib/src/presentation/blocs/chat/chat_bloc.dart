@@ -153,6 +153,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       // 获取投票消息的聚合结果
       mergedMessages = await _loadPollAggregations(event.roomId, mergedMessages);
 
+      // 获取消息的反应聚合结果
+      mergedMessages = await _loadReactionAggregations(event.roomId, mergedMessages);
+
       emit(state.copyWith(
         messages: mergedMessages,
         isLoading: false,
@@ -233,6 +236,63 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }
       } catch (e) {
         debugPrint('ChatBloc: Failed to load poll aggregations for ${pollMsg.id}: $e');
+      }
+    }
+
+    return updatedMessages;
+  }
+
+  /// 加载消息的反应聚合结果
+  Future<List<MessageEntity>> _loadReactionAggregations(
+    String roomId,
+    List<MessageEntity> messages,
+  ) async {
+    // 只为没有反应的消息获取反应聚合（避免重复请求）
+    // 检查最近的一些消息，因为旧消息可能没有反应
+    final messagesToCheck = messages.take(50).toList();
+    if (messagesToCheck.isEmpty) return messages;
+
+    final updatedMessages = List<MessageEntity>.from(messages);
+
+    for (final msg in messagesToCheck) {
+      // 跳过已经有反应的消息
+      if (msg.reactions.isNotEmpty) continue;
+
+      try {
+        final aggregations = await _messageRepository.getReactionAggregations(
+          roomId,
+          msg.id,
+        );
+
+        if (aggregations != null) {
+          final reactionsData = aggregations['reactions'] as Map<String, dynamic>?;
+          if (reactionsData != null && reactionsData.isNotEmpty) {
+            final reactions = <MessageReaction>[];
+
+            for (final entry in reactionsData.entries) {
+              final emoji = entry.key;
+              final data = entry.value as Map<String, dynamic>;
+              final userIds = (data['userIds'] as List<String>?) ?? [];
+              final isMe = data['isMe'] as bool? ?? false;
+
+              reactions.add(MessageReaction(
+                key: emoji,
+                userIds: userIds,
+                isMe: isMe,
+              ));
+            }
+
+            if (reactions.isNotEmpty) {
+              final index = updatedMessages.indexWhere((m) => m.id == msg.id);
+              if (index != -1) {
+                updatedMessages[index] = msg.copyWith(reactions: reactions);
+                debugPrint('ChatBloc: Loaded ${reactions.length} reactions for message ${msg.id}');
+              }
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('ChatBloc: Failed to load reaction aggregations for ${msg.id}: $e');
       }
     }
 

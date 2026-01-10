@@ -13,6 +13,7 @@ class SecureStorageDataSource {
   static const String _keySettings = 'n42_chat_settings';
   static const String _keyContactRemarks = 'n42_chat_contact_remarks';
   static const String _keyAppearanceSettings = 'n42_chat_appearance_settings';
+  static const String _keyStrongReminders = 'n42_chat_strong_reminders';
 
   final FlutterSecureStorage _storage;
 
@@ -320,6 +321,48 @@ class SecureStorageDataSource {
   /// 删除联系人备注
   Future<void> removeContactRemark(String userId) async {
     await setContactRemark(userId, null);
+  }
+
+  // ============================================
+  // 强提醒设置
+  // ============================================
+
+  /// 获取所有强提醒设置
+  Future<Map<String, bool>> getStrongReminders() async {
+    try {
+      final data = await _storage.read(key: _keyStrongReminders);
+      if (data == null) return {};
+
+      final json = jsonDecode(data) as Map<String, dynamic>;
+      return json.map((key, value) => MapEntry(key, value == true || value == 'true'));
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read strong reminders - $e');
+      return {};
+    }
+  }
+
+  /// 设置强提醒
+  Future<void> setStrongReminder(String roomId, bool enabled) async {
+    final reminders = await getStrongReminders();
+
+    if (!enabled) {
+      reminders.remove(roomId);
+    } else {
+      reminders[roomId] = true;
+    }
+
+    await _storage.write(
+      key: _keyStrongReminders,
+      value: jsonEncode(reminders),
+    );
+
+    debugPrint('SecureStorage: Strong reminder set for $roomId: $enabled');
+  }
+
+  /// 获取强提醒状态
+  Future<bool> getStrongReminderStatus(String roomId) async {
+    final reminders = await getStrongReminders();
+    return reminders[roomId] ?? false;
   }
 
   // ============================================

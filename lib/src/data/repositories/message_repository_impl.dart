@@ -303,20 +303,50 @@ class MessageRepositoryImpl implements IMessageRepository {
         return null;
       }
 
-      final uri = Uri.parse(mxcUrl);
-      final downloadLink = uri.getDownloadLink(_client!);
-      debugPrint('downloadMedia: Download link: $downloadLink');
+      // 解析 mxc:// URL
+      if (!mxcUrl.startsWith('mxc://')) {
+        debugPrint('downloadMedia: Invalid mxc URL: $mxcUrl');
+        return null;
+      }
 
-      final response = await _client!.httpClient.get(downloadLink);
+      final uri = Uri.parse(mxcUrl);
+      final serverName = uri.host;
+      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+
+      if (serverName.isEmpty || mediaId.isEmpty) {
+        debugPrint('downloadMedia: Invalid mxc URL components: server=$serverName, mediaId=$mediaId');
+        return null;
+      }
+
+      // 使用 Matrix 1.11+ 认证媒体端点
+      final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      final authenticatedUrl = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
+      debugPrint('downloadMedia: Using authenticated URL: $authenticatedUrl');
+
+      // 使用 Matrix 客户端的 httpClient（自动包含认证信息）
+      final response = await _client!.httpClient.get(Uri.parse(authenticatedUrl));
       debugPrint('downloadMedia: Response status: ${response?.statusCode}');
       debugPrint('downloadMedia: Response body size: ${response?.bodyBytes.length ?? 0}');
 
       if (response != null && response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
         return response.bodyBytes;
-      } else {
-        debugPrint('downloadMedia: Download failed - status: ${response?.statusCode}');
-        return null;
       }
+
+      // 如果认证端点失败，尝试旧的 SDK 方法作为后备
+      debugPrint('downloadMedia: Authenticated endpoint failed, trying SDK fallback');
+      final downloadLink = uri.getDownloadLink(_client!);
+      debugPrint('downloadMedia: SDK download link: $downloadLink');
+
+      final fallbackResponse = await _client!.httpClient.get(downloadLink);
+      debugPrint('downloadMedia: Fallback response status: ${fallbackResponse?.statusCode}');
+      debugPrint('downloadMedia: Fallback response body size: ${fallbackResponse?.bodyBytes.length ?? 0}');
+
+      if (fallbackResponse != null && fallbackResponse.statusCode == 200 && fallbackResponse.bodyBytes.isNotEmpty) {
+        return fallbackResponse.bodyBytes;
+      }
+
+      debugPrint('downloadMedia: Both methods failed');
+      return null;
     } catch (e, stackTrace) {
       debugPrint('downloadMedia: Error downloading media: $e');
       debugPrint('downloadMedia: Stack trace: $stackTrace');
@@ -446,6 +476,19 @@ class MessageRepositoryImpl implements IMessageRepository {
   @override
   Stream<Map<String, dynamic>>? watchPollResponses(String roomId) {
     return _messageDataSource.watchPollResponses(roomId);
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getReactionAggregations(
+    String roomId,
+    String eventId,
+  ) async {
+    try {
+      return await _messageDataSource.getReactionAggregations(roomId, eventId);
+    } catch (e) {
+      debugPrint('MessageRepositoryImpl: Failed to get reaction aggregations: $e');
+      return null;
+    }
   }
 
   @override

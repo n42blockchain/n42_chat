@@ -169,7 +169,10 @@ void _registerRepositories() {
 
   // 会话仓库
   getIt.registerLazySingleton<IConversationRepository>(
-    () => ConversationRepositoryImpl(getIt<MatrixRoomDataSource>()),
+    () => ConversationRepositoryImpl(
+      getIt<MatrixRoomDataSource>(),
+      getIt<SecureStorageDataSource>(),
+    ),
   );
 
   // 消息仓库

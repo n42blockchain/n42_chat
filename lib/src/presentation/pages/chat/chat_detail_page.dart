@@ -67,10 +67,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     super.initState();
     _isPinned = widget.conversation.isPinned;
     _isMuted = widget.conversation.isMuted;
-    
+
     // 使用 conversation.directUserId 初始化
     _cachedOtherUserId = widget.conversation.directUserId;
-    
+
+    // 加载强提醒状态
+    _loadStrongReminderStatus();
+
     // 监听备注更新
     _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
       final targetUserId = widget.conversation.directUserId;
@@ -79,6 +82,21 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         setState(() {});
       }
     });
+  }
+
+  /// 加载强提醒状态
+  Future<void> _loadStrongReminderStatus() async {
+    try {
+      final repository = getIt<IConversationRepository>();
+      final isStrongReminder = await repository.getStrongReminder(widget.conversation.id);
+      if (mounted) {
+        setState(() {
+          _isStrongReminder = isStrongReminder;
+        });
+      }
+    } catch (e) {
+      debugPrint('ChatDetailPage: Failed to load strong reminder status: $e');
+    }
   }
   
   @override
@@ -137,6 +155,23 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       if (mounted) {
         setState(() {
           _isPinned = !pinned;
+        });
+      }
+    }
+  }
+
+  /// 更新强提醒状态
+  Future<void> _updateStrongReminderStatus(bool enabled) async {
+    try {
+      final repository = getIt<IConversationRepository>();
+      await repository.setStrongReminder(widget.conversation.id, enabled);
+      debugPrint('ChatDetailPage: Strong reminder status updated to $enabled');
+    } catch (e) {
+      debugPrint('ChatDetailPage: Failed to update strong reminder status: $e');
+      // 恢复原状态
+      if (mounted) {
+        setState(() {
+          _isStrongReminder = !enabled;
         });
       }
     }
@@ -336,7 +371,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     setState(() {
                       _isStrongReminder = value;
                     });
-                    // TODO: 持久化强提醒设置（需要添加相应的存储方法）
+                    // 持久化强提醒设置
+                    _updateStrongReminderStatus(value);
                   },
                 ),
               ],
