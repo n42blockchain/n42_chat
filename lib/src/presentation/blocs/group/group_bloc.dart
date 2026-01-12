@@ -138,12 +138,26 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     UpdateGroupName event,
     Emitter<GroupState> emit,
   ) async {
+    // 保存当前状态以便在操作后恢复
+    final currentState = state;
+
     try {
       await _groupRepository.setGroupName(event.roomId, event.name);
-      emit(const GroupOperationSuccess('群名称已更新'));
-      add(LoadGroupDetails(event.roomId));
+
+      // 重新加载群详情以获取更新后的数据
+      final group = await _groupRepository.getGroup(event.roomId);
+      if (group != null) {
+        final members = await _groupRepository.getGroupMembers(event.roomId);
+        emit(GroupDetailsLoaded(group: group, members: members));
+      }
+
+      emit(const GroupOperationSuccess('Group name updated'));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      // 恢复之前的状态，然后显示错误
+      if (currentState is GroupDetailsLoaded) {
+        emit(currentState);
+      }
+      emit(GroupError('Failed to update group name: ${e.toString()}'));
     }
   }
 
@@ -151,12 +165,24 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     UpdateGroupTopic event,
     Emitter<GroupState> emit,
   ) async {
+    final currentState = state;
+
     try {
       await _groupRepository.setGroupTopic(event.roomId, event.topic);
-      emit(const GroupOperationSuccess('群描述已更新'));
-      add(LoadGroupDetails(event.roomId));
+
+      // 重新加载群详情
+      final group = await _groupRepository.getGroup(event.roomId);
+      if (group != null) {
+        final members = await _groupRepository.getGroupMembers(event.roomId);
+        emit(GroupDetailsLoaded(group: group, members: members));
+      }
+
+      emit(const GroupOperationSuccess('Group description updated'));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      if (currentState is GroupDetailsLoaded) {
+        emit(currentState);
+      }
+      emit(GroupError('Failed to update group description: ${e.toString()}'));
     }
   }
 
@@ -164,12 +190,24 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     UpdateGroupAvatar event,
     Emitter<GroupState> emit,
   ) async {
+    final currentState = state;
+
     try {
       await _groupRepository.setGroupAvatar(event.roomId, event.avatar);
-      emit(const GroupOperationSuccess('群头像已更新'));
-      add(LoadGroupDetails(event.roomId));
+
+      // 重新加载群详情
+      final group = await _groupRepository.getGroup(event.roomId);
+      if (group != null) {
+        final members = await _groupRepository.getGroupMembers(event.roomId);
+        emit(GroupDetailsLoaded(group: group, members: members));
+      }
+
+      emit(const GroupOperationSuccess('Group avatar updated'));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      if (currentState is GroupDetailsLoaded) {
+        emit(currentState);
+      }
+      emit(GroupError('Failed to update group avatar: ${e.toString()}'));
     }
   }
 
