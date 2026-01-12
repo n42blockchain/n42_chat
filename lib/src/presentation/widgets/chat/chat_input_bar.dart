@@ -48,7 +48,7 @@ class ChatInputBar extends StatefulWidget {
   final ValueChanged<bool>? onFocusChanged;
 
   /// 占位文字
-  final String hintText;
+  final String? hintText;
 
   /// 是否显示语音按钮
   final bool showVoiceButton;
@@ -81,7 +81,7 @@ class ChatInputBar extends StatefulWidget {
     this.onMorePressed,
     this.onChanged,
     this.onFocusChanged,
-    this.hintText = '发送消息',
+    this.hintText,
     this.showVoiceButton = true,
     this.showEmojiButton = true,
     this.showMoreButton = true,
@@ -203,7 +203,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('开始录音失败: $e'),
+            content: Text('${S.of(context)?.startRecordingFailed ?? 'Start recording failed'}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -251,7 +251,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('停止录音失败: $e'),
+            content: Text('${S.of(context)?.stopRecordingFailed ?? 'Stop recording failed'}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -380,7 +380,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
         decoration: InputDecoration(
-          hintText: widget.hintText,
+          hintText: widget.hintText ?? S.of(context)?.sendMessage ?? 'Send message',
           hintStyle: TextStyle(
             fontSize: 16,
             color: AppColors.textTertiary,

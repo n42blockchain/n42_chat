@@ -24,6 +24,7 @@
         "flutter_bloc",
         "flutter_callkit_incoming",
         "flutter_local_notifications",
+        "flutter_localizations",
         "flutter_secure_storage",
         "flutter_slidable",
         "flutter_svg",
@@ -37,7 +38,6 @@
         "injectable",
         "intl",
         "json_annotation",
-        "livekit_client",
         "logger",
         "matrix",
         "mime",
@@ -52,6 +52,7 @@
         "qr_flutter",
         "record",
         "rxdart",
+        "saver_gallery",
         "shimmer",
         "sign_in_with_apple",
         "sqlite3_flutter_libs",
@@ -321,33 +322,6 @@
       ]
     },
     {
-      "name": "livekit_client",
-      "version": "2.6.0",
-      "dependencies": [
-        "async",
-        "collection",
-        "connectivity_plus",
-        "dart_jsonwebtoken",
-        "dart_webrtc",
-        "device_info_plus",
-        "fixnum",
-        "flutter",
-        "flutter_web_plugins",
-        "flutter_webrtc",
-        "http",
-        "json_annotation",
-        "logging",
-        "meta",
-        "mime_type",
-        "path",
-        "protobuf",
-        "sdp_transform",
-        "synchronized",
-        "uuid",
-        "web"
-      ]
-    },
-    {
       "name": "flutter_webrtc",
       "version": "1.2.1",
       "dependencies": [
@@ -473,7 +447,7 @@
     },
     {
       "name": "intl",
-      "version": "0.18.1",
+      "version": "0.20.2",
       "dependencies": [
         "clock",
         "meta",
@@ -501,6 +475,17 @@
       ]
     },
     {
+      "name": "saver_gallery",
+      "version": "3.0.6",
+      "dependencies": [
+        "flutter",
+        "mime",
+        "path",
+        "path_provider",
+        "uuid"
+      ]
+    },
+    {
       "name": "permission_handler",
       "version": "11.4.0",
       "dependencies": [
@@ -511,6 +496,32 @@
         "permission_handler_html",
         "permission_handler_platform_interface",
         "permission_handler_windows"
+      ]
+    },
+    {
+      "name": "file_picker",
+      "version": "8.3.7",
+      "dependencies": [
+        "cross_file",
+        "ffi",
+        "flutter",
+        "flutter_plugin_android_lifecycle",
+        "flutter_web_plugins",
+        "path",
+        "plugin_platform_interface",
+        "web",
+        "win32"
+      ]
+    },
+    {
+      "name": "chewie",
+      "version": "1.13.0",
+      "dependencies": [
+        "cupertino_icons",
+        "flutter",
+        "provider",
+        "video_player",
+        "wakelock_plus"
       ]
     },
     {
@@ -756,6 +767,15 @@
         "sqlite3",
         "typed_data",
         "webrtc_interface"
+      ]
+    },
+    {
+      "name": "flutter_localizations",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter",
+        "intl",
+        "path"
       ]
     },
     {
@@ -1405,6 +1425,11 @@
       ]
     },
     {
+      "name": "webrtc_interface",
+      "version": "1.3.0",
+      "dependencies": []
+    },
+    {
       "name": "dart_webrtc",
       "version": "1.6.0",
       "dependencies": [
@@ -1416,88 +1441,6 @@
         "web",
         "webrtc_interface"
       ]
-    },
-    {
-      "name": "dart_jsonwebtoken",
-      "version": "3.3.1",
-      "dependencies": [
-        "clock",
-        "convert",
-        "ed25519_edwards",
-        "pointycastle"
-      ]
-    },
-    {
-      "name": "mime_type",
-      "version": "1.0.1",
-      "dependencies": []
-    },
-    {
-      "name": "sdp_transform",
-      "version": "0.3.2",
-      "dependencies": []
-    },
-    {
-      "name": "device_info_plus",
-      "version": "12.3.0",
-      "dependencies": [
-        "device_info_plus_platform_interface",
-        "ffi",
-        "file",
-        "flutter",
-        "flutter_web_plugins",
-        "meta",
-        "web",
-        "win32",
-        "win32_registry"
-      ]
-    },
-    {
-      "name": "protobuf",
-      "version": "4.2.0",
-      "dependencies": [
-        "collection",
-        "fixnum",
-        "meta"
-      ]
-    },
-    {
-      "name": "synchronized",
-      "version": "3.4.0",
-      "dependencies": []
-    },
-    {
-      "name": "http",
-      "version": "1.6.0",
-      "dependencies": [
-        "async",
-        "http_parser",
-        "meta",
-        "web"
-      ]
-    },
-    {
-      "name": "fixnum",
-      "version": "1.1.1",
-      "dependencies": []
-    },
-    {
-      "name": "connectivity_plus",
-      "version": "7.0.0",
-      "dependencies": [
-        "collection",
-        "connectivity_plus_platform_interface",
-        "flutter",
-        "flutter_web_plugins",
-        "meta",
-        "nm",
-        "web"
-      ]
-    },
-    {
-      "name": "webrtc_interface",
-      "version": "1.3.0",
-      "dependencies": []
     },
     {
       "name": "plugin_platform_interface",
@@ -1677,6 +1620,21 @@
       ]
     },
     {
+      "name": "http",
+      "version": "1.6.0",
+      "dependencies": [
+        "async",
+        "http_parser",
+        "meta",
+        "web"
+      ]
+    },
+    {
+      "name": "fixnum",
+      "version": "1.1.1",
+      "dependencies": []
+    },
+    {
       "name": "permission_handler_platform_interface",
       "version": "4.3.0",
       "dependencies": [
@@ -1718,6 +1676,40 @@
         "flutter",
         "permission_handler_platform_interface"
       ]
+    },
+    {
+      "name": "cross_file",
+      "version": "0.3.5+1",
+      "dependencies": [
+        "meta",
+        "web"
+      ]
+    },
+    {
+      "name": "ffi",
+      "version": "2.1.4",
+      "dependencies": []
+    },
+    {
+      "name": "flutter_plugin_android_lifecycle",
+      "version": "2.0.33",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "provider",
+      "version": "6.1.5+1",
+      "dependencies": [
+        "collection",
+        "flutter",
+        "nested"
+      ]
+    },
+    {
+      "name": "cupertino_icons",
+      "version": "1.0.8",
+      "dependencies": []
     },
     {
       "name": "record_macos",
@@ -1776,6 +1768,11 @@
         "flutter",
         "plugin_platform_interface"
       ]
+    },
+    {
+      "name": "synchronized",
+      "version": "3.4.0",
+      "dependencies": []
     },
     {
       "name": "file",
@@ -2100,15 +2097,6 @@
       ]
     },
     {
-      "name": "provider",
-      "version": "6.1.5+1",
-      "dependencies": [
-        "collection",
-        "flutter",
-        "nested"
-      ]
-    },
-    {
       "name": "typed_data",
       "version": "1.4.0",
       "dependencies": [
@@ -2127,6 +2115,11 @@
     {
       "name": "slugify",
       "version": "2.0.0",
+      "dependencies": []
+    },
+    {
+      "name": "sdp_transform",
+      "version": "0.3.2",
       "dependencies": []
     },
     {
@@ -2178,11 +2171,6 @@
         "crypto",
         "meta"
       ]
-    },
-    {
-      "name": "ffi",
-      "version": "2.1.4",
-      "dependencies": []
     },
     {
       "name": "enhanced_enum",
@@ -2407,63 +2395,18 @@
       ]
     },
     {
-      "name": "ed25519_edwards",
-      "version": "0.3.1",
-      "dependencies": [
-        "adaptive_number",
-        "collection",
-        "convert",
-        "crypto"
-      ]
-    },
-    {
-      "name": "pointycastle",
-      "version": "4.0.0",
-      "dependencies": [
-        "collection",
-        "convert"
-      ]
-    },
-    {
-      "name": "win32_registry",
-      "version": "2.1.0",
-      "dependencies": [
-        "ffi",
-        "meta",
-        "win32"
-      ]
-    },
-    {
-      "name": "device_info_plus_platform_interface",
-      "version": "7.0.3",
-      "dependencies": [
-        "flutter",
-        "meta",
-        "plugin_platform_interface"
-      ]
-    },
-    {
-      "name": "nm",
-      "version": "0.5.0",
-      "dependencies": [
-        "dbus"
-      ]
-    },
-    {
-      "name": "connectivity_plus_platform_interface",
-      "version": "2.0.1",
-      "dependencies": [
-        "flutter",
-        "meta",
-        "plugin_platform_interface"
-      ]
-    },
-    {
       "name": "path_parsing",
       "version": "1.1.0",
       "dependencies": [
         "meta",
         "vector_math"
+      ]
+    },
+    {
+      "name": "nested",
+      "version": "1.0.0",
+      "dependencies": [
+        "flutter"
       ]
     },
     {
@@ -2493,14 +2436,6 @@
       ]
     },
     {
-      "name": "cross_file",
-      "version": "0.3.5+1",
-      "dependencies": [
-        "meta",
-        "web"
-      ]
-    },
-    {
       "name": "file_selector_macos",
       "version": "0.9.5",
       "dependencies": [
@@ -2515,13 +2450,6 @@
       "dependencies": [
         "cross_file",
         "file_selector_platform_interface",
-        "flutter"
-      ]
-    },
-    {
-      "name": "flutter_plugin_android_lifecycle",
-      "version": "2.0.33",
-      "dependencies": [
         "flutter"
       ]
     },
@@ -2541,13 +2469,6 @@
       "name": "platform",
       "version": "3.1.6",
       "dependencies": []
-    },
-    {
-      "name": "nested",
-      "version": "1.0.0",
-      "dependencies": [
-        "flutter"
-      ]
     },
     {
       "name": "archive",
@@ -2609,13 +2530,6 @@
       ]
     },
     {
-      "name": "adaptive_number",
-      "version": "1.0.0",
-      "dependencies": [
-        "fixnum"
-      ]
-    },
-    {
       "name": "sqflite_platform_interface",
       "version": "2.4.0",
       "dependencies": [
@@ -2655,37 +2569,6 @@
         "meta",
         "path"
       ]
-    },
-    {
-      "name": "file_picker",
-      "version": "8.3.7",
-      "dependencies": [
-        "cross_file",
-        "ffi",
-        "flutter",
-        "flutter_plugin_android_lifecycle",
-        "flutter_web_plugins",
-        "path",
-        "plugin_platform_interface",
-        "web",
-        "win32"
-      ]
-    },
-    {
-      "name": "chewie",
-      "version": "1.13.0",
-      "dependencies": [
-        "cupertino_icons",
-        "flutter",
-        "provider",
-        "video_player",
-        "wakelock_plus"
-      ]
-    },
-    {
-      "name": "cupertino_icons",
-      "version": "1.0.8",
-      "dependencies": []
     }
   ],
   "configVersion": 1

@@ -238,6 +238,21 @@ class MatrixContactDataSource {
     await room.leave();
   }
 
+  /// 删除联系人（离开私聊房间）
+  Future<void> deleteContact(String userId) async {
+    if (_client == null) return;
+
+    // 获取与该用户的私聊房间
+    final roomId = _client!.getDirectChatFromUserId(userId);
+    if (roomId == null) return;
+
+    final room = _client!.getRoomById(roomId);
+    if (room == null) return;
+
+    // 离开房间（相当于删除联系人）
+    await room.leave();
+  }
+
   // ============================================
   // 监听
   // ============================================

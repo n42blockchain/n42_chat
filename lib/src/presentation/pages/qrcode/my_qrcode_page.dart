@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -61,9 +62,9 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
     if (_userId != null) {
       Clipboard.setData(ClipboardData(text: _userId!));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('已复制用户 ID'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(S.of(context)?.idCopied ?? 'ID copied'),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -72,7 +73,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
   void _shareQRCode() {
     // TODO: 实现分享功能
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('分享功能即将推出')),
+      SnackBar(content: Text(S.of(context)?.shareFeatureComingSoon ?? 'Share feature coming soon')),
     );
   }
 
@@ -94,7 +95,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          '我的二维码',
+          S.of(context)?.myQrCode ?? 'My QR Code',
           style: TextStyle(color: textColor, fontSize: 18),
         ),
         centerTitle: true,
@@ -139,7 +140,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _displayName ?? '加载中...',
+                          _displayName ?? (S.of(context)?.loading ?? 'Loading...'),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -204,7 +205,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
 
               // 提示文字
               Text(
-                '扫一扫上面的二维码，加我为好友',
+                S.of(context)?.scanQrToAddMe ?? 'Scan the QR code above to add me as a friend',
                 style: TextStyle(
                   fontSize: 14,
                   color: subtitleColor,
@@ -219,14 +220,14 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                 children: [
                   _buildActionButton(
                     icon: Icons.copy,
-                    label: '复制 ID',
+                    label: S.of(context)?.copyId ?? 'Copy ID',
                     onTap: _copyUserId,
                     isDark: isDark,
                   ),
                   const SizedBox(width: 32),
                   _buildActionButton(
                     icon: Icons.share,
-                    label: '分享',
+                    label: S.of(context)?.share ?? 'Share',
                     onTap: _shareQRCode,
                     isDark: isDark,
                   ),
@@ -298,21 +299,21 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.save_alt),
-                  title: const Text('保存到相册'),
+                  title: Text(S.of(context)?.saveToAlbum ?? 'Save to Album'),
                   onTap: () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('保存功能即将推出')),
+                      SnackBar(content: Text(S.of(context)?.saveFeatureComingSoon ?? 'Save feature coming soon')),
                     );
                   },
                 ),
                 ListTile(
                   leading: const Icon(Icons.refresh),
-                  title: const Text('换个样式'),
+                  title: Text(S.of(context)?.changeStyle ?? 'Change Style'),
                   onTap: () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('更多样式即将推出')),
+                      SnackBar(content: Text(S.of(context)?.moreStylesFeatureComingSoon ?? 'More styles coming soon')),
                     );
                   },
                 ),

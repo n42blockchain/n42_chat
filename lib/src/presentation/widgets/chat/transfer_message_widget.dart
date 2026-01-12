@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 /// 转账消息组件（仿微信）
 class TransferMessageWidget extends StatelessWidget {
   /// 转账金额
@@ -94,7 +96,7 @@ class TransferMessageWidget extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          _getStatusText(),
+                          _getStatusText(context),
                           style: TextStyle(
                             fontSize: 12,
                             color: _getTextColor().withOpacity(0.7),
@@ -118,7 +120,7 @@ class TransferMessageWidget extends StatelessWidget {
                 ),
               ),
               child: Text(
-                '转账',
+                S.of(context)?.transfer ?? 'Transfer',
                 style: TextStyle(
                   fontSize: 11,
                   color: _getTextColor().withOpacity(0.5),
@@ -165,16 +167,20 @@ class TransferMessageWidget extends StatelessWidget {
     }
   }
 
-  String _getStatusText() {
+  String _getStatusText(BuildContext context) {
     switch (status) {
       case TransferStatus.pending:
-        return isSelf ? '待对方接收' : '点击领取';
+        return isSelf
+            ? (S.of(context)?.waitingToReceive ?? 'Waiting to receive')
+            : (S.of(context)?.tapToClaim ?? 'Tap to claim');
       case TransferStatus.received:
-        return isSelf ? '已被接收' : '已收款';
+        return isSelf
+            ? (S.of(context)?.hasBeenReceived ?? 'Has been received')
+            : (S.of(context)?.received ?? 'Received');
       case TransferStatus.refunded:
-        return '已退还';
+        return S.of(context)?.refunded ?? 'Refunded';
       case TransferStatus.expired:
-        return '已过期';
+        return S.of(context)?.expired ?? 'Expired';
     }
   }
 }
@@ -258,7 +264,7 @@ class RedPacketMessageWidget extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              note ?? '恭喜发财，大吉大利',
+                              note ?? (S.of(context)?.redPacketGreeting ?? 'Best wishes'),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -270,7 +276,7 @@ class RedPacketMessageWidget extends StatelessWidget {
                             if (isOpened) ...[
                               const SizedBox(height: 2),
                               Text(
-                                _getStatusText(),
+                                _getStatusText(context),
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: textColor.withOpacity(0.7),
@@ -291,7 +297,7 @@ class RedPacketMessageWidget extends StatelessWidget {
                     color: Colors.black.withOpacity(0.05),
                   ),
                   child: Text(
-                    'N42红包',
+                    S.of(context)?.n42RedPacket ?? 'N42 Red Packet',
                     style: TextStyle(
                       fontSize: 12,
                       color: textColor.withOpacity(0.6),
@@ -369,16 +375,16 @@ class RedPacketMessageWidget extends StatelessWidget {
     );
   }
 
-  String _getStatusText() {
+  String _getStatusText(BuildContext context) {
     switch (status) {
       case RedPacketStatus.pending:
-        return '领个好彩头';
+        return S.of(context)?.getLucky ?? 'Get lucky';
       case RedPacketStatus.opened:
-        return '已领取';
+        return S.of(context)?.claimed ?? 'Claimed';
       case RedPacketStatus.expired:
-        return '已过期';
+        return S.of(context)?.expired ?? 'Expired';
       case RedPacketStatus.empty:
-        return '已被领完';
+        return S.of(context)?.allClaimed ?? 'All claimed';
     }
   }
 }

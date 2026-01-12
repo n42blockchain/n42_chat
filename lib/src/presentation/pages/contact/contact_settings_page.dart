@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
+import '../../blocs/contact/contact_state.dart';
 import 'contact_detail_page.dart';
 
 /// 联系人设置页面（仿微信 - 图二）
@@ -54,7 +56,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          '设置',
+          S.of(context)?.settings ?? 'Settings',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
@@ -74,55 +76,55 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: '编辑备注',
+                  title: S.of(context)?.editRemark ?? 'Edit Remark',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _openEditRemark(),
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             // 设置权限
             _buildMenuSection(
               cardColor: cardColor,
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: '设置权限',
+                  title: S.of(context)?.setPermissions ?? 'Set Permissions',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             // 把他(她)推荐给朋友
             _buildMenuSection(
               cardColor: cardColor,
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: '把他 (她) 推荐给朋友',
+                  title: S.of(context)?.recommendToFriend ?? 'Recommend to Friend',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             // 设为星标朋友 & 加入黑名单
             _buildMenuSection(
               cardColor: cardColor,
               dividerColor: dividerColor,
               children: [
                 _buildSwitchItem(
-                  title: '设为星标朋友',
+                  title: S.of(context)?.setAsStarred ?? 'Set as Starred',
                   value: _isStarred,
                   textColor: textColor,
                   onChanged: (value) {
@@ -134,7 +136,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildSwitchItem(
-                  title: '加入黑名单',
+                  title: S.of(context)?.addToBlocklist ?? 'Add to Blocklist',
                   value: _isBlocked,
                   textColor: textColor,
                   onChanged: (value) {
@@ -150,25 +152,25 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             // 投诉
             _buildMenuSection(
               cardColor: cardColor,
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: '投诉',
+                  title: S.of(context)?.report ?? 'Report',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // 删除联系人
             _buildMenuSection(
               cardColor: cardColor,
@@ -179,9 +181,9 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     alignment: Alignment.center,
-                    child: const Text(
-                      '删除联系人',
-                      style: TextStyle(
+                    child: Text(
+                      S.of(context)?.deleteContact ?? 'Delete Contact',
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Colors.red,
                       ),
@@ -315,29 +317,90 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
   void _showDeleteConfirm() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('删除联系人'),
-        content: Text('确定要删除 ${widget.displayName} 吗？'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.deleteContact ?? 'Delete Contact'),
+        content: Text(S.of(context)?.deleteContactConfirm(widget.displayName) ?? 'Are you sure you want to delete ${widget.displayName}?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消'),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              // TODO: 实现删除联系人
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
+              _deleteContact();
             },
-            child: const Text(
-              '删除',
-              style: TextStyle(color: Colors.red),
+            child: Text(
+              S.of(context)?.delete ?? 'Delete',
+              style: const TextStyle(color: Colors.red),
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _deleteContact() async {
+    // 显示加载指示器
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      // 发送删除事件
+      final bloc = context.read<ContactBloc>();
+      bloc.add(DeleteContact(widget.userId));
+
+      // 等待状态变化
+      await for (final state in bloc.stream) {
+        if (state is ContactDeleted && state.userId == widget.userId) {
+          // 删除成功
+          if (mounted) {
+            Navigator.of(context).pop(); // 关闭加载指示器
+
+            // 返回到联系人列表（连续关闭设置页和详情页）
+            Navigator.of(context).pop(); // 关闭设置页面
+            Navigator.of(context).pop(); // 关闭联系人详情页面
+          }
+          break;
+        } else if (state is ContactError) {
+          // 删除失败
+          if (mounted) {
+            Navigator.of(context).pop(); // 关闭加载指示器
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+          break;
+        } else if (state is ContactLoaded) {
+          // 联系人列表已刷新，说明删除成功
+          if (mounted) {
+            Navigator.of(context).pop(); // 关闭加载指示器
+            Navigator.of(context).pop(); // 关闭设置页面
+            Navigator.of(context).pop(); // 关闭联系人详情页面
+          }
+          break;
+        }
+      }
+    } catch (e) {
+      // 发生异常
+      if (mounted) {
+        Navigator.of(context).pop(); // 关闭加载指示器
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${S.of(context)?.deleteContact ?? "Delete failed"}: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 }
 

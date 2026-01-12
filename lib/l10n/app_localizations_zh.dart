@@ -280,7 +280,7 @@ class SZh extends S {
   String get messages => '消息';
 
   @override
-  String get contacts => '通讯录';
+  String get contacts => '联系人';
 
   @override
   String get discover => '发现';
@@ -387,12 +387,12 @@ class SZh extends S {
 
   @override
   String conversationLabel(String roomId) {
-    return '会话: $roomId';
+    return '会话';
   }
 
   @override
   String contactLabel(String userId) {
-    return '联系人: $userId';
+    return '联系人';
   }
 
   @override
@@ -1138,7 +1138,7 @@ class SZh extends S {
   }
 
   @override
-  String get searchContactsGroupsMessages => '搜索联系人、群聊、消息';
+  String get searchContactsGroupsMessages => '搜索联系人、群聊和消息';
 
   @override
   String get searchError => '搜索出错';
@@ -1347,8 +1347,8 @@ class SZh extends S {
   String get receiveTransfer => '收到转账';
 
   @override
-  String fromSender(String senderName) {
-    return '来自 $senderName';
+  String fromSender(String name) {
+    return '来自 $name';
   }
 
   @override
@@ -1517,7 +1517,7 @@ class SZh extends S {
   String get invoiceDeleted => '发票抬头已删除';
 
   @override
-  String get invoiceType => '抬头类型: ';
+  String get invoiceType => '抬头类型';
 
   @override
   String get personal => '个人';
@@ -1599,7 +1599,7 @@ class SZh extends S {
   String get receiveAmount => '收款金额';
 
   @override
-  String get enterValidAmount => '请输入有效的金额';
+  String get enterValidAmount => '请输入有效的转账金额';
 
   @override
   String get addressCopied => '地址已复制';
@@ -2009,36 +2009,6 @@ class SZh extends S {
   String get defaultRingtone => '默认铃声';
 
   @override
-  String get ringtoneClear => '清脆';
-
-  @override
-  String get ringtonePhone => '电话铃声';
-
-  @override
-  String get ringtoneClassic => '古典';
-
-  @override
-  String get ringtoneSoft => '柔和';
-
-  @override
-  String get ringtoneVibrate => '振动';
-
-  @override
-  String get ringtoneSilent => '静音';
-
-  @override
-  String get selectRingtone => '选择铃声';
-
-  @override
-  String get stop => '停止';
-
-  @override
-  String get loadingRingtones => '正在加载铃声...';
-
-  @override
-  String get noPermissionToEditGroupName => '您没有权限修改群名称';
-
-  @override
   String get myAddresses => '我的地址';
 
   @override
@@ -2287,6 +2257,21 @@ class SZh extends S {
   String get videoRecordingFailed => '视频录制失败，请重试';
 
   @override
+  String get redPacket => '红包';
+
+  @override
+  String get music => '音乐';
+
+  @override
+  String get coupon => '卡券';
+
+  @override
+  String get gift => '礼物';
+
+  @override
+  String get poll => '投票';
+
+  @override
   String get text => '文本';
 
   @override
@@ -2299,10 +2284,23 @@ class SZh extends S {
   String get myNotes => '我的笔记';
 
   @override
-  String get noFavorites => '暂无收藏内容';
+  String get today => '今天';
 
   @override
-  String get longPressToFavorite => '长按聊天消息可收藏';
+  String daysAgoText(int count) {
+    return '$count天前';
+  }
+
+  @override
+  String dateFormat(int month, int day) {
+    return '$month月$day日';
+  }
+
+  @override
+  String get noFavorites => '暂无收藏';
+
+  @override
+  String get longPressToFavorite => '长按消息进行收藏';
 
   @override
   String get newNote => '新建笔记';
@@ -2320,167 +2318,417 @@ class SZh extends S {
   String get deleteFavoriteConfirm => '确定要删除这条收藏吗？';
 
   @override
-  String get today => '今天';
+  String get noSearchResultsFound => '没有找到结果';
 
   @override
-  String daysAgoText(int count) {
-    return '$count天前';
+  String get sendRedPacket => '发红包';
+
+  @override
+  String get amount => '金额';
+
+  @override
+  String get redPacketCover => '红包封面';
+
+  @override
+  String get redPacketType => '红包类型';
+
+  @override
+  String get normalRedPacket => '普通红包';
+
+  @override
+  String get luckyRedPacket => '拼手气';
+
+  @override
+  String get redPacketCount => '红包个数';
+
+  @override
+  String get pieces => '个';
+
+  @override
+  String get putMoneyInRedPacket => '塞钱进红包';
+
+  @override
+  String get redPacketRefundNotice => '未领取的红包，将于24小时后发起退款';
+
+  @override
+  String get openRedPacket => '開';
+
+  @override
+  String get redPacketAllClaimed => '红包已被领完';
+
+  @override
+  String get redPacketExpired => '红包已过期';
+
+  @override
+  String get addTransferNote => '添加转账说明';
+
+  @override
+  String get yuan => '元';
+
+  @override
+  String get savedToChangeCanTransfer => '已存入零钱，可直接转账';
+
+  @override
+  String get replyWithEmoji => '用此表情回复';
+
+  @override
+  String get claimedYourRedPacket => '领取了你的';
+
+  @override
+  String get claimedRedPacket => '领取了';
+
+  @override
+  String get otherTyping => '对方正在输入...';
+
+  @override
+  String get processing => '处理中...';
+
+  @override
+  String get transferCancelled => '转账已取消';
+
+  @override
+  String get transferFailed => '转账失败';
+
+  @override
+  String get creatingPaymentRequest => '正在创建收款请求...';
+
+  @override
+  String get processingPayment => '正在处理支付...';
+
+  @override
+  String get paymentFailed => '支付失败';
+
+  @override
+  String get clickRetry => '点击重试';
+
+  @override
+  String get settingsTitle => '设置';
+
+  @override
+  String get editRemark => '编辑备注';
+
+  @override
+  String get setPermissions => '设置权限';
+
+  @override
+  String get recommendToFriends => '把他 (她) 推荐给朋友';
+
+  @override
+  String get setStarFriend => '设为星标朋友';
+
+  @override
+  String get addToBlacklist => '加入黑名单';
+
+  @override
+  String get complain => '投诉';
+
+  @override
+  String get deleteContact => '删除联系人';
+
+  @override
+  String deleteContactConfirm(String name) {
+    return '确定要删除 $name 吗？';
   }
 
   @override
-  String dateFormat(int month, int day) {
-    return '$month月$day日';
+  String get transferTitle => '转账';
+
+  @override
+  String get receiverAddressLabel => '收款地址';
+
+  @override
+  String get selectTokenLabel => '选择代币';
+
+  @override
+  String get transferAmountLabel => '转账金额';
+
+  @override
+  String get memoLabel => '备注（可选）';
+
+  @override
+  String get enterOrPasteAddressHint => '输入或粘贴钱包地址';
+
+  @override
+  String get scanInDevelopment => '扫描功能开发中...';
+
+  @override
+  String get availableLabel => '可用';
+
+  @override
+  String availableBalanceFormat(String balance, String symbol) {
+    return '可用余额: $balance $symbol';
   }
 
   @override
-  String get noSearchResultsFound => '没有找到相关收藏';
+  String get addMemoHint => '添加备注信息';
 
   @override
-  String get searchMembers => '搜索成员';
+  String get receiveTitle => '收款';
 
   @override
-  String get inviteMembers => '邀请成员';
+  String get walletNotConnectedTitle => '钱包未连接';
 
   @override
-  String get selectMembers => '选择成员';
+  String get connectWalletFirst => '请先连接钱包';
 
   @override
-  String get noMembersToAdd => '没有可添加的成员';
+  String get sendPaymentRequest => '发送收款请求';
 
   @override
-  String get cannotRemoveOwner => '不能移除群主';
+  String get qrCodeGenerateFailed => '二维码生成失败';
 
   @override
-  String get memberRemoved => '成员已移除';
+  String get scanQrToPayMe => '扫描二维码向我付款';
 
   @override
-  String get memberAdded => '成员已添加';
+  String get myWalletAddress => '我的钱包地址';
 
   @override
-  String get scanQrCode => '扫一扫';
+  String get createPaymentRequest => '创建收款请求';
 
   @override
-  String get alignQrCode => '将二维码放入框内';
+  String get selectTokenHint => '选择代币';
 
   @override
-  String get flashlight => '手电筒';
+  String get amountLabel => '金额';
 
   @override
-  String get album => '相册';
+  String get cancelButton => '取消';
 
   @override
-  String get invalidQrCode => '无效的二维码';
+  String get sendRequestButton => '发送请求';
 
   @override
-  String get qrCodeScanFailed => '扫描二维码失败';
+  String get allReadReceipt => '全部已读';
 
   @override
-  String get searchUser => '搜索用户';
+  String readCountReceipt(int count) {
+    return '$count人已读';
+  }
 
   @override
-  String get addByIdSearch => '通过ID搜索添加';
+  String n42IdLabel(String id) {
+    return 'N42号：$id';
+  }
 
   @override
-  String get enterN42Id => '输入N42 ID';
+  String get redPacketDefaultGreeting => '恭喜发财，大吉大利';
 
   @override
-  String get chatRecalled => '撤回了一条消息';
+  String senderRedPacket(String name) {
+    return '$name的红包';
+  }
 
   @override
-  String get systemMessage => '系统消息';
+  String get allButton => '全部';
 
   @override
-  String get setStatus => '设个状态';
+  String get enterValidAddress => '请输入有效的收款地址';
 
   @override
-  String get visibleToFriends24h => '朋友 24 小时内可见';
+  String get pleaseSelectToken => '请选择代币';
 
   @override
-  String get writeStatus => '填写状态';
+  String get receivedTransfer => '收到转账';
+
+  @override
+  String get selectForwardRecipient => '选择转发对象';
+
+  @override
+  String get emojiFaces => '表情';
+
+  @override
+  String get emojiHearts => '爱心';
+
+  @override
+  String get emojiAnimals => '动物';
+
+  @override
+  String get emojiFood => '食物';
+
+  @override
+  String get emojiTransport => '交通';
+
+  @override
+  String get emojiActivities => '活动';
+
+  @override
+  String get emojiObjects => '物品';
+
+  @override
+  String get emojiSymbols => '符号';
+
+  @override
+  String get transferProcessing => '正在处理转账...';
+
+  @override
+  String senderSentRedPacket(String name) {
+    return '$name发出的红包';
+  }
+
+  @override
+  String get savedToBalance => '已存入零钱，可直接转账';
+
+  @override
+  String get redPacketExpiredOrEmpty => '红包已过期/已领完';
+
+  @override
+  String get scanFeatureComingSoon => '扫描功能开发中...';
+
+  @override
+  String get setAsStarred => '设为星标朋友';
+
+  @override
+  String get addToBlocklist => '加入黑名单';
+
+  @override
+  String get claimedYour => '领取了你的';
+
+  @override
+  String get claimedText => '领取了';
+
+  @override
+  String userTyping(String name) {
+    return '$name正在输入...';
+  }
+
+  @override
+  String get typing => '对方正在输入...';
+
+  @override
+  String get waitingToReceive => '待对方接收';
+
+  @override
+  String get tapToClaim => '点击领取';
+
+  @override
+  String get hasBeenReceived => '已被接收';
+
+  @override
+  String get getLucky => '领个好彩头';
+
+  @override
+  String get cameraStartFailed => '相机启动失败';
+
+  @override
+  String get unknownError => '未知错误';
+
+  @override
+  String get placeQrCodeInFrame => '将二维码放入框内扫描';
+
+  @override
+  String get closeManualInput => '关闭手动输入';
+
+  @override
+  String get manualInputUserId => '手动输入用户ID';
+
+  @override
+  String get add => '加入';
+
+  @override
+  String get ringtoneClear => '清脆';
+
+  @override
+  String get ringtonePhone => '电话';
+
+  @override
+  String get ringtoneClassic => '经典';
+
+  @override
+  String get ringtoneSoft => '柔和';
+
+  @override
+  String get ringtoneVibrate => '震动';
+
+  @override
+  String get ringtoneSilent => '静音';
+
+  @override
+  String get stop => '停止';
+
+  @override
+  String get selectRingtone => '选择铃声';
+
+  @override
+  String get loadingRingtones => '加载铃声中...';
+
+  @override
+  String get noRingtonesFound => '未找到铃声';
 
   @override
   String get moodAndThoughts => '心情想法';
 
   @override
-  String get workAndStudy => '工作学习';
-
-  @override
-  String get rest => '休息';
-
-  @override
-  String get enterYourStatus => '输入你的状态...';
-
-  @override
-  String get ok => '确定';
-
-  @override
-  String get statusHappy => '美滋滋';
+  String get statusHappy => '开心';
 
   @override
   String get statusCracked => '裂开';
 
   @override
-  String get statusLucky => '求锦鲤';
+  String get statusLucky => '发呆';
 
   @override
-  String get statusSunny => '等天晴';
+  String get statusSunny => '天气晴';
 
   @override
-  String get statusTired => '疲惫';
+  String get statusTired => '累了';
 
   @override
-  String get statusDaydream => '发呆';
+  String get statusDaydream => '发呆中';
 
   @override
-  String get statusRushing => '冲';
+  String get statusRushing => '忙碌';
 
   @override
-  String get statusOverthinking => '胡思乱想';
+  String get statusOverthinking => '想太多';
 
   @override
   String get statusEnergized => '元气满满';
 
   @override
-  String get statusWorking => '搬砖';
+  String get workAndStudy => '工作学习';
 
   @override
-  String get statusStudying => '沉迷学习';
+  String get statusWorking => '搬砖中';
+
+  @override
+  String get statusStudying => '学习中';
 
   @override
   String get statusBusy => '忙';
 
   @override
-  String get statusSlacking => '摸鱼';
+  String get statusSlacking => '摸鱼中';
 
   @override
-  String get statusTraveling => '出差';
+  String get statusTraveling => '旅行中';
 
   @override
-  String get statusGoingHome => '飞奔回家';
+  String get statusGoingHome => '回家中';
 
   @override
-  String get statusDnd => '勿扰模式';
+  String get statusDnd => '请勿打扰';
 
   @override
-  String get statusHanging => '浪';
+  String get statusHanging => '出去浪';
 
   @override
   String get statusCheckIn => '打卡';
 
   @override
-  String get statusExercising => '运动';
+  String get statusExercising => '运动中';
 
   @override
   String get statusCoffee => '喝咖啡';
 
   @override
-  String get statusBubbleTea => '喝奶茶';
+  String get statusBubbleTea => '奶茶';
 
   @override
-  String get statusEating => '干饭';
+  String get statusEating => '干饭中';
 
   @override
-  String get statusParenting => '带娃';
+  String get statusParenting => '带娃中';
 
   @override
   String get statusSavingWorld => '拯救世界';
@@ -2489,31 +2737,49 @@ class SZh extends S {
   String get statusSelfie => '自拍';
 
   @override
+  String get rest => '休息';
+
+  @override
   String get statusRetreat => '闭关';
 
   @override
-  String get statusHome => '宅';
+  String get statusHome => '宅家';
 
   @override
-  String get statusSleeping => '睡觉';
+  String get statusSleeping => '睡觉中';
 
   @override
-  String get statusCatLover => '吸猫';
+  String get statusCatLover => '吸猫中';
 
   @override
-  String get statusDogWalking => '遛狗';
+  String get statusDogWalking => '遛狗中';
 
   @override
-  String get statusGaming => '玩游戏';
+  String get statusGaming => '游戏中';
 
   @override
-  String get statusListening => '听歌';
+  String get statusListening => '听歌中';
 
   @override
-  String get cameraPermissionRequired => '需要相机权限才能扫描二维码';
+  String get setStatus => '设置状态';
 
   @override
-  String get cameraPermissionDenied => '相机权限被永久拒绝，请在系统设置中开启';
+  String get visibleToFriends24h => '可被好友看到，24小时后自动清除';
+
+  @override
+  String get writeStatus => '写状态';
+
+  @override
+  String get enterYourStatus => '输入你的状态...';
+
+  @override
+  String get ok => '确定';
+
+  @override
+  String get cameraPermissionRequired => '扫描二维码需要相机权限';
+
+  @override
+  String get cameraPermissionDenied => '相机权限已被永久拒绝，请在系统设置中开启。';
 
   @override
   String get cannotGetCameraPermission => '无法获取相机权限';
@@ -2522,6 +2788,22 @@ class SZh extends S {
   String permissionCheckError(String error) {
     return '检查权限时出错: $error';
   }
+
+  @override
+  String get invalidQrCode => '无效的二维码';
+
+  @override
+  String qrCodeProcessFailed(String error) {
+    return '处理二维码失败: $error';
+  }
+
+  @override
+  String cannotAddFriend(String error) {
+    return '无法添加好友: $error';
+  }
+
+  @override
+  String get scanQrCode => '扫描二维码';
 
   @override
   String get checkingCameraPermission => '正在检查相机权限...';
@@ -2536,30 +2818,321 @@ class SZh extends S {
   String get openSettings => '打开设置';
 
   @override
-  String get manualInputUserId => '手动输入用户 ID';
+  String get inviteMembers => '邀请成员';
 
   @override
-  String get closeManualInput => '关闭手动输入';
-
-  @override
-  String get cameraStartFailed => '相机启动失败';
-
-  @override
-  String get unknownError => '未知错误';
-
-  @override
-  String get placeQrCodeInFrame => '将二维码放入框内，即可自动扫描';
-
-  @override
-  String cannotAddFriend(String error) {
-    return '无法添加好友: $error';
+  String inviteCount(int count) {
+    return '邀请($count)';
   }
 
   @override
-  String qrCodeProcessFailed(String error) {
-    return '处理二维码失败: $error';
+  String get noShippingAddress => '暂无收货地址';
+
+  @override
+  String get defaultLabel => '默认';
+
+  @override
+  String get editAddress => '编辑地址';
+
+  @override
+  String get recipient => '收货人';
+
+  @override
+  String get enterRecipientName => '请输入收货人姓名';
+
+  @override
+  String get phoneNumber => '手机号码';
+
+  @override
+  String get enterPhoneNumber => '请输入手机号码';
+
+  @override
+  String get regionHint => '省/市/区';
+
+  @override
+  String get detailedAddress => '详细地址';
+
+  @override
+  String get detailedAddressHint => '街道、门牌号等';
+
+  @override
+  String get setAsDefaultAddress => '设为默认地址';
+
+  @override
+  String get pleaseCompleteInfo => '请填写完整信息';
+
+  @override
+  String get noInvoice => '暂无发票抬头';
+
+  @override
+  String get company => '企业';
+
+  @override
+  String get taxNumber => '税号';
+
+  @override
+  String get editInvoice => '编辑发票抬头';
+
+  @override
+  String get companyName => '企业名称';
+
+  @override
+  String get enterCompanyName => '请输入企业名称';
+
+  @override
+  String get personalName => '个人姓名';
+
+  @override
+  String get enterName => '请输入姓名';
+
+  @override
+  String get taxIdNumber => '纳税人识别号';
+
+  @override
+  String get enterTaxIdNumber => '请输入纳税人识别号';
+
+  @override
+  String get bankNameOptional => '开户银行（选填）';
+
+  @override
+  String get enterBankName => '请输入开户银行';
+
+  @override
+  String get bankAccountOptional => '银行账号（选填）';
+
+  @override
+  String get enterBankAccount => '请输入银行账号';
+
+  @override
+  String get companyAddressOptional => '企业地址（选填）';
+
+  @override
+  String get enterCompanyAddress => '请输入企业地址';
+
+  @override
+  String get companyPhoneOptional => '企业电话（选填）';
+
+  @override
+  String get enterCompanyPhone => '请输入企业电话';
+
+  @override
+  String get setAsDefaultInvoice => '设为默认抬头';
+
+  @override
+  String get confirmDeleteAddress => '确定要删除这个地址吗？';
+
+  @override
+  String get confirmDeleteInvoice => '确定要删除这个发票抬头吗？';
+
+  @override
+  String get groupOwner => '群主';
+
+  @override
+  String get groupAdmin => '管理员';
+
+  @override
+  String get searchMembers => '搜索成员';
+
+  @override
+  String totalMembers(int count) {
+    return '$count位成员';
   }
 
   @override
-  String get add => '添加';
+  String get removeFromGroup => '移出群聊';
+
+  @override
+  String confirmRemoveMember(String name) {
+    return '确定要将\"$name\"移出群聊吗？';
+  }
+
+  @override
+  String get setAsAdmin => '设为管理员';
+
+  @override
+  String get removeAdmin => '取消管理员';
+
+  @override
+  String get deleteContactSuccess => '联系人已删除';
+
+  @override
+  String get unknownSong => '未知歌曲';
+
+  @override
+  String get unknownArtist => '未知艺术家';
+
+  @override
+  String get unknownContact => '未知联系人';
+
+  @override
+  String get personalCard => '个人名片';
+
+  @override
+  String get singleChoice => '单选';
+
+  @override
+  String get multiChoice => '多选';
+
+  @override
+  String get ended => '已结束';
+
+  @override
+  String get endPollButton => '结束投票';
+
+  @override
+  String get createPoll => '创建投票';
+
+  @override
+  String get pollQuestion => '投票问题';
+
+  @override
+  String get pollOptions => '投票选项';
+
+  @override
+  String optionPlaceholder(int index) {
+    return '选项 $index';
+  }
+
+  @override
+  String get addOption => '添加选项';
+
+  @override
+  String get pollSettings => '投票设置';
+
+  @override
+  String get anonymousPoll => '匿名投票';
+
+  @override
+  String get pollHint => '投票发起后将显示在聊天中，群成员可以参与投票';
+
+  @override
+  String get searchSongOrArtist => '搜索歌曲或歌手';
+
+  @override
+  String get noSongsFound => '没有找到歌曲';
+
+  @override
+  String get supportedMusicPlatforms => '支持网易云、QQ音乐、酷狗、酷我等平台的歌曲链接';
+
+  @override
+  String get songNameOptional => '歌曲名称（可选）';
+
+  @override
+  String get enterSongName => '输入歌曲名称';
+
+  @override
+  String get artistNameOptional => '歌手名称（可选）';
+
+  @override
+  String get enterArtistName => '输入歌手名称';
+
+  @override
+  String get shareSong => '分享歌曲';
+
+  @override
+  String get realTimeLocationSharing => '实时位置共享功能开发中...';
+
+  @override
+  String get voiceCallFeatureInDev => '语音通话功能开发中...';
+
+  @override
+  String get reportFeatureInDev => '举报功能开发中...';
+
+  @override
+  String get shareFeatureInDev => '分享功能开发中...';
+
+  @override
+  String get qrCodeFeatureInDev => '二维码功能开发中...';
+
+  @override
+  String get scanQrToAddMe => '扫一扫上面的二维码，加我为好友';
+
+  @override
+  String get saveToAlbum => '保存到相册';
+
+  @override
+  String get changeStyle => '换个样式';
+
+  @override
+  String get copyId => '复制 ID';
+
+  @override
+  String get idCopied => '已复制用户 ID';
+
+  @override
+  String get shareFeatureComingSoon => '分享功能即将推出';
+
+  @override
+  String get saveFeatureComingSoon => '保存功能即将推出';
+
+  @override
+  String get moreStylesFeatureComingSoon => '更多样式即将推出';
+
+  @override
+  String get confirmEndPoll => '确定要结束这个投票吗？';
+
+  @override
+  String get cannotVoteAfterEnd => '结束后将无法继续投票。';
+
+  @override
+  String get bio => '个性签名';
+
+  @override
+  String get homeServer => '服务器';
+
+  @override
+  String get shareContactCard => '分享名片';
+
+  @override
+  String get removeFromBlacklist => '移出黑名单';
+
+  @override
+  String get confirmAddBlacklist => '确定将该用户加入黑名单吗？你将不再收到对方的消息';
+
+  @override
+  String get confirmRemoveBlacklist => '确定将该用户移出黑名单吗？';
+
+  @override
+  String get remarkSaved => '备注已保存';
+
+  @override
+  String get remarkCleared => '已清除备注';
+
+  @override
+  String get receive => '收款';
+
+  @override
+  String get pleaseConnectWallet => '请先连接钱包';
+
+  @override
+  String get sendRequest => '发送请求';
+
+  @override
+  String get pleaseEnterValidAmount => '请输入有效的金额';
+
+  @override
+  String get searchPlaceholder => '搜索联系人、群聊、消息';
+
+  @override
+  String get enterKeywordToSearch => '输入关键词开始搜索';
+
+  @override
+  String get clearHistory => '清除';
+
+  @override
+  String noResultsForQuery(String query) {
+    return '没有找到\"$query\"相关的结果';
+  }
+
+  @override
+  String get allResults => '全部';
+
+  @override
+  String get searchInChat => '在聊天中搜索';
+
+  @override
+  String get groupLabel => '群聊';
+
+  @override
+  String get messageLabel => '消息';
 }

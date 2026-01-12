@@ -1,0 +1,1 @@
+ D:\\N42\\n42_chat\\lib\\l10n\\app_localizations_en.dart D:\\N42\\n42_chat\\lib\\l10n\\app_localizations_zh.dart D:\\N42\\n42_chat\\lib\\l10n\\app_localizations.dart:  D:\\N42\\n42_chat\\l10n.yaml D:\\N42\\n42_chat\\lib\\l10n\\app_en.arb D:\\N42\\n42_chat\\lib\\l10n\\app_zh.arb

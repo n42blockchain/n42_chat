@@ -1116,7 +1116,83 @@ class MatrixMessageDataSource {
       rethrow;
     }
   }
-  
+
+  /// 发送转发的投票快照（包含投票结果，已结束状态）
+  ///
+  /// 转发投票时，发送一个包含投票结果的快照，标记为已结束，不可再投票
+  Future<String?> sendForwardedPollSnapshot(
+    String roomId, {
+    required String question,
+    required List<String> options,
+    required List<String> optionIds,
+    required Map<String, int> voteCounts,
+    required int totalVoters,
+    int maxSelections = 1,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      return null;
+    }
+
+    try {
+      // 使用原有的选项ID或生成新的
+      final pollOptions = <Map<String, dynamic>>[];
+      for (var i = 0; i < options.length; i++) {
+        final optionId = i < optionIds.length ? optionIds[i] : '${DateTime.now().millisecondsSinceEpoch}_$i';
+        pollOptions.add({
+          'id': optionId,
+          'org.matrix.msc1767.text': options[i],
+        });
+      }
+
+      // 构建投票结果文本显示
+      final resultLines = <String>[];
+      resultLines.add('📊 $question');
+      resultLines.add('');
+      for (var i = 0; i < options.length; i++) {
+        final optionId = i < optionIds.length ? optionIds[i] : '';
+        final count = voteCounts[optionId] ?? 0;
+        final percentage = totalVoters > 0 ? (count * 100 / totalVoters).round() : 0;
+        resultLines.add('${options[i]}: $count票 ($percentage%)');
+      }
+      resultLines.add('');
+      resultLines.add('共 $totalVoters 人参与投票');
+      resultLines.add('(转发的投票快照)');
+
+      // 使用自定义的转发投票格式
+      // 包含 n42.forwarded_poll 标记，表示这是转发的投票快照
+      final content = {
+        'org.matrix.msc3381.poll.start': {
+          'question': {
+            'org.matrix.msc1767.text': question,
+          },
+          'kind': 'org.matrix.msc3381.poll.disclosed',
+          'max_selections': maxSelections == 0 ? options.length : maxSelections,
+          'answers': pollOptions,
+        },
+        // 标记为转发的投票快照，包含结果
+        'n42.forwarded_poll': {
+          'vote_counts': voteCounts.map((k, v) => MapEntry(k, v)),
+          'total_voters': totalVoters,
+          'ended': true,
+        },
+        'org.matrix.msc1767.text': resultLines.join('\n'),
+      };
+
+      final eventId = await room.sendEvent(
+        content,
+        type: 'org.matrix.msc3381.poll.start',
+      );
+
+      debugPrint('MatrixMessageDataSource: Forwarded poll snapshot sent: $eventId');
+      return eventId;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to send forwarded poll: $e');
+      rethrow;
+    }
+  }
+
   /// 投票响应
   /// 
   /// 发送 MSC3381 投票响应事件
@@ -1914,7 +1990,36 @@ class MatrixMessageDataSource {
       } catch (e) {
         debugPrint('MatrixMessageDataSource: Error parsing poll aggregation: $e');
       }
-      
+
+      // 检查是否是转发的投票快照
+      final forwardedPoll = event.content['n42.forwarded_poll'] as Map<String, dynamic>?;
+      if (forwardedPoll != null) {
+        // 使用转发投票中的投票结果
+        final forwardedVoteCounts = forwardedPoll['vote_counts'] as Map<String, dynamic>?;
+        final forwardedTotalVoters = forwardedPoll['total_voters'] as int? ?? 0;
+        final forwardedEnded = forwardedPoll['ended'] as bool? ?? true;
+
+        if (forwardedVoteCounts != null) {
+          voteCounts.clear();
+          forwardedVoteCounts.forEach((key, value) {
+            if (value is int) {
+              voteCounts[key] = value;
+            }
+          });
+        }
+
+        return MessageMetadata(
+          pollQuestion: question,
+          pollOptions: options,
+          pollOptionIds: optionIds,
+          maxSelections: maxSelections,
+          pollEnded: forwardedEnded, // 转发的投票始终标记为已结束
+          voteCounts: voteCounts,
+          totalVoters: forwardedTotalVoters,
+          myVotes: myVotes, // 转发的投票不包含用户的投票记录
+        );
+      }
+
       return MessageMetadata(
         pollQuestion: question,
         pollOptions: options,

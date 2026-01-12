@@ -62,9 +62,71 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
   int _retryCount = 0;
   static const int _maxRetries = 3;
 
+  /// 将 mxc:// URL 转换为 HTTP URL
+  String? _convertMxcToHttp(String? mxcUrl) {
+    if (mxcUrl == null || mxcUrl.isEmpty) return null;
+
+    // 如果已经是 HTTP URL，直接返回
+    if (mxcUrl.startsWith('http://') || mxcUrl.startsWith('https://')) {
+      return mxcUrl;
+    }
+
+    // 如果不是 mxc:// URL，返回 null
+    if (!mxcUrl.startsWith('mxc://')) {
+      debugPrint('ImageMessageWidget: Invalid URL format: $mxcUrl');
+      return null;
+    }
+
+    try {
+      final client = MatrixClientManager.instance.client;
+      if (client == null) {
+        debugPrint('ImageMessageWidget: Client is null, cannot convert mxc URL');
+        return null;
+      }
+
+      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      if (homeserver.isEmpty) {
+        debugPrint('ImageMessageWidget: No homeserver configured');
+        return null;
+      }
+
+      // 解析 mxc://server/mediaId
+      final uri = Uri.parse(mxcUrl);
+      final serverName = uri.host;
+      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+
+      if (serverName.isEmpty || mediaId.isEmpty) {
+        debugPrint('ImageMessageWidget: Invalid mxc URL format: $mxcUrl');
+        return null;
+      }
+
+      // 构建认证媒体 URL (Matrix 1.11+)
+      final httpUrl = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
+      debugPrint('ImageMessageWidget: Converted mxc URL to: $httpUrl');
+      return httpUrl;
+    } catch (e) {
+      debugPrint('ImageMessageWidget: Error converting mxc URL: $e');
+      return null;
+    }
+  }
+
   String get _effectiveUrl {
+    // 获取原始 URL
+    var url = widget.thumbnailUrl ?? widget.imageUrl;
+
+    // 如果是 mxc:// URL，转换为 HTTP URL
+    if (url.startsWith('mxc://')) {
+      final httpUrl = _convertMxcToHttp(url);
+      if (httpUrl != null) {
+        url = httpUrl;
+      } else {
+        // 转换失败，返回空字符串触发错误状态
+        debugPrint('ImageMessageWidget: Failed to convert mxc URL, will show error state');
+        return '';
+      }
+    }
+
     // 添加时间戳以强制刷新（仅在重试时）
-    final url = widget.thumbnailUrl ?? widget.imageUrl;
     if (_retryCount > 0 && url.isNotEmpty) {
       final separator = url.contains('?') ? '&' : '?';
       return '$url${separator}_retry=$_retryCount';
@@ -226,6 +288,40 @@ class ImageGridWidget extends StatelessWidget {
     this.maxCount = 9,
   });
 
+  /// 将 mxc:// URL 转换为 HTTP URL
+  String _convertMxcToHttp(String url) {
+    // 如果已经是 HTTP URL，直接返回
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+
+    // 如果不是 mxc:// URL，返回原始 URL
+    if (!url.startsWith('mxc://')) {
+      return url;
+    }
+
+    try {
+      final client = MatrixClientManager.instance.client;
+      if (client == null) return url;
+
+      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      if (homeserver.isEmpty) return url;
+
+      // 解析 mxc://server/mediaId
+      final uri = Uri.parse(url);
+      final serverName = uri.host;
+      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+
+      if (serverName.isEmpty || mediaId.isEmpty) return url;
+
+      // 构建认证媒体 URL (Matrix 1.11+)
+      return '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
+    } catch (e) {
+      debugPrint('ImageGridWidget: Error converting mxc URL: $e');
+      return url;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final displayImages = images.take(maxCount).toList();
@@ -247,6 +343,8 @@ class ImageGridWidget extends StatelessWidget {
         children: List.generate(displayImages.length, (index) {
           final image = displayImages[index];
           final isLast = index == maxCount - 1 && images.length > maxCount;
+          // 获取图片 URL，确保转换 mxc:// URL
+          final imageUrl = _convertMxcToHttp(image.thumbnailUrl ?? image.url);
 
           return GestureDetector(
             onTap: () => onTap?.call(index),
@@ -255,7 +353,7 @@ class ImageGridWidget extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: CachedNetworkImage(
-                    imageUrl: image.thumbnailUrl ?? image.url,
+                    imageUrl: imageUrl,
                     width: itemSize,
                     height: itemSize,
                     fit: BoxFit.cover,

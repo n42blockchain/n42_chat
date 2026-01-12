@@ -1,10 +1,86 @@
 import 'package:intl/intl.dart';
 
+/// 本地化日期字符串
+class DateLocaleStrings {
+  final String yesterday;
+  final String justNow;
+  final String Function(int) minutesAgo;
+  final String Function(int) hoursAgo;
+  final String Function(int) daysAgo;
+  final String online;
+  final String offline;
+  final String Function(int) minutesAgoOnline;
+  final String Function(int) hoursAgoOnline;
+  final String Function(int) daysAgoOnline;
+  final List<String> weekdays;
+  final String Function(int month, int day) monthDay;
+  final String Function(int year, int month, int day) yearMonthDay;
+
+  const DateLocaleStrings({
+    this.yesterday = 'Yesterday',
+    this.justNow = 'Just now',
+    this.minutesAgo = _defaultMinutesAgo,
+    this.hoursAgo = _defaultHoursAgo,
+    this.daysAgo = _defaultDaysAgo,
+    this.online = 'Online',
+    this.offline = 'Offline',
+    this.minutesAgoOnline = _defaultMinutesAgoOnline,
+    this.hoursAgoOnline = _defaultHoursAgoOnline,
+    this.daysAgoOnline = _defaultDaysAgoOnline,
+    this.weekdays = const ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    this.monthDay = _defaultMonthDay,
+    this.yearMonthDay = _defaultYearMonthDay,
+  });
+
+  static String _defaultMinutesAgo(int count) => '$count min ago';
+  static String _defaultHoursAgo(int count) => '${count}h ago';
+  static String _defaultDaysAgo(int count) => '${count}d ago';
+  static String _defaultMinutesAgoOnline(int count) => '$count min ago';
+  static String _defaultHoursAgoOnline(int count) => '${count}h ago';
+  static String _defaultDaysAgoOnline(int count) => '${count}d ago';
+  static String _defaultMonthDay(int month, int day) => '$month/$day';
+  static String _defaultYearMonthDay(int year, int month, int day) => '$year/$month/$day';
+
+  /// Chinese locale strings
+  static const DateLocaleStrings chinese = DateLocaleStrings(
+    yesterday: '昨天',
+    justNow: '刚刚',
+    minutesAgo: _chineseMinutesAgo,
+    hoursAgo: _chineseHoursAgo,
+    daysAgo: _chineseDaysAgo,
+    online: '在线',
+    offline: '离线',
+    minutesAgoOnline: _chineseMinutesAgoOnline,
+    hoursAgoOnline: _chineseHoursAgoOnline,
+    daysAgoOnline: _chineseDaysAgoOnline,
+    weekdays: ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+    monthDay: _chineseMonthDay,
+    yearMonthDay: _chineseYearMonthDay,
+  );
+
+  static String _chineseMinutesAgo(int count) => '$count分钟前';
+  static String _chineseHoursAgo(int count) => '$count小时前';
+  static String _chineseDaysAgo(int count) => '$count天前';
+  static String _chineseMinutesAgoOnline(int count) => '$count分钟前在线';
+  static String _chineseHoursAgoOnline(int count) => '$count小时前在线';
+  static String _chineseDaysAgoOnline(int count) => '$count天前在线';
+  static String _chineseMonthDay(int month, int day) => '$month月$day日';
+  static String _chineseYearMonthDay(int year, int month, int day) => '$year年$month月$day日';
+}
+
 /// 日期时间工具类
 ///
 /// 提供微信风格的时间格式化
 abstract class N42DateUtils {
   N42DateUtils._();
+
+  /// 默认本地化字符串（英文）
+  static DateLocaleStrings _defaultLocale = const DateLocaleStrings();
+
+  /// 设置默认语言
+  static void setLocale(DateLocaleStrings locale) {
+    _defaultLocale = locale;
+  }
 
   /// 格式化会话列表时间
   ///
@@ -13,8 +89,9 @@ abstract class N42DateUtils {
   /// - 本周: 显示星期几
   /// - 今年: 显示月-日 (如 12-25)
   /// - 更早: 显示年-月-日 (如 2023-12-25)
-  static String formatConversationTime(DateTime? dateTime) {
+  static String formatConversationTime(DateTime? dateTime, [DateLocaleStrings? locale]) {
     if (dateTime == null) return '';
+    locale ??= _defaultLocale;
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -26,24 +103,25 @@ abstract class N42DateUtils {
       return DateFormat('HH:mm').format(dateTime);
     } else if (targetDate == yesterday) {
       // 昨天
-      return '昨天';
+      return locale.yesterday;
     } else if (now.difference(dateTime).inDays < 7 &&
         dateTime.weekday < now.weekday) {
       // 本周（且在今天之前）
-      return _getWeekdayName(dateTime.weekday);
+      return locale.weekdays[dateTime.weekday];
     } else if (dateTime.year == now.year) {
       // 今年
-      return DateFormat('M月d日').format(dateTime);
+      return locale.monthDay(dateTime.month, dateTime.day);
     } else {
       // 更早
-      return DateFormat('yyyy年M月d日').format(dateTime);
+      return locale.yearMonthDay(dateTime.year, dateTime.month, dateTime.day);
     }
   }
 
   /// 格式化消息时间（完整格式）
   ///
   /// 用于消息详情页的时间分隔线
-  static String formatMessageTime(DateTime dateTime) {
+  static String formatMessageTime(DateTime dateTime, [DateLocaleStrings? locale]) {
+    locale ??= _defaultLocale;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
@@ -53,22 +131,23 @@ abstract class N42DateUtils {
     if (targetDate == today) {
       dateStr = '';
     } else if (targetDate == yesterday) {
-      dateStr = '昨天 ';
+      dateStr = '${locale.yesterday} ';
     } else if (now.difference(dateTime).inDays < 7 &&
         dateTime.weekday < now.weekday) {
-      dateStr = '${_getWeekdayName(dateTime.weekday)} ';
+      dateStr = '${locale.weekdays[dateTime.weekday]} ';
     } else if (dateTime.year == now.year) {
-      dateStr = '${DateFormat('M月d日').format(dateTime)} ';
+      dateStr = '${locale.monthDay(dateTime.month, dateTime.day)} ';
     } else {
-      dateStr = '${DateFormat('yyyy年M月d日').format(dateTime)} ';
+      dateStr = '${locale.yearMonthDay(dateTime.year, dateTime.month, dateTime.day)} ';
     }
 
     return '$dateStr${DateFormat('HH:mm').format(dateTime)}';
   }
 
   /// 格式化消息详情时间（用于消息详情）
-  static String formatMessageDetailTime(DateTime dateTime) {
-    return DateFormat('yyyy年M月d日 HH:mm').format(dateTime);
+  static String formatMessageDetailTime(DateTime dateTime, [DateLocaleStrings? locale]) {
+    locale ??= _defaultLocale;
+    return '${locale.yearMonthDay(dateTime.year, dateTime.month, dateTime.day)} ${DateFormat('HH:mm').format(dateTime)}';
   }
 
   /// 格式化相对时间
@@ -79,22 +158,23 @@ abstract class N42DateUtils {
   /// - 昨天
   /// - x天前 (< 7天)
   /// - 日期
-  static String formatRelativeTime(DateTime dateTime) {
+  static String formatRelativeTime(DateTime dateTime, [DateLocaleStrings? locale]) {
+    locale ??= _defaultLocale;
     final now = DateTime.now();
     final difference = now.difference(dateTime);
 
     if (difference.inSeconds < 60) {
-      return '刚刚';
+      return locale.justNow;
     } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}分钟前';
+      return locale.minutesAgo(difference.inMinutes);
     } else if (difference.inHours < 24) {
-      return '${difference.inHours}小时前';
+      return locale.hoursAgo(difference.inHours);
     } else if (difference.inDays == 1) {
-      return '昨天';
+      return locale.yesterday;
     } else if (difference.inDays < 7) {
-      return '${difference.inDays}天前';
+      return locale.daysAgo(difference.inDays);
     } else {
-      return formatConversationTime(dateTime);
+      return formatConversationTime(dateTime, locale);
     }
   }
 
@@ -116,22 +196,23 @@ abstract class N42DateUtils {
   }
 
   /// 格式化在线状态时间
-  static String formatLastSeen(DateTime? lastSeen) {
-    if (lastSeen == null) return '离线';
+  static String formatLastSeen(DateTime? lastSeen, [DateLocaleStrings? locale]) {
+    locale ??= _defaultLocale;
+    if (lastSeen == null) return locale.offline;
 
     final now = DateTime.now();
     final difference = now.difference(lastSeen);
 
     if (difference.inMinutes < 5) {
-      return '在线';
+      return locale.online;
     } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}分钟前在线';
+      return locale.minutesAgoOnline(difference.inMinutes);
     } else if (difference.inHours < 24) {
-      return '${difference.inHours}小时前在线';
+      return locale.hoursAgoOnline(difference.inHours);
     } else if (difference.inDays < 7) {
-      return '${difference.inDays}天前在线';
+      return locale.daysAgoOnline(difference.inDays);
     } else {
-      return '离线';
+      return locale.offline;
     }
   }
 
@@ -146,12 +227,6 @@ abstract class N42DateUtils {
   /// 判断是否同一天
   static bool isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
-  }
-
-  /// 获取星期几名称
-  static String _getWeekdayName(int weekday) {
-    const names = ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-    return names[weekday];
   }
 }
 

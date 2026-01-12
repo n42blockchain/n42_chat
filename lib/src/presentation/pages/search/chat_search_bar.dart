@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../blocs/search/search_bloc.dart';
 import '../../blocs/search/search_event.dart';
@@ -98,7 +99,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                     controller: _controller,
                     focusNode: _focusNode,
                     decoration: InputDecoration(
-                      hintText: '在聊天中搜索',
+                      hintText: S.of(context)?.searchInChat ?? 'Search in chat',
                       hintStyle: TextStyle(
                         fontSize: 14,
                         color: isDark

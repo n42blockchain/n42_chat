@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../blocs/transfer/transfer_bloc.dart';
@@ -49,14 +50,14 @@ class _ReceivePageState extends State<ReceivePage> {
 
     if (amount.isEmpty || double.tryParse(amount) == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入有效的金额')),
+        SnackBar(content: Text(S.of(context)?.pleaseEnterValidAmount ?? 'Please enter a valid amount')),
       );
       return;
     }
 
     if (_selectedToken == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请选择代币')),
+        SnackBar(content: Text(S.of(context)?.pleaseSelectToken ?? 'Please select a token')),
       );
       return;
     }
@@ -101,7 +102,7 @@ class _ReceivePageState extends State<ReceivePage> {
         return Scaffold(
           backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
           appBar: N42AppBar(
-            title: '收款',
+            title: S.of(context)?.receive ?? 'Receive',
             leading: IconButton(
               icon: const Icon(Icons.close),
               onPressed: () => Navigator.pop(context),
@@ -124,11 +125,11 @@ class _ReceivePageState extends State<ReceivePage> {
     }
 
     if (walletAddress == null) {
-      return const Center(
+      return Center(
         child: N42EmptyState(
           icon: Icons.account_balance_wallet_outlined,
-          title: '钱包未连接',
-          description: '请先连接钱包',
+          title: S.of(context)?.walletNotConnected ?? 'Wallet Not Connected',
+          description: S.of(context)?.pleaseConnectWallet ?? 'Please connect your wallet first',
         ),
       );
     }
@@ -151,7 +152,7 @@ class _ReceivePageState extends State<ReceivePage> {
           if (widget.roomId != null) ...[
             if (!_showRequestForm) ...[
               N42Button(
-                text: '发送收款请求',
+                text: S.of(context)?.sendPaymentRequest ?? 'Send Payment Request',
                 type: N42ButtonType.secondary,
                 onPressed: () {
                   setState(() {
@@ -189,13 +190,13 @@ class _ReceivePageState extends State<ReceivePage> {
             version: QrVersions.auto,
             size: 200,
             backgroundColor: Colors.white,
-            errorStateBuilder: (context, error) => const Center(
-              child: Text('二维码生成失败'),
+            errorStateBuilder: (ctx, error) => Center(
+              child: Text(S.of(context)?.qrCodeGenerateFailed ?? 'QR code generation failed'),
             ),
           ),
           const SizedBox(height: 16),
           Text(
-            '扫描二维码向我付款',
+            S.of(context)?.scanQrToPayMe ?? 'Scan QR code to pay me',
             style: TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
@@ -217,7 +218,7 @@ class _ReceivePageState extends State<ReceivePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '我的钱包地址',
+            S.of(context)?.myWalletAddress ?? 'My Wallet Address',
             style: TextStyle(
               fontSize: 13,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -241,7 +242,7 @@ class _ReceivePageState extends State<ReceivePage> {
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: walletAddress));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('地址已复制')),
+                    SnackBar(content: Text(S.of(context)?.addressCopied ?? 'Address copied')),
                   );
                 },
               ),
@@ -263,7 +264,7 @@ class _ReceivePageState extends State<ReceivePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '创建收款请求',
+            S.of(context)?.createPaymentRequest ?? 'Create Payment Request',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -276,9 +277,9 @@ class _ReceivePageState extends State<ReceivePage> {
           // 代币选择
           DropdownButtonFormField<TokenInfo>(
             value: _selectedToken,
-            decoration: const InputDecoration(
-              labelText: '选择代币',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: S.of(context)?.selectToken ?? 'Select Token',
+              border: const OutlineInputBorder(),
             ),
             items: tokens.map((token) {
               return DropdownMenuItem(
@@ -300,7 +301,7 @@ class _ReceivePageState extends State<ReceivePage> {
             controller: _amountController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(
-              labelText: '金额',
+              labelText: S.of(context)?.amount ?? 'Amount',
               border: const OutlineInputBorder(),
               suffixText: _selectedToken?.symbol,
             ),
@@ -311,9 +312,9 @@ class _ReceivePageState extends State<ReceivePage> {
           // 备注输入
           TextField(
             controller: _memoController,
-            decoration: const InputDecoration(
-              labelText: '备注（可选）',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: S.of(context)?.memoOptional ?? 'Memo (optional)',
+              border: const OutlineInputBorder(),
             ),
           ),
 
@@ -324,7 +325,7 @@ class _ReceivePageState extends State<ReceivePage> {
             children: [
               Expanded(
                 child: N42Button(
-                  text: '取消',
+                  text: S.of(context)?.cancel ?? 'Cancel',
                   type: N42ButtonType.secondary,
                   onPressed: () {
                     setState(() {
@@ -336,7 +337,7 @@ class _ReceivePageState extends State<ReceivePage> {
               const SizedBox(width: 16),
               Expanded(
                 child: N42Button(
-                  text: '发送请求',
+                  text: S.of(context)?.sendRequest ?? 'Send Request',
                   onPressed: _createPaymentRequest,
                 ),
               ),

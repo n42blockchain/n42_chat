@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
@@ -80,7 +81,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
       child: Scaffold(
         backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
         appBar: N42AppBar(
-          title: '邀请成员',
+          title: S.of(context)?.inviteMembers ?? 'Invite Members',
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () => Navigator.pop(context),
@@ -89,7 +90,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
             TextButton(
               onPressed: _selectedUserIds.isNotEmpty ? _inviteMembers : null,
               child: Text(
-                '邀请(${_selectedUserIds.length})',
+                S.of(context)?.inviteCount(_selectedUserIds.length) ?? 'Invite(${_selectedUserIds.length})',
                 style: TextStyle(
                   color: _selectedUserIds.isNotEmpty
                       ? AppColors.primary
@@ -133,7 +134,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
               padding: const EdgeInsets.all(12),
               child: N42SearchBar(
                 controller: _searchController,
-                hintText: '搜索联系人',
+                hintText: S.of(context)?.searchContacts ?? 'Search contacts',
                 onChanged: (query) {
                   setState(() {
                     _isSearching = query.isNotEmpty;
@@ -152,9 +153,9 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
                   }
 
                   if (state is! ContactLoaded) {
-                    return const N42EmptyState(
+                    return N42EmptyState(
                       icon: Icons.contacts_outlined,
-                      title: '暂无联系人',
+                      title: S.of(context)?.noContacts ?? 'No contacts',
                     );
                   }
 

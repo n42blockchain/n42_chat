@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
@@ -112,7 +113,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             Text(_error!, style: TextStyle(color: AppColors.error)),
             const SizedBox(height: 16),
             N42Button(
-              text: '重试',
+              text: S.of(context)?.retry ?? 'Retry',
               onPressed: _loadUserProfile,
             ),
           ],
@@ -121,7 +122,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
 
     if (_contact == null) {
-      return const Center(child: Text('用户不存在'));
+      return Center(child: Text(S.of(context)?.userNotExist ?? 'User does not exist'));
     }
 
     return CustomScrollView(
@@ -237,7 +238,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         onTap: () {
                           Clipboard.setData(ClipboardData(text: contact.userId));
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('用户ID已复制')),
+                            SnackBar(content: Text(S.of(context)?.userIdCopied ?? 'User ID copied')),
                           );
                         },
                         child: Row(
@@ -293,7 +294,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '个性签名',
+                    S.of(context)?.bio ?? 'Bio',
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark
@@ -315,19 +316,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
           // 在线状态
           _buildInfoTile(
-            '状态',
+            S.of(context)?.status ?? 'Status',
             contact.isOnline
-                ? '在线'
+                ? (S.of(context)?.online ?? 'Online')
                 : (contact.formattedLastActive.isNotEmpty
                     ? contact.formattedLastActive
-                    : '离线'),
+                    : (S.of(context)?.offline ?? 'Offline')),
             isDark,
             statusColor: contact.isOnline ? AppColors.success : null,
           ),
 
           // 服务器
           _buildInfoTile(
-            '服务器',
+            S.of(context)?.homeServer ?? 'Server',
             contact.server,
             isDark,
           ),
@@ -382,7 +383,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           // 发消息按钮
           Expanded(
             child: N42Button(
-              text: '发消息',
+              text: S.of(context)?.sendMessage ?? 'Message',
               onPressed: _startChat,
               icon: Icons.chat_bubble_outline,
             ),
@@ -393,11 +394,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
           // 语音/视频通话按钮（可选）
           Expanded(
             child: N42Button(
-              text: '语音通话',
+              text: S.of(context)?.voiceCall ?? 'Voice Call',
               type: N42ButtonType.secondary,
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('语音通话功能开发中...')),
+                  SnackBar(content: Text(S.of(context)?.voiceCallFeatureInDev ?? 'Voice call feature in development...')),
                 );
               },
               icon: Icons.call_outlined,
@@ -416,7 +417,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         children: [
           // 设置备注
           ListTile(
-            title: const Text('设置备注'),
+            title: Text(S.of(context)?.setRemark ?? 'Set remark'),
             trailing: Icon(
               Icons.chevron_right,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -437,8 +438,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       (context.read<ContactBloc>().state as ContactLoaded)
                           .contacts
                           .any((c) => c.userId == widget.userId && c.isBlocked)
-                  ? '移出黑名单'
-                  : '加入黑名单',
+                  ? (S.of(context)?.removeFromBlacklist ?? 'Remove from Blacklist')
+                  : (S.of(context)?.addToBlacklist ?? 'Add to Blacklist'),
             ),
             trailing: Icon(
               Icons.chevron_right,
@@ -455,7 +456,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
           // 举报
           ListTile(
-            title: const Text('举报'),
+            title: Text(S.of(context)?.report ?? 'Report'),
             trailing: Icon(
               Icons.chevron_right,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -477,41 +478,43 @@ class _UserProfilePageState extends State<UserProfilePage> {
       builder: (dialogContext) {
         final controller = TextEditingController(text: _contact?.remark);
         return AlertDialog(
-          title: const Text('设置备注'),
+          title: Text(S.of(context)?.setRemark ?? 'Set remark'),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(
-              hintText: '输入备注名',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintText: S.of(context)?.enterRemark ?? 'Enter remark',
+              border: const OutlineInputBorder(),
             ),
             autofocus: true,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('取消'),
+              child: Text(S.of(context)?.cancel ?? 'Cancel'),
             ),
             TextButton(
               onPressed: () {
                 final remark = controller.text.trim();
                 Navigator.pop(dialogContext);
-                
+
                 // 保存备注
                 context.read<ContactBloc>().add(SetContactRemark(
                   widget.userId,
                   remark.isEmpty ? null : remark,
                 ));
-                
+
                 // 更新本地状态
                 setState(() {
                   _contact = _contact?.copyWith(remark: remark.isEmpty ? null : remark);
                 });
-                
+
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(remark.isEmpty ? '已清除备注' : '备注已保存')),
+                  SnackBar(content: Text(remark.isEmpty
+                      ? (S.of(context)?.remarkCleared ?? 'Remark cleared')
+                      : (S.of(context)?.remarkSaved ?? 'Remark saved'))),
                 );
               },
-              child: const Text('确定'),
+              child: Text(S.of(context)?.confirm ?? 'Confirm'),
             ),
           ],
         );
@@ -527,26 +530,30 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(isBlocked ? '移出黑名单' : '加入黑名单'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(isBlocked
+            ? (S.of(context)?.removeFromBlacklist ?? 'Remove from Blacklist')
+            : (S.of(context)?.addToBlacklist ?? 'Add to Blacklist')),
         content: Text(isBlocked
-            ? '确定将该用户移出黑名单吗？'
-            : '加入黑名单后，你将不再收到对方的消息'),
+            ? (S.of(context)?.confirmRemoveBlacklist ?? 'Are you sure you want to remove this user from blacklist?')
+            : (S.of(context)?.confirmAddBlacklist ?? 'Are you sure you want to add this user to blacklist? You will not receive messages from them.')),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               if (isBlocked) {
-                this.context.read<ContactBloc>().add(UnignoreUser(widget.userId));
+                context.read<ContactBloc>().add(UnignoreUser(widget.userId));
               } else {
-                this.context.read<ContactBloc>().add(IgnoreUser(widget.userId));
+                context.read<ContactBloc>().add(IgnoreUser(widget.userId));
               }
             },
-            child: Text(isBlocked ? '移出' : '加入'),
+            child: Text(isBlocked
+                ? (S.of(context)?.remove ?? 'Remove')
+                : (S.of(context)?.add ?? 'Add')),
           ),
         ],
       ),
@@ -555,34 +562,34 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   void _report() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('举报功能开发中...')),
+      SnackBar(content: Text(S.of(context)?.reportFeatureInDev ?? 'Report feature in development...')),
     );
   }
 
   void _showMoreOptions() {
     showModalBottomSheet<void>(
       context: context,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.share),
-              title: const Text('分享名片'),
+              title: Text(S.of(context)?.shareContactCard ?? 'Share Contact Card'),
               onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(this.context).showSnackBar(
-                  const SnackBar(content: Text('分享功能开发中...')),
+                Navigator.pop(sheetContext);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(S.of(context)?.shareFeatureInDev ?? 'Share feature in development...')),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.qr_code),
-              title: const Text('二维码'),
+              title: Text(S.of(context)?.qrCode ?? 'QR Code'),
               onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(this.context).showSnackBar(
-                  const SnackBar(content: Text('二维码功能开发中...')),
+                Navigator.pop(sheetContext);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(S.of(context)?.qrCodeFeatureInDev ?? 'QR code feature in development...')),
                 );
               },
             ),

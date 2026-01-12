@@ -53,7 +53,7 @@ class N42EmptyState extends StatelessWidget {
   }) {
     return N42EmptyState(
       icon: Icons.inbox_outlined,
-      title: title ?? '暂无数据',
+      title: title ?? 'No data',
       description: description,
       buttonText: buttonText,
       onButtonPressed: onButtonPressed,
@@ -67,8 +67,8 @@ class N42EmptyState extends StatelessWidget {
   }) {
     return N42EmptyState(
       icon: Icons.search_off,
-      title: title ?? '无搜索结果',
-      description: description ?? '换个关键词试试',
+      title: title ?? 'No search results',
+      description: description ?? 'Try a different keyword',
     );
   }
 
@@ -81,9 +81,9 @@ class N42EmptyState extends StatelessWidget {
   }) {
     return N42EmptyState(
       icon: Icons.error_outline,
-      title: title ?? '加载失败',
-      description: description ?? '请检查网络连接',
-      buttonText: buttonText ?? '重试',
+      title: title ?? 'Failed to load',
+      description: description ?? 'Please check your network connection',
+      buttonText: buttonText ?? 'Retry',
       onButtonPressed: onButtonPressed,
     );
   }
@@ -95,9 +95,9 @@ class N42EmptyState extends StatelessWidget {
   }) {
     return N42EmptyState(
       icon: Icons.wifi_off,
-      title: '网络连接失败',
-      description: '请检查网络设置',
-      buttonText: buttonText ?? '重试',
+      title: 'Network connection failed',
+      description: 'Please check your network settings',
+      buttonText: buttonText ?? 'Retry',
       onButtonPressed: onButtonPressed,
     );
   }

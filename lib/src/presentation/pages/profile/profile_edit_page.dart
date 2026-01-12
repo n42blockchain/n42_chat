@@ -13,6 +13,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../services/ringtone/system_ringtone_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
@@ -954,7 +955,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
       debugPrint('Save addresses error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('保存地址失败: $e')),
+          SnackBar(content: Text('${S.of(context)?.saveAddressFailed ?? 'Save address failed'}: $e')),
         );
       }
     }
@@ -967,12 +968,12 @@ class _AddressManagePageState extends State<_AddressManagePage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: AppBar(
-        title: const Text('我的地址'),
+        title: Text(S.of(context)?.myAddresses ?? 'My Addresses'),
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         actions: [
           TextButton(
             onPressed: _addAddress,
-            child: const Text('新增'),
+            child: Text(S.of(context)?.addNew ?? 'Add New'),
           ),
         ],
       ),
@@ -990,7 +991,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '暂无收货地址',
+                    S.of(context)?.noShippingAddress ?? 'No shipping address',
                     style: TextStyle(
                       fontSize: 16,
                       color: AppColors.textSecondary,
@@ -1000,7 +1001,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                   ElevatedButton.icon(
                     onPressed: _addAddress,
                     icon: const Icon(Icons.add),
-                    label: const Text('添加地址'),
+                    label: Text(S.of(context)?.addAddress ?? 'Add Address'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -1049,7 +1050,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  '默认',
+                                  S.of(context)?.defaultLabel ?? 'Default',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: AppColors.primary,
@@ -1071,12 +1072,12 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                           children: [
                             TextButton(
                               onPressed: () => _editAddress(index),
-                              child: const Text('编辑'),
+                              child: Text(S.of(context)?.edit ?? 'Edit'),
                             ),
                             TextButton(
                               onPressed: () => _deleteAddress(index),
                               child: Text(
-                                '删除',
+                                S.of(context)?.delete ?? 'Delete',
                                 style: TextStyle(color: AppColors.error),
                               ),
                             ),
@@ -1114,7 +1115,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
       await _saveAddresses();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('地址添加成功'), duration: Duration(seconds: 1)),
+          SnackBar(content: Text(S.of(context)?.addressAdded ?? 'Address added'), duration: const Duration(seconds: 1)),
         );
       }
     }
@@ -1143,7 +1144,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
       await _saveAddresses();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('地址更新成功'), duration: Duration(seconds: 1)),
+          SnackBar(content: Text(S.of(context)?.addressUpdated ?? 'Address updated'), duration: const Duration(seconds: 1)),
         );
       }
     }
@@ -1152,29 +1153,29 @@ class _AddressManagePageState extends State<_AddressManagePage> {
   void _deleteAddress(int index) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('删除地址'),
-        content: const Text('确定要删除这个地址吗？'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.deleteAddress ?? 'Delete Address'),
+        content: Text(S.of(context)?.confirmDeleteAddress ?? 'Are you sure you want to delete this address?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               setState(() {
                 _addresses.removeAt(index);
               });
               await _saveAddresses();
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('地址已删除'), duration: Duration(seconds: 1)),
+                  SnackBar(content: Text(S.of(context)?.addressDeleted ?? 'Address deleted'), duration: const Duration(seconds: 1)),
                 );
               }
             },
             child: Text(
-              '删除',
+              S.of(context)?.delete ?? 'Delete',
               style: TextStyle(color: AppColors.error),
             ),
           ),
@@ -1190,46 +1191,47 @@ class _AddressManagePageState extends State<_AddressManagePage> {
     final detailController = TextEditingController(text: address?.detail);
     bool isDefault = address?.isDefault ?? false;
 
+    final s = S.of(context);
     return await showDialog<_AddressItem>(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(address == null ? '新增地址' : '编辑地址'),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          title: Text(address == null ? (s?.addAddress ?? 'Add Address') : (s?.editAddress ?? 'Edit Address')),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: '收货人',
-                    hintText: '请输入收货人姓名',
+                  decoration: InputDecoration(
+                    labelText: s?.recipient ?? 'Recipient',
+                    hintText: s?.enterRecipientName ?? 'Enter recipient name',
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: phoneController,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: '手机号码',
-                    hintText: '请输入手机号码',
+                  decoration: InputDecoration(
+                    labelText: s?.phoneNumber ?? 'Phone Number',
+                    hintText: s?.enterPhoneNumber ?? 'Enter phone number',
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: regionController,
-                  decoration: const InputDecoration(
-                    labelText: '所在地区',
-                    hintText: '省/市/区',
+                  decoration: InputDecoration(
+                    labelText: s?.region ?? 'Region',
+                    hintText: s?.regionHint ?? 'Province/City/District',
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: detailController,
                   maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: '详细地址',
-                    hintText: '街道、门牌号等',
+                  decoration: InputDecoration(
+                    labelText: s?.detailedAddress ?? 'Detailed Address',
+                    hintText: s?.detailedAddressHint ?? 'Street, building number, etc.',
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -1240,7 +1242,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                       isDefault = value ?? false;
                     });
                   },
-                  title: const Text('设为默认地址'),
+                  title: Text(s?.setAsDefaultAddress ?? 'Set as default address'),
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -1249,8 +1251,8 @@ class _AddressManagePageState extends State<_AddressManagePage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(s?.cancel ?? 'Cancel'),
             ),
             TextButton(
               onPressed: () {
@@ -1258,13 +1260,13 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                     phoneController.text.isEmpty ||
                     regionController.text.isEmpty ||
                     detailController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('请填写完整信息')),
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
+                    SnackBar(content: Text(s?.pleaseCompleteInfo ?? 'Please complete all fields')),
                   );
                   return;
                 }
                 Navigator.pop(
-                  context,
+                  dialogContext,
                   _AddressItem(
                     name: nameController.text,
                     phone: phoneController.text,
@@ -1274,7 +1276,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                   ),
                 );
               },
-              child: const Text('保存'),
+              child: Text(s?.save ?? 'Save'),
             ),
           ],
         ),
@@ -1393,7 +1395,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
       debugPrint('Save invoices error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('保存发票抬头失败: $e')),
+          SnackBar(content: Text('${S.of(context)?.saveInvoiceFailed ?? 'Save invoice failed'}: $e')),
         );
       }
     }
@@ -1406,12 +1408,12 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: AppBar(
-        title: const Text('我的发票抬头'),
+        title: Text(S.of(context)?.myInvoices ?? 'My Invoices'),
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         actions: [
           TextButton(
             onPressed: _addInvoice,
-            child: const Text('新增'),
+            child: Text(S.of(context)?.addNew ?? 'Add New'),
           ),
         ],
       ),
@@ -1429,7 +1431,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '暂无发票抬头',
+                    S.of(context)?.noInvoice ?? 'No invoice',
                     style: TextStyle(
                       fontSize: 16,
                       color: AppColors.textSecondary,
@@ -1439,7 +1441,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                   ElevatedButton.icon(
                     onPressed: _addInvoice,
                     icon: const Icon(Icons.add),
-                    label: const Text('添加发票抬头'),
+                    label: Text(S.of(context)?.addInvoice ?? 'Add Invoice'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -1474,11 +1476,11 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                invoice.type == 'company' ? '企业' : '个人',
+                                invoice.type == 'company' ? (S.of(context)?.company ?? 'Company') : (S.of(context)?.personal ?? 'Personal'),
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: invoice.type == 'company' 
-                                      ? AppColors.primary 
+                                  color: invoice.type == 'company'
+                                      ? AppColors.primary
                                       : Colors.orange,
                                 ),
                               ),
@@ -1505,7 +1507,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  '默认',
+                                  S.of(context)?.defaultLabel ?? 'Default',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: AppColors.primary,
@@ -1517,7 +1519,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                         if (invoice.taxNumber != null && invoice.taxNumber!.isNotEmpty) ...[
                           const SizedBox(height: 8),
                           Text(
-                            '税号: ${invoice.taxNumber}',
+                            '${S.of(context)?.taxNumber ?? 'Tax Number'}: ${invoice.taxNumber}',
                             style: TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 14,
@@ -1530,12 +1532,12 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                           children: [
                             TextButton(
                               onPressed: () => _editInvoice(index),
-                              child: const Text('编辑'),
+                              child: Text(S.of(context)?.edit ?? 'Edit'),
                             ),
                             TextButton(
                               onPressed: () => _deleteInvoice(index),
                               child: Text(
-                                '删除',
+                                S.of(context)?.delete ?? 'Delete',
                                 style: TextStyle(color: AppColors.error),
                               ),
                             ),
@@ -1575,7 +1577,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
       await _saveInvoices();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('发票抬头添加成功'), duration: Duration(seconds: 1)),
+          SnackBar(content: Text(S.of(context)?.invoiceAdded ?? 'Invoice added'), duration: const Duration(seconds: 1)),
         );
       }
     }
@@ -1606,7 +1608,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
       await _saveInvoices();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('发票抬头更新成功'), duration: Duration(seconds: 1)),
+          SnackBar(content: Text(S.of(context)?.invoiceUpdated ?? 'Invoice updated'), duration: const Duration(seconds: 1)),
         );
       }
     }
@@ -1615,29 +1617,29 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
   void _deleteInvoice(int index) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('删除发票抬头'),
-        content: const Text('确定要删除这个发票抬头吗？'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.deleteInvoice ?? 'Delete Invoice'),
+        content: Text(S.of(context)?.confirmDeleteInvoice ?? 'Are you sure you want to delete this invoice?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               setState(() {
                 _invoices.removeAt(index);
               });
               await _saveInvoices();
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('发票抬头已删除'), duration: Duration(seconds: 1)),
+                  SnackBar(content: Text(S.of(context)?.invoiceDeleted ?? 'Invoice deleted'), duration: const Duration(seconds: 1)),
                 );
               }
             },
             child: Text(
-              '删除',
+              S.of(context)?.delete ?? 'Delete',
               style: TextStyle(color: AppColors.error),
             ),
           ),
@@ -1656,11 +1658,12 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
     final companyPhoneController = TextEditingController(text: invoice?.companyPhone);
     bool isDefault = invoice?.isDefault ?? false;
 
+    final s = S.of(context);
     return await showDialog<_InvoiceItem>(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(invoice == null ? '新增发票抬头' : '编辑发票抬头'),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          title: Text(invoice == null ? (s?.addInvoice ?? 'Add Invoice') : (s?.editInvoice ?? 'Edit Invoice')),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1669,10 +1672,10 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                 // 抬头类型
                 Row(
                   children: [
-                    const Text('抬头类型: '),
+                    Text('${s?.invoiceType ?? 'Invoice Type'}: '),
                     const SizedBox(width: 8),
                     ChoiceChip(
-                      label: const Text('个人'),
+                      label: Text(s?.personal ?? 'Personal'),
                       selected: type == 'personal',
                       onSelected: (selected) {
                         if (selected) {
@@ -1682,7 +1685,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                     ),
                     const SizedBox(width: 8),
                     ChoiceChip(
-                      label: const Text('企业'),
+                      label: Text(s?.company ?? 'Company'),
                       selected: type == 'company',
                       onSelected: (selected) {
                         if (selected) {
@@ -1696,49 +1699,49 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                 TextField(
                   controller: titleController,
                   decoration: InputDecoration(
-                    labelText: type == 'company' ? '企业名称' : '个人姓名',
-                    hintText: type == 'company' ? '请输入企业名称' : '请输入姓名',
+                    labelText: type == 'company' ? (s?.companyName ?? 'Company Name') : (s?.personalName ?? 'Personal Name'),
+                    hintText: type == 'company' ? (s?.enterCompanyName ?? 'Enter company name') : (s?.enterName ?? 'Enter name'),
                   ),
                 ),
                 if (type == 'company') ...[
                   const SizedBox(height: 12),
                   TextField(
                     controller: taxNumberController,
-                    decoration: const InputDecoration(
-                      labelText: '纳税人识别号',
-                      hintText: '请输入纳税人识别号',
+                    decoration: InputDecoration(
+                      labelText: s?.taxIdNumber ?? 'Tax ID Number',
+                      hintText: s?.enterTaxIdNumber ?? 'Enter tax ID number',
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: bankNameController,
-                    decoration: const InputDecoration(
-                      labelText: '开户银行（选填）',
-                      hintText: '请输入开户银行',
+                    decoration: InputDecoration(
+                      labelText: s?.bankNameOptional ?? 'Bank Name (Optional)',
+                      hintText: s?.enterBankName ?? 'Enter bank name',
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: bankAccountController,
-                    decoration: const InputDecoration(
-                      labelText: '银行账号（选填）',
-                      hintText: '请输入银行账号',
+                    decoration: InputDecoration(
+                      labelText: s?.bankAccountOptional ?? 'Bank Account (Optional)',
+                      hintText: s?.enterBankAccount ?? 'Enter bank account',
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: companyAddressController,
-                    decoration: const InputDecoration(
-                      labelText: '企业地址（选填）',
-                      hintText: '请输入企业地址',
+                    decoration: InputDecoration(
+                      labelText: s?.companyAddressOptional ?? 'Company Address (Optional)',
+                      hintText: s?.enterCompanyAddress ?? 'Enter company address',
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: companyPhoneController,
-                    decoration: const InputDecoration(
-                      labelText: '企业电话（选填）',
-                      hintText: '请输入企业电话',
+                    decoration: InputDecoration(
+                      labelText: s?.companyPhoneOptional ?? 'Company Phone (Optional)',
+                      hintText: s?.enterCompanyPhone ?? 'Enter company phone',
                     ),
                   ),
                 ],
@@ -1750,7 +1753,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                       isDefault = value ?? false;
                     });
                   },
-                  title: const Text('设为默认抬头'),
+                  title: Text(s?.setAsDefaultInvoice ?? 'Set as default invoice'),
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -1759,25 +1762,25 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(s?.cancel ?? 'Cancel'),
             ),
             TextButton(
               onPressed: () {
                 if (titleController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(type == 'company' ? '请输入企业名称' : '请输入姓名')),
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
+                    SnackBar(content: Text(type == 'company' ? (s?.enterCompanyName ?? 'Enter company name') : (s?.enterName ?? 'Enter name'))),
                   );
                   return;
                 }
                 if (type == 'company' && taxNumberController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('请输入纳税人识别号')),
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
+                    SnackBar(content: Text(s?.enterTaxIdNumber ?? 'Enter tax ID number')),
                   );
                   return;
                 }
                 Navigator.pop(
-                  context,
+                  dialogContext,
                   _InvoiceItem(
                     type: type,
                     title: titleController.text,
@@ -1790,7 +1793,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                   ),
                 );
               },
-              child: const Text('保存'),
+              child: Text(s?.save ?? 'Save'),
             ),
           ],
         ),
@@ -1823,11 +1826,13 @@ class _InvoiceItem {
 }
 
 /// 铃声选择页面
+///
+/// 使用设备系统铃声列表，确保所有铃声都可以正常播放
 class _RingtoneSelectPage extends StatefulWidget {
   final String currentRingtone;
-  
+
   const _RingtoneSelectPage({required this.currentRingtone});
-  
+
   @override
   State<_RingtoneSelectPage> createState() => _RingtoneSelectPageState();
 }
@@ -1835,102 +1840,85 @@ class _RingtoneSelectPage extends StatefulWidget {
 class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
   late String _selectedRingtone;
   String? _playingRingtone;
-  AudioPlayer? _audioPlayer;
   bool _isLoading = true;
-  List<Map<String, dynamic>> _availableRingtones = [];
+  List<_RingtoneItem> _ringtones = [];
 
-  // 铃声列表（使用系统默认铃声 URL 或本地资源）
-  List<Map<String, dynamic>> _getRingtones(S? s) => [
-    {'key': 'default', 'name': s?.defaultRingtone ?? 'Default Ringtone', 'icon': Icons.music_note, 'url': 'https://www.soundjay.com/phone/sounds/telephone-ring-01a.mp3'},
-    {'key': 'clear', 'name': s?.ringtoneClear ?? 'Clear', 'icon': Icons.music_note, 'url': 'https://www.soundjay.com/phone/sounds/telephone-ring-02.mp3'},
-    {'key': 'phone', 'name': s?.ringtonePhone ?? 'Phone', 'icon': Icons.phone_in_talk, 'url': 'https://www.soundjay.com/phone/sounds/telephone-ring-03a.mp3'},
-    {'key': 'classic', 'name': s?.ringtoneClassic ?? 'Classic', 'icon': Icons.piano, 'url': 'https://www.soundjay.com/phone/sounds/telephone-ring-04.mp3'},
-    {'key': 'soft', 'name': s?.ringtoneSoft ?? 'Soft', 'icon': Icons.music_note, 'url': 'https://www.soundjay.com/phone/sounds/telephone-ring-05.mp3'},
-    {'key': 'vibrate', 'name': s?.ringtoneVibrate ?? 'Vibrate', 'icon': Icons.vibration, 'url': null},
-    {'key': 'silent', 'name': s?.ringtoneSilent ?? 'Silent', 'icon': Icons.volume_off, 'url': null},
-  ];
+  final _ringtoneService = SystemRingtoneService.instance;
 
   @override
   void initState() {
     super.initState();
     _selectedRingtone = widget.currentRingtone;
-    _audioPlayer = AudioPlayer();
+    _loadRingtones();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_isLoading) {
-      _checkRingtoneAvailability();
-    }
-  }
+  /// 加载系统铃声
+  Future<void> _loadRingtones() async {
+    try {
+      final s = S.of(context);
+      final systemRingtones = await _ringtoneService.getAvailableRingtones();
 
-  /// 检查铃声 URL 是否可访问
-  Future<void> _checkRingtoneAvailability() async {
-    final s = S.of(context);
-    final allRingtones = _getRingtones(s);
-    final available = <Map<String, dynamic>>[];
+      final ringtoneItems = <_RingtoneItem>[];
 
-    for (final ringtone in allRingtones) {
-      final url = ringtone['url'] as String?;
-      if (url == null) {
-        // 振动和静音始终可用
-        available.add(ringtone);
-      } else {
-        // 检查 URL 是否可访问
-        final isAccessible = await _checkUrlAccessible(url);
-        if (isAccessible) {
-          available.add(ringtone);
-        } else {
-          debugPrint('Ringtone not accessible: ${ringtone['name']} - $url');
-        }
+      // 添加系统铃声
+      for (final ringtone in systemRingtones) {
+        ringtoneItems.add(_RingtoneItem(
+          key: ringtone.id,
+          name: ringtone.title,
+          icon: ringtone.isDefault ? Icons.music_note : Icons.audiotrack,
+          uri: ringtone.uri,
+          isSystemRingtone: true,
+        ));
+      }
+
+      // 添加振动和静音选项
+      ringtoneItems.add(_RingtoneItem(
+        key: 'vibrate',
+        name: s?.ringtoneVibrate ?? 'Vibrate',
+        icon: Icons.vibration,
+        uri: null,
+        isSystemRingtone: false,
+      ));
+
+      ringtoneItems.add(_RingtoneItem(
+        key: 'silent',
+        name: s?.ringtoneSilent ?? 'Silent',
+        icon: Icons.volume_off,
+        uri: null,
+        isSystemRingtone: false,
+      ));
+
+      if (mounted) {
+        setState(() {
+          _ringtones = ringtoneItems;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('加载铃声失败: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
-
-    if (mounted) {
-      setState(() {
-        _availableRingtones = available;
-        _isLoading = false;
-      });
-    }
   }
 
-  /// 检查 URL 是否可访问
-  Future<bool> _checkUrlAccessible(String url) async {
-    try {
-      final uri = Uri.parse(url);
-      final client = HttpClient();
-      client.connectionTimeout = const Duration(seconds: 5);
-      final request = await client.headUrl(uri);
-      final response = await request.close();
-      client.close();
-      return response.statusCode >= 200 && response.statusCode < 400;
-    } catch (e) {
-      debugPrint('URL check failed: $e');
-      return false;
-    }
-  }
-  
   @override
   void dispose() {
     _stopRingtone();
-    _audioPlayer?.dispose();
     super.dispose();
   }
-  
+
   /// 播放铃声
-  Future<void> _playRingtone(String ringtoneName, String? ringtoneKey) async {
+  Future<void> _playRingtone(_RingtoneItem ringtone) async {
     // 先停止当前播放
     await _stopRingtone();
 
     final s = S.of(context);
-    final ringtone = _availableRingtones.firstWhere(
-      (r) => r['name'] == ringtoneName || r['key'] == ringtoneKey,
-      orElse: () => _availableRingtones.isNotEmpty ? _availableRingtones.first : {'url': null},
-    );
 
     // 如果是振动，触发振动
-    if (ringtoneKey == 'vibrate') {
+    if (ringtone.key == 'vibrate') {
       HapticFeedback.heavyImpact();
       await Future.delayed(const Duration(milliseconds: 100));
       HapticFeedback.heavyImpact();
@@ -1948,7 +1936,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
     }
 
     // 如果是静音，不播放
-    if (ringtoneKey == 'silent') {
+    if (ringtone.key == 'silent') {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1960,19 +1948,32 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
       return;
     }
 
-    // 如果没有 URL，显示提示
-    final url = ringtone['url'] as String?;
-    if (url == null) {
+    // 如果没有 URI，不播放
+    if (ringtone.uri == null) {
       return;
     }
 
     setState(() {
-      _playingRingtone = ringtoneName;
+      _playingRingtone = ringtone.name;
     });
 
     try {
-      // 播放铃声
-      await _audioPlayer?.play(UrlSource(url));
+      // 使用系统铃声服务播放
+      final success = await _ringtoneService.playRingtone(ringtone.uri!);
+
+      if (!success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(s?.playFailed(ringtone.name) ?? 'Failed to play: ${ringtone.name}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 1),
+          ),
+        );
+        setState(() {
+          _playingRingtone = null;
+        });
+        return;
+      }
 
       // 显示播放提示
       if (mounted) {
@@ -1983,7 +1984,12 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
               children: [
                 const Icon(Icons.play_arrow, color: Colors.white, size: 18),
                 const SizedBox(width: 8),
-                Text(s?.playing(ringtoneName) ?? 'Playing: $ringtoneName'),
+                Expanded(
+                  child: Text(
+                    s?.playing(ringtone.name) ?? 'Playing: ${ringtone.name}',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
             duration: const Duration(seconds: 3),
@@ -1998,7 +2004,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
 
       // 5秒后自动停止
       await Future.delayed(const Duration(seconds: 5));
-      if (mounted && _playingRingtone == ringtoneName) {
+      if (mounted && _playingRingtone == ringtone.name) {
         await _stopRingtone();
       }
     } catch (e) {
@@ -2006,7 +2012,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(s?.playFailed(ringtoneName) ?? 'Failed to play: $ringtoneName'),
+            content: Text(s?.playFailed(ringtone.name) ?? 'Failed to play: ${ringtone.name}'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 1),
           ),
@@ -2017,11 +2023,11 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
       }
     }
   }
-  
+
   /// 停止铃声
   Future<void> _stopRingtone() async {
     try {
-      await _audioPlayer?.stop();
+      await _ringtoneService.stopRingtone();
     } catch (e) {
       debugPrint('停止铃声失败: $e');
     }
@@ -2031,12 +2037,12 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
       });
     }
   }
-  
+
   /// 确认保存
   void _confirmSave() {
     Navigator.pop(context, _selectedRingtone);
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -2093,86 +2099,123 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
                 ],
               ),
             )
-          : ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: _availableRingtones.length,
-              itemBuilder: (context, index) {
-                final ringtone = _availableRingtones[index];
-                final name = ringtone['name'] as String;
-                final key = ringtone['key'] as String;
-                final icon = ringtone['icon'] as IconData;
-                final isSelected = name == _selectedRingtone;
-                final isPlaying = name == _playingRingtone;
+          : _ringtones.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.music_off,
+                        size: 64,
+                        color: isDark ? Colors.white38 : Colors.black26,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        s?.noRingtonesFound ?? 'No ringtones found',
+                        style: TextStyle(
+                          color: isDark ? Colors.white54 : Colors.black45,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  itemCount: _ringtones.length,
+                  itemBuilder: (context, index) {
+                    final ringtone = _ringtones[index];
+                    final isSelected = ringtone.name == _selectedRingtone;
+                    final isPlaying = ringtone.name == _playingRingtone;
 
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: isSelected
-                        ? Border.all(color: AppColors.primary, width: 2)
-                        : null,
-                  ),
-                  child: ListTile(
-                    leading: Container(
-                      width: 44,
-                      height: 44,
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isPlaying
-                            ? AppColors.primary.withValues(alpha: 0.2)
-                            : (isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7)),
+                        color: isDark ? AppColors.surfaceDark : Colors.white,
                         borderRadius: BorderRadius.circular(8),
+                        border: isSelected
+                            ? Border.all(color: AppColors.primary, width: 2)
+                            : null,
                       ),
-                      child: Icon(
-                        isPlaying ? Icons.pause : icon,
-                        color: isPlaying ? AppColors.primary : (isDark ? Colors.white70 : Colors.black54),
-                      ),
-                    ),
-                    title: Text(
-                      name,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                      ),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // 试听按钮
-                        if (ringtone['url'] != null || key == 'vibrate')
-                          IconButton(
-                            icon: Icon(
-                              isPlaying ? Icons.stop : Icons.play_circle_outline,
-                              color: AppColors.primary,
-                            ),
-                            onPressed: () {
-                              if (isPlaying) {
-                                _stopRingtone();
-                              } else {
-                                _playRingtone(name, key);
-                              }
-                            },
+                      child: ListTile(
+                        leading: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: isPlaying
+                                ? AppColors.primary.withValues(alpha: 0.2)
+                                : (isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7)),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        // 选中标记
-                        if (isSelected)
-                          Icon(
-                            Icons.check_circle,
-                            color: AppColors.primary,
+                          child: Icon(
+                            isPlaying ? Icons.pause : ringtone.icon,
+                            color: isPlaying ? AppColors.primary : (isDark ? Colors.white70 : Colors.black54),
                           ),
-                      ],
-                    ),
-                    onTap: () {
-                      setState(() {
-                        _selectedRingtone = name;
-                      });
-                      // 选中后自动试听
-                      _playRingtone(name, key);
-                    },
-                  ),
-                );
-              },
-            ),
+                        ),
+                        title: Text(
+                          ringtone.name,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
+                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // 试听按钮
+                            if (ringtone.uri != null || ringtone.key == 'vibrate')
+                              IconButton(
+                                icon: Icon(
+                                  isPlaying ? Icons.stop : Icons.play_circle_outline,
+                                  color: AppColors.primary,
+                                ),
+                                onPressed: () {
+                                  if (isPlaying) {
+                                    _stopRingtone();
+                                  } else {
+                                    _playRingtone(ringtone);
+                                  }
+                                },
+                              ),
+                            // 选中标记
+                            if (isSelected)
+                              Icon(
+                                Icons.check_circle,
+                                color: AppColors.primary,
+                              ),
+                          ],
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _selectedRingtone = ringtone.name;
+                          });
+                          // 选中后自动试听
+                          _playRingtone(ringtone);
+                        },
+                      ),
+                    );
+                  },
+                ),
     );
   }
+}
+
+/// 铃声项数据模型
+class _RingtoneItem {
+  final String key;
+  final String name;
+  final IconData icon;
+  final String? uri;
+  final bool isSystemRingtone;
+
+  const _RingtoneItem({
+    required this.key,
+    required this.name,
+    required this.icon,
+    this.uri,
+    this.isSystemRingtone = false,
+  });
 }
 

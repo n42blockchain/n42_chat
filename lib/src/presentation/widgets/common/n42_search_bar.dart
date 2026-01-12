@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 微信风格搜索框
@@ -11,7 +12,7 @@ import '../../../core/theme/app_colors.dart';
 /// - 清除按钮
 class N42SearchBar extends StatefulWidget {
   /// 占位文字
-  final String hintText;
+  final String? hintText;
 
   /// 初始值
   final String? initialValue;
@@ -51,7 +52,7 @@ class N42SearchBar extends StatefulWidget {
 
   const N42SearchBar({
     super.key,
-    this.hintText = '搜索',
+    this.hintText,
     this.initialValue,
     this.onChanged,
     this.onSubmitted,
@@ -150,7 +151,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
           GestureDetector(
             onTap: _onCancel,
             child: Text(
-              '取消',
+              S.of(context)?.cancel ?? 'Cancel',
               style: TextStyle(
                 fontSize: 15,
                 color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
@@ -163,6 +164,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
   }
 
   Widget _buildReadOnlySearch(bool isDark) {
+    final hint = widget.hintText ?? S.of(context)?.search ?? 'Search';
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -173,7 +175,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
         ),
         const SizedBox(width: 6),
         Text(
-          widget.hintText,
+          hint,
           style: TextStyle(
             fontSize: 14,
             color: AppColors.textTertiary,
@@ -184,6 +186,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
   }
 
   Widget _buildEditableSearch(bool isDark) {
+    final hint = widget.hintText ?? S.of(context)?.search ?? 'Search';
     return TextField(
       controller: _controller,
       focusNode: _focusNode,
@@ -196,7 +199,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
         color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
       ),
       decoration: InputDecoration(
-        hintText: widget.hintText,
+        hintText: hint,
         hintStyle: TextStyle(
           fontSize: 14,
           color: AppColors.textTertiary,

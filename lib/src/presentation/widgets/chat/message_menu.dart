@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
@@ -95,11 +96,12 @@ class MessageMenu extends StatelessWidget {
   }
 
   Widget _buildActionList(BuildContext context, bool isDark) {
+    final s = S.of(context);
     final items = <MessageMenuItem>[
       if (onReply != null)
         MessageMenuItem(
           icon: Icons.reply,
-          label: '回复',
+          label: s?.reply ?? 'Reply',
           onTap: () {
             Navigator.pop(context);
             onReply?.call();
@@ -108,12 +110,12 @@ class MessageMenu extends StatelessWidget {
       if (onCopy != null && message.type == MessageType.text)
         MessageMenuItem(
           icon: Icons.copy,
-          label: '复制',
+          label: s?.copy ?? 'Copy',
           onTap: () {
             Clipboard.setData(ClipboardData(text: message.content));
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('已复制到剪贴板')),
+              SnackBar(content: Text(s?.copiedToClipboard ?? 'Copied to clipboard')),
             );
             onCopy?.call();
           },
@@ -121,7 +123,7 @@ class MessageMenu extends StatelessWidget {
       if (onForward != null)
         MessageMenuItem(
           icon: Icons.forward,
-          label: '转发',
+          label: s?.forward ?? 'Forward',
           onTap: () {
             Navigator.pop(context);
             onForward?.call();
@@ -130,7 +132,7 @@ class MessageMenu extends StatelessWidget {
       if (canEdit && onEdit != null)
         MessageMenuItem(
           icon: Icons.edit,
-          label: '编辑',
+          label: s?.edit ?? 'Edit',
           onTap: () {
             Navigator.pop(context);
             onEdit?.call();
@@ -139,7 +141,7 @@ class MessageMenu extends StatelessWidget {
       if (onSave != null)
         MessageMenuItem(
           icon: Icons.bookmark_outline,
-          label: '收藏',
+          label: s?.favorite ?? 'Favorite',
           onTap: () {
             Navigator.pop(context);
             onSave?.call();
@@ -148,7 +150,7 @@ class MessageMenu extends StatelessWidget {
       if (canRedact && onRedact != null)
         MessageMenuItem(
           icon: Icons.delete_outline,
-          label: '撤回',
+          label: s?.recall ?? 'Recall',
           onTap: () {
             Navigator.pop(context);
             onRedact?.call();
@@ -158,7 +160,7 @@ class MessageMenu extends StatelessWidget {
       if (onMore != null)
         MessageMenuItem(
           icon: Icons.more_horiz,
-          label: '更多',
+          label: s?.more ?? 'More',
           onTap: () {
             Navigator.pop(context);
             onMore?.call();
@@ -238,7 +240,7 @@ class _ForwardDialogState extends State<ForwardDialog> {
             child: Row(
               children: [
                 Text(
-                  '选择转发对象',
+                  S.of(context)?.selectForwardTarget ?? 'Select Forward Target',
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
@@ -254,7 +256,7 @@ class _ForwardDialogState extends State<ForwardDialog> {
                           Navigator.pop(context);
                         },
                   child: Text(
-                    '发送(${_selectedIds.length})',
+                    S.of(context)?.sendCount(_selectedIds.length) ?? 'Send(${_selectedIds.length})',
                     style: TextStyle(
                       color: _selectedIds.isEmpty
                           ? AppColors.textSecondary
