@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../blocs/group/group_bloc.dart';
@@ -44,7 +45,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: '群成员',
+        title: S.of(context)?.groupMembers ?? 'Group Members',
       ),
       body: BlocConsumer<GroupBloc, GroupState>(
         listener: (context, state) {
@@ -64,9 +65,9 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           }
 
           if (state is! GroupDetailsLoaded) {
-            return const N42EmptyState(
+            return N42EmptyState(
               icon: Icons.error_outline,
-              title: '加载失败',
+              title: S.of(context)?.loadFailed ?? 'Load failed',
             );
           }
 
@@ -106,7 +107,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           padding: const EdgeInsets.all(12),
           child: N42SearchBar(
             controller: _searchController,
-            hintText: '搜索成员',
+            hintText: S.of(context)?.searchMembers ?? 'Search members',
             onChanged: (query) {
               setState(() {
                 _searchQuery = query;
@@ -120,7 +121,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           alignment: Alignment.centerLeft,
           child: Text(
-            '共 ${state.group.memberCount} 位成员',
+            S.of(context)?.totalMembers(state.group.memberCount) ?? '${state.group.memberCount} members',
             style: TextStyle(
               fontSize: 13,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -172,9 +173,9 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                   color: Colors.orange,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text(
-                  '群主',
-                  style: TextStyle(
+                child: Text(
+                  S.of(context)?.groupOwner ?? 'Owner',
+                  style: const TextStyle(
                     fontSize: 10,
                     color: Colors.white,
                   ),
@@ -188,9 +189,9 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text(
-                  '管理员',
-                  style: TextStyle(
+                child: Text(
+                  S.of(context)?.groupAdmin ?? 'Admin',
+                  style: const TextStyle(
                     fontSize: 10,
                     color: Colors.white,
                   ),
@@ -224,7 +225,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             // 查看资料
             ListTile(
               leading: const Icon(Icons.person_outline),
-              title: const Text('查看资料'),
+              title: Text(S.of(this.context)?.viewProfile ?? 'View Profile'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.of(this.context).pushNamed('/profile/${member.userId}');
@@ -234,12 +235,12 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             // 发送消息
             ListTile(
               leading: const Icon(Icons.chat_bubble_outline),
-              title: const Text('发送消息'),
+              title: Text(S.of(this.context)?.sendMessage ?? 'Send Message'),
               onTap: () {
                 Navigator.pop(context);
                 // TODO: 创建私聊
                 ScaffoldMessenger.of(this.context).showSnackBar(
-                  const SnackBar(content: Text('功能开发中...')),
+                  SnackBar(content: Text(S.of(this.context)?.featureInDevelopment ?? 'Feature in development...')),
                 );
               },
             ),
@@ -250,7 +251,9 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                 leading: Icon(
                   member.isAdmin ? Icons.remove_moderator : Icons.add_moderator,
                 ),
-                title: Text(member.isAdmin ? '取消管理员' : '设为管理员'),
+                title: Text(member.isAdmin
+                    ? (S.of(this.context)?.removeAdmin ?? 'Remove Admin')
+                    : (S.of(this.context)?.setAsAdmin ?? 'Set as Admin')),
                 onTap: () {
                   Navigator.pop(context);
                   if (member.isAdmin) {
@@ -269,7 +272,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             if (canManage)
               ListTile(
                 leading: const Icon(Icons.person_remove, color: Colors.red),
-                title: const Text('移出群聊', style: TextStyle(color: Colors.red)),
+                title: Text(S.of(this.context)?.removeFromGroup ?? 'Remove from Group', style: const TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   _confirmKickMember(member);
@@ -284,22 +287,22 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
   void _confirmKickMember(GroupMember member) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('移出成员'),
-        content: Text('确定要将「${member.displayName}」移出群聊吗？'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.removeMember ?? 'Remove Member'),
+        content: Text(S.of(context)?.confirmRemoveMember(member.displayName) ?? 'Are you sure you want to remove "${member.displayName}" from the group?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               this.context.read<GroupBloc>().add(
                     KickMember(widget.roomId, member.userId),
                   );
             },
-            child: const Text('移出', style: TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.remove ?? 'Remove', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),

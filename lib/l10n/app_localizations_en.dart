@@ -22,7 +22,7 @@ class SEn extends S {
   String get unknownUser => 'Unknown User';
 
   @override
-  String get walletNotConnected => 'Wallet not connected';
+  String get walletNotConnected => 'Wallet Not Connected';
 
   @override
   String get cannotGetWalletAddress => 'Cannot get wallet address';
@@ -390,12 +390,12 @@ class SEn extends S {
 
   @override
   String conversationLabel(String roomId) {
-    return 'Conversation: $roomId';
+    return 'Conversation';
   }
 
   @override
   String contactLabel(String userId) {
-    return 'Contact: $userId';
+    return 'Contact';
   }
 
   @override
@@ -502,7 +502,7 @@ class SEn extends S {
   String get n42RedPacket => 'N42 Red Packet';
 
   @override
-  String get goodLuck => 'Get some luck';
+  String get goodLuck => 'Good luck';
 
   @override
   String get claimed => 'Claimed';
@@ -547,11 +547,11 @@ class SEn extends S {
   String get more => 'More';
 
   @override
-  String get selectForwardTarget => 'Select recipient';
+  String get selectForwardTarget => 'Select Forward Target';
 
   @override
   String sendCount(int count) {
-    return 'Send ($count)';
+    return 'Send($count)';
   }
 
   @override
@@ -1148,10 +1148,10 @@ class SEn extends S {
 
   @override
   String get searchContactsGroupsMessages =>
-      'Search contacts, groups, messages';
+      'Search contacts, groups and messages';
 
   @override
-  String get searchError => 'Search error';
+  String get searchError => 'Search Error';
 
   @override
   String get searchHint => 'Search contacts, groups, and messages';
@@ -1177,7 +1177,7 @@ class SEn extends S {
   String get groups => 'Groups';
 
   @override
-  String get noResults => 'No results';
+  String get noResults => 'No Results';
 
   @override
   String get groupInfo => 'Group Info';
@@ -1343,10 +1343,10 @@ class SEn extends S {
   String get redPacketCountMin => 'At least 1 red packet required';
 
   @override
-  String get viewRedPacketDetails => 'View red packet details';
+  String get viewRedPacketDetails => 'View Red Packet Details';
 
   @override
-  String get enterTransferAmount => 'Enter transfer amount';
+  String get enterTransferAmount => 'Please enter transfer amount';
 
   @override
   String get transferTo => 'Transfer to';
@@ -1358,8 +1358,8 @@ class SEn extends S {
   String get receiveTransfer => 'Received transfer';
 
   @override
-  String fromSender(String senderName) {
-    return 'From $senderName';
+  String fromSender(String name) {
+    return 'From $name';
   }
 
   @override
@@ -1463,7 +1463,7 @@ class SEn extends S {
 
   @override
   String featureInDev(String feature) {
-    return '$feature in development...';
+    return '$feature feature in development...';
   }
 
   @override
@@ -1528,7 +1528,7 @@ class SEn extends S {
   String get invoiceDeleted => 'Invoice deleted';
 
   @override
-  String get invoiceType => 'Invoice type: ';
+  String get invoiceType => 'Invoice Type';
 
   @override
   String get personal => 'Personal';
@@ -2024,36 +2024,6 @@ class SEn extends S {
   String get defaultRingtone => 'Default Ringtone';
 
   @override
-  String get ringtoneClear => 'Clear';
-
-  @override
-  String get ringtonePhone => 'Phone';
-
-  @override
-  String get ringtoneClassic => 'Classic';
-
-  @override
-  String get ringtoneSoft => 'Soft';
-
-  @override
-  String get ringtoneVibrate => 'Vibrate';
-
-  @override
-  String get ringtoneSilent => 'Silent';
-
-  @override
-  String get selectRingtone => 'Select Ringtone';
-
-  @override
-  String get stop => 'Stop';
-
-  @override
-  String get loadingRingtones => 'Loading ringtones...';
-
-  @override
-  String get noPermissionToEditGroupName => 'You do not have permission to edit group name';
-
-  @override
   String get myAddresses => 'My Addresses';
 
   @override
@@ -2307,6 +2277,21 @@ class SEn extends S {
       'Video recording failed. Please try again.';
 
   @override
+  String get redPacket => 'Red Packet';
+
+  @override
+  String get music => 'Music';
+
+  @override
+  String get coupon => 'Coupon';
+
+  @override
+  String get gift => 'Gift';
+
+  @override
+  String get poll => 'Poll';
+
+  @override
   String get text => 'Text';
 
   @override
@@ -2317,6 +2302,19 @@ class SEn extends S {
 
   @override
   String get myNotes => 'My Notes';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String daysAgoText(int count) {
+    return '$count days ago';
+  }
+
+  @override
+  String dateFormat(int month, int day) {
+    return '$month/$day';
+  }
 
   @override
   String get noFavorites => 'No favorites yet';
@@ -2337,101 +2335,351 @@ class SEn extends S {
   String get deleteFavorite => 'Delete Favorite';
 
   @override
-  String get deleteFavoriteConfirm => 'Are you sure you want to delete this favorite?';
-
-  @override
-  String get today => 'Today';
-
-  @override
-  String daysAgoText(int count) {
-    return '$count days ago';
-  }
-
-  @override
-  String dateFormat(int month, int day) {
-    return 'M$month D$day';
-  }
+  String get deleteFavoriteConfirm =>
+      'Are you sure you want to delete this favorite?';
 
   @override
   String get noSearchResultsFound => 'No results found';
 
   @override
-  String get searchMembers => 'Search members';
+  String get sendRedPacket => 'Send Red Packet';
 
   @override
-  String get inviteMembers => 'Invite Members';
+  String get amount => 'Amount';
 
   @override
-  String get selectMembers => 'Select Members';
+  String get redPacketCover => 'Red Packet Cover';
 
   @override
-  String get noMembersToAdd => 'No members to add';
+  String get redPacketType => 'Red Packet Type';
 
   @override
-  String get cannotRemoveOwner => 'Cannot remove group owner';
+  String get normalRedPacket => 'Normal';
 
   @override
-  String get memberRemoved => 'Member removed';
+  String get luckyRedPacket => 'Lucky';
 
   @override
-  String get memberAdded => 'Member added';
+  String get redPacketCount => 'Red Packet Count';
 
   @override
-  String get scanQrCode => 'Scan QR Code';
+  String get pieces => 'pieces';
 
   @override
-  String get alignQrCode => 'Align QR code within frame';
+  String get putMoneyInRedPacket => 'Put money in red packet';
 
   @override
-  String get flashlight => 'Flashlight';
+  String get redPacketRefundNotice =>
+      'Unclaimed red packets will be refunded after 24 hours';
 
   @override
-  String get album => 'Album';
+  String get openRedPacket => 'Open';
 
   @override
-  String get invalidQrCode => 'Invalid QR code';
+  String get redPacketAllClaimed => 'Red packet all claimed';
 
   @override
-  String get qrCodeScanFailed => 'Failed to scan QR code';
+  String get redPacketExpired => 'Red packet expired';
 
   @override
-  String get searchUser => 'Search User';
+  String get addTransferNote => 'Add transfer note';
 
   @override
-  String get addByIdSearch => 'Add by ID Search';
+  String get yuan => 'CNY';
 
   @override
-  String get enterN42Id => 'Enter N42 ID';
+  String get savedToChangeCanTransfer =>
+      'Saved to balance, can transfer directly';
 
   @override
-  String get chatRecalled => 'recalled a message';
+  String get replyWithEmoji => 'Reply with this emoji';
 
   @override
-  String get systemMessage => 'System Message';
+  String get claimedYourRedPacket => 'claimed your';
 
   @override
-  String get setStatus => 'Set Status';
+  String get claimedRedPacket => 'claimed';
 
   @override
-  String get visibleToFriends24h => 'Visible to friends for 24 hours';
+  String get otherTyping => 'typing...';
 
   @override
-  String get writeStatus => 'Write Status';
+  String get processing => 'Processing...';
+
+  @override
+  String get transferCancelled => 'Transfer cancelled';
+
+  @override
+  String get transferFailed => 'Transfer failed';
+
+  @override
+  String get creatingPaymentRequest => 'Creating payment request...';
+
+  @override
+  String get processingPayment => 'Processing payment...';
+
+  @override
+  String get paymentFailed => 'Payment failed';
+
+  @override
+  String get clickRetry => 'Tap to retry';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get editRemark => 'Edit Remark';
+
+  @override
+  String get setPermissions => 'Set Permissions';
+
+  @override
+  String get recommendToFriends => 'Recommend to Friends';
+
+  @override
+  String get setStarFriend => 'Set as Star Friend';
+
+  @override
+  String get addToBlacklist => 'Add to Blacklist';
+
+  @override
+  String get complain => 'Report';
+
+  @override
+  String get deleteContact => 'Delete Contact';
+
+  @override
+  String deleteContactConfirm(String name) {
+    return 'Are you sure you want to delete $name?';
+  }
+
+  @override
+  String get transferTitle => 'Transfer';
+
+  @override
+  String get receiverAddressLabel => 'Recipient Address';
+
+  @override
+  String get selectTokenLabel => 'Select Token';
+
+  @override
+  String get transferAmountLabel => 'Transfer Amount';
+
+  @override
+  String get memoLabel => 'Memo (optional)';
+
+  @override
+  String get enterOrPasteAddressHint => 'Enter or paste wallet address';
+
+  @override
+  String get scanInDevelopment => 'Scanning feature in development...';
+
+  @override
+  String get availableLabel => 'Available';
+
+  @override
+  String availableBalanceFormat(String balance, String symbol) {
+    return 'Available: $balance $symbol';
+  }
+
+  @override
+  String get addMemoHint => 'Add a memo';
+
+  @override
+  String get receiveTitle => 'Receive';
+
+  @override
+  String get walletNotConnectedTitle => 'Wallet not connected';
+
+  @override
+  String get connectWalletFirst => 'Please connect wallet first';
+
+  @override
+  String get sendPaymentRequest => 'Send Payment Request';
+
+  @override
+  String get qrCodeGenerateFailed => 'QR code generation failed';
+
+  @override
+  String get scanQrToPayMe => 'Scan QR code to pay me';
+
+  @override
+  String get myWalletAddress => 'My Wallet Address';
+
+  @override
+  String get createPaymentRequest => 'Create Payment Request';
+
+  @override
+  String get selectTokenHint => 'Select Token';
+
+  @override
+  String get amountLabel => 'Amount';
+
+  @override
+  String get cancelButton => 'Cancel';
+
+  @override
+  String get sendRequestButton => 'Send Request';
+
+  @override
+  String get allReadReceipt => 'All read';
+
+  @override
+  String readCountReceipt(int count) {
+    return '$count read';
+  }
+
+  @override
+  String n42IdLabel(String id) {
+    return 'N42 ID: $id';
+  }
+
+  @override
+  String get redPacketDefaultGreeting => 'Best wishes';
+
+  @override
+  String senderRedPacket(String name) {
+    return '$name\'s Red Packet';
+  }
+
+  @override
+  String get allButton => 'All';
+
+  @override
+  String get enterValidAddress => 'Please enter a valid address';
+
+  @override
+  String get pleaseSelectToken => 'Please select a token';
+
+  @override
+  String get receivedTransfer => 'Received Transfer';
+
+  @override
+  String get selectForwardRecipient => 'Select forward recipient';
+
+  @override
+  String get emojiFaces => 'Faces';
+
+  @override
+  String get emojiHearts => 'Hearts';
+
+  @override
+  String get emojiAnimals => 'Animals';
+
+  @override
+  String get emojiFood => 'Food';
+
+  @override
+  String get emojiTransport => 'Transport';
+
+  @override
+  String get emojiActivities => 'Activities';
+
+  @override
+  String get emojiObjects => 'Objects';
+
+  @override
+  String get emojiSymbols => 'Symbols';
+
+  @override
+  String get transferProcessing => 'Processing transfer...';
+
+  @override
+  String senderSentRedPacket(String name) {
+    return '$name sent a red packet';
+  }
+
+  @override
+  String get savedToBalance => 'Saved to balance, can transfer directly';
+
+  @override
+  String get redPacketExpiredOrEmpty => 'Red packet expired/all claimed';
+
+  @override
+  String get scanFeatureComingSoon => 'Scan feature coming soon...';
+
+  @override
+  String get setAsStarred => 'Set as Starred';
+
+  @override
+  String get addToBlocklist => 'Add to Blocklist';
+
+  @override
+  String get claimedYour => ' claimed your ';
+
+  @override
+  String get claimedText => ' claimed ';
+
+  @override
+  String userTyping(String name) {
+    return '$name is typing...';
+  }
+
+  @override
+  String get typing => 'Typing...';
+
+  @override
+  String get waitingToReceive => 'Waiting to receive';
+
+  @override
+  String get tapToClaim => 'Tap to claim';
+
+  @override
+  String get hasBeenReceived => 'Has been received';
+
+  @override
+  String get getLucky => 'Get lucky';
+
+  @override
+  String get cameraStartFailed => 'Camera failed to start';
+
+  @override
+  String get unknownError => 'Unknown error';
+
+  @override
+  String get placeQrCodeInFrame => 'Place QR code within the frame to scan';
+
+  @override
+  String get closeManualInput => 'Close Manual Input';
+
+  @override
+  String get manualInputUserId => 'Manual Input User ID';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get ringtoneClear => 'Clear';
+
+  @override
+  String get ringtonePhone => 'Phone';
+
+  @override
+  String get ringtoneClassic => 'Classic';
+
+  @override
+  String get ringtoneSoft => 'Soft';
+
+  @override
+  String get ringtoneVibrate => 'Vibrate';
+
+  @override
+  String get ringtoneSilent => 'Silent';
+
+  @override
+  String get stop => 'Stop';
+
+  @override
+  String get selectRingtone => 'Select Ringtone';
+
+  @override
+  String get loadingRingtones => 'Loading ringtones...';
+
+  @override
+  String get noRingtonesFound => 'No ringtones found';
 
   @override
   String get moodAndThoughts => 'Mood & Thoughts';
-
-  @override
-  String get workAndStudy => 'Work & Study';
-
-  @override
-  String get rest => 'Rest';
-
-  @override
-  String get enterYourStatus => 'Enter your status...';
-
-  @override
-  String get ok => 'OK';
 
   @override
   String get statusHappy => 'Happy';
@@ -2459,6 +2707,9 @@ class SEn extends S {
 
   @override
   String get statusEnergized => 'Energized';
+
+  @override
+  String get workAndStudy => 'Work & Study';
 
   @override
   String get statusWorking => 'Working';
@@ -2509,6 +2760,9 @@ class SEn extends S {
   String get statusSelfie => 'Selfie';
 
   @override
+  String get rest => 'Rest';
+
+  @override
   String get statusRetreat => 'Retreat';
 
   @override
@@ -2530,10 +2784,27 @@ class SEn extends S {
   String get statusListening => 'Listening';
 
   @override
-  String get cameraPermissionRequired => 'Camera permission is required to scan QR code';
+  String get setStatus => 'Set Status';
 
   @override
-  String get cameraPermissionDenied => 'Camera permission was permanently denied. Please enable it in system settings.';
+  String get visibleToFriends24h => 'Visible to friends for 24 hours';
+
+  @override
+  String get writeStatus => 'Write Status';
+
+  @override
+  String get enterYourStatus => 'Enter your status...';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get cameraPermissionRequired =>
+      'Camera permission is required to scan QR code';
+
+  @override
+  String get cameraPermissionDenied =>
+      'Camera permission was permanently denied. Please enable it in system settings.';
 
   @override
   String get cannotGetCameraPermission => 'Cannot get camera permission';
@@ -2542,6 +2813,22 @@ class SEn extends S {
   String permissionCheckError(String error) {
     return 'Error checking permission: $error';
   }
+
+  @override
+  String get invalidQrCode => 'Invalid QR code';
+
+  @override
+  String qrCodeProcessFailed(String error) {
+    return 'Failed to process QR code: $error';
+  }
+
+  @override
+  String cannotAddFriend(String error) {
+    return 'Cannot add friend: $error';
+  }
+
+  @override
+  String get scanQrCode => 'Scan QR Code';
 
   @override
   String get checkingCameraPermission => 'Checking camera permission...';
@@ -2556,30 +2843,328 @@ class SEn extends S {
   String get openSettings => 'Open Settings';
 
   @override
-  String get manualInputUserId => 'Manual Input User ID';
+  String get inviteMembers => 'Invite Members';
 
   @override
-  String get closeManualInput => 'Close Manual Input';
-
-  @override
-  String get cameraStartFailed => 'Camera failed to start';
-
-  @override
-  String get unknownError => 'Unknown error';
-
-  @override
-  String get placeQrCodeInFrame => 'Place QR code within the frame to scan';
-
-  @override
-  String cannotAddFriend(String error) {
-    return 'Cannot add friend: $error';
+  String inviteCount(int count) {
+    return 'Invite($count)';
   }
 
   @override
-  String qrCodeProcessFailed(String error) {
-    return 'Failed to process QR code: $error';
+  String get noShippingAddress => 'No shipping address';
+
+  @override
+  String get defaultLabel => 'Default';
+
+  @override
+  String get editAddress => 'Edit Address';
+
+  @override
+  String get recipient => 'Recipient';
+
+  @override
+  String get enterRecipientName => 'Enter recipient name';
+
+  @override
+  String get phoneNumber => 'Phone Number';
+
+  @override
+  String get enterPhoneNumber => 'Enter phone number';
+
+  @override
+  String get regionHint => 'Province/City/District';
+
+  @override
+  String get detailedAddress => 'Detailed Address';
+
+  @override
+  String get detailedAddressHint => 'Street, building number, etc.';
+
+  @override
+  String get setAsDefaultAddress => 'Set as default address';
+
+  @override
+  String get pleaseCompleteInfo => 'Please complete all fields';
+
+  @override
+  String get noInvoice => 'No invoice';
+
+  @override
+  String get company => 'Company';
+
+  @override
+  String get taxNumber => 'Tax Number';
+
+  @override
+  String get editInvoice => 'Edit Invoice';
+
+  @override
+  String get companyName => 'Company Name';
+
+  @override
+  String get enterCompanyName => 'Enter company name';
+
+  @override
+  String get personalName => 'Personal Name';
+
+  @override
+  String get enterName => 'Enter name';
+
+  @override
+  String get taxIdNumber => 'Tax ID Number';
+
+  @override
+  String get enterTaxIdNumber => 'Enter tax ID number';
+
+  @override
+  String get bankNameOptional => 'Bank Name (Optional)';
+
+  @override
+  String get enterBankName => 'Enter bank name';
+
+  @override
+  String get bankAccountOptional => 'Bank Account (Optional)';
+
+  @override
+  String get enterBankAccount => 'Enter bank account';
+
+  @override
+  String get companyAddressOptional => 'Company Address (Optional)';
+
+  @override
+  String get enterCompanyAddress => 'Enter company address';
+
+  @override
+  String get companyPhoneOptional => 'Company Phone (Optional)';
+
+  @override
+  String get enterCompanyPhone => 'Enter company phone';
+
+  @override
+  String get setAsDefaultInvoice => 'Set as default invoice';
+
+  @override
+  String get confirmDeleteAddress =>
+      'Are you sure you want to delete this address?';
+
+  @override
+  String get confirmDeleteInvoice =>
+      'Are you sure you want to delete this invoice?';
+
+  @override
+  String get groupOwner => 'Owner';
+
+  @override
+  String get groupAdmin => 'Admin';
+
+  @override
+  String get searchMembers => 'Search members';
+
+  @override
+  String totalMembers(int count) {
+    return '$count members';
   }
 
   @override
-  String get add => 'Add';
+  String get removeFromGroup => 'Remove from Group';
+
+  @override
+  String confirmRemoveMember(String name) {
+    return 'Are you sure you want to remove \"$name\" from the group?';
+  }
+
+  @override
+  String get setAsAdmin => 'Set as Admin';
+
+  @override
+  String get removeAdmin => 'Remove Admin';
+
+  @override
+  String get deleteContactSuccess => 'Contact deleted';
+
+  @override
+  String get unknownSong => 'Unknown Song';
+
+  @override
+  String get unknownArtist => 'Unknown Artist';
+
+  @override
+  String get unknownContact => 'Unknown Contact';
+
+  @override
+  String get personalCard => 'Contact Card';
+
+  @override
+  String get singleChoice => 'Single';
+
+  @override
+  String get multiChoice => 'Multi';
+
+  @override
+  String get ended => 'Ended';
+
+  @override
+  String get endPollButton => 'End Poll';
+
+  @override
+  String get createPoll => 'Create Poll';
+
+  @override
+  String get pollQuestion => 'Poll Question';
+
+  @override
+  String get pollOptions => 'Poll Options';
+
+  @override
+  String optionPlaceholder(int index) {
+    return 'Option $index';
+  }
+
+  @override
+  String get addOption => 'Add Option';
+
+  @override
+  String get pollSettings => 'Poll Settings';
+
+  @override
+  String get anonymousPoll => 'Anonymous Poll';
+
+  @override
+  String get pollHint =>
+      'Poll will be displayed in chat. Group members can vote.';
+
+  @override
+  String get searchSongOrArtist => 'Search song or artist';
+
+  @override
+  String get noSongsFound => 'No songs found';
+
+  @override
+  String get supportedMusicPlatforms =>
+      'Supports music links from NetEase, QQ Music, etc.';
+
+  @override
+  String get songNameOptional => 'Song Name (Optional)';
+
+  @override
+  String get enterSongName => 'Enter song name';
+
+  @override
+  String get artistNameOptional => 'Artist Name (Optional)';
+
+  @override
+  String get enterArtistName => 'Enter artist name';
+
+  @override
+  String get shareSong => 'Share Song';
+
+  @override
+  String get realTimeLocationSharing =>
+      'Real-time location sharing in development...';
+
+  @override
+  String get voiceCallFeatureInDev => 'Voice call feature in development...';
+
+  @override
+  String get reportFeatureInDev => 'Report feature in development...';
+
+  @override
+  String get shareFeatureInDev => 'Share feature in development...';
+
+  @override
+  String get qrCodeFeatureInDev => 'QR code feature in development...';
+
+  @override
+  String get scanQrToAddMe => 'Scan the QR code above to add me as a friend';
+
+  @override
+  String get saveToAlbum => 'Save to Album';
+
+  @override
+  String get changeStyle => 'Change Style';
+
+  @override
+  String get copyId => 'Copy ID';
+
+  @override
+  String get idCopied => 'ID copied';
+
+  @override
+  String get shareFeatureComingSoon => 'Share feature coming soon';
+
+  @override
+  String get saveFeatureComingSoon => 'Save feature coming soon';
+
+  @override
+  String get moreStylesFeatureComingSoon => 'More styles coming soon';
+
+  @override
+  String get confirmEndPoll => 'Are you sure you want to end this poll?';
+
+  @override
+  String get cannotVoteAfterEnd => 'No more votes can be cast after ending.';
+
+  @override
+  String get bio => 'Bio';
+
+  @override
+  String get homeServer => 'Server';
+
+  @override
+  String get shareContactCard => 'Share Contact Card';
+
+  @override
+  String get removeFromBlacklist => 'Remove from Blacklist';
+
+  @override
+  String get confirmAddBlacklist =>
+      'Are you sure you want to add this user to blacklist? You will not receive messages from them.';
+
+  @override
+  String get confirmRemoveBlacklist =>
+      'Are you sure you want to remove this user from blacklist?';
+
+  @override
+  String get remarkSaved => 'Remark saved';
+
+  @override
+  String get remarkCleared => 'Remark cleared';
+
+  @override
+  String get receive => 'Receive';
+
+  @override
+  String get pleaseConnectWallet => 'Please connect your wallet first';
+
+  @override
+  String get sendRequest => 'Send Request';
+
+  @override
+  String get pleaseEnterValidAmount => 'Please enter a valid amount';
+
+  @override
+  String get searchPlaceholder => 'Search contacts, groups, messages';
+
+  @override
+  String get enterKeywordToSearch => 'Enter keyword to start searching';
+
+  @override
+  String get clearHistory => 'Clear';
+
+  @override
+  String noResultsForQuery(String query) {
+    return 'No results found for \"$query\"';
+  }
+
+  @override
+  String get allResults => 'All';
+
+  @override
+  String get searchInChat => 'Search in chat';
+
+  @override
+  String get groupLabel => 'Group';
+
+  @override
+  String get messageLabel => 'Message';
 }

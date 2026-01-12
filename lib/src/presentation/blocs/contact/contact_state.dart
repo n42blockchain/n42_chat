@@ -138,3 +138,13 @@ class ContactRemarkUpdated extends ContactState {
   List<Object?> get props => [userId, remark];
 }
 
+/// 联系人删除成功
+class ContactDeleted extends ContactState {
+  final String userId;
+
+  const ContactDeleted(this.userId);
+
+  @override
+  List<Object?> get props => [userId];
+}
+

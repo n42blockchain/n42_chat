@@ -229,7 +229,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 6),
                       // N42号
                       Text(
-                        'N42号：$n42Id',
+                        S.of(context)?.n42IdLabel(n42Id) ?? 'N42 ID: $n42Id',
                         style: TextStyle(
                           fontSize: 15,
                           color: subtitleColor,

@@ -33,7 +33,7 @@ class SendRedPacketPage extends StatefulWidget {
 class _SendRedPacketPageState extends State<SendRedPacketPage> {
   final _amountController = TextEditingController();
   final _countController = TextEditingController(text: '1');
-  final _greetingController = TextEditingController(text: '恭喜发财，大吉大利');
+  late final TextEditingController _greetingController;
   
   String _selectedToken = 'CNY';
   bool _isLucky = false;
@@ -95,6 +95,20 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   }
   
   @override
+  void initState() {
+    super.initState();
+    _greetingController = TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_greetingController.text.isEmpty) {
+      _greetingController.text = S.of(context)?.redPacketDefaultGreeting ?? 'Best wishes';
+    }
+  }
+
+  @override
   void dispose() {
     _amountController.dispose();
     _countController.dispose();
@@ -143,9 +157,9 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 32),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          '发红包',
-          style: TextStyle(
+        title: Text(
+          S.of(context)?.sendRedPacket ?? 'Send Red Packet',
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w500,
@@ -175,7 +189,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 
                 // 金额输入
                 _buildMenuItem(
-                  label: '金额',
+                  label: S.of(context)?.amount ?? 'Amount',
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -235,7 +249,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                     maxLength: 30,
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                     decoration: InputDecoration(
-                      hintText: '恭喜发财，大吉大利',
+                      hintText: S.of(context)?.redPacketDefaultGreeting ?? 'Best wishes',
                       hintStyle: const TextStyle(color: Colors.white38),
                       border: InputBorder.none,
                       counterText: '',
@@ -258,13 +272,13 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              '红包封面',
-                              style: TextStyle(color: Colors.white, fontSize: 16),
+                            Text(
+                              S.of(context)?.redPacketCover ?? 'Red Packet Cover',
+                              style: const TextStyle(color: Colors.white, fontSize: 16),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '领个好彩头',
+                              S.of(context)?.goodLuck ?? 'Good luck',
                               style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
                             ),
                           ],
@@ -296,15 +310,15 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 if (widget.isGroup) ...[
                   const SizedBox(height: 16),
                   _buildMenuItem(
-                    label: '红包类型',
+                    label: S.of(context)?.redPacketType ?? 'Red Packet Type',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildTypeChip('普通红包', !_isLucky, () {
+                        _buildTypeChip(S.of(context)?.normalRedPacket ?? 'Normal', !_isLucky, () {
                           setState(() => _isLucky = false);
                         }),
                         const SizedBox(width: 8),
-                        _buildTypeChip('拼手气', _isLucky, () {
+                        _buildTypeChip(S.of(context)?.luckyRedPacket ?? 'Lucky', _isLucky, () {
                           setState(() => _isLucky = true);
                         }),
                       ],
@@ -312,7 +326,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                   ),
                   if (_isLucky)
                     _buildMenuItem(
-                      label: '红包个数',
+                      label: S.of(context)?.redPacketCount ?? 'Red Packet Count',
                       trailing: SizedBox(
                         width: 80,
                         child: TextField(
@@ -321,12 +335,12 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           textAlign: TextAlign.right,
                           style: const TextStyle(color: Colors.white, fontSize: 16),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
                             isDense: true,
-                            suffixText: '个',
-                            suffixStyle: TextStyle(color: Colors.white54, fontSize: 14),
+                            suffixText: S.of(context)?.pieces ?? 'pcs',
+                            suffixStyle: const TextStyle(color: Colors.white54, fontSize: 14),
                           ),
                         ),
                       ),
@@ -367,9 +381,9 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        '塞钱进红包',
-                        style: TextStyle(
+                      child: Text(
+                        S.of(context)?.putMoneyInRedPacket ?? 'Put money in',
+                        style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
                         ),
@@ -382,7 +396,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 
                 // 底部提示
                 Text(
-                  '未领取的红包，将于24小时后发起退款',
+                  S.of(context)?.redPacketRefundNotice ?? 'Unclaimed red packets will be refunded after 24 hours',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.4),
                     fontSize: 12,
@@ -558,7 +572,7 @@ class SendRedPacketDialog extends StatelessWidget {
 class OpenRedPacketDialog extends StatefulWidget {
   final String senderName;
   final String? senderAvatar;
-  final String greeting;
+  final String? greeting;
   final OpenRedPacketStatus status;
   final String? claimedAmount;
   final String token;
@@ -569,7 +583,7 @@ class OpenRedPacketDialog extends StatefulWidget {
     super.key,
     required this.senderName,
     this.senderAvatar,
-    this.greeting = '恭喜发财，大吉大利',
+    this.greeting,
     this.status = OpenRedPacketStatus.canOpen,
     this.claimedAmount,
     this.token = 'CNY',
@@ -669,13 +683,13 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
           const SizedBox(height: 12),
           
           Text(
-            '${widget.senderName}的红包',
+            S.of(context)?.senderRedPacket(widget.senderName) ?? '${widget.senderName}\'s Red Packet',
             style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
-          
+
           Text(
-            widget.greeting,
+            widget.greeting ?? S.of(context)?.redPacketDefaultGreeting ?? 'Best wishes',
             style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 32),
@@ -698,10 +712,10 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                           BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4)),
                         ],
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          '開',
-                          style: TextStyle(color: Color(0xFFB8860B), fontSize: 28, fontWeight: FontWeight.bold),
+                          S.of(context)?.openRedPacket ?? 'Open',
+                          style: const TextStyle(color: Color(0xFFB8860B), fontSize: 28, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -722,18 +736,18 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
     String message;
     switch (widget.status) {
       case OpenRedPacketStatus.opened:
-        message = '已领取';
+        message = S.of(context)?.claimed ?? 'Claimed';
         break;
       case OpenRedPacketStatus.empty:
-        message = '红包已被领完';
+        message = S.of(context)?.redPacketAllClaimed ?? 'Red packet all claimed';
         break;
       case OpenRedPacketStatus.expired:
-        message = '红包已过期';
+        message = S.of(context)?.redPacketExpired ?? 'Red packet expired';
         break;
       default:
         message = '';
     }
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Text(message, style: const TextStyle(color: Colors.white70, fontSize: 16)),
@@ -774,13 +788,13 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                 ),
                 
                 Text(
-                  '${widget.senderName}的红包',
+                  S.of(context)?.senderRedPacket(widget.senderName) ?? '${widget.senderName}\'s Red Packet',
                   style: const TextStyle(color: Colors.white, fontSize: 14),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 16),
-                
+
                 // 金额显示 - 使用 FittedBox 自适应
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -817,7 +831,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
             padding: const EdgeInsets.all(20),
             child: TextButton(
               onPressed: widget.onViewDetails,
-              child: const Text('查看红包详情'),
+              child: Text(S.of(context)?.viewRedPacketDetails ?? 'View Red Packet Details'),
             ),
           ),
         ],
@@ -903,7 +917,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
     final amount = _amountController.text.trim();
     if (amount.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入转账金额')),
+        SnackBar(content: Text(S.of(context)?.enterTransferAmount ?? 'Please enter transfer amount')),
       );
       return;
     }
@@ -928,9 +942,9 @@ class _SendTransferPageState extends State<SendTransferPage> {
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          '转账',
-          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+        title: Text(
+          S.of(context)?.transfer ?? 'Transfer',
+          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
       ),
@@ -980,7 +994,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('转账金额', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  Text(S.of(context)?.transferAmount ?? 'Transfer Amount', style: const TextStyle(fontSize: 14, color: Colors.grey)),
                   const SizedBox(height: 16),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -1033,7 +1047,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     controller: _memoController,
                     maxLength: 50,
                     decoration: InputDecoration(
-                      hintText: '添加转账说明',
+                      hintText: S.of(context)?.addTransferNote ?? 'Add transfer note',
                       hintStyle: TextStyle(color: Colors.grey[400]),
                       border: InputBorder.none,
                       counterText: '',
@@ -1148,7 +1162,7 @@ class RedPacketDetailPage extends StatelessWidget {
   final String? senderAvatar;
   
   /// 红包祝福语
-  final String greeting;
+  final String? greeting;
   
   /// 领取金额
   final String? claimedAmount;
@@ -1166,17 +1180,17 @@ class RedPacketDetailPage extends StatelessWidget {
     super.key,
     required this.senderName,
     this.senderAvatar,
-    this.greeting = '恭喜发财，大吉大利',
+    this.greeting,
     this.claimedAmount,
     this.token = 'CNY',
     this.isClaimed = false,
     this.claimers,
   });
   
-  String get _currencyUnit {
+  String _currencyUnit(BuildContext context) {
     switch (token) {
       case 'CNY':
-        return '元';
+        return S.of(context)?.yuan ?? 'CNY';
       case 'ETH':
         return 'ETH';
       case 'BTC':
@@ -1246,7 +1260,7 @@ class RedPacketDetailPage extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '${senderName}发出的红包',
+                          S.of(context)?.senderSentRedPacket(senderName) ?? '$senderName sent a red packet',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 17,
@@ -1260,7 +1274,7 @@ class RedPacketDetailPage extends StatelessWidget {
                     
                     // 祝福语
                     Text(
-                      greeting,
+                      greeting ?? S.of(context)?.redPacketDefaultGreeting ?? 'Best wishes',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
                         fontSize: 15,
@@ -1291,7 +1305,7 @@ class RedPacketDetailPage extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 10),
                                 child: Text(
-                                  _currencyUnit,
+                                  _currencyUnit(context),
                                   style: const TextStyle(
                                     color: Color(0xFFFFD700),
                                     fontSize: 20,
@@ -1311,7 +1325,7 @@ class RedPacketDetailPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '已存入零钱，可直接转账',
+                              S.of(context)?.savedToBalance ?? 'Saved to balance, can transfer directly',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.7),
                                 fontSize: 14,
@@ -1349,7 +1363,7 @@ class RedPacketDetailPage extends StatelessWidget {
                             ),
                             const SizedBox(width: 12),
                             Text(
-                              '用此表情回复',
+                              S.of(context)?.replyWithEmoji ?? 'Reply with this emoji',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.9),
                                 fontSize: 14,
@@ -1359,9 +1373,9 @@ class RedPacketDetailPage extends StatelessWidget {
                         ),
                       ),
                     ] else ...[
-                      const Text(
-                        '红包已过期/已领完',
-                        style: TextStyle(
+                      Text(
+                        S.of(context)?.redPacketExpiredOrEmpty ?? 'Red packet expired/all claimed',
+                        style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 16,
                         ),
@@ -1384,7 +1398,7 @@ class RedPacketDetailPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Divider(height: 1, color: Colors.white10),
-                    ...claimers!.map((claimer) => _buildClaimerItem(claimer)),
+                    ...claimers!.map((claimer) => _buildClaimerItem(context, claimer)),
                   ],
                 ),
               ),
@@ -1394,7 +1408,7 @@ class RedPacketDetailPage extends StatelessWidget {
     );
   }
   
-  Widget _buildClaimerItem(RedPacketClaimer claimer) {
+  Widget _buildClaimerItem(BuildContext context, RedPacketClaimer claimer) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -1433,7 +1447,7 @@ class RedPacketDetailPage extends StatelessWidget {
             ),
           ),
           Text(
-            '${claimer.amount}$_currencyUnit',
+            '${claimer.amount}${_currencyUnit(context)}',
             style: const TextStyle(
               color: Color(0xFFFFD700),
               fontSize: 16,
@@ -1503,10 +1517,10 @@ class ConfirmReceiveDialog extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             
-            const Text('收到转账', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            Text(S.of(context)?.receivedTransfer ?? 'Received Transfer', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
-            
-            Text('来自 $senderName', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+
+            Text(S.of(context)?.fromSender(senderName) ?? 'From $senderName', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
             const SizedBox(height: 24),
             
             Row(

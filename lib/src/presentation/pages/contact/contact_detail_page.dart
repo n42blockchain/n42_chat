@@ -543,20 +543,41 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   }
 
   void _openSettings() {
+    // 获取当前的 ContactBloc
+    ContactBloc? contactBloc;
+    try {
+      contactBloc = context.read<ContactBloc>();
+    } catch (e) {
+      // ContactBloc 可能不可用
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ContactSettingsPage(
-          userId: widget.userId,
-          displayName: _effectiveDisplayName,
-          isStarred: _isStarred,
-          onStarChanged: (starred) {
-            setState(() {
-              _isStarred = starred;
-            });
-          },
-        ),
+        builder: (ctx) {
+          final page = ContactSettingsPage(
+            userId: widget.userId,
+            displayName: _effectiveDisplayName,
+            isStarred: _isStarred,
+            onStarChanged: (starred) {
+              setState(() {
+                _isStarred = starred;
+              });
+            },
+          );
+
+          if (contactBloc != null) {
+            return BlocProvider.value(
+              value: contactBloc,
+              child: page,
+            );
+          }
+          return page;
+        },
       ),
-    );
+    ).then((_) {
+      // 返回时刷新联系人信息
+      _loadContact();
+    });
   }
   
   void _openFriendInfo() {

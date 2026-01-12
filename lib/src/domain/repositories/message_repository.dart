@@ -133,7 +133,18 @@ abstract class IMessageRepository {
     required List<String> options,
     int maxSelections = 1,
   });
-  
+
+  /// 发送转发的投票快照（包含投票结果，不可再投票）
+  Future<MessageEntity?> sendForwardedPollSnapshot(
+    String roomId, {
+    required String question,
+    required List<String> options,
+    required List<String> optionIds,
+    required Map<String, int> voteCounts,
+    required int totalVoters,
+    int maxSelections = 1,
+  });
+
   /// 投票响应
   Future<bool> voteOnPoll(
     String roomId, {

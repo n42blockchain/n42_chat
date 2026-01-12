@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 聊天更多功能面板
@@ -99,43 +100,43 @@ class ChatMorePanel extends StatelessWidget {
                     [
                       _MoreItem(
                         icon: Icons.photo_library_outlined,
-                        label: '照片',
+                        label: S.of(context)?.photos ?? 'Photos',
                         onTap: onPhotoPressed,
                       ),
                       _MoreItem(
                         icon: Icons.camera_alt_outlined,
-                        label: '拍摄',
+                        label: S.of(context)?.takePhoto ?? 'Camera',
                         onTap: onCameraPressed,
                       ),
                       _MoreItem(
                         icon: Icons.videocam_outlined,
-                        label: '视频通话',
+                        label: S.of(context)?.videoCall ?? 'Video Call',
                         onTap: onVideoCallPressed,
                       ),
                       _MoreItem(
                         icon: Icons.location_on_outlined,
-                        label: '位置',
+                        label: S.of(context)?.location ?? 'Location',
                         onTap: onLocationPressed,
                       ),
                       _MoreItem(
                         icon: Icons.card_giftcard,
-                        label: '红包',
+                        label: S.of(context)?.redPacket ?? 'Red Packet',
                         onTap: onRedPacketPressed,
                         iconColor: AppColors.redPacket,
                       ),
                       _MoreItem(
                         icon: Icons.swap_horiz,
-                        label: '转账',
+                        label: S.of(context)?.transfer ?? 'Transfer',
                         onTap: onTransferPressed,
                       ),
                       _MoreItem(
                         icon: Icons.folder_outlined,
-                        label: '文件',
+                        label: S.of(context)?.file ?? 'File',
                         onTap: onFilePressed,
                       ),
                       _MoreItem(
                         icon: Icons.person_outline,
-                        label: '名片',
+                        label: S.of(context)?.contactCard ?? 'Contact',
                         onTap: onContactCardPressed,
                       ),
                     ],
@@ -147,28 +148,28 @@ class ChatMorePanel extends StatelessWidget {
                     [
                       _MoreItem(
                         icon: Icons.star_outline,
-                        label: '收藏',
+                        label: S.of(context)?.favorites ?? 'Favorites',
                         onTap: onFavoritePressed,
                       ),
                       _MoreItem(
                         icon: Icons.music_note_outlined,
-                        label: '音乐',
+                        label: S.of(context)?.music ?? 'Music',
                         onTap: onMusicPressed,
                       ),
                       _MoreItem(
                         icon: Icons.confirmation_num_outlined,
-                        label: '卡券',
+                        label: S.of(context)?.coupon ?? 'Coupon',
                         onTap: onCouponPressed,
                       ),
                       _MoreItem(
                         icon: Icons.redeem,
-                        label: '礼物',
+                        label: S.of(context)?.gift ?? 'Gift',
                         onTap: onGiftPressed,
                         iconColor: AppColors.error,
                       ),
                       _MoreItem(
                         icon: Icons.poll_outlined,
-                        label: '投票',
+                        label: S.of(context)?.poll ?? 'Poll',
                         onTap: onPollPressed,
                         iconColor: AppColors.primary,
                       ),

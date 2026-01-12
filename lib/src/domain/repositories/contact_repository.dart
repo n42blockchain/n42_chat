@@ -61,6 +61,9 @@ abstract class IContactRepository {
 
   /// 获取所有联系人备注
   Future<Map<String, String>> getContactRemarks();
+
+  /// 删除联系人
+  Future<void> deleteContact(String userId);
 }
 
 /// 好友请求

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_utils.dart' as chat_date;
 import '../../../domain/entities/search_result_entity.dart';
@@ -39,7 +40,7 @@ class SearchResultTile extends StatelessWidget {
               ),
 
               // 时间/类型标签
-              _buildTrailing(isDark),
+              _buildTrailing(isDark, context),
             ],
           ),
         ),
@@ -181,7 +182,7 @@ class SearchResultTile extends StatelessWidget {
     );
   }
 
-  Widget _buildTrailing(bool isDark) {
+  Widget _buildTrailing(bool isDark, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
@@ -206,7 +207,7 @@ class SearchResultTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
-            _getTypeLabel(),
+            _getTypeLabel(context),
             style: TextStyle(
               fontSize: 10,
               color: _getTypeColor(),
@@ -217,16 +218,16 @@ class SearchResultTile extends StatelessWidget {
     );
   }
 
-  String _getTypeLabel() {
+  String _getTypeLabel(BuildContext context) {
     switch (item.type) {
       case SearchResultType.contact:
-        return '联系人';
+        return S.of(context)?.contactLabel ?? 'Contact';
       case SearchResultType.group:
-        return '群聊';
+        return S.of(context)?.groupLabel ?? 'Group';
       case SearchResultType.conversation:
-        return '会话';
+        return S.of(context)?.conversationLabel ?? 'Conversation';
       case SearchResultType.message:
-        return '消息';
+        return S.of(context)?.messageLabel ?? 'Message';
       case SearchResultType.all:
         return '';
     }

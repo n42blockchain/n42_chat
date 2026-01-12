@@ -125,3 +125,13 @@ class SetContactRemark extends ContactEvent {
   List<Object?> get props => [userId, remark];
 }
 
+/// 删除联系人
+class DeleteContact extends ContactEvent {
+  final String userId;
+
+  const DeleteContact(this.userId);
+
+  @override
+  List<Object?> get props => [userId];
+}
+

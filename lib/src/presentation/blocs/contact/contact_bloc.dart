@@ -31,6 +31,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     on<ContactsUpdated>(_onContactsUpdated);
     on<OnlineStatusUpdated>(_onOnlineStatusUpdated);
     on<SetContactRemark>(_onSetContactRemark);
+    on<DeleteContact>(_onDeleteContact);
   }
 
   Future<void> _onLoadContacts(
@@ -316,24 +317,51 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
   ) async {
     try {
       debugPrint('ContactBloc: Setting remark for ${event.userId} to "${event.remark}"');
-      
+
       // 同时保存到 RemarkService（全局本地缓存）
       await RemarkService.instance.setRemark(event.userId, event.remark);
       debugPrint('ContactBloc: Remark saved to RemarkService');
-      
+
       // 保存到 ContactRepository
       await _contactRepository.setContactRemark(event.userId, event.remark);
       debugPrint('ContactBloc: Remark saved to ContactRepository');
-      
+
       // 发送成功状态
       emit(ContactRemarkUpdated(userId: event.userId, remark: event.remark));
       debugPrint('ContactBloc: Emitted ContactRemarkUpdated');
-      
+
       // 刷新联系人列表以更新备注
       add(const RefreshContacts());
       debugPrint('ContactBloc: Added RefreshContacts event');
     } catch (e) {
       debugPrint('ContactBloc: Error setting remark - $e');
+      emit(ContactError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteContact(
+    DeleteContact event,
+    Emitter<ContactState> emit,
+  ) async {
+    try {
+      debugPrint('ContactBloc: Deleting contact ${event.userId}');
+
+      // 删除联系人
+      await _contactRepository.deleteContact(event.userId);
+      debugPrint('ContactBloc: Contact deleted successfully');
+
+      // 同时清除 RemarkService 中的备注
+      await RemarkService.instance.setRemark(event.userId, null);
+
+      // 发送删除成功状态
+      emit(ContactDeleted(event.userId));
+      debugPrint('ContactBloc: Emitted ContactDeleted');
+
+      // 刷新联系人列表
+      add(const RefreshContacts());
+      debugPrint('ContactBloc: Added RefreshContacts event');
+    } catch (e) {
+      debugPrint('ContactBloc: Error deleting contact - $e');
       emit(ContactError(e.toString()));
     }
   }

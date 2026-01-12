@@ -38,30 +38,30 @@ class N42BottomNavBar extends StatelessWidget {
     this.items,
   });
 
-  /// 默认Tab配置
+  /// 默认Tab配置 (使用英文，调用者应传入翻译后的 items)
   List<N42BottomNavItem> get defaultItems => [
         N42BottomNavItem(
           icon: Icons.chat_bubble_outline,
           activeIcon: Icons.chat_bubble,
-          label: '消息',
+          label: 'Messages',
           badge: messageUnreadCount,
         ),
         N42BottomNavItem(
           icon: Icons.contacts_outlined,
           activeIcon: Icons.contacts,
-          label: '通讯录',
+          label: 'Contacts',
           badge: contactUnreadCount,
         ),
         N42BottomNavItem(
           icon: Icons.explore_outlined,
           activeIcon: Icons.explore,
-          label: '发现',
+          label: 'Discover',
           showDot: showDiscoverDot,
         ),
         N42BottomNavItem(
           icon: Icons.person_outline,
           activeIcon: Icons.person,
-          label: '我',
+          label: 'Me',
         ),
       ];
 

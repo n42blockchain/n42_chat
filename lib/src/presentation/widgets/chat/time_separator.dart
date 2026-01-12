@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_utils.dart';
 
@@ -207,9 +208,9 @@ class RedPacketClaimMessageWidget extends StatelessWidget {
                     ),
                     children: [
                       TextSpan(text: claimerName),
-                      TextSpan(text: isOwnRedPacket ? '领取了你的' : '领取了'),
+                      TextSpan(text: isOwnRedPacket ? (S.of(context)?.claimedYour ?? ' claimed your ') : (S.of(context)?.claimedText ?? ' claimed ')),
                       TextSpan(
-                        text: '红包',
+                        text: S.of(context)?.redPacket ?? 'Red Packet',
                         style: const TextStyle(
                           color: Color(0xFFE64340),
                         ),
@@ -301,8 +302,8 @@ class _TypingIndicatorState extends State<TypingIndicator>
           const SizedBox(width: 8),
           Text(
             widget.userName != null
-                ? '${widget.userName}正在输入...'
-                : '对方正在输入...',
+                ? (S.of(context)?.userTyping(widget.userName!) ?? '${widget.userName} is typing...')
+                : (S.of(context)?.typing ?? 'Typing...'),
             style: TextStyle(
               fontSize: 12,
               color: AppColors.textTertiary,

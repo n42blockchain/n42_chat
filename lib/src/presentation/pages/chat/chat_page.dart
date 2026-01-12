@@ -462,8 +462,8 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   /// 名片消息点击 - 跳转到用户资料页添加好友
-  void _onContactCardTap(String contactId, String contactName) {
-    debugPrint('Contact card tapped: $contactName ($contactId)');
+  void _onContactCardTap(String contactId, String contactName, String? avatarUrl) {
+    debugPrint('Contact card tapped: $contactName ($contactId), avatar: $avatarUrl');
 
     // 获取当前的 ContactBloc
     ContactBloc? contactBloc;
@@ -480,6 +480,7 @@ class _ChatPageState extends State<ChatPage> {
           final page = ContactDetailPage(
             userId: contactId,
             displayName: contactName,
+            avatarUrl: avatarUrl,
             onSendMessage: () {
               Navigator.of(ctx).pop();
             },
@@ -500,24 +501,70 @@ class _ChatPageState extends State<ChatPage> {
 
   /// 查看图片
   void _viewImage(MessageEntity message) {
-    final imageUrl = message.metadata?.httpUrl ?? message.content;
-    if (imageUrl.isEmpty) return;
-    
+    String? imageUrl = message.metadata?.httpUrl;
+
+    // 如果 httpUrl 为空，尝试从 mediaUrl 转换
+    if (imageUrl == null || imageUrl.isEmpty) {
+      final mxcUrl = message.metadata?.mediaUrl;
+      if (mxcUrl != null && mxcUrl.startsWith('mxc://')) {
+        imageUrl = _convertMxcToHttpUrl(mxcUrl);
+      }
+    }
+
+    if (imageUrl == null || imageUrl.isEmpty) {
+      debugPrint('_viewImage: No valid URL found for image');
+      return;
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => _ImageViewerPage(
-          imageUrl: imageUrl,
+          imageUrl: imageUrl!,
           heroTag: message.id,
         ),
       ),
     );
   }
+
+  /// 将 mxc:// URL 转换为 HTTP URL
+  String? _convertMxcToHttpUrl(String? mxcUrl) {
+    if (mxcUrl == null || mxcUrl.isEmpty) return null;
+    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
+
+    try {
+      final client = MatrixClientManager.instance.client;
+      if (client == null) return null;
+
+      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      if (homeserver.isEmpty) return null;
+
+      final uri = Uri.parse(mxcUrl);
+      final serverName = uri.host;
+      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+
+      if (serverName.isEmpty || mediaId.isEmpty) return null;
+
+      return '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
+    } catch (e) {
+      debugPrint('_convertMxcToHttpUrl error: $e');
+      return null;
+    }
+  }
   
   /// 播放视频
   void _playVideo(MessageEntity message) {
-    final videoUrl = message.metadata?.httpUrl ?? message.content;
-    if (videoUrl.isEmpty) {
+    String? videoUrl = message.metadata?.httpUrl;
+
+    // 如果 httpUrl 为空，尝试从 mediaUrl 转换
+    if (videoUrl == null || videoUrl.isEmpty) {
+      final mxcUrl = message.metadata?.mediaUrl;
+      if (mxcUrl != null && mxcUrl.startsWith('mxc://')) {
+        videoUrl = _convertMxcToHttpUrl(mxcUrl);
+      }
+    }
+
+    if (videoUrl == null || videoUrl.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.invalidVideoUrl ?? 'Invalid video URL'),
@@ -526,13 +573,19 @@ class _ChatPageState extends State<ChatPage> {
       );
       return;
     }
-    
+
+    // 也转换缩略图 URL
+    String? thumbnailUrl = message.metadata?.thumbnailUrl;
+    if (thumbnailUrl != null && thumbnailUrl.startsWith('mxc://')) {
+      thumbnailUrl = _convertMxcToHttpUrl(thumbnailUrl);
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => _VideoPlayerPage(
-          videoUrl: videoUrl,
-          thumbnailUrl: message.metadata?.thumbnailUrl,
+          videoUrl: videoUrl!,
+          thumbnailUrl: thumbnailUrl,
         ),
       ),
     );
@@ -540,7 +593,16 @@ class _ChatPageState extends State<ChatPage> {
   
   /// 打开文件
   void _openFile(MessageEntity message) {
-    final fileUrl = message.metadata?.httpUrl ?? message.content;
+    String? fileUrl = message.metadata?.httpUrl;
+
+    // 如果 httpUrl 为空，尝试从 mediaUrl 转换
+    if (fileUrl == null || fileUrl.isEmpty) {
+      final mxcUrl = message.metadata?.mediaUrl;
+      if (mxcUrl != null && mxcUrl.startsWith('mxc://')) {
+        fileUrl = _convertMxcToHttpUrl(mxcUrl);
+      }
+    }
+
     final fileName = message.metadata?.fileName ?? (S.of(context)?.unknownFile ?? 'Unknown file');
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1997,10 +2059,11 @@ class _ChatPageState extends State<ChatPage> {
       final contactAvatar = result['avatar'] as String?;
       
       // 发送名片消息（作为自定义消息类型）
-      // 名片消息格式：[名片] 联系人名称
+      // 名片消息格式：[名片] 联系人名称 (包含头像URL)
       final cardContent = '''[名片]
 联系人：$contactName
-ID：$contactId''';
+ID：$contactId
+头像：${contactAvatar ?? ''}''';
       
       // 使用文本消息发送名片信息（后续可改为专门的名片消息类型）
       context.read<ChatBloc>().add(SendTextMessage(cardContent));
@@ -3506,17 +3569,29 @@ ID：$contactId''';
           break;
 
         case MessageType.poll:
-          // 转发投票消息 - 创建新的投票
+          // 转发投票消息 - 发送投票快照（包含投票结果，不可再投票）
           final question = message.metadata?.pollQuestion;
           final options = message.metadata?.pollOptions;
+          final optionIds = message.metadata?.pollOptionIds;
+          final voteCounts = message.metadata?.voteCounts;
+          final totalVoters = message.metadata?.totalVoters ?? 0;
           final maxSelections = message.metadata?.maxSelections ?? 1;
 
           if (question != null && options != null && options.isNotEmpty) {
-            debugPrint('Forward poll: question=$question, options=$options');
-            await messageRepository.sendPollMessage(
+            debugPrint('Forward poll snapshot: question=$question, options=$options, voteCounts=$voteCounts');
+
+            // 确保有optionIds，如果没有则生成
+            final effectiveOptionIds = optionIds ?? List.generate(options.length, (i) => 'option_$i');
+            // 确保有voteCounts，如果没有则使用空map
+            final effectiveVoteCounts = voteCounts ?? <String, int>{};
+
+            await messageRepository.sendForwardedPollSnapshot(
               targetRoomId,
               question: question,
               options: options,
+              optionIds: effectiveOptionIds,
+              voteCounts: effectiveVoteCounts,
+              totalVoters: totalVoters,
               maxSelections: maxSelections,
             );
           } else {

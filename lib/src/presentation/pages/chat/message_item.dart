@@ -55,7 +55,7 @@ class MessageItem extends StatelessWidget {
   final Function(MessageEntity message)? onRedPacketTap;
 
   /// 名片点击回调
-  final Function(String contactId, String contactName)? onContactCardTap;
+  final Function(String contactId, String contactName, String? avatarUrl)? onContactCardTap;
 
   const MessageItem({
     super.key,
@@ -218,7 +218,7 @@ class MessageItem extends StatelessWidget {
     Widget content;
     switch (message.type) {
       case MessageType.text:
-        content = _buildTextMessage(isDark);
+        content = _buildTextMessage(isDark, context);
         break;
       case MessageType.image:
         content = _buildImageMessage();
@@ -242,16 +242,16 @@ class MessageItem extends StatelessWidget {
         content = _buildRedPacketMessage();
         break;
       case MessageType.poll:
-        content = _buildPollMessage(isDark);
+        content = _buildPollMessage(isDark, context);
         break;
       case MessageType.music:
-        content = _buildMusicMessage(isDark);
+        content = _buildMusicMessage(isDark, context);
         break;
       case MessageType.encrypted:
         content = _buildEncryptedMessage(isDark);
         break;
       default:
-        content = _buildTextMessage(isDark);
+        content = _buildTextMessage(isDark, context);
     }
     
     // 如果有回复，添加回复引用块
@@ -319,10 +319,10 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  Widget _buildTextMessage(bool isDark) {
+  Widget _buildTextMessage(bool isDark, BuildContext context) {
     // 检测是否是名片消息
     if (_isContactCardMessage(message.content)) {
-      return _buildContactCardMessage(isDark);
+      return _buildContactCardMessage(isDark, context);
     }
 
     // 微信中绿色气泡的文字是黑色，灰色气泡的文字也是黑色
@@ -354,17 +354,24 @@ class MessageItem extends StatelessWidget {
 
       String? contactName;
       String? contactId;
+      String? contactAvatar;
 
       for (final line in lines) {
         if (line.startsWith('联系人：') || line.startsWith('Contact：')) {
           contactName = line.replaceFirst(RegExp(r'^(联系人：|Contact：)'), '').trim();
         } else if (line.startsWith('ID：')) {
           contactId = line.replaceFirst('ID：', '').trim();
+        } else if (line.startsWith('头像：') || line.startsWith('Avatar：')) {
+          contactAvatar = line.replaceFirst(RegExp(r'^(头像：|Avatar：)'), '').trim();
         }
       }
 
       if (contactName != null && contactId != null) {
-        return {'name': contactName, 'id': contactId};
+        return {
+          'name': contactName,
+          'id': contactId,
+          if (contactAvatar != null && contactAvatar.isNotEmpty) 'avatar': contactAvatar,
+        };
       }
     } catch (e) {
       debugPrint('Parse contact card error: $e');
@@ -373,15 +380,16 @@ class MessageItem extends StatelessWidget {
   }
 
   /// 构建名片消息（微信风格）
-  Widget _buildContactCardMessage(bool isDark) {
+  Widget _buildContactCardMessage(bool isDark, BuildContext context) {
     final cardInfo = _parseContactCard(message.content);
-    final contactName = cardInfo?['name'] ?? '未知联系人';
+    final contactName = cardInfo?['name'] ?? (S.of(context)?.unknownContact ?? 'Unknown Contact');
     final contactId = cardInfo?['id'] ?? '';
+    final contactAvatar = cardInfo?['avatar'];
 
     return GestureDetector(
       onTap: () {
         if (contactId.isNotEmpty && onContactCardTap != null) {
-          onContactCardTap!(contactId, contactName);
+          onContactCardTap!(contactId, contactName, contactAvatar);
         }
       },
       child: Container(
@@ -401,25 +409,8 @@ class MessageItem extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  // 头像占位
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: _getColorFromName(contactName),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Center(
-                      child: Text(
-                        contactName.isNotEmpty ? contactName[0].toUpperCase() : '?',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // 头像 - 如果有头像URL则显示网络图片，否则显示首字母
+                  _buildContactAvatar(contactName, contactAvatar),
                   const SizedBox(width: 10),
                   // 名称
                   Expanded(
@@ -471,7 +462,7 @@ class MessageItem extends StatelessWidget {
                 ),
               ),
               child: Text(
-                '个人名片',
+                S.of(context)?.personalCard ?? 'Contact Card',
                 style: TextStyle(
                   fontSize: 11,
                   color: message.isFromMe
@@ -497,6 +488,54 @@ class MessageItem extends StatelessWidget {
     if (name.isEmpty) return colors[0];
     final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
     return colors[index];
+  }
+
+  /// 构建联系人头像（名片消息用）
+  Widget _buildContactAvatar(String name, String? avatarUrl) {
+    if (avatarUrl != null && avatarUrl.isNotEmpty) {
+      // 有头像URL，显示网络图片
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Image.network(
+          avatarUrl,
+          width: 44,
+          height: 44,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            // 加载失败时显示首字母
+            return _buildAvatarPlaceholder(name);
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return _buildAvatarPlaceholder(name);
+          },
+        ),
+      );
+    }
+    // 无头像URL，显示首字母
+    return _buildAvatarPlaceholder(name);
+  }
+
+  /// 构建头像占位符（首字母）
+  Widget _buildAvatarPlaceholder(String name) {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: _getColorFromName(name),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Center(
+        child: Text(
+          name.isNotEmpty ? name[0].toUpperCase() : '?',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildImageMessage() {
@@ -841,10 +880,10 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  Widget _buildMusicMessage(bool isDark) {
+  Widget _buildMusicMessage(bool isDark, BuildContext context) {
     final metadata = message.metadata;
-    final title = metadata?.musicTitle ?? '未知歌曲';
-    final artist = metadata?.musicArtist ?? '未知艺术家';
+    final title = metadata?.musicTitle ?? (S.of(context)?.unknownSong ?? 'Unknown Song');
+    final artist = metadata?.musicArtist ?? (S.of(context)?.unknownArtist ?? 'Unknown Artist');
     final cover = metadata?.musicCover;
     final url = metadata?.musicUrl;
 
@@ -937,7 +976,7 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  Widget _buildPollMessage(bool isDark) {
+  Widget _buildPollMessage(bool isDark, BuildContext context) {
     final metadata = message.metadata;
     final question = metadata?.pollQuestion ?? message.content;
     final options = metadata?.pollOptions ?? [];
@@ -979,7 +1018,9 @@ class MessageItem extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      maxSelections == 1 ? '单选' : '多选',
+                      maxSelections == 1
+                          ? (S.of(context)?.singleChoice ?? 'Single')
+                          : (S.of(context)?.multiChoice ?? 'Multi'),
                       style: TextStyle(
                         fontSize: 10,
                         color: AppColors.primary,
@@ -997,9 +1038,9 @@ class MessageItem extends StatelessWidget {
                     color: Colors.grey.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text(
-                    '已结束',
-                    style: TextStyle(
+                  child: Text(
+                    S.of(context)?.ended ?? 'Ended',
+                    style: const TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
                     ),
@@ -1120,7 +1161,7 @@ class MessageItem extends StatelessWidget {
                 GestureDetector(
                   onTap: () => onEndPoll?.call(message.id),
                   child: Text(
-                    '结束投票',
+                    S.of(context)?.endPollButton ?? 'End Poll',
                     style: TextStyle(
                       fontSize: 11,
                       color: AppColors.error,

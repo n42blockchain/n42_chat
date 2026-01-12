@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/search_result_entity.dart';
 import '../../blocs/search/search_bloc.dart';
@@ -71,7 +72,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
             return Center(
               child: N42EmptyState(
                 icon: Icons.error_outline,
-                title: '搜索出错',
+                title: S.of(context)?.searchError ?? 'Search Error',
                 description: state.message,
               ),
             );
@@ -115,7 +116,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                 controller: _searchController,
                 focusNode: _focusNode,
                 decoration: InputDecoration(
-                  hintText: '搜索联系人、群聊、消息',
+                  hintText: S.of(context)?.searchPlaceholder ?? 'Search contacts, groups, messages',
                   hintStyle: TextStyle(
                     fontSize: 14,
                     color: isDark
@@ -155,11 +156,11 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
 
   Widget _buildSearchHistory(SearchInitial state, bool isDark) {
     if (state.recentSearches.isEmpty) {
-      return const Center(
+      return Center(
         child: N42EmptyState(
           icon: Icons.search,
-          title: '搜索联系人、群聊和消息',
-          description: '输入关键词开始搜索',
+          title: S.of(context)?.searchContactsGroupsMessages ?? 'Search contacts, groups and messages',
+          description: S.of(context)?.enterKeywordToSearch ?? 'Enter keyword to start searching',
         ),
       );
     }
@@ -171,7 +172,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '搜索历史',
+              S.of(context)?.searchHistory ?? 'Search History',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -182,7 +183,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
               onPressed: () {
                 context.read<SearchBloc>().add(const ClearSearchHistory());
               },
-              child: const Text('清除'),
+              child: Text(S.of(context)?.clearHistory ?? 'Clear'),
             ),
           ],
         ),
@@ -216,7 +217,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     if (state.results.isEmpty) {
       return Center(
         child: N42EmptyState.noSearchResult(
-          description: '没有找到"${state.results.query}"相关的结果',
+          description: S.of(context)?.noResultsForQuery(state.results.query) ?? 'No results found for "${state.results.query}"',
         ),
       );
     }
@@ -243,28 +244,28 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           _buildTypeChip(
-            '全部',
+            S.of(context)?.allResults ?? 'All',
             SearchResultType.all,
             state.selectedType,
             state.results.totalCount,
             isDark,
           ),
           _buildTypeChip(
-            '联系人',
+            S.of(context)?.contacts ?? 'Contacts',
             SearchResultType.contact,
             state.selectedType,
             state.results.contacts.length,
             isDark,
           ),
           _buildTypeChip(
-            '群聊',
+            S.of(context)?.groups ?? 'Groups',
             SearchResultType.group,
             state.selectedType,
             state.results.groups.length,
             isDark,
           ),
           _buildTypeChip(
-            '消息',
+            S.of(context)?.messages ?? 'Messages',
             SearchResultType.message,
             state.selectedType,
             state.results.messages.length,
@@ -336,10 +337,10 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     final results = state.filteredResults;
 
     if (results.isEmpty) {
-      return const Center(
+      return Center(
         child: N42EmptyState(
           icon: Icons.search_off,
-          title: '无结果',
+          title: S.of(context)?.noResults ?? 'No Results',
         ),
       );
     }

@@ -302,5 +302,14 @@ class ContactRepositoryImpl implements IContactRepository {
     await _loadRemarkCache();
     return Map.from(_remarkCache);
   }
+
+  @override
+  Future<void> deleteContact(String userId) async {
+    // 删除联系人
+    await _contactDataSource.deleteContact(userId);
+    // 清除备注缓存
+    _remarkCache.remove(userId);
+    await _storageDataSource.setContactRemark(userId, null);
+  }
 }
 

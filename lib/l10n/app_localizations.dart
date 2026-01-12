@@ -586,7 +586,7 @@ abstract class S {
   /// No description provided for @contacts.
   ///
   /// In zh, this message translates to:
-  /// **'通讯录'**
+  /// **'联系人'**
   String get contacts;
 
   /// No description provided for @discover.
@@ -790,13 +790,13 @@ abstract class S {
   /// No description provided for @conversationLabel.
   ///
   /// In zh, this message translates to:
-  /// **'会话: {roomId}'**
+  /// **'会话'**
   String conversationLabel(String roomId);
 
   /// No description provided for @contactLabel.
   ///
   /// In zh, this message translates to:
-  /// **'联系人: {userId}'**
+  /// **'联系人'**
   String contactLabel(String userId);
 
   /// No description provided for @addFriend.
@@ -2164,7 +2164,7 @@ abstract class S {
   /// No description provided for @searchContactsGroupsMessages.
   ///
   /// In zh, this message translates to:
-  /// **'搜索联系人、群聊、消息'**
+  /// **'搜索联系人、群聊和消息'**
   String get searchContactsGroupsMessages;
 
   /// No description provided for @searchError.
@@ -2554,8 +2554,8 @@ abstract class S {
   /// No description provided for @fromSender.
   ///
   /// In zh, this message translates to:
-  /// **'来自 {senderName}'**
-  String fromSender(String senderName);
+  /// **'来自 {name}'**
+  String fromSender(String name);
 
   /// No description provided for @confirmReceive.
   ///
@@ -2854,7 +2854,7 @@ abstract class S {
   /// No description provided for @invoiceType.
   ///
   /// In zh, this message translates to:
-  /// **'抬头类型: '**
+  /// **'抬头类型'**
   String get invoiceType;
 
   /// No description provided for @personal.
@@ -2998,7 +2998,7 @@ abstract class S {
   /// No description provided for @enterValidAmount.
   ///
   /// In zh, this message translates to:
-  /// **'请输入有效的金额'**
+  /// **'请输入有效的转账金额'**
   String get enterValidAmount;
 
   /// No description provided for @addressCopied.
@@ -3727,36 +3727,6 @@ abstract class S {
   /// **'默认铃声'**
   String get defaultRingtone;
 
-  /// No description provided for @ringtoneClear.
-  String get ringtoneClear;
-
-  /// No description provided for @ringtonePhone.
-  String get ringtonePhone;
-
-  /// No description provided for @ringtoneClassic.
-  String get ringtoneClassic;
-
-  /// No description provided for @ringtoneSoft.
-  String get ringtoneSoft;
-
-  /// No description provided for @ringtoneVibrate.
-  String get ringtoneVibrate;
-
-  /// No description provided for @ringtoneSilent.
-  String get ringtoneSilent;
-
-  /// No description provided for @selectRingtone.
-  String get selectRingtone;
-
-  /// No description provided for @stop.
-  String get stop;
-
-  /// No description provided for @loadingRingtones.
-  String get loadingRingtones;
-
-  /// No description provided for @noPermissionToEditGroupName.
-  String get noPermissionToEditGroupName;
-
   /// No description provided for @myAddresses.
   ///
   /// In zh, this message translates to:
@@ -4213,95 +4183,1697 @@ abstract class S {
   /// **'视频录制失败，请重试'**
   String get videoRecordingFailed;
 
+  /// No description provided for @redPacket.
+  ///
+  /// In zh, this message translates to:
+  /// **'红包'**
+  String get redPacket;
+
+  /// No description provided for @music.
+  ///
+  /// In zh, this message translates to:
+  /// **'音乐'**
+  String get music;
+
+  /// No description provided for @coupon.
+  ///
+  /// In zh, this message translates to:
+  /// **'卡券'**
+  String get coupon;
+
+  /// No description provided for @gift.
+  ///
+  /// In zh, this message translates to:
+  /// **'礼物'**
+  String get gift;
+
+  /// No description provided for @poll.
+  ///
+  /// In zh, this message translates to:
+  /// **'投票'**
+  String get poll;
+
+  /// No description provided for @text.
+  ///
+  /// In zh, this message translates to:
+  /// **'文本'**
   String get text;
+
+  /// No description provided for @link.
+  ///
+  /// In zh, this message translates to:
+  /// **'链接'**
   String get link;
+
+  /// No description provided for @note.
+  ///
+  /// In zh, this message translates to:
+  /// **'笔记'**
   String get note;
+
+  /// No description provided for @myNotes.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的笔记'**
   String get myNotes;
-  String get noFavorites;
-  String get longPressToFavorite;
-  String get newNote;
-  String get favoriteLink;
-  String get editTags;
-  String get deleteFavorite;
-  String get deleteFavoriteConfirm;
+
+  /// No description provided for @today.
+  ///
+  /// In zh, this message translates to:
+  /// **'今天'**
   String get today;
+
+  /// No description provided for @daysAgoText.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}天前'**
   String daysAgoText(int count);
+
+  /// No description provided for @dateFormat.
+  ///
+  /// In zh, this message translates to:
+  /// **'{month}月{day}日'**
   String dateFormat(int month, int day);
+
+  /// No description provided for @noFavorites.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无收藏'**
+  String get noFavorites;
+
+  /// No description provided for @longPressToFavorite.
+  ///
+  /// In zh, this message translates to:
+  /// **'长按消息进行收藏'**
+  String get longPressToFavorite;
+
+  /// No description provided for @newNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'新建笔记'**
+  String get newNote;
+
+  /// No description provided for @favoriteLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'收藏链接'**
+  String get favoriteLink;
+
+  /// No description provided for @editTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑标签'**
+  String get editTags;
+
+  /// No description provided for @deleteFavorite.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除收藏'**
+  String get deleteFavorite;
+
+  /// No description provided for @deleteFavoriteConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要删除这条收藏吗？'**
+  String get deleteFavoriteConfirm;
+
+  /// No description provided for @noSearchResultsFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有找到结果'**
   String get noSearchResultsFound;
-  String get searchMembers;
-  String get inviteMembers;
-  String get selectMembers;
-  String get noMembersToAdd;
-  String get cannotRemoveOwner;
-  String get memberRemoved;
-  String get memberAdded;
-  String get scanQrCode;
-  String get alignQrCode;
-  String get flashlight;
-  String get album;
-  String get invalidQrCode;
-  String get qrCodeScanFailed;
-  String get searchUser;
-  String get addByIdSearch;
-  String get enterN42Id;
-  String get chatRecalled;
-  String get systemMessage;
-  String get setStatus;
-  String get visibleToFriends24h;
-  String get writeStatus;
-  String get moodAndThoughts;
-  String get workAndStudy;
-  String get rest;
-  String get enterYourStatus;
-  String get ok;
-  String get statusHappy;
-  String get statusCracked;
-  String get statusLucky;
-  String get statusSunny;
-  String get statusTired;
-  String get statusDaydream;
-  String get statusRushing;
-  String get statusOverthinking;
-  String get statusEnergized;
-  String get statusWorking;
-  String get statusStudying;
-  String get statusBusy;
-  String get statusSlacking;
-  String get statusTraveling;
-  String get statusGoingHome;
-  String get statusDnd;
-  String get statusHanging;
-  String get statusCheckIn;
-  String get statusExercising;
-  String get statusCoffee;
-  String get statusBubbleTea;
-  String get statusEating;
-  String get statusParenting;
-  String get statusSavingWorld;
-  String get statusSelfie;
-  String get statusRetreat;
-  String get statusHome;
-  String get statusSleeping;
-  String get statusCatLover;
-  String get statusDogWalking;
-  String get statusGaming;
-  String get statusListening;
-  String get cameraPermissionRequired;
-  String get cameraPermissionDenied;
-  String get cannotGetCameraPermission;
-  String permissionCheckError(String error);
-  String get checkingCameraPermission;
-  String get needCameraPermission;
-  String get retryPermission;
-  String get openSettings;
-  String get manualInputUserId;
-  String get closeManualInput;
+
+  /// No description provided for @sendRedPacket.
+  ///
+  /// In zh, this message translates to:
+  /// **'发红包'**
+  String get sendRedPacket;
+
+  /// No description provided for @amount.
+  ///
+  /// In zh, this message translates to:
+  /// **'金额'**
+  String get amount;
+
+  /// No description provided for @redPacketCover.
+  ///
+  /// In zh, this message translates to:
+  /// **'红包封面'**
+  String get redPacketCover;
+
+  /// No description provided for @redPacketType.
+  ///
+  /// In zh, this message translates to:
+  /// **'红包类型'**
+  String get redPacketType;
+
+  /// No description provided for @normalRedPacket.
+  ///
+  /// In zh, this message translates to:
+  /// **'普通红包'**
+  String get normalRedPacket;
+
+  /// No description provided for @luckyRedPacket.
+  ///
+  /// In zh, this message translates to:
+  /// **'拼手气'**
+  String get luckyRedPacket;
+
+  /// No description provided for @redPacketCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'红包个数'**
+  String get redPacketCount;
+
+  /// No description provided for @pieces.
+  ///
+  /// In zh, this message translates to:
+  /// **'个'**
+  String get pieces;
+
+  /// No description provided for @putMoneyInRedPacket.
+  ///
+  /// In zh, this message translates to:
+  /// **'塞钱进红包'**
+  String get putMoneyInRedPacket;
+
+  /// No description provided for @redPacketRefundNotice.
+  ///
+  /// In zh, this message translates to:
+  /// **'未领取的红包，将于24小时后发起退款'**
+  String get redPacketRefundNotice;
+
+  /// No description provided for @openRedPacket.
+  ///
+  /// In zh, this message translates to:
+  /// **'開'**
+  String get openRedPacket;
+
+  /// No description provided for @redPacketAllClaimed.
+  ///
+  /// In zh, this message translates to:
+  /// **'红包已被领完'**
+  String get redPacketAllClaimed;
+
+  /// No description provided for @redPacketExpired.
+  ///
+  /// In zh, this message translates to:
+  /// **'红包已过期'**
+  String get redPacketExpired;
+
+  /// No description provided for @addTransferNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加转账说明'**
+  String get addTransferNote;
+
+  /// No description provided for @yuan.
+  ///
+  /// In zh, this message translates to:
+  /// **'元'**
+  String get yuan;
+
+  /// No description provided for @savedToChangeCanTransfer.
+  ///
+  /// In zh, this message translates to:
+  /// **'已存入零钱，可直接转账'**
+  String get savedToChangeCanTransfer;
+
+  /// No description provided for @replyWithEmoji.
+  ///
+  /// In zh, this message translates to:
+  /// **'用此表情回复'**
+  String get replyWithEmoji;
+
+  /// No description provided for @claimedYourRedPacket.
+  ///
+  /// In zh, this message translates to:
+  /// **'领取了你的'**
+  String get claimedYourRedPacket;
+
+  /// No description provided for @claimedRedPacket.
+  ///
+  /// In zh, this message translates to:
+  /// **'领取了'**
+  String get claimedRedPacket;
+
+  /// No description provided for @otherTyping.
+  ///
+  /// In zh, this message translates to:
+  /// **'对方正在输入...'**
+  String get otherTyping;
+
+  /// No description provided for @processing.
+  ///
+  /// In zh, this message translates to:
+  /// **'处理中...'**
+  String get processing;
+
+  /// No description provided for @transferCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'转账已取消'**
+  String get transferCancelled;
+
+  /// No description provided for @transferFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'转账失败'**
+  String get transferFailed;
+
+  /// No description provided for @creatingPaymentRequest.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在创建收款请求...'**
+  String get creatingPaymentRequest;
+
+  /// No description provided for @processingPayment.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在处理支付...'**
+  String get processingPayment;
+
+  /// No description provided for @paymentFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'支付失败'**
+  String get paymentFailed;
+
+  /// No description provided for @clickRetry.
+  ///
+  /// In zh, this message translates to:
+  /// **'点击重试'**
+  String get clickRetry;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置'**
+  String get settingsTitle;
+
+  /// No description provided for @editRemark.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑备注'**
+  String get editRemark;
+
+  /// No description provided for @setPermissions.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置权限'**
+  String get setPermissions;
+
+  /// No description provided for @recommendToFriends.
+  ///
+  /// In zh, this message translates to:
+  /// **'把他 (她) 推荐给朋友'**
+  String get recommendToFriends;
+
+  /// No description provided for @setStarFriend.
+  ///
+  /// In zh, this message translates to:
+  /// **'设为星标朋友'**
+  String get setStarFriend;
+
+  /// No description provided for @addToBlacklist.
+  ///
+  /// In zh, this message translates to:
+  /// **'加入黑名单'**
+  String get addToBlacklist;
+
+  /// No description provided for @complain.
+  ///
+  /// In zh, this message translates to:
+  /// **'投诉'**
+  String get complain;
+
+  /// No description provided for @deleteContact.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除联系人'**
+  String get deleteContact;
+
+  /// No description provided for @deleteContactConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要删除 {name} 吗？'**
+  String deleteContactConfirm(String name);
+
+  /// No description provided for @transferTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'转账'**
+  String get transferTitle;
+
+  /// No description provided for @receiverAddressLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'收款地址'**
+  String get receiverAddressLabel;
+
+  /// No description provided for @selectTokenLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择代币'**
+  String get selectTokenLabel;
+
+  /// No description provided for @transferAmountLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'转账金额'**
+  String get transferAmountLabel;
+
+  /// No description provided for @memoLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'备注（可选）'**
+  String get memoLabel;
+
+  /// No description provided for @enterOrPasteAddressHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入或粘贴钱包地址'**
+  String get enterOrPasteAddressHint;
+
+  /// No description provided for @scanInDevelopment.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描功能开发中...'**
+  String get scanInDevelopment;
+
+  /// No description provided for @availableLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'可用'**
+  String get availableLabel;
+
+  /// No description provided for @availableBalanceFormat.
+  ///
+  /// In zh, this message translates to:
+  /// **'可用余额: {balance} {symbol}'**
+  String availableBalanceFormat(String balance, String symbol);
+
+  /// No description provided for @addMemoHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加备注信息'**
+  String get addMemoHint;
+
+  /// No description provided for @receiveTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'收款'**
+  String get receiveTitle;
+
+  /// No description provided for @walletNotConnectedTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'钱包未连接'**
+  String get walletNotConnectedTitle;
+
+  /// No description provided for @connectWalletFirst.
+  ///
+  /// In zh, this message translates to:
+  /// **'请先连接钱包'**
+  String get connectWalletFirst;
+
+  /// No description provided for @sendPaymentRequest.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送收款请求'**
+  String get sendPaymentRequest;
+
+  /// No description provided for @qrCodeGenerateFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'二维码生成失败'**
+  String get qrCodeGenerateFailed;
+
+  /// No description provided for @scanQrToPayMe.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描二维码向我付款'**
+  String get scanQrToPayMe;
+
+  /// No description provided for @myWalletAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的钱包地址'**
+  String get myWalletAddress;
+
+  /// No description provided for @createPaymentRequest.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建收款请求'**
+  String get createPaymentRequest;
+
+  /// No description provided for @selectTokenHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择代币'**
+  String get selectTokenHint;
+
+  /// No description provided for @amountLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'金额'**
+  String get amountLabel;
+
+  /// No description provided for @cancelButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消'**
+  String get cancelButton;
+
+  /// No description provided for @sendRequestButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送请求'**
+  String get sendRequestButton;
+
+  /// No description provided for @allReadReceipt.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部已读'**
+  String get allReadReceipt;
+
+  /// No description provided for @readCountReceipt.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}人已读'**
+  String readCountReceipt(int count);
+
+  /// No description provided for @n42IdLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'N42号：{id}'**
+  String n42IdLabel(String id);
+
+  /// No description provided for @redPacketDefaultGreeting.
+  ///
+  /// In zh, this message translates to:
+  /// **'恭喜发财，大吉大利'**
+  String get redPacketDefaultGreeting;
+
+  /// No description provided for @senderRedPacket.
+  ///
+  /// In zh, this message translates to:
+  /// **'{name}的红包'**
+  String senderRedPacket(String name);
+
+  /// No description provided for @allButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部'**
+  String get allButton;
+
+  /// No description provided for @enterValidAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入有效的收款地址'**
+  String get enterValidAddress;
+
+  /// No description provided for @pleaseSelectToken.
+  ///
+  /// In zh, this message translates to:
+  /// **'请选择代币'**
+  String get pleaseSelectToken;
+
+  /// No description provided for @receivedTransfer.
+  ///
+  /// In zh, this message translates to:
+  /// **'收到转账'**
+  String get receivedTransfer;
+
+  /// No description provided for @selectForwardRecipient.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择转发对象'**
+  String get selectForwardRecipient;
+
+  /// No description provided for @emojiFaces.
+  ///
+  /// In zh, this message translates to:
+  /// **'表情'**
+  String get emojiFaces;
+
+  /// No description provided for @emojiHearts.
+  ///
+  /// In zh, this message translates to:
+  /// **'爱心'**
+  String get emojiHearts;
+
+  /// No description provided for @emojiAnimals.
+  ///
+  /// In zh, this message translates to:
+  /// **'动物'**
+  String get emojiAnimals;
+
+  /// No description provided for @emojiFood.
+  ///
+  /// In zh, this message translates to:
+  /// **'食物'**
+  String get emojiFood;
+
+  /// No description provided for @emojiTransport.
+  ///
+  /// In zh, this message translates to:
+  /// **'交通'**
+  String get emojiTransport;
+
+  /// No description provided for @emojiActivities.
+  ///
+  /// In zh, this message translates to:
+  /// **'活动'**
+  String get emojiActivities;
+
+  /// No description provided for @emojiObjects.
+  ///
+  /// In zh, this message translates to:
+  /// **'物品'**
+  String get emojiObjects;
+
+  /// No description provided for @emojiSymbols.
+  ///
+  /// In zh, this message translates to:
+  /// **'符号'**
+  String get emojiSymbols;
+
+  /// No description provided for @transferProcessing.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在处理转账...'**
+  String get transferProcessing;
+
+  /// No description provided for @senderSentRedPacket.
+  ///
+  /// In zh, this message translates to:
+  /// **'{name}发出的红包'**
+  String senderSentRedPacket(String name);
+
+  /// No description provided for @savedToBalance.
+  ///
+  /// In zh, this message translates to:
+  /// **'已存入零钱，可直接转账'**
+  String get savedToBalance;
+
+  /// No description provided for @redPacketExpiredOrEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'红包已过期/已领完'**
+  String get redPacketExpiredOrEmpty;
+
+  /// No description provided for @scanFeatureComingSoon.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描功能开发中...'**
+  String get scanFeatureComingSoon;
+
+  /// No description provided for @setAsStarred.
+  ///
+  /// In zh, this message translates to:
+  /// **'设为星标朋友'**
+  String get setAsStarred;
+
+  /// No description provided for @addToBlocklist.
+  ///
+  /// In zh, this message translates to:
+  /// **'加入黑名单'**
+  String get addToBlocklist;
+
+  /// No description provided for @claimedYour.
+  ///
+  /// In zh, this message translates to:
+  /// **'领取了你的'**
+  String get claimedYour;
+
+  /// No description provided for @claimedText.
+  ///
+  /// In zh, this message translates to:
+  /// **'领取了'**
+  String get claimedText;
+
+  /// No description provided for @userTyping.
+  ///
+  /// In zh, this message translates to:
+  /// **'{name}正在输入...'**
+  String userTyping(String name);
+
+  /// No description provided for @typing.
+  ///
+  /// In zh, this message translates to:
+  /// **'对方正在输入...'**
+  String get typing;
+
+  /// No description provided for @waitingToReceive.
+  ///
+  /// In zh, this message translates to:
+  /// **'待对方接收'**
+  String get waitingToReceive;
+
+  /// No description provided for @tapToClaim.
+  ///
+  /// In zh, this message translates to:
+  /// **'点击领取'**
+  String get tapToClaim;
+
+  /// No description provided for @hasBeenReceived.
+  ///
+  /// In zh, this message translates to:
+  /// **'已被接收'**
+  String get hasBeenReceived;
+
+  /// No description provided for @getLucky.
+  ///
+  /// In zh, this message translates to:
+  /// **'领个好彩头'**
+  String get getLucky;
+
+  /// No description provided for @cameraStartFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'相机启动失败'**
   String get cameraStartFailed;
+
+  /// No description provided for @unknownError.
+  ///
+  /// In zh, this message translates to:
+  /// **'未知错误'**
   String get unknownError;
+
+  /// No description provided for @placeQrCodeInFrame.
+  ///
+  /// In zh, this message translates to:
+  /// **'将二维码放入框内扫描'**
   String get placeQrCodeInFrame;
-  String cannotAddFriend(String error);
-  String qrCodeProcessFailed(String error);
+
+  /// No description provided for @closeManualInput.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭手动输入'**
+  String get closeManualInput;
+
+  /// No description provided for @manualInputUserId.
+  ///
+  /// In zh, this message translates to:
+  /// **'手动输入用户ID'**
+  String get manualInputUserId;
+
+  /// No description provided for @add.
+  ///
+  /// In zh, this message translates to:
+  /// **'加入'**
   String get add;
+
+  /// No description provided for @ringtoneClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清脆'**
+  String get ringtoneClear;
+
+  /// No description provided for @ringtonePhone.
+  ///
+  /// In zh, this message translates to:
+  /// **'电话'**
+  String get ringtonePhone;
+
+  /// No description provided for @ringtoneClassic.
+  ///
+  /// In zh, this message translates to:
+  /// **'经典'**
+  String get ringtoneClassic;
+
+  /// No description provided for @ringtoneSoft.
+  ///
+  /// In zh, this message translates to:
+  /// **'柔和'**
+  String get ringtoneSoft;
+
+  /// No description provided for @ringtoneVibrate.
+  ///
+  /// In zh, this message translates to:
+  /// **'震动'**
+  String get ringtoneVibrate;
+
+  /// No description provided for @ringtoneSilent.
+  ///
+  /// In zh, this message translates to:
+  /// **'静音'**
+  String get ringtoneSilent;
+
+  /// No description provided for @stop.
+  ///
+  /// In zh, this message translates to:
+  /// **'停止'**
+  String get stop;
+
+  /// No description provided for @selectRingtone.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择铃声'**
+  String get selectRingtone;
+
+  /// No description provided for @loadingRingtones.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载铃声中...'**
+  String get loadingRingtones;
+
+  /// No description provided for @noRingtonesFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到铃声'**
+  String get noRingtonesFound;
+
+  /// No description provided for @moodAndThoughts.
+  ///
+  /// In zh, this message translates to:
+  /// **'心情想法'**
+  String get moodAndThoughts;
+
+  /// No description provided for @statusHappy.
+  ///
+  /// In zh, this message translates to:
+  /// **'开心'**
+  String get statusHappy;
+
+  /// No description provided for @statusCracked.
+  ///
+  /// In zh, this message translates to:
+  /// **'裂开'**
+  String get statusCracked;
+
+  /// No description provided for @statusLucky.
+  ///
+  /// In zh, this message translates to:
+  /// **'发呆'**
+  String get statusLucky;
+
+  /// No description provided for @statusSunny.
+  ///
+  /// In zh, this message translates to:
+  /// **'天气晴'**
+  String get statusSunny;
+
+  /// No description provided for @statusTired.
+  ///
+  /// In zh, this message translates to:
+  /// **'累了'**
+  String get statusTired;
+
+  /// No description provided for @statusDaydream.
+  ///
+  /// In zh, this message translates to:
+  /// **'发呆中'**
+  String get statusDaydream;
+
+  /// No description provided for @statusRushing.
+  ///
+  /// In zh, this message translates to:
+  /// **'忙碌'**
+  String get statusRushing;
+
+  /// No description provided for @statusOverthinking.
+  ///
+  /// In zh, this message translates to:
+  /// **'想太多'**
+  String get statusOverthinking;
+
+  /// No description provided for @statusEnergized.
+  ///
+  /// In zh, this message translates to:
+  /// **'元气满满'**
+  String get statusEnergized;
+
+  /// No description provided for @workAndStudy.
+  ///
+  /// In zh, this message translates to:
+  /// **'工作学习'**
+  String get workAndStudy;
+
+  /// No description provided for @statusWorking.
+  ///
+  /// In zh, this message translates to:
+  /// **'搬砖中'**
+  String get statusWorking;
+
+  /// No description provided for @statusStudying.
+  ///
+  /// In zh, this message translates to:
+  /// **'学习中'**
+  String get statusStudying;
+
+  /// No description provided for @statusBusy.
+  ///
+  /// In zh, this message translates to:
+  /// **'忙'**
+  String get statusBusy;
+
+  /// No description provided for @statusSlacking.
+  ///
+  /// In zh, this message translates to:
+  /// **'摸鱼中'**
+  String get statusSlacking;
+
+  /// No description provided for @statusTraveling.
+  ///
+  /// In zh, this message translates to:
+  /// **'旅行中'**
+  String get statusTraveling;
+
+  /// No description provided for @statusGoingHome.
+  ///
+  /// In zh, this message translates to:
+  /// **'回家中'**
+  String get statusGoingHome;
+
+  /// No description provided for @statusDnd.
+  ///
+  /// In zh, this message translates to:
+  /// **'请勿打扰'**
+  String get statusDnd;
+
+  /// No description provided for @statusHanging.
+  ///
+  /// In zh, this message translates to:
+  /// **'出去浪'**
+  String get statusHanging;
+
+  /// No description provided for @statusCheckIn.
+  ///
+  /// In zh, this message translates to:
+  /// **'打卡'**
+  String get statusCheckIn;
+
+  /// No description provided for @statusExercising.
+  ///
+  /// In zh, this message translates to:
+  /// **'运动中'**
+  String get statusExercising;
+
+  /// No description provided for @statusCoffee.
+  ///
+  /// In zh, this message translates to:
+  /// **'喝咖啡'**
+  String get statusCoffee;
+
+  /// No description provided for @statusBubbleTea.
+  ///
+  /// In zh, this message translates to:
+  /// **'奶茶'**
+  String get statusBubbleTea;
+
+  /// No description provided for @statusEating.
+  ///
+  /// In zh, this message translates to:
+  /// **'干饭中'**
+  String get statusEating;
+
+  /// No description provided for @statusParenting.
+  ///
+  /// In zh, this message translates to:
+  /// **'带娃中'**
+  String get statusParenting;
+
+  /// No description provided for @statusSavingWorld.
+  ///
+  /// In zh, this message translates to:
+  /// **'拯救世界'**
+  String get statusSavingWorld;
+
+  /// No description provided for @statusSelfie.
+  ///
+  /// In zh, this message translates to:
+  /// **'自拍'**
+  String get statusSelfie;
+
+  /// No description provided for @rest.
+  ///
+  /// In zh, this message translates to:
+  /// **'休息'**
+  String get rest;
+
+  /// No description provided for @statusRetreat.
+  ///
+  /// In zh, this message translates to:
+  /// **'闭关'**
+  String get statusRetreat;
+
+  /// No description provided for @statusHome.
+  ///
+  /// In zh, this message translates to:
+  /// **'宅家'**
+  String get statusHome;
+
+  /// No description provided for @statusSleeping.
+  ///
+  /// In zh, this message translates to:
+  /// **'睡觉中'**
+  String get statusSleeping;
+
+  /// No description provided for @statusCatLover.
+  ///
+  /// In zh, this message translates to:
+  /// **'吸猫中'**
+  String get statusCatLover;
+
+  /// No description provided for @statusDogWalking.
+  ///
+  /// In zh, this message translates to:
+  /// **'遛狗中'**
+  String get statusDogWalking;
+
+  /// No description provided for @statusGaming.
+  ///
+  /// In zh, this message translates to:
+  /// **'游戏中'**
+  String get statusGaming;
+
+  /// No description provided for @statusListening.
+  ///
+  /// In zh, this message translates to:
+  /// **'听歌中'**
+  String get statusListening;
+
+  /// No description provided for @setStatus.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置状态'**
+  String get setStatus;
+
+  /// No description provided for @visibleToFriends24h.
+  ///
+  /// In zh, this message translates to:
+  /// **'可被好友看到，24小时后自动清除'**
+  String get visibleToFriends24h;
+
+  /// No description provided for @writeStatus.
+  ///
+  /// In zh, this message translates to:
+  /// **'写状态'**
+  String get writeStatus;
+
+  /// No description provided for @enterYourStatus.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入你的状态...'**
+  String get enterYourStatus;
+
+  /// No description provided for @ok.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定'**
+  String get ok;
+
+  /// No description provided for @cameraPermissionRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描二维码需要相机权限'**
+  String get cameraPermissionRequired;
+
+  /// No description provided for @cameraPermissionDenied.
+  ///
+  /// In zh, this message translates to:
+  /// **'相机权限已被永久拒绝，请在系统设置中开启。'**
+  String get cameraPermissionDenied;
+
+  /// No description provided for @cannotGetCameraPermission.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法获取相机权限'**
+  String get cannotGetCameraPermission;
+
+  /// No description provided for @permissionCheckError.
+  ///
+  /// In zh, this message translates to:
+  /// **'检查权限时出错: {error}'**
+  String permissionCheckError(String error);
+
+  /// No description provided for @invalidQrCode.
+  ///
+  /// In zh, this message translates to:
+  /// **'无效的二维码'**
+  String get invalidQrCode;
+
+  /// No description provided for @qrCodeProcessFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'处理二维码失败: {error}'**
+  String qrCodeProcessFailed(String error);
+
+  /// No description provided for @cannotAddFriend.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法添加好友: {error}'**
+  String cannotAddFriend(String error);
+
+  /// No description provided for @scanQrCode.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描二维码'**
+  String get scanQrCode;
+
+  /// No description provided for @checkingCameraPermission.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在检查相机权限...'**
+  String get checkingCameraPermission;
+
+  /// No description provided for @needCameraPermission.
+  ///
+  /// In zh, this message translates to:
+  /// **'需要相机权限'**
+  String get needCameraPermission;
+
+  /// No description provided for @retryPermission.
+  ///
+  /// In zh, this message translates to:
+  /// **'重试'**
+  String get retryPermission;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开设置'**
+  String get openSettings;
+
+  /// No description provided for @inviteMembers.
+  ///
+  /// In zh, this message translates to:
+  /// **'邀请成员'**
+  String get inviteMembers;
+
+  /// No description provided for @inviteCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'邀请({count})'**
+  String inviteCount(int count);
+
+  /// No description provided for @noShippingAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无收货地址'**
+  String get noShippingAddress;
+
+  /// No description provided for @defaultLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认'**
+  String get defaultLabel;
+
+  /// No description provided for @editAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑地址'**
+  String get editAddress;
+
+  /// No description provided for @recipient.
+  ///
+  /// In zh, this message translates to:
+  /// **'收货人'**
+  String get recipient;
+
+  /// No description provided for @enterRecipientName.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入收货人姓名'**
+  String get enterRecipientName;
+
+  /// No description provided for @phoneNumber.
+  ///
+  /// In zh, this message translates to:
+  /// **'手机号码'**
+  String get phoneNumber;
+
+  /// No description provided for @enterPhoneNumber.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入手机号码'**
+  String get enterPhoneNumber;
+
+  /// No description provided for @regionHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'省/市/区'**
+  String get regionHint;
+
+  /// No description provided for @detailedAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'详细地址'**
+  String get detailedAddress;
+
+  /// No description provided for @detailedAddressHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'街道、门牌号等'**
+  String get detailedAddressHint;
+
+  /// No description provided for @setAsDefaultAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'设为默认地址'**
+  String get setAsDefaultAddress;
+
+  /// No description provided for @pleaseCompleteInfo.
+  ///
+  /// In zh, this message translates to:
+  /// **'请填写完整信息'**
+  String get pleaseCompleteInfo;
+
+  /// No description provided for @noInvoice.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无发票抬头'**
+  String get noInvoice;
+
+  /// No description provided for @company.
+  ///
+  /// In zh, this message translates to:
+  /// **'企业'**
+  String get company;
+
+  /// No description provided for @taxNumber.
+  ///
+  /// In zh, this message translates to:
+  /// **'税号'**
+  String get taxNumber;
+
+  /// No description provided for @editInvoice.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑发票抬头'**
+  String get editInvoice;
+
+  /// No description provided for @companyName.
+  ///
+  /// In zh, this message translates to:
+  /// **'企业名称'**
+  String get companyName;
+
+  /// No description provided for @enterCompanyName.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入企业名称'**
+  String get enterCompanyName;
+
+  /// No description provided for @personalName.
+  ///
+  /// In zh, this message translates to:
+  /// **'个人姓名'**
+  String get personalName;
+
+  /// No description provided for @enterName.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入姓名'**
+  String get enterName;
+
+  /// No description provided for @taxIdNumber.
+  ///
+  /// In zh, this message translates to:
+  /// **'纳税人识别号'**
+  String get taxIdNumber;
+
+  /// No description provided for @enterTaxIdNumber.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入纳税人识别号'**
+  String get enterTaxIdNumber;
+
+  /// No description provided for @bankNameOptional.
+  ///
+  /// In zh, this message translates to:
+  /// **'开户银行（选填）'**
+  String get bankNameOptional;
+
+  /// No description provided for @enterBankName.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入开户银行'**
+  String get enterBankName;
+
+  /// No description provided for @bankAccountOptional.
+  ///
+  /// In zh, this message translates to:
+  /// **'银行账号（选填）'**
+  String get bankAccountOptional;
+
+  /// No description provided for @enterBankAccount.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入银行账号'**
+  String get enterBankAccount;
+
+  /// No description provided for @companyAddressOptional.
+  ///
+  /// In zh, this message translates to:
+  /// **'企业地址（选填）'**
+  String get companyAddressOptional;
+
+  /// No description provided for @enterCompanyAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入企业地址'**
+  String get enterCompanyAddress;
+
+  /// No description provided for @companyPhoneOptional.
+  ///
+  /// In zh, this message translates to:
+  /// **'企业电话（选填）'**
+  String get companyPhoneOptional;
+
+  /// No description provided for @enterCompanyPhone.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入企业电话'**
+  String get enterCompanyPhone;
+
+  /// No description provided for @setAsDefaultInvoice.
+  ///
+  /// In zh, this message translates to:
+  /// **'设为默认抬头'**
+  String get setAsDefaultInvoice;
+
+  /// No description provided for @confirmDeleteAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要删除这个地址吗？'**
+  String get confirmDeleteAddress;
+
+  /// No description provided for @confirmDeleteInvoice.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要删除这个发票抬头吗？'**
+  String get confirmDeleteInvoice;
+
+  /// No description provided for @groupOwner.
+  ///
+  /// In zh, this message translates to:
+  /// **'群主'**
+  String get groupOwner;
+
+  /// No description provided for @groupAdmin.
+  ///
+  /// In zh, this message translates to:
+  /// **'管理员'**
+  String get groupAdmin;
+
+  /// No description provided for @searchMembers.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索成员'**
+  String get searchMembers;
+
+  /// No description provided for @totalMembers.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}位成员'**
+  String totalMembers(int count);
+
+  /// No description provided for @removeFromGroup.
+  ///
+  /// In zh, this message translates to:
+  /// **'移出群聊'**
+  String get removeFromGroup;
+
+  /// No description provided for @confirmRemoveMember.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要将\"{name}\"移出群聊吗？'**
+  String confirmRemoveMember(String name);
+
+  /// No description provided for @setAsAdmin.
+  ///
+  /// In zh, this message translates to:
+  /// **'设为管理员'**
+  String get setAsAdmin;
+
+  /// No description provided for @removeAdmin.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消管理员'**
+  String get removeAdmin;
+
+  /// No description provided for @deleteContactSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'联系人已删除'**
+  String get deleteContactSuccess;
+
+  /// No description provided for @unknownSong.
+  ///
+  /// In zh, this message translates to:
+  /// **'未知歌曲'**
+  String get unknownSong;
+
+  /// No description provided for @unknownArtist.
+  ///
+  /// In zh, this message translates to:
+  /// **'未知艺术家'**
+  String get unknownArtist;
+
+  /// No description provided for @unknownContact.
+  ///
+  /// In zh, this message translates to:
+  /// **'未知联系人'**
+  String get unknownContact;
+
+  /// No description provided for @personalCard.
+  ///
+  /// In zh, this message translates to:
+  /// **'个人名片'**
+  String get personalCard;
+
+  /// No description provided for @singleChoice.
+  ///
+  /// In zh, this message translates to:
+  /// **'单选'**
+  String get singleChoice;
+
+  /// No description provided for @multiChoice.
+  ///
+  /// In zh, this message translates to:
+  /// **'多选'**
+  String get multiChoice;
+
+  /// No description provided for @ended.
+  ///
+  /// In zh, this message translates to:
+  /// **'已结束'**
+  String get ended;
+
+  /// No description provided for @endPollButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'结束投票'**
+  String get endPollButton;
+
+  /// No description provided for @createPoll.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建投票'**
+  String get createPoll;
+
+  /// No description provided for @pollQuestion.
+  ///
+  /// In zh, this message translates to:
+  /// **'投票问题'**
+  String get pollQuestion;
+
+  /// No description provided for @pollOptions.
+  ///
+  /// In zh, this message translates to:
+  /// **'投票选项'**
+  String get pollOptions;
+
+  /// No description provided for @optionPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'选项 {index}'**
+  String optionPlaceholder(int index);
+
+  /// No description provided for @addOption.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加选项'**
+  String get addOption;
+
+  /// No description provided for @pollSettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'投票设置'**
+  String get pollSettings;
+
+  /// No description provided for @anonymousPoll.
+  ///
+  /// In zh, this message translates to:
+  /// **'匿名投票'**
+  String get anonymousPoll;
+
+  /// No description provided for @pollHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'投票发起后将显示在聊天中，群成员可以参与投票'**
+  String get pollHint;
+
+  /// No description provided for @searchSongOrArtist.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索歌曲或歌手'**
+  String get searchSongOrArtist;
+
+  /// No description provided for @noSongsFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有找到歌曲'**
+  String get noSongsFound;
+
+  /// No description provided for @supportedMusicPlatforms.
+  ///
+  /// In zh, this message translates to:
+  /// **'支持网易云、QQ音乐、酷狗、酷我等平台的歌曲链接'**
+  String get supportedMusicPlatforms;
+
+  /// No description provided for @songNameOptional.
+  ///
+  /// In zh, this message translates to:
+  /// **'歌曲名称（可选）'**
+  String get songNameOptional;
+
+  /// No description provided for @enterSongName.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入歌曲名称'**
+  String get enterSongName;
+
+  /// No description provided for @artistNameOptional.
+  ///
+  /// In zh, this message translates to:
+  /// **'歌手名称（可选）'**
+  String get artistNameOptional;
+
+  /// No description provided for @enterArtistName.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入歌手名称'**
+  String get enterArtistName;
+
+  /// No description provided for @shareSong.
+  ///
+  /// In zh, this message translates to:
+  /// **'分享歌曲'**
+  String get shareSong;
+
+  /// No description provided for @realTimeLocationSharing.
+  ///
+  /// In zh, this message translates to:
+  /// **'实时位置共享功能开发中...'**
+  String get realTimeLocationSharing;
+
+  /// No description provided for @voiceCallFeatureInDev.
+  ///
+  /// In zh, this message translates to:
+  /// **'语音通话功能开发中...'**
+  String get voiceCallFeatureInDev;
+
+  /// No description provided for @reportFeatureInDev.
+  ///
+  /// In zh, this message translates to:
+  /// **'举报功能开发中...'**
+  String get reportFeatureInDev;
+
+  /// No description provided for @shareFeatureInDev.
+  ///
+  /// In zh, this message translates to:
+  /// **'分享功能开发中...'**
+  String get shareFeatureInDev;
+
+  /// No description provided for @qrCodeFeatureInDev.
+  ///
+  /// In zh, this message translates to:
+  /// **'二维码功能开发中...'**
+  String get qrCodeFeatureInDev;
+
+  /// No description provided for @scanQrToAddMe.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫一扫上面的二维码，加我为好友'**
+  String get scanQrToAddMe;
+
+  /// No description provided for @saveToAlbum.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存到相册'**
+  String get saveToAlbum;
+
+  /// No description provided for @changeStyle.
+  ///
+  /// In zh, this message translates to:
+  /// **'换个样式'**
+  String get changeStyle;
+
+  /// No description provided for @copyId.
+  ///
+  /// In zh, this message translates to:
+  /// **'复制 ID'**
+  String get copyId;
+
+  /// No description provided for @idCopied.
+  ///
+  /// In zh, this message translates to:
+  /// **'已复制用户 ID'**
+  String get idCopied;
+
+  /// No description provided for @shareFeatureComingSoon.
+  ///
+  /// In zh, this message translates to:
+  /// **'分享功能即将推出'**
+  String get shareFeatureComingSoon;
+
+  /// No description provided for @saveFeatureComingSoon.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存功能即将推出'**
+  String get saveFeatureComingSoon;
+
+  /// No description provided for @moreStylesFeatureComingSoon.
+  ///
+  /// In zh, this message translates to:
+  /// **'更多样式即将推出'**
+  String get moreStylesFeatureComingSoon;
+
+  /// No description provided for @confirmEndPoll.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要结束这个投票吗？'**
+  String get confirmEndPoll;
+
+  /// No description provided for @cannotVoteAfterEnd.
+  ///
+  /// In zh, this message translates to:
+  /// **'结束后将无法继续投票。'**
+  String get cannotVoteAfterEnd;
+
+  /// No description provided for @bio.
+  ///
+  /// In zh, this message translates to:
+  /// **'个性签名'**
+  String get bio;
+
+  /// No description provided for @homeServer.
+  ///
+  /// In zh, this message translates to:
+  /// **'服务器'**
+  String get homeServer;
+
+  /// No description provided for @shareContactCard.
+  ///
+  /// In zh, this message translates to:
+  /// **'分享名片'**
+  String get shareContactCard;
+
+  /// No description provided for @removeFromBlacklist.
+  ///
+  /// In zh, this message translates to:
+  /// **'移出黑名单'**
+  String get removeFromBlacklist;
+
+  /// No description provided for @confirmAddBlacklist.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定将该用户加入黑名单吗？你将不再收到对方的消息'**
+  String get confirmAddBlacklist;
+
+  /// No description provided for @confirmRemoveBlacklist.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定将该用户移出黑名单吗？'**
+  String get confirmRemoveBlacklist;
+
+  /// No description provided for @remarkSaved.
+  ///
+  /// In zh, this message translates to:
+  /// **'备注已保存'**
+  String get remarkSaved;
+
+  /// No description provided for @remarkCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'已清除备注'**
+  String get remarkCleared;
+
+  /// No description provided for @receive.
+  ///
+  /// In zh, this message translates to:
+  /// **'收款'**
+  String get receive;
+
+  /// No description provided for @pleaseConnectWallet.
+  ///
+  /// In zh, this message translates to:
+  /// **'请先连接钱包'**
+  String get pleaseConnectWallet;
+
+  /// No description provided for @sendRequest.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送请求'**
+  String get sendRequest;
+
+  /// No description provided for @pleaseEnterValidAmount.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入有效的金额'**
+  String get pleaseEnterValidAmount;
+
+  /// No description provided for @searchPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索联系人、群聊、消息'**
+  String get searchPlaceholder;
+
+  /// No description provided for @enterKeywordToSearch.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入关键词开始搜索'**
+  String get enterKeywordToSearch;
+
+  /// No description provided for @clearHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get clearHistory;
+
+  /// No description provided for @noResultsForQuery.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有找到\"{query}\"相关的结果'**
+  String noResultsForQuery(String query);
+
+  /// No description provided for @allResults.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部'**
+  String get allResults;
+
+  /// No description provided for @searchInChat.
+  ///
+  /// In zh, this message translates to:
+  /// **'在聊天中搜索'**
+  String get searchInChat;
+
+  /// No description provided for @groupLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'群聊'**
+  String get groupLabel;
+
+  /// No description provided for @messageLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'消息'**
+  String get messageLabel;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

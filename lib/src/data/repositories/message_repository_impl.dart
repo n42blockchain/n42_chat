@@ -442,6 +442,67 @@ class MessageRepositoryImpl implements IMessageRepository {
   }
   
   @override
+  Future<MessageEntity?> sendForwardedPollSnapshot(
+    String roomId, {
+    required String question,
+    required List<String> options,
+    required List<String> optionIds,
+    required Map<String, int> voteCounts,
+    required int totalVoters,
+    int maxSelections = 1,
+  }) async {
+    try {
+      debugPrint('MessageRepositoryImpl: Sending forwarded poll snapshot - question: $question');
+      final eventId = await _messageDataSource.sendForwardedPollSnapshot(
+        roomId,
+        question: question,
+        options: options,
+        optionIds: optionIds,
+        voteCounts: voteCounts,
+        totalVoters: totalVoters,
+        maxSelections: maxSelections,
+      );
+      if (eventId != null) {
+        debugPrint('MessageRepositoryImpl: Forwarded poll sent successfully - eventId: $eventId');
+
+        // 获取发送者名称
+        String senderName = '';
+        try {
+          final profile = await _client?.ownProfile;
+          senderName = profile?.displayName ?? _client?.userID?.split(':').first.replaceFirst('@', '') ?? '';
+        } catch (e) {
+          senderName = _client?.userID?.split(':').first.replaceFirst('@', '') ?? '';
+        }
+
+        // 返回一个临时消息实体
+        return MessageEntity(
+          id: eventId,
+          roomId: roomId,
+          senderId: _client?.userID ?? '',
+          senderName: senderName,
+          content: question,
+          type: MessageType.poll,
+          timestamp: DateTime.now(),
+          status: MessageStatus.sent,
+          metadata: MessageMetadata(
+            pollQuestion: question,
+            pollOptions: options,
+            pollOptionIds: optionIds,
+            voteCounts: voteCounts,
+            totalVoters: totalVoters,
+            maxSelections: maxSelections,
+            pollEnded: true,
+          ),
+        );
+      }
+      return null;
+    } catch (e) {
+      debugPrint('MessageRepositoryImpl: Failed to send forwarded poll snapshot: $e');
+      rethrow;
+    }
+  }
+
+  @override
   Future<bool> voteOnPoll(
     String roomId, {
     required String pollEventId,

@@ -660,7 +660,7 @@ class MessageMenuHelper {
   static void copyMessage(BuildContext context, MessageEntity message) {
     if (message.type == MessageType.text) {
       Clipboard.setData(ClipboardData(text: message.content));
-      _showToast(context, '已复制');
+      _showToast(context, S.of(context)?.copied ?? 'Copied');
     }
   }
   
