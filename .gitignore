@@ -1,2 +1,10 @@
 flutter_*.log
 build/
+
+# Temp files
+tmpclaude-*
+
+# Script/utility files
+commits_to_translate.txt
+msg_map.sh
+translate_msg.py
