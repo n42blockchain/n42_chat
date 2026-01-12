@@ -134,82 +134,55 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     }
   }
 
-  Future<void> _onUpdateGroupName(
-    UpdateGroupName event,
-    Emitter<GroupState> emit,
-  ) async {
-    // 保存当前状态以便在操作后恢复
+  /// Helper for group update operations with state preservation
+  Future<void> _updateGroupProperty({
+    required String roomId,
+    required Future<void> Function() operation,
+    required String successMessage,
+    required String errorPrefix,
+    required Emitter<GroupState> emit,
+  }) async {
     final currentState = state;
-
     try {
-      await _groupRepository.setGroupName(event.roomId, event.name);
-
-      // 重新加载群详情以获取更新后的数据
-      final group = await _groupRepository.getGroup(event.roomId);
+      await operation();
+      final group = await _groupRepository.getGroup(roomId);
       if (group != null) {
-        final members = await _groupRepository.getGroupMembers(event.roomId);
+        final members = await _groupRepository.getGroupMembers(roomId);
         emit(GroupDetailsLoaded(group: group, members: members));
       }
-
-      emit(const GroupOperationSuccess('Group name updated'));
+      emit(GroupOperationSuccess(successMessage));
     } catch (e) {
-      // 恢复之前的状态，然后显示错误
-      if (currentState is GroupDetailsLoaded) {
-        emit(currentState);
-      }
-      emit(GroupError('Failed to update group name: ${e.toString()}'));
+      if (currentState is GroupDetailsLoaded) emit(currentState);
+      emit(GroupError('$errorPrefix: $e'));
     }
   }
 
-  Future<void> _onUpdateGroupTopic(
-    UpdateGroupTopic event,
-    Emitter<GroupState> emit,
-  ) async {
-    final currentState = state;
+  Future<void> _onUpdateGroupName(UpdateGroupName event, Emitter<GroupState> emit) =>
+      _updateGroupProperty(
+        roomId: event.roomId,
+        operation: () => _groupRepository.setGroupName(event.roomId, event.name),
+        successMessage: 'Group name updated',
+        errorPrefix: 'Failed to update group name',
+        emit: emit,
+      );
 
-    try {
-      await _groupRepository.setGroupTopic(event.roomId, event.topic);
+  Future<void> _onUpdateGroupTopic(UpdateGroupTopic event, Emitter<GroupState> emit) =>
+      _updateGroupProperty(
+        roomId: event.roomId,
+        operation: () => _groupRepository.setGroupTopic(event.roomId, event.topic),
+        successMessage: 'Group description updated',
+        errorPrefix: 'Failed to update group description',
+        emit: emit,
+      );
 
-      // 重新加载群详情
-      final group = await _groupRepository.getGroup(event.roomId);
-      if (group != null) {
-        final members = await _groupRepository.getGroupMembers(event.roomId);
-        emit(GroupDetailsLoaded(group: group, members: members));
-      }
-
-      emit(const GroupOperationSuccess('Group description updated'));
-    } catch (e) {
-      if (currentState is GroupDetailsLoaded) {
-        emit(currentState);
-      }
-      emit(GroupError('Failed to update group description: ${e.toString()}'));
-    }
-  }
-
-  Future<void> _onUpdateGroupAvatar(
-    UpdateGroupAvatar event,
-    Emitter<GroupState> emit,
-  ) async {
-    final currentState = state;
-
-    try {
-      await _groupRepository.setGroupAvatar(event.roomId, event.avatar);
-
-      // 重新加载群详情
-      final group = await _groupRepository.getGroup(event.roomId);
-      if (group != null) {
-        final members = await _groupRepository.getGroupMembers(event.roomId);
-        emit(GroupDetailsLoaded(group: group, members: members));
-      }
-
-      emit(const GroupOperationSuccess('Group avatar updated'));
-    } catch (e) {
-      if (currentState is GroupDetailsLoaded) {
-        emit(currentState);
-      }
-      emit(GroupError('Failed to update group avatar: ${e.toString()}'));
-    }
-  }
+  Future<void> _onUpdateGroupAvatar(UpdateGroupAvatar event, Emitter<GroupState> emit) =>
+      _updateGroupProperty(
+        roomId: event.roomId,
+        operation: () => _groupRepository.setGroupAvatar(event.roomId, event.avatar),
+        successMessage: 'Group avatar updated',
+        errorPrefix: 'Failed to update group avatar',
+        emit: emit,
+      );
 
   Future<void> _onInviteMembers(
     InviteMembers event,
