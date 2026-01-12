@@ -101,12 +101,29 @@ class MatrixGroupDataSource {
   Future<void> setGroupName(String roomId, String name) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) {
-      throw Exception('Room not found');
+      throw Exception('Room not found: $roomId');
     }
+
+    // 检查权限
+    final canChange = room.canSendEvent('m.room.name');
+    final userId = _client?.userID;
+    final powerLevel = userId != null ? room.getPowerLevelByUserId(userId) : 0;
+    debugPrint('setGroupName: roomId=$roomId, name=$name, canSendEvent=$canChange, powerLevel=$powerLevel');
+
+    if (!canChange && powerLevel < 50) {
+      throw Exception('You do not have permission to change the group name');
+    }
+
     try {
       await room.setName(name);
+      debugPrint('setGroupName: Success');
     } catch (e) {
       debugPrint('setGroupName error: $e');
+      // 如果是权限错误，提供更友好的消息
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('forbidden') || errorStr.contains('permission') || errorStr.contains('403')) {
+        throw Exception('You do not have permission to change the group name');
+      }
       rethrow;
     }
   }
