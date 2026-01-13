@@ -460,6 +460,45 @@ class MessageMetadata extends Equatable {
         musicUrl,
         musicCover,
       ];
+
+  /// Create a copy with updated poll fields
+  MessageMetadata copyWithPoll({
+    bool? pollEnded,
+    Map<String, int>? voteCounts,
+    int? totalVoters,
+    List<String>? myVotes,
+  }) => MessageMetadata(
+    pollQuestion: pollQuestion,
+    pollOptions: pollOptions,
+    pollOptionIds: pollOptionIds,
+    maxSelections: maxSelections,
+    pollEnded: pollEnded ?? this.pollEnded,
+    voteCounts: voteCounts ?? this.voteCounts,
+    totalVoters: totalVoters ?? this.totalVoters,
+    myVotes: myVotes ?? this.myVotes,
+    mediaUrl: mediaUrl,
+    httpUrl: httpUrl,
+    thumbnailUrl: thumbnailUrl,
+    mimeType: mimeType,
+    size: size,
+    width: width,
+    height: height,
+    duration: duration,
+    fileName: fileName,
+    isPlayed: isPlayed,
+    waveform: waveform,
+    latitude: latitude,
+    longitude: longitude,
+    locationName: locationName,
+    amount: amount,
+    token: token,
+    transferStatus: transferStatus,
+    txHash: txHash,
+    musicTitle: musicTitle,
+    musicArtist: musicArtist,
+    musicUrl: musicUrl,
+    musicCover: musicCover,
+  );
 }
 
 /// 消息反应（Reaction）
