@@ -183,13 +183,17 @@ class GroupRepositoryImpl implements IGroupRepository {
       myRole = GroupRole.admin;
     }
 
+    // 成员数量包括已加入和已邀请的成员
+    final joinedCount = room.summary.mJoinedMemberCount ?? 0;
+    final invitedCount = room.summary.mInvitedMemberCount ?? 0;
+
     return GroupEntity(
       roomId: room.id,
       name: room.getLocalizedDisplayname(),
       avatarUrl: avatarUrlStr,
       topic: room.topic,
       announcement: room.topic,
-      memberCount: room.summary.mJoinedMemberCount ?? 0,
+      memberCount: joinedCount + invitedCount,
       members: members?.map((u) => _mapUserToGroupMember(room.id, u)).toList() ?? [],
       isEncrypted: room.encrypted,
       isPublic: room.joinRules == matrix.JoinRules.public,
@@ -217,12 +221,18 @@ class GroupRepositoryImpl implements IGroupRepository {
       avatarUrl = _buildAvatarHttpUrl(user.avatarUrl.toString(), client);
     }
 
+    // 根据 Matrix 用户状态确定成员状态
+    final membershipStatus = user.membership == matrix.Membership.invite
+        ? MembershipStatus.invited
+        : MembershipStatus.joined;
+
     return GroupMember(
       userId: user.id,
       displayName: user.calcDisplayname(),
       avatarUrl: avatarUrl,
       role: role,
       powerLevel: powerLevel,
+      membershipStatus: membershipStatus,
     );
   }
   

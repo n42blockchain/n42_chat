@@ -60,6 +60,7 @@ dependencies:
   # ============================================
   # MIT License
   dio: ^5.4.0
+  http: ^1.2.0
 
   # ============================================
   # UI Components - UI组件
@@ -125,7 +126,7 @@ dependencies:
   # QR Code Scanner - 二维码扫描
   # ============================================
   # BSD-3-Clause License
-  mobile_scanner: ^5.1.1
+  mobile_scanner: ^6.0.0
   
   # ============================================
   # VoIP & WebRTC - 音视频通话
