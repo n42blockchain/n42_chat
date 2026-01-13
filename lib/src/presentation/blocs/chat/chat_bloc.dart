@@ -201,35 +201,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
           final index = updatedMessages.indexWhere((m) => m.id == pollMsg.id);
           if (index != -1 && pollMsg.metadata != null) {
-            final oldMetadata = pollMsg.metadata!;
             updatedMessages[index] = pollMsg.copyWith(
-              metadata: MessageMetadata(
-                pollQuestion: oldMetadata.pollQuestion,
-                pollOptions: oldMetadata.pollOptions,
-                pollOptionIds: oldMetadata.pollOptionIds,
-                maxSelections: oldMetadata.maxSelections,
+              metadata: pollMsg.metadata!.copyWithPoll(
                 pollEnded: pollEnded,
                 voteCounts: voteCounts,
                 totalVoters: totalVoters,
                 myVotes: myVotes,
-                mediaUrl: oldMetadata.mediaUrl,
-                httpUrl: oldMetadata.httpUrl,
-                thumbnailUrl: oldMetadata.thumbnailUrl,
-                mimeType: oldMetadata.mimeType,
-                size: oldMetadata.size,
-                width: oldMetadata.width,
-                height: oldMetadata.height,
-                duration: oldMetadata.duration,
-                fileName: oldMetadata.fileName,
-                isPlayed: oldMetadata.isPlayed,
-                waveform: oldMetadata.waveform,
-                latitude: oldMetadata.latitude,
-                longitude: oldMetadata.longitude,
-                locationName: oldMetadata.locationName,
-                amount: oldMetadata.amount,
-                token: oldMetadata.token,
-                transferStatus: oldMetadata.transferStatus,
-                txHash: oldMetadata.txHash,
               ),
             );
           }
@@ -953,52 +930,73 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       );
       
       if (success && !isClosed) {
-        debugPrint('ChatBloc: Vote submitted successfully, updating local state');
-        
-        // 本地更新投票消息以立即显示反馈
+        debugPrint('ChatBloc: Vote submitted successfully, fetching fresh poll data');
+
+        // 从服务器获取最新的投票聚合数据
+        final freshAggregations = await _messageRepository.getPollAggregations(
+          _currentRoomId!,
+          event.pollEventId,
+        );
+
+        // 使用服务器数据更新UI
         final updatedMessages = state.messages.map((msg) {
           if (msg.id == event.pollEventId && msg.metadata != null) {
             final oldMetadata = msg.metadata!;
-            final newVoteCounts = Map<String, int>.from(oldMetadata.voteCounts ?? {});
-            final myVotes = List<String>.from(event.selectedOptionIds);
-            
-            // 更新选中选项的票数
-            for (final optionId in event.selectedOptionIds) {
-              newVoteCounts[optionId] = (newVoteCounts[optionId] ?? 0) + 1;
+
+            // 优先使用服务器返回的数据
+            Map<String, int> newVoteCounts;
+            int totalVoters;
+            List<String> newMyVotes;
+
+            if (freshAggregations != null) {
+              newVoteCounts = (freshAggregations['voteCounts'] as Map<String, dynamic>?)
+                  ?.cast<String, int>() ?? {};
+              totalVoters = freshAggregations['totalVoters'] as int? ?? 0;
+              newMyVotes = (freshAggregations['myVotes'] as List<dynamic>?)
+                  ?.cast<String>() ?? event.selectedOptionIds;
+              debugPrint('ChatBloc: Using fresh poll data - voteCounts: $newVoteCounts, totalVoters: $totalVoters, myVotes: $newMyVotes');
+            } else {
+              // 如果获取失败，使用本地计算的数据
+              debugPrint('ChatBloc: Fresh poll data unavailable, using local calculation');
+              newVoteCounts = Map<String, int>.from(oldMetadata.voteCounts ?? {});
+              final oldMyVotes = List<String>.from(oldMetadata.myVotes ?? []);
+              newMyVotes = List<String>.from(event.selectedOptionIds);
+
+              debugPrint('ChatBloc: oldMyVotes: $oldMyVotes, newMyVotes: $newMyVotes');
+
+              // 减少之前投票但现在取消的选项的票数
+              for (final optionId in oldMyVotes) {
+                if (!newMyVotes.contains(optionId)) {
+                  final currentCount = newVoteCounts[optionId] ?? 0;
+                  if (currentCount > 0) {
+                    newVoteCounts[optionId] = currentCount - 1;
+                    debugPrint('ChatBloc: Decreased vote count for $optionId to ${newVoteCounts[optionId]}');
+                  }
+                }
+              }
+
+              // 增加新投票选项的票数
+              for (final optionId in newMyVotes) {
+                if (!oldMyVotes.contains(optionId)) {
+                  newVoteCounts[optionId] = (newVoteCounts[optionId] ?? 0) + 1;
+                  debugPrint('ChatBloc: Increased vote count for $optionId to ${newVoteCounts[optionId]}');
+                }
+              }
+
+              // 计算新的总投票人数
+              totalVoters = oldMetadata.totalVoters ?? 0;
+              if (oldMyVotes.isEmpty && newMyVotes.isNotEmpty) {
+                totalVoters += 1;
+              } else if (oldMyVotes.isNotEmpty && newMyVotes.isEmpty) {
+                totalVoters = totalVoters > 0 ? totalVoters - 1 : 0;
+              }
             }
             
-            // 计算新的总投票人数
-            final totalVoters = (oldMetadata.totalVoters ?? 0) + 1;
-            
             return msg.copyWith(
-              metadata: MessageMetadata(
-                pollQuestion: oldMetadata.pollQuestion,
-                pollOptions: oldMetadata.pollOptions,
-                pollOptionIds: oldMetadata.pollOptionIds,
-                maxSelections: oldMetadata.maxSelections,
-                pollEnded: oldMetadata.pollEnded,
+              metadata: oldMetadata.copyWithPoll(
                 voteCounts: newVoteCounts,
                 totalVoters: totalVoters,
-                myVotes: myVotes,
-                // 保留其他元数据
-                mediaUrl: oldMetadata.mediaUrl,
-                httpUrl: oldMetadata.httpUrl,
-                thumbnailUrl: oldMetadata.thumbnailUrl,
-                mimeType: oldMetadata.mimeType,
-                size: oldMetadata.size,
-                width: oldMetadata.width,
-                height: oldMetadata.height,
-                duration: oldMetadata.duration,
-                fileName: oldMetadata.fileName,
-                isPlayed: oldMetadata.isPlayed,
-                waveform: oldMetadata.waveform,
-                latitude: oldMetadata.latitude,
-                longitude: oldMetadata.longitude,
-                locationName: oldMetadata.locationName,
-                amount: oldMetadata.amount,
-                token: oldMetadata.token,
-                transferStatus: oldMetadata.transferStatus,
-                txHash: oldMetadata.txHash,
+                myVotes: newMyVotes,
               ),
             );
           }
@@ -1041,33 +1039,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         final totalVoters = (oldMetadata.totalVoters ?? 0) + 1;
 
         return msg.copyWith(
-          metadata: MessageMetadata(
-            pollQuestion: oldMetadata.pollQuestion,
-            pollOptions: oldMetadata.pollOptions,
-            pollOptionIds: oldMetadata.pollOptionIds,
-            maxSelections: oldMetadata.maxSelections,
-            pollEnded: oldMetadata.pollEnded,
+          metadata: oldMetadata.copyWithPoll(
             voteCounts: newVoteCounts,
             totalVoters: totalVoters,
-            myVotes: oldMetadata.myVotes,
-            mediaUrl: oldMetadata.mediaUrl,
-            httpUrl: oldMetadata.httpUrl,
-            thumbnailUrl: oldMetadata.thumbnailUrl,
-            mimeType: oldMetadata.mimeType,
-            size: oldMetadata.size,
-            width: oldMetadata.width,
-            height: oldMetadata.height,
-            duration: oldMetadata.duration,
-            fileName: oldMetadata.fileName,
-            isPlayed: oldMetadata.isPlayed,
-            waveform: oldMetadata.waveform,
-            latitude: oldMetadata.latitude,
-            longitude: oldMetadata.longitude,
-            locationName: oldMetadata.locationName,
-            amount: oldMetadata.amount,
-            token: oldMetadata.token,
-            transferStatus: oldMetadata.transferStatus,
-            txHash: oldMetadata.txHash,
           ),
         );
       }
@@ -1088,37 +1062,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     final updatedMessages = state.messages.map((msg) {
       if (msg.id == event.pollEventId && msg.metadata != null) {
-        final oldMetadata = msg.metadata!;
-
         return msg.copyWith(
-          metadata: MessageMetadata(
-            pollQuestion: oldMetadata.pollQuestion,
-            pollOptions: oldMetadata.pollOptions,
-            pollOptionIds: oldMetadata.pollOptionIds,
-            maxSelections: oldMetadata.maxSelections,
-            pollEnded: true,
-            voteCounts: oldMetadata.voteCounts,
-            totalVoters: oldMetadata.totalVoters,
-            myVotes: oldMetadata.myVotes,
-            mediaUrl: oldMetadata.mediaUrl,
-            httpUrl: oldMetadata.httpUrl,
-            thumbnailUrl: oldMetadata.thumbnailUrl,
-            mimeType: oldMetadata.mimeType,
-            size: oldMetadata.size,
-            width: oldMetadata.width,
-            height: oldMetadata.height,
-            duration: oldMetadata.duration,
-            fileName: oldMetadata.fileName,
-            isPlayed: oldMetadata.isPlayed,
-            waveform: oldMetadata.waveform,
-            latitude: oldMetadata.latitude,
-            longitude: oldMetadata.longitude,
-            locationName: oldMetadata.locationName,
-            amount: oldMetadata.amount,
-            token: oldMetadata.token,
-            transferStatus: oldMetadata.transferStatus,
-            txHash: oldMetadata.txHash,
-          ),
+          metadata: msg.metadata!.copyWithPoll(pollEnded: true),
         );
       }
       return msg;
