@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
@@ -189,19 +187,41 @@ class MatrixGroupDataSource {
   // 成员管理
   // ============================================
 
-  /// 获取群成员列表
+  /// 获取群成员列表（包括已加入和已邀请的成员）
   Future<List<matrix.User>> getGroupMembers(String roomId) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) return [];
 
     await room.requestParticipants();
-    return room.getParticipants();
+    // 获取所有参与者
+    final joinedUsers = room.getParticipants();
+
+    // 尝试获取已邀请的成员
+    final invitedUsers = <matrix.User>[];
+    final states = room.states['m.room.member'];
+    if (states != null) {
+      for (final entry in states.entries) {
+        final event = entry.value;
+        if (event.content['membership'] == 'invite') {
+          final userId = entry.key;
+          // 检查是否已在 joinedUsers 中
+          if (!joinedUsers.any((u) => u.id == userId)) {
+            invitedUsers.add(room.unsafeGetUserFromMemoryOrFallback(userId));
+          }
+        }
+      }
+    }
+
+    return [...joinedUsers, ...invitedUsers];
   }
 
-  /// 获取群成员数量
+  /// 获取群成员数量（包括已加入和已邀请的成员）
   int getGroupMemberCount(String roomId) {
     final room = _client?.getRoomById(roomId);
-    return room?.summary.mJoinedMemberCount ?? 0;
+    if (room == null) return 0;
+    final joined = room.summary.mJoinedMemberCount ?? 0;
+    final invited = room.summary.mInvitedMemberCount ?? 0;
+    return joined + invited;
   }
 
   /// 邀请用户加入群

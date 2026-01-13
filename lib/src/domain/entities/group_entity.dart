@@ -12,6 +12,14 @@ enum GroupRole {
   member,
 }
 
+/// 群成员状态
+enum MembershipStatus {
+  /// 已加入
+  joined,
+  /// 已邀请（等待接受）
+  invited,
+}
+
 /// 群成员实体
 class GroupMember extends Equatable {
   /// 用户ID
@@ -35,6 +43,9 @@ class GroupMember extends Equatable {
   /// 加入时间
   final DateTime? joinedAt;
 
+  /// 成员状态
+  final MembershipStatus membershipStatus;
+
   const GroupMember({
     required this.userId,
     required this.displayName,
@@ -43,7 +54,11 @@ class GroupMember extends Equatable {
     this.powerLevel = 0,
     this.isOnline = false,
     this.joinedAt,
+    this.membershipStatus = MembershipStatus.joined,
   });
+
+  /// 是否已邀请但未加入
+  bool get isInvited => membershipStatus == MembershipStatus.invited;
 
   /// 从 ContactEntity 创建
   factory GroupMember.fromContact(
@@ -104,6 +119,7 @@ class GroupMember extends Equatable {
         powerLevel,
         isOnline,
         joinedAt,
+        membershipStatus,
       ];
 
   GroupMember copyWith({
@@ -114,6 +130,7 @@ class GroupMember extends Equatable {
     int? powerLevel,
     bool? isOnline,
     DateTime? joinedAt,
+    MembershipStatus? membershipStatus,
   }) {
     return GroupMember(
       userId: userId ?? this.userId,
@@ -123,6 +140,7 @@ class GroupMember extends Equatable {
       powerLevel: powerLevel ?? this.powerLevel,
       isOnline: isOnline ?? this.isOnline,
       joinedAt: joinedAt ?? this.joinedAt,
+      membershipStatus: membershipStatus ?? this.membershipStatus,
     );
   }
 }
