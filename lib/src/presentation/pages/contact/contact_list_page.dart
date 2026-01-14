@@ -637,7 +637,7 @@ class _ContactListPageState extends State<ContactListPage> {
               // 推荐给朋友
               ListTile(
                 leading: const Icon(Icons.person_add_alt_1_outlined),
-                title: Text(S.of(context)?.recommendToFriend ?? 'Recommend to friend'),
+                title: Text(S.of(context)?.recommendToFriend ?? 'Share contact'),
                 onTap: () {
                   Navigator.pop(context);
                   _recommendToFriend(contact);

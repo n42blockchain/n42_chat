@@ -1547,5 +1547,431 @@
   "contactLabel": "联系人",
   "groupLabel": "群聊",
   "conversationLabel": "会话",
-  "messageLabel": "消息"
+  "messageLabel": "消息",
+
+  "securityTitle": "安全",
+  "endToEndEncryption": "端到端加密",
+  "keyBackup": "密钥备份",
+  "backupEncryptionKeys": "备份加密密钥",
+  "keysBackedUp": "已备份 {count} 个密钥",
+  "@keysBackedUp": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "backupNotSet": "未设置备份",
+  "restoreKeys": "恢复密钥",
+  "restoreKeysFromBackup": "从备份恢复加密密钥",
+  "exportKeys": "导出密钥",
+  "exportKeysToFile": "导出密钥到文件",
+  "loggedInDevices": "已登录设备",
+  "noOtherDevices": "暂无其他设备",
+  "verified": "已验证",
+  "unverified": "未验证",
+  "advanced": "高级",
+  "crossSigning": "跨设备签名",
+  "enabled": "已启用",
+  "notEnabled": "未启用",
+  "resetEncryption": "重置加密",
+  "deleteAllEncryptionKeys": "删除所有加密密钥",
+  "encryptionNotSupported": "不支持加密",
+  "notInitialized": "未初始化",
+  "backupKeyTitle": "备份密钥",
+  "backupKeyMessage": "是否创建新的密钥备份？这将帮助您在新设备上恢复加密消息。",
+  "backup": "备份",
+  "restoreKeyTitle": "恢复密钥",
+  "restoreKeyMessage": "输入您的恢复密码或恢复密钥来恢复加密消息。",
+  "restore": "恢复",
+  "exportKeyTitle": "导出密钥",
+  "exportKeyMessage": "导出的密钥文件包含您的所有加密密钥，请妥善保管。",
+  "export": "导出",
+  "deviceIdLabel": "设备ID: {deviceId}",
+  "@deviceIdLabel": {
+    "placeholders": {
+      "deviceId": {"type": "String"}
+    }
+  },
+  "deviceStatusVerified": "状态: 已验证",
+  "deviceStatusUnverified": "状态: 未验证",
+  "lastActiveLabel": "最后活跃: {lastSeen}",
+  "@lastActiveLabel": {
+    "placeholders": {
+      "lastSeen": {"type": "String"}
+    }
+  },
+  "verifyThisDevice": "验证此设备",
+  "crossSigningAlreadyEnabled": "跨设备签名已启用",
+  "crossSigningSetupSuccess": "跨设备签名设置成功",
+  "setupFailed": "设置失败: {error}",
+  "@setupFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "resetEncryptionTitle": "重置加密",
+  "resetEncryptionWarning": "警告：这将删除您所有的加密密钥。您将无法解密之前的加密消息。此操作不可撤销。",
+  "reset": "重置",
+
+  "leaveMeeting": "离开会议",
+  "leaveMeetingConfirm": "确定要离开会议吗？",
+  "leave": "离开",
+
+  "justNow": "刚刚",
+  "pokedSomeone": "拍了拍「{name}」{suffix}",
+  "@pokedSomeone": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "suffix": {"type": "String"}
+    }
+  },
+  "noContactsToAdd": "没有可添加的联系人",
+  "addMembers": "添加成员",
+  "invitedMembers": "已邀请 {count} 位成员",
+  "@invitedMembers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "inviteFailed": "邀请失败: {error}",
+  "@inviteFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "memberRemoved": "已移除成员",
+  "removeFailed": "移除失败: {error}",
+  "@removeFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "shareRealTimeLocation": "共享实时位置",
+  "realTimeLocationShareMessage": "开始共享后，对方将能看到你的实时位置，共享时长为1小时。",
+  "startSharing": "开始共享",
+  "locationServiceNotEnabled": "位置服务未开启",
+  "enableLocationService": "请开启位置服务以使用位置功能",
+  "goToSettings": "去设置",
+  "locationPermissionRequired": "需要位置权限才能使用此功能",
+  "locationPermissionDeniedPermanent": "位置权限已被永久拒绝，请在设置中开启",
+  "locationPermissionDenied": "位置权限被拒绝",
+  "gettingLocation": "正在获取位置...",
+  "getLocationFailed": "获取位置失败: {error}",
+  "@getLocationFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "locationSent": "位置已发送",
+  "currentLocation": "当前位置",
+  "nearbyPlace": "附近地点 {index}",
+  "@nearbyPlace": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "approximateDistance": "约 {distance}",
+  "@approximateDistance": {
+    "placeholders": {
+      "distance": {"type": "String"}
+    }
+  },
+  "mapPreview": "地图预览",
+  "searchLocation": "搜索地点",
+  "redPacketSent": "已发送 {amount} {token} 红包",
+  "@redPacketSent": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "token": {"type": "String"}
+    }
+  },
+  "transferDefault": "转账",
+  "transferSent": "已发送 {amount} {token} 转账",
+  "@transferSent": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "token": {"type": "String"}
+    }
+  },
+  "pickFileFailed": "选择文件失败: {error}",
+  "@pickFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "fileSizeLimit": "文件大小不能超过 50MB",
+  "fileSending": "文件发送中: {filename}",
+  "@fileSending": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "sendFileFailed": "发送文件失败: {error}",
+  "@sendFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "contactCardSent": "已发送 {name} 的名片",
+  "@contactCardSent": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "favoritesFeature": "收藏",
+  "couponsFeature": "卡券",
+  "giftFeature": "礼物",
+  "sharedMusic": "已分享 {name}",
+  "@sharedMusic": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "fileNotExist": "文件不存在",
+  "sendFailed": "发送失败: {error}",
+  "@sendFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "endPollTitle": "结束投票",
+  "endPollConfirmMessage": "确定要结束这个投票吗？结束后将无法继续投票。",
+  "confirm": "确定",
+  "pollEndedMessage": "投票已结束",
+  "voteRemoved": "已取消投票",
+  "voteChanged": "投票已更改",
+  "voted": "已投票",
+  "calling": "呼叫中...",
+  "connectingCall": "正在连接...",
+  "ringing": "响铃中...",
+  "inCall": "通话中",
+  "unmute": "取消静音",
+  "muteCall": "静音",
+  "speakerOff": "关闭免提",
+  "speakerOn": "免提",
+  "cameraOn": "开启摄像头",
+  "cameraOff": "关闭摄像头",
+  "hangUp": "挂断",
+  "selectForwardTargetTitle": "选择转发对象",
+  "searchHint": "搜索",
+  "noForwardableChat": "没有可转发的会话",
+  "noMatchingChat": "没有找到相关会话",
+  "imagePreview": "[图片]",
+  "voicePreview": "[语音]",
+  "videoPreview": "[视频]",
+  "filePreviewWithName": "[文件] {filename}",
+  "@filePreviewWithName": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "locationPreviewWithAddress": "[位置] {address}",
+  "@locationPreviewWithAddress": {
+    "placeholders": {
+      "address": {"type": "String"}
+    }
+  },
+  "musicPreviewWithTitle": "[音乐] {title}",
+  "@musicPreviewWithTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "messagePreview": "[消息]",
+  "locationTitle": "位置",
+  "sendButton": "发送",
+  "retryButton": "重试",
+  "selectContact": "选择联系人",
+  "searchContactHint": "搜索联系人",
+  "noContactsFound": "没有找到联系人",
+  "shareMusic": "分享音乐",
+  "recentPlayed": "最近播放",
+  "myFavorites": "我喜欢",
+  "networkLink": "网络链接",
+  "localFile": "本地文件",
+  "musicLinkRequired": "音乐链接 *",
+  "pasteMusicLink": "粘贴音乐链接",
+  "enterSongNamePlaceholder": "输入歌曲名称",
+  "enterArtistNamePlaceholder": "输入歌手名称",
+  "shareMusicButton": "分享音乐",
+  "selectLocalAudio": "选择本地音频文件",
+  "supportedAudioFormats": "支持 MP3、M4A、WAV、FLAC 等格式",
+  "selectFileButton": "选择文件",
+  "pleaseEnterMusicLink": "请输入音乐链接",
+  "pleaseEnterValidLink": "请输入有效的网络链接",
+  "sharedSong": "分享歌曲",
+  "selectMember": "选择成员",
+  "searchMemberHint": "搜索成员",
+  "noMembers": "没有成员",
+  "noMatchingMembers": "未找到匹配的成员",
+  "unknownMember": "未知",
+  "selectedMessagesCount": "已选择 {count} 条消息",
+  "@selectedMessagesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchContactsOrGroups": "搜索联系人或群聊",
+  "noMatchingConversations": "未找到匹配的会话",
+  "videoTitle": "视频",
+  "loadingText": "加载中...",
+  "videoPlaybackFailed": "视频播放失败",
+  "videoLoadFailed": "视频加载失败",
+  "playerInitFailed": "播放器初始化失败",
+  "createPollTitle": "创建投票",
+  "submitPoll": "发起",
+  "pollQuestionLabel": "投票问题",
+  "enterPollQuestionHint": "请输入投票问题",
+  "pollOptionsLabel": "投票选项",
+  "optionHintWithIndex": "选项 {index}",
+  "@optionHintWithIndex": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "addOptionButton": "添加选项",
+  "pollSettingsLabel": "投票设置",
+  "selectionType": "选择类型",
+  "singleChoiceLabel": "单选",
+  "multiChoiceLabel": "多选",
+  "anonymousPollSwitch": "匿名投票",
+  "pleaseEnterQuestion": "请输入投票问题",
+  "atLeastTwoOptions": "至少需要2个选项",
+  "confirmWithCount": "确定 ({count})",
+  "@confirmWithCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "selectMessages": "选择消息",
+  "selectedCount": "已选择 {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "selectAll": "全选",
+  "memberCount": "{count} 人",
+  "@memberCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "groupChatCount": "群聊({count})",
+  "@groupChatCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "privateChat": "私聊",
+  "loading": "加载中...",
+  "noMessages": "暂无消息",
+  "sendFirstMessage": "发送第一条消息开始聊天",
+  "encryptionNotice": "此聊天已启用端到端加密。只有您和对方可以阅读消息。",
+  "replyTo": "回复 {name}",
+  "@replyTo": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "invalidVideoUrl": "无效的视频链接",
+  "unknownFile": "未知文件",
+  "downloadFile": "下载文件",
+  "download": "下载",
+  "invalidLocation": "无效的位置",
+  "address": "地址",
+  "latitude": "纬度",
+  "longitude": "经度",
+  "close": "关闭",
+  "emailVerificationTitle": "邮箱验证",
+  "enterValidEmailAddress": "请输入有效的邮箱地址",
+  "verificationCodeSentTo": "验证码已发送到 {email}",
+  "@verificationCodeSentTo": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "sendCodeFailed": "发送验证码失败: {error}",
+  "@sendCodeFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "verificationSuccess": "验证成功",
+  "verificationFailed": "验证失败",
+  "verificationCodeError": "验证码错误: {error}",
+  "@verificationCodeError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterVerificationCode": "输入验证码",
+  "enterYourEmail": "输入邮箱",
+  "weSentCodeTo": "我们已向 {email} 发送了\n6位验证码",
+  "@weSentCodeTo": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "enterEmailForCode": "输入您的邮箱地址，我们将发送验证码",
+  "sendVerificationCode": "发送验证码",
+  "resendVerificationCode": "重新发送验证码",
+  "canResendAfter": "{seconds}秒后可重新发送",
+  "@canResendAfter": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "changeEmail": "更换邮箱",
+  "addToContacts": "添加到通讯录",
+  "addingToContacts": "添加中...",
+  "addedToContacts": "已添加到通讯录",
+  "addFailedWithError": "添加失败: {error}",
+  "@addFailedWithError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "addPhone": "添加电话",
+  "addTag": "添加标签",
+  "addText": "添加文字",
+  "addPhoto": "添加照片",
+  "groupCountLabel": "{count}个",
+  "@groupCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "addedViaSearch": "通过搜索添加",
+  "addTime": "添加时间",
+  "doneButton": "完成",
+  "waitingForParticipants": "等待参与者加入...",
+  "participantMe": "{name}（我）",
+  "@participantMe": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "sharingLabel": "共享中",
+  "screenSharingBy": "{name} 正在共享屏幕",
+  "@screenSharingBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "participantCount": "{count} 人",
+  "@participantCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "muteLabel": "静音",
+  "unmuteLabel": "解除静音",
+  "turnOffVideo": "关闭视频",
+  "turnOnVideo": "开启视频",
+  "shareScreen": "共享屏幕",
+  "stopSharing": "停止共享",
+  "switchCameraLabel": "切换",
+  "leaveLabel": "离开",
+  "participantsLabel": "参与者",
+  "joiningMeeting": "正在加入会议..."
 }

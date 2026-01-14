@@ -1667,6 +1667,15 @@ class SZh extends S {
   String get groupName => '群聊名称';
 
   @override
+  String get groupNameUpdated => '群名称已更新';
+
+  @override
+  String get updateFailed => '更新失败';
+
+  @override
+  String get noPermissionToModify => '您没有修改权限';
+
+  @override
   String get groupManagement => '群管理';
 
   @override
@@ -1923,6 +1932,12 @@ class SZh extends S {
 
   @override
   String get voted => '已投票';
+
+  @override
+  String get voteChanged => '已更改投票';
+
+  @override
+  String get voteRemoved => '已取消投票';
 
   @override
   String get endPoll => '结束投票';

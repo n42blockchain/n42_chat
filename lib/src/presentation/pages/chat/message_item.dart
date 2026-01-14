@@ -45,8 +45,8 @@ class MessageItem extends StatelessWidget {
   /// 表情回应点击回调
   final Function(String emoji)? onReactionTap;
   
-  /// 投票回调
-  final Function(String pollEventId, String optionId)? onPollVote;
+  /// 投票回调 (pollEventId, optionId, currentVotes, maxSelections)
+  final Function(String pollEventId, String optionId, List<String> currentVotes, int maxSelections)? onPollVote;
   
   /// 结束投票回调
   final Function(String pollEventId)? onEndPoll;
@@ -1071,15 +1071,18 @@ class MessageItem extends StatelessWidget {
             final voteCount = voteCounts[optionId] ?? 0;
             final percentage = totalVoters > 0 ? (voteCount / totalVoters * 100) : 0.0;
 
-            // 检查是否可以投票
+            // 检查是否可以投票或更改投票
             // 1. 投票已结束，不能投票
-            // 2. 已经投票过这个选项，不能重复投票
-            // 3. 已达到最大选择数量，不能选择其他选项
-            final hasReachedMaxSelections = myVotes.length >= maxSelections;
-            final canVote = !pollEnded && !isSelected && !hasReachedMaxSelections;
+            // 2. 单选时，可以点击其他选项更改投票
+            // 3. 多选时，可以取消已选项或选择新选项（未达最大值时）
+            final canChangeVote = !pollEnded && (
+              isSelected ||  // 可以取消已选的
+              myVotes.length < maxSelections ||  // 可以添加新选择
+              (maxSelections == 1 && myVotes.isNotEmpty)  // 单选可以更改
+            );
 
             return GestureDetector(
-              onTap: canVote ? () => onPollVote?.call(message.id, optionId) : null,
+              onTap: canChangeVote ? () => onPollVote?.call(message.id, optionId, myVotes, maxSelections) : null,
               child: Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(10),

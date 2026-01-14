@@ -25,6 +25,9 @@ class ChatDetailPage extends StatefulWidget {
   /// 是否可以踢人（群主/管理员）
   final bool canKickMembers;
 
+  /// 是否可以修改群设置（群名称等）
+  final bool canChangeSettings;
+
   /// 添加成员到群的回调
   final VoidCallback? onAddMember;
 
@@ -41,6 +44,7 @@ class ChatDetailPage extends StatefulWidget {
     super.key,
     required this.conversation,
     this.canKickMembers = false,
+    this.canChangeSettings = false,
     this.onAddMember,
     this.onRemoveMember,
     this.onMemberTap,
@@ -55,10 +59,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   bool _isPinned = false;
   bool _isMuted = false;
   bool _isStrongReminder = false;
-  
+
+  // 群名称（可编辑）
+  late String _groupName;
+
   // 备注更新订阅
   StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
-  
+
   // 缓存对方用户ID
   String? _cachedOtherUserId;
 
@@ -67,6 +74,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     super.initState();
     _isPinned = widget.conversation.isPinned;
     _isMuted = widget.conversation.isMuted;
+    _groupName = widget.conversation.name;
 
     // 使用 conversation.directUserId 初始化
     _cachedOtherUserId = widget.conversation.directUserId;
@@ -145,10 +153,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   /// 更新置顶状态
   Future<void> _updatePinnedStatus(bool pinned) async {
+    debugPrint('ChatDetailPage: _updatePinnedStatus called with pinned=$pinned, roomId=${widget.conversation.id}');
     try {
       final repository = getIt<IConversationRepository>();
       await repository.setPinned(widget.conversation.id, pinned);
-      debugPrint('ChatDetailPage: Pin status updated to $pinned');
+      debugPrint('ChatDetailPage: Pin status updated successfully to $pinned');
     } catch (e) {
       debugPrint('ChatDetailPage: Failed to update pin status: $e');
       // 恢复原状态
@@ -173,6 +182,89 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         setState(() {
           _isStrongReminder = !enabled;
         });
+      }
+    }
+  }
+
+  /// 显示编辑群名称对话框
+  Future<void> _showEditGroupNameDialog() async {
+    // 检查权限
+    if (!widget.canChangeSettings) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(S.of(context)?.noPermissionToModify ?? 'You do not have permission to modify'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    final controller = TextEditingController(text: _groupName);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        title: Text(
+          S.of(context)?.groupName ?? 'Group Name',
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 50,
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          decoration: InputDecoration(
+            hintText: S.of(context)?.enterGroupName ?? 'Enter group name',
+            hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+            counterStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: Text(S.of(context)?.save ?? 'Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (newName != null && newName.isNotEmpty && newName != _groupName) {
+      await _updateGroupName(newName);
+    }
+  }
+
+  /// 更新群名称
+  Future<void> _updateGroupName(String newName) async {
+    try {
+      final groupRepository = getIt<IGroupRepository>();
+      await groupRepository.setGroupName(widget.conversation.id, newName);
+
+      if (mounted) {
+        setState(() {
+          _groupName = newName;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.of(context)?.groupNameUpdated ?? 'Group name updated'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('ChatDetailPage: Failed to update group name: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.of(context)?.updateFailed ?? 'Update failed'),
+            backgroundColor: AppColors.error,
+          ),
+        );
       }
     }
   }
@@ -264,7 +356,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '${S.of(context)?.viewAllGroupMembers ?? "更多群成员"} ',
+                            '${S.of(context)?.viewAllGroupMembers ?? "View All Members"} ',
                             style: TextStyle(
                               fontSize: 13,
                               color: secondaryTextColor,
@@ -293,10 +385,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 if (isGroup) ...[
                   _buildMenuItem(
                     title: S.of(context)?.groupName ?? 'Group Name',
-                    value: widget.conversation.name,
+                    value: _groupName,
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
-                    onTap: () {},
+                    onTap: _showEditGroupNameDialog,
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
@@ -355,6 +447,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   value: _isPinned,
                   textColor: textColor,
                   onChanged: (value) {
+                    debugPrint('ChatDetailPage: Pin switch toggled to $value');
                     setState(() {
                       _isPinned = value;
                     });
@@ -599,7 +692,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('移除成员'),
+        title: Text(S.of(context)?.removeFromGroup ?? 'Remove from Group'),
         content: SizedBox(
           width: double.maxFinite,
           height: 300,
@@ -620,7 +713,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消'),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
         ],
       ),
@@ -694,16 +787,19 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                color: textColor,
+            Expanded(
+              flex: 2,
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: textColor,
+                ),
               ),
             ),
-            const Spacer(),
             if (value != null)
-              Flexible(
+              Expanded(
+                flex: 3,
                 child: Text(
                   value,
                   style: TextStyle(
@@ -711,6 +807,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     color: secondaryTextColor,
                   ),
                   overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
                 ),
               ),
             const SizedBox(width: 4),
@@ -731,24 +828,37 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     required Color textColor,
     required ValueChanged<bool> onChanged,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              color: textColor,
-            ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          debugPrint('ChatDetailPage: Switch row tapped for $title, current value: $value');
+          onChanged(!value);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: textColor,
+                  ),
+                ),
+              ),
+              Switch.adaptive(
+                value: value,
+                onChanged: (newValue) {
+                  debugPrint('ChatDetailPage: Switch widget toggled for $title to $newValue');
+                  onChanged(newValue);
+                },
+                activeColor: AppColors.primary,
+              ),
+            ],
           ),
-          const Spacer(),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: AppColors.primary,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -932,7 +1042,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          '群成员 (${_members.length})',
+          S.of(context)?.groupMembers(_members.length) ?? 'Members (${_members.length})',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
@@ -952,7 +1062,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
               onChanged: _filterMembers,
               style: TextStyle(color: textColor),
               decoration: InputDecoration(
-                hintText: '搜索成员',
+                hintText: S.of(context)?.searchMemberHint ?? 'Search members',
                 hintStyle: TextStyle(color: secondaryTextColor),
                 prefixIcon: Icon(Icons.search, color: secondaryTextColor),
                 filled: true,
@@ -972,7 +1082,9 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                 : _filteredMembers.isEmpty
                     ? Center(
                         child: Text(
-                          _searchQuery.isEmpty ? '没有成员' : '未找到匹配的成员',
+                          _searchQuery.isEmpty
+                              ? (S.of(context)?.noMembers ?? 'No members')
+                              : (S.of(context)?.noMatchingMembers ?? 'No matching members found'),
                           style: TextStyle(color: secondaryTextColor),
                         ),
                       )
@@ -980,7 +1092,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                         itemCount: _filteredMembers.length,
                         itemBuilder: (context, index) {
                           final member = _filteredMembers[index];
-                          final name = member['name'] as String? ?? '未知';
+                          final name = member['name'] as String? ?? (S.of(context)?.unknownMember ?? 'Unknown');
                           final id = member['id'] as String? ?? '';
                           final avatarUrl = member['avatarUrl'] as String?;
                           final role = member['role'] as String?;
@@ -1012,9 +1124,9 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                       color: Colors.orange.withOpacity(0.2),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
-                                    child: const Text(
-                                      '群主',
-                                      style: TextStyle(fontSize: 10, color: Colors.orange),
+                                    child: Text(
+                                      S.of(context)?.groupOwner ?? 'Owner',
+                                      style: const TextStyle(fontSize: 10, color: Colors.orange),
                                     ),
                                   ),
                                 ] else if (role == 'admin') ...[
@@ -1025,9 +1137,9 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                       color: Colors.blue.withOpacity(0.2),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
-                                    child: const Text(
-                                      '管理员',
-                                      style: TextStyle(fontSize: 10, color: Colors.blue),
+                                    child: Text(
+                                      S.of(context)?.groupAdmin ?? 'Admin',
+                                      style: const TextStyle(fontSize: 10, color: Colors.blue),
                                     ),
                                   ),
                                 ],

@@ -108,7 +108,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: S.of(context)?.recommendToFriend ?? 'Recommend to Friend',
+                  title: S.of(context)?.recommendToFriend ?? 'Share contact',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/message_entity.dart';
@@ -318,34 +319,81 @@ class MessageRepositoryImpl implements IMessageRepository {
         return null;
       }
 
-      // 使用 Matrix 1.11+ 认证媒体端点
       final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      final accessToken = _client!.accessToken;
+
+      // 方法1: 使用 Matrix 1.11+ 认证媒体端点 (直接 HTTP 请求)
       final authenticatedUrl = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
-      debugPrint('downloadMedia: Using authenticated URL: $authenticatedUrl');
+      debugPrint('downloadMedia: Trying authenticated URL: $authenticatedUrl');
 
-      // 使用 Matrix 客户端的 httpClient（自动包含认证信息）
-      final response = await _client!.httpClient.get(Uri.parse(authenticatedUrl));
-      debugPrint('downloadMedia: Response status: ${response?.statusCode}');
-      debugPrint('downloadMedia: Response body size: ${response?.bodyBytes.length ?? 0}');
+      try {
+        final response = await http.get(
+          Uri.parse(authenticatedUrl),
+          headers: {
+            if (accessToken != null) 'Authorization': 'Bearer $accessToken',
+          },
+        ).timeout(const Duration(seconds: 30));
 
-      if (response != null && response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
-        return response.bodyBytes;
+        debugPrint('downloadMedia: Auth endpoint response: ${response.statusCode}, size: ${response.bodyBytes.length}');
+
+        if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
+          return response.bodyBytes;
+        }
+      } catch (e) {
+        debugPrint('downloadMedia: Auth endpoint error: $e');
       }
 
-      // 如果认证端点失败，尝试旧的 SDK 方法作为后备
-      debugPrint('downloadMedia: Authenticated endpoint failed, trying SDK fallback');
-      final downloadLink = uri.getDownloadLink(_client!);
-      debugPrint('downloadMedia: SDK download link: $downloadLink');
+      // 方法2: 使用传统媒体端点 v3
+      final legacyUrl = '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
+      debugPrint('downloadMedia: Trying legacy v3 URL: $legacyUrl');
 
-      final fallbackResponse = await _client!.httpClient.get(downloadLink);
-      debugPrint('downloadMedia: Fallback response status: ${fallbackResponse?.statusCode}');
-      debugPrint('downloadMedia: Fallback response body size: ${fallbackResponse?.bodyBytes.length ?? 0}');
+      try {
+        final response = await http.get(
+          Uri.parse(legacyUrl),
+          headers: {
+            if (accessToken != null) 'Authorization': 'Bearer $accessToken',
+          },
+        ).timeout(const Duration(seconds: 30));
 
-      if (fallbackResponse != null && fallbackResponse.statusCode == 200 && fallbackResponse.bodyBytes.isNotEmpty) {
-        return fallbackResponse.bodyBytes;
+        debugPrint('downloadMedia: Legacy v3 response: ${response.statusCode}, size: ${response.bodyBytes.length}');
+
+        if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
+          return response.bodyBytes;
+        }
+      } catch (e) {
+        debugPrint('downloadMedia: Legacy v3 error: $e');
       }
 
-      debugPrint('downloadMedia: Both methods failed');
+      // 方法3: 使用 SDK 的 getDownloadLink (无认证，适用于公开媒体)
+      debugPrint('downloadMedia: Trying SDK getDownloadLink');
+      try {
+        final downloadLink = uri.getDownloadLink(_client!);
+        debugPrint('downloadMedia: SDK download link: $downloadLink');
+
+        final response = await http.get(downloadLink).timeout(const Duration(seconds: 30));
+        debugPrint('downloadMedia: SDK link response: ${response.statusCode}, size: ${response.bodyBytes.length}');
+
+        if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
+          return response.bodyBytes;
+        }
+      } catch (e) {
+        debugPrint('downloadMedia: SDK link error: $e');
+      }
+
+      // 方法4: 使用 Matrix SDK httpClient (带自动认证)
+      debugPrint('downloadMedia: Trying Matrix SDK httpClient');
+      try {
+        final sdkResponse = await _client!.httpClient.get(Uri.parse(authenticatedUrl));
+        debugPrint('downloadMedia: SDK httpClient response: ${sdkResponse?.statusCode}, size: ${sdkResponse?.bodyBytes.length ?? 0}');
+
+        if (sdkResponse != null && sdkResponse.statusCode == 200 && sdkResponse.bodyBytes.isNotEmpty) {
+          return sdkResponse.bodyBytes;
+        }
+      } catch (e) {
+        debugPrint('downloadMedia: SDK httpClient error: $e');
+      }
+
+      debugPrint('downloadMedia: All methods failed');
       return null;
     } catch (e, stackTrace) {
       debugPrint('downloadMedia: Error downloading media: $e');
@@ -353,7 +401,67 @@ class MessageRepositoryImpl implements IMessageRepository {
       return null;
     }
   }
-  
+
+  @override
+  Future<MessageEntity?> forwardMediaMessage(
+    String roomId, {
+    required String mxcUrl,
+    required String msgType,
+    required String filename,
+    String? mimeType,
+    int? width,
+    int? height,
+    int? size,
+    int? duration,
+    String? thumbnailUrl,
+  }) async {
+    try {
+      debugPrint('forwardMediaMessage: roomId=$roomId, mxcUrl=$mxcUrl, msgType=$msgType');
+
+      final room = _client?.getRoomById(roomId);
+      if (room == null) {
+        debugPrint('forwardMediaMessage: Room not found');
+        return null;
+      }
+
+      // 构建媒体消息内容
+      final content = <String, dynamic>{
+        'msgtype': msgType,
+        'body': filename,
+        'url': mxcUrl,
+      };
+
+      // 添加 info 字段
+      final info = <String, dynamic>{};
+      if (mimeType != null) info['mimetype'] = mimeType;
+      if (width != null) info['w'] = width;
+      if (height != null) info['h'] = height;
+      if (size != null) info['size'] = size;
+      if (duration != null) info['duration'] = duration;
+      if (thumbnailUrl != null) info['thumbnail_url'] = thumbnailUrl;
+
+      if (info.isNotEmpty) {
+        content['info'] = info;
+      }
+
+      // 对于文件类型，添加 filename
+      if (msgType == 'm.file') {
+        content['filename'] = filename;
+      }
+
+      debugPrint('forwardMediaMessage: Sending content: $content');
+      final eventId = await room.sendEvent(content);
+      debugPrint('forwardMediaMessage: Event sent: $eventId');
+
+      if (eventId == null) return null;
+      return _getMessageById(roomId, eventId);
+    } catch (e, stackTrace) {
+      debugPrint('forwardMediaMessage: Error: $e');
+      debugPrint('forwardMediaMessage: Stack trace: $stackTrace');
+      return null;
+    }
+  }
+
   @override
   Future<MessageEntity?> sendNoticeMessage({
     required String roomId,

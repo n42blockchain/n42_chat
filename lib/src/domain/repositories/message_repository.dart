@@ -122,7 +122,21 @@ abstract class IMessageRepository {
 
   /// 下载媒体文件
   Future<Uint8List?> downloadMedia(String mxcUrl);
-  
+
+  /// 转发媒体消息（使用现有的 mxc URL，不需要重新上传）
+  Future<MessageEntity?> forwardMediaMessage(
+    String roomId, {
+    required String mxcUrl,
+    required String msgType,
+    required String filename,
+    String? mimeType,
+    int? width,
+    int? height,
+    int? size,
+    int? duration,
+    String? thumbnailUrl,
+  });
+
   /// 获取当前用户ID
   Future<String?> getCurrentUserId();
   

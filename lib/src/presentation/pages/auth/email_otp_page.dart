@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pinput/pinput.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/auth/auth_methods_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
@@ -69,8 +70,8 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
     final email = _emailController.text.trim();
     if (email.isEmpty || !_isValidEmail(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('请输入有效的邮箱地址'),
+        SnackBar(
+          content: Text(S.of(context)?.enterValidEmailAddress ?? 'Please enter a valid email address'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -97,7 +98,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('验证码已发送到 $email'),
+            content: Text(S.of(context)?.verificationCodeSentTo(email) ?? 'Verification code sent to $email'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -109,7 +110,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('发送验证码失败: $e'),
+            content: Text(S.of(context)?.sendCodeFailed(e.toString()) ?? 'Failed to send code: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -135,8 +136,8 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         // 验证成功，进行登录
         // 这里需要根据服务端返回的 session 进行实际登录
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('验证成功'),
+          SnackBar(
+            content: Text(S.of(context)?.verificationSuccess ?? 'Verification successful'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -144,7 +145,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         // 返回登录页面或直接登录
         Navigator.of(context).pop(result);
       } else {
-        throw Exception('验证失败');
+        throw Exception(S.of(context)?.verificationFailed ?? 'Verification failed');
       }
     } catch (e) {
       if (mounted) {
@@ -154,7 +155,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         _otpController.clear();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('验证码错误: $e'),
+            content: Text(S.of(context)?.verificationCodeError(e.toString()) ?? 'Verification code error: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -182,7 +183,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          '邮箱验证',
+          S.of(context)?.emailVerificationTitle ?? 'Email Verification',
           style: TextStyle(
             color: textColor,
             fontSize: 17,
@@ -254,7 +255,9 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
     return Column(
       children: [
         Text(
-          _isEmailSent ? '输入验证码' : '输入邮箱',
+          _isEmailSent
+              ? (S.of(context)?.enterVerificationCode ?? 'Enter verification code')
+              : (S.of(context)?.enterYourEmail ?? 'Enter email'),
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w600,
@@ -265,8 +268,8 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         const SizedBox(height: 8),
         Text(
           _isEmailSent
-              ? '我们已向 ${_emailController.text} 发送了\n6位验证码'
-              : '输入您的邮箱地址，我们将发送验证码',
+              ? (S.of(context)?.weSentCodeTo(_emailController.text) ?? 'We sent a 6-digit code to\n${_emailController.text}')
+              : (S.of(context)?.enterEmailForCode ?? 'Enter your email address, we will send verification code'),
           style: TextStyle(
             fontSize: 14,
             color: textColor,
@@ -377,9 +380,9 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : const Text(
-                '发送验证码',
-                style: TextStyle(
+            : Text(
+                S.of(context)?.sendVerificationCode ?? 'Send verification code',
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -409,8 +412,8 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
             onPressed: canResend ? _sendOtp : null,
             child: Text(
               canResend
-                  ? '重新发送验证码'
-                  : '${_resendCountdown}秒后可重新发送',
+                  ? (S.of(context)?.resendVerificationCode ?? 'Resend verification code')
+                  : (S.of(context)?.canResendAfter(_resendCountdown) ?? 'Can resend after $_resendCountdown seconds'),
               style: TextStyle(
                 fontSize: 14,
                 color: canResend
@@ -431,9 +434,9 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
           _otpController.clear();
         });
       },
-      child: const Text(
-        '更换邮箱',
-        style: TextStyle(
+      child: Text(
+        S.of(context)?.changeEmail ?? 'Change email',
+        style: const TextStyle(
           fontSize: 14,
           color: AppColors.textLink,
         ),

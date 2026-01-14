@@ -92,10 +92,10 @@ class ChatInputBar extends StatefulWidget {
   });
 
   @override
-  State<ChatInputBar> createState() => _ChatInputBarState();
+  State<ChatInputBar> createState() => ChatInputBarState();
 }
 
-class _ChatInputBarState extends State<ChatInputBar> {
+class ChatInputBarState extends State<ChatInputBar> {
   late TextEditingController _controller;
   late FocusNode _focusNode;
   bool _isVoiceMode = false;
@@ -268,6 +268,21 @@ class _ChatInputBarState extends State<ChatInputBar> {
     });
     // 通知父组件录音结束
     widget.onRecordingStateChanged?.call(false, false, Duration.zero);
+  }
+
+  /// 公共方法：从外部取消录音
+  ///
+  /// 当用户点击外部的取消按钮时调用此方法
+  Future<void> cancelRecording() async {
+    if (!_isRecording) return;
+
+    try {
+      await _voiceService.cancelRecording();
+    } catch (e) {
+      debugPrint('Cancel recording error: $e');
+    } finally {
+      _forceResetRecordingState();
+    }
   }
 
   void _updateCancelState(Offset localPosition, Size size) {

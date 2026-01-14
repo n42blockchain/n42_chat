@@ -3127,6 +3127,24 @@ abstract class S {
   /// **'群聊名称'**
   String get groupName;
 
+  /// No description provided for @groupNameUpdated.
+  ///
+  /// In zh, this message translates to:
+  /// **'群名称已更新'**
+  String get groupNameUpdated;
+
+  /// No description provided for @updateFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'更新失败'**
+  String get updateFailed;
+
+  /// No description provided for @noPermissionToModify.
+  ///
+  /// In zh, this message translates to:
+  /// **'您没有修改权限'**
+  String get noPermissionToModify;
+
   /// No description provided for @groupManagement.
   ///
   /// In zh, this message translates to:
@@ -3570,6 +3588,18 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'已投票'**
   String get voted;
+
+  /// No description provided for @voteChanged.
+  ///
+  /// In zh, this message translates to:
+  /// **'已更改投票'**
+  String get voteChanged;
+
+  /// No description provided for @voteRemoved.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消投票'**
+  String get voteRemoved;
 
   /// No description provided for @endPoll.
   ///

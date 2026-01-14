@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
@@ -173,7 +174,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'N42号：$_n42Id',
+                            S.of(context)?.n42Id(_n42Id) ?? 'N42 ID: $_n42Id',
                             style: TextStyle(
                               fontSize: 14,
                               color: secondaryTextColor,
@@ -202,8 +203,8 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                 dividerColor: dividerColor,
                 children: [
                   _buildMenuItem(
-                    title: '朋友资料',
-                    subtitle: '添加朋友的备注名、电话、标签、备忘、照片等，并设置朋友权限。',
+                    title: S.of(context)?.friendInfo ?? 'Friend Info',
+                    subtitle: S.of(context)?.friendInfoDesc ?? 'Add friend\'s remark, phone, tags, notes, photos and set permissions.',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
                     onTap: () => _openFriendInfo(),
@@ -219,7 +220,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                 dividerColor: dividerColor,
                 children: [
                   _buildMenuItem(
-                    title: '朋友圈',
+                    title: S.of(context)?.moments ?? 'Moments',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
                     onTap: () {},
@@ -245,7 +246,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                 // 好友：显示发消息和音视频通话按钮
                 _buildActionButton(
                   icon: Icons.chat_bubble_outline,
-                  label: '发消息',
+                  label: S.of(context)?.sendMessage ?? 'Message',
                   onTap: widget.onSendMessage ?? () => Navigator.of(context).pop(),
                 ),
 
@@ -253,7 +254,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
 
                 _buildActionButton(
                   icon: Icons.phone_outlined,
-                  label: '音视频通话',
+                  label: S.of(context)?.audioVideoCall ?? 'Audio/Video Call',
                   onTap: widget.onVideoCall ?? () {},
                 ),
               ] else ...[
@@ -361,7 +362,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
           Row(
             children: [
               Text(
-                '视频号',
+                S.of(context)?.videoChannel ?? 'Video Channel',
                 style: TextStyle(
                   fontSize: 16,
                   color: textColor,
@@ -493,7 +494,9 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               const Icon(Icons.person_add, size: 20),
             const SizedBox(width: 8),
             Text(
-              _isAddingFriend ? '添加中...' : '添加到通讯录',
+              _isAddingFriend
+                  ? (S.of(context)?.addingToContacts ?? 'Adding...')
+                  : (S.of(context)?.addToContacts ?? 'Add to Contacts'),
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -524,13 +527,13 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('已添加到通讯录')),
+          SnackBar(content: Text(S.of(context)?.addedToContacts ?? 'Added to contacts')),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('添加失败: $e')),
+          SnackBar(content: Text(S.of(context)?.addFailedWithError(e.toString()) ?? 'Add failed: $e')),
         );
       }
     } finally {
@@ -698,7 +701,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          '朋友资料',
+          S.of(context)?.friendInfo ?? 'Friend Info',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
@@ -712,13 +715,13 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 备注分组
-            _buildSectionLabel('备注', labelColor),
+            _buildSectionLabel(S.of(context)?.remark ?? 'Remark', labelColor),
             _buildMenuSection(
               cardColor: cardColor,
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: '备注名',
+                  title: S.of(context)?.remarkName ?? 'Remark Name',
                   value: _currentRemark ?? widget.displayName,
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
@@ -726,60 +729,60 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: '电话',
+                  title: S.of(context)?.phone ?? 'Phone',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: '标签',
+                  title: S.of(context)?.tags ?? 'Tags',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: '备忘',
+                  title: S.of(context)?.notes ?? 'Notes',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: '照片',
+                  title: S.of(context)?.photos ?? 'Photos',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
                 ),
               ],
             ),
-            
+
             // 权限分组
-            _buildSectionLabel('权限', labelColor),
+            _buildSectionLabel(S.of(context)?.permissions ?? 'Permissions', labelColor),
             _buildMenuSection(
               cardColor: cardColor,
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: '权限',
-                  value: '聊天、朋友圈、运动等',
+                  title: S.of(context)?.permissions ?? 'Permissions',
+                  value: S.of(context)?.chatMomentsEtc ?? 'Chat, Moments, Sports, etc.',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
                 ),
               ],
             ),
-            
+
             // 更多信息分组
-            _buildSectionLabel('更多信息', labelColor),
+            _buildSectionLabel(S.of(context)?.moreInfo ?? 'More Info', labelColor),
             _buildMenuSection(
               cardColor: cardColor,
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: '我和他 (她) 的共同群聊',
-                  value: '0个',
+                  title: S.of(context)?.commonGroups ?? 'Groups in common',
+                  value: S.of(context)?.groupCountLabel(0) ?? '0 groups',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -787,8 +790,8 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: '来源',
-                  value: '通过搜索添加',
+                  title: S.of(context)?.source ?? 'Source',
+                  value: S.of(context)?.addedViaSearch ?? 'Added via search',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -796,8 +799,8 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: '添加时间',
-                  value: '未知',
+                  title: S.of(context)?.addTime ?? 'Add time',
+                  value: S.of(context)?.unknownMember ?? 'Unknown',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -1049,7 +1052,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
             child: Padding(
               padding: const EdgeInsets.only(left: 16),
               child: Text(
-                '取消',
+                S.of(context)?.cancel ?? 'Cancel',
                 style: TextStyle(
                   fontSize: 16,
                   color: textColor,
@@ -1059,7 +1062,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
           ),
         ),
         title: Text(
-          '编辑备注',
+          S.of(context)?.editRemark ?? 'Edit Remark',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
@@ -1078,9 +1081,9 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text(
-                  '完成',
-                  style: TextStyle(
+                child: Text(
+                  S.of(context)?.doneButton ?? 'Done',
+                  style: const TextStyle(
                     fontSize: 15,
                     color: Colors.white,
                   ),
@@ -1099,7 +1102,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
             
             // 备注名
             Text(
-              '备注名',
+              S.of(context)?.remarkName ?? 'Remark Name',
               style: TextStyle(
                 fontSize: 13,
                 color: labelColor,
@@ -1133,7 +1136,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
             
             // 电话
             Text(
-              '电话',
+              S.of(context)?.phone ?? 'Phone',
               style: TextStyle(
                 fontSize: 13,
                 color: labelColor,
@@ -1162,7 +1165,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '添加电话',
+                        S.of(context)?.addPhone ?? 'Add phone',
                         style: TextStyle(
                           fontSize: 16,
                           color: hintColor,
@@ -1178,7 +1181,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
             
             // 标签
             Text(
-              '标签',
+              S.of(context)?.tags ?? 'Tags',
               style: TextStyle(
                 fontSize: 13,
                 color: labelColor,
@@ -1201,7 +1204,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                   child: Row(
                     children: [
                       Text(
-                        '添加标签',
+                        S.of(context)?.addTag ?? 'Add tags',
                         style: TextStyle(
                           fontSize: 16,
                           color: hintColor,
@@ -1223,7 +1226,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
             
             // 备忘
             Text(
-              '备忘',
+              S.of(context)?.notes ?? 'Notes',
               style: TextStyle(
                 fontSize: 13,
                 color: labelColor,
@@ -1242,7 +1245,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                   color: textColor,
                 ),
                 decoration: InputDecoration(
-                  hintText: '添加文字',
+                  hintText: S.of(context)?.addText ?? 'Add text',
                   hintStyle: TextStyle(color: hintColor),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
@@ -1257,7 +1260,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
             
             // 照片
             Text(
-              '照片',
+              S.of(context)?.photos ?? 'Photos',
               style: TextStyle(
                 fontSize: 13,
                 color: labelColor,
@@ -1284,7 +1287,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '添加照片',
+                      S.of(context)?.addPhoto ?? 'Add photo',
                       style: TextStyle(
                         fontSize: 12,
                         color: hintColor,

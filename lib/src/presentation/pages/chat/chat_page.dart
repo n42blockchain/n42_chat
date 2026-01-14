@@ -91,6 +91,9 @@ class _ChatPageState extends State<ChatPage> {
   
   // 消息 GlobalKey 映射，用于获取消息气泡位置
   final Map<String, GlobalKey> _messageKeys = {};
+
+  // ChatInputBar 的 GlobalKey，用于调用取消录音方法
+  final GlobalKey<ChatInputBarState> _inputBarKey = GlobalKey<ChatInputBarState>();
   
   // 撤回的消息ID，用于显示"重新编辑"
   final Set<String> _recalledMessageIds = {};
@@ -453,7 +456,7 @@ class _ChatPageState extends State<ChatPage> {
   String _formatTime(DateTime time) {
     final now = DateTime.now();
     if (now.difference(time).inMinutes < 1) {
-      return '刚刚';
+      return S.of(context)?.justNow ?? 'Just now';
     } else if (now.day == time.day) {
       return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
     } else {
@@ -718,17 +721,17 @@ class _ChatPageState extends State<ChatPage> {
   /// 双击头像拍一拍
   void _onAvatarDoubleTap(MessageEntity message) async {
     try {
-      String myDisplayName = '我';
+      String myDisplayName = S.of(context)?.me ?? 'Me';
       String? myPokeText;
       String? myUserId;
-      
+
       // 直接从仓库获取用户资料（更可靠，不依赖 AuthBloc Provider）
       try {
         final authRepository = getIt<IAuthRepository>();
-        
+
         // 获取当前用户基本信息
         final currentUser = authRepository.currentUser;
-        myDisplayName = currentUser?.displayName ?? '我';
+        myDisplayName = currentUser?.displayName ?? (S.of(context)?.me ?? 'Me');
         myUserId = currentUser?.userId;
         
         debugPrint('Poke: currentUser.displayName=$myDisplayName, userId=$myUserId');
@@ -794,9 +797,8 @@ class _ChatPageState extends State<ChatPage> {
     final targetDisplayName = RemarkService.instance.getDisplayName(message.senderId, message.senderName);
     debugPrint('ShowPokeAnimation: targetName=$targetDisplayName, myPokeText=$myPokeText');
     
-    final displayText = myPokeText != null && myPokeText.isNotEmpty
-        ? '拍了拍「$targetDisplayName」$myPokeText'
-        : '拍了拍「$targetDisplayName」';
+    final displayText = S.of(context)?.pokedSomeone(targetDisplayName, myPokeText ?? '')
+        ?? 'poked $targetDisplayName${myPokeText ?? ''}';
     
     debugPrint('ShowPokeAnimation: displayText=$displayText');
     
@@ -833,13 +835,16 @@ class _ChatPageState extends State<ChatPage> {
       // ContactBloc 可能不可用
     }
 
-    // 检查是否可以踢人（群主/管理员）
+    // 检查是否可以踢人和修改群设置（群主/管理员）
     bool canKickMembers = false;
+    bool canChangeSettings = false;
     if (widget.conversation.isGroup) {
       try {
         final groupRepository = getIt<IGroupRepository>();
         final group = await groupRepository.getGroup(widget.conversation.id);
         canKickMembers = group?.canKick ?? false;
+        canChangeSettings = group?.canChangeSettings ?? false;
+        debugPrint('ChatPage: Group permissions - canKick=$canKickMembers, canChangeSettings=$canChangeSettings');
       } catch (e) {
         debugPrint('Failed to get group info: $e');
       }
@@ -853,6 +858,7 @@ class _ChatPageState extends State<ChatPage> {
           final page = ChatDetailPage(
             conversation: widget.conversation,
             canKickMembers: canKickMembers,
+            canChangeSettings: canChangeSettings,
             onAddMember: () => _showAddMemberDialog(ctx),
             onRemoveMember: (userId) => _removeMemberFromGroup(userId),
             onMemberTap: (userId, displayName, avatarUrl) {
@@ -890,7 +896,7 @@ class _ChatPageState extends State<ChatPage> {
 
     if (contacts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('没有可添加的联系人')),
+        SnackBar(content: Text(S.of(context)?.noContactsToAdd ?? 'No contacts available to add')),
       );
       return;
     }
@@ -900,7 +906,7 @@ class _ChatPageState extends State<ChatPage> {
       context: context,
       builder: (dialogCtx) => _ContactSelectDialog(
         contacts: contacts,
-        title: '添加成员',
+        title: S.of(context)?.addMembers ?? 'Add Members',
       ),
     );
 
@@ -910,13 +916,13 @@ class _ChatPageState extends State<ChatPage> {
         await groupRepository.inviteUsers(widget.conversation.id, selectedIds);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('已邀请 ${selectedIds.length} 位成员')),
+            SnackBar(content: Text(S.of(context)?.invitedMembers(selectedIds.length) ?? 'Invited ${selectedIds.length} members')),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('邀请失败: $e')),
+            SnackBar(content: Text(S.of(context)?.inviteFailed(e.toString()) ?? 'Invite failed: $e')),
           );
         }
       }
@@ -930,13 +936,13 @@ class _ChatPageState extends State<ChatPage> {
       await groupRepository.kickMember(widget.conversation.id, userId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('已移除成员')),
+          SnackBar(content: Text(S.of(context)?.memberRemoved ?? 'Member removed')),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('移除失败: $e')),
+          SnackBar(content: Text(S.of(context)?.removeFailed(e.toString()) ?? 'Remove failed: $e')),
         );
       }
     }
@@ -1085,7 +1091,7 @@ class _ChatPageState extends State<ChatPage> {
       child: GestureDetector(
         // 点击空白区域可以取消录音（作为紧急退出方式）
         onTap: () {
-          _onRecordingStateChanged(false, true, _recordingDuration);
+          _inputBarKey.currentState?.cancelRecording();
         },
         child: Container(
           color: Colors.black.withOpacity(0.7),
@@ -1153,7 +1159,7 @@ class _ChatPageState extends State<ChatPage> {
                 // 取消按钮（紧急退出）
                 TextButton.icon(
                   onPressed: () {
-                    _onRecordingStateChanged(false, true, _recordingDuration);
+                    _inputBarKey.currentState?.cancelRecording();
                   },
                   icon: const Icon(Icons.close, color: Colors.white70),
                   label: Text(
@@ -1778,40 +1784,40 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> _shareRealTimeLocation() async {
     // 检查位置服务和权限
     if (!await _checkLocationPermission()) return;
-    
+
     // 显示共享确认对话框
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('共享实时位置'),
-        content: const Text(
-          '开始共享后，对方将能看到你的实时位置，共享时长为1小时。',
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.shareRealTimeLocation ?? 'Share Real-time Location'),
+        content: Text(
+          S.of(context)?.realTimeLocationShareMessage ?? 'After sharing, the other party can see your real-time location for 1 hour.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('开始共享'),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(S.of(context)?.startSharing ?? 'Start Sharing'),
           ),
         ],
       ),
     );
-    
+
     if (confirmed == true && mounted) {
       // TODO: 实现实时位置共享功能
       // 需要建立 WebSocket 连接，持续发送位置更新
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('实时位置共享功能开发中...'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(S.of(context)?.realTimeLocationSharing ?? 'Real-time location sharing in development...'),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
   }
-  
+
   /// 检查位置权限
   Future<bool> _checkLocationPermission() async {
     try {
@@ -1821,17 +1827,17 @@ class _ChatPageState extends State<ChatPage> {
         if (mounted) {
           final shouldOpen = await showDialog<bool>(
             context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('位置服务未开启'),
-              content: const Text('请开启位置服务以使用位置功能'),
+            builder: (ctx) => AlertDialog(
+              title: Text(S.of(context)?.locationServiceNotEnabled ?? 'Location service is not enabled'),
+              content: Text(S.of(context)?.enableLocationService ?? 'Please enable location service to use this feature'),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('取消'),
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(S.of(context)?.cancel ?? 'Cancel'),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('去设置'),
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(S.of(context)?.goToSettings ?? 'Go to Settings'),
                 ),
               ],
             ),
@@ -1850,8 +1856,8 @@ class _ChatPageState extends State<ChatPage> {
         if (permission == LocationPermission.denied) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('需要位置权限才能使用此功能'),
+              SnackBar(
+                content: Text(S.of(context)?.locationPermissionRequired ?? 'Location permission is required for this feature'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -1859,12 +1865,12 @@ class _ChatPageState extends State<ChatPage> {
           return false;
         }
       }
-      
+
       if (permission == LocationPermission.deniedForever) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('位置权限已被永久拒绝，请在设置中开启'),
+            SnackBar(
+              content: Text(S.of(context)?.locationPermissionDeniedPermanent ?? 'Location permission has been permanently denied. Please enable it in settings.'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -1910,7 +1916,7 @@ class _ChatPageState extends State<ChatPage> {
     // 显示发送成功提示
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('已发送 $amount $token 红包'),
+        content: Text(S.of(context)?.redPacketSent(amount, token) ?? 'Sent $amount $token red packet'),
         backgroundColor: const Color(0xFFE64340),
       ),
     );
@@ -1928,7 +1934,7 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
-  
+
   void _doSendTransfer(String amount, String token, String? memo) {
     // 发送转账消息
     final metadata = MessageMetadata(
@@ -1936,17 +1942,17 @@ class _ChatPageState extends State<ChatPage> {
       token: token,
       transferStatus: 'pending',
     );
-    
+
     context.read<ChatBloc>().add(SendCustomMessage(
-      content: memo ?? '转账',
+      content: memo ?? (S.of(context)?.transferDefault ?? 'Transfer'),
       type: MessageType.transfer,
       metadata: metadata,
     ));
-    
+
     // 显示发送成功提示
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('已发送 $amount $token 转账'),
+        content: Text(S.of(context)?.transferSent(amount, token) ?? 'Sent $amount $token transfer'),
         backgroundColor: AppColors.primary,
       ),
     );
@@ -1976,14 +1982,14 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('选择文件失败: $e'),
+            content: Text(S.of(context)?.pickFileFailed(e.toString()) ?? 'Failed to pick file: $e'),
             backgroundColor: AppColors.error,
           ),
         );
       }
     }
   }
-  
+
   Future<void> _sendFile(PlatformFile file) async {
     try {
       final bytes = file.bytes;
@@ -1991,37 +1997,37 @@ class _ChatPageState extends State<ChatPage> {
         debugPrint('File bytes is null or empty');
         return;
       }
-      
+
       final filename = file.name;
       final mimeType = lookupMimeType(filename) ?? 'application/octet-stream';
       final fileSize = bytes.length;
-      
+
       // 检查文件大小（限制 50MB）
       const maxSize = 50 * 1024 * 1024; // 50MB
       if (fileSize > maxSize) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('文件大小不能超过 50MB'),
+            SnackBar(
+              content: Text(S.of(context)?.fileSizeLimit ?? 'File size cannot exceed 50MB'),
               backgroundColor: AppColors.error,
             ),
           );
         }
         return;
       }
-      
+
       debugPrint('Sending file: $filename, size: $fileSize bytes, mimeType: $mimeType');
-      
+
       context.read<ChatBloc>().add(SendFileMessage(
         fileBytes: bytes,
         filename: filename,
         mimeType: mimeType,
       ));
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('文件发送中: $filename'),
+            content: Text(S.of(context)?.fileSending(filename) ?? 'Sending file: $filename'),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -2031,7 +2037,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('发送文件失败: $e'),
+            content: Text(S.of(context)?.sendFileFailed(e.toString()) ?? 'Failed to send file: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -2057,20 +2063,20 @@ class _ChatPageState extends State<ChatPage> {
       final contactId = result['id'] as String;
       final contactName = result['name'] as String;
       final contactAvatar = result['avatar'] as String?;
-      
+
       // 发送名片消息（作为自定义消息类型）
-      // 名片消息格式：[名片] 联系人名称 (包含头像URL)
-      final cardContent = '''[名片]
-联系人：$contactName
-ID：$contactId
-头像：${contactAvatar ?? ''}''';
-      
+      // 名片消息格式：[Contact] Contact Name (includes avatar URL)
+      final cardContent = '''[${S.of(context)?.personalCard ?? 'Contact Card'}]
+${S.of(context)?.contactLabel ?? 'Contact'}: $contactName
+ID: $contactId
+Avatar: ${contactAvatar ?? ''}''';
+
       // 使用文本消息发送名片信息（后续可改为专门的名片消息类型）
       context.read<ChatBloc>().add(SendTextMessage(cardContent));
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('已发送 $contactName 的名片'),
+          content: Text(S.of(context)?.contactCardSent(contactName) ?? 'Sent $contactName\'s contact card'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -2088,7 +2094,7 @@ ID：$contactId
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Voice and video call feature coming soon',
+                  S.of(context)?.voiceCallFeatureInDev ?? 'Voice and video call feature coming soon',
                 ),
               ),
             ],
@@ -2103,7 +2109,7 @@ ID：$contactId
   void _openFavorites() {
     // TODO: 实现收藏功能
     debugPrint('Open favorites');
-    _showFeatureToast('收藏');
+    _showFeatureToast(S.of(context)?.favoritesFeature ?? 'Favorites');
   }
 
   /// 分享音乐
@@ -2145,19 +2151,19 @@ ID：$contactId
 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('已分享 $songName'),
+                content: Text(S.of(context)?.sharedMusic(songName) ?? 'Shared $songName'),
                 duration: const Duration(seconds: 1),
               ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('文件不存在'), backgroundColor: Colors.red),
+              SnackBar(content: Text(S.of(context)?.fileNotExist ?? 'File does not exist'), backgroundColor: Colors.red),
             );
           }
         } catch (e) {
           debugPrint('Error sending local music: $e');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('发送失败: $e'), backgroundColor: Colors.red),
+            SnackBar(content: Text(S.of(context)?.sendFailed(e.toString()) ?? 'Send failed: $e'), backgroundColor: Colors.red),
           );
         }
       } else {
@@ -2175,7 +2181,7 @@ ID：$contactId
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('已分享 $songName'),
+            content: Text(S.of(context)?.sharedMusic(songName) ?? 'Shared $songName'),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -2186,13 +2192,13 @@ ID：$contactId
   void _selectCoupon() {
     // TODO: 实现选择卡券功能
     debugPrint('Select coupon');
-    _showFeatureToast('卡券');
+    _showFeatureToast(S.of(context)?.couponsFeature ?? 'Coupons');
   }
 
   void _sendGift() {
     // TODO: 实现发送礼物功能
     debugPrint('Send gift');
-    _showFeatureToast('礼物');
+    _showFeatureToast(S.of(context)?.giftFeature ?? 'Gift');
   }
 
   /// 创建投票
@@ -2220,14 +2226,33 @@ ID：$contactId
   }
   
   /// 投票选项点击
-  void _onPollVote(String pollEventId, String optionId) {
+  void _onPollVote(String pollEventId, String optionId, List<String> currentVotes, int maxSelections) {
     // 防止重复投票 - 如果正在处理投票，忽略新的点击
     if (_votingPollIds.contains(pollEventId)) {
       debugPrint('ChatPage: Ignoring duplicate vote on poll $pollEventId');
       return;
     }
 
-    debugPrint('ChatPage: Voting on poll $pollEventId, option: $optionId');
+    // 计算新的投票选项列表
+    List<String> newVotes;
+    String actionMessage;
+    final s = S.of(context);
+
+    if (currentVotes.contains(optionId)) {
+      // 点击已选选项 -> 取消投票
+      newVotes = currentVotes.where((id) => id != optionId).toList();
+      actionMessage = s?.voteRemoved ?? 'Vote removed';
+    } else if (maxSelections == 1) {
+      // 单选 -> 直接替换为新选项
+      newVotes = [optionId];
+      actionMessage = s?.voteChanged ?? 'Vote changed';
+    } else {
+      // 多选 -> 添加新选项
+      newVotes = [...currentVotes, optionId];
+      actionMessage = s?.voted ?? 'Voted';
+    }
+
+    debugPrint('ChatPage: Voting on poll $pollEventId, new votes: $newVotes');
 
     // 标记正在投票
     setState(() {
@@ -2236,13 +2261,12 @@ ID：$contactId
 
     context.read<ChatBloc>().add(VoteOnPoll(
       pollEventId: pollEventId,
-      selectedOptionIds: [optionId],
+      selectedOptionIds: newVotes,
     ));
 
-    final s = S.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(s?.voted ?? 'Voted'),
+        content: Text(actionMessage),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
       ),
@@ -2261,31 +2285,31 @@ ID：$contactId
   /// 结束投票
   void _onEndPoll(String pollEventId) async {
     debugPrint('ChatPage: Ending poll $pollEventId');
-    
+
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('结束投票'),
-        content: const Text('确定要结束这个投票吗？结束后将无法继续投票。'),
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.endPollTitle ?? 'End Poll'),
+        content: Text(S.of(context)?.endPollConfirmMessage ?? 'Are you sure you want to end this poll? Voting will be closed after ending.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('确定', style: TextStyle(color: Colors.red)),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(S.of(context)?.confirm ?? 'Confirm', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
-    
+
     if (confirm == true && mounted) {
       // TODO: 实现结束投票功能
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('投票已结束'),
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: Text(S.of(context)?.pollEndedMessage ?? 'Poll ended'),
+          duration: const Duration(seconds: 1),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -2295,7 +2319,7 @@ ID：$contactId
   void _showFeatureToast(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature功能开发中...'),
+        content: Text(S.of(context)?.featureInDev(feature) ?? '$feature feature in development...'),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
       ),
@@ -2573,7 +2597,7 @@ ID：$contactId
                           showSenderName: showSenderName,
                           currentUserId: _currentUserId,
                           onReactionTap: (emoji) => _addReaction(message, emoji),
-                          onPollVote: (pollEventId, optionId) => _onPollVote(pollEventId, optionId),
+                          onPollVote: (pollEventId, optionId, currentVotes, maxSelections) => _onPollVote(pollEventId, optionId, currentVotes, maxSelections),
                           onEndPoll: (pollEventId) => _onEndPoll(pollEventId),
                           onRedPacketTap: _onRedPacketTap,
                           onContactCardTap: _onContactCardTap,
@@ -3016,6 +3040,7 @@ ID：$contactId
 
   Widget _buildInputBar() {
     return ChatInputBar(
+      key: _inputBarKey,
       controller: _inputController,
       focusNode: _inputFocusNode,
       onSendText: _sendMessage,
@@ -3428,64 +3453,111 @@ ID：$contactId
           break;
 
         case MessageType.image:
-          // 下载图片并重新发送
+          // 优先使用直接转发 mxc URL 的方式（Matrix SDK 推荐方式）
           final mediaUrl = message.metadata?.mediaUrl;
           if (mediaUrl != null) {
-            final imageBytes = await messageRepository.downloadMedia(mediaUrl);
-            if (imageBytes != null) {
-              await messageRepository.sendImageMessage(
-                targetRoomId,
-                imageBytes: imageBytes,
-                filename: message.content.isNotEmpty ? message.content : 'image.jpg',
-                mimeType: message.metadata?.mimeType,
-              );
-            } else {
-              // 下载失败，发送文本提示
-              await messageRepository.sendTextMessage(targetRoomId, '[图片] ${message.content}');
+            debugPrint('Forward image: Using direct mxc URL forward (recommended)');
+            final result = await messageRepository.forwardMediaMessage(
+              targetRoomId,
+              mxcUrl: mediaUrl,
+              msgType: 'm.image',
+              filename: message.content.isNotEmpty ? message.content : 'image.jpg',
+              mimeType: message.metadata?.mimeType,
+              width: message.metadata?.width,
+              height: message.metadata?.height,
+              size: message.metadata?.size,
+              thumbnailUrl: message.metadata?.thumbnailUrl,
+            );
+            if (result == null) {
+              // 直接转发失败，尝试下载后重新上传
+              debugPrint('Forward image: Direct forward failed, trying download and re-upload');
+              final imageBytes = await messageRepository.downloadMedia(mediaUrl);
+              if (imageBytes != null) {
+                await messageRepository.sendImageMessage(
+                  targetRoomId,
+                  imageBytes: imageBytes,
+                  filename: message.content.isNotEmpty ? message.content : 'image.jpg',
+                  mimeType: message.metadata?.mimeType,
+                );
+              } else {
+                // 两种方法都失败，抛出异常
+                throw Exception('图片转发失败：无法下载原图片');
+              }
             }
           } else {
-            await messageRepository.sendTextMessage(targetRoomId, '[图片] ${message.content}');
+            throw Exception('图片转发失败：缺少图片地址');
           }
           break;
 
         case MessageType.video:
-          // 下载视频并重新发送
+          // 优先使用直接转发 mxc URL 的方式
           final videoUrl = message.metadata?.mediaUrl;
           if (videoUrl != null) {
-            final videoBytes = await messageRepository.downloadMedia(videoUrl);
-            if (videoBytes != null) {
-              await messageRepository.sendVideoMessage(
-                targetRoomId,
-                videoBytes: videoBytes,
-                filename: message.content.isNotEmpty ? message.content : 'video.mp4',
-                mimeType: message.metadata?.mimeType,
-              );
-            } else {
-              await messageRepository.sendTextMessage(targetRoomId, '[视频] ${message.content}');
+            debugPrint('Forward video: Using direct mxc URL forward (recommended)');
+            final result = await messageRepository.forwardMediaMessage(
+              targetRoomId,
+              mxcUrl: videoUrl,
+              msgType: 'm.video',
+              filename: message.content.isNotEmpty ? message.content : 'video.mp4',
+              mimeType: message.metadata?.mimeType,
+              width: message.metadata?.width,
+              height: message.metadata?.height,
+              size: message.metadata?.size,
+              duration: message.metadata?.duration,
+              thumbnailUrl: message.metadata?.thumbnailUrl,
+            );
+            if (result == null) {
+              // 直接转发失败，尝试下载后重新上传
+              debugPrint('Forward video: Direct forward failed, trying download and re-upload');
+              final videoBytes = await messageRepository.downloadMedia(videoUrl);
+              if (videoBytes != null) {
+                await messageRepository.sendVideoMessage(
+                  targetRoomId,
+                  videoBytes: videoBytes,
+                  filename: message.content.isNotEmpty ? message.content : 'video.mp4',
+                  mimeType: message.metadata?.mimeType,
+                );
+              } else {
+                throw Exception('视频转发失败：无法下载原视频');
+              }
             }
           } else {
-            await messageRepository.sendTextMessage(targetRoomId, '[视频] ${message.content}');
+            throw Exception('视频转发失败：缺少视频地址');
           }
           break;
 
         case MessageType.audio:
-          // 下载音频并重新发送
+          // 优先使用直接转发 mxc URL 的方式
           final audioUrl = message.metadata?.mediaUrl;
           if (audioUrl != null) {
-            final audioBytes = await messageRepository.downloadMedia(audioUrl);
-            if (audioBytes != null) {
-              await messageRepository.sendVoiceMessage(
-                targetRoomId,
-                audioBytes: audioBytes,
-                filename: message.content.isNotEmpty ? message.content : 'audio.m4a',
-                duration: message.metadata?.duration ?? 0,
-                mimeType: message.metadata?.mimeType,
-              );
-            } else {
-              await messageRepository.sendTextMessage(targetRoomId, '[语音消息]');
+            debugPrint('Forward audio: Using direct mxc URL forward (recommended)');
+            final result = await messageRepository.forwardMediaMessage(
+              targetRoomId,
+              mxcUrl: audioUrl,
+              msgType: 'm.audio',
+              filename: message.content.isNotEmpty ? message.content : 'audio.m4a',
+              mimeType: message.metadata?.mimeType,
+              size: message.metadata?.size,
+              duration: message.metadata?.duration,
+            );
+            if (result == null) {
+              // 直接转发失败，尝试下载后重新上传
+              debugPrint('Forward audio: Direct forward failed, trying download and re-upload');
+              final audioBytes = await messageRepository.downloadMedia(audioUrl);
+              if (audioBytes != null) {
+                await messageRepository.sendVoiceMessage(
+                  targetRoomId,
+                  audioBytes: audioBytes,
+                  filename: message.content.isNotEmpty ? message.content : 'audio.m4a',
+                  duration: message.metadata?.duration ?? 0,
+                  mimeType: message.metadata?.mimeType,
+                );
+              } else {
+                throw Exception('语音转发失败：无法下载原语音');
+              }
             }
           } else {
-            await messageRepository.sendTextMessage(targetRoomId, '[语音消息]');
+            throw Exception('语音转发失败：缺少语音地址');
           }
           break;
 
@@ -3564,7 +3636,7 @@ ID：$contactId
               description: message.content,
             );
           } else {
-            await messageRepository.sendTextMessage(targetRoomId, '[位置] ${message.content}');
+            throw Exception('位置转发失败：缺少位置信息');
           }
           break;
 
@@ -3573,33 +3645,44 @@ ID：$contactId
           final question = message.metadata?.pollQuestion;
           final options = message.metadata?.pollOptions;
           final optionIds = message.metadata?.pollOptionIds;
-          final voteCounts = message.metadata?.voteCounts;
-          final totalVoters = message.metadata?.totalVoters ?? 0;
           final maxSelections = message.metadata?.maxSelections ?? 1;
 
           if (question != null && options != null && options.isNotEmpty) {
+            // 主动获取最新的投票聚合数据，确保转发的投票包含最新结果
+            var voteCounts = message.metadata?.voteCounts ?? <String, int>{};
+            var totalVoters = message.metadata?.totalVoters ?? 0;
+
+            try {
+              final aggregations = await messageRepository.getPollAggregations(
+                message.roomId ?? widget.conversation.id,
+                message.id,
+              );
+              if (aggregations != null) {
+                voteCounts = (aggregations['voteCounts'] as Map<String, dynamic>?)
+                    ?.cast<String, int>() ?? voteCounts;
+                totalVoters = aggregations['totalVoters'] as int? ?? totalVoters;
+                debugPrint('Forward poll: fetched latest aggregations - voteCounts=$voteCounts, totalVoters=$totalVoters');
+              }
+            } catch (e) {
+              debugPrint('Forward poll: failed to fetch aggregations, using cached data: $e');
+            }
+
             debugPrint('Forward poll snapshot: question=$question, options=$options, voteCounts=$voteCounts');
 
             // 确保有optionIds，如果没有则生成
             final effectiveOptionIds = optionIds ?? List.generate(options.length, (i) => 'option_$i');
-            // 确保有voteCounts，如果没有则使用空map
-            final effectiveVoteCounts = voteCounts ?? <String, int>{};
 
             await messageRepository.sendForwardedPollSnapshot(
               targetRoomId,
               question: question,
               options: options,
               optionIds: effectiveOptionIds,
-              voteCounts: effectiveVoteCounts,
+              voteCounts: voteCounts,
               totalVoters: totalVoters,
               maxSelections: maxSelections,
             );
           } else {
-            // 如果无法获取投票信息，发送文本提示
-            await messageRepository.sendTextMessage(
-              targetRoomId,
-              '[投票] ${question ?? message.content}',
-            );
+            throw Exception('投票转发失败：缺少投票信息');
           }
           break;
 
@@ -3623,11 +3706,12 @@ ID：$contactId
               },
             );
           } else {
-            await messageRepository.sendTextMessage(targetRoomId, message.content);
+            throw Exception('音乐转发失败：缺少音乐信息');
           }
           break;
 
         default:
+          // 未知类型消息，直接发送文本内容
           await messageRepository.sendTextMessage(targetRoomId, message.content);
       }
 
@@ -3642,17 +3726,8 @@ ID：$contactId
       }
     } catch (e) {
       debugPrint('Simple forward error: $e');
-      // 最后的备用：发送文本描述
-      await messageRepository.sendTextMessage(targetRoomId, message.content);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S.of(context)?.messageForwarded ?? 'Message forwarded'),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
+      // 重新抛出异常，让上层处理
+      rethrow;
     }
   }
 
@@ -4298,27 +4373,27 @@ class _MessageMenuSheet extends StatelessWidget {
               _buildMenuItem(
                 context,
                 icon: Icons.copy,
-                title: '复制',
+                title: S.of(context)?.copy ?? 'Copy',
                 onTap: onCopy,
               ),
             _buildMenuItem(
               context,
               icon: Icons.reply,
-              title: '回复',
+              title: S.of(context)?.reply ?? 'Reply',
               onTap: onReply,
             ),
             if (onForward != null)
               _buildMenuItem(
                 context,
                 icon: Icons.forward,
-                title: '转发',
+                title: S.of(context)?.forward ?? 'Forward',
                 onTap: onForward,
               ),
             if (onDelete != null)
               _buildMenuItem(
                 context,
                 icon: Icons.delete_outline,
-                title: '撤回',
+                title: S.of(context)?.recall ?? 'Recall',
                 color: AppColors.error,
                 onTap: onDelete,
               ),
@@ -4384,7 +4459,7 @@ class _CallDialogState extends State<_CallDialog> {
   bool _isCameraOff = false;
   int _callDuration = 0;
   bool _isConnecting = true;
-  String _callStatus = '呼叫中...';
+  String? _callStatusKey;
   
   @override
   void initState() {
@@ -4404,19 +4479,19 @@ class _CallDialogState extends State<_CallDialog> {
     // 模拟呼叫状态变化
     await Future.delayed(const Duration(milliseconds: 500));
     if (mounted) {
-      setState(() => _callStatus = '正在连接...');
+      setState(() => _callStatusKey = 'connecting');
     }
-    
+
     await Future.delayed(const Duration(seconds: 1));
     if (mounted) {
-      setState(() => _callStatus = '响铃中...');
+      setState(() => _callStatusKey = 'ringing');
     }
-    
+
     await Future.delayed(const Duration(milliseconds: 1500));
     if (mounted) {
       setState(() {
         _isConnecting = false;
-        _callStatus = '通话中';
+        _callStatusKey = 'inCall';
       });
       // 开始计时
       _startTimer();
@@ -4440,6 +4515,19 @@ class _CallDialogState extends State<_CallDialog> {
     final minutes = seconds ~/ 60;
     final secs = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+  }
+
+  String _getCallStatusText(BuildContext context) {
+    switch (_callStatusKey) {
+      case 'connecting':
+        return S.of(context)?.connectingCall ?? 'Connecting...';
+      case 'ringing':
+        return S.of(context)?.ringing ?? 'Ringing...';
+      case 'inCall':
+        return S.of(context)?.inCall ?? 'In call';
+      default:
+        return S.of(context)?.calling ?? 'Calling...';
+    }
   }
   
   void _toggleMute() {
@@ -4511,17 +4599,17 @@ class _CallDialogState extends State<_CallDialog> {
             
             // 通话状态
             Text(
-              _isConnecting 
-                  ? _callStatus
+              _isConnecting
+                  ? _getCallStatusText(context)
                   : _formatDuration(_callDuration),
               style: TextStyle(
                 color: Colors.white.withOpacity(0.8),
                 fontSize: 16,
               ),
             ),
-            
+
             const Spacer(),
-            
+
             // 控制按钮
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -4529,32 +4617,38 @@ class _CallDialogState extends State<_CallDialog> {
                 // 静音
                 _buildControlButton(
                   icon: _isMuted ? Icons.mic_off : Icons.mic,
-                  label: _isMuted ? '取消静音' : '静音',
+                  label: _isMuted
+                      ? (S.of(context)?.unmute ?? 'Unmute')
+                      : (S.of(context)?.muteCall ?? 'Mute'),
                   isActive: _isMuted,
                   onTap: _toggleMute,
                 ),
-                
+
                 // 免提
                 _buildControlButton(
                   icon: _isSpeakerOn ? Icons.volume_up : Icons.volume_down,
-                  label: _isSpeakerOn ? '关闭免提' : '免提',
+                  label: _isSpeakerOn
+                      ? (S.of(context)?.speakerOff ?? 'Speaker Off')
+                      : (S.of(context)?.speakerOn ?? 'Speaker'),
                   isActive: _isSpeakerOn,
                   onTap: _toggleSpeaker,
                 ),
-                
+
                 // 摄像头（仅视频通话）
                 if (widget.isVideoCall)
                   _buildControlButton(
                     icon: _isCameraOff ? Icons.videocam_off : Icons.videocam,
-                    label: _isCameraOff ? '开启摄像头' : '关闭摄像头',
+                    label: _isCameraOff
+                        ? (S.of(context)?.cameraOn ?? 'Camera On')
+                        : (S.of(context)?.cameraOff ?? 'Camera Off'),
                     isActive: _isCameraOff,
                     onTap: _toggleCamera,
                   ),
               ],
             ),
-            
+
             const SizedBox(height: 40),
-            
+
             // 挂断按钮
             GestureDetector(
               onTap: _endCall,
@@ -4572,12 +4666,12 @@ class _CallDialogState extends State<_CallDialog> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
-            const Text(
-              '挂断',
-              style: TextStyle(color: Colors.white, fontSize: 14),
+
+            Text(
+              S.of(context)?.hangUp ?? 'Hang Up',
+              style: const TextStyle(color: Colors.white, fontSize: 14),
             ),
             
             const SizedBox(height: 60),
@@ -4718,7 +4812,7 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
             child: Row(
               children: [
                 Text(
-                  '选择转发对象',
+                  S.of(context)?.selectForwardTargetTitle ?? 'Select Forward Target',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -4733,14 +4827,14 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
               ],
             ),
           ),
-          
+
           // 搜索框
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: '搜索',
+                hintText: S.of(context)?.searchHint ?? 'Search',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: widget.isDark 
@@ -4817,7 +4911,9 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
     if (filteredChats.isEmpty) {
       return Center(
         child: Text(
-          _conversations.isEmpty ? '没有可转发的会话' : '没有找到相关会话',
+          _conversations.isEmpty
+              ? (S.of(context)?.noForwardableChat ?? 'No chats available for forwarding')
+              : (S.of(context)?.noMatchingChat ?? 'No matching chats found'),
           style: TextStyle(
             color: widget.isDark ? Colors.white54 : Colors.black54,
           ),
@@ -6705,14 +6801,14 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
                 fit: BoxFit.cover,
               )
             : Container(color: Colors.black),
-        errorBuilder: (context, errorMessage) => Center(
+        errorBuilder: (ctx, errorMessage) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.error, color: Colors.red, size: 48),
               const SizedBox(height: 16),
               Text(
-                '视频播放失败\n$errorMessage',
+                '${S.of(ctx)?.videoPlaybackFailed ?? 'Video playback failed'}\n$errorMessage',
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white),
               ),
@@ -6720,7 +6816,7 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
           ),
         ),
       );
-      
+
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -6751,17 +6847,17 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('视频', style: TextStyle(color: Colors.white)),
+        title: Text(S.of(context)?.videoTitle ?? 'Video', style: const TextStyle(color: Colors.white)),
         elevation: 0,
       ),
       body: Center(
         child: _isLoading
-            ? const Column(
+            ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: Colors.white),
-                  SizedBox(height: 16),
-                  Text('加载中...', style: TextStyle(color: Colors.white)),
+                  const CircularProgressIndicator(color: Colors.white),
+                  const SizedBox(height: 16),
+                  Text(S.of(context)?.loadingText ?? 'Loading...', style: const TextStyle(color: Colors.white)),
                 ],
               )
             : _error != null
@@ -6771,7 +6867,7 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
                       const Icon(Icons.error, color: Colors.red, size: 48),
                       const SizedBox(height: 16),
                       Text(
-                        '视频加载失败\n$_error',
+                        '${S.of(context)?.videoLoadFailed ?? 'Video load failed'}\n$_error',
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.white),
                       ),
@@ -6784,7 +6880,7 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
                           });
                           _initializePlayer();
                         },
-                        child: const Text('重试'),
+                        child: Text(S.of(context)?.retryButton ?? 'Retry'),
                       ),
                     ],
                   )
@@ -6795,7 +6891,7 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
                             : 16 / 9,
                         child: Chewie(controller: _chewieController!),
                       )
-                    : const Text('播放器初始化失败', style: TextStyle(color: Colors.white)),
+                    : Text(S.of(context)?.playerInitFailed ?? 'Player initialization failed', style: const TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -6848,7 +6944,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
     final question = _questionController.text.trim();
     if (question.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入投票问题')),
+        SnackBar(content: Text(S.of(context)?.pleaseEnterQuestion ?? 'Please enter poll question')),
       );
       return;
     }
@@ -6860,7 +6956,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
 
     if (options.length < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('至少需要2个选项')),
+        SnackBar(content: Text(S.of(context)?.atLeastTwoOptions ?? 'At least 2 options required')),
       );
       return;
     }
@@ -6901,17 +6997,17 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text(
-                    '取消',
+                    S.of(context)?.cancel ?? 'Cancel',
                     style: TextStyle(
                       color: isDark ? Colors.white70 : Colors.black54,
                     ),
                   ),
                 ),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    '创建投票',
+                    S.of(context)?.createPollTitle ?? 'Create Poll',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
                     ),
@@ -6919,9 +7015,9 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                 ),
                 TextButton(
                   onPressed: _submit,
-                  child: const Text(
-                    '发起',
-                    style: TextStyle(
+                  child: Text(
+                    S.of(context)?.submitPoll ?? 'Submit',
+                    style: const TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.w600,
                     ),
@@ -6943,7 +7039,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
               children: [
                 // 问题输入
                 Text(
-                  '投票问题',
+                  S.of(context)?.pollQuestionLabel ?? 'Poll Question',
                   style: TextStyle(
                     fontSize: 14,
                     color: isDark ? Colors.white70 : Colors.black54,
@@ -6955,7 +7051,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                   maxLines: 2,
                   maxLength: 100,
                   decoration: InputDecoration(
-                    hintText: '请输入投票问题',
+                    hintText: S.of(context)?.enterPollQuestionHint ?? 'Please enter poll question',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -6971,7 +7067,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '投票选项',
+                      S.of(context)?.pollOptionsLabel ?? 'Poll Options',
                       style: TextStyle(
                         fontSize: 14,
                         color: isDark ? Colors.white70 : Colors.black54,
@@ -7016,7 +7112,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                             controller: _optionControllers[index],
                             maxLength: 50,
                             decoration: InputDecoration(
-                              hintText: '选项 ${index + 1}',
+                              hintText: S.of(context)?.optionHintWithIndex(index + 1) ?? 'Option ${index + 1}',
                               counterText: '',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -7046,7 +7142,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                   TextButton.icon(
                     onPressed: _addOption,
                     icon: const Icon(Icons.add_circle_outline, size: 20),
-                    label: const Text('添加选项'),
+                    label: Text(S.of(context)?.addOptionButton ?? 'Add Option'),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.green,
                     ),
@@ -7065,7 +7161,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '投票设置',
+                        S.of(context)?.pollSettingsLabel ?? 'Poll Settings',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -7073,16 +7169,16 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      
+
                       // 单选/多选
                       Row(
                         children: [
-                          const Text('选择类型'),
+                          Text(S.of(context)?.selectionType ?? 'Selection Type'),
                           const Spacer(),
                           SegmentedButton<int>(
-                            segments: const [
-                              ButtonSegment(value: 1, label: Text('单选')),
-                              ButtonSegment(value: 0, label: Text('多选')),
+                            segments: [
+                              ButtonSegment(value: 1, label: Text(S.of(context)?.singleChoiceLabel ?? 'Single')),
+                              ButtonSegment(value: 0, label: Text(S.of(context)?.multiChoiceLabel ?? 'Multi')),
                             ],
                             selected: {_maxSelections},
                             onSelectionChanged: (value) {
@@ -7090,7 +7186,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                                 _maxSelections = value.first;
                               });
                             },
-                            style: ButtonStyle(
+                            style: const ButtonStyle(
                               visualDensity: VisualDensity.compact,
                             ),
                           ),
@@ -7104,7 +7200,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                       // 匿名投票
                       Row(
                         children: [
-                          const Text('匿名投票'),
+                          Text(S.of(context)?.anonymousPollSwitch ?? 'Anonymous Poll'),
                           const Spacer(),
                           Switch(
                             value: _isAnonymous,
@@ -7140,7 +7236,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '投票发起后将显示在聊天中，群成员可以参与投票',
+                          S.of(context)?.pollHint ?? 'Poll will be displayed in chat. Group members can vote.',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.blue[700],
@@ -7204,7 +7300,7 @@ class _ContactSelectDialogState extends State<_ContactSelectDialog> {
             TextField(
               onChanged: (value) => setState(() => _searchQuery = value),
               decoration: InputDecoration(
-                hintText: '搜索联系人',
+                hintText: S.of(context)?.searchContactHint ?? 'Search contacts',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -7259,13 +7355,13 @@ class _ContactSelectDialogState extends State<_ContactSelectDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(S.of(context)?.cancel ?? 'Cancel'),
         ),
         TextButton(
           onPressed: _selectedIds.isEmpty
               ? null
               : () => Navigator.of(context).pop(_selectedIds.toList()),
-          child: Text('确定 (${_selectedIds.length})'),
+          child: Text(S.of(context)?.confirmWithCount(_selectedIds.length) ?? 'Confirm (${_selectedIds.length})'),
         ),
       ],
     );
