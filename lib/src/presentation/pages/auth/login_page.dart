@@ -721,7 +721,7 @@ class _LoginPageState extends State<LoginPage> {
         // TODO: 将 Google token 发送到 Matrix 服务器进行验证
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Google 登录成功: ${result.email}'),
+            content: Text(S.of(context)?.googleLoginSuccess(result.email ?? '') ?? 'Google login success: ${result.email}'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -730,7 +730,7 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Google 登录失败: $e'),
+            content: Text(S.of(context)?.googleLoginFailed(e.toString()) ?? 'Google login failed: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -759,8 +759,8 @@ class _LoginPageState extends State<LoginPage> {
         
         // TODO: 将 Apple token 发送到 Matrix 服务器进行验证
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Apple 登录成功'),
+          SnackBar(
+            content: Text(S.of(context)?.appleLoginSuccess ?? 'Apple login success'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -769,7 +769,7 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Apple 登录失败: $e'),
+            content: Text(S.of(context)?.appleLoginFailed(e.toString()) ?? 'Apple login failed: $e'),
             backgroundColor: AppColors.error,
           ),
         );

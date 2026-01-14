@@ -1003,7 +1003,7 @@ class SEn extends S {
   }
 
   @override
-  String get recommendToFriend => 'Recommend to friend';
+  String get recommendToFriend => 'Share contact';
 
   @override
   String get setRemark => 'Set remark';
@@ -1678,6 +1678,15 @@ class SEn extends S {
   String get groupName => 'Group Name';
 
   @override
+  String get groupNameUpdated => 'Group name updated';
+
+  @override
+  String get updateFailed => 'Update failed';
+
+  @override
+  String get noPermissionToModify => 'You do not have permission to modify';
+
+  @override
   String get groupManagement => 'Group Management';
 
   @override
@@ -1937,6 +1946,12 @@ class SEn extends S {
 
   @override
   String get voted => 'Voted';
+
+  @override
+  String get voteChanged => 'Vote changed';
+
+  @override
+  String get voteRemoved => 'Vote removed';
 
   @override
   String get endPoll => 'End Poll';

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -72,7 +73,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> _save() async {
     if (_displayNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入昵称')),
+        SnackBar(content: Text(S.of(context)?.enterNickname ?? 'Enter nickname')),
       );
       return;
     }
@@ -90,7 +91,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('保存失败: $e')),
+          SnackBar(content: Text(S.of(context)?.saveFailed(e.toString()) ?? 'Save failed: $e')),
         );
       }
     } finally {
@@ -107,7 +108,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: '编辑资料',
+        title: S.of(context)?.editProfile ?? 'Edit Profile',
         onBackPressed: () => Navigator.pop(context),
         actions: [
           TextButton(
@@ -119,7 +120,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Text(
-                    '保存',
+                    S.of(context)?.save ?? 'Save',
                     style: TextStyle(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,
@@ -185,9 +186,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               children: [
                 // 昵称
                 _FormField(
-                  label: '昵称',
+                  label: S.of(context)?.nickname ?? 'Nickname',
                   controller: _displayNameController,
-                  placeholder: '请输入昵称',
+                  placeholder: S.of(context)?.enterNickname ?? 'Enter nickname',
                   isDark: isDark,
                 ),
 
@@ -197,9 +198,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                 // 签名
                 _FormField(
-                  label: '签名',
+                  label: S.of(context)?.signature ?? 'Signature',
                   controller: _statusController,
-                  placeholder: '添加个性签名',
+                  placeholder: S.of(context)?.addSignature ?? 'Add a signature',
                   isDark: isDark,
                 ),
               ],
@@ -321,17 +322,17 @@ class _AvatarPickerSheet extends StatelessWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('拍照'),
+              title: Text(S.of(context)?.takePhoto ?? 'Take Photo'),
               onTap: onCamera,
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('从相册选择'),
+              title: Text(S.of(context)?.chooseFromGallery ?? 'Choose from Gallery'),
               onTap: onGallery,
             ),
             const SizedBox(height: 8),
             N42Button.text(
-              text: '取消',
+              text: S.of(context)?.cancel ?? 'Cancel',
               onPressed: () => Navigator.pop(context),
             ),
           ],

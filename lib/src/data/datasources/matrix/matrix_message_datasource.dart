@@ -1320,6 +1320,8 @@ class MatrixMessageDataSource {
   }
 
   /// 获取投票的聚合结果
+  ///
+  /// 根据 MSC3381 规范，每个用户只能有一票（使用最新的投票响应）
   Future<Map<String, dynamic>?> getPollAggregations(String roomId, String pollEventId) async {
     try {
       final room = _client?.getRoomById(roomId);
@@ -1332,9 +1334,8 @@ class MatrixMessageDataSource {
       );
 
       if (response is Map<String, dynamic>) {
-        final voteCounts = <String, int>{};
-        final voters = <String>{};
-        final myVotes = <String>[];
+        // 存储每个用户的最新投票（按 origin_server_ts 排序）
+        final userVotes = <String, Map<String, dynamic>>{};
         bool pollEnded = false;
 
         final chunk = response['chunk'] as List<dynamic>?;
@@ -1343,29 +1344,16 @@ class MatrixMessageDataSource {
             if (item is Map<String, dynamic>) {
               final itemType = item['type'] as String?;
               if (itemType == 'org.matrix.msc3381.poll.response') {
-                final content = item['content'] as Map<String, dynamic>?;
-                final pollResponse = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
-                if (pollResponse != null) {
-                  final selectedAnswers = pollResponse['answers'] as List<dynamic>?;
-                  final senderId = item['sender'] as String?;
+                final senderId = item['sender'] as String?;
+                final originServerTs = item['origin_server_ts'] as int? ?? 0;
 
-                  if (selectedAnswers != null && senderId != null) {
-                    voters.add(senderId);
+                if (senderId != null) {
+                  // 只保留每个用户的最新投票
+                  final existingVote = userVotes[senderId];
+                  final existingTs = existingVote?['origin_server_ts'] as int? ?? 0;
 
-                    for (final answerId in selectedAnswers) {
-                      if (answerId is String) {
-                        voteCounts[answerId] = (voteCounts[answerId] ?? 0) + 1;
-                      }
-                    }
-
-                    if (senderId == _client?.userID) {
-                      myVotes.clear();
-                      for (final answerId in selectedAnswers) {
-                        if (answerId is String) {
-                          myVotes.add(answerId);
-                        }
-                      }
-                    }
+                  if (existingVote == null || originServerTs > existingTs) {
+                    userVotes[senderId] = item;
                   }
                 }
               } else if (itemType == 'org.matrix.msc3381.poll.end') {
@@ -1375,9 +1363,51 @@ class MatrixMessageDataSource {
           }
         }
 
+        // 根据最新投票计算票数
+        final voteCounts = <String, int>{};
+        final myVotes = <String>[];
+
+        for (final entry in userVotes.entries) {
+          final senderId = entry.key;
+          final item = entry.value;
+          final content = item['content'] as Map<String, dynamic>?;
+          final pollResponse = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
+
+          if (pollResponse != null) {
+            final selectedAnswers = pollResponse['answers'] as List<dynamic>?;
+
+            if (selectedAnswers != null && selectedAnswers.isNotEmpty) {
+              for (final answerId in selectedAnswers) {
+                if (answerId is String) {
+                  voteCounts[answerId] = (voteCounts[answerId] ?? 0) + 1;
+                }
+              }
+
+              // 记录当前用户的投票
+              if (senderId == _client?.userID) {
+                for (final answerId in selectedAnswers) {
+                  if (answerId is String) {
+                    myVotes.add(answerId);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // 计算实际投票人数（只计算有有效投票的用户）
+        final totalVoters = userVotes.entries.where((entry) {
+          final content = entry.value['content'] as Map<String, dynamic>?;
+          final pollResponse = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
+          final answers = pollResponse?['answers'] as List<dynamic>?;
+          return answers != null && answers.isNotEmpty;
+        }).length;
+
+        debugPrint('MatrixMessageDataSource: Poll $pollEventId - voteCounts: $voteCounts, totalVoters: $totalVoters, myVotes: $myVotes');
+
         return {
           'voteCounts': voteCounts,
-          'totalVoters': voters.length,
+          'totalVoters': totalVoters,
           'myVotes': myVotes,
           'pollEnded': pollEnded,
         };
@@ -1938,6 +1968,7 @@ class MatrixMessageDataSource {
       
       // 尝试从 unsigned.m.relations 获取聚合的投票数据
       // Matrix 服务器会在 poll.start 事件的 unsigned 中聚合投票响应
+      // 注意：每个用户只能有一票，使用最新的投票响应
       try {
         final unsigned = event.unsigned;
         if (unsigned != null) {
@@ -1948,38 +1979,59 @@ class MatrixMessageDataSource {
             if (references != null) {
               final chunk = references['chunk'] as List<dynamic>?;
               if (chunk != null) {
+                // 存储每个用户的最新投票
+                final userVotes = <String, Map<String, dynamic>>{};
+
                 for (final item in chunk) {
                   if (item is Map<String, dynamic>) {
                     final itemType = item['type'] as String?;
                     if (itemType == 'org.matrix.msc3381.poll.response') {
-                      final content = item['content'] as Map<String, dynamic>?;
-                      final response = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
-                      if (response != null) {
-                        final selectedAnswers = response['answers'] as List<dynamic>?;
-                        final senderId = item['sender'] as String?;
-                        
-                        if (selectedAnswers != null && senderId != null) {
-                          voters.add(senderId);
-                          
-                          for (final answerId in selectedAnswers) {
-                            if (answerId is String && voteCounts.containsKey(answerId)) {
-                              voteCounts[answerId] = (voteCounts[answerId] ?? 0) + 1;
-                            }
-                          }
-                          
-                          // 检查是否是当前用户的投票
-                          if (senderId == _client?.userID) {
-                            myVotes.clear();
-                            for (final answerId in selectedAnswers) {
-                              if (answerId is String) {
-                                myVotes.add(answerId);
-                              }
-                            }
-                          }
+                      final senderId = item['sender'] as String?;
+                      final originServerTs = item['origin_server_ts'] as int? ?? 0;
+
+                      if (senderId != null) {
+                        // 只保留每个用户的最新投票
+                        final existingVote = userVotes[senderId];
+                        final existingTs = existingVote?['origin_server_ts'] as int? ?? 0;
+
+                        if (existingVote == null || originServerTs > existingTs) {
+                          userVotes[senderId] = item;
                         }
                       }
                     } else if (itemType == 'org.matrix.msc3381.poll.end') {
                       pollEnded = true;
+                    }
+                  }
+                }
+
+                // 根据最新投票计算票数
+                for (final entry in userVotes.entries) {
+                  final senderId = entry.key;
+                  final item = entry.value;
+                  final content = item['content'] as Map<String, dynamic>?;
+                  final response = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
+
+                  if (response != null) {
+                    final selectedAnswers = response['answers'] as List<dynamic>?;
+
+                    if (selectedAnswers != null && selectedAnswers.isNotEmpty) {
+                      voters.add(senderId);
+
+                      for (final answerId in selectedAnswers) {
+                        if (answerId is String && voteCounts.containsKey(answerId)) {
+                          voteCounts[answerId] = (voteCounts[answerId] ?? 0) + 1;
+                        }
+                      }
+
+                      // 检查是否是当前用户的投票
+                      if (senderId == _client?.userID) {
+                        myVotes.clear();
+                        for (final answerId in selectedAnswers) {
+                          if (answerId is String) {
+                            myVotes.add(answerId);
+                          }
+                        }
+                      }
                     }
                   }
                 }

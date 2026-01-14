@@ -325,7 +325,7 @@
   "serviceAccounts": "Service Accounts",
   "enterpriseContacts": "Enterprise Contacts",
   "contactsCount": "{count} contacts",
-  "recommendToFriend": "Recommend to friend",
+  "recommendToFriend": "Share contact",
   "setRemark": "Set remark",
   "addToHome": "Add to home screen",
   "sendingCard": "Sending contact card...",
@@ -526,6 +526,9 @@
   "chatDetails": "Chat Details",
   "viewAllGroupMembers": "View all members",
   "groupName": "Group Name",
+  "groupNameUpdated": "Group name updated",
+  "updateFailed": "Update failed",
+  "noPermissionToModify": "You do not have permission to modify",
   "groupManagement": "Group Management",
   "myNicknameInGroup": "My Nickname in Group",
   "pinChat": "Pin Chat",
@@ -603,6 +606,8 @@
   "featureInDevelopment": "{feature} feature in development...",
   "collectMessages": "Collected {count} messages",
   "voted": "Voted",
+  "voteChanged": "Vote changed",
+  "voteRemoved": "Vote removed",
   "endPoll": "End Poll",
   "endPollConfirm": "Are you sure you want to end this poll? No more votes can be cast after ending.",
   "pollEnded": "Poll ended",
@@ -1210,5 +1215,434 @@
   "contactLabel": "Contact",
   "groupLabel": "Group",
   "conversationLabel": "Conversation",
-  "messageLabel": "Message"
+  "messageLabel": "Message",
+
+  "securityTitle": "Security",
+  "endToEndEncryption": "End-to-End Encryption",
+  "keyBackup": "Key Backup",
+  "backupEncryptionKeys": "Backup Encryption Keys",
+  "keysBackedUp": "{count} keys backed up",
+  "@keysBackedUp": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "backupNotSet": "Backup not set",
+  "restoreKeys": "Restore Keys",
+  "restoreKeysFromBackup": "Restore encryption keys from backup",
+  "exportKeys": "Export Keys",
+  "exportKeysToFile": "Export keys to file",
+  "loggedInDevices": "Logged In Devices",
+  "noOtherDevices": "No other devices",
+  "verified": "Verified",
+  "unverified": "Unverified",
+  "advanced": "Advanced",
+  "crossSigning": "Cross-Signing",
+  "enabled": "Enabled",
+  "notEnabled": "Not enabled",
+  "resetEncryption": "Reset Encryption",
+  "deleteAllEncryptionKeys": "Delete all encryption keys",
+  "encryptionNotSupported": "Encryption not supported",
+  "notInitialized": "Not initialized",
+  "backupKeyTitle": "Backup Keys",
+  "backupKeyMessage": "Create a new key backup? This will help you restore encrypted messages on a new device.",
+  "backup": "Backup",
+  "restoreKeyTitle": "Restore Keys",
+  "restoreKeyMessage": "Enter your recovery password or recovery key to restore encrypted messages.",
+  "restore": "Restore",
+  "exportKeyTitle": "Export Keys",
+  "exportKeyMessage": "The exported key file contains all your encryption keys. Please keep it safe.",
+  "export": "Export",
+  "deviceIdLabel": "Device ID: {deviceId}",
+  "@deviceIdLabel": {
+    "placeholders": {
+      "deviceId": {"type": "String"}
+    }
+  },
+  "deviceStatusVerified": "Status: Verified",
+  "deviceStatusUnverified": "Status: Unverified",
+  "lastActiveLabel": "Last active: {lastSeen}",
+  "@lastActiveLabel": {
+    "placeholders": {
+      "lastSeen": {"type": "String"}
+    }
+  },
+  "verifyThisDevice": "Verify this device",
+  "crossSigningAlreadyEnabled": "Cross-signing is already enabled",
+  "crossSigningSetupSuccess": "Cross-signing setup successful",
+  "setupFailed": "Setup failed: {error}",
+  "@setupFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "resetEncryptionTitle": "Reset Encryption",
+  "resetEncryptionWarning": "Warning: This will delete all your encryption keys. You will not be able to decrypt previous encrypted messages. This action cannot be undone.",
+  "reset": "Reset",
+
+  "leaveMeeting": "Leave Meeting",
+  "leaveMeetingConfirm": "Are you sure you want to leave the meeting?",
+  "leave": "Leave",
+
+  "justNow": "Just now",
+  "pokedSomeone": "poked {name}{suffix}",
+  "@pokedSomeone": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "suffix": {"type": "String"}
+    }
+  },
+  "noContactsToAdd": "No contacts available to add",
+  "addMembers": "Add Members",
+  "invitedMembers": "Invited {count} members",
+  "@invitedMembers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "inviteFailed": "Invite failed: {error}",
+  "@inviteFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "memberRemoved": "Member removed",
+  "removeFailed": "Remove failed: {error}",
+  "@removeFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "shareRealTimeLocation": "Share Real-time Location",
+  "realTimeLocationShareMessage": "After sharing, the other party can see your real-time location for 1 hour.",
+  "startSharing": "Start Sharing",
+  "locationServiceNotEnabled": "Location service is not enabled",
+  "enableLocationService": "Please enable location service to use this feature",
+  "goToSettings": "Go to Settings",
+  "locationPermissionRequired": "Location permission is required for this feature",
+  "locationPermissionDeniedPermanent": "Location permission has been permanently denied. Please enable it in settings.",
+  "locationPermissionDenied": "Location permission denied",
+  "gettingLocation": "Getting location...",
+  "getLocationFailed": "Failed to get location: {error}",
+  "@getLocationFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "locationSent": "Location sent",
+  "currentLocation": "Current Location",
+  "nearbyPlace": "Nearby Place {index}",
+  "@nearbyPlace": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "approximateDistance": "About {distance}",
+  "@approximateDistance": {
+    "placeholders": {
+      "distance": {"type": "String"}
+    }
+  },
+  "mapPreview": "Map Preview",
+  "searchLocation": "Search location",
+  "redPacketSent": "Sent {amount} {token} red packet",
+  "@redPacketSent": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "token": {"type": "String"}
+    }
+  },
+  "transferDefault": "Transfer",
+  "transferSent": "Sent {amount} {token} transfer",
+  "@transferSent": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "token": {"type": "String"}
+    }
+  },
+  "pickFileFailed": "Failed to pick file: {error}",
+  "@pickFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "fileSizeLimit": "File size cannot exceed 50MB",
+  "fileSending": "Sending file: {filename}",
+  "@fileSending": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "sendFileFailed": "Failed to send file: {error}",
+  "@sendFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "contactCardSent": "Sent {name}'s contact card",
+  "@contactCardSent": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "favoritesFeature": "Favorites",
+  "couponsFeature": "Coupons",
+  "giftFeature": "Gift",
+  "sharedMusic": "Shared {name}",
+  "@sharedMusic": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "fileNotExist": "File does not exist",
+  "sendFailed": "Send failed: {error}",
+  "@sendFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "endPollTitle": "End Poll",
+  "endPollConfirmMessage": "Are you sure you want to end this poll? Voting will be closed after ending.",
+  "confirm": "Confirm",
+  "pollEndedMessage": "Poll ended",
+  "voteRemoved": "Vote removed",
+  "voteChanged": "Vote changed",
+  "voted": "Voted",
+  "calling": "Calling...",
+  "connectingCall": "Connecting...",
+  "ringing": "Ringing...",
+  "inCall": "In call",
+  "unmute": "Unmute",
+  "muteCall": "Mute",
+  "speakerOff": "Speaker Off",
+  "speakerOn": "Speaker",
+  "cameraOn": "Camera On",
+  "cameraOff": "Camera Off",
+  "hangUp": "Hang Up",
+  "selectForwardTargetTitle": "Select Forward Target",
+  "searchHint": "Search",
+  "noForwardableChat": "No chats available for forwarding",
+  "noMatchingChat": "No matching chats found",
+  "imagePreview": "[Image]",
+  "voicePreview": "[Voice]",
+  "videoPreview": "[Video]",
+  "filePreviewWithName": "[File] {filename}",
+  "@filePreviewWithName": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "locationPreviewWithAddress": "[Location] {address}",
+  "@locationPreviewWithAddress": {
+    "placeholders": {
+      "address": {"type": "String"}
+    }
+  },
+  "musicPreviewWithTitle": "[Music] {title}",
+  "@musicPreviewWithTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "messagePreview": "[Message]",
+  "locationTitle": "Location",
+  "sendButton": "Send",
+  "retryButton": "Retry",
+  "selectContact": "Select Contact",
+  "searchContactHint": "Search contacts",
+  "noContactsFound": "No contacts found",
+  "shareMusic": "Share Music",
+  "recentPlayed": "Recent",
+  "myFavorites": "Favorites",
+  "networkLink": "Link",
+  "localFile": "Local",
+  "musicLinkRequired": "Music Link *",
+  "pasteMusicLink": "Paste music link",
+  "enterSongNamePlaceholder": "Enter song name",
+  "enterArtistNamePlaceholder": "Enter artist name",
+  "shareMusicButton": "Share Music",
+  "selectLocalAudio": "Select Local Audio File",
+  "supportedAudioFormats": "Supports MP3, M4A, WAV, FLAC, etc.",
+  "selectFileButton": "Select File",
+  "pleaseEnterMusicLink": "Please enter music link",
+  "pleaseEnterValidLink": "Please enter a valid URL",
+  "sharedSong": "Shared Song",
+  "selectMember": "Select Member",
+  "searchMemberHint": "Search members",
+  "noMembers": "No members",
+  "noMatchingMembers": "No matching members found",
+  "unknownMember": "Unknown",
+  "selectedMessagesCount": "Selected {count} messages",
+  "@selectedMessagesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchContactsOrGroups": "Search contacts or groups",
+  "noMatchingConversations": "No matching conversations found",
+  "videoTitle": "Video",
+  "loadingText": "Loading...",
+  "videoPlaybackFailed": "Video playback failed",
+  "@videoPlaybackFailed": {
+    "description": "Used with error message"
+  },
+  "videoLoadFailed": "Video load failed",
+  "playerInitFailed": "Player initialization failed",
+  "createPollTitle": "Create Poll",
+  "submitPoll": "Submit",
+  "pollQuestionLabel": "Poll Question",
+  "enterPollQuestionHint": "Please enter poll question",
+  "pollOptionsLabel": "Poll Options",
+  "optionHintWithIndex": "Option {index}",
+  "@optionHintWithIndex": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "addOptionButton": "Add Option",
+  "pollSettingsLabel": "Poll Settings",
+  "selectionType": "Selection Type",
+  "singleChoiceLabel": "Single",
+  "multiChoiceLabel": "Multi",
+  "anonymousPollSwitch": "Anonymous Poll",
+  "pleaseEnterQuestion": "Please enter poll question",
+  "atLeastTwoOptions": "At least 2 options required",
+  "confirmWithCount": "Confirm ({count})",
+  "@confirmWithCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "selectMessages": "Select messages",
+  "selectedCount": "Selected {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "selectAll": "Select All",
+  "memberCount": "{count} members",
+  "@memberCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "groupChatCount": "Group Chat({count})",
+  "@groupChatCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "privateChat": "Private Chat",
+  "loading": "Loading...",
+  "noMessages": "No messages",
+  "sendFirstMessage": "Send the first message to start chatting",
+  "encryptionNotice": "This chat is end-to-end encrypted. Only you and the recipient can read the messages.",
+  "replyTo": "Reply to {name}",
+  "@replyTo": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "invalidVideoUrl": "Invalid video URL",
+  "unknownFile": "Unknown file",
+  "downloadFile": "Download file",
+  "download": "Download",
+  "invalidLocation": "Invalid location",
+  "address": "Address",
+  "latitude": "Latitude",
+  "longitude": "Longitude",
+  "close": "Close",
+  "emailVerificationTitle": "Email Verification",
+  "enterValidEmailAddress": "Please enter a valid email address",
+  "verificationCodeSentTo": "Verification code sent to {email}",
+  "@verificationCodeSentTo": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "sendCodeFailed": "Failed to send code: {error}",
+  "@sendCodeFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "verificationSuccess": "Verification successful",
+  "verificationFailed": "Verification failed",
+  "verificationCodeError": "Verification code error: {error}",
+  "@verificationCodeError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterVerificationCode": "Enter verification code",
+  "enterYourEmail": "Enter email",
+  "weSentCodeTo": "We sent a 6-digit code to\n{email}",
+  "@weSentCodeTo": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "enterEmailForCode": "Enter your email address, we will send verification code",
+  "sendVerificationCode": "Send verification code",
+  "resendVerificationCode": "Resend verification code",
+  "canResendAfter": "Can resend after {seconds} seconds",
+  "@canResendAfter": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "changeEmail": "Change email",
+  "addToContacts": "Add to Contacts",
+  "addingToContacts": "Adding...",
+  "addedToContacts": "Added to contacts",
+  "addFailedWithError": "Add failed: {error}",
+  "@addFailedWithError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "addPhone": "Add phone",
+  "addTag": "Add tags",
+  "addText": "Add text",
+  "addPhoto": "Add photo",
+  "groupCountLabel": "{count} groups",
+  "@groupCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "addedViaSearch": "Added via search",
+  "addTime": "Add time",
+  "doneButton": "Done",
+  "waitingForParticipants": "Waiting for participants to join...",
+  "participantMe": "{name} (Me)",
+  "@participantMe": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "sharingLabel": "Sharing",
+  "screenSharingBy": "{name} is sharing screen",
+  "@screenSharingBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "participantCount": "{count} participants",
+  "@participantCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "muteLabel": "Mute",
+  "unmuteLabel": "Unmute",
+  "turnOffVideo": "Turn off video",
+  "turnOnVideo": "Turn on video",
+  "shareScreen": "Share screen",
+  "stopSharing": "Stop sharing",
+  "switchCameraLabel": "Switch",
+  "leaveLabel": "Leave",
+  "participantsLabel": "Participants",
+  "joiningMeeting": "Joining meeting..."
 }

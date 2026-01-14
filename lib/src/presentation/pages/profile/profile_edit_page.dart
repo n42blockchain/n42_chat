@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -1841,6 +1840,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
   late String _selectedRingtone;
   String? _playingRingtone;
   bool _isLoading = true;
+  bool _hasLoadedRingtones = false;
   List<_RingtoneItem> _ringtones = [];
 
   final _ringtoneService = SystemRingtoneService.instance;
@@ -1849,12 +1849,23 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
   void initState() {
     super.initState();
     _selectedRingtone = widget.currentRingtone;
-    _loadRingtones();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 只加载一次，避免重复调用
+    if (!_hasLoadedRingtones) {
+      _hasLoadedRingtones = true;
+      _loadRingtones();
+    }
   }
 
   /// 加载系统铃声
   Future<void> _loadRingtones() async {
     try {
+      // RingtoneManager 获取系统铃声不需要 READ_MEDIA_AUDIO 权限
+      // 该权限仅用于访问用户设备上的音乐文件，而非系统铃声
       final s = S.of(context);
       final systemRingtones = await _ringtoneService.getAvailableRingtones();
 

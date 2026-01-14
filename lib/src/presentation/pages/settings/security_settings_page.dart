@@ -4,6 +4,7 @@ import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// 安全设置页面
 class SecuritySettingsPage extends StatefulWidget {
@@ -55,7 +56,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: '安全',
+        title: S.of(context)?.securityTitle ?? 'Security',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -120,7 +121,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '端到端加密',
+                  S.of(context)?.endToEndEncryption ?? 'End-to-End Encryption',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -160,7 +161,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
-              '密钥备份',
+              S.of(context)?.keyBackup ?? 'Key Backup',
               style: TextStyle(
                 fontSize: 13,
                 color: isDark
@@ -171,26 +172,26 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ),
           _buildListItem(
             icon: Icons.cloud_upload,
-            title: '备份加密密钥',
+            title: S.of(context)?.backupEncryptionKeys ?? 'Backup Encryption Keys',
             subtitle: _backupInfo != null
-                ? '已备份 ${_backupInfo!.count} 个密钥'
-                : '未设置备份',
+                ? S.of(context)?.keysBackedUp(_backupInfo!.count) ?? '${_backupInfo!.count} keys backed up'
+                : S.of(context)?.backupNotSet ?? 'Backup not set',
             onTap: _showBackupDialog,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildListItem(
             icon: Icons.cloud_download,
-            title: '恢复密钥',
-            subtitle: '从备份恢复加密密钥',
+            title: S.of(context)?.restoreKeys ?? 'Restore Keys',
+            subtitle: S.of(context)?.restoreKeysFromBackup ?? 'Restore encryption keys from backup',
             onTap: _showRestoreDialog,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildListItem(
             icon: Icons.key,
-            title: '导出密钥',
-            subtitle: '导出密钥到文件',
+            title: S.of(context)?.exportKeys ?? 'Export Keys',
+            subtitle: S.of(context)?.exportKeysToFile ?? 'Export keys to file',
             onTap: _showExportDialog,
             isDark: isDark,
           ),
@@ -208,7 +209,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
-              '已登录设备',
+              S.of(context)?.loggedInDevices ?? 'Logged In Devices',
               style: TextStyle(
                 fontSize: 13,
                 color: isDark
@@ -221,7 +222,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                '暂无其他设备',
+                S.of(context)?.noOtherDevices ?? 'No other devices',
                 style: TextStyle(
                   color: isDark
                       ? AppColors.textSecondaryDark
@@ -259,7 +260,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         ),
       ),
       subtitle: Text(
-        device.isVerified ? '已验证' : '未验证',
+        device.isVerified ? (S.of(context)?.verified ?? 'Verified') : (S.of(context)?.unverified ?? 'Unverified'),
         style: TextStyle(
           color: device.isVerified ? Colors.green : Colors.orange,
         ),
@@ -282,7 +283,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
-              '高级',
+              S.of(context)?.advanced ?? 'Advanced',
               style: TextStyle(
                 fontSize: 13,
                 color: isDark
@@ -293,18 +294,18 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ),
           _buildListItem(
             icon: Icons.verified_user,
-            title: '跨设备签名',
+            title: S.of(context)?.crossSigning ?? 'Cross-Signing',
             subtitle: widget.e2eeManager.isCrossSigningEnabled
-                ? '已启用'
-                : '未启用',
+                ? S.of(context)?.enabled ?? 'Enabled'
+                : S.of(context)?.notEnabled ?? 'Not enabled',
             onTap: _setupCrossSigning,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildListItem(
             icon: Icons.delete_forever,
-            title: '重置加密',
-            subtitle: '删除所有加密密钥',
+            title: S.of(context)?.resetEncryption ?? 'Reset Encryption',
+            subtitle: S.of(context)?.deleteAllEncryptionKeys ?? 'Delete all encryption keys',
             onTap: _showResetConfirmation,
             isDark: isDark,
             isDestructive: true,
@@ -360,11 +361,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   String _getStatusText(E2EEStatus status) {
     switch (status) {
       case E2EEStatus.notSupported:
-        return '不支持加密';
+        return S.of(context)?.encryptionNotSupported ?? 'Encryption not supported';
       case E2EEStatus.notInitialized:
-        return '未初始化';
+        return S.of(context)?.notInitialized ?? 'Not initialized';
       case E2EEStatus.ready:
-        return '已启用';
+        return S.of(context)?.enabled ?? 'Enabled';
     }
   }
 
@@ -382,20 +383,20 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   void _showBackupDialog() {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('备份密钥'),
-        content: const Text('是否创建新的密钥备份？这将帮助您在新设备上恢复加密消息。'),
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.backupKeyTitle ?? 'Backup Keys'),
+        content: Text(S.of(context)?.backupKeyMessage ?? 'Create a new key backup? This will help you restore encrypted messages on a new device.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(ctx);
               // 实现备份逻辑
             },
-            child: const Text('备份'),
+            child: Text(S.of(context)?.backup ?? 'Backup'),
           ),
         ],
       ),
@@ -405,20 +406,20 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   void _showRestoreDialog() {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('恢复密钥'),
-        content: const Text('输入您的恢复密码或恢复密钥来恢复加密消息。'),
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.restoreKeyTitle ?? 'Restore Keys'),
+        content: Text(S.of(context)?.restoreKeyMessage ?? 'Enter your recovery password or recovery key to restore encrypted messages.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(ctx);
               // 实现恢复逻辑
             },
-            child: const Text('恢复'),
+            child: Text(S.of(context)?.restore ?? 'Restore'),
           ),
         ],
       ),
@@ -428,20 +429,20 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   void _showExportDialog() {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('导出密钥'),
-        content: const Text('导出的密钥文件包含您的所有加密密钥，请妥善保管。'),
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.exportKeyTitle ?? 'Export Keys'),
+        content: Text(S.of(context)?.exportKeyMessage ?? 'The exported key file contains all your encryption keys. Please keep it safe.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(ctx);
               // 实现导出逻辑
             },
-            child: const Text('导出'),
+            child: Text(S.of(context)?.export ?? 'Export'),
           ),
         ],
       ),
@@ -451,7 +452,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   void _showDeviceDetails(DeviceInfo device) {
     showModalBottomSheet<void>(
       context: context,
-      builder: (context) => Container(
+      builder: (ctx) => Container(
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -463,19 +464,27 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
-            Text('设备ID: ${device.deviceId}'),
-            Text('状态: ${device.isVerified ? "已验证" : "未验证"}'),
-            if (device.lastSeen != null) Text('最后活跃: ${device.lastSeen}'),
+            Text(
+              S.of(context)?.deviceIdLabel(device.deviceId) ?? 'Device ID: ${device.deviceId}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(device.isVerified
+                ? (S.of(context)?.deviceStatusVerified ?? 'Status: Verified')
+                : (S.of(context)?.deviceStatusUnverified ?? 'Status: Unverified')),
+            if (device.lastSeen != null) Text(S.of(context)?.lastActiveLabel(device.lastSeen!) ?? 'Last active: ${device.lastSeen}'),
             const SizedBox(height: 16),
             if (!device.isVerified)
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(ctx);
                   // 验证设备
                 },
-                child: const Text('验证此设备'),
+                child: Text(S.of(context)?.verifyThisDevice ?? 'Verify this device'),
               ),
           ],
         ),
@@ -486,7 +495,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   void _setupCrossSigning() async {
     if (widget.e2eeManager.isCrossSigningEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('跨设备签名已启用')),
+        SnackBar(content: Text(S.of(context)?.crossSigningAlreadyEnabled ?? 'Cross-signing is already enabled')),
       );
       return;
     }
@@ -494,12 +503,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     try {
       await widget.e2eeManager.initializeCrossSigning();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('跨设备签名设置成功')),
+        SnackBar(content: Text(S.of(context)?.crossSigningSetupSuccess ?? 'Cross-signing setup successful')),
       );
       setState(() {});
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('设置失败: $e')),
+        SnackBar(content: Text(S.of(context)?.setupFailed(e.toString()) ?? 'Setup failed: $e')),
       );
     }
   }
@@ -507,23 +516,23 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   void _showResetConfirmation() {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('重置加密'),
-        content: const Text(
-          '警告：这将删除您所有的加密密钥。您将无法解密之前的加密消息。此操作不可撤销。',
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.resetEncryptionTitle ?? 'Reset Encryption'),
+        content: Text(
+          S.of(context)?.resetEncryptionWarning ?? 'Warning: This will delete all your encryption keys. You will not be able to decrypt previous encrypted messages. This action cannot be undone.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(ctx);
               // 实现重置逻辑
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('重置'),
+            child: Text(S.of(context)?.reset ?? 'Reset'),
           ),
         ],
       ),

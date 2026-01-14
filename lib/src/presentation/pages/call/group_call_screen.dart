@@ -11,6 +11,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 // import 'package:livekit_client/livekit_client.dart'; // 暂时禁用
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../services/voip/livekit_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/n42_avatar.dart';
@@ -179,10 +180,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     if (videoParticipants.isEmpty) {
       return Container(
         color: Colors.grey[900],
-        child: const Center(
+        child: Center(
           child: Text(
-            '等待参与者加入...',
-            style: TextStyle(color: Colors.white54, fontSize: 16),
+            S.of(context)?.waitingForParticipants ?? 'Waiting for participants to join...',
+            style: const TextStyle(color: Colors.white54, fontSize: 16),
           ),
         ),
       );
@@ -329,7 +330,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          participant.isLocal ? '${participant.name}（我）' : participant.name,
+                          participant.isLocal
+                              ? (S.of(context)?.participantMe(participant.name) ?? '${participant.name} (Me)')
+                              : participant.name,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
@@ -354,14 +357,14 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     color: AppColors.primary.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.screen_share, color: Colors.white, size: 14),
-                      SizedBox(width: 4),
+                      const Icon(Icons.screen_share, color: Colors.white, size: 14),
+                      const SizedBox(width: 4),
                       Text(
-                        '共享中',
-                        style: TextStyle(color: Colors.white, fontSize: 11),
+                        S.of(context)?.sharingLabel ?? 'Sharing',
+                        style: const TextStyle(color: Colors.white, fontSize: 11),
                       ),
                     ],
                   ),
@@ -408,7 +411,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     const Icon(Icons.screen_share, color: AppColors.primary, size: 18),
                     const SizedBox(width: 8),
                     Text(
-                      '${sharer.name} 正在共享屏幕',
+                      S.of(context)?.screenSharingBy(sharer.name) ?? '${sharer.name} is sharing screen',
                       style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
                   ],
@@ -481,7 +484,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   Row(
                     children: [
                       Text(
-                        '${_participants.length} 人',
+                        S.of(context)?.participantCount(_participants.length) ?? '${_participants.length} participants',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 12,
@@ -571,41 +574,47 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             // 静音
             _buildControlButton(
               icon: _isMuted ? Icons.mic_off : Icons.mic,
-              label: _isMuted ? '解除静音' : '静音',
+              label: _isMuted
+                  ? (S.of(context)?.unmuteLabel ?? 'Unmute')
+                  : (S.of(context)?.muteLabel ?? 'Mute'),
               isActive: _isMuted,
               activeColor: Colors.red,
               onPressed: _toggleMute,
             ),
-            
+
             // 视频
             _buildControlButton(
               icon: _isVideoEnabled ? Icons.videocam : Icons.videocam_off,
-              label: _isVideoEnabled ? '关闭视频' : '开启视频',
+              label: _isVideoEnabled
+                  ? (S.of(context)?.turnOffVideo ?? 'Turn off video')
+                  : (S.of(context)?.turnOnVideo ?? 'Turn on video'),
               isActive: !_isVideoEnabled,
               activeColor: Colors.red,
               onPressed: _toggleVideo,
             ),
-            
+
             // 屏幕共享
             _buildControlButton(
               icon: Icons.screen_share,
-              label: _isScreenSharing ? '停止共享' : '共享屏幕',
+              label: _isScreenSharing
+                  ? (S.of(context)?.stopSharing ?? 'Stop sharing')
+                  : (S.of(context)?.shareScreen ?? 'Share screen'),
               isActive: _isScreenSharing,
               activeColor: AppColors.primary,
               onPressed: _toggleScreenShare,
             ),
-            
+
             // 切换摄像头
             _buildControlButton(
               icon: Icons.cameraswitch,
-              label: '切换',
+              label: S.of(context)?.switchCameraLabel ?? 'Switch',
               onPressed: _switchCamera,
             ),
-            
+
             // 离开
             _buildControlButton(
               icon: Icons.call_end,
-              label: '离开',
+              label: S.of(context)?.leaveLabel ?? 'Leave',
               backgroundColor: Colors.red,
               onPressed: _showLeaveDialog,
             ),
@@ -680,9 +689,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               ),
               child: Row(
                 children: [
-                  const Text(
-                    '参与者',
-                    style: TextStyle(
+                  Text(
+                    S.of(context)?.participantsLabel ?? 'Participants',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -743,7 +752,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         borderRadius: 20,
       ),
       title: Text(
-        participant.isLocal ? '${participant.name}（我）' : participant.name,
+        participant.isLocal
+                              ? (S.of(context)?.participantMe(participant.name) ?? '${participant.name} (Me)')
+                              : participant.name,
         style: const TextStyle(color: Colors.white, fontSize: 14),
       ),
       trailing: Row(
@@ -776,15 +787,15 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     return Positioned.fill(
       child: Container(
         color: Colors.black.withOpacity(0.8),
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(color: AppColors.primary),
-              SizedBox(height: 24),
+              const CircularProgressIndicator(color: AppColors.primary),
+              const SizedBox(height: 24),
               Text(
-                '正在加入会议...',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                S.of(context)?.joiningMeeting ?? 'Joining meeting...',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ],
           ),
@@ -842,21 +853,21 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   void _showLeaveDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('离开会议'),
-        content: const Text('确定要离开会议吗？'),
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.leaveMeeting ?? 'Leave Meeting'),
+        content: Text(S.of(context)?.leaveMeetingConfirm ?? 'Are you sure you want to leave the meeting?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消'),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(S.of(context)?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(ctx).pop();
               _leaveMeeting();
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('离开'),
+            child: Text(S.of(context)?.leaveLabel ?? 'Leave'),
           ),
         ],
       ),
