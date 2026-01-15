@@ -1520,7 +1520,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
             Text(S.of(context)?.receivedTransfer ?? 'Received Transfer', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
 
-            Text(S.of(context)?.fromSender(senderName) ?? 'From $senderName', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+            Text(S.of(context)?.fromSender(senderName, senderName) ?? 'From $senderName', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
             const SizedBox(height: 24),
             
             Row(
