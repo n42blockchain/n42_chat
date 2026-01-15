@@ -34,6 +34,7 @@
         "get_it",
         "go_router",
         "google_sign_in",
+        "http",
         "image_picker",
         "injectable",
         "intl",
@@ -96,7 +97,7 @@
     },
     {
       "name": "mockito",
-      "version": "5.6.1",
+      "version": "5.6.3",
       "dependencies": [
         "analyzer",
         "build",
@@ -112,7 +113,7 @@
     },
     {
       "name": "drift_dev",
-      "version": "2.30.0",
+      "version": "2.30.1",
       "dependencies": [
         "analyzer",
         "args",
@@ -177,7 +178,7 @@
     },
     {
       "name": "build_runner",
-      "version": "2.10.4",
+      "version": "2.10.5",
       "dependencies": [
         "analyzer",
         "args",
@@ -214,7 +215,7 @@
     },
     {
       "name": "flutter_lints",
-      "version": "3.0.2",
+      "version": "6.0.0",
       "dependencies": [
         "lints"
       ]
@@ -336,7 +337,7 @@
     },
     {
       "name": "mobile_scanner",
-      "version": "5.2.3",
+      "version": "6.0.11",
       "dependencies": [
         "flutter",
         "flutter_web_plugins",
@@ -487,7 +488,7 @@
     },
     {
       "name": "permission_handler",
-      "version": "11.4.0",
+      "version": "12.0.1",
       "dependencies": [
         "flutter",
         "meta",
@@ -500,9 +501,10 @@
     },
     {
       "name": "file_picker",
-      "version": "8.3.7",
+      "version": "10.3.8",
       "dependencies": [
         "cross_file",
+        "dbus",
         "ffi",
         "flutter",
         "flutter_plugin_android_lifecycle",
@@ -607,7 +609,7 @@
     },
     {
       "name": "flutter_slidable",
-      "version": "3.1.2",
+      "version": "4.0.3",
       "dependencies": [
         "flutter"
       ]
@@ -628,6 +630,16 @@
         "flutter",
         "flutter_cache_manager",
         "octo_image"
+      ]
+    },
+    {
+      "name": "http",
+      "version": "1.6.0",
+      "dependencies": [
+        "async",
+        "http_parser",
+        "meta",
+        "web"
       ]
     },
     {
@@ -708,7 +720,7 @@
     },
     {
       "name": "injectable",
-      "version": "2.6.0",
+      "version": "2.7.1+4",
       "dependencies": [
         "get_it",
         "meta"
@@ -716,7 +728,7 @@
     },
     {
       "name": "get_it",
-      "version": "7.7.0",
+      "version": "9.2.0",
       "dependencies": [
         "async",
         "collection",
@@ -970,7 +982,7 @@
     },
     {
       "name": "sqlparser",
-      "version": "0.42.1",
+      "version": "0.43.0",
       "dependencies": [
         "charcode",
         "collection",
@@ -1190,7 +1202,7 @@
     },
     {
       "name": "lints",
-      "version": "3.0.0",
+      "version": "6.0.0",
       "dependencies": []
     },
     {
@@ -1277,22 +1289,6 @@
       "dependencies": [
         "flutter",
         "plugin_platform_interface"
-      ]
-    },
-    {
-      "name": "google_sign_in_ios",
-      "version": "5.9.0",
-      "dependencies": [
-        "flutter",
-        "google_sign_in_platform_interface"
-      ]
-    },
-    {
-      "name": "google_sign_in_android",
-      "version": "6.2.1",
-      "dependencies": [
-        "flutter",
-        "google_sign_in_platform_interface"
       ]
     },
     {
@@ -1620,16 +1616,6 @@
       ]
     },
     {
-      "name": "http",
-      "version": "1.6.0",
-      "dependencies": [
-        "async",
-        "http_parser",
-        "meta",
-        "web"
-      ]
-    },
-    {
       "name": "fixnum",
       "version": "1.1.1",
       "dependencies": []
@@ -1671,7 +1657,7 @@
     },
     {
       "name": "permission_handler_android",
-      "version": "12.1.0",
+      "version": "13.0.1",
       "dependencies": [
         "flutter",
         "permission_handler_platform_interface"
@@ -1985,16 +1971,6 @@
       ]
     },
     {
-      "name": "dio_web_adapter",
-      "version": "2.1.1",
-      "dependencies": [
-        "dio",
-        "http_parser",
-        "meta",
-        "web"
-      ]
-    },
-    {
       "name": "http_parser",
       "version": "4.1.2",
       "dependencies": [
@@ -2002,6 +1978,16 @@
         "source_span",
         "string_scanner",
         "typed_data"
+      ]
+    },
+    {
+      "name": "dio_web_adapter",
+      "version": "2.1.1",
+      "dependencies": [
+        "dio",
+        "http_parser",
+        "meta",
+        "web"
       ]
     },
     {
@@ -2568,6 +2554,22 @@
         "ffi",
         "meta",
         "path"
+      ]
+    },
+    {
+      "name": "google_sign_in_ios",
+      "version": "5.9.0",
+      "dependencies": [
+        "flutter",
+        "google_sign_in_platform_interface"
+      ]
+    },
+    {
+      "name": "google_sign_in_android",
+      "version": "6.2.1",
+      "dependencies": [
+        "flutter",
+        "google_sign_in_platform_interface"
       ]
     }
   ],
