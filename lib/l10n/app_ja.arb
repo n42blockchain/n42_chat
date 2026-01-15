@@ -1,0 +1,1543 @@
+{
+  "@@locale": "ja",
+  "chatModuleInitFailed": "チャットモジュールの初期化に失敗しました",
+  "checkNetworkRetry": "ネットワーク接続を確認して再試行してください",
+  "retry": "再試行",
+  "unknownUser": "不明なユーザー",
+  "walletNotConnected": "ウォレット未接続",
+  "cannotGetWalletAddress": "ウォレットアドレスを取得できません",
+  "paymentRequestMemo": "支払いリクエスト: {requestId}",
+  "callServiceNotInitialized": "通話サービスが初期化されていません",
+  "alreadyInCall": "通話中です",
+  "meetingServiceNotInitialized": "ミーティングサービスが初期化されていません",
+  "livekitNotConfigured": "LiveKitが設定されていません",
+  "unknownConversation": "不明な会話",
+  "startCallFailed": "通話の開始に失敗しました: {error}",
+  "answerCallFailed": "応答に失敗しました: {error}",
+  "connectionFailed": "接続に失敗しました",
+  "callRejected": "通話が拒否されました",
+  "noAnswer": "応答なし",
+  "invalidLoginResponse": "無効なログイン応答",
+  "loginFailed": "ログインに失敗しました: {error}",
+  "sessionRestoreFailed": "セッションの復元に失敗しました",
+  "additionalVerificationRequired": "追加認証が必要です",
+  "registrationFailed": "登録に失敗しました: {error}",
+  "cannotConnectServer": "サーバーに接続できません: {error}",
+  "wrongUsernamePassword": "ユーザー名またはパスワードが正しくありません",
+  "usernameTaken": "ユーザー名は既に使用されています",
+  "invalidUsernameFormat": "無効なユーザー名形式",
+  "rateLimitExceeded": "リクエストが多すぎます。しばらくしてから再試行してください",
+  "loginExpired": "ログインの有効期限が切れました",
+  "joinMeetingFailed": "ミーティングへの参加に失敗しました: {error}",
+  "screenShareFailed": "画面共有に失敗しました: {error}",
+  "answer": "応答",
+  "decline": "拒否",
+  "missedCall": "不在着信",
+  "callBack": "折り返し電話",
+  "incomingCall": "着信",
+  "missedVideoCall": "不在ビデオ通話",
+  "missedVoiceCall": "不在音声通話",
+  "passkeyNotInitialized": "パスキーが初期化されていません",
+  "googleSignInNotConfigured": "Googleサインインが設定されていません",
+  "encryptedMessage": "[暗号化されたメッセージ]",
+  "sticker": "[スタンプ]",
+  "groupCreated": "グループが作成されました",
+  "groupNameChanged": "グループ名が変更されました",
+  "groupAvatarChanged": "グループアバターが変更されました",
+  "groupAnnouncementChanged": "グループお知らせが変更されました",
+  "image": "[画像]",
+  "video": "[動画]",
+  "voice": "[音声]",
+  "file": "[ファイル]",
+  "location": "[位置情報]",
+  "unknownMessage": "[不明なメッセージ]",
+  "joinedGroup": "{senderName}がグループに参加しました",
+  "leftGroup": "{senderName}がグループを退出しました",
+  "invitedToGroup": "{senderName}が招待されました",
+  "removedFromGroup": "{senderName}が削除されました",
+  "avatarDataEmpty": "アバターデータが空です",
+  "avatarTooLarge": "アバターファイルが大きすぎます。最大10MBです",
+  "uploadAvatarFailed": "アバターのアップロードに失敗しました",
+  "delete": "削除",
+  "notLoggedIn": "ログインしていません",
+  "roomNotExist": "ルームが見つかりません: {roomId}",
+  "uploadImageFailed": "画像のアップロードに失敗しました",
+  "matrixClientNotInitialized": "Matrixクライアントが初期化されていません",
+  "uploadVoiceFailed": "音声のアップロードに失敗しました: MXC URIを取得できません",
+  "uploadVideoFailed": "動画のアップロードに失敗しました: MXC URIを取得できません",
+  "uploadFileFailed": "ファイルのアップロードに失敗しました: MXC URIを取得できません",
+  "locationWithCoords": "位置情報: {lat}, {lon}",
+  "myLocation": "現在地",
+  "pollEnded": "投票が終了しました",
+  "groupChat": "グループチャット",
+  "search": "検索",
+  "cancel": "キャンセル",
+  "userCancelled": "ユーザーがキャンセルしました",
+  "noData": "データがありません",
+  "noSearchResults": "検索結果がありません",
+  "tryDifferentKeyword": "別のキーワードを試してください",
+  "loadFailed": "読み込みに失敗しました",
+  "checkNetwork": "ネットワーク接続を確認してください",
+  "networkConnectionFailed": "ネットワーク接続に失敗しました",
+  "checkNetworkSettings": "ネットワーク設定を確認してください",
+  "messages": "メッセージ",
+  "contacts": "連絡先",
+  "discover": "発見",
+  "me": "自分",
+  "voiceLoading": "音声を読み込み中です。しばらくしてから再試行してください",
+  "voiceToTextFailed": "音声のテキスト変換に失敗しました",
+  "converting": "変換中...",
+  "convertToText": "テキストに変換",
+  "convertToTextTitle": "テキストに変換",
+  "selectEmoji": "絵文字を選択",
+  "frequentlyUsed": "よく使う",
+  "copy": "コピー",
+  "forward": "転送",
+  "unfavorite": "お気に入り解除",
+  "favorite": "お気に入り",
+  "resend": "再送信",
+  "recall": "取り消し",
+  "multiSelect": "複数選択",
+  "quote": "引用",
+  "remind": "リマインド",
+  "searchThis": "検索",
+  "recallMessageConfirm": "このメッセージを取り消しますか？",
+  "youRecalledMessage": "メッセージを取り消しました",
+  "otherRecalledMessage": "メッセージが取り消されました",
+  "reEdit": "再編集",
+  "copied": "コピーしました",
+  "sendMessageHint": "メッセージを送信",
+  "microphonePermissionRequired": "マイクの使用を許可してください",
+  "startRecordingFailed": "録音の開始に失敗しました: {error}",
+  "recordingTooShort": "録音が短すぎます",
+  "stopRecordingFailed": "録音の停止に失敗しました: {error}",
+  "releaseToCancel": "離すとキャンセル",
+  "releaseToSend": "離すと送信、上にスワイプでキャンセル",
+  "holdToTalk": "押し続けて話す",
+  "send": "送信",
+  "conversationLabel": "会話: {roomId}",
+  "contactLabel": "連絡先: {userId}",
+  "addFriend": "友達を追加",
+  "chatServiceNotConnected": "チャットサービスに接続されていません",
+  "userNotFoundHint": "ユーザー「{query}」が見つかりません\n\nヒント:\n• 完全なユーザーIDを入力してください（例: @username:server.com）\n• ユーザー名のスペルを確認してください",
+  "@userNotFoundHint": {
+    "placeholders": {
+      "query": {"type": "String"}
+    }
+  },
+  "createChatFailed": "チャットの作成に失敗しました: {error}",
+  "@createChatFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "searchFailed": "検索に失敗しました: {error}",
+  "@searchFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterUserIdOrUsername": "ユーザーIDまたはユーザー名を入力して検索",
+  "searching": "検索中...",
+  "searchUserToChat": "ユーザーを検索してチャットを開始",
+  "matrixIdExample": "完全なMatrix IDを入力できます\n例: @user:matrix.n42.network",
+  "userNotFound": "ユーザー「{username}」が見つかりません",
+  "@userNotFound": {
+    "placeholders": {
+      "username": {"type": "String"}
+    }
+  },
+  "chat": "チャット",
+  "settings": "設定",
+  "editProfile": "プロフィールを編集",
+  "login": "ログイン",
+  "createGroup": "グループを作成",
+  "developing": "{title}\n（近日公開）",
+  "error": "エラー",
+  "pageNotFound": "ページが見つかりません",
+  "backToHome": "ホームに戻る",
+  "allRead": "すべて既読",
+  "readCount": "{count}人が既読",
+  "transfer": "送金",
+  "pendingReceipt": "保留中",
+  "tapToReceive": "タップして受け取る",
+  "received": "受け取り済み",
+  "paymentReceived": "支払いを受け取りました",
+  "refunded": "返金済み",
+  "expired": "期限切れ",
+  "redPacketGreeting": "お祝いメッセージ",
+  "n42RedPacket": "N42レッドパケット",
+  "goodLuck": "幸運を祈って",
+  "claimed": "受け取り済み",
+  "allClaimed": "すべて受け取り済み",
+  "emoji": "絵文字",
+  "love": "愛",
+  "animals": "動物",
+  "food": "食べ物",
+  "travel": "旅行",
+  "activities": "アクティビティ",
+  "objects": "物",
+  "symbols": "記号",
+  "reply": "返信",
+  "copiedToClipboard": "クリップボードにコピーしました",
+  "edit": "編集",
+  "more": "もっと見る",
+  "selectForwardTarget": "転送先を選択",
+  "sendCount": "送信 ({count})",
+  "draft": "[下書き] ",
+  "n42Id": "N42 ID: {id}",
+  "friendInfo": "友達情報",
+  "friendInfoDesc": "友達のメモ、電話番号、タグ、ノート、写真を追加し、権限を設定します。",
+  "moments": "モーメント",
+  "sendMessage": "メッセージ",
+  "audioVideoCall": "音声/ビデオ通話",
+  "videoChannel": "ビデオチャンネル",
+  "remark": "メモ",
+  "remarkName": "表示名",
+  "phone": "電話番号",
+  "tags": "タグ",
+  "notes": "ノート",
+  "photos": "写真",
+  "permissions": "権限",
+  "chatMomentsEtc": "チャット、モーメント、スポーツなど",
+  "moreInfo": "詳細情報",
+  "commonGroups": "共通のグループ",
+  "zeroGroups": "0",
+  "source": "追加元",
+  "notificationSettings": "通知",
+  "receiveNotifications": "新着メッセージ通知を受け取る",
+  "showPreview": "メッセージプレビューを表示",
+  "showContentInNotification": "通知にメッセージ内容を表示",
+  "notificationSound": "通知音",
+  "playSoundOnMessage": "メッセージ受信時に音を鳴らす",
+  "vibrate": "バイブレーション",
+  "vibrateOnMessage": "メッセージ受信時にバイブレーション",
+  "doNotDisturb": "おやすみモード",
+  "dndDescription": "指定した時間帯は通知をミュート",
+  "startTime": "開始時間",
+  "endTime": "終了時間",
+  "privacy": "プライバシー",
+  "appearance": "外観",
+  "about": "このアプリについて",
+  "logout": "ログアウト",
+  "logoutConfirm": "ログアウトしてもよろしいですか？",
+  "exit": "ログアウト",
+  "save": "保存",
+  "nickname": "ニックネーム",
+  "enterNickname": "ニックネームを入力",
+  "signature": "署名",
+  "addSignature": "署名を追加",
+  "takePhoto": "写真を撮る",
+  "chooseFromGallery": "ギャラリーから選択",
+  "saveFailed": "保存に失敗しました: {error}",
+  "secureDecentralizedChat": "安全で分散型のメッセージング",
+  "endToEndEncryption": "エンドツーエンド暗号化",
+  "messagesOnlyYouCanSee": "あなたと受信者のみがメッセージを閲覧可能",
+  "decentralized": "分散型",
+  "basedOnMatrix": "Matrixオープンプロトコルを基盤",
+  "walletIntegration": "ウォレット連携",
+  "easyCryptoTransfer": "簡単な暗号通貨送金",
+  "register": "新規登録",
+  "agreeTerms": "ログインすることで、以下に同意したものとみなします",
+  "termsOfService": "利用規約",
+  "and": "および",
+  "privacyPolicy": "プライバシーポリシー",
+  "serverAddress": "サーバーアドレス",
+  "enterServerAddress": "サーバーアドレスを入力",
+  "validServerAddress": "有効なサーバーアドレスを入力してください",
+  "connectedTo": "{serverName}に接続済み",
+  "username": "ユーザー名",
+  "enterUsername": "ユーザー名を入力",
+  "password": "パスワード",
+  "enterPassword": "パスワードを入力",
+  "registerAccount": "新規登録",
+  "forgotPassword": "パスワードを忘れた",
+  "otherLoginMethods": "その他のログイン方法",
+  "emailVerification": "メール認証コード",
+  "enterServerFirst": "先にサーバーアドレスを入力してください",
+  "passkeyNeedsServer": "パスキーログインにはサーバーのサポートが必要です",
+  "googleLoginSuccess": "Googleログイン成功: {email}",
+  "googleLoginFailed": "Googleログインに失敗しました: {error}",
+  "appleLoginSuccess": "Appleログイン成功",
+  "appleLoginFailed": "Appleログインに失敗しました: {error}",
+  "createAccount": "アカウントを作成",
+  "joinN42Chat": "N42 Chatに参加してチャットを始めましょう",
+  "usernameHint": "3〜20文字、英数字と_のみ",
+  "usernameMinLength": "ユーザー名は3文字以上必要です",
+  "usernameMaxLength": "ユーザー名は20文字以下にしてください",
+  "usernameFormat": "ユーザー名は英字、数字、アンダースコアのみ使用可能です",
+  "passwordHint": "8文字以上",
+  "passwordMinLength": "パスワードは8文字以上必要です",
+  "confirmPassword": "パスワードを確認",
+  "reEnterPassword": "パスワードを再入力",
+  "passwordsNotMatch": "パスワードが一致しません",
+  "inviteCode": "招待コード（内蔵）",
+  "filled": "入力済み",
+  "enterInviteCode": "招待コードを入力",
+  "inviteCodeHint": "招待コードは内蔵されており、通常は変更不要です",
+  "agreeTermsFirst": "まず利用規約とプライバシーポリシーを読んで同意してください",
+  "iAgree": "読んで同意します",
+  "alreadyHaveAccount": "既にアカウントをお持ちですか？",
+  "loginNow": "今すぐログイン",
+  "whoCanSee": "閲覧可能な人",
+  "avatar": "アバター",
+  "status": "ステータス",
+  "lastSeen": "最終オンライン",
+  "messageSettings": "メッセージ",
+  "allowStrangerMessage": "知らない人からのメッセージを許可",
+  "receiveNonContact": "連絡先以外からのメッセージを受信",
+  "readReceipts": "既読通知",
+  "letOthersKnowRead": "メッセージを読んだことを相手に知らせる",
+  "typingStatus": "入力中ステータス",
+  "letOthersKnowTyping": "入力中であることを相手に知らせる",
+  "everyone": "全員",
+  "contactsOnly": "連絡先のみ",
+  "nobody": "誰にも表示しない",
+  "whoCanSeeItem": "{title}を閲覧できる人",
+  "version": "バージョン {version}",
+  "checkUpdate": "アップデートを確認",
+  "openSourceLicenses": "オープンソースライセンス",
+  "feedback": "フィードバック",
+  "builtOnMatrix": "Matrixプロトコルを基盤",
+  "loading": "読み込み中...",
+  "noConversations": "会話がありません",
+  "tapToChat": "右上をタップしてチャットを開始",
+  "startGroup": "グループチャットを開始",
+  "scan": "スキャン",
+  "payment": "支払い",
+  "featureComingSoon": "{feature}は近日公開",
+  "markAsRead": "既読にする",
+  "unmute": "ミュート解除",
+  "mute": "ミュート",
+  "unpin": "ピン解除",
+  "pin": "ピン留め",
+  "deleteConversation": "会話を削除",
+  "deleteConversationConfirm": "「{name}」との会話を削除しますか？",
+  "noContacts": "連絡先がありません",
+  "addFriendsToChat": "友達を追加してチャットを始めましょう",
+  "contactNotFound": "連絡先が見つかりません",
+  "tryOtherKeywords": "他のキーワードまたはグローバル検索を試してください",
+  "searchResults": "検索結果",
+  "newFriends": "新しい友達",
+  "chatOnlyFriends": "チャットのみの友達",
+  "officialAccounts": "公式アカウント",
+  "serviceAccounts": "サービスアカウント",
+  "enterpriseContacts": "企業連絡先",
+  "contactsCount": "{count}件の連絡先",
+  "recommendToFriend": "連絡先を共有",
+  "setRemark": "メモを設定",
+  "addToHome": "ホーム画面に追加",
+  "sendingCard": "連絡先カードを送信中...",
+  "contactCard": "[連絡先カード]",
+  "cardSent": "{contact}のカードを{friend}に送信しました",
+  "recommendFailed": "おすすめに失敗しました: {error}",
+  "enterRemark": "メモを入力",
+  "remarkSet": "メモを設定しました: {remark}",
+  "openingChat": "チャットを開いています...",
+  "openChatFailed": "チャットを開けませんでした: {error}",
+  "addContact": "連絡先を追加",
+  "enterUserId": "ユーザーIDを入力",
+  "noFriendRequests": "友達リクエストがありません",
+  "accept": "承認",
+  "reject": "拒否",
+  "acceptedRequest": "{name}の友達リクエストを承認しました",
+  "rejectedRequest": "{name}の友達リクエストを拒否しました",
+  "noGroups": "グループがありません",
+  "creatingGroup": "グループ作成機能は近日公開...",
+  "selectFriendToRecommend": "おすすめする友達を選択",
+  "searchContacts": "連絡先を検索",
+  "noContactsFound": "連絡先が見つかりません",
+  "yesterday": "昨日",
+  "monday": "月",
+  "tuesday": "火",
+  "wednesday": "水",
+  "thursday": "木",
+  "friday": "金",
+  "saturday": "土",
+  "sunday": "日",
+  "justNow": "たった今",
+  "minutesAgo": "{count}分前",
+  "hoursAgo": "{count}時間前",
+  "daysAgo": "{count}日前",
+  "online": "オンライン",
+  "offline": "オフライン",
+  "minutesAgoOnline": "{count}分前にオンライン",
+  "hoursAgoOnline": "{count}時間前にオンライン",
+  "daysAgoOnline": "{count}日前にオンライン",
+  "searchContactsGroupsMessages": "連絡先、グループ、メッセージを検索",
+  "searchError": "検索エラー",
+  "searchHint": "連絡先、グループ、メッセージを検索",
+  "enterKeyword": "キーワードを入力して検索",
+  "searchHistory": "検索履歴",
+  "clear": "クリア",
+  "noResultsFor": "「{query}」の検索結果がありません",
+  "all": "すべて",
+  "groups": "グループ",
+  "noResults": "結果がありません",
+  "groupInfo": "グループ情報",
+  "groupMembers": "メンバー ({count})",
+  "viewAll": "すべて表示",
+  "owner": "オーナー",
+  "admin": "管理者",
+  "invite": "招待",
+  "groupAnnouncement": "グループお知らせ",
+  "notSet": "未設定",
+  "groupDescription": "グループの説明",
+  "publicGroup": "公開グループ",
+  "allowSearchJoin": "検索と参加を許可",
+  "clearChatHistory": "チャット履歴を削除",
+  "dissolveGroup": "グループを解散",
+  "leaveGroup": "グループを退出",
+  "changeGroupName": "グループ名を変更",
+  "enterGroupName": "グループ名を入力",
+  "confirm": "確認",
+  "changeGroupDescription": "グループの説明を変更",
+  "enterGroupDescription": "グループの説明を入力",
+  "editAnnouncement": "お知らせを編集",
+  "enterAnnouncement": "お知らせを入力",
+  "publish": "公開",
+  "clearHistoryConfirm": "すべてのチャット履歴を削除しますか？この操作は取り消せません。",
+  "clearAction": "削除",
+  "chatHistoryCleared": "チャット履歴が削除されました",
+  "leaveGroupConfirm": "「{name}」を退出しますか？",
+  "dissolveGroupConfirm": "「{name}」を解散しますか？この操作は取り消せません。",
+  "dissolve": "解散",
+  "groupQrCode": "グループQRコード",
+  "searchChatHistory": "チャット履歴を検索",
+  "groupIdCopied": "グループIDをコピーしました",
+  "tapCopyGroupId": "{count}人のメンバー · タップしてグループIDをコピー",
+  "featureInDevelopment": "機能開発中...",
+  "receiverAddress": "送金先アドレス",
+  "enterOrPasteAddress": "ウォレットアドレスを入力または貼り付け",
+  "selectToken": "トークンを選択",
+  "transferAmount": "送金額",
+  "available": "利用可能",
+  "allAmount": "全額",
+  "memoOptional": "メモ（任意）",
+  "addMemo": "メモを追加",
+  "confirmTransfer": "送金を確認",
+  "invalidAddress": "有効な送金先アドレスを入力してください",
+  "invalidAmount": "有効な金額を入力してください",
+  "selectTokenPlease": "トークンを選択してください",
+  "addressVerified": "アドレス確認済み",
+  "availableBalance": "残高: {balance} {symbol}",
+  "scanningInDevelopment": "スキャン機能は開発中...",
+  "enterAmount": "金額を入力",
+  "redPacketCountMin": "最低1つのレッドパケットが必要です",
+  "viewRedPacketDetails": "レッドパケットの詳細を表示",
+  "enterTransferAmount": "送金額を入力",
+  "transferTo": "送金先",
+  "selectCurrency": "通貨を選択",
+  "receiveTransfer": "送金を受け取りました",
+  "fromSender": "{senderName}から",
+  "confirmReceive": "受け取りを確認",
+  "groupProfile": "グループ情報",
+  "viewProfile": "プロフィールを表示",
+  "removeMember": "グループから削除",
+  "removeMemberConfirm": "「{name}」をグループから削除しますか？",
+  "remove": "削除",
+  "clearStatus": "ステータスをクリア",
+  "clearStatusConfirm": "現在のステータスをクリアしますか？",
+  "statusCleared": "ステータスをクリアしました",
+  "statusSet": "ステータスを設定しました: {result}",
+  "userNotExist": "ユーザーが存在しません",
+  "userIdCopied": "ユーザーIDをコピーしました",
+  "voiceCallInDevelopment": "音声通話は開発中...",
+  "report": "報告",
+  "reportInDevelopment": "報告機能は開発中...",
+  "shareCard": "カードを共有",
+  "shareInDevelopment": "共有機能は開発中...",
+  "qrCode": "QRコード",
+  "qrCodeInDevelopment": "QRコード機能は開発中...",
+  "avatarUpdated": "アバターを更新しました",
+  "selectImageFailed": "画像の選択に失敗しました: {error}",
+  "changeName": "名前を変更",
+  "male": "男性",
+  "female": "女性",
+  "genderSet": "性別を設定しました: {gender}",
+  "regionSet": "地域を設定しました: {region}",
+  "setPatText": "なでなでテキストを設定",
+  "changeSignature": "署名を変更",
+  "ringtoneSet": "着信音を設定しました: {result}",
+  "featureInDev": "{feature}は開発中...",
+  "saveAddressFailed": "住所の保存に失敗しました: {error}",
+  "myAddress": "マイアドレス",
+  "addNew": "追加",
+  "addAddress": "住所を追加",
+  "addressAdded": "住所を追加しました",
+  "addressUpdated": "住所を更新しました",
+  "deleteAddress": "住所を削除",
+  "deleteAddressConfirm": "この住所を削除しますか？",
+  "addressDeleted": "住所を削除しました",
+  "setDefaultAddress": "デフォルトに設定",
+  "fillCompleteInfo": "すべての項目を入力してください",
+  "saveInvoiceFailed": "請求書の保存に失敗しました: {error}",
+  "myInvoices": "マイ請求書",
+  "addInvoice": "請求書を追加",
+  "invoiceAdded": "請求書を追加しました",
+  "invoiceUpdated": "請求書を更新しました",
+  "deleteInvoice": "請求書を削除",
+  "deleteInvoiceConfirm": "この請求書を削除しますか？",
+  "invoiceDeleted": "請求書を削除しました",
+  "invoiceType": "請求書の種類: ",
+  "personal": "個人",
+  "enterprise": "法人",
+  "setDefaultInvoice": "デフォルトに設定",
+  "enterTaxId": "税務番号を入力",
+  "vibrateMode": "バイブレーションモード",
+  "silentMode": "サイレントモード",
+  "playing": "再生中: {ringtoneName}",
+  "playFailed": "再生に失敗しました: {ringtoneName}",
+  "enterGroupNamePlease": "グループ名を入力してください",
+  "selectAtLeastOne": "少なくとも1人のメンバーを選択してください",
+  "fillStatus": "ステータスを入力",
+  "fileNotExist": "ファイルが存在しません",
+  "sendFailed": "送信に失敗しました: {error}",
+  "cannotOpenBrowser": "ブラウザを開けません",
+  "selectFileFailed": "ファイルの選択に失敗しました: {error}",
+  "enterMusicLink": "音楽リンクを入力",
+  "enterValidLink": "有効なリンクを入力してください",
+  "enterPollQuestion": "投票の質問を入力",
+  "minTwoOptions": "最低2つの選択肢が必要です",
+  "crossDeviceEnabled": "クロスデバイス署名が有効になりました",
+  "crossDeviceSet": "クロスデバイス署名の設定が完了しました",
+  "setupFailed": "設定に失敗しました: {error}",
+  "receiveAmount": "受取金額",
+  "enterValidAmount": "有効な金額を入力してください",
+  "addressCopied": "アドレスをコピーしました",
+  "openItem": "開く: {content}",
+  "newNoteComingSoon": "新規メモ機能は近日公開",
+  "addLinkComingSoon": "リンク追加機能は近日公開",
+  "deleted": "削除しました",
+  "shareComingSoon": "共有機能は近日公開",
+  "saveComingSoon": "保存機能は近日公開",
+  "moreStylesComingSoon": "その他のスタイルは近日公開",
+  "wallet": "ウォレット",
+  "walletArea": "ウォレットエリア",
+  "recording": "録音中",
+  "invalidVideoUrl": "無効な動画URL",
+  "downloadFile": "ファイルをダウンロード",
+  "clearChatHistoryTitle": "チャット履歴を削除",
+  "cannotUndo": "この操作は取り消せません",
+  "videoCall": "ビデオ通話",
+  "voiceCall": "音声通話",
+  "leaveMeeting": "ミーティングを退出",
+  "chatDetails": "チャットの詳細",
+  "viewAllGroupMembers": "すべてのメンバーを表示",
+  "groupName": "グループ名",
+  "groupNameUpdated": "グループ名を更新しました",
+  "updateFailed": "更新に失敗しました",
+  "noPermissionToModify": "変更する権限がありません",
+  "groupManagement": "グループ管理",
+  "myNicknameInGroup": "グループ内のニックネーム",
+  "pinChat": "チャットをピン留め",
+  "strongReminder": "強調リマインダー",
+  "setChatBackground": "チャット背景を設定",
+  "unknownFile": "不明なファイル",
+  "download": "ダウンロード",
+  "invalidLocation": "無効な位置情報",
+  "address": "住所",
+  "latitude": "緯度",
+  "longitude": "経度",
+  "close": "閉じる",
+  "tapToCancel": "タップしてキャンセル",
+  "captureFailed": "キャプチャに失敗しました: {error}",
+  "processingVideo": "動画を処理中...",
+  "videoFileNotExist": "動画ファイルが存在しません",
+  "videoDataEmpty": "動画データが空です",
+  "videoTooLarge": "動画サイズは100MBを超えられません",
+  "sendingVideo": "動画を送信中...",
+  "sendVideoFailed": "動画の送信に失敗しました: {error}",
+  "imageFileNotExist": "画像ファイルが存在しません",
+  "imageDataEmpty": "画像データが空です",
+  "sendingImage": "画像を送信中...",
+  "sendImageFailed": "画像の送信に失敗しました: {error}",
+  "sendLocation": "位置情報を送信",
+  "selectLocationAndSend": "位置を選択して送信",
+  "shareRealTimeLocation": "リアルタイム位置情報を共有",
+  "shareLocationForOneHour": "友達とリアルタイム位置情報を1時間共有",
+  "locationSent": "位置情報を送信しました",
+  "selectMessages": "メッセージを選択",
+  "selectedCount": "{count}件選択",
+  "selectAll": "すべて選択",
+  "groupChatCount": "グループチャット ({count})",
+  "privateChat": "プライベートチャット",
+  "noMessages": "メッセージがありません",
+  "sendFirstMessage": "最初のメッセージを送信してチャットを開始",
+  "encryptionNotice": "このチャットはエンドツーエンド暗号化されています。あなたと受信者のみがメッセージを読むことができます。",
+  "replyTo": "{name}への返信",
+  "multiForward": "転送",
+  "collect": "コレクション",
+  "noMembers": "メンバーがいません",
+  "memberNotFound": "メンバーが見つかりません",
+  "voiceFileNotExist": "音声ファイルが存在しません",
+  "voiceFileEmpty": "音声ファイルが空です",
+  "sendingVoice": "音声を送信中...",
+  "sendVoiceFailed": "音声の送信に失敗しました: {error}",
+  "messageCopied": "メッセージをコピーしました",
+  "messageForwarded": "メッセージを転送しました",
+  "forwardFailed": "転送に失敗しました: {error}",
+  "unfavorited": "お気に入りから削除しました",
+  "favorited": "お気に入りに追加しました",
+  "reactionAdded": "リアクションを追加しました",
+  "failedMessageDeleted": "失敗したメッセージを削除しました",
+  "deleteMessages": "メッセージを削除",
+  "deleteMessagesConfirm": "{count}件のメッセージを削除してもよろしいですか？",
+  "noteOtherMessages": "注意: {count}件のメッセージは他のユーザーからのもので、ローカルでのみ削除できます。",
+  "myMessagesWillBeRecalled": "あなたの{count}件のメッセージは取り消されます。",
+  "recalledCount": "{count}件取り消し、{localCount}件をローカルで削除しました",
+  "recalledMessages": "{count}件のメッセージを取り消しました",
+  "deletedLocally": "{count}件のメッセージを削除しました（ローカル）",
+  "forwardedCount": "{count}件のメッセージを転送しました",
+  "forwardComplete": "転送完了: {success}件成功、{failed}件失敗",
+  "remindOnlyInGroup": "リマインド機能はグループチャットでのみ利用可能です",
+  "onlyTextSearchable": "テキストメッセージのみ検索可能です",
+  "searchFor": "「{text}」を検索",
+  "baiduSearch": "Baidu検索",
+  "googleSearch": "Google検索",
+  "bingSearch": "Bing検索",
+  "calling": "発信中...",
+  "connecting": "接続中...",
+  "ringing": "呼び出し中...",
+  "inCall": "通話中",
+  "collectMessages": "{count}件のメッセージをコレクションに追加しました",
+  "voted": "投票しました",
+  "voteChanged": "投票を変更しました",
+  "voteRemoved": "投票を取り消しました",
+  "endPoll": "投票を終了",
+  "endPollConfirm": "この投票を終了してもよろしいですか？終了後は投票できなくなります。",
+  "memberCount": "{count}人のメンバー",
+  "videoChannels": "チャンネル",
+  "live": "ライブ",
+  "listen": "聴く",
+  "watch": "見る",
+  "searchDiscover": "検索",
+  "nearbyPeople": "近くの人",
+  "games": "ゲーム",
+  "miniPrograms": "ミニプログラム",
+  "done": "完了({count})",
+  "@done": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "services": "サービス",
+  "favorites": "お気に入り",
+  "ordersAndCards": "注文 & カード",
+  "stickers": "スタンプ",
+  "statusSetTo": "ステータスを設定しました: {status}",
+  "@statusSetTo": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "avatarUploadFailed": "アバターのアップロードに失敗しました",
+  "personalProfile": "個人プロフィール",
+  "name": "名前",
+  "gender": "性別",
+  "region": "地域",
+  "myQrCode": "マイQRコード",
+  "poke": "つつく",
+  "ringtone": "着信音",
+  "defaultRingtone": "デフォルト着信音",
+  "myAddresses": "マイアドレス",
+  "genderSetTo": "性別を設定しました: {gender}",
+  "@genderSetTo": {
+    "placeholders": {
+      "gender": {"type": "String"}
+    }
+  },
+  "selectRegion": "地域を選択",
+  "selectCity": "都市を選択",
+  "regionSetTo": "地域を設定しました: {region}",
+  "@regionSetTo": {
+    "placeholders": {
+      "region": {"type": "String"}
+    }
+  },
+  "setPoke": "つつくを設定",
+  "friendPokedMe": "友達がつついてきました",
+  "enterPokeSuffix": "つつくの補足を入力（例: 肩を）",
+  "example": "例",
+  "onTheShoulder": " 肩を",
+  "pokeCleared": "つつくをクリアしました",
+  "pokeSetTo": "つつくを設定しました: つついた{suffix}",
+  "@pokeSetTo": {
+    "placeholders": {
+      "suffix": {"type": "String"}
+    }
+  },
+  "editSignature": "署名を編集",
+  "introduceYourself": "自己紹介を一言で",
+  "signatureCleared": "署名をクリアしました",
+  "signatureUpdated": "署名を更新しました",
+  "scanToAddFriend": "上のQRコードをスキャンして友達に追加",
+  "ringtoneSetTo": "着信音を設定しました: {ringtone}",
+  "@ringtoneSetTo": {
+    "placeholders": {
+      "ringtone": {"type": "String"}
+    }
+  },
+  "confirmDissolveGroup": "本当にグループを解散しますか",
+  "enterValidServerAddress": "有効なサーバーアドレスを入力してください",
+  "emailOtp": "メールOTP",
+  "enterServerAddressFirst": "先にサーバーアドレスを入力してください",
+  "passkeyRequiresServer": "パスキーログインにはサーバーのサポートが必要です",
+  "loginAgreement": "ログインすることで、以下に同意したものとみなします ",
+  "pleaseAgreeToTerms": "利用規約とプライバシーポリシーを読んで同意してください",
+  "registerFailed": "登録に失敗しました",
+  "reenterPassword": "パスワードを再入力",
+  "passwordsDoNotMatch": "パスワードが一致しません",
+  "inviteCodeBuiltIn": "招待コード（内蔵）",
+  "inviteCodeBuiltInNote": "招待コードは内蔵されており、通常は変更不要です",
+  "iHaveReadAndAgree": "読んで同意します ",
+  "startGroupChat": "グループチャットを開始",
+  "addFriends": "友達を追加",
+  "paymentAndCollection": "支払い",
+  "messagesWithCount": "メッセージ({count})",
+  "@messagesWithCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "contactCount": "{count}件の連絡先",
+  "@contactCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "addToHomeScreen": "ホーム画面に追加",
+  "recommendedCardTo": "{contact}のカードを{recipient}におすすめしました",
+  "@recommendedCardTo": {
+    "placeholders": {
+      "contact": {"type": "String"},
+      "recipient": {"type": "String"}
+    }
+  },
+  "enterRemarkName": "表示名を入力",
+  "remarkSetTo": "メモを設定しました: {remark}",
+  "@remarkSetTo": {
+    "placeholders": {
+      "remark": {"type": "String"}
+    }
+  },
+  "acceptedFriendRequest": "{name}の友達リクエストを承認しました",
+  "@acceptedFriendRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "rejectedFriendRequest": "{name}の友達リクエストを拒否しました",
+  "@rejectedFriendRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "groupInvites": "グループ招待",
+  "myGroups": "マイグループ",
+  "invitedToJoinGroup": "グループへの招待",
+  "confirmLeaveGroup": "本当にグループを退出しますか",
+  "leave": "退出",
+  "saveMedia": "保存",
+  "recallThisMessage": "このメッセージを取り消しますか？",
+  "messageRecalled": "メッセージが取り消されました",
+  "savedToGallery": "ギャラリーに保存しました",
+  "failedToSave": "保存に失敗しました",
+  "saving": "保存中...",
+  "share": "共有",
+  "saveToGallery": "ギャラリーに保存",
+  "downloadFailed": "ダウンロードに失敗しました",
+  "noMediaUrl": "メディアURLがありません",
+  "shareFailed": "共有に失敗しました",
+  "failedToLoadImage": "画像の読み込みに失敗しました",
+  "failedToLoadMoreMessages": "追加メッセージの読み込みに失敗しました",
+  "failedToSend": "送信に失敗しました",
+  "failedToSendImage": "画像の送信に失敗しました",
+  "failedToSendVoice": "音声の送信に失敗しました",
+  "failedToSendFile": "ファイルの送信に失敗しました",
+  "failedToSendVideo": "動画の送信に失敗しました",
+  "failedToSendLocation": "位置情報の送信に失敗しました",
+  "failedToResend": "再送信に失敗しました",
+  "failedToRecall": "取り消しに失敗しました",
+  "failedToReply": "返信に失敗しました",
+  "failedToAddReaction": "リアクションの追加に失敗しました",
+  "failedToSendPoll": "投票の送信に失敗しました",
+  "failedToVote": "投票に失敗しました",
+  "failedToLoadMessages": "メッセージの読み込みに失敗しました",
+  "callFeatureComingSoon": "音声通話とビデオ通話機能は近日公開",
+  "cannotForwardRedPacketOrTransfer": "レッドパケットと送金は転送できません",
+  "videoRecordingFailed": "動画録画に失敗しました。再試行してください。",
+  "redPacket": "レッドパケット",
+  "music": "音楽",
+  "coupon": "クーポン",
+  "gift": "ギフト",
+  "poll": "投票",
+  "text": "テキスト",
+  "link": "リンク",
+  "note": "メモ",
+  "myNotes": "マイメモ",
+  "today": "今日",
+  "daysAgoText": "{count}日前",
+  "@daysAgoText": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "dateFormat": "{month}/{day}",
+  "@dateFormat": {
+    "placeholders": {
+      "month": {"type": "int"},
+      "day": {"type": "int"}
+    }
+  },
+  "noFavorites": "お気に入りがありません",
+  "longPressToFavorite": "メッセージを長押ししてお気に入りに追加",
+  "newNote": "新規メモ",
+  "favoriteLink": "リンクをお気に入り",
+  "editTags": "タグを編集",
+  "deleteFavorite": "お気に入りを削除",
+  "deleteFavoriteConfirm": "このお気に入りを削除してもよろしいですか？",
+  "noSearchResultsFound": "結果が見つかりませんでした",
+  "sendRedPacket": "レッドパケットを送る",
+  "amount": "金額",
+  "redPacketCover": "レッドパケットカバー",
+  "redPacketType": "レッドパケットの種類",
+  "normalRedPacket": "通常",
+  "luckyRedPacket": "ラッキー",
+  "redPacketCount": "レッドパケットの数",
+  "pieces": "個",
+  "putMoneyInRedPacket": "レッドパケットにお金を入れる",
+  "redPacketRefundNotice": "24時間以内に受け取られなかったレッドパケットは返金されます",
+  "openRedPacket": "開く",
+  "redPacketAllClaimed": "レッドパケットはすべて受け取られました",
+  "redPacketExpired": "レッドパケットの期限が切れました",
+  "addTransferNote": "送金メモを追加",
+  "yuan": "円",
+  "savedToChangeCanTransfer": "残高に保存され、直接送金可能",
+  "replyWithEmoji": "この絵文字で返信",
+  "claimedYourRedPacket": "があなたの",
+  "claimedRedPacket": "を受け取りました",
+  "otherTyping": "入力中...",
+  "processing": "処理中...",
+  "transferCancelled": "送金がキャンセルされました",
+  "transferFailed": "送金に失敗しました",
+  "creatingPaymentRequest": "支払いリクエストを作成中...",
+  "processingPayment": "支払いを処理中...",
+  "paymentFailed": "支払いに失敗しました",
+  "clickRetry": "タップして再試行",
+  "settingsTitle": "設定",
+  "editRemark": "メモを編集",
+  "setPermissions": "権限を設定",
+  "recommendToFriends": "友達におすすめ",
+  "setStarFriend": "スター付き友達に設定",
+  "addToBlacklist": "ブラックリストに追加",
+  "complain": "報告",
+  "deleteContact": "連絡先を削除",
+  "deleteContactConfirm": "{name}を削除してもよろしいですか？",
+  "@deleteContactConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "transferTitle": "送金",
+  "receiverAddressLabel": "送金先アドレス",
+  "selectTokenLabel": "トークンを選択",
+  "transferAmountLabel": "送金額",
+  "memoLabel": "メモ（任意）",
+  "enterOrPasteAddressHint": "ウォレットアドレスを入力または貼り付け",
+  "scanInDevelopment": "スキャン機能は開発中...",
+  "availableLabel": "利用可能",
+  "availableBalanceFormat": "残高: {balance} {symbol}",
+  "@availableBalanceFormat": {
+    "placeholders": {
+      "balance": {"type": "String"},
+      "symbol": {"type": "String"}
+    }
+  },
+  "addMemoHint": "メモを追加",
+  "receiveTitle": "受け取り",
+  "walletNotConnectedTitle": "ウォレット未接続",
+  "connectWalletFirst": "まずウォレットを接続してください",
+  "sendPaymentRequest": "支払いリクエストを送信",
+  "qrCodeGenerateFailed": "QRコード生成に失敗しました",
+  "scanQrToPayMe": "QRコードをスキャンして支払い",
+  "myWalletAddress": "マイウォレットアドレス",
+  "createPaymentRequest": "支払いリクエストを作成",
+  "selectTokenHint": "トークンを選択",
+  "amountLabel": "金額",
+  "cancelButton": "キャンセル",
+  "sendRequestButton": "リクエストを送信",
+  "allReadReceipt": "すべて既読",
+  "readCountReceipt": "{count}人が既読",
+  "@readCountReceipt": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "n42IdLabel": "N42 ID: {id}",
+  "@n42IdLabel": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "redPacketDefaultGreeting": "お祝いメッセージ",
+  "senderRedPacket": "{name}のレッドパケット",
+  "@senderRedPacket": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "enterValidAddress": "有効なアドレスを入力してください",
+  "pleaseSelectToken": "トークンを選択してください",
+  "receivedTransfer": "送金を受け取りました",
+  "@fromSender": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "selectForwardRecipient": "転送先を選択",
+  "@sendCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "emojiFaces": "顔",
+  "emojiHearts": "ハート",
+  "emojiAnimals": "動物",
+  "emojiFood": "食べ物",
+  "emojiTransport": "乗り物",
+  "emojiActivities": "アクティビティ",
+  "emojiObjects": "物",
+  "emojiSymbols": "記号",
+  "transferProcessing": "送金処理中...",
+  "senderSentRedPacket": "{name}がレッドパケットを送りました",
+  "@senderSentRedPacket": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "savedToBalance": "残高に保存され、直接送金可能",
+  "redPacketExpiredOrEmpty": "レッドパケットの期限切れ/すべて受け取り済み",
+  "scanFeatureComingSoon": "スキャン機能は近日公開...",
+  "setAsStarred": "スター付きに設定",
+  "addToBlocklist": "ブロックリストに追加",
+  "claimedYour": " があなたの ",
+  "claimedText": " を受け取りました",
+  "userTyping": "{name}が入力中...",
+  "@userTyping": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "typing": "入力中...",
+  "waitingToReceive": "受け取り待ち",
+  "tapToClaim": "タップして受け取る",
+  "hasBeenReceived": "受け取り済み",
+  "getLucky": "幸運を祈って",
+  "cameraStartFailed": "カメラの起動に失敗しました",
+  "unknownError": "不明なエラー",
+  "placeQrCodeInFrame": "QRコードを枠内に配置してスキャン",
+  "closeManualInput": "手動入力を閉じる",
+  "manualInputUserId": "ユーザーIDを手動入力",
+  "add": "追加",
+  "ringtoneClear": "クリア",
+  "ringtonePhone": "電話",
+  "ringtoneClassic": "クラシック",
+  "ringtoneSoft": "ソフト",
+  "ringtoneVibrate": "バイブレーション",
+  "ringtoneSilent": "サイレント",
+  "stop": "停止",
+  "selectRingtone": "着信音を選択",
+  "loadingRingtones": "着信音を読み込み中...",
+  "noRingtonesFound": "着信音が見つかりません",
+  "moodAndThoughts": "気分 & 思い",
+  "statusHappy": "嬉しい",
+  "statusCracked": "疲れた",
+  "statusLucky": "ラッキー",
+  "statusSunny": "晴れやか",
+  "statusTired": "疲れた",
+  "statusDaydream": "空想中",
+  "statusRushing": "急いでいる",
+  "statusOverthinking": "考えすぎ",
+  "statusEnergized": "元気いっぱい",
+  "workAndStudy": "仕事 & 勉強",
+  "statusWorking": "仕事中",
+  "statusStudying": "勉強中",
+  "statusBusy": "忙しい",
+  "statusSlacking": "サボり中",
+  "statusTraveling": "旅行中",
+  "statusGoingHome": "帰宅中",
+  "statusDnd": "取り込み中",
+  "statusHanging": "遊び中",
+  "statusCheckIn": "チェックイン",
+  "statusExercising": "運動中",
+  "statusCoffee": "コーヒー",
+  "statusBubbleTea": "タピオカ",
+  "statusEating": "食事中",
+  "statusParenting": "子育て中",
+  "statusSavingWorld": "世界を救う",
+  "statusSelfie": "自撮り",
+  "rest": "休憩",
+  "statusRetreat": "静養中",
+  "statusHome": "在宅",
+  "statusSleeping": "睡眠中",
+  "statusCatLover": "猫好き",
+  "statusDogWalking": "犬の散歩中",
+  "statusGaming": "ゲーム中",
+  "statusListening": "音楽を聴いてる",
+  "setStatus": "ステータスを設定",
+  "visibleToFriends24h": "友達に24時間表示されます",
+  "writeStatus": "ステータスを入力",
+  "enterYourStatus": "ステータスを入力...",
+  "ok": "OK",
+  "cameraPermissionRequired": "QRコードをスキャンするにはカメラの権限が必要です",
+  "cameraPermissionDenied": "カメラの権限が永久に拒否されました。システム設定で有効にしてください。",
+  "cannotGetCameraPermission": "カメラの権限を取得できません",
+  "permissionCheckError": "権限確認エラー: {error}",
+  "@permissionCheckError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "invalidQrCode": "無効なQRコード",
+  "qrCodeProcessFailed": "QRコードの処理に失敗しました: {error}",
+  "@qrCodeProcessFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "cannotAddFriend": "友達を追加できません: {error}",
+  "@cannotAddFriend": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "scanQrCode": "QRコードをスキャン",
+  "checkingCameraPermission": "カメラの権限を確認中...",
+  "needCameraPermission": "カメラの権限が必要です",
+  "retryPermission": "再試行",
+  "openSettings": "設定を開く",
+  "inviteMembers": "メンバーを招待",
+  "inviteCount": "招待({count})",
+  "@inviteCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "noShippingAddress": "配送先住所がありません",
+  "defaultLabel": "デフォルト",
+  "editAddress": "住所を編集",
+  "recipient": "受取人",
+  "enterRecipientName": "受取人の名前を入力",
+  "phoneNumber": "電話番号",
+  "enterPhoneNumber": "電話番号を入力",
+  "regionHint": "都道府県/市区町村",
+  "detailedAddress": "詳細住所",
+  "detailedAddressHint": "番地、建物名など",
+  "setAsDefaultAddress": "デフォルトの住所に設定",
+  "pleaseCompleteInfo": "すべての項目を入力してください",
+  "noInvoice": "請求書がありません",
+  "company": "会社",
+  "taxNumber": "税務番号",
+  "editInvoice": "請求書を編集",
+  "companyName": "会社名",
+  "enterCompanyName": "会社名を入力",
+  "personalName": "個人名",
+  "enterName": "名前を入力",
+  "taxIdNumber": "税務ID番号",
+  "enterTaxIdNumber": "税務ID番号を入力",
+  "bankNameOptional": "銀行名（任意）",
+  "enterBankName": "銀行名を入力",
+  "bankAccountOptional": "銀行口座（任意）",
+  "enterBankAccount": "銀行口座を入力",
+  "companyAddressOptional": "会社住所（任意）",
+  "enterCompanyAddress": "会社住所を入力",
+  "companyPhoneOptional": "会社電話（任意）",
+  "enterCompanyPhone": "会社電話を入力",
+  "setAsDefaultInvoice": "デフォルトの請求書に設定",
+  "confirmDeleteAddress": "この住所を削除してもよろしいですか？",
+  "confirmDeleteInvoice": "この請求書を削除してもよろしいですか？",
+  "groupOwner": "オーナー",
+  "groupAdmin": "管理者",
+  "searchMembers": "メンバーを検索",
+  "totalMembers": "{count}人のメンバー",
+  "@totalMembers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "removeFromGroup": "グループから削除",
+  "confirmRemoveMember": "「{name}」をグループから削除してもよろしいですか？",
+  "@confirmRemoveMember": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "setAsAdmin": "管理者に設定",
+  "removeAdmin": "管理者を解除",
+  "deleteContactSuccess": "連絡先を削除しました",
+  "unknownSong": "不明な曲",
+  "unknownArtist": "不明なアーティスト",
+  "unknownContact": "不明な連絡先",
+  "personalCard": "連絡先カード",
+  "singleChoice": "単一選択",
+  "multiChoice": "複数選択",
+  "ended": "終了",
+  "endPollButton": "投票を終了",
+  "createPoll": "投票を作成",
+  "pollQuestion": "投票の質問",
+  "enterPollQuestionHint": "投票の質問を入力",
+  "pollOptions": "投票オプション",
+  "optionPlaceholder": "オプション {index}",
+  "addOption": "オプションを追加",
+  "pollSettings": "投票設定",
+  "anonymousPoll": "匿名投票",
+  "pollHint": "投票はチャットに表示されます。グループメンバーが投票できます。",
+  "searchSongOrArtist": "曲またはアーティストを検索",
+  "noSongsFound": "曲が見つかりません",
+  "supportedMusicPlatforms": "NetEase、QQ Musicなどの音楽リンクをサポート",
+  "songNameOptional": "曲名（任意）",
+  "enterSongName": "曲名を入力",
+  "artistNameOptional": "アーティスト名（任意）",
+  "enterArtistName": "アーティスト名を入力",
+  "shareSong": "曲を共有",
+  "realTimeLocationSharing": "リアルタイム位置情報共有は開発中...",
+  "voiceCallFeatureInDev": "音声通話機能は開発中...",
+  "reportFeatureInDev": "報告機能は開発中...",
+  "shareFeatureInDev": "共有機能は開発中...",
+  "qrCodeFeatureInDev": "QRコード機能は開発中...",
+  "scanQrToAddMe": "上のQRコードをスキャンして友達に追加",
+  "saveToAlbum": "アルバムに保存",
+  "changeStyle": "スタイルを変更",
+  "copyId": "IDをコピー",
+  "idCopied": "IDをコピーしました",
+  "shareFeatureComingSoon": "共有機能は近日公開",
+  "saveFeatureComingSoon": "保存機能は近日公開",
+  "moreStylesFeatureComingSoon": "その他のスタイルは近日公開",
+  "confirmEndPoll": "この投票を終了してもよろしいですか？",
+  "cannotVoteAfterEnd": "終了後は投票できなくなります。",
+  "@featureInDev": {
+    "placeholders": {
+      "feature": {"type": "String"}
+    }
+  },
+  "@optionPlaceholder": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "bio": "自己紹介",
+  "homeServer": "サーバー",
+  "shareContactCard": "連絡先カードを共有",
+  "removeFromBlacklist": "ブラックリストから削除",
+  "confirmAddBlacklist": "このユーザーをブラックリストに追加してもよろしいですか？このユーザーからのメッセージは受信できなくなります。",
+  "confirmRemoveBlacklist": "このユーザーをブラックリストから削除してもよろしいですか？",
+  "remarkSaved": "メモを保存しました",
+  "remarkCleared": "メモをクリアしました",
+  "receive": "受け取り",
+  "pleaseConnectWallet": "まずウォレットを接続してください",
+  "sendRequest": "リクエストを送信",
+  "pleaseEnterValidAmount": "有効な金額を入力してください",
+  "searchPlaceholder": "連絡先、グループ、メッセージを検索",
+  "enterKeywordToSearch": "キーワードを入力して検索を開始",
+  "clearHistory": "クリア",
+  "noResultsForQuery": "「{query}」の検索結果が見つかりませんでした",
+  "@noResultsForQuery": {
+    "placeholders": {
+      "query": {"type": "String"}
+    }
+  },
+  "allResults": "すべて",
+  "groupLabel": "グループ",
+  "messageLabel": "メッセージ",
+  "searchInChat": "チャット内を検索",
+
+  "securityTitle": "セキュリティ",
+  "keyBackup": "キーバックアップ",
+  "backupEncryptionKeys": "暗号化キーをバックアップ",
+  "keysBackedUp": "{count}個のキーをバックアップしました",
+  "@keysBackedUp": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "backupNotSet": "バックアップ未設定",
+  "restoreKeys": "キーを復元",
+  "restoreKeysFromBackup": "バックアップから暗号化キーを復元",
+  "exportKeys": "キーをエクスポート",
+  "exportKeysToFile": "キーをファイルにエクスポート",
+  "loggedInDevices": "ログイン中のデバイス",
+  "noOtherDevices": "他のデバイスはありません",
+  "verified": "確認済み",
+  "unverified": "未確認",
+  "advanced": "詳細設定",
+  "crossSigning": "クロス署名",
+  "enabled": "有効",
+  "notEnabled": "無効",
+  "resetEncryption": "暗号化をリセット",
+  "deleteAllEncryptionKeys": "すべての暗号化キーを削除",
+  "encryptionNotSupported": "暗号化はサポートされていません",
+  "notInitialized": "初期化されていません",
+  "backupKeyTitle": "キーをバックアップ",
+  "backupKeyMessage": "新しいキーバックアップを作成しますか？これにより、新しいデバイスで暗号化されたメッセージを復元できます。",
+  "backup": "バックアップ",
+  "restoreKeyTitle": "キーを復元",
+  "restoreKeyMessage": "暗号化されたメッセージを復元するには、回復パスワードまたは回復キーを入力してください。",
+  "restore": "復元",
+  "exportKeyTitle": "キーをエクスポート",
+  "exportKeyMessage": "エクスポートされたキーファイルにはすべての暗号化キーが含まれています。安全に保管してください。",
+  "export": "エクスポート",
+  "deviceIdLabel": "デバイスID: {deviceId}",
+  "@deviceIdLabel": {
+    "placeholders": {
+      "deviceId": {"type": "String"}
+    }
+  },
+  "deviceStatusVerified": "ステータス: 確認済み",
+  "deviceStatusUnverified": "ステータス: 未確認",
+  "lastActiveLabel": "最終アクティブ: {lastSeen}",
+  "@lastActiveLabel": {
+    "placeholders": {
+      "lastSeen": {"type": "String"}
+    }
+  },
+  "verifyThisDevice": "このデバイスを確認",
+  "crossSigningAlreadyEnabled": "クロス署名は既に有効です",
+  "crossSigningSetupSuccess": "クロス署名の設定が完了しました",
+  "@setupFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "resetEncryptionTitle": "暗号化をリセット",
+  "resetEncryptionWarning": "警告: これにより、すべての暗号化キーが削除されます。以前の暗号化されたメッセージを復号化できなくなります。この操作は取り消せません。",
+  "reset": "リセット",
+
+  "leaveMeetingConfirm": "ミーティングを退出してもよろしいですか？",
+
+  "pokedSomeone": "{name}{suffix}をつついた",
+  "@pokedSomeone": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "suffix": {"type": "String"}
+    }
+  },
+  "noContactsToAdd": "追加できる連絡先がありません",
+  "addMembers": "メンバーを追加",
+  "invitedMembers": "{count}人のメンバーを招待しました",
+  "@invitedMembers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "inviteFailed": "招待に失敗しました: {error}",
+  "@inviteFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "memberRemoved": "メンバーを削除しました",
+  "removeFailed": "削除に失敗しました: {error}",
+  "@removeFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "realTimeLocationShareMessage": "共有後、相手は1時間あなたのリアルタイム位置情報を見ることができます。",
+  "startSharing": "共有を開始",
+  "locationServiceNotEnabled": "位置情報サービスが有効になっていません",
+  "enableLocationService": "この機能を使用するには位置情報サービスを有効にしてください",
+  "goToSettings": "設定へ移動",
+  "locationPermissionRequired": "この機能には位置情報の権限が必要です",
+  "locationPermissionDeniedPermanent": "位置情報の権限が永久に拒否されました。設定で有効にしてください。",
+  "locationPermissionDenied": "位置情報の権限が拒否されました",
+  "gettingLocation": "位置情報を取得中...",
+  "getLocationFailed": "位置情報の取得に失敗しました: {error}",
+  "@getLocationFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "currentLocation": "現在地",
+  "nearbyPlace": "近くの場所 {index}",
+  "@nearbyPlace": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "approximateDistance": "約{distance}",
+  "@approximateDistance": {
+    "placeholders": {
+      "distance": {"type": "String"}
+    }
+  },
+  "mapPreview": "地図プレビュー",
+  "searchLocation": "場所を検索",
+  "redPacketSent": "{amount} {token}のレッドパケットを送りました",
+  "@redPacketSent": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "token": {"type": "String"}
+    }
+  },
+  "transferDefault": "送金",
+  "transferSent": "{amount} {token}を送金しました",
+  "@transferSent": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "token": {"type": "String"}
+    }
+  },
+  "pickFileFailed": "ファイルの選択に失敗しました: {error}",
+  "@pickFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "fileSizeLimit": "ファイルサイズは50MBを超えられません",
+  "fileSending": "ファイルを送信中: {filename}",
+  "@fileSending": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "sendFileFailed": "ファイルの送信に失敗しました: {error}",
+  "@sendFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "contactCardSent": "{name}の連絡先カードを送信しました",
+  "@contactCardSent": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "favoritesFeature": "お気に入り",
+  "couponsFeature": "クーポン",
+  "giftFeature": "ギフト",
+  "sharedMusic": "{name}を共有しました",
+  "@sharedMusic": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "@sendFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "endPollTitle": "投票を終了",
+  "endPollConfirmMessage": "この投票を終了してもよろしいですか？終了後は投票できなくなります。",
+  "pollEndedMessage": "投票が終了しました",
+  "connectingCall": "接続中...",
+  "muteCall": "ミュート",
+  "speakerOff": "スピーカーオフ",
+  "speakerOn": "スピーカー",
+  "cameraOn": "カメラオン",
+  "cameraOff": "カメラオフ",
+  "hangUp": "通話終了",
+  "selectForwardTargetTitle": "転送先を選択",
+  "noForwardableChat": "転送可能なチャットがありません",
+  "noMatchingChat": "一致するチャットが見つかりません",
+  "imagePreview": "[画像]",
+  "voicePreview": "[音声]",
+  "videoPreview": "[動画]",
+  "filePreviewWithName": "[ファイル] {filename}",
+  "@filePreviewWithName": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "locationPreviewWithAddress": "[位置情報] {address}",
+  "@locationPreviewWithAddress": {
+    "placeholders": {
+      "address": {"type": "String"}
+    }
+  },
+  "musicPreviewWithTitle": "[音楽] {title}",
+  "@musicPreviewWithTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "messagePreview": "[メッセージ]",
+  "locationTitle": "位置情報",
+  "sendButton": "送信",
+  "retryButton": "再試行",
+  "selectContact": "連絡先を選択",
+  "searchContactHint": "連絡先を検索",
+  "shareMusic": "音楽を共有",
+  "recentPlayed": "最近",
+  "myFavorites": "お気に入り",
+  "networkLink": "リンク",
+  "localFile": "ローカル",
+  "musicLinkRequired": "音楽リンク *",
+  "pasteMusicLink": "音楽リンクを貼り付け",
+  "enterSongNamePlaceholder": "曲名を入力",
+  "enterArtistNamePlaceholder": "アーティスト名を入力",
+  "shareMusicButton": "音楽を共有",
+  "selectLocalAudio": "ローカルの音声ファイルを選択",
+  "supportedAudioFormats": "MP3、M4A、WAV、FLACなどをサポート",
+  "selectFileButton": "ファイルを選択",
+  "pleaseEnterMusicLink": "音楽リンクを入力してください",
+  "pleaseEnterValidLink": "有効なURLを入力してください",
+  "sharedSong": "共有した曲",
+  "selectMember": "メンバーを選択",
+  "searchMemberHint": "メンバーを検索",
+  "noMatchingMembers": "一致するメンバーが見つかりません",
+  "unknownMember": "不明",
+  "selectedMessagesCount": "{count}件のメッセージを選択",
+  "@selectedMessagesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchContactsOrGroups": "連絡先またはグループを検索",
+  "noMatchingConversations": "一致する会話が見つかりません",
+  "videoTitle": "動画",
+  "loadingText": "読み込み中...",
+  "videoPlaybackFailed": "動画の再生に失敗しました",
+  "@videoPlaybackFailed": {
+    "description": "Used with error message"
+  },
+  "videoLoadFailed": "動画の読み込みに失敗しました",
+  "playerInitFailed": "プレーヤーの初期化に失敗しました",
+  "createPollTitle": "投票を作成",
+  "submitPoll": "送信",
+  "pollQuestionLabel": "投票の質問",
+  "enterPollQuestionHint": "投票の質問を入力してください",
+  "pollOptionsLabel": "投票オプション",
+  "optionHintWithIndex": "オプション {index}",
+  "@optionHintWithIndex": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "addOptionButton": "オプションを追加",
+  "pollSettingsLabel": "投票設定",
+  "selectionType": "選択タイプ",
+  "singleChoiceLabel": "単一",
+  "multiChoiceLabel": "複数",
+  "anonymousPollSwitch": "匿名投票",
+  "pleaseEnterQuestion": "投票の質問を入力してください",
+  "atLeastTwoOptions": "最低2つのオプションが必要です",
+  "confirmWithCount": "確認 ({count})",
+  "@confirmWithCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@memberCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@groupChatCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@replyTo": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "emailVerificationTitle": "メール認証",
+  "enterValidEmailAddress": "有効なメールアドレスを入力してください",
+  "verificationCodeSentTo": "認証コードを{email}に送信しました",
+  "@verificationCodeSentTo": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "sendCodeFailed": "コードの送信に失敗しました: {error}",
+  "@sendCodeFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "verificationSuccess": "認証に成功しました",
+  "verificationFailed": "認証に失敗しました",
+  "verificationCodeError": "認証コードエラー: {error}",
+  "@verificationCodeError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterVerificationCode": "認証コードを入力",
+  "enterYourEmail": "メールアドレスを入力",
+  "weSentCodeTo": "6桁のコードを\n{email}に送信しました",
+  "@weSentCodeTo": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "enterEmailForCode": "メールアドレスを入力すると、認証コードを送信します",
+  "sendVerificationCode": "認証コードを送信",
+  "resendVerificationCode": "認証コードを再送信",
+  "canResendAfter": "{seconds}秒後に再送信可能",
+  "@canResendAfter": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "changeEmail": "メールアドレスを変更",
+  "addToContacts": "連絡先に追加",
+  "addingToContacts": "追加中...",
+  "addedToContacts": "連絡先に追加しました",
+  "addFailedWithError": "追加に失敗しました: {error}",
+  "@addFailedWithError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "addPhone": "電話番号を追加",
+  "addTag": "タグを追加",
+  "addText": "テキストを追加",
+  "addPhoto": "写真を追加",
+  "groupCountLabel": "{count}件のグループ",
+  "@groupCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "addedViaSearch": "検索で追加",
+  "addTime": "日時を追加",
+  "doneButton": "完了",
+  "waitingForParticipants": "参加者を待っています...",
+  "participantMe": "{name} (自分)",
+  "@participantMe": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "sharingLabel": "共有中",
+  "screenSharingBy": "{name}が画面を共有中",
+  "@screenSharingBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "participantCount": "{count}人の参加者",
+  "@participantCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "muteLabel": "ミュート",
+  "unmuteLabel": "ミュート解除",
+  "turnOffVideo": "ビデオをオフ",
+  "turnOnVideo": "ビデオをオン",
+  "shareScreen": "画面を共有",
+  "stopSharing": "共有を停止",
+  "switchCameraLabel": "切り替え",
+  "leaveLabel": "退出",
+  "participantsLabel": "参加者",
+  "joiningMeeting": "ミーティングに参加中..."
+}

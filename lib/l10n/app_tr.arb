@@ -1,0 +1,1542 @@
+{
+  "@@locale": "tr",
+  "chatModuleInitFailed": "Sohbet modülü başlatılamadı",
+  "checkNetworkRetry": "Lütfen ağ bağlantınızı kontrol edin ve tekrar deneyin",
+  "retry": "Tekrar Dene",
+  "unknownUser": "Bilinmeyen Kullanıcı",
+  "walletNotConnected": "Cüzdan bağlı değil",
+  "cannotGetWalletAddress": "Cüzdan adresi alınamadı",
+  "paymentRequestMemo": "Ödeme talebi: {requestId}",
+  "callServiceNotInitialized": "Arama servisi başlatılmadı",
+  "alreadyInCall": "Zaten bir aramada",
+  "meetingServiceNotInitialized": "Toplantı servisi başlatılmadı",
+  "livekitNotConfigured": "LiveKit yapılandırılmadı",
+  "unknownConversation": "Bilinmeyen sohbet",
+  "startCallFailed": "Arama başlatılamadı: {error}",
+  "answerCallFailed": "Yanıtlanamadı: {error}",
+  "connectionFailed": "Bağlantı başarısız",
+  "callRejected": "Arama reddedildi",
+  "noAnswer": "Cevap yok",
+  "invalidLoginResponse": "Geçersiz giriş yanıtı",
+  "loginFailed": "Giriş başarısız: {error}",
+  "sessionRestoreFailed": "Oturum geri yüklenemedi",
+  "additionalVerificationRequired": "Ek doğrulama gerekli",
+  "registrationFailed": "Kayıt başarısız: {error}",
+  "cannotConnectServer": "Sunucuya bağlanılamadı: {error}",
+  "wrongUsernamePassword": "Yanlış kullanıcı adı veya şifre",
+  "usernameTaken": "Kullanıcı adı zaten alınmış",
+  "invalidUsernameFormat": "Geçersiz kullanıcı adı formatı",
+  "rateLimitExceeded": "Çok fazla istek, lütfen daha sonra tekrar deneyin",
+  "loginExpired": "Oturum süresi doldu",
+  "joinMeetingFailed": "Toplantıya katılınamadı: {error}",
+  "screenShareFailed": "Ekran paylaşımı başarısız: {error}",
+  "answer": "Yanıtla",
+  "decline": "Reddet",
+  "missedCall": "Cevapsız arama",
+  "callBack": "Geri ara",
+  "incomingCall": "Gelen arama",
+  "missedVideoCall": "Cevapsız görüntülü arama",
+  "missedVoiceCall": "Cevapsız sesli arama",
+  "passkeyNotInitialized": "Passkey başlatılmadı",
+  "googleSignInNotConfigured": "Google Giriş yapılandırılmadı",
+  "encryptedMessage": "[Şifreli mesaj]",
+  "sticker": "[Çıkartma]",
+  "groupCreated": "Grup oluşturuldu",
+  "groupNameChanged": "Grup adı değiştirildi",
+  "groupAvatarChanged": "Grup avatarı değiştirildi",
+  "groupAnnouncementChanged": "Grup duyurusu değiştirildi",
+  "image": "[Resim]",
+  "video": "[Video]",
+  "voice": "[Ses]",
+  "file": "[Dosya]",
+  "location": "[Konum]",
+  "unknownMessage": "[Bilinmeyen mesaj]",
+  "joinedGroup": "{senderName} gruba katıldı",
+  "leftGroup": "{senderName} gruptan ayrıldı",
+  "invitedToGroup": "{senderName} davet edildi",
+  "removedFromGroup": "{senderName} gruptan çıkarıldı",
+  "avatarDataEmpty": "Avatar verisi boş",
+  "avatarTooLarge": "Avatar dosyası çok büyük, maksimum 10MB",
+  "uploadAvatarFailed": "Avatar yüklenemedi",
+  "delete": "Sil",
+  "notLoggedIn": "Giriş yapılmadı",
+  "roomNotExist": "Oda bulunamadı: {roomId}",
+  "uploadImageFailed": "Resim yüklenemedi",
+  "matrixClientNotInitialized": "Matrix istemcisi başlatılmadı",
+  "uploadVoiceFailed": "Ses yüklenemedi: MXC URI alınamadı",
+  "uploadVideoFailed": "Video yüklenemedi: MXC URI alınamadı",
+  "uploadFileFailed": "Dosya yüklenemedi: MXC URI alınamadı",
+  "locationWithCoords": "Konum: {lat}, {lon}",
+  "myLocation": "Konumum",
+  "pollEnded": "Anket sona erdi",
+  "groupChat": "Grup Sohbeti",
+  "search": "Ara",
+  "cancel": "İptal",
+  "userCancelled": "Kullanıcı iptal etti",
+  "noData": "Veri yok",
+  "noSearchResults": "Arama sonucu yok",
+  "tryDifferentKeyword": "Farklı bir anahtar kelime deneyin",
+  "loadFailed": "Yükleme başarısız",
+  "checkNetwork": "Lütfen ağ bağlantınızı kontrol edin",
+  "networkConnectionFailed": "Ağ bağlantısı başarısız",
+  "checkNetworkSettings": "Lütfen ağ ayarlarınızı kontrol edin",
+  "messages": "Mesajlar",
+  "contacts": "Kişiler",
+  "discover": "Keşfet",
+  "me": "Ben",
+  "voiceLoading": "Ses yükleniyor, lütfen daha sonra tekrar deneyin",
+  "voiceToTextFailed": "Sesten metne dönüştürme başarısız",
+  "converting": "Dönüştürülüyor...",
+  "convertToText": "Metne çevir",
+  "convertToTextTitle": "Metne Dönüştür",
+  "selectEmoji": "Emoji seç",
+  "frequentlyUsed": "Sık kullanılan",
+  "copy": "Kopyala",
+  "forward": "İlet",
+  "unfavorite": "Favorilerden çıkar",
+  "favorite": "Favorilere ekle",
+  "resend": "Tekrar gönder",
+  "recall": "Geri al",
+  "multiSelect": "Çoklu seçim",
+  "quote": "Alıntıla",
+  "remind": "Hatırlat",
+  "searchThis": "Ara",
+  "recallMessageConfirm": "Bu mesajı geri almak istiyor musunuz?",
+  "youRecalledMessage": "Bir mesajı geri aldınız",
+  "otherRecalledMessage": "Mesaj geri alındı",
+  "reEdit": "Yeniden düzenle",
+  "copied": "Kopyalandı",
+  "sendMessageHint": "Mesaj gönder",
+  "microphonePermissionRequired": "Lütfen mikrofon iznini verin",
+  "startRecordingFailed": "Kayıt başlatılamadı: {error}",
+  "recordingTooShort": "Kayıt çok kısa",
+  "stopRecordingFailed": "Kayıt durdurulamadı: {error}",
+  "releaseToCancel": "İptal etmek için bırakın",
+  "releaseToSend": "Göndermek için bırakın, iptal için yukarı kaydırın",
+  "holdToTalk": "Konuşmak için basılı tutun",
+  "send": "Gönder",
+  "conversationLabel": "Sohbet: {roomId}",
+  "contactLabel": "Kişi: {userId}",
+  "addFriend": "Arkadaş Ekle",
+  "chatServiceNotConnected": "Sohbet servisi bağlı değil",
+  "userNotFoundHint": "\"{query}\" kullanıcısı bulunamadı\n\nİpuçları:\n• Tam kullanıcı ID'sini girin, örn. @kullaniciadi:sunucu.com\n• Kullanıcı adı yazımını kontrol edin",
+  "@userNotFoundHint": {
+    "placeholders": {
+      "query": {"type": "String"}
+    }
+  },
+  "createChatFailed": "Sohbet oluşturulamadı: {error}",
+  "@createChatFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "searchFailed": "Arama başarısız: {error}",
+  "@searchFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterUserIdOrUsername": "Aramak için kullanıcı ID'si veya adı girin",
+  "searching": "Aranıyor...",
+  "searchUserToChat": "Sohbet başlatmak için kullanıcı arayın",
+  "matrixIdExample": "Tam Matrix ID'si girebilirsiniz\nörn. @kullanici:matrix.n42.network",
+  "userNotFound": "\"{username}\" kullanıcısı bulunamadı",
+  "@userNotFound": {
+    "placeholders": {
+      "username": {"type": "String"}
+    }
+  },
+  "chat": "Sohbet",
+  "settings": "Ayarlar",
+  "editProfile": "Profili Düzenle",
+  "login": "Giriş Yap",
+  "createGroup": "Grup Oluştur",
+  "developing": "{title}\n(Yakında)",
+  "error": "Hata",
+  "pageNotFound": "Sayfa bulunamadı",
+  "backToHome": "Ana Sayfaya Dön",
+  "allRead": "Tümü okundu",
+  "readCount": "{count} okundu",
+  "transfer": "Transfer",
+  "pendingReceipt": "Bekliyor",
+  "tapToReceive": "Almak için dokunun",
+  "received": "Alındı",
+  "paymentReceived": "Ödeme alındı",
+  "refunded": "İade edildi",
+  "expired": "Süresi doldu",
+  "redPacketGreeting": "İyi dilekler",
+  "n42RedPacket": "N42 Kırmızı Paket",
+  "goodLuck": "Şans dile",
+  "claimed": "Alındı",
+  "allClaimed": "Tamamı alındı",
+  "emoji": "Emoji",
+  "love": "Aşk",
+  "animals": "Hayvanlar",
+  "food": "Yiyecek",
+  "travel": "Seyahat",
+  "activities": "Aktiviteler",
+  "objects": "Nesneler",
+  "symbols": "Semboller",
+  "reply": "Yanıtla",
+  "copiedToClipboard": "Panoya kopyalandı",
+  "edit": "Düzenle",
+  "more": "Daha fazla",
+  "selectForwardTarget": "Alıcı seçin",
+  "sendCount": "Gönder ({count})",
+  "draft": "[Taslak] ",
+  "n42Id": "N42 ID: {id}",
+  "friendInfo": "Arkadaş Bilgisi",
+  "friendInfoDesc": "Arkadaşınıza not, telefon, etiket ekleyin ve izinleri ayarlayın.",
+  "moments": "Anlar",
+  "sendMessage": "Mesaj",
+  "audioVideoCall": "Sesli/Görüntülü Arama",
+  "videoChannel": "Video Kanalı",
+  "remark": "Not",
+  "remarkName": "Takma Ad",
+  "phone": "Telefon",
+  "tags": "Etiketler",
+  "notes": "Notlar",
+  "photos": "Fotoğraflar",
+  "permissions": "İzinler",
+  "chatMomentsEtc": "Sohbet, Anlar, Spor, vb.",
+  "moreInfo": "Daha Fazla Bilgi",
+  "commonGroups": "Ortak Gruplar",
+  "zeroGroups": "0",
+  "source": "Kaynak",
+  "notificationSettings": "Bildirimler",
+  "receiveNotifications": "Yeni mesaj bildirimleri al",
+  "showPreview": "Mesaj önizlemesi göster",
+  "showContentInNotification": "Bildirimlerde mesaj içeriğini göster",
+  "notificationSound": "Bildirim sesi",
+  "playSoundOnMessage": "Mesaj alındığında ses çal",
+  "vibrate": "Titreşim",
+  "vibrateOnMessage": "Mesaj alındığında titret",
+  "doNotDisturb": "Rahatsız Etmeyin",
+  "dndDescription": "Belirli saatlerde bildirimleri sessize al",
+  "startTime": "Başlangıç saati",
+  "endTime": "Bitiş saati",
+  "privacy": "Gizlilik",
+  "appearance": "Görünüm",
+  "about": "Hakkında",
+  "logout": "Çıkış Yap",
+  "logoutConfirm": "Çıkış yapmak istediğinizden emin misiniz?",
+  "exit": "Çıkış Yap",
+  "save": "Kaydet",
+  "nickname": "Takma Ad",
+  "enterNickname": "Takma ad girin",
+  "signature": "İmza",
+  "addSignature": "İmza ekle",
+  "takePhoto": "Fotoğraf Çek",
+  "chooseFromGallery": "Galeriden Seç",
+  "saveFailed": "Kaydetme başarısız: {error}",
+  "secureDecentralizedChat": "Güvenli, merkezi olmayan mesajlaşma",
+  "endToEndEncryption": "Uçtan uca şifreleme",
+  "messagesOnlyYouCanSee": "Mesajlar sadece siz ve alıcı tarafından görülebilir",
+  "decentralized": "Merkezi Olmayan",
+  "basedOnMatrix": "Matrix açık protokolü üzerine kurulu",
+  "walletIntegration": "Cüzdan Entegrasyonu",
+  "easyCryptoTransfer": "Kolay kripto para transferi",
+  "register": "Kayıt Ol",
+  "agreeTerms": "Giriş yaparak kabul etmiş olursunuz",
+  "termsOfService": "Hizmet Şartları",
+  "and": "ve",
+  "privacyPolicy": "Gizlilik Politikası",
+  "serverAddress": "Sunucu Adresi",
+  "enterServerAddress": "Sunucu adresi girin",
+  "validServerAddress": "Lütfen geçerli bir sunucu adresi girin",
+  "connectedTo": "{serverName} sunucusuna bağlandı",
+  "username": "Kullanıcı Adı",
+  "enterUsername": "Kullanıcı adı girin",
+  "password": "Şifre",
+  "enterPassword": "Şifre girin",
+  "registerAccount": "Kayıt Ol",
+  "forgotPassword": "Şifremi Unuttum",
+  "otherLoginMethods": "Diğer giriş yöntemleri",
+  "emailVerification": "E-posta doğrulama kodu",
+  "enterServerFirst": "Lütfen önce sunucu adresini girin",
+  "passkeyNeedsServer": "Passkey girişi sunucu desteği gerektirir",
+  "googleLoginSuccess": "Google giriş başarılı: {email}",
+  "googleLoginFailed": "Google giriş başarısız: {error}",
+  "appleLoginSuccess": "Apple giriş başarılı",
+  "appleLoginFailed": "Apple giriş başarısız: {error}",
+  "createAccount": "Hesap Oluştur",
+  "joinN42Chat": "Sohbete başlamak için N42 Chat'e katılın",
+  "usernameHint": "3-20 karakter, harf/rakam/_",
+  "usernameMinLength": "Kullanıcı adı en az 3 karakter olmalıdır",
+  "usernameMaxLength": "Kullanıcı adı en fazla 20 karakter olmalıdır",
+  "usernameFormat": "Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir",
+  "passwordHint": "En az 8 karakter",
+  "passwordMinLength": "Şifre en az 8 karakter olmalıdır",
+  "confirmPassword": "Şifreyi Onayla",
+  "reEnterPassword": "Şifreyi tekrar girin",
+  "passwordsNotMatch": "Şifreler eşleşmiyor",
+  "inviteCode": "Davet kodu (yerleşik)",
+  "filled": "Dolduruldu",
+  "enterInviteCode": "Davet kodu girin",
+  "inviteCodeHint": "Davet kodu yerleşiktir, genellikle değiştirmeye gerek yoktur",
+  "agreeTermsFirst": "Lütfen önce şartları ve gizlilik politikasını okuyun ve kabul edin",
+  "iAgree": "Okudum ve kabul ediyorum",
+  "alreadyHaveAccount": "Zaten hesabınız var mı?",
+  "loginNow": "Hemen giriş yapın",
+  "whoCanSee": "Kimler görebilir",
+  "avatar": "Avatar",
+  "status": "Durum",
+  "lastSeen": "Son görülme",
+  "messageSettings": "Mesajlar",
+  "allowStrangerMessage": "Yabancılardan mesaj kabul et",
+  "receiveNonContact": "Kişi listesinde olmayanlardan mesaj al",
+  "readReceipts": "Okundu bilgisi",
+  "letOthersKnowRead": "Başkalarının mesajlarınızı okuduğunuzu bilmesine izin ver",
+  "typingStatus": "Yazma durumu",
+  "letOthersKnowTyping": "Başkalarının yazdığınızı bilmesine izin ver",
+  "everyone": "Herkes",
+  "contactsOnly": "Sadece kişiler",
+  "nobody": "Hiç kimse",
+  "whoCanSeeItem": "{title} kimler görebilir",
+  "version": "Sürüm {version}",
+  "checkUpdate": "Güncellemeleri kontrol et",
+  "openSourceLicenses": "Açık kaynak lisansları",
+  "feedback": "Geri Bildirim",
+  "builtOnMatrix": "Matrix protokolü üzerine kurulu",
+  "loading": "Yükleniyor...",
+  "noConversations": "Sohbet yok",
+  "tapToChat": "Sohbet başlatmak için sağ üste dokunun",
+  "startGroup": "Grup Sohbeti Başlat",
+  "scan": "Tara",
+  "payment": "Ödeme",
+  "featureComingSoon": "{feature} yakında",
+  "markAsRead": "Okundu olarak işaretle",
+  "unmute": "Sesi aç",
+  "mute": "Sessize al",
+  "unpin": "Sabitlemeyi kaldır",
+  "pin": "Sabitle",
+  "deleteConversation": "Sohbeti Sil",
+  "deleteConversationConfirm": "\"{name}\" ile sohbeti silmek istiyor musunuz?",
+  "noContacts": "Kişi yok",
+  "addFriendsToChat": "Sohbete başlamak için arkadaş ekleyin",
+  "contactNotFound": "Kişi bulunamadı",
+  "tryOtherKeywords": "Başka anahtar kelimeler veya genel arama deneyin",
+  "searchResults": "Arama sonuçları",
+  "newFriends": "Yeni Arkadaşlar",
+  "chatOnlyFriends": "Sadece sohbet arkadaşları",
+  "officialAccounts": "Resmi Hesaplar",
+  "serviceAccounts": "Hizmet Hesapları",
+  "enterpriseContacts": "Kurumsal Kişiler",
+  "contactsCount": "{count} kişi",
+  "recommendToFriend": "Kişiyi paylaş",
+  "setRemark": "Not ekle",
+  "addToHome": "Ana ekrana ekle",
+  "sendingCard": "Kişi kartı gönderiliyor...",
+  "contactCard": "[Kişi Kartı]",
+  "cardSent": "{contact} kartı {friend} kişisine gönderildi",
+  "recommendFailed": "Öneri başarısız: {error}",
+  "enterRemark": "Not girin",
+  "remarkSet": "Not ayarlandı: {remark}",
+  "openingChat": "Sohbet açılıyor...",
+  "openChatFailed": "Sohbet açılamadı: {error}",
+  "addContact": "Kişi Ekle",
+  "enterUserId": "Kullanıcı ID'si girin",
+  "noFriendRequests": "Arkadaşlık isteği yok",
+  "accept": "Kabul Et",
+  "reject": "Reddet",
+  "acceptedRequest": "{name} arkadaşlık isteği kabul edildi",
+  "rejectedRequest": "{name} arkadaşlık isteği reddedildi",
+  "noGroups": "Grup yok",
+  "creatingGroup": "Grup oluşturma yakında...",
+  "selectFriendToRecommend": "Önermek için arkadaş seçin",
+  "searchContacts": "Kişilerde ara",
+  "noContactsFound": "Kişi bulunamadı",
+  "yesterday": "Dün",
+  "monday": "Pzt",
+  "tuesday": "Sal",
+  "wednesday": "Çar",
+  "thursday": "Per",
+  "friday": "Cum",
+  "saturday": "Cmt",
+  "sunday": "Paz",
+  "justNow": "Az önce",
+  "minutesAgo": "{count} dk önce",
+  "hoursAgo": "{count}s önce",
+  "daysAgo": "{count}g önce",
+  "online": "Çevrimiçi",
+  "offline": "Çevrimdışı",
+  "minutesAgoOnline": "{count} dk önce çevrimiçi",
+  "hoursAgoOnline": "{count}s önce çevrimiçi",
+  "daysAgoOnline": "{count}g önce çevrimiçi",
+  "searchContactsGroupsMessages": "Kişi, grup ve mesajlarda ara",
+  "searchError": "Arama hatası",
+  "searchHint": "Kişi, grup ve mesajlarda ara",
+  "enterKeyword": "Aramak için anahtar kelime girin",
+  "searchHistory": "Arama Geçmişi",
+  "clear": "Temizle",
+  "noResultsFor": "\"{query}\" için sonuç yok",
+  "all": "Tümü",
+  "groups": "Gruplar",
+  "noResults": "Sonuç yok",
+  "groupInfo": "Grup Bilgisi",
+  "groupMembers": "Üyeler ({count})",
+  "viewAll": "Tümünü gör",
+  "owner": "Sahip",
+  "admin": "Yönetici",
+  "invite": "Davet Et",
+  "groupAnnouncement": "Grup Duyurusu",
+  "notSet": "Ayarlanmadı",
+  "groupDescription": "Grup Açıklaması",
+  "publicGroup": "Herkese Açık Grup",
+  "allowSearchJoin": "Başkalarının arayıp katılmasına izin ver",
+  "clearChatHistory": "Sohbet Geçmişini Temizle",
+  "dissolveGroup": "Grubu Dağıt",
+  "leaveGroup": "Gruptan Ayrıl",
+  "changeGroupName": "Grup Adını Değiştir",
+  "enterGroupName": "Grup adı girin",
+  "confirm": "Onayla",
+  "changeGroupDescription": "Grup Açıklamasını Değiştir",
+  "enterGroupDescription": "Grup açıklaması girin",
+  "editAnnouncement": "Duyuruyu Düzenle",
+  "enterAnnouncement": "Duyuru girin",
+  "publish": "Yayınla",
+  "clearHistoryConfirm": "Tüm sohbet geçmişini temizle? Bu işlem geri alınamaz.",
+  "clearAction": "Temizle",
+  "chatHistoryCleared": "Sohbet geçmişi temizlendi",
+  "leaveGroupConfirm": "\"{name}\" grubundan ayrılmak istiyor musunuz?",
+  "dissolveGroupConfirm": "\"{name}\" grubunu dağıtmak istiyor musunuz? Bu işlem geri alınamaz.",
+  "dissolve": "Dağıt",
+  "groupQrCode": "Grup QR Kodu",
+  "searchChatHistory": "Sohbet Geçmişinde Ara",
+  "groupIdCopied": "Grup ID'si kopyalandı",
+  "tapCopyGroupId": "{count} üye · Grup ID'sini kopyalamak için dokunun",
+  "featureInDevelopment": "Özellik geliştirme aşamasında...",
+  "receiverAddress": "Alıcı Adresi",
+  "enterOrPasteAddress": "Cüzdan adresini girin veya yapıştırın",
+  "selectToken": "Token Seç",
+  "transferAmount": "Transfer Tutarı",
+  "available": "Kullanılabilir",
+  "allAmount": "Tümü",
+  "memoOptional": "Not (isteğe bağlı)",
+  "addMemo": "Not ekle",
+  "confirmTransfer": "Transferi Onayla",
+  "invalidAddress": "Lütfen geçerli bir alıcı adresi girin",
+  "invalidAmount": "Lütfen geçerli bir tutar girin",
+  "selectTokenPlease": "Lütfen bir token seçin",
+  "addressVerified": "Adres doğrulandı",
+  "availableBalance": "Kullanılabilir: {balance} {symbol}",
+  "scanningInDevelopment": "Tarama özelliği geliştirme aşamasında...",
+  "enterAmount": "Tutar girin",
+  "redPacketCountMin": "En az 1 kırmızı paket gerekli",
+  "viewRedPacketDetails": "Kırmızı paket detaylarını gör",
+  "enterTransferAmount": "Transfer tutarını girin",
+  "transferTo": "Transfer hedefi",
+  "selectCurrency": "Para birimi seç",
+  "receiveTransfer": "Transfer alındı",
+  "fromSender": "{senderName} tarafından",
+  "confirmReceive": "Alımı Onayla",
+  "groupProfile": "Grup Bilgisi",
+  "viewProfile": "Profili Gör",
+  "removeMember": "Gruptan Çıkar",
+  "removeMemberConfirm": "\"{name}\" kişisini gruptan çıkarmak istiyor musunuz?",
+  "remove": "Çıkar",
+  "clearStatus": "Durumu Temizle",
+  "clearStatusConfirm": "Mevcut durumu temizle?",
+  "statusCleared": "Durum temizlendi",
+  "statusSet": "Durum ayarlandı: {result}",
+  "userNotExist": "Kullanıcı mevcut değil",
+  "userIdCopied": "Kullanıcı ID'si kopyalandı",
+  "voiceCallInDevelopment": "Sesli arama geliştirme aşamasında...",
+  "report": "Şikayet Et",
+  "reportInDevelopment": "Şikayet özelliği geliştirme aşamasında...",
+  "shareCard": "Kartı Paylaş",
+  "shareInDevelopment": "Paylaşım özelliği geliştirme aşamasında...",
+  "qrCode": "QR Kod",
+  "qrCodeInDevelopment": "QR kod özelliği geliştirme aşamasında...",
+  "avatarUpdated": "Avatar güncellendi",
+  "selectImageFailed": "Resim seçilemedi: {error}",
+  "changeName": "Adı Değiştir",
+  "male": "Erkek",
+  "female": "Kadın",
+  "genderSet": "Cinsiyet ayarlandı: {gender}",
+  "regionSet": "Bölge ayarlandı: {region}",
+  "setPatText": "Dürtme Metnini Ayarla",
+  "changeSignature": "İmzayı Değiştir",
+  "ringtoneSet": "Zil sesi ayarlandı: {result}",
+  "featureInDev": "{feature} geliştirme aşamasında...",
+  "saveAddressFailed": "Adres kaydedilemedi: {error}",
+  "myAddress": "Adreslerim",
+  "addNew": "Ekle",
+  "addAddress": "Adres Ekle",
+  "addressAdded": "Adres eklendi",
+  "addressUpdated": "Adres güncellendi",
+  "deleteAddress": "Adresi Sil",
+  "deleteAddressConfirm": "Bu adresi silmek istiyor musunuz?",
+  "addressDeleted": "Adres silindi",
+  "setDefaultAddress": "Varsayılan olarak ayarla",
+  "fillCompleteInfo": "Lütfen tüm alanları doldurun",
+  "saveInvoiceFailed": "Fatura kaydedilemedi: {error}",
+  "myInvoices": "Faturalarım",
+  "addInvoice": "Fatura Ekle",
+  "invoiceAdded": "Fatura eklendi",
+  "invoiceUpdated": "Fatura güncellendi",
+  "deleteInvoice": "Faturayı Sil",
+  "deleteInvoiceConfirm": "Bu faturayı silmek istiyor musunuz?",
+  "invoiceDeleted": "Fatura silindi",
+  "invoiceType": "Fatura türü: ",
+  "personal": "Bireysel",
+  "enterprise": "Kurumsal",
+  "setDefaultInvoice": "Varsayılan olarak ayarla",
+  "enterTaxId": "Vergi numarası girin",
+  "vibrateMode": "Titreşim modu",
+  "silentMode": "Sessiz mod",
+  "playing": "Çalıyor: {ringtoneName}",
+  "playFailed": "Çalınamadı: {ringtoneName}",
+  "enterGroupNamePlease": "Lütfen grup adı girin",
+  "selectAtLeastOne": "Lütfen en az bir üye seçin",
+  "fillStatus": "Durum Yaz",
+  "fileNotExist": "Dosya mevcut değil",
+  "sendFailed": "Gönderme başarısız: {error}",
+  "cannotOpenBrowser": "Tarayıcı açılamadı",
+  "selectFileFailed": "Dosya seçilemedi: {error}",
+  "enterMusicLink": "Müzik bağlantısı girin",
+  "enterValidLink": "Lütfen geçerli bir bağlantı girin",
+  "enterPollQuestion": "Anket sorusu girin",
+  "minTwoOptions": "En az 2 seçenek gerekli",
+  "crossDeviceEnabled": "Cihazlar arası imza etkin",
+  "crossDeviceSet": "Cihazlar arası imza başarıyla ayarlandı",
+  "setupFailed": "Kurulum başarısız: {error}",
+  "receiveAmount": "Alınacak Tutar",
+  "enterValidAmount": "Lütfen geçerli bir tutar girin",
+  "addressCopied": "Adres kopyalandı",
+  "openItem": "Aç: {content}",
+  "newNoteComingSoon": "Yeni not özelliği yakında",
+  "addLinkComingSoon": "Bağlantı ekleme özelliği yakında",
+  "deleted": "Silindi",
+  "shareComingSoon": "Paylaşım özelliği yakında",
+  "saveComingSoon": "Kaydetme özelliği yakında",
+  "moreStylesComingSoon": "Daha fazla stil yakında",
+  "wallet": "Cüzdan",
+  "walletArea": "Cüzdan alanı",
+  "recording": "Kayıt",
+  "invalidVideoUrl": "Geçersiz video URL'si",
+  "downloadFile": "Dosyayı indir",
+  "clearChatHistoryTitle": "Sohbet Geçmişini Temizle",
+  "cannotUndo": "Bu işlem geri alınamaz",
+  "videoCall": "Görüntülü Arama",
+  "voiceCall": "Sesli Arama",
+  "leaveMeeting": "Toplantıdan Ayrıl",
+  "chatDetails": "Sohbet Detayları",
+  "viewAllGroupMembers": "Tüm üyeleri gör",
+  "groupName": "Grup Adı",
+  "groupNameUpdated": "Grup adı güncellendi",
+  "updateFailed": "Güncelleme başarısız",
+  "noPermissionToModify": "Değiştirme izniniz yok",
+  "groupManagement": "Grup Yönetimi",
+  "myNicknameInGroup": "Gruptaki Takma Adım",
+  "pinChat": "Sohbeti Sabitle",
+  "strongReminder": "Güçlü Hatırlatıcı",
+  "setChatBackground": "Sohbet Arka Planını Ayarla",
+  "unknownFile": "Bilinmeyen dosya",
+  "download": "İndir",
+  "invalidLocation": "Geçersiz konum",
+  "address": "Adres",
+  "latitude": "Enlem",
+  "longitude": "Boylam",
+  "close": "Kapat",
+  "tapToCancel": "İptal etmek için dokunun",
+  "captureFailed": "Yakalama başarısız: {error}",
+  "processingVideo": "Video işleniyor...",
+  "videoFileNotExist": "Video dosyası mevcut değil",
+  "videoDataEmpty": "Video verisi boş",
+  "videoTooLarge": "Video boyutu 100MB'ı geçemez",
+  "sendingVideo": "Video gönderiliyor...",
+  "sendVideoFailed": "Video gönderilemedi: {error}",
+  "imageFileNotExist": "Resim dosyası mevcut değil",
+  "imageDataEmpty": "Resim verisi boş",
+  "sendingImage": "Resim gönderiliyor...",
+  "sendImageFailed": "Resim gönderilemedi: {error}",
+  "sendLocation": "Konum Gönder",
+  "selectLocationAndSend": "Konum seçin ve gönderin",
+  "shareRealTimeLocation": "Gerçek Zamanlı Konum Paylaş",
+  "shareLocationForOneHour": "Arkadaşınızla 1 saat gerçek zamanlı konum paylaşın",
+  "locationSent": "Konum gönderildi",
+  "selectMessages": "Mesaj seç",
+  "selectedCount": "{count} seçildi",
+  "selectAll": "Tümünü Seç",
+  "groupChatCount": "Grup Sohbeti ({count})",
+  "privateChat": "Özel Sohbet",
+  "noMessages": "Mesaj yok",
+  "sendFirstMessage": "Sohbeti başlatmak için ilk mesajı gönderin",
+  "encryptionNotice": "Bu sohbet uçtan uca şifrelenmiştir. Mesajları sadece siz ve alıcı okuyabilir.",
+  "replyTo": "{name} adlı kişiye yanıt",
+  "multiForward": "İlet",
+  "collect": "Kaydet",
+  "noMembers": "Üye yok",
+  "memberNotFound": "Üye bulunamadı",
+  "voiceFileNotExist": "Ses dosyası mevcut değil",
+  "voiceFileEmpty": "Ses dosyası boş",
+  "sendingVoice": "Ses gönderiliyor...",
+  "sendVoiceFailed": "Ses gönderilemedi: {error}",
+  "messageCopied": "Mesaj kopyalandı",
+  "messageForwarded": "Mesaj iletildi",
+  "forwardFailed": "İletme başarısız: {error}",
+  "unfavorited": "Favorilerden çıkarıldı",
+  "favorited": "Favorilere eklendi",
+  "reactionAdded": "Tepki eklendi",
+  "failedMessageDeleted": "Başarısız mesaj silindi",
+  "deleteMessages": "Mesajları sil",
+  "deleteMessagesConfirm": "{count} mesajı silmek istediğinizden emin misiniz?",
+  "noteOtherMessages": "Not: {count} mesaj başkalarına ait, sadece yerel olarak silinebilir.",
+  "myMessagesWillBeRecalled": "Sizden {count} mesaj geri alınacak.",
+  "recalledCount": "{count} mesaj geri alındı, {localCount} yerel olarak silindi",
+  "recalledMessages": "{count} mesaj geri alındı",
+  "deletedLocally": "{count} mesaj silindi (yerel)",
+  "forwardedCount": "{count} mesaj iletildi",
+  "forwardComplete": "İletme tamamlandı: {success} başarılı, {failed} başarısız",
+  "remindOnlyInGroup": "Hatırlatma özelliği sadece grup sohbetlerinde kullanılabilir",
+  "onlyTextSearchable": "Sadece metin mesajları aranabilir",
+  "searchFor": "\"{text}\" ara",
+  "baiduSearch": "Baidu Arama",
+  "googleSearch": "Google Arama",
+  "bingSearch": "Bing Arama",
+  "calling": "Aranıyor...",
+  "connecting": "Bağlanıyor...",
+  "ringing": "Çalıyor...",
+  "inCall": "Aramada",
+  "collectMessages": "{count} mesaj kaydedildi",
+  "voted": "Oy verildi",
+  "voteChanged": "Oy değiştirildi",
+  "voteRemoved": "Oy kaldırıldı",
+  "endPoll": "Anketi Bitir",
+  "endPollConfirm": "Bu anketi bitirmek istediğinizden emin misiniz? Bitirdikten sonra oy verilemez.",
+  "memberCount": "{count} üye",
+  "videoChannels": "Kanallar",
+  "live": "Canlı",
+  "listen": "Dinle",
+  "watch": "İzle",
+  "searchDiscover": "Ara",
+  "nearbyPeople": "Yakındakiler",
+  "games": "Oyunlar",
+  "miniPrograms": "Mini Programlar",
+  "done": "Tamamlandı({count})",
+  "@done": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "services": "Hizmetler",
+  "favorites": "Favoriler",
+  "ordersAndCards": "Siparişler ve Kartlar",
+  "stickers": "Çıkartmalar",
+  "statusSetTo": "Durum ayarlandı: {status}",
+  "@statusSetTo": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "avatarUploadFailed": "Avatar yüklemesi başarısız",
+  "personalProfile": "Kişisel Profil",
+  "name": "Ad",
+  "gender": "Cinsiyet",
+  "region": "Bölge",
+  "myQrCode": "QR Kodum",
+  "poke": "Dürt",
+  "ringtone": "Zil Sesi",
+  "defaultRingtone": "Varsayılan Zil Sesi",
+  "myAddresses": "Adreslerim",
+  "genderSetTo": "Cinsiyet ayarlandı: {gender}",
+  "@genderSetTo": {
+    "placeholders": {
+      "gender": {"type": "String"}
+    }
+  },
+  "selectRegion": "Bölge Seç",
+  "selectCity": "Şehir Seç",
+  "regionSetTo": "Bölge ayarlandı: {region}",
+  "@regionSetTo": {
+    "placeholders": {
+      "region": {"type": "String"}
+    }
+  },
+  "setPoke": "Dürtmeyi Ayarla",
+  "friendPokedMe": "Arkadaş beni dürttü",
+  "enterPokeSuffix": "Dürtme soneki girin, örn: omuzdan",
+  "example": "Örnek",
+  "onTheShoulder": " omuzdan",
+  "pokeCleared": "Dürtme temizlendi",
+  "pokeSetTo": "Dürtme ayarlandı: beni dürttü{suffix}",
+  "@pokeSetTo": {
+    "placeholders": {
+      "suffix": {"type": "String"}
+    }
+  },
+  "editSignature": "İmzayı Düzenle",
+  "introduceYourself": "Kendinizi tanıtacak bir cümle",
+  "signatureCleared": "İmza temizlendi",
+  "signatureUpdated": "İmza güncellendi",
+  "scanToAddFriend": "Beni arkadaş olarak eklemek için yukarıdaki QR kodu tarayın",
+  "ringtoneSetTo": "Zil sesi ayarlandı: {ringtone}",
+  "@ringtoneSetTo": {
+    "placeholders": {
+      "ringtone": {"type": "String"}
+    }
+  },
+  "confirmDissolveGroup": "Bu grubu dağıtmak istediğinizden emin misiniz",
+  "enterValidServerAddress": "Lütfen geçerli bir sunucu adresi girin",
+  "emailOtp": "E-posta OTP",
+  "enterServerAddressFirst": "Lütfen önce sunucu adresi girin",
+  "passkeyRequiresServer": "Passkey girişi sunucu desteği gerektirir",
+  "loginAgreement": "Giriş yaparak kabul etmiş olursunuz ",
+  "pleaseAgreeToTerms": "Lütfen Hizmet Şartları ve Gizlilik Politikasını okuyun ve kabul edin",
+  "registerFailed": "Kayıt başarısız",
+  "reenterPassword": "Şifreyi tekrar girin",
+  "passwordsDoNotMatch": "Şifreler eşleşmiyor",
+  "inviteCodeBuiltIn": "Davet Kodu (Yerleşik)",
+  "inviteCodeBuiltInNote": "Davet kodu yerleşiktir, genellikle değiştirmeye gerek yoktur",
+  "iHaveReadAndAgree": "Okudum ve kabul ediyorum ",
+  "startGroupChat": "Grup Sohbeti Başlat",
+  "addFriends": "Arkadaş Ekle",
+  "paymentAndCollection": "Ödeme",
+  "messagesWithCount": "Mesajlar({count})",
+  "@messagesWithCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "contactCount": "{count} kişi",
+  "@contactCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "addToHomeScreen": "Ana ekrana ekle",
+  "recommendedCardTo": "{contact} kartı {recipient} kişisine önerildi",
+  "@recommendedCardTo": {
+    "placeholders": {
+      "contact": {"type": "String"},
+      "recipient": {"type": "String"}
+    }
+  },
+  "enterRemarkName": "Takma ad girin",
+  "remarkSetTo": "Not ayarlandı: {remark}",
+  "@remarkSetTo": {
+    "placeholders": {
+      "remark": {"type": "String"}
+    }
+  },
+  "acceptedFriendRequest": "{name} arkadaşlık isteği kabul edildi",
+  "@acceptedFriendRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "rejectedFriendRequest": "{name} arkadaşlık isteği reddedildi",
+  "@rejectedFriendRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "groupInvites": "Grup Davetleri",
+  "myGroups": "Gruplarım",
+  "invitedToJoinGroup": "Gruba davet edildi",
+  "confirmLeaveGroup": "Bu gruptan ayrılmak istediğinizden emin misiniz",
+  "leave": "Ayrıl",
+  "saveMedia": "Kaydet",
+  "recallThisMessage": "Bu mesajı geri al?",
+  "messageRecalled": "Mesaj geri alındı",
+  "savedToGallery": "Galeriye kaydedildi",
+  "failedToSave": "Kaydetme başarısız",
+  "saving": "Kaydediliyor...",
+  "share": "Paylaş",
+  "saveToGallery": "Galeriye Kaydet",
+  "downloadFailed": "İndirme başarısız",
+  "noMediaUrl": "Medya URL'si mevcut değil",
+  "shareFailed": "Paylaşım başarısız",
+  "failedToLoadImage": "Resim yüklenemedi",
+  "failedToLoadMoreMessages": "Daha fazla mesaj yüklenemedi",
+  "failedToSend": "Gönderme başarısız",
+  "failedToSendImage": "Resim gönderilemedi",
+  "failedToSendVoice": "Ses gönderilemedi",
+  "failedToSendFile": "Dosya gönderilemedi",
+  "failedToSendVideo": "Video gönderilemedi",
+  "failedToSendLocation": "Konum gönderilemedi",
+  "failedToResend": "Tekrar gönderme başarısız",
+  "failedToRecall": "Geri alma başarısız",
+  "failedToReply": "Yanıtlama başarısız",
+  "failedToAddReaction": "Tepki ekleme başarısız",
+  "failedToSendPoll": "Anket gönderilemedi",
+  "failedToVote": "Oy verme başarısız",
+  "failedToLoadMessages": "Mesajlar yüklenemedi",
+  "callFeatureComingSoon": "Sesli ve görüntülü arama özelliği yakında",
+  "cannotForwardRedPacketOrTransfer": "Kırmızı paketler ve transferler iletilemez",
+  "videoRecordingFailed": "Video kaydı başarısız. Lütfen tekrar deneyin.",
+  "redPacket": "Kırmızı Paket",
+  "music": "Müzik",
+  "coupon": "Kupon",
+  "gift": "Hediye",
+  "poll": "Anket",
+  "text": "Metin",
+  "link": "Bağlantı",
+  "note": "Not",
+  "myNotes": "Notlarım",
+  "today": "Bugün",
+  "daysAgoText": "{count} gün önce",
+  "@daysAgoText": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "dateFormat": "{day}/{month}",
+  "@dateFormat": {
+    "placeholders": {
+      "month": {"type": "int"},
+      "day": {"type": "int"}
+    }
+  },
+  "noFavorites": "Henüz favori yok",
+  "longPressToFavorite": "Favorilere eklemek için mesaja uzun basın",
+  "newNote": "Yeni Not",
+  "favoriteLink": "Favori Bağlantı",
+  "editTags": "Etiketleri Düzenle",
+  "deleteFavorite": "Favoriyi Sil",
+  "deleteFavoriteConfirm": "Bu favoriyi silmek istediğinizden emin misiniz?",
+  "noSearchResultsFound": "Sonuç bulunamadı",
+  "sendRedPacket": "Kırmızı Paket Gönder",
+  "amount": "Tutar",
+  "redPacketCover": "Kırmızı Paket Kapağı",
+  "redPacketType": "Kırmızı Paket Türü",
+  "normalRedPacket": "Normal",
+  "luckyRedPacket": "Şanslı",
+  "redPacketCount": "Kırmızı Paket Sayısı",
+  "pieces": "adet",
+  "putMoneyInRedPacket": "Kırmızı pakete para koy",
+  "redPacketRefundNotice": "Alınmayan kırmızı paketler 24 saat sonra iade edilir",
+  "openRedPacket": "Aç",
+  "redPacketAllClaimed": "Kırmızı paket tamamı alındı",
+  "redPacketExpired": "Kırmızı paket süresi doldu",
+  "addTransferNote": "Transfer notu ekle",
+  "yuan": "TL",
+  "savedToChangeCanTransfer": "Bakiyeye kaydedildi, doğrudan transfer edilebilir",
+  "replyWithEmoji": "Bu emoji ile yanıtla",
+  "claimedYourRedPacket": "sizin kırmızı paketinizi aldı",
+  "claimedRedPacket": "aldı",
+  "otherTyping": "yazıyor...",
+  "processing": "İşleniyor...",
+  "transferCancelled": "Transfer iptal edildi",
+  "transferFailed": "Transfer başarısız",
+  "creatingPaymentRequest": "Ödeme talebi oluşturuluyor...",
+  "processingPayment": "Ödeme işleniyor...",
+  "paymentFailed": "Ödeme başarısız",
+  "clickRetry": "Tekrar denemek için dokunun",
+  "settingsTitle": "Ayarlar",
+  "editRemark": "Notu Düzenle",
+  "setPermissions": "İzinleri Ayarla",
+  "recommendToFriends": "Arkadaşlara Öner",
+  "setStarFriend": "Yıldızlı Arkadaş Olarak Ayarla",
+  "addToBlacklist": "Kara Listeye Ekle",
+  "complain": "Şikayet Et",
+  "deleteContact": "Kişiyi Sil",
+  "deleteContactConfirm": "{name} kişisini silmek istediğinizden emin misiniz?",
+  "@deleteContactConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "transferTitle": "Transfer",
+  "receiverAddressLabel": "Alıcı Adresi",
+  "selectTokenLabel": "Token Seç",
+  "transferAmountLabel": "Transfer Tutarı",
+  "memoLabel": "Not (isteğe bağlı)",
+  "enterOrPasteAddressHint": "Cüzdan adresini girin veya yapıştırın",
+  "scanInDevelopment": "Tarama özelliği geliştirme aşamasında...",
+  "availableLabel": "Kullanılabilir",
+  "availableBalanceFormat": "Kullanılabilir: {balance} {symbol}",
+  "@availableBalanceFormat": {
+    "placeholders": {
+      "balance": {"type": "String"},
+      "symbol": {"type": "String"}
+    }
+  },
+  "addMemoHint": "Not ekle",
+  "receiveTitle": "Al",
+  "walletNotConnectedTitle": "Cüzdan bağlı değil",
+  "connectWalletFirst": "Lütfen önce cüzdanı bağlayın",
+  "sendPaymentRequest": "Ödeme Talebi Gönder",
+  "qrCodeGenerateFailed": "QR kod oluşturma başarısız",
+  "scanQrToPayMe": "Bana ödeme yapmak için QR kodu tarayın",
+  "myWalletAddress": "Cüzdan Adresim",
+  "createPaymentRequest": "Ödeme Talebi Oluştur",
+  "selectTokenHint": "Token Seç",
+  "amountLabel": "Tutar",
+  "cancelButton": "İptal",
+  "sendRequestButton": "Talep Gönder",
+  "allReadReceipt": "Tümü okundu",
+  "readCountReceipt": "{count} okundu",
+  "@readCountReceipt": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "n42IdLabel": "N42 ID: {id}",
+  "@n42IdLabel": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "redPacketDefaultGreeting": "İyi dilekler",
+  "senderRedPacket": "{name} Kırmızı Paketi",
+  "@senderRedPacket": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "enterValidAddress": "Lütfen geçerli bir adres girin",
+  "pleaseSelectToken": "Lütfen bir token seçin",
+  "receivedTransfer": "Transfer Alındı",
+  "@fromSender": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "selectForwardRecipient": "İletilecek kişiyi seçin",
+  "@sendCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "emojiFaces": "Yüzler",
+  "emojiHearts": "Kalpler",
+  "emojiAnimals": "Hayvanlar",
+  "emojiFood": "Yiyecek",
+  "emojiTransport": "Ulaşım",
+  "emojiActivities": "Aktiviteler",
+  "emojiObjects": "Nesneler",
+  "emojiSymbols": "Semboller",
+  "transferProcessing": "Transfer işleniyor...",
+  "senderSentRedPacket": "{name} bir kırmızı paket gönderdi",
+  "@senderSentRedPacket": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "savedToBalance": "Bakiyeye kaydedildi, doğrudan transfer edilebilir",
+  "redPacketExpiredOrEmpty": "Kırmızı paket süresi doldu/tamamı alındı",
+  "scanFeatureComingSoon": "Tarama özelliği yakında...",
+  "setAsStarred": "Yıldızlı Olarak Ayarla",
+  "addToBlocklist": "Engelleme Listesine Ekle",
+  "claimedYour": " sizinkini aldı ",
+  "claimedText": " aldı ",
+  "userTyping": "{name} yazıyor...",
+  "@userTyping": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "typing": "Yazıyor...",
+  "waitingToReceive": "Alınmayı bekliyor",
+  "tapToClaim": "Almak için dokunun",
+  "hasBeenReceived": "Alındı",
+  "getLucky": "Şansını dene",
+  "cameraStartFailed": "Kamera başlatılamadı",
+  "unknownError": "Bilinmeyen hata",
+  "placeQrCodeInFrame": "QR kodu taramak için çerçeveye yerleştirin",
+  "closeManualInput": "Manuel Girişi Kapat",
+  "manualInputUserId": "Manuel Kullanıcı ID Girişi",
+  "add": "Ekle",
+  "ringtoneClear": "Temizle",
+  "ringtonePhone": "Telefon",
+  "ringtoneClassic": "Klasik",
+  "ringtoneSoft": "Yumuşak",
+  "ringtoneVibrate": "Titreşim",
+  "ringtoneSilent": "Sessiz",
+  "stop": "Durdur",
+  "selectRingtone": "Zil Sesi Seç",
+  "loadingRingtones": "Zil sesleri yükleniyor...",
+  "noRingtonesFound": "Zil sesi bulunamadı",
+  "moodAndThoughts": "Ruh Hali ve Düşünceler",
+  "statusHappy": "Mutlu",
+  "statusCracked": "Paramparça",
+  "statusLucky": "Şanslı",
+  "statusSunny": "Güneşli",
+  "statusTired": "Yorgun",
+  "statusDaydream": "Hayal",
+  "statusRushing": "Acele",
+  "statusOverthinking": "Fazla Düşünme",
+  "statusEnergized": "Enerjik",
+  "workAndStudy": "İş ve Çalışma",
+  "statusWorking": "Çalışıyor",
+  "statusStudying": "Ders Çalışıyor",
+  "statusBusy": "Meşgul",
+  "statusSlacking": "Tembellik",
+  "statusTraveling": "Seyahatte",
+  "statusGoingHome": "Eve Gidiyor",
+  "statusDnd": "Rahatsız Etmeyin",
+  "statusHanging": "Takılıyor",
+  "statusCheckIn": "Check-in",
+  "statusExercising": "Egzersiz",
+  "statusCoffee": "Kahve",
+  "statusBubbleTea": "Bubble Tea",
+  "statusEating": "Yemek Yiyor",
+  "statusParenting": "Ebeveynlik",
+  "statusSavingWorld": "Dünyayı Kurtarıyor",
+  "statusSelfie": "Selfie",
+  "rest": "Dinlenme",
+  "statusRetreat": "Dinlenme",
+  "statusHome": "Evde",
+  "statusSleeping": "Uyuyor",
+  "statusCatLover": "Kedi Sever",
+  "statusDogWalking": "Köpek Gezdiriyor",
+  "statusGaming": "Oyun Oynuyor",
+  "statusListening": "Dinliyor",
+  "setStatus": "Durum Ayarla",
+  "visibleToFriends24h": "24 saat arkadaşlara görünür",
+  "writeStatus": "Durum Yaz",
+  "enterYourStatus": "Durumunuzu girin...",
+  "ok": "Tamam",
+  "cameraPermissionRequired": "QR kod taramak için kamera izni gerekli",
+  "cameraPermissionDenied": "Kamera izni kalıcı olarak reddedildi. Lütfen sistem ayarlarından etkinleştirin.",
+  "cannotGetCameraPermission": "Kamera izni alınamadı",
+  "permissionCheckError": "İzin kontrol hatası: {error}",
+  "@permissionCheckError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "invalidQrCode": "Geçersiz QR kod",
+  "qrCodeProcessFailed": "QR kod işlenemedi: {error}",
+  "@qrCodeProcessFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "cannotAddFriend": "Arkadaş eklenemedi: {error}",
+  "@cannotAddFriend": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "scanQrCode": "QR Kod Tara",
+  "checkingCameraPermission": "Kamera izni kontrol ediliyor...",
+  "needCameraPermission": "Kamera İzni Gerekli",
+  "retryPermission": "Tekrar Dene",
+  "openSettings": "Ayarları Aç",
+  "inviteMembers": "Üye Davet Et",
+  "inviteCount": "Davet Et({count})",
+  "@inviteCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "noShippingAddress": "Teslimat adresi yok",
+  "defaultLabel": "Varsayılan",
+  "editAddress": "Adresi Düzenle",
+  "recipient": "Alıcı",
+  "enterRecipientName": "Alıcı adını girin",
+  "phoneNumber": "Telefon Numarası",
+  "enterPhoneNumber": "Telefon numarası girin",
+  "regionHint": "İl/İlçe/Mahalle",
+  "detailedAddress": "Detaylı Adres",
+  "detailedAddressHint": "Sokak, bina numarası, vb.",
+  "setAsDefaultAddress": "Varsayılan adres olarak ayarla",
+  "pleaseCompleteInfo": "Lütfen tüm alanları doldurun",
+  "noInvoice": "Fatura yok",
+  "company": "Şirket",
+  "taxNumber": "Vergi Numarası",
+  "editInvoice": "Faturayı Düzenle",
+  "companyName": "Şirket Adı",
+  "enterCompanyName": "Şirket adı girin",
+  "personalName": "Kişi Adı",
+  "enterName": "Ad girin",
+  "taxIdNumber": "Vergi Kimlik Numarası",
+  "enterTaxIdNumber": "Vergi kimlik numarası girin",
+  "bankNameOptional": "Banka Adı (İsteğe bağlı)",
+  "enterBankName": "Banka adı girin",
+  "bankAccountOptional": "Banka Hesabı (İsteğe bağlı)",
+  "enterBankAccount": "Banka hesabı girin",
+  "companyAddressOptional": "Şirket Adresi (İsteğe bağlı)",
+  "enterCompanyAddress": "Şirket adresi girin",
+  "companyPhoneOptional": "Şirket Telefonu (İsteğe bağlı)",
+  "enterCompanyPhone": "Şirket telefonu girin",
+  "setAsDefaultInvoice": "Varsayılan fatura olarak ayarla",
+  "confirmDeleteAddress": "Bu adresi silmek istediğinizden emin misiniz?",
+  "confirmDeleteInvoice": "Bu faturayı silmek istediğinizden emin misiniz?",
+  "groupOwner": "Sahip",
+  "groupAdmin": "Yönetici",
+  "searchMembers": "Üyelerde ara",
+  "totalMembers": "{count} üye",
+  "@totalMembers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "removeFromGroup": "Gruptan Çıkar",
+  "confirmRemoveMember": "\"{name}\" kişisini gruptan çıkarmak istediğinizden emin misiniz?",
+  "@confirmRemoveMember": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "setAsAdmin": "Yönetici Yap",
+  "removeAdmin": "Yöneticilikten Çıkar",
+  "deleteContactSuccess": "Kişi silindi",
+  "unknownSong": "Bilinmeyen Şarkı",
+  "unknownArtist": "Bilinmeyen Sanatçı",
+  "unknownContact": "Bilinmeyen Kişi",
+  "personalCard": "Kişi Kartı",
+  "singleChoice": "Tekli",
+  "multiChoice": "Çoklu",
+  "ended": "Sona erdi",
+  "endPollButton": "Anketi Bitir",
+  "createPoll": "Anket Oluştur",
+  "pollQuestion": "Anket Sorusu",
+  "enterPollQuestionHint": "Anket sorusu girin",
+  "pollOptions": "Anket Seçenekleri",
+  "optionPlaceholder": "Seçenek {index}",
+  "addOption": "Seçenek Ekle",
+  "pollSettings": "Anket Ayarları",
+  "anonymousPoll": "Anonim Anket",
+  "pollHint": "Anket sohbette görüntülenecek. Grup üyeleri oy verebilir.",
+  "searchSongOrArtist": "Şarkı veya sanatçı ara",
+  "noSongsFound": "Şarkı bulunamadı",
+  "supportedMusicPlatforms": "NetEase, QQ Music vb. platformlardan müzik bağlantılarını destekler.",
+  "songNameOptional": "Şarkı Adı (İsteğe bağlı)",
+  "enterSongName": "Şarkı adı girin",
+  "artistNameOptional": "Sanatçı Adı (İsteğe bağlı)",
+  "enterArtistName": "Sanatçı adı girin",
+  "shareSong": "Şarkı Paylaş",
+  "realTimeLocationSharing": "Gerçek zamanlı konum paylaşımı geliştirme aşamasında...",
+  "voiceCallFeatureInDev": "Sesli arama özelliği geliştirme aşamasında...",
+  "reportFeatureInDev": "Şikayet özelliği geliştirme aşamasında...",
+  "shareFeatureInDev": "Paylaşım özelliği geliştirme aşamasında...",
+  "qrCodeFeatureInDev": "QR kod özelliği geliştirme aşamasında...",
+  "scanQrToAddMe": "Beni arkadaş olarak eklemek için yukarıdaki QR kodu tarayın",
+  "saveToAlbum": "Albüme Kaydet",
+  "changeStyle": "Stili Değiştir",
+  "copyId": "ID Kopyala",
+  "idCopied": "ID kopyalandı",
+  "shareFeatureComingSoon": "Paylaşım özelliği yakında",
+  "saveFeatureComingSoon": "Kaydetme özelliği yakında",
+  "moreStylesFeatureComingSoon": "Daha fazla stil yakında",
+  "confirmEndPoll": "Bu anketi bitirmek istediğinizden emin misiniz?",
+  "cannotVoteAfterEnd": "Bitirdikten sonra oy verilemez.",
+  "@featureInDev": {
+    "placeholders": {
+      "feature": {"type": "String"}
+    }
+  },
+  "@optionPlaceholder": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "bio": "Biyografi",
+  "homeServer": "Sunucu",
+  "shareContactCard": "Kişi Kartını Paylaş",
+  "removeFromBlacklist": "Kara Listeden Çıkar",
+  "confirmAddBlacklist": "Bu kullanıcıyı kara listeye eklemek istediğinizden emin misiniz? Onlardan mesaj almayacaksınız.",
+  "confirmRemoveBlacklist": "Bu kullanıcıyı kara listeden çıkarmak istediğinizden emin misiniz?",
+  "remarkSaved": "Not kaydedildi",
+  "remarkCleared": "Not temizlendi",
+  "receive": "Al",
+  "pleaseConnectWallet": "Lütfen önce cüzdanınızı bağlayın",
+  "sendRequest": "Talep Gönder",
+  "pleaseEnterValidAmount": "Lütfen geçerli bir tutar girin",
+  "searchPlaceholder": "Kişi, grup ve mesajlarda ara",
+  "enterKeywordToSearch": "Aramaya başlamak için anahtar kelime girin",
+  "clearHistory": "Temizle",
+  "noResultsForQuery": "\"{query}\" için sonuç bulunamadı",
+  "@noResultsForQuery": {
+    "placeholders": {
+      "query": {"type": "String"}
+    }
+  },
+  "allResults": "Tümü",
+  "searchInChat": "Sohbette ara",
+  "groupLabel": "Grup",
+  "messageLabel": "Mesaj",
+
+  "securityTitle": "Güvenlik",
+  "keyBackup": "Anahtar Yedekleme",
+  "backupEncryptionKeys": "Şifreleme Anahtarlarını Yedekle",
+  "keysBackedUp": "{count} anahtar yedeklendi",
+  "@keysBackedUp": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "backupNotSet": "Yedekleme ayarlanmadı",
+  "restoreKeys": "Anahtarları Geri Yükle",
+  "restoreKeysFromBackup": "Yedekten şifreleme anahtarlarını geri yükle",
+  "exportKeys": "Anahtarları Dışa Aktar",
+  "exportKeysToFile": "Anahtarları dosyaya aktar",
+  "loggedInDevices": "Giriş Yapılmış Cihazlar",
+  "noOtherDevices": "Başka cihaz yok",
+  "verified": "Doğrulanmış",
+  "unverified": "Doğrulanmamış",
+  "advanced": "Gelişmiş",
+  "crossSigning": "Çapraz İmza",
+  "enabled": "Etkin",
+  "notEnabled": "Etkin değil",
+  "resetEncryption": "Şifrelemeyi Sıfırla",
+  "deleteAllEncryptionKeys": "Tüm şifreleme anahtarlarını sil",
+  "encryptionNotSupported": "Şifreleme desteklenmiyor",
+  "notInitialized": "Başlatılmadı",
+  "backupKeyTitle": "Anahtarları Yedekle",
+  "backupKeyMessage": "Yeni bir anahtar yedeklemesi oluştur? Bu, yeni bir cihazda şifrelenmiş mesajları geri yüklemenize yardımcı olacaktır.",
+  "backup": "Yedekle",
+  "restoreKeyTitle": "Anahtarları Geri Yükle",
+  "restoreKeyMessage": "Şifrelenmiş mesajları geri yüklemek için kurtarma şifrenizi veya kurtarma anahtarınızı girin.",
+  "restore": "Geri Yükle",
+  "exportKeyTitle": "Anahtarları Dışa Aktar",
+  "exportKeyMessage": "Dışa aktarılan anahtar dosyası tüm şifreleme anahtarlarınızı içerir. Lütfen güvenli bir yerde saklayın.",
+  "export": "Dışa Aktar",
+  "deviceIdLabel": "Cihaz ID: {deviceId}",
+  "@deviceIdLabel": {
+    "placeholders": {
+      "deviceId": {"type": "String"}
+    }
+  },
+  "deviceStatusVerified": "Durum: Doğrulanmış",
+  "deviceStatusUnverified": "Durum: Doğrulanmamış",
+  "lastActiveLabel": "Son etkinlik: {lastSeen}",
+  "@lastActiveLabel": {
+    "placeholders": {
+      "lastSeen": {"type": "String"}
+    }
+  },
+  "verifyThisDevice": "Bu cihazı doğrula",
+  "crossSigningAlreadyEnabled": "Çapraz imza zaten etkin",
+  "crossSigningSetupSuccess": "Çapraz imza kurulumu başarılı",
+  "@setupFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "resetEncryptionTitle": "Şifrelemeyi Sıfırla",
+  "resetEncryptionWarning": "Uyarı: Bu tüm şifreleme anahtarlarınızı silecektir. Önceki şifrelenmiş mesajların şifresini çözemeyeceksiniz. Bu işlem geri alınamaz.",
+  "reset": "Sıfırla",
+
+  "leaveMeetingConfirm": "Toplantıdan ayrılmak istediğinizden emin misiniz?",
+
+  "pokedSomeone": "{name} kişisini{suffix} dürttü",
+  "@pokedSomeone": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "suffix": {"type": "String"}
+    }
+  },
+  "noContactsToAdd": "Eklenecek kişi yok",
+  "addMembers": "Üye Ekle",
+  "invitedMembers": "{count} üye davet edildi",
+  "@invitedMembers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "inviteFailed": "Davet başarısız: {error}",
+  "@inviteFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "memberRemoved": "Üye çıkarıldı",
+  "removeFailed": "Çıkarma başarısız: {error}",
+  "@removeFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "realTimeLocationShareMessage": "Paylaştıktan sonra, karşı taraf 1 saat boyunca gerçek zamanlı konumunuzu görebilir.",
+  "startSharing": "Paylaşımı Başlat",
+  "locationServiceNotEnabled": "Konum servisi etkin değil",
+  "enableLocationService": "Bu özelliği kullanmak için lütfen konum servisini etkinleştirin",
+  "goToSettings": "Ayarlara Git",
+  "locationPermissionRequired": "Bu özellik için konum izni gerekli",
+  "locationPermissionDeniedPermanent": "Konum izni kalıcı olarak reddedildi. Lütfen ayarlardan etkinleştirin.",
+  "locationPermissionDenied": "Konum izni reddedildi",
+  "gettingLocation": "Konum alınıyor...",
+  "getLocationFailed": "Konum alınamadı: {error}",
+  "@getLocationFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "currentLocation": "Mevcut Konum",
+  "nearbyPlace": "Yakın Yer {index}",
+  "@nearbyPlace": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "approximateDistance": "Yaklaşık {distance}",
+  "@approximateDistance": {
+    "placeholders": {
+      "distance": {"type": "String"}
+    }
+  },
+  "mapPreview": "Harita Önizleme",
+  "searchLocation": "Konum ara",
+  "redPacketSent": "{amount} {token} kırmızı paket gönderildi",
+  "@redPacketSent": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "token": {"type": "String"}
+    }
+  },
+  "transferDefault": "Transfer",
+  "transferSent": "{amount} {token} transfer gönderildi",
+  "@transferSent": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "token": {"type": "String"}
+    }
+  },
+  "pickFileFailed": "Dosya seçilemedi: {error}",
+  "@pickFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "fileSizeLimit": "Dosya boyutu 50MB'ı geçemez",
+  "fileSending": "Dosya gönderiliyor: {filename}",
+  "@fileSending": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "sendFileFailed": "Dosya gönderilemedi: {error}",
+  "@sendFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "contactCardSent": "{name} kişi kartı gönderildi",
+  "@contactCardSent": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "favoritesFeature": "Favoriler",
+  "couponsFeature": "Kuponlar",
+  "giftFeature": "Hediye",
+  "sharedMusic": "{name} paylaşıldı",
+  "@sharedMusic": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "@sendFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "endPollTitle": "Anketi Bitir",
+  "endPollConfirmMessage": "Bu anketi bitirmek istediğinizden emin misiniz? Bitirdikten sonra oylama kapanacaktır.",
+  "pollEndedMessage": "Anket sona erdi",
+  "connectingCall": "Bağlanıyor...",
+  "muteCall": "Sessize Al",
+  "speakerOff": "Hoparlör Kapalı",
+  "speakerOn": "Hoparlör",
+  "cameraOn": "Kamera Açık",
+  "cameraOff": "Kamera Kapalı",
+  "hangUp": "Kapat",
+  "selectForwardTargetTitle": "İletilecek Hedefi Seçin",
+  "noForwardableChat": "İletmek için sohbet yok",
+  "noMatchingChat": "Eşleşen sohbet bulunamadı",
+  "imagePreview": "[Resim]",
+  "voicePreview": "[Ses]",
+  "videoPreview": "[Video]",
+  "filePreviewWithName": "[Dosya] {filename}",
+  "@filePreviewWithName": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "locationPreviewWithAddress": "[Konum] {address}",
+  "@locationPreviewWithAddress": {
+    "placeholders": {
+      "address": {"type": "String"}
+    }
+  },
+  "musicPreviewWithTitle": "[Müzik] {title}",
+  "@musicPreviewWithTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "messagePreview": "[Mesaj]",
+  "locationTitle": "Konum",
+  "sendButton": "Gönder",
+  "retryButton": "Tekrar Dene",
+  "selectContact": "Kişi Seç",
+  "searchContactHint": "Kişilerde ara",
+  "shareMusic": "Müzik Paylaş",
+  "recentPlayed": "Son Çalınanlar",
+  "myFavorites": "Favorilerim",
+  "networkLink": "Bağlantı",
+  "localFile": "Yerel",
+  "musicLinkRequired": "Müzik Bağlantısı *",
+  "pasteMusicLink": "Müzik bağlantısı yapıştırın",
+  "enterSongNamePlaceholder": "Şarkı adı girin",
+  "enterArtistNamePlaceholder": "Sanatçı adı girin",
+  "shareMusicButton": "Müzik Paylaş",
+  "selectLocalAudio": "Yerel Ses Dosyası Seç",
+  "supportedAudioFormats": "MP3, M4A, WAV, FLAC vb. desteklenir.",
+  "selectFileButton": "Dosya Seç",
+  "pleaseEnterMusicLink": "Lütfen müzik bağlantısı girin",
+  "pleaseEnterValidLink": "Lütfen geçerli bir URL girin",
+  "sharedSong": "Paylaşılan Şarkı",
+  "selectMember": "Üye Seç",
+  "searchMemberHint": "Üyelerde ara",
+  "noMatchingMembers": "Eşleşen üye bulunamadı",
+  "unknownMember": "Bilinmeyen",
+  "selectedMessagesCount": "{count} mesaj seçildi",
+  "@selectedMessagesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchContactsOrGroups": "Kişi veya gruplarda ara",
+  "noMatchingConversations": "Eşleşen sohbet bulunamadı",
+  "videoTitle": "Video",
+  "loadingText": "Yükleniyor...",
+  "videoPlaybackFailed": "Video oynatma başarısız",
+  "@videoPlaybackFailed": {
+    "description": "Used with error message"
+  },
+  "videoLoadFailed": "Video yüklenemedi",
+  "playerInitFailed": "Oynatıcı başlatılamadı",
+  "createPollTitle": "Anket Oluştur",
+  "submitPoll": "Gönder",
+  "pollQuestionLabel": "Anket Sorusu",
+  "pollOptionsLabel": "Anket Seçenekleri",
+  "optionHintWithIndex": "Seçenek {index}",
+  "@optionHintWithIndex": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "addOptionButton": "Seçenek Ekle",
+  "pollSettingsLabel": "Anket Ayarları",
+  "selectionType": "Seçim Türü",
+  "singleChoiceLabel": "Tekli",
+  "multiChoiceLabel": "Çoklu",
+  "anonymousPollSwitch": "Anonim Anket",
+  "pleaseEnterQuestion": "Lütfen anket sorusu girin",
+  "atLeastTwoOptions": "En az 2 seçenek gerekli",
+  "confirmWithCount": "Onayla ({count})",
+  "@confirmWithCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@memberCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@groupChatCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@replyTo": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "emailVerificationTitle": "E-posta Doğrulama",
+  "enterValidEmailAddress": "Lütfen geçerli bir e-posta adresi girin",
+  "verificationCodeSentTo": "{email} adresine doğrulama kodu gönderildi",
+  "@verificationCodeSentTo": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "sendCodeFailed": "Kod gönderilemedi: {error}",
+  "@sendCodeFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "verificationSuccess": "Doğrulama başarılı",
+  "verificationFailed": "Doğrulama başarısız",
+  "verificationCodeError": "Doğrulama kodu hatası: {error}",
+  "@verificationCodeError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterVerificationCode": "Doğrulama kodunu girin",
+  "enterYourEmail": "E-posta girin",
+  "weSentCodeTo": "{email} adresine\n6 haneli kod gönderdik",
+  "@weSentCodeTo": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "enterEmailForCode": "E-posta adresinizi girin, doğrulama kodu göndereceğiz",
+  "sendVerificationCode": "Doğrulama kodu gönder",
+  "resendVerificationCode": "Doğrulama kodunu tekrar gönder",
+  "canResendAfter": "{seconds} saniye sonra tekrar gönderilebilir",
+  "@canResendAfter": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "changeEmail": "E-postayı değiştir",
+  "addToContacts": "Kişilere Ekle",
+  "addingToContacts": "Ekleniyor...",
+  "addedToContacts": "Kişilere eklendi",
+  "addFailedWithError": "Ekleme başarısız: {error}",
+  "@addFailedWithError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "addPhone": "Telefon ekle",
+  "addTag": "Etiket ekle",
+  "addText": "Metin ekle",
+  "addPhoto": "Fotoğraf ekle",
+  "groupCountLabel": "{count} grup",
+  "@groupCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "addedViaSearch": "Arama yoluyla eklendi",
+  "addTime": "Zaman ekle",
+  "doneButton": "Tamam",
+  "waitingForParticipants": "Katılımcılar bekleniyor...",
+  "participantMe": "{name} (Ben)",
+  "@participantMe": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "sharingLabel": "Paylaşılıyor",
+  "screenSharingBy": "{name} ekran paylaşıyor",
+  "@screenSharingBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "participantCount": "{count} katılımcı",
+  "@participantCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "muteLabel": "Sessize Al",
+  "unmuteLabel": "Sesi Aç",
+  "turnOffVideo": "Videoyu kapat",
+  "turnOnVideo": "Videoyu aç",
+  "shareScreen": "Ekran paylaş",
+  "stopSharing": "Paylaşımı durdur",
+  "switchCameraLabel": "Değiştir",
+  "leaveLabel": "Ayrıl",
+  "participantsLabel": "Katılımcılar",
+  "joiningMeeting": "Toplantıya katılınıyor..."
+}
