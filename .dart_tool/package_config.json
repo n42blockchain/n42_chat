@@ -141,7 +141,7 @@
     },
     {
       "name": "build_runner",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner-2.10.4",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner-2.10.5",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -315,7 +315,7 @@
     },
     {
       "name": "drift_dev",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/drift_dev-2.30.0",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/drift_dev-2.30.1",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
@@ -351,7 +351,7 @@
     },
     {
       "name": "file_picker",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/file_picker-8.3.7",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/file_picker-10.3.8",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -447,9 +447,9 @@
     },
     {
       "name": "flutter_lints",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-3.0.2",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-6.0.0",
       "packageUri": "lib/",
-      "languageVersion": "3.1"
+      "languageVersion": "3.8"
     },
     {
       "name": "flutter_local_notifications",
@@ -519,9 +519,9 @@
     },
     {
       "name": "flutter_slidable",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_slidable-3.1.2",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_slidable-4.0.3",
       "packageUri": "lib/",
-      "languageVersion": "2.17"
+      "languageVersion": "3.6"
     },
     {
       "name": "flutter_svg",
@@ -615,7 +615,7 @@
     },
     {
       "name": "get_it",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/get_it-7.7.0",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/get_it-9.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -765,7 +765,7 @@
     },
     {
       "name": "injectable",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/injectable-2.6.0",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/injectable-2.7.1+4",
       "packageUri": "lib/",
       "languageVersion": "3.8"
     },
@@ -825,9 +825,9 @@
     },
     {
       "name": "lints",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/lints-3.0.0",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/lints-6.0.0",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.8"
     },
     {
       "name": "logger",
@@ -879,13 +879,13 @@
     },
     {
       "name": "mobile_scanner",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/mobile_scanner-5.2.3",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/mobile_scanner-6.0.11",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
       "name": "mockito",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/mockito-5.6.1",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/mockito-5.6.3",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -987,13 +987,13 @@
     },
     {
       "name": "permission_handler",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler-11.4.0",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler-12.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "permission_handler_android",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_android-12.1.0",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_android-13.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
@@ -1323,7 +1323,7 @@
     },
     {
       "name": "sqlparser",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/sqlparser-0.42.1",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/sqlparser-0.43.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
