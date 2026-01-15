@@ -1,0 +1,1542 @@
+{
+  "@@locale": "id",
+  "chatModuleInitFailed": "Gagal menginisialisasi modul chat",
+  "checkNetworkRetry": "Silakan periksa koneksi jaringan Anda dan coba lagi",
+  "retry": "Coba Lagi",
+  "unknownUser": "Pengguna Tidak Dikenal",
+  "walletNotConnected": "Dompet tidak terhubung",
+  "cannotGetWalletAddress": "Tidak dapat mendapatkan alamat dompet",
+  "paymentRequestMemo": "Permintaan pembayaran: {requestId}",
+  "callServiceNotInitialized": "Layanan panggilan belum diinisialisasi",
+  "alreadyInCall": "Sedang dalam panggilan",
+  "meetingServiceNotInitialized": "Layanan meeting belum diinisialisasi",
+  "livekitNotConfigured": "LiveKit belum dikonfigurasi",
+  "unknownConversation": "Percakapan tidak dikenal",
+  "startCallFailed": "Gagal memulai panggilan: {error}",
+  "answerCallFailed": "Gagal menjawab: {error}",
+  "connectionFailed": "Koneksi gagal",
+  "callRejected": "Panggilan ditolak",
+  "noAnswer": "Tidak ada jawaban",
+  "invalidLoginResponse": "Respons login tidak valid",
+  "loginFailed": "Login gagal: {error}",
+  "sessionRestoreFailed": "Gagal memulihkan sesi",
+  "additionalVerificationRequired": "Verifikasi tambahan diperlukan",
+  "registrationFailed": "Pendaftaran gagal: {error}",
+  "cannotConnectServer": "Tidak dapat terhubung ke server: {error}",
+  "wrongUsernamePassword": "Nama pengguna atau kata sandi salah",
+  "usernameTaken": "Nama pengguna sudah digunakan",
+  "invalidUsernameFormat": "Format nama pengguna tidak valid",
+  "rateLimitExceeded": "Terlalu banyak permintaan, silakan coba lagi nanti",
+  "loginExpired": "Login kedaluwarsa",
+  "joinMeetingFailed": "Gagal bergabung ke meeting: {error}",
+  "screenShareFailed": "Berbagi layar gagal: {error}",
+  "answer": "Jawab",
+  "decline": "Tolak",
+  "missedCall": "Panggilan tidak terjawab",
+  "callBack": "Panggil balik",
+  "incomingCall": "Panggilan masuk",
+  "missedVideoCall": "Panggilan video tidak terjawab",
+  "missedVoiceCall": "Panggilan suara tidak terjawab",
+  "passkeyNotInitialized": "Passkey belum diinisialisasi",
+  "googleSignInNotConfigured": "Google Sign In belum dikonfigurasi",
+  "encryptedMessage": "[Pesan terenkripsi]",
+  "sticker": "[Stiker]",
+  "groupCreated": "Grup dibuat",
+  "groupNameChanged": "Nama grup diubah",
+  "groupAvatarChanged": "Avatar grup diubah",
+  "groupAnnouncementChanged": "Pengumuman grup diubah",
+  "image": "[Gambar]",
+  "video": "[Video]",
+  "voice": "[Suara]",
+  "file": "[Berkas]",
+  "location": "[Lokasi]",
+  "unknownMessage": "[Pesan tidak dikenal]",
+  "joinedGroup": "{senderName} bergabung ke grup",
+  "leftGroup": "{senderName} keluar dari grup",
+  "invitedToGroup": "{senderName} diundang",
+  "removedFromGroup": "{senderName} dikeluarkan",
+  "avatarDataEmpty": "Data avatar kosong",
+  "avatarTooLarge": "Berkas avatar terlalu besar, maksimal 10MB",
+  "uploadAvatarFailed": "Gagal mengunggah avatar",
+  "delete": "Hapus",
+  "notLoggedIn": "Belum masuk",
+  "roomNotExist": "Ruangan tidak ditemukan: {roomId}",
+  "uploadImageFailed": "Gagal mengunggah gambar",
+  "matrixClientNotInitialized": "Matrix client belum diinisialisasi",
+  "uploadVoiceFailed": "Gagal mengunggah suara: Tidak dapat mendapatkan MXC URI",
+  "uploadVideoFailed": "Gagal mengunggah video: Tidak dapat mendapatkan MXC URI",
+  "uploadFileFailed": "Gagal mengunggah berkas: Tidak dapat mendapatkan MXC URI",
+  "locationWithCoords": "Lokasi: {lat}, {lon}",
+  "myLocation": "Lokasi saya",
+  "pollEnded": "Polling berakhir",
+  "groupChat": "Chat Grup",
+  "search": "Cari",
+  "cancel": "Batal",
+  "userCancelled": "Pengguna membatalkan",
+  "noData": "Tidak ada data",
+  "noSearchResults": "Tidak ada hasil pencarian",
+  "tryDifferentKeyword": "Coba kata kunci lain",
+  "loadFailed": "Gagal memuat",
+  "checkNetwork": "Silakan periksa koneksi jaringan Anda",
+  "networkConnectionFailed": "Koneksi jaringan gagal",
+  "checkNetworkSettings": "Silakan periksa pengaturan jaringan Anda",
+  "messages": "Pesan",
+  "contacts": "Kontak",
+  "discover": "Jelajahi",
+  "me": "Saya",
+  "voiceLoading": "Suara sedang dimuat, silakan coba lagi nanti",
+  "voiceToTextFailed": "Gagal mengubah suara ke teks",
+  "converting": "Mengonversi...",
+  "convertToText": "Ke teks",
+  "convertToTextTitle": "Ubah ke Teks",
+  "selectEmoji": "Pilih emoji",
+  "frequentlyUsed": "Sering digunakan",
+  "copy": "Salin",
+  "forward": "Teruskan",
+  "unfavorite": "Batal favorit",
+  "favorite": "Favorit",
+  "resend": "Kirim ulang",
+  "recall": "Tarik",
+  "multiSelect": "Pilih banyak",
+  "quote": "Kutip",
+  "remind": "Ingatkan",
+  "searchThis": "Cari",
+  "recallMessageConfirm": "Tarik pesan ini?",
+  "youRecalledMessage": "Anda menarik sebuah pesan",
+  "otherRecalledMessage": "Pesan ditarik",
+  "reEdit": "Edit ulang",
+  "copied": "Disalin",
+  "sendMessageHint": "Kirim pesan",
+  "microphonePermissionRequired": "Silakan izinkan akses mikrofon",
+  "startRecordingFailed": "Gagal memulai rekaman: {error}",
+  "recordingTooShort": "Rekaman terlalu pendek",
+  "stopRecordingFailed": "Gagal menghentikan rekaman: {error}",
+  "releaseToCancel": "Lepas untuk membatalkan",
+  "releaseToSend": "Lepas untuk kirim, geser ke atas untuk batal",
+  "holdToTalk": "Tahan untuk bicara",
+  "send": "Kirim",
+  "conversationLabel": "Percakapan: {roomId}",
+  "contactLabel": "Kontak: {userId}",
+  "addFriend": "Tambah Teman",
+  "chatServiceNotConnected": "Layanan chat tidak terhubung",
+  "userNotFoundHint": "Pengguna \"{query}\" tidak ditemukan\n\nTips:\n• Coba masukkan ID pengguna lengkap, contoh @username:server.com\n• Periksa ejaan nama pengguna",
+  "@userNotFoundHint": {
+    "placeholders": {
+      "query": {"type": "String"}
+    }
+  },
+  "createChatFailed": "Gagal membuat chat: {error}",
+  "@createChatFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "searchFailed": "Pencarian gagal: {error}",
+  "@searchFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterUserIdOrUsername": "Masukkan ID atau nama pengguna untuk mencari",
+  "searching": "Mencari...",
+  "searchUserToChat": "Cari pengguna untuk mulai mengobrol",
+  "matrixIdExample": "Anda dapat memasukkan Matrix ID lengkap\ncontoh @user:matrix.n42.network",
+  "userNotFound": "Pengguna \"{username}\" tidak ditemukan",
+  "@userNotFound": {
+    "placeholders": {
+      "username": {"type": "String"}
+    }
+  },
+  "chat": "Chat",
+  "settings": "Pengaturan",
+  "editProfile": "Edit Profil",
+  "login": "Masuk",
+  "createGroup": "Buat Grup",
+  "developing": "{title}\n(Segera hadir)",
+  "error": "Kesalahan",
+  "pageNotFound": "Halaman tidak ditemukan",
+  "backToHome": "Kembali ke Beranda",
+  "allRead": "Semua dibaca",
+  "readCount": "{count} dibaca",
+  "transfer": "Transfer",
+  "pendingReceipt": "Tertunda",
+  "tapToReceive": "Ketuk untuk menerima",
+  "received": "Diterima",
+  "paymentReceived": "Pembayaran diterima",
+  "refunded": "Dikembalikan",
+  "expired": "Kedaluwarsa",
+  "redPacketGreeting": "Semoga sukses selalu",
+  "n42RedPacket": "Angpao N42",
+  "goodLuck": "Semoga beruntung",
+  "claimed": "Diklaim",
+  "allClaimed": "Semua diklaim",
+  "emoji": "Emoji",
+  "love": "Cinta",
+  "animals": "Hewan",
+  "food": "Makanan",
+  "travel": "Perjalanan",
+  "activities": "Aktivitas",
+  "objects": "Objek",
+  "symbols": "Simbol",
+  "reply": "Balas",
+  "copiedToClipboard": "Disalin ke papan klip",
+  "edit": "Edit",
+  "more": "Lainnya",
+  "selectForwardTarget": "Pilih penerima",
+  "sendCount": "Kirim ({count})",
+  "draft": "[Draf] ",
+  "n42Id": "N42 ID: {id}",
+  "friendInfo": "Info Teman",
+  "friendInfoDesc": "Tambahkan catatan teman, telepon, tag, catatan, foto dan atur izin.",
+  "moments": "Moments",
+  "sendMessage": "Pesan",
+  "audioVideoCall": "Panggilan Audio/Video",
+  "videoChannel": "Saluran Video",
+  "remark": "Catatan",
+  "remarkName": "Nama Catatan",
+  "phone": "Telepon",
+  "tags": "Tag",
+  "notes": "Catatan",
+  "photos": "Foto",
+  "permissions": "Izin",
+  "chatMomentsEtc": "Chat, Moments, Olahraga, dll.",
+  "moreInfo": "Info Lainnya",
+  "commonGroups": "Grup bersama",
+  "zeroGroups": "0",
+  "source": "Sumber",
+  "notificationSettings": "Notifikasi",
+  "receiveNotifications": "Terima notifikasi pesan baru",
+  "showPreview": "Tampilkan pratinjau pesan",
+  "showContentInNotification": "Tampilkan isi pesan di notifikasi",
+  "notificationSound": "Suara notifikasi",
+  "playSoundOnMessage": "Putar suara saat menerima pesan",
+  "vibrate": "Getar",
+  "vibrateOnMessage": "Getar saat menerima pesan",
+  "doNotDisturb": "Jangan Ganggu",
+  "dndDescription": "Bisukan notifikasi pada jam tertentu",
+  "startTime": "Waktu mulai",
+  "endTime": "Waktu selesai",
+  "privacy": "Privasi",
+  "appearance": "Tampilan",
+  "about": "Tentang",
+  "logout": "Keluar",
+  "logoutConfirm": "Apakah Anda yakin ingin keluar?",
+  "exit": "Keluar",
+  "save": "Simpan",
+  "nickname": "Nama Panggilan",
+  "enterNickname": "Masukkan nama panggilan",
+  "signature": "Tanda Tangan",
+  "addSignature": "Tambahkan tanda tangan",
+  "takePhoto": "Ambil Foto",
+  "chooseFromGallery": "Pilih dari Galeri",
+  "saveFailed": "Gagal menyimpan: {error}",
+  "secureDecentralizedChat": "Pesan aman dan terdesentralisasi",
+  "endToEndEncryption": "Enkripsi ujung ke ujung",
+  "messagesOnlyYouCanSee": "Pesan hanya dapat dilihat oleh Anda dan penerima",
+  "decentralized": "Terdesentralisasi",
+  "basedOnMatrix": "Dibangun di atas protokol terbuka Matrix",
+  "walletIntegration": "Integrasi Dompet",
+  "easyCryptoTransfer": "Transfer kripto dengan mudah",
+  "register": "Daftar",
+  "agreeTerms": "Dengan masuk, Anda menyetujui",
+  "termsOfService": "Ketentuan Layanan",
+  "and": "dan",
+  "privacyPolicy": "Kebijakan Privasi",
+  "serverAddress": "Alamat Server",
+  "enterServerAddress": "Masukkan alamat server",
+  "validServerAddress": "Silakan masukkan alamat server yang valid",
+  "connectedTo": "Terhubung ke {serverName}",
+  "username": "Nama Pengguna",
+  "enterUsername": "Masukkan nama pengguna",
+  "password": "Kata Sandi",
+  "enterPassword": "Masukkan kata sandi",
+  "registerAccount": "Daftar",
+  "forgotPassword": "Lupa Kata Sandi",
+  "otherLoginMethods": "Metode login lainnya",
+  "emailVerification": "Kode verifikasi email",
+  "enterServerFirst": "Silakan masukkan alamat server terlebih dahulu",
+  "passkeyNeedsServer": "Login passkey memerlukan dukungan server",
+  "googleLoginSuccess": "Login Google berhasil: {email}",
+  "googleLoginFailed": "Login Google gagal: {error}",
+  "appleLoginSuccess": "Login Apple berhasil",
+  "appleLoginFailed": "Login Apple gagal: {error}",
+  "createAccount": "Buat Akun",
+  "joinN42Chat": "Bergabung dengan N42 Chat untuk mulai mengobrol",
+  "usernameHint": "3-20 karakter, huruf/angka/_",
+  "usernameMinLength": "Nama pengguna minimal 3 karakter",
+  "usernameMaxLength": "Nama pengguna maksimal 20 karakter",
+  "usernameFormat": "Nama pengguna hanya boleh berisi huruf, angka, dan garis bawah",
+  "passwordHint": "Minimal 8 karakter",
+  "passwordMinLength": "Kata sandi minimal 8 karakter",
+  "confirmPassword": "Konfirmasi Kata Sandi",
+  "reEnterPassword": "Masukkan ulang kata sandi",
+  "passwordsNotMatch": "Kata sandi tidak cocok",
+  "inviteCode": "Kode undangan (bawaan)",
+  "filled": "Terisi",
+  "enterInviteCode": "Masukkan kode undangan",
+  "inviteCodeHint": "Kode undangan sudah bawaan, biasanya tidak perlu diubah",
+  "agreeTermsFirst": "Silakan baca dan setujui ketentuan dan kebijakan privasi terlebih dahulu",
+  "iAgree": "Saya telah membaca dan menyetujui",
+  "alreadyHaveAccount": "Sudah punya akun?",
+  "loginNow": "Masuk sekarang",
+  "whoCanSee": "Siapa yang dapat melihat",
+  "avatar": "Avatar",
+  "status": "Status",
+  "lastSeen": "Terakhir dilihat",
+  "messageSettings": "Pesan",
+  "allowStrangerMessage": "Izinkan pesan dari orang asing",
+  "receiveNonContact": "Terima pesan dari non-kontak",
+  "readReceipts": "Tanda baca",
+  "letOthersKnowRead": "Beri tahu orang lain Anda telah membaca pesan mereka",
+  "typingStatus": "Status mengetik",
+  "letOthersKnowTyping": "Beri tahu orang lain Anda sedang mengetik",
+  "everyone": "Semua orang",
+  "contactsOnly": "Hanya kontak",
+  "nobody": "Tidak ada",
+  "whoCanSeeItem": "Siapa yang dapat melihat {title}",
+  "version": "Versi {version}",
+  "checkUpdate": "Periksa pembaruan",
+  "openSourceLicenses": "Lisensi open source",
+  "feedback": "Umpan Balik",
+  "builtOnMatrix": "Dibangun di atas protokol Matrix",
+  "loading": "Memuat...",
+  "noConversations": "Tidak ada percakapan",
+  "tapToChat": "Ketuk kanan atas untuk mulai mengobrol",
+  "startGroup": "Mulai Chat Grup",
+  "scan": "Pindai",
+  "payment": "Pembayaran",
+  "featureComingSoon": "{feature} segera hadir",
+  "markAsRead": "Tandai sudah dibaca",
+  "unmute": "Bunyikan",
+  "mute": "Bisukan",
+  "unpin": "Lepas pin",
+  "pin": "Pin",
+  "deleteConversation": "Hapus Percakapan",
+  "deleteConversationConfirm": "Hapus percakapan dengan \"{name}\"?",
+  "noContacts": "Tidak ada kontak",
+  "addFriendsToChat": "Tambah teman untuk mulai mengobrol",
+  "contactNotFound": "Kontak tidak ditemukan",
+  "tryOtherKeywords": "Coba kata kunci lain atau pencarian global",
+  "searchResults": "Hasil pencarian",
+  "newFriends": "Teman Baru",
+  "chatOnlyFriends": "Teman khusus chat",
+  "officialAccounts": "Akun Resmi",
+  "serviceAccounts": "Akun Layanan",
+  "enterpriseContacts": "Kontak Perusahaan",
+  "contactsCount": "{count} kontak",
+  "recommendToFriend": "Bagikan kontak",
+  "setRemark": "Atur catatan",
+  "addToHome": "Tambahkan ke layar utama",
+  "sendingCard": "Mengirim kartu kontak...",
+  "contactCard": "[Kartu Kontak]",
+  "cardSent": "Mengirim kartu {contact} ke {friend}",
+  "recommendFailed": "Rekomendasi gagal: {error}",
+  "enterRemark": "Masukkan catatan",
+  "remarkSet": "Catatan diatur ke: {remark}",
+  "openingChat": "Membuka chat...",
+  "openChatFailed": "Gagal membuka chat: {error}",
+  "addContact": "Tambah Kontak",
+  "enterUserId": "Masukkan ID pengguna",
+  "noFriendRequests": "Tidak ada permintaan pertemanan",
+  "accept": "Terima",
+  "reject": "Tolak",
+  "acceptedRequest": "Menerima permintaan pertemanan {name}",
+  "rejectedRequest": "Menolak permintaan pertemanan {name}",
+  "noGroups": "Tidak ada grup",
+  "creatingGroup": "Pembuatan grup segera hadir...",
+  "selectFriendToRecommend": "Pilih teman untuk direkomendasikan",
+  "searchContacts": "Cari kontak",
+  "noContactsFound": "Tidak ada kontak ditemukan",
+  "yesterday": "Kemarin",
+  "monday": "Sen",
+  "tuesday": "Sel",
+  "wednesday": "Rab",
+  "thursday": "Kam",
+  "friday": "Jum",
+  "saturday": "Sab",
+  "sunday": "Min",
+  "justNow": "Baru saja",
+  "minutesAgo": "{count} menit lalu",
+  "hoursAgo": "{count} jam lalu",
+  "daysAgo": "{count} hari lalu",
+  "online": "Online",
+  "offline": "Offline",
+  "minutesAgoOnline": "Online {count} menit lalu",
+  "hoursAgoOnline": "Online {count} jam lalu",
+  "daysAgoOnline": "Online {count} hari lalu",
+  "searchContactsGroupsMessages": "Cari kontak, grup, pesan",
+  "searchError": "Kesalahan pencarian",
+  "searchHint": "Cari kontak, grup, dan pesan",
+  "enterKeyword": "Masukkan kata kunci untuk mencari",
+  "searchHistory": "Riwayat Pencarian",
+  "clear": "Hapus",
+  "noResultsFor": "Tidak ada hasil untuk \"{query}\"",
+  "all": "Semua",
+  "groups": "Grup",
+  "noResults": "Tidak ada hasil",
+  "groupInfo": "Info Grup",
+  "groupMembers": "Anggota ({count})",
+  "viewAll": "Lihat semua",
+  "owner": "Pemilik",
+  "admin": "Admin",
+  "invite": "Undang",
+  "groupAnnouncement": "Pengumuman Grup",
+  "notSet": "Belum diatur",
+  "groupDescription": "Deskripsi Grup",
+  "publicGroup": "Grup Publik",
+  "allowSearchJoin": "Izinkan orang lain mencari dan bergabung",
+  "clearChatHistory": "Hapus Riwayat Chat",
+  "dissolveGroup": "Bubarkan Grup",
+  "leaveGroup": "Keluar Grup",
+  "changeGroupName": "Ubah Nama Grup",
+  "enterGroupName": "Masukkan nama grup",
+  "confirm": "Konfirmasi",
+  "changeGroupDescription": "Ubah Deskripsi Grup",
+  "enterGroupDescription": "Masukkan deskripsi grup",
+  "editAnnouncement": "Edit Pengumuman",
+  "enterAnnouncement": "Masukkan pengumuman",
+  "publish": "Publikasikan",
+  "clearHistoryConfirm": "Hapus semua riwayat chat? Ini tidak dapat dibatalkan.",
+  "clearAction": "Hapus",
+  "chatHistoryCleared": "Riwayat chat dihapus",
+  "leaveGroupConfirm": "Keluar dari \"{name}\"?",
+  "dissolveGroupConfirm": "Bubarkan \"{name}\"? Ini tidak dapat dibatalkan.",
+  "dissolve": "Bubarkan",
+  "groupQrCode": "Kode QR Grup",
+  "searchChatHistory": "Cari Riwayat Chat",
+  "groupIdCopied": "ID Grup disalin",
+  "tapCopyGroupId": "{count} anggota - Ketuk untuk menyalin ID Grup",
+  "featureInDevelopment": "Fitur sedang dikembangkan...",
+  "receiverAddress": "Alamat Penerima",
+  "enterOrPasteAddress": "Masukkan atau tempel alamat dompet",
+  "selectToken": "Pilih Token",
+  "transferAmount": "Jumlah Transfer",
+  "available": "Tersedia",
+  "allAmount": "Semua",
+  "memoOptional": "Memo (opsional)",
+  "addMemo": "Tambahkan memo",
+  "confirmTransfer": "Konfirmasi Transfer",
+  "invalidAddress": "Silakan masukkan alamat penerima yang valid",
+  "invalidAmount": "Silakan masukkan jumlah yang valid",
+  "selectTokenPlease": "Silakan pilih token",
+  "addressVerified": "Alamat terverifikasi",
+  "availableBalance": "Tersedia: {balance} {symbol}",
+  "scanningInDevelopment": "Fitur pindai sedang dikembangkan...",
+  "enterAmount": "Masukkan jumlah",
+  "redPacketCountMin": "Minimal 1 angpao diperlukan",
+  "viewRedPacketDetails": "Lihat detail angpao",
+  "enterTransferAmount": "Masukkan jumlah transfer",
+  "transferTo": "Transfer ke",
+  "selectCurrency": "Pilih mata uang",
+  "receiveTransfer": "Menerima transfer",
+  "fromSender": "Dari {senderName}",
+  "confirmReceive": "Konfirmasi Penerimaan",
+  "groupProfile": "Info Grup",
+  "viewProfile": "Lihat Profil",
+  "removeMember": "Keluarkan dari Grup",
+  "removeMemberConfirm": "Keluarkan \"{name}\" dari grup?",
+  "remove": "Keluarkan",
+  "clearStatus": "Hapus Status",
+  "clearStatusConfirm": "Hapus status saat ini?",
+  "statusCleared": "Status dihapus",
+  "statusSet": "Status diatur ke: {result}",
+  "userNotExist": "Pengguna tidak ada",
+  "userIdCopied": "ID Pengguna disalin",
+  "voiceCallInDevelopment": "Panggilan suara sedang dikembangkan...",
+  "report": "Laporkan",
+  "reportInDevelopment": "Fitur laporan sedang dikembangkan...",
+  "shareCard": "Bagikan Kartu",
+  "shareInDevelopment": "Fitur bagikan sedang dikembangkan...",
+  "qrCode": "Kode QR",
+  "qrCodeInDevelopment": "Fitur kode QR sedang dikembangkan...",
+  "avatarUpdated": "Avatar diperbarui",
+  "selectImageFailed": "Gagal memilih gambar: {error}",
+  "changeName": "Ubah Nama",
+  "male": "Pria",
+  "female": "Wanita",
+  "genderSet": "Jenis kelamin diatur ke: {gender}",
+  "regionSet": "Wilayah diatur ke: {region}",
+  "setPatText": "Atur Teks Tepukan",
+  "changeSignature": "Ubah Tanda Tangan",
+  "ringtoneSet": "Nada dering diatur ke: {result}",
+  "featureInDev": "{feature} sedang dikembangkan...",
+  "saveAddressFailed": "Gagal menyimpan alamat: {error}",
+  "myAddress": "Alamat Saya",
+  "addNew": "Tambah",
+  "addAddress": "Tambah Alamat",
+  "addressAdded": "Alamat ditambahkan",
+  "addressUpdated": "Alamat diperbarui",
+  "deleteAddress": "Hapus Alamat",
+  "deleteAddressConfirm": "Hapus alamat ini?",
+  "addressDeleted": "Alamat dihapus",
+  "setDefaultAddress": "Atur sebagai default",
+  "fillCompleteInfo": "Silakan isi semua kolom",
+  "saveInvoiceFailed": "Gagal menyimpan faktur: {error}",
+  "myInvoices": "Faktur Saya",
+  "addInvoice": "Tambah Faktur",
+  "invoiceAdded": "Faktur ditambahkan",
+  "invoiceUpdated": "Faktur diperbarui",
+  "deleteInvoice": "Hapus Faktur",
+  "deleteInvoiceConfirm": "Hapus faktur ini?",
+  "invoiceDeleted": "Faktur dihapus",
+  "invoiceType": "Jenis faktur: ",
+  "personal": "Pribadi",
+  "enterprise": "Perusahaan",
+  "setDefaultInvoice": "Atur sebagai default",
+  "enterTaxId": "Masukkan NPWP",
+  "vibrateMode": "Mode getar",
+  "silentMode": "Mode senyap",
+  "playing": "Memutar: {ringtoneName}",
+  "playFailed": "Gagal memutar: {ringtoneName}",
+  "enterGroupNamePlease": "Silakan masukkan nama grup",
+  "selectAtLeastOne": "Silakan pilih minimal satu anggota",
+  "fillStatus": "Tulis Status",
+  "fileNotExist": "Berkas tidak ada",
+  "sendFailed": "Gagal mengirim: {error}",
+  "cannotOpenBrowser": "Tidak dapat membuka browser",
+  "selectFileFailed": "Gagal memilih berkas: {error}",
+  "enterMusicLink": "Masukkan tautan musik",
+  "enterValidLink": "Silakan masukkan tautan yang valid",
+  "enterPollQuestion": "Masukkan pertanyaan polling",
+  "minTwoOptions": "Minimal 2 opsi diperlukan",
+  "crossDeviceEnabled": "Penandatanganan lintas perangkat diaktifkan",
+  "crossDeviceSet": "Penandatanganan lintas perangkat berhasil diatur",
+  "setupFailed": "Pengaturan gagal: {error}",
+  "receiveAmount": "Jumlah Diterima",
+  "enterValidAmount": "Silakan masukkan jumlah yang valid",
+  "addressCopied": "Alamat disalin",
+  "openItem": "Buka: {content}",
+  "newNoteComingSoon": "Fitur catatan baru segera hadir",
+  "addLinkComingSoon": "Fitur tambah tautan segera hadir",
+  "deleted": "Dihapus",
+  "shareComingSoon": "Fitur bagikan segera hadir",
+  "saveComingSoon": "Fitur simpan segera hadir",
+  "moreStylesComingSoon": "Lebih banyak gaya segera hadir",
+  "wallet": "Dompet",
+  "walletArea": "Area dompet",
+  "recording": "Merekam",
+  "invalidVideoUrl": "URL video tidak valid",
+  "downloadFile": "Unduh berkas",
+  "clearChatHistoryTitle": "Hapus Riwayat Chat",
+  "cannotUndo": "Ini tidak dapat dibatalkan",
+  "videoCall": "Panggilan Video",
+  "voiceCall": "Panggilan Suara",
+  "leaveMeeting": "Tinggalkan Meeting",
+  "chatDetails": "Detail Chat",
+  "viewAllGroupMembers": "Lihat semua anggota",
+  "groupName": "Nama Grup",
+  "groupNameUpdated": "Nama grup diperbarui",
+  "updateFailed": "Pembaruan gagal",
+  "noPermissionToModify": "Anda tidak memiliki izin untuk mengubah",
+  "groupManagement": "Manajemen Grup",
+  "myNicknameInGroup": "Nama Panggilan Saya di Grup",
+  "pinChat": "Pin Chat",
+  "strongReminder": "Pengingat Kuat",
+  "setChatBackground": "Atur Latar Belakang Chat",
+  "unknownFile": "Berkas tidak dikenal",
+  "download": "Unduh",
+  "invalidLocation": "Lokasi tidak valid",
+  "address": "Alamat",
+  "latitude": "Garis Lintang",
+  "longitude": "Garis Bujur",
+  "close": "Tutup",
+  "tapToCancel": "Ketuk untuk membatalkan",
+  "captureFailed": "Gagal mengambil gambar: {error}",
+  "processingVideo": "Memproses video...",
+  "videoFileNotExist": "Berkas video tidak ada",
+  "videoDataEmpty": "Data video kosong",
+  "videoTooLarge": "Ukuran video tidak boleh melebihi 100MB",
+  "sendingVideo": "Mengirim video...",
+  "sendVideoFailed": "Gagal mengirim video: {error}",
+  "imageFileNotExist": "Berkas gambar tidak ada",
+  "imageDataEmpty": "Data gambar kosong",
+  "sendingImage": "Mengirim gambar...",
+  "sendImageFailed": "Gagal mengirim gambar: {error}",
+  "sendLocation": "Kirim Lokasi",
+  "selectLocationAndSend": "Pilih lokasi dan kirim",
+  "shareRealTimeLocation": "Bagikan Lokasi Real-time",
+  "shareLocationForOneHour": "Bagikan lokasi real-time dengan teman selama 1 jam",
+  "locationSent": "Lokasi terkirim",
+  "selectMessages": "Pilih pesan",
+  "selectedCount": "Dipilih {count}",
+  "selectAll": "Pilih Semua",
+  "groupChatCount": "Chat Grup ({count})",
+  "privateChat": "Chat Pribadi",
+  "noMessages": "Tidak ada pesan",
+  "sendFirstMessage": "Kirim pesan pertama untuk mulai mengobrol",
+  "encryptionNotice": "Chat ini dienkripsi ujung ke ujung. Hanya Anda dan penerima yang dapat membaca pesan.",
+  "replyTo": "Balas ke {name}",
+  "multiForward": "Teruskan",
+  "collect": "Koleksi",
+  "noMembers": "Tidak ada anggota",
+  "memberNotFound": "Anggota tidak ditemukan",
+  "voiceFileNotExist": "Berkas suara tidak ada",
+  "voiceFileEmpty": "Berkas suara kosong",
+  "sendingVoice": "Mengirim suara...",
+  "sendVoiceFailed": "Gagal mengirim suara: {error}",
+  "messageCopied": "Pesan disalin",
+  "messageForwarded": "Pesan diteruskan",
+  "forwardFailed": "Gagal meneruskan: {error}",
+  "unfavorited": "Batal favorit",
+  "favorited": "Difavoritkan",
+  "reactionAdded": "Reaksi ditambahkan",
+  "failedMessageDeleted": "Pesan gagal dihapus",
+  "deleteMessages": "Hapus pesan",
+  "deleteMessagesConfirm": "Apakah Anda yakin ingin menghapus {count} pesan?",
+  "noteOtherMessages": "Catatan: {count} pesan dari orang lain, hanya dapat dihapus secara lokal.",
+  "myMessagesWillBeRecalled": "{count} pesan dari Anda akan ditarik.",
+  "recalledCount": "Menarik {count} pesan, menghapus {localCount} secara lokal",
+  "recalledMessages": "Menarik {count} pesan",
+  "deletedLocally": "Menghapus {count} pesan (lokal)",
+  "forwardedCount": "Meneruskan {count} pesan",
+  "forwardComplete": "Penerusan selesai: {success} berhasil, {failed} gagal",
+  "remindOnlyInGroup": "Fitur pengingat hanya tersedia di chat grup",
+  "onlyTextSearchable": "Hanya pesan teks yang dapat dicari",
+  "searchFor": "Cari \"{text}\"",
+  "baiduSearch": "Pencarian Baidu",
+  "googleSearch": "Pencarian Google",
+  "bingSearch": "Pencarian Bing",
+  "calling": "Memanggil...",
+  "connecting": "Menghubungkan...",
+  "ringing": "Berdering...",
+  "inCall": "Dalam panggilan",
+  "collectMessages": "Mengoleksi {count} pesan",
+  "voted": "Memilih",
+  "voteChanged": "Pilihan diubah",
+  "voteRemoved": "Pilihan dihapus",
+  "endPoll": "Akhiri Polling",
+  "endPollConfirm": "Apakah Anda yakin ingin mengakhiri polling ini? Tidak ada lagi suara yang dapat diberikan setelah diakhiri.",
+  "memberCount": "{count} anggota",
+  "videoChannels": "Saluran",
+  "live": "Siaran",
+  "listen": "Dengarkan",
+  "watch": "Tonton",
+  "searchDiscover": "Cari",
+  "nearbyPeople": "Sekitar",
+  "games": "Permainan",
+  "miniPrograms": "Mini Program",
+  "done": "Selesai({count})",
+  "@done": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "services": "Layanan",
+  "favorites": "Favorit",
+  "ordersAndCards": "Pesanan & Kartu",
+  "stickers": "Stiker",
+  "statusSetTo": "Status diatur ke: {status}",
+  "@statusSetTo": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "avatarUploadFailed": "Gagal mengunggah avatar",
+  "personalProfile": "Profil Pribadi",
+  "name": "Nama",
+  "gender": "Jenis Kelamin",
+  "region": "Wilayah",
+  "myQrCode": "Kode QR Saya",
+  "poke": "Colek",
+  "ringtone": "Nada Dering",
+  "defaultRingtone": "Nada Dering Default",
+  "myAddresses": "Alamat Saya",
+  "genderSetTo": "Jenis kelamin diatur ke: {gender}",
+  "@genderSetTo": {
+    "placeholders": {
+      "gender": {"type": "String"}
+    }
+  },
+  "selectRegion": "Pilih Wilayah",
+  "selectCity": "Pilih Kota",
+  "regionSetTo": "Wilayah diatur ke: {region}",
+  "@regionSetTo": {
+    "placeholders": {
+      "region": {"type": "String"}
+    }
+  },
+  "setPoke": "Atur Colek",
+  "friendPokedMe": "Teman mencolek saya",
+  "enterPokeSuffix": "Masukkan akhiran colek, contoh: di bahu",
+  "example": "Contoh",
+  "onTheShoulder": " di bahu",
+  "pokeCleared": "Colek dihapus",
+  "pokeSetTo": "Colek diatur ke: mencolek saya{suffix}",
+  "@pokeSetTo": {
+    "placeholders": {
+      "suffix": {"type": "String"}
+    }
+  },
+  "editSignature": "Edit Tanda Tangan",
+  "introduceYourself": "Sebuah kalimat untuk memperkenalkan diri",
+  "signatureCleared": "Tanda tangan dihapus",
+  "signatureUpdated": "Tanda tangan diperbarui",
+  "scanToAddFriend": "Pindai kode QR di atas untuk menambahkan saya sebagai teman",
+  "ringtoneSetTo": "Nada dering diatur ke: {ringtone}",
+  "@ringtoneSetTo": {
+    "placeholders": {
+      "ringtone": {"type": "String"}
+    }
+  },
+  "confirmDissolveGroup": "Apakah Anda yakin ingin membubarkan",
+  "enterValidServerAddress": "Silakan masukkan alamat server yang valid",
+  "emailOtp": "OTP Email",
+  "enterServerAddressFirst": "Silakan masukkan alamat server terlebih dahulu",
+  "passkeyRequiresServer": "Login passkey memerlukan dukungan server",
+  "loginAgreement": "Dengan masuk, Anda menyetujui ",
+  "pleaseAgreeToTerms": "Silakan baca dan setujui Ketentuan Layanan dan Kebijakan Privasi",
+  "registerFailed": "Pendaftaran gagal",
+  "reenterPassword": "Masukkan ulang kata sandi",
+  "passwordsDoNotMatch": "Kata sandi tidak cocok",
+  "inviteCodeBuiltIn": "Kode Undangan (Bawaan)",
+  "inviteCodeBuiltInNote": "Kode undangan sudah bawaan, biasanya tidak perlu diubah",
+  "iHaveReadAndAgree": "Saya telah membaca dan menyetujui ",
+  "startGroupChat": "Mulai Chat Grup",
+  "addFriends": "Tambah Teman",
+  "paymentAndCollection": "Pembayaran",
+  "messagesWithCount": "Pesan({count})",
+  "@messagesWithCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "contactCount": "{count} kontak",
+  "@contactCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "addToHomeScreen": "Tambahkan ke layar utama",
+  "recommendedCardTo": "Merekomendasikan kartu {contact} ke {recipient}",
+  "@recommendedCardTo": {
+    "placeholders": {
+      "contact": {"type": "String"},
+      "recipient": {"type": "String"}
+    }
+  },
+  "enterRemarkName": "Masukkan nama catatan",
+  "remarkSetTo": "Catatan diatur ke: {remark}",
+  "@remarkSetTo": {
+    "placeholders": {
+      "remark": {"type": "String"}
+    }
+  },
+  "acceptedFriendRequest": "Menerima permintaan pertemanan {name}",
+  "@acceptedFriendRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "rejectedFriendRequest": "Menolak permintaan pertemanan {name}",
+  "@rejectedFriendRequest": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "groupInvites": "Undangan Grup",
+  "myGroups": "Grup Saya",
+  "invitedToJoinGroup": "Diundang untuk bergabung ke grup",
+  "confirmLeaveGroup": "Apakah Anda yakin ingin keluar dari",
+  "leave": "Keluar",
+  "saveMedia": "Simpan",
+  "recallThisMessage": "Tarik pesan ini?",
+  "messageRecalled": "Pesan ditarik",
+  "savedToGallery": "Disimpan ke galeri",
+  "failedToSave": "Gagal menyimpan",
+  "saving": "Menyimpan...",
+  "share": "Bagikan",
+  "saveToGallery": "Simpan ke Galeri",
+  "downloadFailed": "Unduhan gagal",
+  "noMediaUrl": "Tidak ada URL media tersedia",
+  "shareFailed": "Gagal membagikan",
+  "failedToLoadImage": "Gagal memuat gambar",
+  "failedToLoadMoreMessages": "Gagal memuat lebih banyak pesan",
+  "failedToSend": "Gagal mengirim",
+  "failedToSendImage": "Gagal mengirim gambar",
+  "failedToSendVoice": "Gagal mengirim suara",
+  "failedToSendFile": "Gagal mengirim berkas",
+  "failedToSendVideo": "Gagal mengirim video",
+  "failedToSendLocation": "Gagal mengirim lokasi",
+  "failedToResend": "Gagal mengirim ulang",
+  "failedToRecall": "Gagal menarik",
+  "failedToReply": "Gagal membalas",
+  "failedToAddReaction": "Gagal menambahkan reaksi",
+  "failedToSendPoll": "Gagal mengirim polling",
+  "failedToVote": "Gagal memilih",
+  "failedToLoadMessages": "Gagal memuat pesan",
+  "callFeatureComingSoon": "Fitur panggilan suara dan video segera hadir",
+  "cannotForwardRedPacketOrTransfer": "Angpao dan transfer tidak dapat diteruskan",
+  "videoRecordingFailed": "Perekaman video gagal. Silakan coba lagi.",
+  "redPacket": "Angpao",
+  "music": "Musik",
+  "coupon": "Kupon",
+  "gift": "Hadiah",
+  "poll": "Polling",
+  "text": "Teks",
+  "link": "Tautan",
+  "note": "Catatan",
+  "myNotes": "Catatan Saya",
+  "today": "Hari ini",
+  "daysAgoText": "{count} hari lalu",
+  "@daysAgoText": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "dateFormat": "{day}/{month}",
+  "@dateFormat": {
+    "placeholders": {
+      "month": {"type": "int"},
+      "day": {"type": "int"}
+    }
+  },
+  "noFavorites": "Belum ada favorit",
+  "longPressToFavorite": "Tekan lama pesan untuk difavoritkan",
+  "newNote": "Catatan Baru",
+  "favoriteLink": "Favoritkan Tautan",
+  "editTags": "Edit Tag",
+  "deleteFavorite": "Hapus Favorit",
+  "deleteFavoriteConfirm": "Apakah Anda yakin ingin menghapus favorit ini?",
+  "noSearchResultsFound": "Tidak ada hasil ditemukan",
+  "sendRedPacket": "Kirim Angpao",
+  "amount": "Jumlah",
+  "redPacketCover": "Sampul Angpao",
+  "redPacketType": "Jenis Angpao",
+  "normalRedPacket": "Normal",
+  "luckyRedPacket": "Hoki",
+  "redPacketCount": "Jumlah Angpao",
+  "pieces": "buah",
+  "putMoneyInRedPacket": "Masukkan uang ke angpao",
+  "redPacketRefundNotice": "Angpao yang tidak diklaim akan dikembalikan setelah 24 jam",
+  "openRedPacket": "Buka",
+  "redPacketAllClaimed": "Angpao habis diklaim",
+  "redPacketExpired": "Angpao kedaluwarsa",
+  "addTransferNote": "Tambahkan catatan transfer",
+  "yuan": "IDR",
+  "savedToChangeCanTransfer": "Disimpan ke saldo, dapat ditransfer langsung",
+  "replyWithEmoji": "Balas dengan emoji ini",
+  "claimedYourRedPacket": "mengklaim",
+  "claimedRedPacket": "mengklaim",
+  "otherTyping": "mengetik...",
+  "processing": "Memproses...",
+  "transferCancelled": "Transfer dibatalkan",
+  "transferFailed": "Transfer gagal",
+  "creatingPaymentRequest": "Membuat permintaan pembayaran...",
+  "processingPayment": "Memproses pembayaran...",
+  "paymentFailed": "Pembayaran gagal",
+  "clickRetry": "Ketuk untuk mencoba lagi",
+  "settingsTitle": "Pengaturan",
+  "editRemark": "Edit Catatan",
+  "setPermissions": "Atur Izin",
+  "recommendToFriends": "Rekomendasikan ke Teman",
+  "setStarFriend": "Atur sebagai Teman Bintang",
+  "addToBlacklist": "Tambahkan ke Daftar Hitam",
+  "complain": "Laporkan",
+  "deleteContact": "Hapus Kontak",
+  "deleteContactConfirm": "Apakah Anda yakin ingin menghapus {name}?",
+  "@deleteContactConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "transferTitle": "Transfer",
+  "receiverAddressLabel": "Alamat Penerima",
+  "selectTokenLabel": "Pilih Token",
+  "transferAmountLabel": "Jumlah Transfer",
+  "memoLabel": "Memo (opsional)",
+  "enterOrPasteAddressHint": "Masukkan atau tempel alamat dompet",
+  "scanInDevelopment": "Fitur pindai sedang dikembangkan...",
+  "availableLabel": "Tersedia",
+  "availableBalanceFormat": "Tersedia: {balance} {symbol}",
+  "@availableBalanceFormat": {
+    "placeholders": {
+      "balance": {"type": "String"},
+      "symbol": {"type": "String"}
+    }
+  },
+  "addMemoHint": "Tambahkan memo",
+  "receiveTitle": "Terima",
+  "walletNotConnectedTitle": "Dompet tidak terhubung",
+  "connectWalletFirst": "Silakan hubungkan dompet terlebih dahulu",
+  "sendPaymentRequest": "Kirim Permintaan Pembayaran",
+  "qrCodeGenerateFailed": "Gagal membuat kode QR",
+  "scanQrToPayMe": "Pindai kode QR untuk membayar saya",
+  "myWalletAddress": "Alamat Dompet Saya",
+  "createPaymentRequest": "Buat Permintaan Pembayaran",
+  "selectTokenHint": "Pilih Token",
+  "amountLabel": "Jumlah",
+  "cancelButton": "Batal",
+  "sendRequestButton": "Kirim Permintaan",
+  "allReadReceipt": "Semua dibaca",
+  "readCountReceipt": "{count} dibaca",
+  "@readCountReceipt": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "n42IdLabel": "N42 ID: {id}",
+  "@n42IdLabel": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "redPacketDefaultGreeting": "Semoga sukses selalu",
+  "senderRedPacket": "Angpao {name}",
+  "@senderRedPacket": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "allButton": "Semua",
+  "enterValidAddress": "Silakan masukkan alamat yang valid",
+  "pleaseSelectToken": "Silakan pilih token",
+  "receivedTransfer": "Transfer Diterima",
+  "@fromSender": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "selectForwardRecipient": "Pilih penerima terusan",
+  "@sendCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "emojiFaces": "Wajah",
+  "emojiHearts": "Hati",
+  "emojiAnimals": "Hewan",
+  "emojiFood": "Makanan",
+  "emojiTransport": "Transportasi",
+  "emojiActivities": "Aktivitas",
+  "emojiObjects": "Objek",
+  "emojiSymbols": "Simbol",
+  "transferProcessing": "Memproses transfer...",
+  "senderSentRedPacket": "{name} mengirim angpao",
+  "@senderSentRedPacket": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "savedToBalance": "Disimpan ke saldo, dapat ditransfer langsung",
+  "redPacketExpiredOrEmpty": "Angpao kedaluwarsa/habis diklaim",
+  "scanFeatureComingSoon": "Fitur pindai segera hadir...",
+  "setAsStarred": "Atur sebagai Berbintang",
+  "addToBlocklist": "Tambahkan ke Daftar Blokir",
+  "claimedYour": " mengklaim ",
+  "claimedText": " mengklaim ",
+  "userTyping": "{name} sedang mengetik...",
+  "@userTyping": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "typing": "Mengetik...",
+  "waitingToReceive": "Menunggu untuk diterima",
+  "tapToClaim": "Ketuk untuk klaim",
+  "hasBeenReceived": "Sudah diterima",
+  "getLucky": "Semoga beruntung",
+  "cameraStartFailed": "Kamera gagal dimulai",
+  "unknownError": "Kesalahan tidak dikenal",
+  "placeQrCodeInFrame": "Letakkan kode QR dalam bingkai untuk memindai",
+  "closeManualInput": "Tutup Input Manual",
+  "manualInputUserId": "Input Manual ID Pengguna",
+  "add": "Tambah",
+  "ringtoneClear": "Hapus",
+  "ringtonePhone": "Telepon",
+  "ringtoneClassic": "Klasik",
+  "ringtoneSoft": "Lembut",
+  "ringtoneVibrate": "Getar",
+  "ringtoneSilent": "Senyap",
+  "stop": "Berhenti",
+  "selectRingtone": "Pilih Nada Dering",
+  "loadingRingtones": "Memuat nada dering...",
+  "noRingtonesFound": "Tidak ada nada dering ditemukan",
+  "moodAndThoughts": "Suasana Hati & Pikiran",
+  "statusHappy": "Senang",
+  "statusCracked": "Hancur",
+  "statusLucky": "Beruntung",
+  "statusSunny": "Cerah",
+  "statusTired": "Lelah",
+  "statusDaydream": "Melamun",
+  "statusRushing": "Terburu-buru",
+  "statusOverthinking": "Berpikir Berlebihan",
+  "statusEnergized": "Berenergi",
+  "workAndStudy": "Kerja & Belajar",
+  "statusWorking": "Bekerja",
+  "statusStudying": "Belajar",
+  "statusBusy": "Sibuk",
+  "statusSlacking": "Santai",
+  "statusTraveling": "Bepergian",
+  "statusGoingHome": "Pulang",
+  "statusDnd": "Jangan Ganggu",
+  "statusHanging": "Nongkrong",
+  "statusCheckIn": "Check In",
+  "statusExercising": "Berolahraga",
+  "statusCoffee": "Kopi",
+  "statusBubbleTea": "Boba",
+  "statusEating": "Makan",
+  "statusParenting": "Mengasuh",
+  "statusSavingWorld": "Menyelamatkan Dunia",
+  "statusSelfie": "Selfie",
+  "rest": "Istirahat",
+  "statusRetreat": "Istirahat",
+  "statusHome": "Di Rumah",
+  "statusSleeping": "Tidur",
+  "statusCatLover": "Pecinta Kucing",
+  "statusDogWalking": "Jalan-jalan dengan Anjing",
+  "statusGaming": "Bermain Game",
+  "statusListening": "Mendengarkan",
+  "setStatus": "Atur Status",
+  "visibleToFriends24h": "Terlihat oleh teman selama 24 jam",
+  "writeStatus": "Tulis Status",
+  "enterYourStatus": "Masukkan status Anda...",
+  "ok": "OK",
+  "cameraPermissionRequired": "Izin kamera diperlukan untuk memindai kode QR",
+  "cameraPermissionDenied": "Izin kamera ditolak secara permanen. Silakan aktifkan di pengaturan sistem.",
+  "cannotGetCameraPermission": "Tidak dapat mendapatkan izin kamera",
+  "permissionCheckError": "Kesalahan memeriksa izin: {error}",
+  "@permissionCheckError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "invalidQrCode": "Kode QR tidak valid",
+  "qrCodeProcessFailed": "Gagal memproses kode QR: {error}",
+  "@qrCodeProcessFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "cannotAddFriend": "Tidak dapat menambah teman: {error}",
+  "@cannotAddFriend": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "scanQrCode": "Pindai Kode QR",
+  "checkingCameraPermission": "Memeriksa izin kamera...",
+  "needCameraPermission": "Izin Kamera Diperlukan",
+  "retryPermission": "Coba Lagi",
+  "openSettings": "Buka Pengaturan",
+  "inviteMembers": "Undang Anggota",
+  "inviteCount": "Undang({count})",
+  "@inviteCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "noShippingAddress": "Tidak ada alamat pengiriman",
+  "defaultLabel": "Default",
+  "editAddress": "Edit Alamat",
+  "recipient": "Penerima",
+  "enterRecipientName": "Masukkan nama penerima",
+  "phoneNumber": "Nomor Telepon",
+  "enterPhoneNumber": "Masukkan nomor telepon",
+  "regionHint": "Provinsi/Kota/Kabupaten",
+  "detailedAddress": "Alamat Lengkap",
+  "detailedAddressHint": "Jalan, nomor gedung, dll.",
+  "setAsDefaultAddress": "Atur sebagai alamat default",
+  "pleaseCompleteInfo": "Silakan lengkapi semua kolom",
+  "noInvoice": "Tidak ada faktur",
+  "company": "Perusahaan",
+  "taxNumber": "Nomor Pajak",
+  "editInvoice": "Edit Faktur",
+  "companyName": "Nama Perusahaan",
+  "enterCompanyName": "Masukkan nama perusahaan",
+  "personalName": "Nama Pribadi",
+  "enterName": "Masukkan nama",
+  "taxIdNumber": "NPWP",
+  "enterTaxIdNumber": "Masukkan NPWP",
+  "bankNameOptional": "Nama Bank (Opsional)",
+  "enterBankName": "Masukkan nama bank",
+  "bankAccountOptional": "Rekening Bank (Opsional)",
+  "enterBankAccount": "Masukkan rekening bank",
+  "companyAddressOptional": "Alamat Perusahaan (Opsional)",
+  "enterCompanyAddress": "Masukkan alamat perusahaan",
+  "companyPhoneOptional": "Telepon Perusahaan (Opsional)",
+  "enterCompanyPhone": "Masukkan telepon perusahaan",
+  "setAsDefaultInvoice": "Atur sebagai faktur default",
+  "confirmDeleteAddress": "Apakah Anda yakin ingin menghapus alamat ini?",
+  "confirmDeleteInvoice": "Apakah Anda yakin ingin menghapus faktur ini?",
+  "groupOwner": "Pemilik",
+  "groupAdmin": "Admin",
+  "searchMembers": "Cari anggota",
+  "totalMembers": "{count} anggota",
+  "@totalMembers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "removeFromGroup": "Keluarkan dari Grup",
+  "confirmRemoveMember": "Apakah Anda yakin ingin mengeluarkan \"{name}\" dari grup?",
+  "@confirmRemoveMember": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "setAsAdmin": "Atur sebagai Admin",
+  "removeAdmin": "Hapus Admin",
+  "deleteContactSuccess": "Kontak dihapus",
+  "unknownSong": "Lagu Tidak Dikenal",
+  "unknownArtist": "Artis Tidak Dikenal",
+  "unknownContact": "Kontak Tidak Dikenal",
+  "personalCard": "Kartu Kontak",
+  "singleChoice": "Tunggal",
+  "multiChoice": "Multi",
+  "ended": "Berakhir",
+  "endPollButton": "Akhiri Polling",
+  "createPoll": "Buat Polling",
+  "pollQuestion": "Pertanyaan Polling",
+  "enterPollQuestionHint": "Masukkan pertanyaan polling",
+  "pollOptions": "Opsi Polling",
+  "optionPlaceholder": "Opsi {index}",
+  "addOption": "Tambah Opsi",
+  "pollSettings": "Pengaturan Polling",
+  "anonymousPoll": "Polling Anonim",
+  "pollHint": "Polling akan ditampilkan di chat. Anggota grup dapat memilih.",
+  "searchSongOrArtist": "Cari lagu atau artis",
+  "noSongsFound": "Tidak ada lagu ditemukan",
+  "supportedMusicPlatforms": "Mendukung tautan musik dari NetEase, QQ Music, dll.",
+  "songNameOptional": "Nama Lagu (Opsional)",
+  "enterSongName": "Masukkan nama lagu",
+  "artistNameOptional": "Nama Artis (Opsional)",
+  "enterArtistName": "Masukkan nama artis",
+  "shareSong": "Bagikan Lagu",
+  "realTimeLocationSharing": "Berbagi lokasi real-time sedang dikembangkan...",
+  "voiceCallFeatureInDev": "Fitur panggilan suara sedang dikembangkan...",
+  "reportFeatureInDev": "Fitur laporan sedang dikembangkan...",
+  "shareFeatureInDev": "Fitur bagikan sedang dikembangkan...",
+  "qrCodeFeatureInDev": "Fitur kode QR sedang dikembangkan...",
+  "scanQrToAddMe": "Pindai kode QR di atas untuk menambahkan saya sebagai teman",
+  "saveToAlbum": "Simpan ke Album",
+  "changeStyle": "Ubah Gaya",
+  "copyId": "Salin ID",
+  "idCopied": "ID disalin",
+  "shareFeatureComingSoon": "Fitur bagikan segera hadir",
+  "saveFeatureComingSoon": "Fitur simpan segera hadir",
+  "moreStylesFeatureComingSoon": "Lebih banyak gaya segera hadir",
+  "confirmEndPoll": "Apakah Anda yakin ingin mengakhiri polling ini?",
+  "cannotVoteAfterEnd": "Tidak ada lagi suara yang dapat diberikan setelah diakhiri.",
+  "@featureInDev": {
+    "placeholders": {
+      "feature": {"type": "String"}
+    }
+  },
+  "@optionPlaceholder": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "bio": "Bio",
+  "homeServer": "Server",
+  "shareContactCard": "Bagikan Kartu Kontak",
+  "removeFromBlacklist": "Hapus dari Daftar Hitam",
+  "confirmAddBlacklist": "Apakah Anda yakin ingin menambahkan pengguna ini ke daftar hitam? Anda tidak akan menerima pesan dari mereka.",
+  "confirmRemoveBlacklist": "Apakah Anda yakin ingin menghapus pengguna ini dari daftar hitam?",
+  "remarkSaved": "Catatan disimpan",
+  "remarkCleared": "Catatan dihapus",
+  "receive": "Terima",
+  "pleaseConnectWallet": "Silakan hubungkan dompet Anda terlebih dahulu",
+  "sendRequest": "Kirim Permintaan",
+  "pleaseEnterValidAmount": "Silakan masukkan jumlah yang valid",
+  "searchPlaceholder": "Cari kontak, grup, pesan",
+  "enterKeywordToSearch": "Masukkan kata kunci untuk mulai mencari",
+  "clearHistory": "Hapus",
+  "noResultsForQuery": "Tidak ada hasil ditemukan untuk \"{query}\"",
+  "@noResultsForQuery": {
+    "placeholders": {
+      "query": {"type": "String"}
+    }
+  },
+  "allResults": "Semua",
+  "searchInChat": "Cari di chat",
+  "groupLabel": "Grup",
+  "messageLabel": "Pesan",
+
+  "securityTitle": "Keamanan",
+  "keyBackup": "Cadangan Kunci",
+  "backupEncryptionKeys": "Cadangkan Kunci Enkripsi",
+  "keysBackedUp": "{count} kunci dicadangkan",
+  "@keysBackedUp": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "backupNotSet": "Cadangan belum diatur",
+  "restoreKeys": "Pulihkan Kunci",
+  "restoreKeysFromBackup": "Pulihkan kunci enkripsi dari cadangan",
+  "exportKeys": "Ekspor Kunci",
+  "exportKeysToFile": "Ekspor kunci ke berkas",
+  "loggedInDevices": "Perangkat yang Masuk",
+  "noOtherDevices": "Tidak ada perangkat lain",
+  "verified": "Terverifikasi",
+  "unverified": "Belum terverifikasi",
+  "advanced": "Lanjutan",
+  "crossSigning": "Cross-Signing",
+  "enabled": "Diaktifkan",
+  "notEnabled": "Tidak diaktifkan",
+  "resetEncryption": "Reset Enkripsi",
+  "deleteAllEncryptionKeys": "Hapus semua kunci enkripsi",
+  "encryptionNotSupported": "Enkripsi tidak didukung",
+  "notInitialized": "Belum diinisialisasi",
+  "backupKeyTitle": "Cadangkan Kunci",
+  "backupKeyMessage": "Buat cadangan kunci baru? Ini akan membantu Anda memulihkan pesan terenkripsi di perangkat baru.",
+  "backup": "Cadangkan",
+  "restoreKeyTitle": "Pulihkan Kunci",
+  "restoreKeyMessage": "Masukkan kata sandi pemulihan atau kunci pemulihan untuk memulihkan pesan terenkripsi.",
+  "restore": "Pulihkan",
+  "exportKeyTitle": "Ekspor Kunci",
+  "exportKeyMessage": "Berkas kunci yang diekspor berisi semua kunci enkripsi Anda. Harap simpan dengan aman.",
+  "export": "Ekspor",
+  "deviceIdLabel": "ID Perangkat: {deviceId}",
+  "@deviceIdLabel": {
+    "placeholders": {
+      "deviceId": {"type": "String"}
+    }
+  },
+  "deviceStatusVerified": "Status: Terverifikasi",
+  "deviceStatusUnverified": "Status: Belum terverifikasi",
+  "lastActiveLabel": "Terakhir aktif: {lastSeen}",
+  "@lastActiveLabel": {
+    "placeholders": {
+      "lastSeen": {"type": "String"}
+    }
+  },
+  "verifyThisDevice": "Verifikasi perangkat ini",
+  "crossSigningAlreadyEnabled": "Cross-signing sudah diaktifkan",
+  "crossSigningSetupSuccess": "Pengaturan cross-signing berhasil",
+  "@setupFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "resetEncryptionTitle": "Reset Enkripsi",
+  "resetEncryptionWarning": "Peringatan: Ini akan menghapus semua kunci enkripsi Anda. Anda tidak akan dapat mendekripsi pesan terenkripsi sebelumnya. Tindakan ini tidak dapat dibatalkan.",
+  "reset": "Reset",
+
+  "leaveMeetingConfirm": "Apakah Anda yakin ingin meninggalkan meeting?",
+
+  "pokedSomeone": "mencolek {name}{suffix}",
+  "@pokedSomeone": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "suffix": {"type": "String"}
+    }
+  },
+  "noContactsToAdd": "Tidak ada kontak yang dapat ditambahkan",
+  "addMembers": "Tambah Anggota",
+  "invitedMembers": "Mengundang {count} anggota",
+  "@invitedMembers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "inviteFailed": "Undangan gagal: {error}",
+  "@inviteFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "memberRemoved": "Anggota dikeluarkan",
+  "removeFailed": "Gagal mengeluarkan: {error}",
+  "@removeFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "realTimeLocationShareMessage": "Setelah berbagi, pihak lain dapat melihat lokasi real-time Anda selama 1 jam.",
+  "startSharing": "Mulai Berbagi",
+  "locationServiceNotEnabled": "Layanan lokasi tidak diaktifkan",
+  "enableLocationService": "Silakan aktifkan layanan lokasi untuk menggunakan fitur ini",
+  "goToSettings": "Buka Pengaturan",
+  "locationPermissionRequired": "Izin lokasi diperlukan untuk fitur ini",
+  "locationPermissionDeniedPermanent": "Izin lokasi telah ditolak secara permanen. Silakan aktifkan di pengaturan.",
+  "locationPermissionDenied": "Izin lokasi ditolak",
+  "gettingLocation": "Mendapatkan lokasi...",
+  "getLocationFailed": "Gagal mendapatkan lokasi: {error}",
+  "@getLocationFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "currentLocation": "Lokasi Saat Ini",
+  "nearbyPlace": "Tempat Terdekat {index}",
+  "@nearbyPlace": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "approximateDistance": "Sekitar {distance}",
+  "@approximateDistance": {
+    "placeholders": {
+      "distance": {"type": "String"}
+    }
+  },
+  "mapPreview": "Pratinjau Peta",
+  "searchLocation": "Cari lokasi",
+  "redPacketSent": "Mengirim angpao {amount} {token}",
+  "@redPacketSent": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "token": {"type": "String"}
+    }
+  },
+  "transferDefault": "Transfer",
+  "transferSent": "Mengirim transfer {amount} {token}",
+  "@transferSent": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "token": {"type": "String"}
+    }
+  },
+  "pickFileFailed": "Gagal memilih berkas: {error}",
+  "@pickFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "fileSizeLimit": "Ukuran berkas tidak boleh melebihi 50MB",
+  "fileSending": "Mengirim berkas: {filename}",
+  "@fileSending": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "sendFileFailed": "Gagal mengirim berkas: {error}",
+  "@sendFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "contactCardSent": "Mengirim kartu kontak {name}",
+  "@contactCardSent": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "favoritesFeature": "Favorit",
+  "couponsFeature": "Kupon",
+  "giftFeature": "Hadiah",
+  "sharedMusic": "Membagikan {name}",
+  "@sharedMusic": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "@sendFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "endPollTitle": "Akhiri Polling",
+  "endPollConfirmMessage": "Apakah Anda yakin ingin mengakhiri polling ini? Pemungutan suara akan ditutup setelah diakhiri.",
+  "pollEndedMessage": "Polling berakhir",
+  "muteCall": "Bisukan",
+  "speakerOff": "Speaker Mati",
+  "speakerOn": "Speaker",
+  "cameraOn": "Kamera Nyala",
+  "cameraOff": "Kamera Mati",
+  "hangUp": "Tutup",
+  "selectForwardTargetTitle": "Pilih Tujuan Terusan",
+  "noForwardableChat": "Tidak ada chat yang dapat diteruskan",
+  "noMatchingChat": "Tidak ada chat yang cocok ditemukan",
+  "imagePreview": "[Gambar]",
+  "voicePreview": "[Suara]",
+  "videoPreview": "[Video]",
+  "filePreviewWithName": "[Berkas] {filename}",
+  "@filePreviewWithName": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "locationPreviewWithAddress": "[Lokasi] {address}",
+  "@locationPreviewWithAddress": {
+    "placeholders": {
+      "address": {"type": "String"}
+    }
+  },
+  "musicPreviewWithTitle": "[Musik] {title}",
+  "@musicPreviewWithTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "messagePreview": "[Pesan]",
+  "locationTitle": "Lokasi",
+  "sendButton": "Kirim",
+  "retryButton": "Coba Lagi",
+  "selectContact": "Pilih Kontak",
+  "searchContactHint": "Cari kontak",
+  "shareMusic": "Bagikan Musik",
+  "recentPlayed": "Terbaru",
+  "myFavorites": "Favorit",
+  "networkLink": "Tautan",
+  "localFile": "Lokal",
+  "musicLinkRequired": "Tautan Musik *",
+  "pasteMusicLink": "Tempel tautan musik",
+  "enterSongNamePlaceholder": "Masukkan nama lagu",
+  "enterArtistNamePlaceholder": "Masukkan nama artis",
+  "shareMusicButton": "Bagikan Musik",
+  "selectLocalAudio": "Pilih Berkas Audio Lokal",
+  "supportedAudioFormats": "Mendukung MP3, M4A, WAV, FLAC, dll.",
+  "selectFileButton": "Pilih Berkas",
+  "pleaseEnterMusicLink": "Silakan masukkan tautan musik",
+  "pleaseEnterValidLink": "Silakan masukkan URL yang valid",
+  "sharedSong": "Lagu Dibagikan",
+  "selectMember": "Pilih Anggota",
+  "searchMemberHint": "Cari anggota",
+  "noMatchingMembers": "Tidak ada anggota yang cocok ditemukan",
+  "unknownMember": "Tidak Dikenal",
+  "selectedMessagesCount": "Dipilih {count} pesan",
+  "@selectedMessagesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchContactsOrGroups": "Cari kontak atau grup",
+  "noMatchingConversations": "Tidak ada percakapan yang cocok ditemukan",
+  "videoTitle": "Video",
+  "loadingText": "Memuat...",
+  "videoPlaybackFailed": "Pemutaran video gagal",
+  "@videoPlaybackFailed": {
+    "description": "Used with error message"
+  },
+  "videoLoadFailed": "Gagal memuat video",
+  "playerInitFailed": "Gagal menginisialisasi pemutar",
+  "createPollTitle": "Buat Polling",
+  "submitPoll": "Kirim",
+  "pollQuestionLabel": "Pertanyaan Polling",
+  "pollOptionsLabel": "Opsi Polling",
+  "optionHintWithIndex": "Opsi {index}",
+  "@optionHintWithIndex": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "addOptionButton": "Tambah Opsi",
+  "pollSettingsLabel": "Pengaturan Polling",
+  "selectionType": "Jenis Pilihan",
+  "singleChoiceLabel": "Tunggal",
+  "multiChoiceLabel": "Multi",
+  "anonymousPollSwitch": "Polling Anonim",
+  "pleaseEnterQuestion": "Silakan masukkan pertanyaan polling",
+  "atLeastTwoOptions": "Minimal 2 opsi diperlukan",
+  "confirmWithCount": "Konfirmasi ({count})",
+  "@confirmWithCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@memberCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@groupChatCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@replyTo": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "emailVerificationTitle": "Verifikasi Email",
+  "enterValidEmailAddress": "Silakan masukkan alamat email yang valid",
+  "verificationCodeSentTo": "Kode verifikasi dikirim ke {email}",
+  "@verificationCodeSentTo": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "sendCodeFailed": "Gagal mengirim kode: {error}",
+  "@sendCodeFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "verificationSuccess": "Verifikasi berhasil",
+  "verificationFailed": "Verifikasi gagal",
+  "verificationCodeError": "Kesalahan kode verifikasi: {error}",
+  "@verificationCodeError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "enterVerificationCode": "Masukkan kode verifikasi",
+  "enterYourEmail": "Masukkan email",
+  "weSentCodeTo": "Kami mengirim kode 6 digit ke\n{email}",
+  "@weSentCodeTo": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "enterEmailForCode": "Masukkan alamat email Anda, kami akan mengirim kode verifikasi",
+  "sendVerificationCode": "Kirim kode verifikasi",
+  "resendVerificationCode": "Kirim ulang kode verifikasi",
+  "canResendAfter": "Dapat mengirim ulang setelah {seconds} detik",
+  "@canResendAfter": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "changeEmail": "Ubah email",
+  "addToContacts": "Tambah ke Kontak",
+  "addingToContacts": "Menambahkan...",
+  "addedToContacts": "Ditambahkan ke kontak",
+  "addFailedWithError": "Gagal menambahkan: {error}",
+  "@addFailedWithError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "addPhone": "Tambah telepon",
+  "addTag": "Tambah tag",
+  "addText": "Tambah teks",
+  "addPhoto": "Tambah foto",
+  "groupCountLabel": "{count} grup",
+  "@groupCountLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "addedViaSearch": "Ditambahkan melalui pencarian",
+  "addTime": "Tambah waktu",
+  "doneButton": "Selesai",
+  "waitingForParticipants": "Menunggu peserta bergabung...",
+  "participantMe": "{name} (Saya)",
+  "@participantMe": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "sharingLabel": "Berbagi",
+  "screenSharingBy": "{name} sedang berbagi layar",
+  "@screenSharingBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "participantCount": "{count} peserta",
+  "@participantCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "muteLabel": "Bisukan",
+  "unmuteLabel": "Bunyikan",
+  "turnOffVideo": "Matikan video",
+  "turnOnVideo": "Nyalakan video",
+  "shareScreen": "Berbagi layar",
+  "stopSharing": "Berhenti berbagi",
+  "switchCameraLabel": "Ganti",
+  "leaveLabel": "Keluar",
+  "participantsLabel": "Peserta",
+  "joiningMeeting": "Bergabung ke meeting..."
+}
