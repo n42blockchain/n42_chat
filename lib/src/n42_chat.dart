@@ -43,7 +43,9 @@ class N42Chat {
   static bool _initialized = false;
   static N42ChatConfig? _config;
   static ThemeMode _themeMode = ThemeMode.system;
+  static Locale _locale = const Locale('en');
   static final List<void Function(ThemeMode)> _themeListeners = [];
+  static final List<void Function(Locale)> _localeListeners = [];
   
   /// 全局 AuthBloc 实例（单例）
   static AuthBloc? _authBloc;
@@ -88,6 +90,42 @@ class N42Chat {
   /// 移除主题变化监听器
   static void removeThemeListener(void Function(ThemeMode) listener) {
     _themeListeners.remove(listener);
+  }
+
+  /// 获取当前语言设置
+  static Locale get locale => _locale;
+
+  /// 设置语言
+  ///
+  /// 用于与主应用同步语言设置
+  ///
+  /// [locale] Flutter 的 Locale
+  ///
+  /// ```dart
+  /// // 在主应用中同步语言
+  /// ref.listen(localeProvider, (previous, next) {
+  ///   N42Chat.setLocale(next);
+  /// });
+  /// ```
+  static void setLocale(Locale locale) {
+    if (_locale != locale) {
+      _locale = locale;
+      // 通知所有监听器
+      for (final listener in _localeListeners) {
+        listener(locale);
+      }
+      debugPrint('N42Chat: Locale changed to $locale');
+    }
+  }
+
+  /// 添加语言变化监听器
+  static void addLocaleListener(void Function(Locale) listener) {
+    _localeListeners.add(listener);
+  }
+
+  /// 移除语言变化监听器
+  static void removeLocaleListener(void Function(Locale) listener) {
+    _localeListeners.remove(listener);
   }
 
   /// 判断当前是否为深色模式

@@ -702,7 +702,7 @@ class SEn extends S {
   String get secureDecentralizedChat => 'Secure, decentralized messaging';
 
   @override
-  String get endToEndEncryption => 'End-to-end encryption';
+  String get endToEndEncryption => 'End-to-End Encryption';
 
   @override
   String get messagesOnlyYouCanSee =>
@@ -1154,7 +1154,7 @@ class SEn extends S {
   String get searchError => 'Search Error';
 
   @override
-  String get searchHint => 'Search contacts, groups, and messages';
+  String get searchHint => 'Search';
 
   @override
   String get enterKeyword => 'Enter keywords to search';
@@ -1358,7 +1358,7 @@ class SEn extends S {
   String get receiveTransfer => 'Received transfer';
 
   @override
-  String fromSender(String name) {
+  String fromSender(String name, Object senderName) {
     return 'From $name';
   }
 
@@ -1781,10 +1781,10 @@ class SEn extends S {
   String get locationSent => 'Location sent';
 
   @override
-  String get selectMessages => 'Select';
+  String get selectMessages => 'Select messages';
 
   @override
-  String selectedCount(Object count) {
+  String selectedCount(int count) {
     return 'Selected $count';
   }
 
@@ -1792,8 +1792,8 @@ class SEn extends S {
   String get selectAll => 'Select All';
 
   @override
-  String groupChatCount(Object count) {
-    return 'Group Chat ($count)';
+  String groupChatCount(int count) {
+    return 'Group Chat($count)';
   }
 
   @override
@@ -1803,14 +1803,14 @@ class SEn extends S {
   String get noMessages => 'No messages';
 
   @override
-  String get sendFirstMessage => 'Send first message to start chatting';
+  String get sendFirstMessage => 'Send the first message to start chatting';
 
   @override
   String get encryptionNotice =>
       'This chat is end-to-end encrypted. Only you and the recipient can read the messages.';
 
   @override
-  String replyTo(Object name) {
+  String replyTo(String name) {
     return 'Reply to $name';
   }
 
@@ -1961,7 +1961,7 @@ class SEn extends S {
       'Are you sure you want to end this poll? No more votes can be cast after ending.';
 
   @override
-  String memberCount(Object count) {
+  String memberCount(int count) {
     return '$count members';
   }
 
@@ -3182,4 +3182,636 @@ class SEn extends S {
 
   @override
   String get messageLabel => 'Message';
+
+  @override
+  String get securityTitle => 'Security';
+
+  @override
+  String get keyBackup => 'Key Backup';
+
+  @override
+  String get backupEncryptionKeys => 'Backup Encryption Keys';
+
+  @override
+  String keysBackedUp(int count) {
+    return '$count keys backed up';
+  }
+
+  @override
+  String get backupNotSet => 'Backup not set';
+
+  @override
+  String get restoreKeys => 'Restore Keys';
+
+  @override
+  String get restoreKeysFromBackup => 'Restore encryption keys from backup';
+
+  @override
+  String get exportKeys => 'Export Keys';
+
+  @override
+  String get exportKeysToFile => 'Export keys to file';
+
+  @override
+  String get loggedInDevices => 'Logged In Devices';
+
+  @override
+  String get noOtherDevices => 'No other devices';
+
+  @override
+  String get verified => 'Verified';
+
+  @override
+  String get unverified => 'Unverified';
+
+  @override
+  String get advanced => 'Advanced';
+
+  @override
+  String get crossSigning => 'Cross-Signing';
+
+  @override
+  String get enabled => 'Enabled';
+
+  @override
+  String get notEnabled => 'Not enabled';
+
+  @override
+  String get resetEncryption => 'Reset Encryption';
+
+  @override
+  String get deleteAllEncryptionKeys => 'Delete all encryption keys';
+
+  @override
+  String get encryptionNotSupported => 'Encryption not supported';
+
+  @override
+  String get notInitialized => 'Not initialized';
+
+  @override
+  String get backupKeyTitle => 'Backup Keys';
+
+  @override
+  String get backupKeyMessage =>
+      'Create a new key backup? This will help you restore encrypted messages on a new device.';
+
+  @override
+  String get backup => 'Backup';
+
+  @override
+  String get restoreKeyTitle => 'Restore Keys';
+
+  @override
+  String get restoreKeyMessage =>
+      'Enter your recovery password or recovery key to restore encrypted messages.';
+
+  @override
+  String get restore => 'Restore';
+
+  @override
+  String get exportKeyTitle => 'Export Keys';
+
+  @override
+  String get exportKeyMessage =>
+      'The exported key file contains all your encryption keys. Please keep it safe.';
+
+  @override
+  String get export => 'Export';
+
+  @override
+  String deviceIdLabel(String deviceId) {
+    return 'Device ID: $deviceId';
+  }
+
+  @override
+  String get deviceStatusVerified => 'Status: Verified';
+
+  @override
+  String get deviceStatusUnverified => 'Status: Unverified';
+
+  @override
+  String lastActiveLabel(String lastSeen) {
+    return 'Last active: $lastSeen';
+  }
+
+  @override
+  String get verifyThisDevice => 'Verify this device';
+
+  @override
+  String get crossSigningAlreadyEnabled => 'Cross-signing is already enabled';
+
+  @override
+  String get crossSigningSetupSuccess => 'Cross-signing setup successful';
+
+  @override
+  String get resetEncryptionTitle => 'Reset Encryption';
+
+  @override
+  String get resetEncryptionWarning =>
+      'Warning: This will delete all your encryption keys. You will not be able to decrypt previous encrypted messages. This action cannot be undone.';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get leaveMeetingConfirm =>
+      'Are you sure you want to leave the meeting?';
+
+  @override
+  String pokedSomeone(String name, String suffix) {
+    return 'poked $name$suffix';
+  }
+
+  @override
+  String get noContactsToAdd => 'No contacts available to add';
+
+  @override
+  String get addMembers => 'Add Members';
+
+  @override
+  String invitedMembers(int count) {
+    return 'Invited $count members';
+  }
+
+  @override
+  String inviteFailed(String error) {
+    return 'Invite failed: $error';
+  }
+
+  @override
+  String get memberRemoved => 'Member removed';
+
+  @override
+  String removeFailed(String error) {
+    return 'Remove failed: $error';
+  }
+
+  @override
+  String get realTimeLocationShareMessage =>
+      'After sharing, the other party can see your real-time location for 1 hour.';
+
+  @override
+  String get startSharing => 'Start Sharing';
+
+  @override
+  String get locationServiceNotEnabled => 'Location service is not enabled';
+
+  @override
+  String get enableLocationService =>
+      'Please enable location service to use this feature';
+
+  @override
+  String get goToSettings => 'Go to Settings';
+
+  @override
+  String get locationPermissionRequired =>
+      'Location permission is required for this feature';
+
+  @override
+  String get locationPermissionDeniedPermanent =>
+      'Location permission has been permanently denied. Please enable it in settings.';
+
+  @override
+  String get locationPermissionDenied => 'Location permission denied';
+
+  @override
+  String get gettingLocation => 'Getting location...';
+
+  @override
+  String getLocationFailed(String error) {
+    return 'Failed to get location: $error';
+  }
+
+  @override
+  String get currentLocation => 'Current Location';
+
+  @override
+  String nearbyPlace(int index) {
+    return 'Nearby Place $index';
+  }
+
+  @override
+  String approximateDistance(String distance) {
+    return 'About $distance';
+  }
+
+  @override
+  String get mapPreview => 'Map Preview';
+
+  @override
+  String get searchLocation => 'Search location';
+
+  @override
+  String redPacketSent(String amount, String token) {
+    return 'Sent $amount $token red packet';
+  }
+
+  @override
+  String get transferDefault => 'Transfer';
+
+  @override
+  String transferSent(String amount, String token) {
+    return 'Sent $amount $token transfer';
+  }
+
+  @override
+  String pickFileFailed(String error) {
+    return 'Failed to pick file: $error';
+  }
+
+  @override
+  String get fileSizeLimit => 'File size cannot exceed 50MB';
+
+  @override
+  String fileSending(String filename) {
+    return 'Sending file: $filename';
+  }
+
+  @override
+  String sendFileFailed(String error) {
+    return 'Failed to send file: $error';
+  }
+
+  @override
+  String contactCardSent(String name) {
+    return 'Sent $name\'s contact card';
+  }
+
+  @override
+  String get favoritesFeature => 'Favorites';
+
+  @override
+  String get couponsFeature => 'Coupons';
+
+  @override
+  String get giftFeature => 'Gift';
+
+  @override
+  String sharedMusic(String name) {
+    return 'Shared $name';
+  }
+
+  @override
+  String get endPollTitle => 'End Poll';
+
+  @override
+  String get endPollConfirmMessage =>
+      'Are you sure you want to end this poll? Voting will be closed after ending.';
+
+  @override
+  String get pollEndedMessage => 'Poll ended';
+
+  @override
+  String get connectingCall => 'Connecting...';
+
+  @override
+  String get muteCall => 'Mute';
+
+  @override
+  String get speakerOff => 'Speaker Off';
+
+  @override
+  String get speakerOn => 'Speaker';
+
+  @override
+  String get cameraOn => 'Camera On';
+
+  @override
+  String get cameraOff => 'Camera Off';
+
+  @override
+  String get hangUp => 'Hang Up';
+
+  @override
+  String get selectForwardTargetTitle => 'Select Forward Target';
+
+  @override
+  String get noForwardableChat => 'No chats available for forwarding';
+
+  @override
+  String get noMatchingChat => 'No matching chats found';
+
+  @override
+  String get imagePreview => '[Image]';
+
+  @override
+  String get voicePreview => '[Voice]';
+
+  @override
+  String get videoPreview => '[Video]';
+
+  @override
+  String filePreviewWithName(String filename) {
+    return '[File] $filename';
+  }
+
+  @override
+  String locationPreviewWithAddress(String address) {
+    return '[Location] $address';
+  }
+
+  @override
+  String musicPreviewWithTitle(String title) {
+    return '[Music] $title';
+  }
+
+  @override
+  String get messagePreview => '[Message]';
+
+  @override
+  String get locationTitle => 'Location';
+
+  @override
+  String get sendButton => 'Send';
+
+  @override
+  String get retryButton => 'Retry';
+
+  @override
+  String get selectContact => 'Select Contact';
+
+  @override
+  String get searchContactHint => 'Search contacts';
+
+  @override
+  String get shareMusic => 'Share Music';
+
+  @override
+  String get recentPlayed => 'Recent';
+
+  @override
+  String get myFavorites => 'Favorites';
+
+  @override
+  String get networkLink => 'Link';
+
+  @override
+  String get localFile => 'Local';
+
+  @override
+  String get musicLinkRequired => 'Music Link *';
+
+  @override
+  String get pasteMusicLink => 'Paste music link';
+
+  @override
+  String get enterSongNamePlaceholder => 'Enter song name';
+
+  @override
+  String get enterArtistNamePlaceholder => 'Enter artist name';
+
+  @override
+  String get shareMusicButton => 'Share Music';
+
+  @override
+  String get selectLocalAudio => 'Select Local Audio File';
+
+  @override
+  String get supportedAudioFormats => 'Supports MP3, M4A, WAV, FLAC, etc.';
+
+  @override
+  String get selectFileButton => 'Select File';
+
+  @override
+  String get pleaseEnterMusicLink => 'Please enter music link';
+
+  @override
+  String get pleaseEnterValidLink => 'Please enter a valid URL';
+
+  @override
+  String get sharedSong => 'Shared Song';
+
+  @override
+  String get selectMember => 'Select Member';
+
+  @override
+  String get searchMemberHint => 'Search members';
+
+  @override
+  String get noMatchingMembers => 'No matching members found';
+
+  @override
+  String get unknownMember => 'Unknown';
+
+  @override
+  String selectedMessagesCount(int count) {
+    return 'Selected $count messages';
+  }
+
+  @override
+  String get searchContactsOrGroups => 'Search contacts or groups';
+
+  @override
+  String get noMatchingConversations => 'No matching conversations found';
+
+  @override
+  String get videoTitle => 'Video';
+
+  @override
+  String get loadingText => 'Loading...';
+
+  @override
+  String get videoPlaybackFailed => 'Video playback failed';
+
+  @override
+  String get videoLoadFailed => 'Video load failed';
+
+  @override
+  String get playerInitFailed => 'Player initialization failed';
+
+  @override
+  String get createPollTitle => 'Create Poll';
+
+  @override
+  String get submitPoll => 'Submit';
+
+  @override
+  String get pollQuestionLabel => 'Poll Question';
+
+  @override
+  String get enterPollQuestionHint => 'Please enter poll question';
+
+  @override
+  String get pollOptionsLabel => 'Poll Options';
+
+  @override
+  String optionHintWithIndex(int index) {
+    return 'Option $index';
+  }
+
+  @override
+  String get addOptionButton => 'Add Option';
+
+  @override
+  String get pollSettingsLabel => 'Poll Settings';
+
+  @override
+  String get selectionType => 'Selection Type';
+
+  @override
+  String get singleChoiceLabel => 'Single';
+
+  @override
+  String get multiChoiceLabel => 'Multi';
+
+  @override
+  String get anonymousPollSwitch => 'Anonymous Poll';
+
+  @override
+  String get pleaseEnterQuestion => 'Please enter poll question';
+
+  @override
+  String get atLeastTwoOptions => 'At least 2 options required';
+
+  @override
+  String confirmWithCount(int count) {
+    return 'Confirm ($count)';
+  }
+
+  @override
+  String get emailVerificationTitle => 'Email Verification';
+
+  @override
+  String get enterValidEmailAddress => 'Please enter a valid email address';
+
+  @override
+  String verificationCodeSentTo(String email) {
+    return 'Verification code sent to $email';
+  }
+
+  @override
+  String sendCodeFailed(String error) {
+    return 'Failed to send code: $error';
+  }
+
+  @override
+  String get verificationSuccess => 'Verification successful';
+
+  @override
+  String get verificationFailed => 'Verification failed';
+
+  @override
+  String verificationCodeError(String error) {
+    return 'Verification code error: $error';
+  }
+
+  @override
+  String get enterVerificationCode => 'Enter verification code';
+
+  @override
+  String get enterYourEmail => 'Enter email';
+
+  @override
+  String weSentCodeTo(String email) {
+    return 'We sent a 6-digit code to\n$email';
+  }
+
+  @override
+  String get enterEmailForCode =>
+      'Enter your email address, we will send verification code';
+
+  @override
+  String get sendVerificationCode => 'Send verification code';
+
+  @override
+  String get resendVerificationCode => 'Resend verification code';
+
+  @override
+  String canResendAfter(int seconds) {
+    return 'Can resend after $seconds seconds';
+  }
+
+  @override
+  String get changeEmail => 'Change email';
+
+  @override
+  String get addToContacts => 'Add to Contacts';
+
+  @override
+  String get addingToContacts => 'Adding...';
+
+  @override
+  String get addedToContacts => 'Added to contacts';
+
+  @override
+  String addFailedWithError(String error) {
+    return 'Add failed: $error';
+  }
+
+  @override
+  String get addPhone => 'Add phone';
+
+  @override
+  String get addTag => 'Add tags';
+
+  @override
+  String get addText => 'Add text';
+
+  @override
+  String get addPhoto => 'Add photo';
+
+  @override
+  String groupCountLabel(int count) {
+    return '$count groups';
+  }
+
+  @override
+  String get addedViaSearch => 'Added via search';
+
+  @override
+  String get addTime => 'Add time';
+
+  @override
+  String get doneButton => 'Done';
+
+  @override
+  String get waitingForParticipants => 'Waiting for participants to join...';
+
+  @override
+  String participantMe(String name) {
+    return '$name (Me)';
+  }
+
+  @override
+  String get sharingLabel => 'Sharing';
+
+  @override
+  String screenSharingBy(String name) {
+    return '$name is sharing screen';
+  }
+
+  @override
+  String participantCount(int count) {
+    return '$count participants';
+  }
+
+  @override
+  String get muteLabel => 'Mute';
+
+  @override
+  String get unmuteLabel => 'Unmute';
+
+  @override
+  String get turnOffVideo => 'Turn off video';
+
+  @override
+  String get turnOnVideo => 'Turn on video';
+
+  @override
+  String get shareScreen => 'Share screen';
+
+  @override
+  String get stopSharing => 'Stop sharing';
+
+  @override
+  String get switchCameraLabel => 'Switch';
+
+  @override
+  String get leaveLabel => 'Leave';
+
+  @override
+  String get participantsLabel => 'Participants';
+
+  @override
+  String get joiningMeeting => 'Joining meeting...';
 }
