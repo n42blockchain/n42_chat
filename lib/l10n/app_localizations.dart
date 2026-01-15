@@ -5,7 +5,19 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
+import 'app_localizations_id.dart';
+import 'app_localizations_it.dart';
+import 'app_localizations_ja.dart';
+import 'app_localizations_ko.dart';
+import 'app_localizations_pl.dart';
+import 'app_localizations_pt.dart';
+import 'app_localizations_ru.dart';
+import 'app_localizations_tr.dart';
+import 'app_localizations_vi.dart';
 import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
@@ -93,7 +105,19 @@ abstract class S {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('de'),
     Locale('en'),
+    Locale('es'),
+    Locale('fr'),
+    Locale('id'),
+    Locale('it'),
+    Locale('ja'),
+    Locale('ko'),
+    Locale('pl'),
+    Locale('pt'),
+    Locale('ru'),
+    Locale('tr'),
+    Locale('vi'),
     Locale('zh')
   ];
 
@@ -1366,7 +1390,7 @@ abstract class S {
   /// No description provided for @endToEndEncryption.
   ///
   /// In zh, this message translates to:
-  /// **'端对端加密'**
+  /// **'端到端加密'**
   String get endToEndEncryption;
 
   /// No description provided for @messagesOnlyYouCanSee.
@@ -1822,7 +1846,7 @@ abstract class S {
   /// No description provided for @unmute.
   ///
   /// In zh, this message translates to:
-  /// **'取消免打扰'**
+  /// **'取消静音'**
   String get unmute;
 
   /// No description provided for @mute.
@@ -2176,7 +2200,7 @@ abstract class S {
   /// No description provided for @searchHint.
   ///
   /// In zh, this message translates to:
-  /// **'搜索联系人、群聊和消息'**
+  /// **'搜索'**
   String get searchHint;
 
   /// No description provided for @enterKeyword.
@@ -2555,7 +2579,7 @@ abstract class S {
   ///
   /// In zh, this message translates to:
   /// **'来自 {name}'**
-  String fromSender(String name);
+  String fromSender(String name, Object senderName);
 
   /// No description provided for @confirmReceive.
   ///
@@ -3070,7 +3094,7 @@ abstract class S {
   /// No description provided for @invalidVideoUrl.
   ///
   /// In zh, this message translates to:
-  /// **'视频地址无效'**
+  /// **'无效的视频链接'**
   String get invalidVideoUrl;
 
   /// No description provided for @downloadFile.
@@ -3190,7 +3214,7 @@ abstract class S {
   /// No description provided for @invalidLocation.
   ///
   /// In zh, this message translates to:
-  /// **'位置信息无效'**
+  /// **'无效的位置'**
   String get invalidLocation;
 
   /// No description provided for @address.
@@ -3316,20 +3340,20 @@ abstract class S {
   /// No description provided for @locationSent.
   ///
   /// In zh, this message translates to:
-  /// **'位置发送成功'**
+  /// **'位置已发送'**
   String get locationSent;
 
   /// No description provided for @selectMessages.
   ///
   /// In zh, this message translates to:
-  /// **'多选'**
+  /// **'选择消息'**
   String get selectMessages;
 
   /// No description provided for @selectedCount.
   ///
   /// In zh, this message translates to:
-  /// **'已选择 {count} 条'**
-  String selectedCount(Object count);
+  /// **'已选择 {count}'**
+  String selectedCount(int count);
 
   /// No description provided for @selectAll.
   ///
@@ -3341,7 +3365,7 @@ abstract class S {
   ///
   /// In zh, this message translates to:
   /// **'群聊({count})'**
-  String groupChatCount(Object count);
+  String groupChatCount(int count);
 
   /// No description provided for @privateChat.
   ///
@@ -3364,14 +3388,14 @@ abstract class S {
   /// No description provided for @encryptionNotice.
   ///
   /// In zh, this message translates to:
-  /// **'本聊天已开启端对端加密保护，只有您和对方可以读取消息内容'**
+  /// **'此聊天已启用端到端加密。只有您和对方可以阅读消息。'**
   String get encryptionNotice;
 
   /// No description provided for @replyTo.
   ///
   /// In zh, this message translates to:
   /// **'回复 {name}'**
-  String replyTo(Object name);
+  String replyTo(String name);
 
   /// No description provided for @multiForward.
   ///
@@ -3388,7 +3412,7 @@ abstract class S {
   /// No description provided for @noMembers.
   ///
   /// In zh, this message translates to:
-  /// **'暂无成员'**
+  /// **'没有成员'**
   String get noMembers;
 
   /// No description provided for @memberNotFound.
@@ -3592,7 +3616,7 @@ abstract class S {
   /// No description provided for @voteChanged.
   ///
   /// In zh, this message translates to:
-  /// **'已更改投票'**
+  /// **'投票已更改'**
   String get voteChanged;
 
   /// No description provided for @voteRemoved.
@@ -3616,8 +3640,8 @@ abstract class S {
   /// No description provided for @memberCount.
   ///
   /// In zh, this message translates to:
-  /// **'{count}人'**
-  String memberCount(Object count);
+  /// **'{count} 人'**
+  String memberCount(int count);
 
   /// No description provided for @videoChannels.
   ///
@@ -4036,7 +4060,7 @@ abstract class S {
   /// No description provided for @leave.
   ///
   /// In zh, this message translates to:
-  /// **'退出'**
+  /// **'离开'**
   String get leave;
 
   /// No description provided for @saveMedia.
@@ -5904,6 +5928,1116 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'消息'**
   String get messageLabel;
+
+  /// No description provided for @securityTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'安全'**
+  String get securityTitle;
+
+  /// No description provided for @keyBackup.
+  ///
+  /// In zh, this message translates to:
+  /// **'密钥备份'**
+  String get keyBackup;
+
+  /// No description provided for @backupEncryptionKeys.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份加密密钥'**
+  String get backupEncryptionKeys;
+
+  /// No description provided for @keysBackedUp.
+  ///
+  /// In zh, this message translates to:
+  /// **'已备份 {count} 个密钥'**
+  String keysBackedUp(int count);
+
+  /// No description provided for @backupNotSet.
+  ///
+  /// In zh, this message translates to:
+  /// **'未设置备份'**
+  String get backupNotSet;
+
+  /// No description provided for @restoreKeys.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复密钥'**
+  String get restoreKeys;
+
+  /// No description provided for @restoreKeysFromBackup.
+  ///
+  /// In zh, this message translates to:
+  /// **'从备份恢复加密密钥'**
+  String get restoreKeysFromBackup;
+
+  /// No description provided for @exportKeys.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出密钥'**
+  String get exportKeys;
+
+  /// No description provided for @exportKeysToFile.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出密钥到文件'**
+  String get exportKeysToFile;
+
+  /// No description provided for @loggedInDevices.
+  ///
+  /// In zh, this message translates to:
+  /// **'已登录设备'**
+  String get loggedInDevices;
+
+  /// No description provided for @noOtherDevices.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无其他设备'**
+  String get noOtherDevices;
+
+  /// No description provided for @verified.
+  ///
+  /// In zh, this message translates to:
+  /// **'已验证'**
+  String get verified;
+
+  /// No description provided for @unverified.
+  ///
+  /// In zh, this message translates to:
+  /// **'未验证'**
+  String get unverified;
+
+  /// No description provided for @advanced.
+  ///
+  /// In zh, this message translates to:
+  /// **'高级'**
+  String get advanced;
+
+  /// No description provided for @crossSigning.
+  ///
+  /// In zh, this message translates to:
+  /// **'跨设备签名'**
+  String get crossSigning;
+
+  /// No description provided for @enabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已启用'**
+  String get enabled;
+
+  /// No description provided for @notEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'未启用'**
+  String get notEnabled;
+
+  /// No description provided for @resetEncryption.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置加密'**
+  String get resetEncryption;
+
+  /// No description provided for @deleteAllEncryptionKeys.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除所有加密密钥'**
+  String get deleteAllEncryptionKeys;
+
+  /// No description provided for @encryptionNotSupported.
+  ///
+  /// In zh, this message translates to:
+  /// **'不支持加密'**
+  String get encryptionNotSupported;
+
+  /// No description provided for @notInitialized.
+  ///
+  /// In zh, this message translates to:
+  /// **'未初始化'**
+  String get notInitialized;
+
+  /// No description provided for @backupKeyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份密钥'**
+  String get backupKeyTitle;
+
+  /// No description provided for @backupKeyMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'是否创建新的密钥备份？这将帮助您在新设备上恢复加密消息。'**
+  String get backupKeyMessage;
+
+  /// No description provided for @backup.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份'**
+  String get backup;
+
+  /// No description provided for @restoreKeyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复密钥'**
+  String get restoreKeyTitle;
+
+  /// No description provided for @restoreKeyMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入您的恢复密码或恢复密钥来恢复加密消息。'**
+  String get restoreKeyMessage;
+
+  /// No description provided for @restore.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复'**
+  String get restore;
+
+  /// No description provided for @exportKeyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出密钥'**
+  String get exportKeyTitle;
+
+  /// No description provided for @exportKeyMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出的密钥文件包含您的所有加密密钥，请妥善保管。'**
+  String get exportKeyMessage;
+
+  /// No description provided for @export.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出'**
+  String get export;
+
+  /// No description provided for @deviceIdLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'设备ID: {deviceId}'**
+  String deviceIdLabel(String deviceId);
+
+  /// No description provided for @deviceStatusVerified.
+  ///
+  /// In zh, this message translates to:
+  /// **'状态: 已验证'**
+  String get deviceStatusVerified;
+
+  /// No description provided for @deviceStatusUnverified.
+  ///
+  /// In zh, this message translates to:
+  /// **'状态: 未验证'**
+  String get deviceStatusUnverified;
+
+  /// No description provided for @lastActiveLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'最后活跃: {lastSeen}'**
+  String lastActiveLabel(String lastSeen);
+
+  /// No description provided for @verifyThisDevice.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证此设备'**
+  String get verifyThisDevice;
+
+  /// No description provided for @crossSigningAlreadyEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'跨设备签名已启用'**
+  String get crossSigningAlreadyEnabled;
+
+  /// No description provided for @crossSigningSetupSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'跨设备签名设置成功'**
+  String get crossSigningSetupSuccess;
+
+  /// No description provided for @resetEncryptionTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置加密'**
+  String get resetEncryptionTitle;
+
+  /// No description provided for @resetEncryptionWarning.
+  ///
+  /// In zh, this message translates to:
+  /// **'警告：这将删除您所有的加密密钥。您将无法解密之前的加密消息。此操作不可撤销。'**
+  String get resetEncryptionWarning;
+
+  /// No description provided for @reset.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置'**
+  String get reset;
+
+  /// No description provided for @leaveMeetingConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要离开会议吗？'**
+  String get leaveMeetingConfirm;
+
+  /// No description provided for @pokedSomeone.
+  ///
+  /// In zh, this message translates to:
+  /// **'拍了拍「{name}」{suffix}'**
+  String pokedSomeone(String name, String suffix);
+
+  /// No description provided for @noContactsToAdd.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有可添加的联系人'**
+  String get noContactsToAdd;
+
+  /// No description provided for @addMembers.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加成员'**
+  String get addMembers;
+
+  /// No description provided for @invitedMembers.
+  ///
+  /// In zh, this message translates to:
+  /// **'已邀请 {count} 位成员'**
+  String invitedMembers(int count);
+
+  /// No description provided for @inviteFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'邀请失败: {error}'**
+  String inviteFailed(String error);
+
+  /// No description provided for @memberRemoved.
+  ///
+  /// In zh, this message translates to:
+  /// **'已移除成员'**
+  String get memberRemoved;
+
+  /// No description provided for @removeFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'移除失败: {error}'**
+  String removeFailed(String error);
+
+  /// No description provided for @realTimeLocationShareMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'开始共享后，对方将能看到你的实时位置，共享时长为1小时。'**
+  String get realTimeLocationShareMessage;
+
+  /// No description provided for @startSharing.
+  ///
+  /// In zh, this message translates to:
+  /// **'开始共享'**
+  String get startSharing;
+
+  /// No description provided for @locationServiceNotEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'位置服务未开启'**
+  String get locationServiceNotEnabled;
+
+  /// No description provided for @enableLocationService.
+  ///
+  /// In zh, this message translates to:
+  /// **'请开启位置服务以使用位置功能'**
+  String get enableLocationService;
+
+  /// No description provided for @goToSettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'去设置'**
+  String get goToSettings;
+
+  /// No description provided for @locationPermissionRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'需要位置权限才能使用此功能'**
+  String get locationPermissionRequired;
+
+  /// No description provided for @locationPermissionDeniedPermanent.
+  ///
+  /// In zh, this message translates to:
+  /// **'位置权限已被永久拒绝，请在设置中开启'**
+  String get locationPermissionDeniedPermanent;
+
+  /// No description provided for @locationPermissionDenied.
+  ///
+  /// In zh, this message translates to:
+  /// **'位置权限被拒绝'**
+  String get locationPermissionDenied;
+
+  /// No description provided for @gettingLocation.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在获取位置...'**
+  String get gettingLocation;
+
+  /// No description provided for @getLocationFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'获取位置失败: {error}'**
+  String getLocationFailed(String error);
+
+  /// No description provided for @currentLocation.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前位置'**
+  String get currentLocation;
+
+  /// No description provided for @nearbyPlace.
+  ///
+  /// In zh, this message translates to:
+  /// **'附近地点 {index}'**
+  String nearbyPlace(int index);
+
+  /// No description provided for @approximateDistance.
+  ///
+  /// In zh, this message translates to:
+  /// **'约 {distance}'**
+  String approximateDistance(String distance);
+
+  /// No description provided for @mapPreview.
+  ///
+  /// In zh, this message translates to:
+  /// **'地图预览'**
+  String get mapPreview;
+
+  /// No description provided for @searchLocation.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索地点'**
+  String get searchLocation;
+
+  /// No description provided for @redPacketSent.
+  ///
+  /// In zh, this message translates to:
+  /// **'已发送 {amount} {token} 红包'**
+  String redPacketSent(String amount, String token);
+
+  /// No description provided for @transferDefault.
+  ///
+  /// In zh, this message translates to:
+  /// **'转账'**
+  String get transferDefault;
+
+  /// No description provided for @transferSent.
+  ///
+  /// In zh, this message translates to:
+  /// **'已发送 {amount} {token} 转账'**
+  String transferSent(String amount, String token);
+
+  /// No description provided for @pickFileFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择文件失败: {error}'**
+  String pickFileFailed(String error);
+
+  /// No description provided for @fileSizeLimit.
+  ///
+  /// In zh, this message translates to:
+  /// **'文件大小不能超过 50MB'**
+  String get fileSizeLimit;
+
+  /// No description provided for @fileSending.
+  ///
+  /// In zh, this message translates to:
+  /// **'文件发送中: {filename}'**
+  String fileSending(String filename);
+
+  /// No description provided for @sendFileFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送文件失败: {error}'**
+  String sendFileFailed(String error);
+
+  /// No description provided for @contactCardSent.
+  ///
+  /// In zh, this message translates to:
+  /// **'已发送 {name} 的名片'**
+  String contactCardSent(String name);
+
+  /// No description provided for @favoritesFeature.
+  ///
+  /// In zh, this message translates to:
+  /// **'收藏'**
+  String get favoritesFeature;
+
+  /// No description provided for @couponsFeature.
+  ///
+  /// In zh, this message translates to:
+  /// **'卡券'**
+  String get couponsFeature;
+
+  /// No description provided for @giftFeature.
+  ///
+  /// In zh, this message translates to:
+  /// **'礼物'**
+  String get giftFeature;
+
+  /// No description provided for @sharedMusic.
+  ///
+  /// In zh, this message translates to:
+  /// **'已分享 {name}'**
+  String sharedMusic(String name);
+
+  /// No description provided for @endPollTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'结束投票'**
+  String get endPollTitle;
+
+  /// No description provided for @endPollConfirmMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要结束这个投票吗？结束后将无法继续投票。'**
+  String get endPollConfirmMessage;
+
+  /// No description provided for @pollEndedMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'投票已结束'**
+  String get pollEndedMessage;
+
+  /// No description provided for @connectingCall.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在连接...'**
+  String get connectingCall;
+
+  /// No description provided for @muteCall.
+  ///
+  /// In zh, this message translates to:
+  /// **'静音'**
+  String get muteCall;
+
+  /// No description provided for @speakerOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭免提'**
+  String get speakerOff;
+
+  /// No description provided for @speakerOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'免提'**
+  String get speakerOn;
+
+  /// No description provided for @cameraOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启摄像头'**
+  String get cameraOn;
+
+  /// No description provided for @cameraOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭摄像头'**
+  String get cameraOff;
+
+  /// No description provided for @hangUp.
+  ///
+  /// In zh, this message translates to:
+  /// **'挂断'**
+  String get hangUp;
+
+  /// No description provided for @selectForwardTargetTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择转发对象'**
+  String get selectForwardTargetTitle;
+
+  /// No description provided for @noForwardableChat.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有可转发的会话'**
+  String get noForwardableChat;
+
+  /// No description provided for @noMatchingChat.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有找到相关会话'**
+  String get noMatchingChat;
+
+  /// No description provided for @imagePreview.
+  ///
+  /// In zh, this message translates to:
+  /// **'[图片]'**
+  String get imagePreview;
+
+  /// No description provided for @voicePreview.
+  ///
+  /// In zh, this message translates to:
+  /// **'[语音]'**
+  String get voicePreview;
+
+  /// No description provided for @videoPreview.
+  ///
+  /// In zh, this message translates to:
+  /// **'[视频]'**
+  String get videoPreview;
+
+  /// No description provided for @filePreviewWithName.
+  ///
+  /// In zh, this message translates to:
+  /// **'[文件] {filename}'**
+  String filePreviewWithName(String filename);
+
+  /// No description provided for @locationPreviewWithAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'[位置] {address}'**
+  String locationPreviewWithAddress(String address);
+
+  /// No description provided for @musicPreviewWithTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'[音乐] {title}'**
+  String musicPreviewWithTitle(String title);
+
+  /// No description provided for @messagePreview.
+  ///
+  /// In zh, this message translates to:
+  /// **'[消息]'**
+  String get messagePreview;
+
+  /// No description provided for @locationTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'位置'**
+  String get locationTitle;
+
+  /// No description provided for @sendButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送'**
+  String get sendButton;
+
+  /// No description provided for @retryButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'重试'**
+  String get retryButton;
+
+  /// No description provided for @selectContact.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择联系人'**
+  String get selectContact;
+
+  /// No description provided for @searchContactHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索联系人'**
+  String get searchContactHint;
+
+  /// No description provided for @shareMusic.
+  ///
+  /// In zh, this message translates to:
+  /// **'分享音乐'**
+  String get shareMusic;
+
+  /// No description provided for @recentPlayed.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近播放'**
+  String get recentPlayed;
+
+  /// No description provided for @myFavorites.
+  ///
+  /// In zh, this message translates to:
+  /// **'我喜欢'**
+  String get myFavorites;
+
+  /// No description provided for @networkLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'网络链接'**
+  String get networkLink;
+
+  /// No description provided for @localFile.
+  ///
+  /// In zh, this message translates to:
+  /// **'本地文件'**
+  String get localFile;
+
+  /// No description provided for @musicLinkRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'音乐链接 *'**
+  String get musicLinkRequired;
+
+  /// No description provided for @pasteMusicLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'粘贴音乐链接'**
+  String get pasteMusicLink;
+
+  /// No description provided for @enterSongNamePlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入歌曲名称'**
+  String get enterSongNamePlaceholder;
+
+  /// No description provided for @enterArtistNamePlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入歌手名称'**
+  String get enterArtistNamePlaceholder;
+
+  /// No description provided for @shareMusicButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'分享音乐'**
+  String get shareMusicButton;
+
+  /// No description provided for @selectLocalAudio.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择本地音频文件'**
+  String get selectLocalAudio;
+
+  /// No description provided for @supportedAudioFormats.
+  ///
+  /// In zh, this message translates to:
+  /// **'支持 MP3、M4A、WAV、FLAC 等格式'**
+  String get supportedAudioFormats;
+
+  /// No description provided for @selectFileButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择文件'**
+  String get selectFileButton;
+
+  /// No description provided for @pleaseEnterMusicLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入音乐链接'**
+  String get pleaseEnterMusicLink;
+
+  /// No description provided for @pleaseEnterValidLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入有效的网络链接'**
+  String get pleaseEnterValidLink;
+
+  /// No description provided for @sharedSong.
+  ///
+  /// In zh, this message translates to:
+  /// **'分享歌曲'**
+  String get sharedSong;
+
+  /// No description provided for @selectMember.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择成员'**
+  String get selectMember;
+
+  /// No description provided for @searchMemberHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索成员'**
+  String get searchMemberHint;
+
+  /// No description provided for @noMatchingMembers.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到匹配的成员'**
+  String get noMatchingMembers;
+
+  /// No description provided for @unknownMember.
+  ///
+  /// In zh, this message translates to:
+  /// **'未知'**
+  String get unknownMember;
+
+  /// No description provided for @selectedMessagesCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'已选择 {count} 条消息'**
+  String selectedMessagesCount(int count);
+
+  /// No description provided for @searchContactsOrGroups.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索联系人或群聊'**
+  String get searchContactsOrGroups;
+
+  /// No description provided for @noMatchingConversations.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到匹配的会话'**
+  String get noMatchingConversations;
+
+  /// No description provided for @videoTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频'**
+  String get videoTitle;
+
+  /// No description provided for @loadingText.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载中...'**
+  String get loadingText;
+
+  /// No description provided for @videoPlaybackFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频播放失败'**
+  String get videoPlaybackFailed;
+
+  /// No description provided for @videoLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频加载失败'**
+  String get videoLoadFailed;
+
+  /// No description provided for @playerInitFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'播放器初始化失败'**
+  String get playerInitFailed;
+
+  /// No description provided for @createPollTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建投票'**
+  String get createPollTitle;
+
+  /// No description provided for @submitPoll.
+  ///
+  /// In zh, this message translates to:
+  /// **'发起'**
+  String get submitPoll;
+
+  /// No description provided for @pollQuestionLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'投票问题'**
+  String get pollQuestionLabel;
+
+  /// No description provided for @enterPollQuestionHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入投票问题'**
+  String get enterPollQuestionHint;
+
+  /// No description provided for @pollOptionsLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'投票选项'**
+  String get pollOptionsLabel;
+
+  /// No description provided for @optionHintWithIndex.
+  ///
+  /// In zh, this message translates to:
+  /// **'选项 {index}'**
+  String optionHintWithIndex(int index);
+
+  /// No description provided for @addOptionButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加选项'**
+  String get addOptionButton;
+
+  /// No description provided for @pollSettingsLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'投票设置'**
+  String get pollSettingsLabel;
+
+  /// No description provided for @selectionType.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择类型'**
+  String get selectionType;
+
+  /// No description provided for @singleChoiceLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'单选'**
+  String get singleChoiceLabel;
+
+  /// No description provided for @multiChoiceLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'多选'**
+  String get multiChoiceLabel;
+
+  /// No description provided for @anonymousPollSwitch.
+  ///
+  /// In zh, this message translates to:
+  /// **'匿名投票'**
+  String get anonymousPollSwitch;
+
+  /// No description provided for @pleaseEnterQuestion.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入投票问题'**
+  String get pleaseEnterQuestion;
+
+  /// No description provided for @atLeastTwoOptions.
+  ///
+  /// In zh, this message translates to:
+  /// **'至少需要2个选项'**
+  String get atLeastTwoOptions;
+
+  /// No description provided for @confirmWithCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定 ({count})'**
+  String confirmWithCount(int count);
+
+  /// No description provided for @emailVerificationTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'邮箱验证'**
+  String get emailVerificationTitle;
+
+  /// No description provided for @enterValidEmailAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入有效的邮箱地址'**
+  String get enterValidEmailAddress;
+
+  /// No description provided for @verificationCodeSentTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证码已发送到 {email}'**
+  String verificationCodeSentTo(String email);
+
+  /// No description provided for @sendCodeFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送验证码失败: {error}'**
+  String sendCodeFailed(String error);
+
+  /// No description provided for @verificationSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证成功'**
+  String get verificationSuccess;
+
+  /// No description provided for @verificationFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证失败'**
+  String get verificationFailed;
+
+  /// No description provided for @verificationCodeError.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证码错误: {error}'**
+  String verificationCodeError(String error);
+
+  /// No description provided for @enterVerificationCode.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入验证码'**
+  String get enterVerificationCode;
+
+  /// No description provided for @enterYourEmail.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入邮箱'**
+  String get enterYourEmail;
+
+  /// No description provided for @weSentCodeTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'我们已向 {email} 发送了\n6位验证码'**
+  String weSentCodeTo(String email);
+
+  /// No description provided for @enterEmailForCode.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入您的邮箱地址，我们将发送验证码'**
+  String get enterEmailForCode;
+
+  /// No description provided for @sendVerificationCode.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送验证码'**
+  String get sendVerificationCode;
+
+  /// No description provided for @resendVerificationCode.
+  ///
+  /// In zh, this message translates to:
+  /// **'重新发送验证码'**
+  String get resendVerificationCode;
+
+  /// No description provided for @canResendAfter.
+  ///
+  /// In zh, this message translates to:
+  /// **'{seconds}秒后可重新发送'**
+  String canResendAfter(int seconds);
+
+  /// No description provided for @changeEmail.
+  ///
+  /// In zh, this message translates to:
+  /// **'更换邮箱'**
+  String get changeEmail;
+
+  /// No description provided for @addToContacts.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加到通讯录'**
+  String get addToContacts;
+
+  /// No description provided for @addingToContacts.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加中...'**
+  String get addingToContacts;
+
+  /// No description provided for @addedToContacts.
+  ///
+  /// In zh, this message translates to:
+  /// **'已添加到通讯录'**
+  String get addedToContacts;
+
+  /// No description provided for @addFailedWithError.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加失败: {error}'**
+  String addFailedWithError(String error);
+
+  /// No description provided for @addPhone.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加电话'**
+  String get addPhone;
+
+  /// No description provided for @addTag.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加标签'**
+  String get addTag;
+
+  /// No description provided for @addText.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加文字'**
+  String get addText;
+
+  /// No description provided for @addPhoto.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加照片'**
+  String get addPhoto;
+
+  /// No description provided for @groupCountLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}个'**
+  String groupCountLabel(int count);
+
+  /// No description provided for @addedViaSearch.
+  ///
+  /// In zh, this message translates to:
+  /// **'通过搜索添加'**
+  String get addedViaSearch;
+
+  /// No description provided for @addTime.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加时间'**
+  String get addTime;
+
+  /// No description provided for @doneButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'完成'**
+  String get doneButton;
+
+  /// No description provided for @waitingForParticipants.
+  ///
+  /// In zh, this message translates to:
+  /// **'等待参与者加入...'**
+  String get waitingForParticipants;
+
+  /// No description provided for @participantMe.
+  ///
+  /// In zh, this message translates to:
+  /// **'{name}（我）'**
+  String participantMe(String name);
+
+  /// No description provided for @sharingLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'共享中'**
+  String get sharingLabel;
+
+  /// No description provided for @screenSharingBy.
+  ///
+  /// In zh, this message translates to:
+  /// **'{name} 正在共享屏幕'**
+  String screenSharingBy(String name);
+
+  /// No description provided for @participantCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 人'**
+  String participantCount(int count);
+
+  /// No description provided for @muteLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'静音'**
+  String get muteLabel;
+
+  /// No description provided for @unmuteLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'解除静音'**
+  String get unmuteLabel;
+
+  /// No description provided for @turnOffVideo.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭视频'**
+  String get turnOffVideo;
+
+  /// No description provided for @turnOnVideo.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启视频'**
+  String get turnOnVideo;
+
+  /// No description provided for @shareScreen.
+  ///
+  /// In zh, this message translates to:
+  /// **'共享屏幕'**
+  String get shareScreen;
+
+  /// No description provided for @stopSharing.
+  ///
+  /// In zh, this message translates to:
+  /// **'停止共享'**
+  String get stopSharing;
+
+  /// No description provided for @switchCameraLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'切换'**
+  String get switchCameraLabel;
+
+  /// No description provided for @leaveLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'离开'**
+  String get leaveLabel;
+
+  /// No description provided for @participantsLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'参与者'**
+  String get participantsLabel;
+
+  /// No description provided for @joiningMeeting.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在加入会议...'**
+  String get joiningMeeting;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
@@ -5915,8 +7049,22 @@ class _SDelegate extends LocalizationsDelegate<S> {
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+        'de',
+        'en',
+        'es',
+        'fr',
+        'id',
+        'it',
+        'ja',
+        'ko',
+        'pl',
+        'pt',
+        'ru',
+        'tr',
+        'vi',
+        'zh'
+      ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_SDelegate old) => false;
@@ -5925,8 +7073,32 @@ class _SDelegate extends LocalizationsDelegate<S> {
 S lookupS(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'de':
+      return SDe();
     case 'en':
       return SEn();
+    case 'es':
+      return SEs();
+    case 'fr':
+      return SFr();
+    case 'id':
+      return SId();
+    case 'it':
+      return SIt();
+    case 'ja':
+      return SJa();
+    case 'ko':
+      return SKo();
+    case 'pl':
+      return SPl();
+    case 'pt':
+      return SPt();
+    case 'ru':
+      return SRu();
+    case 'tr':
+      return STr();
+    case 'vi':
+      return SVi();
     case 'zh':
       return SZh();
   }

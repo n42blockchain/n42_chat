@@ -697,7 +697,7 @@ class SZh extends S {
   String get secureDecentralizedChat => '安全、去中心化的即时通讯';
 
   @override
-  String get endToEndEncryption => '端对端加密';
+  String get endToEndEncryption => '端到端加密';
 
   @override
   String get messagesOnlyYouCanSee => '消息仅你和对方可见';
@@ -939,7 +939,7 @@ class SZh extends S {
   String get markAsRead => '标记已读';
 
   @override
-  String get unmute => '取消免打扰';
+  String get unmute => '取消静音';
 
   @override
   String get mute => '消息免打扰';
@@ -1144,7 +1144,7 @@ class SZh extends S {
   String get searchError => '搜索出错';
 
   @override
-  String get searchHint => '搜索联系人、群聊和消息';
+  String get searchHint => '搜索';
 
   @override
   String get enterKeyword => '输入关键词开始搜索';
@@ -1347,7 +1347,7 @@ class SZh extends S {
   String get receiveTransfer => '收到转账';
 
   @override
-  String fromSender(String name) {
+  String fromSender(String name, Object senderName) {
     return '来自 $name';
   }
 
@@ -1637,7 +1637,7 @@ class SZh extends S {
   String get recording => '录像';
 
   @override
-  String get invalidVideoUrl => '视频地址无效';
+  String get invalidVideoUrl => '无效的视频链接';
 
   @override
   String get downloadFile => '下载文件';
@@ -1697,7 +1697,7 @@ class SZh extends S {
   String get download => '下载';
 
   @override
-  String get invalidLocation => '位置信息无效';
+  String get invalidLocation => '无效的位置';
 
   @override
   String get address => '地址';
@@ -1766,21 +1766,21 @@ class SZh extends S {
   String get shareLocationForOneHour => '与好友共享1小时实时位置';
 
   @override
-  String get locationSent => '位置发送成功';
+  String get locationSent => '位置已发送';
 
   @override
-  String get selectMessages => '多选';
+  String get selectMessages => '选择消息';
 
   @override
-  String selectedCount(Object count) {
-    return '已选择 $count 条';
+  String selectedCount(int count) {
+    return '已选择 $count';
   }
 
   @override
   String get selectAll => '全选';
 
   @override
-  String groupChatCount(Object count) {
+  String groupChatCount(int count) {
     return '群聊($count)';
   }
 
@@ -1794,10 +1794,10 @@ class SZh extends S {
   String get sendFirstMessage => '发送第一条消息开始聊天';
 
   @override
-  String get encryptionNotice => '本聊天已开启端对端加密保护，只有您和对方可以读取消息内容';
+  String get encryptionNotice => '此聊天已启用端到端加密。只有您和对方可以阅读消息。';
 
   @override
-  String replyTo(Object name) {
+  String replyTo(String name) {
     return '回复 $name';
   }
 
@@ -1808,7 +1808,7 @@ class SZh extends S {
   String get collect => '收藏';
 
   @override
-  String get noMembers => '暂无成员';
+  String get noMembers => '没有成员';
 
   @override
   String get memberNotFound => '未找到成员';
@@ -1934,7 +1934,7 @@ class SZh extends S {
   String get voted => '已投票';
 
   @override
-  String get voteChanged => '已更改投票';
+  String get voteChanged => '投票已更改';
 
   @override
   String get voteRemoved => '已取消投票';
@@ -1946,8 +1946,8 @@ class SZh extends S {
   String get endPollConfirm => '确定要结束这个投票吗？结束后将无法继续投票。';
 
   @override
-  String memberCount(Object count) {
-    return '$count人';
+  String memberCount(int count) {
+    return '$count 人';
   }
 
   @override
@@ -2182,7 +2182,7 @@ class SZh extends S {
   String get confirmLeaveGroup => '确定要退出';
 
   @override
-  String get leave => '退出';
+  String get leave => '离开';
 
   @override
   String get saveMedia => '保存';
@@ -3150,4 +3150,625 @@ class SZh extends S {
 
   @override
   String get messageLabel => '消息';
+
+  @override
+  String get securityTitle => '安全';
+
+  @override
+  String get keyBackup => '密钥备份';
+
+  @override
+  String get backupEncryptionKeys => '备份加密密钥';
+
+  @override
+  String keysBackedUp(int count) {
+    return '已备份 $count 个密钥';
+  }
+
+  @override
+  String get backupNotSet => '未设置备份';
+
+  @override
+  String get restoreKeys => '恢复密钥';
+
+  @override
+  String get restoreKeysFromBackup => '从备份恢复加密密钥';
+
+  @override
+  String get exportKeys => '导出密钥';
+
+  @override
+  String get exportKeysToFile => '导出密钥到文件';
+
+  @override
+  String get loggedInDevices => '已登录设备';
+
+  @override
+  String get noOtherDevices => '暂无其他设备';
+
+  @override
+  String get verified => '已验证';
+
+  @override
+  String get unverified => '未验证';
+
+  @override
+  String get advanced => '高级';
+
+  @override
+  String get crossSigning => '跨设备签名';
+
+  @override
+  String get enabled => '已启用';
+
+  @override
+  String get notEnabled => '未启用';
+
+  @override
+  String get resetEncryption => '重置加密';
+
+  @override
+  String get deleteAllEncryptionKeys => '删除所有加密密钥';
+
+  @override
+  String get encryptionNotSupported => '不支持加密';
+
+  @override
+  String get notInitialized => '未初始化';
+
+  @override
+  String get backupKeyTitle => '备份密钥';
+
+  @override
+  String get backupKeyMessage => '是否创建新的密钥备份？这将帮助您在新设备上恢复加密消息。';
+
+  @override
+  String get backup => '备份';
+
+  @override
+  String get restoreKeyTitle => '恢复密钥';
+
+  @override
+  String get restoreKeyMessage => '输入您的恢复密码或恢复密钥来恢复加密消息。';
+
+  @override
+  String get restore => '恢复';
+
+  @override
+  String get exportKeyTitle => '导出密钥';
+
+  @override
+  String get exportKeyMessage => '导出的密钥文件包含您的所有加密密钥，请妥善保管。';
+
+  @override
+  String get export => '导出';
+
+  @override
+  String deviceIdLabel(String deviceId) {
+    return '设备ID: $deviceId';
+  }
+
+  @override
+  String get deviceStatusVerified => '状态: 已验证';
+
+  @override
+  String get deviceStatusUnverified => '状态: 未验证';
+
+  @override
+  String lastActiveLabel(String lastSeen) {
+    return '最后活跃: $lastSeen';
+  }
+
+  @override
+  String get verifyThisDevice => '验证此设备';
+
+  @override
+  String get crossSigningAlreadyEnabled => '跨设备签名已启用';
+
+  @override
+  String get crossSigningSetupSuccess => '跨设备签名设置成功';
+
+  @override
+  String get resetEncryptionTitle => '重置加密';
+
+  @override
+  String get resetEncryptionWarning => '警告：这将删除您所有的加密密钥。您将无法解密之前的加密消息。此操作不可撤销。';
+
+  @override
+  String get reset => '重置';
+
+  @override
+  String get leaveMeetingConfirm => '确定要离开会议吗？';
+
+  @override
+  String pokedSomeone(String name, String suffix) {
+    return '拍了拍「$name」$suffix';
+  }
+
+  @override
+  String get noContactsToAdd => '没有可添加的联系人';
+
+  @override
+  String get addMembers => '添加成员';
+
+  @override
+  String invitedMembers(int count) {
+    return '已邀请 $count 位成员';
+  }
+
+  @override
+  String inviteFailed(String error) {
+    return '邀请失败: $error';
+  }
+
+  @override
+  String get memberRemoved => '已移除成员';
+
+  @override
+  String removeFailed(String error) {
+    return '移除失败: $error';
+  }
+
+  @override
+  String get realTimeLocationShareMessage => '开始共享后，对方将能看到你的实时位置，共享时长为1小时。';
+
+  @override
+  String get startSharing => '开始共享';
+
+  @override
+  String get locationServiceNotEnabled => '位置服务未开启';
+
+  @override
+  String get enableLocationService => '请开启位置服务以使用位置功能';
+
+  @override
+  String get goToSettings => '去设置';
+
+  @override
+  String get locationPermissionRequired => '需要位置权限才能使用此功能';
+
+  @override
+  String get locationPermissionDeniedPermanent => '位置权限已被永久拒绝，请在设置中开启';
+
+  @override
+  String get locationPermissionDenied => '位置权限被拒绝';
+
+  @override
+  String get gettingLocation => '正在获取位置...';
+
+  @override
+  String getLocationFailed(String error) {
+    return '获取位置失败: $error';
+  }
+
+  @override
+  String get currentLocation => '当前位置';
+
+  @override
+  String nearbyPlace(int index) {
+    return '附近地点 $index';
+  }
+
+  @override
+  String approximateDistance(String distance) {
+    return '约 $distance';
+  }
+
+  @override
+  String get mapPreview => '地图预览';
+
+  @override
+  String get searchLocation => '搜索地点';
+
+  @override
+  String redPacketSent(String amount, String token) {
+    return '已发送 $amount $token 红包';
+  }
+
+  @override
+  String get transferDefault => '转账';
+
+  @override
+  String transferSent(String amount, String token) {
+    return '已发送 $amount $token 转账';
+  }
+
+  @override
+  String pickFileFailed(String error) {
+    return '选择文件失败: $error';
+  }
+
+  @override
+  String get fileSizeLimit => '文件大小不能超过 50MB';
+
+  @override
+  String fileSending(String filename) {
+    return '文件发送中: $filename';
+  }
+
+  @override
+  String sendFileFailed(String error) {
+    return '发送文件失败: $error';
+  }
+
+  @override
+  String contactCardSent(String name) {
+    return '已发送 $name 的名片';
+  }
+
+  @override
+  String get favoritesFeature => '收藏';
+
+  @override
+  String get couponsFeature => '卡券';
+
+  @override
+  String get giftFeature => '礼物';
+
+  @override
+  String sharedMusic(String name) {
+    return '已分享 $name';
+  }
+
+  @override
+  String get endPollTitle => '结束投票';
+
+  @override
+  String get endPollConfirmMessage => '确定要结束这个投票吗？结束后将无法继续投票。';
+
+  @override
+  String get pollEndedMessage => '投票已结束';
+
+  @override
+  String get connectingCall => '正在连接...';
+
+  @override
+  String get muteCall => '静音';
+
+  @override
+  String get speakerOff => '关闭免提';
+
+  @override
+  String get speakerOn => '免提';
+
+  @override
+  String get cameraOn => '开启摄像头';
+
+  @override
+  String get cameraOff => '关闭摄像头';
+
+  @override
+  String get hangUp => '挂断';
+
+  @override
+  String get selectForwardTargetTitle => '选择转发对象';
+
+  @override
+  String get noForwardableChat => '没有可转发的会话';
+
+  @override
+  String get noMatchingChat => '没有找到相关会话';
+
+  @override
+  String get imagePreview => '[图片]';
+
+  @override
+  String get voicePreview => '[语音]';
+
+  @override
+  String get videoPreview => '[视频]';
+
+  @override
+  String filePreviewWithName(String filename) {
+    return '[文件] $filename';
+  }
+
+  @override
+  String locationPreviewWithAddress(String address) {
+    return '[位置] $address';
+  }
+
+  @override
+  String musicPreviewWithTitle(String title) {
+    return '[音乐] $title';
+  }
+
+  @override
+  String get messagePreview => '[消息]';
+
+  @override
+  String get locationTitle => '位置';
+
+  @override
+  String get sendButton => '发送';
+
+  @override
+  String get retryButton => '重试';
+
+  @override
+  String get selectContact => '选择联系人';
+
+  @override
+  String get searchContactHint => '搜索联系人';
+
+  @override
+  String get shareMusic => '分享音乐';
+
+  @override
+  String get recentPlayed => '最近播放';
+
+  @override
+  String get myFavorites => '我喜欢';
+
+  @override
+  String get networkLink => '网络链接';
+
+  @override
+  String get localFile => '本地文件';
+
+  @override
+  String get musicLinkRequired => '音乐链接 *';
+
+  @override
+  String get pasteMusicLink => '粘贴音乐链接';
+
+  @override
+  String get enterSongNamePlaceholder => '输入歌曲名称';
+
+  @override
+  String get enterArtistNamePlaceholder => '输入歌手名称';
+
+  @override
+  String get shareMusicButton => '分享音乐';
+
+  @override
+  String get selectLocalAudio => '选择本地音频文件';
+
+  @override
+  String get supportedAudioFormats => '支持 MP3、M4A、WAV、FLAC 等格式';
+
+  @override
+  String get selectFileButton => '选择文件';
+
+  @override
+  String get pleaseEnterMusicLink => '请输入音乐链接';
+
+  @override
+  String get pleaseEnterValidLink => '请输入有效的网络链接';
+
+  @override
+  String get sharedSong => '分享歌曲';
+
+  @override
+  String get selectMember => '选择成员';
+
+  @override
+  String get searchMemberHint => '搜索成员';
+
+  @override
+  String get noMatchingMembers => '未找到匹配的成员';
+
+  @override
+  String get unknownMember => '未知';
+
+  @override
+  String selectedMessagesCount(int count) {
+    return '已选择 $count 条消息';
+  }
+
+  @override
+  String get searchContactsOrGroups => '搜索联系人或群聊';
+
+  @override
+  String get noMatchingConversations => '未找到匹配的会话';
+
+  @override
+  String get videoTitle => '视频';
+
+  @override
+  String get loadingText => '加载中...';
+
+  @override
+  String get videoPlaybackFailed => '视频播放失败';
+
+  @override
+  String get videoLoadFailed => '视频加载失败';
+
+  @override
+  String get playerInitFailed => '播放器初始化失败';
+
+  @override
+  String get createPollTitle => '创建投票';
+
+  @override
+  String get submitPoll => '发起';
+
+  @override
+  String get pollQuestionLabel => '投票问题';
+
+  @override
+  String get enterPollQuestionHint => '请输入投票问题';
+
+  @override
+  String get pollOptionsLabel => '投票选项';
+
+  @override
+  String optionHintWithIndex(int index) {
+    return '选项 $index';
+  }
+
+  @override
+  String get addOptionButton => '添加选项';
+
+  @override
+  String get pollSettingsLabel => '投票设置';
+
+  @override
+  String get selectionType => '选择类型';
+
+  @override
+  String get singleChoiceLabel => '单选';
+
+  @override
+  String get multiChoiceLabel => '多选';
+
+  @override
+  String get anonymousPollSwitch => '匿名投票';
+
+  @override
+  String get pleaseEnterQuestion => '请输入投票问题';
+
+  @override
+  String get atLeastTwoOptions => '至少需要2个选项';
+
+  @override
+  String confirmWithCount(int count) {
+    return '确定 ($count)';
+  }
+
+  @override
+  String get emailVerificationTitle => '邮箱验证';
+
+  @override
+  String get enterValidEmailAddress => '请输入有效的邮箱地址';
+
+  @override
+  String verificationCodeSentTo(String email) {
+    return '验证码已发送到 $email';
+  }
+
+  @override
+  String sendCodeFailed(String error) {
+    return '发送验证码失败: $error';
+  }
+
+  @override
+  String get verificationSuccess => '验证成功';
+
+  @override
+  String get verificationFailed => '验证失败';
+
+  @override
+  String verificationCodeError(String error) {
+    return '验证码错误: $error';
+  }
+
+  @override
+  String get enterVerificationCode => '输入验证码';
+
+  @override
+  String get enterYourEmail => '输入邮箱';
+
+  @override
+  String weSentCodeTo(String email) {
+    return '我们已向 $email 发送了\n6位验证码';
+  }
+
+  @override
+  String get enterEmailForCode => '输入您的邮箱地址，我们将发送验证码';
+
+  @override
+  String get sendVerificationCode => '发送验证码';
+
+  @override
+  String get resendVerificationCode => '重新发送验证码';
+
+  @override
+  String canResendAfter(int seconds) {
+    return '$seconds秒后可重新发送';
+  }
+
+  @override
+  String get changeEmail => '更换邮箱';
+
+  @override
+  String get addToContacts => '添加到通讯录';
+
+  @override
+  String get addingToContacts => '添加中...';
+
+  @override
+  String get addedToContacts => '已添加到通讯录';
+
+  @override
+  String addFailedWithError(String error) {
+    return '添加失败: $error';
+  }
+
+  @override
+  String get addPhone => '添加电话';
+
+  @override
+  String get addTag => '添加标签';
+
+  @override
+  String get addText => '添加文字';
+
+  @override
+  String get addPhoto => '添加照片';
+
+  @override
+  String groupCountLabel(int count) {
+    return '$count个';
+  }
+
+  @override
+  String get addedViaSearch => '通过搜索添加';
+
+  @override
+  String get addTime => '添加时间';
+
+  @override
+  String get doneButton => '完成';
+
+  @override
+  String get waitingForParticipants => '等待参与者加入...';
+
+  @override
+  String participantMe(String name) {
+    return '$name（我）';
+  }
+
+  @override
+  String get sharingLabel => '共享中';
+
+  @override
+  String screenSharingBy(String name) {
+    return '$name 正在共享屏幕';
+  }
+
+  @override
+  String participantCount(int count) {
+    return '$count 人';
+  }
+
+  @override
+  String get muteLabel => '静音';
+
+  @override
+  String get unmuteLabel => '解除静音';
+
+  @override
+  String get turnOffVideo => '关闭视频';
+
+  @override
+  String get turnOnVideo => '开启视频';
+
+  @override
+  String get shareScreen => '共享屏幕';
+
+  @override
+  String get stopSharing => '停止共享';
+
+  @override
+  String get switchCameraLabel => '切换';
+
+  @override
+  String get leaveLabel => '离开';
+
+  @override
+  String get participantsLabel => '参与者';
+
+  @override
+  String get joiningMeeting => '正在加入会议...';
 }
