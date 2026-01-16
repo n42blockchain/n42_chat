@@ -325,21 +325,21 @@ class MatrixRoomDataSource {
       case matrix.MessageTypes.Text:
         return body;
       case matrix.MessageTypes.Image:
-        return '[图片]';
+        return '[Image]';
       case matrix.MessageTypes.Video:
-        return '[视频]';
+        return '[Video]';
       case matrix.MessageTypes.Audio:
-        return '[语音]';
+        return '[Voice]';
       case matrix.MessageTypes.File:
-        return '[文件]';
+        return '[File]';
       case matrix.MessageTypes.Location:
-        return '[位置]';
+        return '[Location]';
       case matrix.MessageTypes.Notice:
         return body;
       case matrix.MessageTypes.Emote:
         return body;
       default:
-        return body.isNotEmpty ? body : '[未知消息]';
+        return body.isNotEmpty ? body : '[Message]';
     }
   }
 

@@ -574,6 +574,12 @@ class SFr extends S {
   }
 
   @override
+  String get n42IdTitle => 'ID N42';
+
+  @override
+  String get n42Bean => 'N42 Bean';
+
+  @override
   String get friendInfo => 'Infos de l\'ami';
 
   @override
@@ -1038,6 +1044,12 @@ class SFr extends S {
 
   @override
   String get contactCard => '[Carte de contact]';
+
+  @override
+  String get fileLabel => 'Fichier';
+
+  @override
+  String get locationLabel => 'Position';
 
   @override
   String cardSent(String contact, String friend) {

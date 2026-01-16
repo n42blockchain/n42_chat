@@ -115,7 +115,7 @@ class ChatMorePanel extends StatelessWidget {
                       ),
                       _MoreItem(
                         icon: Icons.location_on_outlined,
-                        label: S.of(context)?.location ?? 'Location',
+                        label: S.of(context)?.locationLabel ?? 'Location',
                         onTap: onLocationPressed,
                       ),
                       _MoreItem(
@@ -131,12 +131,12 @@ class ChatMorePanel extends StatelessWidget {
                       ),
                       _MoreItem(
                         icon: Icons.folder_outlined,
-                        label: S.of(context)?.file ?? 'File',
+                        label: S.of(context)?.fileLabel ?? 'File',
                         onTap: onFilePressed,
                       ),
                       _MoreItem(
                         icon: Icons.person_outline,
-                        label: S.of(context)?.contactCard ?? 'Contact',
+                        label: 'Contact',
                         onTap: onContactCardPressed,
                       ),
                     ],

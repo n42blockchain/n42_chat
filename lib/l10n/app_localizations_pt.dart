@@ -572,6 +572,12 @@ class SPt extends S {
   }
 
   @override
+  String get n42IdTitle => 'N42 ID';
+
+  @override
+  String get n42Bean => 'N42 Bean';
+
+  @override
   String get friendInfo => 'Info do Amigo';
 
   @override
@@ -1035,6 +1041,12 @@ class SPt extends S {
 
   @override
   String get contactCard => '[Cartão de Contato]';
+
+  @override
+  String get fileLabel => 'Arquivo';
+
+  @override
+  String get locationLabel => 'Localização';
 
   @override
   String cardSent(String contact, String friend) {

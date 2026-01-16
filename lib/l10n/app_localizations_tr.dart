@@ -564,6 +564,12 @@ class STr extends S {
   }
 
   @override
+  String get n42IdTitle => 'N42 ID';
+
+  @override
+  String get n42Bean => 'N42 Bean';
+
+  @override
   String get friendInfo => 'Arkadaş Bilgisi';
 
   @override
@@ -1021,6 +1027,12 @@ class STr extends S {
 
   @override
   String get contactCard => '[Kişi Kartı]';
+
+  @override
+  String get fileLabel => 'Dosya';
+
+  @override
+  String get locationLabel => 'Konum';
 
   @override
   String cardSent(String contact, String friend) {

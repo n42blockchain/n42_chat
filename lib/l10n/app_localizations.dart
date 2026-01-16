@@ -820,7 +820,7 @@ abstract class S {
   /// No description provided for @contactLabel.
   ///
   /// In zh, this message translates to:
-  /// **'联系人'**
+  /// **'联系人: {userId}'**
   String contactLabel(String userId);
 
   /// No description provided for @addFriend.
@@ -1116,6 +1116,18 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'N42号：{id}'**
   String n42Id(String id);
+
+  /// No description provided for @n42IdTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'N42号'**
+  String get n42IdTitle;
+
+  /// No description provided for @n42Bean.
+  ///
+  /// In zh, this message translates to:
+  /// **'N42豆'**
+  String get n42Bean;
 
   /// No description provided for @friendInfo.
   ///
@@ -1974,6 +1986,18 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'[名片]'**
   String get contactCard;
+
+  /// No description provided for @fileLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'文件'**
+  String get fileLabel;
+
+  /// No description provided for @locationLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'位置'**
+  String get locationLabel;
 
   /// No description provided for @cardSent.
   ///

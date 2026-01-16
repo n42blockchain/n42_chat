@@ -568,6 +568,12 @@ class SId extends S {
   }
 
   @override
+  String get n42IdTitle => 'N42 ID';
+
+  @override
+  String get n42Bean => 'N42 Bean';
+
+  @override
   String get friendInfo => 'Info Teman';
 
   @override
@@ -1022,6 +1028,12 @@ class SId extends S {
 
   @override
   String get contactCard => '[Kartu Kontak]';
+
+  @override
+  String get fileLabel => 'Berkas';
+
+  @override
+  String get locationLabel => 'Lokasi';
 
   @override
   String cardSent(String contact, String friend) {

@@ -574,6 +574,12 @@ class SEs extends S {
   }
 
   @override
+  String get n42IdTitle => 'ID N42';
+
+  @override
+  String get n42Bean => 'N42 Bean';
+
+  @override
   String get friendInfo => 'Info del amigo';
 
   @override
@@ -1038,6 +1044,12 @@ class SEs extends S {
 
   @override
   String get contactCard => '[Tarjeta de contacto]';
+
+  @override
+  String get fileLabel => 'Archivo';
+
+  @override
+  String get locationLabel => 'Ubicacion';
 
   @override
   String cardSent(String contact, String friend) {

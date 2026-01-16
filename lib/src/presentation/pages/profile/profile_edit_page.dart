@@ -152,10 +152,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               _buildSection(
                 isDark: isDark,
                 children: [
-                  // N42号
+                  // N42 ID
                   _buildListTile(
                     isDark: isDark,
-                    title: 'N42号',
+                    title: S.of(context)?.n42IdTitle ?? 'N42 ID',
                     value: user?.userId ?? '',
                     showArrow: false,
                   ),
@@ -251,13 +251,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               
               const SizedBox(height: 10),
               
-              // N42豆区块
+              // N42 Bean区块
               _buildSection(
                 isDark: isDark,
                 children: [
                   _buildListTile(
                     isDark: isDark,
-                    title: 'N42豆',
+                    title: S.of(context)?.n42Bean ?? 'N42 Bean',
                     onTap: _openN42Bean,
                   ),
                 ],
@@ -524,12 +524,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
 
   Future<void> _selectRegion() async {
-    // 省份列表
-    final provinces = [
-      '北京', '上海', '天津', '重庆', '广东', '江苏', '浙江', '山东', 
-      '河南', '四川', '湖北', '湖南', '河北', '福建', '安徽', '陕西',
-      '辽宁', '江西', '云南', '广西', '山西', '贵州', '黑龙江', '吉林',
-      '甘肃', '内蒙古', '新疆', '海南', '宁夏', '青海', '西藏', '香港', '澳门', '台湾',
+    // 世界著名城市 - 按地区分类
+    final regions = [
+      'North America', 'Europe', 'Asia', 'Oceania',
+      'South America', 'Middle East', 'Africa',
     ];
 
     final province = await showModalBottomSheet<String>(
@@ -569,10 +567,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             Expanded(
               child: ListView.builder(
                 controller: scrollController,
-                itemCount: provinces.length,
+                itemCount: regions.length,
                 itemBuilder: (context, index) => ListTile(
-                  title: Text(provinces[index]),
-                  onTap: () => Navigator.pop(context, provinces[index]),
+                  title: Text(regions[index]),
+                  onTap: () => Navigator.pop(context, regions[index]),
                 ),
               ),
             ),
@@ -582,9 +580,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
 
     if (province != null) {
-      // 选择城市（简化版，实际应该有更完整的城市数据）
-      final cities = _getCitiesForProvince(province);
-      
+      // 选择城市
+      final cities = _getCitiesForRegion(province);
+
       if (cities.isNotEmpty) {
         final city = await showModalBottomSheet<String>(
           context: context,
@@ -624,44 +622,30 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         );
 
         if (city != null && mounted) {
-          final region = '$province $city';
-          context.read<AuthBloc>().add(UpdateUserProfile(region: region));
+          context.read<AuthBloc>().add(UpdateUserProfile(region: city));
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.regionSetTo(region) ?? 'Region set to: $region'),
+              content: Text(S.of(context)?.regionSetTo(city) ?? 'Region set to: $city'),
               duration: const Duration(seconds: 1),
             ),
           );
         }
-      } else if (mounted) {
-        // 直辖市只有一个选项
-        context.read<AuthBloc>().add(UpdateUserProfile(region: province));
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S.of(context)?.regionSetTo(province) ?? 'Region set to: $province'),
-            duration: const Duration(seconds: 1),
-          ),
-        );
       }
     }
   }
 
-  List<String> _getCitiesForProvince(String province) {
-    // 简化版城市数据
+  List<String> _getCitiesForRegion(String region) {
+    // 世界著名城市数据
     final Map<String, List<String>> cityData = {
-      '北京': ['北京'],
-      '上海': ['上海'],
-      '天津': ['天津'],
-      '重庆': ['重庆'],
-      '广东': ['广州', '深圳', '东莞', '佛山', '珠海', '惠州', '中山'],
-      '江苏': ['南京', '苏州', '无锡', '常州', '南通', '徐州'],
-      '浙江': ['杭州', '宁波', '温州', '嘉兴', '绍兴', '金华'],
-      '山东': ['济南', '青岛', '烟台', '潍坊', '威海', '淄博'],
-      '四川': ['成都', '绵阳', '德阳', '宜宾', '泸州'],
-      '湖北': ['武汉', '宜昌', '襄阳', '荆州', '黄石'],
-      '湖南': ['长沙', '株洲', '湘潭', '衡阳', '岳阳'],
+      'North America': ['New York', 'Los Angeles', 'Chicago', 'San Francisco', 'Miami', 'Toronto', 'Vancouver', 'Mexico City'],
+      'Europe': ['London', 'Paris', 'Berlin', 'Rome', 'Madrid', 'Amsterdam', 'Barcelona', 'Vienna', 'Prague', 'Zurich'],
+      'Asia': ['Tokyo', 'Singapore', 'Hong Kong', 'Seoul', 'Shanghai', 'Beijing', 'Bangkok', 'Mumbai', 'Taipei', 'Osaka'],
+      'Oceania': ['Sydney', 'Melbourne', 'Auckland', 'Brisbane', 'Perth'],
+      'South America': ['São Paulo', 'Rio de Janeiro', 'Buenos Aires', 'Lima', 'Bogotá', 'Santiago'],
+      'Middle East': ['Dubai', 'Abu Dhabi', 'Tel Aviv', 'Istanbul', 'Doha', 'Riyadh'],
+      'Africa': ['Cape Town', 'Cairo', 'Johannesburg', 'Nairobi', 'Casablanca', 'Lagos'],
     };
-    return cityData[province] ?? [province];
+    return cityData[region] ?? [];
   }
 
   Future<void> _editPokeText(String? currentPokeText) async {

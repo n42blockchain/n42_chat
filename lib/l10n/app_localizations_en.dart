@@ -395,7 +395,7 @@ class SEn extends S {
 
   @override
   String contactLabel(String userId) {
-    return 'Contact';
+    return 'Contact: $userId';
   }
 
   @override
@@ -561,6 +561,12 @@ class SEn extends S {
   String n42Id(String id) {
     return 'N42 ID: $id';
   }
+
+  @override
+  String get n42IdTitle => 'N42 ID';
+
+  @override
+  String get n42Bean => 'N42 Bean';
 
   @override
   String get friendInfo => 'Friend Info';
@@ -1016,6 +1022,12 @@ class SEn extends S {
 
   @override
   String get contactCard => '[Contact Card]';
+
+  @override
+  String get fileLabel => 'File';
+
+  @override
+  String get locationLabel => 'Location';
 
   @override
   String cardSent(String contact, String friend) {

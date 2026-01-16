@@ -564,6 +564,12 @@ class SVi extends S {
   }
 
   @override
+  String get n42IdTitle => 'N42 ID';
+
+  @override
+  String get n42Bean => 'N42 Bean';
+
+  @override
   String get friendInfo => 'Thong tin ban be';
 
   @override
@@ -1018,6 +1024,12 @@ class SVi extends S {
 
   @override
   String get contactCard => '[The Lien he]';
+
+  @override
+  String get fileLabel => 'Tep';
+
+  @override
+  String get locationLabel => 'Vi tri';
 
   @override
   String cardSent(String contact, String friend) {

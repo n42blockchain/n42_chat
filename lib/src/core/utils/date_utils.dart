@@ -12,7 +12,8 @@ class DateLocaleStrings {
   final String Function(int) minutesAgoOnline;
   final String Function(int) hoursAgoOnline;
   final String Function(int) daysAgoOnline;
-  final List<String> weekdays;
+  final List<String>? weekdays;
+  final String? localeCode;
   final String Function(int month, int day) monthDay;
   final String Function(int year, int month, int day) yearMonthDay;
 
@@ -27,10 +28,21 @@ class DateLocaleStrings {
     this.minutesAgoOnline = _defaultMinutesAgoOnline,
     this.hoursAgoOnline = _defaultHoursAgoOnline,
     this.daysAgoOnline = _defaultDaysAgoOnline,
-    this.weekdays = const ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    this.weekdays,
+    this.localeCode = 'en',
     this.monthDay = _defaultMonthDay,
     this.yearMonthDay = _defaultYearMonthDay,
   });
+
+  /// 获取本地化的星期几短名
+  String getWeekday(DateTime dateTime) {
+    // 优先使用自定义weekdays数组
+    if (weekdays != null && weekdays!.length > dateTime.weekday) {
+      return weekdays![dateTime.weekday];
+    }
+    // 否则使用intl包的本地化
+    return DateFormat.E(localeCode).format(dateTime);
+  }
 
   static String _defaultMinutesAgo(int count) => '$count min ago';
   static String _defaultHoursAgo(int count) => '${count}h ago';
@@ -54,6 +66,7 @@ class DateLocaleStrings {
     hoursAgoOnline: _chineseHoursAgoOnline,
     daysAgoOnline: _chineseDaysAgoOnline,
     weekdays: ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+    localeCode: 'zh',
     monthDay: _chineseMonthDay,
     yearMonthDay: _chineseYearMonthDay,
   );
@@ -66,6 +79,15 @@ class DateLocaleStrings {
   static String _chineseDaysAgoOnline(int count) => '$count天前在线';
   static String _chineseMonthDay(int month, int day) => '$month月$day日';
   static String _chineseYearMonthDay(int year, int month, int day) => '$year年$month月$day日';
+
+  /// 根据语言代码创建本地化字符串
+  static DateLocaleStrings fromLocaleCode(String localeCode) {
+    if (localeCode.startsWith('zh')) {
+      return chinese;
+    }
+    // 对于其他语言，使用intl包的本地化（不提供自定义weekdays）
+    return DateLocaleStrings(localeCode: localeCode);
+  }
 }
 
 /// 日期时间工具类
@@ -107,7 +129,7 @@ abstract class N42DateUtils {
     } else if (now.difference(dateTime).inDays < 7 &&
         dateTime.weekday < now.weekday) {
       // 本周（且在今天之前）
-      return locale.weekdays[dateTime.weekday];
+      return locale.getWeekday(dateTime);
     } else if (dateTime.year == now.year) {
       // 今年
       return locale.monthDay(dateTime.month, dateTime.day);
@@ -134,7 +156,7 @@ abstract class N42DateUtils {
       dateStr = '${locale.yesterday} ';
     } else if (now.difference(dateTime).inDays < 7 &&
         dateTime.weekday < now.weekday) {
-      dateStr = '${locale.weekdays[dateTime.weekday]} ';
+      dateStr = '${locale.getWeekday(dateTime)} ';
     } else if (dateTime.year == now.year) {
       dateStr = '${locale.monthDay(dateTime.month, dateTime.day)} ';
     } else {

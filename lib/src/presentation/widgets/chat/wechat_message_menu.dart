@@ -184,7 +184,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 if (message.type == MessageType.text)
                   _buildMenuItem(
                     icon: Icons.content_copy_outlined,
-                    label: 'Copy',
+                    label: S.of(context)?.copy ?? 'Copy',
                     onTap: () {
                       onDismiss();
                       onCopy?.call();
@@ -193,7 +193,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 else if (message.type == MessageType.image || message.type == MessageType.video)
                   _buildMenuItem(
                     icon: Icons.download_outlined,
-                    label: 'Save',
+                    label: S.of(context)?.save ?? 'Save',
                     onTap: () {
                       onDismiss();
                       onSave?.call();
@@ -202,7 +202,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 if (onForward != null)
                   _buildMenuItem(
                     icon: Icons.shortcut_outlined,
-                    label: 'Forward',
+                    label: S.of(context)?.forward ?? 'Forward',
                     onTap: () {
                       onDismiss();
                       onForward?.call();
@@ -210,7 +210,7 @@ class WeChatMessageMenu extends StatelessWidget {
                   ),
                 _buildMenuItem(
                   icon: isFavorited ? Icons.star : Icons.star_border_outlined,
-                  label: isFavorited ? 'Unfav' : 'Favorite',
+                  label: isFavorited ? (S.of(context)?.unfavorite ?? 'Unfav') : (S.of(context)?.favorite ?? 'Favorite'),
                   isHighlighted: isFavorited,
                   onTap: () {
                     onDismiss();
@@ -221,7 +221,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 if (message.isFromMe && message.status == MessageStatus.failed) ...[
                   _buildMenuItem(
                     icon: Icons.refresh,
-                    label: 'Resend',
+                    label: S.of(context)?.resend ?? 'Resend',
                     onTap: () {
                       onDismiss();
                       onResend?.call();
@@ -229,7 +229,7 @@ class WeChatMessageMenu extends StatelessWidget {
                   ),
                   _buildMenuItem(
                     icon: Icons.delete_outline,
-                    label: 'Delete',
+                    label: S.of(context)?.delete ?? 'Delete',
                     isHighlighted: true,
                     onTap: () {
                       onDismiss();
@@ -239,7 +239,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 ] else if (message.isFromMe)
                   _buildMenuItem(
                     icon: Icons.undo_outlined,
-                    label: 'Recall',
+                    label: S.of(context)?.recall ?? 'Recall',
                     onTap: () {
                       onDismiss();
                       onRecall?.call();
@@ -247,7 +247,7 @@ class WeChatMessageMenu extends StatelessWidget {
                   ),
                 _buildMenuItem(
                   icon: Icons.checklist_outlined,
-                  label: 'Select',
+                  label: S.of(context)?.selectMessages ?? 'Select',
                   onTap: () {
                     onDismiss();
                     onMultiSelect?.call();
@@ -273,7 +273,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 const SizedBox(width: 8),
                 _buildMenuItem(
                   icon: Icons.format_quote_outlined,
-                  label: 'Quote',
+                  label: S.of(context)?.quote ?? 'Quote',
                   onTap: () {
                     onDismiss();
                     onQuote?.call();
@@ -282,7 +282,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 const SizedBox(width: 20),
                 _buildMenuItem(
                   icon: Icons.notifications_outlined,
-                  label: 'Remind',
+                  label: S.of(context)?.remind ?? 'Remind',
                   onTap: () {
                     onDismiss();
                     onRemind?.call();
@@ -291,7 +291,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 const SizedBox(width: 20),
                 _buildMenuItem(
                   icon: Icons.search,
-                  label: 'Search',
+                  label: S.of(context)?.search ?? 'Search',
                   onTap: () {
                     onDismiss();
                     onSearch?.call();
@@ -468,7 +468,7 @@ class _RecallConfirmSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     child: Text(
-                      'Recall this message?',
+                      S.of(context)?.recallThisMessage ?? 'Recall this message?',
                       style: TextStyle(
                         fontSize: 13,
                         color: isDark ? Colors.grey[400] : Colors.grey[600],
@@ -491,10 +491,10 @@ class _RecallConfirmSheet extends StatelessWidget {
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 18),
-                        child: const Text(
-                          'Recall',
+                        child: Text(
+                          S.of(context)?.recall ?? 'Recall',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 20,
                             color: Color(0xFFFF3B30), // iOS red
                             fontWeight: FontWeight.w400,
@@ -524,7 +524,7 @@ class _RecallConfirmSheet extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     child: Text(
-                      'Cancel',
+                      S.of(context)?.cancel ?? 'Cancel',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20,
