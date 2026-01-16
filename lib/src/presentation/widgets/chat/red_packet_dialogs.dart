@@ -461,11 +461,14 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
         child: child ?? Row(
           children: [
             if (label != null)
-              Text(
-                label,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+              Flexible(
+                child: Text(
+                  label,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            const Spacer(),
+            const SizedBox(width: 8),
             if (trailing != null) trailing,
           ],
         ),

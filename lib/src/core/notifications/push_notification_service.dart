@@ -142,17 +142,17 @@ class PushNotificationService implements IPushNotificationService {
       case 'm.text':
         return content['body'] as String? ?? '';
       case 'm.image':
-        return '[图片]';
+        return '[Image]';
       case 'm.video':
-        return '[视频]';
+        return '[Video]';
       case 'm.audio':
-        return '[语音]';
+        return '[Voice]';
       case 'm.file':
-        return '[文件]';
+        return '[File]';
       case 'm.location':
-        return '[位置]';
+        return '[Location]';
       default:
-        return '[消息]';
+        return '[Message]';
     }
   }
 

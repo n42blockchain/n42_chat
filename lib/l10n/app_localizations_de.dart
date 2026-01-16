@@ -573,6 +573,12 @@ class SDe extends S {
   }
 
   @override
+  String get n42IdTitle => 'N42 ID';
+
+  @override
+  String get n42Bean => 'N42 Bean';
+
+  @override
   String get friendInfo => 'Freund-Info';
 
   @override
@@ -1033,6 +1039,12 @@ class SDe extends S {
 
   @override
   String get contactCard => '[Kontaktkarte]';
+
+  @override
+  String get fileLabel => 'Datei';
+
+  @override
+  String get locationLabel => 'Standort';
 
   @override
   String cardSent(String contact, String friend) {

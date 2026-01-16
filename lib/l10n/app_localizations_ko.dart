@@ -560,6 +560,12 @@ class SKo extends S {
   }
 
   @override
+  String get n42IdTitle => 'N42 ID';
+
+  @override
+  String get n42Bean => 'N42 빈';
+
+  @override
   String get friendInfo => '친구 정보';
 
   @override
@@ -1007,6 +1013,12 @@ class SKo extends S {
 
   @override
   String get contactCard => '[연락처 카드]';
+
+  @override
+  String get fileLabel => '파일';
+
+  @override
+  String get locationLabel => '위치';
 
   @override
   String cardSent(String contact, String friend) {

@@ -392,7 +392,7 @@ class SZh extends S {
 
   @override
   String contactLabel(String userId) {
-    return '联系人';
+    return '联系人: $userId';
   }
 
   @override
@@ -558,6 +558,12 @@ class SZh extends S {
   String n42Id(String id) {
     return 'N42号：$id';
   }
+
+  @override
+  String get n42IdTitle => 'N42号';
+
+  @override
+  String get n42Bean => 'N42豆';
 
   @override
   String get friendInfo => '朋友资料';
@@ -1007,6 +1013,12 @@ class SZh extends S {
 
   @override
   String get contactCard => '[名片]';
+
+  @override
+  String get fileLabel => '文件';
+
+  @override
+  String get locationLabel => '位置';
 
   @override
   String cardSent(String contact, String friend) {

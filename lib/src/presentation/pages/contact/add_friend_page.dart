@@ -311,6 +311,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
             const SizedBox(height: 16),
             Text(
               S.of(context)?.searchUserToChat ?? 'Search user to start chatting',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,

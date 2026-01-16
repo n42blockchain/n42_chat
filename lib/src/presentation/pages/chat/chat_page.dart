@@ -4993,19 +4993,19 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
       case MessageType.text:
         return message.content;
       case MessageType.image:
-        return '[图片]';
+        return S.of(context)?.image ?? '[Image]';
       case MessageType.audio:
-        return '[语音]';
+        return S.of(context)?.voice ?? '[Voice]';
       case MessageType.video:
-        return '[视频]';
+        return S.of(context)?.video ?? '[Video]';
       case MessageType.file:
-        return '[文件] ${message.metadata?.fileName ?? ''}';
+        return '${S.of(context)?.file ?? '[File]'} ${message.metadata?.fileName ?? ''}';
       case MessageType.location:
-        return '[位置] ${message.content}';
+        return '${S.of(context)?.location ?? '[Location]'} ${message.content}';
       case MessageType.music:
-        return '[音乐] ${message.metadata?.musicTitle ?? ''}';
+        return '[Music] ${message.metadata?.musicTitle ?? ''}';
       default:
-        return '[消息]';
+        return S.of(context)?.unknownMessage ?? '[Message]';
     }
   }
 }
@@ -7173,21 +7173,28 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                       // 单选/多选
                       Row(
                         children: [
-                          Text(S.of(context)?.selectionType ?? 'Selection Type'),
-                          const Spacer(),
-                          SegmentedButton<int>(
-                            segments: [
-                              ButtonSegment(value: 1, label: Text(S.of(context)?.singleChoiceLabel ?? 'Single')),
-                              ButtonSegment(value: 0, label: Text(S.of(context)?.multiChoiceLabel ?? 'Multi')),
-                            ],
-                            selected: {_maxSelections},
-                            onSelectionChanged: (value) {
-                              setState(() {
-                                _maxSelections = value.first;
-                              });
-                            },
-                            style: const ButtonStyle(
-                              visualDensity: VisualDensity.compact,
+                          Flexible(
+                            child: Text(
+                              S.of(context)?.selectionType ?? 'Selection Type',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: SegmentedButton<int>(
+                              segments: [
+                                ButtonSegment(value: 1, label: Text(S.of(context)?.singleChoiceLabel ?? 'Single', overflow: TextOverflow.ellipsis)),
+                                ButtonSegment(value: 0, label: Text(S.of(context)?.multiChoiceLabel ?? 'Multi', overflow: TextOverflow.ellipsis)),
+                              ],
+                              selected: {_maxSelections},
+                              onSelectionChanged: (value) {
+                                setState(() {
+                                  _maxSelections = value.first;
+                                });
+                              },
+                              style: const ButtonStyle(
+                                visualDensity: VisualDensity.compact,
+                              ),
                             ),
                           ),
                         ],

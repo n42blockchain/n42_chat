@@ -573,6 +573,12 @@ class SPl extends S {
   }
 
   @override
+  String get n42IdTitle => 'ID N42';
+
+  @override
+  String get n42Bean => 'N42 Bean';
+
+  @override
   String get friendInfo => 'Informacje o znajomym';
 
   @override
@@ -1033,6 +1039,12 @@ class SPl extends S {
 
   @override
   String get contactCard => '[Wizytowka]';
+
+  @override
+  String get fileLabel => 'Plik';
+
+  @override
+  String get locationLabel => 'Lokalizacja';
 
   @override
   String cardSent(String contact, String friend) {

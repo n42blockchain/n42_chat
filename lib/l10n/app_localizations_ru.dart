@@ -569,6 +569,12 @@ class SRu extends S {
   }
 
   @override
+  String get n42IdTitle => 'N42 ID';
+
+  @override
+  String get n42Bean => 'N42 Bean';
+
+  @override
   String get friendInfo => 'Информация о друге';
 
   @override
@@ -1029,6 +1035,12 @@ class SRu extends S {
 
   @override
   String get contactCard => '[Контактная карточка]';
+
+  @override
+  String get fileLabel => 'Файл';
+
+  @override
+  String get locationLabel => 'Местоположение';
 
   @override
   String cardSent(String contact, String friend) {

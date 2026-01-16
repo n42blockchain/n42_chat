@@ -297,6 +297,8 @@
       "id": {"type": "String"}
     }
   },
+  "n42IdTitle": "N42号",
+  "n42Bean": "N42豆",
   "friendInfo": "朋友资料",
   "friendInfoDesc": "添加朋友的备注名、电话、标签、备忘、照片等，并设置朋友权限。",
   "moments": "朋友圈",
@@ -491,6 +493,8 @@
   "addToHome": "添加到桌面",
   "sendingCard": "正在发送名片...",
   "contactCard": "[名片]",
+  "fileLabel": "文件",
+  "locationLabel": "位置",
   "cardSent": "已将 {contact} 的名片推荐给 {friend}",
   "@cardSent": {
     "placeholders": {
@@ -1544,7 +1548,6 @@
   "messages": "消息",
   "noResults": "无结果",
   "searchInChat": "在聊天中搜索",
-  "contactLabel": "联系人",
   "groupLabel": "群聊",
   "conversationLabel": "会话",
   "messageLabel": "消息",

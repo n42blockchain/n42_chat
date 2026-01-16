@@ -560,6 +560,12 @@ class SJa extends S {
   }
 
   @override
+  String get n42IdTitle => 'N42 ID';
+
+  @override
+  String get n42Bean => 'N42ビーン';
+
+  @override
   String get friendInfo => '友達情報';
 
   @override
@@ -1007,6 +1013,12 @@ class SJa extends S {
 
   @override
   String get contactCard => '[連絡先カード]';
+
+  @override
+  String get fileLabel => 'ファイル';
+
+  @override
+  String get locationLabel => '位置情報';
 
   @override
   String cardSent(String contact, String friend) {

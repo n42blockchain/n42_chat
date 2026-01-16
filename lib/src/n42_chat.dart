@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
+import 'core/utils/date_utils.dart';
 import 'domain/entities/user_entity.dart';
 import 'domain/repositories/auth_repository.dart';
 import 'presentation/blocs/auth/auth_bloc.dart';
@@ -110,6 +111,8 @@ class N42Chat {
   static void setLocale(Locale locale) {
     if (_locale != locale) {
       _locale = locale;
+      // 更新日期工具类的本地化
+      N42DateUtils.setLocale(DateLocaleStrings.fromLocaleCode(locale.languageCode));
       // 通知所有监听器
       for (final listener in _localeListeners) {
         listener(locale);

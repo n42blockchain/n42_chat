@@ -167,14 +167,18 @@ class _ChatMainPageState extends State<ChatMainPage> {
       value: value,
       height: 48,
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: textColor, size: 22),
           const SizedBox(width: 14),
-          Text(
-            text,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 16,
+          Flexible(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
