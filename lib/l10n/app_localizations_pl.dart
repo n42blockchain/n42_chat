@@ -3859,4 +3859,14 @@ class SPl extends S {
 
   @override
   String get joiningMeeting => 'Dolaczanie do spotkania...';
+
+  @override
+  String pollVotesFormat(int count, String percentage) {
+    return '$count 票 ($percentage%)';
+  }
+
+  @override
+  String pollParticipantsFormat(int count) {
+    return '$count 人参与';
+  }
 }

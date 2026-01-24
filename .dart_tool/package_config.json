@@ -351,7 +351,7 @@
     },
     {
       "name": "file_picker",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/file_picker-10.3.8",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/file_picker-8.3.7",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -519,9 +519,9 @@
     },
     {
       "name": "flutter_slidable",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_slidable-4.0.3",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_slidable-3.1.2",
       "packageUri": "lib/",
-      "languageVersion": "3.6"
+      "languageVersion": "2.17"
     },
     {
       "name": "flutter_svg",
@@ -987,13 +987,13 @@
     },
     {
       "name": "permission_handler",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler-12.0.1",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler-11.4.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "permission_handler_android",
-      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_android-13.0.1",
+      "rootUri": "file:///C:/Users/10200/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_android-12.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },

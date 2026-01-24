@@ -3856,4 +3856,14 @@ class SRu extends S {
 
   @override
   String get joiningMeeting => 'Присоединение к конференции...';
+
+  @override
+  String pollVotesFormat(int count, String percentage) {
+    return '$count 票 ($percentage%)';
+  }
+
+  @override
+  String pollParticipantsFormat(int count) {
+    return '$count 人参与';
+  }
 }

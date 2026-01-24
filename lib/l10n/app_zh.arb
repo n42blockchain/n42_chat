@@ -1976,5 +1976,18 @@
   "switchCameraLabel": "切换",
   "leaveLabel": "离开",
   "participantsLabel": "参与者",
-  "joiningMeeting": "正在加入会议..."
+  "joiningMeeting": "正在加入会议...",
+  "pollVotesFormat": "{count} 票 ({percentage}%)",
+  "@pollVotesFormat": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "percentage": {"type": "String"}
+    }
+  },
+  "pollParticipantsFormat": "{count} 人参与",
+  "@pollParticipantsFormat": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  }
 }

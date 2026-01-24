@@ -3790,4 +3790,14 @@ class SJa extends S {
 
   @override
   String get joiningMeeting => 'ミーティングに参加中...';
+
+  @override
+  String pollVotesFormat(int count, String percentage) {
+    return '$count 票 ($percentage%)';
+  }
+
+  @override
+  String pollParticipantsFormat(int count) {
+    return '$count 人参与';
+  }
 }

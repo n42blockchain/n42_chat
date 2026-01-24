@@ -3844,4 +3844,14 @@ class SId extends S {
 
   @override
   String get joiningMeeting => 'Bergabung ke meeting...';
+
+  @override
+  String pollVotesFormat(int count, String percentage) {
+    return '$count 票 ($percentage%)';
+  }
+
+  @override
+  String pollParticipantsFormat(int count) {
+    return '$count 人参与';
+  }
 }

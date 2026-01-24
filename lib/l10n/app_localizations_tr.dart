@@ -3843,4 +3843,14 @@ class STr extends S {
 
   @override
   String get joiningMeeting => 'Toplantıya katılınıyor...';
+
+  @override
+  String pollVotesFormat(int count, String percentage) {
+    return '$count 票 ($percentage%)';
+  }
+
+  @override
+  String pollParticipantsFormat(int count) {
+    return '$count 人参与';
+  }
 }

@@ -3826,4 +3826,14 @@ class SEn extends S {
 
   @override
   String get joiningMeeting => 'Joining meeting...';
+
+  @override
+  String pollVotesFormat(int count, String percentage) {
+    return '$count votes ($percentage%)';
+  }
+
+  @override
+  String pollParticipantsFormat(int count) {
+    return '$count participants';
+  }
 }
