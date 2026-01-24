@@ -3850,4 +3850,14 @@ class SIt extends S {
 
   @override
   String get joiningMeeting => 'Entrando nella riunione...';
+
+  @override
+  String pollVotesFormat(int count, String percentage) {
+    return '$count 票 ($percentage%)';
+  }
+
+  @override
+  String pollParticipantsFormat(int count) {
+    return '$count 人参与';
+  }
 }

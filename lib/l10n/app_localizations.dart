@@ -7062,6 +7062,18 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'正在加入会议...'**
   String get joiningMeeting;
+
+  /// No description provided for @pollVotesFormat.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 票 ({percentage}%)'**
+  String pollVotesFormat(int count, String percentage);
+
+  /// No description provided for @pollParticipantsFormat.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 人参与'**
+  String pollParticipantsFormat(int count);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

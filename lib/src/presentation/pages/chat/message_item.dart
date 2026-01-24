@@ -1135,7 +1135,7 @@ class MessageItem extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '$voteCount 票 (${percentage.toStringAsFixed(0)}%)',
+                        S.of(context)?.pollVotesFormat(voteCount, percentage.toStringAsFixed(0)) ?? '$voteCount votes (${percentage.toStringAsFixed(0)}%)',
                         style: TextStyle(
                           fontSize: 11,
                           color: AppColors.textSecondary,
@@ -1154,7 +1154,7 @@ class MessageItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '$totalVoters 人参与',
+                S.of(context)?.pollParticipantsFormat(totalVoters) ?? '$totalVoters participants',
                 style: TextStyle(
                   fontSize: 11,
                   color: AppColors.textSecondary,

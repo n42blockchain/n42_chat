@@ -138,7 +138,8 @@ class ContactRepositoryImpl implements IContactRepository {
     final requests = <FriendRequest>[];
 
     for (final room in invites) {
-      final inviter = room.getState(matrix.EventTypes.RoomMember)?.senderId;
+      // Use directChatMatrixID to get the inviter's ID for direct chat rooms
+      final inviter = room.directChatMatrixID;
       final user = inviter != null
           ? room.unsafeGetUserFromMemoryOrFallback(inviter)
           : null;

@@ -3871,4 +3871,14 @@ class SEs extends S {
 
   @override
   String get joiningMeeting => 'Uniendose a la reunion...';
+
+  @override
+  String pollVotesFormat(int count, String percentage) {
+    return '$count 票 ($percentage%)';
+  }
+
+  @override
+  String pollParticipantsFormat(int count) {
+    return '$count 人参与';
+  }
 }

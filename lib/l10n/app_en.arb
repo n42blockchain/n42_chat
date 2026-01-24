@@ -1647,5 +1647,18 @@
   "switchCameraLabel": "Switch",
   "leaveLabel": "Leave",
   "participantsLabel": "Participants",
-  "joiningMeeting": "Joining meeting..."
+  "joiningMeeting": "Joining meeting...",
+  "pollVotesFormat": "{count} votes ({percentage}%)",
+  "@pollVotesFormat": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "percentage": {"type": "String"}
+    }
+  },
+  "pollParticipantsFormat": "{count} participants",
+  "@pollParticipantsFormat": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  }
 }

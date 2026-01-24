@@ -5512,7 +5512,7 @@ class _ContactCardSelectSheetState extends State<_ContactCardSelectSheet> {
             child: Row(
               children: [
                 Text(
-                  '选择联系人',
+                  S.of(context)?.selectContact ?? 'Select Contact',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -5535,7 +5535,7 @@ class _ContactCardSelectSheetState extends State<_ContactCardSelectSheet> {
             padding: const EdgeInsets.all(12),
             child: TextField(
               decoration: InputDecoration(
-                hintText: '搜索联系人',
+                hintText: S.of(context)?.searchContactHint ?? 'Search contacts',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: widget.isDark 
@@ -5560,7 +5560,7 @@ class _ContactCardSelectSheetState extends State<_ContactCardSelectSheet> {
                 : _filteredContacts.isEmpty
                     ? Center(
                         child: Text(
-                          '没有找到联系人',
+                          S.of(context)?.noContactsFound ?? 'No contacts found',
                           style: TextStyle(
                             color: widget.isDark ? Colors.white54 : Colors.black54,
                           ),
@@ -5721,7 +5721,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
     // 验证链接格式
     if (!link.startsWith('http://') && !link.startsWith('https://')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入有效的网络链接')),
+        SnackBar(content: Text(S.of(context)?.pleaseEnterValidLink ?? 'Please enter a valid URL')),
       );
       return;
     }
@@ -5757,7 +5757,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
             child: Row(
               children: [
                 Text(
-                  '分享音乐',
+                  S.of(context)?.shareMusic ?? 'Share Music',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -5780,10 +5780,10 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildTab(0, '最近播放', Icons.history),
-                _buildTab(1, '我喜欢', Icons.favorite),
-                _buildTab(2, '网络链接', Icons.link),
-                _buildTab(3, '本地文件', Icons.folder),
+                _buildTab(0, S.of(context)?.recentPlayed ?? 'Recent', Icons.history),
+                _buildTab(1, S.of(context)?.myFavorites ?? 'Favorites', Icons.favorite),
+                _buildTab(2, S.of(context)?.networkLink ?? 'Link', Icons.link),
+                _buildTab(3, S.of(context)?.localFile ?? 'Local', Icons.folder),
               ],
             ),
           ),
@@ -5858,7 +5858,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
           padding: const EdgeInsets.all(12),
           child: TextField(
             decoration: InputDecoration(
-              hintText: '搜索歌曲或歌手',
+              hintText: S.of(context)?.searchSongOrArtist ?? 'Search song or artist',
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: widget.isDark 
@@ -5881,7 +5881,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
           child: _currentSongs.isEmpty
               ? Center(
                   child: Text(
-                    '没有找到歌曲',
+                    S.of(context)?.noSongsFound ?? 'No songs found',
                     style: TextStyle(
                       color: widget.isDark ? Colors.white54 : Colors.black54,
                     ),
@@ -6031,7 +6031,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('分享音乐', style: TextStyle(fontSize: 16)),
+              child: Text(S.of(context)?.shareMusicButton ?? 'Share Music', style: const TextStyle(fontSize: 16)),
             ),
           ),
         ],
@@ -6064,7 +6064,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
             ),
             const SizedBox(height: 24),
             Text(
-              '选择本地音频文件',
+              S.of(context)?.selectLocalAudio ?? 'Select Local Audio File',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -6073,7 +6073,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
             ),
             const SizedBox(height: 8),
             Text(
-              '支持 MP3、M4A、WAV、FLAC 等格式',
+              S.of(context)?.supportedAudioFormats ?? 'Supports MP3, M4A, WAV, FLAC, etc.',
               style: TextStyle(
                 fontSize: 14,
                 color: subtextColor,
@@ -6083,7 +6083,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
             ElevatedButton.icon(
               onPressed: _pickLocalAudio,
               icon: const Icon(Icons.folder_open),
-              label: const Text('选择文件'),
+              label: Text(S.of(context)?.selectFileButton ?? 'Select File'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -6430,7 +6430,7 @@ class _MultiForwardSheetState extends State<_MultiForwardSheet> {
               onChanged: _filterConversations,
               style: TextStyle(color: textColor),
               decoration: InputDecoration(
-                hintText: '搜索联系人或群聊',
+                hintText: S.of(context)?.searchContactsOrGroups ?? 'Search contacts or groups',
                 hintStyle: TextStyle(color: subtextColor),
                 prefixIcon: Icon(Icons.search, color: subtextColor),
                 filled: true,

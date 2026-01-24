@@ -3790,4 +3790,14 @@ class SKo extends S {
 
   @override
   String get joiningMeeting => '회의 참여 중...';
+
+  @override
+  String pollVotesFormat(int count, String percentage) {
+    return '$count 票 ($percentage%)';
+  }
+
+  @override
+  String pollParticipantsFormat(int count) {
+    return '$count 人参与';
+  }
 }
