@@ -13,47 +13,159 @@ import 'package:flutter/foundation.dart';
 
 import 'voip_config.dart';
 
-// 存根类型定义
-class Room {
-  Future<void> connect(String url, String token, {dynamic roomOptions, dynamic fastConnectOptions}) async {}
-  Future<void> disconnect() async {}
-  void addListener(void Function() listener) {}
-  void removeListener(void Function() listener) {}
-}
+// 存根类型定义 - 由于 livekit_client 与其他依赖冲突，使用存根实现
+// 这些类模拟 livekit_client API，但不提供实际功能
 
-class LocalParticipant {
-  String get identity => '';
-  String? get name => null;
-  Future<void> setMicrophoneEnabled(bool enabled) async {}
-  Future<void> setCameraEnabled(bool enabled) async {}
-  Future<void> setScreenShareEnabled(bool enabled, {dynamic captureScreenAudio}) async {}
-  List<dynamic> get audioTrackPublications => [];
-  List<dynamic> get videoTrackPublications => [];
-}
+/// 轨道来源
+class TrackSource {
+  static const camera = TrackSource._('camera');
+  static const microphone = TrackSource._('microphone');
+  static const screenShareVideo = TrackSource._('screenShareVideo');
+  static const screenShareAudio = TrackSource._('screenShareAudio');
 
-class RemoteParticipant {
-  String get identity => '';
-  String? get name => null;
-  List<dynamic> get audioTrackPublications => [];
-  List<dynamic> get videoTrackPublications => [];
-}
-
-class ConnectionState {
-  static const connected = ConnectionState._('connected');
-  static const disconnected = ConnectionState._('disconnected');
-  static const reconnecting = ConnectionState._('reconnecting');
-  
   final String _value;
-  const ConnectionState._(this._value);
-  
+  const TrackSource._(this._value);
+
   @override
   String toString() => _value;
 }
 
+/// 视频轨道
+class VideoTrack {
+  final String sid;
+  VideoTrack({this.sid = ''});
+}
+
+/// 本地视频轨道
+class LocalVideoTrack extends VideoTrack {
+  CameraCaptureOptions? currentOptions;
+
+  LocalVideoTrack({super.sid, this.currentOptions});
+
+  Future<void> setCameraPosition(CameraPosition position) async {}
+}
+
+/// 音频轨道
+class AudioTrack {
+  final String sid;
+  AudioTrack({this.sid = ''});
+}
+
+/// 轨道发布信息
+class TrackPublication {
+  final TrackSource source;
+  final dynamic track;
+
+  TrackPublication({required this.source, this.track});
+}
+
+/// 房间选项
+class RoomOptions {
+  final bool adaptiveStream;
+  final bool dynacast;
+  final AudioPublishOptions? defaultAudioPublishOptions;
+  final VideoPublishOptions? defaultVideoPublishOptions;
+  final ScreenShareCaptureOptions? defaultScreenShareCaptureOptions;
+
+  const RoomOptions({
+    this.adaptiveStream = true,
+    this.dynacast = true,
+    this.defaultAudioPublishOptions,
+    this.defaultVideoPublishOptions,
+    this.defaultScreenShareCaptureOptions,
+  });
+}
+
+/// 音频发布选项
+class AudioPublishOptions {
+  final int audioBitrate;
+
+  const AudioPublishOptions({this.audioBitrate = 128000});
+}
+
+/// 视频发布选项
+class VideoPublishOptions {
+  final bool simulcast;
+
+  const VideoPublishOptions({this.simulcast = true});
+}
+
+/// 屏幕共享捕获选项
+class ScreenShareCaptureOptions {
+  final bool useiOSBroadcastExtension;
+  final double maxFrameRate;
+
+  const ScreenShareCaptureOptions({
+    this.useiOSBroadcastExtension = true,
+    this.maxFrameRate = 15.0,
+  });
+}
+
+/// 摄像头捕获选项
+class CameraCaptureOptions {
+  final CameraPosition cameraPosition;
+
+  const CameraCaptureOptions({this.cameraPosition = CameraPosition.front});
+}
+
+/// 房间
+class Room {
+  LocalParticipant? localParticipant;
+  String? name;
+  Map<String, RemoteParticipant> remoteParticipants = {};
+
+  Future<void> connect(String url, String token, {RoomOptions? roomOptions, dynamic fastConnectOptions}) async {
+    // 存根实现
+    localParticipant = LocalParticipant();
+  }
+  Future<void> disconnect() async {}
+  void dispose() {}
+  void addListener(void Function() listener) {}
+  void removeListener(void Function() listener) {}
+}
+
+/// 本地参与者
+class LocalParticipant {
+  String get identity => 'local';
+  String? get name => null;
+  Future<void> setMicrophoneEnabled(bool enabled) async {}
+  Future<void> setCameraEnabled(bool enabled) async {}
+  Future<void> setScreenShareEnabled(bool enabled, {dynamic captureScreenAudio}) async {}
+  List<TrackPublication> get audioTrackPublications => [];
+  List<TrackPublication> get videoTrackPublications => [];
+}
+
+/// 远程参与者
+class RemoteParticipant {
+  String get identity => '';
+  String? get name => null;
+  String? get metadata => null;
+  List<TrackPublication> get audioTrackPublications => [];
+  List<TrackPublication> get videoTrackPublications => [];
+
+  bool isMicrophoneEnabled() => false;
+  bool isCameraEnabled() => false;
+  bool isScreenShareEnabled() => false;
+}
+
+/// 连接状态
+class ConnectionState {
+  static const connected = ConnectionState._('connected');
+  static const disconnected = ConnectionState._('disconnected');
+  static const reconnecting = ConnectionState._('reconnecting');
+
+  final String _value;
+  const ConnectionState._(this._value);
+
+  @override
+  String toString() => _value;
+}
+
+/// 摄像头位置
 class CameraPosition {
   static const front = CameraPosition._('front');
   static const back = CameraPosition._('back');
-  
+
   final String _value;
   const CameraPosition._(this._value);
 }

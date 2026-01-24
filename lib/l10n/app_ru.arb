@@ -115,8 +115,8 @@
   "releaseToSend": "Отпустите для отправки, смахните вверх для отмены",
   "holdToTalk": "Удерживайте для записи",
   "send": "Отправить",
-  "conversationLabel": "Разговор: {roomId}",
-  "contactLabel": "Контакт: {userId}",
+  "conversationWithId": "Разговор: {roomId}",
+  "contactWithId": "Контакт: {userId}",
   "addFriend": "Добавить друга",
   "chatServiceNotConnected": "Служба чата не подключена",
   "userNotFoundHint": "Пользователь \"{query}\" не найден\n\nПодсказки:\n• Попробуйте ввести полный ID пользователя, например @username:server.com\n• Проверьте правильность написания имени",
@@ -380,6 +380,7 @@
   "noResults": "Нет результатов",
   "groupInfo": "Информация о группе",
   "groupMembers": "Участники ({count})",
+  "groupMembersTitle": "Участники группы",
   "viewAll": "Показать все",
   "owner": "Владелец",
   "admin": "Администратор",
@@ -682,7 +683,12 @@
       "ringtone": {"type": "String"}
     }
   },
-  "confirmDissolveGroup": "Вы уверены, что хотите распустить",
+  "confirmDissolveGroup": "Вы уверены, что хотите расформировать «{name}»? Это действие нельзя отменить.",
+  "@confirmDissolveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "enterValidServerAddress": "Пожалуйста, введите действительный адрес сервера",
   "emailOtp": "Код подтверждения по email",
   "enterServerAddressFirst": "Сначала введите адрес сервера",
@@ -738,9 +744,19 @@
     }
   },
   "groupInvites": "Приглашения в группы",
-  "myGroups": "Мои группы",
+  "myGroups": "Мои группы ({count})",
+  "@myGroups": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "invitedToJoinGroup": "Приглашён в группу",
-  "confirmLeaveGroup": "Вы уверены, что хотите покинуть",
+  "confirmLeaveGroup": "Вы уверены, что хотите покинуть «{name}»?",
+  "@confirmLeaveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "leave": "Покинуть",
   "saveMedia": "Сохранить",
   "recallThisMessage": "Отозвать это сообщение?",
@@ -750,9 +766,19 @@
   "saving": "Сохранение...",
   "share": "Поделиться",
   "saveToGallery": "Сохранить в галерею",
-  "downloadFailed": "Ошибка загрузки",
+  "downloadFailed": "Ошибка загрузки: {code}",
+  "@downloadFailed": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
   "noMediaUrl": "URL медиа недоступен",
-  "shareFailed": "Ошибка отправки",
+  "shareFailed": "Ошибка при отправке: {error}",
+  "@shareFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "failedToLoadImage": "Не удалось загрузить изображение",
   "failedToLoadMoreMessages": "Не удалось загрузить больше сообщений",
   "failedToSend": "Не удалось отправить",
@@ -1154,6 +1180,7 @@
   "allResults": "Все",
   "searchInChat": "Поиск в чате",
   "groupLabel": "Группа",
+  "contactLabel": "Контакт",
   "messageLabel": "Сообщение",
 
   "securityTitle": "Безопасность",
@@ -1543,5 +1570,100 @@
   "switchCameraLabel": "Переключить",
   "leaveLabel": "Покинуть",
   "participantsLabel": "Участники",
-  "joiningMeeting": "Присоединение к конференции..."
+  "joiningMeeting": "Присоединение к конференции...",
+  "pollVotesFormat": "{count} голосов ({percentage}%)",
+  "@pollVotesFormat": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "percentage": {"type": "String"}
+    }
+  },
+  "pollParticipantsFormat": "{count} участников",
+  "@pollParticipantsFormat": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "incomingVideoCall": "Входящий видеозвонок",
+  "incomingVoiceCall": "Входящий голосовой звонок",
+  "videoCallInProgress": "Видеозвонок",
+  "voiceCallInProgress": "Голосовой звонок",
+  "reconnectingCall": "Переподключение...",
+  "callEnded": "Звонок завершён",
+  "callFailed": "Звонок не удался",
+  "noMediaUrlAvailable": "URL медиа недоступен",
+  "errorWithMessage": "Ошибка: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+  "musicLinkLabel": "Ссылка на музыку",
+  "redPacketTransferCannotForward": "Красные конверты и переводы нельзя пересылать",
+  "messageNotifications": "Уведомления о сообщениях",
+  "receiveNewMessageNotifications": "Получать уведомления о новых сообщениях",
+  "showMessagePreview": "Показывать предпросмотр сообщения",
+  "showMessageContentInNotification": "Показывать содержимое сообщения в уведомлениях",
+  "vibration": "Вибрация",
+  "doNotDisturbMode": "Не беспокоить",
+  "doNotDisturbDescription": "Не получать уведомления в указанное время",
+  "messagesLabel": "Сообщения",
+  "allowStrangerMessages": "Разрешить сообщения от незнакомцев",
+  "receiveMessagesFromNonContacts": "Получать сообщения от тех, кого нет в контактах",
+  "letOthersKnowYouRead": "Показывать, что вы прочитали сообщения",
+  "typingIndicator": "Индикатор набора",
+  "letOthersKnowYouTyping": "Показывать, что вы печатаете",
+  "whoCanSeeTitle": "Кто может видеть {title}",
+  "@whoCanSeeTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "versionInfo": "Версия {version}",
+  "@versionInfo": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "checkForUpdates": "Проверить обновления",
+  "feedbackAndSuggestions": "Отзывы и предложения",
+  "darkMode": "Тёмный режим",
+  "fontSize": "Размер шрифта",
+  "bubbleStyle": "Стиль пузырей",
+  "followSystem": "Следовать системе",
+  "autoSwitchBySystem": "Автоматически переключаться по настройкам системы",
+  "lightMode": "Светлый режим",
+  "alwaysUseLightTheme": "Всегда использовать светлую тему",
+  "darkModeOption": "Тёмный режим",
+  "alwaysUseDarkTheme": "Всегда использовать тёмную тему",
+  "fontSizeSmall": "Маленький",
+  "fontSizeStandard": "Стандартный",
+  "fontSizeLarge": "Большой",
+  "fontSizeExtraLarge": "Очень большой",
+  "bubbleStyleWechat": "Стиль WeChat",
+  "bubbleStyleWechatDesc": "Классический стиль пузырей WeChat",
+  "bubbleStyleModern": "Современный стиль",
+  "bubbleStyleModernDesc": "Чистый современный стиль пузырей",
+  "bubbleStyleClassic": "Классический стиль",
+  "bubbleStyleClassicDesc": "Традиционный стиль пузырей",
+  "allButton": "Все",
+  "tapToRetry": "Нажмите, чтобы повторить",
+  "noConversationsToForward": "Нет бесед для пересылки",
+  "defaultRedPacketGreeting": "Желаю процветания и удачи",
+  "emojiCategoryFace": "Смайлики",
+  "emojiCategoryHeart": "Сердечки",
+  "emojiCategoryAnimal": "Животные",
+  "emojiCategoryFood": "Еда",
+  "emojiCategoryTransport": "Транспорт",
+  "emojiCategoryActivity": "Активности",
+  "emojiCategoryObject": "Предметы",
+  "emojiCategorySymbol": "Символы",
+  "allowOthersToSearchAndJoin": "Разрешить другим пользователям искать и присоединяться",
+  "confirmClearChatHistory": "Вы уверены, что хотите очистить историю чата?",
+  "createGroupToChat": "Создайте группу, чтобы начать общение",
+  "editGroupAnnouncement": "Редактировать объявление группы",
+  "editGroupDescription": "Редактировать описание группы",
+  "enterGroupAnnouncement": "Введите объявление группы",
+  "memberCountClickToCopy": "{count} участников, нажмите для копирования ID группы",
+  "noPermissionToEditGroupName": "У вас нет прав для изменения названия группы"
 }

@@ -386,12 +386,12 @@ class SKo extends S {
   String get send => '전송';
 
   @override
-  String conversationLabel(String roomId) {
+  String conversationWithId(String roomId) {
     return '대화: $roomId';
   }
 
   @override
-  String contactLabel(String userId) {
+  String contactWithId(String userId) {
     return '연락처: $userId';
   }
 
@@ -1190,6 +1190,9 @@ class SKo extends S {
   }
 
   @override
+  String get groupMembersTitle => '그룹 멤버';
+
+  @override
   String get viewAll => '모두 보기';
 
   @override
@@ -1283,11 +1286,6 @@ class SKo extends S {
   @override
   String tapCopyGroupId(int count) {
     return '멤버 $count명 · 탭하여 그룹 ID 복사';
-  }
-
-  @override
-  String featureInDevelopment(Object feature) {
-    return '기능 개발 중...';
   }
 
   @override
@@ -1939,6 +1937,11 @@ class SKo extends S {
   String get inCall => '통화 중';
 
   @override
+  String featureInDevelopment(String feature) {
+    return '기능 개발 중...';
+  }
+
+  @override
   String collectMessages(Object count) {
     return '$count개 메시지 수집됨';
   }
@@ -2099,7 +2102,9 @@ class SKo extends S {
   }
 
   @override
-  String get confirmDissolveGroup => '정말 해체하시겠습니까';
+  String confirmDissolveGroup(String name) {
+    return '\"$name\"을(를) 해산하시겠습니까? 이 작업은 취소할 수 없습니다.';
+  }
 
   @override
   String get enterValidServerAddress => '올바른 서버 주소를 입력해주세요';
@@ -2186,13 +2191,17 @@ class SKo extends S {
   String get groupInvites => '그룹 초대';
 
   @override
-  String get myGroups => '내 그룹';
+  String myGroups(int count) {
+    return '내 그룹 ($count)';
+  }
 
   @override
   String get invitedToJoinGroup => '그룹 참여 초대됨';
 
   @override
-  String get confirmLeaveGroup => '정말 나가시겠습니까';
+  String confirmLeaveGroup(String name) {
+    return '\"$name\"에서 나가시겠습니까?';
+  }
 
   @override
   String get leave => '나가기';
@@ -2222,13 +2231,17 @@ class SKo extends S {
   String get saveToGallery => '갤러리에 저장';
 
   @override
-  String get downloadFailed => '다운로드 실패';
+  String downloadFailed(String code) {
+    return '다운로드 실패: $code';
+  }
 
   @override
   String get noMediaUrl => '사용 가능한 미디어 URL이 없습니다';
 
   @override
-  String get shareFailed => '공유 실패';
+  String shareFailed(String error) {
+    return '공유 실패: $error';
+  }
 
   @override
   String get failedToLoadImage => '이미지 로드 실패';
@@ -3161,7 +3174,13 @@ class SKo extends S {
   String get searchInChat => '채팅에서 검색';
 
   @override
+  String get contactLabel => '연락처';
+
+  @override
   String get groupLabel => '그룹';
+
+  @override
+  String get conversationLabel => '会话';
 
   @override
   String get messageLabel => '메시지';
@@ -3793,11 +3812,217 @@ class SKo extends S {
 
   @override
   String pollVotesFormat(int count, String percentage) {
-    return '$count 票 ($percentage%)';
+    return '$count표 ($percentage%)';
   }
 
   @override
   String pollParticipantsFormat(int count) {
-    return '$count 人参与';
+    return '$count명 참여';
+  }
+
+  @override
+  String get tapToRetry => '탭하여 다시 시도';
+
+  @override
+  String get noConversationsToForward => '전달할 대화가 없습니다';
+
+  @override
+  String get defaultRedPacketGreeting => '부자 되세요, 행운을 빕니다';
+
+  @override
+  String get emojiCategoryFace => '이모티콘';
+
+  @override
+  String get emojiCategoryHeart => '하트';
+
+  @override
+  String get emojiCategoryAnimal => '동물';
+
+  @override
+  String get emojiCategoryFood => '음식';
+
+  @override
+  String get emojiCategoryTransport => '교통';
+
+  @override
+  String get emojiCategoryActivity => '활동';
+
+  @override
+  String get emojiCategoryObject => '사물';
+
+  @override
+  String get emojiCategorySymbol => '기호';
+
+  @override
+  String get allowOthersToSearchAndJoin => '다른 사용자가 검색하고 참여하도록 허용';
+
+  @override
+  String get allowStrangerMessages => '모르는 사람의 메시지 허용';
+
+  @override
+  String get alwaysUseDarkTheme => '항상 어두운 테마 사용';
+
+  @override
+  String get alwaysUseLightTheme => '항상 밝은 테마 사용';
+
+  @override
+  String get autoSwitchBySystem => '시스템 설정에 따라 자동 전환';
+
+  @override
+  String get bubbleStyle => '말풍선 스타일';
+
+  @override
+  String get bubbleStyleClassic => '클래식 스타일';
+
+  @override
+  String get bubbleStyleClassicDesc => '전통적인 말풍선 스타일';
+
+  @override
+  String get bubbleStyleModern => '모던 스타일';
+
+  @override
+  String get bubbleStyleModernDesc => '깔끔한 모던 말풍선 스타일';
+
+  @override
+  String get bubbleStyleWechat => 'WeChat 스타일';
+
+  @override
+  String get bubbleStyleWechatDesc => '클래식 WeChat 말풍선 스타일';
+
+  @override
+  String get callEnded => '통화 종료';
+
+  @override
+  String get callFailed => '통화 실패';
+
+  @override
+  String get checkForUpdates => '업데이트 확인';
+
+  @override
+  String get confirmClearChatHistory => '채팅 기록을 정말 삭제하시겠습니까?';
+
+  @override
+  String get createGroupToChat => '그룹을 만들어 채팅을 시작하세요';
+
+  @override
+  String get darkMode => '다크 모드';
+
+  @override
+  String get darkModeOption => '다크 모드';
+
+  @override
+  String get doNotDisturbDescription => '지정된 시간 동안 알림을 받지 않습니다';
+
+  @override
+  String get doNotDisturbMode => '방해 금지';
+
+  @override
+  String get editGroupAnnouncement => '그룹 공지 수정';
+
+  @override
+  String get editGroupDescription => '그룹 설명 수정';
+
+  @override
+  String get enterGroupAnnouncement => '그룹 공지를 입력하세요';
+
+  @override
+  String errorWithMessage(String message) {
+    return '오류: $message';
+  }
+
+  @override
+  String get feedbackAndSuggestions => '피드백 및 제안';
+
+  @override
+  String get followSystem => '시스템 설정 따르기';
+
+  @override
+  String get fontSize => '글꼴 크기';
+
+  @override
+  String get fontSizeExtraLarge => '매우 크게';
+
+  @override
+  String get fontSizeLarge => '크게';
+
+  @override
+  String get fontSizeSmall => '작게';
+
+  @override
+  String get fontSizeStandard => '표준';
+
+  @override
+  String get incomingVideoCall => '영상 통화 수신';
+
+  @override
+  String get incomingVoiceCall => '음성 통화 수신';
+
+  @override
+  String get letOthersKnowYouRead => '읽음 확인 보내기';
+
+  @override
+  String get letOthersKnowYouTyping => '입력 중임을 상대방에게 알리기';
+
+  @override
+  String get lightMode => '라이트 모드';
+
+  @override
+  String memberCountClickToCopy(int count) {
+    return '$count명, 클릭하여 그룹 ID 복사';
+  }
+
+  @override
+  String get messageNotifications => '메시지 알림';
+
+  @override
+  String get messagesLabel => '메시지';
+
+  @override
+  String get musicLinkLabel => '음악 링크';
+
+  @override
+  String get noMediaUrlAvailable => '미디어 URL을 사용할 수 없습니다';
+
+  @override
+  String get noPermissionToEditGroupName => '그룹 이름을 수정할 권한이 없습니다';
+
+  @override
+  String get receiveMessagesFromNonContacts => '연락처에 없는 사람의 메시지 받기';
+
+  @override
+  String get receiveNewMessageNotifications => '새 메시지 알림 받기';
+
+  @override
+  String get reconnectingCall => '재연결 중...';
+
+  @override
+  String get redPacketTransferCannotForward => '홍바오와 송금은 전달할 수 없습니다';
+
+  @override
+  String get showMessageContentInNotification => '알림에 메시지 내용 표시';
+
+  @override
+  String get showMessagePreview => '메시지 미리보기 표시';
+
+  @override
+  String get typingIndicator => '입력 중 표시';
+
+  @override
+  String versionInfo(String version) {
+    return '버전 $version';
+  }
+
+  @override
+  String get vibration => '진동';
+
+  @override
+  String get videoCallInProgress => '영상 통화 중';
+
+  @override
+  String get voiceCallInProgress => '음성 통화 중';
+
+  @override
+  String whoCanSeeTitle(String title) {
+    return '$title을(를) 볼 수 있는 사람';
   }
 }

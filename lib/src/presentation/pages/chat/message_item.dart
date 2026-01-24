@@ -227,19 +227,19 @@ class MessageItem extends StatelessWidget {
         content = _buildVoiceMessage();
         break;
       case MessageType.video:
-        content = _buildVideoMessage();
+        content = _buildVideoMessage(context);
         break;
       case MessageType.file:
         content = _buildFileMessage(isDark);
         break;
       case MessageType.location:
-        content = _buildLocationMessage(isDark);
+        content = _buildLocationMessage(isDark, context);
         break;
       case MessageType.transfer:
         content = _buildTransferMessage();
         break;
       case MessageType.redPacket:
-        content = _buildRedPacketMessage();
+        content = _buildRedPacketMessage(context);
         break;
       case MessageType.poll:
         content = _buildPollMessage(isDark, context);
@@ -585,7 +585,7 @@ class MessageItem extends StatelessWidget {
     return '[Speech-to-text requires API configuration]';
   }
 
-  Widget _buildVideoMessage() {
+  Widget _buildVideoMessage(BuildContext context) {
     final metadata = message.metadata;
     final thumbnailUrl = metadata?.thumbnailUrl;
     final durationMs = metadata?.duration;
@@ -629,7 +629,7 @@ class MessageItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '视频',
+                      S.of(context)?.videoTitle ?? 'Video',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.6),
                         fontSize: 14,
@@ -770,7 +770,7 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationMessage(bool isDark) {
+  Widget _buildLocationMessage(bool isDark, BuildContext context) {
     final metadata = message.metadata;
     final latitude = metadata?.latitude;
     final longitude = metadata?.longitude;
@@ -797,7 +797,7 @@ class MessageItem extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            message.content.isNotEmpty ? message.content : '位置',
+            message.content.isNotEmpty ? message.content : (S.of(context)?.locationTitle ?? 'Location'),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -853,7 +853,7 @@ class MessageItem extends StatelessWidget {
     );
   }
   
-  Widget _buildRedPacketMessage() {
+  Widget _buildRedPacketMessage(BuildContext context) {
     final metadata = message.metadata;
     final status = metadata?.transferStatus ?? 'pending';
     
@@ -873,7 +873,7 @@ class MessageItem extends StatelessWidget {
     }
     
     return RedPacketMessageWidget(
-      note: message.content.isNotEmpty ? message.content : '恭喜发财，大吉大利',
+      note: message.content.isNotEmpty ? message.content : (S.of(context)?.defaultRedPacketGreeting ?? 'Best wishes'),
       status: redPacketStatus,
       isSelf: message.isFromMe,
       onTap: () => onRedPacketTap?.call(message),

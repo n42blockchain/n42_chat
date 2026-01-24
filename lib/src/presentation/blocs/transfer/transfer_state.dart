@@ -59,7 +59,7 @@ class WalletInfoLoaded extends TransferState {
 class TransferProcessing extends TransferState {
   final String message;
 
-  const TransferProcessing([this.message = '处理中...']);
+  const TransferProcessing([this.message = 'Processing...']);
 
   @override
   List<Object?> get props => [message];

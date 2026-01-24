@@ -196,14 +196,14 @@
   "releaseToSend": "松开发送，上滑取消",
   "holdToTalk": "按住 说话",
   "send": "发送",
-  "conversationLabel": "会话: {roomId}",
-  "@conversationLabel": {
+  "conversationWithId": "会话: {roomId}",
+  "@conversationWithId": {
     "placeholders": {
       "roomId": {"type": "String"}
     }
   },
-  "contactLabel": "联系人: {userId}",
-  "@contactLabel": {
+  "contactWithId": "联系人: {userId}",
+  "@contactWithId": {
     "placeholders": {
       "userId": {"type": "String"}
     }
@@ -613,6 +613,7 @@
       "count": {"type": "int"}
     }
   },
+  "groupMembersTitle": "群成员",
   "viewAll": "查看全部",
   "owner": "群主",
   "admin": "管理",
@@ -658,7 +659,6 @@
       "count": {"type": "int"}
     }
   },
-  "featureInDevelopment": "功能开发中...",
   "receiverAddress": "收款地址",
   "enterOrPasteAddress": "输入或粘贴钱包地址",
   "selectToken": "选择代币",
@@ -940,6 +940,11 @@
   "ringing": "响铃中...",
   "inCall": "通话中",
   "featureInDevelopment": "{feature}功能开发中...",
+  "@featureInDevelopment": {
+    "placeholders": {
+      "feature": {"type": "String"}
+    }
+  },
   "collectMessages": "已收藏 {count} 条消息",
   "voted": "已投票",
   "voteChanged": "已更改投票",
@@ -1019,7 +1024,12 @@
       "ringtone": {"type": "String"}
     }
   },
-  "confirmDissolveGroup": "确定要解散群聊",
+  "confirmDissolveGroup": "确定要解散群聊「{name}」吗？此操作无法撤销。",
+  "@confirmDissolveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "enterValidServerAddress": "请输入有效的服务器地址",
   "emailOtp": "邮箱验证码",
   "enterServerAddressFirst": "请先输入服务器地址",
@@ -1075,9 +1085,19 @@
     }
   },
   "groupInvites": "群邀请",
-  "myGroups": "我的群聊",
+  "myGroups": "我的群聊 ({count})",
+  "@myGroups": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "invitedToJoinGroup": "邀请加入群聊",
-  "confirmLeaveGroup": "确定要退出",
+  "confirmLeaveGroup": "确定要退出群聊「{name}」吗？",
+  "@confirmLeaveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "leave": "退出",
   "copy": "复制",
   "forward": "转发",
@@ -1100,9 +1120,19 @@
   "saving": "保存中...",
   "share": "分享",
   "saveToGallery": "保存到相册",
-  "downloadFailed": "下载失败",
+  "downloadFailed": "下载失败: {code}",
+  "@downloadFailed": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
   "noMediaUrl": "没有可用的媒体链接",
-  "shareFailed": "分享失败",
+  "shareFailed": "分享失败: {error}",
+  "@shareFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "failedToLoadImage": "图片加载失败",
   "failedToLoadMoreMessages": "加载更多消息失败",
   "failedToSend": "发送失败",
@@ -1548,6 +1578,7 @@
   "messages": "消息",
   "noResults": "无结果",
   "searchInChat": "在聊天中搜索",
+  "contactLabel": "联系人",
   "groupLabel": "群聊",
   "conversationLabel": "会话",
   "messageLabel": "消息",
@@ -1988,6 +2019,92 @@
   "@pollParticipantsFormat": {
     "placeholders": {
       "count": {"type": "int"}
+    }
+  },
+  "tapToRetry": "点击重试",
+  "noConversationsToForward": "没有可转发的会话",
+  "defaultRedPacketGreeting": "恭喜发财，大吉大利",
+  "emojiCategoryFace": "表情",
+  "emojiCategoryHeart": "爱心",
+  "emojiCategoryAnimal": "动物",
+  "emojiCategoryFood": "食物",
+  "emojiCategoryTransport": "交通",
+  "emojiCategoryActivity": "活动",
+  "emojiCategoryObject": "物品",
+  "emojiCategorySymbol": "符号",
+  "allowOthersToSearchAndJoin": "允许他人搜索并加入",
+  "allowStrangerMessages": "允许陌生人消息",
+  "alwaysUseDarkTheme": "始终使用深色主题",
+  "alwaysUseLightTheme": "始终使用浅色主题",
+  "autoSwitchBySystem": "跟随系统自动切换",
+  "bubbleStyle": "气泡样式",
+  "bubbleStyleClassic": "经典样式",
+  "bubbleStyleClassicDesc": "传统的气泡样式",
+  "bubbleStyleModern": "现代样式",
+  "bubbleStyleModernDesc": "简洁的现代气泡样式",
+  "bubbleStyleWechat": "微信样式",
+  "bubbleStyleWechatDesc": "经典微信气泡样式",
+  "callEnded": "通话已结束",
+  "callFailed": "通话失败",
+  "checkForUpdates": "检查更新",
+  "confirmClearChatHistory": "确定要清空聊天记录吗？",
+  "createGroupToChat": "创建群聊以开始聊天",
+  "darkMode": "深色模式",
+  "darkModeOption": "深色模式选项",
+  "doNotDisturbDescription": "在指定时间内不接收通知",
+  "doNotDisturbMode": "勿扰模式",
+  "editGroupAnnouncement": "编辑群公告",
+  "editGroupDescription": "编辑群描述",
+  "enterGroupAnnouncement": "请输入群公告",
+  "errorWithMessage": "错误: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+  "feedbackAndSuggestions": "反馈与建议",
+  "followSystem": "跟随系统",
+  "fontSize": "字体大小",
+  "fontSizeExtraLarge": "特大",
+  "fontSizeLarge": "大",
+  "fontSizeSmall": "小",
+  "fontSizeStandard": "标准",
+  "incomingVideoCall": "视频来电",
+  "incomingVoiceCall": "语音来电",
+  "letOthersKnowYouRead": "让对方知道你已读",
+  "letOthersKnowYouTyping": "让对方知道你正在输入",
+  "lightMode": "浅色模式",
+  "memberCountClickToCopy": "{count}人，点击复制群ID",
+  "@memberCountClickToCopy": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "messageNotifications": "消息通知",
+  "messagesLabel": "消息",
+  "musicLinkLabel": "音乐链接",
+  "noMediaUrlAvailable": "没有可用的媒体链接",
+  "noPermissionToEditGroupName": "你没有权限修改群名称",
+  "receiveMessagesFromNonContacts": "接收非联系人的消息",
+  "receiveNewMessageNotifications": "接收新消息通知",
+  "reconnectingCall": "正在重连...",
+  "redPacketTransferCannotForward": "红包和转账消息无法转发",
+  "showMessageContentInNotification": "在通知中显示消息内容",
+  "showMessagePreview": "显示消息预览",
+  "typingIndicator": "输入状态指示",
+  "versionInfo": "版本 {version}",
+  "@versionInfo": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "vibration": "振动",
+  "videoCallInProgress": "视频通话中",
+  "voiceCallInProgress": "语音通话中",
+  "whoCanSeeTitle": "谁可以看到 {title}",
+  "@whoCanSeeTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
     }
   }
 }

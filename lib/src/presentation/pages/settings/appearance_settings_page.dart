@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -36,11 +37,12 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = S.of(context);
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: '外观',
+        title: l10n?.appearance ?? 'Appearance',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -49,20 +51,20 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           const SizedBox(height: 16),
 
           // 深色模式设置
-          _buildSectionHeader('深色模式', isDark),
-          _buildThemeModeSection(isDark),
+          _buildSectionHeader(l10n?.darkMode ?? 'Dark Mode', isDark),
+          _buildThemeModeSection(context, isDark),
 
           const SizedBox(height: 24),
 
           // 字体大小设置
-          _buildSectionHeader('字体大小', isDark),
-          _buildFontSizeSection(isDark),
+          _buildSectionHeader(l10n?.fontSize ?? 'Font Size', isDark),
+          _buildFontSizeSection(context, isDark),
 
           const SizedBox(height: 24),
 
           // 气泡样式设置
-          _buildSectionHeader('气泡样式', isDark),
-          _buildBubbleStyleSection(isDark),
+          _buildSectionHeader(l10n?.bubbleStyle ?? 'Bubble Style', isDark),
+          _buildBubbleStyleSection(context, isDark),
         ],
       ),
     );
@@ -81,28 +83,29 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     );
   }
 
-  Widget _buildThemeModeSection(bool isDark) {
+  Widget _buildThemeModeSection(BuildContext context, bool isDark) {
+    final l10n = S.of(context);
     return Container(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       child: Column(
         children: [
           _buildThemeModeItem(
-            title: '跟随系统',
-            subtitle: '自动根据系统设置切换',
+            title: l10n?.followSystem ?? 'Follow System',
+            subtitle: l10n?.autoSwitchBySystem ?? 'Auto switch by system settings',
             value: ThemeMode.system,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildThemeModeItem(
-            title: '普通模式',
-            subtitle: '始终使用浅色主题',
+            title: l10n?.lightMode ?? 'Light Mode',
+            subtitle: l10n?.alwaysUseLightTheme ?? 'Always use light theme',
             value: ThemeMode.light,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildThemeModeItem(
-            title: '深色模式',
-            subtitle: '始终使用深色主题',
+            title: l10n?.darkModeOption ?? 'Dark Mode',
+            subtitle: l10n?.alwaysUseDarkTheme ?? 'Always use dark theme',
             value: ThemeMode.dark,
             isDark: isDark,
           ),
@@ -146,31 +149,32 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     );
   }
 
-  Widget _buildFontSizeSection(bool isDark) {
+  Widget _buildFontSizeSection(BuildContext context, bool isDark) {
+    final l10n = S.of(context);
     return Container(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       child: Column(
         children: [
           _buildFontSizeItem(
-            title: '小',
+            title: l10n?.fontSizeSmall ?? 'Small',
             value: FontSize.small,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildFontSizeItem(
-            title: '标准',
+            title: l10n?.fontSizeStandard ?? 'Standard',
             value: FontSize.medium,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildFontSizeItem(
-            title: '大',
+            title: l10n?.fontSizeLarge ?? 'Large',
             value: FontSize.large,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildFontSizeItem(
-            title: '特大',
+            title: l10n?.fontSizeExtraLarge ?? 'Extra Large',
             value: FontSize.extraLarge,
             isDark: isDark,
           ),
@@ -223,28 +227,29 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     );
   }
 
-  Widget _buildBubbleStyleSection(bool isDark) {
+  Widget _buildBubbleStyleSection(BuildContext context, bool isDark) {
+    final l10n = S.of(context);
     return Container(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       child: Column(
         children: [
           _buildBubbleStyleItem(
-            title: '经典风格',
-            subtitle: '经典的消息气泡样式',
+            title: l10n?.bubbleStyleWechat ?? 'WeChat Style',
+            subtitle: l10n?.bubbleStyleWechatDesc ?? 'Classic WeChat bubble style',
             value: BubbleStyle.wechat,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildBubbleStyleItem(
-            title: '现代风格',
-            subtitle: '简洁的现代消息气泡样式',
+            title: l10n?.bubbleStyleModern ?? 'Modern Style',
+            subtitle: l10n?.bubbleStyleModernDesc ?? 'Clean modern bubble style',
             value: BubbleStyle.modern,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildBubbleStyleItem(
-            title: '经典风格',
-            subtitle: '传统的消息气泡样式',
+            title: l10n?.bubbleStyleClassic ?? 'Classic Style',
+            subtitle: l10n?.bubbleStyleClassicDesc ?? 'Traditional bubble style',
             value: BubbleStyle.classic,
             isDark: isDark,
           ),

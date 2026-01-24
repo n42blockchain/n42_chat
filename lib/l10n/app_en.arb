@@ -115,8 +115,8 @@
   "releaseToSend": "Release to send, swipe up to cancel",
   "holdToTalk": "Hold to talk",
   "send": "Send",
-  "conversationLabel": "Conversation: {roomId}",
-  "contactLabel": "Contact: {userId}",
+  "conversationWithId": "Conversation: {roomId}",
+  "contactWithId": "Contact: {userId}",
   "addFriend": "Add Friend",
   "chatServiceNotConnected": "Chat service not connected",
   "userNotFoundHint": "User \"{query}\" not found\n\nTips:\n• Try entering full user ID, e.g. @username:server.com\n• Check the username spelling",
@@ -381,6 +381,7 @@
   "noResults": "No results",
   "groupInfo": "Group Info",
   "groupMembers": "Members ({count})",
+  "groupMembersTitle": "Group Members",
   "viewAll": "View all",
   "owner": "Owner",
   "admin": "Admin",
@@ -411,7 +412,6 @@
   "searchChatHistory": "Search Chat History",
   "groupIdCopied": "Group ID copied",
   "tapCopyGroupId": "{count} members · Tap to copy Group ID",
-  "featureInDevelopment": "Feature in development...",
   "receiverAddress": "Recipient Address",
   "enterOrPasteAddress": "Enter or paste wallet address",
   "selectToken": "Select Token",
@@ -687,7 +687,12 @@
       "ringtone": {"type": "String"}
     }
   },
-  "confirmDissolveGroup": "Are you sure you want to dissolve",
+  "confirmDissolveGroup": "Are you sure you want to dissolve \"{name}\"? This action cannot be undone.",
+  "@confirmDissolveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "enterValidServerAddress": "Please enter a valid server address",
   "emailOtp": "Email OTP",
   "enterServerAddressFirst": "Please enter server address first",
@@ -743,9 +748,19 @@
     }
   },
   "groupInvites": "Group Invites",
-  "myGroups": "My Groups",
+  "myGroups": "My Groups ({count})",
+  "@myGroups": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "invitedToJoinGroup": "Invited to join group",
-  "confirmLeaveGroup": "Are you sure you want to leave",
+  "confirmLeaveGroup": "Are you sure you want to leave \"{name}\"?",
+  "@confirmLeaveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "leave": "Leave",
   "copy": "Copy",
   "forward": "Forward",
@@ -768,9 +783,7 @@
   "saving": "Saving...",
   "share": "Share",
   "saveToGallery": "Save to Gallery",
-  "downloadFailed": "Download failed",
   "noMediaUrl": "No media URL available",
-  "shareFailed": "Share failed",
   "failedToLoadImage": "Failed to load image",
   "failedToLoadMoreMessages": "Failed to load more messages",
   "failedToSend": "Failed to send",
@@ -1216,6 +1229,7 @@
   "messages": "Messages",
   "noResults": "No Results",
   "searchInChat": "Search in chat",
+  "contactLabel": "Contact",
   "groupLabel": "Group",
   "conversationLabel": "Conversation",
   "messageLabel": "Message",
@@ -1660,5 +1674,186 @@
     "placeholders": {
       "count": {"type": "int"}
     }
-  }
+  },
+  "incomingVideoCall": "Incoming video call",
+  "incomingVoiceCall": "Incoming voice call",
+  "videoCallInProgress": "Video call",
+  "voiceCallInProgress": "Voice call",
+  "reconnectingCall": "Reconnecting...",
+  "callEnded": "Call ended",
+  "callFailed": "Call failed",
+  "gettingLocation": "Getting location...",
+  "searchLocation": "Search location",
+  "selectFileFailed": "Failed to select file: {error}",
+  "@selectFileFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "pleaseEnterMusicLink": "Please enter music link",
+  "sharedSong": "Shared Song",
+  "unknownArtist": "Unknown Artist",
+  "searchMemberHint": "Search members",
+  "saveToGallery": "Save to Gallery",
+  "failedToLoadImage": "Failed to load image",
+  "noMediaUrlAvailable": "No media URL available",
+  "saving": "Saving...",
+  "downloadFailed": "Download failed: {code}",
+  "@downloadFailed": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
+  "errorWithMessage": "Error: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+  "musicLinkLabel": "Music Link",
+  "pasteMusicLink": "Paste music link",
+  "songNameOptional": "Song Name (Optional)",
+  "enterSongName": "Enter song name",
+  "artistNameOptional": "Artist Name (Optional)",
+  "enterArtistName": "Enter artist name",
+  "videoRecordingFailed": "Video recording failed",
+  "redPacketTransferCannotForward": "Red envelopes and transfers cannot be forwarded",
+  "chatHistoryCleared": "Chat history cleared",
+  "shareFailed": "Share failed: {error}",
+  "@shareFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "messageNotifications": "Message Notifications",
+  "receiveNewMessageNotifications": "Receive new message notifications",
+  "showMessagePreview": "Show Message Preview",
+  "showMessageContentInNotification": "Show message content in notifications",
+  "notificationSound": "Notification Sound",
+  "playSoundOnMessage": "Play sound when receiving messages",
+  "vibration": "Vibration",
+  "vibrateOnMessage": "Vibrate when receiving messages",
+  "doNotDisturbMode": "Do Not Disturb",
+  "doNotDisturbDescription": "Do not receive notifications during specified time",
+  "startTime": "Start Time",
+  "endTime": "End Time",
+  "privacy": "Privacy",
+  "whoCanSee": "Who can see",
+  "avatar": "Avatar",
+  "status": "Status",
+  "lastSeen": "Last Seen",
+  "messagesLabel": "Messages",
+  "allowStrangerMessages": "Allow Stranger Messages",
+  "receiveMessagesFromNonContacts": "Receive messages from non-contacts",
+  "readReceipts": "Read Receipts",
+  "letOthersKnowYouRead": "Let others know you read their messages",
+  "typingIndicator": "Typing Indicator",
+  "letOthersKnowYouTyping": "Let others know you are typing",
+  "everyone": "Everyone",
+  "contactsOnly": "Contacts Only",
+  "nobody": "Nobody",
+  "whoCanSeeTitle": "Who can see {title}",
+  "@whoCanSeeTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "about": "About",
+  "versionInfo": "Version {version}",
+  "@versionInfo": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "checkForUpdates": "Check for Updates",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  "openSourceLicenses": "Open Source Licenses",
+  "feedbackAndSuggestions": "Feedback & Suggestions",
+  "builtOnMatrix": "Built on Matrix Protocol",
+  "appearance": "Appearance",
+  "darkMode": "Dark Mode",
+  "fontSize": "Font Size",
+  "bubbleStyle": "Bubble Style",
+  "followSystem": "Follow System",
+  "autoSwitchBySystem": "Auto switch by system settings",
+  "lightMode": "Light Mode",
+  "alwaysUseLightTheme": "Always use light theme",
+  "darkModeOption": "Dark Mode",
+  "alwaysUseDarkTheme": "Always use dark theme",
+  "fontSizeSmall": "Small",
+  "fontSizeStandard": "Standard",
+  "fontSizeLarge": "Large",
+  "fontSizeExtraLarge": "Extra Large",
+  "bubbleStyleWechat": "WeChat Style",
+  "bubbleStyleWechatDesc": "Classic WeChat bubble style",
+  "bubbleStyleModern": "Modern Style",
+  "bubbleStyleModernDesc": "Clean modern bubble style",
+  "bubbleStyleClassic": "Classic Style",
+  "bubbleStyleClassicDesc": "Traditional bubble style",
+  "tapToRetry": "Tap to retry",
+  "noConversationsToForward": "No conversations to forward",
+  "defaultRedPacketGreeting": "Best wishes for prosperity",
+  "emojiCategoryFace": "Smileys",
+  "emojiCategoryHeart": "Hearts",
+  "emojiCategoryAnimal": "Animals",
+  "emojiCategoryFood": "Food",
+  "emojiCategoryTransport": "Transport",
+  "emojiCategoryActivity": "Activities",
+  "emojiCategoryObject": "Objects",
+  "emojiCategorySymbol": "Symbols",
+  "allowOthersToSearchAndJoin": "Allow others to search and join",
+  "allowStrangerMessages": "Allow stranger messages",
+  "alwaysUseDarkTheme": "Always use dark theme",
+  "alwaysUseLightTheme": "Always use light theme",
+  "autoSwitchBySystem": "Auto switch by system",
+  "bubbleStyle": "Bubble style",
+  "bubbleStyleClassic": "Classic style",
+  "bubbleStyleClassicDesc": "Traditional bubble style",
+  "bubbleStyleModern": "Modern style",
+  "bubbleStyleModernDesc": "Clean modern bubble style",
+  "bubbleStyleWechat": "WeChat style",
+  "bubbleStyleWechatDesc": "Classic WeChat bubble style",
+  "callEnded": "Call ended",
+  "callFailed": "Call failed",
+  "checkForUpdates": "Check for updates",
+  "confirmClearChatHistory": "Are you sure you want to clear chat history?",
+  "createGroupToChat": "Create a group to start chatting",
+  "darkMode": "Dark mode",
+  "darkModeOption": "Dark mode option",
+  "doNotDisturbDescription": "Do not receive notifications during specified time",
+  "doNotDisturbMode": "Do not disturb",
+  "editGroupAnnouncement": "Edit group announcement",
+  "editGroupDescription": "Edit group description",
+  "enterGroupAnnouncement": "Enter group announcement",
+  "errorWithMessage": "Error: {message}",
+  "feedbackAndSuggestions": "Feedback and suggestions",
+  "followSystem": "Follow system",
+  "fontSize": "Font size",
+  "fontSizeExtraLarge": "Extra large",
+  "fontSizeLarge": "Large",
+  "fontSizeSmall": "Small",
+  "fontSizeStandard": "Standard",
+  "incomingVideoCall": "Incoming video call",
+  "incomingVoiceCall": "Incoming voice call",
+  "letOthersKnowYouRead": "Let others know you read",
+  "letOthersKnowYouTyping": "Let others know you are typing",
+  "lightMode": "Light mode",
+  "memberCountClickToCopy": "{count} members, click to copy group ID",
+  "messageNotifications": "Message notifications",
+  "messagesLabel": "Messages",
+  "musicLinkLabel": "Music link",
+  "noMediaUrlAvailable": "No media URL available",
+  "noPermissionToEditGroupName": "You don't have permission to edit group name",
+  "receiveMessagesFromNonContacts": "Receive messages from non-contacts",
+  "receiveNewMessageNotifications": "Receive new message notifications",
+  "reconnectingCall": "Reconnecting...",
+  "redPacketTransferCannotForward": "Red packets and transfers cannot be forwarded",
+  "showMessageContentInNotification": "Show message content in notification",
+  "showMessagePreview": "Show message preview",
+  "typingIndicator": "Typing indicator",
+  "vibration": "Vibration",
+  "videoCallInProgress": "Video call in progress",
+  "voiceCallInProgress": "Voice call in progress",
+  "whoCanSeeTitle": "Who can see {title}"
 }

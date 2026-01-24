@@ -115,8 +115,8 @@
   "releaseToSend": "Tha de gui, vuot len de huy",
   "holdToTalk": "Giu de noi",
   "send": "Gui",
-  "conversationLabel": "Cuoc tro chuyen: {roomId}",
-  "contactLabel": "Lien he: {userId}",
+  "conversationWithId": "Cuoc tro chuyen: {roomId}",
+  "contactWithId": "Lien he: {userId}",
   "addFriend": "Them ban",
   "chatServiceNotConnected": "Dich vu chat chua ket noi",
   "userNotFoundHint": "Khong tim thay nguoi dung \"{query}\"\n\nGoi y:\n• Thu nhap day du ID nguoi dung, vi du @username:server.com\n• Kiem tra chinh ta ten nguoi dung",
@@ -380,6 +380,7 @@
   "noResults": "Khong co ket qua",
   "groupInfo": "Thong tin nhom",
   "groupMembers": "Thanh vien ({count})",
+  "groupMembersTitle": "Thành viên nhóm",
   "viewAll": "Xem tat ca",
   "owner": "Chu so huu",
   "admin": "Quan tri vien",
@@ -682,7 +683,12 @@
       "ringtone": {"type": "String"}
     }
   },
-  "confirmDissolveGroup": "Ban co chac muon giai tan",
+  "confirmDissolveGroup": "Ban co chac chac muon giai tan \"{name}\" khong? Hanh dong nay khong the hoan tac.",
+  "@confirmDissolveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "enterValidServerAddress": "Vui long nhap dia chi may chu hop le",
   "emailOtp": "OTP Email",
   "enterServerAddressFirst": "Vui long nhap dia chi may chu truoc",
@@ -738,9 +744,19 @@
     }
   },
   "groupInvites": "Loi moi nhom",
-  "myGroups": "Nhom cua toi",
+  "myGroups": "Nhom cua toi ({count})",
+  "@myGroups": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "invitedToJoinGroup": "Duoc moi tham gia nhom",
-  "confirmLeaveGroup": "Ban co chac muon roi",
+  "confirmLeaveGroup": "Ban co chac chac muon roi khoi \"{name}\" khong?",
+  "@confirmLeaveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "leave": "Roi",
   "recallThisMessage": "Thu hoi tin nhan nay?",
   "messageRecalled": "Tin nhan da thu hoi",
@@ -749,9 +765,19 @@
   "saving": "Dang luu...",
   "share": "Chia se",
   "saveToGallery": "Luu vao Thu vien",
-  "downloadFailed": "Tai xuong that bai",
+  "downloadFailed": "Tai xuong that bai: {code}",
+  "@downloadFailed": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
   "noMediaUrl": "Khong co URL media",
-  "shareFailed": "Chia se that bai",
+  "shareFailed": "Chia se that bai: {error}",
+  "@shareFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "failedToLoadImage": "Tai hinh anh that bai",
   "failedToLoadMoreMessages": "Tai them tin nhan that bai",
   "failedToSend": "Gui that bai",
@@ -1153,6 +1179,7 @@
   "allResults": "Tat ca",
   "searchInChat": "Tim trong tro chuyen",
   "groupLabel": "Nhom",
+  "contactLabel": "Lien he",
   "messageLabel": "Tin nhan",
   "securityTitle": "Bao mat",
   "keyBackup": "Sao luu khoa",
@@ -1539,5 +1566,102 @@
   "switchCameraLabel": "Chuyen",
   "leaveLabel": "Roi",
   "participantsLabel": "Nguoi tham gia",
-  "joiningMeeting": "Dang tham gia cuoc hop..."
+  "joiningMeeting": "Dang tham gia cuoc hop...",
+  "connectingCall": "Đang kết nối...",
+  "pollVotesFormat": "{count} phiếu ({percentage}%)",
+  "@pollVotesFormat": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "percentage": {"type": "String"}
+    }
+  },
+  "pollParticipantsFormat": "{count} người tham gia",
+  "@pollParticipantsFormat": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "incomingVideoCall": "Cuộc gọi video đến",
+  "incomingVoiceCall": "Cuộc gọi thoại đến",
+  "videoCallInProgress": "Cuộc gọi video",
+  "voiceCallInProgress": "Cuộc gọi thoại",
+  "reconnectingCall": "Đang kết nối lại...",
+  "callEnded": "Cuộc gọi kết thúc",
+  "callFailed": "Cuộc gọi thất bại",
+  "noMediaUrlAvailable": "URL phương tiện không khả dụng",
+  "errorWithMessage": "Lỗi: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+  "musicLinkLabel": "Liên kết nhạc",
+  "redPacketTransferCannotForward": "Lì xì và chuyển khoản không thể chuyển tiếp",
+  "messageNotifications": "Thông báo tin nhắn",
+  "receiveNewMessageNotifications": "Nhận thông báo tin nhắn mới",
+  "showMessagePreview": "Hiển thị xem trước tin nhắn",
+  "showMessageContentInNotification": "Hiển thị nội dung tin nhắn trong thông báo",
+  "vibration": "Rung",
+  "doNotDisturbMode": "Không làm phiền",
+  "doNotDisturbDescription": "Không nhận thông báo trong khoảng thời gian chỉ định",
+  "messagesLabel": "Tin nhắn",
+  "allowStrangerMessages": "Cho phép tin nhắn từ người lạ",
+  "receiveMessagesFromNonContacts": "Nhận tin nhắn từ người không có trong danh bạ",
+  "letOthersKnowYouRead": "Cho người khác biết bạn đã đọc tin nhắn của họ",
+  "typingIndicator": "Chỉ báo đang nhập",
+  "letOthersKnowYouTyping": "Cho người khác biết bạn đang nhập",
+  "whoCanSeeTitle": "Ai có thể xem {title}",
+  "@whoCanSeeTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "versionInfo": "Phiên bản {version}",
+  "@versionInfo": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "checkForUpdates": "Kiểm tra cập nhật",
+  "feedbackAndSuggestions": "Phản hồi và đề xuất",
+  "darkMode": "Chế độ tối",
+  "fontSize": "Cỡ chữ",
+  "bubbleStyle": "Kiểu bong bóng",
+  "followSystem": "Theo hệ thống",
+  "autoSwitchBySystem": "Tự động chuyển theo cài đặt hệ thống",
+  "lightMode": "Chế độ sáng",
+  "alwaysUseLightTheme": "Luôn dùng giao diện sáng",
+  "darkModeOption": "Chế độ tối",
+  "alwaysUseDarkTheme": "Luôn dùng giao diện tối",
+  "fontSizeSmall": "Nhỏ",
+  "fontSizeStandard": "Tiêu chuẩn",
+  "fontSizeLarge": "Lớn",
+  "fontSizeExtraLarge": "Rất lớn",
+  "bubbleStyleWechat": "Kiểu WeChat",
+  "bubbleStyleWechatDesc": "Kiểu bong bóng WeChat cổ điển",
+  "bubbleStyleModern": "Kiểu hiện đại",
+  "bubbleStyleModernDesc": "Kiểu bong bóng hiện đại sạch sẽ",
+  "bubbleStyleClassic": "Kiểu cổ điển",
+  "bubbleStyleClassicDesc": "Kiểu bong bóng truyền thống",
+  "saveMedia": "Lưu",
+  "allButton": "Tất cả",
+  "tapToRetry": "Nhấn để thử lại",
+  "noConversationsToForward": "Không có cuộc trò chuyện nào để chuyển tiếp",
+  "defaultRedPacketGreeting": "Chúc phát tài phát lộc",
+  "emojiCategoryFace": "Biểu cảm",
+  "emojiCategoryHeart": "Trái tim",
+  "emojiCategoryAnimal": "Động vật",
+  "emojiCategoryFood": "Đồ ăn",
+  "emojiCategoryTransport": "Phương tiện",
+  "emojiCategoryActivity": "Hoạt động",
+  "emojiCategoryObject": "Đồ vật",
+  "emojiCategorySymbol": "Ký hiệu",
+  "allowOthersToSearchAndJoin": "Cho phép những người khác tìm kiếm và tham gia",
+  "confirmClearChatHistory": "Bạn có chắc chắn muốn xóa lịch sử trò chuyện không?",
+  "createGroupToChat": "Tạo một nhóm để bắt đầu trò chuyện",
+  "editGroupAnnouncement": "Chỉnh sửa thông báo nhóm",
+  "editGroupDescription": "Chỉnh sửa mô tả nhóm",
+  "enterGroupAnnouncement": "Nhập thông báo nhóm",
+  "memberCountClickToCopy": "{count} thành viên, nhấp để sao chép ID nhóm",
+  "noPermissionToEditGroupName": "Bạn không có quyền chỉnh sửa tên nhóm"
 }

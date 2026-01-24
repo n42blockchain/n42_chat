@@ -115,8 +115,8 @@
   "releaseToSend": "離すと送信、上にスワイプでキャンセル",
   "holdToTalk": "押し続けて話す",
   "send": "送信",
-  "conversationLabel": "会話: {roomId}",
-  "contactLabel": "連絡先: {userId}",
+  "conversationWithId": "会話: {roomId}",
+  "contactWithId": "連絡先: {userId}",
   "addFriend": "友達を追加",
   "chatServiceNotConnected": "チャットサービスに接続されていません",
   "userNotFoundHint": "ユーザー「{query}」が見つかりません\n\nヒント:\n• 完全なユーザーIDを入力してください（例: @username:server.com）\n• ユーザー名のスペルを確認してください",
@@ -380,6 +380,7 @@
   "noResults": "結果がありません",
   "groupInfo": "グループ情報",
   "groupMembers": "メンバー ({count})",
+  "groupMembersTitle": "グループメンバー",
   "viewAll": "すべて表示",
   "owner": "オーナー",
   "admin": "管理者",
@@ -682,7 +683,12 @@
       "ringtone": {"type": "String"}
     }
   },
-  "confirmDissolveGroup": "本当にグループを解散しますか",
+  "confirmDissolveGroup": "「{name}」を解散してもよろしいですか？この操作は元に戻せません。",
+  "@confirmDissolveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "enterValidServerAddress": "有効なサーバーアドレスを入力してください",
   "emailOtp": "メールOTP",
   "enterServerAddressFirst": "先にサーバーアドレスを入力してください",
@@ -738,9 +744,19 @@
     }
   },
   "groupInvites": "グループ招待",
-  "myGroups": "マイグループ",
+  "myGroups": "マイグループ ({count})",
+  "@myGroups": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "invitedToJoinGroup": "グループへの招待",
-  "confirmLeaveGroup": "本当にグループを退出しますか",
+  "confirmLeaveGroup": "「{name}」を退出してもよろしいですか？",
+  "@confirmLeaveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "leave": "退出",
   "saveMedia": "保存",
   "recallThisMessage": "このメッセージを取り消しますか？",
@@ -750,9 +766,19 @@
   "saving": "保存中...",
   "share": "共有",
   "saveToGallery": "ギャラリーに保存",
-  "downloadFailed": "ダウンロードに失敗しました",
+  "downloadFailed": "ダウンロード失敗: {code}",
+  "@downloadFailed": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
   "noMediaUrl": "メディアURLがありません",
-  "shareFailed": "共有に失敗しました",
+  "shareFailed": "共有に失敗しました: {error}",
+  "@shareFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "failedToLoadImage": "画像の読み込みに失敗しました",
   "failedToLoadMoreMessages": "追加メッセージの読み込みに失敗しました",
   "failedToSend": "送信に失敗しました",
@@ -1153,6 +1179,7 @@
   },
   "allResults": "すべて",
   "groupLabel": "グループ",
+  "contactLabel": "連絡先",
   "messageLabel": "メッセージ",
   "searchInChat": "チャット内を検索",
 
@@ -1543,5 +1570,100 @@
   "switchCameraLabel": "切り替え",
   "leaveLabel": "退出",
   "participantsLabel": "参加者",
-  "joiningMeeting": "ミーティングに参加中..."
+  "joiningMeeting": "ミーティングに参加中...",
+  "pollVotesFormat": "{count}票 ({percentage}%)",
+  "@pollVotesFormat": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "percentage": {"type": "String"}
+    }
+  },
+  "pollParticipantsFormat": "{count}人が参加",
+  "@pollParticipantsFormat": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "incomingVideoCall": "ビデオ通話の着信",
+  "incomingVoiceCall": "音声通話の着信",
+  "videoCallInProgress": "ビデオ通話中",
+  "voiceCallInProgress": "音声通話中",
+  "reconnectingCall": "再接続中...",
+  "callEnded": "通話終了",
+  "callFailed": "通話失敗",
+  "noMediaUrlAvailable": "メディアURLがありません",
+  "errorWithMessage": "エラー: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+  "musicLinkLabel": "音楽リンク",
+  "redPacketTransferCannotForward": "紅包と送金は転送できません",
+  "messageNotifications": "メッセージ通知",
+  "receiveNewMessageNotifications": "新着メッセージ通知を受け取る",
+  "showMessagePreview": "メッセージプレビューを表示",
+  "showMessageContentInNotification": "通知にメッセージ内容を表示",
+  "vibration": "バイブレーション",
+  "doNotDisturbMode": "おやすみモード",
+  "doNotDisturbDescription": "指定時間中は通知を受け取らない",
+  "messagesLabel": "メッセージ",
+  "allowStrangerMessages": "知らない人からのメッセージを許可",
+  "receiveMessagesFromNonContacts": "連絡先以外からのメッセージを受け取る",
+  "letOthersKnowYouRead": "既読を相手に知らせる",
+  "typingIndicator": "入力中表示",
+  "letOthersKnowYouTyping": "入力中であることを相手に知らせる",
+  "whoCanSeeTitle": "{title}を見られる人",
+  "@whoCanSeeTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "versionInfo": "バージョン {version}",
+  "@versionInfo": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "checkForUpdates": "アップデートを確認",
+  "feedbackAndSuggestions": "フィードバックと提案",
+  "darkMode": "ダークモード",
+  "fontSize": "フォントサイズ",
+  "bubbleStyle": "吹き出しスタイル",
+  "followSystem": "システムに従う",
+  "autoSwitchBySystem": "システム設定に応じて自動切り替え",
+  "lightMode": "ライトモード",
+  "alwaysUseLightTheme": "常にライトテーマを使用",
+  "darkModeOption": "ダークモード",
+  "alwaysUseDarkTheme": "常にダークテーマを使用",
+  "fontSizeSmall": "小",
+  "fontSizeStandard": "標準",
+  "fontSizeLarge": "大",
+  "fontSizeExtraLarge": "特大",
+  "bubbleStyleWechat": "WeChatスタイル",
+  "bubbleStyleWechatDesc": "クラシックなWeChat吹き出しスタイル",
+  "bubbleStyleModern": "モダンスタイル",
+  "bubbleStyleModernDesc": "シンプルでモダンな吹き出しスタイル",
+  "bubbleStyleClassic": "クラシックスタイル",
+  "bubbleStyleClassicDesc": "伝統的な吹き出しスタイル",
+  "allButton": "すべて",
+  "tapToRetry": "タップして再試行",
+  "noConversationsToForward": "転送できる会話がありません",
+  "defaultRedPacketGreeting": "金運上昇、幸福をお祈りします",
+  "emojiCategoryFace": "顔文字",
+  "emojiCategoryHeart": "ハート",
+  "emojiCategoryAnimal": "動物",
+  "emojiCategoryFood": "食べ物",
+  "emojiCategoryTransport": "乗り物",
+  "emojiCategoryActivity": "アクティビティ",
+  "emojiCategoryObject": "物",
+  "emojiCategorySymbol": "記号",
+  "allowOthersToSearchAndJoin": "他のユーザーが検索して参加することを許可する",
+  "confirmClearChatHistory": "チャット履歴を削除してもよろしいですか?",
+  "createGroupToChat": "グループを作成してチャットを開始する",
+  "editGroupAnnouncement": "グループお知らせを編集",
+  "editGroupDescription": "グループ説明を編集",
+  "enterGroupAnnouncement": "グループお知らせを入力",
+  "memberCountClickToCopy": "{count}人、クリックしてグループIDをコピー",
+  "noPermissionToEditGroupName": "グループ名を編集する権限がありません"
 }

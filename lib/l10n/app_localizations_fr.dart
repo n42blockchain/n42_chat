@@ -398,12 +398,12 @@ class SFr extends S {
   String get send => 'Envoyer';
 
   @override
-  String conversationLabel(String roomId) {
+  String conversationWithId(String roomId) {
     return 'Conversation : $roomId';
   }
 
   @override
-  String contactLabel(String userId) {
+  String contactWithId(String userId) {
     return 'Contact : $userId';
   }
 
@@ -1222,6 +1222,9 @@ class SFr extends S {
   }
 
   @override
+  String get groupMembersTitle => 'Membres du groupe';
+
+  @override
   String get viewAll => 'Voir tout';
 
   @override
@@ -1317,11 +1320,6 @@ class SFr extends S {
   @override
   String tapCopyGroupId(int count) {
     return '$count membres - Appuyez pour copier l\'ID du groupe';
-  }
-
-  @override
-  String featureInDevelopment(Object feature) {
-    return '$feature en cours de developpement...';
   }
 
   @override
@@ -1986,6 +1984,11 @@ class SFr extends S {
   String get inCall => 'En appel';
 
   @override
+  String featureInDevelopment(String feature) {
+    return '$feature en cours de developpement...';
+  }
+
+  @override
   String collectMessages(Object count) {
     return '$count messages collectes';
   }
@@ -2149,7 +2152,9 @@ class SFr extends S {
   }
 
   @override
-  String get confirmDissolveGroup => 'Etes-vous sur de vouloir dissoudre';
+  String confirmDissolveGroup(String name) {
+    return 'Êtes-vous sûr de vouloir dissoudre « $name » ? Cette action est irréversible.';
+  }
 
   @override
   String get enterValidServerAddress =>
@@ -2241,13 +2246,17 @@ class SFr extends S {
   String get groupInvites => 'Invitations de groupe';
 
   @override
-  String get myGroups => 'Mes groupes';
+  String myGroups(int count) {
+    return 'Mes groupes ($count)';
+  }
 
   @override
   String get invitedToJoinGroup => 'Invite a rejoindre le groupe';
 
   @override
-  String get confirmLeaveGroup => 'Etes-vous sur de vouloir quitter';
+  String confirmLeaveGroup(String name) {
+    return 'Êtes-vous sûr de vouloir quitter « $name » ?';
+  }
 
   @override
   String get leave => 'Quitter';
@@ -2277,13 +2286,17 @@ class SFr extends S {
   String get saveToGallery => 'Enregistrer dans la galerie';
 
   @override
-  String get downloadFailed => 'Echec du telechargement';
+  String downloadFailed(String code) {
+    return 'Échec du téléchargement : $code';
+  }
 
   @override
   String get noMediaUrl => 'Aucune URL media disponible';
 
   @override
-  String get shareFailed => 'Echec du partage';
+  String shareFailed(String error) {
+    return 'Échec du partage : $error';
+  }
 
   @override
   String get failedToLoadImage => 'Echec du chargement de l\'image';
@@ -2614,7 +2627,7 @@ class SFr extends S {
   }
 
   @override
-  String get allButton => '全部';
+  String get allButton => 'Tout';
 
   @override
   String get enterValidAddress => 'Veuillez entrer une adresse valide';
@@ -3252,7 +3265,13 @@ class SFr extends S {
   String get searchInChat => 'Rechercher dans le chat';
 
   @override
+  String get contactLabel => 'Contact';
+
+  @override
   String get groupLabel => 'Groupe';
+
+  @override
+  String get conversationLabel => '会话';
 
   @override
   String get messageLabel => 'Message';
@@ -3898,11 +3917,228 @@ class SFr extends S {
 
   @override
   String pollVotesFormat(int count, String percentage) {
-    return '$count 票 ($percentage%)';
+    return '$count votes ($percentage%)';
   }
 
   @override
   String pollParticipantsFormat(int count) {
-    return '$count 人参与';
+    return '$count participants';
+  }
+
+  @override
+  String get tapToRetry => 'Appuyez pour réessayer';
+
+  @override
+  String get noConversationsToForward => 'Aucune conversation à transférer';
+
+  @override
+  String get defaultRedPacketGreeting => 'Meilleurs vœux de prospérité';
+
+  @override
+  String get emojiCategoryFace => 'Émoticônes';
+
+  @override
+  String get emojiCategoryHeart => 'Cœurs';
+
+  @override
+  String get emojiCategoryAnimal => 'Animaux';
+
+  @override
+  String get emojiCategoryFood => 'Nourriture';
+
+  @override
+  String get emojiCategoryTransport => 'Transports';
+
+  @override
+  String get emojiCategoryActivity => 'Activités';
+
+  @override
+  String get emojiCategoryObject => 'Objets';
+
+  @override
+  String get emojiCategorySymbol => 'Symboles';
+
+  @override
+  String get allowOthersToSearchAndJoin =>
+      'Permettre aux autres de rechercher et de rejoindre';
+
+  @override
+  String get allowStrangerMessages => 'Autoriser les messages d\'inconnus';
+
+  @override
+  String get alwaysUseDarkTheme => 'Toujours utiliser le thème sombre';
+
+  @override
+  String get alwaysUseLightTheme => 'Toujours utiliser le thème clair';
+
+  @override
+  String get autoSwitchBySystem =>
+      'Changer automatiquement selon les paramètres système';
+
+  @override
+  String get bubbleStyle => 'Style de bulle';
+
+  @override
+  String get bubbleStyleClassic => 'Style classique';
+
+  @override
+  String get bubbleStyleClassicDesc => 'Style de bulle traditionnel';
+
+  @override
+  String get bubbleStyleModern => 'Style moderne';
+
+  @override
+  String get bubbleStyleModernDesc => 'Style de bulle moderne et épuré';
+
+  @override
+  String get bubbleStyleWechat => 'Style WeChat';
+
+  @override
+  String get bubbleStyleWechatDesc => 'Style de bulle classique WeChat';
+
+  @override
+  String get callEnded => 'Appel terminé';
+
+  @override
+  String get callFailed => 'Appel échoué';
+
+  @override
+  String get checkForUpdates => 'Rechercher des mises à jour';
+
+  @override
+  String get confirmClearChatHistory =>
+      'Êtes-vous sûr de vouloir effacer l\'historique des messages?';
+
+  @override
+  String get createGroupToChat => 'Créez un groupe pour commencer à discuter';
+
+  @override
+  String get darkMode => 'Mode sombre';
+
+  @override
+  String get darkModeOption => 'Mode sombre';
+
+  @override
+  String get doNotDisturbDescription =>
+      'Ne pas recevoir de notifications pendant la période spécifiée';
+
+  @override
+  String get doNotDisturbMode => 'Ne pas déranger';
+
+  @override
+  String get editGroupAnnouncement => 'Modifier l\'annonce du groupe';
+
+  @override
+  String get editGroupDescription => 'Modifier la description du groupe';
+
+  @override
+  String get enterGroupAnnouncement => 'Veuillez saisir l\'annonce du groupe';
+
+  @override
+  String errorWithMessage(String message) {
+    return 'Erreur : $message';
+  }
+
+  @override
+  String get feedbackAndSuggestions => 'Commentaires et suggestions';
+
+  @override
+  String get followSystem => 'Suivre le système';
+
+  @override
+  String get fontSize => 'Taille de police';
+
+  @override
+  String get fontSizeExtraLarge => 'Très grand';
+
+  @override
+  String get fontSizeLarge => 'Grand';
+
+  @override
+  String get fontSizeSmall => 'Petit';
+
+  @override
+  String get fontSizeStandard => 'Standard';
+
+  @override
+  String get incomingVideoCall => 'Appel vidéo entrant';
+
+  @override
+  String get incomingVoiceCall => 'Appel vocal entrant';
+
+  @override
+  String get letOthersKnowYouRead =>
+      'Permettre aux autres de savoir que vous avez lu leurs messages';
+
+  @override
+  String get letOthersKnowYouTyping =>
+      'Permettre aux autres de savoir que vous écrivez';
+
+  @override
+  String get lightMode => 'Mode clair';
+
+  @override
+  String memberCountClickToCopy(int count) {
+    return '$count membres, cliquez pour copier l\'ID du groupe';
+  }
+
+  @override
+  String get messageNotifications => 'Notifications de messages';
+
+  @override
+  String get messagesLabel => 'Messages';
+
+  @override
+  String get musicLinkLabel => 'Lien musical';
+
+  @override
+  String get noMediaUrlAvailable => 'URL média non disponible';
+
+  @override
+  String get noPermissionToEditGroupName =>
+      'Vous n\'avez pas la permission de modifier le nom du groupe';
+
+  @override
+  String get receiveMessagesFromNonContacts =>
+      'Recevoir les messages des non-contacts';
+
+  @override
+  String get receiveNewMessageNotifications =>
+      'Recevoir les notifications de nouveaux messages';
+
+  @override
+  String get reconnectingCall => 'Reconnexion en cours...';
+
+  @override
+  String get redPacketTransferCannotForward =>
+      'Les enveloppes rouges et les transferts ne peuvent pas être transférés';
+
+  @override
+  String get showMessageContentInNotification =>
+      'Afficher le contenu du message dans les notifications';
+
+  @override
+  String get showMessagePreview => 'Afficher l\'aperçu du message';
+
+  @override
+  String get typingIndicator => 'Indicateur de saisie';
+
+  @override
+  String versionInfo(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get vibration => 'Vibration';
+
+  @override
+  String get videoCallInProgress => 'Appel vidéo';
+
+  @override
+  String get voiceCallInProgress => 'Appel vocal';
+
+  @override
+  String whoCanSeeTitle(String title) {
+    return 'Qui peut voir $title';
   }
 }

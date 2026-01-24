@@ -1338,7 +1338,7 @@ class _ChatPageState extends State<ChatPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Video recording failed'),
+                content: Text(S.of(context)?.videoRecordingFailed ?? 'Video recording failed'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -1354,7 +1354,7 @@ class _ChatPageState extends State<ChatPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Video recording failed'),
+                content: Text(S.of(context)?.videoRecordingFailed ?? 'Video recording failed'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -2764,7 +2764,7 @@ Avatar: ${contactAvatar ?? ''}''';
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '回复 ${state.replyTarget!.senderName}',
+                      S.of(context)?.replyTo(state.replyTarget!.senderName) ?? 'Reply to ${state.replyTarget!.senderName}',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.primary,
@@ -3290,14 +3290,14 @@ Avatar: ${contactAvatar ?? ''}''';
     final imageUrl = message.metadata?.httpUrl ?? message.content;
     if (imageUrl.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No media URL available')),
+        SnackBar(content: Text(S.of(context)?.noMediaUrlAvailable ?? 'No media URL available')),
       );
       return;
     }
 
     try {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Saving...')),
+        SnackBar(content: Text(S.of(context)?.saving ?? 'Saving...')),
       );
 
       // 下载文件
@@ -3331,7 +3331,7 @@ Avatar: ${contactAvatar ?? ''}''';
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Download failed: ${response.statusCode}')),
+            SnackBar(content: Text(S.of(context)?.downloadFailed(response.statusCode.toString()) ?? 'Download failed: ${response.statusCode}')),
           );
         }
       }
@@ -3339,7 +3339,7 @@ Avatar: ${contactAvatar ?? ''}''';
       debugPrint('Save media error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(S.of(context)?.errorWithMessage(e.toString()) ?? 'Error: $e')),
         );
       }
     }
@@ -3481,11 +3481,11 @@ Avatar: ${contactAvatar ?? ''}''';
                 );
               } else {
                 // 两种方法都失败，抛出异常
-                throw Exception('图片转发失败：无法下载原图片');
+                throw Exception('Image forward failed: Cannot download original image');
               }
             }
           } else {
-            throw Exception('图片转发失败：缺少图片地址');
+            throw Exception('Image forward failed: Missing image URL');
           }
           break;
 
@@ -3518,11 +3518,11 @@ Avatar: ${contactAvatar ?? ''}''';
                   mimeType: message.metadata?.mimeType,
                 );
               } else {
-                throw Exception('视频转发失败：无法下载原视频');
+                throw Exception('Video forward failed: Cannot download original video');
               }
             }
           } else {
-            throw Exception('视频转发失败：缺少视频地址');
+            throw Exception('Video forward failed: Missing video URL');
           }
           break;
 
@@ -3553,11 +3553,11 @@ Avatar: ${contactAvatar ?? ''}''';
                   mimeType: message.metadata?.mimeType,
                 );
               } else {
-                throw Exception('语音转发失败：无法下载原语音');
+                throw Exception('Voice forward failed: Cannot download original voice');
               }
             }
           } else {
-            throw Exception('语音转发失败：缺少语音地址');
+            throw Exception('Voice forward failed: Missing voice URL');
           }
           break;
 
@@ -3636,7 +3636,7 @@ Avatar: ${contactAvatar ?? ''}''';
               description: message.content,
             );
           } else {
-            throw Exception('位置转发失败：缺少位置信息');
+            throw Exception('Location forward failed: Missing location info');
           }
           break;
 
@@ -3682,7 +3682,7 @@ Avatar: ${contactAvatar ?? ''}''';
               maxSelections: maxSelections,
             );
           } else {
-            throw Exception('投票转发失败：缺少投票信息');
+            throw Exception('Poll forward failed: Missing poll info');
           }
           break;
 
@@ -3706,7 +3706,7 @@ Avatar: ${contactAvatar ?? ''}''';
               },
             );
           } else {
-            throw Exception('音乐转发失败：缺少音乐信息');
+            throw Exception('Music forward failed: Missing music info');
           }
           break;
 
@@ -3974,7 +3974,7 @@ Avatar: ${contactAvatar ?? ''}''';
     if (selectedMessages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Red envelopes and transfers cannot be forwarded'),
+          content: Text(S.of(context)?.redPacketTransferCannotForward ?? 'Red envelopes and transfers cannot be forwarded'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -5034,7 +5034,7 @@ class _LocationPickerPage extends StatefulWidget {
 
 class _LocationPickerPageState extends State<_LocationPickerPage> {
   Position? _currentPosition;
-  String _currentAddress = '正在获取位置...';
+  String _currentAddress = 'Getting location...';
   bool _isLoading = true;
   String? _errorMessage;
   
@@ -5060,7 +5060,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
       if (!serviceEnabled) {
         setState(() {
           _isLoading = false;
-          _errorMessage = '位置服务未开启';
+          _errorMessage = 'Location service not enabled';
         });
         return;
       }
@@ -5072,7 +5072,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
         if (permission == LocationPermission.denied) {
           setState(() {
             _isLoading = false;
-            _errorMessage = '位置权限被拒绝';
+            _errorMessage = 'Location permission denied';
           });
           return;
         }
@@ -5081,7 +5081,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
       if (permission == LocationPermission.deniedForever) {
         setState(() {
           _isLoading = false;
-          _errorMessage = '位置权限已被永久拒绝';
+          _errorMessage = 'Location permission permanently denied';
         });
         return;
       }
@@ -5110,7 +5110,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = '获取位置失败: $e';
+        _errorMessage = 'Failed to get location: $e';
       });
     }
   }
@@ -5142,7 +5142,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
     // 实际应用中应该使用地图 API 获取真实的 POI 数据
     _nearbyPlaces = [
       _NearbyPlace(
-        name: '我的位置',
+        name: 'My Location',
         address: _currentAddress,
         latitude: position.latitude,
         longitude: position.longitude,
@@ -5150,7 +5150,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
         iconColor: AppColors.primary,
       ),
       _NearbyPlace(
-        name: '当前位置',
+        name: 'Current Location',
         address: '${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}',
         latitude: position.latitude,
         longitude: position.longitude,
@@ -5159,24 +5159,24 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
       ),
       // 模拟附近地点（实际应从地图 API 获取）
       _NearbyPlace(
-        name: '附近地点 1',
-        address: '约 100m',
+        name: 'Nearby Place 1',
+        address: 'About 100m',
         latitude: position.latitude + 0.001,
         longitude: position.longitude + 0.001,
         icon: Icons.place,
         iconColor: Colors.orange,
       ),
       _NearbyPlace(
-        name: '附近地点 2',
-        address: '约 200m',
+        name: 'Nearby Place 2',
+        address: 'About 200m',
         latitude: position.latitude - 0.001,
         longitude: position.longitude + 0.002,
         icon: Icons.place,
         iconColor: Colors.orange,
       ),
       _NearbyPlace(
-        name: '附近地点 3',
-        address: '约 500m',
+        name: 'Nearby Place 3',
+        address: 'About 500m',
         latitude: position.latitude + 0.002,
         longitude: position.longitude - 0.002,
         icon: Icons.place,
@@ -5196,7 +5196,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
       'latitude': selectedPlace?.latitude ?? _currentPosition!.latitude,
       'longitude': selectedPlace?.longitude ?? _currentPosition!.longitude,
       'address': _currentAddress,
-      'name': selectedPlace?.name ?? '我的位置',
+      'name': selectedPlace?.name ?? 'My Location',
     });
   }
 
@@ -5217,7 +5217,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          '位置',
+          S.of(context)?.locationTitle ?? 'Location',
           style: TextStyle(
             color: isDark ? Colors.white : Colors.black,
             fontSize: 18,
@@ -5229,10 +5229,10 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
           TextButton(
             onPressed: _currentPosition != null ? _confirmLocation : null,
             child: Text(
-              '发送',
+              S.of(context)?.sendButton ?? 'Send',
               style: TextStyle(
-                color: _currentPosition != null 
-                    ? AppColors.primary 
+                color: _currentPosition != null
+                    ? AppColors.primary
                     : Colors.grey,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -5242,13 +5242,13 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
         ],
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('正在获取位置...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(S.of(context)?.gettingLocation ?? 'Getting location...'),
                 ],
               ),
             )
@@ -5270,7 +5270,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
                       const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: _getCurrentLocation,
-                        child: const Text('重试'),
+                        child: Text(S.of(context)?.retry ?? 'Retry'),
                       ),
                     ],
                   ),
@@ -5296,7 +5296,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  '地图预览',
+                                  S.of(context)?.mapPreview ?? 'Map Preview',
                                   style: TextStyle(
                                     color: isDark ? Colors.white38 : Colors.black26,
                                   ),
@@ -5342,7 +5342,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
                       color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
                       child: TextField(
                         decoration: InputDecoration(
-                          hintText: '搜索地点',
+                          hintText: S.of(context)?.searchLocation ?? 'Search location',
                           prefixIcon: const Icon(Icons.search),
                           filled: true,
                           fillColor: isDark 
@@ -5700,7 +5700,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
     } catch (e) {
       debugPrint('Error picking audio file: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('选择文件失败: $e')),
+        SnackBar(content: Text(S.of(context)?.selectFileFailed(e.toString()) ?? 'Failed to select file: $e')),
       );
     }
   }
@@ -5713,7 +5713,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
     
     if (link.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请输入音乐链接')),
+        SnackBar(content: Text(S.of(context)?.pleaseEnterMusicLink ?? 'Please enter music link')),
       );
       return;
     }
@@ -5727,8 +5727,8 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
     }
     
     Navigator.pop(context, {
-      'name': title.isNotEmpty ? title : '分享歌曲',
-      'artist': artist.isNotEmpty ? artist : '未知歌手',
+      'name': title.isNotEmpty ? title : (S.of(context)?.sharedSong ?? 'Shared Song'),
+      'artist': artist.isNotEmpty ? artist : (S.of(context)?.unknownArtist ?? 'Unknown Artist'),
       'url': link,
       'isNetwork': true,
     });
@@ -5962,13 +5962,13 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
           ),
           const SizedBox(height: 20),
           // 音乐链接
-          Text('音乐链接 *', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          Text('${S.of(context)?.musicLinkLabel ?? 'Music Link'} *', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
           const SizedBox(height: 8),
           TextField(
             controller: _linkController,
             style: TextStyle(color: textColor),
             decoration: InputDecoration(
-              hintText: '粘贴音乐链接',
+              hintText: S.of(context)?.pasteMusicLink ?? 'Paste music link',
               hintStyle: TextStyle(color: hintColor),
               prefixIcon: Icon(Icons.link, color: hintColor),
               filled: true,
@@ -5981,13 +5981,13 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
           ),
           const SizedBox(height: 16),
           // 歌曲名称
-          Text('歌曲名称（可选）', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          Text(S.of(context)?.songNameOptional ?? 'Song Name (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
           const SizedBox(height: 8),
           TextField(
             controller: _titleController,
             style: TextStyle(color: textColor),
             decoration: InputDecoration(
-              hintText: '输入歌曲名称',
+              hintText: S.of(context)?.enterSongName ?? 'Enter song name',
               hintStyle: TextStyle(color: hintColor),
               prefixIcon: Icon(Icons.music_note, color: hintColor),
               filled: true,
@@ -6000,13 +6000,13 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
           ),
           const SizedBox(height: 16),
           // 歌手名称
-          Text('歌手名称（可选）', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          Text(S.of(context)?.artistNameOptional ?? 'Artist Name (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
           const SizedBox(height: 8),
           TextField(
             controller: _artistController,
             style: TextStyle(color: textColor),
             decoration: InputDecoration(
-              hintText: '输入歌手名称',
+              hintText: S.of(context)?.enterArtistName ?? 'Enter artist name',
               hintStyle: TextStyle(color: hintColor),
               prefixIcon: Icon(Icons.person, color: hintColor),
               filled: true,
@@ -6204,7 +6204,7 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
                 ),
                 Expanded(
                   child: Text(
-                    '选择成员',
+                    S.of(context)?.selectMember ?? 'Select Member',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 18,
@@ -6225,7 +6225,7 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
               onChanged: _filterMembers,
               style: TextStyle(color: textColor),
               decoration: InputDecoration(
-                hintText: '搜索成员',
+                hintText: S.of(context)?.searchMemberHint ?? 'Search members',
                 hintStyle: TextStyle(color: subtextColor),
                 prefixIcon: Icon(Icons.search, color: subtextColor),
                 filled: true,
@@ -6247,7 +6247,9 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
                 : _filteredMembers.isEmpty
                     ? Center(
                         child: Text(
-                          _searchQuery.isEmpty ? '没有成员' : '未找到匹配的成员',
+                          _searchQuery.isEmpty
+                              ? (S.of(context)?.noMembers ?? 'No members')
+                              : (S.of(context)?.noMatchingMembers ?? 'No matching members'),
                           style: TextStyle(color: subtextColor),
                         ),
                       )
@@ -6264,7 +6266,7 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
                               ),
                             ),
                             title: Text(
-                              member['name'] ?? '未知',
+                              member['name'] ?? (S.of(context)?.unknownMember ?? 'Unknown'),
                               style: TextStyle(color: textColor),
                             ),
                             subtitle: Text(
@@ -6274,7 +6276,7 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             onTap: () => widget.onMemberSelected(
-                              member['name'] ?? '未知',
+                              member['name'] ?? (S.of(context)?.unknownMember ?? 'Unknown'),
                               member['id'] ?? '',
                             ),
                           );
@@ -6559,15 +6561,15 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
         if (mounted) {
           if (result.isSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Saved to gallery'),
+              SnackBar(
+                content: Text(S.of(context)?.savedToGallery ?? 'Saved to gallery'),
                 backgroundColor: Colors.green,
               ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Failed to save'),
+              SnackBar(
+                content: Text(S.of(context)?.failedToSave ?? 'Failed to save'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -6577,7 +6579,7 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Download failed: ${response.statusCode}'),
+              content: Text(S.of(context)?.downloadFailed(response.statusCode.toString()) ?? 'Download failed: ${response.statusCode}'),
               backgroundColor: Colors.red,
             ),
           );
@@ -6588,7 +6590,7 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(S.of(context)?.errorWithMessage(e.toString()) ?? 'Error: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -6628,7 +6630,7 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Share failed: $e'),
+            content: Text(S.of(context)?.shareFailed(e.toString()) ?? 'Share failed: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -6682,23 +6684,23 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'save',
                 child: Row(
                   children: [
-                    Icon(Icons.download, color: Colors.white, size: 20),
-                    SizedBox(width: 12),
-                    Text('Save to Gallery', style: TextStyle(color: Colors.white)),
+                    const Icon(Icons.download, color: Colors.white, size: 20),
+                    const SizedBox(width: 12),
+                    Text(S.of(context)?.saveToGallery ?? 'Save to Gallery', style: const TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'share',
                 child: Row(
                   children: [
-                    Icon(Icons.share, color: Colors.white, size: 20),
-                    SizedBox(width: 12),
-                    Text('Share', style: TextStyle(color: Colors.white)),
+                    const Icon(Icons.share, color: Colors.white, size: 20),
+                    const SizedBox(width: 12),
+                    Text(S.of(context)?.share ?? 'Share', style: const TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
@@ -6724,12 +6726,12 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
                 placeholder: (context, url) => const Center(
                   child: CircularProgressIndicator(color: Colors.white),
                 ),
-                errorWidget: (context, url, error) => const Column(
+                errorWidget: (context, url, error) => Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error, color: Colors.red, size: 48),
-                    SizedBox(height: 16),
-                    Text('Failed to load image', style: TextStyle(color: Colors.white)),
+                    const Icon(Icons.error, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    Text(S.of(context)?.failedToLoadImage ?? 'Failed to load image', style: const TextStyle(color: Colors.white)),
                   ],
                 ),
               ),

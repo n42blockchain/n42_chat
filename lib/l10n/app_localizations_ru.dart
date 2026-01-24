@@ -394,12 +394,12 @@ class SRu extends S {
   String get send => 'Отправить';
 
   @override
-  String conversationLabel(String roomId) {
+  String conversationWithId(String roomId) {
     return 'Разговор: $roomId';
   }
 
   @override
-  String contactLabel(String userId) {
+  String contactWithId(String userId) {
     return 'Контакт: $userId';
   }
 
@@ -1213,6 +1213,9 @@ class SRu extends S {
   }
 
   @override
+  String get groupMembersTitle => 'Участники группы';
+
+  @override
   String get viewAll => 'Показать все';
 
   @override
@@ -1307,11 +1310,6 @@ class SRu extends S {
   @override
   String tapCopyGroupId(int count) {
     return '$count участников · Нажмите, чтобы скопировать ID группы';
-  }
-
-  @override
-  String featureInDevelopment(Object feature) {
-    return 'Функция в разработке...';
   }
 
   @override
@@ -1970,6 +1968,11 @@ class SRu extends S {
   String get inCall => 'В разговоре';
 
   @override
+  String featureInDevelopment(String feature) {
+    return 'Функция в разработке...';
+  }
+
+  @override
   String collectMessages(Object count) {
     return 'Сохранено $count сообщений';
   }
@@ -2132,7 +2135,9 @@ class SRu extends S {
   }
 
   @override
-  String get confirmDissolveGroup => 'Вы уверены, что хотите распустить';
+  String confirmDissolveGroup(String name) {
+    return 'Вы уверены, что хотите расформировать «$name»? Это действие нельзя отменить.';
+  }
 
   @override
   String get enterValidServerAddress =>
@@ -2223,13 +2228,17 @@ class SRu extends S {
   String get groupInvites => 'Приглашения в группы';
 
   @override
-  String get myGroups => 'Мои группы';
+  String myGroups(int count) {
+    return 'Мои группы ($count)';
+  }
 
   @override
   String get invitedToJoinGroup => 'Приглашён в группу';
 
   @override
-  String get confirmLeaveGroup => 'Вы уверены, что хотите покинуть';
+  String confirmLeaveGroup(String name) {
+    return 'Вы уверены, что хотите покинуть «$name»?';
+  }
 
   @override
   String get leave => 'Покинуть';
@@ -2259,13 +2268,17 @@ class SRu extends S {
   String get saveToGallery => 'Сохранить в галерею';
 
   @override
-  String get downloadFailed => 'Ошибка загрузки';
+  String downloadFailed(String code) {
+    return 'Ошибка загрузки: $code';
+  }
 
   @override
   String get noMediaUrl => 'URL медиа недоступен';
 
   @override
-  String get shareFailed => 'Ошибка отправки';
+  String shareFailed(String error) {
+    return 'Ошибка при отправке: $error';
+  }
 
   @override
   String get failedToLoadImage => 'Не удалось загрузить изображение';
@@ -2592,7 +2605,7 @@ class SRu extends S {
   }
 
   @override
-  String get allButton => '全部';
+  String get allButton => 'Все';
 
   @override
   String get enterValidAddress => 'Пожалуйста, введите действительный адрес';
@@ -3216,7 +3229,13 @@ class SRu extends S {
   String get searchInChat => 'Поиск в чате';
 
   @override
+  String get contactLabel => 'Контакт';
+
+  @override
   String get groupLabel => 'Группа';
+
+  @override
+  String get conversationLabel => '会话';
 
   @override
   String get messageLabel => 'Сообщение';
@@ -3859,11 +3878,226 @@ class SRu extends S {
 
   @override
   String pollVotesFormat(int count, String percentage) {
-    return '$count 票 ($percentage%)';
+    return '$count голосов ($percentage%)';
   }
 
   @override
   String pollParticipantsFormat(int count) {
-    return '$count 人参与';
+    return '$count участников';
+  }
+
+  @override
+  String get tapToRetry => 'Нажмите, чтобы повторить';
+
+  @override
+  String get noConversationsToForward => 'Нет бесед для пересылки';
+
+  @override
+  String get defaultRedPacketGreeting => 'Желаю процветания и удачи';
+
+  @override
+  String get emojiCategoryFace => 'Смайлики';
+
+  @override
+  String get emojiCategoryHeart => 'Сердечки';
+
+  @override
+  String get emojiCategoryAnimal => 'Животные';
+
+  @override
+  String get emojiCategoryFood => 'Еда';
+
+  @override
+  String get emojiCategoryTransport => 'Транспорт';
+
+  @override
+  String get emojiCategoryActivity => 'Активности';
+
+  @override
+  String get emojiCategoryObject => 'Предметы';
+
+  @override
+  String get emojiCategorySymbol => 'Символы';
+
+  @override
+  String get allowOthersToSearchAndJoin =>
+      'Разрешить другим пользователям искать и присоединяться';
+
+  @override
+  String get allowStrangerMessages => 'Разрешить сообщения от незнакомцев';
+
+  @override
+  String get alwaysUseDarkTheme => 'Всегда использовать тёмную тему';
+
+  @override
+  String get alwaysUseLightTheme => 'Всегда использовать светлую тему';
+
+  @override
+  String get autoSwitchBySystem =>
+      'Автоматически переключаться по настройкам системы';
+
+  @override
+  String get bubbleStyle => 'Стиль пузырей';
+
+  @override
+  String get bubbleStyleClassic => 'Классический стиль';
+
+  @override
+  String get bubbleStyleClassicDesc => 'Традиционный стиль пузырей';
+
+  @override
+  String get bubbleStyleModern => 'Современный стиль';
+
+  @override
+  String get bubbleStyleModernDesc => 'Чистый современный стиль пузырей';
+
+  @override
+  String get bubbleStyleWechat => 'Стиль WeChat';
+
+  @override
+  String get bubbleStyleWechatDesc => 'Классический стиль пузырей WeChat';
+
+  @override
+  String get callEnded => 'Звонок завершён';
+
+  @override
+  String get callFailed => 'Звонок не удался';
+
+  @override
+  String get checkForUpdates => 'Проверить обновления';
+
+  @override
+  String get confirmClearChatHistory =>
+      'Вы уверены, что хотите очистить историю чата?';
+
+  @override
+  String get createGroupToChat => 'Создайте группу, чтобы начать общение';
+
+  @override
+  String get darkMode => 'Тёмный режим';
+
+  @override
+  String get darkModeOption => 'Тёмный режим';
+
+  @override
+  String get doNotDisturbDescription =>
+      'Не получать уведомления в указанное время';
+
+  @override
+  String get doNotDisturbMode => 'Не беспокоить';
+
+  @override
+  String get editGroupAnnouncement => 'Редактировать объявление группы';
+
+  @override
+  String get editGroupDescription => 'Редактировать описание группы';
+
+  @override
+  String get enterGroupAnnouncement => 'Введите объявление группы';
+
+  @override
+  String errorWithMessage(String message) {
+    return 'Ошибка: $message';
+  }
+
+  @override
+  String get feedbackAndSuggestions => 'Отзывы и предложения';
+
+  @override
+  String get followSystem => 'Следовать системе';
+
+  @override
+  String get fontSize => 'Размер шрифта';
+
+  @override
+  String get fontSizeExtraLarge => 'Очень большой';
+
+  @override
+  String get fontSizeLarge => 'Большой';
+
+  @override
+  String get fontSizeSmall => 'Маленький';
+
+  @override
+  String get fontSizeStandard => 'Стандартный';
+
+  @override
+  String get incomingVideoCall => 'Входящий видеозвонок';
+
+  @override
+  String get incomingVoiceCall => 'Входящий голосовой звонок';
+
+  @override
+  String get letOthersKnowYouRead => 'Показывать, что вы прочитали сообщения';
+
+  @override
+  String get letOthersKnowYouTyping => 'Показывать, что вы печатаете';
+
+  @override
+  String get lightMode => 'Светлый режим';
+
+  @override
+  String memberCountClickToCopy(int count) {
+    return '$count участников, нажмите для копирования ID группы';
+  }
+
+  @override
+  String get messageNotifications => 'Уведомления о сообщениях';
+
+  @override
+  String get messagesLabel => 'Сообщения';
+
+  @override
+  String get musicLinkLabel => 'Ссылка на музыку';
+
+  @override
+  String get noMediaUrlAvailable => 'URL медиа недоступен';
+
+  @override
+  String get noPermissionToEditGroupName =>
+      'У вас нет прав для изменения названия группы';
+
+  @override
+  String get receiveMessagesFromNonContacts =>
+      'Получать сообщения от тех, кого нет в контактах';
+
+  @override
+  String get receiveNewMessageNotifications =>
+      'Получать уведомления о новых сообщениях';
+
+  @override
+  String get reconnectingCall => 'Переподключение...';
+
+  @override
+  String get redPacketTransferCannotForward =>
+      'Красные конверты и переводы нельзя пересылать';
+
+  @override
+  String get showMessageContentInNotification =>
+      'Показывать содержимое сообщения в уведомлениях';
+
+  @override
+  String get showMessagePreview => 'Показывать предпросмотр сообщения';
+
+  @override
+  String get typingIndicator => 'Индикатор набора';
+
+  @override
+  String versionInfo(String version) {
+    return 'Версия $version';
+  }
+
+  @override
+  String get vibration => 'Вибрация';
+
+  @override
+  String get videoCallInProgress => 'Видеозвонок';
+
+  @override
+  String get voiceCallInProgress => 'Голосовой звонок';
+
+  @override
+  String whoCanSeeTitle(String title) {
+    return 'Кто может видеть $title';
   }
 }

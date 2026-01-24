@@ -386,12 +386,12 @@ class SJa extends S {
   String get send => '送信';
 
   @override
-  String conversationLabel(String roomId) {
+  String conversationWithId(String roomId) {
     return '会話: $roomId';
   }
 
   @override
-  String contactLabel(String userId) {
+  String contactWithId(String userId) {
     return '連絡先: $userId';
   }
 
@@ -1190,6 +1190,9 @@ class SJa extends S {
   }
 
   @override
+  String get groupMembersTitle => 'グループメンバー';
+
+  @override
   String get viewAll => 'すべて表示';
 
   @override
@@ -1283,11 +1286,6 @@ class SJa extends S {
   @override
   String tapCopyGroupId(int count) {
     return '$count人のメンバー · タップしてグループIDをコピー';
-  }
-
-  @override
-  String featureInDevelopment(Object feature) {
-    return '機能開発中...';
   }
 
   @override
@@ -1939,6 +1937,11 @@ class SJa extends S {
   String get inCall => '通話中';
 
   @override
+  String featureInDevelopment(String feature) {
+    return '機能開発中...';
+  }
+
+  @override
   String collectMessages(Object count) {
     return '$count件のメッセージをコレクションに追加しました';
   }
@@ -2099,7 +2102,9 @@ class SJa extends S {
   }
 
   @override
-  String get confirmDissolveGroup => '本当にグループを解散しますか';
+  String confirmDissolveGroup(String name) {
+    return '「$name」を解散してもよろしいですか？この操作は元に戻せません。';
+  }
 
   @override
   String get enterValidServerAddress => '有効なサーバーアドレスを入力してください';
@@ -2186,13 +2191,17 @@ class SJa extends S {
   String get groupInvites => 'グループ招待';
 
   @override
-  String get myGroups => 'マイグループ';
+  String myGroups(int count) {
+    return 'マイグループ ($count)';
+  }
 
   @override
   String get invitedToJoinGroup => 'グループへの招待';
 
   @override
-  String get confirmLeaveGroup => '本当にグループを退出しますか';
+  String confirmLeaveGroup(String name) {
+    return '「$name」を退出してもよろしいですか？';
+  }
 
   @override
   String get leave => '退出';
@@ -2222,13 +2231,17 @@ class SJa extends S {
   String get saveToGallery => 'ギャラリーに保存';
 
   @override
-  String get downloadFailed => 'ダウンロードに失敗しました';
+  String downloadFailed(String code) {
+    return 'ダウンロード失敗: $code';
+  }
 
   @override
   String get noMediaUrl => 'メディアURLがありません';
 
   @override
-  String get shareFailed => '共有に失敗しました';
+  String shareFailed(String error) {
+    return '共有に失敗しました: $error';
+  }
 
   @override
   String get failedToLoadImage => '画像の読み込みに失敗しました';
@@ -2548,7 +2561,7 @@ class SJa extends S {
   }
 
   @override
-  String get allButton => '全部';
+  String get allButton => 'すべて';
 
   @override
   String get enterValidAddress => '有効なアドレスを入力してください';
@@ -3160,7 +3173,13 @@ class SJa extends S {
   String get searchInChat => 'チャット内を検索';
 
   @override
+  String get contactLabel => '連絡先';
+
+  @override
   String get groupLabel => 'グループ';
+
+  @override
+  String get conversationLabel => '会话';
 
   @override
   String get messageLabel => 'メッセージ';
@@ -3793,11 +3812,217 @@ class SJa extends S {
 
   @override
   String pollVotesFormat(int count, String percentage) {
-    return '$count 票 ($percentage%)';
+    return '$count票 ($percentage%)';
   }
 
   @override
   String pollParticipantsFormat(int count) {
-    return '$count 人参与';
+    return '$count人が参加';
+  }
+
+  @override
+  String get tapToRetry => 'タップして再試行';
+
+  @override
+  String get noConversationsToForward => '転送できる会話がありません';
+
+  @override
+  String get defaultRedPacketGreeting => '金運上昇、幸福をお祈りします';
+
+  @override
+  String get emojiCategoryFace => '顔文字';
+
+  @override
+  String get emojiCategoryHeart => 'ハート';
+
+  @override
+  String get emojiCategoryAnimal => '動物';
+
+  @override
+  String get emojiCategoryFood => '食べ物';
+
+  @override
+  String get emojiCategoryTransport => '乗り物';
+
+  @override
+  String get emojiCategoryActivity => 'アクティビティ';
+
+  @override
+  String get emojiCategoryObject => '物';
+
+  @override
+  String get emojiCategorySymbol => '記号';
+
+  @override
+  String get allowOthersToSearchAndJoin => '他のユーザーが検索して参加することを許可する';
+
+  @override
+  String get allowStrangerMessages => '知らない人からのメッセージを許可';
+
+  @override
+  String get alwaysUseDarkTheme => '常にダークテーマを使用';
+
+  @override
+  String get alwaysUseLightTheme => '常にライトテーマを使用';
+
+  @override
+  String get autoSwitchBySystem => 'システム設定に応じて自動切り替え';
+
+  @override
+  String get bubbleStyle => '吹き出しスタイル';
+
+  @override
+  String get bubbleStyleClassic => 'クラシックスタイル';
+
+  @override
+  String get bubbleStyleClassicDesc => '伝統的な吹き出しスタイル';
+
+  @override
+  String get bubbleStyleModern => 'モダンスタイル';
+
+  @override
+  String get bubbleStyleModernDesc => 'シンプルでモダンな吹き出しスタイル';
+
+  @override
+  String get bubbleStyleWechat => 'WeChatスタイル';
+
+  @override
+  String get bubbleStyleWechatDesc => 'クラシックなWeChat吹き出しスタイル';
+
+  @override
+  String get callEnded => '通話終了';
+
+  @override
+  String get callFailed => '通話失敗';
+
+  @override
+  String get checkForUpdates => 'アップデートを確認';
+
+  @override
+  String get confirmClearChatHistory => 'チャット履歴を削除してもよろしいですか?';
+
+  @override
+  String get createGroupToChat => 'グループを作成してチャットを開始する';
+
+  @override
+  String get darkMode => 'ダークモード';
+
+  @override
+  String get darkModeOption => 'ダークモード';
+
+  @override
+  String get doNotDisturbDescription => '指定時間中は通知を受け取らない';
+
+  @override
+  String get doNotDisturbMode => 'おやすみモード';
+
+  @override
+  String get editGroupAnnouncement => 'グループお知らせを編集';
+
+  @override
+  String get editGroupDescription => 'グループ説明を編集';
+
+  @override
+  String get enterGroupAnnouncement => 'グループお知らせを入力';
+
+  @override
+  String errorWithMessage(String message) {
+    return 'エラー: $message';
+  }
+
+  @override
+  String get feedbackAndSuggestions => 'フィードバックと提案';
+
+  @override
+  String get followSystem => 'システムに従う';
+
+  @override
+  String get fontSize => 'フォントサイズ';
+
+  @override
+  String get fontSizeExtraLarge => '特大';
+
+  @override
+  String get fontSizeLarge => '大';
+
+  @override
+  String get fontSizeSmall => '小';
+
+  @override
+  String get fontSizeStandard => '標準';
+
+  @override
+  String get incomingVideoCall => 'ビデオ通話の着信';
+
+  @override
+  String get incomingVoiceCall => '音声通話の着信';
+
+  @override
+  String get letOthersKnowYouRead => '既読を相手に知らせる';
+
+  @override
+  String get letOthersKnowYouTyping => '入力中であることを相手に知らせる';
+
+  @override
+  String get lightMode => 'ライトモード';
+
+  @override
+  String memberCountClickToCopy(int count) {
+    return '$count人、クリックしてグループIDをコピー';
+  }
+
+  @override
+  String get messageNotifications => 'メッセージ通知';
+
+  @override
+  String get messagesLabel => 'メッセージ';
+
+  @override
+  String get musicLinkLabel => '音楽リンク';
+
+  @override
+  String get noMediaUrlAvailable => 'メディアURLがありません';
+
+  @override
+  String get noPermissionToEditGroupName => 'グループ名を編集する権限がありません';
+
+  @override
+  String get receiveMessagesFromNonContacts => '連絡先以外からのメッセージを受け取る';
+
+  @override
+  String get receiveNewMessageNotifications => '新着メッセージ通知を受け取る';
+
+  @override
+  String get reconnectingCall => '再接続中...';
+
+  @override
+  String get redPacketTransferCannotForward => '紅包と送金は転送できません';
+
+  @override
+  String get showMessageContentInNotification => '通知にメッセージ内容を表示';
+
+  @override
+  String get showMessagePreview => 'メッセージプレビューを表示';
+
+  @override
+  String get typingIndicator => '入力中表示';
+
+  @override
+  String versionInfo(String version) {
+    return 'バージョン $version';
+  }
+
+  @override
+  String get vibration => 'バイブレーション';
+
+  @override
+  String get videoCallInProgress => 'ビデオ通話中';
+
+  @override
+  String get voiceCallInProgress => '音声通話中';
+
+  @override
+  String whoCanSeeTitle(String title) {
+    return '$titleを見られる人';
   }
 }

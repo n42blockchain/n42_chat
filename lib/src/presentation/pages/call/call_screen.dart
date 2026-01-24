@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../services/voip/webrtc_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/n42_avatar.dart';
@@ -300,7 +301,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           
           // 名称
           Text(
-            _session?.peerName ?? '未知',
+            _session?.peerName ?? (S.of(context)?.unknownUser ?? 'Unknown'),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 28,
@@ -308,10 +309,10 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             ),
           ),
           const SizedBox(height: 8),
-          
+
           // 状态文字
           Text(
-            _getStatusText(),
+            _getStatusText(context),
             style: TextStyle(
               color: Colors.white.withOpacity(0.7),
               fontSize: 16,
@@ -340,7 +341,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     if (_state == CallState.incoming) {
       return const SizedBox.shrink();
     }
-    
+
+    final l10n = S.of(context);
     return Positioned(
       bottom: 60,
       left: 0,
@@ -354,41 +356,47 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               // 静音
               _buildControlButton(
                 icon: _isMuted ? Icons.mic_off : Icons.mic,
-                label: _isMuted ? '取消静音' : '静音',
+                label: _isMuted
+                    ? (l10n?.unmute ?? 'Unmute')
+                    : (l10n?.muteCall ?? 'Mute'),
                 isActive: _isMuted,
                 onPressed: _toggleMute,
               ),
-              
+
               // 扬声器（语音通话时显示）
               if (!_isVideoCall)
                 _buildControlButton(
                   icon: _isSpeakerOn ? Icons.volume_up : Icons.volume_down,
-                  label: _isSpeakerOn ? '听筒' : '扬声器',
+                  label: _isSpeakerOn
+                      ? (l10n?.speakerOff ?? 'Speaker Off')
+                      : (l10n?.speakerOn ?? 'Speaker'),
                   isActive: _isSpeakerOn,
                   onPressed: _toggleSpeaker,
                 ),
-              
+
               // 视频开关（视频通话时显示）
               if (_isVideoCall)
                 _buildControlButton(
                   icon: _isVideoEnabled ? Icons.videocam : Icons.videocam_off,
-                  label: _isVideoEnabled ? '关闭视频' : '开启视频',
+                  label: _isVideoEnabled
+                      ? (l10n?.cameraOff ?? 'Camera Off')
+                      : (l10n?.cameraOn ?? 'Camera On'),
                   isActive: !_isVideoEnabled,
                   onPressed: _toggleVideo,
                 ),
-              
+
               // 切换摄像头（视频通话时显示）
               if (_isVideoCall)
                 _buildControlButton(
                   icon: Icons.cameraswitch,
-                  label: '切换',
+                  label: l10n?.switchCameraLabel ?? 'Switch',
                   onPressed: _switchCamera,
                 ),
             ],
           ),
-          
+
           const SizedBox(height: 40),
-          
+
           // 挂断按钮
           _buildHangupButton(),
         ],
@@ -397,6 +405,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   }
   
   Widget _buildIncomingControls() {
+    final l10n = S.of(context);
     return Positioned(
       bottom: 80,
       left: 0,
@@ -408,15 +417,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           _buildCircleButton(
             icon: Icons.call_end,
             color: Colors.red,
-            label: '拒绝',
+            label: l10n?.decline ?? 'Decline',
             onPressed: _rejectCall,
           ),
-          
+
           // 接听
           _buildCircleButton(
             icon: _isVideoCall ? Icons.videocam : Icons.call,
             color: AppColors.primary,
-            label: '接听',
+            label: l10n?.answer ?? 'Answer',
             onPressed: _answerCall,
           ),
         ],
@@ -532,22 +541,27 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     );
   }
   
-  String _getStatusText() {
+  String _getStatusText(BuildContext context) {
+    final l10n = S.of(context);
     switch (_state) {
       case CallState.ringing:
-        return '正在呼叫...';
+        return l10n?.calling ?? 'Calling...';
       case CallState.incoming:
-        return _isVideoCall ? '视频来电' : '语音来电';
+        return _isVideoCall
+            ? (l10n?.incomingVideoCall ?? 'Incoming video call')
+            : (l10n?.incomingVoiceCall ?? 'Incoming voice call');
       case CallState.connecting:
-        return '连接中...';
+        return l10n?.connectingCall ?? 'Connecting...';
       case CallState.connected:
-        return _isVideoCall ? '视频通话中' : '语音通话中';
+        return _isVideoCall
+            ? (l10n?.videoCallInProgress ?? 'Video call')
+            : (l10n?.voiceCallInProgress ?? 'Voice call');
       case CallState.reconnecting:
-        return '重新连接中...';
+        return l10n?.reconnectingCall ?? 'Reconnecting...';
       case CallState.ended:
-        return '通话已结束';
+        return l10n?.callEnded ?? 'Call ended';
       case CallState.failed:
-        return '通话失败';
+        return l10n?.callFailed ?? 'Call failed';
       case CallState.idle:
       default:
         return '';

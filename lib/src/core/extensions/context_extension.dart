@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../theme/n42_chat_theme.dart';
 
 /// BuildContext 扩展方法
@@ -131,10 +132,13 @@ extension ContextExtension on BuildContext {
   Future<bool> showConfirmDialog({
     required String title,
     required String content,
-    String confirmText = '确定',
-    String cancelText = '取消',
+    String? confirmText,
+    String? cancelText,
     bool isDanger = false,
   }) async {
+    final l10n = S.of(this);
+    final confirm = confirmText ?? l10n?.confirm ?? 'OK';
+    final cancel = cancelText ?? l10n?.cancel ?? 'Cancel';
     final result = await showDialog<bool>(
       context: this,
       builder: (context) => AlertDialog(
@@ -144,14 +148,14 @@ extension ContextExtension on BuildContext {
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              cancelText,
+              cancel,
               style: const TextStyle(color: Color(0xFF888888)),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
-              confirmText,
+              confirm,
               style: TextStyle(
                 color: isDanger ? Colors.red : const Color(0xFF07C160),
               ),

@@ -115,8 +115,8 @@
   "releaseToSend": "Lepas untuk kirim, geser ke atas untuk batal",
   "holdToTalk": "Tahan untuk bicara",
   "send": "Kirim",
-  "conversationLabel": "Percakapan: {roomId}",
-  "contactLabel": "Kontak: {userId}",
+  "conversationWithId": "Percakapan: {roomId}",
+  "contactWithId": "Kontak: {userId}",
   "addFriend": "Tambah Teman",
   "chatServiceNotConnected": "Layanan chat tidak terhubung",
   "userNotFoundHint": "Pengguna \"{query}\" tidak ditemukan\n\nTips:\n• Coba masukkan ID pengguna lengkap, contoh @username:server.com\n• Periksa ejaan nama pengguna",
@@ -380,6 +380,7 @@
   "noResults": "Tidak ada hasil",
   "groupInfo": "Info Grup",
   "groupMembers": "Anggota ({count})",
+  "groupMembersTitle": "Anggota Grup",
   "viewAll": "Lihat semua",
   "owner": "Pemilik",
   "admin": "Admin",
@@ -682,7 +683,12 @@
       "ringtone": {"type": "String"}
     }
   },
-  "confirmDissolveGroup": "Apakah Anda yakin ingin membubarkan",
+  "confirmDissolveGroup": "Apakah Anda yakin ingin membubarkan \"{name}\"? Tindakan ini tidak dapat dibatalkan.",
+  "@confirmDissolveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "enterValidServerAddress": "Silakan masukkan alamat server yang valid",
   "emailOtp": "OTP Email",
   "enterServerAddressFirst": "Silakan masukkan alamat server terlebih dahulu",
@@ -738,9 +744,19 @@
     }
   },
   "groupInvites": "Undangan Grup",
-  "myGroups": "Grup Saya",
+  "myGroups": "Grup Saya ({count})",
+  "@myGroups": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "invitedToJoinGroup": "Diundang untuk bergabung ke grup",
-  "confirmLeaveGroup": "Apakah Anda yakin ingin keluar dari",
+  "confirmLeaveGroup": "Apakah Anda yakin ingin keluar dari \"{name}\"?",
+  "@confirmLeaveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "leave": "Keluar",
   "saveMedia": "Simpan",
   "recallThisMessage": "Tarik pesan ini?",
@@ -750,9 +766,19 @@
   "saving": "Menyimpan...",
   "share": "Bagikan",
   "saveToGallery": "Simpan ke Galeri",
-  "downloadFailed": "Unduhan gagal",
+  "downloadFailed": "Unduhan gagal: {code}",
+  "@downloadFailed": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
   "noMediaUrl": "Tidak ada URL media tersedia",
-  "shareFailed": "Gagal membagikan",
+  "shareFailed": "Gagal berbagi: {error}",
+  "@shareFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "failedToLoadImage": "Gagal memuat gambar",
   "failedToLoadMoreMessages": "Gagal memuat lebih banyak pesan",
   "failedToSend": "Gagal mengirim",
@@ -1155,6 +1181,7 @@
   "allResults": "Semua",
   "searchInChat": "Cari di chat",
   "groupLabel": "Grup",
+  "contactLabel": "Kontak",
   "messageLabel": "Pesan",
 
   "securityTitle": "Keamanan",
@@ -1542,5 +1569,101 @@
   "switchCameraLabel": "Ganti",
   "leaveLabel": "Keluar",
   "participantsLabel": "Peserta",
-  "joiningMeeting": "Bergabung ke meeting..."
+  "joiningMeeting": "Bergabung ke meeting...",
+  "connectingCall": "Menghubungkan...",
+  "pollVotesFormat": "{count} suara ({percentage}%)",
+  "@pollVotesFormat": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "percentage": {"type": "String"}
+    }
+  },
+  "pollParticipantsFormat": "{count} peserta",
+  "@pollParticipantsFormat": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "incomingVideoCall": "Panggilan video masuk",
+  "incomingVoiceCall": "Panggilan suara masuk",
+  "videoCallInProgress": "Panggilan video",
+  "voiceCallInProgress": "Panggilan suara",
+  "reconnectingCall": "Menghubungkan ulang...",
+  "callEnded": "Panggilan berakhir",
+  "callFailed": "Panggilan gagal",
+  "noMediaUrlAvailable": "URL media tidak tersedia",
+  "errorWithMessage": "Kesalahan: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+  "musicLinkLabel": "Link musik",
+  "redPacketTransferCannotForward": "Angpao dan transfer tidak dapat diteruskan",
+  "messageNotifications": "Notifikasi pesan",
+  "receiveNewMessageNotifications": "Terima notifikasi pesan baru",
+  "showMessagePreview": "Tampilkan pratinjau pesan",
+  "showMessageContentInNotification": "Tampilkan isi pesan di notifikasi",
+  "vibration": "Getaran",
+  "doNotDisturbMode": "Jangan ganggu",
+  "doNotDisturbDescription": "Tidak menerima notifikasi selama waktu yang ditentukan",
+  "messagesLabel": "Pesan",
+  "allowStrangerMessages": "Izinkan pesan dari orang asing",
+  "receiveMessagesFromNonContacts": "Terima pesan dari non-kontak",
+  "letOthersKnowYouRead": "Biarkan orang lain tahu Anda telah membaca pesan mereka",
+  "typingIndicator": "Indikator mengetik",
+  "letOthersKnowYouTyping": "Biarkan orang lain tahu Anda sedang mengetik",
+  "whoCanSeeTitle": "Siapa yang bisa melihat {title}",
+  "@whoCanSeeTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "versionInfo": "Versi {version}",
+  "@versionInfo": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "checkForUpdates": "Periksa pembaruan",
+  "feedbackAndSuggestions": "Masukan dan saran",
+  "darkMode": "Mode gelap",
+  "fontSize": "Ukuran font",
+  "bubbleStyle": "Gaya gelembung",
+  "followSystem": "Ikuti sistem",
+  "autoSwitchBySystem": "Beralih otomatis sesuai pengaturan sistem",
+  "lightMode": "Mode terang",
+  "alwaysUseLightTheme": "Selalu gunakan tema terang",
+  "darkModeOption": "Mode gelap",
+  "alwaysUseDarkTheme": "Selalu gunakan tema gelap",
+  "fontSizeSmall": "Kecil",
+  "fontSizeStandard": "Standar",
+  "fontSizeLarge": "Besar",
+  "fontSizeExtraLarge": "Sangat besar",
+  "bubbleStyleWechat": "Gaya WeChat",
+  "bubbleStyleWechatDesc": "Gaya gelembung klasik WeChat",
+  "bubbleStyleModern": "Gaya modern",
+  "bubbleStyleModernDesc": "Gaya gelembung modern yang bersih",
+  "bubbleStyleClassic": "Gaya klasik",
+  "bubbleStyleClassicDesc": "Gaya gelembung tradisional",
+  "allButton": "Semua",
+  "tapToRetry": "Ketuk untuk mencoba lagi",
+  "noConversationsToForward": "Tidak ada percakapan untuk diteruskan",
+  "defaultRedPacketGreeting": "Semoga sukses dan sejahtera",
+  "emojiCategoryFace": "Emotikon",
+  "emojiCategoryHeart": "Hati",
+  "emojiCategoryAnimal": "Hewan",
+  "emojiCategoryFood": "Makanan",
+  "emojiCategoryTransport": "Transportasi",
+  "emojiCategoryActivity": "Aktivitas",
+  "emojiCategoryObject": "Objek",
+  "emojiCategorySymbol": "Simbol",
+  "allowOthersToSearchAndJoin": "Izinkan orang lain untuk mencari dan bergabung",
+  "confirmClearChatHistory": "Apakah Anda yakin ingin menghapus riwayat chat?",
+  "createGroupToChat": "Buat grup untuk mulai berbincang",
+  "editGroupAnnouncement": "Edit pengumuman grup",
+  "editGroupDescription": "Edit deskripsi grup",
+  "enterGroupAnnouncement": "Masukkan pengumuman grup",
+  "memberCountClickToCopy": "{count} anggota, klik untuk menyalin ID grup",
+  "noPermissionToEditGroupName": "Anda tidak memiliki izin untuk mengubah nama grup"
 }

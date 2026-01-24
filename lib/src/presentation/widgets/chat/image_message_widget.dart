@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 
@@ -250,9 +251,9 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
               ),
               if (canRetry) ...[
                 const SizedBox(height: 8),
-                const Text(
-                  '点击重试',
-                  style: TextStyle(
+                Text(
+                  S.of(context)?.tapToRetry ?? 'Tap to retry',
+                  style: const TextStyle(
                     color: AppColors.textTertiary,
                     fontSize: 12,
                   ),

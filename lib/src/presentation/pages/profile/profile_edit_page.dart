@@ -886,13 +886,16 @@ class _AddressManagePageState extends State<_AddressManagePage> {
           if (data is Map && data['addresses'] != null) {
             final addressList = data['addresses'] as List;
             setState(() {
-              _addresses = addressList.map((item) => _AddressItem(
-                name: item['name'] ?? '',
-                phone: item['phone'] ?? '',
-                region: item['region'] ?? '',
-                detail: item['detail'] ?? '',
-                isDefault: item['isDefault'] ?? false,
-              )).toList();
+              _addresses = addressList.map((item) {
+                final map = item as Map<String, dynamic>;
+                return _AddressItem(
+                  name: (map['name'] as String?) ?? '',
+                  phone: (map['phone'] as String?) ?? '',
+                  region: (map['region'] as String?) ?? '',
+                  detail: (map['detail'] as String?) ?? '',
+                  isDefault: (map['isDefault'] as bool?) ?? false,
+                );
+              }).toList();
               _isLoading = false;
             });
             return;
@@ -1320,16 +1323,19 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
           if (data is Map && data['invoices'] != null) {
             final invoiceList = data['invoices'] as List;
             setState(() {
-              _invoices = invoiceList.map((item) => _InvoiceItem(
-                type: item['type'] ?? 'personal',
-                title: item['title'] ?? '',
-                taxNumber: item['taxNumber'],
-                bankName: item['bankName'],
-                bankAccount: item['bankAccount'],
-                companyAddress: item['companyAddress'],
-                companyPhone: item['companyPhone'],
-                isDefault: item['isDefault'] ?? false,
-              )).toList();
+              _invoices = invoiceList.map((item) {
+                final map = item as Map<String, dynamic>;
+                return _InvoiceItem(
+                  type: (map['type'] as String?) ?? 'personal',
+                  title: (map['title'] as String?) ?? '',
+                  taxNumber: map['taxNumber'] as String?,
+                  bankName: map['bankName'] as String?,
+                  bankAccount: map['bankAccount'] as String?,
+                  companyAddress: map['companyAddress'] as String?,
+                  companyPhone: map['companyPhone'] as String?,
+                  isDefault: (map['isDefault'] as bool?) ?? false,
+                );
+              }).toList();
               _isLoading = false;
             });
             return;

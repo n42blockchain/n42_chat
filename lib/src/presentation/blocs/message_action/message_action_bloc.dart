@@ -90,7 +90,7 @@ class MessageActionBloc extends Bloc<MessageActionEvent, MessageActionState> {
         event.originalEventId,
         event.content,
       );
-      emit(const MessageActionSuccess('reply', message: '回复已发送'));
+      emit(const MessageActionSuccess('reply', message: 'Reply sent'));
     } catch (e) {
       emit(MessageActionFailure('reply', e.toString()));
     }
@@ -108,7 +108,7 @@ class MessageActionBloc extends Bloc<MessageActionEvent, MessageActionState> {
         event.originalEventId,
         event.newContent,
       );
-      emit(const MessageActionSuccess('edit', message: '消息已编辑'));
+      emit(const MessageActionSuccess('edit', message: 'Message edited'));
     } catch (e) {
       emit(MessageActionFailure('edit', e.toString()));
     }
@@ -126,7 +126,7 @@ class MessageActionBloc extends Bloc<MessageActionEvent, MessageActionState> {
         event.eventId,
         reason: event.reason,
       );
-      emit(const MessageActionSuccess('redact', message: '消息已撤回'));
+      emit(const MessageActionSuccess('redact', message: 'Message recalled'));
     } catch (e) {
       emit(MessageActionFailure('redact', e.toString()));
     }
@@ -144,7 +144,7 @@ class MessageActionBloc extends Bloc<MessageActionEvent, MessageActionState> {
         event.eventId,
         event.toRoomId,
       );
-      emit(const MessageActionSuccess('forward', message: '消息已转发'));
+      emit(const MessageActionSuccess('forward', message: 'Message forwarded'));
     } catch (e) {
       emit(MessageActionFailure('forward', e.toString()));
     }

@@ -389,12 +389,12 @@ class STr extends S {
   String get send => 'Gönder';
 
   @override
-  String conversationLabel(String roomId) {
+  String conversationWithId(String roomId) {
     return 'Sohbet: $roomId';
   }
 
   @override
-  String contactLabel(String userId) {
+  String contactWithId(String userId) {
     return 'Kişi: $userId';
   }
 
@@ -1204,6 +1204,9 @@ class STr extends S {
   }
 
   @override
+  String get groupMembersTitle => 'Grup Üyeleri';
+
+  @override
   String get viewAll => 'Tümünü gör';
 
   @override
@@ -1298,11 +1301,6 @@ class STr extends S {
   @override
   String tapCopyGroupId(int count) {
     return '$count üye · Grup ID\'sini kopyalamak için dokunun';
-  }
-
-  @override
-  String featureInDevelopment(Object feature) {
-    return 'Özellik geliştirme aşamasında...';
   }
 
   @override
@@ -1957,6 +1955,11 @@ class STr extends S {
   String get inCall => 'Aramada';
 
   @override
+  String featureInDevelopment(String feature) {
+    return 'Özellik geliştirme aşamasında...';
+  }
+
+  @override
   String collectMessages(Object count) {
     return '$count mesaj kaydedildi';
   }
@@ -2119,8 +2122,9 @@ class STr extends S {
   }
 
   @override
-  String get confirmDissolveGroup =>
-      'Bu grubu dağıtmak istediğinizden emin misiniz';
+  String confirmDissolveGroup(String name) {
+    return '\"$name\" grubunu dağıtmak istediğinize emin misiniz? Bu işlem geri alınamaz.';
+  }
 
   @override
   String get enterValidServerAddress =>
@@ -2211,14 +2215,17 @@ class STr extends S {
   String get groupInvites => 'Grup Davetleri';
 
   @override
-  String get myGroups => 'Gruplarım';
+  String myGroups(int count) {
+    return 'Gruplarım ($count)';
+  }
 
   @override
   String get invitedToJoinGroup => 'Gruba davet edildi';
 
   @override
-  String get confirmLeaveGroup =>
-      'Bu gruptan ayrılmak istediğinizden emin misiniz';
+  String confirmLeaveGroup(String name) {
+    return '\"$name\" grubundan ayrılmak istediğinize emin misiniz?';
+  }
 
   @override
   String get leave => 'Ayrıl';
@@ -2248,13 +2255,17 @@ class STr extends S {
   String get saveToGallery => 'Galeriye Kaydet';
 
   @override
-  String get downloadFailed => 'İndirme başarısız';
+  String downloadFailed(String code) {
+    return 'İndirme başarısız: $code';
+  }
 
   @override
   String get noMediaUrl => 'Medya URL\'si mevcut değil';
 
   @override
-  String get shareFailed => 'Paylaşım başarısız';
+  String shareFailed(String error) {
+    return 'Paylaşım başarısız: $error';
+  }
 
   @override
   String get failedToLoadImage => 'Resim yüklenemedi';
@@ -2580,7 +2591,7 @@ class STr extends S {
   }
 
   @override
-  String get allButton => '全部';
+  String get allButton => 'Tümü';
 
   @override
   String get enterValidAddress => 'Lütfen geçerli bir adres girin';
@@ -3206,7 +3217,13 @@ class STr extends S {
   String get searchInChat => 'Sohbette ara';
 
   @override
+  String get contactLabel => 'Kişi';
+
+  @override
   String get groupLabel => 'Grup';
+
+  @override
+  String get conversationLabel => '会话';
 
   @override
   String get messageLabel => 'Mesaj';
@@ -3846,11 +3863,224 @@ class STr extends S {
 
   @override
   String pollVotesFormat(int count, String percentage) {
-    return '$count 票 ($percentage%)';
+    return '$count oy ($percentage%)';
   }
 
   @override
   String pollParticipantsFormat(int count) {
-    return '$count 人参与';
+    return '$count katılımcı';
+  }
+
+  @override
+  String get tapToRetry => 'Tekrar denemek için dokunun';
+
+  @override
+  String get noConversationsToForward => 'İletilecek sohbet yok';
+
+  @override
+  String get defaultRedPacketGreeting => 'Bol şans ve bereket dilerim';
+
+  @override
+  String get emojiCategoryFace => 'Suratlar';
+
+  @override
+  String get emojiCategoryHeart => 'Kalpler';
+
+  @override
+  String get emojiCategoryAnimal => 'Hayvanlar';
+
+  @override
+  String get emojiCategoryFood => 'Yiyecek';
+
+  @override
+  String get emojiCategoryTransport => 'Ulaşım';
+
+  @override
+  String get emojiCategoryActivity => 'Aktiviteler';
+
+  @override
+  String get emojiCategoryObject => 'Nesneler';
+
+  @override
+  String get emojiCategorySymbol => 'Semboller';
+
+  @override
+  String get allowOthersToSearchAndJoin =>
+      'Başkalarının arama yapmasına ve katılmasına izin ver';
+
+  @override
+  String get allowStrangerMessages => 'Yabancılardan mesajlara izin ver';
+
+  @override
+  String get alwaysUseDarkTheme => 'Her zaman koyu tema kullan';
+
+  @override
+  String get alwaysUseLightTheme => 'Her zaman açık tema kullan';
+
+  @override
+  String get autoSwitchBySystem => 'Sistem ayarlarına göre otomatik geçiş yap';
+
+  @override
+  String get bubbleStyle => 'Balon stili';
+
+  @override
+  String get bubbleStyleClassic => 'Klasik stil';
+
+  @override
+  String get bubbleStyleClassicDesc => 'Geleneksel balon stili';
+
+  @override
+  String get bubbleStyleModern => 'Modern stil';
+
+  @override
+  String get bubbleStyleModernDesc => 'Temiz modern balon stili';
+
+  @override
+  String get bubbleStyleWechat => 'WeChat stili';
+
+  @override
+  String get bubbleStyleWechatDesc => 'Klasik WeChat balon stili';
+
+  @override
+  String get callEnded => 'Arama sonlandı';
+
+  @override
+  String get callFailed => 'Arama başarısız';
+
+  @override
+  String get checkForUpdates => 'Güncellemeleri kontrol et';
+
+  @override
+  String get confirmClearChatHistory =>
+      'Sohbet geçmişini temizlemek istediğinizden emin misiniz?';
+
+  @override
+  String get createGroupToChat =>
+      'Sohbet etmeye başlamak için bir grup oluşturun';
+
+  @override
+  String get darkMode => 'Karanlık mod';
+
+  @override
+  String get darkModeOption => 'Karanlık mod';
+
+  @override
+  String get doNotDisturbDescription => 'Belirtilen süre boyunca bildirim alma';
+
+  @override
+  String get doNotDisturbMode => 'Rahatsız etmeyin';
+
+  @override
+  String get editGroupAnnouncement => 'Grup duyurusunu düzenle';
+
+  @override
+  String get editGroupDescription => 'Grup açıklamasını düzenle';
+
+  @override
+  String get enterGroupAnnouncement => 'Grup duyurusunu girin';
+
+  @override
+  String errorWithMessage(String message) {
+    return 'Hata: $message';
+  }
+
+  @override
+  String get feedbackAndSuggestions => 'Geri bildirim ve öneriler';
+
+  @override
+  String get followSystem => 'Sistemi takip et';
+
+  @override
+  String get fontSize => 'Yazı tipi boyutu';
+
+  @override
+  String get fontSizeExtraLarge => 'Çok büyük';
+
+  @override
+  String get fontSizeLarge => 'Büyük';
+
+  @override
+  String get fontSizeSmall => 'Küçük';
+
+  @override
+  String get fontSizeStandard => 'Standart';
+
+  @override
+  String get incomingVideoCall => 'Gelen görüntülü arama';
+
+  @override
+  String get incomingVoiceCall => 'Gelen sesli arama';
+
+  @override
+  String get letOthersKnowYouRead =>
+      'Başkalarının mesajlarını okuduğunuzu bilmelerini sağlayın';
+
+  @override
+  String get letOthersKnowYouTyping =>
+      'Başkalarının yazdığınızı bilmelerini sağlayın';
+
+  @override
+  String get lightMode => 'Aydınlık mod';
+
+  @override
+  String memberCountClickToCopy(int count) {
+    return '$count üye, grup ID\'sini kopyalamak için tıklayın';
+  }
+
+  @override
+  String get messageNotifications => 'Mesaj bildirimleri';
+
+  @override
+  String get messagesLabel => 'Mesajlar';
+
+  @override
+  String get musicLinkLabel => 'Müzik bağlantısı';
+
+  @override
+  String get noMediaUrlAvailable => 'Medya URL\'si mevcut değil';
+
+  @override
+  String get noPermissionToEditGroupName => 'Grup adını düzenleme izniniz yok';
+
+  @override
+  String get receiveMessagesFromNonContacts => 'Kişiler dışından mesaj al';
+
+  @override
+  String get receiveNewMessageNotifications => 'Yeni mesaj bildirimleri al';
+
+  @override
+  String get reconnectingCall => 'Yeniden bağlanıyor...';
+
+  @override
+  String get redPacketTransferCannotForward =>
+      'Kırmızı zarflar ve transferler iletilemez';
+
+  @override
+  String get showMessageContentInNotification =>
+      'Bildirimlerde mesaj içeriğini göster';
+
+  @override
+  String get showMessagePreview => 'Mesaj önizlemesini göster';
+
+  @override
+  String get typingIndicator => 'Yazma göstergesi';
+
+  @override
+  String versionInfo(String version) {
+    return 'Sürüm $version';
+  }
+
+  @override
+  String get vibration => 'Titreşim';
+
+  @override
+  String get videoCallInProgress => 'Görüntülü arama';
+
+  @override
+  String get voiceCallInProgress => 'Sesli arama';
+
+  @override
+  String whoCanSeeTitle(String title) {
+    return '$title kimler görebilir';
   }
 }

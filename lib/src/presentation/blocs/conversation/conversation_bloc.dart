@@ -61,7 +61,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
-        error: '加载会话列表失败: ${e.toString()}',
+        error: 'Failed to load conversations: ${e.toString()}',
       ));
     }
   }
@@ -89,7 +89,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     } catch (e) {
       emit(state.copyWith(
         isRefreshing: false,
-        error: '刷新失败: ${e.toString()}',
+        error: 'Refresh failed: ${e.toString()}',
       ));
     }
   }
@@ -161,7 +161,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       emit(state.copyWith(filteredConversations: results));
     } catch (e) {
       emit(state.copyWith(
-        error: '搜索失败: ${e.toString()}',
+        error: 'Search failed: ${e.toString()}',
       ));
     }
   }
@@ -202,7 +202,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         normalConversations: normal,
       ));
     } catch (e) {
-      emit(state.copyWith(error: '设置失败: ${e.toString()}'));
+      emit(state.copyWith(error: 'Setting failed: ${e.toString()}'));
     }
   }
 
@@ -231,7 +231,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         normalConversations: normal,
       ));
     } catch (e) {
-      emit(state.copyWith(error: '设置失败: ${e.toString()}'));
+      emit(state.copyWith(error: 'Setting failed: ${e.toString()}'));
     }
   }
 
@@ -261,7 +261,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         totalUnreadCount: totalUnread,
       ));
     } catch (e) {
-      emit(state.copyWith(error: '标记已读失败: ${e.toString()}'));
+      emit(state.copyWith(error: 'Mark as read failed: ${e.toString()}'));
     }
   }
 
@@ -286,7 +286,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         normalConversations: normal,
       ));
     } catch (e) {
-      emit(state.copyWith(error: '删除失败: ${e.toString()}'));
+      emit(state.copyWith(error: 'Delete failed: ${e.toString()}'));
     }
   }
 
@@ -304,7 +304,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       // 触发刷新
       add(const RefreshConversations());
     } catch (e) {
-      emit(state.copyWith(error: '创建会话失败: ${e.toString()}'));
+      emit(state.copyWith(error: 'Failed to create chat: ${e.toString()}'));
     }
   }
 
@@ -326,7 +326,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       // 触发刷新
       add(const RefreshConversations());
     } catch (e) {
-      emit(state.copyWith(error: '创建群聊失败: ${e.toString()}'));
+      emit(state.copyWith(error: 'Failed to create group: ${e.toString()}'));
     }
   }
 

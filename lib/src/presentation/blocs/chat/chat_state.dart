@@ -62,12 +62,13 @@ class ChatState extends Equatable {
   bool get hasTypingUsers => typingUsers.isNotEmpty;
 
   /// 获取正在输入提示文本
+  /// Note: This returns a raw value that UI layer should localize
   String get typingText {
     if (typingUsers.isEmpty) return '';
     if (typingUsers.length == 1) {
-      return '${typingUsers.first}正在输入...';
+      return '${typingUsers.first} is typing...';
     }
-    return '${typingUsers.length}人正在输入...';
+    return '${typingUsers.length} people typing...';
   }
 
   ChatState copyWith({

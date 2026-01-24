@@ -81,7 +81,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     try {
       final group = await _groupRepository.getGroup(event.roomId);
       if (group == null) {
-        emit(const GroupError('群不存在'));
+        emit(const GroupError('Group not found'));
         return;
       }
 
@@ -190,7 +190,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.inviteUsers(event.roomId, event.userIds);
-      emit(GroupOperationSuccess('已邀请 ${event.userIds.length} 人'));
+      emit(GroupOperationSuccess('Invited ${event.userIds.length} member(s)'));
       add(LoadGroupMembers(event.roomId));
     } catch (e) {
       emit(GroupError(e.toString()));
@@ -207,7 +207,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         event.userId,
         reason: event.reason,
       );
-      emit(const GroupOperationSuccess('成员已移除'));
+      emit(const GroupOperationSuccess('Member removed'));
       add(LoadGroupMembers(event.roomId));
     } catch (e) {
       emit(GroupError(e.toString()));
@@ -220,7 +220,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.setAsAdmin(event.roomId, event.userId);
-      emit(const GroupOperationSuccess('已设为管理员'));
+      emit(const GroupOperationSuccess('Set as admin'));
       add(LoadGroupMembers(event.roomId));
     } catch (e) {
       emit(GroupError(e.toString()));
@@ -233,7 +233,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.removeAdmin(event.roomId, event.userId);
-      emit(const GroupOperationSuccess('已取消管理员'));
+      emit(const GroupOperationSuccess('Admin removed'));
       add(LoadGroupMembers(event.roomId));
     } catch (e) {
       emit(GroupError(e.toString()));
@@ -246,7 +246,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.leaveGroup(event.roomId);
-      emit(const GroupOperationSuccess('已退出群聊'));
+      emit(const GroupOperationSuccess('Left the group'));
       add(const RefreshGroups());
     } catch (e) {
       emit(GroupError(e.toString()));
@@ -259,7 +259,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.deleteGroup(event.roomId);
-      emit(const GroupOperationSuccess('群聊已解散'));
+      emit(const GroupOperationSuccess('Group disbanded'));
       add(const RefreshGroups());
     } catch (e) {
       emit(GroupError(e.toString()));
@@ -288,7 +288,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.acceptGroupInvite(event.roomId);
-      emit(const GroupOperationSuccess('已加入群聊'));
+      emit(const GroupOperationSuccess('Joined the group'));
       add(const RefreshGroups());
     } catch (e) {
       emit(GroupError(e.toString()));
@@ -301,7 +301,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.rejectGroupInvite(event.roomId);
-      emit(const GroupOperationSuccess('已拒绝邀请'));
+      emit(const GroupOperationSuccess('Invitation declined'));
       add(const LoadGroupInvites());
     } catch (e) {
       emit(GroupError(e.toString()));
