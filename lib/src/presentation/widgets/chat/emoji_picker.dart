@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 表情选择器
@@ -37,48 +38,16 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
   late TabController _tabController;
   int _currentCategory = 0;
 
-  // 表情分类
+  // 表情分类（仅包含图标和表情列表，界面只显示图标）
   static const List<_EmojiCategory> _categories = [
-    _EmojiCategory(
-      icon: Icons.emoji_emotions_outlined,
-      name: '表情',
-      emojis: _faceEmojis,
-    ),
-    _EmojiCategory(
-      icon: Icons.favorite_outline,
-      name: '爱心',
-      emojis: _heartEmojis,
-    ),
-    _EmojiCategory(
-      icon: Icons.pets,
-      name: '动物',
-      emojis: _animalEmojis,
-    ),
-    _EmojiCategory(
-      icon: Icons.restaurant,
-      name: '食物',
-      emojis: _foodEmojis,
-    ),
-    _EmojiCategory(
-      icon: Icons.directions_car_outlined,
-      name: '交通',
-      emojis: _transportEmojis,
-    ),
-    _EmojiCategory(
-      icon: Icons.celebration_outlined,
-      name: '活动',
-      emojis: _activityEmojis,
-    ),
-    _EmojiCategory(
-      icon: Icons.lightbulb_outline,
-      name: '物品',
-      emojis: _objectEmojis,
-    ),
-    _EmojiCategory(
-      icon: Icons.flag_outlined,
-      name: '符号',
-      emojis: _symbolEmojis,
-    ),
+    _EmojiCategory(icon: Icons.emoji_emotions_outlined, emojis: _faceEmojis),
+    _EmojiCategory(icon: Icons.favorite_outline, emojis: _heartEmojis),
+    _EmojiCategory(icon: Icons.pets, emojis: _animalEmojis),
+    _EmojiCategory(icon: Icons.restaurant, emojis: _foodEmojis),
+    _EmojiCategory(icon: Icons.directions_car_outlined, emojis: _transportEmojis),
+    _EmojiCategory(icon: Icons.celebration_outlined, emojis: _activityEmojis),
+    _EmojiCategory(icon: Icons.lightbulb_outline, emojis: _objectEmojis),
+    _EmojiCategory(icon: Icons.flag_outlined, emojis: _symbolEmojis),
   ];
 
   // 常用表情
@@ -320,10 +289,10 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
                         width: 60,
                         height: 44,
                         color: AppColors.primary,
-                        child: const Center(
+                        child: Center(
                           child: Text(
-                            '发送',
-                            style: TextStyle(
+                            S.of(context)?.sendButton ?? 'Send',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -373,12 +342,10 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
 
 class _EmojiCategory {
   final IconData icon;
-  final String name;
   final List<String> emojis;
 
   const _EmojiCategory({
     required this.icon,
-    required this.name,
     required this.emojis,
   });
 }

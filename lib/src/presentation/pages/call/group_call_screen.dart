@@ -16,6 +16,30 @@ import '../../../services/voip/livekit_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/n42_avatar.dart';
 
+// VideoTrackRenderer 存根实现
+// 由于 livekit_client 暂时禁用，使用占位符组件
+class VideoTrackRenderer extends StatelessWidget {
+  final VideoTrack videoTrack;
+  final RTCVideoViewObjectFit fit;
+
+  const VideoTrackRenderer(
+    this.videoTrack, {
+    super.key,
+    this.fit = RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // 存根实现 - 显示占位符
+    return Container(
+      color: Colors.black,
+      child: const Center(
+        child: Icon(Icons.videocam_off, color: Colors.white54, size: 48),
+      ),
+    );
+  }
+}
+
 /// 多人会议页面
 class GroupCallScreen extends StatefulWidget {
   final LiveKitService liveKitService;

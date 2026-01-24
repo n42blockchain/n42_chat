@@ -125,10 +125,17 @@ class CallNotificationService {
     String? roomId,
     int durationSeconds = 60,
     Map<String, dynamic>? extra,
+    // 本地化字符串参数
+    String textAccept = 'Answer',
+    String textDecline = 'Decline',
+    String missedCallText = 'Missed call',
+    String callbackText = 'Call back',
+    String incomingCallChannelName = 'Incoming call',
+    String missedCallChannelName = 'Missed call',
   }) async {
     final callId = _uuid.v4();
     _currentCallId = callId;
-    
+
     final params = CallKitParams(
       id: callId,
       nameCaller: callerName,
@@ -136,13 +143,13 @@ class CallNotificationService {
       avatar: callerAvatarUrl,
       handle: callerId,
       type: isVideo ? 1 : 0, // 1 = video, 0 = audio
-      textAccept: '接听',
-      textDecline: '拒绝',
+      textAccept: textAccept,
+      textDecline: textDecline,
       missedCallNotification: NotificationParams(
         showNotification: true,
         isShowCallback: true,
-        subtitle: '未接来电',
-        callbackText: '回拨',
+        subtitle: missedCallText,
+        callbackText: callbackText,
       ),
       duration: durationSeconds * 1000,
       extra: <String, dynamic>{
@@ -162,8 +169,8 @@ class CallNotificationService {
         backgroundUrl: callerAvatarUrl,
         actionColor: '#4CAF50',
         textColor: '#ffffff',
-        incomingCallNotificationChannelName: '来电',
-        missedCallNotificationChannelName: '未接来电',
+        incomingCallNotificationChannelName: incomingCallChannelName,
+        missedCallNotificationChannelName: missedCallChannelName,
         isShowCallID: false,
       ),
       ios: IOSParams(
@@ -258,7 +265,8 @@ class CallNotificationService {
   
   /// 获取当前活动通话
   Future<List<dynamic>> getActiveCalls() async {
-    return await FlutterCallkitIncoming.activeCalls() ?? [];
+    final calls = await FlutterCallkitIncoming.activeCalls();
+    return (calls as List<dynamic>?) ?? [];
   }
   
   /// 检查是否有来电权限（主要用于 iOS）
@@ -273,7 +281,15 @@ class CallNotificationService {
     required String callerName,
     String? callerAvatarUrl,
     bool isVideo = false,
+    // 本地化字符串参数
+    String? missedVideoCallText,
+    String? missedVoiceCallText,
+    String callbackText = 'Call back',
   }) async {
+    final subtitle = isVideo
+        ? (missedVideoCallText ?? 'Missed video call')
+        : (missedVoiceCallText ?? 'Missed voice call');
+
     final params = CallKitParams(
       id: _uuid.v4(),
       nameCaller: callerName,
@@ -283,8 +299,8 @@ class CallNotificationService {
       missedCallNotification: NotificationParams(
         showNotification: true,
         isShowCallback: true,
-        subtitle: isVideo ? '未接视频通话' : '未接语音通话',
-        callbackText: '回拨',
+        subtitle: subtitle,
+        callbackText: callbackText,
       ),
     );
     

@@ -654,7 +654,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               onTap: () {
                 Navigator.pop(sheetContext);
                 ScaffoldMessenger.of(this.context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.featureInDevelopment ?? 'Feature in development')),
+                  SnackBar(content: Text(S.of(context)?.featureInDevelopment('') ?? 'Feature in development')),
                 );
               },
             ),
@@ -664,7 +664,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               onTap: () {
                 Navigator.pop(sheetContext);
                 ScaffoldMessenger.of(this.context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.featureInDevelopment ?? 'Feature in development')),
+                  SnackBar(content: Text(S.of(context)?.featureInDevelopment('') ?? 'Feature in development')),
                 );
               },
             ),

@@ -136,7 +136,7 @@ class ChatMorePanel extends StatelessWidget {
                       ),
                       _MoreItem(
                         icon: Icons.person_outline,
-                        label: 'Contact',
+                        label: S.of(context)?.personalCard ?? 'Contact',
                         onTap: onContactCardPressed,
                       ),
                     ],

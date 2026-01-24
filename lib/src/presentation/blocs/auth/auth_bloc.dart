@@ -84,7 +84,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } else {
       emit(state.copyWith(
         status: AuthStatus.error,
-        errorMessage: result.errorMessage ?? '登录失败',
+        errorMessage: result.errorMessage ?? 'Login failed',
         errorType: result.errorType,
       ));
     }
@@ -132,7 +132,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } else {
       emit(state.copyWith(
         status: AuthStatus.error,
-        errorMessage: result.errorMessage ?? '注册失败',
+        errorMessage: result.errorMessage ?? 'Registration failed',
         errorType: result.errorType,
       ));
     }
@@ -209,13 +209,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
-          errorMessage: '头像上传失败',
+          errorMessage: 'Avatar upload failed',
         ));
       }
     } catch (e) {
       emit(state.copyWith(
         status: AuthStatus.error,
-        errorMessage: '头像上传失败: $e',
+        errorMessage: 'Avatar upload failed: $e',
       ));
     }
   }
@@ -240,13 +240,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
-          errorMessage: '更新昵称失败',
+          errorMessage: 'Update nickname failed',
         ));
       }
     } catch (e) {
       emit(state.copyWith(
         status: AuthStatus.error,
-        errorMessage: '更新昵称失败: $e',
+        errorMessage: 'Update nickname failed: $e',
       ));
     }
   }
@@ -294,7 +294,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       emit(state.copyWith(
         status: AuthStatus.error,
-        errorMessage: '更新资料失败: $e',
+        errorMessage: 'Update profile failed: $e',
       ));
     }
   }

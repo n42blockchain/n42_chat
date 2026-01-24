@@ -386,12 +386,12 @@ class SZh extends S {
   String get send => '发送';
 
   @override
-  String conversationLabel(String roomId) {
-    return '会话';
+  String conversationWithId(String roomId) {
+    return '会话: $roomId';
   }
 
   @override
-  String contactLabel(String userId) {
+  String contactWithId(String userId) {
     return '联系人: $userId';
   }
 
@@ -1190,6 +1190,9 @@ class SZh extends S {
   }
 
   @override
+  String get groupMembersTitle => '群成员';
+
+  @override
   String get viewAll => '查看全部';
 
   @override
@@ -1283,11 +1286,6 @@ class SZh extends S {
   @override
   String tapCopyGroupId(int count) {
     return '$count人 · 点击复制群ID';
-  }
-
-  @override
-  String featureInDevelopment(Object feature) {
-    return '$feature功能开发中...';
   }
 
   @override
@@ -1938,6 +1936,11 @@ class SZh extends S {
   String get inCall => '通话中';
 
   @override
+  String featureInDevelopment(String feature) {
+    return '$feature功能开发中...';
+  }
+
+  @override
   String collectMessages(Object count) {
     return '已收藏 $count 条消息';
   }
@@ -2098,7 +2101,9 @@ class SZh extends S {
   }
 
   @override
-  String get confirmDissolveGroup => '确定要解散群聊';
+  String confirmDissolveGroup(String name) {
+    return '确定要解散群聊「$name」吗？此操作无法撤销。';
+  }
 
   @override
   String get enterValidServerAddress => '请输入有效的服务器地址';
@@ -2185,13 +2190,17 @@ class SZh extends S {
   String get groupInvites => '群邀请';
 
   @override
-  String get myGroups => '我的群聊';
+  String myGroups(int count) {
+    return '我的群聊 ($count)';
+  }
 
   @override
   String get invitedToJoinGroup => '邀请加入群聊';
 
   @override
-  String get confirmLeaveGroup => '确定要退出';
+  String confirmLeaveGroup(String name) {
+    return '确定要退出群聊「$name」吗？';
+  }
 
   @override
   String get leave => '离开';
@@ -2221,13 +2230,17 @@ class SZh extends S {
   String get saveToGallery => '保存到相册';
 
   @override
-  String get downloadFailed => '下载失败';
+  String downloadFailed(String code) {
+    return '下载失败: $code';
+  }
 
   @override
   String get noMediaUrl => '没有可用的媒体链接';
 
   @override
-  String get shareFailed => '分享失败';
+  String shareFailed(String error) {
+    return '分享失败: $error';
+  }
 
   @override
   String get failedToLoadImage => '图片加载失败';
@@ -3158,7 +3171,13 @@ class SZh extends S {
   String get searchInChat => '在聊天中搜索';
 
   @override
+  String get contactLabel => '联系人';
+
+  @override
   String get groupLabel => '群聊';
+
+  @override
+  String get conversationLabel => '会话';
 
   @override
   String get messageLabel => '消息';
@@ -3792,5 +3811,211 @@ class SZh extends S {
   @override
   String pollParticipantsFormat(int count) {
     return '$count 人参与';
+  }
+
+  @override
+  String get tapToRetry => '点击重试';
+
+  @override
+  String get noConversationsToForward => '没有可转发的会话';
+
+  @override
+  String get defaultRedPacketGreeting => '恭喜发财，大吉大利';
+
+  @override
+  String get emojiCategoryFace => '表情';
+
+  @override
+  String get emojiCategoryHeart => '爱心';
+
+  @override
+  String get emojiCategoryAnimal => '动物';
+
+  @override
+  String get emojiCategoryFood => '食物';
+
+  @override
+  String get emojiCategoryTransport => '交通';
+
+  @override
+  String get emojiCategoryActivity => '活动';
+
+  @override
+  String get emojiCategoryObject => '物品';
+
+  @override
+  String get emojiCategorySymbol => '符号';
+
+  @override
+  String get allowOthersToSearchAndJoin => '允许他人搜索并加入';
+
+  @override
+  String get allowStrangerMessages => '允许陌生人消息';
+
+  @override
+  String get alwaysUseDarkTheme => '始终使用深色主题';
+
+  @override
+  String get alwaysUseLightTheme => '始终使用浅色主题';
+
+  @override
+  String get autoSwitchBySystem => '跟随系统自动切换';
+
+  @override
+  String get bubbleStyle => '气泡样式';
+
+  @override
+  String get bubbleStyleClassic => '经典样式';
+
+  @override
+  String get bubbleStyleClassicDesc => '传统的气泡样式';
+
+  @override
+  String get bubbleStyleModern => '现代样式';
+
+  @override
+  String get bubbleStyleModernDesc => '简洁的现代气泡样式';
+
+  @override
+  String get bubbleStyleWechat => '微信样式';
+
+  @override
+  String get bubbleStyleWechatDesc => '经典微信气泡样式';
+
+  @override
+  String get callEnded => '通话已结束';
+
+  @override
+  String get callFailed => '通话失败';
+
+  @override
+  String get checkForUpdates => '检查更新';
+
+  @override
+  String get confirmClearChatHistory => '确定要清空聊天记录吗？';
+
+  @override
+  String get createGroupToChat => '创建群聊以开始聊天';
+
+  @override
+  String get darkMode => '深色模式';
+
+  @override
+  String get darkModeOption => '深色模式选项';
+
+  @override
+  String get doNotDisturbDescription => '在指定时间内不接收通知';
+
+  @override
+  String get doNotDisturbMode => '勿扰模式';
+
+  @override
+  String get editGroupAnnouncement => '编辑群公告';
+
+  @override
+  String get editGroupDescription => '编辑群描述';
+
+  @override
+  String get enterGroupAnnouncement => '请输入群公告';
+
+  @override
+  String errorWithMessage(String message) {
+    return '错误: $message';
+  }
+
+  @override
+  String get feedbackAndSuggestions => '反馈与建议';
+
+  @override
+  String get followSystem => '跟随系统';
+
+  @override
+  String get fontSize => '字体大小';
+
+  @override
+  String get fontSizeExtraLarge => '特大';
+
+  @override
+  String get fontSizeLarge => '大';
+
+  @override
+  String get fontSizeSmall => '小';
+
+  @override
+  String get fontSizeStandard => '标准';
+
+  @override
+  String get incomingVideoCall => '视频来电';
+
+  @override
+  String get incomingVoiceCall => '语音来电';
+
+  @override
+  String get letOthersKnowYouRead => '让对方知道你已读';
+
+  @override
+  String get letOthersKnowYouTyping => '让对方知道你正在输入';
+
+  @override
+  String get lightMode => '浅色模式';
+
+  @override
+  String memberCountClickToCopy(int count) {
+    return '$count人，点击复制群ID';
+  }
+
+  @override
+  String get messageNotifications => '消息通知';
+
+  @override
+  String get messagesLabel => '消息';
+
+  @override
+  String get musicLinkLabel => '音乐链接';
+
+  @override
+  String get noMediaUrlAvailable => '没有可用的媒体链接';
+
+  @override
+  String get noPermissionToEditGroupName => '你没有权限修改群名称';
+
+  @override
+  String get receiveMessagesFromNonContacts => '接收非联系人的消息';
+
+  @override
+  String get receiveNewMessageNotifications => '接收新消息通知';
+
+  @override
+  String get reconnectingCall => '正在重连...';
+
+  @override
+  String get redPacketTransferCannotForward => '红包和转账消息无法转发';
+
+  @override
+  String get showMessageContentInNotification => '在通知中显示消息内容';
+
+  @override
+  String get showMessagePreview => '显示消息预览';
+
+  @override
+  String get typingIndicator => '输入状态指示';
+
+  @override
+  String versionInfo(String version) {
+    return '版本 $version';
+  }
+
+  @override
+  String get vibration => '振动';
+
+  @override
+  String get videoCallInProgress => '视频通话中';
+
+  @override
+  String get voiceCallInProgress => '语音通话中';
+
+  @override
+  String whoCanSeeTitle(String title) {
+    return '谁可以看到 $title';
   }
 }

@@ -92,7 +92,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     InitiateTransfer event,
     Emitter<TransferState> emit,
   ) async {
-    emit(const TransferProcessing('正在处理转账...'));
+    emit(const TransferProcessing('Processing transfer...'));
 
     try {
       final transfer = await _transferRepository.initiateTransfer(
@@ -106,9 +106,9 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       if (transfer.isSuccess) {
         emit(TransferSuccess(transfer));
       } else if (transfer.status == TransferStatus.cancelled) {
-        emit(const TransferFailure('转账已取消'));
+        emit(const TransferFailure('Transfer cancelled'));
       } else {
-        emit(TransferFailure(transfer.failureReason ?? '转账失败'));
+        emit(TransferFailure(transfer.failureReason ?? 'Transfer failed'));
       }
     } catch (e) {
       emit(TransferFailure(e.toString()));
@@ -119,7 +119,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     CreatePaymentRequest event,
     Emitter<TransferState> emit,
   ) async {
-    emit(const TransferProcessing('正在创建收款请求...'));
+    emit(const TransferProcessing('Creating payment request...'));
 
     try {
       final request = await _transferRepository.createPaymentRequest(
@@ -144,7 +144,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     FulfillPaymentRequest event,
     Emitter<TransferState> emit,
   ) async {
-    emit(const TransferProcessing('正在处理支付...'));
+    emit(const TransferProcessing('Processing payment...'));
 
     try {
       final transfer = await _transferRepository.fulfillPaymentRequest(
@@ -158,7 +158,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       if (transfer.isSuccess) {
         emit(TransferSuccess(transfer));
       } else {
-        emit(TransferFailure(transfer.failureReason ?? '支付失败'));
+        emit(TransferFailure(transfer.failureReason ?? 'Payment failed'));
       }
     } catch (e) {
       emit(TransferFailure(e.toString()));

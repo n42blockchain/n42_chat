@@ -389,12 +389,12 @@ class SVi extends S {
   String get send => 'Gui';
 
   @override
-  String conversationLabel(String roomId) {
+  String conversationWithId(String roomId) {
     return 'Cuoc tro chuyen: $roomId';
   }
 
   @override
-  String contactLabel(String userId) {
+  String contactWithId(String userId) {
     return 'Lien he: $userId';
   }
 
@@ -1201,6 +1201,9 @@ class SVi extends S {
   }
 
   @override
+  String get groupMembersTitle => 'Thành viên nhóm';
+
+  @override
   String get viewAll => 'Xem tat ca';
 
   @override
@@ -1295,11 +1298,6 @@ class SVi extends S {
   @override
   String tapCopyGroupId(int count) {
     return '$count thanh vien · Nhan de sao chep ID nhom';
-  }
-
-  @override
-  String featureInDevelopment(Object feature) {
-    return 'Tinh nang dang phat trien...';
   }
 
   @override
@@ -1953,6 +1951,11 @@ class SVi extends S {
   String get inCall => 'Dang trong cuoc goi';
 
   @override
+  String featureInDevelopment(String feature) {
+    return 'Tinh nang dang phat trien...';
+  }
+
+  @override
   String collectMessages(Object count) {
     return 'Da luu $count tin nhan';
   }
@@ -2114,7 +2117,9 @@ class SVi extends S {
   }
 
   @override
-  String get confirmDissolveGroup => 'Ban co chac muon giai tan';
+  String confirmDissolveGroup(String name) {
+    return 'Ban co chac chac muon giai tan \"$name\" khong? Hanh dong nay khong the hoan tac.';
+  }
 
   @override
   String get enterValidServerAddress => 'Vui long nhap dia chi may chu hop le';
@@ -2203,19 +2208,23 @@ class SVi extends S {
   String get groupInvites => 'Loi moi nhom';
 
   @override
-  String get myGroups => 'Nhom cua toi';
+  String myGroups(int count) {
+    return 'Nhom cua toi ($count)';
+  }
 
   @override
   String get invitedToJoinGroup => 'Duoc moi tham gia nhom';
 
   @override
-  String get confirmLeaveGroup => 'Ban co chac muon roi';
+  String confirmLeaveGroup(String name) {
+    return 'Ban co chac chac muon roi khoi \"$name\" khong?';
+  }
 
   @override
   String get leave => 'Roi';
 
   @override
-  String get saveMedia => '保存';
+  String get saveMedia => 'Lưu';
 
   @override
   String get recallThisMessage => 'Thu hoi tin nhan nay?';
@@ -2239,13 +2248,17 @@ class SVi extends S {
   String get saveToGallery => 'Luu vao Thu vien';
 
   @override
-  String get downloadFailed => 'Tai xuong that bai';
+  String downloadFailed(String code) {
+    return 'Tai xuong that bai: $code';
+  }
 
   @override
   String get noMediaUrl => 'Khong co URL media';
 
   @override
-  String get shareFailed => 'Chia se that bai';
+  String shareFailed(String error) {
+    return 'Chia se that bai: $error';
+  }
 
   @override
   String get failedToLoadImage => 'Tai hinh anh that bai';
@@ -2567,7 +2580,7 @@ class SVi extends S {
   }
 
   @override
-  String get allButton => '全部';
+  String get allButton => 'Tất cả';
 
   @override
   String get enterValidAddress => 'Vui long nhap dia chi hop le';
@@ -3184,7 +3197,13 @@ class SVi extends S {
   String get searchInChat => 'Tim trong tro chuyen';
 
   @override
+  String get contactLabel => 'Lien he';
+
+  @override
   String get groupLabel => 'Nhom';
+
+  @override
+  String get conversationLabel => '会话';
 
   @override
   String get messageLabel => 'Tin nhan';
@@ -3466,7 +3485,7 @@ class SVi extends S {
   String get pollEndedMessage => 'Binh chon da ket thuc';
 
   @override
-  String get connectingCall => 'Dang ket noi...';
+  String get connectingCall => 'Đang kết nối...';
 
   @override
   String get muteCall => 'Tat tieng';
@@ -3821,11 +3840,226 @@ class SVi extends S {
 
   @override
   String pollVotesFormat(int count, String percentage) {
-    return '$count 票 ($percentage%)';
+    return '$count phiếu ($percentage%)';
   }
 
   @override
   String pollParticipantsFormat(int count) {
-    return '$count 人参与';
+    return '$count người tham gia';
+  }
+
+  @override
+  String get tapToRetry => 'Nhấn để thử lại';
+
+  @override
+  String get noConversationsToForward =>
+      'Không có cuộc trò chuyện nào để chuyển tiếp';
+
+  @override
+  String get defaultRedPacketGreeting => 'Chúc phát tài phát lộc';
+
+  @override
+  String get emojiCategoryFace => 'Biểu cảm';
+
+  @override
+  String get emojiCategoryHeart => 'Trái tim';
+
+  @override
+  String get emojiCategoryAnimal => 'Động vật';
+
+  @override
+  String get emojiCategoryFood => 'Đồ ăn';
+
+  @override
+  String get emojiCategoryTransport => 'Phương tiện';
+
+  @override
+  String get emojiCategoryActivity => 'Hoạt động';
+
+  @override
+  String get emojiCategoryObject => 'Đồ vật';
+
+  @override
+  String get emojiCategorySymbol => 'Ký hiệu';
+
+  @override
+  String get allowOthersToSearchAndJoin =>
+      'Cho phép những người khác tìm kiếm và tham gia';
+
+  @override
+  String get allowStrangerMessages => 'Cho phép tin nhắn từ người lạ';
+
+  @override
+  String get alwaysUseDarkTheme => 'Luôn dùng giao diện tối';
+
+  @override
+  String get alwaysUseLightTheme => 'Luôn dùng giao diện sáng';
+
+  @override
+  String get autoSwitchBySystem => 'Tự động chuyển theo cài đặt hệ thống';
+
+  @override
+  String get bubbleStyle => 'Kiểu bong bóng';
+
+  @override
+  String get bubbleStyleClassic => 'Kiểu cổ điển';
+
+  @override
+  String get bubbleStyleClassicDesc => 'Kiểu bong bóng truyền thống';
+
+  @override
+  String get bubbleStyleModern => 'Kiểu hiện đại';
+
+  @override
+  String get bubbleStyleModernDesc => 'Kiểu bong bóng hiện đại sạch sẽ';
+
+  @override
+  String get bubbleStyleWechat => 'Kiểu WeChat';
+
+  @override
+  String get bubbleStyleWechatDesc => 'Kiểu bong bóng WeChat cổ điển';
+
+  @override
+  String get callEnded => 'Cuộc gọi kết thúc';
+
+  @override
+  String get callFailed => 'Cuộc gọi thất bại';
+
+  @override
+  String get checkForUpdates => 'Kiểm tra cập nhật';
+
+  @override
+  String get confirmClearChatHistory =>
+      'Bạn có chắc chắn muốn xóa lịch sử trò chuyện không?';
+
+  @override
+  String get createGroupToChat => 'Tạo một nhóm để bắt đầu trò chuyện';
+
+  @override
+  String get darkMode => 'Chế độ tối';
+
+  @override
+  String get darkModeOption => 'Chế độ tối';
+
+  @override
+  String get doNotDisturbDescription =>
+      'Không nhận thông báo trong khoảng thời gian chỉ định';
+
+  @override
+  String get doNotDisturbMode => 'Không làm phiền';
+
+  @override
+  String get editGroupAnnouncement => 'Chỉnh sửa thông báo nhóm';
+
+  @override
+  String get editGroupDescription => 'Chỉnh sửa mô tả nhóm';
+
+  @override
+  String get enterGroupAnnouncement => 'Nhập thông báo nhóm';
+
+  @override
+  String errorWithMessage(String message) {
+    return 'Lỗi: $message';
+  }
+
+  @override
+  String get feedbackAndSuggestions => 'Phản hồi và đề xuất';
+
+  @override
+  String get followSystem => 'Theo hệ thống';
+
+  @override
+  String get fontSize => 'Cỡ chữ';
+
+  @override
+  String get fontSizeExtraLarge => 'Rất lớn';
+
+  @override
+  String get fontSizeLarge => 'Lớn';
+
+  @override
+  String get fontSizeSmall => 'Nhỏ';
+
+  @override
+  String get fontSizeStandard => 'Tiêu chuẩn';
+
+  @override
+  String get incomingVideoCall => 'Cuộc gọi video đến';
+
+  @override
+  String get incomingVoiceCall => 'Cuộc gọi thoại đến';
+
+  @override
+  String get letOthersKnowYouRead =>
+      'Cho người khác biết bạn đã đọc tin nhắn của họ';
+
+  @override
+  String get letOthersKnowYouTyping => 'Cho người khác biết bạn đang nhập';
+
+  @override
+  String get lightMode => 'Chế độ sáng';
+
+  @override
+  String memberCountClickToCopy(int count) {
+    return '$count thành viên, nhấp để sao chép ID nhóm';
+  }
+
+  @override
+  String get messageNotifications => 'Thông báo tin nhắn';
+
+  @override
+  String get messagesLabel => 'Tin nhắn';
+
+  @override
+  String get musicLinkLabel => 'Liên kết nhạc';
+
+  @override
+  String get noMediaUrlAvailable => 'URL phương tiện không khả dụng';
+
+  @override
+  String get noPermissionToEditGroupName =>
+      'Bạn không có quyền chỉnh sửa tên nhóm';
+
+  @override
+  String get receiveMessagesFromNonContacts =>
+      'Nhận tin nhắn từ người không có trong danh bạ';
+
+  @override
+  String get receiveNewMessageNotifications => 'Nhận thông báo tin nhắn mới';
+
+  @override
+  String get reconnectingCall => 'Đang kết nối lại...';
+
+  @override
+  String get redPacketTransferCannotForward =>
+      'Lì xì và chuyển khoản không thể chuyển tiếp';
+
+  @override
+  String get showMessageContentInNotification =>
+      'Hiển thị nội dung tin nhắn trong thông báo';
+
+  @override
+  String get showMessagePreview => 'Hiển thị xem trước tin nhắn';
+
+  @override
+  String get typingIndicator => 'Chỉ báo đang nhập';
+
+  @override
+  String versionInfo(String version) {
+    return 'Phiên bản $version';
+  }
+
+  @override
+  String get vibration => 'Rung';
+
+  @override
+  String get videoCallInProgress => 'Cuộc gọi video';
+
+  @override
+  String get voiceCallInProgress => 'Cuộc gọi thoại';
+
+  @override
+  String whoCanSeeTitle(String title) {
+    return 'Ai có thể xem $title';
   }
 }

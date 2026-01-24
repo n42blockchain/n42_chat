@@ -933,7 +933,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               widget.onClearHistory?.call();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Chat history cleared'),
+                  content: Text(S.of(context)?.chatHistoryCleared ?? 'Chat history cleared'),
                   duration: const Duration(seconds: 1),
                 ),
               );

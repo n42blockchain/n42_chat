@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 消息发送状态 (用于UI显示)
@@ -129,6 +130,7 @@ class MessageReadReceipt extends StatelessWidget {
     }
 
     final allRead = readCount >= totalCount;
+    final l10n = S.of(context);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -140,7 +142,9 @@ class MessageReadReceipt extends StatelessWidget {
         ),
         const SizedBox(width: 2),
         Text(
-          allRead ? '全部已读' : '$readCount人已读',
+          allRead
+              ? (l10n?.allRead ?? 'All read')
+              : (l10n?.readCount(readCount) ?? '$readCount read'),
           style: TextStyle(
             fontSize: 11,
             color: allRead ? AppColors.primary : AppColors.textTertiary,

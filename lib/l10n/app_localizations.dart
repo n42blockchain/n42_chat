@@ -811,17 +811,17 @@ abstract class S {
   /// **'发送'**
   String get send;
 
-  /// No description provided for @conversationLabel.
+  /// No description provided for @conversationWithId.
   ///
   /// In zh, this message translates to:
-  /// **'会话'**
-  String conversationLabel(String roomId);
+  /// **'会话: {roomId}'**
+  String conversationWithId(String roomId);
 
-  /// No description provided for @contactLabel.
+  /// No description provided for @contactWithId.
   ///
   /// In zh, this message translates to:
   /// **'联系人: {userId}'**
-  String contactLabel(String userId);
+  String contactWithId(String userId);
 
   /// No description provided for @addFriend.
   ///
@@ -2281,6 +2281,12 @@ abstract class S {
   /// **'群成员 ({count})'**
   String groupMembers(int count);
 
+  /// No description provided for @groupMembersTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'群成员'**
+  String get groupMembersTitle;
+
   /// No description provided for @viewAll.
   ///
   /// In zh, this message translates to:
@@ -2460,12 +2466,6 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'{count}人 · 点击复制群ID'**
   String tapCopyGroupId(int count);
-
-  /// No description provided for @featureInDevelopment.
-  ///
-  /// In zh, this message translates to:
-  /// **'{feature}功能开发中...'**
-  String featureInDevelopment(Object feature);
 
   /// No description provided for @receiverAddress.
   ///
@@ -3625,6 +3625,12 @@ abstract class S {
   /// **'通话中'**
   String get inCall;
 
+  /// No description provided for @featureInDevelopment.
+  ///
+  /// In zh, this message translates to:
+  /// **'{feature}功能开发中...'**
+  String featureInDevelopment(String feature);
+
   /// No description provided for @collectMessages.
   ///
   /// In zh, this message translates to:
@@ -3916,8 +3922,8 @@ abstract class S {
   /// No description provided for @confirmDissolveGroup.
   ///
   /// In zh, this message translates to:
-  /// **'确定要解散群聊'**
-  String get confirmDissolveGroup;
+  /// **'确定要解散群聊「{name}」吗？此操作无法撤销。'**
+  String confirmDissolveGroup(String name);
 
   /// No description provided for @enterValidServerAddress.
   ///
@@ -4066,8 +4072,8 @@ abstract class S {
   /// No description provided for @myGroups.
   ///
   /// In zh, this message translates to:
-  /// **'我的群聊'**
-  String get myGroups;
+  /// **'我的群聊 ({count})'**
+  String myGroups(int count);
 
   /// No description provided for @invitedToJoinGroup.
   ///
@@ -4078,8 +4084,8 @@ abstract class S {
   /// No description provided for @confirmLeaveGroup.
   ///
   /// In zh, this message translates to:
-  /// **'确定要退出'**
-  String get confirmLeaveGroup;
+  /// **'确定要退出群聊「{name}」吗？'**
+  String confirmLeaveGroup(String name);
 
   /// No description provided for @leave.
   ///
@@ -4138,8 +4144,8 @@ abstract class S {
   /// No description provided for @downloadFailed.
   ///
   /// In zh, this message translates to:
-  /// **'下载失败'**
-  String get downloadFailed;
+  /// **'下载失败: {code}'**
+  String downloadFailed(String code);
 
   /// No description provided for @noMediaUrl.
   ///
@@ -4150,8 +4156,8 @@ abstract class S {
   /// No description provided for @shareFailed.
   ///
   /// In zh, this message translates to:
-  /// **'分享失败'**
-  String get shareFailed;
+  /// **'分享失败: {error}'**
+  String shareFailed(String error);
 
   /// No description provided for @failedToLoadImage.
   ///
@@ -5941,11 +5947,23 @@ abstract class S {
   /// **'在聊天中搜索'**
   String get searchInChat;
 
+  /// No description provided for @contactLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'联系人'**
+  String get contactLabel;
+
   /// No description provided for @groupLabel.
   ///
   /// In zh, this message translates to:
   /// **'群聊'**
   String get groupLabel;
+
+  /// No description provided for @conversationLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'会话'**
+  String get conversationLabel;
 
   /// No description provided for @messageLabel.
   ///
@@ -7074,6 +7092,402 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'{count} 人参与'**
   String pollParticipantsFormat(int count);
+
+  /// No description provided for @tapToRetry.
+  ///
+  /// In zh, this message translates to:
+  /// **'点击重试'**
+  String get tapToRetry;
+
+  /// No description provided for @noConversationsToForward.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有可转发的会话'**
+  String get noConversationsToForward;
+
+  /// No description provided for @defaultRedPacketGreeting.
+  ///
+  /// In zh, this message translates to:
+  /// **'恭喜发财，大吉大利'**
+  String get defaultRedPacketGreeting;
+
+  /// No description provided for @emojiCategoryFace.
+  ///
+  /// In zh, this message translates to:
+  /// **'表情'**
+  String get emojiCategoryFace;
+
+  /// No description provided for @emojiCategoryHeart.
+  ///
+  /// In zh, this message translates to:
+  /// **'爱心'**
+  String get emojiCategoryHeart;
+
+  /// No description provided for @emojiCategoryAnimal.
+  ///
+  /// In zh, this message translates to:
+  /// **'动物'**
+  String get emojiCategoryAnimal;
+
+  /// No description provided for @emojiCategoryFood.
+  ///
+  /// In zh, this message translates to:
+  /// **'食物'**
+  String get emojiCategoryFood;
+
+  /// No description provided for @emojiCategoryTransport.
+  ///
+  /// In zh, this message translates to:
+  /// **'交通'**
+  String get emojiCategoryTransport;
+
+  /// No description provided for @emojiCategoryActivity.
+  ///
+  /// In zh, this message translates to:
+  /// **'活动'**
+  String get emojiCategoryActivity;
+
+  /// No description provided for @emojiCategoryObject.
+  ///
+  /// In zh, this message translates to:
+  /// **'物品'**
+  String get emojiCategoryObject;
+
+  /// No description provided for @emojiCategorySymbol.
+  ///
+  /// In zh, this message translates to:
+  /// **'符号'**
+  String get emojiCategorySymbol;
+
+  /// No description provided for @allowOthersToSearchAndJoin.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许他人搜索并加入'**
+  String get allowOthersToSearchAndJoin;
+
+  /// No description provided for @allowStrangerMessages.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许陌生人消息'**
+  String get allowStrangerMessages;
+
+  /// No description provided for @alwaysUseDarkTheme.
+  ///
+  /// In zh, this message translates to:
+  /// **'始终使用深色主题'**
+  String get alwaysUseDarkTheme;
+
+  /// No description provided for @alwaysUseLightTheme.
+  ///
+  /// In zh, this message translates to:
+  /// **'始终使用浅色主题'**
+  String get alwaysUseLightTheme;
+
+  /// No description provided for @autoSwitchBySystem.
+  ///
+  /// In zh, this message translates to:
+  /// **'跟随系统自动切换'**
+  String get autoSwitchBySystem;
+
+  /// No description provided for @bubbleStyle.
+  ///
+  /// In zh, this message translates to:
+  /// **'气泡样式'**
+  String get bubbleStyle;
+
+  /// No description provided for @bubbleStyleClassic.
+  ///
+  /// In zh, this message translates to:
+  /// **'经典样式'**
+  String get bubbleStyleClassic;
+
+  /// No description provided for @bubbleStyleClassicDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'传统的气泡样式'**
+  String get bubbleStyleClassicDesc;
+
+  /// No description provided for @bubbleStyleModern.
+  ///
+  /// In zh, this message translates to:
+  /// **'现代样式'**
+  String get bubbleStyleModern;
+
+  /// No description provided for @bubbleStyleModernDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'简洁的现代气泡样式'**
+  String get bubbleStyleModernDesc;
+
+  /// No description provided for @bubbleStyleWechat.
+  ///
+  /// In zh, this message translates to:
+  /// **'微信样式'**
+  String get bubbleStyleWechat;
+
+  /// No description provided for @bubbleStyleWechatDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'经典微信气泡样式'**
+  String get bubbleStyleWechatDesc;
+
+  /// No description provided for @callEnded.
+  ///
+  /// In zh, this message translates to:
+  /// **'通话已结束'**
+  String get callEnded;
+
+  /// No description provided for @callFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'通话失败'**
+  String get callFailed;
+
+  /// No description provided for @checkForUpdates.
+  ///
+  /// In zh, this message translates to:
+  /// **'检查更新'**
+  String get checkForUpdates;
+
+  /// No description provided for @confirmClearChatHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要清空聊天记录吗？'**
+  String get confirmClearChatHistory;
+
+  /// No description provided for @createGroupToChat.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建群聊以开始聊天'**
+  String get createGroupToChat;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'深色模式'**
+  String get darkMode;
+
+  /// No description provided for @darkModeOption.
+  ///
+  /// In zh, this message translates to:
+  /// **'深色模式选项'**
+  String get darkModeOption;
+
+  /// No description provided for @doNotDisturbDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'在指定时间内不接收通知'**
+  String get doNotDisturbDescription;
+
+  /// No description provided for @doNotDisturbMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'勿扰模式'**
+  String get doNotDisturbMode;
+
+  /// No description provided for @editGroupAnnouncement.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑群公告'**
+  String get editGroupAnnouncement;
+
+  /// No description provided for @editGroupDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑群描述'**
+  String get editGroupDescription;
+
+  /// No description provided for @enterGroupAnnouncement.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入群公告'**
+  String get enterGroupAnnouncement;
+
+  /// No description provided for @errorWithMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'错误: {message}'**
+  String errorWithMessage(String message);
+
+  /// No description provided for @feedbackAndSuggestions.
+  ///
+  /// In zh, this message translates to:
+  /// **'反馈与建议'**
+  String get feedbackAndSuggestions;
+
+  /// No description provided for @followSystem.
+  ///
+  /// In zh, this message translates to:
+  /// **'跟随系统'**
+  String get followSystem;
+
+  /// No description provided for @fontSize.
+  ///
+  /// In zh, this message translates to:
+  /// **'字体大小'**
+  String get fontSize;
+
+  /// No description provided for @fontSizeExtraLarge.
+  ///
+  /// In zh, this message translates to:
+  /// **'特大'**
+  String get fontSizeExtraLarge;
+
+  /// No description provided for @fontSizeLarge.
+  ///
+  /// In zh, this message translates to:
+  /// **'大'**
+  String get fontSizeLarge;
+
+  /// No description provided for @fontSizeSmall.
+  ///
+  /// In zh, this message translates to:
+  /// **'小'**
+  String get fontSizeSmall;
+
+  /// No description provided for @fontSizeStandard.
+  ///
+  /// In zh, this message translates to:
+  /// **'标准'**
+  String get fontSizeStandard;
+
+  /// No description provided for @incomingVideoCall.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频来电'**
+  String get incomingVideoCall;
+
+  /// No description provided for @incomingVoiceCall.
+  ///
+  /// In zh, this message translates to:
+  /// **'语音来电'**
+  String get incomingVoiceCall;
+
+  /// No description provided for @letOthersKnowYouRead.
+  ///
+  /// In zh, this message translates to:
+  /// **'让对方知道你已读'**
+  String get letOthersKnowYouRead;
+
+  /// No description provided for @letOthersKnowYouTyping.
+  ///
+  /// In zh, this message translates to:
+  /// **'让对方知道你正在输入'**
+  String get letOthersKnowYouTyping;
+
+  /// No description provided for @lightMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'浅色模式'**
+  String get lightMode;
+
+  /// No description provided for @memberCountClickToCopy.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}人，点击复制群ID'**
+  String memberCountClickToCopy(int count);
+
+  /// No description provided for @messageNotifications.
+  ///
+  /// In zh, this message translates to:
+  /// **'消息通知'**
+  String get messageNotifications;
+
+  /// No description provided for @messagesLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'消息'**
+  String get messagesLabel;
+
+  /// No description provided for @musicLinkLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'音乐链接'**
+  String get musicLinkLabel;
+
+  /// No description provided for @noMediaUrlAvailable.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有可用的媒体链接'**
+  String get noMediaUrlAvailable;
+
+  /// No description provided for @noPermissionToEditGroupName.
+  ///
+  /// In zh, this message translates to:
+  /// **'你没有权限修改群名称'**
+  String get noPermissionToEditGroupName;
+
+  /// No description provided for @receiveMessagesFromNonContacts.
+  ///
+  /// In zh, this message translates to:
+  /// **'接收非联系人的消息'**
+  String get receiveMessagesFromNonContacts;
+
+  /// No description provided for @receiveNewMessageNotifications.
+  ///
+  /// In zh, this message translates to:
+  /// **'接收新消息通知'**
+  String get receiveNewMessageNotifications;
+
+  /// No description provided for @reconnectingCall.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在重连...'**
+  String get reconnectingCall;
+
+  /// No description provided for @redPacketTransferCannotForward.
+  ///
+  /// In zh, this message translates to:
+  /// **'红包和转账消息无法转发'**
+  String get redPacketTransferCannotForward;
+
+  /// No description provided for @showMessageContentInNotification.
+  ///
+  /// In zh, this message translates to:
+  /// **'在通知中显示消息内容'**
+  String get showMessageContentInNotification;
+
+  /// No description provided for @showMessagePreview.
+  ///
+  /// In zh, this message translates to:
+  /// **'显示消息预览'**
+  String get showMessagePreview;
+
+  /// No description provided for @typingIndicator.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入状态指示'**
+  String get typingIndicator;
+
+  /// No description provided for @versionInfo.
+  ///
+  /// In zh, this message translates to:
+  /// **'版本 {version}'**
+  String versionInfo(String version);
+
+  /// No description provided for @vibration.
+  ///
+  /// In zh, this message translates to:
+  /// **'振动'**
+  String get vibration;
+
+  /// No description provided for @videoCallInProgress.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频通话中'**
+  String get videoCallInProgress;
+
+  /// No description provided for @voiceCallInProgress.
+  ///
+  /// In zh, this message translates to:
+  /// **'语音通话中'**
+  String get voiceCallInProgress;
+
+  /// No description provided for @whoCanSeeTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'谁可以看到 {title}'**
+  String whoCanSeeTitle(String title);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../l10n/app_localizations.dart';
 import 'voip_config.dart';
 import 'webrtc_service.dart';
 import 'livekit_service.dart';
@@ -313,7 +314,11 @@ class CallManager {
   
   void _handleIncomingCall(CallSession session) async {
     debugPrint('CallManager: Incoming call from ${session.peerName}');
-    
+
+    // 获取本地化字符串
+    final context = _navigatorKey?.currentContext;
+    final l10n = context != null ? S.of(context) : null;
+
     // 显示来电通知
     await _notificationService.showIncomingCall(
       callerId: session.peerId,
@@ -321,8 +326,14 @@ class CallManager {
       callerAvatarUrl: session.peerAvatarUrl,
       isVideo: session.type == CallType.video,
       roomId: session.roomId,
+      textAccept: l10n?.answer ?? 'Answer',
+      textDecline: l10n?.decline ?? 'Decline',
+      missedCallText: l10n?.missedCall ?? 'Missed call',
+      callbackText: l10n?.callBack ?? 'Call back',
+      incomingCallChannelName: l10n?.incomingCall ?? 'Incoming call',
+      missedCallChannelName: l10n?.missedCall ?? 'Missed call',
     );
-    
+
     onIncomingCall?.call(session);
   }
   
@@ -342,6 +353,10 @@ class CallManager {
   }
   
   void _handleNotificationAction(CallAction action, IncomingCallInfo callInfo) {
+    // 获取本地化字符串
+    final context = _navigatorKey?.currentContext;
+    final l10n = context != null ? S.of(context) : null;
+
     switch (action) {
       case CallAction.accept:
         answerCall();
@@ -356,6 +371,9 @@ class CallManager {
           callerName: callInfo.callerName,
           callerAvatarUrl: callInfo.callerAvatarUrl,
           isVideo: callInfo.isVideo,
+          missedVideoCallText: l10n?.missedVideoCall ?? 'Missed video call',
+          missedVoiceCallText: l10n?.missedVoiceCall ?? 'Missed voice call',
+          callbackText: l10n?.callBack ?? 'Call back',
         );
         break;
       case CallAction.callback:

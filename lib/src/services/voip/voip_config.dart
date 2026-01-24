@@ -115,7 +115,7 @@ class VoIPConfig {
   /// 从 Matrix 服务器响应更新 TURN 配置
   void updateFromTurnResponse(Map<String, dynamic> response) {
     if (response['uris'] != null) {
-      turnUris = List<String>.from(response['uris']);
+      turnUris = List<String>.from(response['uris'] as List);
     }
     turnUsername = response['username'] as String?;
     turnPassword = response['password'] as String?;

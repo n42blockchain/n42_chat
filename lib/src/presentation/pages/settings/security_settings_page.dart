@@ -476,7 +476,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             Text(device.isVerified
                 ? (S.of(context)?.deviceStatusVerified ?? 'Status: Verified')
                 : (S.of(context)?.deviceStatusUnverified ?? 'Status: Unverified')),
-            if (device.lastSeen != null) Text(S.of(context)?.lastActiveLabel(device.lastSeen!) ?? 'Last active: ${device.lastSeen}'),
+            if (device.lastSeen != null) Text(S.of(context)?.lastActiveLabel(device.lastSeen!.toIso8601String()) ?? 'Last active: ${device.lastSeen}'),
             const SizedBox(height: 16),
             if (!device.isVerified)
               ElevatedButton(

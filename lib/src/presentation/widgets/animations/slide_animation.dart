@@ -8,6 +8,9 @@ class SlideToDeleteWidget extends StatefulWidget {
   /// 删除回调
   final VoidCallback? onDelete;
 
+  /// 删除按钮标签
+  final String deleteLabel;
+
   /// 其他操作（左滑显示）
   final List<SlideAction>? actions;
 
@@ -18,6 +21,7 @@ class SlideToDeleteWidget extends StatefulWidget {
     super.key,
     required this.child,
     this.onDelete,
+    this.deleteLabel = 'Delete',
     this.actions,
     this.backgroundColor = Colors.red,
   });
@@ -97,7 +101,7 @@ class _SlideToDeleteWidgetState extends State<SlideToDeleteWidget>
                 if (widget.onDelete != null)
                   _buildAction(SlideAction(
                     icon: Icons.delete,
-                    label: '删除',
+                    label: widget.deleteLabel,
                     backgroundColor: Colors.red,
                     onTap: () {
                       _close();

@@ -45,7 +45,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: S.of(context)?.groupMembers ?? 'Group Members',
+        title: S.of(context)?.groupMembersTitle ?? 'Group Members',
       ),
       body: BlocConsumer<GroupBloc, GroupState>(
         listener: (context, state) {
@@ -240,7 +240,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                 Navigator.pop(context);
                 // TODO: 创建私聊
                 ScaffoldMessenger.of(this.context).showSnackBar(
-                  SnackBar(content: Text(S.of(this.context)?.featureInDevelopment ?? 'Feature in development...')),
+                  SnackBar(content: Text(S.of(this.context)?.featureInDevelopment('') ?? 'Feature in development...')),
                 );
               },
             ),

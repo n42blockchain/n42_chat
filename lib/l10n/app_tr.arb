@@ -115,8 +115,8 @@
   "releaseToSend": "Göndermek için bırakın, iptal için yukarı kaydırın",
   "holdToTalk": "Konuşmak için basılı tutun",
   "send": "Gönder",
-  "conversationLabel": "Sohbet: {roomId}",
-  "contactLabel": "Kişi: {userId}",
+  "conversationWithId": "Sohbet: {roomId}",
+  "contactWithId": "Kişi: {userId}",
   "addFriend": "Arkadaş Ekle",
   "chatServiceNotConnected": "Sohbet servisi bağlı değil",
   "userNotFoundHint": "\"{query}\" kullanıcısı bulunamadı\n\nİpuçları:\n• Tam kullanıcı ID'sini girin, örn. @kullaniciadi:sunucu.com\n• Kullanıcı adı yazımını kontrol edin",
@@ -380,6 +380,7 @@
   "noResults": "Sonuç yok",
   "groupInfo": "Grup Bilgisi",
   "groupMembers": "Üyeler ({count})",
+  "groupMembersTitle": "Grup Üyeleri",
   "viewAll": "Tümünü gör",
   "owner": "Sahip",
   "admin": "Yönetici",
@@ -682,7 +683,12 @@
       "ringtone": {"type": "String"}
     }
   },
-  "confirmDissolveGroup": "Bu grubu dağıtmak istediğinizden emin misiniz",
+  "confirmDissolveGroup": "\"{name}\" grubunu dağıtmak istediğinize emin misiniz? Bu işlem geri alınamaz.",
+  "@confirmDissolveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "enterValidServerAddress": "Lütfen geçerli bir sunucu adresi girin",
   "emailOtp": "E-posta OTP",
   "enterServerAddressFirst": "Lütfen önce sunucu adresi girin",
@@ -738,9 +744,19 @@
     }
   },
   "groupInvites": "Grup Davetleri",
-  "myGroups": "Gruplarım",
+  "myGroups": "Gruplarım ({count})",
+  "@myGroups": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "invitedToJoinGroup": "Gruba davet edildi",
-  "confirmLeaveGroup": "Bu gruptan ayrılmak istediğinizden emin misiniz",
+  "confirmLeaveGroup": "\"{name}\" grubundan ayrılmak istediğinize emin misiniz?",
+  "@confirmLeaveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "leave": "Ayrıl",
   "saveMedia": "Kaydet",
   "recallThisMessage": "Bu mesajı geri al?",
@@ -750,9 +766,19 @@
   "saving": "Kaydediliyor...",
   "share": "Paylaş",
   "saveToGallery": "Galeriye Kaydet",
-  "downloadFailed": "İndirme başarısız",
+  "downloadFailed": "İndirme başarısız: {code}",
+  "@downloadFailed": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
   "noMediaUrl": "Medya URL'si mevcut değil",
-  "shareFailed": "Paylaşım başarısız",
+  "shareFailed": "Paylaşım başarısız: {error}",
+  "@shareFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "failedToLoadImage": "Resim yüklenemedi",
   "failedToLoadMoreMessages": "Daha fazla mesaj yüklenemedi",
   "failedToSend": "Gönderme başarısız",
@@ -1154,6 +1180,7 @@
   "allResults": "Tümü",
   "searchInChat": "Sohbette ara",
   "groupLabel": "Grup",
+  "contactLabel": "Kişi",
   "messageLabel": "Mesaj",
 
   "securityTitle": "Güvenlik",
@@ -1542,5 +1569,101 @@
   "switchCameraLabel": "Değiştir",
   "leaveLabel": "Ayrıl",
   "participantsLabel": "Katılımcılar",
-  "joiningMeeting": "Toplantıya katılınıyor..."
+  "joiningMeeting": "Toplantıya katılınıyor...",
+  "connectingCall": "Bağlanıyor...",
+  "pollVotesFormat": "{count} oy ({percentage}%)",
+  "@pollVotesFormat": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "percentage": {"type": "String"}
+    }
+  },
+  "pollParticipantsFormat": "{count} katılımcı",
+  "@pollParticipantsFormat": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "incomingVideoCall": "Gelen görüntülü arama",
+  "incomingVoiceCall": "Gelen sesli arama",
+  "videoCallInProgress": "Görüntülü arama",
+  "voiceCallInProgress": "Sesli arama",
+  "reconnectingCall": "Yeniden bağlanıyor...",
+  "callEnded": "Arama sonlandı",
+  "callFailed": "Arama başarısız",
+  "noMediaUrlAvailable": "Medya URL'si mevcut değil",
+  "errorWithMessage": "Hata: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+  "musicLinkLabel": "Müzik bağlantısı",
+  "redPacketTransferCannotForward": "Kırmızı zarflar ve transferler iletilemez",
+  "messageNotifications": "Mesaj bildirimleri",
+  "receiveNewMessageNotifications": "Yeni mesaj bildirimleri al",
+  "showMessagePreview": "Mesaj önizlemesini göster",
+  "showMessageContentInNotification": "Bildirimlerde mesaj içeriğini göster",
+  "vibration": "Titreşim",
+  "doNotDisturbMode": "Rahatsız etmeyin",
+  "doNotDisturbDescription": "Belirtilen süre boyunca bildirim alma",
+  "messagesLabel": "Mesajlar",
+  "allowStrangerMessages": "Yabancılardan mesajlara izin ver",
+  "receiveMessagesFromNonContacts": "Kişiler dışından mesaj al",
+  "letOthersKnowYouRead": "Başkalarının mesajlarını okuduğunuzu bilmelerini sağlayın",
+  "typingIndicator": "Yazma göstergesi",
+  "letOthersKnowYouTyping": "Başkalarının yazdığınızı bilmelerini sağlayın",
+  "whoCanSeeTitle": "{title} kimler görebilir",
+  "@whoCanSeeTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "versionInfo": "Sürüm {version}",
+  "@versionInfo": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "checkForUpdates": "Güncellemeleri kontrol et",
+  "feedbackAndSuggestions": "Geri bildirim ve öneriler",
+  "darkMode": "Karanlık mod",
+  "fontSize": "Yazı tipi boyutu",
+  "bubbleStyle": "Balon stili",
+  "followSystem": "Sistemi takip et",
+  "autoSwitchBySystem": "Sistem ayarlarına göre otomatik geçiş yap",
+  "lightMode": "Aydınlık mod",
+  "alwaysUseLightTheme": "Her zaman açık tema kullan",
+  "darkModeOption": "Karanlık mod",
+  "alwaysUseDarkTheme": "Her zaman koyu tema kullan",
+  "fontSizeSmall": "Küçük",
+  "fontSizeStandard": "Standart",
+  "fontSizeLarge": "Büyük",
+  "fontSizeExtraLarge": "Çok büyük",
+  "bubbleStyleWechat": "WeChat stili",
+  "bubbleStyleWechatDesc": "Klasik WeChat balon stili",
+  "bubbleStyleModern": "Modern stil",
+  "bubbleStyleModernDesc": "Temiz modern balon stili",
+  "bubbleStyleClassic": "Klasik stil",
+  "bubbleStyleClassicDesc": "Geleneksel balon stili",
+  "allButton": "Tümü",
+  "tapToRetry": "Tekrar denemek için dokunun",
+  "noConversationsToForward": "İletilecek sohbet yok",
+  "defaultRedPacketGreeting": "Bol şans ve bereket dilerim",
+  "emojiCategoryFace": "Suratlar",
+  "emojiCategoryHeart": "Kalpler",
+  "emojiCategoryAnimal": "Hayvanlar",
+  "emojiCategoryFood": "Yiyecek",
+  "emojiCategoryTransport": "Ulaşım",
+  "emojiCategoryActivity": "Aktiviteler",
+  "emojiCategoryObject": "Nesneler",
+  "emojiCategorySymbol": "Semboller",
+  "allowOthersToSearchAndJoin": "Başkalarının arama yapmasına ve katılmasına izin ver",
+  "confirmClearChatHistory": "Sohbet geçmişini temizlemek istediğinizden emin misiniz?",
+  "createGroupToChat": "Sohbet etmeye başlamak için bir grup oluşturun",
+  "editGroupAnnouncement": "Grup duyurusunu düzenle",
+  "editGroupDescription": "Grup açıklamasını düzenle",
+  "enterGroupAnnouncement": "Grup duyurusunu girin",
+  "memberCountClickToCopy": "{count} üye, grup ID'sini kopyalamak için tıklayın",
+  "noPermissionToEditGroupName": "Grup adını düzenleme izniniz yok"
 }

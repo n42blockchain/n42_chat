@@ -115,8 +115,8 @@
   "releaseToSend": "Rilascia per inviare, scorri in alto per annullare",
   "holdToTalk": "Tieni premuto per parlare",
   "send": "Invia",
-  "conversationLabel": "Conversazione: {roomId}",
-  "contactLabel": "Contatto: {userId}",
+  "conversationWithId": "Conversazione: {roomId}",
+  "contactWithId": "Contatto: {userId}",
   "addFriend": "Aggiungi amico",
   "chatServiceNotConnected": "Servizio chat non connesso",
   "userNotFoundHint": "Utente \"{query}\" non trovato\n\nSuggerimenti:\n• Prova a inserire l'ID utente completo, es. @nomeutente:server.com\n• Controlla l'ortografia del nome utente",
@@ -380,6 +380,7 @@
   "noResults": "Nessun risultato",
   "groupInfo": "Info gruppo",
   "groupMembers": "Membri ({count})",
+  "groupMembersTitle": "Membri del gruppo",
   "viewAll": "Vedi tutti",
   "owner": "Proprietario",
   "admin": "Admin",
@@ -682,7 +683,12 @@
       "ringtone": {"type": "String"}
     }
   },
-  "confirmDissolveGroup": "Sei sicuro di voler sciogliere",
+  "confirmDissolveGroup": "Sei sicuro di voler sciogliere \"{name}\"? Questa azione non può essere annullata.",
+  "@confirmDissolveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "enterValidServerAddress": "Inserisci un indirizzo server valido",
   "emailOtp": "OTP email",
   "enterServerAddressFirst": "Inserisci prima l'indirizzo del server",
@@ -738,9 +744,19 @@
     }
   },
   "groupInvites": "Inviti gruppo",
-  "myGroups": "I miei gruppi",
+  "myGroups": "I miei gruppi ({count})",
+  "@myGroups": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "invitedToJoinGroup": "Invitato a unirsi al gruppo",
-  "confirmLeaveGroup": "Sei sicuro di voler lasciare",
+  "confirmLeaveGroup": "Sei sicuro di voler lasciare \"{name}\"?",
+  "@confirmLeaveGroup": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "leave": "Lascia",
   "saveMedia": "Salva",
   "recallThisMessage": "Ritirare questo messaggio?",
@@ -750,9 +766,19 @@
   "saving": "Salvataggio...",
   "share": "Condividi",
   "saveToGallery": "Salva nella galleria",
-  "downloadFailed": "Download fallito",
+  "downloadFailed": "Download fallito: {code}",
+  "@downloadFailed": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
   "noMediaUrl": "Nessun URL media disponibile",
-  "shareFailed": "Condivisione fallita",
+  "shareFailed": "Condivisione fallita: {error}",
+  "@shareFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "failedToLoadImage": "Caricamento immagine fallito",
   "failedToLoadMoreMessages": "Caricamento messaggi fallito",
   "failedToSend": "Invio fallito",
@@ -1154,6 +1180,7 @@
   "allResults": "Tutto",
   "searchInChat": "Cerca nella chat",
   "groupLabel": "Gruppo",
+  "contactLabel": "Contatto",
   "messageLabel": "Messaggio",
 
   "securityTitle": "Sicurezza",
@@ -1542,5 +1569,101 @@
   "switchCameraLabel": "Cambia",
   "leaveLabel": "Lascia",
   "participantsLabel": "Partecipanti",
-  "joiningMeeting": "Entrando nella riunione..."
+  "joiningMeeting": "Entrando nella riunione...",
+  "connectingCall": "Connessione in corso...",
+  "pollVotesFormat": "{count} voti ({percentage}%)",
+  "@pollVotesFormat": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "percentage": {"type": "String"}
+    }
+  },
+  "pollParticipantsFormat": "{count} partecipanti",
+  "@pollParticipantsFormat": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "incomingVideoCall": "Videochiamata in arrivo",
+  "incomingVoiceCall": "Chiamata vocale in arrivo",
+  "videoCallInProgress": "Videochiamata",
+  "voiceCallInProgress": "Chiamata vocale",
+  "reconnectingCall": "Riconnessione in corso...",
+  "callEnded": "Chiamata terminata",
+  "callFailed": "Chiamata fallita",
+  "noMediaUrlAvailable": "URL multimediale non disponibile",
+  "errorWithMessage": "Errore: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+  "musicLinkLabel": "Link musicale",
+  "redPacketTransferCannotForward": "Le buste rosse e i trasferimenti non possono essere inoltrati",
+  "messageNotifications": "Notifiche messaggi",
+  "receiveNewMessageNotifications": "Ricevi notifiche per nuovi messaggi",
+  "showMessagePreview": "Mostra anteprima messaggio",
+  "showMessageContentInNotification": "Mostra contenuto del messaggio nelle notifiche",
+  "vibration": "Vibrazione",
+  "doNotDisturbMode": "Non disturbare",
+  "doNotDisturbDescription": "Non ricevere notifiche durante il periodo specificato",
+  "messagesLabel": "Messaggi",
+  "allowStrangerMessages": "Consenti messaggi da sconosciuti",
+  "receiveMessagesFromNonContacts": "Ricevi messaggi da non-contatti",
+  "letOthersKnowYouRead": "Fai sapere agli altri che hai letto i loro messaggi",
+  "typingIndicator": "Indicatore di digitazione",
+  "letOthersKnowYouTyping": "Fai sapere agli altri che stai scrivendo",
+  "whoCanSeeTitle": "Chi può vedere {title}",
+  "@whoCanSeeTitle": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "versionInfo": "Versione {version}",
+  "@versionInfo": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "checkForUpdates": "Controlla aggiornamenti",
+  "feedbackAndSuggestions": "Feedback e suggerimenti",
+  "darkMode": "Modalità scura",
+  "fontSize": "Dimensione carattere",
+  "bubbleStyle": "Stile fumetto",
+  "followSystem": "Segui sistema",
+  "autoSwitchBySystem": "Cambia automaticamente in base alle impostazioni di sistema",
+  "lightMode": "Modalità chiara",
+  "alwaysUseLightTheme": "Usa sempre tema chiaro",
+  "darkModeOption": "Modalità scura",
+  "alwaysUseDarkTheme": "Usa sempre tema scuro",
+  "fontSizeSmall": "Piccolo",
+  "fontSizeStandard": "Standard",
+  "fontSizeLarge": "Grande",
+  "fontSizeExtraLarge": "Extra grande",
+  "bubbleStyleWechat": "Stile WeChat",
+  "bubbleStyleWechatDesc": "Stile fumetto classico WeChat",
+  "bubbleStyleModern": "Stile moderno",
+  "bubbleStyleModernDesc": "Stile fumetto moderno e pulito",
+  "bubbleStyleClassic": "Stile classico",
+  "bubbleStyleClassicDesc": "Stile fumetto tradizionale",
+  "allButton": "Tutto",
+  "tapToRetry": "Tocca per riprovare",
+  "noConversationsToForward": "Nessuna conversazione da inoltrare",
+  "defaultRedPacketGreeting": "Auguri di prosperità e fortuna",
+  "emojiCategoryFace": "Faccine",
+  "emojiCategoryHeart": "Cuori",
+  "emojiCategoryAnimal": "Animali",
+  "emojiCategoryFood": "Cibo",
+  "emojiCategoryTransport": "Trasporti",
+  "emojiCategoryActivity": "Attività",
+  "emojiCategoryObject": "Oggetti",
+  "emojiCategorySymbol": "Simboli",
+  "allowOthersToSearchAndJoin": "Consenti ad altri di cercare e aderire",
+  "confirmClearChatHistory": "Sei sicuro di voler cancellare la cronologia chat?",
+  "createGroupToChat": "Crea un gruppo per iniziare a chattare",
+  "editGroupAnnouncement": "Modifica annuncio del gruppo",
+  "editGroupDescription": "Modifica descrizione del gruppo",
+  "enterGroupAnnouncement": "Inserisci l'annuncio del gruppo",
+  "memberCountClickToCopy": "{count} membri, fai clic per copiare l'ID del gruppo",
+  "noPermissionToEditGroupName": "Non hai il permesso di modificare il nome del gruppo"
 }

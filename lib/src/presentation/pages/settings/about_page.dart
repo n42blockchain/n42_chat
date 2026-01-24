@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
 
@@ -29,11 +30,12 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = S.of(context);
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: '关于',
+        title: l10n?.about ?? 'About',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -69,7 +71,7 @@ class AboutPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '版本 $version${buildNumber != null ? ' ($buildNumber)' : ''}',
+                  l10n?.versionInfo(version) ?? 'Version $version',
                   style: TextStyle(
                     fontSize: 14,
                     color: isDark
@@ -89,7 +91,7 @@ class AboutPage extends StatelessWidget {
               color: isDark ? AppColors.surfaceDark : AppColors.surface,
               child: ListTile(
                 title: Text(
-                  '检查更新',
+                  l10n?.checkForUpdates ?? 'Check for Updates',
                   style: TextStyle(
                     color: isDark ? Colors.white : AppColors.textPrimary,
                   ),
@@ -112,18 +114,18 @@ class AboutPage extends StatelessWidget {
             child: Column(
               children: [
                 if (onPrivacyPolicy != null)
-                  _buildLinkItem('隐私政策', onPrivacyPolicy!, isDark),
+                  _buildLinkItem(l10n?.privacyPolicy ?? 'Privacy Policy', onPrivacyPolicy!, isDark),
                 if (onTermsOfService != null) ...[
                   _buildDivider(isDark),
-                  _buildLinkItem('服务条款', onTermsOfService!, isDark),
+                  _buildLinkItem(l10n?.termsOfService ?? 'Terms of Service', onTermsOfService!, isDark),
                 ],
                 if (onOpenSource != null) ...[
                   _buildDivider(isDark),
-                  _buildLinkItem('开源许可', onOpenSource!, isDark),
+                  _buildLinkItem(l10n?.openSourceLicenses ?? 'Open Source Licenses', onOpenSource!, isDark),
                 ],
                 if (onFeedback != null) ...[
                   _buildDivider(isDark),
-                  _buildLinkItem('反馈与建议', onFeedback!, isDark),
+                  _buildLinkItem(l10n?.feedbackAndSuggestions ?? 'Feedback & Suggestions', onFeedback!, isDark),
                 ],
               ],
             ),
@@ -136,7 +138,7 @@ class AboutPage extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  '基于 Matrix 协议构建',
+                  l10n?.builtOnMatrix ?? 'Built on Matrix Protocol',
                   style: TextStyle(
                     fontSize: 13,
                     color: isDark

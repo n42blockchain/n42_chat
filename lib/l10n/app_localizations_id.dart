@@ -393,12 +393,12 @@ class SId extends S {
   String get send => 'Kirim';
 
   @override
-  String conversationLabel(String roomId) {
+  String conversationWithId(String roomId) {
     return 'Percakapan: $roomId';
   }
 
   @override
-  String contactLabel(String userId) {
+  String contactWithId(String userId) {
     return 'Kontak: $userId';
   }
 
@@ -1205,6 +1205,9 @@ class SId extends S {
   }
 
   @override
+  String get groupMembersTitle => 'Anggota Grup';
+
+  @override
   String get viewAll => 'Lihat semua';
 
   @override
@@ -1299,11 +1302,6 @@ class SId extends S {
   @override
   String tapCopyGroupId(int count) {
     return '$count anggota - Ketuk untuk menyalin ID Grup';
-  }
-
-  @override
-  String featureInDevelopment(Object feature) {
-    return 'Fitur sedang dikembangkan...';
   }
 
   @override
@@ -1958,6 +1956,11 @@ class SId extends S {
   String get inCall => 'Dalam panggilan';
 
   @override
+  String featureInDevelopment(String feature) {
+    return 'Fitur sedang dikembangkan...';
+  }
+
+  @override
   String collectMessages(Object count) {
     return 'Mengoleksi $count pesan';
   }
@@ -2120,7 +2123,9 @@ class SId extends S {
   }
 
   @override
-  String get confirmDissolveGroup => 'Apakah Anda yakin ingin membubarkan';
+  String confirmDissolveGroup(String name) {
+    return 'Apakah Anda yakin ingin membubarkan \"$name\"? Tindakan ini tidak dapat dibatalkan.';
+  }
 
   @override
   String get enterValidServerAddress =>
@@ -2212,13 +2217,17 @@ class SId extends S {
   String get groupInvites => 'Undangan Grup';
 
   @override
-  String get myGroups => 'Grup Saya';
+  String myGroups(int count) {
+    return 'Grup Saya ($count)';
+  }
 
   @override
   String get invitedToJoinGroup => 'Diundang untuk bergabung ke grup';
 
   @override
-  String get confirmLeaveGroup => 'Apakah Anda yakin ingin keluar dari';
+  String confirmLeaveGroup(String name) {
+    return 'Apakah Anda yakin ingin keluar dari \"$name\"?';
+  }
 
   @override
   String get leave => 'Keluar';
@@ -2248,13 +2257,17 @@ class SId extends S {
   String get saveToGallery => 'Simpan ke Galeri';
 
   @override
-  String get downloadFailed => 'Unduhan gagal';
+  String downloadFailed(String code) {
+    return 'Unduhan gagal: $code';
+  }
 
   @override
   String get noMediaUrl => 'Tidak ada URL media tersedia';
 
   @override
-  String get shareFailed => 'Gagal membagikan';
+  String shareFailed(String error) {
+    return 'Gagal berbagi: $error';
+  }
 
   @override
   String get failedToLoadImage => 'Gagal memuat gambar';
@@ -3206,7 +3219,13 @@ class SId extends S {
   String get searchInChat => 'Cari di chat';
 
   @override
+  String get contactLabel => 'Kontak';
+
+  @override
   String get groupLabel => 'Grup';
+
+  @override
+  String get conversationLabel => '会话';
 
   @override
   String get messageLabel => 'Pesan';
@@ -3490,7 +3509,7 @@ class SId extends S {
   String get pollEndedMessage => 'Polling berakhir';
 
   @override
-  String get connectingCall => '正在连接...';
+  String get connectingCall => 'Menghubungkan...';
 
   @override
   String get muteCall => 'Bisukan';
@@ -3847,11 +3866,226 @@ class SId extends S {
 
   @override
   String pollVotesFormat(int count, String percentage) {
-    return '$count 票 ($percentage%)';
+    return '$count suara ($percentage%)';
   }
 
   @override
   String pollParticipantsFormat(int count) {
-    return '$count 人参与';
+    return '$count peserta';
+  }
+
+  @override
+  String get tapToRetry => 'Ketuk untuk mencoba lagi';
+
+  @override
+  String get noConversationsToForward =>
+      'Tidak ada percakapan untuk diteruskan';
+
+  @override
+  String get defaultRedPacketGreeting => 'Semoga sukses dan sejahtera';
+
+  @override
+  String get emojiCategoryFace => 'Emotikon';
+
+  @override
+  String get emojiCategoryHeart => 'Hati';
+
+  @override
+  String get emojiCategoryAnimal => 'Hewan';
+
+  @override
+  String get emojiCategoryFood => 'Makanan';
+
+  @override
+  String get emojiCategoryTransport => 'Transportasi';
+
+  @override
+  String get emojiCategoryActivity => 'Aktivitas';
+
+  @override
+  String get emojiCategoryObject => 'Objek';
+
+  @override
+  String get emojiCategorySymbol => 'Simbol';
+
+  @override
+  String get allowOthersToSearchAndJoin =>
+      'Izinkan orang lain untuk mencari dan bergabung';
+
+  @override
+  String get allowStrangerMessages => 'Izinkan pesan dari orang asing';
+
+  @override
+  String get alwaysUseDarkTheme => 'Selalu gunakan tema gelap';
+
+  @override
+  String get alwaysUseLightTheme => 'Selalu gunakan tema terang';
+
+  @override
+  String get autoSwitchBySystem => 'Beralih otomatis sesuai pengaturan sistem';
+
+  @override
+  String get bubbleStyle => 'Gaya gelembung';
+
+  @override
+  String get bubbleStyleClassic => 'Gaya klasik';
+
+  @override
+  String get bubbleStyleClassicDesc => 'Gaya gelembung tradisional';
+
+  @override
+  String get bubbleStyleModern => 'Gaya modern';
+
+  @override
+  String get bubbleStyleModernDesc => 'Gaya gelembung modern yang bersih';
+
+  @override
+  String get bubbleStyleWechat => 'Gaya WeChat';
+
+  @override
+  String get bubbleStyleWechatDesc => 'Gaya gelembung klasik WeChat';
+
+  @override
+  String get callEnded => 'Panggilan berakhir';
+
+  @override
+  String get callFailed => 'Panggilan gagal';
+
+  @override
+  String get checkForUpdates => 'Periksa pembaruan';
+
+  @override
+  String get confirmClearChatHistory =>
+      'Apakah Anda yakin ingin menghapus riwayat chat?';
+
+  @override
+  String get createGroupToChat => 'Buat grup untuk mulai berbincang';
+
+  @override
+  String get darkMode => 'Mode gelap';
+
+  @override
+  String get darkModeOption => 'Mode gelap';
+
+  @override
+  String get doNotDisturbDescription =>
+      'Tidak menerima notifikasi selama waktu yang ditentukan';
+
+  @override
+  String get doNotDisturbMode => 'Jangan ganggu';
+
+  @override
+  String get editGroupAnnouncement => 'Edit pengumuman grup';
+
+  @override
+  String get editGroupDescription => 'Edit deskripsi grup';
+
+  @override
+  String get enterGroupAnnouncement => 'Masukkan pengumuman grup';
+
+  @override
+  String errorWithMessage(String message) {
+    return 'Kesalahan: $message';
+  }
+
+  @override
+  String get feedbackAndSuggestions => 'Masukan dan saran';
+
+  @override
+  String get followSystem => 'Ikuti sistem';
+
+  @override
+  String get fontSize => 'Ukuran font';
+
+  @override
+  String get fontSizeExtraLarge => 'Sangat besar';
+
+  @override
+  String get fontSizeLarge => 'Besar';
+
+  @override
+  String get fontSizeSmall => 'Kecil';
+
+  @override
+  String get fontSizeStandard => 'Standar';
+
+  @override
+  String get incomingVideoCall => 'Panggilan video masuk';
+
+  @override
+  String get incomingVoiceCall => 'Panggilan suara masuk';
+
+  @override
+  String get letOthersKnowYouRead =>
+      'Biarkan orang lain tahu Anda telah membaca pesan mereka';
+
+  @override
+  String get letOthersKnowYouTyping =>
+      'Biarkan orang lain tahu Anda sedang mengetik';
+
+  @override
+  String get lightMode => 'Mode terang';
+
+  @override
+  String memberCountClickToCopy(int count) {
+    return '$count anggota, klik untuk menyalin ID grup';
+  }
+
+  @override
+  String get messageNotifications => 'Notifikasi pesan';
+
+  @override
+  String get messagesLabel => 'Pesan';
+
+  @override
+  String get musicLinkLabel => 'Link musik';
+
+  @override
+  String get noMediaUrlAvailable => 'URL media tidak tersedia';
+
+  @override
+  String get noPermissionToEditGroupName =>
+      'Anda tidak memiliki izin untuk mengubah nama grup';
+
+  @override
+  String get receiveMessagesFromNonContacts => 'Terima pesan dari non-kontak';
+
+  @override
+  String get receiveNewMessageNotifications => 'Terima notifikasi pesan baru';
+
+  @override
+  String get reconnectingCall => 'Menghubungkan ulang...';
+
+  @override
+  String get redPacketTransferCannotForward =>
+      'Angpao dan transfer tidak dapat diteruskan';
+
+  @override
+  String get showMessageContentInNotification =>
+      'Tampilkan isi pesan di notifikasi';
+
+  @override
+  String get showMessagePreview => 'Tampilkan pratinjau pesan';
+
+  @override
+  String get typingIndicator => 'Indikator mengetik';
+
+  @override
+  String versionInfo(String version) {
+    return 'Versi $version';
+  }
+
+  @override
+  String get vibration => 'Getaran';
+
+  @override
+  String get videoCallInProgress => 'Panggilan video';
+
+  @override
+  String get voiceCallInProgress => 'Panggilan suara';
+
+  @override
+  String whoCanSeeTitle(String title) {
+    return 'Siapa yang bisa melihat $title';
   }
 }
