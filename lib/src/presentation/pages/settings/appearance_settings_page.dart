@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -8,7 +9,7 @@ import '../../widgets/common/common_widgets.dart';
 /// 外观设置页面
 class AppearanceSettingsPage extends StatefulWidget {
   final AppearanceSettings settings;
-  final Function(AppearanceSettings)? onSave;
+  final void Function(AppearanceSettings)? onSave;
 
   const AppearanceSettingsPage({
     super.key,
@@ -36,7 +37,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Scaffold(

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -84,7 +85,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
   Future<void> _onRefresh() async {
     context.read<ConversationBloc>().add(const RefreshConversations());
     // 等待刷新完成
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
   }
 
   void _onConversationTap(ConversationEntity conversation) {
@@ -103,7 +104,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
     // 检查 ContactBloc 是否可用
@@ -322,9 +323,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
   }
 
   void _showAddMenu() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
@@ -374,7 +375,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 onTap: () {
                   Navigator.pop(ctx);
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ScanQRPage()),
+                    MaterialPageRoute<void>(builder: (_) => const ScanQRPage()),
                   );
                 },
               ),
@@ -406,7 +407,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
     required String title,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
     return ListTile(
       leading: Container(
@@ -431,9 +432,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
   void _navigateToCreateGroup(BuildContext sheetContext) {
     Navigator.pop(sheetContext);
-    
-    Navigator.of(context).push(
-      MaterialPageRoute(
+
+    Navigator.of(context).push<String?>(
+      MaterialPageRoute<String?>(
         builder: (_) => MultiBlocProvider(
           providers: [
             BlocProvider(create: (_) => getIt<GroupBloc>()),
@@ -443,7 +444,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
         ),
       ),
     ).then((roomId) {
-      if (roomId != null && roomId is String) {
+      if (roomId != null) {
         // 刷新会话列表
         context.read<ConversationBloc>().add(const RefreshConversations());
       }
@@ -452,13 +453,13 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
   void _navigateToAddFriend(BuildContext sheetContext) {
     Navigator.pop(sheetContext);
-    
-    Navigator.of(context).push(
-      MaterialPageRoute(
+
+    Navigator.of(context).push<String?>(
+      MaterialPageRoute<String?>(
         builder: (_) => const AddFriendPage(),
       ),
     ).then((roomId) {
-      if (roomId != null && roomId is String) {
+      if (roomId != null) {
         // 刷新会话列表
         context.read<ConversationBloc>().add(const RefreshConversations());
       }
@@ -467,9 +468,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
   void _showConversationMenu(
       BuildContext context, ConversationEntity conversation) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
@@ -567,7 +568,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
     bool isDestructive = false,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final textColor = isDestructive 
         ? AppColors.error 
         : (isDark ? Colors.white : Colors.black);
@@ -583,7 +584,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
   }
 
   void _confirmDeleteConversation(ConversationEntity conversation) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.deleteConversation ?? 'Delete Conversation'),

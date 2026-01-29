@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
@@ -26,7 +27,7 @@ class MessageMenu extends StatelessWidget {
   final MessageEntity message;
   final bool canEdit;
   final bool canRedact;
-  final Function(String emoji)? onReaction;
+  final void Function(String emoji)? onReaction;
   final VoidCallback? onReply;
   final VoidCallback? onCopy;
   final VoidCallback? onForward;
@@ -52,7 +53,7 @@ class MessageMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -224,7 +225,7 @@ class _ForwardDialogState extends State<ForwardDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,

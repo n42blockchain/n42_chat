@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import 'n42_avatar.dart';
 import 'n42_badge.dart';
@@ -81,7 +82,7 @@ class N42ListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = backgroundColor ??
         (isPinned
             ? (isDark ? const Color(0xFF252525) : const Color(0xFFF5F5F5))
@@ -274,7 +275,7 @@ class N42SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Column(
       mainAxisSize: MainAxisSize.min,

@@ -237,7 +237,7 @@ class AuthMethodsService {
       // }
       
       // 暂时返回 true 表示成功发送
-      await Future.delayed(const Duration(seconds: 1)); // 模拟网络延迟
+      await Future<void>.delayed(const Duration(seconds: 1)); // 模拟网络延迟
       
       debugPrint('AuthMethodsService: Email OTP sent');
       return true;
@@ -264,7 +264,7 @@ class AuthMethodsService {
       // 验证成功后返回登录凭证
       
       // 暂时返回模拟数据
-      await Future.delayed(const Duration(seconds: 1));
+      await Future<void>.delayed(const Duration(seconds: 1));
       
       // 如果验证成功，返回登录所需的信息
       return {

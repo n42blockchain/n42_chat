@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../widgets/common/common_widgets.dart';
 
 /// N42豆页面（类似微信豆）
 class N42BeanPage extends StatefulWidget {
@@ -16,7 +16,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
@@ -217,7 +217,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
   }
 
   Widget _buildFeatureItem(String text) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Text(
@@ -232,7 +232,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
   }
 
   void _showBeanDetail() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -245,7 +245,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
 class _BeanDetailSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,

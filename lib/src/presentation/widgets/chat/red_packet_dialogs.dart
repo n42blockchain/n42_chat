@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../core/theme/app_colors.dart';
 
 /// 发红包页面（全屏，仿微信）
 class SendRedPacketPage extends StatefulWidget {
@@ -16,7 +15,7 @@ class SendRedPacketPage extends StatefulWidget {
   final int memberCount;
   
   /// 发送回调
-  final Function(String amount, String token, String greeting, int count, bool isLucky) onSend;
+  final void Function(String amount, String token, String greeting, int count, bool isLucky) onSend;
   
   const SendRedPacketPage({
     super.key,
@@ -541,7 +540,7 @@ class SendRedPacketDialog extends StatelessWidget {
   final String receiverName;
   final bool isGroup;
   final int memberCount;
-  final Function(String amount, String token, String greeting, int count, bool isLucky) onSend;
+  final void Function(String amount, String token, String greeting, int count, bool isLucky) onSend;
   
   const SendRedPacketDialog({
     super.key,
@@ -557,7 +556,7 @@ class SendRedPacketDialog extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Navigator.of(context).pop();
       Navigator.of(context).push(
-        MaterialPageRoute(
+        MaterialPageRoute<void>(
           builder: (_) => SendRedPacketPage(
             receiverName: receiverName,
             isGroup: isGroup,
@@ -1143,7 +1142,7 @@ class SendTransferDialog extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Navigator.of(context).pop();
       Navigator.of(context).push(
-        MaterialPageRoute(
+        MaterialPageRoute<void>(
           builder: (_) => SendTransferPage(
             receiverName: receiverName,
             receiverAvatar: receiverAvatar,

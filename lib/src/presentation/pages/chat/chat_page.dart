@@ -23,6 +23,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
@@ -32,10 +33,7 @@ import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import '../../../domain/repositories/group_repository.dart';
-import '../../../domain/repositories/message_action_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
-import '../../blocs/auth/auth_bloc.dart';
-import '../../blocs/auth/auth_event.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/chat/chat_state.dart';
@@ -390,7 +388,7 @@ class _ChatPageState extends State<ChatPage> {
     // 如果已经领取，直接显示红包详情页
     if (redPacketStatus == OpenRedPacketStatus.opened) {
       Navigator.of(context).push(
-        MaterialPageRoute(
+        MaterialPageRoute<void>(
           builder: (_) => RedPacketDetailPage(
             senderName: senderName,
             senderAvatar: message.senderAvatarUrl,
@@ -413,7 +411,7 @@ class _ChatPageState extends State<ChatPage> {
     }
     
     // 显示开红包弹窗
-    showDialog(
+    showDialog<void>(
       context: context,
       barrierDismissible: true,
       builder: (ctx) => OpenRedPacketDialog(
@@ -430,7 +428,7 @@ class _ChatPageState extends State<ChatPage> {
         onViewDetails: () {
           Navigator.of(ctx).pop();
           Navigator.of(context).push(
-            MaterialPageRoute(
+            MaterialPageRoute<void>(
               builder: (_) => RedPacketDetailPage(
                 senderName: senderName,
                 senderAvatar: message.senderAvatarUrl,
@@ -478,7 +476,7 @@ class _ChatPageState extends State<ChatPage> {
 
     // 跳转到联系人详情页面
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) {
           final page = ContactDetailPage(
             userId: contactId,
@@ -521,7 +519,7 @@ class _ChatPageState extends State<ChatPage> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => _ImageViewerPage(
           imageUrl: imageUrl!,
           heroTag: message.id,
@@ -585,7 +583,7 @@ class _ChatPageState extends State<ChatPage> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => _VideoPlayerPage(
           videoUrl: videoUrl!,
           thumbnailUrl: thumbnailUrl,
@@ -639,7 +637,7 @@ class _ChatPageState extends State<ChatPage> {
     }
     
     // 显示位置信息
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.location ?? 'Location'),
@@ -694,7 +692,7 @@ class _ChatPageState extends State<ChatPage> {
     }
     
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) {
           final page = ContactDetailPage(
             userId: message.senderId,
@@ -853,7 +851,7 @@ class _ChatPageState extends State<ChatPage> {
     if (!mounted) return;
 
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) {
           final page = ChatDetailPage(
             conversation: widget.conversation,
@@ -959,7 +957,7 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     Navigator.of(ctx).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (navCtx) {
           final page = ContactDetailPage(
             userId: userId,
@@ -985,7 +983,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
     // 检查 ContactBloc 是否可用
     bool hasContactBloc = false;
@@ -1649,7 +1647,7 @@ class _ChatPageState extends State<ChatPage> {
 
   /// 显示位置选项菜单（微信风格）
   Future<void> _sendLocation() async {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
@@ -1753,7 +1751,7 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> _openLocationPicker() async {
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
-      MaterialPageRoute(
+      MaterialPageRoute<Map<String, dynamic>>(
         builder: (context) => const _LocationPickerPage(),
       ),
     );
@@ -1886,12 +1884,12 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _sendRedPacket() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => SendRedPacketDialog(
         receiverName: _getDisplayName(),
         isGroup: widget.conversation.isGroup,
-        memberCount: widget.conversation.memberCount ?? 1,
+        memberCount: widget.conversation.memberCount,
         onSend: (amount, token, greeting, count, isLucky) {
           _doSendRedPacket(amount, token, greeting, count, isLucky);
         },
@@ -1923,7 +1921,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _sendTransfer() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => SendTransferDialog(
         receiverName: _getDisplayName(),
@@ -2055,7 +2053,7 @@ class _ChatPageState extends State<ChatPage> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _ContactCardSelectSheet(
-        isDark: Theme.of(context).brightness == Brightness.dark,
+        isDark: context.isDarkMode,
       ),
     );
     
@@ -2122,7 +2120,7 @@ Avatar: ${contactAvatar ?? ''}''';
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _MusicSelectSheet(
-        isDark: Theme.of(context).brightness == Brightness.dark,
+        isDark: context.isDarkMode,
       ),
     );
     
@@ -2273,7 +2271,7 @@ Avatar: ${contactAvatar ?? ''}''';
     );
 
     // 延迟后解除投票锁定
-    Future.delayed(const Duration(seconds: 2), () {
+    Future<void>.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
           _votingPollIds.remove(pollEventId);
@@ -2345,7 +2343,7 @@ Avatar: ${contactAvatar ?? ''}''';
           ),
           if (widget.conversation.type == ConversationType.group)
             Text(
-              S.of(context)?.memberCount(widget.conversation.memberCount ?? 0) ?? '${widget.conversation.memberCount} members',
+              S.of(context)?.memberCount(widget.conversation.memberCount) ?? '${widget.conversation.memberCount} members',
               style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
@@ -2430,7 +2428,7 @@ Avatar: ${contactAvatar ?? ''}''';
       final name = widget.conversation.name;
       // 如果群名为空或为默认值，显示成员数
       if (name.isEmpty || name == 'Empty Chat' || name == 'empty chat') {
-        return S.of(context)?.groupChatCount(widget.conversation.memberCount ?? 0) ?? 'Group Chat(${widget.conversation.memberCount})';
+        return S.of(context)?.groupChatCount(widget.conversation.memberCount) ?? 'Group Chat(${widget.conversation.memberCount})';
       }
       return name;
     }
@@ -2620,7 +2618,7 @@ Avatar: ${contactAvatar ?? ''}''';
   }) {
     final isRedacted = message.type == MessageType.redacted;
     final isSelected = !isRedacted && _selectedMessageIds.contains(message.id);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return GestureDetector(
       onTap: isRedacted ? null : () => _toggleMessageSelection(message.id),
@@ -2735,7 +2733,7 @@ Avatar: ${contactAvatar ?? ''}''';
           return const SizedBox.shrink();
         }
 
-        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final isDark = context.isDarkMode;
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -2803,7 +2801,7 @@ Avatar: ${contactAvatar ?? ''}''';
   
   /// 构建多选模式底部工具栏
   Widget _buildMultiSelectBottomBar() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final hasSelection = _selectedMessageIds.isNotEmpty;
     
     return Container(
@@ -2857,7 +2855,7 @@ Avatar: ${contactAvatar ?? ''}''';
     VoidCallback? onTap,
     bool isDestructive = false,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final color = !enabled
         ? (isDark ? Colors.white38 : Colors.black26)
         : isDestructive
@@ -2906,7 +2904,7 @@ Avatar: ${contactAvatar ?? ''}''';
   
   /// 构建 @ 提醒成员选择器
   Widget _buildMentionPicker() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? const Color(0xFF2C2C2E) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black;
     final subtextColor = isDark ? Colors.white54 : Colors.black54;
@@ -3029,7 +3027,7 @@ Avatar: ${contactAvatar ?? ''}''';
       
       return members.map((m) => {
         'id': m.userId,
-        'name': m.displayName ?? m.userId,
+        'name': m.displayName.isNotEmpty ? m.displayName : m.userId,
         'avatarUrl': m.avatarUrl ?? '',
       }).toList();
     } catch (e) {
@@ -3164,7 +3162,7 @@ Avatar: ${contactAvatar ?? ''}''';
 
   void _showMessageMenu(MessageEntity message) {
     // 使用旧的底部菜单作为 fallback
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _MessageMenuSheet(
@@ -3347,21 +3345,19 @@ Avatar: ${contactAvatar ?? ''}''';
   
   /// 复制消息
   void _copyMessage(MessageEntity message) {
-    String? textToCopy;
-    
+    final String textToCopy;
+
     switch (message.type) {
       case MessageType.text:
         textToCopy = message.content;
-        break;
       case MessageType.location:
         textToCopy = message.content; // 位置描述
-        break;
       default:
         // 对于其他类型的消息，复制消息类型描述
         textToCopy = _getMessageTypeDescription(message.type);
     }
-    
-    if (textToCopy != null && textToCopy.isNotEmpty) {
+
+    if (textToCopy.isNotEmpty) {
       Clipboard.setData(ClipboardData(text: textToCopy));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -3401,9 +3397,9 @@ Avatar: ${contactAvatar ?? ''}''';
   
   /// 显示转发对话框
   Future<void> _showForwardDialog(MessageEntity message) async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
-    await showModalBottomSheet(
+    await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -3582,7 +3578,6 @@ Avatar: ${contactAvatar ?? ''}''';
             try {
               // Matrix 1.11+ 需要认证的媒体访问，需要添加 Authorization header
               final headers = <String, String>{};
-              final client = getIt<IMessageRepository>();
               // 尝试获取 access token
               try {
                 final matrixClient = getIt<MatrixClientManager>().client;
@@ -3654,7 +3649,7 @@ Avatar: ${contactAvatar ?? ''}''';
 
             try {
               final aggregations = await messageRepository.getPollAggregations(
-                message.roomId ?? widget.conversation.id,
+                message.roomId,
                 message.id,
               );
               if (aggregations != null) {
@@ -3981,7 +3976,7 @@ Avatar: ${contactAvatar ?? ''}''';
       return;
     }
     
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
     // 显示转发目标选择对话框
     final targetRoomId = await showModalBottomSheet<String>(
@@ -4054,9 +4049,9 @@ Avatar: ${contactAvatar ?? ''}''';
   
   /// 显示群成员选择器（@某人）
   Future<void> _showMemberPicker(MessageEntity message) async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
-    await showModalBottomSheet(
+    await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -4115,9 +4110,9 @@ Avatar: ${contactAvatar ?? ''}''';
   
   /// 显示搜索选项对话框
   Future<void> _showSearchOptionsDialog(String searchText) async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
-    await showModalBottomSheet(
+    await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
@@ -4349,7 +4344,7 @@ class _MessageMenuSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Container(
       decoration: BoxDecoration(
@@ -4411,7 +4406,7 @@ class _MessageMenuSheet extends StatelessWidget {
     Color? color,
     VoidCallback? onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final textColor = color ??
         (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
 
@@ -4477,17 +4472,17 @@ class _CallDialogState extends State<_CallDialog> {
     debugPrint('_CallDialog: Room ID: ${widget.roomId ?? "N/A"}');
     
     // 模拟呼叫状态变化
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     if (mounted) {
       setState(() => _callStatusKey = 'connecting');
     }
 
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
     if (mounted) {
       setState(() => _callStatusKey = 'ringing');
     }
 
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future<void>.delayed(const Duration(milliseconds: 1500));
     if (mounted) {
       setState(() {
         _isConnecting = false;
@@ -4500,7 +4495,7 @@ class _CallDialogState extends State<_CallDialog> {
   
   void _startTimer() {
     Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 1));
+      await Future<void>.delayed(const Duration(seconds: 1));
       if (mounted && !_isConnecting) {
         setState(() {
           _callDuration++;
@@ -4736,7 +4731,7 @@ class _CallDialogState extends State<_CallDialog> {
 class _ForwardMessageSheet extends StatefulWidget {
   final MessageEntity message;
   final bool isDark;
-  final Function(String conversationId) onForwardToChat;
+  final void Function(String conversationId) onForwardToChat;
 
   const _ForwardMessageSheet({
     required this.message,
@@ -5010,20 +5005,6 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
   }
 }
 
-class _ChatItem {
-  final String id;
-  final String name;
-  final String? avatar;
-  final bool isGroup;
-  
-  _ChatItem({
-    required this.id,
-    required this.name,
-    this.avatar,
-    required this.isGroup,
-  });
-}
-
 /// 位置选择页面（微信风格）
 class _LocationPickerPage extends StatefulWidget {
   const _LocationPickerPage();
@@ -5202,7 +5183,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
@@ -6143,7 +6124,7 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
       setState(() {
         _members = members.map((m) => {
           'id': m.userId,
-          'name': m.displayName ?? m.userId,
+          'name': m.displayName.isNotEmpty ? m.displayName : m.userId,
           'avatarUrl': m.avatarUrl ?? '',
         }).toList();
         _filteredMembers = _members;
@@ -6289,15 +6270,7 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
   }
 
   Color _getColorFromName(String name) {
-    final colors = [
-      const Color(0xFF1AAD19),
-      const Color(0xFF576B95),
-      const Color(0xFFFA9D3B),
-      const Color(0xFFE64340),
-    ];
-    if (name.isEmpty) return colors[0];
-    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
-    return colors[index];
+    return AppColorPalettes.getAvatarColor(name);
   }
 }
 
@@ -6320,7 +6293,6 @@ class _MultiForwardSheetState extends State<_MultiForwardSheet> {
   List<ConversationEntity> _conversations = [];
   List<ConversationEntity> _filteredConversations = [];
   bool _isLoading = true;
-  String _searchQuery = '';
 
   @override
   void initState() {
@@ -6355,7 +6327,6 @@ class _MultiForwardSheetState extends State<_MultiForwardSheet> {
 
   void _filterConversations(String query) {
     setState(() {
-      _searchQuery = query;
       if (query.isEmpty) {
         _filteredConversations = _conversations;
       } else {
@@ -6506,15 +6477,7 @@ class _MultiForwardSheetState extends State<_MultiForwardSheet> {
   }
 
   Color _getColorFromName(String name) {
-    final colors = [
-      const Color(0xFF1AAD19),
-      const Color(0xFF576B95),
-      const Color(0xFFFA9D3B),
-      const Color(0xFFE64340),
-    ];
-    if (name.isEmpty) return colors[0];
-    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
-    return colors[index];
+    return AppColorPalettes.getAvatarColor(name);
   }
 }
 
@@ -6973,7 +6936,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(
@@ -7293,7 +7256,7 @@ class _ContactSelectDialogState extends State<_ContactSelectDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black;
 
@@ -7377,15 +7340,7 @@ class _ContactSelectDialogState extends State<_ContactSelectDialog> {
   }
 
   Color _getColorFromName(String name) {
-    final colors = [
-      const Color(0xFF1AAD19),
-      const Color(0xFF576B95),
-      const Color(0xFFFA9D3B),
-      const Color(0xFFE64340),
-    ];
-    if (name.isEmpty) return colors[0];
-    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
-    return colors[index];
+    return AppColorPalettes.getAvatarColor(name);
   }
 }
 

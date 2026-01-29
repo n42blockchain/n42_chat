@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../domain/entities/message_entity.dart';
-import '../../../domain/entities/message_reaction_entity.dart';
 import 'message_reaction_bar.dart';
 
 /// 快速表情列表（类似微信/WhatsApp/Element）
@@ -445,7 +444,7 @@ class _RecallConfirmSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? const Color(0xFF2C2C2E) : Colors.white;
     final separatorColor = isDark ? const Color(0xFF38383A) : const Color(0xFFE5E5EA);
     
@@ -556,7 +555,7 @@ class RecalledMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final textColor = isDark ? Colors.grey[500] : Colors.grey[600];
     final s = S.of(context);
 

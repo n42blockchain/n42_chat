@@ -395,7 +395,7 @@ class CallManager {
     if (context == null || _webRTCService == null) return;
     
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => CallScreen(
           webRTCService: _webRTCService!,
         ),
@@ -408,7 +408,7 @@ class CallManager {
     if (context == null || _liveKitService == null) return;
     
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => GroupCallScreen(
           liveKitService: _liveKitService!,
           roomName: roomName,

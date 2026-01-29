@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
@@ -13,7 +14,7 @@ class ContactSettingsPage extends StatefulWidget {
   final String userId;
   final String displayName;
   final bool isStarred;
-  final Function(bool)? onStarChanged;
+  final void Function(bool)? onStarChanged;
   
   const ContactSettingsPage({
     super.key,
@@ -39,7 +40,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : Colors.white;
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black;
@@ -295,7 +296,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
     }
     
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) {
           final page = FriendInfoPage(
             userId: widget.userId,
@@ -315,7 +316,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
   }
   
   void _showDeleteConfirm() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.deleteContact ?? 'Delete Contact'),
@@ -342,7 +343,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
 
   void _deleteContact() async {
     // 显示加载指示器
-    showDialog(
+    showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => const Center(

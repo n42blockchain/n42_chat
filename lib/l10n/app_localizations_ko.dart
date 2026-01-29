@@ -730,7 +730,7 @@ class SKo extends S {
   String get termsOfService => '서비스 약관';
 
   @override
-  String get and => ' 및 ';
+  String get and => '및';
 
   @override
   String get privacyPolicy => '개인정보 처리방침';

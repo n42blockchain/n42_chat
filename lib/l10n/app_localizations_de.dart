@@ -742,13 +742,13 @@ class SDe extends S {
   String get register => 'Registrieren';
 
   @override
-  String get agreeTerms => 'Mit der Anmeldung stimmen Sie zu ';
+  String get agreeTerms => 'Mit der Anmeldung stimmen Sie zu';
 
   @override
   String get termsOfService => 'Nutzungsbedingungen';
 
   @override
-  String get and => ' und ';
+  String get and => 'und';
 
   @override
   String get privacyPolicy => 'Datenschutzrichtlinie';

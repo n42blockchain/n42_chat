@@ -103,11 +103,11 @@ class SearchResultItem extends Equatable {
       type: SearchResultType.message,
       id: message.id,
       title: roomName,
-      subtitle: message.senderName ?? message.senderId,
+      subtitle: message.senderName.isNotEmpty ? message.senderName : message.senderId,
       avatarUrl: roomAvatarUrl,
       matchedKeyword: matchedKeyword,
       matchedContent: message.content,
-      timestamp: message.timestamp ?? DateTime.now(),
+      timestamp: message.timestamp,
       roomId: roomId,
       rawData: message,
     );

@@ -384,9 +384,9 @@ class MessageRepositoryImpl implements IMessageRepository {
       debugPrint('downloadMedia: Trying Matrix SDK httpClient');
       try {
         final sdkResponse = await _client!.httpClient.get(Uri.parse(authenticatedUrl));
-        debugPrint('downloadMedia: SDK httpClient response: ${sdkResponse?.statusCode}, size: ${sdkResponse?.bodyBytes.length ?? 0}');
+        debugPrint('downloadMedia: SDK httpClient response: ${sdkResponse.statusCode}, size: ${sdkResponse.bodyBytes.length}');
 
-        if (sdkResponse != null && sdkResponse.statusCode == 200 && sdkResponse.bodyBytes.isNotEmpty) {
+        if (sdkResponse.statusCode == 200 && sdkResponse.bodyBytes.isNotEmpty) {
           return sdkResponse.bodyBytes;
         }
       } catch (e) {

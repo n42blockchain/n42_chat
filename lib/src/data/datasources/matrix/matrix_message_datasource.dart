@@ -1016,11 +1016,9 @@ class MatrixMessageDataSource {
       final stateEvent = room.getState('n42.member.profile', userId);
       if (stateEvent != null) {
         final content = stateEvent.content;
-        if (content is Map<String, dynamic>) {
-          final pokeText = content['pokeText'] as String?;
-          debugPrint('MatrixMessageDataSource: Found pokeText for $userId: $pokeText');
-          return pokeText;
-        }
+        final pokeText = content['pokeText'] as String?;
+        debugPrint('MatrixMessageDataSource: Found pokeText for $userId: $pokeText');
+        return pokeText;
       }
       
       debugPrint('MatrixMessageDataSource: No pokeText found for $userId in room $roomId');
@@ -1273,46 +1271,43 @@ class MatrixMessageDataSource {
         '/client/v1/rooms/${Uri.encodeComponent(roomId)}/relations/${Uri.encodeComponent(eventId)}/m.annotation',
       );
 
-      if (response is Map<String, dynamic>) {
-        final reactions = <String, Map<String, dynamic>>{};
-        final currentUserId = _client?.userID ?? '';
+      final reactions = <String, Map<String, dynamic>>{};
+      final currentUserId = _client?.userID ?? '';
 
-        final chunk = response['chunk'] as List<dynamic>?;
-        if (chunk != null) {
-          for (final item in chunk) {
-            if (item is Map<String, dynamic>) {
-              final itemType = item['type'] as String?;
-              if (itemType == 'm.reaction') {
-                final content = item['content'] as Map<String, dynamic>?;
-                final relatesTo = content?['m.relates_to'] as Map<String, dynamic>?;
-                final emoji = relatesTo?['key'] as String?;
-                final senderId = item['sender'] as String?;
+      final chunk = response['chunk'] as List<dynamic>?;
+      if (chunk != null) {
+        for (final item in chunk) {
+          if (item is Map<String, dynamic>) {
+            final itemType = item['type'] as String?;
+            if (itemType == 'm.reaction') {
+              final content = item['content'] as Map<String, dynamic>?;
+              final relatesTo = content?['m.relates_to'] as Map<String, dynamic>?;
+              final emoji = relatesTo?['key'] as String?;
+              final senderId = item['sender'] as String?;
 
-                if (emoji != null && senderId != null) {
-                  if (!reactions.containsKey(emoji)) {
-                    reactions[emoji] = {
-                      'count': 0,
-                      'userIds': <String>[],
-                      'isMe': false,
-                    };
-                  }
-                  reactions[emoji]!['count'] = (reactions[emoji]!['count'] as int) + 1;
-                  (reactions[emoji]!['userIds'] as List<String>).add(senderId);
-                  if (senderId == currentUserId) {
-                    reactions[emoji]!['isMe'] = true;
-                  }
+              if (emoji != null && senderId != null) {
+                if (!reactions.containsKey(emoji)) {
+                  reactions[emoji] = {
+                    'count': 0,
+                    'userIds': <String>[],
+                    'isMe': false,
+                  };
+                }
+                reactions[emoji]!['count'] = (reactions[emoji]!['count'] as int) + 1;
+                (reactions[emoji]!['userIds'] as List<String>).add(senderId);
+                if (senderId == currentUserId) {
+                  reactions[emoji]!['isMe'] = true;
                 }
               }
             }
           }
         }
-
-        return {
-          'eventId': eventId,
-          'reactions': reactions,
-        };
       }
-      return null;
+
+      return {
+        'eventId': eventId,
+        'reactions': reactions,
+      };
     } catch (e) {
       debugPrint('MatrixMessageDataSource: Failed to get reaction aggregations: $e');
       return null;
@@ -1333,86 +1328,83 @@ class MatrixMessageDataSource {
         '/client/v1/rooms/${Uri.encodeComponent(roomId)}/relations/${Uri.encodeComponent(pollEventId)}/m.reference',
       );
 
-      if (response is Map<String, dynamic>) {
-        // 存储每个用户的最新投票（按 origin_server_ts 排序）
-        final userVotes = <String, Map<String, dynamic>>{};
-        bool pollEnded = false;
+      // 存储每个用户的最新投票（按 origin_server_ts 排序）
+      final userVotes = <String, Map<String, dynamic>>{};
+      bool pollEnded = false;
 
-        final chunk = response['chunk'] as List<dynamic>?;
-        if (chunk != null) {
-          for (final item in chunk) {
-            if (item is Map<String, dynamic>) {
-              final itemType = item['type'] as String?;
-              if (itemType == 'org.matrix.msc3381.poll.response') {
-                final senderId = item['sender'] as String?;
-                final originServerTs = item['origin_server_ts'] as int? ?? 0;
+      final chunk = response['chunk'] as List<dynamic>?;
+      if (chunk != null) {
+        for (final item in chunk) {
+          if (item is Map<String, dynamic>) {
+            final itemType = item['type'] as String?;
+            if (itemType == 'org.matrix.msc3381.poll.response') {
+              final senderId = item['sender'] as String?;
+              final originServerTs = item['origin_server_ts'] as int? ?? 0;
 
-                if (senderId != null) {
-                  // 只保留每个用户的最新投票
-                  final existingVote = userVotes[senderId];
-                  final existingTs = existingVote?['origin_server_ts'] as int? ?? 0;
+              if (senderId != null) {
+                // 只保留每个用户的最新投票
+                final existingVote = userVotes[senderId];
+                final existingTs = existingVote?['origin_server_ts'] as int? ?? 0;
 
-                  if (existingVote == null || originServerTs > existingTs) {
-                    userVotes[senderId] = item;
-                  }
+                if (existingVote == null || originServerTs > existingTs) {
+                  userVotes[senderId] = item;
                 }
-              } else if (itemType == 'org.matrix.msc3381.poll.end') {
-                pollEnded = true;
               }
+            } else if (itemType == 'org.matrix.msc3381.poll.end') {
+              pollEnded = true;
             }
           }
         }
+      }
 
-        // 根据最新投票计算票数
-        final voteCounts = <String, int>{};
-        final myVotes = <String>[];
+      // 根据最新投票计算票数
+      final voteCounts = <String, int>{};
+      final myVotes = <String>[];
 
-        for (final entry in userVotes.entries) {
-          final senderId = entry.key;
-          final item = entry.value;
-          final content = item['content'] as Map<String, dynamic>?;
-          final pollResponse = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
+      for (final entry in userVotes.entries) {
+        final senderId = entry.key;
+        final item = entry.value;
+        final content = item['content'] as Map<String, dynamic>?;
+        final pollResponse = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
 
-          if (pollResponse != null) {
-            final selectedAnswers = pollResponse['answers'] as List<dynamic>?;
+        if (pollResponse != null) {
+          final selectedAnswers = pollResponse['answers'] as List<dynamic>?;
 
-            if (selectedAnswers != null && selectedAnswers.isNotEmpty) {
+          if (selectedAnswers != null && selectedAnswers.isNotEmpty) {
+            for (final answerId in selectedAnswers) {
+              if (answerId is String) {
+                voteCounts[answerId] = (voteCounts[answerId] ?? 0) + 1;
+              }
+            }
+
+            // 记录当前用户的投票
+            if (senderId == _client?.userID) {
               for (final answerId in selectedAnswers) {
                 if (answerId is String) {
-                  voteCounts[answerId] = (voteCounts[answerId] ?? 0) + 1;
-                }
-              }
-
-              // 记录当前用户的投票
-              if (senderId == _client?.userID) {
-                for (final answerId in selectedAnswers) {
-                  if (answerId is String) {
-                    myVotes.add(answerId);
-                  }
+                  myVotes.add(answerId);
                 }
               }
             }
           }
         }
-
-        // 计算实际投票人数（只计算有有效投票的用户）
-        final totalVoters = userVotes.entries.where((entry) {
-          final content = entry.value['content'] as Map<String, dynamic>?;
-          final pollResponse = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
-          final answers = pollResponse?['answers'] as List<dynamic>?;
-          return answers != null && answers.isNotEmpty;
-        }).length;
-
-        debugPrint('MatrixMessageDataSource: Poll $pollEventId - voteCounts: $voteCounts, totalVoters: $totalVoters, myVotes: $myVotes');
-
-        return {
-          'voteCounts': voteCounts,
-          'totalVoters': totalVoters,
-          'myVotes': myVotes,
-          'pollEnded': pollEnded,
-        };
       }
-      return null;
+
+      // 计算实际投票人数（只计算有有效投票的用户）
+      final totalVoters = userVotes.entries.where((entry) {
+        final content = entry.value['content'] as Map<String, dynamic>?;
+        final pollResponse = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
+        final answers = pollResponse?['answers'] as List<dynamic>?;
+        return answers != null && answers.isNotEmpty;
+      }).length;
+
+      debugPrint('MatrixMessageDataSource: Poll $pollEventId - voteCounts: $voteCounts, totalVoters: $totalVoters, myVotes: $myVotes');
+
+      return {
+        'voteCounts': voteCounts,
+        'totalVoters': totalVoters,
+        'myVotes': myVotes,
+        'pollEnded': pollEnded,
+      };
     } catch (e) {
       debugPrint('MatrixMessageDataSource: Failed to get poll aggregations: $e');
       return null;
@@ -1685,9 +1677,7 @@ class MatrixMessageDataSource {
       // chunk 包含表情回应列表 [{type, key, count}]
       final chunk = annotations['chunk'] as List<dynamic>?;
       if (chunk == null || chunk.isEmpty) return reactions;
-      
-      final currentUserId = _client?.userID ?? '';
-      
+
       for (final item in chunk) {
         if (item is Map<String, dynamic>) {
           final emoji = item['key'] as String?;
@@ -1751,9 +1741,6 @@ class MatrixMessageDataSource {
         debugPrint('No homeserver configured');
         return null;
       }
-      
-      // 获取 access_token（用于认证媒体访问）
-      final accessToken = _client!.accessToken;
       
       // 构建 HTTP URL
       // Matrix 1.11+ 认证媒体使用 /_matrix/client/v1/media/ 路径
@@ -1899,11 +1886,6 @@ class MatrixMessageDataSource {
     return null;
   }
   
-  /// 提取消息元数据（旧版，保留兼容）
-  MessageMetadata? _extractMetadata(matrix.Event event) {
-    return _extractMetadataWithHttpUrl(event);
-  }
-
   /// 获取媒体下载URL
   Uri? getMediaUrl(String? mxcUrl, {int? width, int? height}) {
     if (mxcUrl == null || _client == null) return null;
@@ -1925,7 +1907,7 @@ class MatrixMessageDataSource {
   }
   
   /// 提取投票消息元数据
-  MessageMetadata? _extractPollMetadata(matrix.Event event, [matrix.Room? room]) {
+  MessageMetadata? _extractPollMetadata(matrix.Event event) {
     try {
       final pollStart = event.content['org.matrix.msc3381.poll.start'] as Map<String, dynamic>?;
       if (pollStart == null) return null;

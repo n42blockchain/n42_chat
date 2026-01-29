@@ -740,13 +740,13 @@ class SPt extends S {
   String get register => 'Cadastrar';
 
   @override
-  String get agreeTerms => 'Ao entrar, você concorda com ';
+  String get agreeTerms => 'Ao entrar, você concorda com';
 
   @override
   String get termsOfService => 'Termos de Serviço';
 
   @override
-  String get and => ' e ';
+  String get and => 'e';
 
   @override
   String get privacyPolicy => 'Política de Privacidade';

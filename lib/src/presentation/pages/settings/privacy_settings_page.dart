@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -8,7 +9,7 @@ import '../../widgets/common/common_widgets.dart';
 /// 隐私设置页面
 class PrivacySettingsPage extends StatefulWidget {
   final PrivacySettings settings;
-  final Function(PrivacySettings)? onSave;
+  final void Function(PrivacySettings)? onSave;
 
   const PrivacySettingsPage({
     super.key,
@@ -36,7 +37,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Scaffold(
@@ -317,7 +318,7 @@ class _VisibilityPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Container(

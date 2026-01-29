@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../blocs/search/search_bloc.dart';
 import '../../blocs/search/search_event.dart';
@@ -11,7 +12,7 @@ import '../../blocs/search/search_state.dart';
 class ChatSearchBar extends StatefulWidget {
   final String roomId;
   final VoidCallback? onClose;
-  final Function(String eventId)? onNavigateToMessage;
+  final void Function(String eventId)? onNavigateToMessage;
 
   const ChatSearchBar({
     super.key,
@@ -55,7 +56,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return BlocConsumer<SearchBloc, SearchState>(
       listener: (context, state) {

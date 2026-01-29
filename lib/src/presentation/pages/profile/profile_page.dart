@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -80,7 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
@@ -243,7 +244,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           GestureDetector(
                             onTap: () => _showStatusPicker(context, isDark),
                             onLongPress: _statusText != null ? () {
-                              showDialog(
+                              showDialog<void>(
                                 context: context,
                                 builder: (ctx) => AlertDialog(
                                   title: Text(S.of(context)?.clearStatus ?? 'Clear Status'),
@@ -424,7 +425,7 @@ class _ProfilePageState extends State<ProfilePage> {
   /// 显示状态选择器
   void _showStatusPicker(BuildContext context, bool isDark) async {
     final result = await Navigator.of(context).push<String>(
-      MaterialPageRoute(
+      MaterialPageRoute<String>(
         builder: (_) => StatusPage(currentStatus: _statusText),
       ),
     );
@@ -447,7 +448,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final authBloc = context.read<AuthBloc>();
     
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => BlocProvider.value(
           value: authBloc,
           child: const ProfileEditPage(),
@@ -461,13 +462,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _openMyQRCode(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const MyQRCodePage()),
+      MaterialPageRoute<void>(builder: (_) => const MyQRCodePage()),
     );
   }
 
   void _openSettings(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => SettingsPage(
           onLogout: () {
             Navigator.of(context).pop();
@@ -503,7 +504,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _openFavorites(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const FavoriteListPage()),
+      MaterialPageRoute<void>(builder: (_) => const FavoriteListPage()),
     );
   }
 

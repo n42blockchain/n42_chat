@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
@@ -107,7 +108,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : Colors.white;
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black;
@@ -520,7 +521,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       contactBloc.add(StartChat(widget.userId));
 
       // 等待一小段时间让操作完成
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
 
       // 重新加载联系人信息
       _loadContact();
@@ -555,7 +556,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     }
 
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) {
           final page = ContactSettingsPage(
             userId: widget.userId,
@@ -593,7 +594,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     }
     
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) {
           final page = FriendInfoPage(
             userId: widget.userId,
@@ -674,7 +675,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : Colors.white;
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black;
@@ -929,7 +930,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
   
   void _openEditRemark() {
     Navigator.of(context).push<String?>(
-      MaterialPageRoute(
+      MaterialPageRoute<String?>(
         builder: (ctx) {
           // 传递 ContactBloc
           ContactBloc? contactBloc;
@@ -1033,7 +1034,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : Colors.white;
     final cardColor = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF2F2F7);
     final textColor = isDark ? Colors.white : Colors.black;

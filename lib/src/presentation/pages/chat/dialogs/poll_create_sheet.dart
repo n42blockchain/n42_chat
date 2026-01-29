@@ -1,0 +1,374 @@
+// Copyright 2021-2026 N42 Inc. All rights reserved.
+// Use of this source code is governed by a dual license:
+// Apache License 2.0 and MIT License.
+// See LICENSE file in the project root for full license information.
+
+import 'package:flutter/material.dart';
+
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../core/extensions/context_extension.dart';
+
+/// 投票创建弹窗
+class PollCreateSheet extends StatefulWidget {
+  const PollCreateSheet({super.key});
+
+  @override
+  State<PollCreateSheet> createState() => _PollCreateSheetState();
+}
+
+class _PollCreateSheetState extends State<PollCreateSheet> {
+  final _questionController = TextEditingController();
+  final List<TextEditingController> _optionControllers = [
+    TextEditingController(),
+    TextEditingController(),
+  ];
+  int _maxSelections = 1; // 1 = 单选, 0 = 多选（不限）
+  bool _isAnonymous = false;
+
+  @override
+  void dispose() {
+    _questionController.dispose();
+    for (final controller in _optionControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _addOption() {
+    if (_optionControllers.length < 10) {
+      setState(() {
+        _optionControllers.add(TextEditingController());
+      });
+    }
+  }
+
+  void _removeOption(int index) {
+    if (_optionControllers.length > 2) {
+      setState(() {
+        _optionControllers[index].dispose();
+        _optionControllers.removeAt(index);
+      });
+    }
+  }
+
+  void _submit() {
+    final question = _questionController.text.trim();
+    if (question.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(S.of(context)?.pleaseEnterQuestion ?? 'Please enter poll question')),
+      );
+      return;
+    }
+
+    final options = _optionControllers
+        .map((c) => c.text.trim())
+        .where((o) => o.isNotEmpty)
+        .toList();
+
+    if (options.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(S.of(context)?.atLeastTwoOptions ?? 'At least 2 options required')),
+      );
+      return;
+    }
+
+    Navigator.pop(context, {
+      'question': question,
+      'options': options,
+      'maxSelections': _maxSelections,
+      'isAnonymous': _isAnonymous,
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[900] : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // 顶部栏
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    S.of(context)?.cancel ?? 'Cancel',
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black54,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    S.of(context)?.createPollTitle ?? 'Create Poll',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: _submit,
+                  child: Text(
+                    S.of(context)?.submitPoll ?? 'Submit',
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // 内容区域
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: bottomPadding + 16,
+              ),
+              children: [
+                // 问题输入
+                Text(
+                  S.of(context)?.pollQuestionLabel ?? 'Poll Question',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _questionController,
+                  maxLines: 2,
+                  maxLength: 100,
+                  decoration: InputDecoration(
+                    hintText: S.of(context)?.enterPollQuestionHint ?? 'Please enter poll question',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 选项输入
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      S.of(context)?.pollOptionsLabel ?? 'Poll Options',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                      ),
+                    ),
+                    Text(
+                      '${_optionControllers.length}/10',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.white38 : Colors.black38,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                ...List.generate(_optionControllers.length, (index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${index + 1}',
+                            style: const TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _optionControllers[index],
+                            maxLength: 50,
+                            decoration: InputDecoration(
+                              hintText: S.of(context)?.optionHintWithIndex(index + 1) ?? 'Option ${index + 1}',
+                              counterText: '',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              filled: true,
+                              fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (_optionControllers.length > 2)
+                          IconButton(
+                            onPressed: () => _removeOption(index),
+                            icon: const Icon(Icons.remove_circle_outline),
+                            color: Colors.red,
+                            iconSize: 20,
+                          ),
+                      ],
+                    ),
+                  );
+                }),
+
+                if (_optionControllers.length < 10)
+                  TextButton.icon(
+                    onPressed: _addOption,
+                    icon: const Icon(Icons.add_circle_outline, size: 20),
+                    label: Text(S.of(context)?.addOptionButton ?? 'Add Option'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.green,
+                    ),
+                  ),
+
+                const SizedBox(height: 24),
+
+                // 投票类型
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[850] : Colors.grey[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        S.of(context)?.pollSettingsLabel ?? 'Poll Settings',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // 单选/多选
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              S.of(context)?.selectionType ?? 'Selection Type',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: SegmentedButton<int>(
+                              segments: [
+                                ButtonSegment(value: 1, label: Text(S.of(context)?.singleChoiceLabel ?? 'Single', overflow: TextOverflow.ellipsis)),
+                                ButtonSegment(value: 0, label: Text(S.of(context)?.multiChoiceLabel ?? 'Multi', overflow: TextOverflow.ellipsis)),
+                              ],
+                              selected: {_maxSelections},
+                              onSelectionChanged: (value) {
+                                setState(() {
+                                  _maxSelections = value.first;
+                                });
+                              },
+                              style: const ButtonStyle(
+                                visualDensity: VisualDensity.compact,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+                      const Divider(height: 1),
+                      const SizedBox(height: 12),
+
+                      // 匿名投票
+                      Row(
+                        children: [
+                          Text(S.of(context)?.anonymousPollSwitch ?? 'Anonymous Poll'),
+                          const Spacer(),
+                          Switch(
+                            value: _isAnonymous,
+                            onChanged: (value) {
+                              setState(() {
+                                _isAnonymous = value;
+                              });
+                            },
+                            activeColor: Colors.green,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 提示信息
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 18,
+                        color: Colors.blue[700],
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          S.of(context)?.pollHint ?? 'Poll will be displayed in chat. Group members can vote.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue[700],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

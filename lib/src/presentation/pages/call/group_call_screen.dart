@@ -875,7 +875,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   }
   
   void _showLeaveDialog() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.leaveMeeting ?? 'Leave Meeting'),

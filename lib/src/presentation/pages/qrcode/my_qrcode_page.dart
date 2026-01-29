@@ -4,6 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -79,7 +80,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEDEDED);
     final cardColor = isDark ? const Color(0xFF2C2C2C) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF181818);
@@ -274,11 +275,11 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
   }
 
   void _showMoreOptions() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final isDark = context.isDarkMode;
         return Container(
           decoration: BoxDecoration(
             color: isDark ? AppColors.surfaceDark : AppColors.surface,

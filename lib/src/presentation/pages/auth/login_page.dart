@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/auth/auth_methods_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
@@ -110,9 +111,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _showForgotPasswordHelp() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
@@ -161,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     
@@ -201,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
           }
         },
         builder: (context, state) {
-          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+          final isDarkMode = context.isDarkMode;
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Form(
@@ -532,7 +533,7 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 final authBloc = context.read<AuthBloc>();
                 Navigator.of(context).push(
-                  MaterialPageRoute(
+                  MaterialPageRoute<void>(
                     builder: (_) => BlocProvider.value(
                       value: authBloc,
                       child: const RegisterPage(),
@@ -583,7 +584,7 @@ class _LoginPageState extends State<LoginPage> {
   }
   
   Widget _buildDivider() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final dividerColor = isDark ? Colors.white24 : Colors.black12;
     final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
     
@@ -644,8 +645,8 @@ class _LoginPageState extends State<LoginPage> {
               _buildSocialLoginButton(
                 iconPath: null,
                 icon: Icons.apple,
-                color: Theme.of(context).brightness == Brightness.dark 
-                    ? Colors.white 
+                color: context.isDarkMode
+                    ? Colors.white
                     : Colors.black,
                 label: 'Apple',
                 onTap: _loginWithApple,
@@ -670,7 +671,7 @@ class _LoginPageState extends State<LoginPage> {
     required String label,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.surfaceDark : Colors.grey[100];
     final iconColor = isDark ? Colors.white70 : Colors.black54;
     final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
@@ -710,7 +711,7 @@ class _LoginPageState extends State<LoginPage> {
     required String label,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.surfaceDark : Colors.white;
     final borderColor = isDark ? Colors.white12 : Colors.black12;
 
@@ -775,7 +776,7 @@ class _LoginPageState extends State<LoginPage> {
   void _loginWithEmailOtp() {
     final authBloc = context.read<AuthBloc>();
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => BlocProvider.value(
           value: authBloc,
           child: EmailOtpPage(
