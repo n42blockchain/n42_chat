@@ -131,6 +131,16 @@ class N42ChatConfig {
   /// 支持多账号时，每个账号使用不同的数据库
   final String? databaseName;
 
+  /// Terms of Service URL
+  ///
+  /// 服务条款页面链接
+  final String termsOfServiceUrl;
+
+  /// Privacy Policy URL
+  ///
+  /// 隐私政策页面链接
+  final String privacyPolicyUrl;
+
   const N42ChatConfig({
     this.defaultHomeserver = 'https://m.si46.world',
     this.enableEncryption = true,
@@ -152,6 +162,8 @@ class N42ChatConfig {
     this.maxVoiceDuration = 60,
     this.enableDebugLogs = false,
     this.databaseName,
+    this.termsOfServiceUrl = 'https://n42.world/terms',
+    this.privacyPolicyUrl = 'https://n42.world/privacy',
   });
 
   /// 复制并修改配置
@@ -176,6 +188,8 @@ class N42ChatConfig {
     int? maxVoiceDuration,
     bool? enableDebugLogs,
     String? databaseName,
+    String? termsOfServiceUrl,
+    String? privacyPolicyUrl,
   }) {
     return N42ChatConfig(
       defaultHomeserver: defaultHomeserver ?? this.defaultHomeserver,
@@ -199,6 +213,8 @@ class N42ChatConfig {
       maxVoiceDuration: maxVoiceDuration ?? this.maxVoiceDuration,
       enableDebugLogs: enableDebugLogs ?? this.enableDebugLogs,
       databaseName: databaseName ?? this.databaseName,
+      termsOfServiceUrl: termsOfServiceUrl ?? this.termsOfServiceUrl,
+      privacyPolicyUrl: privacyPolicyUrl ?? this.privacyPolicyUrl,
     );
   }
 }

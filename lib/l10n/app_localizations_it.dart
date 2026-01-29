@@ -734,13 +734,13 @@ class SIt extends S {
   String get register => 'Registrati';
 
   @override
-  String get agreeTerms => 'Accedendo, accetti';
+  String get agreeTerms => 'Accedendo, accetti ';
 
   @override
   String get termsOfService => 'Termini di servizio';
 
   @override
-  String get and => 'e';
+  String get and => ' e ';
 
   @override
   String get privacyPolicy => 'Informativa sulla privacy';

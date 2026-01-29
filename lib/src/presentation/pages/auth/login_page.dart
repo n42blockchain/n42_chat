@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -41,6 +42,54 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  /// Convert technical error messages to user-friendly messages
+  String _getFriendlyErrorMessage(dynamic error, String loginMethod) {
+    final errorString = error.toString().toLowerCase();
+
+    // Google Sign In errors
+    if (errorString.contains('google sign in') && errorString.contains('未配置')) {
+      return 'Google Sign In is not available. Please try another login method.';
+    }
+    if (errorString.contains('network_error') || errorString.contains('network error')) {
+      return 'Network error. Please check your internet connection.';
+    }
+    if (errorString.contains('sign_in_canceled') || errorString.contains('canceled')) {
+      return 'Login was canceled.';
+    }
+    if (errorString.contains('sign_in_failed')) {
+      return 'Login failed. Please try again.';
+    }
+
+    // Apple Sign In errors
+    if (errorString.contains('authorizationerrorcode.unknown') ||
+        errorString.contains('error 1000')) {
+      return 'Apple Sign In is not available. Please try another login method.';
+    }
+    if (errorString.contains('authorizationerrorcode.canceled')) {
+      return 'Login was canceled.';
+    }
+    if (errorString.contains('authorizationerrorcode.invalidresponse')) {
+      return 'Invalid response from server. Please try again.';
+    }
+    if (errorString.contains('authorizationerrorcode.nothandled')) {
+      return 'Apple Sign In is not available on this device.';
+    }
+    if (errorString.contains('couldn\'t be completed')) {
+      return 'Apple Sign In is not available. Please try another login method.';
+    }
+
+    // Generic errors
+    if (errorString.contains('timeout') || errorString.contains('timed out')) {
+      return 'Connection timed out. Please try again.';
+    }
+    if (errorString.contains('no internet') || errorString.contains('unreachable')) {
+      return 'Network error. Please check your internet connection.';
+    }
+
+    // Default: return a generic user-friendly message
+    return 'Login failed. Please try again or use another login method.';
+  }
+
   void _onLogin() {
     if (_formKey.currentState?.validate() ?? false) {
       // 微信策略：始终保持登录状态
@@ -58,6 +107,56 @@ class _LoginPageState extends State<LoginPage> {
     if (homeserver.isNotEmpty) {
       context.read<AuthBloc>().add(AuthHomeserverCheckRequested(homeserver));
     }
+  }
+
+  void _showForgotPasswordHelp() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text(
+          S.of(context)?.forgotPassword ?? 'Forgot Password',
+          style: TextStyle(
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'To reset your password, please contact your server administrator.',
+              style: TextStyle(
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Server: ${_homeserverController.text.trim().isNotEmpty ? _homeserverController.text.trim() : "Not specified"}',
+              style: TextStyle(
+                color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              S.of(context)?.ok ?? 'OK',
+              style: const TextStyle(color: AppColors.primary),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -457,18 +556,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             TextButton(
               onPressed: () {
-                // 跳转到邮箱验证码登录
-                final authBloc = context.read<AuthBloc>();
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => BlocProvider.value(
-                      value: authBloc,
-                      child: EmailOtpPage(
-                        homeserver: _homeserverController.text.trim(),
-                      ),
-                    ),
-                  ),
-                );
+                _showForgotPasswordHelp();
               },
               child: Text(
                 S.of(context)?.forgotPassword ?? 'Forgot Password',
@@ -625,32 +713,32 @@ class _LoginPageState extends State<LoginPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppColors.surfaceDark : Colors.white;
     final borderColor = isDark ? Colors.white12 : Colors.black12;
-    
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: borderColor),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (icon != null)
-              Icon(icon, color: color, size: 28),
-            // const SizedBox(height: 2),
-            // Text(
-            //   label,
-            //   style: TextStyle(
-            //     fontSize: 10,
-            //     color: isDark ? Colors.white54 : Colors.black45,
-            //   ),
-            // ),
-          ],
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(12),
+        splashColor: color.withValues(alpha: 0.2),
+        highlightColor: color.withValues(alpha: 0.1),
+        child: Ink(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: borderColor),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null)
+                Icon(icon, color: color, size: 28),
+            ],
+          ),
         ),
       ),
     );
@@ -728,16 +816,17 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       if (mounted) {
+        final friendlyMessage = _getFriendlyErrorMessage(e, 'Google');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.googleLoginFailed(e.toString()) ?? 'Google login failed: $e'),
+            content: Text(friendlyMessage),
             backgroundColor: AppColors.error,
           ),
         );
       }
     }
   }
-  
+
   void _loginWithApple() async {
     final homeserver = _homeserverController.text.trim();
     if (homeserver.isEmpty) {
@@ -767,16 +856,17 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       if (mounted) {
+        final friendlyMessage = _getFriendlyErrorMessage(e, 'Apple');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.appleLoginFailed(e.toString()) ?? 'Apple login failed: $e'),
+            content: Text(friendlyMessage),
             backgroundColor: AppColors.error,
           ),
         );
       }
     }
   }
-  
+
   void _loginWithSso() async {
     final homeserver = _homeserverController.text.trim();
     if (homeserver.isEmpty) {

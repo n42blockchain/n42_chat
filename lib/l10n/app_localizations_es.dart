@@ -743,13 +743,13 @@ class SEs extends S {
   String get register => 'Registrarse';
 
   @override
-  String get agreeTerms => 'Al iniciar sesion, aceptas';
+  String get agreeTerms => 'Al iniciar sesion, aceptas ';
 
   @override
   String get termsOfService => 'Terminos de servicio';
 
   @override
-  String get and => 'y';
+  String get and => ' y ';
 
   @override
   String get privacyPolicy => 'Politica de privacidad';

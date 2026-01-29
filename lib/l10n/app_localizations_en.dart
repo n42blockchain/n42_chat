@@ -730,13 +730,13 @@ class SEn extends S {
   String get register => 'Sign Up';
 
   @override
-  String get agreeTerms => 'By logging in, you agree to';
+  String get agreeTerms => 'By logging in, you agree to ';
 
   @override
   String get termsOfService => 'Terms of Service';
 
   @override
-  String get and => 'and';
+  String get and => ' and ';
 
   @override
   String get privacyPolicy => 'Privacy Policy';

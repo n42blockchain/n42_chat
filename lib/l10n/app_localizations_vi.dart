@@ -731,13 +731,13 @@ class SVi extends S {
   String get register => 'Dang ky';
 
   @override
-  String get agreeTerms => 'Bang viec dang nhap, ban dong y voi';
+  String get agreeTerms => 'Bang viec dang nhap, ban dong y voi ';
 
   @override
   String get termsOfService => 'Dieu khoan Dich vu';
 
   @override
-  String get and => 'va';
+  String get and => ' va ';
 
   @override
   String get privacyPolicy => 'Chinh sach Bao mat';
