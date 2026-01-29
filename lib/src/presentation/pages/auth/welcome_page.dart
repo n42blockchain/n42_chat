@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -10,12 +11,16 @@ class WelcomePage extends StatelessWidget {
   final VoidCallback? onLogin;
   final VoidCallback? onRegister;
   final VoidCallback? onBack;
+  final VoidCallback? onTermsOfService;
+  final VoidCallback? onPrivacyPolicy;
 
   const WelcomePage({
     super.key,
     this.onLogin,
     this.onRegister,
     this.onBack,
+    this.onTermsOfService,
+    this.onPrivacyPolicy,
   });
 
   @override
@@ -232,6 +237,7 @@ class WelcomePage extends StatelessWidget {
             style: TextStyle(
               color: AppColors.textLink.withValues(alpha: 0.8),
             ),
+            recognizer: TapGestureRecognizer()..onTap = onTermsOfService,
           ),
           TextSpan(
             text: ' ${S.of(context)?.and ?? 'and'} ',
@@ -244,6 +250,7 @@ class WelcomePage extends StatelessWidget {
             style: TextStyle(
               color: AppColors.textLink.withValues(alpha: 0.8),
             ),
+            recognizer: TapGestureRecognizer()..onTap = onPrivacyPolicy,
           ),
         ],
       ),

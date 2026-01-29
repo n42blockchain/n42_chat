@@ -743,13 +743,13 @@ class SFr extends S {
   String get register => 'S\'inscrire';
 
   @override
-  String get agreeTerms => 'En vous connectant, vous acceptez';
+  String get agreeTerms => 'En vous connectant, vous acceptez ';
 
   @override
   String get termsOfService => 'Conditions d\'utilisation';
 
   @override
-  String get and => 'et';
+  String get and => ' et ';
 
   @override
   String get privacyPolicy => 'Politique de confidentialite';

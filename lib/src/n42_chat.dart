@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
@@ -419,6 +420,13 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
     );
   }
 
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -445,6 +453,8 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
           return WelcomePage(
             onLogin: () => _navigateToLogin(context),
             onRegister: () => _navigateToRegister(context),
+            onTermsOfService: () => _launchUrl(N42Chat._config?.termsOfServiceUrl ?? 'https://n42.world/terms'),
+            onPrivacyPolicy: () => _launchUrl(N42Chat._config?.privacyPolicyUrl ?? 'https://n42.world/privacy'),
           );
         },
       ),

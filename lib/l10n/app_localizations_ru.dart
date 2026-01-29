@@ -737,13 +737,13 @@ class SRu extends S {
   String get register => 'Зарегистрироваться';
 
   @override
-  String get agreeTerms => 'Входя в систему, вы соглашаетесь с';
+  String get agreeTerms => 'Входя в систему, вы соглашаетесь с ';
 
   @override
   String get termsOfService => 'Условиями использования';
 
   @override
-  String get and => 'и';
+  String get and => ' и ';
 
   @override
   String get privacyPolicy => 'Политикой конфиденциальности';

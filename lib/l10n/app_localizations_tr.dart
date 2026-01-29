@@ -731,13 +731,13 @@ class STr extends S {
   String get register => 'Kayıt Ol';
 
   @override
-  String get agreeTerms => 'Giriş yaparak kabul etmiş olursunuz';
+  String get agreeTerms => 'Giriş yaparak kabul etmiş olursunuz ';
 
   @override
   String get termsOfService => 'Hizmet Şartları';
 
   @override
-  String get and => 've';
+  String get and => ' ve ';
 
   @override
   String get privacyPolicy => 'Gizlilik Politikası';
