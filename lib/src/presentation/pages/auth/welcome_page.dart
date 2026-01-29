@@ -9,11 +9,13 @@ import '../../../core/theme/app_colors.dart';
 class WelcomePage extends StatelessWidget {
   final VoidCallback? onLogin;
   final VoidCallback? onRegister;
+  final VoidCallback? onBack;
 
   const WelcomePage({
     super.key,
     this.onLogin,
     this.onRegister,
+    this.onBack,
   });
 
   @override
@@ -23,33 +25,61 @@ class WelcomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
+        child: Column(
+          children: [
+            // 返回按钮
+            _buildBackButton(context, isDark),
 
-              // Logo和标题
-              _buildHeader(context, isDark),
+            // 主内容
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
+                  children: [
+                    const Spacer(flex: 2),
 
-              const Spacer(flex: 3),
+                    // Logo和标题
+                    _buildHeader(context, isDark),
 
-              // 特性列表
-              _buildFeatures(context, isDark),
+                    const Spacer(flex: 3),
 
-              const Spacer(flex: 2),
+                    // 特性列表
+                    _buildFeatures(context, isDark),
 
-              // 按钮
-              _buildButtons(context, isDark),
+                    const Spacer(flex: 2),
 
-              const SizedBox(height: 32),
+                    // 按钮
+                    _buildButtons(context, isDark),
 
-              // 协议
-              _buildAgreement(context, isDark),
+                    const SizedBox(height: 32),
 
-              const SizedBox(height: 24),
-            ],
+                    // 协议
+                    _buildAgreement(context, isDark),
+
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackButton(BuildContext context, bool isDark) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8, top: 8),
+        child: IconButton(
+          onPressed: onBack ?? () => Navigator.of(context).maybePop(),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            size: 22,
           ),
+          tooltip: 'Back',
         ),
       ),
     );
