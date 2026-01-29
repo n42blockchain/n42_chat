@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
@@ -74,7 +75,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     
@@ -114,7 +115,7 @@ class _RegisterPageState extends State<RegisterPage> {
           }
         },
         builder: (context, state) {
-          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+          final isDarkMode = context.isDarkMode;
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Form(

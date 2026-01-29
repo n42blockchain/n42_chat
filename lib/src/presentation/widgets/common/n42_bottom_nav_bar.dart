@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import 'n42_badge.dart';
 
@@ -67,7 +68,7 @@ class N42BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final navItems = items ?? defaultItems;
 
     return Container(

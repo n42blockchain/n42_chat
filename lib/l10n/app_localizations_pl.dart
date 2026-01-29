@@ -742,13 +742,13 @@ class SPl extends S {
   String get register => 'Zarejestruj sie';
 
   @override
-  String get agreeTerms => 'Logujac sie, akceptujesz ';
+  String get agreeTerms => 'Logujac sie, akceptujesz';
 
   @override
   String get termsOfService => 'Regulamin';
 
   @override
-  String get and => ' i ';
+  String get and => 'i';
 
   @override
   String get privacyPolicy => 'Polityke prywatnosci';

@@ -239,20 +239,7 @@ class N42Avatar extends StatelessWidget {
   }
 
   Color _getColorFromName(String name) {
-    // 根据名称生成固定颜色
-    final colors = [
-      const Color(0xFF1AAD19), // 绿
-      const Color(0xFF576B95), // 蓝
-      const Color(0xFFFA9D3B), // 橙
-      const Color(0xFFE64340), // 红
-      const Color(0xFF9B59B6), // 紫
-      const Color(0xFF3498DB), // 浅蓝
-      const Color(0xFF1ABC9C), // 青
-      const Color(0xFFF39C12), // 黄
-    ];
-
-    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
-    return colors[index];
+    return AppColorPalettes.getAvatarColor(name);
   }
 }
 

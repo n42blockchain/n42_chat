@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/favorite_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -90,7 +91,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     
     return Scaffold(
@@ -502,7 +503,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   }
   
   void _showAddOptions() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       builder: (ctx) => SafeArea(
         child: Column(
@@ -537,7 +538,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   }
 
   void _showFavoriteOptions(FavoriteEntity favorite) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       builder: (ctx) => SafeArea(
         child: Column(

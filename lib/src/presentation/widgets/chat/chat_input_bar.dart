@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -285,21 +286,9 @@ class ChatInputBarState extends State<ChatInputBar> {
     }
   }
 
-  void _updateCancelState(Offset localPosition, Size size) {
-    // 如果手指向上滑动超过一定距离，标记为取消
-    final shouldCancel = localPosition.dy < -50;
-    if (_cancelRecording != shouldCancel) {
-      setState(() {
-        _cancelRecording = shouldCancel;
-      });
-      // 通知父组件
-      widget.onRecordingStateChanged?.call(_isRecording, shouldCancel, _recordingDuration);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Container(
       decoration: BoxDecoration(

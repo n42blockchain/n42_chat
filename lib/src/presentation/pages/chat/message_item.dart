@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
@@ -41,21 +42,21 @@ class MessageItem extends StatelessWidget {
   
   /// 当前用户ID（用于表情回应高亮）
   final String? currentUserId;
-  
+
   /// 表情回应点击回调
-  final Function(String emoji)? onReactionTap;
-  
+  final void Function(String emoji)? onReactionTap;
+
   /// 投票回调 (pollEventId, optionId, currentVotes, maxSelections)
-  final Function(String pollEventId, String optionId, List<String> currentVotes, int maxSelections)? onPollVote;
-  
+  final void Function(String pollEventId, String optionId, List<String> currentVotes, int maxSelections)? onPollVote;
+
   /// 结束投票回调
-  final Function(String pollEventId)? onEndPoll;
-  
+  final void Function(String pollEventId)? onEndPoll;
+
   /// 红包点击回调
-  final Function(MessageEntity message)? onRedPacketTap;
+  final void Function(MessageEntity message)? onRedPacketTap;
 
   /// 名片点击回调
-  final Function(String contactId, String contactName, String? avatarUrl)? onContactCardTap;
+  final void Function(String contactId, String contactName, String? avatarUrl)? onContactCardTap;
 
   const MessageItem({
     super.key,
@@ -108,7 +109,7 @@ class MessageItem extends StatelessWidget {
 
   Widget _buildMessageBubble(BuildContext context) {
     final status = _mapStatus(message.status);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final displayName = _getSenderDisplayName(context);
 
     // 是否显示发送者名称（群聊中非自己的消息）
@@ -213,7 +214,7 @@ class MessageItem extends StatelessWidget {
   }
 
   Widget _buildMessageContent(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     Widget content;
     switch (message.type) {
@@ -479,15 +480,7 @@ class MessageItem extends StatelessWidget {
 
   /// 根据名称生成颜色
   Color _getColorFromName(String name) {
-    final colors = [
-      const Color(0xFF1AAD19),
-      const Color(0xFF576B95),
-      const Color(0xFFFA9D3B),
-      const Color(0xFFE64340),
-    ];
-    if (name.isEmpty) return colors[0];
-    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
-    return colors[index];
+    return AppColorPalettes.getAvatarColor(name);
   }
 
   /// 构建联系人头像（名片消息用）
@@ -581,7 +574,7 @@ class MessageItem extends StatelessWidget {
     // if (text != null) return text;
 
     // Speech-to-text API not configured
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
     return '[Speech-to-text requires API configuration]';
   }
 

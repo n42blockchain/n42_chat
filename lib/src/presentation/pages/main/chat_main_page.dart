@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../blocs/chat/chat_bloc.dart';
@@ -77,10 +78,10 @@ class _ChatMainPageState extends State<ChatMainPage> {
   }
 
   void _openScanQR() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ScanQRPage()),
+    Navigator.of(context).push<Map<String, dynamic>?>(
+      MaterialPageRoute<Map<String, dynamic>?>(builder: (_) => const ScanQRPage()),
     ).then((result) {
-      if (result != null && result is Map) {
+      if (result != null) {
         final roomId = result['roomId'];
         if (roomId != null) {
           _conversationBloc.add(const RefreshConversations());
@@ -91,7 +92,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   /// 显示微信风格的 "+" 弹出菜单
   void _showAddMenu(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final RenderBox button = context.findRenderObject() as RenderBox;
     final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
     
@@ -188,7 +189,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   void _navigateToCreateGroup() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => MultiBlocProvider(
           providers: [
             BlocProvider(create: (_) => getIt<ContactBloc>()..add(const LoadContacts())),
@@ -204,7 +205,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   void _navigateToAddFriend() {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const AddFriendPage()),
+      MaterialPageRoute<void>(builder: (_) => const AddFriendPage()),
     ).then((_) {
       _conversationBloc.add(const RefreshConversations());
     });
@@ -212,7 +213,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   void _navigateToPayment() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => BlocProvider(
           create: (_) => getIt<TransferBloc>(),
           child: const ReceivePage(),
@@ -231,7 +232,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? Colors.white : AppColors.textPrimary;
     
@@ -506,7 +507,7 @@ class _ChatTabContent extends StatelessWidget {
 
   void _navigateToChat(BuildContext context, ConversationEntity conversation) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => MultiBlocProvider(
           providers: [
             BlocProvider(create: (_) => getIt<ChatBloc>()),

@@ -734,13 +734,13 @@ class SId extends S {
   String get register => 'Daftar';
 
   @override
-  String get agreeTerms => 'Dengan masuk, Anda menyetujui ';
+  String get agreeTerms => 'Dengan masuk, Anda menyetujui';
 
   @override
   String get termsOfService => 'Ketentuan Layanan';
 
   @override
-  String get and => ' dan ';
+  String get and => 'dan';
 
   @override
   String get privacyPolicy => 'Kebijakan Privasi';

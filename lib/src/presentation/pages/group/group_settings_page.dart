@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../blocs/group/group_bloc.dart';
@@ -35,7 +36,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return BlocConsumer<GroupBloc, GroupState>(
       listener: (context, state) {

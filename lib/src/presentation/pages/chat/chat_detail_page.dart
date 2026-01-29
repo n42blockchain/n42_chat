@@ -6,9 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import '../../../domain/repositories/group_repository.dart';
@@ -32,10 +32,10 @@ class ChatDetailPage extends StatefulWidget {
   final VoidCallback? onAddMember;
 
   /// 移除成员的回调
-  final Function(String userId)? onRemoveMember;
+  final void Function(String userId)? onRemoveMember;
 
   /// 点击成员头像的回调（返回true表示是好友，可以直接聊天）
-  final Function(String userId, String displayName, String? avatarUrl)? onMemberTap;
+  final void Function(String userId, String displayName, String? avatarUrl)? onMemberTap;
 
   /// 清空聊天记录的回调
   final VoidCallback? onClearHistory;
@@ -66,18 +66,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   // 备注更新订阅
   StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
 
-  // 缓存对方用户ID
-  String? _cachedOtherUserId;
-
   @override
   void initState() {
     super.initState();
     _isPinned = widget.conversation.isPinned;
     _isMuted = widget.conversation.isMuted;
     _groupName = widget.conversation.name;
-
-    // 使用 conversation.directUserId 初始化
-    _cachedOtherUserId = widget.conversation.directUserId;
 
     // 加载强提醒状态
     _loadStrongReminderStatus();
@@ -200,7 +194,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     }
 
     final controller = TextEditingController(text: _groupName);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     final newName = await showDialog<String>(
       context: context,
@@ -271,7 +265,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : const Color(0xFFF5F5F5);
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black;
@@ -564,7 +558,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,
-                color: Theme.of(context).brightness == Brightness.dark
+                color: context.isDarkMode
                     ? Colors.white70
                     : Colors.black54,
               ),
@@ -623,7 +617,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     }
 
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) {
           final page = ContactDetailPage(
             userId: userId,
@@ -650,7 +644,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   /// 打开群成员列表
   void _openGroupMemberList() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) => _GroupMemberListPage(
           roomId: widget.conversation.id,
           roomName: widget.conversation.name,
@@ -689,7 +683,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
     if (ids.isEmpty) return;
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.removeFromGroup ?? 'Remove from Group'),
@@ -724,7 +718,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     required IconData icon,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
@@ -889,7 +883,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     }
 
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) {
           final page = ContactDetailPage(
             userId: userId,
@@ -917,7 +911,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   }
 
   void _showClearConfirm() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.clearChatHistoryTitle ?? 'Clear Chat History'),
@@ -953,7 +947,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 class _GroupMemberListPage extends StatefulWidget {
   final String roomId;
   final String roomName;
-  final Function(String userId, String displayName, String? avatarUrl)? onMemberTap;
+  final void Function(String userId, String displayName, String? avatarUrl)? onMemberTap;
 
   const _GroupMemberListPage({
     required this.roomId,
@@ -1026,7 +1020,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : const Color(0xFFF5F5F5);
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black;

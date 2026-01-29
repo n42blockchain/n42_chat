@@ -1,11 +1,10 @@
-import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -23,7 +22,6 @@ import '../../widgets/common/common_widgets.dart';
 import '../chat/chat_page.dart';
 import '../group/create_group_page.dart';
 import 'contact_tile.dart';
-import 'contact_index_bar.dart';
 
 /// 通讯录页面（仿微信）
 class ContactListPage extends StatefulWidget {
@@ -83,26 +81,9 @@ class _ContactListPageState extends State<ContactListPage> {
     }
   }
 
-  void _onGlobalSearch() {
-    final query = _searchController.text.trim();
-    if (query.isNotEmpty) {
-      context.read<ContactBloc>().add(SearchUsers(query));
-    }
-  }
-
-  void _toggleSearchMode() {
-    setState(() {
-      _isSearchMode = !_isSearchMode;
-      if (!_isSearchMode) {
-        _searchController.clear();
-        context.read<ContactBloc>().add(const ClearSearch());
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
     return Scaffold(
@@ -574,9 +555,9 @@ class _ContactListPageState extends State<ContactListPage> {
   
   /// 显示联系人操作菜单
   void _showContactMenu(ContactEntity contact) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
@@ -680,7 +661,7 @@ class _ContactListPageState extends State<ContactListPage> {
   
   /// 推荐给朋友
   Future<void> _recommendToFriend(ContactEntity contact) async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
     final selectedContact = await showModalBottomSheet<ContactEntity>(
       context: context,
@@ -722,7 +703,7 @@ ID：${contact.userId}''';
       final chatBloc = getIt<ChatBloc>();
       chatBloc.add(InitializeChat(roomId));
       
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
       chatBloc.add(SendTextMessage(cardContent));
       
       if (mounted) {
@@ -752,7 +733,7 @@ ID：${contact.userId}''';
   void _setContactRemark(ContactEntity contact) {
     final controller = TextEditingController(text: contact.remark);
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.setRemark ?? 'Set remark'),
@@ -828,7 +809,7 @@ ID：${contact.userId}''';
       
       Navigator.push(
         context,
-        MaterialPageRoute(
+        MaterialPageRoute<void>(
           builder: (ctx) => MultiBlocProvider(
             providers: [
               BlocProvider(create: (_) => getIt<ChatBloc>()),
@@ -897,7 +878,7 @@ ID：${contact.userId}''';
     final contactBloc = context.read<ContactBloc>();
     Navigator.push(
       context,
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) => BlocProvider.value(
           value: contactBloc,
           child: const _FriendRequestsPage(),
@@ -910,7 +891,7 @@ ID：${contact.userId}''';
     final contactBloc = context.read<ContactBloc>();
     Navigator.push(
       context,
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) => BlocProvider.value(
           value: contactBloc,
           child: const _GroupListPage(),
@@ -1252,7 +1233,7 @@ class _WeChatIndexBarState extends State<_WeChatIndexBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     if (widget.letters.isEmpty) return const SizedBox.shrink();
 
@@ -1352,7 +1333,7 @@ class _FriendRequestsPage extends StatefulWidget {
 class _FriendRequestsPageState extends State<_FriendRequestsPage> {
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
     return Scaffold(
       appBar: AppBar(
@@ -1503,15 +1484,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
   }
   
   Color _getColorFromName(String name) {
-    final colors = [
-      const Color(0xFF1AAD19),
-      const Color(0xFF576B95),
-      const Color(0xFFFA9D3B),
-      const Color(0xFFE64340),
-    ];
-    if (name.isEmpty) return colors[0];
-    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
-    return colors[index];
+    return AppColorPalettes.getAvatarColor(name);
   }
 }
 
@@ -1544,7 +1517,7 @@ class _GroupListPageState extends State<_GroupListPage> {
 
     final roomId = await Navigator.push<String>(
       context,
-      MaterialPageRoute(
+      MaterialPageRoute<String>(
         builder: (ctx) => MultiBlocProvider(
           providers: [
             BlocProvider.value(value: _groupBloc),
@@ -1579,7 +1552,7 @@ class _GroupListPageState extends State<_GroupListPage> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (ctx) => BlocProvider.value(
           value: chatBloc!,
           child: ChatPage(conversation: conversation),
@@ -1590,7 +1563,7 @@ class _GroupListPageState extends State<_GroupListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
@@ -1796,7 +1769,7 @@ class _GroupListPageState extends State<_GroupListPage> {
   }
 
   void _showGroupOptions(GroupEntity group) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     showModalBottomSheet<void>(
       context: context,

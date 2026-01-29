@@ -8,3 +8,14 @@ tmpclaude-*
 commits_to_translate.txt
 msg_map.sh
 translate_msg.py
+.dart_tool/flutter_build/dart_plugin_registrant.dart
+.dart_tool/package_config.json
+.dart_tool/package_graph.json
+.flutter-plugins-dependencies
+example/pubspec.lock
+untranslated.txt
+.dart_tool/flutter_build/dart_plugin_registrant.dart
+.dart_tool/package_config.json
+.dart_tool/package_graph.json
+.flutter-plugins-dependencies
+example/pubspec.lock

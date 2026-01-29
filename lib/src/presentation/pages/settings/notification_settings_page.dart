@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -8,7 +9,7 @@ import '../../widgets/common/common_widgets.dart';
 /// 通知设置页面
 class NotificationSettingsPage extends StatefulWidget {
   final NotificationSettings settings;
-  final Function(NotificationSettings)? onSave;
+  final void Function(NotificationSettings)? onSave;
 
   const NotificationSettingsPage({
     super.key,
@@ -37,7 +38,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Scaffold(

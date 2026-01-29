@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 聊天更多功能面板
@@ -68,7 +69,7 @@ class ChatMorePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     // 获取底部安全区域高度
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     // 内容高度（两行图标 + 页面指示器）- 增加高度避免溢出

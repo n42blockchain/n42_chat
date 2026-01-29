@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../core/utils/matrix_utils.dart';

@@ -184,7 +184,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
 
   void _showMyQRCode() {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const MyQRCodePage()),
+      MaterialPageRoute<void>(builder: (_) => const MyQRCodePage()),
     );
   }
 

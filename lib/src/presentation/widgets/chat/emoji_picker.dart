@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 表情选择器
@@ -194,7 +195,7 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
     return Container(
       height: widget.height,

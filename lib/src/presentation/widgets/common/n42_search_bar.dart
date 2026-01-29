@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 微信风格搜索框
@@ -125,7 +126,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = widget.backgroundColor ??
         (isDark ? AppColors.surfaceDark : AppColors.searchBackground);
 
@@ -247,7 +248,7 @@ class N42SearchBarContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Container(
       color: isDark ? AppColors.navBarDark : AppColors.navBar,

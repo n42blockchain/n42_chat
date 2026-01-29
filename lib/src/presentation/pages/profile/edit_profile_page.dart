@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -11,7 +12,7 @@ import '../../widgets/common/common_widgets.dart';
 /// 编辑资料页面
 class EditProfilePage extends StatefulWidget {
   final UserProfileEntity profile;
-  final Function(String displayName, File? avatar)? onSave;
+  final void Function(String displayName, File? avatar)? onSave;
 
   const EditProfilePage({
     super.key,
@@ -81,7 +82,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     setState(() => _isLoading = true);
 
     try {
-      await widget.onSave?.call(
+      widget.onSave?.call(
         _displayNameController.text.trim(),
         _selectedAvatar,
       );
@@ -103,7 +104,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
@@ -308,7 +309,7 @@ class _AvatarPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Container(
       padding: const EdgeInsets.all(16),

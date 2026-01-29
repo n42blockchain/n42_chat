@@ -75,7 +75,7 @@ class AuthRepositoryImpl implements IAuthRepository {
 
       final accessToken = response.accessToken;
       final userId = response.userId;
-      final deviceId = response.deviceId ?? '';
+      final deviceId = response.deviceId;
       
       if (accessToken.isEmpty || userId.isEmpty) {
         return AuthResult.failure(
@@ -574,14 +574,10 @@ class AuthRepositoryImpl implements IAuthRepository {
       );
       
       debugPrint('AuthRepository: Got account data: $data');
-      
-      if (data is Map<String, dynamic>) {
-        _cachedProfileData = data;
-        debugPrint('AuthRepository: Cached profile data - pokeText: ${data['pokeText']}');
-        return data;
-      }
-      debugPrint('AuthRepository: Data is not a Map, returning null');
-      return null;
+
+      _cachedProfileData = data;
+      debugPrint('AuthRepository: Cached profile data - pokeText: ${data['pokeText']}');
+      return data;
     } catch (e) {
       debugPrint('AuthRepository: Get profile data failed - $e');
       return null;

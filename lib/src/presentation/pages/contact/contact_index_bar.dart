@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 联系人字母索引条
@@ -59,7 +60,7 @@ class _ContactIndexBarState extends State<ContactIndexBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     if (widget.letters.isEmpty) return const SizedBox.shrink();
 

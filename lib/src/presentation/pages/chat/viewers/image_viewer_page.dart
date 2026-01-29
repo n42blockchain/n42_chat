@@ -1,0 +1,241 @@
+// Copyright 2021-2026 N42 Inc. All rights reserved.
+// Use of this source code is governed by a dual license:
+// Apache License 2.0 and MIT License.
+// See LICENSE file in the project root for full license information.
+
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:saver_gallery/saver_gallery.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../data/datasources/matrix/matrix_client_manager.dart';
+
+/// 图片查看器页面
+class ImageViewerPage extends StatefulWidget {
+  final String imageUrl;
+  final String heroTag;
+
+  const ImageViewerPage({
+    super.key,
+    required this.imageUrl,
+    required this.heroTag,
+  });
+
+  @override
+  State<ImageViewerPage> createState() => _ImageViewerPageState();
+}
+
+class _ImageViewerPageState extends State<ImageViewerPage> {
+  bool _isSaving = false;
+
+  Future<void> _saveImage() async {
+    if (_isSaving) return;
+
+    setState(() => _isSaving = true);
+
+    try {
+      // 下载图片
+      final response = await http.get(
+        Uri.parse(widget.imageUrl),
+        headers: {
+          if (MatrixClientManager.instance.client?.accessToken != null)
+            'Authorization': 'Bearer ${MatrixClientManager.instance.client!.accessToken}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // 保存到相册
+        final result = await SaverGallery.saveImage(
+          response.bodyBytes,
+          name: 'n42_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          androidExistNotSave: false,
+        );
+
+        if (mounted) {
+          if (result.isSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(S.of(context)?.savedToGallery ?? 'Saved to gallery'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(S.of(context)?.failedToSave ?? 'Failed to save'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(S.of(context)?.downloadFailed(response.statusCode.toString()) ?? 'Download failed: ${response.statusCode}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Save image error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.of(context)?.errorWithMessage(e.toString()) ?? 'Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
+  Future<void> _shareImage() async {
+    try {
+      // 下载图片到临时文件
+      final response = await http.get(
+        Uri.parse(widget.imageUrl),
+        headers: {
+          if (MatrixClientManager.instance.client?.accessToken != null)
+            'Authorization': 'Bearer ${MatrixClientManager.instance.client!.accessToken}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // 创建临时文件
+        final tempDir = await Directory.systemTemp.createTemp('n42_share');
+        final tempFile = File('${tempDir.path}/image.jpg');
+        await tempFile.writeAsBytes(response.bodyBytes);
+
+        // 分享
+        await Share.shareXFiles([XFile(tempFile.path)]);
+
+        // 清理临时文件
+        await tempDir.delete(recursive: true);
+      }
+    } catch (e) {
+      debugPrint('Share image error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.of(context)?.shareFailed(e.toString()) ?? 'Share failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+        actions: [
+          // 保存按钮
+          IconButton(
+            icon: _isSaving
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Icon(Icons.download),
+            onPressed: _isSaving ? null : _saveImage,
+            tooltip: 'Save',
+          ),
+          // 分享按钮
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: _shareImage,
+            tooltip: 'Share',
+          ),
+          // 更多选项
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            color: Colors.grey[900],
+            onSelected: (value) {
+              switch (value) {
+                case 'save':
+                  _saveImage();
+                  break;
+                case 'share':
+                  _shareImage();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'save',
+                child: Row(
+                  children: [
+                    const Icon(Icons.download, color: Colors.white, size: 20),
+                    const SizedBox(width: 12),
+                    Text(S.of(context)?.saveToGallery ?? 'Save to Gallery', style: const TextStyle(color: Colors.white)),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'share',
+                child: Row(
+                  children: [
+                    const Icon(Icons.share, color: Colors.white, size: 20),
+                    const SizedBox(width: 12),
+                    Text(S.of(context)?.share ?? 'Share', style: const TextStyle(color: Colors.white)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      body: GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: Center(
+          child: InteractiveViewer(
+            minScale: 0.5,
+            maxScale: 4.0,
+            child: Hero(
+              tag: widget.heroTag,
+              child: CachedNetworkImage(
+                imageUrl: widget.imageUrl,
+                fit: BoxFit.contain,
+                httpHeaders: {
+                  if (MatrixClientManager.instance.client?.accessToken != null)
+                    'Authorization': 'Bearer ${MatrixClientManager.instance.client!.accessToken}',
+                },
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                ),
+                errorWidget: (context, url, error) => Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    Text(S.of(context)?.failedToLoadImage ?? 'Failed to load image', style: const TextStyle(color: Colors.white)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

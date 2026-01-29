@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../qrcode/scan_qr_page.dart';
@@ -19,7 +20,7 @@ class DiscoverPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
     final l10n = S.of(context);
@@ -231,7 +232,7 @@ class DiscoverPage extends StatelessWidget {
 
   void _openScanQR(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ScanQRPage()),
+      MaterialPageRoute<void>(builder: (_) => const ScanQRPage()),
     );
   }
 

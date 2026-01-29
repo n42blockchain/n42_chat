@@ -91,7 +91,7 @@ class MatrixSearchDataSource {
       }
 
       final name = room.getLocalizedDisplayname().toLowerCase();
-      final topic = (room.topic ?? '').toLowerCase();
+      final topic = room.topic.toLowerCase();
 
       return name.contains(lowerQuery) || topic.contains(lowerQuery);
     }).toList();
@@ -107,11 +107,11 @@ class MatrixSearchDataSource {
       if (room.membership != matrix.Membership.join) return false;
 
       final name = room.getLocalizedDisplayname().toLowerCase();
-      final topic = (room.topic ?? '').toLowerCase();
+      final topic = room.topic.toLowerCase();
 
       // 检查最后一条消息
       final lastEvent = room.lastEvent;
-      final lastMessage = lastEvent?.body?.toLowerCase() ?? '';
+      final lastMessage = lastEvent?.body.toLowerCase() ?? '';
 
       return name.contains(lowerQuery) ||
           topic.contains(lowerQuery) ||
@@ -212,8 +212,8 @@ class MatrixSearchDataSource {
 
     // 按时间排序
     results.sort((a, b) {
-      final aTime = a.event.originServerTs ?? DateTime.now();
-      final bTime = b.event.originServerTs ?? DateTime.now();
+      final aTime = a.event.originServerTs;
+      final bTime = b.event.originServerTs;
       return bTime.compareTo(aTime);
     });
 
@@ -223,7 +223,6 @@ class MatrixSearchDataSource {
   /// 检查是否是消息事件
   bool _isMessageEvent(matrix.Event event) {
     return event.type == matrix.EventTypes.Message &&
-        event.messageType != null &&
         event.status != matrix.EventStatus.error;
   }
 

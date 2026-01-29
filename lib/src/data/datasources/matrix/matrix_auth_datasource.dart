@@ -132,7 +132,7 @@ class MatrixAuthDataSource {
       } catch (e) {
         // 如果初始化失败，尝试强制重新初始化
         debugPrint('MatrixAuthDataSource: Initial init failed: $e, force reinit...');
-        await Future.delayed(const Duration(milliseconds: 500));
+        await Future<void>.delayed(const Duration(milliseconds: 500));
         await _clientManager.initialize(forceReinit: true);
       }
     }

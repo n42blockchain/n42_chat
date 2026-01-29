@@ -89,7 +89,7 @@ class MatrixClientManager {
       // 等待初始化完成
       int waitCount = 0;
       while (_isInitializing && waitCount < 100) {
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
         waitCount++;
       }
       if (_isInitialized) return;
@@ -159,7 +159,7 @@ class MatrixClientManager {
       );
       
       // 额外等待确保初始化完成
-      await Future.delayed(const Duration(milliseconds: 200));
+      await Future<void>.delayed(const Duration(milliseconds: 200));
 
       _isInitialized = true;
       debugPrint('MatrixClientManager: Initialized successfully');

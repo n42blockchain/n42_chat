@@ -216,3 +216,31 @@ abstract class AppColors {
   static const Color timeSeparator = Color(0xCCCCCCCC);
 }
 
+/// 颜色调色板
+///
+/// 用于头像、标签等需要动态颜色的场景
+abstract class AppColorPalettes {
+  AppColorPalettes._();
+
+  /// 头像颜色列表
+  static const List<Color> avatarColors = [
+    Color(0xFF1AAD19), // 绿
+    Color(0xFF576B95), // 蓝
+    Color(0xFFFA9D3B), // 橙
+    Color(0xFFE64340), // 红
+    Color(0xFF9B59B6), // 紫
+    Color(0xFF3498DB), // 浅蓝
+    Color(0xFF1ABC9C), // 青
+    Color(0xFFF39C12), // 黄
+  ];
+
+  /// 根据名称获取固定头像颜色
+  ///
+  /// 同一名称总是返回相同的颜色
+  static Color getAvatarColor(String name) {
+    if (name.isEmpty) return avatarColors[0];
+    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % avatarColors.length;
+    return avatarColors[index];
+  }
+}
+

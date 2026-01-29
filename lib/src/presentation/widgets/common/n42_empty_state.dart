@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import 'n42_button.dart';
 
@@ -104,7 +104,7 @@ class N42EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Center(
       child: Padding(

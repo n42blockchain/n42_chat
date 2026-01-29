@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -23,7 +24,7 @@ class ContactTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Material(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
@@ -141,7 +142,7 @@ class SimpleContactTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Material(
       color: selected

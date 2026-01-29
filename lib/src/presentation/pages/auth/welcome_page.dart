@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 欢迎页面
@@ -25,7 +26,7 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,

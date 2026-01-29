@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'core/extensions/context_extension.dart';
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
 import 'core/utils/date_utils.dart';
@@ -400,7 +401,7 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
 
   void _navigateToLogin(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => BlocProvider.value(
           value: N42Chat.authBloc,
           child: const LoginPage(),
@@ -411,7 +412,7 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
 
   void _navigateToRegister(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => BlocProvider.value(
           value: N42Chat.authBloc,
           child: const RegisterPage(),
@@ -468,7 +469,7 @@ class _LoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEDEDED),
@@ -557,7 +558,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
       return const _N42ChatEntryWidget();
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEDEDED);
     final textColor = isDark ? Colors.white : const Color(0xFF181818);
     final subtitleColor = isDark ? Colors.white70 : const Color(0xFF888888);

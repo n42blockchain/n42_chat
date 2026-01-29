@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import 'message_status_indicator.dart';
@@ -84,7 +85,7 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -307,15 +308,7 @@ class MessageBubble extends StatelessWidget {
   }
 
   Color _getColorFromName(String name) {
-    final colors = [
-      const Color(0xFF1AAD19),
-      const Color(0xFF576B95),
-      const Color(0xFFFA9D3B),
-      const Color(0xFFE64340),
-    ];
-    if (name.isEmpty) return colors[0];
-    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % colors.length;
-    return colors[index];
+    return AppColorPalettes.getAvatarColor(name);
   }
 }
 
@@ -348,7 +341,7 @@ class TextMessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     // 微信中绿色气泡的文字是黑色，深色模式下对方的灰色气泡文字是白色
     final textColor = isSelf
         ? AppColors.messageTextSent  // 黑色

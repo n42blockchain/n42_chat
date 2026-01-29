@@ -1,6 +1,3 @@
-import 'dart:typed_data';
-
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +7,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../services/ringtone/system_ringtone_service.dart';
@@ -42,7 +40,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
@@ -750,7 +748,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
 
   Future<void> _showMyQRCode(String userId) async {
-    await showDialog(
+    await showDialog<void>(
       context: context,
       builder: (context) => Dialog(
         child: Padding(
@@ -800,7 +798,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   Future<void> _selectRingtone(String? currentRingtone) async {
     final result = await Navigator.of(context).push<String>(
-      MaterialPageRoute(
+      MaterialPageRoute<String>(
         builder: (context) => _RingtoneSelectPage(
           currentRingtone: currentRingtone ?? (S.of(context)?.defaultRingtone ?? 'Default Ringtone'),
         ),
@@ -820,7 +818,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   Future<void> _manageAddresses() async {
     await Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => const _AddressManagePage(),
       ),
     );
@@ -828,7 +826,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   Future<void> _manageInvoices() async {
     await Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => const _InvoiceManagePage(),
       ),
     );
@@ -836,21 +834,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   Future<void> _openN42Bean() async {
     await Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => const N42BeanPage(),
       ),
     );
   }
 
-  void _showFeatureToast(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(S.of(context)?.featureInDevelopment(feature) ?? '$feature is under development...'),
-        duration: const Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
 }
 
 /// 地址管理页面
@@ -883,7 +872,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
             'n42.user.addresses',
           );
           
-          if (data is Map && data['addresses'] != null) {
+          if (data['addresses'] != null) {
             final addressList = data['addresses'] as List;
             setState(() {
               _addresses = addressList.map((item) {
@@ -949,7 +938,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
@@ -1137,7 +1126,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
   }
 
   void _deleteAddress(int index) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.deleteAddress ?? 'Delete Address'),
@@ -1320,7 +1309,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
             'n42.user.invoices',
           );
           
-          if (data is Map && data['invoices'] != null) {
+          if (data['invoices'] != null) {
             final invoiceList = data['invoices'] as List;
             setState(() {
               _invoices = invoiceList.map((item) {
@@ -1392,7 +1381,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
@@ -1604,7 +1593,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
   }
 
   void _deleteInvoice(int index) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.deleteInvoice ?? 'Delete Invoice'),
@@ -2046,7 +2035,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final s = S.of(context);
 
     return Scaffold(

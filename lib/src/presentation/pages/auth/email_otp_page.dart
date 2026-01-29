@@ -7,15 +7,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pinput/pinput.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/auth/auth_methods_service.dart';
-import '../../blocs/auth/auth_bloc.dart';
-import '../../blocs/auth/auth_event.dart';
-import '../../blocs/auth/auth_state.dart';
 
 /// 邮箱验证码页面
 class EmailOtpPage extends StatefulWidget {
@@ -169,7 +166,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
@@ -393,7 +390,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
   }
 
   Widget _buildResendButton() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
     final canResend = _resendCountdown == 0 && !_isVerifying;
 
     return Column(

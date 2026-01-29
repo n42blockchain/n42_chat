@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
 
@@ -7,7 +8,7 @@ import '../../../domain/entities/message_reaction_entity.dart';
 class MessageReactionBar extends StatelessWidget {
   final List<MessageReactionEntity> reactions;
   final String currentUserId;
-  final Function(String emoji)? onReactionTap;
+  final void Function(String emoji)? onReactionTap;
   final VoidCallback? onAddReaction;
 
   const MessageReactionBar({
@@ -22,7 +23,7 @@ class MessageReactionBar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (reactions.isEmpty) return const SizedBox.shrink();
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Wrap(
       spacing: 4,
@@ -147,7 +148,7 @@ class QuickReactionPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -192,7 +193,7 @@ class FullReactionPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return SafeArea(
       child: Container(
