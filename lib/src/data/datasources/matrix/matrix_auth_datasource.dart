@@ -332,6 +332,134 @@ class MatrixAuthDataSource {
 
     await client.updateDevice(deviceId, displayName: displayName);
   }
+
+  // ============================================
+  // 密码管理
+  // ============================================
+
+  /// 请求发送密码重置邮件
+  ///
+  /// 使用 Matrix 邮箱重置 API
+  /// POST /_matrix/client/v3/account/password/email/requestToken
+  Future<bool> requestPasswordResetEmail({
+    required String homeserver,
+    required String email,
+  }) async {
+    if (!_clientManager.isInitialized) {
+      await _clientManager.initialize();
+    }
+
+    final client = _clientManager.client;
+    if (client == null) {
+      throw StateError('Matrix client not initialized');
+    }
+
+    try {
+      // 设置 homeserver
+      final homeserverUri = Uri.parse(homeserver);
+      await client.checkHomeserver(homeserverUri);
+
+      // 生成唯一的 client_secret
+      final clientSecret = 'n42_${DateTime.now().millisecondsSinceEpoch}_${email.hashCode.abs()}';
+
+      // 调用 Matrix API 请求密码重置邮件
+      // 注意：这需要服务器配置了 SMTP 发送邮件
+      final response = await client.requestTokenToResetPasswordEmail(
+        clientSecret,
+        email,
+        1, // sendAttempt
+      );
+
+      debugPrint('MatrixAuthDataSource: Password reset email requested, sid: ${response.sid}');
+      return true;
+    } catch (e) {
+      debugPrint('MatrixAuthDataSource: Request password reset email failed: $e');
+      rethrow;
+    }
+  }
+
+  /// 确认密码重置
+  ///
+  /// 注意：Matrix 标准流程中，用户需要点击邮件中的链接完成验证
+  /// 这里提供简化的验证码确认流程，需要服务端支持
+  Future<bool> confirmPasswordReset({
+    required String homeserver,
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    if (!_clientManager.isInitialized) {
+      await _clientManager.initialize();
+    }
+
+    final client = _clientManager.client;
+    if (client == null) {
+      throw StateError('Matrix client not initialized');
+    }
+
+    try {
+      // 设置 homeserver
+      final homeserverUri = Uri.parse(homeserver);
+      await client.checkHomeserver(homeserverUri);
+
+      // Matrix 标准流程：邮件验证后使用 session token 设置新密码
+      // 这里需要服务端实现验证码验证逻辑
+      // 简化实现：直接调用设置密码 API
+
+      // 创建邮箱验证认证数据
+      final auth = AuthenticationThreePidCreds(
+        type: 'm.login.email.identity',
+        threepidCreds: ThreepidCreds(
+          sid: code, // 使用验证码作为 session id
+          clientSecret: 'n42_reset_${email.hashCode.abs()}',
+        ),
+      );
+
+      await client.changePassword(newPassword, auth: auth);
+
+      debugPrint('MatrixAuthDataSource: Password reset confirmed');
+      return true;
+    } catch (e) {
+      debugPrint('MatrixAuthDataSource: Confirm password reset failed: $e');
+      rethrow;
+    }
+  }
+
+  /// 修改密码
+  ///
+  /// 使用 Matrix changePassword API
+  /// POST /_matrix/client/v3/account/password
+  Future<bool> changeUserPassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    final client = _clientManager.client;
+    if (client == null || !_clientManager.isLoggedIn) {
+      throw StateError('Matrix client not logged in');
+    }
+
+    try {
+      final userId = client.userID;
+      if (userId == null) {
+        throw StateError('User ID not available');
+      }
+
+      // 创建密码认证数据
+      final auth = PasswordAuthenticationData(
+        userId: userId,
+        password: oldPassword,
+      );
+
+      // 调用 Matrix 修改密码 API
+      await client.changePassword(newPassword, auth: auth);
+
+      debugPrint('MatrixAuthDataSource: Password changed successfully');
+      return true;
+    } catch (e) {
+      debugPrint('MatrixAuthDataSource: Change password failed: $e');
+      rethrow;
+    }
+  }
 }
 
 /// 会话凭证
@@ -373,23 +501,50 @@ class SessionCredentials {
 }
 
 /// 用于 registration_token 认证的数据类
-/// 
+///
 /// Matrix 规范要求 m.login.registration_token 认证需要提供 token 字段
 class RegistrationTokenAuthenticationData extends AuthenticationData {
   final String token;
-  
+
   RegistrationTokenAuthenticationData({
     required this.token,
     String? session,
   }) : super(
-    type: 'm.login.registration_token',
-    session: session,
-  );
-  
+          type: 'm.login.registration_token',
+          session: session,
+        );
+
   @override
   Map<String, dynamic> toJson() {
     final json = super.toJson();
     json['token'] = token;
+    return json;
+  }
+}
+
+/// 用于密码认证的数据类
+class PasswordAuthenticationData extends AuthenticationData {
+  final String userId;
+  final String password;
+
+  PasswordAuthenticationData({
+    required this.userId,
+    required this.password,
+    String? session,
+  }) : super(
+          type: 'm.login.password',
+          session: session,
+        );
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['user'] = userId;
+    json['password'] = password;
+    json['identifier'] = {
+      'type': 'm.id.user',
+      'user': userId,
+    };
     return json;
   }
 }

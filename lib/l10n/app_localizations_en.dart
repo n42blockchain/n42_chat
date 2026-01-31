@@ -4067,4 +4067,96 @@ class SEn extends S {
   String whoCanSeeTitle(String title) {
     return 'Who can see $title';
   }
+
+  @override
+  String get emailAddress => 'Email Address';
+
+  @override
+  String get enterEmailAddress => 'Enter email address';
+
+  @override
+  String get emailRecoveryHint => 'Used for password recovery';
+
+  @override
+  String get invalidEmailFormat => 'Please enter a valid email address';
+
+  @override
+  String get optional => 'Optional';
+
+  @override
+  String get resetPassword => 'Reset Password';
+
+  @override
+  String get resetPasswordTitle => 'Reset Your Password';
+
+  @override
+  String get enterRegisteredEmail =>
+      'Enter the email address you registered with';
+
+  @override
+  String get sendResetCode => 'Send Reset Code';
+
+  @override
+  String resetCodeSent(String email) {
+    return 'Reset code sent to $email';
+  }
+
+  @override
+  String get enterResetCode => 'Enter reset code';
+
+  @override
+  String get setNewPassword => 'Set New Password';
+
+  @override
+  String get confirmNewPassword => 'Confirm New Password';
+
+  @override
+  String get newPassword => 'New Password';
+
+  @override
+  String get passwordResetSuccess =>
+      'Password reset successful. Please login with your new password.';
+
+  @override
+  String get resetPasswordFailed => 'Reset password failed';
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get currentPassword => 'Current Password';
+
+  @override
+  String get enterCurrentPassword => 'Enter current password';
+
+  @override
+  String get enterNewPassword => 'Enter new password';
+
+  @override
+  String get passwordChanged =>
+      'Password changed successfully. Please login with your new password.';
+
+  @override
+  String get changePasswordFailed => 'Change password failed';
+
+  @override
+  String get incorrectCurrentPassword => 'Incorrect current password';
+
+  @override
+  String get newPasswordMustBeDifferent =>
+      'New password must be different from current password';
+
+  @override
+  String get changePasswordInfo =>
+      'After changing password, you will be logged out and need to login with the new password.';
+
+  @override
+  String get passwordRequirements => 'Password requirements:';
+
+  @override
+  String get securityNote =>
+      'For security, you will need to re-login on all devices after changing password.';
+
+  @override
+  String get security => 'Security';
 }

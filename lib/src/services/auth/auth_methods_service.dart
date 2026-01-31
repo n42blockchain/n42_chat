@@ -1,13 +1,15 @@
 /// 多种认证方式服务
-/// 
+///
 /// 支持 Passkey、邮箱 OTP、第三方登录等认证方式
 library;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 // Passkey 相关类型定义（简化版，实际需要使用 passkeys 包）
@@ -73,6 +75,45 @@ class PasskeyCredential {
       displayName: json['displayName'] as String?,
     );
   }
+}
+
+/// SSO 提供商信息
+///
+/// Matrix 服务器支持的 SSO 身份提供商
+class SsoProvider {
+  /// 提供商唯一标识
+  final String id;
+
+  /// 提供商显示名称
+  final String name;
+
+  /// 提供商图标 URL（mxc:// 或 https://）
+  final String? icon;
+
+  /// 提供商品牌（如 google, apple, github, gitlab, facebook, twitter）
+  final String? brand;
+
+  const SsoProvider({
+    required this.id,
+    required this.name,
+    this.icon,
+    this.brand,
+  });
+
+  /// 是否为 Google 登录
+  bool get isGoogle => brand == 'google' || name.toLowerCase().contains('google');
+
+  /// 是否为 Apple 登录
+  bool get isApple => brand == 'apple' || name.toLowerCase().contains('apple');
+
+  /// 是否为 GitHub 登录
+  bool get isGitHub => brand == 'github' || name.toLowerCase().contains('github');
+
+  /// 是否为 GitLab 登录
+  bool get isGitLab => brand == 'gitlab' || name.toLowerCase().contains('gitlab');
+
+  @override
+  String toString() => 'SsoProvider(id: $id, name: $name, brand: $brand)';
 }
 
 /// 多认证方式服务
@@ -389,18 +430,75 @@ class AuthMethodsService {
   }
   
   /// 获取支持的 SSO 提供商列表
-  /// 
+  ///
   /// [homeserver] Matrix 服务器地址
-  Future<List<Map<String, dynamic>>> getSsoProviders(String homeserver) async {
+  ///
+  /// 返回 SSO 提供商列表，每个提供商包含:
+  /// - id: 提供商 ID
+  /// - name: 提供商名称
+  /// - icon: 提供商图标 URL（如果有）
+  /// - brand: 提供商品牌（如 google, apple, github 等）
+  Future<List<SsoProvider>> getSsoProviders(String homeserver) async {
     try {
-      // TODO: 调用 /_matrix/client/v3/login 获取支持的登录方式
-      // 返回 type: "m.login.sso" 的 identity_providers
-      
+      final uri = Uri.parse('$homeserver/_matrix/client/v3/login');
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final flows = data['flows'] as List<dynamic>?;
+
+        if (flows == null) return [];
+
+        final providers = <SsoProvider>[];
+
+        for (final flow in flows) {
+          if (flow['type'] == 'm.login.sso') {
+            final identityProviders =
+                flow['identity_providers'] as List<dynamic>?;
+            if (identityProviders != null) {
+              for (final provider in identityProviders) {
+                providers.add(SsoProvider(
+                  id: provider['id'] as String? ?? '',
+                  name: provider['name'] as String? ?? 'SSO',
+                  icon: provider['icon'] as String?,
+                  brand: provider['brand'] as String?,
+                ));
+              }
+            }
+            // 如果没有 identity_providers，说明是单一 SSO 登录
+            if (identityProviders == null || identityProviders.isEmpty) {
+              providers.add(const SsoProvider(
+                id: 'sso',
+                name: 'SSO Login',
+              ));
+            }
+          }
+        }
+
+        debugPrint(
+            'AuthMethodsService: Found ${providers.length} SSO providers');
+        return providers;
+      }
+
       return [];
     } catch (e) {
       debugPrint('AuthMethodsService: Get SSO providers failed: $e');
       return [];
     }
+  }
+
+  /// 获取特定 SSO 提供商的登录 URL
+  ///
+  /// [homeserver] Matrix 服务器地址
+  /// [providerId] SSO 提供商 ID
+  /// [redirectUrl] 回调 URL
+  String getSsoProviderLoginUrl({
+    required String homeserver,
+    required String providerId,
+    required String redirectUrl,
+  }) {
+    final encodedRedirect = Uri.encodeComponent(redirectUrl);
+    return '$homeserver/_matrix/client/v3/login/sso/redirect/$providerId?redirectUrl=$encodedRedirect';
   }
   
   // ============================================

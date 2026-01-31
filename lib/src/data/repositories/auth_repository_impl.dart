@@ -7,19 +7,23 @@ import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/secure_storage_datasource.dart';
 import '../datasources/matrix/matrix_auth_datasource.dart';
+import '../datasources/remote/social_auth_api.dart';
 
 /// 认证仓库实现
 class AuthRepositoryImpl implements IAuthRepository {
   final MatrixAuthDataSource _authDataSource;
   final SecureStorageDataSource _secureStorage;
+  final SocialAuthApi _socialAuthApi;
 
   final _loginStateController = StreamController<bool>.broadcast();
 
   AuthRepositoryImpl({
     MatrixAuthDataSource? authDataSource,
     SecureStorageDataSource? secureStorage,
+    SocialAuthApi? socialAuthApi,
   })  : _authDataSource = authDataSource ?? MatrixAuthDataSource(),
-        _secureStorage = secureStorage ?? SecureStorageDataSource();
+        _secureStorage = secureStorage ?? SecureStorageDataSource(),
+        _socialAuthApi = socialAuthApi ?? SocialAuthApi();
 
   @override
   bool get isLoggedIn => _authDataSource.isLoggedIn;
@@ -572,7 +576,7 @@ class AuthRepositoryImpl implements IAuthRepository {
         client.userID!,
         'n42.user.profile',
       );
-      
+
       debugPrint('AuthRepository: Got account data: $data');
 
       _cachedProfileData = data;
@@ -580,6 +584,343 @@ class AuthRepositoryImpl implements IAuthRepository {
       return data;
     } catch (e) {
       debugPrint('AuthRepository: Get profile data failed - $e');
+      return null;
+    }
+  }
+
+  // ============================================
+  // 密码管理
+  // ============================================
+
+  @override
+  Future<bool> requestPasswordReset({
+    required String homeserver,
+    required String email,
+  }) async {
+    try {
+      debugPrint('AuthRepository: Requesting password reset for $email');
+
+      // 调用 Matrix 邮箱重置 API
+      // POST /_matrix/client/v3/account/password/email/requestToken
+      final success = await _authDataSource.requestPasswordResetEmail(
+        homeserver: homeserver,
+        email: email,
+      );
+
+      debugPrint('AuthRepository: Password reset email ${success ? 'sent' : 'failed'}');
+      return success;
+    } catch (e) {
+      debugPrint('AuthRepository: Request password reset failed - $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> confirmPasswordReset({
+    required String homeserver,
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    try {
+      debugPrint('AuthRepository: Confirming password reset for $email');
+
+      // 调用重置密码确认 API
+      final success = await _authDataSource.confirmPasswordReset(
+        homeserver: homeserver,
+        email: email,
+        code: code,
+        newPassword: newPassword,
+      );
+
+      debugPrint('AuthRepository: Password reset ${success ? 'confirmed' : 'failed'}');
+      return success;
+    } catch (e) {
+      debugPrint('AuthRepository: Confirm password reset failed - $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    if (!isLoggedIn) {
+      throw Exception('未登录');
+    }
+
+    try {
+      debugPrint('AuthRepository: Changing password');
+
+      // 调用 Matrix 修改密码 API
+      final success = await _authDataSource.changeUserPassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+
+      if (success) {
+        // 修改密码成功后清除保存的凭据
+        // 下次登录需要使用新密码
+        await _secureStorage.clearCredentials();
+        debugPrint('AuthRepository: Password changed, credentials cleared');
+      }
+
+      return success;
+    } catch (e) {
+      debugPrint('AuthRepository: Change password failed - $e');
+      rethrow;
+    }
+  }
+
+  // ============================================
+  // 第三方登录
+  // ============================================
+
+  @override
+  Future<AuthResult> loginWithSocialToken({
+    required String homeserver,
+    required String provider,
+    String? idToken,
+    String? accessToken,
+    String? email,
+    String? displayName,
+  }) async {
+    try {
+      debugPrint('AuthRepository: Social login with $provider');
+
+      if (idToken == null || idToken.isEmpty) {
+        return AuthResult.failure(
+          '缺少登录凭证',
+          type: AuthErrorType.invalidCredentials,
+        );
+      }
+
+      // 调用后端 API 完成社交登录
+      SocialLoginResponse response;
+      if (provider == 'google') {
+        response = await _socialAuthApi.loginWithGoogle(
+          idToken: idToken,
+          accessToken: accessToken,
+        );
+      } else if (provider == 'apple') {
+        response = await _socialAuthApi.loginWithApple(
+          idToken: idToken,
+          authorizationCode: accessToken ?? '',
+        );
+      } else {
+        return AuthResult.failure(
+          '不支持的登录方式: $provider',
+          type: AuthErrorType.unknown,
+        );
+      }
+
+      if (!response.success) {
+        return AuthResult.failure(
+          response.error ?? '登录失败',
+          type: AuthErrorType.serverError,
+        );
+      }
+
+      // 如果后端返回了 Matrix 凭证，使用 Matrix Token 登录
+      if (response.hasMatrixCredentials) {
+        final matrixResult = await loginWithToken(
+          homeserver: response.matrixHomeserver!,
+          accessToken: response.matrixAccessToken!,
+          userId: response.matrixUserId!,
+          deviceId: response.matrixDeviceId ?? '',
+        );
+
+        if (matrixResult.success) {
+          debugPrint('AuthRepository: Social login -> Matrix login successful');
+          return matrixResult;
+        }
+      }
+
+      // 如果没有 Matrix 凭证，创建一个临时用户实体
+      // 实际应用中可能需要进一步处理
+      final user = UserEntity(
+        userId: response.matrixUserId ?? '@${response.uuid}:n42.network',
+        displayName: response.nickname ?? displayName ?? email?.split('@').first ?? 'User',
+        avatarUrl: response.avatar,
+      );
+
+      debugPrint('AuthRepository: Social login successful - ${user.userId}');
+      return AuthResult.success(user);
+    } catch (e) {
+      debugPrint('AuthRepository: Social login failed - $e');
+      return AuthResult.failure(
+        '社交登录失败: $e',
+        type: AuthErrorType.unknown,
+      );
+    }
+  }
+
+  @override
+  Future<AuthResult> startSsoLogin({
+    required String homeserver,
+    String? providerId,
+  }) async {
+    try {
+      debugPrint('AuthRepository: Starting SSO login');
+
+      // 检查服务器是否支持 SSO
+      final homeserverInfo = await checkHomeserver(homeserver);
+      if (!homeserverInfo.supportsSsoLogin) {
+        return AuthResult.failure(
+          '服务器不支持 SSO 登录',
+          type: AuthErrorType.serverError,
+        );
+      }
+
+      // SSO 登录成功标志，实际的浏览器跳转由 UI 层处理
+      // 这里只是检查服务器是否支持并返回成功
+      debugPrint('AuthRepository: SSO login ready, homeserver supports SSO');
+
+      // 返回一个特殊的结果表示需要浏览器完成
+      return AuthResult.failure(
+        'SSO_REDIRECT_REQUIRED',
+        type: AuthErrorType.additionalAuthRequired,
+      );
+    } catch (e) {
+      debugPrint('AuthRepository: SSO login failed - $e');
+      return AuthResult.failure(
+        'SSO 登录失败: $e',
+        type: AuthErrorType.unknown,
+      );
+    }
+  }
+
+  // ============================================
+  // 邮箱管理
+  // ============================================
+
+  @override
+  Future<bool> requestChangeEmail({
+    required String password,
+    required String newEmail,
+  }) async {
+    if (!isLoggedIn) {
+      throw Exception('未登录');
+    }
+
+    try {
+      debugPrint('AuthRepository: Requesting change email to $newEmail');
+
+      final client = _authDataSource.clientManager.client;
+      if (client == null) {
+        throw StateError('Matrix client not initialized');
+      }
+
+      // Matrix 使用 3PID (Third Party Identifier) 机制管理邮箱
+      // 添加新邮箱需要先验证
+      final userId = client.userID;
+      if (userId == null) {
+        throw StateError('User ID not available');
+      }
+
+      // 生成 client_secret 用于验证流程
+      final clientSecret = 'n42_email_${DateTime.now().millisecondsSinceEpoch}_${newEmail.hashCode.abs()}';
+
+      // 保存 client_secret 以便后续确认使用
+      await _secureStorage.saveSetting('email_change_secret', clientSecret);
+      await _secureStorage.saveSetting('email_change_address', newEmail);
+
+      // 请求发送验证码到新邮箱
+      final response = await client.requestTokenToRegister3pidEmail(
+        clientSecret,
+        newEmail,
+        1, // sendAttempt
+      );
+
+      // 保存 session ID 用于后续确认
+      await _secureStorage.saveSetting('email_change_sid', response.sid);
+
+      debugPrint('AuthRepository: Email verification sent, sid: ${response.sid}');
+      return true;
+    } catch (e) {
+      debugPrint('AuthRepository: Request change email failed - $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> confirmChangeEmail({
+    required String newEmail,
+    required String code,
+  }) async {
+    if (!isLoggedIn) {
+      throw Exception('未登录');
+    }
+
+    try {
+      debugPrint('AuthRepository: Confirming email change');
+
+      final client = _authDataSource.clientManager.client;
+      if (client == null) {
+        throw StateError('Matrix client not initialized');
+      }
+
+      // 获取之前保存的验证信息
+      final clientSecret = await _secureStorage.getSetting('email_change_secret');
+      final sid = await _secureStorage.getSetting('email_change_sid');
+
+      if (clientSecret == null || sid == null) {
+        throw Exception('未找到邮箱验证会话，请重新请求验证码');
+      }
+
+      // 使用验证码完成 3PID 绑定
+      // 注意：Matrix 标准流程中，用户点击邮件链接完成验证
+      // 这里使用简化的验证码流程，需要服务端支持
+      final threePidCreds = ThreepidCreds(
+        sid: sid,
+        clientSecret: clientSecret,
+      );
+
+      await client.add3pid(
+        threePidCreds,
+        bind: true,
+      );
+
+      // 清除临时保存的验证信息
+      await _secureStorage.removeSetting('email_change_secret');
+      await _secureStorage.removeSetting('email_change_address');
+      await _secureStorage.removeSetting('email_change_sid');
+
+      debugPrint('AuthRepository: Email changed successfully');
+      return true;
+    } catch (e) {
+      debugPrint('AuthRepository: Confirm change email failed - $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String?> getBoundEmail() async {
+    if (!isLoggedIn) {
+      return null;
+    }
+
+    try {
+      final client = _authDataSource.clientManager.client;
+      if (client == null) {
+        return null;
+      }
+
+      // 获取已绑定的 3PID 列表
+      final threePids = await client.getAccount3PIDs();
+
+      // 查找邮箱类型的 3PID
+      for (final threePid in threePids) {
+        if (threePid.medium == 'email') {
+          debugPrint('AuthRepository: Found bound email: ${threePid.address}');
+          return threePid.address;
+        }
+      }
+
+      return null;
+    } catch (e) {
+      debugPrint('AuthRepository: Get bound email failed - $e');
       return null;
     }
   }

@@ -1,0 +1,348 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../services/auth/auth_methods_service.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import '../../blocs/auth/auth_event.dart';
+import '../../blocs/auth/auth_state.dart';
+
+/// 社交登录按钮组件
+///
+/// 显示 Google 和 Apple 登录按钮
+class SocialLoginButtons extends StatefulWidget {
+  /// 是否已同意用户协议
+  final bool isAgreedToTerms;
+
+  /// 服务器地址
+  final String homeserver;
+
+  /// 协议未同意时的回调
+  final VoidCallback? onTermsNotAgreed;
+
+  /// 登录成功回调
+  final VoidCallback? onLoginSuccess;
+
+  /// 错误回调
+  final Function(String)? onError;
+
+  const SocialLoginButtons({
+    super.key,
+    required this.isAgreedToTerms,
+    required this.homeserver,
+    this.onTermsNotAgreed,
+    this.onLoginSuccess,
+    this.onError,
+  });
+
+  @override
+  State<SocialLoginButtons> createState() => _SocialLoginButtonsState();
+}
+
+class _SocialLoginButtonsState extends State<SocialLoginButtons> {
+  final AuthMethodsService _authService = AuthMethodsService();
+  bool _isGoogleLoading = false;
+  bool _isAppleLoading = false;
+  bool _isAppleAvailable = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAppleAvailability();
+  }
+
+  Future<void> _checkAppleAvailability() async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      try {
+        final available = await _authService.isAppleSignInAvailable();
+        if (mounted) {
+          setState(() => _isAppleAvailable = available);
+        }
+      } catch (e) {
+        // Apple Sign-In 不可用
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
+    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state.status == AuthStatus.authenticated) {
+          widget.onLoginSuccess?.call();
+        } else if (state.status == AuthStatus.error && state.errorMessage != null) {
+          widget.onError?.call(state.errorMessage!);
+        }
+      },
+      child: Column(
+        children: [
+          // 分隔线
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Divider(
+                    color: textColor.withValues(alpha: 0.3),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    S.of(context)?.otherLoginMethods ?? 'Other login methods',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Divider(
+                    color: textColor.withValues(alpha: 0.3),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // 社交登录按钮
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Google 登录
+              _buildSocialButton(
+                onTap: _isGoogleLoading ? null : _handleGoogleSignIn,
+                icon: Icons.g_mobiledata,
+                isLoading: _isGoogleLoading,
+                tooltip: 'Google',
+                backgroundColor: Colors.white,
+                iconColor: Colors.red,
+              ),
+
+              const SizedBox(width: 24),
+
+              // Apple 登录 (仅 iOS/macOS)
+              if (_isAppleAvailable)
+                _buildSocialButton(
+                  onTap: _isAppleLoading ? null : _handleAppleSignIn,
+                  icon: Icons.apple,
+                  isLoading: _isAppleLoading,
+                  tooltip: 'Apple',
+                  backgroundColor: isDark ? Colors.white : Colors.black,
+                  iconColor: isDark ? Colors.black : Colors.white,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSocialButton({
+    required VoidCallback? onTap,
+    required IconData icon,
+    required bool isLoading,
+    required String tooltip,
+    required Color backgroundColor,
+    required Color iconColor,
+  }) {
+    final isDark = context.isDarkMode;
+
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? AppColors.dividerDark
+                  : AppColors.divider,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Center(
+            child: isLoading
+                ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.primary,
+                      ),
+                    ),
+                  )
+                : Icon(
+                    icon,
+                    size: 28,
+                    color: iconColor,
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    if (!widget.isAgreedToTerms) {
+      widget.onTermsNotAgreed?.call();
+      return;
+    }
+
+    if (widget.homeserver.isEmpty) {
+      widget.onError?.call(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first');
+      return;
+    }
+
+    setState(() => _isGoogleLoading = true);
+
+    try {
+      // 触发 Google 登录事件
+      if (mounted) {
+        context.read<AuthBloc>().add(AuthGoogleLoginRequested(
+          homeserver: widget.homeserver,
+        ));
+      }
+    } catch (e) {
+      if (mounted) {
+        widget.onError?.call(e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isGoogleLoading = false);
+      }
+    }
+  }
+
+  Future<void> _handleAppleSignIn() async {
+    if (!widget.isAgreedToTerms) {
+      widget.onTermsNotAgreed?.call();
+      return;
+    }
+
+    if (widget.homeserver.isEmpty) {
+      widget.onError?.call(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first');
+      return;
+    }
+
+    setState(() => _isAppleLoading = true);
+
+    try {
+      // 触发 Apple 登录事件
+      if (mounted) {
+        context.read<AuthBloc>().add(AuthAppleLoginRequested(
+          homeserver: widget.homeserver,
+        ));
+      }
+    } catch (e) {
+      if (mounted) {
+        widget.onError?.call(e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isAppleLoading = false);
+      }
+    }
+  }
+}
+
+/// 单独的 Google 登录按钮
+class GoogleSignInButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final bool isLoading;
+
+  const GoogleSignInButton({
+    super.key,
+    this.onPressed,
+    this.isLoading = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: isLoading ? null : onPressed,
+      icon: isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.g_mobiledata, color: Colors.red),
+      label: Text(
+        S.of(context)?.googleLogin ?? 'Sign in with Google',
+        style: const TextStyle(color: Colors.black87),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        minimumSize: const Size(double.infinity, 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: Colors.grey),
+        ),
+      ),
+    );
+  }
+}
+
+/// 单独的 Apple 登录按钮
+class AppleSignInButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final bool isLoading;
+
+  const AppleSignInButton({
+    super.key,
+    this.onPressed,
+    this.isLoading = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return ElevatedButton.icon(
+      onPressed: isLoading ? null : onPressed,
+      icon: isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Icon(
+              Icons.apple,
+              color: isDark ? Colors.black : Colors.white,
+            ),
+      label: Text(
+        S.of(context)?.appleLogin ?? 'Sign in with Apple',
+        style: TextStyle(
+          color: isDark ? Colors.black : Colors.white,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isDark ? Colors.white : Colors.black,
+        minimumSize: const Size(double.infinity, 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+}

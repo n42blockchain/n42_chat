@@ -39,6 +39,63 @@ enum HomeserverStatus {
   invalid,
 }
 
+/// 密码重置状态
+enum PasswordResetStatus {
+  /// 初始状态
+  initial,
+
+  /// 发送验证码中
+  sendingCode,
+
+  /// 验证码已发送
+  codeSent,
+
+  /// 重置中
+  resetting,
+
+  /// 重置成功
+  success,
+
+  /// 重置失败
+  failed,
+}
+
+/// 密码修改状态
+enum ChangePasswordStatus {
+  /// 初始状态
+  initial,
+
+  /// 修改中
+  changing,
+
+  /// 修改成功
+  success,
+
+  /// 修改失败
+  failed,
+}
+
+/// 邮箱修改状态
+enum ChangeEmailStatus {
+  /// 初始状态
+  initial,
+
+  /// 发送验证码中
+  sendingCode,
+
+  /// 验证码已发送
+  codeSent,
+
+  /// 确认中
+  confirming,
+
+  /// 修改成功
+  success,
+
+  /// 修改失败
+  failed,
+}
+
 /// 认证状态
 class AuthState extends Equatable {
   /// 认证状态
@@ -62,6 +119,18 @@ class AuthState extends Equatable {
   /// 上次检查的Homeserver
   final String? lastCheckedHomeserver;
 
+  /// 密码重置状态
+  final PasswordResetStatus passwordResetStatus;
+
+  /// 密码修改状态
+  final ChangePasswordStatus changePasswordStatus;
+
+  /// 邮箱修改状态
+  final ChangeEmailStatus changeEmailStatus;
+
+  /// 绑定的邮箱
+  final String? boundEmail;
+
   const AuthState({
     required this.status,
     this.user,
@@ -70,6 +139,10 @@ class AuthState extends Equatable {
     this.homeserverStatus = HomeserverStatus.unknown,
     this.homeserverInfo,
     this.lastCheckedHomeserver,
+    this.passwordResetStatus = PasswordResetStatus.initial,
+    this.changePasswordStatus = ChangePasswordStatus.initial,
+    this.changeEmailStatus = ChangeEmailStatus.initial,
+    this.boundEmail,
   });
 
   /// 初始状态
@@ -80,7 +153,11 @@ class AuthState extends Equatable {
         errorType = null,
         homeserverStatus = HomeserverStatus.unknown,
         homeserverInfo = null,
-        lastCheckedHomeserver = null;
+        lastCheckedHomeserver = null,
+        passwordResetStatus = PasswordResetStatus.initial,
+        changePasswordStatus = ChangePasswordStatus.initial,
+        changeEmailStatus = ChangeEmailStatus.initial,
+        boundEmail = null;
 
   /// 是否正在加载
   bool get isLoading =>
@@ -109,6 +186,10 @@ class AuthState extends Equatable {
     HomeserverStatus? homeserverStatus,
     HomeserverInfo? homeserverInfo,
     String? lastCheckedHomeserver,
+    PasswordResetStatus? passwordResetStatus,
+    ChangePasswordStatus? changePasswordStatus,
+    ChangeEmailStatus? changeEmailStatus,
+    String? boundEmail,
   }) {
     return AuthState(
       status: status ?? this.status,
@@ -119,6 +200,10 @@ class AuthState extends Equatable {
       homeserverInfo: homeserverInfo ?? this.homeserverInfo,
       lastCheckedHomeserver:
           lastCheckedHomeserver ?? this.lastCheckedHomeserver,
+      passwordResetStatus: passwordResetStatus ?? this.passwordResetStatus,
+      changePasswordStatus: changePasswordStatus ?? this.changePasswordStatus,
+      changeEmailStatus: changeEmailStatus ?? this.changeEmailStatus,
+      boundEmail: boundEmail ?? this.boundEmail,
     );
   }
 
@@ -131,6 +216,10 @@ class AuthState extends Equatable {
         homeserverStatus,
         homeserverInfo,
         lastCheckedHomeserver,
+        passwordResetStatus,
+        changePasswordStatus,
+        changeEmailStatus,
+        boundEmail,
       ];
 
   @override

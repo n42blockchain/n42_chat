@@ -100,6 +100,106 @@ abstract class IAuthRepository {
   
   /// 获取用户自定义资料数据
   Future<Map<String, dynamic>?> getUserProfileData();
+
+  // ============================================
+  // 密码管理
+  // ============================================
+
+  /// 请求发送密码重置验证码
+  ///
+  /// [homeserver] Matrix 服务器地址
+  /// [email] 注册时绑定的邮箱
+  ///
+  /// 返回是否成功发送
+  Future<bool> requestPasswordReset({
+    required String homeserver,
+    required String email,
+  });
+
+  /// 确认重置密码
+  ///
+  /// [homeserver] Matrix 服务器地址
+  /// [email] 注册时绑定的邮箱
+  /// [code] 验证码
+  /// [newPassword] 新密码
+  ///
+  /// 返回是否成功重置
+  Future<bool> confirmPasswordReset({
+    required String homeserver,
+    required String email,
+    required String code,
+    required String newPassword,
+  });
+
+  /// 修改密码
+  ///
+  /// [oldPassword] 当前密码
+  /// [newPassword] 新密码
+  ///
+  /// 返回是否成功修改
+  Future<bool> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  });
+
+  // ============================================
+  // 第三方登录
+  // ============================================
+
+  /// 使用第三方社交登录 Token 登录
+  ///
+  /// [homeserver] Matrix 服务器地址
+  /// [provider] 登录提供商 (google, apple, etc.)
+  /// [idToken] 第三方提供的 ID Token
+  /// [accessToken] 第三方提供的 Access Token
+  /// [email] 用户邮箱
+  /// [displayName] 用户显示名
+  Future<AuthResult> loginWithSocialToken({
+    required String homeserver,
+    required String provider,
+    String? idToken,
+    String? accessToken,
+    String? email,
+    String? displayName,
+  });
+
+  /// 启动 SSO 登录
+  ///
+  /// [homeserver] Matrix 服务器地址
+  /// [providerId] SSO 提供商 ID（可选）
+  Future<AuthResult> startSsoLogin({
+    required String homeserver,
+    String? providerId,
+  });
+
+  // ============================================
+  // 邮箱管理
+  // ============================================
+
+  /// 修改绑定邮箱
+  ///
+  /// [password] 当前密码（用于验证身份）
+  /// [newEmail] 新邮箱地址
+  ///
+  /// 返回是否成功发送验证码
+  Future<bool> requestChangeEmail({
+    required String password,
+    required String newEmail,
+  });
+
+  /// 确认修改邮箱
+  ///
+  /// [newEmail] 新邮箱地址
+  /// [code] 验证码
+  ///
+  /// 返回是否成功修改
+  Future<bool> confirmChangeEmail({
+    required String newEmail,
+    required String code,
+  });
+
+  /// 获取当前绑定的邮箱
+  Future<String?> getBoundEmail();
 }
 
 /// 认证结果
