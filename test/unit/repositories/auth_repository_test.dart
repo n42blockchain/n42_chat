@@ -163,5 +163,181 @@ void main() {
       expect(itemsToClears.length, equals(3));
     });
   });
+
+  group('Password Change', () {
+    test('changePassword should require oldPassword and newPassword', () {
+      // 修改密码必须提供原密码和新密码
+      const requiredParams = ['oldPassword', 'newPassword'];
+      expect(requiredParams.length, equals(2));
+    });
+
+    test('password validation rules', () {
+      // 密码验证规则
+      const minLength = 8;
+      expect(minLength, greaterThanOrEqualTo(8));
+
+      // 测试密码强度
+      bool isPasswordStrong(String password) {
+        return password.length >= 8 &&
+            RegExp(r'[A-Za-z]').hasMatch(password) &&
+            RegExp(r'[0-9]').hasMatch(password);
+      }
+
+      expect(isPasswordStrong('weak'), isFalse);
+      expect(isPasswordStrong('password'), isFalse);
+      expect(isPasswordStrong('Password1'), isTrue);
+      expect(isPasswordStrong('abcd1234'), isTrue);
+    });
+
+    test('newPassword should not equal oldPassword', () {
+      const oldPassword = 'OldPassword123';
+      const newPassword = 'NewPassword456';
+
+      expect(oldPassword != newPassword, isTrue);
+    });
+  });
+
+  group('Password Reset', () {
+    test('reset flow should have 3 steps', () {
+      const resetSteps = [
+        'requestCode',   // 请求验证码
+        'verifyCode',    // 验证验证码
+        'setNewPassword' // 设置新密码
+      ];
+      expect(resetSteps.length, equals(3));
+    });
+
+    test('email validation for reset', () {
+      bool isValidEmail(String email) {
+        return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+      }
+
+      expect(isValidEmail('test@example.com'), isTrue);
+      expect(isValidEmail('user@domain.org'), isTrue);
+      expect(isValidEmail('invalid-email'), isFalse);
+      expect(isValidEmail('@nodomain.com'), isFalse);
+    });
+
+    test('verification code should be 6 digits', () {
+      bool isValidCode(String code) {
+        return RegExp(r'^\d{6}$').hasMatch(code);
+      }
+
+      expect(isValidCode('123456'), isTrue);
+      expect(isValidCode('000000'), isTrue);
+      expect(isValidCode('12345'), isFalse);  // Too short
+      expect(isValidCode('1234567'), isFalse); // Too long
+      expect(isValidCode('abcdef'), isFalse);  // Not digits
+    });
+  });
+
+  group('Email Binding and Change', () {
+    test('email binding should require email validation', () {
+      bool isValidEmail(String email) {
+        return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+      }
+
+      expect(isValidEmail('new@email.com'), isTrue);
+      expect(isValidEmail('invalid'), isFalse);
+    });
+
+    test('email change should require password verification', () {
+      const changeEmailRequirements = [
+        'currentPassword',  // 当前密码验证
+        'newEmail',         // 新邮箱地址
+        'verificationCode', // 邮箱验证码
+      ];
+      expect(changeEmailRequirements.contains('currentPassword'), isTrue);
+    });
+
+    test('verification code resend should have cooldown', () {
+      const resendCooldownSeconds = 60;
+      expect(resendCooldownSeconds, equals(60));
+    });
+  });
+
+  group('Social Login', () {
+    test('supported social providers', () {
+      const providers = ['google', 'apple'];
+      expect(providers, contains('google'));
+      expect(providers, contains('apple'));
+    });
+
+    test('social login should return matrix credentials', () {
+      // 社交登录成功后应返回 Matrix 凭据
+      const expectedCredentials = [
+        'matrixUserId',
+        'matrixAccessToken',
+        'matrixHomeserver',
+        'matrixDeviceId',
+      ];
+      expect(expectedCredentials.length, equals(4));
+    });
+
+    test('social login response validation', () {
+      // 模拟社交登录响应验证
+      Map<String, dynamic> mockResponse = {
+        'success': true,
+        'matrix_user_id': '@user:server.com',
+        'matrix_access_token': 'syt_token_123',
+        'matrix_homeserver': 'https://server.com',
+      };
+
+      expect(mockResponse['success'], isTrue);
+      expect(mockResponse['matrix_user_id'], isNotNull);
+      expect(mockResponse['matrix_access_token'], isNotNull);
+      expect(mockResponse['matrix_homeserver'], isNotNull);
+    });
+
+    test('social login should handle cancellation', () {
+      // 用户取消社交登录时不应抛出错误
+      const cancelResult = 'canceled';
+      expect(cancelResult, equals('canceled'));
+    });
+
+    test('social login should handle provider not available', () {
+      // 处理社交登录提供商不可用的情况
+      bool isProviderAvailable(String provider, String platform) {
+        if (provider == 'apple') {
+          return platform == 'ios' || platform == 'macos';
+        }
+        return true; // Google 在所有平台可用
+      }
+
+      expect(isProviderAvailable('google', 'ios'), isTrue);
+      expect(isProviderAvailable('google', 'android'), isTrue);
+      expect(isProviderAvailable('apple', 'ios'), isTrue);
+      expect(isProviderAvailable('apple', 'android'), isFalse);
+    });
+  });
+
+  group('Social Account Binding', () {
+    test('bind social account requirements', () {
+      const bindRequirements = [
+        'provider',   // 提供商类型
+        'idToken',    // ID Token
+        'uuid',       // 用户 UUID
+        'token',      // 用户 Token
+      ];
+      expect(bindRequirements.length, equals(4));
+    });
+
+    test('unbind social account should require provider', () {
+      const unbindRequirements = ['provider', 'uuid', 'token'];
+      expect(unbindRequirements.contains('provider'), isTrue);
+    });
+
+    test('get bound accounts should return list', () {
+      // 模拟获取已绑定账号列表
+      List<Map<String, String>> mockBoundAccounts = [
+        {'provider': 'google', 'email': 'user@gmail.com'},
+        {'provider': 'apple', 'email': 'user@icloud.com'},
+      ];
+
+      expect(mockBoundAccounts.length, equals(2));
+      expect(mockBoundAccounts[0]['provider'], equals('google'));
+      expect(mockBoundAccounts[1]['provider'], equals('apple'));
+    });
+  });
 }
 

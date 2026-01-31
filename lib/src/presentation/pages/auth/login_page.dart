@@ -8,12 +8,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../services/auth/auth_methods_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import 'register_page.dart';
 import 'email_otp_page.dart';
+import 'reset_password_page.dart';
 
 /// 登录页面
 ///
@@ -43,54 +43,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  /// Convert technical error messages to user-friendly messages
-  String _getFriendlyErrorMessage(dynamic error, String loginMethod) {
-    final errorString = error.toString().toLowerCase();
-
-    // Google Sign In errors
-    if (errorString.contains('google sign in') && errorString.contains('未配置')) {
-      return 'Google Sign In is not available. Please try another login method.';
-    }
-    if (errorString.contains('network_error') || errorString.contains('network error')) {
-      return 'Network error. Please check your internet connection.';
-    }
-    if (errorString.contains('sign_in_canceled') || errorString.contains('canceled')) {
-      return 'Login was canceled.';
-    }
-    if (errorString.contains('sign_in_failed')) {
-      return 'Login failed. Please try again.';
-    }
-
-    // Apple Sign In errors
-    if (errorString.contains('authorizationerrorcode.unknown') ||
-        errorString.contains('error 1000')) {
-      return 'Apple Sign In is not available. Please try another login method.';
-    }
-    if (errorString.contains('authorizationerrorcode.canceled')) {
-      return 'Login was canceled.';
-    }
-    if (errorString.contains('authorizationerrorcode.invalidresponse')) {
-      return 'Invalid response from server. Please try again.';
-    }
-    if (errorString.contains('authorizationerrorcode.nothandled')) {
-      return 'Apple Sign In is not available on this device.';
-    }
-    if (errorString.contains('couldn\'t be completed')) {
-      return 'Apple Sign In is not available. Please try another login method.';
-    }
-
-    // Generic errors
-    if (errorString.contains('timeout') || errorString.contains('timed out')) {
-      return 'Connection timed out. Please try again.';
-    }
-    if (errorString.contains('no internet') || errorString.contains('unreachable')) {
-      return 'Network error. Please check your internet connection.';
-    }
-
-    // Default: return a generic user-friendly message
-    return 'Login failed. Please try again or use another login method.';
-  }
-
   void _onLogin() {
     if (_formKey.currentState?.validate() ?? false) {
       // 微信策略：始终保持登录状态
@@ -111,51 +63,25 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _showForgotPasswordHelp() {
-    final isDark = context.isDarkMode;
+    final homeserver = _homeserverController.text.trim();
+    if (homeserver.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
 
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+    // 跳转到重置密码页面
+    final authBloc = context.read<AuthBloc>();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider.value(
+          value: authBloc,
+          child: ResetPasswordPage(homeserver: homeserver),
         ),
-        title: Text(
-          S.of(context)?.forgotPassword ?? 'Forgot Password',
-          style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'To reset your password, please contact your server administrator.',
-              style: TextStyle(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Server: ${_homeserverController.text.trim().isNotEmpty ? _homeserverController.text.trim() : "Not specified"}',
-              style: TextStyle(
-                color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              S.of(context)?.ok ?? 'OK',
-              style: const TextStyle(color: AppColors.primary),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -787,7 +713,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
   
-  void _loginWithGoogle() async {
+  void _loginWithGoogle() {
     final homeserver = _homeserverController.text.trim();
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -798,37 +724,12 @@ class _LoginPageState extends State<LoginPage> {
       );
       return;
     }
-    
-    try {
-      final authService = AuthMethodsService();
-      final result = await authService.signInWithGoogle();
-      
-      if (result != null && mounted) {
-        // 使用 Google 登录结果进行 Matrix SSO
-        debugPrint('Google login success: ${result.email}');
-        
-        // TODO: 将 Google token 发送到 Matrix 服务器进行验证
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S.of(context)?.googleLoginSuccess(result.email ?? '') ?? 'Google login success: ${result.email}'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        final friendlyMessage = _getFriendlyErrorMessage(e, 'Google');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(friendlyMessage),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
+
+    // 触发 AuthBloc 的 Google 登录事件
+    context.read<AuthBloc>().add(AuthGoogleLoginRequested(homeserver: homeserver));
   }
 
-  void _loginWithApple() async {
+  void _loginWithApple() {
     final homeserver = _homeserverController.text.trim();
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -839,33 +740,9 @@ class _LoginPageState extends State<LoginPage> {
       );
       return;
     }
-    
-    try {
-      final authService = AuthMethodsService();
-      final result = await authService.signInWithApple();
-      
-      if (result != null && mounted) {
-        debugPrint('Apple login success');
-        
-        // TODO: 将 Apple token 发送到 Matrix 服务器进行验证
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S.of(context)?.appleLoginSuccess ?? 'Apple login success'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        final friendlyMessage = _getFriendlyErrorMessage(e, 'Apple');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(friendlyMessage),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
+
+    // 触发 AuthBloc 的 Apple 登录事件
+    context.read<AuthBloc>().add(AuthAppleLoginRequested(homeserver: homeserver));
   }
 
   void _loginWithSso() async {

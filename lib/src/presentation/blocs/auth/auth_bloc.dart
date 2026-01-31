@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/repositories/auth_repository.dart';
+import '../../../services/auth/auth_methods_service.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -28,6 +29,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<UpdateDisplayName>(_onUpdateDisplayName);
     on<UpdateUserProfile>(_onUpdateUserProfile);
     on<LoadUserProfileData>(_onLoadUserProfileData);
+    on<AuthRequestPasswordResetRequested>(_onRequestPasswordReset);
+    on<AuthConfirmPasswordResetRequested>(_onConfirmPasswordReset);
+    on<AuthChangePasswordRequested>(_onChangePassword);
+    on<AuthGoogleLoginRequested>(_onGoogleLogin);
+    on<AuthAppleLoginRequested>(_onAppleLogin);
+    on<AuthSsoLoginRequested>(_onSsoLogin);
+    on<AuthRequestChangeEmailRequested>(_onRequestChangeEmail);
+    on<AuthConfirmChangeEmailRequested>(_onConfirmChangeEmail);
+    on<AuthGetBoundEmailRequested>(_onGetBoundEmail);
 
     // 监听登录状态变化
     _loginStateSubscription = _authRepository.loginStateStream.listen(
@@ -322,6 +332,370 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       // 加载失败不影响整体状态
       debugPrint('AuthBloc: Load profile data failed - $e');
+    }
+  }
+
+  // ============================================
+  // 密码管理
+  // ============================================
+
+  /// 请求重置密码验证码
+  Future<void> _onRequestPasswordReset(
+    AuthRequestPasswordResetRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      passwordResetStatus: PasswordResetStatus.sendingCode,
+      errorMessage: null,
+    ));
+
+    try {
+      final success = await _authRepository.requestPasswordReset(
+        homeserver: event.homeserver,
+        email: event.email,
+      );
+
+      if (success) {
+        emit(state.copyWith(
+          passwordResetStatus: PasswordResetStatus.codeSent,
+        ));
+      } else {
+        emit(state.copyWith(
+          passwordResetStatus: PasswordResetStatus.failed,
+          errorMessage: '发送验证码失败',
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        passwordResetStatus: PasswordResetStatus.failed,
+        errorMessage: '发送验证码失败: $e',
+      ));
+    }
+  }
+
+  /// 确认重置密码
+  Future<void> _onConfirmPasswordReset(
+    AuthConfirmPasswordResetRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      passwordResetStatus: PasswordResetStatus.resetting,
+      errorMessage: null,
+    ));
+
+    try {
+      final success = await _authRepository.confirmPasswordReset(
+        homeserver: event.homeserver,
+        email: event.email,
+        code: event.code,
+        newPassword: event.newPassword,
+      );
+
+      if (success) {
+        emit(state.copyWith(
+          passwordResetStatus: PasswordResetStatus.success,
+        ));
+      } else {
+        emit(state.copyWith(
+          passwordResetStatus: PasswordResetStatus.failed,
+          errorMessage: '重置密码失败',
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        passwordResetStatus: PasswordResetStatus.failed,
+        errorMessage: '重置密码失败: $e',
+      ));
+    }
+  }
+
+  /// 修改密码
+  Future<void> _onChangePassword(
+    AuthChangePasswordRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      changePasswordStatus: ChangePasswordStatus.changing,
+      errorMessage: null,
+    ));
+
+    try {
+      final success = await _authRepository.changePassword(
+        oldPassword: event.oldPassword,
+        newPassword: event.newPassword,
+      );
+
+      if (success) {
+        emit(state.copyWith(
+          changePasswordStatus: ChangePasswordStatus.success,
+        ));
+        // 修改密码成功后自动登出
+        add(const AuthLogoutRequested());
+      } else {
+        emit(state.copyWith(
+          changePasswordStatus: ChangePasswordStatus.failed,
+          errorMessage: '修改密码失败',
+        ));
+      }
+    } catch (e) {
+      String errorMessage = '修改密码失败';
+      if (e.toString().contains('M_FORBIDDEN') ||
+          e.toString().contains('M_UNAUTHORIZED')) {
+        errorMessage = '原密码错误';
+      }
+      emit(state.copyWith(
+        changePasswordStatus: ChangePasswordStatus.failed,
+        errorMessage: errorMessage,
+      ));
+    }
+  }
+
+  // ============================================
+  // 第三方登录
+  // ============================================
+
+  /// Google 登录
+  Future<void> _onGoogleLogin(
+    AuthGoogleLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.loading,
+      errorMessage: null,
+    ));
+
+    try {
+      final authService = AuthMethodsService();
+      final googleResult = await authService.signInWithGoogle();
+
+      if (googleResult == null) {
+        emit(state.copyWith(
+          status: AuthStatus.unauthenticated,
+          errorMessage: '登录已取消',
+        ));
+        return;
+      }
+
+      // 尝试使用 Google token 进行 Matrix SSO 登录
+      final result = await _authRepository.loginWithSocialToken(
+        homeserver: event.homeserver,
+        provider: 'google',
+        idToken: googleResult.idToken,
+        accessToken: googleResult.accessToken,
+        email: googleResult.email,
+        displayName: googleResult.displayName,
+      );
+
+      if (result.success && result.user != null) {
+        emit(state.copyWith(
+          status: AuthStatus.authenticated,
+          user: result.user,
+        ));
+        add(const LoadUserProfileData());
+      } else {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage ?? 'Google 登录失败',
+          errorType: result.errorType,
+        ));
+      }
+    } catch (e) {
+      debugPrint('AuthBloc: Google login failed - $e');
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Google 登录失败: $e',
+      ));
+    }
+  }
+
+  /// Apple 登录
+  Future<void> _onAppleLogin(
+    AuthAppleLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.loading,
+      errorMessage: null,
+    ));
+
+    try {
+      final authService = AuthMethodsService();
+      final appleResult = await authService.signInWithApple();
+
+      if (appleResult == null) {
+        emit(state.copyWith(
+          status: AuthStatus.unauthenticated,
+          errorMessage: '登录已取消',
+        ));
+        return;
+      }
+
+      // 尝试使用 Apple token 进行 Matrix SSO 登录
+      final result = await _authRepository.loginWithSocialToken(
+        homeserver: event.homeserver,
+        provider: 'apple',
+        idToken: appleResult.idToken,
+        accessToken: appleResult.accessToken,
+        email: appleResult.email,
+        displayName: appleResult.displayName,
+      );
+
+      if (result.success && result.user != null) {
+        emit(state.copyWith(
+          status: AuthStatus.authenticated,
+          user: result.user,
+        ));
+        add(const LoadUserProfileData());
+      } else {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage ?? 'Apple 登录失败',
+          errorType: result.errorType,
+        ));
+      }
+    } catch (e) {
+      debugPrint('AuthBloc: Apple login failed - $e');
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Apple 登录失败: $e',
+      ));
+    }
+  }
+
+  /// SSO 登录
+  Future<void> _onSsoLogin(
+    AuthSsoLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.loading,
+      errorMessage: null,
+    ));
+
+    try {
+      // 获取 SSO 登录 URL 并启动浏览器
+      final result = await _authRepository.startSsoLogin(
+        homeserver: event.homeserver,
+        providerId: event.providerId,
+      );
+
+      if (result.success) {
+        // SSO 登录需要在浏览器中完成，状态会在回调中更新
+        emit(state.copyWith(
+          status: AuthStatus.unauthenticated,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage ?? 'SSO 登录失败',
+          errorType: result.errorType,
+        ));
+      }
+    } catch (e) {
+      debugPrint('AuthBloc: SSO login failed - $e');
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'SSO 登录失败: $e',
+      ));
+    }
+  }
+
+  // ============================================
+  // 邮箱管理
+  // ============================================
+
+  /// 请求修改邮箱
+  Future<void> _onRequestChangeEmail(
+    AuthRequestChangeEmailRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      changeEmailStatus: ChangeEmailStatus.sendingCode,
+      errorMessage: null,
+    ));
+
+    try {
+      final success = await _authRepository.requestChangeEmail(
+        password: event.password,
+        newEmail: event.newEmail,
+      );
+
+      if (success) {
+        emit(state.copyWith(
+          changeEmailStatus: ChangeEmailStatus.codeSent,
+        ));
+      } else {
+        emit(state.copyWith(
+          changeEmailStatus: ChangeEmailStatus.failed,
+          errorMessage: '发送验证码失败',
+        ));
+      }
+    } catch (e) {
+      String errorMessage = '发送验证码失败';
+      if (e.toString().contains('M_FORBIDDEN') ||
+          e.toString().contains('M_UNAUTHORIZED')) {
+        errorMessage = '密码错误';
+      } else if (e.toString().contains('M_THREEPID_IN_USE')) {
+        errorMessage = '该邮箱已被其他账号绑定';
+      }
+      emit(state.copyWith(
+        changeEmailStatus: ChangeEmailStatus.failed,
+        errorMessage: errorMessage,
+      ));
+    }
+  }
+
+  /// 确认修改邮箱
+  Future<void> _onConfirmChangeEmail(
+    AuthConfirmChangeEmailRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      changeEmailStatus: ChangeEmailStatus.confirming,
+      errorMessage: null,
+    ));
+
+    try {
+      final success = await _authRepository.confirmChangeEmail(
+        newEmail: event.newEmail,
+        code: event.code,
+      );
+
+      if (success) {
+        emit(state.copyWith(
+          changeEmailStatus: ChangeEmailStatus.success,
+          boundEmail: event.newEmail,
+        ));
+      } else {
+        emit(state.copyWith(
+          changeEmailStatus: ChangeEmailStatus.failed,
+          errorMessage: '修改邮箱失败',
+        ));
+      }
+    } catch (e) {
+      String errorMessage = '修改邮箱失败';
+      if (e.toString().contains('M_THREEPID_AUTH_FAILED')) {
+        errorMessage = '验证码错误或已过期';
+      }
+      emit(state.copyWith(
+        changeEmailStatus: ChangeEmailStatus.failed,
+        errorMessage: errorMessage,
+      ));
+    }
+  }
+
+  /// 获取绑定邮箱
+  Future<void> _onGetBoundEmail(
+    AuthGetBoundEmailRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      final email = await _authRepository.getBoundEmail();
+      emit(state.copyWith(
+        boundEmail: email,
+      ));
+    } catch (e) {
+      debugPrint('AuthBloc: Get bound email failed - $e');
     }
   }
 

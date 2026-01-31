@@ -14,6 +14,9 @@ class SettingsPage extends StatelessWidget {
   final VoidCallback? onPrivacy;
   final VoidCallback? onAppearance;
   final VoidCallback? onChat;
+  final VoidCallback? onSecurity;
+  final VoidCallback? onChangePassword;
+  final VoidCallback? onChangeEmail;
   final VoidCallback? onAbout;
   final VoidCallback? onLogout;
 
@@ -25,6 +28,9 @@ class SettingsPage extends StatelessWidget {
     this.onPrivacy,
     this.onAppearance,
     this.onChat,
+    this.onSecurity,
+    this.onChangePassword,
+    this.onChangeEmail,
     this.onAbout,
     this.onLogout,
   });
@@ -91,7 +97,36 @@ class SettingsPage extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // 设置组3：关于
+          // 设置组3：账号安全
+          _SettingsGroup(
+            children: [
+              _SettingsItem(
+                icon: Icons.security_outlined,
+                iconColor: Colors.teal,
+                title: S.of(context)?.security ?? 'Security',
+                onTap: onSecurity,
+                isDark: isDark,
+              ),
+              _SettingsItem(
+                icon: Icons.lock_outline,
+                iconColor: Colors.indigo,
+                title: S.of(context)?.changePassword ?? 'Change Password',
+                onTap: onChangePassword,
+                isDark: isDark,
+              ),
+              _SettingsItem(
+                icon: Icons.email_outlined,
+                iconColor: Colors.cyan,
+                title: S.of(context)?.changeEmail ?? 'Change Email',
+                onTap: onChangeEmail,
+                isDark: isDark,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // 设置组4：关于
           _SettingsGroup(
             children: [
               _SettingsItem(

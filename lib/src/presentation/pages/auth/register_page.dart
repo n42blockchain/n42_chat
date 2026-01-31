@@ -22,6 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _homeserverController = TextEditingController(text: 'https://m.si46.world');
   final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   // 内置邀请码
@@ -38,6 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void dispose() {
     _homeserverController.dispose();
     _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _inviteCodeController.dispose();
@@ -57,10 +59,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (_formKey.currentState?.validate() ?? false) {
       final inviteCode = _inviteCodeController.text.trim();
+      final email = _emailController.text.trim();
       context.read<AuthBloc>().add(AuthRegisterRequested(
             homeserver: _homeserverController.text.trim(),
             username: _usernameController.text.trim(),
             password: _passwordController.text,
+            email: email.isNotEmpty ? email : null,
             registrationToken: inviteCode.isNotEmpty ? inviteCode : null,
           ));
     }
@@ -137,6 +141,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // 用户名输入
                   _buildUsernameInput(isDarkMode),
+
+                  const SizedBox(height: 16),
+
+                  // 邮箱输入
+                  _buildEmailInput(isDarkMode),
 
                   const SizedBox(height: 16),
 
@@ -351,6 +360,81 @@ class _RegisterPageState extends State<RegisterPage> {
             }
             return null;
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmailInput(bool isDark) {
+    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              S.of(context)?.emailAddress ?? 'Email Address',
+              style: TextStyle(
+                fontSize: 14,
+                color: labelColor,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '(${S.of(context)?.optional ?? 'Optional'})',
+              style: TextStyle(
+                fontSize: 12,
+                color: hintColor,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _emailController,
+          style: TextStyle(color: textColor, fontSize: 16),
+          decoration: InputDecoration(
+            hintText: S.of(context)?.enterEmailAddress ?? 'Enter email address',
+            hintStyle: TextStyle(color: hintColor, fontSize: 14),
+            filled: true,
+            fillColor: inputBgColor,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
+            prefixIcon: Icon(
+              Icons.email_outlined,
+              color: hintColor,
+            ),
+          ),
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+          validator: (value) {
+            // 邮箱是可选的，但如果填写了需要验证格式
+            if (value != null && value.isNotEmpty) {
+              final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+              if (!emailRegex.hasMatch(value)) {
+                return S.of(context)?.invalidEmailFormat ?? 'Please enter a valid email address';
+              }
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 4),
+        Text(
+          S.of(context)?.emailRecoveryHint ?? 'Used for password recovery',
+          style: TextStyle(
+            fontSize: 11,
+            color: hintColor,
+          ),
         ),
       ],
     );

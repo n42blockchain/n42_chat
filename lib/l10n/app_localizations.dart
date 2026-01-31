@@ -7488,6 +7488,174 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'谁可以看到 {title}'**
   String whoCanSeeTitle(String title);
+
+  /// No description provided for @emailAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'邮箱地址'**
+  String get emailAddress;
+
+  /// No description provided for @enterEmailAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入邮箱地址'**
+  String get enterEmailAddress;
+
+  /// No description provided for @emailRecoveryHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'用于找回密码'**
+  String get emailRecoveryHint;
+
+  /// No description provided for @invalidEmailFormat.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入有效的邮箱地址'**
+  String get invalidEmailFormat;
+
+  /// No description provided for @optional.
+  ///
+  /// In zh, this message translates to:
+  /// **'选填'**
+  String get optional;
+
+  /// No description provided for @resetPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置密码'**
+  String get resetPassword;
+
+  /// No description provided for @resetPasswordTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置您的密码'**
+  String get resetPasswordTitle;
+
+  /// No description provided for @enterRegisteredEmail.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入注册时绑定的邮箱地址'**
+  String get enterRegisteredEmail;
+
+  /// No description provided for @sendResetCode.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送重置验证码'**
+  String get sendResetCode;
+
+  /// No description provided for @resetCodeSent.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置验证码已发送至 {email}'**
+  String resetCodeSent(String email);
+
+  /// No description provided for @enterResetCode.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入重置验证码'**
+  String get enterResetCode;
+
+  /// No description provided for @setNewPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置新密码'**
+  String get setNewPassword;
+
+  /// No description provided for @confirmNewPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认新密码'**
+  String get confirmNewPassword;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'新密码'**
+  String get newPassword;
+
+  /// No description provided for @passwordResetSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码重置成功，请使用新密码登录'**
+  String get passwordResetSuccess;
+
+  /// No description provided for @resetPasswordFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置密码失败'**
+  String get resetPasswordFailed;
+
+  /// No description provided for @changePassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改密码'**
+  String get changePassword;
+
+  /// No description provided for @currentPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前密码'**
+  String get currentPassword;
+
+  /// No description provided for @enterCurrentPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入当前密码'**
+  String get enterCurrentPassword;
+
+  /// No description provided for @enterNewPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入新密码'**
+  String get enterNewPassword;
+
+  /// No description provided for @passwordChanged.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码修改成功，请使用新密码重新登录'**
+  String get passwordChanged;
+
+  /// No description provided for @changePasswordFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改密码失败'**
+  String get changePasswordFailed;
+
+  /// No description provided for @incorrectCurrentPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前密码错误'**
+  String get incorrectCurrentPassword;
+
+  /// No description provided for @newPasswordMustBeDifferent.
+  ///
+  /// In zh, this message translates to:
+  /// **'新密码不能与当前密码相同'**
+  String get newPasswordMustBeDifferent;
+
+  /// No description provided for @changePasswordInfo.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改密码后，您将被登出，需要使用新密码重新登录。'**
+  String get changePasswordInfo;
+
+  /// No description provided for @passwordRequirements.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码要求：'**
+  String get passwordRequirements;
+
+  /// No description provided for @securityNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'为了安全，修改密码后需要在所有设备上重新登录。'**
+  String get securityNote;
+
+  /// No description provided for @security.
+  ///
+  /// In zh, this message translates to:
+  /// **'安全'**
+  String get security;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

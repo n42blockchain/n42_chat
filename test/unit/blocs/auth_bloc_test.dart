@@ -157,4 +157,224 @@ void main() {
       ],
     );
   });
+
+  group('Password Change', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits [changingPassword, success, loading, unauthenticated] when change password succeeds',
+      build: () {
+        when(() => mockAuthRepository.changePassword(
+              oldPassword: any(named: 'oldPassword'),
+              newPassword: any(named: 'newPassword'),
+            )).thenAnswer((_) async => true);
+        // Mock logout since changePassword triggers logout on success
+        when(() => mockAuthRepository.logout()).thenAnswer((_) async {});
+        return AuthBloc(authRepository: mockAuthRepository);
+      },
+      act: (bloc) => bloc.add(const AuthChangePasswordRequested(
+        oldPassword: 'oldPass123',
+        newPassword: 'newPass456',
+      )),
+      expect: () => [
+        isA<AuthState>()
+            .having((s) => s.changePasswordStatus, 'status', ChangePasswordStatus.changing),
+        isA<AuthState>()
+            .having((s) => s.changePasswordStatus, 'status', ChangePasswordStatus.success),
+        // After success, logout is triggered
+        isA<AuthState>()
+            .having((s) => s.status, 'status', AuthStatus.loading),
+        isA<AuthState>()
+            .having((s) => s.status, 'status', AuthStatus.unauthenticated),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [changingPassword, failed] when change password fails with wrong password',
+      build: () {
+        when(() => mockAuthRepository.changePassword(
+              oldPassword: any(named: 'oldPassword'),
+              newPassword: any(named: 'newPassword'),
+            )).thenAnswer((_) async => false);
+        return AuthBloc(authRepository: mockAuthRepository);
+      },
+      act: (bloc) => bloc.add(const AuthChangePasswordRequested(
+        oldPassword: 'wrongOldPass',
+        newPassword: 'newPass456',
+      )),
+      expect: () => [
+        isA<AuthState>()
+            .having((s) => s.changePasswordStatus, 'status', ChangePasswordStatus.changing),
+        isA<AuthState>()
+            .having((s) => s.changePasswordStatus, 'status', ChangePasswordStatus.failed),
+      ],
+    );
+  });
+
+  group('Password Reset', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits [sendingCode, codeSent] when request reset code succeeds',
+      build: () {
+        when(() => mockAuthRepository.requestPasswordReset(
+              homeserver: any(named: 'homeserver'),
+              email: any(named: 'email'),
+            )).thenAnswer((_) async => true);
+        return AuthBloc(authRepository: mockAuthRepository);
+      },
+      act: (bloc) => bloc.add(const AuthRequestPasswordResetRequested(
+        homeserver: 'https://server.com',
+        email: 'test@example.com',
+      )),
+      expect: () => [
+        isA<AuthState>()
+            .having((s) => s.passwordResetStatus, 'status', PasswordResetStatus.sendingCode),
+        isA<AuthState>()
+            .having((s) => s.passwordResetStatus, 'status', PasswordResetStatus.codeSent),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [sendingCode, failed] when request reset code fails',
+      build: () {
+        when(() => mockAuthRepository.requestPasswordReset(
+              homeserver: any(named: 'homeserver'),
+              email: any(named: 'email'),
+            )).thenAnswer((_) async => false);
+        return AuthBloc(authRepository: mockAuthRepository);
+      },
+      act: (bloc) => bloc.add(const AuthRequestPasswordResetRequested(
+        homeserver: 'https://server.com',
+        email: 'notfound@example.com',
+      )),
+      expect: () => [
+        isA<AuthState>()
+            .having((s) => s.passwordResetStatus, 'status', PasswordResetStatus.sendingCode),
+        isA<AuthState>()
+            .having((s) => s.passwordResetStatus, 'status', PasswordResetStatus.failed),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [resetting, success] when confirm reset succeeds',
+      build: () {
+        when(() => mockAuthRepository.confirmPasswordReset(
+              homeserver: any(named: 'homeserver'),
+              email: any(named: 'email'),
+              code: any(named: 'code'),
+              newPassword: any(named: 'newPassword'),
+            )).thenAnswer((_) async => true);
+        return AuthBloc(authRepository: mockAuthRepository);
+      },
+      act: (bloc) => bloc.add(const AuthConfirmPasswordResetRequested(
+        homeserver: 'https://server.com',
+        email: 'test@example.com',
+        code: '123456',
+        newPassword: 'newPassword123',
+      )),
+      expect: () => [
+        isA<AuthState>()
+            .having((s) => s.passwordResetStatus, 'status', PasswordResetStatus.resetting),
+        isA<AuthState>()
+            .having((s) => s.passwordResetStatus, 'status', PasswordResetStatus.success),
+      ],
+    );
+  });
+
+  group('Email Change', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits [sendingCode, codeSent] when request email change succeeds',
+      build: () {
+        when(() => mockAuthRepository.requestChangeEmail(
+              password: any(named: 'password'),
+              newEmail: any(named: 'newEmail'),
+            )).thenAnswer((_) async => true);
+        return AuthBloc(authRepository: mockAuthRepository);
+      },
+      act: (bloc) => bloc.add(const AuthRequestChangeEmailRequested(
+        password: 'password123',
+        newEmail: 'newemail@example.com',
+      )),
+      expect: () => [
+        isA<AuthState>()
+            .having((s) => s.changeEmailStatus, 'status', ChangeEmailStatus.sendingCode),
+        isA<AuthState>()
+            .having((s) => s.changeEmailStatus, 'status', ChangeEmailStatus.codeSent),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [confirming, success] when confirm email change succeeds',
+      build: () {
+        when(() => mockAuthRepository.confirmChangeEmail(
+              newEmail: any(named: 'newEmail'),
+              code: any(named: 'code'),
+            )).thenAnswer((_) async => true);
+        return AuthBloc(authRepository: mockAuthRepository);
+      },
+      act: (bloc) => bloc.add(const AuthConfirmChangeEmailRequested(
+        newEmail: 'newemail@example.com',
+        code: '123456',
+      )),
+      expect: () => [
+        isA<AuthState>()
+            .having((s) => s.changeEmailStatus, 'status', ChangeEmailStatus.confirming),
+        isA<AuthState>()
+            .having((s) => s.changeEmailStatus, 'status', ChangeEmailStatus.success),
+      ],
+    );
+  });
+
+  group('Social Login', () {
+    // Note: Google and Apple login tests are limited because AuthMethodsService
+    // is created internally in AuthBloc. Full integration tests should be used
+    // to verify the complete social login flow.
+
+    test('Google login event should have homeserver parameter', () {
+      const event = AuthGoogleLoginRequested(homeserver: 'https://server.com');
+      expect(event.homeserver, equals('https://server.com'));
+    });
+
+    test('Apple login event should have homeserver parameter', () {
+      const event = AuthAppleLoginRequested(homeserver: 'https://server.com');
+      expect(event.homeserver, equals('https://server.com'));
+    });
+
+    test('SSO login event should have homeserver parameter', () {
+      const event = AuthSsoLoginRequested(homeserver: 'https://server.com');
+      expect(event.homeserver, equals('https://server.com'));
+    });
+
+    test('loginWithSocialToken should be available in repository', () {
+      // Verify the repository interface has the required method
+      when(() => mockAuthRepository.loginWithSocialToken(
+            homeserver: any(named: 'homeserver'),
+            provider: any(named: 'provider'),
+            idToken: any(named: 'idToken'),
+            accessToken: any(named: 'accessToken'),
+            email: any(named: 'email'),
+            displayName: any(named: 'displayName'),
+          )).thenAnswer((_) async => AuthResult.success(testUser));
+
+      // Method should be callable
+      expect(
+        () => mockAuthRepository.loginWithSocialToken(
+          homeserver: 'https://server.com',
+          provider: 'google',
+        ),
+        returnsNormally,
+      );
+    });
+
+    test('startSsoLogin should be available in repository', () {
+      when(() => mockAuthRepository.startSsoLogin(
+            homeserver: any(named: 'homeserver'),
+            providerId: any(named: 'providerId'),
+          )).thenAnswer((_) async => AuthResult.success(testUser));
+
+      expect(
+        () => mockAuthRepository.startSsoLogin(
+          homeserver: 'https://server.com',
+        ),
+        returnsNormally,
+      );
+    });
+  });
 }

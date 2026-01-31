@@ -220,13 +220,100 @@ class AuthAppleLoginRequested extends AuthEvent {
 class AuthSsoLoginRequested extends AuthEvent {
   final String homeserver;
   final String? providerId;
-  
+
   const AuthSsoLoginRequested({
     required this.homeserver,
     this.providerId,
   });
-  
+
   @override
   List<Object?> get props => [homeserver, providerId];
+}
+
+// ============================================
+// 密码管理事件
+// ============================================
+
+/// 请求重置密码验证码
+class AuthRequestPasswordResetRequested extends AuthEvent {
+  final String homeserver;
+  final String email;
+
+  const AuthRequestPasswordResetRequested({
+    required this.homeserver,
+    required this.email,
+  });
+
+  @override
+  List<Object?> get props => [homeserver, email];
+}
+
+/// 确认重置密码
+class AuthConfirmPasswordResetRequested extends AuthEvent {
+  final String homeserver;
+  final String email;
+  final String code;
+  final String newPassword;
+
+  const AuthConfirmPasswordResetRequested({
+    required this.homeserver,
+    required this.email,
+    required this.code,
+    required this.newPassword,
+  });
+
+  @override
+  List<Object?> get props => [homeserver, email, code, newPassword];
+}
+
+/// 修改密码请求
+class AuthChangePasswordRequested extends AuthEvent {
+  final String oldPassword;
+  final String newPassword;
+
+  const AuthChangePasswordRequested({
+    required this.oldPassword,
+    required this.newPassword,
+  });
+
+  @override
+  List<Object?> get props => [oldPassword, newPassword];
+}
+
+// ============================================
+// 邮箱管理事件
+// ============================================
+
+/// 请求修改绑定邮箱
+class AuthRequestChangeEmailRequested extends AuthEvent {
+  final String password;
+  final String newEmail;
+
+  const AuthRequestChangeEmailRequested({
+    required this.password,
+    required this.newEmail,
+  });
+
+  @override
+  List<Object?> get props => [password, newEmail];
+}
+
+/// 确认修改绑定邮箱
+class AuthConfirmChangeEmailRequested extends AuthEvent {
+  final String newEmail;
+  final String code;
+
+  const AuthConfirmChangeEmailRequested({
+    required this.newEmail,
+    required this.code,
+  });
+
+  @override
+  List<Object?> get props => [newEmail, code];
+}
+
+/// 获取绑定邮箱
+class AuthGetBoundEmailRequested extends AuthEvent {
+  const AuthGetBoundEmailRequested();
 }
 

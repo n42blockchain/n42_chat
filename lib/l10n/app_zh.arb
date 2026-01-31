@@ -2106,5 +2106,60 @@
     "placeholders": {
       "title": {"type": "String"}
     }
-  }
+  },
+
+  "emailAddress": "邮箱地址",
+  "enterEmailAddress": "请输入邮箱地址",
+  "emailRecoveryHint": "用于找回密码",
+  "invalidEmailFormat": "请输入有效的邮箱地址",
+  "optional": "选填",
+
+  "resetPassword": "重置密码",
+  "resetPasswordTitle": "重置您的密码",
+  "enterRegisteredEmail": "请输入注册时绑定的邮箱地址",
+  "sendResetCode": "发送重置验证码",
+  "resetCodeSent": "重置验证码已发送至 {email}",
+  "@resetCodeSent": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "enterResetCode": "输入重置验证码",
+  "setNewPassword": "设置新密码",
+  "confirmNewPassword": "确认新密码",
+  "newPassword": "新密码",
+  "passwordResetSuccess": "密码重置成功，请使用新密码登录",
+  "resetPasswordFailed": "重置密码失败",
+
+  "changePassword": "修改密码",
+  "currentPassword": "当前密码",
+  "enterCurrentPassword": "请输入当前密码",
+  "enterNewPassword": "请输入新密码",
+  "passwordChanged": "密码修改成功，请使用新密码重新登录",
+  "changePasswordFailed": "修改密码失败",
+  "incorrectCurrentPassword": "当前密码错误",
+  "newPasswordMustBeDifferent": "新密码不能与当前密码相同",
+  "changePasswordInfo": "修改密码后，您将被登出，需要使用新密码重新登录。",
+  "passwordRequirements": "密码要求：",
+  "securityNote": "为了安全，修改密码后需要在所有设备上重新登录。",
+
+  "security": "安全",
+
+  "currentBoundEmail": "当前绑定邮箱",
+  "newEmailAddress": "新邮箱地址",
+  "enterNewEmail": "请输入新邮箱地址",
+  "verificationCode": "验证码",
+  "verificationCodeSent": "验证码已发送",
+  "codeSentTo": "验证码已发送至",
+  "didNotReceiveCode": "没有收到验证码？",
+  "resend": "重新发送",
+  "emailChangedSuccess": "邮箱修改成功",
+  "changeEmailFailed": "修改邮箱失败",
+  "emailSecurityNote": "邮箱用于密码找回，请确保安全。",
+
+  "googleLogin": "使用 Google 登录",
+  "appleLogin": "使用 Apple 登录",
+  "socialLoginCancelled": "登录已取消",
+  "socialLoginFailed": "社交登录失败",
+  "enterServerAddressFirst": "请先输入服务器地址"
 }
