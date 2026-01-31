@@ -4284,4 +4284,60 @@ class SFr extends S {
 
   @override
   String get languageChanged => 'Langue modifiée';
+
+  @override
+  String get biometricLogin => '生物识别登录';
+
+  @override
+  String loginWithBiometric(Object type) {
+    return '使用$type登录';
+  }
+
+  @override
+  String get biometricLoginEnabled => '生物识别登录已启用';
+
+  @override
+  String get biometricLoginDisabled => '生物识别登录已禁用';
+
+  @override
+  String get enableBiometricLogin => '启用生物识别登录';
+
+  @override
+  String get disableBiometricLogin => '禁用生物识别登录';
+
+  @override
+  String get biometricNotAvailable => '此设备不支持生物识别';
+
+  @override
+  String get biometricNotEnrolled => '未录入生物识别数据，请在设备设置中设置';
+
+  @override
+  String get biometricAuthFailed => '生物识别验证失败';
+
+  @override
+  String get biometricAuthCancelled => '验证已取消';
+
+  @override
+  String get biometricLockedOut => '尝试次数过多，请稍后再试';
+
+  @override
+  String get useBiometricToLogin => '使用生物识别快速登录';
+
+  @override
+  String get authenticateToLogin => '验证身份以登录';
+
+  @override
+  String get authenticateToEnable => '验证身份以启用生物识别登录';
+
+  @override
+  String get faceId => '面容 ID';
+
+  @override
+  String get touchId => '触控 ID';
+
+  @override
+  String get fingerprint => '指纹';
+
+  @override
+  String get biometric => '生物识别';
 }

@@ -131,6 +131,15 @@ class AuthState extends Equatable {
   /// 绑定的邮箱
   final String? boundEmail;
 
+  /// 生物识别是否可用（设备支持）
+  final bool isBiometricAvailable;
+
+  /// 生物识别是否已启用（用户设置）
+  final bool isBiometricEnabled;
+
+  /// 生物识别类型描述（Face ID / Touch ID / Fingerprint）
+  final String? biometricTypeDescription;
+
   const AuthState({
     required this.status,
     this.user,
@@ -143,6 +152,9 @@ class AuthState extends Equatable {
     this.changePasswordStatus = ChangePasswordStatus.initial,
     this.changeEmailStatus = ChangeEmailStatus.initial,
     this.boundEmail,
+    this.isBiometricAvailable = false,
+    this.isBiometricEnabled = false,
+    this.biometricTypeDescription,
   });
 
   /// 初始状态
@@ -157,7 +169,10 @@ class AuthState extends Equatable {
         passwordResetStatus = PasswordResetStatus.initial,
         changePasswordStatus = ChangePasswordStatus.initial,
         changeEmailStatus = ChangeEmailStatus.initial,
-        boundEmail = null;
+        boundEmail = null,
+        isBiometricAvailable = false,
+        isBiometricEnabled = false,
+        biometricTypeDescription = null;
 
   /// 是否正在加载
   bool get isLoading =>
@@ -190,6 +205,9 @@ class AuthState extends Equatable {
     ChangePasswordStatus? changePasswordStatus,
     ChangeEmailStatus? changeEmailStatus,
     String? boundEmail,
+    bool? isBiometricAvailable,
+    bool? isBiometricEnabled,
+    String? biometricTypeDescription,
   }) {
     return AuthState(
       status: status ?? this.status,
@@ -204,6 +222,9 @@ class AuthState extends Equatable {
       changePasswordStatus: changePasswordStatus ?? this.changePasswordStatus,
       changeEmailStatus: changeEmailStatus ?? this.changeEmailStatus,
       boundEmail: boundEmail ?? this.boundEmail,
+      isBiometricAvailable: isBiometricAvailable ?? this.isBiometricAvailable,
+      isBiometricEnabled: isBiometricEnabled ?? this.isBiometricEnabled,
+      biometricTypeDescription: biometricTypeDescription ?? this.biometricTypeDescription,
     );
   }
 
@@ -220,6 +241,9 @@ class AuthState extends Equatable {
         changePasswordStatus,
         changeEmailStatus,
         boundEmail,
+        isBiometricAvailable,
+        isBiometricEnabled,
+        biometricTypeDescription,
       ];
 
   @override

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/services/biometric_service.dart';
+import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../n42_chat.dart';
 import '../../../services/auth/auth_methods_service.dart';
@@ -14,11 +16,17 @@ import 'auth_state.dart';
 /// 管理用户认证状态
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final IAuthRepository _authRepository;
+  final BiometricService _biometricService;
+  final SecureStorageDataSource _secureStorage;
   StreamSubscription<bool>? _loginStateSubscription;
 
   AuthBloc({
     required IAuthRepository authRepository,
+    BiometricService? biometricService,
+    SecureStorageDataSource? secureStorage,
   })  : _authRepository = authRepository,
+        _biometricService = biometricService ?? BiometricService(),
+        _secureStorage = secureStorage ?? SecureStorageDataSource(),
         super(const AuthState.initial()) {
     on<AuthCheckRequested>(_onCheckRequested);
     on<AuthLoginRequested>(_onLoginRequested);
@@ -39,6 +47,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthRequestChangeEmailRequested>(_onRequestChangeEmail);
     on<AuthConfirmChangeEmailRequested>(_onConfirmChangeEmail);
     on<AuthGetBoundEmailRequested>(_onGetBoundEmail);
+    on<AuthBiometricLoginRequested>(_onBiometricLogin);
+    on<AuthCheckBiometricAvailability>(_onCheckBiometricAvailability);
+    on<AuthEnableBiometricLogin>(_onEnableBiometricLogin);
+    on<AuthDisableBiometricLogin>(_onDisableBiometricLogin);
 
     // 监听登录状态变化
     _loginStateSubscription = _authRepository.loginStateStream.listen(
@@ -724,6 +736,200 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
     } catch (e) {
       debugPrint('AuthBloc: Get bound email failed - $e');
+    }
+  }
+
+  // ============================================
+  // 生物识别登录
+  // ============================================
+
+  /// 检查生物识别可用性
+  Future<void> _onCheckBiometricAvailability(
+    AuthCheckBiometricAvailability event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      final isAvailable = await _biometricService.isAvailable();
+      final isEnabled = await _secureStorage.isBiometricEnabled();
+      final typeDescription = isAvailable
+          ? await _biometricService.getBiometricTypeDescription()
+          : null;
+
+      emit(state.copyWith(
+        isBiometricAvailable: isAvailable,
+        isBiometricEnabled: isEnabled,
+        biometricTypeDescription: typeDescription,
+      ));
+
+      debugPrint('AuthBloc: Biometric availability - available: $isAvailable, enabled: $isEnabled, type: $typeDescription');
+    } catch (e) {
+      debugPrint('AuthBloc: Check biometric availability failed - $e');
+    }
+  }
+
+  /// 生物识别登录
+  Future<void> _onBiometricLogin(
+    AuthBiometricLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.loading,
+      errorMessage: null,
+    ));
+
+    try {
+      // 检查生物识别是否可用
+      final isAvailable = await _biometricService.isAvailable();
+      if (!isAvailable) {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Biometric authentication not available',
+        ));
+        return;
+      }
+
+      // 检查是否已启用生物识别
+      final isEnabled = await _secureStorage.isBiometricEnabled();
+      if (!isEnabled) {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Biometric login not enabled',
+        ));
+        return;
+      }
+
+      // 获取保存的凭据
+      final credentials = await _secureStorage.getCredentials();
+      if (credentials == null) {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'No saved credentials found',
+        ));
+        return;
+      }
+
+      // 执行生物识别认证
+      final biometricResult = await _biometricService.authenticate(
+        reason: 'Authenticate to login',
+      );
+
+      if (!biometricResult.success) {
+        emit(state.copyWith(
+          status: AuthStatus.unauthenticated,
+          errorMessage: biometricResult.errorMessage,
+        ));
+        return;
+      }
+
+      // 生物识别成功，使用保存的凭据登录
+      final homeserver = credentials['homeserver']!;
+      final username = credentials['username']!;
+      final password = credentials['password']!;
+
+      final result = await _authRepository.login(
+        homeserver: homeserver,
+        username: username,
+        password: password,
+        rememberMe: true,
+      );
+
+      if (result.success && result.user != null) {
+        emit(state.copyWith(
+          status: AuthStatus.authenticated,
+          user: result.user,
+        ));
+        // 登录成功后自动加载完整用户资料
+        add(const LoadUserProfileData());
+        // 登录成功后注册推送通知
+        _registerPushNotifications();
+      } else {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage ?? 'Login failed',
+          errorType: result.errorType,
+        ));
+      }
+    } catch (e) {
+      debugPrint('AuthBloc: Biometric login failed - $e');
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Biometric login failed: $e',
+      ));
+    }
+  }
+
+  /// 启用生物识别登录
+  Future<void> _onEnableBiometricLogin(
+    AuthEnableBiometricLogin event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      // 检查生物识别是否可用
+      final isAvailable = await _biometricService.isAvailable();
+      if (!isAvailable) {
+        emit(state.copyWith(
+          errorMessage: 'Biometric authentication not available on this device',
+        ));
+        return;
+      }
+
+      // 获取当前保存的凭据
+      final credentials = await _secureStorage.getCredentials();
+      if (credentials == null) {
+        emit(state.copyWith(
+          errorMessage: 'Please login first to enable biometric login',
+        ));
+        return;
+      }
+
+      // 执行生物识别验证
+      final result = await _biometricService.authenticate(
+        reason: 'Authenticate to enable biometric login',
+      );
+
+      if (result.success) {
+        // 启用生物识别
+        await _secureStorage.enableBiometricLogin(
+          homeserver: credentials['homeserver']!,
+          username: credentials['username']!,
+        );
+
+        emit(state.copyWith(
+          isBiometricEnabled: true,
+        ));
+
+        debugPrint('AuthBloc: Biometric login enabled');
+      } else {
+        emit(state.copyWith(
+          errorMessage: result.errorMessage ?? 'Biometric authentication failed',
+        ));
+      }
+    } catch (e) {
+      debugPrint('AuthBloc: Enable biometric login failed - $e');
+      emit(state.copyWith(
+        errorMessage: 'Failed to enable biometric login: $e',
+      ));
+    }
+  }
+
+  /// 禁用生物识别登录
+  Future<void> _onDisableBiometricLogin(
+    AuthDisableBiometricLogin event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      await _secureStorage.disableBiometricLogin();
+
+      emit(state.copyWith(
+        isBiometricEnabled: false,
+      ));
+
+      debugPrint('AuthBloc: Biometric login disabled');
+    } catch (e) {
+      debugPrint('AuthBloc: Disable biometric login failed - $e');
+      emit(state.copyWith(
+        errorMessage: 'Failed to disable biometric login: $e',
+      ));
     }
   }
 

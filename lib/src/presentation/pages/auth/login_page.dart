@@ -7,7 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
@@ -30,10 +32,50 @@ class _LoginPageState extends State<LoginPage> {
   final _homeserverController = TextEditingController(text: 'https://m.si46.world');
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _biometricService = BiometricService();
+  final _secureStorage = SecureStorageDataSource();
 
   bool _obscurePassword = true;
+  bool _isBiometricAvailable = false;
+  bool _isBiometricEnabled = false;
+  bool _hasCredentials = false;
+  String _biometricTypeDescription = '';
   // 微信策略：同一设备登录一次后自动保持登录状态，无需用户选择
   // 登出时才会清除登录凭据
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometricAvailability();
+  }
+
+  Future<void> _checkBiometricAvailability() async {
+    final isAvailable = await _biometricService.isAvailable();
+    final isEnabled = await _secureStorage.isBiometricEnabled();
+    final hasCredentials = await _secureStorage.hasCredentials();
+    final typeDescription = isAvailable
+        ? await _biometricService.getBiometricTypeDescription()
+        : '';
+
+    if (mounted) {
+      setState(() {
+        _isBiometricAvailable = isAvailable;
+        _isBiometricEnabled = isEnabled;
+        _hasCredentials = hasCredentials;
+        _biometricTypeDescription = typeDescription;
+      });
+
+      // 如果生物识别已启用且有保存的凭据，自动触发生物识别
+      if (isAvailable && isEnabled && hasCredentials) {
+        // 延迟一点再触发，让UI先渲染
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            _loginWithBiometric();
+          }
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -535,6 +577,12 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildAlternativeLoginMethods() {
     return Column(
       children: [
+        // 生物识别登录按钮（如果可用且已启用）
+        if (_isBiometricAvailable && _isBiometricEnabled && _hasCredentials) ...[
+          _buildBiometricLoginButton(),
+          const SizedBox(height: 20),
+        ],
+
         // 第一行：Passkey 和 邮箱验证码
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -552,9 +600,9 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 20),
-        
+
         // 第二行：第三方登录
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -589,6 +637,55 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildBiometricLoginButton() {
+    final isDark = context.isDarkMode;
+    final bgColor = AppColors.primary.withValues(alpha: 0.1);
+    final iconColor = AppColors.primary;
+
+    // 根据生物识别类型选择图标
+    IconData biometricIcon;
+    if (_biometricTypeDescription.contains('Face')) {
+      biometricIcon = Icons.face;
+    } else if (_biometricTypeDescription.contains('Touch') ||
+        _biometricTypeDescription.contains('Fingerprint')) {
+      biometricIcon = Icons.fingerprint;
+    } else {
+      biometricIcon = Icons.security;
+    }
+
+    return InkWell(
+      onTap: _loginWithBiometric,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.3),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(biometricIcon, color: iconColor, size: 28),
+            const SizedBox(width: 12),
+            Text(
+              S.of(context)?.loginWithBiometric(_biometricTypeDescription) ??
+                  'Login with $_biometricTypeDescription',
+              style: TextStyle(
+                fontSize: 16,
+                color: iconColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
   
@@ -675,6 +772,11 @@ class _LoginPageState extends State<LoginPage> {
   // 登录方法
   // ============================================
   
+  void _loginWithBiometric() async {
+    // 直接触发生物识别登录
+    context.read<AuthBloc>().add(const AuthBiometricLoginRequested());
+  }
+
   void _loginWithPasskey() async {
     final homeserver = _homeserverController.text.trim();
     if (homeserver.isEmpty) {
@@ -695,7 +797,7 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.orange,
       ),
     );
-    
+
     // context.read<AuthBloc>().add(AuthPasskeyLoginRequested(homeserver: homeserver));
   }
   

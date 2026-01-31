@@ -14,6 +14,7 @@ class SecureStorageDataSource {
   static const String _keyContactRemarks = 'n42_chat_contact_remarks';
   static const String _keyAppearanceSettings = 'n42_chat_appearance_settings';
   static const String _keyStrongReminders = 'n42_chat_strong_reminders';
+  static const String _keyBiometricSettings = 'n42_chat_biometric_settings';
 
   final FlutterSecureStorage _storage;
 
@@ -363,6 +364,80 @@ class SecureStorageDataSource {
   Future<bool> getStrongReminderStatus(String roomId) async {
     final reminders = await getStrongReminders();
     return reminders[roomId] ?? false;
+  }
+
+  // ============================================
+  // 生物识别设置
+  // ============================================
+
+  /// 保存生物识别设置
+  Future<void> saveBiometricSettings({
+    required bool enabled,
+    String? homeserver,
+    String? username,
+  }) async {
+    final data = {
+      'enabled': enabled,
+      'homeserver': homeserver,
+      'username': username,
+      'savedAt': DateTime.now().toIso8601String(),
+    };
+
+    await _storage.write(
+      key: _keyBiometricSettings,
+      value: jsonEncode(data),
+    );
+
+    debugPrint('SecureStorage: Biometric settings saved - enabled: $enabled');
+  }
+
+  /// 获取生物识别设置
+  Future<Map<String, dynamic>?> getBiometricSettings() async {
+    try {
+      final data = await _storage.read(key: _keyBiometricSettings);
+      if (data == null) return null;
+
+      return jsonDecode(data) as Map<String, dynamic>;
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read biometric settings - $e');
+      return null;
+    }
+  }
+
+  /// 检查生物识别是否启用
+  Future<bool> isBiometricEnabled() async {
+    final settings = await getBiometricSettings();
+    return settings?['enabled'] == true;
+  }
+
+  /// 启用生物识别登录
+  Future<void> enableBiometricLogin({
+    required String homeserver,
+    required String username,
+  }) async {
+    await saveBiometricSettings(
+      enabled: true,
+      homeserver: homeserver,
+      username: username,
+    );
+  }
+
+  /// 禁用生物识别登录
+  Future<void> disableBiometricLogin() async {
+    await _storage.delete(key: _keyBiometricSettings);
+    debugPrint('SecureStorage: Biometric settings cleared');
+  }
+
+  /// 获取生物识别绑定的用户名
+  Future<String?> getBiometricUsername() async {
+    final settings = await getBiometricSettings();
+    return settings?['username'] as String?;
+  }
+
+  /// 获取生物识别绑定的服务器
+  Future<String?> getBiometricHomeserver() async {
+    final settings = await getBiometricSettings();
+    return settings?['homeserver'] as String?;
   }
 
   // ============================================

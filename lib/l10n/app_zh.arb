@@ -2164,5 +2164,24 @@
   "enterServerAddressFirst": "请先输入服务器地址",
 
   "language": "语言",
-  "languageChanged": "语言已更改"
+  "languageChanged": "语言已更改",
+
+  "biometricLogin": "生物识别登录",
+  "loginWithBiometric": "使用{type}登录",
+  "biometricLoginEnabled": "生物识别登录已启用",
+  "biometricLoginDisabled": "生物识别登录已禁用",
+  "enableBiometricLogin": "启用生物识别登录",
+  "disableBiometricLogin": "禁用生物识别登录",
+  "biometricNotAvailable": "此设备不支持生物识别",
+  "biometricNotEnrolled": "未录入生物识别数据，请在设备设置中设置",
+  "biometricAuthFailed": "生物识别验证失败",
+  "biometricAuthCancelled": "验证已取消",
+  "biometricLockedOut": "尝试次数过多，请稍后再试",
+  "useBiometricToLogin": "使用生物识别快速登录",
+  "authenticateToLogin": "验证身份以登录",
+  "authenticateToEnable": "验证身份以启用生物识别登录",
+  "faceId": "面容 ID",
+  "touchId": "触控 ID",
+  "fingerprint": "指纹",
+  "biometric": "生物识别"
 }
