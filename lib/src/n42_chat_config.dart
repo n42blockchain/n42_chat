@@ -49,6 +49,17 @@ class N42ChatConfig {
   /// 默认为 `true`
   final bool enablePushNotifications;
 
+  /// 推送网关 URL
+  ///
+  /// Matrix Sygnal 推送网关服务器地址
+  /// 用于将推送消息转发到 FCM/APNs
+  final String? pushGatewayUrl;
+
+  /// 推送应用标识符
+  ///
+  /// 用于 Matrix 推送注册
+  final String pushAppId;
+
   /// 同步超时时间
   ///
   /// Matrix长轮询同步的超时时间
@@ -145,6 +156,8 @@ class N42ChatConfig {
     this.defaultHomeserver = 'https://m.si46.world',
     this.enableEncryption = true,
     this.enablePushNotifications = true,
+    this.pushGatewayUrl,
+    this.pushAppId = 'com.n42.chat',
     this.syncTimeout = const Duration(seconds: 30),
     this.syncFilter = const SyncFilterConfig(),
     this.customTheme,
@@ -171,6 +184,8 @@ class N42ChatConfig {
     String? defaultHomeserver,
     bool? enableEncryption,
     bool? enablePushNotifications,
+    String? pushGatewayUrl,
+    String? pushAppId,
     Duration? syncTimeout,
     SyncFilterConfig? syncFilter,
     N42ChatTheme? customTheme,
@@ -196,6 +211,8 @@ class N42ChatConfig {
       enableEncryption: enableEncryption ?? this.enableEncryption,
       enablePushNotifications:
           enablePushNotifications ?? this.enablePushNotifications,
+      pushGatewayUrl: pushGatewayUrl ?? this.pushGatewayUrl,
+      pushAppId: pushAppId ?? this.pushAppId,
       syncTimeout: syncTimeout ?? this.syncTimeout,
       syncFilter: syncFilter ?? this.syncFilter,
       customTheme: customTheme ?? this.customTheme,
