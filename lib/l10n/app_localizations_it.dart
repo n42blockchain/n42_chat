@@ -3229,7 +3229,7 @@ class SIt extends S {
   String get groupLabel => 'Gruppo';
 
   @override
-  String get conversationLabel => '会话';
+  String get conversationLabel => 'Conversazione';
 
   @override
   String get messageLabel => 'Messaggio';
@@ -4098,88 +4098,143 @@ class SIt extends S {
   }
 
   @override
-  String get emailAddress => '邮箱地址';
+  String get emailAddress => 'Indirizzo email';
 
   @override
-  String get enterEmailAddress => '请输入邮箱地址';
+  String get enterEmailAddress => 'Inserisci l\'indirizzo email';
 
   @override
-  String get emailRecoveryHint => '用于找回密码';
+  String get emailRecoveryHint => 'Usato per il recupero della password';
 
   @override
-  String get invalidEmailFormat => '请输入有效的邮箱地址';
+  String get invalidEmailFormat => 'Inserisci un indirizzo email valido';
 
   @override
-  String get optional => '选填';
+  String get optional => 'Opzionale';
 
   @override
-  String get resetPassword => '重置密码';
+  String get resetPassword => 'Ripristina password';
 
   @override
-  String get resetPasswordTitle => '重置您的密码';
+  String get resetPasswordTitle => 'Ripristina la tua password';
 
   @override
-  String get enterRegisteredEmail => '请输入注册时绑定的邮箱地址';
+  String get enterRegisteredEmail =>
+      'Inserisci l\'indirizzo email con cui ti sei registrato';
 
   @override
-  String get sendResetCode => '发送重置验证码';
+  String get sendResetCode => 'Invia codice di ripristino';
 
   @override
   String resetCodeSent(String email) {
-    return '重置验证码已发送至 $email';
+    return 'Codice di ripristino inviato a $email';
   }
 
   @override
-  String get enterResetCode => '输入重置验证码';
+  String get enterResetCode => 'Inserisci il codice di ripristino';
 
   @override
-  String get setNewPassword => '设置新密码';
+  String get setNewPassword => 'Imposta nuova password';
 
   @override
-  String get confirmNewPassword => '确认新密码';
+  String get confirmNewPassword => 'Conferma nuova password';
 
   @override
-  String get newPassword => '新密码';
+  String get newPassword => 'Nuova password';
 
   @override
-  String get passwordResetSuccess => '密码重置成功，请使用新密码登录';
+  String get passwordResetSuccess =>
+      'Password ripristinata con successo. Accedi con la tua nuova password.';
 
   @override
-  String get resetPasswordFailed => '重置密码失败';
+  String get resetPasswordFailed => 'Ripristino password fallito';
 
   @override
-  String get changePassword => '修改密码';
+  String get changePassword => 'Cambia password';
 
   @override
-  String get currentPassword => '当前密码';
+  String get currentPassword => 'Password attuale';
 
   @override
-  String get enterCurrentPassword => '请输入当前密码';
+  String get enterCurrentPassword => 'Inserisci la password attuale';
 
   @override
-  String get enterNewPassword => '请输入新密码';
+  String get enterNewPassword => 'Inserisci la nuova password';
 
   @override
-  String get passwordChanged => '密码修改成功，请使用新密码重新登录';
+  String get passwordChanged =>
+      'Password cambiata con successo. Accedi con la tua nuova password.';
 
   @override
-  String get changePasswordFailed => '修改密码失败';
+  String get changePasswordFailed => 'Cambio password fallito';
 
   @override
-  String get incorrectCurrentPassword => '当前密码错误';
+  String get incorrectCurrentPassword => 'Password attuale errata';
 
   @override
-  String get newPasswordMustBeDifferent => '新密码不能与当前密码相同';
+  String get newPasswordMustBeDifferent =>
+      'La nuova password deve essere diversa dalla password attuale';
 
   @override
-  String get changePasswordInfo => '修改密码后，您将被登出，需要使用新密码重新登录。';
+  String get changePasswordInfo =>
+      'Dopo aver cambiato la password, verrai disconnesso e dovrai accedere con la nuova password.';
 
   @override
-  String get passwordRequirements => '密码要求：';
+  String get passwordRequirements => 'Requisiti della password:';
 
   @override
-  String get securityNote => '为了安全，修改密码后需要在所有设备上重新登录。';
+  String get securityNote =>
+      'Per sicurezza, dovrai riaccedere su tutti i dispositivi dopo aver cambiato la password.';
 
   @override
-  String get security => '安全';
+  String get security => 'Sicurezza';
+
+  @override
+  String get currentBoundEmail => 'Email attualmente collegata';
+
+  @override
+  String get newEmailAddress => 'Nuovo indirizzo email';
+
+  @override
+  String get enterNewEmail => 'Inserisci il nuovo indirizzo email';
+
+  @override
+  String get verificationCode => 'Codice di verifica';
+
+  @override
+  String get verificationCodeSent => 'Codice di verifica inviato';
+
+  @override
+  String get codeSentTo => 'Codice di verifica inviato a';
+
+  @override
+  String get didNotReceiveCode => 'Non hai ricevuto il codice?';
+
+  @override
+  String get emailChangedSuccess => 'Email cambiata con successo';
+
+  @override
+  String get changeEmailFailed => 'Cambio email fallito';
+
+  @override
+  String get emailSecurityNote =>
+      'La tua email viene usata per il recupero della password. Mantienila al sicuro.';
+
+  @override
+  String get googleLogin => 'Accedi con Google';
+
+  @override
+  String get appleLogin => 'Accedi con Apple';
+
+  @override
+  String get socialLoginCancelled => 'Accesso annullato';
+
+  @override
+  String get socialLoginFailed => 'Accesso social fallito';
+
+  @override
+  String get language => 'Lingua';
+
+  @override
+  String get languageChanged => 'Lingua cambiata';
 }

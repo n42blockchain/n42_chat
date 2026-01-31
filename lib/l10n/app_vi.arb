@@ -122,19 +122,25 @@
   "userNotFoundHint": "Khong tim thay nguoi dung \"{query}\"\n\nGoi y:\n• Thu nhap day du ID nguoi dung, vi du @username:server.com\n• Kiem tra chinh ta ten nguoi dung",
   "@userNotFoundHint": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "createChatFailed": "Tao cuoc tro chuyen that bai: {error}",
   "@createChatFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "searchFailed": "Tim kiem that bai: {error}",
   "@searchFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterUserIdOrUsername": "Nhap ID nguoi dung hoac ten dang nhap de tim kiem",
@@ -144,7 +150,9 @@
   "userNotFound": "Khong tim thay nguoi dung \"{username}\"",
   "@userNotFound": {
     "placeholders": {
-      "username": {"type": "String"}
+      "username": {
+        "type": "String"
+      }
     }
   },
   "chat": "Tro chuyen",
@@ -623,7 +631,9 @@
   "done": "Xong({count})",
   "@done": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "services": "Dich vu",
@@ -633,7 +643,9 @@
   "statusSetTo": "Trang thai da dat: {status}",
   "@statusSetTo": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "avatarUploadFailed": "Tai len anh dai dien that bai",
@@ -649,7 +661,9 @@
   "genderSetTo": "Gioi tinh da dat: {gender}",
   "@genderSetTo": {
     "placeholders": {
-      "gender": {"type": "String"}
+      "gender": {
+        "type": "String"
+      }
     }
   },
   "selectRegion": "Chon khu vuc",
@@ -657,7 +671,9 @@
   "regionSetTo": "Khu vuc da dat: {region}",
   "@regionSetTo": {
     "placeholders": {
-      "region": {"type": "String"}
+      "region": {
+        "type": "String"
+      }
     }
   },
   "setPoke": "Dat vo vai",
@@ -669,7 +685,9 @@
   "pokeSetTo": "Vo vai da dat: vo vai toi{suffix}",
   "@pokeSetTo": {
     "placeholders": {
-      "suffix": {"type": "String"}
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "editSignature": "Chinh sua chu ky",
@@ -680,13 +698,17 @@
   "ringtoneSetTo": "Nhac chuong da dat: {ringtone}",
   "@ringtoneSetTo": {
     "placeholders": {
-      "ringtone": {"type": "String"}
+      "ringtone": {
+        "type": "String"
+      }
     }
   },
   "confirmDissolveGroup": "Ban co chac chac muon giai tan \"{name}\" khong? Hanh dong nay khong the hoan tac.",
   "@confirmDissolveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "enterValidServerAddress": "Vui long nhap dia chi may chu hop le",
@@ -707,54 +729,72 @@
   "messagesWithCount": "Tin nhan({count})",
   "@messagesWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "contactCount": "{count} lien he",
   "@contactCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addToHomeScreen": "Them vao man hinh chinh",
   "recommendedCardTo": "Da gioi thieu the cua {contact} cho {recipient}",
   "@recommendedCardTo": {
     "placeholders": {
-      "contact": {"type": "String"},
-      "recipient": {"type": "String"}
+      "contact": {
+        "type": "String"
+      },
+      "recipient": {
+        "type": "String"
+      }
     }
   },
   "enterRemarkName": "Nhap ten ghi chu",
   "remarkSetTo": "Ghi chu da dat: {remark}",
   "@remarkSetTo": {
     "placeholders": {
-      "remark": {"type": "String"}
+      "remark": {
+        "type": "String"
+      }
     }
   },
   "acceptedFriendRequest": "Da chap nhan yeu cau ket ban cua {name}",
   "@acceptedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "rejectedFriendRequest": "Da tu choi yeu cau ket ban cua {name}",
   "@rejectedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "groupInvites": "Loi moi nhom",
   "myGroups": "Nhom cua toi ({count})",
   "@myGroups": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "invitedToJoinGroup": "Duoc moi tham gia nhom",
   "confirmLeaveGroup": "Ban co chac chac muon roi khoi \"{name}\" khong?",
   "@confirmLeaveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "leave": "Roi",
@@ -768,14 +808,18 @@
   "downloadFailed": "Tai xuong that bai: {code}",
   "@downloadFailed": {
     "placeholders": {
-      "code": {"type": "String"}
+      "code": {
+        "type": "String"
+      }
     }
   },
   "noMediaUrl": "Khong co URL media",
   "shareFailed": "Chia se that bai: {error}",
   "@shareFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "failedToLoadImage": "Tai hinh anh that bai",
@@ -809,14 +853,20 @@
   "daysAgoText": "{count} ngay truoc",
   "@daysAgoText": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "dateFormat": "{day}/{month}",
   "@dateFormat": {
     "placeholders": {
-      "month": {"type": "int"},
-      "day": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
     }
   },
   "noFavorites": "Chua co yeu thich",
@@ -865,7 +915,9 @@
   "deleteContactConfirm": "Ban co chac muon xoa {name}?",
   "@deleteContactConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "transferTitle": "Chuyen tien",
@@ -879,8 +931,12 @@
   "availableBalanceFormat": "Kha dung: {balance} {symbol}",
   "@availableBalanceFormat": {
     "placeholders": {
-      "balance": {"type": "String"},
-      "symbol": {"type": "String"}
+      "balance": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
     }
   },
   "addMemoHint": "Them ghi chu",
@@ -900,20 +956,26 @@
   "readCountReceipt": "{count} da doc",
   "@readCountReceipt": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "n42IdLabel": "N42 ID: {id}",
   "@n42IdLabel": {
     "placeholders": {
-      "id": {"type": "String"}
+      "id": {
+        "type": "String"
+      }
     }
   },
   "redPacketDefaultGreeting": "Chuc mung tot lanh",
   "senderRedPacket": "Li xi cua {name}",
   "@senderRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "enterValidAddress": "Vui long nhap dia chi hop le",
@@ -921,13 +983,17 @@
   "receivedTransfer": "Da nhan chuyen tien",
   "@fromSender": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "selectForwardRecipient": "Chon nguoi nhan chuyen tiep",
   "@sendCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "emojiFaces": "Khuon mat",
@@ -942,7 +1008,9 @@
   "senderSentRedPacket": "{name} da gui li xi",
   "@senderSentRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "savedToBalance": "Da luu vao so du, co the chuyen truc tiep",
@@ -955,7 +1023,9 @@
   "userTyping": "{name} dang nhap...",
   "@userTyping": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "typing": "Dang nhap...",
@@ -1025,20 +1095,26 @@
   "permissionCheckError": "Loi kiem tra quyen: {error}",
   "@permissionCheckError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "invalidQrCode": "Ma QR khong hop le",
   "qrCodeProcessFailed": "Xu ly ma QR that bai: {error}",
   "@qrCodeProcessFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "cannotAddFriend": "Khong the ket ban: {error}",
   "@cannotAddFriend": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "scanQrCode": "Quet ma QR",
@@ -1050,7 +1126,9 @@
   "inviteCount": "Moi({count})",
   "@inviteCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noShippingAddress": "Khong co dia chi giao hang",
@@ -1092,14 +1170,18 @@
   "totalMembers": "{count} thanh vien",
   "@totalMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "removeFromGroup": "Xoa khoi nhom",
   "confirmRemoveMember": "Ban co chac muon xoa \"{name}\" khoi nhom?",
   "@confirmRemoveMember": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "setAsAdmin": "Dat lam quan tri vien",
@@ -1115,7 +1197,7 @@
   "endPollButton": "Ket thuc binh chon",
   "createPoll": "Tao binh chon",
   "pollQuestion": "Cau hoi binh chon",
-  "enterPollQuestionHint": "Nhap cau hoi binh chon",
+  "enterPollQuestionHint": "Vui long nhap cau hoi binh chon",
   "pollOptions": "Cac lua chon",
   "optionPlaceholder": "Lua chon {index}",
   "addOption": "Them lua chon",
@@ -1147,12 +1229,16 @@
   "cannotVoteAfterEnd": "Khong the binh chon sau khi ket thuc.",
   "@featureInDev": {
     "placeholders": {
-      "feature": {"type": "String"}
+      "feature": {
+        "type": "String"
+      }
     }
   },
   "@optionPlaceholder": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "bio": "Tieu su",
@@ -1173,7 +1259,9 @@
   "noResultsForQuery": "Khong tim thay ket qua cho \"{query}\"",
   "@noResultsForQuery": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "allResults": "Tat ca",
@@ -1187,7 +1275,9 @@
   "keysBackedUp": "{count} khoa da sao luu",
   "@keysBackedUp": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "backupNotSet": "Chua dat sao luu",
@@ -1219,7 +1309,9 @@
   "deviceIdLabel": "ID thiet bi: {deviceId}",
   "@deviceIdLabel": {
     "placeholders": {
-      "deviceId": {"type": "String"}
+      "deviceId": {
+        "type": "String"
+      }
     }
   },
   "deviceStatusVerified": "Trang thai: Da xac minh",
@@ -1227,7 +1319,9 @@
   "lastActiveLabel": "Hoat dong cuoi: {lastSeen}",
   "@lastActiveLabel": {
     "placeholders": {
-      "lastSeen": {"type": "String"}
+      "lastSeen": {
+        "type": "String"
+      }
     }
   },
   "verifyThisDevice": "Xac minh thiet bi nay",
@@ -1235,7 +1329,9 @@
   "crossSigningSetupSuccess": "Cai dat ky cheo thanh cong",
   "@setupFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "resetEncryptionTitle": "Dat lai ma hoa",
@@ -1245,8 +1341,12 @@
   "pokedSomeone": "da vo vai {name}{suffix}",
   "@pokedSomeone": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suffix": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "noContactsToAdd": "Khong co lien he de them",
@@ -1254,20 +1354,26 @@
   "invitedMembers": "Da moi {count} thanh vien",
   "@invitedMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "inviteFailed": "Moi that bai: {error}",
   "@inviteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "memberRemoved": "Da xoa thanh vien",
   "removeFailed": "Xoa that bai: {error}",
   "@removeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "realTimeLocationShareMessage": "Sau khi chia se, nguoi kia co the thay vi tri thoi gian thuc cua ban trong 1 gio.",
@@ -1282,20 +1388,26 @@
   "getLocationFailed": "Lay vi tri that bai: {error}",
   "@getLocationFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "currentLocation": "Vi tri hien tai",
   "nearbyPlace": "Dia diem gan {index}",
   "@nearbyPlace": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "approximateDistance": "Khoang {distance}",
   "@approximateDistance": {
     "placeholders": {
-      "distance": {"type": "String"}
+      "distance": {
+        "type": "String"
+      }
     }
   },
   "mapPreview": "Xem truoc ban do",
@@ -1303,41 +1415,57 @@
   "redPacketSent": "Da gui li xi {amount} {token}",
   "@redPacketSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "transferDefault": "Chuyen tien",
   "transferSent": "Da gui chuyen tien {amount} {token}",
   "@transferSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "pickFileFailed": "Chon tep that bai: {error}",
   "@pickFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "fileSizeLimit": "Kich thuoc tep khong the vuot qua 50MB",
   "fileSending": "Dang gui tep: {filename}",
   "@fileSending": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "sendFileFailed": "Gui tep that bai: {error}",
   "@sendFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "contactCardSent": "Da gui the lien he cua {name}",
   "@contactCardSent": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "favoritesFeature": "Yeu thich",
@@ -1346,18 +1474,22 @@
   "sharedMusic": "Da chia se {name}",
   "@sharedMusic": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@sendFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "endPollTitle": "Ket thuc binh chon",
   "endPollConfirmMessage": "Ban co chac muon ket thuc binh chon nay? Binh chon se dong sau khi ket thuc.",
   "pollEndedMessage": "Binh chon da ket thuc",
-  "connectingCall": "Dang ket noi...",
+  "connectingCall": "Đang kết nối...",
   "muteCall": "Tat tieng",
   "speakerOff": "Tat loa",
   "speakerOn": "Loa",
@@ -1373,19 +1505,25 @@
   "filePreviewWithName": "[Tep] {filename}",
   "@filePreviewWithName": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "locationPreviewWithAddress": "[Vi tri] {address}",
   "@locationPreviewWithAddress": {
     "placeholders": {
-      "address": {"type": "String"}
+      "address": {
+        "type": "String"
+      }
     }
   },
   "musicPreviewWithTitle": "[Nhac] {title}",
   "@musicPreviewWithTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "messagePreview": "[Tin nhan]",
@@ -1417,7 +1555,9 @@
   "selectedMessagesCount": "Da chon {count} tin nhan",
   "@selectedMessagesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "searchContactsOrGroups": "Tim lien he hoac nhom",
@@ -1433,12 +1573,13 @@
   "createPollTitle": "Tao binh chon",
   "submitPoll": "Gui",
   "pollQuestionLabel": "Cau hoi binh chon",
-  "enterPollQuestionHint": "Vui long nhap cau hoi binh chon",
   "pollOptionsLabel": "Cac lua chon",
   "optionHintWithIndex": "Lua chon {index}",
   "@optionHintWithIndex": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "addOptionButton": "Them lua chon",
@@ -1452,27 +1593,37 @@
   "confirmWithCount": "Xac nhan ({count})",
   "@confirmWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@selectedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@memberCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@groupChatCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@replyTo": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "emailVerificationTitle": "Xac minh Email",
@@ -1480,13 +1631,17 @@
   "verificationCodeSentTo": "Ma xac minh da gui den {email}",
   "@verificationCodeSentTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "sendCodeFailed": "Gui ma that bai: {error}",
   "@sendCodeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "verificationSuccess": "Xac minh thanh cong",
@@ -1494,7 +1649,9 @@
   "verificationCodeError": "Loi ma xac minh: {error}",
   "@verificationCodeError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterVerificationCode": "Nhap ma xac minh",
@@ -1502,7 +1659,9 @@
   "weSentCodeTo": "Chung toi da gui ma 6 so den\n{email}",
   "@weSentCodeTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "enterEmailForCode": "Nhap dia chi email, chung toi se gui ma xac minh",
@@ -1511,7 +1670,9 @@
   "canResendAfter": "Co the gui lai sau {seconds} giay",
   "@canResendAfter": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "changeEmail": "Doi email",
@@ -1521,7 +1682,9 @@
   "addFailedWithError": "Them that bai: {error}",
   "@addFailedWithError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "addPhone": "Them dien thoai",
@@ -1531,7 +1694,9 @@
   "groupCountLabel": "{count} nhom",
   "@groupCountLabel": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addedViaSearch": "Da them qua tim kiem",
@@ -1541,20 +1706,26 @@
   "participantMe": "{name} (Toi)",
   "@participantMe": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "sharingLabel": "Dang chia se",
   "screenSharingBy": "{name} dang chia se man hinh",
   "@screenSharingBy": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "participantCount": "{count} nguoi tham gia",
   "@participantCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "muteLabel": "Tat tieng",
@@ -1567,18 +1738,23 @@
   "leaveLabel": "Roi",
   "participantsLabel": "Nguoi tham gia",
   "joiningMeeting": "Dang tham gia cuoc hop...",
-  "connectingCall": "Đang kết nối...",
   "pollVotesFormat": "{count} phiếu ({percentage}%)",
   "@pollVotesFormat": {
     "placeholders": {
-      "count": {"type": "int"},
-      "percentage": {"type": "String"}
+      "count": {
+        "type": "int"
+      },
+      "percentage": {
+        "type": "String"
+      }
     }
   },
   "pollParticipantsFormat": "{count} người tham gia",
   "@pollParticipantsFormat": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "incomingVideoCall": "Cuộc gọi video đến",
@@ -1592,7 +1768,9 @@
   "errorWithMessage": "Lỗi: {message}",
   "@errorWithMessage": {
     "placeholders": {
-      "message": {"type": "String"}
+      "message": {
+        "type": "String"
+      }
     }
   },
   "musicLinkLabel": "Liên kết nhạc",
@@ -1613,13 +1791,17 @@
   "whoCanSeeTitle": "Ai có thể xem {title}",
   "@whoCanSeeTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "versionInfo": "Phiên bản {version}",
   "@versionInfo": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "checkForUpdates": "Kiểm tra cập nhật",
@@ -1663,5 +1845,50 @@
   "editGroupDescription": "Chỉnh sửa mô tả nhóm",
   "enterGroupAnnouncement": "Nhập thông báo nhóm",
   "memberCountClickToCopy": "{count} thành viên, nhấp để sao chép ID nhóm",
-  "noPermissionToEditGroupName": "Bạn không có quyền chỉnh sửa tên nhóm"
+  "noPermissionToEditGroupName": "Bạn không có quyền chỉnh sửa tên nhóm",
+  "appleLogin": "Đăng nhập bằng Apple",
+  "changeEmailFailed": "Thay đổi email thất bại",
+  "changePassword": "Đổi mật khẩu",
+  "changePasswordFailed": "Đổi mật khẩu thất bại",
+  "changePasswordInfo": "Sau khi đổi mật khẩu, bạn sẽ bị đăng xuất và cần đăng nhập lại bằng mật khẩu mới.",
+  "codeSentTo": "Mã xác nhận đã gửi đến",
+  "confirmNewPassword": "Xác nhận mật khẩu mới",
+  "conversationLabel": "Cuộc trò chuyện",
+  "currentBoundEmail": "Email hiện đang liên kết",
+  "currentPassword": "Mật khẩu hiện tại",
+  "didNotReceiveCode": "Không nhận được mã?",
+  "emailAddress": "Địa chỉ email",
+  "emailChangedSuccess": "Email đã được thay đổi thành công",
+  "emailRecoveryHint": "Dùng để khôi phục mật khẩu",
+  "emailSecurityNote": "Email của bạn được dùng để khôi phục mật khẩu. Hãy giữ an toàn.",
+  "enterCurrentPassword": "Nhập mật khẩu hiện tại",
+  "enterEmailAddress": "Nhập địa chỉ email",
+  "enterNewEmail": "Nhập địa chỉ email mới",
+  "enterNewPassword": "Nhập mật khẩu mới",
+  "enterRegisteredEmail": "Nhập địa chỉ email bạn đã đăng ký",
+  "enterResetCode": "Nhập mã đặt lại",
+  "googleLogin": "Đăng nhập bằng Google",
+  "incorrectCurrentPassword": "Mật khẩu hiện tại không đúng",
+  "invalidEmailFormat": "Vui lòng nhập địa chỉ email hợp lệ",
+  "language": "Ngôn ngữ",
+  "languageChanged": "Ngôn ngữ đã thay đổi",
+  "newEmailAddress": "Địa chỉ email mới",
+  "newPassword": "Mật khẩu mới",
+  "newPasswordMustBeDifferent": "Mật khẩu mới phải khác mật khẩu hiện tại",
+  "optional": "Tùy chọn",
+  "passwordChanged": "Mật khẩu đã được thay đổi thành công. Vui lòng đăng nhập bằng mật khẩu mới.",
+  "passwordRequirements": "Yêu cầu mật khẩu:",
+  "passwordResetSuccess": "Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập bằng mật khẩu mới.",
+  "resetCodeSent": "Mã đặt lại đã gửi đến {email}",
+  "resetPassword": "Đặt lại mật khẩu",
+  "resetPasswordFailed": "Đặt lại mật khẩu thất bại",
+  "resetPasswordTitle": "Đặt lại mật khẩu của bạn",
+  "security": "Bảo mật",
+  "securityNote": "Vì lý do bảo mật, bạn sẽ cần đăng nhập lại trên tất cả thiết bị sau khi đổi mật khẩu.",
+  "sendResetCode": "Gửi mã đặt lại",
+  "setNewPassword": "Đặt mật khẩu mới",
+  "socialLoginCancelled": "Đăng nhập đã bị hủy",
+  "socialLoginFailed": "Đăng nhập mạng xã hội thất bại",
+  "verificationCode": "Mã xác nhận",
+  "verificationCodeSent": "Mã xác nhận đã được gửi"
 }

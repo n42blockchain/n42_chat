@@ -3179,7 +3179,7 @@ class SJa extends S {
   String get groupLabel => 'グループ';
 
   @override
-  String get conversationLabel => '会话';
+  String get conversationLabel => '会話';
 
   @override
   String get messageLabel => 'メッセージ';
@@ -4027,88 +4027,137 @@ class SJa extends S {
   }
 
   @override
-  String get emailAddress => '邮箱地址';
+  String get emailAddress => 'メールアドレス';
 
   @override
-  String get enterEmailAddress => '请输入邮箱地址';
+  String get enterEmailAddress => 'メールアドレスを入力';
 
   @override
-  String get emailRecoveryHint => '用于找回密码';
+  String get emailRecoveryHint => 'パスワードの回復に使用されます';
 
   @override
-  String get invalidEmailFormat => '请输入有效的邮箱地址';
+  String get invalidEmailFormat => '有効なメールアドレスを入力してください';
 
   @override
-  String get optional => '选填';
+  String get optional => '任意';
 
   @override
-  String get resetPassword => '重置密码';
+  String get resetPassword => 'パスワードをリセット';
 
   @override
-  String get resetPasswordTitle => '重置您的密码';
+  String get resetPasswordTitle => 'パスワードをリセット';
 
   @override
-  String get enterRegisteredEmail => '请输入注册时绑定的邮箱地址';
+  String get enterRegisteredEmail => '登録時のメールアドレスを入力してください';
 
   @override
-  String get sendResetCode => '发送重置验证码';
+  String get sendResetCode => 'リセットコードを送信';
 
   @override
   String resetCodeSent(String email) {
-    return '重置验证码已发送至 $email';
+    return 'リセットコードを$emailに送信しました';
   }
 
   @override
-  String get enterResetCode => '输入重置验证码';
+  String get enterResetCode => 'リセットコードを入力';
 
   @override
-  String get setNewPassword => '设置新密码';
+  String get setNewPassword => '新しいパスワードを設定';
 
   @override
-  String get confirmNewPassword => '确认新密码';
+  String get confirmNewPassword => '新しいパスワードを確認';
 
   @override
-  String get newPassword => '新密码';
+  String get newPassword => '新しいパスワード';
 
   @override
-  String get passwordResetSuccess => '密码重置成功，请使用新密码登录';
+  String get passwordResetSuccess => 'パスワードが正常にリセットされました。新しいパスワードでログインしてください。';
 
   @override
-  String get resetPasswordFailed => '重置密码失败';
+  String get resetPasswordFailed => 'パスワードのリセットに失敗しました';
 
   @override
-  String get changePassword => '修改密码';
+  String get changePassword => 'パスワードを変更';
 
   @override
-  String get currentPassword => '当前密码';
+  String get currentPassword => '現在のパスワード';
 
   @override
-  String get enterCurrentPassword => '请输入当前密码';
+  String get enterCurrentPassword => '現在のパスワードを入力';
 
   @override
-  String get enterNewPassword => '请输入新密码';
+  String get enterNewPassword => '新しいパスワードを入力';
 
   @override
-  String get passwordChanged => '密码修改成功，请使用新密码重新登录';
+  String get passwordChanged => 'パスワードが正常に変更されました。新しいパスワードでログインしてください。';
 
   @override
-  String get changePasswordFailed => '修改密码失败';
+  String get changePasswordFailed => 'パスワードの変更に失敗しました';
 
   @override
-  String get incorrectCurrentPassword => '当前密码错误';
+  String get incorrectCurrentPassword => '現在のパスワードが正しくありません';
 
   @override
-  String get newPasswordMustBeDifferent => '新密码不能与当前密码相同';
+  String get newPasswordMustBeDifferent => '新しいパスワードは現在のパスワードと異なる必要があります';
 
   @override
-  String get changePasswordInfo => '修改密码后，您将被登出，需要使用新密码重新登录。';
+  String get changePasswordInfo =>
+      'パスワードを変更すると、ログアウトされ、新しいパスワードでログインする必要があります。';
 
   @override
-  String get passwordRequirements => '密码要求：';
+  String get passwordRequirements => 'パスワード要件：';
 
   @override
-  String get securityNote => '为了安全，修改密码后需要在所有设备上重新登录。';
+  String get securityNote => 'セキュリティのため、パスワード変更後はすべてのデバイスで再ログインが必要です。';
 
   @override
-  String get security => '安全';
+  String get security => 'セキュリティ';
+
+  @override
+  String get currentBoundEmail => '現在紐付けられているメールアドレス';
+
+  @override
+  String get newEmailAddress => '新しいメールアドレス';
+
+  @override
+  String get enterNewEmail => '新しいメールアドレスを入力';
+
+  @override
+  String get verificationCode => '確認コード';
+
+  @override
+  String get verificationCodeSent => '確認コードが送信されました';
+
+  @override
+  String get codeSentTo => '確認コードの送信先';
+
+  @override
+  String get didNotReceiveCode => 'コードが届きませんか？';
+
+  @override
+  String get emailChangedSuccess => 'メールアドレスが正常に変更されました';
+
+  @override
+  String get changeEmailFailed => 'メールアドレスの変更に失敗しました';
+
+  @override
+  String get emailSecurityNote => 'メールアドレスはパスワードの回復に使用されます。安全に保管してください。';
+
+  @override
+  String get googleLogin => 'Googleでサインイン';
+
+  @override
+  String get appleLogin => 'Appleでサインイン';
+
+  @override
+  String get socialLoginCancelled => 'ログインがキャンセルされました';
+
+  @override
+  String get socialLoginFailed => 'ソーシャルログインに失敗しました';
+
+  @override
+  String get language => '言語';
+
+  @override
+  String get languageChanged => '言語が変更されました';
 }

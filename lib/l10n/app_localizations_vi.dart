@@ -3203,7 +3203,7 @@ class SVi extends S {
   String get groupLabel => 'Nhom';
 
   @override
-  String get conversationLabel => '会话';
+  String get conversationLabel => 'Cuộc trò chuyện';
 
   @override
   String get messageLabel => 'Tin nhan';
@@ -4064,88 +4064,142 @@ class SVi extends S {
   }
 
   @override
-  String get emailAddress => '邮箱地址';
+  String get emailAddress => 'Địa chỉ email';
 
   @override
-  String get enterEmailAddress => '请输入邮箱地址';
+  String get enterEmailAddress => 'Nhập địa chỉ email';
 
   @override
-  String get emailRecoveryHint => '用于找回密码';
+  String get emailRecoveryHint => 'Dùng để khôi phục mật khẩu';
 
   @override
-  String get invalidEmailFormat => '请输入有效的邮箱地址';
+  String get invalidEmailFormat => 'Vui lòng nhập địa chỉ email hợp lệ';
 
   @override
-  String get optional => '选填';
+  String get optional => 'Tùy chọn';
 
   @override
-  String get resetPassword => '重置密码';
+  String get resetPassword => 'Đặt lại mật khẩu';
 
   @override
-  String get resetPasswordTitle => '重置您的密码';
+  String get resetPasswordTitle => 'Đặt lại mật khẩu của bạn';
 
   @override
-  String get enterRegisteredEmail => '请输入注册时绑定的邮箱地址';
+  String get enterRegisteredEmail => 'Nhập địa chỉ email bạn đã đăng ký';
 
   @override
-  String get sendResetCode => '发送重置验证码';
+  String get sendResetCode => 'Gửi mã đặt lại';
 
   @override
   String resetCodeSent(String email) {
-    return '重置验证码已发送至 $email';
+    return 'Mã đặt lại đã gửi đến $email';
   }
 
   @override
-  String get enterResetCode => '输入重置验证码';
+  String get enterResetCode => 'Nhập mã đặt lại';
 
   @override
-  String get setNewPassword => '设置新密码';
+  String get setNewPassword => 'Đặt mật khẩu mới';
 
   @override
-  String get confirmNewPassword => '确认新密码';
+  String get confirmNewPassword => 'Xác nhận mật khẩu mới';
 
   @override
-  String get newPassword => '新密码';
+  String get newPassword => 'Mật khẩu mới';
 
   @override
-  String get passwordResetSuccess => '密码重置成功，请使用新密码登录';
+  String get passwordResetSuccess =>
+      'Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập bằng mật khẩu mới.';
 
   @override
-  String get resetPasswordFailed => '重置密码失败';
+  String get resetPasswordFailed => 'Đặt lại mật khẩu thất bại';
 
   @override
-  String get changePassword => '修改密码';
+  String get changePassword => 'Đổi mật khẩu';
 
   @override
-  String get currentPassword => '当前密码';
+  String get currentPassword => 'Mật khẩu hiện tại';
 
   @override
-  String get enterCurrentPassword => '请输入当前密码';
+  String get enterCurrentPassword => 'Nhập mật khẩu hiện tại';
 
   @override
-  String get enterNewPassword => '请输入新密码';
+  String get enterNewPassword => 'Nhập mật khẩu mới';
 
   @override
-  String get passwordChanged => '密码修改成功，请使用新密码重新登录';
+  String get passwordChanged =>
+      'Mật khẩu đã được thay đổi thành công. Vui lòng đăng nhập bằng mật khẩu mới.';
 
   @override
-  String get changePasswordFailed => '修改密码失败';
+  String get changePasswordFailed => 'Đổi mật khẩu thất bại';
 
   @override
-  String get incorrectCurrentPassword => '当前密码错误';
+  String get incorrectCurrentPassword => 'Mật khẩu hiện tại không đúng';
 
   @override
-  String get newPasswordMustBeDifferent => '新密码不能与当前密码相同';
+  String get newPasswordMustBeDifferent =>
+      'Mật khẩu mới phải khác mật khẩu hiện tại';
 
   @override
-  String get changePasswordInfo => '修改密码后，您将被登出，需要使用新密码重新登录。';
+  String get changePasswordInfo =>
+      'Sau khi đổi mật khẩu, bạn sẽ bị đăng xuất và cần đăng nhập lại bằng mật khẩu mới.';
 
   @override
-  String get passwordRequirements => '密码要求：';
+  String get passwordRequirements => 'Yêu cầu mật khẩu:';
 
   @override
-  String get securityNote => '为了安全，修改密码后需要在所有设备上重新登录。';
+  String get securityNote =>
+      'Vì lý do bảo mật, bạn sẽ cần đăng nhập lại trên tất cả thiết bị sau khi đổi mật khẩu.';
 
   @override
-  String get security => '安全';
+  String get security => 'Bảo mật';
+
+  @override
+  String get currentBoundEmail => 'Email hiện đang liên kết';
+
+  @override
+  String get newEmailAddress => 'Địa chỉ email mới';
+
+  @override
+  String get enterNewEmail => 'Nhập địa chỉ email mới';
+
+  @override
+  String get verificationCode => 'Mã xác nhận';
+
+  @override
+  String get verificationCodeSent => 'Mã xác nhận đã được gửi';
+
+  @override
+  String get codeSentTo => 'Mã xác nhận đã gửi đến';
+
+  @override
+  String get didNotReceiveCode => 'Không nhận được mã?';
+
+  @override
+  String get emailChangedSuccess => 'Email đã được thay đổi thành công';
+
+  @override
+  String get changeEmailFailed => 'Thay đổi email thất bại';
+
+  @override
+  String get emailSecurityNote =>
+      'Email của bạn được dùng để khôi phục mật khẩu. Hãy giữ an toàn.';
+
+  @override
+  String get googleLogin => 'Đăng nhập bằng Google';
+
+  @override
+  String get appleLogin => 'Đăng nhập bằng Apple';
+
+  @override
+  String get socialLoginCancelled => 'Đăng nhập đã bị hủy';
+
+  @override
+  String get socialLoginFailed => 'Đăng nhập mạng xã hội thất bại';
+
+  @override
+  String get language => 'Ngôn ngữ';
+
+  @override
+  String get languageChanged => 'Ngôn ngữ đã thay đổi';
 }

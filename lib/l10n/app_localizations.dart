@@ -694,7 +694,7 @@ abstract class S {
   /// No description provided for @resend.
   ///
   /// In zh, this message translates to:
-  /// **'重发'**
+  /// **'重新发送'**
   String get resend;
 
   /// No description provided for @recall.
@@ -7656,6 +7656,102 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'安全'**
   String get security;
+
+  /// No description provided for @currentBoundEmail.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前绑定邮箱'**
+  String get currentBoundEmail;
+
+  /// No description provided for @newEmailAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'新邮箱地址'**
+  String get newEmailAddress;
+
+  /// No description provided for @enterNewEmail.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入新邮箱地址'**
+  String get enterNewEmail;
+
+  /// No description provided for @verificationCode.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证码'**
+  String get verificationCode;
+
+  /// No description provided for @verificationCodeSent.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证码已发送'**
+  String get verificationCodeSent;
+
+  /// No description provided for @codeSentTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证码已发送至'**
+  String get codeSentTo;
+
+  /// No description provided for @didNotReceiveCode.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有收到验证码？'**
+  String get didNotReceiveCode;
+
+  /// No description provided for @emailChangedSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'邮箱修改成功'**
+  String get emailChangedSuccess;
+
+  /// No description provided for @changeEmailFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改邮箱失败'**
+  String get changeEmailFailed;
+
+  /// No description provided for @emailSecurityNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'邮箱用于密码找回，请确保安全。'**
+  String get emailSecurityNote;
+
+  /// No description provided for @googleLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用 Google 登录'**
+  String get googleLogin;
+
+  /// No description provided for @appleLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用 Apple 登录'**
+  String get appleLogin;
+
+  /// No description provided for @socialLoginCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'登录已取消'**
+  String get socialLoginCancelled;
+
+  /// No description provided for @socialLoginFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'社交登录失败'**
+  String get socialLoginFailed;
+
+  /// No description provided for @language.
+  ///
+  /// In zh, this message translates to:
+  /// **'语言'**
+  String get language;
+
+  /// No description provided for @languageChanged.
+  ///
+  /// In zh, this message translates to:
+  /// **'语言已更改'**
+  String get languageChanged;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

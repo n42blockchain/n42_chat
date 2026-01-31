@@ -3225,7 +3225,7 @@ class SId extends S {
   String get groupLabel => 'Grup';
 
   @override
-  String get conversationLabel => '会话';
+  String get conversationLabel => 'Percakapan';
 
   @override
   String get messageLabel => 'Pesan';
@@ -4090,88 +4090,143 @@ class SId extends S {
   }
 
   @override
-  String get emailAddress => '邮箱地址';
+  String get emailAddress => 'Alamat email';
 
   @override
-  String get enterEmailAddress => '请输入邮箱地址';
+  String get enterEmailAddress => 'Masukkan alamat email';
 
   @override
-  String get emailRecoveryHint => '用于找回密码';
+  String get emailRecoveryHint => 'Digunakan untuk pemulihan kata sandi';
 
   @override
-  String get invalidEmailFormat => '请输入有效的邮箱地址';
+  String get invalidEmailFormat => 'Masukkan alamat email yang valid';
 
   @override
-  String get optional => '选填';
+  String get optional => 'Opsional';
 
   @override
-  String get resetPassword => '重置密码';
+  String get resetPassword => 'Reset kata sandi';
 
   @override
-  String get resetPasswordTitle => '重置您的密码';
+  String get resetPasswordTitle => 'Reset kata sandi Anda';
 
   @override
-  String get enterRegisteredEmail => '请输入注册时绑定的邮箱地址';
+  String get enterRegisteredEmail =>
+      'Masukkan alamat email yang Anda daftarkan';
 
   @override
-  String get sendResetCode => '发送重置验证码';
+  String get sendResetCode => 'Kirim kode reset';
 
   @override
   String resetCodeSent(String email) {
-    return '重置验证码已发送至 $email';
+    return 'Kode reset dikirim ke $email';
   }
 
   @override
-  String get enterResetCode => '输入重置验证码';
+  String get enterResetCode => 'Masukkan kode reset';
 
   @override
-  String get setNewPassword => '设置新密码';
+  String get setNewPassword => 'Atur kata sandi baru';
 
   @override
-  String get confirmNewPassword => '确认新密码';
+  String get confirmNewPassword => 'Konfirmasi kata sandi baru';
 
   @override
-  String get newPassword => '新密码';
+  String get newPassword => 'Kata sandi baru';
 
   @override
-  String get passwordResetSuccess => '密码重置成功，请使用新密码登录';
+  String get passwordResetSuccess =>
+      'Kata sandi berhasil direset. Silakan masuk dengan kata sandi baru Anda.';
 
   @override
-  String get resetPasswordFailed => '重置密码失败';
+  String get resetPasswordFailed => 'Gagal mereset kata sandi';
 
   @override
-  String get changePassword => '修改密码';
+  String get changePassword => 'Ubah kata sandi';
 
   @override
-  String get currentPassword => '当前密码';
+  String get currentPassword => 'Kata sandi saat ini';
 
   @override
-  String get enterCurrentPassword => '请输入当前密码';
+  String get enterCurrentPassword => 'Masukkan kata sandi saat ini';
 
   @override
-  String get enterNewPassword => '请输入新密码';
+  String get enterNewPassword => 'Masukkan kata sandi baru';
 
   @override
-  String get passwordChanged => '密码修改成功，请使用新密码重新登录';
+  String get passwordChanged =>
+      'Kata sandi berhasil diubah. Silakan masuk dengan kata sandi baru Anda.';
 
   @override
-  String get changePasswordFailed => '修改密码失败';
+  String get changePasswordFailed => 'Gagal mengubah kata sandi';
 
   @override
-  String get incorrectCurrentPassword => '当前密码错误';
+  String get incorrectCurrentPassword => 'Kata sandi saat ini salah';
 
   @override
-  String get newPasswordMustBeDifferent => '新密码不能与当前密码相同';
+  String get newPasswordMustBeDifferent =>
+      'Kata sandi baru harus berbeda dari kata sandi saat ini';
 
   @override
-  String get changePasswordInfo => '修改密码后，您将被登出，需要使用新密码重新登录。';
+  String get changePasswordInfo =>
+      'Setelah mengubah kata sandi, Anda akan keluar dan perlu masuk dengan kata sandi baru.';
 
   @override
-  String get passwordRequirements => '密码要求：';
+  String get passwordRequirements => 'Persyaratan kata sandi:';
 
   @override
-  String get securityNote => '为了安全，修改密码后需要在所有设备上重新登录。';
+  String get securityNote =>
+      'Untuk keamanan, Anda perlu masuk ulang di semua perangkat setelah mengubah kata sandi.';
 
   @override
-  String get security => '安全';
+  String get security => 'Keamanan';
+
+  @override
+  String get currentBoundEmail => 'Email yang terhubung saat ini';
+
+  @override
+  String get newEmailAddress => 'Alamat email baru';
+
+  @override
+  String get enterNewEmail => 'Masukkan alamat email baru';
+
+  @override
+  String get verificationCode => 'Kode verifikasi';
+
+  @override
+  String get verificationCodeSent => 'Kode verifikasi terkirim';
+
+  @override
+  String get codeSentTo => 'Kode verifikasi dikirim ke';
+
+  @override
+  String get didNotReceiveCode => 'Tidak menerima kode?';
+
+  @override
+  String get emailChangedSuccess => 'Email berhasil diubah';
+
+  @override
+  String get changeEmailFailed => 'Gagal mengubah email';
+
+  @override
+  String get emailSecurityNote =>
+      'Email Anda digunakan untuk pemulihan kata sandi. Jaga keamanannya.';
+
+  @override
+  String get googleLogin => 'Masuk dengan Google';
+
+  @override
+  String get appleLogin => 'Masuk dengan Apple';
+
+  @override
+  String get socialLoginCancelled => 'Login dibatalkan';
+
+  @override
+  String get socialLoginFailed => 'Login sosial gagal';
+
+  @override
+  String get language => 'Bahasa';
+
+  @override
+  String get languageChanged => 'Bahasa diubah';
 }

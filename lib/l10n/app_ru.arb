@@ -122,19 +122,25 @@
   "userNotFoundHint": "Пользователь \"{query}\" не найден\n\nПодсказки:\n• Попробуйте ввести полный ID пользователя, например @username:server.com\n• Проверьте правильность написания имени",
   "@userNotFoundHint": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "createChatFailed": "Не удалось создать чат: {error}",
   "@createChatFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "searchFailed": "Ошибка поиска: {error}",
   "@searchFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterUserIdOrUsername": "Введите ID или имя пользователя для поиска",
@@ -144,7 +150,9 @@
   "userNotFound": "Пользователь \"{username}\" не найден",
   "@userNotFound": {
     "placeholders": {
-      "username": {"type": "String"}
+      "username": {
+        "type": "String"
+      }
     }
   },
   "chat": "Чат",
@@ -623,7 +631,9 @@
   "done": "Готово({count})",
   "@done": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "services": "Сервисы",
@@ -633,7 +643,9 @@
   "statusSetTo": "Статус установлен: {status}",
   "@statusSetTo": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "avatarUploadFailed": "Не удалось загрузить аватар",
@@ -649,7 +661,9 @@
   "genderSetTo": "Пол установлен: {gender}",
   "@genderSetTo": {
     "placeholders": {
-      "gender": {"type": "String"}
+      "gender": {
+        "type": "String"
+      }
     }
   },
   "selectRegion": "Выбрать регион",
@@ -657,7 +671,9 @@
   "regionSetTo": "Регион установлен: {region}",
   "@regionSetTo": {
     "placeholders": {
-      "region": {"type": "String"}
+      "region": {
+        "type": "String"
+      }
     }
   },
   "setPoke": "Настроить толчок",
@@ -669,7 +685,9 @@
   "pokeSetTo": "Толчок установлен: толкнул меня{suffix}",
   "@pokeSetTo": {
     "placeholders": {
-      "suffix": {"type": "String"}
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "editSignature": "Редактировать подпись",
@@ -680,13 +698,17 @@
   "ringtoneSetTo": "Рингтон установлен: {ringtone}",
   "@ringtoneSetTo": {
     "placeholders": {
-      "ringtone": {"type": "String"}
+      "ringtone": {
+        "type": "String"
+      }
     }
   },
   "confirmDissolveGroup": "Вы уверены, что хотите расформировать «{name}»? Это действие нельзя отменить.",
   "@confirmDissolveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "enterValidServerAddress": "Пожалуйста, введите действительный адрес сервера",
@@ -707,54 +729,72 @@
   "messagesWithCount": "Сообщения({count})",
   "@messagesWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "contactCount": "{count} контактов",
   "@contactCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addToHomeScreen": "Добавить на главный экран",
   "recommendedCardTo": "Рекомендовано карточка {contact} для {recipient}",
   "@recommendedCardTo": {
     "placeholders": {
-      "contact": {"type": "String"},
-      "recipient": {"type": "String"}
+      "contact": {
+        "type": "String"
+      },
+      "recipient": {
+        "type": "String"
+      }
     }
   },
   "enterRemarkName": "Введите имя заметки",
   "remarkSetTo": "Заметка установлена: {remark}",
   "@remarkSetTo": {
     "placeholders": {
-      "remark": {"type": "String"}
+      "remark": {
+        "type": "String"
+      }
     }
   },
   "acceptedFriendRequest": "Принят запрос в друзья от {name}",
   "@acceptedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "rejectedFriendRequest": "Отклонён запрос в друзья от {name}",
   "@rejectedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "groupInvites": "Приглашения в группы",
   "myGroups": "Мои группы ({count})",
   "@myGroups": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "invitedToJoinGroup": "Приглашён в группу",
   "confirmLeaveGroup": "Вы уверены, что хотите покинуть «{name}»?",
   "@confirmLeaveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "leave": "Покинуть",
@@ -769,14 +809,18 @@
   "downloadFailed": "Ошибка загрузки: {code}",
   "@downloadFailed": {
     "placeholders": {
-      "code": {"type": "String"}
+      "code": {
+        "type": "String"
+      }
     }
   },
   "noMediaUrl": "URL медиа недоступен",
   "shareFailed": "Ошибка при отправке: {error}",
   "@shareFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "failedToLoadImage": "Не удалось загрузить изображение",
@@ -810,14 +854,20 @@
   "daysAgoText": "{count} дней назад",
   "@daysAgoText": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "dateFormat": "{day}.{month}",
   "@dateFormat": {
     "placeholders": {
-      "month": {"type": "int"},
-      "day": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
     }
   },
   "noFavorites": "Пока нет избранного",
@@ -866,7 +916,9 @@
   "deleteContactConfirm": "Вы уверены, что хотите удалить {name}?",
   "@deleteContactConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "transferTitle": "Перевод",
@@ -880,8 +932,12 @@
   "availableBalanceFormat": "Доступно: {balance} {symbol}",
   "@availableBalanceFormat": {
     "placeholders": {
-      "balance": {"type": "String"},
-      "symbol": {"type": "String"}
+      "balance": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
     }
   },
   "addMemoHint": "Добавить примечание",
@@ -901,20 +957,26 @@
   "readCountReceipt": "{count} прочитано",
   "@readCountReceipt": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "n42IdLabel": "N42 ID: {id}",
   "@n42IdLabel": {
     "placeholders": {
-      "id": {"type": "String"}
+      "id": {
+        "type": "String"
+      }
     }
   },
   "redPacketDefaultGreeting": "С наилучшими пожеланиями",
   "senderRedPacket": "Красный конверт от {name}",
   "@senderRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "enterValidAddress": "Пожалуйста, введите действительный адрес",
@@ -922,13 +984,17 @@
   "receivedTransfer": "Полученный перевод",
   "@fromSender": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "selectForwardRecipient": "Выберите получателя для пересылки",
   "@sendCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "emojiFaces": "Лица",
@@ -943,7 +1009,9 @@
   "senderSentRedPacket": "{name} отправил(а) красный конверт",
   "@senderSentRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "savedToBalance": "Сохранено на баланс, можно переводить напрямую",
@@ -956,7 +1024,9 @@
   "userTyping": "{name} печатает...",
   "@userTyping": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "typing": "Печатает...",
@@ -1026,20 +1096,26 @@
   "permissionCheckError": "Ошибка проверки разрешения: {error}",
   "@permissionCheckError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "invalidQrCode": "Недействительный QR-код",
   "qrCodeProcessFailed": "Не удалось обработать QR-код: {error}",
   "@qrCodeProcessFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "cannotAddFriend": "Не удаётся добавить друга: {error}",
   "@cannotAddFriend": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "scanQrCode": "Сканировать QR-код",
@@ -1051,7 +1127,9 @@
   "inviteCount": "Пригласить({count})",
   "@inviteCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noShippingAddress": "Нет адреса доставки",
@@ -1093,14 +1171,18 @@
   "totalMembers": "{count} участников",
   "@totalMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "removeFromGroup": "Удалить из группы",
   "confirmRemoveMember": "Вы уверены, что хотите удалить \"{name}\" из группы?",
   "@confirmRemoveMember": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "setAsAdmin": "Назначить администратором",
@@ -1116,7 +1198,7 @@
   "endPollButton": "Завершить опрос",
   "createPoll": "Создать опрос",
   "pollQuestion": "Вопрос опроса",
-  "enterPollQuestionHint": "Введите вопрос опроса",
+  "enterPollQuestionHint": "Пожалуйста, введите вопрос опроса",
   "pollOptions": "Варианты ответа",
   "optionPlaceholder": "Вариант {index}",
   "addOption": "Добавить вариант",
@@ -1148,12 +1230,16 @@
   "cannotVoteAfterEnd": "После завершения голосование будет невозможно.",
   "@featureInDev": {
     "placeholders": {
-      "feature": {"type": "String"}
+      "feature": {
+        "type": "String"
+      }
     }
   },
   "@optionPlaceholder": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "bio": "О себе",
@@ -1174,7 +1260,9 @@
   "noResultsForQuery": "Результаты не найдены для \"{query}\"",
   "@noResultsForQuery": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "allResults": "Все",
@@ -1182,14 +1270,15 @@
   "groupLabel": "Группа",
   "contactLabel": "Контакт",
   "messageLabel": "Сообщение",
-
   "securityTitle": "Безопасность",
   "keyBackup": "Резервное копирование ключей",
   "backupEncryptionKeys": "Резервное копирование ключей шифрования",
   "keysBackedUp": "{count} ключей сохранено",
   "@keysBackedUp": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "backupNotSet": "Резервная копия не настроена",
@@ -1221,7 +1310,9 @@
   "deviceIdLabel": "ID устройства: {deviceId}",
   "@deviceIdLabel": {
     "placeholders": {
-      "deviceId": {"type": "String"}
+      "deviceId": {
+        "type": "String"
+      }
     }
   },
   "deviceStatusVerified": "Статус: Подтверждено",
@@ -1229,7 +1320,9 @@
   "lastActiveLabel": "Последняя активность: {lastSeen}",
   "@lastActiveLabel": {
     "placeholders": {
-      "lastSeen": {"type": "String"}
+      "lastSeen": {
+        "type": "String"
+      }
     }
   },
   "verifyThisDevice": "Подтвердить это устройство",
@@ -1237,20 +1330,24 @@
   "crossSigningSetupSuccess": "Кросс-подпись успешно настроена",
   "@setupFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "resetEncryptionTitle": "Сбросить шифрование",
   "resetEncryptionWarning": "Внимание: Это удалит все ваши ключи шифрования. Вы не сможете расшифровать ранее зашифрованные сообщения. Это действие нельзя отменить.",
   "reset": "Сбросить",
-
   "leaveMeetingConfirm": "Вы уверены, что хотите покинуть конференцию?",
-
   "pokedSomeone": "толкнул {name}{suffix}",
   "@pokedSomeone": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suffix": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "noContactsToAdd": "Нет доступных контактов для добавления",
@@ -1258,20 +1355,26 @@
   "invitedMembers": "Приглашено {count} участников",
   "@invitedMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "inviteFailed": "Ошибка приглашения: {error}",
   "@inviteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "memberRemoved": "Участник удалён",
   "removeFailed": "Ошибка удаления: {error}",
   "@removeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "realTimeLocationShareMessage": "После отправки другая сторона сможет видеть ваше местоположение в течение 1 часа.",
@@ -1286,20 +1389,26 @@
   "getLocationFailed": "Не удалось получить местоположение: {error}",
   "@getLocationFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "currentLocation": "Текущее местоположение",
   "nearbyPlace": "Место поблизости {index}",
   "@nearbyPlace": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "approximateDistance": "Примерно {distance}",
   "@approximateDistance": {
     "placeholders": {
-      "distance": {"type": "String"}
+      "distance": {
+        "type": "String"
+      }
     }
   },
   "mapPreview": "Предпросмотр карты",
@@ -1307,41 +1416,57 @@
   "redPacketSent": "Отправлен красный конверт на {amount} {token}",
   "@redPacketSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "transferDefault": "Перевод",
   "transferSent": "Отправлен перевод на {amount} {token}",
   "@transferSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "pickFileFailed": "Не удалось выбрать файл: {error}",
   "@pickFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "fileSizeLimit": "Размер файла не может превышать 50 МБ",
   "fileSending": "Отправка файла: {filename}",
   "@fileSending": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "sendFileFailed": "Не удалось отправить файл: {error}",
   "@sendFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "contactCardSent": "Отправлена контактная карточка {name}",
   "@contactCardSent": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "favoritesFeature": "Избранное",
@@ -1350,12 +1475,16 @@
   "sharedMusic": "Поделился {name}",
   "@sharedMusic": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@sendFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "endPollTitle": "Завершить опрос",
@@ -1377,19 +1506,25 @@
   "filePreviewWithName": "[Файл] {filename}",
   "@filePreviewWithName": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "locationPreviewWithAddress": "[Местоположение] {address}",
   "@locationPreviewWithAddress": {
     "placeholders": {
-      "address": {"type": "String"}
+      "address": {
+        "type": "String"
+      }
     }
   },
   "musicPreviewWithTitle": "[Музыка] {title}",
   "@musicPreviewWithTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "messagePreview": "[Сообщение]",
@@ -1421,7 +1556,9 @@
   "selectedMessagesCount": "Выбрано {count} сообщений",
   "@selectedMessagesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "searchContactsOrGroups": "Поиск контактов или групп",
@@ -1437,12 +1574,13 @@
   "createPollTitle": "Создать опрос",
   "submitPoll": "Отправить",
   "pollQuestionLabel": "Вопрос опроса",
-  "enterPollQuestionHint": "Пожалуйста, введите вопрос опроса",
   "pollOptionsLabel": "Варианты ответа",
   "optionHintWithIndex": "Вариант {index}",
   "@optionHintWithIndex": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "addOptionButton": "Добавить вариант",
@@ -1456,27 +1594,37 @@
   "confirmWithCount": "Подтвердить ({count})",
   "@confirmWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@selectedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@memberCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@groupChatCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@replyTo": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "emailVerificationTitle": "Подтверждение email",
@@ -1484,13 +1632,17 @@
   "verificationCodeSentTo": "Код подтверждения отправлен на {email}",
   "@verificationCodeSentTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "sendCodeFailed": "Не удалось отправить код: {error}",
   "@sendCodeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "verificationSuccess": "Проверка успешна",
@@ -1498,7 +1650,9 @@
   "verificationCodeError": "Ошибка кода подтверждения: {error}",
   "@verificationCodeError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterVerificationCode": "Введите код подтверждения",
@@ -1506,7 +1660,9 @@
   "weSentCodeTo": "Мы отправили 6-значный код на\n{email}",
   "@weSentCodeTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "enterEmailForCode": "Введите ваш email адрес, мы отправим код подтверждения",
@@ -1515,7 +1671,9 @@
   "canResendAfter": "Повторная отправка через {seconds} секунд",
   "@canResendAfter": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "changeEmail": "Изменить email",
@@ -1525,7 +1683,9 @@
   "addFailedWithError": "Ошибка добавления: {error}",
   "@addFailedWithError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "addPhone": "Добавить телефон",
@@ -1535,7 +1695,9 @@
   "groupCountLabel": "{count} групп",
   "@groupCountLabel": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addedViaSearch": "Добавлен через поиск",
@@ -1545,20 +1707,26 @@
   "participantMe": "{name} (Я)",
   "@participantMe": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "sharingLabel": "Отправка",
   "screenSharingBy": "{name} делится экраном",
   "@screenSharingBy": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "participantCount": "{count} участников",
   "@participantCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "muteLabel": "Без звука",
@@ -1574,14 +1742,20 @@
   "pollVotesFormat": "{count} голосов ({percentage}%)",
   "@pollVotesFormat": {
     "placeholders": {
-      "count": {"type": "int"},
-      "percentage": {"type": "String"}
+      "count": {
+        "type": "int"
+      },
+      "percentage": {
+        "type": "String"
+      }
     }
   },
   "pollParticipantsFormat": "{count} участников",
   "@pollParticipantsFormat": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "incomingVideoCall": "Входящий видеозвонок",
@@ -1595,7 +1769,9 @@
   "errorWithMessage": "Ошибка: {message}",
   "@errorWithMessage": {
     "placeholders": {
-      "message": {"type": "String"}
+      "message": {
+        "type": "String"
+      }
     }
   },
   "musicLinkLabel": "Ссылка на музыку",
@@ -1616,13 +1792,17 @@
   "whoCanSeeTitle": "Кто может видеть {title}",
   "@whoCanSeeTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "versionInfo": "Версия {version}",
   "@versionInfo": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "checkForUpdates": "Проверить обновления",
@@ -1665,5 +1845,50 @@
   "editGroupDescription": "Редактировать описание группы",
   "enterGroupAnnouncement": "Введите объявление группы",
   "memberCountClickToCopy": "{count} участников, нажмите для копирования ID группы",
-  "noPermissionToEditGroupName": "У вас нет прав для изменения названия группы"
+  "noPermissionToEditGroupName": "У вас нет прав для изменения названия группы",
+  "appleLogin": "Войти через Apple",
+  "changeEmailFailed": "Не удалось изменить email",
+  "changePassword": "Изменить пароль",
+  "changePasswordFailed": "Не удалось изменить пароль",
+  "changePasswordInfo": "После изменения пароля вы будете отключены и должны будете войти с новым паролем.",
+  "codeSentTo": "Код подтверждения отправлен на",
+  "confirmNewPassword": "Подтвердите новый пароль",
+  "conversationLabel": "Беседа",
+  "currentBoundEmail": "Текущий привязанный email",
+  "currentPassword": "Текущий пароль",
+  "didNotReceiveCode": "Не получили код?",
+  "emailAddress": "Адрес электронной почты",
+  "emailChangedSuccess": "Email успешно изменен",
+  "emailRecoveryHint": "Используется для восстановления пароля",
+  "emailSecurityNote": "Ваш email используется для восстановления пароля. Храните его в безопасности.",
+  "enterCurrentPassword": "Введите текущий пароль",
+  "enterEmailAddress": "Введите адрес электронной почты",
+  "enterNewEmail": "Введите новый адрес электронной почты",
+  "enterNewPassword": "Введите новый пароль",
+  "enterRegisteredEmail": "Введите адрес электронной почты, с которым вы зарегистрировались",
+  "enterResetCode": "Введите код сброса",
+  "googleLogin": "Войти через Google",
+  "incorrectCurrentPassword": "Неверный текущий пароль",
+  "invalidEmailFormat": "Введите действительный адрес электронной почты",
+  "language": "Язык",
+  "languageChanged": "Язык изменен",
+  "newEmailAddress": "Новый адрес электронной почты",
+  "newPassword": "Новый пароль",
+  "newPasswordMustBeDifferent": "Новый пароль должен отличаться от текущего",
+  "optional": "Необязательно",
+  "passwordChanged": "Пароль успешно изменен. Войдите с новым паролем.",
+  "passwordRequirements": "Требования к паролю:",
+  "passwordResetSuccess": "Пароль успешно сброшен. Войдите с новым паролем.",
+  "resetCodeSent": "Код сброса отправлен на {email}",
+  "resetPassword": "Сбросить пароль",
+  "resetPasswordFailed": "Не удалось сбросить пароль",
+  "resetPasswordTitle": "Сбросить пароль",
+  "security": "Безопасность",
+  "securityNote": "В целях безопасности вам нужно будет войти заново на всех устройствах после изменения пароля.",
+  "sendResetCode": "Отправить код сброса",
+  "setNewPassword": "Установить новый пароль",
+  "socialLoginCancelled": "Вход отменен",
+  "socialLoginFailed": "Не удалось войти через социальную сеть",
+  "verificationCode": "Код подтверждения",
+  "verificationCodeSent": "Код подтверждения отправлен"
 }

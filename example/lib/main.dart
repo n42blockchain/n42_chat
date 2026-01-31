@@ -36,8 +36,36 @@ void main() async {
 }
 
 /// N42 Chat 示例应用
-class N42ChatExampleApp extends StatelessWidget {
+class N42ChatExampleApp extends StatefulWidget {
   const N42ChatExampleApp({super.key});
+
+  @override
+  State<N42ChatExampleApp> createState() => _N42ChatExampleAppState();
+}
+
+class _N42ChatExampleAppState extends State<N42ChatExampleApp> {
+  Locale _locale = N42Chat.locale;
+
+  @override
+  void initState() {
+    super.initState();
+    // 监听 N42Chat 的语言变化
+    N42Chat.addLocaleListener(_onLocaleChanged);
+  }
+
+  @override
+  void dispose() {
+    N42Chat.removeLocaleListener(_onLocaleChanged);
+    super.dispose();
+  }
+
+  void _onLocaleChanged(Locale locale) {
+    if (mounted) {
+      setState(() {
+        _locale = locale;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +76,7 @@ class N42ChatExampleApp extends StatelessWidget {
       darkTheme: N42ChatTheme.wechatDark().toThemeData(),
       themeMode: ThemeMode.system,
       // 国际化配置
+      locale: _locale,
       localizationsDelegates: S.localizationsDelegates,
       supportedLocales: S.supportedLocales,
       home: const MainScreen(),
@@ -55,126 +84,14 @@ class N42ChatExampleApp extends StatelessWidget {
   }
 }
 
-/// 主屏幕 - 模拟N42钱包的底部导航结构
-class MainScreen extends StatefulWidget {
+/// 主屏幕 - 直接显示聊天界面（独立聊天程序）
+class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 1; // 默认显示聊天Tab
-  int _unreadCount = 0;
-
-  final List<Widget> _pages = [
-    const WalletPage(),
-    N42Chat.chatWidget(),
-    const DiscoverPage(),
-    const ProfilePage(),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _listenToUnreadCount();
-  }
-
-  void _listenToUnreadCount() {
-    N42Chat.unreadCountStream.listen((count) {
-      if (mounted) {
-        setState(() => _unreadCount = count);
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: Theme.of(context).dividerColor,
-              width: 0.5,
-            ),
-          ),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: const Color(0xFFF7F7F7),
-          selectedItemColor: const Color(0xFF07C160),
-          unselectedItemColor: const Color(0xFF888888),
-          selectedFontSize: 11,
-          unselectedFontSize: 11,
-          iconSize: 24,
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.account_balance_wallet_outlined),
-              activeIcon: const Icon(Icons.account_balance_wallet),
-              label: S.of(context)?.wallet ?? 'Wallet',
-            ),
-            BottomNavigationBarItem(
-              icon: _buildChatIcon(false),
-              activeIcon: _buildChatIcon(true),
-              label: S.of(context)?.messages ?? 'Messages',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.explore_outlined),
-              activeIcon: const Icon(Icons.explore),
-              label: S.of(context)?.discover ?? 'Discover',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.person_outline),
-              activeIcon: const Icon(Icons.person),
-              label: S.of(context)?.me ?? 'Me',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildChatIcon(bool isActive) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Icon(
-          isActive ? Icons.chat_bubble : Icons.chat_bubble_outline,
-        ),
-        if (_unreadCount > 0)
-          Positioned(
-            right: -8,
-            top: -4,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFA5151),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              constraints: const BoxConstraints(
-                minWidth: 16,
-                minHeight: 16,
-              ),
-              child: Text(
-                _unreadCount > 99 ? '99+' : _unreadCount.toString(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-      ],
-    );
+    // 登录后直接显示消息页面，无底部导航
+    return N42Chat.chatWidget();
   }
 }
 

@@ -2161,5 +2161,8 @@
   "appleLogin": "使用 Apple 登录",
   "socialLoginCancelled": "登录已取消",
   "socialLoginFailed": "社交登录失败",
-  "enterServerAddressFirst": "请先输入服务器地址"
+  "enterServerAddressFirst": "请先输入服务器地址",
+
+  "language": "语言",
+  "languageChanged": "语言已更改"
 }

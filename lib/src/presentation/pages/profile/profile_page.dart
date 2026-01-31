@@ -7,11 +7,15 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../n42_chat.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../favorite/favorite_list_page.dart';
 import '../qrcode/my_qrcode_page.dart';
+import '../settings/change_email_page.dart';
+import '../settings/change_password_page.dart';
+import '../settings/language_settings_page.dart';
 import '../settings/settings_page.dart';
 import 'profile_edit_page.dart';
 import 'status_page.dart';
@@ -470,6 +474,33 @@ class _ProfilePageState extends State<ProfilePage> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => SettingsPage(
+          onChangePassword: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => BlocProvider.value(
+                  value: N42Chat.authBloc,
+                  child: const ChangePasswordPage(),
+                ),
+              ),
+            );
+          },
+          onChangeEmail: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => BlocProvider.value(
+                  value: N42Chat.authBloc,
+                  child: const ChangeEmailPage(),
+                ),
+              ),
+            );
+          },
+          onLanguage: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const LanguageSettingsPage(),
+              ),
+            );
+          },
           onLogout: () {
             Navigator.of(context).pop();
             _logout(context);

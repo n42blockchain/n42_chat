@@ -14,6 +14,7 @@ class SettingsPage extends StatelessWidget {
   final VoidCallback? onPrivacy;
   final VoidCallback? onAppearance;
   final VoidCallback? onChat;
+  final VoidCallback? onLanguage;
   final VoidCallback? onSecurity;
   final VoidCallback? onChangePassword;
   final VoidCallback? onChangeEmail;
@@ -28,6 +29,7 @@ class SettingsPage extends StatelessWidget {
     this.onPrivacy,
     this.onAppearance,
     this.onChat,
+    this.onLanguage,
     this.onSecurity,
     this.onChangePassword,
     this.onChangeEmail,
@@ -75,7 +77,7 @@ class SettingsPage extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // 设置组2：外观与聊天
+          // 设置组2：外观、聊天与语言
           _SettingsGroup(
             children: [
               _SettingsItem(
@@ -90,6 +92,13 @@ class SettingsPage extends StatelessWidget {
                 iconColor: Colors.green,
                 title: S.of(context)?.chat ?? 'Chat',
                 onTap: onChat,
+                isDark: isDark,
+              ),
+              _SettingsItem(
+                icon: Icons.language_outlined,
+                iconColor: Colors.blue,
+                title: S.of(context)?.language ?? 'Language',
+                onTap: onLanguage,
                 isDark: isDark,
               ),
             ],

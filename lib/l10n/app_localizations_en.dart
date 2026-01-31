@@ -3752,7 +3752,7 @@ class SEn extends S {
   }
 
   @override
-  String get changeEmail => 'Change email';
+  String get changeEmail => 'Change Email';
 
   @override
   String get addToContacts => 'Add to Contacts';
@@ -4159,4 +4159,53 @@ class SEn extends S {
 
   @override
   String get security => 'Security';
+
+  @override
+  String get currentBoundEmail => 'Current bound email';
+
+  @override
+  String get newEmailAddress => 'New Email Address';
+
+  @override
+  String get enterNewEmail => 'Enter new email address';
+
+  @override
+  String get verificationCode => 'Verification Code';
+
+  @override
+  String get verificationCodeSent => 'Verification code sent';
+
+  @override
+  String get codeSentTo => 'Verification code sent to';
+
+  @override
+  String get didNotReceiveCode => 'Didn\'t receive the code?';
+
+  @override
+  String get emailChangedSuccess => 'Email changed successfully';
+
+  @override
+  String get changeEmailFailed => 'Change email failed';
+
+  @override
+  String get emailSecurityNote =>
+      'Your email is used for password recovery. Please keep it secure.';
+
+  @override
+  String get googleLogin => 'Sign in with Google';
+
+  @override
+  String get appleLogin => 'Sign in with Apple';
+
+  @override
+  String get socialLoginCancelled => 'Login cancelled';
+
+  @override
+  String get socialLoginFailed => 'Social login failed';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get languageChanged => 'Language changed';
 }

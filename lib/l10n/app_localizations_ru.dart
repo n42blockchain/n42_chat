@@ -3235,7 +3235,7 @@ class SRu extends S {
   String get groupLabel => 'Группа';
 
   @override
-  String get conversationLabel => '会话';
+  String get conversationLabel => 'Беседа';
 
   @override
   String get messageLabel => 'Сообщение';
@@ -4102,88 +4102,144 @@ class SRu extends S {
   }
 
   @override
-  String get emailAddress => '邮箱地址';
+  String get emailAddress => 'Адрес электронной почты';
 
   @override
-  String get enterEmailAddress => '请输入邮箱地址';
+  String get enterEmailAddress => 'Введите адрес электронной почты';
 
   @override
-  String get emailRecoveryHint => '用于找回密码';
+  String get emailRecoveryHint => 'Используется для восстановления пароля';
 
   @override
-  String get invalidEmailFormat => '请输入有效的邮箱地址';
+  String get invalidEmailFormat =>
+      'Введите действительный адрес электронной почты';
 
   @override
-  String get optional => '选填';
+  String get optional => 'Необязательно';
 
   @override
-  String get resetPassword => '重置密码';
+  String get resetPassword => 'Сбросить пароль';
 
   @override
-  String get resetPasswordTitle => '重置您的密码';
+  String get resetPasswordTitle => 'Сбросить пароль';
 
   @override
-  String get enterRegisteredEmail => '请输入注册时绑定的邮箱地址';
+  String get enterRegisteredEmail =>
+      'Введите адрес электронной почты, с которым вы зарегистрировались';
 
   @override
-  String get sendResetCode => '发送重置验证码';
+  String get sendResetCode => 'Отправить код сброса';
 
   @override
   String resetCodeSent(String email) {
-    return '重置验证码已发送至 $email';
+    return 'Код сброса отправлен на $email';
   }
 
   @override
-  String get enterResetCode => '输入重置验证码';
+  String get enterResetCode => 'Введите код сброса';
 
   @override
-  String get setNewPassword => '设置新密码';
+  String get setNewPassword => 'Установить новый пароль';
 
   @override
-  String get confirmNewPassword => '确认新密码';
+  String get confirmNewPassword => 'Подтвердите новый пароль';
 
   @override
-  String get newPassword => '新密码';
+  String get newPassword => 'Новый пароль';
 
   @override
-  String get passwordResetSuccess => '密码重置成功，请使用新密码登录';
+  String get passwordResetSuccess =>
+      'Пароль успешно сброшен. Войдите с новым паролем.';
 
   @override
-  String get resetPasswordFailed => '重置密码失败';
+  String get resetPasswordFailed => 'Не удалось сбросить пароль';
 
   @override
-  String get changePassword => '修改密码';
+  String get changePassword => 'Изменить пароль';
 
   @override
-  String get currentPassword => '当前密码';
+  String get currentPassword => 'Текущий пароль';
 
   @override
-  String get enterCurrentPassword => '请输入当前密码';
+  String get enterCurrentPassword => 'Введите текущий пароль';
 
   @override
-  String get enterNewPassword => '请输入新密码';
+  String get enterNewPassword => 'Введите новый пароль';
 
   @override
-  String get passwordChanged => '密码修改成功，请使用新密码重新登录';
+  String get passwordChanged =>
+      'Пароль успешно изменен. Войдите с новым паролем.';
 
   @override
-  String get changePasswordFailed => '修改密码失败';
+  String get changePasswordFailed => 'Не удалось изменить пароль';
 
   @override
-  String get incorrectCurrentPassword => '当前密码错误';
+  String get incorrectCurrentPassword => 'Неверный текущий пароль';
 
   @override
-  String get newPasswordMustBeDifferent => '新密码不能与当前密码相同';
+  String get newPasswordMustBeDifferent =>
+      'Новый пароль должен отличаться от текущего';
 
   @override
-  String get changePasswordInfo => '修改密码后，您将被登出，需要使用新密码重新登录。';
+  String get changePasswordInfo =>
+      'После изменения пароля вы будете отключены и должны будете войти с новым паролем.';
 
   @override
-  String get passwordRequirements => '密码要求：';
+  String get passwordRequirements => 'Требования к паролю:';
 
   @override
-  String get securityNote => '为了安全，修改密码后需要在所有设备上重新登录。';
+  String get securityNote =>
+      'В целях безопасности вам нужно будет войти заново на всех устройствах после изменения пароля.';
 
   @override
-  String get security => '安全';
+  String get security => 'Безопасность';
+
+  @override
+  String get currentBoundEmail => 'Текущий привязанный email';
+
+  @override
+  String get newEmailAddress => 'Новый адрес электронной почты';
+
+  @override
+  String get enterNewEmail => 'Введите новый адрес электронной почты';
+
+  @override
+  String get verificationCode => 'Код подтверждения';
+
+  @override
+  String get verificationCodeSent => 'Код подтверждения отправлен';
+
+  @override
+  String get codeSentTo => 'Код подтверждения отправлен на';
+
+  @override
+  String get didNotReceiveCode => 'Не получили код?';
+
+  @override
+  String get emailChangedSuccess => 'Email успешно изменен';
+
+  @override
+  String get changeEmailFailed => 'Не удалось изменить email';
+
+  @override
+  String get emailSecurityNote =>
+      'Ваш email используется для восстановления пароля. Храните его в безопасности.';
+
+  @override
+  String get googleLogin => 'Войти через Google';
+
+  @override
+  String get appleLogin => 'Войти через Apple';
+
+  @override
+  String get socialLoginCancelled => 'Вход отменен';
+
+  @override
+  String get socialLoginFailed => 'Не удалось войти через социальную сеть';
+
+  @override
+  String get language => 'Язык';
+
+  @override
+  String get languageChanged => 'Язык изменен';
 }
