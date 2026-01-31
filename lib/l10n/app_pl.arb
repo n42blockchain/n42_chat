@@ -122,19 +122,25 @@
   "userNotFoundHint": "Uzytkownik \"{query}\" nie zostal znaleziony\n\nWskazowki:\n• Sprobuj wprowadzic pelny identyfikator uzytkownika, np. @nazwa:serwer.com\n• Sprawdz pisownie nazwy uzytkownika",
   "@userNotFoundHint": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "createChatFailed": "Nie udalo sie utworzyc czatu: {error}",
   "@createChatFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "searchFailed": "Wyszukiwanie nie powiodlo sie: {error}",
   "@searchFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterUserIdOrUsername": "Wprowadz ID uzytkownika lub nazwe, aby wyszukac",
@@ -144,7 +150,9 @@
   "userNotFound": "Uzytkownik \"{username}\" nie zostal znaleziony",
   "@userNotFound": {
     "placeholders": {
-      "username": {"type": "String"}
+      "username": {
+        "type": "String"
+      }
     }
   },
   "chat": "Czat",
@@ -623,7 +631,9 @@
   "done": "Gotowe({count})",
   "@done": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "services": "Uslugi",
@@ -633,7 +643,9 @@
   "statusSetTo": "Status ustawiony na: {status}",
   "@statusSetTo": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "avatarUploadFailed": "Przesylanie awatara nie powiodlo sie",
@@ -649,7 +661,9 @@
   "genderSetTo": "Plec ustawiona na: {gender}",
   "@genderSetTo": {
     "placeholders": {
-      "gender": {"type": "String"}
+      "gender": {
+        "type": "String"
+      }
     }
   },
   "selectRegion": "Wybierz region",
@@ -657,7 +671,9 @@
   "regionSetTo": "Region ustawiony na: {region}",
   "@regionSetTo": {
     "placeholders": {
-      "region": {"type": "String"}
+      "region": {
+        "type": "String"
+      }
     }
   },
   "setPoke": "Ustaw szturchniecie",
@@ -669,7 +685,9 @@
   "pokeSetTo": "Szturchniecie ustawione na: szturchnal mnie{suffix}",
   "@pokeSetTo": {
     "placeholders": {
-      "suffix": {"type": "String"}
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "editSignature": "Edytuj podpis",
@@ -680,13 +698,17 @@
   "ringtoneSetTo": "Dzwonek ustawiony na: {ringtone}",
   "@ringtoneSetTo": {
     "placeholders": {
-      "ringtone": {"type": "String"}
+      "ringtone": {
+        "type": "String"
+      }
     }
   },
   "confirmDissolveGroup": "Czy na pewno chcesz rozwiązać \"{name}\"? Tej operacji nie można cofnąć.",
   "@confirmDissolveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "enterValidServerAddress": "Wprowadz prawidlowy adres serwera",
@@ -707,54 +729,72 @@
   "messagesWithCount": "Wiadomosci({count})",
   "@messagesWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "contactCount": "{count} kontaktow",
   "@contactCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addToHomeScreen": "Dodaj do ekranu glownego",
   "recommendedCardTo": "Polecono wizytowke {contact} do {recipient}",
   "@recommendedCardTo": {
     "placeholders": {
-      "contact": {"type": "String"},
-      "recipient": {"type": "String"}
+      "contact": {
+        "type": "String"
+      },
+      "recipient": {
+        "type": "String"
+      }
     }
   },
   "enterRemarkName": "Wprowadz nazwe uwagi",
   "remarkSetTo": "Uwaga ustawiona na: {remark}",
   "@remarkSetTo": {
     "placeholders": {
-      "remark": {"type": "String"}
+      "remark": {
+        "type": "String"
+      }
     }
   },
   "acceptedFriendRequest": "Zaakceptowano zaproszenie od {name}",
   "@acceptedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "rejectedFriendRequest": "Odrzucono zaproszenie od {name}",
   "@rejectedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "groupInvites": "Zaproszenia do grupy",
   "myGroups": "Moje grupy ({count})",
   "@myGroups": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "invitedToJoinGroup": "Zaproszono do dolaczenia do grupy",
   "confirmLeaveGroup": "Czy na pewno chcesz opuścić \"{name}\"?",
   "@confirmLeaveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "leave": "Opusc",
@@ -769,14 +809,18 @@
   "downloadFailed": "Pobieranie nie powiodło się: {code}",
   "@downloadFailed": {
     "placeholders": {
-      "code": {"type": "String"}
+      "code": {
+        "type": "String"
+      }
     }
   },
   "noMediaUrl": "Brak dostepnego adresu URL mediow",
   "shareFailed": "Udostępnianie nie powiodło się: {error}",
   "@shareFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "failedToLoadImage": "Nie udalo sie zaladowac obrazu",
@@ -810,14 +854,20 @@
   "daysAgoText": "{count} dni temu",
   "@daysAgoText": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "dateFormat": "{day}/{month}",
   "@dateFormat": {
     "placeholders": {
-      "month": {"type": "int"},
-      "day": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
     }
   },
   "noFavorites": "Brak ulubionych",
@@ -866,7 +916,9 @@
   "deleteContactConfirm": "Czy na pewno chcesz usunac {name}?",
   "@deleteContactConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "transferTitle": "Przelew",
@@ -880,8 +932,12 @@
   "availableBalanceFormat": "Dostepne: {balance} {symbol}",
   "@availableBalanceFormat": {
     "placeholders": {
-      "balance": {"type": "String"},
-      "symbol": {"type": "String"}
+      "balance": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
     }
   },
   "addMemoHint": "Dodaj notatke",
@@ -901,20 +957,26 @@
   "readCountReceipt": "{count} przeczytane",
   "@readCountReceipt": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "n42IdLabel": "ID N42: {id}",
   "@n42IdLabel": {
     "placeholders": {
-      "id": {"type": "String"}
+      "id": {
+        "type": "String"
+      }
     }
   },
   "redPacketDefaultGreeting": "Najlepsze zyczenia",
   "senderRedPacket": "Czerwona koperta od {name}",
   "@senderRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "allButton": "Wszystko",
@@ -923,13 +985,17 @@
   "receivedTransfer": "Odebrany przelew",
   "@fromSender": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "selectForwardRecipient": "Wybierz odbiorce przekazania",
   "@sendCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "emojiFaces": "Twarze",
@@ -944,7 +1010,9 @@
   "senderSentRedPacket": "{name} wyslal(a) czerwona koperte",
   "@senderSentRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "savedToBalance": "Zapisano na saldo, mozna przelewac bezposrednio",
@@ -957,7 +1025,9 @@
   "userTyping": "{name} pisze...",
   "@userTyping": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "typing": "Pisze...",
@@ -1027,20 +1097,26 @@
   "permissionCheckError": "Blad sprawdzania uprawnienia: {error}",
   "@permissionCheckError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "invalidQrCode": "Nieprawidlowy kod QR",
   "qrCodeProcessFailed": "Nie udalo sie przetworzyc kodu QR: {error}",
   "@qrCodeProcessFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "cannotAddFriend": "Nie mozna dodac znajomego: {error}",
   "@cannotAddFriend": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "scanQrCode": "Skanuj kod QR",
@@ -1052,7 +1128,9 @@
   "inviteCount": "Zapros({count})",
   "@inviteCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noShippingAddress": "Brak adresu dostawy",
@@ -1094,14 +1172,18 @@
   "totalMembers": "{count} czlonkow",
   "@totalMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "removeFromGroup": "Usun z grupy",
   "confirmRemoveMember": "Czy na pewno chcesz usunac \"{name}\" z grupy?",
   "@confirmRemoveMember": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "setAsAdmin": "Ustaw jako administratora",
@@ -1149,12 +1231,16 @@
   "cannotVoteAfterEnd": "Po zakonczeniu nie bedzie mozna glosowac.",
   "@featureInDev": {
     "placeholders": {
-      "feature": {"type": "String"}
+      "feature": {
+        "type": "String"
+      }
     }
   },
   "@optionPlaceholder": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "bio": "Bio",
@@ -1175,7 +1261,9 @@
   "noResultsForQuery": "Brak wynikow dla \"{query}\"",
   "@noResultsForQuery": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "allResults": "Wszystko",
@@ -1183,14 +1271,15 @@
   "groupLabel": "Grupa",
   "contactLabel": "Kontakt",
   "messageLabel": "Wiadomosc",
-
   "securityTitle": "Bezpieczenstwo",
   "keyBackup": "Kopia zapasowa kluczy",
   "backupEncryptionKeys": "Kopia zapasowa kluczy szyfrowania",
   "keysBackedUp": "{count} kluczy skopiowanych",
   "@keysBackedUp": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "backupNotSet": "Kopia zapasowa nie ustawiona",
@@ -1222,7 +1311,9 @@
   "deviceIdLabel": "ID urzadzenia: {deviceId}",
   "@deviceIdLabel": {
     "placeholders": {
-      "deviceId": {"type": "String"}
+      "deviceId": {
+        "type": "String"
+      }
     }
   },
   "deviceStatusVerified": "Status: Zweryfikowane",
@@ -1230,7 +1321,9 @@
   "lastActiveLabel": "Ostatnia aktywnosc: {lastSeen}",
   "@lastActiveLabel": {
     "placeholders": {
-      "lastSeen": {"type": "String"}
+      "lastSeen": {
+        "type": "String"
+      }
     }
   },
   "verifyThisDevice": "Zweryfikuj to urzadzenie",
@@ -1238,20 +1331,24 @@
   "crossSigningSetupSuccess": "Konfiguracja podpisywania krzyzowego powiodla sie",
   "@setupFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "resetEncryptionTitle": "Zresetuj szyfrowanie",
   "resetEncryptionWarning": "Ostrzezenie: Spowoduje to usuniecie wszystkich kluczy szyfrowania. Nie bedziesz moc odszyfrowac poprzednich zaszyfrowanych wiadomosci. Tej operacji nie mozna cofnac.",
   "reset": "Zresetuj",
-
   "leaveMeetingConfirm": "Czy na pewno chcesz opuscic spotkanie?",
-
   "pokedSomeone": "szturchnal(a) {name}{suffix}",
   "@pokedSomeone": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suffix": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "noContactsToAdd": "Brak dostepnych kontaktow do dodania",
@@ -1259,20 +1356,26 @@
   "invitedMembers": "Zaproszono {count} czlonkow",
   "@invitedMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "inviteFailed": "Zaproszenie nie powiodlo sie: {error}",
   "@inviteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "memberRemoved": "Czlonek usuniety",
   "removeFailed": "Usuniecie nie powiodlo sie: {error}",
   "@removeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "realTimeLocationShareMessage": "Po udostepnieniu druga strona bedzie widziec Twoja lokalizacje w czasie rzeczywistym przez 1 godzine.",
@@ -1287,20 +1390,26 @@
   "getLocationFailed": "Nie udalo sie uzyskac lokalizacji: {error}",
   "@getLocationFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "currentLocation": "Biezaca lokalizacja",
   "nearbyPlace": "Miejsce w poblizu {index}",
   "@nearbyPlace": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "approximateDistance": "Okolo {distance}",
   "@approximateDistance": {
     "placeholders": {
-      "distance": {"type": "String"}
+      "distance": {
+        "type": "String"
+      }
     }
   },
   "mapPreview": "Podglad mapy",
@@ -1308,41 +1417,57 @@
   "redPacketSent": "Wyslano {amount} {token} czerwona koperte",
   "@redPacketSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "transferDefault": "Przelew",
   "transferSent": "Wyslano {amount} {token} przelew",
   "@transferSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "pickFileFailed": "Nie udalo sie wybrac pliku: {error}",
   "@pickFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "fileSizeLimit": "Rozmiar pliku nie moze przekraczac 50MB",
   "fileSending": "Wysylanie pliku: {filename}",
   "@fileSending": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "sendFileFailed": "Nie udalo sie wyslac pliku: {error}",
   "@sendFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "contactCardSent": "Wyslano wizytowke {name}",
   "@contactCardSent": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "favoritesFeature": "Ulubione",
@@ -1351,18 +1476,22 @@
   "sharedMusic": "Udostepniono {name}",
   "@sharedMusic": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@sendFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "endPollTitle": "Zakoncz ankiete",
   "endPollConfirmMessage": "Czy na pewno chcesz zakonczyc te ankiete? Glosowanie zostanie zamkniete po zakonczeniu.",
   "pollEndedMessage": "Ankieta zakonczona",
-  "connectingCall": "Laczenie...",
+  "connectingCall": "Łączenie...",
   "muteCall": "Wycisz",
   "speakerOff": "Glosnik wylaczony",
   "speakerOn": "Glosnik",
@@ -1378,19 +1507,25 @@
   "filePreviewWithName": "[Plik] {filename}",
   "@filePreviewWithName": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "locationPreviewWithAddress": "[Lokalizacja] {address}",
   "@locationPreviewWithAddress": {
     "placeholders": {
-      "address": {"type": "String"}
+      "address": {
+        "type": "String"
+      }
     }
   },
   "musicPreviewWithTitle": "[Muzyka] {title}",
   "@musicPreviewWithTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "messagePreview": "[Wiadomosc]",
@@ -1422,7 +1557,9 @@
   "selectedMessagesCount": "Wybrano {count} wiadomosci",
   "@selectedMessagesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "searchContactsOrGroups": "Szukaj kontaktow lub grup",
@@ -1438,12 +1575,13 @@
   "createPollTitle": "Utworz ankiete",
   "submitPoll": "Zatwierdz",
   "pollQuestionLabel": "Pytanie ankiety",
-  "enterPollQuestionHint": "Wprowadz pytanie ankiety",
   "pollOptionsLabel": "Opcje ankiety",
   "optionHintWithIndex": "Opcja {index}",
   "@optionHintWithIndex": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "addOptionButton": "Dodaj opcje",
@@ -1457,27 +1595,37 @@
   "confirmWithCount": "Potwierdz ({count})",
   "@confirmWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@selectedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@memberCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@groupChatCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@replyTo": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "emailVerificationTitle": "Weryfikacja e-mail",
@@ -1485,13 +1633,17 @@
   "verificationCodeSentTo": "Kod weryfikacyjny wyslany na {email}",
   "@verificationCodeSentTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "sendCodeFailed": "Nie udalo sie wyslac kodu: {error}",
   "@sendCodeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "verificationSuccess": "Weryfikacja powiodla sie",
@@ -1499,7 +1651,9 @@
   "verificationCodeError": "Blad kodu weryfikacyjnego: {error}",
   "@verificationCodeError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterVerificationCode": "Wprowadz kod weryfikacyjny",
@@ -1507,7 +1661,9 @@
   "weSentCodeTo": "Wyslalismy 6-cyfrowy kod na\n{email}",
   "@weSentCodeTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "enterEmailForCode": "Wprowadz adres e-mail, wyslimy kod weryfikacyjny",
@@ -1516,7 +1672,9 @@
   "canResendAfter": "Mozna wyslac ponownie za {seconds} sekund",
   "@canResendAfter": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "changeEmail": "Zmien e-mail",
@@ -1526,7 +1684,9 @@
   "addFailedWithError": "Dodawanie nie powiodlo sie: {error}",
   "@addFailedWithError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "addPhone": "Dodaj telefon",
@@ -1536,7 +1696,9 @@
   "groupCountLabel": "{count} grup",
   "@groupCountLabel": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addedViaSearch": "Dodano przez wyszukiwanie",
@@ -1546,20 +1708,26 @@
   "participantMe": "{name} (Ja)",
   "@participantMe": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "sharingLabel": "Udostepnianie",
   "screenSharingBy": "{name} udostepnia ekran",
   "@screenSharingBy": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "participantCount": "{count} uczestnikow",
   "@participantCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "muteLabel": "Wycisz",
@@ -1572,18 +1740,23 @@
   "leaveLabel": "Opusc",
   "participantsLabel": "Uczestnicy",
   "joiningMeeting": "Dolaczanie do spotkania...",
-  "connectingCall": "Łączenie...",
   "pollVotesFormat": "{count} głosów ({percentage}%)",
   "@pollVotesFormat": {
     "placeholders": {
-      "count": {"type": "int"},
-      "percentage": {"type": "String"}
+      "count": {
+        "type": "int"
+      },
+      "percentage": {
+        "type": "String"
+      }
     }
   },
   "pollParticipantsFormat": "{count} uczestników",
   "@pollParticipantsFormat": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "incomingVideoCall": "Przychodzące połączenie wideo",
@@ -1597,7 +1770,9 @@
   "errorWithMessage": "Błąd: {message}",
   "@errorWithMessage": {
     "placeholders": {
-      "message": {"type": "String"}
+      "message": {
+        "type": "String"
+      }
     }
   },
   "musicLinkLabel": "Link do muzyki",
@@ -1618,13 +1793,17 @@
   "whoCanSeeTitle": "Kto może zobaczyć {title}",
   "@whoCanSeeTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "versionInfo": "Wersja {version}",
   "@versionInfo": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "checkForUpdates": "Sprawdź aktualizacje",
@@ -1648,7 +1827,6 @@
   "bubbleStyleModernDesc": "Czysty nowoczesny styl dymków",
   "bubbleStyleClassic": "Styl klasyczny",
   "bubbleStyleClassicDesc": "Tradycyjny styl dymków",
-  "allButton": "Wszystko",
   "tapToRetry": "Dotknij, aby ponowić",
   "noConversationsToForward": "Brak rozmów do przekazania",
   "defaultRedPacketGreeting": "Powodzenia i dobrobytu",
@@ -1667,5 +1845,50 @@
   "editGroupDescription": "Edytuj opis grupy",
   "enterGroupAnnouncement": "Wpisz ogłoszenie grupy",
   "memberCountClickToCopy": "{count} członków, kliknij aby skopiować ID grupy",
-  "noPermissionToEditGroupName": "Nie masz uprawnień do edycji nazwy grupy"
+  "noPermissionToEditGroupName": "Nie masz uprawnień do edycji nazwy grupy",
+  "appleLogin": "Zaloguj przez Apple",
+  "changeEmailFailed": "Nie udało się zmienić adresu e-mail",
+  "changePassword": "Zmień hasło",
+  "changePasswordFailed": "Nie udało się zmienić hasła",
+  "changePasswordInfo": "Po zmianie hasła zostaniesz wylogowany i musisz zalogować się nowym hasłem.",
+  "codeSentTo": "Kod weryfikacyjny wysłany na",
+  "confirmNewPassword": "Potwierdź nowe hasło",
+  "conversationLabel": "Rozmowa",
+  "currentBoundEmail": "Aktualnie powiązany e-mail",
+  "currentPassword": "Aktualne hasło",
+  "didNotReceiveCode": "Nie otrzymałeś kodu?",
+  "emailAddress": "Adres e-mail",
+  "emailChangedSuccess": "E-mail został pomyślnie zmieniony",
+  "emailRecoveryHint": "Używany do odzyskiwania hasła",
+  "emailSecurityNote": "Twój e-mail jest używany do odzyskiwania hasła. Chroń go.",
+  "enterCurrentPassword": "Wprowadź aktualne hasło",
+  "enterEmailAddress": "Wprowadź adres e-mail",
+  "enterNewEmail": "Wprowadź nowy adres e-mail",
+  "enterNewPassword": "Wprowadź nowe hasło",
+  "enterRegisteredEmail": "Wprowadź adres e-mail, z którym się zarejestrowałeś",
+  "enterResetCode": "Wprowadź kod resetowania",
+  "googleLogin": "Zaloguj przez Google",
+  "incorrectCurrentPassword": "Nieprawidłowe aktualne hasło",
+  "invalidEmailFormat": "Wprowadź prawidłowy adres e-mail",
+  "language": "Język",
+  "languageChanged": "Język zmieniony",
+  "newEmailAddress": "Nowy adres e-mail",
+  "newPassword": "Nowe hasło",
+  "newPasswordMustBeDifferent": "Nowe hasło musi się różnić od aktualnego",
+  "optional": "Opcjonalnie",
+  "passwordChanged": "Hasło zostało pomyślnie zmienione. Zaloguj się nowym hasłem.",
+  "passwordRequirements": "Wymagania dotyczące hasła:",
+  "passwordResetSuccess": "Hasło zostało pomyślnie zresetowane. Zaloguj się nowym hasłem.",
+  "resetCodeSent": "Kod resetowania wysłany na {email}",
+  "resetPassword": "Resetuj hasło",
+  "resetPasswordFailed": "Nie udało się zresetować hasła",
+  "resetPasswordTitle": "Zresetuj swoje hasło",
+  "security": "Bezpieczeństwo",
+  "securityNote": "Ze względów bezpieczeństwa po zmianie hasła musisz zalogować się ponownie na wszystkich urządzeniach.",
+  "sendResetCode": "Wyślij kod resetowania",
+  "setNewPassword": "Ustaw nowe hasło",
+  "socialLoginCancelled": "Logowanie anulowane",
+  "socialLoginFailed": "Logowanie społecznościowe nie powiodło się",
+  "verificationCode": "Kod weryfikacyjny",
+  "verificationCodeSent": "Kod weryfikacyjny wysłany"
 }

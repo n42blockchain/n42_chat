@@ -122,19 +122,25 @@
   "userNotFoundHint": "사용자 \"{query}\"를 찾을 수 없습니다\n\n팁:\n• 전체 사용자 ID를 입력해보세요 (예: @username:server.com)\n• 사용자 이름 철자를 확인해주세요",
   "@userNotFoundHint": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "createChatFailed": "채팅 생성 실패: {error}",
   "@createChatFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "searchFailed": "검색 실패: {error}",
   "@searchFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterUserIdOrUsername": "검색할 사용자 ID 또는 이름을 입력하세요",
@@ -144,7 +150,9 @@
   "userNotFound": "사용자 \"{username}\"를 찾을 수 없습니다",
   "@userNotFound": {
     "placeholders": {
-      "username": {"type": "String"}
+      "username": {
+        "type": "String"
+      }
     }
   },
   "chat": "채팅",
@@ -623,7 +631,9 @@
   "done": "완료({count})",
   "@done": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "services": "서비스",
@@ -633,7 +643,9 @@
   "statusSetTo": "상태 설정됨: {status}",
   "@statusSetTo": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "avatarUploadFailed": "프로필 사진 업로드 실패",
@@ -649,7 +661,9 @@
   "genderSetTo": "성별 설정됨: {gender}",
   "@genderSetTo": {
     "placeholders": {
-      "gender": {"type": "String"}
+      "gender": {
+        "type": "String"
+      }
     }
   },
   "selectRegion": "지역 선택",
@@ -657,7 +671,9 @@
   "regionSetTo": "지역 설정됨: {region}",
   "@regionSetTo": {
     "placeholders": {
-      "region": {"type": "String"}
+      "region": {
+        "type": "String"
+      }
     }
   },
   "setPoke": "찌르기 설정",
@@ -669,7 +685,9 @@
   "pokeSetTo": "찌르기 설정됨: 나를 찔렀어요{suffix}",
   "@pokeSetTo": {
     "placeholders": {
-      "suffix": {"type": "String"}
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "editSignature": "상태 메시지 편집",
@@ -680,13 +698,17 @@
   "ringtoneSetTo": "벨소리 설정됨: {ringtone}",
   "@ringtoneSetTo": {
     "placeholders": {
-      "ringtone": {"type": "String"}
+      "ringtone": {
+        "type": "String"
+      }
     }
   },
   "confirmDissolveGroup": "\"{name}\"을(를) 해산하시겠습니까? 이 작업은 취소할 수 없습니다.",
   "@confirmDissolveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "enterValidServerAddress": "올바른 서버 주소를 입력해주세요",
@@ -707,54 +729,72 @@
   "messagesWithCount": "메시지({count})",
   "@messagesWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "contactCount": "연락처 {count}명",
   "@contactCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addToHomeScreen": "홈 화면에 추가",
   "recommendedCardTo": "{contact}님의 카드를 {recipient}님에게 추천했습니다",
   "@recommendedCardTo": {
     "placeholders": {
-      "contact": {"type": "String"},
-      "recipient": {"type": "String"}
+      "contact": {
+        "type": "String"
+      },
+      "recipient": {
+        "type": "String"
+      }
     }
   },
   "enterRemarkName": "별명 입력",
   "remarkSetTo": "별명 설정됨: {remark}",
   "@remarkSetTo": {
     "placeholders": {
-      "remark": {"type": "String"}
+      "remark": {
+        "type": "String"
+      }
     }
   },
   "acceptedFriendRequest": "{name}님의 친구 요청을 수락했습니다",
   "@acceptedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "rejectedFriendRequest": "{name}님의 친구 요청을 거절했습니다",
   "@rejectedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "groupInvites": "그룹 초대",
   "myGroups": "내 그룹 ({count})",
   "@myGroups": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "invitedToJoinGroup": "그룹 참여 초대됨",
   "confirmLeaveGroup": "\"{name}\"에서 나가시겠습니까?",
   "@confirmLeaveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "leave": "나가기",
@@ -769,14 +809,18 @@
   "downloadFailed": "다운로드 실패: {code}",
   "@downloadFailed": {
     "placeholders": {
-      "code": {"type": "String"}
+      "code": {
+        "type": "String"
+      }
     }
   },
   "noMediaUrl": "사용 가능한 미디어 URL이 없습니다",
   "shareFailed": "공유 실패: {error}",
   "@shareFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "failedToLoadImage": "이미지 로드 실패",
@@ -810,14 +854,20 @@
   "daysAgoText": "{count}일 전",
   "@daysAgoText": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "dateFormat": "{month}/{day}",
   "@dateFormat": {
     "placeholders": {
-      "month": {"type": "int"},
-      "day": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
     }
   },
   "noFavorites": "즐겨찾기 없음",
@@ -866,7 +916,9 @@
   "deleteContactConfirm": "정말 {name}님을 삭제하시겠습니까?",
   "@deleteContactConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "transferTitle": "송금",
@@ -880,8 +932,12 @@
   "availableBalanceFormat": "사용 가능: {balance} {symbol}",
   "@availableBalanceFormat": {
     "placeholders": {
-      "balance": {"type": "String"},
-      "symbol": {"type": "String"}
+      "balance": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
     }
   },
   "addMemoHint": "메모 추가",
@@ -901,20 +957,26 @@
   "readCountReceipt": "{count}명 읽음",
   "@readCountReceipt": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "n42IdLabel": "N42 ID: {id}",
   "@n42IdLabel": {
     "placeholders": {
-      "id": {"type": "String"}
+      "id": {
+        "type": "String"
+      }
     }
   },
   "redPacketDefaultGreeting": "행운을 빕니다",
   "senderRedPacket": "{name}님의 레드패킷",
   "@senderRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "allButton": "전체",
@@ -923,13 +985,17 @@
   "receivedTransfer": "송금 받음",
   "@fromSender": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "selectForwardRecipient": "전달할 사람 선택",
   "@sendCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "emojiFaces": "얼굴",
@@ -944,7 +1010,9 @@
   "senderSentRedPacket": "{name}님이 레드패킷을 보냈습니다",
   "@senderSentRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "savedToBalance": "잔액에 저장됨, 바로 송금 가능",
@@ -957,7 +1025,9 @@
   "userTyping": "{name}님이 입력 중...",
   "@userTyping": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "typing": "입력 중...",
@@ -1027,20 +1097,26 @@
   "permissionCheckError": "권한 확인 오류: {error}",
   "@permissionCheckError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "invalidQrCode": "잘못된 QR 코드",
   "qrCodeProcessFailed": "QR 코드 처리 실패: {error}",
   "@qrCodeProcessFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "cannotAddFriend": "친구 추가 불가: {error}",
   "@cannotAddFriend": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "scanQrCode": "QR 코드 스캔",
@@ -1052,7 +1128,9 @@
   "inviteCount": "초대({count})",
   "@inviteCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noShippingAddress": "배송 주소 없음",
@@ -1094,14 +1172,18 @@
   "totalMembers": "멤버 {count}명",
   "@totalMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "removeFromGroup": "그룹에서 삭제",
   "confirmRemoveMember": "정말 \"{name}\"님을 그룹에서 삭제하시겠습니까?",
   "@confirmRemoveMember": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "setAsAdmin": "관리자로 설정",
@@ -1117,7 +1199,7 @@
   "endPollButton": "투표 종료",
   "createPoll": "투표 만들기",
   "pollQuestion": "투표 질문",
-  "enterPollQuestionHint": "투표 질문 입력",
+  "enterPollQuestionHint": "투표 질문을 입력해주세요",
   "pollOptions": "투표 옵션",
   "optionPlaceholder": "옵션 {index}",
   "addOption": "옵션 추가",
@@ -1149,12 +1231,16 @@
   "cannotVoteAfterEnd": "종료 후에는 더 이상 투표할 수 없습니다.",
   "@featureInDev": {
     "placeholders": {
-      "feature": {"type": "String"}
+      "feature": {
+        "type": "String"
+      }
     }
   },
   "@optionPlaceholder": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "bio": "소개",
@@ -1175,7 +1261,9 @@
   "noResultsForQuery": "\"{query}\"에 대한 결과 없음",
   "@noResultsForQuery": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "allResults": "전체",
@@ -1183,14 +1271,15 @@
   "groupLabel": "그룹",
   "contactLabel": "연락처",
   "messageLabel": "메시지",
-
   "securityTitle": "보안",
   "keyBackup": "키 백업",
   "backupEncryptionKeys": "암호화 키 백업",
   "keysBackedUp": "키 {count}개 백업됨",
   "@keysBackedUp": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "backupNotSet": "백업이 설정되지 않음",
@@ -1222,7 +1311,9 @@
   "deviceIdLabel": "기기 ID: {deviceId}",
   "@deviceIdLabel": {
     "placeholders": {
-      "deviceId": {"type": "String"}
+      "deviceId": {
+        "type": "String"
+      }
     }
   },
   "deviceStatusVerified": "상태: 인증됨",
@@ -1230,7 +1321,9 @@
   "lastActiveLabel": "마지막 활동: {lastSeen}",
   "@lastActiveLabel": {
     "placeholders": {
-      "lastSeen": {"type": "String"}
+      "lastSeen": {
+        "type": "String"
+      }
     }
   },
   "verifyThisDevice": "이 기기 인증",
@@ -1238,20 +1331,24 @@
   "crossSigningSetupSuccess": "교차 서명 설정 성공",
   "@setupFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "resetEncryptionTitle": "암호화 재설정",
   "resetEncryptionWarning": "경고: 이 작업은 모든 암호화 키를 삭제합니다. 이전의 암호화된 메시지를 복호화할 수 없게 됩니다. 이 작업은 취소할 수 없습니다.",
   "reset": "재설정",
-
   "leaveMeetingConfirm": "정말 회의를 나가시겠습니까?",
-
   "pokedSomeone": "{name}님을 찔렀어요{suffix}",
   "@pokedSomeone": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suffix": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "noContactsToAdd": "추가할 연락처가 없습니다",
@@ -1259,20 +1356,26 @@
   "invitedMembers": "멤버 {count}명 초대됨",
   "@invitedMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "inviteFailed": "초대 실패: {error}",
   "@inviteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "memberRemoved": "멤버 삭제됨",
   "removeFailed": "삭제 실패: {error}",
   "@removeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "realTimeLocationShareMessage": "공유 후 상대방이 1시간 동안 당신의 실시간 위치를 볼 수 있습니다.",
@@ -1287,20 +1390,26 @@
   "getLocationFailed": "위치 가져오기 실패: {error}",
   "@getLocationFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "currentLocation": "현재 위치",
   "nearbyPlace": "주변 장소 {index}",
   "@nearbyPlace": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "approximateDistance": "약 {distance}",
   "@approximateDistance": {
     "placeholders": {
-      "distance": {"type": "String"}
+      "distance": {
+        "type": "String"
+      }
     }
   },
   "mapPreview": "지도 미리보기",
@@ -1308,41 +1417,57 @@
   "redPacketSent": "{amount} {token} 레드패킷 전송됨",
   "@redPacketSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "transferDefault": "송금",
   "transferSent": "{amount} {token} 송금 전송됨",
   "@transferSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "pickFileFailed": "파일 선택 실패: {error}",
   "@pickFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "fileSizeLimit": "파일 크기는 50MB를 초과할 수 없습니다",
   "fileSending": "파일 전송 중: {filename}",
   "@fileSending": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "sendFileFailed": "파일 전송 실패: {error}",
   "@sendFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "contactCardSent": "{name}님의 연락처 카드 전송됨",
   "@contactCardSent": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "favoritesFeature": "즐겨찾기",
@@ -1351,12 +1476,16 @@
   "sharedMusic": "{name} 공유됨",
   "@sharedMusic": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@sendFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "endPollTitle": "투표 종료",
@@ -1378,19 +1507,25 @@
   "filePreviewWithName": "[파일] {filename}",
   "@filePreviewWithName": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "locationPreviewWithAddress": "[위치] {address}",
   "@locationPreviewWithAddress": {
     "placeholders": {
-      "address": {"type": "String"}
+      "address": {
+        "type": "String"
+      }
     }
   },
   "musicPreviewWithTitle": "[음악] {title}",
   "@musicPreviewWithTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "messagePreview": "[메시지]",
@@ -1422,7 +1557,9 @@
   "selectedMessagesCount": "{count}개 메시지 선택됨",
   "@selectedMessagesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "searchContactsOrGroups": "연락처 또는 그룹 검색",
@@ -1438,12 +1575,13 @@
   "createPollTitle": "투표 만들기",
   "submitPoll": "제출",
   "pollQuestionLabel": "투표 질문",
-  "enterPollQuestionHint": "투표 질문을 입력해주세요",
   "pollOptionsLabel": "투표 옵션",
   "optionHintWithIndex": "옵션 {index}",
   "@optionHintWithIndex": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "addOptionButton": "옵션 추가",
@@ -1457,27 +1595,37 @@
   "confirmWithCount": "확인 ({count})",
   "@confirmWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@selectedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@memberCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@groupChatCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@replyTo": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "emailVerificationTitle": "이메일 인증",
@@ -1485,13 +1633,17 @@
   "verificationCodeSentTo": "인증 코드가 {email}로 전송되었습니다",
   "@verificationCodeSentTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "sendCodeFailed": "코드 전송 실패: {error}",
   "@sendCodeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "verificationSuccess": "인증 성공",
@@ -1499,7 +1651,9 @@
   "verificationCodeError": "인증 코드 오류: {error}",
   "@verificationCodeError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterVerificationCode": "인증 코드 입력",
@@ -1507,7 +1661,9 @@
   "weSentCodeTo": "6자리 코드를 보냈습니다\n{email}",
   "@weSentCodeTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "enterEmailForCode": "이메일 주소를 입력하시면 인증 코드를 보내드립니다",
@@ -1516,7 +1672,9 @@
   "canResendAfter": "{seconds}초 후 다시 보낼 수 있습니다",
   "@canResendAfter": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "changeEmail": "이메일 변경",
@@ -1526,7 +1684,9 @@
   "addFailedWithError": "추가 실패: {error}",
   "@addFailedWithError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "addPhone": "전화번호 추가",
@@ -1536,7 +1696,9 @@
   "groupCountLabel": "그룹 {count}개",
   "@groupCountLabel": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addedViaSearch": "검색으로 추가됨",
@@ -1546,20 +1708,26 @@
   "participantMe": "{name} (나)",
   "@participantMe": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "sharingLabel": "공유 중",
   "screenSharingBy": "{name}님이 화면 공유 중",
   "@screenSharingBy": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "participantCount": "참가자 {count}명",
   "@participantCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "muteLabel": "음소거",
@@ -1575,14 +1743,20 @@
   "pollVotesFormat": "{count}표 ({percentage}%)",
   "@pollVotesFormat": {
     "placeholders": {
-      "count": {"type": "int"},
-      "percentage": {"type": "String"}
+      "count": {
+        "type": "int"
+      },
+      "percentage": {
+        "type": "String"
+      }
     }
   },
   "pollParticipantsFormat": "{count}명 참여",
   "@pollParticipantsFormat": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "incomingVideoCall": "영상 통화 수신",
@@ -1596,7 +1770,9 @@
   "errorWithMessage": "오류: {message}",
   "@errorWithMessage": {
     "placeholders": {
-      "message": {"type": "String"}
+      "message": {
+        "type": "String"
+      }
     }
   },
   "musicLinkLabel": "음악 링크",
@@ -1617,13 +1793,17 @@
   "whoCanSeeTitle": "{title}을(를) 볼 수 있는 사람",
   "@whoCanSeeTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "versionInfo": "버전 {version}",
   "@versionInfo": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "checkForUpdates": "업데이트 확인",
@@ -1647,7 +1827,6 @@
   "bubbleStyleModernDesc": "깔끔한 모던 말풍선 스타일",
   "bubbleStyleClassic": "클래식 스타일",
   "bubbleStyleClassicDesc": "전통적인 말풍선 스타일",
-  "allButton": "전체",
   "tapToRetry": "탭하여 다시 시도",
   "noConversationsToForward": "전달할 대화가 없습니다",
   "defaultRedPacketGreeting": "부자 되세요, 행운을 빕니다",
@@ -1666,5 +1845,50 @@
   "editGroupDescription": "그룹 설명 수정",
   "enterGroupAnnouncement": "그룹 공지를 입력하세요",
   "memberCountClickToCopy": "{count}명, 클릭하여 그룹 ID 복사",
-  "noPermissionToEditGroupName": "그룹 이름을 수정할 권한이 없습니다"
+  "noPermissionToEditGroupName": "그룹 이름을 수정할 권한이 없습니다",
+  "appleLogin": "Apple로 로그인",
+  "changeEmailFailed": "이메일 변경 실패",
+  "changePassword": "비밀번호 변경",
+  "changePasswordFailed": "비밀번호 변경 실패",
+  "changePasswordInfo": "비밀번호를 변경하면 로그아웃되며 새 비밀번호로 로그인해야 합니다.",
+  "codeSentTo": "인증 코드 전송됨",
+  "confirmNewPassword": "새 비밀번호 확인",
+  "conversationLabel": "대화",
+  "currentBoundEmail": "현재 연결된 이메일",
+  "currentPassword": "현재 비밀번호",
+  "didNotReceiveCode": "코드를 받지 못하셨나요?",
+  "emailAddress": "이메일 주소",
+  "emailChangedSuccess": "이메일이 성공적으로 변경되었습니다",
+  "emailRecoveryHint": "비밀번호 복구에 사용됩니다",
+  "emailSecurityNote": "이메일은 비밀번호 복구에 사용됩니다. 안전하게 보관하세요.",
+  "enterCurrentPassword": "현재 비밀번호 입력",
+  "enterEmailAddress": "이메일 주소 입력",
+  "enterNewEmail": "새 이메일 주소 입력",
+  "enterNewPassword": "새 비밀번호 입력",
+  "enterRegisteredEmail": "등록한 이메일 주소를 입력하세요",
+  "enterResetCode": "재설정 코드 입력",
+  "googleLogin": "Google로 로그인",
+  "incorrectCurrentPassword": "현재 비밀번호가 올바르지 않습니다",
+  "invalidEmailFormat": "유효한 이메일 주소를 입력하세요",
+  "language": "언어",
+  "languageChanged": "언어가 변경되었습니다",
+  "newEmailAddress": "새 이메일 주소",
+  "newPassword": "새 비밀번호",
+  "newPasswordMustBeDifferent": "새 비밀번호는 현재 비밀번호와 달라야 합니다",
+  "optional": "선택 사항",
+  "passwordChanged": "비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인하세요.",
+  "passwordRequirements": "비밀번호 요구 사항:",
+  "passwordResetSuccess": "비밀번호가 성공적으로 재설정되었습니다. 새 비밀번호로 로그인하세요.",
+  "resetCodeSent": "재설정 코드가 {email}로 전송되었습니다",
+  "resetPassword": "비밀번호 재설정",
+  "resetPasswordFailed": "비밀번호 재설정 실패",
+  "resetPasswordTitle": "비밀번호 재설정",
+  "security": "보안",
+  "securityNote": "보안을 위해 비밀번호 변경 후 모든 기기에서 다시 로그인해야 합니다.",
+  "sendResetCode": "재설정 코드 전송",
+  "setNewPassword": "새 비밀번호 설정",
+  "socialLoginCancelled": "로그인이 취소되었습니다",
+  "socialLoginFailed": "소셜 로그인 실패",
+  "verificationCode": "인증 코드",
+  "verificationCodeSent": "인증 코드가 전송되었습니다"
 }

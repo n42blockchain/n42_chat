@@ -322,7 +322,7 @@ class SZh extends S {
   String get favorite => '收藏';
 
   @override
-  String get resend => '重发';
+  String get resend => '重新发送';
 
   @override
   String get recall => '撤回';
@@ -4104,4 +4104,52 @@ class SZh extends S {
 
   @override
   String get security => '安全';
+
+  @override
+  String get currentBoundEmail => '当前绑定邮箱';
+
+  @override
+  String get newEmailAddress => '新邮箱地址';
+
+  @override
+  String get enterNewEmail => '请输入新邮箱地址';
+
+  @override
+  String get verificationCode => '验证码';
+
+  @override
+  String get verificationCodeSent => '验证码已发送';
+
+  @override
+  String get codeSentTo => '验证码已发送至';
+
+  @override
+  String get didNotReceiveCode => '没有收到验证码？';
+
+  @override
+  String get emailChangedSuccess => '邮箱修改成功';
+
+  @override
+  String get changeEmailFailed => '修改邮箱失败';
+
+  @override
+  String get emailSecurityNote => '邮箱用于密码找回，请确保安全。';
+
+  @override
+  String get googleLogin => '使用 Google 登录';
+
+  @override
+  String get appleLogin => '使用 Apple 登录';
+
+  @override
+  String get socialLoginCancelled => '登录已取消';
+
+  @override
+  String get socialLoginFailed => '社交登录失败';
+
+  @override
+  String get language => '语言';
+
+  @override
+  String get languageChanged => '语言已更改';
 }

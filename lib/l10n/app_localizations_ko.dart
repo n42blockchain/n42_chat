@@ -3180,7 +3180,7 @@ class SKo extends S {
   String get groupLabel => '그룹';
 
   @override
-  String get conversationLabel => '会话';
+  String get conversationLabel => '대화';
 
   @override
   String get messageLabel => '메시지';
@@ -4027,88 +4027,136 @@ class SKo extends S {
   }
 
   @override
-  String get emailAddress => '邮箱地址';
+  String get emailAddress => '이메일 주소';
 
   @override
-  String get enterEmailAddress => '请输入邮箱地址';
+  String get enterEmailAddress => '이메일 주소 입력';
 
   @override
-  String get emailRecoveryHint => '用于找回密码';
+  String get emailRecoveryHint => '비밀번호 복구에 사용됩니다';
 
   @override
-  String get invalidEmailFormat => '请输入有效的邮箱地址';
+  String get invalidEmailFormat => '유효한 이메일 주소를 입력하세요';
 
   @override
-  String get optional => '选填';
+  String get optional => '선택 사항';
 
   @override
-  String get resetPassword => '重置密码';
+  String get resetPassword => '비밀번호 재설정';
 
   @override
-  String get resetPasswordTitle => '重置您的密码';
+  String get resetPasswordTitle => '비밀번호 재설정';
 
   @override
-  String get enterRegisteredEmail => '请输入注册时绑定的邮箱地址';
+  String get enterRegisteredEmail => '등록한 이메일 주소를 입력하세요';
 
   @override
-  String get sendResetCode => '发送重置验证码';
+  String get sendResetCode => '재설정 코드 전송';
 
   @override
   String resetCodeSent(String email) {
-    return '重置验证码已发送至 $email';
+    return '재설정 코드가 $email로 전송되었습니다';
   }
 
   @override
-  String get enterResetCode => '输入重置验证码';
+  String get enterResetCode => '재설정 코드 입력';
 
   @override
-  String get setNewPassword => '设置新密码';
+  String get setNewPassword => '새 비밀번호 설정';
 
   @override
-  String get confirmNewPassword => '确认新密码';
+  String get confirmNewPassword => '새 비밀번호 확인';
 
   @override
-  String get newPassword => '新密码';
+  String get newPassword => '새 비밀번호';
 
   @override
-  String get passwordResetSuccess => '密码重置成功，请使用新密码登录';
+  String get passwordResetSuccess => '비밀번호가 성공적으로 재설정되었습니다. 새 비밀번호로 로그인하세요.';
 
   @override
-  String get resetPasswordFailed => '重置密码失败';
+  String get resetPasswordFailed => '비밀번호 재설정 실패';
 
   @override
-  String get changePassword => '修改密码';
+  String get changePassword => '비밀번호 변경';
 
   @override
-  String get currentPassword => '当前密码';
+  String get currentPassword => '현재 비밀번호';
 
   @override
-  String get enterCurrentPassword => '请输入当前密码';
+  String get enterCurrentPassword => '현재 비밀번호 입력';
 
   @override
-  String get enterNewPassword => '请输入新密码';
+  String get enterNewPassword => '새 비밀번호 입력';
 
   @override
-  String get passwordChanged => '密码修改成功，请使用新密码重新登录';
+  String get passwordChanged => '비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인하세요.';
 
   @override
-  String get changePasswordFailed => '修改密码失败';
+  String get changePasswordFailed => '비밀번호 변경 실패';
 
   @override
-  String get incorrectCurrentPassword => '当前密码错误';
+  String get incorrectCurrentPassword => '현재 비밀번호가 올바르지 않습니다';
 
   @override
-  String get newPasswordMustBeDifferent => '新密码不能与当前密码相同';
+  String get newPasswordMustBeDifferent => '새 비밀번호는 현재 비밀번호와 달라야 합니다';
 
   @override
-  String get changePasswordInfo => '修改密码后，您将被登出，需要使用新密码重新登录。';
+  String get changePasswordInfo => '비밀번호를 변경하면 로그아웃되며 새 비밀번호로 로그인해야 합니다.';
 
   @override
-  String get passwordRequirements => '密码要求：';
+  String get passwordRequirements => '비밀번호 요구 사항:';
 
   @override
-  String get securityNote => '为了安全，修改密码后需要在所有设备上重新登录。';
+  String get securityNote => '보안을 위해 비밀번호 변경 후 모든 기기에서 다시 로그인해야 합니다.';
 
   @override
-  String get security => '安全';
+  String get security => '보안';
+
+  @override
+  String get currentBoundEmail => '현재 연결된 이메일';
+
+  @override
+  String get newEmailAddress => '새 이메일 주소';
+
+  @override
+  String get enterNewEmail => '새 이메일 주소 입력';
+
+  @override
+  String get verificationCode => '인증 코드';
+
+  @override
+  String get verificationCodeSent => '인증 코드가 전송되었습니다';
+
+  @override
+  String get codeSentTo => '인증 코드 전송됨';
+
+  @override
+  String get didNotReceiveCode => '코드를 받지 못하셨나요?';
+
+  @override
+  String get emailChangedSuccess => '이메일이 성공적으로 변경되었습니다';
+
+  @override
+  String get changeEmailFailed => '이메일 변경 실패';
+
+  @override
+  String get emailSecurityNote => '이메일은 비밀번호 복구에 사용됩니다. 안전하게 보관하세요.';
+
+  @override
+  String get googleLogin => 'Google로 로그인';
+
+  @override
+  String get appleLogin => 'Apple로 로그인';
+
+  @override
+  String get socialLoginCancelled => '로그인이 취소되었습니다';
+
+  @override
+  String get socialLoginFailed => '소셜 로그인 실패';
+
+  @override
+  String get language => '언어';
+
+  @override
+  String get languageChanged => '언어가 변경되었습니다';
 }

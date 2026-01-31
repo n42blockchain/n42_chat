@@ -122,19 +122,25 @@
   "userNotFoundHint": "Pengguna \"{query}\" tidak ditemukan\n\nTips:\n• Coba masukkan ID pengguna lengkap, contoh @username:server.com\n• Periksa ejaan nama pengguna",
   "@userNotFoundHint": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "createChatFailed": "Gagal membuat chat: {error}",
   "@createChatFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "searchFailed": "Pencarian gagal: {error}",
   "@searchFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterUserIdOrUsername": "Masukkan ID atau nama pengguna untuk mencari",
@@ -144,7 +150,9 @@
   "userNotFound": "Pengguna \"{username}\" tidak ditemukan",
   "@userNotFound": {
     "placeholders": {
-      "username": {"type": "String"}
+      "username": {
+        "type": "String"
+      }
     }
   },
   "chat": "Chat",
@@ -623,7 +631,9 @@
   "done": "Selesai({count})",
   "@done": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "services": "Layanan",
@@ -633,7 +643,9 @@
   "statusSetTo": "Status diatur ke: {status}",
   "@statusSetTo": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "avatarUploadFailed": "Gagal mengunggah avatar",
@@ -649,7 +661,9 @@
   "genderSetTo": "Jenis kelamin diatur ke: {gender}",
   "@genderSetTo": {
     "placeholders": {
-      "gender": {"type": "String"}
+      "gender": {
+        "type": "String"
+      }
     }
   },
   "selectRegion": "Pilih Wilayah",
@@ -657,7 +671,9 @@
   "regionSetTo": "Wilayah diatur ke: {region}",
   "@regionSetTo": {
     "placeholders": {
-      "region": {"type": "String"}
+      "region": {
+        "type": "String"
+      }
     }
   },
   "setPoke": "Atur Colek",
@@ -669,7 +685,9 @@
   "pokeSetTo": "Colek diatur ke: mencolek saya{suffix}",
   "@pokeSetTo": {
     "placeholders": {
-      "suffix": {"type": "String"}
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "editSignature": "Edit Tanda Tangan",
@@ -680,13 +698,17 @@
   "ringtoneSetTo": "Nada dering diatur ke: {ringtone}",
   "@ringtoneSetTo": {
     "placeholders": {
-      "ringtone": {"type": "String"}
+      "ringtone": {
+        "type": "String"
+      }
     }
   },
   "confirmDissolveGroup": "Apakah Anda yakin ingin membubarkan \"{name}\"? Tindakan ini tidak dapat dibatalkan.",
   "@confirmDissolveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "enterValidServerAddress": "Silakan masukkan alamat server yang valid",
@@ -707,54 +729,72 @@
   "messagesWithCount": "Pesan({count})",
   "@messagesWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "contactCount": "{count} kontak",
   "@contactCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addToHomeScreen": "Tambahkan ke layar utama",
   "recommendedCardTo": "Merekomendasikan kartu {contact} ke {recipient}",
   "@recommendedCardTo": {
     "placeholders": {
-      "contact": {"type": "String"},
-      "recipient": {"type": "String"}
+      "contact": {
+        "type": "String"
+      },
+      "recipient": {
+        "type": "String"
+      }
     }
   },
   "enterRemarkName": "Masukkan nama catatan",
   "remarkSetTo": "Catatan diatur ke: {remark}",
   "@remarkSetTo": {
     "placeholders": {
-      "remark": {"type": "String"}
+      "remark": {
+        "type": "String"
+      }
     }
   },
   "acceptedFriendRequest": "Menerima permintaan pertemanan {name}",
   "@acceptedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "rejectedFriendRequest": "Menolak permintaan pertemanan {name}",
   "@rejectedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "groupInvites": "Undangan Grup",
   "myGroups": "Grup Saya ({count})",
   "@myGroups": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "invitedToJoinGroup": "Diundang untuk bergabung ke grup",
   "confirmLeaveGroup": "Apakah Anda yakin ingin keluar dari \"{name}\"?",
   "@confirmLeaveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "leave": "Keluar",
@@ -769,14 +809,18 @@
   "downloadFailed": "Unduhan gagal: {code}",
   "@downloadFailed": {
     "placeholders": {
-      "code": {"type": "String"}
+      "code": {
+        "type": "String"
+      }
     }
   },
   "noMediaUrl": "Tidak ada URL media tersedia",
   "shareFailed": "Gagal berbagi: {error}",
   "@shareFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "failedToLoadImage": "Gagal memuat gambar",
@@ -810,14 +854,20 @@
   "daysAgoText": "{count} hari lalu",
   "@daysAgoText": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "dateFormat": "{day}/{month}",
   "@dateFormat": {
     "placeholders": {
-      "month": {"type": "int"},
-      "day": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
     }
   },
   "noFavorites": "Belum ada favorit",
@@ -866,7 +916,9 @@
   "deleteContactConfirm": "Apakah Anda yakin ingin menghapus {name}?",
   "@deleteContactConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "transferTitle": "Transfer",
@@ -880,8 +932,12 @@
   "availableBalanceFormat": "Tersedia: {balance} {symbol}",
   "@availableBalanceFormat": {
     "placeholders": {
-      "balance": {"type": "String"},
-      "symbol": {"type": "String"}
+      "balance": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
     }
   },
   "addMemoHint": "Tambahkan memo",
@@ -901,20 +957,26 @@
   "readCountReceipt": "{count} dibaca",
   "@readCountReceipt": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "n42IdLabel": "N42 ID: {id}",
   "@n42IdLabel": {
     "placeholders": {
-      "id": {"type": "String"}
+      "id": {
+        "type": "String"
+      }
     }
   },
   "redPacketDefaultGreeting": "Semoga sukses selalu",
   "senderRedPacket": "Angpao {name}",
   "@senderRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "allButton": "Semua",
@@ -923,13 +985,17 @@
   "receivedTransfer": "Transfer Diterima",
   "@fromSender": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "selectForwardRecipient": "Pilih penerima terusan",
   "@sendCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "emojiFaces": "Wajah",
@@ -944,7 +1010,9 @@
   "senderSentRedPacket": "{name} mengirim angpao",
   "@senderSentRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "savedToBalance": "Disimpan ke saldo, dapat ditransfer langsung",
@@ -957,7 +1025,9 @@
   "userTyping": "{name} sedang mengetik...",
   "@userTyping": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "typing": "Mengetik...",
@@ -1027,20 +1097,26 @@
   "permissionCheckError": "Kesalahan memeriksa izin: {error}",
   "@permissionCheckError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "invalidQrCode": "Kode QR tidak valid",
   "qrCodeProcessFailed": "Gagal memproses kode QR: {error}",
   "@qrCodeProcessFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "cannotAddFriend": "Tidak dapat menambah teman: {error}",
   "@cannotAddFriend": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "scanQrCode": "Pindai Kode QR",
@@ -1052,7 +1128,9 @@
   "inviteCount": "Undang({count})",
   "@inviteCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noShippingAddress": "Tidak ada alamat pengiriman",
@@ -1094,14 +1172,18 @@
   "totalMembers": "{count} anggota",
   "@totalMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "removeFromGroup": "Keluarkan dari Grup",
   "confirmRemoveMember": "Apakah Anda yakin ingin mengeluarkan \"{name}\" dari grup?",
   "@confirmRemoveMember": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "setAsAdmin": "Atur sebagai Admin",
@@ -1149,12 +1231,16 @@
   "cannotVoteAfterEnd": "Tidak ada lagi suara yang dapat diberikan setelah diakhiri.",
   "@featureInDev": {
     "placeholders": {
-      "feature": {"type": "String"}
+      "feature": {
+        "type": "String"
+      }
     }
   },
   "@optionPlaceholder": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "bio": "Bio",
@@ -1175,7 +1261,9 @@
   "noResultsForQuery": "Tidak ada hasil ditemukan untuk \"{query}\"",
   "@noResultsForQuery": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "allResults": "Semua",
@@ -1183,14 +1271,15 @@
   "groupLabel": "Grup",
   "contactLabel": "Kontak",
   "messageLabel": "Pesan",
-
   "securityTitle": "Keamanan",
   "keyBackup": "Cadangan Kunci",
   "backupEncryptionKeys": "Cadangkan Kunci Enkripsi",
   "keysBackedUp": "{count} kunci dicadangkan",
   "@keysBackedUp": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "backupNotSet": "Cadangan belum diatur",
@@ -1222,7 +1311,9 @@
   "deviceIdLabel": "ID Perangkat: {deviceId}",
   "@deviceIdLabel": {
     "placeholders": {
-      "deviceId": {"type": "String"}
+      "deviceId": {
+        "type": "String"
+      }
     }
   },
   "deviceStatusVerified": "Status: Terverifikasi",
@@ -1230,7 +1321,9 @@
   "lastActiveLabel": "Terakhir aktif: {lastSeen}",
   "@lastActiveLabel": {
     "placeholders": {
-      "lastSeen": {"type": "String"}
+      "lastSeen": {
+        "type": "String"
+      }
     }
   },
   "verifyThisDevice": "Verifikasi perangkat ini",
@@ -1238,20 +1331,24 @@
   "crossSigningSetupSuccess": "Pengaturan cross-signing berhasil",
   "@setupFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "resetEncryptionTitle": "Reset Enkripsi",
   "resetEncryptionWarning": "Peringatan: Ini akan menghapus semua kunci enkripsi Anda. Anda tidak akan dapat mendekripsi pesan terenkripsi sebelumnya. Tindakan ini tidak dapat dibatalkan.",
   "reset": "Reset",
-
   "leaveMeetingConfirm": "Apakah Anda yakin ingin meninggalkan meeting?",
-
   "pokedSomeone": "mencolek {name}{suffix}",
   "@pokedSomeone": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suffix": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "noContactsToAdd": "Tidak ada kontak yang dapat ditambahkan",
@@ -1259,20 +1356,26 @@
   "invitedMembers": "Mengundang {count} anggota",
   "@invitedMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "inviteFailed": "Undangan gagal: {error}",
   "@inviteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "memberRemoved": "Anggota dikeluarkan",
   "removeFailed": "Gagal mengeluarkan: {error}",
   "@removeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "realTimeLocationShareMessage": "Setelah berbagi, pihak lain dapat melihat lokasi real-time Anda selama 1 jam.",
@@ -1287,20 +1390,26 @@
   "getLocationFailed": "Gagal mendapatkan lokasi: {error}",
   "@getLocationFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "currentLocation": "Lokasi Saat Ini",
   "nearbyPlace": "Tempat Terdekat {index}",
   "@nearbyPlace": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "approximateDistance": "Sekitar {distance}",
   "@approximateDistance": {
     "placeholders": {
-      "distance": {"type": "String"}
+      "distance": {
+        "type": "String"
+      }
     }
   },
   "mapPreview": "Pratinjau Peta",
@@ -1308,41 +1417,57 @@
   "redPacketSent": "Mengirim angpao {amount} {token}",
   "@redPacketSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "transferDefault": "Transfer",
   "transferSent": "Mengirim transfer {amount} {token}",
   "@transferSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "pickFileFailed": "Gagal memilih berkas: {error}",
   "@pickFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "fileSizeLimit": "Ukuran berkas tidak boleh melebihi 50MB",
   "fileSending": "Mengirim berkas: {filename}",
   "@fileSending": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "sendFileFailed": "Gagal mengirim berkas: {error}",
   "@sendFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "contactCardSent": "Mengirim kartu kontak {name}",
   "@contactCardSent": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "favoritesFeature": "Favorit",
@@ -1351,12 +1476,16 @@
   "sharedMusic": "Membagikan {name}",
   "@sharedMusic": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@sendFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "endPollTitle": "Akhiri Polling",
@@ -1377,19 +1506,25 @@
   "filePreviewWithName": "[Berkas] {filename}",
   "@filePreviewWithName": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "locationPreviewWithAddress": "[Lokasi] {address}",
   "@locationPreviewWithAddress": {
     "placeholders": {
-      "address": {"type": "String"}
+      "address": {
+        "type": "String"
+      }
     }
   },
   "musicPreviewWithTitle": "[Musik] {title}",
   "@musicPreviewWithTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "messagePreview": "[Pesan]",
@@ -1421,7 +1556,9 @@
   "selectedMessagesCount": "Dipilih {count} pesan",
   "@selectedMessagesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "searchContactsOrGroups": "Cari kontak atau grup",
@@ -1441,7 +1578,9 @@
   "optionHintWithIndex": "Opsi {index}",
   "@optionHintWithIndex": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "addOptionButton": "Tambah Opsi",
@@ -1455,27 +1594,37 @@
   "confirmWithCount": "Konfirmasi ({count})",
   "@confirmWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@selectedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@memberCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@groupChatCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@replyTo": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "emailVerificationTitle": "Verifikasi Email",
@@ -1483,13 +1632,17 @@
   "verificationCodeSentTo": "Kode verifikasi dikirim ke {email}",
   "@verificationCodeSentTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "sendCodeFailed": "Gagal mengirim kode: {error}",
   "@sendCodeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "verificationSuccess": "Verifikasi berhasil",
@@ -1497,7 +1650,9 @@
   "verificationCodeError": "Kesalahan kode verifikasi: {error}",
   "@verificationCodeError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterVerificationCode": "Masukkan kode verifikasi",
@@ -1505,7 +1660,9 @@
   "weSentCodeTo": "Kami mengirim kode 6 digit ke\n{email}",
   "@weSentCodeTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "enterEmailForCode": "Masukkan alamat email Anda, kami akan mengirim kode verifikasi",
@@ -1514,7 +1671,9 @@
   "canResendAfter": "Dapat mengirim ulang setelah {seconds} detik",
   "@canResendAfter": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "changeEmail": "Ubah email",
@@ -1524,7 +1683,9 @@
   "addFailedWithError": "Gagal menambahkan: {error}",
   "@addFailedWithError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "addPhone": "Tambah telepon",
@@ -1534,7 +1695,9 @@
   "groupCountLabel": "{count} grup",
   "@groupCountLabel": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addedViaSearch": "Ditambahkan melalui pencarian",
@@ -1544,20 +1707,26 @@
   "participantMe": "{name} (Saya)",
   "@participantMe": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "sharingLabel": "Berbagi",
   "screenSharingBy": "{name} sedang berbagi layar",
   "@screenSharingBy": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "participantCount": "{count} peserta",
   "@participantCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "muteLabel": "Bisukan",
@@ -1574,14 +1743,20 @@
   "pollVotesFormat": "{count} suara ({percentage}%)",
   "@pollVotesFormat": {
     "placeholders": {
-      "count": {"type": "int"},
-      "percentage": {"type": "String"}
+      "count": {
+        "type": "int"
+      },
+      "percentage": {
+        "type": "String"
+      }
     }
   },
   "pollParticipantsFormat": "{count} peserta",
   "@pollParticipantsFormat": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "incomingVideoCall": "Panggilan video masuk",
@@ -1595,7 +1770,9 @@
   "errorWithMessage": "Kesalahan: {message}",
   "@errorWithMessage": {
     "placeholders": {
-      "message": {"type": "String"}
+      "message": {
+        "type": "String"
+      }
     }
   },
   "musicLinkLabel": "Link musik",
@@ -1616,13 +1793,17 @@
   "whoCanSeeTitle": "Siapa yang bisa melihat {title}",
   "@whoCanSeeTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "versionInfo": "Versi {version}",
   "@versionInfo": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "checkForUpdates": "Periksa pembaruan",
@@ -1646,7 +1827,6 @@
   "bubbleStyleModernDesc": "Gaya gelembung modern yang bersih",
   "bubbleStyleClassic": "Gaya klasik",
   "bubbleStyleClassicDesc": "Gaya gelembung tradisional",
-  "allButton": "Semua",
   "tapToRetry": "Ketuk untuk mencoba lagi",
   "noConversationsToForward": "Tidak ada percakapan untuk diteruskan",
   "defaultRedPacketGreeting": "Semoga sukses dan sejahtera",
@@ -1665,5 +1845,50 @@
   "editGroupDescription": "Edit deskripsi grup",
   "enterGroupAnnouncement": "Masukkan pengumuman grup",
   "memberCountClickToCopy": "{count} anggota, klik untuk menyalin ID grup",
-  "noPermissionToEditGroupName": "Anda tidak memiliki izin untuk mengubah nama grup"
+  "noPermissionToEditGroupName": "Anda tidak memiliki izin untuk mengubah nama grup",
+  "appleLogin": "Masuk dengan Apple",
+  "changeEmailFailed": "Gagal mengubah email",
+  "changePassword": "Ubah kata sandi",
+  "changePasswordFailed": "Gagal mengubah kata sandi",
+  "changePasswordInfo": "Setelah mengubah kata sandi, Anda akan keluar dan perlu masuk dengan kata sandi baru.",
+  "codeSentTo": "Kode verifikasi dikirim ke",
+  "confirmNewPassword": "Konfirmasi kata sandi baru",
+  "conversationLabel": "Percakapan",
+  "currentBoundEmail": "Email yang terhubung saat ini",
+  "currentPassword": "Kata sandi saat ini",
+  "didNotReceiveCode": "Tidak menerima kode?",
+  "emailAddress": "Alamat email",
+  "emailChangedSuccess": "Email berhasil diubah",
+  "emailRecoveryHint": "Digunakan untuk pemulihan kata sandi",
+  "emailSecurityNote": "Email Anda digunakan untuk pemulihan kata sandi. Jaga keamanannya.",
+  "enterCurrentPassword": "Masukkan kata sandi saat ini",
+  "enterEmailAddress": "Masukkan alamat email",
+  "enterNewEmail": "Masukkan alamat email baru",
+  "enterNewPassword": "Masukkan kata sandi baru",
+  "enterRegisteredEmail": "Masukkan alamat email yang Anda daftarkan",
+  "enterResetCode": "Masukkan kode reset",
+  "googleLogin": "Masuk dengan Google",
+  "incorrectCurrentPassword": "Kata sandi saat ini salah",
+  "invalidEmailFormat": "Masukkan alamat email yang valid",
+  "language": "Bahasa",
+  "languageChanged": "Bahasa diubah",
+  "newEmailAddress": "Alamat email baru",
+  "newPassword": "Kata sandi baru",
+  "newPasswordMustBeDifferent": "Kata sandi baru harus berbeda dari kata sandi saat ini",
+  "optional": "Opsional",
+  "passwordChanged": "Kata sandi berhasil diubah. Silakan masuk dengan kata sandi baru Anda.",
+  "passwordRequirements": "Persyaratan kata sandi:",
+  "passwordResetSuccess": "Kata sandi berhasil direset. Silakan masuk dengan kata sandi baru Anda.",
+  "resetCodeSent": "Kode reset dikirim ke {email}",
+  "resetPassword": "Reset kata sandi",
+  "resetPasswordFailed": "Gagal mereset kata sandi",
+  "resetPasswordTitle": "Reset kata sandi Anda",
+  "security": "Keamanan",
+  "securityNote": "Untuk keamanan, Anda perlu masuk ulang di semua perangkat setelah mengubah kata sandi.",
+  "sendResetCode": "Kirim kode reset",
+  "setNewPassword": "Atur kata sandi baru",
+  "socialLoginCancelled": "Login dibatalkan",
+  "socialLoginFailed": "Login sosial gagal",
+  "verificationCode": "Kode verifikasi",
+  "verificationCodeSent": "Kode verifikasi terkirim"
 }

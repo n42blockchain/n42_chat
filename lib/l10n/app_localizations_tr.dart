@@ -3223,7 +3223,7 @@ class STr extends S {
   String get groupLabel => 'Grup';
 
   @override
-  String get conversationLabel => '会话';
+  String get conversationLabel => 'Sohbet';
 
   @override
   String get messageLabel => 'Mesaj';
@@ -4085,88 +4085,142 @@ class STr extends S {
   }
 
   @override
-  String get emailAddress => '邮箱地址';
+  String get emailAddress => 'E-posta adresi';
 
   @override
-  String get enterEmailAddress => '请输入邮箱地址';
+  String get enterEmailAddress => 'E-posta adresini girin';
 
   @override
-  String get emailRecoveryHint => '用于找回密码';
+  String get emailRecoveryHint => 'Şifre kurtarma için kullanılır';
 
   @override
-  String get invalidEmailFormat => '请输入有效的邮箱地址';
+  String get invalidEmailFormat => 'Geçerli bir e-posta adresi girin';
 
   @override
-  String get optional => '选填';
+  String get optional => 'İsteğe bağlı';
 
   @override
-  String get resetPassword => '重置密码';
+  String get resetPassword => 'Şifre sıfırla';
 
   @override
-  String get resetPasswordTitle => '重置您的密码';
+  String get resetPasswordTitle => 'Şifrenizi sıfırlayın';
 
   @override
-  String get enterRegisteredEmail => '请输入注册时绑定的邮箱地址';
+  String get enterRegisteredEmail => 'Kayıt olduğunuz e-posta adresini girin';
 
   @override
-  String get sendResetCode => '发送重置验证码';
+  String get sendResetCode => 'Sıfırlama kodu gönder';
 
   @override
   String resetCodeSent(String email) {
-    return '重置验证码已发送至 $email';
+    return 'Sıfırlama kodu $email adresine gönderildi';
   }
 
   @override
-  String get enterResetCode => '输入重置验证码';
+  String get enterResetCode => 'Sıfırlama kodunu girin';
 
   @override
-  String get setNewPassword => '设置新密码';
+  String get setNewPassword => 'Yeni şifre belirle';
 
   @override
-  String get confirmNewPassword => '确认新密码';
+  String get confirmNewPassword => 'Yeni şifreyi onayla';
 
   @override
-  String get newPassword => '新密码';
+  String get newPassword => 'Yeni şifre';
 
   @override
-  String get passwordResetSuccess => '密码重置成功，请使用新密码登录';
+  String get passwordResetSuccess =>
+      'Şifre başarıyla sıfırlandı. Yeni şifrenizle giriş yapın.';
 
   @override
-  String get resetPasswordFailed => '重置密码失败';
+  String get resetPasswordFailed => 'Şifre sıfırlanamadı';
 
   @override
-  String get changePassword => '修改密码';
+  String get changePassword => 'Şifre değiştir';
 
   @override
-  String get currentPassword => '当前密码';
+  String get currentPassword => 'Mevcut şifre';
 
   @override
-  String get enterCurrentPassword => '请输入当前密码';
+  String get enterCurrentPassword => 'Mevcut şifreyi girin';
 
   @override
-  String get enterNewPassword => '请输入新密码';
+  String get enterNewPassword => 'Yeni şifreyi girin';
 
   @override
-  String get passwordChanged => '密码修改成功，请使用新密码重新登录';
+  String get passwordChanged =>
+      'Şifre başarıyla değiştirildi. Yeni şifrenizle giriş yapın.';
 
   @override
-  String get changePasswordFailed => '修改密码失败';
+  String get changePasswordFailed => 'Şifre değiştirilemedi';
 
   @override
-  String get incorrectCurrentPassword => '当前密码错误';
+  String get incorrectCurrentPassword => 'Mevcut şifre yanlış';
 
   @override
-  String get newPasswordMustBeDifferent => '新密码不能与当前密码相同';
+  String get newPasswordMustBeDifferent =>
+      'Yeni şifre mevcut şifreden farklı olmalıdır';
 
   @override
-  String get changePasswordInfo => '修改密码后，您将被登出，需要使用新密码重新登录。';
+  String get changePasswordInfo =>
+      'Şifre değiştirildikten sonra çıkış yapılacak ve yeni şifre ile giriş yapmanız gerekecek.';
 
   @override
-  String get passwordRequirements => '密码要求：';
+  String get passwordRequirements => 'Şifre gereksinimleri:';
 
   @override
-  String get securityNote => '为了安全，修改密码后需要在所有设备上重新登录。';
+  String get securityNote =>
+      'Güvenlik için şifre değiştirdikten sonra tüm cihazlarda yeniden giriş yapmanız gerekecek.';
 
   @override
-  String get security => '安全';
+  String get security => 'Güvenlik';
+
+  @override
+  String get currentBoundEmail => 'Mevcut bağlı e-posta';
+
+  @override
+  String get newEmailAddress => 'Yeni e-posta adresi';
+
+  @override
+  String get enterNewEmail => 'Yeni e-posta adresini girin';
+
+  @override
+  String get verificationCode => 'Doğrulama kodu';
+
+  @override
+  String get verificationCodeSent => 'Doğrulama kodu gönderildi';
+
+  @override
+  String get codeSentTo => 'Doğrulama kodu gönderildi';
+
+  @override
+  String get didNotReceiveCode => 'Kodu almadınız mı?';
+
+  @override
+  String get emailChangedSuccess => 'E-posta başarıyla değiştirildi';
+
+  @override
+  String get changeEmailFailed => 'E-posta değiştirilemedi';
+
+  @override
+  String get emailSecurityNote =>
+      'E-postanız şifre kurtarma için kullanılır. Güvende tutun.';
+
+  @override
+  String get googleLogin => 'Google ile giriş yap';
+
+  @override
+  String get appleLogin => 'Apple ile giriş yap';
+
+  @override
+  String get socialLoginCancelled => 'Giriş iptal edildi';
+
+  @override
+  String get socialLoginFailed => 'Sosyal giriş başarısız';
+
+  @override
+  String get language => 'Dil';
+
+  @override
+  String get languageChanged => 'Dil değiştirildi';
 }

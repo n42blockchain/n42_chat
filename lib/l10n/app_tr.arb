@@ -122,19 +122,25 @@
   "userNotFoundHint": "\"{query}\" kullanıcısı bulunamadı\n\nİpuçları:\n• Tam kullanıcı ID'sini girin, örn. @kullaniciadi:sunucu.com\n• Kullanıcı adı yazımını kontrol edin",
   "@userNotFoundHint": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "createChatFailed": "Sohbet oluşturulamadı: {error}",
   "@createChatFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "searchFailed": "Arama başarısız: {error}",
   "@searchFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterUserIdOrUsername": "Aramak için kullanıcı ID'si veya adı girin",
@@ -144,7 +150,9 @@
   "userNotFound": "\"{username}\" kullanıcısı bulunamadı",
   "@userNotFound": {
     "placeholders": {
-      "username": {"type": "String"}
+      "username": {
+        "type": "String"
+      }
     }
   },
   "chat": "Sohbet",
@@ -623,7 +631,9 @@
   "done": "Tamamlandı({count})",
   "@done": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "services": "Hizmetler",
@@ -633,7 +643,9 @@
   "statusSetTo": "Durum ayarlandı: {status}",
   "@statusSetTo": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "avatarUploadFailed": "Avatar yüklemesi başarısız",
@@ -649,7 +661,9 @@
   "genderSetTo": "Cinsiyet ayarlandı: {gender}",
   "@genderSetTo": {
     "placeholders": {
-      "gender": {"type": "String"}
+      "gender": {
+        "type": "String"
+      }
     }
   },
   "selectRegion": "Bölge Seç",
@@ -657,7 +671,9 @@
   "regionSetTo": "Bölge ayarlandı: {region}",
   "@regionSetTo": {
     "placeholders": {
-      "region": {"type": "String"}
+      "region": {
+        "type": "String"
+      }
     }
   },
   "setPoke": "Dürtmeyi Ayarla",
@@ -669,7 +685,9 @@
   "pokeSetTo": "Dürtme ayarlandı: beni dürttü{suffix}",
   "@pokeSetTo": {
     "placeholders": {
-      "suffix": {"type": "String"}
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "editSignature": "İmzayı Düzenle",
@@ -680,13 +698,17 @@
   "ringtoneSetTo": "Zil sesi ayarlandı: {ringtone}",
   "@ringtoneSetTo": {
     "placeholders": {
-      "ringtone": {"type": "String"}
+      "ringtone": {
+        "type": "String"
+      }
     }
   },
   "confirmDissolveGroup": "\"{name}\" grubunu dağıtmak istediğinize emin misiniz? Bu işlem geri alınamaz.",
   "@confirmDissolveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "enterValidServerAddress": "Lütfen geçerli bir sunucu adresi girin",
@@ -707,54 +729,72 @@
   "messagesWithCount": "Mesajlar({count})",
   "@messagesWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "contactCount": "{count} kişi",
   "@contactCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addToHomeScreen": "Ana ekrana ekle",
   "recommendedCardTo": "{contact} kartı {recipient} kişisine önerildi",
   "@recommendedCardTo": {
     "placeholders": {
-      "contact": {"type": "String"},
-      "recipient": {"type": "String"}
+      "contact": {
+        "type": "String"
+      },
+      "recipient": {
+        "type": "String"
+      }
     }
   },
   "enterRemarkName": "Takma ad girin",
   "remarkSetTo": "Not ayarlandı: {remark}",
   "@remarkSetTo": {
     "placeholders": {
-      "remark": {"type": "String"}
+      "remark": {
+        "type": "String"
+      }
     }
   },
   "acceptedFriendRequest": "{name} arkadaşlık isteği kabul edildi",
   "@acceptedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "rejectedFriendRequest": "{name} arkadaşlık isteği reddedildi",
   "@rejectedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "groupInvites": "Grup Davetleri",
   "myGroups": "Gruplarım ({count})",
   "@myGroups": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "invitedToJoinGroup": "Gruba davet edildi",
   "confirmLeaveGroup": "\"{name}\" grubundan ayrılmak istediğinize emin misiniz?",
   "@confirmLeaveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "leave": "Ayrıl",
@@ -769,14 +809,18 @@
   "downloadFailed": "İndirme başarısız: {code}",
   "@downloadFailed": {
     "placeholders": {
-      "code": {"type": "String"}
+      "code": {
+        "type": "String"
+      }
     }
   },
   "noMediaUrl": "Medya URL'si mevcut değil",
   "shareFailed": "Paylaşım başarısız: {error}",
   "@shareFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "failedToLoadImage": "Resim yüklenemedi",
@@ -810,14 +854,20 @@
   "daysAgoText": "{count} gün önce",
   "@daysAgoText": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "dateFormat": "{day}/{month}",
   "@dateFormat": {
     "placeholders": {
-      "month": {"type": "int"},
-      "day": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
     }
   },
   "noFavorites": "Henüz favori yok",
@@ -866,7 +916,9 @@
   "deleteContactConfirm": "{name} kişisini silmek istediğinizden emin misiniz?",
   "@deleteContactConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "transferTitle": "Transfer",
@@ -880,8 +932,12 @@
   "availableBalanceFormat": "Kullanılabilir: {balance} {symbol}",
   "@availableBalanceFormat": {
     "placeholders": {
-      "balance": {"type": "String"},
-      "symbol": {"type": "String"}
+      "balance": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
     }
   },
   "addMemoHint": "Not ekle",
@@ -901,20 +957,26 @@
   "readCountReceipt": "{count} okundu",
   "@readCountReceipt": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "n42IdLabel": "N42 ID: {id}",
   "@n42IdLabel": {
     "placeholders": {
-      "id": {"type": "String"}
+      "id": {
+        "type": "String"
+      }
     }
   },
   "redPacketDefaultGreeting": "İyi dilekler",
   "senderRedPacket": "{name} Kırmızı Paketi",
   "@senderRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "enterValidAddress": "Lütfen geçerli bir adres girin",
@@ -922,13 +984,17 @@
   "receivedTransfer": "Transfer Alındı",
   "@fromSender": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "selectForwardRecipient": "İletilecek kişiyi seçin",
   "@sendCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "emojiFaces": "Yüzler",
@@ -943,7 +1009,9 @@
   "senderSentRedPacket": "{name} bir kırmızı paket gönderdi",
   "@senderSentRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "savedToBalance": "Bakiyeye kaydedildi, doğrudan transfer edilebilir",
@@ -956,7 +1024,9 @@
   "userTyping": "{name} yazıyor...",
   "@userTyping": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "typing": "Yazıyor...",
@@ -1026,20 +1096,26 @@
   "permissionCheckError": "İzin kontrol hatası: {error}",
   "@permissionCheckError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "invalidQrCode": "Geçersiz QR kod",
   "qrCodeProcessFailed": "QR kod işlenemedi: {error}",
   "@qrCodeProcessFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "cannotAddFriend": "Arkadaş eklenemedi: {error}",
   "@cannotAddFriend": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "scanQrCode": "QR Kod Tara",
@@ -1051,7 +1127,9 @@
   "inviteCount": "Davet Et({count})",
   "@inviteCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noShippingAddress": "Teslimat adresi yok",
@@ -1093,14 +1171,18 @@
   "totalMembers": "{count} üye",
   "@totalMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "removeFromGroup": "Gruptan Çıkar",
   "confirmRemoveMember": "\"{name}\" kişisini gruptan çıkarmak istediğinizden emin misiniz?",
   "@confirmRemoveMember": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "setAsAdmin": "Yönetici Yap",
@@ -1148,12 +1230,16 @@
   "cannotVoteAfterEnd": "Bitirdikten sonra oy verilemez.",
   "@featureInDev": {
     "placeholders": {
-      "feature": {"type": "String"}
+      "feature": {
+        "type": "String"
+      }
     }
   },
   "@optionPlaceholder": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "bio": "Biyografi",
@@ -1174,7 +1260,9 @@
   "noResultsForQuery": "\"{query}\" için sonuç bulunamadı",
   "@noResultsForQuery": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "allResults": "Tümü",
@@ -1182,14 +1270,15 @@
   "groupLabel": "Grup",
   "contactLabel": "Kişi",
   "messageLabel": "Mesaj",
-
   "securityTitle": "Güvenlik",
   "keyBackup": "Anahtar Yedekleme",
   "backupEncryptionKeys": "Şifreleme Anahtarlarını Yedekle",
   "keysBackedUp": "{count} anahtar yedeklendi",
   "@keysBackedUp": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "backupNotSet": "Yedekleme ayarlanmadı",
@@ -1221,7 +1310,9 @@
   "deviceIdLabel": "Cihaz ID: {deviceId}",
   "@deviceIdLabel": {
     "placeholders": {
-      "deviceId": {"type": "String"}
+      "deviceId": {
+        "type": "String"
+      }
     }
   },
   "deviceStatusVerified": "Durum: Doğrulanmış",
@@ -1229,7 +1320,9 @@
   "lastActiveLabel": "Son etkinlik: {lastSeen}",
   "@lastActiveLabel": {
     "placeholders": {
-      "lastSeen": {"type": "String"}
+      "lastSeen": {
+        "type": "String"
+      }
     }
   },
   "verifyThisDevice": "Bu cihazı doğrula",
@@ -1237,20 +1330,24 @@
   "crossSigningSetupSuccess": "Çapraz imza kurulumu başarılı",
   "@setupFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "resetEncryptionTitle": "Şifrelemeyi Sıfırla",
   "resetEncryptionWarning": "Uyarı: Bu tüm şifreleme anahtarlarınızı silecektir. Önceki şifrelenmiş mesajların şifresini çözemeyeceksiniz. Bu işlem geri alınamaz.",
   "reset": "Sıfırla",
-
   "leaveMeetingConfirm": "Toplantıdan ayrılmak istediğinizden emin misiniz?",
-
   "pokedSomeone": "{name} kişisini{suffix} dürttü",
   "@pokedSomeone": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suffix": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "noContactsToAdd": "Eklenecek kişi yok",
@@ -1258,20 +1355,26 @@
   "invitedMembers": "{count} üye davet edildi",
   "@invitedMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "inviteFailed": "Davet başarısız: {error}",
   "@inviteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "memberRemoved": "Üye çıkarıldı",
   "removeFailed": "Çıkarma başarısız: {error}",
   "@removeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "realTimeLocationShareMessage": "Paylaştıktan sonra, karşı taraf 1 saat boyunca gerçek zamanlı konumunuzu görebilir.",
@@ -1286,20 +1389,26 @@
   "getLocationFailed": "Konum alınamadı: {error}",
   "@getLocationFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "currentLocation": "Mevcut Konum",
   "nearbyPlace": "Yakın Yer {index}",
   "@nearbyPlace": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "approximateDistance": "Yaklaşık {distance}",
   "@approximateDistance": {
     "placeholders": {
-      "distance": {"type": "String"}
+      "distance": {
+        "type": "String"
+      }
     }
   },
   "mapPreview": "Harita Önizleme",
@@ -1307,41 +1416,57 @@
   "redPacketSent": "{amount} {token} kırmızı paket gönderildi",
   "@redPacketSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "transferDefault": "Transfer",
   "transferSent": "{amount} {token} transfer gönderildi",
   "@transferSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "pickFileFailed": "Dosya seçilemedi: {error}",
   "@pickFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "fileSizeLimit": "Dosya boyutu 50MB'ı geçemez",
   "fileSending": "Dosya gönderiliyor: {filename}",
   "@fileSending": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "sendFileFailed": "Dosya gönderilemedi: {error}",
   "@sendFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "contactCardSent": "{name} kişi kartı gönderildi",
   "@contactCardSent": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "favoritesFeature": "Favoriler",
@@ -1350,12 +1475,16 @@
   "sharedMusic": "{name} paylaşıldı",
   "@sharedMusic": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@sendFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "endPollTitle": "Anketi Bitir",
@@ -1377,19 +1506,25 @@
   "filePreviewWithName": "[Dosya] {filename}",
   "@filePreviewWithName": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "locationPreviewWithAddress": "[Konum] {address}",
   "@locationPreviewWithAddress": {
     "placeholders": {
-      "address": {"type": "String"}
+      "address": {
+        "type": "String"
+      }
     }
   },
   "musicPreviewWithTitle": "[Müzik] {title}",
   "@musicPreviewWithTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "messagePreview": "[Mesaj]",
@@ -1421,7 +1556,9 @@
   "selectedMessagesCount": "{count} mesaj seçildi",
   "@selectedMessagesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "searchContactsOrGroups": "Kişi veya gruplarda ara",
@@ -1441,7 +1578,9 @@
   "optionHintWithIndex": "Seçenek {index}",
   "@optionHintWithIndex": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "addOptionButton": "Seçenek Ekle",
@@ -1455,27 +1594,37 @@
   "confirmWithCount": "Onayla ({count})",
   "@confirmWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@selectedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@memberCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@groupChatCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@replyTo": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "emailVerificationTitle": "E-posta Doğrulama",
@@ -1483,13 +1632,17 @@
   "verificationCodeSentTo": "{email} adresine doğrulama kodu gönderildi",
   "@verificationCodeSentTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "sendCodeFailed": "Kod gönderilemedi: {error}",
   "@sendCodeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "verificationSuccess": "Doğrulama başarılı",
@@ -1497,7 +1650,9 @@
   "verificationCodeError": "Doğrulama kodu hatası: {error}",
   "@verificationCodeError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterVerificationCode": "Doğrulama kodunu girin",
@@ -1505,7 +1660,9 @@
   "weSentCodeTo": "{email} adresine\n6 haneli kod gönderdik",
   "@weSentCodeTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "enterEmailForCode": "E-posta adresinizi girin, doğrulama kodu göndereceğiz",
@@ -1514,7 +1671,9 @@
   "canResendAfter": "{seconds} saniye sonra tekrar gönderilebilir",
   "@canResendAfter": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "changeEmail": "E-postayı değiştir",
@@ -1524,7 +1683,9 @@
   "addFailedWithError": "Ekleme başarısız: {error}",
   "@addFailedWithError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "addPhone": "Telefon ekle",
@@ -1534,7 +1695,9 @@
   "groupCountLabel": "{count} grup",
   "@groupCountLabel": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addedViaSearch": "Arama yoluyla eklendi",
@@ -1544,20 +1707,26 @@
   "participantMe": "{name} (Ben)",
   "@participantMe": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "sharingLabel": "Paylaşılıyor",
   "screenSharingBy": "{name} ekran paylaşıyor",
   "@screenSharingBy": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "participantCount": "{count} katılımcı",
   "@participantCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "muteLabel": "Sessize Al",
@@ -1570,18 +1739,23 @@
   "leaveLabel": "Ayrıl",
   "participantsLabel": "Katılımcılar",
   "joiningMeeting": "Toplantıya katılınıyor...",
-  "connectingCall": "Bağlanıyor...",
   "pollVotesFormat": "{count} oy ({percentage}%)",
   "@pollVotesFormat": {
     "placeholders": {
-      "count": {"type": "int"},
-      "percentage": {"type": "String"}
+      "count": {
+        "type": "int"
+      },
+      "percentage": {
+        "type": "String"
+      }
     }
   },
   "pollParticipantsFormat": "{count} katılımcı",
   "@pollParticipantsFormat": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "incomingVideoCall": "Gelen görüntülü arama",
@@ -1595,7 +1769,9 @@
   "errorWithMessage": "Hata: {message}",
   "@errorWithMessage": {
     "placeholders": {
-      "message": {"type": "String"}
+      "message": {
+        "type": "String"
+      }
     }
   },
   "musicLinkLabel": "Müzik bağlantısı",
@@ -1616,13 +1792,17 @@
   "whoCanSeeTitle": "{title} kimler görebilir",
   "@whoCanSeeTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "versionInfo": "Sürüm {version}",
   "@versionInfo": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "checkForUpdates": "Güncellemeleri kontrol et",
@@ -1665,5 +1845,50 @@
   "editGroupDescription": "Grup açıklamasını düzenle",
   "enterGroupAnnouncement": "Grup duyurusunu girin",
   "memberCountClickToCopy": "{count} üye, grup ID'sini kopyalamak için tıklayın",
-  "noPermissionToEditGroupName": "Grup adını düzenleme izniniz yok"
+  "noPermissionToEditGroupName": "Grup adını düzenleme izniniz yok",
+  "appleLogin": "Apple ile giriş yap",
+  "changeEmailFailed": "E-posta değiştirilemedi",
+  "changePassword": "Şifre değiştir",
+  "changePasswordFailed": "Şifre değiştirilemedi",
+  "changePasswordInfo": "Şifre değiştirildikten sonra çıkış yapılacak ve yeni şifre ile giriş yapmanız gerekecek.",
+  "codeSentTo": "Doğrulama kodu gönderildi",
+  "confirmNewPassword": "Yeni şifreyi onayla",
+  "conversationLabel": "Sohbet",
+  "currentBoundEmail": "Mevcut bağlı e-posta",
+  "currentPassword": "Mevcut şifre",
+  "didNotReceiveCode": "Kodu almadınız mı?",
+  "emailAddress": "E-posta adresi",
+  "emailChangedSuccess": "E-posta başarıyla değiştirildi",
+  "emailRecoveryHint": "Şifre kurtarma için kullanılır",
+  "emailSecurityNote": "E-postanız şifre kurtarma için kullanılır. Güvende tutun.",
+  "enterCurrentPassword": "Mevcut şifreyi girin",
+  "enterEmailAddress": "E-posta adresini girin",
+  "enterNewEmail": "Yeni e-posta adresini girin",
+  "enterNewPassword": "Yeni şifreyi girin",
+  "enterRegisteredEmail": "Kayıt olduğunuz e-posta adresini girin",
+  "enterResetCode": "Sıfırlama kodunu girin",
+  "googleLogin": "Google ile giriş yap",
+  "incorrectCurrentPassword": "Mevcut şifre yanlış",
+  "invalidEmailFormat": "Geçerli bir e-posta adresi girin",
+  "language": "Dil",
+  "languageChanged": "Dil değiştirildi",
+  "newEmailAddress": "Yeni e-posta adresi",
+  "newPassword": "Yeni şifre",
+  "newPasswordMustBeDifferent": "Yeni şifre mevcut şifreden farklı olmalıdır",
+  "optional": "İsteğe bağlı",
+  "passwordChanged": "Şifre başarıyla değiştirildi. Yeni şifrenizle giriş yapın.",
+  "passwordRequirements": "Şifre gereksinimleri:",
+  "passwordResetSuccess": "Şifre başarıyla sıfırlandı. Yeni şifrenizle giriş yapın.",
+  "resetCodeSent": "Sıfırlama kodu {email} adresine gönderildi",
+  "resetPassword": "Şifre sıfırla",
+  "resetPasswordFailed": "Şifre sıfırlanamadı",
+  "resetPasswordTitle": "Şifrenizi sıfırlayın",
+  "security": "Güvenlik",
+  "securityNote": "Güvenlik için şifre değiştirdikten sonra tüm cihazlarda yeniden giriş yapmanız gerekecek.",
+  "sendResetCode": "Sıfırlama kodu gönder",
+  "setNewPassword": "Yeni şifre belirle",
+  "socialLoginCancelled": "Giriş iptal edildi",
+  "socialLoginFailed": "Sosyal giriş başarısız",
+  "verificationCode": "Doğrulama kodu",
+  "verificationCodeSent": "Doğrulama kodu gönderildi"
 }

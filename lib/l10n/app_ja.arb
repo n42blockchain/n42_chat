@@ -122,19 +122,25 @@
   "userNotFoundHint": "ユーザー「{query}」が見つかりません\n\nヒント:\n• 完全なユーザーIDを入力してください（例: @username:server.com）\n• ユーザー名のスペルを確認してください",
   "@userNotFoundHint": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "createChatFailed": "チャットの作成に失敗しました: {error}",
   "@createChatFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "searchFailed": "検索に失敗しました: {error}",
   "@searchFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterUserIdOrUsername": "ユーザーIDまたはユーザー名を入力して検索",
@@ -144,7 +150,9 @@
   "userNotFound": "ユーザー「{username}」が見つかりません",
   "@userNotFound": {
     "placeholders": {
-      "username": {"type": "String"}
+      "username": {
+        "type": "String"
+      }
     }
   },
   "chat": "チャット",
@@ -623,7 +631,9 @@
   "done": "完了({count})",
   "@done": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "services": "サービス",
@@ -633,7 +643,9 @@
   "statusSetTo": "ステータスを設定しました: {status}",
   "@statusSetTo": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "avatarUploadFailed": "アバターのアップロードに失敗しました",
@@ -649,7 +661,9 @@
   "genderSetTo": "性別を設定しました: {gender}",
   "@genderSetTo": {
     "placeholders": {
-      "gender": {"type": "String"}
+      "gender": {
+        "type": "String"
+      }
     }
   },
   "selectRegion": "地域を選択",
@@ -657,7 +671,9 @@
   "regionSetTo": "地域を設定しました: {region}",
   "@regionSetTo": {
     "placeholders": {
-      "region": {"type": "String"}
+      "region": {
+        "type": "String"
+      }
     }
   },
   "setPoke": "つつくを設定",
@@ -669,7 +685,9 @@
   "pokeSetTo": "つつくを設定しました: つついた{suffix}",
   "@pokeSetTo": {
     "placeholders": {
-      "suffix": {"type": "String"}
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "editSignature": "署名を編集",
@@ -680,13 +698,17 @@
   "ringtoneSetTo": "着信音を設定しました: {ringtone}",
   "@ringtoneSetTo": {
     "placeholders": {
-      "ringtone": {"type": "String"}
+      "ringtone": {
+        "type": "String"
+      }
     }
   },
   "confirmDissolveGroup": "「{name}」を解散してもよろしいですか？この操作は元に戻せません。",
   "@confirmDissolveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "enterValidServerAddress": "有効なサーバーアドレスを入力してください",
@@ -707,54 +729,72 @@
   "messagesWithCount": "メッセージ({count})",
   "@messagesWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "contactCount": "{count}件の連絡先",
   "@contactCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addToHomeScreen": "ホーム画面に追加",
   "recommendedCardTo": "{contact}のカードを{recipient}におすすめしました",
   "@recommendedCardTo": {
     "placeholders": {
-      "contact": {"type": "String"},
-      "recipient": {"type": "String"}
+      "contact": {
+        "type": "String"
+      },
+      "recipient": {
+        "type": "String"
+      }
     }
   },
   "enterRemarkName": "表示名を入力",
   "remarkSetTo": "メモを設定しました: {remark}",
   "@remarkSetTo": {
     "placeholders": {
-      "remark": {"type": "String"}
+      "remark": {
+        "type": "String"
+      }
     }
   },
   "acceptedFriendRequest": "{name}の友達リクエストを承認しました",
   "@acceptedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "rejectedFriendRequest": "{name}の友達リクエストを拒否しました",
   "@rejectedFriendRequest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "groupInvites": "グループ招待",
   "myGroups": "マイグループ ({count})",
   "@myGroups": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "invitedToJoinGroup": "グループへの招待",
   "confirmLeaveGroup": "「{name}」を退出してもよろしいですか？",
   "@confirmLeaveGroup": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "leave": "退出",
@@ -769,14 +809,18 @@
   "downloadFailed": "ダウンロード失敗: {code}",
   "@downloadFailed": {
     "placeholders": {
-      "code": {"type": "String"}
+      "code": {
+        "type": "String"
+      }
     }
   },
   "noMediaUrl": "メディアURLがありません",
   "shareFailed": "共有に失敗しました: {error}",
   "@shareFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "failedToLoadImage": "画像の読み込みに失敗しました",
@@ -810,14 +854,20 @@
   "daysAgoText": "{count}日前",
   "@daysAgoText": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "dateFormat": "{month}/{day}",
   "@dateFormat": {
     "placeholders": {
-      "month": {"type": "int"},
-      "day": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
     }
   },
   "noFavorites": "お気に入りがありません",
@@ -866,7 +916,9 @@
   "deleteContactConfirm": "{name}を削除してもよろしいですか？",
   "@deleteContactConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "transferTitle": "送金",
@@ -880,8 +932,12 @@
   "availableBalanceFormat": "残高: {balance} {symbol}",
   "@availableBalanceFormat": {
     "placeholders": {
-      "balance": {"type": "String"},
-      "symbol": {"type": "String"}
+      "balance": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
     }
   },
   "addMemoHint": "メモを追加",
@@ -901,20 +957,26 @@
   "readCountReceipt": "{count}人が既読",
   "@readCountReceipt": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "n42IdLabel": "N42 ID: {id}",
   "@n42IdLabel": {
     "placeholders": {
-      "id": {"type": "String"}
+      "id": {
+        "type": "String"
+      }
     }
   },
   "redPacketDefaultGreeting": "お祝いメッセージ",
   "senderRedPacket": "{name}のレッドパケット",
   "@senderRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "enterValidAddress": "有効なアドレスを入力してください",
@@ -922,13 +984,17 @@
   "receivedTransfer": "送金を受け取りました",
   "@fromSender": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "selectForwardRecipient": "転送先を選択",
   "@sendCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "emojiFaces": "顔",
@@ -943,7 +1009,9 @@
   "senderSentRedPacket": "{name}がレッドパケットを送りました",
   "@senderSentRedPacket": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "savedToBalance": "残高に保存され、直接送金可能",
@@ -956,7 +1024,9 @@
   "userTyping": "{name}が入力中...",
   "@userTyping": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "typing": "入力中...",
@@ -1026,20 +1096,26 @@
   "permissionCheckError": "権限確認エラー: {error}",
   "@permissionCheckError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "invalidQrCode": "無効なQRコード",
   "qrCodeProcessFailed": "QRコードの処理に失敗しました: {error}",
   "@qrCodeProcessFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "cannotAddFriend": "友達を追加できません: {error}",
   "@cannotAddFriend": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "scanQrCode": "QRコードをスキャン",
@@ -1051,7 +1127,9 @@
   "inviteCount": "招待({count})",
   "@inviteCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noShippingAddress": "配送先住所がありません",
@@ -1093,14 +1171,18 @@
   "totalMembers": "{count}人のメンバー",
   "@totalMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "removeFromGroup": "グループから削除",
   "confirmRemoveMember": "「{name}」をグループから削除してもよろしいですか？",
   "@confirmRemoveMember": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "setAsAdmin": "管理者に設定",
@@ -1116,7 +1198,7 @@
   "endPollButton": "投票を終了",
   "createPoll": "投票を作成",
   "pollQuestion": "投票の質問",
-  "enterPollQuestionHint": "投票の質問を入力",
+  "enterPollQuestionHint": "投票の質問を入力してください",
   "pollOptions": "投票オプション",
   "optionPlaceholder": "オプション {index}",
   "addOption": "オプションを追加",
@@ -1148,12 +1230,16 @@
   "cannotVoteAfterEnd": "終了後は投票できなくなります。",
   "@featureInDev": {
     "placeholders": {
-      "feature": {"type": "String"}
+      "feature": {
+        "type": "String"
+      }
     }
   },
   "@optionPlaceholder": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "bio": "自己紹介",
@@ -1174,7 +1260,9 @@
   "noResultsForQuery": "「{query}」の検索結果が見つかりませんでした",
   "@noResultsForQuery": {
     "placeholders": {
-      "query": {"type": "String"}
+      "query": {
+        "type": "String"
+      }
     }
   },
   "allResults": "すべて",
@@ -1182,14 +1270,15 @@
   "contactLabel": "連絡先",
   "messageLabel": "メッセージ",
   "searchInChat": "チャット内を検索",
-
   "securityTitle": "セキュリティ",
   "keyBackup": "キーバックアップ",
   "backupEncryptionKeys": "暗号化キーをバックアップ",
   "keysBackedUp": "{count}個のキーをバックアップしました",
   "@keysBackedUp": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "backupNotSet": "バックアップ未設定",
@@ -1221,7 +1310,9 @@
   "deviceIdLabel": "デバイスID: {deviceId}",
   "@deviceIdLabel": {
     "placeholders": {
-      "deviceId": {"type": "String"}
+      "deviceId": {
+        "type": "String"
+      }
     }
   },
   "deviceStatusVerified": "ステータス: 確認済み",
@@ -1229,7 +1320,9 @@
   "lastActiveLabel": "最終アクティブ: {lastSeen}",
   "@lastActiveLabel": {
     "placeholders": {
-      "lastSeen": {"type": "String"}
+      "lastSeen": {
+        "type": "String"
+      }
     }
   },
   "verifyThisDevice": "このデバイスを確認",
@@ -1237,20 +1330,24 @@
   "crossSigningSetupSuccess": "クロス署名の設定が完了しました",
   "@setupFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "resetEncryptionTitle": "暗号化をリセット",
   "resetEncryptionWarning": "警告: これにより、すべての暗号化キーが削除されます。以前の暗号化されたメッセージを復号化できなくなります。この操作は取り消せません。",
   "reset": "リセット",
-
   "leaveMeetingConfirm": "ミーティングを退出してもよろしいですか？",
-
   "pokedSomeone": "{name}{suffix}をつついた",
   "@pokedSomeone": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suffix": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "suffix": {
+        "type": "String"
+      }
     }
   },
   "noContactsToAdd": "追加できる連絡先がありません",
@@ -1258,20 +1355,26 @@
   "invitedMembers": "{count}人のメンバーを招待しました",
   "@invitedMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "inviteFailed": "招待に失敗しました: {error}",
   "@inviteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "memberRemoved": "メンバーを削除しました",
   "removeFailed": "削除に失敗しました: {error}",
   "@removeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "realTimeLocationShareMessage": "共有後、相手は1時間あなたのリアルタイム位置情報を見ることができます。",
@@ -1286,20 +1389,26 @@
   "getLocationFailed": "位置情報の取得に失敗しました: {error}",
   "@getLocationFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "currentLocation": "現在地",
   "nearbyPlace": "近くの場所 {index}",
   "@nearbyPlace": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "approximateDistance": "約{distance}",
   "@approximateDistance": {
     "placeholders": {
-      "distance": {"type": "String"}
+      "distance": {
+        "type": "String"
+      }
     }
   },
   "mapPreview": "地図プレビュー",
@@ -1307,41 +1416,57 @@
   "redPacketSent": "{amount} {token}のレッドパケットを送りました",
   "@redPacketSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "transferDefault": "送金",
   "transferSent": "{amount} {token}を送金しました",
   "@transferSent": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "token": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
   "pickFileFailed": "ファイルの選択に失敗しました: {error}",
   "@pickFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "fileSizeLimit": "ファイルサイズは50MBを超えられません",
   "fileSending": "ファイルを送信中: {filename}",
   "@fileSending": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "sendFileFailed": "ファイルの送信に失敗しました: {error}",
   "@sendFileFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "contactCardSent": "{name}の連絡先カードを送信しました",
   "@contactCardSent": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "favoritesFeature": "お気に入り",
@@ -1350,12 +1475,16 @@
   "sharedMusic": "{name}を共有しました",
   "@sharedMusic": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@sendFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "endPollTitle": "投票を終了",
@@ -1377,19 +1506,25 @@
   "filePreviewWithName": "[ファイル] {filename}",
   "@filePreviewWithName": {
     "placeholders": {
-      "filename": {"type": "String"}
+      "filename": {
+        "type": "String"
+      }
     }
   },
   "locationPreviewWithAddress": "[位置情報] {address}",
   "@locationPreviewWithAddress": {
     "placeholders": {
-      "address": {"type": "String"}
+      "address": {
+        "type": "String"
+      }
     }
   },
   "musicPreviewWithTitle": "[音楽] {title}",
   "@musicPreviewWithTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "messagePreview": "[メッセージ]",
@@ -1421,7 +1556,9 @@
   "selectedMessagesCount": "{count}件のメッセージを選択",
   "@selectedMessagesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "searchContactsOrGroups": "連絡先またはグループを検索",
@@ -1437,12 +1574,13 @@
   "createPollTitle": "投票を作成",
   "submitPoll": "送信",
   "pollQuestionLabel": "投票の質問",
-  "enterPollQuestionHint": "投票の質問を入力してください",
   "pollOptionsLabel": "投票オプション",
   "optionHintWithIndex": "オプション {index}",
   "@optionHintWithIndex": {
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "addOptionButton": "オプションを追加",
@@ -1456,27 +1594,37 @@
   "confirmWithCount": "確認 ({count})",
   "@confirmWithCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@selectedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@memberCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@groupChatCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@replyTo": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "emailVerificationTitle": "メール認証",
@@ -1484,13 +1632,17 @@
   "verificationCodeSentTo": "認証コードを{email}に送信しました",
   "@verificationCodeSentTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "sendCodeFailed": "コードの送信に失敗しました: {error}",
   "@sendCodeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "verificationSuccess": "認証に成功しました",
@@ -1498,7 +1650,9 @@
   "verificationCodeError": "認証コードエラー: {error}",
   "@verificationCodeError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enterVerificationCode": "認証コードを入力",
@@ -1506,7 +1660,9 @@
   "weSentCodeTo": "6桁のコードを\n{email}に送信しました",
   "@weSentCodeTo": {
     "placeholders": {
-      "email": {"type": "String"}
+      "email": {
+        "type": "String"
+      }
     }
   },
   "enterEmailForCode": "メールアドレスを入力すると、認証コードを送信します",
@@ -1515,7 +1671,9 @@
   "canResendAfter": "{seconds}秒後に再送信可能",
   "@canResendAfter": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "changeEmail": "メールアドレスを変更",
@@ -1525,7 +1683,9 @@
   "addFailedWithError": "追加に失敗しました: {error}",
   "@addFailedWithError": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "addPhone": "電話番号を追加",
@@ -1535,7 +1695,9 @@
   "groupCountLabel": "{count}件のグループ",
   "@groupCountLabel": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "addedViaSearch": "検索で追加",
@@ -1545,20 +1707,26 @@
   "participantMe": "{name} (自分)",
   "@participantMe": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "sharingLabel": "共有中",
   "screenSharingBy": "{name}が画面を共有中",
   "@screenSharingBy": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "participantCount": "{count}人の参加者",
   "@participantCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "muteLabel": "ミュート",
@@ -1574,14 +1742,20 @@
   "pollVotesFormat": "{count}票 ({percentage}%)",
   "@pollVotesFormat": {
     "placeholders": {
-      "count": {"type": "int"},
-      "percentage": {"type": "String"}
+      "count": {
+        "type": "int"
+      },
+      "percentage": {
+        "type": "String"
+      }
     }
   },
   "pollParticipantsFormat": "{count}人が参加",
   "@pollParticipantsFormat": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "incomingVideoCall": "ビデオ通話の着信",
@@ -1595,7 +1769,9 @@
   "errorWithMessage": "エラー: {message}",
   "@errorWithMessage": {
     "placeholders": {
-      "message": {"type": "String"}
+      "message": {
+        "type": "String"
+      }
     }
   },
   "musicLinkLabel": "音楽リンク",
@@ -1616,13 +1792,17 @@
   "whoCanSeeTitle": "{title}を見られる人",
   "@whoCanSeeTitle": {
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "versionInfo": "バージョン {version}",
   "@versionInfo": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "checkForUpdates": "アップデートを確認",
@@ -1665,5 +1845,50 @@
   "editGroupDescription": "グループ説明を編集",
   "enterGroupAnnouncement": "グループお知らせを入力",
   "memberCountClickToCopy": "{count}人、クリックしてグループIDをコピー",
-  "noPermissionToEditGroupName": "グループ名を編集する権限がありません"
+  "noPermissionToEditGroupName": "グループ名を編集する権限がありません",
+  "appleLogin": "Appleでサインイン",
+  "changeEmailFailed": "メールアドレスの変更に失敗しました",
+  "changePassword": "パスワードを変更",
+  "changePasswordFailed": "パスワードの変更に失敗しました",
+  "changePasswordInfo": "パスワードを変更すると、ログアウトされ、新しいパスワードでログインする必要があります。",
+  "codeSentTo": "確認コードの送信先",
+  "confirmNewPassword": "新しいパスワードを確認",
+  "conversationLabel": "会話",
+  "currentBoundEmail": "現在紐付けられているメールアドレス",
+  "currentPassword": "現在のパスワード",
+  "didNotReceiveCode": "コードが届きませんか？",
+  "emailAddress": "メールアドレス",
+  "emailChangedSuccess": "メールアドレスが正常に変更されました",
+  "emailRecoveryHint": "パスワードの回復に使用されます",
+  "emailSecurityNote": "メールアドレスはパスワードの回復に使用されます。安全に保管してください。",
+  "enterCurrentPassword": "現在のパスワードを入力",
+  "enterEmailAddress": "メールアドレスを入力",
+  "enterNewEmail": "新しいメールアドレスを入力",
+  "enterNewPassword": "新しいパスワードを入力",
+  "enterRegisteredEmail": "登録時のメールアドレスを入力してください",
+  "enterResetCode": "リセットコードを入力",
+  "googleLogin": "Googleでサインイン",
+  "incorrectCurrentPassword": "現在のパスワードが正しくありません",
+  "invalidEmailFormat": "有効なメールアドレスを入力してください",
+  "language": "言語",
+  "languageChanged": "言語が変更されました",
+  "newEmailAddress": "新しいメールアドレス",
+  "newPassword": "新しいパスワード",
+  "newPasswordMustBeDifferent": "新しいパスワードは現在のパスワードと異なる必要があります",
+  "optional": "任意",
+  "passwordChanged": "パスワードが正常に変更されました。新しいパスワードでログインしてください。",
+  "passwordRequirements": "パスワード要件：",
+  "passwordResetSuccess": "パスワードが正常にリセットされました。新しいパスワードでログインしてください。",
+  "resetCodeSent": "リセットコードを{email}に送信しました",
+  "resetPassword": "パスワードをリセット",
+  "resetPasswordFailed": "パスワードのリセットに失敗しました",
+  "resetPasswordTitle": "パスワードをリセット",
+  "security": "セキュリティ",
+  "securityNote": "セキュリティのため、パスワード変更後はすべてのデバイスで再ログインが必要です。",
+  "sendResetCode": "リセットコードを送信",
+  "setNewPassword": "新しいパスワードを設定",
+  "socialLoginCancelled": "ログインがキャンセルされました",
+  "socialLoginFailed": "ソーシャルログインに失敗しました",
+  "verificationCode": "確認コード",
+  "verificationCodeSent": "確認コードが送信されました"
 }

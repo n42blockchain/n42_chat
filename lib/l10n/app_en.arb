@@ -1911,5 +1911,8 @@
   "appleLogin": "Sign in with Apple",
   "socialLoginCancelled": "Login cancelled",
   "socialLoginFailed": "Social login failed",
-  "enterServerAddressFirst": "Please enter server address first"
+  "enterServerAddressFirst": "Please enter server address first",
+
+  "language": "Language",
+  "languageChanged": "Language changed"
 }
