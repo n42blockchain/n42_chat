@@ -317,3 +317,27 @@ class AuthGetBoundEmailRequested extends AuthEvent {
   const AuthGetBoundEmailRequested();
 }
 
+// ============================================
+// 生物识别登录事件
+// ============================================
+
+/// 生物识别登录请求
+class AuthBiometricLoginRequested extends AuthEvent {
+  const AuthBiometricLoginRequested();
+}
+
+/// 检查生物识别可用性
+class AuthCheckBiometricAvailability extends AuthEvent {
+  const AuthCheckBiometricAvailability();
+}
+
+/// 启用生物识别登录
+class AuthEnableBiometricLogin extends AuthEvent {
+  const AuthEnableBiometricLogin();
+}
+
+/// 禁用生物识别登录
+class AuthDisableBiometricLogin extends AuthEvent {
+  const AuthDisableBiometricLogin();
+}
+

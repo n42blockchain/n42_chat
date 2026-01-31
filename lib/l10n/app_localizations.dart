@@ -7752,6 +7752,114 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'语言已更改'**
   String get languageChanged;
+
+  /// No description provided for @biometricLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'生物识别登录'**
+  String get biometricLogin;
+
+  /// No description provided for @loginWithBiometric.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用{type}登录'**
+  String loginWithBiometric(Object type);
+
+  /// No description provided for @biometricLoginEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'生物识别登录已启用'**
+  String get biometricLoginEnabled;
+
+  /// No description provided for @biometricLoginDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'生物识别登录已禁用'**
+  String get biometricLoginDisabled;
+
+  /// No description provided for @enableBiometricLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'启用生物识别登录'**
+  String get enableBiometricLogin;
+
+  /// No description provided for @disableBiometricLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'禁用生物识别登录'**
+  String get disableBiometricLogin;
+
+  /// No description provided for @biometricNotAvailable.
+  ///
+  /// In zh, this message translates to:
+  /// **'此设备不支持生物识别'**
+  String get biometricNotAvailable;
+
+  /// No description provided for @biometricNotEnrolled.
+  ///
+  /// In zh, this message translates to:
+  /// **'未录入生物识别数据，请在设备设置中设置'**
+  String get biometricNotEnrolled;
+
+  /// No description provided for @biometricAuthFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'生物识别验证失败'**
+  String get biometricAuthFailed;
+
+  /// No description provided for @biometricAuthCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证已取消'**
+  String get biometricAuthCancelled;
+
+  /// No description provided for @biometricLockedOut.
+  ///
+  /// In zh, this message translates to:
+  /// **'尝试次数过多，请稍后再试'**
+  String get biometricLockedOut;
+
+  /// No description provided for @useBiometricToLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用生物识别快速登录'**
+  String get useBiometricToLogin;
+
+  /// No description provided for @authenticateToLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证身份以登录'**
+  String get authenticateToLogin;
+
+  /// No description provided for @authenticateToEnable.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证身份以启用生物识别登录'**
+  String get authenticateToEnable;
+
+  /// No description provided for @faceId.
+  ///
+  /// In zh, this message translates to:
+  /// **'面容 ID'**
+  String get faceId;
+
+  /// No description provided for @touchId.
+  ///
+  /// In zh, this message translates to:
+  /// **'触控 ID'**
+  String get touchId;
+
+  /// No description provided for @fingerprint.
+  ///
+  /// In zh, this message translates to:
+  /// **'指纹'**
+  String get fingerprint;
+
+  /// No description provided for @biometric.
+  ///
+  /// In zh, this message translates to:
+  /// **'生物识别'**
+  String get biometric;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

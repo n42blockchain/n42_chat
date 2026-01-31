@@ -4208,4 +4208,64 @@ class SEn extends S {
 
   @override
   String get languageChanged => 'Language changed';
+
+  @override
+  String get biometricLogin => 'Biometric Login';
+
+  @override
+  String loginWithBiometric(Object type) {
+    return 'Login with $type';
+  }
+
+  @override
+  String get biometricLoginEnabled => 'Biometric login enabled';
+
+  @override
+  String get biometricLoginDisabled => 'Biometric login disabled';
+
+  @override
+  String get enableBiometricLogin => 'Enable biometric login';
+
+  @override
+  String get disableBiometricLogin => 'Disable biometric login';
+
+  @override
+  String get biometricNotAvailable =>
+      'Biometric authentication not available on this device';
+
+  @override
+  String get biometricNotEnrolled =>
+      'No biometric data enrolled. Please set up biometrics in device settings.';
+
+  @override
+  String get biometricAuthFailed => 'Biometric authentication failed';
+
+  @override
+  String get biometricAuthCancelled => 'Authentication cancelled';
+
+  @override
+  String get biometricLockedOut =>
+      'Too many failed attempts. Please try again later.';
+
+  @override
+  String get useBiometricToLogin =>
+      'Use biometric authentication for faster login';
+
+  @override
+  String get authenticateToLogin => 'Authenticate to login';
+
+  @override
+  String get authenticateToEnable => 'Authenticate to enable biometric login';
+
+  @override
+  String get faceId => 'Face ID';
+
+  @override
+  String get touchId => 'Touch ID';
+
+  @override
+  String get fingerprint => 'Fingerprint';
+
+  @override
+  String get biometric => 'Biometric';
 }

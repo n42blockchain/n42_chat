@@ -20,6 +20,11 @@ class SettingsPage extends StatelessWidget {
   final VoidCallback? onChangeEmail;
   final VoidCallback? onAbout;
   final VoidCallback? onLogout;
+  /// 生物识别登录相关
+  final bool isBiometricAvailable;
+  final bool isBiometricEnabled;
+  final String? biometricTypeDescription;
+  final ValueChanged<bool>? onBiometricToggle;
 
   const SettingsPage({
     super.key,
@@ -35,6 +40,10 @@ class SettingsPage extends StatelessWidget {
     this.onChangeEmail,
     this.onAbout,
     this.onLogout,
+    this.isBiometricAvailable = false,
+    this.isBiometricEnabled = false,
+    this.biometricTypeDescription,
+    this.onBiometricToggle,
   });
 
   @override
@@ -116,6 +125,24 @@ class SettingsPage extends StatelessWidget {
                 onTap: onSecurity,
                 isDark: isDark,
               ),
+              if (isBiometricAvailable)
+                _SettingsItem(
+                  icon: biometricTypeDescription?.contains('Face') == true
+                      ? Icons.face
+                      : Icons.fingerprint,
+                  iconColor: Colors.green,
+                  title: S.of(context)?.biometricLogin ?? 'Biometric Login',
+                  subtitle: biometricTypeDescription,
+                  trailing: Switch(
+                    value: isBiometricEnabled,
+                    onChanged: onBiometricToggle,
+                    activeColor: AppColors.primary,
+                  ),
+                  onTap: onBiometricToggle != null
+                      ? () => onBiometricToggle!(!isBiometricEnabled)
+                      : null,
+                  isDark: isDark,
+                ),
               _SettingsItem(
                 icon: Icons.lock_outline,
                 iconColor: Colors.indigo,

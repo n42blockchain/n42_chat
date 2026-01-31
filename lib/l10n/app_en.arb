@@ -1914,5 +1914,29 @@
   "enterServerAddressFirst": "Please enter server address first",
 
   "language": "Language",
-  "languageChanged": "Language changed"
+  "languageChanged": "Language changed",
+
+  "biometricLogin": "Biometric Login",
+  "loginWithBiometric": "Login with {type}",
+  "@loginWithBiometric": {
+    "placeholders": {
+      "type": {"type": "Object"}
+    }
+  },
+  "biometricLoginEnabled": "Biometric login enabled",
+  "biometricLoginDisabled": "Biometric login disabled",
+  "enableBiometricLogin": "Enable biometric login",
+  "disableBiometricLogin": "Disable biometric login",
+  "biometricNotAvailable": "Biometric authentication not available on this device",
+  "biometricNotEnrolled": "No biometric data enrolled. Please set up biometrics in device settings.",
+  "biometricAuthFailed": "Biometric authentication failed",
+  "biometricAuthCancelled": "Authentication cancelled",
+  "biometricLockedOut": "Too many failed attempts. Please try again later.",
+  "useBiometricToLogin": "Use biometric authentication for faster login",
+  "authenticateToLogin": "Authenticate to login",
+  "authenticateToEnable": "Authenticate to enable biometric login",
+  "faceId": "Face ID",
+  "touchId": "Touch ID",
+  "fingerprint": "Fingerprint",
+  "biometric": "Biometric"
 }

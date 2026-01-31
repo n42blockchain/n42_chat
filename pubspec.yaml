@@ -161,6 +161,8 @@ dependencies:
   sign_in_with_apple: ^6.1.4
   # OTP 输入框
   pinput: ^5.0.2
+  # 生物识别 - 面部/指纹登录
+  local_auth: ^2.3.0
 
 dev_dependencies:
   flutter_test:
