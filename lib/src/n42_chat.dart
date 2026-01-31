@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:matrix/matrix.dart' as matrix;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'core/extensions/context_extension.dart';
+import 'core/notifications/firebase_push_service.dart';
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
 import 'core/utils/date_utils.dart';
@@ -49,9 +51,15 @@ class N42Chat {
   static Locale _locale = const Locale('en');
   static final List<void Function(ThemeMode)> _themeListeners = [];
   static final List<void Function(Locale)> _localeListeners = [];
-  
+
   /// 全局 AuthBloc 实例（单例）
   static AuthBloc? _authBloc;
+
+  /// 推送通知服务
+  static FirebasePushService? _pushService;
+
+  /// 通知点击回调
+  static void Function(String? roomId, String? eventId)? _onNotificationTap;
 
   /// 获取当前配置
   static N42ChatConfig? get config => _config;
@@ -174,14 +182,99 @@ class N42Chat {
     _authBloc = getIt<AuthBloc>();
     _authBloc!.add(const AuthRestoreSessionRequested());
 
-    // 初始化推送通知（如果启用）
+    // 初始化推送通知服务（如果启用）
     if (config.enablePushNotifications) {
-      debugPrint('N42Chat: Push notifications enabled');
-      // TODO: 注册推送通知
+      await _initializePushService(config);
     }
 
     _initialized = true;
     debugPrint('N42Chat: Initialized successfully');
+  }
+
+  /// 初始化推送服务
+  static Future<void> _initializePushService(N42ChatConfig config) async {
+    try {
+      // 获取 Matrix 客户端
+      final client = getIt<matrix.Client>();
+
+      // 创建推送服务
+      _pushService = FirebasePushService(
+        client,
+        pushGatewayUrl: config.pushGatewayUrl,
+        appId: config.pushAppId,
+        onNotificationTap: (roomId, eventId) {
+          debugPrint('N42Chat: Notification tapped - roomId: $roomId, eventId: $eventId');
+          _onNotificationTap?.call(roomId, eventId);
+          // 如果有 roomId，导航到对应聊天
+          if (roomId != null) {
+            openConversation(roomId);
+          }
+        },
+      );
+
+      // 初始化
+      await _pushService!.initialize();
+
+      // 如果已登录，立即注册推送
+      if (client.isLogged()) {
+        await _pushService!.registerForPush();
+      }
+
+      debugPrint('N42Chat: Push service initialized');
+    } catch (e) {
+      debugPrint('N42Chat: Failed to initialize push service: $e');
+    }
+  }
+
+  /// 设置通知点击回调
+  ///
+  /// 当用户点击推送通知时触发
+  ///
+  /// ```dart
+  /// N42Chat.setNotificationTapHandler((roomId, eventId) {
+  ///   // 导航到聊天页面
+  ///   Navigator.push(context, ...);
+  /// });
+  /// ```
+  static void setNotificationTapHandler(
+    void Function(String? roomId, String? eventId) handler,
+  ) {
+    _onNotificationTap = handler;
+  }
+
+  /// 获取推送服务
+  static FirebasePushService? get pushService => _pushService;
+
+  /// 注册推送通知
+  ///
+  /// 登录成功后调用此方法注册推送
+  static Future<void> registerPushNotifications() async {
+    if (_pushService != null) {
+      await _pushService!.registerForPush();
+    }
+  }
+
+  /// 取消注册推送通知
+  ///
+  /// 登出时调用
+  static Future<void> unregisterPushNotifications() async {
+    if (_pushService != null) {
+      await _pushService!.unregisterPush();
+    }
+  }
+
+  /// 清除所有通知
+  static Future<void> clearAllNotifications() async {
+    if (_pushService != null) {
+      await _pushService!.clearAllNotifications();
+    }
+  }
+
+  /// 清除指定房间的通知
+  static Future<void> clearNotificationsForRoom(String roomId) async {
+    if (_pushService != null) {
+      await _pushService!.clearNotificationsForRoom(roomId);
+    }
   }
   
   /// 获取全局 AuthBloc

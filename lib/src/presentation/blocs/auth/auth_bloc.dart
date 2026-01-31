@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/repositories/auth_repository.dart';
+import '../../../n42_chat.dart';
 import '../../../services/auth/auth_methods_service.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -91,6 +92,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
       // 登录成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
       add(const LoadUserProfileData());
+      // 登录成功后注册推送通知
+      _registerPushNotifications();
     } else {
       emit(state.copyWith(
         status: AuthStatus.error,
@@ -106,6 +109,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(state.copyWith(status: AuthStatus.loading));
+
+    // 登出前取消推送注册
+    await _unregisterPushNotifications();
 
     await _authRepository.logout();
 
@@ -139,12 +145,34 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
       // 注册成功后自动加载完整用户资料
       add(const LoadUserProfileData());
+      // 注册成功后注册推送通知
+      _registerPushNotifications();
     } else {
       emit(state.copyWith(
         status: AuthStatus.error,
         errorMessage: result.errorMessage ?? 'Registration failed',
         errorType: result.errorType,
       ));
+    }
+  }
+
+  /// 注册推送通知
+  Future<void> _registerPushNotifications() async {
+    try {
+      await N42Chat.registerPushNotifications();
+      debugPrint('AuthBloc: Push notifications registered');
+    } catch (e) {
+      debugPrint('AuthBloc: Failed to register push notifications: $e');
+    }
+  }
+
+  /// 取消注册推送通知
+  Future<void> _unregisterPushNotifications() async {
+    try {
+      await N42Chat.unregisterPushNotifications();
+      debugPrint('AuthBloc: Push notifications unregistered');
+    } catch (e) {
+      debugPrint('AuthBloc: Failed to unregister push notifications: $e');
     }
   }
 

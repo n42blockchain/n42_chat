@@ -53,6 +53,12 @@ export 'src/domain/entities/user_entity.dart';
 export 'src/integration/wallet_bridge.dart';
 
 // ============================================
+// 推送通知导出
+// ============================================
+export 'src/core/notifications/push_notification_service.dart';
+export 'src/core/notifications/firebase_push_service.dart';
+
+// ============================================
 // UI组件导出
 // ============================================
 export 'src/presentation/widgets/widgets.dart';
