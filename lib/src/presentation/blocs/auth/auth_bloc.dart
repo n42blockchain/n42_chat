@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../domain/repositories/auth_repository.dart';
-import '../../../n42_chat.dart';
+import '../../../n42_chat.dart' show N42Chat;
 import '../../../services/auth/auth_methods_service.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -98,10 +98,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     if (result.success && result.user != null) {
+      // 保存登录凭据（用于生物识别登录）
+      debugPrint('AuthBloc: Saving credentials for biometric login...');
+      final credentialsSaved = await _secureStorage.saveCredentials(
+        homeserver: event.homeserver,
+        username: event.username,
+        password: event.password,
+      );
+      if (credentialsSaved) {
+        debugPrint('AuthBloc: Credentials saved and verified successfully');
+      } else {
+        debugPrint('AuthBloc: WARNING - Credentials save verification failed!');
+      }
+
       emit(state.copyWith(
         status: AuthStatus.authenticated,
         user: result.user,
       ));
+      // 通知主应用用户信息变化
+      N42Chat.notifyUserChanged();
       // 登录成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
       add(const LoadUserProfileData());
       // 登录成功后注册推送通知
@@ -366,6 +381,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           status: AuthStatus.authenticated,
           user: user,
         ));
+        // 通知主应用用户信息变化（头像/昵称更新）
+        N42Chat.notifyUserChanged();
       } else {
         debugPrint('AuthBloc: Failed to load user profile, user is null');
       }

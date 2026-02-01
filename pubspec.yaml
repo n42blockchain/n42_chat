@@ -23,6 +23,8 @@ dependencies:
   # Apache 2.0 License - 商业友好
   # 0.32.x 版本支持 Authenticated Media (MSC3916)
   matrix: ^0.32.0
+  # End-to-End Encryption - 端到端加密所需的 libolm 库
+  flutter_olm: ^2.0.0
 
   # ============================================
   # State Management - 状态管理

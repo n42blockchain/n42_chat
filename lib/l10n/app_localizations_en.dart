@@ -4268,4 +4268,17 @@ class SEn extends S {
 
   @override
   String get biometric => 'Biometric';
+
+  @override
+  String get biometricEnabled => 'Enabled - Use biometric to login';
+
+  @override
+  String get biometricDisabled => 'Disabled - Tap to enable';
+
+  @override
+  String get biometricNeedRelogin =>
+      'Please log out and log in again to enable biometric login';
+
+  @override
+  String get or => 'OR';
 }

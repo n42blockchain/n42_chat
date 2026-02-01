@@ -13,9 +13,12 @@ import '../../blocs/auth/auth_event.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../favorite/favorite_list_page.dart';
 import '../qrcode/my_qrcode_page.dart';
+import '../../../core/encryption/e2ee_manager.dart';
+import '../../../core/encryption/key_backup_service.dart';
 import '../settings/change_email_page.dart';
 import '../settings/change_password_page.dart';
 import '../settings/language_settings_page.dart';
+import '../settings/security_settings_page.dart';
 import '../settings/settings_page.dart';
 import 'profile_edit_page.dart';
 import 'status_page.dart';
@@ -474,6 +477,19 @@ class _ProfilePageState extends State<ProfilePage> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => SettingsPage(
+          onSecurity: () {
+            final client = MatrixClientManager.instance.client;
+            if (client == null) return;
+
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => SecuritySettingsPage(
+                  e2eeManager: E2EEManager(client),
+                  keyBackupService: KeyBackupService(client),
+                ),
+              ),
+            );
+          },
           onChangePassword: () {
             Navigator.of(context).push(
               MaterialPageRoute<void>(

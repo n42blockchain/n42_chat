@@ -1938,5 +1938,9 @@
   "faceId": "Face ID",
   "touchId": "Touch ID",
   "fingerprint": "Fingerprint",
-  "biometric": "Biometric"
+  "biometric": "Biometric",
+  "biometricEnabled": "Enabled - Use biometric to login",
+  "biometricDisabled": "Disabled - Tap to enable",
+  "biometricNeedRelogin": "Please log out and log in again to enable biometric login",
+  "or": "OR"
 }

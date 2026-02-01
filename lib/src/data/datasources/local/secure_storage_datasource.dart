@@ -92,7 +92,7 @@ class SecureStorageDataSource {
   // ============================================
 
   /// 保存登录凭据（用于自动登录）
-  Future<void> saveCredentials({
+  Future<bool> saveCredentials({
     required String homeserver,
     required String username,
     required String password,
@@ -104,21 +104,40 @@ class SecureStorageDataSource {
       'savedAt': DateTime.now().toIso8601String(),
     };
 
-    await _storage.write(
-      key: _keyCredentials,
-      value: jsonEncode(credentialsData),
-    );
+    final jsonValue = jsonEncode(credentialsData);
+    debugPrint('SecureStorage: Saving credentials for $username with key: $_keyCredentials');
 
-    debugPrint('SecureStorage: Credentials saved for $username');
+    try {
+      await _storage.write(
+        key: _keyCredentials,
+        value: jsonValue,
+      );
+
+      // 验证保存是否成功 - 立即读取回来
+      final verifyData = await _storage.read(key: _keyCredentials);
+      if (verifyData == null) {
+        debugPrint('SecureStorage: ERROR - Credentials verification failed, read returned null');
+        return false;
+      }
+
+      debugPrint('SecureStorage: Credentials saved and verified for $username');
+      return true;
+    } catch (e) {
+      debugPrint('SecureStorage: ERROR saving credentials - $e');
+      return false;
+    }
   }
 
   /// 获取保存的登录凭据
   Future<Map<String, String>?> getCredentials() async {
     try {
+      debugPrint('SecureStorage: Reading credentials with key: $_keyCredentials');
       final data = await _storage.read(key: _keyCredentials);
+      debugPrint('SecureStorage: Read data: ${data != null ? "found" : "null"}');
       if (data == null) return null;
 
       final json = jsonDecode(data) as Map<String, dynamic>;
+      debugPrint('SecureStorage: Parsed credentials for ${json['username']}');
       return {
         'homeserver': json['homeserver'] as String,
         'username': json['username'] as String,
