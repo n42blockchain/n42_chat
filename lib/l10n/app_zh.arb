@@ -2183,5 +2183,9 @@
   "faceId": "面容 ID",
   "touchId": "触控 ID",
   "fingerprint": "指纹",
-  "biometric": "生物识别"
+  "biometric": "生物识别",
+  "biometricEnabled": "已启用 - 使用生物识别登录",
+  "biometricDisabled": "已禁用 - 点击启用",
+  "biometricNeedRelogin": "请退出后重新登录以启用生物识别",
+  "or": "或"
 }

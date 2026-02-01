@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../n42_chat.dart';
+import '../../blocs/auth/auth_event.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -27,10 +31,31 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   KeyBackupInfo? _backupInfo;
   List<DeviceInfo> _devices = [];
 
+  // 生物识别状态
+  bool _isBiometricAvailable = false;
+  bool _isBiometricEnabled = false;
+  String? _biometricTypeDescription;
+  final BiometricService _biometricService = BiometricService();
+  final SecureStorageDataSource _secureStorage = SecureStorageDataSource();
+
   @override
   void initState() {
     super.initState();
     _loadData();
+    _loadBiometricStatus();
+  }
+
+  Future<void> _loadBiometricStatus() async {
+    final isAvailable = await _biometricService.isAvailable();
+    if (isAvailable) {
+      final typeDescription = await _biometricService.getBiometricTypeDescription();
+      final isEnabled = await _secureStorage.isBiometricEnabled();
+      setState(() {
+        _isBiometricAvailable = true;
+        _biometricTypeDescription = typeDescription;
+        _isBiometricEnabled = isEnabled;
+      });
+    }
   }
 
   Future<void> _loadData() async {
@@ -72,6 +97,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
                 const SizedBox(height: 16),
 
+                // 生物识别登录
+                if (_isBiometricAvailable) ...[
+                  _buildBiometricSection(isDark),
+                  const SizedBox(height: 16),
+                ],
+
                 // 密钥备份
                 _buildKeyBackupSection(isDark),
 
@@ -87,6 +118,134 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               ],
             ),
     );
+  }
+
+  Widget _buildBiometricSection(bool isDark) {
+    final biometricIcon = _biometricTypeDescription?.contains('Face') == true
+        ? Icons.face
+        : Icons.fingerprint;
+
+    return Container(
+      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              S.of(context)?.biometricLogin ?? 'Biometric Login',
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                biometricIcon,
+                color: Colors.green,
+              ),
+            ),
+            title: Text(
+              _biometricTypeDescription ?? 'Biometric',
+              style: TextStyle(
+                color: isDark ? Colors.white : AppColors.textPrimary,
+              ),
+            ),
+            subtitle: Text(
+              _isBiometricEnabled
+                  ? (S.of(context)?.biometricEnabled ?? 'Enabled - Use biometric to login')
+                  : (S.of(context)?.biometricDisabled ?? 'Disabled - Tap to enable'),
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
+              ),
+            ),
+            trailing: Switch(
+              value: _isBiometricEnabled,
+              onChanged: _onBiometricToggle,
+              activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+              activeThumbColor: AppColors.primary,
+            ),
+            onTap: () => _onBiometricToggle(!_isBiometricEnabled),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _onBiometricToggle(bool enable) async {
+    if (enable) {
+      // 首先检查是否有保存的凭据
+      final hasCredentials = await _secureStorage.hasCredentials();
+      if (!hasCredentials) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                S.of(context)?.biometricNeedRelogin ??
+                'Please log out and log in again to enable biometric login',
+              ),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+        return;
+      }
+
+      // 执行生物识别验证
+      final result = await _biometricService.authenticate(
+        reason: S.of(context)?.enableBiometricLogin ?? 'Verify to enable biometric login',
+      );
+
+      if (result.success) {
+        // 获取凭据信息
+        final credentials = await _secureStorage.getCredentials();
+        if (credentials != null) {
+          await _secureStorage.enableBiometricLogin(
+            homeserver: credentials['homeserver']!,
+            username: credentials['username']!,
+          );
+          setState(() => _isBiometricEnabled = true);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(S.of(context)?.biometricLoginEnabled ?? 'Biometric login enabled'),
+              ),
+            );
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result.errorMessage ?? 'Authentication failed'),
+            ),
+          );
+        }
+      }
+    } else {
+      // 禁用生物识别
+      await _secureStorage.disableBiometricLogin();
+      setState(() => _isBiometricEnabled = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.of(context)?.biometricLoginDisabled ?? 'Biometric login disabled'),
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildEncryptionStatus(bool isDark) {

@@ -140,7 +140,7 @@ class MatrixClientManager {
       await database.open();
       debugPrint('MatrixClientManager: Database opened successfully');
       
-      // 创建客户端
+      // 创建客户端（端到端加密由 flutter_olm 自动支持）
       _client = Client(
         clientName,
         databaseBuilder: (_) => database,
