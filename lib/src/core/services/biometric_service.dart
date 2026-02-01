@@ -83,10 +83,18 @@ class BiometricService {
   /// 检查设备是否支持生物识别
   Future<bool> isAvailable() async {
     try {
+      debugPrint('BiometricService: Checking biometric availability...');
       final canCheck = await _localAuth.canCheckBiometrics;
+      debugPrint('BiometricService: canCheckBiometrics = $canCheck');
       final isSupported = await _localAuth.isDeviceSupported();
-      return canCheck || isSupported;
+      debugPrint('BiometricService: isDeviceSupported = $isSupported');
+      final result = canCheck || isSupported;
+      debugPrint('BiometricService: isAvailable result = $result');
+      return result;
     } on PlatformException catch (e) {
+      debugPrint('BiometricService: isAvailable PlatformException - $e');
+      return false;
+    } catch (e) {
       debugPrint('BiometricService: isAvailable error - $e');
       return false;
     }

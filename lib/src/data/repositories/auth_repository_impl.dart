@@ -257,23 +257,31 @@ class AuthRepositoryImpl implements IAuthRepository {
       // 登出
       await _authDataSource.logout();
 
-      // 清除保存的会话和凭据
-      // 微信策略：登出后需要重新输入密码登录
+      // 清除保存的会话
       await _secureStorage.clearSession();
-      await _secureStorage.clearCredentials();
-      
+
+      // 检查是否启用了生物识别登录
+      // 如果启用了，保留凭据用于生物识别快速登录
+      final isBiometricEnabled = await _secureStorage.isBiometricEnabled();
+      if (!isBiometricEnabled) {
+        await _secureStorage.clearCredentials();
+        debugPrint('AuthRepository: Credentials cleared (biometric not enabled)');
+      } else {
+        debugPrint('AuthRepository: Credentials preserved for biometric login');
+      }
+
       // 清除缓存的用户资料
       _cachedProfileData = null;
       _cachedAvatarUrl = null;
       _cachedDisplayName = null;
 
       _loginStateController.add(false);
-      debugPrint('AuthRepository: Logout successful - session and credentials cleared');
+      debugPrint('AuthRepository: Logout successful');
     } catch (e) {
       debugPrint('AuthRepository: Logout error - $e');
-      // 即使出错也清除本地会话和凭据
+      // 即使出错也清除本地会话
       await _secureStorage.clearSession();
-      await _secureStorage.clearCredentials();
+      // 出错时不清除凭据，保守处理
       _cachedProfileData = null;
       _cachedAvatarUrl = null;
       _cachedDisplayName = null;
@@ -410,23 +418,29 @@ class AuthRepositoryImpl implements IAuthRepository {
     }
   }
   
-  /// 构建头像 HTTP URL（不再在 URL 中添加 access_token，改用请求头认证）
+  /// 构建头像 HTTP URL（带 access_token 用于需要认证的服务器）
   String? _buildAvatarHttpUrl(String? mxcUrl, Client client) {
     if (mxcUrl == null || mxcUrl.isEmpty) return null;
     if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-    
+
     try {
       final uri = Uri.parse(mxcUrl);
       final serverName = uri.host;
       final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-      
+
       if (serverName.isEmpty || mediaId.isEmpty) return null;
-      
+
       final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) return null;
-      
-      // 使用认证媒体 API (Matrix 1.11+)
-      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
+
+      final accessToken = client.accessToken;
+      if (accessToken == null || accessToken.isEmpty) {
+        // 无 token 时尝试公开 API
+        return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
+      }
+
+      // 使用带 access_token 的媒体 API（用于需要认证的服务器）
+      return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop&access_token=$accessToken';
     } catch (e) {
       debugPrint('AuthRepository: Error building avatar URL: $e');
       return null;
