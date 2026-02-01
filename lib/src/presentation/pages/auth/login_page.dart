@@ -57,6 +57,9 @@ class _LoginPageState extends State<LoginPage> {
         ? await _biometricService.getBiometricTypeDescription()
         : '';
 
+    // 调试日志
+    debugPrint('LoginPage: Biometric check - available: $isAvailable, enabled: $isEnabled, hasCredentials: $hasCredentials');
+
     if (mounted) {
       setState(() {
         _isBiometricAvailable = isAvailable;
@@ -178,39 +181,50 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
-                  // Logo
-                  _buildLogo(isDarkMode),
+                  // Logo（紧凑版）
+                  _buildCompactLogo(isDarkMode),
 
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 24),
 
                   // 服务器输入
                   _buildServerInput(state, isDarkMode),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   // 用户名输入
                   _buildUsernameInput(isDarkMode),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   // 密码输入
                   _buildPasswordInput(isDarkMode),
 
-                  const SizedBox(height: 32),
-                  
-                  // 微信策略：移除"记住登录"复选框，默认始终保持登录
+                  const SizedBox(height: 20),
+
+                  // 生物识别快捷登录（如果已启用且有凭据）- 显示在登录按钮上方
+                  if (_isBiometricAvailable && _isBiometricEnabled && _hasCredentials) ...[
+                    _buildBiometricQuickLogin(),
+                    const SizedBox(height: 12),
+                    _buildOrDivider(),
+                    const SizedBox(height: 12),
+                  ],
 
                   // 登录按钮
                   _buildLoginButton(state),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
-                  // 其他选项
-                  _buildOtherOptions(),
+                  // 注册和忘记密码链接
+                  _buildQuickLinks(),
 
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 16),
+
+                  // 第三方登录
+                  _buildSocialLogins(),
+
+                  const SizedBox(height: 16),
 
                   // 底部协议
                   _buildAgreement(isDarkMode),
@@ -254,6 +268,140 @@ class _LoginPageState extends State<LoginPage> {
           style: TextStyle(
             fontSize: 14,
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 紧凑版 Logo
+  Widget _buildCompactLogo(bool isDark) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(
+            Icons.chat_bubble_rounded,
+            color: Colors.white,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'N42 Chat',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              ),
+            ),
+            Text(
+              S.of(context)?.secureDecentralizedChat ?? 'Secure, decentralized messaging',
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// 第三方登录
+  Widget _buildSocialLogins() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildSocialButton(
+          icon: Icons.g_mobiledata,
+          color: const Color(0xFFDB4437),
+          onTap: _loginWithGoogle,
+        ),
+        if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) ...[
+          const SizedBox(width: 20),
+          _buildSocialButton(
+            icon: Icons.apple,
+            color: context.isDarkMode ? Colors.white : Colors.black,
+            onTap: _loginWithApple,
+          ),
+        ],
+        const SizedBox(width: 20),
+        _buildSocialButton(
+          icon: Icons.login,
+          color: Colors.blue,
+          onTap: _loginWithSso,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSocialButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+        ),
+        child: Icon(icon, color: color, size: 28),
+      ),
+    );
+  }
+
+  /// 快速链接（注册和忘记密码）
+  Widget _buildQuickLinks() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TextButton(
+          onPressed: () {
+            final authBloc = context.read<AuthBloc>();
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => BlocProvider.value(
+                  value: authBloc,
+                  child: const RegisterPage(),
+                ),
+              ),
+            );
+          },
+          child: Text(
+            S.of(context)?.registerAccount ?? 'Sign Up',
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textLink,
+            ),
+          ),
+        ),
+        const Text(
+          '|',
+          style: TextStyle(color: AppColors.textTertiary),
+        ),
+        TextButton(
+          onPressed: _showForgotPasswordHelp,
+          child: Text(
+            S.of(context)?.forgotPassword ?? 'Forgot Password',
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textLink,
+            ),
           ),
         ),
       ],
@@ -640,8 +788,59 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildBiometricLoginButton() {
+  /// 生物识别快捷登录按钮（显示在登录按钮上方）
+  Widget _buildBiometricQuickLogin() {
+    // 根据生物识别类型选择图标
+    IconData biometricIcon;
+    if (_biometricTypeDescription.contains('Face')) {
+      biometricIcon = Icons.face;
+    } else if (_biometricTypeDescription.contains('Touch') ||
+        _biometricTypeDescription.contains('Fingerprint')) {
+      biometricIcon = Icons.fingerprint;
+    } else {
+      biometricIcon = Icons.security;
+    }
+
+    return ElevatedButton.icon(
+      onPressed: _loginWithBiometric,
+      icon: Icon(biometricIcon, size: 24),
+      label: Text(
+        S.of(context)?.loginWithBiometric(_biometricTypeDescription) ??
+            'Login with $_biometricTypeDescription',
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(double.infinity, 52),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrDivider() {
     final isDark = context.isDarkMode;
+    final dividerColor = isDark ? Colors.white24 : Colors.black12;
+    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+
+    return Row(
+      children: [
+        Expanded(child: Divider(color: dividerColor)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            S.of(context)?.or ?? 'OR',
+            style: TextStyle(color: textColor, fontSize: 12),
+          ),
+        ),
+        Expanded(child: Divider(color: dividerColor)),
+      ],
+    );
+  }
+
+  Widget _buildBiometricLoginButton() {
     final bgColor = AppColors.primary.withValues(alpha: 0.1);
     final iconColor = AppColors.primary;
 

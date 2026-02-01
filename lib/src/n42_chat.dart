@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -18,6 +20,7 @@ import 'presentation/pages/auth/login_page.dart';
 import 'presentation/pages/auth/register_page.dart';
 import 'presentation/pages/auth/welcome_page.dart';
 import 'presentation/pages/main/chat_main_page.dart';
+import 'presentation/pages/profile/profile_page.dart';
 
 /// N42 Chat 模块主入口类
 ///
@@ -60,6 +63,29 @@ class N42Chat {
 
   /// 通知点击回调
   static void Function(String? roomId, String? eventId)? _onNotificationTap;
+
+  /// 用户变化流控制器
+  static final StreamController<UserEntity?> _userStreamController =
+      StreamController<UserEntity?>.broadcast();
+
+  /// 用户变化流
+  ///
+  /// 当用户登录、登出、更新头像/昵称时会发送通知
+  ///
+  /// ```dart
+  /// N42Chat.userStream.listen((user) {
+  ///   // 更新 UI 显示最新的用户信息
+  ///   setState(() => _chatUser = user);
+  /// });
+  /// ```
+  static Stream<UserEntity?> get userStream => _userStreamController.stream;
+
+  /// 通知用户信息变化
+  static void notifyUserChanged() {
+    final user = currentUser;
+    _userStreamController.add(user);
+    debugPrint('N42Chat: User changed notification - ${user?.displayName}');
+  }
 
   /// 获取当前配置
   static N42ChatConfig? get config => _config;
@@ -307,6 +333,28 @@ class N42Chat {
       return const _NotInitializedPage();
     }
     return const _N42ChatEntryWidget();
+  }
+
+  /// 获取个人资料页面 Widget
+  ///
+  /// 返回可嵌入主应用的个人资料页面
+  /// 如果用户未登录，会自动显示登录页面
+  ///
+  /// [showAppBar] 是否显示 AppBar，嵌入主框架时可设为 false
+  ///
+  /// ```dart
+  /// // 导航到个人资料页
+  /// Navigator.push(
+  ///   context,
+  ///   MaterialPageRoute(builder: (_) => N42Chat.profileWidget()),
+  /// );
+  /// ```
+  static Widget profileWidget({bool showAppBar = true}) {
+    // 如果未初始化，显示错误页面
+    if (!_initialized) {
+      return const _NotInitializedPage();
+    }
+    return _N42ProfileEntryWidget(showAppBar: showAppBar);
   }
 
   /// 获取路由配置
@@ -739,6 +787,89 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// N42 个人资料入口 Widget
+///
+/// 根据登录状态自动切换页面：
+/// - 已登录：显示个人资料页
+/// - 未登录：显示欢迎页面（引导登录）
+class _N42ProfileEntryWidget extends StatefulWidget {
+  final bool showAppBar;
+
+  const _N42ProfileEntryWidget({this.showAppBar = true});
+
+  @override
+  State<_N42ProfileEntryWidget> createState() => _N42ProfileEntryWidgetState();
+}
+
+class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
+  @override
+  void initState() {
+    super.initState();
+    // 检查当前登录状态
+    N42Chat.authBloc.add(const AuthCheckRequested());
+  }
+
+  void _navigateToLogin(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider.value(
+          value: N42Chat.authBloc,
+          child: const LoginPage(),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToRegister(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider.value(
+          value: N42Chat.authBloc,
+          child: const RegisterPage(),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: N42Chat.authBloc,
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          // 检查中或初始状态 - 显示加载
+          if (state.status == AuthStatus.initial ||
+              state.status == AuthStatus.checking) {
+            return const _LoadingPage();
+          }
+
+          // 已登录 - 显示个人资料页
+          if (state.isAuthenticated) {
+            return ProfilePage(showAppBar: widget.showAppBar);
+          }
+
+          // 未登录 - 显示欢迎页面
+          return WelcomePage(
+            onLogin: () => _navigateToLogin(context),
+            onRegister: () => _navigateToRegister(context),
+            onTermsOfService: () => _launchUrl(
+                N42Chat._config?.termsOfServiceUrl ?? 'https://n42.world/terms'),
+            onPrivacyPolicy: () => _launchUrl(
+                N42Chat._config?.privacyPolicyUrl ?? 'https://n42.world/privacy'),
+          );
+        },
       ),
     );
   }

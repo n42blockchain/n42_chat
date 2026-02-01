@@ -4310,4 +4310,16 @@ class SDe extends S {
 
   @override
   String get biometric => '生物识别';
+
+  @override
+  String get biometricEnabled => '已启用 - 使用生物识别登录';
+
+  @override
+  String get biometricDisabled => '已禁用 - 点击启用';
+
+  @override
+  String get biometricNeedRelogin => '请退出后重新登录以启用生物识别';
+
+  @override
+  String get or => '或';
 }

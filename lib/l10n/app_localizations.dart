@@ -7860,6 +7860,30 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'生物识别'**
   String get biometric;
+
+  /// No description provided for @biometricEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已启用 - 使用生物识别登录'**
+  String get biometricEnabled;
+
+  /// No description provided for @biometricDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已禁用 - 点击启用'**
+  String get biometricDisabled;
+
+  /// No description provided for @biometricNeedRelogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'请退出后重新登录以启用生物识别'**
+  String get biometricNeedRelogin;
+
+  /// No description provided for @or.
+  ///
+  /// In zh, this message translates to:
+  /// **'或'**
+  String get or;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -127,57 +127,52 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 32),
-
-                  // Logo
-                  _buildLogo(isDarkMode),
-
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 12),
 
                   // 服务器输入
                   _buildServerInput(state, isDarkMode),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
 
                   // 用户名输入
                   _buildUsernameInput(isDarkMode),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
 
                   // 邮箱输入
                   _buildEmailInput(isDarkMode),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
 
                   // 密码输入
                   _buildPasswordInput(isDarkMode),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
 
                   // 确认密码输入
                   _buildConfirmPasswordInput(isDarkMode),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
 
                   // 邀请码输入（可折叠）
                   _buildInviteCodeInput(isDarkMode),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
                   // 同意协议
                   _buildAgreementCheckbox(isDarkMode),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   // 注册按钮
                   _buildRegisterButton(state),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
 
                   // 已有账号
                   _buildLoginLink(isDarkMode),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
