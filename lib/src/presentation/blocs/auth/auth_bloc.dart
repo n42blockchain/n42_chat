@@ -44,6 +44,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthGoogleLoginRequested>(_onGoogleLogin);
     on<AuthAppleLoginRequested>(_onAppleLogin);
     on<AuthSsoLoginRequested>(_onSsoLogin);
+    on<AuthFacebookLoginRequested>(_onFacebookLogin);
+    on<AuthTwitterLoginRequested>(_onTwitterLogin);
+    on<AuthWeChatLoginRequested>(_onWeChatLogin);
     on<AuthRequestChangeEmailRequested>(_onRequestChangeEmail);
     on<AuthConfirmChangeEmailRequested>(_onConfirmChangeEmail);
     on<AuthGetBoundEmailRequested>(_onGetBoundEmail);
@@ -653,6 +656,175 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(state.copyWith(
         status: AuthStatus.error,
         errorMessage: 'SSO 登录失败: $e',
+      ));
+    }
+  }
+
+  /// Facebook 登录
+  Future<void> _onFacebookLogin(
+    AuthFacebookLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.loading,
+      errorMessage: null,
+    ));
+
+    try {
+      final authService = AuthMethodsService();
+      final facebookResult = await authService.signInWithFacebook();
+
+      if (facebookResult == null) {
+        emit(state.copyWith(
+          status: AuthStatus.unauthenticated,
+          errorMessage: '登录已取消',
+        ));
+        return;
+      }
+
+      // 使用 Facebook token 进行登录
+      final result = await _authRepository.loginWithSocialToken(
+        homeserver: event.homeserver,
+        provider: 'facebook',
+        idToken: facebookResult.accessToken,
+        accessToken: facebookResult.accessToken,
+        email: facebookResult.email,
+        displayName: facebookResult.displayName,
+      );
+
+      if (result.success && result.user != null) {
+        emit(state.copyWith(
+          status: AuthStatus.authenticated,
+          user: result.user,
+        ));
+        add(const LoadUserProfileData());
+      } else {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage ?? 'Facebook 登录失败',
+          errorType: result.errorType,
+        ));
+      }
+    } catch (e) {
+      debugPrint('AuthBloc: Facebook login failed - $e');
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Facebook 登录失败',
+      ));
+    }
+  }
+
+  /// Twitter 登录
+  Future<void> _onTwitterLogin(
+    AuthTwitterLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.loading,
+      errorMessage: null,
+    ));
+
+    try {
+      final authService = AuthMethodsService();
+      final twitterResult = await authService.signInWithTwitter();
+
+      if (twitterResult == null) {
+        emit(state.copyWith(
+          status: AuthStatus.unauthenticated,
+          errorMessage: '登录已取消',
+        ));
+        return;
+      }
+
+      // 使用 Twitter token 进行登录
+      final result = await _authRepository.loginWithSocialToken(
+        homeserver: event.homeserver,
+        provider: 'twitter',
+        idToken: twitterResult.accessToken,
+        accessToken: twitterResult.extra?['authTokenSecret'] as String?,
+        email: twitterResult.email,
+        displayName: twitterResult.displayName,
+      );
+
+      if (result.success && result.user != null) {
+        emit(state.copyWith(
+          status: AuthStatus.authenticated,
+          user: result.user,
+        ));
+        add(const LoadUserProfileData());
+      } else {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage ?? 'Twitter 登录失败',
+          errorType: result.errorType,
+        ));
+      }
+    } catch (e) {
+      debugPrint('AuthBloc: Twitter login failed - $e');
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Twitter 登录失败',
+      ));
+    }
+  }
+
+  /// 微信登录
+  Future<void> _onWeChatLogin(
+    AuthWeChatLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.loading,
+      errorMessage: null,
+    ));
+
+    try {
+      final authService = AuthMethodsService();
+      final weChatResult = await authService.signInWithWeChat();
+
+      if (weChatResult == null) {
+        emit(state.copyWith(
+          status: AuthStatus.unauthenticated,
+          errorMessage: '登录已取消',
+        ));
+        return;
+      }
+
+      // 使用微信授权码进行登录
+      final result = await _authRepository.loginWithSocialToken(
+        homeserver: event.homeserver,
+        provider: 'wechat',
+        idToken: weChatResult.accessToken,  // 这是授权码
+        accessToken: null,
+        email: null,
+        displayName: null,
+      );
+
+      if (result.success && result.user != null) {
+        emit(state.copyWith(
+          status: AuthStatus.authenticated,
+          user: result.user,
+        ));
+        add(const LoadUserProfileData());
+      } else {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage ?? '微信登录失败',
+          errorType: result.errorType,
+        ));
+      }
+    } catch (e) {
+      debugPrint('AuthBloc: WeChat login failed - $e');
+      // 对于微信特定错误提供更友好的提示
+      String errorMsg = '微信登录失败';
+      if (e.toString().contains('未初始化')) {
+        errorMsg = '微信登录未配置';
+      } else if (e.toString().contains('安装微信')) {
+        errorMsg = '请先安装微信';
+      }
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: errorMsg,
       ));
     }
   }

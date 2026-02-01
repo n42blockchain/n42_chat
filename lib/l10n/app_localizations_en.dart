@@ -4198,6 +4198,39 @@ class SEn extends S {
   String get appleLogin => 'Sign in with Apple';
 
   @override
+  String get facebookLogin => 'Sign in with Facebook';
+
+  @override
+  String get twitterLogin => 'Sign in with Twitter';
+
+  @override
+  String get wechatLogin => 'Sign in with WeChat';
+
+  @override
+  String get wechat => 'WeChat';
+
+  @override
+  String get facebook => 'Facebook';
+
+  @override
+  String get twitter => 'Twitter';
+
+  @override
+  String get wechatNotInstalled => 'Please install WeChat first';
+
+  @override
+  String get wechatLoginFailed => 'WeChat login failed';
+
+  @override
+  String get facebookLoginFailed => 'Facebook login failed';
+
+  @override
+  String get twitterLoginFailed => 'Twitter login failed';
+
+  @override
+  String get twitterNotConfigured => 'Twitter login not configured';
+
+  @override
   String get socialLoginCancelled => 'Login cancelled';
 
   @override

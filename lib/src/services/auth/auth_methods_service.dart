@@ -8,9 +8,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:fluwx/fluwx.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:twitter_login/twitter_login.dart';
 
 // Passkey 相关类型定义（简化版，实际需要使用 passkeys 包）
 // 由于 passkeys 包在某些环境下可能有兼容性问题，这里使用简化实现
@@ -22,6 +25,9 @@ enum AuthMethod {
   emailOtp,     // 邮箱验证码
   google,       // Google 登录
   apple,        // Apple 登录
+  facebook,     // Facebook 登录
+  twitter,      // Twitter 登录
+  wechat,       // 微信登录
   sso,          // Matrix SSO
 }
 
@@ -112,6 +118,15 @@ class SsoProvider {
   /// 是否为 GitLab 登录
   bool get isGitLab => brand == 'gitlab' || name.toLowerCase().contains('gitlab');
 
+  /// 是否为 Facebook 登录
+  bool get isFacebook => brand == 'facebook' || name.toLowerCase().contains('facebook');
+
+  /// 是否为 Twitter 登录
+  bool get isTwitter => brand == 'twitter' || name.toLowerCase().contains('twitter');
+
+  /// 是否为微信登录
+  bool get isWeChat => brand == 'wechat' || name.toLowerCase().contains('wechat');
+
   @override
   String toString() => 'SsoProvider(id: $id, name: $name, brand: $brand)';
 }
@@ -121,14 +136,25 @@ class AuthMethodsService {
   static final AuthMethodsService _instance = AuthMethodsService._internal();
   factory AuthMethodsService() => _instance;
   AuthMethodsService._internal();
-  
+
   // Passkey 配置
   String? _passkeyRpId;
   String? _passkeyOrigin;
   bool _passkeyInitialized = false;
-  
+
   // Google Sign In
   GoogleSignIn? _googleSignIn;
+
+  // Twitter 配置
+  String? _twitterApiKey;
+  String? _twitterApiSecret;
+  String? _twitterRedirectUri;
+
+  // WeChat 配置
+  String? _weChatAppId;
+  String? _weChatUniversalLink;
+  bool _weChatInitialized = false;
+  Completer<SocialLoginResult?>? _weChatLoginCompleter;
   
   // ============================================
   // 初始化
@@ -139,13 +165,18 @@ class AuthMethodsService {
     String? googleServerClientId,
     String? passkeyRpId,
     String? passkeyOrigin,
+    String? twitterApiKey,
+    String? twitterApiSecret,
+    String? twitterRedirectUri,
+    String? weChatAppId,
+    String? weChatUniversalLink,
   }) async {
     // 初始化 Passkey 配置
     _passkeyRpId = passkeyRpId ?? 'm.si46.world';
     _passkeyOrigin = passkeyOrigin ?? 'https://m.si46.world';
     _passkeyInitialized = true;
     debugPrint('AuthMethodsService: Passkey config initialized');
-    
+
     // 初始化 Google Sign In
     if (googleClientId != null || !kIsWeb) {
       _googleSignIn = GoogleSignIn(
@@ -159,7 +190,41 @@ class AuthMethodsService {
       );
       debugPrint('AuthMethodsService: Google Sign In initialized');
     }
-    
+
+    // 初始化 Twitter 配置
+    _twitterApiKey = twitterApiKey;
+    _twitterApiSecret = twitterApiSecret;
+    _twitterRedirectUri = twitterRedirectUri ?? 'n42chat://';
+    if (_twitterApiKey != null && _twitterApiSecret != null) {
+      debugPrint('AuthMethodsService: Twitter config initialized');
+    }
+
+    // 初始化微信 SDK
+    if (weChatAppId != null) {
+      _weChatAppId = weChatAppId;
+      _weChatUniversalLink = weChatUniversalLink ?? 'https://n42.network/app/';
+      try {
+        await Fluwx().registerApi(
+          appId: _weChatAppId!,
+          universalLink: _weChatUniversalLink!,
+        );
+        _weChatInitialized = await Fluwx().isWeChatInstalled;
+        if (_weChatInitialized) {
+          // 监听微信登录响应
+          Fluwx().addSubscriber((response) {
+            if (response is WeChatAuthResponse) {
+              _handleWeChatAuthResponse(response);
+            }
+          });
+          debugPrint('AuthMethodsService: WeChat SDK initialized');
+        } else {
+          debugPrint('AuthMethodsService: WeChat not installed');
+        }
+      } catch (e) {
+        debugPrint('AuthMethodsService: WeChat init failed - $e');
+      }
+    }
+
     debugPrint('AuthMethodsService: Initialized');
   }
   
@@ -414,6 +479,225 @@ class AuthMethodsService {
   }
   
   // ============================================
+  // Facebook 登录
+  // ============================================
+
+  /// 检查 Facebook 登录是否可用
+  bool isFacebookSignInAvailable() {
+    // Facebook 登录在所有平台都可用
+    return true;
+  }
+
+  /// Facebook 登录
+  Future<SocialLoginResult?> signInWithFacebook() async {
+    try {
+      debugPrint('AuthMethodsService: Starting Facebook Sign In');
+
+      final LoginResult result = await FacebookAuth.instance.login(
+        permissions: ['email', 'public_profile'],
+      );
+
+      if (result.status == LoginStatus.success) {
+        final AccessToken? accessToken = result.accessToken;
+        if (accessToken == null) {
+          debugPrint('AuthMethodsService: Facebook access token is null');
+          return null;
+        }
+
+        // 获取用户信息
+        final userData = await FacebookAuth.instance.getUserData(
+          fields: 'email,name,picture.width(200)',
+        );
+
+        debugPrint('AuthMethodsService: Facebook Sign In success');
+
+        return SocialLoginResult(
+          provider: 'facebook',
+          accessToken: accessToken.tokenString,
+          email: userData['email'] as String?,
+          displayName: userData['name'] as String?,
+          photoUrl: userData['picture']?['data']?['url'] as String?,
+        );
+      } else if (result.status == LoginStatus.cancelled) {
+        debugPrint('AuthMethodsService: Facebook Sign In cancelled');
+        return null;
+      } else {
+        debugPrint('AuthMethodsService: Facebook Sign In failed: ${result.message}');
+        throw Exception(result.message ?? 'Facebook login failed');
+      }
+    } catch (e, stackTrace) {
+      debugPrint('AuthMethodsService: Facebook Sign In failed: $e');
+      debugPrint('Stack: $stackTrace');
+      rethrow;
+    }
+  }
+
+  /// Facebook 登出
+  Future<void> signOutFacebook() async {
+    await FacebookAuth.instance.logOut();
+  }
+
+  // ============================================
+  // Twitter 登录
+  // ============================================
+
+  /// 检查 Twitter 登录是否可用
+  bool isTwitterSignInAvailable() {
+    return _twitterApiKey != null && _twitterApiSecret != null;
+  }
+
+  /// Twitter 登录
+  Future<SocialLoginResult?> signInWithTwitter() async {
+    if (!isTwitterSignInAvailable()) {
+      throw Exception('Twitter 登录未配置');
+    }
+
+    try {
+      debugPrint('AuthMethodsService: Starting Twitter Sign In');
+
+      final twitterLogin = TwitterLogin(
+        apiKey: _twitterApiKey!,
+        apiSecretKey: _twitterApiSecret!,
+        redirectURI: _twitterRedirectUri!,
+      );
+
+      final authResult = await twitterLogin.login();
+
+      switch (authResult.status) {
+        case TwitterLoginStatus.loggedIn:
+          final user = authResult.user;
+          debugPrint('AuthMethodsService: Twitter Sign In success');
+
+          return SocialLoginResult(
+            provider: 'twitter',
+            accessToken: authResult.authToken,
+            email: user?.email,
+            displayName: user?.name,
+            photoUrl: user?.thumbnailImage,
+            extra: {
+              'authTokenSecret': authResult.authTokenSecret,
+              'screenName': user?.screenName,
+              'userId': user?.id.toString(),
+            },
+          );
+
+        case TwitterLoginStatus.cancelledByUser:
+          debugPrint('AuthMethodsService: Twitter Sign In cancelled');
+          return null;
+
+        case TwitterLoginStatus.error:
+          debugPrint('AuthMethodsService: Twitter Sign In error: ${authResult.errorMessage}');
+          throw Exception(authResult.errorMessage ?? 'Twitter login failed');
+
+        default:
+          return null;
+      }
+    } catch (e, stackTrace) {
+      debugPrint('AuthMethodsService: Twitter Sign In failed: $e');
+      debugPrint('Stack: $stackTrace');
+      rethrow;
+    }
+  }
+
+  // ============================================
+  // 微信登录
+  // ============================================
+
+  /// 检查微信登录是否可用
+  Future<bool> isWeChatSignInAvailable() async {
+    if (!_weChatInitialized) return false;
+    try {
+      return await Fluwx().isWeChatInstalled;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// 微信登录
+  Future<SocialLoginResult?> signInWithWeChat() async {
+    if (!_weChatInitialized) {
+      throw Exception('微信 SDK 未初始化');
+    }
+
+    final isInstalled = await Fluwx().isWeChatInstalled;
+    if (!isInstalled) {
+      throw Exception('请先安装微信');
+    }
+
+    try {
+      debugPrint('AuthMethodsService: Starting WeChat Sign In');
+
+      _weChatLoginCompleter = Completer<SocialLoginResult?>();
+
+      // 发起微信授权请求
+      final result = await Fluwx().authBy(
+        which: NormalAuth(
+          scope: 'snsapi_userinfo',
+          state: 'n42_chat_${DateTime.now().millisecondsSinceEpoch}',
+        ),
+      );
+
+      if (!result) {
+        debugPrint('AuthMethodsService: WeChat auth request failed');
+        _weChatLoginCompleter?.complete(null);
+        return null;
+      }
+
+      // 等待微信回调
+      final loginResult = await _weChatLoginCompleter!.future.timeout(
+        const Duration(minutes: 2),
+        onTimeout: () {
+          debugPrint('AuthMethodsService: WeChat login timeout');
+          return null;
+        },
+      );
+
+      return loginResult;
+    } catch (e, stackTrace) {
+      debugPrint('AuthMethodsService: WeChat Sign In failed: $e');
+      debugPrint('Stack: $stackTrace');
+      // 只有在 Completer 未完成时才调用 completeError
+      if (_weChatLoginCompleter != null && !_weChatLoginCompleter!.isCompleted) {
+        _weChatLoginCompleter!.completeError(e);
+      }
+      rethrow;
+    }
+  }
+
+  /// 处理微信授权响应
+  void _handleWeChatAuthResponse(WeChatAuthResponse response) {
+    if (_weChatLoginCompleter == null || _weChatLoginCompleter!.isCompleted) {
+      return;
+    }
+
+    if (response.code != null && response.code!.isNotEmpty) {
+      debugPrint('AuthMethodsService: WeChat auth success');
+
+      // 微信登录成功，返回 code 供后端换取 access_token
+      _weChatLoginCompleter!.complete(SocialLoginResult(
+        provider: 'wechat',
+        accessToken: response.code,  // 这是授权码，需要后端换取 access_token
+        extra: {
+          'code': response.code,
+          'state': response.state,
+          'country': response.country,
+          'lang': response.lang,
+        },
+      ));
+    } else {
+      debugPrint('AuthMethodsService: WeChat auth failed: ${response.errStr}');
+      if (response.errCode == -2) {
+        // 用户取消
+        _weChatLoginCompleter!.complete(null);
+      } else {
+        _weChatLoginCompleter!.completeError(
+          Exception(response.errStr ?? 'WeChat auth failed'),
+        );
+      }
+    }
+  }
+
+  // ============================================
   // Matrix SSO
   // ============================================
   
@@ -508,14 +792,22 @@ class AuthMethodsService {
   /// 清理所有登录状态
   Future<void> signOutAll() async {
     await signOutGoogle();
+    await signOutFacebook();
   }
-  
+
   /// 释放资源
   void dispose() {
     _passkeyInitialized = false;
     _passkeyRpId = null;
     _passkeyOrigin = null;
     _googleSignIn = null;
+    _twitterApiKey = null;
+    _twitterApiSecret = null;
+    _twitterRedirectUri = null;
+    _weChatAppId = null;
+    _weChatUniversalLink = null;
+    _weChatInitialized = false;
+    _weChatLoginCompleter = null;
   }
 }
 

@@ -4235,6 +4235,39 @@ class SPl extends S {
   String get appleLogin => 'Zaloguj przez Apple';
 
   @override
+  String get facebookLogin => '使用 Facebook 登录';
+
+  @override
+  String get twitterLogin => '使用 Twitter 登录';
+
+  @override
+  String get wechatLogin => '使用微信登录';
+
+  @override
+  String get wechat => '微信';
+
+  @override
+  String get facebook => 'Facebook';
+
+  @override
+  String get twitter => 'Twitter';
+
+  @override
+  String get wechatNotInstalled => '请先安装微信';
+
+  @override
+  String get wechatLoginFailed => '微信登录失败';
+
+  @override
+  String get facebookLoginFailed => 'Facebook 登录失败';
+
+  @override
+  String get twitterLoginFailed => 'Twitter 登录失败';
+
+  @override
+  String get twitterNotConfigured => 'Twitter 登录未配置';
+
+  @override
   String get socialLoginCancelled => 'Logowanie anulowane';
 
   @override
