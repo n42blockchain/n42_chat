@@ -47,15 +47,20 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
   final AuthMethodsService _authService = AuthMethodsService();
   bool _isGoogleLoading = false;
   bool _isAppleLoading = false;
+  bool _isFacebookLoading = false;
+  bool _isTwitterLoading = false;
+  bool _isWeChatLoading = false;
   bool _isAppleAvailable = false;
+  bool _isWeChatAvailable = false;
 
   @override
   void initState() {
     super.initState();
-    _checkAppleAvailability();
+    _checkAvailability();
   }
 
-  Future<void> _checkAppleAvailability() async {
+  Future<void> _checkAvailability() async {
+    // 检查 Apple 登录可用性
     if (Platform.isIOS || Platform.isMacOS) {
       try {
         final available = await _authService.isAppleSignInAvailable();
@@ -65,6 +70,16 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       } catch (e) {
         // Apple Sign-In 不可用
       }
+    }
+
+    // 检查微信登录可用性
+    try {
+      final available = await _authService.isWeChatSignInAvailable();
+      if (mounted) {
+        setState(() => _isWeChatAvailable = available);
+      }
+    } catch (e) {
+      // WeChat 不可用
     }
   }
 
@@ -113,8 +128,10 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           ),
 
           // 社交登录按钮
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 16,
+            runSpacing: 12,
             children: [
               // Google 登录
               _buildSocialButton(
@@ -126,8 +143,6 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
                 iconColor: Colors.red,
               ),
 
-              const SizedBox(width: 24),
-
               // Apple 登录 (仅 iOS/macOS)
               if (_isAppleAvailable)
                 _buildSocialButton(
@@ -137,6 +152,38 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
                   tooltip: 'Apple',
                   backgroundColor: isDark ? Colors.white : Colors.black,
                   iconColor: isDark ? Colors.black : Colors.white,
+                ),
+
+              // Facebook 登录
+              _buildSocialButton(
+                onTap: _isFacebookLoading ? null : _handleFacebookSignIn,
+                icon: Icons.facebook,
+                isLoading: _isFacebookLoading,
+                tooltip: 'Facebook',
+                backgroundColor: const Color(0xFF1877F2),
+                iconColor: Colors.white,
+              ),
+
+              // Twitter 登录
+              if (_authService.isTwitterSignInAvailable())
+                _buildSocialButton(
+                  onTap: _isTwitterLoading ? null : _handleTwitterSignIn,
+                  icon: Icons.alternate_email,  // Twitter/X 图标替代
+                  isLoading: _isTwitterLoading,
+                  tooltip: 'Twitter',
+                  backgroundColor: Colors.black,
+                  iconColor: Colors.white,
+                ),
+
+              // 微信登录
+              if (_isWeChatAvailable)
+                _buildSocialButton(
+                  onTap: _isWeChatLoading ? null : _handleWeChatSignIn,
+                  icon: Icons.chat_bubble,  // 使用聊天气泡图标替代
+                  isLoading: _isWeChatLoading,
+                  tooltip: S.of(context)?.wechat ?? 'WeChat',
+                  backgroundColor: const Color(0xFF07C160),
+                  iconColor: Colors.white,
                 ),
             ],
           ),
@@ -260,6 +307,99 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     } finally {
       if (mounted) {
         setState(() => _isAppleLoading = false);
+      }
+    }
+  }
+
+  Future<void> _handleFacebookSignIn() async {
+    if (!widget.isAgreedToTerms) {
+      widget.onTermsNotAgreed?.call();
+      return;
+    }
+
+    if (widget.homeserver.isEmpty) {
+      widget.onError?.call(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first');
+      return;
+    }
+
+    setState(() => _isFacebookLoading = true);
+
+    try {
+      // 触发 Facebook 登录事件
+      if (mounted) {
+        context.read<AuthBloc>().add(AuthFacebookLoginRequested(
+          homeserver: widget.homeserver,
+        ));
+      }
+    } catch (e) {
+      if (mounted) {
+        widget.onError?.call(e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isFacebookLoading = false);
+      }
+    }
+  }
+
+  Future<void> _handleTwitterSignIn() async {
+    if (!widget.isAgreedToTerms) {
+      widget.onTermsNotAgreed?.call();
+      return;
+    }
+
+    if (widget.homeserver.isEmpty) {
+      widget.onError?.call(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first');
+      return;
+    }
+
+    setState(() => _isTwitterLoading = true);
+
+    try {
+      // 触发 Twitter 登录事件
+      if (mounted) {
+        context.read<AuthBloc>().add(AuthTwitterLoginRequested(
+          homeserver: widget.homeserver,
+        ));
+      }
+    } catch (e) {
+      if (mounted) {
+        widget.onError?.call(e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isTwitterLoading = false);
+      }
+    }
+  }
+
+  Future<void> _handleWeChatSignIn() async {
+    if (!widget.isAgreedToTerms) {
+      widget.onTermsNotAgreed?.call();
+      return;
+    }
+
+    if (widget.homeserver.isEmpty) {
+      widget.onError?.call(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first');
+      return;
+    }
+
+    setState(() => _isWeChatLoading = true);
+
+    try {
+      // 触发微信登录事件
+      if (mounted) {
+        context.read<AuthBloc>().add(AuthWeChatLoginRequested(
+          homeserver: widget.homeserver,
+        ));
+      }
+    } catch (e) {
+      if (mounted) {
+        widget.onError?.call(e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isWeChatLoading = false);
       }
     }
   }

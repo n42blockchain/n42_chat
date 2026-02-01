@@ -177,6 +177,246 @@ void main() {
       });
     });
 
+    group('loginWithFacebook', () {
+      test('should return success response with matrix credentials', () async {
+        // Arrange
+        final responseData = {
+          'code': 200,
+          'data': {
+            'uuid': 'facebook-uuid',
+            'token': 'facebook-token',
+            'email': 'test@facebook.com',
+            'nickname': 'Facebook User',
+            'avatar': 'https://facebook.com/avatar.jpg',
+            'matrix_user_id': '@facebook:server.com',
+            'matrix_access_token': 'syt_facebook_token',
+            'matrix_device_id': 'FB_DEVICE',
+            'matrix_homeserver': 'https://matrix.server.com',
+          },
+        };
+
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenAnswer((_) async => http.Response(
+              jsonEncode(responseData),
+              200,
+            ));
+
+        // Act
+        final result = await socialAuthApi.loginWithFacebook(
+          accessToken: 'facebook_access_token',
+        );
+
+        // Assert
+        expect(result.success, isTrue);
+        expect(result.matrixUserId, equals('@facebook:server.com'));
+        expect(result.nickname, equals('Facebook User'));
+        expect(result.hasMatrixCredentials, isTrue);
+      });
+
+      test('should return failure when Facebook login fails', () async {
+        // Arrange
+        final responseData = {
+          'code': 401,
+          'err': 'Invalid Facebook token',
+        };
+
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenAnswer((_) async => http.Response(
+              jsonEncode(responseData),
+              200,
+            ));
+
+        // Act
+        final result = await socialAuthApi.loginWithFacebook(
+          accessToken: 'invalid_token',
+        );
+
+        // Assert
+        expect(result.success, isFalse);
+        expect(result.error, equals('Invalid Facebook token'));
+      });
+
+      test('should handle network errors gracefully', () async {
+        // Arrange
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenThrow(Exception('Network error'));
+
+        // Act
+        final result = await socialAuthApi.loginWithFacebook(
+          accessToken: 'facebook_token',
+        );
+
+        // Assert
+        expect(result.success, isFalse);
+        expect(result.error, contains('Network error'));
+      });
+    });
+
+    group('loginWithTwitter', () {
+      test('should return success response with matrix credentials', () async {
+        // Arrange
+        final responseData = {
+          'code': 200,
+          'data': {
+            'uuid': 'twitter-uuid',
+            'token': 'twitter-token',
+            'email': 'test@twitter.com',
+            'nickname': 'Twitter User',
+            'matrix_user_id': '@twitter:server.com',
+            'matrix_access_token': 'syt_twitter_token',
+            'matrix_device_id': 'TWITTER_DEVICE',
+            'matrix_homeserver': 'https://matrix.server.com',
+          },
+        };
+
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenAnswer((_) async => http.Response(
+              jsonEncode(responseData),
+              200,
+            ));
+
+        // Act
+        final result = await socialAuthApi.loginWithTwitter(
+          authToken: 'twitter_auth_token',
+          authTokenSecret: 'twitter_token_secret',
+        );
+
+        // Assert
+        expect(result.success, isTrue);
+        expect(result.matrixUserId, equals('@twitter:server.com'));
+        expect(result.hasMatrixCredentials, isTrue);
+      });
+
+      test('should return failure when Twitter login fails', () async {
+        // Arrange
+        final responseData = {
+          'code': 401,
+          'err': 'Twitter authentication failed',
+        };
+
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenAnswer((_) async => http.Response(
+              jsonEncode(responseData),
+              200,
+            ));
+
+        // Act
+        final result = await socialAuthApi.loginWithTwitter(
+          authToken: 'invalid_token',
+        );
+
+        // Assert
+        expect(result.success, isFalse);
+        expect(result.error, equals('Twitter authentication failed'));
+      });
+    });
+
+    group('loginWithWeChat', () {
+      test('should return success response with matrix credentials', () async {
+        // Arrange
+        final responseData = {
+          'code': 200,
+          'data': {
+            'uuid': 'wechat-uuid',
+            'token': 'wechat-token',
+            'nickname': 'WeChat User',
+            'avatar': 'https://wx.qlogo.cn/avatar.jpg',
+            'matrix_user_id': '@wechat:server.com',
+            'matrix_access_token': 'syt_wechat_token',
+            'matrix_device_id': 'WECHAT_DEVICE',
+            'matrix_homeserver': 'https://matrix.server.com',
+          },
+        };
+
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenAnswer((_) async => http.Response(
+              jsonEncode(responseData),
+              200,
+            ));
+
+        // Act
+        final result = await socialAuthApi.loginWithWeChat(
+          code: 'wechat_auth_code',
+        );
+
+        // Assert
+        expect(result.success, isTrue);
+        expect(result.matrixUserId, equals('@wechat:server.com'));
+        expect(result.nickname, equals('WeChat User'));
+        expect(result.hasMatrixCredentials, isTrue);
+      });
+
+      test('should return failure when WeChat login fails', () async {
+        // Arrange
+        final responseData = {
+          'code': 401,
+          'err': 'Invalid WeChat code',
+        };
+
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenAnswer((_) async => http.Response(
+              jsonEncode(responseData),
+              200,
+            ));
+
+        // Act
+        final result = await socialAuthApi.loginWithWeChat(
+          code: 'invalid_code',
+        );
+
+        // Assert
+        expect(result.success, isFalse);
+        expect(result.error, equals('Invalid WeChat code'));
+      });
+
+      test('should handle expired WeChat code', () async {
+        // Arrange
+        final responseData = {
+          'code': 400,
+          'err': 'WeChat code expired',
+        };
+
+        when(() => mockClient.post(
+              any(),
+              headers: any(named: 'headers'),
+              body: any(named: 'body'),
+            )).thenAnswer((_) async => http.Response(
+              jsonEncode(responseData),
+              200,
+            ));
+
+        // Act
+        final result = await socialAuthApi.loginWithWeChat(
+          code: 'expired_code',
+        );
+
+        // Assert
+        expect(result.success, isFalse);
+        expect(result.error, equals('WeChat code expired'));
+      });
+    });
+
     group('bindSocialAccount', () {
       test('should return true when binding succeeds', () async {
         // Arrange

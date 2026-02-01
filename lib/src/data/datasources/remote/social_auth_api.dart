@@ -48,6 +48,46 @@ class SocialAuthApi {
     );
   }
 
+  /// 使用 Facebook Token 登录
+  ///
+  /// [accessToken] Facebook Access Token
+  Future<SocialLoginResponse> loginWithFacebook({
+    required String accessToken,
+  }) async {
+    return _loginWithSocialToken(
+      provider: 'facebook',
+      idToken: accessToken,  // Facebook 使用 access token 作为认证凭证
+      accessToken: accessToken,
+    );
+  }
+
+  /// 使用 Twitter Token 登录
+  ///
+  /// [authToken] Twitter Auth Token
+  /// [authTokenSecret] Twitter Auth Token Secret
+  Future<SocialLoginResponse> loginWithTwitter({
+    required String authToken,
+    String? authTokenSecret,
+  }) async {
+    return _loginWithSocialToken(
+      provider: 'twitter',
+      idToken: authToken,
+      accessToken: authTokenSecret,
+    );
+  }
+
+  /// 使用微信授权码登录
+  ///
+  /// [code] 微信授权码，需要后端换取 access_token
+  Future<SocialLoginResponse> loginWithWeChat({
+    required String code,
+  }) async {
+    return _loginWithSocialToken(
+      provider: 'wechat',
+      idToken: code,  // 微信使用授权码
+    );
+  }
+
   /// 通用社交登录方法
   Future<SocialLoginResponse> _loginWithSocialToken({
     required String provider,

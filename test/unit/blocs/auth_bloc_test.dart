@@ -342,6 +342,24 @@ void main() {
       expect(event.homeserver, equals('https://server.com'));
     });
 
+    test('Facebook login event should have homeserver parameter', () {
+      const event = AuthFacebookLoginRequested(homeserver: 'https://server.com');
+      expect(event.homeserver, equals('https://server.com'));
+      expect(event.props, contains('https://server.com'));
+    });
+
+    test('Twitter login event should have homeserver parameter', () {
+      const event = AuthTwitterLoginRequested(homeserver: 'https://server.com');
+      expect(event.homeserver, equals('https://server.com'));
+      expect(event.props, contains('https://server.com'));
+    });
+
+    test('WeChat login event should have homeserver parameter', () {
+      const event = AuthWeChatLoginRequested(homeserver: 'https://server.com');
+      expect(event.homeserver, equals('https://server.com'));
+      expect(event.props, contains('https://server.com'));
+    });
+
     test('loginWithSocialToken should be available in repository', () {
       // Verify the repository interface has the required method
       when(() => mockAuthRepository.loginWithSocialToken(
@@ -375,6 +393,98 @@ void main() {
         ),
         returnsNormally,
       );
+    });
+
+    test('loginWithSocialToken should support facebook provider', () {
+      when(() => mockAuthRepository.loginWithSocialToken(
+            homeserver: any(named: 'homeserver'),
+            provider: 'facebook',
+            idToken: any(named: 'idToken'),
+            accessToken: any(named: 'accessToken'),
+            email: any(named: 'email'),
+            displayName: any(named: 'displayName'),
+          )).thenAnswer((_) async => AuthResult.success(testUser));
+
+      expect(
+        () => mockAuthRepository.loginWithSocialToken(
+          homeserver: 'https://server.com',
+          provider: 'facebook',
+          idToken: 'fb_token',
+          accessToken: 'fb_access_token',
+        ),
+        returnsNormally,
+      );
+    });
+
+    test('loginWithSocialToken should support twitter provider', () {
+      when(() => mockAuthRepository.loginWithSocialToken(
+            homeserver: any(named: 'homeserver'),
+            provider: 'twitter',
+            idToken: any(named: 'idToken'),
+            accessToken: any(named: 'accessToken'),
+            email: any(named: 'email'),
+            displayName: any(named: 'displayName'),
+          )).thenAnswer((_) async => AuthResult.success(testUser));
+
+      expect(
+        () => mockAuthRepository.loginWithSocialToken(
+          homeserver: 'https://server.com',
+          provider: 'twitter',
+          idToken: 'twitter_auth_token',
+          accessToken: 'twitter_token_secret',
+        ),
+        returnsNormally,
+      );
+    });
+
+    test('loginWithSocialToken should support wechat provider', () {
+      when(() => mockAuthRepository.loginWithSocialToken(
+            homeserver: any(named: 'homeserver'),
+            provider: 'wechat',
+            idToken: any(named: 'idToken'),
+            accessToken: any(named: 'accessToken'),
+            email: any(named: 'email'),
+            displayName: any(named: 'displayName'),
+          )).thenAnswer((_) async => AuthResult.success(testUser));
+
+      expect(
+        () => mockAuthRepository.loginWithSocialToken(
+          homeserver: 'https://server.com',
+          provider: 'wechat',
+          idToken: 'wechat_auth_code',
+        ),
+        returnsNormally,
+      );
+    });
+  });
+
+  group('Social Login Events Equality', () {
+    test('Facebook login events with same homeserver should be equal', () {
+      const event1 = AuthFacebookLoginRequested(homeserver: 'https://server.com');
+      const event2 = AuthFacebookLoginRequested(homeserver: 'https://server.com');
+      expect(event1, equals(event2));
+    });
+
+    test('Twitter login events with same homeserver should be equal', () {
+      const event1 = AuthTwitterLoginRequested(homeserver: 'https://server.com');
+      const event2 = AuthTwitterLoginRequested(homeserver: 'https://server.com');
+      expect(event1, equals(event2));
+    });
+
+    test('WeChat login events with same homeserver should be equal', () {
+      const event1 = AuthWeChatLoginRequested(homeserver: 'https://server.com');
+      const event2 = AuthWeChatLoginRequested(homeserver: 'https://server.com');
+      expect(event1, equals(event2));
+    });
+
+    test('Different social login events should not be equal', () {
+      const facebookEvent = AuthFacebookLoginRequested(homeserver: 'https://server.com');
+      const twitterEvent = AuthTwitterLoginRequested(homeserver: 'https://server.com');
+      const wechatEvent = AuthWeChatLoginRequested(homeserver: 'https://server.com');
+
+      expect(facebookEvent, isNot(equals(twitterEvent)));
+      expect(twitterEvent, isNot(equals(wechatEvent)));
+      expect(facebookEvent, isNot(equals(wechatEvent)));
     });
   });
 }

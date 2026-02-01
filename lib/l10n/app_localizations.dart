@@ -7729,6 +7729,72 @@ abstract class S {
   /// **'使用 Apple 登录'**
   String get appleLogin;
 
+  /// No description provided for @facebookLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用 Facebook 登录'**
+  String get facebookLogin;
+
+  /// No description provided for @twitterLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用 Twitter 登录'**
+  String get twitterLogin;
+
+  /// No description provided for @wechatLogin.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用微信登录'**
+  String get wechatLogin;
+
+  /// No description provided for @wechat.
+  ///
+  /// In zh, this message translates to:
+  /// **'微信'**
+  String get wechat;
+
+  /// No description provided for @facebook.
+  ///
+  /// In zh, this message translates to:
+  /// **'Facebook'**
+  String get facebook;
+
+  /// No description provided for @twitter.
+  ///
+  /// In zh, this message translates to:
+  /// **'Twitter'**
+  String get twitter;
+
+  /// No description provided for @wechatNotInstalled.
+  ///
+  /// In zh, this message translates to:
+  /// **'请先安装微信'**
+  String get wechatNotInstalled;
+
+  /// No description provided for @wechatLoginFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'微信登录失败'**
+  String get wechatLoginFailed;
+
+  /// No description provided for @facebookLoginFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'Facebook 登录失败'**
+  String get facebookLoginFailed;
+
+  /// No description provided for @twitterLoginFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'Twitter 登录失败'**
+  String get twitterLoginFailed;
+
+  /// No description provided for @twitterNotConfigured.
+  ///
+  /// In zh, this message translates to:
+  /// **'Twitter 登录未配置'**
+  String get twitterNotConfigured;
+
   /// No description provided for @socialLoginCancelled.
   ///
   /// In zh, this message translates to:

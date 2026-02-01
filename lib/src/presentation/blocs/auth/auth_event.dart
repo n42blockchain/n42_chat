@@ -230,6 +230,36 @@ class AuthSsoLoginRequested extends AuthEvent {
   List<Object?> get props => [homeserver, providerId];
 }
 
+/// Facebook 登录请求
+class AuthFacebookLoginRequested extends AuthEvent {
+  final String homeserver;
+
+  const AuthFacebookLoginRequested({required this.homeserver});
+
+  @override
+  List<Object?> get props => [homeserver];
+}
+
+/// Twitter 登录请求
+class AuthTwitterLoginRequested extends AuthEvent {
+  final String homeserver;
+
+  const AuthTwitterLoginRequested({required this.homeserver});
+
+  @override
+  List<Object?> get props => [homeserver];
+}
+
+/// 微信登录请求
+class AuthWeChatLoginRequested extends AuthEvent {
+  final String homeserver;
+
+  const AuthWeChatLoginRequested({required this.homeserver});
+
+  @override
+  List<Object?> get props => [homeserver];
+}
+
 // ============================================
 // 密码管理事件
 // ============================================
