@@ -129,7 +129,7 @@ dependencies:
   # QR Code Scanner - 二维码扫描
   # ============================================
   # BSD-3-Clause License
-  mobile_scanner: ^6.0.0
+  mobile_scanner: ^7.1.4
   
   # ============================================
   # VoIP & WebRTC - 音视频通话
