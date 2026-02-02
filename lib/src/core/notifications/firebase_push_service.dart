@@ -150,8 +150,9 @@ class FirebasePushService implements IPushNotificationService {
       iOS: iosSettings,
     );
 
+    // flutter_local_notifications 20.0.0 使用命名参数
     await _localNotifications!.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: _onNotificationResponse,
       onDidReceiveBackgroundNotificationResponse: _onBackgroundNotificationResponse,
     );
@@ -463,11 +464,12 @@ class FirebasePushService implements IPushNotificationService {
       iOS: iosDetails,
     );
 
+    // flutter_local_notifications 20.0.0 使用命名参数
     await _localNotifications!.show(
-      notificationId,
-      title,
-      body,
-      details,
+      id: notificationId,
+      title: title,
+      body: body,
+      notificationDetails: details,
       payload: payload,
     );
   }
@@ -478,7 +480,8 @@ class FirebasePushService implements IPushNotificationService {
 
     // 使用 roomId 的 hash 作为通知 ID
     final notificationId = roomId.hashCode;
-    await _localNotifications!.cancel(notificationId);
+    // flutter_local_notifications 20.0.0 使用命名参数
+    await _localNotifications!.cancel(id: notificationId);
   }
 
   @override

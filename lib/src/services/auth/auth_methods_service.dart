@@ -177,19 +177,10 @@ class AuthMethodsService {
     _passkeyInitialized = true;
     debugPrint('AuthMethodsService: Passkey config initialized');
 
-    // 初始化 Google Sign In
-    if (googleClientId != null || !kIsWeb) {
-      _googleSignIn = GoogleSignIn(
-        clientId: googleClientId,
-        serverClientId: googleServerClientId,
-        scopes: [
-          'email',
-          'profile',
-          'openid',
-        ],
-      );
-      debugPrint('AuthMethodsService: Google Sign In initialized');
-    }
+    // 初始化 Google Sign In (google_sign_in 7.x 使用 singleton 模式)
+    // GoogleSignIn 7.x 不再需要手动初始化，使用 GoogleSignIn.instance
+    _googleSignIn = GoogleSignIn.instance;
+    debugPrint('AuthMethodsService: Google Sign In initialized');
 
     // 初始化 Twitter 配置
     _twitterApiKey = twitterApiKey;
@@ -394,32 +385,53 @@ class AuthMethodsService {
   }
   
   /// Google 登录
+  /// google_sign_in 7.x API 变更:
+  /// - 使用 GoogleSignIn.instance singleton
+  /// - authenticate() 替代 signIn()
+  /// - accessToken 需要单独请求 authorization
   Future<SocialLoginResult?> signInWithGoogle() async {
     if (_googleSignIn == null) {
       throw Exception('Google Sign In 未配置');
     }
-    
+
     try {
       debugPrint('AuthMethodsService: Starting Google Sign In');
-      
-      final account = await _googleSignIn!.signIn();
-      if (account == null) {
-        debugPrint('AuthMethodsService: Google Sign In cancelled');
-        return null;
+
+      // google_sign_in 7.x: 使用 authenticate() 方法
+      final account = await _googleSignIn!.authenticate(
+        scopeHint: ['email', 'profile', 'openid'],
+      );
+
+      final auth = account.authentication;
+
+      // 获取 access token (需要单独请求 authorization)
+      String? accessToken;
+      try {
+        final authorization = await account.authorizationClient.authorizationForScopes(
+          ['email', 'profile', 'openid'],
+        );
+        accessToken = authorization?.accessToken;
+      } catch (e) {
+        debugPrint('AuthMethodsService: Failed to get access token: $e');
       }
-      
-      final auth = await account.authentication;
-      
+
       debugPrint('AuthMethodsService: Google Sign In success: ${account.email}');
-      
+
       return SocialLoginResult(
         provider: 'google',
         idToken: auth.idToken,
-        accessToken: auth.accessToken,
+        accessToken: accessToken,
         email: account.email,
         displayName: account.displayName,
         photoUrl: account.photoUrl,
       );
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        debugPrint('AuthMethodsService: Google Sign In cancelled');
+        return null;
+      }
+      debugPrint('AuthMethodsService: Google Sign In failed: $e');
+      rethrow;
     } catch (e, stackTrace) {
       debugPrint('AuthMethodsService: Google Sign In failed: $e');
       debugPrint('Stack: $stackTrace');
