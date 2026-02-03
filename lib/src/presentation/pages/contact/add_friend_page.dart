@@ -223,7 +223,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                           controller: _searchController,
                           focusNode: _focusNode,
                           decoration: InputDecoration(
-                            hintText: '@username:matrix.n42.network',
+                            hintText: S.of(context)?.matrixIdHint ?? '@username:server.com',
                             hintStyle: TextStyle(
                               fontSize: 14,
                               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,

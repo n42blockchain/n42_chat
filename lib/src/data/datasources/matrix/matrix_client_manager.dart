@@ -129,6 +129,8 @@ class MatrixClientManager {
       }
 
       // 创建 Hive 数据库实例并先打开它
+      // ignore: deprecated_member_use
+      // TODO: Migrate to MatrixSdkDatabase when stable
       debugPrint('MatrixClientManager: Creating HiveCollectionsDatabase...');
       final database = HiveCollectionsDatabase(
         clientName,

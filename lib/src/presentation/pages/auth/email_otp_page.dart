@@ -286,7 +286,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
       controller: _emailController,
       style: TextStyle(color: textColor, fontSize: 16),
       decoration: InputDecoration(
-        hintText: 'example@email.com',
+        hintText: S.of(context)?.emailExampleHint ?? 'example@email.com',
         hintStyle: TextStyle(color: hintColor),
         filled: true,
         fillColor: inputBgColor,

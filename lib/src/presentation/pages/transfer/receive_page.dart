@@ -277,6 +277,8 @@ class _ReceivePageState extends State<ReceivePage> {
 
           // 代币选择
           DropdownButtonFormField<TokenInfo>(
+            // ignore: deprecated_member_use
+            // Using value for dynamic state updates, initialValue is for static initial value only
             value: _selectedToken,
             decoration: InputDecoration(
               labelText: S.of(context)?.selectToken ?? 'Select Token',

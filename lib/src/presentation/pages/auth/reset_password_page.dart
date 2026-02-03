@@ -386,7 +386,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           style: TextStyle(color: textColor, fontSize: 24, letterSpacing: 8),
           textAlign: TextAlign.center,
           decoration: InputDecoration(
-            hintText: '------',
+            hintText: S.of(context)?.verificationCodePlaceholder ?? '------',
             hintStyle: TextStyle(color: hintColor, letterSpacing: 8),
             filled: true,
             fillColor: inputBgColor,

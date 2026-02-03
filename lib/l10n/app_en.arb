@@ -1975,5 +1975,16 @@
   "gotIt": "Got it",
   "noN42BeanRecords": "No N42 Bean records",
 
-  "cameraPermissionRestricted": "Camera access is restricted on this device"
+  "cameraPermissionRestricted": "Camera access is restricted on this device",
+
+  "passkeyLabel": "Passkey",
+  "googleLabel": "Google",
+  "appleLabel": "Apple",
+  "ssoLabel": "SSO",
+  "amountHintZero": "0.00",
+  "matrixIdHint": "@username:server.com",
+  "serverAddressHint": "https://m.si46.world",
+  "emailExampleHint": "example@email.com",
+  "verificationCodePlaceholder": "------",
+  "enterPokeSuffixHint": "Enter poke suffix, e.g.: on the shoulder"
 }

@@ -668,10 +668,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               controller: controller,
               autofocus: true,
               maxLength: 50,
-              decoration: const InputDecoration(
-                hintText: 'Enter poke suffix, e.g.: on the shoulder',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: InputDecoration(
+                hintText: S.of(context)?.enterPokeSuffixHint ?? 'Enter poke suffix, e.g.: on the shoulder',
+                border: const OutlineInputBorder(),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
             ),
             const SizedBox(height: 8),

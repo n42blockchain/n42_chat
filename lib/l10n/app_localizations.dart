@@ -8070,6 +8070,66 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'此设备上的相机访问受限'**
   String get cameraPermissionRestricted;
+
+  /// No description provided for @passkeyLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'Passkey'**
+  String get passkeyLabel;
+
+  /// No description provided for @googleLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'Google'**
+  String get googleLabel;
+
+  /// No description provided for @appleLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'Apple'**
+  String get appleLabel;
+
+  /// No description provided for @ssoLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'SSO'**
+  String get ssoLabel;
+
+  /// No description provided for @amountHintZero.
+  ///
+  /// In zh, this message translates to:
+  /// **'0.00'**
+  String get amountHintZero;
+
+  /// No description provided for @matrixIdHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'@username:server.com'**
+  String get matrixIdHint;
+
+  /// No description provided for @serverAddressHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'https://m.si46.world'**
+  String get serverAddressHint;
+
+  /// No description provided for @emailExampleHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'example@email.com'**
+  String get emailExampleHint;
+
+  /// No description provided for @verificationCodePlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'------'**
+  String get verificationCodePlaceholder;
+
+  /// No description provided for @enterPokeSuffixHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入戳一戳后缀，例如：的肩膀'**
+  String get enterPokeSuffixHint;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

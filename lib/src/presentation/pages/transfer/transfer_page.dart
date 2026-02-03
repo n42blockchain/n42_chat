@@ -466,7 +466,7 @@ class _TransferPageState extends State<TransferPage> {
                   controller: _amountController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
-                    hintText: '0.00',
+                    hintText: S.of(context)?.amountHintZero ?? '0.00',
                     border: InputBorder.none,
                     hintStyle: TextStyle(
                       fontSize: 32,

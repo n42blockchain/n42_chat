@@ -537,7 +537,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
               controller: _inputController,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                hintText: '@username:server.com',
+                hintText: S.of(context)?.matrixIdHint ?? '@username:server.com',
                 hintStyle: const TextStyle(color: Colors.white38),
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.1),
