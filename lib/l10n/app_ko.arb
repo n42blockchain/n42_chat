@@ -539,6 +539,8 @@
   "viewAllGroupMembers": "모든 멤버 보기",
   "groupName": "그룹 이름",
   "groupNameUpdated": "그룹 이름이 업데이트되었습니다",
+  "groupDescriptionUpdated": "그룹 설명이 업데이트되었습니다",
+  "groupAvatarUpdated": "그룹 아바타가 업데이트되었습니다",
   "updateFailed": "업데이트 실패",
   "noPermissionToModify": "수정 권한이 없습니다",
   "groupManagement": "그룹 관리",

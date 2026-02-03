@@ -1680,6 +1680,12 @@ class SKo extends S {
   String get groupNameUpdated => '그룹 이름이 업데이트되었습니다';
 
   @override
+  String get groupDescriptionUpdated => '그룹 설명이 업데이트되었습니다';
+
+  @override
+  String get groupAvatarUpdated => '그룹 아바타가 업데이트되었습니다';
+
+  @override
   String get updateFailed => '업데이트 실패';
 
   @override

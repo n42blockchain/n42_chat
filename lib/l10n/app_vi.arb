@@ -539,6 +539,8 @@
   "viewAllGroupMembers": "Xem tat ca thanh vien",
   "groupName": "Ten nhom",
   "groupNameUpdated": "Da cap nhat ten nhom",
+  "groupDescriptionUpdated": "Đã cập nhật mô tả nhóm",
+  "groupAvatarUpdated": "Đã cập nhật ảnh đại diện nhóm",
   "updateFailed": "Cap nhat that bai",
   "noPermissionToModify": "Ban khong co quyen sua doi",
   "groupManagement": "Quan ly nhom",

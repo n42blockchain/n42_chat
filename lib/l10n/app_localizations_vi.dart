@@ -1692,6 +1692,12 @@ class SVi extends S {
   String get groupNameUpdated => 'Da cap nhat ten nhom';
 
   @override
+  String get groupDescriptionUpdated => 'Đã cập nhật mô tả nhóm';
+
+  @override
+  String get groupAvatarUpdated => 'Đã cập nhật ảnh đại diện nhóm';
+
+  @override
   String get updateFailed => 'Cap nhat that bai';
 
   @override

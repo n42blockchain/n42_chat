@@ -864,6 +864,8 @@
   "viewAllGroupMembers": "查看全部群成员",
   "groupName": "群聊名称",
   "groupNameUpdated": "群名称已更新",
+  "groupDescriptionUpdated": "群简介已更新",
+  "groupAvatarUpdated": "群头像已更新",
   "updateFailed": "更新失败",
   "noPermissionToModify": "您没有修改权限",
   "groupManagement": "群管理",

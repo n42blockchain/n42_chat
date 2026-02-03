@@ -41,13 +41,32 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     return BlocConsumer<GroupBloc, GroupState>(
       listener: (context, state) {
         if (state is GroupError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
-        } else if (state is GroupOperationSuccess) {
+          // Map English error messages to localized strings
+          final s = S.of(context);
+          String message = state.message;
+          if (message.contains('do not have permission') || message.contains('permission')) {
+            message = s?.noPermissionToEditGroupName ?? message;
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(message),
+              backgroundColor: Colors.red,
+            ),
+          );
+        } else if (state is GroupOperationSuccess) {
+          // Map English success messages to localized strings
+          final s = S.of(context);
+          String message = state.message;
+          if (message == 'Group name updated') {
+            message = s?.groupNameUpdated ?? message;
+          } else if (message == 'Group description updated') {
+            message = s?.groupDescriptionUpdated ?? message;
+          } else if (message == 'Group avatar updated') {
+            message = s?.groupAvatarUpdated ?? message;
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
               backgroundColor: Colors.green,
             ),
           );

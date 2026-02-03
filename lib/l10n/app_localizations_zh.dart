@@ -1680,6 +1680,12 @@ class SZh extends S {
   String get groupNameUpdated => '群名称已更新';
 
   @override
+  String get groupDescriptionUpdated => '群简介已更新';
+
+  @override
+  String get groupAvatarUpdated => '群头像已更新';
+
+  @override
   String get updateFailed => '更新失败';
 
   @override

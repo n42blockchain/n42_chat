@@ -153,7 +153,12 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       emit(GroupOperationSuccess(successMessage));
     } catch (e) {
       if (currentState is GroupDetailsLoaded) emit(currentState);
-      emit(GroupError('$errorPrefix: $e'));
+      // Extract clean error message without "Exception:" prefix
+      String errorMessage = e.toString();
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring(11);
+      }
+      emit(GroupError(errorMessage));
     }
   }
 

@@ -1706,6 +1706,12 @@ class SRu extends S {
   String get groupNameUpdated => 'Название группы обновлено';
 
   @override
+  String get groupDescriptionUpdated => 'Описание группы обновлено';
+
+  @override
+  String get groupAvatarUpdated => 'Аватар группы обновлен';
+
+  @override
   String get updateFailed => 'Ошибка обновления';
 
   @override

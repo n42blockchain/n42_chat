@@ -1715,6 +1715,12 @@ class SEs extends S {
   String get groupNameUpdated => 'Nombre del grupo actualizado';
 
   @override
+  String get groupDescriptionUpdated => 'Descripción del grupo actualizada';
+
+  @override
+  String get groupAvatarUpdated => 'Avatar del grupo actualizado';
+
+  @override
   String get updateFailed => 'Error de actualizacion';
 
   @override

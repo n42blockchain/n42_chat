@@ -1714,6 +1714,12 @@ class SPt extends S {
   String get groupNameUpdated => 'Nome do grupo atualizado';
 
   @override
+  String get groupDescriptionUpdated => 'Descrição do grupo atualizada';
+
+  @override
+  String get groupAvatarUpdated => 'Avatar do grupo atualizado';
+
+  @override
   String get updateFailed => 'Falha na atualização';
 
   @override

@@ -539,6 +539,8 @@
   "viewAllGroupMembers": "Tüm üyeleri gör",
   "groupName": "Grup Adı",
   "groupNameUpdated": "Grup adı güncellendi",
+  "groupDescriptionUpdated": "Grup açıklaması güncellendi",
+  "groupAvatarUpdated": "Grup avatarı güncellendi",
   "updateFailed": "Güncelleme başarısız",
   "noPermissionToModify": "Değiştirme izniniz yok",
   "groupManagement": "Grup Yönetimi",

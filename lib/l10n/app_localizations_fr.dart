@@ -1721,6 +1721,12 @@ class SFr extends S {
   String get groupNameUpdated => 'Nom du groupe mis a jour';
 
   @override
+  String get groupDescriptionUpdated => 'Description du groupe mise à jour';
+
+  @override
+  String get groupAvatarUpdated => 'Avatar du groupe mis à jour';
+
+  @override
   String get updateFailed => 'Echec de la mise a jour';
 
   @override

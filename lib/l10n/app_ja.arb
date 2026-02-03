@@ -539,6 +539,8 @@
   "viewAllGroupMembers": "すべてのメンバーを表示",
   "groupName": "グループ名",
   "groupNameUpdated": "グループ名を更新しました",
+  "groupDescriptionUpdated": "グループの説明を更新しました",
+  "groupAvatarUpdated": "グループのアバターを更新しました",
   "updateFailed": "更新に失敗しました",
   "noPermissionToModify": "変更する権限がありません",
   "groupManagement": "グループ管理",

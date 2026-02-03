@@ -1680,6 +1680,12 @@ class SJa extends S {
   String get groupNameUpdated => 'グループ名を更新しました';
 
   @override
+  String get groupDescriptionUpdated => 'グループの説明を更新しました';
+
+  @override
+  String get groupAvatarUpdated => 'グループのアバターを更新しました';
+
+  @override
   String get updateFailed => '更新に失敗しました';
 
   @override

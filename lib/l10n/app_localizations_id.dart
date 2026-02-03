@@ -1698,6 +1698,12 @@ class SId extends S {
   String get groupNameUpdated => 'Nama grup diperbarui';
 
   @override
+  String get groupDescriptionUpdated => 'Deskripsi grup diperbarui';
+
+  @override
+  String get groupAvatarUpdated => 'Avatar grup diperbarui';
+
+  @override
   String get updateFailed => 'Pembaruan gagal';
 
   @override

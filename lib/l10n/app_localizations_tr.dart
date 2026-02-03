@@ -1696,6 +1696,12 @@ class STr extends S {
   String get groupNameUpdated => 'Grup adı güncellendi';
 
   @override
+  String get groupDescriptionUpdated => 'Grup açıklaması güncellendi';
+
+  @override
+  String get groupAvatarUpdated => 'Grup avatarı güncellendi';
+
+  @override
   String get updateFailed => 'Güncelleme başarısız';
 
   @override
