@@ -1870,17 +1870,17 @@ class SZh extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return '注意：$count 条消息是他人发送的，只能在本地删除。';
+    return '注意：$count 条消息来自他人，仅对你删除。';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return '$count 条自己发送的消息将被撤回。';
+    return '$count 条你发送的消息将对所有人撤回。';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return '已撤回 $count 条消息，本地删除 $localCount 条';
+    return '已撤回 $count 条消息，$localCount 条仅对你删除';
   }
 
   @override
@@ -1890,7 +1890,7 @@ class SZh extends S {
 
   @override
   String deletedLocally(Object count) {
-    return '已删除 $count 条消息（仅本地）';
+    return '$count 条消息仅对你删除';
   }
 
   @override

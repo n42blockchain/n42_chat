@@ -1904,17 +1904,17 @@ class SPl extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return 'Uwaga: $count wiadomosci jest od innych, mozna usunac tylko lokalnie.';
+    return 'Uwaga: $count wiadomosci jest od innych i zostana usuniete tylko dla Ciebie.';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return '$count wiadomosci od Ciebie zostanie wycofanych.';
+    return '$count wiadomosci od Ciebie zostanie wycofanych dla wszystkich.';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return 'Wycofano $count wiadomosci, usunieto $localCount lokalnie';
+    return 'Wycofano $count wiadomosci, $localCount usunieto tylko dla Ciebie';
   }
 
   @override
@@ -1924,7 +1924,7 @@ class SPl extends S {
 
   @override
   String deletedLocally(Object count) {
-    return 'Usunieto $count wiadomosci (lokalnie)';
+    return '$count wiadomosci usunieto tylko dla Ciebie';
   }
 
   @override

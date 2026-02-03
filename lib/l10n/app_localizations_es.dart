@@ -1907,17 +1907,17 @@ class SEs extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return 'Nota: $count mensajes son de otros, solo se pueden eliminar localmente.';
+    return 'Nota: $count mensajes son de otros y solo se eliminaran para ti.';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return '$count mensajes tuyos seran retirados.';
+    return '$count mensajes tuyos seran retirados para todos.';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return 'Retirados $count mensajes, eliminados $localCount localmente';
+    return 'Retirados $count mensajes, $localCount eliminados solo para ti';
   }
 
   @override
@@ -1927,7 +1927,7 @@ class SEs extends S {
 
   @override
   String deletedLocally(Object count) {
-    return 'Eliminados $count mensajes (localmente)';
+    return '$count mensajes eliminados solo para ti';
   }
 
   @override

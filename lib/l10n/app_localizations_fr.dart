@@ -1916,17 +1916,17 @@ class SFr extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return 'Remarque : $count messages proviennent d\'autres personnes, ne peuvent etre supprimes que localement.';
+    return 'Remarque : $count messages proviennent d\'autres personnes et ne seront supprimes que pour vous.';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return '$count messages de votre part seront rappeles.';
+    return '$count de vos messages seront rappeles pour tout le monde.';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return '$count messages rappeles, $localCount supprimes localement';
+    return '$count messages rappeles, $localCount supprimes uniquement pour vous';
   }
 
   @override
@@ -1936,7 +1936,7 @@ class SFr extends S {
 
   @override
   String deletedLocally(Object count) {
-    return '$count messages supprimes (localement)';
+    return '$count messages supprimes uniquement pour vous';
   }
 
   @override

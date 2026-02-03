@@ -1888,17 +1888,17 @@ class STr extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return 'Not: $count mesaj başkalarına ait, sadece yerel olarak silinebilir.';
+    return 'Not: $count mesaj başkalarına ait ve sadece sizin için silinecek.';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return 'Sizden $count mesaj geri alınacak.';
+    return 'Sizden $count mesaj herkes için geri alınacak.';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return '$count mesaj geri alındı, $localCount yerel olarak silindi';
+    return '$count mesaj geri alındı, $localCount sadece sizin için silindi';
   }
 
   @override
@@ -1908,7 +1908,7 @@ class STr extends S {
 
   @override
   String deletedLocally(Object count) {
-    return '$count mesaj silindi (yerel)';
+    return '$count mesaj sadece sizin için silindi';
   }
 
   @override

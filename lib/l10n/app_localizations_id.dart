@@ -1890,17 +1890,17 @@ class SId extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return 'Catatan: $count pesan dari orang lain, hanya dapat dihapus secara lokal.';
+    return 'Catatan: $count pesan dari orang lain dan hanya akan dihapus untuk Anda.';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return '$count pesan dari Anda akan ditarik.';
+    return '$count pesan dari Anda akan ditarik untuk semua.';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return 'Menarik $count pesan, menghapus $localCount secara lokal';
+    return 'Menarik $count pesan, $localCount dihapus hanya untuk Anda';
   }
 
   @override
@@ -1910,7 +1910,7 @@ class SId extends S {
 
   @override
   String deletedLocally(Object count) {
-    return 'Menghapus $count pesan (lokal)';
+    return '$count pesan dihapus hanya untuk Anda';
   }
 
   @override

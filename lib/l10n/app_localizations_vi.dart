@@ -1884,17 +1884,17 @@ class SVi extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return 'Luu y: $count tin nhan tu nguoi khac, chi co the xoa cuc bo.';
+    return 'Luu y: $count tin nhan tu nguoi khac va chi bi xoa cho ban.';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return '$count tin nhan tu ban se bi thu hoi.';
+    return '$count tin nhan tu ban se bi thu hoi cho tat ca.';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return 'Da thu hoi $count tin nhan, da xoa $localCount cuc bo';
+    return 'Da thu hoi $count tin nhan, $localCount chi bi xoa cho ban';
   }
 
   @override
@@ -1904,7 +1904,7 @@ class SVi extends S {
 
   @override
   String deletedLocally(Object count) {
-    return 'Da xoa $count tin nhan (cuc bo)';
+    return '$count tin nhan chi bi xoa cho ban';
   }
 
   @override

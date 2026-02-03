@@ -1900,17 +1900,17 @@ class SRu extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return 'Примечание: $count сообщений от других, можно удалить только локально.';
+    return 'Примечание: $count сообщений от других и будут удалены только для вас.';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return '$count ваших сообщений будут отозваны.';
+    return '$count ваших сообщений будут отозваны для всех.';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return 'Отозвано $count сообщений, удалено локально $localCount';
+    return 'Отозвано $count сообщений, $localCount удалено только для вас';
   }
 
   @override
@@ -1920,7 +1920,7 @@ class SRu extends S {
 
   @override
   String deletedLocally(Object count) {
-    return 'Удалено $count сообщений (локально)';
+    return '$count сообщений удалено только для вас';
   }
 
   @override
