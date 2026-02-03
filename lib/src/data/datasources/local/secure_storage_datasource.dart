@@ -15,6 +15,7 @@ class SecureStorageDataSource {
   static const String _keyAppearanceSettings = 'n42_chat_appearance_settings';
   static const String _keyStrongReminders = 'n42_chat_strong_reminders';
   static const String _keyBiometricSettings = 'n42_chat_biometric_settings';
+  static const String _keyLocallyDeletedMessages = 'n42_chat_locally_deleted_messages';
 
   final FlutterSecureStorage _storage;
 
@@ -498,6 +499,84 @@ class SecureStorageDataSource {
       return json.map((key, value) => MapEntry(key, value.toString()));
     } catch (e) {
       return {};
+    }
+  }
+
+  // ============================================
+  // 本地删除消息管理
+  // ============================================
+
+  /// 获取房间的本地删除消息ID列表
+  Future<Set<String>> getLocallyDeletedMessageIds(String roomId) async {
+    try {
+      final data = await _storage.read(key: _keyLocallyDeletedMessages);
+      if (data == null) return {};
+
+      final json = jsonDecode(data) as Map<String, dynamic>;
+      final roomData = json[roomId] as List<dynamic>?;
+      if (roomData == null) return {};
+
+      return roomData.cast<String>().toSet();
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read locally deleted messages - $e');
+      return {};
+    }
+  }
+
+  /// 标记消息为本地删除
+  Future<void> markMessagesAsLocallyDeleted(String roomId, List<String> messageIds) async {
+    try {
+      final data = await _storage.read(key: _keyLocallyDeletedMessages);
+      Map<String, dynamic> allData = {};
+
+      if (data != null) {
+        allData = jsonDecode(data) as Map<String, dynamic>;
+      }
+
+      // 获取当前房间的已删除消息列表
+      final currentIds = (allData[roomId] as List<dynamic>?)?.cast<String>().toSet() ?? <String>{};
+      currentIds.addAll(messageIds);
+
+      // 限制每个房间最多保存 1000 个删除记录
+      final limitedIds = currentIds.toList();
+      if (limitedIds.length > 1000) {
+        limitedIds.removeRange(0, limitedIds.length - 1000);
+      }
+
+      allData[roomId] = limitedIds;
+
+      await _storage.write(
+        key: _keyLocallyDeletedMessages,
+        value: jsonEncode(allData),
+      );
+
+      debugPrint('SecureStorage: Marked ${messageIds.length} messages as locally deleted in $roomId');
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to mark messages as locally deleted - $e');
+    }
+  }
+
+  /// 清除房间的本地删除消息记录
+  Future<void> clearLocallyDeletedMessages(String roomId) async {
+    try {
+      final data = await _storage.read(key: _keyLocallyDeletedMessages);
+      if (data == null) return;
+
+      final allData = jsonDecode(data) as Map<String, dynamic>;
+      allData.remove(roomId);
+
+      if (allData.isEmpty) {
+        await _storage.delete(key: _keyLocallyDeletedMessages);
+      } else {
+        await _storage.write(
+          key: _keyLocallyDeletedMessages,
+          value: jsonEncode(allData),
+        );
+      }
+
+      debugPrint('SecureStorage: Cleared locally deleted messages for $roomId');
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to clear locally deleted messages - $e');
     }
   }
 

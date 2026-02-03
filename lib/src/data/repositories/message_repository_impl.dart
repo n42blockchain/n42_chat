@@ -7,6 +7,7 @@ import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/message_entity.dart';
 import '../../domain/repositories/message_repository.dart';
+import '../datasources/local/secure_storage_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_message_datasource.dart';
 
@@ -14,11 +15,16 @@ import '../datasources/matrix/matrix_message_datasource.dart';
 class MessageRepositoryImpl implements IMessageRepository {
   final MatrixMessageDataSource _messageDataSource;
   final MatrixClientManager _clientManager;
+  final SecureStorageDataSource _secureStorage;
 
   // 缓存时间线，避免重复创建
   final Map<String, matrix.Timeline> _timelines = {};
 
-  MessageRepositoryImpl(this._messageDataSource, this._clientManager);
+  MessageRepositoryImpl(
+    this._messageDataSource,
+    this._clientManager,
+    this._secureStorage,
+  );
 
   matrix.Client? get _client => _clientManager.client;
 
@@ -753,6 +759,25 @@ class MessageRepositoryImpl implements IMessageRepository {
   /// 清理所有时间线缓存
   void disposeAllTimelines() {
     _timelines.clear();
+  }
+
+  // ============================================
+  // 本地删除消息管理
+  // ============================================
+
+  @override
+  Future<Set<String>> getLocallyDeletedMessageIds(String roomId) async {
+    return _secureStorage.getLocallyDeletedMessageIds(roomId);
+  }
+
+  @override
+  Future<void> markMessagesAsLocallyDeleted(String roomId, List<String> messageIds) async {
+    await _secureStorage.markMessagesAsLocallyDeleted(roomId, messageIds);
+  }
+
+  @override
+  Future<void> clearLocallyDeletedMessages(String roomId) async {
+    await _secureStorage.clearLocallyDeletedMessages(roomId);
   }
 }
 

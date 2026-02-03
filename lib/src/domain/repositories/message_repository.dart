@@ -188,5 +188,14 @@ abstract class IMessageRepository {
     required String content,
     Map<String, dynamic>? additionalData,
   });
+
+  /// 获取房间的本地删除消息ID列表
+  Future<Set<String>> getLocallyDeletedMessageIds(String roomId);
+
+  /// 标记消息为本地删除（持久化存储）
+  Future<void> markMessagesAsLocallyDeleted(String roomId, List<String> messageIds);
+
+  /// 清除房间的本地删除消息记录
+  Future<void> clearLocallyDeletedMessages(String roomId);
 }
 

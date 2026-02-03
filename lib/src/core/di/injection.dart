@@ -180,6 +180,7 @@ void _registerRepositories() {
     () => MessageRepositoryImpl(
       getIt<MatrixMessageDataSource>(),
       getIt<MatrixClientManager>(),
+      getIt<SecureStorageDataSource>(),
     ),
   );
 
