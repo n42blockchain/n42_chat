@@ -96,28 +96,36 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final stream = _messageRepository.watchPollResponses(roomId);
     if (stream == null) return;
 
-    _pollResponsesSubscription = stream.listen((response) {
-      final type = response['type'] as String?;
-      final pollEventId = response['pollEventId'] as String?;
+    _pollResponsesSubscription = stream.listen(
+      (response) {
+        // 防止在 BLoC 关闭后添加事件
+        if (isClosed) return;
 
-      if (pollEventId == null) return;
+        final type = response['type'] as String?;
+        final pollEventId = response['pollEventId'] as String?;
 
-      if (type == 'vote') {
-        final answers = (response['answers'] as List<dynamic>?)
-            ?.cast<String>() ?? [];
-        final senderId = response['senderId'] as String? ?? '';
-        final isCurrentUser = response['isCurrentUser'] as bool? ?? false;
+        if (pollEventId == null) return;
 
-        add(PollResponseReceived(
-          pollEventId: pollEventId,
-          selectedOptionIds: answers,
-          senderId: senderId,
-          isCurrentUser: isCurrentUser,
-        ));
-      } else if (type == 'end') {
-        add(PollEnded(pollEventId: pollEventId));
-      }
-    });
+        if (type == 'vote') {
+          final answers = (response['answers'] as List<dynamic>?)
+              ?.cast<String>() ?? [];
+          final senderId = response['senderId'] as String? ?? '';
+          final isCurrentUser = response['isCurrentUser'] as bool? ?? false;
+
+          add(PollResponseReceived(
+            pollEventId: pollEventId,
+            selectedOptionIds: answers,
+            senderId: senderId,
+            isCurrentUser: isCurrentUser,
+          ));
+        } else if (type == 'end') {
+          add(PollEnded(pollEventId: pollEventId));
+        }
+      },
+      onError: (Object error) {
+        debugPrint('ChatBloc: Poll responses stream error: $error');
+      },
+    );
   }
 
   /// 加载消息
@@ -131,13 +139,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         limit: event.limit,
       );
 
+      // 构建当前消息的索引 Map (O(n) 而不是 O(n²))
+      final currentMessagesMap = <String, MessageEntity>{};
+      for (final msg in state.messages) {
+        currentMessagesMap[msg.id] = msg;
+      }
+
       // 保留之前的 reactions（服务器聚合可能需要时间）
-      final currentMessages = state.messages;
       var mergedMessages = messages.map((newMsg) {
-        final currentMsg = currentMessages.firstWhere(
-          (m) => m.id == newMsg.id,
-          orElse: () => newMsg,
-        );
+        final currentMsg = currentMessagesMap[newMsg.id];
+        if (currentMsg == null) return newMsg;
+
         // 如果当前消息有 reactions 但新消息没有，保留当前的 reactions
         if (currentMsg.reactions.isNotEmpty && newMsg.reactions.isEmpty) {
           return newMsg.copyWith(reactions: currentMsg.reactions);
@@ -326,9 +338,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     _messagesSubscription = _messageRepository
         .watchMessages(_currentRoomId!)
-        .listen((messages) {
-      add(MessagesUpdated(messages));
-    });
+        .listen(
+      (messages) {
+        // 防止在 BLoC 关闭后添加事件
+        if (!isClosed) {
+          add(MessagesUpdated(messages));
+        }
+      },
+      onError: (Object error) {
+        debugPrint('ChatBloc: Messages stream error: $error');
+      },
+    );
   }
 
   /// 取消订阅
@@ -349,35 +369,38 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final filteredMessages = event.messages
         .where((m) => !_locallyDeletedMessageIds.contains(m.id))
         .toList();
-    
+
+    // 构建当前消息的索引 Map (O(n) 而不是 O(n²))
+    final currentMessagesMap = <String, MessageEntity>{};
+    for (final msg in state.messages) {
+      currentMessagesMap[msg.id] = msg;
+    }
+
     // 保留本地添加的 reactions 和投票状态（服务器聚合可能需要时间）
-    final currentMessages = state.messages;
     final mergedMessages = filteredMessages.map((newMsg) {
       // 查找当前状态中的同一消息
-      final currentMsg = currentMessages.firstWhere(
-        (m) => m.id == newMsg.id,
-        orElse: () => newMsg,
-      );
-      
+      final currentMsg = currentMessagesMap[newMsg.id];
+      if (currentMsg == null) return newMsg;
+
       // 如果当前消息有 reactions 但新消息没有，保留当前的 reactions
       if (currentMsg.reactions.isNotEmpty && newMsg.reactions.isEmpty) {
         newMsg = newMsg.copyWith(reactions: currentMsg.reactions);
       }
-      
+
       // 保留投票消息的本地状态（服务器聚合需要时间）
-      if (newMsg.type == MessageType.poll && 
+      if (newMsg.type == MessageType.poll &&
           currentMsg.type == MessageType.poll &&
           currentMsg.metadata != null) {
         final currentMeta = currentMsg.metadata!;
         final newMeta = newMsg.metadata;
-        
+
         // 如果本地有投票数据但服务器返回的没有，保留本地数据
-        if ((currentMeta.totalVoters ?? 0) > 0 && 
+        if ((currentMeta.totalVoters ?? 0) > 0 &&
             (newMeta?.totalVoters ?? 0) == 0) {
           newMsg = newMsg.copyWith(metadata: currentMeta);
         }
         // 如果本地有我的投票但服务器返回的没有，保留本地数据
-        else if ((currentMeta.myVotes?.isNotEmpty ?? false) && 
+        else if ((currentMeta.myVotes?.isNotEmpty ?? false) &&
                  (newMeta?.myVotes?.isEmpty ?? true)) {
           newMsg = newMsg.copyWith(
             metadata: MessageMetadata(
@@ -412,10 +435,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           );
         }
       }
-      
+
       return newMsg;
     }).toList();
-    
+
     if (!isClosed) {
       emit(state.copyWith(messages: mergedMessages));
     }

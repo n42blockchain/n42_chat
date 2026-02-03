@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/conversation_entity.dart';
@@ -103,9 +104,17 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
     _conversationsSubscription = _conversationRepository
         .watchConversations()
-        .listen((conversations) {
-      add(ConversationsUpdated(conversations));
-    });
+        .listen(
+      (conversations) {
+        // 防止在 BLoC 关闭后添加事件
+        if (!isClosed) {
+          add(ConversationsUpdated(conversations));
+        }
+      },
+      onError: (Object error) {
+        debugPrint('ConversationBloc: Conversations stream error: $error');
+      },
+    );
   }
 
   /// 取消订阅
