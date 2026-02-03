@@ -539,6 +539,8 @@
   "viewAllGroupMembers": "Просмотреть всех участников",
   "groupName": "Название группы",
   "groupNameUpdated": "Название группы обновлено",
+  "groupDescriptionUpdated": "Описание группы обновлено",
+  "groupAvatarUpdated": "Аватар группы обновлен",
   "updateFailed": "Ошибка обновления",
   "noPermissionToModify": "У вас нет прав на изменение",
   "groupManagement": "Управление группой",

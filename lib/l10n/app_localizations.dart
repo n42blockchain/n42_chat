@@ -3181,6 +3181,18 @@ abstract class S {
   /// **'群名称已更新'**
   String get groupNameUpdated;
 
+  /// No description provided for @groupDescriptionUpdated.
+  ///
+  /// In zh, this message translates to:
+  /// **'群简介已更新'**
+  String get groupDescriptionUpdated;
+
+  /// No description provided for @groupAvatarUpdated.
+  ///
+  /// In zh, this message translates to:
+  /// **'群头像已更新'**
+  String get groupAvatarUpdated;
+
   /// No description provided for @updateFailed.
   ///
   /// In zh, this message translates to:

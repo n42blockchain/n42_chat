@@ -1699,6 +1699,12 @@ class SIt extends S {
   String get groupNameUpdated => 'Nome gruppo aggiornato';
 
   @override
+  String get groupDescriptionUpdated => 'Descrizione gruppo aggiornata';
+
+  @override
+  String get groupAvatarUpdated => 'Avatar gruppo aggiornato';
+
+  @override
   String get updateFailed => 'Aggiornamento fallito';
 
   @override

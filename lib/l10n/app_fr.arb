@@ -539,6 +539,8 @@
   "viewAllGroupMembers": "Voir tous les membres",
   "groupName": "Nom du groupe",
   "groupNameUpdated": "Nom du groupe mis a jour",
+  "groupDescriptionUpdated": "Description du groupe mise à jour",
+  "groupAvatarUpdated": "Avatar du groupe mis à jour",
   "updateFailed": "Echec de la mise a jour",
   "noPermissionToModify": "Vous n'avez pas la permission de modifier",
   "groupManagement": "Gestion du groupe",

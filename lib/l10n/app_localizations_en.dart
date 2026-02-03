@@ -1691,6 +1691,12 @@ class SEn extends S {
   String get groupNameUpdated => 'Group name updated';
 
   @override
+  String get groupDescriptionUpdated => 'Group description updated';
+
+  @override
+  String get groupAvatarUpdated => 'Group avatar updated';
+
+  @override
   String get updateFailed => 'Update failed';
 
   @override

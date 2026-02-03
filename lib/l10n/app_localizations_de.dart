@@ -1711,6 +1711,12 @@ class SDe extends S {
   String get groupNameUpdated => 'Gruppenname aktualisiert';
 
   @override
+  String get groupDescriptionUpdated => 'Gruppenbeschreibung aktualisiert';
+
+  @override
+  String get groupAvatarUpdated => 'Gruppen-Avatar aktualisiert';
+
+  @override
   String get updateFailed => 'Aktualisierung fehlgeschlagen';
 
   @override

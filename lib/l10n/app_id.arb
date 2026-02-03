@@ -539,6 +539,8 @@
   "viewAllGroupMembers": "Lihat semua anggota",
   "groupName": "Nama Grup",
   "groupNameUpdated": "Nama grup diperbarui",
+  "groupDescriptionUpdated": "Deskripsi grup diperbarui",
+  "groupAvatarUpdated": "Avatar grup diperbarui",
   "updateFailed": "Pembaruan gagal",
   "noPermissionToModify": "Anda tidak memiliki izin untuk mengubah",
   "groupManagement": "Manajemen Grup",

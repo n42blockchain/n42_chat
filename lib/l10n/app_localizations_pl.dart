@@ -1710,6 +1710,12 @@ class SPl extends S {
   String get groupNameUpdated => 'Nazwa grupy zaktualizowana';
 
   @override
+  String get groupDescriptionUpdated => 'Opis grupy zaktualizowany';
+
+  @override
+  String get groupAvatarUpdated => 'Awatar grupy zaktualizowany';
+
+  @override
   String get updateFailed => 'Aktualizacja nie powiodla sie';
 
   @override
