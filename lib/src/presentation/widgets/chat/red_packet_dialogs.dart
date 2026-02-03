@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
+import '../../../core/theme/app_colors.dart';
 
 /// 发红包页面（全屏，仿微信）
 class SendRedPacketPage extends StatefulWidget {
@@ -145,21 +147,25 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    
+    final isDark = context.isDarkMode;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: bgColor,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 32),
+          icon: Icon(Icons.chevron_left, color: textColor, size: 32),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           S.of(context)?.sendRedPacket ?? 'Send Red Packet',
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: textColor,
             fontSize: 18,
             fontWeight: FontWeight.w500,
           ),
@@ -167,7 +173,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_horiz, color: Colors.white),
+            icon: Icon(Icons.more_horiz, color: textColor),
             onPressed: () {},
           ),
         ],
@@ -188,6 +194,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 
                 // 金额输入
                 _buildMenuItem(
+                  context: context,
                   label: S.of(context)?.amount ?? 'Amount',
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -198,7 +205,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.white10,
+                            color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
@@ -206,9 +213,9 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                             children: [
                               Text(
                                 _selectedToken,
-                                style: const TextStyle(color: Colors.white70, fontSize: 14),
+                                style: TextStyle(color: secondaryTextColor, fontSize: 14),
                               ),
-                              const Icon(Icons.arrow_drop_down, color: Colors.white70, size: 18),
+                              Icon(Icons.arrow_drop_down, color: secondaryTextColor, size: 18),
                             ],
                           ),
                         ),
@@ -223,13 +230,13 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                             FilteringTextInputFormatter.allow(RegExp(_amountPattern)),
                           ],
                           textAlign: TextAlign.right,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: textColor,
                             fontSize: 16,
                           ),
                           decoration: InputDecoration(
                             hintText: _decimalPlaces > 2 ? '0.0' : '0.00',
-                            hintStyle: const TextStyle(color: Colors.white38),
+                            hintStyle: TextStyle(color: secondaryTextColor.withOpacity(0.5)),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
                             isDense: true,
@@ -243,19 +250,20 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 
                 // 祝福语输入
                 _buildMenuItem(
+                  context: context,
                   child: TextField(
                     controller: _greetingController,
                     maxLength: 30,
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: textColor, fontSize: 16),
                     decoration: InputDecoration(
                       hintText: S.of(context)?.redPacketDefaultGreeting ?? 'Best wishes',
-                      hintStyle: const TextStyle(color: Colors.white38),
+                      hintStyle: TextStyle(color: secondaryTextColor.withOpacity(0.5)),
                       border: InputBorder.none,
                       counterText: '',
                       contentPadding: EdgeInsets.zero,
                       isDense: true,
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.white54),
+                        icon: Icon(Icons.emoji_emotions_outlined, color: secondaryTextColor),
                         onPressed: () {},
                       ),
                     ),
@@ -264,6 +272,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 
                 // 红包封面
                 _buildMenuItem(
+                  context: context,
                   onTap: () {},
                   child: Row(
                     children: [
@@ -273,12 +282,12 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                           children: [
                             Text(
                               S.of(context)?.redPacketCover ?? 'Red Packet Cover',
-                              style: const TextStyle(color: Colors.white, fontSize: 16),
+                              style: TextStyle(color: textColor, fontSize: 16),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               S.of(context)?.goodLuck ?? 'Good luck',
-                              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                              style: TextStyle(color: secondaryTextColor, fontSize: 13),
                             ),
                           ],
                         ),
@@ -300,7 +309,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Icon(Icons.chevron_right, color: Colors.white38),
+                      Icon(Icons.chevron_right, color: secondaryTextColor),
                     ],
                   ),
                 ),
@@ -309,15 +318,16 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 if (widget.isGroup) ...[
                   const SizedBox(height: 16),
                   _buildMenuItem(
+                    context: context,
                     label: S.of(context)?.redPacketType ?? 'Red Packet Type',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildTypeChip(S.of(context)?.normalRedPacket ?? 'Normal', !_isLucky, () {
+                        _buildTypeChip(context, S.of(context)?.normalRedPacket ?? 'Normal', !_isLucky, () {
                           setState(() => _isLucky = false);
                         }),
                         const SizedBox(width: 8),
-                        _buildTypeChip(S.of(context)?.luckyRedPacket ?? 'Lucky', _isLucky, () {
+                        _buildTypeChip(context, S.of(context)?.luckyRedPacket ?? 'Lucky', _isLucky, () {
                           setState(() => _isLucky = true);
                         }),
                       ],
@@ -325,6 +335,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                   ),
                   if (_isLucky)
                     _buildMenuItem(
+                      context: context,
                       label: S.of(context)?.redPacketCount ?? 'Red Packet Count',
                       trailing: SizedBox(
                         width: 80,
@@ -333,13 +344,13 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                           keyboardType: TextInputType.number,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           textAlign: TextAlign.right,
-                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                          style: TextStyle(color: textColor, fontSize: 16),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
                             isDense: true,
                             suffixText: S.of(context)?.pieces ?? 'pcs',
-                            suffixStyle: const TextStyle(color: Colors.white54, fontSize: 14),
+                            suffixStyle: TextStyle(color: secondaryTextColor, fontSize: 14),
                           ),
                         ),
                       ),
@@ -349,19 +360,19 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 const Spacer(),
                 
                 const SizedBox(height: 24),
-                
+
                 // 金额显示
                 Text(
                   '$_currencySymbol ${_amount.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: textColor,
                     fontSize: 48,
                     fontWeight: FontWeight.w300,
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // 发送按钮
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -372,9 +383,9 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                       onPressed: _amount > 0 ? _send : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFE85D04),
-                        disabledBackgroundColor: const Color(0xFF4A3020),
+                        disabledBackgroundColor: isDark ? const Color(0xFF4A3020) : const Color(0xFFE8D0C0),
                         foregroundColor: Colors.white,
-                        disabledForegroundColor: Colors.white38,
+                        disabledForegroundColor: isDark ? Colors.white38 : Colors.white60,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -390,14 +401,14 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // 底部提示
                 Text(
                   S.of(context)?.redPacketRefundNotice ?? 'Unclaimed red packets will be refunded after 24 hours',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
+                    color: secondaryTextColor.withOpacity(0.6),
                     fontSize: 12,
                   ),
                 ),
@@ -443,18 +454,23 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   }
   
   Widget _buildMenuItem({
+    required BuildContext context,
     String? label,
     Widget? trailing,
     Widget? child,
     VoidCallback? onTap,
   }) {
+    final isDark = context.isDarkMode;
+    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFF1C1C1E),
+          color: surfaceColor,
           borderRadius: BorderRadius.circular(10),
         ),
         child: child ?? Row(
@@ -463,7 +479,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
               Flexible(
                 child: Text(
                   label,
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(color: textColor, fontSize: 16),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -475,19 +491,24 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     );
   }
   
-  Widget _buildTypeChip(String label, bool selected, VoidCallback onTap) {
+  Widget _buildTypeChip(BuildContext context, String label, bool selected, VoidCallback onTap) {
+    final isDark = context.isDarkMode;
+    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFFE85D04) : Colors.white10,
+          color: selected
+              ? const Color(0xFFE85D04)
+              : (isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? Colors.white : Colors.white54,
+            color: selected ? Colors.white : secondaryTextColor,
             fontSize: 13,
           ),
         ),
@@ -496,25 +517,29 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   }
   
   void _showTokenPicker() {
+    final isDark = context.isDarkMode;
+    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF2C2C2E),
+      backgroundColor: surfaceColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => SafeArea(
+      builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                S.of(context)?.selectCurrency ?? 'Select currency',
-                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                S.of(ctx)?.selectCurrency ?? 'Select currency',
+                style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),
             ..._tokens.map((token) => ListTile(
-              title: Text(token, style: const TextStyle(color: Colors.white)),
+              title: Text(token, style: TextStyle(color: textColor)),
               trailing: _selectedToken == token
                   ? const Icon(Icons.check, color: Color(0xFFE85D04))
                   : null,
@@ -524,7 +549,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                   // 切换币种时验证金额小数位
                   _validateAmountDecimals();
                 });
-                Navigator.pop(context);
+                Navigator.pop(ctx);
               },
             )),
             const SizedBox(height: 16),
