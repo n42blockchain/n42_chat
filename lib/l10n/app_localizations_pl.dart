@@ -317,6 +317,9 @@ class SPl extends S {
   String get selectEmoji => 'Wybierz emotikon';
 
   @override
+  String get selectRedPacketCover => 'Wybierz okładkę';
+
+  @override
   String get frequentlyUsed => 'Czesto uzywane';
 
   @override
@@ -1896,6 +1899,9 @@ class SPl extends S {
 
   @override
   String get reactionAdded => 'Reakcja dodana';
+
+  @override
+  String get reactionRemoved => 'Reakcja usunieta';
 
   @override
   String get failedMessageDeleted => 'Nieudana wiadomosc usunieta';

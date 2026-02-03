@@ -190,10 +190,15 @@ class ChatInputBarState extends State<ChatInputBar> {
       } else {
         // 显示权限提示
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          final messenger = ScaffoldMessenger.of(context);
+          messenger.clearSnackBars();
+          messenger.showSnackBar(
             SnackBar(
               content: Text(S.of(context)?.microphonePermissionRequired ?? 'Please allow microphone permission'),
               backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              dismissDirection: DismissDirection.horizontal,
             ),
           );
         }
@@ -202,10 +207,15 @@ class ChatInputBarState extends State<ChatInputBar> {
       debugPrint('Start recording error: $e');
       _forceResetRecordingState();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+        messenger.showSnackBar(
           SnackBar(
             content: Text('${S.of(context)?.startRecordingFailed ?? 'Start recording failed'}: $e'),
             backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            dismissDirection: DismissDirection.horizontal,
           ),
         );
       }
@@ -238,10 +248,14 @@ class ChatInputBarState extends State<ChatInputBar> {
       } else if (result != null) {
         // 录音时间太短
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          final messenger = ScaffoldMessenger.of(context);
+          messenger.clearSnackBars();
+          messenger.showSnackBar(
             SnackBar(
               content: Text(S.of(context)?.recordingTooShort ?? 'Recording too short'),
               duration: const Duration(seconds: 1),
+              behavior: SnackBarBehavior.floating,
+              dismissDirection: DismissDirection.horizontal,
             ),
           );
         }
@@ -250,10 +264,15 @@ class ChatInputBarState extends State<ChatInputBar> {
       debugPrint('Stop recording error: $e');
       _forceResetRecordingState();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+        messenger.showSnackBar(
           SnackBar(
             content: Text('${S.of(context)?.stopRecordingFailed ?? 'Stop recording failed'}: $e'),
             backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            dismissDirection: DismissDirection.horizontal,
           ),
         );
       }

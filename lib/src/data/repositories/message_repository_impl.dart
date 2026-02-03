@@ -654,6 +654,16 @@ class MessageRepositoryImpl implements IMessageRepository {
   }
 
   @override
+  Future<bool> endPoll(String roomId, String pollEventId) async {
+    try {
+      return await _messageDataSource.endPoll(roomId, pollEventId);
+    } catch (e) {
+      debugPrint('MessageRepositoryImpl: Failed to end poll: $e');
+      return false;
+    }
+  }
+
+  @override
   Future<Map<String, dynamic>?> getReactionAggregations(
     String roomId,
     String eventId,

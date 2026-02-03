@@ -317,6 +317,9 @@ class SFr extends S {
   String get selectEmoji => 'Choisir un emoji';
 
   @override
+  String get selectRedPacketCover => 'Sélectionner la couverture';
+
+  @override
   String get frequentlyUsed => 'Frequemment utilises';
 
   @override
@@ -1908,6 +1911,9 @@ class SFr extends S {
 
   @override
   String get reactionAdded => 'Reaction ajoutee';
+
+  @override
+  String get reactionRemoved => 'Reaction supprimee';
 
   @override
   String get failedMessageDeleted => 'Message echoue supprime';

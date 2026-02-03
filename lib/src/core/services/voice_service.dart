@@ -87,16 +87,17 @@ class VoiceService {
   Future<bool> startRecording() async {
     if (_isRecording) return false;
 
-    // 检查权限
+    // 检查权限 - 使用 permission_handler
     if (!await hasPermission()) {
       final granted = await requestPermission();
-      if (!granted) return false;
+      if (!granted) {
+        debugPrint('VoiceService: Microphone permission not granted');
+        return false;
+      }
     }
 
-    // 检查是否可以录音
-    if (!await _recorder.hasPermission()) {
-      return false;
-    }
+    // 注意：不再使用 _recorder.hasPermission()，因为它与 permission_handler 可能不一致
+    // permission_handler 已经确认权限已授予
 
     try {
       // 生成录音文件路径

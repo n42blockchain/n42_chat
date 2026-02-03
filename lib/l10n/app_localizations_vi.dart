@@ -309,6 +309,9 @@ class SVi extends S {
   String get selectEmoji => 'Chon bieu tuong cam xuc';
 
   @override
+  String get selectRedPacketCover => 'Chon bia';
+
+  @override
   String get frequentlyUsed => 'Thuong dung';
 
   @override
@@ -1876,6 +1879,9 @@ class SVi extends S {
 
   @override
   String get reactionAdded => 'Da them phan ung';
+
+  @override
+  String get reactionRemoved => 'Da xoa phan ung';
 
   @override
   String get failedMessageDeleted => 'Da xoa tin nhan that bai';

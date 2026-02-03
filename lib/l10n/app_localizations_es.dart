@@ -318,6 +318,9 @@ class SEs extends S {
   String get selectEmoji => 'Seleccionar emoji';
 
   @override
+  String get selectRedPacketCover => 'Seleccionar portada';
+
+  @override
   String get frequentlyUsed => 'Usados frecuentemente';
 
   @override
@@ -1899,6 +1902,9 @@ class SEs extends S {
 
   @override
   String get reactionAdded => 'Reaccion agregada';
+
+  @override
+  String get reactionRemoved => 'Reaccion eliminada';
 
   @override
   String get failedMessageDeleted => 'Mensaje fallido eliminado';

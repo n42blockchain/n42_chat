@@ -309,6 +309,9 @@ class STr extends S {
   String get selectEmoji => 'Emoji seç';
 
   @override
+  String get selectRedPacketCover => 'Kapak seç';
+
+  @override
   String get frequentlyUsed => 'Sık kullanılan';
 
   @override
@@ -1880,6 +1883,9 @@ class STr extends S {
 
   @override
   String get reactionAdded => 'Tepki eklendi';
+
+  @override
+  String get reactionRemoved => 'Tepki kaldırıldı';
 
   @override
   String get failedMessageDeleted => 'Başarısız mesaj silindi';

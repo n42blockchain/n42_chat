@@ -313,6 +313,9 @@ class SRu extends S {
   String get selectEmoji => 'Выбрать эмодзи';
 
   @override
+  String get selectRedPacketCover => 'Выбрать обложку';
+
+  @override
   String get frequentlyUsed => 'Часто используемые';
 
   @override
@@ -1892,6 +1895,9 @@ class SRu extends S {
 
   @override
   String get reactionAdded => 'Реакция добавлена';
+
+  @override
+  String get reactionRemoved => 'Реакция удалена';
 
   @override
   String get failedMessageDeleted => 'Неотправленное сообщение удалено';

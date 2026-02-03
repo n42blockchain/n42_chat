@@ -312,6 +312,9 @@ class SIt extends S {
   String get selectEmoji => 'Seleziona emoji';
 
   @override
+  String get selectRedPacketCover => 'Seleziona copertina';
+
+  @override
   String get frequentlyUsed => 'Usati di frequente';
 
   @override
@@ -1884,6 +1887,9 @@ class SIt extends S {
 
   @override
   String get reactionAdded => 'Reazione aggiunta';
+
+  @override
+  String get reactionRemoved => 'Reazione rimossa';
 
   @override
   String get failedMessageDeleted => 'Messaggio fallito eliminato';

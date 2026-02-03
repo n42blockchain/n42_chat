@@ -315,6 +315,9 @@ class SPt extends S {
   String get selectEmoji => 'Selecionar emoji';
 
   @override
+  String get selectRedPacketCover => 'Selecionar capa';
+
+  @override
   String get frequentlyUsed => 'Usados frequentemente';
 
   @override
@@ -1899,6 +1902,9 @@ class SPt extends S {
 
   @override
   String get reactionAdded => 'Reação adicionada';
+
+  @override
+  String get reactionRemoved => 'Reação removida';
 
   @override
   String get failedMessageDeleted => 'Mensagem com falha excluída';

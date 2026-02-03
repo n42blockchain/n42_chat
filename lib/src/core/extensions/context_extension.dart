@@ -91,41 +91,66 @@ extension ContextExtension on BuildContext {
   // ============================================
 
   /// 显示SnackBar
+  ///
+  /// Features:
+  /// - Auto-dismiss after duration (no manual swipe needed)
+  /// - Clears previous SnackBar to prevent queue buildup
+  /// - Floating behavior to avoid iPhone home indicator gesture conflicts
+  /// - Horizontal swipe to dismiss (easier than vertical)
   void showSnackBar(
     String message, {
     Duration duration = const Duration(seconds: 2),
     SnackBarAction? action,
+    Color? backgroundColor,
   }) {
-    ScaffoldMessenger.of(this).showSnackBar(
+    final messenger = ScaffoldMessenger.of(this);
+    // Clear any existing SnackBar to prevent queue buildup
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
       SnackBar(
         content: Text(message),
         duration: duration,
         action: action,
+        backgroundColor: backgroundColor,
         behavior: SnackBarBehavior.floating,
+        dismissDirection: DismissDirection.horizontal,
       ),
     );
   }
 
   /// 显示错误SnackBar
-  void showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(this).showSnackBar(
+  void showErrorSnackBar(String message, {Duration duration = const Duration(seconds: 3)}) {
+    final messenger = ScaffoldMessenger.of(this);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
       SnackBar(
         content: Text(message),
+        duration: duration,
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
+        dismissDirection: DismissDirection.horizontal,
       ),
     );
   }
 
   /// 显示成功SnackBar
-  void showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(this).showSnackBar(
+  void showSuccessSnackBar(String message, {Duration duration = const Duration(seconds: 2)}) {
+    final messenger = ScaffoldMessenger.of(this);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
       SnackBar(
         content: Text(message),
+        duration: duration,
         backgroundColor: const Color(0xFF07C160),
         behavior: SnackBarBehavior.floating,
+        dismissDirection: DismissDirection.horizontal,
       ),
     );
+  }
+
+  /// 清除所有 SnackBar
+  void clearSnackBars() {
+    ScaffoldMessenger.of(this).clearSnackBars();
   }
 
   /// 显示确认对话框

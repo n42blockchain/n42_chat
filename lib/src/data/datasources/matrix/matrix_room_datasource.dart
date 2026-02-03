@@ -298,20 +298,24 @@ class MatrixRoomDataSource {
       case matrix.EventTypes.Message:
         return _getMessagePreview(event);
       case matrix.EventTypes.Encrypted:
-        return '[加密消息]';
+        return '[Encrypted]';
       case matrix.EventTypes.Sticker:
-        return '[表情]';
+        return '[Sticker]';
       case matrix.EventTypes.RoomMember:
         return _getMemberEventPreview(event, room);
       case matrix.EventTypes.RoomCreate:
-        return '创建了群聊';
+        return 'Created group';
       case matrix.EventTypes.RoomName:
-        return '修改了群名称';
+        return 'Changed group name';
       case matrix.EventTypes.RoomAvatar:
-        return '修改了群头像';
+        return 'Changed group avatar';
       case matrix.EventTypes.RoomTopic:
-        return '修改了群公告';
+        return 'Changed group topic';
       default:
+        // 检查是否是投票消息
+        if (event.type == 'org.matrix.msc3381.poll.start') {
+          return '[Poll]';
+        }
         return '';
     }
   }
@@ -351,13 +355,13 @@ class MatrixRoomDataSource {
 
     switch (membership) {
       case 'join':
-        return '$senderName 加入了群聊';
+        return '$senderName joined';
       case 'leave':
-        return '$senderName 离开了群聊';
+        return '$senderName left';
       case 'invite':
-        return '$senderName 被邀请加入';
+        return '$senderName was invited';
       case 'ban':
-        return '$senderName 被移出群聊';
+        return '$senderName was banned';
       default:
         return '';
     }

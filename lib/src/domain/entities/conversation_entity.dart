@@ -142,13 +142,13 @@ class ConversationEntity extends Equatable {
   String get lastMessagePreview {
     if (hasTypingUsers) {
       if (typingUsers.length == 1) {
-        return '${typingUsers.first}正在输入...';
+        return '${typingUsers.first} is typing...';
       }
-      return '${typingUsers.length}人正在输入...';
+      return '${typingUsers.length} people are typing...';
     }
 
     if (draft != null && draft!.isNotEmpty) {
-      return '[草稿] $draft';
+      return '[Draft] $draft';
     }
 
     if (lastMessage == null || lastMessage!.isEmpty) {

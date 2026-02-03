@@ -307,6 +307,9 @@ class SZh extends S {
   String get selectEmoji => '选择表情';
 
   @override
+  String get selectRedPacketCover => '选择封面';
+
+  @override
   String get frequentlyUsed => '常用';
 
   @override
@@ -1862,6 +1865,9 @@ class SZh extends S {
 
   @override
   String get reactionAdded => '已添加表情回应';
+
+  @override
+  String get reactionRemoved => '已移除表情回应';
 
   @override
   String get failedMessageDeleted => '已删除失败消息';

@@ -717,12 +717,12 @@ class MatrixMessageDataSource {
       // 注意：不在 info 中包含浮点数，某些服务器不支持
       final content = {
         'msgtype': matrix.MessageTypes.Location,
-        'body': description ?? '位置: $latStr, $lonStr',
+        'body': description ?? 'Location: $latStr, $lonStr',
         'geo_uri': geoUri,
         // Matrix 规范的 m.location 扩展 (可选)
         'org.matrix.msc3488.location': {
           'uri': geoUri,
-          'description': description ?? '我的位置',
+          'description': description ?? 'My location',
         },
         // 资产类型
         'org.matrix.msc3488.asset': {
@@ -1152,11 +1152,11 @@ class MatrixMessageDataSource {
         final optionId = i < optionIds.length ? optionIds[i] : '';
         final count = voteCounts[optionId] ?? 0;
         final percentage = totalVoters > 0 ? (count * 100 / totalVoters).round() : 0;
-        resultLines.add('${options[i]}: $count票 ($percentage%)');
+        resultLines.add('${options[i]}: $count votes ($percentage%)');
       }
       resultLines.add('');
-      resultLines.add('共 $totalVoters 人参与投票');
-      resultLines.add('(转发的投票快照)');
+      resultLines.add('$totalVoters participants');
+      resultLines.add('(Forwarded poll snapshot)');
 
       // 使用自定义的转发投票格式
       // 包含 n42.forwarded_poll 标记，表示这是转发的投票快照
@@ -1242,7 +1242,7 @@ class MatrixMessageDataSource {
           'event_id': pollEventId,
         },
         'org.matrix.msc3381.poll.end': {},
-        'org.matrix.msc1767.text': '投票已结束',
+        'org.matrix.msc1767.text': 'Poll ended',
       };
 
       await room.sendEvent(

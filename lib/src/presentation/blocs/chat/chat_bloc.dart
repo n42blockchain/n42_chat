@@ -50,6 +50,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendPollMessage>(_onSendPollMessage);
     on<VoteOnPoll>(_onVoteOnPoll);
     on<PollResponseReceived>(_onPollResponseReceived);
+    on<EndPoll>(_onEndPoll);
     on<PollEnded>(_onPollEnded);
     on<SendCustomMessage>(_onSendCustomMessage);
     on<ClearChatHistory>(_onClearChatHistory);
@@ -242,8 +243,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final updatedMessages = List<MessageEntity>.from(messages);
 
     for (final msg in messagesToCheck) {
-      // 跳过已经有反应的消息
-      if (msg.reactions.isNotEmpty) continue;
+      // 不再跳过有反应的消息，因为本地提取的反应可能有占位符 userIds
+      // 始终从服务器获取真实的聚合数据以确保 userIds 准确
 
       try {
         final aggregations = await _messageRepository.getReactionAggregations(
@@ -1075,7 +1076,46 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     emit(state.copyWith(messages: updatedMessages));
   }
 
-  /// 处理投票结束事件
+  /// 主动结束投票
+  Future<void> _onEndPoll(
+    EndPoll event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+
+    try {
+      debugPrint('ChatBloc: Ending poll - poll: ${event.pollEventId}');
+
+      // 调用 API 结束投票
+      final success = await _messageRepository.endPoll(
+        _currentRoomId!,
+        event.pollEventId,
+      );
+
+      if (success) {
+        // 立即更新本地状态
+        final updatedMessages = state.messages.map((msg) {
+          if (msg.id == event.pollEventId && msg.metadata != null) {
+            return msg.copyWith(
+              metadata: msg.metadata!.copyWithPoll(pollEnded: true),
+            );
+          }
+          return msg;
+        }).toList();
+
+        emit(state.copyWith(messages: updatedMessages));
+        debugPrint('ChatBloc: Poll ended successfully');
+      } else {
+        debugPrint('ChatBloc: Failed to end poll');
+        emit(state.copyWith(error: 'Failed to end poll'));
+      }
+    } catch (e) {
+      debugPrint('ChatBloc: Error ending poll: $e');
+      emit(state.copyWith(error: 'Error ending poll: $e'));
+    }
+  }
+
+  /// 处理投票已结束事件（从服务器接收）
   Future<void> _onPollEnded(
     PollEnded event,
     Emitter<ChatState> emit,

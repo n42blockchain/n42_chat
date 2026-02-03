@@ -312,6 +312,18 @@ class N42ChatTheme {
         thickness: 0.5,
         space: 0,
       ),
+      // SnackBar theme - floating behavior to avoid iPhone home indicator conflicts
+      // Auto-dismiss with short duration, no manual swipe needed
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        // Keep it away from edges to avoid gesture conflicts
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        // Allow horizontal swipe to dismiss (easier than vertical)
+        dismissDirection: DismissDirection.horizontal,
+      ),
     );
   }
 
