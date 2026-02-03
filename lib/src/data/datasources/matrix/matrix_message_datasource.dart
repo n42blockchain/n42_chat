@@ -1896,7 +1896,9 @@ class MatrixMessageDataSource {
     try {
       final uri = Uri.parse(mxcUrl);
       if (width != null && height != null) {
-        return uri.getThumbnailUri(
+        // ignore: deprecated_member_use
+        // Using synchronous getThumbnail for Uri? return type compatibility
+        return uri.getThumbnail(
           _client!,
           width: width,
           height: height,
