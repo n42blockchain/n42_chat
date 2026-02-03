@@ -318,6 +318,9 @@ class SDe extends S {
   String get selectEmoji => 'Emoji auswählen';
 
   @override
+  String get selectRedPacketCover => 'Cover auswählen';
+
+  @override
   String get frequentlyUsed => 'Häufig verwendet';
 
   @override
@@ -1895,6 +1898,9 @@ class SDe extends S {
 
   @override
   String get reactionAdded => 'Reaktion hinzugefügt';
+
+  @override
+  String get reactionRemoved => 'Reaktion entfernt';
 
   @override
   String get failedMessageDeleted => 'Fehlgeschlagene Nachricht gelöscht';

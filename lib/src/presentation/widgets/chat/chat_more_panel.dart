@@ -10,7 +10,7 @@ import '../../../core/theme/app_colors.dart';
 /// - 照片、拍摄、视频通话、位置
 /// - 红包、转账、文件、名片
 /// - 收藏、音乐、卡券等（可滑动）
-class ChatMorePanel extends StatelessWidget {
+class ChatMorePanel extends StatefulWidget {
   /// 选择照片回调
   final VoidCallback? onPhotoPressed;
 
@@ -68,6 +68,36 @@ class ChatMorePanel extends StatelessWidget {
   });
 
   @override
+  State<ChatMorePanel> createState() => _ChatMorePanelState();
+}
+
+class _ChatMorePanelState extends State<ChatMorePanel> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController.addListener(_onPageChanged);
+  }
+
+  @override
+  void dispose() {
+    _pageController.removeListener(_onPageChanged);
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onPageChanged() {
+    final page = _pageController.page?.round() ?? 0;
+    if (page != _currentPage) {
+      setState(() {
+        _currentPage = page;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     // 获取底部安全区域高度
@@ -93,6 +123,7 @@ class ChatMorePanel extends StatelessWidget {
           children: [
             Expanded(
               child: PageView(
+                controller: _pageController,
                 children: [
                   // 第一页
                   _buildPage(
@@ -102,43 +133,43 @@ class ChatMorePanel extends StatelessWidget {
                       _MoreItem(
                         icon: Icons.photo_library_outlined,
                         label: S.of(context)?.photos ?? 'Photos',
-                        onTap: onPhotoPressed,
+                        onTap: widget.onPhotoPressed,
                       ),
                       _MoreItem(
                         icon: Icons.camera_alt_outlined,
                         label: S.of(context)?.takePhoto ?? 'Camera',
-                        onTap: onCameraPressed,
+                        onTap: widget.onCameraPressed,
                       ),
                       _MoreItem(
                         icon: Icons.videocam_outlined,
                         label: S.of(context)?.videoCall ?? 'Video Call',
-                        onTap: onVideoCallPressed,
+                        onTap: widget.onVideoCallPressed,
                       ),
                       _MoreItem(
                         icon: Icons.location_on_outlined,
                         label: S.of(context)?.locationLabel ?? 'Location',
-                        onTap: onLocationPressed,
+                        onTap: widget.onLocationPressed,
                       ),
                       _MoreItem(
                         icon: Icons.card_giftcard,
                         label: S.of(context)?.redPacket ?? 'Red Packet',
-                        onTap: onRedPacketPressed,
+                        onTap: widget.onRedPacketPressed,
                         iconColor: AppColors.redPacket,
                       ),
                       _MoreItem(
                         icon: Icons.swap_horiz,
                         label: S.of(context)?.transfer ?? 'Transfer',
-                        onTap: onTransferPressed,
+                        onTap: widget.onTransferPressed,
                       ),
                       _MoreItem(
                         icon: Icons.folder_outlined,
                         label: S.of(context)?.fileLabel ?? 'File',
-                        onTap: onFilePressed,
+                        onTap: widget.onFilePressed,
                       ),
                       _MoreItem(
                         icon: Icons.person_outline,
-                        label: S.of(context)?.personalCard ?? 'Contact',
-                        onTap: onContactCardPressed,
+                        label: 'Contact',
+                        onTap: widget.onContactCardPressed,
                       ),
                     ],
                   ),
@@ -150,31 +181,61 @@ class ChatMorePanel extends StatelessWidget {
                       _MoreItem(
                         icon: Icons.star_outline,
                         label: S.of(context)?.favorites ?? 'Favorites',
-                        onTap: onFavoritePressed,
+                        onTap: widget.onFavoritePressed,
                       ),
                       _MoreItem(
                         icon: Icons.music_note_outlined,
                         label: S.of(context)?.music ?? 'Music',
-                        onTap: onMusicPressed,
+                        onTap: widget.onMusicPressed,
                       ),
                       _MoreItem(
                         icon: Icons.confirmation_num_outlined,
                         label: S.of(context)?.coupon ?? 'Coupon',
-                        onTap: onCouponPressed,
+                        onTap: widget.onCouponPressed,
                       ),
                       _MoreItem(
                         icon: Icons.redeem,
                         label: S.of(context)?.gift ?? 'Gift',
-                        onTap: onGiftPressed,
+                        onTap: widget.onGiftPressed,
                         iconColor: AppColors.error,
                       ),
                       _MoreItem(
                         icon: Icons.poll_outlined,
                         label: S.of(context)?.poll ?? 'Poll',
-                        onTap: onPollPressed,
+                        onTap: widget.onPollPressed,
                         iconColor: AppColors.primary,
                       ),
                     ],
+                  ),
+                ],
+              ),
+            ),
+            // 页面指示器（移到 PageView 外部）
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: _currentPage == 0
+                          ? AppColors.textSecondary
+                          : AppColors.textTertiary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: _currentPage == 1
+                          ? AppColors.textSecondary
+                          : AppColors.textTertiary,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ],
               ),
@@ -221,32 +282,6 @@ class ChatMorePanel extends StatelessWidget {
                       const SizedBox(width: 70),
                 ],
               ),
-            ),
-          ),
-          // 页面指示器
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 5,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: AppColors.textSecondary,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 5),
-                Container(
-                  width: 5,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: AppColors.textTertiary,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ],
             ),
           ),
         ],

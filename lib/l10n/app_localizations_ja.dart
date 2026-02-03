@@ -307,6 +307,9 @@ class SJa extends S {
   String get selectEmoji => '絵文字を選択';
 
   @override
+  String get selectRedPacketCover => 'カバーを選択';
+
+  @override
   String get frequentlyUsed => 'よく使う';
 
   @override
@@ -1863,6 +1866,9 @@ class SJa extends S {
 
   @override
   String get reactionAdded => 'リアクションを追加しました';
+
+  @override
+  String get reactionRemoved => 'リアクションを削除しました';
 
   @override
   String get failedMessageDeleted => '失敗したメッセージを削除しました';

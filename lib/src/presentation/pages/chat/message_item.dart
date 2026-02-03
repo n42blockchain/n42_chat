@@ -344,7 +344,16 @@ class MessageItem extends StatelessWidget {
 
   /// 检测是否是名片消息
   bool _isContactCardMessage(String content) {
-    return content.startsWith('[名片]') || content.startsWith('[Contact Card]');
+    // 检查多种可能的名片消息格式
+    // 支持不同语言的本地化标题
+    if (content.startsWith('[')) {
+      final firstLine = content.split('\n').first.toLowerCase();
+      return firstLine.contains('名片') ||
+             firstLine.contains('contact') ||
+             firstLine.contains('card') ||
+             firstLine.contains('personal');
+    }
+    return false;
   }
 
   /// 解析名片消息内容
@@ -358,12 +367,18 @@ class MessageItem extends StatelessWidget {
       String? contactAvatar;
 
       for (final line in lines) {
-        if (line.startsWith('联系人：') || line.startsWith('Contact：')) {
-          contactName = line.replaceFirst(RegExp(r'^(联系人：|Contact：)'), '').trim();
-        } else if (line.startsWith('ID：')) {
-          contactId = line.replaceFirst('ID：', '').trim();
-        } else if (line.startsWith('头像：') || line.startsWith('Avatar：')) {
-          contactAvatar = line.replaceFirst(RegExp(r'^(头像：|Avatar：)'), '').trim();
+        // 支持普通冒号 : 和全角冒号 ：
+        // 新格式使用 "Name:" 前缀
+        // 同时支持旧格式的 "联系人" 和 "Contact"
+        if (line.startsWith('Name:') || line.startsWith('Name：') ||
+            line.startsWith('联系人：') || line.startsWith('联系人:') ||
+            line.startsWith('Contact：') || line.startsWith('Contact:')) {
+          contactName = line.replaceFirst(RegExp(r'^(Name[：:]|联系人[：:]|Contact[：:])'), '').trim();
+        } else if (line.startsWith('ID：') || line.startsWith('ID:')) {
+          contactId = line.replaceFirst(RegExp(r'^ID[：:]'), '').trim();
+        } else if (line.startsWith('头像：') || line.startsWith('头像:') ||
+                   line.startsWith('Avatar：') || line.startsWith('Avatar:')) {
+          contactAvatar = line.replaceFirst(RegExp(r'^(头像[：:]|Avatar[：:])'), '').trim();
         }
       }
 
@@ -768,48 +783,134 @@ class MessageItem extends StatelessWidget {
     final latitude = metadata?.latitude;
     final longitude = metadata?.longitude;
 
+    // 解析位置名称
+    String locationName = message.content;
+    if (locationName.isEmpty ||
+        locationName.startsWith('geo:') ||
+        locationName.contains('Location was shared')) {
+      locationName = S.of(context)?.myLocation ?? 'My Location';
+    }
+
     return SizedBox(
-      width: 200,
+      width: 220,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 地图预览占位
+          // 地图预览区域 - 微信/WhatsApp风格
           Container(
-            height: 120,
+            height: 100,
             decoration: BoxDecoration(
-              color: AppColors.placeholder,
-              borderRadius: BorderRadius.circular(4),
+              color: const Color(0xFFE8EEF0),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
             ),
-            child: const Center(
-              child: Icon(
-                Icons.location_on,
-                size: 40,
-                color: AppColors.primary,
-              ),
+            child: Stack(
+              children: [
+                // 地图网格背景
+                CustomPaint(
+                  size: const Size(220, 100),
+                  painter: _MapGridPainter(),
+                ),
+                // 中心位置标记
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.location_on,
+                          color: AppColors.primary,
+                          size: 24,
+                        ),
+                      ),
+                      // 位置标记阴影
+                      Container(
+                        width: 8,
+                        height: 4,
+                        margin: const EdgeInsets.only(top: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            message.content.isNotEmpty ? message.content : (S.of(context)?.locationTitle ?? 'Location'),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 14,
+          // 位置信息区域
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
               color: message.isFromMe
-                  ? AppColors.messageTextSent
-                  : (isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.messageTextReceived),
+                  ? AppColors.messageSent
+                  : (isDark ? AppColors.messageReceivedDark : AppColors.messageReceived),
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+            ),
+            child: Row(
+              children: [
+                // 位置图标
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.location_on,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                // 位置文字
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        locationName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: message.isFromMe
+                              ? AppColors.messageTextSent
+                              : (isDark
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.messageTextReceived),
+                        ),
+                      ),
+                      if (latitude != null && longitude != null)
+                        Text(
+                          '${latitude.toStringAsFixed(4)}, ${longitude.toStringAsFixed(4)}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: message.isFromMe
+                                ? AppColors.messageTextSent.withValues(alpha: 0.7)
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          if (latitude != null && longitude != null)
-            Text(
-              '${latitude.toStringAsFixed(6)}, ${longitude.toStringAsFixed(6)}',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
-              ),
-            ),
         ],
       ),
     );
@@ -1213,5 +1314,58 @@ class MessageItem extends StatelessWidget {
     final secs = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
+}
+
+/// 地图网格背景绘制器 - 模拟地图预览效果
+class _MapGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFD4DDE0)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    // 绘制水平线（模拟道路）
+    const spacing = 20.0;
+    for (double y = spacing; y < size.height; y += spacing) {
+      canvas.drawLine(
+        Offset(0, y),
+        Offset(size.width, y),
+        paint,
+      );
+    }
+
+    // 绘制垂直线
+    for (double x = spacing; x < size.width; x += spacing) {
+      canvas.drawLine(
+        Offset(x, 0),
+        Offset(x, size.height),
+        paint,
+      );
+    }
+
+    // 绘制一些"主干道"（较粗的线）
+    final mainRoadPaint = Paint()
+      ..color = const Color(0xFFC0CDD2)
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke;
+
+    // 水平主干道
+    canvas.drawLine(
+      Offset(0, size.height * 0.5),
+      Offset(size.width, size.height * 0.5),
+      mainRoadPaint,
+    );
+
+    // 垂直主干道
+    canvas.drawLine(
+      Offset(size.width * 0.5, 0),
+      Offset(size.width * 0.5, size.height),
+      mainRoadPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 

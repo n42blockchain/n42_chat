@@ -637,7 +637,7 @@ class _ChatPageState extends State<ChatPage> {
     final metadata = message.metadata;
     final lat = metadata?.latitude;
     final lng = metadata?.longitude;
-    
+
     if (lat == null || lng == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -647,28 +647,24 @@ class _ChatPageState extends State<ChatPage> {
       );
       return;
     }
-    
-    // 显示位置信息
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.location ?? 'Location'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${S.of(context)?.address ?? 'Address'}: ${message.content}'),
-            const SizedBox(height: 8),
-            Text('${S.of(context)?.latitude ?? 'Latitude'}: $lat'),
-            Text('${S.of(context)?.longitude ?? 'Longitude'}: $lng'),
-          ],
+
+    // 解析位置名称
+    String locationName = message.content;
+    if (locationName.isEmpty ||
+        locationName.startsWith('geo:') ||
+        locationName.contains('Location was shared')) {
+      locationName = S.of(context)?.myLocation ?? 'My Location';
+    }
+
+    // 打开微信风格的位置详情页面
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (ctx) => _LocationDetailPage(
+          latitude: lat,
+          longitude: lng,
+          locationName: locationName,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(S.of(context)?.close ?? 'Close'),
-          ),
-        ],
       ),
     );
   }
@@ -1659,13 +1655,14 @@ class _ChatPageState extends State<ChatPage> {
 
   /// 显示位置选项菜单（微信风格）
   Future<void> _sendLocation() async {
+    final isDark = context.isDarkMode;
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
         ),
         child: SafeArea(
           child: Column(
@@ -1688,18 +1685,24 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 title: Text(
                   S.of(context)?.sendLocation ?? 'Send Location',
-                  style: const TextStyle(fontSize: 16),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  ),
                 ),
                 subtitle: Text(
                   S.of(context)?.selectLocationAndSend ?? 'Select location and send',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  ),
                 ),
                 onTap: () {
                   Navigator.pop(context);
                   _openLocationPicker();
                 },
               ),
-              const Divider(height: 1),
+              Divider(height: 1, color: isDark ? AppColors.dividerDark : AppColors.divider),
               // 共享实时位置
               ListTile(
                 leading: Container(
@@ -1717,11 +1720,17 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 title: Text(
                   S.of(context)?.shareRealTimeLocation ?? 'Share Real-time Location',
-                  style: const TextStyle(fontSize: 16),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  ),
                 ),
                 subtitle: Text(
                   S.of(context)?.shareLocationForOneHour ?? 'Share real-time location with friend for 1 hour',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  ),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -1736,7 +1745,7 @@ class _ChatPageState extends State<ChatPage> {
                 child: TextButton(
                   onPressed: () => Navigator.pop(context),
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.grey[100],
+                    backgroundColor: isDark ? AppColors.backgroundDark : Colors.grey[100],
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -1744,8 +1753,8 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   child: Text(
                     S.of(context)?.cancel ?? 'Cancel',
-                    style: const TextStyle(
-                      color: Colors.black87,
+                    style: TextStyle(
+                      color: isDark ? AppColors.textPrimaryDark : Colors.black87,
                       fontSize: 16,
                     ),
                   ),
@@ -1927,7 +1936,7 @@ class _ChatPageState extends State<ChatPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(S.of(context)?.redPacketSent(amount, token) ?? 'Sent $amount $token red packet'),
-        backgroundColor: const Color(0xFFE64340),
+        backgroundColor: AppColors.success,
       ),
     );
   }
@@ -2058,14 +2067,24 @@ class _ChatPageState extends State<ChatPage> {
   /// 发送名片
   Future<void> _sendContactCard() async {
     debugPrint('Send contact card');
-    
+
+    // 预先获取本地化字符串，确保使用正确的语言
+    final l10n = S.of(context);
+    final selectContactText = l10n?.selectContact ?? 'Select Contact';
+    final searchContactHintText = l10n?.searchContactHint ?? 'Search contacts';
+    final noContactsFoundText = l10n?.noContactsFound ?? 'No contacts found';
+    final isDark = context.isDarkMode;
+
     // 显示联系人选择对话框
     final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _ContactCardSelectSheet(
-        isDark: context.isDarkMode,
+      builder: (_) => _ContactCardSelectSheet(
+        isDark: isDark,
+        selectContactText: selectContactText,
+        searchContactHintText: searchContactHintText,
+        noContactsFoundText: noContactsFoundText,
       ),
     );
     
@@ -2075,9 +2094,10 @@ class _ChatPageState extends State<ChatPage> {
       final contactAvatar = result['avatar'] as String?;
 
       // 发送名片消息（作为自定义消息类型）
-      // 名片消息格式：[Contact] Contact Name (includes avatar URL)
-      final cardContent = '''[${S.of(context)?.personalCard ?? 'Contact Card'}]
-${S.of(context)?.contactLabel ?? 'Contact'}: $contactName
+      // 名片消息格式使用固定英文键名便于解析，显示时再本地化
+      // Format: [Contact Card]\nName: xxx\nID: xxx\nAvatar: xxx
+      final cardContent = '''[Contact Card]
+Name: $contactName
 ID: $contactId
 Avatar: ${contactAvatar ?? ''}''';
 
@@ -2087,6 +2107,7 @@ Avatar: ${contactAvatar ?? ''}''';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.contactCardSent(contactName) ?? 'Sent $contactName\'s contact card'),
+          backgroundColor: AppColors.success,
           duration: const Duration(seconds: 1),
         ),
       );
@@ -2315,12 +2336,14 @@ Avatar: ${contactAvatar ?? ''}''';
     );
 
     if (confirm == true && mounted) {
-      // TODO: 实现结束投票功能
+      // 调用 Bloc 结束投票
+      context.read<ChatBloc>().add(EndPoll(pollEventId: pollEventId));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.pollEndedMessage ?? 'Poll ended'),
           duration: const Duration(seconds: 1),
           behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.success,
         ),
       );
     }
@@ -2738,14 +2761,18 @@ Avatar: ${contactAvatar ?? ''}''';
   }
 
   Widget _buildReplyPreview() {
+    // 预先从父级 context 获取本地化，避免 BlocBuilder 内部 context 语言不正确
+    final l10n = S.of(context);
+    final isDark = context.isDarkMode;
+
     return BlocBuilder<ChatBloc, ChatState>(
       buildWhen: (prev, curr) => prev.replyTarget != curr.replyTarget,
-      builder: (context, state) {
+      builder: (_, state) {
         if (state.replyTarget == null) {
           return const SizedBox.shrink();
         }
 
-        final isDark = context.isDarkMode;
+        final replyToText = l10n?.replyTo(state.replyTarget!.senderName) ?? 'Reply to ${state.replyTarget!.senderName}';
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -2774,7 +2801,7 @@ Avatar: ${contactAvatar ?? ''}''';
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      S.of(context)?.replyTo(state.replyTarget!.senderName) ?? 'Reply to ${state.replyTarget!.senderName}',
+                      replyToText,
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.primary,
@@ -3765,17 +3792,25 @@ Avatar: ${contactAvatar ?? ''}''';
     // TODO: 持久化到本地存储或服务器
   }
   
-  /// 添加表情回应
+  /// 添加或移除表情回应
   void _addReaction(MessageEntity message, String emoji) {
-    debugPrint('Adding reaction $emoji to message ${message.id}');
-    
-    // 通过 ChatBloc 发送表情回应
+    // 检查当前用户是否已经对这个表情做出了回应
+    final existingReaction = message.reactions.where((r) => r.key == emoji).firstOrNull;
+    final isRemoving = existingReaction != null && existingReaction.isMe;
+
+    debugPrint('${isRemoving ? "Removing" : "Adding"} reaction $emoji to message ${message.id}');
+
+    // 通过 ChatBloc 发送表情回应（toggle 逻辑在 bloc 中处理）
     context.read<ChatBloc>().add(AddReaction(
       messageId: message.id,
       emoji: emoji,
     ));
-    
-    // 显示反馈
+
+    // 显示反馈 - 根据是添加还是移除显示不同消息
+    final feedbackText = isRemoving
+        ? (S.of(context)?.reactionRemoved ?? 'Reaction removed')
+        : (S.of(context)?.reactionAdded ?? 'Reaction added');
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -3783,7 +3818,7 @@ Avatar: ${contactAvatar ?? ''}''';
           children: [
             Text(emoji, style: const TextStyle(fontSize: 20)),
             const SizedBox(width: 8),
-            Text(S.of(context)?.reactionAdded ?? 'Reaction added'),
+            Text(feedbackText),
           ],
         ),
         duration: const Duration(seconds: 1),
@@ -5047,17 +5082,17 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
         _isLoading = true;
         _errorMessage = null;
       });
-      
+
       // 检查位置服务
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Location service not enabled';
+          _errorMessage = S.of(context)?.locationServiceNotEnabled ?? 'Location service not enabled';
         });
         return;
       }
-      
+
       // 检查权限
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -5065,16 +5100,16 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
         if (permission == LocationPermission.denied) {
           setState(() {
             _isLoading = false;
-            _errorMessage = 'Location permission denied';
+            _errorMessage = S.of(context)?.locationPermissionDenied ?? 'Location permission denied';
           });
           return;
         }
       }
-      
+
       if (permission == LocationPermission.deniedForever) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Location permission permanently denied';
+          _errorMessage = S.of(context)?.locationPermissionDeniedPermanent ?? 'Location permission permanently denied';
         });
         return;
       }
@@ -5103,11 +5138,11 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Failed to get location: $e';
+        _errorMessage = S.of(context)?.getLocationFailed(e.toString()) ?? 'Failed to get location: $e';
       });
     }
   }
-  
+
   Future<void> _getAddressFromPosition(Position position) async {
     try {
       // 使用简单的坐标显示，因为 geocoding 可能需要 API key
@@ -5133,9 +5168,13 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
   void _generateNearbyPlaces(Position position) {
     // 生成模拟的附近地点
     // 实际应用中应该使用地图 API 获取真实的 POI 数据
+    final l10n = S.of(context);
+    final myLocation = l10n?.myLocation ?? 'My Location';
+    final currentLocation = l10n?.currentLocation ?? 'Current Location';
+
     _nearbyPlaces = [
       _NearbyPlace(
-        name: 'My Location',
+        name: myLocation,
         address: _currentAddress,
         latitude: position.latitude,
         longitude: position.longitude,
@@ -5143,7 +5182,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
         iconColor: AppColors.primary,
       ),
       _NearbyPlace(
-        name: 'Current Location',
+        name: currentLocation,
         address: '${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}',
         latitude: position.latitude,
         longitude: position.longitude,
@@ -5152,24 +5191,24 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
       ),
       // 模拟附近地点（实际应从地图 API 获取）
       _NearbyPlace(
-        name: 'Nearby Place 1',
-        address: 'About 100m',
+        name: l10n?.nearbyPlace(1) ?? 'Nearby Place 1',
+        address: l10n?.approximateDistance('100m') ?? 'About 100m',
         latitude: position.latitude + 0.001,
         longitude: position.longitude + 0.001,
         icon: Icons.place,
         iconColor: Colors.orange,
       ),
       _NearbyPlace(
-        name: 'Nearby Place 2',
-        address: 'About 200m',
+        name: l10n?.nearbyPlace(2) ?? 'Nearby Place 2',
+        address: l10n?.approximateDistance('200m') ?? 'About 200m',
         latitude: position.latitude - 0.001,
         longitude: position.longitude + 0.002,
         icon: Icons.place,
         iconColor: Colors.orange,
       ),
       _NearbyPlace(
-        name: 'Nearby Place 3',
-        address: 'About 500m',
+        name: l10n?.nearbyPlace(3) ?? 'Nearby Place 3',
+        address: l10n?.approximateDistance('500m') ?? 'About 500m',
         latitude: position.latitude + 0.002,
         longitude: position.longitude - 0.002,
         icon: Icons.place,
@@ -5180,16 +5219,16 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
   
   void _confirmLocation() {
     if (_currentPosition == null) return;
-    
-    final selectedPlace = _nearbyPlaces.isNotEmpty 
+
+    final selectedPlace = _nearbyPlaces.isNotEmpty
         ? _nearbyPlaces[_selectedPlaceIndex]
         : null;
-    
+
     Navigator.pop(context, {
       'latitude': selectedPlace?.latitude ?? _currentPosition!.latitude,
       'longitude': selectedPlace?.longitude ?? _currentPosition!.longitude,
       'address': _currentAddress,
-      'name': selectedPlace?.name ?? 'My Location',
+      'name': selectedPlace?.name ?? (S.of(context)?.myLocation ?? 'My Location'),
     });
   }
 
@@ -5422,7 +5461,7 @@ class _NearbyPlace {
   final double longitude;
   final IconData icon;
   final Color iconColor;
-  
+
   _NearbyPlace({
     required this.name,
     required this.address,
@@ -5433,12 +5472,362 @@ class _NearbyPlace {
   });
 }
 
+/// 位置详情页面 - 微信/WhatsApp风格
+class _LocationDetailPage extends StatelessWidget {
+  final double latitude;
+  final double longitude;
+  final String locationName;
+
+  const _LocationDetailPage({
+    required this.latitude,
+    required this.longitude,
+    required this.locationName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
+
+    return Scaffold(
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      body: Stack(
+        children: [
+          // 地图区域（占满屏幕）
+          Positioned.fill(
+            child: Container(
+              color: const Color(0xFFE8EEF0),
+              child: CustomPaint(
+                painter: _LargeMapPainter(),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 位置标记
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.location_on,
+                          color: AppColors.primary,
+                          size: 32,
+                        ),
+                      ),
+                      // 标记阴影
+                      Container(
+                        width: 16,
+                        height: 6,
+                        margin: const EdgeInsets.only(top: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // 顶部导航栏
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.3),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new,
+                        size: 18,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // 底部位置信息卡片
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.surfaceDark : Colors.white,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 拖动指示条
+                      Container(
+                        width: 36,
+                        height: 4,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.white24 : Colors.black12,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      // 位置信息
+                      Row(
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.location_on,
+                              color: AppColors.primary,
+                              size: 28,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  locationName,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${latitude.toStringAsFixed(6)}, ${longitude.toStringAsFixed(6)}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      // 操作按钮
+                      Row(
+                        children: [
+                          // 复制坐标
+                          Expanded(
+                            child: _ActionButton(
+                              icon: Icons.copy_rounded,
+                              label: S.of(context)?.copy ?? 'Copy',
+                              isDark: isDark,
+                              onTap: () {
+                                Clipboard.setData(ClipboardData(text: '$latitude, $longitude'));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(S.of(context)?.addressCopied ?? 'Coordinates copied'),
+                                    duration: const Duration(seconds: 1),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // 在地图中打开
+                          Expanded(
+                            flex: 2,
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                final url = 'https://maps.google.com/?q=$latitude,$longitude';
+                                final uri = Uri.parse(url);
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                }
+                              },
+                              icon: const Icon(Icons.navigation_rounded, size: 20),
+                              label: Text(S.of(context)?.mapPreview ?? 'Open in Maps'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 位置详情页面的操作按钮
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: isDark ? AppColors.backgroundDark : const Color(0xFFF5F5F5),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 22,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 大地图网格绘制器
+class _LargeMapPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFD4DDE0)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    // 绘制网格线
+    const spacing = 40.0;
+    for (double y = 0; y < size.height; y += spacing) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+    for (double x = 0; x < size.width; x += spacing) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+
+    // 绘制主干道
+    final mainPaint = Paint()
+      ..color = const Color(0xFFC0CDD2)
+      ..strokeWidth = 3.0
+      ..style = PaintingStyle.stroke;
+
+    // 水平主干道
+    canvas.drawLine(
+      Offset(0, size.height * 0.4),
+      Offset(size.width, size.height * 0.4),
+      mainPaint,
+    );
+    canvas.drawLine(
+      Offset(0, size.height * 0.7),
+      Offset(size.width, size.height * 0.7),
+      mainPaint,
+    );
+
+    // 垂直主干道
+    canvas.drawLine(
+      Offset(size.width * 0.3, 0),
+      Offset(size.width * 0.3, size.height),
+      mainPaint,
+    );
+    canvas.drawLine(
+      Offset(size.width * 0.6, 0),
+      Offset(size.width * 0.6, size.height),
+      mainPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 /// 联系人名片选择底部弹窗
 class _ContactCardSelectSheet extends StatefulWidget {
   final bool isDark;
-  
-  const _ContactCardSelectSheet({required this.isDark});
-  
+  final String selectContactText;
+  final String searchContactHintText;
+  final String noContactsFoundText;
+
+  const _ContactCardSelectSheet({
+    required this.isDark,
+    required this.selectContactText,
+    required this.searchContactHintText,
+    required this.noContactsFoundText,
+  });
+
   @override
   State<_ContactCardSelectSheet> createState() => _ContactCardSelectSheetState();
 }
@@ -5505,7 +5894,7 @@ class _ContactCardSelectSheetState extends State<_ContactCardSelectSheet> {
             child: Row(
               children: [
                 Text(
-                  S.of(context)?.selectContact ?? 'Select Contact',
+                  widget.selectContactText,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -5528,7 +5917,7 @@ class _ContactCardSelectSheetState extends State<_ContactCardSelectSheet> {
             padding: const EdgeInsets.all(12),
             child: TextField(
               decoration: InputDecoration(
-                hintText: S.of(context)?.searchContactHint ?? 'Search contacts',
+                hintText: widget.searchContactHintText,
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: widget.isDark 
@@ -5553,7 +5942,7 @@ class _ContactCardSelectSheetState extends State<_ContactCardSelectSheet> {
                 : _filteredContacts.isEmpty
                     ? Center(
                         child: Text(
-                          S.of(context)?.noContactsFound ?? 'No contacts found',
+                          widget.noContactsFoundText,
                           style: TextStyle(
                             color: widget.isDark ? Colors.white54 : Colors.black54,
                           ),

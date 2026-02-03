@@ -314,6 +314,9 @@ class SId extends S {
   String get selectEmoji => 'Pilih emoji';
 
   @override
+  String get selectRedPacketCover => 'Pilih sampul';
+
+  @override
   String get frequentlyUsed => 'Sering digunakan';
 
   @override
@@ -1882,6 +1885,9 @@ class SId extends S {
 
   @override
   String get reactionAdded => 'Reaksi ditambahkan';
+
+  @override
+  String get reactionRemoved => 'Reaksi dihapus';
 
   @override
   String get failedMessageDeleted => 'Pesan gagal dihapus';

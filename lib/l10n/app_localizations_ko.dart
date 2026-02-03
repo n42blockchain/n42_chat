@@ -307,6 +307,9 @@ class SKo extends S {
   String get selectEmoji => '이모티콘 선택';
 
   @override
+  String get selectRedPacketCover => '커버 선택';
+
+  @override
   String get frequentlyUsed => '자주 사용';
 
   @override
@@ -1863,6 +1866,9 @@ class SKo extends S {
 
   @override
   String get reactionAdded => '반응 추가됨';
+
+  @override
+  String get reactionRemoved => '반응 제거됨';
 
   @override
   String get failedMessageDeleted => '실패한 메시지 삭제됨';

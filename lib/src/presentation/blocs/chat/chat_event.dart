@@ -332,7 +332,17 @@ class PollResponseReceived extends ChatEvent {
   List<Object?> get props => [pollEventId, selectedOptionIds, senderId, isCurrentUser];
 }
 
-/// 投票结束事件
+/// 结束投票事件（主动结束）
+class EndPoll extends ChatEvent {
+  final String pollEventId;
+
+  const EndPoll({required this.pollEventId});
+
+  @override
+  List<Object?> get props => [pollEventId];
+}
+
+/// 投票已结束事件（从服务器接收）
 class PollEnded extends ChatEvent {
   final String pollEventId;
 

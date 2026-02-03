@@ -661,6 +661,12 @@ abstract class S {
   /// **'选择表情'**
   String get selectEmoji;
 
+  /// No description provided for @selectRedPacketCover.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择封面'**
+  String get selectRedPacketCover;
+
   /// No description provided for @frequentlyUsed.
   ///
   /// In zh, this message translates to:
@@ -3516,6 +3522,12 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'已添加表情回应'**
   String get reactionAdded;
+
+  /// No description provided for @reactionRemoved.
+  ///
+  /// In zh, this message translates to:
+  /// **'已移除表情回应'**
+  String get reactionRemoved;
 
   /// No description provided for @failedMessageDeleted.
   ///

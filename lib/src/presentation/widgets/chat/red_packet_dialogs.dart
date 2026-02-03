@@ -38,8 +38,52 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   
   String _selectedToken = 'CNY';
   bool _isLucky = false;
-  
+  int _selectedCoverIndex = 0;
+
   final List<String> _tokens = ['CNY', 'ETH', 'USDT', 'BTC'];
+
+  /// 可用的红包封面
+  static const List<_RedPacketCover> _covers = [
+    _RedPacketCover(
+      id: 'default',
+      colors: [Color(0xFFE64340), Color(0xFFD63030)],
+      name: 'Classic Red',
+    ),
+    _RedPacketCover(
+      id: 'gold',
+      colors: [Color(0xFFFFB800), Color(0xFFFF8C00)],
+      name: 'Golden',
+    ),
+    _RedPacketCover(
+      id: 'purple',
+      colors: [Color(0xFF9C27B0), Color(0xFF7B1FA2)],
+      name: 'Purple',
+    ),
+    _RedPacketCover(
+      id: 'blue',
+      colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+      name: 'Ocean Blue',
+    ),
+    _RedPacketCover(
+      id: 'green',
+      colors: [Color(0xFF4CAF50), Color(0xFF388E3C)],
+      name: 'Nature Green',
+    ),
+    _RedPacketCover(
+      id: 'pink',
+      colors: [Color(0xFFE91E63), Color(0xFFC2185B)],
+      name: 'Rose Pink',
+    ),
+  ];
+
+  /// 常用表情列表
+  static const List<String> _emojis = [
+    '🎉', '🎊', '💰', '🧧', '💵', '💴', '💶', '💷',
+    '🤑', '💸', '🏆', '🎁', '🎈', '🎀', '✨', '⭐',
+    '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍',
+    '😊', '😄', '🥳', '😎', '🤩', '😍', '🙏', '👍',
+    '🐉', '🐅', '🐇', '🐕', '🐖', '🐂', '🐏', '🐔',
+  ];
   
   double get _amount {
     final text = _amountController.text.trim();
@@ -264,7 +308,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                       isDense: true,
                       suffixIcon: IconButton(
                         icon: Icon(Icons.emoji_emotions_outlined, color: secondaryTextColor),
-                        onPressed: () {},
+                        onPressed: _showEmojiPicker,
                       ),
                     ),
                   ),
@@ -273,7 +317,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 // 红包封面
                 _buildMenuItem(
                   context: context,
-                  onTap: () {},
+                  onTap: _showCoverPicker,
                   child: Row(
                     children: [
                       Expanded(
@@ -286,7 +330,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              S.of(context)?.goodLuck ?? 'Good luck',
+                              _covers[_selectedCoverIndex].name,
                               style: TextStyle(color: secondaryTextColor, fontSize: 13),
                             ),
                           ],
@@ -297,10 +341,10 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         width: 60,
                         height: 80,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
-                            colors: [Color(0xFFE64340), Color(0xFFD63030)],
+                            colors: _covers[_selectedCoverIndex].colors,
                           ),
                           borderRadius: BorderRadius.circular(4),
                         ),
@@ -558,6 +602,225 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
       ),
     );
   }
+
+  /// 显示表情选择器
+  void _showEmojiPicker() {
+    final isDark = context.isDarkMode;
+    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      S.of(ctx)?.selectEmoji ?? 'Select Emoji',
+                      style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w500),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 8,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                ),
+                itemCount: _emojis.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      // 在当前光标位置插入表情
+                      final text = _greetingController.text;
+                      final selection = _greetingController.selection;
+                      final newText = text.replaceRange(
+                        selection.start,
+                        selection.end,
+                        _emojis[index],
+                      );
+                      _greetingController.text = newText;
+                      _greetingController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: selection.start + _emojis[index].length),
+                      );
+                      Navigator.pop(ctx);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text(
+                          _emojis[index],
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 显示红包封面选择器
+  void _showCoverPicker() {
+    final isDark = context.isDarkMode;
+    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: surfaceColor,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Container(
+          height: MediaQuery.of(ctx).size.height * 0.6,
+          padding: const EdgeInsets.only(top: 16),
+          child: Column(
+            children: [
+              // 标题
+              Text(
+                S.of(ctx)?.selectRedPacketCover ?? 'Select Cover',
+                style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 16),
+              // 封面网格
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 0.65,
+                    ),
+                    itemCount: _covers.length,
+                    itemBuilder: (context, index) {
+                      final cover = _covers[index];
+                      final isSelected = _selectedCoverIndex == index;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedCoverIndex = index;
+                          });
+                          Navigator.pop(ctx);
+                        },
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: cover.colors,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: isSelected
+                                      ? Border.all(color: const Color(0xFFE85D04), width: 3)
+                                      : null,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Stack(
+                                  children: [
+                                    // 红包图标
+                                    Center(
+                                      child: _buildRedPacketIcon(36, Colors.white70),
+                                    ),
+                                    // 选中标记
+                                    if (isSelected)
+                                      Positioned(
+                                        top: 8,
+                                        right: 8,
+                                        child: Container(
+                                          width: 24,
+                                          height: 24,
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFFE85D04),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.check,
+                                            color: Colors.white,
+                                            size: 16,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              cover.name,
+                              style: TextStyle(
+                                color: isSelected ? const Color(0xFFE85D04) : secondaryTextColor,
+                                fontSize: 12,
+                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 红包封面数据
+class _RedPacketCover {
+  final String id;
+  final List<Color> colors;
+  final String name;
+
+  const _RedPacketCover({
+    required this.id,
+    required this.colors,
+    required this.name,
+  });
 }
 
 /// 发红包弹窗（保留兼容性）
@@ -959,8 +1222,16 @@ class _SendTransferPageState extends State<SendTransferPage> {
   
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
+    final bgColor = isDark ? AppColors.backgroundDark : const Color(0xFFF5F5F5);
+    final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : Colors.grey;
+    final chipBgColor = isDark ? Colors.white10 : Colors.grey[100];
+    final dividerColor = isDark ? AppColors.dividerDark : AppColors.divider;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: bgColor,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: const Color(0xFFF9A825),
@@ -980,20 +1251,20 @@ class _SendTransferPageState extends State<SendTransferPage> {
           children: [
             // 接收者信息
             Container(
-              color: Colors.white,
+              color: surfaceColor,
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: Colors.grey[200],
+                    backgroundColor: isDark ? Colors.grey[700] : Colors.grey[200],
                     backgroundImage: widget.receiverAvatar != null
                         ? NetworkImage(widget.receiverAvatar!)
                         : null,
                     child: widget.receiverAvatar == null
                         ? Text(
                             widget.receiverName.isNotEmpty ? widget.receiverName[0] : '?',
-                            style: TextStyle(color: Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold),
                           )
                         : null,
                   ),
@@ -1002,26 +1273,26 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(S.of(context)?.transferTo ?? 'Transfer to', style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                        Text(S.of(context)?.transferTo ?? 'Transfer to', style: TextStyle(fontSize: 13, color: secondaryTextColor)),
                         const SizedBox(height: 2),
-                        Text(widget.receiverName, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
+                        Text(widget.receiverName, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: textColor)),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // 金额输入卡片
             Container(
-              color: Colors.white,
+              color: surfaceColor,
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(S.of(context)?.transferAmount ?? 'Transfer Amount', style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                  Text(S.of(context)?.transferAmount ?? 'Transfer Amount', style: TextStyle(fontSize: 14, color: secondaryTextColor)),
                   const SizedBox(height: 16),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -1032,14 +1303,14 @@ class _SendTransferPageState extends State<SendTransferPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.grey[100],
+                            color: chipBgColor,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(_selectedToken, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                              const Icon(Icons.arrow_drop_down, size: 20),
+                              Text(_selectedToken, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: textColor)),
+                              Icon(Icons.arrow_drop_down, size: 20, color: textColor),
                             ],
                           ),
                         ),
@@ -1053,10 +1324,10 @@ class _SendTransferPageState extends State<SendTransferPage> {
                           inputFormatters: [
                             FilteringTextInputFormatter.allow(RegExp(_amountPattern)),
                           ],
-                          style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: textColor),
                           decoration: InputDecoration(
                             hintText: '0.00',
-                            hintStyle: TextStyle(color: Colors.grey),
+                            hintStyle: TextStyle(color: secondaryTextColor),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
                           ),
@@ -1064,18 +1335,19 @@ class _SendTransferPageState extends State<SendTransferPage> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  const Divider(height: 1),
+                  Divider(height: 1, color: dividerColor),
                   const SizedBox(height: 16),
-                  
+
                   // 转账说明
                   TextField(
                     controller: _memoController,
                     maxLength: 50,
+                    style: TextStyle(color: textColor),
                     decoration: InputDecoration(
                       hintText: S.of(context)?.addTransferNote ?? 'Add transfer note',
-                      hintStyle: TextStyle(color: Colors.grey[400]),
+                      hintStyle: TextStyle(color: secondaryTextColor.withAlpha(153)),
                       border: InputBorder.none,
                       counterText: '',
                       contentPadding: EdgeInsets.zero,
@@ -1085,9 +1357,9 @@ class _SendTransferPageState extends State<SendTransferPage> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // 转账按钮
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1111,23 +1383,28 @@ class _SendTransferPageState extends State<SendTransferPage> {
       ),
     );
   }
-  
+
   void _showTokenPicker() {
+    final isDark = context.isDarkMode;
+    final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+
     showModalBottomSheet(
       context: context,
+      backgroundColor: surfaceColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => SafeArea(
+      builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Text(S.of(context)?.selectCurrency ?? 'Select currency', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              child: Text(S.of(ctx)?.selectCurrency ?? 'Select currency', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: textColor)),
             ),
             ..._tokens.map((token) => ListTile(
-              title: Text(token),
+              title: Text(token, style: TextStyle(color: textColor)),
               trailing: _selectedToken == token
                   ? const Icon(Icons.check, color: Color(0xFFF9A825))
                   : null,
@@ -1137,7 +1414,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                   // 切换币种时验证金额小数位
                   _validateAmountDecimals();
                 });
-                Navigator.pop(context);
+                Navigator.pop(ctx);
               },
             )),
             const SizedBox(height: 16),

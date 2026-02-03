@@ -175,6 +175,9 @@ abstract class IMessageRepository {
   /// 监听投票响应事件
   Stream<Map<String, dynamic>>? watchPollResponses(String roomId);
 
+  /// 结束投票
+  Future<bool> endPoll(String roomId, String pollEventId);
+
   /// 获取消息反应聚合结果
   Future<Map<String, dynamic>?> getReactionAggregations(
     String roomId,
