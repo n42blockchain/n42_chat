@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -35,6 +36,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
   }
 
   Widget _buildTopSection(bool isDark) {
+    final s = S.of(context);
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -53,7 +55,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
           children: [
             // 顶部导航栏
             _buildAppBar(),
-            
+
             // N42豆展示区域
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 60),
@@ -84,21 +86,21 @@ class _N42BeanPageState extends State<N42BeanPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // N42豆文字
-                  const Text(
-                    'N42豆',
-                    style: TextStyle(
+                  Text(
+                    s?.n42BeanTitle ?? 'N42 Bean',
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // 豆数量
                   Text(
-                    _beanCount > 0 ? '$_beanCount' : '暂无N42豆',
+                    _beanCount > 0 ? '$_beanCount' : (s?.noN42Bean ?? 'No N42 Bean'),
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white.withOpacity(0.7),
@@ -114,6 +116,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
   }
 
   Widget _buildAppBar() {
+    final s = S.of(context);
     return Container(
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -126,9 +129,9 @@ class _N42BeanPageState extends State<N42BeanPage> {
           const Spacer(),
           TextButton(
             onPressed: _showBeanDetail,
-            child: const Text(
-              'N42豆明细',
-              style: TextStyle(
+            child: Text(
+              s?.n42BeanDetails ?? 'N42 Bean Details',
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
               ),
@@ -140,6 +143,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
   }
 
   Widget _buildBottomSection(bool isDark) {
+    final s = S.of(context);
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -156,7 +160,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
           children: [
             // 说明标题
             Text(
-              'N42豆是用于兑换N42内虚拟物品和服务的道具，目前可用于兑换：',
+              s?.n42BeanDescription ?? 'N42 Bean is a token used to redeem virtual items and services in N42. Currently available for:',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -165,20 +169,20 @@ class _N42BeanPageState extends State<N42BeanPage> {
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // 功能列表
-            _buildFeatureItem('· 会员专属表情和主题'),
-            _buildFeatureItem('· 聊天气泡个性化'),
-            _buildFeatureItem('· 红包封面定制'),
-            _buildFeatureItem('· 专属昵称标识'),
-            _buildFeatureItem('· 群聊特权功能'),
-            _buildFeatureItem('· 云存储空间扩展'),
-            _buildFeatureItem('· 视频通话美颜滤镜'),
-            _buildFeatureItem('· 朋友圈背景更换'),
-            _buildFeatureItem('· VIP客服优先服务'),
-            
+            _buildFeatureItem('· ${s?.n42BeanFeature1 ?? 'Exclusive member stickers and themes'}'),
+            _buildFeatureItem('· ${s?.n42BeanFeature2 ?? 'Chat bubble customization'}'),
+            _buildFeatureItem('· ${s?.n42BeanFeature3 ?? 'Red packet cover customization'}'),
+            _buildFeatureItem('· ${s?.n42BeanFeature4 ?? 'Exclusive nickname badge'}'),
+            _buildFeatureItem('· ${s?.n42BeanFeature5 ?? 'Group chat privileges'}'),
+            _buildFeatureItem('· ${s?.n42BeanFeature6 ?? 'Cloud storage expansion'}'),
+            _buildFeatureItem('· ${s?.n42BeanFeature7 ?? 'Video call beauty filters'}'),
+            _buildFeatureItem('· ${s?.n42BeanFeature8 ?? 'Moments background customization'}'),
+            _buildFeatureItem('· ${s?.n42BeanFeature9 ?? 'VIP customer service priority'}'),
+
             const SizedBox(height: 40),
-            
+
             // 我知道了按钮
             Center(
               child: SizedBox(
@@ -186,11 +190,11 @@ class _N42BeanPageState extends State<N42BeanPage> {
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark 
+                    backgroundColor: isDark
                         ? AppColors.surfaceDark.withOpacity(0.5)
                         : const Color(0xFFF5F5F5),
-                    foregroundColor: isDark 
-                        ? AppColors.textPrimaryDark 
+                    foregroundColor: isDark
+                        ? AppColors.textPrimaryDark
                         : AppColors.textPrimary,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -198,9 +202,9 @@ class _N42BeanPageState extends State<N42BeanPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
-                    '我知道了',
-                    style: TextStyle(
+                  child: Text(
+                    s?.gotIt ?? 'Got it',
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -208,7 +212,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 20),
           ],
         ),
@@ -246,7 +250,8 @@ class _BeanDetailSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    
+    final s = S.of(context);
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       decoration: BoxDecoration(
@@ -268,7 +273,7 @@ class _BeanDetailSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // 标题
           Padding(
             padding: const EdgeInsets.all(16),
@@ -276,7 +281,7 @@ class _BeanDetailSheet extends StatelessWidget {
               children: [
                 const Spacer(),
                 Text(
-                  'N42豆明细',
+                  s?.n42BeanDetails ?? 'N42 Bean Details',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -294,12 +299,12 @@ class _BeanDetailSheet extends StatelessWidget {
               ],
             ),
           ),
-          
+
           Divider(
             height: 1,
             color: isDark ? AppColors.dividerDark : AppColors.divider,
           ),
-          
+
           // 空状态
           Expanded(
             child: Center(
@@ -313,7 +318,7 @@ class _BeanDetailSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '暂无N42豆明细记录',
+                    s?.noN42BeanRecords ?? 'No N42 Bean records',
                     style: TextStyle(
                       fontSize: 16,
                       color: AppColors.textSecondary,

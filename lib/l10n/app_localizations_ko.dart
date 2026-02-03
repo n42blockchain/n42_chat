@@ -4149,16 +4149,16 @@ class SKo extends S {
   String get appleLogin => 'Apple로 로그인';
 
   @override
-  String get facebookLogin => '使用 Facebook 登录';
+  String get facebookLogin => 'Facebook로 로그인';
 
   @override
-  String get twitterLogin => '使用 Twitter 登录';
+  String get twitterLogin => 'Twitter로 로그인';
 
   @override
-  String get wechatLogin => '使用微信登录';
+  String get wechatLogin => 'WeChat로 로그인';
 
   @override
-  String get wechat => '微信';
+  String get wechat => 'WeChat';
 
   @override
   String get facebook => 'Facebook';
@@ -4167,19 +4167,19 @@ class SKo extends S {
   String get twitter => 'Twitter';
 
   @override
-  String get wechatNotInstalled => '请先安装微信';
+  String get wechatNotInstalled => 'WeChat을 먼저 설치하세요';
 
   @override
-  String get wechatLoginFailed => '微信登录失败';
+  String get wechatLoginFailed => 'WeChat 로그인 실패';
 
   @override
-  String get facebookLoginFailed => 'Facebook 登录失败';
+  String get facebookLoginFailed => 'Facebook 로그인 실패';
 
   @override
-  String get twitterLoginFailed => 'Twitter 登录失败';
+  String get twitterLoginFailed => 'Twitter 로그인 실패';
 
   @override
-  String get twitterNotConfigured => 'Twitter 登录未配置';
+  String get twitterNotConfigured => 'Twitter 로그인이 설정되지 않음';
 
   @override
   String get socialLoginCancelled => '로그인이 취소되었습니다';
@@ -4260,4 +4260,53 @@ class SKo extends S {
 
   @override
   String get or => '或';
+
+  @override
+  String get n42BeanTitle => 'N42 빈';
+
+  @override
+  String get n42BeanDetails => 'N42 빈 상세';
+
+  @override
+  String get noN42Bean => 'N42 빈 없음';
+
+  @override
+  String get n42BeanDescription =>
+      'N42 빈은 N42 내 가상 아이템과 서비스를 교환하기 위한 토큰입니다. 현재 이용 가능:';
+
+  @override
+  String get n42BeanFeature1 => '회원 전용 스티커 및 테마';
+
+  @override
+  String get n42BeanFeature2 => '채팅 말풍선 커스터마이징';
+
+  @override
+  String get n42BeanFeature3 => '세뱃돈 봉투 커버 커스터마이징';
+
+  @override
+  String get n42BeanFeature4 => '전용 닉네임 뱃지';
+
+  @override
+  String get n42BeanFeature5 => '그룹 채팅 특권';
+
+  @override
+  String get n42BeanFeature6 => '클라우드 저장소 확장';
+
+  @override
+  String get n42BeanFeature7 => '영상통화 뷰티 필터';
+
+  @override
+  String get n42BeanFeature8 => '모먼트 배경 커스터마이징';
+
+  @override
+  String get n42BeanFeature9 => 'VIP 고객 서비스 우선권';
+
+  @override
+  String get gotIt => '알겠습니다';
+
+  @override
+  String get noN42BeanRecords => 'N42 빈 기록 없음';
+
+  @override
+  String get cameraPermissionRestricted => '이 기기에서 카메라 접근이 제한되어 있습니다';
 }

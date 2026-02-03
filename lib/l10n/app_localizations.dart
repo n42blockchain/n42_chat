@@ -7950,6 +7950,102 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'或'**
   String get or;
+
+  /// No description provided for @n42BeanTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'N42豆'**
+  String get n42BeanTitle;
+
+  /// No description provided for @n42BeanDetails.
+  ///
+  /// In zh, this message translates to:
+  /// **'N42豆明细'**
+  String get n42BeanDetails;
+
+  /// No description provided for @noN42Bean.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无N42豆'**
+  String get noN42Bean;
+
+  /// No description provided for @n42BeanDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'N42豆是用于兑换N42内虚拟物品和服务的道具，目前可用于兑换：'**
+  String get n42BeanDescription;
+
+  /// No description provided for @n42BeanFeature1.
+  ///
+  /// In zh, this message translates to:
+  /// **'会员专属表情和主题'**
+  String get n42BeanFeature1;
+
+  /// No description provided for @n42BeanFeature2.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天气泡个性化'**
+  String get n42BeanFeature2;
+
+  /// No description provided for @n42BeanFeature3.
+  ///
+  /// In zh, this message translates to:
+  /// **'红包封面定制'**
+  String get n42BeanFeature3;
+
+  /// No description provided for @n42BeanFeature4.
+  ///
+  /// In zh, this message translates to:
+  /// **'专属昵称标识'**
+  String get n42BeanFeature4;
+
+  /// No description provided for @n42BeanFeature5.
+  ///
+  /// In zh, this message translates to:
+  /// **'群聊特权功能'**
+  String get n42BeanFeature5;
+
+  /// No description provided for @n42BeanFeature6.
+  ///
+  /// In zh, this message translates to:
+  /// **'云存储空间扩展'**
+  String get n42BeanFeature6;
+
+  /// No description provided for @n42BeanFeature7.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频通话美颜滤镜'**
+  String get n42BeanFeature7;
+
+  /// No description provided for @n42BeanFeature8.
+  ///
+  /// In zh, this message translates to:
+  /// **'朋友圈背景更换'**
+  String get n42BeanFeature8;
+
+  /// No description provided for @n42BeanFeature9.
+  ///
+  /// In zh, this message translates to:
+  /// **'VIP客服优先服务'**
+  String get n42BeanFeature9;
+
+  /// No description provided for @gotIt.
+  ///
+  /// In zh, this message translates to:
+  /// **'我知道了'**
+  String get gotIt;
+
+  /// No description provided for @noN42BeanRecords.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无N42豆明细记录'**
+  String get noN42BeanRecords;
+
+  /// No description provided for @cameraPermissionRestricted.
+  ///
+  /// In zh, this message translates to:
+  /// **'此设备上的相机访问受限'**
+  String get cameraPermissionRestricted;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

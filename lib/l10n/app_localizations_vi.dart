@@ -4192,16 +4192,16 @@ class SVi extends S {
   String get appleLogin => 'Đăng nhập bằng Apple';
 
   @override
-  String get facebookLogin => '使用 Facebook 登录';
+  String get facebookLogin => 'Đăng nhập bằng Facebook';
 
   @override
-  String get twitterLogin => '使用 Twitter 登录';
+  String get twitterLogin => 'Đăng nhập bằng Twitter';
 
   @override
-  String get wechatLogin => '使用微信登录';
+  String get wechatLogin => 'Đăng nhập bằng WeChat';
 
   @override
-  String get wechat => '微信';
+  String get wechat => 'WeChat';
 
   @override
   String get facebook => 'Facebook';
@@ -4210,19 +4210,19 @@ class SVi extends S {
   String get twitter => 'Twitter';
 
   @override
-  String get wechatNotInstalled => '请先安装微信';
+  String get wechatNotInstalled => 'Vui lòng cài đặt WeChat trước';
 
   @override
-  String get wechatLoginFailed => '微信登录失败';
+  String get wechatLoginFailed => 'Đăng nhập WeChat thất bại';
 
   @override
-  String get facebookLoginFailed => 'Facebook 登录失败';
+  String get facebookLoginFailed => 'Đăng nhập Facebook thất bại';
 
   @override
-  String get twitterLoginFailed => 'Twitter 登录失败';
+  String get twitterLoginFailed => 'Đăng nhập Twitter thất bại';
 
   @override
-  String get twitterNotConfigured => 'Twitter 登录未配置';
+  String get twitterNotConfigured => 'Đăng nhập Twitter chưa được cấu hình';
 
   @override
   String get socialLoginCancelled => 'Đăng nhập đã bị hủy';
@@ -4303,4 +4303,54 @@ class SVi extends S {
 
   @override
   String get or => '或';
+
+  @override
+  String get n42BeanTitle => 'N42 Bean';
+
+  @override
+  String get n42BeanDetails => 'Chi tiết N42 Bean';
+
+  @override
+  String get noN42Bean => 'Không có N42 Bean';
+
+  @override
+  String get n42BeanDescription =>
+      'N42 Bean là token dùng để đổi vật phẩm ảo và dịch vụ trong N42. Hiện có thể dùng cho:';
+
+  @override
+  String get n42BeanFeature1 => 'Nhãn dán và chủ đề độc quyền cho thành viên';
+
+  @override
+  String get n42BeanFeature2 => 'Tùy chỉnh bong bóng chat';
+
+  @override
+  String get n42BeanFeature3 => 'Tùy chỉnh bìa phong bao đỏ';
+
+  @override
+  String get n42BeanFeature4 => 'Huy hiệu biệt danh độc quyền';
+
+  @override
+  String get n42BeanFeature5 => 'Đặc quyền trò chuyện nhóm';
+
+  @override
+  String get n42BeanFeature6 => 'Mở rộng lưu trữ đám mây';
+
+  @override
+  String get n42BeanFeature7 => 'Bộ lọc làm đẹp cuộc gọi video';
+
+  @override
+  String get n42BeanFeature8 => 'Tùy chỉnh nền Khoảnh khắc';
+
+  @override
+  String get n42BeanFeature9 => 'Ưu tiên dịch vụ khách hàng VIP';
+
+  @override
+  String get gotIt => 'Đã hiểu';
+
+  @override
+  String get noN42BeanRecords => 'Không có bản ghi N42 Bean';
+
+  @override
+  String get cameraPermissionRestricted =>
+      'Quyền truy cập camera bị hạn chế trên thiết bị này';
 }

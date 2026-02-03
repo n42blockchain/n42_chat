@@ -1901,5 +1901,23 @@
   "socialLoginCancelled": "Giriş iptal edildi",
   "socialLoginFailed": "Sosyal giriş başarısız",
   "verificationCode": "Doğrulama kodu",
-  "verificationCodeSent": "Doğrulama kodu gönderildi"
+  "verificationCodeSent": "Doğrulama kodu gönderildi",
+
+  "n42BeanTitle": "N42 Bean",
+  "n42BeanDetails": "N42 Bean Detayları",
+  "noN42Bean": "N42 Bean yok",
+  "n42BeanDescription": "N42 Bean, N42'deki sanal eşya ve hizmetleri almak için kullanılan bir tokendır. Şu anda şunlar için kullanılabilir:",
+  "n42BeanFeature1": "Üyelere özel çıkartmalar ve temalar",
+  "n42BeanFeature2": "Sohbet balonu özelleştirme",
+  "n42BeanFeature3": "Kırmızı zarf kapağı özelleştirme",
+  "n42BeanFeature4": "Özel takma ad rozeti",
+  "n42BeanFeature5": "Grup sohbeti ayrıcalıkları",
+  "n42BeanFeature6": "Bulut depolama genişletme",
+  "n42BeanFeature7": "Görüntülü arama güzellik filtreleri",
+  "n42BeanFeature8": "Anlar arka plan özelleştirme",
+  "n42BeanFeature9": "VIP müşteri hizmetleri önceliği",
+  "gotIt": "Anladım",
+  "noN42BeanRecords": "N42 Bean kaydı yok",
+
+  "cameraPermissionRestricted": "Bu cihazda kamera erişimi kısıtlı"
 }

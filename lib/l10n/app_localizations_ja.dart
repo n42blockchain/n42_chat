@@ -4150,16 +4150,16 @@ class SJa extends S {
   String get appleLogin => 'Appleでサインイン';
 
   @override
-  String get facebookLogin => '使用 Facebook 登录';
+  String get facebookLogin => 'Facebookでサインイン';
 
   @override
-  String get twitterLogin => '使用 Twitter 登录';
+  String get twitterLogin => 'Twitterでサインイン';
 
   @override
-  String get wechatLogin => '使用微信登录';
+  String get wechatLogin => 'WeChatでサインイン';
 
   @override
-  String get wechat => '微信';
+  String get wechat => 'WeChat';
 
   @override
   String get facebook => 'Facebook';
@@ -4168,19 +4168,19 @@ class SJa extends S {
   String get twitter => 'Twitter';
 
   @override
-  String get wechatNotInstalled => '请先安装微信';
+  String get wechatNotInstalled => 'WeChatをインストールしてください';
 
   @override
-  String get wechatLoginFailed => '微信登录失败';
+  String get wechatLoginFailed => 'WeChatログインに失敗しました';
 
   @override
-  String get facebookLoginFailed => 'Facebook 登录失败';
+  String get facebookLoginFailed => 'Facebookログインに失敗しました';
 
   @override
-  String get twitterLoginFailed => 'Twitter 登录失败';
+  String get twitterLoginFailed => 'Twitterログインに失敗しました';
 
   @override
-  String get twitterNotConfigured => 'Twitter 登录未配置';
+  String get twitterNotConfigured => 'Twitterログインが設定されていません';
 
   @override
   String get socialLoginCancelled => 'ログインがキャンセルされました';
@@ -4261,4 +4261,53 @@ class SJa extends S {
 
   @override
   String get or => '或';
+
+  @override
+  String get n42BeanTitle => 'N42ビーン';
+
+  @override
+  String get n42BeanDetails => 'N42ビーン詳細';
+
+  @override
+  String get noN42Bean => 'N42ビーンなし';
+
+  @override
+  String get n42BeanDescription =>
+      'N42ビーンはN42内の仮想アイテムやサービスを交換するためのトークンです。現在利用可能：';
+
+  @override
+  String get n42BeanFeature1 => '会員限定スタンプとテーマ';
+
+  @override
+  String get n42BeanFeature2 => 'チャットバブルのカスタマイズ';
+
+  @override
+  String get n42BeanFeature3 => '紅包カバーのカスタマイズ';
+
+  @override
+  String get n42BeanFeature4 => '限定ニックネームバッジ';
+
+  @override
+  String get n42BeanFeature5 => 'グループチャット特権';
+
+  @override
+  String get n42BeanFeature6 => 'クラウドストレージ拡張';
+
+  @override
+  String get n42BeanFeature7 => 'ビデオ通話美顔フィルター';
+
+  @override
+  String get n42BeanFeature8 => 'モーメント背景カスタマイズ';
+
+  @override
+  String get n42BeanFeature9 => 'VIPカスタマーサービス優先';
+
+  @override
+  String get gotIt => '了解';
+
+  @override
+  String get noN42BeanRecords => 'N42ビーン記録なし';
+
+  @override
+  String get cameraPermissionRestricted => 'このデバイスではカメラアクセスが制限されています';
 }

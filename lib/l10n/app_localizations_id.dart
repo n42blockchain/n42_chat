@@ -4219,16 +4219,16 @@ class SId extends S {
   String get appleLogin => 'Masuk dengan Apple';
 
   @override
-  String get facebookLogin => '使用 Facebook 登录';
+  String get facebookLogin => 'Masuk dengan Facebook';
 
   @override
-  String get twitterLogin => '使用 Twitter 登录';
+  String get twitterLogin => 'Masuk dengan Twitter';
 
   @override
-  String get wechatLogin => '使用微信登录';
+  String get wechatLogin => 'Masuk dengan WeChat';
 
   @override
-  String get wechat => '微信';
+  String get wechat => 'WeChat';
 
   @override
   String get facebook => 'Facebook';
@@ -4237,19 +4237,19 @@ class SId extends S {
   String get twitter => 'Twitter';
 
   @override
-  String get wechatNotInstalled => '请先安装微信';
+  String get wechatNotInstalled => 'Silakan instal WeChat terlebih dahulu';
 
   @override
-  String get wechatLoginFailed => '微信登录失败';
+  String get wechatLoginFailed => 'Login WeChat gagal';
 
   @override
-  String get facebookLoginFailed => 'Facebook 登录失败';
+  String get facebookLoginFailed => 'Login Facebook gagal';
 
   @override
-  String get twitterLoginFailed => 'Twitter 登录失败';
+  String get twitterLoginFailed => 'Login Twitter gagal';
 
   @override
-  String get twitterNotConfigured => 'Twitter 登录未配置';
+  String get twitterNotConfigured => 'Login Twitter tidak dikonfigurasi';
 
   @override
   String get socialLoginCancelled => 'Login dibatalkan';
@@ -4330,4 +4330,54 @@ class SId extends S {
 
   @override
   String get or => '或';
+
+  @override
+  String get n42BeanTitle => 'N42 Bean';
+
+  @override
+  String get n42BeanDetails => 'Detail N42 Bean';
+
+  @override
+  String get noN42Bean => 'Tidak ada N42 Bean';
+
+  @override
+  String get n42BeanDescription =>
+      'N42 Bean adalah token untuk menukarkan barang virtual dan layanan di N42. Saat ini tersedia untuk:';
+
+  @override
+  String get n42BeanFeature1 => 'Stiker dan tema eksklusif anggota';
+
+  @override
+  String get n42BeanFeature2 => 'Kustomisasi gelembung chat';
+
+  @override
+  String get n42BeanFeature3 => 'Kustomisasi sampul amplop merah';
+
+  @override
+  String get n42BeanFeature4 => 'Lencana nama panggilan eksklusif';
+
+  @override
+  String get n42BeanFeature5 => 'Hak istimewa chat grup';
+
+  @override
+  String get n42BeanFeature6 => 'Perluasan penyimpanan cloud';
+
+  @override
+  String get n42BeanFeature7 => 'Filter kecantikan panggilan video';
+
+  @override
+  String get n42BeanFeature8 => 'Kustomisasi latar belakang Moments';
+
+  @override
+  String get n42BeanFeature9 => 'Prioritas layanan pelanggan VIP';
+
+  @override
+  String get gotIt => 'Mengerti';
+
+  @override
+  String get noN42BeanRecords => 'Tidak ada catatan N42 Bean';
+
+  @override
+  String get cameraPermissionRestricted =>
+      'Akses kamera dibatasi pada perangkat ini';
 }

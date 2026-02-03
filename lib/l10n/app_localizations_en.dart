@@ -4314,4 +4314,54 @@ class SEn extends S {
 
   @override
   String get or => 'OR';
+
+  @override
+  String get n42BeanTitle => 'N42 Bean';
+
+  @override
+  String get n42BeanDetails => 'N42 Bean Details';
+
+  @override
+  String get noN42Bean => 'No N42 Bean';
+
+  @override
+  String get n42BeanDescription =>
+      'N42 Bean is a token used to redeem virtual items and services in N42. Currently available for:';
+
+  @override
+  String get n42BeanFeature1 => 'Exclusive member stickers and themes';
+
+  @override
+  String get n42BeanFeature2 => 'Chat bubble customization';
+
+  @override
+  String get n42BeanFeature3 => 'Red packet cover customization';
+
+  @override
+  String get n42BeanFeature4 => 'Exclusive nickname badge';
+
+  @override
+  String get n42BeanFeature5 => 'Group chat privileges';
+
+  @override
+  String get n42BeanFeature6 => 'Cloud storage expansion';
+
+  @override
+  String get n42BeanFeature7 => 'Video call beauty filters';
+
+  @override
+  String get n42BeanFeature8 => 'Moments background customization';
+
+  @override
+  String get n42BeanFeature9 => 'VIP customer service priority';
+
+  @override
+  String get gotIt => 'Got it';
+
+  @override
+  String get noN42BeanRecords => 'No N42 Bean records';
+
+  @override
+  String get cameraPermissionRestricted =>
+      'Camera access is restricted on this device';
 }

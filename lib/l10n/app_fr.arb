@@ -1901,5 +1901,23 @@
   "socialLoginCancelled": "Connexion annulée",
   "socialLoginFailed": "Échec de la connexion sociale",
   "verificationCode": "Code de vérification",
-  "verificationCodeSent": "Code de vérification envoyé"
+  "verificationCodeSent": "Code de vérification envoyé",
+
+  "n42BeanTitle": "N42 Bean",
+  "n42BeanDetails": "Détails N42 Bean",
+  "noN42Bean": "Pas de N42 Bean",
+  "n42BeanDescription": "N42 Bean est un jeton pour échanger des articles virtuels et des services dans N42. Actuellement disponible pour :",
+  "n42BeanFeature1": "Autocollants et thèmes exclusifs aux membres",
+  "n42BeanFeature2": "Personnalisation des bulles de chat",
+  "n42BeanFeature3": "Personnalisation des enveloppes rouges",
+  "n42BeanFeature4": "Badge de pseudo exclusif",
+  "n42BeanFeature5": "Privilèges de chat de groupe",
+  "n42BeanFeature6": "Extension de stockage cloud",
+  "n42BeanFeature7": "Filtres beauté pour appels vidéo",
+  "n42BeanFeature8": "Personnalisation de l'arrière-plan Moments",
+  "n42BeanFeature9": "Priorité au service client VIP",
+  "gotIt": "Compris",
+  "noN42BeanRecords": "Aucun enregistrement N42 Bean",
+
+  "cameraPermissionRestricted": "L'accès à la caméra est restreint sur cet appareil"
 }

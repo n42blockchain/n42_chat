@@ -4213,16 +4213,16 @@ class STr extends S {
   String get appleLogin => 'Apple ile giriş yap';
 
   @override
-  String get facebookLogin => '使用 Facebook 登录';
+  String get facebookLogin => 'Facebook ile giriş yap';
 
   @override
-  String get twitterLogin => '使用 Twitter 登录';
+  String get twitterLogin => 'Twitter ile giriş yap';
 
   @override
-  String get wechatLogin => '使用微信登录';
+  String get wechatLogin => 'WeChat ile giriş yap';
 
   @override
-  String get wechat => '微信';
+  String get wechat => 'WeChat';
 
   @override
   String get facebook => 'Facebook';
@@ -4231,19 +4231,19 @@ class STr extends S {
   String get twitter => 'Twitter';
 
   @override
-  String get wechatNotInstalled => '请先安装微信';
+  String get wechatNotInstalled => 'Lütfen önce WeChat yükleyin';
 
   @override
-  String get wechatLoginFailed => '微信登录失败';
+  String get wechatLoginFailed => 'WeChat girişi başarısız';
 
   @override
-  String get facebookLoginFailed => 'Facebook 登录失败';
+  String get facebookLoginFailed => 'Facebook girişi başarısız';
 
   @override
-  String get twitterLoginFailed => 'Twitter 登录失败';
+  String get twitterLoginFailed => 'Twitter girişi başarısız';
 
   @override
-  String get twitterNotConfigured => 'Twitter 登录未配置';
+  String get twitterNotConfigured => 'Twitter girişi yapılandırılmamış';
 
   @override
   String get socialLoginCancelled => 'Giriş iptal edildi';
@@ -4324,4 +4324,53 @@ class STr extends S {
 
   @override
   String get or => '或';
+
+  @override
+  String get n42BeanTitle => 'N42 Bean';
+
+  @override
+  String get n42BeanDetails => 'N42 Bean Detayları';
+
+  @override
+  String get noN42Bean => 'N42 Bean yok';
+
+  @override
+  String get n42BeanDescription =>
+      'N42 Bean, N42\'deki sanal eşya ve hizmetleri almak için kullanılan bir tokendır. Şu anda şunlar için kullanılabilir:';
+
+  @override
+  String get n42BeanFeature1 => 'Üyelere özel çıkartmalar ve temalar';
+
+  @override
+  String get n42BeanFeature2 => 'Sohbet balonu özelleştirme';
+
+  @override
+  String get n42BeanFeature3 => 'Kırmızı zarf kapağı özelleştirme';
+
+  @override
+  String get n42BeanFeature4 => 'Özel takma ad rozeti';
+
+  @override
+  String get n42BeanFeature5 => 'Grup sohbeti ayrıcalıkları';
+
+  @override
+  String get n42BeanFeature6 => 'Bulut depolama genişletme';
+
+  @override
+  String get n42BeanFeature7 => 'Görüntülü arama güzellik filtreleri';
+
+  @override
+  String get n42BeanFeature8 => 'Anlar arka plan özelleştirme';
+
+  @override
+  String get n42BeanFeature9 => 'VIP müşteri hizmetleri önceliği';
+
+  @override
+  String get gotIt => 'Anladım';
+
+  @override
+  String get noN42BeanRecords => 'N42 Bean kaydı yok';
+
+  @override
+  String get cameraPermissionRestricted => 'Bu cihazda kamera erişimi kısıtlı';
 }

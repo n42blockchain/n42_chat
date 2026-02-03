@@ -1901,5 +1901,23 @@
   "socialLoginCancelled": "ログインがキャンセルされました",
   "socialLoginFailed": "ソーシャルログインに失敗しました",
   "verificationCode": "確認コード",
-  "verificationCodeSent": "確認コードが送信されました"
+  "verificationCodeSent": "確認コードが送信されました",
+
+  "n42BeanTitle": "N42ビーン",
+  "n42BeanDetails": "N42ビーン詳細",
+  "noN42Bean": "N42ビーンなし",
+  "n42BeanDescription": "N42ビーンはN42内の仮想アイテムやサービスを交換するためのトークンです。現在利用可能：",
+  "n42BeanFeature1": "会員限定スタンプとテーマ",
+  "n42BeanFeature2": "チャットバブルのカスタマイズ",
+  "n42BeanFeature3": "紅包カバーのカスタマイズ",
+  "n42BeanFeature4": "限定ニックネームバッジ",
+  "n42BeanFeature5": "グループチャット特権",
+  "n42BeanFeature6": "クラウドストレージ拡張",
+  "n42BeanFeature7": "ビデオ通話美顔フィルター",
+  "n42BeanFeature8": "モーメント背景カスタマイズ",
+  "n42BeanFeature9": "VIPカスタマーサービス優先",
+  "gotIt": "了解",
+  "noN42BeanRecords": "N42ビーン記録なし",
+
+  "cameraPermissionRestricted": "このデバイスではカメラアクセスが制限されています"
 }

@@ -1953,5 +1953,23 @@
   "biometricEnabled": "Enabled - Use biometric to login",
   "biometricDisabled": "Disabled - Tap to enable",
   "biometricNeedRelogin": "Please log out and log in again to enable biometric login",
-  "or": "OR"
+  "or": "OR",
+
+  "n42BeanTitle": "N42 Bean",
+  "n42BeanDetails": "N42 Bean Details",
+  "noN42Bean": "No N42 Bean",
+  "n42BeanDescription": "N42 Bean is a token used to redeem virtual items and services in N42. Currently available for:",
+  "n42BeanFeature1": "Exclusive member stickers and themes",
+  "n42BeanFeature2": "Chat bubble customization",
+  "n42BeanFeature3": "Red packet cover customization",
+  "n42BeanFeature4": "Exclusive nickname badge",
+  "n42BeanFeature5": "Group chat privileges",
+  "n42BeanFeature6": "Cloud storage expansion",
+  "n42BeanFeature7": "Video call beauty filters",
+  "n42BeanFeature8": "Moments background customization",
+  "n42BeanFeature9": "VIP customer service priority",
+  "gotIt": "Got it",
+  "noN42BeanRecords": "No N42 Bean records",
+
+  "cameraPermissionRestricted": "Camera access is restricted on this device"
 }

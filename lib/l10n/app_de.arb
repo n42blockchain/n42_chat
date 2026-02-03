@@ -1901,5 +1901,23 @@
   "socialLoginCancelled": "Anmeldung abgebrochen",
   "socialLoginFailed": "Soziale Anmeldung fehlgeschlagen",
   "verificationCode": "Bestätigungscode",
-  "verificationCodeSent": "Bestätigungscode gesendet"
+  "verificationCodeSent": "Bestätigungscode gesendet",
+
+  "n42BeanTitle": "N42 Bean",
+  "n42BeanDetails": "N42 Bean Details",
+  "noN42Bean": "Keine N42 Beans",
+  "n42BeanDescription": "N42 Bean ist ein Token zum Einlösen von virtuellen Gegenständen und Diensten in N42. Derzeit verfügbar für:",
+  "n42BeanFeature1": "Exklusive Mitglieder-Sticker und Themes",
+  "n42BeanFeature2": "Chat-Blasen-Anpassung",
+  "n42BeanFeature3": "Rote Umschlag-Cover-Anpassung",
+  "n42BeanFeature4": "Exklusives Nickname-Abzeichen",
+  "n42BeanFeature5": "Gruppenchat-Privilegien",
+  "n42BeanFeature6": "Cloud-Speicher-Erweiterung",
+  "n42BeanFeature7": "Videoanruf-Beauty-Filter",
+  "n42BeanFeature8": "Moments-Hintergrund-Anpassung",
+  "n42BeanFeature9": "VIP-Kundenservice-Priorität",
+  "gotIt": "Verstanden",
+  "noN42BeanRecords": "Keine N42 Bean Einträge",
+
+  "cameraPermissionRestricted": "Der Kamerazugriff ist auf diesem Gerät eingeschränkt"
 }
