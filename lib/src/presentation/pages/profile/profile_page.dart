@@ -62,20 +62,23 @@ class _ProfilePageState extends State<ProfilePage> {
         
         // 异步获取头像
         try {
-          final profile = await client.ownProfile;
-          if (mounted) {
-            // 将 mxc:// URL 转换为 HTTP URL
-            final avatarMxc = profile.avatarUrl?.toString();
-            final avatarHttpUrl = mx_utils.MatrixUtils.mxcToHttp(
-              avatarMxc,
-              client: client,
-              width: 128,
-              height: 128,
-            );
-            setState(() {
-              _displayName = profile.displayName ?? _displayName;
-              _avatarUrl = avatarHttpUrl;
-            });
+          final userId = client.userID;
+          if (userId != null) {
+            final profile = await client.getUserProfile(userId);
+            if (mounted) {
+              // 将 mxc:// URL 转换为 HTTP URL
+              final avatarMxc = profile.avatarUrl?.toString();
+              final avatarHttpUrl = mx_utils.MatrixUtils.mxcToHttp(
+                avatarMxc,
+                client: client,
+                width: 128,
+                height: 128,
+              );
+              setState(() {
+                _displayName = profile.displayname ?? _displayName;
+                _avatarUrl = avatarHttpUrl;
+              });
+            }
           }
         } catch (e) {
           debugPrint('Failed to get avatar: $e');
@@ -285,8 +288,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
                                 color: isDark 
-                                    ? Colors.white.withOpacity(0.1) 
-                                    : Colors.black.withOpacity(0.05),
+                                    ? Colors.white.withValues(alpha: 0.1) 
+                                    : Colors.black.withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: Row(

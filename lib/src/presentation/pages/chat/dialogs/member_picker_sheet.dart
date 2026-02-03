@@ -141,7 +141,7 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
                 prefixIcon: Icon(Icons.search, color: subtextColor),
                 filled: true,
                 fillColor: widget.isDark
-                    ? Colors.white.withOpacity(0.1)
+                    ? Colors.white.withValues(alpha: 0.1)
                     : Colors.grey[200],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),

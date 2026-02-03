@@ -142,7 +142,7 @@ class _StatusPageState extends State<StatusPage> {
                   S.of(context)?.visibleToFriends24h ?? 'Visible to friends for 24 hours',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -159,7 +159,7 @@ class _StatusPageState extends State<StatusPage> {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
       ),
       child: GestureDetector(
@@ -172,7 +172,7 @@ class _StatusPageState extends State<StatusPage> {
               height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.6), width: 2),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 2),
               ),
             ),
             const SizedBox(width: 12),
@@ -180,7 +180,7 @@ class _StatusPageState extends State<StatusPage> {
               S.of(context)?.writeStatus ?? 'Write Status',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
           ],
@@ -193,7 +193,7 @@ class _StatusPageState extends State<StatusPage> {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -205,7 +205,7 @@ class _StatusPageState extends State<StatusPage> {
               category.title,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
               ),
             ),
           ),
@@ -239,7 +239,7 @@ class _StatusPageState extends State<StatusPage> {
               width: 44,
               height: 44,
               decoration: isSelected ? BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(8),
               ) : null,
               child: Icon(

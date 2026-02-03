@@ -1021,7 +1021,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.1),
+                                  color: AppColors.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -1449,8 +1449,8 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                               ),
                               decoration: BoxDecoration(
                                 color: invoice.type == 'company' 
-                                    ? AppColors.primary.withOpacity(0.1)
-                                    : Colors.orange.withOpacity(0.1),
+                                    ? AppColors.primary.withValues(alpha: 0.1)
+                                    : Colors.orange.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
@@ -1481,7 +1481,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.1),
+                                  color: AppColors.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(

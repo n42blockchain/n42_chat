@@ -235,7 +235,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       child: const Icon(
@@ -332,7 +332,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
 
     final submittedPinTheme = defaultPinTheme.copyWith(
       decoration: defaultPinTheme.decoration!.copyWith(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         border: Border.all(color: AppColors.primary),
       ),
     );
@@ -362,7 +362,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         onPressed: _isSending ? null : _sendOtp,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
+          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

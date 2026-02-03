@@ -277,7 +277,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
-              color: AppColors.error.withOpacity(0.1),
+              color: AppColors.error.withValues(alpha: 0.1),
               child: Text(
                 _errorMessage!,
                 style: const TextStyle(color: AppColors.error, fontSize: 13),
@@ -323,7 +323,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? AppColors.textSecondaryDark.withOpacity(0.7) : AppColors.textSecondary.withOpacity(0.7),
+                color: isDark ? AppColors.textSecondaryDark.withValues(alpha: 0.7) : AppColors.textSecondary.withValues(alpha: 0.7),
               ),
             ),
           ],

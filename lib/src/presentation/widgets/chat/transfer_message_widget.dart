@@ -76,7 +76,7 @@ class TransferMessageWidget extends StatelessWidget {
                     child: Icon(
                       status == TransferStatus.received ? Icons.check : Icons.access_time,
                       size: 20,
-                      color: _getTextColor().withOpacity(0.8),
+                      color: _getTextColor().withValues(alpha: 0.8),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -99,7 +99,7 @@ class TransferMessageWidget extends StatelessWidget {
                           _getStatusText(context),
                           style: TextStyle(
                             fontSize: 12,
-                            color: _getTextColor().withOpacity(0.7),
+                            color: _getTextColor().withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -113,7 +113,7 @@ class TransferMessageWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(4),
                   bottomRight: Radius.circular(4),
@@ -123,7 +123,7 @@ class TransferMessageWidget extends StatelessWidget {
                 S.of(context)?.transfer ?? 'Transfer',
                 style: TextStyle(
                   fontSize: 11,
-                  color: _getTextColor().withOpacity(0.5),
+                  color: _getTextColor().withValues(alpha: 0.5),
                 ),
               ),
             ),
@@ -149,10 +149,10 @@ class TransferMessageWidget extends StatelessWidget {
     switch (status) {
       case TransferStatus.pending:
       case TransferStatus.received:
-        return Colors.white.withOpacity(0.25);
+        return Colors.white.withValues(alpha: 0.25);
       case TransferStatus.refunded:
       case TransferStatus.expired:
-        return Colors.grey.withOpacity(0.2);
+        return Colors.grey.withValues(alpha: 0.2);
     }
   }
 
@@ -279,7 +279,7 @@ class RedPacketMessageWidget extends StatelessWidget {
                                 _getStatusText(context),
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: textColor.withOpacity(0.7),
+                                  color: textColor.withValues(alpha: 0.7),
                                 ),
                               ),
                             ],
@@ -294,13 +294,13 @@ class RedPacketMessageWidget extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                   ),
                   child: Text(
                     S.of(context)?.n42RedPacket ?? 'N42 Red Packet',
                     style: TextStyle(
                       fontSize: 12,
-                      color: textColor.withOpacity(0.6),
+                      color: textColor.withValues(alpha: 0.6),
                     ),
                   ),
                 ),
@@ -333,7 +333,7 @@ class RedPacketMessageWidget extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.25),
+          color: Colors.white.withValues(alpha: 0.25),
           shape: BoxShape.circle,
         ),
         child: const Icon(
