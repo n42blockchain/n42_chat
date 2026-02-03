@@ -384,7 +384,7 @@ class _LoginPageState extends State<LoginPage> {
           },
           child: Text(
             S.of(context)?.registerAccount ?? 'Sign Up',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: AppColors.textLink,
             ),
@@ -398,7 +398,7 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: _showForgotPasswordHelp,
           child: Text(
             S.of(context)?.forgotPassword ?? 'Forgot Password',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: AppColors.textLink,
             ),
@@ -622,14 +622,14 @@ class _LoginPageState extends State<LoginPage> {
             ? const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(
+                child: const CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
             : Text(
                 S.of(context)?.login ?? 'Log In',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -659,7 +659,7 @@ class _LoginPageState extends State<LoginPage> {
               },
               child: Text(
                 S.of(context)?.registerAccount ?? 'Sign Up',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textLink,
                 ),
@@ -677,7 +677,7 @@ class _LoginPageState extends State<LoginPage> {
               },
               child: Text(
                 S.of(context)?.forgotPassword ?? 'Forgot Password',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textLink,
                 ),
@@ -842,7 +842,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildBiometricLoginButton() {
     final bgColor = AppColors.primary.withValues(alpha: 0.1);
-    final iconColor = AppColors.primary;
+    const iconColor = AppColors.primary;
 
     // 根据生物识别类型选择图标
     IconData biometricIcon;
@@ -876,7 +876,7 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               S.of(context)?.loginWithBiometric(_biometricTypeDescription) ??
                   'Login with $_biometricTypeDescription',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 color: iconColor,
                 fontWeight: FontWeight.w600,

@@ -286,7 +286,7 @@ class MessageItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(4),
-        border: Border(
+        border: const Border(
           left: BorderSide(
             color: AppColors.primary,
             width: 2,
@@ -300,7 +300,7 @@ class MessageItem extends StatelessWidget {
           if (message.replyToSender != null)
             Text(
               message.replyToSender!,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: AppColors.primary,
@@ -799,9 +799,9 @@ class MessageItem extends StatelessWidget {
           // 地图预览区域 - 微信/WhatsApp风格
           Container(
             height: 100,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE8EEF0),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+            decoration: const BoxDecoration(
+              color: Color(0xFFE8EEF0),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
             ),
             child: Stack(
               children: [
@@ -1012,14 +1012,14 @@ class MessageItem extends StatelessWidget {
                       child: Image.network(
                         cover,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Icon(
+                        errorBuilder: (_, __, ___) => const Icon(
                           Icons.music_note,
                           size: 24,
                           color: AppColors.primary,
                         ),
                       ),
                     )
-                  : Icon(
+                  : const Icon(
                       Icons.music_note,
                       size: 24,
                       color: AppColors.primary,
@@ -1059,7 +1059,7 @@ class MessageItem extends StatelessWidget {
               ),
             ),
             // 播放图标
-            Icon(
+            const Icon(
               Icons.play_circle_filled,
               size: 32,
               color: AppColors.primary,
@@ -1105,7 +1105,7 @@ class MessageItem extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.poll,
                       size: 12,
                       color: AppColors.primary,
@@ -1115,7 +1115,7 @@ class MessageItem extends StatelessWidget {
                       maxSelections == 1
                           ? (S.of(context)?.singleChoice ?? 'Single')
                           : (S.of(context)?.multiChoice ?? 'Multi'),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w500,
@@ -1206,7 +1206,7 @@ class MessageItem extends StatelessWidget {
                           ),
                         ),
                         if (isSelected)
-                          Icon(
+                          const Icon(
                             Icons.check_circle,
                             size: 18,
                             color: AppColors.primary,
@@ -1230,7 +1230,7 @@ class MessageItem extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         S.of(context)?.pollVotesFormat(voteCount, percentage.toStringAsFixed(0)) ?? '$voteCount votes (${percentage.toStringAsFixed(0)}%)',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.textSecondary,
                         ),
@@ -1249,7 +1249,7 @@ class MessageItem extends StatelessWidget {
             children: [
               Text(
                 S.of(context)?.pollParticipantsFormat(totalVoters) ?? '$totalVoters participants',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
                   color: AppColors.textSecondary,
                 ),
@@ -1259,7 +1259,7 @@ class MessageItem extends StatelessWidget {
                   onTap: () => onEndPoll?.call(message.id),
                   child: Text(
                     S.of(context)?.endPollButton ?? 'End Poll',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
                       color: AppColors.error,
                     ),
@@ -1273,7 +1273,7 @@ class MessageItem extends StatelessWidget {
   }
 
   Widget _buildEncryptedMessage(bool isDark) {
-    return Row(
+    return const Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
@@ -1281,7 +1281,7 @@ class MessageItem extends StatelessWidget {
           size: 16,
           color: AppColors.textSecondary,
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: 4),
         Text(
           '[加密消息]',
           style: TextStyle(

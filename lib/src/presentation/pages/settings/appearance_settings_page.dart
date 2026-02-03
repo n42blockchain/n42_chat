@@ -139,7 +139,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         ),
       ),
       trailing: isSelected
-          ? Icon(
+          ? const Icon(
               Icons.check,
               color: AppColors.primary,
             )
@@ -217,7 +217,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         ),
       ),
       trailing: isSelected
-          ? Icon(
+          ? const Icon(
               Icons.check,
               color: AppColors.primary,
             )
@@ -283,7 +283,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         ),
       ),
       trailing: isSelected
-          ? Icon(
+          ? const Icon(
               Icons.check,
               color: AppColors.primary,
             )

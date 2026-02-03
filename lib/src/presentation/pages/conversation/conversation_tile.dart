@@ -189,8 +189,8 @@ class ConversationTile extends StatelessWidget {
                 children: [
                   // 加密标识
                   if (conversation.isEncrypted)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 4),
+                    const Padding(
+                      padding: EdgeInsets.only(right: 4),
                       child: Icon(
                         Icons.lock,
                         size: 14,
@@ -235,7 +235,7 @@ class ConversationTile extends StatelessWidget {
           children: [
             // 草稿标识
             if (conversation.draft != null && conversation.draft!.isNotEmpty)
-              Text(
+              const Text(
                 '[草稿] ',
                 style: TextStyle(
                   fontSize: 13,

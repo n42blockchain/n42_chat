@@ -122,7 +122,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   )
                 : Text(
                     S.of(context)?.save ?? 'Save',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,
                     ),

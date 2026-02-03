@@ -210,7 +210,7 @@ class _LanguageItem extends StatelessWidget {
                 ),
                 // 选中标识
                 if (isSelected)
-                  Icon(
+                  const Icon(
                     Icons.check_circle,
                     color: AppColors.primary,
                     size: 24,

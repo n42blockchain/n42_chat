@@ -271,13 +271,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
                                             content: Text(S.of(context)?.statusCleared ?? 'Status cleared'),
-                                            duration: Duration(seconds: 1),
+                                            duration: const Duration(seconds: 1),
                                           ),
                                         );
                                       },
                                       child: Text(
                                         S.of(context)?.clear ?? 'Clear',
-                                        style: TextStyle(color: AppColors.error),
+                                        style: const TextStyle(color: AppColors.error),
                                       ),
                                     ),
                                   ],
@@ -545,7 +545,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Navigator.pop(ctx);
               context.read<AuthBloc>().add(const AuthLogoutRequested());
             },
-            child: Text(S.of(context)?.logout ?? 'Log Out', style: TextStyle(color: AppColors.error)),
+            child: Text(S.of(context)?.logout ?? 'Log Out', style: const TextStyle(color: AppColors.error)),
           ),
         ],
       ),

@@ -478,8 +478,8 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
           Container(
             width: size * 0.6,
             height: size * 0.6,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFD700),
+            decoration: const BoxDecoration(
+              color: Color(0xFFFFD700),
               shape: BoxShape.circle,
             ),
           ),

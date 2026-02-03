@@ -287,7 +287,7 @@ class SettingsPage extends StatelessWidget {
             },
             child: Text(
               S.of(context)?.logout ?? 'Log Out',
-              style: TextStyle(color: AppColors.error),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],

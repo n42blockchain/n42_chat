@@ -136,7 +136,7 @@ class N42EmptyState extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 description!,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                 ),
@@ -210,7 +210,7 @@ class N42Loading extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               message!,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),

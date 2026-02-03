@@ -169,7 +169,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
+        const Icon(
           Icons.search,
           size: 18,
           color: AppColors.textTertiary,
@@ -177,7 +177,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
         const SizedBox(width: 6),
         Text(
           hint,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             color: AppColors.textTertiary,
           ),
@@ -201,11 +201,11 @@ class _N42SearchBarState extends State<N42SearchBar> {
       ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(
+        hintStyle: const TextStyle(
           fontSize: 14,
           color: AppColors.textTertiary,
         ),
-        prefixIcon: Icon(
+        prefixIcon: const Icon(
           Icons.search,
           size: 18,
           color: AppColors.textTertiary,
@@ -217,7 +217,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
         suffixIcon: _showClear
             ? GestureDetector(
                 onTap: _onClear,
-                child: Icon(
+                child: const Icon(
                   Icons.cancel,
                   size: 18,
                   color: AppColors.textTertiary,

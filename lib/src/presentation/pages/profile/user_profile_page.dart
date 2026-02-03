@@ -111,7 +111,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(_error!, style: TextStyle(color: AppColors.error)),
+            Text(_error!, style: const TextStyle(color: AppColors.error)),
             const SizedBox(height: 16),
             N42Button(
               text: S.of(context)?.retry ?? 'Retry',

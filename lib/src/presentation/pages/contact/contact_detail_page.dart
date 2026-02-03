@@ -400,7 +400,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                           color: Colors.grey.shade800,
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: Stack(
+                        child: const Stack(
                           children: [
                             Center(
                               child: Icon(
@@ -440,7 +440,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             border: Border(
               top: BorderSide(color: Colors.white10, width: 0.5),
               bottom: BorderSide(color: Colors.white10, width: 0.5),
