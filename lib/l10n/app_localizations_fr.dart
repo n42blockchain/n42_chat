@@ -4447,4 +4447,34 @@ class SFr extends S {
   @override
   String get cameraPermissionRestricted =>
       'L\'accès à la caméra est restreint sur cet appareil';
+
+  @override
+  String get passkeyLabel => 'Passkey';
+
+  @override
+  String get googleLabel => 'Google';
+
+  @override
+  String get appleLabel => 'Apple';
+
+  @override
+  String get ssoLabel => 'SSO';
+
+  @override
+  String get amountHintZero => '0.00';
+
+  @override
+  String get matrixIdHint => '@username:server.com';
+
+  @override
+  String get serverAddressHint => 'https://m.si46.world';
+
+  @override
+  String get emailExampleHint => 'example@email.com';
+
+  @override
+  String get verificationCodePlaceholder => '------';
+
+  @override
+  String get enterPokeSuffixHint => '输入戳一戳后缀，例如：的肩膀';
 }

@@ -168,7 +168,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                       ),
                       _MoreItem(
                         icon: Icons.person_outline,
-                        label: 'Contact',
+                        label: S.of(context)?.contactLabel ?? 'Contact',
                         onTap: widget.onContactCardPressed,
                       ),
                     ],

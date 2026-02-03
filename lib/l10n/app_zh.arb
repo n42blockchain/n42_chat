@@ -2220,5 +2220,16 @@
   "gotIt": "我知道了",
   "noN42BeanRecords": "暂无N42豆明细记录",
 
-  "cameraPermissionRestricted": "此设备上的相机访问受限"
+  "cameraPermissionRestricted": "此设备上的相机访问受限",
+
+  "passkeyLabel": "Passkey",
+  "googleLabel": "Google",
+  "appleLabel": "Apple",
+  "ssoLabel": "SSO",
+  "amountHintZero": "0.00",
+  "matrixIdHint": "@username:server.com",
+  "serverAddressHint": "https://m.si46.world",
+  "emailExampleHint": "example@email.com",
+  "verificationCodePlaceholder": "------",
+  "enterPokeSuffixHint": "输入戳一戳后缀，例如：的肩膀"
 }

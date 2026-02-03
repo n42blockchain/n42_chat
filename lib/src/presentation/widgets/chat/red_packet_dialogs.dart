@@ -279,7 +279,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                             fontSize: 16,
                           ),
                           decoration: InputDecoration(
-                            hintText: _decimalPlaces > 2 ? '0.0' : '0.00',
+                            hintText: _decimalPlaces > 2 ? '0.0' : (S.of(context)?.amountHintZero ?? '0.00'),
                             hintStyle: TextStyle(color: secondaryTextColor.withValues(alpha: 0.5)),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
@@ -1326,7 +1326,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                           ],
                           style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: textColor),
                           decoration: InputDecoration(
-                            hintText: '0.00',
+                            hintText: S.of(context)?.amountHintZero ?? '0.00',
                             hintStyle: TextStyle(color: secondaryTextColor),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,

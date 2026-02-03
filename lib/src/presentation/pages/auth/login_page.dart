@@ -429,7 +429,7 @@ class _LoginPageState extends State<LoginPage> {
           controller: _homeserverController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: 'https://m.si46.world',
+            hintText: S.of(context)?.serverAddressHint ?? 'https://m.si46.world',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -737,7 +737,7 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             _buildLoginMethodButton(
               icon: Icons.fingerprint,
-              label: 'Passkey',
+              label: S.of(context)?.passkeyLabel ?? 'Passkey',
               onTap: _loginWithPasskey,
             ),
             const SizedBox(width: 32),
@@ -759,7 +759,7 @@ class _LoginPageState extends State<LoginPage> {
               iconPath: null,
               icon: Icons.g_mobiledata,
               color: const Color(0xFFDB4437),
-              label: 'Google',
+              label: S.of(context)?.googleLabel ?? 'Google',
               onTap: _loginWithGoogle,
             ),
             const SizedBox(width: 24),
@@ -770,7 +770,7 @@ class _LoginPageState extends State<LoginPage> {
                 color: context.isDarkMode
                     ? Colors.white
                     : Colors.black,
-                label: 'Apple',
+                label: S.of(context)?.appleLabel ?? 'Apple',
                 onTap: _loginWithApple,
               ),
             if (!kIsWeb && (Platform.isIOS || Platform.isMacOS))
@@ -779,7 +779,7 @@ class _LoginPageState extends State<LoginPage> {
               iconPath: null,
               icon: Icons.login,
               color: AppColors.primary,
-              label: 'SSO',
+              label: S.of(context)?.ssoLabel ?? 'SSO',
               onTap: _loginWithSso,
             ),
           ],

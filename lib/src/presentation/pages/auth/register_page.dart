@@ -240,7 +240,7 @@ class _RegisterPageState extends State<RegisterPage> {
           controller: _homeserverController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: 'https://m.si46.world',
+            hintText: S.of(context)?.serverAddressHint ?? 'https://m.si46.world',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,

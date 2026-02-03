@@ -1896,7 +1896,7 @@ class MatrixMessageDataSource {
     try {
       final uri = Uri.parse(mxcUrl);
       if (width != null && height != null) {
-        return uri.getThumbnail(
+        return uri.getThumbnailUri(
           _client!,
           width: width,
           height: height,
