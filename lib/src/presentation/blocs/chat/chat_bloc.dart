@@ -68,7 +68,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) async {
     _currentRoomId = event.roomId;
-    _locallyDeletedMessageIds.clear(); // 新聊天室，清除已删除消息ID集合
+    _locallyDeletedMessageIds.clear();
+
+    // 从持久化存储加载已删除的消息ID
+    try {
+      final persistedDeletedIds = await _messageRepository.getLocallyDeletedMessageIds(event.roomId);
+      _locallyDeletedMessageIds.addAll(persistedDeletedIds);
+      debugPrint('ChatBloc: Loaded ${persistedDeletedIds.length} locally deleted message IDs from storage');
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to load locally deleted message IDs: $e');
+    }
+
     emit(state.copyWith(roomId: event.roomId, isLoading: true, clearError: true));
 
     // 加载消息并订阅更新
@@ -624,20 +634,34 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
   
   /// 本地删除消息（不发送到服务器）
-  void _onDeleteMessagesLocally(
+  Future<void> _onDeleteMessagesLocally(
     DeleteMessagesLocally event,
     Emitter<ChatState> emit,
-  ) {
+  ) async {
+    if (_currentRoomId == null) return;
+
     final idsToDelete = event.messageIds.toSet();
-    
-    // 将删除的消息ID添加到集合中，防止被消息订阅恢复
+
+    // 将删除的消息ID添加到内存集合中，防止被消息订阅恢复
     _locallyDeletedMessageIds.addAll(idsToDelete);
     debugPrint('ChatBloc: Locally deleted message IDs: $idsToDelete');
-    
+
+    // 立即更新 UI
     final updatedMessages = state.messages
         .where((m) => !idsToDelete.contains(m.id))
         .toList();
     emit(state.copyWith(messages: updatedMessages));
+
+    // 持久化到存储（异步，不阻塞 UI）
+    try {
+      await _messageRepository.markMessagesAsLocallyDeleted(
+        _currentRoomId!,
+        event.messageIds,
+      );
+      debugPrint('ChatBloc: Persisted ${event.messageIds.length} deleted message IDs to storage');
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to persist deleted message IDs: $e');
+    }
   }
   
   /// 删除发送失败的消息（从本地和服务器）
