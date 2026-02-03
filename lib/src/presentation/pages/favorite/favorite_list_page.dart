@@ -182,7 +182,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.primary.withOpacity(0.1)
+                    ? AppColors.primary.withValues(alpha: 0.1)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -332,7 +332,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: const Icon(
@@ -375,7 +375,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
+                color: Colors.blue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: const Icon(
@@ -417,7 +417,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: const Icon(

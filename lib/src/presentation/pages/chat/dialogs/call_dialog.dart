@@ -145,7 +145,7 @@ class _CallDialogState extends State<CallDialog> {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primary.withOpacity(0.3),
+                color: AppColors.primary.withValues(alpha: 0.3),
                 border: Border.all(color: AppColors.primary, width: 3),
               ),
               child: widget.contactAvatar != null
@@ -179,7 +179,7 @@ class _CallDialogState extends State<CallDialog> {
                   ? _getCallStatusText(context)
                   : _formatDuration(_callDuration),
               style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 16,
               ),
             ),
@@ -280,7 +280,7 @@ class _CallDialogState extends State<CallDialog> {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: isActive ? Colors.white : Colors.white.withOpacity(0.2),
+              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -293,7 +293,7 @@ class _CallDialogState extends State<CallDialog> {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 12,
             ),
           ),

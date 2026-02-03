@@ -66,7 +66,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50).withOpacity(0.3),
+                      color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -103,7 +103,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                     _beanCount > 0 ? '$_beanCount' : (s?.noN42Bean ?? 'No N42 Bean'),
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -191,7 +191,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDark
-                        ? AppColors.surfaceDark.withOpacity(0.5)
+                        ? AppColors.surfaceDark.withValues(alpha: 0.5)
                         : const Color(0xFFF5F5F5),
                     foregroundColor: isDark
                         ? AppColors.textPrimaryDark

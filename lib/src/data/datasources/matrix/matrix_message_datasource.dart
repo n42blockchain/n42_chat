@@ -1903,6 +1903,7 @@ class MatrixMessageDataSource {
           method: matrix.ThumbnailMethod.scale,
         );
       }
+      // ignore: deprecated_member_use
       return uri.getDownloadLink(_client!);
     } catch (e) {
       return null;

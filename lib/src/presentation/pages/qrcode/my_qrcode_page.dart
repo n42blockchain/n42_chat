@@ -41,11 +41,14 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
         
         // 异步获取头像URL
         try {
-          final profile = await client.ownProfile;
-          if (mounted) {
-            setState(() {
-              _avatarUrl = profile.avatarUrl?.toString();
-            });
+          final userId = client.userID;
+          if (userId != null) {
+            final profile = await client.getUserProfile(userId);
+            if (mounted) {
+              setState(() {
+                _avatarUrl = profile.avatarUrl?.toString();
+              });
+            }
           }
         } catch (_) {}
       }
@@ -116,7 +119,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -256,7 +259,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFF07C160).withOpacity(0.1),
+              color: const Color(0xFF07C160).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: const Color(0xFF07C160), size: 24),

@@ -136,7 +136,7 @@ class SettingsPage extends StatelessWidget {
                   trailing: Switch(
                     value: isBiometricEnabled,
                     onChanged: onBiometricToggle,
-                    activeColor: AppColors.primary,
+                    activeTrackColor: AppColors.primary,
                   ),
                   onTap: onBiometricToggle != null
                       ? () => onBiometricToggle!(!isBiometricEnabled)

@@ -1104,7 +1104,7 @@ class _ChatPageState extends State<ChatPage> {
           _inputBarKey.currentState?.cancelRecording();
         },
         child: Container(
-          color: Colors.black.withOpacity(0.7),
+          color: Colors.black.withValues(alpha: 0.7),
           child: SafeArea(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1119,7 +1119,7 @@ class _ChatPageState extends State<ChatPage> {
                     boxShadow: [
                       BoxShadow(
                         color: (_isRecordingCancelled ? AppColors.error : AppColors.primary)
-                            .withOpacity(0.4),
+                            .withValues(alpha: 0.4),
                         blurRadius: 30,
                         spreadRadius: 10,
                       ),
@@ -1151,8 +1151,8 @@ class _ChatPageState extends State<ChatPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   decoration: BoxDecoration(
                     color: _isRecordingCancelled 
-                        ? AppColors.error.withOpacity(0.2) 
-                        : Colors.white.withOpacity(0.1),
+                        ? AppColors.error.withValues(alpha: 0.2) 
+                        : Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -2432,7 +2432,7 @@ Avatar: ${contactAvatar ?? ''}''';
           onPressed: _selectAllMessages,
           child: Text(
             S.of(context)?.selectAll ?? 'Select All',
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.primary,
               fontSize: 14,
             ),
@@ -2664,7 +2664,7 @@ Avatar: ${contactAvatar ?? ''}''';
       child: Container(
         key: messageKey,
         color: isSelected
-            ? (isDark ? Colors.white.withOpacity(0.1) : Colors.blue.withOpacity(0.1))
+            ? (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.blue.withValues(alpha: 0.1))
             : Colors.transparent,
         child: Row(
           children: [
@@ -2741,7 +2741,7 @@ Avatar: ${contactAvatar ?? ''}''';
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.lock_outline,
               size: 16,
               color: AppColors.primary,
@@ -2751,7 +2751,7 @@ Avatar: ${contactAvatar ?? ''}''';
               child: Text(
                 S.of(context)?.encryptionNotice ?? 'This chat is end-to-end encrypted. Only you and the recipient can read the messages.',
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.primary,
                   height: 1.4,
@@ -2806,7 +2806,7 @@ Avatar: ${contactAvatar ?? ''}''';
                   children: [
                     Text(
                       replyToText,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w500,
@@ -2816,7 +2816,7 @@ Avatar: ${contactAvatar ?? ''}''';
                       state.replyTarget!.content,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
                       ),
@@ -2858,7 +2858,7 @@ Avatar: ${contactAvatar ?? ''}''';
         color: isDark ? AppColors.surfaceDark : AppColors.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             offset: const Offset(0, -1),
             blurRadius: 3,
           ),
@@ -3930,7 +3930,7 @@ Avatar: ${contactAvatar ?? ''}''';
               const SizedBox(height: 8),
               Text(
                 S.of(context)?.noteOtherMessages(otherMessages.length) ?? 'Note: ${otherMessages.length} messages are from others, can only delete locally.',
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 13,
                 ),
@@ -3940,7 +3940,7 @@ Avatar: ${contactAvatar ?? ''}''';
               const SizedBox(height: 8),
               Text(
                 S.of(context)?.myMessagesWillBeRecalled(myMessages.length) ?? '${myMessages.length} messages from you will be recalled.',
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 13,
                 ),
@@ -3957,7 +3957,7 @@ Avatar: ${contactAvatar ?? ''}''';
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
               S.of(context)?.delete ?? 'Delete',
-              style: TextStyle(color: AppColors.error),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -4615,7 +4615,7 @@ class _CallDialogState extends State<_CallDialog> {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primary.withOpacity(0.3),
+                color: AppColors.primary.withValues(alpha: 0.3),
                 border: Border.all(color: AppColors.primary, width: 3),
               ),
               child: widget.contactAvatar != null
@@ -4649,7 +4649,7 @@ class _CallDialogState extends State<_CallDialog> {
                   ? _getCallStatusText(context)
                   : _formatDuration(_callDuration),
               style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 16,
               ),
             ),
@@ -4755,7 +4755,7 @@ class _CallDialogState extends State<_CallDialog> {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: isActive ? Colors.white : Colors.white.withOpacity(0.2),
+              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -4768,7 +4768,7 @@ class _CallDialogState extends State<_CallDialog> {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 12,
             ),
           ),
@@ -5293,7 +5293,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.location_off,
                         size: 64,
                         color: Colors.grey,
@@ -6616,7 +6616,7 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
                 prefixIcon: Icon(Icons.search, color: subtextColor),
                 filled: true,
                 fillColor: widget.isDark 
-                    ? Colors.white.withOpacity(0.1) 
+                    ? Colors.white.withValues(alpha: 0.1) 
                     : Colors.grey[200],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -6813,7 +6813,7 @@ class _MultiForwardSheetState extends State<_MultiForwardSheet> {
                 prefixIcon: Icon(Icons.search, color: subtextColor),
                 filled: true,
                 fillColor: widget.isDark 
-                    ? Colors.white.withOpacity(0.1) 
+                    ? Colors.white.withValues(alpha: 0.1) 
                     : Colors.grey[200],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -7483,7 +7483,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                           height: 24,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
+                            color: Colors.green.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -7605,7 +7605,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                                 _isAnonymous = value;
                               });
                             },
-                            activeColor: Colors.green,
+                            activeTrackColor: Colors.green,
                           ),
                         ],
                       ),
@@ -7619,7 +7619,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -7728,7 +7728,7 @@ class _ContactSelectDialogState extends State<_ContactSelectDialog> {
                     ),
                     subtitle: Text(
                       contact.userId,
-                      style: TextStyle(fontSize: 12, color: textColor.withOpacity(0.6)),
+                      style: TextStyle(fontSize: 12, color: textColor.withValues(alpha: 0.6)),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

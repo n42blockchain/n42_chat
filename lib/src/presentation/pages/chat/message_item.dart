@@ -274,11 +274,11 @@ class MessageItem extends StatelessWidget {
   /// 构建回复引用块
   Widget _buildReplyQuote(bool isDark) {
     final bgColor = message.isFromMe
-        ? Colors.black.withOpacity(0.1)
-        : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05));
+        ? Colors.black.withValues(alpha: 0.1)
+        : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05));
     
     final textColor = message.isFromMe
-        ? AppColors.messageTextSent.withOpacity(0.8)
+        ? AppColors.messageTextSent.withValues(alpha: 0.8)
         : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary);
     
     return Container(
@@ -451,7 +451,7 @@ class MessageItem extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             color: message.isFromMe
-                                ? AppColors.messageTextSent.withOpacity(0.6)
+                                ? AppColors.messageTextSent.withValues(alpha: 0.6)
                                 : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
                           ),
                           maxLines: 1,
@@ -471,8 +471,8 @@ class MessageItem extends StatelessWidget {
                 border: Border(
                   top: BorderSide(
                     color: message.isFromMe
-                        ? Colors.black.withOpacity(0.1)
-                        : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05)),
+                        ? Colors.black.withValues(alpha: 0.1)
+                        : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
                     width: 0.5,
                   ),
                 ),
@@ -482,7 +482,7 @@ class MessageItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   color: message.isFromMe
-                      ? AppColors.messageTextSent.withOpacity(0.5)
+                      ? AppColors.messageTextSent.withValues(alpha: 0.5)
                       : (isDark ? AppColors.textSecondaryDark : AppColors.textTertiary),
                 ),
               ),
@@ -632,14 +632,14 @@ class MessageItem extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.videocam,
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withValues(alpha: 0.6),
                       size: 48,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       S.of(context)?.videoTitle ?? 'Video',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
+                        color: Colors.white.withValues(alpha: 0.6),
                         fontSize: 14,
                       ),
                     ),
@@ -647,7 +647,7 @@ class MessageItem extends StatelessWidget {
                       Text(
                         _formatFileSize(fileSize),
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
+                          color: Colors.white.withValues(alpha: 0.4),
                           fontSize: 12,
                         ),
                       ),
@@ -659,7 +659,7 @@ class MessageItem extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
               ),
@@ -677,7 +677,7 @@ class MessageItem extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -697,7 +697,7 @@ class MessageItem extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Icon(
@@ -1003,7 +1003,7 @@ class MessageItem extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: cover != null && cover.isNotEmpty
@@ -1049,7 +1049,7 @@ class MessageItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       color: message.isFromMe
-                          ? AppColors.messageTextSent.withOpacity(0.7)
+                          ? AppColors.messageTextSent.withValues(alpha: 0.7)
                           : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
                     ),
                     maxLines: 1,
@@ -1099,7 +1099,7 @@ class MessageItem extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
@@ -1129,7 +1129,7 @@ class MessageItem extends StatelessWidget {
                   margin: const EdgeInsets.only(left: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: Colors.grey.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -1182,7 +1182,7 @@ class MessageItem extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: isSelected 
-                      ? AppColors.primary.withOpacity(0.1)
+                      ? AppColors.primary.withValues(alpha: 0.1)
                       : (isDark ? Colors.grey[800] : Colors.grey[100]),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(

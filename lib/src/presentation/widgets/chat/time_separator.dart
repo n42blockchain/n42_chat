@@ -171,7 +171,7 @@ class RedPacketClaimMessageWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               border: Border.all(
-                color: const Color(0xFFE64340).withOpacity(0.3),
+                color: const Color(0xFFE64340).withValues(alpha: 0.3),
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(4),

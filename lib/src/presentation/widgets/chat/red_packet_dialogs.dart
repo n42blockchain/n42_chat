@@ -249,7 +249,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05),
+                            color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
@@ -280,7 +280,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                           ),
                           decoration: InputDecoration(
                             hintText: _decimalPlaces > 2 ? '0.0' : '0.00',
-                            hintStyle: TextStyle(color: secondaryTextColor.withOpacity(0.5)),
+                            hintStyle: TextStyle(color: secondaryTextColor.withValues(alpha: 0.5)),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
                             isDense: true,
@@ -301,7 +301,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                     style: TextStyle(color: textColor, fontSize: 16),
                     decoration: InputDecoration(
                       hintText: S.of(context)?.redPacketDefaultGreeting ?? 'Best wishes',
-                      hintStyle: TextStyle(color: secondaryTextColor.withOpacity(0.5)),
+                      hintStyle: TextStyle(color: secondaryTextColor.withValues(alpha: 0.5)),
                       border: InputBorder.none,
                       counterText: '',
                       contentPadding: EdgeInsets.zero,
@@ -452,7 +452,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 Text(
                   S.of(context)?.redPacketRefundNotice ?? 'Unclaimed red packets will be refunded after 24 hours',
                   style: TextStyle(
-                    color: secondaryTextColor.withOpacity(0.6),
+                    color: secondaryTextColor.withValues(alpha: 0.6),
                     fontSize: 12,
                   ),
                 ),
@@ -546,7 +546,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
         decoration: BoxDecoration(
           color: selected
               ? const Color(0xFFE85D04)
-              : (isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
+              : (isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05)),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
@@ -663,7 +663,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05),
+                        color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Center(
@@ -748,7 +748,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                                       : null,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: Colors.black.withValues(alpha: 0.1),
                                       blurRadius: 8,
                                       offset: const Offset(0, 4),
                                     ),
@@ -1580,7 +1580,7 @@ class RedPacketDetailPage extends StatelessWidget {
                     Text(
                       greeting ?? S.of(context)?.redPacketDefaultGreeting ?? 'Best wishes',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 15,
                       ),
                     ),
@@ -1631,13 +1631,13 @@ class RedPacketDetailPage extends StatelessWidget {
                             Text(
                               S.of(context)?.savedToBalance ?? 'Saved to balance, can transfer directly',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                                 fontSize: 14,
                               ),
                             ),
                             Icon(
                               Icons.chevron_right,
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                               size: 18,
                             ),
                           ],
@@ -1650,7 +1650,7 @@ class RedPacketDetailPage extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -1660,7 +1660,7 @@ class RedPacketDetailPage extends StatelessWidget {
                               width: 32,
                               height: 32,
                               decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(0.2),
+                                color: Colors.orange.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: const Center(child: Text('🐕', style: TextStyle(fontSize: 20))),
@@ -1669,7 +1669,7 @@ class RedPacketDetailPage extends StatelessWidget {
                             Text(
                               S.of(context)?.replyWithEmoji ?? 'Reply with this emoji',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                                 fontSize: 14,
                               ),
                             ),
@@ -1743,7 +1743,7 @@ class RedPacketDetailPage extends StatelessWidget {
                   Text(
                     claimer.claimTime!,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 13,
                     ),
                   ),
@@ -1814,7 +1814,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: const Color(0xFFF9A825).withOpacity(0.1),
+                color: const Color(0xFFF9A825).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.account_balance_wallet, size: 32, color: Color(0xFFF9A825)),

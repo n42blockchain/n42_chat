@@ -848,7 +848,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   debugPrint('ChatDetailPage: Switch widget toggled for $title to $newValue');
                   onChanged(newValue);
                 },
-                activeColor: AppColors.primary,
+                activeTrackColor: AppColors.primary,
               ),
             ],
           ),
@@ -1115,7 +1115,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: Colors.orange.withOpacity(0.2),
+                                      color: Colors.orange.withValues(alpha: 0.2),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
@@ -1128,7 +1128,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: Colors.blue.withOpacity(0.2),
+                                      color: Colors.blue.withValues(alpha: 0.2),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(

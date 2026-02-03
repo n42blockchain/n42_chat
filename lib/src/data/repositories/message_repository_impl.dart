@@ -375,6 +375,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       // 方法3: 使用 SDK 的 getDownloadLink (无认证，适用于公开媒体)
       debugPrint('downloadMedia: Trying SDK getDownloadLink');
       try {
+        // ignore: deprecated_member_use
         final downloadLink = uri.getDownloadLink(_client!);
         debugPrint('downloadMedia: SDK download link: $downloadLink');
 
@@ -528,8 +529,11 @@ class MessageRepositoryImpl implements IMessageRepository {
         // 获取发送者名称
         String senderName = '';
         try {
-          final profile = await _client?.ownProfile;
-          senderName = profile?.displayName ?? _client?.userID?.split(':').first.replaceFirst('@', '') ?? '';
+          final userId = _client?.userID;
+          if (userId != null) {
+            final profile = await _client?.getUserProfile(userId);
+            senderName = profile?.displayname ?? userId.split(':').first.replaceFirst('@', '');
+          }
         } catch (e) {
           senderName = _client?.userID?.split(':').first.replaceFirst('@', '') ?? '';
         }
@@ -584,8 +588,11 @@ class MessageRepositoryImpl implements IMessageRepository {
         // 获取发送者名称
         String senderName = '';
         try {
-          final profile = await _client?.ownProfile;
-          senderName = profile?.displayName ?? _client?.userID?.split(':').first.replaceFirst('@', '') ?? '';
+          final userId = _client?.userID;
+          if (userId != null) {
+            final profile = await _client?.getUserProfile(userId);
+            senderName = profile?.displayname ?? userId.split(':').first.replaceFirst('@', '');
+          }
         } catch (e) {
           senderName = _client?.userID?.split(':').first.replaceFirst('@', '') ?? '';
         }

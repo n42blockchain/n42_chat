@@ -272,7 +272,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.primary,
+            activeTrackColor: AppColors.primary,
           ),
         ],
       ),

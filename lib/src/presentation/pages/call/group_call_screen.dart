@@ -330,7 +330,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.8),
+                          color: Colors.red.withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Icon(
@@ -378,7 +378,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.9),
+                    color: AppColors.primary.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Row(
@@ -476,7 +476,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.black.withOpacity(0.7),
+              Colors.black.withValues(alpha: 0.7),
               Colors.transparent,
             ],
           ),
@@ -510,7 +510,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       Text(
                         S.of(context)?.participantCount(_participants.length) ?? '${_participants.length} participants',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 12,
                         ),
                       ),
@@ -527,7 +527,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       Text(
                         _formatDuration(_duration),
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 12,
                           fontFeatures: const [FontFeature.tabularFigures()],
                         ),
@@ -587,7 +587,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
             colors: [
-              Colors.black.withOpacity(0.8),
+              Colors.black.withValues(alpha: 0.8),
               Colors.transparent,
             ],
           ),
@@ -667,7 +667,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: backgroundColor ?? 
-                  (isActive ? (activeColor ?? Colors.white) : Colors.white.withOpacity(0.2)),
+                  (isActive ? (activeColor ?? Colors.white) : Colors.white.withValues(alpha: 0.2)),
             ),
             child: Icon(
               icon,
@@ -679,7 +679,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 11,
             ),
           ),
@@ -695,7 +695,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       bottom: 0,
       child: Container(
         width: 280,
-        color: Colors.black.withOpacity(0.9),
+        color: Colors.black.withValues(alpha: 0.9),
         child: Column(
           children: [
             // 标题栏
@@ -708,7 +708,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               ),
               decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Colors.white.withOpacity(0.1)),
+                  bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                 ),
               ),
               child: Row(
@@ -725,7 +725,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.2),
+                      color: AppColors.primary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -810,7 +810,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   Widget _buildConnectingOverlay() {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withOpacity(0.8),
+        color: Colors.black.withValues(alpha: 0.8),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

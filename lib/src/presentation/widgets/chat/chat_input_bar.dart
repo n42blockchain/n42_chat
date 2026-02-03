@@ -449,7 +449,7 @@ class ChatInputBarState extends State<ChatInputBar> {
         height: 40,
         decoration: BoxDecoration(
           color: _isRecording
-              ? (_cancelRecording ? AppColors.error.withOpacity(0.1) : AppColors.primary.withOpacity(0.1))
+              ? (_cancelRecording ? AppColors.error.withValues(alpha: 0.1) : AppColors.primary.withValues(alpha: 0.1))
               : (isDark ? AppColors.surfaceDark : AppColors.surface),
           borderRadius: BorderRadius.circular(4),
           border: _isRecording

@@ -73,7 +73,7 @@ class WeChatMessageMenu extends StatelessWidget {
           children: [
             // 半透明背景
             Container(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
             ),
             // 菜单
             Positioned(
@@ -155,7 +155,7 @@ class WeChatMessageMenu extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -170,7 +170,7 @@ class WeChatMessageMenu extends StatelessWidget {
           // 分隔线
           Container(
             height: 0.5,
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
           ),
           
           // 第一行按钮
@@ -260,7 +260,7 @@ class WeChatMessageMenu extends StatelessWidget {
           Container(
             margin: const EdgeInsets.symmetric(vertical: 8),
             height: 0.5,
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
           ),
           
           // 第二行按钮
@@ -330,8 +330,8 @@ class WeChatMessageMenu extends StatelessWidget {
           onReaction?.call(emoji);
         },
         borderRadius: BorderRadius.circular(22),
-        splashColor: Colors.white.withOpacity(0.2),
-        highlightColor: Colors.white.withOpacity(0.1),
+        splashColor: Colors.white.withValues(alpha: 0.2),
+        highlightColor: Colors.white.withValues(alpha: 0.1),
         child: Container(
           width: 44,
           height: 44,
@@ -367,14 +367,14 @@ class WeChatMessageMenu extends StatelessWidget {
             );
           },
           borderRadius: BorderRadius.circular(20),
-          splashColor: Colors.white.withOpacity(0.2),
-          highlightColor: Colors.white.withOpacity(0.1),
+          splashColor: Colors.white.withValues(alpha: 0.2),
+          highlightColor: Colors.white.withValues(alpha: 0.1),
           child: Container(
             width: 40,
             height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Icon(
@@ -399,8 +399,8 @@ class WeChatMessageMenu extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
-        splashColor: Colors.white.withOpacity(0.1),
-        highlightColor: Colors.white.withOpacity(0.05),
+        splashColor: Colors.white.withValues(alpha: 0.1),
+        highlightColor: Colors.white.withValues(alpha: 0.05),
         child: Container(
           width: 58,
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),

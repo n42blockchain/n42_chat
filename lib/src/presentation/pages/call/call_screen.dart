@@ -196,8 +196,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            AppColors.primary.withOpacity(0.8),
-            AppColors.primary.withOpacity(0.4),
+            AppColors.primary.withValues(alpha: 0.8),
+            AppColors.primary.withValues(alpha: 0.4),
             Colors.black,
           ],
         ),
@@ -230,7 +230,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -284,7 +284,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                     width: 2,
                   ),
                 ),
@@ -314,7 +314,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           Text(
             _getStatusText(context),
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               fontSize: 16,
             ),
           ),
@@ -449,7 +449,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isActive ? Colors.white : Colors.white.withOpacity(0.2),
+              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.2),
             ),
             child: Icon(
               icon,
@@ -461,7 +461,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 12,
             ),
           ),
@@ -489,7 +489,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               color: color,
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.4),
+                  color: color.withValues(alpha: 0.4),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -526,7 +526,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           color: Colors.red,
           boxShadow: [
             BoxShadow(
-              color: Colors.red.withOpacity(0.4),
+              color: Colors.red.withValues(alpha: 0.4),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),

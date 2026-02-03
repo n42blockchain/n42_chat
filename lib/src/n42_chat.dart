@@ -716,7 +716,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.15),
+                  color: Colors.orange.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(

@@ -88,7 +88,7 @@ class _ContactSelectDialogState extends State<ContactSelectDialog> {
                     ),
                     subtitle: Text(
                       contact.userId,
-                      style: TextStyle(fontSize: 12, color: textColor.withOpacity(0.6)),
+                      style: TextStyle(fontSize: 12, color: textColor.withValues(alpha: 0.6)),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

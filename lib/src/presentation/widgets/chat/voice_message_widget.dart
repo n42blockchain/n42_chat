@@ -281,7 +281,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.placeholder.withOpacity(0.3),
+                color: AppColors.placeholder.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(

@@ -360,7 +360,7 @@ class N42SettingsTile extends StatelessWidget {
       return Switch(
         value: switchValue!,
         onChanged: onSwitchChanged,
-        activeColor: AppColors.primary,
+        activeTrackColor: AppColors.primary,
       );
     }
 
