@@ -1883,17 +1883,17 @@ class SEn extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return 'Note: $count messages are from others, can only delete locally.';
+    return 'Note: $count messages are from others and will only be deleted for you.';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return '$count messages from you will be recalled.';
+    return '$count messages from you will be recalled for everyone.';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return 'Recalled $count messages, deleted $localCount locally';
+    return 'Recalled $count messages, $localCount deleted only for you';
   }
 
   @override
@@ -1903,7 +1903,7 @@ class SEn extends S {
 
   @override
   String deletedLocally(Object count) {
-    return 'Deleted $count messages (locally)';
+    return '$count messages deleted only for you';
   }
 
   @override

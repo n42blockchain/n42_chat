@@ -1903,17 +1903,17 @@ class SDe extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return 'Hinweis: $count Nachrichten sind von anderen, können nur lokal gelöscht werden.';
+    return 'Hinweis: $count Nachrichten sind von anderen und werden nur für Sie gelöscht.';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return '$count Nachrichten von Ihnen werden zurückgerufen.';
+    return '$count Nachrichten von Ihnen werden für alle zurückgerufen.';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return '$count Nachrichten zurückgerufen, $localCount lokal gelöscht';
+    return '$count Nachrichten zurückgerufen, $localCount nur für Sie gelöscht';
   }
 
   @override
@@ -1923,7 +1923,7 @@ class SDe extends S {
 
   @override
   String deletedLocally(Object count) {
-    return '$count Nachrichten gelöscht (lokal)';
+    return '$count Nachrichten nur für Sie gelöscht';
   }
 
   @override

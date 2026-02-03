@@ -1907,17 +1907,17 @@ class SPt extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return 'Nota: $count mensagens são de outros, só podem ser excluídas localmente.';
+    return 'Nota: $count mensagens são de outros e serão excluídas apenas para você.';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return '$count mensagens suas serão desfeitas.';
+    return '$count mensagens suas serão desfeitas para todos.';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return 'Desfeitas $count mensagens, excluídas $localCount localmente';
+    return 'Desfeitas $count mensagens, $localCount excluídas apenas para você';
   }
 
   @override
@@ -1927,7 +1927,7 @@ class SPt extends S {
 
   @override
   String deletedLocally(Object count) {
-    return 'Excluídas $count mensagens (localmente)';
+    return '$count mensagens excluídas apenas para você';
   }
 
   @override

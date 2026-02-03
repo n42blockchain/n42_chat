@@ -1871,17 +1871,17 @@ class SKo extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return '참고: $count개의 메시지는 다른 사람의 것으로, 로컬에서만 삭제됩니다.';
+    return '참고: $count개의 메시지는 다른 사람의 것으로, 나에게만 삭제됩니다.';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return '내 $count개의 메시지가 취소됩니다.';
+    return '내 $count개의 메시지가 모든 사람에게 취소됩니다.';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return '$count개 취소됨, $localCount개 로컬 삭제됨';
+    return '$count개 취소됨, $localCount개 나에게만 삭제됨';
   }
 
   @override
@@ -1891,7 +1891,7 @@ class SKo extends S {
 
   @override
   String deletedLocally(Object count) {
-    return '$count개 메시지 삭제됨 (로컬)';
+    return '$count개 메시지가 나에게만 삭제됨';
   }
 
   @override

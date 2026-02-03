@@ -3526,19 +3526,19 @@ abstract class S {
   /// No description provided for @noteOtherMessages.
   ///
   /// In zh, this message translates to:
-  /// **'注意：{count} 条消息是他人发送的，只能在本地删除。'**
+  /// **'注意：{count} 条消息来自他人，仅对你删除。'**
   String noteOtherMessages(Object count);
 
   /// No description provided for @myMessagesWillBeRecalled.
   ///
   /// In zh, this message translates to:
-  /// **'{count} 条自己发送的消息将被撤回。'**
+  /// **'{count} 条你发送的消息将对所有人撤回。'**
   String myMessagesWillBeRecalled(Object count);
 
   /// No description provided for @recalledCount.
   ///
   /// In zh, this message translates to:
-  /// **'已撤回 {count} 条消息，本地删除 {localCount} 条'**
+  /// **'已撤回 {count} 条消息，{localCount} 条仅对你删除'**
   String recalledCount(Object count, Object localCount);
 
   /// No description provided for @recalledMessages.
@@ -3550,7 +3550,7 @@ abstract class S {
   /// No description provided for @deletedLocally.
   ///
   /// In zh, this message translates to:
-  /// **'已删除 {count} 条消息（仅本地）'**
+  /// **'{count} 条消息仅对你删除'**
   String deletedLocally(Object count);
 
   /// No description provided for @forwardedCount.

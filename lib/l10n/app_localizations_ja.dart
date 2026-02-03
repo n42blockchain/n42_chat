@@ -1871,17 +1871,17 @@ class SJa extends S {
 
   @override
   String noteOtherMessages(Object count) {
-    return '注意: $count件のメッセージは他のユーザーからのもので、ローカルでのみ削除できます。';
+    return '注意: $count件のメッセージは他のユーザーからのもので、あなたにのみ削除されます。';
   }
 
   @override
   String myMessagesWillBeRecalled(Object count) {
-    return 'あなたの$count件のメッセージは取り消されます。';
+    return 'あなたの$count件のメッセージは全員に対して取り消されます。';
   }
 
   @override
   String recalledCount(Object count, Object localCount) {
-    return '$count件取り消し、$localCount件をローカルで削除しました';
+    return '$count件取り消し、$localCount件はあなたにのみ削除';
   }
 
   @override
@@ -1891,7 +1891,7 @@ class SJa extends S {
 
   @override
   String deletedLocally(Object count) {
-    return '$count件のメッセージを削除しました（ローカル）';
+    return '$count件のメッセージはあなたにのみ削除されました';
   }
 
   @override
