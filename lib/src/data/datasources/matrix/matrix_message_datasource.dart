@@ -1713,38 +1713,38 @@ class MatrixMessageDataSource {
   /// 对于需要认证的服务器，添加 access_token 参数
   String? _buildHttpUrl(String? mxcUrl, {int? width, int? height, String method = 'scale'}) {
     if (mxcUrl == null || mxcUrl.isEmpty || _client == null) return null;
-    
+
     // 如果已经是 HTTP URL，直接返回
     if (mxcUrl.startsWith('http://') || mxcUrl.startsWith('https://')) {
       return mxcUrl;
     }
-    
+
     // 验证是否是有效的 mxc:// URL
     if (!mxcUrl.startsWith('mxc://')) {
       debugPrint('Invalid mxc URL: $mxcUrl');
       return null;
     }
-    
+
     try {
       // 解析 mxc://server/mediaId
       final uri = Uri.parse(mxcUrl);
       final serverName = uri.host;
       final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-      
+
       if (serverName.isEmpty || mediaId.isEmpty) {
         debugPrint('Invalid mxc URL format: $mxcUrl');
         return null;
       }
-      
+
       final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) {
         debugPrint('No homeserver configured');
         return null;
       }
-      
+
       // 构建 HTTP URL
-      // Matrix 1.11+ 认证媒体使用 /_matrix/client/v1/media/ 路径
-      // 旧版使用 /_matrix/media/v3/ 路径
+      // 优先使用 Matrix 1.11+ 认证媒体 API
+      // 如果服务器不支持，视频播放器会显示错误，用户可以重试
       String url;
       if (width != null && height != null) {
         // 缩略图 URL - 使用认证媒体 API
@@ -1753,8 +1753,8 @@ class MatrixMessageDataSource {
         // 完整下载 URL - 使用认证媒体 API
         url = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
       }
-      
-      debugPrint('Built media URL: $url');
+
+      debugPrint('Built media URL: $url (mxcUrl: $mxcUrl)');
       return url;
     } catch (e) {
       debugPrint('Error building HTTP URL: $e');
@@ -1801,15 +1801,18 @@ class MatrixMessageDataSource {
 
     // 视频信息
     if (event.messageType == matrix.MessageTypes.Video) {
+      final httpUrl = _convertMxcToHttp(mxcUrl);
+      final thumbnailHttpUrl = _convertMxcToHttp(thumbnailMxc, width: 400, height: 400);
+      debugPrint('Video metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, thumbnailMxc=$thumbnailMxc, thumbnailHttpUrl=$thumbnailHttpUrl');
       return MessageMetadata(
         mediaUrl: mxcUrl,
-        httpUrl: _convertMxcToHttp(mxcUrl),
+        httpUrl: httpUrl,
         width: info?['w'] as int?,
         height: info?['h'] as int?,
         duration: info?['duration'] as int?,
         size: info?['size'] as int?,
         mimeType: info?['mimetype'] as String?,
-        thumbnailUrl: _convertMxcToHttp(thumbnailMxc, width: 400, height: 400),
+        thumbnailUrl: thumbnailHttpUrl,
       );
     }
 
