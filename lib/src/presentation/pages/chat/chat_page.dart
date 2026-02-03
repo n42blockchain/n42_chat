@@ -186,17 +186,21 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     // 取消备注更新订阅
     _remarkSubscription?.cancel();
-    
+
     // 先清理聊天室（在 super.dispose 之前）
     try {
       context.read<ChatBloc>().add(const DisposeChat());
     } catch (e) {
       debugPrint('ChatPage: Error disposing ChatBloc: $e');
     }
-    
+
+    // 移除监听器（必须在 dispose 之前）
+    _scrollController.removeListener(_onScroll);
+    _inputFocusNode.removeListener(_onInputFocusChanged);
+
+    // 释放资源
     _scrollController.dispose();
     _inputController.dispose();
-    _inputFocusNode.removeListener(_onInputFocusChanged);
     _inputFocusNode.dispose();
 
     super.dispose();

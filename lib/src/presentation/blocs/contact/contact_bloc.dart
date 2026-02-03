@@ -45,7 +45,13 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
       _contactsSubscription?.cancel();
       _contactsSubscription = _contactRepository.watchContacts().listen(
         (contacts) {
-          add(const ContactsUpdated());
+          // 防止在 BLoC 关闭后添加事件
+          if (!isClosed) {
+            add(const ContactsUpdated());
+          }
+        },
+        onError: (Object error) {
+          debugPrint('ContactBloc: Contacts stream error: $error');
         },
       );
 
@@ -54,7 +60,13 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
       _onlineStatusSubscription =
           _contactRepository.watchOnlineStatus().listen(
         (statusMap) {
-          add(OnlineStatusUpdated(statusMap));
+          // 防止在 BLoC 关闭后添加事件
+          if (!isClosed) {
+            add(OnlineStatusUpdated(statusMap));
+          }
+        },
+        onError: (Object error) {
+          debugPrint('ContactBloc: Online status stream error: $error');
         },
       );
 

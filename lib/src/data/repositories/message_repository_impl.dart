@@ -17,8 +17,10 @@ class MessageRepositoryImpl implements IMessageRepository {
   final MatrixClientManager _clientManager;
   final SecureStorageDataSource _secureStorage;
 
-  // 缓存时间线，避免重复创建
+  // 缓存时间线，避免重复创建（使用 LRU 策略，最多缓存 5 个）
+  static const int _maxTimelineCacheSize = 5;
   final Map<String, matrix.Timeline> _timelines = {};
+  final List<String> _timelineAccessOrder = []; // 记录访问顺序，实现 LRU
 
   MessageRepositoryImpl(
     this._messageDataSource,
@@ -709,6 +711,10 @@ class MessageRepositoryImpl implements IMessageRepository {
   // ============================================
 
   Future<matrix.Timeline?> _getOrCreateTimeline(String roomId, {bool requestHistory = true}) async {
+    // 更新访问顺序（LRU）
+    _timelineAccessOrder.remove(roomId);
+    _timelineAccessOrder.add(roomId);
+
     if (_timelines.containsKey(roomId)) {
       return _timelines[roomId];
     }
@@ -716,9 +722,16 @@ class MessageRepositoryImpl implements IMessageRepository {
     final room = _client?.getRoomById(roomId);
     if (room == null) return null;
 
+    // 检查缓存是否已满，移除最久未使用的 timeline
+    while (_timelines.length >= _maxTimelineCacheSize && _timelineAccessOrder.isNotEmpty) {
+      final oldestRoomId = _timelineAccessOrder.removeAt(0);
+      _timelines.remove(oldestRoomId);
+      debugPrint('MessageRepositoryImpl: Evicted timeline cache for room $oldestRoomId (LRU)');
+    }
+
     final timeline = await room.getTimeline();
     _timelines[roomId] = timeline;
-    
+
     // 自动请求历史消息以确保有足够的消息显示
     if (requestHistory && timeline.events.length < 50) {
       debugPrint('MessageRepositoryImpl: Timeline has ${timeline.events.length} events, requesting more history...');
@@ -729,7 +742,7 @@ class MessageRepositoryImpl implements IMessageRepository {
         debugPrint('MessageRepositoryImpl: Failed to request history: $e');
       }
     }
-    
+
     return timeline;
   }
 
@@ -764,11 +777,13 @@ class MessageRepositoryImpl implements IMessageRepository {
   /// 清理时间线缓存
   void disposeTimeline(String roomId) {
     _timelines.remove(roomId);
+    _timelineAccessOrder.remove(roomId);
   }
 
   /// 清理所有时间线缓存
   void disposeAllTimelines() {
     _timelines.clear();
+    _timelineAccessOrder.clear();
   }
 
   // ============================================
