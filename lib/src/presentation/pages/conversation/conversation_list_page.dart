@@ -15,11 +15,13 @@ import '../../blocs/conversation/conversation_bloc.dart';
 import '../../blocs/conversation/conversation_event.dart';
 import '../../blocs/conversation/conversation_state.dart';
 import '../../blocs/group/group_bloc.dart';
+import '../../blocs/search/search_bloc.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../widgets/animations/fade_animation.dart';
 import '../contact/add_friend_page.dart';
 import '../group/create_group_page.dart';
 import '../qrcode/scan_qr_page.dart';
+import '../search/global_search_page.dart';
 import 'conversation_tile.dart';
 
 /// 会话列表页面（仿微信）
@@ -228,7 +230,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: GestureDetector(
-        onTap: widget.onSearchTap,
+        onTap: widget.onSearchTap ?? _navigateToSearch,
         child: Container(
           height: 36,
           decoration: BoxDecoration(
@@ -253,6 +255,17 @@ class _ConversationListPageState extends State<ConversationListPage> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToSearch() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider(
+          create: (_) => getIt<SearchBloc>(),
+          child: const GlobalSearchPage(),
         ),
       ),
     );

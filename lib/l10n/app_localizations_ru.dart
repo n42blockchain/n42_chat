@@ -4232,16 +4232,16 @@ class SRu extends S {
   String get appleLogin => 'Войти через Apple';
 
   @override
-  String get facebookLogin => '使用 Facebook 登录';
+  String get facebookLogin => 'Войти через Facebook';
 
   @override
-  String get twitterLogin => '使用 Twitter 登录';
+  String get twitterLogin => 'Войти через Twitter';
 
   @override
-  String get wechatLogin => '使用微信登录';
+  String get wechatLogin => 'Войти через WeChat';
 
   @override
-  String get wechat => '微信';
+  String get wechat => 'WeChat';
 
   @override
   String get facebook => 'Facebook';
@@ -4250,19 +4250,19 @@ class SRu extends S {
   String get twitter => 'Twitter';
 
   @override
-  String get wechatNotInstalled => '请先安装微信';
+  String get wechatNotInstalled => 'Сначала установите WeChat';
 
   @override
-  String get wechatLoginFailed => '微信登录失败';
+  String get wechatLoginFailed => 'Ошибка входа через WeChat';
 
   @override
-  String get facebookLoginFailed => 'Facebook 登录失败';
+  String get facebookLoginFailed => 'Ошибка входа через Facebook';
 
   @override
-  String get twitterLoginFailed => 'Twitter 登录失败';
+  String get twitterLoginFailed => 'Ошибка входа через Twitter';
 
   @override
-  String get twitterNotConfigured => 'Twitter 登录未配置';
+  String get twitterNotConfigured => 'Вход через Twitter не настроен';
 
   @override
   String get socialLoginCancelled => 'Вход отменен';
@@ -4343,4 +4343,54 @@ class SRu extends S {
 
   @override
   String get or => '或';
+
+  @override
+  String get n42BeanTitle => 'N42 Bean';
+
+  @override
+  String get n42BeanDetails => 'Детали N42 Bean';
+
+  @override
+  String get noN42Bean => 'Нет N42 Bean';
+
+  @override
+  String get n42BeanDescription =>
+      'N42 Bean — токен для обмена на виртуальные предметы и услуги в N42. Сейчас доступно:';
+
+  @override
+  String get n42BeanFeature1 => 'Эксклюзивные стикеры и темы для участников';
+
+  @override
+  String get n42BeanFeature2 => 'Настройка пузырей чата';
+
+  @override
+  String get n42BeanFeature3 => 'Настройка обложек красных конвертов';
+
+  @override
+  String get n42BeanFeature4 => 'Эксклюзивный значок никнейма';
+
+  @override
+  String get n42BeanFeature5 => 'Привилегии группового чата';
+
+  @override
+  String get n42BeanFeature6 => 'Расширение облачного хранилища';
+
+  @override
+  String get n42BeanFeature7 => 'Фильтры красоты для видеозвонков';
+
+  @override
+  String get n42BeanFeature8 => 'Настройка фона Moments';
+
+  @override
+  String get n42BeanFeature9 => 'Приоритет VIP-обслуживания';
+
+  @override
+  String get gotIt => 'Понятно';
+
+  @override
+  String get noN42BeanRecords => 'Нет записей N42 Bean';
+
+  @override
+  String get cameraPermissionRestricted =>
+      'Доступ к камере ограничен на этом устройстве';
 }

@@ -4274,16 +4274,16 @@ class SFr extends S {
   String get appleLogin => 'Se connecter avec Apple';
 
   @override
-  String get facebookLogin => '使用 Facebook 登录';
+  String get facebookLogin => 'Se connecter avec Facebook';
 
   @override
-  String get twitterLogin => '使用 Twitter 登录';
+  String get twitterLogin => 'Se connecter avec Twitter';
 
   @override
-  String get wechatLogin => '使用微信登录';
+  String get wechatLogin => 'Se connecter avec WeChat';
 
   @override
-  String get wechat => '微信';
+  String get wechat => 'WeChat';
 
   @override
   String get facebook => 'Facebook';
@@ -4292,19 +4292,19 @@ class SFr extends S {
   String get twitter => 'Twitter';
 
   @override
-  String get wechatNotInstalled => '请先安装微信';
+  String get wechatNotInstalled => 'Veuillez d\'abord installer WeChat';
 
   @override
-  String get wechatLoginFailed => '微信登录失败';
+  String get wechatLoginFailed => 'Échec de la connexion WeChat';
 
   @override
-  String get facebookLoginFailed => 'Facebook 登录失败';
+  String get facebookLoginFailed => 'Échec de la connexion Facebook';
 
   @override
-  String get twitterLoginFailed => 'Twitter 登录失败';
+  String get twitterLoginFailed => 'Échec de la connexion Twitter';
 
   @override
-  String get twitterNotConfigured => 'Twitter 登录未配置';
+  String get twitterNotConfigured => 'Connexion Twitter non configurée';
 
   @override
   String get socialLoginCancelled => 'Connexion annulée';
@@ -4385,4 +4385,54 @@ class SFr extends S {
 
   @override
   String get or => '或';
+
+  @override
+  String get n42BeanTitle => 'N42 Bean';
+
+  @override
+  String get n42BeanDetails => 'Détails N42 Bean';
+
+  @override
+  String get noN42Bean => 'Pas de N42 Bean';
+
+  @override
+  String get n42BeanDescription =>
+      'N42 Bean est un jeton pour échanger des articles virtuels et des services dans N42. Actuellement disponible pour :';
+
+  @override
+  String get n42BeanFeature1 => 'Autocollants et thèmes exclusifs aux membres';
+
+  @override
+  String get n42BeanFeature2 => 'Personnalisation des bulles de chat';
+
+  @override
+  String get n42BeanFeature3 => 'Personnalisation des enveloppes rouges';
+
+  @override
+  String get n42BeanFeature4 => 'Badge de pseudo exclusif';
+
+  @override
+  String get n42BeanFeature5 => 'Privilèges de chat de groupe';
+
+  @override
+  String get n42BeanFeature6 => 'Extension de stockage cloud';
+
+  @override
+  String get n42BeanFeature7 => 'Filtres beauté pour appels vidéo';
+
+  @override
+  String get n42BeanFeature8 => 'Personnalisation de l\'arrière-plan Moments';
+
+  @override
+  String get n42BeanFeature9 => 'Priorité au service client VIP';
+
+  @override
+  String get gotIt => 'Compris';
+
+  @override
+  String get noN42BeanRecords => 'Aucun enregistrement N42 Bean';
+
+  @override
+  String get cameraPermissionRestricted =>
+      'L\'accès à la caméra est restreint sur cet appareil';
 }

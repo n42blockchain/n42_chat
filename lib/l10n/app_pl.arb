@@ -1901,5 +1901,23 @@
   "socialLoginCancelled": "Logowanie anulowane",
   "socialLoginFailed": "Logowanie społecznościowe nie powiodło się",
   "verificationCode": "Kod weryfikacyjny",
-  "verificationCodeSent": "Kod weryfikacyjny wysłany"
+  "verificationCodeSent": "Kod weryfikacyjny wysłany",
+
+  "n42BeanTitle": "N42 Bean",
+  "n42BeanDetails": "Szczegóły N42 Bean",
+  "noN42Bean": "Brak N42 Bean",
+  "n42BeanDescription": "N42 Bean to token do wymiany na wirtualne przedmioty i usługi w N42. Obecnie dostępne:",
+  "n42BeanFeature1": "Ekskluzywne naklejki i motywy dla członków",
+  "n42BeanFeature2": "Personalizacja dymków czatu",
+  "n42BeanFeature3": "Personalizacja okładek czerwonych kopert",
+  "n42BeanFeature4": "Ekskluzywna odznaka pseudonimu",
+  "n42BeanFeature5": "Przywileje czatu grupowego",
+  "n42BeanFeature6": "Rozszerzenie pamięci w chmurze",
+  "n42BeanFeature7": "Filtry upiększające do rozmów wideo",
+  "n42BeanFeature8": "Personalizacja tła Moments",
+  "n42BeanFeature9": "Priorytetowa obsługa klienta VIP",
+  "gotIt": "Rozumiem",
+  "noN42BeanRecords": "Brak rekordów N42 Bean",
+
+  "cameraPermissionRestricted": "Dostęp do kamery jest ograniczony na tym urządzeniu"
 }

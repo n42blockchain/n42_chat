@@ -2198,5 +2198,23 @@
   "biometricEnabled": "已启用 - 使用生物识别登录",
   "biometricDisabled": "已禁用 - 点击启用",
   "biometricNeedRelogin": "请退出后重新登录以启用生物识别",
-  "or": "或"
+  "or": "或",
+
+  "n42BeanTitle": "N42豆",
+  "n42BeanDetails": "N42豆明细",
+  "noN42Bean": "暂无N42豆",
+  "n42BeanDescription": "N42豆是用于兑换N42内虚拟物品和服务的道具，目前可用于兑换：",
+  "n42BeanFeature1": "会员专属表情和主题",
+  "n42BeanFeature2": "聊天气泡个性化",
+  "n42BeanFeature3": "红包封面定制",
+  "n42BeanFeature4": "专属昵称标识",
+  "n42BeanFeature5": "群聊特权功能",
+  "n42BeanFeature6": "云存储空间扩展",
+  "n42BeanFeature7": "视频通话美颜滤镜",
+  "n42BeanFeature8": "朋友圈背景更换",
+  "n42BeanFeature9": "VIP客服优先服务",
+  "gotIt": "我知道了",
+  "noN42BeanRecords": "暂无N42豆明细记录",
+
+  "cameraPermissionRestricted": "此设备上的相机访问受限"
 }

@@ -1901,5 +1901,23 @@
   "socialLoginCancelled": "Login dibatalkan",
   "socialLoginFailed": "Login sosial gagal",
   "verificationCode": "Kode verifikasi",
-  "verificationCodeSent": "Kode verifikasi terkirim"
+  "verificationCodeSent": "Kode verifikasi terkirim",
+
+  "n42BeanTitle": "N42 Bean",
+  "n42BeanDetails": "Detail N42 Bean",
+  "noN42Bean": "Tidak ada N42 Bean",
+  "n42BeanDescription": "N42 Bean adalah token untuk menukarkan barang virtual dan layanan di N42. Saat ini tersedia untuk:",
+  "n42BeanFeature1": "Stiker dan tema eksklusif anggota",
+  "n42BeanFeature2": "Kustomisasi gelembung chat",
+  "n42BeanFeature3": "Kustomisasi sampul amplop merah",
+  "n42BeanFeature4": "Lencana nama panggilan eksklusif",
+  "n42BeanFeature5": "Hak istimewa chat grup",
+  "n42BeanFeature6": "Perluasan penyimpanan cloud",
+  "n42BeanFeature7": "Filter kecantikan panggilan video",
+  "n42BeanFeature8": "Kustomisasi latar belakang Moments",
+  "n42BeanFeature9": "Prioritas layanan pelanggan VIP",
+  "gotIt": "Mengerti",
+  "noN42BeanRecords": "Tidak ada catatan N42 Bean",
+
+  "cameraPermissionRestricted": "Akses kamera dibatasi pada perangkat ini"
 }

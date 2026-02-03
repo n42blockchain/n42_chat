@@ -37,7 +37,12 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _checkCameraPermission();
+      // Add a small delay to ensure system permission status is updated
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          _checkCameraPermission();
+        }
+      });
     }
   }
 
@@ -56,43 +61,62 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     });
 
     try {
-      final status = await Permission.camera.status;
+      var status = await Permission.camera.status;
+      debugPrint('Camera permission initial status: $status');
 
-      if (status.isGranted) {
+      // Handle granted or limited (iOS 14+ limited access is still usable for camera)
+      if (status.isGranted || status.isLimited) {
         _initScanner();
         setState(() {
           _hasPermission = true;
           _isCheckingPermission = false;
         });
-      } else if (status.isDenied) {
-        final result = await Permission.camera.request();
-        if (result.isGranted) {
+        return;
+      }
+
+      // If denied, try to request permission
+      if (status.isDenied) {
+        status = await Permission.camera.request();
+        debugPrint('Camera permission after request: $status');
+
+        if (status.isGranted || status.isLimited) {
           _initScanner();
           setState(() {
             _hasPermission = true;
             _isCheckingPermission = false;
           });
-        } else {
-          setState(() {
-            _hasPermission = false;
-            _isCheckingPermission = false;
-            _permissionError = S.of(context)?.cameraPermissionRequired ?? 'Camera permission is required to scan QR code';
-          });
+          return;
         }
-      } else if (status.isPermanentlyDenied) {
+      }
+
+      // Handle permanently denied
+      if (status.isPermanentlyDenied) {
         setState(() {
           _hasPermission = false;
           _isCheckingPermission = false;
           _permissionError = S.of(context)?.cameraPermissionDenied ?? 'Camera permission was permanently denied. Please enable it in system settings.';
         });
-      } else {
+        return;
+      }
+
+      // Handle restricted (iOS parental controls, etc.)
+      if (status.isRestricted) {
         setState(() {
           _hasPermission = false;
           _isCheckingPermission = false;
-          _permissionError = S.of(context)?.cannotGetCameraPermission ?? 'Cannot get camera permission';
+          _permissionError = S.of(context)?.cameraPermissionRestricted ?? 'Camera access is restricted on this device.';
         });
+        return;
       }
+
+      // Fallback for any other status
+      setState(() {
+        _hasPermission = false;
+        _isCheckingPermission = false;
+        _permissionError = S.of(context)?.cameraPermissionRequired ?? 'Camera permission is required to scan QR code';
+      });
     } catch (e) {
+      debugPrint('Camera permission check error: $e');
       setState(() {
         _hasPermission = false;
         _isCheckingPermission = false;

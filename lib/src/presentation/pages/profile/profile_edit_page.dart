@@ -1648,10 +1648,12 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 抬头类型
-                Row(
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
                     Text('${s?.invoiceType ?? 'Invoice Type'}: '),
-                    const SizedBox(width: 8),
                     ChoiceChip(
                       label: Text(s?.personal ?? 'Personal'),
                       selected: type == 'personal',
@@ -1661,7 +1663,6 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                         }
                       },
                     ),
-                    const SizedBox(width: 8),
                     ChoiceChip(
                       label: Text(s?.company ?? 'Company'),
                       selected: type == 'company',

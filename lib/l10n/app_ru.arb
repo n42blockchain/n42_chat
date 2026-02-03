@@ -1901,5 +1901,23 @@
   "socialLoginCancelled": "Вход отменен",
   "socialLoginFailed": "Не удалось войти через социальную сеть",
   "verificationCode": "Код подтверждения",
-  "verificationCodeSent": "Код подтверждения отправлен"
+  "verificationCodeSent": "Код подтверждения отправлен",
+
+  "n42BeanTitle": "N42 Bean",
+  "n42BeanDetails": "Детали N42 Bean",
+  "noN42Bean": "Нет N42 Bean",
+  "n42BeanDescription": "N42 Bean — токен для обмена на виртуальные предметы и услуги в N42. Сейчас доступно:",
+  "n42BeanFeature1": "Эксклюзивные стикеры и темы для участников",
+  "n42BeanFeature2": "Настройка пузырей чата",
+  "n42BeanFeature3": "Настройка обложек красных конвертов",
+  "n42BeanFeature4": "Эксклюзивный значок никнейма",
+  "n42BeanFeature5": "Привилегии группового чата",
+  "n42BeanFeature6": "Расширение облачного хранилища",
+  "n42BeanFeature7": "Фильтры красоты для видеозвонков",
+  "n42BeanFeature8": "Настройка фона Moments",
+  "n42BeanFeature9": "Приоритет VIP-обслуживания",
+  "gotIt": "Понятно",
+  "noN42BeanRecords": "Нет записей N42 Bean",
+
+  "cameraPermissionRestricted": "Доступ к камере ограничен на этом устройстве"
 }

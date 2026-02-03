@@ -1901,5 +1901,23 @@
   "socialLoginCancelled": "Login cancelado",
   "socialLoginFailed": "Falha no login social",
   "verificationCode": "Código de verificação",
-  "verificationCodeSent": "Código de verificação enviado"
+  "verificationCodeSent": "Código de verificação enviado",
+
+  "n42BeanTitle": "N42 Bean",
+  "n42BeanDetails": "Detalhes do N42 Bean",
+  "noN42Bean": "Sem N42 Bean",
+  "n42BeanDescription": "N42 Bean é um token para resgatar itens virtuais e serviços no N42. Atualmente disponível para:",
+  "n42BeanFeature1": "Figurinhas e temas exclusivos para membros",
+  "n42BeanFeature2": "Personalização de balões de chat",
+  "n42BeanFeature3": "Personalização de capas de envelope vermelho",
+  "n42BeanFeature4": "Distintivo de apelido exclusivo",
+  "n42BeanFeature5": "Privilégios de chat em grupo",
+  "n42BeanFeature6": "Expansão de armazenamento em nuvem",
+  "n42BeanFeature7": "Filtros de beleza para videochamadas",
+  "n42BeanFeature8": "Personalização de fundo dos Moments",
+  "n42BeanFeature9": "Prioridade no atendimento VIP",
+  "gotIt": "Entendi",
+  "noN42BeanRecords": "Sem registros de N42 Bean",
+
+  "cameraPermissionRestricted": "O acesso à câmera está restrito neste dispositivo"
 }

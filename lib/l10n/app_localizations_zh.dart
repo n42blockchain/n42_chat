@@ -4253,4 +4253,52 @@ class SZh extends S {
 
   @override
   String get or => '或';
+
+  @override
+  String get n42BeanTitle => 'N42豆';
+
+  @override
+  String get n42BeanDetails => 'N42豆明细';
+
+  @override
+  String get noN42Bean => '暂无N42豆';
+
+  @override
+  String get n42BeanDescription => 'N42豆是用于兑换N42内虚拟物品和服务的道具，目前可用于兑换：';
+
+  @override
+  String get n42BeanFeature1 => '会员专属表情和主题';
+
+  @override
+  String get n42BeanFeature2 => '聊天气泡个性化';
+
+  @override
+  String get n42BeanFeature3 => '红包封面定制';
+
+  @override
+  String get n42BeanFeature4 => '专属昵称标识';
+
+  @override
+  String get n42BeanFeature5 => '群聊特权功能';
+
+  @override
+  String get n42BeanFeature6 => '云存储空间扩展';
+
+  @override
+  String get n42BeanFeature7 => '视频通话美颜滤镜';
+
+  @override
+  String get n42BeanFeature8 => '朋友圈背景更换';
+
+  @override
+  String get n42BeanFeature9 => 'VIP客服优先服务';
+
+  @override
+  String get gotIt => '我知道了';
+
+  @override
+  String get noN42BeanRecords => '暂无N42豆明细记录';
+
+  @override
+  String get cameraPermissionRestricted => '此设备上的相机访问受限';
 }

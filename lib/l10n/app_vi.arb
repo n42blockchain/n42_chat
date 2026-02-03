@@ -1901,5 +1901,23 @@
   "socialLoginCancelled": "Đăng nhập đã bị hủy",
   "socialLoginFailed": "Đăng nhập mạng xã hội thất bại",
   "verificationCode": "Mã xác nhận",
-  "verificationCodeSent": "Mã xác nhận đã được gửi"
+  "verificationCodeSent": "Mã xác nhận đã được gửi",
+
+  "n42BeanTitle": "N42 Bean",
+  "n42BeanDetails": "Chi tiết N42 Bean",
+  "noN42Bean": "Không có N42 Bean",
+  "n42BeanDescription": "N42 Bean là token dùng để đổi vật phẩm ảo và dịch vụ trong N42. Hiện có thể dùng cho:",
+  "n42BeanFeature1": "Nhãn dán và chủ đề độc quyền cho thành viên",
+  "n42BeanFeature2": "Tùy chỉnh bong bóng chat",
+  "n42BeanFeature3": "Tùy chỉnh bìa phong bao đỏ",
+  "n42BeanFeature4": "Huy hiệu biệt danh độc quyền",
+  "n42BeanFeature5": "Đặc quyền trò chuyện nhóm",
+  "n42BeanFeature6": "Mở rộng lưu trữ đám mây",
+  "n42BeanFeature7": "Bộ lọc làm đẹp cuộc gọi video",
+  "n42BeanFeature8": "Tùy chỉnh nền Khoảnh khắc",
+  "n42BeanFeature9": "Ưu tiên dịch vụ khách hàng VIP",
+  "gotIt": "Đã hiểu",
+  "noN42BeanRecords": "Không có bản ghi N42 Bean",
+
+  "cameraPermissionRestricted": "Quyền truy cập camera bị hạn chế trên thiết bị này"
 }
