@@ -198,7 +198,7 @@ class _ReceivePageState extends State<ReceivePage> {
           const SizedBox(height: 16),
           Text(
             S.of(context)?.scanQrToPayMe ?? 'Scan QR code to pay me',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
             ),

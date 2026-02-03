@@ -345,7 +345,7 @@ class _VisibilityPickerSheet extends StatelessWidget {
             ...VisibilityLevel.values.map((level) => ListTile(
                   title: Text(_getLabel(context, level)),
                   trailing: currentValue == level
-                      ? Icon(Icons.check, color: AppColors.primary)
+                      ? const Icon(Icons.check, color: AppColors.primary)
                       : null,
                   onTap: () => Navigator.pop(context, level),
                 )),

@@ -122,7 +122,7 @@ class MessageReadReceipt extends StatelessWidget {
     if (compact) {
       return Text(
         '$readCount/$totalCount',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 11,
           color: AppColors.textTertiary,
         ),

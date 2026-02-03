@@ -601,7 +601,7 @@ class _RegisterPageState extends State<RegisterPage> {
               if (!_showInviteCode)
                 Text(
                   S.of(context)?.filled ?? 'Filled',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.success,
                   ),
@@ -690,14 +690,14 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   TextSpan(
                     text: S.of(context)?.termsOfService ?? 'Terms of Service',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: AppColors.textLink,
                     ),
                   ),
                   TextSpan(text: S.of(context)?.and ?? ' and '),
                   TextSpan(
                     text: S.of(context)?.privacyPolicy ?? 'Privacy Policy',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: AppColors.textLink,
                     ),
                   ),
@@ -731,12 +731,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
             : Text(
                 S.of(context)?.register ?? 'Sign Up',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -765,7 +765,7 @@ class _RegisterPageState extends State<RegisterPage> {
           },
           child: Text(
             S.of(context)?.loginNow ?? 'Log In Now',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: AppColors.textLink,
               fontWeight: FontWeight.w500,

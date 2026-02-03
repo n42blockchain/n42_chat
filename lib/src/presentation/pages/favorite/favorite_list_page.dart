@@ -485,7 +485,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           const SizedBox(height: 8),
           Text(
             S.of(context)?.longPressToFavorite ?? 'Long press message to favorite',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: AppColors.textTertiary,
             ),

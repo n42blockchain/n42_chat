@@ -404,7 +404,7 @@ class ChatInputBarState extends State<ChatInputBar> {
         ),
         decoration: InputDecoration(
           hintText: widget.hintText ?? S.of(context)?.sendMessage ?? 'Send message',
-          hintStyle: TextStyle(
+          hintStyle: const TextStyle(
             fontSize: 16,
             color: AppColors.textTertiary,
           ),

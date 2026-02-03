@@ -352,7 +352,7 @@ class N42GroupAvatar extends StatelessWidget {
             : null;
         
         if (colIdx > 0) {
-          rowChildren.add(SizedBox(width: gap));
+          rowChildren.add(const SizedBox(width: gap));
         }
         
         // 使用唯一 key 强制刷新每个成员头像
@@ -379,7 +379,7 @@ class N42GroupAvatar extends StatelessWidget {
       }
       
       if (rowIdx > 0) {
-        rows.add(SizedBox(height: gap));
+        rows.add(const SizedBox(height: gap));
       }
       
       rows.add(

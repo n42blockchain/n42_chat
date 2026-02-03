@@ -311,7 +311,7 @@ class _BeanDetailSheet extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.receipt_long_outlined,
                     size: 64,
                     color: AppColors.textTertiary,
@@ -319,7 +319,7 @@ class _BeanDetailSheet extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     s?.noN42BeanRecords ?? 'No N42 Bean records',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.textSecondary,
                     ),

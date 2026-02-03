@@ -329,16 +329,16 @@ class LiveKitService {
       _setState(MeetingState.connecting);
       
       // 连接选项
-      final roomOptions = RoomOptions(
+      const roomOptions = RoomOptions(
         adaptiveStream: true,
         dynacast: true,
-        defaultAudioPublishOptions: const AudioPublishOptions(
+        defaultAudioPublishOptions: AudioPublishOptions(
           audioBitrate: 128000, // 128kbps
         ),
-        defaultVideoPublishOptions: const VideoPublishOptions(
+        defaultVideoPublishOptions: VideoPublishOptions(
           simulcast: true,
         ),
-        defaultScreenShareCaptureOptions: const ScreenShareCaptureOptions(
+        defaultScreenShareCaptureOptions: ScreenShareCaptureOptions(
           useiOSBroadcastExtension: true,
           maxFrameRate: 15.0,
         ),

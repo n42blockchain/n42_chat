@@ -172,7 +172,7 @@ class SimpleContactTile extends StatelessWidget {
                 ),
               ),
               if (selected)
-                Icon(
+                const Icon(
                   Icons.check_circle,
                   color: AppColors.primary,
                   size: 24,

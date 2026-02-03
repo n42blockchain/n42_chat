@@ -358,7 +358,7 @@ class _LiveIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final color = const Color(0xFFFF4757);
+    const color = Color(0xFFFF4757);
     
     // 外圈描边
     final outerPaint = Paint()
@@ -450,7 +450,7 @@ class _WatchIcon extends StatelessWidget {
 class _WatchIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final color = const Color(0xFFFFB300);
+    const color = Color(0xFFFFB300);
     final cx = size.width / 2;
     final cy = size.height / 2;
     final r = size.width * 0.38;
@@ -501,7 +501,7 @@ class _SearchIcon extends StatelessWidget {
 class _SearchIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final color = const Color(0xFFFF4757);
+    const color = Color(0xFFFF4757);
     final w = size.width;
     final h = size.height;
     
@@ -551,7 +551,7 @@ class _NearbyIcon extends StatelessWidget {
 class _NearbyIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final color = const Color(0xFF10AEFF);
+    const color = Color(0xFF10AEFF);
     final cx = size.width / 2;
     final cy = size.height / 2;
     
@@ -612,7 +612,7 @@ class _GameIcon extends StatelessWidget {
 class _GameIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final color = const Color(0xFF4CAF50);
+    const color = Color(0xFF4CAF50);
     final w = size.width;
     final h = size.height;
     final p = w * 0.12;
@@ -664,7 +664,7 @@ class _MiniProgramIcon extends StatelessWidget {
 class _MiniProgramIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final color = const Color(0xFF7B68EE);
+    const color = Color(0xFF7B68EE);
     final w = size.width;
     final h = size.height;
     

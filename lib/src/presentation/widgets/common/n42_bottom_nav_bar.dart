@@ -59,7 +59,7 @@ class N42BottomNavBar extends StatelessWidget {
           label: 'Discover',
           showDot: showDiscoverDot,
         ),
-        N42BottomNavItem(
+        const N42BottomNavItem(
           icon: Icons.person_outline,
           activeIcon: Icons.person,
           label: 'Me',

@@ -161,7 +161,7 @@ class N42ListTile extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 trailing!,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.textTertiary,
                 ),
@@ -184,7 +184,7 @@ class N42ListTile extends StatelessWidget {
                   subtitle!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                   ),
@@ -207,7 +207,7 @@ class N42ListTile extends StatelessWidget {
         return Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: AppColors.textTertiary,
             shape: BoxShape.circle,
           ),
@@ -312,7 +312,7 @@ class N42SettingsTile extends StatelessWidget {
                           const SizedBox(height: 2),
                           Text(
                             subtitle!,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.textSecondary,
                             ),
@@ -370,14 +370,14 @@ class N42SettingsTile extends StatelessWidget {
         if (trailing != null)
           Text(
             trailing!,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
             ),
           ),
         if (showArrow) ...[
           const SizedBox(width: 4),
-          Icon(
+          const Icon(
             Icons.chevron_right,
             size: 20,
             color: AppColors.textTertiary,

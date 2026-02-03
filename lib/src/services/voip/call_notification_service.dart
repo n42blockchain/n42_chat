@@ -173,7 +173,7 @@ class CallNotificationService {
         missedCallNotificationChannelName: missedCallChannelName,
         isShowCallID: false,
       ),
-      ios: IOSParams(
+      ios: const IOSParams(
         iconName: 'CallKitLogo',
         handleType: 'generic',
         supportsVideo: true,
@@ -220,14 +220,14 @@ class CallNotificationService {
         'calleeId': calleeId,
         'roomId': roomId,
       },
-      android: AndroidParams(
+      android: const AndroidParams(
         isCustomNotification: true,
         isShowLogo: true,
         backgroundColor: '#0955fa',
         actionColor: '#4CAF50',
         textColor: '#ffffff',
       ),
-      ios: IOSParams(
+      ios: const IOSParams(
         iconName: 'CallKitLogo',
         handleType: 'generic',
         supportsVideo: true,
@@ -235,7 +235,7 @@ class CallNotificationService {
         maximumCallsPerCallGroup: 1,
       ),
     );
-    
+
     await FlutterCallkitIncoming.startCall(params);
     
     debugPrint('CallNotificationService: Starting outgoing call $callId to $calleeName');

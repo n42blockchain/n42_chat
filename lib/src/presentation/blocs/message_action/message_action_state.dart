@@ -63,7 +63,7 @@ class MessageActionFailure extends MessageActionState {
 class ForwardResult extends MessageActionState {
   final Map<String, bool> results;
 
-  ForwardResult(this.results);
+  const ForwardResult(this.results);
 
   int get successCount => results.values.where((v) => v).length;
   int get failureCount => results.values.where((v) => !v).length;

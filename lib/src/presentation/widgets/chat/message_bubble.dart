@@ -118,7 +118,7 @@ class MessageBubble extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
                           _formatTime(timestamp!),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.textTertiary,
                           ),

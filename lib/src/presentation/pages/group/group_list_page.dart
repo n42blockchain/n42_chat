@@ -180,7 +180,7 @@ class _GroupListPageState extends State<GroupListPage> {
         ),
         subtitle: Text(
           S.of(context)?.invitedToJoinGroup ?? 'Invited to join group',
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 13,
             color: AppColors.primary,
           ),

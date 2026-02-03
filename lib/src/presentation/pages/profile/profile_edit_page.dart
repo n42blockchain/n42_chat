@@ -106,7 +106,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                             size: 60,
                           ),
                         const SizedBox(width: 8),
-                        Icon(
+                        const Icon(
                           Icons.chevron_right,
                           color: AppColors.textTertiary,
                         ),
@@ -172,7 +172,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                         ),
                         const SizedBox(width: 8),
-                        Icon(
+                        const Icon(
                           Icons.chevron_right,
                           color: AppColors.textTertiary,
                         ),
@@ -328,7 +328,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       ),
                     if (showArrow) ...[
                       const SizedBox(width: 8),
-                      Icon(
+                      const Icon(
                         Icons.chevron_right,
                         color: AppColors.textTertiary,
                         size: 20,
@@ -540,7 +540,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 border: Border(
                   bottom: BorderSide(color: AppColors.divider),
                 ),
@@ -549,7 +549,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 children: [
                   Text(
                     S.of(context)?.selectRegion ?? 'Select Region',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -597,7 +597,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     padding: const EdgeInsets.all(16),
                     child: Text(
                       S.of(context)?.selectCity ?? 'Select City',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -658,7 +658,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           children: [
             Text(
               S.of(context)?.friendPokedMe ?? 'Friend poked me',
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 14,
               ),
@@ -668,8 +668,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               controller: controller,
               autofocus: true,
               maxLength: 50,
-              decoration: InputDecoration(
-                hintText: S.of(context)?.enterPokeSuffix ?? 'Enter poke suffix, e.g.: on the shoulder',
+              decoration: const InputDecoration(
+                hintText: 'Enter poke suffix, e.g.: on the shoulder',
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
@@ -677,7 +677,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             const SizedBox(height: 8),
             Text(
               '${S.of(context)?.example ?? 'Example'}: ${S.of(context)?.friendPokedMe ?? 'Friend poked me'}${controller.text.isNotEmpty ? controller.text : (S.of(context)?.onTheShoulder ?? " on the shoulder")}',
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.textTertiary,
                 fontSize: 12,
               ),
@@ -758,7 +758,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             children: [
               Text(
                 S.of(context)?.myQrCode ?? 'My QR Code',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -779,7 +779,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               const SizedBox(height: 16),
               Text(
                 userId,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                 ),
@@ -787,7 +787,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               const SizedBox(height: 8),
               Text(
                 S.of(context)?.scanToAddFriend ?? 'Scan the QR code above to add me as a friend',
-                style: TextStyle(fontSize: 12),
+                style: const TextStyle(fontSize: 12),
               ),
             ],
           ),
@@ -959,7 +959,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.location_off_outlined,
                     size: 64,
                     color: AppColors.textTertiary,
@@ -967,7 +967,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                   const SizedBox(height: 16),
                   Text(
                     S.of(context)?.noShippingAddress ?? 'No shipping address',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.textSecondary,
                     ),
@@ -1009,7 +1009,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                             const SizedBox(width: 12),
                             Text(
                               address.phone,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: AppColors.textSecondary,
                               ),
                             ),
@@ -1026,7 +1026,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                                 ),
                                 child: Text(
                                   S.of(context)?.defaultLabel ?? 'Default',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: AppColors.primary,
                                   ),
@@ -1037,7 +1037,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                         const SizedBox(height: 8),
                         Text(
                           address.fullAddress,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -1053,7 +1053,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                               onPressed: () => _deleteAddress(index),
                               child: Text(
                                 S.of(context)?.delete ?? 'Delete',
-                                style: TextStyle(color: AppColors.error),
+                                style: const TextStyle(color: AppColors.error),
                               ),
                             ),
                           ],
@@ -1151,7 +1151,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
             },
             child: Text(
               S.of(context)?.delete ?? 'Delete',
-              style: TextStyle(color: AppColors.error),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -1402,7 +1402,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.receipt_long_outlined,
                     size: 64,
                     color: AppColors.textTertiary,
@@ -1410,7 +1410,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                   const SizedBox(height: 16),
                   Text(
                     S.of(context)?.noInvoice ?? 'No invoice',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.textSecondary,
                     ),
@@ -1486,7 +1486,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                                 ),
                                 child: Text(
                                   S.of(context)?.defaultLabel ?? 'Default',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: AppColors.primary,
                                   ),
@@ -1498,7 +1498,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                           const SizedBox(height: 8),
                           Text(
                             '${S.of(context)?.taxNumber ?? 'Tax Number'}: ${invoice.taxNumber}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 14,
                             ),
@@ -1516,7 +1516,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                               onPressed: () => _deleteInvoice(index),
                               child: Text(
                                 S.of(context)?.delete ?? 'Delete',
-                                style: TextStyle(color: AppColors.error),
+                                style: const TextStyle(color: AppColors.error),
                               ),
                             ),
                           ],
@@ -1618,7 +1618,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
             },
             child: Text(
               S.of(context)?.delete ?? 'Delete',
-              style: TextStyle(color: AppColors.error),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -2065,7 +2065,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
             onPressed: _confirmSave,
             child: Text(
               s?.confirm ?? 'Confirm',
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.primary,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -2172,7 +2172,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
                               ),
                             // 选中标记
                             if (isSelected)
-                              Icon(
+                              const Icon(
                                 Icons.check_circle,
                                 color: AppColors.primary,
                               ),

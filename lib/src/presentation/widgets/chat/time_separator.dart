@@ -74,7 +74,7 @@ class SystemMessageWidget extends StatelessWidget {
     if (clickableTexts == null || clickableTexts!.isEmpty) {
       return Text(
         message,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 12,
           color: AppColors.textTertiary,
         ),
@@ -100,7 +100,7 @@ class SystemMessageWidget extends StatelessWidget {
       // 添加可点击文本
       spans.add(TextSpan(
         text: clickable.text,
-        style: TextStyle(
+        style: const TextStyle(
           color: AppColors.link,
         ),
         recognizer: null, // 需要使用 GestureRecognizer
@@ -118,7 +118,7 @@ class SystemMessageWidget extends StatelessWidget {
 
     return Text.rich(
       TextSpan(
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 12,
           color: AppColors.textTertiary,
         ),
@@ -202,7 +202,7 @@ class RedPacketClaimMessageWidget extends StatelessWidget {
                 // 消息文本
                 Text.rich(
                   TextSpan(
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
                     ),
@@ -304,7 +304,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
             widget.userName != null
                 ? (S.of(context)?.userTyping(widget.userName!) ?? '${widget.userName} is typing...')
                 : (S.of(context)?.typing ?? 'Typing...'),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               color: AppColors.textTertiary,
             ),
