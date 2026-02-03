@@ -41,26 +41,42 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   Future<void> _initializePlayer() async {
     try {
-      debugPrint('Initializing video player with URL: ${widget.videoUrl}');
+      debugPrint('=== Video Player Initialization ===');
+      debugPrint('Video URL: ${widget.videoUrl}');
+      debugPrint('Thumbnail URL: ${widget.thumbnailUrl}');
+
+      // Validate video URL
+      if (widget.videoUrl.isEmpty) {
+        throw Exception('Video URL is empty');
+      }
 
       // 获取 access token
       String? accessToken;
       try {
         final matrixManager = getIt<MatrixClientManager>();
         accessToken = matrixManager.client?.accessToken;
+        debugPrint('Access token obtained: ${accessToken != null ? 'Yes (${accessToken.length} chars)' : 'No'}');
       } catch (e) {
         debugPrint('Failed to get access token: $e');
       }
 
+      final headers = <String, String>{};
+      if (accessToken != null) {
+        headers['Authorization'] = 'Bearer $accessToken';
+      }
+
       // 创建视频控制器
+      debugPrint('Creating VideoPlayerController...');
       _controller = VideoPlayerController.networkUrl(
         Uri.parse(widget.videoUrl),
-        httpHeaders: accessToken != null
-            ? {'Authorization': 'Bearer $accessToken'}
-            : {},
+        httpHeaders: headers,
       );
 
+      debugPrint('Initializing video controller...');
       await _controller.initialize();
+      debugPrint('Video controller initialized successfully');
+      debugPrint('Video duration: ${_controller.value.duration}');
+      debugPrint('Video size: ${_controller.value.size}');
 
       _chewieController = ChewieController(
         videoPlayerController: _controller,
@@ -71,6 +87,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
             ? CachedNetworkImage(
                 imageUrl: widget.thumbnailUrl!,
                 fit: BoxFit.cover,
+                httpHeaders: headers,
               )
             : Container(color: Colors.black),
         errorBuilder: (ctx, errorMessage) => Center(
@@ -94,8 +111,10 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           _isLoading = false;
         });
       }
-    } catch (e) {
-      debugPrint('Video player error: $e');
+    } catch (e, stackTrace) {
+      debugPrint('=== Video Player Error ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       if (mounted) {
         setState(() {
           _isLoading = false;
