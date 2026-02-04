@@ -17,8 +17,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // 确保 Firebase 已初始化
   await Firebase.initializeApp();
 
-  debugPrint('N42Chat: Background message received: ${message.messageId}');
-
   // 处理后台推送
   await FirebasePushService._handleBackgroundMessage(message);
 }
@@ -115,7 +113,6 @@ class FirebasePushService implements IPushNotificationService {
       // 监听 Token 刷新
       _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh.listen((token) {
         _fcmToken = token;
-        debugPrint('N42Chat: FCM token refreshed');
         // 重新注册推送
         if (_client.isLogged()) {
           registerForPush();
@@ -126,7 +123,6 @@ class FirebasePushService implements IPushNotificationService {
       _syncSubscription = _client.onSync.stream.listen(_handleSyncUpdate);
 
       _isInitialized = true;
-      debugPrint('N42Chat: Firebase push service initialized');
     } catch (e) {
       debugPrint('N42Chat: Failed to initialize push service: $e');
     }
@@ -150,7 +146,7 @@ class FirebasePushService implements IPushNotificationService {
       iOS: iosSettings,
     );
 
-    // flutter_local_notifications 20.x 使用命名参数
+    // flutter_local_notifications 20.x: 所有参数都是命名参数
     await _localNotifications!.initialize(
       settings: initSettings,
       onDidReceiveNotificationResponse: _onNotificationResponse,
@@ -174,26 +170,20 @@ class FirebasePushService implements IPushNotificationService {
       provisional: false,
     );
 
-    debugPrint('N42Chat: Notification permission: ${settings.authorizationStatus}');
-
     if (settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional) {
       // 获取 FCM Token
       _fcmToken = await FirebaseMessaging.instance.getToken();
-      debugPrint('N42Chat: FCM token obtained');
 
       // iOS 还需要获取 APNs Token
       if (Platform.isIOS) {
         _apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-        debugPrint('N42Chat: APNs token obtained');
       }
     }
   }
 
   /// 处理前台消息
   void _handleForegroundMessage(RemoteMessage message) {
-    debugPrint('N42Chat: Foreground message: ${message.messageId}');
-
     // 检查通知配置
     if (!_notificationConfig.enabled) return;
     if (_notificationConfig.isInDoNotDisturbPeriod()) return;
@@ -209,10 +199,20 @@ class FirebasePushService implements IPushNotificationService {
         if (room.pushRuleState == matrix.PushRuleState.dontNotify) {
           return;
         }
+
+        // 从房间获取信息显示通知
+        final roomName = room.getLocalizedDisplayname();
+        showLocalNotification(
+          title: roomName,
+          body: 'You have a new message',
+          roomId: roomId,
+          eventId: eventId,
+        );
+        return;
       }
     }
 
-    // 显示本地通知
+    // 如果有 notification payload，使用它
     final notification = message.notification;
     if (notification != null) {
       showLocalNotification(
@@ -222,39 +222,102 @@ class FirebasePushService implements IPushNotificationService {
         eventId: eventId,
         imageUrl: notification.android?.imageUrl ?? notification.apple?.imageUrl,
       );
+    } else {
+      // 没有 notification payload，显示默认通知
+      showLocalNotification(
+        title: 'N42 Chat',
+        body: 'You have a new message',
+        roomId: roomId,
+        eventId: eventId,
+      );
     }
   }
 
   /// 处理后台消息（静态方法）
   static Future<void> _handleBackgroundMessage(RemoteMessage message) async {
-    debugPrint('N42Chat: Background message: ${message.messageId}');
+    // 后台消息在单独的 isolate 中运行，需要初始化本地通知
+    if (_localNotifications == null) {
+      _localNotifications = FlutterLocalNotificationsPlugin();
 
-    // 后台消息通常由系统自动显示通知
-    // 这里可以添加额外的处理逻辑，如更新徽章数等
+      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const iosSettings = DarwinInitializationSettings();
+      const initSettings = InitializationSettings(
+        android: androidSettings,
+        iOS: iosSettings,
+      );
+
+      await _localNotifications!.initialize(settings: initSettings);
+
+      // 创建 Android 通知渠道
+      if (Platform.isAndroid) {
+        await _localNotifications!
+            .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+            ?.createNotificationChannel(_channel);
+      }
+    }
+
+    // 如果没有 notification payload，手动显示通知
+    if (message.notification == null) {
+      final roomId = message.data['room_id'] as String?;
+      final eventId = message.data['event_id'] as String?;
+
+      // 构建 payload
+      final payload = json.encode({
+        'room_id': roomId,
+        'event_id': eventId,
+      });
+
+      // 使用时间戳生成唯一通知 ID
+      final notificationId = DateTime.now().millisecondsSinceEpoch % 2147483647;
+
+      final androidDetails = AndroidNotificationDetails(
+        _channel.id,
+        _channel.name,
+        channelDescription: _channel.description,
+        importance: Importance.high,
+        priority: Priority.high,
+        playSound: true,
+        enableVibration: true,
+      );
+
+      const iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      );
+
+      final details = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _localNotifications!.show(
+        id: notificationId,
+        title: 'N42 Chat',
+        body: 'You have a new message',
+        notificationDetails: details,
+        payload: payload,
+      );
+    }
   }
 
   /// 处理通知点击
   void _handleNotificationTap(RemoteMessage message) {
-    debugPrint('N42Chat: Notification tapped: ${message.messageId}');
-
     final roomId = message.data['room_id'] as String?;
     final eventId = message.data['event_id'] as String?;
-
     onNotificationTap?.call(roomId, eventId);
   }
 
   /// 本地通知点击响应
   void _onNotificationResponse(NotificationResponse response) {
-    debugPrint('N42Chat: Local notification tapped: ${response.payload}');
-
     if (response.payload != null) {
       try {
         final data = json.decode(response.payload!);
         final roomId = data['room_id'] as String?;
         final eventId = data['event_id'] as String?;
         onNotificationTap?.call(roomId, eventId);
-      } catch (e) {
-        debugPrint('N42Chat: Failed to parse notification payload: $e');
+      } catch (_) {
+        // 忽略解析错误
       }
     }
   }
@@ -262,7 +325,6 @@ class FirebasePushService implements IPushNotificationService {
   /// 后台通知点击响应
   @pragma('vm:entry-point')
   static void _onBackgroundNotificationResponse(NotificationResponse response) {
-    debugPrint('N42Chat: Background notification tapped: ${response.payload}');
     // 后台点击会通过 FirebaseMessaging.onMessageOpenedApp 处理
   }
 
@@ -356,13 +418,7 @@ class FirebasePushService implements IPushNotificationService {
 
   @override
   Future<void> registerForPush() async {
-    if (_fcmToken == null) {
-      debugPrint('N42Chat: No FCM token available');
-      return;
-    }
-
-    if (pushGatewayUrl == null) {
-      debugPrint('N42Chat: Push gateway URL not configured');
+    if (_fcmToken == null || pushGatewayUrl == null) {
       return;
     }
 
@@ -383,8 +439,6 @@ class FirebasePushService implements IPushNotificationService {
         ),
         append: false,
       );
-
-      debugPrint('N42Chat: Push registered successfully');
     } catch (e) {
       debugPrint('N42Chat: Failed to register push: $e');
     }
@@ -406,10 +460,8 @@ class FirebasePushService implements IPushNotificationService {
           data: matrix.PusherData(),
         ),
       );
-
-      debugPrint('N42Chat: Push unregistered');
-    } catch (e) {
-      debugPrint('N42Chat: Failed to unregister push: $e');
+    } catch (_) {
+      // 忽略注销错误
     }
   }
 
@@ -430,57 +482,58 @@ class FirebasePushService implements IPushNotificationService {
   }) async {
     if (_localNotifications == null) return;
 
-    // 构建 payload
-    final payload = json.encode({
-      'room_id': roomId,
-      'event_id': eventId,
-    });
+    try {
+      // 构建 payload
+      final payload = json.encode({
+        'room_id': roomId,
+        'event_id': eventId,
+      });
 
-    // 生成通知 ID（使用 roomId 的 hash，这样同一房间的通知会覆盖）
-    final notificationId = roomId?.hashCode ?? DateTime.now().millisecondsSinceEpoch;
+      // 使用时间戳生成唯一通知 ID
+      final notificationId = DateTime.now().millisecondsSinceEpoch % 2147483647;
 
-    // Android 通知详情
-    final androidDetails = AndroidNotificationDetails(
-      _channel.id,
-      _channel.name,
-      channelDescription: _channel.description,
-      importance: Importance.high,
-      priority: Priority.high,
-      playSound: _notificationConfig.playSound,
-      enableVibration: _notificationConfig.vibrate,
-      groupKey: 'n42_chat_messages',
-      category: AndroidNotificationCategory.message,
-    );
+      // Android 通知详情
+      final androidDetails = AndroidNotificationDetails(
+        _channel.id,
+        _channel.name,
+        channelDescription: _channel.description,
+        importance: Importance.max,
+        priority: Priority.max,
+        playSound: true,
+        enableVibration: true,
+        groupKey: 'n42_chat_messages',
+        category: AndroidNotificationCategory.message,
+        fullScreenIntent: true,
+      );
 
-    // iOS 通知详情
-    const iosDetails = DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
+      // iOS 通知详情
+      const iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      );
 
-    final details = NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
-    );
+      final details = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
 
-    // flutter_local_notifications 18.x 使用命名参数
-    await _localNotifications!.show(
-      id: notificationId,
-      title: title,
-      body: body,
-      notificationDetails: details,
-      payload: payload,
-    );
+      await _localNotifications!.show(
+        id: notificationId,
+        title: title,
+        body: body,
+        notificationDetails: details,
+        payload: payload,
+      );
+    } catch (_) {
+      // 忽略通知显示错误
+    }
   }
 
   @override
   Future<void> clearNotificationsForRoom(String roomId) async {
     if (_localNotifications == null) return;
-
-    // 使用 roomId 的 hash 作为通知 ID
     final notificationId = roomId.hashCode;
-    // flutter_local_notifications 18.x 使用命名参数
     await _localNotifications!.cancel(id: notificationId);
   }
 
