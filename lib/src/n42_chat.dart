@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'core/extensions/context_extension.dart';
 import 'core/notifications/firebase_push_service.dart';
+import 'data/datasources/matrix/matrix_client_manager.dart';
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
 import 'core/utils/date_utils.dart';
@@ -220,8 +221,14 @@ class N42Chat {
   /// 初始化推送服务
   static Future<void> _initializePushService(N42ChatConfig config) async {
     try {
-      // 获取 Matrix 客户端
-      final client = getIt<matrix.Client>();
+      // 获取 Matrix 客户端管理器
+      final clientManager = getIt<MatrixClientManager>();
+      final client = clientManager.client;
+
+      if (client == null) {
+        debugPrint('N42Chat: Matrix client not initialized, push service will be initialized on login');
+        return;
+      }
 
       // 创建推送服务
       _pushService = FirebasePushService(
@@ -275,6 +282,11 @@ class N42Chat {
   ///
   /// 登录成功后调用此方法注册推送
   static Future<void> registerPushNotifications() async {
+    // 如果推送服务未初始化，先初始化
+    if (_pushService == null && _config != null && _config!.enablePushNotifications) {
+      await _initializePushService(_config!);
+    }
+
     if (_pushService != null) {
       await _pushService!.registerForPush();
     }
