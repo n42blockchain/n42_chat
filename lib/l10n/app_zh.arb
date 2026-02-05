@@ -125,6 +125,8 @@
   "avatarTooLarge": "头像文件过大，最大支持 10MB",
   "uploadAvatarFailed": "上传头像失败",
   "delete": "删除",
+  "deleteThisMessage": "删除这条消息？",
+  "messageDeleted": "消息已删除",
   "notLoggedIn": "未登录",
   "roomNotExist": "房间不存在: {roomId}",
   "@roomNotExist": {

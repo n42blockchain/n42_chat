@@ -230,6 +230,12 @@ class SEn extends S {
   String get delete => 'Delete';
 
   @override
+  String get deleteThisMessage => 'Delete this message?';
+
+  @override
+  String get messageDeleted => 'Message deleted';
+
+  @override
   String get notLoggedIn => 'Not logged in';
 
   @override

@@ -216,8 +216,8 @@ class WeChatMessageMenu extends StatelessWidget {
                     onFavorite?.call();
                   },
                 ),
-                // 发送失败的消息显示"重发"和"删除"
-                if (message.isFromMe && message.status == MessageStatus.failed) ...[
+                // 发送失败的消息显示"重发"
+                if (message.isFromMe && message.status == MessageStatus.failed)
                   _buildMenuItem(
                     icon: Icons.refresh,
                     label: S.of(context)?.resend ?? 'Resend',
@@ -226,16 +226,8 @@ class WeChatMessageMenu extends StatelessWidget {
                       onResend?.call();
                     },
                   ),
-                  _buildMenuItem(
-                    icon: Icons.delete_outline,
-                    label: S.of(context)?.delete ?? 'Delete',
-                    isHighlighted: true,
-                    onTap: () {
-                      onDismiss();
-                      onDelete?.call();
-                    },
-                  ),
-                ] else if (message.isFromMe)
+                // 自己发送的消息显示"撤回"（撤回后双方都不可见）
+                if (message.isFromMe && message.status != MessageStatus.failed)
                   _buildMenuItem(
                     icon: Icons.undo_outlined,
                     label: S.of(context)?.recall ?? 'Recall',
@@ -244,6 +236,15 @@ class WeChatMessageMenu extends StatelessWidget {
                       onRecall?.call();
                     },
                   ),
+                // 所有消息都可以删除（仅本地删除）
+                _buildMenuItem(
+                  icon: Icons.delete_outline,
+                  label: S.of(context)?.delete ?? 'Delete',
+                  onTap: () {
+                    onDismiss();
+                    onDelete?.call();
+                  },
+                ),
                 _buildMenuItem(
                   icon: Icons.checklist_outlined,
                   label: S.of(context)?.selectMessages ?? 'Select',
