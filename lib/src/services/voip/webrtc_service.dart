@@ -967,24 +967,19 @@ class WebRTCService {
 
     debugPrint('WebRTCService: Remote party hung up');
 
-    // 发送自己的 hangup 事件（包含通话时长），用于记录通话
+    // 发送通话记录消息
     final durationSeconds = _currentSession!.duration.inSeconds;
     final isVideo = _currentSession!.type == CallType.video;
-    try {
-      final room = _client.getRoomById(_currentSession!.roomId);
-      if (room != null) {
-        await room.sendEvent({
-          'call_id': _currentSession!.callId,
-          'party_id': _client.deviceID,
-          'version': '1',
-          'reason': 'remote_hangup',
-          'duration': durationSeconds,
-          'call_type': isVideo ? 'video' : 'voice',
-        }, type: 'm.call.hangup');
-        debugPrint('WebRTCService: Sent hangup event with duration=$durationSeconds');
-      }
-    } catch (e) {
-      debugPrint('WebRTCService: Failed to send hangup event: $e');
+    // 如果是来电状态（还没接听）且对方取消，视为未接来电
+    final isMissed = _state == CallState.incoming;
+    final room = _client.getRoomById(_currentSession!.roomId);
+    if (room != null) {
+      await _sendCallRecordMessage(
+        room: room,
+        isVideo: isVideo,
+        durationSeconds: durationSeconds,
+        isMissed: isMissed,
+      );
     }
 
     // 先通知 UI 通话结束
@@ -1025,24 +1020,17 @@ class WebRTCService {
 
     debugPrint('WebRTCService: Call rejected by remote party');
 
-    // 发送 hangup 事件记录通话被拒绝
+    // 发送通话记录消息（对方拒绝 = 未接通）
     if (_currentSession != null) {
       final isVideo = _currentSession!.type == CallType.video;
-      try {
-        final room = _client.getRoomById(_currentSession!.roomId);
-        if (room != null) {
-          await room.sendEvent({
-            'call_id': _currentSession!.callId,
-            'party_id': _client.deviceID,
-            'version': '1',
-            'reason': 'user_busy',  // 对方忙/拒绝
-            'duration': 0,
-            'call_type': isVideo ? 'video' : 'voice',
-          }, type: 'm.call.hangup');
-          debugPrint('WebRTCService: Sent hangup event for rejected call');
-        }
-      } catch (e) {
-        debugPrint('WebRTCService: Failed to send hangup event: $e');
+      final room = _client.getRoomById(_currentSession!.roomId);
+      if (room != null) {
+        await _sendCallRecordMessage(
+          room: room,
+          isVideo: isVideo,
+          durationSeconds: 0,
+          isMissed: true,  // 对方拒绝视为未接
+        );
       }
     }
 
