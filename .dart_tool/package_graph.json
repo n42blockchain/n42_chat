@@ -23,12 +23,15 @@
         "flutter",
         "flutter_bloc",
         "flutter_callkit_incoming",
+        "flutter_facebook_auth",
         "flutter_local_notifications",
         "flutter_localizations",
+        "flutter_olm",
         "flutter_secure_storage",
         "flutter_slidable",
         "flutter_svg",
         "flutter_webrtc",
+        "fluwx",
         "geocoding",
         "geolocator",
         "get_it",
@@ -59,6 +62,7 @@
         "shimmer",
         "sign_in_with_apple",
         "sqlite3_flutter_libs",
+        "twitter_login",
         "url_launcher",
         "uuid",
         "video_player",
@@ -79,7 +83,7 @@
     },
     {
       "name": "bloc_test",
-      "version": "9.1.7",
+      "version": "10.0.0",
       "dependencies": [
         "bloc",
         "diff_match_patch",
@@ -242,7 +246,7 @@
     },
     {
       "name": "local_auth",
-      "version": "2.3.0",
+      "version": "3.0.0",
       "dependencies": [
         "flutter",
         "local_auth_android",
@@ -260,8 +264,36 @@
       ]
     },
     {
+      "name": "fluwx",
+      "version": "4.6.3",
+      "dependencies": [
+        "flutter",
+        "flutter_web_plugins",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "twitter_login",
+      "version": "4.4.2",
+      "dependencies": [
+        "crypto",
+        "flutter",
+        "http"
+      ]
+    },
+    {
+      "name": "flutter_facebook_auth",
+      "version": "7.1.5",
+      "dependencies": [
+        "facebook_auth_desktop",
+        "flutter",
+        "flutter_facebook_auth_platform_interface",
+        "flutter_facebook_auth_web"
+      ]
+    },
+    {
       "name": "sign_in_with_apple",
-      "version": "6.1.4",
+      "version": "7.0.1",
       "dependencies": [
         "flutter",
         "meta",
@@ -271,7 +303,7 @@
     },
     {
       "name": "google_sign_in",
-      "version": "6.3.0",
+      "version": "7.2.0",
       "dependencies": [
         "flutter",
         "google_sign_in_android",
@@ -350,10 +382,12 @@
     },
     {
       "name": "mobile_scanner",
-      "version": "6.0.11",
+      "version": "7.1.4",
       "dependencies": [
+        "collection",
         "flutter",
         "flutter_web_plugins",
+        "meta",
         "plugin_platform_interface",
         "web"
       ]
@@ -521,7 +555,7 @@
     },
     {
       "name": "permission_handler",
-      "version": "11.4.0",
+      "version": "12.0.1",
       "dependencies": [
         "flutter",
         "meta",
@@ -769,18 +803,25 @@
     },
     {
       "name": "bloc",
-      "version": "8.1.4",
+      "version": "9.2.0",
       "dependencies": [
         "meta"
       ]
     },
     {
       "name": "flutter_bloc",
-      "version": "8.1.6",
+      "version": "9.1.1",
       "dependencies": [
         "bloc",
         "flutter",
         "provider"
+      ]
+    },
+    {
+      "name": "flutter_olm",
+      "version": "2.0.0",
+      "dependencies": [
+        "flutter"
       ]
     },
     {
@@ -1282,7 +1323,7 @@
     },
     {
       "name": "local_auth_windows",
-      "version": "1.0.11",
+      "version": "2.0.1",
       "dependencies": [
         "flutter",
         "local_auth_platform_interface"
@@ -1298,7 +1339,7 @@
     },
     {
       "name": "local_auth_darwin",
-      "version": "1.6.1",
+      "version": "2.0.1",
       "dependencies": [
         "flutter",
         "intl",
@@ -1307,7 +1348,7 @@
     },
     {
       "name": "local_auth_android",
-      "version": "1.0.56",
+      "version": "2.0.4",
       "dependencies": [
         "flutter",
         "flutter_plugin_android_lifecycle",
@@ -1321,8 +1362,50 @@
       "dependencies": []
     },
     {
-      "name": "sign_in_with_apple_web",
+      "name": "plugin_platform_interface",
+      "version": "2.1.8",
+      "dependencies": [
+        "meta"
+      ]
+    },
+    {
+      "name": "flutter_web_plugins",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "facebook_auth_desktop",
       "version": "2.1.1",
+      "dependencies": [
+        "flutter",
+        "flutter_facebook_auth_platform_interface",
+        "flutter_secure_storage",
+        "http"
+      ]
+    },
+    {
+      "name": "flutter_facebook_auth_web",
+      "version": "6.1.2",
+      "dependencies": [
+        "flutter",
+        "flutter_facebook_auth_platform_interface",
+        "flutter_web_plugins",
+        "web"
+      ]
+    },
+    {
+      "name": "flutter_facebook_auth_platform_interface",
+      "version": "6.1.2",
+      "dependencies": [
+        "flutter",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "sign_in_with_apple_web",
+      "version": "3.0.0",
       "dependencies": [
         "flutter",
         "flutter_web_plugins",
@@ -1331,7 +1414,7 @@
     },
     {
       "name": "sign_in_with_apple_platform_interface",
-      "version": "1.1.0",
+      "version": "2.0.0",
       "dependencies": [
         "flutter",
         "meta",
@@ -1340,7 +1423,7 @@
     },
     {
       "name": "google_sign_in_web",
-      "version": "0.12.4+4",
+      "version": "1.1.0",
       "dependencies": [
         "flutter",
         "flutter_web_plugins",
@@ -1352,7 +1435,7 @@
     },
     {
       "name": "google_sign_in_platform_interface",
-      "version": "2.5.0",
+      "version": "3.1.0",
       "dependencies": [
         "flutter",
         "plugin_platform_interface"
@@ -1360,7 +1443,7 @@
     },
     {
       "name": "google_sign_in_ios",
-      "version": "5.9.0",
+      "version": "6.2.5",
       "dependencies": [
         "flutter",
         "google_sign_in_platform_interface"
@@ -1368,7 +1451,7 @@
     },
     {
       "name": "google_sign_in_android",
-      "version": "6.2.1",
+      "version": "7.2.7",
       "dependencies": [
         "flutter",
         "google_sign_in_platform_interface"
@@ -1419,13 +1502,6 @@
         "flutter",
         "meta",
         "plugin_platform_interface"
-      ]
-    },
-    {
-      "name": "flutter_web_plugins",
-      "version": "0.0.0",
-      "dependencies": [
-        "flutter"
       ]
     },
     {
@@ -1519,13 +1595,6 @@
         "synchronized",
         "web",
         "webrtc_interface"
-      ]
-    },
-    {
-      "name": "plugin_platform_interface",
-      "version": "2.1.8",
-      "dependencies": [
-        "meta"
       ]
     },
     {
@@ -1774,7 +1843,7 @@
     },
     {
       "name": "permission_handler_android",
-      "version": "12.1.0",
+      "version": "13.0.1",
       "dependencies": [
         "flutter",
         "permission_handler_platform_interface"
