@@ -78,6 +78,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         status: AuthStatus.authenticated,
         user: user,
       ));
+      // 已登录状态，初始化通话管理器
+      _initializeCallManager();
     } else {
       emit(state.copyWith(status: AuthStatus.unauthenticated));
     }
@@ -124,6 +126,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       add(const LoadUserProfileData());
       // 登录成功后注册推送通知
       _registerPushNotifications();
+      // 登录成功后初始化通话管理器
+      _initializeCallManager();
     } else {
       emit(state.copyWith(
         status: AuthStatus.error,
@@ -177,6 +181,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       add(const LoadUserProfileData());
       // 注册成功后注册推送通知
       _registerPushNotifications();
+      // 注册成功后初始化通话管理器
+      _initializeCallManager();
     } else {
       emit(state.copyWith(
         status: AuthStatus.error,
@@ -193,6 +199,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       debugPrint('AuthBloc: Push notifications registered');
     } catch (e) {
       debugPrint('AuthBloc: Failed to register push notifications: $e');
+    }
+  }
+
+  /// 初始化通话管理器（登录成功后调用）
+  Future<void> _initializeCallManager() async {
+    try {
+      await N42Chat.initializeCallManager();
+      debugPrint('AuthBloc: Call manager initialized');
+    } catch (e) {
+      debugPrint('AuthBloc: Failed to initialize call manager: $e');
     }
   }
 
@@ -247,6 +263,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
       // 恢复会话成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
       add(const LoadUserProfileData());
+      // 恢复会话成功后初始化通话管理器
+      _initializeCallManager();
     } else {
       emit(state.copyWith(
         status: AuthStatus.unauthenticated,
@@ -552,6 +570,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
+        // Google 登录成功后初始化通话管理器
+        _initializeCallManager();
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -606,6 +626,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
+        // Apple 登录成功后初始化通话管理器
+        _initializeCallManager();
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -698,6 +720,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
+        // Facebook 登录成功后初始化通话管理器
+        _initializeCallManager();
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -752,6 +776,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
+        // Twitter 登录成功后初始化通话管理器
+        _initializeCallManager();
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -806,6 +832,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
+        // 微信登录成功后初始化通话管理器
+        _initializeCallManager();
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -1031,6 +1059,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         add(const LoadUserProfileData());
         // 登录成功后注册推送通知
         _registerPushNotifications();
+        // 登录成功后初始化通话管理器
+        _initializeCallManager();
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,

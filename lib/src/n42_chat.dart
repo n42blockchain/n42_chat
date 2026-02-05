@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'core/extensions/context_extension.dart';
 import 'core/notifications/firebase_push_service.dart';
 import 'data/datasources/matrix/matrix_client_manager.dart';
+import 'services/voip/call_manager.dart';
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
 import 'core/utils/date_utils.dart';
@@ -62,6 +64,12 @@ class N42Chat {
   /// 推送通知服务
   static FirebasePushService? _pushService;
 
+  /// 通话管理器
+  static CallManager? _callManager;
+
+  /// 导航键（用于通话页面导航）
+  static GlobalKey<NavigatorState>? _navigatorKey;
+
   /// 通知点击回调
   static void Function(String? roomId, String? eventId)? _onNotificationTap;
 
@@ -93,6 +101,16 @@ class N42Chat {
 
   /// 是否已初始化
   static bool get isInitialized => _initialized;
+
+  /// 获取通话管理器
+  static CallManager? get callManager => _callManager;
+
+  /// 设置导航键（用于通话页面导航）
+  static void setNavigatorKey(GlobalKey<NavigatorState> key) {
+    _navigatorKey = key;
+    // 同步更新 CallManager 的导航键
+    _callManager?.setNavigatorKey(key);
+  }
 
   /// 获取当前主题模式
   static ThemeMode get themeMode => _themeMode;
@@ -214,6 +232,17 @@ class N42Chat {
       await _initializePushService(config);
     }
 
+    // 如果 Matrix 客户端已登录，立即初始化通话管理器
+    try {
+      final clientManager = getIt<MatrixClientManager>();
+      if (clientManager.client?.isLogged() == true) {
+        debugPrint('N42Chat: Matrix client is logged in, initializing call manager');
+        await initializeCallManager();
+      }
+    } catch (e) {
+      debugPrint('N42Chat: Failed to check login status for call manager: $e');
+    }
+
     _initialized = true;
     debugPrint('N42Chat: Initialized successfully');
   }
@@ -299,6 +328,135 @@ class N42Chat {
     if (_pushService != null) {
       await _pushService!.unregisterPush();
     }
+  }
+
+  /// 初始化通话管理器
+  ///
+  /// 登录成功后调用此方法初始化 VoIP 服务
+  static Future<void> initializeCallManager() async {
+    try {
+      final clientManager = getIt<MatrixClientManager>();
+      final client = clientManager.client;
+
+      if (client == null) {
+        debugPrint('N42Chat: Matrix client not initialized, call manager will be initialized later');
+        return;
+      }
+
+      _callManager = CallManager();
+      await _callManager!.initialize(
+        client: client,
+        navigatorKey: _navigatorKey,
+      );
+
+      // 配置 TURN 服务器（从 Matrix 服务器获取）
+      try {
+        final turnServers = await client.getTurnServer();
+        debugPrint('N42Chat: TURN servers response: ${turnServers.uris}');
+        if (turnServers.uris.isNotEmpty) {
+          _callManager!.configureTurn(
+            uris: turnServers.uris,
+            username: turnServers.username,
+            password: turnServers.password,
+            ttl: turnServers.ttl,
+          );
+          debugPrint('N42Chat: TURN servers configured');
+        } else {
+          debugPrint('N42Chat: No TURN servers available');
+        }
+      } catch (e) {
+        debugPrint('N42Chat: Failed to get TURN servers: $e');
+      }
+
+      // 从 well-known 获取 LiveKit 配置
+      await _discoverLiveKitConfig(client);
+
+      debugPrint('N42Chat: Call manager initialized');
+    } catch (e) {
+      debugPrint('N42Chat: Failed to initialize call manager: $e');
+    }
+  }
+
+  /// 从 well-known 发现 LiveKit 配置
+  static Future<void> _discoverLiveKitConfig(matrix.Client client) async {
+    try {
+      final homeserver = client.homeserver;
+      if (homeserver == null) return;
+
+      // 获取 well-known 配置
+      final wellKnownUrl = Uri.parse('${homeserver.origin}/.well-known/matrix/client');
+      debugPrint('N42Chat: Fetching well-known from $wellKnownUrl');
+
+      final response = await client.httpClient.get(wellKnownUrl);
+      if (response.statusCode != 200) {
+        debugPrint('N42Chat: Well-known request failed: ${response.statusCode}');
+        return;
+      }
+
+      final wellKnown = jsonDecode(response.body) as Map<String, dynamic>;
+      debugPrint('N42Chat: Well-known response: $wellKnown');
+
+      // 检查 rtc_foci (Matrix VoIP focus 配置)
+      // 格式参考: https://spec.matrix.org/latest/client-server-api/#mhomesserver
+      final rtcFoci = wellKnown['org.matrix.msc4143.rtc_foci'] as List<dynamic>?;
+      if (rtcFoci != null && rtcFoci.isNotEmpty) {
+        for (final focus in rtcFoci) {
+          if (focus is Map<String, dynamic>) {
+            final type = focus['type'] as String?;
+            if (type == 'livekit') {
+              // livekit_service_url 是 JWT 服务 URL，用于获取访问令牌
+              final jwtServiceUrl = focus['livekit_service_url'] as String?;
+              final liveKitAlias = focus['livekit_alias'] as String?;
+              debugPrint('N42Chat: Found LiveKit JWT service: $jwtServiceUrl, alias=$liveKitAlias');
+
+              if (jwtServiceUrl != null) {
+                // 保存 JWT URL
+                _liveKitJwtUrl = jwtServiceUrl;
+
+                // 从 JWT URL 推导 WebSocket URL
+                // https://m.si46.world/livekit/jwt -> wss://m.si46.world/livekit/sfu
+                final uri = Uri.parse(jwtServiceUrl);
+                final wsUrl = 'wss://${uri.host}/livekit/sfu';
+
+                if (_callManager != null) {
+                  _callManager!.configureLiveKit(url: wsUrl);
+                  debugPrint('N42Chat: LiveKit WebSocket configured: $wsUrl');
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // 备选：检查自定义 LiveKit 配置字段
+      final liveKitConfig = wellKnown['n42.livekit'] as Map<String, dynamic>?;
+      if (liveKitConfig != null && _callManager != null) {
+        final wsUrl = liveKitConfig['ws_url'] as String?;
+        final jwtUrl = liveKitConfig['jwt_url'] as String?;
+        if (wsUrl != null) {
+          _callManager!.configureLiveKit(url: wsUrl);
+          debugPrint('N42Chat: LiveKit configured from n42.livekit: $wsUrl');
+        }
+        // 保存 JWT URL 供后续使用
+        if (jwtUrl != null) {
+          _liveKitJwtUrl = jwtUrl;
+          debugPrint('N42Chat: LiveKit JWT URL: $jwtUrl');
+        }
+      }
+    } catch (e) {
+      debugPrint('N42Chat: Failed to discover LiveKit config: $e');
+    }
+  }
+
+  /// LiveKit JWT URL (用于获取访问令牌)
+  static String? _liveKitJwtUrl;
+  static String? get liveKitJwtUrl => _liveKitJwtUrl;
+
+  /// 释放通话管理器
+  static Future<void> disposeCallManager() async {
+    await _callManager?.dispose();
+    _callManager = null;
   }
 
   /// 清除所有通知
