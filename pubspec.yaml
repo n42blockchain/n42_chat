@@ -137,7 +137,7 @@ dependencies:
   # MIT License
   flutter_webrtc: ^1.2.1
   # LiveKit 多人会议 - 需要解决 pointycastle 版本冲突后启用
-  # livekit_client: ^2.5.4
+  livekit_client: ^2.6.0
   
   # ============================================
   # Push Notifications & Call Kit - 来电推送

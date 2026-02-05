@@ -1,174 +1,14 @@
 /// LiveKit 多人会议服务
-/// 
+///
 /// 封装 livekit_client，提供多人音视频会议功能
-/// 
-/// 注意：由于 livekit_client 与 web3dart 存在依赖冲突（pointycastle 版本），
-/// 当前使用存根实现。解决冲突后可启用完整功能。
 library;
 
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-// import 'package:livekit_client/livekit_client.dart'; // 暂时禁用
+import 'package:livekit_client/livekit_client.dart';
 
 import 'voip_config.dart';
-
-// 存根类型定义 - 由于 livekit_client 与其他依赖冲突，使用存根实现
-// 这些类模拟 livekit_client API，但不提供实际功能
-
-/// 轨道来源
-class TrackSource {
-  static const camera = TrackSource._('camera');
-  static const microphone = TrackSource._('microphone');
-  static const screenShareVideo = TrackSource._('screenShareVideo');
-  static const screenShareAudio = TrackSource._('screenShareAudio');
-
-  final String _value;
-  const TrackSource._(this._value);
-
-  @override
-  String toString() => _value;
-}
-
-/// 视频轨道
-class VideoTrack {
-  final String sid;
-  VideoTrack({this.sid = ''});
-}
-
-/// 本地视频轨道
-class LocalVideoTrack extends VideoTrack {
-  CameraCaptureOptions? currentOptions;
-
-  LocalVideoTrack({super.sid, this.currentOptions});
-
-  Future<void> setCameraPosition(CameraPosition position) async {}
-}
-
-/// 音频轨道
-class AudioTrack {
-  final String sid;
-  AudioTrack({this.sid = ''});
-}
-
-/// 轨道发布信息
-class TrackPublication {
-  final TrackSource source;
-  final dynamic track;
-
-  TrackPublication({required this.source, this.track});
-}
-
-/// 房间选项
-class RoomOptions {
-  final bool adaptiveStream;
-  final bool dynacast;
-  final AudioPublishOptions? defaultAudioPublishOptions;
-  final VideoPublishOptions? defaultVideoPublishOptions;
-  final ScreenShareCaptureOptions? defaultScreenShareCaptureOptions;
-
-  const RoomOptions({
-    this.adaptiveStream = true,
-    this.dynacast = true,
-    this.defaultAudioPublishOptions,
-    this.defaultVideoPublishOptions,
-    this.defaultScreenShareCaptureOptions,
-  });
-}
-
-/// 音频发布选项
-class AudioPublishOptions {
-  final int audioBitrate;
-
-  const AudioPublishOptions({this.audioBitrate = 128000});
-}
-
-/// 视频发布选项
-class VideoPublishOptions {
-  final bool simulcast;
-
-  const VideoPublishOptions({this.simulcast = true});
-}
-
-/// 屏幕共享捕获选项
-class ScreenShareCaptureOptions {
-  final bool useiOSBroadcastExtension;
-  final double maxFrameRate;
-
-  const ScreenShareCaptureOptions({
-    this.useiOSBroadcastExtension = true,
-    this.maxFrameRate = 15.0,
-  });
-}
-
-/// 摄像头捕获选项
-class CameraCaptureOptions {
-  final CameraPosition cameraPosition;
-
-  const CameraCaptureOptions({this.cameraPosition = CameraPosition.front});
-}
-
-/// 房间
-class Room {
-  LocalParticipant? localParticipant;
-  String? name;
-  Map<String, RemoteParticipant> remoteParticipants = {};
-
-  Future<void> connect(String url, String token, {RoomOptions? roomOptions, dynamic fastConnectOptions}) async {
-    // 存根实现
-    localParticipant = LocalParticipant();
-  }
-  Future<void> disconnect() async {}
-  void dispose() {}
-  void addListener(void Function() listener) {}
-  void removeListener(void Function() listener) {}
-}
-
-/// 本地参与者
-class LocalParticipant {
-  String get identity => 'local';
-  String? get name => null;
-  Future<void> setMicrophoneEnabled(bool enabled) async {}
-  Future<void> setCameraEnabled(bool enabled) async {}
-  Future<void> setScreenShareEnabled(bool enabled, {dynamic captureScreenAudio}) async {}
-  List<TrackPublication> get audioTrackPublications => [];
-  List<TrackPublication> get videoTrackPublications => [];
-}
-
-/// 远程参与者
-class RemoteParticipant {
-  String get identity => '';
-  String? get name => null;
-  String? get metadata => null;
-  List<TrackPublication> get audioTrackPublications => [];
-  List<TrackPublication> get videoTrackPublications => [];
-
-  bool isMicrophoneEnabled() => false;
-  bool isCameraEnabled() => false;
-  bool isScreenShareEnabled() => false;
-}
-
-/// 连接状态
-class ConnectionState {
-  static const connected = ConnectionState._('connected');
-  static const disconnected = ConnectionState._('disconnected');
-  static const reconnecting = ConnectionState._('reconnecting');
-
-  final String _value;
-  const ConnectionState._(this._value);
-
-  @override
-  String toString() => _value;
-}
-
-/// 摄像头位置
-class CameraPosition {
-  static const front = CameraPosition._('front');
-  static const back = CameraPosition._('back');
-
-  final String _value;
-  const CameraPosition._(this._value);
-}
 
 /// 会议状态
 enum MeetingState {
@@ -193,7 +33,7 @@ class MeetingParticipant {
   final VideoTrack? videoTrack;
   final AudioTrack? audioTrack;
   final VideoTrack? screenTrack;
-  
+
   MeetingParticipant({
     required this.id,
     required this.name,
@@ -207,7 +47,7 @@ class MeetingParticipant {
     this.audioTrack,
     this.screenTrack,
   });
-  
+
   MeetingParticipant copyWith({
     bool? isSpeaking,
     bool? isMuted,
@@ -240,7 +80,7 @@ class MeetingInfo {
   final DateTime startTime;
   final int maxParticipants;
   final bool isRecording;
-  
+
   MeetingInfo({
     required this.roomId,
     required this.roomName,
@@ -251,41 +91,42 @@ class MeetingInfo {
 }
 
 /// LiveKit 服务
-class LiveKitService {
+class LiveKitService extends ChangeNotifier {
   final VoIPConfig _config;
-  
+
   Room? _room;
   LocalParticipant? _localParticipant;
-  
+  EventsListener<RoomEvent>? _roomListener;
+
   MeetingState _state = MeetingState.idle;
   MeetingInfo? _currentMeeting;
   final Map<String, MeetingParticipant> _participants = {};
-  
+
   // 本地控制状态
   bool _isMuted = false;
   bool _isVideoEnabled = true;
   bool _isScreenSharing = false;
-  
+
   // 事件回调
-  Function(MeetingState state)? onStateChanged;
-  Function(List<MeetingParticipant> participants)? onParticipantsChanged;
-  Function(MeetingParticipant participant)? onParticipantJoined;
-  Function(MeetingParticipant participant)? onParticipantLeft;
-  Function(MeetingParticipant participant)? onActiveSpeakerChanged;
-  Function(String error)? onError;
-  Function(bool isRecording)? onRecordingStateChanged;
-  
+  void Function(MeetingState state)? onStateChanged;
+  void Function(List<MeetingParticipant> participants)? onParticipantsChanged;
+  void Function(MeetingParticipant participant)? onParticipantJoined;
+  void Function(MeetingParticipant participant)? onParticipantLeft;
+  void Function(MeetingParticipant participant)? onActiveSpeakerChanged;
+  void Function(String error)? onError;
+  void Function(bool isRecording)? onRecordingStateChanged;
+
   // 通话时长
   Timer? _durationTimer;
   Duration _duration = Duration.zero;
-  Function(Duration duration)? onDurationUpdate;
-  
+  void Function(Duration duration)? onDurationUpdate;
+
   LiveKitService() : _config = VoIPConfig();
-  
+
   // ============================================
   // Getters
   // ============================================
-  
+
   MeetingState get state => _state;
   MeetingInfo? get currentMeeting => _currentMeeting;
   List<MeetingParticipant> get participants => _participants.values.toList();
@@ -295,13 +136,14 @@ class LiveKitService {
   bool get isInMeeting => _state == MeetingState.connected;
   LocalParticipant? get localParticipant => _localParticipant;
   Duration get duration => _duration;
-  
+  Room? get room => _room;
+
   // ============================================
   // 加入/离开会议
   // ============================================
-  
+
   /// 加入会议
-  /// 
+  ///
   /// [roomName] 房间名称
   /// [token] LiveKit 访问令牌（从服务端获取）
   /// [participantName] 参与者名称
@@ -319,52 +161,56 @@ class LiveKitService {
       debugPrint('LiveKitService: Already in a meeting');
       return false;
     }
-    
+
     if (_config.liveKitUrl == null) {
       onError?.call('LiveKit 服务器未配置');
       return false;
     }
-    
+
     try {
       _setState(MeetingState.connecting);
-      
-      // 连接选项
-      const roomOptions = RoomOptions(
-        adaptiveStream: true,
-        dynacast: true,
-        defaultAudioPublishOptions: AudioPublishOptions(
-          audioBitrate: 128000, // 128kbps
-        ),
-        defaultVideoPublishOptions: VideoPublishOptions(
-          simulcast: true,
-        ),
-        defaultScreenShareCaptureOptions: ScreenShareCaptureOptions(
-          useiOSBroadcastExtension: true,
-          maxFrameRate: 15.0,
+
+      // 创建房间实例
+      _room = Room(
+        roomOptions: const RoomOptions(
+          adaptiveStream: true,
+          dynacast: true,
+          defaultAudioPublishOptions: AudioPublishOptions(
+            audioBitrate: AudioPreset.music,
+          ),
+          defaultVideoPublishOptions: VideoPublishOptions(
+            simulcast: true,
+            videoCodec: 'VP8',
+          ),
+          defaultScreenShareCaptureOptions: ScreenShareCaptureOptions(
+            useiOSBroadcastExtension: true,
+            maxFrameRate: 15.0,
+          ),
         ),
       );
-      
-      // 连接到房间
-      _room = Room();
-      
+
       // 设置事件监听
       _setupRoomListeners();
-      
+
+      // 连接到房间
       await _room!.connect(
         _config.liveKitUrl!,
         token,
-        roomOptions: roomOptions,
+        fastConnectOptions: FastConnectOptions(
+          microphone: TrackOption(enabled: enableAudio),
+          camera: TrackOption(enabled: enableVideo),
+        ),
       );
-      
+
       _localParticipant = _room!.localParticipant;
-      
+
       // 创建会议信息
       _currentMeeting = MeetingInfo(
         roomId: _room!.name ?? roomName,
         roomName: roomName,
         startTime: DateTime.now(),
       );
-      
+
       // 添加本地参与者
       _participants[_localParticipant!.identity] = MeetingParticipant(
         id: _localParticipant!.identity,
@@ -374,27 +220,19 @@ class LiveKitService {
         isMuted: !enableAudio,
         isVideoEnabled: enableVideo,
       );
-      
-      // 发布本地媒体
-      if (enableAudio) {
-        await _localParticipant!.setMicrophoneEnabled(true);
-        _isMuted = false;
-      }
-      
-      if (enableVideo) {
-        await _localParticipant!.setCameraEnabled(true);
-        _isVideoEnabled = true;
-      }
-      
+
+      _isMuted = !enableAudio;
+      _isVideoEnabled = enableVideo;
+
       // 添加已有参与者
       for (final participant in _room!.remoteParticipants.values) {
         _addRemoteParticipant(participant);
       }
-      
+
       _setState(MeetingState.connected);
       _startDurationTimer();
       _notifyParticipantsChanged();
-      
+
       debugPrint('LiveKitService: Joined meeting $roomName');
       return true;
     } catch (e, stackTrace) {
@@ -406,57 +244,59 @@ class LiveKitService {
       return false;
     }
   }
-  
+
   /// 离开会议
   Future<void> leaveMeeting() async {
     if (_room == null) return;
-    
+
     try {
       await _room!.disconnect();
     } catch (e) {
       debugPrint('LiveKitService: Leave meeting failed: $e');
     }
-    
+
     await _cleanup();
     _setState(MeetingState.disconnected);
     debugPrint('LiveKitService: Left meeting');
   }
-  
+
   // ============================================
   // 媒体控制
   // ============================================
-  
+
   /// 切换麦克风
   Future<void> toggleMicrophone() async {
     if (_localParticipant == null) return;
-    
+
     _isMuted = !_isMuted;
     await _localParticipant!.setMicrophoneEnabled(!_isMuted);
-    
+
     _updateLocalParticipant();
     debugPrint('LiveKitService: Microphone ${_isMuted ? "muted" : "unmuted"}');
   }
-  
+
   /// 切换摄像头
   Future<void> toggleCamera() async {
     if (_localParticipant == null) return;
-    
+
     _isVideoEnabled = !_isVideoEnabled;
     await _localParticipant!.setCameraEnabled(_isVideoEnabled);
-    
+
     _updateLocalParticipant();
     debugPrint('LiveKitService: Camera ${_isVideoEnabled ? "enabled" : "disabled"}');
   }
-  
+
   /// 切换前后摄像头
   Future<void> switchCamera() async {
-    final videoTrack = _localParticipant?.videoTrackPublications
-        .firstOrNull?.track as LocalVideoTrack?;
-    
-    if (videoTrack != null) {
+    final publication = _localParticipant?.videoTrackPublications
+        .where((pub) => pub.source == TrackSource.camera)
+        .firstOrNull;
+
+    final videoTrack = publication?.track;
+    if (videoTrack is LocalVideoTrack) {
       // 切换摄像头
-      final captureOptions = videoTrack.currentOptions as CameraCaptureOptions?;
-      if (captureOptions != null) {
+      final captureOptions = videoTrack.currentOptions;
+      if (captureOptions is CameraCaptureOptions) {
         final newPosition = captureOptions.cameraPosition == CameraPosition.front
             ? CameraPosition.back
             : CameraPosition.front;
@@ -465,11 +305,11 @@ class LiveKitService {
       }
     }
   }
-  
+
   /// 开始屏幕共享
   Future<bool> startScreenShare() async {
     if (_localParticipant == null) return false;
-    
+
     try {
       await _localParticipant!.setScreenShareEnabled(true);
       _isScreenSharing = true;
@@ -482,11 +322,11 @@ class LiveKitService {
       return false;
     }
   }
-  
+
   /// 停止屏幕共享
   Future<void> stopScreenShare() async {
     if (_localParticipant == null) return;
-    
+
     try {
       await _localParticipant!.setScreenShareEnabled(false);
       _isScreenSharing = false;
@@ -496,7 +336,7 @@ class LiveKitService {
       debugPrint('LiveKitService: Stop screen share failed: $e');
     }
   }
-  
+
   /// 切换屏幕共享
   Future<void> toggleScreenShare() async {
     if (_isScreenSharing) {
@@ -505,77 +345,115 @@ class LiveKitService {
       await startScreenShare();
     }
   }
-  
+
   // ============================================
   // 录制控制
   // ============================================
-  
+
   /// 开始录制（需要服务端支持）
   Future<bool> startRecording() async {
     // TODO: 实现服务端录制 API 调用
     debugPrint('LiveKitService: Recording requires server-side implementation');
     return false;
   }
-  
+
   /// 停止录制
   Future<void> stopRecording() async {
     // TODO: 实现服务端录制 API 调用
     debugPrint('LiveKitService: Stop recording requires server-side implementation');
   }
-  
+
   // ============================================
   // 私有方法
   // ============================================
-  
+
   /// 设置房间事件监听
   void _setupRoomListeners() {
     if (_room == null) return;
-    
+
+    _roomListener = _room!.createListener();
+
     // 参与者加入
-    _room!.addListener(_onRoomEvent);
-  }
-  
-  void _onRoomEvent() {
-    final room = _room;
-    if (room == null) return;
-    
-    // 更新参与者列表
-    final currentIds = <String>{};
-    
-    // 检查新加入的参与者
-    for (final participant in room.remoteParticipants.values) {
-      currentIds.add(participant.identity);
-      
-      if (!_participants.containsKey(participant.identity)) {
-        _addRemoteParticipant(participant);
-      } else {
-        _updateRemoteParticipant(participant);
-      }
-    }
-    
-    // 检查离开的参与者
-    final leftIds = _participants.keys
-        .where((id) => id != _localParticipant?.identity && !currentIds.contains(id))
-        .toList();
-    
-    for (final id in leftIds) {
-      final participant = _participants.remove(id);
+    _roomListener!.on<ParticipantConnectedEvent>((event) {
+      _addRemoteParticipant(event.participant);
+      _notifyParticipantsChanged();
+    });
+
+    // 参与者离开
+    _roomListener!.on<ParticipantDisconnectedEvent>((event) {
+      final participant = _participants.remove(event.participant.identity);
       if (participant != null) {
         onParticipantLeft?.call(participant);
       }
-    }
-    
-    // 更新本地参与者的轨道
-    _updateLocalParticipant();
-    
-    _notifyParticipantsChanged();
+      _notifyParticipantsChanged();
+    });
+
+    // 轨道订阅
+    _roomListener!.on<TrackSubscribedEvent>((event) {
+      _updateRemoteParticipant(event.participant);
+      _notifyParticipantsChanged();
+    });
+
+    // 轨道取消订阅
+    _roomListener!.on<TrackUnsubscribedEvent>((event) {
+      _updateRemoteParticipant(event.participant);
+      _notifyParticipantsChanged();
+    });
+
+    // 轨道静音状态变化
+    _roomListener!.on<TrackMutedEvent>((event) {
+      if (event.participant is RemoteParticipant) {
+        _updateRemoteParticipant(event.participant as RemoteParticipant);
+      }
+      _notifyParticipantsChanged();
+    });
+
+    _roomListener!.on<TrackUnmutedEvent>((event) {
+      if (event.participant is RemoteParticipant) {
+        _updateRemoteParticipant(event.participant as RemoteParticipant);
+      }
+      _notifyParticipantsChanged();
+    });
+
+    // 活跃说话人变化
+    _roomListener!.on<ActiveSpeakersChangedEvent>((event) {
+      for (final speaker in event.speakers) {
+        final participant = _participants[speaker.identity];
+        if (participant != null) {
+          _participants[speaker.identity] = participant.copyWith(isSpeaking: true);
+          onActiveSpeakerChanged?.call(_participants[speaker.identity]!);
+        }
+      }
+      _notifyParticipantsChanged();
+    });
+
+    // 连接状态变化
+    _roomListener!.on<RoomDisconnectedEvent>((event) {
+      debugPrint('LiveKitService: Room disconnected: ${event.reason}');
+      _setState(MeetingState.disconnected);
+    });
+
+    _roomListener!.on<RoomReconnectingEvent>((event) {
+      debugPrint('LiveKitService: Room reconnecting');
+      _setState(MeetingState.reconnecting);
+    });
+
+    _roomListener!.on<RoomReconnectedEvent>((event) {
+      debugPrint('LiveKitService: Room reconnected');
+      _setState(MeetingState.connected);
+    });
+
+    // 录制状态变化
+    _roomListener!.on<RoomRecordingStatusChanged>((event) {
+      onRecordingStateChanged?.call(event.activeRecording);
+    });
   }
-  
+
   /// 添加远程参与者
   void _addRemoteParticipant(RemoteParticipant participant) {
     final meetingParticipant = MeetingParticipant(
       id: participant.identity,
-      name: participant.name ?? participant.identity,
+      name: participant.name.isNotEmpty ? participant.name : participant.identity,
       avatarUrl: participant.metadata,
       isLocal: false,
       isMuted: !participant.isMicrophoneEnabled(),
@@ -585,18 +463,18 @@ class LiveKitService {
       audioTrack: _getAudioTrack(participant),
       screenTrack: _getScreenTrack(participant),
     );
-    
+
     _participants[participant.identity] = meetingParticipant;
     onParticipantJoined?.call(meetingParticipant);
-    
+
     debugPrint('LiveKitService: Participant joined: ${participant.name}');
   }
-  
+
   /// 更新远程参与者
   void _updateRemoteParticipant(RemoteParticipant participant) {
     final existing = _participants[participant.identity];
     if (existing == null) return;
-    
+
     _participants[participant.identity] = existing.copyWith(
       isMuted: !participant.isMicrophoneEnabled(),
       isVideoEnabled: participant.isCameraEnabled(),
@@ -606,14 +484,14 @@ class LiveKitService {
       screenTrack: _getScreenTrack(participant),
     );
   }
-  
+
   /// 更新本地参与者
   void _updateLocalParticipant() {
     if (_localParticipant == null) return;
-    
+
     final existing = _participants[_localParticipant!.identity];
     if (existing == null) return;
-    
+
     _participants[_localParticipant!.identity] = existing.copyWith(
       isMuted: _isMuted,
       isVideoEnabled: _isVideoEnabled,
@@ -621,8 +499,10 @@ class LiveKitService {
       videoTrack: _getLocalVideoTrack(),
       screenTrack: _getLocalScreenTrack(),
     );
+
+    _notifyParticipantsChanged();
   }
-  
+
   /// 获取视频轨道
   VideoTrack? _getVideoTrack(RemoteParticipant participant) {
     for (final pub in participant.videoTrackPublications) {
@@ -632,7 +512,7 @@ class LiveKitService {
     }
     return null;
   }
-  
+
   /// 获取音频轨道
   AudioTrack? _getAudioTrack(RemoteParticipant participant) {
     for (final pub in participant.audioTrackPublications) {
@@ -642,7 +522,7 @@ class LiveKitService {
     }
     return null;
   }
-  
+
   /// 获取屏幕共享轨道
   VideoTrack? _getScreenTrack(RemoteParticipant participant) {
     for (final pub in participant.videoTrackPublications) {
@@ -652,7 +532,7 @@ class LiveKitService {
     }
     return null;
   }
-  
+
   /// 获取本地视频轨道
   VideoTrack? _getLocalVideoTrack() {
     for (final pub in _localParticipant?.videoTrackPublications ?? []) {
@@ -662,7 +542,7 @@ class LiveKitService {
     }
     return null;
   }
-  
+
   /// 获取本地屏幕共享轨道
   VideoTrack? _getLocalScreenTrack() {
     for (final pub in _localParticipant?.videoTrackPublications ?? []) {
@@ -672,20 +552,22 @@ class LiveKitService {
     }
     return null;
   }
-  
+
   /// 通知参与者变化
   void _notifyParticipantsChanged() {
     onParticipantsChanged?.call(participants);
+    notifyListeners();
   }
-  
+
   /// 设置状态
   void _setState(MeetingState newState) {
     if (_state == newState) return;
     _state = newState;
     onStateChanged?.call(_state);
+    notifyListeners();
     debugPrint('LiveKitService: State changed to $_state');
   }
-  
+
   /// 启动通话时长计时器
   void _startDurationTimer() {
     _durationTimer?.cancel();
@@ -695,31 +577,35 @@ class LiveKitService {
       onDurationUpdate?.call(_duration);
     });
   }
-  
+
   /// 清理资源
   Future<void> _cleanup() async {
     _durationTimer?.cancel();
     _durationTimer = null;
     _duration = Duration.zero;
-    
-    _room?.removeListener(_onRoomEvent);
+
+    // 同步释放资源，不需要等待
+    _roomListener?.dispose();
+    _roomListener = null;
+
     _room?.dispose();
     _room = null;
-    
+
     _localParticipant = null;
     _participants.clear();
     _currentMeeting = null;
-    
+
     _isMuted = false;
     _isVideoEnabled = true;
     _isScreenSharing = false;
-    
+
     debugPrint('LiveKitService: Cleaned up');
   }
-  
+
   /// 释放资源
+  @override
   Future<void> dispose() async {
     await leaveMeeting();
+    super.dispose();
   }
 }
-
