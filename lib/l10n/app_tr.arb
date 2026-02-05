@@ -59,6 +59,8 @@
   "avatarTooLarge": "Avatar dosyası çok büyük, maksimum 10MB",
   "uploadAvatarFailed": "Avatar yüklenemedi",
   "delete": "Sil",
+  "deleteThisMessage": "Bu mesajı silmek istiyor musunuz?",
+  "messageDeleted": "Mesaj silindi",
   "notLoggedIn": "Giriş yapılmadı",
   "roomNotExist": "Oda bulunamadı: {roomId}",
   "uploadImageFailed": "Resim yüklenemedi",

@@ -230,10 +230,10 @@ class STr extends S {
   String get delete => 'Sil';
 
   @override
-  String get deleteThisMessage => '删除这条消息？';
+  String get deleteThisMessage => 'Bu mesajı silmek istiyor musunuz?';
 
   @override
-  String get messageDeleted => '消息已删除';
+  String get messageDeleted => 'Mesaj silindi';
 
   @override
   String get notLoggedIn => 'Giriş yapılmadı';

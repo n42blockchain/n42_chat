@@ -59,6 +59,8 @@
   "avatarTooLarge": "Fichier avatar trop volumineux, max 10 Mo",
   "uploadAvatarFailed": "Echec du telechargement de l'avatar",
   "delete": "Supprimer",
+  "deleteThisMessage": "Supprimer ce message ?",
+  "messageDeleted": "Message supprimé",
   "notLoggedIn": "Non connecte",
   "roomNotExist": "Salon introuvable : {roomId}",
   "uploadImageFailed": "Echec du telechargement de l'image",

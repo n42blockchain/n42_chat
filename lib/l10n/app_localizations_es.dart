@@ -235,10 +235,10 @@ class SEs extends S {
   String get delete => 'Eliminar';
 
   @override
-  String get deleteThisMessage => '删除这条消息？';
+  String get deleteThisMessage => '¿Eliminar este mensaje?';
 
   @override
-  String get messageDeleted => '消息已删除';
+  String get messageDeleted => 'Mensaje eliminado';
 
   @override
   String get notLoggedIn => 'No has iniciado sesion';

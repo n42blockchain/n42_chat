@@ -232,10 +232,10 @@ class SId extends S {
   String get delete => 'Hapus';
 
   @override
-  String get deleteThisMessage => '删除这条消息？';
+  String get deleteThisMessage => 'Hapus pesan ini?';
 
   @override
-  String get messageDeleted => '消息已删除';
+  String get messageDeleted => 'Pesan dihapus';
 
   @override
   String get notLoggedIn => 'Belum masuk';

@@ -235,10 +235,10 @@ class SFr extends S {
   String get delete => 'Supprimer';
 
   @override
-  String get deleteThisMessage => '删除这条消息？';
+  String get deleteThisMessage => 'Supprimer ce message ?';
 
   @override
-  String get messageDeleted => '消息已删除';
+  String get messageDeleted => 'Message supprimé';
 
   @override
   String get notLoggedIn => 'Non connecte';

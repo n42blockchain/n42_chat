@@ -41,7 +41,12 @@ class VoIPConfig {
   /// LiveKit API Key（用于生成 token）
   String? liveKitApiKey;
   
-  /// LiveKit API Secret（用于生成 token，仅服务端使用）
+  /// LiveKit API Secret（用于生成 token）
+  ///
+  /// **安全警告**: 此字段仅用于开发测试。
+  /// 生产环境中，token 应由后端服务器生成，
+  /// API Secret 不应存储在客户端。
+  @Deprecated('Token should be generated server-side in production')
   String? liveKitApiSecret;
   
   // ============================================

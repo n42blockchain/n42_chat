@@ -59,6 +59,8 @@
   "avatarTooLarge": "Plik awatara jest za duzy, maks. 10MB",
   "uploadAvatarFailed": "Nie udalo sie przeslac awatara",
   "delete": "Usun",
+  "deleteThisMessage": "Usunąć tę wiadomość?",
+  "messageDeleted": "Wiadomość usunięta",
   "notLoggedIn": "Nie zalogowano",
   "roomNotExist": "Pokoj nie zostal znaleziony: {roomId}",
   "uploadImageFailed": "Nie udalo sie przeslac obrazu",

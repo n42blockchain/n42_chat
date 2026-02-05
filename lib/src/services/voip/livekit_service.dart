@@ -20,6 +20,20 @@ enum MeetingState {
   failed,
 }
 
+/// 会议错误类型（用于国际化）
+enum MeetingErrorType {
+  /// LiveKit 服务器未配置
+  serverNotConfigured,
+  /// 加入会议失败
+  joinFailed,
+  /// 屏幕共享失败
+  screenShareFailed,
+  /// 连接断开
+  connectionLost,
+  /// 未知错误
+  unknown,
+}
+
 /// 参与者信息
 class MeetingParticipant {
   final String id;
@@ -113,7 +127,9 @@ class LiveKitService extends ChangeNotifier {
   void Function(MeetingParticipant participant)? onParticipantJoined;
   void Function(MeetingParticipant participant)? onParticipantLeft;
   void Function(MeetingParticipant participant)? onActiveSpeakerChanged;
-  void Function(String error)? onError;
+  /// 错误回调，传递错误类型和可选的详细信息
+  /// 调用方应根据 [MeetingErrorType] 显示国际化的错误消息
+  void Function(MeetingErrorType type, [String? details])? onError;
   void Function(bool isRecording)? onRecordingStateChanged;
 
   // 通话时长
@@ -163,7 +179,7 @@ class LiveKitService extends ChangeNotifier {
     }
 
     if (_config.liveKitUrl == null) {
-      onError?.call('LiveKit 服务器未配置');
+      onError?.call(MeetingErrorType.serverNotConfigured);
       return false;
     }
 
@@ -239,7 +255,7 @@ class LiveKitService extends ChangeNotifier {
       debugPrint('LiveKitService: Join meeting failed: $e');
       debugPrint('Stack: $stackTrace');
       _setState(MeetingState.failed);
-      onError?.call('加入会议失败: $e');
+      onError?.call(MeetingErrorType.joinFailed, e.toString());
       await _cleanup();
       return false;
     }
@@ -318,7 +334,7 @@ class LiveKitService extends ChangeNotifier {
       return true;
     } catch (e) {
       debugPrint('LiveKitService: Start screen share failed: $e');
-      onError?.call('屏幕共享失败: $e');
+      onError?.call(MeetingErrorType.screenShareFailed, e.toString());
       return false;
     }
   }
@@ -584,11 +600,11 @@ class LiveKitService extends ChangeNotifier {
     _durationTimer = null;
     _duration = Duration.zero;
 
-    // 同步释放资源，不需要等待
-    _roomListener?.dispose();
+    // 异步释放资源
+    await _roomListener?.dispose();
     _roomListener = null;
 
-    _room?.dispose();
+    await _room?.dispose();
     _room = null;
 
     _localParticipant = null;
@@ -604,8 +620,12 @@ class LiveKitService extends ChangeNotifier {
 
   /// 释放资源
   @override
-  Future<void> dispose() async {
-    await leaveMeeting();
+  void dispose() {
+    // 注意: dispose 必须是同步的（ChangeNotifier 要求）
+    // 如果需要异步清理，应在调用 dispose 前手动调用 leaveMeeting
+    _durationTimer?.cancel();
+    _roomListener?.dispose();
+    _room?.dispose();
     super.dispose();
   }
 }

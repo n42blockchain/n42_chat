@@ -231,10 +231,10 @@ class SRu extends S {
   String get delete => 'Удалить';
 
   @override
-  String get deleteThisMessage => '删除这条消息？';
+  String get deleteThisMessage => 'Удалить это сообщение?';
 
   @override
-  String get messageDeleted => '消息已删除';
+  String get messageDeleted => 'Сообщение удалено';
 
   @override
   String get notLoggedIn => 'Не выполнен вход';

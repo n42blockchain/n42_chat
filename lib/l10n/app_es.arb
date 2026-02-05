@@ -59,6 +59,8 @@
   "avatarTooLarge": "El archivo del avatar es muy grande, maximo 10MB",
   "uploadAvatarFailed": "Error al subir el avatar",
   "delete": "Eliminar",
+  "deleteThisMessage": "¿Eliminar este mensaje?",
+  "messageDeleted": "Mensaje eliminado",
   "notLoggedIn": "No has iniciado sesion",
   "roomNotExist": "Sala no encontrada: {roomId}",
   "uploadImageFailed": "Error al subir la imagen",

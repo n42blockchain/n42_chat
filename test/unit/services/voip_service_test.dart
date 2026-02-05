@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/src/services/voip/voip_config.dart';
+import 'package:n42_chat/src/services/voip/livekit_service.dart';
 
 void main() {
   group('VoIPConfig', () {
@@ -121,11 +122,147 @@ void main() {
 
     test('toConstraints should return valid map', () {
       final constraints = VideoResolution.hd720.toConstraints();
-      
+
       expect(constraints['width'], isA<Map>());
       expect(constraints['height'], isA<Map>());
       expect(constraints['width']['ideal'], equals(1280));
       expect(constraints['height']['ideal'], equals(720));
+    });
+  });
+
+  group('LiveKitService', () {
+    late LiveKitService liveKitService;
+
+    setUp(() {
+      liveKitService = LiveKitService();
+    });
+
+    tearDown(() {
+      liveKitService.dispose();
+    });
+
+    test('initial state should be idle', () {
+      expect(liveKitService.state, equals(MeetingState.idle));
+      expect(liveKitService.isInMeeting, isFalse);
+      expect(liveKitService.participants, isEmpty);
+    });
+
+    test('should not be muted by default', () {
+      expect(liveKitService.isMuted, isFalse);
+      expect(liveKitService.isVideoEnabled, isTrue);
+      expect(liveKitService.isScreenSharing, isFalse);
+    });
+
+    test('currentMeeting should be null when not in meeting', () {
+      expect(liveKitService.currentMeeting, isNull);
+    });
+
+    test('joinMeeting should fail without LiveKit URL configured', () async {
+      final result = await liveKitService.joinMeeting(
+        roomName: 'test-room',
+        token: 'test-token',
+        participantName: 'Test User',
+      );
+
+      expect(result, isFalse);
+      expect(liveKitService.state, equals(MeetingState.idle));
+    });
+
+    test('leaveMeeting should be safe when not in meeting', () async {
+      // Should not throw
+      await liveKitService.leaveMeeting();
+      expect(liveKitService.state, equals(MeetingState.idle));
+    });
+
+    test('toggleMicrophone should be safe when not in meeting', () async {
+      // Should not throw
+      await liveKitService.toggleMicrophone();
+    });
+
+    test('toggleCamera should be safe when not in meeting', () async {
+      // Should not throw
+      await liveKitService.toggleCamera();
+    });
+
+    test('duration should be zero when not in meeting', () {
+      expect(liveKitService.duration, equals(Duration.zero));
+    });
+  });
+
+  group('MeetingParticipant', () {
+    test('should create with required fields', () {
+      final participant = MeetingParticipant(
+        id: 'user-123',
+        name: 'Test User',
+      );
+
+      expect(participant.id, equals('user-123'));
+      expect(participant.name, equals('Test User'));
+      expect(participant.isLocal, isFalse);
+      expect(participant.isMuted, isFalse);
+      expect(participant.isVideoEnabled, isTrue);
+    });
+
+    test('copyWith should create new instance with updated fields', () {
+      final participant = MeetingParticipant(
+        id: 'user-123',
+        name: 'Test User',
+      );
+
+      final updated = participant.copyWith(
+        isMuted: true,
+        isVideoEnabled: false,
+      );
+
+      expect(updated.id, equals('user-123'));
+      expect(updated.name, equals('Test User'));
+      expect(updated.isMuted, isTrue);
+      expect(updated.isVideoEnabled, isFalse);
+    });
+
+    test('copyWith should preserve unchanged fields', () {
+      final participant = MeetingParticipant(
+        id: 'user-123',
+        name: 'Test User',
+        avatarUrl: 'https://example.com/avatar.png',
+        isLocal: true,
+      );
+
+      final updated = participant.copyWith(isMuted: true);
+
+      expect(updated.avatarUrl, equals('https://example.com/avatar.png'));
+      expect(updated.isLocal, isTrue);
+    });
+  });
+
+  group('MeetingInfo', () {
+    test('should create with required fields', () {
+      final now = DateTime.now();
+      final info = MeetingInfo(
+        roomId: 'room-123',
+        roomName: 'Test Room',
+        startTime: now,
+      );
+
+      expect(info.roomId, equals('room-123'));
+      expect(info.roomName, equals('Test Room'));
+      expect(info.startTime, equals(now));
+      expect(info.maxParticipants, equals(50));
+      expect(info.isRecording, isFalse);
+    });
+
+    test('should create with optional fields', () {
+      final now = DateTime.now();
+      final info = MeetingInfo(
+        roomId: 'room-123',
+        roomName: 'Test Room',
+        startTime: now,
+        maxParticipants: 100,
+        isRecording: true,
+      );
+
+      expect(info.maxParticipants, equals(100));
+      expect(info.isRecording, isTrue);
     });
   });
 }

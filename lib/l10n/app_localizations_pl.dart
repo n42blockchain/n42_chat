@@ -234,10 +234,10 @@ class SPl extends S {
   String get delete => 'Usun';
 
   @override
-  String get deleteThisMessage => '删除这条消息？';
+  String get deleteThisMessage => 'Usunąć tę wiadomość?';
 
   @override
-  String get messageDeleted => '消息已删除';
+  String get messageDeleted => 'Wiadomość usunięta';
 
   @override
   String get notLoggedIn => 'Nie zalogowano';

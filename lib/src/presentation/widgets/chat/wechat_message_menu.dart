@@ -39,7 +39,7 @@ class WeChatMessageMenu extends StatelessWidget {
   final VoidCallback? onSave; // 保存图片/视频
 
   /// 表情回应回调
-  final Function(String emoji)? onReaction;
+  final void Function(String emoji)? onReaction;
 
   const WeChatMessageMenu({
     super.key,
@@ -357,7 +357,7 @@ class WeChatMessageMenu extends StatelessWidget {
             // 先关闭当前菜单
             onDismiss();
             // 显示完整表情选择器
-            showModalBottomSheet(
+            showModalBottomSheet<void>(
               context: context,
               backgroundColor: Colors.transparent,
               builder: (ctx) => FullReactionPicker(
@@ -614,7 +614,7 @@ class MessageMenuHelper {
     VoidCallback? onDelete,
     VoidCallback? onResend,
     VoidCallback? onSave,
-    Function(String emoji)? onReaction,
+    void Function(String emoji)? onReaction,
     bool isFavorited = false,
   }) {
     // 获取消息气泡的位置和大小

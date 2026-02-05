@@ -59,6 +59,8 @@
   "avatarTooLarge": "프로필 사진이 너무 큽니다. 최대 10MB",
   "uploadAvatarFailed": "프로필 사진 업로드 실패",
   "delete": "삭제",
+  "deleteThisMessage": "이 메시지를 삭제하시겠습니까?",
+  "messageDeleted": "메시지가 삭제되었습니다",
   "notLoggedIn": "로그인되지 않음",
   "roomNotExist": "방을 찾을 수 없습니다: {roomId}",
   "uploadImageFailed": "이미지 업로드 실패",

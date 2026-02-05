@@ -59,6 +59,8 @@
   "avatarTooLarge": "Berkas avatar terlalu besar, maksimal 10MB",
   "uploadAvatarFailed": "Gagal mengunggah avatar",
   "delete": "Hapus",
+  "deleteThisMessage": "Hapus pesan ini?",
+  "messageDeleted": "Pesan dihapus",
   "notLoggedIn": "Belum masuk",
   "roomNotExist": "Ruangan tidak ditemukan: {roomId}",
   "uploadImageFailed": "Gagal mengunggah gambar",
