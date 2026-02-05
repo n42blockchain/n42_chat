@@ -65,6 +65,8 @@
   "avatarTooLarge": "Avatar file too large, max 10MB",
   "uploadAvatarFailed": "Failed to upload avatar",
   "delete": "Delete",
+  "deleteThisMessage": "Delete this message?",
+  "messageDeleted": "Message deleted",
   "notLoggedIn": "Not logged in",
   "roomNotExist": "Room not found: {roomId}",
   "uploadImageFailed": "Failed to upload image",

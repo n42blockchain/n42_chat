@@ -3418,8 +3418,8 @@ Avatar: ${contactAvatar ?? ''}''';
           _searchMessage(message);
         },
         onDelete: () {
-          debugPrint('Delete failed message clicked');
-          _deleteFailedMessage(message);
+          debugPrint('Delete message locally clicked');
+          _deleteMessageLocally(message);
         },
         onResend: () {
           debugPrint('Resend clicked');
@@ -3959,7 +3959,37 @@ Avatar: ${contactAvatar ?? ''}''';
       ),
     );
   }
-  
+
+  /// 本地删除消息（仅从本地移除，对方仍可见）
+  Future<void> _deleteMessageLocally(MessageEntity message) async {
+    // 显示确认对话框
+    final confirmed = await _showDeleteConfirmDialog();
+    if (!confirmed) return;
+
+    // 本地删除
+    context.read<ChatBloc>().add(DeleteMessagesLocally([message.id]));
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(S.of(context)?.messageDeleted ?? 'Message deleted'),
+          duration: const Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  /// 显示删除确认对话框
+  Future<bool> _showDeleteConfirmDialog() async {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _DeleteConfirmSheet(),
+    );
+    return result ?? false;
+  }
+
   /// 撤回消息
   Future<void> _recallMessage(MessageEntity message) async {
     if (!message.isFromMe) return;
@@ -4486,6 +4516,108 @@ Avatar: ${contactAvatar ?? ''}''';
               });
             }
           : null,
+    );
+  }
+}
+
+/// 删除确认底部弹窗（微信风格）
+class _DeleteConfirmSheet extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF2C2C2E) : Colors.white;
+    final separatorColor = isDark ? const Color(0xFF38383A) : const Color(0xFFE5E5EA);
+
+    return SafeArea(
+      child: Container(
+        margin: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 主要内容
+            Container(
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 标题
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Text(
+                      S.of(context)?.deleteThisMessage ?? 'Delete this message?',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                    ),
+                  ),
+
+                  // 分隔线
+                  Container(height: 0.5, color: separatorColor),
+
+                  // 删除按钮
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => Navigator.pop(context, true),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(14),
+                        bottomRight: Radius.circular(14),
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        child: Text(
+                          S.of(context)?.delete ?? 'Delete',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Color(0xFFFF3B30), // iOS red
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // 取消按钮
+            Container(
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => Navigator.pop(context, false),
+                  borderRadius: BorderRadius.circular(14),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    child: Text(
+                      S.of(context)?.cancel ?? 'Cancel',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: isDark ? Colors.white : const Color(0xFF007AFF),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

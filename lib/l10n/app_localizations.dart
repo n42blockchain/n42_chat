@@ -511,6 +511,18 @@ abstract class S {
   /// **'删除'**
   String get delete;
 
+  /// No description provided for @deleteThisMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除这条消息？'**
+  String get deleteThisMessage;
+
+  /// No description provided for @messageDeleted.
+  ///
+  /// In zh, this message translates to:
+  /// **'消息已删除'**
+  String get messageDeleted;
+
   /// No description provided for @notLoggedIn.
   ///
   /// In zh, this message translates to:

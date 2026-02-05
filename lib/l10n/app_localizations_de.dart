@@ -234,6 +234,12 @@ class SDe extends S {
   String get delete => 'Löschen';
 
   @override
+  String get deleteThisMessage => '删除这条消息？';
+
+  @override
+  String get messageDeleted => '消息已删除';
+
+  @override
   String get notLoggedIn => 'Nicht angemeldet';
 
   @override
