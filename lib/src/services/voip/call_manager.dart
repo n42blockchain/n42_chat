@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../l10n/app_localizations.dart';
+import '../../n42_chat.dart';
 import 'voip_config.dart';
 import 'webrtc_service.dart';
 import 'livekit_service.dart';
@@ -40,9 +41,12 @@ class CallManager {
   
   // 导航键
   GlobalKey<NavigatorState>? _navigatorKey;
-  
+
   // 是否已初始化
   bool _isInitialized = false;
+
+  // 是否已显示通话界面
+  bool _isCallScreenShowing = false;
   
   // 事件回调
   Function(CallSession)? onIncomingCall;
@@ -50,9 +54,15 @@ class CallManager {
   Function(String error)? onError;
   
   // ============================================
-  // Getters
+  // Getters & Setters
   // ============================================
-  
+
+  /// 更新导航键（在 N42Chat.setNavigatorKey() 中调用）
+  void setNavigatorKey(GlobalKey<NavigatorState>? key) {
+    _navigatorKey = key;
+    debugPrint('CallManager: Navigator key updated');
+  }
+
   VoIPConfig get config => _config;
   WebRTCService? get webRTCService => _webRTCService;
   LiveKitService? get liveKitService => _liveKitService;
@@ -176,15 +186,20 @@ class CallManager {
     required CallType type,
   }) async {
     if (_webRTCService == null) {
-      onError?.call('通话服务未初始化');
+      onError?.call('call_not_initialized');
       return false;
     }
-    
+
     if (isInCall || isInMeeting) {
-      onError?.call('当前正在通话中');
+      onError?.call('already_in_call');
       return false;
     }
-    
+
+    // 设置活跃房间，禁用该房间的消息通知
+    N42Chat.pushService?.setActiveRoom(roomId);
+    // 设置通话状态，禁用所有消息通知
+    N42Chat.pushService?.setInCall(true);
+
     // 显示去电通知
     await _notificationService.showOutgoingCall(
       calleeId: peerId,
@@ -215,11 +230,25 @@ class CallManager {
   
   /// 接听来电
   Future<bool> answerCall() async {
-    if (_webRTCService == null) return false;
-    
+    debugPrint('CallManager: answerCall called');
+    debugPrint('CallManager: _isInitialized=$_isInitialized, _webRTCService=${_webRTCService != null ? "exists" : "null"}');
+
+    if (_webRTCService == null) {
+      debugPrint('CallManager: ERROR - webRTCService is null in answerCall');
+      return false;
+    }
+
+    final state = _webRTCService!.state;
+    final session = _webRTCService!.currentSession;
+    debugPrint('CallManager: current state=$state, session=${session != null ? "exists (callId=${session.callId})" : "null"}');
+
+    // 立即停止来电铃声和通知
+    await _notificationService.endAllCalls();
+
     final success = await _webRTCService!.answerCall();
+    debugPrint('CallManager: answerCall result=$success');
     if (success) {
-      _navigateToCallScreen();
+      _navigateToCallScreen(isIncoming: true, session: session);
     }
     return success;
   }
@@ -228,12 +257,21 @@ class CallManager {
   Future<void> rejectCall() async {
     await _webRTCService?.rejectCall();
     await _notificationService.endAllCalls();
+    // 清除活跃房间
+    N42Chat.pushService?.setActiveRoom(null);
   }
-  
+
+  /// 停止来电铃声（不挂断通话）
+  Future<void> stopRingtone() async {
+    await _notificationService.endAllCalls();
+  }
+
   /// 挂断通话
   Future<void> hangupCall() async {
     await _webRTCService?.hangup();
     await _notificationService.endAllCalls();
+    // 清除活跃房间
+    N42Chat.pushService?.setActiveRoom(null);
   }
   
   // ============================================
@@ -315,6 +353,11 @@ class CallManager {
   void _handleIncomingCall(CallSession session) async {
     debugPrint('CallManager: Incoming call from ${session.peerName}');
 
+    // 设置活跃房间，禁用该房间的消息通知
+    N42Chat.pushService?.setActiveRoom(session.roomId);
+    // 设置通话状态，禁用所有消息通知
+    N42Chat.pushService?.setInCall(true);
+
     // 获取本地化字符串
     final context = _navigatorKey?.currentContext;
     final l10n = context != null ? S.of(context) : null;
@@ -334,21 +377,34 @@ class CallManager {
       missedCallChannelName: l10n?.missedCall ?? 'Missed call',
     );
 
+    // 直接导航到来电界面（如果应用在前台）
+    _navigateToCallScreen(isIncoming: true, session: session);
+
     onIncomingCall?.call(session);
   }
   
   void _handleCallStateChanged(CallState state) {
     debugPrint('CallManager: Call state changed to $state');
-    
+
     if (state == CallState.connected) {
       final callId = _webRTCService?.currentSession?.callId;
       if (callId != null) {
         _notificationService.setCallConnected(callId);
       }
+      // 确保通话界面已显示
+      if (!_isCallScreenShowing) {
+        debugPrint('CallManager: Call connected but screen not showing, navigating now');
+        _navigateToCallScreen();
+      }
     } else if (state == CallState.ended || state == CallState.failed) {
       _notificationService.endAllCalls();
+      _isCallScreenShowing = false;
+      // 清除活跃房间，恢复该房间的消息通知
+      N42Chat.pushService?.setActiveRoom(null);
+      // 清除通话状态，恢复消息通知
+      N42Chat.pushService?.setInCall(false);
     }
-    
+
     onCallStateChanged?.call(state);
   }
   
@@ -390,17 +446,45 @@ class CallManager {
     }
   }
   
-  void _navigateToCallScreen() {
+  void _navigateToCallScreen({bool isIncoming = false, CallSession? session}) {
+    debugPrint('CallManager: _navigateToCallScreen called, isIncoming=$isIncoming, _isCallScreenShowing=$_isCallScreenShowing');
+
+    if (_isCallScreenShowing) {
+      debugPrint('CallManager: Call screen already showing, skipping navigation');
+      return;
+    }
+
+    if (_navigatorKey == null) {
+      debugPrint('CallManager: ERROR - navigatorKey is null! Did you call N42Chat.setNavigatorKey()?');
+      return;
+    }
+
     final context = _navigatorKey?.currentContext;
-    if (context == null || _webRTCService == null) return;
-    
+    if (context == null) {
+      debugPrint('CallManager: ERROR - navigatorKey.currentContext is null! App might be in background.');
+      return;
+    }
+
+    if (_webRTCService == null) {
+      debugPrint('CallManager: ERROR - webRTCService is null!');
+      return;
+    }
+
+    debugPrint('CallManager: Navigating to CallScreen');
+    _isCallScreenShowing = true;
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (context) => CallScreen(
           webRTCService: _webRTCService!,
+          session: session,
+          isIncoming: isIncoming,
         ),
       ),
-    );
+    ).then((_) {
+      debugPrint('CallManager: CallScreen closed');
+      _isCallScreenShowing = false;
+    });
   }
   
   void _navigateToGroupCallScreen(String roomName) {

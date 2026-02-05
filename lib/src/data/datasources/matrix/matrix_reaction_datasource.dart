@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'matrix_client_manager.dart';
@@ -169,10 +170,23 @@ class MatrixReactionDataSource {
     String eventId, {
     String? reason,
   }) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) throw Exception('Room not found');
+    debugPrint('MatrixReactionDataSource: redactMessage called - roomId=$roomId, eventId=$eventId, reason=$reason');
 
-    await room.redactEvent(eventId, reason: reason);
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      debugPrint('MatrixReactionDataSource: Room not found: $roomId');
+      throw Exception('Room not found');
+    }
+
+    try {
+      debugPrint('MatrixReactionDataSource: Calling room.redactEvent...');
+      final result = await room.redactEvent(eventId, reason: reason);
+      debugPrint('MatrixReactionDataSource: redactEvent completed, result=$result');
+    } catch (e, stackTrace) {
+      debugPrint('MatrixReactionDataSource: redactEvent failed: $e');
+      debugPrint('MatrixReactionDataSource: Stack: $stackTrace');
+      rethrow;
+    }
   }
 
   /// 转发消息
