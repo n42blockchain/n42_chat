@@ -63,8 +63,8 @@ class FirebasePushService implements IPushNotificationService {
   StreamSubscription<String>? _tokenRefreshSubscription;
   StreamSubscription<matrix.SyncUpdate>? _syncSubscription;
 
-  /// 静态实例（用于后台处理）
-  static FirebasePushService? _instance;
+  /// 静态实例（用于后台处理，保留以便将来使用）
+  static FirebasePushService? _instance; // ignore: unused_field
 
   /// 通知配置
   NotificationConfig _notificationConfig = const NotificationConfig();
@@ -173,9 +173,9 @@ class FirebasePushService implements IPushNotificationService {
       iOS: iosSettings,
     );
 
-    // flutter_local_notifications 20.x: 所有参数都是命名参数
+    // flutter_local_notifications 20.x: 第一个参数是位置参数
     await _localNotifications!.initialize(
-      settings: initSettings,
+      initSettings,
       onDidReceiveNotificationResponse: _onNotificationResponse,
       onDidReceiveBackgroundNotificationResponse: _onBackgroundNotificationResponse,
     );
@@ -298,7 +298,7 @@ class FirebasePushService implements IPushNotificationService {
         iOS: iosSettings,
       );
 
-      await _localNotifications!.initialize(settings: initSettings);
+      await _localNotifications!.initialize(initSettings);
 
       // 创建 Android 通知渠道
       if (Platform.isAndroid) {
@@ -344,10 +344,10 @@ class FirebasePushService implements IPushNotificationService {
       );
 
       await _localNotifications!.show(
-        id: notificationId,
-        title: 'N42 Chat',
-        body: 'You have a new message',
-        notificationDetails: details,
+        notificationId,
+        'N42 Chat',
+        'You have a new message',
+        details,
         payload: payload,
       );
     }
@@ -445,7 +445,7 @@ class FirebasePushService implements IPushNotificationService {
 
     // 检查消息时间戳，只显示新消息的通知
     final originServerTs = event.originServerTs;
-    if (originServerTs != null && _lastSyncTime != null) {
+    if (_lastSyncTime != null) {
       // 只显示在上次同步之后产生的消息
       // 给 5 秒的容差，避免网络延迟导致的问题
       final threshold = _lastSyncTime!.subtract(const Duration(seconds: 5));
@@ -619,10 +619,10 @@ class FirebasePushService implements IPushNotificationService {
       );
 
       await _localNotifications!.show(
-        id: notificationId,
-        title: title,
-        body: body,
-        notificationDetails: details,
+        notificationId,
+        title,
+        body,
+        details,
         payload: payload,
       );
     } catch (_) {
@@ -634,7 +634,7 @@ class FirebasePushService implements IPushNotificationService {
   Future<void> clearNotificationsForRoom(String roomId) async {
     if (_localNotifications == null) return;
     final notificationId = roomId.hashCode;
-    await _localNotifications!.cancel(id: notificationId);
+    await _localNotifications!.cancel(notificationId);
   }
 
   @override

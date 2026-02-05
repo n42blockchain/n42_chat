@@ -290,7 +290,6 @@ class MatrixMessageDataSource {
         rethrow;
       }
     }
-    return null;
   }
 
   /// 发送文本消息
@@ -1631,7 +1630,7 @@ class MatrixMessageDataSource {
 
       // 优先使用 messageType，其次使用 content['msgtype']
       String? effectiveMsgType;
-      if (msgType != null && msgType.isNotEmpty && msgType != 'm.bad.encrypted') {
+      if (msgType.isNotEmpty && msgType != 'm.bad.encrypted') {
         effectiveMsgType = msgType;
       } else if (contentMsgType != null && contentMsgType.isNotEmpty) {
         effectiveMsgType = contentMsgType;
@@ -2064,7 +2063,6 @@ class MatrixMessageDataSource {
     // 通话结束事件
     if (event.type == 'm.call.hangup') {
       final reason = event.content['reason'] as String?;
-      final callId = event.content['call_id'] as String?;
       final duration = event.content['duration'] as int? ?? 0;
 
       // 判断是否是未接来电
