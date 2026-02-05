@@ -58,6 +58,9 @@ class MessageItem extends StatelessWidget {
   /// 名片点击回调
   final void Function(String contactId, String contactName, String? avatarUrl)? onContactCardTap;
 
+  /// 回拨通话回调
+  final void Function(MessageEntity message)? onCallBack;
+
   const MessageItem({
     super.key,
     required this.message,
@@ -75,6 +78,7 @@ class MessageItem extends StatelessWidget {
     this.onEndPoll,
     this.onRedPacketTap,
     this.onContactCardTap,
+    this.onCallBack,
   });
 
   @override
@@ -84,7 +88,13 @@ class MessageItem extends StatelessWidget {
         message.type == MessageType.notice) {
       return SystemMessageWidget(message: message.content);
     }
-    
+
+    // 通话消息 - 微信风格
+    if (message.type == MessageType.voiceCall ||
+        message.type == MessageType.videoCall) {
+      return _buildCallMessage(context);
+    }
+
     // 已撤回的消息 - 显示微信风格的撤回提示
     if (message.type == MessageType.redacted) {
       return RecalledMessageWidget(
@@ -1291,6 +1301,115 @@ class MessageItem extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  /// 构建通话消息（微信风格）
+  Widget _buildCallMessage(BuildContext context) {
+    final isDark = context.isDarkMode;
+    final metadata = message.metadata;
+    final isVideo = message.type == MessageType.videoCall;
+    final isMissed = metadata?.isMissedCall ?? false;
+    final callDuration = metadata?.callDuration;
+    final displayName = _getSenderDisplayName(context);
+
+    // 构建通话状态文本（微信风格）
+    String callText;
+    if (isMissed) {
+      // 未接来电
+      callText = message.isFromMe
+          ? (S.of(context)?.callNotAnswered ?? '对方未接听')
+          : (isVideo
+              ? (S.of(context)?.missedVideoCall ?? '未接视频通话')
+              : (S.of(context)?.missedVoiceCall ?? '未接语音通话'));
+    } else if (callDuration != null && callDuration > 0) {
+      // 成功通话 - 微信风格："通话时长 00:55"
+      final minutes = callDuration ~/ 60;
+      final seconds = callDuration % 60;
+      final durationStr = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+      callText = '${S.of(context)?.callDurationLabel ?? '通话时长'} $durationStr';
+    } else {
+      // 已取消
+      callText = isVideo
+          ? (S.of(context)?.videoCallCancelled ?? '视频通话已取消')
+          : (S.of(context)?.voiceCallCancelled ?? '语音通话已取消');
+    }
+
+    // 未接来电显示红色
+    final textColor = isMissed && !message.isFromMe
+        ? AppColors.error
+        : (message.isFromMe
+            ? AppColors.messageTextSent
+            : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived));
+
+    final iconColor = isMissed && !message.isFromMe
+        ? AppColors.error
+        : (isDark ? Colors.white70 : Colors.black54);
+
+    return MessageBubble(
+      isSelf: message.isFromMe,
+      status: _mapStatus(message.status),
+      timestamp: message.timestamp,
+      showTimestamp: false,
+      avatarUrl: message.senderAvatarUrl,
+      avatarName: displayName,
+      onAvatarTap: onAvatarTap,
+      onAvatarDoubleTap: onAvatarDoubleTap,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 通话图标
+          Icon(
+            isVideo ? Icons.videocam : Icons.phone,
+            size: 18,
+            color: iconColor,
+          ),
+          const SizedBox(width: 6),
+          // 通话文本
+          Flexible(
+            child: Text(
+              callText,
+              style: TextStyle(
+                fontSize: 15,
+                color: textColor,
+              ),
+            ),
+          ),
+          // 未接来电显示回拨按钮
+          if (isMissed && !message.isFromMe && onCallBack != null) ...[
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () => onCallBack?.call(message),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isVideo ? Icons.videocam : Icons.phone,
+                      size: 14,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      S.of(context)?.callBack ?? '回拨',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
