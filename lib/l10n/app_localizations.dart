@@ -343,6 +343,42 @@ abstract class S {
   /// **'未接语音通话'**
   String get missedVoiceCall;
 
+  /// No description provided for @voiceCallTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'语音通话'**
+  String get voiceCallTitle;
+
+  /// No description provided for @videoCallTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频通话'**
+  String get videoCallTitle;
+
+  /// No description provided for @callNotAnswered.
+  ///
+  /// In zh, this message translates to:
+  /// **'对方未接听'**
+  String get callNotAnswered;
+
+  /// No description provided for @callDurationLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'通话时长'**
+  String get callDurationLabel;
+
+  /// No description provided for @voiceCallCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'语音通话已取消'**
+  String get voiceCallCancelled;
+
+  /// No description provided for @videoCallCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频通话已取消'**
+  String get videoCallCancelled;
+
   /// No description provided for @passkeyNotInitialized.
   ///
   /// In zh, this message translates to:

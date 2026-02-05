@@ -42,7 +42,7 @@ class MatrixMessageDataSource {
     if (room == null) return [];
 
     final timeline = await room.getTimeline();
-    
+
     // 如果需要加载更多历史消息
     if (fromEventId != null) {
       await timeline.requestHistory(historyCount: limit);
@@ -1596,17 +1596,83 @@ class MatrixMessageDataSource {
     if (event.redactedBecause != null) {
       return MessageType.redacted;
     }
-    
+
     // 检查是否是投票消息
     if (event.type == 'org.matrix.msc3381.poll.start') {
       return MessageType.poll;
     }
-    
+
+    // 检查是否是通话结束事件
+    if (event.type == 'm.call.hangup') {
+      // 从 hangup 事件的 call_type 字段判断是语音还是视频通话
+      final callType = event.content['call_type'] as String?;
+      final callId = event.content['call_id'] as String?;
+      debugPrint('_mapMessageType: m.call.hangup - callId=$callId, call_type=$callType');
+      return callType == 'video' ? MessageType.videoCall : MessageType.voiceCall;
+    }
+
+    // 获取消息类型（对于已解密的加密消息，messageType 会返回正确的类型）
+    final msgType = event.messageType;
+
+    // 检查是否是通话记录消息
+    if (msgType == 'n42.call.record') {
+      final callType = event.content['call_type'] as String?;
+      debugPrint('_mapMessageType: n42.call.record - call_type=$callType');
+      return callType == 'video' ? MessageType.videoCall : MessageType.voiceCall;
+    }
+
+    // 处理加密消息
     if (event.type == matrix.EventTypes.Encrypted) {
+      // 尝试多种方式获取消息类型
+      final contentMsgType = event.content['msgtype'] as String?;
+      final body = event.body;
+      final plaintextBody = event.plaintextBody;
+      debugPrint('_mapMessageType: Encrypted event - msgType=$msgType, contentMsgType=$contentMsgType, body=$body, plaintextBody=$plaintextBody');
+
+      // 优先使用 messageType，其次使用 content['msgtype']
+      String? effectiveMsgType;
+      if (msgType != null && msgType.isNotEmpty && msgType != 'm.bad.encrypted') {
+        effectiveMsgType = msgType;
+      } else if (contentMsgType != null && contentMsgType.isNotEmpty) {
+        effectiveMsgType = contentMsgType;
+      }
+
+      debugPrint('_mapMessageType: effectiveMsgType=$effectiveMsgType');
+
+      if (effectiveMsgType == matrix.MessageTypes.Audio) {
+        return MessageType.audio;
+      } else if (effectiveMsgType == matrix.MessageTypes.Video) {
+        return MessageType.video;
+      } else if (effectiveMsgType == matrix.MessageTypes.Image) {
+        return MessageType.image;
+      } else if (effectiveMsgType == matrix.MessageTypes.File) {
+        return MessageType.file;
+      } else if (effectiveMsgType == matrix.MessageTypes.Text) {
+        return MessageType.text;
+      } else if (effectiveMsgType == matrix.MessageTypes.Location) {
+        return MessageType.location;
+      } else if (effectiveMsgType == matrix.MessageTypes.Notice) {
+        return MessageType.notice;
+      }
+
+      // 如果有有效的 body 或 plaintextBody，可能是文本消息
+      if ((body.isNotEmpty && body != 'Encrypted event') ||
+          (plaintextBody.isNotEmpty && plaintextBody != body)) {
+        debugPrint('_mapMessageType: Encrypted message with valid body, treating as text');
+        return MessageType.text;
+      }
+
+      // 未解密或解密失败，返回 encrypted
+      debugPrint('_mapMessageType: Encrypted message not decrypted');
       return MessageType.encrypted;
     }
 
-    final msgType = event.messageType;
+    // 调试：打印消息类型信息
+    debugPrint('_mapMessageType: msgType=$msgType, eventType=${event.type}, senderId=${event.senderId}');
+    if (event.content['url'] != null) {
+      debugPrint('_mapMessageType: has url=${event.content['url']}, info=${event.content['info']}');
+    }
+
     switch (msgType) {
       case matrix.MessageTypes.Text:
         return MessageType.text;
@@ -1617,7 +1683,8 @@ class MatrixMessageDataSource {
       case matrix.MessageTypes.Audio:
         return MessageType.audio;
       case matrix.MessageTypes.File:
-        return MessageType.file;
+        // 检查文件类型，可能是 bridge 发送的图片/视频/音频
+        return _detectFileType(event);
       case matrix.MessageTypes.Location:
         return MessageType.location;
       case matrix.MessageTypes.Notice:
@@ -1637,8 +1704,100 @@ class MatrixMessageDataSource {
         if (event.content['msgtype'] == 'n42.music') {
           return MessageType.music;
         }
+        // 尝试从内容中检测媒体类型（处理 bridge 发送的特殊格式）
+        final detectedType = _detectMediaTypeFromContent(event);
+        if (detectedType != null) {
+          return detectedType;
+        }
         return MessageType.text;
     }
+  }
+
+  /// 检测文件类型（用于 m.file 消息，可能是 bridge 发送的图片/视频/音频）
+  MessageType _detectFileType(matrix.Event event) {
+    final info = event.content['info'] as Map<String, dynamic>?;
+    final mimeType = info?['mimetype'] as String? ?? '';
+    final filename = (event.content['filename'] as String?) ?? event.body;
+
+    debugPrint('_detectFileType: mimeType=$mimeType, filename=$filename');
+
+    // 根据 MIME 类型判断
+    if (mimeType.startsWith('image/')) {
+      return MessageType.image;
+    }
+    if (mimeType.startsWith('video/')) {
+      return MessageType.video;
+    }
+    if (mimeType.startsWith('audio/')) {
+      return MessageType.audio;
+    }
+
+    // 根据文件扩展名判断
+    final lowerFilename = filename.toLowerCase();
+    if (lowerFilename.endsWith('.jpg') ||
+        lowerFilename.endsWith('.jpeg') ||
+        lowerFilename.endsWith('.png') ||
+        lowerFilename.endsWith('.gif') ||
+        lowerFilename.endsWith('.webp') ||
+        lowerFilename.endsWith('.bmp')) {
+      return MessageType.image;
+    }
+    if (lowerFilename.endsWith('.mp4') ||
+        lowerFilename.endsWith('.mov') ||
+        lowerFilename.endsWith('.avi') ||
+        lowerFilename.endsWith('.webm')) {
+      return MessageType.video;
+    }
+    if (lowerFilename.endsWith('.mp3') ||
+        lowerFilename.endsWith('.m4a') ||
+        lowerFilename.endsWith('.ogg') ||
+        lowerFilename.endsWith('.wav')) {
+      return MessageType.audio;
+    }
+
+    return MessageType.file;
+  }
+
+  /// 从消息内容中检测媒体类型（处理 bridge 发送的特殊格式）
+  MessageType? _detectMediaTypeFromContent(matrix.Event event) {
+    // 检查是否有 url 字段（媒体消息的特征）
+    final url = event.content['url'] as String?;
+    if (url == null || url.isEmpty) {
+      return null;
+    }
+
+    final info = event.content['info'] as Map<String, dynamic>?;
+    final mimeType = info?['mimetype'] as String? ?? '';
+
+    debugPrint('_detectMediaTypeFromContent: url=$url, mimeType=$mimeType');
+
+    // 根据 MIME 类型判断
+    if (mimeType.startsWith('image/')) {
+      debugPrint('_detectMediaTypeFromContent: detected as image');
+      return MessageType.image;
+    }
+    if (mimeType.startsWith('video/')) {
+      debugPrint('_detectMediaTypeFromContent: detected as video');
+      return MessageType.video;
+    }
+    if (mimeType.startsWith('audio/')) {
+      debugPrint('_detectMediaTypeFromContent: detected as audio');
+      return MessageType.audio;
+    }
+
+    // 尝试从 URL 判断
+    final lowerUrl = url.toLowerCase();
+    if (lowerUrl.contains('image') ||
+        lowerUrl.endsWith('.jpg') ||
+        lowerUrl.endsWith('.png') ||
+        lowerUrl.endsWith('.gif')) {
+      debugPrint('_detectMediaTypeFromContent: detected as image from URL');
+      return MessageType.image;
+    }
+
+    // 如果有 url 但无法确定类型，默认作为文件处理
+    debugPrint('_detectMediaTypeFromContent: has url but unknown type, treating as file');
+    return MessageType.file;
   }
 
   /// 映射消息状态
@@ -1883,6 +2042,104 @@ class MatrixMessageDataSource {
         musicArtist: event.content['artist'] as String?,
         musicUrl: event.content['url'] as String?,
         musicCover: event.content['cover'] as String?,
+      );
+    }
+
+    // 通话记录消息
+    if (event.content['msgtype'] == 'n42.call.record') {
+      final duration = event.content['duration'] as int? ?? 0;
+      final isMissed = event.content['missed'] as bool? ?? false;
+
+      debugPrint('_extractMetadataWithHttpUrl: n42.call.record - duration=$duration, missed=$isMissed');
+
+      return MessageMetadata(
+        callDuration: duration,
+        callEnded: true,
+        isMissedCall: isMissed,
+        callRoomId: event.room.id,
+        callPeerId: event.senderId != _client?.userID ? event.senderId : null,
+      );
+    }
+
+    // 通话结束事件
+    if (event.type == 'm.call.hangup') {
+      final reason = event.content['reason'] as String?;
+      final callId = event.content['call_id'] as String?;
+      final duration = event.content['duration'] as int? ?? 0;
+
+      // 判断是否是未接来电
+      // 常见的未接来电原因：invite_timeout, user_busy, no_answer
+      // 如果有通话时长，则不是未接来电
+      final isMissed = duration == 0 && (
+                       reason == 'invite_timeout' ||
+                       reason == 'no_answer' ||
+                       reason == 'user_hangup' && event.senderId != _client?.userID);
+
+      debugPrint('_extractMetadataWithHttpUrl: m.call.hangup - reason=$reason, duration=$duration, isMissed=$isMissed');
+
+      return MessageMetadata(
+        callDuration: duration,
+        callEnded: true,
+        isMissedCall: isMissed,
+        callEndReason: reason,
+        callRoomId: event.room.id,
+        callPeerId: event.senderId != _client?.userID ? event.senderId : null,
+      );
+    }
+
+    // Fallback: 根据 MIME 类型检测媒体类型（处理 bridge 发送的特殊格式）
+    // 这对于 mautrix-wechat 等 bridge 发送的消息很重要
+    if (mxcUrl != null && mxcUrl.isNotEmpty) {
+      final mimeType = info?['mimetype'] as String? ?? '';
+      debugPrint('_extractMetadataWithHttpUrl fallback: mxcUrl=$mxcUrl, mimeType=$mimeType');
+
+      // 根据 MIME 类型返回适当的元数据
+      if (mimeType.startsWith('image/')) {
+        debugPrint('_extractMetadataWithHttpUrl: detected image from MIME type');
+        return MessageMetadata(
+          mediaUrl: mxcUrl,
+          httpUrl: _convertMxcToHttp(mxcUrl),
+          width: info?['w'] as int?,
+          height: info?['h'] as int?,
+          size: info?['size'] as int?,
+          mimeType: mimeType,
+          thumbnailUrl: _convertMxcToHttp(thumbnailMxc, width: 400, height: 400),
+        );
+      }
+
+      if (mimeType.startsWith('video/')) {
+        debugPrint('_extractMetadataWithHttpUrl: detected video from MIME type');
+        return MessageMetadata(
+          mediaUrl: mxcUrl,
+          httpUrl: _convertMxcToHttp(mxcUrl),
+          width: info?['w'] as int?,
+          height: info?['h'] as int?,
+          duration: info?['duration'] as int?,
+          size: info?['size'] as int?,
+          mimeType: mimeType,
+          thumbnailUrl: _convertMxcToHttp(thumbnailMxc, width: 400, height: 400),
+        );
+      }
+
+      if (mimeType.startsWith('audio/')) {
+        debugPrint('_extractMetadataWithHttpUrl: detected audio from MIME type');
+        return MessageMetadata(
+          mediaUrl: mxcUrl,
+          httpUrl: _convertMxcToHttp(mxcUrl),
+          duration: info?['duration'] as int?,
+          size: info?['size'] as int?,
+          mimeType: mimeType,
+        );
+      }
+
+      // 如果有 URL 但无法确定类型，作为文件处理
+      debugPrint('_extractMetadataWithHttpUrl: has url but unknown type, treating as file');
+      return MessageMetadata(
+        mediaUrl: mxcUrl,
+        httpUrl: _convertMxcToHttp(mxcUrl),
+        fileName: (event.content['filename'] as String?) ?? event.body,
+        size: info?['size'] as int?,
+        mimeType: mimeType.isNotEmpty ? mimeType : null,
       );
     }
 

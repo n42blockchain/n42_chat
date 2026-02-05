@@ -138,6 +138,24 @@ class SEn extends S {
   String get missedVoiceCall => 'Missed voice call';
 
   @override
+  String get voiceCallTitle => 'Voice call';
+
+  @override
+  String get videoCallTitle => 'Video call';
+
+  @override
+  String get callNotAnswered => 'Not answered';
+
+  @override
+  String get callDurationLabel => 'Call duration';
+
+  @override
+  String get voiceCallCancelled => 'Voice call cancelled';
+
+  @override
+  String get videoCallCancelled => 'Video call cancelled';
+
+  @override
   String get passkeyNotInitialized => 'Passkey not initialized';
 
   @override

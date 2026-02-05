@@ -136,6 +136,24 @@ class SZh extends S {
   String get missedVoiceCall => '未接语音通话';
 
   @override
+  String get voiceCallTitle => '语音通话';
+
+  @override
+  String get videoCallTitle => '视频通话';
+
+  @override
+  String get callNotAnswered => '对方未接听';
+
+  @override
+  String get callDurationLabel => '通话时长';
+
+  @override
+  String get voiceCallCancelled => '语音通话已取消';
+
+  @override
+  String get videoCallCancelled => '视频通话已取消';
+
+  @override
   String get passkeyNotInitialized => 'Passkey 未初始化';
 
   @override
