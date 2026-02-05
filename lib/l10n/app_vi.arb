@@ -59,6 +59,8 @@
   "avatarTooLarge": "Tep anh dai dien qua lon, toi da 10MB",
   "uploadAvatarFailed": "Tai len anh dai dien that bai",
   "delete": "Xoa",
+  "deleteThisMessage": "Xóa tin nhắn này?",
+  "messageDeleted": "Tin nhắn đã xóa",
   "notLoggedIn": "Chua dang nhap",
   "roomNotExist": "Khong tim thay phong: {roomId}",
   "uploadImageFailed": "Tai len hinh anh that bai",

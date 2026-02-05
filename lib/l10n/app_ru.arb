@@ -59,6 +59,8 @@
   "avatarTooLarge": "Файл аватара слишком большой, максимум 10 МБ",
   "uploadAvatarFailed": "Не удалось загрузить аватар",
   "delete": "Удалить",
+  "deleteThisMessage": "Удалить это сообщение?",
+  "messageDeleted": "Сообщение удалено",
   "notLoggedIn": "Не выполнен вход",
   "roomNotExist": "Комната не найдена: {roomId}",
   "uploadImageFailed": "Не удалось загрузить изображение",

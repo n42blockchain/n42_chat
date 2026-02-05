@@ -233,10 +233,10 @@ class SPt extends S {
   String get delete => 'Excluir';
 
   @override
-  String get deleteThisMessage => '删除这条消息？';
+  String get deleteThisMessage => 'Excluir esta mensagem?';
 
   @override
-  String get messageDeleted => '消息已删除';
+  String get messageDeleted => 'Mensagem excluída';
 
   @override
   String get notLoggedIn => 'Não conectado';

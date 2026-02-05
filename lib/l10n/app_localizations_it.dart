@@ -230,10 +230,10 @@ class SIt extends S {
   String get delete => 'Elimina';
 
   @override
-  String get deleteThisMessage => '删除这条消息？';
+  String get deleteThisMessage => 'Eliminare questo messaggio?';
 
   @override
-  String get messageDeleted => '消息已删除';
+  String get messageDeleted => 'Messaggio eliminato';
 
   @override
   String get notLoggedIn => 'Non connesso';

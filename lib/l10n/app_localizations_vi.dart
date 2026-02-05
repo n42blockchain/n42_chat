@@ -228,10 +228,10 @@ class SVi extends S {
   String get delete => 'Xoa';
 
   @override
-  String get deleteThisMessage => '删除这条消息？';
+  String get deleteThisMessage => 'Xóa tin nhắn này?';
 
   @override
-  String get messageDeleted => '消息已删除';
+  String get messageDeleted => 'Tin nhắn đã xóa';
 
   @override
   String get notLoggedIn => 'Chua dang nhap';

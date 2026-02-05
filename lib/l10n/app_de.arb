@@ -59,6 +59,8 @@
   "avatarTooLarge": "Avatar-Datei zu groß, max. 10MB",
   "uploadAvatarFailed": "Avatar-Upload fehlgeschlagen",
   "delete": "Löschen",
+  "deleteThisMessage": "Diese Nachricht löschen?",
+  "messageDeleted": "Nachricht gelöscht",
   "notLoggedIn": "Nicht angemeldet",
   "roomNotExist": "Raum nicht gefunden: {roomId}",
   "uploadImageFailed": "Bild-Upload fehlgeschlagen",

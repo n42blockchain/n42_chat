@@ -81,5 +81,24 @@ void main() {
         ),
       ],
     );
+
+    test('DeleteMessagesLocally event should contain message ids', () {
+      const event = DeleteMessagesLocally(['msg1', 'msg2']);
+      expect(event.messageIds, equals(['msg1', 'msg2']));
+      expect(event.props, equals([['msg1', 'msg2']]));
+    });
+
+    test('RedactMessage event should contain message id and reason', () {
+      const event = RedactMessage('msg1', reason: 'spam');
+      expect(event.messageId, equals('msg1'));
+      expect(event.reason, equals('spam'));
+      expect(event.props, equals(['msg1', 'spam']));
+    });
+
+    test('RedactMessage event should allow null reason', () {
+      const event = RedactMessage('msg1');
+      expect(event.messageId, equals('msg1'));
+      expect(event.reason, isNull);
+    });
   });
 }

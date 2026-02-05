@@ -228,10 +228,10 @@ class SJa extends S {
   String get delete => '削除';
 
   @override
-  String get deleteThisMessage => '删除这条消息？';
+  String get deleteThisMessage => 'このメッセージを削除しますか？';
 
   @override
-  String get messageDeleted => '消息已删除';
+  String get messageDeleted => 'メッセージが削除されました';
 
   @override
   String get notLoggedIn => 'ログインしていません';

@@ -59,6 +59,8 @@
   "avatarTooLarge": "アバターファイルが大きすぎます。最大10MBです",
   "uploadAvatarFailed": "アバターのアップロードに失敗しました",
   "delete": "削除",
+  "deleteThisMessage": "このメッセージを削除しますか？",
+  "messageDeleted": "メッセージが削除されました",
   "notLoggedIn": "ログインしていません",
   "roomNotExist": "ルームが見つかりません: {roomId}",
   "uploadImageFailed": "画像のアップロードに失敗しました",

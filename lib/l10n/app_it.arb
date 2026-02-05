@@ -59,6 +59,8 @@
   "avatarTooLarge": "File avatar troppo grande, max 10MB",
   "uploadAvatarFailed": "Caricamento avatar fallito",
   "delete": "Elimina",
+  "deleteThisMessage": "Eliminare questo messaggio?",
+  "messageDeleted": "Messaggio eliminato",
   "notLoggedIn": "Non connesso",
   "roomNotExist": "Stanza non trovata: {roomId}",
   "uploadImageFailed": "Caricamento immagine fallito",
