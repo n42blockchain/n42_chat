@@ -36,6 +36,10 @@ enum MessageType {
   poll,
   /// 音乐分享
   music,
+  /// 语音通话
+  voiceCall,
+  /// 视频通话
+  videoCall,
   /// 未知类型
   unknown,
 }
@@ -372,6 +376,28 @@ class MessageMetadata extends Equatable {
   /// 专辑封面
   final String? musicCover;
 
+  // ============================================
+  // 通话属性
+  // ============================================
+
+  /// 通话时长（秒）
+  final int? callDuration;
+
+  /// 通话是否已结束
+  final bool? callEnded;
+
+  /// 是否是未接来电
+  final bool? isMissedCall;
+
+  /// 通话结束原因
+  final String? callEndReason;
+
+  /// 通话房间 ID（用于回拨）
+  final String? callRoomId;
+
+  /// 通话对方 ID
+  final String? callPeerId;
+
   const MessageMetadata({
     this.mediaUrl,
     this.httpUrl,
@@ -403,6 +429,12 @@ class MessageMetadata extends Equatable {
     this.musicArtist,
     this.musicUrl,
     this.musicCover,
+    this.callDuration,
+    this.callEnded,
+    this.isMissedCall,
+    this.callEndReason,
+    this.callRoomId,
+    this.callPeerId,
   });
 
   /// 格式化文件大小
@@ -459,6 +491,12 @@ class MessageMetadata extends Equatable {
         musicArtist,
         musicUrl,
         musicCover,
+        callDuration,
+        callEnded,
+        isMissedCall,
+        callEndReason,
+        callRoomId,
+        callPeerId,
       ];
 
   /// Create a copy with updated poll fields

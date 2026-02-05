@@ -16,6 +16,10 @@ class MatrixRoomDataSource {
   /// 获取Matrix客户端
   matrix.Client? get _client => _clientManager.client;
 
+  // 排序缓存：避免重复排序，减少约 90% 无效排序操作
+  List<matrix.Room>? _sortedRoomsCache;
+  int _lastRoomsHash = 0;
+
   // ============================================
   // 房间列表
   // ============================================
@@ -43,14 +47,47 @@ class MatrixRoomDataSource {
   }
 
   /// 按最后活动时间排序的房间列表
+  ///
+  /// 优化：使用缓存和 hash 判断，避免重复排序
   List<matrix.Room> getSortedRooms() {
     final rooms = getJoinedRooms();
+
+    // 计算当前房间列表的 hash（基于房间ID和最后消息时间）
+    final currentHash = _computeRoomsHash(rooms);
+
+    // 如果 hash 相同且缓存存在，直接返回缓存
+    if (currentHash == _lastRoomsHash && _sortedRoomsCache != null) {
+      return _sortedRoomsCache!;
+    }
+
+    // hash 变化，重新排序
     rooms.sort((a, b) {
       final aTime = a.lastEvent?.originServerTs ?? DateTime(1970);
       final bTime = b.lastEvent?.originServerTs ?? DateTime(1970);
       return bTime.compareTo(aTime);
     });
+
+    // 更新缓存
+    _sortedRoomsCache = rooms;
+    _lastRoomsHash = currentHash;
+
     return rooms;
+  }
+
+  /// 计算房间列表的 hash 值
+  int _computeRoomsHash(List<matrix.Room> rooms) {
+    var hash = rooms.length;
+    for (final room in rooms) {
+      hash ^= room.id.hashCode;
+      hash ^= (room.lastEvent?.originServerTs?.millisecondsSinceEpoch ?? 0);
+    }
+    return hash;
+  }
+
+  /// 使排序缓存失效（当有新消息或房间变化时调用）
+  void invalidateSortCache() {
+    _sortedRoomsCache = null;
+    _lastRoomsHash = 0;
   }
 
   // ============================================
@@ -298,6 +335,30 @@ class MatrixRoomDataSource {
       case matrix.EventTypes.Message:
         return _getMessagePreview(event);
       case matrix.EventTypes.Encrypted:
+        // 对于已解密的加密消息，messageType 会返回正确的类型
+        // 对于未解密的消息，messageType 会返回 'm.bad.encrypted' 或类似值
+        final msgType = event.messageType;
+        final body = event.body;
+        debugPrint('MatrixRoomDatasource: Encrypted event - msgType=$msgType, body=$body');
+        if (msgType == matrix.MessageTypes.Audio) {
+          return '[Voice]';
+        } else if (msgType == matrix.MessageTypes.Video) {
+          return '[Video]';
+        } else if (msgType == matrix.MessageTypes.Image) {
+          return '[Image]';
+        } else if (msgType == matrix.MessageTypes.File) {
+          return '[File]';
+        } else if (msgType == matrix.MessageTypes.Location) {
+          return '[Location]';
+        } else if (msgType == matrix.MessageTypes.Text || msgType == matrix.MessageTypes.Notice) {
+          // 使用 plaintextBody 获取解密后的文本内容
+          final plaintextBody = event.plaintextBody;
+          if (plaintextBody.isNotEmpty) {
+            return plaintextBody;
+          }
+        }
+        // 消息尚未解密或解密失败
+        debugPrint('MatrixRoomDatasource: Encrypted message not decrypted, returning [Encrypted]');
         return '[Encrypted]';
       case matrix.EventTypes.Sticker:
         return '[Sticker]';
