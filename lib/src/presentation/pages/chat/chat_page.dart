@@ -21,6 +21,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../n42_chat.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
@@ -44,6 +45,7 @@ import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/red_packet_dialogs.dart';
 import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../widgets/wechat_toast.dart';
 import '../contact/contact_detail_page.dart';
 import '../search/chat_search_bar.dart';
 import 'chat_detail_page.dart';
@@ -125,12 +127,18 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
 
+    // 设置当前活跃房间（避免弹出通知）
+    N42Chat.pushService?.setActiveRoom(widget.conversation.id);
+
+    // 清除该房间的通知
+    N42Chat.clearNotificationsForRoom(widget.conversation.id);
+
     // 初始化聊天室
     context.read<ChatBloc>().add(InitializeChat(widget.conversation.id));
-    
+
     // 获取当前用户ID
     _loadCurrentUserId();
-    
+
     // 获取私聊对方的用户ID
     _loadOtherUserId();
 
@@ -149,6 +157,45 @@ class _ChatPageState extends State<ChatPage> {
         setState(() {});
       }
     });
+
+    // 设置通话错误回调
+    N42Chat.callManager?.onError = _handleCallError;
+  }
+
+  /// 处理通话错误
+  void _handleCallError(String errorCode) {
+    if (!mounted) return;
+
+    final l10n = S.of(context);
+    String message;
+
+    switch (errorCode) {
+      case 'call_not_initialized':
+        message = l10n?.callServiceNotInitialized ?? 'Call service not initialized';
+        break;
+      case 'already_in_call':
+        message = l10n?.alreadyInCall ?? 'Already in a call';
+        break;
+      case 'call_failed':
+        message = l10n?.connectionFailed ?? 'Call failed';
+        break;
+      case 'answer_failed':
+        message = l10n?.connectionFailed ?? 'Failed to answer';
+        break;
+      case 'connection_failed':
+        message = l10n?.connectionFailed ?? 'Connection failed';
+        break;
+      case 'call_rejected':
+        message = l10n?.callRejected ?? 'Call rejected';
+        break;
+      case 'no_answer':
+        message = l10n?.noAnswer ?? 'No answer';
+        break;
+      default:
+        message = errorCode;
+    }
+
+    WeChatToast.show(context, message, type: ToastType.warning);
   }
   
   /// 获取私聊对方的用户ID
@@ -184,6 +231,14 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    // 清除当前活跃房间
+    N42Chat.pushService?.setActiveRoom(null);
+
+    // 清除通话错误回调
+    if (N42Chat.callManager?.onError == _handleCallError) {
+      N42Chat.callManager?.onError = null;
+    }
+
     // 取消备注更新订阅
     _remarkSubscription?.cancel();
 
@@ -2119,25 +2174,70 @@ Avatar: ${contactAvatar ?? ''}''';
   }
 
   Future<void> _startVideoCall() async {
-    // 显示功能暂不可用提示
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.info_outline, color: Colors.white),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  S.of(context)?.voiceCallFeatureInDev ?? 'Voice and video call feature coming soon',
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: AppColors.primary,
-          duration: const Duration(seconds: 2),
-        ),
-      );
+    await _startCall(isVideo: true);
+  }
+
+  Future<void> _startVoiceCall() async {
+    await _startCall(isVideo: false);
+  }
+
+  Future<void> _startCall({required bool isVideo}) async {
+    final callManager = N42Chat.callManager;
+
+    if (callManager == null || !callManager.isInitialized) {
+      // 尝试初始化
+      await N42Chat.initializeCallManager();
+      if (N42Chat.callManager == null) {
+        if (mounted) {
+          WeChatToast.warning(
+            context,
+            S.of(context)?.callServiceNotInitialized ?? 'Call service not available',
+          );
+        }
+        return;
+      }
+    }
+
+    // 设置错误回调（确保在发起通话前设置）
+    N42Chat.callManager?.onError = _handleCallError;
+
+    // 获取对方信息（私聊）
+    if (!widget.conversation.isGroup) {
+      final peerId = widget.conversation.directUserId;
+      if (peerId == null) {
+        if (mounted) {
+          WeChatToast.warning(
+            context,
+            S.of(context)?.error ?? 'Cannot start call',
+          );
+        }
+        return;
+      }
+
+      // 发起通话，错误会通过 onError 回调处理
+      if (isVideo) {
+        await N42Chat.callManager!.startVideoCall(
+          roomId: widget.conversation.id,
+          peerId: peerId,
+          peerName: widget.conversation.name,
+          peerAvatarUrl: widget.conversation.avatarUrl,
+        );
+      } else {
+        await N42Chat.callManager!.startVoiceCall(
+          roomId: widget.conversation.id,
+          peerId: peerId,
+          peerName: widget.conversation.name,
+          peerAvatarUrl: widget.conversation.avatarUrl,
+        );
+      }
+    } else {
+      // 群组通话需要 LiveKit 支持
+      if (mounted) {
+        WeChatToast.info(
+          context,
+          S.of(context)?.featureComingSoon('Group Call') ?? 'Group calls coming soon',
+        );
+      }
     }
   }
 
@@ -2392,6 +2492,19 @@ Avatar: ${contactAvatar ?? ''}''';
       ),
       onBackPressed: widget.onBack ?? () => Navigator.of(context).pop(),
       actions: [
+        // 私聊显示通话按钮
+        if (!widget.conversation.isGroup) ...[
+          IconButton(
+            icon: const Icon(Icons.phone_outlined),
+            onPressed: _startVoiceCall,
+            tooltip: S.of(context)?.voiceCall ?? 'Voice Call',
+          ),
+          IconButton(
+            icon: const Icon(Icons.videocam_outlined),
+            onPressed: _startVideoCall,
+            tooltip: S.of(context)?.videoCall ?? 'Video Call',
+          ),
+        ],
         IconButton(
           icon: const Icon(Icons.search),
           onPressed: _toggleSearch,

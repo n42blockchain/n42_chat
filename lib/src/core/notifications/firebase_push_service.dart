@@ -69,6 +69,15 @@ class FirebasePushService implements IPushNotificationService {
   /// 通知配置
   NotificationConfig _notificationConfig = const NotificationConfig();
 
+  /// 当前活跃的房间 ID（用户正在查看的房间不弹通知）
+  String? _activeRoomId;
+
+  /// 是否正在通话中（通话期间禁用所有消息通知）
+  bool _isInCall = false;
+
+  /// 上次同步时间（用于过滤旧消息）
+  DateTime? _lastSyncTime;
+
   FirebasePushService(
     this._client, {
     this.pushGatewayUrl,
@@ -83,6 +92,24 @@ class FirebasePushService implements IPushNotificationService {
   void setNotificationConfig(NotificationConfig config) {
     _notificationConfig = config;
   }
+
+  /// 设置当前活跃房间（正在查看的房间不弹通知）
+  void setActiveRoom(String? roomId) {
+    _activeRoomId = roomId;
+    debugPrint('FirebasePushService: Active room set to $roomId');
+  }
+
+  /// 获取当前活跃房间
+  String? get activeRoomId => _activeRoomId;
+
+  /// 设置通话状态（通话期间禁用所有消息通知）
+  void setInCall(bool inCall) {
+    _isInCall = inCall;
+    debugPrint('FirebasePushService: In call set to $inCall');
+  }
+
+  /// 获取是否正在通话
+  bool get isInCall => _isInCall;
 
   @override
   Future<void> initialize() async {
@@ -188,6 +215,24 @@ class FirebasePushService implements IPushNotificationService {
     if (!_notificationConfig.enabled) return;
     if (_notificationConfig.isInDoNotDisturbPeriod()) return;
 
+    // 通话期间禁用所有消息通知
+    if (_isInCall) {
+      debugPrint('FirebasePushService: Skipping foreground notification during call');
+      return;
+    }
+
+    // 过滤通话相关的推送（由 CallKit 处理）
+    final eventType = message.data['type'] as String?;
+    if (eventType != null && eventType.startsWith('m.call.')) {
+      debugPrint('FirebasePushService: Skipping foreground notification for call event: $eventType');
+      // 收到来电推送时，立即设置通话状态，防止后续消息通知
+      if (eventType == 'm.call.invite') {
+        _isInCall = true;
+        debugPrint('FirebasePushService: Set isInCall=true for incoming call');
+      }
+      return;
+    }
+
     // 解析 Matrix 推送数据
     final roomId = message.data['room_id'] as String?;
     final eventId = message.data['event_id'] as String?;
@@ -235,6 +280,13 @@ class FirebasePushService implements IPushNotificationService {
 
   /// 处理后台消息（静态方法）
   static Future<void> _handleBackgroundMessage(RemoteMessage message) async {
+    // 过滤通话相关的推送（由 CallKit 处理）
+    final eventType = message.data['type'] as String?;
+    if (eventType != null && eventType.startsWith('m.call.')) {
+      debugPrint('FirebasePushService: Skipping background notification for call event: $eventType');
+      return;
+    }
+
     // 后台消息在单独的 isolate 中运行，需要初始化本地通知
     if (_localNotifications == null) {
       _localNotifications = FlutterLocalNotificationsPlugin();
@@ -335,6 +387,16 @@ class FirebasePushService implements IPushNotificationService {
     final joinedRooms = syncUpdate.rooms?.join;
     if (joinedRooms == null) return;
 
+    // 记录当前同步时间
+    final syncTime = DateTime.now();
+
+    // 首次同步时，只记录时间，不弹通知（避免历史消息弹通知）
+    if (_lastSyncTime == null) {
+      _lastSyncTime = syncTime;
+      debugPrint('FirebasePushService: First sync, skipping notifications for historical messages');
+      return;
+    }
+
     for (final entry in joinedRooms.entries) {
       final roomId = entry.key;
       final roomUpdate = entry.value;
@@ -346,14 +408,52 @@ class FirebasePushService implements IPushNotificationService {
         }
       }
     }
+
+    _lastSyncTime = syncTime;
   }
 
   bool _shouldShowNotification(matrix.MatrixEvent event, String roomId) {
+    // 通话期间禁用所有消息通知
+    if (_isInCall) {
+      debugPrint('FirebasePushService: Skipping notification during call');
+      return false;
+    }
+
+    // 过滤通话相关事件（m.call.*）- 这些由 CallKit 通知处理
+    final eventType = event.type;
+    if (eventType.startsWith('m.call.')) {
+      debugPrint('FirebasePushService: Skipping notification for call event: $eventType');
+      // 收到来电事件时，立即设置通话状态，防止后续消息通知
+      if (eventType == 'm.call.invite' && event.senderId != _client.userID) {
+        _isInCall = true;
+        debugPrint('FirebasePushService: Set isInCall=true for incoming call event');
+      }
+      return false;
+    }
+
     // 只显示消息类型的通知
-    if (event.type != matrix.EventTypes.Message) return false;
+    if (eventType != matrix.EventTypes.Message) return false;
 
     // 不显示自己发送的消息
     if (event.senderId == _client.userID) return false;
+
+    // 不显示当前正在查看的房间的消息
+    if (_activeRoomId == roomId) {
+      debugPrint('FirebasePushService: Skipping notification for active room $roomId');
+      return false;
+    }
+
+    // 检查消息时间戳，只显示新消息的通知
+    final originServerTs = event.originServerTs;
+    if (originServerTs != null && _lastSyncTime != null) {
+      // 只显示在上次同步之后产生的消息
+      // 给 5 秒的容差，避免网络延迟导致的问题
+      final threshold = _lastSyncTime!.subtract(const Duration(seconds: 5));
+      if (originServerTs.isBefore(threshold)) {
+        debugPrint('FirebasePushService: Skipping notification for old message (${originServerTs.toIso8601String()})');
+        return false;
+      }
+    }
 
     // 检查房间是否静音
     final room = _client.getRoomById(roomId);
