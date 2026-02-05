@@ -13,7 +13,6 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../services/voip/call_manager.dart';
 import '../../../services/voip/webrtc_service.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/n42_avatar.dart';
 
 /// 通话页面
@@ -50,9 +49,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   CallSession? _cachedSession;
 
   // 保存原来的回调（用于 dispose 时恢复）
-  Function(CallState)? _originalStateCallback;
-  Function(Duration)? _originalDurationCallback;
-  Function(String)? _originalErrorCallback;
+  void Function(CallState)? _originalStateCallback;
+  void Function(Duration)? _originalDurationCallback;
+  void Function(String)? _originalErrorCallback;
 
   // 微信风格的颜色
   static const Color _bgColor = Color(0xFF1F1F1F);
@@ -739,7 +738,6 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       case CallState.failed:
         return l10n?.callFailed ?? '通话失败';
       case CallState.idle:
-      default:
         return '';
     }
   }
