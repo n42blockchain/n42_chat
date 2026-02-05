@@ -508,7 +508,10 @@ class CallManager {
   /// 释放资源
   Future<void> dispose() async {
     await _webRTCService?.dispose();
-    await _liveKitService?.dispose();
+    // LiveKitService.dispose() 是同步的（ChangeNotifier 要求）
+    // 如需异步清理，应先调用 leaveMeeting()
+    await _liveKitService?.leaveMeeting();
+    _liveKitService?.dispose();
     _notificationService.dispose();
     _isInitialized = false;
     debugPrint('CallManager: Disposed');

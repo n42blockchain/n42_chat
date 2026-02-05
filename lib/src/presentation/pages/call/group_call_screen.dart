@@ -8,7 +8,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-// import 'package:livekit_client/livekit_client.dart'; // 暂时禁用
+import 'package:livekit_client/livekit_client.dart' show VideoTrack;
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -125,10 +125,25 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     });
   }
   
-  void _onError(String error) {
+  void _onError(MeetingErrorType type, [String? details]) {
     if (mounted) {
+      final s = S.of(context);
+      final errorDetails = details ?? '';
+      String message;
+      switch (type) {
+        case MeetingErrorType.serverNotConfigured:
+          message = s?.livekitNotConfigured ?? 'LiveKit not configured';
+        case MeetingErrorType.joinFailed:
+          message = s?.joinMeetingFailed(errorDetails) ?? 'Failed to join meeting';
+        case MeetingErrorType.screenShareFailed:
+          message = s?.screenShareFailed(errorDetails) ?? 'Screen share failed';
+        case MeetingErrorType.connectionLost:
+          message = s?.connectionFailed ?? 'Connection failed';
+        case MeetingErrorType.unknown:
+          message = details ?? (s?.unknownError ?? 'Unknown error');
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error), backgroundColor: Colors.red),
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
     }
   }
