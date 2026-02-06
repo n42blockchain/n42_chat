@@ -100,13 +100,13 @@ class _CallDialogState extends State<CallDialog> {
   String _getCallStatusText(BuildContext context) {
     switch (_callStatusKey) {
       case 'connecting':
-        return S.of(context)?.connectingCall ?? 'Connecting...';
+        return S.of(context)?.chatConnectingCall ?? 'Connecting...';
       case 'ringing':
-        return S.of(context)?.ringing ?? 'Ringing...';
+        return S.of(context)?.chatRinging ?? 'Ringing...';
       case 'inCall':
-        return S.of(context)?.inCall ?? 'In call';
+        return S.of(context)?.chatInCall ?? 'In call';
       default:
-        return S.of(context)?.calling ?? 'Calling...';
+        return S.of(context)?.chatCalling ?? 'Calling...';
     }
   }
 
@@ -193,16 +193,16 @@ class _CallDialogState extends State<CallDialog> {
                 _buildControlButton(
                   icon: _isMuted ? Icons.mic_off : Icons.mic,
                   label: _isMuted
-                      ? (S.of(context)?.unmute ?? 'Unmute')
-                      : (S.of(context)?.muteCall ?? 'Mute'),
+                      ? (S.of(context)?.commonUnmute ?? 'Unmute')
+                      : (S.of(context)?.chatMuteCall ?? 'Mute'),
                   isActive: _isMuted,
                   onTap: _toggleMute,
                 ),
                 _buildControlButton(
                   icon: _isSpeakerOn ? Icons.volume_up : Icons.volume_down,
                   label: _isSpeakerOn
-                      ? (S.of(context)?.speakerOff ?? 'Speaker Off')
-                      : (S.of(context)?.speakerOn ?? 'Speaker'),
+                      ? (S.of(context)?.chatSpeakerOff ?? 'Speaker Off')
+                      : (S.of(context)?.chatSpeakerOn ?? 'Speaker'),
                   isActive: _isSpeakerOn,
                   onTap: _toggleSpeaker,
                 ),
@@ -210,8 +210,8 @@ class _CallDialogState extends State<CallDialog> {
                   _buildControlButton(
                     icon: _isCameraOff ? Icons.videocam_off : Icons.videocam,
                     label: _isCameraOff
-                        ? (S.of(context)?.cameraOn ?? 'Camera On')
-                        : (S.of(context)?.cameraOff ?? 'Camera Off'),
+                        ? (S.of(context)?.chatCameraOn ?? 'Camera On')
+                        : (S.of(context)?.chatCameraOff ?? 'Camera Off'),
                     isActive: _isCameraOff,
                     onTap: _toggleCamera,
                   ),
@@ -241,7 +241,7 @@ class _CallDialogState extends State<CallDialog> {
             const SizedBox(height: 16),
 
             Text(
-              S.of(context)?.hangUp ?? 'Hang Up',
+              S.of(context)?.chatHangUp ?? 'Hang Up',
               style: const TextStyle(color: Colors.white, fontSize: 14),
             ),
 

@@ -94,7 +94,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         setState(() {
           _hasPermission = false;
           _isCheckingPermission = false;
-          _permissionError = S.of(context)?.cameraPermissionDenied ?? 'Camera permission was permanently denied. Please enable it in system settings.';
+          _permissionError = S.of(context)?.qrcodeCameraPermissionDenied ?? 'Camera permission was permanently denied. Please enable it in system settings.';
         });
         return;
       }
@@ -104,7 +104,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         setState(() {
           _hasPermission = false;
           _isCheckingPermission = false;
-          _permissionError = S.of(context)?.cameraPermissionRestricted ?? 'Camera access is restricted on this device.';
+          _permissionError = S.of(context)?.qrcodeCameraPermissionRestricted ?? 'Camera access is restricted on this device.';
         });
         return;
       }
@@ -113,14 +113,14 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       setState(() {
         _hasPermission = false;
         _isCheckingPermission = false;
-        _permissionError = S.of(context)?.cameraPermissionRequired ?? 'Camera permission is required to scan QR code';
+        _permissionError = S.of(context)?.qrcodeCameraPermissionRequired ?? 'Camera permission is required to scan QR code';
       });
     } catch (e) {
       debugPrint('Camera permission check error: $e');
       setState(() {
         _hasPermission = false;
         _isCheckingPermission = false;
-        _permissionError = S.of(context)?.permissionCheckError(e.toString()) ?? 'Error checking permission: $e';
+        _permissionError = S.of(context)?.qrcodePermissionCheckError(e.toString()) ?? 'Error checking permission: $e';
       });
     }
   }
@@ -160,11 +160,11 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       } else if (data.startsWith('@') && data.contains(':')) {
         await _startChatWithUser(data);
       } else {
-        _showError(S.of(context)?.invalidQrCode ?? 'Invalid QR code');
+        _showError(S.of(context)?.qrcodeInvalidQrCode ?? 'Invalid QR code');
         _scannerController?.start();
       }
     } catch (e) {
-      _showError(S.of(context)?.qrCodeProcessFailed(e.toString()) ?? 'Failed to process QR code: $e');
+      _showError(S.of(context)?.qrcodeProcessFailed(e.toString()) ?? 'Failed to process QR code: $e');
       _scannerController?.start();
     } finally {
       if (mounted) {
@@ -179,7 +179,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       final client = clientManager.client;
 
       if (client == null) {
-        _showError(S.of(context)?.chatServiceNotConnected ?? 'Chat service not connected');
+        _showError(S.of(context)?.commonChatServiceNotConnected ?? 'Chat service not connected');
         _scannerController?.start();
         return;
       }
@@ -190,7 +190,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         Navigator.of(context).pop({'roomId': roomId, 'userId': userId});
       }
     } catch (e) {
-      _showError(S.of(context)?.cannotAddFriend(e.toString()) ?? 'Cannot add friend: $e');
+      _showError(S.of(context)?.qrcodeCannotAddFriend(e.toString()) ?? 'Cannot add friend: $e');
       _scannerController?.start();
     }
   }
@@ -251,7 +251,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          S.of(context)?.scanQrCode ?? 'Scan QR Code',
+          S.of(context)?.qrcodeScanQrCode ?? 'Scan QR Code',
           style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
         centerTitle: true,
@@ -281,7 +281,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
             ),
             const SizedBox(height: 16),
             Text(
-              S.of(context)?.checkingCameraPermission ?? 'Checking camera permission...',
+              S.of(context)?.qrcodeCheckingCameraPermission ?? 'Checking camera permission...',
               style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),
           ],
@@ -311,7 +311,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
               ),
               const SizedBox(height: 24),
               Text(
-                S.of(context)?.needCameraPermission ?? 'Camera Permission Required',
+                S.of(context)?.qrcodeNeedCameraPermission ?? 'Camera Permission Required',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -320,7 +320,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
               ),
               const SizedBox(height: 12),
               Text(
-                _permissionError ?? (S.of(context)?.cameraPermissionRequired ?? 'Camera permission is required to scan QR code'),
+                _permissionError ?? (S.of(context)?.qrcodeCameraPermissionRequired ?? 'Camera permission is required to scan QR code'),
                 style: const TextStyle(
                   color: Colors.white54,
                   fontSize: 14,
@@ -344,7 +344,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: Text(S.of(context)?.retryPermission ?? 'Retry'),
+                    child: Text(S.of(context)?.qrcodeRetryPermission ?? 'Retry'),
                   ),
                   const SizedBox(width: 16),
                   OutlinedButton(
@@ -360,7 +360,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: Text(S.of(context)?.openSettings ?? 'Open Settings'),
+                    child: Text(S.of(context)?.qrcodeOpenSettings ?? 'Open Settings'),
                   ),
                 ],
               ),
@@ -369,8 +369,8 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                 onPressed: _toggleManualInput,
                 child: Text(
                   _showManualInput
-                      ? (S.of(context)?.closeManualInput ?? 'Close Manual Input')
-                      : (S.of(context)?.manualInputUserId ?? 'Manual Input User ID'),
+                      ? (S.of(context)?.qrcodeCloseManualInput ?? 'Close Manual Input')
+                      : (S.of(context)?.qrcodeManualInputUserId ?? 'Manual Input User ID'),
                   style: const TextStyle(
                     color: Color(0xFF07C160),
                     fontSize: 14,
@@ -401,12 +401,12 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    S.of(context)?.cameraStartFailed ?? 'Camera failed to start',
+                    S.of(context)?.qrcodeCameraStartFailed ?? 'Camera failed to start',
                     style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    error.errorDetails?.message ?? (S.of(context)?.unknownError ?? 'Unknown error'),
+                    error.errorDetails?.message ?? (S.of(context)?.qrcodeUnknownError ?? 'Unknown error'),
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                     textAlign: TextAlign.center,
                   ),
@@ -425,7 +425,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
             child: Column(
               children: [
                 Text(
-                  S.of(context)?.placeQrCodeInFrame ?? 'Place QR code within the frame to scan',
+                  S.of(context)?.qrcodePlaceQrCodeInFrame ?? 'Place QR code within the frame to scan',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 14,
@@ -437,8 +437,8 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   onPressed: _toggleManualInput,
                   child: Text(
                     _showManualInput
-                        ? (S.of(context)?.closeManualInput ?? 'Close Manual Input')
-                        : (S.of(context)?.manualInputUserId ?? 'Manual Input User ID'),
+                        ? (S.of(context)?.qrcodeCloseManualInput ?? 'Close Manual Input')
+                        : (S.of(context)?.qrcodeManualInputUserId ?? 'Manual Input User ID'),
                     style: const TextStyle(
                       color: Color(0xFF07C160),
                       fontSize: 14,
@@ -452,7 +452,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   children: [
                     _buildBottomButton(
                       icon: Icons.qr_code,
-                      label: S.of(context)?.myQrCode ?? 'My QR Code',
+                      label: S.of(context)?.commonMyQrCode ?? 'My QR Code',
                       onTap: _showMyQRCode,
                     ),
                   ],
@@ -537,7 +537,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
               controller: _inputController,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                hintText: S.of(context)?.matrixIdHint ?? '@username:server.com',
+                hintText: S.of(context)?.commonMatrixIdHint ?? '@username:server.com',
                 hintStyle: const TextStyle(color: Colors.white38),
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.1),
@@ -574,7 +574,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                       color: Colors.white,
                     ),
                   )
-                : Text(S.of(context)?.add ?? 'Add'),
+                : Text(S.of(context)?.commonAdd ?? 'Add'),
           ),
         ],
       ),

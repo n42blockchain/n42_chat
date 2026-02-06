@@ -75,7 +75,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     if (_codeController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.enterVerificationCode ?? 'Please enter verification code'),
+          content: Text(S.of(context)?.commonEnterVerificationCode ?? 'Please enter verification code'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -90,11 +90,11 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return S.of(context)?.enterEmailAddress ?? 'Please enter email address';
+      return S.of(context)?.commonEnterEmailAddress ?? 'Please enter email address';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
-      return S.of(context)?.invalidEmailFormat ?? 'Invalid email format';
+      return S.of(context)?.commonInvalidEmailFormat ?? 'Invalid email format';
     }
     return null;
   }
@@ -107,7 +107,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: N42AppBar(
-        title: S.of(context)?.changeEmail ?? 'Change Email',
+        title: S.of(context)?.commonChangeEmail ?? 'Change Email',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -121,14 +121,14 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             _startCountdown();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.verificationCodeSent ?? 'Verification code sent'),
+                content: Text(S.of(context)?.settingsVerificationCodeSent ?? 'Verification code sent'),
                 backgroundColor: AppColors.success,
               ),
             );
           } else if (state.changeEmailStatus == ChangeEmailStatus.success) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.emailChangedSuccess ?? 'Email changed successfully'),
+                content: Text(S.of(context)?.settingsEmailChangedSuccess ?? 'Email changed successfully'),
                 backgroundColor: AppColors.success,
               ),
             );
@@ -137,7 +137,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage ??
-                    (S.of(context)?.changeEmailFailed ?? 'Change email failed')),
+                    (S.of(context)?.settingsChangeEmailFailed ?? 'Change email failed')),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -212,7 +212,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  S.of(context)?.currentBoundEmail ?? 'Current bound email',
+                  S.of(context)?.settingsCurrentBoundEmail ?? 'Current bound email',
                   style: TextStyle(
                     fontSize: 12,
                     color: textColor,
@@ -245,7 +245,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.currentPassword ?? 'Current Password',
+          S.of(context)?.settingsCurrentPassword ?? 'Current Password',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -257,7 +257,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterCurrentPassword ?? 'Enter current password',
+            hintText: S.of(context)?.settingsEnterCurrentPassword ?? 'Enter current password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -289,7 +289,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.enterCurrentPassword ?? 'Please enter current password';
+              return S.of(context)?.settingsEnterCurrentPassword ?? 'Please enter current password';
             }
             return null;
           },
@@ -308,7 +308,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.newEmailAddress ?? 'New Email Address',
+          S.of(context)?.settingsNewEmailAddress ?? 'New Email Address',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -320,7 +320,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           controller: _emailController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterNewEmail ?? 'Enter new email address',
+            hintText: S.of(context)?.settingsEnterNewEmail ?? 'Enter new email address',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -355,7 +355,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.verificationCode ?? 'Verification Code',
+          S.of(context)?.settingsVerificationCode ?? 'Verification Code',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -364,7 +364,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         ),
         const SizedBox(height: 8),
         Text(
-          '${S.of(context)?.codeSentTo ?? 'Verification code sent to'} ${_emailController.text}',
+          '${S.of(context)?.settingsCodeSentTo ?? 'Verification code sent to'} ${_emailController.text}',
           style: TextStyle(
             fontSize: 12,
             color: hintColor,
@@ -375,7 +375,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           controller: _codeController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterVerificationCode ?? 'Enter verification code',
+            hintText: S.of(context)?.commonEnterVerificationCode ?? 'Enter verification code',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -423,7 +423,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                 ),
               )
             : Text(
-                S.of(context)?.sendVerificationCode ?? 'Send Verification Code',
+                S.of(context)?.commonSendVerificationCode ?? 'Send Verification Code',
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
@@ -442,7 +442,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          S.of(context)?.didNotReceiveCode ?? "Didn't receive the code?",
+          S.of(context)?.settingsDidNotReceiveCode ?? "Didn't receive the code?",
           style: TextStyle(
             fontSize: 14,
             color: textColor,
@@ -452,8 +452,8 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           onPressed: canResend ? _requestCode : null,
           child: Text(
             _countdown > 0
-                ? '${S.of(context)?.resend ?? 'Resend'} (${_countdown}s)'
-                : S.of(context)?.resend ?? 'Resend',
+                ? '${S.of(context)?.settingsResend ?? 'Resend'} (${_countdown}s)'
+                : S.of(context)?.settingsResend ?? 'Resend',
             style: TextStyle(
               fontSize: 14,
               color: canResend ? AppColors.primary : textColor,
@@ -487,7 +487,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                 ),
               )
             : Text(
-                S.of(context)?.confirm ?? 'Confirm',
+                S.of(context)?.commonConfirm ?? 'Confirm',
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
@@ -517,7 +517,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              S.of(context)?.emailSecurityNote ??
+              S.of(context)?.settingsEmailSecurityNote ??
                   'Your email is used for password recovery. Please keep it secure.',
               style: TextStyle(
                 fontSize: 12,

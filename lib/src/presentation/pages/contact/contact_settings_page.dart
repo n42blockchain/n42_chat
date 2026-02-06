@@ -57,7 +57,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          S.of(context)?.settings ?? 'Settings',
+          S.of(context)?.commonSettings ?? 'Settings',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
@@ -77,7 +77,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: S.of(context)?.editRemark ?? 'Edit Remark',
+                  title: S.of(context)?.contactEditRemark ?? 'Edit Remark',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _openEditRemark(),
@@ -93,7 +93,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: S.of(context)?.setPermissions ?? 'Set Permissions',
+                  title: S.of(context)?.contactSetPermissions ?? 'Set Permissions',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -109,7 +109,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: S.of(context)?.recommendToFriend ?? 'Share contact',
+                  title: S.of(context)?.contactRecommendToFriend ?? 'Share contact',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -125,7 +125,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
               dividerColor: dividerColor,
               children: [
                 _buildSwitchItem(
-                  title: S.of(context)?.setAsStarred ?? 'Set as Starred',
+                  title: S.of(context)?.contactSetAsStarred ?? 'Set as Starred',
                   value: _isStarred,
                   textColor: textColor,
                   onChanged: (value) {
@@ -137,7 +137,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildSwitchItem(
-                  title: S.of(context)?.addToBlocklist ?? 'Add to Blocklist',
+                  title: S.of(context)?.contactAddToBlocklist ?? 'Add to Blocklist',
                   value: _isBlocked,
                   textColor: textColor,
                   onChanged: (value) {
@@ -162,7 +162,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: S.of(context)?.report ?? 'Report',
+                  title: S.of(context)?.commonReport ?? 'Report',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -183,7 +183,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     alignment: Alignment.center,
                     child: Text(
-                      S.of(context)?.deleteContact ?? 'Delete Contact',
+                      S.of(context)?.contactDeleteContact ?? 'Delete Contact',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.red,
@@ -319,12 +319,12 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.deleteContact ?? 'Delete Contact'),
-        content: Text(S.of(context)?.deleteContactConfirm(widget.displayName) ?? 'Are you sure you want to delete ${widget.displayName}?'),
+        title: Text(S.of(context)?.contactDeleteContact ?? 'Delete Contact'),
+        content: Text(S.of(context)?.contactDeleteContactConfirm(widget.displayName) ?? 'Are you sure you want to delete ${widget.displayName}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -332,7 +332,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
               _deleteContact();
             },
             child: Text(
-              S.of(context)?.delete ?? 'Delete',
+              S.of(context)?.commonDelete ?? 'Delete',
               style: const TextStyle(color: Colors.red),
             ),
           ),
@@ -396,7 +396,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
         Navigator.of(context).pop(); // 关闭加载指示器
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${S.of(context)?.deleteContact ?? "Delete failed"}: $e'),
+            content: Text('${S.of(context)?.contactDeleteContact ?? "Delete failed"}: $e'),
             backgroundColor: AppColors.error,
           ),
         );

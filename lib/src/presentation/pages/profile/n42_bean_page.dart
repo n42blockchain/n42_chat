@@ -89,7 +89,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
 
                   // N42豆文字
                   Text(
-                    s?.n42BeanTitle ?? 'N42 Bean',
+                    s?.profileN42BeanTitle ?? 'N42 Bean',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -100,7 +100,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
 
                   // 豆数量
                   Text(
-                    _beanCount > 0 ? '$_beanCount' : (s?.noN42Bean ?? 'No N42 Bean'),
+                    _beanCount > 0 ? '$_beanCount' : (s?.profileNoN42Bean ?? 'No N42 Bean'),
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white.withValues(alpha: 0.7),
@@ -130,7 +130,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
           TextButton(
             onPressed: _showBeanDetail,
             child: Text(
-              s?.n42BeanDetails ?? 'N42 Bean Details',
+              s?.profileN42BeanDetails ?? 'N42 Bean Details',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -160,7 +160,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
           children: [
             // 说明标题
             Text(
-              s?.n42BeanDescription ?? 'N42 Bean is a token used to redeem virtual items and services in N42. Currently available for:',
+              s?.profileN42BeanDescription ?? 'N42 Bean is a token used to redeem virtual items and services in N42. Currently available for:',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -171,15 +171,15 @@ class _N42BeanPageState extends State<N42BeanPage> {
             const SizedBox(height: 20),
 
             // 功能列表
-            _buildFeatureItem('· ${s?.n42BeanFeature1 ?? 'Exclusive member stickers and themes'}'),
-            _buildFeatureItem('· ${s?.n42BeanFeature2 ?? 'Chat bubble customization'}'),
-            _buildFeatureItem('· ${s?.n42BeanFeature3 ?? 'Red packet cover customization'}'),
-            _buildFeatureItem('· ${s?.n42BeanFeature4 ?? 'Exclusive nickname badge'}'),
-            _buildFeatureItem('· ${s?.n42BeanFeature5 ?? 'Group chat privileges'}'),
-            _buildFeatureItem('· ${s?.n42BeanFeature6 ?? 'Cloud storage expansion'}'),
-            _buildFeatureItem('· ${s?.n42BeanFeature7 ?? 'Video call beauty filters'}'),
-            _buildFeatureItem('· ${s?.n42BeanFeature8 ?? 'Moments background customization'}'),
-            _buildFeatureItem('· ${s?.n42BeanFeature9 ?? 'VIP customer service priority'}'),
+            _buildFeatureItem('· ${s?.profileN42BeanFeature1 ?? 'Exclusive member stickers and themes'}'),
+            _buildFeatureItem('· ${s?.profileN42BeanFeature2 ?? 'Chat bubble customization'}'),
+            _buildFeatureItem('· ${s?.profileN42BeanFeature3 ?? 'Red packet cover customization'}'),
+            _buildFeatureItem('· ${s?.profileN42BeanFeature4 ?? 'Exclusive nickname badge'}'),
+            _buildFeatureItem('· ${s?.profileN42BeanFeature5 ?? 'Group chat privileges'}'),
+            _buildFeatureItem('· ${s?.profileN42BeanFeature6 ?? 'Cloud storage expansion'}'),
+            _buildFeatureItem('· ${s?.profileN42BeanFeature7 ?? 'Video call beauty filters'}'),
+            _buildFeatureItem('· ${s?.profileN42BeanFeature8 ?? 'Moments background customization'}'),
+            _buildFeatureItem('· ${s?.profileN42BeanFeature9 ?? 'VIP customer service priority'}'),
 
             const SizedBox(height: 40),
 
@@ -203,7 +203,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                     ),
                   ),
                   child: Text(
-                    s?.gotIt ?? 'Got it',
+                    s?.profileGotIt ?? 'Got it',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -281,7 +281,7 @@ class _BeanDetailSheet extends StatelessWidget {
               children: [
                 const Spacer(),
                 Text(
-                  s?.n42BeanDetails ?? 'N42 Bean Details',
+                  s?.profileN42BeanDetails ?? 'N42 Bean Details',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -318,7 +318,7 @@ class _BeanDetailSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    s?.noN42BeanRecords ?? 'No N42 Bean records',
+                    s?.profileNoN42BeanRecords ?? 'No N42 Bean records',
                     style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.textSecondary,

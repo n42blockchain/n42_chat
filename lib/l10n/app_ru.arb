@@ -1,745 +1,494 @@
 {
   "@@locale": "ru",
-  "chatModuleInitFailed": "Ошибка инициализации модуля чата",
-  "checkNetworkRetry": "Проверьте подключение к сети и повторите попытку",
-  "retry": "Повторить",
-  "unknownUser": "Неизвестный пользователь",
-  "walletNotConnected": "Кошелёк не подключён",
-  "cannotGetWalletAddress": "Не удаётся получить адрес кошелька",
-  "paymentRequestMemo": "Запрос на оплату: {requestId}",
-  "callServiceNotInitialized": "Служба вызовов не инициализирована",
-  "alreadyInCall": "Уже в вызове",
-  "meetingServiceNotInitialized": "Служба конференций не инициализирована",
-  "livekitNotConfigured": "LiveKit не настроен",
-  "unknownConversation": "Неизвестный разговор",
-  "startCallFailed": "Не удалось начать вызов: {error}",
-  "answerCallFailed": "Не удалось ответить: {error}",
-  "connectionFailed": "Ошибка подключения",
-  "callRejected": "Вызов отклонён",
-  "noAnswer": "Нет ответа",
-  "invalidLoginResponse": "Неверный ответ при входе",
-  "loginFailed": "Ошибка входа: {error}",
-  "sessionRestoreFailed": "Не удалось восстановить сессию",
-  "additionalVerificationRequired": "Требуется дополнительная проверка",
-  "registrationFailed": "Ошибка регистрации: {error}",
-  "cannotConnectServer": "Не удаётся подключиться к серверу: {error}",
-  "wrongUsernamePassword": "Неверное имя пользователя или пароль",
-  "usernameTaken": "Имя пользователя уже занято",
-  "invalidUsernameFormat": "Неверный формат имени пользователя",
-  "rateLimitExceeded": "Слишком много запросов, попробуйте позже",
-  "loginExpired": "Сессия истекла",
-  "joinMeetingFailed": "Не удалось присоединиться к конференции: {error}",
-  "screenShareFailed": "Не удалось поделиться экраном: {error}",
-  "answer": "Ответить",
-  "decline": "Отклонить",
-  "missedCall": "Пропущенный вызов",
-  "callBack": "Перезвонить",
-  "incomingCall": "Входящий вызов",
-  "missedVideoCall": "Пропущенный видеовызов",
-  "missedVoiceCall": "Пропущенный голосовой вызов",
-  "passkeyNotInitialized": "Passkey не инициализирован",
-  "googleSignInNotConfigured": "Вход через Google не настроен",
-  "encryptedMessage": "[Зашифрованное сообщение]",
-  "sticker": "[Стикер]",
-  "groupCreated": "Группа создана",
-  "groupNameChanged": "Название группы изменено",
-  "groupAvatarChanged": "Аватар группы изменён",
-  "groupAnnouncementChanged": "Объявление группы изменено",
-  "image": "[Изображение]",
-  "video": "[Видео]",
-  "voice": "[Голосовое сообщение]",
-  "file": "[Файл]",
-  "location": "[Местоположение]",
-  "unknownMessage": "[Неизвестное сообщение]",
-  "joinedGroup": "{senderName} присоединился к группе",
-  "leftGroup": "{senderName} покинул группу",
-  "invitedToGroup": "{senderName} приглашён",
-  "removedFromGroup": "{senderName} удалён",
-  "avatarDataEmpty": "Данные аватара пусты",
-  "avatarTooLarge": "Файл аватара слишком большой, максимум 10 МБ",
-  "uploadAvatarFailed": "Не удалось загрузить аватар",
-  "delete": "Удалить",
-  "deleteThisMessage": "Удалить это сообщение?",
-  "messageDeleted": "Сообщение удалено",
-  "notLoggedIn": "Не выполнен вход",
-  "roomNotExist": "Комната не найдена: {roomId}",
-  "uploadImageFailed": "Не удалось загрузить изображение",
-  "matrixClientNotInitialized": "Клиент Matrix не инициализирован",
-  "uploadVoiceFailed": "Не удалось загрузить голосовое сообщение: Невозможно получить MXC URI",
-  "uploadVideoFailed": "Не удалось загрузить видео: Невозможно получить MXC URI",
-  "uploadFileFailed": "Не удалось загрузить файл: Невозможно получить MXC URI",
-  "locationWithCoords": "Местоположение: {lat}, {lon}",
-  "myLocation": "Моё местоположение",
-  "pollEnded": "Опрос завершён",
-  "groupChat": "Групповой чат",
-  "search": "Поиск",
-  "cancel": "Отмена",
-  "userCancelled": "Пользователь отменил",
-  "noData": "Нет данных",
-  "noSearchResults": "Нет результатов поиска",
-  "tryDifferentKeyword": "Попробуйте другое ключевое слово",
-  "loadFailed": "Ошибка загрузки",
-  "checkNetwork": "Проверьте подключение к сети",
-  "networkConnectionFailed": "Ошибка сетевого подключения",
-  "checkNetworkSettings": "Проверьте сетевые настройки",
-  "messages": "Сообщения",
-  "contacts": "Контакты",
-  "discover": "Обзор",
-  "me": "Я",
-  "voiceLoading": "Загрузка голосового сообщения, попробуйте позже",
-  "voiceToTextFailed": "Не удалось преобразовать голос в текст",
-  "converting": "Преобразование...",
-  "convertToText": "В текст",
-  "convertToTextTitle": "Преобразовать в текст",
-  "selectEmoji": "Выбрать эмодзи",
-  "selectRedPacketCover": "Выбрать обложку",
-  "frequentlyUsed": "Часто используемые",
-  "copy": "Копировать",
-  "forward": "Переслать",
-  "unfavorite": "Удалить из избранного",
-  "favorite": "В избранное",
-  "resend": "Отправить повторно",
-  "recall": "Отозвать",
-  "multiSelect": "Множественный выбор",
-  "quote": "Цитировать",
-  "remind": "Напомнить",
-  "searchThis": "Поиск",
-  "recallMessageConfirm": "Отозвать это сообщение?",
-  "youRecalledMessage": "Вы отозвали сообщение",
-  "otherRecalledMessage": "Сообщение отозвано",
-  "reEdit": "Редактировать",
-  "copied": "Скопировано",
-  "sendMessageHint": "Написать сообщение",
-  "microphonePermissionRequired": "Пожалуйста, разрешите доступ к микрофону",
-  "startRecordingFailed": "Не удалось начать запись: {error}",
-  "recordingTooShort": "Запись слишком короткая",
-  "stopRecordingFailed": "Не удалось остановить запись: {error}",
-  "releaseToCancel": "Отпустите для отмены",
-  "releaseToSend": "Отпустите для отправки, смахните вверх для отмены",
-  "holdToTalk": "Удерживайте для записи",
-  "send": "Отправить",
-  "conversationWithId": "Разговор: {roomId}",
-  "contactWithId": "Контакт: {userId}",
-  "addFriend": "Добавить друга",
-  "chatServiceNotConnected": "Служба чата не подключена",
-  "userNotFoundHint": "Пользователь \"{query}\" не найден\n\nПодсказки:\n• Попробуйте ввести полный ID пользователя, например @username:server.com\n• Проверьте правильность написания имени",
-  "@userNotFoundHint": {
+  "commonRetry": "Повторить",
+  "commonUnknownUser": "Неизвестный пользователь",
+  "transferWalletNotConnected": "Кошелёк не подключён",
+  "chatCallServiceNotInitialized": "Служба вызовов не инициализирована",
+  "authLoginFailed": "Ошибка входа: {error}",
+  "chatCallBack": "Перезвонить",
+  "chatMissedVideoCall": "Пропущенный видеовызов",
+  "chatMissedVoiceCall": "Пропущенный голосовой вызов",
+  "commonImage": "[Изображение]",
+  "chatVideo": "[Видео]",
+  "chatVoice": "[Голосовое сообщение]",
+  "commonFile": "[Файл]",
+  "chatLocation": "[Местоположение]",
+  "chatUnknownMessage": "[Неизвестное сообщение]",
+  "commonDelete": "Удалить",
+  "chatDeleteThisMessage": "Удалить это сообщение?",
+  "chatMessageDeleted": "Сообщение удалено",
+  "profileNotLoggedIn": "Не выполнен вход",
+  "chatMyLocation": "Моё местоположение",
+  "commonGroupChat": "Групповой чат",
+  "commonSearch": "Поиск",
+  "commonCancel": "Отмена",
+  "commonLoadFailed": "Ошибка загрузки",
+  "commonMessages": "Сообщения",
+  "commonContacts": "Контакты",
+  "commonMe": "Я",
+  "commonVoiceLoading": "Загрузка голосового сообщения, попробуйте позже",
+  "commonVoiceToTextFailed": "Не удалось преобразовать голос в текст",
+  "commonConvertToText": "В текст",
+  "chatCopy": "Копировать",
+  "commonForward": "Переслать",
+  "commonUnfavorite": "Удалить из избранного",
+  "commonFavorite": "В избранное",
+  "settingsResend": "Отправить повторно",
+  "chatRecall": "Отозвать",
+  "commonQuote": "Цитировать",
+  "commonRemind": "Напомнить",
+  "chatCopied": "Скопировано",
+  "storySendMessageHint": "Написать сообщение",
+  "commonMicrophonePermissionRequired": "Пожалуйста, разрешите доступ к микрофону",
+  "commonStartRecordingFailed": "Не удалось начать запись: {error}",
+  "commonRecordingTooShort": "Запись слишком короткая",
+  "commonStopRecordingFailed": "Не удалось остановить запись: {error}",
+  "chatReleaseToCancel": "Отпустите для отмены",
+  "chatReleaseToSend": "Отпустите для отправки, смахните вверх для отмены",
+  "commonHoldToTalk": "Удерживайте для записи",
+  "commonSend": "Отправить",
+  "commonAddFriend": "Добавить друга",
+  "commonChatServiceNotConnected": "Служба чата не подключена",
+  "contactUserNotFoundHint": "Пользователь \"{query}\" не найден\n\nПодсказки:\n• Попробуйте ввести полный ID пользователя, например @username:server.com\n• Проверьте правильность написания имени",
+  "@contactUserNotFoundHint": {
     "placeholders": {
       "query": {
         "type": "String"
       }
     }
   },
-  "createChatFailed": "Не удалось создать чат: {error}",
-  "@createChatFailed": {
+  "contactCreateChatFailed": "Не удалось создать чат: {error}",
+  "@contactCreateChatFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "searchFailed": "Ошибка поиска: {error}",
-  "@searchFailed": {
+  "contactSearchFailed": "Ошибка поиска: {error}",
+  "@contactSearchFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "enterUserIdOrUsername": "Введите ID или имя пользователя для поиска",
-  "searching": "Поиск...",
-  "searchUserToChat": "Найдите пользователя, чтобы начать чат",
-  "matrixIdExample": "Вы можете ввести полный Matrix ID\nнапример @user:matrix.n42.network",
-  "userNotFound": "Пользователь \"{username}\" не найден",
-  "@userNotFound": {
+  "contactEnterUserIdOrUsername": "Введите ID или имя пользователя для поиска",
+  "contactSearching": "Поиск...",
+  "contactSearchUserToChat": "Найдите пользователя, чтобы начать чат",
+  "contactMatrixIdExample": "Вы можете ввести полный Matrix ID\nнапример @user:matrix.n42.network",
+  "contactUserNotFound": "Пользователь \"{username}\" не найден",
+  "@contactUserNotFound": {
     "placeholders": {
       "username": {
         "type": "String"
       }
     }
   },
-  "chat": "Чат",
-  "settings": "Настройки",
-  "editProfile": "Редактировать профиль",
-  "login": "Войти",
-  "createGroup": "Создать группу",
-  "developing": "{title}\n(Скоро)",
-  "error": "Ошибка",
-  "pageNotFound": "Страница не найдена",
-  "backToHome": "На главную",
-  "allRead": "Все прочитаны",
-  "readCount": "{count} прочитано",
-  "transfer": "Перевод",
-  "pendingReceipt": "Ожидание",
-  "tapToReceive": "Нажмите, чтобы получить",
-  "received": "Получено",
-  "paymentReceived": "Платёж получен",
-  "refunded": "Возвращено",
-  "expired": "Истёк",
-  "redPacketGreeting": "С наилучшими пожеланиями",
-  "n42RedPacket": "Красный конверт N42",
-  "goodLuck": "Удачи",
-  "claimed": "Получено",
-  "allClaimed": "Все получены",
-  "emoji": "Эмодзи",
-  "love": "Любовь",
-  "animals": "Животные",
-  "food": "Еда",
-  "travel": "Путешествия",
-  "activities": "Активность",
-  "objects": "Предметы",
-  "symbols": "Символы",
-  "reply": "Ответить",
-  "copiedToClipboard": "Скопировано в буфер обмена",
-  "edit": "Редактировать",
-  "more": "Ещё",
-  "selectForwardTarget": "Выбрать получателя",
-  "sendCount": "Отправить ({count})",
-  "draft": "[Черновик] ",
-  "n42Id": "N42 ID: {id}",
-  "n42IdTitle": "N42 ID",
-  "n42Bean": "N42 Bean",
-  "friendInfo": "Информация о друге",
-  "friendInfoDesc": "Добавьте заметку, телефон, теги, примечания, фото и настройте разрешения.",
-  "moments": "Моменты",
-  "sendMessage": "Сообщение",
-  "audioVideoCall": "Аудио/видеовызов",
-  "videoChannel": "Видеоканал",
-  "remark": "Заметка",
-  "remarkName": "Имя заметки",
-  "phone": "Телефон",
-  "tags": "Теги",
-  "notes": "Заметки",
-  "photos": "Фото",
-  "permissions": "Разрешения",
-  "chatMomentsEtc": "Чат, Моменты, Спорт и т.д.",
-  "moreInfo": "Подробнее",
-  "commonGroups": "Общие группы",
-  "zeroGroups": "0",
-  "source": "Источник",
-  "notificationSettings": "Уведомления",
-  "receiveNotifications": "Получать уведомления о новых сообщениях",
-  "showPreview": "Показывать предпросмотр сообщения",
-  "showContentInNotification": "Показывать содержимое в уведомлениях",
-  "notificationSound": "Звук уведомления",
-  "playSoundOnMessage": "Воспроизводить звук при получении сообщения",
-  "vibrate": "Вибрация",
-  "vibrateOnMessage": "Вибрировать при получении сообщения",
-  "doNotDisturb": "Не беспокоить",
-  "dndDescription": "Отключить уведомления в указанные часы",
-  "startTime": "Время начала",
-  "endTime": "Время окончания",
-  "privacy": "Конфиденциальность",
-  "appearance": "Внешний вид",
-  "about": "О приложении",
-  "logout": "Выйти",
-  "logoutConfirm": "Вы уверены, что хотите выйти?",
-  "exit": "Выйти",
-  "save": "Сохранить",
-  "nickname": "Никнейм",
-  "enterNickname": "Введите никнейм",
-  "signature": "Подпись",
-  "addSignature": "Добавить подпись",
-  "takePhoto": "Сделать фото",
-  "chooseFromGallery": "Выбрать из галереи",
-  "saveFailed": "Ошибка сохранения: {error}",
-  "secureDecentralizedChat": "Безопасный децентрализованный мессенджер",
-  "endToEndEncryption": "Сквозное шифрование",
-  "messagesOnlyYouCanSee": "Сообщения видны только вам и получателю",
-  "decentralized": "Децентрализованный",
-  "basedOnMatrix": "На основе открытого протокола Matrix",
-  "walletIntegration": "Интеграция с кошельком",
-  "easyCryptoTransfer": "Простые криптовалютные переводы",
-  "register": "Зарегистрироваться",
-  "agreeTerms": "Входя в систему, вы соглашаетесь с",
-  "termsOfService": "Условиями использования",
-  "and": "и",
-  "privacyPolicy": "Политикой конфиденциальности",
-  "serverAddress": "Адрес сервера",
-  "enterServerAddress": "Введите адрес сервера",
-  "validServerAddress": "Пожалуйста, введите действительный адрес сервера",
-  "connectedTo": "Подключено к {serverName}",
-  "username": "Имя пользователя",
-  "enterUsername": "Введите имя пользователя",
-  "password": "Пароль",
-  "enterPassword": "Введите пароль",
-  "registerAccount": "Зарегистрироваться",
-  "forgotPassword": "Забыли пароль",
-  "otherLoginMethods": "Другие способы входа",
-  "emailVerification": "Код подтверждения по email",
-  "enterServerFirst": "Сначала введите адрес сервера",
-  "passkeyNeedsServer": "Для входа через Passkey требуется поддержка сервера",
-  "googleLoginSuccess": "Вход через Google успешен: {email}",
-  "googleLoginFailed": "Ошибка входа через Google: {error}",
-  "appleLoginSuccess": "Вход через Apple успешен",
-  "appleLoginFailed": "Ошибка входа через Apple: {error}",
-  "createAccount": "Создать аккаунт",
-  "joinN42Chat": "Присоединитесь к N42 Chat, чтобы начать общение",
-  "usernameHint": "3-20 символов, буквы/цифры/_",
-  "usernameMinLength": "Имя пользователя должно содержать не менее 3 символов",
-  "usernameMaxLength": "Имя пользователя должно содержать не более 20 символов",
-  "usernameFormat": "Имя пользователя может содержать только буквы, цифры и подчёркивания",
-  "passwordHint": "Минимум 8 символов",
-  "passwordMinLength": "Пароль должен содержать не менее 8 символов",
-  "confirmPassword": "Подтвердите пароль",
-  "reEnterPassword": "Введите пароль повторно",
-  "passwordsNotMatch": "Пароли не совпадают",
-  "inviteCode": "Код приглашения (встроенный)",
-  "filled": "Заполнено",
-  "enterInviteCode": "Введите код приглашения",
-  "inviteCodeHint": "Код приглашения встроен, обычно изменять не требуется",
-  "agreeTermsFirst": "Сначала прочитайте и согласитесь с условиями и политикой конфиденциальности",
-  "iAgree": "Я прочитал и согласен с",
-  "alreadyHaveAccount": "Уже есть аккаунт?",
-  "loginNow": "Войти",
-  "whoCanSee": "Кто может видеть",
-  "avatar": "Аватар",
-  "status": "Статус",
-  "lastSeen": "Последний визит",
-  "messageSettings": "Сообщения",
-  "allowStrangerMessage": "Разрешить сообщения от незнакомцев",
-  "receiveNonContact": "Получать сообщения не из контактов",
-  "readReceipts": "Отчёты о прочтении",
-  "letOthersKnowRead": "Сообщать другим, что вы прочитали их сообщения",
-  "typingStatus": "Статус набора",
-  "letOthersKnowTyping": "Сообщать другим, что вы печатаете",
-  "everyone": "Все",
-  "contactsOnly": "Только контакты",
-  "nobody": "Никто",
-  "whoCanSeeItem": "Кто может видеть {title}",
-  "version": "Версия {version}",
-  "checkUpdate": "Проверить обновления",
-  "openSourceLicenses": "Лицензии открытого ПО",
-  "feedback": "Обратная связь",
-  "builtOnMatrix": "На основе протокола Matrix",
-  "loading": "Загрузка...",
-  "noConversations": "Нет разговоров",
-  "tapToChat": "Нажмите справа вверху, чтобы начать чат",
-  "startGroup": "Создать групповой чат",
-  "scan": "Сканировать",
-  "payment": "Оплата",
-  "featureComingSoon": "{feature} скоро появится",
-  "markAsRead": "Отметить как прочитанное",
-  "unmute": "Включить звук",
-  "mute": "Без звука",
-  "unpin": "Открепить",
-  "pin": "Закрепить",
-  "deleteConversation": "Удалить разговор",
-  "deleteConversationConfirm": "Удалить разговор с \"{name}\"?",
-  "noContacts": "Нет контактов",
-  "addFriendsToChat": "Добавьте друзей, чтобы начать общение",
+  "commonChat": "Чат",
+  "commonSettings": "Настройки",
+  "profileEditProfile": "Редактировать профиль",
+  "authLogin": "Войти",
+  "commonCreateGroup": "Создать группу",
+  "chatError": "Ошибка",
+  "commonTransfer": "Перевод",
+  "commonReceived": "Получено",
+  "commonRefunded": "Возвращено",
+  "commonExpired": "Истёк",
+  "chatRedPacketGreeting": "С наилучшими пожеланиями",
+  "commonN42RedPacket": "Красный конверт N42",
+  "commonClaimed": "Получено",
+  "commonAllClaimed": "Все получены",
+  "chatReply": "Ответить",
+  "commonEdit": "Редактировать",
+  "chatSelectForwardTarget": "Выбрать получателя",
+  "commonSendCount": "Отправить ({count})",
+  "contactN42Id": "N42 ID: {id}",
+  "profileN42IdTitle": "N42 ID",
+  "profileN42Bean": "N42 Bean",
+  "contactFriendInfo": "Информация о друге",
+  "contactFriendInfoDesc": "Добавьте заметку, телефон, теги, примечания, фото и настройте разрешения.",
+  "commonMoments": "Моменты",
+  "commonSendMessage": "Сообщение",
+  "contactAudioVideoCall": "Аудио/видеовызов",
+  "contactVideoChannel": "Видеоканал",
+  "contactRemark": "Заметка",
+  "contactRemarkName": "Имя заметки",
+  "contactPhone": "Телефон",
+  "contactTags": "Теги",
+  "contactNotes": "Заметки",
+  "contactPhotos": "Фото",
+  "contactPermissions": "Разрешения",
+  "contactChatMomentsEtc": "Чат, Моменты, Спорт и т.д.",
+  "contactMoreInfo": "Подробнее",
+  "contactCommonGroups": "Общие группы",
+  "contactSource": "Источник",
+  "settingsNotificationSettings": "Уведомления",
+  "settingsPrivacy": "Конфиденциальность",
+  "settingsAppearance": "Внешний вид",
+  "settingsAbout": "О приложении",
+  "commonLogout": "Выйти",
+  "commonLogoutConfirm": "Вы уверены, что хотите выйти?",
+  "commonSave": "Сохранить",
+  "profileNickname": "Никнейм",
+  "profileEnterNickname": "Введите никнейм",
+  "profileSignature": "Подпись",
+  "profileAddSignature": "Добавить подпись",
+  "commonTakePhoto": "Сделать фото",
+  "profileChooseFromGallery": "Выбрать из галереи",
+  "profileSaveFailed": "Ошибка сохранения: {error}",
+  "authSecureDecentralizedChat": "Безопасный децентрализованный мессенджер",
+  "commonEndToEndEncryption": "Сквозное шифрование",
+  "authMessagesOnlyYouCanSee": "Сообщения видны только вам и получателю",
+  "authDecentralized": "Децентрализованный",
+  "authBasedOnMatrix": "На основе открытого протокола Matrix",
+  "authWalletIntegration": "Интеграция с кошельком",
+  "authEasyCryptoTransfer": "Простые криптовалютные переводы",
+  "authRegister": "Зарегистрироваться",
+  "authAgreeTerms": "Входя в систему, вы соглашаетесь с",
+  "authTermsOfService": "Условиями использования",
+  "authAnd": "и",
+  "authPrivacyPolicy": "Политикой конфиденциальности",
+  "authServerAddress": "Адрес сервера",
+  "authEnterServerAddress": "Введите адрес сервера",
+  "authConnectedTo": "Подключено к {serverName}",
+  "authUsername": "Имя пользователя",
+  "authEnterUsername": "Введите имя пользователя",
+  "authPassword": "Пароль",
+  "authEnterPassword": "Введите пароль",
+  "authRegisterAccount": "Зарегистрироваться",
+  "authForgotPassword": "Забыли пароль",
+  "authOtherLoginMethods": "Другие способы входа",
+  "authCreateAccount": "Создать аккаунт",
+  "authJoinN42Chat": "Присоединитесь к N42 Chat, чтобы начать общение",
+  "authUsernameHint": "3-20 символов, буквы/цифры/_",
+  "authUsernameMinLength": "Имя пользователя должно содержать не менее 3 символов",
+  "authUsernameMaxLength": "Имя пользователя должно содержать не более 20 символов",
+  "authUsernameFormat": "Имя пользователя может содержать только буквы, цифры и подчёркивания",
+  "authPasswordHint": "Минимум 8 символов",
+  "commonPasswordMinLength": "Пароль должен содержать не менее 8 символов",
+  "authConfirmPassword": "Подтвердите пароль",
+  "authFilled": "Заполнено",
+  "authEnterInviteCode": "Введите код приглашения",
+  "authAlreadyHaveAccount": "Уже есть аккаунт?",
+  "authLoginNow": "Войти",
+  "profileAvatar": "Аватар",
+  "profileStatus": "Статус",
+  "commonLoading": "Загрузка...",
+  "conversationNoConversations": "Нет разговоров",
+  "conversationTapToChat": "Нажмите справа вверху, чтобы начать чат",
+  "conversationStartGroup": "Создать групповой чат",
+  "commonScan": "Сканировать",
+  "commonPayment": "Оплата",
+  "commonFeatureComingSoon": "{feature} скоро появится",
+  "conversationMarkAsRead": "Отметить как прочитанное",
+  "commonUnmute": "Включить звук",
+  "commonMute": "Без звука",
+  "conversationUnpin": "Открепить",
+  "conversationPin": "Закрепить",
+  "conversationDeleteConversation": "Удалить разговор",
+  "conversationDeleteConversationConfirm": "Удалить разговор с \"{name}\"?",
+  "commonNoContacts": "Нет контактов",
+  "contactAddFriendsToChat": "Добавьте друзей, чтобы начать общение",
   "contactNotFound": "Контакт не найден",
-  "tryOtherKeywords": "Попробуйте другие ключевые слова или глобальный поиск",
-  "searchResults": "Результаты поиска",
-  "newFriends": "Новые друзья",
-  "chatOnlyFriends": "Друзья только для чата",
-  "officialAccounts": "Официальные аккаунты",
-  "serviceAccounts": "Сервисные аккаунты",
-  "enterpriseContacts": "Корпоративные контакты",
-  "contactsCount": "{count} контактов",
-  "recommendToFriend": "Поделиться контактом",
-  "setRemark": "Установить заметку",
-  "addToHome": "Добавить на главный экран",
-  "sendingCard": "Отправка контактной карточки...",
-  "contactCard": "[Контактная карточка]",
-  "fileLabel": "Файл",
-  "locationLabel": "Местоположение",
-  "cardSent": "Отправлена карточка {contact} для {friend}",
-  "recommendFailed": "Ошибка рекомендации: {error}",
-  "enterRemark": "Введите заметку",
-  "remarkSet": "Заметка установлена: {remark}",
-  "openingChat": "Открытие чата...",
-  "openChatFailed": "Не удалось открыть чат: {error}",
-  "addContact": "Добавить контакт",
-  "enterUserId": "Введите ID пользователя",
-  "noFriendRequests": "Нет запросов в друзья",
-  "accept": "Принять",
-  "reject": "Отклонить",
-  "acceptedRequest": "Принят запрос в друзья от {name}",
-  "rejectedRequest": "Отклонён запрос в друзья от {name}",
-  "noGroups": "Нет групп",
-  "creatingGroup": "Создание группы скоро появится...",
-  "selectFriendToRecommend": "Выберите друга для рекомендации",
-  "searchContacts": "Поиск контактов",
-  "noContactsFound": "Контакты не найдены",
-  "yesterday": "Вчера",
-  "monday": "Пн",
-  "tuesday": "Вт",
-  "wednesday": "Ср",
-  "thursday": "Чт",
-  "friday": "Пт",
-  "saturday": "Сб",
-  "sunday": "Вс",
-  "justNow": "Только что",
-  "minutesAgo": "{count} мин. назад",
-  "hoursAgo": "{count} ч. назад",
-  "daysAgo": "{count} дн. назад",
-  "online": "В сети",
-  "offline": "Не в сети",
-  "minutesAgoOnline": "Был(а) {count} мин. назад",
-  "hoursAgoOnline": "Был(а) {count} ч. назад",
-  "daysAgoOnline": "Был(а) {count} дн. назад",
+  "contactTryOtherKeywords": "Попробуйте другие ключевые слова или глобальный поиск",
+  "contactSearchResults": "Результаты поиска",
+  "contactNewFriends": "Новые друзья",
+  "contactChatOnlyFriends": "Chat-only Friends",
+  "contactOfficialAccounts": "Официальные аккаунты",
+  "contactServiceAccounts": "Сервисные аккаунты",
+  "contactEnterpriseContacts": "Корпоративные контакты",
+  "contactRecommendToFriend": "Поделиться контактом",
+  "commonSetRemark": "Установить заметку",
+  "contactSendingCard": "Отправка контактной карточки...",
+  "commonFileLabel": "Файл",
+  "commonLocationLabel": "Местоположение",
+  "contactRecommendFailed": "Ошибка рекомендации: {error}",
+  "profileEnterRemark": "Введите заметку",
+  "contactOpeningChat": "Открытие чата...",
+  "contactOpenChatFailed": "Не удалось открыть чат: {error}",
+  "contactAddContact": "Добавить контакт",
+  "contactEnterUserId": "Введите ID пользователя",
+  "contactNoFriendRequests": "Нет запросов в друзья",
+  "commonAccept": "Принять",
+  "commonReject": "Отклонить",
+  "commonNoGroups": "Нет групп",
+  "contactSelectFriendToRecommend": "Выберите друга для рекомендации",
+  "commonSearchContacts": "Поиск контактов",
+  "contactNoContactsFound": "Контакты не найдены",
+  "favoriteYesterday": "Вчера",
+  "chatJustNow": "Только что",
+  "profileOnline": "В сети",
+  "profileOffline": "Не в сети",
   "searchContactsGroupsMessages": "Поиск контактов, групп, сообщений",
   "searchError": "Ошибка поиска",
-  "searchHint": "Поиск контактов, групп и сообщений",
-  "enterKeyword": "Введите ключевые слова для поиска",
+  "chatSearchHint": "Поиск контактов, групп и сообщений",
   "searchHistory": "История поиска",
-  "clear": "Очистить",
-  "noResultsFor": "Нет результатов для \"{query}\"",
-  "all": "Все",
-  "groups": "Группы",
-  "noResults": "Нет результатов",
-  "groupInfo": "Информация о группе",
-  "groupMembers": "Участники ({count})",
+  "commonClear": "Очистить",
+  "commonAll": "Все",
+  "searchGroups": "Группы",
+  "searchNoResults": "Нет результатов",
+  "commonGroupMembers": "Участники ({count})",
   "groupMembersTitle": "Участники группы",
-  "viewAll": "Показать все",
-  "owner": "Владелец",
-  "admin": "Администратор",
-  "invite": "Пригласить",
-  "groupAnnouncement": "Объявление группы",
-  "notSet": "Не установлено",
+  "groupViewAll": "Показать все",
+  "groupOwner": "Владелец",
+  "groupAdmin": "Администратор",
+  "groupInvite": "Пригласить",
+  "commonGroupAnnouncement": "Объявление группы",
+  "commonNotSet": "Не установлено",
   "groupDescription": "Описание группы",
-  "publicGroup": "Публичная группа",
-  "allowSearchJoin": "Разрешить поиск и присоединение",
-  "clearChatHistory": "Очистить историю чата",
-  "dissolveGroup": "Распустить группу",
-  "leaveGroup": "Покинуть группу",
-  "changeGroupName": "Изменить название группы",
-  "enterGroupName": "Введите название группы",
-  "confirm": "Подтвердить",
-  "changeGroupDescription": "Изменить описание группы",
-  "enterGroupDescription": "Введите описание группы",
-  "editAnnouncement": "Редактировать объявление",
-  "enterAnnouncement": "Введите объявление",
-  "publish": "Опубликовать",
-  "clearHistoryConfirm": "Очистить всю историю чата? Это действие нельзя отменить.",
-  "clearAction": "Очистить",
-  "chatHistoryCleared": "История чата очищена",
-  "leaveGroupConfirm": "Покинуть \"{name}\"?",
-  "dissolveGroupConfirm": "Распустить \"{name}\"? Это действие нельзя отменить.",
-  "dissolve": "Распустить",
+  "groupPublicGroup": "Публичная группа",
+  "commonClearChatHistory": "Очистить историю чата",
+  "commonDissolveGroup": "Распустить группу",
+  "commonLeaveGroup": "Покинуть группу",
+  "groupChangeGroupName": "Изменить название группы",
+  "commonEnterGroupName": "Введите название группы",
+  "commonConfirm": "Подтвердить",
+  "groupEnterGroupDescription": "Введите описание группы",
+  "groupPublish": "Опубликовать",
+  "chatClearHistoryConfirm": "Очистить всю историю чата? Это действие нельзя отменить.",
+  "chatClearAction": "Очистить",
+  "commonChatHistoryCleared": "История чата очищена",
+  "commonDissolve": "Распустить",
   "groupQrCode": "QR-код группы",
-  "searchChatHistory": "Поиск в истории чата",
+  "commonSearchChatHistory": "Поиск в истории чата",
   "groupIdCopied": "ID группы скопирован",
-  "tapCopyGroupId": "{count} участников · Нажмите, чтобы скопировать ID группы",
-  "featureInDevelopment": "Функция в разработке...",
-  "receiverAddress": "Адрес получателя",
-  "enterOrPasteAddress": "Введите или вставьте адрес кошелька",
-  "selectToken": "Выбрать токен",
-  "transferAmount": "Сумма перевода",
-  "available": "Доступно",
-  "allAmount": "Всё",
-  "memoOptional": "Примечание (необязательно)",
-  "addMemo": "Добавить примечание",
-  "confirmTransfer": "Подтвердить перевод",
-  "invalidAddress": "Пожалуйста, введите действительный адрес получателя",
-  "invalidAmount": "Пожалуйста, введите действительную сумму",
-  "selectTokenPlease": "Пожалуйста, выберите токен",
-  "addressVerified": "Адрес подтверждён",
-  "availableBalance": "Доступно: {balance} {symbol}",
-  "scanningInDevelopment": "Функция сканирования в разработке...",
-  "enterAmount": "Введите сумму",
-  "redPacketCountMin": "Требуется минимум 1 красный конверт",
-  "viewRedPacketDetails": "Посмотреть детали красного конверта",
-  "enterTransferAmount": "Введите сумму перевода",
-  "transferTo": "Перевести",
-  "selectCurrency": "Выбрать валюту",
-  "receiveTransfer": "Полученный перевод",
-  "fromSender": "От {senderName}",
-  "confirmReceive": "Подтвердить получение",
+  "commonFeatureInDevelopment": "Функция в разработке...",
+  "transferEnterOrPasteAddress": "Введите или вставьте адрес кошелька",
+  "transferSelectToken": "Выбрать токен",
+  "commonTransferAmount": "Сумма перевода",
+  "transferAvailable": "Доступно",
+  "transferMemoOptional": "Примечание (необязательно)",
+  "transferConfirmTransfer": "Подтвердить перевод",
+  "transferAddressVerified": "Адрес подтверждён",
+  "transferAvailableBalance": "Доступно: {balance} {symbol}",
+  "commonEnterAmount": "Введите сумму",
+  "commonRedPacketCountMin": "Требуется минимум 1 красный конверт",
+  "commonViewRedPacketDetails": "Посмотреть детали красного конверта",
+  "commonEnterTransferAmount": "Введите сумму перевода",
+  "commonTransferTo": "Перевести",
+  "commonFromSender": "От {senderName}",
+  "commonConfirmReceive": "Подтвердить получение",
   "groupProfile": "Информация о группе",
-  "viewProfile": "Просмотреть профиль",
-  "removeMember": "Удалить из группы",
-  "removeMemberConfirm": "Удалить \"{name}\" из группы?",
-  "remove": "Удалить",
-  "clearStatus": "Очистить статус",
-  "clearStatusConfirm": "Очистить текущий статус?",
-  "statusCleared": "Статус очищен",
-  "statusSet": "Статус установлен: {result}",
-  "userNotExist": "Пользователь не существует",
-  "userIdCopied": "ID пользователя скопирован",
-  "voiceCallInDevelopment": "Голосовой вызов в разработке...",
-  "report": "Пожаловаться",
-  "reportInDevelopment": "Функция жалобы в разработке...",
-  "shareCard": "Поделиться карточкой",
-  "shareInDevelopment": "Функция отправки в разработке...",
-  "qrCode": "QR-код",
-  "qrCodeInDevelopment": "Функция QR-кода в разработке...",
-  "avatarUpdated": "Аватар обновлён",
-  "selectImageFailed": "Не удалось выбрать изображение: {error}",
-  "changeName": "Изменить имя",
-  "male": "Мужской",
-  "female": "Женский",
-  "genderSet": "Пол установлен: {gender}",
-  "regionSet": "Регион установлен: {region}",
-  "setPatText": "Установить текст хлопка",
-  "changeSignature": "Изменить подпись",
-  "ringtoneSet": "Рингтон установлен: {result}",
-  "featureInDev": "{feature} в разработке...",
-  "saveAddressFailed": "Не удалось сохранить адрес: {error}",
-  "myAddress": "Мой адрес",
-  "addNew": "Добавить",
-  "addAddress": "Добавить адрес",
-  "addressAdded": "Адрес добавлен",
-  "addressUpdated": "Адрес обновлён",
-  "deleteAddress": "Удалить адрес",
-  "deleteAddressConfirm": "Удалить этот адрес?",
-  "addressDeleted": "Адрес удалён",
-  "setDefaultAddress": "Установить по умолчанию",
-  "fillCompleteInfo": "Пожалуйста, заполните все поля",
-  "saveInvoiceFailed": "Не удалось сохранить счёт: {error}",
-  "myInvoices": "Мои счета",
-  "addInvoice": "Добавить счёт",
-  "invoiceAdded": "Счёт добавлен",
-  "invoiceUpdated": "Счёт обновлён",
-  "deleteInvoice": "Удалить счёт",
-  "deleteInvoiceConfirm": "Удалить этот счёт?",
-  "invoiceDeleted": "Счёт удалён",
-  "invoiceType": "Тип счёта: ",
-  "personal": "Личный",
-  "enterprise": "Корпоративный",
-  "setDefaultInvoice": "Установить по умолчанию",
-  "enterTaxId": "Введите ИНН",
-  "vibrateMode": "Режим вибрации",
-  "silentMode": "Беззвучный режим",
-  "playing": "Воспроизведение: {ringtoneName}",
-  "playFailed": "Ошибка воспроизведения: {ringtoneName}",
-  "enterGroupNamePlease": "Пожалуйста, введите название группы",
-  "selectAtLeastOne": "Пожалуйста, выберите хотя бы одного участника",
-  "fillStatus": "Написать статус",
-  "fileNotExist": "Файл не существует",
-  "sendFailed": "Ошибка отправки: {error}",
-  "cannotOpenBrowser": "Не удаётся открыть браузер",
-  "selectFileFailed": "Не удалось выбрать файл: {error}",
-  "enterMusicLink": "Введите ссылку на музыку",
-  "enterValidLink": "Пожалуйста, введите действительную ссылку",
-  "enterPollQuestion": "Введите вопрос опроса",
-  "minTwoOptions": "Требуется минимум 2 варианта",
-  "crossDeviceEnabled": "Межустройственная подпись включена",
-  "crossDeviceSet": "Межустройственная подпись настроена успешно",
-  "setupFailed": "Ошибка настройки: {error}",
-  "receiveAmount": "Сумма к получению",
-  "enterValidAmount": "Пожалуйста, введите действительную сумму",
-  "addressCopied": "Адрес скопирован",
-  "openItem": "Открыть: {content}",
-  "newNoteComingSoon": "Новые заметки скоро появятся",
-  "addLinkComingSoon": "Добавление ссылок скоро появится",
-  "deleted": "Удалено",
-  "shareComingSoon": "Функция отправки скоро появится",
-  "saveComingSoon": "Функция сохранения скоро появится",
-  "moreStylesComingSoon": "Больше стилей скоро появится",
-  "wallet": "Кошелёк",
-  "walletArea": "Область кошелька",
-  "recording": "Запись",
-  "invalidVideoUrl": "Недействительный URL видео",
-  "downloadFile": "Скачать файл",
-  "clearChatHistoryTitle": "Очистить историю чата",
-  "cannotUndo": "Это действие нельзя отменить",
-  "videoCall": "Видеовызов",
-  "voiceCall": "Голосовой вызов",
-  "leaveMeeting": "Покинуть конференцию",
+  "groupRemoveMember": "Удалить из группы",
+  "commonRemove": "Удалить",
+  "profileClearStatus": "Очистить статус",
+  "profileClearStatusConfirm": "Очистить текущий статус?",
+  "profileStatusCleared": "Статус очищен",
+  "profileUserNotExist": "Пользователь не существует",
+  "profileUserIdCopied": "ID пользователя скопирован",
+  "commonReport": "Пожаловаться",
+  "profileQrCode": "QR-код",
+  "profileAvatarUpdated": "Аватар обновлён",
+  "commonSelectImageFailed": "Не удалось выбрать изображение: {error}",
+  "profileChangeName": "Изменить имя",
+  "profileMale": "Мужской",
+  "profileFemale": "Женский",
+  "chatFeatureInDev": "{feature} в разработке...",
+  "profileSaveAddressFailed": "Не удалось сохранить адрес: {error}",
+  "profileAddNew": "Добавить",
+  "profileAddAddress": "Добавить адрес",
+  "profileAddressAdded": "Адрес добавлен",
+  "profileAddressUpdated": "Адрес обновлён",
+  "profileDeleteAddress": "Удалить адрес",
+  "profileAddressDeleted": "Адрес удалён",
+  "profileSaveInvoiceFailed": "Не удалось сохранить счёт: {error}",
+  "profileMyInvoices": "Мои счета",
+  "profileAddInvoice": "Добавить счёт",
+  "profileInvoiceAdded": "Счёт добавлен",
+  "profileInvoiceUpdated": "Счёт обновлён",
+  "profileDeleteInvoice": "Удалить счёт",
+  "profileInvoiceDeleted": "Счёт удалён",
+  "profilePersonal": "Личный",
+  "groupSelectAtLeastOne": "Пожалуйста, выберите хотя бы одного участника",
+  "chatFileNotExist": "Файл не существует",
+  "chatSendFailed": "Ошибка отправки: {error}",
+  "chatCannotOpenBrowser": "Не удаётся открыть браузер",
+  "chatSelectFileFailed": "Не удалось выбрать файл: {error}",
+  "settingsSetupFailed": "Ошибка настройки: {error}",
+  "transferEnterValidAmount": "Пожалуйста, введите действительную сумму",
+  "commonAddressCopied": "Адрес скопирован",
+  "favoriteOpenItem": "Открыть: {content}",
+  "favoriteDeleted": "Удалено",
+  "profileWallet": "Кошелёк",
+  "chatRecording": "Запись",
+  "chatInvalidVideoUrl": "Недействительный URL видео",
+  "chatDownloadFile": "Скачать файл",
+  "chatClearChatHistoryTitle": "Очистить историю чата",
+  "chatVideoCall": "Видеовызов",
+  "commonVoiceCall": "Голосовой вызов",
+  "callLeaveMeeting": "Покинуть конференцию",
   "chatDetails": "Детали чата",
-  "viewAllGroupMembers": "Просмотреть всех участников",
-  "groupName": "Название группы",
-  "groupNameUpdated": "Название группы обновлено",
-  "groupDescriptionUpdated": "Описание группы обновлено",
-  "groupAvatarUpdated": "Аватар группы обновлен",
-  "updateFailed": "Ошибка обновления",
-  "noPermissionToModify": "У вас нет прав на изменение",
-  "groupManagement": "Управление группой",
-  "myNicknameInGroup": "Мой никнейм в группе",
-  "pinChat": "Закрепить чат",
-  "strongReminder": "Важное напоминание",
-  "setChatBackground": "Установить фон чата",
-  "unknownFile": "Неизвестный файл",
-  "download": "Скачать",
-  "invalidLocation": "Недействительное местоположение",
-  "address": "Адрес",
-  "latitude": "Широта",
-  "longitude": "Долгота",
-  "close": "Закрыть",
-  "tapToCancel": "Нажмите для отмены",
-  "captureFailed": "Ошибка захвата: {error}",
-  "processingVideo": "Обработка видео...",
-  "videoFileNotExist": "Видеофайл не существует",
-  "videoDataEmpty": "Данные видео пусты",
-  "videoTooLarge": "Размер видео не может превышать 100 МБ",
-  "sendingVideo": "Отправка видео...",
-  "sendVideoFailed": "Не удалось отправить видео: {error}",
-  "imageFileNotExist": "Файл изображения не существует",
-  "imageDataEmpty": "Данные изображения пусты",
-  "sendingImage": "Отправка изображения...",
-  "sendImageFailed": "Не удалось отправить изображение: {error}",
-  "sendLocation": "Отправить местоположение",
-  "selectLocationAndSend": "Выберите местоположение и отправьте",
-  "shareRealTimeLocation": "Поделиться местоположением в реальном времени",
-  "shareLocationForOneHour": "Поделиться местоположением с другом на 1 час",
-  "locationSent": "Местоположение отправлено",
-  "selectMessages": "Выбрать сообщения",
-  "selectedCount": "Выбрано {count}",
-  "selectAll": "Выбрать все",
-  "groupChatCount": "Групповой чат ({count})",
-  "privateChat": "Личный чат",
-  "noMessages": "Нет сообщений",
-  "sendFirstMessage": "Отправьте первое сообщение, чтобы начать общение",
-  "encryptionNotice": "Этот чат защищён сквозным шифрованием. Только вы и получатель можете читать сообщения.",
-  "replyTo": "Ответ {name}",
-  "multiForward": "Переслать",
-  "collect": "Собрать",
-  "noMembers": "Нет участников",
-  "memberNotFound": "Участник не найден",
-  "voiceFileNotExist": "Голосовой файл не существует",
-  "voiceFileEmpty": "Голосовой файл пуст",
-  "sendingVoice": "Отправка голосового сообщения...",
-  "sendVoiceFailed": "Не удалось отправить голосовое сообщение: {error}",
-  "messageCopied": "Сообщение скопировано",
-  "messageForwarded": "Сообщение переслано",
-  "forwardFailed": "Ошибка пересылки: {error}",
-  "unfavorited": "Удалено из избранного",
-  "favorited": "Добавлено в избранное",
-  "reactionAdded": "Реакция добавлена",
-  "reactionRemoved": "Реакция удалена",
-  "failedMessageDeleted": "Неотправленное сообщение удалено",
-  "deleteMessages": "Удалить сообщения",
-  "deleteMessagesConfirm": "Вы уверены, что хотите удалить {count} сообщений?",
-  "noteOtherMessages": "Примечание: {count} сообщений от других и будут удалены только для вас.",
-  "myMessagesWillBeRecalled": "{count} ваших сообщений будут отозваны для всех.",
-  "recalledCount": "Отозвано {count} сообщений, {localCount} удалено только для вас",
-  "recalledMessages": "Отозвано {count} сообщений",
-  "deletedLocally": "{count} сообщений удалено только для вас",
-  "forwardedCount": "Переслано {count} сообщений",
-  "forwardComplete": "Пересылка завершена: {success} успешно, {failed} ошибок",
-  "remindOnlyInGroup": "Функция напоминания доступна только в групповом чате",
-  "onlyTextSearchable": "Поиск доступен только для текстовых сообщений",
-  "searchFor": "Искать \"{text}\"",
-  "baiduSearch": "Поиск Baidu",
-  "googleSearch": "Поиск Google",
-  "bingSearch": "Поиск Bing",
-  "calling": "Вызов...",
-  "connecting": "Подключение...",
-  "ringing": "Звонок...",
-  "inCall": "В разговоре",
-  "collectMessages": "Сохранено {count} сообщений",
-  "voted": "Проголосовано",
-  "voteChanged": "Голос изменён",
-  "voteRemoved": "Голос удалён",
-  "endPoll": "Завершить опрос",
-  "endPollConfirm": "Вы уверены, что хотите завершить этот опрос? После завершения голосование будет невозможно.",
-  "memberCount": "{count} участников",
-  "videoChannels": "Каналы",
-  "live": "Прямой эфир",
-  "listen": "Слушать",
-  "watch": "Смотреть",
-  "searchDiscover": "Поиск",
-  "nearbyPeople": "Рядом",
-  "games": "Игры",
-  "miniPrograms": "Мини-программы",
-  "done": "Готово({count})",
-  "@done": {
+  "chatViewAllGroupMembers": "Просмотреть всех участников",
+  "chatGroupName": "Название группы",
+  "chatGroupNameUpdated": "Название группы обновлено",
+  "chatUpdateFailed": "Ошибка обновления",
+  "chatNoPermissionToModify": "У вас нет прав на изменение",
+  "chatGroupManagement": "Управление группой",
+  "chatMyNicknameInGroup": "Мой никнейм в группе",
+  "chatPinChat": "Закрепить чат",
+  "chatStrongReminder": "Важное напоминание",
+  "chatSetChatBackground": "Установить фон чата",
+  "chatUnknownFile": "Неизвестный файл",
+  "chatDownload": "Скачать",
+  "chatInvalidLocation": "Недействительное местоположение",
+  "chatTapToCancel": "Нажмите для отмены",
+  "chatCaptureFailed": "Ошибка захвата: {error}",
+  "chatProcessingVideo": "Обработка видео...",
+  "chatVideoFileNotExist": "Видеофайл не существует",
+  "chatVideoDataEmpty": "Данные видео пусты",
+  "chatVideoTooLarge": "Размер видео не может превышать 100 МБ",
+  "chatSendingVideo": "Отправка видео...",
+  "chatSendVideoFailed": "Не удалось отправить видео: {error}",
+  "chatImageFileNotExist": "Файл изображения не существует",
+  "commonImageDataEmpty": "Данные изображения пусты",
+  "chatSendingImage": "Отправка изображения...",
+  "chatSendImageFailed": "Не удалось отправить изображение: {error}",
+  "chatSendLocation": "Отправить местоположение",
+  "chatSelectLocationAndSend": "Выберите местоположение и отправьте",
+  "chatShareRealTimeLocation": "Поделиться местоположением в реальном времени",
+  "chatShareLocationForOneHour": "Поделиться местоположением с другом на 1 час",
+  "chatLocationSent": "Местоположение отправлено",
+  "chatSelectMessages": "Выбрать сообщения",
+  "chatSelectedCount": "Выбрано {count}",
+  "chatSelectAll": "Выбрать все",
+  "chatGroupChatCount": "Групповой чат ({count})",
+  "chatPrivateChat": "Личный чат",
+  "chatNoMessages": "Нет сообщений",
+  "chatSendFirstMessage": "Отправьте первое сообщение, чтобы начать общение",
+  "chatEncryptionNotice": "Этот чат защищён сквозным шифрованием. Только вы и получатель можете читать сообщения.",
+  "chatMultiForward": "Переслать",
+  "chatCollect": "Собрать",
+  "chatNoMembers": "Нет участников",
+  "chatMemberNotFound": "Участник не найден",
+  "chatVoiceFileNotExist": "Голосовой файл не существует",
+  "chatVoiceFileEmpty": "Голосовой файл пуст",
+  "chatSendingVoice": "Отправка голосового сообщения...",
+  "chatSendVoiceFailed": "Не удалось отправить голосовое сообщение: {error}",
+  "chatMessageForwarded": "Сообщение переслано",
+  "chatForwardFailed": "Ошибка пересылки: {error}",
+  "chatUnfavorited": "Удалено из избранного",
+  "chatFavorited": "Добавлено в избранное",
+  "chatReactionAdded": "Реакция добавлена",
+  "chatReactionRemoved": "Реакция удалена",
+  "chatFailedMessageDeleted": "Неотправленное сообщение удалено",
+  "chatDeleteMessages": "Удалить сообщения",
+  "chatDeleteMessagesConfirm": "Вы уверены, что хотите удалить {count} сообщений?",
+  "chatNoteOtherMessages": "Примечание: {count} сообщений от других и будут удалены только для вас.",
+  "chatMyMessagesWillBeRecalled": "{count} ваших сообщений будут отозваны для всех.",
+  "chatRecalledCount": "Отозвано {count} сообщений, {localCount} удалено только для вас",
+  "chatRecalledMessages": "Отозвано {count} сообщений",
+  "chatDeletedLocally": "{count} сообщений удалено только для вас",
+  "chatForwardedCount": "Переслано {count} сообщений",
+  "chatForwardComplete": "Пересылка завершена: {success} успешно, {failed} ошибок",
+  "chatRemindOnlyInGroup": "Функция напоминания доступна только в групповом чате",
+  "chatOnlyTextSearchable": "Поиск доступен только для текстовых сообщений",
+  "chatSearchFor": "Искать \"{text}\"",
+  "chatBaiduSearch": "Поиск Baidu",
+  "chatGoogleSearch": "Поиск Google",
+  "chatBingSearch": "Поиск Bing",
+  "chatCalling": "Вызов...",
+  "chatRinging": "Звонок...",
+  "chatInCall": "В разговоре",
+  "chatCollectMessages": "Сохранено {count} сообщений",
+  "commonMemberCount": "{count} участников",
+  "groupDone": "Готово({count})",
+  "@groupDone": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "services": "Сервисы",
-  "favorites": "Избранное",
-  "ordersAndCards": "Заказы и карты",
-  "stickers": "Стикеры",
-  "statusSetTo": "Статус установлен: {status}",
-  "@statusSetTo": {
+  "profileServices": "Сервисы",
+  "commonFavorites": "Избранное",
+  "profileOrdersAndCards": "Заказы и карты",
+  "profileStickers": "Стикеры",
+  "profileStatusSetTo": "Статус установлен: {status}",
+  "@profileStatusSetTo": {
     "placeholders": {
       "status": {
         "type": "String"
       }
     }
   },
-  "avatarUploadFailed": "Не удалось загрузить аватар",
-  "personalProfile": "Личный профиль",
-  "name": "Имя",
-  "gender": "Пол",
-  "region": "Регион",
-  "myQrCode": "Мой QR-код",
-  "poke": "Толкнуть",
-  "ringtone": "Рингтон",
-  "defaultRingtone": "Рингтон по умолчанию",
-  "myAddresses": "Мои адреса",
-  "genderSetTo": "Пол установлен: {gender}",
-  "@genderSetTo": {
+  "profileAvatarUploadFailed": "Не удалось загрузить аватар",
+  "profilePersonalProfile": "Личный профиль",
+  "profileName": "Имя",
+  "profileGender": "Пол",
+  "profileRegion": "Регион",
+  "commonMyQrCode": "Мой QR-код",
+  "profilePoke": "Толкнуть",
+  "profileRingtone": "Рингтон",
+  "profileDefaultRingtone": "Рингтон по умолчанию",
+  "profileMyAddresses": "Мои адреса",
+  "profileGenderSetTo": "Пол установлен: {gender}",
+  "@profileGenderSetTo": {
     "placeholders": {
       "gender": {
         "type": "String"
       }
     }
   },
-  "selectRegion": "Выбрать регион",
-  "selectCity": "Выбрать город",
-  "regionSetTo": "Регион установлен: {region}",
-  "@regionSetTo": {
+  "profileSelectRegion": "Выбрать регион",
+  "profileSelectCity": "Выбрать город",
+  "profileRegionSetTo": "Регион установлен: {region}",
+  "@profileRegionSetTo": {
     "placeholders": {
       "region": {
         "type": "String"
       }
     }
   },
-  "setPoke": "Настроить толчок",
-  "friendPokedMe": "Друг толкнул меня",
-  "enterPokeSuffix": "Введите суффикс, например: по плечу",
-  "example": "Пример",
-  "onTheShoulder": " по плечу",
-  "pokeCleared": "Толчок сброшен",
-  "pokeSetTo": "Толчок установлен: толкнул меня{suffix}",
-  "@pokeSetTo": {
+  "profileSetPoke": "Настроить толчок",
+  "profileFriendPokedMe": "Друг толкнул меня",
+  "profileExample": "Пример",
+  "profileOnTheShoulder": " по плечу",
+  "profilePokeCleared": "Толчок сброшен",
+  "profilePokeSetTo": "Толчок установлен: толкнул меня{suffix}",
+  "@profilePokeSetTo": {
     "placeholders": {
       "suffix": {
         "type": "String"
       }
     }
   },
-  "editSignature": "Редактировать подпись",
-  "introduceYourself": "Предложение, чтобы представить себя",
-  "signatureCleared": "Подпись удалена",
-  "signatureUpdated": "Подпись обновлена",
-  "scanToAddFriend": "Отсканируйте QR-код выше, чтобы добавить меня в друзья",
-  "ringtoneSetTo": "Рингтон установлен: {ringtone}",
-  "@ringtoneSetTo": {
+  "profileEditSignature": "Редактировать подпись",
+  "profileIntroduceYourself": "Предложение, чтобы представить себя",
+  "profileSignatureCleared": "Подпись удалена",
+  "profileSignatureUpdated": "Подпись обновлена",
+  "profileScanToAddFriend": "Отсканируйте QR-код выше, чтобы добавить меня в друзья",
+  "profileRingtoneSetTo": "Рингтон установлен: {ringtone}",
+  "@profileRingtoneSetTo": {
     "placeholders": {
       "ringtone": {
         "type": "String"
       }
     }
   },
-  "confirmDissolveGroup": "Вы уверены, что хотите расформировать «{name}»? Это действие нельзя отменить.",
-  "@confirmDissolveGroup": {
+  "commonConfirmDissolveGroup": "Вы уверены, что хотите расформировать «{name}»? Это действие нельзя отменить.",
+  "@commonConfirmDissolveGroup": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "enterValidServerAddress": "Пожалуйста, введите действительный адрес сервера",
-  "emailOtp": "Код подтверждения по email",
-  "enterServerAddressFirst": "Сначала введите адрес сервера",
-  "passkeyRequiresServer": "Для входа через Passkey требуется поддержка сервера",
-  "loginAgreement": "Входя в систему, вы соглашаетесь с ",
-  "pleaseAgreeToTerms": "Пожалуйста, прочитайте и согласитесь с Условиями использования и Политикой конфиденциальности",
-  "registerFailed": "Ошибка регистрации",
-  "reenterPassword": "Введите пароль повторно",
-  "passwordsDoNotMatch": "Пароли не совпадают",
-  "inviteCodeBuiltIn": "Код приглашения (встроенный)",
-  "inviteCodeBuiltInNote": "Код приглашения встроен, обычно изменять не требуется",
-  "iHaveReadAndAgree": "Я прочитал и согласен с ",
-  "startGroupChat": "Создать групповой чат",
-  "addFriends": "Добавить друзей",
-  "paymentAndCollection": "Оплата",
-  "messagesWithCount": "Сообщения({count})",
-  "@messagesWithCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
+  "authEnterValidServerAddress": "Пожалуйста, введите действительный адрес сервера",
+  "authEmailOtp": "Код подтверждения по email",
+  "authEnterServerAddressFirst": "Сначала введите адрес сервера",
+  "authPasskeyRequiresServer": "Для входа через Passkey требуется поддержка сервера",
+  "authLoginAgreement": "Входя в систему, вы соглашаетесь с ",
+  "authPleaseAgreeToTerms": "Пожалуйста, прочитайте и согласитесь с Условиями использования и Политикой конфиденциальности",
+  "authRegisterFailed": "Ошибка регистрации",
+  "commonReenterPassword": "Введите пароль повторно",
+  "commonPasswordsDoNotMatch": "Пароли не совпадают",
+  "authInviteCodeBuiltIn": "Код приглашения (встроенный)",
+  "authInviteCodeBuiltInNote": "Код приглашения встроен, обычно изменять не требуется",
+  "authIHaveReadAndAgree": "Я прочитал и согласен с ",
+  "mainStartGroupChat": "Создать групповой чат",
+  "mainAddFriends": "Добавить друзей",
+  "mainPaymentAndCollection": "Оплата",
   "contactCount": "{count} контактов",
   "@contactCount": {
     "placeholders": {
@@ -748,9 +497,9 @@
       }
     }
   },
-  "addToHomeScreen": "Добавить на главный экран",
-  "recommendedCardTo": "Рекомендовано карточка {contact} для {recipient}",
-  "@recommendedCardTo": {
+  "contactAddToHomeScreen": "Добавить на главный экран",
+  "contactRecommendedCardTo": "Рекомендовано карточка {contact} для {recipient}",
+  "@contactRecommendedCardTo": {
     "placeholders": {
       "contact": {
         "type": "String"
@@ -760,113 +509,94 @@
       }
     }
   },
-  "enterRemarkName": "Введите имя заметки",
-  "remarkSetTo": "Заметка установлена: {remark}",
-  "@remarkSetTo": {
+  "contactEnterRemarkName": "Введите имя заметки",
+  "contactRemarkSetTo": "Заметка установлена: {remark}",
+  "@contactRemarkSetTo": {
     "placeholders": {
       "remark": {
         "type": "String"
       }
     }
   },
-  "acceptedFriendRequest": "Принят запрос в друзья от {name}",
-  "@acceptedFriendRequest": {
+  "contactAcceptedFriendRequest": "Принят запрос в друзья от {name}",
+  "@contactAcceptedFriendRequest": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "rejectedFriendRequest": "Отклонён запрос в друзья от {name}",
-  "@rejectedFriendRequest": {
+  "contactRejectedFriendRequest": "Отклонён запрос в друзья от {name}",
+  "@contactRejectedFriendRequest": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "groupInvites": "Приглашения в группы",
-  "myGroups": "Мои группы ({count})",
-  "@myGroups": {
+  "commonGroupInvites": "Приглашения в группы",
+  "commonMyGroups": "Мои группы ({count})",
+  "@commonMyGroups": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "invitedToJoinGroup": "Приглашён в группу",
-  "confirmLeaveGroup": "Вы уверены, что хотите покинуть «{name}»?",
-  "@confirmLeaveGroup": {
+  "commonInvitedToJoinGroup": "Приглашён в группу",
+  "commonConfirmLeaveGroup": "Вы уверены, что хотите покинуть «{name}»?",
+  "@commonConfirmLeaveGroup": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "leave": "Покинуть",
-  "saveMedia": "Сохранить",
-  "recallThisMessage": "Отозвать это сообщение?",
-  "messageRecalled": "Сообщение отозвано",
-  "savedToGallery": "Сохранено в галерею",
-  "failedToSave": "Ошибка сохранения",
-  "saving": "Сохранение...",
-  "share": "Поделиться",
-  "saveToGallery": "Сохранить в галерею",
-  "downloadFailed": "Ошибка загрузки: {code}",
-  "@downloadFailed": {
+  "commonLeave": "Покинуть",
+  "commonRecallThisMessage": "Отозвать это сообщение?",
+  "commonSavedToGallery": "Сохранено в галерею",
+  "commonFailedToSave": "Ошибка сохранения",
+  "chatSaving": "Сохранение...",
+  "commonShare": "Поделиться",
+  "chatSaveToGallery": "Сохранить в галерею",
+  "chatDownloadFailed": "Ошибка загрузки: {code}",
+  "@chatDownloadFailed": {
     "placeholders": {
       "code": {
         "type": "String"
       }
     }
   },
-  "noMediaUrl": "URL медиа недоступен",
-  "shareFailed": "Ошибка при отправке: {error}",
-  "@shareFailed": {
+  "commonShareFailed": "Ошибка при отправке: {error}",
+  "@commonShareFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "failedToLoadImage": "Не удалось загрузить изображение",
-  "failedToLoadMoreMessages": "Не удалось загрузить больше сообщений",
-  "failedToSend": "Не удалось отправить",
-  "failedToSendImage": "Не удалось отправить изображение",
-  "failedToSendVoice": "Не удалось отправить голосовое сообщение",
-  "failedToSendFile": "Не удалось отправить файл",
-  "failedToSendVideo": "Не удалось отправить видео",
-  "failedToSendLocation": "Не удалось отправить местоположение",
-  "failedToResend": "Не удалось отправить повторно",
-  "failedToRecall": "Не удалось отозвать",
-  "failedToReply": "Не удалось ответить",
-  "failedToAddReaction": "Не удалось добавить реакцию",
-  "failedToSendPoll": "Не удалось отправить опрос",
-  "failedToVote": "Не удалось проголосовать",
-  "failedToLoadMessages": "Не удалось загрузить сообщения",
-  "callFeatureComingSoon": "Голосовые и видеовызовы скоро появятся",
-  "cannotForwardRedPacketOrTransfer": "Красные конверты и переводы нельзя пересылать",
-  "videoRecordingFailed": "Ошибка записи видео. Пожалуйста, попробуйте снова.",
-  "redPacket": "Красный конверт",
-  "music": "Музыка",
-  "coupon": "Купон",
-  "gift": "Подарок",
-  "poll": "Опрос",
-  "text": "Текст",
-  "link": "Ссылка",
-  "note": "Заметка",
-  "myNotes": "Мои заметки",
-  "today": "Сегодня",
-  "daysAgoText": "{count} дней назад",
-  "@daysAgoText": {
+  "chatFailedToLoadImage": "Не удалось загрузить изображение",
+  "chatVideoRecordingFailed": "Ошибка записи видео. Пожалуйста, попробуйте снова.",
+  "profileRedPacket": "Красный конверт",
+  "commonMusic": "Музыка",
+  "commonCoupon": "Купон",
+  "commonGift": "Подарок",
+  "commonPoll": "Опрос",
+  "favoriteText": "Текст",
+  "favoriteLinkLabel": "Ссылка",
+  "favoriteNote": "Заметка",
+  "favoriteMyNotes": "Мои заметки",
+  "favoriteToday": "Сегодня",
+  "favoriteDaysAgoText": "{count} дней назад",
+  "@favoriteDaysAgoText": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "dateFormat": "{day}.{month}",
-  "@dateFormat": {
+  "favoriteDateFormat": "{day}.{month}",
+  "@favoriteDateFormat": {
     "placeholders": {
       "month": {
         "type": "int"
@@ -876,51 +606,36 @@
       }
     }
   },
-  "noFavorites": "Пока нет избранного",
-  "longPressToFavorite": "Нажмите и удерживайте сообщение, чтобы добавить в избранное",
-  "newNote": "Новая заметка",
+  "favoriteNoFavorites": "Пока нет избранного",
+  "favoriteLongPressToFavorite": "Нажмите и удерживайте сообщение, чтобы добавить в избранное",
+  "favoriteNewNote": "Новая заметка",
   "favoriteLink": "Добавить ссылку в избранное",
-  "editTags": "Редактировать теги",
-  "deleteFavorite": "Удалить из избранного",
-  "deleteFavoriteConfirm": "Вы уверены, что хотите удалить это из избранного?",
-  "noSearchResultsFound": "Результаты не найдены",
-  "sendRedPacket": "Отправить красный конверт",
-  "amount": "Сумма",
-  "redPacketCover": "Обложка красного конверта",
-  "redPacketType": "Тип красного конверта",
-  "normalRedPacket": "Обычный",
-  "luckyRedPacket": "Счастливый",
-  "redPacketCount": "Количество конвертов",
-  "pieces": "штук",
-  "putMoneyInRedPacket": "Положить деньги в красный конверт",
-  "redPacketRefundNotice": "Неполученные красные конверты будут возвращены через 24 часа",
-  "openRedPacket": "Открыть",
-  "redPacketAllClaimed": "Все красные конверты получены",
-  "redPacketExpired": "Красный конверт истёк",
-  "addTransferNote": "Добавить примечание к переводу",
-  "yuan": "руб.",
-  "savedToChangeCanTransfer": "Сохранено на баланс, можно переводить напрямую",
-  "replyWithEmoji": "Ответить этим эмодзи",
-  "claimedYourRedPacket": "получил(а) ваш",
-  "claimedRedPacket": "получил(а)",
-  "otherTyping": "печатает...",
-  "processing": "Обработка...",
-  "transferCancelled": "Перевод отменён",
-  "transferFailed": "Ошибка перевода",
-  "creatingPaymentRequest": "Создание запроса на оплату...",
-  "processingPayment": "Обработка платежа...",
-  "paymentFailed": "Ошибка платежа",
-  "clickRetry": "Нажмите, чтобы повторить",
-  "settingsTitle": "Настройки",
-  "editRemark": "Редактировать заметку",
-  "setPermissions": "Установить разрешения",
-  "recommendToFriends": "Рекомендовать друзьям",
-  "setStarFriend": "Отметить как важного друга",
-  "addToBlacklist": "Добавить в чёрный список",
-  "complain": "Пожаловаться",
-  "deleteContact": "Удалить контакт",
-  "deleteContactConfirm": "Вы уверены, что хотите удалить {name}?",
-  "@deleteContactConfirm": {
+  "favoriteEditTags": "Редактировать теги",
+  "favoriteDeleteFavorite": "Удалить из избранного",
+  "favoriteDeleteFavoriteConfirm": "Вы уверены, что хотите удалить это из избранного?",
+  "favoriteNoSearchResultsFound": "Результаты не найдены",
+  "commonSendRedPacket": "Отправить красный конверт",
+  "transferAmount": "Сумма",
+  "commonRedPacketCover": "Обложка красного конверта",
+  "commonRedPacketType": "Тип красного конверта",
+  "commonNormalRedPacket": "Обычный",
+  "commonLuckyRedPacket": "Счастливый",
+  "commonRedPacketCount": "Количество конвертов",
+  "commonPieces": "штук",
+  "commonPutMoneyInRedPacket": "Положить деньги в красный конверт",
+  "commonRedPacketRefundNotice": "Неполученные красные конверты будут возвращены через 24 часа",
+  "commonOpenRedPacket": "Открыть",
+  "commonRedPacketAllClaimed": "Все красные конверты получены",
+  "commonRedPacketExpired": "Красный конверт истёк",
+  "commonAddTransferNote": "Добавить примечание к переводу",
+  "commonYuan": "руб.",
+  "commonReplyWithEmoji": "Ответить этим эмодзи",
+  "contactEditRemark": "Редактировать заметку",
+  "contactSetPermissions": "Установить разрешения",
+  "profileAddToBlacklist": "Добавить в чёрный список",
+  "contactDeleteContact": "Удалить контакт",
+  "contactDeleteContactConfirm": "Вы уверены, что хотите удалить {name}?",
+  "@contactDeleteContactConfirm": {
     "placeholders": {
       "name": {
         "type": "String"
@@ -928,425 +643,282 @@
     }
   },
   "transferTitle": "Перевод",
-  "receiverAddressLabel": "Адрес получателя",
-  "selectTokenLabel": "Выбрать токен",
+  "transferReceiverAddressLabel": "Адрес получателя",
+  "transferSelectTokenLabel": "Выбрать токен",
   "transferAmountLabel": "Сумма перевода",
-  "memoLabel": "Примечание (необязательно)",
-  "enterOrPasteAddressHint": "Введите или вставьте адрес кошелька",
-  "scanInDevelopment": "Функция сканирования в разработке...",
-  "availableLabel": "Доступно",
-  "availableBalanceFormat": "Доступно: {balance} {symbol}",
-  "@availableBalanceFormat": {
-    "placeholders": {
-      "balance": {
-        "type": "String"
-      },
-      "symbol": {
-        "type": "String"
-      }
-    }
-  },
-  "addMemoHint": "Добавить примечание",
-  "receiveTitle": "Получить",
-  "walletNotConnectedTitle": "Кошелёк не подключён",
-  "connectWalletFirst": "Сначала подключите кошелёк",
-  "sendPaymentRequest": "Отправить запрос на оплату",
-  "qrCodeGenerateFailed": "Ошибка генерации QR-кода",
-  "scanQrToPayMe": "Отсканируйте QR-код, чтобы оплатить мне",
-  "myWalletAddress": "Адрес моего кошелька",
-  "createPaymentRequest": "Создать запрос на оплату",
-  "selectTokenHint": "Выбрать токен",
-  "amountLabel": "Сумма",
-  "cancelButton": "Отмена",
-  "sendRequestButton": "Отправить запрос",
-  "allReadReceipt": "Все прочитаны",
-  "readCountReceipt": "{count} прочитано",
-  "@readCountReceipt": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "n42IdLabel": "N42 ID: {id}",
-  "@n42IdLabel": {
+  "transferMemoLabel": "Примечание (необязательно)",
+  "transferAddMemoHint": "Добавить примечание",
+  "transferSendPaymentRequest": "Отправить запрос на оплату",
+  "transferQrCodeGenerateFailed": "Ошибка генерации QR-кода",
+  "transferScanQrToPayMe": "Отсканируйте QR-код, чтобы оплатить мне",
+  "transferMyWalletAddress": "Адрес моего кошелька",
+  "transferCreatePaymentRequest": "Создать запрос на оплату",
+  "profileN42IdLabel": "N42 ID: {id}",
+  "@profileN42IdLabel": {
     "placeholders": {
       "id": {
         "type": "String"
       }
     }
   },
-  "redPacketDefaultGreeting": "С наилучшими пожеланиями",
-  "senderRedPacket": "Красный конверт от {name}",
-  "@senderRedPacket": {
+  "commonRedPacketDefaultGreeting": "С наилучшими пожеланиями",
+  "commonSenderRedPacket": "Красный конверт от {name}",
+  "@commonSenderRedPacket": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "enterValidAddress": "Пожалуйста, введите действительный адрес",
-  "pleaseSelectToken": "Пожалуйста, выберите токен",
-  "receivedTransfer": "Полученный перевод",
-  "@fromSender": {
+  "transferEnterValidAddress": "Пожалуйста, введите действительный адрес",
+  "transferPleaseSelectToken": "Пожалуйста, выберите токен",
+  "commonReceivedTransfer": "Полученный перевод",
+  "@commonFromSender": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "selectForwardRecipient": "Выберите получателя для пересылки",
-  "@sendCount": {
+  "@commonSendCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "emojiFaces": "Лица",
-  "emojiHearts": "Сердечки",
-  "emojiAnimals": "Животные",
-  "emojiFood": "Еда",
-  "emojiTransport": "Транспорт",
-  "emojiActivities": "Активность",
-  "emojiObjects": "Предметы",
-  "emojiSymbols": "Символы",
-  "transferProcessing": "Обработка перевода...",
-  "senderSentRedPacket": "{name} отправил(а) красный конверт",
-  "@senderSentRedPacket": {
+  "commonSenderSentRedPacket": "{name} отправил(а) красный конверт",
+  "@commonSenderSentRedPacket": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "savedToBalance": "Сохранено на баланс, можно переводить напрямую",
-  "redPacketExpiredOrEmpty": "Красный конверт истёк/все получены",
-  "scanFeatureComingSoon": "Функция сканирования скоро появится...",
-  "setAsStarred": "Отметить как важного",
-  "addToBlocklist": "Добавить в чёрный список",
-  "claimedYour": " получил(а) ваш ",
-  "claimedText": " получил(а) ",
-  "userTyping": "{name} печатает...",
-  "@userTyping": {
+  "commonSavedToBalance": "Сохранено на баланс, можно переводить напрямую",
+  "commonRedPacketExpiredOrEmpty": "Красный конверт истёк/все получены",
+  "transferScanFeatureComingSoon": "Функция сканирования скоро появится...",
+  "contactSetAsStarred": "Отметить как важного",
+  "contactAddToBlocklist": "Добавить в чёрный список",
+  "commonClaimedYour": " получил(а) ваш ",
+  "commonClaimedText": " получил(а) ",
+  "commonUserTyping": "{name} печатает...",
+  "@commonUserTyping": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "typing": "Печатает...",
-  "waitingToReceive": "Ожидание получения",
-  "tapToClaim": "Нажмите, чтобы получить",
-  "hasBeenReceived": "Получено",
-  "getLucky": "Удачи",
-  "cameraStartFailed": "Не удалось запустить камеру",
-  "unknownError": "Неизвестная ошибка",
-  "placeQrCodeInFrame": "Поместите QR-код в рамку для сканирования",
-  "closeManualInput": "Закрыть ручной ввод",
-  "manualInputUserId": "Ввести ID пользователя вручную",
-  "add": "Добавить",
-  "ringtoneClear": "Очистить",
-  "ringtonePhone": "Телефон",
-  "ringtoneClassic": "Классический",
-  "ringtoneSoft": "Мягкий",
-  "ringtoneVibrate": "Вибрация",
-  "ringtoneSilent": "Беззвучный",
-  "stop": "Стоп",
-  "selectRingtone": "Выбрать рингтон",
-  "loadingRingtones": "Загрузка рингтонов...",
-  "noRingtonesFound": "Рингтоны не найдены",
-  "moodAndThoughts": "Настроение и мысли",
-  "statusHappy": "Счастлив",
-  "statusCracked": "Разбит",
-  "statusLucky": "Везучий",
-  "statusSunny": "Солнечный",
-  "statusTired": "Усталый",
-  "statusDaydream": "Мечтаю",
-  "statusRushing": "Спешу",
-  "statusOverthinking": "Задумался",
-  "statusEnergized": "Энергичный",
-  "workAndStudy": "Работа и учёба",
-  "statusWorking": "Работаю",
-  "statusStudying": "Учусь",
-  "statusBusy": "Занят",
-  "statusSlacking": "Ленюсь",
-  "statusTraveling": "Путешествую",
-  "statusGoingHome": "Иду домой",
-  "statusDnd": "Не беспокоить",
-  "statusHanging": "Отдыхаю",
-  "statusCheckIn": "Отметка",
-  "statusExercising": "Тренируюсь",
-  "statusCoffee": "Кофе",
-  "statusBubbleTea": "Чай с пузырьками",
-  "statusEating": "Ем",
-  "statusParenting": "С детьми",
-  "statusSavingWorld": "Спасаю мир",
-  "statusSelfie": "Селфи",
-  "rest": "Отдых",
-  "statusRetreat": "Уединение",
-  "statusHome": "Дома",
-  "statusSleeping": "Сплю",
-  "statusCatLover": "Люблю кошек",
-  "statusDogWalking": "Гуляю с собакой",
-  "statusGaming": "Играю",
-  "statusListening": "Слушаю музыку",
-  "setStatus": "Установить статус",
-  "visibleToFriends24h": "Виден друзьям в течение 24 часов",
-  "writeStatus": "Написать статус",
-  "enterYourStatus": "Введите ваш статус...",
-  "ok": "ОК",
-  "cameraPermissionRequired": "Для сканирования QR-кода требуется разрешение камеры",
-  "cameraPermissionDenied": "Разрешение камеры отклонено навсегда. Пожалуйста, включите его в настройках системы.",
-  "cannotGetCameraPermission": "Не удаётся получить разрешение камеры",
-  "permissionCheckError": "Ошибка проверки разрешения: {error}",
-  "@permissionCheckError": {
+  "commonTyping": "Печатает...",
+  "commonWaitingToReceive": "Ожидание получения",
+  "commonTapToClaim": "Нажмите, чтобы получить",
+  "commonHasBeenReceived": "Получено",
+  "commonGetLucky": "Удачи",
+  "qrcodeCameraStartFailed": "Не удалось запустить камеру",
+  "qrcodeUnknownError": "Неизвестная ошибка",
+  "qrcodePlaceQrCodeInFrame": "Поместите QR-код в рамку для сканирования",
+  "qrcodeCloseManualInput": "Закрыть ручной ввод",
+  "qrcodeManualInputUserId": "Ввести ID пользователя вручную",
+  "commonAdd": "Добавить",
+  "profileSetStatus": "Установить статус",
+  "profileVisibleToFriends24h": "Виден друзьям в течение 24 часов",
+  "profileWriteStatus": "Написать статус",
+  "profileEnterYourStatus": "Введите ваш статус...",
+  "profileOk": "ОК",
+  "qrcodeCameraPermissionRequired": "Для сканирования QR-кода требуется разрешение камеры",
+  "qrcodeCameraPermissionDenied": "Разрешение камеры отклонено навсегда. Пожалуйста, включите его в настройках системы.",
+  "qrcodePermissionCheckError": "Ошибка проверки разрешения: {error}",
+  "@qrcodePermissionCheckError": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "invalidQrCode": "Недействительный QR-код",
-  "qrCodeProcessFailed": "Не удалось обработать QR-код: {error}",
-  "@qrCodeProcessFailed": {
+  "qrcodeInvalidQrCode": "Недействительный QR-код",
+  "qrcodeCannotAddFriend": "Не удаётся добавить друга: {error}",
+  "@qrcodeCannotAddFriend": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "cannotAddFriend": "Не удаётся добавить друга: {error}",
-  "@cannotAddFriend": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "scanQrCode": "Сканировать QR-код",
-  "checkingCameraPermission": "Проверка разрешения камеры...",
-  "needCameraPermission": "Требуется разрешение камеры",
-  "retryPermission": "Повторить",
-  "openSettings": "Открыть настройки",
-  "inviteMembers": "Пригласить участников",
-  "inviteCount": "Пригласить({count})",
-  "@inviteCount": {
+  "qrcodeScanQrCode": "Сканировать QR-код",
+  "qrcodeCheckingCameraPermission": "Проверка разрешения камеры...",
+  "qrcodeNeedCameraPermission": "Требуется разрешение камеры",
+  "qrcodeRetryPermission": "Повторить",
+  "qrcodeOpenSettings": "Открыть настройки",
+  "groupInviteMembers": "Пригласить участников",
+  "groupInviteCount": "Пригласить({count})",
+  "@groupInviteCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "noShippingAddress": "Нет адреса доставки",
-  "defaultLabel": "По умолчанию",
-  "editAddress": "Редактировать адрес",
-  "recipient": "Получатель",
-  "enterRecipientName": "Введите имя получателя",
-  "phoneNumber": "Номер телефона",
-  "enterPhoneNumber": "Введите номер телефона",
-  "regionHint": "Область/Город/Район",
-  "detailedAddress": "Подробный адрес",
-  "detailedAddressHint": "Улица, номер дома и т.д.",
-  "setAsDefaultAddress": "Установить как адрес по умолчанию",
-  "pleaseCompleteInfo": "Пожалуйста, заполните все поля",
-  "noInvoice": "Нет счёта",
-  "company": "Компания",
-  "taxNumber": "ИНН",
-  "editInvoice": "Редактировать счёт",
-  "companyName": "Название компании",
-  "enterCompanyName": "Введите название компании",
-  "personalName": "Имя",
-  "enterName": "Введите имя",
-  "taxIdNumber": "ИНН",
-  "enterTaxIdNumber": "Введите ИНН",
-  "bankNameOptional": "Название банка (необязательно)",
-  "enterBankName": "Введите название банка",
-  "bankAccountOptional": "Номер счёта (необязательно)",
-  "enterBankAccount": "Введите номер счёта",
-  "companyAddressOptional": "Адрес компании (необязательно)",
-  "enterCompanyAddress": "Введите адрес компании",
-  "companyPhoneOptional": "Телефон компании (необязательно)",
-  "enterCompanyPhone": "Введите телефон компании",
-  "setAsDefaultInvoice": "Установить как счёт по умолчанию",
-  "confirmDeleteAddress": "Вы уверены, что хотите удалить этот адрес?",
-  "confirmDeleteInvoice": "Вы уверены, что хотите удалить этот счёт?",
-  "groupOwner": "Владелец",
-  "groupAdmin": "Администратор",
-  "searchMembers": "Поиск участников",
-  "totalMembers": "{count} участников",
-  "@totalMembers": {
+  "profileNoShippingAddress": "Нет адреса доставки",
+  "profileDefaultLabel": "По умолчанию",
+  "profileNoInvoice": "Нет счёта",
+  "profileCompany": "Компания",
+  "profileTaxNumber": "ИНН",
+  "profileConfirmDeleteAddress": "Вы уверены, что хотите удалить этот адрес?",
+  "profileConfirmDeleteInvoice": "Вы уверены, что хотите удалить этот счёт?",
+  "commonGroupOwner": "Владелец",
+  "commonGroupAdmin": "Администратор",
+  "groupSearchMembers": "Поиск участников",
+  "groupTotalMembers": "{count} участников",
+  "@groupTotalMembers": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "removeFromGroup": "Удалить из группы",
-  "confirmRemoveMember": "Вы уверены, что хотите удалить \"{name}\" из группы?",
-  "@confirmRemoveMember": {
+  "chatRemoveFromGroup": "Удалить из группы",
+  "groupConfirmRemoveMember": "Вы уверены, что хотите удалить \"{name}\" из группы?",
+  "@groupConfirmRemoveMember": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "setAsAdmin": "Назначить администратором",
-  "removeAdmin": "Снять права администратора",
-  "deleteContactSuccess": "Контакт удалён",
-  "unknownSong": "Неизвестная песня",
-  "unknownArtist": "Неизвестный исполнитель",
-  "unknownContact": "Неизвестный контакт",
-  "personalCard": "Контактная карточка",
-  "singleChoice": "Один",
-  "multiChoice": "Несколько",
-  "ended": "Завершён",
-  "endPollButton": "Завершить опрос",
-  "createPoll": "Создать опрос",
-  "pollQuestion": "Вопрос опроса",
-  "enterPollQuestionHint": "Пожалуйста, введите вопрос опроса",
-  "pollOptions": "Варианты ответа",
-  "optionPlaceholder": "Вариант {index}",
-  "addOption": "Добавить вариант",
-  "pollSettings": "Настройки опроса",
-  "anonymousPoll": "Анонимный опрос",
-  "pollHint": "Опрос будет отображён в чате. Участники группы смогут голосовать.",
-  "searchSongOrArtist": "Поиск песни или исполнителя",
-  "noSongsFound": "Песни не найдены",
-  "supportedMusicPlatforms": "Поддерживаются музыкальные ссылки с NetEase, QQ Music и т.д.",
-  "songNameOptional": "Название песни (необязательно)",
-  "enterSongName": "Введите название песни",
-  "artistNameOptional": "Исполнитель (необязательно)",
-  "enterArtistName": "Введите имя исполнителя",
-  "shareSong": "Поделиться песней",
-  "realTimeLocationSharing": "Отправка местоположения в реальном времени в разработке...",
-  "voiceCallFeatureInDev": "Голосовой вызов в разработке...",
-  "reportFeatureInDev": "Функция жалобы в разработке...",
-  "shareFeatureInDev": "Функция отправки в разработке...",
-  "qrCodeFeatureInDev": "Функция QR-кода в разработке...",
-  "scanQrToAddMe": "Отсканируйте QR-код выше, чтобы добавить меня в друзья",
-  "saveToAlbum": "Сохранить в альбом",
-  "changeStyle": "Изменить стиль",
-  "copyId": "Копировать ID",
-  "idCopied": "ID скопирован",
-  "shareFeatureComingSoon": "Функция отправки скоро появится",
-  "saveFeatureComingSoon": "Функция сохранения скоро появится",
-  "moreStylesFeatureComingSoon": "Больше стилей скоро появится",
-  "confirmEndPoll": "Вы уверены, что хотите завершить этот опрос?",
-  "cannotVoteAfterEnd": "После завершения голосование будет невозможно.",
-  "@featureInDev": {
+  "chatUnknownSong": "Неизвестная песня",
+  "chatUnknownArtist": "Неизвестный исполнитель",
+  "chatUnknownContact": "Неизвестный контакт",
+  "chatPersonalCard": "Контактная карточка",
+  "chatSingleChoice": "Один",
+  "chatMultiChoice": "Несколько",
+  "chatEnded": "Завершён",
+  "chatEndPollButton": "Завершить опрос",
+  "chatEnterPollQuestionHint": "Пожалуйста, введите вопрос опроса",
+  "chatPollHint": "Опрос будет отображён в чате. Участники группы смогут голосовать.",
+  "chatSearchSongOrArtist": "Поиск песни или исполнителя",
+  "chatNoSongsFound": "Песни не найдены",
+  "chatSongNameOptional": "Название песни (необязательно)",
+  "chatEnterSongName": "Введите название песни",
+  "chatArtistNameOptional": "Исполнитель (необязательно)",
+  "chatEnterArtistName": "Введите имя исполнителя",
+  "chatRealTimeLocationSharing": "Отправка местоположения в реальном времени в разработке...",
+  "profileVoiceCallFeatureInDev": "Голосовой вызов в разработке...",
+  "profileReportFeatureInDev": "Функция жалобы в разработке...",
+  "profileShareFeatureInDev": "Функция отправки в разработке...",
+  "profileQrCodeFeatureInDev": "Функция QR-кода в разработке...",
+  "qrcodeScanQrToAddMe": "Отсканируйте QR-код выше, чтобы добавить меня в друзья",
+  "qrcodeSaveToAlbum": "Сохранить в альбом",
+  "qrcodeChangeStyle": "Изменить стиль",
+  "qrcodeCopyId": "Копировать ID",
+  "qrcodeIdCopied": "ID скопирован",
+  "qrcodeMoreStylesFeatureComingSoon": "Больше стилей скоро появится",
+  "@chatFeatureInDev": {
     "placeholders": {
       "feature": {
         "type": "String"
       }
     }
   },
-  "@optionPlaceholder": {
-    "placeholders": {
-      "index": {
-        "type": "int"
-      }
-    }
-  },
-  "bio": "О себе",
-  "homeServer": "Сервер",
-  "shareContactCard": "Поделиться контактной карточкой",
-  "removeFromBlacklist": "Удалить из чёрного списка",
-  "confirmAddBlacklist": "Вы уверены, что хотите добавить этого пользователя в чёрный список? Вы не будете получать от него сообщения.",
-  "confirmRemoveBlacklist": "Вы уверены, что хотите удалить этого пользователя из чёрного списка?",
-  "remarkSaved": "Заметка сохранена",
-  "remarkCleared": "Заметка удалена",
-  "receive": "Получить",
-  "pleaseConnectWallet": "Сначала подключите ваш кошелёк",
-  "sendRequest": "Отправить запрос",
-  "pleaseEnterValidAmount": "Пожалуйста, введите действительную сумму",
+  "profileBio": "О себе",
+  "profileHomeServer": "Сервер",
+  "profileShareContactCard": "Поделиться контактной карточкой",
+  "profileRemoveFromBlacklist": "Удалить из чёрного списка",
+  "profileConfirmAddBlacklist": "Вы уверены, что хотите добавить этого пользователя в чёрный список? Вы не будете получать от него сообщения.",
+  "profileConfirmRemoveBlacklist": "Вы уверены, что хотите удалить этого пользователя из чёрного списка?",
+  "profileRemarkSaved": "Заметка сохранена",
+  "profileRemarkCleared": "Заметка удалена",
+  "transferReceive": "Получить",
+  "transferPleaseConnectWallet": "Сначала подключите ваш кошелёк",
+  "transferSendRequest": "Отправить запрос",
+  "transferPleaseEnterValidAmount": "Пожалуйста, введите действительную сумму",
   "searchPlaceholder": "Поиск контактов, групп, сообщений",
-  "enterKeywordToSearch": "Введите ключевое слово для поиска",
-  "clearHistory": "Очистить",
-  "noResultsForQuery": "Результаты не найдены для \"{query}\"",
-  "@noResultsForQuery": {
+  "searchEnterKeywordToSearch": "Введите ключевое слово для поиска",
+  "searchClearHistory": "Очистить",
+  "searchNoResultsForQuery": "Результаты не найдены для \"{query}\"",
+  "@searchNoResultsForQuery": {
     "placeholders": {
       "query": {
         "type": "String"
       }
     }
   },
-  "allResults": "Все",
+  "searchAllResults": "Все",
   "searchInChat": "Поиск в чате",
-  "groupLabel": "Группа",
-  "contactLabel": "Контакт",
-  "messageLabel": "Сообщение",
-  "securityTitle": "Безопасность",
-  "keyBackup": "Резервное копирование ключей",
-  "backupEncryptionKeys": "Резервное копирование ключей шифрования",
-  "keysBackedUp": "{count} ключей сохранено",
-  "@keysBackedUp": {
+  "searchGroupLabel": "Группа",
+  "searchContactLabel": "Контакт",
+  "searchMessageLabel": "Сообщение",
+  "settingsSecurityTitle": "Безопасность",
+  "settingsKeyBackup": "Резервное копирование ключей",
+  "settingsBackupEncryptionKeys": "Резервное копирование ключей шифрования",
+  "settingsKeysBackedUp": "{count} ключей сохранено",
+  "@settingsKeysBackedUp": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "backupNotSet": "Резервная копия не настроена",
-  "restoreKeys": "Восстановить ключи",
-  "restoreKeysFromBackup": "Восстановить ключи шифрования из резервной копии",
-  "exportKeys": "Экспортировать ключи",
-  "exportKeysToFile": "Экспортировать ключи в файл",
-  "loggedInDevices": "Авторизованные устройства",
-  "noOtherDevices": "Нет других устройств",
-  "verified": "Подтверждено",
-  "unverified": "Не подтверждено",
-  "advanced": "Дополнительно",
-  "crossSigning": "Кросс-подпись",
-  "enabled": "Включено",
-  "notEnabled": "Не включено",
-  "resetEncryption": "Сбросить шифрование",
-  "deleteAllEncryptionKeys": "Удалить все ключи шифрования",
-  "encryptionNotSupported": "Шифрование не поддерживается",
-  "notInitialized": "Не инициализировано",
-  "backupKeyTitle": "Резервное копирование ключей",
-  "backupKeyMessage": "Создать новую резервную копию ключей? Это поможет восстановить зашифрованные сообщения на новом устройстве.",
-  "backup": "Сохранить",
-  "restoreKeyTitle": "Восстановить ключи",
-  "restoreKeyMessage": "Введите пароль восстановления или ключ восстановления для восстановления зашифрованных сообщений.",
-  "restore": "Восстановить",
-  "exportKeyTitle": "Экспортировать ключи",
-  "exportKeyMessage": "Экспортируемый файл ключей содержит все ваши ключи шифрования. Пожалуйста, храните его в безопасном месте.",
-  "export": "Экспорт",
-  "deviceIdLabel": "ID устройства: {deviceId}",
-  "@deviceIdLabel": {
+  "settingsBackupNotSet": "Резервная копия не настроена",
+  "settingsRestoreKeys": "Восстановить ключи",
+  "settingsRestoreKeysFromBackup": "Восстановить ключи шифрования из резервной копии",
+  "settingsExportKeys": "Экспортировать ключи",
+  "settingsExportKeysToFile": "Экспортировать ключи в файл",
+  "settingsLoggedInDevices": "Авторизованные устройства",
+  "settingsNoOtherDevices": "Нет других устройств",
+  "settingsVerified": "Подтверждено",
+  "settingsUnverified": "Не подтверждено",
+  "settingsAdvanced": "Дополнительно",
+  "settingsCrossSigning": "Кросс-подпись",
+  "settingsEnabled": "Включено",
+  "settingsNotEnabled": "Не включено",
+  "settingsResetEncryption": "Сбросить шифрование",
+  "settingsDeleteAllEncryptionKeys": "Удалить все ключи шифрования",
+  "settingsEncryptionNotSupported": "Шифрование не поддерживается",
+  "settingsNotInitialized": "Не инициализировано",
+  "settingsBackupKeyTitle": "Резервное копирование ключей",
+  "settingsBackupKeyMessage": "Создать новую резервную копию ключей? Это поможет восстановить зашифрованные сообщения на новом устройстве.",
+  "settingsBackup": "Сохранить",
+  "settingsRestoreKeyTitle": "Восстановить ключи",
+  "settingsRestoreKeyMessage": "Введите пароль восстановления или ключ восстановления для восстановления зашифрованных сообщений.",
+  "settingsRestore": "Восстановить",
+  "settingsExportKeyTitle": "Экспортировать ключи",
+  "settingsExportKeyMessage": "Экспортируемый файл ключей содержит все ваши ключи шифрования. Пожалуйста, храните его в безопасном месте.",
+  "settingsExport": "Экспорт",
+  "settingsDeviceIdLabel": "ID устройства: {deviceId}",
+  "@settingsDeviceIdLabel": {
     "placeholders": {
       "deviceId": {
         "type": "String"
       }
     }
   },
-  "deviceStatusVerified": "Статус: Подтверждено",
-  "deviceStatusUnverified": "Статус: Не подтверждено",
-  "lastActiveLabel": "Последняя активность: {lastSeen}",
-  "@lastActiveLabel": {
+  "settingsDeviceStatusVerified": "Статус: Подтверждено",
+  "settingsDeviceStatusUnverified": "Статус: Не подтверждено",
+  "settingsLastActiveLabel": "Последняя активность: {lastSeen}",
+  "@settingsLastActiveLabel": {
     "placeholders": {
       "lastSeen": {
         "type": "String"
       }
     }
   },
-  "verifyThisDevice": "Подтвердить это устройство",
-  "crossSigningAlreadyEnabled": "Кросс-подпись уже включена",
-  "crossSigningSetupSuccess": "Кросс-подпись успешно настроена",
-  "@setupFailed": {
+  "settingsVerifyThisDevice": "Подтвердить это устройство",
+  "settingsCrossSigningAlreadyEnabled": "Кросс-подпись уже включена",
+  "settingsCrossSigningSetupSuccess": "Кросс-подпись успешно настроена",
+  "@settingsSetupFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "resetEncryptionTitle": "Сбросить шифрование",
-  "resetEncryptionWarning": "Внимание: Это удалит все ваши ключи шифрования. Вы не сможете расшифровать ранее зашифрованные сообщения. Это действие нельзя отменить.",
-  "reset": "Сбросить",
-  "leaveMeetingConfirm": "Вы уверены, что хотите покинуть конференцию?",
-  "pokedSomeone": "толкнул {name}{suffix}",
-  "@pokedSomeone": {
+  "settingsResetEncryptionTitle": "Сбросить шифрование",
+  "settingsResetEncryptionWarning": "Внимание: Это удалит все ваши ключи шифрования. Вы не сможете расшифровать ранее зашифрованные сообщения. Это действие нельзя отменить.",
+  "settingsReset": "Сбросить",
+  "callLeaveMeetingConfirm": "Вы уверены, что хотите покинуть конференцию?",
+  "chatPokedSomeone": "толкнул {name}{suffix}",
+  "@chatPokedSomeone": {
     "placeholders": {
       "name": {
         "type": "String"
@@ -1356,71 +928,54 @@
       }
     }
   },
-  "noContactsToAdd": "Нет доступных контактов для добавления",
-  "addMembers": "Добавить участников",
-  "invitedMembers": "Приглашено {count} участников",
-  "@invitedMembers": {
+  "chatNoContactsToAdd": "Нет доступных контактов для добавления",
+  "chatAddMembers": "Добавить участников",
+  "chatInvitedMembers": "Приглашено {count} участников",
+  "@chatInvitedMembers": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "inviteFailed": "Ошибка приглашения: {error}",
-  "@inviteFailed": {
+  "chatInviteFailed": "Ошибка приглашения: {error}",
+  "@chatInviteFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "memberRemoved": "Участник удалён",
-  "removeFailed": "Ошибка удаления: {error}",
-  "@removeFailed": {
+  "chatMemberRemoved": "Участник удалён",
+  "chatRemoveFailed": "Ошибка удаления: {error}",
+  "@chatRemoveFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "realTimeLocationShareMessage": "После отправки другая сторона сможет видеть ваше местоположение в течение 1 часа.",
-  "startSharing": "Начать отправку",
-  "locationServiceNotEnabled": "Служба геолокации не включена",
-  "enableLocationService": "Пожалуйста, включите службу геолокации для использования этой функции",
-  "goToSettings": "Перейти в настройки",
-  "locationPermissionRequired": "Для этой функции требуется разрешение на определение местоположения",
-  "locationPermissionDeniedPermanent": "Разрешение на определение местоположения отклонено навсегда. Пожалуйста, включите его в настройках.",
-  "locationPermissionDenied": "Разрешение на определение местоположения отклонено",
-  "gettingLocation": "Получение местоположения...",
-  "getLocationFailed": "Не удалось получить местоположение: {error}",
-  "@getLocationFailed": {
+  "chatRealTimeLocationShareMessage": "После отправки другая сторона сможет видеть ваше местоположение в течение 1 часа.",
+  "chatStartSharing": "Начать отправку",
+  "chatLocationServiceNotEnabled": "Служба геолокации не включена",
+  "chatEnableLocationService": "Пожалуйста, включите службу геолокации для использования этой функции",
+  "chatGoToSettings": "Перейти в настройки",
+  "chatLocationPermissionRequired": "Для этой функции требуется разрешение на определение местоположения",
+  "chatLocationPermissionDeniedPermanent": "Разрешение на определение местоположения отклонено навсегда. Пожалуйста, включите его в настройках.",
+  "chatLocationPermissionDenied": "Разрешение на определение местоположения отклонено",
+  "chatGettingLocation": "Получение местоположения...",
+  "chatGetLocationFailed": "Не удалось получить местоположение: {error}",
+  "@chatGetLocationFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "currentLocation": "Текущее местоположение",
-  "nearbyPlace": "Место поблизости {index}",
-  "@nearbyPlace": {
-    "placeholders": {
-      "index": {
-        "type": "int"
-      }
-    }
-  },
-  "approximateDistance": "Примерно {distance}",
-  "@approximateDistance": {
-    "placeholders": {
-      "distance": {
-        "type": "String"
-      }
-    }
-  },
-  "mapPreview": "Предпросмотр карты",
-  "searchLocation": "Поиск местоположения",
-  "redPacketSent": "Отправлен красный конверт на {amount} {token}",
-  "@redPacketSent": {
+  "chatMapPreview": "Предпросмотр карты",
+  "chatSearchLocation": "Поиск местоположения",
+  "chatRedPacketSent": "Отправлен красный конверт на {amount} {token}",
+  "@chatRedPacketSent": {
     "placeholders": {
       "amount": {
         "type": "String"
@@ -1430,9 +985,9 @@
       }
     }
   },
-  "transferDefault": "Перевод",
-  "transferSent": "Отправлен перевод на {amount} {token}",
-  "@transferSent": {
+  "chatTransferDefault": "Перевод",
+  "chatTransferSent": "Отправлен перевод на {amount} {token}",
+  "@chatTransferSent": {
     "placeholders": {
       "amount": {
         "type": "String"
@@ -1442,311 +997,267 @@
       }
     }
   },
-  "pickFileFailed": "Не удалось выбрать файл: {error}",
-  "@pickFileFailed": {
+  "chatPickFileFailed": "Не удалось выбрать файл: {error}",
+  "@chatPickFileFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "fileSizeLimit": "Размер файла не может превышать 50 МБ",
-  "fileSending": "Отправка файла: {filename}",
-  "@fileSending": {
+  "chatFileSizeLimit": "Размер файла не может превышать 50 МБ",
+  "chatFileSending": "Отправка файла: {filename}",
+  "@chatFileSending": {
     "placeholders": {
       "filename": {
         "type": "String"
       }
     }
   },
-  "sendFileFailed": "Не удалось отправить файл: {error}",
-  "@sendFileFailed": {
+  "chatSendFileFailed": "Не удалось отправить файл: {error}",
+  "@chatSendFileFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "contactCardSent": "Отправлена контактная карточка {name}",
-  "@contactCardSent": {
+  "chatContactCardSent": "Отправлена контактная карточка {name}",
+  "@chatContactCardSent": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "favoritesFeature": "Избранное",
-  "couponsFeature": "Купоны",
-  "giftFeature": "Подарок",
-  "sharedMusic": "Поделился {name}",
-  "@sharedMusic": {
+  "chatFavoritesFeature": "Избранное",
+  "chatCouponsFeature": "Купоны",
+  "chatGiftFeature": "Подарок",
+  "chatSharedMusic": "Поделился {name}",
+  "@chatSharedMusic": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "@sendFailed": {
+  "@chatSendFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "endPollTitle": "Завершить опрос",
-  "endPollConfirmMessage": "Вы уверены, что хотите завершить этот опрос? После завершения голосование будет закрыто.",
-  "pollEndedMessage": "Опрос завершён",
-  "connectingCall": "Подключение...",
-  "muteCall": "Без звука",
-  "speakerOff": "Динамик выкл",
-  "speakerOn": "Динамик",
-  "cameraOn": "Камера вкл",
-  "cameraOff": "Камера выкл",
-  "hangUp": "Завершить",
-  "selectForwardTargetTitle": "Выбрать получателя",
-  "noForwardableChat": "Нет доступных чатов для пересылки",
-  "noMatchingChat": "Подходящие чаты не найдены",
-  "imagePreview": "[Изображение]",
-  "voicePreview": "[Голосовое сообщение]",
-  "videoPreview": "[Видео]",
-  "filePreviewWithName": "[Файл] {filename}",
-  "@filePreviewWithName": {
-    "placeholders": {
-      "filename": {
-        "type": "String"
-      }
-    }
-  },
-  "locationPreviewWithAddress": "[Местоположение] {address}",
-  "@locationPreviewWithAddress": {
-    "placeholders": {
-      "address": {
-        "type": "String"
-      }
-    }
-  },
-  "musicPreviewWithTitle": "[Музыка] {title}",
-  "@musicPreviewWithTitle": {
-    "placeholders": {
-      "title": {
-        "type": "String"
-      }
-    }
-  },
-  "messagePreview": "[Сообщение]",
-  "locationTitle": "Местоположение",
-  "sendButton": "Отправить",
-  "retryButton": "Повторить",
-  "selectContact": "Выбрать контакт",
-  "searchContactHint": "Поиск контактов",
-  "shareMusic": "Поделиться музыкой",
-  "recentPlayed": "Недавние",
-  "myFavorites": "Избранное",
-  "networkLink": "Ссылка",
-  "localFile": "Локальный",
-  "musicLinkRequired": "Ссылка на музыку *",
-  "pasteMusicLink": "Вставьте ссылку на музыку",
-  "enterSongNamePlaceholder": "Введите название песни",
-  "enterArtistNamePlaceholder": "Введите имя исполнителя",
-  "shareMusicButton": "Поделиться музыкой",
-  "selectLocalAudio": "Выбрать локальный аудиофайл",
-  "supportedAudioFormats": "Поддерживаются MP3, M4A, WAV, FLAC и др.",
-  "selectFileButton": "Выбрать файл",
-  "pleaseEnterMusicLink": "Пожалуйста, введите ссылку на музыку",
-  "pleaseEnterValidLink": "Пожалуйста, введите действительный URL",
-  "sharedSong": "Поделился песней",
-  "selectMember": "Выбрать участника",
-  "searchMemberHint": "Поиск участников",
-  "noMatchingMembers": "Подходящие участники не найдены",
-  "unknownMember": "Неизвестно",
-  "selectedMessagesCount": "Выбрано {count} сообщений",
-  "@selectedMessagesCount": {
+  "chatEndPollTitle": "Завершить опрос",
+  "chatEndPollConfirmMessage": "Вы уверены, что хотите завершить этот опрос? После завершения голосование будет закрыто.",
+  "chatPollEndedMessage": "Опрос завершён",
+  "chatConnectingCall": "Подключение...",
+  "chatMuteCall": "Без звука",
+  "chatSpeakerOff": "Динамик выкл",
+  "chatSpeakerOn": "Динамик",
+  "chatCameraOn": "Камера вкл",
+  "chatCameraOff": "Камера выкл",
+  "chatHangUp": "Завершить",
+  "chatSelectForwardTargetTitle": "Выбрать получателя",
+  "chatNoForwardableChat": "Нет доступных чатов для пересылки",
+  "chatNoMatchingChat": "Подходящие чаты не найдены",
+  "chatLocationTitle": "Местоположение",
+  "chatSendButton": "Отправить",
+  "chatRetryButton": "Повторить",
+  "chatSearchContactHint": "Поиск контактов",
+  "chatShareMusic": "Поделиться музыкой",
+  "chatRecentPlayed": "Недавние",
+  "chatMyFavorites": "Избранное",
+  "chatNetworkLink": "Ссылка",
+  "chatLocalFile": "Локальный",
+  "chatPasteMusicLink": "Вставьте ссылку на музыку",
+  "chatShareMusicButton": "Поделиться музыкой",
+  "chatSelectLocalAudio": "Выбрать локальный аудиофайл",
+  "chatSupportedAudioFormats": "Поддерживаются MP3, M4A, WAV, FLAC и др.",
+  "chatSelectFileButton": "Выбрать файл",
+  "chatPleaseEnterMusicLink": "Пожалуйста, введите ссылку на музыку",
+  "chatPleaseEnterValidLink": "Пожалуйста, введите действительный URL",
+  "chatSharedSong": "Поделился песней",
+  "chatSelectMember": "Выбрать участника",
+  "chatSearchMemberHint": "Поиск участников",
+  "chatNoMatchingMembers": "Подходящие участники не найдены",
+  "commonUnknownMember": "Неизвестно",
+  "chatSelectedMessagesCount": "Выбрано {count} сообщений",
+  "@chatSelectedMessagesCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "searchContactsOrGroups": "Поиск контактов или групп",
-  "noMatchingConversations": "Подходящие разговоры не найдены",
-  "videoTitle": "Видео",
-  "loadingText": "Загрузка...",
-  "videoPlaybackFailed": "Ошибка воспроизведения видео",
-  "@videoPlaybackFailed": {
-    "description": "Used with error message"
-  },
-  "videoLoadFailed": "Ошибка загрузки видео",
-  "playerInitFailed": "Ошибка инициализации плеера",
-  "createPollTitle": "Создать опрос",
-  "submitPoll": "Отправить",
-  "pollQuestionLabel": "Вопрос опроса",
-  "pollOptionsLabel": "Варианты ответа",
-  "optionHintWithIndex": "Вариант {index}",
-  "@optionHintWithIndex": {
+  "chatSearchContactsOrGroups": "Поиск контактов или групп",
+  "chatVideoTitle": "Видео",
+  "chatLoadingText": "Загрузка...",
+  "chatVideoLoadFailed": "Ошибка загрузки видео",
+  "chatPlayerInitFailed": "Ошибка инициализации плеера",
+  "chatCreatePollTitle": "Создать опрос",
+  "chatSubmitPoll": "Отправить",
+  "chatPollQuestionLabel": "Вопрос опроса",
+  "chatPollOptionsLabel": "Варианты ответа",
+  "chatOptionHintWithIndex": "Вариант {index}",
+  "@chatOptionHintWithIndex": {
     "placeholders": {
       "index": {
         "type": "int"
       }
     }
   },
-  "addOptionButton": "Добавить вариант",
-  "pollSettingsLabel": "Настройки опроса",
-  "selectionType": "Тип выбора",
-  "singleChoiceLabel": "Один",
-  "multiChoiceLabel": "Несколько",
-  "anonymousPollSwitch": "Анонимный опрос",
-  "pleaseEnterQuestion": "Пожалуйста, введите вопрос опроса",
-  "atLeastTwoOptions": "Требуется минимум 2 варианта",
-  "confirmWithCount": "Подтвердить ({count})",
-  "@confirmWithCount": {
+  "chatAddOptionButton": "Добавить вариант",
+  "chatPollSettingsLabel": "Настройки опроса",
+  "chatSelectionType": "Тип выбора",
+  "chatSingleChoiceLabel": "Один",
+  "chatMultiChoiceLabel": "Несколько",
+  "chatAnonymousPollSwitch": "Анонимный опрос",
+  "chatPleaseEnterQuestion": "Пожалуйста, введите вопрос опроса",
+  "chatAtLeastTwoOptions": "Требуется минимум 2 варианта",
+  "chatConfirmWithCount": "Подтвердить ({count})",
+  "@chatConfirmWithCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "@selectedCount": {
+  "@chatSelectedCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "@memberCount": {
+  "@commonMemberCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "@groupChatCount": {
+  "@chatGroupChatCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "@replyTo": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "emailVerificationTitle": "Подтверждение email",
-  "enterValidEmailAddress": "Пожалуйста, введите действительный email адрес",
-  "verificationCodeSentTo": "Код подтверждения отправлен на {email}",
-  "@verificationCodeSentTo": {
+  "authEmailVerificationTitle": "Подтверждение email",
+  "authEnterValidEmailAddress": "Пожалуйста, введите действительный email адрес",
+  "authVerificationCodeSentTo": "Код подтверждения отправлен на {email}",
+  "@authVerificationCodeSentTo": {
     "placeholders": {
       "email": {
         "type": "String"
       }
     }
   },
-  "sendCodeFailed": "Не удалось отправить код: {error}",
-  "@sendCodeFailed": {
+  "authSendCodeFailed": "Не удалось отправить код: {error}",
+  "@authSendCodeFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "verificationSuccess": "Проверка успешна",
-  "verificationFailed": "Проверка не удалась",
-  "verificationCodeError": "Ошибка кода подтверждения: {error}",
-  "@verificationCodeError": {
+  "authVerificationSuccess": "Проверка успешна",
+  "authVerificationFailed": "Проверка не удалась",
+  "authVerificationCodeError": "Ошибка кода подтверждения: {error}",
+  "@authVerificationCodeError": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "enterVerificationCode": "Введите код подтверждения",
-  "enterYourEmail": "Введите email",
-  "weSentCodeTo": "Мы отправили 6-значный код на\n{email}",
-  "@weSentCodeTo": {
+  "commonEnterVerificationCode": "Введите код подтверждения",
+  "authEnterYourEmail": "Введите email",
+  "authWeSentCodeTo": "Мы отправили 6-значный код на\n{email}",
+  "@authWeSentCodeTo": {
     "placeholders": {
       "email": {
         "type": "String"
       }
     }
   },
-  "enterEmailForCode": "Введите ваш email адрес, мы отправим код подтверждения",
-  "sendVerificationCode": "Отправить код подтверждения",
-  "resendVerificationCode": "Отправить код повторно",
-  "canResendAfter": "Повторная отправка через {seconds} секунд",
-  "@canResendAfter": {
+  "authEnterEmailForCode": "Введите ваш email адрес, мы отправим код подтверждения",
+  "commonSendVerificationCode": "Отправить код подтверждения",
+  "authResendVerificationCode": "Отправить код повторно",
+  "authCanResendAfter": "Повторная отправка через {seconds} секунд",
+  "@authCanResendAfter": {
     "placeholders": {
       "seconds": {
         "type": "int"
       }
     }
   },
-  "changeEmail": "Изменить email",
-  "addToContacts": "Добавить в контакты",
-  "addingToContacts": "Добавление...",
-  "addedToContacts": "Добавлено в контакты",
-  "addFailedWithError": "Ошибка добавления: {error}",
-  "@addFailedWithError": {
+  "commonChangeEmail": "Изменить email",
+  "contactAddToContacts": "Добавить в контакты",
+  "contactAddingToContacts": "Добавление...",
+  "contactAddedToContacts": "Добавлено в контакты",
+  "contactAddFailedWithError": "Ошибка добавления: {error}",
+  "@contactAddFailedWithError": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "addPhone": "Добавить телефон",
-  "addTag": "Добавить теги",
-  "addText": "Добавить текст",
-  "addPhoto": "Добавить фото",
-  "groupCountLabel": "{count} групп",
-  "@groupCountLabel": {
+  "contactAddPhone": "Добавить телефон",
+  "contactAddTag": "Добавить теги",
+  "contactAddText": "Добавить текст",
+  "contactAddPhoto": "Добавить фото",
+  "contactGroupCountLabel": "{count} групп",
+  "@contactGroupCountLabel": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "addedViaSearch": "Добавлен через поиск",
-  "addTime": "Добавить время",
-  "doneButton": "Готово",
-  "waitingForParticipants": "Ожидание присоединения участников...",
-  "participantMe": "{name} (Я)",
-  "@participantMe": {
+  "contactAddedViaSearch": "Добавлен через поиск",
+  "contactAddTime": "Добавить время",
+  "contactDoneButton": "Готово",
+  "callWaitingForParticipants": "Ожидание присоединения участников...",
+  "callParticipantMe": "{name} (Я)",
+  "@callParticipantMe": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "sharingLabel": "Отправка",
-  "screenSharingBy": "{name} делится экраном",
-  "@screenSharingBy": {
+  "callSharingLabel": "Отправка",
+  "callScreenSharingBy": "{name} делится экраном",
+  "@callScreenSharingBy": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "participantCount": "{count} участников",
-  "@participantCount": {
+  "callParticipantCount": "{count} участников",
+  "@callParticipantCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "muteLabel": "Без звука",
-  "unmuteLabel": "Со звуком",
-  "turnOffVideo": "Выключить видео",
-  "turnOnVideo": "Включить видео",
-  "shareScreen": "Поделиться экраном",
-  "stopSharing": "Прекратить отправку",
-  "switchCameraLabel": "Переключить",
-  "leaveLabel": "Покинуть",
-  "participantsLabel": "Участники",
-  "joiningMeeting": "Присоединение к конференции...",
-  "pollVotesFormat": "{count} голосов ({percentage}%)",
-  "@pollVotesFormat": {
+  "callMuteLabel": "Без звука",
+  "callUnmuteLabel": "Со звуком",
+  "callTurnOffVideo": "Выключить видео",
+  "callTurnOnVideo": "Включить видео",
+  "callShareScreen": "Поделиться экраном",
+  "callStopSharing": "Прекратить отправку",
+  "callSwitchCameraLabel": "Переключить",
+  "callLeaveLabel": "Покинуть",
+  "callParticipantsLabel": "Участники",
+  "callJoiningMeeting": "Присоединение к конференции...",
+  "chatPollVotesFormat": "{count} голосов ({percentage}%)",
+  "@chatPollVotesFormat": {
     "placeholders": {
       "count": {
         "type": "int"
@@ -1756,174 +1267,457 @@
       }
     }
   },
-  "pollParticipantsFormat": "{count} участников",
-  "@pollParticipantsFormat": {
+  "chatPollParticipantsFormat": "{count} участников",
+  "@chatPollParticipantsFormat": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "incomingVideoCall": "Входящий видеозвонок",
-  "incomingVoiceCall": "Входящий голосовой звонок",
-  "videoCallInProgress": "Видеозвонок",
-  "voiceCallInProgress": "Голосовой звонок",
-  "reconnectingCall": "Переподключение...",
-  "callEnded": "Звонок завершён",
-  "callFailed": "Звонок не удался",
-  "noMediaUrlAvailable": "URL медиа недоступен",
-  "errorWithMessage": "Ошибка: {message}",
-  "@errorWithMessage": {
+  "chatNoMediaUrlAvailable": "URL медиа недоступен",
+  "chatErrorWithMessage": "Ошибка: {message}",
+  "@chatErrorWithMessage": {
     "placeholders": {
       "message": {
         "type": "String"
       }
     }
   },
-  "musicLinkLabel": "Ссылка на музыку",
-  "redPacketTransferCannotForward": "Красные конверты и переводы нельзя пересылать",
-  "messageNotifications": "Уведомления о сообщениях",
-  "receiveNewMessageNotifications": "Получать уведомления о новых сообщениях",
-  "showMessagePreview": "Показывать предпросмотр сообщения",
-  "showMessageContentInNotification": "Показывать содержимое сообщения в уведомлениях",
-  "vibration": "Вибрация",
-  "doNotDisturbMode": "Не беспокоить",
-  "doNotDisturbDescription": "Не получать уведомления в указанное время",
-  "messagesLabel": "Сообщения",
-  "allowStrangerMessages": "Разрешить сообщения от незнакомцев",
-  "receiveMessagesFromNonContacts": "Получать сообщения от тех, кого нет в контактах",
-  "letOthersKnowYouRead": "Показывать, что вы прочитали сообщения",
-  "typingIndicator": "Индикатор набора",
-  "letOthersKnowYouTyping": "Показывать, что вы печатаете",
-  "whoCanSeeTitle": "Кто может видеть {title}",
-  "@whoCanSeeTitle": {
+  "chatMusicLinkLabel": "Ссылка на музыку",
+  "chatRedPacketTransferCannotForward": "Красные конверты и переводы нельзя пересылать",
+  "commonTapToRetry": "Нажмите, чтобы повторить",
+  "chatDefaultRedPacketGreeting": "Желаю процветания и удачи",
+  "groupAllowOthersToSearchAndJoin": "Разрешить другим пользователям искать и присоединяться",
+  "groupConfirmClearChatHistory": "Вы уверены, что хотите очистить историю чата?",
+  "groupCreateGroupToChat": "Создайте группу, чтобы начать общение",
+  "groupEditGroupAnnouncement": "Редактировать объявление группы",
+  "groupEditGroupDescription": "Редактировать описание группы",
+  "groupEnterGroupAnnouncement": "Введите объявление группы",
+  "groupMemberCountClickToCopy": "{count} участников, нажмите для копирования ID группы",
+  "groupNoPermissionToEditGroupName": "У вас нет прав для изменения названия группы",
+  "commonAppleLogin": "Войти через Apple",
+  "settingsChangeEmailFailed": "Не удалось изменить email",
+  "settingsChangePassword": "Изменить пароль",
+  "settingsChangePasswordFailed": "Не удалось изменить пароль",
+  "settingsChangePasswordInfo": "После изменения пароля вы будете отключены и должны будете войти с новым паролем.",
+  "settingsCodeSentTo": "Код подтверждения отправлен на",
+  "commonConfirmNewPassword": "Подтвердите новый пароль",
+  "searchConversationLabel": "Беседа",
+  "settingsCurrentBoundEmail": "Текущий привязанный email",
+  "settingsCurrentPassword": "Текущий пароль",
+  "settingsDidNotReceiveCode": "Не получили код?",
+  "authEmailAddress": "Адрес электронной почты",
+  "settingsEmailChangedSuccess": "Email успешно изменен",
+  "authEmailRecoveryHint": "Используется для восстановления пароля",
+  "settingsEmailSecurityNote": "Ваш email используется для восстановления пароля. Храните его в безопасности.",
+  "settingsEnterCurrentPassword": "Введите текущий пароль",
+  "commonEnterEmailAddress": "Введите адрес электронной почты",
+  "settingsEnterNewEmail": "Введите новый адрес электронной почты",
+  "settingsEnterNewPassword": "Введите новый пароль",
+  "authEnterRegisteredEmail": "Введите адрес электронной почты, с которым вы зарегистрировались",
+  "authEnterResetCode": "Введите код сброса",
+  "commonGoogleLogin": "Войти через Google",
+  "commonWechat": "WeChat",
+  "commonInvalidEmailFormat": "Введите действительный адрес электронной почты",
+  "settingsLanguage": "Язык",
+  "settingsLanguageChanged": "Язык изменен",
+  "settingsNewEmailAddress": "Новый адрес электронной почты",
+  "commonNewPassword": "Новый пароль",
+  "settingsNewPasswordMustBeDifferent": "Новый пароль должен отличаться от текущего",
+  "authOptional": "Необязательно",
+  "settingsPasswordChanged": "Пароль успешно изменен. Войдите с новым паролем.",
+  "settingsPasswordRequirements": "Требования к паролю:",
+  "authPasswordResetSuccess": "Пароль успешно сброшен. Войдите с новым паролем.",
+  "authResetCodeSent": "Код сброса отправлен на {email}",
+  "authResetPassword": "Сбросить пароль",
+  "authResetPasswordFailed": "Не удалось сбросить пароль",
+  "settingsSecurity": "Безопасность",
+  "settingsSecurityNote": "В целях безопасности вам нужно будет войти заново на всех устройствах после изменения пароля.",
+  "authSendResetCode": "Отправить код сброса",
+  "authSetNewPassword": "Установить новый пароль",
+  "settingsVerificationCode": "Код подтверждения",
+  "settingsVerificationCodeSent": "Код подтверждения отправлен",
+  "qrcodeCameraPermissionRestricted": "Доступ к камере ограничен на этом устройстве",
+  "contactCreateTag": "Create Tag",
+  "contactEnterTagName": "Enter tag name",
+  "contactEditTag": "Edit Tag",
+  "contactDeleteTag": "Delete Tag",
+  "contactDeleteTagConfirm": "Are you sure you want to delete the tag \"{tagName}\"?",
+  "@contactDeleteTagConfirm": {
+    "placeholders": {
+      "tagName": {
+        "type": "String"
+      }
+    }
+  },
+  "contactNoTags": "No tags yet",
+  "contactFriendPermissions": "Friend Permissions",
+  "contactSetChatOnly": "Set as Chat-only",
+  "contactChatOnlyDesc": "Can only chat with you, other content will be hidden",
+  "contactHideMyMoments": "Hide My Moments",
+  "contactHideMyMomentsDesc": "This friend cannot see my Moments",
+  "contactHideTheirMoments": "Hide Their Moments",
+  "contactHideTheirMomentsDesc": "Don't see this friend's Moments",
+  "contactHideMyStatus": "Hide My Status",
+  "contactHideMyStatusDesc": "This friend cannot see my status updates",
+  "contactNoChatOnlyFriends": "No chat-only friends",
+  "contactNoOfficialAccounts": "No official accounts",
+  "contactFollowOfficialAccountsDesc": "Follow official accounts to get the latest updates",
+  "contactNoServiceAccounts": "No service accounts",
+  "contactSubscribeServiceAccountsDesc": "Subscribe to service accounts for convenient services",
+  "contactNoEnterpriseContacts": "No enterprise contacts",
+  "contactEnterpriseContactsDesc": "Enterprise contacts will be displayed here",
+  "profileCardPack": "Card Pack",
+  "profileOrders": "Orders",
+  "profileNoOrders": "No orders",
+  "profileOrdersDesc": "Your orders will be displayed here",
+  "profileNoCards": "No cards",
+  "profileCardsDesc": "Your cards will be displayed here",
+  "favoriteEnterTagsHint": "Enter tags separated by commas",
+  "favoriteTagsUpdated": "Tags updated",
+  "favoriteForwardedContent": "Content forwarded",
+  "favoriteEnterNoteContent": "Enter note content",
+  "favoriteNoteAdded": "Note added",
+  "favoriteLinkTitle": "Link title",
+  "favoriteLinkUrl": "https://",
+  "favoriteLinkAdded": "Link added",
+  "contactPhotoAdded": "Photo added",
+  "contactEnterPhone": "Enter phone number",
+  "commonConversationWithId": "Разговор: {roomId}",
+  "commonContactWithId": "Контакт: {userId}",
+  "commonDiscover": "Обзор",
+  "commonDeveloping": "{title}\n(Скоро)",
+  "commonPageNotFound": "Страница не найдена",
+  "commonBackToHome": "На главную",
+  "settingsMessageNotifications": "Уведомления о сообщениях",
+  "settingsReceiveNewMessageNotifications": "Получать уведомления о новых сообщениях",
+  "settingsShowMessagePreview": "Показывать предпросмотр сообщения",
+  "settingsShowMessageContentInNotification": "Показывать содержимое сообщения в уведомлениях",
+  "settingsNotificationSound": "Звук уведомления",
+  "settingsPlaySoundOnMessage": "Воспроизводить звук при получении сообщения",
+  "commonVibration": "Вибрация",
+  "settingsVibrateOnMessage": "Вибрировать при получении сообщения",
+  "settingsDoNotDisturbMode": "Не беспокоить",
+  "settingsDoNotDisturbDescription": "Не получать уведомления в указанное время",
+  "settingsStartTime": "Время начала",
+  "settingsEndTime": "Время окончания",
+  "settingsWhoCanSee": "Кто может видеть",
+  "settingsLastSeen": "Последний визит",
+  "settingsMessagesLabel": "Сообщения",
+  "settingsAllowStrangerMessages": "Разрешить сообщения от незнакомцев",
+  "settingsReceiveMessagesFromNonContacts": "Получать сообщения от тех, кого нет в контактах",
+  "settingsReadReceipts": "Отчёты о прочтении",
+  "settingsLetOthersKnowYouRead": "Показывать, что вы прочитали сообщения",
+  "settingsTypingIndicator": "Индикатор набора",
+  "settingsLetOthersKnowYouTyping": "Показывать, что вы печатаете",
+  "settingsEveryone": "Все",
+  "settingsContactsOnly": "Только контакты",
+  "settingsNobody": "Никто",
+  "settingsWhoCanSeeTitle": "Кто может видеть {title}",
+  "@settingsWhoCanSeeTitle": {
     "placeholders": {
       "title": {
         "type": "String"
       }
     }
   },
-  "versionInfo": "Версия {version}",
-  "@versionInfo": {
+  "settingsVersionInfo": "Версия {version}",
+  "@settingsVersionInfo": {
     "placeholders": {
       "version": {
         "type": "String"
       }
     }
   },
-  "checkForUpdates": "Проверить обновления",
-  "feedbackAndSuggestions": "Отзывы и предложения",
-  "darkMode": "Тёмный режим",
-  "fontSize": "Размер шрифта",
-  "bubbleStyle": "Стиль пузырей",
-  "followSystem": "Следовать системе",
-  "autoSwitchBySystem": "Автоматически переключаться по настройкам системы",
-  "lightMode": "Светлый режим",
-  "alwaysUseLightTheme": "Всегда использовать светлую тему",
-  "darkModeOption": "Тёмный режим",
-  "alwaysUseDarkTheme": "Всегда использовать тёмную тему",
-  "fontSizeSmall": "Маленький",
-  "fontSizeStandard": "Стандартный",
-  "fontSizeLarge": "Большой",
-  "fontSizeExtraLarge": "Очень большой",
-  "bubbleStyleWechat": "Стиль WeChat",
-  "bubbleStyleWechatDesc": "Классический стиль пузырей WeChat",
-  "bubbleStyleModern": "Современный стиль",
-  "bubbleStyleModernDesc": "Чистый современный стиль пузырей",
-  "bubbleStyleClassic": "Классический стиль",
-  "bubbleStyleClassicDesc": "Традиционный стиль пузырей",
-  "allButton": "Все",
-  "tapToRetry": "Нажмите, чтобы повторить",
-  "noConversationsToForward": "Нет бесед для пересылки",
-  "defaultRedPacketGreeting": "Желаю процветания и удачи",
-  "emojiCategoryFace": "Смайлики",
-  "emojiCategoryHeart": "Сердечки",
-  "emojiCategoryAnimal": "Животные",
-  "emojiCategoryFood": "Еда",
-  "emojiCategoryTransport": "Транспорт",
-  "emojiCategoryActivity": "Активности",
-  "emojiCategoryObject": "Предметы",
-  "emojiCategorySymbol": "Символы",
-  "allowOthersToSearchAndJoin": "Разрешить другим пользователям искать и присоединяться",
-  "confirmClearChatHistory": "Вы уверены, что хотите очистить историю чата?",
-  "createGroupToChat": "Создайте группу, чтобы начать общение",
-  "editGroupAnnouncement": "Редактировать объявление группы",
-  "editGroupDescription": "Редактировать описание группы",
-  "enterGroupAnnouncement": "Введите объявление группы",
-  "memberCountClickToCopy": "{count} участников, нажмите для копирования ID группы",
-  "noPermissionToEditGroupName": "У вас нет прав для изменения названия группы",
-  "appleLogin": "Войти через Apple",
-  "changeEmailFailed": "Не удалось изменить email",
-  "changePassword": "Изменить пароль",
-  "changePasswordFailed": "Не удалось изменить пароль",
-  "changePasswordInfo": "После изменения пароля вы будете отключены и должны будете войти с новым паролем.",
-  "codeSentTo": "Код подтверждения отправлен на",
-  "confirmNewPassword": "Подтвердите новый пароль",
-  "conversationLabel": "Беседа",
-  "currentBoundEmail": "Текущий привязанный email",
-  "currentPassword": "Текущий пароль",
-  "didNotReceiveCode": "Не получили код?",
-  "emailAddress": "Адрес электронной почты",
-  "emailChangedSuccess": "Email успешно изменен",
-  "emailRecoveryHint": "Используется для восстановления пароля",
-  "emailSecurityNote": "Ваш email используется для восстановления пароля. Храните его в безопасности.",
-  "enterCurrentPassword": "Введите текущий пароль",
-  "enterEmailAddress": "Введите адрес электронной почты",
-  "enterNewEmail": "Введите новый адрес электронной почты",
-  "enterNewPassword": "Введите новый пароль",
-  "enterRegisteredEmail": "Введите адрес электронной почты, с которым вы зарегистрировались",
-  "enterResetCode": "Введите код сброса",
-  "googleLogin": "Войти через Google",
-  "facebook": "Facebook",
-  "facebookLogin": "Войти через Facebook",
-  "facebookLoginFailed": "Ошибка входа через Facebook",
-  "twitter": "Twitter",
-  "twitterLogin": "Войти через Twitter",
-  "twitterLoginFailed": "Ошибка входа через Twitter",
-  "twitterNotConfigured": "Вход через Twitter не настроен",
-  "wechat": "WeChat",
-  "wechatLogin": "Войти через WeChat",
-  "wechatLoginFailed": "Ошибка входа через WeChat",
-  "wechatNotInstalled": "Сначала установите WeChat",
-  "incorrectCurrentPassword": "Неверный текущий пароль",
-  "invalidEmailFormat": "Введите действительный адрес электронной почты",
-  "language": "Язык",
-  "languageChanged": "Язык изменен",
-  "newEmailAddress": "Новый адрес электронной почты",
-  "newPassword": "Новый пароль",
-  "newPasswordMustBeDifferent": "Новый пароль должен отличаться от текущего",
-  "optional": "Необязательно",
-  "passwordChanged": "Пароль успешно изменен. Войдите с новым паролем.",
-  "passwordRequirements": "Требования к паролю:",
-  "passwordResetSuccess": "Пароль успешно сброшен. Войдите с новым паролем.",
-  "resetCodeSent": "Код сброса отправлен на {email}",
-  "resetPassword": "Сбросить пароль",
-  "resetPasswordFailed": "Не удалось сбросить пароль",
-  "resetPasswordTitle": "Сбросить пароль",
-  "security": "Безопасность",
-  "securityNote": "В целях безопасности вам нужно будет войти заново на всех устройствах после изменения пароля.",
-  "sendResetCode": "Отправить код сброса",
-  "setNewPassword": "Установить новый пароль",
-  "socialLoginCancelled": "Вход отменен",
-  "socialLoginFailed": "Не удалось войти через социальную сеть",
-  "verificationCode": "Код подтверждения",
-  "verificationCodeSent": "Код подтверждения отправлен",
-
-  "n42BeanTitle": "N42 Bean",
-  "n42BeanDetails": "Детали N42 Bean",
-  "noN42Bean": "Нет N42 Bean",
-  "n42BeanDescription": "N42 Bean — токен для обмена на виртуальные предметы и услуги в N42. Сейчас доступно:",
-  "n42BeanFeature1": "Эксклюзивные стикеры и темы для участников",
-  "n42BeanFeature2": "Настройка пузырей чата",
-  "n42BeanFeature3": "Настройка обложек красных конвертов",
-  "n42BeanFeature4": "Эксклюзивный значок никнейма",
-  "n42BeanFeature5": "Привилегии группового чата",
-  "n42BeanFeature6": "Расширение облачного хранилища",
-  "n42BeanFeature7": "Фильтры красоты для видеозвонков",
-  "n42BeanFeature8": "Настройка фона Moments",
-  "n42BeanFeature9": "Приоритет VIP-обслуживания",
-  "gotIt": "Понятно",
-  "noN42BeanRecords": "Нет записей N42 Bean",
-
-  "cameraPermissionRestricted": "Доступ к камере ограничен на этом устройстве"
+  "settingsCheckForUpdates": "Проверить обновления",
+  "settingsOpenSourceLicenses": "Лицензии открытого ПО",
+  "settingsFeedbackAndSuggestions": "Отзывы и предложения",
+  "settingsBuiltOnMatrix": "На основе протокола Matrix",
+  "settingsDarkMode": "Тёмный режим",
+  "settingsFontSize": "Размер шрифта",
+  "settingsBubbleStyle": "Стиль пузырей",
+  "settingsFollowSystem": "Следовать системе",
+  "settingsAutoSwitchBySystem": "Автоматически переключаться по настройкам системы",
+  "settingsLightMode": "Светлый режим",
+  "settingsAlwaysUseLightTheme": "Всегда использовать светлую тему",
+  "settingsDarkModeOption": "Тёмный режим",
+  "settingsAlwaysUseDarkTheme": "Всегда использовать тёмную тему",
+  "settingsFontSizeSmall": "Маленький",
+  "settingsFontSizeStandard": "Стандартный",
+  "settingsFontSizeLarge": "Большой",
+  "settingsFontSizeExtraLarge": "Очень большой",
+  "settingsBubbleStyleWechat": "Стиль WeChat",
+  "settingsBubbleStyleWechatDesc": "Классический стиль пузырей WeChat",
+  "settingsBubbleStyleModern": "Современный стиль",
+  "settingsBubbleStyleModernDesc": "Чистый современный стиль пузырей",
+  "settingsBubbleStyleClassic": "Классический стиль",
+  "settingsBubbleStyleClassicDesc": "Традиционный стиль пузырей",
+  "discoverVideoChannels": "Каналы",
+  "discoverLive": "Прямой эфир",
+  "discoverListen": "Слушать",
+  "discoverWatch": "Смотреть",
+  "discoverSearchDiscover": "Поиск",
+  "discoverNearbyPeople": "Рядом",
+  "discoverGames": "Игры",
+  "discoverMiniPrograms": "Мини-программы",
+  "chatAlreadyInCall": "Уже в вызове",
+  "commonConnectionFailed": "Ошибка подключения",
+  "chatCallRejected": "Вызов отклонён",
+  "chatNoAnswer": "Нет ответа",
+  "commonClose": "Закрыть",
+  "chatSelectContact": "Выбрать контакт",
+  "chatVoteRemoved": "Голос удалён",
+  "chatVoteChanged": "Голос изменён",
+  "chatVoted": "Проголосовано",
+  "chatReplyTo": "Ответ {name}",
+  "@chatReplyTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatCurrentLocation": "Текущее местоположение",
+  "chatNearbyPlace": "Место поблизости {index}",
+  "@chatNearbyPlace": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "chatApproximateDistance": "Примерно {distance}",
+  "@chatApproximateDistance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "chatAddress": "Адрес",
+  "chatLatitude": "Широта",
+  "chatLongitude": "Долгота",
+  "groupDescriptionUpdated": "Описание группы обновлено",
+  "groupAvatarUpdated": "Аватар группы обновлен",
+  "callDecline": "Отклонить",
+  "callAnswer": "Ответить",
+  "callIncomingVideoCall": "Входящий видеозвонок",
+  "callIncomingVoiceCall": "Входящий голосовой звонок",
+  "callVideoCallInProgress": "Видеозвонок",
+  "callVoiceCallInProgress": "Голосовой звонок",
+  "callReconnectingCall": "Переподключение...",
+  "callEnded": "Звонок завершён",
+  "callFailed": "Звонок не удался",
+  "callLivekitNotConfigured": "LiveKit не настроен",
+  "callJoinMeetingFailed": "Не удалось присоединиться к конференции: {error}",
+  "callScreenShareFailed": "Не удалось поделиться экраном: {error}",
+  "profileN42BeanTitle": "N42 Bean",
+  "profileNoN42Bean": "Нет N42 Bean",
+  "profileN42BeanDetails": "Детали N42 Bean",
+  "profileN42BeanDescription": "N42 Bean — токен для обмена на виртуальные предметы и услуги в N42. Сейчас доступно:",
+  "profileN42BeanFeature1": "Эксклюзивные стикеры и темы для участников",
+  "profileN42BeanFeature2": "Настройка пузырей чата",
+  "profileN42BeanFeature3": "Настройка обложек красных конвертов",
+  "profileN42BeanFeature4": "Эксклюзивный значок никнейма",
+  "profileN42BeanFeature5": "Привилегии группового чата",
+  "profileN42BeanFeature6": "Расширение облачного хранилища",
+  "profileN42BeanFeature7": "Фильтры красоты для видеозвонков",
+  "profileN42BeanFeature8": "Настройка фона Moments",
+  "profileN42BeanFeature9": "Приоритет VIP-обслуживания",
+  "profileGotIt": "Понятно",
+  "profileNoN42BeanRecords": "Нет записей N42 Bean",
+  "profileMoodAndThoughts": "Настроение и мысли",
+  "profileStatusHappy": "Счастлив",
+  "profileStatusCracked": "Разбит",
+  "profileStatusLucky": "Везучий",
+  "profileStatusSunny": "Солнечный",
+  "profileStatusTired": "Усталый",
+  "profileStatusDaydream": "Мечтаю",
+  "profileStatusRushing": "Спешу",
+  "profileStatusOverthinking": "Задумался",
+  "profileStatusEnergized": "Энергичный",
+  "profileWorkAndStudy": "Работа и учёба",
+  "profileStatusWorking": "Работаю",
+  "profileStatusStudying": "Учусь",
+  "profileStatusBusy": "Занят",
+  "profileStatusSlacking": "Ленюсь",
+  "profileStatusTraveling": "Путешествую",
+  "profileStatusGoingHome": "Иду домой",
+  "profileStatusDnd": "Не беспокоить",
+  "profileActivities": "Активность",
+  "profileStatusHanging": "Отдыхаю",
+  "profileStatusCheckIn": "Отметка",
+  "profileStatusExercising": "Тренируюсь",
+  "profileStatusCoffee": "Кофе",
+  "profileStatusBubbleTea": "Чай с пузырьками",
+  "profileStatusEating": "Ем",
+  "profileStatusParenting": "С детьми",
+  "profileStatusSavingWorld": "Спасаю мир",
+  "profileStatusSelfie": "Селфи",
+  "profileRest": "Отдых",
+  "profileStatusRetreat": "Уединение",
+  "profileStatusHome": "Дома",
+  "profileStatusSleeping": "Сплю",
+  "profileStatusCatLover": "Люблю кошек",
+  "profileStatusDogWalking": "Гуляю с собакой",
+  "profileStatusGaming": "Играю",
+  "profileStatusListening": "Слушаю музыку",
+  "profileEditAddress": "Редактировать адрес",
+  "profileRecipient": "Получатель",
+  "profileEnterRecipientName": "Введите имя получателя",
+  "profilePhoneNumber": "Номер телефона",
+  "profileEnterPhoneNumber": "Введите номер телефона",
+  "profileRegionHint": "Область/Город/Район",
+  "profileDetailedAddress": "Подробный адрес",
+  "profileDetailedAddressHint": "Улица, номер дома и т.д.",
+  "profileSetAsDefaultAddress": "Установить как адрес по умолчанию",
+  "profilePleaseCompleteInfo": "Пожалуйста, заполните все поля",
+  "profileEditInvoice": "Редактировать счёт",
+  "profileInvoiceType": "Тип счёта: ",
+  "profileCompanyName": "Название компании",
+  "profilePersonalName": "Имя",
+  "profileEnterCompanyName": "Введите название компании",
+  "profileEnterName": "Введите имя",
+  "profileTaxIdNumber": "ИНН",
+  "profileEnterTaxIdNumber": "Введите ИНН",
+  "profileBankNameOptional": "Название банка (необязательно)",
+  "profileEnterBankName": "Введите название банка",
+  "profileBankAccountOptional": "Номер счёта (необязательно)",
+  "profileEnterBankAccount": "Введите номер счёта",
+  "profileCompanyAddressOptional": "Адрес компании (необязательно)",
+  "profileEnterCompanyAddress": "Введите адрес компании",
+  "profileCompanyPhoneOptional": "Телефон компании (необязательно)",
+  "profileEnterCompanyPhone": "Введите телефон компании",
+  "profileSetAsDefaultInvoice": "Установить как счёт по умолчанию",
+  "profileRingtoneVibrate": "Вибрация",
+  "profileRingtoneSilent": "Беззвучный",
+  "profileVibrateMode": "Режим вибрации",
+  "profileSilentMode": "Беззвучный режим",
+  "profilePlayFailed": "Ошибка воспроизведения: {ringtoneName}",
+  "profilePlaying": "Воспроизведение: {ringtoneName}",
+  "profileStop": "Стоп",
+  "profileSelectRingtone": "Выбрать рингтон",
+  "profileLoadingRingtones": "Загрузка рингтонов...",
+  "profileNoRingtonesFound": "Рингтоны не найдены",
+  "mainMessagesWithCount": "Сообщения({count})",
+  "@mainMessagesWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commonCopiedToClipboard": "Скопировано в буфер обмена",
+  "commonMore": "Ещё",
+  "commonAllRead": "Все прочитаны",
+  "commonReadCount": "{count} прочитано",
+  "commonYouRecalledMessage": "Вы отозвали сообщение",
+  "commonMessageRecalled": "Сообщение отозвано",
+  "commonReEdit": "Редактировать",
+  "commonWalletArea": "Область кошелька",
+  "callIncomingCall": "Входящий вызов",
+  "callMissedCall": "Пропущенный вызов",
+  "groupRemoveAdmin": "Снять права администратора",
+  "chatSelectCurrency": "Выбрать валюту",
+  "chatSelectEmoji": "Выбрать эмодзи",
+  "chatSelectRedPacketCover": "Выбрать обложку",
+  "groupSetAsAdmin": "Назначить администратором",
+  "chatVideoPlaybackFailed": "Ошибка воспроизведения видео",
+  "@chatVideoPlaybackFailed": {
+    "description": "Used with error message"
+  },
+  "groupViewProfile": "Просмотреть профиль",
+  "favoriteAddLinkComingSoon": "Добавление ссылок скоро появится",
+  "favoriteNewNoteComingSoon": "Новые заметки скоро появятся",
+  "qrcodeSaveFeatureComingSoon": "Функция сохранения скоро появится",
+  "qrcodeShareFeatureComingSoon": "Функция отправки скоро появится",
+  "qrcodeProcessFailed": "Не удалось обработать QR-код: {error}",
+  "@qrcodeProcessFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "authAppleLabel": "Apple",
+  "authEmailExampleHint": "example@email.com",
+  "authGoogleLabel": "Google",
+  "authLoginWithBiometric": "Войти с помощью {type}",
+  "@authLoginWithBiometric": {
+    "placeholders": {
+      "type": {
+        "type": "Object"
+      }
+    }
+  },
+  "authOr": "ИЛИ",
+  "authPasskeyLabel": "Passkey",
+  "authServerAddressHint": "https://m.si46.world",
+  "authSsoLabel": "SSO",
+  "authVerificationCodePlaceholder": "------",
+  "chatCallDurationLabel": "Длительность звонка",
+  "chatCallNotAnswered": "Нет ответа",
+  "chatMessage": "Сообщение",
+  "chatVideoCallCancelled": "Видеозвонок отменён",
+  "chatVoiceCallCancelled": "Голосовой звонок отменён",
+  "chatVoiceMessage": "Голос",
+  "commonMatrixIdHint": "@username:server.com",
+  "commonTranslate": "Перевести",
+  "commonTranslatedFrom": "Переведено с {language}",
+  "@commonTranslatedFrom": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "commonTranslating": "Перевод...",
+  "commonTranslation": "Перевод",
+  "commonTranslationFailed": "Ошибка перевода",
+  "contactNoCommonGroups": "Нет общих групп",
+  "contactNoCommonGroupsDescription": "У вас нет общих групп",
+  "conversationHideChat": "Скрыть",
+  "groupAlbum": "Альбом группы",
+  "groupDocuments": "Документы",
+  "groupDownloadStarted": "Загрузка {filename}...",
+  "@groupDownloadStarted": {
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      }
+    }
+  },
+  "groupFiles": "Файлы группы",
+  "groupImages": "Изображения",
+  "groupNoFiles": "Нет файлов",
+  "groupNoFilesDescription": "В этой группе пока нет файлов",
+  "groupNoMedia": "Нет медиа",
+  "groupNoMediaDescription": "В этой группе пока нет фото или видео",
+  "groupSize": "Размер",
+  "groupTotal": "Всего",
+  "groupVideos": "Видео",
+  "profileEnterPokeSuffixHint": "Введите суффикс тычка, например: в плечо",
+  "settingsAddQuickReply": "Добавить быстрый ответ",
+  "settingsBiometricDisabled": "Отключено — нажмите для включения",
+  "settingsBiometricEnabled": "Включено — вход по биометрии",
+  "settingsBiometricLogin": "Биометрический вход",
+  "settingsBiometricLoginDisabled": "Биометрический вход отключён",
+  "settingsBiometricLoginEnabled": "Биометрический вход включён",
+  "settingsBiometricNeedRelogin": "Выйдите и войдите снова, чтобы включить биометрический вход",
+  "settingsDefaultQuickReplies": "Будут показаны быстрые ответы по умолчанию",
+  "settingsDeleteQuickReply": "Удалить быстрый ответ",
+  "settingsEditQuickReply": "Редактировать быстрый ответ",
+  "settingsEnableBiometricLogin": "Включить биометрический вход",
+  "settingsHiddenChats": "Скрытые чаты",
+  "settingsManageQuickReplies": "Управление быстрыми ответами",
+  "settingsNoHiddenChats": "Нет скрытых чатов",
+  "settingsNoHiddenChatsDescription": "Скрытые вами чаты будут отображаться здесь",
+  "settingsNoQuickReplies": "Нет быстрых ответов",
+  "settingsQuickReply": "Быстрый ответ",
+  "settingsUnhideChat": "Показать",
+  "storyNoViewers": "Пока нет зрителей",
+  "storyReplyToStory": "Ответить на историю...",
+  "storyViewers": "Зрители",
+  "transferAmountHintZero": "0.00"
 }

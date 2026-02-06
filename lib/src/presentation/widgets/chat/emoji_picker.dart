@@ -292,7 +292,7 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
                         color: AppColors.primary,
                         child: Center(
                           child: Text(
-                            S.of(context)?.sendButton ?? 'Send',
+                            S.of(context)?.chatSendButton ?? 'Send',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,

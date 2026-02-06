@@ -114,7 +114,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             Text(_error!, style: const TextStyle(color: AppColors.error)),
             const SizedBox(height: 16),
             N42Button(
-              text: S.of(context)?.retry ?? 'Retry',
+              text: S.of(context)?.commonRetry ?? 'Retry',
               onPressed: _loadUserProfile,
             ),
           ],
@@ -123,7 +123,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
 
     if (_contact == null) {
-      return Center(child: Text(S.of(context)?.userNotExist ?? 'User does not exist'));
+      return Center(child: Text(S.of(context)?.profileUserNotExist ?? 'User does not exist'));
     }
 
     return CustomScrollView(
@@ -239,7 +239,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         onTap: () {
                           Clipboard.setData(ClipboardData(text: contact.userId));
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(S.of(context)?.userIdCopied ?? 'User ID copied')),
+                            SnackBar(content: Text(S.of(context)?.profileUserIdCopied ?? 'User ID copied')),
                           );
                         },
                         child: Row(
@@ -295,7 +295,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    S.of(context)?.bio ?? 'Bio',
+                    S.of(context)?.profileBio ?? 'Bio',
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark
@@ -317,19 +317,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
           // 在线状态
           _buildInfoTile(
-            S.of(context)?.status ?? 'Status',
+            S.of(context)?.profileStatus ?? 'Status',
             contact.isOnline
-                ? (S.of(context)?.online ?? 'Online')
+                ? (S.of(context)?.profileOnline ?? 'Online')
                 : (contact.formattedLastActive.isNotEmpty
                     ? contact.formattedLastActive
-                    : (S.of(context)?.offline ?? 'Offline')),
+                    : (S.of(context)?.profileOffline ?? 'Offline')),
             isDark,
             statusColor: contact.isOnline ? AppColors.success : null,
           ),
 
           // 服务器
           _buildInfoTile(
-            S.of(context)?.homeServer ?? 'Server',
+            S.of(context)?.profileHomeServer ?? 'Server',
             contact.server,
             isDark,
           ),
@@ -384,7 +384,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           // 发消息按钮
           Expanded(
             child: N42Button(
-              text: S.of(context)?.sendMessage ?? 'Message',
+              text: S.of(context)?.commonSendMessage ?? 'Message',
               onPressed: _startChat,
               icon: Icons.chat_bubble_outline,
             ),
@@ -395,11 +395,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
           // 语音/视频通话按钮（可选）
           Expanded(
             child: N42Button(
-              text: S.of(context)?.voiceCall ?? 'Voice Call',
+              text: S.of(context)?.commonVoiceCall ?? 'Voice Call',
               type: N42ButtonType.secondary,
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.voiceCallFeatureInDev ?? 'Voice call feature in development...')),
+                  SnackBar(content: Text(S.of(context)?.profileVoiceCallFeatureInDev ?? 'Voice call feature in development...')),
                 );
               },
               icon: Icons.call_outlined,
@@ -418,7 +418,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         children: [
           // 设置备注
           ListTile(
-            title: Text(S.of(context)?.setRemark ?? 'Set remark'),
+            title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
             trailing: Icon(
               Icons.chevron_right,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -439,8 +439,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       (context.read<ContactBloc>().state as ContactLoaded)
                           .contacts
                           .any((c) => c.userId == widget.userId && c.isBlocked)
-                  ? (S.of(context)?.removeFromBlacklist ?? 'Remove from Blacklist')
-                  : (S.of(context)?.addToBlacklist ?? 'Add to Blacklist'),
+                  ? (S.of(context)?.profileRemoveFromBlacklist ?? 'Remove from Blacklist')
+                  : (S.of(context)?.profileAddToBlacklist ?? 'Add to Blacklist'),
             ),
             trailing: Icon(
               Icons.chevron_right,
@@ -457,7 +457,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
           // 举报
           ListTile(
-            title: Text(S.of(context)?.report ?? 'Report'),
+            title: Text(S.of(context)?.commonReport ?? 'Report'),
             trailing: Icon(
               Icons.chevron_right,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -479,11 +479,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
       builder: (dialogContext) {
         final controller = TextEditingController(text: _contact?.remark);
         return AlertDialog(
-          title: Text(S.of(context)?.setRemark ?? 'Set remark'),
+          title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
           content: TextField(
             controller: controller,
             decoration: InputDecoration(
-              hintText: S.of(context)?.enterRemark ?? 'Enter remark',
+              hintText: S.of(context)?.profileEnterRemark ?? 'Enter remark',
               border: const OutlineInputBorder(),
             ),
             autofocus: true,
@@ -491,7 +491,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text(S.of(context)?.cancel ?? 'Cancel'),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
             ),
             TextButton(
               onPressed: () {
@@ -511,11 +511,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(remark.isEmpty
-                      ? (S.of(context)?.remarkCleared ?? 'Remark cleared')
-                      : (S.of(context)?.remarkSaved ?? 'Remark saved'))),
+                      ? (S.of(context)?.profileRemarkCleared ?? 'Remark cleared')
+                      : (S.of(context)?.profileRemarkSaved ?? 'Remark saved'))),
                 );
               },
-              child: Text(S.of(context)?.confirm ?? 'Confirm'),
+              child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
             ),
           ],
         );
@@ -533,15 +533,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(isBlocked
-            ? (S.of(context)?.removeFromBlacklist ?? 'Remove from Blacklist')
-            : (S.of(context)?.addToBlacklist ?? 'Add to Blacklist')),
+            ? (S.of(context)?.profileRemoveFromBlacklist ?? 'Remove from Blacklist')
+            : (S.of(context)?.profileAddToBlacklist ?? 'Add to Blacklist')),
         content: Text(isBlocked
-            ? (S.of(context)?.confirmRemoveBlacklist ?? 'Are you sure you want to remove this user from blacklist?')
-            : (S.of(context)?.confirmAddBlacklist ?? 'Are you sure you want to add this user to blacklist? You will not receive messages from them.')),
+            ? (S.of(context)?.profileConfirmRemoveBlacklist ?? 'Are you sure you want to remove this user from blacklist?')
+            : (S.of(context)?.profileConfirmAddBlacklist ?? 'Are you sure you want to add this user to blacklist? You will not receive messages from them.')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -553,8 +553,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
               }
             },
             child: Text(isBlocked
-                ? (S.of(context)?.remove ?? 'Remove')
-                : (S.of(context)?.add ?? 'Add')),
+                ? (S.of(context)?.commonRemove ?? 'Remove')
+                : (S.of(context)?.commonAdd ?? 'Add')),
           ),
         ],
       ),
@@ -563,7 +563,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   void _report() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context)?.reportFeatureInDev ?? 'Report feature in development...')),
+      SnackBar(content: Text(S.of(context)?.profileReportFeatureInDev ?? 'Report feature in development...')),
     );
   }
 
@@ -576,21 +576,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
           children: [
             ListTile(
               leading: const Icon(Icons.share),
-              title: Text(S.of(context)?.shareContactCard ?? 'Share Contact Card'),
+              title: Text(S.of(context)?.profileShareContactCard ?? 'Share Contact Card'),
               onTap: () {
                 Navigator.pop(sheetContext);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.shareFeatureInDev ?? 'Share feature in development...')),
+                  SnackBar(content: Text(S.of(context)?.profileShareFeatureInDev ?? 'Share feature in development...')),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.qr_code),
-              title: Text(S.of(context)?.qrCode ?? 'QR Code'),
+              title: Text(S.of(context)?.profileQrCode ?? 'QR Code'),
               onTap: () {
                 Navigator.pop(sheetContext);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.qrCodeFeatureInDev ?? 'QR code feature in development...')),
+                  SnackBar(content: Text(S.of(context)?.profileQrCodeFeatureInDev ?? 'QR code feature in development...')),
                 );
               },
             ),

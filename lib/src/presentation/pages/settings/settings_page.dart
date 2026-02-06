@@ -56,7 +56,7 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: S.of(context)?.settings ?? 'Settings',
+        title: S.of(context)?.commonSettings ?? 'Settings',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -73,14 +73,14 @@ class SettingsPage extends StatelessWidget {
               _SettingsItem(
                 icon: Icons.notifications_outlined,
                 iconColor: Colors.red,
-                title: S.of(context)?.notificationSettings ?? 'Notifications',
+                title: S.of(context)?.settingsNotificationSettings ?? 'Notifications',
                 onTap: onNotification,
                 isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.lock_outline,
                 iconColor: Colors.blue,
-                title: S.of(context)?.privacy ?? 'Privacy',
+                title: S.of(context)?.settingsPrivacy ?? 'Privacy',
                 onTap: onPrivacy,
                 isDark: isDark,
               ),
@@ -95,28 +95,28 @@ class SettingsPage extends StatelessWidget {
               _SettingsItem(
                 icon: Icons.palette_outlined,
                 iconColor: Colors.purple,
-                title: S.of(context)?.appearance ?? 'Appearance',
+                title: S.of(context)?.settingsAppearance ?? 'Appearance',
                 onTap: onAppearance,
                 isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.chat_outlined,
                 iconColor: Colors.green,
-                title: S.of(context)?.chat ?? 'Chat',
+                title: S.of(context)?.commonChat ?? 'Chat',
                 onTap: onChat,
                 isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.flash_on_outlined,
                 iconColor: Colors.orange,
-                title: S.of(context)?.quickReply ?? 'Quick Reply',
+                title: S.of(context)?.settingsQuickReply ?? 'Quick Reply',
                 onTap: () => _navigateToQuickReplies(context),
                 isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.language_outlined,
                 iconColor: Colors.blue,
-                title: S.of(context)?.language ?? 'Language',
+                title: S.of(context)?.settingsLanguage ?? 'Language',
                 onTap: onLanguage,
                 isDark: isDark,
               ),
@@ -131,7 +131,7 @@ class SettingsPage extends StatelessWidget {
               _SettingsItem(
                 icon: Icons.security_outlined,
                 iconColor: Colors.teal,
-                title: S.of(context)?.security ?? 'Security',
+                title: S.of(context)?.settingsSecurity ?? 'Security',
                 onTap: onSecurity,
                 isDark: isDark,
               ),
@@ -141,7 +141,7 @@ class SettingsPage extends StatelessWidget {
                       ? Icons.face
                       : Icons.fingerprint,
                   iconColor: Colors.green,
-                  title: S.of(context)?.biometricLogin ?? 'Biometric Login',
+                  title: S.of(context)?.settingsBiometricLogin ?? 'Biometric Login',
                   subtitle: biometricTypeDescription,
                   trailing: Switch(
                     value: isBiometricEnabled,
@@ -156,14 +156,14 @@ class SettingsPage extends StatelessWidget {
               _SettingsItem(
                 icon: Icons.lock_outline,
                 iconColor: Colors.indigo,
-                title: S.of(context)?.changePassword ?? 'Change Password',
+                title: S.of(context)?.settingsChangePassword ?? 'Change Password',
                 onTap: onChangePassword,
                 isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.email_outlined,
                 iconColor: Colors.cyan,
-                title: S.of(context)?.changeEmail ?? 'Change Email',
+                title: S.of(context)?.commonChangeEmail ?? 'Change Email',
                 onTap: onChangeEmail,
                 isDark: isDark,
               ),
@@ -178,7 +178,7 @@ class SettingsPage extends StatelessWidget {
               _SettingsItem(
                 icon: Icons.info_outline,
                 iconColor: Colors.orange,
-                title: S.of(context)?.about ?? 'About',
+                title: S.of(context)?.settingsAbout ?? 'About',
                 onTap: onAbout,
                 isDark: isDark,
               ),
@@ -192,7 +192,7 @@ class SettingsPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: N42Button.danger(
-                text: S.of(context)?.logout ?? 'Log Out',
+                text: S.of(context)?.commonLogout ?? 'Log Out',
                 onPressed: () => _showLogoutConfirmDialog(context),
               ),
             ),
@@ -293,12 +293,12 @@ class SettingsPage extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(S.of(context)?.logout ?? 'Log Out'),
-        content: Text(S.of(context)?.logoutConfirm ?? 'Are you sure you want to log out?'),
+        title: Text(S.of(context)?.commonLogout ?? 'Log Out'),
+        content: Text(S.of(context)?.commonLogoutConfirm ?? 'Are you sure you want to log out?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -306,7 +306,7 @@ class SettingsPage extends StatelessWidget {
               onLogout?.call();
             },
             child: Text(
-              S.of(context)?.logout ?? 'Log Out',
+              S.of(context)?.commonLogout ?? 'Log Out',
               style: const TextStyle(color: AppColors.error),
             ),
           ),

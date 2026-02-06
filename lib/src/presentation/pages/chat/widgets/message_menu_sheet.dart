@@ -53,27 +53,27 @@ class MessageMenuSheet extends StatelessWidget {
               _buildMenuItem(
                 context,
                 icon: Icons.copy,
-                title: S.of(context)?.copy ?? 'Copy',
+                title: S.of(context)?.chatCopy ?? 'Copy',
                 onTap: onCopy,
               ),
             _buildMenuItem(
               context,
               icon: Icons.reply,
-              title: S.of(context)?.reply ?? 'Reply',
+              title: S.of(context)?.chatReply ?? 'Reply',
               onTap: onReply,
             ),
             if (onForward != null)
               _buildMenuItem(
                 context,
                 icon: Icons.forward,
-                title: S.of(context)?.forward ?? 'Forward',
+                title: S.of(context)?.commonForward ?? 'Forward',
                 onTap: onForward,
               ),
             if (onDelete != null)
               _buildMenuItem(
                 context,
                 icon: Icons.delete_outline,
-                title: S.of(context)?.recall ?? 'Recall',
+                title: S.of(context)?.chatRecall ?? 'Recall',
                 color: AppColors.error,
                 onTap: onDelete,
               ),

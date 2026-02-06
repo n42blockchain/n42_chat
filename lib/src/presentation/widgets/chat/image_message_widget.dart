@@ -252,7 +252,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
               if (canRetry) ...[
                 const SizedBox(height: 8),
                 Text(
-                  S.of(context)?.tapToRetry ?? 'Tap to retry',
+                  S.of(context)?.commonTapToRetry ?? 'Tap to retry',
                   style: const TextStyle(
                     color: AppColors.textTertiary,
                     fontSize: 12,

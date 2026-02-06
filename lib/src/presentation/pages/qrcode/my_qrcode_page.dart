@@ -67,7 +67,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
       Clipboard.setData(ClipboardData(text: _userId!));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.idCopied ?? 'ID copied'),
+          content: Text(S.of(context)?.qrcodeIdCopied ?? 'ID copied'),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -77,7 +77,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
   void _shareQRCode() {
     // TODO: 实现分享功能
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context)?.shareFeatureComingSoon ?? 'Share feature coming soon')),
+      SnackBar(content: Text(S.of(context)?.qrcodeShareFeatureComingSoon ?? 'Share feature coming soon')),
     );
   }
 
@@ -99,7 +99,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          S.of(context)?.myQrCode ?? 'My QR Code',
+          S.of(context)?.commonMyQrCode ?? 'My QR Code',
           style: TextStyle(color: textColor, fontSize: 18),
         ),
         centerTitle: true,
@@ -144,7 +144,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _displayName ?? (S.of(context)?.loading ?? 'Loading...'),
+                          _displayName ?? (S.of(context)?.commonLoading ?? 'Loading...'),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -209,7 +209,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
 
               // 提示文字
               Text(
-                S.of(context)?.scanQrToAddMe ?? 'Scan the QR code above to add me as a friend',
+                S.of(context)?.qrcodeScanQrToAddMe ?? 'Scan the QR code above to add me as a friend',
                 style: TextStyle(
                   fontSize: 14,
                   color: subtitleColor,
@@ -224,14 +224,14 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                 children: [
                   _buildActionButton(
                     icon: Icons.copy,
-                    label: S.of(context)?.copyId ?? 'Copy ID',
+                    label: S.of(context)?.qrcodeCopyId ?? 'Copy ID',
                     onTap: _copyUserId,
                     isDark: isDark,
                   ),
                   const SizedBox(width: 32),
                   _buildActionButton(
                     icon: Icons.share,
-                    label: S.of(context)?.share ?? 'Share',
+                    label: S.of(context)?.commonShare ?? 'Share',
                     onTap: _shareQRCode,
                     isDark: isDark,
                   ),
@@ -303,21 +303,21 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.save_alt),
-                  title: Text(S.of(context)?.saveToAlbum ?? 'Save to Album'),
+                  title: Text(S.of(context)?.qrcodeSaveToAlbum ?? 'Save to Album'),
                   onTap: () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(S.of(context)?.saveFeatureComingSoon ?? 'Save feature coming soon')),
+                      SnackBar(content: Text(S.of(context)?.qrcodeSaveFeatureComingSoon ?? 'Save feature coming soon')),
                     );
                   },
                 ),
                 ListTile(
                   leading: const Icon(Icons.refresh),
-                  title: Text(S.of(context)?.changeStyle ?? 'Change Style'),
+                  title: Text(S.of(context)?.qrcodeChangeStyle ?? 'Change Style'),
                   onTap: () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(S.of(context)?.moreStylesFeatureComingSoon ?? 'More styles coming soon')),
+                      SnackBar(content: Text(S.of(context)?.qrcodeMoreStylesFeatureComingSoon ?? 'More styles coming soon')),
                     );
                   },
                 ),

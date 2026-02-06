@@ -72,7 +72,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.languageChanged ?? 'Language changed'),
+          content: Text(S.of(context)?.settingsLanguageChanged ?? 'Language changed'),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 2),
         ),
@@ -88,7 +88,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: N42AppBar(
-        title: S.of(context)?.language ?? 'Language',
+        title: S.of(context)?.settingsLanguage ?? 'Language',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),

@@ -102,7 +102,7 @@ class MessageMenu extends StatelessWidget {
       if (onReply != null)
         MessageMenuItem(
           icon: Icons.reply,
-          label: s?.reply ?? 'Reply',
+          label: s?.chatReply ?? 'Reply',
           onTap: () {
             Navigator.pop(context);
             onReply?.call();
@@ -111,12 +111,12 @@ class MessageMenu extends StatelessWidget {
       if (onCopy != null && message.type == MessageType.text)
         MessageMenuItem(
           icon: Icons.copy,
-          label: s?.copy ?? 'Copy',
+          label: s?.chatCopy ?? 'Copy',
           onTap: () {
             Clipboard.setData(ClipboardData(text: message.content));
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(s?.copiedToClipboard ?? 'Copied to clipboard')),
+              SnackBar(content: Text(s?.commonCopiedToClipboard ?? 'Copied to clipboard')),
             );
             onCopy?.call();
           },
@@ -124,7 +124,7 @@ class MessageMenu extends StatelessWidget {
       if (onForward != null)
         MessageMenuItem(
           icon: Icons.forward,
-          label: s?.forward ?? 'Forward',
+          label: s?.commonForward ?? 'Forward',
           onTap: () {
             Navigator.pop(context);
             onForward?.call();
@@ -133,7 +133,7 @@ class MessageMenu extends StatelessWidget {
       if (canEdit && onEdit != null)
         MessageMenuItem(
           icon: Icons.edit,
-          label: s?.edit ?? 'Edit',
+          label: s?.commonEdit ?? 'Edit',
           onTap: () {
             Navigator.pop(context);
             onEdit?.call();
@@ -142,7 +142,7 @@ class MessageMenu extends StatelessWidget {
       if (onSave != null)
         MessageMenuItem(
           icon: Icons.bookmark_outline,
-          label: s?.favorite ?? 'Favorite',
+          label: s?.commonFavorite ?? 'Favorite',
           onTap: () {
             Navigator.pop(context);
             onSave?.call();
@@ -151,7 +151,7 @@ class MessageMenu extends StatelessWidget {
       if (canRedact && onRedact != null)
         MessageMenuItem(
           icon: Icons.delete_outline,
-          label: s?.recall ?? 'Recall',
+          label: s?.chatRecall ?? 'Recall',
           onTap: () {
             Navigator.pop(context);
             onRedact?.call();
@@ -161,7 +161,7 @@ class MessageMenu extends StatelessWidget {
       if (onMore != null)
         MessageMenuItem(
           icon: Icons.more_horiz,
-          label: s?.more ?? 'More',
+          label: s?.commonMore ?? 'More',
           onTap: () {
             Navigator.pop(context);
             onMore?.call();
@@ -241,7 +241,7 @@ class _ForwardDialogState extends State<ForwardDialog> {
             child: Row(
               children: [
                 Text(
-                  S.of(context)?.selectForwardTarget ?? 'Select Forward Target',
+                  S.of(context)?.chatSelectForwardTarget ?? 'Select Forward Target',
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
@@ -257,7 +257,7 @@ class _ForwardDialogState extends State<ForwardDialog> {
                           Navigator.pop(context);
                         },
                   child: Text(
-                    S.of(context)?.sendCount(_selectedIds.length) ?? 'Send(${_selectedIds.length})',
+                    S.of(context)?.commonSendCount(_selectedIds.length) ?? 'Send(${_selectedIds.length})',
                     style: TextStyle(
                       color: _selectedIds.isEmpty
                           ? AppColors.textSecondary

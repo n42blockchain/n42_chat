@@ -115,7 +115,7 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
                 ),
                 Expanded(
                   child: Text(
-                    S.of(context)?.selectMember ?? 'Select Member',
+                    S.of(context)?.chatSelectMember ?? 'Select Member',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 18,
@@ -136,7 +136,7 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
               onChanged: _filterMembers,
               style: TextStyle(color: textColor),
               decoration: InputDecoration(
-                hintText: S.of(context)?.searchMemberHint ?? 'Search members',
+                hintText: S.of(context)?.chatSearchMemberHint ?? 'Search members',
                 hintStyle: TextStyle(color: subtextColor),
                 prefixIcon: Icon(Icons.search, color: subtextColor),
                 filled: true,
@@ -159,8 +159,8 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
                     ? Center(
                         child: Text(
                           _searchQuery.isEmpty
-                              ? (S.of(context)?.noMembers ?? 'No members')
-                              : (S.of(context)?.noMatchingMembers ?? 'No matching members'),
+                              ? (S.of(context)?.chatNoMembers ?? 'No members')
+                              : (S.of(context)?.chatNoMatchingMembers ?? 'No matching members'),
                           style: TextStyle(color: subtextColor),
                         ),
                       )
@@ -177,7 +177,7 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
                               ),
                             ),
                             title: Text(
-                              member['name'] ?? (S.of(context)?.unknownMember ?? 'Unknown'),
+                              member['name'] ?? (S.of(context)?.commonUnknownMember ?? 'Unknown'),
                               style: TextStyle(color: textColor),
                             ),
                             subtitle: Text(
@@ -187,7 +187,7 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             onTap: () => widget.onMemberSelected(
-                              member['name'] ?? (S.of(context)?.unknownMember ?? 'Unknown'),
+                              member['name'] ?? (S.of(context)?.commonUnknownMember ?? 'Unknown'),
                               member['id'] ?? '',
                             ),
                           );

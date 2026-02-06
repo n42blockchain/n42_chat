@@ -53,7 +53,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             setState(() => _isUploading = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.avatarUpdated ?? 'Avatar updated'),
+                content: Text(S.of(context)?.profileAvatarUpdated ?? 'Avatar updated'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -62,7 +62,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             setState(() => _isUploading = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? (S.of(context)?.avatarUploadFailed ?? 'Avatar upload failed')),
+                content: Text(state.errorMessage ?? (S.of(context)?.profileAvatarUploadFailed ?? 'Avatar upload failed')),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -75,7 +75,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         return Scaffold(
           backgroundColor: isDark ? AppColors.backgroundDark : const Color(0xFFF5F5F5),
           appBar: N42AppBar(
-            title: S.of(context)?.personalProfile ?? 'Personal Profile',
+            title: S.of(context)?.profilePersonalProfile ?? 'Personal Profile',
             backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
           ),
           body: ListView(
@@ -89,7 +89,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 头像
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.avatar ?? 'Avatar',
+                    title: S.of(context)?.profileAvatar ?? 'Avatar',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -119,8 +119,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 名字
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.name ?? 'Name',
-                    value: user?.displayName ?? (S.of(context)?.notSet ?? 'Not Set'),
+                    title: S.of(context)?.profileName ?? 'Name',
+                    value: user?.displayName ?? (S.of(context)?.commonNotSet ?? 'Not Set'),
                     onTap: () => _editDisplayName(user?.displayName),
                   ),
                   _buildDivider(isDark),
@@ -128,7 +128,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 性别
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.gender ?? 'Gender',
+                    title: S.of(context)?.profileGender ?? 'Gender',
                     value: _getGenderText(context, user?.gender),
                     onTap: _selectGender,
                   ),
@@ -137,8 +137,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 地区
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.region ?? 'Region',
-                    value: user?.region ?? (S.of(context)?.notSet ?? 'Not Set'),
+                    title: S.of(context)?.profileRegion ?? 'Region',
+                    value: user?.region ?? (S.of(context)?.commonNotSet ?? 'Not Set'),
                     onTap: _selectRegion,
                   ),
                 ],
@@ -153,7 +153,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // N42 ID
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.n42IdTitle ?? 'N42 ID',
+                    title: S.of(context)?.profileN42IdTitle ?? 'N42 ID',
                     value: user?.userId ?? '',
                     showArrow: false,
                   ),
@@ -162,7 +162,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 我的二维码
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.myQrCode ?? 'My QR Code',
+                    title: S.of(context)?.commonMyQrCode ?? 'My QR Code',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -192,8 +192,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 拍一拍
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.poke ?? 'Poke',
-                    value: user?.pokeText?.isNotEmpty == true ? user!.pokeText! : (S.of(context)?.notSet ?? 'Not Set'),
+                    title: S.of(context)?.profilePoke ?? 'Poke',
+                    value: user?.pokeText?.isNotEmpty == true ? user!.pokeText! : (S.of(context)?.commonNotSet ?? 'Not Set'),
                     onTap: () => _editPokeText(user?.pokeText),
                   ),
                   _buildDivider(isDark),
@@ -201,8 +201,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 签名
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.signature ?? 'Signature',
-                    value: user?.signature ?? (S.of(context)?.notSet ?? 'Not Set'),
+                    title: S.of(context)?.profileSignature ?? 'Signature',
+                    value: user?.signature ?? (S.of(context)?.commonNotSet ?? 'Not Set'),
                     onTap: () => _editSignature(user?.signature),
                   ),
                 ],
@@ -217,8 +217,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 来电铃声
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.ringtone ?? 'Ringtone',
-                    value: user?.ringtone ?? (S.of(context)?.defaultRingtone ?? 'Default Ringtone'),
+                    title: S.of(context)?.profileRingtone ?? 'Ringtone',
+                    value: user?.ringtone ?? (S.of(context)?.profileDefaultRingtone ?? 'Default Ringtone'),
                     onTap: () => _selectRingtone(user?.ringtone),
                   ),
                 ],
@@ -233,7 +233,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 我的地址
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.myAddresses ?? 'My Addresses',
+                    title: S.of(context)?.profileMyAddresses ?? 'My Addresses',
                     onTap: _manageAddresses,
                   ),
                   _buildDivider(isDark),
@@ -241,7 +241,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   // 我的发票抬头
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.myInvoices ?? 'My Invoices',
+                    title: S.of(context)?.profileMyInvoices ?? 'My Invoices',
                     onTap: _manageInvoices,
                   ),
                 ],
@@ -255,7 +255,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 children: [
                   _buildListTile(
                     isDark: isDark,
-                    title: S.of(context)?.n42Bean ?? 'N42 Bean',
+                    title: S.of(context)?.profileN42Bean ?? 'N42 Bean',
                     onTap: _openN42Bean,
                   ),
                 ],
@@ -357,11 +357,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   String _getGenderText(BuildContext context, String? gender) {
     switch (gender) {
       case 'male':
-        return S.of(context)?.male ?? 'Male';
+        return S.of(context)?.profileMale ?? 'Male';
       case 'female':
-        return S.of(context)?.female ?? 'Female';
+        return S.of(context)?.profileFemale ?? 'Female';
       default:
-        return S.of(context)?.notSet ?? 'Not Set';
+        return S.of(context)?.commonNotSet ?? 'Not Set';
     }
   }
 
@@ -374,18 +374,18 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: Text(S.of(context)?.takePhoto ?? 'Take Photo'),
+              title: Text(S.of(context)?.commonTakePhoto ?? 'Take Photo'),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: Text(S.of(context)?.chooseFromGallery ?? 'Choose from Gallery'),
+              title: Text(S.of(context)?.profileChooseFromGallery ?? 'Choose from Gallery'),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
             const SizedBox(height: 8),
             ListTile(
               leading: const Icon(Icons.close),
-              title: Text(S.of(context)?.cancel ?? 'Cancel'),
+              title: Text(S.of(context)?.commonCancel ?? 'Cancel'),
               onTap: () => Navigator.pop(context),
             ),
           ],
@@ -418,7 +418,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       debugPrint('ProfileEditPage: Image bytes: ${bytes.length}');
       
       if (bytes.isEmpty) {
-        throw Exception(S.of(context)?.imageDataEmpty ?? 'Image data is empty');
+        throw Exception(S.of(context)?.commonImageDataEmpty ?? 'Image data is empty');
       }
       
       // 确保文件名有正确的扩展名
@@ -442,7 +442,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         setState(() => _isUploading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${S.of(context)?.selectImageFailed ?? 'Failed to select image'}: $e'),
+            content: Text('${S.of(context)?.commonSelectImageFailed ?? 'Failed to select image'}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -455,24 +455,24 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(S.of(context)?.changeName ?? 'Change Name'),
+        title: Text(S.of(context)?.profileChangeName ?? 'Change Name'),
         content: TextField(
           controller: controller,
           autofocus: true,
           maxLength: 20,
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterNickname ?? 'Enter nickname',
+            hintText: S.of(context)?.profileEnterNickname ?? 'Enter nickname',
             counterText: '',
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: Text(S.of(context)?.confirm ?? 'Confirm'),
+            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
           ),
         ],
       ),
@@ -491,17 +491,17 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: Text(S.of(context)?.male ?? 'Male', textAlign: TextAlign.center),
+              title: Text(S.of(context)?.profileMale ?? 'Male', textAlign: TextAlign.center),
               onTap: () => Navigator.pop(context, 'male'),
             ),
             const Divider(height: 1),
             ListTile(
-              title: Text(S.of(context)?.female ?? 'Female', textAlign: TextAlign.center),
+              title: Text(S.of(context)?.profileFemale ?? 'Female', textAlign: TextAlign.center),
               onTap: () => Navigator.pop(context, 'female'),
             ),
             const Divider(height: 1),
             ListTile(
-              title: Text(S.of(context)?.cancel ?? 'Cancel', textAlign: TextAlign.center),
+              title: Text(S.of(context)?.commonCancel ?? 'Cancel', textAlign: TextAlign.center),
               onTap: () => Navigator.pop(context),
             ),
           ],
@@ -511,10 +511,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     if (result != null && mounted) {
       context.read<AuthBloc>().add(UpdateUserProfile(gender: result));
-      final genderText = result == 'male' ? (S.of(context)?.male ?? 'Male') : (S.of(context)?.female ?? 'Female');
+      final genderText = result == 'male' ? (S.of(context)?.profileMale ?? 'Male') : (S.of(context)?.profileFemale ?? 'Female');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.genderSetTo(genderText) ?? 'Gender set to: $genderText'),
+          content: Text(S.of(context)?.profileGenderSetTo(genderText) ?? 'Gender set to: $genderText'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -548,7 +548,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               child: Row(
                 children: [
                   Text(
-                    S.of(context)?.selectRegion ?? 'Select Region',
+                    S.of(context)?.profileSelectRegion ?? 'Select Region',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -596,7 +596,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      S.of(context)?.selectCity ?? 'Select City',
+                      S.of(context)?.profileSelectCity ?? 'Select City',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -623,7 +623,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           context.read<AuthBloc>().add(UpdateUserProfile(region: city));
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.regionSetTo(city) ?? 'Region set to: $city'),
+              content: Text(S.of(context)?.profileRegionSetTo(city) ?? 'Region set to: $city'),
               duration: const Duration(seconds: 1),
             ),
           );
@@ -651,13 +651,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(S.of(context)?.setPoke ?? 'Set Poke'),
+        title: Text(S.of(context)?.profileSetPoke ?? 'Set Poke'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              S.of(context)?.friendPokedMe ?? 'Friend poked me',
+              S.of(context)?.profileFriendPokedMe ?? 'Friend poked me',
               style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 14,
@@ -669,14 +669,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               autofocus: true,
               maxLength: 50,
               decoration: InputDecoration(
-                hintText: S.of(context)?.enterPokeSuffixHint ?? 'Enter poke suffix, e.g.: on the shoulder',
+                hintText: S.of(context)?.profileEnterPokeSuffixHint ?? 'Enter poke suffix, e.g.: on the shoulder',
                 border: const OutlineInputBorder(),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              '${S.of(context)?.example ?? 'Example'}: ${S.of(context)?.friendPokedMe ?? 'Friend poked me'}${controller.text.isNotEmpty ? controller.text : (S.of(context)?.onTheShoulder ?? " on the shoulder")}',
+              '${S.of(context)?.profileExample ?? 'Example'}: ${S.of(context)?.profileFriendPokedMe ?? 'Friend poked me'}${controller.text.isNotEmpty ? controller.text : (S.of(context)?.profileOnTheShoulder ?? " on the shoulder")}',
               style: const TextStyle(
                 color: AppColors.textTertiary,
                 fontSize: 12,
@@ -687,11 +687,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: Text(S.of(context)?.confirm ?? 'Confirm'),
+            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
           ),
         ],
       ),
@@ -701,7 +701,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       context.read<AuthBloc>().add(UpdateUserProfile(pokeText: result));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result.isEmpty ? (S.of(context)?.pokeCleared ?? 'Poke cleared') : (S.of(context)?.pokeSetTo(result) ?? 'Poke set to: poked me$result')),
+          content: Text(result.isEmpty ? (S.of(context)?.profilePokeCleared ?? 'Poke cleared') : (S.of(context)?.profilePokeSetTo(result) ?? 'Poke set to: poked me$result')),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -713,24 +713,24 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(S.of(context)?.editSignature ?? 'Edit Signature'),
+        title: Text(S.of(context)?.profileEditSignature ?? 'Edit Signature'),
         content: TextField(
           controller: controller,
           autofocus: true,
           maxLength: 50,
           maxLines: 3,
           decoration: InputDecoration(
-            hintText: S.of(context)?.introduceYourself ?? 'A sentence to introduce yourself',
+            hintText: S.of(context)?.profileIntroduceYourself ?? 'A sentence to introduce yourself',
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: Text(S.of(context)?.confirm ?? 'Confirm'),
+            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
           ),
         ],
       ),
@@ -740,7 +740,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       context.read<AuthBloc>().add(UpdateUserProfile(signature: result));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result.isEmpty ? (S.of(context)?.signatureCleared ?? 'Signature cleared') : (S.of(context)?.signatureUpdated ?? 'Signature updated')),
+          content: Text(result.isEmpty ? (S.of(context)?.profileSignatureCleared ?? 'Signature cleared') : (S.of(context)?.profileSignatureUpdated ?? 'Signature updated')),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -757,7 +757,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                S.of(context)?.myQrCode ?? 'My QR Code',
+                S.of(context)?.commonMyQrCode ?? 'My QR Code',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -786,7 +786,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                S.of(context)?.scanToAddFriend ?? 'Scan the QR code above to add me as a friend',
+                S.of(context)?.profileScanToAddFriend ?? 'Scan the QR code above to add me as a friend',
                 style: const TextStyle(fontSize: 12),
               ),
             ],
@@ -800,7 +800,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     final result = await Navigator.of(context).push<String>(
       MaterialPageRoute<String>(
         builder: (context) => _RingtoneSelectPage(
-          currentRingtone: currentRingtone ?? (S.of(context)?.defaultRingtone ?? 'Default Ringtone'),
+          currentRingtone: currentRingtone ?? (S.of(context)?.profileDefaultRingtone ?? 'Default Ringtone'),
         ),
       ),
     );
@@ -809,7 +809,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       context.read<AuthBloc>().add(UpdateUserProfile(ringtone: result));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.ringtoneSetTo(result) ?? 'Ringtone set to: $result'),
+          content: Text(S.of(context)?.profileRingtoneSetTo(result) ?? 'Ringtone set to: $result'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -930,7 +930,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
       debugPrint('Save addresses error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${S.of(context)?.saveAddressFailed ?? 'Save address failed'}: $e')),
+          SnackBar(content: Text('${S.of(context)?.profileSaveAddressFailed ?? 'Save address failed'}: $e')),
         );
       }
     }
@@ -943,12 +943,12 @@ class _AddressManagePageState extends State<_AddressManagePage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: AppBar(
-        title: Text(S.of(context)?.myAddresses ?? 'My Addresses'),
+        title: Text(S.of(context)?.profileMyAddresses ?? 'My Addresses'),
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         actions: [
           TextButton(
             onPressed: _addAddress,
-            child: Text(S.of(context)?.addNew ?? 'Add New'),
+            child: Text(S.of(context)?.profileAddNew ?? 'Add New'),
           ),
         ],
       ),
@@ -966,7 +966,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    S.of(context)?.noShippingAddress ?? 'No shipping address',
+                    S.of(context)?.profileNoShippingAddress ?? 'No shipping address',
                     style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.textSecondary,
@@ -976,7 +976,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                   ElevatedButton.icon(
                     onPressed: _addAddress,
                     icon: const Icon(Icons.add),
-                    label: Text(S.of(context)?.addAddress ?? 'Add Address'),
+                    label: Text(S.of(context)?.profileAddAddress ?? 'Add Address'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -1025,7 +1025,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  S.of(context)?.defaultLabel ?? 'Default',
+                                  S.of(context)?.profileDefaultLabel ?? 'Default',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: AppColors.primary,
@@ -1047,12 +1047,12 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                           children: [
                             TextButton(
                               onPressed: () => _editAddress(index),
-                              child: Text(S.of(context)?.edit ?? 'Edit'),
+                              child: Text(S.of(context)?.commonEdit ?? 'Edit'),
                             ),
                             TextButton(
                               onPressed: () => _deleteAddress(index),
                               child: Text(
-                                S.of(context)?.delete ?? 'Delete',
+                                S.of(context)?.commonDelete ?? 'Delete',
                                 style: const TextStyle(color: AppColors.error),
                               ),
                             ),
@@ -1090,7 +1090,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
       await _saveAddresses();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.addressAdded ?? 'Address added'), duration: const Duration(seconds: 1)),
+          SnackBar(content: Text(S.of(context)?.profileAddressAdded ?? 'Address added'), duration: const Duration(seconds: 1)),
         );
       }
     }
@@ -1119,7 +1119,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
       await _saveAddresses();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.addressUpdated ?? 'Address updated'), duration: const Duration(seconds: 1)),
+          SnackBar(content: Text(S.of(context)?.profileAddressUpdated ?? 'Address updated'), duration: const Duration(seconds: 1)),
         );
       }
     }
@@ -1129,12 +1129,12 @@ class _AddressManagePageState extends State<_AddressManagePage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.deleteAddress ?? 'Delete Address'),
-        content: Text(S.of(context)?.confirmDeleteAddress ?? 'Are you sure you want to delete this address?'),
+        title: Text(S.of(context)?.profileDeleteAddress ?? 'Delete Address'),
+        content: Text(S.of(context)?.profileConfirmDeleteAddress ?? 'Are you sure you want to delete this address?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -1145,12 +1145,12 @@ class _AddressManagePageState extends State<_AddressManagePage> {
               await _saveAddresses();
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.addressDeleted ?? 'Address deleted'), duration: const Duration(seconds: 1)),
+                  SnackBar(content: Text(S.of(context)?.profileAddressDeleted ?? 'Address deleted'), duration: const Duration(seconds: 1)),
                 );
               }
             },
             child: Text(
-              S.of(context)?.delete ?? 'Delete',
+              S.of(context)?.commonDelete ?? 'Delete',
               style: const TextStyle(color: AppColors.error),
             ),
           ),
@@ -1171,7 +1171,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) => AlertDialog(
-          title: Text(address == null ? (s?.addAddress ?? 'Add Address') : (s?.editAddress ?? 'Edit Address')),
+          title: Text(address == null ? (s?.profileAddAddress ?? 'Add Address') : (s?.profileEditAddress ?? 'Edit Address')),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1179,8 +1179,8 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                 TextField(
                   controller: nameController,
                   decoration: InputDecoration(
-                    labelText: s?.recipient ?? 'Recipient',
-                    hintText: s?.enterRecipientName ?? 'Enter recipient name',
+                    labelText: s?.profileRecipient ?? 'Recipient',
+                    hintText: s?.profileEnterRecipientName ?? 'Enter recipient name',
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -1188,16 +1188,16 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                   controller: phoneController,
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    labelText: s?.phoneNumber ?? 'Phone Number',
-                    hintText: s?.enterPhoneNumber ?? 'Enter phone number',
+                    labelText: s?.profilePhoneNumber ?? 'Phone Number',
+                    hintText: s?.profileEnterPhoneNumber ?? 'Enter phone number',
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: regionController,
                   decoration: InputDecoration(
-                    labelText: s?.region ?? 'Region',
-                    hintText: s?.regionHint ?? 'Province/City/District',
+                    labelText: s?.profileRegion ?? 'Region',
+                    hintText: s?.profileRegionHint ?? 'Province/City/District',
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -1205,8 +1205,8 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                   controller: detailController,
                   maxLines: 2,
                   decoration: InputDecoration(
-                    labelText: s?.detailedAddress ?? 'Detailed Address',
-                    hintText: s?.detailedAddressHint ?? 'Street, building number, etc.',
+                    labelText: s?.profileDetailedAddress ?? 'Detailed Address',
+                    hintText: s?.profileDetailedAddressHint ?? 'Street, building number, etc.',
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -1217,7 +1217,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                       isDefault = value ?? false;
                     });
                   },
-                  title: Text(s?.setAsDefaultAddress ?? 'Set as default address'),
+                  title: Text(s?.profileSetAsDefaultAddress ?? 'Set as default address'),
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -1227,7 +1227,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text(s?.cancel ?? 'Cancel'),
+              child: Text(s?.commonCancel ?? 'Cancel'),
             ),
             TextButton(
               onPressed: () {
@@ -1236,7 +1236,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                     regionController.text.isEmpty ||
                     detailController.text.isEmpty) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    SnackBar(content: Text(s?.pleaseCompleteInfo ?? 'Please complete all fields')),
+                    SnackBar(content: Text(s?.profilePleaseCompleteInfo ?? 'Please complete all fields')),
                   );
                   return;
                 }
@@ -1251,7 +1251,7 @@ class _AddressManagePageState extends State<_AddressManagePage> {
                   ),
                 );
               },
-              child: Text(s?.save ?? 'Save'),
+              child: Text(s?.commonSave ?? 'Save'),
             ),
           ],
         ),
@@ -1373,7 +1373,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
       debugPrint('Save invoices error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${S.of(context)?.saveInvoiceFailed ?? 'Save invoice failed'}: $e')),
+          SnackBar(content: Text('${S.of(context)?.profileSaveInvoiceFailed ?? 'Save invoice failed'}: $e')),
         );
       }
     }
@@ -1386,12 +1386,12 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: AppBar(
-        title: Text(S.of(context)?.myInvoices ?? 'My Invoices'),
+        title: Text(S.of(context)?.profileMyInvoices ?? 'My Invoices'),
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         actions: [
           TextButton(
             onPressed: _addInvoice,
-            child: Text(S.of(context)?.addNew ?? 'Add New'),
+            child: Text(S.of(context)?.profileAddNew ?? 'Add New'),
           ),
         ],
       ),
@@ -1409,7 +1409,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    S.of(context)?.noInvoice ?? 'No invoice',
+                    S.of(context)?.profileNoInvoice ?? 'No invoice',
                     style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.textSecondary,
@@ -1419,7 +1419,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                   ElevatedButton.icon(
                     onPressed: _addInvoice,
                     icon: const Icon(Icons.add),
-                    label: Text(S.of(context)?.addInvoice ?? 'Add Invoice'),
+                    label: Text(S.of(context)?.profileAddInvoice ?? 'Add Invoice'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -1454,7 +1454,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                invoice.type == 'company' ? (S.of(context)?.company ?? 'Company') : (S.of(context)?.personal ?? 'Personal'),
+                                invoice.type == 'company' ? (S.of(context)?.profileCompany ?? 'Company') : (S.of(context)?.profilePersonal ?? 'Personal'),
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: invoice.type == 'company'
@@ -1485,7 +1485,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  S.of(context)?.defaultLabel ?? 'Default',
+                                  S.of(context)?.profileDefaultLabel ?? 'Default',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: AppColors.primary,
@@ -1497,7 +1497,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                         if (invoice.taxNumber != null && invoice.taxNumber!.isNotEmpty) ...[
                           const SizedBox(height: 8),
                           Text(
-                            '${S.of(context)?.taxNumber ?? 'Tax Number'}: ${invoice.taxNumber}',
+                            '${S.of(context)?.profileTaxNumber ?? 'Tax Number'}: ${invoice.taxNumber}',
                             style: const TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 14,
@@ -1510,12 +1510,12 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                           children: [
                             TextButton(
                               onPressed: () => _editInvoice(index),
-                              child: Text(S.of(context)?.edit ?? 'Edit'),
+                              child: Text(S.of(context)?.commonEdit ?? 'Edit'),
                             ),
                             TextButton(
                               onPressed: () => _deleteInvoice(index),
                               child: Text(
-                                S.of(context)?.delete ?? 'Delete',
+                                S.of(context)?.commonDelete ?? 'Delete',
                                 style: const TextStyle(color: AppColors.error),
                               ),
                             ),
@@ -1555,7 +1555,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
       await _saveInvoices();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.invoiceAdded ?? 'Invoice added'), duration: const Duration(seconds: 1)),
+          SnackBar(content: Text(S.of(context)?.profileInvoiceAdded ?? 'Invoice added'), duration: const Duration(seconds: 1)),
         );
       }
     }
@@ -1586,7 +1586,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
       await _saveInvoices();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.invoiceUpdated ?? 'Invoice updated'), duration: const Duration(seconds: 1)),
+          SnackBar(content: Text(S.of(context)?.profileInvoiceUpdated ?? 'Invoice updated'), duration: const Duration(seconds: 1)),
         );
       }
     }
@@ -1596,12 +1596,12 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.deleteInvoice ?? 'Delete Invoice'),
-        content: Text(S.of(context)?.confirmDeleteInvoice ?? 'Are you sure you want to delete this invoice?'),
+        title: Text(S.of(context)?.profileDeleteInvoice ?? 'Delete Invoice'),
+        content: Text(S.of(context)?.profileConfirmDeleteInvoice ?? 'Are you sure you want to delete this invoice?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -1612,12 +1612,12 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
               await _saveInvoices();
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.invoiceDeleted ?? 'Invoice deleted'), duration: const Duration(seconds: 1)),
+                  SnackBar(content: Text(S.of(context)?.profileInvoiceDeleted ?? 'Invoice deleted'), duration: const Duration(seconds: 1)),
                 );
               }
             },
             child: Text(
-              S.of(context)?.delete ?? 'Delete',
+              S.of(context)?.commonDelete ?? 'Delete',
               style: const TextStyle(color: AppColors.error),
             ),
           ),
@@ -1641,7 +1641,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) => AlertDialog(
-          title: Text(invoice == null ? (s?.addInvoice ?? 'Add Invoice') : (s?.editInvoice ?? 'Edit Invoice')),
+          title: Text(invoice == null ? (s?.profileAddInvoice ?? 'Add Invoice') : (s?.profileEditInvoice ?? 'Edit Invoice')),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1653,9 +1653,9 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    Text('${s?.invoiceType ?? 'Invoice Type'}: '),
+                    Text('${s?.profileInvoiceType ?? 'Invoice Type'}: '),
                     ChoiceChip(
-                      label: Text(s?.personal ?? 'Personal'),
+                      label: Text(s?.profilePersonal ?? 'Personal'),
                       selected: type == 'personal',
                       onSelected: (selected) {
                         if (selected) {
@@ -1664,7 +1664,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                       },
                     ),
                     ChoiceChip(
-                      label: Text(s?.company ?? 'Company'),
+                      label: Text(s?.profileCompany ?? 'Company'),
                       selected: type == 'company',
                       onSelected: (selected) {
                         if (selected) {
@@ -1678,8 +1678,8 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                 TextField(
                   controller: titleController,
                   decoration: InputDecoration(
-                    labelText: type == 'company' ? (s?.companyName ?? 'Company Name') : (s?.personalName ?? 'Personal Name'),
-                    hintText: type == 'company' ? (s?.enterCompanyName ?? 'Enter company name') : (s?.enterName ?? 'Enter name'),
+                    labelText: type == 'company' ? (s?.profileCompanyName ?? 'Company Name') : (s?.profilePersonalName ?? 'Personal Name'),
+                    hintText: type == 'company' ? (s?.profileEnterCompanyName ?? 'Enter company name') : (s?.profileEnterName ?? 'Enter name'),
                   ),
                 ),
                 if (type == 'company') ...[
@@ -1687,40 +1687,40 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                   TextField(
                     controller: taxNumberController,
                     decoration: InputDecoration(
-                      labelText: s?.taxIdNumber ?? 'Tax ID Number',
-                      hintText: s?.enterTaxIdNumber ?? 'Enter tax ID number',
+                      labelText: s?.profileTaxIdNumber ?? 'Tax ID Number',
+                      hintText: s?.profileEnterTaxIdNumber ?? 'Enter tax ID number',
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: bankNameController,
                     decoration: InputDecoration(
-                      labelText: s?.bankNameOptional ?? 'Bank Name (Optional)',
-                      hintText: s?.enterBankName ?? 'Enter bank name',
+                      labelText: s?.profileBankNameOptional ?? 'Bank Name (Optional)',
+                      hintText: s?.profileEnterBankName ?? 'Enter bank name',
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: bankAccountController,
                     decoration: InputDecoration(
-                      labelText: s?.bankAccountOptional ?? 'Bank Account (Optional)',
-                      hintText: s?.enterBankAccount ?? 'Enter bank account',
+                      labelText: s?.profileBankAccountOptional ?? 'Bank Account (Optional)',
+                      hintText: s?.profileEnterBankAccount ?? 'Enter bank account',
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: companyAddressController,
                     decoration: InputDecoration(
-                      labelText: s?.companyAddressOptional ?? 'Company Address (Optional)',
-                      hintText: s?.enterCompanyAddress ?? 'Enter company address',
+                      labelText: s?.profileCompanyAddressOptional ?? 'Company Address (Optional)',
+                      hintText: s?.profileEnterCompanyAddress ?? 'Enter company address',
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: companyPhoneController,
                     decoration: InputDecoration(
-                      labelText: s?.companyPhoneOptional ?? 'Company Phone (Optional)',
-                      hintText: s?.enterCompanyPhone ?? 'Enter company phone',
+                      labelText: s?.profileCompanyPhoneOptional ?? 'Company Phone (Optional)',
+                      hintText: s?.profileEnterCompanyPhone ?? 'Enter company phone',
                     ),
                   ),
                 ],
@@ -1732,7 +1732,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                       isDefault = value ?? false;
                     });
                   },
-                  title: Text(s?.setAsDefaultInvoice ?? 'Set as default invoice'),
+                  title: Text(s?.profileSetAsDefaultInvoice ?? 'Set as default invoice'),
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -1742,19 +1742,19 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text(s?.cancel ?? 'Cancel'),
+              child: Text(s?.commonCancel ?? 'Cancel'),
             ),
             TextButton(
               onPressed: () {
                 if (titleController.text.isEmpty) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    SnackBar(content: Text(type == 'company' ? (s?.enterCompanyName ?? 'Enter company name') : (s?.enterName ?? 'Enter name'))),
+                    SnackBar(content: Text(type == 'company' ? (s?.profileEnterCompanyName ?? 'Enter company name') : (s?.profileEnterName ?? 'Enter name'))),
                   );
                   return;
                 }
                 if (type == 'company' && taxNumberController.text.isEmpty) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    SnackBar(content: Text(s?.enterTaxIdNumber ?? 'Enter tax ID number')),
+                    SnackBar(content: Text(s?.profileEnterTaxIdNumber ?? 'Enter tax ID number')),
                   );
                   return;
                 }
@@ -1772,7 +1772,7 @@ class _InvoiceManagePageState extends State<_InvoiceManagePage> {
                   ),
                 );
               },
-              child: Text(s?.save ?? 'Save'),
+              child: Text(s?.commonSave ?? 'Save'),
             ),
           ],
         ),
@@ -1865,7 +1865,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
       // 添加振动和静音选项
       ringtoneItems.add(_RingtoneItem(
         key: 'vibrate',
-        name: s?.ringtoneVibrate ?? 'Vibrate',
+        name: s?.profileRingtoneVibrate ?? 'Vibrate',
         icon: Icons.vibration,
         uri: null,
         isSystemRingtone: false,
@@ -1873,7 +1873,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
 
       ringtoneItems.add(_RingtoneItem(
         key: 'silent',
-        name: s?.ringtoneSilent ?? 'Silent',
+        name: s?.profileRingtoneSilent ?? 'Silent',
         icon: Icons.volume_off,
         uri: null,
         isSystemRingtone: false,
@@ -1918,7 +1918,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(s?.vibrateMode ?? 'Vibrate mode'),
+            content: Text(s?.profileVibrateMode ?? 'Vibrate mode'),
             duration: const Duration(milliseconds: 800),
           ),
         );
@@ -1931,7 +1931,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(s?.silentMode ?? 'Silent mode'),
+            content: Text(s?.profileSilentMode ?? 'Silent mode'),
             duration: const Duration(milliseconds: 800),
           ),
         );
@@ -1955,7 +1955,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
       if (!success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(s?.playFailed(ringtone.name) ?? 'Failed to play: ${ringtone.name}'),
+            content: Text(s?.profilePlayFailed(ringtone.name) ?? 'Failed to play: ${ringtone.name}'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 1),
           ),
@@ -1977,7 +1977,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    s?.playing(ringtone.name) ?? 'Playing: ${ringtone.name}',
+                    s?.profilePlaying(ringtone.name) ?? 'Playing: ${ringtone.name}',
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -1985,7 +1985,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
             ),
             duration: const Duration(seconds: 3),
             action: SnackBarAction(
-              label: s?.stop ?? 'Stop',
+              label: s?.profileStop ?? 'Stop',
               textColor: Colors.white,
               onPressed: _stopRingtone,
             ),
@@ -2003,7 +2003,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(s?.playFailed(ringtone.name) ?? 'Failed to play: ${ringtone.name}'),
+            content: Text(s?.profilePlayFailed(ringtone.name) ?? 'Failed to play: ${ringtone.name}'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 1),
           ),
@@ -2052,7 +2052,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
           onPressed: () => Navigator.pop(context), // 取消不保存
         ),
         title: Text(
-          s?.selectRingtone ?? 'Select Ringtone',
+          s?.profileSelectRingtone ?? 'Select Ringtone',
           style: TextStyle(
             color: isDark ? Colors.white : Colors.black,
             fontSize: 18,
@@ -2064,7 +2064,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
           TextButton(
             onPressed: _confirmSave,
             child: Text(
-              s?.confirm ?? 'Confirm',
+              s?.commonConfirm ?? 'Confirm',
               style: const TextStyle(
                 color: AppColors.primary,
                 fontSize: 16,
@@ -2082,7 +2082,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
                   const CircularProgressIndicator(),
                   const SizedBox(height: 16),
                   Text(
-                    s?.loadingRingtones ?? 'Loading ringtones...',
+                    s?.profileLoadingRingtones ?? 'Loading ringtones...',
                     style: TextStyle(
                       color: isDark ? Colors.white70 : Colors.black54,
                     ),
@@ -2102,7 +2102,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        s?.noRingtonesFound ?? 'No ringtones found',
+                        s?.profileNoRingtonesFound ?? 'No ringtones found',
                         style: TextStyle(
                           color: isDark ? Colors.white54 : Colors.black45,
                           fontSize: 16,

@@ -186,7 +186,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     if (!widget.canChangeSettings) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.noPermissionToModify ?? 'You do not have permission to modify'),
+          content: Text(S.of(context)?.chatNoPermissionToModify ?? 'You do not have permission to modify'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -201,7 +201,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       builder: (context) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
         title: Text(
-          S.of(context)?.groupName ?? 'Group Name',
+          S.of(context)?.chatGroupName ?? 'Group Name',
           style: TextStyle(color: isDark ? Colors.white : Colors.black),
         ),
         content: TextField(
@@ -210,7 +210,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           maxLength: 50,
           style: TextStyle(color: isDark ? Colors.white : Colors.black),
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterGroupName ?? 'Enter group name',
+            hintText: S.of(context)?.commonEnterGroupName ?? 'Enter group name',
             hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
             counterStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
           ),
@@ -218,11 +218,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: Text(S.of(context)?.save ?? 'Save'),
+            child: Text(S.of(context)?.commonSave ?? 'Save'),
           ),
         ],
       ),
@@ -245,7 +245,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.groupNameUpdated ?? 'Group name updated'),
+            content: Text(S.of(context)?.chatGroupNameUpdated ?? 'Group name updated'),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -255,7 +255,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.updateFailed ?? 'Update failed'),
+            content: Text(S.of(context)?.chatUpdateFailed ?? 'Update failed'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -350,7 +350,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '${S.of(context)?.viewAllGroupMembers ?? "View All Members"} ',
+                            '${S.of(context)?.chatViewAllGroupMembers ?? "View All Members"} ',
                             style: TextStyle(
                               fontSize: 13,
                               color: secondaryTextColor,
@@ -378,7 +378,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               children: [
                 if (isGroup) ...[
                   _buildMenuItem(
-                    title: S.of(context)?.groupName ?? 'Group Name',
+                    title: S.of(context)?.chatGroupName ?? 'Group Name',
                     value: _groupName,
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
@@ -386,21 +386,21 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
-                    title: S.of(context)?.groupAnnouncement ?? 'Group Announcement',
+                    title: S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
                     onTap: () {},
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
-                    title: S.of(context)?.groupManagement ?? 'Group Management',
+                    title: S.of(context)?.chatGroupManagement ?? 'Group Management',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
                     onTap: () {},
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
-                    title: S.of(context)?.myNicknameInGroup ?? 'My Nickname in Group',
+                    title: S.of(context)?.chatMyNicknameInGroup ?? 'My Nickname in Group',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
                     onTap: () {},
@@ -408,7 +408,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   _buildDivider(dividerColor),
                 ],
                 _buildMenuItem(
-                  title: S.of(context)?.searchChatHistory ?? 'Search Chat History',
+                  title: S.of(context)?.commonSearchChatHistory ?? 'Search Chat History',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -424,7 +424,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               dividerColor: dividerColor,
               children: [
                 _buildSwitchItem(
-                  title: S.of(context)?.mute ?? 'Mute',
+                  title: S.of(context)?.commonMute ?? 'Mute',
                   value: _isMuted,
                   textColor: textColor,
                   onChanged: (value) {
@@ -437,7 +437,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildSwitchItem(
-                  title: S.of(context)?.pinChat ?? 'Pin Chat',
+                  title: S.of(context)?.chatPinChat ?? 'Pin Chat',
                   value: _isPinned,
                   textColor: textColor,
                   onChanged: (value) {
@@ -451,7 +451,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildSwitchItem(
-                  title: S.of(context)?.strongReminder ?? 'Strong Reminder',
+                  title: S.of(context)?.chatStrongReminder ?? 'Strong Reminder',
                   value: _isStrongReminder,
                   textColor: textColor,
                   onChanged: (value) {
@@ -473,7 +473,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: S.of(context)?.setChatBackground ?? 'Set Chat Background',
+                  title: S.of(context)?.chatSetChatBackground ?? 'Set Chat Background',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -489,7 +489,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: S.of(context)?.clearChatHistory ?? 'Clear Chat History',
+                  title: S.of(context)?.commonClearChatHistory ?? 'Clear Chat History',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _showClearConfirm(),
@@ -505,7 +505,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: S.of(context)?.report ?? 'Report',
+                  title: S.of(context)?.commonReport ?? 'Report',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -686,7 +686,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.removeFromGroup ?? 'Remove from Group'),
+        title: Text(S.of(context)?.chatRemoveFromGroup ?? 'Remove from Group'),
         content: SizedBox(
           width: double.maxFinite,
           height: 300,
@@ -707,7 +707,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
         ],
       ),
@@ -914,12 +914,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.clearChatHistoryTitle ?? 'Clear Chat History'),
-        content: Text(S.of(context)?.clearHistoryConfirm ?? 'Are you sure you want to clear all chat history? This action cannot be undone.'),
+        title: Text(S.of(context)?.chatClearChatHistoryTitle ?? 'Clear Chat History'),
+        content: Text(S.of(context)?.chatClearHistoryConfirm ?? 'Are you sure you want to clear all chat history? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -927,13 +927,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               widget.onClearHistory?.call();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(S.of(context)?.chatHistoryCleared ?? 'Chat history cleared'),
+                  content: Text(S.of(context)?.commonChatHistoryCleared ?? 'Chat history cleared'),
                   duration: const Duration(seconds: 1),
                 ),
               );
             },
             child: Text(
-              S.of(context)?.clearAction ?? 'Clear',
+              S.of(context)?.chatClearAction ?? 'Clear',
               style: const TextStyle(color: Colors.red),
             ),
           ),
@@ -1036,7 +1036,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          S.of(context)?.groupMembers(_members.length) ?? 'Members (${_members.length})',
+          S.of(context)?.commonGroupMembers(_members.length) ?? 'Members (${_members.length})',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
@@ -1056,7 +1056,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
               onChanged: _filterMembers,
               style: TextStyle(color: textColor),
               decoration: InputDecoration(
-                hintText: S.of(context)?.searchMemberHint ?? 'Search members',
+                hintText: S.of(context)?.chatSearchMemberHint ?? 'Search members',
                 hintStyle: TextStyle(color: secondaryTextColor),
                 prefixIcon: Icon(Icons.search, color: secondaryTextColor),
                 filled: true,
@@ -1077,8 +1077,8 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                     ? Center(
                         child: Text(
                           _searchQuery.isEmpty
-                              ? (S.of(context)?.noMembers ?? 'No members')
-                              : (S.of(context)?.noMatchingMembers ?? 'No matching members found'),
+                              ? (S.of(context)?.chatNoMembers ?? 'No members')
+                              : (S.of(context)?.chatNoMatchingMembers ?? 'No matching members found'),
                           style: TextStyle(color: secondaryTextColor),
                         ),
                       )
@@ -1086,7 +1086,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                         itemCount: _filteredMembers.length,
                         itemBuilder: (context, index) {
                           final member = _filteredMembers[index];
-                          final name = member['name'] as String? ?? (S.of(context)?.unknownMember ?? 'Unknown');
+                          final name = member['name'] as String? ?? (S.of(context)?.commonUnknownMember ?? 'Unknown');
                           final id = member['id'] as String? ?? '';
                           final avatarUrl = member['avatarUrl'] as String?;
                           final role = member['role'] as String?;
@@ -1119,7 +1119,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
-                                      S.of(context)?.groupOwner ?? 'Owner',
+                                      S.of(context)?.commonGroupOwner ?? 'Owner',
                                       style: const TextStyle(fontSize: 10, color: Colors.orange),
                                     ),
                                   ),
@@ -1132,7 +1132,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
-                                      S.of(context)?.groupAdmin ?? 'Admin',
+                                      S.of(context)?.commonGroupAdmin ?? 'Admin',
                                       style: const TextStyle(fontSize: 10, color: Colors.blue),
                                     ),
                                   ),

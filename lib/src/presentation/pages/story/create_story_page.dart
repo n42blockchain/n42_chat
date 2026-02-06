@@ -136,7 +136,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               : TextButton(
                   onPressed: _canPost ? _postStory : null,
                   child: Text(
-                    s?.send ?? 'Post',
+                    s?.commonSend ?? 'Post',
                     style: TextStyle(
                       color: _canPost
                           ? (_mode == StoryMode.text
@@ -163,14 +163,14 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildModeTab(
-          label: s?.text ?? 'Text',
+          label: s?.favoriteText ?? 'Text',
           isSelected: _mode == StoryMode.text,
           textColor: textColor,
           onTap: () => setState(() => _mode = StoryMode.text),
         ),
         const SizedBox(width: 24),
         _buildModeTab(
-          label: s?.photos ?? 'Photo',
+          label: s?.contactPhotos ?? 'Photo',
           isSelected: _mode == StoryMode.photo,
           textColor: textColor,
           onTap: () => setState(() => _mode = StoryMode.photo),
@@ -233,7 +233,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                     fontWeight: FontWeight.w500,
                   ),
                   decoration: InputDecoration(
-                    hintText: S.of(context)?.sendMessageHint ?? 'Type something...',
+                    hintText: S.of(context)?.storySendMessageHint ?? 'Type something...',
                     hintStyle: TextStyle(
                       color: _currentTextColor.withOpacity(0.5),
                       fontSize: 28,
@@ -336,7 +336,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               maxLines: 2,
               maxLength: 100,
               decoration: InputDecoration(
-                hintText: s?.sendMessageHint ?? 'Add a caption...',
+                hintText: s?.storySendMessageHint ?? 'Add a caption...',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
@@ -404,7 +404,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                s?.photos ?? 'Add Photo',
+                s?.contactPhotos ?? 'Add Photo',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,

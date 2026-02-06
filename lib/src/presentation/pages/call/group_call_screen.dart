@@ -132,15 +132,15 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       String message;
       switch (type) {
         case MeetingErrorType.serverNotConfigured:
-          message = s?.livekitNotConfigured ?? 'LiveKit not configured';
+          message = s?.callLivekitNotConfigured ?? 'LiveKit not configured';
         case MeetingErrorType.joinFailed:
-          message = s?.joinMeetingFailed(errorDetails) ?? 'Failed to join meeting';
+          message = s?.callJoinMeetingFailed(errorDetails) ?? 'Failed to join meeting';
         case MeetingErrorType.screenShareFailed:
-          message = s?.screenShareFailed(errorDetails) ?? 'Screen share failed';
+          message = s?.callScreenShareFailed(errorDetails) ?? 'Screen share failed';
         case MeetingErrorType.connectionLost:
-          message = s?.connectionFailed ?? 'Connection failed';
+          message = s?.commonConnectionFailed ?? 'Connection failed';
         case MeetingErrorType.unknown:
-          message = details ?? (s?.unknownError ?? 'Unknown error');
+          message = details ?? (s?.qrcodeUnknownError ?? 'Unknown error');
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message), backgroundColor: Colors.red),
@@ -221,7 +221,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         color: Colors.grey[900],
         child: Center(
           child: Text(
-            S.of(context)?.waitingForParticipants ?? 'Waiting for participants to join...',
+            S.of(context)?.callWaitingForParticipants ?? 'Waiting for participants to join...',
             style: const TextStyle(color: Colors.white54, fontSize: 16),
           ),
         ),
@@ -370,7 +370,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         ),
                         child: Text(
                           participant.isLocal
-                              ? (S.of(context)?.participantMe(participant.name) ?? '${participant.name} (Me)')
+                              ? (S.of(context)?.callParticipantMe(participant.name) ?? '${participant.name} (Me)')
                               : participant.name,
                           style: const TextStyle(
                             color: Colors.white,
@@ -402,7 +402,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       const Icon(Icons.screen_share, color: Colors.white, size: 14),
                       const SizedBox(width: 4),
                       Text(
-                        S.of(context)?.sharingLabel ?? 'Sharing',
+                        S.of(context)?.callSharingLabel ?? 'Sharing',
                         style: const TextStyle(color: Colors.white, fontSize: 11),
                       ),
                     ],
@@ -450,7 +450,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     const Icon(Icons.screen_share, color: AppColors.primary, size: 18),
                     const SizedBox(width: 8),
                     Text(
-                      S.of(context)?.screenSharingBy(sharer.name) ?? '${sharer.name} is sharing screen',
+                      S.of(context)?.callScreenSharingBy(sharer.name) ?? '${sharer.name} is sharing screen',
                       style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
                   ],
@@ -523,7 +523,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   Row(
                     children: [
                       Text(
-                        S.of(context)?.participantCount(_participants.length) ?? '${_participants.length} participants',
+                        S.of(context)?.callParticipantCount(_participants.length) ?? '${_participants.length} participants',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 12,
@@ -614,8 +614,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             _buildControlButton(
               icon: _isMuted ? Icons.mic_off : Icons.mic,
               label: _isMuted
-                  ? (S.of(context)?.unmuteLabel ?? 'Unmute')
-                  : (S.of(context)?.muteLabel ?? 'Mute'),
+                  ? (S.of(context)?.callUnmuteLabel ?? 'Unmute')
+                  : (S.of(context)?.callMuteLabel ?? 'Mute'),
               isActive: _isMuted,
               activeColor: Colors.red,
               onPressed: _toggleMute,
@@ -625,8 +625,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             _buildControlButton(
               icon: _isVideoEnabled ? Icons.videocam : Icons.videocam_off,
               label: _isVideoEnabled
-                  ? (S.of(context)?.turnOffVideo ?? 'Turn off video')
-                  : (S.of(context)?.turnOnVideo ?? 'Turn on video'),
+                  ? (S.of(context)?.callTurnOffVideo ?? 'Turn off video')
+                  : (S.of(context)?.callTurnOnVideo ?? 'Turn on video'),
               isActive: !_isVideoEnabled,
               activeColor: Colors.red,
               onPressed: _toggleVideo,
@@ -636,8 +636,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             _buildControlButton(
               icon: Icons.screen_share,
               label: _isScreenSharing
-                  ? (S.of(context)?.stopSharing ?? 'Stop sharing')
-                  : (S.of(context)?.shareScreen ?? 'Share screen'),
+                  ? (S.of(context)?.callStopSharing ?? 'Stop sharing')
+                  : (S.of(context)?.callShareScreen ?? 'Share screen'),
               isActive: _isScreenSharing,
               activeColor: AppColors.primary,
               onPressed: _toggleScreenShare,
@@ -646,14 +646,14 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             // 切换摄像头
             _buildControlButton(
               icon: Icons.cameraswitch,
-              label: S.of(context)?.switchCameraLabel ?? 'Switch',
+              label: S.of(context)?.callSwitchCameraLabel ?? 'Switch',
               onPressed: _switchCamera,
             ),
 
             // 离开
             _buildControlButton(
               icon: Icons.call_end,
-              label: S.of(context)?.leaveLabel ?? 'Leave',
+              label: S.of(context)?.callLeaveLabel ?? 'Leave',
               backgroundColor: Colors.red,
               onPressed: _showLeaveDialog,
             ),
@@ -729,7 +729,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               child: Row(
                 children: [
                   Text(
-                    S.of(context)?.participantsLabel ?? 'Participants',
+                    S.of(context)?.callParticipantsLabel ?? 'Participants',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -792,7 +792,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
       title: Text(
         participant.isLocal
-                              ? (S.of(context)?.participantMe(participant.name) ?? '${participant.name} (Me)')
+                              ? (S.of(context)?.callParticipantMe(participant.name) ?? '${participant.name} (Me)')
                               : participant.name,
         style: const TextStyle(color: Colors.white, fontSize: 14),
       ),
@@ -833,7 +833,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               const CircularProgressIndicator(color: AppColors.primary),
               const SizedBox(height: 24),
               Text(
-                S.of(context)?.joiningMeeting ?? 'Joining meeting...',
+                S.of(context)?.callJoiningMeeting ?? 'Joining meeting...',
                 style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ],
@@ -893,12 +893,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.leaveMeeting ?? 'Leave Meeting'),
-        content: Text(S.of(context)?.leaveMeetingConfirm ?? 'Are you sure you want to leave the meeting?'),
+        title: Text(S.of(context)?.callLeaveMeeting ?? 'Leave Meeting'),
+        content: Text(S.of(context)?.callLeaveMeetingConfirm ?? 'Are you sure you want to leave the meeting?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -906,7 +906,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               _leaveMeeting();
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(S.of(context)?.leaveLabel ?? 'Leave'),
+            child: Text(S.of(context)?.callLeaveLabel ?? 'Leave'),
           ),
         ],
       ),

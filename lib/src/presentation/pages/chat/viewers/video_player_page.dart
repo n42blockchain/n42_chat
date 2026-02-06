@@ -97,7 +97,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
               const Icon(Icons.error, color: Colors.red, size: 48),
               const SizedBox(height: 16),
               Text(
-                '${S.of(ctx)?.videoPlaybackFailed ?? 'Video playback failed'}\n$errorMessage',
+                '${S.of(ctx)?.chatVideoPlaybackFailed ?? 'Video playback failed'}\n$errorMessage',
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white),
               ),
@@ -138,7 +138,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(S.of(context)?.videoTitle ?? 'Video', style: const TextStyle(color: Colors.white)),
+        title: Text(S.of(context)?.chatVideoTitle ?? 'Video', style: const TextStyle(color: Colors.white)),
         elevation: 0,
       ),
       body: Center(
@@ -148,7 +148,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                 children: [
                   const CircularProgressIndicator(color: Colors.white),
                   const SizedBox(height: 16),
-                  Text(S.of(context)?.loadingText ?? 'Loading...', style: const TextStyle(color: Colors.white)),
+                  Text(S.of(context)?.chatLoadingText ?? 'Loading...', style: const TextStyle(color: Colors.white)),
                 ],
               )
             : _error != null
@@ -158,7 +158,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                       const Icon(Icons.error, color: Colors.red, size: 48),
                       const SizedBox(height: 16),
                       Text(
-                        '${S.of(context)?.videoLoadFailed ?? 'Video load failed'}\n$_error',
+                        '${S.of(context)?.chatVideoLoadFailed ?? 'Video load failed'}\n$_error',
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.white),
                       ),
@@ -171,7 +171,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                           });
                           _initializePlayer();
                         },
-                        child: Text(S.of(context)?.retryButton ?? 'Retry'),
+                        child: Text(S.of(context)?.chatRetryButton ?? 'Retry'),
                       ),
                     ],
                   )
@@ -182,7 +182,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                             : 16 / 9,
                         child: Chewie(controller: _chewieController!),
                       )
-                    : Text(S.of(context)?.playerInitFailed ?? 'Player initialization failed', style: const TextStyle(color: Colors.white)),
+                    : Text(S.of(context)?.chatPlayerInitFailed ?? 'Player initialization failed', style: const TextStyle(color: Colors.white)),
       ),
     );
   }

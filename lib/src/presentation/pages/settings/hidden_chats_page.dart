@@ -40,20 +40,20 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: l10n?.hiddenChats ?? 'Hidden Chats',
+        title: l10n?.settingsHiddenChats ?? 'Hidden Chats',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
       body: BlocBuilder<ConversationBloc, ConversationState>(
         builder: (context, state) {
           if (state.isLoadingHidden) {
-            return N42Loading(message: l10n?.loading ?? 'Loading...');
+            return N42Loading(message: l10n?.commonLoading ?? 'Loading...');
           }
 
           if (state.hiddenConversations.isEmpty) {
             return N42EmptyState.noData(
-              title: l10n?.noHiddenChats ?? 'No hidden chats',
-              description: l10n?.noHiddenChatsDescription ??
+              title: l10n?.settingsNoHiddenChats ?? 'No hidden chats',
+              description: l10n?.settingsNoHiddenChatsDescription ??
                   'Chats you hide will appear here',
             );
           }
@@ -109,7 +109,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
         trailing: TextButton(
           onPressed: () => _unhideChat(context, conversation),
           child: Text(
-            l10n?.unhideChat ?? 'Unhide',
+            l10n?.settingsUnhideChat ?? 'Unhide',
             style: const TextStyle(
               color: AppColors.primary,
               fontSize: 14,
@@ -163,7 +163,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                   color: isDark ? Colors.white54 : Colors.black54,
                 ),
                 title: Text(
-                  l10n?.unhideChat ?? 'Unhide',
+                  l10n?.settingsUnhideChat ?? 'Unhide',
                   style: TextStyle(
                     color: isDark ? Colors.white : Colors.black,
                   ),
@@ -181,7 +181,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                   color: isDark ? Colors.white54 : Colors.black54,
                 ),
                 title: Text(
-                  l10n?.chat ?? 'Chat',
+                  l10n?.commonChat ?? 'Chat',
                   style: TextStyle(
                     color: isDark ? Colors.white : Colors.black,
                   ),

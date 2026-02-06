@@ -120,7 +120,7 @@ class TransferMessageWidget extends StatelessWidget {
                 ),
               ),
               child: Text(
-                S.of(context)?.transfer ?? 'Transfer',
+                S.of(context)?.commonTransfer ?? 'Transfer',
                 style: TextStyle(
                   fontSize: 11,
                   color: _getTextColor().withValues(alpha: 0.5),
@@ -171,16 +171,16 @@ class TransferMessageWidget extends StatelessWidget {
     switch (status) {
       case TransferStatus.pending:
         return isSelf
-            ? (S.of(context)?.waitingToReceive ?? 'Waiting to receive')
-            : (S.of(context)?.tapToClaim ?? 'Tap to claim');
+            ? (S.of(context)?.commonWaitingToReceive ?? 'Waiting to receive')
+            : (S.of(context)?.commonTapToClaim ?? 'Tap to claim');
       case TransferStatus.received:
         return isSelf
-            ? (S.of(context)?.hasBeenReceived ?? 'Has been received')
-            : (S.of(context)?.received ?? 'Received');
+            ? (S.of(context)?.commonHasBeenReceived ?? 'Has been received')
+            : (S.of(context)?.commonReceived ?? 'Received');
       case TransferStatus.refunded:
-        return S.of(context)?.refunded ?? 'Refunded';
+        return S.of(context)?.commonRefunded ?? 'Refunded';
       case TransferStatus.expired:
-        return S.of(context)?.expired ?? 'Expired';
+        return S.of(context)?.commonExpired ?? 'Expired';
     }
   }
 }
@@ -264,7 +264,7 @@ class RedPacketMessageWidget extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              note ?? (S.of(context)?.redPacketGreeting ?? 'Best wishes'),
+                              note ?? (S.of(context)?.chatRedPacketGreeting ?? 'Best wishes'),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -297,7 +297,7 @@ class RedPacketMessageWidget extends StatelessWidget {
                     color: Colors.black.withValues(alpha: 0.05),
                   ),
                   child: Text(
-                    S.of(context)?.n42RedPacket ?? 'N42 Red Packet',
+                    S.of(context)?.commonN42RedPacket ?? 'N42 Red Packet',
                     style: TextStyle(
                       fontSize: 12,
                       color: textColor.withValues(alpha: 0.6),
@@ -378,13 +378,13 @@ class RedPacketMessageWidget extends StatelessWidget {
   String _getStatusText(BuildContext context) {
     switch (status) {
       case RedPacketStatus.pending:
-        return S.of(context)?.getLucky ?? 'Get lucky';
+        return S.of(context)?.commonGetLucky ?? 'Get lucky';
       case RedPacketStatus.opened:
-        return S.of(context)?.claimed ?? 'Claimed';
+        return S.of(context)?.commonClaimed ?? 'Claimed';
       case RedPacketStatus.expired:
-        return S.of(context)?.expired ?? 'Expired';
+        return S.of(context)?.commonExpired ?? 'Expired';
       case RedPacketStatus.empty:
-        return S.of(context)?.allClaimed ?? 'All claimed';
+        return S.of(context)?.commonAllClaimed ?? 'All claimed';
     }
   }
 }

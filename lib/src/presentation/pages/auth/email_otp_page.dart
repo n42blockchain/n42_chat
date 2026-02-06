@@ -68,7 +68,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
     if (email.isEmpty || !_isValidEmail(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.enterValidEmailAddress ?? 'Please enter a valid email address'),
+          content: Text(S.of(context)?.authEnterValidEmailAddress ?? 'Please enter a valid email address'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -95,7 +95,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.verificationCodeSentTo(email) ?? 'Verification code sent to $email'),
+            content: Text(S.of(context)?.authVerificationCodeSentTo(email) ?? 'Verification code sent to $email'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -107,7 +107,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.sendCodeFailed(e.toString()) ?? 'Failed to send code: $e'),
+            content: Text(S.of(context)?.authSendCodeFailed(e.toString()) ?? 'Failed to send code: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -134,7 +134,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         // 这里需要根据服务端返回的 session 进行实际登录
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.verificationSuccess ?? 'Verification successful'),
+            content: Text(S.of(context)?.authVerificationSuccess ?? 'Verification successful'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -142,7 +142,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         // 返回登录页面或直接登录
         Navigator.of(context).pop(result);
       } else {
-        throw Exception(S.of(context)?.verificationFailed ?? 'Verification failed');
+        throw Exception(S.of(context)?.authVerificationFailed ?? 'Verification failed');
       }
     } catch (e) {
       if (mounted) {
@@ -152,7 +152,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         _otpController.clear();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.verificationCodeError(e.toString()) ?? 'Verification code error: $e'),
+            content: Text(S.of(context)?.authVerificationCodeError(e.toString()) ?? 'Verification code error: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -180,7 +180,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          S.of(context)?.emailVerificationTitle ?? 'Email Verification',
+          S.of(context)?.authEmailVerificationTitle ?? 'Email Verification',
           style: TextStyle(
             color: textColor,
             fontSize: 17,
@@ -253,8 +253,8 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
       children: [
         Text(
           _isEmailSent
-              ? (S.of(context)?.enterVerificationCode ?? 'Enter verification code')
-              : (S.of(context)?.enterYourEmail ?? 'Enter email'),
+              ? (S.of(context)?.commonEnterVerificationCode ?? 'Enter verification code')
+              : (S.of(context)?.authEnterYourEmail ?? 'Enter email'),
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w600,
@@ -265,8 +265,8 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         const SizedBox(height: 8),
         Text(
           _isEmailSent
-              ? (S.of(context)?.weSentCodeTo(_emailController.text) ?? 'We sent a 6-digit code to\n${_emailController.text}')
-              : (S.of(context)?.enterEmailForCode ?? 'Enter your email address, we will send verification code'),
+              ? (S.of(context)?.authWeSentCodeTo(_emailController.text) ?? 'We sent a 6-digit code to\n${_emailController.text}')
+              : (S.of(context)?.authEnterEmailForCode ?? 'Enter your email address, we will send verification code'),
           style: TextStyle(
             fontSize: 14,
             color: textColor,
@@ -286,7 +286,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
       controller: _emailController,
       style: TextStyle(color: textColor, fontSize: 16),
       decoration: InputDecoration(
-        hintText: S.of(context)?.emailExampleHint ?? 'example@email.com',
+        hintText: S.of(context)?.authEmailExampleHint ?? 'example@email.com',
         hintStyle: TextStyle(color: hintColor),
         filled: true,
         fillColor: inputBgColor,
@@ -378,7 +378,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
                 ),
               )
             : Text(
-                S.of(context)?.sendVerificationCode ?? 'Send verification code',
+                S.of(context)?.commonSendVerificationCode ?? 'Send verification code',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -409,8 +409,8 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
             onPressed: canResend ? _sendOtp : null,
             child: Text(
               canResend
-                  ? (S.of(context)?.resendVerificationCode ?? 'Resend verification code')
-                  : (S.of(context)?.canResendAfter(_resendCountdown) ?? 'Can resend after $_resendCountdown seconds'),
+                  ? (S.of(context)?.authResendVerificationCode ?? 'Resend verification code')
+                  : (S.of(context)?.authCanResendAfter(_resendCountdown) ?? 'Can resend after $_resendCountdown seconds'),
               style: TextStyle(
                 fontSize: 14,
                 color: canResend
@@ -432,7 +432,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         });
       },
       child: Text(
-        S.of(context)?.changeEmail ?? 'Change email',
+        S.of(context)?.commonChangeEmail ?? 'Change email',
         style: const TextStyle(
           fontSize: 14,
           color: AppColors.textLink,

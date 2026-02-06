@@ -208,9 +208,9 @@ class RedPacketClaimMessageWidget extends StatelessWidget {
                     ),
                     children: [
                       TextSpan(text: claimerName),
-                      TextSpan(text: isOwnRedPacket ? (S.of(context)?.claimedYour ?? ' claimed your ') : (S.of(context)?.claimedText ?? ' claimed ')),
+                      TextSpan(text: isOwnRedPacket ? (S.of(context)?.commonClaimedYour ?? ' claimed your ') : (S.of(context)?.commonClaimedText ?? ' claimed ')),
                       TextSpan(
-                        text: S.of(context)?.redPacket ?? 'Red Packet',
+                        text: S.of(context)?.profileRedPacket ?? 'Red Packet',
                         style: const TextStyle(
                           color: Color(0xFFE64340),
                         ),
@@ -302,8 +302,8 @@ class _TypingIndicatorState extends State<TypingIndicator>
           const SizedBox(width: 8),
           Text(
             widget.userName != null
-                ? (S.of(context)?.userTyping(widget.userName!) ?? '${widget.userName} is typing...')
-                : (S.of(context)?.typing ?? 'Typing...'),
+                ? (S.of(context)?.commonUserTyping(widget.userName!) ?? '${widget.userName} is typing...')
+                : (S.of(context)?.commonTyping ?? 'Typing...'),
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.textTertiary,

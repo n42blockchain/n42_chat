@@ -104,7 +104,7 @@ class WalletPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFEDEDED),
       appBar: AppBar(
-        title: Text(S.of(context)?.wallet ?? 'Wallet'),
+        title: Text(S.of(context)?.profileWallet ?? 'Wallet'),
         backgroundColor: const Color(0xFFF7F7F7),
         foregroundColor: const Color(0xFF181818),
         elevation: 0,
@@ -137,7 +137,7 @@ class WalletPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              S.of(context)?.walletArea ?? 'Wallet area',
+              S.of(context)?.commonWalletArea ?? 'Wallet area',
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF888888),
@@ -206,7 +206,7 @@ class DiscoverPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFEDEDED),
       appBar: AppBar(
-        title: Text(S.of(context)?.discover ?? 'Discover'),
+        title: Text(S.of(context)?.commonDiscover ?? 'Discover'),
         backgroundColor: const Color(0xFFF7F7F7),
         foregroundColor: const Color(0xFF181818),
         elevation: 0,
@@ -218,7 +218,7 @@ class DiscoverPage extends StatelessWidget {
             _DiscoverItem(
               icon: Icons.qr_code_scanner,
               iconColor: const Color(0xFF3D7CF4),
-              title: S.of(context)?.scan ?? 'Scan',
+              title: S.of(context)?.commonScan ?? 'Scan',
               onTap: () {},
             ),
           ]),
@@ -374,7 +374,7 @@ class ProfilePage extends StatelessWidget {
                 _buildSection([
                   _ProfileItem(
                     icon: Icons.settings,
-                    title: S.of(context)?.settings ?? 'Settings',
+                    title: S.of(context)?.commonSettings ?? 'Settings',
                     onTap: () {},
                   ),
                 ]),
@@ -397,7 +397,7 @@ class ProfilePage extends StatelessWidget {
                 _buildSection([
                   _ProfileItem(
                     icon: Icons.info_outline,
-                    title: S.of(context)?.about ?? 'About',
+                    title: S.of(context)?.settingsAbout ?? 'About',
                     onTap: () {},
                   ),
                 ]),

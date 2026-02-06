@@ -161,7 +161,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
         child: N42EmptyState(
           icon: Icons.search,
           title: S.of(context)?.searchContactsGroupsMessages ?? 'Search contacts, groups and messages',
-          description: S.of(context)?.enterKeywordToSearch ?? 'Enter keyword to start searching',
+          description: S.of(context)?.searchEnterKeywordToSearch ?? 'Enter keyword to start searching',
         ),
       );
     }
@@ -184,7 +184,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
               onPressed: () {
                 context.read<SearchBloc>().add(const ClearSearchHistory());
               },
-              child: Text(S.of(context)?.clearHistory ?? 'Clear'),
+              child: Text(S.of(context)?.searchClearHistory ?? 'Clear'),
             ),
           ],
         ),
@@ -218,7 +218,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     if (state.results.isEmpty) {
       return Center(
         child: N42EmptyState.noSearchResult(
-          description: S.of(context)?.noResultsForQuery(state.results.query) ?? 'No results found for "${state.results.query}"',
+          description: S.of(context)?.searchNoResultsForQuery(state.results.query) ?? 'No results found for "${state.results.query}"',
         ),
       );
     }
@@ -245,28 +245,28 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           _buildTypeChip(
-            S.of(context)?.allResults ?? 'All',
+            S.of(context)?.searchAllResults ?? 'All',
             SearchResultType.all,
             state.selectedType,
             state.results.totalCount,
             isDark,
           ),
           _buildTypeChip(
-            S.of(context)?.contacts ?? 'Contacts',
+            S.of(context)?.commonContacts ?? 'Contacts',
             SearchResultType.contact,
             state.selectedType,
             state.results.contacts.length,
             isDark,
           ),
           _buildTypeChip(
-            S.of(context)?.groups ?? 'Groups',
+            S.of(context)?.searchGroups ?? 'Groups',
             SearchResultType.group,
             state.selectedType,
             state.results.groups.length,
             isDark,
           ),
           _buildTypeChip(
-            S.of(context)?.messages ?? 'Messages',
+            S.of(context)?.commonMessages ?? 'Messages',
             SearchResultType.message,
             state.selectedType,
             state.results.messages.length,
@@ -341,7 +341,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
       return Center(
         child: N42EmptyState(
           icon: Icons.search_off,
-          title: S.of(context)?.noResults ?? 'No Results',
+          title: S.of(context)?.searchNoResults ?? 'No Results',
         ),
       );
     }

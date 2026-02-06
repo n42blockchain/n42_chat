@@ -89,7 +89,7 @@ class _ContactListPageState extends State<ContactListPage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: widget.showAppBar ? N42AppBar(
-        title: S.of(context)?.contacts ?? 'Contacts',
+        title: S.of(context)?.commonContacts ?? 'Contacts',
         showBackButton: false,
         actions: [
           IconButton(
@@ -128,9 +128,9 @@ class _ContactListPageState extends State<ContactListPage> {
                 if (state is ContactError) {
                   return N42EmptyState(
                     icon: Icons.error_outline,
-                    title: S.of(context)?.loadFailed ?? 'Load failed',
+                    title: S.of(context)?.commonLoadFailed ?? 'Load failed',
                     description: state.message,
-                    buttonText: S.of(context)?.retry ?? 'Retry',
+                    buttonText: S.of(context)?.commonRetry ?? 'Retry',
                     onButtonPressed: () {
                       context.read<ContactBloc>().add(const LoadContacts());
                     },
@@ -143,8 +143,8 @@ class _ContactListPageState extends State<ContactListPage> {
 
                 return N42EmptyState(
                   icon: Icons.contacts_outlined,
-                  title: S.of(context)?.noContacts ?? 'No contacts',
-                  description: S.of(context)?.addFriendsToChat ?? 'Add friends to start chatting',
+                  title: S.of(context)?.commonNoContacts ?? 'No contacts',
+                  description: S.of(context)?.contactAddFriendsToChat ?? 'Add friends to start chatting',
                 );
               },
             ),
@@ -172,7 +172,7 @@ class _ContactListPageState extends State<ContactListPage> {
             color: isDark ? Colors.white : Colors.black,
           ),
           decoration: InputDecoration(
-            hintText: S.of(context)?.search ?? 'Search',
+            hintText: S.of(context)?.commonSearch ?? 'Search',
             hintStyle: TextStyle(
               fontSize: 15,
               color: isDark ? Colors.white54 : Colors.black45,
@@ -302,7 +302,7 @@ class _ContactListPageState extends State<ContactListPage> {
       return N42EmptyState(
         icon: Icons.search_off,
         title: S.of(context)?.contactNotFound ?? 'Contact not found',
-        description: S.of(context)?.tryOtherKeywords ?? 'Try other keywords or global search',
+        description: S.of(context)?.contactTryOtherKeywords ?? 'Try other keywords or global search',
       );
     }
 
@@ -310,7 +310,7 @@ class _ContactListPageState extends State<ContactListPage> {
       children: [
         // 本地搜索结果
         if (localResults.isNotEmpty) ...[
-          _buildSectionHeader(S.of(context)?.contacts ?? 'Contacts', isDark),
+          _buildSectionHeader(S.of(context)?.commonContacts ?? 'Contacts', isDark),
           ...localResults.map((contact) => ContactTile(
                 contact: contact,
                 onTap: () => _onContactTap(contact),
@@ -326,7 +326,7 @@ class _ContactListPageState extends State<ContactListPage> {
 
         // 全局搜索结果
         if (globalResults.isNotEmpty) ...[
-          _buildSectionHeader(S.of(context)?.searchResults ?? 'Search Results', isDark),
+          _buildSectionHeader(S.of(context)?.contactSearchResults ?? 'Search Results', isDark),
           ...globalResults.map((contact) => ContactTile(
                 contact: contact,
                 showOnlineStatus: false,
@@ -348,7 +348,7 @@ class _ContactListPageState extends State<ContactListPage> {
           _buildFunctionItem(
             isDark: isDark,
             icon: _NewFriendIcon(),
-            title: S.of(context)?.newFriends ?? 'New Friends',
+            title: S.of(context)?.contactNewFriends ?? 'New Friends',
             badgeCount: state.friendRequests.length,
             onTap: _showFriendRequestsPage,
           ),
@@ -358,8 +358,8 @@ class _ContactListPageState extends State<ContactListPage> {
           _buildFunctionItem(
             isDark: isDark,
             icon: _ChatOnlyFriendIcon(),
-            title: S.of(context)?.chatOnlyFriends ?? 'Chat-only Friends',
-            onTap: () => _showComingSoon(S.of(context)?.chatOnlyFriends ?? 'Chat-only Friends'),
+            title: S.of(context)?.contactChatOnlyFriends ?? 'Chat-only Friends',
+            onTap: () => _showComingSoon(S.of(context)?.contactChatOnlyFriends ?? 'Chat-only Friends'),
           ),
           
           const SizedBox(height: 8),
@@ -378,7 +378,7 @@ class _ContactListPageState extends State<ContactListPage> {
                     return _buildFunctionItem(
                       isDark: isDark,
                       icon: _GroupChatIcon(),
-                      title: S.of(context)?.groupChat ?? 'Group Chat',
+                      title: S.of(context)?.commonGroupChat ?? 'Group Chat',
                       badgeCount: inviteCount,
                       onTap: _showGroupsPage,
                     );
@@ -390,8 +390,8 @@ class _ContactListPageState extends State<ContactListPage> {
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _TagIcon(),
-                  title: S.of(context)?.tags ?? 'Tags',
-                  onTap: () => _showComingSoon(S.of(context)?.tags ?? 'Tags'),
+                  title: S.of(context)?.contactTags ?? 'Tags',
+                  onTap: () => _showComingSoon(S.of(context)?.contactTags ?? 'Tags'),
                 ),
                 _buildItemDivider(isDark),
 
@@ -399,8 +399,8 @@ class _ContactListPageState extends State<ContactListPage> {
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _OfficialAccountIcon(),
-                  title: S.of(context)?.officialAccounts ?? 'Official Accounts',
-                  onTap: () => _showComingSoon(S.of(context)?.officialAccounts ?? 'Official Accounts'),
+                  title: S.of(context)?.contactOfficialAccounts ?? 'Official Accounts',
+                  onTap: () => _showComingSoon(S.of(context)?.contactOfficialAccounts ?? 'Official Accounts'),
                 ),
                 _buildItemDivider(isDark),
 
@@ -408,8 +408,8 @@ class _ContactListPageState extends State<ContactListPage> {
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _ServiceAccountIcon(),
-                  title: S.of(context)?.serviceAccounts ?? 'Service Accounts',
-                  onTap: () => _showComingSoon(S.of(context)?.serviceAccounts ?? 'Service Accounts'),
+                  title: S.of(context)?.contactServiceAccounts ?? 'Service Accounts',
+                  onTap: () => _showComingSoon(S.of(context)?.contactServiceAccounts ?? 'Service Accounts'),
                 ),
                 _buildItemDivider(isDark),
 
@@ -417,8 +417,8 @@ class _ContactListPageState extends State<ContactListPage> {
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _EnterpriseContactIcon(),
-                  title: S.of(context)?.enterpriseContacts ?? 'Enterprise Contacts',
-                  onTap: () => _showComingSoon(S.of(context)?.enterpriseContacts ?? 'Enterprise Contacts'),
+                  title: S.of(context)?.contactEnterpriseContacts ?? 'Enterprise Contacts',
+                  onTap: () => _showComingSoon(S.of(context)?.contactEnterpriseContacts ?? 'Enterprise Contacts'),
                 ),
               ],
             ),
@@ -543,7 +543,7 @@ class _ContactListPageState extends State<ContactListPage> {
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.featureComingSoon(feature) ?? '$feature coming soon'),
+        content: Text(S.of(context)?.commonFeatureComingSoon(feature) ?? '$feature coming soon'),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -609,7 +609,7 @@ class _ContactListPageState extends State<ContactListPage> {
               // 发消息
               ListTile(
                 leading: const Icon(Icons.chat_bubble_outline),
-                title: Text(S.of(context)?.sendMessage ?? 'Message'),
+                title: Text(S.of(context)?.commonSendMessage ?? 'Message'),
                 onTap: () {
                   Navigator.pop(context);
                   _startChatWithContact(contact);
@@ -618,7 +618,7 @@ class _ContactListPageState extends State<ContactListPage> {
               // 推荐给朋友
               ListTile(
                 leading: const Icon(Icons.person_add_alt_1_outlined),
-                title: Text(S.of(context)?.recommendToFriend ?? 'Share contact'),
+                title: Text(S.of(context)?.contactRecommendToFriend ?? 'Share contact'),
                 onTap: () {
                   Navigator.pop(context);
                   _recommendToFriend(contact);
@@ -627,7 +627,7 @@ class _ContactListPageState extends State<ContactListPage> {
               // 设置备注
               ListTile(
                 leading: const Icon(Icons.edit_outlined),
-                title: Text(S.of(context)?.setRemark ?? 'Set remark'),
+                title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
                 onTap: () {
                   Navigator.pop(context);
                   _setContactRemark(contact);
@@ -636,11 +636,11 @@ class _ContactListPageState extends State<ContactListPage> {
               // 添加到桌面
               ListTile(
                 leading: const Icon(Icons.add_to_home_screen),
-                title: Text(S.of(context)?.addToHomeScreen ?? 'Add to home screen'),
+                title: Text(S.of(context)?.contactAddToHomeScreen ?? 'Add to home screen'),
                 onTap: () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(S.of(context)?.featureInDevelopment('') ?? 'Feature in development')),
+                    SnackBar(content: Text(S.of(context)?.commonFeatureInDevelopment('') ?? 'Feature in development')),
                   );
                 },
               ),
@@ -648,7 +648,7 @@ class _ContactListPageState extends State<ContactListPage> {
               // 取消按钮
               ListTile(
                 leading: const Icon(Icons.close),
-                title: Text(S.of(context)?.cancel ?? 'Cancel'),
+                title: Text(S.of(context)?.commonCancel ?? 'Cancel'),
                 onTap: () => Navigator.pop(context),
               ),
               const SizedBox(height: 8),
@@ -686,7 +686,7 @@ class _ContactListPageState extends State<ContactListPage> {
                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               ),
               const SizedBox(width: 12),
-              Text(S.of(context)?.sendingCard ?? 'Sending card...'),
+              Text(S.of(context)?.contactSendingCard ?? 'Sending card...'),
             ],
           ),
           duration: const Duration(seconds: 2),
@@ -710,7 +710,7 @@ ID：${contact.userId}''';
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.recommendedCardTo(contact.effectiveDisplayName, selectedContact.effectiveDisplayName) ?? 'Recommended ${contact.effectiveDisplayName}\'s card to ${selectedContact.effectiveDisplayName}'),
+            content: Text(S.of(context)?.contactRecommendedCardTo(contact.effectiveDisplayName, selectedContact.effectiveDisplayName) ?? 'Recommended ${contact.effectiveDisplayName}\'s card to ${selectedContact.effectiveDisplayName}'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -721,7 +721,7 @@ ID：${contact.userId}''';
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.recommendFailed(e.toString()) ?? 'Recommend failed: $e'),
+            content: Text(S.of(context)?.contactRecommendFailed(e.toString()) ?? 'Recommend failed: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -736,11 +736,11 @@ ID：${contact.userId}''';
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.setRemark ?? 'Set remark'),
+        title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterRemarkName ?? 'Enter remark name',
+            hintText: S.of(context)?.contactEnterRemarkName ?? 'Enter remark name',
             border: const OutlineInputBorder(),
             suffixIcon: IconButton(
               icon: const Icon(Icons.clear),
@@ -752,18 +752,18 @@ ID：${contact.userId}''';
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(dialogContext);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(S.of(context)?.remarkSetTo(controller.text) ?? 'Remark set to: ${controller.text}'),
+                  content: Text(S.of(context)?.contactRemarkSetTo(controller.text) ?? 'Remark set to: ${controller.text}'),
                 ),
               );
             },
-            child: Text(S.of(context)?.confirm ?? 'OK'),
+            child: Text(S.of(context)?.commonConfirm ?? 'OK'),
           ),
         ],
       ),
@@ -782,7 +782,7 @@ ID：${contact.userId}''';
                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               ),
               const SizedBox(width: 12),
-              Text(S.of(context)?.openingChat ?? 'Opening chat...'),
+              Text(S.of(context)?.contactOpeningChat ?? 'Opening chat...'),
             ],
           ),
           duration: const Duration(seconds: 2),
@@ -828,7 +828,7 @@ ID：${contact.userId}''';
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.openChatFailed(e.toString()) ?? 'Open chat failed: $e'),
+            content: Text(S.of(context)?.contactOpenChatFailed(e.toString()) ?? 'Open chat failed: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -840,13 +840,13 @@ ID：${contact.userId}''';
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.addContact ?? 'Add Contact'),
+        title: Text(S.of(context)?.contactAddContact ?? 'Add Contact'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               decoration: InputDecoration(
-                hintText: S.of(context)?.enterUserId ?? 'Enter user ID',
+                hintText: S.of(context)?.contactEnterUserId ?? 'Enter user ID',
                 border: const OutlineInputBorder(),
               ),
               onSubmitted: (value) {
@@ -861,13 +861,13 @@ ID：${contact.userId}''';
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
             },
-            child: Text(S.of(context)?.scan ?? 'Scan'),
+            child: Text(S.of(context)?.commonScan ?? 'Scan'),
           ),
         ],
       ),
@@ -1337,7 +1337,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
     
     return Scaffold(
       appBar: AppBar(
-        title: Text(S.of(context)?.newFriends ?? 'New Friends'),
+        title: Text(S.of(context)?.contactNewFriends ?? 'New Friends'),
         backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black,
         elevation: 0.5,
@@ -1362,7 +1362,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    S.of(context)?.noFriendRequests ?? 'No friend requests',
+                    S.of(context)?.contactNoFriendRequests ?? 'No friend requests',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -1395,7 +1395,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
     // Use userId for consistent color generation, userName for display
     final colorSource = request.userId.isNotEmpty ? request.userId : request.userName;
     final displayName = request.userName == 'Unknown User'
-        ? (S.of(context)?.unknownUser ?? 'Unknown User')
+        ? (S.of(context)?.commonUnknownUser ?? 'Unknown User')
         : request.userName;
     final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : '?';
 
@@ -1444,7 +1444,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
-            child: Text(S.of(context)?.accept ?? 'Accept'),
+            child: Text(S.of(context)?.commonAccept ?? 'Accept'),
           ),
           const SizedBox(width: 8),
           TextButton(
@@ -1457,7 +1457,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
-            child: Text(S.of(context)?.reject ?? 'Reject'),
+            child: Text(S.of(context)?.commonReject ?? 'Reject'),
           ),
         ],
       ),
@@ -1468,7 +1468,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
     context.read<ContactBloc>().add(AcceptFriendRequest(request.id));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.acceptedFriendRequest(request.userName) ?? 'Accepted ${request.userName}\'s friend request'),
+        content: Text(S.of(context)?.contactAcceptedFriendRequest(request.userName) ?? 'Accepted ${request.userName}\'s friend request'),
         backgroundColor: Colors.green,
       ),
     );
@@ -1478,7 +1478,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
     context.read<ContactBloc>().add(RejectFriendRequest(request.id));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.rejectedFriendRequest(request.userName) ?? 'Rejected ${request.userName}\'s friend request'),
+        content: Text(S.of(context)?.contactRejectedFriendRequest(request.userName) ?? 'Rejected ${request.userName}\'s friend request'),
       ),
     );
   }
@@ -1568,7 +1568,7 @@ class _GroupListPageState extends State<_GroupListPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: AppBar(
-        title: Text(S.of(context)?.groupChat ?? 'Group Chat'),
+        title: Text(S.of(context)?.commonGroupChat ?? 'Group Chat'),
         backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black,
         elevation: 0.5,
@@ -1620,7 +1620,7 @@ class _GroupListPageState extends State<_GroupListPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            S.of(context)?.noGroups ?? 'No groups',
+            S.of(context)?.commonNoGroups ?? 'No groups',
             style: TextStyle(
               fontSize: 16,
               color: isDark ? Colors.grey[400] : Colors.grey[600],
@@ -1630,7 +1630,7 @@ class _GroupListPageState extends State<_GroupListPage> {
           ElevatedButton.icon(
             onPressed: _navigateToCreateGroup,
             icon: const Icon(Icons.add),
-            label: Text(S.of(context)?.createGroup ?? 'Create Group'),
+            label: Text(S.of(context)?.commonCreateGroup ?? 'Create Group'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
@@ -1654,14 +1654,14 @@ class _GroupListPageState extends State<_GroupListPage> {
         children: [
           // 群邀请
           if (state.invites.isNotEmpty) ...[
-            _buildSectionHeader(S.of(context)?.groupInvites ?? 'Group Invites', isDark),
+            _buildSectionHeader(S.of(context)?.commonGroupInvites ?? 'Group Invites', isDark),
             ...state.invites.map((invite) => _buildInviteTile(invite, isDark)),
           ],
 
           // 我的群聊
           if (state.groups.isNotEmpty) ...[
             _buildSectionHeader(
-              '${S.of(context)?.myGroups ?? "My Groups"} (${state.groups.length})',
+              '${S.of(context)?.commonMyGroups ?? "My Groups"} (${state.groups.length})',
               isDark,
             ),
             ...state.groups.map((group) => _buildGroupTile(group, isDark)),
@@ -1704,7 +1704,7 @@ class _GroupListPageState extends State<_GroupListPage> {
           ),
         ),
         subtitle: Text(
-          S.of(context)?.memberCount(group.memberCount) ?? '${group.memberCount} members',
+          S.of(context)?.commonMemberCount(group.memberCount) ?? '${group.memberCount} members',
           style: TextStyle(
             fontSize: 13,
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -1741,7 +1741,7 @@ class _GroupListPageState extends State<_GroupListPage> {
           ),
         ),
         subtitle: Text(
-          S.of(context)?.invitedToJoinGroup ?? 'Invited to join group',
+          S.of(context)?.commonInvitedToJoinGroup ?? 'Invited to join group',
           style: const TextStyle(
             fontSize: 13,
             color: AppColors.primary,
@@ -1754,13 +1754,13 @@ class _GroupListPageState extends State<_GroupListPage> {
               onPressed: () {
                 _groupBloc.add(RejectGroupInvite(group.roomId));
               },
-              child: Text(S.of(context)?.reject ?? 'Reject'),
+              child: Text(S.of(context)?.commonReject ?? 'Reject'),
             ),
             TextButton(
               onPressed: () {
                 _groupBloc.add(AcceptGroupInvite(group.roomId));
               },
-              child: Text(S.of(context)?.accept ?? 'Accept'),
+              child: Text(S.of(context)?.commonAccept ?? 'Accept'),
             ),
           ],
         ),
@@ -1780,7 +1780,7 @@ class _GroupListPageState extends State<_GroupListPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.chat_bubble_outline),
-              title: Text(S.of(context)?.sendMessage ?? 'Send Message'),
+              title: Text(S.of(context)?.commonSendMessage ?? 'Send Message'),
               onTap: () {
                 Navigator.pop(ctx);
                 _navigateToChat(group.roomId);
@@ -1790,7 +1790,7 @@ class _GroupListPageState extends State<_GroupListPage> {
               ListTile(
                 leading: const Icon(Icons.delete_outline, color: Colors.red),
                 title: Text(
-                  S.of(context)?.dissolveGroup ?? 'Dissolve Group',
+                  S.of(context)?.commonDissolveGroup ?? 'Dissolve Group',
                   style: const TextStyle(color: Colors.red),
                 ),
                 onTap: () {
@@ -1802,7 +1802,7 @@ class _GroupListPageState extends State<_GroupListPage> {
               ListTile(
                 leading: const Icon(Icons.exit_to_app, color: Colors.red),
                 title: Text(
-                  S.of(context)?.leaveGroup ?? 'Leave Group',
+                  S.of(context)?.commonLeaveGroup ?? 'Leave Group',
                   style: const TextStyle(color: Colors.red),
                 ),
                 onTap: () {
@@ -1820,14 +1820,14 @@ class _GroupListPageState extends State<_GroupListPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.leaveGroup ?? 'Leave Group'),
+        title: Text(S.of(context)?.commonLeaveGroup ?? 'Leave Group'),
         content: Text(
-          '${S.of(context)?.confirmLeaveGroup ?? "Are you sure you want to leave"} "${group.name}"?',
+          '${S.of(context)?.commonConfirmLeaveGroup ?? "Are you sure you want to leave"} "${group.name}"?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -1835,7 +1835,7 @@ class _GroupListPageState extends State<_GroupListPage> {
               _groupBloc.add(LeaveGroup(group.roomId));
             },
             child: Text(
-              S.of(context)?.leave ?? 'Leave',
+              S.of(context)?.commonLeave ?? 'Leave',
               style: const TextStyle(color: Colors.red),
             ),
           ),
@@ -1848,14 +1848,14 @@ class _GroupListPageState extends State<_GroupListPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.dissolveGroup ?? 'Dissolve Group'),
+        title: Text(S.of(context)?.commonDissolveGroup ?? 'Dissolve Group'),
         content: Text(
-          '${S.of(context)?.confirmDissolveGroup ?? "Are you sure you want to dissolve"} "${group.name}"?',
+          '${S.of(context)?.commonConfirmDissolveGroup ?? "Are you sure you want to dissolve"} "${group.name}"?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -1863,7 +1863,7 @@ class _GroupListPageState extends State<_GroupListPage> {
               _groupBloc.add(DeleteGroup(group.roomId));
             },
             child: Text(
-              S.of(context)?.dissolve ?? 'Dissolve',
+              S.of(context)?.commonDissolve ?? 'Dissolve',
               style: const TextStyle(color: Colors.red),
             ),
           ),
@@ -1949,7 +1949,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
             child: Row(
               children: [
                 Text(
-                  S.of(context)?.selectFriendToRecommend ?? 'Select friend to recommend',
+                  S.of(context)?.contactSelectFriendToRecommend ?? 'Select friend to recommend',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -1972,7 +1972,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
             padding: const EdgeInsets.all(12),
             child: TextField(
               decoration: InputDecoration(
-                hintText: S.of(context)?.searchContacts ?? 'Search contacts',
+                hintText: S.of(context)?.commonSearchContacts ?? 'Search contacts',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: widget.isDark 
@@ -1997,7 +1997,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                 : _filteredContacts.isEmpty
                     ? Center(
                         child: Text(
-                          S.of(context)?.noContactsFound ?? 'No contacts found',
+                          S.of(context)?.contactNoContactsFound ?? 'No contacts found',
                           style: TextStyle(
                             color: widget.isDark ? Colors.white54 : Colors.black54,
                           ),

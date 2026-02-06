@@ -140,43 +140,43 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                     [
                       _MoreItem(
                         icon: Icons.photo_library_outlined,
-                        label: S.of(context)?.photos ?? 'Photos',
+                        label: S.of(context)?.contactPhotos ?? 'Photos',
                         onTap: widget.onPhotoPressed,
                       ),
                       _MoreItem(
                         icon: Icons.camera_alt_outlined,
-                        label: S.of(context)?.takePhoto ?? 'Camera',
+                        label: S.of(context)?.commonTakePhoto ?? 'Camera',
                         onTap: widget.onCameraPressed,
                       ),
                       _MoreItem(
                         icon: Icons.videocam_outlined,
-                        label: S.of(context)?.videoCall ?? 'Video Call',
+                        label: S.of(context)?.chatVideoCall ?? 'Video Call',
                         onTap: widget.onVideoCallPressed,
                       ),
                       _MoreItem(
                         icon: Icons.location_on_outlined,
-                        label: S.of(context)?.locationLabel ?? 'Location',
+                        label: S.of(context)?.commonLocationLabel ?? 'Location',
                         onTap: widget.onLocationPressed,
                       ),
                       _MoreItem(
                         icon: Icons.card_giftcard,
-                        label: S.of(context)?.redPacket ?? 'Red Packet',
+                        label: S.of(context)?.profileRedPacket ?? 'Red Packet',
                         onTap: widget.onRedPacketPressed,
                         iconColor: AppColors.redPacket,
                       ),
                       _MoreItem(
                         icon: Icons.swap_horiz,
-                        label: S.of(context)?.transfer ?? 'Transfer',
+                        label: S.of(context)?.commonTransfer ?? 'Transfer',
                         onTap: widget.onTransferPressed,
                       ),
                       _MoreItem(
                         icon: Icons.folder_outlined,
-                        label: S.of(context)?.fileLabel ?? 'File',
+                        label: S.of(context)?.commonFileLabel ?? 'File',
                         onTap: widget.onFilePressed,
                       ),
                       _MoreItem(
                         icon: Icons.person_outline,
-                        label: S.of(context)?.contactLabel ?? 'Contact',
+                        label: S.of(context)?.searchContactLabel ?? 'Contact',
                         onTap: widget.onContactCardPressed,
                       ),
                     ],
@@ -188,28 +188,28 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                     [
                       _MoreItem(
                         icon: Icons.star_outline,
-                        label: S.of(context)?.favorites ?? 'Favorites',
+                        label: S.of(context)?.commonFavorites ?? 'Favorites',
                         onTap: widget.onFavoritePressed,
                       ),
                       _MoreItem(
                         icon: Icons.music_note_outlined,
-                        label: S.of(context)?.music ?? 'Music',
+                        label: S.of(context)?.commonMusic ?? 'Music',
                         onTap: widget.onMusicPressed,
                       ),
                       _MoreItem(
                         icon: Icons.confirmation_num_outlined,
-                        label: S.of(context)?.coupon ?? 'Coupon',
+                        label: S.of(context)?.commonCoupon ?? 'Coupon',
                         onTap: widget.onCouponPressed,
                       ),
                       _MoreItem(
                         icon: Icons.redeem,
-                        label: S.of(context)?.gift ?? 'Gift',
+                        label: S.of(context)?.commonGift ?? 'Gift',
                         onTap: widget.onGiftPressed,
                         iconColor: AppColors.error,
                       ),
                       _MoreItem(
                         icon: Icons.poll_outlined,
-                        label: S.of(context)?.poll ?? 'Poll',
+                        label: S.of(context)?.commonPoll ?? 'Poll',
                         onTap: widget.onPollPressed,
                         iconColor: AppColors.primary,
                       ),
@@ -221,7 +221,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                       ),
                       _MoreItem(
                         icon: Icons.emoji_emotions_outlined,
-                        label: S.of(context)?.stickers ?? 'Stickers',
+                        label: S.of(context)?.profileStickers ?? 'Stickers',
                         onTap: widget.onStickerPressed,
                         iconColor: Colors.orange,
                       ),

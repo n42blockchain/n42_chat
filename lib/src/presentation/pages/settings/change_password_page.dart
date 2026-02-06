@@ -52,7 +52,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: N42AppBar(
-        title: S.of(context)?.changePassword ?? 'Change Password',
+        title: S.of(context)?.settingsChangePassword ?? 'Change Password',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -61,7 +61,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           if (state.changePasswordStatus == ChangePasswordStatus.success) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.passwordChanged ??
+                content: Text(S.of(context)?.settingsPasswordChanged ??
                     'Password changed successfully. Please login with your new password.'),
                 backgroundColor: AppColors.success,
               ),
@@ -72,7 +72,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage ??
-                    (S.of(context)?.changePasswordFailed ?? 'Change password failed')),
+                    (S.of(context)?.settingsChangePasswordFailed ?? 'Change password failed')),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -138,7 +138,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                               ),
                             )
                           : Text(
-                              S.of(context)?.confirm ?? 'Confirm',
+                              S.of(context)?.commonConfirm ?? 'Confirm',
                               style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,
@@ -181,7 +181,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              S.of(context)?.changePasswordInfo ??
+              S.of(context)?.settingsChangePasswordInfo ??
                   'After changing password, you will be logged out and need to login with the new password.',
               style: TextStyle(
                 fontSize: 14,
@@ -204,7 +204,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.currentPassword ?? 'Current Password',
+          S.of(context)?.settingsCurrentPassword ?? 'Current Password',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -216,7 +216,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           controller: _currentPasswordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterCurrentPassword ?? 'Enter current password',
+            hintText: S.of(context)?.settingsEnterCurrentPassword ?? 'Enter current password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -248,7 +248,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.enterCurrentPassword ?? 'Please enter current password';
+              return S.of(context)?.settingsEnterCurrentPassword ?? 'Please enter current password';
             }
             return null;
           },
@@ -267,7 +267,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.newPassword ?? 'New Password',
+          S.of(context)?.commonNewPassword ?? 'New Password',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -279,7 +279,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           controller: _newPasswordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterNewPassword ?? 'Enter new password',
+            hintText: S.of(context)?.settingsEnterNewPassword ?? 'Enter new password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -311,13 +311,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.enterNewPassword ?? 'Please enter new password';
+              return S.of(context)?.settingsEnterNewPassword ?? 'Please enter new password';
             }
             if (value.length < 8) {
-              return S.of(context)?.passwordMinLength ?? 'Password must be at least 8 characters';
+              return S.of(context)?.commonPasswordMinLength ?? 'Password must be at least 8 characters';
             }
             if (value == _currentPasswordController.text) {
-              return S.of(context)?.newPasswordMustBeDifferent ??
+              return S.of(context)?.settingsNewPasswordMustBeDifferent ??
                   'New password must be different from current password';
             }
             return null;
@@ -337,7 +337,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.confirmNewPassword ?? 'Confirm New Password',
+          S.of(context)?.commonConfirmNewPassword ?? 'Confirm New Password',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -349,7 +349,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           controller: _confirmPasswordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.reenterPassword ?? 'Re-enter password',
+            hintText: S.of(context)?.commonReenterPassword ?? 'Re-enter password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -382,10 +382,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           onFieldSubmitted: (_) => _changePassword(),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.reenterPassword ?? 'Please re-enter password';
+              return S.of(context)?.commonReenterPassword ?? 'Please re-enter password';
             }
             if (value != _newPasswordController.text) {
-              return S.of(context)?.passwordsDoNotMatch ?? 'Passwords do not match';
+              return S.of(context)?.commonPasswordsDoNotMatch ?? 'Passwords do not match';
             }
             return null;
           },
@@ -401,7 +401,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.passwordRequirements ?? 'Password requirements:',
+          S.of(context)?.settingsPasswordRequirements ?? 'Password requirements:',
           style: TextStyle(
             fontSize: 12,
             color: textColor,
@@ -409,7 +409,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         ),
         const SizedBox(height: 4),
         Text(
-          '• ${S.of(context)?.passwordMinLength ?? 'At least 8 characters'}',
+          '• ${S.of(context)?.commonPasswordMinLength ?? 'At least 8 characters'}',
           style: TextStyle(
             fontSize: 12,
             color: textColor,
@@ -438,7 +438,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              S.of(context)?.securityNote ??
+              S.of(context)?.settingsSecurityNote ??
                   'For security, you will need to re-login on all devices after changing password.',
               style: TextStyle(
                 fontSize: 12,

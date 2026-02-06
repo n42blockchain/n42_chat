@@ -101,7 +101,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: widget.showAppBar ? N42AppBar(
-        title: S.of(context)?.me ?? 'Me',
+        title: S.of(context)?.commonMe ?? 'Me',
         showBackButton: false,
       ) : null,
       body: ListView(
@@ -121,8 +121,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.verified_outlined,
                 iconColor: AppColors.primary,
-                title: S.of(context)?.services ?? 'Services',
-                onTap: () => _showComingSoon(context, S.of(context)?.services ?? 'Services'),
+                title: S.of(context)?.profileServices ?? 'Services',
+                onTap: () => _showComingSoon(context, S.of(context)?.profileServices ?? 'Services'),
               ),
             ],
           ),
@@ -139,7 +139,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.inventory_2_outlined,
                 iconColor: const Color(0xFFFF9F0A),
-                title: S.of(context)?.favorites ?? 'Favorites',
+                title: S.of(context)?.commonFavorites ?? 'Favorites',
                 onTap: () => _openFavorites(context),
               ),
               _buildDivider(context, isDark),
@@ -148,8 +148,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.photo_library_outlined,
                 iconColor: const Color(0xFF007AFF),
-                title: S.of(context)?.moments ?? 'Moments',
-                onTap: () => _showComingSoon(context, S.of(context)?.moments ?? 'Moments'),
+                title: S.of(context)?.commonMoments ?? 'Moments',
+                onTap: () => _showComingSoon(context, S.of(context)?.commonMoments ?? 'Moments'),
               ),
               _buildDivider(context, isDark),
               _buildMenuItem(
@@ -157,8 +157,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.card_giftcard_outlined,
                 iconColor: const Color(0xFFFF6B6B),
-                title: S.of(context)?.ordersAndCards ?? 'Orders & Cards',
-                onTap: () => _showComingSoon(context, S.of(context)?.ordersAndCards ?? 'Orders & Cards'),
+                title: S.of(context)?.profileOrdersAndCards ?? 'Orders & Cards',
+                onTap: () => _showComingSoon(context, S.of(context)?.profileOrdersAndCards ?? 'Orders & Cards'),
               ),
               _buildDivider(context, isDark),
               _buildMenuItem(
@@ -166,8 +166,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.emoji_emotions_outlined,
                 iconColor: const Color(0xFFFFCC00),
-                title: S.of(context)?.stickers ?? 'Stickers',
-                onTap: () => _showComingSoon(context, S.of(context)?.stickers ?? 'Stickers'),
+                title: S.of(context)?.profileStickers ?? 'Stickers',
+                onTap: () => _showComingSoon(context, S.of(context)?.profileStickers ?? 'Stickers'),
               ),
             ],
           ),
@@ -184,7 +184,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 isDark: isDark,
                 icon: Icons.settings_outlined,
                 iconColor: const Color(0xFF5E97F6),
-                title: S.of(context)?.settings ?? 'Settings',
+                title: S.of(context)?.commonSettings ?? 'Settings',
                 onTap: () => _openSettings(context),
               ),
             ],
@@ -231,7 +231,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       // 用户名
                       Text(
-                        _displayName ?? (S.of(context)?.notLoggedIn ?? 'Not Logged In'),
+                        _displayName ?? (S.of(context)?.profileNotLoggedIn ?? 'Not Logged In'),
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
@@ -241,7 +241,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 6),
                       // N42号
                       Text(
-                        S.of(context)?.n42IdLabel(n42Id) ?? 'N42 ID: $n42Id',
+                        S.of(context)?.profileN42IdLabel(n42Id) ?? 'N42 ID: $n42Id',
                         style: TextStyle(
                           fontSize: 15,
                           color: subtitleColor,
@@ -258,12 +258,12 @@ class _ProfilePageState extends State<ProfilePage> {
                               showDialog<void>(
                                 context: context,
                                 builder: (ctx) => AlertDialog(
-                                  title: Text(S.of(context)?.clearStatus ?? 'Clear Status'),
-                                  content: Text(S.of(context)?.clearStatusConfirm ?? 'Are you sure you want to clear your status?'),
+                                  title: Text(S.of(context)?.profileClearStatus ?? 'Clear Status'),
+                                  content: Text(S.of(context)?.profileClearStatusConfirm ?? 'Are you sure you want to clear your status?'),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(ctx),
-                                      child: Text(S.of(context)?.cancel ?? 'Cancel'),
+                                      child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
                                     ),
                                     TextButton(
                                       onPressed: () {
@@ -271,13 +271,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                         setState(() => _statusText = null);
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                            content: Text(S.of(context)?.statusCleared ?? 'Status cleared'),
+                                            content: Text(S.of(context)?.profileStatusCleared ?? 'Status cleared'),
                                             duration: const Duration(seconds: 1),
                                           ),
                                         );
                                       },
                                       child: Text(
-                                        S.of(context)?.clear ?? 'Clear',
+                                        S.of(context)?.commonClear ?? 'Clear',
                                         style: const TextStyle(color: AppColors.error),
                                       ),
                                     ),
@@ -305,7 +305,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     const SizedBox(width: 2),
                                   ],
                                   Text(
-                                    _statusText ?? (S.of(context)?.status ?? 'Status'),
+                                    _statusText ?? (S.of(context)?.profileStatus ?? 'Status'),
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: subtitleColor,
@@ -456,7 +456,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.statusSetTo(result) ?? 'Status set to: $result'),
+          content: Text(S.of(context)?.profileStatusSetTo(result) ?? 'Status set to: $result'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -543,19 +543,19 @@ class _ProfilePageState extends State<ProfilePage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.logout ?? 'Log Out'),
-        content: Text(S.of(context)?.logoutConfirm ?? 'Are you sure you want to log out?'),
+        title: Text(S.of(context)?.commonLogout ?? 'Log Out'),
+        content: Text(S.of(context)?.commonLogoutConfirm ?? 'Are you sure you want to log out?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               context.read<AuthBloc>().add(const AuthLogoutRequested());
             },
-            child: Text(S.of(context)?.logout ?? 'Log Out', style: const TextStyle(color: AppColors.error)),
+            child: Text(S.of(context)?.commonLogout ?? 'Log Out', style: const TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -571,7 +571,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void _showComingSoon(BuildContext context, String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.featureComingSoon(feature) ?? '$feature coming soon'),
+        content: Text(S.of(context)?.commonFeatureComingSoon(feature) ?? '$feature coming soon'),
         duration: const Duration(seconds: 2),
       ),
     );

@@ -107,7 +107,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  l10n?.quickReply ?? 'Quick Reply',
+                  l10n?.settingsQuickReply ?? 'Quick Reply',
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
@@ -121,7 +121,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
                       widget.onManage?.call();
                     },
                     child: Text(
-                      l10n?.manageQuickReplies ?? 'Manage',
+                      l10n?.settingsManageQuickReplies ?? 'Manage',
                       style: const TextStyle(
                         color: AppColors.primary,
                         fontSize: 14,
@@ -168,7 +168,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
           ),
           const SizedBox(height: 16),
           Text(
-            l10n?.noQuickReplies ?? 'No quick replies',
+            l10n?.settingsNoQuickReplies ?? 'No quick replies',
             style: TextStyle(
               fontSize: 15,
               color: isDark ? Colors.white54 : Colors.black45,

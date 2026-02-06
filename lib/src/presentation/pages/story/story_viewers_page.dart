@@ -37,7 +37,7 @@ class StoryViewersPage extends StatelessWidget {
         title: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n?.viewers ?? 'Viewers'),
+            Text(l10n?.storyViewers ?? 'Viewers'),
             if (viewers.isNotEmpty)
               Text(
                 '${viewers.length}',
@@ -60,7 +60,7 @@ class StoryViewersPage extends StatelessWidget {
       body: viewers.isEmpty
           ? N42EmptyState(
               icon: Icons.visibility_off_outlined,
-              title: l10n?.noViewers ?? 'No viewers yet',
+              title: l10n?.storyNoViewers ?? 'No viewers yet',
             )
           : ListView.builder(
               itemCount: viewers.length,

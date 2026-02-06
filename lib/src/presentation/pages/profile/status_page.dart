@@ -19,57 +19,57 @@ class _StatusPageState extends State<StatusPage> {
     final s = S.of(context);
     return [
       StatusCategory(
-        title: s?.moodAndThoughts ?? 'Mood & Thoughts',
+        title: s?.profileMoodAndThoughts ?? 'Mood & Thoughts',
         items: [
-          StatusItem(icon: Icons.sentiment_very_satisfied, text: s?.statusHappy ?? 'Happy'),
-          StatusItem(icon: Icons.sentiment_dissatisfied, text: s?.statusCracked ?? 'Shattered'),
-          StatusItem(icon: Icons.auto_awesome, text: s?.statusLucky ?? 'Lucky'),
-          StatusItem(icon: Icons.wb_sunny_outlined, text: s?.statusSunny ?? 'Sunny'),
-          StatusItem(icon: Icons.airline_seat_recline_normal, text: s?.statusTired ?? 'Tired'),
-          StatusItem(icon: Icons.psychology_outlined, text: s?.statusDaydream ?? 'Daydream'),
-          StatusItem(icon: Icons.flash_on, text: s?.statusRushing ?? 'Rushing'),
+          StatusItem(icon: Icons.sentiment_very_satisfied, text: s?.profileStatusHappy ?? 'Happy'),
+          StatusItem(icon: Icons.sentiment_dissatisfied, text: s?.profileStatusCracked ?? 'Shattered'),
+          StatusItem(icon: Icons.auto_awesome, text: s?.profileStatusLucky ?? 'Lucky'),
+          StatusItem(icon: Icons.wb_sunny_outlined, text: s?.profileStatusSunny ?? 'Sunny'),
+          StatusItem(icon: Icons.airline_seat_recline_normal, text: s?.profileStatusTired ?? 'Tired'),
+          StatusItem(icon: Icons.psychology_outlined, text: s?.profileStatusDaydream ?? 'Daydream'),
+          StatusItem(icon: Icons.flash_on, text: s?.profileStatusRushing ?? 'Rushing'),
           StatusItem(icon: Icons.mood_bad, text: 'emo'),
-          StatusItem(icon: Icons.cloud_outlined, text: s?.statusOverthinking ?? 'Overthinking'),
-          StatusItem(icon: Icons.celebration, text: s?.statusEnergized ?? 'Energized'),
+          StatusItem(icon: Icons.cloud_outlined, text: s?.profileStatusOverthinking ?? 'Overthinking'),
+          StatusItem(icon: Icons.celebration, text: s?.profileStatusEnergized ?? 'Energized'),
           StatusItem(icon: Icons.smart_toy_outlined, text: 'bot'),
         ],
       ),
       StatusCategory(
-        title: s?.workAndStudy ?? 'Work & Study',
+        title: s?.profileWorkAndStudy ?? 'Work & Study',
         items: [
-          StatusItem(icon: Icons.construction, text: s?.statusWorking ?? 'Working'),
-          StatusItem(icon: Icons.menu_book, text: s?.statusStudying ?? 'Studying'),
-          StatusItem(icon: Icons.work_outline, text: s?.statusBusy ?? 'Busy'),
-          StatusItem(icon: Icons.catching_pokemon, text: s?.statusSlacking ?? 'Slacking'),
-          StatusItem(icon: Icons.flight_takeoff, text: s?.statusTraveling ?? 'Traveling'),
-          StatusItem(icon: Icons.directions_run, text: s?.statusGoingHome ?? 'Going Home'),
-          StatusItem(icon: Icons.do_not_disturb_on_outlined, text: s?.statusDnd ?? 'Do Not Disturb'),
+          StatusItem(icon: Icons.construction, text: s?.profileStatusWorking ?? 'Working'),
+          StatusItem(icon: Icons.menu_book, text: s?.profileStatusStudying ?? 'Studying'),
+          StatusItem(icon: Icons.work_outline, text: s?.profileStatusBusy ?? 'Busy'),
+          StatusItem(icon: Icons.catching_pokemon, text: s?.profileStatusSlacking ?? 'Slacking'),
+          StatusItem(icon: Icons.flight_takeoff, text: s?.profileStatusTraveling ?? 'Traveling'),
+          StatusItem(icon: Icons.directions_run, text: s?.profileStatusGoingHome ?? 'Going Home'),
+          StatusItem(icon: Icons.do_not_disturb_on_outlined, text: s?.profileStatusDnd ?? 'Do Not Disturb'),
         ],
       ),
       StatusCategory(
-        title: s?.activities ?? 'Activities',
+        title: s?.profileActivities ?? 'Activities',
         items: [
-          StatusItem(icon: Icons.surfing, text: s?.statusHanging ?? 'Hanging Out'),
-          StatusItem(icon: Icons.check_circle_outline, text: s?.statusCheckIn ?? 'Check In'),
-          StatusItem(icon: Icons.fitness_center, text: s?.statusExercising ?? 'Exercising'),
-          StatusItem(icon: Icons.coffee_outlined, text: s?.statusCoffee ?? 'Coffee'),
-          StatusItem(icon: Icons.local_cafe_outlined, text: s?.statusBubbleTea ?? 'Bubble Tea'),
-          StatusItem(icon: Icons.rice_bowl, text: s?.statusEating ?? 'Eating'),
-          StatusItem(icon: Icons.child_friendly, text: s?.statusParenting ?? 'Parenting'),
-          StatusItem(icon: Icons.public, text: s?.statusSavingWorld ?? 'Saving World'),
-          StatusItem(icon: Icons.camera_alt_outlined, text: s?.statusSelfie ?? 'Selfie'),
+          StatusItem(icon: Icons.surfing, text: s?.profileStatusHanging ?? 'Hanging Out'),
+          StatusItem(icon: Icons.check_circle_outline, text: s?.profileStatusCheckIn ?? 'Check In'),
+          StatusItem(icon: Icons.fitness_center, text: s?.profileStatusExercising ?? 'Exercising'),
+          StatusItem(icon: Icons.coffee_outlined, text: s?.profileStatusCoffee ?? 'Coffee'),
+          StatusItem(icon: Icons.local_cafe_outlined, text: s?.profileStatusBubbleTea ?? 'Bubble Tea'),
+          StatusItem(icon: Icons.rice_bowl, text: s?.profileStatusEating ?? 'Eating'),
+          StatusItem(icon: Icons.child_friendly, text: s?.profileStatusParenting ?? 'Parenting'),
+          StatusItem(icon: Icons.public, text: s?.profileStatusSavingWorld ?? 'Saving World'),
+          StatusItem(icon: Icons.camera_alt_outlined, text: s?.profileStatusSelfie ?? 'Selfie'),
         ],
       ),
       StatusCategory(
-        title: s?.rest ?? 'Rest',
+        title: s?.profileRest ?? 'Rest',
         items: [
-          StatusItem(icon: Icons.self_improvement, text: s?.statusRetreat ?? 'Retreat'),
-          StatusItem(icon: Icons.home_outlined, text: s?.statusHome ?? 'Home'),
-          StatusItem(icon: Icons.bedtime_outlined, text: s?.statusSleeping ?? 'Sleeping'),
-          StatusItem(icon: Icons.pets, text: s?.statusCatLover ?? 'Cat Lover'),
-          StatusItem(icon: Icons.pets_outlined, text: s?.statusDogWalking ?? 'Walking Dog'),
-          StatusItem(icon: Icons.sports_esports, text: s?.statusGaming ?? 'Gaming'),
-          StatusItem(icon: Icons.headphones, text: s?.statusListening ?? 'Listening'),
+          StatusItem(icon: Icons.self_improvement, text: s?.profileStatusRetreat ?? 'Retreat'),
+          StatusItem(icon: Icons.home_outlined, text: s?.profileStatusHome ?? 'Home'),
+          StatusItem(icon: Icons.bedtime_outlined, text: s?.profileStatusSleeping ?? 'Sleeping'),
+          StatusItem(icon: Icons.pets, text: s?.profileStatusCatLover ?? 'Cat Lover'),
+          StatusItem(icon: Icons.pets_outlined, text: s?.profileStatusDogWalking ?? 'Walking Dog'),
+          StatusItem(icon: Icons.sports_esports, text: s?.profileStatusGaming ?? 'Gaming'),
+          StatusItem(icon: Icons.headphones, text: s?.profileStatusListening ?? 'Listening'),
         ],
       ),
     ];
@@ -130,7 +130,7 @@ class _StatusPageState extends State<StatusPage> {
             child: Column(
               children: [
                 Text(
-                  S.of(context)?.setStatus ?? 'Set Status',
+                  S.of(context)?.profileSetStatus ?? 'Set Status',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -139,7 +139,7 @@ class _StatusPageState extends State<StatusPage> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  S.of(context)?.visibleToFriends24h ?? 'Visible to friends for 24 hours',
+                  S.of(context)?.profileVisibleToFriends24h ?? 'Visible to friends for 24 hours',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white.withValues(alpha: 0.8),
@@ -177,7 +177,7 @@ class _StatusPageState extends State<StatusPage> {
             ),
             const SizedBox(width: 12),
             Text(
-              S.of(context)?.writeStatus ?? 'Write Status',
+              S.of(context)?.profileWriteStatus ?? 'Write Status',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.white.withValues(alpha: 0.8),
@@ -269,20 +269,20 @@ class _StatusPageState extends State<StatusPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.writeStatus ?? 'Write Status'),
+        title: Text(S.of(context)?.profileWriteStatus ?? 'Write Status'),
         content: TextField(
           controller: _customController,
           autofocus: true,
           maxLength: 20,
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterYourStatus ?? 'Enter your status...',
+            hintText: S.of(context)?.profileEnterYourStatus ?? 'Enter your status...',
             border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -291,7 +291,7 @@ class _StatusPageState extends State<StatusPage> {
                 Navigator.pop(context, _customController.text.trim());
               }
             },
-            child: Text(S.of(context)?.ok ?? 'OK'),
+            child: Text(S.of(context)?.profileOk ?? 'OK'),
           ),
         ],
       ),

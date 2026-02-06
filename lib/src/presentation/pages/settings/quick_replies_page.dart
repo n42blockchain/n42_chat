@@ -65,12 +65,12 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n?.deleteQuickReply ?? 'Delete Quick Reply'),
+        title: Text(l10n?.settingsDeleteQuickReply ?? 'Delete Quick Reply'),
         content: Text('Delete "${reply.content}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n?.cancel ?? 'Cancel'),
+            child: Text(l10n?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -81,7 +81,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
               _saveReplies();
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(l10n?.delete ?? 'Delete'),
+            child: Text(l10n?.commonDelete ?? 'Delete'),
           ),
         ],
       ),
@@ -97,21 +97,21 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(isEditing
-            ? (l10n?.editQuickReply ?? 'Edit Quick Reply')
-            : (l10n?.addQuickReply ?? 'Add Quick Reply')),
+            ? (l10n?.settingsEditQuickReply ?? 'Edit Quick Reply')
+            : (l10n?.settingsAddQuickReply ?? 'Add Quick Reply')),
         content: TextField(
           controller: controller,
           autofocus: true,
           maxLength: 100,
           decoration: InputDecoration(
-            hintText: l10n?.quickReply ?? 'Quick Reply',
+            hintText: l10n?.settingsQuickReply ?? 'Quick Reply',
             border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n?.cancel ?? 'Cancel'),
+            child: Text(l10n?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -141,7 +141,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
               });
               _saveReplies();
             },
-            child: Text(l10n?.save ?? 'Save'),
+            child: Text(l10n?.commonSave ?? 'Save'),
           ),
         ],
       ),
@@ -160,7 +160,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n?.cancel ?? 'Cancel'),
+            child: Text(l10n?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -186,14 +186,14 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: l10n?.manageQuickReplies ?? 'Manage Quick Replies',
+        title: l10n?.settingsManageQuickReplies ?? 'Manage Quick Replies',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: _addReply,
-            tooltip: l10n?.addQuickReply ?? 'Add',
+            tooltip: l10n?.settingsAddQuickReply ?? 'Add',
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -211,7 +211,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
         ],
       ),
       body: _isLoading
-          ? N42Loading(message: l10n?.loading ?? 'Loading...')
+          ? N42Loading(message: l10n?.commonLoading ?? 'Loading...')
           : _replies.isEmpty
               ? _buildEmptyState(isDark, l10n)
               : _buildReplyList(isDark),
@@ -220,9 +220,9 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
 
   Widget _buildEmptyState(bool isDark, S? l10n) {
     return N42EmptyState.noData(
-      title: l10n?.noQuickReplies ?? 'No quick replies',
-      description: l10n?.defaultQuickReplies ?? 'Default quick replies will be shown',
-      buttonText: l10n?.addQuickReply ?? 'Add Quick Reply',
+      title: l10n?.settingsNoQuickReplies ?? 'No quick replies',
+      description: l10n?.settingsDefaultQuickReplies ?? 'Default quick replies will be shown',
+      buttonText: l10n?.settingsAddQuickReply ?? 'Add Quick Reply',
       onButtonPressed: _addReply,
     );
   }

@@ -92,7 +92,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
             child: Row(
               children: [
                 Text(
-                  S.of(context)?.selectForwardTargetTitle ?? 'Select Forward Target',
+                  S.of(context)?.chatSelectForwardTargetTitle ?? 'Select Forward Target',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -114,7 +114,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: S.of(context)?.searchHint ?? 'Search',
+                hintText: S.of(context)?.chatSearchHint ?? 'Search',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: widget.isDark
@@ -192,8 +192,8 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
       return Center(
         child: Text(
           _conversations.isEmpty
-              ? (S.of(context)?.noForwardableChat ?? 'No chats available for forwarding')
-              : (S.of(context)?.noMatchingChat ?? 'No matching chats found'),
+              ? (S.of(context)?.chatNoForwardableChat ?? 'No chats available for forwarding')
+              : (S.of(context)?.chatNoMatchingChat ?? 'No matching chats found'),
           style: TextStyle(
             color: widget.isDark ? Colors.white54 : Colors.black54,
           ),
@@ -273,19 +273,19 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
       case MessageType.text:
         return message.content;
       case MessageType.image:
-        return S.of(context)?.image ?? '[Image]';
+        return S.of(context)?.commonImage ?? '[Image]';
       case MessageType.audio:
-        return S.of(context)?.voice ?? '[Voice]';
+        return S.of(context)?.chatVoice ?? '[Voice]';
       case MessageType.video:
-        return S.of(context)?.video ?? '[Video]';
+        return S.of(context)?.chatVideo ?? '[Video]';
       case MessageType.file:
-        return '${S.of(context)?.file ?? '[File]'} ${message.metadata?.fileName ?? ''}';
+        return '${S.of(context)?.commonFile ?? '[File]'} ${message.metadata?.fileName ?? ''}';
       case MessageType.location:
-        return '${S.of(context)?.location ?? '[Location]'} ${message.content}';
+        return '${S.of(context)?.chatLocation ?? '[Location]'} ${message.content}';
       case MessageType.music:
         return '[Music] ${message.metadata?.musicTitle ?? ''}';
       default:
-        return S.of(context)?.unknownMessage ?? '[Message]';
+        return S.of(context)?.chatUnknownMessage ?? '[Message]';
     }
   }
 }

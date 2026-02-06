@@ -74,21 +74,21 @@ class _TransferPageState extends State<TransferPage> {
 
     if (!_isAddressValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.enterValidAddress ?? 'Please enter a valid address')),
+        SnackBar(content: Text(S.of(context)?.transferEnterValidAddress ?? 'Please enter a valid address')),
       );
       return;
     }
 
     if (amount.isEmpty || double.tryParse(amount) == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.enterValidAmount ?? 'Please enter a valid amount')),
+        SnackBar(content: Text(S.of(context)?.transferEnterValidAmount ?? 'Please enter a valid amount')),
       );
       return;
     }
 
     if (_selectedToken == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.pleaseSelectToken ?? 'Please select a token')),
+        SnackBar(content: Text(S.of(context)?.transferPleaseSelectToken ?? 'Please select a token')),
       );
       return;
     }
@@ -170,7 +170,7 @@ class _TransferPageState extends State<TransferPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 收款地址
-          _buildSectionTitle(S.of(context)?.receiverAddressLabel ?? 'Receiver Address', isDark),
+          _buildSectionTitle(S.of(context)?.transferReceiverAddressLabel ?? 'Receiver Address', isDark),
           const SizedBox(height: 8),
           _buildAddressInput(isDark),
 
@@ -181,7 +181,7 @@ class _TransferPageState extends State<TransferPage> {
           const SizedBox(height: 24),
 
           // 代币选择
-          _buildSectionTitle(S.of(context)?.selectTokenLabel ?? 'Select Token', isDark),
+          _buildSectionTitle(S.of(context)?.transferSelectTokenLabel ?? 'Select Token', isDark),
           const SizedBox(height: 8),
           _buildTokenSelector(tokens, balances, isDark),
 
@@ -195,7 +195,7 @@ class _TransferPageState extends State<TransferPage> {
           const SizedBox(height: 24),
 
           // 备注
-          _buildSectionTitle(S.of(context)?.memoLabel ?? 'Memo (Optional)', isDark),
+          _buildSectionTitle(S.of(context)?.transferMemoLabel ?? 'Memo (Optional)', isDark),
           const SizedBox(height: 8),
           _buildMemoInput(isDark),
 
@@ -238,7 +238,7 @@ class _TransferPageState extends State<TransferPage> {
             child: TextField(
               controller: _addressController,
               decoration: InputDecoration(
-                hintText: S.of(context)?.enterOrPasteAddress ?? 'Enter or paste wallet address',
+                hintText: S.of(context)?.transferEnterOrPasteAddress ?? 'Enter or paste wallet address',
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -276,7 +276,7 @@ class _TransferPageState extends State<TransferPage> {
             onPressed: () {
               // TODO: 实现二维码扫描
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(S.of(context)?.scanFeatureComingSoon ?? 'Scan feature coming soon...')),
+                SnackBar(content: Text(S.of(context)?.transferScanFeatureComingSoon ?? 'Scan feature coming soon...')),
               );
             },
           ),
@@ -303,7 +303,7 @@ class _TransferPageState extends State<TransferPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                name ?? (S.of(context)?.unknownUser ?? 'Unknown User'),
+                name ?? (S.of(context)?.commonUnknownUser ?? 'Unknown User'),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -312,7 +312,7 @@ class _TransferPageState extends State<TransferPage> {
               ),
               if (_isAddressValid)
                 Text(
-                  S.of(context)?.addressVerified ?? 'Address verified',
+                  S.of(context)?.transferAddressVerified ?? 'Address verified',
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.success,
@@ -419,7 +419,7 @@ class _TransferPageState extends State<TransferPage> {
                         ),
                       ),
                       Text(
-                        S.of(context)?.available ?? 'Available',
+                        S.of(context)?.transferAvailable ?? 'Available',
                         style: TextStyle(
                           fontSize: 11,
                           color: isDark
@@ -466,7 +466,7 @@ class _TransferPageState extends State<TransferPage> {
                   controller: _amountController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
-                    hintText: S.of(context)?.amountHintZero ?? '0.00',
+                    hintText: S.of(context)?.transferAmountHintZero ?? '0.00',
                     border: InputBorder.none,
                     hintStyle: TextStyle(
                       fontSize: 32,
@@ -497,7 +497,7 @@ class _TransferPageState extends State<TransferPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${S.of(context)?.availableBalance ?? 'Available balance'}: $balance ${_selectedToken?.symbol ?? ''}',
+                '${S.of(context)?.transferAvailableBalance ?? 'Available balance'}: $balance ${_selectedToken?.symbol ?? ''}',
                 style: TextStyle(
                   fontSize: 13,
                   color: isDark
@@ -509,7 +509,7 @@ class _TransferPageState extends State<TransferPage> {
                 onPressed: () {
                   _amountController.text = balance;
                 },
-                child: Text(S.of(context)?.all ?? 'All'),
+                child: Text(S.of(context)?.commonAll ?? 'All'),
               ),
             ],
           ),
@@ -527,7 +527,7 @@ class _TransferPageState extends State<TransferPage> {
       child: TextField(
         controller: _memoController,
         decoration: InputDecoration(
-          hintText: S.of(context)?.addMemoHint ?? 'Add memo',
+          hintText: S.of(context)?.transferAddMemoHint ?? 'Add memo',
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(16),
           hintStyle: TextStyle(
@@ -547,7 +547,7 @@ class _TransferPageState extends State<TransferPage> {
     return SizedBox(
       width: double.infinity,
       child: N42Button(
-        text: S.of(context)?.confirmTransfer ?? 'Confirm Transfer',
+        text: S.of(context)?.transferConfirmTransfer ?? 'Confirm Transfer',
         onPressed: _submitTransfer,
       ),
     );

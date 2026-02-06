@@ -9,1186 +9,635 @@ class STr extends S {
   STr([String locale = 'tr']) : super(locale);
 
   @override
-  String get chatModuleInitFailed => 'Sohbet modülü başlatılamadı';
+  String get commonRetry => 'Tekrar Dene';
 
   @override
-  String get checkNetworkRetry =>
-      'Lütfen ağ bağlantınızı kontrol edin ve tekrar deneyin';
+  String get commonUnknownUser => 'Bilinmeyen Kullanıcı';
 
   @override
-  String get retry => 'Tekrar Dene';
+  String get transferWalletNotConnected => 'Cüzdan bağlı değil';
 
   @override
-  String get unknownUser => 'Bilinmeyen Kullanıcı';
+  String get chatCallServiceNotInitialized => 'Arama servisi başlatılmadı';
 
   @override
-  String get walletNotConnected => 'Cüzdan bağlı değil';
-
-  @override
-  String get cannotGetWalletAddress => 'Cüzdan adresi alınamadı';
-
-  @override
-  String paymentRequestMemo(String requestId) {
-    return 'Ödeme talebi: $requestId';
-  }
-
-  @override
-  String get callServiceNotInitialized => 'Arama servisi başlatılmadı';
-
-  @override
-  String get alreadyInCall => 'Zaten bir aramada';
-
-  @override
-  String get meetingServiceNotInitialized => 'Toplantı servisi başlatılmadı';
-
-  @override
-  String get livekitNotConfigured => 'LiveKit yapılandırılmadı';
-
-  @override
-  String get unknownConversation => 'Bilinmeyen sohbet';
-
-  @override
-  String startCallFailed(String error) {
-    return 'Arama başlatılamadı: $error';
-  }
-
-  @override
-  String answerCallFailed(String error) {
-    return 'Yanıtlanamadı: $error';
-  }
-
-  @override
-  String get connectionFailed => 'Bağlantı başarısız';
-
-  @override
-  String get callRejected => 'Arama reddedildi';
-
-  @override
-  String get noAnswer => 'Cevap yok';
-
-  @override
-  String get invalidLoginResponse => 'Geçersiz giriş yanıtı';
-
-  @override
-  String loginFailed(String error) {
+  String authLoginFailed(String error) {
     return 'Giriş başarısız: $error';
   }
 
   @override
-  String get sessionRestoreFailed => 'Oturum geri yüklenemedi';
+  String get chatCallBack => 'Geri ara';
 
   @override
-  String get additionalVerificationRequired => 'Ek doğrulama gerekli';
+  String get chatMissedVideoCall => 'Cevapsız görüntülü arama';
 
   @override
-  String registrationFailed(String error) {
-    return 'Kayıt başarısız: $error';
-  }
+  String get chatMissedVoiceCall => 'Cevapsız sesli arama';
 
   @override
-  String cannotConnectServer(String error) {
-    return 'Sunucuya bağlanılamadı: $error';
-  }
+  String get chatCallNotAnswered => 'Cevaplanmadı';
 
   @override
-  String get wrongUsernamePassword => 'Yanlış kullanıcı adı veya şifre';
+  String get chatCallDurationLabel => 'Arama süresi';
 
   @override
-  String get usernameTaken => 'Kullanıcı adı zaten alınmış';
+  String get chatVoiceCallCancelled => 'Sesli arama iptal edildi';
 
   @override
-  String get invalidUsernameFormat => 'Geçersiz kullanıcı adı formatı';
+  String get chatVideoCallCancelled => 'Görüntülü arama iptal edildi';
 
   @override
-  String get rateLimitExceeded =>
-      'Çok fazla istek, lütfen daha sonra tekrar deneyin';
+  String get commonImage => '[Resim]';
 
   @override
-  String get loginExpired => 'Oturum süresi doldu';
+  String get chatVideo => '[Video]';
 
   @override
-  String joinMeetingFailed(String error) {
-    return 'Toplantıya katılınamadı: $error';
-  }
+  String get chatVoice => '[Ses]';
 
   @override
-  String screenShareFailed(String error) {
-    return 'Ekran paylaşımı başarısız: $error';
-  }
+  String get commonFile => '[Dosya]';
 
   @override
-  String get answer => 'Yanıtla';
+  String get chatLocation => '[Konum]';
 
   @override
-  String get decline => 'Reddet';
+  String get chatUnknownMessage => '[Bilinmeyen mesaj]';
 
   @override
-  String get missedCall => 'Cevapsız arama';
+  String get commonDelete => 'Sil';
 
   @override
-  String get callBack => 'Geri ara';
+  String get chatDeleteThisMessage => 'Bu mesajı silmek istiyor musunuz?';
 
   @override
-  String get incomingCall => 'Gelen arama';
+  String get chatMessageDeleted => 'Mesaj silindi';
 
   @override
-  String get missedVideoCall => 'Cevapsız görüntülü arama';
+  String get profileNotLoggedIn => 'Giriş yapılmadı';
 
   @override
-  String get missedVoiceCall => 'Cevapsız sesli arama';
+  String get chatMyLocation => 'Konumum';
 
   @override
-  String get voiceCallTitle => '语音通话';
+  String get commonGroupChat => 'Grup Sohbeti';
 
   @override
-  String get videoCallTitle => '视频通话';
+  String get commonSearch => 'Ara';
 
   @override
-  String get callNotAnswered => '对方未接听';
+  String get commonCancel => 'İptal';
 
   @override
-  String get callDurationLabel => '通话时长';
+  String get commonLoadFailed => 'Yükleme başarısız';
 
   @override
-  String get voiceCallCancelled => '语音通话已取消';
+  String get commonMessages => 'Mesajlar';
 
   @override
-  String get videoCallCancelled => '视频通话已取消';
+  String get commonContacts => 'Kişiler';
 
   @override
-  String get passkeyNotInitialized => 'Passkey başlatılmadı';
+  String get commonMe => 'Ben';
 
   @override
-  String get googleSignInNotConfigured => 'Google Giriş yapılandırılmadı';
+  String get commonVoiceLoading =>
+      'Ses yükleniyor, lütfen daha sonra tekrar deneyin';
 
   @override
-  String get encryptedMessage => '[Şifreli mesaj]';
+  String get commonVoiceToTextFailed => 'Sesten metne dönüştürme başarısız';
 
   @override
-  String get sticker => '[Çıkartma]';
+  String get commonConvertToText => 'Metne çevir';
 
   @override
-  String get groupCreated => 'Grup oluşturuldu';
+  String get chatCopy => 'Kopyala';
 
   @override
-  String get groupNameChanged => 'Grup adı değiştirildi';
+  String get commonForward => 'İlet';
 
   @override
-  String get groupAvatarChanged => 'Grup avatarı değiştirildi';
+  String get commonUnfavorite => 'Favorilerden çıkar';
 
   @override
-  String get groupAnnouncementChanged => 'Grup duyurusu değiştirildi';
+  String get commonFavorite => 'Favorilere ekle';
 
   @override
-  String get image => '[Resim]';
+  String get settingsResend => 'Tekrar gönder';
 
   @override
-  String get video => '[Video]';
+  String get chatRecall => 'Geri al';
 
   @override
-  String get voice => '[Ses]';
+  String get commonQuote => 'Alıntıla';
 
   @override
-  String get file => '[Dosya]';
+  String get commonRemind => 'Hatırlat';
 
   @override
-  String get location => '[Konum]';
+  String get chatCopied => 'Kopyalandı';
 
   @override
-  String get unknownMessage => '[Bilinmeyen mesaj]';
+  String get storySendMessageHint => 'Mesaj gönder';
 
   @override
-  String joinedGroup(String senderName) {
-    return '$senderName gruba katıldı';
-  }
+  String get commonMicrophonePermissionRequired =>
+      'Lütfen mikrofon iznini verin';
 
   @override
-  String leftGroup(String senderName) {
-    return '$senderName gruptan ayrıldı';
-  }
-
-  @override
-  String invitedToGroup(String senderName) {
-    return '$senderName davet edildi';
-  }
-
-  @override
-  String removedFromGroup(String senderName) {
-    return '$senderName gruptan çıkarıldı';
-  }
-
-  @override
-  String get avatarDataEmpty => 'Avatar verisi boş';
-
-  @override
-  String get avatarTooLarge => 'Avatar dosyası çok büyük, maksimum 10MB';
-
-  @override
-  String get uploadAvatarFailed => 'Avatar yüklenemedi';
-
-  @override
-  String get delete => 'Sil';
-
-  @override
-  String get deleteThisMessage => 'Bu mesajı silmek istiyor musunuz?';
-
-  @override
-  String get messageDeleted => 'Mesaj silindi';
-
-  @override
-  String get notLoggedIn => 'Giriş yapılmadı';
-
-  @override
-  String roomNotExist(String roomId) {
-    return 'Oda bulunamadı: $roomId';
-  }
-
-  @override
-  String get uploadImageFailed => 'Resim yüklenemedi';
-
-  @override
-  String get matrixClientNotInitialized => 'Matrix istemcisi başlatılmadı';
-
-  @override
-  String get uploadVoiceFailed => 'Ses yüklenemedi: MXC URI alınamadı';
-
-  @override
-  String get uploadVideoFailed => 'Video yüklenemedi: MXC URI alınamadı';
-
-  @override
-  String get uploadFileFailed => 'Dosya yüklenemedi: MXC URI alınamadı';
-
-  @override
-  String locationWithCoords(String lat, String lon) {
-    return 'Konum: $lat, $lon';
-  }
-
-  @override
-  String get myLocation => 'Konumum';
-
-  @override
-  String get pollEnded => 'Anket sona erdi';
-
-  @override
-  String get groupChat => 'Grup Sohbeti';
-
-  @override
-  String get search => 'Ara';
-
-  @override
-  String get cancel => 'İptal';
-
-  @override
-  String get userCancelled => 'Kullanıcı iptal etti';
-
-  @override
-  String get noData => 'Veri yok';
-
-  @override
-  String get noSearchResults => 'Arama sonucu yok';
-
-  @override
-  String get tryDifferentKeyword => 'Farklı bir anahtar kelime deneyin';
-
-  @override
-  String get loadFailed => 'Yükleme başarısız';
-
-  @override
-  String get checkNetwork => 'Lütfen ağ bağlantınızı kontrol edin';
-
-  @override
-  String get networkConnectionFailed => 'Ağ bağlantısı başarısız';
-
-  @override
-  String get checkNetworkSettings => 'Lütfen ağ ayarlarınızı kontrol edin';
-
-  @override
-  String get messages => 'Mesajlar';
-
-  @override
-  String get contacts => 'Kişiler';
-
-  @override
-  String get discover => 'Keşfet';
-
-  @override
-  String get me => 'Ben';
-
-  @override
-  String get voiceLoading => 'Ses yükleniyor, lütfen daha sonra tekrar deneyin';
-
-  @override
-  String get voiceToTextFailed => 'Sesten metne dönüştürme başarısız';
-
-  @override
-  String get converting => 'Dönüştürülüyor...';
-
-  @override
-  String get convertToText => 'Metne çevir';
-
-  @override
-  String get convertToTextTitle => 'Metne Dönüştür';
-
-  @override
-  String get selectEmoji => 'Emoji seç';
-
-  @override
-  String get selectRedPacketCover => 'Kapak seç';
-
-  @override
-  String get frequentlyUsed => 'Sık kullanılan';
-
-  @override
-  String get copy => 'Kopyala';
-
-  @override
-  String get forward => 'İlet';
-
-  @override
-  String get unfavorite => 'Favorilerden çıkar';
-
-  @override
-  String get favorite => 'Favorilere ekle';
-
-  @override
-  String get resend => 'Tekrar gönder';
-
-  @override
-  String get recall => 'Geri al';
-
-  @override
-  String get multiSelect => 'Çoklu seçim';
-
-  @override
-  String get quote => 'Alıntıla';
-
-  @override
-  String get remind => 'Hatırlat';
-
-  @override
-  String get searchThis => 'Ara';
-
-  @override
-  String get recallMessageConfirm => 'Bu mesajı geri almak istiyor musunuz?';
-
-  @override
-  String get youRecalledMessage => 'Bir mesajı geri aldınız';
-
-  @override
-  String get otherRecalledMessage => 'Mesaj geri alındı';
-
-  @override
-  String get reEdit => 'Yeniden düzenle';
-
-  @override
-  String get copied => 'Kopyalandı';
-
-  @override
-  String get sendMessageHint => 'Mesaj gönder';
-
-  @override
-  String get microphonePermissionRequired => 'Lütfen mikrofon iznini verin';
-
-  @override
-  String startRecordingFailed(String error) {
+  String commonStartRecordingFailed(String error) {
     return 'Kayıt başlatılamadı: $error';
   }
 
   @override
-  String get recordingTooShort => 'Kayıt çok kısa';
+  String get commonRecordingTooShort => 'Kayıt çok kısa';
 
   @override
-  String stopRecordingFailed(String error) {
+  String commonStopRecordingFailed(String error) {
     return 'Kayıt durdurulamadı: $error';
   }
 
   @override
-  String get releaseToCancel => 'İptal etmek için bırakın';
+  String get chatReleaseToCancel => 'İptal etmek için bırakın';
 
   @override
-  String get releaseToSend =>
+  String get chatReleaseToSend =>
       'Göndermek için bırakın, iptal için yukarı kaydırın';
 
   @override
-  String get holdToTalk => 'Konuşmak için basılı tutun';
+  String get commonHoldToTalk => 'Konuşmak için basılı tutun';
 
   @override
-  String get send => 'Gönder';
+  String get commonSend => 'Gönder';
 
   @override
-  String conversationWithId(String roomId) {
-    return 'Sohbet: $roomId';
-  }
+  String get commonAddFriend => 'Arkadaş Ekle';
 
   @override
-  String contactWithId(String userId) {
-    return 'Kişi: $userId';
-  }
+  String get commonChatServiceNotConnected => 'Sohbet servisi bağlı değil';
 
   @override
-  String get addFriend => 'Arkadaş Ekle';
-
-  @override
-  String get chatServiceNotConnected => 'Sohbet servisi bağlı değil';
-
-  @override
-  String userNotFoundHint(String query) {
+  String contactUserNotFoundHint(String query) {
     return '\"$query\" kullanıcısı bulunamadı\n\nİpuçları:\n• Tam kullanıcı ID\'sini girin, örn. @kullaniciadi:sunucu.com\n• Kullanıcı adı yazımını kontrol edin';
   }
 
   @override
-  String createChatFailed(String error) {
+  String contactCreateChatFailed(String error) {
     return 'Sohbet oluşturulamadı: $error';
   }
 
   @override
-  String searchFailed(String error) {
+  String contactSearchFailed(String error) {
     return 'Arama başarısız: $error';
   }
 
   @override
-  String get enterUserIdOrUsername =>
+  String get contactEnterUserIdOrUsername =>
       'Aramak için kullanıcı ID\'si veya adı girin';
 
   @override
-  String get searching => 'Aranıyor...';
+  String get contactSearching => 'Aranıyor...';
 
   @override
-  String get searchUserToChat => 'Sohbet başlatmak için kullanıcı arayın';
+  String get contactSearchUserToChat =>
+      'Sohbet başlatmak için kullanıcı arayın';
 
   @override
-  String get matrixIdExample =>
+  String get contactMatrixIdExample =>
       'Tam Matrix ID\'si girebilirsiniz\nörn. @kullanici:matrix.n42.network';
 
   @override
-  String userNotFound(String username) {
+  String contactUserNotFound(String username) {
     return '\"$username\" kullanıcısı bulunamadı';
   }
 
   @override
-  String get chat => 'Sohbet';
+  String get commonChat => 'Sohbet';
 
   @override
-  String get settings => 'Ayarlar';
+  String get commonSettings => 'Ayarlar';
 
   @override
-  String get editProfile => 'Profili Düzenle';
+  String get profileEditProfile => 'Profili Düzenle';
 
   @override
-  String get login => 'Giriş Yap';
+  String get authLogin => 'Giriş Yap';
 
   @override
-  String get createGroup => 'Grup Oluştur';
+  String get commonCreateGroup => 'Grup Oluştur';
 
   @override
-  String developing(String title) {
-    return '$title\n(Yakında)';
-  }
+  String get chatError => 'Hata';
 
   @override
-  String get error => 'Hata';
+  String get commonTransfer => 'Transfer';
 
   @override
-  String get pageNotFound => 'Sayfa bulunamadı';
+  String get commonReceived => 'Alındı';
 
   @override
-  String get backToHome => 'Ana Sayfaya Dön';
+  String get commonRefunded => 'İade edildi';
 
   @override
-  String get allRead => 'Tümü okundu';
+  String get commonExpired => 'Süresi doldu';
 
   @override
-  String readCount(int count) {
-    return '$count okundu';
-  }
+  String get chatRedPacketGreeting => 'İyi dilekler';
 
   @override
-  String get transfer => 'Transfer';
+  String get commonN42RedPacket => 'N42 Kırmızı Paket';
 
   @override
-  String get pendingReceipt => 'Bekliyor';
+  String get commonClaimed => 'Alındı';
 
   @override
-  String get tapToReceive => 'Almak için dokunun';
+  String get commonAllClaimed => 'Tamamı alındı';
 
   @override
-  String get received => 'Alındı';
+  String get chatReply => 'Yanıtla';
 
   @override
-  String get paymentReceived => 'Ödeme alındı';
+  String get commonEdit => 'Düzenle';
 
   @override
-  String get refunded => 'İade edildi';
+  String get chatSelectForwardTarget => 'Alıcı seçin';
 
   @override
-  String get expired => 'Süresi doldu';
-
-  @override
-  String get redPacketGreeting => 'İyi dilekler';
-
-  @override
-  String get n42RedPacket => 'N42 Kırmızı Paket';
-
-  @override
-  String get goodLuck => 'Şans dile';
-
-  @override
-  String get claimed => 'Alındı';
-
-  @override
-  String get allClaimed => 'Tamamı alındı';
-
-  @override
-  String get emoji => 'Emoji';
-
-  @override
-  String get love => 'Aşk';
-
-  @override
-  String get animals => 'Hayvanlar';
-
-  @override
-  String get food => 'Yiyecek';
-
-  @override
-  String get travel => 'Seyahat';
-
-  @override
-  String get activities => 'Aktiviteler';
-
-  @override
-  String get objects => 'Nesneler';
-
-  @override
-  String get symbols => 'Semboller';
-
-  @override
-  String get reply => 'Yanıtla';
-
-  @override
-  String get copiedToClipboard => 'Panoya kopyalandı';
-
-  @override
-  String get edit => 'Düzenle';
-
-  @override
-  String get more => 'Daha fazla';
-
-  @override
-  String get selectForwardTarget => 'Alıcı seçin';
-
-  @override
-  String sendCount(int count) {
+  String commonSendCount(int count) {
     return 'Gönder ($count)';
   }
 
   @override
-  String get draft => '[Taslak] ';
-
-  @override
-  String n42Id(String id) {
+  String contactN42Id(String id) {
     return 'N42 ID: $id';
   }
 
   @override
-  String get n42IdTitle => 'N42 ID';
+  String get profileN42IdTitle => 'N42 ID';
 
   @override
-  String get n42Bean => 'N42 Bean';
+  String get profileN42Bean => 'N42 Bean';
 
   @override
-  String get friendInfo => 'Arkadaş Bilgisi';
+  String get contactFriendInfo => 'Arkadaş Bilgisi';
 
   @override
-  String get friendInfoDesc =>
+  String get contactFriendInfoDesc =>
       'Arkadaşınıza not, telefon, etiket ekleyin ve izinleri ayarlayın.';
 
   @override
-  String get moments => 'Anlar';
+  String get commonMoments => 'Anlar';
 
   @override
-  String get sendMessage => 'Mesaj';
+  String get commonSendMessage => 'Mesaj';
 
   @override
-  String get audioVideoCall => 'Sesli/Görüntülü Arama';
+  String get contactAudioVideoCall => 'Sesli/Görüntülü Arama';
 
   @override
-  String get videoChannel => 'Video Kanalı';
+  String get contactVideoChannel => 'Video Kanalı';
 
   @override
-  String get remark => 'Not';
+  String get contactRemark => 'Not';
 
   @override
-  String get remarkName => 'Takma Ad';
+  String get contactRemarkName => 'Takma Ad';
 
   @override
-  String get phone => 'Telefon';
+  String get contactPhone => 'Telefon';
 
   @override
-  String get tags => 'Etiketler';
+  String get contactTags => 'Etiketler';
 
   @override
-  String get notes => 'Notlar';
+  String get contactNotes => 'Notlar';
 
   @override
-  String get photos => 'Fotoğraflar';
+  String get contactPhotos => 'Fotoğraflar';
 
   @override
-  String get permissions => 'İzinler';
+  String get contactPermissions => 'İzinler';
 
   @override
-  String get chatMomentsEtc => 'Sohbet, Anlar, Spor, vb.';
+  String get contactChatMomentsEtc => 'Sohbet, Anlar, Spor, vb.';
 
   @override
-  String get moreInfo => 'Daha Fazla Bilgi';
+  String get contactMoreInfo => 'Daha Fazla Bilgi';
 
   @override
-  String get commonGroups => 'Ortak Gruplar';
+  String get contactCommonGroups => 'Ortak Gruplar';
 
   @override
-  String get zeroGroups => '0';
+  String get contactSource => 'Kaynak';
 
   @override
-  String get source => 'Kaynak';
+  String get settingsNotificationSettings => 'Bildirimler';
 
   @override
-  String get notificationSettings => 'Bildirimler';
+  String get settingsPrivacy => 'Gizlilik';
 
   @override
-  String get receiveNotifications => 'Yeni mesaj bildirimleri al';
+  String get settingsAppearance => 'Görünüm';
 
   @override
-  String get showPreview => 'Mesaj önizlemesi göster';
+  String get settingsAbout => 'Hakkında';
 
   @override
-  String get showContentInNotification =>
-      'Bildirimlerde mesaj içeriğini göster';
+  String get commonLogout => 'Çıkış Yap';
 
   @override
-  String get notificationSound => 'Bildirim sesi';
+  String get commonLogoutConfirm => 'Çıkış yapmak istediğinizden emin misiniz?';
 
   @override
-  String get playSoundOnMessage => 'Mesaj alındığında ses çal';
+  String get commonSave => 'Kaydet';
 
   @override
-  String get vibrate => 'Titreşim';
+  String get profileNickname => 'Takma Ad';
 
   @override
-  String get vibrateOnMessage => 'Mesaj alındığında titret';
+  String get profileEnterNickname => 'Takma ad girin';
 
   @override
-  String get doNotDisturb => 'Rahatsız Etmeyin';
+  String get profileSignature => 'İmza';
 
   @override
-  String get dndDescription => 'Belirli saatlerde bildirimleri sessize al';
+  String get profileAddSignature => 'İmza ekle';
 
   @override
-  String get startTime => 'Başlangıç saati';
+  String get commonTakePhoto => 'Fotoğraf Çek';
 
   @override
-  String get endTime => 'Bitiş saati';
+  String get profileChooseFromGallery => 'Galeriden Seç';
 
   @override
-  String get privacy => 'Gizlilik';
-
-  @override
-  String get appearance => 'Görünüm';
-
-  @override
-  String get about => 'Hakkında';
-
-  @override
-  String get logout => 'Çıkış Yap';
-
-  @override
-  String get logoutConfirm => 'Çıkış yapmak istediğinizden emin misiniz?';
-
-  @override
-  String get exit => 'Çıkış Yap';
-
-  @override
-  String get save => 'Kaydet';
-
-  @override
-  String get nickname => 'Takma Ad';
-
-  @override
-  String get enterNickname => 'Takma ad girin';
-
-  @override
-  String get signature => 'İmza';
-
-  @override
-  String get addSignature => 'İmza ekle';
-
-  @override
-  String get takePhoto => 'Fotoğraf Çek';
-
-  @override
-  String get chooseFromGallery => 'Galeriden Seç';
-
-  @override
-  String saveFailed(String error) {
+  String profileSaveFailed(String error) {
     return 'Kaydetme başarısız: $error';
   }
 
   @override
-  String get secureDecentralizedChat => 'Güvenli, merkezi olmayan mesajlaşma';
+  String get authSecureDecentralizedChat =>
+      'Güvenli, merkezi olmayan mesajlaşma';
 
   @override
-  String get endToEndEncryption => 'Uçtan uca şifreleme';
+  String get commonEndToEndEncryption => 'Uçtan uca şifreleme';
 
   @override
-  String get messagesOnlyYouCanSee =>
+  String get authMessagesOnlyYouCanSee =>
       'Mesajlar sadece siz ve alıcı tarafından görülebilir';
 
   @override
-  String get decentralized => 'Merkezi Olmayan';
+  String get authDecentralized => 'Merkezi Olmayan';
 
   @override
-  String get basedOnMatrix => 'Matrix açık protokolü üzerine kurulu';
+  String get authBasedOnMatrix => 'Matrix açık protokolü üzerine kurulu';
 
   @override
-  String get walletIntegration => 'Cüzdan Entegrasyonu';
+  String get authWalletIntegration => 'Cüzdan Entegrasyonu';
 
   @override
-  String get easyCryptoTransfer => 'Kolay kripto para transferi';
+  String get authEasyCryptoTransfer => 'Kolay kripto para transferi';
 
   @override
-  String get register => 'Kayıt Ol';
+  String get authRegister => 'Kayıt Ol';
 
   @override
-  String get agreeTerms => 'Giriş yaparak kabul etmiş olursunuz';
+  String get authAgreeTerms => 'Giriş yaparak kabul etmiş olursunuz';
 
   @override
-  String get termsOfService => 'Hizmet Şartları';
+  String get authTermsOfService => 'Hizmet Şartları';
 
   @override
-  String get and => 've';
+  String get authAnd => 've';
 
   @override
-  String get privacyPolicy => 'Gizlilik Politikası';
+  String get authPrivacyPolicy => 'Gizlilik Politikası';
 
   @override
-  String get serverAddress => 'Sunucu Adresi';
+  String get authServerAddress => 'Sunucu Adresi';
 
   @override
-  String get enterServerAddress => 'Sunucu adresi girin';
+  String get authEnterServerAddress => 'Sunucu adresi girin';
 
   @override
-  String get validServerAddress => 'Lütfen geçerli bir sunucu adresi girin';
-
-  @override
-  String connectedTo(String serverName) {
+  String authConnectedTo(String serverName) {
     return '$serverName sunucusuna bağlandı';
   }
 
   @override
-  String get username => 'Kullanıcı Adı';
+  String get authUsername => 'Kullanıcı Adı';
 
   @override
-  String get enterUsername => 'Kullanıcı adı girin';
+  String get authEnterUsername => 'Kullanıcı adı girin';
 
   @override
-  String get password => 'Şifre';
+  String get authPassword => 'Şifre';
 
   @override
-  String get enterPassword => 'Şifre girin';
+  String get authEnterPassword => 'Şifre girin';
 
   @override
-  String get registerAccount => 'Kayıt Ol';
+  String get authRegisterAccount => 'Kayıt Ol';
 
   @override
-  String get forgotPassword => 'Şifremi Unuttum';
+  String get authForgotPassword => 'Şifremi Unuttum';
 
   @override
-  String get otherLoginMethods => 'Diğer giriş yöntemleri';
+  String get authOtherLoginMethods => 'Diğer giriş yöntemleri';
 
   @override
-  String get emailVerification => 'E-posta doğrulama kodu';
+  String get authCreateAccount => 'Hesap Oluştur';
 
   @override
-  String get enterServerFirst => 'Lütfen önce sunucu adresini girin';
+  String get authJoinN42Chat => 'Sohbete başlamak için N42 Chat\'e katılın';
 
   @override
-  String get passkeyNeedsServer => 'Passkey girişi sunucu desteği gerektirir';
+  String get authUsernameHint => '3-20 karakter, harf/rakam/_';
 
   @override
-  String googleLoginSuccess(String email) {
-    return 'Google giriş başarılı: $email';
-  }
+  String get authUsernameMinLength =>
+      'Kullanıcı adı en az 3 karakter olmalıdır';
 
   @override
-  String googleLoginFailed(String error) {
-    return 'Google giriş başarısız: $error';
-  }
-
-  @override
-  String get appleLoginSuccess => 'Apple giriş başarılı';
-
-  @override
-  String appleLoginFailed(String error) {
-    return 'Apple giriş başarısız: $error';
-  }
-
-  @override
-  String get createAccount => 'Hesap Oluştur';
-
-  @override
-  String get joinN42Chat => 'Sohbete başlamak için N42 Chat\'e katılın';
-
-  @override
-  String get usernameHint => '3-20 karakter, harf/rakam/_';
-
-  @override
-  String get usernameMinLength => 'Kullanıcı adı en az 3 karakter olmalıdır';
-
-  @override
-  String get usernameMaxLength =>
+  String get authUsernameMaxLength =>
       'Kullanıcı adı en fazla 20 karakter olmalıdır';
 
   @override
-  String get usernameFormat =>
+  String get authUsernameFormat =>
       'Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir';
 
   @override
-  String get passwordHint => 'En az 8 karakter';
+  String get authPasswordHint => 'En az 8 karakter';
 
   @override
-  String get passwordMinLength => 'Şifre en az 8 karakter olmalıdır';
+  String get commonPasswordMinLength => 'Şifre en az 8 karakter olmalıdır';
 
   @override
-  String get confirmPassword => 'Şifreyi Onayla';
+  String get authConfirmPassword => 'Şifreyi Onayla';
 
   @override
-  String get reEnterPassword => 'Şifreyi tekrar girin';
+  String get authFilled => 'Dolduruldu';
 
   @override
-  String get passwordsNotMatch => 'Şifreler eşleşmiyor';
+  String get authEnterInviteCode => 'Davet kodu girin';
 
   @override
-  String get inviteCode => 'Davet kodu (yerleşik)';
+  String get authAlreadyHaveAccount => 'Zaten hesabınız var mı?';
 
   @override
-  String get filled => 'Dolduruldu';
+  String get authLoginNow => 'Hemen giriş yapın';
 
   @override
-  String get enterInviteCode => 'Davet kodu girin';
+  String get profileAvatar => 'Avatar';
 
   @override
-  String get inviteCodeHint =>
-      'Davet kodu yerleşiktir, genellikle değiştirmeye gerek yoktur';
+  String get profileStatus => 'Durum';
 
   @override
-  String get agreeTermsFirst =>
-      'Lütfen önce şartları ve gizlilik politikasını okuyun ve kabul edin';
+  String get commonLoading => 'Yükleniyor...';
 
   @override
-  String get iAgree => 'Okudum ve kabul ediyorum';
+  String get conversationNoConversations => 'Sohbet yok';
 
   @override
-  String get alreadyHaveAccount => 'Zaten hesabınız var mı?';
+  String get conversationTapToChat => 'Sohbet başlatmak için sağ üste dokunun';
 
   @override
-  String get loginNow => 'Hemen giriş yapın';
+  String get conversationStartGroup => 'Grup Sohbeti Başlat';
 
   @override
-  String get whoCanSee => 'Kimler görebilir';
+  String get commonScan => 'Tara';
 
   @override
-  String get avatar => 'Avatar';
+  String get commonPayment => 'Ödeme';
 
   @override
-  String get status => 'Durum';
-
-  @override
-  String get lastSeen => 'Son görülme';
-
-  @override
-  String get messageSettings => 'Mesajlar';
-
-  @override
-  String get allowStrangerMessage => 'Yabancılardan mesaj kabul et';
-
-  @override
-  String get receiveNonContact => 'Kişi listesinde olmayanlardan mesaj al';
-
-  @override
-  String get readReceipts => 'Okundu bilgisi';
-
-  @override
-  String get letOthersKnowRead =>
-      'Başkalarının mesajlarınızı okuduğunuzu bilmesine izin ver';
-
-  @override
-  String get typingStatus => 'Yazma durumu';
-
-  @override
-  String get letOthersKnowTyping =>
-      'Başkalarının yazdığınızı bilmesine izin ver';
-
-  @override
-  String get everyone => 'Herkes';
-
-  @override
-  String get contactsOnly => 'Sadece kişiler';
-
-  @override
-  String get nobody => 'Hiç kimse';
-
-  @override
-  String whoCanSeeItem(String title) {
-    return '$title kimler görebilir';
-  }
-
-  @override
-  String version(String version) {
-    return 'Sürüm $version';
-  }
-
-  @override
-  String get checkUpdate => 'Güncellemeleri kontrol et';
-
-  @override
-  String get openSourceLicenses => 'Açık kaynak lisansları';
-
-  @override
-  String get feedback => 'Geri Bildirim';
-
-  @override
-  String get builtOnMatrix => 'Matrix protokolü üzerine kurulu';
-
-  @override
-  String get loading => 'Yükleniyor...';
-
-  @override
-  String get noConversations => 'Sohbet yok';
-
-  @override
-  String get tapToChat => 'Sohbet başlatmak için sağ üste dokunun';
-
-  @override
-  String get startGroup => 'Grup Sohbeti Başlat';
-
-  @override
-  String get scan => 'Tara';
-
-  @override
-  String get payment => 'Ödeme';
-
-  @override
-  String featureComingSoon(String feature) {
+  String commonFeatureComingSoon(String feature) {
     return '$feature yakında';
   }
 
   @override
-  String get markAsRead => 'Okundu olarak işaretle';
+  String get conversationMarkAsRead => 'Okundu olarak işaretle';
 
   @override
-  String get unmute => 'Sesi aç';
+  String get commonUnmute => 'Sesi aç';
 
   @override
-  String get mute => 'Sessize al';
+  String get commonMute => 'Sessize al';
 
   @override
-  String get unpin => 'Sabitlemeyi kaldır';
+  String get conversationUnpin => 'Sabitlemeyi kaldır';
 
   @override
-  String get pin => 'Sabitle';
+  String get conversationPin => 'Sabitle';
 
   @override
-  String get deleteConversation => 'Sohbeti Sil';
+  String get conversationDeleteConversation => 'Sohbeti Sil';
 
   @override
-  String deleteConversationConfirm(String name) {
+  String conversationDeleteConversationConfirm(String name) {
     return '\"$name\" ile sohbeti silmek istiyor musunuz?';
   }
 
   @override
-  String get noContacts => 'Kişi yok';
+  String get commonNoContacts => 'Kişi yok';
 
   @override
-  String get addFriendsToChat => 'Sohbete başlamak için arkadaş ekleyin';
+  String get contactAddFriendsToChat => 'Sohbete başlamak için arkadaş ekleyin';
 
   @override
   String get contactNotFound => 'Kişi bulunamadı';
 
   @override
-  String get tryOtherKeywords =>
+  String get contactTryOtherKeywords =>
       'Başka anahtar kelimeler veya genel arama deneyin';
 
   @override
-  String get searchResults => 'Arama sonuçları';
+  String get contactSearchResults => 'Arama sonuçları';
 
   @override
-  String get newFriends => 'Yeni Arkadaşlar';
+  String get contactNewFriends => 'Yeni Arkadaşlar';
 
   @override
-  String get chatOnlyFriends => 'Sadece sohbet arkadaşları';
+  String get contactChatOnlyFriends => 'Chat-only Friends';
 
   @override
-  String get officialAccounts => 'Resmi Hesaplar';
+  String get contactOfficialAccounts => 'Resmi Hesaplar';
 
   @override
-  String get serviceAccounts => 'Hizmet Hesapları';
+  String get contactServiceAccounts => 'Hizmet Hesapları';
 
   @override
-  String get enterpriseContacts => 'Kurumsal Kişiler';
+  String get contactEnterpriseContacts => 'Kurumsal Kişiler';
 
   @override
-  String contactsCount(int count) {
-    return '$count kişi';
-  }
+  String get contactRecommendToFriend => 'Kişiyi paylaş';
 
   @override
-  String get recommendToFriend => 'Kişiyi paylaş';
+  String get commonSetRemark => 'Not ekle';
 
   @override
-  String get setRemark => 'Not ekle';
+  String get contactSendingCard => 'Kişi kartı gönderiliyor...';
 
   @override
-  String get addToHome => 'Ana ekrana ekle';
+  String get commonFileLabel => 'Dosya';
 
   @override
-  String get sendingCard => 'Kişi kartı gönderiliyor...';
+  String get commonLocationLabel => 'Konum';
 
   @override
-  String get contactCard => '[Kişi Kartı]';
-
-  @override
-  String get fileLabel => 'Dosya';
-
-  @override
-  String get locationLabel => 'Konum';
-
-  @override
-  String cardSent(String contact, String friend) {
-    return '$contact kartı $friend kişisine gönderildi';
-  }
-
-  @override
-  String recommendFailed(String error) {
+  String contactRecommendFailed(String error) {
     return 'Öneri başarısız: $error';
   }
 
   @override
-  String get enterRemark => 'Not girin';
+  String get profileEnterRemark => 'Not girin';
 
   @override
-  String remarkSet(String remark) {
-    return 'Not ayarlandı: $remark';
-  }
+  String get contactOpeningChat => 'Sohbet açılıyor...';
 
   @override
-  String get openingChat => 'Sohbet açılıyor...';
-
-  @override
-  String openChatFailed(String error) {
+  String contactOpenChatFailed(String error) {
     return 'Sohbet açılamadı: $error';
   }
 
   @override
-  String get addContact => 'Kişi Ekle';
+  String get contactAddContact => 'Kişi Ekle';
 
   @override
-  String get enterUserId => 'Kullanıcı ID\'si girin';
+  String get contactEnterUserId => 'Kullanıcı ID\'si girin';
 
   @override
-  String get noFriendRequests => 'Arkadaşlık isteği yok';
+  String get contactNoFriendRequests => 'Arkadaşlık isteği yok';
 
   @override
-  String get accept => 'Kabul Et';
+  String get commonAccept => 'Kabul Et';
 
   @override
-  String get reject => 'Reddet';
+  String get commonReject => 'Reddet';
 
   @override
-  String acceptedRequest(String name) {
-    return '$name arkadaşlık isteği kabul edildi';
-  }
+  String get commonNoGroups => 'Grup yok';
 
   @override
-  String rejectedRequest(String name) {
-    return '$name arkadaşlık isteği reddedildi';
-  }
+  String get contactSelectFriendToRecommend => 'Önermek için arkadaş seçin';
 
   @override
-  String get noGroups => 'Grup yok';
+  String get commonSearchContacts => 'Kişilerde ara';
 
   @override
-  String get creatingGroup => 'Grup oluşturma yakında...';
+  String get contactNoContactsFound => 'Kişi bulunamadı';
 
   @override
-  String get selectFriendToRecommend => 'Önermek için arkadaş seçin';
+  String get favoriteYesterday => 'Dün';
 
   @override
-  String get searchContacts => 'Kişilerde ara';
+  String get chatJustNow => 'Az önce';
 
   @override
-  String get noContactsFound => 'Kişi bulunamadı';
+  String get profileOnline => 'Çevrimiçi';
 
   @override
-  String get yesterday => 'Dün';
-
-  @override
-  String get monday => 'Pzt';
-
-  @override
-  String get tuesday => 'Sal';
-
-  @override
-  String get wednesday => 'Çar';
-
-  @override
-  String get thursday => 'Per';
-
-  @override
-  String get friday => 'Cum';
-
-  @override
-  String get saturday => 'Cmt';
-
-  @override
-  String get sunday => 'Paz';
-
-  @override
-  String get justNow => 'Az önce';
-
-  @override
-  String minutesAgo(int count) {
-    return '$count dk önce';
-  }
-
-  @override
-  String hoursAgo(int count) {
-    return '${count}s önce';
-  }
-
-  @override
-  String daysAgo(int count) {
-    return '${count}g önce';
-  }
-
-  @override
-  String get online => 'Çevrimiçi';
-
-  @override
-  String get offline => 'Çevrimdışı';
-
-  @override
-  String minutesAgoOnline(int count) {
-    return '$count dk önce çevrimiçi';
-  }
-
-  @override
-  String hoursAgoOnline(int count) {
-    return '${count}s önce çevrimiçi';
-  }
-
-  @override
-  String daysAgoOnline(int count) {
-    return '${count}g önce çevrimiçi';
-  }
+  String get profileOffline => 'Çevrimdışı';
 
   @override
   String get searchContactsGroupsMessages => 'Kişi, grup ve mesajlarda ara';
@@ -1197,36 +646,25 @@ class STr extends S {
   String get searchError => 'Arama hatası';
 
   @override
-  String get searchHint => 'Kişi, grup ve mesajlarda ara';
-
-  @override
-  String get enterKeyword => 'Aramak için anahtar kelime girin';
+  String get chatSearchHint => 'Kişi, grup ve mesajlarda ara';
 
   @override
   String get searchHistory => 'Arama Geçmişi';
 
   @override
-  String get clear => 'Temizle';
+  String get commonClear => 'Temizle';
 
   @override
-  String noResultsFor(String query) {
-    return '\"$query\" için sonuç yok';
-  }
+  String get commonAll => 'Tümü';
 
   @override
-  String get all => 'Tümü';
+  String get searchGroups => 'Gruplar';
 
   @override
-  String get groups => 'Gruplar';
+  String get searchNoResults => 'Sonuç yok';
 
   @override
-  String get noResults => 'Sonuç yok';
-
-  @override
-  String get groupInfo => 'Grup Bilgisi';
-
-  @override
-  String groupMembers(int count) {
+  String commonGroupMembers(int count) {
     return 'Üyeler ($count)';
   }
 
@@ -1234,1808 +672,7 @@ class STr extends S {
   String get groupMembersTitle => 'Grup Üyeleri';
 
   @override
-  String get viewAll => 'Tümünü gör';
-
-  @override
-  String get owner => 'Sahip';
-
-  @override
-  String get admin => 'Yönetici';
-
-  @override
-  String get invite => 'Davet Et';
-
-  @override
-  String get groupAnnouncement => 'Grup Duyurusu';
-
-  @override
-  String get notSet => 'Ayarlanmadı';
-
-  @override
-  String get groupDescription => 'Grup Açıklaması';
-
-  @override
-  String get publicGroup => 'Herkese Açık Grup';
-
-  @override
-  String get allowSearchJoin => 'Başkalarının arayıp katılmasına izin ver';
-
-  @override
-  String get clearChatHistory => 'Sohbet Geçmişini Temizle';
-
-  @override
-  String get dissolveGroup => 'Grubu Dağıt';
-
-  @override
-  String get leaveGroup => 'Gruptan Ayrıl';
-
-  @override
-  String get changeGroupName => 'Grup Adını Değiştir';
-
-  @override
-  String get enterGroupName => 'Grup adı girin';
-
-  @override
-  String get confirm => 'Onayla';
-
-  @override
-  String get changeGroupDescription => 'Grup Açıklamasını Değiştir';
-
-  @override
-  String get enterGroupDescription => 'Grup açıklaması girin';
-
-  @override
-  String get editAnnouncement => 'Duyuruyu Düzenle';
-
-  @override
-  String get enterAnnouncement => 'Duyuru girin';
-
-  @override
-  String get publish => 'Yayınla';
-
-  @override
-  String get clearHistoryConfirm =>
-      'Tüm sohbet geçmişini temizle? Bu işlem geri alınamaz.';
-
-  @override
-  String get clearAction => 'Temizle';
-
-  @override
-  String get chatHistoryCleared => 'Sohbet geçmişi temizlendi';
-
-  @override
-  String leaveGroupConfirm(String name) {
-    return '\"$name\" grubundan ayrılmak istiyor musunuz?';
-  }
-
-  @override
-  String dissolveGroupConfirm(String name) {
-    return '\"$name\" grubunu dağıtmak istiyor musunuz? Bu işlem geri alınamaz.';
-  }
-
-  @override
-  String get dissolve => 'Dağıt';
-
-  @override
-  String get groupQrCode => 'Grup QR Kodu';
-
-  @override
-  String get searchChatHistory => 'Sohbet Geçmişinde Ara';
-
-  @override
-  String get groupIdCopied => 'Grup ID\'si kopyalandı';
-
-  @override
-  String tapCopyGroupId(int count) {
-    return '$count üye · Grup ID\'sini kopyalamak için dokunun';
-  }
-
-  @override
-  String get receiverAddress => 'Alıcı Adresi';
-
-  @override
-  String get enterOrPasteAddress => 'Cüzdan adresini girin veya yapıştırın';
-
-  @override
-  String get selectToken => 'Token Seç';
-
-  @override
-  String get transferAmount => 'Transfer Tutarı';
-
-  @override
-  String get available => 'Kullanılabilir';
-
-  @override
-  String get allAmount => 'Tümü';
-
-  @override
-  String get memoOptional => 'Not (isteğe bağlı)';
-
-  @override
-  String get addMemo => 'Not ekle';
-
-  @override
-  String get confirmTransfer => 'Transferi Onayla';
-
-  @override
-  String get invalidAddress => 'Lütfen geçerli bir alıcı adresi girin';
-
-  @override
-  String get invalidAmount => 'Lütfen geçerli bir tutar girin';
-
-  @override
-  String get selectTokenPlease => 'Lütfen bir token seçin';
-
-  @override
-  String get addressVerified => 'Adres doğrulandı';
-
-  @override
-  String availableBalance(String balance, String symbol) {
-    return 'Kullanılabilir: $balance $symbol';
-  }
-
-  @override
-  String get scanningInDevelopment =>
-      'Tarama özelliği geliştirme aşamasında...';
-
-  @override
-  String get enterAmount => 'Tutar girin';
-
-  @override
-  String get redPacketCountMin => 'En az 1 kırmızı paket gerekli';
-
-  @override
-  String get viewRedPacketDetails => 'Kırmızı paket detaylarını gör';
-
-  @override
-  String get enterTransferAmount => 'Transfer tutarını girin';
-
-  @override
-  String get transferTo => 'Transfer hedefi';
-
-  @override
-  String get selectCurrency => 'Para birimi seç';
-
-  @override
-  String get receiveTransfer => 'Transfer alındı';
-
-  @override
-  String fromSender(String name, Object senderName) {
-    return '$senderName tarafından';
-  }
-
-  @override
-  String get confirmReceive => 'Alımı Onayla';
-
-  @override
-  String get groupProfile => 'Grup Bilgisi';
-
-  @override
-  String get viewProfile => 'Profili Gör';
-
-  @override
-  String get removeMember => 'Gruptan Çıkar';
-
-  @override
-  String removeMemberConfirm(String name) {
-    return '\"$name\" kişisini gruptan çıkarmak istiyor musunuz?';
-  }
-
-  @override
-  String get remove => 'Çıkar';
-
-  @override
-  String get clearStatus => 'Durumu Temizle';
-
-  @override
-  String get clearStatusConfirm => 'Mevcut durumu temizle?';
-
-  @override
-  String get statusCleared => 'Durum temizlendi';
-
-  @override
-  String statusSet(String result) {
-    return 'Durum ayarlandı: $result';
-  }
-
-  @override
-  String get userNotExist => 'Kullanıcı mevcut değil';
-
-  @override
-  String get userIdCopied => 'Kullanıcı ID\'si kopyalandı';
-
-  @override
-  String get voiceCallInDevelopment => 'Sesli arama geliştirme aşamasında...';
-
-  @override
-  String get report => 'Şikayet Et';
-
-  @override
-  String get reportInDevelopment => 'Şikayet özelliği geliştirme aşamasında...';
-
-  @override
-  String get shareCard => 'Kartı Paylaş';
-
-  @override
-  String get shareInDevelopment => 'Paylaşım özelliği geliştirme aşamasında...';
-
-  @override
-  String get qrCode => 'QR Kod';
-
-  @override
-  String get qrCodeInDevelopment => 'QR kod özelliği geliştirme aşamasında...';
-
-  @override
-  String get avatarUpdated => 'Avatar güncellendi';
-
-  @override
-  String selectImageFailed(String error) {
-    return 'Resim seçilemedi: $error';
-  }
-
-  @override
-  String get changeName => 'Adı Değiştir';
-
-  @override
-  String get male => 'Erkek';
-
-  @override
-  String get female => 'Kadın';
-
-  @override
-  String genderSet(String gender) {
-    return 'Cinsiyet ayarlandı: $gender';
-  }
-
-  @override
-  String regionSet(String region) {
-    return 'Bölge ayarlandı: $region';
-  }
-
-  @override
-  String get setPatText => 'Dürtme Metnini Ayarla';
-
-  @override
-  String get changeSignature => 'İmzayı Değiştir';
-
-  @override
-  String ringtoneSet(String result) {
-    return 'Zil sesi ayarlandı: $result';
-  }
-
-  @override
-  String featureInDev(String feature) {
-    return '$feature geliştirme aşamasında...';
-  }
-
-  @override
-  String saveAddressFailed(String error) {
-    return 'Adres kaydedilemedi: $error';
-  }
-
-  @override
-  String get myAddress => 'Adreslerim';
-
-  @override
-  String get addNew => 'Ekle';
-
-  @override
-  String get addAddress => 'Adres Ekle';
-
-  @override
-  String get addressAdded => 'Adres eklendi';
-
-  @override
-  String get addressUpdated => 'Adres güncellendi';
-
-  @override
-  String get deleteAddress => 'Adresi Sil';
-
-  @override
-  String get deleteAddressConfirm => 'Bu adresi silmek istiyor musunuz?';
-
-  @override
-  String get addressDeleted => 'Adres silindi';
-
-  @override
-  String get setDefaultAddress => 'Varsayılan olarak ayarla';
-
-  @override
-  String get fillCompleteInfo => 'Lütfen tüm alanları doldurun';
-
-  @override
-  String saveInvoiceFailed(String error) {
-    return 'Fatura kaydedilemedi: $error';
-  }
-
-  @override
-  String get myInvoices => 'Faturalarım';
-
-  @override
-  String get addInvoice => 'Fatura Ekle';
-
-  @override
-  String get invoiceAdded => 'Fatura eklendi';
-
-  @override
-  String get invoiceUpdated => 'Fatura güncellendi';
-
-  @override
-  String get deleteInvoice => 'Faturayı Sil';
-
-  @override
-  String get deleteInvoiceConfirm => 'Bu faturayı silmek istiyor musunuz?';
-
-  @override
-  String get invoiceDeleted => 'Fatura silindi';
-
-  @override
-  String get invoiceType => 'Fatura türü: ';
-
-  @override
-  String get personal => 'Bireysel';
-
-  @override
-  String get enterprise => 'Kurumsal';
-
-  @override
-  String get setDefaultInvoice => 'Varsayılan olarak ayarla';
-
-  @override
-  String get enterTaxId => 'Vergi numarası girin';
-
-  @override
-  String get vibrateMode => 'Titreşim modu';
-
-  @override
-  String get silentMode => 'Sessiz mod';
-
-  @override
-  String playing(String ringtoneName) {
-    return 'Çalıyor: $ringtoneName';
-  }
-
-  @override
-  String playFailed(String ringtoneName) {
-    return 'Çalınamadı: $ringtoneName';
-  }
-
-  @override
-  String get enterGroupNamePlease => 'Lütfen grup adı girin';
-
-  @override
-  String get selectAtLeastOne => 'Lütfen en az bir üye seçin';
-
-  @override
-  String get fillStatus => 'Durum Yaz';
-
-  @override
-  String get fileNotExist => 'Dosya mevcut değil';
-
-  @override
-  String sendFailed(String error) {
-    return 'Gönderme başarısız: $error';
-  }
-
-  @override
-  String get cannotOpenBrowser => 'Tarayıcı açılamadı';
-
-  @override
-  String selectFileFailed(String error) {
-    return 'Dosya seçilemedi: $error';
-  }
-
-  @override
-  String get enterMusicLink => 'Müzik bağlantısı girin';
-
-  @override
-  String get enterValidLink => 'Lütfen geçerli bir bağlantı girin';
-
-  @override
-  String get enterPollQuestion => 'Anket sorusu girin';
-
-  @override
-  String get minTwoOptions => 'En az 2 seçenek gerekli';
-
-  @override
-  String get crossDeviceEnabled => 'Cihazlar arası imza etkin';
-
-  @override
-  String get crossDeviceSet => 'Cihazlar arası imza başarıyla ayarlandı';
-
-  @override
-  String setupFailed(String error) {
-    return 'Kurulum başarısız: $error';
-  }
-
-  @override
-  String get receiveAmount => 'Alınacak Tutar';
-
-  @override
-  String get enterValidAmount => 'Lütfen geçerli bir tutar girin';
-
-  @override
-  String get addressCopied => 'Adres kopyalandı';
-
-  @override
-  String openItem(String content) {
-    return 'Aç: $content';
-  }
-
-  @override
-  String get newNoteComingSoon => 'Yeni not özelliği yakında';
-
-  @override
-  String get addLinkComingSoon => 'Bağlantı ekleme özelliği yakında';
-
-  @override
-  String get deleted => 'Silindi';
-
-  @override
-  String get shareComingSoon => 'Paylaşım özelliği yakında';
-
-  @override
-  String get saveComingSoon => 'Kaydetme özelliği yakında';
-
-  @override
-  String get moreStylesComingSoon => 'Daha fazla stil yakında';
-
-  @override
-  String get wallet => 'Cüzdan';
-
-  @override
-  String get walletArea => 'Cüzdan alanı';
-
-  @override
-  String get recording => 'Kayıt';
-
-  @override
-  String get invalidVideoUrl => 'Geçersiz video URL\'si';
-
-  @override
-  String get downloadFile => 'Dosyayı indir';
-
-  @override
-  String get clearChatHistoryTitle => 'Sohbet Geçmişini Temizle';
-
-  @override
-  String get cannotUndo => 'Bu işlem geri alınamaz';
-
-  @override
-  String get videoCall => 'Görüntülü Arama';
-
-  @override
-  String get voiceCall => 'Sesli Arama';
-
-  @override
-  String get leaveMeeting => 'Toplantıdan Ayrıl';
-
-  @override
-  String get chatDetails => 'Sohbet Detayları';
-
-  @override
-  String get viewAllGroupMembers => 'Tüm üyeleri gör';
-
-  @override
-  String get groupName => 'Grup Adı';
-
-  @override
-  String get groupNameUpdated => 'Grup adı güncellendi';
-
-  @override
-  String get groupDescriptionUpdated => 'Grup açıklaması güncellendi';
-
-  @override
-  String get groupAvatarUpdated => 'Grup avatarı güncellendi';
-
-  @override
-  String get updateFailed => 'Güncelleme başarısız';
-
-  @override
-  String get noPermissionToModify => 'Değiştirme izniniz yok';
-
-  @override
-  String get groupManagement => 'Grup Yönetimi';
-
-  @override
-  String get myNicknameInGroup => 'Gruptaki Takma Adım';
-
-  @override
-  String get pinChat => 'Sohbeti Sabitle';
-
-  @override
-  String get strongReminder => 'Güçlü Hatırlatıcı';
-
-  @override
-  String get setChatBackground => 'Sohbet Arka Planını Ayarla';
-
-  @override
-  String get unknownFile => 'Bilinmeyen dosya';
-
-  @override
-  String get download => 'İndir';
-
-  @override
-  String get invalidLocation => 'Geçersiz konum';
-
-  @override
-  String get address => 'Adres';
-
-  @override
-  String get latitude => 'Enlem';
-
-  @override
-  String get longitude => 'Boylam';
-
-  @override
-  String get close => 'Kapat';
-
-  @override
-  String get tapToCancel => 'İptal etmek için dokunun';
-
-  @override
-  String captureFailed(Object error) {
-    return 'Yakalama başarısız: $error';
-  }
-
-  @override
-  String get processingVideo => 'Video işleniyor...';
-
-  @override
-  String get videoFileNotExist => 'Video dosyası mevcut değil';
-
-  @override
-  String get videoDataEmpty => 'Video verisi boş';
-
-  @override
-  String get videoTooLarge => 'Video boyutu 100MB\'ı geçemez';
-
-  @override
-  String get sendingVideo => 'Video gönderiliyor...';
-
-  @override
-  String sendVideoFailed(Object error) {
-    return 'Video gönderilemedi: $error';
-  }
-
-  @override
-  String get imageFileNotExist => 'Resim dosyası mevcut değil';
-
-  @override
-  String get imageDataEmpty => 'Resim verisi boş';
-
-  @override
-  String get sendingImage => 'Resim gönderiliyor...';
-
-  @override
-  String sendImageFailed(Object error) {
-    return 'Resim gönderilemedi: $error';
-  }
-
-  @override
-  String get sendLocation => 'Konum Gönder';
-
-  @override
-  String get selectLocationAndSend => 'Konum seçin ve gönderin';
-
-  @override
-  String get shareRealTimeLocation => 'Gerçek Zamanlı Konum Paylaş';
-
-  @override
-  String get shareLocationForOneHour =>
-      'Arkadaşınızla 1 saat gerçek zamanlı konum paylaşın';
-
-  @override
-  String get locationSent => 'Konum gönderildi';
-
-  @override
-  String get selectMessages => 'Mesaj seç';
-
-  @override
-  String selectedCount(int count) {
-    return '$count seçildi';
-  }
-
-  @override
-  String get selectAll => 'Tümünü Seç';
-
-  @override
-  String groupChatCount(int count) {
-    return 'Grup Sohbeti ($count)';
-  }
-
-  @override
-  String get privateChat => 'Özel Sohbet';
-
-  @override
-  String get noMessages => 'Mesaj yok';
-
-  @override
-  String get sendFirstMessage => 'Sohbeti başlatmak için ilk mesajı gönderin';
-
-  @override
-  String get encryptionNotice =>
-      'Bu sohbet uçtan uca şifrelenmiştir. Mesajları sadece siz ve alıcı okuyabilir.';
-
-  @override
-  String replyTo(String name) {
-    return '$name adlı kişiye yanıt';
-  }
-
-  @override
-  String get multiForward => 'İlet';
-
-  @override
-  String get collect => 'Kaydet';
-
-  @override
-  String get noMembers => 'Üye yok';
-
-  @override
-  String get memberNotFound => 'Üye bulunamadı';
-
-  @override
-  String get voiceFileNotExist => 'Ses dosyası mevcut değil';
-
-  @override
-  String get voiceFileEmpty => 'Ses dosyası boş';
-
-  @override
-  String get sendingVoice => 'Ses gönderiliyor...';
-
-  @override
-  String sendVoiceFailed(Object error) {
-    return 'Ses gönderilemedi: $error';
-  }
-
-  @override
-  String get messageCopied => 'Mesaj kopyalandı';
-
-  @override
-  String get messageForwarded => 'Mesaj iletildi';
-
-  @override
-  String forwardFailed(Object error) {
-    return 'İletme başarısız: $error';
-  }
-
-  @override
-  String get unfavorited => 'Favorilerden çıkarıldı';
-
-  @override
-  String get favorited => 'Favorilere eklendi';
-
-  @override
-  String get reactionAdded => 'Tepki eklendi';
-
-  @override
-  String get reactionRemoved => 'Tepki kaldırıldı';
-
-  @override
-  String get failedMessageDeleted => 'Başarısız mesaj silindi';
-
-  @override
-  String get deleteMessages => 'Mesajları sil';
-
-  @override
-  String deleteMessagesConfirm(Object count) {
-    return '$count mesajı silmek istediğinizden emin misiniz?';
-  }
-
-  @override
-  String noteOtherMessages(Object count) {
-    return 'Not: $count mesaj başkalarına ait ve sadece sizin için silinecek.';
-  }
-
-  @override
-  String myMessagesWillBeRecalled(Object count) {
-    return 'Sizden $count mesaj herkes için geri alınacak.';
-  }
-
-  @override
-  String recalledCount(Object count, Object localCount) {
-    return '$count mesaj geri alındı, $localCount sadece sizin için silindi';
-  }
-
-  @override
-  String recalledMessages(Object count) {
-    return '$count mesaj geri alındı';
-  }
-
-  @override
-  String deletedLocally(Object count) {
-    return '$count mesaj sadece sizin için silindi';
-  }
-
-  @override
-  String forwardedCount(Object count) {
-    return '$count mesaj iletildi';
-  }
-
-  @override
-  String forwardComplete(Object failed, Object success) {
-    return 'İletme tamamlandı: $success başarılı, $failed başarısız';
-  }
-
-  @override
-  String get remindOnlyInGroup =>
-      'Hatırlatma özelliği sadece grup sohbetlerinde kullanılabilir';
-
-  @override
-  String get onlyTextSearchable => 'Sadece metin mesajları aranabilir';
-
-  @override
-  String searchFor(Object text) {
-    return '\"$text\" ara';
-  }
-
-  @override
-  String get baiduSearch => 'Baidu Arama';
-
-  @override
-  String get googleSearch => 'Google Arama';
-
-  @override
-  String get bingSearch => 'Bing Arama';
-
-  @override
-  String get calling => 'Aranıyor...';
-
-  @override
-  String get connecting => 'Bağlanıyor...';
-
-  @override
-  String get ringing => 'Çalıyor...';
-
-  @override
-  String get inCall => 'Aramada';
-
-  @override
-  String featureInDevelopment(String feature) {
-    return 'Özellik geliştirme aşamasında...';
-  }
-
-  @override
-  String collectMessages(Object count) {
-    return '$count mesaj kaydedildi';
-  }
-
-  @override
-  String get voted => 'Oy verildi';
-
-  @override
-  String get voteChanged => 'Oy değiştirildi';
-
-  @override
-  String get voteRemoved => 'Oy kaldırıldı';
-
-  @override
-  String get endPoll => 'Anketi Bitir';
-
-  @override
-  String get endPollConfirm =>
-      'Bu anketi bitirmek istediğinizden emin misiniz? Bitirdikten sonra oy verilemez.';
-
-  @override
-  String memberCount(int count) {
-    return '$count üye';
-  }
-
-  @override
-  String get videoChannels => 'Kanallar';
-
-  @override
-  String get live => 'Canlı';
-
-  @override
-  String get listen => 'Dinle';
-
-  @override
-  String get watch => 'İzle';
-
-  @override
-  String get searchDiscover => 'Ara';
-
-  @override
-  String get nearbyPeople => 'Yakındakiler';
-
-  @override
-  String get games => 'Oyunlar';
-
-  @override
-  String get miniPrograms => 'Mini Programlar';
-
-  @override
-  String done(int count) {
-    return 'Tamamlandı($count)';
-  }
-
-  @override
-  String get services => 'Hizmetler';
-
-  @override
-  String get favorites => 'Favoriler';
-
-  @override
-  String get ordersAndCards => 'Siparişler ve Kartlar';
-
-  @override
-  String get stickers => 'Çıkartmalar';
-
-  @override
-  String statusSetTo(String status) {
-    return 'Durum ayarlandı: $status';
-  }
-
-  @override
-  String get avatarUploadFailed => 'Avatar yüklemesi başarısız';
-
-  @override
-  String get personalProfile => 'Kişisel Profil';
-
-  @override
-  String get name => 'Ad';
-
-  @override
-  String get gender => 'Cinsiyet';
-
-  @override
-  String get region => 'Bölge';
-
-  @override
-  String get myQrCode => 'QR Kodum';
-
-  @override
-  String get poke => 'Dürt';
-
-  @override
-  String get ringtone => 'Zil Sesi';
-
-  @override
-  String get defaultRingtone => 'Varsayılan Zil Sesi';
-
-  @override
-  String get myAddresses => 'Adreslerim';
-
-  @override
-  String genderSetTo(String gender) {
-    return 'Cinsiyet ayarlandı: $gender';
-  }
-
-  @override
-  String get selectRegion => 'Bölge Seç';
-
-  @override
-  String get selectCity => 'Şehir Seç';
-
-  @override
-  String regionSetTo(String region) {
-    return 'Bölge ayarlandı: $region';
-  }
-
-  @override
-  String get setPoke => 'Dürtmeyi Ayarla';
-
-  @override
-  String get friendPokedMe => 'Arkadaş beni dürttü';
-
-  @override
-  String get enterPokeSuffix => 'Dürtme soneki girin, örn: omuzdan';
-
-  @override
-  String get example => 'Örnek';
-
-  @override
-  String get onTheShoulder => ' omuzdan';
-
-  @override
-  String get pokeCleared => 'Dürtme temizlendi';
-
-  @override
-  String pokeSetTo(String suffix) {
-    return 'Dürtme ayarlandı: beni dürttü$suffix';
-  }
-
-  @override
-  String get editSignature => 'İmzayı Düzenle';
-
-  @override
-  String get introduceYourself => 'Kendinizi tanıtacak bir cümle';
-
-  @override
-  String get signatureCleared => 'İmza temizlendi';
-
-  @override
-  String get signatureUpdated => 'İmza güncellendi';
-
-  @override
-  String get scanToAddFriend =>
-      'Beni arkadaş olarak eklemek için yukarıdaki QR kodu tarayın';
-
-  @override
-  String ringtoneSetTo(String ringtone) {
-    return 'Zil sesi ayarlandı: $ringtone';
-  }
-
-  @override
-  String confirmDissolveGroup(String name) {
-    return '\"$name\" grubunu dağıtmak istediğinize emin misiniz? Bu işlem geri alınamaz.';
-  }
-
-  @override
-  String get enterValidServerAddress =>
-      'Lütfen geçerli bir sunucu adresi girin';
-
-  @override
-  String get emailOtp => 'E-posta OTP';
-
-  @override
-  String get enterServerAddressFirst => 'Lütfen önce sunucu adresi girin';
-
-  @override
-  String get passkeyRequiresServer =>
-      'Passkey girişi sunucu desteği gerektirir';
-
-  @override
-  String get loginAgreement => 'Giriş yaparak kabul etmiş olursunuz ';
-
-  @override
-  String get pleaseAgreeToTerms =>
-      'Lütfen Hizmet Şartları ve Gizlilik Politikasını okuyun ve kabul edin';
-
-  @override
-  String get registerFailed => 'Kayıt başarısız';
-
-  @override
-  String get reenterPassword => 'Şifreyi tekrar girin';
-
-  @override
-  String get passwordsDoNotMatch => 'Şifreler eşleşmiyor';
-
-  @override
-  String get inviteCodeBuiltIn => 'Davet Kodu (Yerleşik)';
-
-  @override
-  String get inviteCodeBuiltInNote =>
-      'Davet kodu yerleşiktir, genellikle değiştirmeye gerek yoktur';
-
-  @override
-  String get iHaveReadAndAgree => 'Okudum ve kabul ediyorum ';
-
-  @override
-  String get startGroupChat => 'Grup Sohbeti Başlat';
-
-  @override
-  String get addFriends => 'Arkadaş Ekle';
-
-  @override
-  String get paymentAndCollection => 'Ödeme';
-
-  @override
-  String messagesWithCount(int count) {
-    return 'Mesajlar($count)';
-  }
-
-  @override
-  String contactCount(int count) {
-    return '$count kişi';
-  }
-
-  @override
-  String get addToHomeScreen => 'Ana ekrana ekle';
-
-  @override
-  String recommendedCardTo(String contact, String recipient) {
-    return '$contact kartı $recipient kişisine önerildi';
-  }
-
-  @override
-  String get enterRemarkName => 'Takma ad girin';
-
-  @override
-  String remarkSetTo(String remark) {
-    return 'Not ayarlandı: $remark';
-  }
-
-  @override
-  String acceptedFriendRequest(String name) {
-    return '$name arkadaşlık isteği kabul edildi';
-  }
-
-  @override
-  String rejectedFriendRequest(String name) {
-    return '$name arkadaşlık isteği reddedildi';
-  }
-
-  @override
-  String get groupInvites => 'Grup Davetleri';
-
-  @override
-  String myGroups(int count) {
-    return 'Gruplarım ($count)';
-  }
-
-  @override
-  String get invitedToJoinGroup => 'Gruba davet edildi';
-
-  @override
-  String confirmLeaveGroup(String name) {
-    return '\"$name\" grubundan ayrılmak istediğinize emin misiniz?';
-  }
-
-  @override
-  String get leave => 'Ayrıl';
-
-  @override
-  String get saveMedia => 'Kaydet';
-
-  @override
-  String get recallThisMessage => 'Bu mesajı geri al?';
-
-  @override
-  String get messageRecalled => 'Mesaj geri alındı';
-
-  @override
-  String get savedToGallery => 'Galeriye kaydedildi';
-
-  @override
-  String get failedToSave => 'Kaydetme başarısız';
-
-  @override
-  String get saving => 'Kaydediliyor...';
-
-  @override
-  String get share => 'Paylaş';
-
-  @override
-  String get saveToGallery => 'Galeriye Kaydet';
-
-  @override
-  String downloadFailed(String code) {
-    return 'İndirme başarısız: $code';
-  }
-
-  @override
-  String get noMediaUrl => 'Medya URL\'si mevcut değil';
-
-  @override
-  String shareFailed(String error) {
-    return 'Paylaşım başarısız: $error';
-  }
-
-  @override
-  String get failedToLoadImage => 'Resim yüklenemedi';
-
-  @override
-  String get failedToLoadMoreMessages => 'Daha fazla mesaj yüklenemedi';
-
-  @override
-  String get failedToSend => 'Gönderme başarısız';
-
-  @override
-  String get failedToSendImage => 'Resim gönderilemedi';
-
-  @override
-  String get failedToSendVoice => 'Ses gönderilemedi';
-
-  @override
-  String get failedToSendFile => 'Dosya gönderilemedi';
-
-  @override
-  String get failedToSendVideo => 'Video gönderilemedi';
-
-  @override
-  String get failedToSendLocation => 'Konum gönderilemedi';
-
-  @override
-  String get failedToResend => 'Tekrar gönderme başarısız';
-
-  @override
-  String get failedToRecall => 'Geri alma başarısız';
-
-  @override
-  String get failedToReply => 'Yanıtlama başarısız';
-
-  @override
-  String get failedToAddReaction => 'Tepki ekleme başarısız';
-
-  @override
-  String get failedToSendPoll => 'Anket gönderilemedi';
-
-  @override
-  String get failedToVote => 'Oy verme başarısız';
-
-  @override
-  String get failedToLoadMessages => 'Mesajlar yüklenemedi';
-
-  @override
-  String get callFeatureComingSoon =>
-      'Sesli ve görüntülü arama özelliği yakında';
-
-  @override
-  String get cannotForwardRedPacketOrTransfer =>
-      'Kırmızı paketler ve transferler iletilemez';
-
-  @override
-  String get videoRecordingFailed =>
-      'Video kaydı başarısız. Lütfen tekrar deneyin.';
-
-  @override
-  String get redPacket => 'Kırmızı Paket';
-
-  @override
-  String get music => 'Müzik';
-
-  @override
-  String get coupon => 'Kupon';
-
-  @override
-  String get gift => 'Hediye';
-
-  @override
-  String get poll => 'Anket';
-
-  @override
-  String get text => 'Metin';
-
-  @override
-  String get link => 'Bağlantı';
-
-  @override
-  String get note => 'Not';
-
-  @override
-  String get myNotes => 'Notlarım';
-
-  @override
-  String get today => 'Bugün';
-
-  @override
-  String daysAgoText(int count) {
-    return '$count gün önce';
-  }
-
-  @override
-  String dateFormat(int month, int day) {
-    return '$day/$month';
-  }
-
-  @override
-  String get noFavorites => 'Henüz favori yok';
-
-  @override
-  String get longPressToFavorite => 'Favorilere eklemek için mesaja uzun basın';
-
-  @override
-  String get newNote => 'Yeni Not';
-
-  @override
-  String get favoriteLink => 'Favori Bağlantı';
-
-  @override
-  String get editTags => 'Etiketleri Düzenle';
-
-  @override
-  String get deleteFavorite => 'Favoriyi Sil';
-
-  @override
-  String get deleteFavoriteConfirm =>
-      'Bu favoriyi silmek istediğinizden emin misiniz?';
-
-  @override
-  String get noSearchResultsFound => 'Sonuç bulunamadı';
-
-  @override
-  String get sendRedPacket => 'Kırmızı Paket Gönder';
-
-  @override
-  String get amount => 'Tutar';
-
-  @override
-  String get redPacketCover => 'Kırmızı Paket Kapağı';
-
-  @override
-  String get redPacketType => 'Kırmızı Paket Türü';
-
-  @override
-  String get normalRedPacket => 'Normal';
-
-  @override
-  String get luckyRedPacket => 'Şanslı';
-
-  @override
-  String get redPacketCount => 'Kırmızı Paket Sayısı';
-
-  @override
-  String get pieces => 'adet';
-
-  @override
-  String get putMoneyInRedPacket => 'Kırmızı pakete para koy';
-
-  @override
-  String get redPacketRefundNotice =>
-      'Alınmayan kırmızı paketler 24 saat sonra iade edilir';
-
-  @override
-  String get openRedPacket => 'Aç';
-
-  @override
-  String get redPacketAllClaimed => 'Kırmızı paket tamamı alındı';
-
-  @override
-  String get redPacketExpired => 'Kırmızı paket süresi doldu';
-
-  @override
-  String get addTransferNote => 'Transfer notu ekle';
-
-  @override
-  String get yuan => 'TL';
-
-  @override
-  String get savedToChangeCanTransfer =>
-      'Bakiyeye kaydedildi, doğrudan transfer edilebilir';
-
-  @override
-  String get replyWithEmoji => 'Bu emoji ile yanıtla';
-
-  @override
-  String get claimedYourRedPacket => 'sizin kırmızı paketinizi aldı';
-
-  @override
-  String get claimedRedPacket => 'aldı';
-
-  @override
-  String get otherTyping => 'yazıyor...';
-
-  @override
-  String get processing => 'İşleniyor...';
-
-  @override
-  String get transferCancelled => 'Transfer iptal edildi';
-
-  @override
-  String get transferFailed => 'Transfer başarısız';
-
-  @override
-  String get creatingPaymentRequest => 'Ödeme talebi oluşturuluyor...';
-
-  @override
-  String get processingPayment => 'Ödeme işleniyor...';
-
-  @override
-  String get paymentFailed => 'Ödeme başarısız';
-
-  @override
-  String get clickRetry => 'Tekrar denemek için dokunun';
-
-  @override
-  String get settingsTitle => 'Ayarlar';
-
-  @override
-  String get editRemark => 'Notu Düzenle';
-
-  @override
-  String get setPermissions => 'İzinleri Ayarla';
-
-  @override
-  String get recommendToFriends => 'Arkadaşlara Öner';
-
-  @override
-  String get setStarFriend => 'Yıldızlı Arkadaş Olarak Ayarla';
-
-  @override
-  String get addToBlacklist => 'Kara Listeye Ekle';
-
-  @override
-  String get complain => 'Şikayet Et';
-
-  @override
-  String get deleteContact => 'Kişiyi Sil';
-
-  @override
-  String deleteContactConfirm(String name) {
-    return '$name kişisini silmek istediğinizden emin misiniz?';
-  }
-
-  @override
-  String get transferTitle => 'Transfer';
-
-  @override
-  String get receiverAddressLabel => 'Alıcı Adresi';
-
-  @override
-  String get selectTokenLabel => 'Token Seç';
-
-  @override
-  String get transferAmountLabel => 'Transfer Tutarı';
-
-  @override
-  String get memoLabel => 'Not (isteğe bağlı)';
-
-  @override
-  String get enterOrPasteAddressHint => 'Cüzdan adresini girin veya yapıştırın';
-
-  @override
-  String get scanInDevelopment => 'Tarama özelliği geliştirme aşamasında...';
-
-  @override
-  String get availableLabel => 'Kullanılabilir';
-
-  @override
-  String availableBalanceFormat(String balance, String symbol) {
-    return 'Kullanılabilir: $balance $symbol';
-  }
-
-  @override
-  String get addMemoHint => 'Not ekle';
-
-  @override
-  String get receiveTitle => 'Al';
-
-  @override
-  String get walletNotConnectedTitle => 'Cüzdan bağlı değil';
-
-  @override
-  String get connectWalletFirst => 'Lütfen önce cüzdanı bağlayın';
-
-  @override
-  String get sendPaymentRequest => 'Ödeme Talebi Gönder';
-
-  @override
-  String get qrCodeGenerateFailed => 'QR kod oluşturma başarısız';
-
-  @override
-  String get scanQrToPayMe => 'Bana ödeme yapmak için QR kodu tarayın';
-
-  @override
-  String get myWalletAddress => 'Cüzdan Adresim';
-
-  @override
-  String get createPaymentRequest => 'Ödeme Talebi Oluştur';
-
-  @override
-  String get selectTokenHint => 'Token Seç';
-
-  @override
-  String get amountLabel => 'Tutar';
-
-  @override
-  String get cancelButton => 'İptal';
-
-  @override
-  String get sendRequestButton => 'Talep Gönder';
-
-  @override
-  String get allReadReceipt => 'Tümü okundu';
-
-  @override
-  String readCountReceipt(int count) {
-    return '$count okundu';
-  }
-
-  @override
-  String n42IdLabel(String id) {
-    return 'N42 ID: $id';
-  }
-
-  @override
-  String get redPacketDefaultGreeting => 'İyi dilekler';
-
-  @override
-  String senderRedPacket(String name) {
-    return '$name Kırmızı Paketi';
-  }
-
-  @override
-  String get allButton => 'Tümü';
-
-  @override
-  String get enterValidAddress => 'Lütfen geçerli bir adres girin';
-
-  @override
-  String get pleaseSelectToken => 'Lütfen bir token seçin';
-
-  @override
-  String get receivedTransfer => 'Transfer Alındı';
-
-  @override
-  String get selectForwardRecipient => 'İletilecek kişiyi seçin';
-
-  @override
-  String get emojiFaces => 'Yüzler';
-
-  @override
-  String get emojiHearts => 'Kalpler';
-
-  @override
-  String get emojiAnimals => 'Hayvanlar';
-
-  @override
-  String get emojiFood => 'Yiyecek';
-
-  @override
-  String get emojiTransport => 'Ulaşım';
-
-  @override
-  String get emojiActivities => 'Aktiviteler';
-
-  @override
-  String get emojiObjects => 'Nesneler';
-
-  @override
-  String get emojiSymbols => 'Semboller';
-
-  @override
-  String get transferProcessing => 'Transfer işleniyor...';
-
-  @override
-  String senderSentRedPacket(String name) {
-    return '$name bir kırmızı paket gönderdi';
-  }
-
-  @override
-  String get savedToBalance =>
-      'Bakiyeye kaydedildi, doğrudan transfer edilebilir';
-
-  @override
-  String get redPacketExpiredOrEmpty =>
-      'Kırmızı paket süresi doldu/tamamı alındı';
-
-  @override
-  String get scanFeatureComingSoon => 'Tarama özelliği yakında...';
-
-  @override
-  String get setAsStarred => 'Yıldızlı Olarak Ayarla';
-
-  @override
-  String get addToBlocklist => 'Engelleme Listesine Ekle';
-
-  @override
-  String get claimedYour => ' sizinkini aldı ';
-
-  @override
-  String get claimedText => ' aldı ';
-
-  @override
-  String userTyping(String name) {
-    return '$name yazıyor...';
-  }
-
-  @override
-  String get typing => 'Yazıyor...';
-
-  @override
-  String get waitingToReceive => 'Alınmayı bekliyor';
-
-  @override
-  String get tapToClaim => 'Almak için dokunun';
-
-  @override
-  String get hasBeenReceived => 'Alındı';
-
-  @override
-  String get getLucky => 'Şansını dene';
-
-  @override
-  String get cameraStartFailed => 'Kamera başlatılamadı';
-
-  @override
-  String get unknownError => 'Bilinmeyen hata';
-
-  @override
-  String get placeQrCodeInFrame => 'QR kodu taramak için çerçeveye yerleştirin';
-
-  @override
-  String get closeManualInput => 'Manuel Girişi Kapat';
-
-  @override
-  String get manualInputUserId => 'Manuel Kullanıcı ID Girişi';
-
-  @override
-  String get add => 'Ekle';
-
-  @override
-  String get ringtoneClear => 'Temizle';
-
-  @override
-  String get ringtonePhone => 'Telefon';
-
-  @override
-  String get ringtoneClassic => 'Klasik';
-
-  @override
-  String get ringtoneSoft => 'Yumuşak';
-
-  @override
-  String get ringtoneVibrate => 'Titreşim';
-
-  @override
-  String get ringtoneSilent => 'Sessiz';
-
-  @override
-  String get stop => 'Durdur';
-
-  @override
-  String get selectRingtone => 'Zil Sesi Seç';
-
-  @override
-  String get loadingRingtones => 'Zil sesleri yükleniyor...';
-
-  @override
-  String get noRingtonesFound => 'Zil sesi bulunamadı';
-
-  @override
-  String get moodAndThoughts => 'Ruh Hali ve Düşünceler';
-
-  @override
-  String get statusHappy => 'Mutlu';
-
-  @override
-  String get statusCracked => 'Paramparça';
-
-  @override
-  String get statusLucky => 'Şanslı';
-
-  @override
-  String get statusSunny => 'Güneşli';
-
-  @override
-  String get statusTired => 'Yorgun';
-
-  @override
-  String get statusDaydream => 'Hayal';
-
-  @override
-  String get statusRushing => 'Acele';
-
-  @override
-  String get statusOverthinking => 'Fazla Düşünme';
-
-  @override
-  String get statusEnergized => 'Enerjik';
-
-  @override
-  String get workAndStudy => 'İş ve Çalışma';
-
-  @override
-  String get statusWorking => 'Çalışıyor';
-
-  @override
-  String get statusStudying => 'Ders Çalışıyor';
-
-  @override
-  String get statusBusy => 'Meşgul';
-
-  @override
-  String get statusSlacking => 'Tembellik';
-
-  @override
-  String get statusTraveling => 'Seyahatte';
-
-  @override
-  String get statusGoingHome => 'Eve Gidiyor';
-
-  @override
-  String get statusDnd => 'Rahatsız Etmeyin';
-
-  @override
-  String get statusHanging => 'Takılıyor';
-
-  @override
-  String get statusCheckIn => 'Check-in';
-
-  @override
-  String get statusExercising => 'Egzersiz';
-
-  @override
-  String get statusCoffee => 'Kahve';
-
-  @override
-  String get statusBubbleTea => 'Bubble Tea';
-
-  @override
-  String get statusEating => 'Yemek Yiyor';
-
-  @override
-  String get statusParenting => 'Ebeveynlik';
-
-  @override
-  String get statusSavingWorld => 'Dünyayı Kurtarıyor';
-
-  @override
-  String get statusSelfie => 'Selfie';
-
-  @override
-  String get rest => 'Dinlenme';
-
-  @override
-  String get statusRetreat => 'Dinlenme';
-
-  @override
-  String get statusHome => 'Evde';
-
-  @override
-  String get statusSleeping => 'Uyuyor';
-
-  @override
-  String get statusCatLover => 'Kedi Sever';
-
-  @override
-  String get statusDogWalking => 'Köpek Gezdiriyor';
-
-  @override
-  String get statusGaming => 'Oyun Oynuyor';
-
-  @override
-  String get statusListening => 'Dinliyor';
-
-  @override
-  String get setStatus => 'Durum Ayarla';
-
-  @override
-  String get visibleToFriends24h => '24 saat arkadaşlara görünür';
-
-  @override
-  String get writeStatus => 'Durum Yaz';
-
-  @override
-  String get enterYourStatus => 'Durumunuzu girin...';
-
-  @override
-  String get ok => 'Tamam';
-
-  @override
-  String get cameraPermissionRequired =>
-      'QR kod taramak için kamera izni gerekli';
-
-  @override
-  String get cameraPermissionDenied =>
-      'Kamera izni kalıcı olarak reddedildi. Lütfen sistem ayarlarından etkinleştirin.';
-
-  @override
-  String get cannotGetCameraPermission => 'Kamera izni alınamadı';
-
-  @override
-  String permissionCheckError(String error) {
-    return 'İzin kontrol hatası: $error';
-  }
-
-  @override
-  String get invalidQrCode => 'Geçersiz QR kod';
-
-  @override
-  String qrCodeProcessFailed(String error) {
-    return 'QR kod işlenemedi: $error';
-  }
-
-  @override
-  String cannotAddFriend(String error) {
-    return 'Arkadaş eklenemedi: $error';
-  }
-
-  @override
-  String get scanQrCode => 'QR Kod Tara';
-
-  @override
-  String get checkingCameraPermission => 'Kamera izni kontrol ediliyor...';
-
-  @override
-  String get needCameraPermission => 'Kamera İzni Gerekli';
-
-  @override
-  String get retryPermission => 'Tekrar Dene';
-
-  @override
-  String get openSettings => 'Ayarları Aç';
-
-  @override
-  String get inviteMembers => 'Üye Davet Et';
-
-  @override
-  String inviteCount(int count) {
-    return 'Davet Et($count)';
-  }
-
-  @override
-  String get noShippingAddress => 'Teslimat adresi yok';
-
-  @override
-  String get defaultLabel => 'Varsayılan';
-
-  @override
-  String get editAddress => 'Adresi Düzenle';
-
-  @override
-  String get recipient => 'Alıcı';
-
-  @override
-  String get enterRecipientName => 'Alıcı adını girin';
-
-  @override
-  String get phoneNumber => 'Telefon Numarası';
-
-  @override
-  String get enterPhoneNumber => 'Telefon numarası girin';
-
-  @override
-  String get regionHint => 'İl/İlçe/Mahalle';
-
-  @override
-  String get detailedAddress => 'Detaylı Adres';
-
-  @override
-  String get detailedAddressHint => 'Sokak, bina numarası, vb.';
-
-  @override
-  String get setAsDefaultAddress => 'Varsayılan adres olarak ayarla';
-
-  @override
-  String get pleaseCompleteInfo => 'Lütfen tüm alanları doldurun';
-
-  @override
-  String get noInvoice => 'Fatura yok';
-
-  @override
-  String get company => 'Şirket';
-
-  @override
-  String get taxNumber => 'Vergi Numarası';
-
-  @override
-  String get editInvoice => 'Faturayı Düzenle';
-
-  @override
-  String get companyName => 'Şirket Adı';
-
-  @override
-  String get enterCompanyName => 'Şirket adı girin';
-
-  @override
-  String get personalName => 'Kişi Adı';
-
-  @override
-  String get enterName => 'Ad girin';
-
-  @override
-  String get taxIdNumber => 'Vergi Kimlik Numarası';
-
-  @override
-  String get enterTaxIdNumber => 'Vergi kimlik numarası girin';
-
-  @override
-  String get bankNameOptional => 'Banka Adı (İsteğe bağlı)';
-
-  @override
-  String get enterBankName => 'Banka adı girin';
-
-  @override
-  String get bankAccountOptional => 'Banka Hesabı (İsteğe bağlı)';
-
-  @override
-  String get enterBankAccount => 'Banka hesabı girin';
-
-  @override
-  String get companyAddressOptional => 'Şirket Adresi (İsteğe bağlı)';
-
-  @override
-  String get enterCompanyAddress => 'Şirket adresi girin';
-
-  @override
-  String get companyPhoneOptional => 'Şirket Telefonu (İsteğe bağlı)';
-
-  @override
-  String get enterCompanyPhone => 'Şirket telefonu girin';
-
-  @override
-  String get setAsDefaultInvoice => 'Varsayılan fatura olarak ayarla';
-
-  @override
-  String get confirmDeleteAddress =>
-      'Bu adresi silmek istediğinizden emin misiniz?';
-
-  @override
-  String get confirmDeleteInvoice =>
-      'Bu faturayı silmek istediğinizden emin misiniz?';
+  String get groupViewAll => 'Tümünü gör';
 
   @override
   String get groupOwner => 'Sahip';
@@ -3044,938 +681,2646 @@ class STr extends S {
   String get groupAdmin => 'Yönetici';
 
   @override
-  String get searchMembers => 'Üyelerde ara';
+  String get groupInvite => 'Davet Et';
 
   @override
-  String totalMembers(int count) {
+  String get commonGroupAnnouncement => 'Grup Duyurusu';
+
+  @override
+  String get commonNotSet => 'Ayarlanmadı';
+
+  @override
+  String get groupDescription => 'Grup Açıklaması';
+
+  @override
+  String get groupPublicGroup => 'Herkese Açık Grup';
+
+  @override
+  String get commonClearChatHistory => 'Sohbet Geçmişini Temizle';
+
+  @override
+  String get commonDissolveGroup => 'Grubu Dağıt';
+
+  @override
+  String get commonLeaveGroup => 'Gruptan Ayrıl';
+
+  @override
+  String get groupChangeGroupName => 'Grup Adını Değiştir';
+
+  @override
+  String get commonEnterGroupName => 'Grup adı girin';
+
+  @override
+  String get commonConfirm => 'Onayla';
+
+  @override
+  String get groupEnterGroupDescription => 'Grup açıklaması girin';
+
+  @override
+  String get groupPublish => 'Yayınla';
+
+  @override
+  String get chatClearHistoryConfirm =>
+      'Tüm sohbet geçmişini temizle? Bu işlem geri alınamaz.';
+
+  @override
+  String get chatClearAction => 'Temizle';
+
+  @override
+  String get commonChatHistoryCleared => 'Sohbet geçmişi temizlendi';
+
+  @override
+  String get commonDissolve => 'Dağıt';
+
+  @override
+  String get groupQrCode => 'Grup QR Kodu';
+
+  @override
+  String get commonSearchChatHistory => 'Sohbet Geçmişinde Ara';
+
+  @override
+  String get groupIdCopied => 'Grup ID\'si kopyalandı';
+
+  @override
+  String get transferEnterOrPasteAddress =>
+      'Cüzdan adresini girin veya yapıştırın';
+
+  @override
+  String get transferSelectToken => 'Token Seç';
+
+  @override
+  String get commonTransferAmount => 'Transfer Tutarı';
+
+  @override
+  String get transferAvailable => 'Kullanılabilir';
+
+  @override
+  String get transferMemoOptional => 'Not (isteğe bağlı)';
+
+  @override
+  String get transferConfirmTransfer => 'Transferi Onayla';
+
+  @override
+  String get transferAddressVerified => 'Adres doğrulandı';
+
+  @override
+  String transferAvailableBalance(String balance, String symbol) {
+    return 'Kullanılabilir: $balance $symbol';
+  }
+
+  @override
+  String get commonEnterAmount => 'Tutar girin';
+
+  @override
+  String get commonRedPacketCountMin => 'En az 1 kırmızı paket gerekli';
+
+  @override
+  String get commonViewRedPacketDetails => 'Kırmızı paket detaylarını gör';
+
+  @override
+  String get commonEnterTransferAmount => 'Transfer tutarını girin';
+
+  @override
+  String get commonTransferTo => 'Transfer hedefi';
+
+  @override
+  String commonFromSender(String name, Object senderName) {
+    return '$senderName tarafından';
+  }
+
+  @override
+  String get commonConfirmReceive => 'Alımı Onayla';
+
+  @override
+  String get groupProfile => 'Grup Bilgisi';
+
+  @override
+  String get groupRemoveMember => 'Gruptan Çıkar';
+
+  @override
+  String get commonRemove => 'Çıkar';
+
+  @override
+  String get profileClearStatus => 'Durumu Temizle';
+
+  @override
+  String get profileClearStatusConfirm => 'Mevcut durumu temizle?';
+
+  @override
+  String get profileStatusCleared => 'Durum temizlendi';
+
+  @override
+  String get profileUserNotExist => 'Kullanıcı mevcut değil';
+
+  @override
+  String get profileUserIdCopied => 'Kullanıcı ID\'si kopyalandı';
+
+  @override
+  String get commonReport => 'Şikayet Et';
+
+  @override
+  String get profileQrCode => 'QR Kod';
+
+  @override
+  String get profileAvatarUpdated => 'Avatar güncellendi';
+
+  @override
+  String commonSelectImageFailed(String error) {
+    return 'Resim seçilemedi: $error';
+  }
+
+  @override
+  String get profileChangeName => 'Adı Değiştir';
+
+  @override
+  String get profileMale => 'Erkek';
+
+  @override
+  String get profileFemale => 'Kadın';
+
+  @override
+  String chatFeatureInDev(String feature) {
+    return '$feature geliştirme aşamasında...';
+  }
+
+  @override
+  String profileSaveAddressFailed(String error) {
+    return 'Adres kaydedilemedi: $error';
+  }
+
+  @override
+  String get profileAddNew => 'Ekle';
+
+  @override
+  String get profileAddAddress => 'Adres Ekle';
+
+  @override
+  String get profileAddressAdded => 'Adres eklendi';
+
+  @override
+  String get profileAddressUpdated => 'Adres güncellendi';
+
+  @override
+  String get profileDeleteAddress => 'Adresi Sil';
+
+  @override
+  String get profileAddressDeleted => 'Adres silindi';
+
+  @override
+  String profileSaveInvoiceFailed(String error) {
+    return 'Fatura kaydedilemedi: $error';
+  }
+
+  @override
+  String get profileMyInvoices => 'Faturalarım';
+
+  @override
+  String get profileAddInvoice => 'Fatura Ekle';
+
+  @override
+  String get profileInvoiceAdded => 'Fatura eklendi';
+
+  @override
+  String get profileInvoiceUpdated => 'Fatura güncellendi';
+
+  @override
+  String get profileDeleteInvoice => 'Faturayı Sil';
+
+  @override
+  String get profileInvoiceDeleted => 'Fatura silindi';
+
+  @override
+  String get profilePersonal => 'Bireysel';
+
+  @override
+  String get groupSelectAtLeastOne => 'Lütfen en az bir üye seçin';
+
+  @override
+  String get chatFileNotExist => 'Dosya mevcut değil';
+
+  @override
+  String chatSendFailed(String error) {
+    return 'Gönderme başarısız: $error';
+  }
+
+  @override
+  String get chatCannotOpenBrowser => 'Tarayıcı açılamadı';
+
+  @override
+  String chatSelectFileFailed(String error) {
+    return 'Dosya seçilemedi: $error';
+  }
+
+  @override
+  String settingsSetupFailed(String error) {
+    return 'Kurulum başarısız: $error';
+  }
+
+  @override
+  String get transferEnterValidAmount => 'Lütfen geçerli bir tutar girin';
+
+  @override
+  String get commonAddressCopied => 'Adres kopyalandı';
+
+  @override
+  String favoriteOpenItem(String content) {
+    return 'Aç: $content';
+  }
+
+  @override
+  String get favoriteDeleted => 'Silindi';
+
+  @override
+  String get profileWallet => 'Cüzdan';
+
+  @override
+  String get chatRecording => 'Kayıt';
+
+  @override
+  String get chatInvalidVideoUrl => 'Geçersiz video URL\'si';
+
+  @override
+  String get chatDownloadFile => 'Dosyayı indir';
+
+  @override
+  String get chatClearChatHistoryTitle => 'Sohbet Geçmişini Temizle';
+
+  @override
+  String get chatVideoCall => 'Görüntülü Arama';
+
+  @override
+  String get commonVoiceCall => 'Sesli Arama';
+
+  @override
+  String get callLeaveMeeting => 'Toplantıdan Ayrıl';
+
+  @override
+  String get chatDetails => 'Sohbet Detayları';
+
+  @override
+  String get chatViewAllGroupMembers => 'Tüm üyeleri gör';
+
+  @override
+  String get chatGroupName => 'Grup Adı';
+
+  @override
+  String get chatGroupNameUpdated => 'Grup adı güncellendi';
+
+  @override
+  String get chatUpdateFailed => 'Güncelleme başarısız';
+
+  @override
+  String get chatNoPermissionToModify => 'Değiştirme izniniz yok';
+
+  @override
+  String get chatGroupManagement => 'Grup Yönetimi';
+
+  @override
+  String get chatMyNicknameInGroup => 'Gruptaki Takma Adım';
+
+  @override
+  String get chatPinChat => 'Sohbeti Sabitle';
+
+  @override
+  String get chatStrongReminder => 'Güçlü Hatırlatıcı';
+
+  @override
+  String get chatSetChatBackground => 'Sohbet Arka Planını Ayarla';
+
+  @override
+  String get chatUnknownFile => 'Bilinmeyen dosya';
+
+  @override
+  String get chatDownload => 'İndir';
+
+  @override
+  String get chatInvalidLocation => 'Geçersiz konum';
+
+  @override
+  String get chatTapToCancel => 'İptal etmek için dokunun';
+
+  @override
+  String chatCaptureFailed(Object error) {
+    return 'Yakalama başarısız: $error';
+  }
+
+  @override
+  String get chatProcessingVideo => 'Video işleniyor...';
+
+  @override
+  String get chatVideoFileNotExist => 'Video dosyası mevcut değil';
+
+  @override
+  String get chatVideoDataEmpty => 'Video verisi boş';
+
+  @override
+  String get chatVideoTooLarge => 'Video boyutu 100MB\'ı geçemez';
+
+  @override
+  String get chatSendingVideo => 'Video gönderiliyor...';
+
+  @override
+  String chatSendVideoFailed(Object error) {
+    return 'Video gönderilemedi: $error';
+  }
+
+  @override
+  String get chatImageFileNotExist => 'Resim dosyası mevcut değil';
+
+  @override
+  String get commonImageDataEmpty => 'Resim verisi boş';
+
+  @override
+  String get chatSendingImage => 'Resim gönderiliyor...';
+
+  @override
+  String chatSendImageFailed(Object error) {
+    return 'Resim gönderilemedi: $error';
+  }
+
+  @override
+  String get chatSendLocation => 'Konum Gönder';
+
+  @override
+  String get chatSelectLocationAndSend => 'Konum seçin ve gönderin';
+
+  @override
+  String get chatShareRealTimeLocation => 'Gerçek Zamanlı Konum Paylaş';
+
+  @override
+  String get chatShareLocationForOneHour =>
+      'Arkadaşınızla 1 saat gerçek zamanlı konum paylaşın';
+
+  @override
+  String get chatLocationSent => 'Konum gönderildi';
+
+  @override
+  String get chatSelectMessages => 'Mesaj seç';
+
+  @override
+  String chatSelectedCount(int count) {
+    return '$count seçildi';
+  }
+
+  @override
+  String get chatSelectAll => 'Tümünü Seç';
+
+  @override
+  String chatGroupChatCount(int count) {
+    return 'Grup Sohbeti ($count)';
+  }
+
+  @override
+  String get chatPrivateChat => 'Özel Sohbet';
+
+  @override
+  String get chatNoMessages => 'Mesaj yok';
+
+  @override
+  String get chatSendFirstMessage =>
+      'Sohbeti başlatmak için ilk mesajı gönderin';
+
+  @override
+  String get chatEncryptionNotice =>
+      'Bu sohbet uçtan uca şifrelenmiştir. Mesajları sadece siz ve alıcı okuyabilir.';
+
+  @override
+  String get chatMultiForward => 'İlet';
+
+  @override
+  String get chatCollect => 'Kaydet';
+
+  @override
+  String get chatNoMembers => 'Üye yok';
+
+  @override
+  String get chatMemberNotFound => 'Üye bulunamadı';
+
+  @override
+  String get chatVoiceFileNotExist => 'Ses dosyası mevcut değil';
+
+  @override
+  String get chatVoiceFileEmpty => 'Ses dosyası boş';
+
+  @override
+  String get chatSendingVoice => 'Ses gönderiliyor...';
+
+  @override
+  String chatSendVoiceFailed(Object error) {
+    return 'Ses gönderilemedi: $error';
+  }
+
+  @override
+  String get chatMessageForwarded => 'Mesaj iletildi';
+
+  @override
+  String chatForwardFailed(Object error) {
+    return 'İletme başarısız: $error';
+  }
+
+  @override
+  String get chatUnfavorited => 'Favorilerden çıkarıldı';
+
+  @override
+  String get chatFavorited => 'Favorilere eklendi';
+
+  @override
+  String get chatReactionAdded => 'Tepki eklendi';
+
+  @override
+  String get chatReactionRemoved => 'Tepki kaldırıldı';
+
+  @override
+  String get chatFailedMessageDeleted => 'Başarısız mesaj silindi';
+
+  @override
+  String get chatDeleteMessages => 'Mesajları sil';
+
+  @override
+  String chatDeleteMessagesConfirm(Object count) {
+    return '$count mesajı silmek istediğinizden emin misiniz?';
+  }
+
+  @override
+  String chatNoteOtherMessages(Object count) {
+    return 'Not: $count mesaj başkalarına ait ve sadece sizin için silinecek.';
+  }
+
+  @override
+  String chatMyMessagesWillBeRecalled(Object count) {
+    return 'Sizden $count mesaj herkes için geri alınacak.';
+  }
+
+  @override
+  String chatRecalledCount(Object count, Object localCount) {
+    return '$count mesaj geri alındı, $localCount sadece sizin için silindi';
+  }
+
+  @override
+  String chatRecalledMessages(Object count) {
+    return '$count mesaj geri alındı';
+  }
+
+  @override
+  String chatDeletedLocally(Object count) {
+    return '$count mesaj sadece sizin için silindi';
+  }
+
+  @override
+  String chatForwardedCount(Object count) {
+    return '$count mesaj iletildi';
+  }
+
+  @override
+  String chatForwardComplete(Object failed, Object success) {
+    return 'İletme tamamlandı: $success başarılı, $failed başarısız';
+  }
+
+  @override
+  String get chatRemindOnlyInGroup =>
+      'Hatırlatma özelliği sadece grup sohbetlerinde kullanılabilir';
+
+  @override
+  String get chatOnlyTextSearchable => 'Sadece metin mesajları aranabilir';
+
+  @override
+  String chatSearchFor(Object text) {
+    return '\"$text\" ara';
+  }
+
+  @override
+  String get chatBaiduSearch => 'Baidu Arama';
+
+  @override
+  String get chatGoogleSearch => 'Google Arama';
+
+  @override
+  String get chatBingSearch => 'Bing Arama';
+
+  @override
+  String get chatCalling => 'Aranıyor...';
+
+  @override
+  String get chatRinging => 'Çalıyor...';
+
+  @override
+  String get chatInCall => 'Aramada';
+
+  @override
+  String commonFeatureInDevelopment(String feature) {
+    return 'Özellik geliştirme aşamasında...';
+  }
+
+  @override
+  String chatCollectMessages(Object count) {
+    return '$count mesaj kaydedildi';
+  }
+
+  @override
+  String commonMemberCount(int count) {
     return '$count üye';
   }
 
   @override
-  String get removeFromGroup => 'Gruptan Çıkar';
+  String groupDone(int count) {
+    return 'Tamamlandı($count)';
+  }
 
   @override
-  String confirmRemoveMember(String name) {
+  String get profileServices => 'Hizmetler';
+
+  @override
+  String get commonFavorites => 'Favoriler';
+
+  @override
+  String get profileOrdersAndCards => 'Siparişler ve Kartlar';
+
+  @override
+  String get profileStickers => 'Çıkartmalar';
+
+  @override
+  String profileStatusSetTo(String status) {
+    return 'Durum ayarlandı: $status';
+  }
+
+  @override
+  String get profileAvatarUploadFailed => 'Avatar yüklemesi başarısız';
+
+  @override
+  String get profilePersonalProfile => 'Kişisel Profil';
+
+  @override
+  String get profileName => 'Ad';
+
+  @override
+  String get profileGender => 'Cinsiyet';
+
+  @override
+  String get profileRegion => 'Bölge';
+
+  @override
+  String get commonMyQrCode => 'QR Kodum';
+
+  @override
+  String get profilePoke => 'Dürt';
+
+  @override
+  String get profileRingtone => 'Zil Sesi';
+
+  @override
+  String get profileDefaultRingtone => 'Varsayılan Zil Sesi';
+
+  @override
+  String get profileMyAddresses => 'Adreslerim';
+
+  @override
+  String profileGenderSetTo(String gender) {
+    return 'Cinsiyet ayarlandı: $gender';
+  }
+
+  @override
+  String get profileSelectRegion => 'Bölge Seç';
+
+  @override
+  String get profileSelectCity => 'Şehir Seç';
+
+  @override
+  String profileRegionSetTo(String region) {
+    return 'Bölge ayarlandı: $region';
+  }
+
+  @override
+  String get profileSetPoke => 'Dürtmeyi Ayarla';
+
+  @override
+  String get profileFriendPokedMe => 'Arkadaş beni dürttü';
+
+  @override
+  String get profileExample => 'Örnek';
+
+  @override
+  String get profileOnTheShoulder => ' omuzdan';
+
+  @override
+  String get profilePokeCleared => 'Dürtme temizlendi';
+
+  @override
+  String profilePokeSetTo(String suffix) {
+    return 'Dürtme ayarlandı: beni dürttü$suffix';
+  }
+
+  @override
+  String get profileEditSignature => 'İmzayı Düzenle';
+
+  @override
+  String get profileIntroduceYourself => 'Kendinizi tanıtacak bir cümle';
+
+  @override
+  String get profileSignatureCleared => 'İmza temizlendi';
+
+  @override
+  String get profileSignatureUpdated => 'İmza güncellendi';
+
+  @override
+  String get profileScanToAddFriend =>
+      'Beni arkadaş olarak eklemek için yukarıdaki QR kodu tarayın';
+
+  @override
+  String profileRingtoneSetTo(String ringtone) {
+    return 'Zil sesi ayarlandı: $ringtone';
+  }
+
+  @override
+  String commonConfirmDissolveGroup(String name) {
+    return '\"$name\" grubunu dağıtmak istediğinize emin misiniz? Bu işlem geri alınamaz.';
+  }
+
+  @override
+  String get authEnterValidServerAddress =>
+      'Lütfen geçerli bir sunucu adresi girin';
+
+  @override
+  String get authEmailOtp => 'E-posta OTP';
+
+  @override
+  String get authEnterServerAddressFirst => 'Lütfen önce sunucu adresi girin';
+
+  @override
+  String get authPasskeyRequiresServer =>
+      'Passkey girişi sunucu desteği gerektirir';
+
+  @override
+  String get authLoginAgreement => 'Giriş yaparak kabul etmiş olursunuz ';
+
+  @override
+  String get authPleaseAgreeToTerms =>
+      'Lütfen Hizmet Şartları ve Gizlilik Politikasını okuyun ve kabul edin';
+
+  @override
+  String get authRegisterFailed => 'Kayıt başarısız';
+
+  @override
+  String get commonReenterPassword => 'Şifreyi tekrar girin';
+
+  @override
+  String get commonPasswordsDoNotMatch => 'Şifreler eşleşmiyor';
+
+  @override
+  String get authInviteCodeBuiltIn => 'Davet Kodu (Yerleşik)';
+
+  @override
+  String get authInviteCodeBuiltInNote =>
+      'Davet kodu yerleşiktir, genellikle değiştirmeye gerek yoktur';
+
+  @override
+  String get authIHaveReadAndAgree => 'Okudum ve kabul ediyorum ';
+
+  @override
+  String get mainStartGroupChat => 'Grup Sohbeti Başlat';
+
+  @override
+  String get mainAddFriends => 'Arkadaş Ekle';
+
+  @override
+  String get mainPaymentAndCollection => 'Ödeme';
+
+  @override
+  String contactCount(int count) {
+    return '$count kişi';
+  }
+
+  @override
+  String get contactAddToHomeScreen => 'Ana ekrana ekle';
+
+  @override
+  String contactRecommendedCardTo(String contact, String recipient) {
+    return '$contact kartı $recipient kişisine önerildi';
+  }
+
+  @override
+  String get contactEnterRemarkName => 'Takma ad girin';
+
+  @override
+  String contactRemarkSetTo(String remark) {
+    return 'Not ayarlandı: $remark';
+  }
+
+  @override
+  String contactAcceptedFriendRequest(String name) {
+    return '$name arkadaşlık isteği kabul edildi';
+  }
+
+  @override
+  String contactRejectedFriendRequest(String name) {
+    return '$name arkadaşlık isteği reddedildi';
+  }
+
+  @override
+  String get commonGroupInvites => 'Grup Davetleri';
+
+  @override
+  String commonMyGroups(int count) {
+    return 'Gruplarım ($count)';
+  }
+
+  @override
+  String get commonInvitedToJoinGroup => 'Gruba davet edildi';
+
+  @override
+  String commonConfirmLeaveGroup(String name) {
+    return '\"$name\" grubundan ayrılmak istediğinize emin misiniz?';
+  }
+
+  @override
+  String get commonLeave => 'Ayrıl';
+
+  @override
+  String get commonRecallThisMessage => 'Bu mesajı geri al?';
+
+  @override
+  String get commonSavedToGallery => 'Galeriye kaydedildi';
+
+  @override
+  String get commonFailedToSave => 'Kaydetme başarısız';
+
+  @override
+  String get chatSaving => 'Kaydediliyor...';
+
+  @override
+  String get commonShare => 'Paylaş';
+
+  @override
+  String get chatSaveToGallery => 'Galeriye Kaydet';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'İndirme başarısız: $code';
+  }
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Paylaşım başarısız: $error';
+  }
+
+  @override
+  String get chatFailedToLoadImage => 'Resim yüklenemedi';
+
+  @override
+  String get chatVideoRecordingFailed =>
+      'Video kaydı başarısız. Lütfen tekrar deneyin.';
+
+  @override
+  String get profileRedPacket => 'Kırmızı Paket';
+
+  @override
+  String get commonMusic => 'Müzik';
+
+  @override
+  String get commonCoupon => 'Kupon';
+
+  @override
+  String get commonGift => 'Hediye';
+
+  @override
+  String get commonPoll => 'Anket';
+
+  @override
+  String get favoriteText => 'Metin';
+
+  @override
+  String get favoriteLinkLabel => 'Bağlantı';
+
+  @override
+  String get favoriteNote => 'Not';
+
+  @override
+  String get favoriteMyNotes => 'Notlarım';
+
+  @override
+  String get favoriteToday => 'Bugün';
+
+  @override
+  String favoriteDaysAgoText(int count) {
+    return '$count gün önce';
+  }
+
+  @override
+  String favoriteDateFormat(int month, int day) {
+    return '$day/$month';
+  }
+
+  @override
+  String get favoriteNoFavorites => 'Henüz favori yok';
+
+  @override
+  String get favoriteLongPressToFavorite =>
+      'Favorilere eklemek için mesaja uzun basın';
+
+  @override
+  String get favoriteNewNote => 'Yeni Not';
+
+  @override
+  String get favoriteLink => 'Favori Bağlantı';
+
+  @override
+  String get favoriteEditTags => 'Etiketleri Düzenle';
+
+  @override
+  String get favoriteDeleteFavorite => 'Favoriyi Sil';
+
+  @override
+  String get favoriteDeleteFavoriteConfirm =>
+      'Bu favoriyi silmek istediğinizden emin misiniz?';
+
+  @override
+  String get favoriteNoSearchResultsFound => 'Sonuç bulunamadı';
+
+  @override
+  String get commonSendRedPacket => 'Kırmızı Paket Gönder';
+
+  @override
+  String get transferAmount => 'Tutar';
+
+  @override
+  String get commonRedPacketCover => 'Kırmızı Paket Kapağı';
+
+  @override
+  String get commonRedPacketType => 'Kırmızı Paket Türü';
+
+  @override
+  String get commonNormalRedPacket => 'Normal';
+
+  @override
+  String get commonLuckyRedPacket => 'Şanslı';
+
+  @override
+  String get commonRedPacketCount => 'Kırmızı Paket Sayısı';
+
+  @override
+  String get commonPieces => 'adet';
+
+  @override
+  String get commonPutMoneyInRedPacket => 'Kırmızı pakete para koy';
+
+  @override
+  String get commonRedPacketRefundNotice =>
+      'Alınmayan kırmızı paketler 24 saat sonra iade edilir';
+
+  @override
+  String get commonOpenRedPacket => 'Aç';
+
+  @override
+  String get commonRedPacketAllClaimed => 'Kırmızı paket tamamı alındı';
+
+  @override
+  String get commonRedPacketExpired => 'Kırmızı paket süresi doldu';
+
+  @override
+  String get commonAddTransferNote => 'Transfer notu ekle';
+
+  @override
+  String get commonYuan => 'TL';
+
+  @override
+  String get commonReplyWithEmoji => 'Bu emoji ile yanıtla';
+
+  @override
+  String get contactEditRemark => 'Notu Düzenle';
+
+  @override
+  String get contactSetPermissions => 'İzinleri Ayarla';
+
+  @override
+  String get profileAddToBlacklist => 'Kara Listeye Ekle';
+
+  @override
+  String get contactDeleteContact => 'Kişiyi Sil';
+
+  @override
+  String contactDeleteContactConfirm(String name) {
+    return '$name kişisini silmek istediğinizden emin misiniz?';
+  }
+
+  @override
+  String get transferTitle => 'Transfer';
+
+  @override
+  String get transferReceiverAddressLabel => 'Alıcı Adresi';
+
+  @override
+  String get transferSelectTokenLabel => 'Token Seç';
+
+  @override
+  String get transferAmountLabel => 'Transfer Tutarı';
+
+  @override
+  String get transferMemoLabel => 'Not (isteğe bağlı)';
+
+  @override
+  String get transferAddMemoHint => 'Not ekle';
+
+  @override
+  String get transferSendPaymentRequest => 'Ödeme Talebi Gönder';
+
+  @override
+  String get transferQrCodeGenerateFailed => 'QR kod oluşturma başarısız';
+
+  @override
+  String get transferScanQrToPayMe => 'Bana ödeme yapmak için QR kodu tarayın';
+
+  @override
+  String get transferMyWalletAddress => 'Cüzdan Adresim';
+
+  @override
+  String get transferCreatePaymentRequest => 'Ödeme Talebi Oluştur';
+
+  @override
+  String profileN42IdLabel(String id) {
+    return 'N42 ID: $id';
+  }
+
+  @override
+  String get commonRedPacketDefaultGreeting => 'İyi dilekler';
+
+  @override
+  String commonSenderRedPacket(String name) {
+    return '$name Kırmızı Paketi';
+  }
+
+  @override
+  String get transferEnterValidAddress => 'Lütfen geçerli bir adres girin';
+
+  @override
+  String get transferPleaseSelectToken => 'Lütfen bir token seçin';
+
+  @override
+  String get commonReceivedTransfer => 'Transfer Alındı';
+
+  @override
+  String commonSenderSentRedPacket(String name) {
+    return '$name bir kırmızı paket gönderdi';
+  }
+
+  @override
+  String get commonSavedToBalance =>
+      'Bakiyeye kaydedildi, doğrudan transfer edilebilir';
+
+  @override
+  String get commonRedPacketExpiredOrEmpty =>
+      'Kırmızı paket süresi doldu/tamamı alındı';
+
+  @override
+  String get transferScanFeatureComingSoon => 'Tarama özelliği yakında...';
+
+  @override
+  String get contactSetAsStarred => 'Yıldızlı Olarak Ayarla';
+
+  @override
+  String get contactAddToBlocklist => 'Engelleme Listesine Ekle';
+
+  @override
+  String get commonClaimedYour => ' sizinkini aldı ';
+
+  @override
+  String get commonClaimedText => ' aldı ';
+
+  @override
+  String commonUserTyping(String name) {
+    return '$name yazıyor...';
+  }
+
+  @override
+  String get commonTyping => 'Yazıyor...';
+
+  @override
+  String get commonWaitingToReceive => 'Alınmayı bekliyor';
+
+  @override
+  String get commonTapToClaim => 'Almak için dokunun';
+
+  @override
+  String get commonHasBeenReceived => 'Alındı';
+
+  @override
+  String get commonGetLucky => 'Şansını dene';
+
+  @override
+  String get qrcodeCameraStartFailed => 'Kamera başlatılamadı';
+
+  @override
+  String get qrcodeUnknownError => 'Bilinmeyen hata';
+
+  @override
+  String get qrcodePlaceQrCodeInFrame =>
+      'QR kodu taramak için çerçeveye yerleştirin';
+
+  @override
+  String get qrcodeCloseManualInput => 'Manuel Girişi Kapat';
+
+  @override
+  String get qrcodeManualInputUserId => 'Manuel Kullanıcı ID Girişi';
+
+  @override
+  String get commonAdd => 'Ekle';
+
+  @override
+  String get profileSetStatus => 'Durum Ayarla';
+
+  @override
+  String get profileVisibleToFriends24h => '24 saat arkadaşlara görünür';
+
+  @override
+  String get profileWriteStatus => 'Durum Yaz';
+
+  @override
+  String get profileEnterYourStatus => 'Durumunuzu girin...';
+
+  @override
+  String get profileOk => 'Tamam';
+
+  @override
+  String get qrcodeCameraPermissionRequired =>
+      'QR kod taramak için kamera izni gerekli';
+
+  @override
+  String get qrcodeCameraPermissionDenied =>
+      'Kamera izni kalıcı olarak reddedildi. Lütfen sistem ayarlarından etkinleştirin.';
+
+  @override
+  String qrcodePermissionCheckError(String error) {
+    return 'İzin kontrol hatası: $error';
+  }
+
+  @override
+  String get qrcodeInvalidQrCode => 'Geçersiz QR kod';
+
+  @override
+  String qrcodeCannotAddFriend(String error) {
+    return 'Arkadaş eklenemedi: $error';
+  }
+
+  @override
+  String get qrcodeScanQrCode => 'QR Kod Tara';
+
+  @override
+  String get qrcodeCheckingCameraPermission =>
+      'Kamera izni kontrol ediliyor...';
+
+  @override
+  String get qrcodeNeedCameraPermission => 'Kamera İzni Gerekli';
+
+  @override
+  String get qrcodeRetryPermission => 'Tekrar Dene';
+
+  @override
+  String get qrcodeOpenSettings => 'Ayarları Aç';
+
+  @override
+  String get groupInviteMembers => 'Üye Davet Et';
+
+  @override
+  String groupInviteCount(int count) {
+    return 'Davet Et($count)';
+  }
+
+  @override
+  String get profileNoShippingAddress => 'Teslimat adresi yok';
+
+  @override
+  String get profileDefaultLabel => 'Varsayılan';
+
+  @override
+  String get profileNoInvoice => 'Fatura yok';
+
+  @override
+  String get profileCompany => 'Şirket';
+
+  @override
+  String get profileTaxNumber => 'Vergi Numarası';
+
+  @override
+  String get profileConfirmDeleteAddress =>
+      'Bu adresi silmek istediğinizden emin misiniz?';
+
+  @override
+  String get profileConfirmDeleteInvoice =>
+      'Bu faturayı silmek istediğinizden emin misiniz?';
+
+  @override
+  String get commonGroupOwner => 'Sahip';
+
+  @override
+  String get commonGroupAdmin => 'Yönetici';
+
+  @override
+  String get groupSearchMembers => 'Üyelerde ara';
+
+  @override
+  String groupTotalMembers(int count) {
+    return '$count üye';
+  }
+
+  @override
+  String get chatRemoveFromGroup => 'Gruptan Çıkar';
+
+  @override
+  String groupConfirmRemoveMember(String name) {
     return '\"$name\" kişisini gruptan çıkarmak istediğinizden emin misiniz?';
   }
 
   @override
-  String get setAsAdmin => 'Yönetici Yap';
+  String get chatUnknownSong => 'Bilinmeyen Şarkı';
 
   @override
-  String get removeAdmin => 'Yöneticilikten Çıkar';
+  String get chatUnknownArtist => 'Bilinmeyen Sanatçı';
 
   @override
-  String get deleteContactSuccess => 'Kişi silindi';
+  String get chatUnknownContact => 'Bilinmeyen Kişi';
 
   @override
-  String get unknownSong => 'Bilinmeyen Şarkı';
+  String get chatPersonalCard => 'Kişi Kartı';
 
   @override
-  String get unknownArtist => 'Bilinmeyen Sanatçı';
+  String get chatSingleChoice => 'Tekli';
 
   @override
-  String get unknownContact => 'Bilinmeyen Kişi';
+  String get chatMultiChoice => 'Çoklu';
 
   @override
-  String get personalCard => 'Kişi Kartı';
+  String get chatEnded => 'Sona erdi';
 
   @override
-  String get singleChoice => 'Tekli';
+  String get chatEndPollButton => 'Anketi Bitir';
 
   @override
-  String get multiChoice => 'Çoklu';
-
-  @override
-  String get ended => 'Sona erdi';
-
-  @override
-  String get endPollButton => 'Anketi Bitir';
-
-  @override
-  String get createPoll => 'Anket Oluştur';
-
-  @override
-  String get pollQuestion => 'Anket Sorusu';
-
-  @override
-  String get pollOptions => 'Anket Seçenekleri';
-
-  @override
-  String optionPlaceholder(int index) {
-    return 'Seçenek $index';
-  }
-
-  @override
-  String get addOption => 'Seçenek Ekle';
-
-  @override
-  String get pollSettings => 'Anket Ayarları';
-
-  @override
-  String get anonymousPoll => 'Anonim Anket';
-
-  @override
-  String get pollHint =>
+  String get chatPollHint =>
       'Anket sohbette görüntülenecek. Grup üyeleri oy verebilir.';
 
   @override
-  String get searchSongOrArtist => 'Şarkı veya sanatçı ara';
+  String get chatSearchSongOrArtist => 'Şarkı veya sanatçı ara';
 
   @override
-  String get noSongsFound => 'Şarkı bulunamadı';
+  String get chatNoSongsFound => 'Şarkı bulunamadı';
 
   @override
-  String get supportedMusicPlatforms =>
-      'NetEase, QQ Music vb. platformlardan müzik bağlantılarını destekler.';
+  String get chatSongNameOptional => 'Şarkı Adı (İsteğe bağlı)';
 
   @override
-  String get songNameOptional => 'Şarkı Adı (İsteğe bağlı)';
+  String get chatEnterSongName => 'Şarkı adı girin';
 
   @override
-  String get enterSongName => 'Şarkı adı girin';
+  String get chatArtistNameOptional => 'Sanatçı Adı (İsteğe bağlı)';
 
   @override
-  String get artistNameOptional => 'Sanatçı Adı (İsteğe bağlı)';
+  String get chatEnterArtistName => 'Sanatçı adı girin';
 
   @override
-  String get enterArtistName => 'Sanatçı adı girin';
-
-  @override
-  String get shareSong => 'Şarkı Paylaş';
-
-  @override
-  String get realTimeLocationSharing =>
+  String get chatRealTimeLocationSharing =>
       'Gerçek zamanlı konum paylaşımı geliştirme aşamasında...';
 
   @override
-  String get voiceCallFeatureInDev =>
+  String get profileVoiceCallFeatureInDev =>
       'Sesli arama özelliği geliştirme aşamasında...';
 
   @override
-  String get reportFeatureInDev => 'Şikayet özelliği geliştirme aşamasında...';
+  String get profileReportFeatureInDev =>
+      'Şikayet özelliği geliştirme aşamasında...';
 
   @override
-  String get shareFeatureInDev => 'Paylaşım özelliği geliştirme aşamasında...';
+  String get profileShareFeatureInDev =>
+      'Paylaşım özelliği geliştirme aşamasında...';
 
   @override
-  String get qrCodeFeatureInDev => 'QR kod özelliği geliştirme aşamasında...';
+  String get profileQrCodeFeatureInDev =>
+      'QR kod özelliği geliştirme aşamasında...';
 
   @override
-  String get scanQrToAddMe =>
+  String get qrcodeScanQrToAddMe =>
       'Beni arkadaş olarak eklemek için yukarıdaki QR kodu tarayın';
 
   @override
-  String get saveToAlbum => 'Albüme Kaydet';
+  String get qrcodeSaveToAlbum => 'Albüme Kaydet';
 
   @override
-  String get changeStyle => 'Stili Değiştir';
+  String get qrcodeChangeStyle => 'Stili Değiştir';
 
   @override
-  String get copyId => 'ID Kopyala';
+  String get qrcodeCopyId => 'ID Kopyala';
 
   @override
-  String get idCopied => 'ID kopyalandı';
+  String get qrcodeIdCopied => 'ID kopyalandı';
 
   @override
-  String get shareFeatureComingSoon => 'Paylaşım özelliği yakında';
+  String get qrcodeMoreStylesFeatureComingSoon => 'Daha fazla stil yakında';
 
   @override
-  String get saveFeatureComingSoon => 'Kaydetme özelliği yakında';
+  String get profileBio => 'Biyografi';
 
   @override
-  String get moreStylesFeatureComingSoon => 'Daha fazla stil yakında';
+  String get profileHomeServer => 'Sunucu';
 
   @override
-  String get confirmEndPoll =>
-      'Bu anketi bitirmek istediğinizden emin misiniz?';
+  String get profileShareContactCard => 'Kişi Kartını Paylaş';
 
   @override
-  String get cannotVoteAfterEnd => 'Bitirdikten sonra oy verilemez.';
+  String get profileRemoveFromBlacklist => 'Kara Listeden Çıkar';
 
   @override
-  String get bio => 'Biyografi';
-
-  @override
-  String get homeServer => 'Sunucu';
-
-  @override
-  String get shareContactCard => 'Kişi Kartını Paylaş';
-
-  @override
-  String get removeFromBlacklist => 'Kara Listeden Çıkar';
-
-  @override
-  String get confirmAddBlacklist =>
+  String get profileConfirmAddBlacklist =>
       'Bu kullanıcıyı kara listeye eklemek istediğinizden emin misiniz? Onlardan mesaj almayacaksınız.';
 
   @override
-  String get confirmRemoveBlacklist =>
+  String get profileConfirmRemoveBlacklist =>
       'Bu kullanıcıyı kara listeden çıkarmak istediğinizden emin misiniz?';
 
   @override
-  String get remarkSaved => 'Not kaydedildi';
+  String get profileRemarkSaved => 'Not kaydedildi';
 
   @override
-  String get remarkCleared => 'Not temizlendi';
+  String get profileRemarkCleared => 'Not temizlendi';
 
   @override
-  String get receive => 'Al';
+  String get transferReceive => 'Al';
 
   @override
-  String get pleaseConnectWallet => 'Lütfen önce cüzdanınızı bağlayın';
+  String get transferPleaseConnectWallet => 'Lütfen önce cüzdanınızı bağlayın';
 
   @override
-  String get sendRequest => 'Talep Gönder';
+  String get transferSendRequest => 'Talep Gönder';
 
   @override
-  String get pleaseEnterValidAmount => 'Lütfen geçerli bir tutar girin';
+  String get transferPleaseEnterValidAmount => 'Lütfen geçerli bir tutar girin';
 
   @override
   String get searchPlaceholder => 'Kişi, grup ve mesajlarda ara';
 
   @override
-  String get enterKeywordToSearch =>
+  String get searchEnterKeywordToSearch =>
       'Aramaya başlamak için anahtar kelime girin';
 
   @override
-  String get clearHistory => 'Temizle';
+  String get searchClearHistory => 'Temizle';
 
   @override
-  String noResultsForQuery(String query) {
+  String searchNoResultsForQuery(String query) {
     return '\"$query\" için sonuç bulunamadı';
   }
 
   @override
-  String get allResults => 'Tümü';
+  String get searchAllResults => 'Tümü';
 
   @override
   String get searchInChat => 'Sohbette ara';
 
   @override
-  String get contactLabel => 'Kişi';
+  String get searchContactLabel => 'Kişi';
 
   @override
-  String get groupLabel => 'Grup';
+  String get searchGroupLabel => 'Grup';
 
   @override
-  String get conversationLabel => 'Sohbet';
+  String get searchConversationLabel => 'Sohbet';
 
   @override
-  String get messageLabel => 'Mesaj';
+  String get searchMessageLabel => 'Mesaj';
 
   @override
-  String get securityTitle => 'Güvenlik';
+  String get settingsSecurityTitle => 'Güvenlik';
 
   @override
-  String get keyBackup => 'Anahtar Yedekleme';
+  String get settingsKeyBackup => 'Anahtar Yedekleme';
 
   @override
-  String get backupEncryptionKeys => 'Şifreleme Anahtarlarını Yedekle';
+  String get settingsBackupEncryptionKeys => 'Şifreleme Anahtarlarını Yedekle';
 
   @override
-  String keysBackedUp(int count) {
+  String settingsKeysBackedUp(int count) {
     return '$count anahtar yedeklendi';
   }
 
   @override
-  String get backupNotSet => 'Yedekleme ayarlanmadı';
+  String get settingsBackupNotSet => 'Yedekleme ayarlanmadı';
 
   @override
-  String get restoreKeys => 'Anahtarları Geri Yükle';
+  String get settingsRestoreKeys => 'Anahtarları Geri Yükle';
 
   @override
-  String get restoreKeysFromBackup =>
+  String get settingsRestoreKeysFromBackup =>
       'Yedekten şifreleme anahtarlarını geri yükle';
 
   @override
-  String get exportKeys => 'Anahtarları Dışa Aktar';
+  String get settingsExportKeys => 'Anahtarları Dışa Aktar';
 
   @override
-  String get exportKeysToFile => 'Anahtarları dosyaya aktar';
+  String get settingsExportKeysToFile => 'Anahtarları dosyaya aktar';
 
   @override
-  String get loggedInDevices => 'Giriş Yapılmış Cihazlar';
+  String get settingsLoggedInDevices => 'Giriş Yapılmış Cihazlar';
 
   @override
-  String get noOtherDevices => 'Başka cihaz yok';
+  String get settingsNoOtherDevices => 'Başka cihaz yok';
 
   @override
-  String get verified => 'Doğrulanmış';
+  String get settingsVerified => 'Doğrulanmış';
 
   @override
-  String get unverified => 'Doğrulanmamış';
+  String get settingsUnverified => 'Doğrulanmamış';
 
   @override
-  String get advanced => 'Gelişmiş';
+  String get settingsAdvanced => 'Gelişmiş';
 
   @override
-  String get crossSigning => 'Çapraz İmza';
+  String get settingsCrossSigning => 'Çapraz İmza';
 
   @override
-  String get enabled => 'Etkin';
+  String get settingsEnabled => 'Etkin';
 
   @override
-  String get notEnabled => 'Etkin değil';
+  String get settingsNotEnabled => 'Etkin değil';
 
   @override
-  String get resetEncryption => 'Şifrelemeyi Sıfırla';
+  String get settingsResetEncryption => 'Şifrelemeyi Sıfırla';
 
   @override
-  String get deleteAllEncryptionKeys => 'Tüm şifreleme anahtarlarını sil';
+  String get settingsDeleteAllEncryptionKeys =>
+      'Tüm şifreleme anahtarlarını sil';
 
   @override
-  String get encryptionNotSupported => 'Şifreleme desteklenmiyor';
+  String get settingsEncryptionNotSupported => 'Şifreleme desteklenmiyor';
 
   @override
-  String get notInitialized => 'Başlatılmadı';
+  String get settingsNotInitialized => 'Başlatılmadı';
 
   @override
-  String get backupKeyTitle => 'Anahtarları Yedekle';
+  String get settingsBackupKeyTitle => 'Anahtarları Yedekle';
 
   @override
-  String get backupKeyMessage =>
+  String get settingsBackupKeyMessage =>
       'Yeni bir anahtar yedeklemesi oluştur? Bu, yeni bir cihazda şifrelenmiş mesajları geri yüklemenize yardımcı olacaktır.';
 
   @override
-  String get backup => 'Yedekle';
+  String get settingsBackup => 'Yedekle';
 
   @override
-  String get restoreKeyTitle => 'Anahtarları Geri Yükle';
+  String get settingsRestoreKeyTitle => 'Anahtarları Geri Yükle';
 
   @override
-  String get restoreKeyMessage =>
+  String get settingsRestoreKeyMessage =>
       'Şifrelenmiş mesajları geri yüklemek için kurtarma şifrenizi veya kurtarma anahtarınızı girin.';
 
   @override
-  String get restore => 'Geri Yükle';
+  String get settingsRestore => 'Geri Yükle';
 
   @override
-  String get exportKeyTitle => 'Anahtarları Dışa Aktar';
+  String get settingsExportKeyTitle => 'Anahtarları Dışa Aktar';
 
   @override
-  String get exportKeyMessage =>
+  String get settingsExportKeyMessage =>
       'Dışa aktarılan anahtar dosyası tüm şifreleme anahtarlarınızı içerir. Lütfen güvenli bir yerde saklayın.';
 
   @override
-  String get export => 'Dışa Aktar';
+  String get settingsExport => 'Dışa Aktar';
 
   @override
-  String deviceIdLabel(String deviceId) {
+  String settingsDeviceIdLabel(String deviceId) {
     return 'Cihaz ID: $deviceId';
   }
 
   @override
-  String get deviceStatusVerified => 'Durum: Doğrulanmış';
+  String get settingsDeviceStatusVerified => 'Durum: Doğrulanmış';
 
   @override
-  String get deviceStatusUnverified => 'Durum: Doğrulanmamış';
+  String get settingsDeviceStatusUnverified => 'Durum: Doğrulanmamış';
 
   @override
-  String lastActiveLabel(String lastSeen) {
+  String settingsLastActiveLabel(String lastSeen) {
     return 'Son etkinlik: $lastSeen';
   }
 
   @override
-  String get verifyThisDevice => 'Bu cihazı doğrula';
+  String get settingsVerifyThisDevice => 'Bu cihazı doğrula';
 
   @override
-  String get crossSigningAlreadyEnabled => 'Çapraz imza zaten etkin';
+  String get settingsCrossSigningAlreadyEnabled => 'Çapraz imza zaten etkin';
 
   @override
-  String get crossSigningSetupSuccess => 'Çapraz imza kurulumu başarılı';
+  String get settingsCrossSigningSetupSuccess =>
+      'Çapraz imza kurulumu başarılı';
 
   @override
-  String get resetEncryptionTitle => 'Şifrelemeyi Sıfırla';
+  String get settingsResetEncryptionTitle => 'Şifrelemeyi Sıfırla';
 
   @override
-  String get resetEncryptionWarning =>
+  String get settingsResetEncryptionWarning =>
       'Uyarı: Bu tüm şifreleme anahtarlarınızı silecektir. Önceki şifrelenmiş mesajların şifresini çözemeyeceksiniz. Bu işlem geri alınamaz.';
 
   @override
-  String get reset => 'Sıfırla';
+  String get settingsReset => 'Sıfırla';
 
   @override
-  String get leaveMeetingConfirm =>
+  String get callLeaveMeetingConfirm =>
       'Toplantıdan ayrılmak istediğinizden emin misiniz?';
 
   @override
-  String pokedSomeone(String name, String suffix) {
+  String chatPokedSomeone(String name, String suffix) {
     return '$name kişisini$suffix dürttü';
   }
 
   @override
-  String get noContactsToAdd => 'Eklenecek kişi yok';
+  String get chatNoContactsToAdd => 'Eklenecek kişi yok';
 
   @override
-  String get addMembers => 'Üye Ekle';
+  String get chatAddMembers => 'Üye Ekle';
 
   @override
-  String invitedMembers(int count) {
+  String chatInvitedMembers(int count) {
     return '$count üye davet edildi';
   }
 
   @override
-  String inviteFailed(String error) {
+  String chatInviteFailed(String error) {
     return 'Davet başarısız: $error';
   }
 
   @override
-  String get memberRemoved => 'Üye çıkarıldı';
+  String get chatMemberRemoved => 'Üye çıkarıldı';
 
   @override
-  String removeFailed(String error) {
+  String chatRemoveFailed(String error) {
     return 'Çıkarma başarısız: $error';
   }
 
   @override
-  String get realTimeLocationShareMessage =>
+  String get chatRealTimeLocationShareMessage =>
       'Paylaştıktan sonra, karşı taraf 1 saat boyunca gerçek zamanlı konumunuzu görebilir.';
 
   @override
-  String get startSharing => 'Paylaşımı Başlat';
+  String get chatStartSharing => 'Paylaşımı Başlat';
 
   @override
-  String get locationServiceNotEnabled => 'Konum servisi etkin değil';
+  String get chatLocationServiceNotEnabled => 'Konum servisi etkin değil';
 
   @override
-  String get enableLocationService =>
+  String get chatEnableLocationService =>
       'Bu özelliği kullanmak için lütfen konum servisini etkinleştirin';
 
   @override
-  String get goToSettings => 'Ayarlara Git';
+  String get chatGoToSettings => 'Ayarlara Git';
 
   @override
-  String get locationPermissionRequired => 'Bu özellik için konum izni gerekli';
+  String get chatLocationPermissionRequired =>
+      'Bu özellik için konum izni gerekli';
 
   @override
-  String get locationPermissionDeniedPermanent =>
+  String get chatLocationPermissionDeniedPermanent =>
       'Konum izni kalıcı olarak reddedildi. Lütfen ayarlardan etkinleştirin.';
 
   @override
-  String get locationPermissionDenied => 'Konum izni reddedildi';
+  String get chatLocationPermissionDenied => 'Konum izni reddedildi';
 
   @override
-  String get gettingLocation => 'Konum alınıyor...';
+  String get chatGettingLocation => 'Konum alınıyor...';
 
   @override
-  String getLocationFailed(String error) {
+  String chatGetLocationFailed(String error) {
     return 'Konum alınamadı: $error';
   }
 
   @override
-  String get currentLocation => 'Mevcut Konum';
+  String get chatMapPreview => 'Harita Önizleme';
 
   @override
-  String nearbyPlace(int index) {
-    return 'Yakın Yer $index';
-  }
+  String get chatSearchLocation => 'Konum ara';
 
   @override
-  String approximateDistance(String distance) {
-    return 'Yaklaşık $distance';
-  }
-
-  @override
-  String get mapPreview => 'Harita Önizleme';
-
-  @override
-  String get searchLocation => 'Konum ara';
-
-  @override
-  String redPacketSent(String amount, String token) {
+  String chatRedPacketSent(String amount, String token) {
     return '$amount $token kırmızı paket gönderildi';
   }
 
   @override
-  String get transferDefault => 'Transfer';
+  String get chatTransferDefault => 'Transfer';
 
   @override
-  String transferSent(String amount, String token) {
+  String chatTransferSent(String amount, String token) {
     return '$amount $token transfer gönderildi';
   }
 
   @override
-  String pickFileFailed(String error) {
+  String chatPickFileFailed(String error) {
     return 'Dosya seçilemedi: $error';
   }
 
   @override
-  String get fileSizeLimit => 'Dosya boyutu 50MB\'ı geçemez';
+  String get chatFileSizeLimit => 'Dosya boyutu 50MB\'ı geçemez';
 
   @override
-  String fileSending(String filename) {
+  String chatFileSending(String filename) {
     return 'Dosya gönderiliyor: $filename';
   }
 
   @override
-  String sendFileFailed(String error) {
+  String chatSendFileFailed(String error) {
     return 'Dosya gönderilemedi: $error';
   }
 
   @override
-  String contactCardSent(String name) {
+  String chatContactCardSent(String name) {
     return '$name kişi kartı gönderildi';
   }
 
   @override
-  String get favoritesFeature => 'Favoriler';
+  String get chatFavoritesFeature => 'Favoriler';
 
   @override
-  String get couponsFeature => 'Kuponlar';
+  String get chatCouponsFeature => 'Kuponlar';
 
   @override
-  String get giftFeature => 'Hediye';
+  String get chatGiftFeature => 'Hediye';
 
   @override
-  String sharedMusic(String name) {
+  String chatSharedMusic(String name) {
     return '$name paylaşıldı';
   }
 
   @override
-  String get endPollTitle => 'Anketi Bitir';
+  String get chatEndPollTitle => 'Anketi Bitir';
 
   @override
-  String get endPollConfirmMessage =>
+  String get chatEndPollConfirmMessage =>
       'Bu anketi bitirmek istediğinizden emin misiniz? Bitirdikten sonra oylama kapanacaktır.';
 
   @override
-  String get pollEndedMessage => 'Anket sona erdi';
+  String get chatPollEndedMessage => 'Anket sona erdi';
 
   @override
-  String get connectingCall => 'Bağlanıyor...';
+  String get chatConnectingCall => 'Bağlanıyor...';
 
   @override
-  String get muteCall => 'Sessize Al';
+  String get chatMuteCall => 'Sessize Al';
 
   @override
-  String get speakerOff => 'Hoparlör Kapalı';
+  String get chatSpeakerOff => 'Hoparlör Kapalı';
 
   @override
-  String get speakerOn => 'Hoparlör';
+  String get chatSpeakerOn => 'Hoparlör';
 
   @override
-  String get cameraOn => 'Kamera Açık';
+  String get chatCameraOn => 'Kamera Açık';
 
   @override
-  String get cameraOff => 'Kamera Kapalı';
+  String get chatCameraOff => 'Kamera Kapalı';
 
   @override
-  String get hangUp => 'Kapat';
+  String get chatHangUp => 'Kapat';
 
   @override
-  String get selectForwardTargetTitle => 'İletilecek Hedefi Seçin';
+  String get chatSelectForwardTargetTitle => 'İletilecek Hedefi Seçin';
 
   @override
-  String get noForwardableChat => 'İletmek için sohbet yok';
+  String get chatNoForwardableChat => 'İletmek için sohbet yok';
 
   @override
-  String get noMatchingChat => 'Eşleşen sohbet bulunamadı';
+  String get chatNoMatchingChat => 'Eşleşen sohbet bulunamadı';
 
   @override
-  String get imagePreview => '[Resim]';
+  String get chatLocationTitle => 'Konum';
 
   @override
-  String get voicePreview => '[Ses]';
+  String get chatSendButton => 'Gönder';
 
   @override
-  String get videoPreview => '[Video]';
+  String get chatRetryButton => 'Tekrar Dene';
 
   @override
-  String filePreviewWithName(String filename) {
-    return '[Dosya] $filename';
-  }
+  String get chatSearchContactHint => 'Kişilerde ara';
 
   @override
-  String locationPreviewWithAddress(String address) {
-    return '[Konum] $address';
-  }
+  String get chatShareMusic => 'Müzik Paylaş';
 
   @override
-  String musicPreviewWithTitle(String title) {
-    return '[Müzik] $title';
-  }
+  String get chatRecentPlayed => 'Son Çalınanlar';
 
   @override
-  String get messagePreview => '[Mesaj]';
+  String get chatMyFavorites => 'Favorilerim';
 
   @override
-  String get locationTitle => 'Konum';
+  String get chatNetworkLink => 'Bağlantı';
 
   @override
-  String get sendButton => 'Gönder';
+  String get chatLocalFile => 'Yerel';
 
   @override
-  String get retryButton => 'Tekrar Dene';
+  String get chatPasteMusicLink => 'Müzik bağlantısı yapıştırın';
 
   @override
-  String get selectContact => 'Kişi Seç';
+  String get chatShareMusicButton => 'Müzik Paylaş';
 
   @override
-  String get searchContactHint => 'Kişilerde ara';
+  String get chatSelectLocalAudio => 'Yerel Ses Dosyası Seç';
 
   @override
-  String get shareMusic => 'Müzik Paylaş';
+  String get chatSupportedAudioFormats =>
+      'MP3, M4A, WAV, FLAC vb. desteklenir.';
 
   @override
-  String get recentPlayed => 'Son Çalınanlar';
+  String get chatSelectFileButton => 'Dosya Seç';
 
   @override
-  String get myFavorites => 'Favorilerim';
+  String get chatPleaseEnterMusicLink => 'Lütfen müzik bağlantısı girin';
 
   @override
-  String get networkLink => 'Bağlantı';
+  String get chatPleaseEnterValidLink => 'Lütfen geçerli bir URL girin';
 
   @override
-  String get localFile => 'Yerel';
+  String get chatSharedSong => 'Paylaşılan Şarkı';
 
   @override
-  String get musicLinkRequired => 'Müzik Bağlantısı *';
+  String get chatSelectMember => 'Üye Seç';
 
   @override
-  String get pasteMusicLink => 'Müzik bağlantısı yapıştırın';
+  String get chatSearchMemberHint => 'Üyelerde ara';
 
   @override
-  String get enterSongNamePlaceholder => 'Şarkı adı girin';
+  String get chatNoMatchingMembers => 'Eşleşen üye bulunamadı';
 
   @override
-  String get enterArtistNamePlaceholder => 'Sanatçı adı girin';
+  String get commonUnknownMember => 'Bilinmeyen';
 
   @override
-  String get shareMusicButton => 'Müzik Paylaş';
-
-  @override
-  String get selectLocalAudio => 'Yerel Ses Dosyası Seç';
-
-  @override
-  String get supportedAudioFormats => 'MP3, M4A, WAV, FLAC vb. desteklenir.';
-
-  @override
-  String get selectFileButton => 'Dosya Seç';
-
-  @override
-  String get pleaseEnterMusicLink => 'Lütfen müzik bağlantısı girin';
-
-  @override
-  String get pleaseEnterValidLink => 'Lütfen geçerli bir URL girin';
-
-  @override
-  String get sharedSong => 'Paylaşılan Şarkı';
-
-  @override
-  String get selectMember => 'Üye Seç';
-
-  @override
-  String get searchMemberHint => 'Üyelerde ara';
-
-  @override
-  String get noMatchingMembers => 'Eşleşen üye bulunamadı';
-
-  @override
-  String get unknownMember => 'Bilinmeyen';
-
-  @override
-  String selectedMessagesCount(int count) {
+  String chatSelectedMessagesCount(int count) {
     return '$count mesaj seçildi';
   }
 
   @override
-  String get searchContactsOrGroups => 'Kişi veya gruplarda ara';
+  String get chatSearchContactsOrGroups => 'Kişi veya gruplarda ara';
 
   @override
-  String get noMatchingConversations => 'Eşleşen sohbet bulunamadı';
+  String get chatVideoTitle => 'Video';
 
   @override
-  String get videoTitle => 'Video';
+  String get chatLoadingText => 'Yükleniyor...';
 
   @override
-  String get loadingText => 'Yükleniyor...';
+  String get chatVideoLoadFailed => 'Video yüklenemedi';
 
   @override
-  String get videoPlaybackFailed => 'Video oynatma başarısız';
+  String get chatPlayerInitFailed => 'Oynatıcı başlatılamadı';
 
   @override
-  String get videoLoadFailed => 'Video yüklenemedi';
+  String get chatCreatePollTitle => 'Anket Oluştur';
 
   @override
-  String get playerInitFailed => 'Oynatıcı başlatılamadı';
+  String get chatSubmitPoll => 'Gönder';
 
   @override
-  String get createPollTitle => 'Anket Oluştur';
+  String get chatPollQuestionLabel => 'Anket Sorusu';
 
   @override
-  String get submitPoll => 'Gönder';
+  String get chatEnterPollQuestionHint => 'Anket sorusu girin';
 
   @override
-  String get pollQuestionLabel => 'Anket Sorusu';
+  String get chatPollOptionsLabel => 'Anket Seçenekleri';
 
   @override
-  String get enterPollQuestionHint => 'Anket sorusu girin';
-
-  @override
-  String get pollOptionsLabel => 'Anket Seçenekleri';
-
-  @override
-  String optionHintWithIndex(int index) {
+  String chatOptionHintWithIndex(int index) {
     return 'Seçenek $index';
   }
 
   @override
-  String get addOptionButton => 'Seçenek Ekle';
+  String get chatAddOptionButton => 'Seçenek Ekle';
 
   @override
-  String get pollSettingsLabel => 'Anket Ayarları';
+  String get chatPollSettingsLabel => 'Anket Ayarları';
 
   @override
-  String get selectionType => 'Seçim Türü';
+  String get chatSelectionType => 'Seçim Türü';
 
   @override
-  String get singleChoiceLabel => 'Tekli';
+  String get chatSingleChoiceLabel => 'Tekli';
 
   @override
-  String get multiChoiceLabel => 'Çoklu';
+  String get chatMultiChoiceLabel => 'Çoklu';
 
   @override
-  String get anonymousPollSwitch => 'Anonim Anket';
+  String get chatAnonymousPollSwitch => 'Anonim Anket';
 
   @override
-  String get pleaseEnterQuestion => 'Lütfen anket sorusu girin';
+  String get chatPleaseEnterQuestion => 'Lütfen anket sorusu girin';
 
   @override
-  String get atLeastTwoOptions => 'En az 2 seçenek gerekli';
+  String get chatAtLeastTwoOptions => 'En az 2 seçenek gerekli';
 
   @override
-  String confirmWithCount(int count) {
+  String chatConfirmWithCount(int count) {
     return 'Onayla ($count)';
   }
 
   @override
-  String get emailVerificationTitle => 'E-posta Doğrulama';
+  String get authEmailVerificationTitle => 'E-posta Doğrulama';
 
   @override
-  String get enterValidEmailAddress =>
+  String get authEnterValidEmailAddress =>
       'Lütfen geçerli bir e-posta adresi girin';
 
   @override
-  String verificationCodeSentTo(String email) {
+  String authVerificationCodeSentTo(String email) {
     return '$email adresine doğrulama kodu gönderildi';
   }
 
   @override
-  String sendCodeFailed(String error) {
+  String authSendCodeFailed(String error) {
     return 'Kod gönderilemedi: $error';
   }
 
   @override
-  String get verificationSuccess => 'Doğrulama başarılı';
+  String get authVerificationSuccess => 'Doğrulama başarılı';
 
   @override
-  String get verificationFailed => 'Doğrulama başarısız';
+  String get authVerificationFailed => 'Doğrulama başarısız';
 
   @override
-  String verificationCodeError(String error) {
+  String authVerificationCodeError(String error) {
     return 'Doğrulama kodu hatası: $error';
   }
 
   @override
-  String get enterVerificationCode => 'Doğrulama kodunu girin';
+  String get commonEnterVerificationCode => 'Doğrulama kodunu girin';
 
   @override
-  String get enterYourEmail => 'E-posta girin';
+  String get authEnterYourEmail => 'E-posta girin';
 
   @override
-  String weSentCodeTo(String email) {
+  String authWeSentCodeTo(String email) {
     return '$email adresine\n6 haneli kod gönderdik';
   }
 
   @override
-  String get enterEmailForCode =>
+  String get authEnterEmailForCode =>
       'E-posta adresinizi girin, doğrulama kodu göndereceğiz';
 
   @override
-  String get sendVerificationCode => 'Doğrulama kodu gönder';
+  String get commonSendVerificationCode => 'Doğrulama kodu gönder';
 
   @override
-  String get resendVerificationCode => 'Doğrulama kodunu tekrar gönder';
+  String get authResendVerificationCode => 'Doğrulama kodunu tekrar gönder';
 
   @override
-  String canResendAfter(int seconds) {
+  String authCanResendAfter(int seconds) {
     return '$seconds saniye sonra tekrar gönderilebilir';
   }
 
   @override
-  String get changeEmail => 'E-postayı değiştir';
+  String get commonChangeEmail => 'E-postayı değiştir';
 
   @override
-  String get addToContacts => 'Kişilere Ekle';
+  String get contactAddToContacts => 'Kişilere Ekle';
 
   @override
-  String get addingToContacts => 'Ekleniyor...';
+  String get contactAddingToContacts => 'Ekleniyor...';
 
   @override
-  String get addedToContacts => 'Kişilere eklendi';
+  String get contactAddedToContacts => 'Kişilere eklendi';
 
   @override
-  String addFailedWithError(String error) {
+  String contactAddFailedWithError(String error) {
     return 'Ekleme başarısız: $error';
   }
 
   @override
-  String get addPhone => 'Telefon ekle';
+  String get contactAddPhone => 'Telefon ekle';
 
   @override
-  String get addTag => 'Etiket ekle';
+  String get contactAddTag => 'Etiket ekle';
 
   @override
-  String get addText => 'Metin ekle';
+  String get contactAddText => 'Metin ekle';
 
   @override
-  String get addPhoto => 'Fotoğraf ekle';
+  String get contactAddPhoto => 'Fotoğraf ekle';
 
   @override
-  String groupCountLabel(int count) {
+  String contactGroupCountLabel(int count) {
     return '$count grup';
   }
 
   @override
-  String get addedViaSearch => 'Arama yoluyla eklendi';
+  String get contactAddedViaSearch => 'Arama yoluyla eklendi';
 
   @override
-  String get addTime => 'Zaman ekle';
+  String get contactAddTime => 'Zaman ekle';
 
   @override
-  String get doneButton => 'Tamam';
+  String get contactDoneButton => 'Tamam';
 
   @override
-  String get waitingForParticipants => 'Katılımcılar bekleniyor...';
+  String get callWaitingForParticipants => 'Katılımcılar bekleniyor...';
 
   @override
-  String participantMe(String name) {
+  String callParticipantMe(String name) {
     return '$name (Ben)';
   }
 
   @override
-  String get sharingLabel => 'Paylaşılıyor';
+  String get callSharingLabel => 'Paylaşılıyor';
 
   @override
-  String screenSharingBy(String name) {
+  String callScreenSharingBy(String name) {
     return '$name ekran paylaşıyor';
   }
 
   @override
-  String participantCount(int count) {
+  String callParticipantCount(int count) {
     return '$count katılımcı';
   }
 
   @override
-  String get muteLabel => 'Sessize Al';
+  String get callMuteLabel => 'Sessize Al';
 
   @override
-  String get unmuteLabel => 'Sesi Aç';
+  String get callUnmuteLabel => 'Sesi Aç';
 
   @override
-  String get turnOffVideo => 'Videoyu kapat';
+  String get callTurnOffVideo => 'Videoyu kapat';
 
   @override
-  String get turnOnVideo => 'Videoyu aç';
+  String get callTurnOnVideo => 'Videoyu aç';
 
   @override
-  String get shareScreen => 'Ekran paylaş';
+  String get callShareScreen => 'Ekran paylaş';
 
   @override
-  String get stopSharing => 'Paylaşımı durdur';
+  String get callStopSharing => 'Paylaşımı durdur';
 
   @override
-  String get switchCameraLabel => 'Değiştir';
+  String get callSwitchCameraLabel => 'Değiştir';
 
   @override
-  String get leaveLabel => 'Ayrıl';
+  String get callLeaveLabel => 'Ayrıl';
 
   @override
-  String get participantsLabel => 'Katılımcılar';
+  String get callParticipantsLabel => 'Katılımcılar';
 
   @override
-  String get joiningMeeting => 'Toplantıya katılınıyor...';
+  String get callJoiningMeeting => 'Toplantıya katılınıyor...';
 
   @override
-  String pollVotesFormat(int count, String percentage) {
+  String chatPollVotesFormat(int count, String percentage) {
     return '$count oy ($percentage%)';
   }
 
   @override
-  String pollParticipantsFormat(int count) {
+  String chatPollParticipantsFormat(int count) {
     return '$count katılımcı';
   }
 
   @override
-  String get tapToRetry => 'Tekrar denemek için dokunun';
+  String get commonTapToRetry => 'Tekrar denemek için dokunun';
 
   @override
-  String get noConversationsToForward => 'İletilecek sohbet yok';
+  String get chatDefaultRedPacketGreeting => 'Bol şans ve bereket dilerim';
 
   @override
-  String get defaultRedPacketGreeting => 'Bol şans ve bereket dilerim';
-
-  @override
-  String get emojiCategoryFace => 'Suratlar';
-
-  @override
-  String get emojiCategoryHeart => 'Kalpler';
-
-  @override
-  String get emojiCategoryAnimal => 'Hayvanlar';
-
-  @override
-  String get emojiCategoryFood => 'Yiyecek';
-
-  @override
-  String get emojiCategoryTransport => 'Ulaşım';
-
-  @override
-  String get emojiCategoryActivity => 'Aktiviteler';
-
-  @override
-  String get emojiCategoryObject => 'Nesneler';
-
-  @override
-  String get emojiCategorySymbol => 'Semboller';
-
-  @override
-  String get allowOthersToSearchAndJoin =>
+  String get groupAllowOthersToSearchAndJoin =>
       'Başkalarının arama yapmasına ve katılmasına izin ver';
 
   @override
-  String get allowStrangerMessages => 'Yabancılardan mesajlara izin ver';
+  String get groupConfirmClearChatHistory =>
+      'Sohbet geçmişini temizlemek istediğinizden emin misiniz?';
 
   @override
-  String get alwaysUseDarkTheme => 'Her zaman koyu tema kullan';
+  String get groupCreateGroupToChat =>
+      'Sohbet etmeye başlamak için bir grup oluşturun';
 
   @override
-  String get alwaysUseLightTheme => 'Her zaman açık tema kullan';
+  String get groupEditGroupAnnouncement => 'Grup duyurusunu düzenle';
 
   @override
-  String get autoSwitchBySystem => 'Sistem ayarlarına göre otomatik geçiş yap';
+  String get groupEditGroupDescription => 'Grup açıklamasını düzenle';
 
   @override
-  String get bubbleStyle => 'Balon stili';
+  String get groupEnterGroupAnnouncement => 'Grup duyurusunu girin';
 
   @override
-  String get bubbleStyleClassic => 'Klasik stil';
+  String chatErrorWithMessage(String message) {
+    return 'Hata: $message';
+  }
 
   @override
-  String get bubbleStyleClassicDesc => 'Geleneksel balon stili';
+  String groupMemberCountClickToCopy(int count) {
+    return '$count üye, grup ID\'sini kopyalamak için tıklayın';
+  }
 
   @override
-  String get bubbleStyleModern => 'Modern stil';
+  String get chatMusicLinkLabel => 'Müzik bağlantısı';
 
   @override
-  String get bubbleStyleModernDesc => 'Temiz modern balon stili';
+  String get chatNoMediaUrlAvailable => 'Medya URL\'si mevcut değil';
 
   @override
-  String get bubbleStyleWechat => 'WeChat stili';
+  String get groupNoPermissionToEditGroupName =>
+      'Grup adını düzenleme izniniz yok';
 
   @override
-  String get bubbleStyleWechatDesc => 'Klasik WeChat balon stili';
+  String get chatRedPacketTransferCannotForward =>
+      'Kırmızı zarflar ve transferler iletilemez';
+
+  @override
+  String get authEmailAddress => 'E-posta adresi';
+
+  @override
+  String get commonEnterEmailAddress => 'E-posta adresini girin';
+
+  @override
+  String get authEmailRecoveryHint => 'Şifre kurtarma için kullanılır';
+
+  @override
+  String get commonInvalidEmailFormat => 'Geçerli bir e-posta adresi girin';
+
+  @override
+  String get authOptional => 'İsteğe bağlı';
+
+  @override
+  String get authResetPassword => 'Şifre sıfırla';
+
+  @override
+  String get authEnterRegisteredEmail =>
+      'Kayıt olduğunuz e-posta adresini girin';
+
+  @override
+  String get authSendResetCode => 'Sıfırlama kodu gönder';
+
+  @override
+  String authResetCodeSent(String email) {
+    return 'Sıfırlama kodu $email adresine gönderildi';
+  }
+
+  @override
+  String get authEnterResetCode => 'Sıfırlama kodunu girin';
+
+  @override
+  String get authSetNewPassword => 'Yeni şifre belirle';
+
+  @override
+  String get commonConfirmNewPassword => 'Yeni şifreyi onayla';
+
+  @override
+  String get commonNewPassword => 'Yeni şifre';
+
+  @override
+  String get authPasswordResetSuccess =>
+      'Şifre başarıyla sıfırlandı. Yeni şifrenizle giriş yapın.';
+
+  @override
+  String get authResetPasswordFailed => 'Şifre sıfırlanamadı';
+
+  @override
+  String get settingsChangePassword => 'Şifre değiştir';
+
+  @override
+  String get settingsCurrentPassword => 'Mevcut şifre';
+
+  @override
+  String get settingsEnterCurrentPassword => 'Mevcut şifreyi girin';
+
+  @override
+  String get settingsEnterNewPassword => 'Yeni şifreyi girin';
+
+  @override
+  String get settingsPasswordChanged =>
+      'Şifre başarıyla değiştirildi. Yeni şifrenizle giriş yapın.';
+
+  @override
+  String get settingsChangePasswordFailed => 'Şifre değiştirilemedi';
+
+  @override
+  String get settingsNewPasswordMustBeDifferent =>
+      'Yeni şifre mevcut şifreden farklı olmalıdır';
+
+  @override
+  String get settingsChangePasswordInfo =>
+      'Şifre değiştirildikten sonra çıkış yapılacak ve yeni şifre ile giriş yapmanız gerekecek.';
+
+  @override
+  String get settingsPasswordRequirements => 'Şifre gereksinimleri:';
+
+  @override
+  String get settingsSecurityNote =>
+      'Güvenlik için şifre değiştirdikten sonra tüm cihazlarda yeniden giriş yapmanız gerekecek.';
+
+  @override
+  String get settingsSecurity => 'Güvenlik';
+
+  @override
+  String get settingsCurrentBoundEmail => 'Mevcut bağlı e-posta';
+
+  @override
+  String get settingsNewEmailAddress => 'Yeni e-posta adresi';
+
+  @override
+  String get settingsEnterNewEmail => 'Yeni e-posta adresini girin';
+
+  @override
+  String get settingsVerificationCode => 'Doğrulama kodu';
+
+  @override
+  String get settingsVerificationCodeSent => 'Doğrulama kodu gönderildi';
+
+  @override
+  String get settingsCodeSentTo => 'Doğrulama kodu gönderildi';
+
+  @override
+  String get settingsDidNotReceiveCode => 'Kodu almadınız mı?';
+
+  @override
+  String get settingsEmailChangedSuccess => 'E-posta başarıyla değiştirildi';
+
+  @override
+  String get settingsChangeEmailFailed => 'E-posta değiştirilemedi';
+
+  @override
+  String get settingsEmailSecurityNote =>
+      'E-postanız şifre kurtarma için kullanılır. Güvende tutun.';
+
+  @override
+  String get commonGoogleLogin => 'Google ile giriş yap';
+
+  @override
+  String get commonAppleLogin => 'Apple ile giriş yap';
+
+  @override
+  String get commonWechat => 'WeChat';
+
+  @override
+  String get settingsLanguage => 'Dil';
+
+  @override
+  String get settingsLanguageChanged => 'Dil değiştirildi';
+
+  @override
+  String get settingsBiometricLogin => 'Biyometrik giriş';
+
+  @override
+  String authLoginWithBiometric(Object type) {
+    return '$type ile giriş yap';
+  }
+
+  @override
+  String get settingsBiometricLoginEnabled => 'Biyometrik giriş etkin';
+
+  @override
+  String get settingsBiometricLoginDisabled => 'Biyometrik giriş devre dışı';
+
+  @override
+  String get settingsEnableBiometricLogin => 'Biyometrik girişi etkinleştir';
+
+  @override
+  String get settingsBiometricEnabled => 'Etkin - Giriş için biyometri kullan';
+
+  @override
+  String get settingsBiometricDisabled =>
+      'Devre dışı - Etkinleştirmek için dokunun';
+
+  @override
+  String get settingsBiometricNeedRelogin =>
+      'Biyometrik girişi etkinleştirmek için çıkış yapıp tekrar giriş yapın';
+
+  @override
+  String get authOr => 'VEYA';
+
+  @override
+  String get qrcodeCameraPermissionRestricted =>
+      'Bu cihazda kamera erişimi kısıtlı';
+
+  @override
+  String get authPasskeyLabel => 'Passkey';
+
+  @override
+  String get authGoogleLabel => 'Google';
+
+  @override
+  String get authAppleLabel => 'Apple';
+
+  @override
+  String get authSsoLabel => 'SSO';
+
+  @override
+  String get transferAmountHintZero => '0.00';
+
+  @override
+  String get commonMatrixIdHint => '@username:server.com';
+
+  @override
+  String get authServerAddressHint => 'https://m.si46.world';
+
+  @override
+  String get authEmailExampleHint => 'example@email.com';
+
+  @override
+  String get authVerificationCodePlaceholder => '------';
+
+  @override
+  String get profileEnterPokeSuffixHint => 'Dürtme ekini girin, ör.: omzuna';
+
+  @override
+  String get groupAlbum => 'Grup albümü';
+
+  @override
+  String get groupFiles => 'Grup dosyaları';
+
+  @override
+  String get groupImages => 'Görseller';
+
+  @override
+  String get groupVideos => 'Videolar';
+
+  @override
+  String get groupTotal => 'Toplam';
+
+  @override
+  String get groupSize => 'Boyut';
+
+  @override
+  String get groupNoMedia => 'Medya yok';
+
+  @override
+  String get groupNoMediaDescription =>
+      'Bu grupta henüz fotoğraf veya video yok';
+
+  @override
+  String get groupDocuments => 'Belgeler';
+
+  @override
+  String get groupNoFiles => 'Dosya yok';
+
+  @override
+  String get groupNoFilesDescription => 'Bu grupta henüz dosya yok';
+
+  @override
+  String groupDownloadStarted(String filename) {
+    return '$filename indiriliyor...';
+  }
+
+  @override
+  String get contactNoCommonGroups => 'Ortak grup yok';
+
+  @override
+  String get contactNoCommonGroupsDescription => 'Ortak grubunuz yok';
+
+  @override
+  String get chatVoiceMessage => 'Ses';
+
+  @override
+  String get chatMessage => 'Mesaj';
+
+  @override
+  String get conversationHideChat => 'Gizle';
+
+  @override
+  String get settingsQuickReply => 'Hızlı yanıt';
+
+  @override
+  String get commonTranslate => 'Çevir';
+
+  @override
+  String get contactCreateTag => 'Create Tag';
+
+  @override
+  String get contactEnterTagName => 'Enter tag name';
+
+  @override
+  String get contactEditTag => 'Edit Tag';
+
+  @override
+  String get contactDeleteTag => 'Delete Tag';
+
+  @override
+  String contactDeleteTagConfirm(String tagName) {
+    return 'Are you sure you want to delete the tag \"$tagName\"?';
+  }
+
+  @override
+  String get contactNoTags => 'No tags yet';
+
+  @override
+  String get contactFriendPermissions => 'Friend Permissions';
+
+  @override
+  String get contactSetChatOnly => 'Set as Chat-only';
+
+  @override
+  String get contactChatOnlyDesc =>
+      'Can only chat with you, other content will be hidden';
+
+  @override
+  String get contactHideMyMoments => 'Hide My Moments';
+
+  @override
+  String get contactHideMyMomentsDesc => 'This friend cannot see my Moments';
+
+  @override
+  String get contactHideTheirMoments => 'Hide Their Moments';
+
+  @override
+  String get contactHideTheirMomentsDesc => 'Don\'t see this friend\'s Moments';
+
+  @override
+  String get contactHideMyStatus => 'Hide My Status';
+
+  @override
+  String get contactHideMyStatusDesc =>
+      'This friend cannot see my status updates';
+
+  @override
+  String get contactNoChatOnlyFriends => 'No chat-only friends';
+
+  @override
+  String get contactNoOfficialAccounts => 'No official accounts';
+
+  @override
+  String get contactFollowOfficialAccountsDesc =>
+      'Follow official accounts to get the latest updates';
+
+  @override
+  String get contactNoServiceAccounts => 'No service accounts';
+
+  @override
+  String get contactSubscribeServiceAccountsDesc =>
+      'Subscribe to service accounts for convenient services';
+
+  @override
+  String get contactNoEnterpriseContacts => 'No enterprise contacts';
+
+  @override
+  String get contactEnterpriseContactsDesc =>
+      'Enterprise contacts will be displayed here';
+
+  @override
+  String get profileCardPack => 'Card Pack';
+
+  @override
+  String get profileOrders => 'Orders';
+
+  @override
+  String get profileNoOrders => 'No orders';
+
+  @override
+  String get profileOrdersDesc => 'Your orders will be displayed here';
+
+  @override
+  String get profileNoCards => 'No cards';
+
+  @override
+  String get profileCardsDesc => 'Your cards will be displayed here';
+
+  @override
+  String get favoriteEnterTagsHint => 'Enter tags separated by commas';
+
+  @override
+  String get favoriteTagsUpdated => 'Tags updated';
+
+  @override
+  String get favoriteForwardedContent => 'Content forwarded';
+
+  @override
+  String get favoriteEnterNoteContent => 'Enter note content';
+
+  @override
+  String get favoriteNoteAdded => 'Note added';
+
+  @override
+  String get favoriteLinkTitle => 'Link title';
+
+  @override
+  String get favoriteLinkUrl => 'https://';
+
+  @override
+  String get favoriteLinkAdded => 'Link added';
+
+  @override
+  String get contactPhotoAdded => 'Photo added';
+
+  @override
+  String get contactEnterPhone => 'Enter phone number';
+
+  @override
+  String commonConversationWithId(String roomId) {
+    return 'Sohbet: $roomId';
+  }
+
+  @override
+  String commonContactWithId(String userId) {
+    return 'Kişi: $userId';
+  }
+
+  @override
+  String get commonDiscover => 'Keşfet';
+
+  @override
+  String commonDeveloping(String title) {
+    return '$title\n(Yakında)';
+  }
+
+  @override
+  String get commonPageNotFound => 'Sayfa bulunamadı';
+
+  @override
+  String get commonBackToHome => 'Ana Sayfaya Dön';
+
+  @override
+  String get settingsMessageNotifications => 'Mesaj bildirimleri';
+
+  @override
+  String get settingsReceiveNewMessageNotifications =>
+      'Yeni mesaj bildirimleri al';
+
+  @override
+  String get settingsShowMessagePreview => 'Mesaj önizlemesini göster';
+
+  @override
+  String get settingsShowMessageContentInNotification =>
+      'Bildirimlerde mesaj içeriğini göster';
+
+  @override
+  String get settingsNotificationSound => 'Bildirim sesi';
+
+  @override
+  String get settingsPlaySoundOnMessage => 'Mesaj alındığında ses çal';
+
+  @override
+  String get commonVibration => 'Titreşim';
+
+  @override
+  String get settingsVibrateOnMessage => 'Mesaj alındığında titret';
+
+  @override
+  String get settingsDoNotDisturbMode => 'Rahatsız etmeyin';
+
+  @override
+  String get settingsDoNotDisturbDescription =>
+      'Belirtilen süre boyunca bildirim alma';
+
+  @override
+  String get settingsStartTime => 'Başlangıç saati';
+
+  @override
+  String get settingsEndTime => 'Bitiş saati';
+
+  @override
+  String get settingsDeleteQuickReply => 'Hızlı yanıtı sil';
+
+  @override
+  String get settingsEditQuickReply => 'Hızlı yanıtı düzenle';
+
+  @override
+  String get settingsAddQuickReply => 'Hızlı yanıt ekle';
+
+  @override
+  String get settingsManageQuickReplies => 'Hızlı yanıtları yönet';
+
+  @override
+  String get settingsNoQuickReplies => 'Hızlı yanıt yok';
+
+  @override
+  String get settingsDefaultQuickReplies =>
+      'Varsayılan hızlı yanıtlar gösterilecek';
+
+  @override
+  String get settingsWhoCanSee => 'Kimler görebilir';
+
+  @override
+  String get settingsLastSeen => 'Son görülme';
+
+  @override
+  String get settingsHiddenChats => 'Gizli sohbetler';
+
+  @override
+  String get settingsMessagesLabel => 'Mesajlar';
+
+  @override
+  String get settingsAllowStrangerMessages =>
+      'Yabancılardan mesajlara izin ver';
+
+  @override
+  String get settingsReceiveMessagesFromNonContacts =>
+      'Kişiler dışından mesaj al';
+
+  @override
+  String get settingsReadReceipts => 'Okundu bilgisi';
+
+  @override
+  String get settingsLetOthersKnowYouRead =>
+      'Başkalarının mesajlarını okuduğunuzu bilmelerini sağlayın';
+
+  @override
+  String get settingsTypingIndicator => 'Yazma göstergesi';
+
+  @override
+  String get settingsLetOthersKnowYouTyping =>
+      'Başkalarının yazdığınızı bilmelerini sağlayın';
+
+  @override
+  String get settingsEveryone => 'Herkes';
+
+  @override
+  String get settingsContactsOnly => 'Sadece kişiler';
+
+  @override
+  String get settingsNobody => 'Hiç kimse';
+
+  @override
+  String settingsWhoCanSeeTitle(String title) {
+    return '$title kimler görebilir';
+  }
+
+  @override
+  String settingsVersionInfo(String version) {
+    return 'Sürüm $version';
+  }
+
+  @override
+  String get settingsCheckForUpdates => 'Güncellemeleri kontrol et';
+
+  @override
+  String get settingsOpenSourceLicenses => 'Açık kaynak lisansları';
+
+  @override
+  String get settingsFeedbackAndSuggestions => 'Geri bildirim ve öneriler';
+
+  @override
+  String get settingsBuiltOnMatrix => 'Matrix protokolü üzerine kurulu';
+
+  @override
+  String get settingsNoHiddenChats => 'Gizli sohbet yok';
+
+  @override
+  String get settingsNoHiddenChatsDescription =>
+      'Gizlediğiniz sohbetler burada görünecek';
+
+  @override
+  String get settingsUnhideChat => 'Göster';
+
+  @override
+  String get settingsDarkMode => 'Karanlık mod';
+
+  @override
+  String get settingsFontSize => 'Yazı tipi boyutu';
+
+  @override
+  String get settingsBubbleStyle => 'Balon stili';
+
+  @override
+  String get settingsFollowSystem => 'Sistemi takip et';
+
+  @override
+  String get settingsAutoSwitchBySystem =>
+      'Sistem ayarlarına göre otomatik geçiş yap';
+
+  @override
+  String get settingsLightMode => 'Aydınlık mod';
+
+  @override
+  String get settingsAlwaysUseLightTheme => 'Her zaman açık tema kullan';
+
+  @override
+  String get settingsDarkModeOption => 'Karanlık mod';
+
+  @override
+  String get settingsAlwaysUseDarkTheme => 'Her zaman koyu tema kullan';
+
+  @override
+  String get settingsFontSizeSmall => 'Küçük';
+
+  @override
+  String get settingsFontSizeStandard => 'Standart';
+
+  @override
+  String get settingsFontSizeLarge => 'Büyük';
+
+  @override
+  String get settingsFontSizeExtraLarge => 'Çok büyük';
+
+  @override
+  String get settingsBubbleStyleWechat => 'WeChat stili';
+
+  @override
+  String get settingsBubbleStyleWechatDesc => 'Klasik WeChat balon stili';
+
+  @override
+  String get settingsBubbleStyleModern => 'Modern stil';
+
+  @override
+  String get settingsBubbleStyleModernDesc => 'Temiz modern balon stili';
+
+  @override
+  String get settingsBubbleStyleClassic => 'Klasik stil';
+
+  @override
+  String get settingsBubbleStyleClassicDesc => 'Geleneksel balon stili';
+
+  @override
+  String get discoverVideoChannels => 'Kanallar';
+
+  @override
+  String get discoverLive => 'Canlı';
+
+  @override
+  String get discoverListen => 'Dinle';
+
+  @override
+  String get discoverWatch => 'İzle';
+
+  @override
+  String get discoverSearchDiscover => 'Ara';
+
+  @override
+  String get discoverNearbyPeople => 'Yakındakiler';
+
+  @override
+  String get discoverGames => 'Oyunlar';
+
+  @override
+  String get discoverMiniPrograms => 'Mini Programlar';
+
+  @override
+  String get chatAlreadyInCall => 'Zaten bir aramada';
+
+  @override
+  String get commonConnectionFailed => 'Bağlantı başarısız';
+
+  @override
+  String get chatCallRejected => 'Arama reddedildi';
+
+  @override
+  String get chatNoAnswer => 'Cevap yok';
+
+  @override
+  String get commonClose => 'Kapat';
+
+  @override
+  String get chatSelectContact => 'Kişi Seç';
+
+  @override
+  String get chatVoteRemoved => 'Oy kaldırıldı';
+
+  @override
+  String get chatVoteChanged => 'Oy değiştirildi';
+
+  @override
+  String get chatVoted => 'Oy verildi';
+
+  @override
+  String chatReplyTo(String name) {
+    return '$name adlı kişiye yanıt';
+  }
+
+  @override
+  String get chatCurrentLocation => 'Mevcut Konum';
+
+  @override
+  String chatNearbyPlace(int index) {
+    return 'Yakın Yer $index';
+  }
+
+  @override
+  String chatApproximateDistance(String distance) {
+    return 'Yaklaşık $distance';
+  }
+
+  @override
+  String get chatAddress => 'Adres';
+
+  @override
+  String get chatLatitude => 'Enlem';
+
+  @override
+  String get chatLongitude => 'Boylam';
+
+  @override
+  String get groupDescriptionUpdated => 'Grup açıklaması güncellendi';
+
+  @override
+  String get groupAvatarUpdated => 'Grup avatarı güncellendi';
+
+  @override
+  String get callDecline => 'Reddet';
+
+  @override
+  String get callAnswer => 'Yanıtla';
+
+  @override
+  String get callIncomingVideoCall => 'Gelen görüntülü arama';
+
+  @override
+  String get callIncomingVoiceCall => 'Gelen sesli arama';
+
+  @override
+  String get callVideoCallInProgress => 'Görüntülü arama';
+
+  @override
+  String get callVoiceCallInProgress => 'Sesli arama';
+
+  @override
+  String get callReconnectingCall => 'Yeniden bağlanıyor...';
 
   @override
   String get callEnded => 'Arama sonlandı';
@@ -3984,617 +3329,382 @@ class STr extends S {
   String get callFailed => 'Arama başarısız';
 
   @override
-  String get checkForUpdates => 'Güncellemeleri kontrol et';
+  String get callLivekitNotConfigured => 'LiveKit yapılandırılmadı';
 
   @override
-  String get confirmClearChatHistory =>
-      'Sohbet geçmişini temizlemek istediğinizden emin misiniz?';
-
-  @override
-  String get createGroupToChat =>
-      'Sohbet etmeye başlamak için bir grup oluşturun';
-
-  @override
-  String get darkMode => 'Karanlık mod';
-
-  @override
-  String get darkModeOption => 'Karanlık mod';
-
-  @override
-  String get doNotDisturbDescription => 'Belirtilen süre boyunca bildirim alma';
-
-  @override
-  String get doNotDisturbMode => 'Rahatsız etmeyin';
-
-  @override
-  String get editGroupAnnouncement => 'Grup duyurusunu düzenle';
-
-  @override
-  String get editGroupDescription => 'Grup açıklamasını düzenle';
-
-  @override
-  String get enterGroupAnnouncement => 'Grup duyurusunu girin';
-
-  @override
-  String errorWithMessage(String message) {
-    return 'Hata: $message';
+  String callJoinMeetingFailed(String error) {
+    return 'Toplantıya katılınamadı: $error';
   }
 
   @override
-  String get feedbackAndSuggestions => 'Geri bildirim ve öneriler';
-
-  @override
-  String get followSystem => 'Sistemi takip et';
-
-  @override
-  String get fontSize => 'Yazı tipi boyutu';
-
-  @override
-  String get fontSizeExtraLarge => 'Çok büyük';
-
-  @override
-  String get fontSizeLarge => 'Büyük';
-
-  @override
-  String get fontSizeSmall => 'Küçük';
-
-  @override
-  String get fontSizeStandard => 'Standart';
-
-  @override
-  String get incomingVideoCall => 'Gelen görüntülü arama';
-
-  @override
-  String get incomingVoiceCall => 'Gelen sesli arama';
-
-  @override
-  String get letOthersKnowYouRead =>
-      'Başkalarının mesajlarını okuduğunuzu bilmelerini sağlayın';
-
-  @override
-  String get letOthersKnowYouTyping =>
-      'Başkalarının yazdığınızı bilmelerini sağlayın';
-
-  @override
-  String get lightMode => 'Aydınlık mod';
-
-  @override
-  String memberCountClickToCopy(int count) {
-    return '$count üye, grup ID\'sini kopyalamak için tıklayın';
+  String callScreenShareFailed(String error) {
+    return 'Ekran paylaşımı başarısız: $error';
   }
 
   @override
-  String get messageNotifications => 'Mesaj bildirimleri';
+  String get profileN42BeanTitle => 'N42 Bean';
 
   @override
-  String get messagesLabel => 'Mesajlar';
+  String get profileNoN42Bean => 'N42 Bean yok';
 
   @override
-  String get musicLinkLabel => 'Müzik bağlantısı';
+  String get profileN42BeanDetails => 'N42 Bean Detayları';
 
   @override
-  String get noMediaUrlAvailable => 'Medya URL\'si mevcut değil';
-
-  @override
-  String get noPermissionToEditGroupName => 'Grup adını düzenleme izniniz yok';
-
-  @override
-  String get receiveMessagesFromNonContacts => 'Kişiler dışından mesaj al';
-
-  @override
-  String get receiveNewMessageNotifications => 'Yeni mesaj bildirimleri al';
-
-  @override
-  String get reconnectingCall => 'Yeniden bağlanıyor...';
-
-  @override
-  String get redPacketTransferCannotForward =>
-      'Kırmızı zarflar ve transferler iletilemez';
-
-  @override
-  String get showMessageContentInNotification =>
-      'Bildirimlerde mesaj içeriğini göster';
-
-  @override
-  String get showMessagePreview => 'Mesaj önizlemesini göster';
-
-  @override
-  String get typingIndicator => 'Yazma göstergesi';
-
-  @override
-  String versionInfo(String version) {
-    return 'Sürüm $version';
-  }
-
-  @override
-  String get vibration => 'Titreşim';
-
-  @override
-  String get videoCallInProgress => 'Görüntülü arama';
-
-  @override
-  String get voiceCallInProgress => 'Sesli arama';
-
-  @override
-  String whoCanSeeTitle(String title) {
-    return '$title kimler görebilir';
-  }
-
-  @override
-  String get emailAddress => 'E-posta adresi';
-
-  @override
-  String get enterEmailAddress => 'E-posta adresini girin';
-
-  @override
-  String get emailRecoveryHint => 'Şifre kurtarma için kullanılır';
-
-  @override
-  String get invalidEmailFormat => 'Geçerli bir e-posta adresi girin';
-
-  @override
-  String get optional => 'İsteğe bağlı';
-
-  @override
-  String get resetPassword => 'Şifre sıfırla';
-
-  @override
-  String get resetPasswordTitle => 'Şifrenizi sıfırlayın';
-
-  @override
-  String get enterRegisteredEmail => 'Kayıt olduğunuz e-posta adresini girin';
-
-  @override
-  String get sendResetCode => 'Sıfırlama kodu gönder';
-
-  @override
-  String resetCodeSent(String email) {
-    return 'Sıfırlama kodu $email adresine gönderildi';
-  }
-
-  @override
-  String get enterResetCode => 'Sıfırlama kodunu girin';
-
-  @override
-  String get setNewPassword => 'Yeni şifre belirle';
-
-  @override
-  String get confirmNewPassword => 'Yeni şifreyi onayla';
-
-  @override
-  String get newPassword => 'Yeni şifre';
-
-  @override
-  String get passwordResetSuccess =>
-      'Şifre başarıyla sıfırlandı. Yeni şifrenizle giriş yapın.';
-
-  @override
-  String get resetPasswordFailed => 'Şifre sıfırlanamadı';
-
-  @override
-  String get changePassword => 'Şifre değiştir';
-
-  @override
-  String get currentPassword => 'Mevcut şifre';
-
-  @override
-  String get enterCurrentPassword => 'Mevcut şifreyi girin';
-
-  @override
-  String get enterNewPassword => 'Yeni şifreyi girin';
-
-  @override
-  String get passwordChanged =>
-      'Şifre başarıyla değiştirildi. Yeni şifrenizle giriş yapın.';
-
-  @override
-  String get changePasswordFailed => 'Şifre değiştirilemedi';
-
-  @override
-  String get incorrectCurrentPassword => 'Mevcut şifre yanlış';
-
-  @override
-  String get newPasswordMustBeDifferent =>
-      'Yeni şifre mevcut şifreden farklı olmalıdır';
-
-  @override
-  String get changePasswordInfo =>
-      'Şifre değiştirildikten sonra çıkış yapılacak ve yeni şifre ile giriş yapmanız gerekecek.';
-
-  @override
-  String get passwordRequirements => 'Şifre gereksinimleri:';
-
-  @override
-  String get securityNote =>
-      'Güvenlik için şifre değiştirdikten sonra tüm cihazlarda yeniden giriş yapmanız gerekecek.';
-
-  @override
-  String get security => 'Güvenlik';
-
-  @override
-  String get currentBoundEmail => 'Mevcut bağlı e-posta';
-
-  @override
-  String get newEmailAddress => 'Yeni e-posta adresi';
-
-  @override
-  String get enterNewEmail => 'Yeni e-posta adresini girin';
-
-  @override
-  String get verificationCode => 'Doğrulama kodu';
-
-  @override
-  String get verificationCodeSent => 'Doğrulama kodu gönderildi';
-
-  @override
-  String get codeSentTo => 'Doğrulama kodu gönderildi';
-
-  @override
-  String get didNotReceiveCode => 'Kodu almadınız mı?';
-
-  @override
-  String get emailChangedSuccess => 'E-posta başarıyla değiştirildi';
-
-  @override
-  String get changeEmailFailed => 'E-posta değiştirilemedi';
-
-  @override
-  String get emailSecurityNote =>
-      'E-postanız şifre kurtarma için kullanılır. Güvende tutun.';
-
-  @override
-  String get googleLogin => 'Google ile giriş yap';
-
-  @override
-  String get appleLogin => 'Apple ile giriş yap';
-
-  @override
-  String get facebookLogin => 'Facebook ile giriş yap';
-
-  @override
-  String get twitterLogin => 'Twitter ile giriş yap';
-
-  @override
-  String get wechatLogin => 'WeChat ile giriş yap';
-
-  @override
-  String get wechat => 'WeChat';
-
-  @override
-  String get facebook => 'Facebook';
-
-  @override
-  String get twitter => 'Twitter';
-
-  @override
-  String get wechatNotInstalled => 'Lütfen önce WeChat yükleyin';
-
-  @override
-  String get wechatLoginFailed => 'WeChat girişi başarısız';
-
-  @override
-  String get facebookLoginFailed => 'Facebook girişi başarısız';
-
-  @override
-  String get twitterLoginFailed => 'Twitter girişi başarısız';
-
-  @override
-  String get twitterNotConfigured => 'Twitter girişi yapılandırılmamış';
-
-  @override
-  String get socialLoginCancelled => 'Giriş iptal edildi';
-
-  @override
-  String get socialLoginFailed => 'Sosyal giriş başarısız';
-
-  @override
-  String get language => 'Dil';
-
-  @override
-  String get languageChanged => 'Dil değiştirildi';
-
-  @override
-  String get biometricLogin => '生物识别登录';
-
-  @override
-  String loginWithBiometric(Object type) {
-    return '使用$type登录';
-  }
-
-  @override
-  String get biometricLoginEnabled => '生物识别登录已启用';
-
-  @override
-  String get biometricLoginDisabled => '生物识别登录已禁用';
-
-  @override
-  String get enableBiometricLogin => '启用生物识别登录';
-
-  @override
-  String get disableBiometricLogin => '禁用生物识别登录';
-
-  @override
-  String get biometricNotAvailable => '此设备不支持生物识别';
-
-  @override
-  String get biometricNotEnrolled => '未录入生物识别数据，请在设备设置中设置';
-
-  @override
-  String get biometricAuthFailed => '生物识别验证失败';
-
-  @override
-  String get biometricAuthCancelled => '验证已取消';
-
-  @override
-  String get biometricLockedOut => '尝试次数过多，请稍后再试';
-
-  @override
-  String get useBiometricToLogin => '使用生物识别快速登录';
-
-  @override
-  String get authenticateToLogin => '验证身份以登录';
-
-  @override
-  String get authenticateToEnable => '验证身份以启用生物识别登录';
-
-  @override
-  String get faceId => '面容 ID';
-
-  @override
-  String get touchId => '触控 ID';
-
-  @override
-  String get fingerprint => '指纹';
-
-  @override
-  String get biometric => '生物识别';
-
-  @override
-  String get biometricEnabled => '已启用 - 使用生物识别登录';
-
-  @override
-  String get biometricDisabled => '已禁用 - 点击启用';
-
-  @override
-  String get biometricNeedRelogin => '请退出后重新登录以启用生物识别';
-
-  @override
-  String get or => '或';
-
-  @override
-  String get n42BeanTitle => 'N42 Bean';
-
-  @override
-  String get n42BeanDetails => 'N42 Bean Detayları';
-
-  @override
-  String get noN42Bean => 'N42 Bean yok';
-
-  @override
-  String get n42BeanDescription =>
+  String get profileN42BeanDescription =>
       'N42 Bean, N42\'deki sanal eşya ve hizmetleri almak için kullanılan bir tokendır. Şu anda şunlar için kullanılabilir:';
 
   @override
-  String get n42BeanFeature1 => 'Üyelere özel çıkartmalar ve temalar';
+  String get profileN42BeanFeature1 => 'Üyelere özel çıkartmalar ve temalar';
 
   @override
-  String get n42BeanFeature2 => 'Sohbet balonu özelleştirme';
+  String get profileN42BeanFeature2 => 'Sohbet balonu özelleştirme';
 
   @override
-  String get n42BeanFeature3 => 'Kırmızı zarf kapağı özelleştirme';
+  String get profileN42BeanFeature3 => 'Kırmızı zarf kapağı özelleştirme';
 
   @override
-  String get n42BeanFeature4 => 'Özel takma ad rozeti';
+  String get profileN42BeanFeature4 => 'Özel takma ad rozeti';
 
   @override
-  String get n42BeanFeature5 => 'Grup sohbeti ayrıcalıkları';
+  String get profileN42BeanFeature5 => 'Grup sohbeti ayrıcalıkları';
 
   @override
-  String get n42BeanFeature6 => 'Bulut depolama genişletme';
+  String get profileN42BeanFeature6 => 'Bulut depolama genişletme';
 
   @override
-  String get n42BeanFeature7 => 'Görüntülü arama güzellik filtreleri';
+  String get profileN42BeanFeature7 => 'Görüntülü arama güzellik filtreleri';
 
   @override
-  String get n42BeanFeature8 => 'Anlar arka plan özelleştirme';
+  String get profileN42BeanFeature8 => 'Anlar arka plan özelleştirme';
 
   @override
-  String get n42BeanFeature9 => 'VIP müşteri hizmetleri önceliği';
+  String get profileN42BeanFeature9 => 'VIP müşteri hizmetleri önceliği';
 
   @override
-  String get gotIt => 'Anladım';
+  String get profileGotIt => 'Anladım';
 
   @override
-  String get noN42BeanRecords => 'N42 Bean kaydı yok';
+  String get profileNoN42BeanRecords => 'N42 Bean kaydı yok';
 
   @override
-  String get cameraPermissionRestricted => 'Bu cihazda kamera erişimi kısıtlı';
+  String get profileMoodAndThoughts => 'Ruh Hali ve Düşünceler';
 
   @override
-  String get passkeyLabel => 'Passkey';
+  String get profileStatusHappy => 'Mutlu';
 
   @override
-  String get googleLabel => 'Google';
+  String get profileStatusCracked => 'Paramparça';
 
   @override
-  String get appleLabel => 'Apple';
+  String get profileStatusLucky => 'Şanslı';
 
   @override
-  String get ssoLabel => 'SSO';
+  String get profileStatusSunny => 'Güneşli';
 
   @override
-  String get amountHintZero => '0.00';
+  String get profileStatusTired => 'Yorgun';
 
   @override
-  String get matrixIdHint => '@username:server.com';
+  String get profileStatusDaydream => 'Hayal';
 
   @override
-  String get serverAddressHint => 'https://m.si46.world';
+  String get profileStatusRushing => 'Acele';
 
   @override
-  String get emailExampleHint => 'example@email.com';
+  String get profileStatusOverthinking => 'Fazla Düşünme';
 
   @override
-  String get verificationCodePlaceholder => '------';
+  String get profileStatusEnergized => 'Enerjik';
 
   @override
-  String get enterPokeSuffixHint => '输入戳一戳后缀，例如：的肩膀';
+  String get profileWorkAndStudy => 'İş ve Çalışma';
 
   @override
-  String get groupAlbum => '群相册';
+  String get profileStatusWorking => 'Çalışıyor';
 
   @override
-  String get groupFiles => '群文件';
+  String get profileStatusStudying => 'Ders Çalışıyor';
 
   @override
-  String get images => '图片';
+  String get profileStatusBusy => 'Meşgul';
 
   @override
-  String get videos => '视频';
+  String get profileStatusSlacking => 'Tembellik';
 
   @override
-  String get total => '全部';
+  String get profileStatusTraveling => 'Seyahatte';
 
   @override
-  String get size => '大小';
+  String get profileStatusGoingHome => 'Eve Gidiyor';
 
   @override
-  String get noMedia => '暂无媒体';
+  String get profileStatusDnd => 'Rahatsız Etmeyin';
 
   @override
-  String get noMediaDescription => '此群还没有图片或视频';
+  String get profileActivities => 'Aktiviteler';
 
   @override
-  String get documents => '文档';
+  String get profileStatusHanging => 'Takılıyor';
 
   @override
-  String get noFiles => '暂无文件';
+  String get profileStatusCheckIn => 'Check-in';
 
   @override
-  String get noFilesDescription => '此群还没有文件';
+  String get profileStatusExercising => 'Egzersiz';
 
   @override
-  String downloadStarted(String filename) {
-    return '正在下载 $filename...';
+  String get profileStatusCoffee => 'Kahve';
+
+  @override
+  String get profileStatusBubbleTea => 'Bubble Tea';
+
+  @override
+  String get profileStatusEating => 'Yemek Yiyor';
+
+  @override
+  String get profileStatusParenting => 'Ebeveynlik';
+
+  @override
+  String get profileStatusSavingWorld => 'Dünyayı Kurtarıyor';
+
+  @override
+  String get profileStatusSelfie => 'Selfie';
+
+  @override
+  String get profileRest => 'Dinlenme';
+
+  @override
+  String get profileStatusRetreat => 'Dinlenme';
+
+  @override
+  String get profileStatusHome => 'Evde';
+
+  @override
+  String get profileStatusSleeping => 'Uyuyor';
+
+  @override
+  String get profileStatusCatLover => 'Kedi Sever';
+
+  @override
+  String get profileStatusDogWalking => 'Köpek Gezdiriyor';
+
+  @override
+  String get profileStatusGaming => 'Oyun Oynuyor';
+
+  @override
+  String get profileStatusListening => 'Dinliyor';
+
+  @override
+  String get profileEditAddress => 'Adresi Düzenle';
+
+  @override
+  String get profileRecipient => 'Alıcı';
+
+  @override
+  String get profileEnterRecipientName => 'Alıcı adını girin';
+
+  @override
+  String get profilePhoneNumber => 'Telefon Numarası';
+
+  @override
+  String get profileEnterPhoneNumber => 'Telefon numarası girin';
+
+  @override
+  String get profileRegionHint => 'İl/İlçe/Mahalle';
+
+  @override
+  String get profileDetailedAddress => 'Detaylı Adres';
+
+  @override
+  String get profileDetailedAddressHint => 'Sokak, bina numarası, vb.';
+
+  @override
+  String get profileSetAsDefaultAddress => 'Varsayılan adres olarak ayarla';
+
+  @override
+  String get profilePleaseCompleteInfo => 'Lütfen tüm alanları doldurun';
+
+  @override
+  String get profileEditInvoice => 'Faturayı Düzenle';
+
+  @override
+  String get profileInvoiceType => 'Fatura türü: ';
+
+  @override
+  String get profileCompanyName => 'Şirket Adı';
+
+  @override
+  String get profilePersonalName => 'Kişi Adı';
+
+  @override
+  String get profileEnterCompanyName => 'Şirket adı girin';
+
+  @override
+  String get profileEnterName => 'Ad girin';
+
+  @override
+  String get profileTaxIdNumber => 'Vergi Kimlik Numarası';
+
+  @override
+  String get profileEnterTaxIdNumber => 'Vergi kimlik numarası girin';
+
+  @override
+  String get profileBankNameOptional => 'Banka Adı (İsteğe bağlı)';
+
+  @override
+  String get profileEnterBankName => 'Banka adı girin';
+
+  @override
+  String get profileBankAccountOptional => 'Banka Hesabı (İsteğe bağlı)';
+
+  @override
+  String get profileEnterBankAccount => 'Banka hesabı girin';
+
+  @override
+  String get profileCompanyAddressOptional => 'Şirket Adresi (İsteğe bağlı)';
+
+  @override
+  String get profileEnterCompanyAddress => 'Şirket adresi girin';
+
+  @override
+  String get profileCompanyPhoneOptional => 'Şirket Telefonu (İsteğe bağlı)';
+
+  @override
+  String get profileEnterCompanyPhone => 'Şirket telefonu girin';
+
+  @override
+  String get profileSetAsDefaultInvoice => 'Varsayılan fatura olarak ayarla';
+
+  @override
+  String get profileRingtoneVibrate => 'Titreşim';
+
+  @override
+  String get profileRingtoneSilent => 'Sessiz';
+
+  @override
+  String get profileVibrateMode => 'Titreşim modu';
+
+  @override
+  String get profileSilentMode => 'Sessiz mod';
+
+  @override
+  String profilePlayFailed(String ringtoneName) {
+    return 'Çalınamadı: $ringtoneName';
   }
 
   @override
-  String get noCommonGroups => '暂无共同群组';
-
-  @override
-  String get noCommonGroupsDescription => '你们没有共同加入的群组';
-
-  @override
-  String get pinMessage => '置顶';
-
-  @override
-  String get unpinMessage => '取消置顶';
-
-  @override
-  String get voiceMessage => '语音';
-
-  @override
-  String get message => '消息';
-
-  @override
-  String get hideChat => '隐藏';
-
-  @override
-  String get unhideChat => '取消隐藏';
-
-  @override
-  String get hiddenChats => '隐藏的聊天';
-
-  @override
-  String get noHiddenChats => '没有隐藏的聊天';
-
-  @override
-  String get noHiddenChatsDescription => '你隐藏的聊天会显示在这里';
-
-  @override
-  String get quickReply => '快捷回复';
-
-  @override
-  String get manageQuickReplies => '管理快捷回复';
-
-  @override
-  String get addQuickReply => '添加快捷回复';
-
-  @override
-  String get editQuickReply => '编辑快捷回复';
-
-  @override
-  String get deleteQuickReply => '删除快捷回复';
-
-  @override
-  String get noQuickReplies => '暂无快捷回复';
-
-  @override
-  String get defaultQuickReplies => '将显示默认快捷回复';
-
-  @override
-  String get translate => '翻译';
-
-  @override
-  String get translating => '翻译中...';
-
-  @override
-  String get translationFailed => '翻译失败';
-
-  @override
-  String translatedFrom(String language) {
-    return '翻译自$language';
+  String profilePlaying(String ringtoneName) {
+    return 'Çalıyor: $ringtoneName';
   }
 
   @override
-  String get showOriginal => '显示原文';
+  String get profileStop => 'Durdur';
 
   @override
-  String get hideTranslation => '隐藏翻译';
+  String get profileSelectRingtone => 'Zil Sesi Seç';
 
   @override
-  String get translation => '翻译';
+  String get profileLoadingRingtones => 'Zil sesleri yükleniyor...';
 
   @override
-  String get story => '状态';
+  String get profileNoRingtonesFound => 'Zil sesi bulunamadı';
 
   @override
-  String get myStory => '我的状态';
-
-  @override
-  String get addToStory => '发布状态';
-
-  @override
-  String get storyExpired => '状态已过期';
-
-  @override
-  String storyExpiresIn(String time) {
-    return '$time后过期';
+  String mainMessagesWithCount(int count) {
+    return 'Mesajlar($count)';
   }
 
   @override
-  String get viewers => '浏览者';
+  String get storyViewers => 'İzleyenler';
 
   @override
-  String get noViewers => '暂无浏览';
+  String get storyNoViewers => 'Henüz izleyen yok';
 
   @override
-  String viewersCount(int count) {
-    return '$count人浏览';
+  String get storyReplyToStory => 'Hikayeye yanıt ver...';
+
+  @override
+  String get commonCopiedToClipboard => 'Panoya kopyalandı';
+
+  @override
+  String get commonMore => 'Daha fazla';
+
+  @override
+  String get commonTranslating => 'Çevriliyor...';
+
+  @override
+  String commonTranslatedFrom(String language) {
+    return '$language dilinden çevrildi';
   }
 
   @override
-  String get replyToStory => '回复状态...';
+  String get commonTranslation => 'Çeviri';
 
   @override
-  String get createStory => '发布状态';
+  String get commonTranslationFailed => 'Çeviri başarısız';
 
   @override
-  String get storySettings => '状态设置';
+  String get commonAllRead => 'Tümü okundu';
 
   @override
-  String get whoCanSeeMyStory => '谁可以看我的状态';
+  String commonReadCount(int count) {
+    return '$count okundu';
+  }
 
   @override
-  String get storyPrivacy => '状态隐私';
+  String get commonYouRecalledMessage => 'Bir mesajı geri aldınız';
+
+  @override
+  String get commonMessageRecalled => 'Mesaj geri alındı';
+
+  @override
+  String get commonReEdit => 'Yeniden düzenle';
+
+  @override
+  String get commonWalletArea => 'Cüzdan alanı';
+
+  @override
+  String get callIncomingCall => 'Gelen arama';
+
+  @override
+  String get callMissedCall => 'Cevapsız arama';
+
+  @override
+  String get groupRemoveAdmin => 'Yöneticilikten Çıkar';
+
+  @override
+  String get chatSelectCurrency => 'Para birimi seç';
+
+  @override
+  String get chatSelectEmoji => 'Emoji seç';
+
+  @override
+  String get chatSelectRedPacketCover => 'Kapak seç';
+
+  @override
+  String get groupSetAsAdmin => 'Yönetici Yap';
+
+  @override
+  String get chatVideoPlaybackFailed => 'Video oynatma başarısız';
+
+  @override
+  String get groupViewProfile => 'Profili Gör';
+
+  @override
+  String get favoriteAddLinkComingSoon => 'Bağlantı ekleme özelliği yakında';
+
+  @override
+  String get favoriteNewNoteComingSoon => 'Yeni not özelliği yakında';
+
+  @override
+  String get qrcodeSaveFeatureComingSoon => 'Kaydetme özelliği yakında';
+
+  @override
+  String get qrcodeShareFeatureComingSoon => 'Paylaşım özelliği yakında';
+
+  @override
+  String qrcodeProcessFailed(String error) {
+    return 'QR kod işlenemedi: $error';
+  }
 }

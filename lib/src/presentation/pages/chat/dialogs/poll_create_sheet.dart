@@ -55,7 +55,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
     final question = _questionController.text.trim();
     if (question.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.pleaseEnterQuestion ?? 'Please enter poll question')),
+        SnackBar(content: Text(S.of(context)?.chatPleaseEnterQuestion ?? 'Please enter poll question')),
       );
       return;
     }
@@ -67,7 +67,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
 
     if (options.length < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.atLeastTwoOptions ?? 'At least 2 options required')),
+        SnackBar(content: Text(S.of(context)?.chatAtLeastTwoOptions ?? 'At least 2 options required')),
       );
       return;
     }
@@ -108,7 +108,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text(
-                    S.of(context)?.cancel ?? 'Cancel',
+                    S.of(context)?.commonCancel ?? 'Cancel',
                     style: TextStyle(
                       color: isDark ? Colors.white70 : Colors.black54,
                     ),
@@ -116,7 +116,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                 ),
                 Expanded(
                   child: Text(
-                    S.of(context)?.createPollTitle ?? 'Create Poll',
+                    S.of(context)?.chatCreatePollTitle ?? 'Create Poll',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 17,
@@ -127,7 +127,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                 TextButton(
                   onPressed: _submit,
                   child: Text(
-                    S.of(context)?.submitPoll ?? 'Submit',
+                    S.of(context)?.chatSubmitPoll ?? 'Submit',
                     style: const TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.w600,
@@ -150,7 +150,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
               children: [
                 // 问题输入
                 Text(
-                  S.of(context)?.pollQuestionLabel ?? 'Poll Question',
+                  S.of(context)?.chatPollQuestionLabel ?? 'Poll Question',
                   style: TextStyle(
                     fontSize: 14,
                     color: isDark ? Colors.white70 : Colors.black54,
@@ -162,7 +162,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                   maxLines: 2,
                   maxLength: 100,
                   decoration: InputDecoration(
-                    hintText: S.of(context)?.enterPollQuestionHint ?? 'Please enter poll question',
+                    hintText: S.of(context)?.chatEnterPollQuestionHint ?? 'Please enter poll question',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -178,7 +178,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      S.of(context)?.pollOptionsLabel ?? 'Poll Options',
+                      S.of(context)?.chatPollOptionsLabel ?? 'Poll Options',
                       style: TextStyle(
                         fontSize: 14,
                         color: isDark ? Colors.white70 : Colors.black54,
@@ -223,7 +223,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                             controller: _optionControllers[index],
                             maxLength: 50,
                             decoration: InputDecoration(
-                              hintText: S.of(context)?.optionHintWithIndex(index + 1) ?? 'Option ${index + 1}',
+                              hintText: S.of(context)?.chatOptionHintWithIndex(index + 1) ?? 'Option ${index + 1}',
                               counterText: '',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -253,7 +253,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                   TextButton.icon(
                     onPressed: _addOption,
                     icon: const Icon(Icons.add_circle_outline, size: 20),
-                    label: Text(S.of(context)?.addOptionButton ?? 'Add Option'),
+                    label: Text(S.of(context)?.chatAddOptionButton ?? 'Add Option'),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.green,
                     ),
@@ -272,7 +272,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        S.of(context)?.pollSettingsLabel ?? 'Poll Settings',
+                        S.of(context)?.chatPollSettingsLabel ?? 'Poll Settings',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -286,7 +286,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                         children: [
                           Flexible(
                             child: Text(
-                              S.of(context)?.selectionType ?? 'Selection Type',
+                              S.of(context)?.chatSelectionType ?? 'Selection Type',
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -294,8 +294,8 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                           Flexible(
                             child: SegmentedButton<int>(
                               segments: [
-                                ButtonSegment(value: 1, label: Text(S.of(context)?.singleChoiceLabel ?? 'Single', overflow: TextOverflow.ellipsis)),
-                                ButtonSegment(value: 0, label: Text(S.of(context)?.multiChoiceLabel ?? 'Multi', overflow: TextOverflow.ellipsis)),
+                                ButtonSegment(value: 1, label: Text(S.of(context)?.chatSingleChoiceLabel ?? 'Single', overflow: TextOverflow.ellipsis)),
+                                ButtonSegment(value: 0, label: Text(S.of(context)?.chatMultiChoiceLabel ?? 'Multi', overflow: TextOverflow.ellipsis)),
                               ],
                               selected: {_maxSelections},
                               onSelectionChanged: (value) {
@@ -318,7 +318,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                       // 匿名投票
                       Row(
                         children: [
-                          Text(S.of(context)?.anonymousPollSwitch ?? 'Anonymous Poll'),
+                          Text(S.of(context)?.chatAnonymousPollSwitch ?? 'Anonymous Poll'),
                           const Spacer(),
                           Switch(
                             value: _isAnonymous,
@@ -354,7 +354,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          S.of(context)?.pollHint ?? 'Poll will be displayed in chat. Group members can vote.',
+                          S.of(context)?.chatPollHint ?? 'Poll will be displayed in chat. Group members can vote.',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.blue[700],

@@ -138,7 +138,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
       // 提示用户
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.voiceLoading ?? 'Voice loading, please try again later'),
+          content: Text(S.of(context)?.commonVoiceLoading ?? 'Voice loading, please try again later'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -174,7 +174,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.voiceToTextFailed ?? 'Voice to text failed'),
+            content: Text(S.of(context)?.commonVoiceToTextFailed ?? 'Voice to text failed'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -323,7 +323,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                     ),
                   const SizedBox(width: 4),
                   Text(
-                    _isConverting ? '...' : (S.of(context)?.convertToText ?? 'To text'),
+                    _isConverting ? '...' : (S.of(context)?.commonConvertToText ?? 'To text'),
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
@@ -362,7 +362,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
               if (_convertedText == null)
                 ListTile(
                   leading: const Icon(Icons.text_fields),
-                  title: Text(S.of(context)?.convertToText ?? 'To text'),
+                  title: Text(S.of(context)?.commonConvertToText ?? 'To text'),
                   onTap: () {
                     Navigator.pop(ctx);
                     _convertToText();
@@ -370,7 +370,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                 ),
               ListTile(
                 leading: const Icon(Icons.cancel),
-                title: Text(S.of(context)?.cancel ?? 'Cancel'),
+                title: Text(S.of(context)?.commonCancel ?? 'Cancel'),
                 onTap: () => Navigator.pop(ctx),
               ),
               const SizedBox(height: 8),

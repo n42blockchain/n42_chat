@@ -45,7 +45,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           final s = S.of(context);
           String message = state.message;
           if (message.contains('do not have permission') || message.contains('permission')) {
-            message = s?.noPermissionToEditGroupName ?? message;
+            message = s?.groupNoPermissionToEditGroupName ?? message;
           }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -58,7 +58,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           final s = S.of(context);
           String message = state.message;
           if (message == 'Group name updated') {
-            message = s?.groupNameUpdated ?? message;
+            message = s?.chatGroupNameUpdated ?? message;
           } else if (message == 'Group description updated') {
             message = s?.groupDescriptionUpdated ?? message;
           } else if (message == 'Group avatar updated') {
@@ -85,7 +85,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             appBar: N42AppBar(title: S.of(context)?.groupProfile ?? 'Group Info'),
             body: N42EmptyState(
               icon: Icons.error_outline,
-              title: S.of(context)?.loadFailed ?? 'Load failed',
+              title: S.of(context)?.commonLoadFailed ?? 'Load failed',
             ),
           );
         }
@@ -186,7 +186,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(S.of(context)?.noPermissionToEditGroupName ?? 'You do not have permission to edit group name'),
+                          content: Text(S.of(context)?.groupNoPermissionToEditGroupName ?? 'You do not have permission to edit group name'),
                           duration: const Duration(seconds: 2),
                         ),
                       );
@@ -225,7 +225,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     );
                   },
                   child: Text(
-                    S.of(context)?.memberCountClickToCopy(group.memberCount) ?? '${group.memberCount} members - Click to copy group ID',
+                    S.of(context)?.groupMemberCountClickToCopy(group.memberCount) ?? '${group.memberCount} members - Click to copy group ID',
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark
@@ -260,7 +260,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                S.of(context)?.groupMembers(group.memberCount) ?? 'Group Members (${group.memberCount})',
+                S.of(context)?.commonGroupMembers(group.memberCount) ?? 'Group Members (${group.memberCount})',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
@@ -269,7 +269,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               ),
               TextButton(
                 onPressed: () => _navigateToMemberList(group),
-                child: Text(S.of(context)?.viewAll ?? 'View All'),
+                child: Text(S.of(context)?.groupViewAll ?? 'View All'),
               ),
             ],
           ),
@@ -313,7 +313,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      S.of(context)?.owner ?? 'Owner',
+                      S.of(context)?.commonGroupOwner ?? 'Owner',
                       style: const TextStyle(
                         fontSize: 8,
                         color: Colors.white,
@@ -332,7 +332,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      S.of(context)?.admin ?? 'Admin',
+                      S.of(context)?.commonGroupAdmin ?? 'Admin',
                       style: const TextStyle(
                         fontSize: 8,
                         color: Colors.white,
@@ -376,7 +376,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           SizedBox(
             width: 50,
             child: Text(
-              S.of(context)?.invite ?? 'Invite',
+              S.of(context)?.groupInvite ?? 'Invite',
               style: const TextStyle(fontSize: 11),
               textAlign: TextAlign.center,
             ),
@@ -393,11 +393,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         children: [
           // 群公告
           ListTile(
-            title: Text(S.of(context)?.groupAnnouncement ?? 'Group Announcement'),
+            title: Text(S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement'),
             subtitle: Text(
               group.announcement?.isNotEmpty == true
                   ? group.announcement!
-                  : S.of(context)?.notSet ?? 'Not set',
+                  : S.of(context)?.commonNotSet ?? 'Not set',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -411,7 +411,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           ListTile(
             title: Text(S.of(context)?.groupDescription ?? 'Group Description'),
             subtitle: Text(
-              group.topic?.isNotEmpty == true ? group.topic! : S.of(context)?.notSet ?? 'Not set',
+              group.topic?.isNotEmpty == true ? group.topic! : S.of(context)?.commonNotSet ?? 'Not set',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -424,8 +424,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
             // 群可见性
             SwitchListTile(
-              title: Text(S.of(context)?.publicGroup ?? 'Public Group'),
-              subtitle: Text(S.of(context)?.allowOthersToSearchAndJoin ?? 'Allow others to search and join'),
+              title: Text(S.of(context)?.groupPublicGroup ?? 'Public Group'),
+              subtitle: Text(S.of(context)?.groupAllowOthersToSearchAndJoin ?? 'Allow others to search and join'),
               value: group.isPublic,
               onChanged: (value) {
                 // TODO: 实现
@@ -444,7 +444,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         children: [
           // 清空聊天记录
           ListTile(
-            title: Text(S.of(context)?.clearChatHistory ?? 'Clear Chat History'),
+            title: Text(S.of(context)?.commonClearChatHistory ?? 'Clear Chat History'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _clearChatHistory(),
           ),
@@ -454,7 +454,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           // 退出/解散群聊
           ListTile(
             title: Text(
-              group.isOwner ? (S.of(context)?.dissolveGroup ?? 'Dissolve Group') : (S.of(context)?.leaveGroup ?? 'Leave Group'),
+              group.isOwner ? (S.of(context)?.commonDissolveGroup ?? 'Dissolve Group') : (S.of(context)?.commonLeaveGroup ?? 'Leave Group'),
               style: const TextStyle(color: Colors.red),
             ),
             onTap: () {
@@ -484,11 +484,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.changeGroupName ?? 'Change Group Name'),
+        title: Text(S.of(context)?.groupChangeGroupName ?? 'Change Group Name'),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterGroupName ?? 'Enter group name',
+            hintText: S.of(context)?.commonEnterGroupName ?? 'Enter group name',
             border: const OutlineInputBorder(),
           ),
           autofocus: true,
@@ -496,7 +496,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -506,7 +506,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 this.context.read<GroupBloc>().add(UpdateGroupName(widget.roomId, name));
               }
             },
-            child: Text(S.of(context)?.confirm ?? 'OK'),
+            child: Text(S.of(context)?.commonConfirm ?? 'OK'),
           ),
         ],
       ),
@@ -518,11 +518,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.editGroupDescription ?? 'Edit Group Description'),
+        title: Text(S.of(context)?.groupEditGroupDescription ?? 'Edit Group Description'),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterGroupDescription ?? 'Enter group description',
+            hintText: S.of(context)?.groupEnterGroupDescription ?? 'Enter group description',
             border: const OutlineInputBorder(),
           ),
           maxLines: 3,
@@ -531,7 +531,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -540,7 +540,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     UpdateGroupTopic(widget.roomId, controller.text.trim()),
                   );
             },
-            child: Text(S.of(context)?.confirm ?? 'OK'),
+            child: Text(S.of(context)?.commonConfirm ?? 'OK'),
           ),
         ],
       ),
@@ -552,11 +552,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.editGroupAnnouncement ?? 'Edit Group Announcement'),
+        title: Text(S.of(context)?.groupEditGroupAnnouncement ?? 'Edit Group Announcement'),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterGroupAnnouncement ?? 'Enter group announcement',
+            hintText: S.of(context)?.groupEnterGroupAnnouncement ?? 'Enter group announcement',
             border: const OutlineInputBorder(),
           ),
           maxLines: 5,
@@ -565,7 +565,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -575,7 +575,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     UpdateGroupTopic(widget.roomId, controller.text.trim()),
                   );
             },
-            child: Text(S.of(context)?.publish ?? 'Publish'),
+            child: Text(S.of(context)?.groupPublish ?? 'Publish'),
           ),
         ],
       ),
@@ -594,22 +594,22 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.clearChatHistory ?? 'Clear Chat History'),
-        content: Text(S.of(context)?.confirmClearChatHistory ?? 'Are you sure you want to clear chat history? This action cannot be undone.'),
+        title: Text(S.of(context)?.commonClearChatHistory ?? 'Clear Chat History'),
+        content: Text(S.of(context)?.groupConfirmClearChatHistory ?? 'Are you sure you want to clear chat history? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
               widget.onClearHistory?.call();
               ScaffoldMessenger.of(this.context).showSnackBar(
-                SnackBar(content: Text(S.of(context)?.chatHistoryCleared ?? 'Chat history cleared')),
+                SnackBar(content: Text(S.of(context)?.commonChatHistoryCleared ?? 'Chat history cleared')),
               );
             },
-            child: Text(S.of(context)?.clear ?? 'Clear', style: const TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.commonClear ?? 'Clear', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -620,12 +620,12 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.leaveGroup ?? 'Leave Group'),
-        content: Text(S.of(context)?.confirmLeaveGroup(group.name) ?? 'Are you sure you want to leave "${group.name}"?'),
+        title: Text(S.of(context)?.commonLeaveGroup ?? 'Leave Group'),
+        content: Text(S.of(context)?.commonConfirmLeaveGroup(group.name) ?? 'Are you sure you want to leave "${group.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -633,7 +633,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               this.context.read<GroupBloc>().add(LeaveGroup(widget.roomId));
               Navigator.of(this.context).pop();
             },
-            child: Text(S.of(context)?.leave ?? 'Leave', style: const TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.commonLeave ?? 'Leave', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -644,12 +644,12 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.dissolveGroup ?? 'Dissolve Group'),
-        content: Text(S.of(context)?.confirmDissolveGroup(group.name) ?? 'Are you sure you want to dissolve "${group.name}"? This action cannot be undone.'),
+        title: Text(S.of(context)?.commonDissolveGroup ?? 'Dissolve Group'),
+        content: Text(S.of(context)?.commonConfirmDissolveGroup(group.name) ?? 'Are you sure you want to dissolve "${group.name}"? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -657,7 +657,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               this.context.read<GroupBloc>().add(DeleteGroup(widget.roomId));
               Navigator.of(this.context).pop();
             },
-            child: Text(S.of(context)?.dissolve ?? 'Dissolve', style: const TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.commonDissolve ?? 'Dissolve', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -677,17 +677,17 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               onTap: () {
                 Navigator.pop(sheetContext);
                 ScaffoldMessenger.of(this.context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.featureInDevelopment('') ?? 'Feature in development')),
+                  SnackBar(content: Text(S.of(context)?.commonFeatureInDevelopment('') ?? 'Feature in development')),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: Text(S.of(context)?.searchChatHistory ?? 'Search Chat History'),
+              title: Text(S.of(context)?.commonSearchChatHistory ?? 'Search Chat History'),
               onTap: () {
                 Navigator.pop(sheetContext);
                 ScaffoldMessenger.of(this.context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.featureInDevelopment('') ?? 'Feature in development')),
+                  SnackBar(content: Text(S.of(context)?.commonFeatureInDevelopment('') ?? 'Feature in development')),
                 );
               },
             ),

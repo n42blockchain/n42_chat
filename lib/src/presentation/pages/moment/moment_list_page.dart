@@ -73,7 +73,7 @@ class _MomentListViewState extends State<_MomentListView> {
               background: _buildCoverSection(context, isDark),
             ),
             title: Text(
-              s?.moments ?? 'Moments',
+              s?.commonMoments ?? 'Moments',
               style: TextStyle(
                 color: isDark ? Colors.white : Colors.black,
               ),

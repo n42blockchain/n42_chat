@@ -369,12 +369,12 @@ class CallManager {
       callerAvatarUrl: session.peerAvatarUrl,
       isVideo: session.type == CallType.video,
       roomId: session.roomId,
-      textAccept: l10n?.answer ?? 'Answer',
-      textDecline: l10n?.decline ?? 'Decline',
-      missedCallText: l10n?.missedCall ?? 'Missed call',
-      callbackText: l10n?.callBack ?? 'Call back',
-      incomingCallChannelName: l10n?.incomingCall ?? 'Incoming call',
-      missedCallChannelName: l10n?.missedCall ?? 'Missed call',
+      textAccept: l10n?.callAnswer ?? 'Answer',
+      textDecline: l10n?.callDecline ?? 'Decline',
+      missedCallText: l10n?.callMissedCall ?? 'Missed call',
+      callbackText: l10n?.chatCallBack ?? 'Call back',
+      incomingCallChannelName: l10n?.callIncomingCall ?? 'Incoming call',
+      missedCallChannelName: l10n?.callMissedCall ?? 'Missed call',
     );
 
     // 直接导航到来电界面（如果应用在前台）
@@ -427,9 +427,9 @@ class CallManager {
           callerName: callInfo.callerName,
           callerAvatarUrl: callInfo.callerAvatarUrl,
           isVideo: callInfo.isVideo,
-          missedVideoCallText: l10n?.missedVideoCall ?? 'Missed video call',
-          missedVoiceCallText: l10n?.missedVoiceCall ?? 'Missed voice call',
-          callbackText: l10n?.callBack ?? 'Call back',
+          missedVideoCallText: l10n?.chatMissedVideoCall ?? 'Missed video call',
+          missedVoiceCallText: l10n?.chatMissedVoiceCall ?? 'Missed voice call',
+          callbackText: l10n?.chatCallBack ?? 'Call back',
         );
         break;
       case CallAction.callback:

@@ -51,14 +51,14 @@ class _ReceivePageState extends State<ReceivePage> {
 
     if (amount.isEmpty || double.tryParse(amount) == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.pleaseEnterValidAmount ?? 'Please enter a valid amount')),
+        SnackBar(content: Text(S.of(context)?.transferPleaseEnterValidAmount ?? 'Please enter a valid amount')),
       );
       return;
     }
 
     if (_selectedToken == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.pleaseSelectToken ?? 'Please select a token')),
+        SnackBar(content: Text(S.of(context)?.transferPleaseSelectToken ?? 'Please select a token')),
       );
       return;
     }
@@ -103,7 +103,7 @@ class _ReceivePageState extends State<ReceivePage> {
         return Scaffold(
           backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
           appBar: N42AppBar(
-            title: S.of(context)?.receive ?? 'Receive',
+            title: S.of(context)?.transferReceive ?? 'Receive',
             leading: IconButton(
               icon: const Icon(Icons.close),
               onPressed: () => Navigator.pop(context),
@@ -129,8 +129,8 @@ class _ReceivePageState extends State<ReceivePage> {
       return Center(
         child: N42EmptyState(
           icon: Icons.account_balance_wallet_outlined,
-          title: S.of(context)?.walletNotConnected ?? 'Wallet Not Connected',
-          description: S.of(context)?.pleaseConnectWallet ?? 'Please connect your wallet first',
+          title: S.of(context)?.transferWalletNotConnected ?? 'Wallet Not Connected',
+          description: S.of(context)?.transferPleaseConnectWallet ?? 'Please connect your wallet first',
         ),
       );
     }
@@ -153,7 +153,7 @@ class _ReceivePageState extends State<ReceivePage> {
           if (widget.roomId != null) ...[
             if (!_showRequestForm) ...[
               N42Button(
-                text: S.of(context)?.sendPaymentRequest ?? 'Send Payment Request',
+                text: S.of(context)?.transferSendPaymentRequest ?? 'Send Payment Request',
                 type: N42ButtonType.secondary,
                 onPressed: () {
                   setState(() {
@@ -192,12 +192,12 @@ class _ReceivePageState extends State<ReceivePage> {
             size: 200,
             backgroundColor: Colors.white,
             errorStateBuilder: (ctx, error) => Center(
-              child: Text(S.of(context)?.qrCodeGenerateFailed ?? 'QR code generation failed'),
+              child: Text(S.of(context)?.transferQrCodeGenerateFailed ?? 'QR code generation failed'),
             ),
           ),
           const SizedBox(height: 16),
           Text(
-            S.of(context)?.scanQrToPayMe ?? 'Scan QR code to pay me',
+            S.of(context)?.transferScanQrToPayMe ?? 'Scan QR code to pay me',
             style: const TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary,
@@ -219,7 +219,7 @@ class _ReceivePageState extends State<ReceivePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            S.of(context)?.myWalletAddress ?? 'My Wallet Address',
+            S.of(context)?.transferMyWalletAddress ?? 'My Wallet Address',
             style: TextStyle(
               fontSize: 13,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -243,7 +243,7 @@ class _ReceivePageState extends State<ReceivePage> {
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: walletAddress));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(S.of(context)?.addressCopied ?? 'Address copied')),
+                    SnackBar(content: Text(S.of(context)?.commonAddressCopied ?? 'Address copied')),
                   );
                 },
               ),
@@ -265,7 +265,7 @@ class _ReceivePageState extends State<ReceivePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            S.of(context)?.createPaymentRequest ?? 'Create Payment Request',
+            S.of(context)?.transferCreatePaymentRequest ?? 'Create Payment Request',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -281,7 +281,7 @@ class _ReceivePageState extends State<ReceivePage> {
             // Using value for dynamic state updates, initialValue is for static initial value only
             value: _selectedToken,
             decoration: InputDecoration(
-              labelText: S.of(context)?.selectToken ?? 'Select Token',
+              labelText: S.of(context)?.transferSelectToken ?? 'Select Token',
               border: const OutlineInputBorder(),
             ),
             items: tokens.map((token) {
@@ -304,7 +304,7 @@ class _ReceivePageState extends State<ReceivePage> {
             controller: _amountController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(
-              labelText: S.of(context)?.amount ?? 'Amount',
+              labelText: S.of(context)?.commonTransferAmount ?? 'Amount',
               border: const OutlineInputBorder(),
               suffixText: _selectedToken?.symbol,
             ),
@@ -316,7 +316,7 @@ class _ReceivePageState extends State<ReceivePage> {
           TextField(
             controller: _memoController,
             decoration: InputDecoration(
-              labelText: S.of(context)?.memoOptional ?? 'Memo (optional)',
+              labelText: S.of(context)?.transferMemoOptional ?? 'Memo (optional)',
               border: const OutlineInputBorder(),
             ),
           ),
@@ -328,7 +328,7 @@ class _ReceivePageState extends State<ReceivePage> {
             children: [
               Expanded(
                 child: N42Button(
-                  text: S.of(context)?.cancel ?? 'Cancel',
+                  text: S.of(context)?.commonCancel ?? 'Cancel',
                   type: N42ButtonType.secondary,
                   onPressed: () {
                     setState(() {
@@ -340,7 +340,7 @@ class _ReceivePageState extends State<ReceivePage> {
               const SizedBox(width: 16),
               Expanded(
                 child: N42Button(
-                  text: S.of(context)?.sendRequest ?? 'Send Request',
+                  text: S.of(context)?.transferSendRequest ?? 'Send Request',
                   onPressed: _createPaymentRequest,
                 ),
               ),

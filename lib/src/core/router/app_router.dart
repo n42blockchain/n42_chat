@@ -43,7 +43,7 @@ class N42ChatRouter {
           name: Routes.conversationListName,
           builder: (context, state) {
             final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.messages ?? 'Messages');
+            return _PlaceholderPage(title: l10n?.commonMessages ?? 'Messages');
           },
           routes: [
             // 会话详情
@@ -54,7 +54,7 @@ class N42ChatRouter {
                 final roomId = state.pathParameters['roomId']!;
                 final l10n = S.of(context);
                 return _PlaceholderPage(
-                    title: l10n?.conversationWithId(roomId) ??
+                    title: l10n?.commonConversationWithId(roomId) ??
                         'Conversation: $roomId');
               },
             ),
@@ -67,7 +67,7 @@ class N42ChatRouter {
           name: Routes.contactsName,
           builder: (context, state) {
             final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.contacts ?? 'Contacts');
+            return _PlaceholderPage(title: l10n?.commonContacts ?? 'Contacts');
           },
           routes: [
             // 联系人详情
@@ -78,7 +78,7 @@ class N42ChatRouter {
                 final userId = state.pathParameters['userId']!;
                 final l10n = S.of(context);
                 return _PlaceholderPage(
-                    title: l10n?.contactWithId(userId) ?? 'Contact: $userId');
+                    title: l10n?.commonContactWithId(userId) ?? 'Contact: $userId');
               },
             ),
             // 添加联系人
@@ -88,7 +88,7 @@ class N42ChatRouter {
               builder: (context, state) {
                 final l10n = S.of(context);
                 return _PlaceholderPage(
-                    title: l10n?.addFriend ?? 'Add Friend');
+                    title: l10n?.commonAddFriend ?? 'Add Friend');
               },
             ),
           ],
@@ -100,7 +100,7 @@ class N42ChatRouter {
           name: Routes.discoverName,
           builder: (context, state) {
             final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.discover ?? 'Discover');
+            return _PlaceholderPage(title: l10n?.commonDiscover ?? 'Discover');
           },
         ),
 
@@ -110,7 +110,7 @@ class N42ChatRouter {
           name: Routes.profileName,
           builder: (context, state) {
             final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.me ?? 'Me');
+            return _PlaceholderPage(title: l10n?.commonMe ?? 'Me');
           },
           routes: [
             // 设置
@@ -119,7 +119,7 @@ class N42ChatRouter {
               name: Routes.settingsName,
               builder: (context, state) {
                 final l10n = S.of(context);
-                return _PlaceholderPage(title: l10n?.settings ?? 'Settings');
+                return _PlaceholderPage(title: l10n?.commonSettings ?? 'Settings');
               },
             ),
             // 编辑资料
@@ -129,7 +129,7 @@ class N42ChatRouter {
               builder: (context, state) {
                 final l10n = S.of(context);
                 return _PlaceholderPage(
-                    title: l10n?.editProfile ?? 'Edit Profile');
+                    title: l10n?.profileEditProfile ?? 'Edit Profile');
               },
             ),
           ],
@@ -141,7 +141,7 @@ class N42ChatRouter {
           name: Routes.loginName,
           builder: (context, state) {
             final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.login ?? 'Log In');
+            return _PlaceholderPage(title: l10n?.authLogin ?? 'Log In');
           },
         ),
 
@@ -151,7 +151,7 @@ class N42ChatRouter {
           name: Routes.searchName,
           builder: (context, state) {
             final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.search ?? 'Search');
+            return _PlaceholderPage(title: l10n?.commonSearch ?? 'Search');
           },
         ),
 
@@ -161,7 +161,7 @@ class N42ChatRouter {
           name: Routes.createGroupName,
           builder: (context, state) {
             final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.createGroup ?? 'Create Group');
+            return _PlaceholderPage(title: l10n?.commonCreateGroup ?? 'Create Group');
           },
         ),
       ];
@@ -231,7 +231,7 @@ class _PlaceholderPage extends StatelessWidget {
       backgroundColor: const Color(0xFFEDEDED),
       body: Center(
         child: Text(
-          l10n?.developing(title) ?? '$title\n(Coming soon)',
+          l10n?.commonDeveloping(title) ?? '$title\n(Coming soon)',
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 16,
@@ -254,7 +254,7 @@ class _ErrorPage extends StatelessWidget {
     final l10n = S.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.error ?? 'Error'),
+        title: Text(l10n?.chatError ?? 'Error'),
         backgroundColor: const Color(0xFFF7F7F7),
         foregroundColor: const Color(0xFF181818),
       ),
@@ -270,7 +270,7 @@ class _ErrorPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              l10n?.pageNotFound ?? 'Page not found',
+              l10n?.commonPageNotFound ?? 'Page not found',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
@@ -293,7 +293,7 @@ class _ErrorPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF07C160),
               ),
-              child: Text(l10n?.backToHome ?? 'Back to Home'),
+              child: Text(l10n?.commonBackToHome ?? 'Back to Home'),
             ),
           ],
         ),

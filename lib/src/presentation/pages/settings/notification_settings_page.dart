@@ -44,7 +44,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: l10n?.messageNotifications ?? 'Message Notifications',
+        title: l10n?.settingsMessageNotifications ?? 'Message Notifications',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -58,8 +58,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             child: Column(
               children: [
                 _buildSwitchTile(
-                  title: l10n?.messageNotifications ?? 'Message Notifications',
-                  subtitle: l10n?.receiveNewMessageNotifications ?? 'Receive new message notifications',
+                  title: l10n?.settingsMessageNotifications ?? 'Message Notifications',
+                  subtitle: l10n?.settingsReceiveNewMessageNotifications ?? 'Receive new message notifications',
                   icon: Icons.notifications_outlined,
                   value: _settings.enabled,
                   onChanged: (value) => _updateSettings(
@@ -80,8 +80,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               child: Column(
                 children: [
                   _buildSwitchTile(
-                    title: l10n?.showMessagePreview ?? 'Show Message Preview',
-                    subtitle: l10n?.showMessageContentInNotification ?? 'Show message content in notifications',
+                    title: l10n?.settingsShowMessagePreview ?? 'Show Message Preview',
+                    subtitle: l10n?.settingsShowMessageContentInNotification ?? 'Show message content in notifications',
                     icon: Icons.visibility_outlined,
                     value: _settings.showPreview,
                     onChanged: (value) => _updateSettings(
@@ -91,8 +91,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ),
                   _buildDivider(isDark),
                   _buildSwitchTile(
-                    title: l10n?.notificationSound ?? 'Notification Sound',
-                    subtitle: l10n?.playSoundOnMessage ?? 'Play sound when receiving messages',
+                    title: l10n?.settingsNotificationSound ?? 'Notification Sound',
+                    subtitle: l10n?.settingsPlaySoundOnMessage ?? 'Play sound when receiving messages',
                     icon: Icons.volume_up_outlined,
                     value: _settings.playSound,
                     onChanged: (value) => _updateSettings(
@@ -102,8 +102,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ),
                   _buildDivider(isDark),
                   _buildSwitchTile(
-                    title: l10n?.vibration ?? 'Vibration',
-                    subtitle: l10n?.vibrateOnMessage ?? 'Vibrate when receiving messages',
+                    title: l10n?.commonVibration ?? 'Vibration',
+                    subtitle: l10n?.settingsVibrateOnMessage ?? 'Vibrate when receiving messages',
                     icon: Icons.vibration,
                     value: _settings.vibrate,
                     onChanged: (value) => _updateSettings(
@@ -123,8 +123,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               child: Column(
                 children: [
                   _buildSwitchTile(
-                    title: l10n?.doNotDisturbMode ?? 'Do Not Disturb',
-                    subtitle: l10n?.doNotDisturbDescription ?? 'Do not receive notifications during specified time',
+                    title: l10n?.settingsDoNotDisturbMode ?? 'Do Not Disturb',
+                    subtitle: l10n?.settingsDoNotDisturbDescription ?? 'Do not receive notifications during specified time',
                     icon: Icons.do_not_disturb_on_outlined,
                     value: _settings.doNotDisturb,
                     onChanged: (value) => _updateSettings(
@@ -135,7 +135,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   if (_settings.doNotDisturb) ...[
                     _buildDivider(isDark),
                     _buildTimeTile(
-                      title: l10n?.startTime ?? 'Start Time',
+                      title: l10n?.settingsStartTime ?? 'Start Time',
                       value: _settings.doNotDisturbStart ?? '22:00',
                       icon: Icons.access_time,
                       onTap: () => _selectTime(true),
@@ -143,7 +143,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     ),
                     _buildDivider(isDark),
                     _buildTimeTile(
-                      title: l10n?.endTime ?? 'End Time',
+                      title: l10n?.settingsEndTime ?? 'End Time',
                       value: _settings.doNotDisturbEnd ?? '07:00',
                       icon: Icons.access_time,
                       onTap: () => _selectTime(false),

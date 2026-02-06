@@ -143,8 +143,8 @@ class MessageReadReceipt extends StatelessWidget {
         const SizedBox(width: 2),
         Text(
           allRead
-              ? (l10n?.allRead ?? 'All read')
-              : (l10n?.readCount(readCount) ?? '$readCount read'),
+              ? (l10n?.commonAllRead ?? 'All read')
+              : (l10n?.commonReadCount(readCount) ?? '$readCount read'),
           style: TextStyle(
             fontSize: 11,
             color: allRead ? AppColors.primary : AppColors.textTertiary,

@@ -74,7 +74,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> _save() async {
     if (_displayNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.enterNickname ?? 'Enter nickname')),
+        SnackBar(content: Text(S.of(context)?.profileEnterNickname ?? 'Enter nickname')),
       );
       return;
     }
@@ -92,7 +92,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.saveFailed(e.toString()) ?? 'Save failed: $e')),
+          SnackBar(content: Text(S.of(context)?.profileSaveFailed(e.toString()) ?? 'Save failed: $e')),
         );
       }
     } finally {
@@ -109,7 +109,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: S.of(context)?.editProfile ?? 'Edit Profile',
+        title: S.of(context)?.profileEditProfile ?? 'Edit Profile',
         onBackPressed: () => Navigator.pop(context),
         actions: [
           TextButton(
@@ -121,7 +121,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Text(
-                    S.of(context)?.save ?? 'Save',
+                    S.of(context)?.commonSave ?? 'Save',
                     style: const TextStyle(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,
@@ -187,9 +187,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               children: [
                 // 昵称
                 _FormField(
-                  label: S.of(context)?.nickname ?? 'Nickname',
+                  label: S.of(context)?.profileNickname ?? 'Nickname',
                   controller: _displayNameController,
-                  placeholder: S.of(context)?.enterNickname ?? 'Enter nickname',
+                  placeholder: S.of(context)?.profileEnterNickname ?? 'Enter nickname',
                   isDark: isDark,
                 ),
 
@@ -199,9 +199,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                 // 签名
                 _FormField(
-                  label: S.of(context)?.signature ?? 'Signature',
+                  label: S.of(context)?.profileSignature ?? 'Signature',
                   controller: _statusController,
-                  placeholder: S.of(context)?.addSignature ?? 'Add a signature',
+                  placeholder: S.of(context)?.profileAddSignature ?? 'Add a signature',
                   isDark: isDark,
                 ),
               ],
@@ -323,17 +323,17 @@ class _AvatarPickerSheet extends StatelessWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: Text(S.of(context)?.takePhoto ?? 'Take Photo'),
+              title: Text(S.of(context)?.commonTakePhoto ?? 'Take Photo'),
               onTap: onCamera,
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: Text(S.of(context)?.chooseFromGallery ?? 'Choose from Gallery'),
+              title: Text(S.of(context)?.profileChooseFromGallery ?? 'Choose from Gallery'),
               onTap: onGallery,
             ),
             const SizedBox(height: 8),
             N42Button.text(
-              text: S.of(context)?.cancel ?? 'Cancel',
+              text: S.of(context)?.commonCancel ?? 'Cancel',
               onPressed: () => Navigator.pop(context),
             ),
           ],

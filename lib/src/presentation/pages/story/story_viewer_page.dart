@@ -662,8 +662,8 @@ class _StoryContentState extends State<_StoryContent> {
               const SizedBox(width: 8),
               Text(
                 viewCount > 0
-                    ? '$viewCount ${l10n?.viewers ?? "viewers"}'
-                    : (l10n?.noViewers ?? 'No viewers yet'),
+                    ? '$viewCount ${l10n?.storyViewers ?? "viewers"}'
+                    : (l10n?.storyNoViewers ?? 'No viewers yet'),
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.8),
                   fontSize: 14,
@@ -706,7 +706,7 @@ class _StoryContentState extends State<_StoryContent> {
                     fontSize: 14,
                   ),
                   decoration: InputDecoration(
-                    hintText: l10n?.replyToStory ?? 'Reply to story...',
+                    hintText: l10n?.storyReplyToStory ?? 'Reply to story...',
                     hintStyle: TextStyle(
                       color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 14,

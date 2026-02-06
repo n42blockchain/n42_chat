@@ -82,7 +82,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
       child: Scaffold(
         backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
         appBar: N42AppBar(
-          title: S.of(context)?.inviteMembers ?? 'Invite Members',
+          title: S.of(context)?.groupInviteMembers ?? 'Invite Members',
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () => Navigator.pop(context),
@@ -91,7 +91,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
             TextButton(
               onPressed: _selectedUserIds.isNotEmpty ? _inviteMembers : null,
               child: Text(
-                S.of(context)?.inviteCount(_selectedUserIds.length) ?? 'Invite(${_selectedUserIds.length})',
+                S.of(context)?.groupInviteCount(_selectedUserIds.length) ?? 'Invite(${_selectedUserIds.length})',
                 style: TextStyle(
                   color: _selectedUserIds.isNotEmpty
                       ? AppColors.primary
@@ -135,7 +135,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
               padding: const EdgeInsets.all(12),
               child: N42SearchBar(
                 controller: _searchController,
-                hintText: S.of(context)?.searchContacts ?? 'Search contacts',
+                hintText: S.of(context)?.commonSearchContacts ?? 'Search contacts',
                 onChanged: (query) {
                   setState(() {
                     _isSearching = query.isNotEmpty;
@@ -156,7 +156,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
                   if (state is! ContactLoaded) {
                     return N42EmptyState(
                       icon: Icons.contacts_outlined,
-                      title: S.of(context)?.noContacts ?? 'No contacts',
+                      title: S.of(context)?.commonNoContacts ?? 'No contacts',
                     );
                   }
 
