@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 
+import '../services/giphy_service.dart';
 import '../services/remark_service.dart';
 import '../../data/datasources/local/secure_storage_datasource.dart';
 import '../../data/datasources/matrix/matrix_auth_datasource.dart';
@@ -117,6 +118,16 @@ Future<void> _registerServices() async {
   final voiceService = VoiceService();
   await voiceService.initialize();
   getIt.registerLazySingleton<VoiceService>(() => voiceService);
+
+  // Giphy 服务 (仅当配置了 API Key 时注册)
+  final config = getIt<N42ChatConfig>();
+  if (config.giphyApiKey != null && config.giphyApiKey!.isNotEmpty) {
+    getIt.registerLazySingleton<GiphyService>(
+      () => GiphyService(
+        config: GiphyConfig(apiKey: config.giphyApiKey!),
+      ),
+    );
+  }
 }
 
 /// 注册数据源

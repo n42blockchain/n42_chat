@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/giphy_service.dart';
@@ -34,7 +35,7 @@ class GifPicker extends StatefulWidget {
 }
 
 class _GifPickerState extends State<GifPicker> {
-  final GiphyService _giphyService = GiphyService();
+  GiphyService? _giphyService;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -44,13 +45,26 @@ class _GifPickerState extends State<GifPicker> {
   int _offset = 0;
   String _currentQuery = '';
   Timer? _debounceTimer;
+  bool _serviceAvailable = false;
 
   @override
   void initState() {
     super.initState();
-    _loadTrendingGifs();
-    _scrollController.addListener(_onScroll);
-    _searchController.addListener(_onSearchChanged);
+    _initializeService();
+  }
+
+  void _initializeService() {
+    try {
+      if (GetIt.instance.isRegistered<GiphyService>()) {
+        _giphyService = GetIt.instance<GiphyService>();
+        _serviceAvailable = true;
+        _loadTrendingGifs();
+        _scrollController.addListener(_onScroll);
+        _searchController.addListener(_onSearchChanged);
+      }
+    } catch (e) {
+      debugPrint('GifPicker: GiphyService not available: $e');
+    }
   }
 
   @override
@@ -58,7 +72,7 @@ class _GifPickerState extends State<GifPicker> {
     _debounceTimer?.cancel();
     _scrollController.dispose();
     _searchController.dispose();
-    _giphyService.dispose();
+    // 不要 dispose _giphyService，因为它是单例
     super.dispose();
   }
 
@@ -95,14 +109,14 @@ class _GifPickerState extends State<GifPicker> {
   }
 
   Future<void> _loadTrendingGifs() async {
-    if (_isLoading) return;
+    if (_isLoading || _giphyService == null) return;
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final result = await _giphyService.getTrendingGifs(offset: _offset);
+      final result = await _giphyService!.getTrendingGifs(offset: _offset);
       if (mounted) {
         setState(() {
           _gifs.addAll(result.gifs);
@@ -121,14 +135,14 @@ class _GifPickerState extends State<GifPicker> {
   }
 
   Future<void> _searchGifs() async {
-    if (_isLoading || _currentQuery.isEmpty) return;
+    if (_isLoading || _currentQuery.isEmpty || _giphyService == null) return;
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final result = await _giphyService.searchGifs(
+      final result = await _giphyService!.searchGifs(
         query: _currentQuery,
         offset: _offset,
       );
@@ -240,6 +254,37 @@ class _GifPickerState extends State<GifPicker> {
   }
 
   Widget _buildGifGrid(bool isDark) {
+    // 服务不可用时显示提示
+    if (!_serviceAvailable) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.warning_amber_outlined,
+              size: 48,
+              color: isDark ? Colors.grey[600] : Colors.grey[400],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'GIF service not configured',
+              style: TextStyle(
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Please configure Giphy API key',
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? Colors.grey[500] : Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (_gifs.isEmpty && _isLoading) {
       return const Center(
         child: CircularProgressIndicator(),

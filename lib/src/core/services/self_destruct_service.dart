@@ -6,6 +6,10 @@ import 'package:n42_chat/src/domain/entities/message_entity.dart';
 /// 阅后即焚消息管理服务
 ///
 /// 负责追踪和管理所有阅后即焚消息的生命周期
+///
+/// 时间同步说明：
+/// - 支持设置服务器时间偏移以确保准确的倒计时
+/// - 使用 DateTime.now().millisecondsSinceEpoch 进行精确计时
 class SelfDestructService extends ChangeNotifier {
   /// 单例实例
   static SelfDestructService? _instance;
@@ -21,6 +25,27 @@ class SelfDestructService extends ChangeNotifier {
   /// 用于测试的工厂构造函数
   @visibleForTesting
   factory SelfDestructService.forTest() => SelfDestructService._();
+
+  /// 服务器时间与本地时间的偏移（毫秒）
+  /// 正值表示服务器时间比本地时间快
+  int _serverTimeOffsetMs = 0;
+
+  /// 设置服务器时间偏移
+  ///
+  /// [serverTime] 服务器当前时间
+  void setServerTime(DateTime serverTime) {
+    final localTime = DateTime.now();
+    _serverTimeOffsetMs = serverTime.millisecondsSinceEpoch -
+                          localTime.millisecondsSinceEpoch;
+    debugPrint('SelfDestructService: Server time offset set to ${_serverTimeOffsetMs}ms');
+  }
+
+  /// 获取同步后的当前时间
+  DateTime get syncedNow {
+    return DateTime.fromMillisecondsSinceEpoch(
+      DateTime.now().millisecondsSinceEpoch + _serverTimeOffsetMs,
+    );
+  }
 
   /// 活跃的消息定时器 {messageId: Timer}
   final Map<String, Timer> _timers = {};
@@ -101,20 +126,32 @@ class SelfDestructService extends ChangeNotifier {
   }
 
   /// 设置消息销毁定时器
+  ///
+  /// 使用精确的时间计算来避免 Timer 漂移问题
   void _setupTimer(MessageEntity message, int remainingSeconds) {
     // 取消现有定时器
     _timers[message.id]?.cancel();
 
+    // 记录销毁的目标时间戳
+    final destructionTimeMs = syncedNow.millisecondsSinceEpoch +
+                              (remainingSeconds * 1000);
+
     // 创建倒计时定时器（每秒更新）
-    var countdown = remainingSeconds;
     _timers[message.id] = Timer.periodic(
       const Duration(seconds: 1),
       (timer) {
-        countdown--;
+        // 基于时间戳计算剩余秒数，避免累积误差
+        final nowMs = syncedNow.millisecondsSinceEpoch;
+        final remainingMs = destructionTimeMs - nowMs;
+        final countdown = (remainingMs / 1000).ceil();
 
-        // 通知倒计时更新
-        for (final callback in _countdownCallbacks) {
-          callback(message.id, countdown);
+        // 通知倒计时更新（复制列表以防止迭代时修改）
+        for (final callback in List.from(_countdownCallbacks)) {
+          try {
+            callback(message.id, countdown);
+          } catch (e) {
+            debugPrint('SelfDestructService: Countdown callback error: $e');
+          }
         }
 
         if (countdown <= 0) {
@@ -137,9 +174,13 @@ class SelfDestructService extends ChangeNotifier {
     _timers.remove(message.id);
     _trackedMessages.remove(message.id);
 
-    // 通知销毁回调
-    for (final callback in _destructionCallbacks) {
-      callback(message.id, message.roomId);
+    // 通知销毁回调（复制列表以防止迭代时修改）
+    for (final callback in List.from(_destructionCallbacks)) {
+      try {
+        callback(message.id, message.roomId);
+      } catch (e) {
+        debugPrint('SelfDestructService: Destruction callback error: $e');
+      }
     }
 
     notifyListeners();

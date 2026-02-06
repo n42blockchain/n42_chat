@@ -108,6 +108,8 @@ dependencies:
   collection: ^1.18.0
   rxdart: ^0.27.7
   logger: ^2.0.2
+  # Cryptography - 加密工具
+  crypto: ^3.0.3
   
   # ============================================
   # UI Helpers

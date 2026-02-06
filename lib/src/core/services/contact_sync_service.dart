@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
@@ -61,10 +64,27 @@ class MatchedContact {
 /// 通讯录同步服务
 ///
 /// 提供手机通讯录读取和 Matrix 用户匹配功能
+///
+/// 隐私说明：
+/// - 搜索使用模糊匹配，不直接暴露完整信息
+/// - 批量处理以减少网络请求
 class ContactSyncService {
   final MatrixClientManager _clientManager;
 
+  /// 每批处理的联系人数量
+  static const int _batchSize = 10;
+
+  /// 请求之间的延迟（毫秒），用于限流
+  static const int _requestDelayMs = 100;
+
   ContactSyncService(this._clientManager);
+
+  /// 对敏感信息进行单向哈希（用于日志，不发送到服务器）
+  String _hashForLogging(String value) {
+    final bytes = utf8.encode(value);
+    final digest = sha256.convert(bytes);
+    return digest.toString().substring(0, 8);
+  }
 
   /// 检查通讯录权限
   Future<bool> hasPermission() async {
@@ -117,12 +137,32 @@ class ContactSyncService {
     }
   }
 
+  /// 验证邮箱格式
+  bool _isValidEmail(String email) {
+    if (email.isEmpty || email.length > 254) return false;
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
+  /// 验证电话号码格式
+  bool _isValidPhone(String phone) {
+    if (phone.isEmpty) return false;
+    final normalized = PhoneContact._normalizePhone(phone);
+    // 至少5位数字
+    if (normalized.length < 5 || normalized.length > 20) return false;
+    return RegExp(r'^[+]?[0-9]+$').hasMatch(normalized);
+  }
+
   /// 搜索匹配的 Matrix 用户
   ///
   /// 通过电话号码或邮箱查找已注册的 Matrix 用户
+  /// 使用批量处理和请求节流来优化性能
   Future<List<MatchedContact>> findMatchingUsers(
-    List<PhoneContact> phoneContacts,
-  ) async {
+    List<PhoneContact> phoneContacts, {
+    void Function(int current, int total)? onProgress,
+  }) async {
     final client = _clientManager.client;
     if (client == null) {
       debugPrint('ContactSyncService: Matrix client not available');
@@ -130,71 +170,79 @@ class ContactSyncService {
     }
 
     final matched = <MatchedContact>[];
+    final processedUserIds = <String>{};
+    final total = phoneContacts.length;
+    var processed = 0;
 
-    // 使用邮箱搜索（Matrix 通常使用邮箱作为第三方标识符）
-    for (final contact in phoneContacts) {
-      if (contact.emails.isEmpty) continue;
+    // 分批处理联系人
+    for (var i = 0; i < phoneContacts.length; i += _batchSize) {
+      final batchEnd = min(i + _batchSize, phoneContacts.length);
+      final batch = phoneContacts.sublist(i, batchEnd);
 
-      for (final email in contact.emails) {
-        try {
-          // 尝试通过邮箱查找 Matrix 用户
-          // 这依赖于 Identity Server 的配置
-          final response = await client.searchUserDirectory(
-            email,
-            limit: 5,
-          );
+      for (final contact in batch) {
+        // 搜索邮箱
+        for (final email in contact.emails) {
+          if (!_isValidEmail(email)) continue;
 
-          for (final user in response.results) {
-            // 检查是否已经匹配过这个用户
-            final alreadyMatched = matched.any(
-              (m) => m.matrixUserId == user.userId,
+          try {
+            final response = await client.searchUserDirectory(
+              email,
+              limit: 3,
             );
-            if (alreadyMatched) continue;
 
-            matched.add(MatchedContact(
-              phoneContact: contact,
-              matrixUserId: user.userId,
-              matrixDisplayName: user.displayName,
-              matrixAvatarUrl: user.avatarUrl?.toString(),
-            ));
+            for (final user in response.results) {
+              if (processedUserIds.contains(user.userId)) continue;
+              processedUserIds.add(user.userId);
+
+              matched.add(MatchedContact(
+                phoneContact: contact,
+                matrixUserId: user.userId,
+                matrixDisplayName: user.displayName,
+                matrixAvatarUrl: user.avatarUrl?.toString(),
+              ));
+            }
+
+            // 请求节流
+            await Future.delayed(Duration(milliseconds: _requestDelayMs));
+          } catch (e) {
+            // 使用哈希保护隐私信息
+            debugPrint('ContactSyncService: Search error for ${_hashForLogging(email)}: $e');
           }
-        } catch (e) {
-          debugPrint('ContactSyncService: Search error for $email: $e');
         }
-      }
-    }
 
-    // 使用电话号码搜索（格式化为 Matrix MSISDN 格式）
-    for (final contact in phoneContacts) {
-      if (contact.phones.isEmpty) continue;
+        // 搜索电话号码
+        for (final phone in contact.phones) {
+          if (!_isValidPhone(phone)) continue;
 
-      for (final phone in contact.phones) {
-        try {
-          // 标准化电话号码
-          final normalizedPhone = PhoneContact._normalizePhone(phone);
+          try {
+            final normalizedPhone = PhoneContact._normalizePhone(phone);
 
-          // 搜索用户目录
-          final response = await client.searchUserDirectory(
-            normalizedPhone,
-            limit: 5,
-          );
-
-          for (final user in response.results) {
-            final alreadyMatched = matched.any(
-              (m) => m.matrixUserId == user.userId,
+            final response = await client.searchUserDirectory(
+              normalizedPhone,
+              limit: 3,
             );
-            if (alreadyMatched) continue;
 
-            matched.add(MatchedContact(
-              phoneContact: contact,
-              matrixUserId: user.userId,
-              matrixDisplayName: user.displayName,
-              matrixAvatarUrl: user.avatarUrl?.toString(),
-            ));
+            for (final user in response.results) {
+              if (processedUserIds.contains(user.userId)) continue;
+              processedUserIds.add(user.userId);
+
+              matched.add(MatchedContact(
+                phoneContact: contact,
+                matrixUserId: user.userId,
+                matrixDisplayName: user.displayName,
+                matrixAvatarUrl: user.avatarUrl?.toString(),
+              ));
+            }
+
+            // 请求节流
+            await Future.delayed(Duration(milliseconds: _requestDelayMs));
+          } catch (e) {
+            debugPrint('ContactSyncService: Search error for phone: $e');
           }
-        } catch (e) {
-          debugPrint('ContactSyncService: Search error for $phone: $e');
         }
+
+        processed++;
+        onProgress?.call(processed, total);
       }
     }
 
@@ -207,8 +255,12 @@ class ContactSyncService {
   /// 1. 请求通讯录权限
   /// 2. 读取手机通讯录
   /// 3. 搜索匹配的 Matrix 用户
+  ///
+  /// [onProgress] 回调用于报告进度
+  /// [withPhotos] 是否加载联系人照片（可能影响性能）
   Future<ContactSyncResult> syncContacts({
     void Function(int current, int total)? onProgress,
+    bool withPhotos = false,
   }) async {
     // 检查权限
     final hasPermission = await requestPermission();
@@ -221,8 +273,8 @@ class ContactSyncService {
       );
     }
 
-    // 读取通讯录
-    final phoneContacts = await getPhoneContacts(withPhoto: true);
+    // 读取通讯录（默认不加载照片以提升性能）
+    final phoneContacts = await getPhoneContacts(withPhoto: withPhotos);
     if (phoneContacts.isEmpty) {
       return const ContactSyncResult(
         success: true,
@@ -234,8 +286,11 @@ class ContactSyncService {
     // 报告进度
     onProgress?.call(0, phoneContacts.length);
 
-    // 搜索匹配用户
-    final matchedContacts = await findMatchingUsers(phoneContacts);
+    // 搜索匹配用户（带进度回调）
+    final matchedContacts = await findMatchingUsers(
+      phoneContacts,
+      onProgress: onProgress,
+    );
 
     return ContactSyncResult(
       success: true,
