@@ -51,11 +51,19 @@ class UnsubscribeMessages extends ChatEvent {
 /// 发送文本消息
 class SendTextMessage extends ChatEvent {
   final String text;
+  final int? selfDestructAfter;
+  final List<String>? mentionedUserIds;
+  final bool mentionsRoom;
 
-  const SendTextMessage(this.text);
+  const SendTextMessage(
+    this.text, {
+    this.selfDestructAfter,
+    this.mentionedUserIds,
+    this.mentionsRoom = false,
+  });
 
   @override
-  List<Object?> get props => [text];
+  List<Object?> get props => [text, selfDestructAfter, mentionedUserIds, mentionsRoom];
 }
 
 /// 发送图片消息
@@ -371,4 +379,150 @@ class SendCustomMessage extends ChatEvent {
 /// 清空聊天记录（本地）
 class ClearChatHistory extends ChatEvent {
   const ClearChatHistory();
+}
+
+/// 开始消息的自毁倒计时（消息被阅读时触发）
+class StartMessageDestruction extends ChatEvent {
+  final String messageId;
+
+  const StartMessageDestruction(this.messageId);
+
+  @override
+  List<Object?> get props => [messageId];
+}
+
+/// 销毁已过期的阅后即焚消息
+class DestroyExpiredMessages extends ChatEvent {
+  const DestroyExpiredMessages();
+}
+
+/// 更新阅后即焚消息的倒计时状态
+class UpdateDestructionCountdown extends ChatEvent {
+  final String messageId;
+  final DateTime destroyedAt;
+
+  const UpdateDestructionCountdown({
+    required this.messageId,
+    required this.destroyedAt,
+  });
+
+  @override
+  List<Object?> get props => [messageId, destroyedAt];
+}
+
+/// 发送定时消息
+class SendScheduledMessage extends ChatEvent {
+  final String text;
+  final DateTime scheduledAt;
+  final int? selfDestructAfter;
+  final List<String>? mentionedUserIds;
+  final bool mentionsRoom;
+
+  const SendScheduledMessage({
+    required this.text,
+    required this.scheduledAt,
+    this.selfDestructAfter,
+    this.mentionedUserIds,
+    this.mentionsRoom = false,
+  });
+
+  @override
+  List<Object?> get props => [text, scheduledAt, selfDestructAfter, mentionedUserIds, mentionsRoom];
+}
+
+/// 取消定时消息
+class CancelScheduledMessage extends ChatEvent {
+  final String messageId;
+
+  const CancelScheduledMessage(this.messageId);
+
+  @override
+  List<Object?> get props => [messageId];
+}
+
+/// 发送到期的定时消息（内部事件，由定时器触发）
+class SendDueScheduledMessages extends ChatEvent {
+  const SendDueScheduledMessages();
+}
+
+/// 语音消息转文字
+class TranscribeVoiceMessage extends ChatEvent {
+  final String messageId;
+  final String? audioPath;
+  final String language;
+
+  const TranscribeVoiceMessage({
+    required this.messageId,
+    this.audioPath,
+    this.language = 'zh-CN',
+  });
+
+  @override
+  List<Object?> get props => [messageId, audioPath, language];
+}
+
+/// 语音转文字完成（内部事件）
+class VoiceTranscriptionCompleted extends ChatEvent {
+  final String messageId;
+  final String? transcription;
+  final bool success;
+
+  const VoiceTranscriptionCompleted({
+    required this.messageId,
+    this.transcription,
+    required this.success,
+  });
+
+  @override
+  List<Object?> get props => [messageId, transcription, success];
+}
+
+/// 发送 GIF 消息
+class SendGifMessage extends ChatEvent {
+  final String gifUrl;
+  final String? previewUrl;
+  final int? width;
+  final int? height;
+  final String? title;
+
+  const SendGifMessage({
+    required this.gifUrl,
+    this.previewUrl,
+    this.width,
+    this.height,
+    this.title,
+  });
+
+  @override
+  List<Object?> get props => [gifUrl, previewUrl, width, height, title];
+}
+
+/// 发送贴纸消息
+class SendStickerMessage extends ChatEvent {
+  final String stickerId;
+  final String packId;
+  final String url;
+  final String? httpUrl;
+  final String? name;
+  final String? emoji;
+  final int? width;
+  final int? height;
+  final String? mimeType;
+  final int? size;
+
+  const SendStickerMessage({
+    required this.stickerId,
+    required this.packId,
+    required this.url,
+    this.httpUrl,
+    this.name,
+    this.emoji,
+    this.width,
+    this.height,
+    this.mimeType,
+    this.size,
+  });
+
+  @override
+  List<Object?> get props => [stickerId, packId, url, httpUrl, name, emoji, width, height, mimeType, size];
 }

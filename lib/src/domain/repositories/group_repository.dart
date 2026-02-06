@@ -54,6 +54,25 @@ abstract class IGroupRepository {
   Future<void> setGroupVisibility(String roomId, bool isPublic);
 
   // ============================================
+  // 置顶消息管理
+  // ============================================
+
+  /// 获取置顶消息事件ID列表
+  Future<List<String>> getPinnedEventIds(String roomId);
+
+  /// 置顶消息
+  Future<void> pinMessage(String roomId, String eventId);
+
+  /// 取消置顶消息
+  Future<void> unpinMessage(String roomId, String eventId);
+
+  /// 设置置顶消息列表（替换现有的全部置顶）
+  Future<void> setPinnedMessages(String roomId, List<String> eventIds);
+
+  /// 检查当前用户是否可以置顶消息
+  bool canPinMessages(String roomId);
+
+  // ============================================
   // 成员管理
   // ============================================
 

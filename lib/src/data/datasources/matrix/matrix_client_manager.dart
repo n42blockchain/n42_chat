@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io' if (dart.library.html) 'dart:html';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
@@ -9,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:n42_chat/src/core/utils/io_helper.dart' as io_helper;
 
 /// Matrix客户端管理器
 ///
@@ -112,12 +112,9 @@ class MatrixClientManager {
       // 确保数据库目录存在（仅在非 Web 平台）
       if (!kIsWeb && dbPath.isNotEmpty) {
         try {
-          final dir = Directory(dbPath);
-          if (!dir.existsSync()) {
-            dir.createSync(recursive: true);
-            debugPrint('MatrixClientManager: Created database directory');
-          }
-          
+          await io_helper.ensureDirectoryExists(dbPath);
+          debugPrint('MatrixClientManager: Created database directory');
+
           // 初始化 Hive（必须在使用 HiveCollectionsDatabase 之前）
           debugPrint('MatrixClientManager: Initializing Hive at: $dbPath');
           Hive.init(dbPath);

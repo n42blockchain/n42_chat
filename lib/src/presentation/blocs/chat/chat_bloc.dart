@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/services/speech_to_text_service.dart';
+import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
 import 'chat_event.dart';
@@ -11,17 +14,26 @@ import 'chat_state.dart';
 /// 聊天BLoC
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final IMessageRepository _messageRepository;
+  final SecureStorageDataSource _secureStorage;
 
   StreamSubscription<List<MessageEntity>>? _messagesSubscription;
   StreamSubscription<Map<String, dynamic>>? _pollResponsesSubscription;
   String? _currentRoomId;
+
+  // 阅后即焚定时器
+  Timer? _destructionTimer;
+
+  // 定时发送检查定时器
+  Timer? _scheduledMessageTimer;
 
   // 已本地删除的消息ID集合（防止被消息订阅恢复）
   final Set<String> _locallyDeletedMessageIds = {};
 
   ChatBloc({
     required IMessageRepository messageRepository,
+    required SecureStorageDataSource secureStorage,
   })  : _messageRepository = messageRepository,
+        _secureStorage = secureStorage,
         super(ChatState.initial()) {
     on<InitializeChat>(_onInitializeChat);
     on<LoadMessages>(_onLoadMessages);
@@ -54,12 +66,24 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<PollEnded>(_onPollEnded);
     on<SendCustomMessage>(_onSendCustomMessage);
     on<ClearChatHistory>(_onClearChatHistory);
+    on<StartMessageDestruction>(_onStartMessageDestruction);
+    on<DestroyExpiredMessages>(_onDestroyExpiredMessages);
+    on<UpdateDestructionCountdown>(_onUpdateDestructionCountdown);
+    on<SendScheduledMessage>(_onSendScheduledMessage);
+    on<CancelScheduledMessage>(_onCancelScheduledMessage);
+    on<SendDueScheduledMessages>(_onSendDueScheduledMessages);
+    on<TranscribeVoiceMessage>(_onTranscribeVoiceMessage);
+    on<VoiceTranscriptionCompleted>(_onVoiceTranscriptionCompleted);
+    on<SendGifMessage>(_onSendGifMessage);
+    on<SendStickerMessage>(_onSendStickerMessage);
   }
 
   @override
   Future<void> close() {
     _messagesSubscription?.cancel();
     _pollResponsesSubscription?.cancel();
+    _destructionTimer?.cancel();
+    _scheduledMessageTimer?.cancel();
     return super.close();
   }
 
@@ -112,6 +136,54 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // 后台静默加载完整数据（不阻塞 UI）
     _loadFullMessagesInBackground(event.roomId);
+
+    // 启动阅后即焚定时器
+    _startDestructionTimer();
+
+    // 启动定时消息检查定时器
+    _startScheduledMessageTimer();
+
+    // 加载已保存的销毁时间
+    _loadSavedDestructionTimes(event.roomId);
+
+    // 加载定时消息
+    _loadScheduledMessages(event.roomId);
+  }
+
+  /// 启动阅后即焚销毁定时器
+  void _startDestructionTimer() {
+    _destructionTimer?.cancel();
+    // 每秒检查一次是否有消息需要销毁
+    _destructionTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!isClosed && _currentRoomId != null) {
+        add(const DestroyExpiredMessages());
+      }
+    });
+  }
+
+  /// 加载已保存的销毁时间
+  void _loadSavedDestructionTimes(String roomId) {
+    Future.microtask(() async {
+      try {
+        final destructionTimes = await _secureStorage.getMessageDestructionTimes(roomId);
+        if (destructionTimes.isEmpty || isClosed) return;
+
+        // 更新消息的销毁时间
+        final updatedMessages = state.messages.map((msg) {
+          final destroyedAt = destructionTimes[msg.id];
+          if (destroyedAt != null && msg.isSelfDestructing && !msg.isDestructionStarted) {
+            return msg.copyWith(destroyedAt: destroyedAt);
+          }
+          return msg;
+        }).toList();
+
+        if (!isClosed) {
+          emit(state.copyWith(messages: updatedMessages));
+        }
+      } catch (e) {
+        debugPrint('ChatBloc: Failed to load saved destruction times: $e');
+      }
+    });
   }
 
   /// 后台加载完整消息数据
@@ -528,7 +600,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         );
         emit(state.copyWith(isSending: false, clearReplyTarget: true));
       } else {
-        await _messageRepository.sendTextMessage(_currentRoomId!, event.text);
+        await _messageRepository.sendTextMessage(
+          _currentRoomId!,
+          event.text,
+          selfDestructAfter: event.selfDestructAfter,
+          mentionedUserIds: event.mentionedUserIds,
+          mentionsRoom: event.mentionsRoom,
+        );
         emit(state.copyWith(isSending: false));
       }
     } catch (e) {
@@ -899,6 +977,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   /// 标记消息已读
+  ///
+  /// 根据用户隐私设置决定是否发送已读回执
   Future<void> _onMarkMessageAsRead(
     MarkMessageAsRead event,
     Emitter<ChatState> emit,
@@ -906,6 +986,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (_currentRoomId == null) return;
 
     try {
+      // 检查隐私设置：是否允许发送已读回执
+      final shouldSendReadReceipts = await _secureStorage.shouldShowReadReceipts();
+      if (!shouldSendReadReceipts) {
+        debugPrint('ChatBloc: Skipping read receipt due to privacy settings');
+        return;
+      }
+
       await _messageRepository.markAsRead(_currentRoomId!, event.messageId);
     } catch (e) {
       // 静默失败
@@ -913,6 +1000,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   /// 发送正在输入状态
+  ///
+  /// 根据用户隐私设置决定是否发送输入状态
   Future<void> _onSendTypingNotification(
     SendTypingNotification event,
     Emitter<ChatState> emit,
@@ -920,6 +1009,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (_currentRoomId == null) return;
 
     try {
+      // 检查隐私设置：是否允许发送输入状态
+      final shouldSendTypingIndicator = await _secureStorage.shouldShowTypingIndicator();
+      if (!shouldSendTypingIndicator) {
+        debugPrint('ChatBloc: Skipping typing notification due to privacy settings');
+        return;
+      }
+
       await _messageRepository.sendTypingNotification(
         _currentRoomId!,
         event.isTyping,
@@ -1355,6 +1451,522 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       emit(state.copyWith(
         messages: [],
         clearError: true,
+      ));
+    }
+  }
+
+  /// 开始消息的自毁倒计时
+  Future<void> _onStartMessageDestruction(
+    StartMessageDestruction event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+
+    try {
+      // 查找消息
+      final messageIndex = state.messages.indexWhere((m) => m.id == event.messageId);
+      if (messageIndex == -1) return;
+
+      final message = state.messages[messageIndex];
+
+      // 检查是否是阅后即焚消息且倒计时未开始
+      if (!message.isSelfDestructing || message.isDestructionStarted) return;
+
+      // 计算销毁时间
+      final destroyedAt = DateTime.now().add(
+        Duration(seconds: message.selfDestructAfter!),
+      );
+
+      // 保存到本地存储
+      await _secureStorage.setMessageDestroyedAt(
+        _currentRoomId!,
+        event.messageId,
+        destroyedAt,
+      );
+
+      // 更新消息状态
+      final updatedMessages = List<MessageEntity>.from(state.messages);
+      updatedMessages[messageIndex] = message.copyWith(destroyedAt: destroyedAt);
+
+      if (!isClosed) {
+        emit(state.copyWith(messages: updatedMessages));
+      }
+
+      debugPrint('ChatBloc: Started destruction countdown for message ${event.messageId}, will destroy at $destroyedAt');
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to start message destruction: $e');
+    }
+  }
+
+  /// 销毁已过期的阅后即焚消息
+  Future<void> _onDestroyExpiredMessages(
+    DestroyExpiredMessages event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+
+    final now = DateTime.now();
+    final expiredMessageIds = <String>[];
+
+    // 找出所有已过期的消息
+    for (final message in state.messages) {
+      if (message.isSelfDestructing &&
+          message.isDestructionStarted &&
+          message.destroyedAt!.isBefore(now)) {
+        expiredMessageIds.add(message.id);
+      }
+    }
+
+    if (expiredMessageIds.isEmpty) return;
+
+    debugPrint('ChatBloc: Destroying ${expiredMessageIds.length} expired messages');
+
+    // 从本地列表中移除
+    _locallyDeletedMessageIds.addAll(expiredMessageIds);
+    final updatedMessages = state.messages
+        .where((m) => !expiredMessageIds.contains(m.id))
+        .toList();
+
+    if (!isClosed) {
+      emit(state.copyWith(messages: updatedMessages));
+    }
+
+    // 异步撤回消息（不阻塞 UI）
+    for (final messageId in expiredMessageIds) {
+      try {
+        await _messageRepository.redactMessage(
+          _currentRoomId!,
+          messageId,
+          reason: 'Self-destructed',
+        );
+      } catch (e) {
+        debugPrint('ChatBloc: Failed to redact expired message $messageId: $e');
+      }
+    }
+
+    // 清除销毁时间记录
+    await _secureStorage.clearMessageDestructionTimes(
+      _currentRoomId!,
+      expiredMessageIds,
+    );
+  }
+
+  /// 更新阅后即焚消息的倒计时状态
+  void _onUpdateDestructionCountdown(
+    UpdateDestructionCountdown event,
+    Emitter<ChatState> emit,
+  ) {
+    final messageIndex = state.messages.indexWhere((m) => m.id == event.messageId);
+    if (messageIndex == -1) return;
+
+    final message = state.messages[messageIndex];
+    if (!message.isSelfDestructing) return;
+
+    final updatedMessages = List<MessageEntity>.from(state.messages);
+    updatedMessages[messageIndex] = message.copyWith(destroyedAt: event.destroyedAt);
+
+    if (!isClosed) {
+      emit(state.copyWith(messages: updatedMessages));
+    }
+  }
+
+  // ============================================
+  // 定时发送消息
+  // ============================================
+
+  /// 启动定时消息检查定时器
+  void _startScheduledMessageTimer() {
+    _scheduledMessageTimer?.cancel();
+    // 每分钟检查一次是否有到期的定时消息
+    _scheduledMessageTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (!isClosed) {
+        add(const SendDueScheduledMessages());
+      }
+    });
+  }
+
+  /// 加载定时消息
+  void _loadScheduledMessages(String roomId) {
+    Future.microtask(() async {
+      try {
+        final scheduledMessages = await _secureStorage.getScheduledMessages(roomId);
+        if (scheduledMessages.isEmpty || isClosed) return;
+
+        // 获取当前用户ID
+        final currentUserId = await _messageRepository.getCurrentUserId() ?? '';
+
+        // 为每个定时消息创建临时消息实体显示在UI中
+        final tempMessages = <MessageEntity>[];
+        for (final msg in scheduledMessages) {
+          final scheduledAt = DateTime.parse(msg['scheduledAt'] as String);
+
+          tempMessages.add(MessageEntity(
+            id: msg['messageId'] as String,
+            roomId: roomId,
+            senderId: currentUserId,
+            senderName: 'Me',
+            content: msg['text'] as String,
+            type: MessageType.text,
+            timestamp: DateTime.parse(msg['createdAt'] as String),
+            status: MessageStatus.sending,
+            isFromMe: true,
+            scheduledAt: scheduledAt,
+            selfDestructAfter: msg['selfDestructAfter'] as int?,
+            mentionedUserIds: (msg['mentionedUserIds'] as List<dynamic>?)?.cast<String>() ?? [],
+            mentionsRoom: msg['mentionsRoom'] as bool? ?? false,
+          ));
+        }
+
+        if (tempMessages.isNotEmpty && !isClosed) {
+          // 将定时消息添加到消息列表末尾（按时间排序）
+          final allMessages = [...state.messages, ...tempMessages];
+          allMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          emit(state.copyWith(messages: allMessages));
+        }
+      } catch (e) {
+        debugPrint('ChatBloc: Failed to load scheduled messages: $e');
+      }
+    });
+  }
+
+  /// 发送定时消息
+  Future<void> _onSendScheduledMessage(
+    SendScheduledMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null || event.text.trim().isEmpty) return;
+
+    try {
+      // 生成临时消息ID
+      final tempId = 'scheduled_${DateTime.now().millisecondsSinceEpoch}';
+
+      // 获取当前用户ID
+      final currentUserId = await _messageRepository.getCurrentUserId() ?? '';
+
+      // 保存定时消息到本地存储
+      await _secureStorage.saveScheduledMessage(
+        roomId: _currentRoomId!,
+        messageId: tempId,
+        text: event.text,
+        scheduledAt: event.scheduledAt,
+        selfDestructAfter: event.selfDestructAfter,
+        mentionedUserIds: event.mentionedUserIds,
+        mentionsRoom: event.mentionsRoom,
+      );
+
+      // 创建临时消息显示在UI中
+      final tempMessage = MessageEntity(
+        id: tempId,
+        roomId: _currentRoomId!,
+        senderId: currentUserId,
+        senderName: 'Me',
+        content: event.text,
+        type: MessageType.text,
+        timestamp: DateTime.now(),
+        status: MessageStatus.sending,
+        isFromMe: true,
+        scheduledAt: event.scheduledAt,
+        selfDestructAfter: event.selfDestructAfter,
+        mentionedUserIds: event.mentionedUserIds ?? [],
+        mentionsRoom: event.mentionsRoom,
+      );
+
+      // 添加到消息列表
+      if (!isClosed) {
+        emit(state.copyWith(messages: [tempMessage, ...state.messages]));
+      }
+
+      debugPrint('ChatBloc: Scheduled message saved - $tempId for ${event.scheduledAt}');
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to schedule message: $e');
+      if (!isClosed) {
+        emit(state.copyWith(error: 'Failed to schedule message'));
+      }
+    }
+  }
+
+  /// 取消定时消息
+  Future<void> _onCancelScheduledMessage(
+    CancelScheduledMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+
+    try {
+      // 从存储中删除
+      await _secureStorage.removeScheduledMessage(_currentRoomId!, event.messageId);
+
+      // 从UI中移除
+      final updatedMessages = state.messages
+          .where((m) => m.id != event.messageId)
+          .toList();
+
+      if (!isClosed) {
+        emit(state.copyWith(messages: updatedMessages));
+      }
+
+      debugPrint('ChatBloc: Scheduled message cancelled - ${event.messageId}');
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to cancel scheduled message: $e');
+    }
+  }
+
+  /// 发送到期的定时消息
+  Future<void> _onSendDueScheduledMessages(
+    SendDueScheduledMessages event,
+    Emitter<ChatState> emit,
+  ) async {
+    try {
+      // 获取所有到期的定时消息
+      final dueMessages = await _secureStorage.getDueScheduledMessages();
+      if (dueMessages.isEmpty) return;
+
+      debugPrint('ChatBloc: Found ${dueMessages.length} due scheduled messages');
+
+      for (final msg in dueMessages) {
+        final roomId = msg['roomId'] as String;
+        final messageId = msg['messageId'] as String;
+        final text = msg['text'] as String;
+        final selfDestructAfter = msg['selfDestructAfter'] as int?;
+        final mentionedUserIds = (msg['mentionedUserIds'] as List<dynamic>?)?.cast<String>();
+        final mentionsRoom = msg['mentionsRoom'] as bool? ?? false;
+
+        try {
+          // 发送消息
+          await _messageRepository.sendTextMessage(
+            roomId,
+            text,
+            selfDestructAfter: selfDestructAfter,
+            mentionedUserIds: mentionedUserIds,
+            mentionsRoom: mentionsRoom,
+          );
+
+          // 从存储中删除
+          await _secureStorage.removeScheduledMessage(roomId, messageId);
+
+          // 如果是当前房间，更新UI
+          if (roomId == _currentRoomId && !isClosed) {
+            final updatedMessages = state.messages
+                .where((m) => m.id != messageId)
+                .toList();
+            emit(state.copyWith(messages: updatedMessages));
+          }
+
+          debugPrint('ChatBloc: Sent scheduled message - $messageId');
+        } catch (e) {
+          debugPrint('ChatBloc: Failed to send scheduled message $messageId: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to process due scheduled messages: $e');
+    }
+  }
+
+  // ============================================
+  // 语音转文字
+  // ============================================
+
+  /// 语音消息转文字
+  Future<void> _onTranscribeVoiceMessage(
+    TranscribeVoiceMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+
+    try {
+      // 查找消息
+      final messageIndex = state.messages.indexWhere((m) => m.id == event.messageId);
+      if (messageIndex == -1) {
+        debugPrint('ChatBloc: Message not found for transcription: ${event.messageId}');
+        return;
+      }
+
+      final message = state.messages[messageIndex];
+
+      // 检查是否是语音消息
+      if (message.type != MessageType.voice && message.type != MessageType.audio) {
+        debugPrint('ChatBloc: Message is not a voice message: ${message.type}');
+        return;
+      }
+
+      // 检查是否已经有转录结果
+      if (message.metadata?.hasTranscription == true) {
+        debugPrint('ChatBloc: Message already has transcription');
+        return;
+      }
+
+      // 更新状态为正在转录
+      final updatedMessages = List<MessageEntity>.from(state.messages);
+      updatedMessages[messageIndex] = message.copyWith(
+        metadata: (message.metadata ?? const MessageMetadata()).copyWithTranscription(
+          transcriptionStatus: TranscriptionStatus.transcribing,
+        ),
+      );
+
+      if (!isClosed) {
+        emit(state.copyWith(messages: updatedMessages));
+      }
+
+      // 获取语音文件路径
+      String? audioPath = event.audioPath;
+      if (audioPath == null && message.metadata?.mediaUrl != null) {
+        // 如果没有提供路径，尝试下载音频
+        final mxcUrl = message.metadata!.mediaUrl!;
+        try {
+          final bytes = await _messageRepository.downloadMedia(mxcUrl);
+          if (bytes != null) {
+            // 保存到临时文件
+            final tempDir = Directory.systemTemp;
+            final tempFile = File('${tempDir.path}/voice_${event.messageId}.m4a');
+            await tempFile.writeAsBytes(bytes);
+            audioPath = tempFile.path;
+          }
+        } catch (e) {
+          debugPrint('ChatBloc: Failed to download voice message: $e');
+        }
+      }
+
+      if (audioPath == null) {
+        debugPrint('ChatBloc: No audio path available for transcription');
+        add(VoiceTranscriptionCompleted(
+          messageId: event.messageId,
+          success: false,
+        ));
+        return;
+      }
+
+      // 调用语音转文字服务
+      final speechService = SpeechToTextService();
+      if (!speechService.isConfigured) {
+        debugPrint('ChatBloc: Speech-to-text service not configured');
+        add(VoiceTranscriptionCompleted(
+          messageId: event.messageId,
+          success: false,
+        ));
+        return;
+      }
+
+      final transcription = await speechService.transcribe(
+        audioPath,
+        language: event.language,
+      );
+
+      // 发送完成事件
+      add(VoiceTranscriptionCompleted(
+        messageId: event.messageId,
+        transcription: transcription,
+        success: transcription != null,
+      ));
+
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to transcribe voice message: $e');
+      add(VoiceTranscriptionCompleted(
+        messageId: event.messageId,
+        success: false,
+      ));
+    }
+  }
+
+  /// 语音转文字完成
+  void _onVoiceTranscriptionCompleted(
+    VoiceTranscriptionCompleted event,
+    Emitter<ChatState> emit,
+  ) {
+    final messageIndex = state.messages.indexWhere((m) => m.id == event.messageId);
+    if (messageIndex == -1) return;
+
+    final message = state.messages[messageIndex];
+    final updatedMessages = List<MessageEntity>.from(state.messages);
+
+    updatedMessages[messageIndex] = message.copyWith(
+      metadata: (message.metadata ?? const MessageMetadata()).copyWithTranscription(
+        transcription: event.transcription,
+        transcriptionStatus: event.success
+            ? TranscriptionStatus.success
+            : TranscriptionStatus.failed,
+      ),
+    );
+
+    if (!isClosed) {
+      emit(state.copyWith(messages: updatedMessages));
+    }
+
+    if (event.success) {
+      debugPrint('ChatBloc: Voice transcription completed: ${event.transcription}');
+    } else {
+      debugPrint('ChatBloc: Voice transcription failed for message ${event.messageId}');
+    }
+  }
+
+  /// 发送 GIF 消息
+  Future<void> _onSendGifMessage(
+    SendGifMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) {
+      debugPrint('ChatBloc: Cannot send GIF - no room ID');
+      return;
+    }
+
+    emit(state.copyWith(isSending: true, clearError: true));
+
+    try {
+      debugPrint('ChatBloc: Sending GIF from ${event.gifUrl}');
+      await _messageRepository.sendGifMessage(
+        _currentRoomId!,
+        gifUrl: event.gifUrl,
+        previewUrl: event.previewUrl,
+        width: event.width,
+        height: event.height,
+        title: event.title,
+      );
+      debugPrint('ChatBloc: GIF sent successfully');
+      emit(state.copyWith(isSending: false));
+    } catch (e, stackTrace) {
+      debugPrint('ChatBloc: Send GIF error - $e');
+      debugPrint('ChatBloc: Stack trace - $stackTrace');
+      emit(state.copyWith(
+        isSending: false,
+        error: 'Failed to send GIF: $e',
+      ));
+    }
+  }
+
+  /// 发送贴纸消息
+  Future<void> _onSendStickerMessage(
+    SendStickerMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) {
+      debugPrint('ChatBloc: Cannot send sticker - no room ID');
+      return;
+    }
+
+    emit(state.copyWith(isSending: true, clearError: true));
+
+    try {
+      debugPrint('ChatBloc: Sending sticker ${event.stickerId} from pack ${event.packId}');
+      await _messageRepository.sendStickerMessage(
+        _currentRoomId!,
+        stickerId: event.stickerId,
+        packId: event.packId,
+        url: event.url,
+        httpUrl: event.httpUrl,
+        name: event.name,
+        emoji: event.emoji,
+        width: event.width,
+        height: event.height,
+        mimeType: event.mimeType,
+        size: event.size,
+      );
+      debugPrint('ChatBloc: Sticker sent successfully');
+      emit(state.copyWith(isSending: false));
+    } catch (e, stackTrace) {
+      debugPrint('ChatBloc: Send sticker error - $e');
+      debugPrint('ChatBloc: Stack trace - $stackTrace');
+      emit(state.copyWith(
+        isSending: false,
+        error: 'Failed to send sticker: $e',
       ));
     }
   }

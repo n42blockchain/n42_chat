@@ -137,9 +137,9 @@ void main() {
       );
 
       expect(withMessage.lastMessagePreview, 'Hello world');
-      expect(withDraft.lastMessagePreview, '[草稿] Draft message');
+      expect(withDraft.lastMessagePreview, '[Draft] Draft message');
       expect(groupWithSender.lastMessagePreview, 'Alice: Hello');
-      expect(withTyping.lastMessagePreview, 'Alice正在输入...');
+      expect(withTyping.lastMessagePreview, 'Alice is typing...');
     });
 
     test('should support copyWith', () {

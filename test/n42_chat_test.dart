@@ -8,11 +8,10 @@ void main() {
       expect(N42Chat.isInitialized, isFalse);
     });
 
-    test('should throw when accessing chatWidget before initialization', () {
-      expect(
-        () => N42Chat.chatWidget(),
-        throwsA(isA<StateError>()),
-      );
+    test('should return Widget when accessing chatWidget before initialization', () {
+      // chatWidget returns a fallback widget instead of throwing
+      final widget = N42Chat.chatWidget();
+      expect(widget, isA<Widget>());
     });
 
     test('should throw when accessing routes before initialization', () {
@@ -27,7 +26,7 @@ void main() {
     test('should have default values', () {
       const config = N42ChatConfig();
 
-      expect(config.defaultHomeserver, equals('https://matrix.org'));
+      expect(config.defaultHomeserver, equals('https://m.si46.world'));
       expect(config.enableEncryption, isTrue);
       expect(config.enablePushNotifications, isTrue);
       expect(config.syncTimeout, equals(const Duration(seconds: 30)));

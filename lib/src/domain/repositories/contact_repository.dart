@@ -53,6 +53,15 @@ abstract class IContactRepository {
   /// 监听用户在线状态变化
   Stream<Map<String, bool>> watchOnlineStatus();
 
+  /// 获取用户状态消息
+  Future<String?> getUserStatusMessage(String userId);
+
+  /// 设置当前用户的状态消息
+  Future<void> setMyStatus(String? statusMessage);
+
+  /// 获取当前用户的状态消息
+  Future<String?> getMyStatus();
+
   /// 设置联系人备注
   Future<void> setContactRemark(String userId, String? remark);
 

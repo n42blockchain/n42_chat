@@ -11,8 +11,12 @@ import '../../data/datasources/matrix/matrix_message_datasource.dart';
 import '../../data/datasources/matrix/matrix_room_datasource.dart';
 import '../../data/datasources/matrix/matrix_reaction_datasource.dart';
 import '../../data/datasources/matrix/matrix_search_datasource.dart';
+import '../../data/datasources/matrix/matrix_moment_datasource.dart';
+import '../../data/datasources/matrix/matrix_sticker_datasource.dart';
 import '../services/voice_service.dart';
 import '../../data/repositories/auth_repository_impl.dart';
+import '../../data/repositories/moment_repository_impl.dart';
+import '../../data/repositories/sticker_repository_impl.dart';
 import '../../data/repositories/contact_repository_impl.dart';
 import '../../data/repositories/conversation_repository_impl.dart';
 import '../../data/repositories/group_repository_impl.dart';
@@ -28,6 +32,8 @@ import '../../domain/repositories/message_repository.dart';
 import '../../domain/repositories/message_action_repository.dart';
 import '../../domain/repositories/search_repository.dart';
 import '../../domain/repositories/transfer_repository.dart';
+import '../../domain/repositories/moment_repository.dart';
+import '../../domain/repositories/sticker_repository.dart';
 import '../../integration/wallet_bridge.dart';
 import '../../n42_chat_config.dart';
 import '../../presentation/blocs/auth/auth_bloc.dart';
@@ -38,6 +44,7 @@ import '../../presentation/blocs/group/group_bloc.dart';
 import '../../presentation/blocs/message_action/message_action_bloc.dart';
 import '../../presentation/blocs/search/search_bloc.dart';
 import '../../presentation/blocs/transfer/transfer_bloc.dart';
+import '../../presentation/blocs/moment/moment_bloc.dart';
 
 /// 全局GetIt实例
 final GetIt getIt = GetIt.instance;
@@ -155,6 +162,16 @@ Future<void> _registerDataSources() async {
   getIt.registerLazySingleton<MatrixReactionDataSource>(
     () => MatrixReactionDataSource(getIt<MatrixClientManager>()),
   );
+
+  // Matrix动态数据源
+  getIt.registerLazySingleton<MatrixMomentDataSource>(
+    () => MatrixMomentDataSource(getIt<MatrixClientManager>()),
+  );
+
+  // Matrix贴纸数据源
+  getIt.registerLazySingleton<MatrixStickerDataSource>(
+    () => MatrixStickerDataSource(getIt<MatrixClientManager>()),
+  );
 }
 
 /// 注册仓库
@@ -224,6 +241,21 @@ void _registerRepositories() {
       getIt<MatrixClientManager>(),
     ),
   );
+
+  // 动态仓库
+  getIt.registerLazySingleton<IMomentRepository>(
+    () => MomentRepositoryImpl(
+      getIt<MatrixMomentDataSource>(),
+      getIt<SecureStorageDataSource>(),
+    ),
+  );
+
+  // 贴纸仓库
+  getIt.registerLazySingleton<IStickerRepository>(
+    () => StickerRepositoryImpl(
+      getIt<MatrixStickerDataSource>(),
+    ),
+  );
 }
 
 /// 注册用例
@@ -249,6 +281,7 @@ void _registerBlocs() {
   getIt.registerFactory<ChatBloc>(
     () => ChatBloc(
       messageRepository: getIt<IMessageRepository>(),
+      secureStorage: getIt<SecureStorageDataSource>(),
     ),
   );
 
@@ -278,6 +311,11 @@ void _registerBlocs() {
   // 消息操作BLoC
   getIt.registerFactory<MessageActionBloc>(
     () => MessageActionBloc(getIt<IMessageActionRepository>()),
+  );
+
+  // 动态BLoC
+  getIt.registerFactory<MomentBloc>(
+    () => MomentBloc(getIt<IMomentRepository>()),
   );
 }
 

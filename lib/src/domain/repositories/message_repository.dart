@@ -26,7 +26,17 @@ abstract class IMessageRepository {
   });
 
   /// 发送文本消息
-  Future<MessageEntity?> sendTextMessage(String roomId, String text);
+  ///
+  /// [selfDestructAfter] 阅后即焚秒数，null 表示不自毁
+  /// [mentionedUserIds] 提及的用户ID列表
+  /// [mentionsRoom] 是否 @全体成员
+  Future<MessageEntity?> sendTextMessage(
+    String roomId,
+    String text, {
+    int? selfDestructAfter,
+    List<String>? mentionedUserIds,
+    bool mentionsRoom = false,
+  });
 
   /// 发送图片消息
   Future<MessageEntity?> sendImageMessage(
@@ -68,6 +78,31 @@ abstract class IMessageRepository {
     required double latitude,
     required double longitude,
     String? description,
+  });
+
+  /// 发送 GIF 消息
+  Future<MessageEntity?> sendGifMessage(
+    String roomId, {
+    required String gifUrl,
+    String? previewUrl,
+    int? width,
+    int? height,
+    String? title,
+  });
+
+  /// 发送贴纸消息
+  Future<MessageEntity?> sendStickerMessage(
+    String roomId, {
+    required String stickerId,
+    required String packId,
+    required String url,
+    String? httpUrl,
+    String? name,
+    String? emoji,
+    int? width,
+    int? height,
+    String? mimeType,
+    int? size,
   });
 
   /// 重发失败的消息
@@ -200,5 +235,27 @@ abstract class IMessageRepository {
 
   /// 清除房间的本地删除消息记录
   Future<void> clearLocallyDeletedMessages(String roomId);
+
+  /// 发送阅后即焚消息
+  ///
+  /// [selfDestructAfter] 消息被阅读后多少秒自毁
+  Future<MessageEntity?> sendSelfDestructingMessage(
+    String roomId,
+    String text, {
+    required int selfDestructAfter,
+  });
+
+  /// 开始消息的自毁倒计时（消息被阅读时调用）
+  ///
+  /// 返回更新后的消息（设置了 destroyedAt）
+  Future<MessageEntity?> startMessageDestruction(
+    String roomId,
+    String messageId,
+  );
+
+  /// 销毁已过期的消息
+  ///
+  /// 自动删除所有已过期的阅后即焚消息
+  Future<void> destroyExpiredMessages(String roomId);
 }
 

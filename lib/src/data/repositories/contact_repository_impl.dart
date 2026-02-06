@@ -237,6 +237,23 @@ class ContactRepositoryImpl implements IContactRepository {
     }
   }
 
+  @override
+  Future<String?> getUserStatusMessage(String userId) async {
+    return await _contactDataSource.getUserStatusMessage(userId);
+  }
+
+  @override
+  Future<void> setMyStatus(String? statusMessage) async {
+    await _contactDataSource.setUserStatus(statusMessage);
+  }
+
+  @override
+  Future<String?> getMyStatus() async {
+    final myUserId = _contactDataSource.currentUserId;
+    if (myUserId == null) return null;
+    return await _contactDataSource.getUserStatusMessage(myUserId);
+  }
+
   // ============================================
   // 辅助方法
   // ============================================

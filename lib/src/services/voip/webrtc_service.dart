@@ -567,12 +567,90 @@ class WebRTCService {
   /// 切换前后摄像头
   Future<void> switchCamera() async {
     if (_localStream == null) return;
-    
+
     final videoTrack = _localStream!.getVideoTracks().firstOrNull;
     if (videoTrack != null) {
       await Helper.switchCamera(videoTrack);
       _isFrontCamera = !_isFrontCamera;
       debugPrint('WebRTCService: Camera switched to ${_isFrontCamera ? "front" : "back"}');
+    }
+  }
+
+  // ============================================
+  // 音频处理控制
+  // ============================================
+
+  /// 切换降噪功能
+  Future<void> toggleNoiseSuppression() async {
+    _config.enableNoiseSuppression = !_config.enableNoiseSuppression;
+    await _updateAudioProcessing();
+  }
+
+  /// 切换回声消除
+  Future<void> toggleEchoCancellation() async {
+    _config.enableEchoCancellation = !_config.enableEchoCancellation;
+    await _updateAudioProcessing();
+  }
+
+  /// 切换自动增益控制
+  Future<void> toggleAutoGainControl() async {
+    _config.enableAutoGainControl = !_config.enableAutoGainControl;
+    await _updateAudioProcessing();
+  }
+
+  /// 获取当前音频处理配置
+  AudioProcessingConfig get audioProcessingConfig => _config.audioProcessing;
+
+  /// 更新音频处理设置
+  ///
+  /// WebRTC 需要重新创建音轨来应用新设置
+  Future<void> _updateAudioProcessing() async {
+    if (_localStream == null || _peerConnection == null) {
+      debugPrint('WebRTCService: Cannot update audio processing - no active call');
+      return;
+    }
+
+    final audioConfig = _config.audioProcessing;
+    debugPrint('WebRTCService: Updating audio processing: $audioConfig');
+
+    try {
+      // 停止并移除当前音轨
+      final oldAudioTrack = _localStream!.getAudioTracks().firstOrNull;
+      if (oldAudioTrack != null) {
+        oldAudioTrack.stop();
+        _localStream!.removeTrack(oldAudioTrack);
+      }
+
+      // 创建新的音轨（使用更新的约束）
+      final newStream = await navigator.mediaDevices.getUserMedia({
+        'audio': audioConfig.toWebRTCConstraints(),
+        'video': false,
+      });
+
+      final newAudioTrack = newStream.getAudioTracks().firstOrNull;
+      if (newAudioTrack != null) {
+        // 添加到本地流
+        _localStream!.addTrack(newAudioTrack);
+
+        // 替换 PeerConnection 中的音轨
+        final senders = await _peerConnection!.getSenders();
+        for (final sender in senders) {
+          if (sender.track?.kind == 'audio') {
+            await sender.replaceTrack(newAudioTrack);
+            break;
+          }
+        }
+
+        // 应用静音状态
+        newAudioTrack.enabled = !_isMuted;
+      }
+
+      // 释放临时流
+      newStream.dispose();
+
+      debugPrint('WebRTCService: Audio processing updated successfully');
+    } catch (e) {
+      debugPrint('WebRTCService: Failed to update audio processing: $e');
     }
   }
   
@@ -596,19 +674,27 @@ class WebRTCService {
   
   /// 获取本地媒体流
   Future<void> _getUserMedia(CallType type) async {
+    // 获取音频处理配置
+    final audioConfig = _config.audioProcessing;
+
     final constraints = {
-      'audio': true,
+      'audio': {
+        // 应用音频处理配置
+        ...audioConfig.toWebRTCConstraints(),
+      },
       'video': type == CallType.video ? {
         'facingMode': 'user',
         ..._config.maxVideoResolution.toConstraints(),
         'frameRate': {'ideal': _config.maxFrameRate},
       } : false,
     };
-    
+
+    debugPrint('WebRTCService: Getting media with audio processing: $audioConfig');
+
     _localStream = await navigator.mediaDevices.getUserMedia(constraints);
     localRenderer.srcObject = _localStream;
     onLocalStream?.call(_localStream!);
-    
+
     debugPrint('WebRTCService: Got local stream with ${_localStream!.getTracks().length} tracks');
   }
   

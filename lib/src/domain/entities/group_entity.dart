@@ -20,6 +20,28 @@ enum MembershipStatus {
   invited,
 }
 
+/// 群组类型
+enum GroupType {
+  /// 普通群组
+  group,
+  /// 频道（单向广播）
+  channel,
+  /// 超级群（大规模群组）
+  superGroup,
+}
+
+/// 加入方式
+enum JoinRule {
+  /// 公开（任何人可加入）
+  public,
+  /// 私有（需邀请）
+  invite,
+  /// 敲门（需申请审批）
+  knock,
+  /// 受限（需满足条件）
+  restricted,
+}
+
 /// 群成员实体
 class GroupMember extends Equatable {
   /// 用户ID
@@ -162,6 +184,9 @@ class GroupEntity extends Equatable {
   /// 群公告
   final String? announcement;
 
+  /// 置顶消息事件ID列表
+  final List<String> pinnedEventIds;
+
   /// 成员数量
   final int memberCount;
 
@@ -189,12 +214,53 @@ class GroupEntity extends Equatable {
   /// 当前用户是否可以修改设置
   final bool canChangeSettings;
 
+  // ============================================
+  // 频道/超级群属性
+  // ============================================
+
+  /// 群组类型
+  final GroupType groupType;
+
+  /// 是否是频道
+  bool get isChannel => groupType == GroupType.channel;
+
+  /// 是否是超级群
+  bool get isSuperGroup => groupType == GroupType.superGroup;
+
+  /// 订阅者数量（频道专用）
+  final int subscriberCount;
+
+  /// 加入方式
+  final JoinRule joinRule;
+
+  /// 是否允许成员发言（频道中默认只有管理员可发言）
+  final bool membersCanSpeak;
+
+  /// 是否显示成员列表
+  final bool showMemberList;
+
+  /// 慢速模式间隔（秒），0 表示不限制
+  final int slowModeInterval;
+
+  /// 频道用户名（用于公开链接，如 @channel_name）
+  final String? channelUsername;
+
+  /// 频道链接
+  String? get channelLink => channelUsername != null ? 'https://n42.app/$channelUsername' : null;
+
+  /// 是否已验证（官方频道）
+  final bool isVerified;
+
+  /// 频道分类
+  final String? category;
+
   const GroupEntity({
     required this.roomId,
     required this.name,
     this.avatarUrl,
     this.topic,
     this.announcement,
+    this.pinnedEventIds = const [],
     this.memberCount = 0,
     this.members = const [],
     this.isEncrypted = false,
@@ -204,7 +270,22 @@ class GroupEntity extends Equatable {
     this.canInvite = false,
     this.canKick = false,
     this.canChangeSettings = false,
+    this.groupType = GroupType.group,
+    this.subscriberCount = 0,
+    this.joinRule = JoinRule.invite,
+    this.membersCanSpeak = true,
+    this.showMemberList = true,
+    this.slowModeInterval = 0,
+    this.channelUsername,
+    this.isVerified = false,
+    this.category,
   });
+
+  /// 是否有置顶消息
+  bool get hasPinnedMessages => pinnedEventIds.isNotEmpty;
+
+  /// 获取置顶消息数量
+  int get pinnedMessageCount => pinnedEventIds.length;
 
   /// 是否是群主
   bool get isOwner => myRole == GroupRole.owner;
@@ -238,6 +319,7 @@ class GroupEntity extends Equatable {
         avatarUrl,
         topic,
         announcement,
+        pinnedEventIds,
         memberCount,
         members,
         isEncrypted,
@@ -247,6 +329,15 @@ class GroupEntity extends Equatable {
         canInvite,
         canKick,
         canChangeSettings,
+        groupType,
+        subscriberCount,
+        joinRule,
+        membersCanSpeak,
+        showMemberList,
+        slowModeInterval,
+        channelUsername,
+        isVerified,
+        category,
       ];
 
   GroupEntity copyWith({
@@ -255,6 +346,7 @@ class GroupEntity extends Equatable {
     String? avatarUrl,
     String? topic,
     String? announcement,
+    List<String>? pinnedEventIds,
     int? memberCount,
     List<GroupMember>? members,
     bool? isEncrypted,
@@ -264,6 +356,15 @@ class GroupEntity extends Equatable {
     bool? canInvite,
     bool? canKick,
     bool? canChangeSettings,
+    GroupType? groupType,
+    int? subscriberCount,
+    JoinRule? joinRule,
+    bool? membersCanSpeak,
+    bool? showMemberList,
+    int? slowModeInterval,
+    String? channelUsername,
+    bool? isVerified,
+    String? category,
   }) {
     return GroupEntity(
       roomId: roomId ?? this.roomId,
@@ -271,6 +372,7 @@ class GroupEntity extends Equatable {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       topic: topic ?? this.topic,
       announcement: announcement ?? this.announcement,
+      pinnedEventIds: pinnedEventIds ?? this.pinnedEventIds,
       memberCount: memberCount ?? this.memberCount,
       members: members ?? this.members,
       isEncrypted: isEncrypted ?? this.isEncrypted,
@@ -280,6 +382,65 @@ class GroupEntity extends Equatable {
       canInvite: canInvite ?? this.canInvite,
       canKick: canKick ?? this.canKick,
       canChangeSettings: canChangeSettings ?? this.canChangeSettings,
+      groupType: groupType ?? this.groupType,
+      subscriberCount: subscriberCount ?? this.subscriberCount,
+      joinRule: joinRule ?? this.joinRule,
+      membersCanSpeak: membersCanSpeak ?? this.membersCanSpeak,
+      showMemberList: showMemberList ?? this.showMemberList,
+      slowModeInterval: slowModeInterval ?? this.slowModeInterval,
+      channelUsername: channelUsername ?? this.channelUsername,
+      isVerified: isVerified ?? this.isVerified,
+      category: category ?? this.category,
+    );
+  }
+
+  /// 创建频道
+  factory GroupEntity.channel({
+    required String roomId,
+    required String name,
+    String? avatarUrl,
+    String? topic,
+    int subscriberCount = 0,
+    String? channelUsername,
+    bool isVerified = false,
+    String? category,
+  }) {
+    return GroupEntity(
+      roomId: roomId,
+      name: name,
+      avatarUrl: avatarUrl,
+      topic: topic,
+      groupType: GroupType.channel,
+      subscriberCount: subscriberCount,
+      joinRule: JoinRule.public,
+      membersCanSpeak: false,
+      showMemberList: false,
+      channelUsername: channelUsername,
+      isVerified: isVerified,
+      category: category,
+    );
+  }
+
+  /// 创建超级群
+  factory GroupEntity.superGroup({
+    required String roomId,
+    required String name,
+    String? avatarUrl,
+    String? topic,
+    int memberCount = 0,
+    int slowModeInterval = 0,
+  }) {
+    return GroupEntity(
+      roomId: roomId,
+      name: name,
+      avatarUrl: avatarUrl,
+      topic: topic,
+      groupType: GroupType.superGroup,
+      memberCount: memberCount,
+      joinRule: JoinRule.public,
+      membersCanSpeak: true,
+      showMemberList: true,
+      slowModeInterval: slowModeInterval,
     );
   }
 }

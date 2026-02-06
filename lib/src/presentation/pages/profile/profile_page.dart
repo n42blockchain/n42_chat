@@ -3,18 +3,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/encryption/e2ee_manager.dart';
+import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../domain/repositories/contact_repository.dart';
 import '../../../n42_chat.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../favorite/favorite_list_page.dart';
 import '../qrcode/my_qrcode_page.dart';
-import '../../../core/encryption/e2ee_manager.dart';
-import '../../../core/encryption/key_backup_service.dart';
 import '../settings/change_email_page.dart';
 import '../settings/change_password_page.dart';
 import '../settings/language_settings_page.dart';
@@ -439,11 +440,20 @@ class _ProfilePageState extends State<ProfilePage> {
         builder: (_) => StatusPage(currentStatus: _statusText),
       ),
     );
-    
+
     if (result != null && mounted) {
       setState(() {
         _statusText = result;
       });
+
+      // 同步状态到服务器
+      try {
+        final contactRepository = getIt<IContactRepository>();
+        await contactRepository.setMyStatus(result);
+      } catch (e) {
+        debugPrint('Failed to sync status: $e');
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.statusSetTo(result) ?? 'Status set to: $result'),
