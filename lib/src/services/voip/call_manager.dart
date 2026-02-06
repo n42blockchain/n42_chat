@@ -387,9 +387,9 @@ class CallManager {
     debugPrint('CallManager: Call state changed to $state');
 
     if (state == CallState.connected) {
-      final callId = _webRTCService?.currentSession?.callId;
-      if (callId != null) {
-        _notificationService.setCallConnected(callId);
+      final callKitId = _notificationService.currentCallId;
+      if (callKitId != null) {
+        _notificationService.setCallConnected(callKitId);
       }
       // 确保通话界面已显示
       if (!_isCallScreenShowing) {

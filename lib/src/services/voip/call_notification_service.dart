@@ -67,8 +67,11 @@ class CallNotificationService {
   final _callActionController = StreamController<(CallAction, IncomingCallInfo)>.broadcast();
   Stream<(CallAction, IncomingCallInfo)> get callActions => _callActionController.stream;
   
-  // 当前通话 ID
+  // 当前 CallKit 通话 ID
   String? _currentCallId;
+
+  /// 获取当前 CallKit 通话 ID
+  String? get currentCallId => _currentCallId;
   
   /// 初始化
   Future<void> initialize() async {
