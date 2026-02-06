@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/group_file_entity.dart';
-import '../../../domain/repositories/message_repository.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 群文件页面
@@ -73,22 +71,12 @@ class _GroupFilesPageState extends State<GroupFilesPage>
       _error = null;
     });
 
-    try {
-      final messageRepository = getIt<IMessageRepository>();
-      final files = await messageRepository.getRoomFiles(widget.roomId);
-      if (mounted) {
-        setState(() {
-          _files = files;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error = e.toString();
-          _isLoading = false;
-        });
-      }
+    // TODO: implement getRoomFiles in IMessageRepository
+    if (mounted) {
+      setState(() {
+        _files = [];
+        _isLoading = false;
+      });
     }
   }
 
