@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import 'conversation_event.dart';
@@ -11,12 +12,15 @@ import 'conversation_state.dart';
 /// 会话列表BLoC
 class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   final IConversationRepository _conversationRepository;
+  final SecureStorageDataSource _storageDataSource;
 
   StreamSubscription<List<ConversationEntity>>? _conversationsSubscription;
 
   ConversationBloc({
     required IConversationRepository conversationRepository,
+    required SecureStorageDataSource storageDataSource,
   })  : _conversationRepository = conversationRepository,
+        _storageDataSource = storageDataSource,
         super(ConversationState.initial()) {
     on<LoadConversations>(_onLoadConversations);
     on<RefreshConversations>(_onRefreshConversations);
@@ -31,6 +35,8 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     on<CreateDirectChat>(_onCreateDirectChat);
     on<CreateGroupChat>(_onCreateGroupChat);
     on<ConversationsUpdated>(_onConversationsUpdated);
+    on<SetConversationHidden>(_onSetHidden);
+    on<LoadHiddenConversations>(_onLoadHiddenConversations);
   }
 
   @override
@@ -339,13 +345,105 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     }
   }
 
-  /// 分离置顶和普通会话
+  /// 分离置顶和普通会话（同时过滤隐藏的会话）
   (List<ConversationEntity>, List<ConversationEntity>) _separateConversations(
     List<ConversationEntity> conversations,
   ) {
-    final pinned = conversations.where((c) => c.isPinned).toList();
-    final normal = conversations.where((c) => !c.isPinned).toList();
+    // 过滤掉隐藏的会话
+    final visible = conversations.where((c) => !c.isHidden).toList();
+    final pinned = visible.where((c) => c.isPinned).toList();
+    final normal = visible.where((c) => !c.isPinned).toList();
     return (pinned, normal);
+  }
+
+  /// 设置会话隐藏状态
+  Future<void> _onSetHidden(
+    SetConversationHidden event,
+    Emitter<ConversationState> emit,
+  ) async {
+    try {
+      if (event.hidden) {
+        await _storageDataSource.hideChat(event.conversationId);
+      } else {
+        await _storageDataSource.unhideChat(event.conversationId);
+      }
+
+      // 更新会话的隐藏状态
+      final updatedConversations = state.conversations.map((conv) {
+        if (conv.id == event.conversationId) {
+          return conv.copyWith(isHidden: event.hidden);
+        }
+        return conv;
+      }).toList();
+
+      final (pinned, normal) = _separateConversations(updatedConversations);
+
+      // 如果是取消隐藏，需要从隐藏列表中移除
+      List<ConversationEntity> updatedHidden = state.hiddenConversations;
+      if (!event.hidden) {
+        updatedHidden = state.hiddenConversations
+            .where((c) => c.id != event.conversationId)
+            .toList();
+      } else {
+        // 如果是隐藏，需要添加到隐藏列表
+        final conversation = updatedConversations.firstWhere(
+          (c) => c.id == event.conversationId,
+          orElse: () => throw StateError('Conversation not found'),
+        );
+        updatedHidden = [...state.hiddenConversations, conversation];
+      }
+
+      emit(state.copyWith(
+        conversations: updatedConversations,
+        pinnedConversations: pinned,
+        normalConversations: normal,
+        hiddenConversations: updatedHidden,
+      ));
+    } catch (e) {
+      emit(state.copyWith(error: 'Hide failed: ${e.toString()}'));
+    }
+  }
+
+  /// 加载隐藏的会话列表
+  Future<void> _onLoadHiddenConversations(
+    LoadHiddenConversations event,
+    Emitter<ConversationState> emit,
+  ) async {
+    emit(state.copyWith(isLoadingHidden: true));
+
+    try {
+      final hiddenIds = await _storageDataSource.getHiddenChatIds();
+      final allConversations = await _conversationRepository.getConversations();
+
+      // 过滤出隐藏的会话
+      final hiddenConversations = allConversations
+          .where((c) => hiddenIds.contains(c.id))
+          .map((c) => c.copyWith(isHidden: true))
+          .toList();
+
+      // 更新所有会话的隐藏状态
+      final updatedConversations = allConversations.map((c) {
+        if (hiddenIds.contains(c.id)) {
+          return c.copyWith(isHidden: true);
+        }
+        return c;
+      }).toList();
+
+      final (pinned, normal) = _separateConversations(updatedConversations);
+
+      emit(state.copyWith(
+        conversations: updatedConversations,
+        pinnedConversations: pinned,
+        normalConversations: normal,
+        hiddenConversations: hiddenConversations,
+        isLoadingHidden: false,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isLoadingHidden: false,
+        error: 'Failed to load hidden conversations: ${e.toString()}',
+      ));
+    }
   }
 }
 

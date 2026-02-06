@@ -158,6 +158,12 @@ class N42ChatConfig {
   /// 如果不设置，GIF 功能将不可用
   final String? giphyApiKey;
 
+  /// Google Translate API Key
+  ///
+  /// 用于消息翻译功能。从 Google Cloud Console 获取
+  /// 如果不设置，将使用模拟翻译（仅用于开发测试）
+  final String? googleTranslateApiKey;
+
   const N42ChatConfig({
     this.defaultHomeserver = 'https://m.si46.world',
     this.enableEncryption = true,
@@ -184,6 +190,7 @@ class N42ChatConfig {
     this.termsOfServiceUrl = 'https://n42.world/terms',
     this.privacyPolicyUrl = 'https://n42.world/privacy',
     this.giphyApiKey,
+    this.googleTranslateApiKey,
   });
 
   /// 复制并修改配置
@@ -213,6 +220,7 @@ class N42ChatConfig {
     String? termsOfServiceUrl,
     String? privacyPolicyUrl,
     String? giphyApiKey,
+    String? googleTranslateApiKey,
   }) {
     return N42ChatConfig(
       defaultHomeserver: defaultHomeserver ?? this.defaultHomeserver,
@@ -241,6 +249,7 @@ class N42ChatConfig {
       termsOfServiceUrl: termsOfServiceUrl ?? this.termsOfServiceUrl,
       privacyPolicyUrl: privacyPolicyUrl ?? this.privacyPolicyUrl,
       giphyApiKey: giphyApiKey ?? this.giphyApiKey,
+      googleTranslateApiKey: googleTranslateApiKey ?? this.googleTranslateApiKey,
     );
   }
 }

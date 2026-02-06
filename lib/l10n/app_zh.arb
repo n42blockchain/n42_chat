@@ -2239,5 +2239,80 @@
   "serverAddressHint": "https://m.si46.world",
   "emailExampleHint": "example@email.com",
   "verificationCodePlaceholder": "------",
-  "enterPokeSuffixHint": "输入戳一戳后缀，例如：的肩膀"
+  "enterPokeSuffixHint": "输入戳一戳后缀，例如：的肩膀",
+
+  "groupAlbum": "群相册",
+  "groupFiles": "群文件",
+  "images": "图片",
+  "videos": "视频",
+  "total": "全部",
+  "size": "大小",
+  "noMedia": "暂无媒体",
+  "noMediaDescription": "此群还没有图片或视频",
+  "documents": "文档",
+  "noFiles": "暂无文件",
+  "noFilesDescription": "此群还没有文件",
+  "downloadStarted": "正在下载 {filename}...",
+  "@downloadStarted": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "noCommonGroups": "暂无共同群组",
+  "noCommonGroupsDescription": "你们没有共同加入的群组",
+  "pinMessage": "置顶",
+  "unpinMessage": "取消置顶",
+  "voiceMessage": "语音",
+  "message": "消息",
+
+  "hideChat": "隐藏",
+  "unhideChat": "取消隐藏",
+  "hiddenChats": "隐藏的聊天",
+  "noHiddenChats": "没有隐藏的聊天",
+  "noHiddenChatsDescription": "你隐藏的聊天会显示在这里",
+
+  "quickReply": "快捷回复",
+  "manageQuickReplies": "管理快捷回复",
+  "addQuickReply": "添加快捷回复",
+  "editQuickReply": "编辑快捷回复",
+  "deleteQuickReply": "删除快捷回复",
+  "noQuickReplies": "暂无快捷回复",
+  "defaultQuickReplies": "将显示默认快捷回复",
+
+  "translate": "翻译",
+  "translating": "翻译中...",
+  "translationFailed": "翻译失败",
+  "translatedFrom": "翻译自{language}",
+  "@translatedFrom": {
+    "placeholders": {
+      "language": {"type": "String"}
+    }
+  },
+  "showOriginal": "显示原文",
+  "hideTranslation": "隐藏翻译",
+  "translation": "翻译",
+
+  "story": "状态",
+  "myStory": "我的状态",
+  "addToStory": "发布状态",
+  "storyExpired": "状态已过期",
+  "storyExpiresIn": "{time}后过期",
+  "@storyExpiresIn": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "viewers": "浏览者",
+  "noViewers": "暂无浏览",
+  "viewersCount": "{count}人浏览",
+  "@viewersCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "replyToStory": "回复状态...",
+  "createStory": "发布状态",
+  "storySettings": "状态设置",
+  "whoCanSeeMyStory": "谁可以看我的状态",
+  "storyPrivacy": "状态隐私"
 }

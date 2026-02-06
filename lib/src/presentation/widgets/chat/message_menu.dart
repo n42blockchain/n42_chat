@@ -299,7 +299,7 @@ class _ForwardDialogState extends State<ForwardDialog> {
                         }
                       });
                     },
-                    activeTrackColor: AppColors.primary,
+                    activeColor: AppColors.primary,
                   ),
                   onTap: () {
                     setState(() {

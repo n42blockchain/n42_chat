@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.dart';
 import 'package:n42_chat/src/domain/entities/conversation_entity.dart';
 import 'package:n42_chat/src/domain/repositories/conversation_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/conversation/conversation_bloc.dart';
@@ -8,9 +9,11 @@ import 'package:n42_chat/src/presentation/blocs/conversation/conversation_event.
 import 'package:n42_chat/src/presentation/blocs/conversation/conversation_state.dart';
 
 class MockConversationRepository extends Mock implements IConversationRepository {}
+class MockSecureStorageDataSource extends Mock implements SecureStorageDataSource {}
 
 void main() {
   late MockConversationRepository mockRepository;
+  late MockSecureStorageDataSource mockStorageDataSource;
 
   final testConversations = [
     const ConversationEntity(
@@ -32,11 +35,15 @@ void main() {
 
   setUp(() {
     mockRepository = MockConversationRepository();
+    mockStorageDataSource = MockSecureStorageDataSource();
+    // Mock hidden chats methods
+    when(() => mockStorageDataSource.getHiddenChatIds())
+        .thenAnswer((_) async => <String>{});
   });
 
   group('ConversationBloc', () {
     test('initial state should be ConversationState.initial', () {
-      final bloc = ConversationBloc(conversationRepository: mockRepository);
+      final bloc = ConversationBloc(conversationRepository: mockRepository, storageDataSource: mockStorageDataSource);
       expect(bloc.state.conversations, isEmpty);
       bloc.close();
     });
@@ -48,7 +55,7 @@ void main() {
             .thenAnswer((_) async => testConversations);
         when(() => mockRepository.getTotalUnreadCount())
             .thenAnswer((_) async => 5);
-        return ConversationBloc(conversationRepository: mockRepository);
+        return ConversationBloc(conversationRepository: mockRepository, storageDataSource: mockStorageDataSource);
       },
       act: (bloc) => bloc.add(const LoadConversations()),
       expect: () => [
@@ -64,7 +71,7 @@ void main() {
       build: () {
         when(() => mockRepository.markAsRead(any()))
             .thenAnswer((_) async {});
-        return ConversationBloc(conversationRepository: mockRepository);
+        return ConversationBloc(conversationRepository: mockRepository, storageDataSource: mockStorageDataSource);
       },
       seed: () => ConversationState.initial().copyWith(
         conversations: testConversations,

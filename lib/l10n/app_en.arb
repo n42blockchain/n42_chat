@@ -1994,5 +1994,80 @@
   "serverAddressHint": "https://m.si46.world",
   "emailExampleHint": "example@email.com",
   "verificationCodePlaceholder": "------",
-  "enterPokeSuffixHint": "Enter poke suffix, e.g.: on the shoulder"
+  "enterPokeSuffixHint": "Enter poke suffix, e.g.: on the shoulder",
+
+  "groupAlbum": "Group Album",
+  "groupFiles": "Group Files",
+  "images": "Images",
+  "videos": "Videos",
+  "total": "Total",
+  "size": "Size",
+  "noMedia": "No Media",
+  "noMediaDescription": "No photos or videos in this group yet",
+  "documents": "Docs",
+  "noFiles": "No Files",
+  "noFilesDescription": "No files in this group yet",
+  "downloadStarted": "Downloading {filename}...",
+  "@downloadStarted": {
+    "placeholders": {
+      "filename": {"type": "String"}
+    }
+  },
+  "noCommonGroups": "No common groups",
+  "noCommonGroupsDescription": "You don't have any groups in common",
+  "pinMessage": "Pin",
+  "unpinMessage": "Unpin",
+  "voiceMessage": "Voice",
+  "message": "Message",
+
+  "hideChat": "Hide",
+  "unhideChat": "Unhide",
+  "hiddenChats": "Hidden Chats",
+  "noHiddenChats": "No hidden chats",
+  "noHiddenChatsDescription": "Chats you hide will appear here",
+
+  "quickReply": "Quick Reply",
+  "manageQuickReplies": "Manage Quick Replies",
+  "addQuickReply": "Add Quick Reply",
+  "editQuickReply": "Edit Quick Reply",
+  "deleteQuickReply": "Delete Quick Reply",
+  "noQuickReplies": "No quick replies",
+  "defaultQuickReplies": "Default quick replies will be shown",
+
+  "translate": "Translate",
+  "translating": "Translating...",
+  "translationFailed": "Translation failed",
+  "translatedFrom": "Translated from {language}",
+  "@translatedFrom": {
+    "placeholders": {
+      "language": {"type": "String"}
+    }
+  },
+  "showOriginal": "Show original",
+  "hideTranslation": "Hide translation",
+  "translation": "Translation",
+
+  "story": "Story",
+  "myStory": "My Story",
+  "addToStory": "Add to Story",
+  "storyExpired": "Story expired",
+  "storyExpiresIn": "Expires in {time}",
+  "@storyExpiresIn": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "viewers": "Viewers",
+  "noViewers": "No viewers yet",
+  "viewersCount": "{count} viewers",
+  "@viewersCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "replyToStory": "Reply to story...",
+  "createStory": "Create Story",
+  "storySettings": "Story Settings",
+  "whoCanSeeMyStory": "Who can see my story",
+  "storyPrivacy": "Story Privacy"
 }

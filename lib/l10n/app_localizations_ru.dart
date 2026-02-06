@@ -4459,4 +4459,162 @@ class SRu extends S {
 
   @override
   String get enterPokeSuffixHint => '输入戳一戳后缀，例如：的肩膀';
+
+  @override
+  String get groupAlbum => '群相册';
+
+  @override
+  String get groupFiles => '群文件';
+
+  @override
+  String get images => '图片';
+
+  @override
+  String get videos => '视频';
+
+  @override
+  String get total => '全部';
+
+  @override
+  String get size => '大小';
+
+  @override
+  String get noMedia => '暂无媒体';
+
+  @override
+  String get noMediaDescription => '此群还没有图片或视频';
+
+  @override
+  String get documents => '文档';
+
+  @override
+  String get noFiles => '暂无文件';
+
+  @override
+  String get noFilesDescription => '此群还没有文件';
+
+  @override
+  String downloadStarted(String filename) {
+    return '正在下载 $filename...';
+  }
+
+  @override
+  String get noCommonGroups => '暂无共同群组';
+
+  @override
+  String get noCommonGroupsDescription => '你们没有共同加入的群组';
+
+  @override
+  String get pinMessage => '置顶';
+
+  @override
+  String get unpinMessage => '取消置顶';
+
+  @override
+  String get voiceMessage => '语音';
+
+  @override
+  String get message => '消息';
+
+  @override
+  String get hideChat => '隐藏';
+
+  @override
+  String get unhideChat => '取消隐藏';
+
+  @override
+  String get hiddenChats => '隐藏的聊天';
+
+  @override
+  String get noHiddenChats => '没有隐藏的聊天';
+
+  @override
+  String get noHiddenChatsDescription => '你隐藏的聊天会显示在这里';
+
+  @override
+  String get quickReply => '快捷回复';
+
+  @override
+  String get manageQuickReplies => '管理快捷回复';
+
+  @override
+  String get addQuickReply => '添加快捷回复';
+
+  @override
+  String get editQuickReply => '编辑快捷回复';
+
+  @override
+  String get deleteQuickReply => '删除快捷回复';
+
+  @override
+  String get noQuickReplies => '暂无快捷回复';
+
+  @override
+  String get defaultQuickReplies => '将显示默认快捷回复';
+
+  @override
+  String get translate => '翻译';
+
+  @override
+  String get translating => '翻译中...';
+
+  @override
+  String get translationFailed => '翻译失败';
+
+  @override
+  String translatedFrom(String language) {
+    return '翻译自$language';
+  }
+
+  @override
+  String get showOriginal => '显示原文';
+
+  @override
+  String get hideTranslation => '隐藏翻译';
+
+  @override
+  String get translation => '翻译';
+
+  @override
+  String get story => '状态';
+
+  @override
+  String get myStory => '我的状态';
+
+  @override
+  String get addToStory => '发布状态';
+
+  @override
+  String get storyExpired => '状态已过期';
+
+  @override
+  String storyExpiresIn(String time) {
+    return '$time后过期';
+  }
+
+  @override
+  String get viewers => '浏览者';
+
+  @override
+  String get noViewers => '暂无浏览';
+
+  @override
+  String viewersCount(int count) {
+    return '$count人浏览';
+  }
+
+  @override
+  String get replyToStory => '回复状态...';
+
+  @override
+  String get createStory => '发布状态';
+
+  @override
+  String get storySettings => '状态设置';
+
+  @override
+  String get whoCanSeeMyStory => '谁可以看我的状态';
+
+  @override
+  String get storyPrivacy => '状态隐私';
 }

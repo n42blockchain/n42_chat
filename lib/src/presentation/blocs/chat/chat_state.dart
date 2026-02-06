@@ -34,6 +34,24 @@ class ChatState extends Equatable {
   /// 草稿
   final String? draft;
 
+  /// 置顶消息列表
+  final List<MessageEntity> pinnedMessages;
+
+  /// 当前显示的置顶消息索引
+  final int currentPinnedIndex;
+
+  /// 当前用户是否可以置顶消息
+  final bool canPinMessages;
+
+  /// 消息翻译结果 (messageId -> translatedText)
+  final Map<String, String> translatedMessages;
+
+  /// 正在翻译的消息ID
+  final Set<String> translatingMessageIds;
+
+  /// 翻译检测到的源语言 (messageId -> sourceLanguage)
+  final Map<String, String> detectedSourceLanguages;
+
   const ChatState({
     this.roomId,
     this.messages = const [],
@@ -45,6 +63,12 @@ class ChatState extends Equatable {
     this.replyTarget,
     this.typingUsers = const [],
     this.draft,
+    this.pinnedMessages = const [],
+    this.currentPinnedIndex = 0,
+    this.canPinMessages = false,
+    this.translatedMessages = const {},
+    this.translatingMessageIds = const {},
+    this.detectedSourceLanguages = const {},
   });
 
   /// 初始状态
@@ -60,6 +84,24 @@ class ChatState extends Equatable {
 
   /// 是否有人正在输入
   bool get hasTypingUsers => typingUsers.isNotEmpty;
+
+  /// 是否有置顶消息
+  bool get hasPinnedMessages => pinnedMessages.isNotEmpty;
+
+  /// 检查消息是否正在翻译
+  bool isTranslating(String messageId) => translatingMessageIds.contains(messageId);
+
+  /// 获取消息的翻译结果
+  String? getTranslation(String messageId) => translatedMessages[messageId];
+
+  /// 获取检测到的源语言
+  String? getDetectedLanguage(String messageId) => detectedSourceLanguages[messageId];
+
+  /// 当前置顶消息
+  MessageEntity? get currentPinnedMessage =>
+      pinnedMessages.isNotEmpty && currentPinnedIndex < pinnedMessages.length
+          ? pinnedMessages[currentPinnedIndex]
+          : null;
 
   /// 获取正在输入提示文本
   /// Note: This returns a raw value that UI layer should localize
@@ -82,6 +124,12 @@ class ChatState extends Equatable {
     MessageEntity? replyTarget,
     List<String>? typingUsers,
     String? draft,
+    List<MessageEntity>? pinnedMessages,
+    int? currentPinnedIndex,
+    bool? canPinMessages,
+    Map<String, String>? translatedMessages,
+    Set<String>? translatingMessageIds,
+    Map<String, String>? detectedSourceLanguages,
     bool clearError = false,
     bool clearReplyTarget = false,
   }) {
@@ -96,6 +144,12 @@ class ChatState extends Equatable {
       replyTarget: clearReplyTarget ? null : (replyTarget ?? this.replyTarget),
       typingUsers: typingUsers ?? this.typingUsers,
       draft: draft ?? this.draft,
+      pinnedMessages: pinnedMessages ?? this.pinnedMessages,
+      currentPinnedIndex: currentPinnedIndex ?? this.currentPinnedIndex,
+      canPinMessages: canPinMessages ?? this.canPinMessages,
+      translatedMessages: translatedMessages ?? this.translatedMessages,
+      translatingMessageIds: translatingMessageIds ?? this.translatingMessageIds,
+      detectedSourceLanguages: detectedSourceLanguages ?? this.detectedSourceLanguages,
     );
   }
 
@@ -111,6 +165,12 @@ class ChatState extends Equatable {
         replyTarget,
         typingUsers,
         draft,
+        pinnedMessages,
+        currentPinnedIndex,
+        canPinMessages,
+        translatedMessages,
+        translatingMessageIds,
+        detectedSourceLanguages,
       ];
 }
 

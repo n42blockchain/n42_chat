@@ -88,9 +88,12 @@ class ConversationEntity extends Equatable {
 
   /// 是否被邀请但未加入
   final bool isInvite;
-  
+
   /// 私聊对方的用户ID（仅私聊有效）
   final String? directUserId;
+
+  /// 是否被隐藏
+  final bool isHidden;
 
   const ConversationEntity({
     required this.id,
@@ -119,6 +122,7 @@ class ConversationEntity extends Equatable {
     this.isLowPriority = false,
     this.isInvite = false,
     this.directUserId,
+    this.isHidden = false,
   });
 
   /// 是否是私聊
@@ -207,6 +211,7 @@ class ConversationEntity extends Equatable {
         isLowPriority,
         isInvite,
         directUserId,
+        isHidden,
       ];
 
   ConversationEntity copyWith({
@@ -236,6 +241,7 @@ class ConversationEntity extends Equatable {
     bool? isLowPriority,
     bool? isInvite,
     String? directUserId,
+    bool? isHidden,
   }) {
     return ConversationEntity(
       id: id ?? this.id,
@@ -264,6 +270,7 @@ class ConversationEntity extends Equatable {
       isLowPriority: isLowPriority ?? this.isLowPriority,
       isInvite: isInvite ?? this.isInvite,
       directUserId: directUserId ?? this.directUserId,
+      isHidden: isHidden ?? this.isHidden,
     );
   }
 }

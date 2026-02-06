@@ -61,6 +61,9 @@ class MessageItem extends StatelessWidget {
   /// 回拨通话回调
   final void Function(MessageEntity message)? onCallBack;
 
+  /// 引用块点击回调 - 用于跳转到被引用的消息
+  final void Function(String messageId)? onReplyQuoteTap;
+
   const MessageItem({
     super.key,
     required this.message,
@@ -79,6 +82,7 @@ class MessageItem extends StatelessWidget {
     this.onRedPacketTap,
     this.onContactCardTap,
     this.onCallBack,
+    this.onReplyQuoteTap,
   });
 
   @override
@@ -286,46 +290,54 @@ class MessageItem extends StatelessWidget {
     final bgColor = message.isFromMe
         ? Colors.black.withValues(alpha: 0.1)
         : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05));
-    
+
     final textColor = message.isFromMe
         ? AppColors.messageTextSent.withValues(alpha: 0.8)
         : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary);
-    
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(4),
-        border: const Border(
-          left: BorderSide(
-            color: AppColors.primary,
-            width: 2,
+
+    // 包装 GestureDetector 以支持点击跳转到原消息
+    return GestureDetector(
+      onTap: () {
+        if (message.replyToId != null && onReplyQuoteTap != null) {
+          onReplyQuoteTap!(message.replyToId!);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(4),
+          border: const Border(
+            left: BorderSide(
+              color: AppColors.primary,
+              width: 2,
+            ),
           ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (message.replyToSender != null)
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (message.replyToSender != null)
+              Text(
+                message.replyToSender!,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primary,
+                ),
+              ),
             Text(
-              message.replyToSender!,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: AppColors.primary,
+              message.replyToContent ?? '',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13,
+                color: textColor,
               ),
             ),
-          Text(
-            message.replyToContent ?? '',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 13,
-              color: textColor,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

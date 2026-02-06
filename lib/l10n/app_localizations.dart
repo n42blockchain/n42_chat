@@ -8178,6 +8178,306 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'输入戳一戳后缀，例如：的肩膀'**
   String get enterPokeSuffixHint;
+
+  /// No description provided for @groupAlbum.
+  ///
+  /// In zh, this message translates to:
+  /// **'群相册'**
+  String get groupAlbum;
+
+  /// No description provided for @groupFiles.
+  ///
+  /// In zh, this message translates to:
+  /// **'群文件'**
+  String get groupFiles;
+
+  /// No description provided for @images.
+  ///
+  /// In zh, this message translates to:
+  /// **'图片'**
+  String get images;
+
+  /// No description provided for @videos.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频'**
+  String get videos;
+
+  /// No description provided for @total.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部'**
+  String get total;
+
+  /// No description provided for @size.
+  ///
+  /// In zh, this message translates to:
+  /// **'大小'**
+  String get size;
+
+  /// No description provided for @noMedia.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无媒体'**
+  String get noMedia;
+
+  /// No description provided for @noMediaDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'此群还没有图片或视频'**
+  String get noMediaDescription;
+
+  /// No description provided for @documents.
+  ///
+  /// In zh, this message translates to:
+  /// **'文档'**
+  String get documents;
+
+  /// No description provided for @noFiles.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无文件'**
+  String get noFiles;
+
+  /// No description provided for @noFilesDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'此群还没有文件'**
+  String get noFilesDescription;
+
+  /// No description provided for @downloadStarted.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在下载 {filename}...'**
+  String downloadStarted(String filename);
+
+  /// No description provided for @noCommonGroups.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无共同群组'**
+  String get noCommonGroups;
+
+  /// No description provided for @noCommonGroupsDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'你们没有共同加入的群组'**
+  String get noCommonGroupsDescription;
+
+  /// No description provided for @pinMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'置顶'**
+  String get pinMessage;
+
+  /// No description provided for @unpinMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消置顶'**
+  String get unpinMessage;
+
+  /// No description provided for @voiceMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'语音'**
+  String get voiceMessage;
+
+  /// No description provided for @message.
+  ///
+  /// In zh, this message translates to:
+  /// **'消息'**
+  String get message;
+
+  /// No description provided for @hideChat.
+  ///
+  /// In zh, this message translates to:
+  /// **'隐藏'**
+  String get hideChat;
+
+  /// No description provided for @unhideChat.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消隐藏'**
+  String get unhideChat;
+
+  /// No description provided for @hiddenChats.
+  ///
+  /// In zh, this message translates to:
+  /// **'隐藏的聊天'**
+  String get hiddenChats;
+
+  /// No description provided for @noHiddenChats.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有隐藏的聊天'**
+  String get noHiddenChats;
+
+  /// No description provided for @noHiddenChatsDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'你隐藏的聊天会显示在这里'**
+  String get noHiddenChatsDescription;
+
+  /// No description provided for @quickReply.
+  ///
+  /// In zh, this message translates to:
+  /// **'快捷回复'**
+  String get quickReply;
+
+  /// No description provided for @manageQuickReplies.
+  ///
+  /// In zh, this message translates to:
+  /// **'管理快捷回复'**
+  String get manageQuickReplies;
+
+  /// No description provided for @addQuickReply.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加快捷回复'**
+  String get addQuickReply;
+
+  /// No description provided for @editQuickReply.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑快捷回复'**
+  String get editQuickReply;
+
+  /// No description provided for @deleteQuickReply.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除快捷回复'**
+  String get deleteQuickReply;
+
+  /// No description provided for @noQuickReplies.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无快捷回复'**
+  String get noQuickReplies;
+
+  /// No description provided for @defaultQuickReplies.
+  ///
+  /// In zh, this message translates to:
+  /// **'将显示默认快捷回复'**
+  String get defaultQuickReplies;
+
+  /// No description provided for @translate.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻译'**
+  String get translate;
+
+  /// No description provided for @translating.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻译中...'**
+  String get translating;
+
+  /// No description provided for @translationFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻译失败'**
+  String get translationFailed;
+
+  /// No description provided for @translatedFrom.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻译自{language}'**
+  String translatedFrom(String language);
+
+  /// No description provided for @showOriginal.
+  ///
+  /// In zh, this message translates to:
+  /// **'显示原文'**
+  String get showOriginal;
+
+  /// No description provided for @hideTranslation.
+  ///
+  /// In zh, this message translates to:
+  /// **'隐藏翻译'**
+  String get hideTranslation;
+
+  /// No description provided for @translation.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻译'**
+  String get translation;
+
+  /// No description provided for @story.
+  ///
+  /// In zh, this message translates to:
+  /// **'状态'**
+  String get story;
+
+  /// No description provided for @myStory.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的状态'**
+  String get myStory;
+
+  /// No description provided for @addToStory.
+  ///
+  /// In zh, this message translates to:
+  /// **'发布状态'**
+  String get addToStory;
+
+  /// No description provided for @storyExpired.
+  ///
+  /// In zh, this message translates to:
+  /// **'状态已过期'**
+  String get storyExpired;
+
+  /// No description provided for @storyExpiresIn.
+  ///
+  /// In zh, this message translates to:
+  /// **'{time}后过期'**
+  String storyExpiresIn(String time);
+
+  /// No description provided for @viewers.
+  ///
+  /// In zh, this message translates to:
+  /// **'浏览者'**
+  String get viewers;
+
+  /// No description provided for @noViewers.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无浏览'**
+  String get noViewers;
+
+  /// No description provided for @viewersCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}人浏览'**
+  String viewersCount(int count);
+
+  /// No description provided for @replyToStory.
+  ///
+  /// In zh, this message translates to:
+  /// **'回复状态...'**
+  String get replyToStory;
+
+  /// No description provided for @createStory.
+  ///
+  /// In zh, this message translates to:
+  /// **'发布状态'**
+  String get createStory;
+
+  /// No description provided for @storySettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'状态设置'**
+  String get storySettings;
+
+  /// No description provided for @whoCanSeeMyStory.
+  ///
+  /// In zh, this message translates to:
+  /// **'谁可以看我的状态'**
+  String get whoCanSeeMyStory;
+
+  /// No description provided for @storyPrivacy.
+  ///
+  /// In zh, this message translates to:
+  /// **'状态隐私'**
+  String get storyPrivacy;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

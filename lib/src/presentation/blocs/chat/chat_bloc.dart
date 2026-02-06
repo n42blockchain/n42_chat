@@ -5,8 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/services/speech_to_text_service.dart';
+import '../../../core/services/translation_service.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
@@ -15,6 +17,8 @@ import 'chat_state.dart';
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final IMessageRepository _messageRepository;
   final SecureStorageDataSource _secureStorage;
+  final IGroupRepository? _groupRepository;
+  final ITranslationService? _translationService;
 
   StreamSubscription<List<MessageEntity>>? _messagesSubscription;
   StreamSubscription<Map<String, dynamic>>? _pollResponsesSubscription;
@@ -32,8 +36,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ChatBloc({
     required IMessageRepository messageRepository,
     required SecureStorageDataSource secureStorage,
+    IGroupRepository? groupRepository,
+    ITranslationService? translationService,
   })  : _messageRepository = messageRepository,
         _secureStorage = secureStorage,
+        _groupRepository = groupRepository,
+        _translationService = translationService,
         super(ChatState.initial()) {
     on<InitializeChat>(_onInitializeChat);
     on<LoadMessages>(_onLoadMessages);
@@ -76,6 +84,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<VoiceTranscriptionCompleted>(_onVoiceTranscriptionCompleted);
     on<SendGifMessage>(_onSendGifMessage);
     on<SendStickerMessage>(_onSendStickerMessage);
+    on<LoadPinnedMessages>(_onLoadPinnedMessages);
+    on<PinMessage>(_onPinMessage);
+    on<UnpinMessage>(_onUnpinMessage);
+    on<NavigatePinnedMessage>(_onNavigatePinnedMessage);
+    on<TranslateMessage>(_onTranslateMessage);
+    on<TranslationCompleted>(_onTranslationCompleted);
+    on<ClearTranslation>(_onClearTranslation);
   }
 
   @override
@@ -148,6 +163,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // 加载定时消息
     _loadScheduledMessages(event.roomId);
+
+    // 加载置顶消息
+    add(const LoadPinnedMessages());
   }
 
   /// 启动阅后即焚销毁定时器
@@ -1969,6 +1987,249 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         error: 'Failed to send sticker: $e',
       ));
     }
+  }
+
+  // ============================================
+  // 置顶消息处理
+  // ============================================
+
+  /// 加载置顶消息
+  Future<void> _onLoadPinnedMessages(
+    LoadPinnedMessages event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null || _groupRepository == null) return;
+
+    try {
+      final pinnedEventIds = await _groupRepository!.getPinnedEventIds(_currentRoomId!);
+      final canPin = _groupRepository!.canPinMessages(_currentRoomId!);
+
+      // 从当前消息列表中查找置顶消息
+      final pinnedMessages = <MessageEntity>[];
+      for (final eventId in pinnedEventIds) {
+        final msg = state.messages.firstWhere(
+          (m) => m.id == eventId,
+          orElse: () => MessageEntity(
+            id: eventId,
+            roomId: _currentRoomId!,
+            senderId: '',
+            senderName: '',
+            content: '[Message not loaded]',
+            timestamp: DateTime.now(),
+            type: MessageType.text,
+            status: MessageStatus.sent,
+            isFromMe: false,
+          ),
+        );
+        // 只添加真实加载的消息
+        if (msg.senderId.isNotEmpty) {
+          pinnedMessages.add(msg);
+        }
+      }
+
+      emit(state.copyWith(
+        pinnedMessages: pinnedMessages,
+        canPinMessages: canPin,
+        currentPinnedIndex: 0,
+      ));
+
+      debugPrint('ChatBloc: Loaded ${pinnedMessages.length} pinned messages, canPin=$canPin');
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to load pinned messages: $e');
+    }
+  }
+
+  /// 置顶消息
+  Future<void> _onPinMessage(
+    PinMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null || _groupRepository == null) return;
+
+    try {
+      await _groupRepository!.pinMessage(_currentRoomId!, event.messageId);
+      // 重新加载置顶消息
+      add(const LoadPinnedMessages());
+      debugPrint('ChatBloc: Pinned message ${event.messageId}');
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to pin message: $e');
+      emit(state.copyWith(error: 'Failed to pin message: $e'));
+    }
+  }
+
+  /// 取消置顶消息
+  Future<void> _onUnpinMessage(
+    UnpinMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null || _groupRepository == null) return;
+
+    try {
+      await _groupRepository!.unpinMessage(_currentRoomId!, event.messageId);
+      // 重新加载置顶消息
+      add(const LoadPinnedMessages());
+      debugPrint('ChatBloc: Unpinned message ${event.messageId}');
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to unpin message: $e');
+      emit(state.copyWith(error: 'Failed to unpin message: $e'));
+    }
+  }
+
+  /// 切换显示的置顶消息
+  void _onNavigatePinnedMessage(
+    NavigatePinnedMessage event,
+    Emitter<ChatState> emit,
+  ) {
+    if (state.pinnedMessages.isEmpty) return;
+
+    var newIndex = state.currentPinnedIndex + event.delta;
+    // 循环显示
+    if (newIndex < 0) {
+      newIndex = state.pinnedMessages.length - 1;
+    } else if (newIndex >= state.pinnedMessages.length) {
+      newIndex = 0;
+    }
+
+    emit(state.copyWith(currentPinnedIndex: newIndex));
+  }
+
+  // ============================================
+  // 消息翻译处理
+  // ============================================
+
+  /// 翻译消息
+  Future<void> _onTranslateMessage(
+    TranslateMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_translationService == null) {
+      debugPrint('ChatBloc: Translation service not available');
+      add(TranslationCompleted(
+        messageId: event.messageId,
+        success: false,
+        error: 'Translation service not configured',
+      ));
+      return;
+    }
+
+    // 检查是否已经在翻译中
+    if (state.isTranslating(event.messageId)) {
+      debugPrint('ChatBloc: Message ${event.messageId} is already being translated');
+      return;
+    }
+
+    // 检查是否已有翻译结果
+    final existingTranslation = state.getTranslation(event.messageId);
+    if (existingTranslation != null) {
+      debugPrint('ChatBloc: Message ${event.messageId} already has translation');
+      return;
+    }
+
+    // 查找消息
+    final message = state.messages.firstWhere(
+      (m) => m.id == event.messageId,
+      orElse: () => MessageEntity(
+        id: '',
+        roomId: '',
+        senderId: '',
+        senderName: '',
+        content: '',
+        timestamp: DateTime.now(),
+        type: MessageType.text,
+        status: MessageStatus.sent,
+        isFromMe: false,
+      ),
+    );
+
+    if (message.id.isEmpty || message.type != MessageType.text) {
+      debugPrint('ChatBloc: Cannot translate message - not a text message');
+      return;
+    }
+
+    // 更新状态为正在翻译
+    final newTranslatingIds = Set<String>.from(state.translatingMessageIds)
+      ..add(event.messageId);
+    emit(state.copyWith(translatingMessageIds: newTranslatingIds));
+
+    try {
+      debugPrint('ChatBloc: Translating message ${event.messageId} to ${event.targetLanguage}');
+
+      final result = await _translationService!.translate(
+        text: message.content,
+        targetLanguage: event.targetLanguage,
+      );
+
+      add(TranslationCompleted(
+        messageId: event.messageId,
+        translatedText: result.translatedText,
+        detectedSourceLanguage: result.detectedSourceLanguage,
+        success: result.success,
+        error: result.error,
+      ));
+    } catch (e) {
+      debugPrint('ChatBloc: Translation error: $e');
+      add(TranslationCompleted(
+        messageId: event.messageId,
+        success: false,
+        error: e.toString(),
+      ));
+    }
+  }
+
+  /// 翻译完成
+  void _onTranslationCompleted(
+    TranslationCompleted event,
+    Emitter<ChatState> emit,
+  ) {
+    // 移除正在翻译状态
+    final newTranslatingIds = Set<String>.from(state.translatingMessageIds)
+      ..remove(event.messageId);
+
+    if (event.success && event.translatedText != null) {
+      // 保存翻译结果
+      final newTranslatedMessages = Map<String, String>.from(state.translatedMessages)
+        ..[event.messageId] = event.translatedText!;
+
+      // 保存检测到的源语言
+      final newDetectedLanguages = Map<String, String>.from(state.detectedSourceLanguages);
+      if (event.detectedSourceLanguage != null) {
+        newDetectedLanguages[event.messageId] = event.detectedSourceLanguage!;
+      }
+
+      emit(state.copyWith(
+        translatingMessageIds: newTranslatingIds,
+        translatedMessages: newTranslatedMessages,
+        detectedSourceLanguages: newDetectedLanguages,
+      ));
+
+      debugPrint('ChatBloc: Translation completed for message ${event.messageId}');
+    } else {
+      // 翻译失败
+      emit(state.copyWith(
+        translatingMessageIds: newTranslatingIds,
+        error: event.error ?? 'Translation failed',
+      ));
+
+      debugPrint('ChatBloc: Translation failed for message ${event.messageId}: ${event.error}');
+    }
+  }
+
+  /// 清除消息翻译
+  void _onClearTranslation(
+    ClearTranslation event,
+    Emitter<ChatState> emit,
+  ) {
+    final newTranslatedMessages = Map<String, String>.from(state.translatedMessages)
+      ..remove(event.messageId);
+    final newDetectedLanguages = Map<String, String>.from(state.detectedSourceLanguages)
+      ..remove(event.messageId);
+
+    emit(state.copyWith(
+      translatedMessages: newTranslatedMessages,
+      detectedSourceLanguages: newDetectedLanguages,
+    ));
+
+    debugPrint('ChatBloc: Cleared translation for message ${event.messageId}');
   }
 }
 

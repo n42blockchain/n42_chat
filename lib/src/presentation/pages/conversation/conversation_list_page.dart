@@ -8,7 +8,9 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
+import '../../../domain/entities/story_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
@@ -16,12 +18,18 @@ import '../../blocs/conversation/conversation_event.dart';
 import '../../blocs/conversation/conversation_state.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/search/search_bloc.dart';
+import '../../blocs/story/story_bloc.dart';
+import '../../blocs/story/story_event.dart';
+import '../../blocs/story/story_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../widgets/animations/fade_animation.dart';
+import '../../widgets/story/story_bar.dart';
 import '../contact/add_friend_page.dart';
 import '../group/create_group_page.dart';
 import '../qrcode/scan_qr_page.dart';
 import '../search/global_search_page.dart';
+import '../story/create_story_page.dart';
+import '../story/story_viewer_page.dart';
 import 'conversation_tile.dart';
 
 /// 会话列表页面（仿微信）
@@ -55,6 +63,8 @@ class _ConversationListPageState extends State<ConversationListPage> {
   StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
   // 保存 Bloc 引用，避免在 dispose 中访问 context
   late ConversationBloc _conversationBloc;
+  // StoryBloc 引用
+  StoryBloc? _storyBloc;
 
   @override
   void initState() {
@@ -65,6 +75,11 @@ class _ConversationListPageState extends State<ConversationListPage> {
     _conversationBloc
       ..add(const LoadConversations())
       ..add(const SubscribeConversations());
+
+    // 初始化 StoryBloc
+    _storyBloc = getIt<StoryBloc>()
+      ..add(const LoadStories())
+      ..add(const SubscribeStories());
 
     // 监听备注更新
     _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
@@ -81,6 +96,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
     _remarkSubscription?.cancel();
     // 取消会话订阅（使用保存的引用）
     _conversationBloc.add(const UnsubscribeConversations());
+    // 取消 Story 订阅并关闭 bloc
+    _storyBloc?.add(const UnsubscribeStories());
+    _storyBloc?.close();
     super.dispose();
   }
 
@@ -118,59 +136,15 @@ class _ConversationListPageState extends State<ConversationListPage> {
       // ContactBloc 不可用
     }
 
-    Widget scaffold = Scaffold(
+    final scaffold = Scaffold(
       backgroundColor: bgColor,
       appBar: widget.showAppBar ? _buildAppBar(isDark) : null,
-      body: Column(
-        children: [
-          // 搜索栏（微信风格）
-          _buildSearchBar(isDark),
-
-          // 会话列表
-          Expanded(
-            child: BlocConsumer<ConversationBloc, ConversationState>(
-              listener: (context, state) {
-                // 处理新建会话导航
-                if (state.newConversationId != null) {
-                  final conversation = state.conversations.firstWhere(
-                    (c) => c.id == state.newConversationId,
-                    orElse: () => state.conversations.first,
-                  );
-                  widget.onConversationTap?.call(conversation);
-                }
-
-                // 显示错误
-                if (state.error != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.error!),
-                      backgroundColor: AppColors.error,
-                    ),
-                  );
-                }
-              },
-              builder: (context, state) {
-                if (state.isLoading) {
-                  return N42Loading(message: S.of(context)?.loading ?? 'Loading...');
-                }
-
-                if (state.isEmpty) {
-                  return N42EmptyState.noData(
-                    title: S.of(context)?.noConversations ?? 'No conversations',
-                    description: S.of(context)?.tapToChat ?? 'Tap the top right to start chatting',
-                  );
-                }
-
-                return RefreshIndicator(
-                  onRefresh: _onRefresh,
-                  color: AppColors.primary,
-                child: _buildConversationList(state, isDark),
-                );
-            },
-          ),
-        ),
-      ],
-      ),
+      body: _storyBloc != null
+          ? BlocProvider<StoryBloc>.value(
+              value: _storyBloc!,
+              child: _buildBody(isDark),
+            )
+          : _buildBody(isDark),
     );
     
     // 如果有 ContactBloc，用 BlocListener 包装来监听备注更新
@@ -187,6 +161,217 @@ class _ConversationListPageState extends State<ConversationListPage> {
     }
     
     return scaffold;
+  }
+
+  /// 构建页面主体
+  Widget _buildBody(bool isDark) {
+    return Column(
+      children: [
+        // 搜索栏（微信风格）
+        _buildSearchBar(isDark),
+
+        // Story 栏
+        if (_storyBloc != null) _buildStoryBar(isDark),
+
+        // 会话列表
+        Expanded(
+          child: BlocConsumer<ConversationBloc, ConversationState>(
+            listener: (context, state) {
+              // 处理新建会话导航
+              if (state.newConversationId != null) {
+                final conversation = state.conversations.firstWhere(
+                  (c) => c.id == state.newConversationId,
+                  orElse: () => state.conversations.first,
+                );
+                widget.onConversationTap?.call(conversation);
+              }
+
+              // 显示错误
+              if (state.error != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.error!),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              }
+            },
+            builder: (context, state) {
+              if (state.isLoading) {
+                return N42Loading(
+                    message: S.of(context)?.loading ?? 'Loading...');
+              }
+
+              if (state.isEmpty) {
+                return N42EmptyState.noData(
+                  title: S.of(context)?.noConversations ?? 'No conversations',
+                  description: S.of(context)?.tapToChat ??
+                      'Tap the top right to start chatting',
+                );
+              }
+
+              return RefreshIndicator(
+                onRefresh: _onRefresh,
+                color: AppColors.primary,
+                child: _buildConversationList(state, isDark),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 构建 Story 栏
+  Widget _buildStoryBar(bool isDark) {
+    return BlocBuilder<StoryBloc, StoryState>(
+      builder: (context, state) {
+        // 获取当前用户信息
+        final clientManager = MatrixClientManager.instance;
+        final myUserId = clientManager.userId;
+        final myDisplayName = clientManager.displayName;
+        // 头像 URL 需要从 state.myStories 中获取，或者异步获取
+        String? myAvatarUrl;
+        if (state.myStories.isNotEmpty) {
+          myAvatarUrl = state.myStories.first.userAvatarUrl;
+        }
+
+        // 构建我的 Story
+        UserStories? myStory;
+        if (state.myStories.isNotEmpty && myUserId != null) {
+          myStory = UserStories(
+            userId: myUserId,
+            userName: myDisplayName ?? myUserId,
+            avatarUrl: myAvatarUrl,
+            stories: state.myStories,
+            lastUpdated: state.myStories.first.createdAt,
+          );
+        }
+
+        return StoryBar(
+          userStories: state.userStories,
+          myStory: myStory,
+          myAvatarUrl: myAvatarUrl,
+          myName: myDisplayName,
+          onMyStoryTap: () => _onMyStoryTap(myStory),
+          onUserStoryTap: (userStory) => _onUserStoryTap(userStory, state),
+          onAddStory: _onAddStory,
+        );
+      },
+    );
+  }
+
+  /// 点击我的 Story
+  void _onMyStoryTap(UserStories? myStory) {
+    final currentUserId = MatrixClientManager.instance.client?.userID;
+
+    if (myStory != null && myStory.stories.isNotEmpty) {
+      // 查看我的 Stories
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => StoryViewerPage(
+            allUserStories: [myStory],
+            initialUserIndex: 0,
+            currentUserId: currentUserId,
+            onStoryViewed: () {
+              // 自己的 Story 不需要记录查看
+            },
+          ),
+        ),
+      );
+    } else {
+      // 没有 Story，跳转到创建页面
+      _onAddStory();
+    }
+  }
+
+  /// 点击用户 Story
+  void _onUserStoryTap(UserStories userStory, StoryState state) {
+    // 找到该用户在列表中的索引
+    final userIndex = state.userStories.indexOf(userStory);
+    if (userIndex < 0) return;
+
+    final currentUserId = MatrixClientManager.instance.client?.userID;
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => StoryViewerPage(
+          allUserStories: state.userStories,
+          initialUserIndex: userIndex,
+          currentUserId: currentUserId,
+          onStoryViewed: () {
+            // 记录查看 Story
+            final currentStory = userStory.stories.isNotEmpty
+                ? userStory.stories.first
+                : null;
+            if (currentStory != null) {
+              _storyBloc?.add(ViewStory(currentStory.id));
+            }
+          },
+          onReply: (userId, storyId, message) {
+            // 回复 Story：创建私聊并发送消息
+            _handleStoryReply(userId, storyId, message);
+          },
+        ),
+      ),
+    );
+  }
+
+  /// 处理 Story 回复
+  void _handleStoryReply(String userId, String storyId, String message) {
+    // TODO: 实现创建私聊并发送带 Story 引用的消息
+    // 可以通过 ConversationBloc 或 MessageBloc 来实现
+    debugPrint('Reply to story $storyId from user $userId: $message');
+  }
+
+  /// 添加新 Story
+  void _onAddStory() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => CreateStoryPage(
+          onPost: (content, imageBytes, imageName, backgroundColor, textColor) {
+            // 构建媒体输入
+            final media = <StoryMediaInput>[];
+            if (imageBytes != null && imageName != null) {
+              media.add(StoryMediaInput(
+                type: StoryMediaType.image,
+                bytes: imageBytes,
+                filename: imageName,
+                mimeType: _getMimeType(imageName),
+              ));
+            }
+
+            // 发布 Story
+            _storyBloc?.add(PostStory(
+              content: content,
+              media: media,
+              backgroundColor: backgroundColor,
+              textColor: textColor,
+            ));
+          },
+        ),
+      ),
+    );
+  }
+
+  /// 根据文件名获取 MIME 类型
+  String? _getMimeType(String filename) {
+    final ext = filename.split('.').last.toLowerCase();
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'webp':
+        return 'image/webp';
+      case 'heic':
+        return 'image/heic';
+      default:
+        return 'image/jpeg';
+    }
   }
 
   PreferredSizeWidget _buildAppBar(bool isDark) {
@@ -550,6 +735,20 @@ class _ConversationListPageState extends State<ConversationListPage> {
                   context.read<ConversationBloc>().add(SetConversationPinned(
                         conversationId: conversation.id,
                         pinned: !conversation.isPinned,
+                      ));
+                },
+              ),
+
+              // 隐藏
+              _buildMenuTile(
+                ctx,
+                icon: Icons.visibility_off_outlined,
+                title: S.of(context)?.hideChat ?? 'Hide',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  context.read<ConversationBloc>().add(SetConversationHidden(
+                        conversationId: conversation.id,
+                        hidden: true,
                       ));
                 },
               ),
