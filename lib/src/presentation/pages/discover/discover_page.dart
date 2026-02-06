@@ -6,6 +6,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../moment/moment_list_page.dart';
 import '../qrcode/scan_qr_page.dart';
 
 /// 发现页面（仿微信）
@@ -45,7 +46,7 @@ class DiscoverPage extends StatelessWidget {
                 isDark: isDark,
                 iconWidget: _MomentsIcon(),
                 title: l10n?.moments ?? 'Moments',
-                onTap: () => _showComingSoon(context, l10n?.moments ?? 'Moments'),
+                onTap: () => _openMoments(context),
               ),
               _buildDivider(context, isDark),
               _buildMenuItem(
@@ -233,6 +234,12 @@ class DiscoverPage extends StatelessWidget {
   void _openScanQR(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const ScanQRPage()),
+    );
+  }
+
+  void _openMoments(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const MomentListPage()),
     );
   }
 

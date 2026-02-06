@@ -133,8 +133,20 @@ class MessageRepositoryImpl implements IMessageRepository {
   }
 
   @override
-  Future<MessageEntity?> sendTextMessage(String roomId, String text) async {
-    final eventId = await _messageDataSource.sendTextMessage(roomId, text);
+  Future<MessageEntity?> sendTextMessage(
+    String roomId,
+    String text, {
+    int? selfDestructAfter,
+    List<String>? mentionedUserIds,
+    bool mentionsRoom = false,
+  }) async {
+    final eventId = await _messageDataSource.sendTextMessage(
+      roomId,
+      text,
+      selfDestructAfter: selfDestructAfter,
+      mentionedUserIds: mentionedUserIds,
+      mentionsRoom: mentionsRoom,
+    );
     if (eventId == null) return null;
 
     return _getMessageById(roomId, eventId);
@@ -228,6 +240,60 @@ class MessageRepositoryImpl implements IMessageRepository {
       latitude: latitude,
       longitude: longitude,
       description: description,
+    );
+    if (eventId == null) return null;
+
+    return _getMessageById(roomId, eventId);
+  }
+
+  @override
+  Future<MessageEntity?> sendGifMessage(
+    String roomId, {
+    required String gifUrl,
+    String? previewUrl,
+    int? width,
+    int? height,
+    String? title,
+  }) async {
+    final eventId = await _messageDataSource.sendGifMessage(
+      roomId,
+      gifUrl: gifUrl,
+      previewUrl: previewUrl,
+      width: width,
+      height: height,
+      title: title,
+    );
+    if (eventId == null) return null;
+
+    return _getMessageById(roomId, eventId);
+  }
+
+  @override
+  Future<MessageEntity?> sendStickerMessage(
+    String roomId, {
+    required String stickerId,
+    required String packId,
+    required String url,
+    String? httpUrl,
+    String? name,
+    String? emoji,
+    int? width,
+    int? height,
+    String? mimeType,
+    int? size,
+  }) async {
+    final eventId = await _messageDataSource.sendStickerMessage(
+      roomId,
+      stickerId: stickerId,
+      packId: packId,
+      url: url,
+      httpUrl: httpUrl,
+      name: name,
+      emoji: emoji,
+      width: width,
+      height: height,
+      mimeType: mimeType,
+      size: size,
     );
     if (eventId == null) return null;
 
@@ -858,6 +924,86 @@ class MessageRepositoryImpl implements IMessageRepository {
   @override
   Future<void> clearLocallyDeletedMessages(String roomId) async {
     await _secureStorage.clearLocallyDeletedMessages(roomId);
+  }
+
+  @override
+  Future<MessageEntity?> sendSelfDestructingMessage(
+    String roomId,
+    String text, {
+    required int selfDestructAfter,
+  }) async {
+    final eventId = await _messageDataSource.sendTextMessage(
+      roomId,
+      text,
+      selfDestructAfter: selfDestructAfter,
+    );
+    if (eventId == null) return null;
+
+    return _getMessageById(roomId, eventId);
+  }
+
+  @override
+  Future<MessageEntity?> startMessageDestruction(
+    String roomId,
+    String messageId,
+  ) async {
+    // 获取当前消息
+    final message = await _getMessageById(roomId, messageId);
+    if (message == null || !message.isSelfDestructing) return null;
+
+    // 如果已经开始销毁，直接返回
+    if (message.isDestructionStarted) return message;
+
+    // 计算销毁时间
+    final destroyedAt = DateTime.now().add(
+      Duration(seconds: message.selfDestructAfter!),
+    );
+
+    // 存储销毁时间到本地存储
+    await _secureStorage.setMessageDestroyedAt(
+      roomId,
+      messageId,
+      destroyedAt,
+    );
+
+    // 返回更新后的消息
+    return message.copyWith(destroyedAt: destroyedAt);
+  }
+
+  @override
+  Future<void> destroyExpiredMessages(String roomId) async {
+    try {
+      // 获取所有消息的销毁时间
+      final destructionTimes = await _secureStorage.getMessageDestructionTimes(roomId);
+      if (destructionTimes.isEmpty) return;
+
+      final now = DateTime.now();
+      final expiredMessageIds = <String>[];
+
+      for (final entry in destructionTimes.entries) {
+        if (entry.value.isBefore(now)) {
+          expiredMessageIds.add(entry.key);
+        }
+      }
+
+      if (expiredMessageIds.isEmpty) return;
+
+      debugPrint('MessageRepositoryImpl: Destroying ${expiredMessageIds.length} expired messages');
+
+      // 撤回过期消息
+      for (final messageId in expiredMessageIds) {
+        try {
+          await redactMessage(roomId, messageId, reason: 'Self-destructed');
+        } catch (e) {
+          debugPrint('MessageRepositoryImpl: Failed to redact message $messageId: $e');
+        }
+      }
+
+      // 清除销毁时间记录
+      await _secureStorage.clearMessageDestructionTimes(roomId, expiredMessageIds);
+    } catch (e) {
+      debugPrint('MessageRepositoryImpl: Error destroying expired messages: $e');
+    }
   }
 }
 

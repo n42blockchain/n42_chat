@@ -122,6 +122,21 @@ class MessageEntity extends Equatable {
   /// 已读回执用户列表
   final List<String> readBy;
 
+  /// 提及的用户ID列表
+  final List<String> mentionedUserIds;
+
+  /// 是否 @全体成员
+  final bool mentionsRoom;
+
+  /// 阅后即焚：消息被阅读后多少秒自毁（null 表示不自毁）
+  final int? selfDestructAfter;
+
+  /// 阅后即焚：消息实际销毁时间（已设置则表示倒计时已开始）
+  final DateTime? destroyedAt;
+
+  /// 定时发送：消息的预定发送时间（null 表示立即发送）
+  final DateTime? scheduledAt;
+
   const MessageEntity({
     required this.id,
     required this.roomId,
@@ -142,6 +157,11 @@ class MessageEntity extends Equatable {
     this.metadata,
     this.reactions = const [],
     this.readBy = const [],
+    this.mentionedUserIds = const [],
+    this.mentionsRoom = false,
+    this.selfDestructAfter,
+    this.destroyedAt,
+    this.scheduledAt,
   });
 
   /// 是否是文本消息
@@ -165,6 +185,48 @@ class MessageEntity extends Equatable {
 
   /// 是否发送失败
   bool get isFailed => status == MessageStatus.failed;
+
+  /// 是否是阅后即焚消息
+  bool get isSelfDestructing => selfDestructAfter != null;
+
+  /// 阅后即焚倒计时是否已开始
+  bool get isDestructionStarted => destroyedAt != null;
+
+  /// 获取剩余销毁时间（秒），null 表示尚未开始或不是阅后即焚消息
+  int? get remainingDestructionSeconds {
+    if (!isSelfDestructing || destroyedAt == null) return null;
+    final remaining = destroyedAt!.difference(DateTime.now()).inSeconds;
+    return remaining > 0 ? remaining : 0;
+  }
+
+  /// 消息是否已过期（应该被销毁）
+  bool get isExpired {
+    if (!isSelfDestructing || destroyedAt == null) return false;
+    return DateTime.now().isAfter(destroyedAt!);
+  }
+
+  /// 是否是定时消息
+  bool get isScheduled => scheduledAt != null;
+
+  /// 定时消息是否已到发送时间
+  bool get isScheduledTimeReached {
+    if (scheduledAt == null) return false;
+    return DateTime.now().isAfter(scheduledAt!) ||
+           DateTime.now().isAtSameMomentAs(scheduledAt!);
+  }
+
+  /// 获取距离定时发送的剩余秒数
+  int? get remainingScheduledSeconds {
+    if (scheduledAt == null) return null;
+    final remaining = scheduledAt!.difference(DateTime.now()).inSeconds;
+    return remaining > 0 ? remaining : 0;
+  }
+
+  /// 是否提及了指定用户
+  bool mentionsUser(String userId) => mentionedUserIds.contains(userId);
+
+  /// 是否有任何提及（包括 @全体 或具体用户）
+  bool get hasMentions => mentionsRoom || mentionedUserIds.isNotEmpty;
 
   /// 获取发送者首字母
   String get senderInitials {
@@ -201,6 +263,11 @@ class MessageEntity extends Equatable {
         metadata,
         reactions,
         readBy,
+        mentionedUserIds,
+        mentionsRoom,
+        selfDestructAfter,
+        destroyedAt,
+        scheduledAt,
       ];
 
   MessageEntity copyWith({
@@ -223,6 +290,11 @@ class MessageEntity extends Equatable {
     MessageMetadata? metadata,
     List<MessageReaction>? reactions,
     List<String>? readBy,
+    List<String>? mentionedUserIds,
+    bool? mentionsRoom,
+    int? selfDestructAfter,
+    DateTime? destroyedAt,
+    DateTime? scheduledAt,
   }) {
     return MessageEntity(
       id: id ?? this.id,
@@ -244,8 +316,33 @@ class MessageEntity extends Equatable {
       metadata: metadata ?? this.metadata,
       reactions: reactions ?? this.reactions,
       readBy: readBy ?? this.readBy,
+      mentionedUserIds: mentionedUserIds ?? this.mentionedUserIds,
+      mentionsRoom: mentionsRoom ?? this.mentionsRoom,
+      selfDestructAfter: selfDestructAfter ?? this.selfDestructAfter,
+      destroyedAt: destroyedAt ?? this.destroyedAt,
+      scheduledAt: scheduledAt ?? this.scheduledAt,
     );
   }
+
+  /// 创建一个开始自毁倒计时的消息副本
+  MessageEntity startDestruction() {
+    if (!isSelfDestructing || isDestructionStarted) return this;
+    return copyWith(
+      destroyedAt: DateTime.now().add(Duration(seconds: selfDestructAfter!)),
+    );
+  }
+}
+
+/// 语音转文字状态
+enum TranscriptionStatus {
+  /// 尚未开始转录
+  none,
+  /// 正在转录中
+  transcribing,
+  /// 转录成功
+  success,
+  /// 转录失败
+  failed,
 }
 
 /// 消息附加数据
@@ -302,6 +399,12 @@ class MessageMetadata extends Equatable {
 
   /// 波形数据
   final List<int>? waveform;
+
+  /// 语音转文字结果
+  final String? transcription;
+
+  /// 语音转文字状态
+  final TranscriptionStatus? transcriptionStatus;
 
   // ============================================
   // 位置属性
@@ -410,6 +513,8 @@ class MessageMetadata extends Equatable {
     this.fileName,
     this.isPlayed,
     this.waveform,
+    this.transcription,
+    this.transcriptionStatus,
     this.latitude,
     this.longitude,
     this.locationName,
@@ -472,6 +577,8 @@ class MessageMetadata extends Equatable {
         fileName,
         isPlayed,
         waveform,
+        transcription,
+        transcriptionStatus,
         latitude,
         longitude,
         locationName,
@@ -525,6 +632,8 @@ class MessageMetadata extends Equatable {
     fileName: fileName,
     isPlayed: isPlayed,
     waveform: waveform,
+    transcription: transcription,
+    transcriptionStatus: transcriptionStatus,
     latitude: latitude,
     longitude: longitude,
     locationName: locationName,
@@ -537,6 +646,59 @@ class MessageMetadata extends Equatable {
     musicUrl: musicUrl,
     musicCover: musicCover,
   );
+
+  /// Create a copy with updated transcription fields
+  MessageMetadata copyWithTranscription({
+    String? transcription,
+    TranscriptionStatus? transcriptionStatus,
+  }) => MessageMetadata(
+    mediaUrl: mediaUrl,
+    httpUrl: httpUrl,
+    thumbnailUrl: thumbnailUrl,
+    mimeType: mimeType,
+    size: size,
+    width: width,
+    height: height,
+    duration: duration,
+    fileName: fileName,
+    isPlayed: isPlayed,
+    waveform: waveform,
+    transcription: transcription ?? this.transcription,
+    transcriptionStatus: transcriptionStatus ?? this.transcriptionStatus,
+    latitude: latitude,
+    longitude: longitude,
+    locationName: locationName,
+    amount: amount,
+    token: token,
+    transferStatus: transferStatus,
+    txHash: txHash,
+    pollQuestion: pollQuestion,
+    pollOptions: pollOptions,
+    pollOptionIds: pollOptionIds,
+    maxSelections: maxSelections,
+    pollEnded: pollEnded,
+    voteCounts: voteCounts,
+    totalVoters: totalVoters,
+    myVotes: myVotes,
+    musicTitle: musicTitle,
+    musicArtist: musicArtist,
+    musicUrl: musicUrl,
+    musicCover: musicCover,
+    callDuration: callDuration,
+    callEnded: callEnded,
+    isMissedCall: isMissedCall,
+    callEndReason: callEndReason,
+    callRoomId: callRoomId,
+    callPeerId: callPeerId,
+  );
+
+  /// 是否有转录文本
+  bool get hasTranscription =>
+      transcription != null && transcription!.isNotEmpty;
+
+  /// 是否正在转录中
+  bool get isTranscribing =>
+      transcriptionStatus == TranscriptionStatus.transcribing;
 }
 
 /// 消息反应（Reaction）

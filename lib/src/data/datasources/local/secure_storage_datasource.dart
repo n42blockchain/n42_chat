@@ -16,6 +16,13 @@ class SecureStorageDataSource {
   static const String _keyStrongReminders = 'n42_chat_strong_reminders';
   static const String _keyBiometricSettings = 'n42_chat_biometric_settings';
   static const String _keyLocallyDeletedMessages = 'n42_chat_locally_deleted_messages';
+  static const String _keyMessageDestructionTimes = 'n42_chat_message_destruction_times';
+  static const String _keyPrivacySettings = 'n42_chat_privacy_settings';
+  static const String _keyScheduledMessages = 'n42_chat_scheduled_messages';
+  static const String _keyMomentSettings = 'n42_chat_moment_settings';
+  static const String _keyHiddenMomentUsers = 'n42_chat_hidden_moment_users';
+  static const String _keyBlockedMomentUsers = 'n42_chat_blocked_moment_users';
+  static const String _keyMomentLastReadTime = 'n42_chat_moment_last_read_time';
 
   final FlutterSecureStorage _storage;
 
@@ -577,6 +584,458 @@ class SecureStorageDataSource {
       debugPrint('SecureStorage: Cleared locally deleted messages for $roomId');
     } catch (e) {
       debugPrint('SecureStorage: Failed to clear locally deleted messages - $e');
+    }
+  }
+
+  // ============================================
+  // 阅后即焚消息销毁时间管理
+  // ============================================
+
+  /// 设置消息的销毁时间
+  Future<void> setMessageDestroyedAt(
+    String roomId,
+    String messageId,
+    DateTime destroyedAt,
+  ) async {
+    try {
+      final data = await _storage.read(key: _keyMessageDestructionTimes);
+      Map<String, dynamic> allData = {};
+
+      if (data != null) {
+        allData = jsonDecode(data) as Map<String, dynamic>;
+      }
+
+      // 获取当前房间的销毁时间记录
+      final roomData = (allData[roomId] as Map<String, dynamic>?) ?? {};
+      roomData[messageId] = destroyedAt.toIso8601String();
+      allData[roomId] = roomData;
+
+      await _storage.write(
+        key: _keyMessageDestructionTimes,
+        value: jsonEncode(allData),
+      );
+
+      debugPrint('SecureStorage: Set destruction time for message $messageId in $roomId');
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to set message destruction time - $e');
+    }
+  }
+
+  /// 获取房间所有消息的销毁时间
+  Future<Map<String, DateTime>> getMessageDestructionTimes(String roomId) async {
+    try {
+      final data = await _storage.read(key: _keyMessageDestructionTimes);
+      if (data == null) return {};
+
+      final allData = jsonDecode(data) as Map<String, dynamic>;
+      final roomData = allData[roomId] as Map<String, dynamic>?;
+      if (roomData == null) return {};
+
+      return roomData.map((key, value) {
+        return MapEntry(key, DateTime.parse(value as String));
+      });
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read message destruction times - $e');
+      return {};
+    }
+  }
+
+  /// 获取单条消息的销毁时间
+  Future<DateTime?> getMessageDestroyedAt(String roomId, String messageId) async {
+    final times = await getMessageDestructionTimes(roomId);
+    return times[messageId];
+  }
+
+  /// 清除指定消息的销毁时间记录
+  Future<void> clearMessageDestructionTimes(
+    String roomId,
+    List<String> messageIds,
+  ) async {
+    try {
+      final data = await _storage.read(key: _keyMessageDestructionTimes);
+      if (data == null) return;
+
+      final allData = jsonDecode(data) as Map<String, dynamic>;
+      final roomData = allData[roomId] as Map<String, dynamic>?;
+      if (roomData == null) return;
+
+      for (final messageId in messageIds) {
+        roomData.remove(messageId);
+      }
+
+      if (roomData.isEmpty) {
+        allData.remove(roomId);
+      } else {
+        allData[roomId] = roomData;
+      }
+
+      if (allData.isEmpty) {
+        await _storage.delete(key: _keyMessageDestructionTimes);
+      } else {
+        await _storage.write(
+          key: _keyMessageDestructionTimes,
+          value: jsonEncode(allData),
+        );
+      }
+
+      debugPrint('SecureStorage: Cleared ${messageIds.length} destruction time records in $roomId');
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to clear message destruction times - $e');
+    }
+  }
+
+  /// 清除房间所有消息的销毁时间记录
+  Future<void> clearAllMessageDestructionTimes(String roomId) async {
+    try {
+      final data = await _storage.read(key: _keyMessageDestructionTimes);
+      if (data == null) return;
+
+      final allData = jsonDecode(data) as Map<String, dynamic>;
+      allData.remove(roomId);
+
+      if (allData.isEmpty) {
+        await _storage.delete(key: _keyMessageDestructionTimes);
+      } else {
+        await _storage.write(
+          key: _keyMessageDestructionTimes,
+          value: jsonEncode(allData),
+        );
+      }
+
+      debugPrint('SecureStorage: Cleared all destruction time records in $roomId');
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to clear all destruction times - $e');
+    }
+  }
+
+  // ============================================
+  // 隐私设置
+  // ============================================
+
+  /// 保存隐私设置
+  ///
+  /// [avatarVisibility] 头像可见性 (everyone, contacts, nobody)
+  /// [statusVisibility] 状态可见性 (everyone, contacts, nobody)
+  /// [lastSeenVisibility] 最后上线时间可见性 (everyone, contacts, nobody)
+  /// [allowStrangerMessage] 是否允许陌生人私聊
+  /// [showReadReceipts] 是否显示已读回执
+  /// [showTypingIndicator] 是否显示输入状态
+  Future<void> savePrivacySettings({
+    String avatarVisibility = 'everyone',
+    String statusVisibility = 'everyone',
+    String lastSeenVisibility = 'everyone',
+    bool allowStrangerMessage = true,
+    bool showReadReceipts = true,
+    bool showTypingIndicator = true,
+  }) async {
+    final data = {
+      'avatarVisibility': avatarVisibility,
+      'statusVisibility': statusVisibility,
+      'lastSeenVisibility': lastSeenVisibility,
+      'allowStrangerMessage': allowStrangerMessage,
+      'showReadReceipts': showReadReceipts,
+      'showTypingIndicator': showTypingIndicator,
+      'savedAt': DateTime.now().toIso8601String(),
+    };
+
+    await _storage.write(
+      key: _keyPrivacySettings,
+      value: jsonEncode(data),
+    );
+
+    debugPrint('SecureStorage: Privacy settings saved');
+  }
+
+  /// 获取隐私设置
+  Future<Map<String, dynamic>?> getPrivacySettings() async {
+    try {
+      final data = await _storage.read(key: _keyPrivacySettings);
+      if (data == null) return null;
+
+      return jsonDecode(data) as Map<String, dynamic>;
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read privacy settings - $e');
+      return null;
+    }
+  }
+
+  /// 检查是否应该显示已读回执
+  Future<bool> shouldShowReadReceipts() async {
+    final settings = await getPrivacySettings();
+    return settings?['showReadReceipts'] ?? true;
+  }
+
+  /// 检查是否应该显示输入状态
+  Future<bool> shouldShowTypingIndicator() async {
+    final settings = await getPrivacySettings();
+    return settings?['showTypingIndicator'] ?? true;
+  }
+
+  /// 更新单个隐私设置项
+  Future<void> updatePrivacySetting(String key, dynamic value) async {
+    final current = await getPrivacySettings() ?? {};
+    current[key] = value;
+    current['savedAt'] = DateTime.now().toIso8601String();
+
+    await _storage.write(
+      key: _keyPrivacySettings,
+      value: jsonEncode(current),
+    );
+
+    debugPrint('SecureStorage: Privacy setting updated - $key: $value');
+  }
+
+  // ============================================
+  // 定时消息管理
+  // ============================================
+
+  /// 保存定时消息
+  ///
+  /// [roomId] 房间ID
+  /// [messageId] 本地临时消息ID
+  /// [text] 消息内容
+  /// [scheduledAt] 预定发送时间
+  /// [selfDestructAfter] 阅后即焚秒数（可选）
+  /// [mentionedUserIds] 提及的用户ID列表（可选）
+  /// [mentionsRoom] 是否 @全体成员
+  Future<void> saveScheduledMessage({
+    required String roomId,
+    required String messageId,
+    required String text,
+    required DateTime scheduledAt,
+    int? selfDestructAfter,
+    List<String>? mentionedUserIds,
+    bool mentionsRoom = false,
+  }) async {
+    try {
+      final data = await _storage.read(key: _keyScheduledMessages);
+      Map<String, dynamic> allData = {};
+
+      if (data != null) {
+        allData = jsonDecode(data) as Map<String, dynamic>;
+      }
+
+      // 获取当前房间的定时消息列表
+      final roomMessages = (allData[roomId] as List<dynamic>?)?.cast<Map<String, dynamic>>() ?? [];
+
+      // 添加新的定时消息
+      roomMessages.add({
+        'messageId': messageId,
+        'text': text,
+        'scheduledAt': scheduledAt.toIso8601String(),
+        'selfDestructAfter': selfDestructAfter,
+        'mentionedUserIds': mentionedUserIds,
+        'mentionsRoom': mentionsRoom,
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+
+      allData[roomId] = roomMessages;
+
+      await _storage.write(
+        key: _keyScheduledMessages,
+        value: jsonEncode(allData),
+      );
+
+      debugPrint('SecureStorage: Scheduled message saved - $messageId for $scheduledAt');
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to save scheduled message - $e');
+    }
+  }
+
+  /// 获取房间的所有定时消息
+  Future<List<Map<String, dynamic>>> getScheduledMessages(String roomId) async {
+    try {
+      final data = await _storage.read(key: _keyScheduledMessages);
+      if (data == null) return [];
+
+      final allData = jsonDecode(data) as Map<String, dynamic>;
+      final roomMessages = allData[roomId] as List<dynamic>?;
+      if (roomMessages == null) return [];
+
+      return roomMessages.cast<Map<String, dynamic>>();
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read scheduled messages - $e');
+      return [];
+    }
+  }
+
+  /// 获取所有房间的到期定时消息
+  Future<List<Map<String, dynamic>>> getDueScheduledMessages() async {
+    try {
+      final data = await _storage.read(key: _keyScheduledMessages);
+      if (data == null) return [];
+
+      final allData = jsonDecode(data) as Map<String, dynamic>;
+      final now = DateTime.now();
+      final dueMessages = <Map<String, dynamic>>[];
+
+      for (final entry in allData.entries) {
+        final roomId = entry.key;
+        final messages = (entry.value as List<dynamic>).cast<Map<String, dynamic>>();
+
+        for (final msg in messages) {
+          final scheduledAt = DateTime.parse(msg['scheduledAt'] as String);
+          if (now.isAfter(scheduledAt) || now.isAtSameMomentAs(scheduledAt)) {
+            dueMessages.add({
+              ...msg,
+              'roomId': roomId,
+            });
+          }
+        }
+      }
+
+      return dueMessages;
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to get due scheduled messages - $e');
+      return [];
+    }
+  }
+
+  /// 删除定时消息
+  Future<void> removeScheduledMessage(String roomId, String messageId) async {
+    try {
+      final data = await _storage.read(key: _keyScheduledMessages);
+      if (data == null) return;
+
+      final allData = jsonDecode(data) as Map<String, dynamic>;
+      final roomMessages = (allData[roomId] as List<dynamic>?)?.cast<Map<String, dynamic>>();
+      if (roomMessages == null) return;
+
+      roomMessages.removeWhere((msg) => msg['messageId'] == messageId);
+
+      if (roomMessages.isEmpty) {
+        allData.remove(roomId);
+      } else {
+        allData[roomId] = roomMessages;
+      }
+
+      if (allData.isEmpty) {
+        await _storage.delete(key: _keyScheduledMessages);
+      } else {
+        await _storage.write(
+          key: _keyScheduledMessages,
+          value: jsonEncode(allData),
+        );
+      }
+
+      debugPrint('SecureStorage: Scheduled message removed - $messageId');
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to remove scheduled message - $e');
+    }
+  }
+
+  /// 清除房间所有定时消息
+  Future<void> clearScheduledMessages(String roomId) async {
+    try {
+      final data = await _storage.read(key: _keyScheduledMessages);
+      if (data == null) return;
+
+      final allData = jsonDecode(data) as Map<String, dynamic>;
+      allData.remove(roomId);
+
+      if (allData.isEmpty) {
+        await _storage.delete(key: _keyScheduledMessages);
+      } else {
+        await _storage.write(
+          key: _keyScheduledMessages,
+          value: jsonEncode(allData),
+        );
+      }
+
+      debugPrint('SecureStorage: Cleared all scheduled messages for $roomId');
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to clear scheduled messages - $e');
+    }
+  }
+
+  // ============================================
+  // 朋友圈设置
+  // ============================================
+
+  /// 保存朋友圈设置
+  Future<void> saveMomentSettings({
+    bool allowStrangers = false,
+    int visibleDays = 0,
+  }) async {
+    final data = {
+      'allowStrangers': allowStrangers,
+      'visibleDays': visibleDays,
+    };
+    await _storage.write(
+      key: _keyMomentSettings,
+      value: jsonEncode(data),
+    );
+  }
+
+  /// 获取朋友圈设置
+  Future<Map<String, dynamic>?> getMomentSettings() async {
+    try {
+      final data = await _storage.read(key: _keyMomentSettings);
+      if (data == null) return null;
+      return jsonDecode(data) as Map<String, dynamic>;
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read moment settings - $e');
+      return null;
+    }
+  }
+
+  /// 保存不看谁的朋友圈列表
+  Future<void> saveHiddenMomentUsers(List<String> userIds) async {
+    await _storage.write(
+      key: _keyHiddenMomentUsers,
+      value: jsonEncode(userIds),
+    );
+  }
+
+  /// 获取不看谁的朋友圈列表
+  Future<List<String>?> getHiddenMomentUsers() async {
+    try {
+      final data = await _storage.read(key: _keyHiddenMomentUsers);
+      if (data == null) return null;
+      return (jsonDecode(data) as List).cast<String>();
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read hidden moment users - $e');
+      return null;
+    }
+  }
+
+  /// 保存不让谁看我的朋友圈列表
+  Future<void> saveBlockedMomentUsers(List<String> userIds) async {
+    await _storage.write(
+      key: _keyBlockedMomentUsers,
+      value: jsonEncode(userIds),
+    );
+  }
+
+  /// 获取不让谁看我的朋友圈列表
+  Future<List<String>?> getBlockedMomentUsers() async {
+    try {
+      final data = await _storage.read(key: _keyBlockedMomentUsers);
+      if (data == null) return null;
+      return (jsonDecode(data) as List).cast<String>();
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read blocked moment users - $e');
+      return null;
+    }
+  }
+
+  /// 保存朋友圈最后阅读时间
+  Future<void> saveMomentLastReadTime(DateTime time) async {
+    await _storage.write(
+      key: _keyMomentLastReadTime,
+      value: time.toIso8601String(),
+    );
+  }
+
+  /// 获取朋友圈最后阅读时间
+  Future<DateTime?> getMomentLastReadTime() async {
+    try {
+      final data = await _storage.read(key: _keyMomentLastReadTime);
+      if (data == null) return null;
+      return DateTime.parse(data);
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read moment last read time - $e');
+      return null;
     }
   }
 

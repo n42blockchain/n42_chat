@@ -293,9 +293,46 @@ class MatrixMessageDataSource {
   }
 
   /// 发送文本消息
-  Future<String?> sendTextMessage(String roomId, String text) async {
+  ///
+  /// [selfDestructAfter] 阅后即焚秒数，null 表示不自毁
+  /// [mentionedUserIds] 提及的用户ID列表
+  /// [mentionsRoom] 是否 @全体成员
+  Future<String?> sendTextMessage(
+    String roomId,
+    String text, {
+    int? selfDestructAfter,
+    List<String>? mentionedUserIds,
+    bool mentionsRoom = false,
+  }) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) return null;
+
+    // 构建消息内容
+    final content = <String, dynamic>{
+      'msgtype': 'm.text',
+      'body': text,
+    };
+
+    // 添加 m.mentions 字段（Matrix 规范）
+    if (mentionsRoom || (mentionedUserIds != null && mentionedUserIds.isNotEmpty)) {
+      content['m.mentions'] = <String, dynamic>{
+        if (mentionsRoom) 'room': true,
+        if (mentionedUserIds != null && mentionedUserIds.isNotEmpty)
+          'user_ids': mentionedUserIds,
+      };
+    }
+
+    // 添加阅后即焚字段
+    if (selfDestructAfter != null && selfDestructAfter > 0) {
+      content['n42.self_destruct'] = {
+        'after': selfDestructAfter,
+      };
+    }
+
+    // 如果有特殊字段，使用 sendEvent；否则使用 sendTextEvent
+    if (content.length > 2) {
+      return await room.sendEvent(content);
+    }
 
     return await room.sendTextEvent(text);
   }
@@ -745,6 +782,156 @@ class MatrixMessageDataSource {
       debugPrint('=== sendLocationMessage ERROR ===');
       debugPrint('Error: $e');
       debugPrint('Error type: ${e.runtimeType}');
+      debugPrint('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
+
+  /// 发送 GIF 消息
+  ///
+  /// GIF 作为图片消息发送，带有特殊标记
+  Future<String?> sendGifMessage(
+    String roomId, {
+    required String gifUrl,
+    String? previewUrl,
+    int? width,
+    int? height,
+    String? title,
+  }) async {
+    debugPrint('=== MatrixMessageDataSource.sendGifMessage start ===');
+    debugPrint('roomId: $roomId');
+    debugPrint('gifUrl: $gifUrl');
+
+    try {
+      if (_client == null) {
+        debugPrint('ERROR: Matrix client is null');
+        throw Exception('Matrix 客户端未初始化');
+      }
+
+      if (!_client!.isLogged()) {
+        debugPrint('ERROR: Not logged in');
+        throw Exception('未登录');
+      }
+
+      final room = _client!.getRoomById(roomId);
+      if (room == null) {
+        debugPrint('ERROR: Room not found: $roomId');
+        throw Exception('房间不存在: $roomId');
+      }
+
+      // 构建 GIF 消息内容
+      // 使用 m.image 类型但添加 GIF 相关元数据
+      final info = <String, dynamic>{
+        'mimetype': 'image/gif',
+      };
+      if (width != null) info['w'] = width;
+      if (height != null) info['h'] = height;
+
+      final content = <String, dynamic>{
+        'msgtype': matrix.MessageTypes.Image,
+        'body': title ?? 'GIF',
+        'url': gifUrl,
+        'info': info,
+        // 添加自定义字段标识 GIF 来源
+        'org.n42.gif': {
+          'source': 'giphy',
+          'preview_url': previewUrl,
+        },
+      };
+
+      debugPrint('GIF content: $content');
+      debugPrint('Calling room.sendEvent...');
+
+      final result = await room.sendEvent(content);
+      debugPrint('sendEvent result: $result');
+
+      debugPrint('=== sendGifMessage completed successfully ===');
+      return result;
+    } catch (e, stackTrace) {
+      debugPrint('=== sendGifMessage ERROR ===');
+      debugPrint('Error: $e');
+      debugPrint('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
+
+  /// 发送贴纸消息
+  ///
+  /// 使用 Matrix m.sticker 消息类型
+  Future<String?> sendStickerMessage(
+    String roomId, {
+    required String stickerId,
+    required String packId,
+    required String url,
+    String? httpUrl,
+    String? name,
+    String? emoji,
+    int? width,
+    int? height,
+    String? mimeType,
+    int? size,
+  }) async {
+    debugPrint('=== MatrixMessageDataSource.sendStickerMessage start ===');
+    debugPrint('roomId: $roomId');
+    debugPrint('stickerId: $stickerId');
+    debugPrint('packId: $packId');
+    debugPrint('url: $url');
+
+    try {
+      if (_client == null) {
+        debugPrint('ERROR: Matrix client is null');
+        throw Exception('Matrix 客户端未初始化');
+      }
+
+      if (!_client!.isLogged()) {
+        debugPrint('ERROR: Not logged in');
+        throw Exception('未登录');
+      }
+
+      final room = _client!.getRoomById(roomId);
+      if (room == null) {
+        debugPrint('ERROR: Room not found: $roomId');
+        throw Exception('房间不存在: $roomId');
+      }
+
+      // 如果是 emoji 贴纸，发送为文本消息
+      if (url.startsWith('emoji:')) {
+        final emojiChar = url.substring(6);
+        debugPrint('Sending emoji sticker as text: $emojiChar');
+        return await room.sendTextEvent(emojiChar);
+      }
+
+      // 构建贴纸消息内容 (使用 m.sticker 事件类型)
+      final info = <String, dynamic>{
+        'mimetype': mimeType ?? 'image/png',
+      };
+      if (width != null) info['w'] = width;
+      if (height != null) info['h'] = height;
+      if (size != null) info['size'] = size;
+
+      final content = <String, dynamic>{
+        'body': name ?? emoji ?? 'sticker',
+        'url': url,
+        'info': info,
+        // 添加自定义字段标识贴纸来源
+        'org.n42.sticker': {
+          'pack_id': packId,
+          'sticker_id': stickerId,
+          'emoji': emoji,
+        },
+      };
+
+      debugPrint('Sticker content: $content');
+      debugPrint('Calling room.sendEvent with type m.sticker...');
+
+      final result = await room.sendEvent(content, type: matrix.EventTypes.Sticker);
+      debugPrint('sendEvent result: $result');
+
+      debugPrint('=== sendStickerMessage completed successfully ===');
+      return result;
+    } catch (e, stackTrace) {
+      debugPrint('=== sendStickerMessage ERROR ===');
+      debugPrint('Error: $e');
       debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
@@ -1486,10 +1673,10 @@ class MatrixMessageDataSource {
   /// 将Matrix事件转换为消息实体
   MessageEntity mapEventToMessage(matrix.Event event, matrix.Room room) {
     final sender = room.unsafeGetUserFromMemoryOrFallback(event.senderId);
-    
+
     // 解析消息内容，处理回复格式
     final parsedContent = _parseMessageContent(event, room);
-    
+
     // 转换头像 mxc:// URL 为 HTTP URL（使用手动构建方式）
     final avatarHttpUrl = _buildHttpUrl(
       sender.avatarUrl?.toString(),
@@ -1497,7 +1684,18 @@ class MatrixMessageDataSource {
       height: 80,
       method: 'crop',
     );
-    
+
+    // 解析阅后即焚字段
+    final selfDestructData = event.content['n42.self_destruct'] as Map<String, dynamic>?;
+    final selfDestructAfter = selfDestructData?['after'] as int?;
+
+    // 解析 m.mentions 字段
+    final mentionsData = event.content['m.mentions'] as Map<String, dynamic>?;
+    final mentionsRoom = mentionsData?['room'] as bool? ?? false;
+    final mentionedUserIds = (mentionsData?['user_ids'] as List<dynamic>?)
+        ?.cast<String>()
+        .toList() ?? <String>[];
+
     return MessageEntity(
       id: event.eventId,
       roomId: room.id,
@@ -1515,6 +1713,9 @@ class MatrixMessageDataSource {
       isEdited: false, // 简化处理，后续可通过检查编辑事件实现
       reactions: _extractReactions(event),
       metadata: _extractMetadataWithHttpUrl(event),
+      mentionedUserIds: mentionedUserIds,
+      mentionsRoom: mentionsRoom,
+      selfDestructAfter: selfDestructAfter,
     );
   }
   

@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../widgets/common/common_widgets.dart';
+import 'phone_contacts_page.dart';
 
 /// 添加好友页面
 class AddFriendPage extends StatefulWidget {
@@ -180,6 +181,19 @@ class _AddFriendPageState extends State<AddFriendPage> {
     }
   }
 
+  Future<void> _openPhoneContacts() async {
+    final result = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (_) => const PhoneContactsPage(),
+      ),
+    );
+
+    // 如果从通讯录页面返回了房间 ID，关闭当前页面并返回
+    if (result != null && mounted) {
+      Navigator.of(context).pop(result);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
@@ -269,6 +283,46 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   ],
                 ),
               ],
+            ),
+          ),
+
+          // 从通讯录导入选项
+          Container(
+            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            margin: const EdgeInsets.only(top: 8),
+            child: ListTile(
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.contacts,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+              ),
+              title: Text(
+                'From Contacts',
+                style: TextStyle(
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              subtitle: Text(
+                'Find friends from your phone contacts',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                ),
+              ),
+              trailing: Icon(
+                Icons.chevron_right,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              ),
+              onTap: () => _openPhoneContacts(),
             ),
           ),
 

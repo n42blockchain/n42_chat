@@ -42,7 +42,11 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../blocs/search/search_bloc.dart';
 import '../../widgets/chat/chat_widgets.dart';
+import '../../widgets/chat/gif_picker.dart';
+import '../../widgets/chat/sticker_picker.dart';
 import '../../widgets/chat/red_packet_dialogs.dart';
+import '../../../domain/entities/sticker_pack_entity.dart';
+import '../sticker/sticker_store_page.dart';
 import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../widgets/wechat_toast.dart';
@@ -82,6 +86,7 @@ class _ChatPageState extends State<ChatPage> {
   bool _showSearchBar = false;
   bool _showMorePanel = false;
   bool _showEmojiPicker = false;
+  bool _showStickerPicker = false;
   String? _highlightedMessageId;
   
   // 录音状态
@@ -1110,7 +1115,10 @@ class _ChatPageState extends State<ChatPage> {
 
               // 表情选择器
               if (_showEmojiPicker && !_isMultiSelectMode) _buildEmojiPicker(),
-              
+
+              // 贴纸选择器
+              if (_showStickerPicker && !_isMultiSelectMode) _buildStickerPicker(),
+
               // 更多功能面板（仅在非多选模式下）
               if (_showMorePanel && !_isMultiSelectMode) _buildMorePanel(),
             ],
@@ -1246,6 +1254,14 @@ class _ChatPageState extends State<ChatPage> {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
+  /// 构建贴纸选择器面板
+  Widget _buildStickerPicker() {
+    return StickerPicker(
+      onStickerSelected: _onStickerSelected,
+      onOpenStore: _openStickerStore,
+    );
+  }
+
   Widget _buildMorePanel() {
     return ChatMorePanel(
       onPhotoPressed: () {
@@ -1300,6 +1316,14 @@ class _ChatPageState extends State<ChatPage> {
         _hideMorePanel();
         _createPoll();
       },
+      onGifPressed: () {
+        _hideMorePanel();
+        _showGifPicker();
+      },
+      onStickerPressed: () {
+        _hideMorePanel();
+        _toggleStickerPicker();
+      },
     );
   }
 
@@ -1307,6 +1331,7 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       _showMorePanel = false;
       _showEmojiPicker = false;
+      _showStickerPicker = false;
     });
   }
 
@@ -2351,7 +2376,7 @@ Avatar: ${contactAvatar ?? ''}''';
       final maxSelections = result['maxSelections'] as int? ?? 1;
 
       debugPrint('ChatPage: Creating poll - question: $question, options: $options, maxSelections: $maxSelections');
-      
+
       context.read<ChatBloc>().add(SendPollMessage(
         question: question,
         options: options,
@@ -2359,7 +2384,66 @@ Avatar: ${contactAvatar ?? ''}''';
       ));
     }
   }
-  
+
+  /// 显示 GIF 选择器
+  Future<void> _showGifPicker() async {
+    final gif = await showGifPicker(context);
+    if (gif != null && mounted) {
+      debugPrint('ChatPage: Sending GIF - ${gif.title}');
+      context.read<ChatBloc>().add(SendGifMessage(
+        gifUrl: gif.originalUrl,
+        previewUrl: gif.previewUrl,
+        width: gif.width,
+        height: gif.height,
+        title: gif.title,
+      ));
+    }
+  }
+
+  /// 显示/隐藏贴纸选择器面板
+  void _toggleStickerPicker() {
+    setState(() {
+      _showStickerPicker = !_showStickerPicker;
+      _showMorePanel = false;
+      _showEmojiPicker = false;
+      if (_showStickerPicker) {
+        _inputFocusNode.unfocus();
+      }
+    });
+  }
+
+  /// 发送贴纸消息
+  void _onStickerSelected(Sticker sticker, String packId) {
+    debugPrint('ChatPage: Sending sticker ${sticker.id} from pack $packId');
+    context.read<ChatBloc>().add(SendStickerMessage(
+      stickerId: sticker.id,
+      packId: packId,
+      url: sticker.url,
+      httpUrl: sticker.httpUrl,
+      name: sticker.name,
+      emoji: sticker.emoji,
+      width: sticker.width,
+      height: sticker.height,
+      mimeType: sticker.mimeType,
+      size: sticker.size,
+    ));
+
+    // 发送后隐藏贴纸面板
+    setState(() {
+      _showStickerPicker = false;
+    });
+  }
+
+  /// 打开贴纸商店
+  void _openStickerStore() {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) => const StickerStorePage(),
+      ),
+    );
+  }
+
   /// 投票选项点击
   void _onPollVote(String pollEventId, String optionId, List<String> currentVotes, int maxSelections) {
     // 防止重复投票 - 如果正在处理投票，忽略新的点击

@@ -1,0 +1,415 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../domain/entities/moment_entity.dart';
+import '../../../domain/repositories/moment_repository.dart';
+import 'moment_event.dart';
+import 'moment_state.dart';
+
+/// 动态 Bloc
+class MomentBloc extends Bloc<MomentEvent, MomentState> {
+  final IMomentRepository _momentRepository;
+
+  StreamSubscription<List<MomentEntity>>? _momentsSubscription;
+
+  MomentBloc(this._momentRepository) : super(MomentState.initial()) {
+    on<LoadMoments>(_onLoadMoments);
+    on<LoadMoreMoments>(_onLoadMoreMoments);
+    on<LoadUserMoments>(_onLoadUserMoments);
+    on<PostTextMoment>(_onPostTextMoment);
+    on<PostImageMoment>(_onPostImageMoment);
+    on<PostVideoMoment>(_onPostVideoMoment);
+    on<DeleteMoment>(_onDeleteMoment);
+    on<LikeMoment>(_onLikeMoment);
+    on<UnlikeMoment>(_onUnlikeMoment);
+    on<CommentMoment>(_onCommentMoment);
+    on<DeleteComment>(_onDeleteComment);
+    on<RefreshMoments>(_onRefreshMoments);
+    on<SubscribeMoments>(_onSubscribeMoments);
+    on<UnsubscribeMoments>(_onUnsubscribeMoments);
+    on<MomentsUpdated>(_onMomentsUpdated);
+    on<MarkMomentsAsRead>(_onMarkMomentsAsRead);
+  }
+
+  @override
+  Future<void> close() {
+    _momentsSubscription?.cancel();
+    return super.close();
+  }
+
+  /// 加载动态列表
+  Future<void> _onLoadMoments(
+    LoadMoments event,
+    Emitter<MomentState> emit,
+  ) async {
+    if (state.isLoading) return;
+
+    emit(state.copyWith(
+      isLoading: true,
+      clearError: true,
+    ));
+
+    try {
+      final moments = await _momentRepository.getMoments(
+        limit: event.limit,
+      );
+
+      final unreadCount = await _momentRepository.getUnreadMomentCount();
+
+      emit(state.copyWith(
+        moments: moments,
+        isLoading: false,
+        hasMore: moments.length >= event.limit,
+        lastMomentId: moments.isNotEmpty ? moments.last.id : null,
+        unreadCount: unreadCount,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  /// 加载更多动态
+  Future<void> _onLoadMoreMoments(
+    LoadMoreMoments event,
+    Emitter<MomentState> emit,
+  ) async {
+    if (state.isLoadingMore || !state.hasMore) return;
+
+    emit(state.copyWith(isLoadingMore: true));
+
+    try {
+      final moreMoments = await _momentRepository.getMoments(
+        limit: 20,
+        beforeId: state.lastMomentId,
+      );
+
+      emit(state.copyWith(
+        moments: [...state.moments, ...moreMoments],
+        isLoadingMore: false,
+        hasMore: moreMoments.length >= 20,
+        lastMomentId: moreMoments.isNotEmpty ? moreMoments.last.id : state.lastMomentId,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isLoadingMore: false,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  /// 加载用户动态
+  Future<void> _onLoadUserMoments(
+    LoadUserMoments event,
+    Emitter<MomentState> emit,
+  ) async {
+    emit(state.copyWith(isLoading: true, clearError: true));
+
+    try {
+      final moments = await _momentRepository.getUserMoments(
+        event.userId,
+        limit: event.limit,
+      );
+
+      emit(state.copyWith(
+        moments: moments,
+        isLoading: false,
+        hasMore: moments.length >= event.limit,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  /// 发布纯文字动态
+  Future<void> _onPostTextMoment(
+    PostTextMoment event,
+    Emitter<MomentState> emit,
+  ) async {
+    emit(state.copyWith(isPosting: true, postingProgress: 0.0));
+
+    try {
+      final moment = await _momentRepository.postTextMoment(
+        content: event.content,
+        location: event.location,
+        visibility: event.visibility,
+        visibilityUserIds: event.visibilityUserIds,
+      );
+
+      emit(state.copyWith(
+        moments: [moment, ...state.moments],
+        isPosting: false,
+        postingProgress: 1.0,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isPosting: false,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  /// 发布图片动态
+  Future<void> _onPostImageMoment(
+    PostImageMoment event,
+    Emitter<MomentState> emit,
+  ) async {
+    emit(state.copyWith(isPosting: true, postingProgress: 0.0));
+
+    try {
+      final mediaInputs = event.images
+          .map((img) => MomentMediaInput(
+                bytes: img.bytes,
+                filename: img.filename,
+                mimeType: img.mimeType,
+                width: img.width,
+                height: img.height,
+              ))
+          .toList();
+
+      final moment = await _momentRepository.postImageMoment(
+        content: event.content,
+        images: mediaInputs,
+        location: event.location,
+        visibility: event.visibility,
+        visibilityUserIds: event.visibilityUserIds,
+      );
+
+      emit(state.copyWith(
+        moments: [moment, ...state.moments],
+        isPosting: false,
+        postingProgress: 1.0,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isPosting: false,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  /// 发布视频动态
+  Future<void> _onPostVideoMoment(
+    PostVideoMoment event,
+    Emitter<MomentState> emit,
+  ) async {
+    emit(state.copyWith(isPosting: true, postingProgress: 0.0));
+
+    try {
+      final videoInput = MomentMediaInput(
+        bytes: event.videoBytes,
+        filename: event.filename,
+        mimeType: event.mimeType,
+        width: event.width,
+        height: event.height,
+        duration: event.duration,
+      );
+
+      final moment = await _momentRepository.postVideoMoment(
+        content: event.content,
+        video: videoInput,
+        thumbnailBytes: event.thumbnailBytes,
+        location: event.location,
+        visibility: event.visibility,
+        visibilityUserIds: event.visibilityUserIds,
+      );
+
+      emit(state.copyWith(
+        moments: [moment, ...state.moments],
+        isPosting: false,
+        postingProgress: 1.0,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isPosting: false,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  /// 删除动态
+  Future<void> _onDeleteMoment(
+    DeleteMoment event,
+    Emitter<MomentState> emit,
+  ) async {
+    try {
+      await _momentRepository.deleteMoment(event.momentId);
+
+      emit(state.copyWith(
+        moments: state.moments.where((m) => m.id != event.momentId).toList(),
+      ));
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+    }
+  }
+
+  /// 点赞动态
+  Future<void> _onLikeMoment(
+    LikeMoment event,
+    Emitter<MomentState> emit,
+  ) async {
+    // 乐观更新
+    final updatedMoments = state.moments.map((m) {
+      if (m.id == event.momentId) {
+        return m.copyWith(isLikedByMe: true);
+      }
+      return m;
+    }).toList();
+
+    emit(state.copyWith(moments: updatedMoments));
+
+    try {
+      await _momentRepository.likeMoment(event.momentId);
+    } catch (e) {
+      // 回滚
+      final revertedMoments = state.moments.map((m) {
+        if (m.id == event.momentId) {
+          return m.copyWith(isLikedByMe: false);
+        }
+        return m;
+      }).toList();
+
+      emit(state.copyWith(
+        moments: revertedMoments,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  /// 取消点赞
+  Future<void> _onUnlikeMoment(
+    UnlikeMoment event,
+    Emitter<MomentState> emit,
+  ) async {
+    // 乐观更新
+    final updatedMoments = state.moments.map((m) {
+      if (m.id == event.momentId) {
+        return m.copyWith(isLikedByMe: false);
+      }
+      return m;
+    }).toList();
+
+    emit(state.copyWith(moments: updatedMoments));
+
+    try {
+      await _momentRepository.unlikeMoment(event.momentId);
+    } catch (e) {
+      // 回滚
+      final revertedMoments = state.moments.map((m) {
+        if (m.id == event.momentId) {
+          return m.copyWith(isLikedByMe: true);
+        }
+        return m;
+      }).toList();
+
+      emit(state.copyWith(
+        moments: revertedMoments,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  /// 评论动态
+  Future<void> _onCommentMoment(
+    CommentMoment event,
+    Emitter<MomentState> emit,
+  ) async {
+    try {
+      final comment = await _momentRepository.commentMoment(
+        momentId: event.momentId,
+        content: event.content,
+        replyToCommentId: event.replyToCommentId,
+        replyToUserId: event.replyToUserId,
+      );
+
+      // 更新本地状态
+      final updatedMoments = state.moments.map((m) {
+        if (m.id == event.momentId) {
+          return m.addComment(comment);
+        }
+        return m;
+      }).toList();
+
+      emit(state.copyWith(moments: updatedMoments));
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+    }
+  }
+
+  /// 删除评论
+  Future<void> _onDeleteComment(
+    DeleteComment event,
+    Emitter<MomentState> emit,
+  ) async {
+    try {
+      await _momentRepository.deleteComment(event.momentId, event.commentId);
+
+      // 更新本地状态
+      final updatedMoments = state.moments.map((m) {
+        if (m.id == event.momentId) {
+          return m.removeComment(event.commentId);
+        }
+        return m;
+      }).toList();
+
+      emit(state.copyWith(moments: updatedMoments));
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+    }
+  }
+
+  /// 刷新动态
+  Future<void> _onRefreshMoments(
+    RefreshMoments event,
+    Emitter<MomentState> emit,
+  ) async {
+    await _momentRepository.refreshMoments();
+    add(const LoadMoments(refresh: true));
+  }
+
+  /// 订阅动态更新
+  Future<void> _onSubscribeMoments(
+    SubscribeMoments event,
+    Emitter<MomentState> emit,
+  ) async {
+    await _momentsSubscription?.cancel();
+
+    _momentsSubscription = _momentRepository.watchMoments().listen(
+      (moments) {
+        add(MomentsUpdated(moments));
+      },
+    );
+  }
+
+  /// 取消订阅动态更新
+  Future<void> _onUnsubscribeMoments(
+    UnsubscribeMoments event,
+    Emitter<MomentState> emit,
+  ) async {
+    await _momentsSubscription?.cancel();
+    _momentsSubscription = null;
+  }
+
+  /// 动态列表更新
+  void _onMomentsUpdated(
+    MomentsUpdated event,
+    Emitter<MomentState> emit,
+  ) {
+    emit(state.copyWith(moments: event.moments));
+  }
+
+  /// 标记已读
+  Future<void> _onMarkMomentsAsRead(
+    MarkMomentsAsRead event,
+    Emitter<MomentState> emit,
+  ) async {
+    await _momentRepository.markMomentsAsRead();
+    emit(state.copyWith(unreadCount: 0));
+  }
+}

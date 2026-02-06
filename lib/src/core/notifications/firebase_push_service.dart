@@ -173,9 +173,9 @@ class FirebasePushService implements IPushNotificationService {
       iOS: iosSettings,
     );
 
-    // flutter_local_notifications 20.x: 使用命名参数
+    // flutter_local_notifications: 使用位置参数
     await _localNotifications!.initialize(
-      settings: initSettings,
+      initSettings,
       onDidReceiveNotificationResponse: _onNotificationResponse,
       onDidReceiveBackgroundNotificationResponse: _onBackgroundNotificationResponse,
     );
@@ -298,7 +298,7 @@ class FirebasePushService implements IPushNotificationService {
         iOS: iosSettings,
       );
 
-      await _localNotifications!.initialize(settings: initSettings);
+      await _localNotifications!.initialize(initSettings);
 
       // 创建 Android 通知渠道
       if (Platform.isAndroid) {
@@ -344,10 +344,10 @@ class FirebasePushService implements IPushNotificationService {
       );
 
       await _localNotifications!.show(
-        id: notificationId,
-        title: 'N42 Chat',
-        body: 'You have a new message',
-        notificationDetails: details,
+        notificationId,
+        'N42 Chat',
+        'You have a new message',
+        details,
         payload: payload,
       );
     }
@@ -619,10 +619,10 @@ class FirebasePushService implements IPushNotificationService {
       );
 
       await _localNotifications!.show(
-        id: notificationId,
-        title: title,
-        body: body,
-        notificationDetails: details,
+        notificationId,
+        title,
+        body,
+        details,
         payload: payload,
       );
     } catch (_) {
@@ -634,7 +634,7 @@ class FirebasePushService implements IPushNotificationService {
   Future<void> clearNotificationsForRoom(String roomId) async {
     if (_localNotifications == null) return;
     final notificationId = roomId.hashCode;
-    await _localNotifications!.cancel(id: notificationId);
+    await _localNotifications!.cancel(notificationId);
   }
 
   @override

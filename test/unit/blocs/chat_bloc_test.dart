@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
 import 'package:n42_chat/src/domain/repositories/message_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_bloc.dart';
@@ -9,8 +10,11 @@ import 'package:n42_chat/src/presentation/blocs/chat/chat_state.dart';
 
 class MockMessageRepository extends Mock implements IMessageRepository {}
 
+class MockSecureStorage extends Mock implements SecureStorageDataSource {}
+
 void main() {
   late MockMessageRepository mockRepository;
+  late MockSecureStorage mockSecureStorage;
 
   final testMessages = [
     MessageEntity(
@@ -37,11 +41,12 @@ void main() {
 
   setUp(() {
     mockRepository = MockMessageRepository();
+    mockSecureStorage = MockSecureStorage();
   });
 
   group('ChatBloc', () {
     test('initial state should be ChatState.initial', () {
-      final bloc = ChatBloc(messageRepository: mockRepository);
+      final bloc = ChatBloc(messageRepository: mockRepository, secureStorage: mockSecureStorage);
       expect(bloc.state.roomId, isNull);
       expect(bloc.state.messages, isEmpty);
       bloc.close();
@@ -49,7 +54,7 @@ void main() {
 
     blocTest<ChatBloc, ChatState>(
       'sets reply target when SetReplyTarget is added',
-      build: () => ChatBloc(messageRepository: mockRepository),
+      build: () => ChatBloc(messageRepository: mockRepository, secureStorage: mockSecureStorage),
       seed: () => ChatState.initial().copyWith(
         roomId: '!room:server.com',
         messages: testMessages,
@@ -66,7 +71,7 @@ void main() {
 
     blocTest<ChatBloc, ChatState>(
       'clears reply target when SetReplyTarget(null) is added',
-      build: () => ChatBloc(messageRepository: mockRepository),
+      build: () => ChatBloc(messageRepository: mockRepository, secureStorage: mockSecureStorage),
       seed: () => ChatState.initial().copyWith(
         roomId: '!room:server.com',
         messages: testMessages,

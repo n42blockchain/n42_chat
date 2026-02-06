@@ -428,6 +428,106 @@ class MatrixGroupDataSource {
   }
 
   // ============================================
+  // 置顶消息
+  // ============================================
+
+  /// 获取置顶消息事件ID列表
+  List<String> getPinnedEventIds(String roomId) {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return [];
+
+    // Matrix 使用 m.room.pinned_events 状态事件存储置顶消息
+    final pinnedState = room.getState('m.room.pinned_events');
+    if (pinnedState == null) return [];
+
+    final pinnedContent = pinnedState.content;
+    final pinnedList = pinnedContent['pinned'];
+    if (pinnedList is List) {
+      return pinnedList.cast<String>();
+    }
+    return [];
+  }
+
+  /// 置顶消息
+  Future<void> pinMessage(String roomId, String eventId) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      throw Exception('Room not found: $roomId');
+    }
+
+    // 获取当前置顶列表
+    final currentPinned = getPinnedEventIds(roomId);
+
+    // 检查是否已置顶
+    if (currentPinned.contains(eventId)) {
+      return; // 已置顶，无需重复操作
+    }
+
+    // 添加新的置顶消息
+    final newPinned = [...currentPinned, eventId];
+
+    // 发送状态事件
+    await room.client.setRoomStateWithKey(
+      roomId,
+      'm.room.pinned_events',
+      '',
+      {'pinned': newPinned},
+    );
+  }
+
+  /// 取消置顶消息
+  Future<void> unpinMessage(String roomId, String eventId) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      throw Exception('Room not found: $roomId');
+    }
+
+    // 获取当前置顶列表
+    final currentPinned = getPinnedEventIds(roomId);
+
+    // 检查是否在置顶列表中
+    if (!currentPinned.contains(eventId)) {
+      return; // 不在置顶列表中，无需操作
+    }
+
+    // 移除指定的置顶消息
+    final newPinned = currentPinned.where((id) => id != eventId).toList();
+
+    // 发送状态事件
+    await room.client.setRoomStateWithKey(
+      roomId,
+      'm.room.pinned_events',
+      '',
+      {'pinned': newPinned},
+    );
+  }
+
+  /// 设置置顶消息列表（替换现有的全部置顶）
+  Future<void> setPinnedMessages(String roomId, List<String> eventIds) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      throw Exception('Room not found: $roomId');
+    }
+
+    // 发送状态事件
+    await room.client.setRoomStateWithKey(
+      roomId,
+      'm.room.pinned_events',
+      '',
+      {'pinned': eventIds},
+    );
+  }
+
+  /// 检查当前用户是否可以置顶消息
+  bool canPinMessages(String roomId) {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return false;
+
+    // 检查是否可以发送 m.room.pinned_events 状态事件
+    return room.canSendEvent('m.room.pinned_events');
+  }
+
+  // ============================================
   // 监听
   // ============================================
 

@@ -50,6 +50,12 @@ class ChatMorePanel extends StatefulWidget {
   /// 投票回调
   final VoidCallback? onPollPressed;
 
+  /// GIF 回调
+  final VoidCallback? onGifPressed;
+
+  /// 贴纸回调
+  final VoidCallback? onStickerPressed;
+
   const ChatMorePanel({
     super.key,
     this.onPhotoPressed,
@@ -65,6 +71,8 @@ class ChatMorePanel extends StatefulWidget {
     this.onCouponPressed,
     this.onGiftPressed,
     this.onPollPressed,
+    this.onGifPressed,
+    this.onStickerPressed,
   });
 
   @override
@@ -204,6 +212,18 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                         label: S.of(context)?.poll ?? 'Poll',
                         onTap: widget.onPollPressed,
                         iconColor: AppColors.primary,
+                      ),
+                      _MoreItem(
+                        icon: Icons.gif_box_outlined,
+                        label: 'GIF',
+                        onTap: widget.onGifPressed,
+                        iconColor: AppColors.textLink,
+                      ),
+                      _MoreItem(
+                        icon: Icons.emoji_emotions_outlined,
+                        label: S.of(context)?.stickers ?? 'Stickers',
+                        onTap: widget.onStickerPressed,
+                        iconColor: Colors.orange,
                       ),
                     ],
                   ),

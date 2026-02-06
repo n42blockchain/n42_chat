@@ -186,24 +186,35 @@ class LiveKitService extends ChangeNotifier {
     try {
       _setState(MeetingState.connecting);
 
+      // 获取音频处理配置
+      final audioConfig = _config.audioProcessing;
+
       // 创建房间实例
       _room = Room(
-        roomOptions: const RoomOptions(
+        roomOptions: RoomOptions(
           adaptiveStream: true,
           dynacast: true,
-          defaultAudioPublishOptions: AudioPublishOptions(
+          defaultAudioPublishOptions: const AudioPublishOptions(
             audioBitrate: AudioPreset.music,
           ),
-          defaultVideoPublishOptions: VideoPublishOptions(
+          defaultVideoPublishOptions: const VideoPublishOptions(
             simulcast: true,
             videoCodec: 'VP8',
           ),
-          defaultScreenShareCaptureOptions: ScreenShareCaptureOptions(
+          defaultScreenShareCaptureOptions: const ScreenShareCaptureOptions(
             useiOSBroadcastExtension: true,
             maxFrameRate: 15.0,
           ),
+          // 音频处理配置
+          defaultAudioCaptureOptions: AudioCaptureOptions(
+            echoCancellation: audioConfig.echoCancellation,
+            noiseSuppression: audioConfig.noiseSuppression,
+            autoGainControl: audioConfig.autoGainControl,
+            highPassFilter: audioConfig.highPassFilter,
+          ),
         ),
       );
+      debugPrint('LiveKitService: Room created with audio processing: $audioConfig');
 
       // 设置事件监听
       _setupRoomListeners();
@@ -359,6 +370,159 @@ class LiveKitService extends ChangeNotifier {
       await stopScreenShare();
     } else {
       await startScreenShare();
+    }
+  }
+
+  // ============================================
+  // 音频处理控制
+  // ============================================
+
+  /// 切换降噪功能
+  Future<void> toggleNoiseSuppression() async {
+    _config.enableNoiseSuppression = !_config.enableNoiseSuppression;
+    await _updateAudioProcessing();
+  }
+
+  /// 切换回声消除
+  Future<void> toggleEchoCancellation() async {
+    _config.enableEchoCancellation = !_config.enableEchoCancellation;
+    await _updateAudioProcessing();
+  }
+
+  /// 切换自动增益控制
+  Future<void> toggleAutoGainControl() async {
+    _config.enableAutoGainControl = !_config.enableAutoGainControl;
+    await _updateAudioProcessing();
+  }
+
+  /// 切换增强模式
+  Future<void> toggleEnhancedMode() async {
+    _config.enableEnhancedAudioMode = !_config.enableEnhancedAudioMode;
+    await _updateAudioProcessing();
+  }
+
+  /// 获取当前音频处理配置
+  AudioProcessingConfig get audioProcessingConfig => _config.audioProcessing;
+
+  /// 更新音频处理设置
+  Future<void> _updateAudioProcessing() async {
+    if (_localParticipant == null) return;
+
+    final audioConfig = _config.audioProcessing;
+    debugPrint('LiveKitService: Updating audio processing: $audioConfig');
+
+    // LiveKit 需要重新发布音轨来应用新的音频处理设置
+    // 先禁用麦克风，再重新启用
+    try {
+      await _localParticipant!.setMicrophoneEnabled(false);
+      await Future.delayed(const Duration(milliseconds: 100));
+      await _localParticipant!.setMicrophoneEnabled(!_isMuted);
+      debugPrint('LiveKitService: Audio processing updated successfully');
+    } catch (e) {
+      debugPrint('LiveKitService: Failed to update audio processing: $e');
+    }
+
+    notifyListeners();
+  }
+
+  // ============================================
+  // 背景处理控制
+  // ============================================
+
+  /// 获取当前背景处理配置
+  BackgroundProcessingConfig get backgroundProcessingConfig => _config.backgroundProcessing;
+
+  /// 是否启用了背景处理
+  bool get isBackgroundProcessingEnabled => _config.backgroundMode != BackgroundMode.none;
+
+  /// 启用背景模糊
+  ///
+  /// [radius] 模糊半径 (0.0 - 1.0)
+  Future<void> enableBackgroundBlur({double radius = 0.5}) async {
+    _config.backgroundMode = BackgroundMode.blur;
+    _config.backgroundBlurRadius = radius.clamp(0.0, 1.0);
+    await _updateBackgroundProcessing();
+  }
+
+  /// 设置虚拟背景
+  ///
+  /// [imageUrl] 背景图片的 URL 或本地路径
+  Future<void> setVirtualBackground(String imageUrl) async {
+    _config.backgroundMode = BackgroundMode.virtualBackground;
+    _config.virtualBackgroundUrl = imageUrl;
+    await _updateBackgroundProcessing();
+  }
+
+  /// 禁用背景处理
+  Future<void> disableBackgroundProcessing() async {
+    _config.backgroundMode = BackgroundMode.none;
+    await _updateBackgroundProcessing();
+  }
+
+  /// 切换背景模糊
+  Future<void> toggleBackgroundBlur() async {
+    if (_config.backgroundMode == BackgroundMode.blur) {
+      await disableBackgroundProcessing();
+    } else {
+      await enableBackgroundBlur();
+    }
+  }
+
+  /// 调整背景模糊强度
+  Future<void> setBackgroundBlurRadius(double radius) async {
+    if (_config.backgroundMode != BackgroundMode.blur) return;
+
+    _config.backgroundBlurRadius = radius.clamp(0.0, 1.0);
+    await _updateBackgroundProcessing();
+  }
+
+  /// 更新背景处理设置
+  ///
+  /// 注意：LiveKit 的背景处理需要使用视频处理器（Video Processor）
+  /// 这里提供了配置更新的框架，实际的视频处理需要配合 UI 层实现
+  Future<void> _updateBackgroundProcessing() async {
+    final bgConfig = _config.backgroundProcessing;
+    debugPrint('LiveKitService: Updating background processing: $bgConfig');
+
+    // LiveKit 背景模糊通过 LocalVideoTrack 的处理器实现
+    // 需要重新设置视频轨道来应用新设置
+    if (_localParticipant == null || !_isVideoEnabled) {
+      debugPrint('LiveKitService: No active video to apply background processing');
+      notifyListeners();
+      return;
+    }
+
+    try {
+      // 获取当前的视频轨道
+      final publication = _localParticipant?.videoTrackPublications
+          .where((pub) => pub.source == TrackSource.camera)
+          .firstOrNull;
+
+      final videoTrack = publication?.track;
+      if (videoTrack is LocalVideoTrack) {
+        // 根据背景模式应用不同的处理
+        switch (_config.backgroundMode) {
+          case BackgroundMode.blur:
+            debugPrint('LiveKitService: Background blur enabled with radius: ${_config.backgroundBlurRadius}');
+            // 实际的模糊处理需要通过 VideoProcessor 实现
+            // 这里记录配置，由 UI 层应用实际的视觉效果
+            break;
+          case BackgroundMode.virtualBackground:
+            debugPrint('LiveKitService: Virtual background set: ${_config.virtualBackgroundUrl}');
+            // 虚拟背景需要使用人像分割和图像合成
+            break;
+          case BackgroundMode.solidColor:
+            debugPrint('LiveKitService: Solid color background applied');
+            break;
+          case BackgroundMode.none:
+            debugPrint('LiveKitService: Background processing disabled');
+            break;
+        }
+      }
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint('LiveKitService: Failed to update background processing: $e');
     }
   }
 

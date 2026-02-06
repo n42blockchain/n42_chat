@@ -169,6 +169,35 @@ class GroupRepositoryImpl implements IGroupRepository {
   }
 
   // ============================================
+  // 置顶消息管理
+  // ============================================
+
+  @override
+  Future<List<String>> getPinnedEventIds(String roomId) async {
+    return _groupDataSource.getPinnedEventIds(roomId);
+  }
+
+  @override
+  Future<void> pinMessage(String roomId, String eventId) async {
+    await _groupDataSource.pinMessage(roomId, eventId);
+  }
+
+  @override
+  Future<void> unpinMessage(String roomId, String eventId) async {
+    await _groupDataSource.unpinMessage(roomId, eventId);
+  }
+
+  @override
+  Future<void> setPinnedMessages(String roomId, List<String> eventIds) async {
+    await _groupDataSource.setPinnedMessages(roomId, eventIds);
+  }
+
+  @override
+  bool canPinMessages(String roomId) {
+    return _groupDataSource.canPinMessages(roomId);
+  }
+
+  // ============================================
   // 辅助方法
   // ============================================
 
@@ -187,12 +216,16 @@ class GroupRepositoryImpl implements IGroupRepository {
     final joinedCount = room.summary.mJoinedMemberCount ?? 0;
     final invitedCount = room.summary.mInvitedMemberCount ?? 0;
 
+    // 获取置顶消息ID列表
+    final pinnedEventIds = _groupDataSource.getPinnedEventIds(room.id);
+
     return GroupEntity(
       roomId: room.id,
       name: room.getLocalizedDisplayname(),
       avatarUrl: avatarUrlStr,
       topic: room.topic,
       announcement: room.topic,
+      pinnedEventIds: pinnedEventIds,
       memberCount: joinedCount + invitedCount,
       members: members?.map((u) => _mapUserToGroupMember(room.id, u)).toList() ?? [],
       isEncrypted: room.encrypted,

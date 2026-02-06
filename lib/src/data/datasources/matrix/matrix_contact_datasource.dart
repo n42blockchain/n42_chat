@@ -15,6 +15,9 @@ class MatrixContactDataSource {
   /// 获取Matrix客户端
   matrix.Client? get _client => _clientManager.client;
 
+  /// 获取当前用户ID
+  String? get currentUserId => _client?.userID;
+
   // ============================================
   // 联系人获取
   // ============================================
@@ -208,6 +211,26 @@ class MatrixContactDataSource {
   Future<String?> getUserStatusMessage(String userId) async {
     final presence = await getUserPresence(userId);
     return presence?.statusMsg;
+  }
+
+  /// 设置当前用户的状态消息
+  Future<void> setUserStatus(String? statusMessage) async {
+    if (_client == null) return;
+    await _client!.setPresence(
+      _client!.userID!,
+      matrix.PresenceType.online,
+      statusMsg: statusMessage,
+    );
+  }
+
+  /// 设置当前用户的在线状态
+  Future<void> setPresenceStatus(matrix.PresenceType presenceType, {String? statusMessage}) async {
+    if (_client == null) return;
+    await _client!.setPresence(
+      _client!.userID!,
+      presenceType,
+      statusMsg: statusMessage,
+    );
   }
 
   // ============================================
