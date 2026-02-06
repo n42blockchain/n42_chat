@@ -67,23 +67,57 @@ class GiphySearchResult {
   bool get hasMore => offset + gifs.length < totalCount;
 }
 
+/// Giphy API 服务配置
+class GiphyConfig {
+  /// API Key - 必须在运行时配置
+  final String apiKey;
+
+  /// 每页数量
+  final int pageSize;
+
+  /// 默认内容评级
+  final String defaultRating;
+
+  const GiphyConfig({
+    required this.apiKey,
+    this.pageSize = 25,
+    this.defaultRating = 'g',
+  });
+}
+
 /// Giphy API 服务
 ///
 /// 提供 GIF 搜索和热门 GIF 获取功能
+///
+/// 使用前必须配置API Key:
+/// ```dart
+/// final service = GiphyService(
+///   config: GiphyConfig(apiKey: 'your-api-key'),
+/// );
+/// ```
 class GiphyService {
-  /// Giphy API Key
-  /// 注意：生产环境中应该使用环境变量或安全存储
-  static const String _apiKey = 'YOUR_GIPHY_API_KEY';
-
   /// API Base URL
   static const String _baseUrl = 'https://api.giphy.com/v1/gifs';
 
-  /// 每页数量
-  static const int _pageSize = 25;
-
   final http.Client _client;
+  final GiphyConfig _config;
 
-  GiphyService({http.Client? client}) : _client = client ?? http.Client();
+  /// 创建 GiphyService
+  ///
+  /// [config] 必须提供有效的 API Key
+  /// [client] 可选的 HTTP 客户端，用于测试
+  GiphyService({
+    required GiphyConfig config,
+    http.Client? client,
+  })  : _config = config,
+        _client = client ?? http.Client() {
+    if (_config.apiKey.isEmpty || _config.apiKey == 'YOUR_GIPHY_API_KEY') {
+      debugPrint('WARNING: GiphyService initialized without valid API key');
+    }
+  }
+
+  /// 每页数量
+  int get _pageSize => _config.pageSize;
 
   /// 搜索 GIF
   ///
@@ -95,10 +129,11 @@ class GiphyService {
   Future<GiphySearchResult> searchGifs({
     required String query,
     int offset = 0,
-    int limit = _pageSize,
+    int? limit,
     String rating = 'g',
     String lang = 'en',
   }) async {
+    final effectiveLimit = limit ?? _pageSize;
     if (query.trim().isEmpty) {
       return const GiphySearchResult(gifs: [], totalCount: 0, offset: 0);
     }
@@ -106,9 +141,9 @@ class GiphyService {
     try {
       final uri = Uri.parse('$_baseUrl/search').replace(
         queryParameters: {
-          'api_key': _apiKey,
+          'api_key': _config.apiKey,
           'q': query,
-          'limit': limit.toString(),
+          'limit': effectiveLimit.toString(),
           'offset': offset.toString(),
           'rating': rating,
           'lang': lang,
@@ -137,14 +172,15 @@ class GiphyService {
   /// [rating] 内容评级
   Future<GiphySearchResult> getTrendingGifs({
     int offset = 0,
-    int limit = _pageSize,
+    int? limit,
     String rating = 'g',
   }) async {
+    final effectiveLimit = limit ?? _pageSize;
     try {
       final uri = Uri.parse('$_baseUrl/trending').replace(
         queryParameters: {
-          'api_key': _apiKey,
-          'limit': limit.toString(),
+          'api_key': _config.apiKey,
+          'limit': effectiveLimit.toString(),
           'offset': offset.toString(),
           'rating': rating,
         },
@@ -170,7 +206,7 @@ class GiphyService {
     try {
       final uri = Uri.parse('$_baseUrl/$id').replace(
         queryParameters: {
-          'api_key': _apiKey,
+          'api_key': _config.apiKey,
         },
       );
 
@@ -196,7 +232,7 @@ class GiphyService {
   Future<GiphyGif?> getRandomGif({String? tag}) async {
     try {
       final queryParams = <String, String>{
-        'api_key': _apiKey,
+        'api_key': _config.apiKey,
         'rating': 'g',
       };
       if (tag != null && tag.isNotEmpty) {

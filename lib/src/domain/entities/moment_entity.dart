@@ -448,21 +448,29 @@ class MomentEntity extends Equatable {
   }
 
   /// 添加点赞
-  MomentEntity addLike(MomentLike like) {
+  ///
+  /// [like] 点赞信息
+  /// [currentUserId] 当前用户ID，用于判断是否是自己点赞
+  MomentEntity addLike(MomentLike like, {String? currentUserId}) {
     if (likes.any((l) => l.userId == like.userId)) {
       return this;
     }
+    final isCurrentUserLike = currentUserId != null && like.userId == currentUserId;
     return copyWith(
       likes: [...likes, like],
-      isLikedByMe: like.userId == userId ? true : isLikedByMe,
+      isLikedByMe: isCurrentUserLike ? true : isLikedByMe,
     );
   }
 
   /// 移除点赞
-  MomentEntity removeLike(String likeUserId) {
+  ///
+  /// [likeUserId] 要移除的点赞用户ID
+  /// [currentUserId] 当前用户ID，用于判断是否是自己取消点赞
+  MomentEntity removeLike(String likeUserId, {String? currentUserId}) {
+    final isCurrentUserUnlike = currentUserId != null && likeUserId == currentUserId;
     return copyWith(
       likes: likes.where((l) => l.userId != likeUserId).toList(),
-      isLikedByMe: likeUserId == userId ? false : isLikedByMe,
+      isLikedByMe: isCurrentUserUnlike ? false : isLikedByMe,
     );
   }
 

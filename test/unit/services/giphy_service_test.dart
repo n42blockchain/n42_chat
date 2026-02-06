@@ -82,7 +82,10 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      service = GiphyService(client: mockClient);
+      service = GiphyService(
+        config: const GiphyConfig(apiKey: 'test-api-key'),
+        client: mockClient,
+      );
     });
 
     tearDown(() {
@@ -226,7 +229,10 @@ void main() {
           return http.Response('Server Error', 500);
         });
 
-        final errorService = GiphyService(client: errorClient);
+        final errorService = GiphyService(
+          config: const GiphyConfig(apiKey: 'test-api-key'),
+          client: errorClient,
+        );
 
         final result = await errorService.searchGifs(query: 'test');
 
@@ -241,7 +247,10 @@ void main() {
           throw Exception('Network error');
         });
 
-        final errorService = GiphyService(client: errorClient);
+        final errorService = GiphyService(
+          config: const GiphyConfig(apiKey: 'test-api-key'),
+          client: errorClient,
+        );
 
         final result = await errorService.searchGifs(query: 'test');
 

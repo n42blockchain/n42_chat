@@ -152,6 +152,12 @@ class N42ChatConfig {
   /// 隐私政策页面链接
   final String privacyPolicyUrl;
 
+  /// Giphy API Key
+  ///
+  /// 用于 GIF 搜索功能。从 https://developers.giphy.com/ 获取
+  /// 如果不设置，GIF 功能将不可用
+  final String? giphyApiKey;
+
   const N42ChatConfig({
     this.defaultHomeserver = 'https://m.si46.world',
     this.enableEncryption = true,
@@ -177,6 +183,7 @@ class N42ChatConfig {
     this.databaseName,
     this.termsOfServiceUrl = 'https://n42.world/terms',
     this.privacyPolicyUrl = 'https://n42.world/privacy',
+    this.giphyApiKey,
   });
 
   /// 复制并修改配置
@@ -205,6 +212,7 @@ class N42ChatConfig {
     String? databaseName,
     String? termsOfServiceUrl,
     String? privacyPolicyUrl,
+    String? giphyApiKey,
   }) {
     return N42ChatConfig(
       defaultHomeserver: defaultHomeserver ?? this.defaultHomeserver,
@@ -232,6 +240,7 @@ class N42ChatConfig {
       databaseName: databaseName ?? this.databaseName,
       termsOfServiceUrl: termsOfServiceUrl ?? this.termsOfServiceUrl,
       privacyPolicyUrl: privacyPolicyUrl ?? this.privacyPolicyUrl,
+      giphyApiKey: giphyApiKey ?? this.giphyApiKey,
     );
   }
 }
