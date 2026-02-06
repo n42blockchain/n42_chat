@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
+import 'quick_replies_page.dart';
 
 /// 设置页面
 class SettingsPage extends StatelessWidget {
@@ -101,6 +104,13 @@ class SettingsPage extends StatelessWidget {
                 iconColor: Colors.green,
                 title: S.of(context)?.chat ?? 'Chat',
                 onTap: onChat,
+                isDark: isDark,
+              ),
+              _SettingsItem(
+                icon: Icons.flash_on_outlined,
+                iconColor: Colors.orange,
+                title: S.of(context)?.quickReply ?? 'Quick Reply',
+                onTap: () => _navigateToQuickReplies(context),
                 isDark: isDark,
               ),
               _SettingsItem(
@@ -264,6 +274,16 @@ class SettingsPage extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToQuickReplies(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => QuickRepliesPage(
+          storageDataSource: getIt<SecureStorageDataSource>(),
         ),
       ),
     );

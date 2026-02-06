@@ -24,7 +24,9 @@ class WeChatMessageMenu extends StatelessWidget {
   
   // 状态
   final bool isFavorited;
-  
+  final bool isPinned;
+  final bool canPin;
+
   // 回调函数
   final VoidCallback? onCopy;
   final VoidCallback? onForward;
@@ -37,6 +39,9 @@ class WeChatMessageMenu extends StatelessWidget {
   final VoidCallback? onDelete; // 删除发送失败的消息
   final VoidCallback? onResend; // 重新发送失败的消息
   final VoidCallback? onSave; // 保存图片/视频
+  final VoidCallback? onPin; // 置顶消息
+  final VoidCallback? onUnpin; // 取消置顶
+  final VoidCallback? onTranslate; // 翻译消息
 
   /// 表情回应回调
   final void Function(String emoji)? onReaction;
@@ -48,6 +53,8 @@ class WeChatMessageMenu extends StatelessWidget {
     required this.messageSize,
     required this.onDismiss,
     this.isFavorited = false,
+    this.isPinned = false,
+    this.canPin = false,
     this.onCopy,
     this.onForward,
     this.onFavorite,
@@ -59,6 +66,9 @@ class WeChatMessageMenu extends StatelessWidget {
     this.onDelete,
     this.onResend,
     this.onSave,
+    this.onPin,
+    this.onUnpin,
+    this.onTranslate,
     this.onReaction,
   });
 
@@ -280,6 +290,38 @@ class WeChatMessageMenu extends StatelessWidget {
                   },
                 ),
                 const SizedBox(width: 20),
+                // 翻译按钮（仅文本消息显示）
+                if (message.type == MessageType.text && onTranslate != null)
+                  _buildMenuItem(
+                    icon: Icons.translate,
+                    label: S.of(context)?.translate ?? 'Translate',
+                    onTap: () {
+                      onDismiss();
+                      onTranslate?.call();
+                    },
+                  ),
+                if (message.type == MessageType.text && onTranslate != null) const SizedBox(width: 20),
+                // 置顶/取消置顶按钮（仅在有权限时显示）
+                if (canPin)
+                  isPinned
+                      ? _buildMenuItem(
+                          icon: Icons.push_pin,
+                          label: S.of(context)?.unpin ?? 'Unpin',
+                          isHighlighted: true,
+                          onTap: () {
+                            onDismiss();
+                            onUnpin?.call();
+                          },
+                        )
+                      : _buildMenuItem(
+                          icon: Icons.push_pin_outlined,
+                          label: S.of(context)?.pin ?? 'Pin',
+                          onTap: () {
+                            onDismiss();
+                            onPin?.call();
+                          },
+                        ),
+                if (canPin) const SizedBox(width: 20),
                 _buildMenuItem(
                   icon: Icons.notifications_outlined,
                   label: S.of(context)?.remind ?? 'Remind',
@@ -614,6 +656,7 @@ class MessageMenuHelper {
     VoidCallback? onDelete,
     VoidCallback? onResend,
     VoidCallback? onSave,
+    VoidCallback? onTranslate,
     void Function(String emoji)? onReaction,
     bool isFavorited = false,
   }) {
@@ -649,6 +692,7 @@ class MessageMenuHelper {
         onDelete: onDelete,
         onResend: onResend,
         onSave: onSave,
+        onTranslate: onTranslate,
         onReaction: onReaction,
       ),
     );

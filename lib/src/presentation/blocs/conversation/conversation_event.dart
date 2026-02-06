@@ -129,3 +129,22 @@ class ConversationsUpdated extends ConversationEvent {
   List<Object?> get props => [conversations];
 }
 
+/// 设置会话隐藏状态
+class SetConversationHidden extends ConversationEvent {
+  final String conversationId;
+  final bool hidden;
+
+  const SetConversationHidden({
+    required this.conversationId,
+    required this.hidden,
+  });
+
+  @override
+  List<Object?> get props => [conversationId, hidden];
+}
+
+/// 加载隐藏的会话列表
+class LoadHiddenConversations extends ConversationEvent {
+  const LoadHiddenConversations();
+}
+

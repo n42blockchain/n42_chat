@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 
 import '../services/giphy_service.dart';
 import '../services/remark_service.dart';
+import '../services/translation_service.dart';
 import '../../data/datasources/local/secure_storage_datasource.dart';
 import '../../data/datasources/matrix/matrix_auth_datasource.dart';
 import '../../data/datasources/matrix/matrix_client_manager.dart';
@@ -14,10 +15,12 @@ import '../../data/datasources/matrix/matrix_reaction_datasource.dart';
 import '../../data/datasources/matrix/matrix_search_datasource.dart';
 import '../../data/datasources/matrix/matrix_moment_datasource.dart';
 import '../../data/datasources/matrix/matrix_sticker_datasource.dart';
+import '../../data/datasources/matrix/matrix_story_datasource.dart';
 import '../services/voice_service.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/moment_repository_impl.dart';
 import '../../data/repositories/sticker_repository_impl.dart';
+import '../../data/repositories/story_repository_impl.dart';
 import '../../data/repositories/contact_repository_impl.dart';
 import '../../data/repositories/conversation_repository_impl.dart';
 import '../../data/repositories/group_repository_impl.dart';
@@ -35,6 +38,7 @@ import '../../domain/repositories/search_repository.dart';
 import '../../domain/repositories/transfer_repository.dart';
 import '../../domain/repositories/moment_repository.dart';
 import '../../domain/repositories/sticker_repository.dart';
+import '../../domain/repositories/story_repository.dart';
 import '../../integration/wallet_bridge.dart';
 import '../../n42_chat_config.dart';
 import '../../presentation/blocs/auth/auth_bloc.dart';
@@ -46,6 +50,7 @@ import '../../presentation/blocs/message_action/message_action_bloc.dart';
 import '../../presentation/blocs/search/search_bloc.dart';
 import '../../presentation/blocs/transfer/transfer_bloc.dart';
 import '../../presentation/blocs/moment/moment_bloc.dart';
+import '../../presentation/blocs/story/story_bloc.dart';
 
 /// 全局GetIt实例
 final GetIt getIt = GetIt.instance;
@@ -128,6 +133,14 @@ Future<void> _registerServices() async {
       ),
     );
   }
+
+  // 翻译服务
+  getIt.registerLazySingleton<ITranslationService>(
+    () => GoogleTranslationService(
+      apiKey: config.googleTranslateApiKey,
+      storageDataSource: getIt<SecureStorageDataSource>(),
+    ),
+  );
 }
 
 /// 注册数据源
@@ -182,6 +195,11 @@ Future<void> _registerDataSources() async {
   // Matrix贴纸数据源
   getIt.registerLazySingleton<MatrixStickerDataSource>(
     () => MatrixStickerDataSource(getIt<MatrixClientManager>()),
+  );
+
+  // Matrix Story 数据源
+  getIt.registerLazySingleton<MatrixStoryDataSource>(
+    () => MatrixStoryDataSource(getIt<MatrixClientManager>()),
   );
 }
 
@@ -267,6 +285,14 @@ void _registerRepositories() {
       getIt<MatrixStickerDataSource>(),
     ),
   );
+
+  // Story 仓库
+  getIt.registerLazySingleton<IStoryRepository>(
+    () => StoryRepositoryImpl(
+      getIt<MatrixStoryDataSource>(),
+      getIt<SecureStorageDataSource>(),
+    ),
+  );
 }
 
 /// 注册用例
@@ -285,6 +311,7 @@ void _registerBlocs() {
   getIt.registerFactory<ConversationBloc>(
     () => ConversationBloc(
       conversationRepository: getIt<IConversationRepository>(),
+      storageDataSource: getIt<SecureStorageDataSource>(),
     ),
   );
 
@@ -293,6 +320,8 @@ void _registerBlocs() {
     () => ChatBloc(
       messageRepository: getIt<IMessageRepository>(),
       secureStorage: getIt<SecureStorageDataSource>(),
+      groupRepository: getIt<IGroupRepository>(),
+      translationService: getIt<ITranslationService>(),
     ),
   );
 
@@ -327,6 +356,11 @@ void _registerBlocs() {
   // 动态BLoC
   getIt.registerFactory<MomentBloc>(
     () => MomentBloc(getIt<IMomentRepository>()),
+  );
+
+  // Story BLoC
+  getIt.registerFactory<StoryBloc>(
+    () => StoryBloc(getIt<IStoryRepository>()),
   );
 }
 

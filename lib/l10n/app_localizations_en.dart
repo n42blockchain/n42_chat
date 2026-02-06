@@ -4430,4 +4430,163 @@ class SEn extends S {
 
   @override
   String get enterPokeSuffixHint => 'Enter poke suffix, e.g.: on the shoulder';
+
+  @override
+  String get groupAlbum => 'Group Album';
+
+  @override
+  String get groupFiles => 'Group Files';
+
+  @override
+  String get images => 'Images';
+
+  @override
+  String get videos => 'Videos';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get size => 'Size';
+
+  @override
+  String get noMedia => 'No Media';
+
+  @override
+  String get noMediaDescription => 'No photos or videos in this group yet';
+
+  @override
+  String get documents => 'Docs';
+
+  @override
+  String get noFiles => 'No Files';
+
+  @override
+  String get noFilesDescription => 'No files in this group yet';
+
+  @override
+  String downloadStarted(String filename) {
+    return 'Downloading $filename...';
+  }
+
+  @override
+  String get noCommonGroups => 'No common groups';
+
+  @override
+  String get noCommonGroupsDescription =>
+      'You don\'t have any groups in common';
+
+  @override
+  String get pinMessage => 'Pin';
+
+  @override
+  String get unpinMessage => 'Unpin';
+
+  @override
+  String get voiceMessage => 'Voice';
+
+  @override
+  String get message => 'Message';
+
+  @override
+  String get hideChat => 'Hide';
+
+  @override
+  String get unhideChat => 'Unhide';
+
+  @override
+  String get hiddenChats => 'Hidden Chats';
+
+  @override
+  String get noHiddenChats => 'No hidden chats';
+
+  @override
+  String get noHiddenChatsDescription => 'Chats you hide will appear here';
+
+  @override
+  String get quickReply => 'Quick Reply';
+
+  @override
+  String get manageQuickReplies => 'Manage Quick Replies';
+
+  @override
+  String get addQuickReply => 'Add Quick Reply';
+
+  @override
+  String get editQuickReply => 'Edit Quick Reply';
+
+  @override
+  String get deleteQuickReply => 'Delete Quick Reply';
+
+  @override
+  String get noQuickReplies => 'No quick replies';
+
+  @override
+  String get defaultQuickReplies => 'Default quick replies will be shown';
+
+  @override
+  String get translate => 'Translate';
+
+  @override
+  String get translating => 'Translating...';
+
+  @override
+  String get translationFailed => 'Translation failed';
+
+  @override
+  String translatedFrom(String language) {
+    return 'Translated from $language';
+  }
+
+  @override
+  String get showOriginal => 'Show original';
+
+  @override
+  String get hideTranslation => 'Hide translation';
+
+  @override
+  String get translation => 'Translation';
+
+  @override
+  String get story => 'Story';
+
+  @override
+  String get myStory => 'My Story';
+
+  @override
+  String get addToStory => 'Add to Story';
+
+  @override
+  String get storyExpired => 'Story expired';
+
+  @override
+  String storyExpiresIn(String time) {
+    return 'Expires in $time';
+  }
+
+  @override
+  String get viewers => 'Viewers';
+
+  @override
+  String get noViewers => 'No viewers yet';
+
+  @override
+  String viewersCount(int count) {
+    return '$count viewers';
+  }
+
+  @override
+  String get replyToStory => 'Reply to story...';
+
+  @override
+  String get createStory => 'Create Story';
+
+  @override
+  String get storySettings => 'Story Settings';
+
+  @override
+  String get whoCanSeeMyStory => 'Who can see my story';
+
+  @override
+  String get storyPrivacy => 'Story Privacy';
 }

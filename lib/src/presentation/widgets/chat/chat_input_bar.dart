@@ -42,6 +42,9 @@ class ChatInputBar extends StatefulWidget {
   /// 更多按钮点击回调
   final VoidCallback? onMorePressed;
 
+  /// 快捷回复按钮点击回调
+  final VoidCallback? onQuickReplyPressed;
+
   /// 输入变化回调
   final ValueChanged<String>? onChanged;
 
@@ -59,6 +62,9 @@ class ChatInputBar extends StatefulWidget {
 
   /// 是否显示更多按钮
   final bool showMoreButton;
+
+  /// 是否显示快捷回复按钮
+  final bool showQuickReplyButton;
 
   /// 是否禁用
   final bool enabled;
@@ -80,12 +86,14 @@ class ChatInputBar extends StatefulWidget {
     this.onVoicePressed,
     this.onEmojiPressed,
     this.onMorePressed,
+    this.onQuickReplyPressed,
     this.onChanged,
     this.onFocusChanged,
     this.hintText,
     this.showVoiceButton = true,
     this.showEmojiButton = true,
     this.showMoreButton = true,
+    this.showQuickReplyButton = true,
     this.enabled = true,
     this.maxLines = 5,
     this.controller,
@@ -340,6 +348,14 @@ class ChatInputBarState extends State<ChatInputBar> {
                     ? _buildVoiceButton(isDark)
                     : _buildTextField(isDark),
               ),
+
+              // 快捷回复按钮
+              if (widget.showQuickReplyButton)
+                _buildIconButton(
+                  icon: Icons.flash_on_outlined,
+                  onPressed: widget.onQuickReplyPressed,
+                  isDark: isDark,
+                ),
 
               // 表情按钮
               if (widget.showEmojiButton)

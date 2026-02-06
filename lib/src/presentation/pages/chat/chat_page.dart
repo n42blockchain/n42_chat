@@ -1084,6 +1084,9 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 ),
 
+              // 置顶消息横幅
+              _buildPinnedMessageBanner(),
+
               // 消息列表
               Expanded(
                 child: Stack(
@@ -2693,22 +2696,189 @@ Avatar: ${contactAvatar ?? ''}''';
   }
 
   void _navigateToMessage(String eventId) {
+    _scrollToMessage(eventId);
+  }
+
+  /// 滚动到指定消息并高亮显示
+  void _scrollToMessage(String eventId) async {
+    // 先检查消息是否在当前视图中
+    final messageKey = _messageKeys[eventId];
+    if (messageKey?.currentContext != null) {
+      // 消息已加载，使用 Scrollable.ensureVisible 精确滚动
+      await Scrollable.ensureVisible(
+        messageKey!.currentContext!,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+        alignment: 0.5, // 滚动到屏幕中间
+      );
+      _highlightMessage(eventId);
+    } else {
+      // 消息可能还没加载，尝试使用索引估算滚动
+      final chatBloc = context.read<ChatBloc>();
+      final state = chatBloc.state;
+      final index = state.messages.indexWhere((m) => m.id == eventId);
+
+      if (index != -1) {
+        // 使用估算位置滚动
+        _scrollController.animateTo(
+          index * 80.0, // 估算每条消息高度
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+        // 滚动后延迟设置高亮
+        Future.delayed(const Duration(milliseconds: 350), () {
+          if (mounted) {
+            _highlightMessage(eventId);
+          }
+        });
+      }
+    }
+  }
+
+  /// 高亮显示指定消息（2秒后自动取消）
+  void _highlightMessage(String eventId) {
     setState(() {
       _highlightedMessageId = eventId;
     });
+    // 2秒后自动取消高亮
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted && _highlightedMessageId == eventId) {
+        setState(() {
+          _highlightedMessageId = null;
+        });
+      }
+    });
+  }
 
-    // 滚动到指定消息
-    final chatBloc = context.read<ChatBloc>();
-    final state = chatBloc.state;
-    final index = state.messages.indexWhere((m) => m.id == eventId);
+  /// 构建置顶消息横幅
+  Widget _buildPinnedMessageBanner() {
+    return BlocBuilder<ChatBloc, ChatState>(
+      buildWhen: (prev, curr) =>
+          prev.pinnedMessages != curr.pinnedMessages ||
+          prev.currentPinnedIndex != curr.currentPinnedIndex,
+      builder: (context, state) {
+        if (state.pinnedMessages.isEmpty) {
+          return const SizedBox.shrink();
+        }
 
-    if (index != -1) {
-      // 使用 jumpTo 滚动到消息位置
-      _scrollController.animateTo(
-        index * 80.0, // 估算每条消息高度
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+        final msg = state.currentPinnedMessage;
+        if (msg == null) return const SizedBox.shrink();
+
+        final isDark = context.isDarkMode;
+        final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+        final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+        final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+
+        return GestureDetector(
+          onTap: () => _scrollToMessage(msg.id),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: bgColor,
+              border: Border(
+                bottom: BorderSide(
+                  color: isDark ? AppColors.dividerDark : AppColors.divider,
+                  width: 0.5,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                // 置顶图标
+                Icon(
+                  Icons.push_pin,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: 8),
+                // 消息内容预览
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        msg.senderName,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      Text(
+                        _getPinnedMessagePreview(msg),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: textColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // 多条置顶时显示计数和导航
+                if (state.pinnedMessages.length > 1) ...[
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      context.read<ChatBloc>().add(const NavigatePinnedMessage(1));
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${state.currentPinnedIndex + 1}/${state.pinnedMessages.length}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                // 关闭按钮（如果有权限可以取消置顶）
+                if (state.canPinMessages)
+                  IconButton(
+                    icon: Icon(Icons.close, size: 16, color: secondaryTextColor),
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      context.read<ChatBloc>().add(UnpinMessage(msg.id));
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// 获取置顶消息预览文本
+  String _getPinnedMessagePreview(MessageEntity msg) {
+    switch (msg.type) {
+      case MessageType.text:
+        return msg.content;
+      case MessageType.image:
+        return '[${S.of(context)?.image ?? 'Image'}]';
+      case MessageType.video:
+        return '[${S.of(context)?.videoTitle ?? 'Video'}]';
+      case MessageType.audio:
+        return '[${S.of(context)?.voiceMessage ?? 'Voice'}]';
+      case MessageType.file:
+        return '[${S.of(context)?.file ?? 'File'}] ${msg.metadata?.fileName ?? ''}';
+      case MessageType.location:
+        return '[${S.of(context)?.location ?? 'Location'}]';
+      default:
+        return msg.content.isNotEmpty ? msg.content : '[${S.of(context)?.message ?? 'Message'}]';
     }
   }
 
@@ -2835,6 +3005,7 @@ Avatar: ${contactAvatar ?? ''}''';
                           onEndPoll: (pollEventId) => _onEndPoll(pollEventId),
                           onRedPacketTap: _onRedPacketTap,
                           onContactCardTap: _onContactCardTap,
+                          onReplyQuoteTap: _scrollToMessage,
                         ),
                       ),
               ],
@@ -3456,12 +3627,19 @@ Avatar: ${contactAvatar ?? ''}''';
     final overlay = Overlay.of(context);
     late OverlayEntry overlayEntry;
     
+    // 获取置顶状态
+    final chatState = context.read<ChatBloc>().state;
+    final isPinned = chatState.pinnedMessages.any((m) => m.id == message.id);
+    final canPin = chatState.canPinMessages;
+
     overlayEntry = OverlayEntry(
       builder: (ctx) => WeChatMessageMenu(
         message: message,
         position: position,
         messageSize: size,
         isFavorited: _favoritedMessageIds.contains(message.id),
+        isPinned: isPinned,
+        canPin: canPin,
         onDismiss: () {
           debugPrint('Menu dismissed');
           overlayEntry.remove();
@@ -3516,6 +3694,14 @@ Avatar: ${contactAvatar ?? ''}''';
         onReaction: (emoji) {
           debugPrint('Reaction clicked: $emoji');
           _addReaction(message, emoji);
+        },
+        onPin: () {
+          debugPrint('Pin clicked');
+          context.read<ChatBloc>().add(PinMessage(message.id));
+        },
+        onUnpin: () {
+          debugPrint('Unpin clicked');
+          context.read<ChatBloc>().add(UnpinMessage(message.id));
         },
       ),
     );

@@ -526,3 +526,90 @@ class SendStickerMessage extends ChatEvent {
   @override
   List<Object?> get props => [stickerId, packId, url, httpUrl, name, emoji, width, height, mimeType, size];
 }
+
+// ============================================
+// 置顶消息事件
+// ============================================
+
+/// 加载置顶消息
+class LoadPinnedMessages extends ChatEvent {
+  const LoadPinnedMessages();
+}
+
+/// 置顶消息
+class PinMessage extends ChatEvent {
+  final String messageId;
+
+  const PinMessage(this.messageId);
+
+  @override
+  List<Object?> get props => [messageId];
+}
+
+/// 取消置顶消息
+class UnpinMessage extends ChatEvent {
+  final String messageId;
+
+  const UnpinMessage(this.messageId);
+
+  @override
+  List<Object?> get props => [messageId];
+}
+
+/// 切换到下一个/上一个置顶消息
+class NavigatePinnedMessage extends ChatEvent {
+  final int delta; // 1 = 下一个, -1 = 上一个
+
+  const NavigatePinnedMessage(this.delta);
+
+  @override
+  List<Object?> get props => [delta];
+}
+
+// ============================================
+// 消息翻译事件
+// ============================================
+
+/// 翻译消息
+class TranslateMessage extends ChatEvent {
+  final String messageId;
+  final String targetLanguage;
+
+  const TranslateMessage({
+    required this.messageId,
+    required this.targetLanguage,
+  });
+
+  @override
+  List<Object?> get props => [messageId, targetLanguage];
+}
+
+/// 翻译完成（内部事件）
+class TranslationCompleted extends ChatEvent {
+  final String messageId;
+  final String? translatedText;
+  final String? detectedSourceLanguage;
+  final bool success;
+  final String? error;
+
+  const TranslationCompleted({
+    required this.messageId,
+    this.translatedText,
+    this.detectedSourceLanguage,
+    required this.success,
+    this.error,
+  });
+
+  @override
+  List<Object?> get props => [messageId, translatedText, detectedSourceLanguage, success, error];
+}
+
+/// 清除消息翻译
+class ClearTranslation extends ChatEvent {
+  final String messageId;
+
+  const ClearTranslation(this.messageId);
+
+  @override
+  List<Object?> get props => [messageId];
+}

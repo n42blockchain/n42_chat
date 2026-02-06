@@ -23,6 +23,10 @@ class SecureStorageDataSource {
   static const String _keyHiddenMomentUsers = 'n42_chat_hidden_moment_users';
   static const String _keyBlockedMomentUsers = 'n42_chat_blocked_moment_users';
   static const String _keyMomentLastReadTime = 'n42_chat_moment_last_read_time';
+  static const String _keyHiddenChats = 'n42_chat_hidden_chats';
+  static const String _keyQuickReplies = 'n42_chat_quick_replies';
+  static const String _keyTranslationCache = 'n42_chat_translation_cache';
+  static const String _keyTranslationSettings = 'n42_chat_translation_settings';
 
   final FlutterSecureStorage _storage;
 
@@ -762,13 +766,13 @@ class SecureStorageDataSource {
   /// 检查是否应该显示已读回执
   Future<bool> shouldShowReadReceipts() async {
     final settings = await getPrivacySettings();
-    return settings?['showReadReceipts'] ?? true;
+    return (settings?['showReadReceipts'] as bool?) ?? true;
   }
 
   /// 检查是否应该显示输入状态
   Future<bool> shouldShowTypingIndicator() async {
     final settings = await getPrivacySettings();
-    return settings?['showTypingIndicator'] ?? true;
+    return (settings?['showTypingIndicator'] as bool?) ?? true;
   }
 
   /// 更新单个隐私设置项
@@ -1036,6 +1040,226 @@ class SecureStorageDataSource {
     } catch (e) {
       debugPrint('SecureStorage: Failed to read moment last read time - $e');
       return null;
+    }
+  }
+
+  // ============================================
+  // 隐藏聊天管理
+  // ============================================
+
+  /// 获取隐藏的聊天 ID 集合
+  Future<Set<String>> getHiddenChatIds() async {
+    try {
+      final data = await _storage.read(key: _keyHiddenChats);
+      if (data == null) return {};
+      return (jsonDecode(data) as List).cast<String>().toSet();
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read hidden chats - $e');
+      return {};
+    }
+  }
+
+  /// 隐藏聊天
+  Future<void> hideChat(String roomId) async {
+    try {
+      final ids = await getHiddenChatIds();
+      ids.add(roomId);
+      await _storage.write(
+        key: _keyHiddenChats,
+        value: jsonEncode(ids.toList()),
+      );
+      debugPrint('SecureStorage: Chat hidden - $roomId');
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to hide chat - $e');
+    }
+  }
+
+  /// 取消隐藏聊天
+  Future<void> unhideChat(String roomId) async {
+    try {
+      final ids = await getHiddenChatIds();
+      ids.remove(roomId);
+      await _storage.write(
+        key: _keyHiddenChats,
+        value: jsonEncode(ids.toList()),
+      );
+      debugPrint('SecureStorage: Chat unhidden - $roomId');
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to unhide chat - $e');
+    }
+  }
+
+  /// 检查聊天是否被隐藏
+  Future<bool> isChatHidden(String roomId) async {
+    final ids = await getHiddenChatIds();
+    return ids.contains(roomId);
+  }
+
+  // ============================================
+  // 快捷回复模板管理
+  // ============================================
+
+  /// 获取快捷回复模板列表
+  Future<List<Map<String, dynamic>>> getQuickReplies() async {
+    try {
+      final data = await _storage.read(key: _keyQuickReplies);
+      if (data == null) {
+        // 返回默认模板
+        return _getDefaultQuickReplies();
+      }
+      return (jsonDecode(data) as List).cast<Map<String, dynamic>>();
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read quick replies - $e');
+      return _getDefaultQuickReplies();
+    }
+  }
+
+  List<Map<String, dynamic>> _getDefaultQuickReplies() {
+    const defaults = ['好的', '收到', '稍等', '在忙，稍后回复', '谢谢', '没问题'];
+    return defaults.asMap().entries.map((e) => {
+      'id': 'default_${e.key}',
+      'content': e.value,
+      'order': e.key,
+      'isSystem': true,
+    }).toList();
+  }
+
+  /// 保存快捷回复模板列表
+  Future<void> saveQuickReplies(List<Map<String, dynamic>> replies) async {
+    try {
+      await _storage.write(
+        key: _keyQuickReplies,
+        value: jsonEncode(replies),
+      );
+      debugPrint('SecureStorage: Quick replies saved');
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to save quick replies - $e');
+    }
+  }
+
+  /// 添加快捷回复模板
+  Future<void> addQuickReply(String content) async {
+    try {
+      final replies = await getQuickReplies();
+      final newReply = {
+        'id': 'custom_${DateTime.now().millisecondsSinceEpoch}',
+        'content': content,
+        'order': replies.length,
+        'isSystem': false,
+      };
+      replies.add(newReply);
+      await saveQuickReplies(replies);
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to add quick reply - $e');
+    }
+  }
+
+  /// 删除快捷回复模板
+  Future<void> removeQuickReply(String id) async {
+    try {
+      final replies = await getQuickReplies();
+      replies.removeWhere((r) => r['id'] == id);
+      await saveQuickReplies(replies);
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to remove quick reply - $e');
+    }
+  }
+
+  /// 更新快捷回复使用时间
+  Future<void> updateQuickReplyLastUsed(String id) async {
+    try {
+      final replies = await getQuickReplies();
+      final index = replies.indexWhere((r) => r['id'] == id);
+      if (index != -1) {
+        replies[index]['lastUsed'] = DateTime.now().toIso8601String();
+        await saveQuickReplies(replies);
+      }
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to update quick reply last used - $e');
+    }
+  }
+
+  // ============================================
+  // 翻译缓存管理
+  // ============================================
+
+  /// 获取翻译缓存
+  Future<String?> getTranslationCache(String messageId, String targetLanguage) async {
+    try {
+      final data = await _storage.read(key: _keyTranslationCache);
+      if (data == null) return null;
+
+      final cache = jsonDecode(data) as Map<String, dynamic>;
+      final key = '${messageId}_$targetLanguage';
+      return cache[key] as String?;
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read translation cache - $e');
+      return null;
+    }
+  }
+
+  /// 保存翻译缓存
+  Future<void> saveTranslationCache(String messageId, String targetLanguage, String translation) async {
+    try {
+      final data = await _storage.read(key: _keyTranslationCache);
+      Map<String, dynamic> cache = {};
+      if (data != null) {
+        cache = jsonDecode(data) as Map<String, dynamic>;
+      }
+
+      final key = '${messageId}_$targetLanguage';
+      cache[key] = translation;
+
+      // 限制缓存大小，最多保存 500 条
+      if (cache.length > 500) {
+        final keys = cache.keys.toList();
+        for (var i = 0; i < 100; i++) {
+          cache.remove(keys[i]);
+        }
+      }
+
+      await _storage.write(
+        key: _keyTranslationCache,
+        value: jsonEncode(cache),
+      );
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to save translation cache - $e');
+    }
+  }
+
+  /// 获取翻译设置
+  Future<Map<String, dynamic>?> getTranslationSettings() async {
+    try {
+      final data = await _storage.read(key: _keyTranslationSettings);
+      if (data == null) return null;
+      return jsonDecode(data) as Map<String, dynamic>;
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read translation settings - $e');
+      return null;
+    }
+  }
+
+  /// 保存翻译设置
+  Future<void> saveTranslationSettings({
+    String? defaultTargetLanguage,
+    bool? autoTranslate,
+  }) async {
+    try {
+      final current = await getTranslationSettings() ?? {};
+      if (defaultTargetLanguage != null) {
+        current['defaultTargetLanguage'] = defaultTargetLanguage;
+      }
+      if (autoTranslate != null) {
+        current['autoTranslate'] = autoTranslate;
+      }
+      current['updatedAt'] = DateTime.now().toIso8601String();
+
+      await _storage.write(
+        key: _keyTranslationSettings,
+        value: jsonEncode(current),
+      );
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to save translation settings - $e');
     }
   }
 

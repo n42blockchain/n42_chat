@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_profile_entity.dart';
+import '../../blocs/conversation/conversation_bloc.dart';
+import '../../blocs/conversation/conversation_event.dart';
 import '../../widgets/common/common_widgets.dart';
+import 'hidden_chats_page.dart';
 
 /// 隐私设置页面
 class PrivacySettingsPage extends StatefulWidget {
   final PrivacySettings settings;
   final void Function(PrivacySettings)? onSave;
+  final void Function(dynamic conversation)? onConversationTap;
 
   const PrivacySettingsPage({
     super.key,
     required this.settings,
     this.onSave,
+    this.onConversationTap,
   });
 
   @override
@@ -87,6 +94,25 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   (value) => _updateSettings(
                     _settings.copyWith(lastSeenVisibility: value),
                   ),
+                  isDark,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // 隐藏聊天入口
+          _buildSectionHeader(l10n?.chat ?? 'Chat', isDark),
+          Container(
+            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            child: Column(
+              children: [
+                _buildNavigationItem(
+                  context,
+                  l10n?.hiddenChats ?? 'Hidden Chats',
+                  Icons.visibility_off_outlined,
+                  () => _navigateToHiddenChats(context),
                   isDark,
                 ),
               ],
@@ -285,6 +311,66 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
       case VisibilityLevel.nobody:
         return l10n?.nobody ?? 'Nobody';
     }
+  }
+
+  Widget _buildNavigationItem(
+    BuildContext context,
+    String title,
+    IconData icon,
+    VoidCallback onTap,
+    bool isDark,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(icon, color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToHiddenChats(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider(
+          create: (_) => getIt<ConversationBloc>()
+            ..add(const LoadHiddenConversations()),
+          child: HiddenChatsPage(
+            onConversationTap: widget.onConversationTap != null
+                ? (conversation) => widget.onConversationTap!(conversation)
+                : null,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _showVisibilityPicker(

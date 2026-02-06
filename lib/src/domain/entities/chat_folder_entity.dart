@@ -228,8 +228,8 @@ class ChatFolderEntity extends Equatable {
       icon: json['icon'] as String?,
       color: json['color'] as String?,
       order: json['order'] as int? ?? 0,
-      includedRoomIds: List<String>.from(json['includedRoomIds'] ?? []),
-      excludedRoomIds: List<String>.from(json['excludedRoomIds'] ?? []),
+      includedRoomIds: List<String>.from((json['includedRoomIds'] as List?) ?? []),
+      excludedRoomIds: List<String>.from((json['excludedRoomIds'] as List?) ?? []),
       filter: json['filter'] != null
           ? ChatFolderFilter.fromJson(json['filter'] as Map<String, dynamic>)
           : const ChatFolderFilter(),

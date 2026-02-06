@@ -37,6 +37,12 @@ class ConversationState extends Equatable {
   /// 新创建的会话ID（用于导航）
   final String? newConversationId;
 
+  /// 隐藏的会话列表
+  final List<ConversationEntity> hiddenConversations;
+
+  /// 是否正在加载隐藏会话
+  final bool isLoadingHidden;
+
   const ConversationState({
     this.conversations = const [],
     this.filteredConversations,
@@ -49,6 +55,8 @@ class ConversationState extends Equatable {
     this.error,
     this.totalUnreadCount = 0,
     this.newConversationId,
+    this.hiddenConversations = const [],
+    this.isLoadingHidden = false,
   });
 
   /// 初始状态
@@ -87,6 +95,8 @@ class ConversationState extends Equatable {
     String? error,
     int? totalUnreadCount,
     String? newConversationId,
+    List<ConversationEntity>? hiddenConversations,
+    bool? isLoadingHidden,
     bool clearFilteredConversations = false,
     bool clearError = false,
     bool clearNewConversationId = false,
@@ -107,6 +117,8 @@ class ConversationState extends Equatable {
       newConversationId: clearNewConversationId
           ? null
           : (newConversationId ?? this.newConversationId),
+      hiddenConversations: hiddenConversations ?? this.hiddenConversations,
+      isLoadingHidden: isLoadingHidden ?? this.isLoadingHidden,
     );
   }
 
@@ -123,6 +135,8 @@ class ConversationState extends Equatable {
         error,
         totalUnreadCount,
         newConversationId,
+        hiddenConversations,
+        isLoadingHidden,
       ];
 }
 
