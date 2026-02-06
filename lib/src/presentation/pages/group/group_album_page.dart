@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/group_album_entity.dart';
-import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/group_album/group_album_bloc.dart';
 import '../../blocs/group_album/group_album_event.dart';
 import '../../blocs/group_album/group_album_state.dart';
@@ -27,9 +25,8 @@ class GroupAlbumPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => GroupAlbumBloc(
-        messageRepository: getIt<IMessageRepository>(),
-      )..add(LoadGroupAlbum(roomId: roomId)),
+      create: (_) => GroupAlbumBloc()
+        ..add(LoadGroupAlbum(roomId: roomId)),
       child: _GroupAlbumView(groupName: groupName),
     );
   }

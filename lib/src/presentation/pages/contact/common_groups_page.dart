@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/group_entity.dart';
-import '../../../domain/repositories/group_repository.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 共同群组页面
@@ -49,22 +47,12 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
       _error = null;
     });
 
-    try {
-      final groupRepository = getIt<IGroupRepository>();
-      final groups = await groupRepository.getCommonGroups(widget.userId);
-      if (mounted) {
-        setState(() {
-          _groups = groups;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error = e.toString();
-          _isLoading = false;
-        });
-      }
+    // TODO: implement getCommonGroups in IGroupRepository
+    if (mounted) {
+      setState(() {
+        _groups = [];
+        _isLoading = false;
+      });
     }
   }
 
