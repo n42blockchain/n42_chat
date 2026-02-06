@@ -112,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first'),
+          content: Text(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -147,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
-          S.of(context)?.login ?? 'Log In',
+          S.of(context)?.authLogin ?? 'Log In',
           style: TextStyle(
             color: textColor,
             fontSize: 17,
@@ -161,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
           if (state.hasError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? S.of(context)?.loginFailed('') ?? 'Login failed'),
+                content: Text(state.errorMessage ?? S.of(context)?.authLoginFailed('') ?? 'Login failed'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -264,7 +264,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         const SizedBox(height: 4),
         Text(
-          S.of(context)?.secureDecentralizedChat ?? 'Secure, decentralized instant messaging',
+          S.of(context)?.authSecureDecentralizedChat ?? 'Secure, decentralized instant messaging',
           style: TextStyle(
             fontSize: 14,
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -305,7 +305,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             Text(
-              S.of(context)?.secureDecentralizedChat ?? 'Secure, decentralized messaging',
+              S.of(context)?.authSecureDecentralizedChat ?? 'Secure, decentralized messaging',
               style: TextStyle(
                 fontSize: 12,
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -383,7 +383,7 @@ class _LoginPageState extends State<LoginPage> {
             );
           },
           child: Text(
-            S.of(context)?.registerAccount ?? 'Sign Up',
+            S.of(context)?.authRegisterAccount ?? 'Sign Up',
             style: const TextStyle(
               fontSize: 14,
               color: AppColors.textLink,
@@ -397,7 +397,7 @@ class _LoginPageState extends State<LoginPage> {
         TextButton(
           onPressed: _showForgotPasswordHelp,
           child: Text(
-            S.of(context)?.forgotPassword ?? 'Forgot Password',
+            S.of(context)?.authForgotPassword ?? 'Forgot Password',
             style: const TextStyle(
               fontSize: 14,
               color: AppColors.textLink,
@@ -418,7 +418,7 @@ class _LoginPageState extends State<LoginPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.serverAddress ?? 'Server Address',
+          S.of(context)?.authServerAddress ?? 'Server Address',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -429,7 +429,7 @@ class _LoginPageState extends State<LoginPage> {
           controller: _homeserverController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.serverAddressHint ?? 'https://m.si46.world',
+            hintText: S.of(context)?.authServerAddressHint ?? 'https://m.si46.world',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -466,10 +466,10 @@ class _LoginPageState extends State<LoginPage> {
           onEditingComplete: _checkHomeserver,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.enterServerAddress ?? 'Please enter server address';
+              return S.of(context)?.authEnterServerAddress ?? 'Please enter server address';
             }
             if (!value.startsWith('http://') && !value.startsWith('https://')) {
-              return S.of(context)?.enterValidServerAddress ?? 'Please enter a valid server address';
+              return S.of(context)?.authEnterValidServerAddress ?? 'Please enter a valid server address';
             }
             return null;
           },
@@ -477,7 +477,7 @@ class _LoginPageState extends State<LoginPage> {
         if (state.isHomeserverValid && state.homeserverInfo != null) ...[
           const SizedBox(height: 4),
           Text(
-            '✓ ${S.of(context)?.connectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
+            '✓ ${S.of(context)?.authConnectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.success,
@@ -498,7 +498,7 @@ class _LoginPageState extends State<LoginPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.username ?? 'Username',
+          S.of(context)?.authUsername ?? 'Username',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -509,7 +509,7 @@ class _LoginPageState extends State<LoginPage> {
           controller: _usernameController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterUsername ?? 'Enter username',
+            hintText: S.of(context)?.authEnterUsername ?? 'Enter username',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -529,7 +529,7 @@ class _LoginPageState extends State<LoginPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.enterUsername ?? 'Please enter username';
+              return S.of(context)?.authEnterUsername ?? 'Please enter username';
             }
             return null;
           },
@@ -548,7 +548,7 @@ class _LoginPageState extends State<LoginPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.password ?? 'Password',
+          S.of(context)?.authPassword ?? 'Password',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -559,7 +559,7 @@ class _LoginPageState extends State<LoginPage> {
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterPassword ?? 'Enter password',
+            hintText: S.of(context)?.authEnterPassword ?? 'Enter password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -592,7 +592,7 @@ class _LoginPageState extends State<LoginPage> {
           onFieldSubmitted: (_) => _onLogin(),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.enterPassword ?? 'Please enter password';
+              return S.of(context)?.authEnterPassword ?? 'Please enter password';
             }
             return null;
           },
@@ -628,7 +628,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               )
             : Text(
-                S.of(context)?.login ?? 'Log In',
+                S.of(context)?.authLogin ?? 'Log In',
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
@@ -658,7 +658,7 @@ class _LoginPageState extends State<LoginPage> {
                 );
               },
               child: Text(
-                S.of(context)?.registerAccount ?? 'Sign Up',
+                S.of(context)?.authRegisterAccount ?? 'Sign Up',
                 style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textLink,
@@ -676,7 +676,7 @@ class _LoginPageState extends State<LoginPage> {
                 _showForgotPasswordHelp();
               },
               child: Text(
-                S.of(context)?.forgotPassword ?? 'Forgot Password',
+                S.of(context)?.authForgotPassword ?? 'Forgot Password',
                 style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textLink,
@@ -710,7 +710,7 @@ class _LoginPageState extends State<LoginPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            S.of(context)?.otherLoginMethods ?? 'Other login methods',
+            S.of(context)?.authOtherLoginMethods ?? 'Other login methods',
             style: TextStyle(
               fontSize: 12,
               color: textColor,
@@ -737,13 +737,13 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             _buildLoginMethodButton(
               icon: Icons.fingerprint,
-              label: S.of(context)?.passkeyLabel ?? 'Passkey',
+              label: S.of(context)?.authPasskeyLabel ?? 'Passkey',
               onTap: _loginWithPasskey,
             ),
             const SizedBox(width: 32),
             _buildLoginMethodButton(
               icon: Icons.email_outlined,
-              label: S.of(context)?.emailOtp ?? 'Email OTP',
+              label: S.of(context)?.authEmailOtp ?? 'Email OTP',
               onTap: _loginWithEmailOtp,
             ),
           ],
@@ -759,7 +759,7 @@ class _LoginPageState extends State<LoginPage> {
               iconPath: null,
               icon: Icons.g_mobiledata,
               color: const Color(0xFFDB4437),
-              label: S.of(context)?.googleLabel ?? 'Google',
+              label: S.of(context)?.authGoogleLabel ?? 'Google',
               onTap: _loginWithGoogle,
             ),
             const SizedBox(width: 24),
@@ -770,7 +770,7 @@ class _LoginPageState extends State<LoginPage> {
                 color: context.isDarkMode
                     ? Colors.white
                     : Colors.black,
-                label: S.of(context)?.appleLabel ?? 'Apple',
+                label: S.of(context)?.authAppleLabel ?? 'Apple',
                 onTap: _loginWithApple,
               ),
             if (!kIsWeb && (Platform.isIOS || Platform.isMacOS))
@@ -779,7 +779,7 @@ class _LoginPageState extends State<LoginPage> {
               iconPath: null,
               icon: Icons.login,
               color: AppColors.primary,
-              label: S.of(context)?.ssoLabel ?? 'SSO',
+              label: S.of(context)?.authSsoLabel ?? 'SSO',
               onTap: _loginWithSso,
             ),
           ],
@@ -805,7 +805,7 @@ class _LoginPageState extends State<LoginPage> {
       onPressed: _loginWithBiometric,
       icon: Icon(biometricIcon, size: 24),
       label: Text(
-        S.of(context)?.loginWithBiometric(_biometricTypeDescription) ??
+        S.of(context)?.authLoginWithBiometric(_biometricTypeDescription) ??
             'Login with $_biometricTypeDescription',
         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
@@ -831,7 +831,7 @@ class _LoginPageState extends State<LoginPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            S.of(context)?.or ?? 'OR',
+            S.of(context)?.authOr ?? 'OR',
             style: TextStyle(color: textColor, fontSize: 12),
           ),
         ),
@@ -874,7 +874,7 @@ class _LoginPageState extends State<LoginPage> {
             Icon(biometricIcon, color: iconColor, size: 28),
             const SizedBox(width: 12),
             Text(
-              S.of(context)?.loginWithBiometric(_biometricTypeDescription) ??
+              S.of(context)?.authLoginWithBiometric(_biometricTypeDescription) ??
                   'Login with $_biometricTypeDescription',
               style: const TextStyle(
                 fontSize: 16,
@@ -981,7 +981,7 @@ class _LoginPageState extends State<LoginPage> {
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first'),
+          content: Text(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -992,7 +992,7 @@ class _LoginPageState extends State<LoginPage> {
     // 目前显示提示
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.passkeyRequiresServer ?? 'Passkey login requires server support'),
+        content: Text(S.of(context)?.authPasskeyRequiresServer ?? 'Passkey login requires server support'),
         backgroundColor: Colors.orange,
       ),
     );
@@ -1019,7 +1019,7 @@ class _LoginPageState extends State<LoginPage> {
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first'),
+          content: Text(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -1035,7 +1035,7 @@ class _LoginPageState extends State<LoginPage> {
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first'),
+          content: Text(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -1051,7 +1051,7 @@ class _LoginPageState extends State<LoginPage> {
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first'),
+          content: Text(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -1068,21 +1068,21 @@ class _LoginPageState extends State<LoginPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Text.rich(
         TextSpan(
-          text: S.of(context)?.loginAgreement ?? 'By logging in, you agree to ',
+          text: S.of(context)?.authLoginAgreement ?? 'By logging in, you agree to ',
           style: TextStyle(
             fontSize: 12,
             color: textColor,
           ),
           children: [
             TextSpan(
-              text: S.of(context)?.termsOfService ?? 'Terms of Service',
+              text: S.of(context)?.authTermsOfService ?? 'Terms of Service',
               style: TextStyle(
                 color: AppColors.textLink.withValues(alpha: 0.8),
               ),
             ),
-            TextSpan(text: S.of(context)?.and ?? ' and '),
+            TextSpan(text: S.of(context)?.authAnd ?? ' and '),
             TextSpan(
-              text: S.of(context)?.privacyPolicy ?? 'Privacy Policy',
+              text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
               style: TextStyle(
                 color: AppColors.textLink.withValues(alpha: 0.8),
               ),

@@ -202,7 +202,7 @@ class ChatInputBarState extends State<ChatInputBar> {
           messenger.clearSnackBars();
           messenger.showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.microphonePermissionRequired ?? 'Please allow microphone permission'),
+              content: Text(S.of(context)?.commonMicrophonePermissionRequired ?? 'Please allow microphone permission'),
               backgroundColor: AppColors.error,
               duration: const Duration(seconds: 3),
               behavior: SnackBarBehavior.floating,
@@ -219,7 +219,7 @@ class ChatInputBarState extends State<ChatInputBar> {
         messenger.clearSnackBars();
         messenger.showSnackBar(
           SnackBar(
-            content: Text('${S.of(context)?.startRecordingFailed ?? 'Start recording failed'}: $e'),
+            content: Text('${S.of(context)?.commonStartRecordingFailed ?? 'Start recording failed'}: $e'),
             backgroundColor: AppColors.error,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
@@ -260,7 +260,7 @@ class ChatInputBarState extends State<ChatInputBar> {
           messenger.clearSnackBars();
           messenger.showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.recordingTooShort ?? 'Recording too short'),
+              content: Text(S.of(context)?.commonRecordingTooShort ?? 'Recording too short'),
               duration: const Duration(seconds: 1),
               behavior: SnackBarBehavior.floating,
               dismissDirection: DismissDirection.horizontal,
@@ -276,7 +276,7 @@ class ChatInputBarState extends State<ChatInputBar> {
         messenger.clearSnackBars();
         messenger.showSnackBar(
           SnackBar(
-            content: Text('${S.of(context)?.stopRecordingFailed ?? 'Stop recording failed'}: $e'),
+            content: Text('${S.of(context)?.commonStopRecordingFailed ?? 'Stop recording failed'}: $e'),
             backgroundColor: AppColors.error,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
@@ -419,7 +419,7 @@ class ChatInputBarState extends State<ChatInputBar> {
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
         decoration: InputDecoration(
-          hintText: widget.hintText ?? S.of(context)?.sendMessage ?? 'Send message',
+          hintText: widget.hintText ?? S.of(context)?.commonSendMessage ?? 'Send message',
           hintStyle: const TextStyle(
             fontSize: 16,
             color: AppColors.textTertiary,
@@ -478,8 +478,8 @@ class ChatInputBarState extends State<ChatInputBar> {
         child: Center(
           child: Text(
             _isRecording
-                ? (_cancelRecording ? (S.of(context)?.releaseToCancel ?? 'Release to cancel') : (S.of(context)?.releaseToSend ?? 'Release to send, swipe up to cancel'))
-                : (S.of(context)?.holdToTalk ?? 'Hold to talk'),
+                ? (_cancelRecording ? (S.of(context)?.chatReleaseToCancel ?? 'Release to cancel') : (S.of(context)?.chatReleaseToSend ?? 'Release to send, swipe up to cancel'))
+                : (S.of(context)?.commonHoldToTalk ?? 'Hold to talk'),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -509,7 +509,7 @@ class ChatInputBarState extends State<ChatInputBar> {
           elevation: 0,
         ),
         child: Text(
-          S.of(context)?.send ?? 'Send',
+          S.of(context)?.commonSend ?? 'Send',
           style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w500,

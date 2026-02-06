@@ -420,7 +420,7 @@ class MessageItem extends StatelessWidget {
   /// 构建名片消息（微信风格）
   Widget _buildContactCardMessage(bool isDark, BuildContext context) {
     final cardInfo = _parseContactCard(message.content);
-    final contactName = cardInfo?['name'] ?? (S.of(context)?.unknownContact ?? 'Unknown Contact');
+    final contactName = cardInfo?['name'] ?? (S.of(context)?.chatUnknownContact ?? 'Unknown Contact');
     final contactId = cardInfo?['id'] ?? '';
     final contactAvatar = cardInfo?['avatar'];
 
@@ -500,7 +500,7 @@ class MessageItem extends StatelessWidget {
                 ),
               ),
               child: Text(
-                S.of(context)?.personalCard ?? 'Contact Card',
+                S.of(context)?.chatPersonalCard ?? 'Contact Card',
                 style: TextStyle(
                   fontSize: 11,
                   color: message.isFromMe
@@ -659,7 +659,7 @@ class MessageItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      S.of(context)?.videoTitle ?? 'Video',
+                      S.of(context)?.chatVideoTitle ?? 'Video',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.6),
                         fontSize: 14,
@@ -810,7 +810,7 @@ class MessageItem extends StatelessWidget {
     if (locationName.isEmpty ||
         locationName.startsWith('geo:') ||
         locationName.contains('Location was shared')) {
-      locationName = S.of(context)?.myLocation ?? 'My Location';
+      locationName = S.of(context)?.chatMyLocation ?? 'My Location';
     }
 
     return SizedBox(
@@ -989,7 +989,7 @@ class MessageItem extends StatelessWidget {
     }
     
     return RedPacketMessageWidget(
-      note: message.content.isNotEmpty ? message.content : (S.of(context)?.defaultRedPacketGreeting ?? 'Best wishes'),
+      note: message.content.isNotEmpty ? message.content : (S.of(context)?.chatDefaultRedPacketGreeting ?? 'Best wishes'),
       status: redPacketStatus,
       isSelf: message.isFromMe,
       onTap: () => onRedPacketTap?.call(message),
@@ -998,8 +998,8 @@ class MessageItem extends StatelessWidget {
 
   Widget _buildMusicMessage(bool isDark, BuildContext context) {
     final metadata = message.metadata;
-    final title = metadata?.musicTitle ?? (S.of(context)?.unknownSong ?? 'Unknown Song');
-    final artist = metadata?.musicArtist ?? (S.of(context)?.unknownArtist ?? 'Unknown Artist');
+    final title = metadata?.musicTitle ?? (S.of(context)?.chatUnknownSong ?? 'Unknown Song');
+    final artist = metadata?.musicArtist ?? (S.of(context)?.chatUnknownArtist ?? 'Unknown Artist');
     final cover = metadata?.musicCover;
     final url = metadata?.musicUrl;
 
@@ -1135,8 +1135,8 @@ class MessageItem extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       maxSelections == 1
-                          ? (S.of(context)?.singleChoice ?? 'Single')
-                          : (S.of(context)?.multiChoice ?? 'Multi'),
+                          ? (S.of(context)?.chatSingleChoice ?? 'Single')
+                          : (S.of(context)?.chatMultiChoice ?? 'Multi'),
                       style: const TextStyle(
                         fontSize: 10,
                         color: AppColors.primary,
@@ -1155,7 +1155,7 @@ class MessageItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    S.of(context)?.ended ?? 'Ended',
+                    S.of(context)?.chatEnded ?? 'Ended',
                     style: const TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
@@ -1251,7 +1251,7 @@ class MessageItem extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        S.of(context)?.pollVotesFormat(voteCount, percentage.toStringAsFixed(0)) ?? '$voteCount votes (${percentage.toStringAsFixed(0)}%)',
+                        S.of(context)?.chatPollVotesFormat(voteCount, percentage.toStringAsFixed(0)) ?? '$voteCount votes (${percentage.toStringAsFixed(0)}%)',
                         style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.textSecondary,
@@ -1270,7 +1270,7 @@ class MessageItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                S.of(context)?.pollParticipantsFormat(totalVoters) ?? '$totalVoters participants',
+                S.of(context)?.chatPollParticipantsFormat(totalVoters) ?? '$totalVoters participants',
                 style: const TextStyle(
                   fontSize: 11,
                   color: AppColors.textSecondary,
@@ -1280,7 +1280,7 @@ class MessageItem extends StatelessWidget {
                 GestureDetector(
                   onTap: () => onEndPoll?.call(message.id),
                   child: Text(
-                    S.of(context)?.endPollButton ?? 'End Poll',
+                    S.of(context)?.chatEndPollButton ?? 'End Poll',
                     style: const TextStyle(
                       fontSize: 11,
                       color: AppColors.error,
@@ -1330,21 +1330,21 @@ class MessageItem extends StatelessWidget {
     if (isMissed) {
       // 未接来电
       callText = message.isFromMe
-          ? (S.of(context)?.callNotAnswered ?? '对方未接听')
+          ? (S.of(context)?.chatCallNotAnswered ?? '对方未接听')
           : (isVideo
-              ? (S.of(context)?.missedVideoCall ?? '未接视频通话')
-              : (S.of(context)?.missedVoiceCall ?? '未接语音通话'));
+              ? (S.of(context)?.chatMissedVideoCall ?? '未接视频通话')
+              : (S.of(context)?.chatMissedVoiceCall ?? '未接语音通话'));
     } else if (callDuration != null && callDuration > 0) {
       // 成功通话 - 微信风格："通话时长 00:55"
       final minutes = callDuration ~/ 60;
       final seconds = callDuration % 60;
       final durationStr = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-      callText = '${S.of(context)?.callDurationLabel ?? '通话时长'} $durationStr';
+      callText = '${S.of(context)?.chatCallDurationLabel ?? '通话时长'} $durationStr';
     } else {
       // 已取消
       callText = isVideo
-          ? (S.of(context)?.videoCallCancelled ?? '视频通话已取消')
-          : (S.of(context)?.voiceCallCancelled ?? '语音通话已取消');
+          ? (S.of(context)?.chatVideoCallCancelled ?? '视频通话已取消')
+          : (S.of(context)?.chatVoiceCallCancelled ?? '语音通话已取消');
     }
 
     // 未接来电显示红色
@@ -1408,7 +1408,7 @@ class MessageItem extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      S.of(context)?.callBack ?? '回拨',
+                      S.of(context)?.chatCallBack ?? '回拨',
                       style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.primary,

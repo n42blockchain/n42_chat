@@ -70,7 +70,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                 return TextButton(
                   onPressed: _canPost() ? _postMoment : null,
                   child: Text(
-                    s?.send ?? 'Post',
+                    s?.commonSend ?? 'Post',
                     style: TextStyle(
                       color: _canPost()
                           ? Theme.of(context).primaryColor

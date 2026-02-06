@@ -227,7 +227,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
                 // 用户名
                 Text(
-                  _session?.peerName ?? (l10n?.unknownUser ?? 'Unknown'),
+                  _session?.peerName ?? (l10n?.commonUnknownUser ?? 'Unknown'),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -438,7 +438,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           // 拒绝
           _buildWeChatActionButton(
             icon: Icons.call_end,
-            label: l10n?.decline ?? '拒绝',
+            label: l10n?.callDecline ?? '拒绝',
             color: _hangupColor,
             onTap: _rejectCall,
           ),
@@ -446,7 +446,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           // 接听
           _buildWeChatActionButton(
             icon: Icons.call,
-            label: l10n?.answer ?? '接听',
+            label: l10n?.callAnswer ?? '接听',
             color: _answerColor,
             onTap: _answerCall,
           ),
@@ -642,7 +642,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _session?.peerName ?? (l10n?.unknownUser ?? 'Unknown'),
+                  _session?.peerName ?? (l10n?.commonUnknownUser ?? 'Unknown'),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -720,19 +720,19 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     final l10n = S.of(context);
     switch (_state) {
       case CallState.ringing:
-        return l10n?.calling ?? '正在呼叫...';
+        return l10n?.chatCalling ?? '正在呼叫...';
       case CallState.incoming:
         return _isVideoCall
-            ? (l10n?.incomingVideoCall ?? '视频通话邀请')
-            : (l10n?.incomingVoiceCall ?? '语音通话邀请');
+            ? (l10n?.callIncomingVideoCall ?? '视频通话邀请')
+            : (l10n?.callIncomingVoiceCall ?? '语音通话邀请');
       case CallState.connecting:
-        return l10n?.connectingCall ?? '连接中...';
+        return l10n?.chatConnectingCall ?? '连接中...';
       case CallState.connected:
         return _isVideoCall
-            ? (l10n?.videoCallInProgress ?? '视频通话中')
-            : (l10n?.voiceCallInProgress ?? '语音通话中');
+            ? (l10n?.callVideoCallInProgress ?? '视频通话中')
+            : (l10n?.callVoiceCallInProgress ?? '语音通话中');
       case CallState.reconnecting:
-        return l10n?.reconnectingCall ?? '重新连接中...';
+        return l10n?.callReconnectingCall ?? '重新连接中...';
       case CallState.ended:
         return l10n?.callEnded ?? '通话已结束';
       case CallState.failed:

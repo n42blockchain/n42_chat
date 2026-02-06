@@ -111,7 +111,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    S.of(context)?.otherLoginMethods ?? 'Other login methods',
+                    S.of(context)?.authOtherLoginMethods ?? 'Other login methods',
                     style: TextStyle(
                       fontSize: 13,
                       color: textColor,
@@ -138,7 +138,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
                 onTap: _isGoogleLoading ? null : _handleGoogleSignIn,
                 icon: Icons.g_mobiledata,
                 isLoading: _isGoogleLoading,
-                tooltip: S.of(context)?.googleLabel ?? 'Google',
+                tooltip: S.of(context)?.authGoogleLabel ?? 'Google',
                 backgroundColor: Colors.white,
                 iconColor: Colors.red,
               ),
@@ -149,7 +149,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
                   onTap: _isAppleLoading ? null : _handleAppleSignIn,
                   icon: Icons.apple,
                   isLoading: _isAppleLoading,
-                  tooltip: S.of(context)?.appleLabel ?? 'Apple',
+                  tooltip: S.of(context)?.authAppleLabel ?? 'Apple',
                   backgroundColor: isDark ? Colors.white : Colors.black,
                   iconColor: isDark ? Colors.black : Colors.white,
                 ),
@@ -181,7 +181,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
                   onTap: _isWeChatLoading ? null : _handleWeChatSignIn,
                   icon: Icons.chat_bubble,  // 使用聊天气泡图标替代
                   isLoading: _isWeChatLoading,
-                  tooltip: S.of(context)?.wechat ?? 'WeChat',
+                  tooltip: S.of(context)?.commonWechat ?? 'WeChat',
                   backgroundColor: const Color(0xFF07C160),
                   iconColor: Colors.white,
                 ),
@@ -256,7 +256,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     }
 
     if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first');
+      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
       return;
     }
 
@@ -287,7 +287,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     }
 
     if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first');
+      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
       return;
     }
 
@@ -318,7 +318,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     }
 
     if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first');
+      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
       return;
     }
 
@@ -349,7 +349,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     }
 
     if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first');
+      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
       return;
     }
 
@@ -380,7 +380,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     }
 
     if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.enterServerAddressFirst ?? 'Please enter server address first');
+      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
       return;
     }
 
@@ -428,7 +428,7 @@ class GoogleSignInButton extends StatelessWidget {
             )
           : const Icon(Icons.g_mobiledata, color: Colors.red),
       label: Text(
-        S.of(context)?.googleLogin ?? 'Sign in with Google',
+        S.of(context)?.commonGoogleLogin ?? 'Sign in with Google',
         style: const TextStyle(color: Colors.black87),
       ),
       style: ElevatedButton.styleFrom(
@@ -471,7 +471,7 @@ class AppleSignInButton extends StatelessWidget {
               color: isDark ? Colors.black : Colors.white,
             ),
       label: Text(
-        S.of(context)?.appleLogin ?? 'Sign in with Apple',
+        S.of(context)?.commonAppleLogin ?? 'Sign in with Apple',
         style: TextStyle(
           color: isDark ? Colors.black : Colors.white,
         ),

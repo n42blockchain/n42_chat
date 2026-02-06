@@ -9,1183 +9,632 @@ class SVi extends S {
   SVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get chatModuleInitFailed => 'Khoi tao module chat that bai';
+  String get commonRetry => 'Thu lai';
 
   @override
-  String get checkNetworkRetry => 'Vui long kiem tra ket noi mang va thu lai';
+  String get commonUnknownUser => 'Nguoi dung khong xac dinh';
 
   @override
-  String get retry => 'Thu lai';
+  String get transferWalletNotConnected => 'Vi chua ket noi';
 
   @override
-  String get unknownUser => 'Nguoi dung khong xac dinh';
+  String get chatCallServiceNotInitialized => 'Dich vu goi chua khoi tao';
 
   @override
-  String get walletNotConnected => 'Vi chua ket noi';
-
-  @override
-  String get cannotGetWalletAddress => 'Khong the lay dia chi vi';
-
-  @override
-  String paymentRequestMemo(String requestId) {
-    return 'Yeu cau thanh toan: $requestId';
-  }
-
-  @override
-  String get callServiceNotInitialized => 'Dich vu goi chua khoi tao';
-
-  @override
-  String get alreadyInCall => 'Dang trong cuoc goi';
-
-  @override
-  String get meetingServiceNotInitialized => 'Dich vu hop chua khoi tao';
-
-  @override
-  String get livekitNotConfigured => 'LiveKit chua duoc cau hinh';
-
-  @override
-  String get unknownConversation => 'Cuoc tro chuyen khong xac dinh';
-
-  @override
-  String startCallFailed(String error) {
-    return 'Bat dau cuoc goi that bai: $error';
-  }
-
-  @override
-  String answerCallFailed(String error) {
-    return 'Tra loi that bai: $error';
-  }
-
-  @override
-  String get connectionFailed => 'Ket noi that bai';
-
-  @override
-  String get callRejected => 'Cuoc goi bi tu choi';
-
-  @override
-  String get noAnswer => 'Khong tra loi';
-
-  @override
-  String get invalidLoginResponse => 'Phan hoi dang nhap khong hop le';
-
-  @override
-  String loginFailed(String error) {
+  String authLoginFailed(String error) {
     return 'Dang nhap that bai: $error';
   }
 
   @override
-  String get sessionRestoreFailed => 'Khoi phuc phien that bai';
+  String get chatCallBack => 'Goi lai';
 
   @override
-  String get additionalVerificationRequired => 'Can xac minh bo sung';
+  String get chatMissedVideoCall => 'Cuoc goi video nho';
 
   @override
-  String registrationFailed(String error) {
-    return 'Dang ky that bai: $error';
-  }
+  String get chatMissedVoiceCall => 'Cuoc goi thoai nho';
 
   @override
-  String cannotConnectServer(String error) {
-    return 'Khong the ket noi may chu: $error';
-  }
+  String get chatCallNotAnswered => 'Không trả lời';
 
   @override
-  String get wrongUsernamePassword => 'Ten dang nhap hoac mat khau khong dung';
+  String get chatCallDurationLabel => 'Thời lượng cuộc gọi';
 
   @override
-  String get usernameTaken => 'Ten dang nhap da duoc su dung';
+  String get chatVoiceCallCancelled => 'Cuộc gọi thoại đã bị huỷ';
 
   @override
-  String get invalidUsernameFormat => 'Dinh dang ten dang nhap khong hop le';
+  String get chatVideoCallCancelled => 'Cuộc gọi video đã bị huỷ';
 
   @override
-  String get rateLimitExceeded => 'Qua nhieu yeu cau, vui long thu lai sau';
+  String get commonImage => '[Hinh anh]';
 
   @override
-  String get loginExpired => 'Dang nhap het han';
+  String get chatVideo => '[Video]';
 
   @override
-  String joinMeetingFailed(String error) {
-    return 'Tham gia cuoc hop that bai: $error';
-  }
+  String get chatVoice => '[Tin nhan thoai]';
 
   @override
-  String screenShareFailed(String error) {
-    return 'Chia se man hinh that bai: $error';
-  }
+  String get commonFile => '[Tep]';
 
   @override
-  String get answer => 'Tra loi';
+  String get chatLocation => '[Vi tri]';
 
   @override
-  String get decline => 'Tu choi';
+  String get chatUnknownMessage => '[Tin nhan khong xac dinh]';
 
   @override
-  String get missedCall => 'Cuoc goi nho';
+  String get commonDelete => 'Xoa';
 
   @override
-  String get callBack => 'Goi lai';
+  String get chatDeleteThisMessage => 'Xóa tin nhắn này?';
 
   @override
-  String get incomingCall => 'Cuoc goi den';
+  String get chatMessageDeleted => 'Tin nhắn đã xóa';
 
   @override
-  String get missedVideoCall => 'Cuoc goi video nho';
+  String get profileNotLoggedIn => 'Chua dang nhap';
 
   @override
-  String get missedVoiceCall => 'Cuoc goi thoai nho';
+  String get chatMyLocation => 'Vi tri cua toi';
 
   @override
-  String get voiceCallTitle => '语音通话';
+  String get commonGroupChat => 'Chat nhom';
 
   @override
-  String get videoCallTitle => '视频通话';
+  String get commonSearch => 'Tim kiem';
 
   @override
-  String get callNotAnswered => '对方未接听';
+  String get commonCancel => 'Huy';
 
   @override
-  String get callDurationLabel => '通话时长';
+  String get commonLoadFailed => 'Tai that bai';
 
   @override
-  String get voiceCallCancelled => '语音通话已取消';
+  String get commonMessages => 'Tin nhan';
 
   @override
-  String get videoCallCancelled => '视频通话已取消';
+  String get commonContacts => 'Danh ba';
 
   @override
-  String get passkeyNotInitialized => 'Passkey chua khoi tao';
+  String get commonMe => 'Toi';
 
   @override
-  String get googleSignInNotConfigured => 'Dang nhap Google chua cau hinh';
+  String get commonVoiceLoading =>
+      'Dang tai tin nhan thoai, vui long thu lai sau';
 
   @override
-  String get encryptedMessage => '[Tin nhan ma hoa]';
+  String get commonVoiceToTextFailed =>
+      'Chuyen giong noi thanh van ban that bai';
 
   @override
-  String get sticker => '[Nhan dan]';
+  String get commonConvertToText => 'Chuyen thanh van ban';
 
   @override
-  String get groupCreated => 'Nhom da duoc tao';
+  String get chatCopy => 'Sao chep';
 
   @override
-  String get groupNameChanged => 'Ten nhom da thay doi';
+  String get commonForward => 'Chuyen tiep';
 
   @override
-  String get groupAvatarChanged => 'Anh dai dien nhom da thay doi';
+  String get commonUnfavorite => 'Bo yeu thich';
 
   @override
-  String get groupAnnouncementChanged => 'Thong bao nhom da thay doi';
+  String get commonFavorite => 'Yeu thich';
 
   @override
-  String get image => '[Hinh anh]';
+  String get settingsResend => 'Gui lai';
 
   @override
-  String get video => '[Video]';
+  String get chatRecall => 'Thu hoi';
 
   @override
-  String get voice => '[Tin nhan thoai]';
+  String get commonQuote => 'Trich dan';
 
   @override
-  String get file => '[Tep]';
+  String get commonRemind => 'Nhac nho';
 
   @override
-  String get location => '[Vi tri]';
+  String get chatCopied => 'Da sao chep';
 
   @override
-  String get unknownMessage => '[Tin nhan khong xac dinh]';
+  String get storySendMessageHint => 'Gui tin nhan';
 
   @override
-  String joinedGroup(String senderName) {
-    return '$senderName da tham gia nhom';
-  }
-
-  @override
-  String leftGroup(String senderName) {
-    return '$senderName da roi nhom';
-  }
-
-  @override
-  String invitedToGroup(String senderName) {
-    return '$senderName da duoc moi';
-  }
-
-  @override
-  String removedFromGroup(String senderName) {
-    return '$senderName da bi xoa';
-  }
-
-  @override
-  String get avatarDataEmpty => 'Du lieu anh dai dien trong';
-
-  @override
-  String get avatarTooLarge => 'Tep anh dai dien qua lon, toi da 10MB';
-
-  @override
-  String get uploadAvatarFailed => 'Tai len anh dai dien that bai';
-
-  @override
-  String get delete => 'Xoa';
-
-  @override
-  String get deleteThisMessage => 'Xóa tin nhắn này?';
-
-  @override
-  String get messageDeleted => 'Tin nhắn đã xóa';
-
-  @override
-  String get notLoggedIn => 'Chua dang nhap';
-
-  @override
-  String roomNotExist(String roomId) {
-    return 'Khong tim thay phong: $roomId';
-  }
-
-  @override
-  String get uploadImageFailed => 'Tai len hinh anh that bai';
-
-  @override
-  String get matrixClientNotInitialized => 'Matrix client chua khoi tao';
-
-  @override
-  String get uploadVoiceFailed =>
-      'Tai len tin nhan thoai that bai: Khong the lay MXC URI';
-
-  @override
-  String get uploadVideoFailed =>
-      'Tai len video that bai: Khong the lay MXC URI';
-
-  @override
-  String get uploadFileFailed => 'Tai len tep that bai: Khong the lay MXC URI';
-
-  @override
-  String locationWithCoords(String lat, String lon) {
-    return 'Vi tri: $lat, $lon';
-  }
-
-  @override
-  String get myLocation => 'Vi tri cua toi';
-
-  @override
-  String get pollEnded => 'Binh chon da ket thuc';
-
-  @override
-  String get groupChat => 'Chat nhom';
-
-  @override
-  String get search => 'Tim kiem';
-
-  @override
-  String get cancel => 'Huy';
-
-  @override
-  String get userCancelled => 'Nguoi dung da huy';
-
-  @override
-  String get noData => 'Khong co du lieu';
-
-  @override
-  String get noSearchResults => 'Khong co ket qua tim kiem';
-
-  @override
-  String get tryDifferentKeyword => 'Thu tu khoa khac';
-
-  @override
-  String get loadFailed => 'Tai that bai';
-
-  @override
-  String get checkNetwork => 'Vui long kiem tra ket noi mang';
-
-  @override
-  String get networkConnectionFailed => 'Ket noi mang that bai';
-
-  @override
-  String get checkNetworkSettings => 'Vui long kiem tra cai dat mang';
-
-  @override
-  String get messages => 'Tin nhan';
-
-  @override
-  String get contacts => 'Danh ba';
-
-  @override
-  String get discover => 'Kham pha';
-
-  @override
-  String get me => 'Toi';
-
-  @override
-  String get voiceLoading => 'Dang tai tin nhan thoai, vui long thu lai sau';
-
-  @override
-  String get voiceToTextFailed => 'Chuyen giong noi thanh van ban that bai';
-
-  @override
-  String get converting => 'Dang chuyen doi...';
-
-  @override
-  String get convertToText => 'Chuyen thanh van ban';
-
-  @override
-  String get convertToTextTitle => 'Chuyen thanh van ban';
-
-  @override
-  String get selectEmoji => 'Chon bieu tuong cam xuc';
-
-  @override
-  String get selectRedPacketCover => 'Chon bia';
-
-  @override
-  String get frequentlyUsed => 'Thuong dung';
-
-  @override
-  String get copy => 'Sao chep';
-
-  @override
-  String get forward => 'Chuyen tiep';
-
-  @override
-  String get unfavorite => 'Bo yeu thich';
-
-  @override
-  String get favorite => 'Yeu thich';
-
-  @override
-  String get resend => 'Gui lai';
-
-  @override
-  String get recall => 'Thu hoi';
-
-  @override
-  String get multiSelect => 'Chon nhieu';
-
-  @override
-  String get quote => 'Trich dan';
-
-  @override
-  String get remind => 'Nhac nho';
-
-  @override
-  String get searchThis => 'Tim kiem';
-
-  @override
-  String get recallMessageConfirm => 'Thu hoi tin nhan nay?';
-
-  @override
-  String get youRecalledMessage => 'Ban da thu hoi mot tin nhan';
-
-  @override
-  String get otherRecalledMessage => 'Tin nhan da duoc thu hoi';
-
-  @override
-  String get reEdit => 'Chinh sua lai';
-
-  @override
-  String get copied => 'Da sao chep';
-
-  @override
-  String get sendMessageHint => 'Gui tin nhan';
-
-  @override
-  String get microphonePermissionRequired =>
+  String get commonMicrophonePermissionRequired =>
       'Vui long cap quyen truy cap micro';
 
   @override
-  String startRecordingFailed(String error) {
+  String commonStartRecordingFailed(String error) {
     return 'Bat dau ghi am that bai: $error';
   }
 
   @override
-  String get recordingTooShort => 'Ban ghi qua ngan';
+  String get commonRecordingTooShort => 'Ban ghi qua ngan';
 
   @override
-  String stopRecordingFailed(String error) {
+  String commonStopRecordingFailed(String error) {
     return 'Dung ghi am that bai: $error';
   }
 
   @override
-  String get releaseToCancel => 'Tha de huy';
+  String get chatReleaseToCancel => 'Tha de huy';
 
   @override
-  String get releaseToSend => 'Tha de gui, vuot len de huy';
+  String get chatReleaseToSend => 'Tha de gui, vuot len de huy';
 
   @override
-  String get holdToTalk => 'Giu de noi';
+  String get commonHoldToTalk => 'Giu de noi';
 
   @override
-  String get send => 'Gui';
+  String get commonSend => 'Gui';
 
   @override
-  String conversationWithId(String roomId) {
-    return 'Cuoc tro chuyen: $roomId';
-  }
+  String get commonAddFriend => 'Them ban';
 
   @override
-  String contactWithId(String userId) {
-    return 'Lien he: $userId';
-  }
+  String get commonChatServiceNotConnected => 'Dich vu chat chua ket noi';
 
   @override
-  String get addFriend => 'Them ban';
-
-  @override
-  String get chatServiceNotConnected => 'Dich vu chat chua ket noi';
-
-  @override
-  String userNotFoundHint(String query) {
+  String contactUserNotFoundHint(String query) {
     return 'Khong tim thay nguoi dung \"$query\"\n\nGoi y:\n• Thu nhap day du ID nguoi dung, vi du @username:server.com\n• Kiem tra chinh ta ten nguoi dung';
   }
 
   @override
-  String createChatFailed(String error) {
+  String contactCreateChatFailed(String error) {
     return 'Tao cuoc tro chuyen that bai: $error';
   }
 
   @override
-  String searchFailed(String error) {
+  String contactSearchFailed(String error) {
     return 'Tim kiem that bai: $error';
   }
 
   @override
-  String get enterUserIdOrUsername =>
+  String get contactEnterUserIdOrUsername =>
       'Nhap ID nguoi dung hoac ten dang nhap de tim kiem';
 
   @override
-  String get searching => 'Dang tim kiem...';
+  String get contactSearching => 'Dang tim kiem...';
 
   @override
-  String get searchUserToChat => 'Tim nguoi dung de bat dau tro chuyen';
+  String get contactSearchUserToChat => 'Tim nguoi dung de bat dau tro chuyen';
 
   @override
-  String get matrixIdExample =>
+  String get contactMatrixIdExample =>
       'Ban co the nhap day du Matrix ID\nvi du @user:matrix.n42.network';
 
   @override
-  String userNotFound(String username) {
+  String contactUserNotFound(String username) {
     return 'Khong tim thay nguoi dung \"$username\"';
   }
 
   @override
-  String get chat => 'Tro chuyen';
+  String get commonChat => 'Tro chuyen';
 
   @override
-  String get settings => 'Cai dat';
+  String get commonSettings => 'Cai dat';
 
   @override
-  String get editProfile => 'Chinh sua ho so';
+  String get profileEditProfile => 'Chinh sua ho so';
 
   @override
-  String get login => 'Dang nhap';
+  String get authLogin => 'Dang nhap';
 
   @override
-  String get createGroup => 'Tao nhom';
+  String get commonCreateGroup => 'Tao nhom';
 
   @override
-  String developing(String title) {
-    return '$title\n(Sap ra mat)';
-  }
+  String get chatError => 'Loi';
 
   @override
-  String get error => 'Loi';
+  String get commonTransfer => 'Chuyen tien';
 
   @override
-  String get pageNotFound => 'Khong tim thay trang';
+  String get commonReceived => 'Da nhan';
 
   @override
-  String get backToHome => 'Quay lai trang chu';
+  String get commonRefunded => 'Da hoan tien';
 
   @override
-  String get allRead => 'Da doc tat ca';
+  String get commonExpired => 'Het han';
 
   @override
-  String readCount(int count) {
-    return '$count da doc';
-  }
+  String get chatRedPacketGreeting => 'Chuc mung tot lanh';
 
   @override
-  String get transfer => 'Chuyen tien';
+  String get commonN42RedPacket => 'Li xi N42';
 
   @override
-  String get pendingReceipt => 'Cho xu ly';
+  String get commonClaimed => 'Da nhan';
 
   @override
-  String get tapToReceive => 'Nhan de nhan';
+  String get commonAllClaimed => 'Da nhan het';
 
   @override
-  String get received => 'Da nhan';
+  String get chatReply => 'Tra loi';
 
   @override
-  String get paymentReceived => 'Da nhan thanh toan';
+  String get commonEdit => 'Chinh sua';
 
   @override
-  String get refunded => 'Da hoan tien';
+  String get chatSelectForwardTarget => 'Chon nguoi nhan';
 
   @override
-  String get expired => 'Het han';
-
-  @override
-  String get redPacketGreeting => 'Chuc mung tot lanh';
-
-  @override
-  String get n42RedPacket => 'Li xi N42';
-
-  @override
-  String get goodLuck => 'Chuc may man';
-
-  @override
-  String get claimed => 'Da nhan';
-
-  @override
-  String get allClaimed => 'Da nhan het';
-
-  @override
-  String get emoji => 'Bieu tuong cam xuc';
-
-  @override
-  String get love => 'Yeu thuong';
-
-  @override
-  String get animals => 'Dong vat';
-
-  @override
-  String get food => 'Thuc an';
-
-  @override
-  String get travel => 'Du lich';
-
-  @override
-  String get activities => 'Hoat dong';
-
-  @override
-  String get objects => 'Do vat';
-
-  @override
-  String get symbols => 'Bieu tuong';
-
-  @override
-  String get reply => 'Tra loi';
-
-  @override
-  String get copiedToClipboard => 'Da sao chep vao clipboard';
-
-  @override
-  String get edit => 'Chinh sua';
-
-  @override
-  String get more => 'Them';
-
-  @override
-  String get selectForwardTarget => 'Chon nguoi nhan';
-
-  @override
-  String sendCount(int count) {
+  String commonSendCount(int count) {
     return 'Gui ($count)';
   }
 
   @override
-  String get draft => '[Ban nhap] ';
-
-  @override
-  String n42Id(String id) {
+  String contactN42Id(String id) {
     return 'N42 ID: $id';
   }
 
   @override
-  String get n42IdTitle => 'N42 ID';
+  String get profileN42IdTitle => 'N42 ID';
 
   @override
-  String get n42Bean => 'N42 Bean';
+  String get profileN42Bean => 'N42 Bean';
 
   @override
-  String get friendInfo => 'Thong tin ban be';
+  String get contactFriendInfo => 'Thong tin ban be';
 
   @override
-  String get friendInfoDesc =>
+  String get contactFriendInfoDesc =>
       'Them ghi chu, dien thoai, the, ghi nhan, anh cua ban be va cai dat quyen.';
 
   @override
-  String get moments => 'Khoang khac';
+  String get commonMoments => 'Khoang khac';
 
   @override
-  String get sendMessage => 'Tin nhan';
+  String get commonSendMessage => 'Tin nhan';
 
   @override
-  String get audioVideoCall => 'Goi Am thanh/Video';
+  String get contactAudioVideoCall => 'Goi Am thanh/Video';
 
   @override
-  String get videoChannel => 'Kenh Video';
+  String get contactVideoChannel => 'Kenh Video';
 
   @override
-  String get remark => 'Ghi chu';
+  String get contactRemark => 'Ghi chu';
 
   @override
-  String get remarkName => 'Ten ghi chu';
+  String get contactRemarkName => 'Ten ghi chu';
 
   @override
-  String get phone => 'Dien thoai';
+  String get contactPhone => 'Dien thoai';
 
   @override
-  String get tags => 'The';
+  String get contactTags => 'The';
 
   @override
-  String get notes => 'Ghi chu';
+  String get contactNotes => 'Ghi chu';
 
   @override
-  String get photos => 'Anh';
+  String get contactPhotos => 'Anh';
 
   @override
-  String get permissions => 'Quyen';
+  String get contactPermissions => 'Quyen';
 
   @override
-  String get chatMomentsEtc => 'Chat, Khoang khac, The thao, v.v.';
+  String get contactChatMomentsEtc => 'Chat, Khoang khac, The thao, v.v.';
 
   @override
-  String get moreInfo => 'Thong tin them';
+  String get contactMoreInfo => 'Thong tin them';
 
   @override
-  String get commonGroups => 'Nhom chung';
+  String get contactCommonGroups => 'Nhom chung';
 
   @override
-  String get zeroGroups => '0';
+  String get contactSource => 'Nguon';
 
   @override
-  String get source => 'Nguon';
+  String get settingsNotificationSettings => 'Thong bao';
 
   @override
-  String get notificationSettings => 'Thong bao';
+  String get settingsPrivacy => 'Quyen rieng tu';
 
   @override
-  String get receiveNotifications => 'Nhan thong bao tin nhan moi';
+  String get settingsAppearance => 'Giao dien';
 
   @override
-  String get showPreview => 'Hien thi xem truoc tin nhan';
+  String get settingsAbout => 'Gioi thieu';
 
   @override
-  String get showContentInNotification =>
-      'Hien thi noi dung tin nhan trong thong bao';
+  String get commonLogout => 'Dang xuat';
 
   @override
-  String get notificationSound => 'Am thanh thong bao';
+  String get commonLogoutConfirm => 'Ban co chac muon dang xuat?';
 
   @override
-  String get playSoundOnMessage => 'Phat am thanh khi nhan tin nhan';
+  String get commonSave => 'Luu';
 
   @override
-  String get vibrate => 'Rung';
+  String get profileNickname => 'Biet danh';
 
   @override
-  String get vibrateOnMessage => 'Rung khi nhan tin nhan';
+  String get profileEnterNickname => 'Nhap biet danh';
 
   @override
-  String get doNotDisturb => 'Khong lam phien';
+  String get profileSignature => 'Chu ky';
 
   @override
-  String get dndDescription => 'Tat thong bao trong khung gio chi dinh';
+  String get profileAddSignature => 'Them chu ky';
 
   @override
-  String get startTime => 'Thoi gian bat dau';
+  String get commonTakePhoto => 'Chup anh';
 
   @override
-  String get endTime => 'Thoi gian ket thuc';
+  String get profileChooseFromGallery => 'Chon tu thu vien';
 
   @override
-  String get privacy => 'Quyen rieng tu';
-
-  @override
-  String get appearance => 'Giao dien';
-
-  @override
-  String get about => 'Gioi thieu';
-
-  @override
-  String get logout => 'Dang xuat';
-
-  @override
-  String get logoutConfirm => 'Ban co chac muon dang xuat?';
-
-  @override
-  String get exit => 'Dang xuat';
-
-  @override
-  String get save => 'Luu';
-
-  @override
-  String get nickname => 'Biet danh';
-
-  @override
-  String get enterNickname => 'Nhap biet danh';
-
-  @override
-  String get signature => 'Chu ky';
-
-  @override
-  String get addSignature => 'Them chu ky';
-
-  @override
-  String get takePhoto => 'Chup anh';
-
-  @override
-  String get chooseFromGallery => 'Chon tu thu vien';
-
-  @override
-  String saveFailed(String error) {
+  String profileSaveFailed(String error) {
     return 'Luu that bai: $error';
   }
 
   @override
-  String get secureDecentralizedChat => 'Nhan tin bao mat, phi tap trung';
+  String get authSecureDecentralizedChat => 'Nhan tin bao mat, phi tap trung';
 
   @override
-  String get endToEndEncryption => 'Ma hoa dau cuoi';
+  String get commonEndToEndEncryption => 'Ma hoa dau cuoi';
 
   @override
-  String get messagesOnlyYouCanSee =>
+  String get authMessagesOnlyYouCanSee =>
       'Chi ban va nguoi nhan moi xem duoc tin nhan';
 
   @override
-  String get decentralized => 'Phi tap trung';
+  String get authDecentralized => 'Phi tap trung';
 
   @override
-  String get basedOnMatrix => 'Xay dung tren giao thuc mo Matrix';
+  String get authBasedOnMatrix => 'Xay dung tren giao thuc mo Matrix';
 
   @override
-  String get walletIntegration => 'Tich hop Vi';
+  String get authWalletIntegration => 'Tich hop Vi';
 
   @override
-  String get easyCryptoTransfer => 'Chuyen tien dien tu de dang';
+  String get authEasyCryptoTransfer => 'Chuyen tien dien tu de dang';
 
   @override
-  String get register => 'Dang ky';
+  String get authRegister => 'Dang ky';
 
   @override
-  String get agreeTerms => 'Bang viec dang nhap, ban dong y voi';
+  String get authAgreeTerms => 'Bang viec dang nhap, ban dong y voi';
 
   @override
-  String get termsOfService => 'Dieu khoan Dich vu';
+  String get authTermsOfService => 'Dieu khoan Dich vu';
 
   @override
-  String get and => 'va';
+  String get authAnd => 'va';
 
   @override
-  String get privacyPolicy => 'Chinh sach Bao mat';
+  String get authPrivacyPolicy => 'Chinh sach Bao mat';
 
   @override
-  String get serverAddress => 'Dia chi May chu';
+  String get authServerAddress => 'Dia chi May chu';
 
   @override
-  String get enterServerAddress => 'Nhap dia chi may chu';
+  String get authEnterServerAddress => 'Nhap dia chi may chu';
 
   @override
-  String get validServerAddress => 'Vui long nhap dia chi may chu hop le';
-
-  @override
-  String connectedTo(String serverName) {
+  String authConnectedTo(String serverName) {
     return 'Da ket noi toi $serverName';
   }
 
   @override
-  String get username => 'Ten dang nhap';
+  String get authUsername => 'Ten dang nhap';
 
   @override
-  String get enterUsername => 'Nhap ten dang nhap';
+  String get authEnterUsername => 'Nhap ten dang nhap';
 
   @override
-  String get password => 'Mat khau';
+  String get authPassword => 'Mat khau';
 
   @override
-  String get enterPassword => 'Nhap mat khau';
+  String get authEnterPassword => 'Nhap mat khau';
 
   @override
-  String get registerAccount => 'Dang ky';
+  String get authRegisterAccount => 'Dang ky';
 
   @override
-  String get forgotPassword => 'Quen mat khau';
+  String get authForgotPassword => 'Quen mat khau';
 
   @override
-  String get otherLoginMethods => 'Phuong thuc dang nhap khac';
+  String get authOtherLoginMethods => 'Phuong thuc dang nhap khac';
 
   @override
-  String get emailVerification => 'Ma xac minh email';
+  String get authCreateAccount => 'Tao tai khoan';
 
   @override
-  String get enterServerFirst => 'Vui long nhap dia chi may chu truoc';
+  String get authJoinN42Chat => 'Tham gia N42 Chat de bat dau tro chuyen';
 
   @override
-  String get passkeyNeedsServer => 'Dang nhap Passkey can ho tro may chu';
+  String get authUsernameHint => '3-20 ky tu, chu/so/_';
 
   @override
-  String googleLoginSuccess(String email) {
-    return 'Dang nhap Google thanh cong: $email';
-  }
+  String get authUsernameMinLength => 'Ten dang nhap phai co it nhat 3 ky tu';
 
   @override
-  String googleLoginFailed(String error) {
-    return 'Dang nhap Google that bai: $error';
-  }
+  String get authUsernameMaxLength => 'Ten dang nhap toi da 20 ky tu';
 
   @override
-  String get appleLoginSuccess => 'Dang nhap Apple thanh cong';
-
-  @override
-  String appleLoginFailed(String error) {
-    return 'Dang nhap Apple that bai: $error';
-  }
-
-  @override
-  String get createAccount => 'Tao tai khoan';
-
-  @override
-  String get joinN42Chat => 'Tham gia N42 Chat de bat dau tro chuyen';
-
-  @override
-  String get usernameHint => '3-20 ky tu, chu/so/_';
-
-  @override
-  String get usernameMinLength => 'Ten dang nhap phai co it nhat 3 ky tu';
-
-  @override
-  String get usernameMaxLength => 'Ten dang nhap toi da 20 ky tu';
-
-  @override
-  String get usernameFormat =>
+  String get authUsernameFormat =>
       'Ten dang nhap chi co the chua chu, so va dau gach duoi';
 
   @override
-  String get passwordHint => 'Toi thieu 8 ky tu';
+  String get authPasswordHint => 'Toi thieu 8 ky tu';
 
   @override
-  String get passwordMinLength => 'Mat khau phai co it nhat 8 ky tu';
+  String get commonPasswordMinLength => 'Mat khau phai co it nhat 8 ky tu';
 
   @override
-  String get confirmPassword => 'Xac nhan mat khau';
+  String get authConfirmPassword => 'Xac nhan mat khau';
 
   @override
-  String get reEnterPassword => 'Nhap lai mat khau';
+  String get authFilled => 'Da dien';
 
   @override
-  String get passwordsNotMatch => 'Mat khau khong khop';
+  String get authEnterInviteCode => 'Nhap ma moi';
 
   @override
-  String get inviteCode => 'Ma moi (tich hop san)';
+  String get authAlreadyHaveAccount => 'Da co tai khoan?';
 
   @override
-  String get filled => 'Da dien';
+  String get authLoginNow => 'Dang nhap ngay';
 
   @override
-  String get enterInviteCode => 'Nhap ma moi';
+  String get profileAvatar => 'Anh dai dien';
 
   @override
-  String get inviteCodeHint =>
-      'Ma moi da tich hop san, thuong khong can thay doi';
+  String get profileStatus => 'Trang thai';
 
   @override
-  String get agreeTermsFirst =>
-      'Vui long doc va dong y voi dieu khoan va chinh sach bao mat truoc';
+  String get commonLoading => 'Dang tai...';
 
   @override
-  String get iAgree => 'Toi da doc va dong y voi';
+  String get conversationNoConversations => 'Khong co cuoc tro chuyen';
 
   @override
-  String get alreadyHaveAccount => 'Da co tai khoan?';
+  String get conversationTapToChat =>
+      'Nhan vao goc tren ben phai de bat dau tro chuyen';
 
   @override
-  String get loginNow => 'Dang nhap ngay';
+  String get conversationStartGroup => 'Bat dau Chat nhom';
 
   @override
-  String get whoCanSee => 'Ai co the xem';
+  String get commonScan => 'Quet';
 
   @override
-  String get avatar => 'Anh dai dien';
+  String get commonPayment => 'Thanh toan';
 
   @override
-  String get status => 'Trang thai';
-
-  @override
-  String get lastSeen => 'Lan cuoi truc tuyen';
-
-  @override
-  String get messageSettings => 'Tin nhan';
-
-  @override
-  String get allowStrangerMessage => 'Cho phep tin nhan tu nguoi la';
-
-  @override
-  String get receiveNonContact => 'Nhan tin nhan tu nguoi khong trong danh ba';
-
-  @override
-  String get readReceipts => 'Xac nhan da doc';
-
-  @override
-  String get letOthersKnowRead =>
-      'Cho nguoi khac biet ban da doc tin nhan cua ho';
-
-  @override
-  String get typingStatus => 'Trang thai dang nhap';
-
-  @override
-  String get letOthersKnowTyping => 'Cho nguoi khac biet ban dang nhap';
-
-  @override
-  String get everyone => 'Tat ca moi nguoi';
-
-  @override
-  String get contactsOnly => 'Chi danh ba';
-
-  @override
-  String get nobody => 'Khong ai';
-
-  @override
-  String whoCanSeeItem(String title) {
-    return 'Ai co the xem $title';
-  }
-
-  @override
-  String version(String version) {
-    return 'Phien ban $version';
-  }
-
-  @override
-  String get checkUpdate => 'Kiem tra cap nhat';
-
-  @override
-  String get openSourceLicenses => 'Giay phep ma nguon mo';
-
-  @override
-  String get feedback => 'Phan hoi';
-
-  @override
-  String get builtOnMatrix => 'Xay dung tren giao thuc Matrix';
-
-  @override
-  String get loading => 'Dang tai...';
-
-  @override
-  String get noConversations => 'Khong co cuoc tro chuyen';
-
-  @override
-  String get tapToChat => 'Nhan vao goc tren ben phai de bat dau tro chuyen';
-
-  @override
-  String get startGroup => 'Bat dau Chat nhom';
-
-  @override
-  String get scan => 'Quet';
-
-  @override
-  String get payment => 'Thanh toan';
-
-  @override
-  String featureComingSoon(String feature) {
+  String commonFeatureComingSoon(String feature) {
     return '$feature sap ra mat';
   }
 
   @override
-  String get markAsRead => 'Danh dau da doc';
+  String get conversationMarkAsRead => 'Danh dau da doc';
 
   @override
-  String get unmute => 'Bo tat tieng';
+  String get commonUnmute => 'Bo tat tieng';
 
   @override
-  String get mute => 'Tat tieng';
+  String get commonMute => 'Tat tieng';
 
   @override
-  String get unpin => 'Bo ghim';
+  String get conversationUnpin => 'Bo ghim';
 
   @override
-  String get pin => 'Ghim';
+  String get conversationPin => 'Ghim';
 
   @override
-  String get deleteConversation => 'Xoa cuoc tro chuyen';
+  String get conversationDeleteConversation => 'Xoa cuoc tro chuyen';
 
   @override
-  String deleteConversationConfirm(String name) {
+  String conversationDeleteConversationConfirm(String name) {
     return 'Xoa cuoc tro chuyen voi \"$name\"?';
   }
 
   @override
-  String get noContacts => 'Khong co lien he';
+  String get commonNoContacts => 'Khong co lien he';
 
   @override
-  String get addFriendsToChat => 'Them ban de bat dau tro chuyen';
+  String get contactAddFriendsToChat => 'Them ban de bat dau tro chuyen';
 
   @override
   String get contactNotFound => 'Khong tim thay lien he';
 
   @override
-  String get tryOtherKeywords => 'Thu tu khoa khac hoac tim kiem toan cau';
+  String get contactTryOtherKeywords =>
+      'Thu tu khoa khac hoac tim kiem toan cau';
 
   @override
-  String get searchResults => 'Ket qua tim kiem';
+  String get contactSearchResults => 'Ket qua tim kiem';
 
   @override
-  String get newFriends => 'Ban moi';
+  String get contactNewFriends => 'Ban moi';
 
   @override
-  String get chatOnlyFriends => 'Ban chi chat';
+  String get contactChatOnlyFriends => 'Chat-only Friends';
 
   @override
-  String get officialAccounts => 'Tai khoan chinh thuc';
+  String get contactOfficialAccounts => 'Tai khoan chinh thuc';
 
   @override
-  String get serviceAccounts => 'Tai khoan dich vu';
+  String get contactServiceAccounts => 'Tai khoan dich vu';
 
   @override
-  String get enterpriseContacts => 'Lien he doanh nghiep';
+  String get contactEnterpriseContacts => 'Lien he doanh nghiep';
 
   @override
-  String contactsCount(int count) {
-    return '$count lien he';
-  }
+  String get contactRecommendToFriend => 'Chia se lien he';
 
   @override
-  String get recommendToFriend => 'Chia se lien he';
+  String get commonSetRemark => 'Dat ghi chu';
 
   @override
-  String get setRemark => 'Dat ghi chu';
+  String get contactSendingCard => 'Dang gui the lien he...';
 
   @override
-  String get addToHome => 'Them vao man hinh chinh';
+  String get commonFileLabel => 'Tep';
 
   @override
-  String get sendingCard => 'Dang gui the lien he...';
+  String get commonLocationLabel => 'Vi tri';
 
   @override
-  String get contactCard => '[The Lien he]';
-
-  @override
-  String get fileLabel => 'Tep';
-
-  @override
-  String get locationLabel => 'Vi tri';
-
-  @override
-  String cardSent(String contact, String friend) {
-    return 'Da gui the cua $contact cho $friend';
-  }
-
-  @override
-  String recommendFailed(String error) {
+  String contactRecommendFailed(String error) {
     return 'Gioi thieu that bai: $error';
   }
 
   @override
-  String get enterRemark => 'Nhap ghi chu';
+  String get profileEnterRemark => 'Nhap ghi chu';
 
   @override
-  String remarkSet(String remark) {
-    return 'Ghi chu da dat: $remark';
-  }
+  String get contactOpeningChat => 'Dang mo tro chuyen...';
 
   @override
-  String get openingChat => 'Dang mo tro chuyen...';
-
-  @override
-  String openChatFailed(String error) {
+  String contactOpenChatFailed(String error) {
     return 'Mo tro chuyen that bai: $error';
   }
 
   @override
-  String get addContact => 'Them lien he';
+  String get contactAddContact => 'Them lien he';
 
   @override
-  String get enterUserId => 'Nhap ID nguoi dung';
+  String get contactEnterUserId => 'Nhap ID nguoi dung';
 
   @override
-  String get noFriendRequests => 'Khong co yeu cau ket ban';
+  String get contactNoFriendRequests => 'Khong co yeu cau ket ban';
 
   @override
-  String get accept => 'Chap nhan';
+  String get commonAccept => 'Chap nhan';
 
   @override
-  String get reject => 'Tu choi';
+  String get commonReject => 'Tu choi';
 
   @override
-  String acceptedRequest(String name) {
-    return 'Da chap nhan yeu cau ket ban cua $name';
-  }
+  String get commonNoGroups => 'Khong co nhom';
 
   @override
-  String rejectedRequest(String name) {
-    return 'Da tu choi yeu cau ket ban cua $name';
-  }
+  String get contactSelectFriendToRecommend => 'Chon ban de gioi thieu';
 
   @override
-  String get noGroups => 'Khong co nhom';
+  String get commonSearchContacts => 'Tim kiem lien he';
 
   @override
-  String get creatingGroup => 'Sap co tinh nang tao nhom...';
+  String get contactNoContactsFound => 'Khong tim thay lien he';
 
   @override
-  String get selectFriendToRecommend => 'Chon ban de gioi thieu';
+  String get favoriteYesterday => 'Hom qua';
 
   @override
-  String get searchContacts => 'Tim kiem lien he';
+  String get chatJustNow => 'Vua xong';
 
   @override
-  String get noContactsFound => 'Khong tim thay lien he';
+  String get profileOnline => 'Truc tuyen';
 
   @override
-  String get yesterday => 'Hom qua';
-
-  @override
-  String get monday => 'T2';
-
-  @override
-  String get tuesday => 'T3';
-
-  @override
-  String get wednesday => 'T4';
-
-  @override
-  String get thursday => 'T5';
-
-  @override
-  String get friday => 'T6';
-
-  @override
-  String get saturday => 'T7';
-
-  @override
-  String get sunday => 'CN';
-
-  @override
-  String get justNow => 'Vua xong';
-
-  @override
-  String minutesAgo(int count) {
-    return '$count phut truoc';
-  }
-
-  @override
-  String hoursAgo(int count) {
-    return '$count gio truoc';
-  }
-
-  @override
-  String daysAgo(int count) {
-    return '$count ngay truoc';
-  }
-
-  @override
-  String get online => 'Truc tuyen';
-
-  @override
-  String get offline => 'Ngoai tuyen';
-
-  @override
-  String minutesAgoOnline(int count) {
-    return 'Truc tuyen $count phut truoc';
-  }
-
-  @override
-  String hoursAgoOnline(int count) {
-    return 'Truc tuyen $count gio truoc';
-  }
-
-  @override
-  String daysAgoOnline(int count) {
-    return 'Truc tuyen $count ngay truoc';
-  }
+  String get profileOffline => 'Ngoai tuyen';
 
   @override
   String get searchContactsGroupsMessages => 'Tim lien he, nhom, tin nhan';
@@ -1194,36 +643,25 @@ class SVi extends S {
   String get searchError => 'Loi tim kiem';
 
   @override
-  String get searchHint => 'Tim lien he, nhom va tin nhan';
-
-  @override
-  String get enterKeyword => 'Nhap tu khoa de tim kiem';
+  String get chatSearchHint => 'Tim lien he, nhom va tin nhan';
 
   @override
   String get searchHistory => 'Lich su tim kiem';
 
   @override
-  String get clear => 'Xoa';
+  String get commonClear => 'Xoa';
 
   @override
-  String noResultsFor(String query) {
-    return 'Khong co ket qua cho \"$query\"';
-  }
+  String get commonAll => 'Tat ca';
 
   @override
-  String get all => 'Tat ca';
+  String get searchGroups => 'Nhom';
 
   @override
-  String get groups => 'Nhom';
+  String get searchNoResults => 'Khong co ket qua';
 
   @override
-  String get noResults => 'Khong co ket qua';
-
-  @override
-  String get groupInfo => 'Thong tin nhom';
-
-  @override
-  String groupMembers(int count) {
+  String commonGroupMembers(int count) {
     return 'Thanh vien ($count)';
   }
 
@@ -1231,1795 +669,7 @@ class SVi extends S {
   String get groupMembersTitle => 'Thành viên nhóm';
 
   @override
-  String get viewAll => 'Xem tat ca';
-
-  @override
-  String get owner => 'Chu so huu';
-
-  @override
-  String get admin => 'Quan tri vien';
-
-  @override
-  String get invite => 'Moi';
-
-  @override
-  String get groupAnnouncement => 'Thong bao nhom';
-
-  @override
-  String get notSet => 'Chua dat';
-
-  @override
-  String get groupDescription => 'Mo ta nhom';
-
-  @override
-  String get publicGroup => 'Nhom cong khai';
-
-  @override
-  String get allowSearchJoin => 'Cho phep nguoi khac tim kiem va tham gia';
-
-  @override
-  String get clearChatHistory => 'Xoa lich su tro chuyen';
-
-  @override
-  String get dissolveGroup => 'Giai tan nhom';
-
-  @override
-  String get leaveGroup => 'Roi nhom';
-
-  @override
-  String get changeGroupName => 'Doi ten nhom';
-
-  @override
-  String get enterGroupName => 'Nhap ten nhom';
-
-  @override
-  String get confirm => 'Xac nhan';
-
-  @override
-  String get changeGroupDescription => 'Doi mo ta nhom';
-
-  @override
-  String get enterGroupDescription => 'Nhap mo ta nhom';
-
-  @override
-  String get editAnnouncement => 'Chinh sua thong bao';
-
-  @override
-  String get enterAnnouncement => 'Nhap thong bao';
-
-  @override
-  String get publish => 'Dang';
-
-  @override
-  String get clearHistoryConfirm =>
-      'Xoa tat ca lich su tro chuyen? Hanh dong nay khong the hoan tac.';
-
-  @override
-  String get clearAction => 'Xoa';
-
-  @override
-  String get chatHistoryCleared => 'Da xoa lich su tro chuyen';
-
-  @override
-  String leaveGroupConfirm(String name) {
-    return 'Roi nhom \"$name\"?';
-  }
-
-  @override
-  String dissolveGroupConfirm(String name) {
-    return 'Giai tan nhom \"$name\"? Hanh dong nay khong the hoan tac.';
-  }
-
-  @override
-  String get dissolve => 'Giai tan';
-
-  @override
-  String get groupQrCode => 'Ma QR nhom';
-
-  @override
-  String get searchChatHistory => 'Tim kich su tro chuyen';
-
-  @override
-  String get groupIdCopied => 'Da sao chep ID nhom';
-
-  @override
-  String tapCopyGroupId(int count) {
-    return '$count thanh vien · Nhan de sao chep ID nhom';
-  }
-
-  @override
-  String get receiverAddress => 'Dia chi nguoi nhan';
-
-  @override
-  String get enterOrPasteAddress => 'Nhap hoac dan dia chi vi';
-
-  @override
-  String get selectToken => 'Chon Token';
-
-  @override
-  String get transferAmount => 'So tien chuyen';
-
-  @override
-  String get available => 'Kha dung';
-
-  @override
-  String get allAmount => 'Tat ca';
-
-  @override
-  String get memoOptional => 'Ghi chu (tuy chon)';
-
-  @override
-  String get addMemo => 'Them ghi chu';
-
-  @override
-  String get confirmTransfer => 'Xac nhan chuyen tien';
-
-  @override
-  String get invalidAddress => 'Vui long nhap dia chi nguoi nhan hop le';
-
-  @override
-  String get invalidAmount => 'Vui long nhap so tien hop le';
-
-  @override
-  String get selectTokenPlease => 'Vui long chon token';
-
-  @override
-  String get addressVerified => 'Dia chi da xac minh';
-
-  @override
-  String availableBalance(String balance, String symbol) {
-    return 'Kha dung: $balance $symbol';
-  }
-
-  @override
-  String get scanningInDevelopment => 'Tinh nang quet dang phat trien...';
-
-  @override
-  String get enterAmount => 'Nhap so tien';
-
-  @override
-  String get redPacketCountMin => 'Can it nhat 1 li xi';
-
-  @override
-  String get viewRedPacketDetails => 'Xem chi tiet li xi';
-
-  @override
-  String get enterTransferAmount => 'Nhap so tien chuyen';
-
-  @override
-  String get transferTo => 'Chuyen den';
-
-  @override
-  String get selectCurrency => 'Chon loai tien';
-
-  @override
-  String get receiveTransfer => 'Da nhan chuyen tien';
-
-  @override
-  String fromSender(String name, Object senderName) {
-    return 'Tu $senderName';
-  }
-
-  @override
-  String get confirmReceive => 'Xac nhan nhan';
-
-  @override
-  String get groupProfile => 'Thong tin nhom';
-
-  @override
-  String get viewProfile => 'Xem ho so';
-
-  @override
-  String get removeMember => 'Xoa khoi nhom';
-
-  @override
-  String removeMemberConfirm(String name) {
-    return 'Xoa \"$name\" khoi nhom?';
-  }
-
-  @override
-  String get remove => 'Xoa';
-
-  @override
-  String get clearStatus => 'Xoa trang thai';
-
-  @override
-  String get clearStatusConfirm => 'Xoa trang thai hien tai?';
-
-  @override
-  String get statusCleared => 'Da xoa trang thai';
-
-  @override
-  String statusSet(String result) {
-    return 'Trang thai da dat: $result';
-  }
-
-  @override
-  String get userNotExist => 'Nguoi dung khong ton tai';
-
-  @override
-  String get userIdCopied => 'Da sao chep ID nguoi dung';
-
-  @override
-  String get voiceCallInDevelopment => 'Goi thoai dang phat trien...';
-
-  @override
-  String get report => 'Bao cao';
-
-  @override
-  String get reportInDevelopment => 'Tinh nang bao cao dang phat trien...';
-
-  @override
-  String get shareCard => 'Chia se the';
-
-  @override
-  String get shareInDevelopment => 'Tinh nang chia se dang phat trien...';
-
-  @override
-  String get qrCode => 'Ma QR';
-
-  @override
-  String get qrCodeInDevelopment => 'Tinh nang ma QR dang phat trien...';
-
-  @override
-  String get avatarUpdated => 'Da cap nhat anh dai dien';
-
-  @override
-  String selectImageFailed(String error) {
-    return 'Chon hinh anh that bai: $error';
-  }
-
-  @override
-  String get changeName => 'Doi ten';
-
-  @override
-  String get male => 'Nam';
-
-  @override
-  String get female => 'Nu';
-
-  @override
-  String genderSet(String gender) {
-    return 'Gioi tinh da dat: $gender';
-  }
-
-  @override
-  String regionSet(String region) {
-    return 'Khu vuc da dat: $region';
-  }
-
-  @override
-  String get setPatText => 'Dat van ban vo vai';
-
-  @override
-  String get changeSignature => 'Doi chu ky';
-
-  @override
-  String ringtoneSet(String result) {
-    return 'Nhac chuong da dat: $result';
-  }
-
-  @override
-  String featureInDev(String feature) {
-    return '$feature dang phat trien...';
-  }
-
-  @override
-  String saveAddressFailed(String error) {
-    return 'Luu dia chi that bai: $error';
-  }
-
-  @override
-  String get myAddress => 'Dia chi cua toi';
-
-  @override
-  String get addNew => 'Them';
-
-  @override
-  String get addAddress => 'Them dia chi';
-
-  @override
-  String get addressAdded => 'Da them dia chi';
-
-  @override
-  String get addressUpdated => 'Da cap nhat dia chi';
-
-  @override
-  String get deleteAddress => 'Xoa dia chi';
-
-  @override
-  String get deleteAddressConfirm => 'Xoa dia chi nay?';
-
-  @override
-  String get addressDeleted => 'Da xoa dia chi';
-
-  @override
-  String get setDefaultAddress => 'Dat lam mac dinh';
-
-  @override
-  String get fillCompleteInfo => 'Vui long dien day du thong tin';
-
-  @override
-  String saveInvoiceFailed(String error) {
-    return 'Luu hoa don that bai: $error';
-  }
-
-  @override
-  String get myInvoices => 'Hoa don cua toi';
-
-  @override
-  String get addInvoice => 'Them hoa don';
-
-  @override
-  String get invoiceAdded => 'Da them hoa don';
-
-  @override
-  String get invoiceUpdated => 'Da cap nhat hoa don';
-
-  @override
-  String get deleteInvoice => 'Xoa hoa don';
-
-  @override
-  String get deleteInvoiceConfirm => 'Xoa hoa don nay?';
-
-  @override
-  String get invoiceDeleted => 'Da xoa hoa don';
-
-  @override
-  String get invoiceType => 'Loai hoa don: ';
-
-  @override
-  String get personal => 'Ca nhan';
-
-  @override
-  String get enterprise => 'Doanh nghiep';
-
-  @override
-  String get setDefaultInvoice => 'Dat lam mac dinh';
-
-  @override
-  String get enterTaxId => 'Nhap ma so thue';
-
-  @override
-  String get vibrateMode => 'Che do rung';
-
-  @override
-  String get silentMode => 'Che do im lang';
-
-  @override
-  String playing(String ringtoneName) {
-    return 'Dang phat: $ringtoneName';
-  }
-
-  @override
-  String playFailed(String ringtoneName) {
-    return 'Phat that bai: $ringtoneName';
-  }
-
-  @override
-  String get enterGroupNamePlease => 'Vui long nhap ten nhom';
-
-  @override
-  String get selectAtLeastOne => 'Vui long chon it nhat mot thanh vien';
-
-  @override
-  String get fillStatus => 'Viet trang thai';
-
-  @override
-  String get fileNotExist => 'Tep khong ton tai';
-
-  @override
-  String sendFailed(String error) {
-    return 'Gui that bai: $error';
-  }
-
-  @override
-  String get cannotOpenBrowser => 'Khong the mo trinh duyet';
-
-  @override
-  String selectFileFailed(String error) {
-    return 'Chon tep that bai: $error';
-  }
-
-  @override
-  String get enterMusicLink => 'Nhap lien ket nhac';
-
-  @override
-  String get enterValidLink => 'Vui long nhap lien ket hop le';
-
-  @override
-  String get enterPollQuestion => 'Nhap cau hoi binh chon';
-
-  @override
-  String get minTwoOptions => 'Can it nhat 2 lua chon';
-
-  @override
-  String get crossDeviceEnabled => 'Da bat ky da thiet bi';
-
-  @override
-  String get crossDeviceSet => 'Cai dat ky da thiet bi thanh cong';
-
-  @override
-  String setupFailed(String error) {
-    return 'Cai dat that bai: $error';
-  }
-
-  @override
-  String get receiveAmount => 'So tien nhan';
-
-  @override
-  String get enterValidAmount => 'Vui long nhap so tien hop le';
-
-  @override
-  String get addressCopied => 'Da sao chep dia chi';
-
-  @override
-  String openItem(String content) {
-    return 'Mo: $content';
-  }
-
-  @override
-  String get newNoteComingSoon => 'Tinh nang ghi chu moi sap ra mat';
-
-  @override
-  String get addLinkComingSoon => 'Tinh nang them lien ket sap ra mat';
-
-  @override
-  String get deleted => 'Da xoa';
-
-  @override
-  String get shareComingSoon => 'Tinh nang chia se sap ra mat';
-
-  @override
-  String get saveComingSoon => 'Tinh nang luu sap ra mat';
-
-  @override
-  String get moreStylesComingSoon => 'Them kieu sap ra mat';
-
-  @override
-  String get wallet => 'Vi';
-
-  @override
-  String get walletArea => 'Khu vuc vi';
-
-  @override
-  String get recording => 'Dang ghi am';
-
-  @override
-  String get invalidVideoUrl => 'URL video khong hop le';
-
-  @override
-  String get downloadFile => 'Tai tep xuong';
-
-  @override
-  String get clearChatHistoryTitle => 'Xoa lich su tro chuyen';
-
-  @override
-  String get cannotUndo => 'Hanh dong nay khong the hoan tac';
-
-  @override
-  String get videoCall => 'Goi Video';
-
-  @override
-  String get voiceCall => 'Goi Thoai';
-
-  @override
-  String get leaveMeeting => 'Roi cuoc hop';
-
-  @override
-  String get chatDetails => 'Chi tiet tro chuyen';
-
-  @override
-  String get viewAllGroupMembers => 'Xem tat ca thanh vien';
-
-  @override
-  String get groupName => 'Ten nhom';
-
-  @override
-  String get groupNameUpdated => 'Da cap nhat ten nhom';
-
-  @override
-  String get groupDescriptionUpdated => 'Đã cập nhật mô tả nhóm';
-
-  @override
-  String get groupAvatarUpdated => 'Đã cập nhật ảnh đại diện nhóm';
-
-  @override
-  String get updateFailed => 'Cap nhat that bai';
-
-  @override
-  String get noPermissionToModify => 'Ban khong co quyen sua doi';
-
-  @override
-  String get groupManagement => 'Quan ly nhom';
-
-  @override
-  String get myNicknameInGroup => 'Biet danh trong nhom';
-
-  @override
-  String get pinChat => 'Ghim tro chuyen';
-
-  @override
-  String get strongReminder => 'Nhac nho manh';
-
-  @override
-  String get setChatBackground => 'Dat hinh nen tro chuyen';
-
-  @override
-  String get unknownFile => 'Tep khong xac dinh';
-
-  @override
-  String get download => 'Tai xuong';
-
-  @override
-  String get invalidLocation => 'Vi tri khong hop le';
-
-  @override
-  String get address => 'Dia chi';
-
-  @override
-  String get latitude => 'Vi do';
-
-  @override
-  String get longitude => 'Kinh do';
-
-  @override
-  String get close => 'Dong';
-
-  @override
-  String get tapToCancel => 'Nhan de huy';
-
-  @override
-  String captureFailed(Object error) {
-    return 'Chup that bai: $error';
-  }
-
-  @override
-  String get processingVideo => 'Dang xu ly video...';
-
-  @override
-  String get videoFileNotExist => 'Tep video khong ton tai';
-
-  @override
-  String get videoDataEmpty => 'Du lieu video trong';
-
-  @override
-  String get videoTooLarge => 'Kich thuoc video khong the vuot qua 100MB';
-
-  @override
-  String get sendingVideo => 'Dang gui video...';
-
-  @override
-  String sendVideoFailed(Object error) {
-    return 'Gui video that bai: $error';
-  }
-
-  @override
-  String get imageFileNotExist => 'Tep hinh anh khong ton tai';
-
-  @override
-  String get imageDataEmpty => 'Du lieu hinh anh trong';
-
-  @override
-  String get sendingImage => 'Dang gui hinh anh...';
-
-  @override
-  String sendImageFailed(Object error) {
-    return 'Gui hinh anh that bai: $error';
-  }
-
-  @override
-  String get sendLocation => 'Gui vi tri';
-
-  @override
-  String get selectLocationAndSend => 'Chon vi tri va gui';
-
-  @override
-  String get shareRealTimeLocation => 'Chia se vi tri thoi gian thuc';
-
-  @override
-  String get shareLocationForOneHour =>
-      'Chia se vi tri thoi gian thuc voi ban trong 1 gio';
-
-  @override
-  String get locationSent => 'Da gui vi tri';
-
-  @override
-  String get selectMessages => 'Chon tin nhan';
-
-  @override
-  String selectedCount(int count) {
-    return 'Da chon $count';
-  }
-
-  @override
-  String get selectAll => 'Chon tat ca';
-
-  @override
-  String groupChatCount(int count) {
-    return 'Chat nhom ($count)';
-  }
-
-  @override
-  String get privateChat => 'Chat rieng';
-
-  @override
-  String get noMessages => 'Khong co tin nhan';
-
-  @override
-  String get sendFirstMessage => 'Gui tin nhan dau tien de bat dau tro chuyen';
-
-  @override
-  String get encryptionNotice =>
-      'Cuoc tro chuyen nay duoc ma hoa dau cuoi. Chi ban va nguoi nhan moi doc duoc tin nhan.';
-
-  @override
-  String replyTo(String name) {
-    return 'Tra loi $name';
-  }
-
-  @override
-  String get multiForward => 'Chuyen tiep';
-
-  @override
-  String get collect => 'Luu tap';
-
-  @override
-  String get noMembers => 'Khong co thanh vien';
-
-  @override
-  String get memberNotFound => 'Khong tim thay thanh vien';
-
-  @override
-  String get voiceFileNotExist => 'Tep giong noi khong ton tai';
-
-  @override
-  String get voiceFileEmpty => 'Tep giong noi trong';
-
-  @override
-  String get sendingVoice => 'Dang gui tin nhan thoai...';
-
-  @override
-  String sendVoiceFailed(Object error) {
-    return 'Gui tin nhan thoai that bai: $error';
-  }
-
-  @override
-  String get messageCopied => 'Da sao chep tin nhan';
-
-  @override
-  String get messageForwarded => 'Da chuyen tiep tin nhan';
-
-  @override
-  String forwardFailed(Object error) {
-    return 'Chuyen tiep that bai: $error';
-  }
-
-  @override
-  String get unfavorited => 'Da bo yeu thich';
-
-  @override
-  String get favorited => 'Da yeu thich';
-
-  @override
-  String get reactionAdded => 'Da them phan ung';
-
-  @override
-  String get reactionRemoved => 'Da xoa phan ung';
-
-  @override
-  String get failedMessageDeleted => 'Da xoa tin nhan that bai';
-
-  @override
-  String get deleteMessages => 'Xoa tin nhan';
-
-  @override
-  String deleteMessagesConfirm(Object count) {
-    return 'Ban co chac muon xoa $count tin nhan?';
-  }
-
-  @override
-  String noteOtherMessages(Object count) {
-    return 'Luu y: $count tin nhan tu nguoi khac va chi bi xoa cho ban.';
-  }
-
-  @override
-  String myMessagesWillBeRecalled(Object count) {
-    return '$count tin nhan tu ban se bi thu hoi cho tat ca.';
-  }
-
-  @override
-  String recalledCount(Object count, Object localCount) {
-    return 'Da thu hoi $count tin nhan, $localCount chi bi xoa cho ban';
-  }
-
-  @override
-  String recalledMessages(Object count) {
-    return 'Da thu hoi $count tin nhan';
-  }
-
-  @override
-  String deletedLocally(Object count) {
-    return '$count tin nhan chi bi xoa cho ban';
-  }
-
-  @override
-  String forwardedCount(Object count) {
-    return 'Da chuyen tiep $count tin nhan';
-  }
-
-  @override
-  String forwardComplete(Object failed, Object success) {
-    return 'Chuyen tiep hoan tat: $success thanh cong, $failed that bai';
-  }
-
-  @override
-  String get remindOnlyInGroup =>
-      'Tinh nang nhac nho chi kha dung trong chat nhom';
-
-  @override
-  String get onlyTextSearchable => 'Chi co the tim kiem tin nhan van ban';
-
-  @override
-  String searchFor(Object text) {
-    return 'Tim \"$text\"';
-  }
-
-  @override
-  String get baiduSearch => 'Tim Baidu';
-
-  @override
-  String get googleSearch => 'Tim Google';
-
-  @override
-  String get bingSearch => 'Tim Bing';
-
-  @override
-  String get calling => 'Dang goi...';
-
-  @override
-  String get connecting => 'Dang ket noi...';
-
-  @override
-  String get ringing => 'Dang reo...';
-
-  @override
-  String get inCall => 'Dang trong cuoc goi';
-
-  @override
-  String featureInDevelopment(String feature) {
-    return 'Tinh nang dang phat trien...';
-  }
-
-  @override
-  String collectMessages(Object count) {
-    return 'Da luu $count tin nhan';
-  }
-
-  @override
-  String get voted => 'Da binh chon';
-
-  @override
-  String get voteChanged => 'Da thay doi binh chon';
-
-  @override
-  String get voteRemoved => 'Da xoa binh chon';
-
-  @override
-  String get endPoll => 'Ket thuc binh chon';
-
-  @override
-  String get endPollConfirm =>
-      'Ban co chac muon ket thuc binh chon nay? Khong the binh chon sau khi ket thuc.';
-
-  @override
-  String memberCount(int count) {
-    return '$count thanh vien';
-  }
-
-  @override
-  String get videoChannels => 'Kenh';
-
-  @override
-  String get live => 'Truc tiep';
-
-  @override
-  String get listen => 'Nghe';
-
-  @override
-  String get watch => 'Xem';
-
-  @override
-  String get searchDiscover => 'Tim kiem';
-
-  @override
-  String get nearbyPeople => 'Gan day';
-
-  @override
-  String get games => 'Tro choi';
-
-  @override
-  String get miniPrograms => 'Ung dung mini';
-
-  @override
-  String done(int count) {
-    return 'Xong($count)';
-  }
-
-  @override
-  String get services => 'Dich vu';
-
-  @override
-  String get favorites => 'Yeu thich';
-
-  @override
-  String get ordersAndCards => 'Don hang & The';
-
-  @override
-  String get stickers => 'Nhan dan';
-
-  @override
-  String statusSetTo(String status) {
-    return 'Trang thai da dat: $status';
-  }
-
-  @override
-  String get avatarUploadFailed => 'Tai len anh dai dien that bai';
-
-  @override
-  String get personalProfile => 'Ho so ca nhan';
-
-  @override
-  String get name => 'Ten';
-
-  @override
-  String get gender => 'Gioi tinh';
-
-  @override
-  String get region => 'Khu vuc';
-
-  @override
-  String get myQrCode => 'Ma QR cua toi';
-
-  @override
-  String get poke => 'Vo vai';
-
-  @override
-  String get ringtone => 'Nhac chuong';
-
-  @override
-  String get defaultRingtone => 'Nhac chuong mac dinh';
-
-  @override
-  String get myAddresses => 'Dia chi cua toi';
-
-  @override
-  String genderSetTo(String gender) {
-    return 'Gioi tinh da dat: $gender';
-  }
-
-  @override
-  String get selectRegion => 'Chon khu vuc';
-
-  @override
-  String get selectCity => 'Chon thanh pho';
-
-  @override
-  String regionSetTo(String region) {
-    return 'Khu vuc da dat: $region';
-  }
-
-  @override
-  String get setPoke => 'Dat vo vai';
-
-  @override
-  String get friendPokedMe => 'Ban be vo vai toi';
-
-  @override
-  String get enterPokeSuffix => 'Nhap hau to vo vai, vi du: vao vai';
-
-  @override
-  String get example => 'Vi du';
-
-  @override
-  String get onTheShoulder => ' vao vai';
-
-  @override
-  String get pokeCleared => 'Da xoa vo vai';
-
-  @override
-  String pokeSetTo(String suffix) {
-    return 'Vo vai da dat: vo vai toi$suffix';
-  }
-
-  @override
-  String get editSignature => 'Chinh sua chu ky';
-
-  @override
-  String get introduceYourself => 'Mot cau gioi thieu ban than';
-
-  @override
-  String get signatureCleared => 'Da xoa chu ky';
-
-  @override
-  String get signatureUpdated => 'Da cap nhat chu ky';
-
-  @override
-  String get scanToAddFriend => 'Quet ma QR tren de ket ban voi toi';
-
-  @override
-  String ringtoneSetTo(String ringtone) {
-    return 'Nhac chuong da dat: $ringtone';
-  }
-
-  @override
-  String confirmDissolveGroup(String name) {
-    return 'Ban co chac chac muon giai tan \"$name\" khong? Hanh dong nay khong the hoan tac.';
-  }
-
-  @override
-  String get enterValidServerAddress => 'Vui long nhap dia chi may chu hop le';
-
-  @override
-  String get emailOtp => 'OTP Email';
-
-  @override
-  String get enterServerAddressFirst => 'Vui long nhap dia chi may chu truoc';
-
-  @override
-  String get passkeyRequiresServer => 'Dang nhap Passkey can ho tro may chu';
-
-  @override
-  String get loginAgreement => 'Bang viec dang nhap, ban dong y voi ';
-
-  @override
-  String get pleaseAgreeToTerms =>
-      'Vui long doc va dong y voi Dieu khoan Dich vu va Chinh sach Bao mat';
-
-  @override
-  String get registerFailed => 'Dang ky that bai';
-
-  @override
-  String get reenterPassword => 'Nhap lai mat khau';
-
-  @override
-  String get passwordsDoNotMatch => 'Mat khau khong khop';
-
-  @override
-  String get inviteCodeBuiltIn => 'Ma moi (tich hop san)';
-
-  @override
-  String get inviteCodeBuiltInNote =>
-      'Ma moi da tich hop san, thuong khong can thay doi';
-
-  @override
-  String get iHaveReadAndAgree => 'Toi da doc va dong y voi ';
-
-  @override
-  String get startGroupChat => 'Bat dau Chat nhom';
-
-  @override
-  String get addFriends => 'Them ban';
-
-  @override
-  String get paymentAndCollection => 'Thanh toan';
-
-  @override
-  String messagesWithCount(int count) {
-    return 'Tin nhan($count)';
-  }
-
-  @override
-  String contactCount(int count) {
-    return '$count lien he';
-  }
-
-  @override
-  String get addToHomeScreen => 'Them vao man hinh chinh';
-
-  @override
-  String recommendedCardTo(String contact, String recipient) {
-    return 'Da gioi thieu the cua $contact cho $recipient';
-  }
-
-  @override
-  String get enterRemarkName => 'Nhap ten ghi chu';
-
-  @override
-  String remarkSetTo(String remark) {
-    return 'Ghi chu da dat: $remark';
-  }
-
-  @override
-  String acceptedFriendRequest(String name) {
-    return 'Da chap nhan yeu cau ket ban cua $name';
-  }
-
-  @override
-  String rejectedFriendRequest(String name) {
-    return 'Da tu choi yeu cau ket ban cua $name';
-  }
-
-  @override
-  String get groupInvites => 'Loi moi nhom';
-
-  @override
-  String myGroups(int count) {
-    return 'Nhom cua toi ($count)';
-  }
-
-  @override
-  String get invitedToJoinGroup => 'Duoc moi tham gia nhom';
-
-  @override
-  String confirmLeaveGroup(String name) {
-    return 'Ban co chac chac muon roi khoi \"$name\" khong?';
-  }
-
-  @override
-  String get leave => 'Roi';
-
-  @override
-  String get saveMedia => 'Lưu';
-
-  @override
-  String get recallThisMessage => 'Thu hoi tin nhan nay?';
-
-  @override
-  String get messageRecalled => 'Tin nhan da thu hoi';
-
-  @override
-  String get savedToGallery => 'Da luu vao thu vien';
-
-  @override
-  String get failedToSave => 'Luu that bai';
-
-  @override
-  String get saving => 'Dang luu...';
-
-  @override
-  String get share => 'Chia se';
-
-  @override
-  String get saveToGallery => 'Luu vao Thu vien';
-
-  @override
-  String downloadFailed(String code) {
-    return 'Tai xuong that bai: $code';
-  }
-
-  @override
-  String get noMediaUrl => 'Khong co URL media';
-
-  @override
-  String shareFailed(String error) {
-    return 'Chia se that bai: $error';
-  }
-
-  @override
-  String get failedToLoadImage => 'Tai hinh anh that bai';
-
-  @override
-  String get failedToLoadMoreMessages => 'Tai them tin nhan that bai';
-
-  @override
-  String get failedToSend => 'Gui that bai';
-
-  @override
-  String get failedToSendImage => 'Gui hinh anh that bai';
-
-  @override
-  String get failedToSendVoice => 'Gui tin nhan thoai that bai';
-
-  @override
-  String get failedToSendFile => 'Gui tep that bai';
-
-  @override
-  String get failedToSendVideo => 'Gui video that bai';
-
-  @override
-  String get failedToSendLocation => 'Gui vi tri that bai';
-
-  @override
-  String get failedToResend => 'Gui lai that bai';
-
-  @override
-  String get failedToRecall => 'Thu hoi that bai';
-
-  @override
-  String get failedToReply => 'Tra loi that bai';
-
-  @override
-  String get failedToAddReaction => 'Them phan ung that bai';
-
-  @override
-  String get failedToSendPoll => 'Gui binh chon that bai';
-
-  @override
-  String get failedToVote => 'Binh chon that bai';
-
-  @override
-  String get failedToLoadMessages => 'Tai tin nhan that bai';
-
-  @override
-  String get callFeatureComingSoon => 'Tinh nang goi thoai va video sap ra mat';
-
-  @override
-  String get cannotForwardRedPacketOrTransfer =>
-      'Khong the chuyen tiep li xi va chuyen tien';
-
-  @override
-  String get videoRecordingFailed => 'Quay video that bai. Vui long thu lai.';
-
-  @override
-  String get redPacket => 'Li xi';
-
-  @override
-  String get music => 'Nhac';
-
-  @override
-  String get coupon => 'Phieu giam gia';
-
-  @override
-  String get gift => 'Qua tang';
-
-  @override
-  String get poll => 'Binh chon';
-
-  @override
-  String get text => 'Van ban';
-
-  @override
-  String get link => 'Lien ket';
-
-  @override
-  String get note => 'Ghi chu';
-
-  @override
-  String get myNotes => 'Ghi chu cua toi';
-
-  @override
-  String get today => 'Hom nay';
-
-  @override
-  String daysAgoText(int count) {
-    return '$count ngay truoc';
-  }
-
-  @override
-  String dateFormat(int month, int day) {
-    return '$day/$month';
-  }
-
-  @override
-  String get noFavorites => 'Chua co yeu thich';
-
-  @override
-  String get longPressToFavorite => 'Nhan giu tin nhan de yeu thich';
-
-  @override
-  String get newNote => 'Ghi chu moi';
-
-  @override
-  String get favoriteLink => 'Lien ket yeu thich';
-
-  @override
-  String get editTags => 'Chinh sua the';
-
-  @override
-  String get deleteFavorite => 'Xoa yeu thich';
-
-  @override
-  String get deleteFavoriteConfirm => 'Ban co chac muon xoa yeu thich nay?';
-
-  @override
-  String get noSearchResultsFound => 'Khong tim thay ket qua';
-
-  @override
-  String get sendRedPacket => 'Gui li xi';
-
-  @override
-  String get amount => 'So tien';
-
-  @override
-  String get redPacketCover => 'Bia li xi';
-
-  @override
-  String get redPacketType => 'Loai li xi';
-
-  @override
-  String get normalRedPacket => 'Thuong';
-
-  @override
-  String get luckyRedPacket => 'May man';
-
-  @override
-  String get redPacketCount => 'So li xi';
-
-  @override
-  String get pieces => 'cai';
-
-  @override
-  String get putMoneyInRedPacket => 'Bo tien vao li xi';
-
-  @override
-  String get redPacketRefundNotice => 'Li xi chua nhan se duoc hoan sau 24 gio';
-
-  @override
-  String get openRedPacket => 'Mo';
-
-  @override
-  String get redPacketAllClaimed => 'Li xi da nhan het';
-
-  @override
-  String get redPacketExpired => 'Li xi het han';
-
-  @override
-  String get addTransferNote => 'Them ghi chu chuyen tien';
-
-  @override
-  String get yuan => 'VND';
-
-  @override
-  String get savedToChangeCanTransfer =>
-      'Da luu vao so du, co the chuyen truc tiep';
-
-  @override
-  String get replyWithEmoji => 'Tra loi bang bieu tuong nay';
-
-  @override
-  String get claimedYourRedPacket => 'da nhan li xi cua ban';
-
-  @override
-  String get claimedRedPacket => 'da nhan';
-
-  @override
-  String get otherTyping => 'dang nhap...';
-
-  @override
-  String get processing => 'Dang xu ly...';
-
-  @override
-  String get transferCancelled => 'Da huy chuyen tien';
-
-  @override
-  String get transferFailed => 'Chuyen tien that bai';
-
-  @override
-  String get creatingPaymentRequest => 'Dang tao yeu cau thanh toan...';
-
-  @override
-  String get processingPayment => 'Dang xu ly thanh toan...';
-
-  @override
-  String get paymentFailed => 'Thanh toan that bai';
-
-  @override
-  String get clickRetry => 'Nhan de thu lai';
-
-  @override
-  String get settingsTitle => 'Cai dat';
-
-  @override
-  String get editRemark => 'Chinh sua ghi chu';
-
-  @override
-  String get setPermissions => 'Dat quyen';
-
-  @override
-  String get recommendToFriends => 'Gioi thieu cho ban be';
-
-  @override
-  String get setStarFriend => 'Dat lam ban than';
-
-  @override
-  String get addToBlacklist => 'Them vao danh sach chan';
-
-  @override
-  String get complain => 'Bao cao';
-
-  @override
-  String get deleteContact => 'Xoa lien he';
-
-  @override
-  String deleteContactConfirm(String name) {
-    return 'Ban co chac muon xoa $name?';
-  }
-
-  @override
-  String get transferTitle => 'Chuyen tien';
-
-  @override
-  String get receiverAddressLabel => 'Dia chi nguoi nhan';
-
-  @override
-  String get selectTokenLabel => 'Chon Token';
-
-  @override
-  String get transferAmountLabel => 'So tien chuyen';
-
-  @override
-  String get memoLabel => 'Ghi chu (tuy chon)';
-
-  @override
-  String get enterOrPasteAddressHint => 'Nhap hoac dan dia chi vi';
-
-  @override
-  String get scanInDevelopment => 'Tinh nang quet dang phat trien...';
-
-  @override
-  String get availableLabel => 'Kha dung';
-
-  @override
-  String availableBalanceFormat(String balance, String symbol) {
-    return 'Kha dung: $balance $symbol';
-  }
-
-  @override
-  String get addMemoHint => 'Them ghi chu';
-
-  @override
-  String get receiveTitle => 'Nhan';
-
-  @override
-  String get walletNotConnectedTitle => 'Vi chua ket noi';
-
-  @override
-  String get connectWalletFirst => 'Vui long ket noi vi truoc';
-
-  @override
-  String get sendPaymentRequest => 'Gui yeu cau thanh toan';
-
-  @override
-  String get qrCodeGenerateFailed => 'Tao ma QR that bai';
-
-  @override
-  String get scanQrToPayMe => 'Quet ma QR de thanh toan cho toi';
-
-  @override
-  String get myWalletAddress => 'Dia chi vi cua toi';
-
-  @override
-  String get createPaymentRequest => 'Tao yeu cau thanh toan';
-
-  @override
-  String get selectTokenHint => 'Chon Token';
-
-  @override
-  String get amountLabel => 'So tien';
-
-  @override
-  String get cancelButton => 'Huy';
-
-  @override
-  String get sendRequestButton => 'Gui yeu cau';
-
-  @override
-  String get allReadReceipt => 'Tat ca da doc';
-
-  @override
-  String readCountReceipt(int count) {
-    return '$count da doc';
-  }
-
-  @override
-  String n42IdLabel(String id) {
-    return 'N42 ID: $id';
-  }
-
-  @override
-  String get redPacketDefaultGreeting => 'Chuc mung tot lanh';
-
-  @override
-  String senderRedPacket(String name) {
-    return 'Li xi cua $name';
-  }
-
-  @override
-  String get allButton => 'Tất cả';
-
-  @override
-  String get enterValidAddress => 'Vui long nhap dia chi hop le';
-
-  @override
-  String get pleaseSelectToken => 'Vui long chon token';
-
-  @override
-  String get receivedTransfer => 'Da nhan chuyen tien';
-
-  @override
-  String get selectForwardRecipient => 'Chon nguoi nhan chuyen tiep';
-
-  @override
-  String get emojiFaces => 'Khuon mat';
-
-  @override
-  String get emojiHearts => 'Trai tim';
-
-  @override
-  String get emojiAnimals => 'Dong vat';
-
-  @override
-  String get emojiFood => 'Thuc an';
-
-  @override
-  String get emojiTransport => 'Giao thong';
-
-  @override
-  String get emojiActivities => 'Hoat dong';
-
-  @override
-  String get emojiObjects => 'Do vat';
-
-  @override
-  String get emojiSymbols => 'Bieu tuong';
-
-  @override
-  String get transferProcessing => 'Dang xu ly chuyen tien...';
-
-  @override
-  String senderSentRedPacket(String name) {
-    return '$name da gui li xi';
-  }
-
-  @override
-  String get savedToBalance => 'Da luu vao so du, co the chuyen truc tiep';
-
-  @override
-  String get redPacketExpiredOrEmpty => 'Li xi het han/da nhan het';
-
-  @override
-  String get scanFeatureComingSoon => 'Tinh nang quet sap ra mat...';
-
-  @override
-  String get setAsStarred => 'Dat lam yeu thich';
-
-  @override
-  String get addToBlocklist => 'Them vao danh sach chan';
-
-  @override
-  String get claimedYour => ' da nhan ';
-
-  @override
-  String get claimedText => ' da nhan ';
-
-  @override
-  String userTyping(String name) {
-    return '$name dang nhap...';
-  }
-
-  @override
-  String get typing => 'Dang nhap...';
-
-  @override
-  String get waitingToReceive => 'Cho nhan';
-
-  @override
-  String get tapToClaim => 'Nhan de nhan';
-
-  @override
-  String get hasBeenReceived => 'Da nhan';
-
-  @override
-  String get getLucky => 'Chuc may man';
-
-  @override
-  String get cameraStartFailed => 'Camera khoi dong that bai';
-
-  @override
-  String get unknownError => 'Loi khong xac dinh';
-
-  @override
-  String get placeQrCodeInFrame => 'Dat ma QR trong khung de quet';
-
-  @override
-  String get closeManualInput => 'Dong nhap thu cong';
-
-  @override
-  String get manualInputUserId => 'Nhap ID nguoi dung thu cong';
-
-  @override
-  String get add => 'Them';
-
-  @override
-  String get ringtoneClear => 'Xoa';
-
-  @override
-  String get ringtonePhone => 'Dien thoai';
-
-  @override
-  String get ringtoneClassic => 'Co dien';
-
-  @override
-  String get ringtoneSoft => 'Nhe nhang';
-
-  @override
-  String get ringtoneVibrate => 'Rung';
-
-  @override
-  String get ringtoneSilent => 'Im lang';
-
-  @override
-  String get stop => 'Dung';
-
-  @override
-  String get selectRingtone => 'Chon nhac chuong';
-
-  @override
-  String get loadingRingtones => 'Dang tai nhac chuong...';
-
-  @override
-  String get noRingtonesFound => 'Khong tim thay nhac chuong';
-
-  @override
-  String get moodAndThoughts => 'Tam trang & Suy nghi';
-
-  @override
-  String get statusHappy => 'Vui ve';
-
-  @override
-  String get statusCracked => 'Vo tan';
-
-  @override
-  String get statusLucky => 'May man';
-
-  @override
-  String get statusSunny => 'Nang ve';
-
-  @override
-  String get statusTired => 'Met moi';
-
-  @override
-  String get statusDaydream => 'Mo mong';
-
-  @override
-  String get statusRushing => 'Ban ron';
-
-  @override
-  String get statusOverthinking => 'Suy nghi qua nhieu';
-
-  @override
-  String get statusEnergized => 'Day nang luong';
-
-  @override
-  String get workAndStudy => 'Cong viec & Hoc tap';
-
-  @override
-  String get statusWorking => 'Dang lam viec';
-
-  @override
-  String get statusStudying => 'Dang hoc';
-
-  @override
-  String get statusBusy => 'Ban';
-
-  @override
-  String get statusSlacking => 'Nghi ngoi';
-
-  @override
-  String get statusTraveling => 'Di du lich';
-
-  @override
-  String get statusGoingHome => 'Ve nha';
-
-  @override
-  String get statusDnd => 'Khong lam phien';
-
-  @override
-  String get statusHanging => 'Di choi';
-
-  @override
-  String get statusCheckIn => 'Diem danh';
-
-  @override
-  String get statusExercising => 'Tap the duc';
-
-  @override
-  String get statusCoffee => 'Uong ca phe';
-
-  @override
-  String get statusBubbleTea => 'Uong tra sua';
-
-  @override
-  String get statusEating => 'An uong';
-
-  @override
-  String get statusParenting => 'Cham con';
-
-  @override
-  String get statusSavingWorld => 'Cuu the gioi';
-
-  @override
-  String get statusSelfie => 'Chup selfie';
-
-  @override
-  String get rest => 'Nghi ngoi';
-
-  @override
-  String get statusRetreat => 'An cu';
-
-  @override
-  String get statusHome => 'O nha';
-
-  @override
-  String get statusSleeping => 'Dang ngu';
-
-  @override
-  String get statusCatLover => 'Nguoi yeu meo';
-
-  @override
-  String get statusDogWalking => 'Dat cho di dao';
-
-  @override
-  String get statusGaming => 'Choi game';
-
-  @override
-  String get statusListening => 'Dang nghe';
-
-  @override
-  String get setStatus => 'Dat trang thai';
-
-  @override
-  String get visibleToFriends24h => 'Hien thi voi ban be trong 24 gio';
-
-  @override
-  String get writeStatus => 'Viet trang thai';
-
-  @override
-  String get enterYourStatus => 'Nhap trang thai...';
-
-  @override
-  String get ok => 'OK';
-
-  @override
-  String get cameraPermissionRequired => 'Can quyen camera de quet ma QR';
-
-  @override
-  String get cameraPermissionDenied =>
-      'Quyen camera bi tu choi vinh vien. Vui long bat trong cai dat he thong.';
-
-  @override
-  String get cannotGetCameraPermission => 'Khong the lay quyen camera';
-
-  @override
-  String permissionCheckError(String error) {
-    return 'Loi kiem tra quyen: $error';
-  }
-
-  @override
-  String get invalidQrCode => 'Ma QR khong hop le';
-
-  @override
-  String qrCodeProcessFailed(String error) {
-    return 'Xu ly ma QR that bai: $error';
-  }
-
-  @override
-  String cannotAddFriend(String error) {
-    return 'Khong the ket ban: $error';
-  }
-
-  @override
-  String get scanQrCode => 'Quet ma QR';
-
-  @override
-  String get checkingCameraPermission => 'Dang kiem tra quyen camera...';
-
-  @override
-  String get needCameraPermission => 'Can quyen camera';
-
-  @override
-  String get retryPermission => 'Thu lai';
-
-  @override
-  String get openSettings => 'Mo cai dat';
-
-  @override
-  String get inviteMembers => 'Moi thanh vien';
-
-  @override
-  String inviteCount(int count) {
-    return 'Moi($count)';
-  }
-
-  @override
-  String get noShippingAddress => 'Khong co dia chi giao hang';
-
-  @override
-  String get defaultLabel => 'Mac dinh';
-
-  @override
-  String get editAddress => 'Chinh sua dia chi';
-
-  @override
-  String get recipient => 'Nguoi nhan';
-
-  @override
-  String get enterRecipientName => 'Nhap ten nguoi nhan';
-
-  @override
-  String get phoneNumber => 'So dien thoai';
-
-  @override
-  String get enterPhoneNumber => 'Nhap so dien thoai';
-
-  @override
-  String get regionHint => 'Tinh/Thanh pho/Quan';
-
-  @override
-  String get detailedAddress => 'Dia chi chi tiet';
-
-  @override
-  String get detailedAddressHint => 'Duong, so nha, v.v.';
-
-  @override
-  String get setAsDefaultAddress => 'Dat lam dia chi mac dinh';
-
-  @override
-  String get pleaseCompleteInfo => 'Vui long dien day du thong tin';
-
-  @override
-  String get noInvoice => 'Khong co hoa don';
-
-  @override
-  String get company => 'Cong ty';
-
-  @override
-  String get taxNumber => 'Ma so thue';
-
-  @override
-  String get editInvoice => 'Chinh sua hoa don';
-
-  @override
-  String get companyName => 'Ten cong ty';
-
-  @override
-  String get enterCompanyName => 'Nhap ten cong ty';
-
-  @override
-  String get personalName => 'Ten ca nhan';
-
-  @override
-  String get enterName => 'Nhap ten';
-
-  @override
-  String get taxIdNumber => 'Ma so thue';
-
-  @override
-  String get enterTaxIdNumber => 'Nhap ma so thue';
-
-  @override
-  String get bankNameOptional => 'Ten ngan hang (Tuy chon)';
-
-  @override
-  String get enterBankName => 'Nhap ten ngan hang';
-
-  @override
-  String get bankAccountOptional => 'Tai khoan ngan hang (Tuy chon)';
-
-  @override
-  String get enterBankAccount => 'Nhap tai khoan ngan hang';
-
-  @override
-  String get companyAddressOptional => 'Dia chi cong ty (Tuy chon)';
-
-  @override
-  String get enterCompanyAddress => 'Nhap dia chi cong ty';
-
-  @override
-  String get companyPhoneOptional => 'Dien thoai cong ty (Tuy chon)';
-
-  @override
-  String get enterCompanyPhone => 'Nhap dien thoai cong ty';
-
-  @override
-  String get setAsDefaultInvoice => 'Dat lam hoa don mac dinh';
-
-  @override
-  String get confirmDeleteAddress => 'Ban co chac muon xoa dia chi nay?';
-
-  @override
-  String get confirmDeleteInvoice => 'Ban co chac muon xoa hoa don nay?';
+  String get groupViewAll => 'Xem tat ca';
 
   @override
   String get groupOwner => 'Chu so huu';
@@ -3028,932 +678,2627 @@ class SVi extends S {
   String get groupAdmin => 'Quan tri vien';
 
   @override
-  String get searchMembers => 'Tim thanh vien';
+  String get groupInvite => 'Moi';
 
   @override
-  String totalMembers(int count) {
+  String get commonGroupAnnouncement => 'Thong bao nhom';
+
+  @override
+  String get commonNotSet => 'Chua dat';
+
+  @override
+  String get groupDescription => 'Mo ta nhom';
+
+  @override
+  String get groupPublicGroup => 'Nhom cong khai';
+
+  @override
+  String get commonClearChatHistory => 'Xoa lich su tro chuyen';
+
+  @override
+  String get commonDissolveGroup => 'Giai tan nhom';
+
+  @override
+  String get commonLeaveGroup => 'Roi nhom';
+
+  @override
+  String get groupChangeGroupName => 'Doi ten nhom';
+
+  @override
+  String get commonEnterGroupName => 'Nhap ten nhom';
+
+  @override
+  String get commonConfirm => 'Xac nhan';
+
+  @override
+  String get groupEnterGroupDescription => 'Nhap mo ta nhom';
+
+  @override
+  String get groupPublish => 'Dang';
+
+  @override
+  String get chatClearHistoryConfirm =>
+      'Xoa tat ca lich su tro chuyen? Hanh dong nay khong the hoan tac.';
+
+  @override
+  String get chatClearAction => 'Xoa';
+
+  @override
+  String get commonChatHistoryCleared => 'Da xoa lich su tro chuyen';
+
+  @override
+  String get commonDissolve => 'Giai tan';
+
+  @override
+  String get groupQrCode => 'Ma QR nhom';
+
+  @override
+  String get commonSearchChatHistory => 'Tim kich su tro chuyen';
+
+  @override
+  String get groupIdCopied => 'Da sao chep ID nhom';
+
+  @override
+  String get transferEnterOrPasteAddress => 'Nhap hoac dan dia chi vi';
+
+  @override
+  String get transferSelectToken => 'Chon Token';
+
+  @override
+  String get commonTransferAmount => 'So tien chuyen';
+
+  @override
+  String get transferAvailable => 'Kha dung';
+
+  @override
+  String get transferMemoOptional => 'Ghi chu (tuy chon)';
+
+  @override
+  String get transferConfirmTransfer => 'Xac nhan chuyen tien';
+
+  @override
+  String get transferAddressVerified => 'Dia chi da xac minh';
+
+  @override
+  String transferAvailableBalance(String balance, String symbol) {
+    return 'Kha dung: $balance $symbol';
+  }
+
+  @override
+  String get commonEnterAmount => 'Nhap so tien';
+
+  @override
+  String get commonRedPacketCountMin => 'Can it nhat 1 li xi';
+
+  @override
+  String get commonViewRedPacketDetails => 'Xem chi tiet li xi';
+
+  @override
+  String get commonEnterTransferAmount => 'Nhap so tien chuyen';
+
+  @override
+  String get commonTransferTo => 'Chuyen den';
+
+  @override
+  String commonFromSender(String name, Object senderName) {
+    return 'Tu $senderName';
+  }
+
+  @override
+  String get commonConfirmReceive => 'Xac nhan nhan';
+
+  @override
+  String get groupProfile => 'Thong tin nhom';
+
+  @override
+  String get groupRemoveMember => 'Xoa khoi nhom';
+
+  @override
+  String get commonRemove => 'Xoa';
+
+  @override
+  String get profileClearStatus => 'Xoa trang thai';
+
+  @override
+  String get profileClearStatusConfirm => 'Xoa trang thai hien tai?';
+
+  @override
+  String get profileStatusCleared => 'Da xoa trang thai';
+
+  @override
+  String get profileUserNotExist => 'Nguoi dung khong ton tai';
+
+  @override
+  String get profileUserIdCopied => 'Da sao chep ID nguoi dung';
+
+  @override
+  String get commonReport => 'Bao cao';
+
+  @override
+  String get profileQrCode => 'Ma QR';
+
+  @override
+  String get profileAvatarUpdated => 'Da cap nhat anh dai dien';
+
+  @override
+  String commonSelectImageFailed(String error) {
+    return 'Chon hinh anh that bai: $error';
+  }
+
+  @override
+  String get profileChangeName => 'Doi ten';
+
+  @override
+  String get profileMale => 'Nam';
+
+  @override
+  String get profileFemale => 'Nu';
+
+  @override
+  String chatFeatureInDev(String feature) {
+    return '$feature dang phat trien...';
+  }
+
+  @override
+  String profileSaveAddressFailed(String error) {
+    return 'Luu dia chi that bai: $error';
+  }
+
+  @override
+  String get profileAddNew => 'Them';
+
+  @override
+  String get profileAddAddress => 'Them dia chi';
+
+  @override
+  String get profileAddressAdded => 'Da them dia chi';
+
+  @override
+  String get profileAddressUpdated => 'Da cap nhat dia chi';
+
+  @override
+  String get profileDeleteAddress => 'Xoa dia chi';
+
+  @override
+  String get profileAddressDeleted => 'Da xoa dia chi';
+
+  @override
+  String profileSaveInvoiceFailed(String error) {
+    return 'Luu hoa don that bai: $error';
+  }
+
+  @override
+  String get profileMyInvoices => 'Hoa don cua toi';
+
+  @override
+  String get profileAddInvoice => 'Them hoa don';
+
+  @override
+  String get profileInvoiceAdded => 'Da them hoa don';
+
+  @override
+  String get profileInvoiceUpdated => 'Da cap nhat hoa don';
+
+  @override
+  String get profileDeleteInvoice => 'Xoa hoa don';
+
+  @override
+  String get profileInvoiceDeleted => 'Da xoa hoa don';
+
+  @override
+  String get profilePersonal => 'Ca nhan';
+
+  @override
+  String get groupSelectAtLeastOne => 'Vui long chon it nhat mot thanh vien';
+
+  @override
+  String get chatFileNotExist => 'Tep khong ton tai';
+
+  @override
+  String chatSendFailed(String error) {
+    return 'Gui that bai: $error';
+  }
+
+  @override
+  String get chatCannotOpenBrowser => 'Khong the mo trinh duyet';
+
+  @override
+  String chatSelectFileFailed(String error) {
+    return 'Chon tep that bai: $error';
+  }
+
+  @override
+  String settingsSetupFailed(String error) {
+    return 'Cai dat that bai: $error';
+  }
+
+  @override
+  String get transferEnterValidAmount => 'Vui long nhap so tien hop le';
+
+  @override
+  String get commonAddressCopied => 'Da sao chep dia chi';
+
+  @override
+  String favoriteOpenItem(String content) {
+    return 'Mo: $content';
+  }
+
+  @override
+  String get favoriteDeleted => 'Da xoa';
+
+  @override
+  String get profileWallet => 'Vi';
+
+  @override
+  String get chatRecording => 'Dang ghi am';
+
+  @override
+  String get chatInvalidVideoUrl => 'URL video khong hop le';
+
+  @override
+  String get chatDownloadFile => 'Tai tep xuong';
+
+  @override
+  String get chatClearChatHistoryTitle => 'Xoa lich su tro chuyen';
+
+  @override
+  String get chatVideoCall => 'Goi Video';
+
+  @override
+  String get commonVoiceCall => 'Goi Thoai';
+
+  @override
+  String get callLeaveMeeting => 'Roi cuoc hop';
+
+  @override
+  String get chatDetails => 'Chi tiet tro chuyen';
+
+  @override
+  String get chatViewAllGroupMembers => 'Xem tat ca thanh vien';
+
+  @override
+  String get chatGroupName => 'Ten nhom';
+
+  @override
+  String get chatGroupNameUpdated => 'Da cap nhat ten nhom';
+
+  @override
+  String get chatUpdateFailed => 'Cap nhat that bai';
+
+  @override
+  String get chatNoPermissionToModify => 'Ban khong co quyen sua doi';
+
+  @override
+  String get chatGroupManagement => 'Quan ly nhom';
+
+  @override
+  String get chatMyNicknameInGroup => 'Biet danh trong nhom';
+
+  @override
+  String get chatPinChat => 'Ghim tro chuyen';
+
+  @override
+  String get chatStrongReminder => 'Nhac nho manh';
+
+  @override
+  String get chatSetChatBackground => 'Dat hinh nen tro chuyen';
+
+  @override
+  String get chatUnknownFile => 'Tep khong xac dinh';
+
+  @override
+  String get chatDownload => 'Tai xuong';
+
+  @override
+  String get chatInvalidLocation => 'Vi tri khong hop le';
+
+  @override
+  String get chatTapToCancel => 'Nhan de huy';
+
+  @override
+  String chatCaptureFailed(Object error) {
+    return 'Chup that bai: $error';
+  }
+
+  @override
+  String get chatProcessingVideo => 'Dang xu ly video...';
+
+  @override
+  String get chatVideoFileNotExist => 'Tep video khong ton tai';
+
+  @override
+  String get chatVideoDataEmpty => 'Du lieu video trong';
+
+  @override
+  String get chatVideoTooLarge => 'Kich thuoc video khong the vuot qua 100MB';
+
+  @override
+  String get chatSendingVideo => 'Dang gui video...';
+
+  @override
+  String chatSendVideoFailed(Object error) {
+    return 'Gui video that bai: $error';
+  }
+
+  @override
+  String get chatImageFileNotExist => 'Tep hinh anh khong ton tai';
+
+  @override
+  String get commonImageDataEmpty => 'Du lieu hinh anh trong';
+
+  @override
+  String get chatSendingImage => 'Dang gui hinh anh...';
+
+  @override
+  String chatSendImageFailed(Object error) {
+    return 'Gui hinh anh that bai: $error';
+  }
+
+  @override
+  String get chatSendLocation => 'Gui vi tri';
+
+  @override
+  String get chatSelectLocationAndSend => 'Chon vi tri va gui';
+
+  @override
+  String get chatShareRealTimeLocation => 'Chia se vi tri thoi gian thuc';
+
+  @override
+  String get chatShareLocationForOneHour =>
+      'Chia se vi tri thoi gian thuc voi ban trong 1 gio';
+
+  @override
+  String get chatLocationSent => 'Da gui vi tri';
+
+  @override
+  String get chatSelectMessages => 'Chon tin nhan';
+
+  @override
+  String chatSelectedCount(int count) {
+    return 'Da chon $count';
+  }
+
+  @override
+  String get chatSelectAll => 'Chon tat ca';
+
+  @override
+  String chatGroupChatCount(int count) {
+    return 'Chat nhom ($count)';
+  }
+
+  @override
+  String get chatPrivateChat => 'Chat rieng';
+
+  @override
+  String get chatNoMessages => 'Khong co tin nhan';
+
+  @override
+  String get chatSendFirstMessage =>
+      'Gui tin nhan dau tien de bat dau tro chuyen';
+
+  @override
+  String get chatEncryptionNotice =>
+      'Cuoc tro chuyen nay duoc ma hoa dau cuoi. Chi ban va nguoi nhan moi doc duoc tin nhan.';
+
+  @override
+  String get chatMultiForward => 'Chuyen tiep';
+
+  @override
+  String get chatCollect => 'Luu tap';
+
+  @override
+  String get chatNoMembers => 'Khong co thanh vien';
+
+  @override
+  String get chatMemberNotFound => 'Khong tim thay thanh vien';
+
+  @override
+  String get chatVoiceFileNotExist => 'Tep giong noi khong ton tai';
+
+  @override
+  String get chatVoiceFileEmpty => 'Tep giong noi trong';
+
+  @override
+  String get chatSendingVoice => 'Dang gui tin nhan thoai...';
+
+  @override
+  String chatSendVoiceFailed(Object error) {
+    return 'Gui tin nhan thoai that bai: $error';
+  }
+
+  @override
+  String get chatMessageForwarded => 'Da chuyen tiep tin nhan';
+
+  @override
+  String chatForwardFailed(Object error) {
+    return 'Chuyen tiep that bai: $error';
+  }
+
+  @override
+  String get chatUnfavorited => 'Da bo yeu thich';
+
+  @override
+  String get chatFavorited => 'Da yeu thich';
+
+  @override
+  String get chatReactionAdded => 'Da them phan ung';
+
+  @override
+  String get chatReactionRemoved => 'Da xoa phan ung';
+
+  @override
+  String get chatFailedMessageDeleted => 'Da xoa tin nhan that bai';
+
+  @override
+  String get chatDeleteMessages => 'Xoa tin nhan';
+
+  @override
+  String chatDeleteMessagesConfirm(Object count) {
+    return 'Ban co chac muon xoa $count tin nhan?';
+  }
+
+  @override
+  String chatNoteOtherMessages(Object count) {
+    return 'Luu y: $count tin nhan tu nguoi khac va chi bi xoa cho ban.';
+  }
+
+  @override
+  String chatMyMessagesWillBeRecalled(Object count) {
+    return '$count tin nhan tu ban se bi thu hoi cho tat ca.';
+  }
+
+  @override
+  String chatRecalledCount(Object count, Object localCount) {
+    return 'Da thu hoi $count tin nhan, $localCount chi bi xoa cho ban';
+  }
+
+  @override
+  String chatRecalledMessages(Object count) {
+    return 'Da thu hoi $count tin nhan';
+  }
+
+  @override
+  String chatDeletedLocally(Object count) {
+    return '$count tin nhan chi bi xoa cho ban';
+  }
+
+  @override
+  String chatForwardedCount(Object count) {
+    return 'Da chuyen tiep $count tin nhan';
+  }
+
+  @override
+  String chatForwardComplete(Object failed, Object success) {
+    return 'Chuyen tiep hoan tat: $success thanh cong, $failed that bai';
+  }
+
+  @override
+  String get chatRemindOnlyInGroup =>
+      'Tinh nang nhac nho chi kha dung trong chat nhom';
+
+  @override
+  String get chatOnlyTextSearchable => 'Chi co the tim kiem tin nhan van ban';
+
+  @override
+  String chatSearchFor(Object text) {
+    return 'Tim \"$text\"';
+  }
+
+  @override
+  String get chatBaiduSearch => 'Tim Baidu';
+
+  @override
+  String get chatGoogleSearch => 'Tim Google';
+
+  @override
+  String get chatBingSearch => 'Tim Bing';
+
+  @override
+  String get chatCalling => 'Dang goi...';
+
+  @override
+  String get chatRinging => 'Dang reo...';
+
+  @override
+  String get chatInCall => 'Dang trong cuoc goi';
+
+  @override
+  String commonFeatureInDevelopment(String feature) {
+    return 'Tinh nang dang phat trien...';
+  }
+
+  @override
+  String chatCollectMessages(Object count) {
+    return 'Da luu $count tin nhan';
+  }
+
+  @override
+  String commonMemberCount(int count) {
     return '$count thanh vien';
   }
 
   @override
-  String get removeFromGroup => 'Xoa khoi nhom';
+  String groupDone(int count) {
+    return 'Xong($count)';
+  }
 
   @override
-  String confirmRemoveMember(String name) {
+  String get profileServices => 'Dich vu';
+
+  @override
+  String get commonFavorites => 'Yeu thich';
+
+  @override
+  String get profileOrdersAndCards => 'Don hang & The';
+
+  @override
+  String get profileStickers => 'Nhan dan';
+
+  @override
+  String profileStatusSetTo(String status) {
+    return 'Trang thai da dat: $status';
+  }
+
+  @override
+  String get profileAvatarUploadFailed => 'Tai len anh dai dien that bai';
+
+  @override
+  String get profilePersonalProfile => 'Ho so ca nhan';
+
+  @override
+  String get profileName => 'Ten';
+
+  @override
+  String get profileGender => 'Gioi tinh';
+
+  @override
+  String get profileRegion => 'Khu vuc';
+
+  @override
+  String get commonMyQrCode => 'Ma QR cua toi';
+
+  @override
+  String get profilePoke => 'Vo vai';
+
+  @override
+  String get profileRingtone => 'Nhac chuong';
+
+  @override
+  String get profileDefaultRingtone => 'Nhac chuong mac dinh';
+
+  @override
+  String get profileMyAddresses => 'Dia chi cua toi';
+
+  @override
+  String profileGenderSetTo(String gender) {
+    return 'Gioi tinh da dat: $gender';
+  }
+
+  @override
+  String get profileSelectRegion => 'Chon khu vuc';
+
+  @override
+  String get profileSelectCity => 'Chon thanh pho';
+
+  @override
+  String profileRegionSetTo(String region) {
+    return 'Khu vuc da dat: $region';
+  }
+
+  @override
+  String get profileSetPoke => 'Dat vo vai';
+
+  @override
+  String get profileFriendPokedMe => 'Ban be vo vai toi';
+
+  @override
+  String get profileExample => 'Vi du';
+
+  @override
+  String get profileOnTheShoulder => ' vao vai';
+
+  @override
+  String get profilePokeCleared => 'Da xoa vo vai';
+
+  @override
+  String profilePokeSetTo(String suffix) {
+    return 'Vo vai da dat: vo vai toi$suffix';
+  }
+
+  @override
+  String get profileEditSignature => 'Chinh sua chu ky';
+
+  @override
+  String get profileIntroduceYourself => 'Mot cau gioi thieu ban than';
+
+  @override
+  String get profileSignatureCleared => 'Da xoa chu ky';
+
+  @override
+  String get profileSignatureUpdated => 'Da cap nhat chu ky';
+
+  @override
+  String get profileScanToAddFriend => 'Quet ma QR tren de ket ban voi toi';
+
+  @override
+  String profileRingtoneSetTo(String ringtone) {
+    return 'Nhac chuong da dat: $ringtone';
+  }
+
+  @override
+  String commonConfirmDissolveGroup(String name) {
+    return 'Ban co chac chac muon giai tan \"$name\" khong? Hanh dong nay khong the hoan tac.';
+  }
+
+  @override
+  String get authEnterValidServerAddress =>
+      'Vui long nhap dia chi may chu hop le';
+
+  @override
+  String get authEmailOtp => 'OTP Email';
+
+  @override
+  String get authEnterServerAddressFirst =>
+      'Vui long nhap dia chi may chu truoc';
+
+  @override
+  String get authPasskeyRequiresServer =>
+      'Dang nhap Passkey can ho tro may chu';
+
+  @override
+  String get authLoginAgreement => 'Bang viec dang nhap, ban dong y voi ';
+
+  @override
+  String get authPleaseAgreeToTerms =>
+      'Vui long doc va dong y voi Dieu khoan Dich vu va Chinh sach Bao mat';
+
+  @override
+  String get authRegisterFailed => 'Dang ky that bai';
+
+  @override
+  String get commonReenterPassword => 'Nhap lai mat khau';
+
+  @override
+  String get commonPasswordsDoNotMatch => 'Mat khau khong khop';
+
+  @override
+  String get authInviteCodeBuiltIn => 'Ma moi (tich hop san)';
+
+  @override
+  String get authInviteCodeBuiltInNote =>
+      'Ma moi da tich hop san, thuong khong can thay doi';
+
+  @override
+  String get authIHaveReadAndAgree => 'Toi da doc va dong y voi ';
+
+  @override
+  String get mainStartGroupChat => 'Bat dau Chat nhom';
+
+  @override
+  String get mainAddFriends => 'Them ban';
+
+  @override
+  String get mainPaymentAndCollection => 'Thanh toan';
+
+  @override
+  String contactCount(int count) {
+    return '$count lien he';
+  }
+
+  @override
+  String get contactAddToHomeScreen => 'Them vao man hinh chinh';
+
+  @override
+  String contactRecommendedCardTo(String contact, String recipient) {
+    return 'Da gioi thieu the cua $contact cho $recipient';
+  }
+
+  @override
+  String get contactEnterRemarkName => 'Nhap ten ghi chu';
+
+  @override
+  String contactRemarkSetTo(String remark) {
+    return 'Ghi chu da dat: $remark';
+  }
+
+  @override
+  String contactAcceptedFriendRequest(String name) {
+    return 'Da chap nhan yeu cau ket ban cua $name';
+  }
+
+  @override
+  String contactRejectedFriendRequest(String name) {
+    return 'Da tu choi yeu cau ket ban cua $name';
+  }
+
+  @override
+  String get commonGroupInvites => 'Loi moi nhom';
+
+  @override
+  String commonMyGroups(int count) {
+    return 'Nhom cua toi ($count)';
+  }
+
+  @override
+  String get commonInvitedToJoinGroup => 'Duoc moi tham gia nhom';
+
+  @override
+  String commonConfirmLeaveGroup(String name) {
+    return 'Ban co chac chac muon roi khoi \"$name\" khong?';
+  }
+
+  @override
+  String get commonLeave => 'Roi';
+
+  @override
+  String get commonRecallThisMessage => 'Thu hoi tin nhan nay?';
+
+  @override
+  String get commonSavedToGallery => 'Da luu vao thu vien';
+
+  @override
+  String get commonFailedToSave => 'Luu that bai';
+
+  @override
+  String get chatSaving => 'Dang luu...';
+
+  @override
+  String get commonShare => 'Chia se';
+
+  @override
+  String get chatSaveToGallery => 'Luu vao Thu vien';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Tai xuong that bai: $code';
+  }
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Chia se that bai: $error';
+  }
+
+  @override
+  String get chatFailedToLoadImage => 'Tai hinh anh that bai';
+
+  @override
+  String get chatVideoRecordingFailed =>
+      'Quay video that bai. Vui long thu lai.';
+
+  @override
+  String get profileRedPacket => 'Li xi';
+
+  @override
+  String get commonMusic => 'Nhac';
+
+  @override
+  String get commonCoupon => 'Phieu giam gia';
+
+  @override
+  String get commonGift => 'Qua tang';
+
+  @override
+  String get commonPoll => 'Binh chon';
+
+  @override
+  String get favoriteText => 'Van ban';
+
+  @override
+  String get favoriteLinkLabel => 'Lien ket';
+
+  @override
+  String get favoriteNote => 'Ghi chu';
+
+  @override
+  String get favoriteMyNotes => 'Ghi chu cua toi';
+
+  @override
+  String get favoriteToday => 'Hom nay';
+
+  @override
+  String favoriteDaysAgoText(int count) {
+    return '$count ngay truoc';
+  }
+
+  @override
+  String favoriteDateFormat(int month, int day) {
+    return '$day/$month';
+  }
+
+  @override
+  String get favoriteNoFavorites => 'Chua co yeu thich';
+
+  @override
+  String get favoriteLongPressToFavorite => 'Nhan giu tin nhan de yeu thich';
+
+  @override
+  String get favoriteNewNote => 'Ghi chu moi';
+
+  @override
+  String get favoriteLink => 'Lien ket yeu thich';
+
+  @override
+  String get favoriteEditTags => 'Chinh sua the';
+
+  @override
+  String get favoriteDeleteFavorite => 'Xoa yeu thich';
+
+  @override
+  String get favoriteDeleteFavoriteConfirm =>
+      'Ban co chac muon xoa yeu thich nay?';
+
+  @override
+  String get favoriteNoSearchResultsFound => 'Khong tim thay ket qua';
+
+  @override
+  String get commonSendRedPacket => 'Gui li xi';
+
+  @override
+  String get transferAmount => 'So tien';
+
+  @override
+  String get commonRedPacketCover => 'Bia li xi';
+
+  @override
+  String get commonRedPacketType => 'Loai li xi';
+
+  @override
+  String get commonNormalRedPacket => 'Thuong';
+
+  @override
+  String get commonLuckyRedPacket => 'May man';
+
+  @override
+  String get commonRedPacketCount => 'So li xi';
+
+  @override
+  String get commonPieces => 'cai';
+
+  @override
+  String get commonPutMoneyInRedPacket => 'Bo tien vao li xi';
+
+  @override
+  String get commonRedPacketRefundNotice =>
+      'Li xi chua nhan se duoc hoan sau 24 gio';
+
+  @override
+  String get commonOpenRedPacket => 'Mo';
+
+  @override
+  String get commonRedPacketAllClaimed => 'Li xi da nhan het';
+
+  @override
+  String get commonRedPacketExpired => 'Li xi het han';
+
+  @override
+  String get commonAddTransferNote => 'Them ghi chu chuyen tien';
+
+  @override
+  String get commonYuan => 'VND';
+
+  @override
+  String get commonReplyWithEmoji => 'Tra loi bang bieu tuong nay';
+
+  @override
+  String get contactEditRemark => 'Chinh sua ghi chu';
+
+  @override
+  String get contactSetPermissions => 'Dat quyen';
+
+  @override
+  String get profileAddToBlacklist => 'Them vao danh sach chan';
+
+  @override
+  String get contactDeleteContact => 'Xoa lien he';
+
+  @override
+  String contactDeleteContactConfirm(String name) {
+    return 'Ban co chac muon xoa $name?';
+  }
+
+  @override
+  String get transferTitle => 'Chuyen tien';
+
+  @override
+  String get transferReceiverAddressLabel => 'Dia chi nguoi nhan';
+
+  @override
+  String get transferSelectTokenLabel => 'Chon Token';
+
+  @override
+  String get transferAmountLabel => 'So tien chuyen';
+
+  @override
+  String get transferMemoLabel => 'Ghi chu (tuy chon)';
+
+  @override
+  String get transferAddMemoHint => 'Them ghi chu';
+
+  @override
+  String get transferSendPaymentRequest => 'Gui yeu cau thanh toan';
+
+  @override
+  String get transferQrCodeGenerateFailed => 'Tao ma QR that bai';
+
+  @override
+  String get transferScanQrToPayMe => 'Quet ma QR de thanh toan cho toi';
+
+  @override
+  String get transferMyWalletAddress => 'Dia chi vi cua toi';
+
+  @override
+  String get transferCreatePaymentRequest => 'Tao yeu cau thanh toan';
+
+  @override
+  String profileN42IdLabel(String id) {
+    return 'N42 ID: $id';
+  }
+
+  @override
+  String get commonRedPacketDefaultGreeting => 'Chuc mung tot lanh';
+
+  @override
+  String commonSenderRedPacket(String name) {
+    return 'Li xi cua $name';
+  }
+
+  @override
+  String get transferEnterValidAddress => 'Vui long nhap dia chi hop le';
+
+  @override
+  String get transferPleaseSelectToken => 'Vui long chon token';
+
+  @override
+  String get commonReceivedTransfer => 'Da nhan chuyen tien';
+
+  @override
+  String commonSenderSentRedPacket(String name) {
+    return '$name da gui li xi';
+  }
+
+  @override
+  String get commonSavedToBalance =>
+      'Da luu vao so du, co the chuyen truc tiep';
+
+  @override
+  String get commonRedPacketExpiredOrEmpty => 'Li xi het han/da nhan het';
+
+  @override
+  String get transferScanFeatureComingSoon => 'Tinh nang quet sap ra mat...';
+
+  @override
+  String get contactSetAsStarred => 'Dat lam yeu thich';
+
+  @override
+  String get contactAddToBlocklist => 'Them vao danh sach chan';
+
+  @override
+  String get commonClaimedYour => ' da nhan ';
+
+  @override
+  String get commonClaimedText => ' da nhan ';
+
+  @override
+  String commonUserTyping(String name) {
+    return '$name dang nhap...';
+  }
+
+  @override
+  String get commonTyping => 'Dang nhap...';
+
+  @override
+  String get commonWaitingToReceive => 'Cho nhan';
+
+  @override
+  String get commonTapToClaim => 'Nhan de nhan';
+
+  @override
+  String get commonHasBeenReceived => 'Da nhan';
+
+  @override
+  String get commonGetLucky => 'Chuc may man';
+
+  @override
+  String get qrcodeCameraStartFailed => 'Camera khoi dong that bai';
+
+  @override
+  String get qrcodeUnknownError => 'Loi khong xac dinh';
+
+  @override
+  String get qrcodePlaceQrCodeInFrame => 'Dat ma QR trong khung de quet';
+
+  @override
+  String get qrcodeCloseManualInput => 'Dong nhap thu cong';
+
+  @override
+  String get qrcodeManualInputUserId => 'Nhap ID nguoi dung thu cong';
+
+  @override
+  String get commonAdd => 'Them';
+
+  @override
+  String get profileSetStatus => 'Dat trang thai';
+
+  @override
+  String get profileVisibleToFriends24h => 'Hien thi voi ban be trong 24 gio';
+
+  @override
+  String get profileWriteStatus => 'Viet trang thai';
+
+  @override
+  String get profileEnterYourStatus => 'Nhap trang thai...';
+
+  @override
+  String get profileOk => 'OK';
+
+  @override
+  String get qrcodeCameraPermissionRequired => 'Can quyen camera de quet ma QR';
+
+  @override
+  String get qrcodeCameraPermissionDenied =>
+      'Quyen camera bi tu choi vinh vien. Vui long bat trong cai dat he thong.';
+
+  @override
+  String qrcodePermissionCheckError(String error) {
+    return 'Loi kiem tra quyen: $error';
+  }
+
+  @override
+  String get qrcodeInvalidQrCode => 'Ma QR khong hop le';
+
+  @override
+  String qrcodeCannotAddFriend(String error) {
+    return 'Khong the ket ban: $error';
+  }
+
+  @override
+  String get qrcodeScanQrCode => 'Quet ma QR';
+
+  @override
+  String get qrcodeCheckingCameraPermission => 'Dang kiem tra quyen camera...';
+
+  @override
+  String get qrcodeNeedCameraPermission => 'Can quyen camera';
+
+  @override
+  String get qrcodeRetryPermission => 'Thu lai';
+
+  @override
+  String get qrcodeOpenSettings => 'Mo cai dat';
+
+  @override
+  String get groupInviteMembers => 'Moi thanh vien';
+
+  @override
+  String groupInviteCount(int count) {
+    return 'Moi($count)';
+  }
+
+  @override
+  String get profileNoShippingAddress => 'Khong co dia chi giao hang';
+
+  @override
+  String get profileDefaultLabel => 'Mac dinh';
+
+  @override
+  String get profileNoInvoice => 'Khong co hoa don';
+
+  @override
+  String get profileCompany => 'Cong ty';
+
+  @override
+  String get profileTaxNumber => 'Ma so thue';
+
+  @override
+  String get profileConfirmDeleteAddress => 'Ban co chac muon xoa dia chi nay?';
+
+  @override
+  String get profileConfirmDeleteInvoice => 'Ban co chac muon xoa hoa don nay?';
+
+  @override
+  String get commonGroupOwner => 'Chu so huu';
+
+  @override
+  String get commonGroupAdmin => 'Quan tri vien';
+
+  @override
+  String get groupSearchMembers => 'Tim thanh vien';
+
+  @override
+  String groupTotalMembers(int count) {
+    return '$count thanh vien';
+  }
+
+  @override
+  String get chatRemoveFromGroup => 'Xoa khoi nhom';
+
+  @override
+  String groupConfirmRemoveMember(String name) {
     return 'Ban co chac muon xoa \"$name\" khoi nhom?';
   }
 
   @override
-  String get setAsAdmin => 'Dat lam quan tri vien';
+  String get chatUnknownSong => 'Bai hat khong xac dinh';
 
   @override
-  String get removeAdmin => 'Xoa quyen quan tri';
+  String get chatUnknownArtist => 'Nghe si khong xac dinh';
 
   @override
-  String get deleteContactSuccess => 'Da xoa lien he';
+  String get chatUnknownContact => 'Lien he khong xac dinh';
 
   @override
-  String get unknownSong => 'Bai hat khong xac dinh';
+  String get chatPersonalCard => 'The lien he';
 
   @override
-  String get unknownArtist => 'Nghe si khong xac dinh';
+  String get chatSingleChoice => 'Chon mot';
 
   @override
-  String get unknownContact => 'Lien he khong xac dinh';
+  String get chatMultiChoice => 'Chon nhieu';
 
   @override
-  String get personalCard => 'The lien he';
+  String get chatEnded => 'Ket thuc';
 
   @override
-  String get singleChoice => 'Chon mot';
+  String get chatEndPollButton => 'Ket thuc binh chon';
 
   @override
-  String get multiChoice => 'Chon nhieu';
-
-  @override
-  String get ended => 'Ket thuc';
-
-  @override
-  String get endPollButton => 'Ket thuc binh chon';
-
-  @override
-  String get createPoll => 'Tao binh chon';
-
-  @override
-  String get pollQuestion => 'Cau hoi binh chon';
-
-  @override
-  String get pollOptions => 'Cac lua chon';
-
-  @override
-  String optionPlaceholder(int index) {
-    return 'Lua chon $index';
-  }
-
-  @override
-  String get addOption => 'Them lua chon';
-
-  @override
-  String get pollSettings => 'Cai dat binh chon';
-
-  @override
-  String get anonymousPoll => 'Binh chon an danh';
-
-  @override
-  String get pollHint =>
+  String get chatPollHint =>
       'Binh chon se hien trong chat. Thanh vien nhom co the binh chon.';
 
   @override
-  String get searchSongOrArtist => 'Tim bai hat hoac nghe si';
+  String get chatSearchSongOrArtist => 'Tim bai hat hoac nghe si';
 
   @override
-  String get noSongsFound => 'Khong tim thay bai hat';
+  String get chatNoSongsFound => 'Khong tim thay bai hat';
 
   @override
-  String get supportedMusicPlatforms =>
-      'Ho tro lien ket nhac tu NetEase, QQ Music, v.v.';
+  String get chatSongNameOptional => 'Ten bai hat (Tuy chon)';
 
   @override
-  String get songNameOptional => 'Ten bai hat (Tuy chon)';
+  String get chatEnterSongName => 'Nhap ten bai hat';
 
   @override
-  String get enterSongName => 'Nhap ten bai hat';
+  String get chatArtistNameOptional => 'Ten nghe si (Tuy chon)';
 
   @override
-  String get artistNameOptional => 'Ten nghe si (Tuy chon)';
+  String get chatEnterArtistName => 'Nhap ten nghe si';
 
   @override
-  String get enterArtistName => 'Nhap ten nghe si';
-
-  @override
-  String get shareSong => 'Chia se bai hat';
-
-  @override
-  String get realTimeLocationSharing =>
+  String get chatRealTimeLocationSharing =>
       'Chia se vi tri thoi gian thuc dang phat trien...';
 
   @override
-  String get voiceCallFeatureInDev => 'Tinh nang goi thoai dang phat trien...';
+  String get profileVoiceCallFeatureInDev =>
+      'Tinh nang goi thoai dang phat trien...';
 
   @override
-  String get reportFeatureInDev => 'Tinh nang bao cao dang phat trien...';
+  String get profileReportFeatureInDev =>
+      'Tinh nang bao cao dang phat trien...';
 
   @override
-  String get shareFeatureInDev => 'Tinh nang chia se dang phat trien...';
+  String get profileShareFeatureInDev => 'Tinh nang chia se dang phat trien...';
 
   @override
-  String get qrCodeFeatureInDev => 'Tinh nang ma QR dang phat trien...';
+  String get profileQrCodeFeatureInDev => 'Tinh nang ma QR dang phat trien...';
 
   @override
-  String get scanQrToAddMe => 'Quet ma QR tren de ket ban voi toi';
+  String get qrcodeScanQrToAddMe => 'Quet ma QR tren de ket ban voi toi';
 
   @override
-  String get saveToAlbum => 'Luu vao Album';
+  String get qrcodeSaveToAlbum => 'Luu vao Album';
 
   @override
-  String get changeStyle => 'Doi kieu';
+  String get qrcodeChangeStyle => 'Doi kieu';
 
   @override
-  String get copyId => 'Sao chep ID';
+  String get qrcodeCopyId => 'Sao chep ID';
 
   @override
-  String get idCopied => 'Da sao chep ID';
+  String get qrcodeIdCopied => 'Da sao chep ID';
 
   @override
-  String get shareFeatureComingSoon => 'Tinh nang chia se sap ra mat';
+  String get qrcodeMoreStylesFeatureComingSoon => 'Them kieu sap ra mat';
 
   @override
-  String get saveFeatureComingSoon => 'Tinh nang luu sap ra mat';
+  String get profileBio => 'Tieu su';
 
   @override
-  String get moreStylesFeatureComingSoon => 'Them kieu sap ra mat';
+  String get profileHomeServer => 'May chu';
 
   @override
-  String get confirmEndPoll => 'Ban co chac muon ket thuc binh chon nay?';
+  String get profileShareContactCard => 'Chia se the lien he';
 
   @override
-  String get cannotVoteAfterEnd => 'Khong the binh chon sau khi ket thuc.';
+  String get profileRemoveFromBlacklist => 'Xoa khoi danh sach chan';
 
   @override
-  String get bio => 'Tieu su';
-
-  @override
-  String get homeServer => 'May chu';
-
-  @override
-  String get shareContactCard => 'Chia se the lien he';
-
-  @override
-  String get removeFromBlacklist => 'Xoa khoi danh sach chan';
-
-  @override
-  String get confirmAddBlacklist =>
+  String get profileConfirmAddBlacklist =>
       'Ban co chac muon them nguoi nay vao danh sach chan? Ban se khong nhan tin nhan tu ho.';
 
   @override
-  String get confirmRemoveBlacklist =>
+  String get profileConfirmRemoveBlacklist =>
       'Ban co chac muon xoa nguoi nay khoi danh sach chan?';
 
   @override
-  String get remarkSaved => 'Da luu ghi chu';
+  String get profileRemarkSaved => 'Da luu ghi chu';
 
   @override
-  String get remarkCleared => 'Da xoa ghi chu';
+  String get profileRemarkCleared => 'Da xoa ghi chu';
 
   @override
-  String get receive => 'Nhan';
+  String get transferReceive => 'Nhan';
 
   @override
-  String get pleaseConnectWallet => 'Vui long ket noi vi truoc';
+  String get transferPleaseConnectWallet => 'Vui long ket noi vi truoc';
 
   @override
-  String get sendRequest => 'Gui yeu cau';
+  String get transferSendRequest => 'Gui yeu cau';
 
   @override
-  String get pleaseEnterValidAmount => 'Vui long nhap so tien hop le';
+  String get transferPleaseEnterValidAmount => 'Vui long nhap so tien hop le';
 
   @override
   String get searchPlaceholder => 'Tim lien he, nhom, tin nhan';
 
   @override
-  String get enterKeywordToSearch => 'Nhap tu khoa de bat dau tim kiem';
+  String get searchEnterKeywordToSearch => 'Nhap tu khoa de bat dau tim kiem';
 
   @override
-  String get clearHistory => 'Xoa';
+  String get searchClearHistory => 'Xoa';
 
   @override
-  String noResultsForQuery(String query) {
+  String searchNoResultsForQuery(String query) {
     return 'Khong tim thay ket qua cho \"$query\"';
   }
 
   @override
-  String get allResults => 'Tat ca';
+  String get searchAllResults => 'Tat ca';
 
   @override
   String get searchInChat => 'Tim trong tro chuyen';
 
   @override
-  String get contactLabel => 'Lien he';
+  String get searchContactLabel => 'Lien he';
 
   @override
-  String get groupLabel => 'Nhom';
+  String get searchGroupLabel => 'Nhom';
 
   @override
-  String get conversationLabel => 'Cuộc trò chuyện';
+  String get searchConversationLabel => 'Cuộc trò chuyện';
 
   @override
-  String get messageLabel => 'Tin nhan';
+  String get searchMessageLabel => 'Tin nhan';
 
   @override
-  String get securityTitle => 'Bao mat';
+  String get settingsSecurityTitle => 'Bao mat';
 
   @override
-  String get keyBackup => 'Sao luu khoa';
+  String get settingsKeyBackup => 'Sao luu khoa';
 
   @override
-  String get backupEncryptionKeys => 'Sao luu khoa ma hoa';
+  String get settingsBackupEncryptionKeys => 'Sao luu khoa ma hoa';
 
   @override
-  String keysBackedUp(int count) {
+  String settingsKeysBackedUp(int count) {
     return '$count khoa da sao luu';
   }
 
   @override
-  String get backupNotSet => 'Chua dat sao luu';
+  String get settingsBackupNotSet => 'Chua dat sao luu';
 
   @override
-  String get restoreKeys => 'Khoi phuc khoa';
+  String get settingsRestoreKeys => 'Khoi phuc khoa';
 
   @override
-  String get restoreKeysFromBackup => 'Khoi phuc khoa ma hoa tu ban sao luu';
+  String get settingsRestoreKeysFromBackup =>
+      'Khoi phuc khoa ma hoa tu ban sao luu';
 
   @override
-  String get exportKeys => 'Xuat khoa';
+  String get settingsExportKeys => 'Xuat khoa';
 
   @override
-  String get exportKeysToFile => 'Xuat khoa ra tep';
+  String get settingsExportKeysToFile => 'Xuat khoa ra tep';
 
   @override
-  String get loggedInDevices => 'Thiet bi da dang nhap';
+  String get settingsLoggedInDevices => 'Thiet bi da dang nhap';
 
   @override
-  String get noOtherDevices => 'Khong co thiet bi khac';
+  String get settingsNoOtherDevices => 'Khong co thiet bi khac';
 
   @override
-  String get verified => 'Da xac minh';
+  String get settingsVerified => 'Da xac minh';
 
   @override
-  String get unverified => 'Chua xac minh';
+  String get settingsUnverified => 'Chua xac minh';
 
   @override
-  String get advanced => 'Nang cao';
+  String get settingsAdvanced => 'Nang cao';
 
   @override
-  String get crossSigning => 'Ky cheo';
+  String get settingsCrossSigning => 'Ky cheo';
 
   @override
-  String get enabled => 'Da bat';
+  String get settingsEnabled => 'Da bat';
 
   @override
-  String get notEnabled => 'Chua bat';
+  String get settingsNotEnabled => 'Chua bat';
 
   @override
-  String get resetEncryption => 'Dat lai ma hoa';
+  String get settingsResetEncryption => 'Dat lai ma hoa';
 
   @override
-  String get deleteAllEncryptionKeys => 'Xoa tat ca khoa ma hoa';
+  String get settingsDeleteAllEncryptionKeys => 'Xoa tat ca khoa ma hoa';
 
   @override
-  String get encryptionNotSupported => 'Khong ho tro ma hoa';
+  String get settingsEncryptionNotSupported => 'Khong ho tro ma hoa';
 
   @override
-  String get notInitialized => 'Chua khoi tao';
+  String get settingsNotInitialized => 'Chua khoi tao';
 
   @override
-  String get backupKeyTitle => 'Sao luu khoa';
+  String get settingsBackupKeyTitle => 'Sao luu khoa';
 
   @override
-  String get backupKeyMessage =>
+  String get settingsBackupKeyMessage =>
       'Tao ban sao luu khoa moi? Dieu nay se giup ban khoi phuc tin nhan ma hoa tren thiet bi moi.';
 
   @override
-  String get backup => 'Sao luu';
+  String get settingsBackup => 'Sao luu';
 
   @override
-  String get restoreKeyTitle => 'Khoi phuc khoa';
+  String get settingsRestoreKeyTitle => 'Khoi phuc khoa';
 
   @override
-  String get restoreKeyMessage =>
+  String get settingsRestoreKeyMessage =>
       'Nhap mat khau khoi phuc hoac khoa khoi phuc de khoi phuc tin nhan ma hoa.';
 
   @override
-  String get restore => 'Khoi phuc';
+  String get settingsRestore => 'Khoi phuc';
 
   @override
-  String get exportKeyTitle => 'Xuat khoa';
+  String get settingsExportKeyTitle => 'Xuat khoa';
 
   @override
-  String get exportKeyMessage =>
+  String get settingsExportKeyMessage =>
       'Tep khoa xuat chua tat ca khoa ma hoa cua ban. Vui long giu an toan.';
 
   @override
-  String get export => 'Xuat';
+  String get settingsExport => 'Xuat';
 
   @override
-  String deviceIdLabel(String deviceId) {
+  String settingsDeviceIdLabel(String deviceId) {
     return 'ID thiet bi: $deviceId';
   }
 
   @override
-  String get deviceStatusVerified => 'Trang thai: Da xac minh';
+  String get settingsDeviceStatusVerified => 'Trang thai: Da xac minh';
 
   @override
-  String get deviceStatusUnverified => 'Trang thai: Chua xac minh';
+  String get settingsDeviceStatusUnverified => 'Trang thai: Chua xac minh';
 
   @override
-  String lastActiveLabel(String lastSeen) {
+  String settingsLastActiveLabel(String lastSeen) {
     return 'Hoat dong cuoi: $lastSeen';
   }
 
   @override
-  String get verifyThisDevice => 'Xac minh thiet bi nay';
+  String get settingsVerifyThisDevice => 'Xac minh thiet bi nay';
 
   @override
-  String get crossSigningAlreadyEnabled => 'Ky cheo da duoc bat';
+  String get settingsCrossSigningAlreadyEnabled => 'Ky cheo da duoc bat';
 
   @override
-  String get crossSigningSetupSuccess => 'Cai dat ky cheo thanh cong';
+  String get settingsCrossSigningSetupSuccess => 'Cai dat ky cheo thanh cong';
 
   @override
-  String get resetEncryptionTitle => 'Dat lai ma hoa';
+  String get settingsResetEncryptionTitle => 'Dat lai ma hoa';
 
   @override
-  String get resetEncryptionWarning =>
+  String get settingsResetEncryptionWarning =>
       'Canh bao: Hanh dong nay se xoa tat ca khoa ma hoa cua ban. Ban se khong the giai ma tin nhan ma hoa truoc do. Hanh dong nay khong the hoan tac.';
 
   @override
-  String get reset => 'Dat lai';
+  String get settingsReset => 'Dat lai';
 
   @override
-  String get leaveMeetingConfirm => 'Ban co chac muon roi cuoc hop?';
+  String get callLeaveMeetingConfirm => 'Ban co chac muon roi cuoc hop?';
 
   @override
-  String pokedSomeone(String name, String suffix) {
+  String chatPokedSomeone(String name, String suffix) {
     return 'da vo vai $name$suffix';
   }
 
   @override
-  String get noContactsToAdd => 'Khong co lien he de them';
+  String get chatNoContactsToAdd => 'Khong co lien he de them';
 
   @override
-  String get addMembers => 'Them thanh vien';
+  String get chatAddMembers => 'Them thanh vien';
 
   @override
-  String invitedMembers(int count) {
+  String chatInvitedMembers(int count) {
     return 'Da moi $count thanh vien';
   }
 
   @override
-  String inviteFailed(String error) {
+  String chatInviteFailed(String error) {
     return 'Moi that bai: $error';
   }
 
   @override
-  String get memberRemoved => 'Da xoa thanh vien';
+  String get chatMemberRemoved => 'Da xoa thanh vien';
 
   @override
-  String removeFailed(String error) {
+  String chatRemoveFailed(String error) {
     return 'Xoa that bai: $error';
   }
 
   @override
-  String get realTimeLocationShareMessage =>
+  String get chatRealTimeLocationShareMessage =>
       'Sau khi chia se, nguoi kia co the thay vi tri thoi gian thuc cua ban trong 1 gio.';
 
   @override
-  String get startSharing => 'Bat dau chia se';
+  String get chatStartSharing => 'Bat dau chia se';
 
   @override
-  String get locationServiceNotEnabled => 'Dich vu vi tri chua duoc bat';
+  String get chatLocationServiceNotEnabled => 'Dich vu vi tri chua duoc bat';
 
   @override
-  String get enableLocationService =>
+  String get chatEnableLocationService =>
       'Vui long bat dich vu vi tri de su dung tinh nang nay';
 
   @override
-  String get goToSettings => 'Di den Cai dat';
+  String get chatGoToSettings => 'Di den Cai dat';
 
   @override
-  String get locationPermissionRequired => 'Can quyen vi tri cho tinh nang nay';
+  String get chatLocationPermissionRequired =>
+      'Can quyen vi tri cho tinh nang nay';
 
   @override
-  String get locationPermissionDeniedPermanent =>
+  String get chatLocationPermissionDeniedPermanent =>
       'Quyen vi tri bi tu choi vinh vien. Vui long bat trong cai dat.';
 
   @override
-  String get locationPermissionDenied => 'Quyen vi tri bi tu choi';
+  String get chatLocationPermissionDenied => 'Quyen vi tri bi tu choi';
 
   @override
-  String get gettingLocation => 'Dang lay vi tri...';
+  String get chatGettingLocation => 'Dang lay vi tri...';
 
   @override
-  String getLocationFailed(String error) {
+  String chatGetLocationFailed(String error) {
     return 'Lay vi tri that bai: $error';
   }
 
   @override
-  String get currentLocation => 'Vi tri hien tai';
+  String get chatMapPreview => 'Xem truoc ban do';
 
   @override
-  String nearbyPlace(int index) {
-    return 'Dia diem gan $index';
-  }
+  String get chatSearchLocation => 'Tim vi tri';
 
   @override
-  String approximateDistance(String distance) {
-    return 'Khoang $distance';
-  }
-
-  @override
-  String get mapPreview => 'Xem truoc ban do';
-
-  @override
-  String get searchLocation => 'Tim vi tri';
-
-  @override
-  String redPacketSent(String amount, String token) {
+  String chatRedPacketSent(String amount, String token) {
     return 'Da gui li xi $amount $token';
   }
 
   @override
-  String get transferDefault => 'Chuyen tien';
+  String get chatTransferDefault => 'Chuyen tien';
 
   @override
-  String transferSent(String amount, String token) {
+  String chatTransferSent(String amount, String token) {
     return 'Da gui chuyen tien $amount $token';
   }
 
   @override
-  String pickFileFailed(String error) {
+  String chatPickFileFailed(String error) {
     return 'Chon tep that bai: $error';
   }
 
   @override
-  String get fileSizeLimit => 'Kich thuoc tep khong the vuot qua 50MB';
+  String get chatFileSizeLimit => 'Kich thuoc tep khong the vuot qua 50MB';
 
   @override
-  String fileSending(String filename) {
+  String chatFileSending(String filename) {
     return 'Dang gui tep: $filename';
   }
 
   @override
-  String sendFileFailed(String error) {
+  String chatSendFileFailed(String error) {
     return 'Gui tep that bai: $error';
   }
 
   @override
-  String contactCardSent(String name) {
+  String chatContactCardSent(String name) {
     return 'Da gui the lien he cua $name';
   }
 
   @override
-  String get favoritesFeature => 'Yeu thich';
+  String get chatFavoritesFeature => 'Yeu thich';
 
   @override
-  String get couponsFeature => 'Phieu giam gia';
+  String get chatCouponsFeature => 'Phieu giam gia';
 
   @override
-  String get giftFeature => 'Qua tang';
+  String get chatGiftFeature => 'Qua tang';
 
   @override
-  String sharedMusic(String name) {
+  String chatSharedMusic(String name) {
     return 'Da chia se $name';
   }
 
   @override
-  String get endPollTitle => 'Ket thuc binh chon';
+  String get chatEndPollTitle => 'Ket thuc binh chon';
 
   @override
-  String get endPollConfirmMessage =>
+  String get chatEndPollConfirmMessage =>
       'Ban co chac muon ket thuc binh chon nay? Binh chon se dong sau khi ket thuc.';
 
   @override
-  String get pollEndedMessage => 'Binh chon da ket thuc';
+  String get chatPollEndedMessage => 'Binh chon da ket thuc';
 
   @override
-  String get connectingCall => 'Đang kết nối...';
+  String get chatConnectingCall => 'Đang kết nối...';
 
   @override
-  String get muteCall => 'Tat tieng';
+  String get chatMuteCall => 'Tat tieng';
 
   @override
-  String get speakerOff => 'Tat loa';
+  String get chatSpeakerOff => 'Tat loa';
 
   @override
-  String get speakerOn => 'Loa';
+  String get chatSpeakerOn => 'Loa';
 
   @override
-  String get cameraOn => 'Bat camera';
+  String get chatCameraOn => 'Bat camera';
 
   @override
-  String get cameraOff => 'Tat camera';
+  String get chatCameraOff => 'Tat camera';
 
   @override
-  String get hangUp => 'Cup may';
+  String get chatHangUp => 'Cup may';
 
   @override
-  String get selectForwardTargetTitle => 'Chon muc tieu chuyen tiep';
+  String get chatSelectForwardTargetTitle => 'Chon muc tieu chuyen tiep';
 
   @override
-  String get noForwardableChat => 'Khong co tro chuyen de chuyen tiep';
+  String get chatNoForwardableChat => 'Khong co tro chuyen de chuyen tiep';
 
   @override
-  String get noMatchingChat => 'Khong tim thay tro chuyen phu hop';
+  String get chatNoMatchingChat => 'Khong tim thay tro chuyen phu hop';
 
   @override
-  String get imagePreview => '[Hinh anh]';
+  String get chatLocationTitle => 'Vi tri';
 
   @override
-  String get voicePreview => '[Tin nhan thoai]';
+  String get chatSendButton => 'Gui';
 
   @override
-  String get videoPreview => '[Video]';
+  String get chatRetryButton => 'Thu lai';
 
   @override
-  String filePreviewWithName(String filename) {
-    return '[Tep] $filename';
-  }
+  String get chatSearchContactHint => 'Tim lien he';
 
   @override
-  String locationPreviewWithAddress(String address) {
-    return '[Vi tri] $address';
-  }
+  String get chatShareMusic => 'Chia se nhac';
 
   @override
-  String musicPreviewWithTitle(String title) {
-    return '[Nhac] $title';
-  }
+  String get chatRecentPlayed => 'Gan day';
 
   @override
-  String get messagePreview => '[Tin nhan]';
+  String get chatMyFavorites => 'Yeu thich';
 
   @override
-  String get locationTitle => 'Vi tri';
+  String get chatNetworkLink => 'Lien ket';
 
   @override
-  String get sendButton => 'Gui';
+  String get chatLocalFile => 'Tep';
 
   @override
-  String get retryButton => 'Thu lai';
+  String get chatPasteMusicLink => 'Dan lien ket nhac';
 
   @override
-  String get selectContact => 'Chon lien he';
+  String get chatShareMusicButton => 'Chia se nhac';
 
   @override
-  String get searchContactHint => 'Tim lien he';
+  String get chatSelectLocalAudio => 'Chon tep am thanh';
 
   @override
-  String get shareMusic => 'Chia se nhac';
+  String get chatSupportedAudioFormats => 'Ho tro MP3, M4A, WAV, FLAC, v.v.';
 
   @override
-  String get recentPlayed => 'Gan day';
+  String get chatSelectFileButton => 'Chon tep';
 
   @override
-  String get myFavorites => 'Yeu thich';
+  String get chatPleaseEnterMusicLink => 'Vui long nhap lien ket nhac';
 
   @override
-  String get networkLink => 'Lien ket';
+  String get chatPleaseEnterValidLink => 'Vui long nhap URL hop le';
 
   @override
-  String get localFile => 'Tep';
+  String get chatSharedSong => 'Bai hat da chia se';
 
   @override
-  String get musicLinkRequired => 'Lien ket nhac *';
+  String get chatSelectMember => 'Chon thanh vien';
 
   @override
-  String get pasteMusicLink => 'Dan lien ket nhac';
+  String get chatSearchMemberHint => 'Tim thanh vien';
 
   @override
-  String get enterSongNamePlaceholder => 'Nhap ten bai hat';
+  String get chatNoMatchingMembers => 'Khong tim thay thanh vien phu hop';
 
   @override
-  String get enterArtistNamePlaceholder => 'Nhap ten nghe si';
+  String get commonUnknownMember => 'Khong xac dinh';
 
   @override
-  String get shareMusicButton => 'Chia se nhac';
-
-  @override
-  String get selectLocalAudio => 'Chon tep am thanh';
-
-  @override
-  String get supportedAudioFormats => 'Ho tro MP3, M4A, WAV, FLAC, v.v.';
-
-  @override
-  String get selectFileButton => 'Chon tep';
-
-  @override
-  String get pleaseEnterMusicLink => 'Vui long nhap lien ket nhac';
-
-  @override
-  String get pleaseEnterValidLink => 'Vui long nhap URL hop le';
-
-  @override
-  String get sharedSong => 'Bai hat da chia se';
-
-  @override
-  String get selectMember => 'Chon thanh vien';
-
-  @override
-  String get searchMemberHint => 'Tim thanh vien';
-
-  @override
-  String get noMatchingMembers => 'Khong tim thay thanh vien phu hop';
-
-  @override
-  String get unknownMember => 'Khong xac dinh';
-
-  @override
-  String selectedMessagesCount(int count) {
+  String chatSelectedMessagesCount(int count) {
     return 'Da chon $count tin nhan';
   }
 
   @override
-  String get searchContactsOrGroups => 'Tim lien he hoac nhom';
+  String get chatSearchContactsOrGroups => 'Tim lien he hoac nhom';
 
   @override
-  String get noMatchingConversations => 'Khong tim thay tro chuyen phu hop';
+  String get chatVideoTitle => 'Video';
 
   @override
-  String get videoTitle => 'Video';
+  String get chatLoadingText => 'Dang tai...';
 
   @override
-  String get loadingText => 'Dang tai...';
+  String get chatVideoLoadFailed => 'Tai video that bai';
 
   @override
-  String get videoPlaybackFailed => 'Phat video that bai';
+  String get chatPlayerInitFailed => 'Khoi tao trinh phat that bai';
 
   @override
-  String get videoLoadFailed => 'Tai video that bai';
+  String get chatCreatePollTitle => 'Tao binh chon';
 
   @override
-  String get playerInitFailed => 'Khoi tao trinh phat that bai';
+  String get chatSubmitPoll => 'Gui';
 
   @override
-  String get createPollTitle => 'Tao binh chon';
+  String get chatPollQuestionLabel => 'Cau hoi binh chon';
 
   @override
-  String get submitPoll => 'Gui';
+  String get chatEnterPollQuestionHint => 'Vui long nhap cau hoi binh chon';
 
   @override
-  String get pollQuestionLabel => 'Cau hoi binh chon';
+  String get chatPollOptionsLabel => 'Cac lua chon';
 
   @override
-  String get enterPollQuestionHint => 'Vui long nhap cau hoi binh chon';
-
-  @override
-  String get pollOptionsLabel => 'Cac lua chon';
-
-  @override
-  String optionHintWithIndex(int index) {
+  String chatOptionHintWithIndex(int index) {
     return 'Lua chon $index';
   }
 
   @override
-  String get addOptionButton => 'Them lua chon';
+  String get chatAddOptionButton => 'Them lua chon';
 
   @override
-  String get pollSettingsLabel => 'Cai dat binh chon';
+  String get chatPollSettingsLabel => 'Cai dat binh chon';
 
   @override
-  String get selectionType => 'Loai chon';
+  String get chatSelectionType => 'Loai chon';
 
   @override
-  String get singleChoiceLabel => 'Chon mot';
+  String get chatSingleChoiceLabel => 'Chon mot';
 
   @override
-  String get multiChoiceLabel => 'Chon nhieu';
+  String get chatMultiChoiceLabel => 'Chon nhieu';
 
   @override
-  String get anonymousPollSwitch => 'Binh chon an danh';
+  String get chatAnonymousPollSwitch => 'Binh chon an danh';
 
   @override
-  String get pleaseEnterQuestion => 'Vui long nhap cau hoi binh chon';
+  String get chatPleaseEnterQuestion => 'Vui long nhap cau hoi binh chon';
 
   @override
-  String get atLeastTwoOptions => 'Can it nhat 2 lua chon';
+  String get chatAtLeastTwoOptions => 'Can it nhat 2 lua chon';
 
   @override
-  String confirmWithCount(int count) {
+  String chatConfirmWithCount(int count) {
     return 'Xac nhan ($count)';
   }
 
   @override
-  String get emailVerificationTitle => 'Xac minh Email';
+  String get authEmailVerificationTitle => 'Xac minh Email';
 
   @override
-  String get enterValidEmailAddress => 'Vui long nhap dia chi email hop le';
+  String get authEnterValidEmailAddress => 'Vui long nhap dia chi email hop le';
 
   @override
-  String verificationCodeSentTo(String email) {
+  String authVerificationCodeSentTo(String email) {
     return 'Ma xac minh da gui den $email';
   }
 
   @override
-  String sendCodeFailed(String error) {
+  String authSendCodeFailed(String error) {
     return 'Gui ma that bai: $error';
   }
 
   @override
-  String get verificationSuccess => 'Xac minh thanh cong';
+  String get authVerificationSuccess => 'Xac minh thanh cong';
 
   @override
-  String get verificationFailed => 'Xac minh that bai';
+  String get authVerificationFailed => 'Xac minh that bai';
 
   @override
-  String verificationCodeError(String error) {
+  String authVerificationCodeError(String error) {
     return 'Loi ma xac minh: $error';
   }
 
   @override
-  String get enterVerificationCode => 'Nhap ma xac minh';
+  String get commonEnterVerificationCode => 'Nhap ma xac minh';
 
   @override
-  String get enterYourEmail => 'Nhap email';
+  String get authEnterYourEmail => 'Nhap email';
 
   @override
-  String weSentCodeTo(String email) {
+  String authWeSentCodeTo(String email) {
     return 'Chung toi da gui ma 6 so den\n$email';
   }
 
   @override
-  String get enterEmailForCode =>
+  String get authEnterEmailForCode =>
       'Nhap dia chi email, chung toi se gui ma xac minh';
 
   @override
-  String get sendVerificationCode => 'Gui ma xac minh';
+  String get commonSendVerificationCode => 'Gui ma xac minh';
 
   @override
-  String get resendVerificationCode => 'Gui lai ma xac minh';
+  String get authResendVerificationCode => 'Gui lai ma xac minh';
 
   @override
-  String canResendAfter(int seconds) {
+  String authCanResendAfter(int seconds) {
     return 'Co the gui lai sau $seconds giay';
   }
 
   @override
-  String get changeEmail => 'Doi email';
+  String get commonChangeEmail => 'Doi email';
 
   @override
-  String get addToContacts => 'Them vao danh ba';
+  String get contactAddToContacts => 'Them vao danh ba';
 
   @override
-  String get addingToContacts => 'Dang them...';
+  String get contactAddingToContacts => 'Dang them...';
 
   @override
-  String get addedToContacts => 'Da them vao danh ba';
+  String get contactAddedToContacts => 'Da them vao danh ba';
 
   @override
-  String addFailedWithError(String error) {
+  String contactAddFailedWithError(String error) {
     return 'Them that bai: $error';
   }
 
   @override
-  String get addPhone => 'Them dien thoai';
+  String get contactAddPhone => 'Them dien thoai';
 
   @override
-  String get addTag => 'Them the';
+  String get contactAddTag => 'Them the';
 
   @override
-  String get addText => 'Them van ban';
+  String get contactAddText => 'Them van ban';
 
   @override
-  String get addPhoto => 'Them anh';
+  String get contactAddPhoto => 'Them anh';
 
   @override
-  String groupCountLabel(int count) {
+  String contactGroupCountLabel(int count) {
     return '$count nhom';
   }
 
   @override
-  String get addedViaSearch => 'Da them qua tim kiem';
+  String get contactAddedViaSearch => 'Da them qua tim kiem';
 
   @override
-  String get addTime => 'Thoi gian them';
+  String get contactAddTime => 'Thoi gian them';
 
   @override
-  String get doneButton => 'Xong';
+  String get contactDoneButton => 'Xong';
 
   @override
-  String get waitingForParticipants => 'Dang cho nguoi tham gia...';
+  String get callWaitingForParticipants => 'Dang cho nguoi tham gia...';
 
   @override
-  String participantMe(String name) {
+  String callParticipantMe(String name) {
     return '$name (Toi)';
   }
 
   @override
-  String get sharingLabel => 'Dang chia se';
+  String get callSharingLabel => 'Dang chia se';
 
   @override
-  String screenSharingBy(String name) {
+  String callScreenSharingBy(String name) {
     return '$name dang chia se man hinh';
   }
 
   @override
-  String participantCount(int count) {
+  String callParticipantCount(int count) {
     return '$count nguoi tham gia';
   }
 
   @override
-  String get muteLabel => 'Tat tieng';
+  String get callMuteLabel => 'Tat tieng';
 
   @override
-  String get unmuteLabel => 'Bat tieng';
+  String get callUnmuteLabel => 'Bat tieng';
 
   @override
-  String get turnOffVideo => 'Tat video';
+  String get callTurnOffVideo => 'Tat video';
 
   @override
-  String get turnOnVideo => 'Bat video';
+  String get callTurnOnVideo => 'Bat video';
 
   @override
-  String get shareScreen => 'Chia se man hinh';
+  String get callShareScreen => 'Chia se man hinh';
 
   @override
-  String get stopSharing => 'Dung chia se';
+  String get callStopSharing => 'Dung chia se';
 
   @override
-  String get switchCameraLabel => 'Chuyen';
+  String get callSwitchCameraLabel => 'Chuyen';
 
   @override
-  String get leaveLabel => 'Roi';
+  String get callLeaveLabel => 'Roi';
 
   @override
-  String get participantsLabel => 'Nguoi tham gia';
+  String get callParticipantsLabel => 'Nguoi tham gia';
 
   @override
-  String get joiningMeeting => 'Dang tham gia cuoc hop...';
+  String get callJoiningMeeting => 'Dang tham gia cuoc hop...';
 
   @override
-  String pollVotesFormat(int count, String percentage) {
+  String chatPollVotesFormat(int count, String percentage) {
     return '$count phiếu ($percentage%)';
   }
 
   @override
-  String pollParticipantsFormat(int count) {
+  String chatPollParticipantsFormat(int count) {
     return '$count người tham gia';
   }
 
   @override
-  String get tapToRetry => 'Nhấn để thử lại';
+  String get commonTapToRetry => 'Nhấn để thử lại';
 
   @override
-  String get noConversationsToForward =>
-      'Không có cuộc trò chuyện nào để chuyển tiếp';
+  String get chatDefaultRedPacketGreeting => 'Chúc phát tài phát lộc';
 
   @override
-  String get defaultRedPacketGreeting => 'Chúc phát tài phát lộc';
-
-  @override
-  String get emojiCategoryFace => 'Biểu cảm';
-
-  @override
-  String get emojiCategoryHeart => 'Trái tim';
-
-  @override
-  String get emojiCategoryAnimal => 'Động vật';
-
-  @override
-  String get emojiCategoryFood => 'Đồ ăn';
-
-  @override
-  String get emojiCategoryTransport => 'Phương tiện';
-
-  @override
-  String get emojiCategoryActivity => 'Hoạt động';
-
-  @override
-  String get emojiCategoryObject => 'Đồ vật';
-
-  @override
-  String get emojiCategorySymbol => 'Ký hiệu';
-
-  @override
-  String get allowOthersToSearchAndJoin =>
+  String get groupAllowOthersToSearchAndJoin =>
       'Cho phép những người khác tìm kiếm và tham gia';
 
   @override
-  String get allowStrangerMessages => 'Cho phép tin nhắn từ người lạ';
+  String get groupConfirmClearChatHistory =>
+      'Bạn có chắc chắn muốn xóa lịch sử trò chuyện không?';
 
   @override
-  String get alwaysUseDarkTheme => 'Luôn dùng giao diện tối';
+  String get groupCreateGroupToChat => 'Tạo một nhóm để bắt đầu trò chuyện';
 
   @override
-  String get alwaysUseLightTheme => 'Luôn dùng giao diện sáng';
+  String get groupEditGroupAnnouncement => 'Chỉnh sửa thông báo nhóm';
 
   @override
-  String get autoSwitchBySystem => 'Tự động chuyển theo cài đặt hệ thống';
+  String get groupEditGroupDescription => 'Chỉnh sửa mô tả nhóm';
 
   @override
-  String get bubbleStyle => 'Kiểu bong bóng';
+  String get groupEnterGroupAnnouncement => 'Nhập thông báo nhóm';
 
   @override
-  String get bubbleStyleClassic => 'Kiểu cổ điển';
+  String chatErrorWithMessage(String message) {
+    return 'Lỗi: $message';
+  }
 
   @override
-  String get bubbleStyleClassicDesc => 'Kiểu bong bóng truyền thống';
+  String groupMemberCountClickToCopy(int count) {
+    return '$count thành viên, nhấp để sao chép ID nhóm';
+  }
 
   @override
-  String get bubbleStyleModern => 'Kiểu hiện đại';
+  String get chatMusicLinkLabel => 'Liên kết nhạc';
 
   @override
-  String get bubbleStyleModernDesc => 'Kiểu bong bóng hiện đại sạch sẽ';
+  String get chatNoMediaUrlAvailable => 'URL phương tiện không khả dụng';
 
   @override
-  String get bubbleStyleWechat => 'Kiểu WeChat';
+  String get groupNoPermissionToEditGroupName =>
+      'Bạn không có quyền chỉnh sửa tên nhóm';
 
   @override
-  String get bubbleStyleWechatDesc => 'Kiểu bong bóng WeChat cổ điển';
+  String get chatRedPacketTransferCannotForward =>
+      'Lì xì và chuyển khoản không thể chuyển tiếp';
+
+  @override
+  String get authEmailAddress => 'Địa chỉ email';
+
+  @override
+  String get commonEnterEmailAddress => 'Nhập địa chỉ email';
+
+  @override
+  String get authEmailRecoveryHint => 'Dùng để khôi phục mật khẩu';
+
+  @override
+  String get commonInvalidEmailFormat => 'Vui lòng nhập địa chỉ email hợp lệ';
+
+  @override
+  String get authOptional => 'Tùy chọn';
+
+  @override
+  String get authResetPassword => 'Đặt lại mật khẩu';
+
+  @override
+  String get authEnterRegisteredEmail => 'Nhập địa chỉ email bạn đã đăng ký';
+
+  @override
+  String get authSendResetCode => 'Gửi mã đặt lại';
+
+  @override
+  String authResetCodeSent(String email) {
+    return 'Mã đặt lại đã gửi đến $email';
+  }
+
+  @override
+  String get authEnterResetCode => 'Nhập mã đặt lại';
+
+  @override
+  String get authSetNewPassword => 'Đặt mật khẩu mới';
+
+  @override
+  String get commonConfirmNewPassword => 'Xác nhận mật khẩu mới';
+
+  @override
+  String get commonNewPassword => 'Mật khẩu mới';
+
+  @override
+  String get authPasswordResetSuccess =>
+      'Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập bằng mật khẩu mới.';
+
+  @override
+  String get authResetPasswordFailed => 'Đặt lại mật khẩu thất bại';
+
+  @override
+  String get settingsChangePassword => 'Đổi mật khẩu';
+
+  @override
+  String get settingsCurrentPassword => 'Mật khẩu hiện tại';
+
+  @override
+  String get settingsEnterCurrentPassword => 'Nhập mật khẩu hiện tại';
+
+  @override
+  String get settingsEnterNewPassword => 'Nhập mật khẩu mới';
+
+  @override
+  String get settingsPasswordChanged =>
+      'Mật khẩu đã được thay đổi thành công. Vui lòng đăng nhập bằng mật khẩu mới.';
+
+  @override
+  String get settingsChangePasswordFailed => 'Đổi mật khẩu thất bại';
+
+  @override
+  String get settingsNewPasswordMustBeDifferent =>
+      'Mật khẩu mới phải khác mật khẩu hiện tại';
+
+  @override
+  String get settingsChangePasswordInfo =>
+      'Sau khi đổi mật khẩu, bạn sẽ bị đăng xuất và cần đăng nhập lại bằng mật khẩu mới.';
+
+  @override
+  String get settingsPasswordRequirements => 'Yêu cầu mật khẩu:';
+
+  @override
+  String get settingsSecurityNote =>
+      'Vì lý do bảo mật, bạn sẽ cần đăng nhập lại trên tất cả thiết bị sau khi đổi mật khẩu.';
+
+  @override
+  String get settingsSecurity => 'Bảo mật';
+
+  @override
+  String get settingsCurrentBoundEmail => 'Email hiện đang liên kết';
+
+  @override
+  String get settingsNewEmailAddress => 'Địa chỉ email mới';
+
+  @override
+  String get settingsEnterNewEmail => 'Nhập địa chỉ email mới';
+
+  @override
+  String get settingsVerificationCode => 'Mã xác nhận';
+
+  @override
+  String get settingsVerificationCodeSent => 'Mã xác nhận đã được gửi';
+
+  @override
+  String get settingsCodeSentTo => 'Mã xác nhận đã gửi đến';
+
+  @override
+  String get settingsDidNotReceiveCode => 'Không nhận được mã?';
+
+  @override
+  String get settingsEmailChangedSuccess => 'Email đã được thay đổi thành công';
+
+  @override
+  String get settingsChangeEmailFailed => 'Thay đổi email thất bại';
+
+  @override
+  String get settingsEmailSecurityNote =>
+      'Email của bạn được dùng để khôi phục mật khẩu. Hãy giữ an toàn.';
+
+  @override
+  String get commonGoogleLogin => 'Đăng nhập bằng Google';
+
+  @override
+  String get commonAppleLogin => 'Đăng nhập bằng Apple';
+
+  @override
+  String get commonWechat => 'WeChat';
+
+  @override
+  String get settingsLanguage => 'Ngôn ngữ';
+
+  @override
+  String get settingsLanguageChanged => 'Ngôn ngữ đã thay đổi';
+
+  @override
+  String get settingsBiometricLogin => 'Đăng nhập sinh trắc học';
+
+  @override
+  String authLoginWithBiometric(Object type) {
+    return 'Đăng nhập bằng $type';
+  }
+
+  @override
+  String get settingsBiometricLoginEnabled => 'Đăng nhập sinh trắc học đã bật';
+
+  @override
+  String get settingsBiometricLoginDisabled => 'Đăng nhập sinh trắc học đã tắt';
+
+  @override
+  String get settingsEnableBiometricLogin => 'Bật đăng nhập sinh trắc học';
+
+  @override
+  String get settingsBiometricEnabled =>
+      'Đã bật - Dùng sinh trắc học để đăng nhập';
+
+  @override
+  String get settingsBiometricDisabled => 'Đã tắt - Nhấn để bật';
+
+  @override
+  String get settingsBiometricNeedRelogin =>
+      'Vui lòng đăng xuất và đăng nhập lại để bật đăng nhập sinh trắc học';
+
+  @override
+  String get authOr => 'HOẶC';
+
+  @override
+  String get qrcodeCameraPermissionRestricted =>
+      'Quyền truy cập camera bị hạn chế trên thiết bị này';
+
+  @override
+  String get authPasskeyLabel => 'Passkey';
+
+  @override
+  String get authGoogleLabel => 'Google';
+
+  @override
+  String get authAppleLabel => 'Apple';
+
+  @override
+  String get authSsoLabel => 'SSO';
+
+  @override
+  String get transferAmountHintZero => '0.00';
+
+  @override
+  String get commonMatrixIdHint => '@username:server.com';
+
+  @override
+  String get authServerAddressHint => 'https://m.si46.world';
+
+  @override
+  String get authEmailExampleHint => 'example@email.com';
+
+  @override
+  String get authVerificationCodePlaceholder => '------';
+
+  @override
+  String get profileEnterPokeSuffixHint => 'Nhập hậu tố chọc, ví dụ: vào vai';
+
+  @override
+  String get groupAlbum => 'Album nhóm';
+
+  @override
+  String get groupFiles => 'Tệp nhóm';
+
+  @override
+  String get groupImages => 'Hình ảnh';
+
+  @override
+  String get groupVideos => 'Video';
+
+  @override
+  String get groupTotal => 'Tổng cộng';
+
+  @override
+  String get groupSize => 'Kích thước';
+
+  @override
+  String get groupNoMedia => 'Không có phương tiện';
+
+  @override
+  String get groupNoMediaDescription =>
+      'Chưa có ảnh hoặc video nào trong nhóm này';
+
+  @override
+  String get groupDocuments => 'Tài liệu';
+
+  @override
+  String get groupNoFiles => 'Không có tệp';
+
+  @override
+  String get groupNoFilesDescription => 'Chưa có tệp nào trong nhóm này';
+
+  @override
+  String groupDownloadStarted(String filename) {
+    return 'Đang tải $filename...';
+  }
+
+  @override
+  String get contactNoCommonGroups => 'Không có nhóm chung';
+
+  @override
+  String get contactNoCommonGroupsDescription =>
+      'Các bạn không có nhóm chung nào';
+
+  @override
+  String get chatVoiceMessage => 'Giọng nói';
+
+  @override
+  String get chatMessage => 'Tin nhắn';
+
+  @override
+  String get conversationHideChat => 'Ẩn';
+
+  @override
+  String get settingsQuickReply => 'Trả lời nhanh';
+
+  @override
+  String get commonTranslate => 'Dịch';
+
+  @override
+  String get contactCreateTag => 'Create Tag';
+
+  @override
+  String get contactEnterTagName => 'Enter tag name';
+
+  @override
+  String get contactEditTag => 'Edit Tag';
+
+  @override
+  String get contactDeleteTag => 'Delete Tag';
+
+  @override
+  String contactDeleteTagConfirm(String tagName) {
+    return 'Are you sure you want to delete the tag \"$tagName\"?';
+  }
+
+  @override
+  String get contactNoTags => 'No tags yet';
+
+  @override
+  String get contactFriendPermissions => 'Friend Permissions';
+
+  @override
+  String get contactSetChatOnly => 'Set as Chat-only';
+
+  @override
+  String get contactChatOnlyDesc =>
+      'Can only chat with you, other content will be hidden';
+
+  @override
+  String get contactHideMyMoments => 'Hide My Moments';
+
+  @override
+  String get contactHideMyMomentsDesc => 'This friend cannot see my Moments';
+
+  @override
+  String get contactHideTheirMoments => 'Hide Their Moments';
+
+  @override
+  String get contactHideTheirMomentsDesc => 'Don\'t see this friend\'s Moments';
+
+  @override
+  String get contactHideMyStatus => 'Hide My Status';
+
+  @override
+  String get contactHideMyStatusDesc =>
+      'This friend cannot see my status updates';
+
+  @override
+  String get contactNoChatOnlyFriends => 'No chat-only friends';
+
+  @override
+  String get contactNoOfficialAccounts => 'No official accounts';
+
+  @override
+  String get contactFollowOfficialAccountsDesc =>
+      'Follow official accounts to get the latest updates';
+
+  @override
+  String get contactNoServiceAccounts => 'No service accounts';
+
+  @override
+  String get contactSubscribeServiceAccountsDesc =>
+      'Subscribe to service accounts for convenient services';
+
+  @override
+  String get contactNoEnterpriseContacts => 'No enterprise contacts';
+
+  @override
+  String get contactEnterpriseContactsDesc =>
+      'Enterprise contacts will be displayed here';
+
+  @override
+  String get profileCardPack => 'Card Pack';
+
+  @override
+  String get profileOrders => 'Orders';
+
+  @override
+  String get profileNoOrders => 'No orders';
+
+  @override
+  String get profileOrdersDesc => 'Your orders will be displayed here';
+
+  @override
+  String get profileNoCards => 'No cards';
+
+  @override
+  String get profileCardsDesc => 'Your cards will be displayed here';
+
+  @override
+  String get favoriteEnterTagsHint => 'Enter tags separated by commas';
+
+  @override
+  String get favoriteTagsUpdated => 'Tags updated';
+
+  @override
+  String get favoriteForwardedContent => 'Content forwarded';
+
+  @override
+  String get favoriteEnterNoteContent => 'Enter note content';
+
+  @override
+  String get favoriteNoteAdded => 'Note added';
+
+  @override
+  String get favoriteLinkTitle => 'Link title';
+
+  @override
+  String get favoriteLinkUrl => 'https://';
+
+  @override
+  String get favoriteLinkAdded => 'Link added';
+
+  @override
+  String get contactPhotoAdded => 'Photo added';
+
+  @override
+  String get contactEnterPhone => 'Enter phone number';
+
+  @override
+  String commonConversationWithId(String roomId) {
+    return 'Cuoc tro chuyen: $roomId';
+  }
+
+  @override
+  String commonContactWithId(String userId) {
+    return 'Lien he: $userId';
+  }
+
+  @override
+  String get commonDiscover => 'Kham pha';
+
+  @override
+  String commonDeveloping(String title) {
+    return '$title\n(Sap ra mat)';
+  }
+
+  @override
+  String get commonPageNotFound => 'Khong tim thay trang';
+
+  @override
+  String get commonBackToHome => 'Quay lai trang chu';
+
+  @override
+  String get settingsMessageNotifications => 'Thông báo tin nhắn';
+
+  @override
+  String get settingsReceiveNewMessageNotifications =>
+      'Nhận thông báo tin nhắn mới';
+
+  @override
+  String get settingsShowMessagePreview => 'Hiển thị xem trước tin nhắn';
+
+  @override
+  String get settingsShowMessageContentInNotification =>
+      'Hiển thị nội dung tin nhắn trong thông báo';
+
+  @override
+  String get settingsNotificationSound => 'Am thanh thong bao';
+
+  @override
+  String get settingsPlaySoundOnMessage => 'Phat am thanh khi nhan tin nhan';
+
+  @override
+  String get commonVibration => 'Rung';
+
+  @override
+  String get settingsVibrateOnMessage => 'Rung khi nhan tin nhan';
+
+  @override
+  String get settingsDoNotDisturbMode => 'Không làm phiền';
+
+  @override
+  String get settingsDoNotDisturbDescription =>
+      'Không nhận thông báo trong khoảng thời gian chỉ định';
+
+  @override
+  String get settingsStartTime => 'Thoi gian bat dau';
+
+  @override
+  String get settingsEndTime => 'Thoi gian ket thuc';
+
+  @override
+  String get settingsDeleteQuickReply => 'Xóa trả lời nhanh';
+
+  @override
+  String get settingsEditQuickReply => 'Sửa trả lời nhanh';
+
+  @override
+  String get settingsAddQuickReply => 'Thêm trả lời nhanh';
+
+  @override
+  String get settingsManageQuickReplies => 'Quản lý trả lời nhanh';
+
+  @override
+  String get settingsNoQuickReplies => 'Không có trả lời nhanh';
+
+  @override
+  String get settingsDefaultQuickReplies =>
+      'Trả lời nhanh mặc định sẽ được hiển thị';
+
+  @override
+  String get settingsWhoCanSee => 'Ai co the xem';
+
+  @override
+  String get settingsLastSeen => 'Lan cuoi truc tuyen';
+
+  @override
+  String get settingsHiddenChats => 'Cuộc trò chuyện ẩn';
+
+  @override
+  String get settingsMessagesLabel => 'Tin nhắn';
+
+  @override
+  String get settingsAllowStrangerMessages => 'Cho phép tin nhắn từ người lạ';
+
+  @override
+  String get settingsReceiveMessagesFromNonContacts =>
+      'Nhận tin nhắn từ người không có trong danh bạ';
+
+  @override
+  String get settingsReadReceipts => 'Xac nhan da doc';
+
+  @override
+  String get settingsLetOthersKnowYouRead =>
+      'Cho người khác biết bạn đã đọc tin nhắn của họ';
+
+  @override
+  String get settingsTypingIndicator => 'Chỉ báo đang nhập';
+
+  @override
+  String get settingsLetOthersKnowYouTyping =>
+      'Cho người khác biết bạn đang nhập';
+
+  @override
+  String get settingsEveryone => 'Tat ca moi nguoi';
+
+  @override
+  String get settingsContactsOnly => 'Chi danh ba';
+
+  @override
+  String get settingsNobody => 'Khong ai';
+
+  @override
+  String settingsWhoCanSeeTitle(String title) {
+    return 'Ai có thể xem $title';
+  }
+
+  @override
+  String settingsVersionInfo(String version) {
+    return 'Phiên bản $version';
+  }
+
+  @override
+  String get settingsCheckForUpdates => 'Kiểm tra cập nhật';
+
+  @override
+  String get settingsOpenSourceLicenses => 'Giay phep ma nguon mo';
+
+  @override
+  String get settingsFeedbackAndSuggestions => 'Phản hồi và đề xuất';
+
+  @override
+  String get settingsBuiltOnMatrix => 'Xay dung tren giao thuc Matrix';
+
+  @override
+  String get settingsNoHiddenChats => 'Không có cuộc trò chuyện ẩn';
+
+  @override
+  String get settingsNoHiddenChatsDescription =>
+      'Các cuộc trò chuyện bạn ẩn sẽ xuất hiện ở đây';
+
+  @override
+  String get settingsUnhideChat => 'Bỏ ẩn';
+
+  @override
+  String get settingsDarkMode => 'Chế độ tối';
+
+  @override
+  String get settingsFontSize => 'Cỡ chữ';
+
+  @override
+  String get settingsBubbleStyle => 'Kiểu bong bóng';
+
+  @override
+  String get settingsFollowSystem => 'Theo hệ thống';
+
+  @override
+  String get settingsAutoSwitchBySystem =>
+      'Tự động chuyển theo cài đặt hệ thống';
+
+  @override
+  String get settingsLightMode => 'Chế độ sáng';
+
+  @override
+  String get settingsAlwaysUseLightTheme => 'Luôn dùng giao diện sáng';
+
+  @override
+  String get settingsDarkModeOption => 'Chế độ tối';
+
+  @override
+  String get settingsAlwaysUseDarkTheme => 'Luôn dùng giao diện tối';
+
+  @override
+  String get settingsFontSizeSmall => 'Nhỏ';
+
+  @override
+  String get settingsFontSizeStandard => 'Tiêu chuẩn';
+
+  @override
+  String get settingsFontSizeLarge => 'Lớn';
+
+  @override
+  String get settingsFontSizeExtraLarge => 'Rất lớn';
+
+  @override
+  String get settingsBubbleStyleWechat => 'Kiểu WeChat';
+
+  @override
+  String get settingsBubbleStyleWechatDesc => 'Kiểu bong bóng WeChat cổ điển';
+
+  @override
+  String get settingsBubbleStyleModern => 'Kiểu hiện đại';
+
+  @override
+  String get settingsBubbleStyleModernDesc => 'Kiểu bong bóng hiện đại sạch sẽ';
+
+  @override
+  String get settingsBubbleStyleClassic => 'Kiểu cổ điển';
+
+  @override
+  String get settingsBubbleStyleClassicDesc => 'Kiểu bong bóng truyền thống';
+
+  @override
+  String get discoverVideoChannels => 'Kenh';
+
+  @override
+  String get discoverLive => 'Truc tiep';
+
+  @override
+  String get discoverListen => 'Nghe';
+
+  @override
+  String get discoverWatch => 'Xem';
+
+  @override
+  String get discoverSearchDiscover => 'Tim kiem';
+
+  @override
+  String get discoverNearbyPeople => 'Gan day';
+
+  @override
+  String get discoverGames => 'Tro choi';
+
+  @override
+  String get discoverMiniPrograms => 'Ung dung mini';
+
+  @override
+  String get chatAlreadyInCall => 'Dang trong cuoc goi';
+
+  @override
+  String get commonConnectionFailed => 'Ket noi that bai';
+
+  @override
+  String get chatCallRejected => 'Cuoc goi bi tu choi';
+
+  @override
+  String get chatNoAnswer => 'Khong tra loi';
+
+  @override
+  String get commonClose => 'Dong';
+
+  @override
+  String get chatSelectContact => 'Chon lien he';
+
+  @override
+  String get chatVoteRemoved => 'Da xoa binh chon';
+
+  @override
+  String get chatVoteChanged => 'Da thay doi binh chon';
+
+  @override
+  String get chatVoted => 'Da binh chon';
+
+  @override
+  String chatReplyTo(String name) {
+    return 'Tra loi $name';
+  }
+
+  @override
+  String get chatCurrentLocation => 'Vi tri hien tai';
+
+  @override
+  String chatNearbyPlace(int index) {
+    return 'Dia diem gan $index';
+  }
+
+  @override
+  String chatApproximateDistance(String distance) {
+    return 'Khoang $distance';
+  }
+
+  @override
+  String get chatAddress => 'Dia chi';
+
+  @override
+  String get chatLatitude => 'Vi do';
+
+  @override
+  String get chatLongitude => 'Kinh do';
+
+  @override
+  String get groupDescriptionUpdated => 'Đã cập nhật mô tả nhóm';
+
+  @override
+  String get groupAvatarUpdated => 'Đã cập nhật ảnh đại diện nhóm';
+
+  @override
+  String get callDecline => 'Tu choi';
+
+  @override
+  String get callAnswer => 'Tra loi';
+
+  @override
+  String get callIncomingVideoCall => 'Cuộc gọi video đến';
+
+  @override
+  String get callIncomingVoiceCall => 'Cuộc gọi thoại đến';
+
+  @override
+  String get callVideoCallInProgress => 'Cuộc gọi video';
+
+  @override
+  String get callVoiceCallInProgress => 'Cuộc gọi thoại';
+
+  @override
+  String get callReconnectingCall => 'Đang kết nối lại...';
 
   @override
   String get callEnded => 'Cuộc gọi kết thúc';
@@ -3962,619 +3307,383 @@ class SVi extends S {
   String get callFailed => 'Cuộc gọi thất bại';
 
   @override
-  String get checkForUpdates => 'Kiểm tra cập nhật';
+  String get callLivekitNotConfigured => 'LiveKit chua duoc cau hinh';
 
   @override
-  String get confirmClearChatHistory =>
-      'Bạn có chắc chắn muốn xóa lịch sử trò chuyện không?';
-
-  @override
-  String get createGroupToChat => 'Tạo một nhóm để bắt đầu trò chuyện';
-
-  @override
-  String get darkMode => 'Chế độ tối';
-
-  @override
-  String get darkModeOption => 'Chế độ tối';
-
-  @override
-  String get doNotDisturbDescription =>
-      'Không nhận thông báo trong khoảng thời gian chỉ định';
-
-  @override
-  String get doNotDisturbMode => 'Không làm phiền';
-
-  @override
-  String get editGroupAnnouncement => 'Chỉnh sửa thông báo nhóm';
-
-  @override
-  String get editGroupDescription => 'Chỉnh sửa mô tả nhóm';
-
-  @override
-  String get enterGroupAnnouncement => 'Nhập thông báo nhóm';
-
-  @override
-  String errorWithMessage(String message) {
-    return 'Lỗi: $message';
+  String callJoinMeetingFailed(String error) {
+    return 'Tham gia cuoc hop that bai: $error';
   }
 
   @override
-  String get feedbackAndSuggestions => 'Phản hồi và đề xuất';
-
-  @override
-  String get followSystem => 'Theo hệ thống';
-
-  @override
-  String get fontSize => 'Cỡ chữ';
-
-  @override
-  String get fontSizeExtraLarge => 'Rất lớn';
-
-  @override
-  String get fontSizeLarge => 'Lớn';
-
-  @override
-  String get fontSizeSmall => 'Nhỏ';
-
-  @override
-  String get fontSizeStandard => 'Tiêu chuẩn';
-
-  @override
-  String get incomingVideoCall => 'Cuộc gọi video đến';
-
-  @override
-  String get incomingVoiceCall => 'Cuộc gọi thoại đến';
-
-  @override
-  String get letOthersKnowYouRead =>
-      'Cho người khác biết bạn đã đọc tin nhắn của họ';
-
-  @override
-  String get letOthersKnowYouTyping => 'Cho người khác biết bạn đang nhập';
-
-  @override
-  String get lightMode => 'Chế độ sáng';
-
-  @override
-  String memberCountClickToCopy(int count) {
-    return '$count thành viên, nhấp để sao chép ID nhóm';
+  String callScreenShareFailed(String error) {
+    return 'Chia se man hinh that bai: $error';
   }
 
   @override
-  String get messageNotifications => 'Thông báo tin nhắn';
+  String get profileN42BeanTitle => 'N42 Bean';
 
   @override
-  String get messagesLabel => 'Tin nhắn';
+  String get profileNoN42Bean => 'Không có N42 Bean';
 
   @override
-  String get musicLinkLabel => 'Liên kết nhạc';
+  String get profileN42BeanDetails => 'Chi tiết N42 Bean';
 
   @override
-  String get noMediaUrlAvailable => 'URL phương tiện không khả dụng';
-
-  @override
-  String get noPermissionToEditGroupName =>
-      'Bạn không có quyền chỉnh sửa tên nhóm';
-
-  @override
-  String get receiveMessagesFromNonContacts =>
-      'Nhận tin nhắn từ người không có trong danh bạ';
-
-  @override
-  String get receiveNewMessageNotifications => 'Nhận thông báo tin nhắn mới';
-
-  @override
-  String get reconnectingCall => 'Đang kết nối lại...';
-
-  @override
-  String get redPacketTransferCannotForward =>
-      'Lì xì và chuyển khoản không thể chuyển tiếp';
-
-  @override
-  String get showMessageContentInNotification =>
-      'Hiển thị nội dung tin nhắn trong thông báo';
-
-  @override
-  String get showMessagePreview => 'Hiển thị xem trước tin nhắn';
-
-  @override
-  String get typingIndicator => 'Chỉ báo đang nhập';
-
-  @override
-  String versionInfo(String version) {
-    return 'Phiên bản $version';
-  }
-
-  @override
-  String get vibration => 'Rung';
-
-  @override
-  String get videoCallInProgress => 'Cuộc gọi video';
-
-  @override
-  String get voiceCallInProgress => 'Cuộc gọi thoại';
-
-  @override
-  String whoCanSeeTitle(String title) {
-    return 'Ai có thể xem $title';
-  }
-
-  @override
-  String get emailAddress => 'Địa chỉ email';
-
-  @override
-  String get enterEmailAddress => 'Nhập địa chỉ email';
-
-  @override
-  String get emailRecoveryHint => 'Dùng để khôi phục mật khẩu';
-
-  @override
-  String get invalidEmailFormat => 'Vui lòng nhập địa chỉ email hợp lệ';
-
-  @override
-  String get optional => 'Tùy chọn';
-
-  @override
-  String get resetPassword => 'Đặt lại mật khẩu';
-
-  @override
-  String get resetPasswordTitle => 'Đặt lại mật khẩu của bạn';
-
-  @override
-  String get enterRegisteredEmail => 'Nhập địa chỉ email bạn đã đăng ký';
-
-  @override
-  String get sendResetCode => 'Gửi mã đặt lại';
-
-  @override
-  String resetCodeSent(String email) {
-    return 'Mã đặt lại đã gửi đến $email';
-  }
-
-  @override
-  String get enterResetCode => 'Nhập mã đặt lại';
-
-  @override
-  String get setNewPassword => 'Đặt mật khẩu mới';
-
-  @override
-  String get confirmNewPassword => 'Xác nhận mật khẩu mới';
-
-  @override
-  String get newPassword => 'Mật khẩu mới';
-
-  @override
-  String get passwordResetSuccess =>
-      'Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập bằng mật khẩu mới.';
-
-  @override
-  String get resetPasswordFailed => 'Đặt lại mật khẩu thất bại';
-
-  @override
-  String get changePassword => 'Đổi mật khẩu';
-
-  @override
-  String get currentPassword => 'Mật khẩu hiện tại';
-
-  @override
-  String get enterCurrentPassword => 'Nhập mật khẩu hiện tại';
-
-  @override
-  String get enterNewPassword => 'Nhập mật khẩu mới';
-
-  @override
-  String get passwordChanged =>
-      'Mật khẩu đã được thay đổi thành công. Vui lòng đăng nhập bằng mật khẩu mới.';
-
-  @override
-  String get changePasswordFailed => 'Đổi mật khẩu thất bại';
-
-  @override
-  String get incorrectCurrentPassword => 'Mật khẩu hiện tại không đúng';
-
-  @override
-  String get newPasswordMustBeDifferent =>
-      'Mật khẩu mới phải khác mật khẩu hiện tại';
-
-  @override
-  String get changePasswordInfo =>
-      'Sau khi đổi mật khẩu, bạn sẽ bị đăng xuất và cần đăng nhập lại bằng mật khẩu mới.';
-
-  @override
-  String get passwordRequirements => 'Yêu cầu mật khẩu:';
-
-  @override
-  String get securityNote =>
-      'Vì lý do bảo mật, bạn sẽ cần đăng nhập lại trên tất cả thiết bị sau khi đổi mật khẩu.';
-
-  @override
-  String get security => 'Bảo mật';
-
-  @override
-  String get currentBoundEmail => 'Email hiện đang liên kết';
-
-  @override
-  String get newEmailAddress => 'Địa chỉ email mới';
-
-  @override
-  String get enterNewEmail => 'Nhập địa chỉ email mới';
-
-  @override
-  String get verificationCode => 'Mã xác nhận';
-
-  @override
-  String get verificationCodeSent => 'Mã xác nhận đã được gửi';
-
-  @override
-  String get codeSentTo => 'Mã xác nhận đã gửi đến';
-
-  @override
-  String get didNotReceiveCode => 'Không nhận được mã?';
-
-  @override
-  String get emailChangedSuccess => 'Email đã được thay đổi thành công';
-
-  @override
-  String get changeEmailFailed => 'Thay đổi email thất bại';
-
-  @override
-  String get emailSecurityNote =>
-      'Email của bạn được dùng để khôi phục mật khẩu. Hãy giữ an toàn.';
-
-  @override
-  String get googleLogin => 'Đăng nhập bằng Google';
-
-  @override
-  String get appleLogin => 'Đăng nhập bằng Apple';
-
-  @override
-  String get facebookLogin => 'Đăng nhập bằng Facebook';
-
-  @override
-  String get twitterLogin => 'Đăng nhập bằng Twitter';
-
-  @override
-  String get wechatLogin => 'Đăng nhập bằng WeChat';
-
-  @override
-  String get wechat => 'WeChat';
-
-  @override
-  String get facebook => 'Facebook';
-
-  @override
-  String get twitter => 'Twitter';
-
-  @override
-  String get wechatNotInstalled => 'Vui lòng cài đặt WeChat trước';
-
-  @override
-  String get wechatLoginFailed => 'Đăng nhập WeChat thất bại';
-
-  @override
-  String get facebookLoginFailed => 'Đăng nhập Facebook thất bại';
-
-  @override
-  String get twitterLoginFailed => 'Đăng nhập Twitter thất bại';
-
-  @override
-  String get twitterNotConfigured => 'Đăng nhập Twitter chưa được cấu hình';
-
-  @override
-  String get socialLoginCancelled => 'Đăng nhập đã bị hủy';
-
-  @override
-  String get socialLoginFailed => 'Đăng nhập mạng xã hội thất bại';
-
-  @override
-  String get language => 'Ngôn ngữ';
-
-  @override
-  String get languageChanged => 'Ngôn ngữ đã thay đổi';
-
-  @override
-  String get biometricLogin => '生物识别登录';
-
-  @override
-  String loginWithBiometric(Object type) {
-    return '使用$type登录';
-  }
-
-  @override
-  String get biometricLoginEnabled => '生物识别登录已启用';
-
-  @override
-  String get biometricLoginDisabled => '生物识别登录已禁用';
-
-  @override
-  String get enableBiometricLogin => '启用生物识别登录';
-
-  @override
-  String get disableBiometricLogin => '禁用生物识别登录';
-
-  @override
-  String get biometricNotAvailable => '此设备不支持生物识别';
-
-  @override
-  String get biometricNotEnrolled => '未录入生物识别数据，请在设备设置中设置';
-
-  @override
-  String get biometricAuthFailed => '生物识别验证失败';
-
-  @override
-  String get biometricAuthCancelled => '验证已取消';
-
-  @override
-  String get biometricLockedOut => '尝试次数过多，请稍后再试';
-
-  @override
-  String get useBiometricToLogin => '使用生物识别快速登录';
-
-  @override
-  String get authenticateToLogin => '验证身份以登录';
-
-  @override
-  String get authenticateToEnable => '验证身份以启用生物识别登录';
-
-  @override
-  String get faceId => '面容 ID';
-
-  @override
-  String get touchId => '触控 ID';
-
-  @override
-  String get fingerprint => '指纹';
-
-  @override
-  String get biometric => '生物识别';
-
-  @override
-  String get biometricEnabled => '已启用 - 使用生物识别登录';
-
-  @override
-  String get biometricDisabled => '已禁用 - 点击启用';
-
-  @override
-  String get biometricNeedRelogin => '请退出后重新登录以启用生物识别';
-
-  @override
-  String get or => '或';
-
-  @override
-  String get n42BeanTitle => 'N42 Bean';
-
-  @override
-  String get n42BeanDetails => 'Chi tiết N42 Bean';
-
-  @override
-  String get noN42Bean => 'Không có N42 Bean';
-
-  @override
-  String get n42BeanDescription =>
+  String get profileN42BeanDescription =>
       'N42 Bean là token dùng để đổi vật phẩm ảo và dịch vụ trong N42. Hiện có thể dùng cho:';
 
   @override
-  String get n42BeanFeature1 => 'Nhãn dán và chủ đề độc quyền cho thành viên';
+  String get profileN42BeanFeature1 =>
+      'Nhãn dán và chủ đề độc quyền cho thành viên';
 
   @override
-  String get n42BeanFeature2 => 'Tùy chỉnh bong bóng chat';
+  String get profileN42BeanFeature2 => 'Tùy chỉnh bong bóng chat';
 
   @override
-  String get n42BeanFeature3 => 'Tùy chỉnh bìa phong bao đỏ';
+  String get profileN42BeanFeature3 => 'Tùy chỉnh bìa phong bao đỏ';
 
   @override
-  String get n42BeanFeature4 => 'Huy hiệu biệt danh độc quyền';
+  String get profileN42BeanFeature4 => 'Huy hiệu biệt danh độc quyền';
 
   @override
-  String get n42BeanFeature5 => 'Đặc quyền trò chuyện nhóm';
+  String get profileN42BeanFeature5 => 'Đặc quyền trò chuyện nhóm';
 
   @override
-  String get n42BeanFeature6 => 'Mở rộng lưu trữ đám mây';
+  String get profileN42BeanFeature6 => 'Mở rộng lưu trữ đám mây';
 
   @override
-  String get n42BeanFeature7 => 'Bộ lọc làm đẹp cuộc gọi video';
+  String get profileN42BeanFeature7 => 'Bộ lọc làm đẹp cuộc gọi video';
 
   @override
-  String get n42BeanFeature8 => 'Tùy chỉnh nền Khoảnh khắc';
+  String get profileN42BeanFeature8 => 'Tùy chỉnh nền Khoảnh khắc';
 
   @override
-  String get n42BeanFeature9 => 'Ưu tiên dịch vụ khách hàng VIP';
+  String get profileN42BeanFeature9 => 'Ưu tiên dịch vụ khách hàng VIP';
 
   @override
-  String get gotIt => 'Đã hiểu';
+  String get profileGotIt => 'Đã hiểu';
 
   @override
-  String get noN42BeanRecords => 'Không có bản ghi N42 Bean';
+  String get profileNoN42BeanRecords => 'Không có bản ghi N42 Bean';
 
   @override
-  String get cameraPermissionRestricted =>
-      'Quyền truy cập camera bị hạn chế trên thiết bị này';
+  String get profileMoodAndThoughts => 'Tam trang & Suy nghi';
 
   @override
-  String get passkeyLabel => 'Passkey';
+  String get profileStatusHappy => 'Vui ve';
 
   @override
-  String get googleLabel => 'Google';
+  String get profileStatusCracked => 'Vo tan';
 
   @override
-  String get appleLabel => 'Apple';
+  String get profileStatusLucky => 'May man';
 
   @override
-  String get ssoLabel => 'SSO';
+  String get profileStatusSunny => 'Nang ve';
 
   @override
-  String get amountHintZero => '0.00';
+  String get profileStatusTired => 'Met moi';
 
   @override
-  String get matrixIdHint => '@username:server.com';
+  String get profileStatusDaydream => 'Mo mong';
 
   @override
-  String get serverAddressHint => 'https://m.si46.world';
+  String get profileStatusRushing => 'Ban ron';
 
   @override
-  String get emailExampleHint => 'example@email.com';
+  String get profileStatusOverthinking => 'Suy nghi qua nhieu';
 
   @override
-  String get verificationCodePlaceholder => '------';
+  String get profileStatusEnergized => 'Day nang luong';
 
   @override
-  String get enterPokeSuffixHint => '输入戳一戳后缀，例如：的肩膀';
+  String get profileWorkAndStudy => 'Cong viec & Hoc tap';
 
   @override
-  String get groupAlbum => '群相册';
+  String get profileStatusWorking => 'Dang lam viec';
 
   @override
-  String get groupFiles => '群文件';
+  String get profileStatusStudying => 'Dang hoc';
 
   @override
-  String get images => '图片';
+  String get profileStatusBusy => 'Ban';
 
   @override
-  String get videos => '视频';
+  String get profileStatusSlacking => 'Nghi ngoi';
 
   @override
-  String get total => '全部';
+  String get profileStatusTraveling => 'Di du lich';
 
   @override
-  String get size => '大小';
+  String get profileStatusGoingHome => 'Ve nha';
 
   @override
-  String get noMedia => '暂无媒体';
+  String get profileStatusDnd => 'Khong lam phien';
 
   @override
-  String get noMediaDescription => '此群还没有图片或视频';
+  String get profileActivities => 'Hoat dong';
 
   @override
-  String get documents => '文档';
+  String get profileStatusHanging => 'Di choi';
 
   @override
-  String get noFiles => '暂无文件';
+  String get profileStatusCheckIn => 'Diem danh';
 
   @override
-  String get noFilesDescription => '此群还没有文件';
+  String get profileStatusExercising => 'Tap the duc';
 
   @override
-  String downloadStarted(String filename) {
-    return '正在下载 $filename...';
+  String get profileStatusCoffee => 'Uong ca phe';
+
+  @override
+  String get profileStatusBubbleTea => 'Uong tra sua';
+
+  @override
+  String get profileStatusEating => 'An uong';
+
+  @override
+  String get profileStatusParenting => 'Cham con';
+
+  @override
+  String get profileStatusSavingWorld => 'Cuu the gioi';
+
+  @override
+  String get profileStatusSelfie => 'Chup selfie';
+
+  @override
+  String get profileRest => 'Nghi ngoi';
+
+  @override
+  String get profileStatusRetreat => 'An cu';
+
+  @override
+  String get profileStatusHome => 'O nha';
+
+  @override
+  String get profileStatusSleeping => 'Dang ngu';
+
+  @override
+  String get profileStatusCatLover => 'Nguoi yeu meo';
+
+  @override
+  String get profileStatusDogWalking => 'Dat cho di dao';
+
+  @override
+  String get profileStatusGaming => 'Choi game';
+
+  @override
+  String get profileStatusListening => 'Dang nghe';
+
+  @override
+  String get profileEditAddress => 'Chinh sua dia chi';
+
+  @override
+  String get profileRecipient => 'Nguoi nhan';
+
+  @override
+  String get profileEnterRecipientName => 'Nhap ten nguoi nhan';
+
+  @override
+  String get profilePhoneNumber => 'So dien thoai';
+
+  @override
+  String get profileEnterPhoneNumber => 'Nhap so dien thoai';
+
+  @override
+  String get profileRegionHint => 'Tinh/Thanh pho/Quan';
+
+  @override
+  String get profileDetailedAddress => 'Dia chi chi tiet';
+
+  @override
+  String get profileDetailedAddressHint => 'Duong, so nha, v.v.';
+
+  @override
+  String get profileSetAsDefaultAddress => 'Dat lam dia chi mac dinh';
+
+  @override
+  String get profilePleaseCompleteInfo => 'Vui long dien day du thong tin';
+
+  @override
+  String get profileEditInvoice => 'Chinh sua hoa don';
+
+  @override
+  String get profileInvoiceType => 'Loai hoa don: ';
+
+  @override
+  String get profileCompanyName => 'Ten cong ty';
+
+  @override
+  String get profilePersonalName => 'Ten ca nhan';
+
+  @override
+  String get profileEnterCompanyName => 'Nhap ten cong ty';
+
+  @override
+  String get profileEnterName => 'Nhap ten';
+
+  @override
+  String get profileTaxIdNumber => 'Ma so thue';
+
+  @override
+  String get profileEnterTaxIdNumber => 'Nhap ma so thue';
+
+  @override
+  String get profileBankNameOptional => 'Ten ngan hang (Tuy chon)';
+
+  @override
+  String get profileEnterBankName => 'Nhap ten ngan hang';
+
+  @override
+  String get profileBankAccountOptional => 'Tai khoan ngan hang (Tuy chon)';
+
+  @override
+  String get profileEnterBankAccount => 'Nhap tai khoan ngan hang';
+
+  @override
+  String get profileCompanyAddressOptional => 'Dia chi cong ty (Tuy chon)';
+
+  @override
+  String get profileEnterCompanyAddress => 'Nhap dia chi cong ty';
+
+  @override
+  String get profileCompanyPhoneOptional => 'Dien thoai cong ty (Tuy chon)';
+
+  @override
+  String get profileEnterCompanyPhone => 'Nhap dien thoai cong ty';
+
+  @override
+  String get profileSetAsDefaultInvoice => 'Dat lam hoa don mac dinh';
+
+  @override
+  String get profileRingtoneVibrate => 'Rung';
+
+  @override
+  String get profileRingtoneSilent => 'Im lang';
+
+  @override
+  String get profileVibrateMode => 'Che do rung';
+
+  @override
+  String get profileSilentMode => 'Che do im lang';
+
+  @override
+  String profilePlayFailed(String ringtoneName) {
+    return 'Phat that bai: $ringtoneName';
   }
 
   @override
-  String get noCommonGroups => '暂无共同群组';
-
-  @override
-  String get noCommonGroupsDescription => '你们没有共同加入的群组';
-
-  @override
-  String get pinMessage => '置顶';
-
-  @override
-  String get unpinMessage => '取消置顶';
-
-  @override
-  String get voiceMessage => '语音';
-
-  @override
-  String get message => '消息';
-
-  @override
-  String get hideChat => '隐藏';
-
-  @override
-  String get unhideChat => '取消隐藏';
-
-  @override
-  String get hiddenChats => '隐藏的聊天';
-
-  @override
-  String get noHiddenChats => '没有隐藏的聊天';
-
-  @override
-  String get noHiddenChatsDescription => '你隐藏的聊天会显示在这里';
-
-  @override
-  String get quickReply => '快捷回复';
-
-  @override
-  String get manageQuickReplies => '管理快捷回复';
-
-  @override
-  String get addQuickReply => '添加快捷回复';
-
-  @override
-  String get editQuickReply => '编辑快捷回复';
-
-  @override
-  String get deleteQuickReply => '删除快捷回复';
-
-  @override
-  String get noQuickReplies => '暂无快捷回复';
-
-  @override
-  String get defaultQuickReplies => '将显示默认快捷回复';
-
-  @override
-  String get translate => '翻译';
-
-  @override
-  String get translating => '翻译中...';
-
-  @override
-  String get translationFailed => '翻译失败';
-
-  @override
-  String translatedFrom(String language) {
-    return '翻译自$language';
+  String profilePlaying(String ringtoneName) {
+    return 'Dang phat: $ringtoneName';
   }
 
   @override
-  String get showOriginal => '显示原文';
+  String get profileStop => 'Dung';
 
   @override
-  String get hideTranslation => '隐藏翻译';
+  String get profileSelectRingtone => 'Chon nhac chuong';
 
   @override
-  String get translation => '翻译';
+  String get profileLoadingRingtones => 'Dang tai nhac chuong...';
 
   @override
-  String get story => '状态';
+  String get profileNoRingtonesFound => 'Khong tim thay nhac chuong';
 
   @override
-  String get myStory => '我的状态';
-
-  @override
-  String get addToStory => '发布状态';
-
-  @override
-  String get storyExpired => '状态已过期';
-
-  @override
-  String storyExpiresIn(String time) {
-    return '$time后过期';
+  String mainMessagesWithCount(int count) {
+    return 'Tin nhan($count)';
   }
 
   @override
-  String get viewers => '浏览者';
+  String get storyViewers => 'Người xem';
 
   @override
-  String get noViewers => '暂无浏览';
+  String get storyNoViewers => 'Chưa có người xem';
 
   @override
-  String viewersCount(int count) {
-    return '$count人浏览';
+  String get storyReplyToStory => 'Trả lời trạng thái...';
+
+  @override
+  String get commonCopiedToClipboard => 'Da sao chep vao clipboard';
+
+  @override
+  String get commonMore => 'Them';
+
+  @override
+  String get commonTranslating => 'Đang dịch...';
+
+  @override
+  String commonTranslatedFrom(String language) {
+    return 'Dịch từ $language';
   }
 
   @override
-  String get replyToStory => '回复状态...';
+  String get commonTranslation => 'Bản dịch';
 
   @override
-  String get createStory => '发布状态';
+  String get commonTranslationFailed => 'Dịch thất bại';
 
   @override
-  String get storySettings => '状态设置';
+  String get commonAllRead => 'Da doc tat ca';
 
   @override
-  String get whoCanSeeMyStory => '谁可以看我的状态';
+  String commonReadCount(int count) {
+    return '$count da doc';
+  }
 
   @override
-  String get storyPrivacy => '状态隐私';
+  String get commonYouRecalledMessage => 'Ban da thu hoi mot tin nhan';
+
+  @override
+  String get commonMessageRecalled => 'Tin nhan da thu hoi';
+
+  @override
+  String get commonReEdit => 'Chinh sua lai';
+
+  @override
+  String get commonWalletArea => 'Khu vuc vi';
+
+  @override
+  String get callIncomingCall => 'Cuoc goi den';
+
+  @override
+  String get callMissedCall => 'Cuoc goi nho';
+
+  @override
+  String get groupRemoveAdmin => 'Xoa quyen quan tri';
+
+  @override
+  String get chatSelectCurrency => 'Chon loai tien';
+
+  @override
+  String get chatSelectEmoji => 'Chon bieu tuong cam xuc';
+
+  @override
+  String get chatSelectRedPacketCover => 'Chon bia';
+
+  @override
+  String get groupSetAsAdmin => 'Dat lam quan tri vien';
+
+  @override
+  String get chatVideoPlaybackFailed => 'Phat video that bai';
+
+  @override
+  String get groupViewProfile => 'Xem ho so';
+
+  @override
+  String get favoriteAddLinkComingSoon => 'Tinh nang them lien ket sap ra mat';
+
+  @override
+  String get favoriteNewNoteComingSoon => 'Tinh nang ghi chu moi sap ra mat';
+
+  @override
+  String get qrcodeSaveFeatureComingSoon => 'Tinh nang luu sap ra mat';
+
+  @override
+  String get qrcodeShareFeatureComingSoon => 'Tinh nang chia se sap ra mat';
+
+  @override
+  String qrcodeProcessFailed(String error) {
+    return 'Xu ly ma QR that bai: $error';
+  }
 }

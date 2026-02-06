@@ -176,25 +176,25 @@ class _ChatPageState extends State<ChatPage> {
 
     switch (errorCode) {
       case 'call_not_initialized':
-        message = l10n?.callServiceNotInitialized ?? 'Call service not initialized';
+        message = l10n?.chatCallServiceNotInitialized ?? 'Call service not initialized';
         break;
       case 'already_in_call':
-        message = l10n?.alreadyInCall ?? 'Already in a call';
+        message = l10n?.chatAlreadyInCall ?? 'Already in a call';
         break;
       case 'call_failed':
-        message = l10n?.connectionFailed ?? 'Call failed';
+        message = l10n?.commonConnectionFailed ?? 'Call failed';
         break;
       case 'answer_failed':
-        message = l10n?.connectionFailed ?? 'Failed to answer';
+        message = l10n?.commonConnectionFailed ?? 'Failed to answer';
         break;
       case 'connection_failed':
-        message = l10n?.connectionFailed ?? 'Connection failed';
+        message = l10n?.commonConnectionFailed ?? 'Connection failed';
         break;
       case 'call_rejected':
-        message = l10n?.callRejected ?? 'Call rejected';
+        message = l10n?.chatCallRejected ?? 'Call rejected';
         break;
       case 'no_answer':
-        message = l10n?.noAnswer ?? 'No answer';
+        message = l10n?.chatNoAnswer ?? 'No answer';
         break;
       default:
         message = errorCode;
@@ -423,7 +423,7 @@ class _ChatPageState extends State<ChatPage> {
   void _onRedPacketTap(MessageEntity message) {
     final metadata = message.metadata;
     final status = metadata?.transferStatus ?? 'pending';
-    final greeting = message.content.isNotEmpty ? message.content : (S.of(context)?.redPacketGreeting ?? 'Best wishes');
+    final greeting = message.content.isNotEmpty ? message.content : (S.of(context)?.chatRedPacketGreeting ?? 'Best wishes');
     final amount = metadata?.amount;
     final token = metadata?.token ?? 'CNY';
     
@@ -518,7 +518,7 @@ class _ChatPageState extends State<ChatPage> {
   String _formatTime(DateTime time) {
     final now = DateTime.now();
     if (now.difference(time).inMinutes < 1) {
-      return S.of(context)?.justNow ?? 'Just now';
+      return S.of(context)?.chatJustNow ?? 'Just now';
     } else if (now.day == time.day) {
       return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
     } else {
@@ -642,7 +642,7 @@ class _ChatPageState extends State<ChatPage> {
       debugPrint('ERROR: Video URL is still empty after conversion attempt');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.invalidVideoUrl ?? 'Invalid video URL'),
+          content: Text(S.of(context)?.chatInvalidVideoUrl ?? 'Invalid video URL'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -680,13 +680,13 @@ class _ChatPageState extends State<ChatPage> {
       }
     }
 
-    final fileName = message.metadata?.fileName ?? (S.of(context)?.unknownFile ?? 'Unknown file');
+    final fileName = message.metadata?.fileName ?? (S.of(context)?.chatUnknownFile ?? 'Unknown file');
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${S.of(context)?.downloadFile ?? 'Download file'}: $fileName'),
+        content: Text('${S.of(context)?.chatDownloadFile ?? 'Download file'}: $fileName'),
         action: SnackBarAction(
-          label: S.of(context)?.download ?? 'Download',
+          label: S.of(context)?.chatDownload ?? 'Download',
           onPressed: () {
             // TODO: 实现文件下载
             debugPrint('Download file: $fileUrl');
@@ -705,7 +705,7 @@ class _ChatPageState extends State<ChatPage> {
     if (lat == null || lng == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.invalidLocation ?? 'Invalid location'),
+          content: Text(S.of(context)?.chatInvalidLocation ?? 'Invalid location'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -717,7 +717,7 @@ class _ChatPageState extends State<ChatPage> {
     if (locationName.isEmpty ||
         locationName.startsWith('geo:') ||
         locationName.contains('Location was shared')) {
-      locationName = S.of(context)?.myLocation ?? 'My Location';
+      locationName = S.of(context)?.chatMyLocation ?? 'My Location';
     }
 
     // 打开微信风格的位置详情页面
@@ -791,7 +791,7 @@ class _ChatPageState extends State<ChatPage> {
   /// 双击头像拍一拍
   void _onAvatarDoubleTap(MessageEntity message) async {
     try {
-      String myDisplayName = S.of(context)?.me ?? 'Me';
+      String myDisplayName = S.of(context)?.commonMe ?? 'Me';
       String? myPokeText;
       String? myUserId;
 
@@ -801,7 +801,7 @@ class _ChatPageState extends State<ChatPage> {
 
         // 获取当前用户基本信息
         final currentUser = authRepository.currentUser;
-        myDisplayName = currentUser?.displayName ?? (S.of(context)?.me ?? 'Me');
+        myDisplayName = currentUser?.displayName ?? (S.of(context)?.commonMe ?? 'Me');
         myUserId = currentUser?.userId;
         
         debugPrint('Poke: currentUser.displayName=$myDisplayName, userId=$myUserId');
@@ -867,7 +867,7 @@ class _ChatPageState extends State<ChatPage> {
     final targetDisplayName = RemarkService.instance.getDisplayName(message.senderId, message.senderName);
     debugPrint('ShowPokeAnimation: targetName=$targetDisplayName, myPokeText=$myPokeText');
     
-    final displayText = S.of(context)?.pokedSomeone(targetDisplayName, myPokeText ?? '')
+    final displayText = S.of(context)?.chatPokedSomeone(targetDisplayName, myPokeText ?? '')
         ?? 'poked $targetDisplayName${myPokeText ?? ''}';
     
     debugPrint('ShowPokeAnimation: displayText=$displayText');
@@ -966,7 +966,7 @@ class _ChatPageState extends State<ChatPage> {
 
     if (contacts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.noContactsToAdd ?? 'No contacts available to add')),
+        SnackBar(content: Text(S.of(context)?.chatNoContactsToAdd ?? 'No contacts available to add')),
       );
       return;
     }
@@ -976,7 +976,7 @@ class _ChatPageState extends State<ChatPage> {
       context: context,
       builder: (dialogCtx) => _ContactSelectDialog(
         contacts: contacts,
-        title: S.of(context)?.addMembers ?? 'Add Members',
+        title: S.of(context)?.chatAddMembers ?? 'Add Members',
       ),
     );
 
@@ -986,13 +986,13 @@ class _ChatPageState extends State<ChatPage> {
         await groupRepository.inviteUsers(widget.conversation.id, selectedIds);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context)?.invitedMembers(selectedIds.length) ?? 'Invited ${selectedIds.length} members')),
+            SnackBar(content: Text(S.of(context)?.chatInvitedMembers(selectedIds.length) ?? 'Invited ${selectedIds.length} members')),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context)?.inviteFailed(e.toString()) ?? 'Invite failed: $e')),
+            SnackBar(content: Text(S.of(context)?.chatInviteFailed(e.toString()) ?? 'Invite failed: $e')),
           );
         }
       }
@@ -1006,13 +1006,13 @@ class _ChatPageState extends State<ChatPage> {
       await groupRepository.kickMember(widget.conversation.id, userId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.memberRemoved ?? 'Member removed')),
+          SnackBar(content: Text(S.of(context)?.chatMemberRemoved ?? 'Member removed')),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.removeFailed(e.toString()) ?? 'Remove failed: $e')),
+          SnackBar(content: Text(S.of(context)?.chatRemoveFailed(e.toString()) ?? 'Remove failed: $e')),
         );
       }
     }
@@ -1223,8 +1223,8 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   child: Text(
                     _isRecordingCancelled
-                        ? (S.of(context)?.releaseToCancel ?? 'Release to cancel')
-                        : (S.of(context)?.releaseToSend ?? 'Release to send, swipe up to cancel'),
+                        ? (S.of(context)?.chatReleaseToCancel ?? 'Release to cancel')
+                        : (S.of(context)?.chatReleaseToSend ?? 'Release to send, swipe up to cancel'),
                     style: TextStyle(
                       color: _isRecordingCancelled ? AppColors.error : Colors.white,
                       fontSize: 16,
@@ -1239,7 +1239,7 @@ class _ChatPageState extends State<ChatPage> {
                   },
                   icon: const Icon(Icons.close, color: Colors.white70),
                   label: Text(
-                    S.of(context)?.tapToCancel ?? 'Tap to cancel',
+                    S.of(context)?.chatTapToCancel ?? 'Tap to cancel',
                     style: const TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                 ),
@@ -1358,7 +1358,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.selectImageFailed(e.toString()) ?? 'Failed to select image: $e'),
+            content: Text(S.of(context)?.commonSelectImageFailed(e.toString()) ?? 'Failed to select image: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1376,18 +1376,18 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: Text(S.of(context)?.takePhoto ?? 'Take Photo'),
+              title: Text(S.of(context)?.commonTakePhoto ?? 'Take Photo'),
               onTap: () => Navigator.pop(context, 'photo'),
             ),
             ListTile(
               leading: const Icon(Icons.videocam),
-              title: Text(S.of(context)?.recording ?? 'Recording'),
+              title: Text(S.of(context)?.chatRecording ?? 'Recording'),
               onTap: () => Navigator.pop(context, 'video'),
             ),
             const SizedBox(height: 8),
             ListTile(
               leading: const Icon(Icons.close),
-              title: Text(S.of(context)?.cancel ?? 'Cancel'),
+              title: Text(S.of(context)?.commonCancel ?? 'Cancel'),
               onTap: () => Navigator.pop(context),
             ),
           ],
@@ -1431,7 +1431,7 @@ class _ChatPageState extends State<ChatPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.videoRecordingFailed ?? 'Video recording failed'),
+                content: Text(S.of(context)?.chatVideoRecordingFailed ?? 'Video recording failed'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -1447,7 +1447,7 @@ class _ChatPageState extends State<ChatPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.videoRecordingFailed ?? 'Video recording failed'),
+                content: Text(S.of(context)?.chatVideoRecordingFailed ?? 'Video recording failed'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -1462,7 +1462,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.captureFailed(e.toString()) ?? 'Capture failed: $e'),
+            content: Text(S.of(context)?.chatCaptureFailed(e.toString()) ?? 'Capture failed: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1480,7 +1480,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.processingVideo ?? 'Processing video...'),
+            content: Text(S.of(context)?.chatProcessingVideo ?? 'Processing video...'),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -1498,7 +1498,7 @@ class _ChatPageState extends State<ChatPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.videoFileNotExist ?? 'Video file does not exist'),
+                content: Text(S.of(context)?.chatVideoFileNotExist ?? 'Video file does not exist'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -1513,7 +1513,7 @@ class _ChatPageState extends State<ChatPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.videoDataEmpty ?? 'Video data is empty'),
+              content: Text(S.of(context)?.chatVideoDataEmpty ?? 'Video data is empty'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -1555,7 +1555,7 @@ class _ChatPageState extends State<ChatPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.videoTooLarge ?? 'Video size cannot exceed 100MB'),
+              content: Text(S.of(context)?.chatVideoTooLarge ?? 'Video size cannot exceed 100MB'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -1607,7 +1607,7 @@ class _ChatPageState extends State<ChatPage> {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.sendingVideo ?? 'Sending video...'),
+            content: Text(S.of(context)?.chatSendingVideo ?? 'Sending video...'),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -1618,7 +1618,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.sendVideoFailed(e.toString()) ?? 'Failed to send video: $e'),
+            content: Text(S.of(context)?.chatSendVideoFailed(e.toString()) ?? 'Failed to send video: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1645,7 +1645,7 @@ class _ChatPageState extends State<ChatPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.imageFileNotExist ?? 'Image file does not exist'),
+                content: Text(S.of(context)?.chatImageFileNotExist ?? 'Image file does not exist'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -1660,7 +1660,7 @@ class _ChatPageState extends State<ChatPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.imageDataEmpty ?? 'Image data is empty'),
+              content: Text(S.of(context)?.commonImageDataEmpty ?? 'Image data is empty'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -1721,7 +1721,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.sendingImage ?? 'Sending image...'),
+            content: Text(S.of(context)?.chatSendingImage ?? 'Sending image...'),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -1732,7 +1732,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.sendImageFailed(e.toString()) ?? 'Failed to send image: $e'),
+            content: Text(S.of(context)?.chatSendImageFailed(e.toString()) ?? 'Failed to send image: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1771,14 +1771,14 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 ),
                 title: Text(
-                  S.of(context)?.sendLocation ?? 'Send Location',
+                  S.of(context)?.chatSendLocation ?? 'Send Location',
                   style: TextStyle(
                     fontSize: 16,
                     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 subtitle: Text(
-                  S.of(context)?.selectLocationAndSend ?? 'Select location and send',
+                  S.of(context)?.chatSelectLocationAndSend ?? 'Select location and send',
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -1806,14 +1806,14 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 ),
                 title: Text(
-                  S.of(context)?.shareRealTimeLocation ?? 'Share Real-time Location',
+                  S.of(context)?.chatShareRealTimeLocation ?? 'Share Real-time Location',
                   style: TextStyle(
                     fontSize: 16,
                     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 subtitle: Text(
-                  S.of(context)?.shareLocationForOneHour ?? 'Share real-time location with friend for 1 hour',
+                  S.of(context)?.chatShareLocationForOneHour ?? 'Share real-time location with friend for 1 hour',
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -1839,7 +1839,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                   child: Text(
-                    S.of(context)?.cancel ?? 'Cancel',
+                    S.of(context)?.commonCancel ?? 'Cancel',
                     style: TextStyle(
                       color: isDark ? AppColors.textPrimaryDark : Colors.black87,
                       fontSize: 16,
@@ -1867,7 +1867,7 @@ class _ChatPageState extends State<ChatPage> {
     if (result != null && mounted) {
       final latitude = result['latitude'] as double;
       final longitude = result['longitude'] as double;
-      final address = result['address'] as String? ?? (S.of(context)?.myLocation ?? 'My location');
+      final address = result['address'] as String? ?? (S.of(context)?.chatMyLocation ?? 'My location');
       final name = result['name'] as String?;
       
       // 发送位置消息
@@ -1879,7 +1879,7 @@ class _ChatPageState extends State<ChatPage> {
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.locationSent ?? 'Location sent'),
+          content: Text(S.of(context)?.chatLocationSent ?? 'Location sent'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -1895,18 +1895,18 @@ class _ChatPageState extends State<ChatPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.shareRealTimeLocation ?? 'Share Real-time Location'),
+        title: Text(S.of(context)?.chatShareRealTimeLocation ?? 'Share Real-time Location'),
         content: Text(
-          S.of(context)?.realTimeLocationShareMessage ?? 'After sharing, the other party can see your real-time location for 1 hour.',
+          S.of(context)?.chatRealTimeLocationShareMessage ?? 'After sharing, the other party can see your real-time location for 1 hour.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(S.of(context)?.startSharing ?? 'Start Sharing'),
+            child: Text(S.of(context)?.chatStartSharing ?? 'Start Sharing'),
           ),
         ],
       ),
@@ -1917,7 +1917,7 @@ class _ChatPageState extends State<ChatPage> {
       // 需要建立 WebSocket 连接，持续发送位置更新
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.realTimeLocationSharing ?? 'Real-time location sharing in development...'),
+          content: Text(S.of(context)?.chatRealTimeLocationSharing ?? 'Real-time location sharing in development...'),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -1934,16 +1934,16 @@ class _ChatPageState extends State<ChatPage> {
           final shouldOpen = await showDialog<bool>(
             context: context,
             builder: (ctx) => AlertDialog(
-              title: Text(S.of(context)?.locationServiceNotEnabled ?? 'Location service is not enabled'),
-              content: Text(S.of(context)?.enableLocationService ?? 'Please enable location service to use this feature'),
+              title: Text(S.of(context)?.chatLocationServiceNotEnabled ?? 'Location service is not enabled'),
+              content: Text(S.of(context)?.chatEnableLocationService ?? 'Please enable location service to use this feature'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: Text(S.of(context)?.cancel ?? 'Cancel'),
+                  child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, true),
-                  child: Text(S.of(context)?.goToSettings ?? 'Go to Settings'),
+                  child: Text(S.of(context)?.chatGoToSettings ?? 'Go to Settings'),
                 ),
               ],
             ),
@@ -1963,7 +1963,7 @@ class _ChatPageState extends State<ChatPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.locationPermissionRequired ?? 'Location permission is required for this feature'),
+                content: Text(S.of(context)?.chatLocationPermissionRequired ?? 'Location permission is required for this feature'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -1976,7 +1976,7 @@ class _ChatPageState extends State<ChatPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.locationPermissionDeniedPermanent ?? 'Location permission has been permanently denied. Please enable it in settings.'),
+              content: Text(S.of(context)?.chatLocationPermissionDeniedPermanent ?? 'Location permission has been permanently denied. Please enable it in settings.'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -2022,7 +2022,7 @@ class _ChatPageState extends State<ChatPage> {
     // 显示发送成功提示
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.redPacketSent(amount, token) ?? 'Sent $amount $token red packet'),
+        content: Text(S.of(context)?.chatRedPacketSent(amount, token) ?? 'Sent $amount $token red packet'),
         backgroundColor: AppColors.success,
       ),
     );
@@ -2050,7 +2050,7 @@ class _ChatPageState extends State<ChatPage> {
     );
 
     context.read<ChatBloc>().add(SendCustomMessage(
-      content: memo ?? (S.of(context)?.transferDefault ?? 'Transfer'),
+      content: memo ?? (S.of(context)?.chatTransferDefault ?? 'Transfer'),
       type: MessageType.transfer,
       metadata: metadata,
     ));
@@ -2058,7 +2058,7 @@ class _ChatPageState extends State<ChatPage> {
     // 显示发送成功提示
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.transferSent(amount, token) ?? 'Sent $amount $token transfer'),
+        content: Text(S.of(context)?.chatTransferSent(amount, token) ?? 'Sent $amount $token transfer'),
         backgroundColor: AppColors.primary,
       ),
     );
@@ -2088,7 +2088,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.pickFileFailed(e.toString()) ?? 'Failed to pick file: $e'),
+            content: Text(S.of(context)?.chatPickFileFailed(e.toString()) ?? 'Failed to pick file: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -2114,7 +2114,7 @@ class _ChatPageState extends State<ChatPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.fileSizeLimit ?? 'File size cannot exceed 50MB'),
+              content: Text(S.of(context)?.chatFileSizeLimit ?? 'File size cannot exceed 50MB'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -2133,7 +2133,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.fileSending(filename) ?? 'Sending file: $filename'),
+            content: Text(S.of(context)?.chatFileSending(filename) ?? 'Sending file: $filename'),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -2143,7 +2143,7 @@ class _ChatPageState extends State<ChatPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.sendFileFailed(e.toString()) ?? 'Failed to send file: $e'),
+            content: Text(S.of(context)?.chatSendFileFailed(e.toString()) ?? 'Failed to send file: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -2157,9 +2157,9 @@ class _ChatPageState extends State<ChatPage> {
 
     // 预先获取本地化字符串，确保使用正确的语言
     final l10n = S.of(context);
-    final selectContactText = l10n?.selectContact ?? 'Select Contact';
-    final searchContactHintText = l10n?.searchContactHint ?? 'Search contacts';
-    final noContactsFoundText = l10n?.noContactsFound ?? 'No contacts found';
+    final selectContactText = l10n?.chatSelectContact ?? 'Select Contact';
+    final searchContactHintText = l10n?.chatSearchContactHint ?? 'Search contacts';
+    final noContactsFoundText = l10n?.contactNoContactsFound ?? 'No contacts found';
     final isDark = context.isDarkMode;
 
     // 显示联系人选择对话框
@@ -2193,7 +2193,7 @@ Avatar: ${contactAvatar ?? ''}''';
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.contactCardSent(contactName) ?? 'Sent $contactName\'s contact card'),
+          content: Text(S.of(context)?.chatContactCardSent(contactName) ?? 'Sent $contactName\'s contact card'),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 1),
         ),
@@ -2219,7 +2219,7 @@ Avatar: ${contactAvatar ?? ''}''';
         if (mounted) {
           WeChatToast.warning(
             context,
-            S.of(context)?.callServiceNotInitialized ?? 'Call service not available',
+            S.of(context)?.chatCallServiceNotInitialized ?? 'Call service not available',
           );
         }
         return;
@@ -2236,7 +2236,7 @@ Avatar: ${contactAvatar ?? ''}''';
         if (mounted) {
           WeChatToast.warning(
             context,
-            S.of(context)?.error ?? 'Cannot start call',
+            S.of(context)?.chatError ?? 'Cannot start call',
           );
         }
         return;
@@ -2263,7 +2263,7 @@ Avatar: ${contactAvatar ?? ''}''';
       if (mounted) {
         WeChatToast.info(
           context,
-          S.of(context)?.featureComingSoon('Group Call') ?? 'Group calls coming soon',
+          S.of(context)?.commonFeatureComingSoon('Group Call') ?? 'Group calls coming soon',
         );
       }
     }
@@ -2272,7 +2272,7 @@ Avatar: ${contactAvatar ?? ''}''';
   void _openFavorites() {
     // TODO: 实现收藏功能
     debugPrint('Open favorites');
-    _showFeatureToast(S.of(context)?.favoritesFeature ?? 'Favorites');
+    _showFeatureToast(S.of(context)?.chatFavoritesFeature ?? 'Favorites');
   }
 
   /// 分享音乐
@@ -2314,19 +2314,19 @@ Avatar: ${contactAvatar ?? ''}''';
 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.sharedMusic(songName) ?? 'Shared $songName'),
+                content: Text(S.of(context)?.chatSharedMusic(songName) ?? 'Shared $songName'),
                 duration: const Duration(seconds: 1),
               ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(S.of(context)?.fileNotExist ?? 'File does not exist'), backgroundColor: Colors.red),
+              SnackBar(content: Text(S.of(context)?.chatFileNotExist ?? 'File does not exist'), backgroundColor: Colors.red),
             );
           }
         } catch (e) {
           debugPrint('Error sending local music: $e');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context)?.sendFailed(e.toString()) ?? 'Send failed: $e'), backgroundColor: Colors.red),
+            SnackBar(content: Text(S.of(context)?.chatSendFailed(e.toString()) ?? 'Send failed: $e'), backgroundColor: Colors.red),
           );
         }
       } else {
@@ -2344,7 +2344,7 @@ Avatar: ${contactAvatar ?? ''}''';
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.sharedMusic(songName) ?? 'Shared $songName'),
+            content: Text(S.of(context)?.chatSharedMusic(songName) ?? 'Shared $songName'),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -2355,13 +2355,13 @@ Avatar: ${contactAvatar ?? ''}''';
   void _selectCoupon() {
     // TODO: 实现选择卡券功能
     debugPrint('Select coupon');
-    _showFeatureToast(S.of(context)?.couponsFeature ?? 'Coupons');
+    _showFeatureToast(S.of(context)?.chatCouponsFeature ?? 'Coupons');
   }
 
   void _sendGift() {
     // TODO: 实现发送礼物功能
     debugPrint('Send gift');
-    _showFeatureToast(S.of(context)?.giftFeature ?? 'Gift');
+    _showFeatureToast(S.of(context)?.chatGiftFeature ?? 'Gift');
   }
 
   /// 创建投票
@@ -2463,15 +2463,15 @@ Avatar: ${contactAvatar ?? ''}''';
     if (currentVotes.contains(optionId)) {
       // 点击已选选项 -> 取消投票
       newVotes = currentVotes.where((id) => id != optionId).toList();
-      actionMessage = s?.voteRemoved ?? 'Vote removed';
+      actionMessage = s?.chatVoteRemoved ?? 'Vote removed';
     } else if (maxSelections == 1) {
       // 单选 -> 直接替换为新选项
       newVotes = [optionId];
-      actionMessage = s?.voteChanged ?? 'Vote changed';
+      actionMessage = s?.chatVoteChanged ?? 'Vote changed';
     } else {
       // 多选 -> 添加新选项
       newVotes = [...currentVotes, optionId];
-      actionMessage = s?.voted ?? 'Voted';
+      actionMessage = s?.chatVoted ?? 'Voted';
     }
 
     debugPrint('ChatPage: Voting on poll $pollEventId, new votes: $newVotes');
@@ -2511,16 +2511,16 @@ Avatar: ${contactAvatar ?? ''}''';
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.endPollTitle ?? 'End Poll'),
-        content: Text(S.of(context)?.endPollConfirmMessage ?? 'Are you sure you want to end this poll? Voting will be closed after ending.'),
+        title: Text(S.of(context)?.chatEndPollTitle ?? 'End Poll'),
+        content: Text(S.of(context)?.chatEndPollConfirmMessage ?? 'Are you sure you want to end this poll? Voting will be closed after ending.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(S.of(context)?.confirm ?? 'Confirm', style: const TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.commonConfirm ?? 'Confirm', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -2531,7 +2531,7 @@ Avatar: ${contactAvatar ?? ''}''';
       context.read<ChatBloc>().add(EndPoll(pollEventId: pollEventId));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.pollEndedMessage ?? 'Poll ended'),
+          content: Text(S.of(context)?.chatPollEndedMessage ?? 'Poll ended'),
           duration: const Duration(seconds: 1),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.success,
@@ -2543,7 +2543,7 @@ Avatar: ${contactAvatar ?? ''}''';
   void _showFeatureToast(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.featureInDev(feature) ?? '$feature feature in development...'),
+        content: Text(S.of(context)?.chatFeatureInDev(feature) ?? '$feature feature in development...'),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
       ),
@@ -2569,7 +2569,7 @@ Avatar: ${contactAvatar ?? ''}''';
           ),
           if (widget.conversation.type == ConversationType.group)
             Text(
-              S.of(context)?.memberCount(widget.conversation.memberCount) ?? '${widget.conversation.memberCount} members',
+              S.of(context)?.commonMemberCount(widget.conversation.memberCount) ?? '${widget.conversation.memberCount} members',
               style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
@@ -2584,12 +2584,12 @@ Avatar: ${contactAvatar ?? ''}''';
           IconButton(
             icon: const Icon(Icons.phone_outlined),
             onPressed: _startVoiceCall,
-            tooltip: S.of(context)?.voiceCall ?? 'Voice Call',
+            tooltip: S.of(context)?.commonVoiceCall ?? 'Voice Call',
           ),
           IconButton(
             icon: const Icon(Icons.videocam_outlined),
             onPressed: _startVideoCall,
-            tooltip: S.of(context)?.videoCall ?? 'Video Call',
+            tooltip: S.of(context)?.chatVideoCall ?? 'Video Call',
           ),
         ],
         IconButton(
@@ -2617,8 +2617,8 @@ Avatar: ${contactAvatar ?? ''}''';
       ),
       title: Text(
         _selectedMessageIds.isEmpty
-            ? (S.of(context)?.selectMessages ?? 'Select messages')
-            : (S.of(context)?.selectedCount(_selectedMessageIds.length) ?? 'Selected ${_selectedMessageIds.length}'),
+            ? (S.of(context)?.chatSelectMessages ?? 'Select messages')
+            : (S.of(context)?.chatSelectedCount(_selectedMessageIds.length) ?? 'Selected ${_selectedMessageIds.length}'),
         style: TextStyle(
           color: isDark ? Colors.white : Colors.black,
           fontSize: 17,
@@ -2631,7 +2631,7 @@ Avatar: ${contactAvatar ?? ''}''';
         TextButton(
           onPressed: _selectAllMessages,
           child: Text(
-            S.of(context)?.selectAll ?? 'Select All',
+            S.of(context)?.chatSelectAll ?? 'Select All',
             style: const TextStyle(
               color: AppColors.primary,
               fontSize: 14,
@@ -2667,7 +2667,7 @@ Avatar: ${contactAvatar ?? ''}''';
       final name = widget.conversation.name;
       // 如果群名为空或为默认值，显示成员数
       if (name.isEmpty || name == 'Empty Chat' || name == 'empty chat') {
-        return S.of(context)?.groupChatCount(widget.conversation.memberCount) ?? 'Group Chat(${widget.conversation.memberCount})';
+        return S.of(context)?.chatGroupChatCount(widget.conversation.memberCount) ?? 'Group Chat(${widget.conversation.memberCount})';
       }
       return name;
     }
@@ -2681,7 +2681,7 @@ Avatar: ${contactAvatar ?? ''}''';
     // 如果名称为空或为默认值，返回简化的用户ID或默认文本
     final name = widget.conversation.name;
     if (name.isEmpty || name == 'Empty Chat' || name == 'empty chat') {
-      return S.of(context)?.privateChat ?? 'Private Chat';
+      return S.of(context)?.chatPrivateChat ?? 'Private Chat';
     }
     return name;
   }
@@ -2868,17 +2868,17 @@ Avatar: ${contactAvatar ?? ''}''';
       case MessageType.text:
         return msg.content;
       case MessageType.image:
-        return '[${S.of(context)?.image ?? 'Image'}]';
+        return '[${S.of(context)?.commonImage ?? 'Image'}]';
       case MessageType.video:
-        return '[${S.of(context)?.videoTitle ?? 'Video'}]';
+        return '[${S.of(context)?.chatVideoTitle ?? 'Video'}]';
       case MessageType.audio:
-        return '[${S.of(context)?.voiceMessage ?? 'Voice'}]';
+        return '[${S.of(context)?.chatVoiceMessage ?? 'Voice'}]';
       case MessageType.file:
-        return '[${S.of(context)?.file ?? 'File'}] ${msg.metadata?.fileName ?? ''}';
+        return '[${S.of(context)?.commonFile ?? 'File'}] ${msg.metadata?.fileName ?? ''}';
       case MessageType.location:
-        return '[${S.of(context)?.location ?? 'Location'}]';
+        return '[${S.of(context)?.chatLocation ?? 'Location'}]';
       default:
-        return msg.content.isNotEmpty ? msg.content : '[${S.of(context)?.message ?? 'Message'}]';
+        return msg.content.isNotEmpty ? msg.content : '[${S.of(context)?.chatMessage ?? 'Message'}]';
     }
   }
 
@@ -2897,7 +2897,7 @@ Avatar: ${contactAvatar ?? ''}''';
       },
       builder: (context, state) {
         if (state.isLoading) {
-          return N42Loading(message: S.of(context)?.loading ?? 'Loading...');
+          return N42Loading(message: S.of(context)?.commonLoading ?? 'Loading...');
         }
 
         if (state.isEmpty) {
@@ -2907,8 +2907,8 @@ Avatar: ${contactAvatar ?? ''}''';
               _buildEncryptionNotice(),
               const SizedBox(height: 16),
               N42EmptyState.noData(
-                title: S.of(context)?.noMessages ?? 'No messages',
-                description: S.of(context)?.sendFirstMessage ?? 'Send first message to start chatting',
+                title: S.of(context)?.chatNoMessages ?? 'No messages',
+                description: S.of(context)?.chatSendFirstMessage ?? 'Send first message to start chatting',
               ),
             ],
           );
@@ -3117,7 +3117,7 @@ Avatar: ${contactAvatar ?? ''}''';
             const SizedBox(width: 8),
             Flexible(
               child: Text(
-                S.of(context)?.encryptionNotice ?? 'This chat is end-to-end encrypted. Only you and the recipient can read the messages.',
+                S.of(context)?.chatEncryptionNotice ?? 'This chat is end-to-end encrypted. Only you and the recipient can read the messages.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 12,
@@ -3144,7 +3144,7 @@ Avatar: ${contactAvatar ?? ''}''';
           return const SizedBox.shrink();
         }
 
-        final replyToText = l10n?.replyTo(state.replyTarget!.senderName) ?? 'Reply to ${state.replyTarget!.senderName}';
+        final replyToText = l10n?.chatReplyTo(state.replyTarget!.senderName) ?? 'Reply to ${state.replyTarget!.senderName}';
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -3237,19 +3237,19 @@ Avatar: ${contactAvatar ?? ''}''';
         children: [
           _buildMultiSelectAction(
             icon: Icons.forward,
-            label: S.of(context)?.multiForward ?? 'Forward',
+            label: S.of(context)?.chatMultiForward ?? 'Forward',
             enabled: hasSelection,
             onTap: hasSelection ? _forwardSelectedMessages : null,
           ),
           _buildMultiSelectAction(
             icon: Icons.star_border,
-            label: S.of(context)?.collect ?? 'Collect',
+            label: S.of(context)?.chatCollect ?? 'Collect',
             enabled: hasSelection,
             onTap: hasSelection ? _favoriteSelectedMessages : null,
           ),
           _buildMultiSelectAction(
             icon: Icons.delete_outline,
-            label: S.of(context)?.delete ?? 'Delete',
+            label: S.of(context)?.commonDelete ?? 'Delete',
             enabled: hasSelection,
             onTap: hasSelection ? _deleteSelectedMessages : null,
             isDestructive: true,
@@ -3305,7 +3305,7 @@ Avatar: ${contactAvatar ?? ''}''';
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.collectMessages(_selectedMessageIds.length) ?? 'Collected ${_selectedMessageIds.length} messages'),
+        content: Text(S.of(context)?.chatCollectMessages(_selectedMessageIds.length) ?? 'Collected ${_selectedMessageIds.length} messages'),
         duration: const Duration(seconds: 1),
       ),
     );
@@ -3356,8 +3356,8 @@ Avatar: ${contactAvatar ?? ''}''';
               padding: const EdgeInsets.all(16),
               child: Text(
                 _mentionSearchQuery.isEmpty
-                    ? (S.of(context)?.noMembers ?? 'No members')
-                    : (S.of(context)?.memberNotFound ?? 'Member not found'),
+                    ? (S.of(context)?.chatNoMembers ?? 'No members')
+                    : (S.of(context)?.chatMemberNotFound ?? 'Member not found'),
                 style: TextStyle(color: subtextColor),
               ),
             );
@@ -3472,7 +3472,7 @@ Avatar: ${contactAvatar ?? ''}''';
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.voiceFileNotExist ?? 'Voice file does not exist'),
+              content: Text(S.of(context)?.chatVoiceFileNotExist ?? 'Voice file does not exist'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -3488,7 +3488,7 @@ Avatar: ${contactAvatar ?? ''}''';
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.voiceFileEmpty ?? 'Voice file is empty'),
+              content: Text(S.of(context)?.chatVoiceFileEmpty ?? 'Voice file is empty'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -3531,7 +3531,7 @@ Avatar: ${contactAvatar ?? ''}''';
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.sendingVoice ?? 'Sending voice...'),
+            content: Text(S.of(context)?.chatSendingVoice ?? 'Sending voice...'),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -3542,7 +3542,7 @@ Avatar: ${contactAvatar ?? ''}''';
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.sendVoiceFailed(e.toString()) ?? 'Failed to send voice: $e'),
+            content: Text(S.of(context)?.chatSendVoiceFailed(e.toString()) ?? 'Failed to send voice: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -3714,14 +3714,14 @@ Avatar: ${contactAvatar ?? ''}''';
     final imageUrl = message.metadata?.httpUrl ?? message.content;
     if (imageUrl.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.noMediaUrlAvailable ?? 'No media URL available')),
+        SnackBar(content: Text(S.of(context)?.chatNoMediaUrlAvailable ?? 'No media URL available')),
       );
       return;
     }
 
     try {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.saving ?? 'Saving...')),
+        SnackBar(content: Text(S.of(context)?.chatSaving ?? 'Saving...')),
       );
 
       // 下载文件
@@ -3744,18 +3744,18 @@ Avatar: ${contactAvatar ?? ''}''';
         if (mounted) {
           if (result.isSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(S.of(context)?.savedToGallery ?? 'Saved to gallery')),
+              SnackBar(content: Text(S.of(context)?.commonSavedToGallery ?? 'Saved to gallery')),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(S.of(context)?.failedToSave ?? 'Failed to save')),
+              SnackBar(content: Text(S.of(context)?.commonFailedToSave ?? 'Failed to save')),
             );
           }
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context)?.downloadFailed(response.statusCode.toString()) ?? 'Download failed: ${response.statusCode}')),
+            SnackBar(content: Text(S.of(context)?.chatDownloadFailed(response.statusCode.toString()) ?? 'Download failed: ${response.statusCode}')),
           );
         }
       }
@@ -3763,7 +3763,7 @@ Avatar: ${contactAvatar ?? ''}''';
       debugPrint('Save media error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.errorWithMessage(e.toString()) ?? 'Error: $e')),
+          SnackBar(content: Text(S.of(context)?.chatErrorWithMessage(e.toString()) ?? 'Error: $e')),
         );
       }
     }
@@ -3787,7 +3787,7 @@ Avatar: ${contactAvatar ?? ''}''';
       Clipboard.setData(ClipboardData(text: textToCopy));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.copied ?? 'Copied'),
+          content: Text(S.of(context)?.chatCopied ?? 'Copied'),
           duration: const Duration(seconds: 1),
           behavior: SnackBarBehavior.floating,
         ),
@@ -3798,17 +3798,17 @@ Avatar: ${contactAvatar ?? ''}''';
   String _getMessageTypeDescription(MessageType type) {
     switch (type) {
       case MessageType.image:
-        return S.of(context)?.image ?? '[Image]';
+        return S.of(context)?.commonImage ?? '[Image]';
       case MessageType.audio:
-        return S.of(context)?.voice ?? '[Voice]';
+        return S.of(context)?.chatVoice ?? '[Voice]';
       case MessageType.video:
-        return S.of(context)?.video ?? '[Video]';
+        return S.of(context)?.chatVideo ?? '[Video]';
       case MessageType.file:
-        return S.of(context)?.file ?? '[File]';
+        return S.of(context)?.commonFile ?? '[File]';
       case MessageType.location:
-        return S.of(context)?.location ?? '[Location]';
+        return S.of(context)?.chatLocation ?? '[Location]';
       case MessageType.transfer:
-        return S.of(context)?.transfer ?? '[Transfer]';
+        return S.of(context)?.commonTransfer ?? '[Transfer]';
       case MessageType.music:
         return '[Music]';
       default:
@@ -3854,7 +3854,7 @@ Avatar: ${contactAvatar ?? ''}''';
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.forwardFailed(e.toString()) ?? 'Forward failed: $e'),
+            content: Text(S.of(context)?.chatForwardFailed(e.toString()) ?? 'Forward failed: $e'),
             duration: const Duration(seconds: 2),
             backgroundColor: Colors.red,
           ),
@@ -4139,7 +4139,7 @@ Avatar: ${contactAvatar ?? ''}''';
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.messageForwarded ?? 'Message forwarded'),
+            content: Text(S.of(context)?.chatMessageForwarded ?? 'Message forwarded'),
             duration: const Duration(seconds: 1),
             backgroundColor: Colors.green,
           ),
@@ -4159,7 +4159,7 @@ Avatar: ${contactAvatar ?? ''}''';
         _favoritedMessageIds.remove(message.id);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.unfavorited ?? 'Unfavorited'),
+            content: Text(S.of(context)?.chatUnfavorited ?? 'Unfavorited'),
             duration: const Duration(seconds: 1),
             behavior: SnackBarBehavior.floating,
           ),
@@ -4168,7 +4168,7 @@ Avatar: ${contactAvatar ?? ''}''';
         _favoritedMessageIds.add(message.id);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.favorited ?? 'Favorited'),
+            content: Text(S.of(context)?.chatFavorited ?? 'Favorited'),
             duration: const Duration(seconds: 1),
             behavior: SnackBarBehavior.floating,
           ),
@@ -4195,8 +4195,8 @@ Avatar: ${contactAvatar ?? ''}''';
 
     // 显示反馈 - 根据是添加还是移除显示不同消息
     final feedbackText = isRemoving
-        ? (S.of(context)?.reactionRemoved ?? 'Reaction removed')
-        : (S.of(context)?.reactionAdded ?? 'Reaction added');
+        ? (S.of(context)?.chatReactionRemoved ?? 'Reaction removed')
+        : (S.of(context)?.chatReactionAdded ?? 'Reaction added');
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -4223,7 +4223,7 @@ Avatar: ${contactAvatar ?? ''}''';
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.failedMessageDeleted ?? 'Failed message deleted'),
+        content: Text(S.of(context)?.chatFailedMessageDeleted ?? 'Failed message deleted'),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
       ),
@@ -4242,7 +4242,7 @@ Avatar: ${contactAvatar ?? ''}''';
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.messageDeleted ?? 'Message deleted'),
+          content: Text(S.of(context)?.chatMessageDeleted ?? 'Message deleted'),
           duration: const Duration(seconds: 1),
           behavior: SnackBarBehavior.floating,
         ),
@@ -4333,16 +4333,16 @@ Avatar: ${contactAvatar ?? ''}''';
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.deleteMessages ?? 'Delete messages'),
+        title: Text(S.of(context)?.chatDeleteMessages ?? 'Delete messages'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(S.of(context)?.deleteMessagesConfirm(selectedMessages.length) ?? 'Are you sure you want to delete ${selectedMessages.length} messages?'),
+            Text(S.of(context)?.chatDeleteMessagesConfirm(selectedMessages.length) ?? 'Are you sure you want to delete ${selectedMessages.length} messages?'),
             if (otherMessages.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                S.of(context)?.noteOtherMessages(otherMessages.length) ?? 'Note: ${otherMessages.length} messages are from others, can only delete locally.',
+                S.of(context)?.chatNoteOtherMessages(otherMessages.length) ?? 'Note: ${otherMessages.length} messages are from others, can only delete locally.',
                 style: const TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 13,
@@ -4352,7 +4352,7 @@ Avatar: ${contactAvatar ?? ''}''';
             if (myMessages.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                S.of(context)?.myMessagesWillBeRecalled(myMessages.length) ?? '${myMessages.length} messages from you will be recalled.',
+                S.of(context)?.chatMyMessagesWillBeRecalled(myMessages.length) ?? '${myMessages.length} messages from you will be recalled.',
                 style: const TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 13,
@@ -4364,12 +4364,12 @@ Avatar: ${contactAvatar ?? ''}''';
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              S.of(context)?.delete ?? 'Delete',
+              S.of(context)?.commonDelete ?? 'Delete',
               style: const TextStyle(color: AppColors.error),
             ),
           ),
@@ -4399,11 +4399,11 @@ Avatar: ${contactAvatar ?? ''}''';
     if (mounted) {
       String message;
       if (redactedCount > 0 && localDeletedCount > 0) {
-        message = S.of(context)?.recalledCount(redactedCount, localDeletedCount) ?? 'Recalled $redactedCount messages, deleted $localDeletedCount locally';
+        message = S.of(context)?.chatRecalledCount(redactedCount, localDeletedCount) ?? 'Recalled $redactedCount messages, deleted $localDeletedCount locally';
       } else if (redactedCount > 0) {
-        message = S.of(context)?.recalledMessages(redactedCount) ?? 'Recalled $redactedCount messages';
+        message = S.of(context)?.chatRecalledMessages(redactedCount) ?? 'Recalled $redactedCount messages';
       } else {
-        message = S.of(context)?.deletedLocally(localDeletedCount) ?? 'Deleted $localDeletedCount messages (locally)';
+        message = S.of(context)?.chatDeletedLocally(localDeletedCount) ?? 'Deleted $localDeletedCount messages (locally)';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -4433,7 +4433,7 @@ Avatar: ${contactAvatar ?? ''}''';
     if (selectedMessages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.redPacketTransferCannotForward ?? 'Red envelopes and transfers cannot be forwarded'),
+          content: Text(S.of(context)?.chatRedPacketTransferCannotForward ?? 'Red envelopes and transfers cannot be forwarded'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -4472,9 +4472,9 @@ Avatar: ${contactAvatar ?? ''}''';
     if (mounted) {
       String resultMsg;
       if (failCount == 0) {
-        resultMsg = S.of(context)?.forwardedCount(successCount) ?? 'Forwarded $successCount messages';
+        resultMsg = S.of(context)?.chatForwardedCount(successCount) ?? 'Forwarded $successCount messages';
       } else {
-        resultMsg = S.of(context)?.forwardComplete(successCount, failCount) ?? 'Forward complete: $successCount succeeded, $failCount failed';
+        resultMsg = S.of(context)?.chatForwardComplete(successCount, failCount) ?? 'Forward complete: $successCount succeeded, $failCount failed';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -4500,7 +4500,7 @@ Avatar: ${contactAvatar ?? ''}''';
     if (widget.conversation.type != ConversationType.group) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.remindOnlyInGroup ?? 'Remind feature is only available in group chat'),
+          content: Text(S.of(context)?.chatRemindOnlyInGroup ?? 'Remind feature is only available in group chat'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -4561,7 +4561,7 @@ Avatar: ${contactAvatar ?? ''}''';
     if (message.type != MessageType.text || message.content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.onlyTextSearchable ?? 'Only text messages can be searched'),
+          content: Text(S.of(context)?.chatOnlyTextSearchable ?? 'Only text messages can be searched'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -4600,7 +4600,7 @@ Avatar: ${contactAvatar ?? ''}''';
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  S.of(context)?.searchFor(searchText) ?? 'Search "$searchText"',
+                  S.of(context)?.chatSearchFor(searchText) ?? 'Search "$searchText"',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -4613,7 +4613,7 @@ Avatar: ${contactAvatar ?? ''}''';
               _buildSearchOption(
                 context,
                 icon: Icons.search,
-                title: S.of(context)?.baiduSearch ?? 'Baidu Search',
+                title: S.of(context)?.chatBaiduSearch ?? 'Baidu Search',
                 onTap: () {
                   Navigator.pop(ctx);
                   _openSearch('https://www.baidu.com/s?wd=${Uri.encodeComponent(searchText)}');
@@ -4623,7 +4623,7 @@ Avatar: ${contactAvatar ?? ''}''';
               _buildSearchOption(
                 context,
                 icon: Icons.g_mobiledata,
-                title: S.of(context)?.googleSearch ?? 'Google Search',
+                title: S.of(context)?.chatGoogleSearch ?? 'Google Search',
                 onTap: () {
                   Navigator.pop(ctx);
                   _openSearch('https://www.google.com/search?q=${Uri.encodeComponent(searchText)}');
@@ -4633,7 +4633,7 @@ Avatar: ${contactAvatar ?? ''}''';
               _buildSearchOption(
                 context,
                 icon: Icons.article,
-                title: S.of(context)?.bingSearch ?? 'Bing Search',
+                title: S.of(context)?.chatBingSearch ?? 'Bing Search',
                 onTap: () {
                   Navigator.pop(ctx);
                   _openSearch('https://www.bing.com/search?q=${Uri.encodeComponent(searchText)}');
@@ -4672,7 +4672,7 @@ Avatar: ${contactAvatar ?? ''}''';
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.cannotOpenBrowser ?? 'Cannot open browser')),
+          SnackBar(content: Text(S.of(context)?.chatCannotOpenBrowser ?? 'Cannot open browser')),
         );
       }
     }
@@ -4817,7 +4817,7 @@ class _DeleteConfirmSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     child: Text(
-                      S.of(context)?.deleteThisMessage ?? 'Delete this message?',
+                      S.of(context)?.chatDeleteThisMessage ?? 'Delete this message?',
                       style: TextStyle(
                         fontSize: 13,
                         color: isDark ? Colors.grey[400] : Colors.grey[600],
@@ -4841,7 +4841,7 @@ class _DeleteConfirmSheet extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         child: Text(
-                          S.of(context)?.delete ?? 'Delete',
+                          S.of(context)?.commonDelete ?? 'Delete',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 20,
@@ -4873,7 +4873,7 @@ class _DeleteConfirmSheet extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     child: Text(
-                      S.of(context)?.cancel ?? 'Cancel',
+                      S.of(context)?.commonCancel ?? 'Cancel',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20,
@@ -4934,27 +4934,27 @@ class _MessageMenuSheet extends StatelessWidget {
               _buildMenuItem(
                 context,
                 icon: Icons.copy,
-                title: S.of(context)?.copy ?? 'Copy',
+                title: S.of(context)?.chatCopy ?? 'Copy',
                 onTap: onCopy,
               ),
             _buildMenuItem(
               context,
               icon: Icons.reply,
-              title: S.of(context)?.reply ?? 'Reply',
+              title: S.of(context)?.chatReply ?? 'Reply',
               onTap: onReply,
             ),
             if (onForward != null)
               _buildMenuItem(
                 context,
                 icon: Icons.forward,
-                title: S.of(context)?.forward ?? 'Forward',
+                title: S.of(context)?.commonForward ?? 'Forward',
                 onTap: onForward,
               ),
             if (onDelete != null)
               _buildMenuItem(
                 context,
                 icon: Icons.delete_outline,
-                title: S.of(context)?.recall ?? 'Recall',
+                title: S.of(context)?.chatRecall ?? 'Recall',
                 color: AppColors.error,
                 onTap: onDelete,
               ),
@@ -5081,13 +5081,13 @@ class _CallDialogState extends State<_CallDialog> {
   String _getCallStatusText(BuildContext context) {
     switch (_callStatusKey) {
       case 'connecting':
-        return S.of(context)?.connectingCall ?? 'Connecting...';
+        return S.of(context)?.chatConnectingCall ?? 'Connecting...';
       case 'ringing':
-        return S.of(context)?.ringing ?? 'Ringing...';
+        return S.of(context)?.chatRinging ?? 'Ringing...';
       case 'inCall':
-        return S.of(context)?.inCall ?? 'In call';
+        return S.of(context)?.chatInCall ?? 'In call';
       default:
-        return S.of(context)?.calling ?? 'Calling...';
+        return S.of(context)?.chatCalling ?? 'Calling...';
     }
   }
   
@@ -5179,8 +5179,8 @@ class _CallDialogState extends State<_CallDialog> {
                 _buildControlButton(
                   icon: _isMuted ? Icons.mic_off : Icons.mic,
                   label: _isMuted
-                      ? (S.of(context)?.unmute ?? 'Unmute')
-                      : (S.of(context)?.muteCall ?? 'Mute'),
+                      ? (S.of(context)?.commonUnmute ?? 'Unmute')
+                      : (S.of(context)?.chatMuteCall ?? 'Mute'),
                   isActive: _isMuted,
                   onTap: _toggleMute,
                 ),
@@ -5189,8 +5189,8 @@ class _CallDialogState extends State<_CallDialog> {
                 _buildControlButton(
                   icon: _isSpeakerOn ? Icons.volume_up : Icons.volume_down,
                   label: _isSpeakerOn
-                      ? (S.of(context)?.speakerOff ?? 'Speaker Off')
-                      : (S.of(context)?.speakerOn ?? 'Speaker'),
+                      ? (S.of(context)?.chatSpeakerOff ?? 'Speaker Off')
+                      : (S.of(context)?.chatSpeakerOn ?? 'Speaker'),
                   isActive: _isSpeakerOn,
                   onTap: _toggleSpeaker,
                 ),
@@ -5200,8 +5200,8 @@ class _CallDialogState extends State<_CallDialog> {
                   _buildControlButton(
                     icon: _isCameraOff ? Icons.videocam_off : Icons.videocam,
                     label: _isCameraOff
-                        ? (S.of(context)?.cameraOn ?? 'Camera On')
-                        : (S.of(context)?.cameraOff ?? 'Camera Off'),
+                        ? (S.of(context)?.chatCameraOn ?? 'Camera On')
+                        : (S.of(context)?.chatCameraOff ?? 'Camera Off'),
                     isActive: _isCameraOff,
                     onTap: _toggleCamera,
                   ),
@@ -5231,7 +5231,7 @@ class _CallDialogState extends State<_CallDialog> {
             const SizedBox(height: 16),
 
             Text(
-              S.of(context)?.hangUp ?? 'Hang Up',
+              S.of(context)?.chatHangUp ?? 'Hang Up',
               style: const TextStyle(color: Colors.white, fontSize: 14),
             ),
             
@@ -5373,7 +5373,7 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
             child: Row(
               children: [
                 Text(
-                  S.of(context)?.selectForwardTargetTitle ?? 'Select Forward Target',
+                  S.of(context)?.chatSelectForwardTargetTitle ?? 'Select Forward Target',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -5395,7 +5395,7 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: S.of(context)?.searchHint ?? 'Search',
+                hintText: S.of(context)?.chatSearchHint ?? 'Search',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: widget.isDark 
@@ -5473,8 +5473,8 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
       return Center(
         child: Text(
           _conversations.isEmpty
-              ? (S.of(context)?.noForwardableChat ?? 'No chats available for forwarding')
-              : (S.of(context)?.noMatchingChat ?? 'No matching chats found'),
+              ? (S.of(context)?.chatNoForwardableChat ?? 'No chats available for forwarding')
+              : (S.of(context)?.chatNoMatchingChat ?? 'No matching chats found'),
           style: TextStyle(
             color: widget.isDark ? Colors.white54 : Colors.black54,
           ),
@@ -5554,19 +5554,19 @@ class _ForwardMessageSheetState extends State<_ForwardMessageSheet> {
       case MessageType.text:
         return message.content;
       case MessageType.image:
-        return S.of(context)?.image ?? '[Image]';
+        return S.of(context)?.commonImage ?? '[Image]';
       case MessageType.audio:
-        return S.of(context)?.voice ?? '[Voice]';
+        return S.of(context)?.chatVoice ?? '[Voice]';
       case MessageType.video:
-        return S.of(context)?.video ?? '[Video]';
+        return S.of(context)?.chatVideo ?? '[Video]';
       case MessageType.file:
-        return '${S.of(context)?.file ?? '[File]'} ${message.metadata?.fileName ?? ''}';
+        return '${S.of(context)?.commonFile ?? '[File]'} ${message.metadata?.fileName ?? ''}';
       case MessageType.location:
-        return '${S.of(context)?.location ?? '[Location]'} ${message.content}';
+        return '${S.of(context)?.chatLocation ?? '[Location]'} ${message.content}';
       case MessageType.music:
         return '[Music] ${message.metadata?.musicTitle ?? ''}';
       default:
-        return S.of(context)?.unknownMessage ?? '[Message]';
+        return S.of(context)?.chatUnknownMessage ?? '[Message]';
     }
   }
 }
@@ -5607,7 +5607,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
       if (!serviceEnabled) {
         setState(() {
           _isLoading = false;
-          _errorMessage = S.of(context)?.locationServiceNotEnabled ?? 'Location service not enabled';
+          _errorMessage = S.of(context)?.chatLocationServiceNotEnabled ?? 'Location service not enabled';
         });
         return;
       }
@@ -5619,7 +5619,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
         if (permission == LocationPermission.denied) {
           setState(() {
             _isLoading = false;
-            _errorMessage = S.of(context)?.locationPermissionDenied ?? 'Location permission denied';
+            _errorMessage = S.of(context)?.chatLocationPermissionDenied ?? 'Location permission denied';
           });
           return;
         }
@@ -5628,7 +5628,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
       if (permission == LocationPermission.deniedForever) {
         setState(() {
           _isLoading = false;
-          _errorMessage = S.of(context)?.locationPermissionDeniedPermanent ?? 'Location permission permanently denied';
+          _errorMessage = S.of(context)?.chatLocationPermissionDeniedPermanent ?? 'Location permission permanently denied';
         });
         return;
       }
@@ -5657,7 +5657,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = S.of(context)?.getLocationFailed(e.toString()) ?? 'Failed to get location: $e';
+        _errorMessage = S.of(context)?.chatGetLocationFailed(e.toString()) ?? 'Failed to get location: $e';
       });
     }
   }
@@ -5688,8 +5688,8 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
     // 生成模拟的附近地点
     // 实际应用中应该使用地图 API 获取真实的 POI 数据
     final l10n = S.of(context);
-    final myLocation = l10n?.myLocation ?? 'My Location';
-    final currentLocation = l10n?.currentLocation ?? 'Current Location';
+    final myLocation = l10n?.chatMyLocation ?? 'My Location';
+    final currentLocation = l10n?.chatCurrentLocation ?? 'Current Location';
 
     _nearbyPlaces = [
       _NearbyPlace(
@@ -5710,24 +5710,24 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
       ),
       // 模拟附近地点（实际应从地图 API 获取）
       _NearbyPlace(
-        name: l10n?.nearbyPlace(1) ?? 'Nearby Place 1',
-        address: l10n?.approximateDistance('100m') ?? 'About 100m',
+        name: l10n?.chatNearbyPlace(1) ?? 'Nearby Place 1',
+        address: l10n?.chatApproximateDistance('100m') ?? 'About 100m',
         latitude: position.latitude + 0.001,
         longitude: position.longitude + 0.001,
         icon: Icons.place,
         iconColor: Colors.orange,
       ),
       _NearbyPlace(
-        name: l10n?.nearbyPlace(2) ?? 'Nearby Place 2',
-        address: l10n?.approximateDistance('200m') ?? 'About 200m',
+        name: l10n?.chatNearbyPlace(2) ?? 'Nearby Place 2',
+        address: l10n?.chatApproximateDistance('200m') ?? 'About 200m',
         latitude: position.latitude - 0.001,
         longitude: position.longitude + 0.002,
         icon: Icons.place,
         iconColor: Colors.orange,
       ),
       _NearbyPlace(
-        name: l10n?.nearbyPlace(3) ?? 'Nearby Place 3',
-        address: l10n?.approximateDistance('500m') ?? 'About 500m',
+        name: l10n?.chatNearbyPlace(3) ?? 'Nearby Place 3',
+        address: l10n?.chatApproximateDistance('500m') ?? 'About 500m',
         latitude: position.latitude + 0.002,
         longitude: position.longitude - 0.002,
         icon: Icons.place,
@@ -5747,7 +5747,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
       'latitude': selectedPlace?.latitude ?? _currentPosition!.latitude,
       'longitude': selectedPlace?.longitude ?? _currentPosition!.longitude,
       'address': _currentAddress,
-      'name': selectedPlace?.name ?? (S.of(context)?.myLocation ?? 'My Location'),
+      'name': selectedPlace?.name ?? (S.of(context)?.chatMyLocation ?? 'My Location'),
     });
   }
 
@@ -5768,7 +5768,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          S.of(context)?.locationTitle ?? 'Location',
+          S.of(context)?.chatLocationTitle ?? 'Location',
           style: TextStyle(
             color: isDark ? Colors.white : Colors.black,
             fontSize: 18,
@@ -5780,7 +5780,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
           TextButton(
             onPressed: _currentPosition != null ? _confirmLocation : null,
             child: Text(
-              S.of(context)?.sendButton ?? 'Send',
+              S.of(context)?.chatSendButton ?? 'Send',
               style: TextStyle(
                 color: _currentPosition != null
                     ? AppColors.primary
@@ -5799,7 +5799,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
                 children: [
                   const CircularProgressIndicator(),
                   const SizedBox(height: 16),
-                  Text(S.of(context)?.gettingLocation ?? 'Getting location...'),
+                  Text(S.of(context)?.chatGettingLocation ?? 'Getting location...'),
                 ],
               ),
             )
@@ -5821,7 +5821,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
                       const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: _getCurrentLocation,
-                        child: Text(S.of(context)?.retry ?? 'Retry'),
+                        child: Text(S.of(context)?.commonRetry ?? 'Retry'),
                       ),
                     ],
                   ),
@@ -5847,7 +5847,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  S.of(context)?.mapPreview ?? 'Map Preview',
+                                  S.of(context)?.chatMapPreview ?? 'Map Preview',
                                   style: TextStyle(
                                     color: isDark ? Colors.white38 : Colors.black26,
                                   ),
@@ -5893,7 +5893,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
                       color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
                       child: TextField(
                         decoration: InputDecoration(
-                          hintText: S.of(context)?.searchLocation ?? 'Search location',
+                          hintText: S.of(context)?.chatSearchLocation ?? 'Search location',
                           prefixIcon: const Icon(Icons.search),
                           filled: true,
                           fillColor: isDark 
@@ -6179,13 +6179,13 @@ class _LocationDetailPage extends StatelessWidget {
                           Expanded(
                             child: _ActionButton(
                               icon: Icons.copy_rounded,
-                              label: S.of(context)?.copy ?? 'Copy',
+                              label: S.of(context)?.chatCopy ?? 'Copy',
                               isDark: isDark,
                               onTap: () {
                                 Clipboard.setData(ClipboardData(text: '$latitude, $longitude'));
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text(S.of(context)?.addressCopied ?? 'Coordinates copied'),
+                                    content: Text(S.of(context)?.commonAddressCopied ?? 'Coordinates copied'),
                                     duration: const Duration(seconds: 1),
                                     behavior: SnackBarBehavior.floating,
                                   ),
@@ -6206,7 +6206,7 @@ class _LocationDetailPage extends StatelessWidget {
                                 }
                               },
                               icon: const Icon(Icons.navigation_rounded, size: 20),
-                              label: Text(S.of(context)?.mapPreview ?? 'Open in Maps'),
+                              label: Text(S.of(context)?.chatMapPreview ?? 'Open in Maps'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 foregroundColor: Colors.white,
@@ -6601,7 +6601,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
     } catch (e) {
       debugPrint('Error picking audio file: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.selectFileFailed(e.toString()) ?? 'Failed to select file: $e')),
+        SnackBar(content: Text(S.of(context)?.chatSelectFileFailed(e.toString()) ?? 'Failed to select file: $e')),
       );
     }
   }
@@ -6614,7 +6614,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
     
     if (link.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.pleaseEnterMusicLink ?? 'Please enter music link')),
+        SnackBar(content: Text(S.of(context)?.chatPleaseEnterMusicLink ?? 'Please enter music link')),
       );
       return;
     }
@@ -6622,14 +6622,14 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
     // 验证链接格式
     if (!link.startsWith('http://') && !link.startsWith('https://')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.pleaseEnterValidLink ?? 'Please enter a valid URL')),
+        SnackBar(content: Text(S.of(context)?.chatPleaseEnterValidLink ?? 'Please enter a valid URL')),
       );
       return;
     }
     
     Navigator.pop(context, {
-      'name': title.isNotEmpty ? title : (S.of(context)?.sharedSong ?? 'Shared Song'),
-      'artist': artist.isNotEmpty ? artist : (S.of(context)?.unknownArtist ?? 'Unknown Artist'),
+      'name': title.isNotEmpty ? title : (S.of(context)?.chatSharedSong ?? 'Shared Song'),
+      'artist': artist.isNotEmpty ? artist : (S.of(context)?.chatUnknownArtist ?? 'Unknown Artist'),
       'url': link,
       'isNetwork': true,
     });
@@ -6658,7 +6658,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
             child: Row(
               children: [
                 Text(
-                  S.of(context)?.shareMusic ?? 'Share Music',
+                  S.of(context)?.chatShareMusic ?? 'Share Music',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -6681,10 +6681,10 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildTab(0, S.of(context)?.recentPlayed ?? 'Recent', Icons.history),
-                _buildTab(1, S.of(context)?.myFavorites ?? 'Favorites', Icons.favorite),
-                _buildTab(2, S.of(context)?.networkLink ?? 'Link', Icons.link),
-                _buildTab(3, S.of(context)?.localFile ?? 'Local', Icons.folder),
+                _buildTab(0, S.of(context)?.chatRecentPlayed ?? 'Recent', Icons.history),
+                _buildTab(1, S.of(context)?.chatMyFavorites ?? 'Favorites', Icons.favorite),
+                _buildTab(2, S.of(context)?.chatNetworkLink ?? 'Link', Icons.link),
+                _buildTab(3, S.of(context)?.chatLocalFile ?? 'Local', Icons.folder),
               ],
             ),
           ),
@@ -6759,7 +6759,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
           padding: const EdgeInsets.all(12),
           child: TextField(
             decoration: InputDecoration(
-              hintText: S.of(context)?.searchSongOrArtist ?? 'Search song or artist',
+              hintText: S.of(context)?.chatSearchSongOrArtist ?? 'Search song or artist',
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: widget.isDark 
@@ -6782,7 +6782,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
           child: _currentSongs.isEmpty
               ? Center(
                   child: Text(
-                    S.of(context)?.noSongsFound ?? 'No songs found',
+                    S.of(context)?.chatNoSongsFound ?? 'No songs found',
                     style: TextStyle(
                       color: widget.isDark ? Colors.white54 : Colors.black54,
                     ),
@@ -6863,13 +6863,13 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
           ),
           const SizedBox(height: 20),
           // 音乐链接
-          Text('${S.of(context)?.musicLinkLabel ?? 'Music Link'} *', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          Text('${S.of(context)?.chatMusicLinkLabel ?? 'Music Link'} *', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
           const SizedBox(height: 8),
           TextField(
             controller: _linkController,
             style: TextStyle(color: textColor),
             decoration: InputDecoration(
-              hintText: S.of(context)?.pasteMusicLink ?? 'Paste music link',
+              hintText: S.of(context)?.chatPasteMusicLink ?? 'Paste music link',
               hintStyle: TextStyle(color: hintColor),
               prefixIcon: Icon(Icons.link, color: hintColor),
               filled: true,
@@ -6882,13 +6882,13 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
           ),
           const SizedBox(height: 16),
           // 歌曲名称
-          Text(S.of(context)?.songNameOptional ?? 'Song Name (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          Text(S.of(context)?.chatSongNameOptional ?? 'Song Name (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
           const SizedBox(height: 8),
           TextField(
             controller: _titleController,
             style: TextStyle(color: textColor),
             decoration: InputDecoration(
-              hintText: S.of(context)?.enterSongName ?? 'Enter song name',
+              hintText: S.of(context)?.chatEnterSongName ?? 'Enter song name',
               hintStyle: TextStyle(color: hintColor),
               prefixIcon: Icon(Icons.music_note, color: hintColor),
               filled: true,
@@ -6901,13 +6901,13 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
           ),
           const SizedBox(height: 16),
           // 歌手名称
-          Text(S.of(context)?.artistNameOptional ?? 'Artist Name (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          Text(S.of(context)?.chatArtistNameOptional ?? 'Artist Name (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
           const SizedBox(height: 8),
           TextField(
             controller: _artistController,
             style: TextStyle(color: textColor),
             decoration: InputDecoration(
-              hintText: S.of(context)?.enterArtistName ?? 'Enter artist name',
+              hintText: S.of(context)?.chatEnterArtistName ?? 'Enter artist name',
               hintStyle: TextStyle(color: hintColor),
               prefixIcon: Icon(Icons.person, color: hintColor),
               filled: true,
@@ -6932,7 +6932,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text(S.of(context)?.shareMusicButton ?? 'Share Music', style: const TextStyle(fontSize: 16)),
+              child: Text(S.of(context)?.chatShareMusicButton ?? 'Share Music', style: const TextStyle(fontSize: 16)),
             ),
           ),
         ],
@@ -6965,7 +6965,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
             ),
             const SizedBox(height: 24),
             Text(
-              S.of(context)?.selectLocalAudio ?? 'Select Local Audio File',
+              S.of(context)?.chatSelectLocalAudio ?? 'Select Local Audio File',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -6974,7 +6974,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
             ),
             const SizedBox(height: 8),
             Text(
-              S.of(context)?.supportedAudioFormats ?? 'Supports MP3, M4A, WAV, FLAC, etc.',
+              S.of(context)?.chatSupportedAudioFormats ?? 'Supports MP3, M4A, WAV, FLAC, etc.',
               style: TextStyle(
                 fontSize: 14,
                 color: subtextColor,
@@ -6984,7 +6984,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
             ElevatedButton.icon(
               onPressed: _pickLocalAudio,
               icon: const Icon(Icons.folder_open),
-              label: Text(S.of(context)?.selectFileButton ?? 'Select File'),
+              label: Text(S.of(context)?.chatSelectFileButton ?? 'Select File'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -7105,7 +7105,7 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
                 ),
                 Expanded(
                   child: Text(
-                    S.of(context)?.selectMember ?? 'Select Member',
+                    S.of(context)?.chatSelectMember ?? 'Select Member',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 18,
@@ -7126,7 +7126,7 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
               onChanged: _filterMembers,
               style: TextStyle(color: textColor),
               decoration: InputDecoration(
-                hintText: S.of(context)?.searchMemberHint ?? 'Search members',
+                hintText: S.of(context)?.chatSearchMemberHint ?? 'Search members',
                 hintStyle: TextStyle(color: subtextColor),
                 prefixIcon: Icon(Icons.search, color: subtextColor),
                 filled: true,
@@ -7149,8 +7149,8 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
                     ? Center(
                         child: Text(
                           _searchQuery.isEmpty
-                              ? (S.of(context)?.noMembers ?? 'No members')
-                              : (S.of(context)?.noMatchingMembers ?? 'No matching members'),
+                              ? (S.of(context)?.chatNoMembers ?? 'No members')
+                              : (S.of(context)?.chatNoMatchingMembers ?? 'No matching members'),
                           style: TextStyle(color: subtextColor),
                         ),
                       )
@@ -7167,7 +7167,7 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
                               ),
                             ),
                             title: Text(
-                              member['name'] ?? (S.of(context)?.unknownMember ?? 'Unknown'),
+                              member['name'] ?? (S.of(context)?.commonUnknownMember ?? 'Unknown'),
                               style: TextStyle(color: textColor),
                             ),
                             subtitle: Text(
@@ -7177,7 +7177,7 @@ class _MemberPickerSheetState extends State<_MemberPickerSheet> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             onTap: () => widget.onMemberSelected(
-                              member['name'] ?? (S.of(context)?.unknownMember ?? 'Unknown'),
+                              member['name'] ?? (S.of(context)?.commonUnknownMember ?? 'Unknown'),
                               member['id'] ?? '',
                             ),
                           );
@@ -7323,7 +7323,7 @@ class _MultiForwardSheetState extends State<_MultiForwardSheet> {
               onChanged: _filterConversations,
               style: TextStyle(color: textColor),
               decoration: InputDecoration(
-                hintText: S.of(context)?.searchContactsOrGroups ?? 'Search contacts or groups',
+                hintText: S.of(context)?.chatSearchContactsOrGroups ?? 'Search contacts or groups',
                 hintStyle: TextStyle(color: subtextColor),
                 prefixIcon: Icon(Icons.search, color: subtextColor),
                 filled: true,
@@ -7445,14 +7445,14 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
           if (result.isSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.savedToGallery ?? 'Saved to gallery'),
+                content: Text(S.of(context)?.commonSavedToGallery ?? 'Saved to gallery'),
                 backgroundColor: Colors.green,
               ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.failedToSave ?? 'Failed to save'),
+                content: Text(S.of(context)?.commonFailedToSave ?? 'Failed to save'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -7462,7 +7462,7 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.downloadFailed(response.statusCode.toString()) ?? 'Download failed: ${response.statusCode}'),
+              content: Text(S.of(context)?.chatDownloadFailed(response.statusCode.toString()) ?? 'Download failed: ${response.statusCode}'),
               backgroundColor: Colors.red,
             ),
           );
@@ -7473,7 +7473,7 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.errorWithMessage(e.toString()) ?? 'Error: $e'),
+            content: Text(S.of(context)?.chatErrorWithMessage(e.toString()) ?? 'Error: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -7513,7 +7513,7 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.shareFailed(e.toString()) ?? 'Share failed: $e'),
+            content: Text(S.of(context)?.commonShareFailed(e.toString()) ?? 'Share failed: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -7573,7 +7573,7 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
                   children: [
                     const Icon(Icons.download, color: Colors.white, size: 20),
                     const SizedBox(width: 12),
-                    Text(S.of(context)?.saveToGallery ?? 'Save to Gallery', style: const TextStyle(color: Colors.white)),
+                    Text(S.of(context)?.chatSaveToGallery ?? 'Save to Gallery', style: const TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
@@ -7583,7 +7583,7 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
                   children: [
                     const Icon(Icons.share, color: Colors.white, size: 20),
                     const SizedBox(width: 12),
-                    Text(S.of(context)?.share ?? 'Share', style: const TextStyle(color: Colors.white)),
+                    Text(S.of(context)?.commonShare ?? 'Share', style: const TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
@@ -7614,7 +7614,7 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
                   children: [
                     const Icon(Icons.error, color: Colors.red, size: 48),
                     const SizedBox(height: 16),
-                    Text(S.of(context)?.failedToLoadImage ?? 'Failed to load image', style: const TextStyle(color: Colors.white)),
+                    Text(S.of(context)?.chatFailedToLoadImage ?? 'Failed to load image', style: const TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
@@ -7710,7 +7710,7 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
               const Icon(Icons.error, color: Colors.red, size: 48),
               const SizedBox(height: 16),
               Text(
-                '${S.of(ctx)?.videoPlaybackFailed ?? 'Video playback failed'}\n$errorMessage',
+                '${S.of(ctx)?.chatVideoPlaybackFailed ?? 'Video playback failed'}\n$errorMessage',
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white),
               ),
@@ -7751,7 +7751,7 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(S.of(context)?.videoTitle ?? 'Video', style: const TextStyle(color: Colors.white)),
+        title: Text(S.of(context)?.chatVideoTitle ?? 'Video', style: const TextStyle(color: Colors.white)),
         elevation: 0,
       ),
       body: Center(
@@ -7761,7 +7761,7 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
                 children: [
                   const CircularProgressIndicator(color: Colors.white),
                   const SizedBox(height: 16),
-                  Text(S.of(context)?.loadingText ?? 'Loading...', style: const TextStyle(color: Colors.white)),
+                  Text(S.of(context)?.chatLoadingText ?? 'Loading...', style: const TextStyle(color: Colors.white)),
                 ],
               )
             : _error != null
@@ -7771,7 +7771,7 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
                       const Icon(Icons.error, color: Colors.red, size: 48),
                       const SizedBox(height: 16),
                       Text(
-                        '${S.of(context)?.videoLoadFailed ?? 'Video load failed'}\n$_error',
+                        '${S.of(context)?.chatVideoLoadFailed ?? 'Video load failed'}\n$_error',
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.white),
                       ),
@@ -7784,7 +7784,7 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
                           });
                           _initializePlayer();
                         },
-                        child: Text(S.of(context)?.retryButton ?? 'Retry'),
+                        child: Text(S.of(context)?.chatRetryButton ?? 'Retry'),
                       ),
                     ],
                   )
@@ -7795,7 +7795,7 @@ class _VideoPlayerPageState extends State<_VideoPlayerPage> {
                             : 16 / 9,
                         child: Chewie(controller: _chewieController!),
                       )
-                    : Text(S.of(context)?.playerInitFailed ?? 'Player initialization failed', style: const TextStyle(color: Colors.white)),
+                    : Text(S.of(context)?.chatPlayerInitFailed ?? 'Player initialization failed', style: const TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -7848,7 +7848,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
     final question = _questionController.text.trim();
     if (question.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.pleaseEnterQuestion ?? 'Please enter poll question')),
+        SnackBar(content: Text(S.of(context)?.chatPleaseEnterQuestion ?? 'Please enter poll question')),
       );
       return;
     }
@@ -7860,7 +7860,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
 
     if (options.length < 2) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.atLeastTwoOptions ?? 'At least 2 options required')),
+        SnackBar(content: Text(S.of(context)?.chatAtLeastTwoOptions ?? 'At least 2 options required')),
       );
       return;
     }
@@ -7901,7 +7901,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text(
-                    S.of(context)?.cancel ?? 'Cancel',
+                    S.of(context)?.commonCancel ?? 'Cancel',
                     style: TextStyle(
                       color: isDark ? Colors.white70 : Colors.black54,
                     ),
@@ -7909,7 +7909,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                 ),
                 Expanded(
                   child: Text(
-                    S.of(context)?.createPollTitle ?? 'Create Poll',
+                    S.of(context)?.chatCreatePollTitle ?? 'Create Poll',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 17,
@@ -7920,7 +7920,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                 TextButton(
                   onPressed: _submit,
                   child: Text(
-                    S.of(context)?.submitPoll ?? 'Submit',
+                    S.of(context)?.chatSubmitPoll ?? 'Submit',
                     style: const TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.w600,
@@ -7943,7 +7943,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
               children: [
                 // 问题输入
                 Text(
-                  S.of(context)?.pollQuestionLabel ?? 'Poll Question',
+                  S.of(context)?.chatPollQuestionLabel ?? 'Poll Question',
                   style: TextStyle(
                     fontSize: 14,
                     color: isDark ? Colors.white70 : Colors.black54,
@@ -7955,7 +7955,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                   maxLines: 2,
                   maxLength: 100,
                   decoration: InputDecoration(
-                    hintText: S.of(context)?.enterPollQuestionHint ?? 'Please enter poll question',
+                    hintText: S.of(context)?.chatEnterPollQuestionHint ?? 'Please enter poll question',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -7971,7 +7971,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      S.of(context)?.pollOptionsLabel ?? 'Poll Options',
+                      S.of(context)?.chatPollOptionsLabel ?? 'Poll Options',
                       style: TextStyle(
                         fontSize: 14,
                         color: isDark ? Colors.white70 : Colors.black54,
@@ -8016,7 +8016,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                             controller: _optionControllers[index],
                             maxLength: 50,
                             decoration: InputDecoration(
-                              hintText: S.of(context)?.optionHintWithIndex(index + 1) ?? 'Option ${index + 1}',
+                              hintText: S.of(context)?.chatOptionHintWithIndex(index + 1) ?? 'Option ${index + 1}',
                               counterText: '',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -8046,7 +8046,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                   TextButton.icon(
                     onPressed: _addOption,
                     icon: const Icon(Icons.add_circle_outline, size: 20),
-                    label: Text(S.of(context)?.addOptionButton ?? 'Add Option'),
+                    label: Text(S.of(context)?.chatAddOptionButton ?? 'Add Option'),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.green,
                     ),
@@ -8065,7 +8065,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        S.of(context)?.pollSettingsLabel ?? 'Poll Settings',
+                        S.of(context)?.chatPollSettingsLabel ?? 'Poll Settings',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -8079,7 +8079,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                         children: [
                           Flexible(
                             child: Text(
-                              S.of(context)?.selectionType ?? 'Selection Type',
+                              S.of(context)?.chatSelectionType ?? 'Selection Type',
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -8087,8 +8087,8 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                           Flexible(
                             child: SegmentedButton<int>(
                               segments: [
-                                ButtonSegment(value: 1, label: Text(S.of(context)?.singleChoiceLabel ?? 'Single', overflow: TextOverflow.ellipsis)),
-                                ButtonSegment(value: 0, label: Text(S.of(context)?.multiChoiceLabel ?? 'Multi', overflow: TextOverflow.ellipsis)),
+                                ButtonSegment(value: 1, label: Text(S.of(context)?.chatSingleChoiceLabel ?? 'Single', overflow: TextOverflow.ellipsis)),
+                                ButtonSegment(value: 0, label: Text(S.of(context)?.chatMultiChoiceLabel ?? 'Multi', overflow: TextOverflow.ellipsis)),
                               ],
                               selected: {_maxSelections},
                               onSelectionChanged: (value) {
@@ -8111,7 +8111,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                       // 匿名投票
                       Row(
                         children: [
-                          Text(S.of(context)?.anonymousPollSwitch ?? 'Anonymous Poll'),
+                          Text(S.of(context)?.chatAnonymousPollSwitch ?? 'Anonymous Poll'),
                           const Spacer(),
                           Switch(
                             value: _isAnonymous,
@@ -8147,7 +8147,7 @@ class _PollCreateSheetState extends State<_PollCreateSheet> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          S.of(context)?.pollHint ?? 'Poll will be displayed in chat. Group members can vote.',
+                          S.of(context)?.chatPollHint ?? 'Poll will be displayed in chat. Group members can vote.',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.blue[700],
@@ -8211,7 +8211,7 @@ class _ContactSelectDialogState extends State<_ContactSelectDialog> {
             TextField(
               onChanged: (value) => setState(() => _searchQuery = value),
               decoration: InputDecoration(
-                hintText: S.of(context)?.searchContactHint ?? 'Search contacts',
+                hintText: S.of(context)?.chatSearchContactHint ?? 'Search contacts',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -8266,13 +8266,13 @@ class _ContactSelectDialogState extends State<_ContactSelectDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(S.of(context)?.cancel ?? 'Cancel'),
+          child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
         ),
         TextButton(
           onPressed: _selectedIds.isEmpty
               ? null
               : () => Navigator.of(context).pop(_selectedIds.toList()),
-          child: Text(S.of(context)?.confirmWithCount(_selectedIds.length) ?? 'Confirm (${_selectedIds.length})'),
+          child: Text(S.of(context)?.chatConfirmWithCount(_selectedIds.length) ?? 'Confirm (${_selectedIds.length})'),
         ),
       ],
     );

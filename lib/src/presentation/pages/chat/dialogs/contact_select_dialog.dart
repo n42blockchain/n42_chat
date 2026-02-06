@@ -56,7 +56,7 @@ class _ContactSelectDialogState extends State<ContactSelectDialog> {
             TextField(
               onChanged: (value) => setState(() => _searchQuery = value),
               decoration: InputDecoration(
-                hintText: S.of(context)?.searchContactHint ?? 'Search contacts',
+                hintText: S.of(context)?.chatSearchContactHint ?? 'Search contacts',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -111,13 +111,13 @@ class _ContactSelectDialogState extends State<ContactSelectDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(S.of(context)?.cancel ?? 'Cancel'),
+          child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
         ),
         TextButton(
           onPressed: _selectedIds.isEmpty
               ? null
               : () => Navigator.of(context).pop(_selectedIds.toList()),
-          child: Text(S.of(context)?.confirmWithCount(_selectedIds.length) ?? 'Confirm (${_selectedIds.length})'),
+          child: Text(S.of(context)?.chatConfirmWithCount(_selectedIds.length) ?? 'Confirm (${_selectedIds.length})'),
         ),
       ],
     );

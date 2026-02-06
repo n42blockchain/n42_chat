@@ -132,7 +132,7 @@ class WelcomePage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          S.of(context)?.secureDecentralizedChat ?? 'Secure, decentralized messaging',
+          S.of(context)?.authSecureDecentralizedChat ?? 'Secure, decentralized messaging',
           style: TextStyle(
             fontSize: 16,
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -147,22 +147,22 @@ class WelcomePage extends StatelessWidget {
       children: [
         _FeatureItem(
           icon: Icons.security,
-          title: S.of(context)?.endToEndEncryption ?? 'End-to-end encryption',
-          description: S.of(context)?.messagesOnlyYouCanSee ?? 'Messages visible only to you and the recipient',
+          title: S.of(context)?.commonEndToEndEncryption ?? 'End-to-end encryption',
+          description: S.of(context)?.authMessagesOnlyYouCanSee ?? 'Messages visible only to you and the recipient',
           isDark: isDark,
         ),
         const SizedBox(height: 20),
         _FeatureItem(
           icon: Icons.public,
-          title: S.of(context)?.decentralized ?? 'Decentralized',
-          description: S.of(context)?.basedOnMatrix ?? 'Built on the Matrix open protocol',
+          title: S.of(context)?.authDecentralized ?? 'Decentralized',
+          description: S.of(context)?.authBasedOnMatrix ?? 'Built on the Matrix open protocol',
           isDark: isDark,
         ),
         const SizedBox(height: 20),
         _FeatureItem(
           icon: Icons.account_balance_wallet,
-          title: S.of(context)?.walletIntegration ?? 'Wallet Integration',
-          description: S.of(context)?.easyCryptoTransfer ?? 'Easy cryptocurrency transfers',
+          title: S.of(context)?.authWalletIntegration ?? 'Wallet Integration',
+          description: S.of(context)?.authEasyCryptoTransfer ?? 'Easy cryptocurrency transfers',
           isDark: isDark,
         ),
       ],
@@ -186,7 +186,7 @@ class WelcomePage extends StatelessWidget {
               elevation: 0,
             ),
             child: Text(
-              S.of(context)?.login ?? 'Log In',
+              S.of(context)?.authLogin ?? 'Log In',
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
@@ -211,7 +211,7 @@ class WelcomePage extends StatelessWidget {
               ),
             ),
             child: Text(
-              S.of(context)?.register ?? 'Sign Up',
+              S.of(context)?.authRegister ?? 'Sign Up',
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
@@ -227,27 +227,27 @@ class WelcomePage extends StatelessWidget {
   Widget _buildAgreement(BuildContext context, bool isDark) {
     return Text.rich(
       TextSpan(
-        text: S.of(context)?.agreeTerms ?? 'By logging in, you agree to ',
+        text: S.of(context)?.authAgreeTerms ?? 'By logging in, you agree to ',
         style: TextStyle(
           fontSize: 12,
           color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
         ),
         children: [
           TextSpan(
-            text: S.of(context)?.termsOfService ?? 'Terms of Service',
+            text: S.of(context)?.authTermsOfService ?? 'Terms of Service',
             style: TextStyle(
               color: AppColors.textLink.withValues(alpha: 0.8),
             ),
             recognizer: TapGestureRecognizer()..onTap = onTermsOfService,
           ),
           TextSpan(
-            text: ' ${S.of(context)?.and ?? 'and'} ',
+            text: ' ${S.of(context)?.authAnd ?? 'and'} ',
             style: TextStyle(
               color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
           ),
           TextSpan(
-            text: S.of(context)?.privacyPolicy ?? 'Privacy Policy',
+            text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
             style: TextStyle(
               color: AppColors.textLink.withValues(alpha: 0.8),
             ),

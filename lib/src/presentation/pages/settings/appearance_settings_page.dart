@@ -43,7 +43,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: l10n?.appearance ?? 'Appearance',
+        title: l10n?.settingsAppearance ?? 'Appearance',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -52,19 +52,19 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           const SizedBox(height: 16),
 
           // 深色模式设置
-          _buildSectionHeader(l10n?.darkMode ?? 'Dark Mode', isDark),
+          _buildSectionHeader(l10n?.settingsDarkMode ?? 'Dark Mode', isDark),
           _buildThemeModeSection(context, isDark),
 
           const SizedBox(height: 24),
 
           // 字体大小设置
-          _buildSectionHeader(l10n?.fontSize ?? 'Font Size', isDark),
+          _buildSectionHeader(l10n?.settingsFontSize ?? 'Font Size', isDark),
           _buildFontSizeSection(context, isDark),
 
           const SizedBox(height: 24),
 
           // 气泡样式设置
-          _buildSectionHeader(l10n?.bubbleStyle ?? 'Bubble Style', isDark),
+          _buildSectionHeader(l10n?.settingsBubbleStyle ?? 'Bubble Style', isDark),
           _buildBubbleStyleSection(context, isDark),
         ],
       ),
@@ -91,22 +91,22 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
       child: Column(
         children: [
           _buildThemeModeItem(
-            title: l10n?.followSystem ?? 'Follow System',
-            subtitle: l10n?.autoSwitchBySystem ?? 'Auto switch by system settings',
+            title: l10n?.settingsFollowSystem ?? 'Follow System',
+            subtitle: l10n?.settingsAutoSwitchBySystem ?? 'Auto switch by system settings',
             value: ThemeMode.system,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildThemeModeItem(
-            title: l10n?.lightMode ?? 'Light Mode',
-            subtitle: l10n?.alwaysUseLightTheme ?? 'Always use light theme',
+            title: l10n?.settingsLightMode ?? 'Light Mode',
+            subtitle: l10n?.settingsAlwaysUseLightTheme ?? 'Always use light theme',
             value: ThemeMode.light,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildThemeModeItem(
-            title: l10n?.darkModeOption ?? 'Dark Mode',
-            subtitle: l10n?.alwaysUseDarkTheme ?? 'Always use dark theme',
+            title: l10n?.settingsDarkModeOption ?? 'Dark Mode',
+            subtitle: l10n?.settingsAlwaysUseDarkTheme ?? 'Always use dark theme',
             value: ThemeMode.dark,
             isDark: isDark,
           ),
@@ -157,25 +157,25 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
       child: Column(
         children: [
           _buildFontSizeItem(
-            title: l10n?.fontSizeSmall ?? 'Small',
+            title: l10n?.settingsFontSizeSmall ?? 'Small',
             value: FontSize.small,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildFontSizeItem(
-            title: l10n?.fontSizeStandard ?? 'Standard',
+            title: l10n?.settingsFontSizeStandard ?? 'Standard',
             value: FontSize.medium,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildFontSizeItem(
-            title: l10n?.fontSizeLarge ?? 'Large',
+            title: l10n?.settingsFontSizeLarge ?? 'Large',
             value: FontSize.large,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildFontSizeItem(
-            title: l10n?.fontSizeExtraLarge ?? 'Extra Large',
+            title: l10n?.settingsFontSizeExtraLarge ?? 'Extra Large',
             value: FontSize.extraLarge,
             isDark: isDark,
           ),
@@ -235,22 +235,22 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
       child: Column(
         children: [
           _buildBubbleStyleItem(
-            title: l10n?.bubbleStyleWechat ?? 'WeChat Style',
-            subtitle: l10n?.bubbleStyleWechatDesc ?? 'Classic WeChat bubble style',
+            title: l10n?.settingsBubbleStyleWechat ?? 'WeChat Style',
+            subtitle: l10n?.settingsBubbleStyleWechatDesc ?? 'Classic WeChat bubble style',
             value: BubbleStyle.wechat,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildBubbleStyleItem(
-            title: l10n?.bubbleStyleModern ?? 'Modern Style',
-            subtitle: l10n?.bubbleStyleModernDesc ?? 'Clean modern bubble style',
+            title: l10n?.settingsBubbleStyleModern ?? 'Modern Style',
+            subtitle: l10n?.settingsBubbleStyleModernDesc ?? 'Clean modern bubble style',
             value: BubbleStyle.modern,
             isDark: isDark,
           ),
           _buildDivider(isDark),
           _buildBubbleStyleItem(
-            title: l10n?.bubbleStyleClassic ?? 'Classic Style',
-            subtitle: l10n?.bubbleStyleClassicDesc ?? 'Traditional bubble style',
+            title: l10n?.settingsBubbleStyleClassic ?? 'Classic Style',
+            subtitle: l10n?.settingsBubbleStyleClassicDesc ?? 'Traditional bubble style',
             value: BubbleStyle.classic,
             isDark: isDark,
           ),

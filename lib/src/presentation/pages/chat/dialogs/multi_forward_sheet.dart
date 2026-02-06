@@ -112,7 +112,7 @@ class _MultiForwardSheetState extends State<MultiForwardSheet> {
                   child: Column(
                     children: [
                       Text(
-                        S.of(context)?.selectForwardTarget ?? '选择转发对象',
+                        S.of(context)?.chatSelectForwardTarget ?? '选择转发对象',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -120,7 +120,7 @@ class _MultiForwardSheetState extends State<MultiForwardSheet> {
                         ),
                       ),
                       Text(
-                        S.of(context)?.selectedMessagesCount(widget.selectedCount) ?? '已选择 ${widget.selectedCount} 条消息',
+                        S.of(context)?.chatSelectedMessagesCount(widget.selectedCount) ?? '已选择 ${widget.selectedCount} 条消息',
                         style: TextStyle(
                           fontSize: 12,
                           color: subtextColor,
@@ -141,7 +141,7 @@ class _MultiForwardSheetState extends State<MultiForwardSheet> {
               onChanged: _filterConversations,
               style: TextStyle(color: textColor),
               decoration: InputDecoration(
-                hintText: S.of(context)?.searchContactsOrGroups ?? 'Search contacts or groups',
+                hintText: S.of(context)?.chatSearchContactsOrGroups ?? 'Search contacts or groups',
                 hintStyle: TextStyle(color: subtextColor),
                 prefixIcon: Icon(Icons.search, color: subtextColor),
                 filled: true,
@@ -164,8 +164,8 @@ class _MultiForwardSheetState extends State<MultiForwardSheet> {
                     ? Center(
                         child: Text(
                           _conversations.isEmpty
-                              ? (S.of(context)?.noForwardableChat ?? '没有可转发的会话')
-                              : (S.of(context)?.noMatchingChat ?? '未找到匹配的会话'),
+                              ? (S.of(context)?.chatNoForwardableChat ?? '没有可转发的会话')
+                              : (S.of(context)?.chatNoMatchingChat ?? '未找到匹配的会话'),
                           style: TextStyle(color: subtextColor),
                         ),
                       )

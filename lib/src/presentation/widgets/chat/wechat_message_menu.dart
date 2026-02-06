@@ -193,7 +193,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 if (message.type == MessageType.text)
                   _buildMenuItem(
                     icon: Icons.content_copy_outlined,
-                    label: S.of(context)?.copy ?? 'Copy',
+                    label: S.of(context)?.chatCopy ?? 'Copy',
                     onTap: () {
                       onDismiss();
                       onCopy?.call();
@@ -202,7 +202,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 else if (message.type == MessageType.image || message.type == MessageType.video)
                   _buildMenuItem(
                     icon: Icons.download_outlined,
-                    label: S.of(context)?.save ?? 'Save',
+                    label: S.of(context)?.commonSave ?? 'Save',
                     onTap: () {
                       onDismiss();
                       onSave?.call();
@@ -211,7 +211,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 if (onForward != null)
                   _buildMenuItem(
                     icon: Icons.shortcut_outlined,
-                    label: S.of(context)?.forward ?? 'Forward',
+                    label: S.of(context)?.commonForward ?? 'Forward',
                     onTap: () {
                       onDismiss();
                       onForward?.call();
@@ -219,7 +219,7 @@ class WeChatMessageMenu extends StatelessWidget {
                   ),
                 _buildMenuItem(
                   icon: isFavorited ? Icons.star : Icons.star_border_outlined,
-                  label: isFavorited ? (S.of(context)?.unfavorite ?? 'Unfav') : (S.of(context)?.favorite ?? 'Favorite'),
+                  label: isFavorited ? (S.of(context)?.commonUnfavorite ?? 'Unfav') : (S.of(context)?.commonFavorite ?? 'Favorite'),
                   isHighlighted: isFavorited,
                   onTap: () {
                     onDismiss();
@@ -230,7 +230,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 if (message.isFromMe && message.status == MessageStatus.failed)
                   _buildMenuItem(
                     icon: Icons.refresh,
-                    label: S.of(context)?.resend ?? 'Resend',
+                    label: S.of(context)?.settingsResend ?? 'Resend',
                     onTap: () {
                       onDismiss();
                       onResend?.call();
@@ -240,7 +240,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 if (message.isFromMe && message.status != MessageStatus.failed)
                   _buildMenuItem(
                     icon: Icons.undo_outlined,
-                    label: S.of(context)?.recall ?? 'Recall',
+                    label: S.of(context)?.chatRecall ?? 'Recall',
                     onTap: () {
                       onDismiss();
                       onRecall?.call();
@@ -249,7 +249,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 // 所有消息都可以删除（仅本地删除）
                 _buildMenuItem(
                   icon: Icons.delete_outline,
-                  label: S.of(context)?.delete ?? 'Delete',
+                  label: S.of(context)?.commonDelete ?? 'Delete',
                   onTap: () {
                     onDismiss();
                     onDelete?.call();
@@ -257,7 +257,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 ),
                 _buildMenuItem(
                   icon: Icons.checklist_outlined,
-                  label: S.of(context)?.selectMessages ?? 'Select',
+                  label: S.of(context)?.chatSelectMessages ?? 'Select',
                   onTap: () {
                     onDismiss();
                     onMultiSelect?.call();
@@ -283,7 +283,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 const SizedBox(width: 8),
                 _buildMenuItem(
                   icon: Icons.format_quote_outlined,
-                  label: S.of(context)?.quote ?? 'Quote',
+                  label: S.of(context)?.commonQuote ?? 'Quote',
                   onTap: () {
                     onDismiss();
                     onQuote?.call();
@@ -294,7 +294,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 if (message.type == MessageType.text && onTranslate != null)
                   _buildMenuItem(
                     icon: Icons.translate,
-                    label: S.of(context)?.translate ?? 'Translate',
+                    label: S.of(context)?.commonTranslate ?? 'Translate',
                     onTap: () {
                       onDismiss();
                       onTranslate?.call();
@@ -306,7 +306,7 @@ class WeChatMessageMenu extends StatelessWidget {
                   isPinned
                       ? _buildMenuItem(
                           icon: Icons.push_pin,
-                          label: S.of(context)?.unpin ?? 'Unpin',
+                          label: S.of(context)?.conversationUnpin ?? 'Unpin',
                           isHighlighted: true,
                           onTap: () {
                             onDismiss();
@@ -315,7 +315,7 @@ class WeChatMessageMenu extends StatelessWidget {
                         )
                       : _buildMenuItem(
                           icon: Icons.push_pin_outlined,
-                          label: S.of(context)?.pin ?? 'Pin',
+                          label: S.of(context)?.conversationPin ?? 'Pin',
                           onTap: () {
                             onDismiss();
                             onPin?.call();
@@ -324,7 +324,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 if (canPin) const SizedBox(width: 20),
                 _buildMenuItem(
                   icon: Icons.notifications_outlined,
-                  label: S.of(context)?.remind ?? 'Remind',
+                  label: S.of(context)?.commonRemind ?? 'Remind',
                   onTap: () {
                     onDismiss();
                     onRemind?.call();
@@ -333,7 +333,7 @@ class WeChatMessageMenu extends StatelessWidget {
                 const SizedBox(width: 20),
                 _buildMenuItem(
                   icon: Icons.search,
-                  label: S.of(context)?.search ?? 'Search',
+                  label: S.of(context)?.commonSearch ?? 'Search',
                   onTap: () {
                     onDismiss();
                     onSearch?.call();
@@ -510,7 +510,7 @@ class _RecallConfirmSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     child: Text(
-                      S.of(context)?.recallThisMessage ?? 'Recall this message?',
+                      S.of(context)?.commonRecallThisMessage ?? 'Recall this message?',
                       style: TextStyle(
                         fontSize: 13,
                         color: isDark ? Colors.grey[400] : Colors.grey[600],
@@ -534,7 +534,7 @@ class _RecallConfirmSheet extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         child: Text(
-                          S.of(context)?.recall ?? 'Recall',
+                          S.of(context)?.chatRecall ?? 'Recall',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 20,
@@ -566,7 +566,7 @@ class _RecallConfirmSheet extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     child: Text(
-                      S.of(context)?.cancel ?? 'Cancel',
+                      S.of(context)?.commonCancel ?? 'Cancel',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20,
@@ -611,8 +611,8 @@ class RecalledMessageWidget extends StatelessWidget {
           children: [
             Text(
               isFromMe
-                  ? (s?.youRecalledMessage ?? 'You recalled a message')
-                  : (s?.messageRecalled ?? 'Message recalled'),
+                  ? (s?.commonYouRecalledMessage ?? 'You recalled a message')
+                  : (s?.commonMessageRecalled ?? 'Message recalled'),
               style: TextStyle(
                 fontSize: 12,
                 color: textColor,
@@ -623,7 +623,7 @@ class RecalledMessageWidget extends StatelessWidget {
               GestureDetector(
                 onTap: onReEdit,
                 child: Text(
-                  s?.reEdit ?? 'Re-edit',
+                  s?.commonReEdit ?? 'Re-edit',
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark ? const Color(0xFF57A5FF) : const Color(0xFF576B95),
@@ -704,7 +704,7 @@ class MessageMenuHelper {
   static void copyMessage(BuildContext context, MessageEntity message) {
     if (message.type == MessageType.text) {
       Clipboard.setData(ClipboardData(text: message.content));
-      _showToast(context, S.of(context)?.copied ?? 'Copied');
+      _showToast(context, S.of(context)?.chatCopied ?? 'Copied');
     }
   }
   

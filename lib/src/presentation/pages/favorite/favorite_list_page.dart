@@ -97,7 +97,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: N42AppBar(
-        title: S.of(context)?.favorites ?? 'Favorites',
+        title: S.of(context)?.commonFavorites ?? 'Favorites',
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -145,12 +145,12 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
     ];
 
     final typeLabels = {
-      null: S.of(context)?.all ?? 'All',
-      FavoriteType.text: S.of(context)?.text ?? 'Text',
-      FavoriteType.image: S.of(context)?.image ?? 'Image',
-      FavoriteType.link: S.of(context)?.link ?? 'Link',
-      FavoriteType.file: S.of(context)?.file ?? 'File',
-      FavoriteType.note: S.of(context)?.note ?? 'Note',
+      null: S.of(context)?.commonAll ?? 'All',
+      FavoriteType.text: S.of(context)?.favoriteText ?? 'Text',
+      FavoriteType.image: S.of(context)?.commonImage ?? 'Image',
+      FavoriteType.link: S.of(context)?.favoriteLinkLabel ?? 'Link',
+      FavoriteType.file: S.of(context)?.commonFile ?? 'File',
+      FavoriteType.note: S.of(context)?.favoriteNote ?? 'Note',
     };
     
     return Container(
@@ -187,7 +187,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                typeLabels[type] ?? (S.of(context)?.all ?? 'All'),
+                typeLabels[type] ?? (S.of(context)?.commonAll ?? 'All'),
                 style: TextStyle(
                   fontSize: 13,
                   color: isSelected
@@ -264,7 +264,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
                       ],
                     ] else
                       Text(
-                        S.of(context)?.myNotes ?? 'My Notes',
+                        S.of(context)?.favoriteMyNotes ?? 'My Notes',
                         style: TextStyle(
                           fontSize: 12,
                           color: subtitleColor,
@@ -476,7 +476,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            S.of(context)?.noFavorites ?? 'No favorites yet',
+            S.of(context)?.favoriteNoFavorites ?? 'No favorites yet',
             style: TextStyle(
               fontSize: 16,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -484,7 +484,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            S.of(context)?.longPressToFavorite ?? 'Long press message to favorite',
+            S.of(context)?.favoriteLongPressToFavorite ?? 'Long press message to favorite',
             style: const TextStyle(
               fontSize: 14,
               color: AppColors.textTertiary,
@@ -511,7 +511,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.note_add),
-              title: Text(S.of(context)?.newNote ?? 'New Note'),
+              title: Text(S.of(context)?.favoriteNewNote ?? 'New Note'),
               onTap: () {
                 Navigator.pop(ctx);
                 _createNote();
@@ -533,7 +533,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   
   void _openFavoriteDetail(FavoriteEntity favorite) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context)?.openItem(favorite.content) ?? 'Open: ${favorite.content}')),
+      SnackBar(content: Text(S.of(context)?.favoriteOpenItem(favorite.content) ?? 'Open: ${favorite.content}')),
     );
   }
 
@@ -546,21 +546,21 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.edit),
-              title: Text(S.of(context)?.editTags ?? 'Edit Tags'),
+              title: Text(S.of(context)?.favoriteEditTags ?? 'Edit Tags'),
               onTap: () {
                 Navigator.pop(ctx);
               },
             ),
             ListTile(
               leading: const Icon(Icons.share),
-              title: Text(S.of(context)?.forward ?? 'Forward'),
+              title: Text(S.of(context)?.commonForward ?? 'Forward'),
               onTap: () {
                 Navigator.pop(ctx);
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: Text(S.of(context)?.delete ?? 'Delete', style: const TextStyle(color: Colors.red)),
+              title: Text(S.of(context)?.commonDelete ?? 'Delete', style: const TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(ctx);
                 _deleteFavorite(favorite);
@@ -574,13 +574,13 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
   
   void _createNote() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context)?.newNoteComingSoon ?? 'New note feature coming soon')),
+      SnackBar(content: Text(S.of(context)?.favoriteNewNoteComingSoon ?? 'New note feature coming soon')),
     );
   }
 
   void _addLink() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context)?.addLinkComingSoon ?? 'Add link feature coming soon')),
+      SnackBar(content: Text(S.of(context)?.favoriteAddLinkComingSoon ?? 'Add link feature coming soon')),
     );
   }
 
@@ -588,12 +588,12 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.deleteFavorite ?? 'Delete Favorite'),
-        content: Text(S.of(context)?.deleteFavoriteConfirm ?? 'Are you sure you want to delete this favorite?'),
+        title: Text(S.of(context)?.favoriteDeleteFavorite ?? 'Delete Favorite'),
+        content: Text(S.of(context)?.favoriteDeleteFavoriteConfirm ?? 'Are you sure you want to delete this favorite?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -602,10 +602,10 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
                 _favorites.removeWhere((f) => f.id == favorite.id);
               });
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(S.of(context)?.deleted ?? 'Deleted')),
+                SnackBar(content: Text(S.of(context)?.favoriteDeleted ?? 'Deleted')),
               );
             },
-            child: Text(S.of(context)?.delete ?? 'Delete', style: const TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.commonDelete ?? 'Delete', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -617,13 +617,13 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
     final diff = now.difference(time);
 
     if (diff.inDays == 0) {
-      return S.of(context)?.today ?? 'Today';
+      return S.of(context)?.favoriteToday ?? 'Today';
     } else if (diff.inDays == 1) {
-      return S.of(context)?.yesterday ?? 'Yesterday';
+      return S.of(context)?.favoriteYesterday ?? 'Yesterday';
     } else if (diff.inDays < 7) {
-      return S.of(context)?.daysAgoText(diff.inDays) ?? '${diff.inDays} days ago';
+      return S.of(context)?.favoriteDaysAgoText(diff.inDays) ?? '${diff.inDays} days ago';
     } else {
-      return S.of(context)?.dateFormat(time.month, time.day) ?? '${time.month}/${time.day}';
+      return S.of(context)?.favoriteDateFormat(time.month, time.day) ?? '${time.month}/${time.day}';
     }
   }
   
@@ -675,7 +675,7 @@ class _FavoriteSearchDelegate extends SearchDelegate<FavoriteEntity?> {
 
     if (results.isEmpty) {
       return Center(
-        child: Text(S.of(context)?.noSearchResultsFound ?? 'No results found'),
+        child: Text(S.of(context)?.favoriteNoSearchResultsFound ?? 'No results found'),
       );
     }
     

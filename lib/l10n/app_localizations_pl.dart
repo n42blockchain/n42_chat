@@ -9,1198 +9,638 @@ class SPl extends S {
   SPl([String locale = 'pl']) : super(locale);
 
   @override
-  String get chatModuleInitFailed =>
-      'Inicjalizacja modulu czatu nie powiodla sie';
+  String get commonRetry => 'Ponow';
 
   @override
-  String get checkNetworkRetry =>
-      'Sprawdz polaczenie sieciowe i sprobuj ponownie';
+  String get commonUnknownUser => 'Nieznany uzytkownik';
 
   @override
-  String get retry => 'Ponow';
+  String get transferWalletNotConnected => 'Portfel nie jest polaczony';
 
   @override
-  String get unknownUser => 'Nieznany uzytkownik';
-
-  @override
-  String get walletNotConnected => 'Portfel nie jest polaczony';
-
-  @override
-  String get cannotGetWalletAddress => 'Nie mozna uzyskac adresu portfela';
-
-  @override
-  String paymentRequestMemo(String requestId) {
-    return 'Zadanie platnosci: $requestId';
-  }
-
-  @override
-  String get callServiceNotInitialized =>
+  String get chatCallServiceNotInitialized =>
       'Usluga polaczen nie zostala zainicjowana';
 
   @override
-  String get alreadyInCall => 'Juz trwa polaczenie';
-
-  @override
-  String get meetingServiceNotInitialized =>
-      'Usluga spotkan nie zostala zainicjowana';
-
-  @override
-  String get livekitNotConfigured => 'LiveKit nie jest skonfigurowany';
-
-  @override
-  String get unknownConversation => 'Nieznana rozmowa';
-
-  @override
-  String startCallFailed(String error) {
-    return 'Nie udalo sie rozpoczac polaczenia: $error';
-  }
-
-  @override
-  String answerCallFailed(String error) {
-    return 'Nie udalo sie odebrać: $error';
-  }
-
-  @override
-  String get connectionFailed => 'Polaczenie nie powiodlo sie';
-
-  @override
-  String get callRejected => 'Polaczenie odrzucone';
-
-  @override
-  String get noAnswer => 'Brak odpowiedzi';
-
-  @override
-  String get invalidLoginResponse => 'Nieprawidlowa odpowiedz logowania';
-
-  @override
-  String loginFailed(String error) {
+  String authLoginFailed(String error) {
     return 'Logowanie nie powiodlo sie: $error';
   }
 
   @override
-  String get sessionRestoreFailed => 'Przywrocenie sesji nie powiodlo sie';
+  String get chatCallBack => 'Oddzwon';
 
   @override
-  String get additionalVerificationRequired => 'Wymagana dodatkowa weryfikacja';
+  String get chatMissedVideoCall => 'Nieodebrane polaczenie wideo';
 
   @override
-  String registrationFailed(String error) {
-    return 'Rejestracja nie powiodla sie: $error';
-  }
+  String get chatMissedVoiceCall => 'Nieodebrane polaczenie glosowe';
 
   @override
-  String cannotConnectServer(String error) {
-    return 'Nie mozna polaczyc sie z serwerem: $error';
-  }
+  String get chatCallNotAnswered => 'Brak odpowiedzi';
 
   @override
-  String get wrongUsernamePassword =>
-      'Nieprawidlowa nazwa uzytkownika lub haslo';
+  String get chatCallDurationLabel => 'Czas rozmowy';
 
   @override
-  String get usernameTaken => 'Nazwa uzytkownika jest juz zajeta';
+  String get chatVoiceCallCancelled => 'Rozmowa głosowa anulowana';
 
   @override
-  String get invalidUsernameFormat => 'Nieprawidlowy format nazwy uzytkownika';
+  String get chatVideoCallCancelled => 'Rozmowa wideo anulowana';
 
   @override
-  String get rateLimitExceeded => 'Zbyt wiele zapytan, sprobuj pozniej';
+  String get commonImage => '[Obraz]';
 
   @override
-  String get loginExpired => 'Sesja logowania wygasla';
+  String get chatVideo => '[Wideo]';
 
   @override
-  String joinMeetingFailed(String error) {
-    return 'Nie udalo sie dolaczyc do spotkania: $error';
-  }
+  String get chatVoice => '[Glos]';
 
   @override
-  String screenShareFailed(String error) {
-    return 'Udostepnianie ekranu nie powiodlo sie: $error';
-  }
+  String get commonFile => '[Plik]';
 
   @override
-  String get answer => 'Odbierz';
+  String get chatLocation => '[Lokalizacja]';
 
   @override
-  String get decline => 'Odrzuc';
+  String get chatUnknownMessage => '[Nieznana wiadomosc]';
 
   @override
-  String get missedCall => 'Nieodebrane polaczenie';
+  String get commonDelete => 'Usun';
 
   @override
-  String get callBack => 'Oddzwon';
+  String get chatDeleteThisMessage => 'Usunąć tę wiadomość?';
 
   @override
-  String get incomingCall => 'Polaczenie przychodzace';
+  String get chatMessageDeleted => 'Wiadomość usunięta';
 
   @override
-  String get missedVideoCall => 'Nieodebrane polaczenie wideo';
+  String get profileNotLoggedIn => 'Nie zalogowano';
 
   @override
-  String get missedVoiceCall => 'Nieodebrane polaczenie glosowe';
+  String get chatMyLocation => 'Moja lokalizacja';
 
   @override
-  String get voiceCallTitle => '语音通话';
+  String get commonGroupChat => 'Czat grupowy';
 
   @override
-  String get videoCallTitle => '视频通话';
+  String get commonSearch => 'Szukaj';
 
   @override
-  String get callNotAnswered => '对方未接听';
+  String get commonCancel => 'Anuluj';
 
   @override
-  String get callDurationLabel => '通话时长';
+  String get commonLoadFailed => 'Nie udalo sie zaladowac';
 
   @override
-  String get voiceCallCancelled => '语音通话已取消';
+  String get commonMessages => 'Wiadomosci';
 
   @override
-  String get videoCallCancelled => '视频通话已取消';
+  String get commonContacts => 'Kontakty';
 
   @override
-  String get passkeyNotInitialized => 'Klucz dostepu nie zostal zainicjowany';
+  String get commonMe => 'Ja';
 
   @override
-  String get googleSignInNotConfigured =>
-      'Logowanie Google nie jest skonfigurowane';
+  String get commonVoiceLoading => 'Ladowanie glosu, sprobuj pozniej';
 
   @override
-  String get encryptedMessage => '[Zaszyfrowana wiadomosc]';
+  String get commonVoiceToTextFailed =>
+      'Konwersja glosu na tekst nie powiodla sie';
 
   @override
-  String get sticker => '[Naklejka]';
+  String get commonConvertToText => 'Na tekst';
 
   @override
-  String get groupCreated => 'Grupa utworzona';
+  String get chatCopy => 'Kopiuj';
 
   @override
-  String get groupNameChanged => 'Nazwa grupy zostala zmieniona';
+  String get commonForward => 'Przekaz dalej';
 
   @override
-  String get groupAvatarChanged => 'Awatar grupy zostal zmieniony';
+  String get commonUnfavorite => 'Usun z ulubionych';
 
   @override
-  String get groupAnnouncementChanged => 'Ogloszenie grupy zostalo zmienione';
+  String get commonFavorite => 'Ulubione';
 
   @override
-  String get image => '[Obraz]';
+  String get settingsResend => 'Wyslij ponownie';
 
   @override
-  String get video => '[Wideo]';
+  String get chatRecall => 'Wycofaj';
 
   @override
-  String get voice => '[Glos]';
+  String get commonQuote => 'Cytuj';
 
   @override
-  String get file => '[Plik]';
+  String get commonRemind => 'Przypomnij';
 
   @override
-  String get location => '[Lokalizacja]';
+  String get chatCopied => 'Skopiowano';
 
   @override
-  String get unknownMessage => '[Nieznana wiadomosc]';
+  String get storySendMessageHint => 'Wyslij wiadomosc';
 
   @override
-  String joinedGroup(String senderName) {
-    return '$senderName dolaczyl(a) do grupy';
-  }
-
-  @override
-  String leftGroup(String senderName) {
-    return '$senderName opuscil(a) grupe';
-  }
-
-  @override
-  String invitedToGroup(String senderName) {
-    return '$senderName zostal(a) zaproszony(a)';
-  }
-
-  @override
-  String removedFromGroup(String senderName) {
-    return '$senderName zostal(a) usuniety(a)';
-  }
-
-  @override
-  String get avatarDataEmpty => 'Dane awatara sa puste';
-
-  @override
-  String get avatarTooLarge => 'Plik awatara jest za duzy, maks. 10MB';
-
-  @override
-  String get uploadAvatarFailed => 'Nie udalo sie przeslac awatara';
-
-  @override
-  String get delete => 'Usun';
-
-  @override
-  String get deleteThisMessage => 'Usunąć tę wiadomość?';
-
-  @override
-  String get messageDeleted => 'Wiadomość usunięta';
-
-  @override
-  String get notLoggedIn => 'Nie zalogowano';
-
-  @override
-  String roomNotExist(String roomId) {
-    return 'Pokoj nie zostal znaleziony: $roomId';
-  }
-
-  @override
-  String get uploadImageFailed => 'Nie udalo sie przeslac obrazu';
-
-  @override
-  String get matrixClientNotInitialized =>
-      'Klient Matrix nie zostal zainicjowany';
-
-  @override
-  String get uploadVoiceFailed =>
-      'Nie udalo sie przeslac glosu: Nie mozna uzyskac URI MXC';
-
-  @override
-  String get uploadVideoFailed =>
-      'Nie udalo sie przeslac wideo: Nie mozna uzyskac URI MXC';
-
-  @override
-  String get uploadFileFailed =>
-      'Nie udalo sie przeslac pliku: Nie mozna uzyskac URI MXC';
-
-  @override
-  String locationWithCoords(String lat, String lon) {
-    return 'Lokalizacja: $lat, $lon';
-  }
-
-  @override
-  String get myLocation => 'Moja lokalizacja';
-
-  @override
-  String get pollEnded => 'Ankieta zakonczona';
-
-  @override
-  String get groupChat => 'Czat grupowy';
-
-  @override
-  String get search => 'Szukaj';
-
-  @override
-  String get cancel => 'Anuluj';
-
-  @override
-  String get userCancelled => 'Uzytkownik anulowal';
-
-  @override
-  String get noData => 'Brak danych';
-
-  @override
-  String get noSearchResults => 'Brak wynikow wyszukiwania';
-
-  @override
-  String get tryDifferentKeyword => 'Sprobuj innego slowa kluczowego';
-
-  @override
-  String get loadFailed => 'Nie udalo sie zaladowac';
-
-  @override
-  String get checkNetwork => 'Sprawdz polaczenie sieciowe';
-
-  @override
-  String get networkConnectionFailed => 'Polaczenie sieciowe nie powiodlo sie';
-
-  @override
-  String get checkNetworkSettings => 'Sprawdz ustawienia sieci';
-
-  @override
-  String get messages => 'Wiadomosci';
-
-  @override
-  String get contacts => 'Kontakty';
-
-  @override
-  String get discover => 'Odkrywaj';
-
-  @override
-  String get me => 'Ja';
-
-  @override
-  String get voiceLoading => 'Ladowanie glosu, sprobuj pozniej';
-
-  @override
-  String get voiceToTextFailed => 'Konwersja glosu na tekst nie powiodla sie';
-
-  @override
-  String get converting => 'Konwertowanie...';
-
-  @override
-  String get convertToText => 'Na tekst';
-
-  @override
-  String get convertToTextTitle => 'Konwertuj na tekst';
-
-  @override
-  String get selectEmoji => 'Wybierz emotikon';
-
-  @override
-  String get selectRedPacketCover => 'Wybierz okładkę';
-
-  @override
-  String get frequentlyUsed => 'Czesto uzywane';
-
-  @override
-  String get copy => 'Kopiuj';
-
-  @override
-  String get forward => 'Przekaz dalej';
-
-  @override
-  String get unfavorite => 'Usun z ulubionych';
-
-  @override
-  String get favorite => 'Ulubione';
-
-  @override
-  String get resend => 'Wyslij ponownie';
-
-  @override
-  String get recall => 'Wycofaj';
-
-  @override
-  String get multiSelect => 'Wielokrotny wybor';
-
-  @override
-  String get quote => 'Cytuj';
-
-  @override
-  String get remind => 'Przypomnij';
-
-  @override
-  String get searchThis => 'Szukaj';
-
-  @override
-  String get recallMessageConfirm => 'Wycofac te wiadomosc?';
-
-  @override
-  String get youRecalledMessage => 'Wycofales wiadomosc';
-
-  @override
-  String get otherRecalledMessage => 'Wiadomosc wycofana';
-
-  @override
-  String get reEdit => 'Edytuj ponownie';
-
-  @override
-  String get copied => 'Skopiowano';
-
-  @override
-  String get sendMessageHint => 'Wyslij wiadomosc';
-
-  @override
-  String get microphonePermissionRequired =>
+  String get commonMicrophonePermissionRequired =>
       'Prosze zezwolic na dostep do mikrofonu';
 
   @override
-  String startRecordingFailed(String error) {
+  String commonStartRecordingFailed(String error) {
     return 'Nie udalo sie rozpoczac nagrywania: $error';
   }
 
   @override
-  String get recordingTooShort => 'Nagranie zbyt krotkie';
+  String get commonRecordingTooShort => 'Nagranie zbyt krotkie';
 
   @override
-  String stopRecordingFailed(String error) {
+  String commonStopRecordingFailed(String error) {
     return 'Nie udalo sie zatrzymac nagrywania: $error';
   }
 
   @override
-  String get releaseToCancel => 'Zwolnij, aby anulowac';
+  String get chatReleaseToCancel => 'Zwolnij, aby anulowac';
 
   @override
-  String get releaseToSend =>
+  String get chatReleaseToSend =>
       'Zwolnij, aby wyslac, przesun w gore, aby anulowac';
 
   @override
-  String get holdToTalk => 'Przytrzymaj, aby mowic';
+  String get commonHoldToTalk => 'Przytrzymaj, aby mowic';
 
   @override
-  String get send => 'Wyslij';
+  String get commonSend => 'Wyslij';
 
   @override
-  String conversationWithId(String roomId) {
-    return 'Rozmowa: $roomId';
-  }
+  String get commonAddFriend => 'Dodaj znajomego';
 
   @override
-  String contactWithId(String userId) {
-    return 'Kontakt: $userId';
-  }
+  String get commonChatServiceNotConnected => 'Usluga czatu nie jest polaczona';
 
   @override
-  String get addFriend => 'Dodaj znajomego';
-
-  @override
-  String get chatServiceNotConnected => 'Usluga czatu nie jest polaczona';
-
-  @override
-  String userNotFoundHint(String query) {
+  String contactUserNotFoundHint(String query) {
     return 'Uzytkownik \"$query\" nie zostal znaleziony\n\nWskazowki:\n• Sprobuj wprowadzic pelny identyfikator uzytkownika, np. @nazwa:serwer.com\n• Sprawdz pisownie nazwy uzytkownika';
   }
 
   @override
-  String createChatFailed(String error) {
+  String contactCreateChatFailed(String error) {
     return 'Nie udalo sie utworzyc czatu: $error';
   }
 
   @override
-  String searchFailed(String error) {
+  String contactSearchFailed(String error) {
     return 'Wyszukiwanie nie powiodlo sie: $error';
   }
 
   @override
-  String get enterUserIdOrUsername =>
+  String get contactEnterUserIdOrUsername =>
       'Wprowadz ID uzytkownika lub nazwe, aby wyszukac';
 
   @override
-  String get searching => 'Wyszukiwanie...';
+  String get contactSearching => 'Wyszukiwanie...';
 
   @override
-  String get searchUserToChat => 'Wyszukaj uzytkownika, aby rozpoczac czat';
+  String get contactSearchUserToChat =>
+      'Wyszukaj uzytkownika, aby rozpoczac czat';
 
   @override
-  String get matrixIdExample =>
+  String get contactMatrixIdExample =>
       'Mozesz wprowadzic pelny identyfikator Matrix\nnp. @uzytkownik:matrix.n42.network';
 
   @override
-  String userNotFound(String username) {
+  String contactUserNotFound(String username) {
     return 'Uzytkownik \"$username\" nie zostal znaleziony';
   }
 
   @override
-  String get chat => 'Czat';
+  String get commonChat => 'Czat';
 
   @override
-  String get settings => 'Ustawienia';
+  String get commonSettings => 'Ustawienia';
 
   @override
-  String get editProfile => 'Edytuj profil';
+  String get profileEditProfile => 'Edytuj profil';
 
   @override
-  String get login => 'Zaloguj sie';
+  String get authLogin => 'Zaloguj sie';
 
   @override
-  String get createGroup => 'Utworz grupe';
+  String get commonCreateGroup => 'Utworz grupe';
 
   @override
-  String developing(String title) {
-    return '$title\n(Wkrotce)';
-  }
+  String get chatError => 'Blad';
 
   @override
-  String get error => 'Blad';
+  String get commonTransfer => 'Przelew';
 
   @override
-  String get pageNotFound => 'Strona nie zostala znaleziona';
+  String get commonReceived => 'Odebrano';
 
   @override
-  String get backToHome => 'Wroc do strony glownej';
+  String get commonRefunded => 'Zwrocono';
 
   @override
-  String get allRead => 'Wszystko przeczytane';
+  String get commonExpired => 'Wygaslo';
 
   @override
-  String readCount(int count) {
-    return '$count przeczytane';
-  }
+  String get chatRedPacketGreeting => 'Najlepsze zyczenia';
 
   @override
-  String get transfer => 'Przelew';
+  String get commonN42RedPacket => 'Czerwona koperta N42';
 
   @override
-  String get pendingReceipt => 'Oczekujace';
+  String get commonClaimed => 'Odebrano';
 
   @override
-  String get tapToReceive => 'Dotknij, aby odebrac';
+  String get commonAllClaimed => 'Wszystko odebrane';
 
   @override
-  String get received => 'Odebrano';
+  String get chatReply => 'Odpowiedz';
 
   @override
-  String get paymentReceived => 'Platnosc odebrana';
+  String get commonEdit => 'Edytuj';
 
   @override
-  String get refunded => 'Zwrocono';
+  String get chatSelectForwardTarget => 'Wybierz odbiorce';
 
   @override
-  String get expired => 'Wygaslo';
-
-  @override
-  String get redPacketGreeting => 'Najlepsze zyczenia';
-
-  @override
-  String get n42RedPacket => 'Czerwona koperta N42';
-
-  @override
-  String get goodLuck => 'Powodzenia';
-
-  @override
-  String get claimed => 'Odebrano';
-
-  @override
-  String get allClaimed => 'Wszystko odebrane';
-
-  @override
-  String get emoji => 'Emotikon';
-
-  @override
-  String get love => 'Milosc';
-
-  @override
-  String get animals => 'Zwierzeta';
-
-  @override
-  String get food => 'Jedzenie';
-
-  @override
-  String get travel => 'Podroze';
-
-  @override
-  String get activities => 'Aktywnosci';
-
-  @override
-  String get objects => 'Przedmioty';
-
-  @override
-  String get symbols => 'Symbole';
-
-  @override
-  String get reply => 'Odpowiedz';
-
-  @override
-  String get copiedToClipboard => 'Skopiowano do schowka';
-
-  @override
-  String get edit => 'Edytuj';
-
-  @override
-  String get more => 'Wiecej';
-
-  @override
-  String get selectForwardTarget => 'Wybierz odbiorce';
-
-  @override
-  String sendCount(int count) {
+  String commonSendCount(int count) {
     return 'Wyslij ($count)';
   }
 
   @override
-  String get draft => '[Szkic] ';
-
-  @override
-  String n42Id(String id) {
+  String contactN42Id(String id) {
     return 'ID N42: $id';
   }
 
   @override
-  String get n42IdTitle => 'ID N42';
+  String get profileN42IdTitle => 'ID N42';
 
   @override
-  String get n42Bean => 'N42 Bean';
+  String get profileN42Bean => 'N42 Bean';
 
   @override
-  String get friendInfo => 'Informacje o znajomym';
+  String get contactFriendInfo => 'Informacje o znajomym';
 
   @override
-  String get friendInfoDesc =>
+  String get contactFriendInfoDesc =>
       'Dodaj uwage, telefon, tagi, notatki, zdjecia i ustaw uprawnienia znajomego.';
 
   @override
-  String get moments => 'Chwile';
+  String get commonMoments => 'Chwile';
 
   @override
-  String get sendMessage => 'Wiadomosc';
+  String get commonSendMessage => 'Wiadomosc';
 
   @override
-  String get audioVideoCall => 'Polaczenie audio/wideo';
+  String get contactAudioVideoCall => 'Polaczenie audio/wideo';
 
   @override
-  String get videoChannel => 'Kanal wideo';
+  String get contactVideoChannel => 'Kanal wideo';
 
   @override
-  String get remark => 'Uwaga';
+  String get contactRemark => 'Uwaga';
 
   @override
-  String get remarkName => 'Nazwa uwagi';
+  String get contactRemarkName => 'Nazwa uwagi';
 
   @override
-  String get phone => 'Telefon';
+  String get contactPhone => 'Telefon';
 
   @override
-  String get tags => 'Tagi';
+  String get contactTags => 'Tagi';
 
   @override
-  String get notes => 'Notatki';
+  String get contactNotes => 'Notatki';
 
   @override
-  String get photos => 'Zdjecia';
+  String get contactPhotos => 'Zdjecia';
 
   @override
-  String get permissions => 'Uprawnienia';
+  String get contactPermissions => 'Uprawnienia';
 
   @override
-  String get chatMomentsEtc => 'Czat, Chwile, Sport itp.';
+  String get contactChatMomentsEtc => 'Czat, Chwile, Sport itp.';
 
   @override
-  String get moreInfo => 'Wiecej informacji';
+  String get contactMoreInfo => 'Wiecej informacji';
 
   @override
-  String get commonGroups => 'Wspolne grupy';
+  String get contactCommonGroups => 'Wspolne grupy';
 
   @override
-  String get zeroGroups => '0';
+  String get contactSource => 'Zrodlo';
 
   @override
-  String get source => 'Zrodlo';
+  String get settingsNotificationSettings => 'Powiadomienia';
 
   @override
-  String get notificationSettings => 'Powiadomienia';
+  String get settingsPrivacy => 'Prywatnosc';
 
   @override
-  String get receiveNotifications =>
-      'Otrzymuj powiadomienia o nowych wiadomosciach';
+  String get settingsAppearance => 'Wyglad';
 
   @override
-  String get showPreview => 'Pokaz podglad wiadomosci';
+  String get settingsAbout => 'O aplikacji';
 
   @override
-  String get showContentInNotification =>
-      'Pokaz tresc wiadomosci w powiadomieniach';
+  String get commonLogout => 'Wyloguj';
 
   @override
-  String get notificationSound => 'Dzwiek powiadomienia';
+  String get commonLogoutConfirm => 'Czy na pewno chcesz sie wylogowac?';
 
   @override
-  String get playSoundOnMessage => 'Odtwarzaj dzwiek przy odbiorze wiadomosci';
+  String get commonSave => 'Zapisz';
 
   @override
-  String get vibrate => 'Wibracja';
+  String get profileNickname => 'Pseudonim';
 
   @override
-  String get vibrateOnMessage => 'Wibruj przy odbiorze wiadomosci';
+  String get profileEnterNickname => 'Wprowadz pseudonim';
 
   @override
-  String get doNotDisturb => 'Nie przeszkadzac';
+  String get profileSignature => 'Podpis';
 
   @override
-  String get dndDescription => 'Wycisz powiadomienia w okreslonych godzinach';
+  String get profileAddSignature => 'Dodaj podpis';
 
   @override
-  String get startTime => 'Czas rozpoczecia';
+  String get commonTakePhoto => 'Zrob zdjecie';
 
   @override
-  String get endTime => 'Czas zakonczenia';
+  String get profileChooseFromGallery => 'Wybierz z galerii';
 
   @override
-  String get privacy => 'Prywatnosc';
-
-  @override
-  String get appearance => 'Wyglad';
-
-  @override
-  String get about => 'O aplikacji';
-
-  @override
-  String get logout => 'Wyloguj';
-
-  @override
-  String get logoutConfirm => 'Czy na pewno chcesz sie wylogowac?';
-
-  @override
-  String get exit => 'Wyloguj';
-
-  @override
-  String get save => 'Zapisz';
-
-  @override
-  String get nickname => 'Pseudonim';
-
-  @override
-  String get enterNickname => 'Wprowadz pseudonim';
-
-  @override
-  String get signature => 'Podpis';
-
-  @override
-  String get addSignature => 'Dodaj podpis';
-
-  @override
-  String get takePhoto => 'Zrob zdjecie';
-
-  @override
-  String get chooseFromGallery => 'Wybierz z galerii';
-
-  @override
-  String saveFailed(String error) {
+  String profileSaveFailed(String error) {
     return 'Nie udalo sie zapisac: $error';
   }
 
   @override
-  String get secureDecentralizedChat =>
+  String get authSecureDecentralizedChat =>
       'Bezpieczna, zdecentralizowana komunikacja';
 
   @override
-  String get endToEndEncryption => 'Szyfrowanie od konca do konca';
+  String get commonEndToEndEncryption => 'Szyfrowanie od konca do konca';
 
   @override
-  String get messagesOnlyYouCanSee =>
+  String get authMessagesOnlyYouCanSee =>
       'Wiadomosci widoczne tylko dla Ciebie i odbiorcy';
 
   @override
-  String get decentralized => 'Zdecentralizowany';
+  String get authDecentralized => 'Zdecentralizowany';
 
   @override
-  String get basedOnMatrix => 'Oparty na otwartym protokole Matrix';
+  String get authBasedOnMatrix => 'Oparty na otwartym protokole Matrix';
 
   @override
-  String get walletIntegration => 'Integracja portfela';
+  String get authWalletIntegration => 'Integracja portfela';
 
   @override
-  String get easyCryptoTransfer => 'Latwe przelewy kryptowalut';
+  String get authEasyCryptoTransfer => 'Latwe przelewy kryptowalut';
 
   @override
-  String get register => 'Zarejestruj sie';
+  String get authRegister => 'Zarejestruj sie';
 
   @override
-  String get agreeTerms => 'Logujac sie, akceptujesz';
+  String get authAgreeTerms => 'Logujac sie, akceptujesz';
 
   @override
-  String get termsOfService => 'Regulamin';
+  String get authTermsOfService => 'Regulamin';
 
   @override
-  String get and => 'i';
+  String get authAnd => 'i';
 
   @override
-  String get privacyPolicy => 'Polityke prywatnosci';
+  String get authPrivacyPolicy => 'Polityke prywatnosci';
 
   @override
-  String get serverAddress => 'Adres serwera';
+  String get authServerAddress => 'Adres serwera';
 
   @override
-  String get enterServerAddress => 'Wprowadz adres serwera';
+  String get authEnterServerAddress => 'Wprowadz adres serwera';
 
   @override
-  String get validServerAddress => 'Wprowadz prawidlowy adres serwera';
-
-  @override
-  String connectedTo(String serverName) {
+  String authConnectedTo(String serverName) {
     return 'Polaczono z $serverName';
   }
 
   @override
-  String get username => 'Nazwa uzytkownika';
+  String get authUsername => 'Nazwa uzytkownika';
 
   @override
-  String get enterUsername => 'Wprowadz nazwe uzytkownika';
+  String get authEnterUsername => 'Wprowadz nazwe uzytkownika';
 
   @override
-  String get password => 'Haslo';
+  String get authPassword => 'Haslo';
 
   @override
-  String get enterPassword => 'Wprowadz haslo';
+  String get authEnterPassword => 'Wprowadz haslo';
 
   @override
-  String get registerAccount => 'Zarejestruj sie';
+  String get authRegisterAccount => 'Zarejestruj sie';
 
   @override
-  String get forgotPassword => 'Zapomniales hasla';
+  String get authForgotPassword => 'Zapomniales hasla';
 
   @override
-  String get otherLoginMethods => 'Inne metody logowania';
+  String get authOtherLoginMethods => 'Inne metody logowania';
 
   @override
-  String get emailVerification => 'Kod weryfikacyjny e-mail';
+  String get authCreateAccount => 'Utworz konto';
 
   @override
-  String get enterServerFirst => 'Najpierw wprowadz adres serwera';
+  String get authJoinN42Chat => 'Dolacz do N42 Chat, aby rozpoczac rozmowe';
 
   @override
-  String get passkeyNeedsServer =>
-      'Logowanie kluczem dostepu wymaga wsparcia serwera';
+  String get authUsernameHint => '3-20 znakow, litery/cyfry/_';
 
   @override
-  String googleLoginSuccess(String email) {
-    return 'Logowanie Google powiodlo sie: $email';
-  }
-
-  @override
-  String googleLoginFailed(String error) {
-    return 'Logowanie Google nie powiodlo sie: $error';
-  }
-
-  @override
-  String get appleLoginSuccess => 'Logowanie Apple powiodlo sie';
-
-  @override
-  String appleLoginFailed(String error) {
-    return 'Logowanie Apple nie powiodlo sie: $error';
-  }
-
-  @override
-  String get createAccount => 'Utworz konto';
-
-  @override
-  String get joinN42Chat => 'Dolacz do N42 Chat, aby rozpoczac rozmowe';
-
-  @override
-  String get usernameHint => '3-20 znakow, litery/cyfry/_';
-
-  @override
-  String get usernameMinLength =>
+  String get authUsernameMinLength =>
       'Nazwa uzytkownika musi miec co najmniej 3 znaki';
 
   @override
-  String get usernameMaxLength =>
+  String get authUsernameMaxLength =>
       'Nazwa uzytkownika moze miec maksymalnie 20 znakow';
 
   @override
-  String get usernameFormat =>
+  String get authUsernameFormat =>
       'Nazwa uzytkownika moze zawierac tylko litery, cyfry i podkreslenia';
 
   @override
-  String get passwordHint => 'Min. 8 znakow';
+  String get authPasswordHint => 'Min. 8 znakow';
 
   @override
-  String get passwordMinLength => 'Haslo musi miec co najmniej 8 znakow';
+  String get commonPasswordMinLength => 'Haslo musi miec co najmniej 8 znakow';
 
   @override
-  String get confirmPassword => 'Potwierdz haslo';
+  String get authConfirmPassword => 'Potwierdz haslo';
 
   @override
-  String get reEnterPassword => 'Wprowadz haslo ponownie';
+  String get authFilled => 'Wypelniono';
 
   @override
-  String get passwordsNotMatch => 'Hasla nie pasuja do siebie';
+  String get authEnterInviteCode => 'Wprowadz kod zaproszenia';
 
   @override
-  String get inviteCode => 'Kod zaproszenia (wbudowany)';
+  String get authAlreadyHaveAccount => 'Masz juz konto?';
 
   @override
-  String get filled => 'Wypelniono';
+  String get authLoginNow => 'Zaloguj sie teraz';
 
   @override
-  String get enterInviteCode => 'Wprowadz kod zaproszenia';
+  String get profileAvatar => 'Awatar';
 
   @override
-  String get inviteCodeHint =>
-      'Kod zaproszenia jest wbudowany, zwykle nie trzeba go zmieniac';
+  String get profileStatus => 'Status';
 
   @override
-  String get agreeTermsFirst =>
-      'Najpierw przeczytaj i zaakceptuj regulamin i polityke prywatnosci';
+  String get commonLoading => 'Ladowanie...';
 
   @override
-  String get iAgree => 'Przeczytałem i akceptuje';
+  String get conversationNoConversations => 'Brak rozmow';
 
   @override
-  String get alreadyHaveAccount => 'Masz juz konto?';
+  String get conversationTapToChat =>
+      'Dotknij prawego gornego rogu, aby rozpoczac rozmowe';
 
   @override
-  String get loginNow => 'Zaloguj sie teraz';
+  String get conversationStartGroup => 'Rozpocznij czat grupowy';
 
   @override
-  String get whoCanSee => 'Kto moze zobaczyc';
+  String get commonScan => 'Skanuj';
 
   @override
-  String get avatar => 'Awatar';
+  String get commonPayment => 'Platnosc';
 
   @override
-  String get status => 'Status';
-
-  @override
-  String get lastSeen => 'Ostatnio widziany';
-
-  @override
-  String get messageSettings => 'Wiadomosci';
-
-  @override
-  String get allowStrangerMessage => 'Zezwalaj na wiadomosci od nieznajomych';
-
-  @override
-  String get receiveNonContact => 'Odbieraj wiadomosci od osob spoza kontaktow';
-
-  @override
-  String get readReceipts => 'Potwierdzenia odczytu';
-
-  @override
-  String get letOthersKnowRead =>
-      'Pozwol innym wiedziec, ze przeczytales ich wiadomosci';
-
-  @override
-  String get typingStatus => 'Status pisania';
-
-  @override
-  String get letOthersKnowTyping => 'Pozwol innym wiedziec, ze piszesz';
-
-  @override
-  String get everyone => 'Wszyscy';
-
-  @override
-  String get contactsOnly => 'Tylko kontakty';
-
-  @override
-  String get nobody => 'Nikt';
-
-  @override
-  String whoCanSeeItem(String title) {
-    return 'Kto moze zobaczyc $title';
-  }
-
-  @override
-  String version(String version) {
-    return 'Wersja $version';
-  }
-
-  @override
-  String get checkUpdate => 'Sprawdz aktualizacje';
-
-  @override
-  String get openSourceLicenses => 'Licencje open source';
-
-  @override
-  String get feedback => 'Opinie';
-
-  @override
-  String get builtOnMatrix => 'Oparty na protokole Matrix';
-
-  @override
-  String get loading => 'Ladowanie...';
-
-  @override
-  String get noConversations => 'Brak rozmow';
-
-  @override
-  String get tapToChat => 'Dotknij prawego gornego rogu, aby rozpoczac rozmowe';
-
-  @override
-  String get startGroup => 'Rozpocznij czat grupowy';
-
-  @override
-  String get scan => 'Skanuj';
-
-  @override
-  String get payment => 'Platnosc';
-
-  @override
-  String featureComingSoon(String feature) {
+  String commonFeatureComingSoon(String feature) {
     return '$feature wkrotce dostepne';
   }
 
   @override
-  String get markAsRead => 'Oznacz jako przeczytane';
+  String get conversationMarkAsRead => 'Oznacz jako przeczytane';
 
   @override
-  String get unmute => 'Wlacz dzwiek';
+  String get commonUnmute => 'Wlacz dzwiek';
 
   @override
-  String get mute => 'Wycisz';
+  String get commonMute => 'Wycisz';
 
   @override
-  String get unpin => 'Odepnij';
+  String get conversationUnpin => 'Odepnij';
 
   @override
-  String get pin => 'Przypnij';
+  String get conversationPin => 'Przypnij';
 
   @override
-  String get deleteConversation => 'Usun rozmowe';
+  String get conversationDeleteConversation => 'Usun rozmowe';
 
   @override
-  String deleteConversationConfirm(String name) {
+  String conversationDeleteConversationConfirm(String name) {
     return 'Usunac rozmowe z \"$name\"?';
   }
 
   @override
-  String get noContacts => 'Brak kontaktow';
+  String get commonNoContacts => 'Brak kontaktow';
 
   @override
-  String get addFriendsToChat => 'Dodaj znajomych, aby rozpoczac rozmowe';
+  String get contactAddFriendsToChat =>
+      'Dodaj znajomych, aby rozpoczac rozmowe';
 
   @override
   String get contactNotFound => 'Kontakt nie zostal znaleziony';
 
   @override
-  String get tryOtherKeywords =>
+  String get contactTryOtherKeywords =>
       'Sprobuj innych slow kluczowych lub wyszukiwania globalnego';
 
   @override
-  String get searchResults => 'Wyniki wyszukiwania';
+  String get contactSearchResults => 'Wyniki wyszukiwania';
 
   @override
-  String get newFriends => 'Nowi znajomi';
+  String get contactNewFriends => 'Nowi znajomi';
 
   @override
-  String get chatOnlyFriends => 'Znajomi tylko do czatu';
+  String get contactChatOnlyFriends => 'Chat-only Friends';
 
   @override
-  String get officialAccounts => 'Konta oficjalne';
+  String get contactOfficialAccounts => 'Konta oficjalne';
 
   @override
-  String get serviceAccounts => 'Konta uslugowe';
+  String get contactServiceAccounts => 'Konta uslugowe';
 
   @override
-  String get enterpriseContacts => 'Kontakty firmowe';
+  String get contactEnterpriseContacts => 'Kontakty firmowe';
 
   @override
-  String contactsCount(int count) {
-    return '$count kontaktow';
-  }
+  String get contactRecommendToFriend => 'Udostepnij kontakt';
 
   @override
-  String get recommendToFriend => 'Udostepnij kontakt';
+  String get commonSetRemark => 'Ustaw uwage';
 
   @override
-  String get setRemark => 'Ustaw uwage';
+  String get contactSendingCard => 'Wysylanie wizytowki...';
 
   @override
-  String get addToHome => 'Dodaj do ekranu glownego';
+  String get commonFileLabel => 'Plik';
 
   @override
-  String get sendingCard => 'Wysylanie wizytowki...';
+  String get commonLocationLabel => 'Lokalizacja';
 
   @override
-  String get contactCard => '[Wizytowka]';
-
-  @override
-  String get fileLabel => 'Plik';
-
-  @override
-  String get locationLabel => 'Lokalizacja';
-
-  @override
-  String cardSent(String contact, String friend) {
-    return 'Wyslano wizytowke $contact do $friend';
-  }
-
-  @override
-  String recommendFailed(String error) {
+  String contactRecommendFailed(String error) {
     return 'Polecenie nie powiodlo sie: $error';
   }
 
   @override
-  String get enterRemark => 'Wprowadz uwage';
+  String get profileEnterRemark => 'Wprowadz uwage';
 
   @override
-  String remarkSet(String remark) {
-    return 'Uwaga ustawiona na: $remark';
-  }
+  String get contactOpeningChat => 'Otwieranie czatu...';
 
   @override
-  String get openingChat => 'Otwieranie czatu...';
-
-  @override
-  String openChatFailed(String error) {
+  String contactOpenChatFailed(String error) {
     return 'Nie udalo sie otworzyc czatu: $error';
   }
 
   @override
-  String get addContact => 'Dodaj kontakt';
+  String get contactAddContact => 'Dodaj kontakt';
 
   @override
-  String get enterUserId => 'Wprowadz ID uzytkownika';
+  String get contactEnterUserId => 'Wprowadz ID uzytkownika';
 
   @override
-  String get noFriendRequests => 'Brak zaproszen do znajomych';
+  String get contactNoFriendRequests => 'Brak zaproszen do znajomych';
 
   @override
-  String get accept => 'Akceptuj';
+  String get commonAccept => 'Akceptuj';
 
   @override
-  String get reject => 'Odrzuc';
+  String get commonReject => 'Odrzuc';
 
   @override
-  String acceptedRequest(String name) {
-    return 'Zaakceptowano zaproszenie od $name';
-  }
+  String get commonNoGroups => 'Brak grup';
 
   @override
-  String rejectedRequest(String name) {
-    return 'Odrzucono zaproszenie od $name';
-  }
+  String get contactSelectFriendToRecommend => 'Wybierz znajomego do polecenia';
 
   @override
-  String get noGroups => 'Brak grup';
+  String get commonSearchContacts => 'Szukaj kontaktow';
 
   @override
-  String get creatingGroup => 'Tworzenie grupy wkrotce dostepne...';
+  String get contactNoContactsFound => 'Nie znaleziono kontaktow';
 
   @override
-  String get selectFriendToRecommend => 'Wybierz znajomego do polecenia';
+  String get favoriteYesterday => 'Wczoraj';
 
   @override
-  String get searchContacts => 'Szukaj kontaktow';
+  String get chatJustNow => 'Przed chwila';
 
   @override
-  String get noContactsFound => 'Nie znaleziono kontaktow';
+  String get profileOnline => 'Online';
 
   @override
-  String get yesterday => 'Wczoraj';
-
-  @override
-  String get monday => 'Pon';
-
-  @override
-  String get tuesday => 'Wt';
-
-  @override
-  String get wednesday => 'Sr';
-
-  @override
-  String get thursday => 'Czw';
-
-  @override
-  String get friday => 'Pt';
-
-  @override
-  String get saturday => 'Sob';
-
-  @override
-  String get sunday => 'Niedz';
-
-  @override
-  String get justNow => 'Przed chwila';
-
-  @override
-  String minutesAgo(int count) {
-    return '$count min temu';
-  }
-
-  @override
-  String hoursAgo(int count) {
-    return '$count godz. temu';
-  }
-
-  @override
-  String daysAgo(int count) {
-    return '$count dni temu';
-  }
-
-  @override
-  String get online => 'Online';
-
-  @override
-  String get offline => 'Offline';
-
-  @override
-  String minutesAgoOnline(int count) {
-    return 'Online $count min temu';
-  }
-
-  @override
-  String hoursAgoOnline(int count) {
-    return 'Online $count godz. temu';
-  }
-
-  @override
-  String daysAgoOnline(int count) {
-    return 'Online $count dni temu';
-  }
+  String get profileOffline => 'Offline';
 
   @override
   String get searchContactsGroupsMessages =>
@@ -1210,36 +650,25 @@ class SPl extends S {
   String get searchError => 'Blad wyszukiwania';
 
   @override
-  String get searchHint => 'Szukaj kontaktow, grup i wiadomosci';
-
-  @override
-  String get enterKeyword => 'Wprowadz slowa kluczowe, aby wyszukac';
+  String get chatSearchHint => 'Szukaj kontaktow, grup i wiadomosci';
 
   @override
   String get searchHistory => 'Historia wyszukiwania';
 
   @override
-  String get clear => 'Wyczysc';
+  String get commonClear => 'Wyczysc';
 
   @override
-  String noResultsFor(String query) {
-    return 'Brak wynikow dla \"$query\"';
-  }
+  String get commonAll => 'Wszystko';
 
   @override
-  String get all => 'Wszystko';
+  String get searchGroups => 'Grupy';
 
   @override
-  String get groups => 'Grupy';
+  String get searchNoResults => 'Brak wynikow';
 
   @override
-  String get noResults => 'Brak wynikow';
-
-  @override
-  String get groupInfo => 'Informacje o grupie';
-
-  @override
-  String groupMembers(int count) {
+  String commonGroupMembers(int count) {
     return 'Czlonkowie ($count)';
   }
 
@@ -1247,1812 +676,7 @@ class SPl extends S {
   String get groupMembersTitle => 'Członkowie grupy';
 
   @override
-  String get viewAll => 'Zobacz wszystko';
-
-  @override
-  String get owner => 'Wlasciciel';
-
-  @override
-  String get admin => 'Administrator';
-
-  @override
-  String get invite => 'Zapros';
-
-  @override
-  String get groupAnnouncement => 'Ogloszenie grupy';
-
-  @override
-  String get notSet => 'Nie ustawiono';
-
-  @override
-  String get groupDescription => 'Opis grupy';
-
-  @override
-  String get publicGroup => 'Grupa publiczna';
-
-  @override
-  String get allowSearchJoin => 'Zezwalaj innym na wyszukiwanie i dolaczanie';
-
-  @override
-  String get clearChatHistory => 'Wyczysc historie czatu';
-
-  @override
-  String get dissolveGroup => 'Rozwiaz grupe';
-
-  @override
-  String get leaveGroup => 'Opusc grupe';
-
-  @override
-  String get changeGroupName => 'Zmien nazwe grupy';
-
-  @override
-  String get enterGroupName => 'Wprowadz nazwe grupy';
-
-  @override
-  String get confirm => 'Potwierdz';
-
-  @override
-  String get changeGroupDescription => 'Zmien opis grupy';
-
-  @override
-  String get enterGroupDescription => 'Wprowadz opis grupy';
-
-  @override
-  String get editAnnouncement => 'Edytuj ogloszenie';
-
-  @override
-  String get enterAnnouncement => 'Wprowadz ogloszenie';
-
-  @override
-  String get publish => 'Opublikuj';
-
-  @override
-  String get clearHistoryConfirm =>
-      'Wyczyścic cala historie czatu? Tej operacji nie mozna cofnac.';
-
-  @override
-  String get clearAction => 'Wyczysc';
-
-  @override
-  String get chatHistoryCleared => 'Historia czatu wyczyszczona';
-
-  @override
-  String leaveGroupConfirm(String name) {
-    return 'Opuscic \"$name\"?';
-  }
-
-  @override
-  String dissolveGroupConfirm(String name) {
-    return 'Rozwiazac \"$name\"? Tej operacji nie mozna cofnac.';
-  }
-
-  @override
-  String get dissolve => 'Rozwiaz';
-
-  @override
-  String get groupQrCode => 'Kod QR grupy';
-
-  @override
-  String get searchChatHistory => 'Szukaj w historii czatu';
-
-  @override
-  String get groupIdCopied => 'ID grupy skopiowano';
-
-  @override
-  String tapCopyGroupId(int count) {
-    return '$count czlonkow · Dotknij, aby skopiowac ID grupy';
-  }
-
-  @override
-  String get receiverAddress => 'Adres odbiorcy';
-
-  @override
-  String get enterOrPasteAddress => 'Wprowadz lub wklej adres portfela';
-
-  @override
-  String get selectToken => 'Wybierz token';
-
-  @override
-  String get transferAmount => 'Kwota przelewu';
-
-  @override
-  String get available => 'Dostepne';
-
-  @override
-  String get allAmount => 'Wszystko';
-
-  @override
-  String get memoOptional => 'Notatka (opcjonalna)';
-
-  @override
-  String get addMemo => 'Dodaj notatke';
-
-  @override
-  String get confirmTransfer => 'Potwierdz przelew';
-
-  @override
-  String get invalidAddress => 'Wprowadz prawidlowy adres odbiorcy';
-
-  @override
-  String get invalidAmount => 'Wprowadz prawidlowa kwote';
-
-  @override
-  String get selectTokenPlease => 'Wybierz token';
-
-  @override
-  String get addressVerified => 'Adres zweryfikowany';
-
-  @override
-  String availableBalance(String balance, String symbol) {
-    return 'Dostepne: $balance $symbol';
-  }
-
-  @override
-  String get scanningInDevelopment => 'Funkcja skanowania w trakcie rozwoju...';
-
-  @override
-  String get enterAmount => 'Wprowadz kwote';
-
-  @override
-  String get redPacketCountMin => 'Wymagana co najmniej 1 czerwona koperta';
-
-  @override
-  String get viewRedPacketDetails => 'Zobacz szczegoly czerwonej koperty';
-
-  @override
-  String get enterTransferAmount => 'Wprowadz kwote przelewu';
-
-  @override
-  String get transferTo => 'Przelew do';
-
-  @override
-  String get selectCurrency => 'Wybierz walute';
-
-  @override
-  String get receiveTransfer => 'Odebrany przelew';
-
-  @override
-  String fromSender(String name, Object senderName) {
-    return 'Od $senderName';
-  }
-
-  @override
-  String get confirmReceive => 'Potwierdz odbiór';
-
-  @override
-  String get groupProfile => 'Informacje o grupie';
-
-  @override
-  String get viewProfile => 'Zobacz profil';
-
-  @override
-  String get removeMember => 'Usun z grupy';
-
-  @override
-  String removeMemberConfirm(String name) {
-    return 'Usunac \"$name\" z grupy?';
-  }
-
-  @override
-  String get remove => 'Usun';
-
-  @override
-  String get clearStatus => 'Wyczysc status';
-
-  @override
-  String get clearStatusConfirm => 'Wyczyścic biezacy status?';
-
-  @override
-  String get statusCleared => 'Status wyczyszczony';
-
-  @override
-  String statusSet(String result) {
-    return 'Status ustawiony na: $result';
-  }
-
-  @override
-  String get userNotExist => 'Uzytkownik nie istnieje';
-
-  @override
-  String get userIdCopied => 'ID uzytkownika skopiowano';
-
-  @override
-  String get voiceCallInDevelopment =>
-      'Polaczenie glosowe w trakcie rozwoju...';
-
-  @override
-  String get report => 'Zglos';
-
-  @override
-  String get reportInDevelopment => 'Funkcja zglaszania w trakcie rozwoju...';
-
-  @override
-  String get shareCard => 'Udostepnij wizytowke';
-
-  @override
-  String get shareInDevelopment => 'Funkcja udostepniania w trakcie rozwoju...';
-
-  @override
-  String get qrCode => 'Kod QR';
-
-  @override
-  String get qrCodeInDevelopment => 'Funkcja kodu QR w trakcie rozwoju...';
-
-  @override
-  String get avatarUpdated => 'Awatar zaktualizowany';
-
-  @override
-  String selectImageFailed(String error) {
-    return 'Nie udalo sie wybrac obrazu: $error';
-  }
-
-  @override
-  String get changeName => 'Zmien nazwe';
-
-  @override
-  String get male => 'Mezczyzna';
-
-  @override
-  String get female => 'Kobieta';
-
-  @override
-  String genderSet(String gender) {
-    return 'Plec ustawiona na: $gender';
-  }
-
-  @override
-  String regionSet(String region) {
-    return 'Region ustawiony na: $region';
-  }
-
-  @override
-  String get setPatText => 'Ustaw tekst poklepania';
-
-  @override
-  String get changeSignature => 'Zmien podpis';
-
-  @override
-  String ringtoneSet(String result) {
-    return 'Dzwonek ustawiony na: $result';
-  }
-
-  @override
-  String featureInDev(String feature) {
-    return '$feature w trakcie rozwoju...';
-  }
-
-  @override
-  String saveAddressFailed(String error) {
-    return 'Nie udalo sie zapisac adresu: $error';
-  }
-
-  @override
-  String get myAddress => 'Moj adres';
-
-  @override
-  String get addNew => 'Dodaj';
-
-  @override
-  String get addAddress => 'Dodaj adres';
-
-  @override
-  String get addressAdded => 'Adres dodany';
-
-  @override
-  String get addressUpdated => 'Adres zaktualizowany';
-
-  @override
-  String get deleteAddress => 'Usun adres';
-
-  @override
-  String get deleteAddressConfirm => 'Usunac ten adres?';
-
-  @override
-  String get addressDeleted => 'Adres usuniety';
-
-  @override
-  String get setDefaultAddress => 'Ustaw jako domyslny';
-
-  @override
-  String get fillCompleteInfo => 'Wypelnij wszystkie pola';
-
-  @override
-  String saveInvoiceFailed(String error) {
-    return 'Nie udalo sie zapisac faktury: $error';
-  }
-
-  @override
-  String get myInvoices => 'Moje faktury';
-
-  @override
-  String get addInvoice => 'Dodaj fakture';
-
-  @override
-  String get invoiceAdded => 'Faktura dodana';
-
-  @override
-  String get invoiceUpdated => 'Faktura zaktualizowana';
-
-  @override
-  String get deleteInvoice => 'Usun fakture';
-
-  @override
-  String get deleteInvoiceConfirm => 'Usunac te fakture?';
-
-  @override
-  String get invoiceDeleted => 'Faktura usunieta';
-
-  @override
-  String get invoiceType => 'Typ faktury: ';
-
-  @override
-  String get personal => 'Osobista';
-
-  @override
-  String get enterprise => 'Firmowa';
-
-  @override
-  String get setDefaultInvoice => 'Ustaw jako domyslna';
-
-  @override
-  String get enterTaxId => 'Wprowadz NIP';
-
-  @override
-  String get vibrateMode => 'Tryb wibracji';
-
-  @override
-  String get silentMode => 'Tryb cichy';
-
-  @override
-  String playing(String ringtoneName) {
-    return 'Odtwarzanie: $ringtoneName';
-  }
-
-  @override
-  String playFailed(String ringtoneName) {
-    return 'Nie udalo sie odtworzyc: $ringtoneName';
-  }
-
-  @override
-  String get enterGroupNamePlease => 'Wprowadz nazwe grupy';
-
-  @override
-  String get selectAtLeastOne => 'Wybierz co najmniej jednego czlonka';
-
-  @override
-  String get fillStatus => 'Napisz status';
-
-  @override
-  String get fileNotExist => 'Plik nie istnieje';
-
-  @override
-  String sendFailed(String error) {
-    return 'Wyslanie nie powiodlo sie: $error';
-  }
-
-  @override
-  String get cannotOpenBrowser => 'Nie mozna otworzyc przegladarki';
-
-  @override
-  String selectFileFailed(String error) {
-    return 'Nie udalo sie wybrac pliku: $error';
-  }
-
-  @override
-  String get enterMusicLink => 'Wprowadz link do muzyki';
-
-  @override
-  String get enterValidLink => 'Wprowadz prawidlowy link';
-
-  @override
-  String get enterPollQuestion => 'Wprowadz pytanie ankiety';
-
-  @override
-  String get minTwoOptions => 'Wymagane co najmniej 2 opcje';
-
-  @override
-  String get crossDeviceEnabled => 'Podpisywanie miedzyurzadzeniowe wlaczone';
-
-  @override
-  String get crossDeviceSet =>
-      'Podpisywanie miedzyurzadzeniowe skonfigurowane pomyslnie';
-
-  @override
-  String setupFailed(String error) {
-    return 'Konfiguracja nie powiodla sie: $error';
-  }
-
-  @override
-  String get receiveAmount => 'Kwota do otrzymania';
-
-  @override
-  String get enterValidAmount => 'Wprowadz prawidlowa kwote';
-
-  @override
-  String get addressCopied => 'Adres skopiowany';
-
-  @override
-  String openItem(String content) {
-    return 'Otworz: $content';
-  }
-
-  @override
-  String get newNoteComingSoon => 'Nowa notatka wkrotce dostepna';
-
-  @override
-  String get addLinkComingSoon => 'Dodawanie linkow wkrotce dostepne';
-
-  @override
-  String get deleted => 'Usunieto';
-
-  @override
-  String get shareComingSoon => 'Udostepnianie wkrotce dostepne';
-
-  @override
-  String get saveComingSoon => 'Zapisywanie wkrotce dostepne';
-
-  @override
-  String get moreStylesComingSoon => 'Wiecej stylow wkrotce dostepnych';
-
-  @override
-  String get wallet => 'Portfel';
-
-  @override
-  String get walletArea => 'Strefa portfela';
-
-  @override
-  String get recording => 'Nagrywanie';
-
-  @override
-  String get invalidVideoUrl => 'Nieprawidlowy adres URL wideo';
-
-  @override
-  String get downloadFile => 'Pobierz plik';
-
-  @override
-  String get clearChatHistoryTitle => 'Wyczysc historie czatu';
-
-  @override
-  String get cannotUndo => 'Tej operacji nie mozna cofnac';
-
-  @override
-  String get videoCall => 'Polaczenie wideo';
-
-  @override
-  String get voiceCall => 'Polaczenie glosowe';
-
-  @override
-  String get leaveMeeting => 'Opusc spotkanie';
-
-  @override
-  String get chatDetails => 'Szczegoly czatu';
-
-  @override
-  String get viewAllGroupMembers => 'Zobacz wszystkich czlonkow';
-
-  @override
-  String get groupName => 'Nazwa grupy';
-
-  @override
-  String get groupNameUpdated => 'Nazwa grupy zaktualizowana';
-
-  @override
-  String get groupDescriptionUpdated => 'Opis grupy zaktualizowany';
-
-  @override
-  String get groupAvatarUpdated => 'Awatar grupy zaktualizowany';
-
-  @override
-  String get updateFailed => 'Aktualizacja nie powiodla sie';
-
-  @override
-  String get noPermissionToModify => 'Nie masz uprawnien do modyfikacji';
-
-  @override
-  String get groupManagement => 'Zarzadzanie grupa';
-
-  @override
-  String get myNicknameInGroup => 'Moj pseudonim w grupie';
-
-  @override
-  String get pinChat => 'Przypnij czat';
-
-  @override
-  String get strongReminder => 'Silne przypomnienie';
-
-  @override
-  String get setChatBackground => 'Ustaw tlo czatu';
-
-  @override
-  String get unknownFile => 'Nieznany plik';
-
-  @override
-  String get download => 'Pobierz';
-
-  @override
-  String get invalidLocation => 'Nieprawidlowa lokalizacja';
-
-  @override
-  String get address => 'Adres';
-
-  @override
-  String get latitude => 'Szerokosc geograficzna';
-
-  @override
-  String get longitude => 'Dlugosc geograficzna';
-
-  @override
-  String get close => 'Zamknij';
-
-  @override
-  String get tapToCancel => 'Dotknij, aby anulowac';
-
-  @override
-  String captureFailed(Object error) {
-    return 'Przechwytywanie nie powiodlo sie: $error';
-  }
-
-  @override
-  String get processingVideo => 'Przetwarzanie wideo...';
-
-  @override
-  String get videoFileNotExist => 'Plik wideo nie istnieje';
-
-  @override
-  String get videoDataEmpty => 'Dane wideo sa puste';
-
-  @override
-  String get videoTooLarge => 'Rozmiar wideo nie moze przekraczac 100MB';
-
-  @override
-  String get sendingVideo => 'Wysylanie wideo...';
-
-  @override
-  String sendVideoFailed(Object error) {
-    return 'Nie udalo sie wyslac wideo: $error';
-  }
-
-  @override
-  String get imageFileNotExist => 'Plik obrazu nie istnieje';
-
-  @override
-  String get imageDataEmpty => 'Dane obrazu sa puste';
-
-  @override
-  String get sendingImage => 'Wysylanie obrazu...';
-
-  @override
-  String sendImageFailed(Object error) {
-    return 'Nie udalo sie wyslac obrazu: $error';
-  }
-
-  @override
-  String get sendLocation => 'Wyslij lokalizacje';
-
-  @override
-  String get selectLocationAndSend => 'Wybierz lokalizacje i wyslij';
-
-  @override
-  String get shareRealTimeLocation =>
-      'Udostepnij lokalizacje w czasie rzeczywistym';
-
-  @override
-  String get shareLocationForOneHour =>
-      'Udostepnij lokalizacje znajomemu przez 1 godzine';
-
-  @override
-  String get locationSent => 'Lokalizacja wyslana';
-
-  @override
-  String get selectMessages => 'Wybierz wiadomosci';
-
-  @override
-  String selectedCount(int count) {
-    return 'Wybrano $count';
-  }
-
-  @override
-  String get selectAll => 'Wybierz wszystko';
-
-  @override
-  String groupChatCount(int count) {
-    return 'Czat grupowy ($count)';
-  }
-
-  @override
-  String get privateChat => 'Czat prywatny';
-
-  @override
-  String get noMessages => 'Brak wiadomosci';
-
-  @override
-  String get sendFirstMessage =>
-      'Wyslij pierwsza wiadomosc, aby rozpoczac rozmowe';
-
-  @override
-  String get encryptionNotice =>
-      'Ten czat jest szyfrowany od konca do konca. Tylko Ty i odbiorca mozecie czytac wiadomosci.';
-
-  @override
-  String replyTo(String name) {
-    return 'Odpowiedz do $name';
-  }
-
-  @override
-  String get multiForward => 'Przekaz dalej';
-
-  @override
-  String get collect => 'Zbierz';
-
-  @override
-  String get noMembers => 'Brak czlonkow';
-
-  @override
-  String get memberNotFound => 'Czlonek nie zostal znaleziony';
-
-  @override
-  String get voiceFileNotExist => 'Plik glosowy nie istnieje';
-
-  @override
-  String get voiceFileEmpty => 'Plik glosowy jest pusty';
-
-  @override
-  String get sendingVoice => 'Wysylanie glosu...';
-
-  @override
-  String sendVoiceFailed(Object error) {
-    return 'Nie udalo sie wyslac glosu: $error';
-  }
-
-  @override
-  String get messageCopied => 'Wiadomosc skopiowana';
-
-  @override
-  String get messageForwarded => 'Wiadomosc przekazana';
-
-  @override
-  String forwardFailed(Object error) {
-    return 'Przekazanie nie powiodlo sie: $error';
-  }
-
-  @override
-  String get unfavorited => 'Usunieto z ulubionych';
-
-  @override
-  String get favorited => 'Dodano do ulubionych';
-
-  @override
-  String get reactionAdded => 'Reakcja dodana';
-
-  @override
-  String get reactionRemoved => 'Reakcja usunieta';
-
-  @override
-  String get failedMessageDeleted => 'Nieudana wiadomosc usunieta';
-
-  @override
-  String get deleteMessages => 'Usun wiadomosci';
-
-  @override
-  String deleteMessagesConfirm(Object count) {
-    return 'Czy na pewno chcesz usunac $count wiadomosci?';
-  }
-
-  @override
-  String noteOtherMessages(Object count) {
-    return 'Uwaga: $count wiadomosci jest od innych i zostana usuniete tylko dla Ciebie.';
-  }
-
-  @override
-  String myMessagesWillBeRecalled(Object count) {
-    return '$count wiadomosci od Ciebie zostanie wycofanych dla wszystkich.';
-  }
-
-  @override
-  String recalledCount(Object count, Object localCount) {
-    return 'Wycofano $count wiadomosci, $localCount usunieto tylko dla Ciebie';
-  }
-
-  @override
-  String recalledMessages(Object count) {
-    return 'Wycofano $count wiadomosci';
-  }
-
-  @override
-  String deletedLocally(Object count) {
-    return '$count wiadomosci usunieto tylko dla Ciebie';
-  }
-
-  @override
-  String forwardedCount(Object count) {
-    return 'Przekazano $count wiadomosci';
-  }
-
-  @override
-  String forwardComplete(Object failed, Object success) {
-    return 'Przekazanie zakonczone: $success udanych, $failed nieudanych';
-  }
-
-  @override
-  String get remindOnlyInGroup =>
-      'Funkcja przypomnienia jest dostepna tylko w czacie grupowym';
-
-  @override
-  String get onlyTextSearchable => 'Mozna wyszukiwac tylko wiadomosci tekstowe';
-
-  @override
-  String searchFor(Object text) {
-    return 'Szukaj \"$text\"';
-  }
-
-  @override
-  String get baiduSearch => 'Wyszukiwanie Baidu';
-
-  @override
-  String get googleSearch => 'Wyszukiwanie Google';
-
-  @override
-  String get bingSearch => 'Wyszukiwanie Bing';
-
-  @override
-  String get calling => 'Dzwonie...';
-
-  @override
-  String get connecting => 'Laczenie...';
-
-  @override
-  String get ringing => 'Dzwoni...';
-
-  @override
-  String get inCall => 'W trakcie polaczenia';
-
-  @override
-  String featureInDevelopment(String feature) {
-    return 'Funkcja w trakcie rozwoju...';
-  }
-
-  @override
-  String collectMessages(Object count) {
-    return 'Zebrano $count wiadomosci';
-  }
-
-  @override
-  String get voted => 'Zaglosowano';
-
-  @override
-  String get voteChanged => 'Glos zmieniony';
-
-  @override
-  String get voteRemoved => 'Glos usuniety';
-
-  @override
-  String get endPoll => 'Zakoncz ankiete';
-
-  @override
-  String get endPollConfirm =>
-      'Czy na pewno chcesz zakonczyc te ankiete? Po zakonczeniu nie bedzie mozna glosowac.';
-
-  @override
-  String memberCount(int count) {
-    return '$count czlonkow';
-  }
-
-  @override
-  String get videoChannels => 'Kanaly';
-
-  @override
-  String get live => 'Na zywo';
-
-  @override
-  String get listen => 'Sluchaj';
-
-  @override
-  String get watch => 'Ogladaj';
-
-  @override
-  String get searchDiscover => 'Szukaj';
-
-  @override
-  String get nearbyPeople => 'W poblizu';
-
-  @override
-  String get games => 'Gry';
-
-  @override
-  String get miniPrograms => 'Miniprogramy';
-
-  @override
-  String done(int count) {
-    return 'Gotowe($count)';
-  }
-
-  @override
-  String get services => 'Uslugi';
-
-  @override
-  String get favorites => 'Ulubione';
-
-  @override
-  String get ordersAndCards => 'Zamowienia i karty';
-
-  @override
-  String get stickers => 'Naklejki';
-
-  @override
-  String statusSetTo(String status) {
-    return 'Status ustawiony na: $status';
-  }
-
-  @override
-  String get avatarUploadFailed => 'Przesylanie awatara nie powiodlo sie';
-
-  @override
-  String get personalProfile => 'Profil osobisty';
-
-  @override
-  String get name => 'Imie';
-
-  @override
-  String get gender => 'Plec';
-
-  @override
-  String get region => 'Region';
-
-  @override
-  String get myQrCode => 'Moj kod QR';
-
-  @override
-  String get poke => 'Szturchnij';
-
-  @override
-  String get ringtone => 'Dzwonek';
-
-  @override
-  String get defaultRingtone => 'Domyslny dzwonek';
-
-  @override
-  String get myAddresses => 'Moje adresy';
-
-  @override
-  String genderSetTo(String gender) {
-    return 'Plec ustawiona na: $gender';
-  }
-
-  @override
-  String get selectRegion => 'Wybierz region';
-
-  @override
-  String get selectCity => 'Wybierz miasto';
-
-  @override
-  String regionSetTo(String region) {
-    return 'Region ustawiony na: $region';
-  }
-
-  @override
-  String get setPoke => 'Ustaw szturchniecie';
-
-  @override
-  String get friendPokedMe => 'Znajomy mnie szturchnal';
-
-  @override
-  String get enterPokeSuffix =>
-      'Wprowadz przyrostek szturchniecia, np.: w ramie';
-
-  @override
-  String get example => 'Przyklad';
-
-  @override
-  String get onTheShoulder => ' w ramie';
-
-  @override
-  String get pokeCleared => 'Szturchniecie wyczyszczone';
-
-  @override
-  String pokeSetTo(String suffix) {
-    return 'Szturchniecie ustawione na: szturchnal mnie$suffix';
-  }
-
-  @override
-  String get editSignature => 'Edytuj podpis';
-
-  @override
-  String get introduceYourself => 'Zdanie, ktore Cie opisuje';
-
-  @override
-  String get signatureCleared => 'Podpis wyczyszczony';
-
-  @override
-  String get signatureUpdated => 'Podpis zaktualizowany';
-
-  @override
-  String get scanToAddFriend =>
-      'Zeskanuj powyzszy kod QR, aby dodac mnie jako znajomego';
-
-  @override
-  String ringtoneSetTo(String ringtone) {
-    return 'Dzwonek ustawiony na: $ringtone';
-  }
-
-  @override
-  String confirmDissolveGroup(String name) {
-    return 'Czy na pewno chcesz rozwiązać \"$name\"? Tej operacji nie można cofnąć.';
-  }
-
-  @override
-  String get enterValidServerAddress => 'Wprowadz prawidlowy adres serwera';
-
-  @override
-  String get emailOtp => 'Kod OTP z e-maila';
-
-  @override
-  String get enterServerAddressFirst => 'Najpierw wprowadz adres serwera';
-
-  @override
-  String get passkeyRequiresServer =>
-      'Logowanie kluczem dostepu wymaga wsparcia serwera';
-
-  @override
-  String get loginAgreement => 'Logujac sie, akceptujesz ';
-
-  @override
-  String get pleaseAgreeToTerms =>
-      'Przeczytaj i zaakceptuj Regulamin i Polityke prywatnosci';
-
-  @override
-  String get registerFailed => 'Rejestracja nie powiodla sie';
-
-  @override
-  String get reenterPassword => 'Wprowadz haslo ponownie';
-
-  @override
-  String get passwordsDoNotMatch => 'Hasla nie pasuja do siebie';
-
-  @override
-  String get inviteCodeBuiltIn => 'Kod zaproszenia (wbudowany)';
-
-  @override
-  String get inviteCodeBuiltInNote =>
-      'Kod zaproszenia jest wbudowany, zwykle nie trzeba go zmieniac';
-
-  @override
-  String get iHaveReadAndAgree => 'Przeczytałem i akceptuje ';
-
-  @override
-  String get startGroupChat => 'Rozpocznij czat grupowy';
-
-  @override
-  String get addFriends => 'Dodaj znajomych';
-
-  @override
-  String get paymentAndCollection => 'Platnosc';
-
-  @override
-  String messagesWithCount(int count) {
-    return 'Wiadomosci($count)';
-  }
-
-  @override
-  String contactCount(int count) {
-    return '$count kontaktow';
-  }
-
-  @override
-  String get addToHomeScreen => 'Dodaj do ekranu glownego';
-
-  @override
-  String recommendedCardTo(String contact, String recipient) {
-    return 'Polecono wizytowke $contact do $recipient';
-  }
-
-  @override
-  String get enterRemarkName => 'Wprowadz nazwe uwagi';
-
-  @override
-  String remarkSetTo(String remark) {
-    return 'Uwaga ustawiona na: $remark';
-  }
-
-  @override
-  String acceptedFriendRequest(String name) {
-    return 'Zaakceptowano zaproszenie od $name';
-  }
-
-  @override
-  String rejectedFriendRequest(String name) {
-    return 'Odrzucono zaproszenie od $name';
-  }
-
-  @override
-  String get groupInvites => 'Zaproszenia do grupy';
-
-  @override
-  String myGroups(int count) {
-    return 'Moje grupy ($count)';
-  }
-
-  @override
-  String get invitedToJoinGroup => 'Zaproszono do dolaczenia do grupy';
-
-  @override
-  String confirmLeaveGroup(String name) {
-    return 'Czy na pewno chcesz opuścić \"$name\"?';
-  }
-
-  @override
-  String get leave => 'Opusc';
-
-  @override
-  String get saveMedia => 'Zapisz';
-
-  @override
-  String get recallThisMessage => 'Wycofac te wiadomosc?';
-
-  @override
-  String get messageRecalled => 'Wiadomosc wycofana';
-
-  @override
-  String get savedToGallery => 'Zapisano w galerii';
-
-  @override
-  String get failedToSave => 'Nie udalo sie zapisac';
-
-  @override
-  String get saving => 'Zapisywanie...';
-
-  @override
-  String get share => 'Udostepnij';
-
-  @override
-  String get saveToGallery => 'Zapisz w galerii';
-
-  @override
-  String downloadFailed(String code) {
-    return 'Pobieranie nie powiodło się: $code';
-  }
-
-  @override
-  String get noMediaUrl => 'Brak dostepnego adresu URL mediow';
-
-  @override
-  String shareFailed(String error) {
-    return 'Udostępnianie nie powiodło się: $error';
-  }
-
-  @override
-  String get failedToLoadImage => 'Nie udalo sie zaladowac obrazu';
-
-  @override
-  String get failedToLoadMoreMessages =>
-      'Nie udalo sie zaladowac wiecej wiadomosci';
-
-  @override
-  String get failedToSend => 'Nie udalo sie wyslac';
-
-  @override
-  String get failedToSendImage => 'Nie udalo sie wyslac obrazu';
-
-  @override
-  String get failedToSendVoice => 'Nie udalo sie wyslac glosu';
-
-  @override
-  String get failedToSendFile => 'Nie udalo sie wyslac pliku';
-
-  @override
-  String get failedToSendVideo => 'Nie udalo sie wyslac wideo';
-
-  @override
-  String get failedToSendLocation => 'Nie udalo sie wyslac lokalizacji';
-
-  @override
-  String get failedToResend => 'Nie udalo sie wyslac ponownie';
-
-  @override
-  String get failedToRecall => 'Nie udalo sie wycofac';
-
-  @override
-  String get failedToReply => 'Nie udalo sie odpowiedziec';
-
-  @override
-  String get failedToAddReaction => 'Nie udalo sie dodac reakcji';
-
-  @override
-  String get failedToSendPoll => 'Nie udalo sie wyslac ankiety';
-
-  @override
-  String get failedToVote => 'Nie udalo sie zaglosowac';
-
-  @override
-  String get failedToLoadMessages => 'Nie udalo sie zaladowac wiadomosci';
-
-  @override
-  String get callFeatureComingSoon =>
-      'Funkcja polaczen glosowych i wideo wkrotce dostepna';
-
-  @override
-  String get cannotForwardRedPacketOrTransfer =>
-      'Czerwone koperty i przelewy nie moga byc przekazywane';
-
-  @override
-  String get videoRecordingFailed =>
-      'Nagrywanie wideo nie powiodlo sie. Sprobuj ponownie.';
-
-  @override
-  String get redPacket => 'Czerwona koperta';
-
-  @override
-  String get music => 'Muzyka';
-
-  @override
-  String get coupon => 'Kupon';
-
-  @override
-  String get gift => 'Prezent';
-
-  @override
-  String get poll => 'Ankieta';
-
-  @override
-  String get text => 'Tekst';
-
-  @override
-  String get link => 'Link';
-
-  @override
-  String get note => 'Notatka';
-
-  @override
-  String get myNotes => 'Moje notatki';
-
-  @override
-  String get today => 'Dzisiaj';
-
-  @override
-  String daysAgoText(int count) {
-    return '$count dni temu';
-  }
-
-  @override
-  String dateFormat(int month, int day) {
-    return '$day/$month';
-  }
-
-  @override
-  String get noFavorites => 'Brak ulubionych';
-
-  @override
-  String get longPressToFavorite =>
-      'Przytrzymaj wiadomosc, aby dodac do ulubionych';
-
-  @override
-  String get newNote => 'Nowa notatka';
-
-  @override
-  String get favoriteLink => 'Ulubiony link';
-
-  @override
-  String get editTags => 'Edytuj tagi';
-
-  @override
-  String get deleteFavorite => 'Usun z ulubionych';
-
-  @override
-  String get deleteFavoriteConfirm =>
-      'Czy na pewno chcesz usunac ten ulubiony element?';
-
-  @override
-  String get noSearchResultsFound => 'Nie znaleziono wynikow';
-
-  @override
-  String get sendRedPacket => 'Wyslij czerwona koperte';
-
-  @override
-  String get amount => 'Kwota';
-
-  @override
-  String get redPacketCover => 'Okladka czerwonej koperty';
-
-  @override
-  String get redPacketType => 'Typ czerwonej koperty';
-
-  @override
-  String get normalRedPacket => 'Zwykla';
-
-  @override
-  String get luckyRedPacket => 'Szczesliwa';
-
-  @override
-  String get redPacketCount => 'Liczba czerwonych kopert';
-
-  @override
-  String get pieces => 'sztuk';
-
-  @override
-  String get putMoneyInRedPacket => 'Wloz pieniadze do czerwonej koperty';
-
-  @override
-  String get redPacketRefundNotice =>
-      'Nieodebrane czerwone koperty zostana zwrocone po 24 godzinach';
-
-  @override
-  String get openRedPacket => 'Otworz';
-
-  @override
-  String get redPacketAllClaimed => 'Wszystkie czerwone koperty odebrane';
-
-  @override
-  String get redPacketExpired => 'Czerwona koperta wygasla';
-
-  @override
-  String get addTransferNote => 'Dodaj notatke do przelewu';
-
-  @override
-  String get yuan => 'PLN';
-
-  @override
-  String get savedToChangeCanTransfer =>
-      'Zapisano na saldo, mozna przelewac bezposrednio';
-
-  @override
-  String get replyWithEmoji => 'Odpowiedz tym emotikonem';
-
-  @override
-  String get claimedYourRedPacket => 'odebral(a) Twoja';
-
-  @override
-  String get claimedRedPacket => 'odebral(a)';
-
-  @override
-  String get otherTyping => 'pisze...';
-
-  @override
-  String get processing => 'Przetwarzanie...';
-
-  @override
-  String get transferCancelled => 'Przelew anulowany';
-
-  @override
-  String get transferFailed => 'Przelew nie powiodl sie';
-
-  @override
-  String get creatingPaymentRequest => 'Tworzenie zadania platnosci...';
-
-  @override
-  String get processingPayment => 'Przetwarzanie platnosci...';
-
-  @override
-  String get paymentFailed => 'Platnosc nie powiodla sie';
-
-  @override
-  String get clickRetry => 'Dotknij, aby ponowic';
-
-  @override
-  String get settingsTitle => 'Ustawienia';
-
-  @override
-  String get editRemark => 'Edytuj uwage';
-
-  @override
-  String get setPermissions => 'Ustaw uprawnienia';
-
-  @override
-  String get recommendToFriends => 'Polec znajomym';
-
-  @override
-  String get setStarFriend => 'Ustaw jako ulubionego znajomego';
-
-  @override
-  String get addToBlacklist => 'Dodaj do czarnej listy';
-
-  @override
-  String get complain => 'Zglos';
-
-  @override
-  String get deleteContact => 'Usun kontakt';
-
-  @override
-  String deleteContactConfirm(String name) {
-    return 'Czy na pewno chcesz usunac $name?';
-  }
-
-  @override
-  String get transferTitle => 'Przelew';
-
-  @override
-  String get receiverAddressLabel => 'Adres odbiorcy';
-
-  @override
-  String get selectTokenLabel => 'Wybierz token';
-
-  @override
-  String get transferAmountLabel => 'Kwota przelewu';
-
-  @override
-  String get memoLabel => 'Notatka (opcjonalna)';
-
-  @override
-  String get enterOrPasteAddressHint => 'Wprowadz lub wklej adres portfela';
-
-  @override
-  String get scanInDevelopment => 'Funkcja skanowania w trakcie rozwoju...';
-
-  @override
-  String get availableLabel => 'Dostepne';
-
-  @override
-  String availableBalanceFormat(String balance, String symbol) {
-    return 'Dostepne: $balance $symbol';
-  }
-
-  @override
-  String get addMemoHint => 'Dodaj notatke';
-
-  @override
-  String get receiveTitle => 'Odbierz';
-
-  @override
-  String get walletNotConnectedTitle => 'Portfel nie jest polaczony';
-
-  @override
-  String get connectWalletFirst => 'Najpierw polacz portfel';
-
-  @override
-  String get sendPaymentRequest => 'Wyslij zadanie platnosci';
-
-  @override
-  String get qrCodeGenerateFailed => 'Generowanie kodu QR nie powiodlo sie';
-
-  @override
-  String get scanQrToPayMe => 'Zeskanuj kod QR, aby mi zaplacic';
-
-  @override
-  String get myWalletAddress => 'Moj adres portfela';
-
-  @override
-  String get createPaymentRequest => 'Utworz zadanie platnosci';
-
-  @override
-  String get selectTokenHint => 'Wybierz token';
-
-  @override
-  String get amountLabel => 'Kwota';
-
-  @override
-  String get cancelButton => 'Anuluj';
-
-  @override
-  String get sendRequestButton => 'Wyslij zadanie';
-
-  @override
-  String get allReadReceipt => 'Wszystko przeczytane';
-
-  @override
-  String readCountReceipt(int count) {
-    return '$count przeczytane';
-  }
-
-  @override
-  String n42IdLabel(String id) {
-    return 'ID N42: $id';
-  }
-
-  @override
-  String get redPacketDefaultGreeting => 'Najlepsze zyczenia';
-
-  @override
-  String senderRedPacket(String name) {
-    return 'Czerwona koperta od $name';
-  }
-
-  @override
-  String get allButton => 'Wszystko';
-
-  @override
-  String get enterValidAddress => 'Wprowadz prawidlowy adres';
-
-  @override
-  String get pleaseSelectToken => 'Wybierz token';
-
-  @override
-  String get receivedTransfer => 'Odebrany przelew';
-
-  @override
-  String get selectForwardRecipient => 'Wybierz odbiorce przekazania';
-
-  @override
-  String get emojiFaces => 'Twarze';
-
-  @override
-  String get emojiHearts => 'Serca';
-
-  @override
-  String get emojiAnimals => 'Zwierzeta';
-
-  @override
-  String get emojiFood => 'Jedzenie';
-
-  @override
-  String get emojiTransport => 'Transport';
-
-  @override
-  String get emojiActivities => 'Aktywnosci';
-
-  @override
-  String get emojiObjects => 'Przedmioty';
-
-  @override
-  String get emojiSymbols => 'Symbole';
-
-  @override
-  String get transferProcessing => 'Przetwarzanie przelewu...';
-
-  @override
-  String senderSentRedPacket(String name) {
-    return '$name wyslal(a) czerwona koperte';
-  }
-
-  @override
-  String get savedToBalance =>
-      'Zapisano na saldo, mozna przelewac bezposrednio';
-
-  @override
-  String get redPacketExpiredOrEmpty =>
-      'Czerwona koperta wygasla/wszystkie odebrane';
-
-  @override
-  String get scanFeatureComingSoon => 'Funkcja skanowania wkrotce dostepna...';
-
-  @override
-  String get setAsStarred => 'Ustaw jako ulubione';
-
-  @override
-  String get addToBlocklist => 'Dodaj do listy zablokowanych';
-
-  @override
-  String get claimedYour => ' odebral(a) Twoja ';
-
-  @override
-  String get claimedText => ' odebral(a) ';
-
-  @override
-  String userTyping(String name) {
-    return '$name pisze...';
-  }
-
-  @override
-  String get typing => 'Pisze...';
-
-  @override
-  String get waitingToReceive => 'Oczekiwanie na odbiór';
-
-  @override
-  String get tapToClaim => 'Dotknij, aby odebrac';
-
-  @override
-  String get hasBeenReceived => 'Zostalo odebrane';
-
-  @override
-  String get getLucky => 'Niech Ci sie szczesci';
-
-  @override
-  String get cameraStartFailed => 'Kamera nie uruchomila sie';
-
-  @override
-  String get unknownError => 'Nieznany blad';
-
-  @override
-  String get placeQrCodeInFrame => 'Umiesc kod QR w ramce, aby zeskanowac';
-
-  @override
-  String get closeManualInput => 'Zamknij reczne wprowadzanie';
-
-  @override
-  String get manualInputUserId => 'Reczne wprowadzanie ID uzytkownika';
-
-  @override
-  String get add => 'Dodaj';
-
-  @override
-  String get ringtoneClear => 'Wyczysc';
-
-  @override
-  String get ringtonePhone => 'Telefon';
-
-  @override
-  String get ringtoneClassic => 'Klasyczny';
-
-  @override
-  String get ringtoneSoft => 'Lagodny';
-
-  @override
-  String get ringtoneVibrate => 'Wibracja';
-
-  @override
-  String get ringtoneSilent => 'Cichy';
-
-  @override
-  String get stop => 'Zatrzymaj';
-
-  @override
-  String get selectRingtone => 'Wybierz dzwonek';
-
-  @override
-  String get loadingRingtones => 'Ladowanie dzwonkow...';
-
-  @override
-  String get noRingtonesFound => 'Nie znaleziono dzwonkow';
-
-  @override
-  String get moodAndThoughts => 'Nastroj i mysli';
-
-  @override
-  String get statusHappy => 'Szczesliwy';
-
-  @override
-  String get statusCracked => 'Rozbity';
-
-  @override
-  String get statusLucky => 'Szczęsliwy';
-
-  @override
-  String get statusSunny => 'Sloneczny';
-
-  @override
-  String get statusTired => 'Zmęczony';
-
-  @override
-  String get statusDaydream => 'Marzenia na jawie';
-
-  @override
-  String get statusRushing => 'W pospichu';
-
-  @override
-  String get statusOverthinking => 'Zamyslony';
-
-  @override
-  String get statusEnergized => 'Pelen energii';
-
-  @override
-  String get workAndStudy => 'Praca i nauka';
-
-  @override
-  String get statusWorking => 'Pracuje';
-
-  @override
-  String get statusStudying => 'Ucze sie';
-
-  @override
-  String get statusBusy => 'Zajety';
-
-  @override
-  String get statusSlacking => 'Obijam sie';
-
-  @override
-  String get statusTraveling => 'Podrozuje';
-
-  @override
-  String get statusGoingHome => 'Wracam do domu';
-
-  @override
-  String get statusDnd => 'Nie przeszkadzac';
-
-  @override
-  String get statusHanging => 'Spotykam sie';
-
-  @override
-  String get statusCheckIn => 'Meldunek';
-
-  @override
-  String get statusExercising => 'Cwicze';
-
-  @override
-  String get statusCoffee => 'Kawa';
-
-  @override
-  String get statusBubbleTea => 'Bubble tea';
-
-  @override
-  String get statusEating => 'Jem';
-
-  @override
-  String get statusParenting => 'Opieka nad dziecmi';
-
-  @override
-  String get statusSavingWorld => 'Ratuje swiat';
-
-  @override
-  String get statusSelfie => 'Selfie';
-
-  @override
-  String get rest => 'Odpoczynek';
-
-  @override
-  String get statusRetreat => 'Odwrot';
-
-  @override
-  String get statusHome => 'W domu';
-
-  @override
-  String get statusSleeping => 'Spie';
-
-  @override
-  String get statusCatLover => 'Kociarz';
-
-  @override
-  String get statusDogWalking => 'Spacer z psem';
-
-  @override
-  String get statusGaming => 'Gram';
-
-  @override
-  String get statusListening => 'Slucham';
-
-  @override
-  String get setStatus => 'Ustaw status';
-
-  @override
-  String get visibleToFriends24h => 'Widoczne dla znajomych przez 24 godziny';
-
-  @override
-  String get writeStatus => 'Napisz status';
-
-  @override
-  String get enterYourStatus => 'Wprowadz swoj status...';
-
-  @override
-  String get ok => 'OK';
-
-  @override
-  String get cameraPermissionRequired =>
-      'Wymagane uprawnienie do kamery, aby skanowac kod QR';
-
-  @override
-  String get cameraPermissionDenied =>
-      'Uprawnienie do kamery zostalo trwale odrzucone. Wlacz je w ustawieniach systemu.';
-
-  @override
-  String get cannotGetCameraPermission =>
-      'Nie mozna uzyskac uprawnienia do kamery';
-
-  @override
-  String permissionCheckError(String error) {
-    return 'Blad sprawdzania uprawnienia: $error';
-  }
-
-  @override
-  String get invalidQrCode => 'Nieprawidlowy kod QR';
-
-  @override
-  String qrCodeProcessFailed(String error) {
-    return 'Nie udalo sie przetworzyc kodu QR: $error';
-  }
-
-  @override
-  String cannotAddFriend(String error) {
-    return 'Nie mozna dodac znajomego: $error';
-  }
-
-  @override
-  String get scanQrCode => 'Skanuj kod QR';
-
-  @override
-  String get checkingCameraPermission => 'Sprawdzanie uprawnienia do kamery...';
-
-  @override
-  String get needCameraPermission => 'Wymagane uprawnienie do kamery';
-
-  @override
-  String get retryPermission => 'Ponow';
-
-  @override
-  String get openSettings => 'Otworz ustawienia';
-
-  @override
-  String get inviteMembers => 'Zapros czlonkow';
-
-  @override
-  String inviteCount(int count) {
-    return 'Zapros($count)';
-  }
-
-  @override
-  String get noShippingAddress => 'Brak adresu dostawy';
-
-  @override
-  String get defaultLabel => 'Domyslny';
-
-  @override
-  String get editAddress => 'Edytuj adres';
-
-  @override
-  String get recipient => 'Odbiorca';
-
-  @override
-  String get enterRecipientName => 'Wprowadz nazwe odbiorcy';
-
-  @override
-  String get phoneNumber => 'Numer telefonu';
-
-  @override
-  String get enterPhoneNumber => 'Wprowadz numer telefonu';
-
-  @override
-  String get regionHint => 'Wojewodztwo/Miasto/Dzielnica';
-
-  @override
-  String get detailedAddress => 'Szczegolowy adres';
-
-  @override
-  String get detailedAddressHint => 'Ulica, numer budynku itp.';
-
-  @override
-  String get setAsDefaultAddress => 'Ustaw jako domyslny adres';
-
-  @override
-  String get pleaseCompleteInfo => 'Wypelnij wszystkie pola';
-
-  @override
-  String get noInvoice => 'Brak faktury';
-
-  @override
-  String get company => 'Firma';
-
-  @override
-  String get taxNumber => 'NIP';
-
-  @override
-  String get editInvoice => 'Edytuj fakture';
-
-  @override
-  String get companyName => 'Nazwa firmy';
-
-  @override
-  String get enterCompanyName => 'Wprowadz nazwe firmy';
-
-  @override
-  String get personalName => 'Imie i nazwisko';
-
-  @override
-  String get enterName => 'Wprowadz imie i nazwisko';
-
-  @override
-  String get taxIdNumber => 'Numer NIP';
-
-  @override
-  String get enterTaxIdNumber => 'Wprowadz numer NIP';
-
-  @override
-  String get bankNameOptional => 'Nazwa banku (opcjonalna)';
-
-  @override
-  String get enterBankName => 'Wprowadz nazwe banku';
-
-  @override
-  String get bankAccountOptional => 'Numer konta bankowego (opcjonalny)';
-
-  @override
-  String get enterBankAccount => 'Wprowadz numer konta bankowego';
-
-  @override
-  String get companyAddressOptional => 'Adres firmy (opcjonalny)';
-
-  @override
-  String get enterCompanyAddress => 'Wprowadz adres firmy';
-
-  @override
-  String get companyPhoneOptional => 'Telefon firmy (opcjonalny)';
-
-  @override
-  String get enterCompanyPhone => 'Wprowadz telefon firmy';
-
-  @override
-  String get setAsDefaultInvoice => 'Ustaw jako domyslna fakture';
-
-  @override
-  String get confirmDeleteAddress => 'Czy na pewno chcesz usunac ten adres?';
-
-  @override
-  String get confirmDeleteInvoice => 'Czy na pewno chcesz usunac te fakture?';
+  String get groupViewAll => 'Zobacz wszystko';
 
   @override
   String get groupOwner => 'Wlasciciel';
@@ -3061,940 +685,2658 @@ class SPl extends S {
   String get groupAdmin => 'Administrator';
 
   @override
-  String get searchMembers => 'Szukaj czlonkow';
+  String get groupInvite => 'Zapros';
 
   @override
-  String totalMembers(int count) {
+  String get commonGroupAnnouncement => 'Ogloszenie grupy';
+
+  @override
+  String get commonNotSet => 'Nie ustawiono';
+
+  @override
+  String get groupDescription => 'Opis grupy';
+
+  @override
+  String get groupPublicGroup => 'Grupa publiczna';
+
+  @override
+  String get commonClearChatHistory => 'Wyczysc historie czatu';
+
+  @override
+  String get commonDissolveGroup => 'Rozwiaz grupe';
+
+  @override
+  String get commonLeaveGroup => 'Opusc grupe';
+
+  @override
+  String get groupChangeGroupName => 'Zmien nazwe grupy';
+
+  @override
+  String get commonEnterGroupName => 'Wprowadz nazwe grupy';
+
+  @override
+  String get commonConfirm => 'Potwierdz';
+
+  @override
+  String get groupEnterGroupDescription => 'Wprowadz opis grupy';
+
+  @override
+  String get groupPublish => 'Opublikuj';
+
+  @override
+  String get chatClearHistoryConfirm =>
+      'Wyczyścic cala historie czatu? Tej operacji nie mozna cofnac.';
+
+  @override
+  String get chatClearAction => 'Wyczysc';
+
+  @override
+  String get commonChatHistoryCleared => 'Historia czatu wyczyszczona';
+
+  @override
+  String get commonDissolve => 'Rozwiaz';
+
+  @override
+  String get groupQrCode => 'Kod QR grupy';
+
+  @override
+  String get commonSearchChatHistory => 'Szukaj w historii czatu';
+
+  @override
+  String get groupIdCopied => 'ID grupy skopiowano';
+
+  @override
+  String get transferEnterOrPasteAddress => 'Wprowadz lub wklej adres portfela';
+
+  @override
+  String get transferSelectToken => 'Wybierz token';
+
+  @override
+  String get commonTransferAmount => 'Kwota przelewu';
+
+  @override
+  String get transferAvailable => 'Dostepne';
+
+  @override
+  String get transferMemoOptional => 'Notatka (opcjonalna)';
+
+  @override
+  String get transferConfirmTransfer => 'Potwierdz przelew';
+
+  @override
+  String get transferAddressVerified => 'Adres zweryfikowany';
+
+  @override
+  String transferAvailableBalance(String balance, String symbol) {
+    return 'Dostepne: $balance $symbol';
+  }
+
+  @override
+  String get commonEnterAmount => 'Wprowadz kwote';
+
+  @override
+  String get commonRedPacketCountMin =>
+      'Wymagana co najmniej 1 czerwona koperta';
+
+  @override
+  String get commonViewRedPacketDetails => 'Zobacz szczegoly czerwonej koperty';
+
+  @override
+  String get commonEnterTransferAmount => 'Wprowadz kwote przelewu';
+
+  @override
+  String get commonTransferTo => 'Przelew do';
+
+  @override
+  String commonFromSender(String name, Object senderName) {
+    return 'Od $senderName';
+  }
+
+  @override
+  String get commonConfirmReceive => 'Potwierdz odbiór';
+
+  @override
+  String get groupProfile => 'Informacje o grupie';
+
+  @override
+  String get groupRemoveMember => 'Usun z grupy';
+
+  @override
+  String get commonRemove => 'Usun';
+
+  @override
+  String get profileClearStatus => 'Wyczysc status';
+
+  @override
+  String get profileClearStatusConfirm => 'Wyczyścic biezacy status?';
+
+  @override
+  String get profileStatusCleared => 'Status wyczyszczony';
+
+  @override
+  String get profileUserNotExist => 'Uzytkownik nie istnieje';
+
+  @override
+  String get profileUserIdCopied => 'ID uzytkownika skopiowano';
+
+  @override
+  String get commonReport => 'Zglos';
+
+  @override
+  String get profileQrCode => 'Kod QR';
+
+  @override
+  String get profileAvatarUpdated => 'Awatar zaktualizowany';
+
+  @override
+  String commonSelectImageFailed(String error) {
+    return 'Nie udalo sie wybrac obrazu: $error';
+  }
+
+  @override
+  String get profileChangeName => 'Zmien nazwe';
+
+  @override
+  String get profileMale => 'Mezczyzna';
+
+  @override
+  String get profileFemale => 'Kobieta';
+
+  @override
+  String chatFeatureInDev(String feature) {
+    return '$feature w trakcie rozwoju...';
+  }
+
+  @override
+  String profileSaveAddressFailed(String error) {
+    return 'Nie udalo sie zapisac adresu: $error';
+  }
+
+  @override
+  String get profileAddNew => 'Dodaj';
+
+  @override
+  String get profileAddAddress => 'Dodaj adres';
+
+  @override
+  String get profileAddressAdded => 'Adres dodany';
+
+  @override
+  String get profileAddressUpdated => 'Adres zaktualizowany';
+
+  @override
+  String get profileDeleteAddress => 'Usun adres';
+
+  @override
+  String get profileAddressDeleted => 'Adres usuniety';
+
+  @override
+  String profileSaveInvoiceFailed(String error) {
+    return 'Nie udalo sie zapisac faktury: $error';
+  }
+
+  @override
+  String get profileMyInvoices => 'Moje faktury';
+
+  @override
+  String get profileAddInvoice => 'Dodaj fakture';
+
+  @override
+  String get profileInvoiceAdded => 'Faktura dodana';
+
+  @override
+  String get profileInvoiceUpdated => 'Faktura zaktualizowana';
+
+  @override
+  String get profileDeleteInvoice => 'Usun fakture';
+
+  @override
+  String get profileInvoiceDeleted => 'Faktura usunieta';
+
+  @override
+  String get profilePersonal => 'Osobista';
+
+  @override
+  String get groupSelectAtLeastOne => 'Wybierz co najmniej jednego czlonka';
+
+  @override
+  String get chatFileNotExist => 'Plik nie istnieje';
+
+  @override
+  String chatSendFailed(String error) {
+    return 'Wyslanie nie powiodlo sie: $error';
+  }
+
+  @override
+  String get chatCannotOpenBrowser => 'Nie mozna otworzyc przegladarki';
+
+  @override
+  String chatSelectFileFailed(String error) {
+    return 'Nie udalo sie wybrac pliku: $error';
+  }
+
+  @override
+  String settingsSetupFailed(String error) {
+    return 'Konfiguracja nie powiodla sie: $error';
+  }
+
+  @override
+  String get transferEnterValidAmount => 'Wprowadz prawidlowa kwote';
+
+  @override
+  String get commonAddressCopied => 'Adres skopiowany';
+
+  @override
+  String favoriteOpenItem(String content) {
+    return 'Otworz: $content';
+  }
+
+  @override
+  String get favoriteDeleted => 'Usunieto';
+
+  @override
+  String get profileWallet => 'Portfel';
+
+  @override
+  String get chatRecording => 'Nagrywanie';
+
+  @override
+  String get chatInvalidVideoUrl => 'Nieprawidlowy adres URL wideo';
+
+  @override
+  String get chatDownloadFile => 'Pobierz plik';
+
+  @override
+  String get chatClearChatHistoryTitle => 'Wyczysc historie czatu';
+
+  @override
+  String get chatVideoCall => 'Polaczenie wideo';
+
+  @override
+  String get commonVoiceCall => 'Polaczenie glosowe';
+
+  @override
+  String get callLeaveMeeting => 'Opusc spotkanie';
+
+  @override
+  String get chatDetails => 'Szczegoly czatu';
+
+  @override
+  String get chatViewAllGroupMembers => 'Zobacz wszystkich czlonkow';
+
+  @override
+  String get chatGroupName => 'Nazwa grupy';
+
+  @override
+  String get chatGroupNameUpdated => 'Nazwa grupy zaktualizowana';
+
+  @override
+  String get chatUpdateFailed => 'Aktualizacja nie powiodla sie';
+
+  @override
+  String get chatNoPermissionToModify => 'Nie masz uprawnien do modyfikacji';
+
+  @override
+  String get chatGroupManagement => 'Zarzadzanie grupa';
+
+  @override
+  String get chatMyNicknameInGroup => 'Moj pseudonim w grupie';
+
+  @override
+  String get chatPinChat => 'Przypnij czat';
+
+  @override
+  String get chatStrongReminder => 'Silne przypomnienie';
+
+  @override
+  String get chatSetChatBackground => 'Ustaw tlo czatu';
+
+  @override
+  String get chatUnknownFile => 'Nieznany plik';
+
+  @override
+  String get chatDownload => 'Pobierz';
+
+  @override
+  String get chatInvalidLocation => 'Nieprawidlowa lokalizacja';
+
+  @override
+  String get chatTapToCancel => 'Dotknij, aby anulowac';
+
+  @override
+  String chatCaptureFailed(Object error) {
+    return 'Przechwytywanie nie powiodlo sie: $error';
+  }
+
+  @override
+  String get chatProcessingVideo => 'Przetwarzanie wideo...';
+
+  @override
+  String get chatVideoFileNotExist => 'Plik wideo nie istnieje';
+
+  @override
+  String get chatVideoDataEmpty => 'Dane wideo sa puste';
+
+  @override
+  String get chatVideoTooLarge => 'Rozmiar wideo nie moze przekraczac 100MB';
+
+  @override
+  String get chatSendingVideo => 'Wysylanie wideo...';
+
+  @override
+  String chatSendVideoFailed(Object error) {
+    return 'Nie udalo sie wyslac wideo: $error';
+  }
+
+  @override
+  String get chatImageFileNotExist => 'Plik obrazu nie istnieje';
+
+  @override
+  String get commonImageDataEmpty => 'Dane obrazu sa puste';
+
+  @override
+  String get chatSendingImage => 'Wysylanie obrazu...';
+
+  @override
+  String chatSendImageFailed(Object error) {
+    return 'Nie udalo sie wyslac obrazu: $error';
+  }
+
+  @override
+  String get chatSendLocation => 'Wyslij lokalizacje';
+
+  @override
+  String get chatSelectLocationAndSend => 'Wybierz lokalizacje i wyslij';
+
+  @override
+  String get chatShareRealTimeLocation =>
+      'Udostepnij lokalizacje w czasie rzeczywistym';
+
+  @override
+  String get chatShareLocationForOneHour =>
+      'Udostepnij lokalizacje znajomemu przez 1 godzine';
+
+  @override
+  String get chatLocationSent => 'Lokalizacja wyslana';
+
+  @override
+  String get chatSelectMessages => 'Wybierz wiadomosci';
+
+  @override
+  String chatSelectedCount(int count) {
+    return 'Wybrano $count';
+  }
+
+  @override
+  String get chatSelectAll => 'Wybierz wszystko';
+
+  @override
+  String chatGroupChatCount(int count) {
+    return 'Czat grupowy ($count)';
+  }
+
+  @override
+  String get chatPrivateChat => 'Czat prywatny';
+
+  @override
+  String get chatNoMessages => 'Brak wiadomosci';
+
+  @override
+  String get chatSendFirstMessage =>
+      'Wyslij pierwsza wiadomosc, aby rozpoczac rozmowe';
+
+  @override
+  String get chatEncryptionNotice =>
+      'Ten czat jest szyfrowany od konca do konca. Tylko Ty i odbiorca mozecie czytac wiadomosci.';
+
+  @override
+  String get chatMultiForward => 'Przekaz dalej';
+
+  @override
+  String get chatCollect => 'Zbierz';
+
+  @override
+  String get chatNoMembers => 'Brak czlonkow';
+
+  @override
+  String get chatMemberNotFound => 'Czlonek nie zostal znaleziony';
+
+  @override
+  String get chatVoiceFileNotExist => 'Plik glosowy nie istnieje';
+
+  @override
+  String get chatVoiceFileEmpty => 'Plik glosowy jest pusty';
+
+  @override
+  String get chatSendingVoice => 'Wysylanie glosu...';
+
+  @override
+  String chatSendVoiceFailed(Object error) {
+    return 'Nie udalo sie wyslac glosu: $error';
+  }
+
+  @override
+  String get chatMessageForwarded => 'Wiadomosc przekazana';
+
+  @override
+  String chatForwardFailed(Object error) {
+    return 'Przekazanie nie powiodlo sie: $error';
+  }
+
+  @override
+  String get chatUnfavorited => 'Usunieto z ulubionych';
+
+  @override
+  String get chatFavorited => 'Dodano do ulubionych';
+
+  @override
+  String get chatReactionAdded => 'Reakcja dodana';
+
+  @override
+  String get chatReactionRemoved => 'Reakcja usunieta';
+
+  @override
+  String get chatFailedMessageDeleted => 'Nieudana wiadomosc usunieta';
+
+  @override
+  String get chatDeleteMessages => 'Usun wiadomosci';
+
+  @override
+  String chatDeleteMessagesConfirm(Object count) {
+    return 'Czy na pewno chcesz usunac $count wiadomosci?';
+  }
+
+  @override
+  String chatNoteOtherMessages(Object count) {
+    return 'Uwaga: $count wiadomosci jest od innych i zostana usuniete tylko dla Ciebie.';
+  }
+
+  @override
+  String chatMyMessagesWillBeRecalled(Object count) {
+    return '$count wiadomosci od Ciebie zostanie wycofanych dla wszystkich.';
+  }
+
+  @override
+  String chatRecalledCount(Object count, Object localCount) {
+    return 'Wycofano $count wiadomosci, $localCount usunieto tylko dla Ciebie';
+  }
+
+  @override
+  String chatRecalledMessages(Object count) {
+    return 'Wycofano $count wiadomosci';
+  }
+
+  @override
+  String chatDeletedLocally(Object count) {
+    return '$count wiadomosci usunieto tylko dla Ciebie';
+  }
+
+  @override
+  String chatForwardedCount(Object count) {
+    return 'Przekazano $count wiadomosci';
+  }
+
+  @override
+  String chatForwardComplete(Object failed, Object success) {
+    return 'Przekazanie zakonczone: $success udanych, $failed nieudanych';
+  }
+
+  @override
+  String get chatRemindOnlyInGroup =>
+      'Funkcja przypomnienia jest dostepna tylko w czacie grupowym';
+
+  @override
+  String get chatOnlyTextSearchable =>
+      'Mozna wyszukiwac tylko wiadomosci tekstowe';
+
+  @override
+  String chatSearchFor(Object text) {
+    return 'Szukaj \"$text\"';
+  }
+
+  @override
+  String get chatBaiduSearch => 'Wyszukiwanie Baidu';
+
+  @override
+  String get chatGoogleSearch => 'Wyszukiwanie Google';
+
+  @override
+  String get chatBingSearch => 'Wyszukiwanie Bing';
+
+  @override
+  String get chatCalling => 'Dzwonie...';
+
+  @override
+  String get chatRinging => 'Dzwoni...';
+
+  @override
+  String get chatInCall => 'W trakcie polaczenia';
+
+  @override
+  String commonFeatureInDevelopment(String feature) {
+    return 'Funkcja w trakcie rozwoju...';
+  }
+
+  @override
+  String chatCollectMessages(Object count) {
+    return 'Zebrano $count wiadomosci';
+  }
+
+  @override
+  String commonMemberCount(int count) {
     return '$count czlonkow';
   }
 
   @override
-  String get removeFromGroup => 'Usun z grupy';
+  String groupDone(int count) {
+    return 'Gotowe($count)';
+  }
 
   @override
-  String confirmRemoveMember(String name) {
+  String get profileServices => 'Uslugi';
+
+  @override
+  String get commonFavorites => 'Ulubione';
+
+  @override
+  String get profileOrdersAndCards => 'Zamowienia i karty';
+
+  @override
+  String get profileStickers => 'Naklejki';
+
+  @override
+  String profileStatusSetTo(String status) {
+    return 'Status ustawiony na: $status';
+  }
+
+  @override
+  String get profileAvatarUploadFailed =>
+      'Przesylanie awatara nie powiodlo sie';
+
+  @override
+  String get profilePersonalProfile => 'Profil osobisty';
+
+  @override
+  String get profileName => 'Imie';
+
+  @override
+  String get profileGender => 'Plec';
+
+  @override
+  String get profileRegion => 'Region';
+
+  @override
+  String get commonMyQrCode => 'Moj kod QR';
+
+  @override
+  String get profilePoke => 'Szturchnij';
+
+  @override
+  String get profileRingtone => 'Dzwonek';
+
+  @override
+  String get profileDefaultRingtone => 'Domyslny dzwonek';
+
+  @override
+  String get profileMyAddresses => 'Moje adresy';
+
+  @override
+  String profileGenderSetTo(String gender) {
+    return 'Plec ustawiona na: $gender';
+  }
+
+  @override
+  String get profileSelectRegion => 'Wybierz region';
+
+  @override
+  String get profileSelectCity => 'Wybierz miasto';
+
+  @override
+  String profileRegionSetTo(String region) {
+    return 'Region ustawiony na: $region';
+  }
+
+  @override
+  String get profileSetPoke => 'Ustaw szturchniecie';
+
+  @override
+  String get profileFriendPokedMe => 'Znajomy mnie szturchnal';
+
+  @override
+  String get profileExample => 'Przyklad';
+
+  @override
+  String get profileOnTheShoulder => ' w ramie';
+
+  @override
+  String get profilePokeCleared => 'Szturchniecie wyczyszczone';
+
+  @override
+  String profilePokeSetTo(String suffix) {
+    return 'Szturchniecie ustawione na: szturchnal mnie$suffix';
+  }
+
+  @override
+  String get profileEditSignature => 'Edytuj podpis';
+
+  @override
+  String get profileIntroduceYourself => 'Zdanie, ktore Cie opisuje';
+
+  @override
+  String get profileSignatureCleared => 'Podpis wyczyszczony';
+
+  @override
+  String get profileSignatureUpdated => 'Podpis zaktualizowany';
+
+  @override
+  String get profileScanToAddFriend =>
+      'Zeskanuj powyzszy kod QR, aby dodac mnie jako znajomego';
+
+  @override
+  String profileRingtoneSetTo(String ringtone) {
+    return 'Dzwonek ustawiony na: $ringtone';
+  }
+
+  @override
+  String commonConfirmDissolveGroup(String name) {
+    return 'Czy na pewno chcesz rozwiązać \"$name\"? Tej operacji nie można cofnąć.';
+  }
+
+  @override
+  String get authEnterValidServerAddress => 'Wprowadz prawidlowy adres serwera';
+
+  @override
+  String get authEmailOtp => 'Kod OTP z e-maila';
+
+  @override
+  String get authEnterServerAddressFirst => 'Najpierw wprowadz adres serwera';
+
+  @override
+  String get authPasskeyRequiresServer =>
+      'Logowanie kluczem dostepu wymaga wsparcia serwera';
+
+  @override
+  String get authLoginAgreement => 'Logujac sie, akceptujesz ';
+
+  @override
+  String get authPleaseAgreeToTerms =>
+      'Przeczytaj i zaakceptuj Regulamin i Polityke prywatnosci';
+
+  @override
+  String get authRegisterFailed => 'Rejestracja nie powiodla sie';
+
+  @override
+  String get commonReenterPassword => 'Wprowadz haslo ponownie';
+
+  @override
+  String get commonPasswordsDoNotMatch => 'Hasla nie pasuja do siebie';
+
+  @override
+  String get authInviteCodeBuiltIn => 'Kod zaproszenia (wbudowany)';
+
+  @override
+  String get authInviteCodeBuiltInNote =>
+      'Kod zaproszenia jest wbudowany, zwykle nie trzeba go zmieniac';
+
+  @override
+  String get authIHaveReadAndAgree => 'Przeczytałem i akceptuje ';
+
+  @override
+  String get mainStartGroupChat => 'Rozpocznij czat grupowy';
+
+  @override
+  String get mainAddFriends => 'Dodaj znajomych';
+
+  @override
+  String get mainPaymentAndCollection => 'Platnosc';
+
+  @override
+  String contactCount(int count) {
+    return '$count kontaktow';
+  }
+
+  @override
+  String get contactAddToHomeScreen => 'Dodaj do ekranu glownego';
+
+  @override
+  String contactRecommendedCardTo(String contact, String recipient) {
+    return 'Polecono wizytowke $contact do $recipient';
+  }
+
+  @override
+  String get contactEnterRemarkName => 'Wprowadz nazwe uwagi';
+
+  @override
+  String contactRemarkSetTo(String remark) {
+    return 'Uwaga ustawiona na: $remark';
+  }
+
+  @override
+  String contactAcceptedFriendRequest(String name) {
+    return 'Zaakceptowano zaproszenie od $name';
+  }
+
+  @override
+  String contactRejectedFriendRequest(String name) {
+    return 'Odrzucono zaproszenie od $name';
+  }
+
+  @override
+  String get commonGroupInvites => 'Zaproszenia do grupy';
+
+  @override
+  String commonMyGroups(int count) {
+    return 'Moje grupy ($count)';
+  }
+
+  @override
+  String get commonInvitedToJoinGroup => 'Zaproszono do dolaczenia do grupy';
+
+  @override
+  String commonConfirmLeaveGroup(String name) {
+    return 'Czy na pewno chcesz opuścić \"$name\"?';
+  }
+
+  @override
+  String get commonLeave => 'Opusc';
+
+  @override
+  String get commonRecallThisMessage => 'Wycofac te wiadomosc?';
+
+  @override
+  String get commonSavedToGallery => 'Zapisano w galerii';
+
+  @override
+  String get commonFailedToSave => 'Nie udalo sie zapisac';
+
+  @override
+  String get chatSaving => 'Zapisywanie...';
+
+  @override
+  String get commonShare => 'Udostepnij';
+
+  @override
+  String get chatSaveToGallery => 'Zapisz w galerii';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Pobieranie nie powiodło się: $code';
+  }
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Udostępnianie nie powiodło się: $error';
+  }
+
+  @override
+  String get chatFailedToLoadImage => 'Nie udalo sie zaladowac obrazu';
+
+  @override
+  String get chatVideoRecordingFailed =>
+      'Nagrywanie wideo nie powiodlo sie. Sprobuj ponownie.';
+
+  @override
+  String get profileRedPacket => 'Czerwona koperta';
+
+  @override
+  String get commonMusic => 'Muzyka';
+
+  @override
+  String get commonCoupon => 'Kupon';
+
+  @override
+  String get commonGift => 'Prezent';
+
+  @override
+  String get commonPoll => 'Ankieta';
+
+  @override
+  String get favoriteText => 'Tekst';
+
+  @override
+  String get favoriteLinkLabel => 'Link';
+
+  @override
+  String get favoriteNote => 'Notatka';
+
+  @override
+  String get favoriteMyNotes => 'Moje notatki';
+
+  @override
+  String get favoriteToday => 'Dzisiaj';
+
+  @override
+  String favoriteDaysAgoText(int count) {
+    return '$count dni temu';
+  }
+
+  @override
+  String favoriteDateFormat(int month, int day) {
+    return '$day/$month';
+  }
+
+  @override
+  String get favoriteNoFavorites => 'Brak ulubionych';
+
+  @override
+  String get favoriteLongPressToFavorite =>
+      'Przytrzymaj wiadomosc, aby dodac do ulubionych';
+
+  @override
+  String get favoriteNewNote => 'Nowa notatka';
+
+  @override
+  String get favoriteLink => 'Ulubiony link';
+
+  @override
+  String get favoriteEditTags => 'Edytuj tagi';
+
+  @override
+  String get favoriteDeleteFavorite => 'Usun z ulubionych';
+
+  @override
+  String get favoriteDeleteFavoriteConfirm =>
+      'Czy na pewno chcesz usunac ten ulubiony element?';
+
+  @override
+  String get favoriteNoSearchResultsFound => 'Nie znaleziono wynikow';
+
+  @override
+  String get commonSendRedPacket => 'Wyslij czerwona koperte';
+
+  @override
+  String get transferAmount => 'Kwota';
+
+  @override
+  String get commonRedPacketCover => 'Okladka czerwonej koperty';
+
+  @override
+  String get commonRedPacketType => 'Typ czerwonej koperty';
+
+  @override
+  String get commonNormalRedPacket => 'Zwykla';
+
+  @override
+  String get commonLuckyRedPacket => 'Szczesliwa';
+
+  @override
+  String get commonRedPacketCount => 'Liczba czerwonych kopert';
+
+  @override
+  String get commonPieces => 'sztuk';
+
+  @override
+  String get commonPutMoneyInRedPacket => 'Wloz pieniadze do czerwonej koperty';
+
+  @override
+  String get commonRedPacketRefundNotice =>
+      'Nieodebrane czerwone koperty zostana zwrocone po 24 godzinach';
+
+  @override
+  String get commonOpenRedPacket => 'Otworz';
+
+  @override
+  String get commonRedPacketAllClaimed => 'Wszystkie czerwone koperty odebrane';
+
+  @override
+  String get commonRedPacketExpired => 'Czerwona koperta wygasla';
+
+  @override
+  String get commonAddTransferNote => 'Dodaj notatke do przelewu';
+
+  @override
+  String get commonYuan => 'PLN';
+
+  @override
+  String get commonReplyWithEmoji => 'Odpowiedz tym emotikonem';
+
+  @override
+  String get contactEditRemark => 'Edytuj uwage';
+
+  @override
+  String get contactSetPermissions => 'Ustaw uprawnienia';
+
+  @override
+  String get profileAddToBlacklist => 'Dodaj do czarnej listy';
+
+  @override
+  String get contactDeleteContact => 'Usun kontakt';
+
+  @override
+  String contactDeleteContactConfirm(String name) {
+    return 'Czy na pewno chcesz usunac $name?';
+  }
+
+  @override
+  String get transferTitle => 'Przelew';
+
+  @override
+  String get transferReceiverAddressLabel => 'Adres odbiorcy';
+
+  @override
+  String get transferSelectTokenLabel => 'Wybierz token';
+
+  @override
+  String get transferAmountLabel => 'Kwota przelewu';
+
+  @override
+  String get transferMemoLabel => 'Notatka (opcjonalna)';
+
+  @override
+  String get transferAddMemoHint => 'Dodaj notatke';
+
+  @override
+  String get transferSendPaymentRequest => 'Wyslij zadanie platnosci';
+
+  @override
+  String get transferQrCodeGenerateFailed =>
+      'Generowanie kodu QR nie powiodlo sie';
+
+  @override
+  String get transferScanQrToPayMe => 'Zeskanuj kod QR, aby mi zaplacic';
+
+  @override
+  String get transferMyWalletAddress => 'Moj adres portfela';
+
+  @override
+  String get transferCreatePaymentRequest => 'Utworz zadanie platnosci';
+
+  @override
+  String profileN42IdLabel(String id) {
+    return 'ID N42: $id';
+  }
+
+  @override
+  String get commonRedPacketDefaultGreeting => 'Najlepsze zyczenia';
+
+  @override
+  String commonSenderRedPacket(String name) {
+    return 'Czerwona koperta od $name';
+  }
+
+  @override
+  String get transferEnterValidAddress => 'Wprowadz prawidlowy adres';
+
+  @override
+  String get transferPleaseSelectToken => 'Wybierz token';
+
+  @override
+  String get commonReceivedTransfer => 'Odebrany przelew';
+
+  @override
+  String commonSenderSentRedPacket(String name) {
+    return '$name wyslal(a) czerwona koperte';
+  }
+
+  @override
+  String get commonSavedToBalance =>
+      'Zapisano na saldo, mozna przelewac bezposrednio';
+
+  @override
+  String get commonRedPacketExpiredOrEmpty =>
+      'Czerwona koperta wygasla/wszystkie odebrane';
+
+  @override
+  String get transferScanFeatureComingSoon =>
+      'Funkcja skanowania wkrotce dostepna...';
+
+  @override
+  String get contactSetAsStarred => 'Ustaw jako ulubione';
+
+  @override
+  String get contactAddToBlocklist => 'Dodaj do listy zablokowanych';
+
+  @override
+  String get commonClaimedYour => ' odebral(a) Twoja ';
+
+  @override
+  String get commonClaimedText => ' odebral(a) ';
+
+  @override
+  String commonUserTyping(String name) {
+    return '$name pisze...';
+  }
+
+  @override
+  String get commonTyping => 'Pisze...';
+
+  @override
+  String get commonWaitingToReceive => 'Oczekiwanie na odbiór';
+
+  @override
+  String get commonTapToClaim => 'Dotknij, aby odebrac';
+
+  @override
+  String get commonHasBeenReceived => 'Zostalo odebrane';
+
+  @override
+  String get commonGetLucky => 'Niech Ci sie szczesci';
+
+  @override
+  String get qrcodeCameraStartFailed => 'Kamera nie uruchomila sie';
+
+  @override
+  String get qrcodeUnknownError => 'Nieznany blad';
+
+  @override
+  String get qrcodePlaceQrCodeInFrame =>
+      'Umiesc kod QR w ramce, aby zeskanowac';
+
+  @override
+  String get qrcodeCloseManualInput => 'Zamknij reczne wprowadzanie';
+
+  @override
+  String get qrcodeManualInputUserId => 'Reczne wprowadzanie ID uzytkownika';
+
+  @override
+  String get commonAdd => 'Dodaj';
+
+  @override
+  String get profileSetStatus => 'Ustaw status';
+
+  @override
+  String get profileVisibleToFriends24h =>
+      'Widoczne dla znajomych przez 24 godziny';
+
+  @override
+  String get profileWriteStatus => 'Napisz status';
+
+  @override
+  String get profileEnterYourStatus => 'Wprowadz swoj status...';
+
+  @override
+  String get profileOk => 'OK';
+
+  @override
+  String get qrcodeCameraPermissionRequired =>
+      'Wymagane uprawnienie do kamery, aby skanowac kod QR';
+
+  @override
+  String get qrcodeCameraPermissionDenied =>
+      'Uprawnienie do kamery zostalo trwale odrzucone. Wlacz je w ustawieniach systemu.';
+
+  @override
+  String qrcodePermissionCheckError(String error) {
+    return 'Blad sprawdzania uprawnienia: $error';
+  }
+
+  @override
+  String get qrcodeInvalidQrCode => 'Nieprawidlowy kod QR';
+
+  @override
+  String qrcodeCannotAddFriend(String error) {
+    return 'Nie mozna dodac znajomego: $error';
+  }
+
+  @override
+  String get qrcodeScanQrCode => 'Skanuj kod QR';
+
+  @override
+  String get qrcodeCheckingCameraPermission =>
+      'Sprawdzanie uprawnienia do kamery...';
+
+  @override
+  String get qrcodeNeedCameraPermission => 'Wymagane uprawnienie do kamery';
+
+  @override
+  String get qrcodeRetryPermission => 'Ponow';
+
+  @override
+  String get qrcodeOpenSettings => 'Otworz ustawienia';
+
+  @override
+  String get groupInviteMembers => 'Zapros czlonkow';
+
+  @override
+  String groupInviteCount(int count) {
+    return 'Zapros($count)';
+  }
+
+  @override
+  String get profileNoShippingAddress => 'Brak adresu dostawy';
+
+  @override
+  String get profileDefaultLabel => 'Domyslny';
+
+  @override
+  String get profileNoInvoice => 'Brak faktury';
+
+  @override
+  String get profileCompany => 'Firma';
+
+  @override
+  String get profileTaxNumber => 'NIP';
+
+  @override
+  String get profileConfirmDeleteAddress =>
+      'Czy na pewno chcesz usunac ten adres?';
+
+  @override
+  String get profileConfirmDeleteInvoice =>
+      'Czy na pewno chcesz usunac te fakture?';
+
+  @override
+  String get commonGroupOwner => 'Wlasciciel';
+
+  @override
+  String get commonGroupAdmin => 'Administrator';
+
+  @override
+  String get groupSearchMembers => 'Szukaj czlonkow';
+
+  @override
+  String groupTotalMembers(int count) {
+    return '$count czlonkow';
+  }
+
+  @override
+  String get chatRemoveFromGroup => 'Usun z grupy';
+
+  @override
+  String groupConfirmRemoveMember(String name) {
     return 'Czy na pewno chcesz usunac \"$name\" z grupy?';
   }
 
   @override
-  String get setAsAdmin => 'Ustaw jako administratora';
+  String get chatUnknownSong => 'Nieznany utwor';
 
   @override
-  String get removeAdmin => 'Usun administratora';
+  String get chatUnknownArtist => 'Nieznany artysta';
 
   @override
-  String get deleteContactSuccess => 'Kontakt usuniety';
+  String get chatUnknownContact => 'Nieznany kontakt';
 
   @override
-  String get unknownSong => 'Nieznany utwor';
+  String get chatPersonalCard => 'Wizytowka';
 
   @override
-  String get unknownArtist => 'Nieznany artysta';
+  String get chatSingleChoice => 'Pojedynczy wybor';
 
   @override
-  String get unknownContact => 'Nieznany kontakt';
+  String get chatMultiChoice => 'Wielokrotny wybor';
 
   @override
-  String get personalCard => 'Wizytowka';
+  String get chatEnded => 'Zakonczone';
 
   @override
-  String get singleChoice => 'Pojedynczy wybor';
+  String get chatEndPollButton => 'Zakoncz ankiete';
 
   @override
-  String get multiChoice => 'Wielokrotny wybor';
-
-  @override
-  String get ended => 'Zakonczone';
-
-  @override
-  String get endPollButton => 'Zakoncz ankiete';
-
-  @override
-  String get createPoll => 'Utworz ankiete';
-
-  @override
-  String get pollQuestion => 'Pytanie ankiety';
-
-  @override
-  String get pollOptions => 'Opcje ankiety';
-
-  @override
-  String optionPlaceholder(int index) {
-    return 'Opcja $index';
-  }
-
-  @override
-  String get addOption => 'Dodaj opcje';
-
-  @override
-  String get pollSettings => 'Ustawienia ankiety';
-
-  @override
-  String get anonymousPoll => 'Anonimowa ankieta';
-
-  @override
-  String get pollHint =>
+  String get chatPollHint =>
       'Ankieta bedzie wyswietlana na czacie. Czlonkowie grupy moga glosowac.';
 
   @override
-  String get searchSongOrArtist => 'Szukaj utworu lub artysty';
+  String get chatSearchSongOrArtist => 'Szukaj utworu lub artysty';
 
   @override
-  String get noSongsFound => 'Nie znaleziono utworow';
+  String get chatNoSongsFound => 'Nie znaleziono utworow';
 
   @override
-  String get supportedMusicPlatforms =>
-      'Obsluguje linki muzyczne z NetEase, QQ Music itp.';
+  String get chatSongNameOptional => 'Nazwa utworu (opcjonalna)';
 
   @override
-  String get songNameOptional => 'Nazwa utworu (opcjonalna)';
+  String get chatEnterSongName => 'Wprowadz nazwe utworu';
 
   @override
-  String get enterSongName => 'Wprowadz nazwe utworu';
+  String get chatArtistNameOptional => 'Nazwa artysty (opcjonalna)';
 
   @override
-  String get artistNameOptional => 'Nazwa artysty (opcjonalna)';
+  String get chatEnterArtistName => 'Wprowadz nazwe artysty';
 
   @override
-  String get enterArtistName => 'Wprowadz nazwe artysty';
-
-  @override
-  String get shareSong => 'Udostepnij utwor';
-
-  @override
-  String get realTimeLocationSharing =>
+  String get chatRealTimeLocationSharing =>
       'Udostepnianie lokalizacji w czasie rzeczywistym w trakcie rozwoju...';
 
   @override
-  String get voiceCallFeatureInDev =>
+  String get profileVoiceCallFeatureInDev =>
       'Funkcja polaczenia glosowego w trakcie rozwoju...';
 
   @override
-  String get reportFeatureInDev => 'Funkcja zglaszania w trakcie rozwoju...';
+  String get profileReportFeatureInDev =>
+      'Funkcja zglaszania w trakcie rozwoju...';
 
   @override
-  String get shareFeatureInDev => 'Funkcja udostepniania w trakcie rozwoju...';
+  String get profileShareFeatureInDev =>
+      'Funkcja udostepniania w trakcie rozwoju...';
 
   @override
-  String get qrCodeFeatureInDev => 'Funkcja kodu QR w trakcie rozwoju...';
+  String get profileQrCodeFeatureInDev =>
+      'Funkcja kodu QR w trakcie rozwoju...';
 
   @override
-  String get scanQrToAddMe =>
+  String get qrcodeScanQrToAddMe =>
       'Zeskanuj powyzszy kod QR, aby dodac mnie jako znajomego';
 
   @override
-  String get saveToAlbum => 'Zapisz w albumie';
+  String get qrcodeSaveToAlbum => 'Zapisz w albumie';
 
   @override
-  String get changeStyle => 'Zmien styl';
+  String get qrcodeChangeStyle => 'Zmien styl';
 
   @override
-  String get copyId => 'Kopiuj ID';
+  String get qrcodeCopyId => 'Kopiuj ID';
 
   @override
-  String get idCopied => 'ID skopiowane';
+  String get qrcodeIdCopied => 'ID skopiowane';
 
   @override
-  String get shareFeatureComingSoon => 'Funkcja udostepniania wkrotce dostepna';
+  String get qrcodeMoreStylesFeatureComingSoon =>
+      'Wiecej stylow wkrotce dostepnych';
 
   @override
-  String get saveFeatureComingSoon => 'Funkcja zapisywania wkrotce dostepna';
+  String get profileBio => 'Bio';
 
   @override
-  String get moreStylesFeatureComingSoon => 'Wiecej stylow wkrotce dostepnych';
+  String get profileHomeServer => 'Serwer';
 
   @override
-  String get confirmEndPoll => 'Czy na pewno chcesz zakonczyc te ankiete?';
+  String get profileShareContactCard => 'Udostepnij wizytowke';
 
   @override
-  String get cannotVoteAfterEnd => 'Po zakonczeniu nie bedzie mozna glosowac.';
+  String get profileRemoveFromBlacklist => 'Usun z czarnej listy';
 
   @override
-  String get bio => 'Bio';
-
-  @override
-  String get homeServer => 'Serwer';
-
-  @override
-  String get shareContactCard => 'Udostepnij wizytowke';
-
-  @override
-  String get removeFromBlacklist => 'Usun z czarnej listy';
-
-  @override
-  String get confirmAddBlacklist =>
+  String get profileConfirmAddBlacklist =>
       'Czy na pewno chcesz dodac tego uzytkownika do czarnej listy? Nie bedziesz otrzymywac od niego wiadomosci.';
 
   @override
-  String get confirmRemoveBlacklist =>
+  String get profileConfirmRemoveBlacklist =>
       'Czy na pewno chcesz usunac tego uzytkownika z czarnej listy?';
 
   @override
-  String get remarkSaved => 'Uwaga zapisana';
+  String get profileRemarkSaved => 'Uwaga zapisana';
 
   @override
-  String get remarkCleared => 'Uwaga wyczyszczona';
+  String get profileRemarkCleared => 'Uwaga wyczyszczona';
 
   @override
-  String get receive => 'Odbierz';
+  String get transferReceive => 'Odbierz';
 
   @override
-  String get pleaseConnectWallet => 'Najpierw polacz portfel';
+  String get transferPleaseConnectWallet => 'Najpierw polacz portfel';
 
   @override
-  String get sendRequest => 'Wyslij zadanie';
+  String get transferSendRequest => 'Wyslij zadanie';
 
   @override
-  String get pleaseEnterValidAmount => 'Wprowadz prawidlowa kwote';
+  String get transferPleaseEnterValidAmount => 'Wprowadz prawidlowa kwote';
 
   @override
   String get searchPlaceholder => 'Szukaj kontaktow, grup, wiadomosci';
 
   @override
-  String get enterKeywordToSearch => 'Wprowadz slowo kluczowe, aby wyszukac';
+  String get searchEnterKeywordToSearch =>
+      'Wprowadz slowo kluczowe, aby wyszukac';
 
   @override
-  String get clearHistory => 'Wyczysc';
+  String get searchClearHistory => 'Wyczysc';
 
   @override
-  String noResultsForQuery(String query) {
+  String searchNoResultsForQuery(String query) {
     return 'Brak wynikow dla \"$query\"';
   }
 
   @override
-  String get allResults => 'Wszystko';
+  String get searchAllResults => 'Wszystko';
 
   @override
   String get searchInChat => 'Szukaj na czacie';
 
   @override
-  String get contactLabel => 'Kontakt';
+  String get searchContactLabel => 'Kontakt';
 
   @override
-  String get groupLabel => 'Grupa';
+  String get searchGroupLabel => 'Grupa';
 
   @override
-  String get conversationLabel => 'Rozmowa';
+  String get searchConversationLabel => 'Rozmowa';
 
   @override
-  String get messageLabel => 'Wiadomosc';
+  String get searchMessageLabel => 'Wiadomosc';
 
   @override
-  String get securityTitle => 'Bezpieczenstwo';
+  String get settingsSecurityTitle => 'Bezpieczenstwo';
 
   @override
-  String get keyBackup => 'Kopia zapasowa kluczy';
+  String get settingsKeyBackup => 'Kopia zapasowa kluczy';
 
   @override
-  String get backupEncryptionKeys => 'Kopia zapasowa kluczy szyfrowania';
+  String get settingsBackupEncryptionKeys =>
+      'Kopia zapasowa kluczy szyfrowania';
 
   @override
-  String keysBackedUp(int count) {
+  String settingsKeysBackedUp(int count) {
     return '$count kluczy skopiowanych';
   }
 
   @override
-  String get backupNotSet => 'Kopia zapasowa nie ustawiona';
+  String get settingsBackupNotSet => 'Kopia zapasowa nie ustawiona';
 
   @override
-  String get restoreKeys => 'Przywroc klucze';
+  String get settingsRestoreKeys => 'Przywroc klucze';
 
   @override
-  String get restoreKeysFromBackup =>
+  String get settingsRestoreKeysFromBackup =>
       'Przywroc klucze szyfrowania z kopii zapasowej';
 
   @override
-  String get exportKeys => 'Eksportuj klucze';
+  String get settingsExportKeys => 'Eksportuj klucze';
 
   @override
-  String get exportKeysToFile => 'Eksportuj klucze do pliku';
+  String get settingsExportKeysToFile => 'Eksportuj klucze do pliku';
 
   @override
-  String get loggedInDevices => 'Zalogowane urzadzenia';
+  String get settingsLoggedInDevices => 'Zalogowane urzadzenia';
 
   @override
-  String get noOtherDevices => 'Brak innych urzadzen';
+  String get settingsNoOtherDevices => 'Brak innych urzadzen';
 
   @override
-  String get verified => 'Zweryfikowane';
+  String get settingsVerified => 'Zweryfikowane';
 
   @override
-  String get unverified => 'Niezweryfikowane';
+  String get settingsUnverified => 'Niezweryfikowane';
 
   @override
-  String get advanced => 'Zaawansowane';
+  String get settingsAdvanced => 'Zaawansowane';
 
   @override
-  String get crossSigning => 'Podpisywanie krzyzowe';
+  String get settingsCrossSigning => 'Podpisywanie krzyzowe';
 
   @override
-  String get enabled => 'Wlaczone';
+  String get settingsEnabled => 'Wlaczone';
 
   @override
-  String get notEnabled => 'Nie wlaczone';
+  String get settingsNotEnabled => 'Nie wlaczone';
 
   @override
-  String get resetEncryption => 'Zresetuj szyfrowanie';
+  String get settingsResetEncryption => 'Zresetuj szyfrowanie';
 
   @override
-  String get deleteAllEncryptionKeys => 'Usun wszystkie klucze szyfrowania';
+  String get settingsDeleteAllEncryptionKeys =>
+      'Usun wszystkie klucze szyfrowania';
 
   @override
-  String get encryptionNotSupported => 'Szyfrowanie nie jest obslugiwane';
+  String get settingsEncryptionNotSupported =>
+      'Szyfrowanie nie jest obslugiwane';
 
   @override
-  String get notInitialized => 'Nie zainicjowano';
+  String get settingsNotInitialized => 'Nie zainicjowano';
 
   @override
-  String get backupKeyTitle => 'Kopia zapasowa kluczy';
+  String get settingsBackupKeyTitle => 'Kopia zapasowa kluczy';
 
   @override
-  String get backupKeyMessage =>
+  String get settingsBackupKeyMessage =>
       'Utworzyc nowa kopie zapasowa kluczy? Pomoze to przywrocic zaszyfrowane wiadomosci na nowym urzadzeniu.';
 
   @override
-  String get backup => 'Kopia zapasowa';
+  String get settingsBackup => 'Kopia zapasowa';
 
   @override
-  String get restoreKeyTitle => 'Przywroc klucze';
+  String get settingsRestoreKeyTitle => 'Przywroc klucze';
 
   @override
-  String get restoreKeyMessage =>
+  String get settingsRestoreKeyMessage =>
       'Wprowadz haslo odzyskiwania lub klucz odzyskiwania, aby przywrocic zaszyfrowane wiadomosci.';
 
   @override
-  String get restore => 'Przywroc';
+  String get settingsRestore => 'Przywroc';
 
   @override
-  String get exportKeyTitle => 'Eksportuj klucze';
+  String get settingsExportKeyTitle => 'Eksportuj klucze';
 
   @override
-  String get exportKeyMessage =>
+  String get settingsExportKeyMessage =>
       'Wyeksportowany plik kluczy zawiera wszystkie Twoje klucze szyfrowania. Przechowuj go w bezpiecznym miejscu.';
 
   @override
-  String get export => 'Eksportuj';
+  String get settingsExport => 'Eksportuj';
 
   @override
-  String deviceIdLabel(String deviceId) {
+  String settingsDeviceIdLabel(String deviceId) {
     return 'ID urzadzenia: $deviceId';
   }
 
   @override
-  String get deviceStatusVerified => 'Status: Zweryfikowane';
+  String get settingsDeviceStatusVerified => 'Status: Zweryfikowane';
 
   @override
-  String get deviceStatusUnverified => 'Status: Niezweryfikowane';
+  String get settingsDeviceStatusUnverified => 'Status: Niezweryfikowane';
 
   @override
-  String lastActiveLabel(String lastSeen) {
+  String settingsLastActiveLabel(String lastSeen) {
     return 'Ostatnia aktywnosc: $lastSeen';
   }
 
   @override
-  String get verifyThisDevice => 'Zweryfikuj to urzadzenie';
+  String get settingsVerifyThisDevice => 'Zweryfikuj to urzadzenie';
 
   @override
-  String get crossSigningAlreadyEnabled =>
+  String get settingsCrossSigningAlreadyEnabled =>
       'Podpisywanie krzyzowe jest juz wlaczone';
 
   @override
-  String get crossSigningSetupSuccess =>
+  String get settingsCrossSigningSetupSuccess =>
       'Konfiguracja podpisywania krzyzowego powiodla sie';
 
   @override
-  String get resetEncryptionTitle => 'Zresetuj szyfrowanie';
+  String get settingsResetEncryptionTitle => 'Zresetuj szyfrowanie';
 
   @override
-  String get resetEncryptionWarning =>
+  String get settingsResetEncryptionWarning =>
       'Ostrzezenie: Spowoduje to usuniecie wszystkich kluczy szyfrowania. Nie bedziesz moc odszyfrowac poprzednich zaszyfrowanych wiadomosci. Tej operacji nie mozna cofnac.';
 
   @override
-  String get reset => 'Zresetuj';
+  String get settingsReset => 'Zresetuj';
 
   @override
-  String get leaveMeetingConfirm => 'Czy na pewno chcesz opuscic spotkanie?';
+  String get callLeaveMeetingConfirm =>
+      'Czy na pewno chcesz opuscic spotkanie?';
 
   @override
-  String pokedSomeone(String name, String suffix) {
+  String chatPokedSomeone(String name, String suffix) {
     return 'szturchnal(a) $name$suffix';
   }
 
   @override
-  String get noContactsToAdd => 'Brak dostepnych kontaktow do dodania';
+  String get chatNoContactsToAdd => 'Brak dostepnych kontaktow do dodania';
 
   @override
-  String get addMembers => 'Dodaj czlonkow';
+  String get chatAddMembers => 'Dodaj czlonkow';
 
   @override
-  String invitedMembers(int count) {
+  String chatInvitedMembers(int count) {
     return 'Zaproszono $count czlonkow';
   }
 
   @override
-  String inviteFailed(String error) {
+  String chatInviteFailed(String error) {
     return 'Zaproszenie nie powiodlo sie: $error';
   }
 
   @override
-  String get memberRemoved => 'Czlonek usuniety';
+  String get chatMemberRemoved => 'Czlonek usuniety';
 
   @override
-  String removeFailed(String error) {
+  String chatRemoveFailed(String error) {
     return 'Usuniecie nie powiodlo sie: $error';
   }
 
   @override
-  String get realTimeLocationShareMessage =>
+  String get chatRealTimeLocationShareMessage =>
       'Po udostepnieniu druga strona bedzie widziec Twoja lokalizacje w czasie rzeczywistym przez 1 godzine.';
 
   @override
-  String get startSharing => 'Rozpocznij udostepnianie';
+  String get chatStartSharing => 'Rozpocznij udostepnianie';
 
   @override
-  String get locationServiceNotEnabled =>
+  String get chatLocationServiceNotEnabled =>
       'Usluga lokalizacji nie jest wlaczona';
 
   @override
-  String get enableLocationService =>
+  String get chatEnableLocationService =>
       'Wlacz usluge lokalizacji, aby korzystac z tej funkcji';
 
   @override
-  String get goToSettings => 'Przejdz do ustawien';
+  String get chatGoToSettings => 'Przejdz do ustawien';
 
   @override
-  String get locationPermissionRequired =>
+  String get chatLocationPermissionRequired =>
       'Wymagane uprawnienie do lokalizacji dla tej funkcji';
 
   @override
-  String get locationPermissionDeniedPermanent =>
+  String get chatLocationPermissionDeniedPermanent =>
       'Uprawnienie do lokalizacji zostalo trwale odrzucone. Wlacz je w ustawieniach.';
 
   @override
-  String get locationPermissionDenied => 'Uprawnienie do lokalizacji odrzucone';
+  String get chatLocationPermissionDenied =>
+      'Uprawnienie do lokalizacji odrzucone';
 
   @override
-  String get gettingLocation => 'Pobieranie lokalizacji...';
+  String get chatGettingLocation => 'Pobieranie lokalizacji...';
 
   @override
-  String getLocationFailed(String error) {
+  String chatGetLocationFailed(String error) {
     return 'Nie udalo sie uzyskac lokalizacji: $error';
   }
 
   @override
-  String get currentLocation => 'Biezaca lokalizacja';
+  String get chatMapPreview => 'Podglad mapy';
 
   @override
-  String nearbyPlace(int index) {
-    return 'Miejsce w poblizu $index';
-  }
+  String get chatSearchLocation => 'Szukaj lokalizacji';
 
   @override
-  String approximateDistance(String distance) {
-    return 'Okolo $distance';
-  }
-
-  @override
-  String get mapPreview => 'Podglad mapy';
-
-  @override
-  String get searchLocation => 'Szukaj lokalizacji';
-
-  @override
-  String redPacketSent(String amount, String token) {
+  String chatRedPacketSent(String amount, String token) {
     return 'Wyslano $amount $token czerwona koperte';
   }
 
   @override
-  String get transferDefault => 'Przelew';
+  String get chatTransferDefault => 'Przelew';
 
   @override
-  String transferSent(String amount, String token) {
+  String chatTransferSent(String amount, String token) {
     return 'Wyslano $amount $token przelew';
   }
 
   @override
-  String pickFileFailed(String error) {
+  String chatPickFileFailed(String error) {
     return 'Nie udalo sie wybrac pliku: $error';
   }
 
   @override
-  String get fileSizeLimit => 'Rozmiar pliku nie moze przekraczac 50MB';
+  String get chatFileSizeLimit => 'Rozmiar pliku nie moze przekraczac 50MB';
 
   @override
-  String fileSending(String filename) {
+  String chatFileSending(String filename) {
     return 'Wysylanie pliku: $filename';
   }
 
   @override
-  String sendFileFailed(String error) {
+  String chatSendFileFailed(String error) {
     return 'Nie udalo sie wyslac pliku: $error';
   }
 
   @override
-  String contactCardSent(String name) {
+  String chatContactCardSent(String name) {
     return 'Wyslano wizytowke $name';
   }
 
   @override
-  String get favoritesFeature => 'Ulubione';
+  String get chatFavoritesFeature => 'Ulubione';
 
   @override
-  String get couponsFeature => 'Kupony';
+  String get chatCouponsFeature => 'Kupony';
 
   @override
-  String get giftFeature => 'Prezent';
+  String get chatGiftFeature => 'Prezent';
 
   @override
-  String sharedMusic(String name) {
+  String chatSharedMusic(String name) {
     return 'Udostepniono $name';
   }
 
   @override
-  String get endPollTitle => 'Zakoncz ankiete';
+  String get chatEndPollTitle => 'Zakoncz ankiete';
 
   @override
-  String get endPollConfirmMessage =>
+  String get chatEndPollConfirmMessage =>
       'Czy na pewno chcesz zakonczyc te ankiete? Glosowanie zostanie zamkniete po zakonczeniu.';
 
   @override
-  String get pollEndedMessage => 'Ankieta zakonczona';
+  String get chatPollEndedMessage => 'Ankieta zakonczona';
 
   @override
-  String get connectingCall => 'Łączenie...';
+  String get chatConnectingCall => 'Łączenie...';
 
   @override
-  String get muteCall => 'Wycisz';
+  String get chatMuteCall => 'Wycisz';
 
   @override
-  String get speakerOff => 'Glosnik wylaczony';
+  String get chatSpeakerOff => 'Glosnik wylaczony';
 
   @override
-  String get speakerOn => 'Glosnik';
+  String get chatSpeakerOn => 'Glosnik';
 
   @override
-  String get cameraOn => 'Kamera wlaczona';
+  String get chatCameraOn => 'Kamera wlaczona';
 
   @override
-  String get cameraOff => 'Kamera wylaczona';
+  String get chatCameraOff => 'Kamera wylaczona';
 
   @override
-  String get hangUp => 'Rozlacz';
+  String get chatHangUp => 'Rozlacz';
 
   @override
-  String get selectForwardTargetTitle => 'Wybierz cel przekazania';
+  String get chatSelectForwardTargetTitle => 'Wybierz cel przekazania';
 
   @override
-  String get noForwardableChat => 'Brak czatow dostepnych do przekazania';
+  String get chatNoForwardableChat => 'Brak czatow dostepnych do przekazania';
 
   @override
-  String get noMatchingChat => 'Nie znaleziono pasujacych czatow';
+  String get chatNoMatchingChat => 'Nie znaleziono pasujacych czatow';
 
   @override
-  String get imagePreview => '[Obraz]';
+  String get chatLocationTitle => 'Lokalizacja';
 
   @override
-  String get voicePreview => '[Glos]';
+  String get chatSendButton => 'Wyslij';
 
   @override
-  String get videoPreview => '[Wideo]';
+  String get chatRetryButton => 'Ponow';
 
   @override
-  String filePreviewWithName(String filename) {
-    return '[Plik] $filename';
-  }
+  String get chatSearchContactHint => 'Szukaj kontaktow';
 
   @override
-  String locationPreviewWithAddress(String address) {
-    return '[Lokalizacja] $address';
-  }
+  String get chatShareMusic => 'Udostepnij muzyke';
 
   @override
-  String musicPreviewWithTitle(String title) {
-    return '[Muzyka] $title';
-  }
+  String get chatRecentPlayed => 'Ostatnie';
 
   @override
-  String get messagePreview => '[Wiadomosc]';
+  String get chatMyFavorites => 'Ulubione';
 
   @override
-  String get locationTitle => 'Lokalizacja';
+  String get chatNetworkLink => 'Link';
 
   @override
-  String get sendButton => 'Wyslij';
+  String get chatLocalFile => 'Lokalne';
 
   @override
-  String get retryButton => 'Ponow';
+  String get chatPasteMusicLink => 'Wklej link do muzyki';
 
   @override
-  String get selectContact => 'Wybierz kontakt';
+  String get chatShareMusicButton => 'Udostepnij muzyke';
 
   @override
-  String get searchContactHint => 'Szukaj kontaktow';
+  String get chatSelectLocalAudio => 'Wybierz lokalny plik audio';
 
   @override
-  String get shareMusic => 'Udostepnij muzyke';
+  String get chatSupportedAudioFormats => 'Obsluguje MP3, M4A, WAV, FLAC itp.';
 
   @override
-  String get recentPlayed => 'Ostatnie';
+  String get chatSelectFileButton => 'Wybierz plik';
 
   @override
-  String get myFavorites => 'Ulubione';
+  String get chatPleaseEnterMusicLink => 'Wprowadz link do muzyki';
 
   @override
-  String get networkLink => 'Link';
+  String get chatPleaseEnterValidLink => 'Wprowadz prawidlowy adres URL';
 
   @override
-  String get localFile => 'Lokalne';
+  String get chatSharedSong => 'Udostepniony utwor';
 
   @override
-  String get musicLinkRequired => 'Link do muzyki *';
+  String get chatSelectMember => 'Wybierz czlonka';
 
   @override
-  String get pasteMusicLink => 'Wklej link do muzyki';
+  String get chatSearchMemberHint => 'Szukaj czlonkow';
 
   @override
-  String get enterSongNamePlaceholder => 'Wprowadz nazwe utworu';
+  String get chatNoMatchingMembers => 'Nie znaleziono pasujacych czlonkow';
 
   @override
-  String get enterArtistNamePlaceholder => 'Wprowadz nazwe artysty';
+  String get commonUnknownMember => 'Nieznany';
 
   @override
-  String get shareMusicButton => 'Udostepnij muzyke';
-
-  @override
-  String get selectLocalAudio => 'Wybierz lokalny plik audio';
-
-  @override
-  String get supportedAudioFormats => 'Obsluguje MP3, M4A, WAV, FLAC itp.';
-
-  @override
-  String get selectFileButton => 'Wybierz plik';
-
-  @override
-  String get pleaseEnterMusicLink => 'Wprowadz link do muzyki';
-
-  @override
-  String get pleaseEnterValidLink => 'Wprowadz prawidlowy adres URL';
-
-  @override
-  String get sharedSong => 'Udostepniony utwor';
-
-  @override
-  String get selectMember => 'Wybierz czlonka';
-
-  @override
-  String get searchMemberHint => 'Szukaj czlonkow';
-
-  @override
-  String get noMatchingMembers => 'Nie znaleziono pasujacych czlonkow';
-
-  @override
-  String get unknownMember => 'Nieznany';
-
-  @override
-  String selectedMessagesCount(int count) {
+  String chatSelectedMessagesCount(int count) {
     return 'Wybrano $count wiadomosci';
   }
 
   @override
-  String get searchContactsOrGroups => 'Szukaj kontaktow lub grup';
+  String get chatSearchContactsOrGroups => 'Szukaj kontaktow lub grup';
 
   @override
-  String get noMatchingConversations => 'Nie znaleziono pasujacych rozmow';
+  String get chatVideoTitle => 'Wideo';
 
   @override
-  String get videoTitle => 'Wideo';
+  String get chatLoadingText => 'Ladowanie...';
 
   @override
-  String get loadingText => 'Ladowanie...';
+  String get chatVideoLoadFailed => 'Ladowanie wideo nie powiodlo sie';
 
   @override
-  String get videoPlaybackFailed => 'Odtwarzanie wideo nie powiodlo sie';
+  String get chatPlayerInitFailed =>
+      'Inicjalizacja odtwarzacza nie powiodla sie';
 
   @override
-  String get videoLoadFailed => 'Ladowanie wideo nie powiodlo sie';
+  String get chatCreatePollTitle => 'Utworz ankiete';
 
   @override
-  String get playerInitFailed => 'Inicjalizacja odtwarzacza nie powiodla sie';
+  String get chatSubmitPoll => 'Zatwierdz';
 
   @override
-  String get createPollTitle => 'Utworz ankiete';
+  String get chatPollQuestionLabel => 'Pytanie ankiety';
 
   @override
-  String get submitPoll => 'Zatwierdz';
+  String get chatEnterPollQuestionHint => 'Wprowadz pytanie ankiety';
 
   @override
-  String get pollQuestionLabel => 'Pytanie ankiety';
+  String get chatPollOptionsLabel => 'Opcje ankiety';
 
   @override
-  String get enterPollQuestionHint => 'Wprowadz pytanie ankiety';
-
-  @override
-  String get pollOptionsLabel => 'Opcje ankiety';
-
-  @override
-  String optionHintWithIndex(int index) {
+  String chatOptionHintWithIndex(int index) {
     return 'Opcja $index';
   }
 
   @override
-  String get addOptionButton => 'Dodaj opcje';
+  String get chatAddOptionButton => 'Dodaj opcje';
 
   @override
-  String get pollSettingsLabel => 'Ustawienia ankiety';
+  String get chatPollSettingsLabel => 'Ustawienia ankiety';
 
   @override
-  String get selectionType => 'Typ wyboru';
+  String get chatSelectionType => 'Typ wyboru';
 
   @override
-  String get singleChoiceLabel => 'Pojedynczy';
+  String get chatSingleChoiceLabel => 'Pojedynczy';
 
   @override
-  String get multiChoiceLabel => 'Wielokrotny';
+  String get chatMultiChoiceLabel => 'Wielokrotny';
 
   @override
-  String get anonymousPollSwitch => 'Anonimowa ankieta';
+  String get chatAnonymousPollSwitch => 'Anonimowa ankieta';
 
   @override
-  String get pleaseEnterQuestion => 'Wprowadz pytanie ankiety';
+  String get chatPleaseEnterQuestion => 'Wprowadz pytanie ankiety';
 
   @override
-  String get atLeastTwoOptions => 'Wymagane co najmniej 2 opcje';
+  String get chatAtLeastTwoOptions => 'Wymagane co najmniej 2 opcje';
 
   @override
-  String confirmWithCount(int count) {
+  String chatConfirmWithCount(int count) {
     return 'Potwierdz ($count)';
   }
 
   @override
-  String get emailVerificationTitle => 'Weryfikacja e-mail';
+  String get authEmailVerificationTitle => 'Weryfikacja e-mail';
 
   @override
-  String get enterValidEmailAddress => 'Wprowadz prawidlowy adres e-mail';
+  String get authEnterValidEmailAddress => 'Wprowadz prawidlowy adres e-mail';
 
   @override
-  String verificationCodeSentTo(String email) {
+  String authVerificationCodeSentTo(String email) {
     return 'Kod weryfikacyjny wyslany na $email';
   }
 
   @override
-  String sendCodeFailed(String error) {
+  String authSendCodeFailed(String error) {
     return 'Nie udalo sie wyslac kodu: $error';
   }
 
   @override
-  String get verificationSuccess => 'Weryfikacja powiodla sie';
+  String get authVerificationSuccess => 'Weryfikacja powiodla sie';
 
   @override
-  String get verificationFailed => 'Weryfikacja nie powiodla sie';
+  String get authVerificationFailed => 'Weryfikacja nie powiodla sie';
 
   @override
-  String verificationCodeError(String error) {
+  String authVerificationCodeError(String error) {
     return 'Blad kodu weryfikacyjnego: $error';
   }
 
   @override
-  String get enterVerificationCode => 'Wprowadz kod weryfikacyjny';
+  String get commonEnterVerificationCode => 'Wprowadz kod weryfikacyjny';
 
   @override
-  String get enterYourEmail => 'Wprowadz e-mail';
+  String get authEnterYourEmail => 'Wprowadz e-mail';
 
   @override
-  String weSentCodeTo(String email) {
+  String authWeSentCodeTo(String email) {
     return 'Wyslalismy 6-cyfrowy kod na\n$email';
   }
 
   @override
-  String get enterEmailForCode =>
+  String get authEnterEmailForCode =>
       'Wprowadz adres e-mail, wyslimy kod weryfikacyjny';
 
   @override
-  String get sendVerificationCode => 'Wyslij kod weryfikacyjny';
+  String get commonSendVerificationCode => 'Wyslij kod weryfikacyjny';
 
   @override
-  String get resendVerificationCode => 'Wyslij ponownie kod weryfikacyjny';
+  String get authResendVerificationCode => 'Wyslij ponownie kod weryfikacyjny';
 
   @override
-  String canResendAfter(int seconds) {
+  String authCanResendAfter(int seconds) {
     return 'Mozna wyslac ponownie za $seconds sekund';
   }
 
   @override
-  String get changeEmail => 'Zmien e-mail';
+  String get commonChangeEmail => 'Zmien e-mail';
 
   @override
-  String get addToContacts => 'Dodaj do kontaktow';
+  String get contactAddToContacts => 'Dodaj do kontaktow';
 
   @override
-  String get addingToContacts => 'Dodawanie...';
+  String get contactAddingToContacts => 'Dodawanie...';
 
   @override
-  String get addedToContacts => 'Dodano do kontaktow';
+  String get contactAddedToContacts => 'Dodano do kontaktow';
 
   @override
-  String addFailedWithError(String error) {
+  String contactAddFailedWithError(String error) {
     return 'Dodawanie nie powiodlo sie: $error';
   }
 
   @override
-  String get addPhone => 'Dodaj telefon';
+  String get contactAddPhone => 'Dodaj telefon';
 
   @override
-  String get addTag => 'Dodaj tagi';
+  String get contactAddTag => 'Dodaj tagi';
 
   @override
-  String get addText => 'Dodaj tekst';
+  String get contactAddText => 'Dodaj tekst';
 
   @override
-  String get addPhoto => 'Dodaj zdjecie';
+  String get contactAddPhoto => 'Dodaj zdjecie';
 
   @override
-  String groupCountLabel(int count) {
+  String contactGroupCountLabel(int count) {
     return '$count grup';
   }
 
   @override
-  String get addedViaSearch => 'Dodano przez wyszukiwanie';
+  String get contactAddedViaSearch => 'Dodano przez wyszukiwanie';
 
   @override
-  String get addTime => 'Dodaj czas';
+  String get contactAddTime => 'Dodaj czas';
 
   @override
-  String get doneButton => 'Gotowe';
+  String get contactDoneButton => 'Gotowe';
 
   @override
-  String get waitingForParticipants =>
+  String get callWaitingForParticipants =>
       'Oczekiwanie na dolaczenie uczestnikow...';
 
   @override
-  String participantMe(String name) {
+  String callParticipantMe(String name) {
     return '$name (Ja)';
   }
 
   @override
-  String get sharingLabel => 'Udostepnianie';
+  String get callSharingLabel => 'Udostepnianie';
 
   @override
-  String screenSharingBy(String name) {
+  String callScreenSharingBy(String name) {
     return '$name udostepnia ekran';
   }
 
   @override
-  String participantCount(int count) {
+  String callParticipantCount(int count) {
     return '$count uczestnikow';
   }
 
   @override
-  String get muteLabel => 'Wycisz';
+  String get callMuteLabel => 'Wycisz';
 
   @override
-  String get unmuteLabel => 'Wlacz dzwiek';
+  String get callUnmuteLabel => 'Wlacz dzwiek';
 
   @override
-  String get turnOffVideo => 'Wylacz wideo';
+  String get callTurnOffVideo => 'Wylacz wideo';
 
   @override
-  String get turnOnVideo => 'Wlacz wideo';
+  String get callTurnOnVideo => 'Wlacz wideo';
 
   @override
-  String get shareScreen => 'Udostepnij ekran';
+  String get callShareScreen => 'Udostepnij ekran';
 
   @override
-  String get stopSharing => 'Zatrzymaj udostepnianie';
+  String get callStopSharing => 'Zatrzymaj udostepnianie';
 
   @override
-  String get switchCameraLabel => 'Przelacz';
+  String get callSwitchCameraLabel => 'Przelacz';
 
   @override
-  String get leaveLabel => 'Opusc';
+  String get callLeaveLabel => 'Opusc';
 
   @override
-  String get participantsLabel => 'Uczestnicy';
+  String get callParticipantsLabel => 'Uczestnicy';
 
   @override
-  String get joiningMeeting => 'Dolaczanie do spotkania...';
+  String get callJoiningMeeting => 'Dolaczanie do spotkania...';
 
   @override
-  String pollVotesFormat(int count, String percentage) {
+  String chatPollVotesFormat(int count, String percentage) {
     return '$count głosów ($percentage%)';
   }
 
   @override
-  String pollParticipantsFormat(int count) {
+  String chatPollParticipantsFormat(int count) {
     return '$count uczestników';
   }
 
   @override
-  String get tapToRetry => 'Dotknij, aby ponowić';
+  String get commonTapToRetry => 'Dotknij, aby ponowić';
 
   @override
-  String get noConversationsToForward => 'Brak rozmów do przekazania';
+  String get chatDefaultRedPacketGreeting => 'Powodzenia i dobrobytu';
 
   @override
-  String get defaultRedPacketGreeting => 'Powodzenia i dobrobytu';
-
-  @override
-  String get emojiCategoryFace => 'Buźki';
-
-  @override
-  String get emojiCategoryHeart => 'Serca';
-
-  @override
-  String get emojiCategoryAnimal => 'Zwierzęta';
-
-  @override
-  String get emojiCategoryFood => 'Jedzenie';
-
-  @override
-  String get emojiCategoryTransport => 'Transport';
-
-  @override
-  String get emojiCategoryActivity => 'Aktywności';
-
-  @override
-  String get emojiCategoryObject => 'Przedmioty';
-
-  @override
-  String get emojiCategorySymbol => 'Symbole';
-
-  @override
-  String get allowOthersToSearchAndJoin =>
+  String get groupAllowOthersToSearchAndJoin =>
       'Zezwól innym na wyszukiwanie i dołączanie';
 
   @override
-  String get allowStrangerMessages => 'Zezwalaj na wiadomości od nieznajomych';
+  String get groupConfirmClearChatHistory =>
+      'Czy na pewno chcesz usunąć historię czatu?';
 
   @override
-  String get alwaysUseDarkTheme => 'Zawsze używaj ciemnego motywu';
+  String get groupCreateGroupToChat => 'Utwórz grupę, aby rozpocząć czat';
 
   @override
-  String get alwaysUseLightTheme => 'Zawsze używaj jasnego motywu';
+  String get groupEditGroupAnnouncement => 'Edytuj ogłoszenie grupy';
 
   @override
-  String get autoSwitchBySystem =>
+  String get groupEditGroupDescription => 'Edytuj opis grupy';
+
+  @override
+  String get groupEnterGroupAnnouncement => 'Wpisz ogłoszenie grupy';
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Błąd: $message';
+  }
+
+  @override
+  String groupMemberCountClickToCopy(int count) {
+    return '$count członków, kliknij aby skopiować ID grupy';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Link do muzyki';
+
+  @override
+  String get chatNoMediaUrlAvailable => 'URL multimediów niedostępny';
+
+  @override
+  String get groupNoPermissionToEditGroupName =>
+      'Nie masz uprawnień do edycji nazwy grupy';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Czerwone koperty i przelewy nie mogą być przekazywane';
+
+  @override
+  String get authEmailAddress => 'Adres e-mail';
+
+  @override
+  String get commonEnterEmailAddress => 'Wprowadź adres e-mail';
+
+  @override
+  String get authEmailRecoveryHint => 'Używany do odzyskiwania hasła';
+
+  @override
+  String get commonInvalidEmailFormat => 'Wprowadź prawidłowy adres e-mail';
+
+  @override
+  String get authOptional => 'Opcjonalnie';
+
+  @override
+  String get authResetPassword => 'Resetuj hasło';
+
+  @override
+  String get authEnterRegisteredEmail =>
+      'Wprowadź adres e-mail, z którym się zarejestrowałeś';
+
+  @override
+  String get authSendResetCode => 'Wyślij kod resetowania';
+
+  @override
+  String authResetCodeSent(String email) {
+    return 'Kod resetowania wysłany na $email';
+  }
+
+  @override
+  String get authEnterResetCode => 'Wprowadź kod resetowania';
+
+  @override
+  String get authSetNewPassword => 'Ustaw nowe hasło';
+
+  @override
+  String get commonConfirmNewPassword => 'Potwierdź nowe hasło';
+
+  @override
+  String get commonNewPassword => 'Nowe hasło';
+
+  @override
+  String get authPasswordResetSuccess =>
+      'Hasło zostało pomyślnie zresetowane. Zaloguj się nowym hasłem.';
+
+  @override
+  String get authResetPasswordFailed => 'Nie udało się zresetować hasła';
+
+  @override
+  String get settingsChangePassword => 'Zmień hasło';
+
+  @override
+  String get settingsCurrentPassword => 'Aktualne hasło';
+
+  @override
+  String get settingsEnterCurrentPassword => 'Wprowadź aktualne hasło';
+
+  @override
+  String get settingsEnterNewPassword => 'Wprowadź nowe hasło';
+
+  @override
+  String get settingsPasswordChanged =>
+      'Hasło zostało pomyślnie zmienione. Zaloguj się nowym hasłem.';
+
+  @override
+  String get settingsChangePasswordFailed => 'Nie udało się zmienić hasła';
+
+  @override
+  String get settingsNewPasswordMustBeDifferent =>
+      'Nowe hasło musi się różnić od aktualnego';
+
+  @override
+  String get settingsChangePasswordInfo =>
+      'Po zmianie hasła zostaniesz wylogowany i musisz zalogować się nowym hasłem.';
+
+  @override
+  String get settingsPasswordRequirements => 'Wymagania dotyczące hasła:';
+
+  @override
+  String get settingsSecurityNote =>
+      'Ze względów bezpieczeństwa po zmianie hasła musisz zalogować się ponownie na wszystkich urządzeniach.';
+
+  @override
+  String get settingsSecurity => 'Bezpieczeństwo';
+
+  @override
+  String get settingsCurrentBoundEmail => 'Aktualnie powiązany e-mail';
+
+  @override
+  String get settingsNewEmailAddress => 'Nowy adres e-mail';
+
+  @override
+  String get settingsEnterNewEmail => 'Wprowadź nowy adres e-mail';
+
+  @override
+  String get settingsVerificationCode => 'Kod weryfikacyjny';
+
+  @override
+  String get settingsVerificationCodeSent => 'Kod weryfikacyjny wysłany';
+
+  @override
+  String get settingsCodeSentTo => 'Kod weryfikacyjny wysłany na';
+
+  @override
+  String get settingsDidNotReceiveCode => 'Nie otrzymałeś kodu?';
+
+  @override
+  String get settingsEmailChangedSuccess => 'E-mail został pomyślnie zmieniony';
+
+  @override
+  String get settingsChangeEmailFailed => 'Nie udało się zmienić adresu e-mail';
+
+  @override
+  String get settingsEmailSecurityNote =>
+      'Twój e-mail jest używany do odzyskiwania hasła. Chroń go.';
+
+  @override
+  String get commonGoogleLogin => 'Zaloguj przez Google';
+
+  @override
+  String get commonAppleLogin => 'Zaloguj przez Apple';
+
+  @override
+  String get commonWechat => 'WeChat';
+
+  @override
+  String get settingsLanguage => 'Język';
+
+  @override
+  String get settingsLanguageChanged => 'Język zmieniony';
+
+  @override
+  String get settingsBiometricLogin => 'Logowanie biometryczne';
+
+  @override
+  String authLoginWithBiometric(Object type) {
+    return 'Zaloguj się za pomocą $type';
+  }
+
+  @override
+  String get settingsBiometricLoginEnabled => 'Logowanie biometryczne włączone';
+
+  @override
+  String get settingsBiometricLoginDisabled =>
+      'Logowanie biometryczne wyłączone';
+
+  @override
+  String get settingsEnableBiometricLogin => 'Włącz logowanie biometryczne';
+
+  @override
+  String get settingsBiometricEnabled =>
+      'Włączono - Użyj biometrii do logowania';
+
+  @override
+  String get settingsBiometricDisabled => 'Wyłączono - Dotknij, aby włączyć';
+
+  @override
+  String get settingsBiometricNeedRelogin =>
+      'Wyloguj się i zaloguj ponownie, aby włączyć logowanie biometryczne';
+
+  @override
+  String get authOr => 'LUB';
+
+  @override
+  String get qrcodeCameraPermissionRestricted =>
+      'Dostęp do kamery jest ograniczony na tym urządzeniu';
+
+  @override
+  String get authPasskeyLabel => 'Passkey';
+
+  @override
+  String get authGoogleLabel => 'Google';
+
+  @override
+  String get authAppleLabel => 'Apple';
+
+  @override
+  String get authSsoLabel => 'SSO';
+
+  @override
+  String get transferAmountHintZero => '0.00';
+
+  @override
+  String get commonMatrixIdHint => '@username:server.com';
+
+  @override
+  String get authServerAddressHint => 'https://m.si46.world';
+
+  @override
+  String get authEmailExampleHint => 'example@email.com';
+
+  @override
+  String get authVerificationCodePlaceholder => '------';
+
+  @override
+  String get profileEnterPokeSuffixHint =>
+      'Wprowadź sufiks szturchnięcia, np.: w ramię';
+
+  @override
+  String get groupAlbum => 'Album grupy';
+
+  @override
+  String get groupFiles => 'Pliki grupy';
+
+  @override
+  String get groupImages => 'Obrazy';
+
+  @override
+  String get groupVideos => 'Filmy';
+
+  @override
+  String get groupTotal => 'Łącznie';
+
+  @override
+  String get groupSize => 'Rozmiar';
+
+  @override
+  String get groupNoMedia => 'Brak mediów';
+
+  @override
+  String get groupNoMediaDescription => 'Brak zdjęć i filmów w tej grupie';
+
+  @override
+  String get groupDocuments => 'Dokumenty';
+
+  @override
+  String get groupNoFiles => 'Brak plików';
+
+  @override
+  String get groupNoFilesDescription => 'Brak plików w tej grupie';
+
+  @override
+  String groupDownloadStarted(String filename) {
+    return 'Pobieranie $filename...';
+  }
+
+  @override
+  String get contactNoCommonGroups => 'Brak wspólnych grup';
+
+  @override
+  String get contactNoCommonGroupsDescription => 'Nie macie wspólnych grup';
+
+  @override
+  String get chatVoiceMessage => 'Głos';
+
+  @override
+  String get chatMessage => 'Wiadomość';
+
+  @override
+  String get conversationHideChat => 'Ukryj';
+
+  @override
+  String get settingsQuickReply => 'Szybka odpowiedź';
+
+  @override
+  String get commonTranslate => 'Przetłumacz';
+
+  @override
+  String get contactCreateTag => 'Create Tag';
+
+  @override
+  String get contactEnterTagName => 'Enter tag name';
+
+  @override
+  String get contactEditTag => 'Edit Tag';
+
+  @override
+  String get contactDeleteTag => 'Delete Tag';
+
+  @override
+  String contactDeleteTagConfirm(String tagName) {
+    return 'Are you sure you want to delete the tag \"$tagName\"?';
+  }
+
+  @override
+  String get contactNoTags => 'No tags yet';
+
+  @override
+  String get contactFriendPermissions => 'Friend Permissions';
+
+  @override
+  String get contactSetChatOnly => 'Set as Chat-only';
+
+  @override
+  String get contactChatOnlyDesc =>
+      'Can only chat with you, other content will be hidden';
+
+  @override
+  String get contactHideMyMoments => 'Hide My Moments';
+
+  @override
+  String get contactHideMyMomentsDesc => 'This friend cannot see my Moments';
+
+  @override
+  String get contactHideTheirMoments => 'Hide Their Moments';
+
+  @override
+  String get contactHideTheirMomentsDesc => 'Don\'t see this friend\'s Moments';
+
+  @override
+  String get contactHideMyStatus => 'Hide My Status';
+
+  @override
+  String get contactHideMyStatusDesc =>
+      'This friend cannot see my status updates';
+
+  @override
+  String get contactNoChatOnlyFriends => 'No chat-only friends';
+
+  @override
+  String get contactNoOfficialAccounts => 'No official accounts';
+
+  @override
+  String get contactFollowOfficialAccountsDesc =>
+      'Follow official accounts to get the latest updates';
+
+  @override
+  String get contactNoServiceAccounts => 'No service accounts';
+
+  @override
+  String get contactSubscribeServiceAccountsDesc =>
+      'Subscribe to service accounts for convenient services';
+
+  @override
+  String get contactNoEnterpriseContacts => 'No enterprise contacts';
+
+  @override
+  String get contactEnterpriseContactsDesc =>
+      'Enterprise contacts will be displayed here';
+
+  @override
+  String get profileCardPack => 'Card Pack';
+
+  @override
+  String get profileOrders => 'Orders';
+
+  @override
+  String get profileNoOrders => 'No orders';
+
+  @override
+  String get profileOrdersDesc => 'Your orders will be displayed here';
+
+  @override
+  String get profileNoCards => 'No cards';
+
+  @override
+  String get profileCardsDesc => 'Your cards will be displayed here';
+
+  @override
+  String get favoriteEnterTagsHint => 'Enter tags separated by commas';
+
+  @override
+  String get favoriteTagsUpdated => 'Tags updated';
+
+  @override
+  String get favoriteForwardedContent => 'Content forwarded';
+
+  @override
+  String get favoriteEnterNoteContent => 'Enter note content';
+
+  @override
+  String get favoriteNoteAdded => 'Note added';
+
+  @override
+  String get favoriteLinkTitle => 'Link title';
+
+  @override
+  String get favoriteLinkUrl => 'https://';
+
+  @override
+  String get favoriteLinkAdded => 'Link added';
+
+  @override
+  String get contactPhotoAdded => 'Photo added';
+
+  @override
+  String get contactEnterPhone => 'Enter phone number';
+
+  @override
+  String commonConversationWithId(String roomId) {
+    return 'Rozmowa: $roomId';
+  }
+
+  @override
+  String commonContactWithId(String userId) {
+    return 'Kontakt: $userId';
+  }
+
+  @override
+  String get commonDiscover => 'Odkrywaj';
+
+  @override
+  String commonDeveloping(String title) {
+    return '$title\n(Wkrotce)';
+  }
+
+  @override
+  String get commonPageNotFound => 'Strona nie zostala znaleziona';
+
+  @override
+  String get commonBackToHome => 'Wroc do strony glownej';
+
+  @override
+  String get settingsMessageNotifications => 'Powiadomienia o wiadomościach';
+
+  @override
+  String get settingsReceiveNewMessageNotifications =>
+      'Otrzymuj powiadomienia o nowych wiadomościach';
+
+  @override
+  String get settingsShowMessagePreview => 'Pokaż podgląd wiadomości';
+
+  @override
+  String get settingsShowMessageContentInNotification =>
+      'Pokaż treść wiadomości w powiadomieniach';
+
+  @override
+  String get settingsNotificationSound => 'Dzwiek powiadomienia';
+
+  @override
+  String get settingsPlaySoundOnMessage =>
+      'Odtwarzaj dzwiek przy odbiorze wiadomosci';
+
+  @override
+  String get commonVibration => 'Wibracje';
+
+  @override
+  String get settingsVibrateOnMessage => 'Wibruj przy odbiorze wiadomosci';
+
+  @override
+  String get settingsDoNotDisturbMode => 'Nie przeszkadzać';
+
+  @override
+  String get settingsDoNotDisturbDescription =>
+      'Nie otrzymuj powiadomień w określonym czasie';
+
+  @override
+  String get settingsStartTime => 'Czas rozpoczecia';
+
+  @override
+  String get settingsEndTime => 'Czas zakonczenia';
+
+  @override
+  String get settingsDeleteQuickReply => 'Usuń szybką odpowiedź';
+
+  @override
+  String get settingsEditQuickReply => 'Edytuj szybką odpowiedź';
+
+  @override
+  String get settingsAddQuickReply => 'Dodaj szybką odpowiedź';
+
+  @override
+  String get settingsManageQuickReplies => 'Zarządzaj szybkimi odpowiedziami';
+
+  @override
+  String get settingsNoQuickReplies => 'Brak szybkich odpowiedzi';
+
+  @override
+  String get settingsDefaultQuickReplies =>
+      'Zostaną wyświetlone domyślne szybkie odpowiedzi';
+
+  @override
+  String get settingsWhoCanSee => 'Kto moze zobaczyc';
+
+  @override
+  String get settingsLastSeen => 'Ostatnio widziany';
+
+  @override
+  String get settingsHiddenChats => 'Ukryte czaty';
+
+  @override
+  String get settingsMessagesLabel => 'Wiadomości';
+
+  @override
+  String get settingsAllowStrangerMessages =>
+      'Zezwalaj na wiadomości od nieznajomych';
+
+  @override
+  String get settingsReceiveMessagesFromNonContacts =>
+      'Otrzymuj wiadomości od osób spoza kontaktów';
+
+  @override
+  String get settingsReadReceipts => 'Potwierdzenia odczytu';
+
+  @override
+  String get settingsLetOthersKnowYouRead =>
+      'Pozwól innym wiedzieć, że przeczytałeś ich wiadomości';
+
+  @override
+  String get settingsTypingIndicator => 'Wskaźnik pisania';
+
+  @override
+  String get settingsLetOthersKnowYouTyping =>
+      'Pozwól innym wiedzieć, że piszesz';
+
+  @override
+  String get settingsEveryone => 'Wszyscy';
+
+  @override
+  String get settingsContactsOnly => 'Tylko kontakty';
+
+  @override
+  String get settingsNobody => 'Nikt';
+
+  @override
+  String settingsWhoCanSeeTitle(String title) {
+    return 'Kto może zobaczyć $title';
+  }
+
+  @override
+  String settingsVersionInfo(String version) {
+    return 'Wersja $version';
+  }
+
+  @override
+  String get settingsCheckForUpdates => 'Sprawdź aktualizacje';
+
+  @override
+  String get settingsOpenSourceLicenses => 'Licencje open source';
+
+  @override
+  String get settingsFeedbackAndSuggestions => 'Opinie i sugestie';
+
+  @override
+  String get settingsBuiltOnMatrix => 'Oparty na protokole Matrix';
+
+  @override
+  String get settingsNoHiddenChats => 'Brak ukrytych czatów';
+
+  @override
+  String get settingsNoHiddenChatsDescription =>
+      'Ukryte czaty pojawią się tutaj';
+
+  @override
+  String get settingsUnhideChat => 'Pokaż';
+
+  @override
+  String get settingsDarkMode => 'Tryb ciemny';
+
+  @override
+  String get settingsFontSize => 'Rozmiar czcionki';
+
+  @override
+  String get settingsBubbleStyle => 'Styl dymków';
+
+  @override
+  String get settingsFollowSystem => 'Podążaj za systemem';
+
+  @override
+  String get settingsAutoSwitchBySystem =>
       'Automatycznie przełączaj według ustawień systemowych';
 
   @override
-  String get bubbleStyle => 'Styl dymków';
+  String get settingsLightMode => 'Tryb jasny';
 
   @override
-  String get bubbleStyleClassic => 'Styl klasyczny';
+  String get settingsAlwaysUseLightTheme => 'Zawsze używaj jasnego motywu';
 
   @override
-  String get bubbleStyleClassicDesc => 'Tradycyjny styl dymków';
+  String get settingsDarkModeOption => 'Tryb ciemny';
 
   @override
-  String get bubbleStyleModern => 'Styl nowoczesny';
+  String get settingsAlwaysUseDarkTheme => 'Zawsze używaj ciemnego motywu';
 
   @override
-  String get bubbleStyleModernDesc => 'Czysty nowoczesny styl dymków';
+  String get settingsFontSizeSmall => 'Mały';
 
   @override
-  String get bubbleStyleWechat => 'Styl WeChat';
+  String get settingsFontSizeStandard => 'Standardowy';
 
   @override
-  String get bubbleStyleWechatDesc => 'Klasyczny styl dymków WeChat';
+  String get settingsFontSizeLarge => 'Duży';
+
+  @override
+  String get settingsFontSizeExtraLarge => 'Bardzo duży';
+
+  @override
+  String get settingsBubbleStyleWechat => 'Styl WeChat';
+
+  @override
+  String get settingsBubbleStyleWechatDesc => 'Klasyczny styl dymków WeChat';
+
+  @override
+  String get settingsBubbleStyleModern => 'Styl nowoczesny';
+
+  @override
+  String get settingsBubbleStyleModernDesc => 'Czysty nowoczesny styl dymków';
+
+  @override
+  String get settingsBubbleStyleClassic => 'Styl klasyczny';
+
+  @override
+  String get settingsBubbleStyleClassicDesc => 'Tradycyjny styl dymków';
+
+  @override
+  String get discoverVideoChannels => 'Kanaly';
+
+  @override
+  String get discoverLive => 'Na zywo';
+
+  @override
+  String get discoverListen => 'Sluchaj';
+
+  @override
+  String get discoverWatch => 'Ogladaj';
+
+  @override
+  String get discoverSearchDiscover => 'Szukaj';
+
+  @override
+  String get discoverNearbyPeople => 'W poblizu';
+
+  @override
+  String get discoverGames => 'Gry';
+
+  @override
+  String get discoverMiniPrograms => 'Miniprogramy';
+
+  @override
+  String get chatAlreadyInCall => 'Juz trwa polaczenie';
+
+  @override
+  String get commonConnectionFailed => 'Polaczenie nie powiodlo sie';
+
+  @override
+  String get chatCallRejected => 'Polaczenie odrzucone';
+
+  @override
+  String get chatNoAnswer => 'Brak odpowiedzi';
+
+  @override
+  String get commonClose => 'Zamknij';
+
+  @override
+  String get chatSelectContact => 'Wybierz kontakt';
+
+  @override
+  String get chatVoteRemoved => 'Glos usuniety';
+
+  @override
+  String get chatVoteChanged => 'Glos zmieniony';
+
+  @override
+  String get chatVoted => 'Zaglosowano';
+
+  @override
+  String chatReplyTo(String name) {
+    return 'Odpowiedz do $name';
+  }
+
+  @override
+  String get chatCurrentLocation => 'Biezaca lokalizacja';
+
+  @override
+  String chatNearbyPlace(int index) {
+    return 'Miejsce w poblizu $index';
+  }
+
+  @override
+  String chatApproximateDistance(String distance) {
+    return 'Okolo $distance';
+  }
+
+  @override
+  String get chatAddress => 'Adres';
+
+  @override
+  String get chatLatitude => 'Szerokosc geograficzna';
+
+  @override
+  String get chatLongitude => 'Dlugosc geograficzna';
+
+  @override
+  String get groupDescriptionUpdated => 'Opis grupy zaktualizowany';
+
+  @override
+  String get groupAvatarUpdated => 'Awatar grupy zaktualizowany';
+
+  @override
+  String get callDecline => 'Odrzuc';
+
+  @override
+  String get callAnswer => 'Odbierz';
+
+  @override
+  String get callIncomingVideoCall => 'Przychodzące połączenie wideo';
+
+  @override
+  String get callIncomingVoiceCall => 'Przychodzące połączenie głosowe';
+
+  @override
+  String get callVideoCallInProgress => 'Połączenie wideo';
+
+  @override
+  String get callVoiceCallInProgress => 'Połączenie głosowe';
+
+  @override
+  String get callReconnectingCall => 'Ponowne łączenie...';
 
   @override
   String get callEnded => 'Połączenie zakończone';
@@ -4003,622 +3345,386 @@ class SPl extends S {
   String get callFailed => 'Połączenie nieudane';
 
   @override
-  String get checkForUpdates => 'Sprawdź aktualizacje';
+  String get callLivekitNotConfigured => 'LiveKit nie jest skonfigurowany';
 
   @override
-  String get confirmClearChatHistory =>
-      'Czy na pewno chcesz usunąć historię czatu?';
-
-  @override
-  String get createGroupToChat => 'Utwórz grupę, aby rozpocząć czat';
-
-  @override
-  String get darkMode => 'Tryb ciemny';
-
-  @override
-  String get darkModeOption => 'Tryb ciemny';
-
-  @override
-  String get doNotDisturbDescription =>
-      'Nie otrzymuj powiadomień w określonym czasie';
-
-  @override
-  String get doNotDisturbMode => 'Nie przeszkadzać';
-
-  @override
-  String get editGroupAnnouncement => 'Edytuj ogłoszenie grupy';
-
-  @override
-  String get editGroupDescription => 'Edytuj opis grupy';
-
-  @override
-  String get enterGroupAnnouncement => 'Wpisz ogłoszenie grupy';
-
-  @override
-  String errorWithMessage(String message) {
-    return 'Błąd: $message';
+  String callJoinMeetingFailed(String error) {
+    return 'Nie udalo sie dolaczyc do spotkania: $error';
   }
 
   @override
-  String get feedbackAndSuggestions => 'Opinie i sugestie';
-
-  @override
-  String get followSystem => 'Podążaj za systemem';
-
-  @override
-  String get fontSize => 'Rozmiar czcionki';
-
-  @override
-  String get fontSizeExtraLarge => 'Bardzo duży';
-
-  @override
-  String get fontSizeLarge => 'Duży';
-
-  @override
-  String get fontSizeSmall => 'Mały';
-
-  @override
-  String get fontSizeStandard => 'Standardowy';
-
-  @override
-  String get incomingVideoCall => 'Przychodzące połączenie wideo';
-
-  @override
-  String get incomingVoiceCall => 'Przychodzące połączenie głosowe';
-
-  @override
-  String get letOthersKnowYouRead =>
-      'Pozwól innym wiedzieć, że przeczytałeś ich wiadomości';
-
-  @override
-  String get letOthersKnowYouTyping => 'Pozwól innym wiedzieć, że piszesz';
-
-  @override
-  String get lightMode => 'Tryb jasny';
-
-  @override
-  String memberCountClickToCopy(int count) {
-    return '$count członków, kliknij aby skopiować ID grupy';
+  String callScreenShareFailed(String error) {
+    return 'Udostepnianie ekranu nie powiodlo sie: $error';
   }
 
   @override
-  String get messageNotifications => 'Powiadomienia o wiadomościach';
+  String get profileN42BeanTitle => 'N42 Bean';
 
   @override
-  String get messagesLabel => 'Wiadomości';
+  String get profileNoN42Bean => 'Brak N42 Bean';
 
   @override
-  String get musicLinkLabel => 'Link do muzyki';
+  String get profileN42BeanDetails => 'Szczegóły N42 Bean';
 
   @override
-  String get noMediaUrlAvailable => 'URL multimediów niedostępny';
-
-  @override
-  String get noPermissionToEditGroupName =>
-      'Nie masz uprawnień do edycji nazwy grupy';
-
-  @override
-  String get receiveMessagesFromNonContacts =>
-      'Otrzymuj wiadomości od osób spoza kontaktów';
-
-  @override
-  String get receiveNewMessageNotifications =>
-      'Otrzymuj powiadomienia o nowych wiadomościach';
-
-  @override
-  String get reconnectingCall => 'Ponowne łączenie...';
-
-  @override
-  String get redPacketTransferCannotForward =>
-      'Czerwone koperty i przelewy nie mogą być przekazywane';
-
-  @override
-  String get showMessageContentInNotification =>
-      'Pokaż treść wiadomości w powiadomieniach';
-
-  @override
-  String get showMessagePreview => 'Pokaż podgląd wiadomości';
-
-  @override
-  String get typingIndicator => 'Wskaźnik pisania';
-
-  @override
-  String versionInfo(String version) {
-    return 'Wersja $version';
-  }
-
-  @override
-  String get vibration => 'Wibracje';
-
-  @override
-  String get videoCallInProgress => 'Połączenie wideo';
-
-  @override
-  String get voiceCallInProgress => 'Połączenie głosowe';
-
-  @override
-  String whoCanSeeTitle(String title) {
-    return 'Kto może zobaczyć $title';
-  }
-
-  @override
-  String get emailAddress => 'Adres e-mail';
-
-  @override
-  String get enterEmailAddress => 'Wprowadź adres e-mail';
-
-  @override
-  String get emailRecoveryHint => 'Używany do odzyskiwania hasła';
-
-  @override
-  String get invalidEmailFormat => 'Wprowadź prawidłowy adres e-mail';
-
-  @override
-  String get optional => 'Opcjonalnie';
-
-  @override
-  String get resetPassword => 'Resetuj hasło';
-
-  @override
-  String get resetPasswordTitle => 'Zresetuj swoje hasło';
-
-  @override
-  String get enterRegisteredEmail =>
-      'Wprowadź adres e-mail, z którym się zarejestrowałeś';
-
-  @override
-  String get sendResetCode => 'Wyślij kod resetowania';
-
-  @override
-  String resetCodeSent(String email) {
-    return 'Kod resetowania wysłany na $email';
-  }
-
-  @override
-  String get enterResetCode => 'Wprowadź kod resetowania';
-
-  @override
-  String get setNewPassword => 'Ustaw nowe hasło';
-
-  @override
-  String get confirmNewPassword => 'Potwierdź nowe hasło';
-
-  @override
-  String get newPassword => 'Nowe hasło';
-
-  @override
-  String get passwordResetSuccess =>
-      'Hasło zostało pomyślnie zresetowane. Zaloguj się nowym hasłem.';
-
-  @override
-  String get resetPasswordFailed => 'Nie udało się zresetować hasła';
-
-  @override
-  String get changePassword => 'Zmień hasło';
-
-  @override
-  String get currentPassword => 'Aktualne hasło';
-
-  @override
-  String get enterCurrentPassword => 'Wprowadź aktualne hasło';
-
-  @override
-  String get enterNewPassword => 'Wprowadź nowe hasło';
-
-  @override
-  String get passwordChanged =>
-      'Hasło zostało pomyślnie zmienione. Zaloguj się nowym hasłem.';
-
-  @override
-  String get changePasswordFailed => 'Nie udało się zmienić hasła';
-
-  @override
-  String get incorrectCurrentPassword => 'Nieprawidłowe aktualne hasło';
-
-  @override
-  String get newPasswordMustBeDifferent =>
-      'Nowe hasło musi się różnić od aktualnego';
-
-  @override
-  String get changePasswordInfo =>
-      'Po zmianie hasła zostaniesz wylogowany i musisz zalogować się nowym hasłem.';
-
-  @override
-  String get passwordRequirements => 'Wymagania dotyczące hasła:';
-
-  @override
-  String get securityNote =>
-      'Ze względów bezpieczeństwa po zmianie hasła musisz zalogować się ponownie na wszystkich urządzeniach.';
-
-  @override
-  String get security => 'Bezpieczeństwo';
-
-  @override
-  String get currentBoundEmail => 'Aktualnie powiązany e-mail';
-
-  @override
-  String get newEmailAddress => 'Nowy adres e-mail';
-
-  @override
-  String get enterNewEmail => 'Wprowadź nowy adres e-mail';
-
-  @override
-  String get verificationCode => 'Kod weryfikacyjny';
-
-  @override
-  String get verificationCodeSent => 'Kod weryfikacyjny wysłany';
-
-  @override
-  String get codeSentTo => 'Kod weryfikacyjny wysłany na';
-
-  @override
-  String get didNotReceiveCode => 'Nie otrzymałeś kodu?';
-
-  @override
-  String get emailChangedSuccess => 'E-mail został pomyślnie zmieniony';
-
-  @override
-  String get changeEmailFailed => 'Nie udało się zmienić adresu e-mail';
-
-  @override
-  String get emailSecurityNote =>
-      'Twój e-mail jest używany do odzyskiwania hasła. Chroń go.';
-
-  @override
-  String get googleLogin => 'Zaloguj przez Google';
-
-  @override
-  String get appleLogin => 'Zaloguj przez Apple';
-
-  @override
-  String get facebookLogin => 'Zaloguj przez Facebook';
-
-  @override
-  String get twitterLogin => 'Zaloguj przez Twitter';
-
-  @override
-  String get wechatLogin => 'Zaloguj przez WeChat';
-
-  @override
-  String get wechat => 'WeChat';
-
-  @override
-  String get facebook => 'Facebook';
-
-  @override
-  String get twitter => 'Twitter';
-
-  @override
-  String get wechatNotInstalled => 'Najpierw zainstaluj WeChat';
-
-  @override
-  String get wechatLoginFailed => 'Logowanie przez WeChat nie powiodło się';
-
-  @override
-  String get facebookLoginFailed => 'Logowanie przez Facebook nie powiodło się';
-
-  @override
-  String get twitterLoginFailed => 'Logowanie przez Twitter nie powiodło się';
-
-  @override
-  String get twitterNotConfigured =>
-      'Logowanie przez Twitter nie jest skonfigurowane';
-
-  @override
-  String get socialLoginCancelled => 'Logowanie anulowane';
-
-  @override
-  String get socialLoginFailed => 'Logowanie społecznościowe nie powiodło się';
-
-  @override
-  String get language => 'Język';
-
-  @override
-  String get languageChanged => 'Język zmieniony';
-
-  @override
-  String get biometricLogin => '生物识别登录';
-
-  @override
-  String loginWithBiometric(Object type) {
-    return '使用$type登录';
-  }
-
-  @override
-  String get biometricLoginEnabled => '生物识别登录已启用';
-
-  @override
-  String get biometricLoginDisabled => '生物识别登录已禁用';
-
-  @override
-  String get enableBiometricLogin => '启用生物识别登录';
-
-  @override
-  String get disableBiometricLogin => '禁用生物识别登录';
-
-  @override
-  String get biometricNotAvailable => '此设备不支持生物识别';
-
-  @override
-  String get biometricNotEnrolled => '未录入生物识别数据，请在设备设置中设置';
-
-  @override
-  String get biometricAuthFailed => '生物识别验证失败';
-
-  @override
-  String get biometricAuthCancelled => '验证已取消';
-
-  @override
-  String get biometricLockedOut => '尝试次数过多，请稍后再试';
-
-  @override
-  String get useBiometricToLogin => '使用生物识别快速登录';
-
-  @override
-  String get authenticateToLogin => '验证身份以登录';
-
-  @override
-  String get authenticateToEnable => '验证身份以启用生物识别登录';
-
-  @override
-  String get faceId => '面容 ID';
-
-  @override
-  String get touchId => '触控 ID';
-
-  @override
-  String get fingerprint => '指纹';
-
-  @override
-  String get biometric => '生物识别';
-
-  @override
-  String get biometricEnabled => '已启用 - 使用生物识别登录';
-
-  @override
-  String get biometricDisabled => '已禁用 - 点击启用';
-
-  @override
-  String get biometricNeedRelogin => '请退出后重新登录以启用生物识别';
-
-  @override
-  String get or => '或';
-
-  @override
-  String get n42BeanTitle => 'N42 Bean';
-
-  @override
-  String get n42BeanDetails => 'Szczegóły N42 Bean';
-
-  @override
-  String get noN42Bean => 'Brak N42 Bean';
-
-  @override
-  String get n42BeanDescription =>
+  String get profileN42BeanDescription =>
       'N42 Bean to token do wymiany na wirtualne przedmioty i usługi w N42. Obecnie dostępne:';
 
   @override
-  String get n42BeanFeature1 => 'Ekskluzywne naklejki i motywy dla członków';
+  String get profileN42BeanFeature1 =>
+      'Ekskluzywne naklejki i motywy dla członków';
 
   @override
-  String get n42BeanFeature2 => 'Personalizacja dymków czatu';
+  String get profileN42BeanFeature2 => 'Personalizacja dymków czatu';
 
   @override
-  String get n42BeanFeature3 => 'Personalizacja okładek czerwonych kopert';
+  String get profileN42BeanFeature3 =>
+      'Personalizacja okładek czerwonych kopert';
 
   @override
-  String get n42BeanFeature4 => 'Ekskluzywna odznaka pseudonimu';
+  String get profileN42BeanFeature4 => 'Ekskluzywna odznaka pseudonimu';
 
   @override
-  String get n42BeanFeature5 => 'Przywileje czatu grupowego';
+  String get profileN42BeanFeature5 => 'Przywileje czatu grupowego';
 
   @override
-  String get n42BeanFeature6 => 'Rozszerzenie pamięci w chmurze';
+  String get profileN42BeanFeature6 => 'Rozszerzenie pamięci w chmurze';
 
   @override
-  String get n42BeanFeature7 => 'Filtry upiększające do rozmów wideo';
+  String get profileN42BeanFeature7 => 'Filtry upiększające do rozmów wideo';
 
   @override
-  String get n42BeanFeature8 => 'Personalizacja tła Moments';
+  String get profileN42BeanFeature8 => 'Personalizacja tła Moments';
 
   @override
-  String get n42BeanFeature9 => 'Priorytetowa obsługa klienta VIP';
+  String get profileN42BeanFeature9 => 'Priorytetowa obsługa klienta VIP';
 
   @override
-  String get gotIt => 'Rozumiem';
+  String get profileGotIt => 'Rozumiem';
 
   @override
-  String get noN42BeanRecords => 'Brak rekordów N42 Bean';
+  String get profileNoN42BeanRecords => 'Brak rekordów N42 Bean';
 
   @override
-  String get cameraPermissionRestricted =>
-      'Dostęp do kamery jest ograniczony na tym urządzeniu';
+  String get profileMoodAndThoughts => 'Nastroj i mysli';
 
   @override
-  String get passkeyLabel => 'Passkey';
+  String get profileStatusHappy => 'Szczesliwy';
 
   @override
-  String get googleLabel => 'Google';
+  String get profileStatusCracked => 'Rozbity';
 
   @override
-  String get appleLabel => 'Apple';
+  String get profileStatusLucky => 'Szczęsliwy';
 
   @override
-  String get ssoLabel => 'SSO';
+  String get profileStatusSunny => 'Sloneczny';
 
   @override
-  String get amountHintZero => '0.00';
+  String get profileStatusTired => 'Zmęczony';
 
   @override
-  String get matrixIdHint => '@username:server.com';
+  String get profileStatusDaydream => 'Marzenia na jawie';
 
   @override
-  String get serverAddressHint => 'https://m.si46.world';
+  String get profileStatusRushing => 'W pospichu';
 
   @override
-  String get emailExampleHint => 'example@email.com';
+  String get profileStatusOverthinking => 'Zamyslony';
 
   @override
-  String get verificationCodePlaceholder => '------';
+  String get profileStatusEnergized => 'Pelen energii';
 
   @override
-  String get enterPokeSuffixHint => '输入戳一戳后缀，例如：的肩膀';
+  String get profileWorkAndStudy => 'Praca i nauka';
 
   @override
-  String get groupAlbum => '群相册';
+  String get profileStatusWorking => 'Pracuje';
 
   @override
-  String get groupFiles => '群文件';
+  String get profileStatusStudying => 'Ucze sie';
 
   @override
-  String get images => '图片';
+  String get profileStatusBusy => 'Zajety';
 
   @override
-  String get videos => '视频';
+  String get profileStatusSlacking => 'Obijam sie';
 
   @override
-  String get total => '全部';
+  String get profileStatusTraveling => 'Podrozuje';
 
   @override
-  String get size => '大小';
+  String get profileStatusGoingHome => 'Wracam do domu';
 
   @override
-  String get noMedia => '暂无媒体';
+  String get profileStatusDnd => 'Nie przeszkadzac';
 
   @override
-  String get noMediaDescription => '此群还没有图片或视频';
+  String get profileActivities => 'Aktywnosci';
 
   @override
-  String get documents => '文档';
+  String get profileStatusHanging => 'Spotykam sie';
 
   @override
-  String get noFiles => '暂无文件';
+  String get profileStatusCheckIn => 'Meldunek';
 
   @override
-  String get noFilesDescription => '此群还没有文件';
+  String get profileStatusExercising => 'Cwicze';
 
   @override
-  String downloadStarted(String filename) {
-    return '正在下载 $filename...';
+  String get profileStatusCoffee => 'Kawa';
+
+  @override
+  String get profileStatusBubbleTea => 'Bubble tea';
+
+  @override
+  String get profileStatusEating => 'Jem';
+
+  @override
+  String get profileStatusParenting => 'Opieka nad dziecmi';
+
+  @override
+  String get profileStatusSavingWorld => 'Ratuje swiat';
+
+  @override
+  String get profileStatusSelfie => 'Selfie';
+
+  @override
+  String get profileRest => 'Odpoczynek';
+
+  @override
+  String get profileStatusRetreat => 'Odwrot';
+
+  @override
+  String get profileStatusHome => 'W domu';
+
+  @override
+  String get profileStatusSleeping => 'Spie';
+
+  @override
+  String get profileStatusCatLover => 'Kociarz';
+
+  @override
+  String get profileStatusDogWalking => 'Spacer z psem';
+
+  @override
+  String get profileStatusGaming => 'Gram';
+
+  @override
+  String get profileStatusListening => 'Slucham';
+
+  @override
+  String get profileEditAddress => 'Edytuj adres';
+
+  @override
+  String get profileRecipient => 'Odbiorca';
+
+  @override
+  String get profileEnterRecipientName => 'Wprowadz nazwe odbiorcy';
+
+  @override
+  String get profilePhoneNumber => 'Numer telefonu';
+
+  @override
+  String get profileEnterPhoneNumber => 'Wprowadz numer telefonu';
+
+  @override
+  String get profileRegionHint => 'Wojewodztwo/Miasto/Dzielnica';
+
+  @override
+  String get profileDetailedAddress => 'Szczegolowy adres';
+
+  @override
+  String get profileDetailedAddressHint => 'Ulica, numer budynku itp.';
+
+  @override
+  String get profileSetAsDefaultAddress => 'Ustaw jako domyslny adres';
+
+  @override
+  String get profilePleaseCompleteInfo => 'Wypelnij wszystkie pola';
+
+  @override
+  String get profileEditInvoice => 'Edytuj fakture';
+
+  @override
+  String get profileInvoiceType => 'Typ faktury: ';
+
+  @override
+  String get profileCompanyName => 'Nazwa firmy';
+
+  @override
+  String get profilePersonalName => 'Imie i nazwisko';
+
+  @override
+  String get profileEnterCompanyName => 'Wprowadz nazwe firmy';
+
+  @override
+  String get profileEnterName => 'Wprowadz imie i nazwisko';
+
+  @override
+  String get profileTaxIdNumber => 'Numer NIP';
+
+  @override
+  String get profileEnterTaxIdNumber => 'Wprowadz numer NIP';
+
+  @override
+  String get profileBankNameOptional => 'Nazwa banku (opcjonalna)';
+
+  @override
+  String get profileEnterBankName => 'Wprowadz nazwe banku';
+
+  @override
+  String get profileBankAccountOptional => 'Numer konta bankowego (opcjonalny)';
+
+  @override
+  String get profileEnterBankAccount => 'Wprowadz numer konta bankowego';
+
+  @override
+  String get profileCompanyAddressOptional => 'Adres firmy (opcjonalny)';
+
+  @override
+  String get profileEnterCompanyAddress => 'Wprowadz adres firmy';
+
+  @override
+  String get profileCompanyPhoneOptional => 'Telefon firmy (opcjonalny)';
+
+  @override
+  String get profileEnterCompanyPhone => 'Wprowadz telefon firmy';
+
+  @override
+  String get profileSetAsDefaultInvoice => 'Ustaw jako domyslna fakture';
+
+  @override
+  String get profileRingtoneVibrate => 'Wibracja';
+
+  @override
+  String get profileRingtoneSilent => 'Cichy';
+
+  @override
+  String get profileVibrateMode => 'Tryb wibracji';
+
+  @override
+  String get profileSilentMode => 'Tryb cichy';
+
+  @override
+  String profilePlayFailed(String ringtoneName) {
+    return 'Nie udalo sie odtworzyc: $ringtoneName';
   }
 
   @override
-  String get noCommonGroups => '暂无共同群组';
-
-  @override
-  String get noCommonGroupsDescription => '你们没有共同加入的群组';
-
-  @override
-  String get pinMessage => '置顶';
-
-  @override
-  String get unpinMessage => '取消置顶';
-
-  @override
-  String get voiceMessage => '语音';
-
-  @override
-  String get message => '消息';
-
-  @override
-  String get hideChat => '隐藏';
-
-  @override
-  String get unhideChat => '取消隐藏';
-
-  @override
-  String get hiddenChats => '隐藏的聊天';
-
-  @override
-  String get noHiddenChats => '没有隐藏的聊天';
-
-  @override
-  String get noHiddenChatsDescription => '你隐藏的聊天会显示在这里';
-
-  @override
-  String get quickReply => '快捷回复';
-
-  @override
-  String get manageQuickReplies => '管理快捷回复';
-
-  @override
-  String get addQuickReply => '添加快捷回复';
-
-  @override
-  String get editQuickReply => '编辑快捷回复';
-
-  @override
-  String get deleteQuickReply => '删除快捷回复';
-
-  @override
-  String get noQuickReplies => '暂无快捷回复';
-
-  @override
-  String get defaultQuickReplies => '将显示默认快捷回复';
-
-  @override
-  String get translate => '翻译';
-
-  @override
-  String get translating => '翻译中...';
-
-  @override
-  String get translationFailed => '翻译失败';
-
-  @override
-  String translatedFrom(String language) {
-    return '翻译自$language';
+  String profilePlaying(String ringtoneName) {
+    return 'Odtwarzanie: $ringtoneName';
   }
 
   @override
-  String get showOriginal => '显示原文';
+  String get profileStop => 'Zatrzymaj';
 
   @override
-  String get hideTranslation => '隐藏翻译';
+  String get profileSelectRingtone => 'Wybierz dzwonek';
 
   @override
-  String get translation => '翻译';
+  String get profileLoadingRingtones => 'Ladowanie dzwonkow...';
 
   @override
-  String get story => '状态';
+  String get profileNoRingtonesFound => 'Nie znaleziono dzwonkow';
 
   @override
-  String get myStory => '我的状态';
-
-  @override
-  String get addToStory => '发布状态';
-
-  @override
-  String get storyExpired => '状态已过期';
-
-  @override
-  String storyExpiresIn(String time) {
-    return '$time后过期';
+  String mainMessagesWithCount(int count) {
+    return 'Wiadomosci($count)';
   }
 
   @override
-  String get viewers => '浏览者';
+  String get storyViewers => 'Widzowie';
 
   @override
-  String get noViewers => '暂无浏览';
+  String get storyNoViewers => 'Brak widzów';
 
   @override
-  String viewersCount(int count) {
-    return '$count人浏览';
+  String get storyReplyToStory => 'Odpowiedz na relację...';
+
+  @override
+  String get commonCopiedToClipboard => 'Skopiowano do schowka';
+
+  @override
+  String get commonMore => 'Wiecej';
+
+  @override
+  String get commonTranslating => 'Tłumaczenie...';
+
+  @override
+  String commonTranslatedFrom(String language) {
+    return 'Przetłumaczono z $language';
   }
 
   @override
-  String get replyToStory => '回复状态...';
+  String get commonTranslation => 'Tłumaczenie';
 
   @override
-  String get createStory => '发布状态';
+  String get commonTranslationFailed => 'Tłumaczenie nie powiodło się';
 
   @override
-  String get storySettings => '状态设置';
+  String get commonAllRead => 'Wszystko przeczytane';
 
   @override
-  String get whoCanSeeMyStory => '谁可以看我的状态';
+  String commonReadCount(int count) {
+    return '$count przeczytane';
+  }
 
   @override
-  String get storyPrivacy => '状态隐私';
+  String get commonYouRecalledMessage => 'Wycofales wiadomosc';
+
+  @override
+  String get commonMessageRecalled => 'Wiadomosc wycofana';
+
+  @override
+  String get commonReEdit => 'Edytuj ponownie';
+
+  @override
+  String get commonWalletArea => 'Strefa portfela';
+
+  @override
+  String get callIncomingCall => 'Polaczenie przychodzace';
+
+  @override
+  String get callMissedCall => 'Nieodebrane polaczenie';
+
+  @override
+  String get groupRemoveAdmin => 'Usun administratora';
+
+  @override
+  String get chatSelectCurrency => 'Wybierz walute';
+
+  @override
+  String get chatSelectEmoji => 'Wybierz emotikon';
+
+  @override
+  String get chatSelectRedPacketCover => 'Wybierz okładkę';
+
+  @override
+  String get groupSetAsAdmin => 'Ustaw jako administratora';
+
+  @override
+  String get chatVideoPlaybackFailed => 'Odtwarzanie wideo nie powiodlo sie';
+
+  @override
+  String get groupViewProfile => 'Zobacz profil';
+
+  @override
+  String get favoriteAddLinkComingSoon => 'Dodawanie linkow wkrotce dostepne';
+
+  @override
+  String get favoriteNewNoteComingSoon => 'Nowa notatka wkrotce dostepna';
+
+  @override
+  String get qrcodeSaveFeatureComingSoon =>
+      'Funkcja zapisywania wkrotce dostepna';
+
+  @override
+  String get qrcodeShareFeatureComingSoon =>
+      'Funkcja udostepniania wkrotce dostepna';
+
+  @override
+  String qrcodeProcessFailed(String error) {
+    return 'Nie udalo sie przetworzyc kodu QR: $error';
+  }
 }

@@ -1,745 +1,494 @@
 {
   "@@locale": "ko",
-  "chatModuleInitFailed": "채팅 모듈 초기화 실패",
-  "checkNetworkRetry": "네트워크 연결을 확인하고 다시 시도해주세요",
-  "retry": "다시 시도",
-  "unknownUser": "알 수 없는 사용자",
-  "walletNotConnected": "지갑이 연결되지 않음",
-  "cannotGetWalletAddress": "지갑 주소를 가져올 수 없습니다",
-  "paymentRequestMemo": "결제 요청: {requestId}",
-  "callServiceNotInitialized": "통화 서비스가 초기화되지 않았습니다",
-  "alreadyInCall": "이미 통화 중입니다",
-  "meetingServiceNotInitialized": "회의 서비스가 초기화되지 않았습니다",
-  "livekitNotConfigured": "LiveKit이 구성되지 않았습니다",
-  "unknownConversation": "알 수 없는 대화",
-  "startCallFailed": "통화 시작 실패: {error}",
-  "answerCallFailed": "응답 실패: {error}",
-  "connectionFailed": "연결 실패",
-  "callRejected": "통화 거절됨",
-  "noAnswer": "응답 없음",
-  "invalidLoginResponse": "잘못된 로그인 응답",
-  "loginFailed": "로그인 실패: {error}",
-  "sessionRestoreFailed": "세션 복원 실패",
-  "additionalVerificationRequired": "추가 인증이 필요합니다",
-  "registrationFailed": "회원가입 실패: {error}",
-  "cannotConnectServer": "서버에 연결할 수 없습니다: {error}",
-  "wrongUsernamePassword": "아이디 또는 비밀번호가 올바르지 않습니다",
-  "usernameTaken": "이미 사용 중인 아이디입니다",
-  "invalidUsernameFormat": "잘못된 아이디 형식입니다",
-  "rateLimitExceeded": "요청이 너무 많습니다. 잠시 후 다시 시도해주세요",
-  "loginExpired": "로그인이 만료되었습니다",
-  "joinMeetingFailed": "회의 참여 실패: {error}",
-  "screenShareFailed": "화면 공유 실패: {error}",
-  "answer": "응답",
-  "decline": "거절",
-  "missedCall": "부재중 전화",
-  "callBack": "다시 전화",
-  "incomingCall": "수신 전화",
-  "missedVideoCall": "부재중 영상통화",
-  "missedVoiceCall": "부재중 음성통화",
-  "passkeyNotInitialized": "패스키가 초기화되지 않았습니다",
-  "googleSignInNotConfigured": "Google 로그인이 구성되지 않았습니다",
-  "encryptedMessage": "[암호화된 메시지]",
-  "sticker": "[스티커]",
-  "groupCreated": "그룹이 생성되었습니다",
-  "groupNameChanged": "그룹 이름이 변경되었습니다",
-  "groupAvatarChanged": "그룹 프로필 사진이 변경되었습니다",
-  "groupAnnouncementChanged": "그룹 공지가 변경되었습니다",
-  "image": "[이미지]",
-  "video": "[동영상]",
-  "voice": "[음성]",
-  "file": "[파일]",
-  "location": "[위치]",
-  "unknownMessage": "[알 수 없는 메시지]",
-  "joinedGroup": "{senderName}님이 그룹에 참여했습니다",
-  "leftGroup": "{senderName}님이 그룹을 나갔습니다",
-  "invitedToGroup": "{senderName}님이 초대되었습니다",
-  "removedFromGroup": "{senderName}님이 삭제되었습니다",
-  "avatarDataEmpty": "프로필 사진 데이터가 비어 있습니다",
-  "avatarTooLarge": "프로필 사진이 너무 큽니다. 최대 10MB",
-  "uploadAvatarFailed": "프로필 사진 업로드 실패",
-  "delete": "삭제",
-  "deleteThisMessage": "이 메시지를 삭제하시겠습니까?",
-  "messageDeleted": "메시지가 삭제되었습니다",
-  "notLoggedIn": "로그인되지 않음",
-  "roomNotExist": "방을 찾을 수 없습니다: {roomId}",
-  "uploadImageFailed": "이미지 업로드 실패",
-  "matrixClientNotInitialized": "Matrix 클라이언트가 초기화되지 않았습니다",
-  "uploadVoiceFailed": "음성 업로드 실패: MXC URI를 가져올 수 없습니다",
-  "uploadVideoFailed": "동영상 업로드 실패: MXC URI를 가져올 수 없습니다",
-  "uploadFileFailed": "파일 업로드 실패: MXC URI를 가져올 수 없습니다",
-  "locationWithCoords": "위치: {lat}, {lon}",
-  "myLocation": "내 위치",
-  "pollEnded": "투표가 종료되었습니다",
-  "groupChat": "그룹 채팅",
-  "search": "검색",
-  "cancel": "취소",
-  "userCancelled": "사용자가 취소했습니다",
-  "noData": "데이터 없음",
-  "noSearchResults": "검색 결과 없음",
-  "tryDifferentKeyword": "다른 키워드로 시도해보세요",
-  "loadFailed": "로드 실패",
-  "checkNetwork": "네트워크 연결을 확인해주세요",
-  "networkConnectionFailed": "네트워크 연결 실패",
-  "checkNetworkSettings": "네트워크 설정을 확인해주세요",
-  "messages": "메시지",
-  "contacts": "연락처",
-  "discover": "발견",
-  "me": "나",
-  "voiceLoading": "음성 로딩 중, 잠시 후 다시 시도해주세요",
-  "voiceToTextFailed": "음성을 텍스트로 변환 실패",
-  "converting": "변환 중...",
-  "convertToText": "텍스트로 변환",
-  "convertToTextTitle": "텍스트로 변환",
-  "selectEmoji": "이모티콘 선택",
-  "selectRedPacketCover": "커버 선택",
-  "frequentlyUsed": "자주 사용",
-  "copy": "복사",
-  "forward": "전달",
-  "unfavorite": "즐겨찾기 해제",
-  "favorite": "즐겨찾기",
-  "resend": "다시 보내기",
-  "recall": "메시지 취소",
-  "multiSelect": "다중 선택",
-  "quote": "인용",
-  "remind": "멘션",
-  "searchThis": "검색",
-  "recallMessageConfirm": "이 메시지를 취소하시겠습니까?",
-  "youRecalledMessage": "메시지를 취소했습니다",
-  "otherRecalledMessage": "메시지가 취소되었습니다",
-  "reEdit": "다시 편집",
-  "copied": "복사됨",
-  "sendMessageHint": "메시지 보내기",
-  "microphonePermissionRequired": "마이크 권한을 허용해주세요",
-  "startRecordingFailed": "녹음 시작 실패: {error}",
-  "recordingTooShort": "녹음이 너무 짧습니다",
-  "stopRecordingFailed": "녹음 중지 실패: {error}",
-  "releaseToCancel": "손가락을 떼면 취소",
-  "releaseToSend": "손가락을 떼면 전송, 위로 스와이프하면 취소",
-  "holdToTalk": "길게 눌러서 말하기",
-  "send": "전송",
-  "conversationWithId": "대화: {roomId}",
-  "contactWithId": "연락처: {userId}",
-  "addFriend": "친구 추가",
-  "chatServiceNotConnected": "채팅 서비스에 연결되지 않음",
-  "userNotFoundHint": "사용자 \"{query}\"를 찾을 수 없습니다\n\n팁:\n• 전체 사용자 ID를 입력해보세요 (예: @username:server.com)\n• 사용자 이름 철자를 확인해주세요",
-  "@userNotFoundHint": {
+  "commonRetry": "다시 시도",
+  "commonUnknownUser": "알 수 없는 사용자",
+  "transferWalletNotConnected": "지갑이 연결되지 않음",
+  "chatCallServiceNotInitialized": "통화 서비스가 초기화되지 않았습니다",
+  "authLoginFailed": "로그인 실패: {error}",
+  "chatCallBack": "다시 전화",
+  "chatMissedVideoCall": "부재중 영상통화",
+  "chatMissedVoiceCall": "부재중 음성통화",
+  "commonImage": "[이미지]",
+  "chatVideo": "[동영상]",
+  "chatVoice": "[음성]",
+  "commonFile": "[파일]",
+  "chatLocation": "[위치]",
+  "chatUnknownMessage": "[알 수 없는 메시지]",
+  "commonDelete": "삭제",
+  "chatDeleteThisMessage": "이 메시지를 삭제하시겠습니까?",
+  "chatMessageDeleted": "메시지가 삭제되었습니다",
+  "profileNotLoggedIn": "로그인되지 않음",
+  "chatMyLocation": "내 위치",
+  "commonGroupChat": "그룹 채팅",
+  "commonSearch": "검색",
+  "commonCancel": "취소",
+  "commonLoadFailed": "로드 실패",
+  "commonMessages": "메시지",
+  "commonContacts": "연락처",
+  "commonMe": "나",
+  "commonVoiceLoading": "음성 로딩 중, 잠시 후 다시 시도해주세요",
+  "commonVoiceToTextFailed": "음성을 텍스트로 변환 실패",
+  "commonConvertToText": "텍스트로 변환",
+  "chatCopy": "복사",
+  "commonForward": "전달",
+  "commonUnfavorite": "즐겨찾기 해제",
+  "commonFavorite": "즐겨찾기",
+  "settingsResend": "다시 보내기",
+  "chatRecall": "메시지 취소",
+  "commonQuote": "인용",
+  "commonRemind": "멘션",
+  "chatCopied": "복사됨",
+  "storySendMessageHint": "메시지 보내기",
+  "commonMicrophonePermissionRequired": "마이크 권한을 허용해주세요",
+  "commonStartRecordingFailed": "녹음 시작 실패: {error}",
+  "commonRecordingTooShort": "녹음이 너무 짧습니다",
+  "commonStopRecordingFailed": "녹음 중지 실패: {error}",
+  "chatReleaseToCancel": "손가락을 떼면 취소",
+  "chatReleaseToSend": "손가락을 떼면 전송, 위로 스와이프하면 취소",
+  "commonHoldToTalk": "길게 눌러서 말하기",
+  "commonSend": "전송",
+  "commonAddFriend": "친구 추가",
+  "commonChatServiceNotConnected": "채팅 서비스에 연결되지 않음",
+  "contactUserNotFoundHint": "사용자 \"{query}\"를 찾을 수 없습니다\n\n팁:\n• 전체 사용자 ID를 입력해보세요 (예: @username:server.com)\n• 사용자 이름 철자를 확인해주세요",
+  "@contactUserNotFoundHint": {
     "placeholders": {
       "query": {
         "type": "String"
       }
     }
   },
-  "createChatFailed": "채팅 생성 실패: {error}",
-  "@createChatFailed": {
+  "contactCreateChatFailed": "채팅 생성 실패: {error}",
+  "@contactCreateChatFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "searchFailed": "검색 실패: {error}",
-  "@searchFailed": {
+  "contactSearchFailed": "검색 실패: {error}",
+  "@contactSearchFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "enterUserIdOrUsername": "검색할 사용자 ID 또는 이름을 입력하세요",
-  "searching": "검색 중...",
-  "searchUserToChat": "채팅할 사용자를 검색하세요",
-  "matrixIdExample": "전체 Matrix ID를 입력할 수 있습니다\n예: @user:matrix.n42.network",
-  "userNotFound": "사용자 \"{username}\"를 찾을 수 없습니다",
-  "@userNotFound": {
+  "contactEnterUserIdOrUsername": "검색할 사용자 ID 또는 이름을 입력하세요",
+  "contactSearching": "검색 중...",
+  "contactSearchUserToChat": "채팅할 사용자를 검색하세요",
+  "contactMatrixIdExample": "전체 Matrix ID를 입력할 수 있습니다\n예: @user:matrix.n42.network",
+  "contactUserNotFound": "사용자 \"{username}\"를 찾을 수 없습니다",
+  "@contactUserNotFound": {
     "placeholders": {
       "username": {
         "type": "String"
       }
     }
   },
-  "chat": "채팅",
-  "settings": "설정",
-  "editProfile": "프로필 편집",
-  "login": "로그인",
-  "createGroup": "그룹 만들기",
-  "developing": "{title}\n(곧 출시 예정)",
-  "error": "오류",
-  "pageNotFound": "페이지를 찾을 수 없습니다",
-  "backToHome": "홈으로 돌아가기",
-  "allRead": "모두 읽음",
-  "readCount": "{count}명 읽음",
-  "transfer": "송금",
-  "pendingReceipt": "대기 중",
-  "tapToReceive": "탭하여 받기",
-  "received": "받음",
-  "paymentReceived": "결제가 완료되었습니다",
-  "refunded": "환불됨",
-  "expired": "만료됨",
-  "redPacketGreeting": "행운을 빕니다",
-  "n42RedPacket": "N42 레드패킷",
-  "goodLuck": "행운을 잡으세요",
-  "claimed": "수령 완료",
-  "allClaimed": "모두 수령됨",
-  "emoji": "이모티콘",
-  "love": "사랑",
-  "animals": "동물",
-  "food": "음식",
-  "travel": "여행",
-  "activities": "활동",
-  "objects": "사물",
-  "symbols": "기호",
-  "reply": "답장",
-  "copiedToClipboard": "클립보드에 복사됨",
-  "edit": "편집",
-  "more": "더보기",
-  "selectForwardTarget": "받는 사람 선택",
-  "sendCount": "전송 ({count})",
-  "draft": "[임시 저장] ",
-  "n42Id": "N42 ID: {id}",
-  "n42IdTitle": "N42 ID",
-  "n42Bean": "N42 빈",
-  "friendInfo": "친구 정보",
-  "friendInfoDesc": "친구의 별명, 전화번호, 태그, 메모, 사진을 추가하고 권한을 설정하세요.",
-  "moments": "모먼트",
-  "sendMessage": "메시지",
-  "audioVideoCall": "음성/영상 통화",
-  "videoChannel": "영상 채널",
-  "remark": "별명",
-  "remarkName": "별명",
-  "phone": "전화번호",
-  "tags": "태그",
-  "notes": "메모",
-  "photos": "사진",
-  "permissions": "권한",
-  "chatMomentsEtc": "채팅, 모먼트, 운동 등",
-  "moreInfo": "추가 정보",
-  "commonGroups": "공통 그룹",
-  "zeroGroups": "0",
-  "source": "출처",
-  "notificationSettings": "알림",
-  "receiveNotifications": "새 메시지 알림 받기",
-  "showPreview": "메시지 미리보기 표시",
-  "showContentInNotification": "알림에 메시지 내용 표시",
-  "notificationSound": "알림 소리",
-  "playSoundOnMessage": "메시지 수신 시 소리 재생",
-  "vibrate": "진동",
-  "vibrateOnMessage": "메시지 수신 시 진동",
-  "doNotDisturb": "방해 금지",
-  "dndDescription": "지정된 시간 동안 알림 음소거",
-  "startTime": "시작 시간",
-  "endTime": "종료 시간",
-  "privacy": "개인정보",
-  "appearance": "외관",
-  "about": "정보",
-  "logout": "로그아웃",
-  "logoutConfirm": "정말 로그아웃하시겠습니까?",
-  "exit": "로그아웃",
-  "save": "저장",
-  "nickname": "닉네임",
-  "enterNickname": "닉네임 입력",
-  "signature": "상태 메시지",
-  "addSignature": "상태 메시지 추가",
-  "takePhoto": "사진 촬영",
-  "chooseFromGallery": "갤러리에서 선택",
-  "saveFailed": "저장 실패: {error}",
-  "secureDecentralizedChat": "안전한 분산형 메시징",
-  "endToEndEncryption": "종단간 암호화",
-  "messagesOnlyYouCanSee": "나와 상대방만 볼 수 있는 메시지",
-  "decentralized": "분산형",
-  "basedOnMatrix": "Matrix 오픈 프로토콜 기반",
-  "walletIntegration": "지갑 연동",
-  "easyCryptoTransfer": "간편한 암호화폐 송금",
-  "register": "회원가입",
-  "agreeTerms": "로그인하면 다음에 동의하는 것으로 간주됩니다",
-  "termsOfService": "서비스 약관",
-  "and": "및",
-  "privacyPolicy": "개인정보 처리방침",
-  "serverAddress": "서버 주소",
-  "enterServerAddress": "서버 주소 입력",
-  "validServerAddress": "올바른 서버 주소를 입력해주세요",
-  "connectedTo": "{serverName}에 연결됨",
-  "username": "아이디",
-  "enterUsername": "아이디 입력",
-  "password": "비밀번호",
-  "enterPassword": "비밀번호 입력",
-  "registerAccount": "회원가입",
-  "forgotPassword": "비밀번호 찾기",
-  "otherLoginMethods": "다른 로그인 방법",
-  "emailVerification": "이메일 인증 코드",
-  "enterServerFirst": "먼저 서버 주소를 입력해주세요",
-  "passkeyNeedsServer": "패스키 로그인은 서버 지원이 필요합니다",
-  "googleLoginSuccess": "Google 로그인 성공: {email}",
-  "googleLoginFailed": "Google 로그인 실패: {error}",
-  "appleLoginSuccess": "Apple 로그인 성공",
-  "appleLoginFailed": "Apple 로그인 실패: {error}",
-  "createAccount": "계정 만들기",
-  "joinN42Chat": "N42 Chat에 가입하여 채팅을 시작하세요",
-  "usernameHint": "3-20자, 영문/숫자/_",
-  "usernameMinLength": "아이디는 최소 3자 이상이어야 합니다",
-  "usernameMaxLength": "아이디는 최대 20자까지 가능합니다",
-  "usernameFormat": "아이디는 영문, 숫자, 밑줄만 사용할 수 있습니다",
-  "passwordHint": "최소 8자",
-  "passwordMinLength": "비밀번호는 최소 8자 이상이어야 합니다",
-  "confirmPassword": "비밀번호 확인",
-  "reEnterPassword": "비밀번호 재입력",
-  "passwordsNotMatch": "비밀번호가 일치하지 않습니다",
-  "inviteCode": "초대 코드 (내장)",
-  "filled": "입력됨",
-  "enterInviteCode": "초대 코드 입력",
-  "inviteCodeHint": "초대 코드는 내장되어 있어 일반적으로 수정할 필요가 없습니다",
-  "agreeTermsFirst": "먼저 약관과 개인정보 처리방침을 읽고 동의해주세요",
-  "iAgree": "읽고 동의합니다",
-  "alreadyHaveAccount": "이미 계정이 있으신가요?",
-  "loginNow": "지금 로그인",
-  "whoCanSee": "볼 수 있는 사람",
-  "avatar": "프로필 사진",
-  "status": "상태",
-  "lastSeen": "마지막 접속",
-  "messageSettings": "메시지",
-  "allowStrangerMessage": "모르는 사람의 메시지 허용",
-  "receiveNonContact": "연락처에 없는 사람의 메시지 받기",
-  "readReceipts": "읽음 확인",
-  "letOthersKnowRead": "상대방에게 메시지를 읽었다고 알림",
-  "typingStatus": "입력 중 표시",
-  "letOthersKnowTyping": "상대방에게 입력 중이라고 알림",
-  "everyone": "모든 사람",
-  "contactsOnly": "연락처만",
-  "nobody": "아무도",
-  "whoCanSeeItem": "{title}을(를) 볼 수 있는 사람",
-  "version": "버전 {version}",
-  "checkUpdate": "업데이트 확인",
-  "openSourceLicenses": "오픈소스 라이선스",
-  "feedback": "피드백",
-  "builtOnMatrix": "Matrix 프로토콜 기반",
-  "loading": "로딩 중...",
-  "noConversations": "대화 없음",
-  "tapToChat": "오른쪽 상단을 탭하여 채팅 시작",
-  "startGroup": "그룹 채팅 시작",
-  "scan": "스캔",
-  "payment": "결제",
-  "featureComingSoon": "{feature} 곧 출시 예정",
-  "markAsRead": "읽음으로 표시",
-  "unmute": "알림 켜기",
-  "mute": "알림 끄기",
-  "unpin": "고정 해제",
-  "pin": "고정",
-  "deleteConversation": "대화 삭제",
-  "deleteConversationConfirm": "\"{name}\"님과의 대화를 삭제하시겠습니까?",
-  "noContacts": "연락처 없음",
-  "addFriendsToChat": "친구를 추가하여 채팅을 시작하세요",
+  "commonChat": "채팅",
+  "commonSettings": "설정",
+  "profileEditProfile": "프로필 편집",
+  "authLogin": "로그인",
+  "commonCreateGroup": "그룹 만들기",
+  "chatError": "오류",
+  "commonTransfer": "송금",
+  "commonReceived": "받음",
+  "commonRefunded": "환불됨",
+  "commonExpired": "만료됨",
+  "chatRedPacketGreeting": "행운을 빕니다",
+  "commonN42RedPacket": "N42 레드패킷",
+  "commonClaimed": "수령 완료",
+  "commonAllClaimed": "모두 수령됨",
+  "chatReply": "답장",
+  "commonEdit": "편집",
+  "chatSelectForwardTarget": "받는 사람 선택",
+  "commonSendCount": "전송 ({count})",
+  "contactN42Id": "N42 ID: {id}",
+  "profileN42IdTitle": "N42 ID",
+  "profileN42Bean": "N42 빈",
+  "contactFriendInfo": "친구 정보",
+  "contactFriendInfoDesc": "친구의 별명, 전화번호, 태그, 메모, 사진을 추가하고 권한을 설정하세요.",
+  "commonMoments": "모먼트",
+  "commonSendMessage": "메시지",
+  "contactAudioVideoCall": "음성/영상 통화",
+  "contactVideoChannel": "영상 채널",
+  "contactRemark": "별명",
+  "contactRemarkName": "별명",
+  "contactPhone": "전화번호",
+  "contactTags": "태그",
+  "contactNotes": "메모",
+  "contactPhotos": "사진",
+  "contactPermissions": "권한",
+  "contactChatMomentsEtc": "채팅, 모먼트, 운동 등",
+  "contactMoreInfo": "추가 정보",
+  "contactCommonGroups": "공통 그룹",
+  "contactSource": "출처",
+  "settingsNotificationSettings": "알림",
+  "settingsPrivacy": "개인정보",
+  "settingsAppearance": "외관",
+  "settingsAbout": "정보",
+  "commonLogout": "로그아웃",
+  "commonLogoutConfirm": "정말 로그아웃하시겠습니까?",
+  "commonSave": "저장",
+  "profileNickname": "닉네임",
+  "profileEnterNickname": "닉네임 입력",
+  "profileSignature": "상태 메시지",
+  "profileAddSignature": "상태 메시지 추가",
+  "commonTakePhoto": "사진 촬영",
+  "profileChooseFromGallery": "갤러리에서 선택",
+  "profileSaveFailed": "저장 실패: {error}",
+  "authSecureDecentralizedChat": "안전한 분산형 메시징",
+  "commonEndToEndEncryption": "종단간 암호화",
+  "authMessagesOnlyYouCanSee": "나와 상대방만 볼 수 있는 메시지",
+  "authDecentralized": "분산형",
+  "authBasedOnMatrix": "Matrix 오픈 프로토콜 기반",
+  "authWalletIntegration": "지갑 연동",
+  "authEasyCryptoTransfer": "간편한 암호화폐 송금",
+  "authRegister": "회원가입",
+  "authAgreeTerms": "로그인하면 다음에 동의하는 것으로 간주됩니다",
+  "authTermsOfService": "서비스 약관",
+  "authAnd": "및",
+  "authPrivacyPolicy": "개인정보 처리방침",
+  "authServerAddress": "서버 주소",
+  "authEnterServerAddress": "서버 주소 입력",
+  "authConnectedTo": "{serverName}에 연결됨",
+  "authUsername": "아이디",
+  "authEnterUsername": "아이디 입력",
+  "authPassword": "비밀번호",
+  "authEnterPassword": "비밀번호 입력",
+  "authRegisterAccount": "회원가입",
+  "authForgotPassword": "비밀번호 찾기",
+  "authOtherLoginMethods": "다른 로그인 방법",
+  "authCreateAccount": "계정 만들기",
+  "authJoinN42Chat": "N42 Chat에 가입하여 채팅을 시작하세요",
+  "authUsernameHint": "3-20자, 영문/숫자/_",
+  "authUsernameMinLength": "아이디는 최소 3자 이상이어야 합니다",
+  "authUsernameMaxLength": "아이디는 최대 20자까지 가능합니다",
+  "authUsernameFormat": "아이디는 영문, 숫자, 밑줄만 사용할 수 있습니다",
+  "authPasswordHint": "최소 8자",
+  "commonPasswordMinLength": "비밀번호는 최소 8자 이상이어야 합니다",
+  "authConfirmPassword": "비밀번호 확인",
+  "authFilled": "입력됨",
+  "authEnterInviteCode": "초대 코드 입력",
+  "authAlreadyHaveAccount": "이미 계정이 있으신가요?",
+  "authLoginNow": "지금 로그인",
+  "profileAvatar": "프로필 사진",
+  "profileStatus": "상태",
+  "commonLoading": "로딩 중...",
+  "conversationNoConversations": "대화 없음",
+  "conversationTapToChat": "오른쪽 상단을 탭하여 채팅 시작",
+  "conversationStartGroup": "그룹 채팅 시작",
+  "commonScan": "스캔",
+  "commonPayment": "결제",
+  "commonFeatureComingSoon": "{feature} 곧 출시 예정",
+  "conversationMarkAsRead": "읽음으로 표시",
+  "commonUnmute": "알림 켜기",
+  "commonMute": "알림 끄기",
+  "conversationUnpin": "고정 해제",
+  "conversationPin": "고정",
+  "conversationDeleteConversation": "대화 삭제",
+  "conversationDeleteConversationConfirm": "\"{name}\"님과의 대화를 삭제하시겠습니까?",
+  "commonNoContacts": "연락처 없음",
+  "contactAddFriendsToChat": "친구를 추가하여 채팅을 시작하세요",
   "contactNotFound": "연락처를 찾을 수 없습니다",
-  "tryOtherKeywords": "다른 키워드로 시도하거나 전체 검색을 이용하세요",
-  "searchResults": "검색 결과",
-  "newFriends": "새 친구",
-  "chatOnlyFriends": "채팅 전용 친구",
-  "officialAccounts": "공식 계정",
-  "serviceAccounts": "서비스 계정",
-  "enterpriseContacts": "기업 연락처",
-  "contactsCount": "연락처 {count}명",
-  "recommendToFriend": "연락처 공유",
-  "setRemark": "별명 설정",
-  "addToHome": "홈 화면에 추가",
-  "sendingCard": "연락처 카드 전송 중...",
-  "contactCard": "[연락처 카드]",
-  "fileLabel": "파일",
-  "locationLabel": "위치",
-  "cardSent": "{contact}님의 카드를 {friend}님에게 전송했습니다",
-  "recommendFailed": "추천 실패: {error}",
-  "enterRemark": "별명 입력",
-  "remarkSet": "별명이 설정되었습니다: {remark}",
-  "openingChat": "채팅 열는 중...",
-  "openChatFailed": "채팅 열기 실패: {error}",
-  "addContact": "연락처 추가",
-  "enterUserId": "사용자 ID 입력",
-  "noFriendRequests": "친구 요청 없음",
-  "accept": "수락",
-  "reject": "거절",
-  "acceptedRequest": "{name}님의 친구 요청을 수락했습니다",
-  "rejectedRequest": "{name}님의 친구 요청을 거절했습니다",
-  "noGroups": "그룹 없음",
-  "creatingGroup": "그룹 만들기 곧 출시 예정...",
-  "selectFriendToRecommend": "추천할 친구 선택",
-  "searchContacts": "연락처 검색",
-  "noContactsFound": "연락처를 찾을 수 없습니다",
-  "yesterday": "어제",
-  "monday": "월",
-  "tuesday": "화",
-  "wednesday": "수",
-  "thursday": "목",
-  "friday": "금",
-  "saturday": "토",
-  "sunday": "일",
-  "justNow": "방금",
-  "minutesAgo": "{count}분 전",
-  "hoursAgo": "{count}시간 전",
-  "daysAgo": "{count}일 전",
-  "online": "온라인",
-  "offline": "오프라인",
-  "minutesAgoOnline": "{count}분 전 온라인",
-  "hoursAgoOnline": "{count}시간 전 온라인",
-  "daysAgoOnline": "{count}일 전 온라인",
+  "contactTryOtherKeywords": "다른 키워드로 시도하거나 전체 검색을 이용하세요",
+  "contactSearchResults": "검색 결과",
+  "contactNewFriends": "새 친구",
+  "contactChatOnlyFriends": "Chat-only Friends",
+  "contactOfficialAccounts": "공식 계정",
+  "contactServiceAccounts": "서비스 계정",
+  "contactEnterpriseContacts": "기업 연락처",
+  "contactRecommendToFriend": "연락처 공유",
+  "commonSetRemark": "별명 설정",
+  "contactSendingCard": "연락처 카드 전송 중...",
+  "commonFileLabel": "파일",
+  "commonLocationLabel": "위치",
+  "contactRecommendFailed": "추천 실패: {error}",
+  "profileEnterRemark": "별명 입력",
+  "contactOpeningChat": "채팅 열는 중...",
+  "contactOpenChatFailed": "채팅 열기 실패: {error}",
+  "contactAddContact": "연락처 추가",
+  "contactEnterUserId": "사용자 ID 입력",
+  "contactNoFriendRequests": "친구 요청 없음",
+  "commonAccept": "수락",
+  "commonReject": "거절",
+  "commonNoGroups": "그룹 없음",
+  "contactSelectFriendToRecommend": "추천할 친구 선택",
+  "commonSearchContacts": "연락처 검색",
+  "contactNoContactsFound": "연락처를 찾을 수 없습니다",
+  "favoriteYesterday": "어제",
+  "chatJustNow": "방금",
+  "profileOnline": "온라인",
+  "profileOffline": "오프라인",
   "searchContactsGroupsMessages": "연락처, 그룹, 메시지 검색",
   "searchError": "검색 오류",
-  "searchHint": "연락처, 그룹, 메시지 검색",
-  "enterKeyword": "키워드를 입력하여 검색",
+  "chatSearchHint": "연락처, 그룹, 메시지 검색",
   "searchHistory": "검색 기록",
-  "clear": "지우기",
-  "noResultsFor": "\"{query}\"에 대한 결과 없음",
-  "all": "전체",
-  "groups": "그룹",
-  "noResults": "결과 없음",
-  "groupInfo": "그룹 정보",
-  "groupMembers": "멤버 ({count}명)",
+  "commonClear": "지우기",
+  "commonAll": "전체",
+  "searchGroups": "그룹",
+  "searchNoResults": "결과 없음",
+  "commonGroupMembers": "멤버 ({count}명)",
   "groupMembersTitle": "그룹 멤버",
-  "viewAll": "모두 보기",
-  "owner": "소유자",
-  "admin": "관리자",
-  "invite": "초대",
-  "groupAnnouncement": "그룹 공지",
-  "notSet": "설정되지 않음",
+  "groupViewAll": "모두 보기",
+  "groupOwner": "소유자",
+  "groupAdmin": "관리자",
+  "groupInvite": "초대",
+  "commonGroupAnnouncement": "그룹 공지",
+  "commonNotSet": "설정되지 않음",
   "groupDescription": "그룹 설명",
-  "publicGroup": "공개 그룹",
-  "allowSearchJoin": "다른 사람이 검색하고 참여할 수 있도록 허용",
-  "clearChatHistory": "채팅 기록 지우기",
-  "dissolveGroup": "그룹 해체",
-  "leaveGroup": "그룹 나가기",
-  "changeGroupName": "그룹 이름 변경",
-  "enterGroupName": "그룹 이름 입력",
-  "confirm": "확인",
-  "changeGroupDescription": "그룹 설명 변경",
-  "enterGroupDescription": "그룹 설명 입력",
-  "editAnnouncement": "공지 편집",
-  "enterAnnouncement": "공지 입력",
-  "publish": "게시",
-  "clearHistoryConfirm": "모든 채팅 기록을 지우시겠습니까? 이 작업은 취소할 수 없습니다.",
-  "clearAction": "지우기",
-  "chatHistoryCleared": "채팅 기록이 삭제되었습니다",
-  "leaveGroupConfirm": "\"{name}\"을(를) 나가시겠습니까?",
-  "dissolveGroupConfirm": "\"{name}\"을(를) 해체하시겠습니까? 이 작업은 취소할 수 없습니다.",
-  "dissolve": "해체",
+  "groupPublicGroup": "공개 그룹",
+  "commonClearChatHistory": "채팅 기록 지우기",
+  "commonDissolveGroup": "그룹 해체",
+  "commonLeaveGroup": "그룹 나가기",
+  "groupChangeGroupName": "그룹 이름 변경",
+  "commonEnterGroupName": "그룹 이름 입력",
+  "commonConfirm": "확인",
+  "groupEnterGroupDescription": "그룹 설명 입력",
+  "groupPublish": "게시",
+  "chatClearHistoryConfirm": "모든 채팅 기록을 지우시겠습니까? 이 작업은 취소할 수 없습니다.",
+  "chatClearAction": "지우기",
+  "commonChatHistoryCleared": "채팅 기록이 삭제되었습니다",
+  "commonDissolve": "해체",
   "groupQrCode": "그룹 QR 코드",
-  "searchChatHistory": "채팅 기록 검색",
+  "commonSearchChatHistory": "채팅 기록 검색",
   "groupIdCopied": "그룹 ID 복사됨",
-  "tapCopyGroupId": "멤버 {count}명 · 탭하여 그룹 ID 복사",
-  "featureInDevelopment": "기능 개발 중...",
-  "receiverAddress": "받는 주소",
-  "enterOrPasteAddress": "지갑 주소 입력 또는 붙여넣기",
-  "selectToken": "토큰 선택",
-  "transferAmount": "송금 금액",
-  "available": "사용 가능",
-  "allAmount": "전액",
-  "memoOptional": "메모 (선택)",
-  "addMemo": "메모 추가",
-  "confirmTransfer": "송금 확인",
-  "invalidAddress": "올바른 받는 주소를 입력해주세요",
-  "invalidAmount": "올바른 금액을 입력해주세요",
-  "selectTokenPlease": "토큰을 선택해주세요",
-  "addressVerified": "주소 확인됨",
-  "availableBalance": "사용 가능: {balance} {symbol}",
-  "scanningInDevelopment": "스캔 기능 개발 중...",
-  "enterAmount": "금액 입력",
-  "redPacketCountMin": "최소 1개의 레드패킷이 필요합니다",
-  "viewRedPacketDetails": "레드패킷 상세 보기",
-  "enterTransferAmount": "송금 금액 입력",
-  "transferTo": "받는 사람",
-  "selectCurrency": "통화 선택",
-  "receiveTransfer": "송금 받음",
-  "fromSender": "{senderName}님으로부터",
-  "confirmReceive": "수령 확인",
+  "commonFeatureInDevelopment": "기능 개발 중...",
+  "transferEnterOrPasteAddress": "지갑 주소 입력 또는 붙여넣기",
+  "transferSelectToken": "토큰 선택",
+  "commonTransferAmount": "송금 금액",
+  "transferAvailable": "사용 가능",
+  "transferMemoOptional": "메모 (선택)",
+  "transferConfirmTransfer": "송금 확인",
+  "transferAddressVerified": "주소 확인됨",
+  "transferAvailableBalance": "사용 가능: {balance} {symbol}",
+  "commonEnterAmount": "금액 입력",
+  "commonRedPacketCountMin": "최소 1개의 레드패킷이 필요합니다",
+  "commonViewRedPacketDetails": "레드패킷 상세 보기",
+  "commonEnterTransferAmount": "송금 금액 입력",
+  "commonTransferTo": "받는 사람",
+  "commonFromSender": "{senderName}님으로부터",
+  "commonConfirmReceive": "수령 확인",
   "groupProfile": "그룹 정보",
-  "viewProfile": "프로필 보기",
-  "removeMember": "그룹에서 삭제",
-  "removeMemberConfirm": "그룹에서 \"{name}\"님을 삭제하시겠습니까?",
-  "remove": "삭제",
-  "clearStatus": "상태 지우기",
-  "clearStatusConfirm": "현재 상태를 지우시겠습니까?",
-  "statusCleared": "상태가 지워졌습니다",
-  "statusSet": "상태 설정됨: {result}",
-  "userNotExist": "사용자가 존재하지 않습니다",
-  "userIdCopied": "사용자 ID 복사됨",
-  "voiceCallInDevelopment": "음성 통화 개발 중...",
-  "report": "신고",
-  "reportInDevelopment": "신고 기능 개발 중...",
-  "shareCard": "카드 공유",
-  "shareInDevelopment": "공유 기능 개발 중...",
-  "qrCode": "QR 코드",
-  "qrCodeInDevelopment": "QR 코드 기능 개발 중...",
-  "avatarUpdated": "프로필 사진이 업데이트되었습니다",
-  "selectImageFailed": "이미지 선택 실패: {error}",
-  "changeName": "이름 변경",
-  "male": "남성",
-  "female": "여성",
-  "genderSet": "성별이 설정되었습니다: {gender}",
-  "regionSet": "지역이 설정되었습니다: {region}",
-  "setPatText": "찌르기 텍스트 설정",
-  "changeSignature": "상태 메시지 변경",
-  "ringtoneSet": "벨소리가 설정되었습니다: {result}",
-  "featureInDev": "{feature} 개발 중...",
-  "saveAddressFailed": "주소 저장 실패: {error}",
-  "myAddress": "내 주소",
-  "addNew": "추가",
-  "addAddress": "주소 추가",
-  "addressAdded": "주소가 추가되었습니다",
-  "addressUpdated": "주소가 업데이트되었습니다",
-  "deleteAddress": "주소 삭제",
-  "deleteAddressConfirm": "이 주소를 삭제하시겠습니까?",
-  "addressDeleted": "주소가 삭제되었습니다",
-  "setDefaultAddress": "기본 주소로 설정",
-  "fillCompleteInfo": "모든 항목을 입력해주세요",
-  "saveInvoiceFailed": "청구서 저장 실패: {error}",
-  "myInvoices": "내 청구서",
-  "addInvoice": "청구서 추가",
-  "invoiceAdded": "청구서가 추가되었습니다",
-  "invoiceUpdated": "청구서가 업데이트되었습니다",
-  "deleteInvoice": "청구서 삭제",
-  "deleteInvoiceConfirm": "이 청구서를 삭제하시겠습니까?",
-  "invoiceDeleted": "청구서가 삭제되었습니다",
-  "invoiceType": "청구서 유형: ",
-  "personal": "개인",
-  "enterprise": "기업",
-  "setDefaultInvoice": "기본 청구서로 설정",
-  "enterTaxId": "사업자 등록번호 입력",
-  "vibrateMode": "진동 모드",
-  "silentMode": "무음 모드",
-  "playing": "재생 중: {ringtoneName}",
-  "playFailed": "재생 실패: {ringtoneName}",
-  "enterGroupNamePlease": "그룹 이름을 입력해주세요",
-  "selectAtLeastOne": "최소 한 명의 멤버를 선택해주세요",
-  "fillStatus": "상태 작성",
-  "fileNotExist": "파일이 존재하지 않습니다",
-  "sendFailed": "전송 실패: {error}",
-  "cannotOpenBrowser": "브라우저를 열 수 없습니다",
-  "selectFileFailed": "파일 선택 실패: {error}",
-  "enterMusicLink": "음악 링크 입력",
-  "enterValidLink": "올바른 링크를 입력해주세요",
-  "enterPollQuestion": "투표 질문 입력",
-  "minTwoOptions": "최소 2개의 옵션이 필요합니다",
-  "crossDeviceEnabled": "교차 기기 서명이 활성화되었습니다",
-  "crossDeviceSet": "교차 기기 서명이 성공적으로 설정되었습니다",
-  "setupFailed": "설정 실패: {error}",
-  "receiveAmount": "받을 금액",
-  "enterValidAmount": "올바른 금액을 입력해주세요",
-  "addressCopied": "주소 복사됨",
-  "openItem": "열기: {content}",
-  "newNoteComingSoon": "새 노트 기능 곧 출시 예정",
-  "addLinkComingSoon": "링크 추가 기능 곧 출시 예정",
-  "deleted": "삭제됨",
-  "shareComingSoon": "공유 기능 곧 출시 예정",
-  "saveComingSoon": "저장 기능 곧 출시 예정",
-  "moreStylesComingSoon": "더 많은 스타일 곧 출시 예정",
-  "wallet": "지갑",
-  "walletArea": "지갑 영역",
-  "recording": "녹음 중",
-  "invalidVideoUrl": "잘못된 동영상 URL",
-  "downloadFile": "파일 다운로드",
-  "clearChatHistoryTitle": "채팅 기록 지우기",
-  "cannotUndo": "이 작업은 취소할 수 없습니다",
-  "videoCall": "영상 통화",
-  "voiceCall": "음성 통화",
-  "leaveMeeting": "회의 나가기",
+  "groupRemoveMember": "그룹에서 삭제",
+  "commonRemove": "삭제",
+  "profileClearStatus": "상태 지우기",
+  "profileClearStatusConfirm": "현재 상태를 지우시겠습니까?",
+  "profileStatusCleared": "상태가 지워졌습니다",
+  "profileUserNotExist": "사용자가 존재하지 않습니다",
+  "profileUserIdCopied": "사용자 ID 복사됨",
+  "commonReport": "신고",
+  "profileQrCode": "QR 코드",
+  "profileAvatarUpdated": "프로필 사진이 업데이트되었습니다",
+  "commonSelectImageFailed": "이미지 선택 실패: {error}",
+  "profileChangeName": "이름 변경",
+  "profileMale": "남성",
+  "profileFemale": "여성",
+  "chatFeatureInDev": "{feature} 개발 중...",
+  "profileSaveAddressFailed": "주소 저장 실패: {error}",
+  "profileAddNew": "추가",
+  "profileAddAddress": "주소 추가",
+  "profileAddressAdded": "주소가 추가되었습니다",
+  "profileAddressUpdated": "주소가 업데이트되었습니다",
+  "profileDeleteAddress": "주소 삭제",
+  "profileAddressDeleted": "주소가 삭제되었습니다",
+  "profileSaveInvoiceFailed": "청구서 저장 실패: {error}",
+  "profileMyInvoices": "내 청구서",
+  "profileAddInvoice": "청구서 추가",
+  "profileInvoiceAdded": "청구서가 추가되었습니다",
+  "profileInvoiceUpdated": "청구서가 업데이트되었습니다",
+  "profileDeleteInvoice": "청구서 삭제",
+  "profileInvoiceDeleted": "청구서가 삭제되었습니다",
+  "profilePersonal": "개인",
+  "groupSelectAtLeastOne": "최소 한 명의 멤버를 선택해주세요",
+  "chatFileNotExist": "파일이 존재하지 않습니다",
+  "chatSendFailed": "전송 실패: {error}",
+  "chatCannotOpenBrowser": "브라우저를 열 수 없습니다",
+  "chatSelectFileFailed": "파일 선택 실패: {error}",
+  "settingsSetupFailed": "설정 실패: {error}",
+  "transferEnterValidAmount": "올바른 금액을 입력해주세요",
+  "commonAddressCopied": "주소 복사됨",
+  "favoriteOpenItem": "열기: {content}",
+  "favoriteDeleted": "삭제됨",
+  "profileWallet": "지갑",
+  "chatRecording": "녹음 중",
+  "chatInvalidVideoUrl": "잘못된 동영상 URL",
+  "chatDownloadFile": "파일 다운로드",
+  "chatClearChatHistoryTitle": "채팅 기록 지우기",
+  "chatVideoCall": "영상 통화",
+  "commonVoiceCall": "음성 통화",
+  "callLeaveMeeting": "회의 나가기",
   "chatDetails": "채팅 상세",
-  "viewAllGroupMembers": "모든 멤버 보기",
-  "groupName": "그룹 이름",
-  "groupNameUpdated": "그룹 이름이 업데이트되었습니다",
-  "groupDescriptionUpdated": "그룹 설명이 업데이트되었습니다",
-  "groupAvatarUpdated": "그룹 아바타가 업데이트되었습니다",
-  "updateFailed": "업데이트 실패",
-  "noPermissionToModify": "수정 권한이 없습니다",
-  "groupManagement": "그룹 관리",
-  "myNicknameInGroup": "그룹 내 내 별명",
-  "pinChat": "채팅 고정",
-  "strongReminder": "강력 알림",
-  "setChatBackground": "채팅 배경 설정",
-  "unknownFile": "알 수 없는 파일",
-  "download": "다운로드",
-  "invalidLocation": "잘못된 위치",
-  "address": "주소",
-  "latitude": "위도",
-  "longitude": "경도",
-  "close": "닫기",
-  "tapToCancel": "탭하여 취소",
-  "captureFailed": "캡처 실패: {error}",
-  "processingVideo": "동영상 처리 중...",
-  "videoFileNotExist": "동영상 파일이 존재하지 않습니다",
-  "videoDataEmpty": "동영상 데이터가 비어 있습니다",
-  "videoTooLarge": "동영상 크기는 100MB를 초과할 수 없습니다",
-  "sendingVideo": "동영상 전송 중...",
-  "sendVideoFailed": "동영상 전송 실패: {error}",
-  "imageFileNotExist": "이미지 파일이 존재하지 않습니다",
-  "imageDataEmpty": "이미지 데이터가 비어 있습니다",
-  "sendingImage": "이미지 전송 중...",
-  "sendImageFailed": "이미지 전송 실패: {error}",
-  "sendLocation": "위치 보내기",
-  "selectLocationAndSend": "위치를 선택하고 보내기",
-  "shareRealTimeLocation": "실시간 위치 공유",
-  "shareLocationForOneHour": "친구와 1시간 동안 실시간 위치 공유",
-  "locationSent": "위치가 전송되었습니다",
-  "selectMessages": "메시지 선택",
-  "selectedCount": "{count}개 선택됨",
-  "selectAll": "전체 선택",
-  "groupChatCount": "그룹 채팅 ({count})",
-  "privateChat": "개인 채팅",
-  "noMessages": "메시지 없음",
-  "sendFirstMessage": "첫 메시지를 보내 채팅을 시작하세요",
-  "encryptionNotice": "이 채팅은 종단간 암호화되어 있습니다. 나와 상대방만 메시지를 읽을 수 있습니다.",
-  "replyTo": "{name}님에게 답장",
-  "multiForward": "전달",
-  "collect": "수집",
-  "noMembers": "멤버 없음",
-  "memberNotFound": "멤버를 찾을 수 없습니다",
-  "voiceFileNotExist": "음성 파일이 존재하지 않습니다",
-  "voiceFileEmpty": "음성 파일이 비어 있습니다",
-  "sendingVoice": "음성 전송 중...",
-  "sendVoiceFailed": "음성 전송 실패: {error}",
-  "messageCopied": "메시지 복사됨",
-  "messageForwarded": "메시지 전달됨",
-  "forwardFailed": "전달 실패: {error}",
-  "unfavorited": "즐겨찾기 해제됨",
-  "favorited": "즐겨찾기 추가됨",
-  "reactionAdded": "반응 추가됨",
-  "reactionRemoved": "반응 제거됨",
-  "failedMessageDeleted": "실패한 메시지 삭제됨",
-  "deleteMessages": "메시지 삭제",
-  "deleteMessagesConfirm": "정말 {count}개의 메시지를 삭제하시겠습니까?",
-  "noteOtherMessages": "참고: {count}개의 메시지는 다른 사람의 것으로, 나에게만 삭제됩니다.",
-  "myMessagesWillBeRecalled": "내 {count}개의 메시지가 모든 사람에게 취소됩니다.",
-  "recalledCount": "{count}개 취소됨, {localCount}개 나에게만 삭제됨",
-  "recalledMessages": "{count}개 메시지 취소됨",
-  "deletedLocally": "{count}개 메시지가 나에게만 삭제됨",
-  "forwardedCount": "{count}개 메시지 전달됨",
-  "forwardComplete": "전달 완료: {success}개 성공, {failed}개 실패",
-  "remindOnlyInGroup": "멘션 기능은 그룹 채팅에서만 사용할 수 있습니다",
-  "onlyTextSearchable": "텍스트 메시지만 검색할 수 있습니다",
-  "searchFor": "\"{text}\" 검색",
-  "baiduSearch": "바이두 검색",
-  "googleSearch": "Google 검색",
-  "bingSearch": "Bing 검색",
-  "calling": "전화 중...",
-  "connecting": "연결 중...",
-  "ringing": "벨소리 울리는 중...",
-  "inCall": "통화 중",
-  "collectMessages": "{count}개 메시지 수집됨",
-  "voted": "투표함",
-  "voteChanged": "투표 변경됨",
-  "voteRemoved": "투표 취소됨",
-  "endPoll": "투표 종료",
-  "endPollConfirm": "정말 이 투표를 종료하시겠습니까? 종료 후에는 더 이상 투표할 수 없습니다.",
-  "memberCount": "멤버 {count}명",
-  "videoChannels": "채널",
-  "live": "라이브",
-  "listen": "듣기",
-  "watch": "보기",
-  "searchDiscover": "검색",
-  "nearbyPeople": "주변",
-  "games": "게임",
-  "miniPrograms": "미니 프로그램",
-  "done": "완료({count})",
-  "@done": {
+  "chatViewAllGroupMembers": "모든 멤버 보기",
+  "chatGroupName": "그룹 이름",
+  "chatGroupNameUpdated": "그룹 이름이 업데이트되었습니다",
+  "chatUpdateFailed": "업데이트 실패",
+  "chatNoPermissionToModify": "수정 권한이 없습니다",
+  "chatGroupManagement": "그룹 관리",
+  "chatMyNicknameInGroup": "그룹 내 내 별명",
+  "chatPinChat": "채팅 고정",
+  "chatStrongReminder": "강력 알림",
+  "chatSetChatBackground": "채팅 배경 설정",
+  "chatUnknownFile": "알 수 없는 파일",
+  "chatDownload": "다운로드",
+  "chatInvalidLocation": "잘못된 위치",
+  "chatTapToCancel": "탭하여 취소",
+  "chatCaptureFailed": "캡처 실패: {error}",
+  "chatProcessingVideo": "동영상 처리 중...",
+  "chatVideoFileNotExist": "동영상 파일이 존재하지 않습니다",
+  "chatVideoDataEmpty": "동영상 데이터가 비어 있습니다",
+  "chatVideoTooLarge": "동영상 크기는 100MB를 초과할 수 없습니다",
+  "chatSendingVideo": "동영상 전송 중...",
+  "chatSendVideoFailed": "동영상 전송 실패: {error}",
+  "chatImageFileNotExist": "이미지 파일이 존재하지 않습니다",
+  "commonImageDataEmpty": "이미지 데이터가 비어 있습니다",
+  "chatSendingImage": "이미지 전송 중...",
+  "chatSendImageFailed": "이미지 전송 실패: {error}",
+  "chatSendLocation": "위치 보내기",
+  "chatSelectLocationAndSend": "위치를 선택하고 보내기",
+  "chatShareRealTimeLocation": "실시간 위치 공유",
+  "chatShareLocationForOneHour": "친구와 1시간 동안 실시간 위치 공유",
+  "chatLocationSent": "위치가 전송되었습니다",
+  "chatSelectMessages": "메시지 선택",
+  "chatSelectedCount": "{count}개 선택됨",
+  "chatSelectAll": "전체 선택",
+  "chatGroupChatCount": "그룹 채팅 ({count})",
+  "chatPrivateChat": "개인 채팅",
+  "chatNoMessages": "메시지 없음",
+  "chatSendFirstMessage": "첫 메시지를 보내 채팅을 시작하세요",
+  "chatEncryptionNotice": "이 채팅은 종단간 암호화되어 있습니다. 나와 상대방만 메시지를 읽을 수 있습니다.",
+  "chatMultiForward": "전달",
+  "chatCollect": "수집",
+  "chatNoMembers": "멤버 없음",
+  "chatMemberNotFound": "멤버를 찾을 수 없습니다",
+  "chatVoiceFileNotExist": "음성 파일이 존재하지 않습니다",
+  "chatVoiceFileEmpty": "음성 파일이 비어 있습니다",
+  "chatSendingVoice": "음성 전송 중...",
+  "chatSendVoiceFailed": "음성 전송 실패: {error}",
+  "chatMessageForwarded": "메시지 전달됨",
+  "chatForwardFailed": "전달 실패: {error}",
+  "chatUnfavorited": "즐겨찾기 해제됨",
+  "chatFavorited": "즐겨찾기 추가됨",
+  "chatReactionAdded": "반응 추가됨",
+  "chatReactionRemoved": "반응 제거됨",
+  "chatFailedMessageDeleted": "실패한 메시지 삭제됨",
+  "chatDeleteMessages": "메시지 삭제",
+  "chatDeleteMessagesConfirm": "정말 {count}개의 메시지를 삭제하시겠습니까?",
+  "chatNoteOtherMessages": "참고: {count}개의 메시지는 다른 사람의 것으로, 나에게만 삭제됩니다.",
+  "chatMyMessagesWillBeRecalled": "내 {count}개의 메시지가 모든 사람에게 취소됩니다.",
+  "chatRecalledCount": "{count}개 취소됨, {localCount}개 나에게만 삭제됨",
+  "chatRecalledMessages": "{count}개 메시지 취소됨",
+  "chatDeletedLocally": "{count}개 메시지가 나에게만 삭제됨",
+  "chatForwardedCount": "{count}개 메시지 전달됨",
+  "chatForwardComplete": "전달 완료: {success}개 성공, {failed}개 실패",
+  "chatRemindOnlyInGroup": "멘션 기능은 그룹 채팅에서만 사용할 수 있습니다",
+  "chatOnlyTextSearchable": "텍스트 메시지만 검색할 수 있습니다",
+  "chatSearchFor": "\"{text}\" 검색",
+  "chatBaiduSearch": "바이두 검색",
+  "chatGoogleSearch": "Google 검색",
+  "chatBingSearch": "Bing 검색",
+  "chatCalling": "전화 중...",
+  "chatRinging": "벨소리 울리는 중...",
+  "chatInCall": "통화 중",
+  "chatCollectMessages": "{count}개 메시지 수집됨",
+  "commonMemberCount": "멤버 {count}명",
+  "groupDone": "완료({count})",
+  "@groupDone": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "services": "서비스",
-  "favorites": "즐겨찾기",
-  "ordersAndCards": "주문 및 카드",
-  "stickers": "스티커",
-  "statusSetTo": "상태 설정됨: {status}",
-  "@statusSetTo": {
+  "profileServices": "서비스",
+  "commonFavorites": "즐겨찾기",
+  "profileOrdersAndCards": "주문 및 카드",
+  "profileStickers": "스티커",
+  "profileStatusSetTo": "상태 설정됨: {status}",
+  "@profileStatusSetTo": {
     "placeholders": {
       "status": {
         "type": "String"
       }
     }
   },
-  "avatarUploadFailed": "프로필 사진 업로드 실패",
-  "personalProfile": "개인 프로필",
-  "name": "이름",
-  "gender": "성별",
-  "region": "지역",
-  "myQrCode": "내 QR 코드",
-  "poke": "찌르기",
-  "ringtone": "벨소리",
-  "defaultRingtone": "기본 벨소리",
-  "myAddresses": "내 주소",
-  "genderSetTo": "성별 설정됨: {gender}",
-  "@genderSetTo": {
+  "profileAvatarUploadFailed": "프로필 사진 업로드 실패",
+  "profilePersonalProfile": "개인 프로필",
+  "profileName": "이름",
+  "profileGender": "성별",
+  "profileRegion": "지역",
+  "commonMyQrCode": "내 QR 코드",
+  "profilePoke": "찌르기",
+  "profileRingtone": "벨소리",
+  "profileDefaultRingtone": "기본 벨소리",
+  "profileMyAddresses": "내 주소",
+  "profileGenderSetTo": "성별 설정됨: {gender}",
+  "@profileGenderSetTo": {
     "placeholders": {
       "gender": {
         "type": "String"
       }
     }
   },
-  "selectRegion": "지역 선택",
-  "selectCity": "도시 선택",
-  "regionSetTo": "지역 설정됨: {region}",
-  "@regionSetTo": {
+  "profileSelectRegion": "지역 선택",
+  "profileSelectCity": "도시 선택",
+  "profileRegionSetTo": "지역 설정됨: {region}",
+  "@profileRegionSetTo": {
     "placeholders": {
       "region": {
         "type": "String"
       }
     }
   },
-  "setPoke": "찌르기 설정",
-  "friendPokedMe": "친구가 나를 찔렀어요",
-  "enterPokeSuffix": "찌르기 접미사 입력, 예: 어깨를",
-  "example": "예시",
-  "onTheShoulder": " 어깨를",
-  "pokeCleared": "찌르기가 지워졌습니다",
-  "pokeSetTo": "찌르기 설정됨: 나를 찔렀어요{suffix}",
-  "@pokeSetTo": {
+  "profileSetPoke": "찌르기 설정",
+  "profileFriendPokedMe": "친구가 나를 찔렀어요",
+  "profileExample": "예시",
+  "profileOnTheShoulder": " 어깨를",
+  "profilePokeCleared": "찌르기가 지워졌습니다",
+  "profilePokeSetTo": "찌르기 설정됨: 나를 찔렀어요{suffix}",
+  "@profilePokeSetTo": {
     "placeholders": {
       "suffix": {
         "type": "String"
       }
     }
   },
-  "editSignature": "상태 메시지 편집",
-  "introduceYourself": "자신을 소개하는 한 마디",
-  "signatureCleared": "상태 메시지가 지워졌습니다",
-  "signatureUpdated": "상태 메시지가 업데이트되었습니다",
-  "scanToAddFriend": "위의 QR 코드를 스캔하여 친구로 추가하세요",
-  "ringtoneSetTo": "벨소리 설정됨: {ringtone}",
-  "@ringtoneSetTo": {
+  "profileEditSignature": "상태 메시지 편집",
+  "profileIntroduceYourself": "자신을 소개하는 한 마디",
+  "profileSignatureCleared": "상태 메시지가 지워졌습니다",
+  "profileSignatureUpdated": "상태 메시지가 업데이트되었습니다",
+  "profileScanToAddFriend": "위의 QR 코드를 스캔하여 친구로 추가하세요",
+  "profileRingtoneSetTo": "벨소리 설정됨: {ringtone}",
+  "@profileRingtoneSetTo": {
     "placeholders": {
       "ringtone": {
         "type": "String"
       }
     }
   },
-  "confirmDissolveGroup": "\"{name}\"을(를) 해산하시겠습니까? 이 작업은 취소할 수 없습니다.",
-  "@confirmDissolveGroup": {
+  "commonConfirmDissolveGroup": "\"{name}\"을(를) 해산하시겠습니까? 이 작업은 취소할 수 없습니다.",
+  "@commonConfirmDissolveGroup": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "enterValidServerAddress": "올바른 서버 주소를 입력해주세요",
-  "emailOtp": "이메일 OTP",
-  "enterServerAddressFirst": "먼저 서버 주소를 입력해주세요",
-  "passkeyRequiresServer": "패스키 로그인은 서버 지원이 필요합니다",
-  "loginAgreement": "로그인하면 다음에 동의하는 것으로 간주됩니다 ",
-  "pleaseAgreeToTerms": "서비스 약관과 개인정보 처리방침을 읽고 동의해주세요",
-  "registerFailed": "회원가입 실패",
-  "reenterPassword": "비밀번호 재입력",
-  "passwordsDoNotMatch": "비밀번호가 일치하지 않습니다",
-  "inviteCodeBuiltIn": "초대 코드 (내장)",
-  "inviteCodeBuiltInNote": "초대 코드는 내장되어 있어 일반적으로 수정할 필요가 없습니다",
-  "iHaveReadAndAgree": "읽고 동의합니다 ",
-  "startGroupChat": "그룹 채팅 시작",
-  "addFriends": "친구 추가",
-  "paymentAndCollection": "결제",
-  "messagesWithCount": "메시지({count})",
-  "@messagesWithCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
+  "authEnterValidServerAddress": "올바른 서버 주소를 입력해주세요",
+  "authEmailOtp": "이메일 OTP",
+  "authEnterServerAddressFirst": "먼저 서버 주소를 입력해주세요",
+  "authPasskeyRequiresServer": "패스키 로그인은 서버 지원이 필요합니다",
+  "authLoginAgreement": "로그인하면 다음에 동의하는 것으로 간주됩니다 ",
+  "authPleaseAgreeToTerms": "서비스 약관과 개인정보 처리방침을 읽고 동의해주세요",
+  "authRegisterFailed": "회원가입 실패",
+  "commonReenterPassword": "비밀번호 재입력",
+  "commonPasswordsDoNotMatch": "비밀번호가 일치하지 않습니다",
+  "authInviteCodeBuiltIn": "초대 코드 (내장)",
+  "authInviteCodeBuiltInNote": "초대 코드는 내장되어 있어 일반적으로 수정할 필요가 없습니다",
+  "authIHaveReadAndAgree": "읽고 동의합니다 ",
+  "mainStartGroupChat": "그룹 채팅 시작",
+  "mainAddFriends": "친구 추가",
+  "mainPaymentAndCollection": "결제",
   "contactCount": "연락처 {count}명",
   "@contactCount": {
     "placeholders": {
@@ -748,9 +497,9 @@
       }
     }
   },
-  "addToHomeScreen": "홈 화면에 추가",
-  "recommendedCardTo": "{contact}님의 카드를 {recipient}님에게 추천했습니다",
-  "@recommendedCardTo": {
+  "contactAddToHomeScreen": "홈 화면에 추가",
+  "contactRecommendedCardTo": "{contact}님의 카드를 {recipient}님에게 추천했습니다",
+  "@contactRecommendedCardTo": {
     "placeholders": {
       "contact": {
         "type": "String"
@@ -760,113 +509,94 @@
       }
     }
   },
-  "enterRemarkName": "별명 입력",
-  "remarkSetTo": "별명 설정됨: {remark}",
-  "@remarkSetTo": {
+  "contactEnterRemarkName": "별명 입력",
+  "contactRemarkSetTo": "별명 설정됨: {remark}",
+  "@contactRemarkSetTo": {
     "placeholders": {
       "remark": {
         "type": "String"
       }
     }
   },
-  "acceptedFriendRequest": "{name}님의 친구 요청을 수락했습니다",
-  "@acceptedFriendRequest": {
+  "contactAcceptedFriendRequest": "{name}님의 친구 요청을 수락했습니다",
+  "@contactAcceptedFriendRequest": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "rejectedFriendRequest": "{name}님의 친구 요청을 거절했습니다",
-  "@rejectedFriendRequest": {
+  "contactRejectedFriendRequest": "{name}님의 친구 요청을 거절했습니다",
+  "@contactRejectedFriendRequest": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "groupInvites": "그룹 초대",
-  "myGroups": "내 그룹 ({count})",
-  "@myGroups": {
+  "commonGroupInvites": "그룹 초대",
+  "commonMyGroups": "내 그룹 ({count})",
+  "@commonMyGroups": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "invitedToJoinGroup": "그룹 참여 초대됨",
-  "confirmLeaveGroup": "\"{name}\"에서 나가시겠습니까?",
-  "@confirmLeaveGroup": {
+  "commonInvitedToJoinGroup": "그룹 참여 초대됨",
+  "commonConfirmLeaveGroup": "\"{name}\"에서 나가시겠습니까?",
+  "@commonConfirmLeaveGroup": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "leave": "나가기",
-  "saveMedia": "저장",
-  "recallThisMessage": "이 메시지를 취소하시겠습니까?",
-  "messageRecalled": "메시지가 취소되었습니다",
-  "savedToGallery": "갤러리에 저장됨",
-  "failedToSave": "저장 실패",
-  "saving": "저장 중...",
-  "share": "공유",
-  "saveToGallery": "갤러리에 저장",
-  "downloadFailed": "다운로드 실패: {code}",
-  "@downloadFailed": {
+  "commonLeave": "나가기",
+  "commonRecallThisMessage": "이 메시지를 취소하시겠습니까?",
+  "commonSavedToGallery": "갤러리에 저장됨",
+  "commonFailedToSave": "저장 실패",
+  "chatSaving": "저장 중...",
+  "commonShare": "공유",
+  "chatSaveToGallery": "갤러리에 저장",
+  "chatDownloadFailed": "다운로드 실패: {code}",
+  "@chatDownloadFailed": {
     "placeholders": {
       "code": {
         "type": "String"
       }
     }
   },
-  "noMediaUrl": "사용 가능한 미디어 URL이 없습니다",
-  "shareFailed": "공유 실패: {error}",
-  "@shareFailed": {
+  "commonShareFailed": "공유 실패: {error}",
+  "@commonShareFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "failedToLoadImage": "이미지 로드 실패",
-  "failedToLoadMoreMessages": "더 많은 메시지 로드 실패",
-  "failedToSend": "전송 실패",
-  "failedToSendImage": "이미지 전송 실패",
-  "failedToSendVoice": "음성 전송 실패",
-  "failedToSendFile": "파일 전송 실패",
-  "failedToSendVideo": "동영상 전송 실패",
-  "failedToSendLocation": "위치 전송 실패",
-  "failedToResend": "재전송 실패",
-  "failedToRecall": "취소 실패",
-  "failedToReply": "답장 실패",
-  "failedToAddReaction": "반응 추가 실패",
-  "failedToSendPoll": "투표 전송 실패",
-  "failedToVote": "투표 실패",
-  "failedToLoadMessages": "메시지 로드 실패",
-  "callFeatureComingSoon": "음성 및 영상 통화 기능 곧 출시 예정",
-  "cannotForwardRedPacketOrTransfer": "레드패킷과 송금은 전달할 수 없습니다",
-  "videoRecordingFailed": "동영상 녹화 실패. 다시 시도해주세요.",
-  "redPacket": "레드패킷",
-  "music": "음악",
-  "coupon": "쿠폰",
-  "gift": "선물",
-  "poll": "투표",
-  "text": "텍스트",
-  "link": "링크",
-  "note": "노트",
-  "myNotes": "내 노트",
-  "today": "오늘",
-  "daysAgoText": "{count}일 전",
-  "@daysAgoText": {
+  "chatFailedToLoadImage": "이미지 로드 실패",
+  "chatVideoRecordingFailed": "동영상 녹화 실패. 다시 시도해주세요.",
+  "profileRedPacket": "레드패킷",
+  "commonMusic": "음악",
+  "commonCoupon": "쿠폰",
+  "commonGift": "선물",
+  "commonPoll": "투표",
+  "favoriteText": "텍스트",
+  "favoriteLinkLabel": "링크",
+  "favoriteNote": "노트",
+  "favoriteMyNotes": "내 노트",
+  "favoriteToday": "오늘",
+  "favoriteDaysAgoText": "{count}일 전",
+  "@favoriteDaysAgoText": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "dateFormat": "{month}/{day}",
-  "@dateFormat": {
+  "favoriteDateFormat": "{month}/{day}",
+  "@favoriteDateFormat": {
     "placeholders": {
       "month": {
         "type": "int"
@@ -876,51 +606,36 @@
       }
     }
   },
-  "noFavorites": "즐겨찾기 없음",
-  "longPressToFavorite": "메시지를 길게 눌러 즐겨찾기에 추가",
-  "newNote": "새 노트",
+  "favoriteNoFavorites": "즐겨찾기 없음",
+  "favoriteLongPressToFavorite": "메시지를 길게 눌러 즐겨찾기에 추가",
+  "favoriteNewNote": "새 노트",
   "favoriteLink": "즐겨찾기 링크",
-  "editTags": "태그 편집",
-  "deleteFavorite": "즐겨찾기 삭제",
-  "deleteFavoriteConfirm": "정말 이 즐겨찾기를 삭제하시겠습니까?",
-  "noSearchResultsFound": "결과를 찾을 수 없습니다",
-  "sendRedPacket": "레드패킷 보내기",
-  "amount": "금액",
-  "redPacketCover": "레드패킷 커버",
-  "redPacketType": "레드패킷 유형",
-  "normalRedPacket": "일반",
-  "luckyRedPacket": "행운",
-  "redPacketCount": "레드패킷 개수",
-  "pieces": "개",
-  "putMoneyInRedPacket": "레드패킷에 돈 넣기",
-  "redPacketRefundNotice": "24시간 후 수령하지 않은 레드패킷은 환불됩니다",
-  "openRedPacket": "열기",
-  "redPacketAllClaimed": "레드패킷 모두 수령됨",
-  "redPacketExpired": "레드패킷 만료됨",
-  "addTransferNote": "송금 메모 추가",
-  "yuan": "원",
-  "savedToChangeCanTransfer": "잔액에 저장됨, 바로 송금 가능",
-  "replyWithEmoji": "이 이모티콘으로 답장",
-  "claimedYourRedPacket": "님이 당신의",
-  "claimedRedPacket": "님이 수령함",
-  "otherTyping": "입력 중...",
-  "processing": "처리 중...",
-  "transferCancelled": "송금 취소됨",
-  "transferFailed": "송금 실패",
-  "creatingPaymentRequest": "결제 요청 생성 중...",
-  "processingPayment": "결제 처리 중...",
-  "paymentFailed": "결제 실패",
-  "clickRetry": "탭하여 다시 시도",
-  "settingsTitle": "설정",
-  "editRemark": "별명 편집",
-  "setPermissions": "권한 설정",
-  "recommendToFriends": "친구에게 추천",
-  "setStarFriend": "즐겨찾는 친구로 설정",
-  "addToBlacklist": "차단 목록에 추가",
-  "complain": "신고",
-  "deleteContact": "연락처 삭제",
-  "deleteContactConfirm": "정말 {name}님을 삭제하시겠습니까?",
-  "@deleteContactConfirm": {
+  "favoriteEditTags": "태그 편집",
+  "favoriteDeleteFavorite": "즐겨찾기 삭제",
+  "favoriteDeleteFavoriteConfirm": "정말 이 즐겨찾기를 삭제하시겠습니까?",
+  "favoriteNoSearchResultsFound": "결과를 찾을 수 없습니다",
+  "commonSendRedPacket": "레드패킷 보내기",
+  "transferAmount": "금액",
+  "commonRedPacketCover": "레드패킷 커버",
+  "commonRedPacketType": "레드패킷 유형",
+  "commonNormalRedPacket": "일반",
+  "commonLuckyRedPacket": "행운",
+  "commonRedPacketCount": "레드패킷 개수",
+  "commonPieces": "개",
+  "commonPutMoneyInRedPacket": "레드패킷에 돈 넣기",
+  "commonRedPacketRefundNotice": "24시간 후 수령하지 않은 레드패킷은 환불됩니다",
+  "commonOpenRedPacket": "열기",
+  "commonRedPacketAllClaimed": "레드패킷 모두 수령됨",
+  "commonRedPacketExpired": "레드패킷 만료됨",
+  "commonAddTransferNote": "송금 메모 추가",
+  "commonYuan": "원",
+  "commonReplyWithEmoji": "이 이모티콘으로 답장",
+  "contactEditRemark": "별명 편집",
+  "contactSetPermissions": "권한 설정",
+  "profileAddToBlacklist": "차단 목록에 추가",
+  "contactDeleteContact": "연락처 삭제",
+  "contactDeleteContactConfirm": "정말 {name}님을 삭제하시겠습니까?",
+  "@contactDeleteContactConfirm": {
     "placeholders": {
       "name": {
         "type": "String"
@@ -928,426 +643,282 @@
     }
   },
   "transferTitle": "송금",
-  "receiverAddressLabel": "받는 주소",
-  "selectTokenLabel": "토큰 선택",
+  "transferReceiverAddressLabel": "받는 주소",
+  "transferSelectTokenLabel": "토큰 선택",
   "transferAmountLabel": "송금 금액",
-  "memoLabel": "메모 (선택)",
-  "enterOrPasteAddressHint": "지갑 주소 입력 또는 붙여넣기",
-  "scanInDevelopment": "스캔 기능 개발 중...",
-  "availableLabel": "사용 가능",
-  "availableBalanceFormat": "사용 가능: {balance} {symbol}",
-  "@availableBalanceFormat": {
-    "placeholders": {
-      "balance": {
-        "type": "String"
-      },
-      "symbol": {
-        "type": "String"
-      }
-    }
-  },
-  "addMemoHint": "메모 추가",
-  "receiveTitle": "받기",
-  "walletNotConnectedTitle": "지갑이 연결되지 않음",
-  "connectWalletFirst": "먼저 지갑을 연결해주세요",
-  "sendPaymentRequest": "결제 요청 보내기",
-  "qrCodeGenerateFailed": "QR 코드 생성 실패",
-  "scanQrToPayMe": "QR 코드를 스캔하여 결제하세요",
-  "myWalletAddress": "내 지갑 주소",
-  "createPaymentRequest": "결제 요청 생성",
-  "selectTokenHint": "토큰 선택",
-  "amountLabel": "금액",
-  "cancelButton": "취소",
-  "sendRequestButton": "요청 보내기",
-  "allReadReceipt": "모두 읽음",
-  "readCountReceipt": "{count}명 읽음",
-  "@readCountReceipt": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "n42IdLabel": "N42 ID: {id}",
-  "@n42IdLabel": {
+  "transferMemoLabel": "메모 (선택)",
+  "transferAddMemoHint": "메모 추가",
+  "transferSendPaymentRequest": "결제 요청 보내기",
+  "transferQrCodeGenerateFailed": "QR 코드 생성 실패",
+  "transferScanQrToPayMe": "QR 코드를 스캔하여 결제하세요",
+  "transferMyWalletAddress": "내 지갑 주소",
+  "transferCreatePaymentRequest": "결제 요청 생성",
+  "profileN42IdLabel": "N42 ID: {id}",
+  "@profileN42IdLabel": {
     "placeholders": {
       "id": {
         "type": "String"
       }
     }
   },
-  "redPacketDefaultGreeting": "행운을 빕니다",
-  "senderRedPacket": "{name}님의 레드패킷",
-  "@senderRedPacket": {
+  "commonRedPacketDefaultGreeting": "행운을 빕니다",
+  "commonSenderRedPacket": "{name}님의 레드패킷",
+  "@commonSenderRedPacket": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "allButton": "전체",
-  "enterValidAddress": "올바른 주소를 입력해주세요",
-  "pleaseSelectToken": "토큰을 선택해주세요",
-  "receivedTransfer": "송금 받음",
-  "@fromSender": {
+  "transferEnterValidAddress": "올바른 주소를 입력해주세요",
+  "transferPleaseSelectToken": "토큰을 선택해주세요",
+  "commonReceivedTransfer": "송금 받음",
+  "@commonFromSender": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "selectForwardRecipient": "전달할 사람 선택",
-  "@sendCount": {
+  "@commonSendCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "emojiFaces": "얼굴",
-  "emojiHearts": "하트",
-  "emojiAnimals": "동물",
-  "emojiFood": "음식",
-  "emojiTransport": "교통",
-  "emojiActivities": "활동",
-  "emojiObjects": "사물",
-  "emojiSymbols": "기호",
-  "transferProcessing": "송금 처리 중...",
-  "senderSentRedPacket": "{name}님이 레드패킷을 보냈습니다",
-  "@senderSentRedPacket": {
+  "commonSenderSentRedPacket": "{name}님이 레드패킷을 보냈습니다",
+  "@commonSenderSentRedPacket": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "savedToBalance": "잔액에 저장됨, 바로 송금 가능",
-  "redPacketExpiredOrEmpty": "레드패킷 만료됨/모두 수령됨",
-  "scanFeatureComingSoon": "스캔 기능 곧 출시 예정...",
-  "setAsStarred": "즐겨찾기로 설정",
-  "addToBlocklist": "차단 목록에 추가",
-  "claimedYour": " 님이 당신의 ",
-  "claimedText": " 님이 수령함 ",
-  "userTyping": "{name}님이 입력 중...",
-  "@userTyping": {
+  "commonSavedToBalance": "잔액에 저장됨, 바로 송금 가능",
+  "commonRedPacketExpiredOrEmpty": "레드패킷 만료됨/모두 수령됨",
+  "transferScanFeatureComingSoon": "스캔 기능 곧 출시 예정...",
+  "contactSetAsStarred": "즐겨찾기로 설정",
+  "contactAddToBlocklist": "차단 목록에 추가",
+  "commonClaimedYour": " 님이 당신의 ",
+  "commonClaimedText": " 님이 수령함 ",
+  "commonUserTyping": "{name}님이 입력 중...",
+  "@commonUserTyping": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "typing": "입력 중...",
-  "waitingToReceive": "받기 대기 중",
-  "tapToClaim": "탭하여 수령",
-  "hasBeenReceived": "수령됨",
-  "getLucky": "행운을 잡으세요",
-  "cameraStartFailed": "카메라 시작 실패",
-  "unknownError": "알 수 없는 오류",
-  "placeQrCodeInFrame": "프레임 안에 QR 코드를 배치하세요",
-  "closeManualInput": "수동 입력 닫기",
-  "manualInputUserId": "사용자 ID 수동 입력",
-  "add": "추가",
-  "ringtoneClear": "지우기",
-  "ringtonePhone": "전화",
-  "ringtoneClassic": "클래식",
-  "ringtoneSoft": "부드러운",
-  "ringtoneVibrate": "진동",
-  "ringtoneSilent": "무음",
-  "stop": "중지",
-  "selectRingtone": "벨소리 선택",
-  "loadingRingtones": "벨소리 로딩 중...",
-  "noRingtonesFound": "벨소리를 찾을 수 없습니다",
-  "moodAndThoughts": "기분 및 생각",
-  "statusHappy": "행복해요",
-  "statusCracked": "무너졌어요",
-  "statusLucky": "운이 좋아요",
-  "statusSunny": "화창해요",
-  "statusTired": "피곤해요",
-  "statusDaydream": "몽상 중",
-  "statusRushing": "바쁜 중",
-  "statusOverthinking": "생각이 많아요",
-  "statusEnergized": "활력 넘쳐요",
-  "workAndStudy": "일 및 공부",
-  "statusWorking": "일하는 중",
-  "statusStudying": "공부하는 중",
-  "statusBusy": "바쁨",
-  "statusSlacking": "쉬는 중",
-  "statusTraveling": "여행 중",
-  "statusGoingHome": "집에 가는 중",
-  "statusDnd": "방해 금지",
-  "statusHanging": "놀고 있어요",
-  "statusCheckIn": "체크인",
-  "statusExercising": "운동 중",
-  "statusCoffee": "커피",
-  "statusBubbleTea": "버블티",
-  "statusEating": "식사 중",
-  "statusParenting": "육아 중",
-  "statusSavingWorld": "세상 구하는 중",
-  "statusSelfie": "셀카",
-  "rest": "휴식",
-  "statusRetreat": "피정 중",
-  "statusHome": "집",
-  "statusSleeping": "자는 중",
-  "statusCatLover": "고양이 좋아요",
-  "statusDogWalking": "산책 중",
-  "statusGaming": "게임 중",
-  "statusListening": "듣는 중",
-  "setStatus": "상태 설정",
-  "visibleToFriends24h": "친구에게 24시간 동안 표시됨",
-  "writeStatus": "상태 작성",
-  "enterYourStatus": "상태를 입력하세요...",
-  "ok": "확인",
-  "cameraPermissionRequired": "QR 코드 스캔을 위해 카메라 권한이 필요합니다",
-  "cameraPermissionDenied": "카메라 권한이 영구적으로 거부되었습니다. 시스템 설정에서 활성화해주세요.",
-  "cannotGetCameraPermission": "카메라 권한을 얻을 수 없습니다",
-  "permissionCheckError": "권한 확인 오류: {error}",
-  "@permissionCheckError": {
+  "commonTyping": "입력 중...",
+  "commonWaitingToReceive": "받기 대기 중",
+  "commonTapToClaim": "탭하여 수령",
+  "commonHasBeenReceived": "수령됨",
+  "commonGetLucky": "행운을 잡으세요",
+  "qrcodeCameraStartFailed": "카메라 시작 실패",
+  "qrcodeUnknownError": "알 수 없는 오류",
+  "qrcodePlaceQrCodeInFrame": "프레임 안에 QR 코드를 배치하세요",
+  "qrcodeCloseManualInput": "수동 입력 닫기",
+  "qrcodeManualInputUserId": "사용자 ID 수동 입력",
+  "commonAdd": "추가",
+  "profileSetStatus": "상태 설정",
+  "profileVisibleToFriends24h": "친구에게 24시간 동안 표시됨",
+  "profileWriteStatus": "상태 작성",
+  "profileEnterYourStatus": "상태를 입력하세요...",
+  "profileOk": "확인",
+  "qrcodeCameraPermissionRequired": "QR 코드 스캔을 위해 카메라 권한이 필요합니다",
+  "qrcodeCameraPermissionDenied": "카메라 권한이 영구적으로 거부되었습니다. 시스템 설정에서 활성화해주세요.",
+  "qrcodePermissionCheckError": "권한 확인 오류: {error}",
+  "@qrcodePermissionCheckError": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "invalidQrCode": "잘못된 QR 코드",
-  "qrCodeProcessFailed": "QR 코드 처리 실패: {error}",
-  "@qrCodeProcessFailed": {
+  "qrcodeInvalidQrCode": "잘못된 QR 코드",
+  "qrcodeCannotAddFriend": "친구 추가 불가: {error}",
+  "@qrcodeCannotAddFriend": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "cannotAddFriend": "친구 추가 불가: {error}",
-  "@cannotAddFriend": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "scanQrCode": "QR 코드 스캔",
-  "checkingCameraPermission": "카메라 권한 확인 중...",
-  "needCameraPermission": "카메라 권한 필요",
-  "retryPermission": "다시 시도",
-  "openSettings": "설정 열기",
-  "inviteMembers": "멤버 초대",
-  "inviteCount": "초대({count})",
-  "@inviteCount": {
+  "qrcodeScanQrCode": "QR 코드 스캔",
+  "qrcodeCheckingCameraPermission": "카메라 권한 확인 중...",
+  "qrcodeNeedCameraPermission": "카메라 권한 필요",
+  "qrcodeRetryPermission": "다시 시도",
+  "qrcodeOpenSettings": "설정 열기",
+  "groupInviteMembers": "멤버 초대",
+  "groupInviteCount": "초대({count})",
+  "@groupInviteCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "noShippingAddress": "배송 주소 없음",
-  "defaultLabel": "기본",
-  "editAddress": "주소 편집",
-  "recipient": "수령인",
-  "enterRecipientName": "수령인 이름 입력",
-  "phoneNumber": "전화번호",
-  "enterPhoneNumber": "전화번호 입력",
-  "regionHint": "시/도/구",
-  "detailedAddress": "상세 주소",
-  "detailedAddressHint": "도로명, 건물 번호 등",
-  "setAsDefaultAddress": "기본 주소로 설정",
-  "pleaseCompleteInfo": "모든 항목을 입력해주세요",
-  "noInvoice": "청구서 없음",
-  "company": "회사",
-  "taxNumber": "사업자 등록번호",
-  "editInvoice": "청구서 편집",
-  "companyName": "회사명",
-  "enterCompanyName": "회사명 입력",
-  "personalName": "개인 이름",
-  "enterName": "이름 입력",
-  "taxIdNumber": "사업자 등록번호",
-  "enterTaxIdNumber": "사업자 등록번호 입력",
-  "bankNameOptional": "은행명 (선택)",
-  "enterBankName": "은행명 입력",
-  "bankAccountOptional": "계좌번호 (선택)",
-  "enterBankAccount": "계좌번호 입력",
-  "companyAddressOptional": "회사 주소 (선택)",
-  "enterCompanyAddress": "회사 주소 입력",
-  "companyPhoneOptional": "회사 전화번호 (선택)",
-  "enterCompanyPhone": "회사 전화번호 입력",
-  "setAsDefaultInvoice": "기본 청구서로 설정",
-  "confirmDeleteAddress": "정말 이 주소를 삭제하시겠습니까?",
-  "confirmDeleteInvoice": "정말 이 청구서를 삭제하시겠습니까?",
-  "groupOwner": "소유자",
-  "groupAdmin": "관리자",
-  "searchMembers": "멤버 검색",
-  "totalMembers": "멤버 {count}명",
-  "@totalMembers": {
+  "profileNoShippingAddress": "배송 주소 없음",
+  "profileDefaultLabel": "기본",
+  "profileNoInvoice": "청구서 없음",
+  "profileCompany": "회사",
+  "profileTaxNumber": "사업자 등록번호",
+  "profileConfirmDeleteAddress": "정말 이 주소를 삭제하시겠습니까?",
+  "profileConfirmDeleteInvoice": "정말 이 청구서를 삭제하시겠습니까?",
+  "commonGroupOwner": "소유자",
+  "commonGroupAdmin": "관리자",
+  "groupSearchMembers": "멤버 검색",
+  "groupTotalMembers": "멤버 {count}명",
+  "@groupTotalMembers": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "removeFromGroup": "그룹에서 삭제",
-  "confirmRemoveMember": "정말 \"{name}\"님을 그룹에서 삭제하시겠습니까?",
-  "@confirmRemoveMember": {
+  "chatRemoveFromGroup": "그룹에서 삭제",
+  "groupConfirmRemoveMember": "정말 \"{name}\"님을 그룹에서 삭제하시겠습니까?",
+  "@groupConfirmRemoveMember": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "setAsAdmin": "관리자로 설정",
-  "removeAdmin": "관리자 삭제",
-  "deleteContactSuccess": "연락처 삭제됨",
-  "unknownSong": "알 수 없는 곡",
-  "unknownArtist": "알 수 없는 아티스트",
-  "unknownContact": "알 수 없는 연락처",
-  "personalCard": "연락처 카드",
-  "singleChoice": "단일",
-  "multiChoice": "복수",
-  "ended": "종료됨",
-  "endPollButton": "투표 종료",
-  "createPoll": "투표 만들기",
-  "pollQuestion": "투표 질문",
-  "enterPollQuestionHint": "투표 질문을 입력해주세요",
-  "pollOptions": "투표 옵션",
-  "optionPlaceholder": "옵션 {index}",
-  "addOption": "옵션 추가",
-  "pollSettings": "투표 설정",
-  "anonymousPoll": "익명 투표",
-  "pollHint": "투표가 채팅에 표시됩니다. 그룹 멤버가 투표할 수 있습니다.",
-  "searchSongOrArtist": "곡 또는 아티스트 검색",
-  "noSongsFound": "곡을 찾을 수 없습니다",
-  "supportedMusicPlatforms": "네이버 음악, 멜론 등의 음악 링크를 지원합니다",
-  "songNameOptional": "곡 이름 (선택)",
-  "enterSongName": "곡 이름 입력",
-  "artistNameOptional": "아티스트 이름 (선택)",
-  "enterArtistName": "아티스트 이름 입력",
-  "shareSong": "곡 공유",
-  "realTimeLocationSharing": "실시간 위치 공유 개발 중...",
-  "voiceCallFeatureInDev": "음성 통화 기능 개발 중...",
-  "reportFeatureInDev": "신고 기능 개발 중...",
-  "shareFeatureInDev": "공유 기능 개발 중...",
-  "qrCodeFeatureInDev": "QR 코드 기능 개발 중...",
-  "scanQrToAddMe": "위의 QR 코드를 스캔하여 친구로 추가하세요",
-  "saveToAlbum": "앨범에 저장",
-  "changeStyle": "스타일 변경",
-  "copyId": "ID 복사",
-  "idCopied": "ID 복사됨",
-  "shareFeatureComingSoon": "공유 기능 곧 출시 예정",
-  "saveFeatureComingSoon": "저장 기능 곧 출시 예정",
-  "moreStylesFeatureComingSoon": "더 많은 스타일 곧 출시 예정",
-  "confirmEndPoll": "정말 이 투표를 종료하시겠습니까?",
-  "cannotVoteAfterEnd": "종료 후에는 더 이상 투표할 수 없습니다.",
-  "@featureInDev": {
+  "chatUnknownSong": "알 수 없는 곡",
+  "chatUnknownArtist": "알 수 없는 아티스트",
+  "chatUnknownContact": "알 수 없는 연락처",
+  "chatPersonalCard": "연락처 카드",
+  "chatSingleChoice": "단일",
+  "chatMultiChoice": "복수",
+  "chatEnded": "종료됨",
+  "chatEndPollButton": "투표 종료",
+  "chatEnterPollQuestionHint": "투표 질문을 입력해주세요",
+  "chatPollHint": "투표가 채팅에 표시됩니다. 그룹 멤버가 투표할 수 있습니다.",
+  "chatSearchSongOrArtist": "곡 또는 아티스트 검색",
+  "chatNoSongsFound": "곡을 찾을 수 없습니다",
+  "chatSongNameOptional": "곡 이름 (선택)",
+  "chatEnterSongName": "곡 이름 입력",
+  "chatArtistNameOptional": "아티스트 이름 (선택)",
+  "chatEnterArtistName": "아티스트 이름 입력",
+  "chatRealTimeLocationSharing": "실시간 위치 공유 개발 중...",
+  "profileVoiceCallFeatureInDev": "음성 통화 기능 개발 중...",
+  "profileReportFeatureInDev": "신고 기능 개발 중...",
+  "profileShareFeatureInDev": "공유 기능 개발 중...",
+  "profileQrCodeFeatureInDev": "QR 코드 기능 개발 중...",
+  "qrcodeScanQrToAddMe": "위의 QR 코드를 스캔하여 친구로 추가하세요",
+  "qrcodeSaveToAlbum": "앨범에 저장",
+  "qrcodeChangeStyle": "스타일 변경",
+  "qrcodeCopyId": "ID 복사",
+  "qrcodeIdCopied": "ID 복사됨",
+  "qrcodeMoreStylesFeatureComingSoon": "더 많은 스타일 곧 출시 예정",
+  "@chatFeatureInDev": {
     "placeholders": {
       "feature": {
         "type": "String"
       }
     }
   },
-  "@optionPlaceholder": {
-    "placeholders": {
-      "index": {
-        "type": "int"
-      }
-    }
-  },
-  "bio": "소개",
-  "homeServer": "서버",
-  "shareContactCard": "연락처 카드 공유",
-  "removeFromBlacklist": "차단 목록에서 삭제",
-  "confirmAddBlacklist": "정말 이 사용자를 차단 목록에 추가하시겠습니까? 이 사용자로부터 메시지를 받지 않게 됩니다.",
-  "confirmRemoveBlacklist": "정말 이 사용자를 차단 목록에서 삭제하시겠습니까?",
-  "remarkSaved": "별명 저장됨",
-  "remarkCleared": "별명 지워짐",
-  "receive": "받기",
-  "pleaseConnectWallet": "먼저 지갑을 연결해주세요",
-  "sendRequest": "요청 보내기",
-  "pleaseEnterValidAmount": "올바른 금액을 입력해주세요",
+  "profileBio": "소개",
+  "profileHomeServer": "서버",
+  "profileShareContactCard": "연락처 카드 공유",
+  "profileRemoveFromBlacklist": "차단 목록에서 삭제",
+  "profileConfirmAddBlacklist": "정말 이 사용자를 차단 목록에 추가하시겠습니까? 이 사용자로부터 메시지를 받지 않게 됩니다.",
+  "profileConfirmRemoveBlacklist": "정말 이 사용자를 차단 목록에서 삭제하시겠습니까?",
+  "profileRemarkSaved": "별명 저장됨",
+  "profileRemarkCleared": "별명 지워짐",
+  "transferReceive": "받기",
+  "transferPleaseConnectWallet": "먼저 지갑을 연결해주세요",
+  "transferSendRequest": "요청 보내기",
+  "transferPleaseEnterValidAmount": "올바른 금액을 입력해주세요",
   "searchPlaceholder": "연락처, 그룹, 메시지 검색",
-  "enterKeywordToSearch": "키워드를 입력하여 검색 시작",
-  "clearHistory": "지우기",
-  "noResultsForQuery": "\"{query}\"에 대한 결과 없음",
-  "@noResultsForQuery": {
+  "searchEnterKeywordToSearch": "키워드를 입력하여 검색 시작",
+  "searchClearHistory": "지우기",
+  "searchNoResultsForQuery": "\"{query}\"에 대한 결과 없음",
+  "@searchNoResultsForQuery": {
     "placeholders": {
       "query": {
         "type": "String"
       }
     }
   },
-  "allResults": "전체",
+  "searchAllResults": "전체",
   "searchInChat": "채팅에서 검색",
-  "groupLabel": "그룹",
-  "contactLabel": "연락처",
-  "messageLabel": "메시지",
-  "securityTitle": "보안",
-  "keyBackup": "키 백업",
-  "backupEncryptionKeys": "암호화 키 백업",
-  "keysBackedUp": "키 {count}개 백업됨",
-  "@keysBackedUp": {
+  "searchGroupLabel": "그룹",
+  "searchContactLabel": "연락처",
+  "searchMessageLabel": "메시지",
+  "settingsSecurityTitle": "보안",
+  "settingsKeyBackup": "키 백업",
+  "settingsBackupEncryptionKeys": "암호화 키 백업",
+  "settingsKeysBackedUp": "키 {count}개 백업됨",
+  "@settingsKeysBackedUp": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "backupNotSet": "백업이 설정되지 않음",
-  "restoreKeys": "키 복원",
-  "restoreKeysFromBackup": "백업에서 암호화 키 복원",
-  "exportKeys": "키 내보내기",
-  "exportKeysToFile": "파일로 키 내보내기",
-  "loggedInDevices": "로그인된 기기",
-  "noOtherDevices": "다른 기기 없음",
-  "verified": "인증됨",
-  "unverified": "미인증",
-  "advanced": "고급",
-  "crossSigning": "교차 서명",
-  "enabled": "활성화됨",
-  "notEnabled": "활성화되지 않음",
-  "resetEncryption": "암호화 재설정",
-  "deleteAllEncryptionKeys": "모든 암호화 키 삭제",
-  "encryptionNotSupported": "암호화가 지원되지 않습니다",
-  "notInitialized": "초기화되지 않음",
-  "backupKeyTitle": "키 백업",
-  "backupKeyMessage": "새 키 백업을 생성하시겠습니까? 새 기기에서 암호화된 메시지를 복원하는 데 도움이 됩니다.",
-  "backup": "백업",
-  "restoreKeyTitle": "키 복원",
-  "restoreKeyMessage": "복구 비밀번호 또는 복구 키를 입력하여 암호화된 메시지를 복원하세요.",
-  "restore": "복원",
-  "exportKeyTitle": "키 내보내기",
-  "exportKeyMessage": "내보낸 키 파일에는 모든 암호화 키가 포함됩니다. 안전하게 보관해주세요.",
-  "export": "내보내기",
-  "deviceIdLabel": "기기 ID: {deviceId}",
-  "@deviceIdLabel": {
+  "settingsBackupNotSet": "백업이 설정되지 않음",
+  "settingsRestoreKeys": "키 복원",
+  "settingsRestoreKeysFromBackup": "백업에서 암호화 키 복원",
+  "settingsExportKeys": "키 내보내기",
+  "settingsExportKeysToFile": "파일로 키 내보내기",
+  "settingsLoggedInDevices": "로그인된 기기",
+  "settingsNoOtherDevices": "다른 기기 없음",
+  "settingsVerified": "인증됨",
+  "settingsUnverified": "미인증",
+  "settingsAdvanced": "고급",
+  "settingsCrossSigning": "교차 서명",
+  "settingsEnabled": "활성화됨",
+  "settingsNotEnabled": "활성화되지 않음",
+  "settingsResetEncryption": "암호화 재설정",
+  "settingsDeleteAllEncryptionKeys": "모든 암호화 키 삭제",
+  "settingsEncryptionNotSupported": "암호화가 지원되지 않습니다",
+  "settingsNotInitialized": "초기화되지 않음",
+  "settingsBackupKeyTitle": "키 백업",
+  "settingsBackupKeyMessage": "새 키 백업을 생성하시겠습니까? 새 기기에서 암호화된 메시지를 복원하는 데 도움이 됩니다.",
+  "settingsBackup": "백업",
+  "settingsRestoreKeyTitle": "키 복원",
+  "settingsRestoreKeyMessage": "복구 비밀번호 또는 복구 키를 입력하여 암호화된 메시지를 복원하세요.",
+  "settingsRestore": "복원",
+  "settingsExportKeyTitle": "키 내보내기",
+  "settingsExportKeyMessage": "내보낸 키 파일에는 모든 암호화 키가 포함됩니다. 안전하게 보관해주세요.",
+  "settingsExport": "내보내기",
+  "settingsDeviceIdLabel": "기기 ID: {deviceId}",
+  "@settingsDeviceIdLabel": {
     "placeholders": {
       "deviceId": {
         "type": "String"
       }
     }
   },
-  "deviceStatusVerified": "상태: 인증됨",
-  "deviceStatusUnverified": "상태: 미인증",
-  "lastActiveLabel": "마지막 활동: {lastSeen}",
-  "@lastActiveLabel": {
+  "settingsDeviceStatusVerified": "상태: 인증됨",
+  "settingsDeviceStatusUnverified": "상태: 미인증",
+  "settingsLastActiveLabel": "마지막 활동: {lastSeen}",
+  "@settingsLastActiveLabel": {
     "placeholders": {
       "lastSeen": {
         "type": "String"
       }
     }
   },
-  "verifyThisDevice": "이 기기 인증",
-  "crossSigningAlreadyEnabled": "교차 서명이 이미 활성화되어 있습니다",
-  "crossSigningSetupSuccess": "교차 서명 설정 성공",
-  "@setupFailed": {
+  "settingsVerifyThisDevice": "이 기기 인증",
+  "settingsCrossSigningAlreadyEnabled": "교차 서명이 이미 활성화되어 있습니다",
+  "settingsCrossSigningSetupSuccess": "교차 서명 설정 성공",
+  "@settingsSetupFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "resetEncryptionTitle": "암호화 재설정",
-  "resetEncryptionWarning": "경고: 이 작업은 모든 암호화 키를 삭제합니다. 이전의 암호화된 메시지를 복호화할 수 없게 됩니다. 이 작업은 취소할 수 없습니다.",
-  "reset": "재설정",
-  "leaveMeetingConfirm": "정말 회의를 나가시겠습니까?",
-  "pokedSomeone": "{name}님을 찔렀어요{suffix}",
-  "@pokedSomeone": {
+  "settingsResetEncryptionTitle": "암호화 재설정",
+  "settingsResetEncryptionWarning": "경고: 이 작업은 모든 암호화 키를 삭제합니다. 이전의 암호화된 메시지를 복호화할 수 없게 됩니다. 이 작업은 취소할 수 없습니다.",
+  "settingsReset": "재설정",
+  "callLeaveMeetingConfirm": "정말 회의를 나가시겠습니까?",
+  "chatPokedSomeone": "{name}님을 찔렀어요{suffix}",
+  "@chatPokedSomeone": {
     "placeholders": {
       "name": {
         "type": "String"
@@ -1357,71 +928,54 @@
       }
     }
   },
-  "noContactsToAdd": "추가할 연락처가 없습니다",
-  "addMembers": "멤버 추가",
-  "invitedMembers": "멤버 {count}명 초대됨",
-  "@invitedMembers": {
+  "chatNoContactsToAdd": "추가할 연락처가 없습니다",
+  "chatAddMembers": "멤버 추가",
+  "chatInvitedMembers": "멤버 {count}명 초대됨",
+  "@chatInvitedMembers": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "inviteFailed": "초대 실패: {error}",
-  "@inviteFailed": {
+  "chatInviteFailed": "초대 실패: {error}",
+  "@chatInviteFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "memberRemoved": "멤버 삭제됨",
-  "removeFailed": "삭제 실패: {error}",
-  "@removeFailed": {
+  "chatMemberRemoved": "멤버 삭제됨",
+  "chatRemoveFailed": "삭제 실패: {error}",
+  "@chatRemoveFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "realTimeLocationShareMessage": "공유 후 상대방이 1시간 동안 당신의 실시간 위치를 볼 수 있습니다.",
-  "startSharing": "공유 시작",
-  "locationServiceNotEnabled": "위치 서비스가 활성화되지 않았습니다",
-  "enableLocationService": "이 기능을 사용하려면 위치 서비스를 활성화해주세요",
-  "goToSettings": "설정으로 이동",
-  "locationPermissionRequired": "이 기능을 사용하려면 위치 권한이 필요합니다",
-  "locationPermissionDeniedPermanent": "위치 권한이 영구적으로 거부되었습니다. 설정에서 활성화해주세요.",
-  "locationPermissionDenied": "위치 권한 거부됨",
-  "gettingLocation": "위치 가져오는 중...",
-  "getLocationFailed": "위치 가져오기 실패: {error}",
-  "@getLocationFailed": {
+  "chatRealTimeLocationShareMessage": "공유 후 상대방이 1시간 동안 당신의 실시간 위치를 볼 수 있습니다.",
+  "chatStartSharing": "공유 시작",
+  "chatLocationServiceNotEnabled": "위치 서비스가 활성화되지 않았습니다",
+  "chatEnableLocationService": "이 기능을 사용하려면 위치 서비스를 활성화해주세요",
+  "chatGoToSettings": "설정으로 이동",
+  "chatLocationPermissionRequired": "이 기능을 사용하려면 위치 권한이 필요합니다",
+  "chatLocationPermissionDeniedPermanent": "위치 권한이 영구적으로 거부되었습니다. 설정에서 활성화해주세요.",
+  "chatLocationPermissionDenied": "위치 권한 거부됨",
+  "chatGettingLocation": "위치 가져오는 중...",
+  "chatGetLocationFailed": "위치 가져오기 실패: {error}",
+  "@chatGetLocationFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "currentLocation": "현재 위치",
-  "nearbyPlace": "주변 장소 {index}",
-  "@nearbyPlace": {
-    "placeholders": {
-      "index": {
-        "type": "int"
-      }
-    }
-  },
-  "approximateDistance": "약 {distance}",
-  "@approximateDistance": {
-    "placeholders": {
-      "distance": {
-        "type": "String"
-      }
-    }
-  },
-  "mapPreview": "지도 미리보기",
-  "searchLocation": "위치 검색",
-  "redPacketSent": "{amount} {token} 레드패킷 전송됨",
-  "@redPacketSent": {
+  "chatMapPreview": "지도 미리보기",
+  "chatSearchLocation": "위치 검색",
+  "chatRedPacketSent": "{amount} {token} 레드패킷 전송됨",
+  "@chatRedPacketSent": {
     "placeholders": {
       "amount": {
         "type": "String"
@@ -1431,9 +985,9 @@
       }
     }
   },
-  "transferDefault": "송금",
-  "transferSent": "{amount} {token} 송금 전송됨",
-  "@transferSent": {
+  "chatTransferDefault": "송금",
+  "chatTransferSent": "{amount} {token} 송금 전송됨",
+  "@chatTransferSent": {
     "placeholders": {
       "amount": {
         "type": "String"
@@ -1443,311 +997,267 @@
       }
     }
   },
-  "pickFileFailed": "파일 선택 실패: {error}",
-  "@pickFileFailed": {
+  "chatPickFileFailed": "파일 선택 실패: {error}",
+  "@chatPickFileFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "fileSizeLimit": "파일 크기는 50MB를 초과할 수 없습니다",
-  "fileSending": "파일 전송 중: {filename}",
-  "@fileSending": {
+  "chatFileSizeLimit": "파일 크기는 50MB를 초과할 수 없습니다",
+  "chatFileSending": "파일 전송 중: {filename}",
+  "@chatFileSending": {
     "placeholders": {
       "filename": {
         "type": "String"
       }
     }
   },
-  "sendFileFailed": "파일 전송 실패: {error}",
-  "@sendFileFailed": {
+  "chatSendFileFailed": "파일 전송 실패: {error}",
+  "@chatSendFileFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "contactCardSent": "{name}님의 연락처 카드 전송됨",
-  "@contactCardSent": {
+  "chatContactCardSent": "{name}님의 연락처 카드 전송됨",
+  "@chatContactCardSent": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "favoritesFeature": "즐겨찾기",
-  "couponsFeature": "쿠폰",
-  "giftFeature": "선물",
-  "sharedMusic": "{name} 공유됨",
-  "@sharedMusic": {
+  "chatFavoritesFeature": "즐겨찾기",
+  "chatCouponsFeature": "쿠폰",
+  "chatGiftFeature": "선물",
+  "chatSharedMusic": "{name} 공유됨",
+  "@chatSharedMusic": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "@sendFailed": {
+  "@chatSendFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "endPollTitle": "투표 종료",
-  "endPollConfirmMessage": "정말 이 투표를 종료하시겠습니까? 종료 후에는 투표가 마감됩니다.",
-  "pollEndedMessage": "투표가 종료되었습니다",
-  "connectingCall": "연결 중...",
-  "muteCall": "음소거",
-  "speakerOff": "스피커 끄기",
-  "speakerOn": "스피커",
-  "cameraOn": "카메라 켜기",
-  "cameraOff": "카메라 끄기",
-  "hangUp": "끊기",
-  "selectForwardTargetTitle": "전달 대상 선택",
-  "noForwardableChat": "전달 가능한 채팅이 없습니다",
-  "noMatchingChat": "일치하는 채팅을 찾을 수 없습니다",
-  "imagePreview": "[이미지]",
-  "voicePreview": "[음성]",
-  "videoPreview": "[동영상]",
-  "filePreviewWithName": "[파일] {filename}",
-  "@filePreviewWithName": {
-    "placeholders": {
-      "filename": {
-        "type": "String"
-      }
-    }
-  },
-  "locationPreviewWithAddress": "[위치] {address}",
-  "@locationPreviewWithAddress": {
-    "placeholders": {
-      "address": {
-        "type": "String"
-      }
-    }
-  },
-  "musicPreviewWithTitle": "[음악] {title}",
-  "@musicPreviewWithTitle": {
-    "placeholders": {
-      "title": {
-        "type": "String"
-      }
-    }
-  },
-  "messagePreview": "[메시지]",
-  "locationTitle": "위치",
-  "sendButton": "전송",
-  "retryButton": "다시 시도",
-  "selectContact": "연락처 선택",
-  "searchContactHint": "연락처 검색",
-  "shareMusic": "음악 공유",
-  "recentPlayed": "최근",
-  "myFavorites": "즐겨찾기",
-  "networkLink": "링크",
-  "localFile": "로컬",
-  "musicLinkRequired": "음악 링크 *",
-  "pasteMusicLink": "음악 링크 붙여넣기",
-  "enterSongNamePlaceholder": "곡 이름 입력",
-  "enterArtistNamePlaceholder": "아티스트 이름 입력",
-  "shareMusicButton": "음악 공유",
-  "selectLocalAudio": "로컬 오디오 파일 선택",
-  "supportedAudioFormats": "MP3, M4A, WAV, FLAC 등 지원",
-  "selectFileButton": "파일 선택",
-  "pleaseEnterMusicLink": "음악 링크를 입력해주세요",
-  "pleaseEnterValidLink": "올바른 URL을 입력해주세요",
-  "sharedSong": "공유된 곡",
-  "selectMember": "멤버 선택",
-  "searchMemberHint": "멤버 검색",
-  "noMatchingMembers": "일치하는 멤버를 찾을 수 없습니다",
-  "unknownMember": "알 수 없음",
-  "selectedMessagesCount": "{count}개 메시지 선택됨",
-  "@selectedMessagesCount": {
+  "chatEndPollTitle": "투표 종료",
+  "chatEndPollConfirmMessage": "정말 이 투표를 종료하시겠습니까? 종료 후에는 투표가 마감됩니다.",
+  "chatPollEndedMessage": "투표가 종료되었습니다",
+  "chatConnectingCall": "연결 중...",
+  "chatMuteCall": "음소거",
+  "chatSpeakerOff": "스피커 끄기",
+  "chatSpeakerOn": "스피커",
+  "chatCameraOn": "카메라 켜기",
+  "chatCameraOff": "카메라 끄기",
+  "chatHangUp": "끊기",
+  "chatSelectForwardTargetTitle": "전달 대상 선택",
+  "chatNoForwardableChat": "전달 가능한 채팅이 없습니다",
+  "chatNoMatchingChat": "일치하는 채팅을 찾을 수 없습니다",
+  "chatLocationTitle": "위치",
+  "chatSendButton": "전송",
+  "chatRetryButton": "다시 시도",
+  "chatSearchContactHint": "연락처 검색",
+  "chatShareMusic": "음악 공유",
+  "chatRecentPlayed": "최근",
+  "chatMyFavorites": "즐겨찾기",
+  "chatNetworkLink": "링크",
+  "chatLocalFile": "로컬",
+  "chatPasteMusicLink": "음악 링크 붙여넣기",
+  "chatShareMusicButton": "음악 공유",
+  "chatSelectLocalAudio": "로컬 오디오 파일 선택",
+  "chatSupportedAudioFormats": "MP3, M4A, WAV, FLAC 등 지원",
+  "chatSelectFileButton": "파일 선택",
+  "chatPleaseEnterMusicLink": "음악 링크를 입력해주세요",
+  "chatPleaseEnterValidLink": "올바른 URL을 입력해주세요",
+  "chatSharedSong": "공유된 곡",
+  "chatSelectMember": "멤버 선택",
+  "chatSearchMemberHint": "멤버 검색",
+  "chatNoMatchingMembers": "일치하는 멤버를 찾을 수 없습니다",
+  "commonUnknownMember": "알 수 없음",
+  "chatSelectedMessagesCount": "{count}개 메시지 선택됨",
+  "@chatSelectedMessagesCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "searchContactsOrGroups": "연락처 또는 그룹 검색",
-  "noMatchingConversations": "일치하는 대화를 찾을 수 없습니다",
-  "videoTitle": "동영상",
-  "loadingText": "로딩 중...",
-  "videoPlaybackFailed": "동영상 재생 실패",
-  "@videoPlaybackFailed": {
-    "description": "Used with error message"
-  },
-  "videoLoadFailed": "동영상 로드 실패",
-  "playerInitFailed": "플레이어 초기화 실패",
-  "createPollTitle": "투표 만들기",
-  "submitPoll": "제출",
-  "pollQuestionLabel": "투표 질문",
-  "pollOptionsLabel": "투표 옵션",
-  "optionHintWithIndex": "옵션 {index}",
-  "@optionHintWithIndex": {
+  "chatSearchContactsOrGroups": "연락처 또는 그룹 검색",
+  "chatVideoTitle": "동영상",
+  "chatLoadingText": "로딩 중...",
+  "chatVideoLoadFailed": "동영상 로드 실패",
+  "chatPlayerInitFailed": "플레이어 초기화 실패",
+  "chatCreatePollTitle": "투표 만들기",
+  "chatSubmitPoll": "제출",
+  "chatPollQuestionLabel": "투표 질문",
+  "chatPollOptionsLabel": "투표 옵션",
+  "chatOptionHintWithIndex": "옵션 {index}",
+  "@chatOptionHintWithIndex": {
     "placeholders": {
       "index": {
         "type": "int"
       }
     }
   },
-  "addOptionButton": "옵션 추가",
-  "pollSettingsLabel": "투표 설정",
-  "selectionType": "선택 유형",
-  "singleChoiceLabel": "단일",
-  "multiChoiceLabel": "복수",
-  "anonymousPollSwitch": "익명 투표",
-  "pleaseEnterQuestion": "투표 질문을 입력해주세요",
-  "atLeastTwoOptions": "최소 2개의 옵션이 필요합니다",
-  "confirmWithCount": "확인 ({count})",
-  "@confirmWithCount": {
+  "chatAddOptionButton": "옵션 추가",
+  "chatPollSettingsLabel": "투표 설정",
+  "chatSelectionType": "선택 유형",
+  "chatSingleChoiceLabel": "단일",
+  "chatMultiChoiceLabel": "복수",
+  "chatAnonymousPollSwitch": "익명 투표",
+  "chatPleaseEnterQuestion": "투표 질문을 입력해주세요",
+  "chatAtLeastTwoOptions": "최소 2개의 옵션이 필요합니다",
+  "chatConfirmWithCount": "확인 ({count})",
+  "@chatConfirmWithCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "@selectedCount": {
+  "@chatSelectedCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "@memberCount": {
+  "@commonMemberCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "@groupChatCount": {
+  "@chatGroupChatCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "@replyTo": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "emailVerificationTitle": "이메일 인증",
-  "enterValidEmailAddress": "올바른 이메일 주소를 입력해주세요",
-  "verificationCodeSentTo": "인증 코드가 {email}로 전송되었습니다",
-  "@verificationCodeSentTo": {
+  "authEmailVerificationTitle": "이메일 인증",
+  "authEnterValidEmailAddress": "올바른 이메일 주소를 입력해주세요",
+  "authVerificationCodeSentTo": "인증 코드가 {email}로 전송되었습니다",
+  "@authVerificationCodeSentTo": {
     "placeholders": {
       "email": {
         "type": "String"
       }
     }
   },
-  "sendCodeFailed": "코드 전송 실패: {error}",
-  "@sendCodeFailed": {
+  "authSendCodeFailed": "코드 전송 실패: {error}",
+  "@authSendCodeFailed": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "verificationSuccess": "인증 성공",
-  "verificationFailed": "인증 실패",
-  "verificationCodeError": "인증 코드 오류: {error}",
-  "@verificationCodeError": {
+  "authVerificationSuccess": "인증 성공",
+  "authVerificationFailed": "인증 실패",
+  "authVerificationCodeError": "인증 코드 오류: {error}",
+  "@authVerificationCodeError": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "enterVerificationCode": "인증 코드 입력",
-  "enterYourEmail": "이메일 입력",
-  "weSentCodeTo": "6자리 코드를 보냈습니다\n{email}",
-  "@weSentCodeTo": {
+  "commonEnterVerificationCode": "인증 코드 입력",
+  "authEnterYourEmail": "이메일 입력",
+  "authWeSentCodeTo": "6자리 코드를 보냈습니다\n{email}",
+  "@authWeSentCodeTo": {
     "placeholders": {
       "email": {
         "type": "String"
       }
     }
   },
-  "enterEmailForCode": "이메일 주소를 입력하시면 인증 코드를 보내드립니다",
-  "sendVerificationCode": "인증 코드 보내기",
-  "resendVerificationCode": "인증 코드 다시 보내기",
-  "canResendAfter": "{seconds}초 후 다시 보낼 수 있습니다",
-  "@canResendAfter": {
+  "authEnterEmailForCode": "이메일 주소를 입력하시면 인증 코드를 보내드립니다",
+  "commonSendVerificationCode": "인증 코드 보내기",
+  "authResendVerificationCode": "인증 코드 다시 보내기",
+  "authCanResendAfter": "{seconds}초 후 다시 보낼 수 있습니다",
+  "@authCanResendAfter": {
     "placeholders": {
       "seconds": {
         "type": "int"
       }
     }
   },
-  "changeEmail": "이메일 변경",
-  "addToContacts": "연락처에 추가",
-  "addingToContacts": "추가 중...",
-  "addedToContacts": "연락처에 추가됨",
-  "addFailedWithError": "추가 실패: {error}",
-  "@addFailedWithError": {
+  "commonChangeEmail": "이메일 변경",
+  "contactAddToContacts": "연락처에 추가",
+  "contactAddingToContacts": "추가 중...",
+  "contactAddedToContacts": "연락처에 추가됨",
+  "contactAddFailedWithError": "추가 실패: {error}",
+  "@contactAddFailedWithError": {
     "placeholders": {
       "error": {
         "type": "String"
       }
     }
   },
-  "addPhone": "전화번호 추가",
-  "addTag": "태그 추가",
-  "addText": "텍스트 추가",
-  "addPhoto": "사진 추가",
-  "groupCountLabel": "그룹 {count}개",
-  "@groupCountLabel": {
+  "contactAddPhone": "전화번호 추가",
+  "contactAddTag": "태그 추가",
+  "contactAddText": "텍스트 추가",
+  "contactAddPhoto": "사진 추가",
+  "contactGroupCountLabel": "그룹 {count}개",
+  "@contactGroupCountLabel": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "addedViaSearch": "검색으로 추가됨",
-  "addTime": "추가 시간",
-  "doneButton": "완료",
-  "waitingForParticipants": "참가자 대기 중...",
-  "participantMe": "{name} (나)",
-  "@participantMe": {
+  "contactAddedViaSearch": "검색으로 추가됨",
+  "contactAddTime": "추가 시간",
+  "contactDoneButton": "완료",
+  "callWaitingForParticipants": "참가자 대기 중...",
+  "callParticipantMe": "{name} (나)",
+  "@callParticipantMe": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "sharingLabel": "공유 중",
-  "screenSharingBy": "{name}님이 화면 공유 중",
-  "@screenSharingBy": {
+  "callSharingLabel": "공유 중",
+  "callScreenSharingBy": "{name}님이 화면 공유 중",
+  "@callScreenSharingBy": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "participantCount": "참가자 {count}명",
-  "@participantCount": {
+  "callParticipantCount": "참가자 {count}명",
+  "@callParticipantCount": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "muteLabel": "음소거",
-  "unmuteLabel": "음소거 해제",
-  "turnOffVideo": "영상 끄기",
-  "turnOnVideo": "영상 켜기",
-  "shareScreen": "화면 공유",
-  "stopSharing": "공유 중지",
-  "switchCameraLabel": "전환",
-  "leaveLabel": "나가기",
-  "participantsLabel": "참가자",
-  "joiningMeeting": "회의 참여 중...",
-  "pollVotesFormat": "{count}표 ({percentage}%)",
-  "@pollVotesFormat": {
+  "callMuteLabel": "음소거",
+  "callUnmuteLabel": "음소거 해제",
+  "callTurnOffVideo": "영상 끄기",
+  "callTurnOnVideo": "영상 켜기",
+  "callShareScreen": "화면 공유",
+  "callStopSharing": "공유 중지",
+  "callSwitchCameraLabel": "전환",
+  "callLeaveLabel": "나가기",
+  "callParticipantsLabel": "참가자",
+  "callJoiningMeeting": "회의 참여 중...",
+  "chatPollVotesFormat": "{count}표 ({percentage}%)",
+  "@chatPollVotesFormat": {
     "placeholders": {
       "count": {
         "type": "int"
@@ -1757,173 +1267,457 @@
       }
     }
   },
-  "pollParticipantsFormat": "{count}명 참여",
-  "@pollParticipantsFormat": {
+  "chatPollParticipantsFormat": "{count}명 참여",
+  "@chatPollParticipantsFormat": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "incomingVideoCall": "영상 통화 수신",
-  "incomingVoiceCall": "음성 통화 수신",
-  "videoCallInProgress": "영상 통화 중",
-  "voiceCallInProgress": "음성 통화 중",
-  "reconnectingCall": "재연결 중...",
-  "callEnded": "통화 종료",
-  "callFailed": "통화 실패",
-  "noMediaUrlAvailable": "미디어 URL을 사용할 수 없습니다",
-  "errorWithMessage": "오류: {message}",
-  "@errorWithMessage": {
+  "chatNoMediaUrlAvailable": "미디어 URL을 사용할 수 없습니다",
+  "chatErrorWithMessage": "오류: {message}",
+  "@chatErrorWithMessage": {
     "placeholders": {
       "message": {
         "type": "String"
       }
     }
   },
-  "musicLinkLabel": "음악 링크",
-  "redPacketTransferCannotForward": "홍바오와 송금은 전달할 수 없습니다",
-  "messageNotifications": "메시지 알림",
-  "receiveNewMessageNotifications": "새 메시지 알림 받기",
-  "showMessagePreview": "메시지 미리보기 표시",
-  "showMessageContentInNotification": "알림에 메시지 내용 표시",
-  "vibration": "진동",
-  "doNotDisturbMode": "방해 금지",
-  "doNotDisturbDescription": "지정된 시간 동안 알림을 받지 않습니다",
-  "messagesLabel": "메시지",
-  "allowStrangerMessages": "모르는 사람의 메시지 허용",
-  "receiveMessagesFromNonContacts": "연락처에 없는 사람의 메시지 받기",
-  "letOthersKnowYouRead": "읽음 확인 보내기",
-  "typingIndicator": "입력 중 표시",
-  "letOthersKnowYouTyping": "입력 중임을 상대방에게 알리기",
-  "whoCanSeeTitle": "{title}을(를) 볼 수 있는 사람",
-  "@whoCanSeeTitle": {
+  "chatMusicLinkLabel": "음악 링크",
+  "chatRedPacketTransferCannotForward": "홍바오와 송금은 전달할 수 없습니다",
+  "commonTapToRetry": "탭하여 다시 시도",
+  "chatDefaultRedPacketGreeting": "부자 되세요, 행운을 빕니다",
+  "groupAllowOthersToSearchAndJoin": "다른 사용자가 검색하고 참여하도록 허용",
+  "groupConfirmClearChatHistory": "채팅 기록을 정말 삭제하시겠습니까?",
+  "groupCreateGroupToChat": "그룹을 만들어 채팅을 시작하세요",
+  "groupEditGroupAnnouncement": "그룹 공지 수정",
+  "groupEditGroupDescription": "그룹 설명 수정",
+  "groupEnterGroupAnnouncement": "그룹 공지를 입력하세요",
+  "groupMemberCountClickToCopy": "{count}명, 클릭하여 그룹 ID 복사",
+  "groupNoPermissionToEditGroupName": "그룹 이름을 수정할 권한이 없습니다",
+  "commonAppleLogin": "Apple로 로그인",
+  "settingsChangeEmailFailed": "이메일 변경 실패",
+  "settingsChangePassword": "비밀번호 변경",
+  "settingsChangePasswordFailed": "비밀번호 변경 실패",
+  "settingsChangePasswordInfo": "비밀번호를 변경하면 로그아웃되며 새 비밀번호로 로그인해야 합니다.",
+  "settingsCodeSentTo": "인증 코드 전송됨",
+  "commonConfirmNewPassword": "새 비밀번호 확인",
+  "searchConversationLabel": "대화",
+  "settingsCurrentBoundEmail": "현재 연결된 이메일",
+  "settingsCurrentPassword": "현재 비밀번호",
+  "settingsDidNotReceiveCode": "코드를 받지 못하셨나요?",
+  "authEmailAddress": "이메일 주소",
+  "settingsEmailChangedSuccess": "이메일이 성공적으로 변경되었습니다",
+  "authEmailRecoveryHint": "비밀번호 복구에 사용됩니다",
+  "settingsEmailSecurityNote": "이메일은 비밀번호 복구에 사용됩니다. 안전하게 보관하세요.",
+  "settingsEnterCurrentPassword": "현재 비밀번호 입력",
+  "commonEnterEmailAddress": "이메일 주소 입력",
+  "settingsEnterNewEmail": "새 이메일 주소 입력",
+  "settingsEnterNewPassword": "새 비밀번호 입력",
+  "authEnterRegisteredEmail": "등록한 이메일 주소를 입력하세요",
+  "authEnterResetCode": "재설정 코드 입력",
+  "commonGoogleLogin": "Google로 로그인",
+  "commonWechat": "WeChat",
+  "commonInvalidEmailFormat": "유효한 이메일 주소를 입력하세요",
+  "settingsLanguage": "언어",
+  "settingsLanguageChanged": "언어가 변경되었습니다",
+  "settingsNewEmailAddress": "새 이메일 주소",
+  "commonNewPassword": "새 비밀번호",
+  "settingsNewPasswordMustBeDifferent": "새 비밀번호는 현재 비밀번호와 달라야 합니다",
+  "authOptional": "선택 사항",
+  "settingsPasswordChanged": "비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인하세요.",
+  "settingsPasswordRequirements": "비밀번호 요구 사항:",
+  "authPasswordResetSuccess": "비밀번호가 성공적으로 재설정되었습니다. 새 비밀번호로 로그인하세요.",
+  "authResetCodeSent": "재설정 코드가 {email}로 전송되었습니다",
+  "authResetPassword": "비밀번호 재설정",
+  "authResetPasswordFailed": "비밀번호 재설정 실패",
+  "settingsSecurity": "보안",
+  "settingsSecurityNote": "보안을 위해 비밀번호 변경 후 모든 기기에서 다시 로그인해야 합니다.",
+  "authSendResetCode": "재설정 코드 전송",
+  "authSetNewPassword": "새 비밀번호 설정",
+  "settingsVerificationCode": "인증 코드",
+  "settingsVerificationCodeSent": "인증 코드가 전송되었습니다",
+  "qrcodeCameraPermissionRestricted": "이 기기에서 카메라 접근이 제한되어 있습니다",
+  "contactCreateTag": "Create Tag",
+  "contactEnterTagName": "Enter tag name",
+  "contactEditTag": "Edit Tag",
+  "contactDeleteTag": "Delete Tag",
+  "contactDeleteTagConfirm": "Are you sure you want to delete the tag \"{tagName}\"?",
+  "@contactDeleteTagConfirm": {
+    "placeholders": {
+      "tagName": {
+        "type": "String"
+      }
+    }
+  },
+  "contactNoTags": "No tags yet",
+  "contactFriendPermissions": "Friend Permissions",
+  "contactSetChatOnly": "Set as Chat-only",
+  "contactChatOnlyDesc": "Can only chat with you, other content will be hidden",
+  "contactHideMyMoments": "Hide My Moments",
+  "contactHideMyMomentsDesc": "This friend cannot see my Moments",
+  "contactHideTheirMoments": "Hide Their Moments",
+  "contactHideTheirMomentsDesc": "Don't see this friend's Moments",
+  "contactHideMyStatus": "Hide My Status",
+  "contactHideMyStatusDesc": "This friend cannot see my status updates",
+  "contactNoChatOnlyFriends": "No chat-only friends",
+  "contactNoOfficialAccounts": "No official accounts",
+  "contactFollowOfficialAccountsDesc": "Follow official accounts to get the latest updates",
+  "contactNoServiceAccounts": "No service accounts",
+  "contactSubscribeServiceAccountsDesc": "Subscribe to service accounts for convenient services",
+  "contactNoEnterpriseContacts": "No enterprise contacts",
+  "contactEnterpriseContactsDesc": "Enterprise contacts will be displayed here",
+  "profileCardPack": "Card Pack",
+  "profileOrders": "Orders",
+  "profileNoOrders": "No orders",
+  "profileOrdersDesc": "Your orders will be displayed here",
+  "profileNoCards": "No cards",
+  "profileCardsDesc": "Your cards will be displayed here",
+  "favoriteEnterTagsHint": "Enter tags separated by commas",
+  "favoriteTagsUpdated": "Tags updated",
+  "favoriteForwardedContent": "Content forwarded",
+  "favoriteEnterNoteContent": "Enter note content",
+  "favoriteNoteAdded": "Note added",
+  "favoriteLinkTitle": "Link title",
+  "favoriteLinkUrl": "https://",
+  "favoriteLinkAdded": "Link added",
+  "contactPhotoAdded": "Photo added",
+  "contactEnterPhone": "Enter phone number",
+  "commonConversationWithId": "대화: {roomId}",
+  "commonContactWithId": "연락처: {userId}",
+  "commonDiscover": "발견",
+  "commonDeveloping": "{title}\n(곧 출시 예정)",
+  "commonPageNotFound": "페이지를 찾을 수 없습니다",
+  "commonBackToHome": "홈으로 돌아가기",
+  "settingsMessageNotifications": "메시지 알림",
+  "settingsReceiveNewMessageNotifications": "새 메시지 알림 받기",
+  "settingsShowMessagePreview": "메시지 미리보기 표시",
+  "settingsShowMessageContentInNotification": "알림에 메시지 내용 표시",
+  "settingsNotificationSound": "알림 소리",
+  "settingsPlaySoundOnMessage": "메시지 수신 시 소리 재생",
+  "commonVibration": "진동",
+  "settingsVibrateOnMessage": "메시지 수신 시 진동",
+  "settingsDoNotDisturbMode": "방해 금지",
+  "settingsDoNotDisturbDescription": "지정된 시간 동안 알림을 받지 않습니다",
+  "settingsStartTime": "시작 시간",
+  "settingsEndTime": "종료 시간",
+  "settingsWhoCanSee": "볼 수 있는 사람",
+  "settingsLastSeen": "마지막 접속",
+  "settingsMessagesLabel": "메시지",
+  "settingsAllowStrangerMessages": "모르는 사람의 메시지 허용",
+  "settingsReceiveMessagesFromNonContacts": "연락처에 없는 사람의 메시지 받기",
+  "settingsReadReceipts": "읽음 확인",
+  "settingsLetOthersKnowYouRead": "읽음 확인 보내기",
+  "settingsTypingIndicator": "입력 중 표시",
+  "settingsLetOthersKnowYouTyping": "입력 중임을 상대방에게 알리기",
+  "settingsEveryone": "모든 사람",
+  "settingsContactsOnly": "연락처만",
+  "settingsNobody": "아무도",
+  "settingsWhoCanSeeTitle": "{title}을(를) 볼 수 있는 사람",
+  "@settingsWhoCanSeeTitle": {
     "placeholders": {
       "title": {
         "type": "String"
       }
     }
   },
-  "versionInfo": "버전 {version}",
-  "@versionInfo": {
+  "settingsVersionInfo": "버전 {version}",
+  "@settingsVersionInfo": {
     "placeholders": {
       "version": {
         "type": "String"
       }
     }
   },
-  "checkForUpdates": "업데이트 확인",
-  "feedbackAndSuggestions": "피드백 및 제안",
-  "darkMode": "다크 모드",
-  "fontSize": "글꼴 크기",
-  "bubbleStyle": "말풍선 스타일",
-  "followSystem": "시스템 설정 따르기",
-  "autoSwitchBySystem": "시스템 설정에 따라 자동 전환",
-  "lightMode": "라이트 모드",
-  "alwaysUseLightTheme": "항상 밝은 테마 사용",
-  "darkModeOption": "다크 모드",
-  "alwaysUseDarkTheme": "항상 어두운 테마 사용",
-  "fontSizeSmall": "작게",
-  "fontSizeStandard": "표준",
-  "fontSizeLarge": "크게",
-  "fontSizeExtraLarge": "매우 크게",
-  "bubbleStyleWechat": "WeChat 스타일",
-  "bubbleStyleWechatDesc": "클래식 WeChat 말풍선 스타일",
-  "bubbleStyleModern": "모던 스타일",
-  "bubbleStyleModernDesc": "깔끔한 모던 말풍선 스타일",
-  "bubbleStyleClassic": "클래식 스타일",
-  "bubbleStyleClassicDesc": "전통적인 말풍선 스타일",
-  "tapToRetry": "탭하여 다시 시도",
-  "noConversationsToForward": "전달할 대화가 없습니다",
-  "defaultRedPacketGreeting": "부자 되세요, 행운을 빕니다",
-  "emojiCategoryFace": "이모티콘",
-  "emojiCategoryHeart": "하트",
-  "emojiCategoryAnimal": "동물",
-  "emojiCategoryFood": "음식",
-  "emojiCategoryTransport": "교통",
-  "emojiCategoryActivity": "활동",
-  "emojiCategoryObject": "사물",
-  "emojiCategorySymbol": "기호",
-  "allowOthersToSearchAndJoin": "다른 사용자가 검색하고 참여하도록 허용",
-  "confirmClearChatHistory": "채팅 기록을 정말 삭제하시겠습니까?",
-  "createGroupToChat": "그룹을 만들어 채팅을 시작하세요",
-  "editGroupAnnouncement": "그룹 공지 수정",
-  "editGroupDescription": "그룹 설명 수정",
-  "enterGroupAnnouncement": "그룹 공지를 입력하세요",
-  "memberCountClickToCopy": "{count}명, 클릭하여 그룹 ID 복사",
-  "noPermissionToEditGroupName": "그룹 이름을 수정할 권한이 없습니다",
-  "appleLogin": "Apple로 로그인",
-  "changeEmailFailed": "이메일 변경 실패",
-  "changePassword": "비밀번호 변경",
-  "changePasswordFailed": "비밀번호 변경 실패",
-  "changePasswordInfo": "비밀번호를 변경하면 로그아웃되며 새 비밀번호로 로그인해야 합니다.",
-  "codeSentTo": "인증 코드 전송됨",
-  "confirmNewPassword": "새 비밀번호 확인",
-  "conversationLabel": "대화",
-  "currentBoundEmail": "현재 연결된 이메일",
-  "currentPassword": "현재 비밀번호",
-  "didNotReceiveCode": "코드를 받지 못하셨나요?",
-  "emailAddress": "이메일 주소",
-  "emailChangedSuccess": "이메일이 성공적으로 변경되었습니다",
-  "emailRecoveryHint": "비밀번호 복구에 사용됩니다",
-  "emailSecurityNote": "이메일은 비밀번호 복구에 사용됩니다. 안전하게 보관하세요.",
-  "enterCurrentPassword": "현재 비밀번호 입력",
-  "enterEmailAddress": "이메일 주소 입력",
-  "enterNewEmail": "새 이메일 주소 입력",
-  "enterNewPassword": "새 비밀번호 입력",
-  "enterRegisteredEmail": "등록한 이메일 주소를 입력하세요",
-  "enterResetCode": "재설정 코드 입력",
-  "googleLogin": "Google로 로그인",
-  "facebook": "Facebook",
-  "facebookLogin": "Facebook로 로그인",
-  "facebookLoginFailed": "Facebook 로그인 실패",
-  "twitter": "Twitter",
-  "twitterLogin": "Twitter로 로그인",
-  "twitterLoginFailed": "Twitter 로그인 실패",
-  "twitterNotConfigured": "Twitter 로그인이 설정되지 않음",
-  "wechat": "WeChat",
-  "wechatLogin": "WeChat로 로그인",
-  "wechatLoginFailed": "WeChat 로그인 실패",
-  "wechatNotInstalled": "WeChat을 먼저 설치하세요",
-  "incorrectCurrentPassword": "현재 비밀번호가 올바르지 않습니다",
-  "invalidEmailFormat": "유효한 이메일 주소를 입력하세요",
-  "language": "언어",
-  "languageChanged": "언어가 변경되었습니다",
-  "newEmailAddress": "새 이메일 주소",
-  "newPassword": "새 비밀번호",
-  "newPasswordMustBeDifferent": "새 비밀번호는 현재 비밀번호와 달라야 합니다",
-  "optional": "선택 사항",
-  "passwordChanged": "비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인하세요.",
-  "passwordRequirements": "비밀번호 요구 사항:",
-  "passwordResetSuccess": "비밀번호가 성공적으로 재설정되었습니다. 새 비밀번호로 로그인하세요.",
-  "resetCodeSent": "재설정 코드가 {email}로 전송되었습니다",
-  "resetPassword": "비밀번호 재설정",
-  "resetPasswordFailed": "비밀번호 재설정 실패",
-  "resetPasswordTitle": "비밀번호 재설정",
-  "security": "보안",
-  "securityNote": "보안을 위해 비밀번호 변경 후 모든 기기에서 다시 로그인해야 합니다.",
-  "sendResetCode": "재설정 코드 전송",
-  "setNewPassword": "새 비밀번호 설정",
-  "socialLoginCancelled": "로그인이 취소되었습니다",
-  "socialLoginFailed": "소셜 로그인 실패",
-  "verificationCode": "인증 코드",
-  "verificationCodeSent": "인증 코드가 전송되었습니다",
-
-  "n42BeanTitle": "N42 빈",
-  "n42BeanDetails": "N42 빈 상세",
-  "noN42Bean": "N42 빈 없음",
-  "n42BeanDescription": "N42 빈은 N42 내 가상 아이템과 서비스를 교환하기 위한 토큰입니다. 현재 이용 가능:",
-  "n42BeanFeature1": "회원 전용 스티커 및 테마",
-  "n42BeanFeature2": "채팅 말풍선 커스터마이징",
-  "n42BeanFeature3": "세뱃돈 봉투 커버 커스터마이징",
-  "n42BeanFeature4": "전용 닉네임 뱃지",
-  "n42BeanFeature5": "그룹 채팅 특권",
-  "n42BeanFeature6": "클라우드 저장소 확장",
-  "n42BeanFeature7": "영상통화 뷰티 필터",
-  "n42BeanFeature8": "모먼트 배경 커스터마이징",
-  "n42BeanFeature9": "VIP 고객 서비스 우선권",
-  "gotIt": "알겠습니다",
-  "noN42BeanRecords": "N42 빈 기록 없음",
-
-  "cameraPermissionRestricted": "이 기기에서 카메라 접근이 제한되어 있습니다"
+  "settingsCheckForUpdates": "업데이트 확인",
+  "settingsOpenSourceLicenses": "오픈소스 라이선스",
+  "settingsFeedbackAndSuggestions": "피드백 및 제안",
+  "settingsBuiltOnMatrix": "Matrix 프로토콜 기반",
+  "settingsDarkMode": "다크 모드",
+  "settingsFontSize": "글꼴 크기",
+  "settingsBubbleStyle": "말풍선 스타일",
+  "settingsFollowSystem": "시스템 설정 따르기",
+  "settingsAutoSwitchBySystem": "시스템 설정에 따라 자동 전환",
+  "settingsLightMode": "라이트 모드",
+  "settingsAlwaysUseLightTheme": "항상 밝은 테마 사용",
+  "settingsDarkModeOption": "다크 모드",
+  "settingsAlwaysUseDarkTheme": "항상 어두운 테마 사용",
+  "settingsFontSizeSmall": "작게",
+  "settingsFontSizeStandard": "표준",
+  "settingsFontSizeLarge": "크게",
+  "settingsFontSizeExtraLarge": "매우 크게",
+  "settingsBubbleStyleWechat": "WeChat 스타일",
+  "settingsBubbleStyleWechatDesc": "클래식 WeChat 말풍선 스타일",
+  "settingsBubbleStyleModern": "모던 스타일",
+  "settingsBubbleStyleModernDesc": "깔끔한 모던 말풍선 스타일",
+  "settingsBubbleStyleClassic": "클래식 스타일",
+  "settingsBubbleStyleClassicDesc": "전통적인 말풍선 스타일",
+  "discoverVideoChannels": "채널",
+  "discoverLive": "라이브",
+  "discoverListen": "듣기",
+  "discoverWatch": "보기",
+  "discoverSearchDiscover": "검색",
+  "discoverNearbyPeople": "주변",
+  "discoverGames": "게임",
+  "discoverMiniPrograms": "미니 프로그램",
+  "chatAlreadyInCall": "이미 통화 중입니다",
+  "commonConnectionFailed": "연결 실패",
+  "chatCallRejected": "통화 거절됨",
+  "chatNoAnswer": "응답 없음",
+  "commonClose": "닫기",
+  "chatSelectContact": "연락처 선택",
+  "chatVoteRemoved": "투표 취소됨",
+  "chatVoteChanged": "투표 변경됨",
+  "chatVoted": "투표함",
+  "chatReplyTo": "{name}님에게 답장",
+  "@chatReplyTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatCurrentLocation": "현재 위치",
+  "chatNearbyPlace": "주변 장소 {index}",
+  "@chatNearbyPlace": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "chatApproximateDistance": "약 {distance}",
+  "@chatApproximateDistance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "chatAddress": "주소",
+  "chatLatitude": "위도",
+  "chatLongitude": "경도",
+  "groupDescriptionUpdated": "그룹 설명이 업데이트되었습니다",
+  "groupAvatarUpdated": "그룹 아바타가 업데이트되었습니다",
+  "callDecline": "거절",
+  "callAnswer": "응답",
+  "callIncomingVideoCall": "영상 통화 수신",
+  "callIncomingVoiceCall": "음성 통화 수신",
+  "callVideoCallInProgress": "영상 통화 중",
+  "callVoiceCallInProgress": "음성 통화 중",
+  "callReconnectingCall": "재연결 중...",
+  "callEnded": "통화 종료",
+  "callFailed": "통화 실패",
+  "callLivekitNotConfigured": "LiveKit이 구성되지 않았습니다",
+  "callJoinMeetingFailed": "회의 참여 실패: {error}",
+  "callScreenShareFailed": "화면 공유 실패: {error}",
+  "profileN42BeanTitle": "N42 빈",
+  "profileNoN42Bean": "N42 빈 없음",
+  "profileN42BeanDetails": "N42 빈 상세",
+  "profileN42BeanDescription": "N42 빈은 N42 내 가상 아이템과 서비스를 교환하기 위한 토큰입니다. 현재 이용 가능:",
+  "profileN42BeanFeature1": "회원 전용 스티커 및 테마",
+  "profileN42BeanFeature2": "채팅 말풍선 커스터마이징",
+  "profileN42BeanFeature3": "세뱃돈 봉투 커버 커스터마이징",
+  "profileN42BeanFeature4": "전용 닉네임 뱃지",
+  "profileN42BeanFeature5": "그룹 채팅 특권",
+  "profileN42BeanFeature6": "클라우드 저장소 확장",
+  "profileN42BeanFeature7": "영상통화 뷰티 필터",
+  "profileN42BeanFeature8": "모먼트 배경 커스터마이징",
+  "profileN42BeanFeature9": "VIP 고객 서비스 우선권",
+  "profileGotIt": "알겠습니다",
+  "profileNoN42BeanRecords": "N42 빈 기록 없음",
+  "profileMoodAndThoughts": "기분 및 생각",
+  "profileStatusHappy": "행복해요",
+  "profileStatusCracked": "무너졌어요",
+  "profileStatusLucky": "운이 좋아요",
+  "profileStatusSunny": "화창해요",
+  "profileStatusTired": "피곤해요",
+  "profileStatusDaydream": "몽상 중",
+  "profileStatusRushing": "바쁜 중",
+  "profileStatusOverthinking": "생각이 많아요",
+  "profileStatusEnergized": "활력 넘쳐요",
+  "profileWorkAndStudy": "일 및 공부",
+  "profileStatusWorking": "일하는 중",
+  "profileStatusStudying": "공부하는 중",
+  "profileStatusBusy": "바쁨",
+  "profileStatusSlacking": "쉬는 중",
+  "profileStatusTraveling": "여행 중",
+  "profileStatusGoingHome": "집에 가는 중",
+  "profileStatusDnd": "방해 금지",
+  "profileActivities": "활동",
+  "profileStatusHanging": "놀고 있어요",
+  "profileStatusCheckIn": "체크인",
+  "profileStatusExercising": "운동 중",
+  "profileStatusCoffee": "커피",
+  "profileStatusBubbleTea": "버블티",
+  "profileStatusEating": "식사 중",
+  "profileStatusParenting": "육아 중",
+  "profileStatusSavingWorld": "세상 구하는 중",
+  "profileStatusSelfie": "셀카",
+  "profileRest": "휴식",
+  "profileStatusRetreat": "피정 중",
+  "profileStatusHome": "집",
+  "profileStatusSleeping": "자는 중",
+  "profileStatusCatLover": "고양이 좋아요",
+  "profileStatusDogWalking": "산책 중",
+  "profileStatusGaming": "게임 중",
+  "profileStatusListening": "듣는 중",
+  "profileEditAddress": "주소 편집",
+  "profileRecipient": "수령인",
+  "profileEnterRecipientName": "수령인 이름 입력",
+  "profilePhoneNumber": "전화번호",
+  "profileEnterPhoneNumber": "전화번호 입력",
+  "profileRegionHint": "시/도/구",
+  "profileDetailedAddress": "상세 주소",
+  "profileDetailedAddressHint": "도로명, 건물 번호 등",
+  "profileSetAsDefaultAddress": "기본 주소로 설정",
+  "profilePleaseCompleteInfo": "모든 항목을 입력해주세요",
+  "profileEditInvoice": "청구서 편집",
+  "profileInvoiceType": "청구서 유형: ",
+  "profileCompanyName": "회사명",
+  "profilePersonalName": "개인 이름",
+  "profileEnterCompanyName": "회사명 입력",
+  "profileEnterName": "이름 입력",
+  "profileTaxIdNumber": "사업자 등록번호",
+  "profileEnterTaxIdNumber": "사업자 등록번호 입력",
+  "profileBankNameOptional": "은행명 (선택)",
+  "profileEnterBankName": "은행명 입력",
+  "profileBankAccountOptional": "계좌번호 (선택)",
+  "profileEnterBankAccount": "계좌번호 입력",
+  "profileCompanyAddressOptional": "회사 주소 (선택)",
+  "profileEnterCompanyAddress": "회사 주소 입력",
+  "profileCompanyPhoneOptional": "회사 전화번호 (선택)",
+  "profileEnterCompanyPhone": "회사 전화번호 입력",
+  "profileSetAsDefaultInvoice": "기본 청구서로 설정",
+  "profileRingtoneVibrate": "진동",
+  "profileRingtoneSilent": "무음",
+  "profileVibrateMode": "진동 모드",
+  "profileSilentMode": "무음 모드",
+  "profilePlayFailed": "재생 실패: {ringtoneName}",
+  "profilePlaying": "재생 중: {ringtoneName}",
+  "profileStop": "중지",
+  "profileSelectRingtone": "벨소리 선택",
+  "profileLoadingRingtones": "벨소리 로딩 중...",
+  "profileNoRingtonesFound": "벨소리를 찾을 수 없습니다",
+  "mainMessagesWithCount": "메시지({count})",
+  "@mainMessagesWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commonCopiedToClipboard": "클립보드에 복사됨",
+  "commonMore": "더보기",
+  "commonAllRead": "모두 읽음",
+  "commonReadCount": "{count}명 읽음",
+  "commonYouRecalledMessage": "메시지를 취소했습니다",
+  "commonMessageRecalled": "메시지가 취소되었습니다",
+  "commonReEdit": "다시 편집",
+  "commonWalletArea": "지갑 영역",
+  "callIncomingCall": "수신 전화",
+  "callMissedCall": "부재중 전화",
+  "groupRemoveAdmin": "관리자 삭제",
+  "chatSelectCurrency": "통화 선택",
+  "chatSelectEmoji": "이모티콘 선택",
+  "chatSelectRedPacketCover": "커버 선택",
+  "groupSetAsAdmin": "관리자로 설정",
+  "chatVideoPlaybackFailed": "동영상 재생 실패",
+  "@chatVideoPlaybackFailed": {
+    "description": "Used with error message"
+  },
+  "groupViewProfile": "프로필 보기",
+  "favoriteAddLinkComingSoon": "링크 추가 기능 곧 출시 예정",
+  "favoriteNewNoteComingSoon": "새 노트 기능 곧 출시 예정",
+  "qrcodeSaveFeatureComingSoon": "저장 기능 곧 출시 예정",
+  "qrcodeShareFeatureComingSoon": "공유 기능 곧 출시 예정",
+  "qrcodeProcessFailed": "QR 코드 처리 실패: {error}",
+  "@qrcodeProcessFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "authAppleLabel": "Apple",
+  "authEmailExampleHint": "example@email.com",
+  "authGoogleLabel": "Google",
+  "authLoginWithBiometric": "{type}으로 로그인",
+  "@authLoginWithBiometric": {
+    "placeholders": {
+      "type": {
+        "type": "Object"
+      }
+    }
+  },
+  "authOr": "또는",
+  "authPasskeyLabel": "패스키",
+  "authServerAddressHint": "https://m.si46.world",
+  "authSsoLabel": "SSO",
+  "authVerificationCodePlaceholder": "------",
+  "chatCallDurationLabel": "통화 시간",
+  "chatCallNotAnswered": "응답 없음",
+  "chatMessage": "메시지",
+  "chatVideoCallCancelled": "영상 통화 취소됨",
+  "chatVoiceCallCancelled": "음성 통화 취소됨",
+  "chatVoiceMessage": "음성",
+  "commonMatrixIdHint": "@username:server.com",
+  "commonTranslate": "번역",
+  "commonTranslatedFrom": "{language}에서 번역됨",
+  "@commonTranslatedFrom": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "commonTranslating": "번역 중...",
+  "commonTranslation": "번역",
+  "commonTranslationFailed": "번역 실패",
+  "contactNoCommonGroups": "공통 그룹 없음",
+  "contactNoCommonGroupsDescription": "공통으로 가입한 그룹이 없습니다",
+  "conversationHideChat": "숨기기",
+  "groupAlbum": "그룹 앨범",
+  "groupDocuments": "문서",
+  "groupDownloadStarted": "{filename} 다운로드 중...",
+  "@groupDownloadStarted": {
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      }
+    }
+  },
+  "groupFiles": "그룹 파일",
+  "groupImages": "이미지",
+  "groupNoFiles": "파일 없음",
+  "groupNoFilesDescription": "이 그룹에 아직 파일이 없습니다",
+  "groupNoMedia": "미디어 없음",
+  "groupNoMediaDescription": "이 그룹에 아직 사진이나 동영상이 없습니다",
+  "groupSize": "크기",
+  "groupTotal": "전체",
+  "groupVideos": "동영상",
+  "profileEnterPokeSuffixHint": "쿡 찌르기 접미사를 입력하세요, 예: 어깨를",
+  "settingsAddQuickReply": "빠른 답장 추가",
+  "settingsBiometricDisabled": "비활성화됨 - 탭하여 활성화",
+  "settingsBiometricEnabled": "활성화됨 - 생체 인식으로 로그인",
+  "settingsBiometricLogin": "생체 인식 로그인",
+  "settingsBiometricLoginDisabled": "생체 인식 로그인이 비활성화되었습니다",
+  "settingsBiometricLoginEnabled": "생체 인식 로그인이 활성화되었습니다",
+  "settingsBiometricNeedRelogin": "생체 인식 로그인을 활성화하려면 로그아웃 후 다시 로그인하세요",
+  "settingsDefaultQuickReplies": "기본 빠른 답장이 표시됩니다",
+  "settingsDeleteQuickReply": "빠른 답장 삭제",
+  "settingsEditQuickReply": "빠른 답장 편집",
+  "settingsEnableBiometricLogin": "생체 인식 로그인 활성화",
+  "settingsHiddenChats": "숨겨진 채팅",
+  "settingsManageQuickReplies": "빠른 답장 관리",
+  "settingsNoHiddenChats": "숨겨진 채팅 없음",
+  "settingsNoHiddenChatsDescription": "숨긴 채팅이 여기에 표시됩니다",
+  "settingsNoQuickReplies": "빠른 답장 없음",
+  "settingsQuickReply": "빠른 답장",
+  "settingsUnhideChat": "숨기기 해제",
+  "storyNoViewers": "아직 조회자 없음",
+  "storyReplyToStory": "스토리에 답장...",
+  "storyViewers": "조회자",
+  "transferAmountHintZero": "0.00"
 }

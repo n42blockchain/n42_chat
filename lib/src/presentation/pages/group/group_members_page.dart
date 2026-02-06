@@ -68,7 +68,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           if (state is! GroupDetailsLoaded) {
             return N42EmptyState(
               icon: Icons.error_outline,
-              title: S.of(context)?.loadFailed ?? 'Load failed',
+              title: S.of(context)?.commonLoadFailed ?? 'Load failed',
             );
           }
 
@@ -108,7 +108,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           padding: const EdgeInsets.all(12),
           child: N42SearchBar(
             controller: _searchController,
-            hintText: S.of(context)?.searchMembers ?? 'Search members',
+            hintText: S.of(context)?.groupSearchMembers ?? 'Search members',
             onChanged: (query) {
               setState(() {
                 _searchQuery = query;
@@ -122,7 +122,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           alignment: Alignment.centerLeft,
           child: Text(
-            S.of(context)?.totalMembers(state.group.memberCount) ?? '${state.group.memberCount} members',
+            S.of(context)?.groupTotalMembers(state.group.memberCount) ?? '${state.group.memberCount} members',
             style: TextStyle(
               fontSize: 13,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -175,7 +175,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  S.of(context)?.groupOwner ?? 'Owner',
+                  S.of(context)?.commonGroupOwner ?? 'Owner',
                   style: const TextStyle(
                     fontSize: 10,
                     color: Colors.white,
@@ -191,7 +191,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  S.of(context)?.groupAdmin ?? 'Admin',
+                  S.of(context)?.commonGroupAdmin ?? 'Admin',
                   style: const TextStyle(
                     fontSize: 10,
                     color: Colors.white,
@@ -226,7 +226,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             // 查看资料
             ListTile(
               leading: const Icon(Icons.person_outline),
-              title: Text(S.of(this.context)?.viewProfile ?? 'View Profile'),
+              title: Text(S.of(this.context)?.groupViewProfile ?? 'View Profile'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.of(this.context).pushNamed('/profile/${member.userId}');
@@ -236,12 +236,12 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             // 发送消息
             ListTile(
               leading: const Icon(Icons.chat_bubble_outline),
-              title: Text(S.of(this.context)?.sendMessage ?? 'Send Message'),
+              title: Text(S.of(this.context)?.commonSendMessage ?? 'Send Message'),
               onTap: () {
                 Navigator.pop(context);
                 // TODO: 创建私聊
                 ScaffoldMessenger.of(this.context).showSnackBar(
-                  SnackBar(content: Text(S.of(this.context)?.featureInDevelopment('') ?? 'Feature in development...')),
+                  SnackBar(content: Text(S.of(this.context)?.commonFeatureInDevelopment('') ?? 'Feature in development...')),
                 );
               },
             ),
@@ -253,8 +253,8 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                   member.isAdmin ? Icons.remove_moderator : Icons.add_moderator,
                 ),
                 title: Text(member.isAdmin
-                    ? (S.of(this.context)?.removeAdmin ?? 'Remove Admin')
-                    : (S.of(this.context)?.setAsAdmin ?? 'Set as Admin')),
+                    ? (S.of(this.context)?.groupRemoveAdmin ?? 'Remove Admin')
+                    : (S.of(this.context)?.groupSetAsAdmin ?? 'Set as Admin')),
                 onTap: () {
                   Navigator.pop(context);
                   if (member.isAdmin) {
@@ -273,7 +273,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             if (canManage)
               ListTile(
                 leading: const Icon(Icons.person_remove, color: Colors.red),
-                title: Text(S.of(this.context)?.removeFromGroup ?? 'Remove from Group', style: const TextStyle(color: Colors.red)),
+                title: Text(S.of(this.context)?.chatRemoveFromGroup ?? 'Remove from Group', style: const TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   _confirmKickMember(member);
@@ -289,12 +289,12 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.removeMember ?? 'Remove Member'),
-        content: Text(S.of(context)?.confirmRemoveMember(member.displayName) ?? 'Are you sure you want to remove "${member.displayName}" from the group?'),
+        title: Text(S.of(context)?.groupRemoveMember ?? 'Remove Member'),
+        content: Text(S.of(context)?.groupConfirmRemoveMember(member.displayName) ?? 'Are you sure you want to remove "${member.displayName}" from the group?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -303,7 +303,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                     KickMember(widget.roomId, member.userId),
                   );
             },
-            child: Text(S.of(context)?.remove ?? 'Remove', style: const TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.commonRemove ?? 'Remove', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),

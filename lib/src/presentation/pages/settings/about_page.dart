@@ -36,7 +36,7 @@ class AboutPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: l10n?.about ?? 'About',
+        title: l10n?.settingsAbout ?? 'About',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -72,7 +72,7 @@ class AboutPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  l10n?.versionInfo(version) ?? 'Version $version',
+                  l10n?.settingsVersionInfo(version) ?? 'Version $version',
                   style: TextStyle(
                     fontSize: 14,
                     color: isDark
@@ -92,7 +92,7 @@ class AboutPage extends StatelessWidget {
               color: isDark ? AppColors.surfaceDark : AppColors.surface,
               child: ListTile(
                 title: Text(
-                  l10n?.checkForUpdates ?? 'Check for Updates',
+                  l10n?.settingsCheckForUpdates ?? 'Check for Updates',
                   style: TextStyle(
                     color: isDark ? Colors.white : AppColors.textPrimary,
                   ),
@@ -115,18 +115,18 @@ class AboutPage extends StatelessWidget {
             child: Column(
               children: [
                 if (onPrivacyPolicy != null)
-                  _buildLinkItem(l10n?.privacyPolicy ?? 'Privacy Policy', onPrivacyPolicy!, isDark),
+                  _buildLinkItem(l10n?.authPrivacyPolicy ?? 'Privacy Policy', onPrivacyPolicy!, isDark),
                 if (onTermsOfService != null) ...[
                   _buildDivider(isDark),
-                  _buildLinkItem(l10n?.termsOfService ?? 'Terms of Service', onTermsOfService!, isDark),
+                  _buildLinkItem(l10n?.authTermsOfService ?? 'Terms of Service', onTermsOfService!, isDark),
                 ],
                 if (onOpenSource != null) ...[
                   _buildDivider(isDark),
-                  _buildLinkItem(l10n?.openSourceLicenses ?? 'Open Source Licenses', onOpenSource!, isDark),
+                  _buildLinkItem(l10n?.settingsOpenSourceLicenses ?? 'Open Source Licenses', onOpenSource!, isDark),
                 ],
                 if (onFeedback != null) ...[
                   _buildDivider(isDark),
-                  _buildLinkItem(l10n?.feedbackAndSuggestions ?? 'Feedback & Suggestions', onFeedback!, isDark),
+                  _buildLinkItem(l10n?.settingsFeedbackAndSuggestions ?? 'Feedback & Suggestions', onFeedback!, isDark),
                 ],
               ],
             ),
@@ -139,7 +139,7 @@ class AboutPage extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  l10n?.builtOnMatrix ?? 'Built on Matrix Protocol',
+                  l10n?.settingsBuiltOnMatrix ?? 'Built on Matrix Protocol',
                   style: TextStyle(
                     fontSize: 13,
                     color: isDark

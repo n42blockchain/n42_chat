@@ -132,7 +132,7 @@ class TranslatedMessageWidget extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            l10n?.translating ?? 'Translating...',
+            l10n?.commonTranslating ?? 'Translating...',
             style: TextStyle(
               fontSize: 13,
               color: isDark ? Colors.white54 : Colors.black45,
@@ -146,9 +146,9 @@ class TranslatedMessageWidget extends StatelessWidget {
   String _getTranslationLabel(S? l10n) {
     if (detectedSourceLanguage != null) {
       final langName = _getLanguageName(detectedSourceLanguage!);
-      return '${l10n?.translatedFrom ?? 'Translated from'} $langName';
+      return '${l10n?.commonTranslatedFrom ?? 'Translated from'} $langName';
     }
-    return l10n?.translation ?? 'Translation';
+    return l10n?.commonTranslation ?? 'Translation';
   }
 
   String _getLanguageName(String code) {
@@ -203,7 +203,7 @@ class TranslationErrorWidget extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            l10n?.translationFailed ?? 'Translation failed',
+            l10n?.commonTranslationFailed ?? 'Translation failed',
             style: TextStyle(
               fontSize: 13,
               color: isDark ? Colors.white54 : Colors.black54,
@@ -214,7 +214,7 @@ class TranslationErrorWidget extends StatelessWidget {
             GestureDetector(
               onTap: onRetry,
               child: Text(
-                l10n?.retry ?? 'Retry',
+                l10n?.commonRetry ?? 'Retry',
                 style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.primary,

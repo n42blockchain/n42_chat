@@ -222,13 +222,13 @@ class SearchResultTile extends StatelessWidget {
   String _getTypeLabel(BuildContext context) {
     switch (item.type) {
       case SearchResultType.contact:
-        return S.of(context)?.contactLabel ?? 'Contact';
+        return S.of(context)?.searchContactLabel ?? 'Contact';
       case SearchResultType.group:
-        return S.of(context)?.groupLabel ?? 'Group';
+        return S.of(context)?.searchGroupLabel ?? 'Group';
       case SearchResultType.conversation:
-        return S.of(context)?.conversationLabel ?? 'Conversation';
+        return S.of(context)?.searchConversationLabel ?? 'Conversation';
       case SearchResultType.message:
-        return S.of(context)?.messageLabel ?? 'Message';
+        return S.of(context)?.searchMessageLabel ?? 'Message';
       case SearchResultType.all:
         return '';
     }

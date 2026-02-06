@@ -32,7 +32,7 @@ class _GroupListPageState extends State<GroupListPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: S.of(context)?.groupChat ?? 'Group Chat',
+        title: S.of(context)?.commonGroupChat ?? 'Group Chat',
         actions: [
           IconButton(
             icon: Icon(
@@ -66,8 +66,8 @@ class _GroupListPageState extends State<GroupListPage> {
 
           return N42EmptyState(
             icon: Icons.group_outlined,
-            title: S.of(context)?.noGroups ?? 'No groups',
-            description: S.of(context)?.createGroupToChat ?? 'Create a group to start chatting',
+            title: S.of(context)?.commonNoGroups ?? 'No groups',
+            description: S.of(context)?.groupCreateGroupToChat ?? 'Create a group to start chatting',
           );
         },
       ),
@@ -79,9 +79,9 @@ class _GroupListPageState extends State<GroupListPage> {
       return Center(
         child: N42EmptyState(
           icon: Icons.group_outlined,
-          title: S.of(context)?.noGroups ?? 'No groups',
-          description: S.of(context)?.createGroupToChat ?? 'Create a group to start chatting',
-          buttonText: S.of(context)?.createGroup ?? 'Create Group',
+          title: S.of(context)?.commonNoGroups ?? 'No groups',
+          description: S.of(context)?.groupCreateGroupToChat ?? 'Create a group to start chatting',
+          buttonText: S.of(context)?.commonCreateGroup ?? 'Create Group',
           onButtonPressed: () => _navigateToCreateGroup(),
         ),
       );
@@ -95,13 +95,13 @@ class _GroupListPageState extends State<GroupListPage> {
         children: [
           // 群邀请
           if (state.invites.isNotEmpty) ...[
-            _buildSectionHeader(S.of(context)?.groupInvites ?? 'Group Invites', isDark),
+            _buildSectionHeader(S.of(context)?.commonGroupInvites ?? 'Group Invites', isDark),
             ...state.invites.map((invite) => _buildInviteTile(invite, isDark)),
           ],
 
           // 我的群聊
           if (state.groups.isNotEmpty) ...[
-            _buildSectionHeader(S.of(context)?.myGroups(state.groups.length) ?? 'My Groups (${state.groups.length})', isDark),
+            _buildSectionHeader(S.of(context)?.commonMyGroups(state.groups.length) ?? 'My Groups (${state.groups.length})', isDark),
             ...state.groups.map((group) => _buildGroupTile(group, isDark)),
           ],
         ],
@@ -142,7 +142,7 @@ class _GroupListPageState extends State<GroupListPage> {
           ),
         ),
         subtitle: Text(
-          S.of(context)?.memberCount(group.memberCount) ?? '${group.memberCount} members',
+          S.of(context)?.commonMemberCount(group.memberCount) ?? '${group.memberCount} members',
           style: TextStyle(
             fontSize: 13,
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -179,7 +179,7 @@ class _GroupListPageState extends State<GroupListPage> {
           ),
         ),
         subtitle: Text(
-          S.of(context)?.invitedToJoinGroup ?? 'Invited to join group',
+          S.of(context)?.commonInvitedToJoinGroup ?? 'Invited to join group',
           style: const TextStyle(
             fontSize: 13,
             color: AppColors.primary,
@@ -192,13 +192,13 @@ class _GroupListPageState extends State<GroupListPage> {
               onPressed: () {
                 context.read<GroupBloc>().add(RejectGroupInvite(group.roomId));
               },
-              child: Text(S.of(context)?.reject ?? 'Reject'),
+              child: Text(S.of(context)?.commonReject ?? 'Reject'),
             ),
             TextButton(
               onPressed: () {
                 context.read<GroupBloc>().add(AcceptGroupInvite(group.roomId));
               },
-              child: Text(S.of(context)?.accept ?? 'Accept'),
+              child: Text(S.of(context)?.commonAccept ?? 'Accept'),
             ),
           ],
         ),
@@ -235,7 +235,7 @@ class _GroupListPageState extends State<GroupListPage> {
             if (group.isOwner)
               ListTile(
                 leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: Text(S.of(context)?.dissolveGroup ?? 'Dissolve Group', style: const TextStyle(color: Colors.red)),
+                title: Text(S.of(context)?.commonDissolveGroup ?? 'Dissolve Group', style: const TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   _confirmDeleteGroup(group);
@@ -244,7 +244,7 @@ class _GroupListPageState extends State<GroupListPage> {
             else
               ListTile(
                 leading: const Icon(Icons.exit_to_app, color: Colors.red),
-                title: Text(S.of(context)?.leaveGroup ?? 'Leave Group', style: const TextStyle(color: Colors.red)),
+                title: Text(S.of(context)?.commonLeaveGroup ?? 'Leave Group', style: const TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   _confirmLeaveGroup(group);
@@ -260,19 +260,19 @@ class _GroupListPageState extends State<GroupListPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.leaveGroup ?? 'Leave Group'),
-        content: Text(S.of(context)?.confirmLeaveGroup(group.name) ?? 'Are you sure you want to leave "${group.name}"?'),
+        title: Text(S.of(context)?.commonLeaveGroup ?? 'Leave Group'),
+        content: Text(S.of(context)?.commonConfirmLeaveGroup(group.name) ?? 'Are you sure you want to leave "${group.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
               this.context.read<GroupBloc>().add(LeaveGroup(group.roomId));
             },
-            child: Text(S.of(context)?.leave ?? 'Leave', style: const TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.commonLeave ?? 'Leave', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -283,19 +283,19 @@ class _GroupListPageState extends State<GroupListPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.dissolveGroup ?? 'Dissolve Group'),
-        content: Text(S.of(context)?.confirmDissolveGroup(group.name) ?? 'Are you sure you want to dissolve "${group.name}"? This action cannot be undone.'),
+        title: Text(S.of(context)?.commonDissolveGroup ?? 'Dissolve Group'),
+        content: Text(S.of(context)?.commonConfirmDissolveGroup(group.name) ?? 'Are you sure you want to dissolve "${group.name}"? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.cancel ?? 'Cancel'),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
               this.context.read<GroupBloc>().add(DeleteGroup(group.roomId));
             },
-            child: Text(S.of(context)?.dissolve ?? 'Dissolve', style: const TextStyle(color: Colors.red)),
+            child: Text(S.of(context)?.commonDissolve ?? 'Dissolve', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),

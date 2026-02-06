@@ -69,7 +69,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     if (_emailController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.enterEmailAddress ?? 'Please enter email address'),
+          content: Text(S.of(context)?.commonEnterEmailAddress ?? 'Please enter email address'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -81,7 +81,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     if (!emailRegex.hasMatch(_emailController.text.trim())) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.invalidEmailFormat ?? 'Please enter a valid email address'),
+          content: Text(S.of(context)?.commonInvalidEmailFormat ?? 'Please enter a valid email address'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -98,7 +98,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     if (_codeController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.enterVerificationCode ?? 'Please enter verification code'),
+          content: Text(S.of(context)?.commonEnterVerificationCode ?? 'Please enter verification code'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -145,7 +145,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           },
         ),
         title: Text(
-          S.of(context)?.resetPassword ?? 'Reset Password',
+          S.of(context)?.authResetPassword ?? 'Reset Password',
           style: TextStyle(
             color: textColor,
             fontSize: 17,
@@ -163,7 +163,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             _startResendCountdown();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.resetCodeSent(_emailController.text.trim()) ??
+                content: Text(S.of(context)?.authResetCodeSent(_emailController.text.trim()) ??
                     'Reset code sent to ${_emailController.text.trim()}'),
                 backgroundColor: AppColors.success,
               ),
@@ -171,7 +171,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           } else if (state.passwordResetStatus == PasswordResetStatus.success) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.passwordResetSuccess ??
+                content: Text(S.of(context)?.authPasswordResetSuccess ??
                     'Password reset successful. Please login with your new password.'),
                 backgroundColor: AppColors.success,
               ),
@@ -181,7 +181,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           } else if (state.passwordResetStatus == PasswordResetStatus.failed) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? (S.of(context)?.resetPasswordFailed ?? 'Reset password failed')),
+                content: Text(state.errorMessage ?? (S.of(context)?.authResetPasswordFailed ?? 'Reset password failed')),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -277,7 +277,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.enterRegisteredEmail ?? 'Enter the email address you registered with',
+          S.of(context)?.authEnterRegisteredEmail ?? 'Enter the email address you registered with',
           style: TextStyle(
             fontSize: 16,
             color: textColor,
@@ -286,7 +286,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         ),
         const SizedBox(height: 24),
         Text(
-          S.of(context)?.emailAddress ?? 'Email Address',
+          S.of(context)?.authEmailAddress ?? 'Email Address',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -297,7 +297,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           controller: _emailController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterEmailAddress ?? 'Enter email address',
+            hintText: S.of(context)?.commonEnterEmailAddress ?? 'Enter email address',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -341,7 +341,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     ),
                   )
                 : Text(
-                    S.of(context)?.sendResetCode ?? 'Send Reset Code',
+                    S.of(context)?.authSendResetCode ?? 'Send Reset Code',
                     style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
@@ -364,7 +364,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.resetCodeSent(_emailController.text.trim()) ??
+          S.of(context)?.authResetCodeSent(_emailController.text.trim()) ??
               'Reset code sent to ${_emailController.text.trim()}',
           style: TextStyle(
             fontSize: 16,
@@ -374,7 +374,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         ),
         const SizedBox(height: 24),
         Text(
-          S.of(context)?.enterResetCode ?? 'Enter reset code',
+          S.of(context)?.authEnterResetCode ?? 'Enter reset code',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -386,7 +386,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           style: TextStyle(color: textColor, fontSize: 24, letterSpacing: 8),
           textAlign: TextAlign.center,
           decoration: InputDecoration(
-            hintText: S.of(context)?.verificationCodePlaceholder ?? '------',
+            hintText: S.of(context)?.authVerificationCodePlaceholder ?? '------',
             hintStyle: TextStyle(color: hintColor, letterSpacing: 8),
             filled: true,
             fillColor: inputBgColor,
@@ -415,8 +415,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   },
             child: Text(
               _resendCountdown > 0
-                  ? '${S.of(context)?.canResendAfter(_resendCountdown) ?? 'Can resend after $_resendCountdown seconds'}'
-                  : S.of(context)?.resendVerificationCode ?? 'Resend verification code',
+                  ? '${S.of(context)?.authCanResendAfter(_resendCountdown) ?? 'Can resend after $_resendCountdown seconds'}'
+                  : S.of(context)?.authResendVerificationCode ?? 'Resend verification code',
               style: TextStyle(
                 color: _resendCountdown > 0 ? hintColor : AppColors.textLink,
               ),
@@ -436,7 +436,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               elevation: 0,
             ),
             child: Text(
-              S.of(context)?.confirm ?? 'Confirm',
+              S.of(context)?.commonConfirm ?? 'Confirm',
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
@@ -459,7 +459,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.setNewPassword ?? 'Set New Password',
+          S.of(context)?.authSetNewPassword ?? 'Set New Password',
           style: TextStyle(
             fontSize: 16,
             color: textColor,
@@ -468,7 +468,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         ),
         const SizedBox(height: 24),
         Text(
-          S.of(context)?.newPassword ?? 'New Password',
+          S.of(context)?.commonNewPassword ?? 'New Password',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -479,7 +479,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.passwordHint ?? 'Min 8 characters',
+            hintText: S.of(context)?.authPasswordHint ?? 'Min 8 characters',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -511,17 +511,17 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.enterPassword ?? 'Please enter password';
+              return S.of(context)?.authEnterPassword ?? 'Please enter password';
             }
             if (value.length < 8) {
-              return S.of(context)?.passwordMinLength ?? 'Password must be at least 8 characters';
+              return S.of(context)?.commonPasswordMinLength ?? 'Password must be at least 8 characters';
             }
             return null;
           },
         ),
         const SizedBox(height: 16),
         Text(
-          S.of(context)?.confirmNewPassword ?? 'Confirm New Password',
+          S.of(context)?.commonConfirmNewPassword ?? 'Confirm New Password',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -532,7 +532,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           controller: _confirmPasswordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.reenterPassword ?? 'Re-enter password',
+            hintText: S.of(context)?.commonReenterPassword ?? 'Re-enter password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -565,10 +565,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           onFieldSubmitted: (_) => _resetPassword(),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.reenterPassword ?? 'Please re-enter password';
+              return S.of(context)?.commonReenterPassword ?? 'Please re-enter password';
             }
             if (value != _passwordController.text) {
-              return S.of(context)?.passwordsDoNotMatch ?? 'Passwords do not match';
+              return S.of(context)?.commonPasswordsDoNotMatch ?? 'Passwords do not match';
             }
             return null;
           },
@@ -596,7 +596,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     ),
                   )
                 : Text(
-                    S.of(context)?.resetPassword ?? 'Reset Password',
+                    S.of(context)?.authResetPassword ?? 'Reset Password',
                     style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w600,

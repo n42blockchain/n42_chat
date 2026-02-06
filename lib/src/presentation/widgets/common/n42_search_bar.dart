@@ -152,7 +152,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
           GestureDetector(
             onTap: _onCancel,
             child: Text(
-              S.of(context)?.cancel ?? 'Cancel',
+              S.of(context)?.commonCancel ?? 'Cancel',
               style: TextStyle(
                 fontSize: 15,
                 color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
@@ -165,7 +165,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
   }
 
   Widget _buildReadOnlySearch(bool isDark) {
-    final hint = widget.hintText ?? S.of(context)?.search ?? 'Search';
+    final hint = widget.hintText ?? S.of(context)?.commonSearch ?? 'Search';
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -187,7 +187,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
   }
 
   Widget _buildEditableSearch(bool isDark) {
-    final hint = widget.hintText ?? S.of(context)?.search ?? 'Search';
+    final hint = widget.hintText ?? S.of(context)?.commonSearch ?? 'Search';
     return TextField(
       controller: _controller,
       focusNode: _focusNode,

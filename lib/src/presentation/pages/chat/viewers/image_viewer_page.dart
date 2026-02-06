@@ -59,14 +59,14 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
           if (result.isSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.savedToGallery ?? 'Saved to gallery'),
+                content: Text(S.of(context)?.commonSavedToGallery ?? 'Saved to gallery'),
                 backgroundColor: Colors.green,
               ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.failedToSave ?? 'Failed to save'),
+                content: Text(S.of(context)?.commonFailedToSave ?? 'Failed to save'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -76,7 +76,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.downloadFailed(response.statusCode.toString()) ?? 'Download failed: ${response.statusCode}'),
+              content: Text(S.of(context)?.chatDownloadFailed(response.statusCode.toString()) ?? 'Download failed: ${response.statusCode}'),
               backgroundColor: Colors.red,
             ),
           );
@@ -87,7 +87,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.errorWithMessage(e.toString()) ?? 'Error: $e'),
+            content: Text(S.of(context)?.chatErrorWithMessage(e.toString()) ?? 'Error: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -127,7 +127,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.shareFailed(e.toString()) ?? 'Share failed: $e'),
+            content: Text(S.of(context)?.commonShareFailed(e.toString()) ?? 'Share failed: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -187,7 +187,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                   children: [
                     const Icon(Icons.download, color: Colors.white, size: 20),
                     const SizedBox(width: 12),
-                    Text(S.of(context)?.saveToGallery ?? 'Save to Gallery', style: const TextStyle(color: Colors.white)),
+                    Text(S.of(context)?.chatSaveToGallery ?? 'Save to Gallery', style: const TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
@@ -197,7 +197,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                   children: [
                     const Icon(Icons.share, color: Colors.white, size: 20),
                     const SizedBox(width: 12),
-                    Text(S.of(context)?.share ?? 'Share', style: const TextStyle(color: Colors.white)),
+                    Text(S.of(context)?.commonShare ?? 'Share', style: const TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
@@ -228,7 +228,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                   children: [
                     const Icon(Icons.error, color: Colors.red, size: 48),
                     const SizedBox(height: 16),
-                    Text(S.of(context)?.failedToLoadImage ?? 'Failed to load image', style: const TextStyle(color: Colors.white)),
+                    Text(S.of(context)?.chatFailedToLoadImage ?? 'Failed to load image', style: const TextStyle(color: Colors.white)),
                   ],
                 ),
               ),

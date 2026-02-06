@@ -149,7 +149,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_greetingController.text.isEmpty) {
-      _greetingController.text = S.of(context)?.redPacketDefaultGreeting ?? 'Best wishes';
+      _greetingController.text = S.of(context)?.commonRedPacketDefaultGreeting ?? 'Best wishes';
     }
   }
 
@@ -165,7 +165,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     final amount = _amountController.text.trim();
     if (amount.isEmpty || _amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.enterAmount ?? 'Enter amount')),
+        SnackBar(content: Text(S.of(context)?.commonEnterAmount ?? 'Enter amount')),
       );
       return;
     }
@@ -173,7 +173,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     final count = int.tryParse(_countController.text) ?? 1;
     if (widget.isGroup && _isLucky && count < 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.redPacketCountMin ?? 'At least 1 red packet required')),
+        SnackBar(content: Text(S.of(context)?.commonRedPacketCountMin ?? 'At least 1 red packet required')),
       );
       return;
     }
@@ -207,7 +207,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          S.of(context)?.sendRedPacket ?? 'Send Red Packet',
+          S.of(context)?.commonSendRedPacket ?? 'Send Red Packet',
           style: TextStyle(
             color: textColor,
             fontSize: 18,
@@ -239,7 +239,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 // 金额输入
                 _buildMenuItem(
                   context: context,
-                  label: S.of(context)?.amount ?? 'Amount',
+                  label: S.of(context)?.commonTransferAmount ?? 'Amount',
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -279,7 +279,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                             fontSize: 16,
                           ),
                           decoration: InputDecoration(
-                            hintText: _decimalPlaces > 2 ? '0.0' : (S.of(context)?.amountHintZero ?? '0.00'),
+                            hintText: _decimalPlaces > 2 ? '0.0' : (S.of(context)?.transferAmountHintZero ?? '0.00'),
                             hintStyle: TextStyle(color: secondaryTextColor.withValues(alpha: 0.5)),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
@@ -300,7 +300,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                     maxLength: 30,
                     style: TextStyle(color: textColor, fontSize: 16),
                     decoration: InputDecoration(
-                      hintText: S.of(context)?.redPacketDefaultGreeting ?? 'Best wishes',
+                      hintText: S.of(context)?.commonRedPacketDefaultGreeting ?? 'Best wishes',
                       hintStyle: TextStyle(color: secondaryTextColor.withValues(alpha: 0.5)),
                       border: InputBorder.none,
                       counterText: '',
@@ -325,7 +325,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              S.of(context)?.redPacketCover ?? 'Red Packet Cover',
+                              S.of(context)?.commonRedPacketCover ?? 'Red Packet Cover',
                               style: TextStyle(color: textColor, fontSize: 16),
                             ),
                             const SizedBox(height: 4),
@@ -363,15 +363,15 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                   const SizedBox(height: 16),
                   _buildMenuItem(
                     context: context,
-                    label: S.of(context)?.redPacketType ?? 'Red Packet Type',
+                    label: S.of(context)?.commonRedPacketType ?? 'Red Packet Type',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildTypeChip(context, S.of(context)?.normalRedPacket ?? 'Normal', !_isLucky, () {
+                        _buildTypeChip(context, S.of(context)?.commonNormalRedPacket ?? 'Normal', !_isLucky, () {
                           setState(() => _isLucky = false);
                         }),
                         const SizedBox(width: 8),
-                        _buildTypeChip(context, S.of(context)?.luckyRedPacket ?? 'Lucky', _isLucky, () {
+                        _buildTypeChip(context, S.of(context)?.commonLuckyRedPacket ?? 'Lucky', _isLucky, () {
                           setState(() => _isLucky = true);
                         }),
                       ],
@@ -380,7 +380,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                   if (_isLucky)
                     _buildMenuItem(
                       context: context,
-                      label: S.of(context)?.redPacketCount ?? 'Red Packet Count',
+                      label: S.of(context)?.commonRedPacketCount ?? 'Red Packet Count',
                       trailing: SizedBox(
                         width: 80,
                         child: TextField(
@@ -393,7 +393,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
                             isDense: true,
-                            suffixText: S.of(context)?.pieces ?? 'pcs',
+                            suffixText: S.of(context)?.commonPieces ?? 'pcs',
                             suffixStyle: TextStyle(color: secondaryTextColor, fontSize: 14),
                           ),
                         ),
@@ -436,7 +436,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         elevation: 0,
                       ),
                       child: Text(
-                        S.of(context)?.putMoneyInRedPacket ?? 'Put money in',
+                        S.of(context)?.commonPutMoneyInRedPacket ?? 'Put money in',
                         style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
@@ -450,7 +450,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
 
                 // 底部提示
                 Text(
-                  S.of(context)?.redPacketRefundNotice ?? 'Unclaimed red packets will be refunded after 24 hours',
+                  S.of(context)?.commonRedPacketRefundNotice ?? 'Unclaimed red packets will be refunded after 24 hours',
                   style: TextStyle(
                     color: secondaryTextColor.withValues(alpha: 0.6),
                     fontSize: 12,
@@ -578,7 +578,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                S.of(ctx)?.selectCurrency ?? 'Select currency',
+                S.of(ctx)?.chatSelectCurrency ?? 'Select currency',
                 style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),
@@ -625,7 +625,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 children: [
                   Expanded(
                     child: Text(
-                      S.of(ctx)?.selectEmoji ?? 'Select Emoji',
+                      S.of(ctx)?.chatSelectEmoji ?? 'Select Emoji',
                       style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w500),
                       textAlign: TextAlign.center,
                     ),
@@ -706,7 +706,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
             children: [
               // 标题
               Text(
-                S.of(ctx)?.selectRedPacketCover ?? 'Select Cover',
+                S.of(ctx)?.chatSelectRedPacketCover ?? 'Select Cover',
                 style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 16),
@@ -973,13 +973,13 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
           const SizedBox(height: 12),
           
           Text(
-            S.of(context)?.senderRedPacket(widget.senderName) ?? '${widget.senderName}\'s Red Packet',
+            S.of(context)?.commonSenderRedPacket(widget.senderName) ?? '${widget.senderName}\'s Red Packet',
             style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
 
           Text(
-            widget.greeting ?? S.of(context)?.redPacketDefaultGreeting ?? 'Best wishes',
+            widget.greeting ?? S.of(context)?.commonRedPacketDefaultGreeting ?? 'Best wishes',
             style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 32),
@@ -1004,7 +1004,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                       ),
                       child: Center(
                         child: Text(
-                          S.of(context)?.openRedPacket ?? 'Open',
+                          S.of(context)?.commonOpenRedPacket ?? 'Open',
                           style: const TextStyle(color: Color(0xFFB8860B), fontSize: 28, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -1026,13 +1026,13 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
     String message;
     switch (widget.status) {
       case OpenRedPacketStatus.opened:
-        message = S.of(context)?.claimed ?? 'Claimed';
+        message = S.of(context)?.commonClaimed ?? 'Claimed';
         break;
       case OpenRedPacketStatus.empty:
-        message = S.of(context)?.redPacketAllClaimed ?? 'Red packet all claimed';
+        message = S.of(context)?.commonRedPacketAllClaimed ?? 'Red packet all claimed';
         break;
       case OpenRedPacketStatus.expired:
-        message = S.of(context)?.redPacketExpired ?? 'Red packet expired';
+        message = S.of(context)?.commonRedPacketExpired ?? 'Red packet expired';
         break;
       default:
         message = '';
@@ -1078,7 +1078,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                 ),
                 
                 Text(
-                  S.of(context)?.senderRedPacket(widget.senderName) ?? '${widget.senderName}\'s Red Packet',
+                  S.of(context)?.commonSenderRedPacket(widget.senderName) ?? '${widget.senderName}\'s Red Packet',
                   style: const TextStyle(color: Colors.white, fontSize: 14),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -1121,7 +1121,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
             padding: const EdgeInsets.all(20),
             child: TextButton(
               onPressed: widget.onViewDetails,
-              child: Text(S.of(context)?.viewRedPacketDetails ?? 'View Red Packet Details'),
+              child: Text(S.of(context)?.commonViewRedPacketDetails ?? 'View Red Packet Details'),
             ),
           ),
         ],
@@ -1207,7 +1207,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
     final amount = _amountController.text.trim();
     if (amount.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.enterTransferAmount ?? 'Please enter transfer amount')),
+        SnackBar(content: Text(S.of(context)?.commonEnterTransferAmount ?? 'Please enter transfer amount')),
       );
       return;
     }
@@ -1241,7 +1241,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          S.of(context)?.transfer ?? 'Transfer',
+          S.of(context)?.commonTransfer ?? 'Transfer',
           style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
@@ -1273,7 +1273,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(S.of(context)?.transferTo ?? 'Transfer to', style: TextStyle(fontSize: 13, color: secondaryTextColor)),
+                        Text(S.of(context)?.commonTransferTo ?? 'Transfer to', style: TextStyle(fontSize: 13, color: secondaryTextColor)),
                         const SizedBox(height: 2),
                         Text(widget.receiverName, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: textColor)),
                       ],
@@ -1292,7 +1292,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(S.of(context)?.transferAmount ?? 'Transfer Amount', style: TextStyle(fontSize: 14, color: secondaryTextColor)),
+                  Text(S.of(context)?.commonTransferAmount ?? 'Transfer Amount', style: TextStyle(fontSize: 14, color: secondaryTextColor)),
                   const SizedBox(height: 16),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -1326,7 +1326,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                           ],
                           style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: textColor),
                           decoration: InputDecoration(
-                            hintText: S.of(context)?.amountHintZero ?? '0.00',
+                            hintText: S.of(context)?.transferAmountHintZero ?? '0.00',
                             hintStyle: TextStyle(color: secondaryTextColor),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
@@ -1346,7 +1346,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     maxLength: 50,
                     style: TextStyle(color: textColor),
                     decoration: InputDecoration(
-                      hintText: S.of(context)?.addTransferNote ?? 'Add transfer note',
+                      hintText: S.of(context)?.commonAddTransferNote ?? 'Add transfer note',
                       hintStyle: TextStyle(color: secondaryTextColor.withAlpha(153)),
                       border: InputBorder.none,
                       counterText: '',
@@ -1374,7 +1374,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     elevation: 0,
                   ),
-                  child: Text(S.of(context)?.confirmTransfer ?? 'Confirm Transfer', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                  child: Text(S.of(context)?.transferConfirmTransfer ?? 'Confirm Transfer', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                 ),
               ),
             ),
@@ -1401,7 +1401,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
           children: [
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Text(S.of(ctx)?.selectCurrency ?? 'Select currency', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: textColor)),
+              child: Text(S.of(ctx)?.chatSelectCurrency ?? 'Select currency', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: textColor)),
             ),
             ..._tokens.map((token) => ListTile(
               title: Text(token, style: TextStyle(color: textColor)),
@@ -1494,7 +1494,7 @@ class RedPacketDetailPage extends StatelessWidget {
   String _currencyUnit(BuildContext context) {
     switch (token) {
       case 'CNY':
-        return S.of(context)?.yuan ?? 'CNY';
+        return S.of(context)?.commonYuan ?? 'CNY';
       case 'ETH':
         return 'ETH';
       case 'BTC':
@@ -1564,7 +1564,7 @@ class RedPacketDetailPage extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          S.of(context)?.senderSentRedPacket(senderName) ?? '$senderName sent a red packet',
+                          S.of(context)?.commonSenderSentRedPacket(senderName) ?? '$senderName sent a red packet',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 17,
@@ -1578,7 +1578,7 @@ class RedPacketDetailPage extends StatelessWidget {
                     
                     // 祝福语
                     Text(
-                      greeting ?? S.of(context)?.redPacketDefaultGreeting ?? 'Best wishes',
+                      greeting ?? S.of(context)?.commonRedPacketDefaultGreeting ?? 'Best wishes',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 15,
@@ -1629,7 +1629,7 @@ class RedPacketDetailPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              S.of(context)?.savedToBalance ?? 'Saved to balance, can transfer directly',
+                              S.of(context)?.commonSavedToBalance ?? 'Saved to balance, can transfer directly',
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.7),
                                 fontSize: 14,
@@ -1667,7 +1667,7 @@ class RedPacketDetailPage extends StatelessWidget {
                             ),
                             const SizedBox(width: 12),
                             Text(
-                              S.of(context)?.replyWithEmoji ?? 'Reply with this emoji',
+                              S.of(context)?.commonReplyWithEmoji ?? 'Reply with this emoji',
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.9),
                                 fontSize: 14,
@@ -1678,7 +1678,7 @@ class RedPacketDetailPage extends StatelessWidget {
                       ),
                     ] else ...[
                       Text(
-                        S.of(context)?.redPacketExpiredOrEmpty ?? 'Red packet expired/all claimed',
+                        S.of(context)?.commonRedPacketExpiredOrEmpty ?? 'Red packet expired/all claimed',
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 16,
@@ -1821,10 +1821,10 @@ class ConfirmReceiveDialog extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             
-            Text(S.of(context)?.receivedTransfer ?? 'Received Transfer', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            Text(S.of(context)?.commonReceivedTransfer ?? 'Received Transfer', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
 
-            Text(S.of(context)?.fromSender(senderName, senderName) ?? 'From $senderName', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+            Text(S.of(context)?.commonFromSender(senderName, senderName) ?? 'From $senderName', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
             const SizedBox(height: 24),
             
             Row(
@@ -1867,7 +1867,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   elevation: 0,
                 ),
-                child: Text(S.of(context)?.confirmReceive ?? 'Confirm Receipt', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                child: Text(S.of(context)?.commonConfirmReceive ?? 'Confirm Receipt', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ),
           ],

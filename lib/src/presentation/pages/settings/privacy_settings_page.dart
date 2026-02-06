@@ -50,7 +50,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: l10n?.privacy ?? 'Privacy',
+        title: l10n?.settingsPrivacy ?? 'Privacy',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -59,14 +59,14 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
           const SizedBox(height: 16),
 
           // 可见性设置
-          _buildSectionHeader(l10n?.whoCanSee ?? 'Who can see', isDark),
+          _buildSectionHeader(l10n?.settingsWhoCanSee ?? 'Who can see', isDark),
           Container(
             color: isDark ? AppColors.surfaceDark : AppColors.surface,
             child: Column(
               children: [
                 _buildVisibilityItem(
                   context,
-                  l10n?.avatar ?? 'Avatar',
+                  l10n?.profileAvatar ?? 'Avatar',
                   Icons.account_circle_outlined,
                   _settings.avatarVisibility,
                   (value) => _updateSettings(
@@ -77,7 +77,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 _buildDivider(isDark),
                 _buildVisibilityItem(
                   context,
-                  l10n?.status ?? 'Status',
+                  l10n?.profileStatus ?? 'Status',
                   Icons.info_outline,
                   _settings.statusVisibility,
                   (value) => _updateSettings(
@@ -88,7 +88,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 _buildDivider(isDark),
                 _buildVisibilityItem(
                   context,
-                  l10n?.lastSeen ?? 'Last Seen',
+                  l10n?.settingsLastSeen ?? 'Last Seen',
                   Icons.access_time,
                   _settings.lastSeenVisibility,
                   (value) => _updateSettings(
@@ -103,14 +103,14 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
           const SizedBox(height: 16),
 
           // 隐藏聊天入口
-          _buildSectionHeader(l10n?.chat ?? 'Chat', isDark),
+          _buildSectionHeader(l10n?.commonChat ?? 'Chat', isDark),
           Container(
             color: isDark ? AppColors.surfaceDark : AppColors.surface,
             child: Column(
               children: [
                 _buildNavigationItem(
                   context,
-                  l10n?.hiddenChats ?? 'Hidden Chats',
+                  l10n?.settingsHiddenChats ?? 'Hidden Chats',
                   Icons.visibility_off_outlined,
                   () => _navigateToHiddenChats(context),
                   isDark,
@@ -122,14 +122,14 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
           const SizedBox(height: 16),
 
           // 消息设置
-          _buildSectionHeader(l10n?.messagesLabel ?? 'Messages', isDark),
+          _buildSectionHeader(l10n?.settingsMessagesLabel ?? 'Messages', isDark),
           Container(
             color: isDark ? AppColors.surfaceDark : AppColors.surface,
             child: Column(
               children: [
                 _buildSwitchTile(
-                  title: l10n?.allowStrangerMessages ?? 'Allow Stranger Messages',
-                  subtitle: l10n?.receiveMessagesFromNonContacts ?? 'Receive messages from non-contacts',
+                  title: l10n?.settingsAllowStrangerMessages ?? 'Allow Stranger Messages',
+                  subtitle: l10n?.settingsReceiveMessagesFromNonContacts ?? 'Receive messages from non-contacts',
                   icon: Icons.person_add_outlined,
                   value: _settings.allowStrangerMessage,
                   onChanged: (value) => _updateSettings(
@@ -139,8 +139,8 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 ),
                 _buildDivider(isDark),
                 _buildSwitchTile(
-                  title: l10n?.readReceipts ?? 'Read Receipts',
-                  subtitle: l10n?.letOthersKnowYouRead ?? 'Let others know you read their messages',
+                  title: l10n?.settingsReadReceipts ?? 'Read Receipts',
+                  subtitle: l10n?.settingsLetOthersKnowYouRead ?? 'Let others know you read their messages',
                   icon: Icons.done_all,
                   value: _settings.showReadReceipts,
                   onChanged: (value) => _updateSettings(
@@ -150,8 +150,8 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 ),
                 _buildDivider(isDark),
                 _buildSwitchTile(
-                  title: l10n?.typingIndicator ?? 'Typing Indicator',
-                  subtitle: l10n?.letOthersKnowYouTyping ?? 'Let others know you are typing',
+                  title: l10n?.settingsTypingIndicator ?? 'Typing Indicator',
+                  subtitle: l10n?.settingsLetOthersKnowYouTyping ?? 'Let others know you are typing',
                   icon: Icons.keyboard,
                   value: _settings.showTypingIndicator,
                   onChanged: (value) => _updateSettings(
@@ -305,11 +305,11 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     final l10n = S.of(context);
     switch (level) {
       case VisibilityLevel.everyone:
-        return l10n?.everyone ?? 'Everyone';
+        return l10n?.settingsEveryone ?? 'Everyone';
       case VisibilityLevel.contacts:
-        return l10n?.contactsOnly ?? 'Contacts Only';
+        return l10n?.settingsContactsOnly ?? 'Contacts Only';
       case VisibilityLevel.nobody:
-        return l10n?.nobody ?? 'Nobody';
+        return l10n?.settingsNobody ?? 'Nobody';
     }
   }
 
@@ -419,7 +419,7 @@ class _VisibilityPickerSheet extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                l10n?.whoCanSeeTitle(title) ?? 'Who can see $title',
+                l10n?.settingsWhoCanSeeTitle(title) ?? 'Who can see $title',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
@@ -445,11 +445,11 @@ class _VisibilityPickerSheet extends StatelessWidget {
     final l10n = S.of(context);
     switch (level) {
       case VisibilityLevel.everyone:
-        return l10n?.everyone ?? 'Everyone';
+        return l10n?.settingsEveryone ?? 'Everyone';
       case VisibilityLevel.contacts:
-        return l10n?.contactsOnly ?? 'Contacts Only';
+        return l10n?.settingsContactsOnly ?? 'Contacts Only';
       case VisibilityLevel.nobody:
-        return l10n?.nobody ?? 'Nobody';
+        return l10n?.settingsNobody ?? 'Nobody';
     }
   }
 }

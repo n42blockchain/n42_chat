@@ -50,7 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
     if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.pleaseAgreeToTerms ?? 'Please read and agree to the Terms of Service and Privacy Policy'),
+          content: Text(S.of(context)?.authPleaseAgreeToTerms ?? 'Please read and agree to the Terms of Service and Privacy Policy'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -93,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
-          S.of(context)?.register ?? 'Sign Up',
+          S.of(context)?.authRegister ?? 'Sign Up',
           style: TextStyle(
             color: textColor,
             fontSize: 17,
@@ -107,7 +107,7 @@ class _RegisterPageState extends State<RegisterPage> {
           if (state.hasError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? (S.of(context)?.registerFailed ?? 'Registration failed')),
+                content: Text(state.errorMessage ?? (S.of(context)?.authRegisterFailed ?? 'Registration failed')),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -200,7 +200,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         const SizedBox(height: 16),
         Text(
-          S.of(context)?.createAccount ?? 'Create Account',
+          S.of(context)?.authCreateAccount ?? 'Create Account',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w600,
@@ -209,7 +209,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         const SizedBox(height: 4),
         Text(
-          S.of(context)?.joinN42Chat ?? 'Join N42 Chat to start chatting',
+          S.of(context)?.authJoinN42Chat ?? 'Join N42 Chat to start chatting',
           style: TextStyle(
             fontSize: 14,
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -229,7 +229,7 @@ class _RegisterPageState extends State<RegisterPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.serverAddress ?? 'Server Address',
+          S.of(context)?.authServerAddress ?? 'Server Address',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -240,7 +240,7 @@ class _RegisterPageState extends State<RegisterPage> {
           controller: _homeserverController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.serverAddressHint ?? 'https://m.si46.world',
+            hintText: S.of(context)?.authServerAddressHint ?? 'https://m.si46.world',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -277,10 +277,10 @@ class _RegisterPageState extends State<RegisterPage> {
           onEditingComplete: _checkHomeserver,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.enterServerAddress ?? 'Please enter server address';
+              return S.of(context)?.authEnterServerAddress ?? 'Please enter server address';
             }
             if (!value.startsWith('http://') && !value.startsWith('https://')) {
-              return S.of(context)?.enterValidServerAddress ?? 'Please enter a valid server address';
+              return S.of(context)?.authEnterValidServerAddress ?? 'Please enter a valid server address';
             }
             return null;
           },
@@ -288,7 +288,7 @@ class _RegisterPageState extends State<RegisterPage> {
         if (state.isHomeserverValid && state.homeserverInfo != null) ...[
           const SizedBox(height: 4),
           Text(
-            '✓ ${S.of(context)?.connectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
+            '✓ ${S.of(context)?.authConnectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.success,
@@ -309,7 +309,7 @@ class _RegisterPageState extends State<RegisterPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.username ?? 'Username',
+          S.of(context)?.authUsername ?? 'Username',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -321,7 +321,7 @@ class _RegisterPageState extends State<RegisterPage> {
           style: TextStyle(color: textColor, fontSize: 16),
           maxLength: 20,
           decoration: InputDecoration(
-            hintText: S.of(context)?.usernameHint ?? '3-20 chars, letters/numbers/_',
+            hintText: S.of(context)?.authUsernameHint ?? '3-20 chars, letters/numbers/_',
             hintStyle: TextStyle(color: hintColor, fontSize: 14),
             filled: true,
             fillColor: inputBgColor,
@@ -342,16 +342,16 @@ class _RegisterPageState extends State<RegisterPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.enterUsername ?? 'Please enter username';
+              return S.of(context)?.authEnterUsername ?? 'Please enter username';
             }
             if (value.length < 3) {
-              return S.of(context)?.usernameMinLength ?? 'Username must be at least 3 characters';
+              return S.of(context)?.authUsernameMinLength ?? 'Username must be at least 3 characters';
             }
             if (value.length > 20) {
-              return S.of(context)?.usernameMaxLength ?? 'Username must be at most 20 characters';
+              return S.of(context)?.authUsernameMaxLength ?? 'Username must be at most 20 characters';
             }
             if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-              return S.of(context)?.usernameFormat ?? 'Username can only contain letters, numbers, and underscores';
+              return S.of(context)?.authUsernameFormat ?? 'Username can only contain letters, numbers, and underscores';
             }
             return null;
           },
@@ -372,7 +372,7 @@ class _RegisterPageState extends State<RegisterPage> {
         Row(
           children: [
             Text(
-              S.of(context)?.emailAddress ?? 'Email Address',
+              S.of(context)?.authEmailAddress ?? 'Email Address',
               style: TextStyle(
                 fontSize: 14,
                 color: labelColor,
@@ -380,7 +380,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             const SizedBox(width: 4),
             Text(
-              '(${S.of(context)?.optional ?? 'Optional'})',
+              '(${S.of(context)?.authOptional ?? 'Optional'})',
               style: TextStyle(
                 fontSize: 12,
                 color: hintColor,
@@ -393,7 +393,7 @@ class _RegisterPageState extends State<RegisterPage> {
           controller: _emailController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.enterEmailAddress ?? 'Enter email address',
+            hintText: S.of(context)?.commonEnterEmailAddress ?? 'Enter email address',
             hintStyle: TextStyle(color: hintColor, fontSize: 14),
             filled: true,
             fillColor: inputBgColor,
@@ -417,7 +417,7 @@ class _RegisterPageState extends State<RegisterPage> {
             if (value != null && value.isNotEmpty) {
               final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
               if (!emailRegex.hasMatch(value)) {
-                return S.of(context)?.invalidEmailFormat ?? 'Please enter a valid email address';
+                return S.of(context)?.commonInvalidEmailFormat ?? 'Please enter a valid email address';
               }
             }
             return null;
@@ -425,7 +425,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         const SizedBox(height: 4),
         Text(
-          S.of(context)?.emailRecoveryHint ?? 'Used for password recovery',
+          S.of(context)?.authEmailRecoveryHint ?? 'Used for password recovery',
           style: TextStyle(
             fontSize: 11,
             color: hintColor,
@@ -445,7 +445,7 @@ class _RegisterPageState extends State<RegisterPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.password ?? 'Password',
+          S.of(context)?.authPassword ?? 'Password',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -456,7 +456,7 @@ class _RegisterPageState extends State<RegisterPage> {
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.passwordHint ?? 'Min 8 characters',
+            hintText: S.of(context)?.authPasswordHint ?? 'Min 8 characters',
             hintStyle: TextStyle(color: hintColor, fontSize: 14),
             filled: true,
             fillColor: inputBgColor,
@@ -488,10 +488,10 @@ class _RegisterPageState extends State<RegisterPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.enterPassword ?? 'Please enter password';
+              return S.of(context)?.authEnterPassword ?? 'Please enter password';
             }
             if (value.length < 8) {
-              return S.of(context)?.passwordMinLength ?? 'Password must be at least 8 characters';
+              return S.of(context)?.commonPasswordMinLength ?? 'Password must be at least 8 characters';
             }
             return null;
           },
@@ -510,7 +510,7 @@ class _RegisterPageState extends State<RegisterPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.confirmPassword ?? 'Confirm Password',
+          S.of(context)?.authConfirmPassword ?? 'Confirm Password',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -521,7 +521,7 @@ class _RegisterPageState extends State<RegisterPage> {
           controller: _confirmPasswordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.reenterPassword ?? 'Re-enter password',
+            hintText: S.of(context)?.commonReenterPassword ?? 'Re-enter password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -554,10 +554,10 @@ class _RegisterPageState extends State<RegisterPage> {
           onFieldSubmitted: (_) => _onRegister(),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.reenterPassword ?? 'Please re-enter password';
+              return S.of(context)?.commonReenterPassword ?? 'Please re-enter password';
             }
             if (value != _passwordController.text) {
-              return S.of(context)?.passwordsDoNotMatch ?? 'Passwords do not match';
+              return S.of(context)?.commonPasswordsDoNotMatch ?? 'Passwords do not match';
             }
             return null;
           },
@@ -591,7 +591,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(width: 4),
               Text(
-                S.of(context)?.inviteCodeBuiltIn ?? 'Invite Code (Built-in)',
+                S.of(context)?.authInviteCodeBuiltIn ?? 'Invite Code (Built-in)',
                 style: TextStyle(
                   fontSize: 14,
                   color: labelColor,
@@ -600,7 +600,7 @@ class _RegisterPageState extends State<RegisterPage> {
               const Spacer(),
               if (!_showInviteCode)
                 Text(
-                  S.of(context)?.filled ?? 'Filled',
+                  S.of(context)?.authFilled ?? 'Filled',
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.success,
@@ -617,7 +617,7 @@ class _RegisterPageState extends State<RegisterPage> {
             style: TextStyle(color: textColor, fontSize: 14),
             maxLines: 2,
             decoration: InputDecoration(
-              hintText: S.of(context)?.enterInviteCode ?? 'Enter invite code',
+              hintText: S.of(context)?.authEnterInviteCode ?? 'Enter invite code',
               hintStyle: TextStyle(color: hintColor),
               filled: true,
               fillColor: inputBgColor,
@@ -637,7 +637,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            S.of(context)?.inviteCodeBuiltInNote ?? 'Invite code is built-in, usually no need to modify',
+            S.of(context)?.authInviteCodeBuiltInNote ?? 'Invite code is built-in, usually no need to modify',
             style: TextStyle(
               fontSize: 11,
               color: hintColor,
@@ -682,21 +682,21 @@ class _RegisterPageState extends State<RegisterPage> {
             },
             child: Text.rich(
               TextSpan(
-                text: S.of(context)?.iHaveReadAndAgree ?? 'I have read and agree to ',
+                text: S.of(context)?.authIHaveReadAndAgree ?? 'I have read and agree to ',
                 style: TextStyle(
                   fontSize: 13,
                   color: textColor,
                 ),
                 children: [
                   TextSpan(
-                    text: S.of(context)?.termsOfService ?? 'Terms of Service',
+                    text: S.of(context)?.authTermsOfService ?? 'Terms of Service',
                     style: const TextStyle(
                       color: AppColors.textLink,
                     ),
                   ),
-                  TextSpan(text: S.of(context)?.and ?? ' and '),
+                  TextSpan(text: S.of(context)?.authAnd ?? ' and '),
                   TextSpan(
-                    text: S.of(context)?.privacyPolicy ?? 'Privacy Policy',
+                    text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
                     style: const TextStyle(
                       color: AppColors.textLink,
                     ),
@@ -735,7 +735,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               )
             : Text(
-                S.of(context)?.register ?? 'Sign Up',
+                S.of(context)?.authRegister ?? 'Sign Up',
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
@@ -753,7 +753,7 @@ class _RegisterPageState extends State<RegisterPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          S.of(context)?.alreadyHaveAccount ?? 'Already have an account?',
+          S.of(context)?.authAlreadyHaveAccount ?? 'Already have an account?',
           style: TextStyle(
             fontSize: 14,
             color: textColor,
@@ -764,7 +764,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Navigator.of(context).pop();
           },
           child: Text(
-            S.of(context)?.loginNow ?? 'Log In Now',
+            S.of(context)?.authLoginNow ?? 'Log In Now',
             style: const TextStyle(
               fontSize: 14,
               color: AppColors.textLink,

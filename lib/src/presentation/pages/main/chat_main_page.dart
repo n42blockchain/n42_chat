@@ -116,25 +116,25 @@ class _ChatMainPageState extends State<ChatMainPage> {
         _buildPopupMenuItem(
           value: 'group',
           icon: Icons.chat_bubble_outline,
-          text: S.of(context)?.startGroupChat ?? 'Start Group Chat',
+          text: S.of(context)?.mainStartGroupChat ?? 'Start Group Chat',
           isDark: isDark,
         ),
         _buildPopupMenuItem(
           value: 'add_friend',
           icon: Icons.person_add_outlined,
-          text: S.of(context)?.addFriends ?? 'Add Friends',
+          text: S.of(context)?.mainAddFriends ?? 'Add Friends',
           isDark: isDark,
         ),
         _buildPopupMenuItem(
           value: 'scan',
           icon: Icons.qr_code_scanner,
-          text: S.of(context)?.scan ?? 'Scan',
+          text: S.of(context)?.commonScan ?? 'Scan',
           isDark: isDark,
         ),
         _buildPopupMenuItem(
           value: 'payment',
           icon: Icons.payment_outlined,
-          text: S.of(context)?.paymentAndCollection ?? 'Payment',
+          text: S.of(context)?.mainPaymentAndCollection ?? 'Payment',
           isDark: isDark,
         ),
       ],
@@ -252,20 +252,20 @@ class _ChatMainPageState extends State<ChatMainPage> {
           switch (_currentIndex) {
             case 0:
               currentTitle = totalUnread > 0
-                  ? (l10n?.messagesWithCount(totalUnread) ?? 'Messages($totalUnread)')
-                  : (l10n?.messages ?? 'Messages');
+                  ? (l10n?.mainMessagesWithCount(totalUnread) ?? 'Messages($totalUnread)')
+                  : (l10n?.commonMessages ?? 'Messages');
               break;
             case 1:
-              currentTitle = l10n?.contacts ?? 'Contacts';
+              currentTitle = l10n?.commonContacts ?? 'Contacts';
               break;
             case 2:
-              currentTitle = l10n?.discover ?? 'Discover';
+              currentTitle = l10n?.commonDiscover ?? 'Discover';
               break;
             case 3:
-              currentTitle = l10n?.me ?? 'Me';
+              currentTitle = l10n?.commonMe ?? 'Me';
               break;
             default:
-              currentTitle = l10n?.messages ?? 'Messages';
+              currentTitle = l10n?.commonMessages ?? 'Messages';
           }
           
           return Scaffold(
@@ -356,7 +356,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
                     index: 0,
                     icon: Icons.chat_bubble_outline,
                     activeIcon: Icons.chat_bubble,
-                    label: l10n?.messages ?? 'Messages',
+                    label: l10n?.commonMessages ?? 'Messages',
                     selectedColor: selectedColor,
                     unselectedColor: unselectedColor,
                     badge: totalUnread,
@@ -365,7 +365,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
                     index: 1,
                     icon: Icons.contacts_outlined,
                     activeIcon: Icons.contacts,
-                    label: l10n?.contacts ?? 'Contacts',
+                    label: l10n?.commonContacts ?? 'Contacts',
                     selectedColor: selectedColor,
                     unselectedColor: unselectedColor,
                   ),
@@ -373,7 +373,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
                     index: 2,
                     icon: Icons.explore_outlined,
                     activeIcon: Icons.explore,
-                    label: l10n?.discover ?? 'Discover',
+                    label: l10n?.commonDiscover ?? 'Discover',
                     selectedColor: selectedColor,
                     unselectedColor: unselectedColor,
                   ),
@@ -381,7 +381,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
                     index: 3,
                     icon: Icons.person_outline,
                     activeIcon: Icons.person,
-                    label: l10n?.me ?? 'Me',
+                    label: l10n?.commonMe ?? 'Me',
                     selectedColor: selectedColor,
                     unselectedColor: unselectedColor,
                   ),

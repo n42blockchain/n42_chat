@@ -162,8 +162,8 @@ extension ContextExtension on BuildContext {
     bool isDanger = false,
   }) async {
     final l10n = S.of(this);
-    final confirm = confirmText ?? l10n?.confirm ?? 'OK';
-    final cancel = cancelText ?? l10n?.cancel ?? 'Cancel';
+    final confirm = confirmText ?? l10n?.commonConfirm ?? 'OK';
+    final cancel = cancelText ?? l10n?.commonCancel ?? 'Cancel';
     final result = await showDialog<bool>(
       context: this,
       builder: (context) => AlertDialog(

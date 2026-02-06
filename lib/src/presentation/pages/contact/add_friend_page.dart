@@ -54,7 +54,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
       
       if (client == null) {
         setState(() {
-          _errorMessage = S.of(context)?.chatServiceNotConnected ?? 'Chat service not connected';
+          _errorMessage = S.of(context)?.commonChatServiceNotConnected ?? 'Chat service not connected';
           _isLoading = false;
         });
         return;
@@ -132,12 +132,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
         _isLoading = false;
         _isSearching = true;
         if (results.isEmpty) {
-          _errorMessage = S.of(context)?.userNotFoundHint(query) ?? 'User "$query" not found\n\nTips:\n• Try entering full user ID, e.g. @username:server.com\n• Check the username spelling';
+          _errorMessage = S.of(context)?.contactUserNotFoundHint(query) ?? 'User "$query" not found\n\nTips:\n• Try entering full user ID, e.g. @username:server.com\n• Check the username spelling';
         }
       });
     } catch (e) {
       setState(() {
-        _errorMessage = S.of(context)?.searchFailed(e.toString()) ?? 'Search failed: $e';
+        _errorMessage = S.of(context)?.contactSearchFailed(e.toString()) ?? 'Search failed: $e';
         _isLoading = false;
       });
     }
@@ -151,7 +151,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
       final client = clientManager.client;
       
       if (client == null) {
-        _showError(S.of(context)?.chatServiceNotConnected ?? 'Chat service not connected');
+        _showError(S.of(context)?.commonChatServiceNotConnected ?? 'Chat service not connected');
         return;
       }
 
@@ -162,7 +162,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         Navigator.of(context).pop(roomId);
       }
     } catch (e) {
-      _showError(S.of(context)?.createChatFailed(e.toString()) ?? 'Failed to create chat: $e');
+      _showError(S.of(context)?.contactCreateChatFailed(e.toString()) ?? 'Failed to create chat: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -201,7 +201,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
-        title: S.of(context)?.addFriend ?? 'Add Friend',
+        title: S.of(context)?.commonAddFriend ?? 'Add Friend',
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),
@@ -217,7 +217,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  S.of(context)?.enterUserIdOrUsername ?? 'Enter user ID or username to search',
+                  S.of(context)?.contactEnterUserIdOrUsername ?? 'Enter user ID or username to search',
                   style: TextStyle(
                     fontSize: 13,
                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -237,7 +237,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                           controller: _searchController,
                           focusNode: _focusNode,
                           decoration: InputDecoration(
-                            hintText: S.of(context)?.matrixIdHint ?? '@username:server.com',
+                            hintText: S.of(context)?.commonMatrixIdHint ?? '@username:server.com',
                             hintStyle: TextStyle(
                               fontSize: 14,
                               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -278,7 +278,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                                 color: Colors.white,
                               ),
                             )
-                          : Text(S.of(context)?.search ?? 'Search'),
+                          : Text(S.of(context)?.commonSearch ?? 'Search'),
                     ),
                   ],
                 ),
@@ -349,7 +349,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
   Widget _buildContent(bool isDark) {
     if (_isLoading) {
-      return N42Loading(message: S.of(context)?.searching ?? 'Searching...');
+      return N42Loading(message: S.of(context)?.contactSearching ?? 'Searching...');
     }
 
     if (!_isSearching) {
@@ -364,7 +364,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              S.of(context)?.searchUserToChat ?? 'Search user to start chatting',
+              S.of(context)?.contactSearchUserToChat ?? 'Search user to start chatting',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
@@ -373,7 +373,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              S.of(context)?.matrixIdExample ?? 'You can enter a full Matrix ID\ne.g. @user:matrix.n42.network',
+              S.of(context)?.contactMatrixIdExample ?? 'You can enter a full Matrix ID\ne.g. @user:matrix.n42.network',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
@@ -387,7 +387,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
     if (_searchResults.isEmpty) {
       return N42EmptyState.noSearchResult(
-        description: S.of(context)?.userNotFound(_searchController.text) ?? 'User "${_searchController.text}" not found',
+        description: S.of(context)?.contactUserNotFound(_searchController.text) ?? 'User "${_searchController.text}" not found',
       );
     }
 
@@ -432,7 +432,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
           side: const BorderSide(color: AppColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
-        child: Text(S.of(context)?.chat ?? 'Chat'),
+        child: Text(S.of(context)?.commonChat ?? 'Chat'),
       ),
     );
   }

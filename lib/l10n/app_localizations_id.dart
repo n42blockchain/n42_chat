@@ -9,1187 +9,634 @@ class SId extends S {
   SId([String locale = 'id']) : super(locale);
 
   @override
-  String get chatModuleInitFailed => 'Gagal menginisialisasi modul chat';
+  String get commonRetry => 'Coba Lagi';
 
   @override
-  String get checkNetworkRetry =>
-      'Silakan periksa koneksi jaringan Anda dan coba lagi';
+  String get commonUnknownUser => 'Pengguna Tidak Dikenal';
 
   @override
-  String get retry => 'Coba Lagi';
+  String get transferWalletNotConnected => 'Dompet tidak terhubung';
 
   @override
-  String get unknownUser => 'Pengguna Tidak Dikenal';
-
-  @override
-  String get walletNotConnected => 'Dompet tidak terhubung';
-
-  @override
-  String get cannotGetWalletAddress => 'Tidak dapat mendapatkan alamat dompet';
-
-  @override
-  String paymentRequestMemo(String requestId) {
-    return 'Permintaan pembayaran: $requestId';
-  }
-
-  @override
-  String get callServiceNotInitialized =>
+  String get chatCallServiceNotInitialized =>
       'Layanan panggilan belum diinisialisasi';
 
   @override
-  String get alreadyInCall => 'Sedang dalam panggilan';
-
-  @override
-  String get meetingServiceNotInitialized =>
-      'Layanan meeting belum diinisialisasi';
-
-  @override
-  String get livekitNotConfigured => 'LiveKit belum dikonfigurasi';
-
-  @override
-  String get unknownConversation => 'Percakapan tidak dikenal';
-
-  @override
-  String startCallFailed(String error) {
-    return 'Gagal memulai panggilan: $error';
-  }
-
-  @override
-  String answerCallFailed(String error) {
-    return 'Gagal menjawab: $error';
-  }
-
-  @override
-  String get connectionFailed => 'Koneksi gagal';
-
-  @override
-  String get callRejected => 'Panggilan ditolak';
-
-  @override
-  String get noAnswer => 'Tidak ada jawaban';
-
-  @override
-  String get invalidLoginResponse => 'Respons login tidak valid';
-
-  @override
-  String loginFailed(String error) {
+  String authLoginFailed(String error) {
     return 'Login gagal: $error';
   }
 
   @override
-  String get sessionRestoreFailed => 'Gagal memulihkan sesi';
+  String get chatCallBack => 'Panggil balik';
 
   @override
-  String get additionalVerificationRequired => 'Verifikasi tambahan diperlukan';
+  String get chatMissedVideoCall => 'Panggilan video tidak terjawab';
 
   @override
-  String registrationFailed(String error) {
-    return 'Pendaftaran gagal: $error';
-  }
+  String get chatMissedVoiceCall => 'Panggilan suara tidak terjawab';
 
   @override
-  String cannotConnectServer(String error) {
-    return 'Tidak dapat terhubung ke server: $error';
-  }
+  String get chatCallNotAnswered => 'Tidak dijawab';
 
   @override
-  String get wrongUsernamePassword => 'Nama pengguna atau kata sandi salah';
+  String get chatCallDurationLabel => 'Durasi panggilan';
 
   @override
-  String get usernameTaken => 'Nama pengguna sudah digunakan';
+  String get chatVoiceCallCancelled => 'Panggilan suara dibatalkan';
 
   @override
-  String get invalidUsernameFormat => 'Format nama pengguna tidak valid';
+  String get chatVideoCallCancelled => 'Panggilan video dibatalkan';
 
   @override
-  String get rateLimitExceeded =>
-      'Terlalu banyak permintaan, silakan coba lagi nanti';
+  String get commonImage => '[Gambar]';
 
   @override
-  String get loginExpired => 'Login kedaluwarsa';
+  String get chatVideo => '[Video]';
 
   @override
-  String joinMeetingFailed(String error) {
-    return 'Gagal bergabung ke meeting: $error';
-  }
+  String get chatVoice => '[Suara]';
 
   @override
-  String screenShareFailed(String error) {
-    return 'Berbagi layar gagal: $error';
-  }
+  String get commonFile => '[Berkas]';
 
   @override
-  String get answer => 'Jawab';
+  String get chatLocation => '[Lokasi]';
 
   @override
-  String get decline => 'Tolak';
+  String get chatUnknownMessage => '[Pesan tidak dikenal]';
 
   @override
-  String get missedCall => 'Panggilan tidak terjawab';
+  String get commonDelete => 'Hapus';
 
   @override
-  String get callBack => 'Panggil balik';
+  String get chatDeleteThisMessage => 'Hapus pesan ini?';
 
   @override
-  String get incomingCall => 'Panggilan masuk';
+  String get chatMessageDeleted => 'Pesan dihapus';
 
   @override
-  String get missedVideoCall => 'Panggilan video tidak terjawab';
+  String get profileNotLoggedIn => 'Belum masuk';
 
   @override
-  String get missedVoiceCall => 'Panggilan suara tidak terjawab';
+  String get chatMyLocation => 'Lokasi saya';
 
   @override
-  String get voiceCallTitle => '语音通话';
+  String get commonGroupChat => 'Chat Grup';
 
   @override
-  String get videoCallTitle => '视频通话';
+  String get commonSearch => 'Cari';
 
   @override
-  String get callNotAnswered => '对方未接听';
+  String get commonCancel => 'Batal';
 
   @override
-  String get callDurationLabel => '通话时长';
+  String get commonLoadFailed => 'Gagal memuat';
 
   @override
-  String get voiceCallCancelled => '语音通话已取消';
+  String get commonMessages => 'Pesan';
 
   @override
-  String get videoCallCancelled => '视频通话已取消';
+  String get commonContacts => 'Kontak';
 
   @override
-  String get passkeyNotInitialized => 'Passkey belum diinisialisasi';
+  String get commonMe => 'Saya';
 
   @override
-  String get googleSignInNotConfigured => 'Google Sign In belum dikonfigurasi';
+  String get commonVoiceLoading =>
+      'Suara sedang dimuat, silakan coba lagi nanti';
 
   @override
-  String get encryptedMessage => '[Pesan terenkripsi]';
+  String get commonVoiceToTextFailed => 'Gagal mengubah suara ke teks';
 
   @override
-  String get sticker => '[Stiker]';
+  String get commonConvertToText => 'Ke teks';
 
   @override
-  String get groupCreated => 'Grup dibuat';
+  String get chatCopy => 'Salin';
 
   @override
-  String get groupNameChanged => 'Nama grup diubah';
+  String get commonForward => 'Teruskan';
 
   @override
-  String get groupAvatarChanged => 'Avatar grup diubah';
+  String get commonUnfavorite => 'Batal favorit';
 
   @override
-  String get groupAnnouncementChanged => 'Pengumuman grup diubah';
+  String get commonFavorite => 'Favorit';
 
   @override
-  String get image => '[Gambar]';
+  String get settingsResend => 'Kirim ulang';
 
   @override
-  String get video => '[Video]';
+  String get chatRecall => 'Tarik';
 
   @override
-  String get voice => '[Suara]';
+  String get commonQuote => 'Kutip';
 
   @override
-  String get file => '[Berkas]';
+  String get commonRemind => 'Ingatkan';
 
   @override
-  String get location => '[Lokasi]';
+  String get chatCopied => 'Disalin';
 
   @override
-  String get unknownMessage => '[Pesan tidak dikenal]';
+  String get storySendMessageHint => 'Kirim pesan';
 
   @override
-  String joinedGroup(String senderName) {
-    return '$senderName bergabung ke grup';
-  }
+  String get commonMicrophonePermissionRequired =>
+      'Silakan izinkan akses mikrofon';
 
   @override
-  String leftGroup(String senderName) {
-    return '$senderName keluar dari grup';
-  }
-
-  @override
-  String invitedToGroup(String senderName) {
-    return '$senderName diundang';
-  }
-
-  @override
-  String removedFromGroup(String senderName) {
-    return '$senderName dikeluarkan';
-  }
-
-  @override
-  String get avatarDataEmpty => 'Data avatar kosong';
-
-  @override
-  String get avatarTooLarge => 'Berkas avatar terlalu besar, maksimal 10MB';
-
-  @override
-  String get uploadAvatarFailed => 'Gagal mengunggah avatar';
-
-  @override
-  String get delete => 'Hapus';
-
-  @override
-  String get deleteThisMessage => 'Hapus pesan ini?';
-
-  @override
-  String get messageDeleted => 'Pesan dihapus';
-
-  @override
-  String get notLoggedIn => 'Belum masuk';
-
-  @override
-  String roomNotExist(String roomId) {
-    return 'Ruangan tidak ditemukan: $roomId';
-  }
-
-  @override
-  String get uploadImageFailed => 'Gagal mengunggah gambar';
-
-  @override
-  String get matrixClientNotInitialized => 'Matrix client belum diinisialisasi';
-
-  @override
-  String get uploadVoiceFailed =>
-      'Gagal mengunggah suara: Tidak dapat mendapatkan MXC URI';
-
-  @override
-  String get uploadVideoFailed =>
-      'Gagal mengunggah video: Tidak dapat mendapatkan MXC URI';
-
-  @override
-  String get uploadFileFailed =>
-      'Gagal mengunggah berkas: Tidak dapat mendapatkan MXC URI';
-
-  @override
-  String locationWithCoords(String lat, String lon) {
-    return 'Lokasi: $lat, $lon';
-  }
-
-  @override
-  String get myLocation => 'Lokasi saya';
-
-  @override
-  String get pollEnded => 'Polling berakhir';
-
-  @override
-  String get groupChat => 'Chat Grup';
-
-  @override
-  String get search => 'Cari';
-
-  @override
-  String get cancel => 'Batal';
-
-  @override
-  String get userCancelled => 'Pengguna membatalkan';
-
-  @override
-  String get noData => 'Tidak ada data';
-
-  @override
-  String get noSearchResults => 'Tidak ada hasil pencarian';
-
-  @override
-  String get tryDifferentKeyword => 'Coba kata kunci lain';
-
-  @override
-  String get loadFailed => 'Gagal memuat';
-
-  @override
-  String get checkNetwork => 'Silakan periksa koneksi jaringan Anda';
-
-  @override
-  String get networkConnectionFailed => 'Koneksi jaringan gagal';
-
-  @override
-  String get checkNetworkSettings => 'Silakan periksa pengaturan jaringan Anda';
-
-  @override
-  String get messages => 'Pesan';
-
-  @override
-  String get contacts => 'Kontak';
-
-  @override
-  String get discover => 'Jelajahi';
-
-  @override
-  String get me => 'Saya';
-
-  @override
-  String get voiceLoading => 'Suara sedang dimuat, silakan coba lagi nanti';
-
-  @override
-  String get voiceToTextFailed => 'Gagal mengubah suara ke teks';
-
-  @override
-  String get converting => 'Mengonversi...';
-
-  @override
-  String get convertToText => 'Ke teks';
-
-  @override
-  String get convertToTextTitle => 'Ubah ke Teks';
-
-  @override
-  String get selectEmoji => 'Pilih emoji';
-
-  @override
-  String get selectRedPacketCover => 'Pilih sampul';
-
-  @override
-  String get frequentlyUsed => 'Sering digunakan';
-
-  @override
-  String get copy => 'Salin';
-
-  @override
-  String get forward => 'Teruskan';
-
-  @override
-  String get unfavorite => 'Batal favorit';
-
-  @override
-  String get favorite => 'Favorit';
-
-  @override
-  String get resend => 'Kirim ulang';
-
-  @override
-  String get recall => 'Tarik';
-
-  @override
-  String get multiSelect => 'Pilih banyak';
-
-  @override
-  String get quote => 'Kutip';
-
-  @override
-  String get remind => 'Ingatkan';
-
-  @override
-  String get searchThis => 'Cari';
-
-  @override
-  String get recallMessageConfirm => 'Tarik pesan ini?';
-
-  @override
-  String get youRecalledMessage => 'Anda menarik sebuah pesan';
-
-  @override
-  String get otherRecalledMessage => 'Pesan ditarik';
-
-  @override
-  String get reEdit => 'Edit ulang';
-
-  @override
-  String get copied => 'Disalin';
-
-  @override
-  String get sendMessageHint => 'Kirim pesan';
-
-  @override
-  String get microphonePermissionRequired => 'Silakan izinkan akses mikrofon';
-
-  @override
-  String startRecordingFailed(String error) {
+  String commonStartRecordingFailed(String error) {
     return 'Gagal memulai rekaman: $error';
   }
 
   @override
-  String get recordingTooShort => 'Rekaman terlalu pendek';
+  String get commonRecordingTooShort => 'Rekaman terlalu pendek';
 
   @override
-  String stopRecordingFailed(String error) {
+  String commonStopRecordingFailed(String error) {
     return 'Gagal menghentikan rekaman: $error';
   }
 
   @override
-  String get releaseToCancel => 'Lepas untuk membatalkan';
+  String get chatReleaseToCancel => 'Lepas untuk membatalkan';
 
   @override
-  String get releaseToSend => 'Lepas untuk kirim, geser ke atas untuk batal';
+  String get chatReleaseToSend =>
+      'Lepas untuk kirim, geser ke atas untuk batal';
 
   @override
-  String get holdToTalk => 'Tahan untuk bicara';
+  String get commonHoldToTalk => 'Tahan untuk bicara';
 
   @override
-  String get send => 'Kirim';
+  String get commonSend => 'Kirim';
 
   @override
-  String conversationWithId(String roomId) {
-    return 'Percakapan: $roomId';
-  }
+  String get commonAddFriend => 'Tambah Teman';
 
   @override
-  String contactWithId(String userId) {
-    return 'Kontak: $userId';
-  }
+  String get commonChatServiceNotConnected => 'Layanan chat tidak terhubung';
 
   @override
-  String get addFriend => 'Tambah Teman';
-
-  @override
-  String get chatServiceNotConnected => 'Layanan chat tidak terhubung';
-
-  @override
-  String userNotFoundHint(String query) {
+  String contactUserNotFoundHint(String query) {
     return 'Pengguna \"$query\" tidak ditemukan\n\nTips:\n• Coba masukkan ID pengguna lengkap, contoh @username:server.com\n• Periksa ejaan nama pengguna';
   }
 
   @override
-  String createChatFailed(String error) {
+  String contactCreateChatFailed(String error) {
     return 'Gagal membuat chat: $error';
   }
 
   @override
-  String searchFailed(String error) {
+  String contactSearchFailed(String error) {
     return 'Pencarian gagal: $error';
   }
 
   @override
-  String get enterUserIdOrUsername =>
+  String get contactEnterUserIdOrUsername =>
       'Masukkan ID atau nama pengguna untuk mencari';
 
   @override
-  String get searching => 'Mencari...';
+  String get contactSearching => 'Mencari...';
 
   @override
-  String get searchUserToChat => 'Cari pengguna untuk mulai mengobrol';
+  String get contactSearchUserToChat => 'Cari pengguna untuk mulai mengobrol';
 
   @override
-  String get matrixIdExample =>
+  String get contactMatrixIdExample =>
       'Anda dapat memasukkan Matrix ID lengkap\ncontoh @user:matrix.n42.network';
 
   @override
-  String userNotFound(String username) {
+  String contactUserNotFound(String username) {
     return 'Pengguna \"$username\" tidak ditemukan';
   }
 
   @override
-  String get chat => 'Chat';
+  String get commonChat => 'Chat';
 
   @override
-  String get settings => 'Pengaturan';
+  String get commonSettings => 'Pengaturan';
 
   @override
-  String get editProfile => 'Edit Profil';
+  String get profileEditProfile => 'Edit Profil';
 
   @override
-  String get login => 'Masuk';
+  String get authLogin => 'Masuk';
 
   @override
-  String get createGroup => 'Buat Grup';
+  String get commonCreateGroup => 'Buat Grup';
 
   @override
-  String developing(String title) {
-    return '$title\n(Segera hadir)';
-  }
+  String get chatError => 'Kesalahan';
 
   @override
-  String get error => 'Kesalahan';
+  String get commonTransfer => 'Transfer';
 
   @override
-  String get pageNotFound => 'Halaman tidak ditemukan';
+  String get commonReceived => 'Diterima';
 
   @override
-  String get backToHome => 'Kembali ke Beranda';
+  String get commonRefunded => 'Dikembalikan';
 
   @override
-  String get allRead => 'Semua dibaca';
+  String get commonExpired => 'Kedaluwarsa';
 
   @override
-  String readCount(int count) {
-    return '$count dibaca';
-  }
+  String get chatRedPacketGreeting => 'Semoga sukses selalu';
 
   @override
-  String get transfer => 'Transfer';
+  String get commonN42RedPacket => 'Angpao N42';
 
   @override
-  String get pendingReceipt => 'Tertunda';
+  String get commonClaimed => 'Diklaim';
 
   @override
-  String get tapToReceive => 'Ketuk untuk menerima';
+  String get commonAllClaimed => 'Semua diklaim';
 
   @override
-  String get received => 'Diterima';
+  String get chatReply => 'Balas';
 
   @override
-  String get paymentReceived => 'Pembayaran diterima';
+  String get commonEdit => 'Edit';
 
   @override
-  String get refunded => 'Dikembalikan';
+  String get chatSelectForwardTarget => 'Pilih penerima';
 
   @override
-  String get expired => 'Kedaluwarsa';
-
-  @override
-  String get redPacketGreeting => 'Semoga sukses selalu';
-
-  @override
-  String get n42RedPacket => 'Angpao N42';
-
-  @override
-  String get goodLuck => 'Semoga beruntung';
-
-  @override
-  String get claimed => 'Diklaim';
-
-  @override
-  String get allClaimed => 'Semua diklaim';
-
-  @override
-  String get emoji => 'Emoji';
-
-  @override
-  String get love => 'Cinta';
-
-  @override
-  String get animals => 'Hewan';
-
-  @override
-  String get food => 'Makanan';
-
-  @override
-  String get travel => 'Perjalanan';
-
-  @override
-  String get activities => 'Aktivitas';
-
-  @override
-  String get objects => 'Objek';
-
-  @override
-  String get symbols => 'Simbol';
-
-  @override
-  String get reply => 'Balas';
-
-  @override
-  String get copiedToClipboard => 'Disalin ke papan klip';
-
-  @override
-  String get edit => 'Edit';
-
-  @override
-  String get more => 'Lainnya';
-
-  @override
-  String get selectForwardTarget => 'Pilih penerima';
-
-  @override
-  String sendCount(int count) {
+  String commonSendCount(int count) {
     return 'Kirim ($count)';
   }
 
   @override
-  String get draft => '[Draf] ';
-
-  @override
-  String n42Id(String id) {
+  String contactN42Id(String id) {
     return 'N42 ID: $id';
   }
 
   @override
-  String get n42IdTitle => 'N42 ID';
+  String get profileN42IdTitle => 'N42 ID';
 
   @override
-  String get n42Bean => 'N42 Bean';
+  String get profileN42Bean => 'N42 Bean';
 
   @override
-  String get friendInfo => 'Info Teman';
+  String get contactFriendInfo => 'Info Teman';
 
   @override
-  String get friendInfoDesc =>
+  String get contactFriendInfoDesc =>
       'Tambahkan catatan teman, telepon, tag, catatan, foto dan atur izin.';
 
   @override
-  String get moments => 'Moments';
+  String get commonMoments => 'Moments';
 
   @override
-  String get sendMessage => 'Pesan';
+  String get commonSendMessage => 'Pesan';
 
   @override
-  String get audioVideoCall => 'Panggilan Audio/Video';
+  String get contactAudioVideoCall => 'Panggilan Audio/Video';
 
   @override
-  String get videoChannel => 'Saluran Video';
+  String get contactVideoChannel => 'Saluran Video';
 
   @override
-  String get remark => 'Catatan';
+  String get contactRemark => 'Catatan';
 
   @override
-  String get remarkName => 'Nama Catatan';
+  String get contactRemarkName => 'Nama Catatan';
 
   @override
-  String get phone => 'Telepon';
+  String get contactPhone => 'Telepon';
 
   @override
-  String get tags => 'Tag';
+  String get contactTags => 'Tag';
 
   @override
-  String get notes => 'Catatan';
+  String get contactNotes => 'Catatan';
 
   @override
-  String get photos => 'Foto';
+  String get contactPhotos => 'Foto';
 
   @override
-  String get permissions => 'Izin';
+  String get contactPermissions => 'Izin';
 
   @override
-  String get chatMomentsEtc => 'Chat, Moments, Olahraga, dll.';
+  String get contactChatMomentsEtc => 'Chat, Moments, Olahraga, dll.';
 
   @override
-  String get moreInfo => 'Info Lainnya';
+  String get contactMoreInfo => 'Info Lainnya';
 
   @override
-  String get commonGroups => 'Grup bersama';
+  String get contactCommonGroups => 'Grup bersama';
 
   @override
-  String get zeroGroups => '0';
+  String get contactSource => 'Sumber';
 
   @override
-  String get source => 'Sumber';
+  String get settingsNotificationSettings => 'Notifikasi';
 
   @override
-  String get notificationSettings => 'Notifikasi';
+  String get settingsPrivacy => 'Privasi';
 
   @override
-  String get receiveNotifications => 'Terima notifikasi pesan baru';
+  String get settingsAppearance => 'Tampilan';
 
   @override
-  String get showPreview => 'Tampilkan pratinjau pesan';
+  String get settingsAbout => 'Tentang';
 
   @override
-  String get showContentInNotification => 'Tampilkan isi pesan di notifikasi';
+  String get commonLogout => 'Keluar';
 
   @override
-  String get notificationSound => 'Suara notifikasi';
+  String get commonLogoutConfirm => 'Apakah Anda yakin ingin keluar?';
 
   @override
-  String get playSoundOnMessage => 'Putar suara saat menerima pesan';
+  String get commonSave => 'Simpan';
 
   @override
-  String get vibrate => 'Getar';
+  String get profileNickname => 'Nama Panggilan';
 
   @override
-  String get vibrateOnMessage => 'Getar saat menerima pesan';
+  String get profileEnterNickname => 'Masukkan nama panggilan';
 
   @override
-  String get doNotDisturb => 'Jangan Ganggu';
+  String get profileSignature => 'Tanda Tangan';
 
   @override
-  String get dndDescription => 'Bisukan notifikasi pada jam tertentu';
+  String get profileAddSignature => 'Tambahkan tanda tangan';
 
   @override
-  String get startTime => 'Waktu mulai';
+  String get commonTakePhoto => 'Ambil Foto';
 
   @override
-  String get endTime => 'Waktu selesai';
+  String get profileChooseFromGallery => 'Pilih dari Galeri';
 
   @override
-  String get privacy => 'Privasi';
-
-  @override
-  String get appearance => 'Tampilan';
-
-  @override
-  String get about => 'Tentang';
-
-  @override
-  String get logout => 'Keluar';
-
-  @override
-  String get logoutConfirm => 'Apakah Anda yakin ingin keluar?';
-
-  @override
-  String get exit => 'Keluar';
-
-  @override
-  String get save => 'Simpan';
-
-  @override
-  String get nickname => 'Nama Panggilan';
-
-  @override
-  String get enterNickname => 'Masukkan nama panggilan';
-
-  @override
-  String get signature => 'Tanda Tangan';
-
-  @override
-  String get addSignature => 'Tambahkan tanda tangan';
-
-  @override
-  String get takePhoto => 'Ambil Foto';
-
-  @override
-  String get chooseFromGallery => 'Pilih dari Galeri';
-
-  @override
-  String saveFailed(String error) {
+  String profileSaveFailed(String error) {
     return 'Gagal menyimpan: $error';
   }
 
   @override
-  String get secureDecentralizedChat => 'Pesan aman dan terdesentralisasi';
+  String get authSecureDecentralizedChat => 'Pesan aman dan terdesentralisasi';
 
   @override
-  String get endToEndEncryption => 'Enkripsi ujung ke ujung';
+  String get commonEndToEndEncryption => 'Enkripsi ujung ke ujung';
 
   @override
-  String get messagesOnlyYouCanSee =>
+  String get authMessagesOnlyYouCanSee =>
       'Pesan hanya dapat dilihat oleh Anda dan penerima';
 
   @override
-  String get decentralized => 'Terdesentralisasi';
+  String get authDecentralized => 'Terdesentralisasi';
 
   @override
-  String get basedOnMatrix => 'Dibangun di atas protokol terbuka Matrix';
+  String get authBasedOnMatrix => 'Dibangun di atas protokol terbuka Matrix';
 
   @override
-  String get walletIntegration => 'Integrasi Dompet';
+  String get authWalletIntegration => 'Integrasi Dompet';
 
   @override
-  String get easyCryptoTransfer => 'Transfer kripto dengan mudah';
+  String get authEasyCryptoTransfer => 'Transfer kripto dengan mudah';
 
   @override
-  String get register => 'Daftar';
+  String get authRegister => 'Daftar';
 
   @override
-  String get agreeTerms => 'Dengan masuk, Anda menyetujui';
+  String get authAgreeTerms => 'Dengan masuk, Anda menyetujui';
 
   @override
-  String get termsOfService => 'Ketentuan Layanan';
+  String get authTermsOfService => 'Ketentuan Layanan';
 
   @override
-  String get and => 'dan';
+  String get authAnd => 'dan';
 
   @override
-  String get privacyPolicy => 'Kebijakan Privasi';
+  String get authPrivacyPolicy => 'Kebijakan Privasi';
 
   @override
-  String get serverAddress => 'Alamat Server';
+  String get authServerAddress => 'Alamat Server';
 
   @override
-  String get enterServerAddress => 'Masukkan alamat server';
+  String get authEnterServerAddress => 'Masukkan alamat server';
 
   @override
-  String get validServerAddress => 'Silakan masukkan alamat server yang valid';
-
-  @override
-  String connectedTo(String serverName) {
+  String authConnectedTo(String serverName) {
     return 'Terhubung ke $serverName';
   }
 
   @override
-  String get username => 'Nama Pengguna';
+  String get authUsername => 'Nama Pengguna';
 
   @override
-  String get enterUsername => 'Masukkan nama pengguna';
+  String get authEnterUsername => 'Masukkan nama pengguna';
 
   @override
-  String get password => 'Kata Sandi';
+  String get authPassword => 'Kata Sandi';
 
   @override
-  String get enterPassword => 'Masukkan kata sandi';
+  String get authEnterPassword => 'Masukkan kata sandi';
 
   @override
-  String get registerAccount => 'Daftar';
+  String get authRegisterAccount => 'Daftar';
 
   @override
-  String get forgotPassword => 'Lupa Kata Sandi';
+  String get authForgotPassword => 'Lupa Kata Sandi';
 
   @override
-  String get otherLoginMethods => 'Metode login lainnya';
+  String get authOtherLoginMethods => 'Metode login lainnya';
 
   @override
-  String get emailVerification => 'Kode verifikasi email';
+  String get authCreateAccount => 'Buat Akun';
 
   @override
-  String get enterServerFirst =>
-      'Silakan masukkan alamat server terlebih dahulu';
+  String get authJoinN42Chat =>
+      'Bergabung dengan N42 Chat untuk mulai mengobrol';
 
   @override
-  String get passkeyNeedsServer => 'Login passkey memerlukan dukungan server';
+  String get authUsernameHint => '3-20 karakter, huruf/angka/_';
 
   @override
-  String googleLoginSuccess(String email) {
-    return 'Login Google berhasil: $email';
-  }
+  String get authUsernameMinLength => 'Nama pengguna minimal 3 karakter';
 
   @override
-  String googleLoginFailed(String error) {
-    return 'Login Google gagal: $error';
-  }
+  String get authUsernameMaxLength => 'Nama pengguna maksimal 20 karakter';
 
   @override
-  String get appleLoginSuccess => 'Login Apple berhasil';
-
-  @override
-  String appleLoginFailed(String error) {
-    return 'Login Apple gagal: $error';
-  }
-
-  @override
-  String get createAccount => 'Buat Akun';
-
-  @override
-  String get joinN42Chat => 'Bergabung dengan N42 Chat untuk mulai mengobrol';
-
-  @override
-  String get usernameHint => '3-20 karakter, huruf/angka/_';
-
-  @override
-  String get usernameMinLength => 'Nama pengguna minimal 3 karakter';
-
-  @override
-  String get usernameMaxLength => 'Nama pengguna maksimal 20 karakter';
-
-  @override
-  String get usernameFormat =>
+  String get authUsernameFormat =>
       'Nama pengguna hanya boleh berisi huruf, angka, dan garis bawah';
 
   @override
-  String get passwordHint => 'Minimal 8 karakter';
+  String get authPasswordHint => 'Minimal 8 karakter';
 
   @override
-  String get passwordMinLength => 'Kata sandi minimal 8 karakter';
+  String get commonPasswordMinLength => 'Kata sandi minimal 8 karakter';
 
   @override
-  String get confirmPassword => 'Konfirmasi Kata Sandi';
+  String get authConfirmPassword => 'Konfirmasi Kata Sandi';
 
   @override
-  String get reEnterPassword => 'Masukkan ulang kata sandi';
+  String get authFilled => 'Terisi';
 
   @override
-  String get passwordsNotMatch => 'Kata sandi tidak cocok';
+  String get authEnterInviteCode => 'Masukkan kode undangan';
 
   @override
-  String get inviteCode => 'Kode undangan (bawaan)';
+  String get authAlreadyHaveAccount => 'Sudah punya akun?';
 
   @override
-  String get filled => 'Terisi';
+  String get authLoginNow => 'Masuk sekarang';
 
   @override
-  String get enterInviteCode => 'Masukkan kode undangan';
+  String get profileAvatar => 'Avatar';
 
   @override
-  String get inviteCodeHint =>
-      'Kode undangan sudah bawaan, biasanya tidak perlu diubah';
+  String get profileStatus => 'Status';
 
   @override
-  String get agreeTermsFirst =>
-      'Silakan baca dan setujui ketentuan dan kebijakan privasi terlebih dahulu';
+  String get commonLoading => 'Memuat...';
 
   @override
-  String get iAgree => 'Saya telah membaca dan menyetujui';
+  String get conversationNoConversations => 'Tidak ada percakapan';
 
   @override
-  String get alreadyHaveAccount => 'Sudah punya akun?';
+  String get conversationTapToChat => 'Ketuk kanan atas untuk mulai mengobrol';
 
   @override
-  String get loginNow => 'Masuk sekarang';
+  String get conversationStartGroup => 'Mulai Chat Grup';
 
   @override
-  String get whoCanSee => 'Siapa yang dapat melihat';
+  String get commonScan => 'Pindai';
 
   @override
-  String get avatar => 'Avatar';
+  String get commonPayment => 'Pembayaran';
 
   @override
-  String get status => 'Status';
-
-  @override
-  String get lastSeen => 'Terakhir dilihat';
-
-  @override
-  String get messageSettings => 'Pesan';
-
-  @override
-  String get allowStrangerMessage => 'Izinkan pesan dari orang asing';
-
-  @override
-  String get receiveNonContact => 'Terima pesan dari non-kontak';
-
-  @override
-  String get readReceipts => 'Tanda baca';
-
-  @override
-  String get letOthersKnowRead =>
-      'Beri tahu orang lain Anda telah membaca pesan mereka';
-
-  @override
-  String get typingStatus => 'Status mengetik';
-
-  @override
-  String get letOthersKnowTyping => 'Beri tahu orang lain Anda sedang mengetik';
-
-  @override
-  String get everyone => 'Semua orang';
-
-  @override
-  String get contactsOnly => 'Hanya kontak';
-
-  @override
-  String get nobody => 'Tidak ada';
-
-  @override
-  String whoCanSeeItem(String title) {
-    return 'Siapa yang dapat melihat $title';
-  }
-
-  @override
-  String version(String version) {
-    return 'Versi $version';
-  }
-
-  @override
-  String get checkUpdate => 'Periksa pembaruan';
-
-  @override
-  String get openSourceLicenses => 'Lisensi open source';
-
-  @override
-  String get feedback => 'Umpan Balik';
-
-  @override
-  String get builtOnMatrix => 'Dibangun di atas protokol Matrix';
-
-  @override
-  String get loading => 'Memuat...';
-
-  @override
-  String get noConversations => 'Tidak ada percakapan';
-
-  @override
-  String get tapToChat => 'Ketuk kanan atas untuk mulai mengobrol';
-
-  @override
-  String get startGroup => 'Mulai Chat Grup';
-
-  @override
-  String get scan => 'Pindai';
-
-  @override
-  String get payment => 'Pembayaran';
-
-  @override
-  String featureComingSoon(String feature) {
+  String commonFeatureComingSoon(String feature) {
     return '$feature segera hadir';
   }
 
   @override
-  String get markAsRead => 'Tandai sudah dibaca';
+  String get conversationMarkAsRead => 'Tandai sudah dibaca';
 
   @override
-  String get unmute => 'Bunyikan';
+  String get commonUnmute => 'Bunyikan';
 
   @override
-  String get mute => 'Bisukan';
+  String get commonMute => 'Bisukan';
 
   @override
-  String get unpin => 'Lepas pin';
+  String get conversationUnpin => 'Lepas pin';
 
   @override
-  String get pin => 'Pin';
+  String get conversationPin => 'Pin';
 
   @override
-  String get deleteConversation => 'Hapus Percakapan';
+  String get conversationDeleteConversation => 'Hapus Percakapan';
 
   @override
-  String deleteConversationConfirm(String name) {
+  String conversationDeleteConversationConfirm(String name) {
     return 'Hapus percakapan dengan \"$name\"?';
   }
 
   @override
-  String get noContacts => 'Tidak ada kontak';
+  String get commonNoContacts => 'Tidak ada kontak';
 
   @override
-  String get addFriendsToChat => 'Tambah teman untuk mulai mengobrol';
+  String get contactAddFriendsToChat => 'Tambah teman untuk mulai mengobrol';
 
   @override
   String get contactNotFound => 'Kontak tidak ditemukan';
 
   @override
-  String get tryOtherKeywords => 'Coba kata kunci lain atau pencarian global';
+  String get contactTryOtherKeywords =>
+      'Coba kata kunci lain atau pencarian global';
 
   @override
-  String get searchResults => 'Hasil pencarian';
+  String get contactSearchResults => 'Hasil pencarian';
 
   @override
-  String get newFriends => 'Teman Baru';
+  String get contactNewFriends => 'Teman Baru';
 
   @override
-  String get chatOnlyFriends => 'Teman khusus chat';
+  String get contactChatOnlyFriends => 'Chat-only Friends';
 
   @override
-  String get officialAccounts => 'Akun Resmi';
+  String get contactOfficialAccounts => 'Akun Resmi';
 
   @override
-  String get serviceAccounts => 'Akun Layanan';
+  String get contactServiceAccounts => 'Akun Layanan';
 
   @override
-  String get enterpriseContacts => 'Kontak Perusahaan';
+  String get contactEnterpriseContacts => 'Kontak Perusahaan';
 
   @override
-  String contactsCount(int count) {
-    return '$count kontak';
-  }
+  String get contactRecommendToFriend => 'Bagikan kontak';
 
   @override
-  String get recommendToFriend => 'Bagikan kontak';
+  String get commonSetRemark => 'Atur catatan';
 
   @override
-  String get setRemark => 'Atur catatan';
+  String get contactSendingCard => 'Mengirim kartu kontak...';
 
   @override
-  String get addToHome => 'Tambahkan ke layar utama';
+  String get commonFileLabel => 'Berkas';
 
   @override
-  String get sendingCard => 'Mengirim kartu kontak...';
+  String get commonLocationLabel => 'Lokasi';
 
   @override
-  String get contactCard => '[Kartu Kontak]';
-
-  @override
-  String get fileLabel => 'Berkas';
-
-  @override
-  String get locationLabel => 'Lokasi';
-
-  @override
-  String cardSent(String contact, String friend) {
-    return 'Mengirim kartu $contact ke $friend';
-  }
-
-  @override
-  String recommendFailed(String error) {
+  String contactRecommendFailed(String error) {
     return 'Rekomendasi gagal: $error';
   }
 
   @override
-  String get enterRemark => 'Masukkan catatan';
+  String get profileEnterRemark => 'Masukkan catatan';
 
   @override
-  String remarkSet(String remark) {
-    return 'Catatan diatur ke: $remark';
-  }
+  String get contactOpeningChat => 'Membuka chat...';
 
   @override
-  String get openingChat => 'Membuka chat...';
-
-  @override
-  String openChatFailed(String error) {
+  String contactOpenChatFailed(String error) {
     return 'Gagal membuka chat: $error';
   }
 
   @override
-  String get addContact => 'Tambah Kontak';
+  String get contactAddContact => 'Tambah Kontak';
 
   @override
-  String get enterUserId => 'Masukkan ID pengguna';
+  String get contactEnterUserId => 'Masukkan ID pengguna';
 
   @override
-  String get noFriendRequests => 'Tidak ada permintaan pertemanan';
+  String get contactNoFriendRequests => 'Tidak ada permintaan pertemanan';
 
   @override
-  String get accept => 'Terima';
+  String get commonAccept => 'Terima';
 
   @override
-  String get reject => 'Tolak';
+  String get commonReject => 'Tolak';
 
   @override
-  String acceptedRequest(String name) {
-    return 'Menerima permintaan pertemanan $name';
-  }
+  String get commonNoGroups => 'Tidak ada grup';
 
   @override
-  String rejectedRequest(String name) {
-    return 'Menolak permintaan pertemanan $name';
-  }
+  String get contactSelectFriendToRecommend =>
+      'Pilih teman untuk direkomendasikan';
 
   @override
-  String get noGroups => 'Tidak ada grup';
+  String get commonSearchContacts => 'Cari kontak';
 
   @override
-  String get creatingGroup => 'Pembuatan grup segera hadir...';
+  String get contactNoContactsFound => 'Tidak ada kontak ditemukan';
 
   @override
-  String get selectFriendToRecommend => 'Pilih teman untuk direkomendasikan';
+  String get favoriteYesterday => 'Kemarin';
 
   @override
-  String get searchContacts => 'Cari kontak';
+  String get chatJustNow => 'Baru saja';
 
   @override
-  String get noContactsFound => 'Tidak ada kontak ditemukan';
+  String get profileOnline => 'Online';
 
   @override
-  String get yesterday => 'Kemarin';
-
-  @override
-  String get monday => 'Sen';
-
-  @override
-  String get tuesday => 'Sel';
-
-  @override
-  String get wednesday => 'Rab';
-
-  @override
-  String get thursday => 'Kam';
-
-  @override
-  String get friday => 'Jum';
-
-  @override
-  String get saturday => 'Sab';
-
-  @override
-  String get sunday => 'Min';
-
-  @override
-  String get justNow => 'Baru saja';
-
-  @override
-  String minutesAgo(int count) {
-    return '$count menit lalu';
-  }
-
-  @override
-  String hoursAgo(int count) {
-    return '$count jam lalu';
-  }
-
-  @override
-  String daysAgo(int count) {
-    return '$count hari lalu';
-  }
-
-  @override
-  String get online => 'Online';
-
-  @override
-  String get offline => 'Offline';
-
-  @override
-  String minutesAgoOnline(int count) {
-    return 'Online $count menit lalu';
-  }
-
-  @override
-  String hoursAgoOnline(int count) {
-    return 'Online $count jam lalu';
-  }
-
-  @override
-  String daysAgoOnline(int count) {
-    return 'Online $count hari lalu';
-  }
+  String get profileOffline => 'Offline';
 
   @override
   String get searchContactsGroupsMessages => 'Cari kontak, grup, pesan';
@@ -1198,36 +645,25 @@ class SId extends S {
   String get searchError => 'Kesalahan pencarian';
 
   @override
-  String get searchHint => 'Cari kontak, grup, dan pesan';
-
-  @override
-  String get enterKeyword => 'Masukkan kata kunci untuk mencari';
+  String get chatSearchHint => 'Cari kontak, grup, dan pesan';
 
   @override
   String get searchHistory => 'Riwayat Pencarian';
 
   @override
-  String get clear => 'Hapus';
+  String get commonClear => 'Hapus';
 
   @override
-  String noResultsFor(String query) {
-    return 'Tidak ada hasil untuk \"$query\"';
-  }
+  String get commonAll => 'Semua';
 
   @override
-  String get all => 'Semua';
+  String get searchGroups => 'Grup';
 
   @override
-  String get groups => 'Grup';
+  String get searchNoResults => 'Tidak ada hasil';
 
   @override
-  String get noResults => 'Tidak ada hasil';
-
-  @override
-  String get groupInfo => 'Info Grup';
-
-  @override
-  String groupMembers(int count) {
+  String commonGroupMembers(int count) {
     return 'Anggota ($count)';
   }
 
@@ -1235,1808 +671,7 @@ class SId extends S {
   String get groupMembersTitle => 'Anggota Grup';
 
   @override
-  String get viewAll => 'Lihat semua';
-
-  @override
-  String get owner => 'Pemilik';
-
-  @override
-  String get admin => 'Admin';
-
-  @override
-  String get invite => 'Undang';
-
-  @override
-  String get groupAnnouncement => 'Pengumuman Grup';
-
-  @override
-  String get notSet => 'Belum diatur';
-
-  @override
-  String get groupDescription => 'Deskripsi Grup';
-
-  @override
-  String get publicGroup => 'Grup Publik';
-
-  @override
-  String get allowSearchJoin => 'Izinkan orang lain mencari dan bergabung';
-
-  @override
-  String get clearChatHistory => 'Hapus Riwayat Chat';
-
-  @override
-  String get dissolveGroup => 'Bubarkan Grup';
-
-  @override
-  String get leaveGroup => 'Keluar Grup';
-
-  @override
-  String get changeGroupName => 'Ubah Nama Grup';
-
-  @override
-  String get enterGroupName => 'Masukkan nama grup';
-
-  @override
-  String get confirm => 'Konfirmasi';
-
-  @override
-  String get changeGroupDescription => 'Ubah Deskripsi Grup';
-
-  @override
-  String get enterGroupDescription => 'Masukkan deskripsi grup';
-
-  @override
-  String get editAnnouncement => 'Edit Pengumuman';
-
-  @override
-  String get enterAnnouncement => 'Masukkan pengumuman';
-
-  @override
-  String get publish => 'Publikasikan';
-
-  @override
-  String get clearHistoryConfirm =>
-      'Hapus semua riwayat chat? Ini tidak dapat dibatalkan.';
-
-  @override
-  String get clearAction => 'Hapus';
-
-  @override
-  String get chatHistoryCleared => 'Riwayat chat dihapus';
-
-  @override
-  String leaveGroupConfirm(String name) {
-    return 'Keluar dari \"$name\"?';
-  }
-
-  @override
-  String dissolveGroupConfirm(String name) {
-    return 'Bubarkan \"$name\"? Ini tidak dapat dibatalkan.';
-  }
-
-  @override
-  String get dissolve => 'Bubarkan';
-
-  @override
-  String get groupQrCode => 'Kode QR Grup';
-
-  @override
-  String get searchChatHistory => 'Cari Riwayat Chat';
-
-  @override
-  String get groupIdCopied => 'ID Grup disalin';
-
-  @override
-  String tapCopyGroupId(int count) {
-    return '$count anggota - Ketuk untuk menyalin ID Grup';
-  }
-
-  @override
-  String get receiverAddress => 'Alamat Penerima';
-
-  @override
-  String get enterOrPasteAddress => 'Masukkan atau tempel alamat dompet';
-
-  @override
-  String get selectToken => 'Pilih Token';
-
-  @override
-  String get transferAmount => 'Jumlah Transfer';
-
-  @override
-  String get available => 'Tersedia';
-
-  @override
-  String get allAmount => 'Semua';
-
-  @override
-  String get memoOptional => 'Memo (opsional)';
-
-  @override
-  String get addMemo => 'Tambahkan memo';
-
-  @override
-  String get confirmTransfer => 'Konfirmasi Transfer';
-
-  @override
-  String get invalidAddress => 'Silakan masukkan alamat penerima yang valid';
-
-  @override
-  String get invalidAmount => 'Silakan masukkan jumlah yang valid';
-
-  @override
-  String get selectTokenPlease => 'Silakan pilih token';
-
-  @override
-  String get addressVerified => 'Alamat terverifikasi';
-
-  @override
-  String availableBalance(String balance, String symbol) {
-    return 'Tersedia: $balance $symbol';
-  }
-
-  @override
-  String get scanningInDevelopment => 'Fitur pindai sedang dikembangkan...';
-
-  @override
-  String get enterAmount => 'Masukkan jumlah';
-
-  @override
-  String get redPacketCountMin => 'Minimal 1 angpao diperlukan';
-
-  @override
-  String get viewRedPacketDetails => 'Lihat detail angpao';
-
-  @override
-  String get enterTransferAmount => 'Masukkan jumlah transfer';
-
-  @override
-  String get transferTo => 'Transfer ke';
-
-  @override
-  String get selectCurrency => 'Pilih mata uang';
-
-  @override
-  String get receiveTransfer => 'Menerima transfer';
-
-  @override
-  String fromSender(String name, Object senderName) {
-    return 'Dari $senderName';
-  }
-
-  @override
-  String get confirmReceive => 'Konfirmasi Penerimaan';
-
-  @override
-  String get groupProfile => 'Info Grup';
-
-  @override
-  String get viewProfile => 'Lihat Profil';
-
-  @override
-  String get removeMember => 'Keluarkan dari Grup';
-
-  @override
-  String removeMemberConfirm(String name) {
-    return 'Keluarkan \"$name\" dari grup?';
-  }
-
-  @override
-  String get remove => 'Keluarkan';
-
-  @override
-  String get clearStatus => 'Hapus Status';
-
-  @override
-  String get clearStatusConfirm => 'Hapus status saat ini?';
-
-  @override
-  String get statusCleared => 'Status dihapus';
-
-  @override
-  String statusSet(String result) {
-    return 'Status diatur ke: $result';
-  }
-
-  @override
-  String get userNotExist => 'Pengguna tidak ada';
-
-  @override
-  String get userIdCopied => 'ID Pengguna disalin';
-
-  @override
-  String get voiceCallInDevelopment => 'Panggilan suara sedang dikembangkan...';
-
-  @override
-  String get report => 'Laporkan';
-
-  @override
-  String get reportInDevelopment => 'Fitur laporan sedang dikembangkan...';
-
-  @override
-  String get shareCard => 'Bagikan Kartu';
-
-  @override
-  String get shareInDevelopment => 'Fitur bagikan sedang dikembangkan...';
-
-  @override
-  String get qrCode => 'Kode QR';
-
-  @override
-  String get qrCodeInDevelopment => 'Fitur kode QR sedang dikembangkan...';
-
-  @override
-  String get avatarUpdated => 'Avatar diperbarui';
-
-  @override
-  String selectImageFailed(String error) {
-    return 'Gagal memilih gambar: $error';
-  }
-
-  @override
-  String get changeName => 'Ubah Nama';
-
-  @override
-  String get male => 'Pria';
-
-  @override
-  String get female => 'Wanita';
-
-  @override
-  String genderSet(String gender) {
-    return 'Jenis kelamin diatur ke: $gender';
-  }
-
-  @override
-  String regionSet(String region) {
-    return 'Wilayah diatur ke: $region';
-  }
-
-  @override
-  String get setPatText => 'Atur Teks Tepukan';
-
-  @override
-  String get changeSignature => 'Ubah Tanda Tangan';
-
-  @override
-  String ringtoneSet(String result) {
-    return 'Nada dering diatur ke: $result';
-  }
-
-  @override
-  String featureInDev(String feature) {
-    return '$feature sedang dikembangkan...';
-  }
-
-  @override
-  String saveAddressFailed(String error) {
-    return 'Gagal menyimpan alamat: $error';
-  }
-
-  @override
-  String get myAddress => 'Alamat Saya';
-
-  @override
-  String get addNew => 'Tambah';
-
-  @override
-  String get addAddress => 'Tambah Alamat';
-
-  @override
-  String get addressAdded => 'Alamat ditambahkan';
-
-  @override
-  String get addressUpdated => 'Alamat diperbarui';
-
-  @override
-  String get deleteAddress => 'Hapus Alamat';
-
-  @override
-  String get deleteAddressConfirm => 'Hapus alamat ini?';
-
-  @override
-  String get addressDeleted => 'Alamat dihapus';
-
-  @override
-  String get setDefaultAddress => 'Atur sebagai default';
-
-  @override
-  String get fillCompleteInfo => 'Silakan isi semua kolom';
-
-  @override
-  String saveInvoiceFailed(String error) {
-    return 'Gagal menyimpan faktur: $error';
-  }
-
-  @override
-  String get myInvoices => 'Faktur Saya';
-
-  @override
-  String get addInvoice => 'Tambah Faktur';
-
-  @override
-  String get invoiceAdded => 'Faktur ditambahkan';
-
-  @override
-  String get invoiceUpdated => 'Faktur diperbarui';
-
-  @override
-  String get deleteInvoice => 'Hapus Faktur';
-
-  @override
-  String get deleteInvoiceConfirm => 'Hapus faktur ini?';
-
-  @override
-  String get invoiceDeleted => 'Faktur dihapus';
-
-  @override
-  String get invoiceType => 'Jenis faktur: ';
-
-  @override
-  String get personal => 'Pribadi';
-
-  @override
-  String get enterprise => 'Perusahaan';
-
-  @override
-  String get setDefaultInvoice => 'Atur sebagai default';
-
-  @override
-  String get enterTaxId => 'Masukkan NPWP';
-
-  @override
-  String get vibrateMode => 'Mode getar';
-
-  @override
-  String get silentMode => 'Mode senyap';
-
-  @override
-  String playing(String ringtoneName) {
-    return 'Memutar: $ringtoneName';
-  }
-
-  @override
-  String playFailed(String ringtoneName) {
-    return 'Gagal memutar: $ringtoneName';
-  }
-
-  @override
-  String get enterGroupNamePlease => 'Silakan masukkan nama grup';
-
-  @override
-  String get selectAtLeastOne => 'Silakan pilih minimal satu anggota';
-
-  @override
-  String get fillStatus => 'Tulis Status';
-
-  @override
-  String get fileNotExist => 'Berkas tidak ada';
-
-  @override
-  String sendFailed(String error) {
-    return 'Gagal mengirim: $error';
-  }
-
-  @override
-  String get cannotOpenBrowser => 'Tidak dapat membuka browser';
-
-  @override
-  String selectFileFailed(String error) {
-    return 'Gagal memilih berkas: $error';
-  }
-
-  @override
-  String get enterMusicLink => 'Masukkan tautan musik';
-
-  @override
-  String get enterValidLink => 'Silakan masukkan tautan yang valid';
-
-  @override
-  String get enterPollQuestion => 'Masukkan pertanyaan polling';
-
-  @override
-  String get minTwoOptions => 'Minimal 2 opsi diperlukan';
-
-  @override
-  String get crossDeviceEnabled =>
-      'Penandatanganan lintas perangkat diaktifkan';
-
-  @override
-  String get crossDeviceSet =>
-      'Penandatanganan lintas perangkat berhasil diatur';
-
-  @override
-  String setupFailed(String error) {
-    return 'Pengaturan gagal: $error';
-  }
-
-  @override
-  String get receiveAmount => 'Jumlah Diterima';
-
-  @override
-  String get enterValidAmount => 'Silakan masukkan jumlah yang valid';
-
-  @override
-  String get addressCopied => 'Alamat disalin';
-
-  @override
-  String openItem(String content) {
-    return 'Buka: $content';
-  }
-
-  @override
-  String get newNoteComingSoon => 'Fitur catatan baru segera hadir';
-
-  @override
-  String get addLinkComingSoon => 'Fitur tambah tautan segera hadir';
-
-  @override
-  String get deleted => 'Dihapus';
-
-  @override
-  String get shareComingSoon => 'Fitur bagikan segera hadir';
-
-  @override
-  String get saveComingSoon => 'Fitur simpan segera hadir';
-
-  @override
-  String get moreStylesComingSoon => 'Lebih banyak gaya segera hadir';
-
-  @override
-  String get wallet => 'Dompet';
-
-  @override
-  String get walletArea => 'Area dompet';
-
-  @override
-  String get recording => 'Merekam';
-
-  @override
-  String get invalidVideoUrl => 'URL video tidak valid';
-
-  @override
-  String get downloadFile => 'Unduh berkas';
-
-  @override
-  String get clearChatHistoryTitle => 'Hapus Riwayat Chat';
-
-  @override
-  String get cannotUndo => 'Ini tidak dapat dibatalkan';
-
-  @override
-  String get videoCall => 'Panggilan Video';
-
-  @override
-  String get voiceCall => 'Panggilan Suara';
-
-  @override
-  String get leaveMeeting => 'Tinggalkan Meeting';
-
-  @override
-  String get chatDetails => 'Detail Chat';
-
-  @override
-  String get viewAllGroupMembers => 'Lihat semua anggota';
-
-  @override
-  String get groupName => 'Nama Grup';
-
-  @override
-  String get groupNameUpdated => 'Nama grup diperbarui';
-
-  @override
-  String get groupDescriptionUpdated => 'Deskripsi grup diperbarui';
-
-  @override
-  String get groupAvatarUpdated => 'Avatar grup diperbarui';
-
-  @override
-  String get updateFailed => 'Pembaruan gagal';
-
-  @override
-  String get noPermissionToModify => 'Anda tidak memiliki izin untuk mengubah';
-
-  @override
-  String get groupManagement => 'Manajemen Grup';
-
-  @override
-  String get myNicknameInGroup => 'Nama Panggilan Saya di Grup';
-
-  @override
-  String get pinChat => 'Pin Chat';
-
-  @override
-  String get strongReminder => 'Pengingat Kuat';
-
-  @override
-  String get setChatBackground => 'Atur Latar Belakang Chat';
-
-  @override
-  String get unknownFile => 'Berkas tidak dikenal';
-
-  @override
-  String get download => 'Unduh';
-
-  @override
-  String get invalidLocation => 'Lokasi tidak valid';
-
-  @override
-  String get address => 'Alamat';
-
-  @override
-  String get latitude => 'Garis Lintang';
-
-  @override
-  String get longitude => 'Garis Bujur';
-
-  @override
-  String get close => 'Tutup';
-
-  @override
-  String get tapToCancel => 'Ketuk untuk membatalkan';
-
-  @override
-  String captureFailed(Object error) {
-    return 'Gagal mengambil gambar: $error';
-  }
-
-  @override
-  String get processingVideo => 'Memproses video...';
-
-  @override
-  String get videoFileNotExist => 'Berkas video tidak ada';
-
-  @override
-  String get videoDataEmpty => 'Data video kosong';
-
-  @override
-  String get videoTooLarge => 'Ukuran video tidak boleh melebihi 100MB';
-
-  @override
-  String get sendingVideo => 'Mengirim video...';
-
-  @override
-  String sendVideoFailed(Object error) {
-    return 'Gagal mengirim video: $error';
-  }
-
-  @override
-  String get imageFileNotExist => 'Berkas gambar tidak ada';
-
-  @override
-  String get imageDataEmpty => 'Data gambar kosong';
-
-  @override
-  String get sendingImage => 'Mengirim gambar...';
-
-  @override
-  String sendImageFailed(Object error) {
-    return 'Gagal mengirim gambar: $error';
-  }
-
-  @override
-  String get sendLocation => 'Kirim Lokasi';
-
-  @override
-  String get selectLocationAndSend => 'Pilih lokasi dan kirim';
-
-  @override
-  String get shareRealTimeLocation => 'Bagikan Lokasi Real-time';
-
-  @override
-  String get shareLocationForOneHour =>
-      'Bagikan lokasi real-time dengan teman selama 1 jam';
-
-  @override
-  String get locationSent => 'Lokasi terkirim';
-
-  @override
-  String get selectMessages => 'Pilih pesan';
-
-  @override
-  String selectedCount(int count) {
-    return 'Dipilih $count';
-  }
-
-  @override
-  String get selectAll => 'Pilih Semua';
-
-  @override
-  String groupChatCount(int count) {
-    return 'Chat Grup ($count)';
-  }
-
-  @override
-  String get privateChat => 'Chat Pribadi';
-
-  @override
-  String get noMessages => 'Tidak ada pesan';
-
-  @override
-  String get sendFirstMessage => 'Kirim pesan pertama untuk mulai mengobrol';
-
-  @override
-  String get encryptionNotice =>
-      'Chat ini dienkripsi ujung ke ujung. Hanya Anda dan penerima yang dapat membaca pesan.';
-
-  @override
-  String replyTo(String name) {
-    return 'Balas ke $name';
-  }
-
-  @override
-  String get multiForward => 'Teruskan';
-
-  @override
-  String get collect => 'Koleksi';
-
-  @override
-  String get noMembers => 'Tidak ada anggota';
-
-  @override
-  String get memberNotFound => 'Anggota tidak ditemukan';
-
-  @override
-  String get voiceFileNotExist => 'Berkas suara tidak ada';
-
-  @override
-  String get voiceFileEmpty => 'Berkas suara kosong';
-
-  @override
-  String get sendingVoice => 'Mengirim suara...';
-
-  @override
-  String sendVoiceFailed(Object error) {
-    return 'Gagal mengirim suara: $error';
-  }
-
-  @override
-  String get messageCopied => 'Pesan disalin';
-
-  @override
-  String get messageForwarded => 'Pesan diteruskan';
-
-  @override
-  String forwardFailed(Object error) {
-    return 'Gagal meneruskan: $error';
-  }
-
-  @override
-  String get unfavorited => 'Batal favorit';
-
-  @override
-  String get favorited => 'Difavoritkan';
-
-  @override
-  String get reactionAdded => 'Reaksi ditambahkan';
-
-  @override
-  String get reactionRemoved => 'Reaksi dihapus';
-
-  @override
-  String get failedMessageDeleted => 'Pesan gagal dihapus';
-
-  @override
-  String get deleteMessages => 'Hapus pesan';
-
-  @override
-  String deleteMessagesConfirm(Object count) {
-    return 'Apakah Anda yakin ingin menghapus $count pesan?';
-  }
-
-  @override
-  String noteOtherMessages(Object count) {
-    return 'Catatan: $count pesan dari orang lain dan hanya akan dihapus untuk Anda.';
-  }
-
-  @override
-  String myMessagesWillBeRecalled(Object count) {
-    return '$count pesan dari Anda akan ditarik untuk semua.';
-  }
-
-  @override
-  String recalledCount(Object count, Object localCount) {
-    return 'Menarik $count pesan, $localCount dihapus hanya untuk Anda';
-  }
-
-  @override
-  String recalledMessages(Object count) {
-    return 'Menarik $count pesan';
-  }
-
-  @override
-  String deletedLocally(Object count) {
-    return '$count pesan dihapus hanya untuk Anda';
-  }
-
-  @override
-  String forwardedCount(Object count) {
-    return 'Meneruskan $count pesan';
-  }
-
-  @override
-  String forwardComplete(Object failed, Object success) {
-    return 'Penerusan selesai: $success berhasil, $failed gagal';
-  }
-
-  @override
-  String get remindOnlyInGroup => 'Fitur pengingat hanya tersedia di chat grup';
-
-  @override
-  String get onlyTextSearchable => 'Hanya pesan teks yang dapat dicari';
-
-  @override
-  String searchFor(Object text) {
-    return 'Cari \"$text\"';
-  }
-
-  @override
-  String get baiduSearch => 'Pencarian Baidu';
-
-  @override
-  String get googleSearch => 'Pencarian Google';
-
-  @override
-  String get bingSearch => 'Pencarian Bing';
-
-  @override
-  String get calling => 'Memanggil...';
-
-  @override
-  String get connecting => 'Menghubungkan...';
-
-  @override
-  String get ringing => 'Berdering...';
-
-  @override
-  String get inCall => 'Dalam panggilan';
-
-  @override
-  String featureInDevelopment(String feature) {
-    return 'Fitur sedang dikembangkan...';
-  }
-
-  @override
-  String collectMessages(Object count) {
-    return 'Mengoleksi $count pesan';
-  }
-
-  @override
-  String get voted => 'Memilih';
-
-  @override
-  String get voteChanged => 'Pilihan diubah';
-
-  @override
-  String get voteRemoved => 'Pilihan dihapus';
-
-  @override
-  String get endPoll => 'Akhiri Polling';
-
-  @override
-  String get endPollConfirm =>
-      'Apakah Anda yakin ingin mengakhiri polling ini? Tidak ada lagi suara yang dapat diberikan setelah diakhiri.';
-
-  @override
-  String memberCount(int count) {
-    return '$count anggota';
-  }
-
-  @override
-  String get videoChannels => 'Saluran';
-
-  @override
-  String get live => 'Siaran';
-
-  @override
-  String get listen => 'Dengarkan';
-
-  @override
-  String get watch => 'Tonton';
-
-  @override
-  String get searchDiscover => 'Cari';
-
-  @override
-  String get nearbyPeople => 'Sekitar';
-
-  @override
-  String get games => 'Permainan';
-
-  @override
-  String get miniPrograms => 'Mini Program';
-
-  @override
-  String done(int count) {
-    return 'Selesai($count)';
-  }
-
-  @override
-  String get services => 'Layanan';
-
-  @override
-  String get favorites => 'Favorit';
-
-  @override
-  String get ordersAndCards => 'Pesanan & Kartu';
-
-  @override
-  String get stickers => 'Stiker';
-
-  @override
-  String statusSetTo(String status) {
-    return 'Status diatur ke: $status';
-  }
-
-  @override
-  String get avatarUploadFailed => 'Gagal mengunggah avatar';
-
-  @override
-  String get personalProfile => 'Profil Pribadi';
-
-  @override
-  String get name => 'Nama';
-
-  @override
-  String get gender => 'Jenis Kelamin';
-
-  @override
-  String get region => 'Wilayah';
-
-  @override
-  String get myQrCode => 'Kode QR Saya';
-
-  @override
-  String get poke => 'Colek';
-
-  @override
-  String get ringtone => 'Nada Dering';
-
-  @override
-  String get defaultRingtone => 'Nada Dering Default';
-
-  @override
-  String get myAddresses => 'Alamat Saya';
-
-  @override
-  String genderSetTo(String gender) {
-    return 'Jenis kelamin diatur ke: $gender';
-  }
-
-  @override
-  String get selectRegion => 'Pilih Wilayah';
-
-  @override
-  String get selectCity => 'Pilih Kota';
-
-  @override
-  String regionSetTo(String region) {
-    return 'Wilayah diatur ke: $region';
-  }
-
-  @override
-  String get setPoke => 'Atur Colek';
-
-  @override
-  String get friendPokedMe => 'Teman mencolek saya';
-
-  @override
-  String get enterPokeSuffix => 'Masukkan akhiran colek, contoh: di bahu';
-
-  @override
-  String get example => 'Contoh';
-
-  @override
-  String get onTheShoulder => ' di bahu';
-
-  @override
-  String get pokeCleared => 'Colek dihapus';
-
-  @override
-  String pokeSetTo(String suffix) {
-    return 'Colek diatur ke: mencolek saya$suffix';
-  }
-
-  @override
-  String get editSignature => 'Edit Tanda Tangan';
-
-  @override
-  String get introduceYourself => 'Sebuah kalimat untuk memperkenalkan diri';
-
-  @override
-  String get signatureCleared => 'Tanda tangan dihapus';
-
-  @override
-  String get signatureUpdated => 'Tanda tangan diperbarui';
-
-  @override
-  String get scanToAddFriend =>
-      'Pindai kode QR di atas untuk menambahkan saya sebagai teman';
-
-  @override
-  String ringtoneSetTo(String ringtone) {
-    return 'Nada dering diatur ke: $ringtone';
-  }
-
-  @override
-  String confirmDissolveGroup(String name) {
-    return 'Apakah Anda yakin ingin membubarkan \"$name\"? Tindakan ini tidak dapat dibatalkan.';
-  }
-
-  @override
-  String get enterValidServerAddress =>
-      'Silakan masukkan alamat server yang valid';
-
-  @override
-  String get emailOtp => 'OTP Email';
-
-  @override
-  String get enterServerAddressFirst =>
-      'Silakan masukkan alamat server terlebih dahulu';
-
-  @override
-  String get passkeyRequiresServer =>
-      'Login passkey memerlukan dukungan server';
-
-  @override
-  String get loginAgreement => 'Dengan masuk, Anda menyetujui ';
-
-  @override
-  String get pleaseAgreeToTerms =>
-      'Silakan baca dan setujui Ketentuan Layanan dan Kebijakan Privasi';
-
-  @override
-  String get registerFailed => 'Pendaftaran gagal';
-
-  @override
-  String get reenterPassword => 'Masukkan ulang kata sandi';
-
-  @override
-  String get passwordsDoNotMatch => 'Kata sandi tidak cocok';
-
-  @override
-  String get inviteCodeBuiltIn => 'Kode Undangan (Bawaan)';
-
-  @override
-  String get inviteCodeBuiltInNote =>
-      'Kode undangan sudah bawaan, biasanya tidak perlu diubah';
-
-  @override
-  String get iHaveReadAndAgree => 'Saya telah membaca dan menyetujui ';
-
-  @override
-  String get startGroupChat => 'Mulai Chat Grup';
-
-  @override
-  String get addFriends => 'Tambah Teman';
-
-  @override
-  String get paymentAndCollection => 'Pembayaran';
-
-  @override
-  String messagesWithCount(int count) {
-    return 'Pesan($count)';
-  }
-
-  @override
-  String contactCount(int count) {
-    return '$count kontak';
-  }
-
-  @override
-  String get addToHomeScreen => 'Tambahkan ke layar utama';
-
-  @override
-  String recommendedCardTo(String contact, String recipient) {
-    return 'Merekomendasikan kartu $contact ke $recipient';
-  }
-
-  @override
-  String get enterRemarkName => 'Masukkan nama catatan';
-
-  @override
-  String remarkSetTo(String remark) {
-    return 'Catatan diatur ke: $remark';
-  }
-
-  @override
-  String acceptedFriendRequest(String name) {
-    return 'Menerima permintaan pertemanan $name';
-  }
-
-  @override
-  String rejectedFriendRequest(String name) {
-    return 'Menolak permintaan pertemanan $name';
-  }
-
-  @override
-  String get groupInvites => 'Undangan Grup';
-
-  @override
-  String myGroups(int count) {
-    return 'Grup Saya ($count)';
-  }
-
-  @override
-  String get invitedToJoinGroup => 'Diundang untuk bergabung ke grup';
-
-  @override
-  String confirmLeaveGroup(String name) {
-    return 'Apakah Anda yakin ingin keluar dari \"$name\"?';
-  }
-
-  @override
-  String get leave => 'Keluar';
-
-  @override
-  String get saveMedia => 'Simpan';
-
-  @override
-  String get recallThisMessage => 'Tarik pesan ini?';
-
-  @override
-  String get messageRecalled => 'Pesan ditarik';
-
-  @override
-  String get savedToGallery => 'Disimpan ke galeri';
-
-  @override
-  String get failedToSave => 'Gagal menyimpan';
-
-  @override
-  String get saving => 'Menyimpan...';
-
-  @override
-  String get share => 'Bagikan';
-
-  @override
-  String get saveToGallery => 'Simpan ke Galeri';
-
-  @override
-  String downloadFailed(String code) {
-    return 'Unduhan gagal: $code';
-  }
-
-  @override
-  String get noMediaUrl => 'Tidak ada URL media tersedia';
-
-  @override
-  String shareFailed(String error) {
-    return 'Gagal berbagi: $error';
-  }
-
-  @override
-  String get failedToLoadImage => 'Gagal memuat gambar';
-
-  @override
-  String get failedToLoadMoreMessages => 'Gagal memuat lebih banyak pesan';
-
-  @override
-  String get failedToSend => 'Gagal mengirim';
-
-  @override
-  String get failedToSendImage => 'Gagal mengirim gambar';
-
-  @override
-  String get failedToSendVoice => 'Gagal mengirim suara';
-
-  @override
-  String get failedToSendFile => 'Gagal mengirim berkas';
-
-  @override
-  String get failedToSendVideo => 'Gagal mengirim video';
-
-  @override
-  String get failedToSendLocation => 'Gagal mengirim lokasi';
-
-  @override
-  String get failedToResend => 'Gagal mengirim ulang';
-
-  @override
-  String get failedToRecall => 'Gagal menarik';
-
-  @override
-  String get failedToReply => 'Gagal membalas';
-
-  @override
-  String get failedToAddReaction => 'Gagal menambahkan reaksi';
-
-  @override
-  String get failedToSendPoll => 'Gagal mengirim polling';
-
-  @override
-  String get failedToVote => 'Gagal memilih';
-
-  @override
-  String get failedToLoadMessages => 'Gagal memuat pesan';
-
-  @override
-  String get callFeatureComingSoon =>
-      'Fitur panggilan suara dan video segera hadir';
-
-  @override
-  String get cannotForwardRedPacketOrTransfer =>
-      'Angpao dan transfer tidak dapat diteruskan';
-
-  @override
-  String get videoRecordingFailed =>
-      'Perekaman video gagal. Silakan coba lagi.';
-
-  @override
-  String get redPacket => 'Angpao';
-
-  @override
-  String get music => 'Musik';
-
-  @override
-  String get coupon => 'Kupon';
-
-  @override
-  String get gift => 'Hadiah';
-
-  @override
-  String get poll => 'Polling';
-
-  @override
-  String get text => 'Teks';
-
-  @override
-  String get link => 'Tautan';
-
-  @override
-  String get note => 'Catatan';
-
-  @override
-  String get myNotes => 'Catatan Saya';
-
-  @override
-  String get today => 'Hari ini';
-
-  @override
-  String daysAgoText(int count) {
-    return '$count hari lalu';
-  }
-
-  @override
-  String dateFormat(int month, int day) {
-    return '$day/$month';
-  }
-
-  @override
-  String get noFavorites => 'Belum ada favorit';
-
-  @override
-  String get longPressToFavorite => 'Tekan lama pesan untuk difavoritkan';
-
-  @override
-  String get newNote => 'Catatan Baru';
-
-  @override
-  String get favoriteLink => 'Favoritkan Tautan';
-
-  @override
-  String get editTags => 'Edit Tag';
-
-  @override
-  String get deleteFavorite => 'Hapus Favorit';
-
-  @override
-  String get deleteFavoriteConfirm =>
-      'Apakah Anda yakin ingin menghapus favorit ini?';
-
-  @override
-  String get noSearchResultsFound => 'Tidak ada hasil ditemukan';
-
-  @override
-  String get sendRedPacket => 'Kirim Angpao';
-
-  @override
-  String get amount => 'Jumlah';
-
-  @override
-  String get redPacketCover => 'Sampul Angpao';
-
-  @override
-  String get redPacketType => 'Jenis Angpao';
-
-  @override
-  String get normalRedPacket => 'Normal';
-
-  @override
-  String get luckyRedPacket => 'Hoki';
-
-  @override
-  String get redPacketCount => 'Jumlah Angpao';
-
-  @override
-  String get pieces => 'buah';
-
-  @override
-  String get putMoneyInRedPacket => 'Masukkan uang ke angpao';
-
-  @override
-  String get redPacketRefundNotice =>
-      'Angpao yang tidak diklaim akan dikembalikan setelah 24 jam';
-
-  @override
-  String get openRedPacket => 'Buka';
-
-  @override
-  String get redPacketAllClaimed => 'Angpao habis diklaim';
-
-  @override
-  String get redPacketExpired => 'Angpao kedaluwarsa';
-
-  @override
-  String get addTransferNote => 'Tambahkan catatan transfer';
-
-  @override
-  String get yuan => 'IDR';
-
-  @override
-  String get savedToChangeCanTransfer =>
-      'Disimpan ke saldo, dapat ditransfer langsung';
-
-  @override
-  String get replyWithEmoji => 'Balas dengan emoji ini';
-
-  @override
-  String get claimedYourRedPacket => 'mengklaim';
-
-  @override
-  String get claimedRedPacket => 'mengklaim';
-
-  @override
-  String get otherTyping => 'mengetik...';
-
-  @override
-  String get processing => 'Memproses...';
-
-  @override
-  String get transferCancelled => 'Transfer dibatalkan';
-
-  @override
-  String get transferFailed => 'Transfer gagal';
-
-  @override
-  String get creatingPaymentRequest => 'Membuat permintaan pembayaran...';
-
-  @override
-  String get processingPayment => 'Memproses pembayaran...';
-
-  @override
-  String get paymentFailed => 'Pembayaran gagal';
-
-  @override
-  String get clickRetry => 'Ketuk untuk mencoba lagi';
-
-  @override
-  String get settingsTitle => 'Pengaturan';
-
-  @override
-  String get editRemark => 'Edit Catatan';
-
-  @override
-  String get setPermissions => 'Atur Izin';
-
-  @override
-  String get recommendToFriends => 'Rekomendasikan ke Teman';
-
-  @override
-  String get setStarFriend => 'Atur sebagai Teman Bintang';
-
-  @override
-  String get addToBlacklist => 'Tambahkan ke Daftar Hitam';
-
-  @override
-  String get complain => 'Laporkan';
-
-  @override
-  String get deleteContact => 'Hapus Kontak';
-
-  @override
-  String deleteContactConfirm(String name) {
-    return 'Apakah Anda yakin ingin menghapus $name?';
-  }
-
-  @override
-  String get transferTitle => 'Transfer';
-
-  @override
-  String get receiverAddressLabel => 'Alamat Penerima';
-
-  @override
-  String get selectTokenLabel => 'Pilih Token';
-
-  @override
-  String get transferAmountLabel => 'Jumlah Transfer';
-
-  @override
-  String get memoLabel => 'Memo (opsional)';
-
-  @override
-  String get enterOrPasteAddressHint => 'Masukkan atau tempel alamat dompet';
-
-  @override
-  String get scanInDevelopment => 'Fitur pindai sedang dikembangkan...';
-
-  @override
-  String get availableLabel => 'Tersedia';
-
-  @override
-  String availableBalanceFormat(String balance, String symbol) {
-    return 'Tersedia: $balance $symbol';
-  }
-
-  @override
-  String get addMemoHint => 'Tambahkan memo';
-
-  @override
-  String get receiveTitle => 'Terima';
-
-  @override
-  String get walletNotConnectedTitle => 'Dompet tidak terhubung';
-
-  @override
-  String get connectWalletFirst => 'Silakan hubungkan dompet terlebih dahulu';
-
-  @override
-  String get sendPaymentRequest => 'Kirim Permintaan Pembayaran';
-
-  @override
-  String get qrCodeGenerateFailed => 'Gagal membuat kode QR';
-
-  @override
-  String get scanQrToPayMe => 'Pindai kode QR untuk membayar saya';
-
-  @override
-  String get myWalletAddress => 'Alamat Dompet Saya';
-
-  @override
-  String get createPaymentRequest => 'Buat Permintaan Pembayaran';
-
-  @override
-  String get selectTokenHint => 'Pilih Token';
-
-  @override
-  String get amountLabel => 'Jumlah';
-
-  @override
-  String get cancelButton => 'Batal';
-
-  @override
-  String get sendRequestButton => 'Kirim Permintaan';
-
-  @override
-  String get allReadReceipt => 'Semua dibaca';
-
-  @override
-  String readCountReceipt(int count) {
-    return '$count dibaca';
-  }
-
-  @override
-  String n42IdLabel(String id) {
-    return 'N42 ID: $id';
-  }
-
-  @override
-  String get redPacketDefaultGreeting => 'Semoga sukses selalu';
-
-  @override
-  String senderRedPacket(String name) {
-    return 'Angpao $name';
-  }
-
-  @override
-  String get allButton => 'Semua';
-
-  @override
-  String get enterValidAddress => 'Silakan masukkan alamat yang valid';
-
-  @override
-  String get pleaseSelectToken => 'Silakan pilih token';
-
-  @override
-  String get receivedTransfer => 'Transfer Diterima';
-
-  @override
-  String get selectForwardRecipient => 'Pilih penerima terusan';
-
-  @override
-  String get emojiFaces => 'Wajah';
-
-  @override
-  String get emojiHearts => 'Hati';
-
-  @override
-  String get emojiAnimals => 'Hewan';
-
-  @override
-  String get emojiFood => 'Makanan';
-
-  @override
-  String get emojiTransport => 'Transportasi';
-
-  @override
-  String get emojiActivities => 'Aktivitas';
-
-  @override
-  String get emojiObjects => 'Objek';
-
-  @override
-  String get emojiSymbols => 'Simbol';
-
-  @override
-  String get transferProcessing => 'Memproses transfer...';
-
-  @override
-  String senderSentRedPacket(String name) {
-    return '$name mengirim angpao';
-  }
-
-  @override
-  String get savedToBalance => 'Disimpan ke saldo, dapat ditransfer langsung';
-
-  @override
-  String get redPacketExpiredOrEmpty => 'Angpao kedaluwarsa/habis diklaim';
-
-  @override
-  String get scanFeatureComingSoon => 'Fitur pindai segera hadir...';
-
-  @override
-  String get setAsStarred => 'Atur sebagai Berbintang';
-
-  @override
-  String get addToBlocklist => 'Tambahkan ke Daftar Blokir';
-
-  @override
-  String get claimedYour => ' mengklaim ';
-
-  @override
-  String get claimedText => ' mengklaim ';
-
-  @override
-  String userTyping(String name) {
-    return '$name sedang mengetik...';
-  }
-
-  @override
-  String get typing => 'Mengetik...';
-
-  @override
-  String get waitingToReceive => 'Menunggu untuk diterima';
-
-  @override
-  String get tapToClaim => 'Ketuk untuk klaim';
-
-  @override
-  String get hasBeenReceived => 'Sudah diterima';
-
-  @override
-  String get getLucky => 'Semoga beruntung';
-
-  @override
-  String get cameraStartFailed => 'Kamera gagal dimulai';
-
-  @override
-  String get unknownError => 'Kesalahan tidak dikenal';
-
-  @override
-  String get placeQrCodeInFrame =>
-      'Letakkan kode QR dalam bingkai untuk memindai';
-
-  @override
-  String get closeManualInput => 'Tutup Input Manual';
-
-  @override
-  String get manualInputUserId => 'Input Manual ID Pengguna';
-
-  @override
-  String get add => 'Tambah';
-
-  @override
-  String get ringtoneClear => 'Hapus';
-
-  @override
-  String get ringtonePhone => 'Telepon';
-
-  @override
-  String get ringtoneClassic => 'Klasik';
-
-  @override
-  String get ringtoneSoft => 'Lembut';
-
-  @override
-  String get ringtoneVibrate => 'Getar';
-
-  @override
-  String get ringtoneSilent => 'Senyap';
-
-  @override
-  String get stop => 'Berhenti';
-
-  @override
-  String get selectRingtone => 'Pilih Nada Dering';
-
-  @override
-  String get loadingRingtones => 'Memuat nada dering...';
-
-  @override
-  String get noRingtonesFound => 'Tidak ada nada dering ditemukan';
-
-  @override
-  String get moodAndThoughts => 'Suasana Hati & Pikiran';
-
-  @override
-  String get statusHappy => 'Senang';
-
-  @override
-  String get statusCracked => 'Hancur';
-
-  @override
-  String get statusLucky => 'Beruntung';
-
-  @override
-  String get statusSunny => 'Cerah';
-
-  @override
-  String get statusTired => 'Lelah';
-
-  @override
-  String get statusDaydream => 'Melamun';
-
-  @override
-  String get statusRushing => 'Terburu-buru';
-
-  @override
-  String get statusOverthinking => 'Berpikir Berlebihan';
-
-  @override
-  String get statusEnergized => 'Berenergi';
-
-  @override
-  String get workAndStudy => 'Kerja & Belajar';
-
-  @override
-  String get statusWorking => 'Bekerja';
-
-  @override
-  String get statusStudying => 'Belajar';
-
-  @override
-  String get statusBusy => 'Sibuk';
-
-  @override
-  String get statusSlacking => 'Santai';
-
-  @override
-  String get statusTraveling => 'Bepergian';
-
-  @override
-  String get statusGoingHome => 'Pulang';
-
-  @override
-  String get statusDnd => 'Jangan Ganggu';
-
-  @override
-  String get statusHanging => 'Nongkrong';
-
-  @override
-  String get statusCheckIn => 'Check In';
-
-  @override
-  String get statusExercising => 'Berolahraga';
-
-  @override
-  String get statusCoffee => 'Kopi';
-
-  @override
-  String get statusBubbleTea => 'Boba';
-
-  @override
-  String get statusEating => 'Makan';
-
-  @override
-  String get statusParenting => 'Mengasuh';
-
-  @override
-  String get statusSavingWorld => 'Menyelamatkan Dunia';
-
-  @override
-  String get statusSelfie => 'Selfie';
-
-  @override
-  String get rest => 'Istirahat';
-
-  @override
-  String get statusRetreat => 'Istirahat';
-
-  @override
-  String get statusHome => 'Di Rumah';
-
-  @override
-  String get statusSleeping => 'Tidur';
-
-  @override
-  String get statusCatLover => 'Pecinta Kucing';
-
-  @override
-  String get statusDogWalking => 'Jalan-jalan dengan Anjing';
-
-  @override
-  String get statusGaming => 'Bermain Game';
-
-  @override
-  String get statusListening => 'Mendengarkan';
-
-  @override
-  String get setStatus => 'Atur Status';
-
-  @override
-  String get visibleToFriends24h => 'Terlihat oleh teman selama 24 jam';
-
-  @override
-  String get writeStatus => 'Tulis Status';
-
-  @override
-  String get enterYourStatus => 'Masukkan status Anda...';
-
-  @override
-  String get ok => 'OK';
-
-  @override
-  String get cameraPermissionRequired =>
-      'Izin kamera diperlukan untuk memindai kode QR';
-
-  @override
-  String get cameraPermissionDenied =>
-      'Izin kamera ditolak secara permanen. Silakan aktifkan di pengaturan sistem.';
-
-  @override
-  String get cannotGetCameraPermission => 'Tidak dapat mendapatkan izin kamera';
-
-  @override
-  String permissionCheckError(String error) {
-    return 'Kesalahan memeriksa izin: $error';
-  }
-
-  @override
-  String get invalidQrCode => 'Kode QR tidak valid';
-
-  @override
-  String qrCodeProcessFailed(String error) {
-    return 'Gagal memproses kode QR: $error';
-  }
-
-  @override
-  String cannotAddFriend(String error) {
-    return 'Tidak dapat menambah teman: $error';
-  }
-
-  @override
-  String get scanQrCode => 'Pindai Kode QR';
-
-  @override
-  String get checkingCameraPermission => 'Memeriksa izin kamera...';
-
-  @override
-  String get needCameraPermission => 'Izin Kamera Diperlukan';
-
-  @override
-  String get retryPermission => 'Coba Lagi';
-
-  @override
-  String get openSettings => 'Buka Pengaturan';
-
-  @override
-  String get inviteMembers => 'Undang Anggota';
-
-  @override
-  String inviteCount(int count) {
-    return 'Undang($count)';
-  }
-
-  @override
-  String get noShippingAddress => 'Tidak ada alamat pengiriman';
-
-  @override
-  String get defaultLabel => 'Default';
-
-  @override
-  String get editAddress => 'Edit Alamat';
-
-  @override
-  String get recipient => 'Penerima';
-
-  @override
-  String get enterRecipientName => 'Masukkan nama penerima';
-
-  @override
-  String get phoneNumber => 'Nomor Telepon';
-
-  @override
-  String get enterPhoneNumber => 'Masukkan nomor telepon';
-
-  @override
-  String get regionHint => 'Provinsi/Kota/Kabupaten';
-
-  @override
-  String get detailedAddress => 'Alamat Lengkap';
-
-  @override
-  String get detailedAddressHint => 'Jalan, nomor gedung, dll.';
-
-  @override
-  String get setAsDefaultAddress => 'Atur sebagai alamat default';
-
-  @override
-  String get pleaseCompleteInfo => 'Silakan lengkapi semua kolom';
-
-  @override
-  String get noInvoice => 'Tidak ada faktur';
-
-  @override
-  String get company => 'Perusahaan';
-
-  @override
-  String get taxNumber => 'Nomor Pajak';
-
-  @override
-  String get editInvoice => 'Edit Faktur';
-
-  @override
-  String get companyName => 'Nama Perusahaan';
-
-  @override
-  String get enterCompanyName => 'Masukkan nama perusahaan';
-
-  @override
-  String get personalName => 'Nama Pribadi';
-
-  @override
-  String get enterName => 'Masukkan nama';
-
-  @override
-  String get taxIdNumber => 'NPWP';
-
-  @override
-  String get enterTaxIdNumber => 'Masukkan NPWP';
-
-  @override
-  String get bankNameOptional => 'Nama Bank (Opsional)';
-
-  @override
-  String get enterBankName => 'Masukkan nama bank';
-
-  @override
-  String get bankAccountOptional => 'Rekening Bank (Opsional)';
-
-  @override
-  String get enterBankAccount => 'Masukkan rekening bank';
-
-  @override
-  String get companyAddressOptional => 'Alamat Perusahaan (Opsional)';
-
-  @override
-  String get enterCompanyAddress => 'Masukkan alamat perusahaan';
-
-  @override
-  String get companyPhoneOptional => 'Telepon Perusahaan (Opsional)';
-
-  @override
-  String get enterCompanyPhone => 'Masukkan telepon perusahaan';
-
-  @override
-  String get setAsDefaultInvoice => 'Atur sebagai faktur default';
-
-  @override
-  String get confirmDeleteAddress =>
-      'Apakah Anda yakin ingin menghapus alamat ini?';
-
-  @override
-  String get confirmDeleteInvoice =>
-      'Apakah Anda yakin ingin menghapus faktur ini?';
+  String get groupViewAll => 'Lihat semua';
 
   @override
   String get groupOwner => 'Pemilik';
@@ -3045,941 +680,2649 @@ class SId extends S {
   String get groupAdmin => 'Admin';
 
   @override
-  String get searchMembers => 'Cari anggota';
+  String get groupInvite => 'Undang';
 
   @override
-  String totalMembers(int count) {
+  String get commonGroupAnnouncement => 'Pengumuman Grup';
+
+  @override
+  String get commonNotSet => 'Belum diatur';
+
+  @override
+  String get groupDescription => 'Deskripsi Grup';
+
+  @override
+  String get groupPublicGroup => 'Grup Publik';
+
+  @override
+  String get commonClearChatHistory => 'Hapus Riwayat Chat';
+
+  @override
+  String get commonDissolveGroup => 'Bubarkan Grup';
+
+  @override
+  String get commonLeaveGroup => 'Keluar Grup';
+
+  @override
+  String get groupChangeGroupName => 'Ubah Nama Grup';
+
+  @override
+  String get commonEnterGroupName => 'Masukkan nama grup';
+
+  @override
+  String get commonConfirm => 'Konfirmasi';
+
+  @override
+  String get groupEnterGroupDescription => 'Masukkan deskripsi grup';
+
+  @override
+  String get groupPublish => 'Publikasikan';
+
+  @override
+  String get chatClearHistoryConfirm =>
+      'Hapus semua riwayat chat? Ini tidak dapat dibatalkan.';
+
+  @override
+  String get chatClearAction => 'Hapus';
+
+  @override
+  String get commonChatHistoryCleared => 'Riwayat chat dihapus';
+
+  @override
+  String get commonDissolve => 'Bubarkan';
+
+  @override
+  String get groupQrCode => 'Kode QR Grup';
+
+  @override
+  String get commonSearchChatHistory => 'Cari Riwayat Chat';
+
+  @override
+  String get groupIdCopied => 'ID Grup disalin';
+
+  @override
+  String get transferEnterOrPasteAddress =>
+      'Masukkan atau tempel alamat dompet';
+
+  @override
+  String get transferSelectToken => 'Pilih Token';
+
+  @override
+  String get commonTransferAmount => 'Jumlah Transfer';
+
+  @override
+  String get transferAvailable => 'Tersedia';
+
+  @override
+  String get transferMemoOptional => 'Memo (opsional)';
+
+  @override
+  String get transferConfirmTransfer => 'Konfirmasi Transfer';
+
+  @override
+  String get transferAddressVerified => 'Alamat terverifikasi';
+
+  @override
+  String transferAvailableBalance(String balance, String symbol) {
+    return 'Tersedia: $balance $symbol';
+  }
+
+  @override
+  String get commonEnterAmount => 'Masukkan jumlah';
+
+  @override
+  String get commonRedPacketCountMin => 'Minimal 1 angpao diperlukan';
+
+  @override
+  String get commonViewRedPacketDetails => 'Lihat detail angpao';
+
+  @override
+  String get commonEnterTransferAmount => 'Masukkan jumlah transfer';
+
+  @override
+  String get commonTransferTo => 'Transfer ke';
+
+  @override
+  String commonFromSender(String name, Object senderName) {
+    return 'Dari $senderName';
+  }
+
+  @override
+  String get commonConfirmReceive => 'Konfirmasi Penerimaan';
+
+  @override
+  String get groupProfile => 'Info Grup';
+
+  @override
+  String get groupRemoveMember => 'Keluarkan dari Grup';
+
+  @override
+  String get commonRemove => 'Keluarkan';
+
+  @override
+  String get profileClearStatus => 'Hapus Status';
+
+  @override
+  String get profileClearStatusConfirm => 'Hapus status saat ini?';
+
+  @override
+  String get profileStatusCleared => 'Status dihapus';
+
+  @override
+  String get profileUserNotExist => 'Pengguna tidak ada';
+
+  @override
+  String get profileUserIdCopied => 'ID Pengguna disalin';
+
+  @override
+  String get commonReport => 'Laporkan';
+
+  @override
+  String get profileQrCode => 'Kode QR';
+
+  @override
+  String get profileAvatarUpdated => 'Avatar diperbarui';
+
+  @override
+  String commonSelectImageFailed(String error) {
+    return 'Gagal memilih gambar: $error';
+  }
+
+  @override
+  String get profileChangeName => 'Ubah Nama';
+
+  @override
+  String get profileMale => 'Pria';
+
+  @override
+  String get profileFemale => 'Wanita';
+
+  @override
+  String chatFeatureInDev(String feature) {
+    return '$feature sedang dikembangkan...';
+  }
+
+  @override
+  String profileSaveAddressFailed(String error) {
+    return 'Gagal menyimpan alamat: $error';
+  }
+
+  @override
+  String get profileAddNew => 'Tambah';
+
+  @override
+  String get profileAddAddress => 'Tambah Alamat';
+
+  @override
+  String get profileAddressAdded => 'Alamat ditambahkan';
+
+  @override
+  String get profileAddressUpdated => 'Alamat diperbarui';
+
+  @override
+  String get profileDeleteAddress => 'Hapus Alamat';
+
+  @override
+  String get profileAddressDeleted => 'Alamat dihapus';
+
+  @override
+  String profileSaveInvoiceFailed(String error) {
+    return 'Gagal menyimpan faktur: $error';
+  }
+
+  @override
+  String get profileMyInvoices => 'Faktur Saya';
+
+  @override
+  String get profileAddInvoice => 'Tambah Faktur';
+
+  @override
+  String get profileInvoiceAdded => 'Faktur ditambahkan';
+
+  @override
+  String get profileInvoiceUpdated => 'Faktur diperbarui';
+
+  @override
+  String get profileDeleteInvoice => 'Hapus Faktur';
+
+  @override
+  String get profileInvoiceDeleted => 'Faktur dihapus';
+
+  @override
+  String get profilePersonal => 'Pribadi';
+
+  @override
+  String get groupSelectAtLeastOne => 'Silakan pilih minimal satu anggota';
+
+  @override
+  String get chatFileNotExist => 'Berkas tidak ada';
+
+  @override
+  String chatSendFailed(String error) {
+    return 'Gagal mengirim: $error';
+  }
+
+  @override
+  String get chatCannotOpenBrowser => 'Tidak dapat membuka browser';
+
+  @override
+  String chatSelectFileFailed(String error) {
+    return 'Gagal memilih berkas: $error';
+  }
+
+  @override
+  String settingsSetupFailed(String error) {
+    return 'Pengaturan gagal: $error';
+  }
+
+  @override
+  String get transferEnterValidAmount => 'Silakan masukkan jumlah yang valid';
+
+  @override
+  String get commonAddressCopied => 'Alamat disalin';
+
+  @override
+  String favoriteOpenItem(String content) {
+    return 'Buka: $content';
+  }
+
+  @override
+  String get favoriteDeleted => 'Dihapus';
+
+  @override
+  String get profileWallet => 'Dompet';
+
+  @override
+  String get chatRecording => 'Merekam';
+
+  @override
+  String get chatInvalidVideoUrl => 'URL video tidak valid';
+
+  @override
+  String get chatDownloadFile => 'Unduh berkas';
+
+  @override
+  String get chatClearChatHistoryTitle => 'Hapus Riwayat Chat';
+
+  @override
+  String get chatVideoCall => 'Panggilan Video';
+
+  @override
+  String get commonVoiceCall => 'Panggilan Suara';
+
+  @override
+  String get callLeaveMeeting => 'Tinggalkan Meeting';
+
+  @override
+  String get chatDetails => 'Detail Chat';
+
+  @override
+  String get chatViewAllGroupMembers => 'Lihat semua anggota';
+
+  @override
+  String get chatGroupName => 'Nama Grup';
+
+  @override
+  String get chatGroupNameUpdated => 'Nama grup diperbarui';
+
+  @override
+  String get chatUpdateFailed => 'Pembaruan gagal';
+
+  @override
+  String get chatNoPermissionToModify =>
+      'Anda tidak memiliki izin untuk mengubah';
+
+  @override
+  String get chatGroupManagement => 'Manajemen Grup';
+
+  @override
+  String get chatMyNicknameInGroup => 'Nama Panggilan Saya di Grup';
+
+  @override
+  String get chatPinChat => 'Pin Chat';
+
+  @override
+  String get chatStrongReminder => 'Pengingat Kuat';
+
+  @override
+  String get chatSetChatBackground => 'Atur Latar Belakang Chat';
+
+  @override
+  String get chatUnknownFile => 'Berkas tidak dikenal';
+
+  @override
+  String get chatDownload => 'Unduh';
+
+  @override
+  String get chatInvalidLocation => 'Lokasi tidak valid';
+
+  @override
+  String get chatTapToCancel => 'Ketuk untuk membatalkan';
+
+  @override
+  String chatCaptureFailed(Object error) {
+    return 'Gagal mengambil gambar: $error';
+  }
+
+  @override
+  String get chatProcessingVideo => 'Memproses video...';
+
+  @override
+  String get chatVideoFileNotExist => 'Berkas video tidak ada';
+
+  @override
+  String get chatVideoDataEmpty => 'Data video kosong';
+
+  @override
+  String get chatVideoTooLarge => 'Ukuran video tidak boleh melebihi 100MB';
+
+  @override
+  String get chatSendingVideo => 'Mengirim video...';
+
+  @override
+  String chatSendVideoFailed(Object error) {
+    return 'Gagal mengirim video: $error';
+  }
+
+  @override
+  String get chatImageFileNotExist => 'Berkas gambar tidak ada';
+
+  @override
+  String get commonImageDataEmpty => 'Data gambar kosong';
+
+  @override
+  String get chatSendingImage => 'Mengirim gambar...';
+
+  @override
+  String chatSendImageFailed(Object error) {
+    return 'Gagal mengirim gambar: $error';
+  }
+
+  @override
+  String get chatSendLocation => 'Kirim Lokasi';
+
+  @override
+  String get chatSelectLocationAndSend => 'Pilih lokasi dan kirim';
+
+  @override
+  String get chatShareRealTimeLocation => 'Bagikan Lokasi Real-time';
+
+  @override
+  String get chatShareLocationForOneHour =>
+      'Bagikan lokasi real-time dengan teman selama 1 jam';
+
+  @override
+  String get chatLocationSent => 'Lokasi terkirim';
+
+  @override
+  String get chatSelectMessages => 'Pilih pesan';
+
+  @override
+  String chatSelectedCount(int count) {
+    return 'Dipilih $count';
+  }
+
+  @override
+  String get chatSelectAll => 'Pilih Semua';
+
+  @override
+  String chatGroupChatCount(int count) {
+    return 'Chat Grup ($count)';
+  }
+
+  @override
+  String get chatPrivateChat => 'Chat Pribadi';
+
+  @override
+  String get chatNoMessages => 'Tidak ada pesan';
+
+  @override
+  String get chatSendFirstMessage =>
+      'Kirim pesan pertama untuk mulai mengobrol';
+
+  @override
+  String get chatEncryptionNotice =>
+      'Chat ini dienkripsi ujung ke ujung. Hanya Anda dan penerima yang dapat membaca pesan.';
+
+  @override
+  String get chatMultiForward => 'Teruskan';
+
+  @override
+  String get chatCollect => 'Koleksi';
+
+  @override
+  String get chatNoMembers => 'Tidak ada anggota';
+
+  @override
+  String get chatMemberNotFound => 'Anggota tidak ditemukan';
+
+  @override
+  String get chatVoiceFileNotExist => 'Berkas suara tidak ada';
+
+  @override
+  String get chatVoiceFileEmpty => 'Berkas suara kosong';
+
+  @override
+  String get chatSendingVoice => 'Mengirim suara...';
+
+  @override
+  String chatSendVoiceFailed(Object error) {
+    return 'Gagal mengirim suara: $error';
+  }
+
+  @override
+  String get chatMessageForwarded => 'Pesan diteruskan';
+
+  @override
+  String chatForwardFailed(Object error) {
+    return 'Gagal meneruskan: $error';
+  }
+
+  @override
+  String get chatUnfavorited => 'Batal favorit';
+
+  @override
+  String get chatFavorited => 'Difavoritkan';
+
+  @override
+  String get chatReactionAdded => 'Reaksi ditambahkan';
+
+  @override
+  String get chatReactionRemoved => 'Reaksi dihapus';
+
+  @override
+  String get chatFailedMessageDeleted => 'Pesan gagal dihapus';
+
+  @override
+  String get chatDeleteMessages => 'Hapus pesan';
+
+  @override
+  String chatDeleteMessagesConfirm(Object count) {
+    return 'Apakah Anda yakin ingin menghapus $count pesan?';
+  }
+
+  @override
+  String chatNoteOtherMessages(Object count) {
+    return 'Catatan: $count pesan dari orang lain dan hanya akan dihapus untuk Anda.';
+  }
+
+  @override
+  String chatMyMessagesWillBeRecalled(Object count) {
+    return '$count pesan dari Anda akan ditarik untuk semua.';
+  }
+
+  @override
+  String chatRecalledCount(Object count, Object localCount) {
+    return 'Menarik $count pesan, $localCount dihapus hanya untuk Anda';
+  }
+
+  @override
+  String chatRecalledMessages(Object count) {
+    return 'Menarik $count pesan';
+  }
+
+  @override
+  String chatDeletedLocally(Object count) {
+    return '$count pesan dihapus hanya untuk Anda';
+  }
+
+  @override
+  String chatForwardedCount(Object count) {
+    return 'Meneruskan $count pesan';
+  }
+
+  @override
+  String chatForwardComplete(Object failed, Object success) {
+    return 'Penerusan selesai: $success berhasil, $failed gagal';
+  }
+
+  @override
+  String get chatRemindOnlyInGroup =>
+      'Fitur pengingat hanya tersedia di chat grup';
+
+  @override
+  String get chatOnlyTextSearchable => 'Hanya pesan teks yang dapat dicari';
+
+  @override
+  String chatSearchFor(Object text) {
+    return 'Cari \"$text\"';
+  }
+
+  @override
+  String get chatBaiduSearch => 'Pencarian Baidu';
+
+  @override
+  String get chatGoogleSearch => 'Pencarian Google';
+
+  @override
+  String get chatBingSearch => 'Pencarian Bing';
+
+  @override
+  String get chatCalling => 'Memanggil...';
+
+  @override
+  String get chatRinging => 'Berdering...';
+
+  @override
+  String get chatInCall => 'Dalam panggilan';
+
+  @override
+  String commonFeatureInDevelopment(String feature) {
+    return 'Fitur sedang dikembangkan...';
+  }
+
+  @override
+  String chatCollectMessages(Object count) {
+    return 'Mengoleksi $count pesan';
+  }
+
+  @override
+  String commonMemberCount(int count) {
     return '$count anggota';
   }
 
   @override
-  String get removeFromGroup => 'Keluarkan dari Grup';
+  String groupDone(int count) {
+    return 'Selesai($count)';
+  }
 
   @override
-  String confirmRemoveMember(String name) {
+  String get profileServices => 'Layanan';
+
+  @override
+  String get commonFavorites => 'Favorit';
+
+  @override
+  String get profileOrdersAndCards => 'Pesanan & Kartu';
+
+  @override
+  String get profileStickers => 'Stiker';
+
+  @override
+  String profileStatusSetTo(String status) {
+    return 'Status diatur ke: $status';
+  }
+
+  @override
+  String get profileAvatarUploadFailed => 'Gagal mengunggah avatar';
+
+  @override
+  String get profilePersonalProfile => 'Profil Pribadi';
+
+  @override
+  String get profileName => 'Nama';
+
+  @override
+  String get profileGender => 'Jenis Kelamin';
+
+  @override
+  String get profileRegion => 'Wilayah';
+
+  @override
+  String get commonMyQrCode => 'Kode QR Saya';
+
+  @override
+  String get profilePoke => 'Colek';
+
+  @override
+  String get profileRingtone => 'Nada Dering';
+
+  @override
+  String get profileDefaultRingtone => 'Nada Dering Default';
+
+  @override
+  String get profileMyAddresses => 'Alamat Saya';
+
+  @override
+  String profileGenderSetTo(String gender) {
+    return 'Jenis kelamin diatur ke: $gender';
+  }
+
+  @override
+  String get profileSelectRegion => 'Pilih Wilayah';
+
+  @override
+  String get profileSelectCity => 'Pilih Kota';
+
+  @override
+  String profileRegionSetTo(String region) {
+    return 'Wilayah diatur ke: $region';
+  }
+
+  @override
+  String get profileSetPoke => 'Atur Colek';
+
+  @override
+  String get profileFriendPokedMe => 'Teman mencolek saya';
+
+  @override
+  String get profileExample => 'Contoh';
+
+  @override
+  String get profileOnTheShoulder => ' di bahu';
+
+  @override
+  String get profilePokeCleared => 'Colek dihapus';
+
+  @override
+  String profilePokeSetTo(String suffix) {
+    return 'Colek diatur ke: mencolek saya$suffix';
+  }
+
+  @override
+  String get profileEditSignature => 'Edit Tanda Tangan';
+
+  @override
+  String get profileIntroduceYourself =>
+      'Sebuah kalimat untuk memperkenalkan diri';
+
+  @override
+  String get profileSignatureCleared => 'Tanda tangan dihapus';
+
+  @override
+  String get profileSignatureUpdated => 'Tanda tangan diperbarui';
+
+  @override
+  String get profileScanToAddFriend =>
+      'Pindai kode QR di atas untuk menambahkan saya sebagai teman';
+
+  @override
+  String profileRingtoneSetTo(String ringtone) {
+    return 'Nada dering diatur ke: $ringtone';
+  }
+
+  @override
+  String commonConfirmDissolveGroup(String name) {
+    return 'Apakah Anda yakin ingin membubarkan \"$name\"? Tindakan ini tidak dapat dibatalkan.';
+  }
+
+  @override
+  String get authEnterValidServerAddress =>
+      'Silakan masukkan alamat server yang valid';
+
+  @override
+  String get authEmailOtp => 'OTP Email';
+
+  @override
+  String get authEnterServerAddressFirst =>
+      'Silakan masukkan alamat server terlebih dahulu';
+
+  @override
+  String get authPasskeyRequiresServer =>
+      'Login passkey memerlukan dukungan server';
+
+  @override
+  String get authLoginAgreement => 'Dengan masuk, Anda menyetujui ';
+
+  @override
+  String get authPleaseAgreeToTerms =>
+      'Silakan baca dan setujui Ketentuan Layanan dan Kebijakan Privasi';
+
+  @override
+  String get authRegisterFailed => 'Pendaftaran gagal';
+
+  @override
+  String get commonReenterPassword => 'Masukkan ulang kata sandi';
+
+  @override
+  String get commonPasswordsDoNotMatch => 'Kata sandi tidak cocok';
+
+  @override
+  String get authInviteCodeBuiltIn => 'Kode Undangan (Bawaan)';
+
+  @override
+  String get authInviteCodeBuiltInNote =>
+      'Kode undangan sudah bawaan, biasanya tidak perlu diubah';
+
+  @override
+  String get authIHaveReadAndAgree => 'Saya telah membaca dan menyetujui ';
+
+  @override
+  String get mainStartGroupChat => 'Mulai Chat Grup';
+
+  @override
+  String get mainAddFriends => 'Tambah Teman';
+
+  @override
+  String get mainPaymentAndCollection => 'Pembayaran';
+
+  @override
+  String contactCount(int count) {
+    return '$count kontak';
+  }
+
+  @override
+  String get contactAddToHomeScreen => 'Tambahkan ke layar utama';
+
+  @override
+  String contactRecommendedCardTo(String contact, String recipient) {
+    return 'Merekomendasikan kartu $contact ke $recipient';
+  }
+
+  @override
+  String get contactEnterRemarkName => 'Masukkan nama catatan';
+
+  @override
+  String contactRemarkSetTo(String remark) {
+    return 'Catatan diatur ke: $remark';
+  }
+
+  @override
+  String contactAcceptedFriendRequest(String name) {
+    return 'Menerima permintaan pertemanan $name';
+  }
+
+  @override
+  String contactRejectedFriendRequest(String name) {
+    return 'Menolak permintaan pertemanan $name';
+  }
+
+  @override
+  String get commonGroupInvites => 'Undangan Grup';
+
+  @override
+  String commonMyGroups(int count) {
+    return 'Grup Saya ($count)';
+  }
+
+  @override
+  String get commonInvitedToJoinGroup => 'Diundang untuk bergabung ke grup';
+
+  @override
+  String commonConfirmLeaveGroup(String name) {
+    return 'Apakah Anda yakin ingin keluar dari \"$name\"?';
+  }
+
+  @override
+  String get commonLeave => 'Keluar';
+
+  @override
+  String get commonRecallThisMessage => 'Tarik pesan ini?';
+
+  @override
+  String get commonSavedToGallery => 'Disimpan ke galeri';
+
+  @override
+  String get commonFailedToSave => 'Gagal menyimpan';
+
+  @override
+  String get chatSaving => 'Menyimpan...';
+
+  @override
+  String get commonShare => 'Bagikan';
+
+  @override
+  String get chatSaveToGallery => 'Simpan ke Galeri';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Unduhan gagal: $code';
+  }
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Gagal berbagi: $error';
+  }
+
+  @override
+  String get chatFailedToLoadImage => 'Gagal memuat gambar';
+
+  @override
+  String get chatVideoRecordingFailed =>
+      'Perekaman video gagal. Silakan coba lagi.';
+
+  @override
+  String get profileRedPacket => 'Angpao';
+
+  @override
+  String get commonMusic => 'Musik';
+
+  @override
+  String get commonCoupon => 'Kupon';
+
+  @override
+  String get commonGift => 'Hadiah';
+
+  @override
+  String get commonPoll => 'Polling';
+
+  @override
+  String get favoriteText => 'Teks';
+
+  @override
+  String get favoriteLinkLabel => 'Tautan';
+
+  @override
+  String get favoriteNote => 'Catatan';
+
+  @override
+  String get favoriteMyNotes => 'Catatan Saya';
+
+  @override
+  String get favoriteToday => 'Hari ini';
+
+  @override
+  String favoriteDaysAgoText(int count) {
+    return '$count hari lalu';
+  }
+
+  @override
+  String favoriteDateFormat(int month, int day) {
+    return '$day/$month';
+  }
+
+  @override
+  String get favoriteNoFavorites => 'Belum ada favorit';
+
+  @override
+  String get favoriteLongPressToFavorite =>
+      'Tekan lama pesan untuk difavoritkan';
+
+  @override
+  String get favoriteNewNote => 'Catatan Baru';
+
+  @override
+  String get favoriteLink => 'Favoritkan Tautan';
+
+  @override
+  String get favoriteEditTags => 'Edit Tag';
+
+  @override
+  String get favoriteDeleteFavorite => 'Hapus Favorit';
+
+  @override
+  String get favoriteDeleteFavoriteConfirm =>
+      'Apakah Anda yakin ingin menghapus favorit ini?';
+
+  @override
+  String get favoriteNoSearchResultsFound => 'Tidak ada hasil ditemukan';
+
+  @override
+  String get commonSendRedPacket => 'Kirim Angpao';
+
+  @override
+  String get transferAmount => 'Jumlah';
+
+  @override
+  String get commonRedPacketCover => 'Sampul Angpao';
+
+  @override
+  String get commonRedPacketType => 'Jenis Angpao';
+
+  @override
+  String get commonNormalRedPacket => 'Normal';
+
+  @override
+  String get commonLuckyRedPacket => 'Hoki';
+
+  @override
+  String get commonRedPacketCount => 'Jumlah Angpao';
+
+  @override
+  String get commonPieces => 'buah';
+
+  @override
+  String get commonPutMoneyInRedPacket => 'Masukkan uang ke angpao';
+
+  @override
+  String get commonRedPacketRefundNotice =>
+      'Angpao yang tidak diklaim akan dikembalikan setelah 24 jam';
+
+  @override
+  String get commonOpenRedPacket => 'Buka';
+
+  @override
+  String get commonRedPacketAllClaimed => 'Angpao habis diklaim';
+
+  @override
+  String get commonRedPacketExpired => 'Angpao kedaluwarsa';
+
+  @override
+  String get commonAddTransferNote => 'Tambahkan catatan transfer';
+
+  @override
+  String get commonYuan => 'IDR';
+
+  @override
+  String get commonReplyWithEmoji => 'Balas dengan emoji ini';
+
+  @override
+  String get contactEditRemark => 'Edit Catatan';
+
+  @override
+  String get contactSetPermissions => 'Atur Izin';
+
+  @override
+  String get profileAddToBlacklist => 'Tambahkan ke Daftar Hitam';
+
+  @override
+  String get contactDeleteContact => 'Hapus Kontak';
+
+  @override
+  String contactDeleteContactConfirm(String name) {
+    return 'Apakah Anda yakin ingin menghapus $name?';
+  }
+
+  @override
+  String get transferTitle => 'Transfer';
+
+  @override
+  String get transferReceiverAddressLabel => 'Alamat Penerima';
+
+  @override
+  String get transferSelectTokenLabel => 'Pilih Token';
+
+  @override
+  String get transferAmountLabel => 'Jumlah Transfer';
+
+  @override
+  String get transferMemoLabel => 'Memo (opsional)';
+
+  @override
+  String get transferAddMemoHint => 'Tambahkan memo';
+
+  @override
+  String get transferSendPaymentRequest => 'Kirim Permintaan Pembayaran';
+
+  @override
+  String get transferQrCodeGenerateFailed => 'Gagal membuat kode QR';
+
+  @override
+  String get transferScanQrToPayMe => 'Pindai kode QR untuk membayar saya';
+
+  @override
+  String get transferMyWalletAddress => 'Alamat Dompet Saya';
+
+  @override
+  String get transferCreatePaymentRequest => 'Buat Permintaan Pembayaran';
+
+  @override
+  String profileN42IdLabel(String id) {
+    return 'N42 ID: $id';
+  }
+
+  @override
+  String get commonRedPacketDefaultGreeting => 'Semoga sukses selalu';
+
+  @override
+  String commonSenderRedPacket(String name) {
+    return 'Angpao $name';
+  }
+
+  @override
+  String get transferEnterValidAddress => 'Silakan masukkan alamat yang valid';
+
+  @override
+  String get transferPleaseSelectToken => 'Silakan pilih token';
+
+  @override
+  String get commonReceivedTransfer => 'Transfer Diterima';
+
+  @override
+  String commonSenderSentRedPacket(String name) {
+    return '$name mengirim angpao';
+  }
+
+  @override
+  String get commonSavedToBalance =>
+      'Disimpan ke saldo, dapat ditransfer langsung';
+
+  @override
+  String get commonRedPacketExpiredOrEmpty =>
+      'Angpao kedaluwarsa/habis diklaim';
+
+  @override
+  String get transferScanFeatureComingSoon => 'Fitur pindai segera hadir...';
+
+  @override
+  String get contactSetAsStarred => 'Atur sebagai Berbintang';
+
+  @override
+  String get contactAddToBlocklist => 'Tambahkan ke Daftar Blokir';
+
+  @override
+  String get commonClaimedYour => ' mengklaim ';
+
+  @override
+  String get commonClaimedText => ' mengklaim ';
+
+  @override
+  String commonUserTyping(String name) {
+    return '$name sedang mengetik...';
+  }
+
+  @override
+  String get commonTyping => 'Mengetik...';
+
+  @override
+  String get commonWaitingToReceive => 'Menunggu untuk diterima';
+
+  @override
+  String get commonTapToClaim => 'Ketuk untuk klaim';
+
+  @override
+  String get commonHasBeenReceived => 'Sudah diterima';
+
+  @override
+  String get commonGetLucky => 'Semoga beruntung';
+
+  @override
+  String get qrcodeCameraStartFailed => 'Kamera gagal dimulai';
+
+  @override
+  String get qrcodeUnknownError => 'Kesalahan tidak dikenal';
+
+  @override
+  String get qrcodePlaceQrCodeInFrame =>
+      'Letakkan kode QR dalam bingkai untuk memindai';
+
+  @override
+  String get qrcodeCloseManualInput => 'Tutup Input Manual';
+
+  @override
+  String get qrcodeManualInputUserId => 'Input Manual ID Pengguna';
+
+  @override
+  String get commonAdd => 'Tambah';
+
+  @override
+  String get profileSetStatus => 'Atur Status';
+
+  @override
+  String get profileVisibleToFriends24h => 'Terlihat oleh teman selama 24 jam';
+
+  @override
+  String get profileWriteStatus => 'Tulis Status';
+
+  @override
+  String get profileEnterYourStatus => 'Masukkan status Anda...';
+
+  @override
+  String get profileOk => 'OK';
+
+  @override
+  String get qrcodeCameraPermissionRequired =>
+      'Izin kamera diperlukan untuk memindai kode QR';
+
+  @override
+  String get qrcodeCameraPermissionDenied =>
+      'Izin kamera ditolak secara permanen. Silakan aktifkan di pengaturan sistem.';
+
+  @override
+  String qrcodePermissionCheckError(String error) {
+    return 'Kesalahan memeriksa izin: $error';
+  }
+
+  @override
+  String get qrcodeInvalidQrCode => 'Kode QR tidak valid';
+
+  @override
+  String qrcodeCannotAddFriend(String error) {
+    return 'Tidak dapat menambah teman: $error';
+  }
+
+  @override
+  String get qrcodeScanQrCode => 'Pindai Kode QR';
+
+  @override
+  String get qrcodeCheckingCameraPermission => 'Memeriksa izin kamera...';
+
+  @override
+  String get qrcodeNeedCameraPermission => 'Izin Kamera Diperlukan';
+
+  @override
+  String get qrcodeRetryPermission => 'Coba Lagi';
+
+  @override
+  String get qrcodeOpenSettings => 'Buka Pengaturan';
+
+  @override
+  String get groupInviteMembers => 'Undang Anggota';
+
+  @override
+  String groupInviteCount(int count) {
+    return 'Undang($count)';
+  }
+
+  @override
+  String get profileNoShippingAddress => 'Tidak ada alamat pengiriman';
+
+  @override
+  String get profileDefaultLabel => 'Default';
+
+  @override
+  String get profileNoInvoice => 'Tidak ada faktur';
+
+  @override
+  String get profileCompany => 'Perusahaan';
+
+  @override
+  String get profileTaxNumber => 'Nomor Pajak';
+
+  @override
+  String get profileConfirmDeleteAddress =>
+      'Apakah Anda yakin ingin menghapus alamat ini?';
+
+  @override
+  String get profileConfirmDeleteInvoice =>
+      'Apakah Anda yakin ingin menghapus faktur ini?';
+
+  @override
+  String get commonGroupOwner => 'Pemilik';
+
+  @override
+  String get commonGroupAdmin => 'Admin';
+
+  @override
+  String get groupSearchMembers => 'Cari anggota';
+
+  @override
+  String groupTotalMembers(int count) {
+    return '$count anggota';
+  }
+
+  @override
+  String get chatRemoveFromGroup => 'Keluarkan dari Grup';
+
+  @override
+  String groupConfirmRemoveMember(String name) {
     return 'Apakah Anda yakin ingin mengeluarkan \"$name\" dari grup?';
   }
 
   @override
-  String get setAsAdmin => 'Atur sebagai Admin';
+  String get chatUnknownSong => 'Lagu Tidak Dikenal';
 
   @override
-  String get removeAdmin => 'Hapus Admin';
+  String get chatUnknownArtist => 'Artis Tidak Dikenal';
 
   @override
-  String get deleteContactSuccess => 'Kontak dihapus';
+  String get chatUnknownContact => 'Kontak Tidak Dikenal';
 
   @override
-  String get unknownSong => 'Lagu Tidak Dikenal';
+  String get chatPersonalCard => 'Kartu Kontak';
 
   @override
-  String get unknownArtist => 'Artis Tidak Dikenal';
+  String get chatSingleChoice => 'Tunggal';
 
   @override
-  String get unknownContact => 'Kontak Tidak Dikenal';
+  String get chatMultiChoice => 'Multi';
 
   @override
-  String get personalCard => 'Kartu Kontak';
+  String get chatEnded => 'Berakhir';
 
   @override
-  String get singleChoice => 'Tunggal';
+  String get chatEndPollButton => 'Akhiri Polling';
 
   @override
-  String get multiChoice => 'Multi';
-
-  @override
-  String get ended => 'Berakhir';
-
-  @override
-  String get endPollButton => 'Akhiri Polling';
-
-  @override
-  String get createPoll => 'Buat Polling';
-
-  @override
-  String get pollQuestion => 'Pertanyaan Polling';
-
-  @override
-  String get pollOptions => 'Opsi Polling';
-
-  @override
-  String optionPlaceholder(int index) {
-    return 'Opsi $index';
-  }
-
-  @override
-  String get addOption => 'Tambah Opsi';
-
-  @override
-  String get pollSettings => 'Pengaturan Polling';
-
-  @override
-  String get anonymousPoll => 'Polling Anonim';
-
-  @override
-  String get pollHint =>
+  String get chatPollHint =>
       'Polling akan ditampilkan di chat. Anggota grup dapat memilih.';
 
   @override
-  String get searchSongOrArtist => 'Cari lagu atau artis';
+  String get chatSearchSongOrArtist => 'Cari lagu atau artis';
 
   @override
-  String get noSongsFound => 'Tidak ada lagu ditemukan';
+  String get chatNoSongsFound => 'Tidak ada lagu ditemukan';
 
   @override
-  String get supportedMusicPlatforms =>
-      'Mendukung tautan musik dari NetEase, QQ Music, dll.';
+  String get chatSongNameOptional => 'Nama Lagu (Opsional)';
 
   @override
-  String get songNameOptional => 'Nama Lagu (Opsional)';
+  String get chatEnterSongName => 'Masukkan nama lagu';
 
   @override
-  String get enterSongName => 'Masukkan nama lagu';
+  String get chatArtistNameOptional => 'Nama Artis (Opsional)';
 
   @override
-  String get artistNameOptional => 'Nama Artis (Opsional)';
+  String get chatEnterArtistName => 'Masukkan nama artis';
 
   @override
-  String get enterArtistName => 'Masukkan nama artis';
-
-  @override
-  String get shareSong => 'Bagikan Lagu';
-
-  @override
-  String get realTimeLocationSharing =>
+  String get chatRealTimeLocationSharing =>
       'Berbagi lokasi real-time sedang dikembangkan...';
 
   @override
-  String get voiceCallFeatureInDev =>
+  String get profileVoiceCallFeatureInDev =>
       'Fitur panggilan suara sedang dikembangkan...';
 
   @override
-  String get reportFeatureInDev => 'Fitur laporan sedang dikembangkan...';
+  String get profileReportFeatureInDev =>
+      'Fitur laporan sedang dikembangkan...';
 
   @override
-  String get shareFeatureInDev => 'Fitur bagikan sedang dikembangkan...';
+  String get profileShareFeatureInDev => 'Fitur bagikan sedang dikembangkan...';
 
   @override
-  String get qrCodeFeatureInDev => 'Fitur kode QR sedang dikembangkan...';
+  String get profileQrCodeFeatureInDev =>
+      'Fitur kode QR sedang dikembangkan...';
 
   @override
-  String get scanQrToAddMe =>
+  String get qrcodeScanQrToAddMe =>
       'Pindai kode QR di atas untuk menambahkan saya sebagai teman';
 
   @override
-  String get saveToAlbum => 'Simpan ke Album';
+  String get qrcodeSaveToAlbum => 'Simpan ke Album';
 
   @override
-  String get changeStyle => 'Ubah Gaya';
+  String get qrcodeChangeStyle => 'Ubah Gaya';
 
   @override
-  String get copyId => 'Salin ID';
+  String get qrcodeCopyId => 'Salin ID';
 
   @override
-  String get idCopied => 'ID disalin';
+  String get qrcodeIdCopied => 'ID disalin';
 
   @override
-  String get shareFeatureComingSoon => 'Fitur bagikan segera hadir';
+  String get qrcodeMoreStylesFeatureComingSoon =>
+      'Lebih banyak gaya segera hadir';
 
   @override
-  String get saveFeatureComingSoon => 'Fitur simpan segera hadir';
+  String get profileBio => 'Bio';
 
   @override
-  String get moreStylesFeatureComingSoon => 'Lebih banyak gaya segera hadir';
+  String get profileHomeServer => 'Server';
 
   @override
-  String get confirmEndPoll =>
-      'Apakah Anda yakin ingin mengakhiri polling ini?';
+  String get profileShareContactCard => 'Bagikan Kartu Kontak';
 
   @override
-  String get cannotVoteAfterEnd =>
-      'Tidak ada lagi suara yang dapat diberikan setelah diakhiri.';
+  String get profileRemoveFromBlacklist => 'Hapus dari Daftar Hitam';
 
   @override
-  String get bio => 'Bio';
-
-  @override
-  String get homeServer => 'Server';
-
-  @override
-  String get shareContactCard => 'Bagikan Kartu Kontak';
-
-  @override
-  String get removeFromBlacklist => 'Hapus dari Daftar Hitam';
-
-  @override
-  String get confirmAddBlacklist =>
+  String get profileConfirmAddBlacklist =>
       'Apakah Anda yakin ingin menambahkan pengguna ini ke daftar hitam? Anda tidak akan menerima pesan dari mereka.';
 
   @override
-  String get confirmRemoveBlacklist =>
+  String get profileConfirmRemoveBlacklist =>
       'Apakah Anda yakin ingin menghapus pengguna ini dari daftar hitam?';
 
   @override
-  String get remarkSaved => 'Catatan disimpan';
+  String get profileRemarkSaved => 'Catatan disimpan';
 
   @override
-  String get remarkCleared => 'Catatan dihapus';
+  String get profileRemarkCleared => 'Catatan dihapus';
 
   @override
-  String get receive => 'Terima';
+  String get transferReceive => 'Terima';
 
   @override
-  String get pleaseConnectWallet =>
+  String get transferPleaseConnectWallet =>
       'Silakan hubungkan dompet Anda terlebih dahulu';
 
   @override
-  String get sendRequest => 'Kirim Permintaan';
+  String get transferSendRequest => 'Kirim Permintaan';
 
   @override
-  String get pleaseEnterValidAmount => 'Silakan masukkan jumlah yang valid';
+  String get transferPleaseEnterValidAmount =>
+      'Silakan masukkan jumlah yang valid';
 
   @override
   String get searchPlaceholder => 'Cari kontak, grup, pesan';
 
   @override
-  String get enterKeywordToSearch => 'Masukkan kata kunci untuk mulai mencari';
+  String get searchEnterKeywordToSearch =>
+      'Masukkan kata kunci untuk mulai mencari';
 
   @override
-  String get clearHistory => 'Hapus';
+  String get searchClearHistory => 'Hapus';
 
   @override
-  String noResultsForQuery(String query) {
+  String searchNoResultsForQuery(String query) {
     return 'Tidak ada hasil ditemukan untuk \"$query\"';
   }
 
   @override
-  String get allResults => 'Semua';
+  String get searchAllResults => 'Semua';
 
   @override
   String get searchInChat => 'Cari di chat';
 
   @override
-  String get contactLabel => 'Kontak';
+  String get searchContactLabel => 'Kontak';
 
   @override
-  String get groupLabel => 'Grup';
+  String get searchGroupLabel => 'Grup';
 
   @override
-  String get conversationLabel => 'Percakapan';
+  String get searchConversationLabel => 'Percakapan';
 
   @override
-  String get messageLabel => 'Pesan';
+  String get searchMessageLabel => 'Pesan';
 
   @override
-  String get securityTitle => 'Keamanan';
+  String get settingsSecurityTitle => 'Keamanan';
 
   @override
-  String get keyBackup => 'Cadangan Kunci';
+  String get settingsKeyBackup => 'Cadangan Kunci';
 
   @override
-  String get backupEncryptionKeys => 'Cadangkan Kunci Enkripsi';
+  String get settingsBackupEncryptionKeys => 'Cadangkan Kunci Enkripsi';
 
   @override
-  String keysBackedUp(int count) {
+  String settingsKeysBackedUp(int count) {
     return '$count kunci dicadangkan';
   }
 
   @override
-  String get backupNotSet => 'Cadangan belum diatur';
+  String get settingsBackupNotSet => 'Cadangan belum diatur';
 
   @override
-  String get restoreKeys => 'Pulihkan Kunci';
+  String get settingsRestoreKeys => 'Pulihkan Kunci';
 
   @override
-  String get restoreKeysFromBackup => 'Pulihkan kunci enkripsi dari cadangan';
+  String get settingsRestoreKeysFromBackup =>
+      'Pulihkan kunci enkripsi dari cadangan';
 
   @override
-  String get exportKeys => 'Ekspor Kunci';
+  String get settingsExportKeys => 'Ekspor Kunci';
 
   @override
-  String get exportKeysToFile => 'Ekspor kunci ke berkas';
+  String get settingsExportKeysToFile => 'Ekspor kunci ke berkas';
 
   @override
-  String get loggedInDevices => 'Perangkat yang Masuk';
+  String get settingsLoggedInDevices => 'Perangkat yang Masuk';
 
   @override
-  String get noOtherDevices => 'Tidak ada perangkat lain';
+  String get settingsNoOtherDevices => 'Tidak ada perangkat lain';
 
   @override
-  String get verified => 'Terverifikasi';
+  String get settingsVerified => 'Terverifikasi';
 
   @override
-  String get unverified => 'Belum terverifikasi';
+  String get settingsUnverified => 'Belum terverifikasi';
 
   @override
-  String get advanced => 'Lanjutan';
+  String get settingsAdvanced => 'Lanjutan';
 
   @override
-  String get crossSigning => 'Cross-Signing';
+  String get settingsCrossSigning => 'Cross-Signing';
 
   @override
-  String get enabled => 'Diaktifkan';
+  String get settingsEnabled => 'Diaktifkan';
 
   @override
-  String get notEnabled => 'Tidak diaktifkan';
+  String get settingsNotEnabled => 'Tidak diaktifkan';
 
   @override
-  String get resetEncryption => 'Reset Enkripsi';
+  String get settingsResetEncryption => 'Reset Enkripsi';
 
   @override
-  String get deleteAllEncryptionKeys => 'Hapus semua kunci enkripsi';
+  String get settingsDeleteAllEncryptionKeys => 'Hapus semua kunci enkripsi';
 
   @override
-  String get encryptionNotSupported => 'Enkripsi tidak didukung';
+  String get settingsEncryptionNotSupported => 'Enkripsi tidak didukung';
 
   @override
-  String get notInitialized => 'Belum diinisialisasi';
+  String get settingsNotInitialized => 'Belum diinisialisasi';
 
   @override
-  String get backupKeyTitle => 'Cadangkan Kunci';
+  String get settingsBackupKeyTitle => 'Cadangkan Kunci';
 
   @override
-  String get backupKeyMessage =>
+  String get settingsBackupKeyMessage =>
       'Buat cadangan kunci baru? Ini akan membantu Anda memulihkan pesan terenkripsi di perangkat baru.';
 
   @override
-  String get backup => 'Cadangkan';
+  String get settingsBackup => 'Cadangkan';
 
   @override
-  String get restoreKeyTitle => 'Pulihkan Kunci';
+  String get settingsRestoreKeyTitle => 'Pulihkan Kunci';
 
   @override
-  String get restoreKeyMessage =>
+  String get settingsRestoreKeyMessage =>
       'Masukkan kata sandi pemulihan atau kunci pemulihan untuk memulihkan pesan terenkripsi.';
 
   @override
-  String get restore => 'Pulihkan';
+  String get settingsRestore => 'Pulihkan';
 
   @override
-  String get exportKeyTitle => 'Ekspor Kunci';
+  String get settingsExportKeyTitle => 'Ekspor Kunci';
 
   @override
-  String get exportKeyMessage =>
+  String get settingsExportKeyMessage =>
       'Berkas kunci yang diekspor berisi semua kunci enkripsi Anda. Harap simpan dengan aman.';
 
   @override
-  String get export => 'Ekspor';
+  String get settingsExport => 'Ekspor';
 
   @override
-  String deviceIdLabel(String deviceId) {
+  String settingsDeviceIdLabel(String deviceId) {
     return 'ID Perangkat: $deviceId';
   }
 
   @override
-  String get deviceStatusVerified => 'Status: Terverifikasi';
+  String get settingsDeviceStatusVerified => 'Status: Terverifikasi';
 
   @override
-  String get deviceStatusUnverified => 'Status: Belum terverifikasi';
+  String get settingsDeviceStatusUnverified => 'Status: Belum terverifikasi';
 
   @override
-  String lastActiveLabel(String lastSeen) {
+  String settingsLastActiveLabel(String lastSeen) {
     return 'Terakhir aktif: $lastSeen';
   }
 
   @override
-  String get verifyThisDevice => 'Verifikasi perangkat ini';
+  String get settingsVerifyThisDevice => 'Verifikasi perangkat ini';
 
   @override
-  String get crossSigningAlreadyEnabled => 'Cross-signing sudah diaktifkan';
+  String get settingsCrossSigningAlreadyEnabled =>
+      'Cross-signing sudah diaktifkan';
 
   @override
-  String get crossSigningSetupSuccess => 'Pengaturan cross-signing berhasil';
+  String get settingsCrossSigningSetupSuccess =>
+      'Pengaturan cross-signing berhasil';
 
   @override
-  String get resetEncryptionTitle => 'Reset Enkripsi';
+  String get settingsResetEncryptionTitle => 'Reset Enkripsi';
 
   @override
-  String get resetEncryptionWarning =>
+  String get settingsResetEncryptionWarning =>
       'Peringatan: Ini akan menghapus semua kunci enkripsi Anda. Anda tidak akan dapat mendekripsi pesan terenkripsi sebelumnya. Tindakan ini tidak dapat dibatalkan.';
 
   @override
-  String get reset => 'Reset';
+  String get settingsReset => 'Reset';
 
   @override
-  String get leaveMeetingConfirm =>
+  String get callLeaveMeetingConfirm =>
       'Apakah Anda yakin ingin meninggalkan meeting?';
 
   @override
-  String pokedSomeone(String name, String suffix) {
+  String chatPokedSomeone(String name, String suffix) {
     return 'mencolek $name$suffix';
   }
 
   @override
-  String get noContactsToAdd => 'Tidak ada kontak yang dapat ditambahkan';
+  String get chatNoContactsToAdd => 'Tidak ada kontak yang dapat ditambahkan';
 
   @override
-  String get addMembers => 'Tambah Anggota';
+  String get chatAddMembers => 'Tambah Anggota';
 
   @override
-  String invitedMembers(int count) {
+  String chatInvitedMembers(int count) {
     return 'Mengundang $count anggota';
   }
 
   @override
-  String inviteFailed(String error) {
+  String chatInviteFailed(String error) {
     return 'Undangan gagal: $error';
   }
 
   @override
-  String get memberRemoved => 'Anggota dikeluarkan';
+  String get chatMemberRemoved => 'Anggota dikeluarkan';
 
   @override
-  String removeFailed(String error) {
+  String chatRemoveFailed(String error) {
     return 'Gagal mengeluarkan: $error';
   }
 
   @override
-  String get realTimeLocationShareMessage =>
+  String get chatRealTimeLocationShareMessage =>
       'Setelah berbagi, pihak lain dapat melihat lokasi real-time Anda selama 1 jam.';
 
   @override
-  String get startSharing => 'Mulai Berbagi';
+  String get chatStartSharing => 'Mulai Berbagi';
 
   @override
-  String get locationServiceNotEnabled => 'Layanan lokasi tidak diaktifkan';
+  String get chatLocationServiceNotEnabled => 'Layanan lokasi tidak diaktifkan';
 
   @override
-  String get enableLocationService =>
+  String get chatEnableLocationService =>
       'Silakan aktifkan layanan lokasi untuk menggunakan fitur ini';
 
   @override
-  String get goToSettings => 'Buka Pengaturan';
+  String get chatGoToSettings => 'Buka Pengaturan';
 
   @override
-  String get locationPermissionRequired =>
+  String get chatLocationPermissionRequired =>
       'Izin lokasi diperlukan untuk fitur ini';
 
   @override
-  String get locationPermissionDeniedPermanent =>
+  String get chatLocationPermissionDeniedPermanent =>
       'Izin lokasi telah ditolak secara permanen. Silakan aktifkan di pengaturan.';
 
   @override
-  String get locationPermissionDenied => 'Izin lokasi ditolak';
+  String get chatLocationPermissionDenied => 'Izin lokasi ditolak';
 
   @override
-  String get gettingLocation => 'Mendapatkan lokasi...';
+  String get chatGettingLocation => 'Mendapatkan lokasi...';
 
   @override
-  String getLocationFailed(String error) {
+  String chatGetLocationFailed(String error) {
     return 'Gagal mendapatkan lokasi: $error';
   }
 
   @override
-  String get currentLocation => 'Lokasi Saat Ini';
+  String get chatMapPreview => 'Pratinjau Peta';
 
   @override
-  String nearbyPlace(int index) {
-    return 'Tempat Terdekat $index';
-  }
+  String get chatSearchLocation => 'Cari lokasi';
 
   @override
-  String approximateDistance(String distance) {
-    return 'Sekitar $distance';
-  }
-
-  @override
-  String get mapPreview => 'Pratinjau Peta';
-
-  @override
-  String get searchLocation => 'Cari lokasi';
-
-  @override
-  String redPacketSent(String amount, String token) {
+  String chatRedPacketSent(String amount, String token) {
     return 'Mengirim angpao $amount $token';
   }
 
   @override
-  String get transferDefault => 'Transfer';
+  String get chatTransferDefault => 'Transfer';
 
   @override
-  String transferSent(String amount, String token) {
+  String chatTransferSent(String amount, String token) {
     return 'Mengirim transfer $amount $token';
   }
 
   @override
-  String pickFileFailed(String error) {
+  String chatPickFileFailed(String error) {
     return 'Gagal memilih berkas: $error';
   }
 
   @override
-  String get fileSizeLimit => 'Ukuran berkas tidak boleh melebihi 50MB';
+  String get chatFileSizeLimit => 'Ukuran berkas tidak boleh melebihi 50MB';
 
   @override
-  String fileSending(String filename) {
+  String chatFileSending(String filename) {
     return 'Mengirim berkas: $filename';
   }
 
   @override
-  String sendFileFailed(String error) {
+  String chatSendFileFailed(String error) {
     return 'Gagal mengirim berkas: $error';
   }
 
   @override
-  String contactCardSent(String name) {
+  String chatContactCardSent(String name) {
     return 'Mengirim kartu kontak $name';
   }
 
   @override
-  String get favoritesFeature => 'Favorit';
+  String get chatFavoritesFeature => 'Favorit';
 
   @override
-  String get couponsFeature => 'Kupon';
+  String get chatCouponsFeature => 'Kupon';
 
   @override
-  String get giftFeature => 'Hadiah';
+  String get chatGiftFeature => 'Hadiah';
 
   @override
-  String sharedMusic(String name) {
+  String chatSharedMusic(String name) {
     return 'Membagikan $name';
   }
 
   @override
-  String get endPollTitle => 'Akhiri Polling';
+  String get chatEndPollTitle => 'Akhiri Polling';
 
   @override
-  String get endPollConfirmMessage =>
+  String get chatEndPollConfirmMessage =>
       'Apakah Anda yakin ingin mengakhiri polling ini? Pemungutan suara akan ditutup setelah diakhiri.';
 
   @override
-  String get pollEndedMessage => 'Polling berakhir';
+  String get chatPollEndedMessage => 'Polling berakhir';
 
   @override
-  String get connectingCall => 'Menghubungkan...';
+  String get chatConnectingCall => 'Menghubungkan...';
 
   @override
-  String get muteCall => 'Bisukan';
+  String get chatMuteCall => 'Bisukan';
 
   @override
-  String get speakerOff => 'Speaker Mati';
+  String get chatSpeakerOff => 'Speaker Mati';
 
   @override
-  String get speakerOn => 'Speaker';
+  String get chatSpeakerOn => 'Speaker';
 
   @override
-  String get cameraOn => 'Kamera Nyala';
+  String get chatCameraOn => 'Kamera Nyala';
 
   @override
-  String get cameraOff => 'Kamera Mati';
+  String get chatCameraOff => 'Kamera Mati';
 
   @override
-  String get hangUp => 'Tutup';
+  String get chatHangUp => 'Tutup';
 
   @override
-  String get selectForwardTargetTitle => 'Pilih Tujuan Terusan';
+  String get chatSelectForwardTargetTitle => 'Pilih Tujuan Terusan';
 
   @override
-  String get noForwardableChat => 'Tidak ada chat yang dapat diteruskan';
+  String get chatNoForwardableChat => 'Tidak ada chat yang dapat diteruskan';
 
   @override
-  String get noMatchingChat => 'Tidak ada chat yang cocok ditemukan';
+  String get chatNoMatchingChat => 'Tidak ada chat yang cocok ditemukan';
 
   @override
-  String get imagePreview => '[Gambar]';
+  String get chatLocationTitle => 'Lokasi';
 
   @override
-  String get voicePreview => '[Suara]';
+  String get chatSendButton => 'Kirim';
 
   @override
-  String get videoPreview => '[Video]';
+  String get chatRetryButton => 'Coba Lagi';
 
   @override
-  String filePreviewWithName(String filename) {
-    return '[Berkas] $filename';
-  }
+  String get chatSearchContactHint => 'Cari kontak';
 
   @override
-  String locationPreviewWithAddress(String address) {
-    return '[Lokasi] $address';
-  }
+  String get chatShareMusic => 'Bagikan Musik';
 
   @override
-  String musicPreviewWithTitle(String title) {
-    return '[Musik] $title';
-  }
+  String get chatRecentPlayed => 'Terbaru';
 
   @override
-  String get messagePreview => '[Pesan]';
+  String get chatMyFavorites => 'Favorit';
 
   @override
-  String get locationTitle => 'Lokasi';
+  String get chatNetworkLink => 'Tautan';
 
   @override
-  String get sendButton => 'Kirim';
+  String get chatLocalFile => 'Lokal';
 
   @override
-  String get retryButton => 'Coba Lagi';
+  String get chatPasteMusicLink => 'Tempel tautan musik';
 
   @override
-  String get selectContact => 'Pilih Kontak';
+  String get chatShareMusicButton => 'Bagikan Musik';
 
   @override
-  String get searchContactHint => 'Cari kontak';
+  String get chatSelectLocalAudio => 'Pilih Berkas Audio Lokal';
 
   @override
-  String get shareMusic => 'Bagikan Musik';
+  String get chatSupportedAudioFormats => 'Mendukung MP3, M4A, WAV, FLAC, dll.';
 
   @override
-  String get recentPlayed => 'Terbaru';
+  String get chatSelectFileButton => 'Pilih Berkas';
 
   @override
-  String get myFavorites => 'Favorit';
+  String get chatPleaseEnterMusicLink => 'Silakan masukkan tautan musik';
 
   @override
-  String get networkLink => 'Tautan';
+  String get chatPleaseEnterValidLink => 'Silakan masukkan URL yang valid';
 
   @override
-  String get localFile => 'Lokal';
+  String get chatSharedSong => 'Lagu Dibagikan';
 
   @override
-  String get musicLinkRequired => 'Tautan Musik *';
+  String get chatSelectMember => 'Pilih Anggota';
 
   @override
-  String get pasteMusicLink => 'Tempel tautan musik';
+  String get chatSearchMemberHint => 'Cari anggota';
 
   @override
-  String get enterSongNamePlaceholder => 'Masukkan nama lagu';
+  String get chatNoMatchingMembers => 'Tidak ada anggota yang cocok ditemukan';
 
   @override
-  String get enterArtistNamePlaceholder => 'Masukkan nama artis';
+  String get commonUnknownMember => 'Tidak Dikenal';
 
   @override
-  String get shareMusicButton => 'Bagikan Musik';
-
-  @override
-  String get selectLocalAudio => 'Pilih Berkas Audio Lokal';
-
-  @override
-  String get supportedAudioFormats => 'Mendukung MP3, M4A, WAV, FLAC, dll.';
-
-  @override
-  String get selectFileButton => 'Pilih Berkas';
-
-  @override
-  String get pleaseEnterMusicLink => 'Silakan masukkan tautan musik';
-
-  @override
-  String get pleaseEnterValidLink => 'Silakan masukkan URL yang valid';
-
-  @override
-  String get sharedSong => 'Lagu Dibagikan';
-
-  @override
-  String get selectMember => 'Pilih Anggota';
-
-  @override
-  String get searchMemberHint => 'Cari anggota';
-
-  @override
-  String get noMatchingMembers => 'Tidak ada anggota yang cocok ditemukan';
-
-  @override
-  String get unknownMember => 'Tidak Dikenal';
-
-  @override
-  String selectedMessagesCount(int count) {
+  String chatSelectedMessagesCount(int count) {
     return 'Dipilih $count pesan';
   }
 
   @override
-  String get searchContactsOrGroups => 'Cari kontak atau grup';
+  String get chatSearchContactsOrGroups => 'Cari kontak atau grup';
 
   @override
-  String get noMatchingConversations =>
-      'Tidak ada percakapan yang cocok ditemukan';
+  String get chatVideoTitle => 'Video';
 
   @override
-  String get videoTitle => 'Video';
+  String get chatLoadingText => 'Memuat...';
 
   @override
-  String get loadingText => 'Memuat...';
+  String get chatVideoLoadFailed => 'Gagal memuat video';
 
   @override
-  String get videoPlaybackFailed => 'Pemutaran video gagal';
+  String get chatPlayerInitFailed => 'Gagal menginisialisasi pemutar';
 
   @override
-  String get videoLoadFailed => 'Gagal memuat video';
+  String get chatCreatePollTitle => 'Buat Polling';
 
   @override
-  String get playerInitFailed => 'Gagal menginisialisasi pemutar';
+  String get chatSubmitPoll => 'Kirim';
 
   @override
-  String get createPollTitle => 'Buat Polling';
+  String get chatPollQuestionLabel => 'Pertanyaan Polling';
 
   @override
-  String get submitPoll => 'Kirim';
+  String get chatEnterPollQuestionHint => 'Masukkan pertanyaan polling';
 
   @override
-  String get pollQuestionLabel => 'Pertanyaan Polling';
+  String get chatPollOptionsLabel => 'Opsi Polling';
 
   @override
-  String get enterPollQuestionHint => 'Masukkan pertanyaan polling';
-
-  @override
-  String get pollOptionsLabel => 'Opsi Polling';
-
-  @override
-  String optionHintWithIndex(int index) {
+  String chatOptionHintWithIndex(int index) {
     return 'Opsi $index';
   }
 
   @override
-  String get addOptionButton => 'Tambah Opsi';
+  String get chatAddOptionButton => 'Tambah Opsi';
 
   @override
-  String get pollSettingsLabel => 'Pengaturan Polling';
+  String get chatPollSettingsLabel => 'Pengaturan Polling';
 
   @override
-  String get selectionType => 'Jenis Pilihan';
+  String get chatSelectionType => 'Jenis Pilihan';
 
   @override
-  String get singleChoiceLabel => 'Tunggal';
+  String get chatSingleChoiceLabel => 'Tunggal';
 
   @override
-  String get multiChoiceLabel => 'Multi';
+  String get chatMultiChoiceLabel => 'Multi';
 
   @override
-  String get anonymousPollSwitch => 'Polling Anonim';
+  String get chatAnonymousPollSwitch => 'Polling Anonim';
 
   @override
-  String get pleaseEnterQuestion => 'Silakan masukkan pertanyaan polling';
+  String get chatPleaseEnterQuestion => 'Silakan masukkan pertanyaan polling';
 
   @override
-  String get atLeastTwoOptions => 'Minimal 2 opsi diperlukan';
+  String get chatAtLeastTwoOptions => 'Minimal 2 opsi diperlukan';
 
   @override
-  String confirmWithCount(int count) {
+  String chatConfirmWithCount(int count) {
     return 'Konfirmasi ($count)';
   }
 
   @override
-  String get emailVerificationTitle => 'Verifikasi Email';
+  String get authEmailVerificationTitle => 'Verifikasi Email';
 
   @override
-  String get enterValidEmailAddress =>
+  String get authEnterValidEmailAddress =>
       'Silakan masukkan alamat email yang valid';
 
   @override
-  String verificationCodeSentTo(String email) {
+  String authVerificationCodeSentTo(String email) {
     return 'Kode verifikasi dikirim ke $email';
   }
 
   @override
-  String sendCodeFailed(String error) {
+  String authSendCodeFailed(String error) {
     return 'Gagal mengirim kode: $error';
   }
 
   @override
-  String get verificationSuccess => 'Verifikasi berhasil';
+  String get authVerificationSuccess => 'Verifikasi berhasil';
 
   @override
-  String get verificationFailed => 'Verifikasi gagal';
+  String get authVerificationFailed => 'Verifikasi gagal';
 
   @override
-  String verificationCodeError(String error) {
+  String authVerificationCodeError(String error) {
     return 'Kesalahan kode verifikasi: $error';
   }
 
   @override
-  String get enterVerificationCode => 'Masukkan kode verifikasi';
+  String get commonEnterVerificationCode => 'Masukkan kode verifikasi';
 
   @override
-  String get enterYourEmail => 'Masukkan email';
+  String get authEnterYourEmail => 'Masukkan email';
 
   @override
-  String weSentCodeTo(String email) {
+  String authWeSentCodeTo(String email) {
     return 'Kami mengirim kode 6 digit ke\n$email';
   }
 
   @override
-  String get enterEmailForCode =>
+  String get authEnterEmailForCode =>
       'Masukkan alamat email Anda, kami akan mengirim kode verifikasi';
 
   @override
-  String get sendVerificationCode => 'Kirim kode verifikasi';
+  String get commonSendVerificationCode => 'Kirim kode verifikasi';
 
   @override
-  String get resendVerificationCode => 'Kirim ulang kode verifikasi';
+  String get authResendVerificationCode => 'Kirim ulang kode verifikasi';
 
   @override
-  String canResendAfter(int seconds) {
+  String authCanResendAfter(int seconds) {
     return 'Dapat mengirim ulang setelah $seconds detik';
   }
 
   @override
-  String get changeEmail => 'Ubah email';
+  String get commonChangeEmail => 'Ubah email';
 
   @override
-  String get addToContacts => 'Tambah ke Kontak';
+  String get contactAddToContacts => 'Tambah ke Kontak';
 
   @override
-  String get addingToContacts => 'Menambahkan...';
+  String get contactAddingToContacts => 'Menambahkan...';
 
   @override
-  String get addedToContacts => 'Ditambahkan ke kontak';
+  String get contactAddedToContacts => 'Ditambahkan ke kontak';
 
   @override
-  String addFailedWithError(String error) {
+  String contactAddFailedWithError(String error) {
     return 'Gagal menambahkan: $error';
   }
 
   @override
-  String get addPhone => 'Tambah telepon';
+  String get contactAddPhone => 'Tambah telepon';
 
   @override
-  String get addTag => 'Tambah tag';
+  String get contactAddTag => 'Tambah tag';
 
   @override
-  String get addText => 'Tambah teks';
+  String get contactAddText => 'Tambah teks';
 
   @override
-  String get addPhoto => 'Tambah foto';
+  String get contactAddPhoto => 'Tambah foto';
 
   @override
-  String groupCountLabel(int count) {
+  String contactGroupCountLabel(int count) {
     return '$count grup';
   }
 
   @override
-  String get addedViaSearch => 'Ditambahkan melalui pencarian';
+  String get contactAddedViaSearch => 'Ditambahkan melalui pencarian';
 
   @override
-  String get addTime => 'Tambah waktu';
+  String get contactAddTime => 'Tambah waktu';
 
   @override
-  String get doneButton => 'Selesai';
+  String get contactDoneButton => 'Selesai';
 
   @override
-  String get waitingForParticipants => 'Menunggu peserta bergabung...';
+  String get callWaitingForParticipants => 'Menunggu peserta bergabung...';
 
   @override
-  String participantMe(String name) {
+  String callParticipantMe(String name) {
     return '$name (Saya)';
   }
 
   @override
-  String get sharingLabel => 'Berbagi';
+  String get callSharingLabel => 'Berbagi';
 
   @override
-  String screenSharingBy(String name) {
+  String callScreenSharingBy(String name) {
     return '$name sedang berbagi layar';
   }
 
   @override
-  String participantCount(int count) {
+  String callParticipantCount(int count) {
     return '$count peserta';
   }
 
   @override
-  String get muteLabel => 'Bisukan';
+  String get callMuteLabel => 'Bisukan';
 
   @override
-  String get unmuteLabel => 'Bunyikan';
+  String get callUnmuteLabel => 'Bunyikan';
 
   @override
-  String get turnOffVideo => 'Matikan video';
+  String get callTurnOffVideo => 'Matikan video';
 
   @override
-  String get turnOnVideo => 'Nyalakan video';
+  String get callTurnOnVideo => 'Nyalakan video';
 
   @override
-  String get shareScreen => 'Berbagi layar';
+  String get callShareScreen => 'Berbagi layar';
 
   @override
-  String get stopSharing => 'Berhenti berbagi';
+  String get callStopSharing => 'Berhenti berbagi';
 
   @override
-  String get switchCameraLabel => 'Ganti';
+  String get callSwitchCameraLabel => 'Ganti';
 
   @override
-  String get leaveLabel => 'Keluar';
+  String get callLeaveLabel => 'Keluar';
 
   @override
-  String get participantsLabel => 'Peserta';
+  String get callParticipantsLabel => 'Peserta';
 
   @override
-  String get joiningMeeting => 'Bergabung ke meeting...';
+  String get callJoiningMeeting => 'Bergabung ke meeting...';
 
   @override
-  String pollVotesFormat(int count, String percentage) {
+  String chatPollVotesFormat(int count, String percentage) {
     return '$count suara ($percentage%)';
   }
 
   @override
-  String pollParticipantsFormat(int count) {
+  String chatPollParticipantsFormat(int count) {
     return '$count peserta';
   }
 
   @override
-  String get tapToRetry => 'Ketuk untuk mencoba lagi';
+  String get commonTapToRetry => 'Ketuk untuk mencoba lagi';
 
   @override
-  String get noConversationsToForward =>
-      'Tidak ada percakapan untuk diteruskan';
+  String get chatDefaultRedPacketGreeting => 'Semoga sukses dan sejahtera';
 
   @override
-  String get defaultRedPacketGreeting => 'Semoga sukses dan sejahtera';
-
-  @override
-  String get emojiCategoryFace => 'Emotikon';
-
-  @override
-  String get emojiCategoryHeart => 'Hati';
-
-  @override
-  String get emojiCategoryAnimal => 'Hewan';
-
-  @override
-  String get emojiCategoryFood => 'Makanan';
-
-  @override
-  String get emojiCategoryTransport => 'Transportasi';
-
-  @override
-  String get emojiCategoryActivity => 'Aktivitas';
-
-  @override
-  String get emojiCategoryObject => 'Objek';
-
-  @override
-  String get emojiCategorySymbol => 'Simbol';
-
-  @override
-  String get allowOthersToSearchAndJoin =>
+  String get groupAllowOthersToSearchAndJoin =>
       'Izinkan orang lain untuk mencari dan bergabung';
 
   @override
-  String get allowStrangerMessages => 'Izinkan pesan dari orang asing';
+  String get groupConfirmClearChatHistory =>
+      'Apakah Anda yakin ingin menghapus riwayat chat?';
 
   @override
-  String get alwaysUseDarkTheme => 'Selalu gunakan tema gelap';
+  String get groupCreateGroupToChat => 'Buat grup untuk mulai berbincang';
 
   @override
-  String get alwaysUseLightTheme => 'Selalu gunakan tema terang';
+  String get groupEditGroupAnnouncement => 'Edit pengumuman grup';
 
   @override
-  String get autoSwitchBySystem => 'Beralih otomatis sesuai pengaturan sistem';
+  String get groupEditGroupDescription => 'Edit deskripsi grup';
 
   @override
-  String get bubbleStyle => 'Gaya gelembung';
+  String get groupEnterGroupAnnouncement => 'Masukkan pengumuman grup';
 
   @override
-  String get bubbleStyleClassic => 'Gaya klasik';
+  String chatErrorWithMessage(String message) {
+    return 'Kesalahan: $message';
+  }
 
   @override
-  String get bubbleStyleClassicDesc => 'Gaya gelembung tradisional';
+  String groupMemberCountClickToCopy(int count) {
+    return '$count anggota, klik untuk menyalin ID grup';
+  }
 
   @override
-  String get bubbleStyleModern => 'Gaya modern';
+  String get chatMusicLinkLabel => 'Link musik';
 
   @override
-  String get bubbleStyleModernDesc => 'Gaya gelembung modern yang bersih';
+  String get chatNoMediaUrlAvailable => 'URL media tidak tersedia';
 
   @override
-  String get bubbleStyleWechat => 'Gaya WeChat';
+  String get groupNoPermissionToEditGroupName =>
+      'Anda tidak memiliki izin untuk mengubah nama grup';
 
   @override
-  String get bubbleStyleWechatDesc => 'Gaya gelembung klasik WeChat';
+  String get chatRedPacketTransferCannotForward =>
+      'Angpao dan transfer tidak dapat diteruskan';
+
+  @override
+  String get authEmailAddress => 'Alamat email';
+
+  @override
+  String get commonEnterEmailAddress => 'Masukkan alamat email';
+
+  @override
+  String get authEmailRecoveryHint => 'Digunakan untuk pemulihan kata sandi';
+
+  @override
+  String get commonInvalidEmailFormat => 'Masukkan alamat email yang valid';
+
+  @override
+  String get authOptional => 'Opsional';
+
+  @override
+  String get authResetPassword => 'Reset kata sandi';
+
+  @override
+  String get authEnterRegisteredEmail =>
+      'Masukkan alamat email yang Anda daftarkan';
+
+  @override
+  String get authSendResetCode => 'Kirim kode reset';
+
+  @override
+  String authResetCodeSent(String email) {
+    return 'Kode reset dikirim ke $email';
+  }
+
+  @override
+  String get authEnterResetCode => 'Masukkan kode reset';
+
+  @override
+  String get authSetNewPassword => 'Atur kata sandi baru';
+
+  @override
+  String get commonConfirmNewPassword => 'Konfirmasi kata sandi baru';
+
+  @override
+  String get commonNewPassword => 'Kata sandi baru';
+
+  @override
+  String get authPasswordResetSuccess =>
+      'Kata sandi berhasil direset. Silakan masuk dengan kata sandi baru Anda.';
+
+  @override
+  String get authResetPasswordFailed => 'Gagal mereset kata sandi';
+
+  @override
+  String get settingsChangePassword => 'Ubah kata sandi';
+
+  @override
+  String get settingsCurrentPassword => 'Kata sandi saat ini';
+
+  @override
+  String get settingsEnterCurrentPassword => 'Masukkan kata sandi saat ini';
+
+  @override
+  String get settingsEnterNewPassword => 'Masukkan kata sandi baru';
+
+  @override
+  String get settingsPasswordChanged =>
+      'Kata sandi berhasil diubah. Silakan masuk dengan kata sandi baru Anda.';
+
+  @override
+  String get settingsChangePasswordFailed => 'Gagal mengubah kata sandi';
+
+  @override
+  String get settingsNewPasswordMustBeDifferent =>
+      'Kata sandi baru harus berbeda dari kata sandi saat ini';
+
+  @override
+  String get settingsChangePasswordInfo =>
+      'Setelah mengubah kata sandi, Anda akan keluar dan perlu masuk dengan kata sandi baru.';
+
+  @override
+  String get settingsPasswordRequirements => 'Persyaratan kata sandi:';
+
+  @override
+  String get settingsSecurityNote =>
+      'Untuk keamanan, Anda perlu masuk ulang di semua perangkat setelah mengubah kata sandi.';
+
+  @override
+  String get settingsSecurity => 'Keamanan';
+
+  @override
+  String get settingsCurrentBoundEmail => 'Email yang terhubung saat ini';
+
+  @override
+  String get settingsNewEmailAddress => 'Alamat email baru';
+
+  @override
+  String get settingsEnterNewEmail => 'Masukkan alamat email baru';
+
+  @override
+  String get settingsVerificationCode => 'Kode verifikasi';
+
+  @override
+  String get settingsVerificationCodeSent => 'Kode verifikasi terkirim';
+
+  @override
+  String get settingsCodeSentTo => 'Kode verifikasi dikirim ke';
+
+  @override
+  String get settingsDidNotReceiveCode => 'Tidak menerima kode?';
+
+  @override
+  String get settingsEmailChangedSuccess => 'Email berhasil diubah';
+
+  @override
+  String get settingsChangeEmailFailed => 'Gagal mengubah email';
+
+  @override
+  String get settingsEmailSecurityNote =>
+      'Email Anda digunakan untuk pemulihan kata sandi. Jaga keamanannya.';
+
+  @override
+  String get commonGoogleLogin => 'Masuk dengan Google';
+
+  @override
+  String get commonAppleLogin => 'Masuk dengan Apple';
+
+  @override
+  String get commonWechat => 'WeChat';
+
+  @override
+  String get settingsLanguage => 'Bahasa';
+
+  @override
+  String get settingsLanguageChanged => 'Bahasa diubah';
+
+  @override
+  String get settingsBiometricLogin => 'Login biometrik';
+
+  @override
+  String authLoginWithBiometric(Object type) {
+    return 'Masuk dengan $type';
+  }
+
+  @override
+  String get settingsBiometricLoginEnabled => 'Login biometrik diaktifkan';
+
+  @override
+  String get settingsBiometricLoginDisabled => 'Login biometrik dinonaktifkan';
+
+  @override
+  String get settingsEnableBiometricLogin => 'Aktifkan login biometrik';
+
+  @override
+  String get settingsBiometricEnabled =>
+      'Aktif - Gunakan biometrik untuk masuk';
+
+  @override
+  String get settingsBiometricDisabled => 'Nonaktif - Ketuk untuk mengaktifkan';
+
+  @override
+  String get settingsBiometricNeedRelogin =>
+      'Silakan keluar dan masuk kembali untuk mengaktifkan login biometrik';
+
+  @override
+  String get authOr => 'ATAU';
+
+  @override
+  String get qrcodeCameraPermissionRestricted =>
+      'Akses kamera dibatasi pada perangkat ini';
+
+  @override
+  String get authPasskeyLabel => 'Passkey';
+
+  @override
+  String get authGoogleLabel => 'Google';
+
+  @override
+  String get authAppleLabel => 'Apple';
+
+  @override
+  String get authSsoLabel => 'SSO';
+
+  @override
+  String get transferAmountHintZero => '0.00';
+
+  @override
+  String get commonMatrixIdHint => '@username:server.com';
+
+  @override
+  String get authServerAddressHint => 'https://m.si46.world';
+
+  @override
+  String get authEmailExampleHint => 'example@email.com';
+
+  @override
+  String get authVerificationCodePlaceholder => '------';
+
+  @override
+  String get profileEnterPokeSuffixHint =>
+      'Masukkan sufiks colek, misal: di bahu';
+
+  @override
+  String get groupAlbum => 'Album grup';
+
+  @override
+  String get groupFiles => 'File grup';
+
+  @override
+  String get groupImages => 'Gambar';
+
+  @override
+  String get groupVideos => 'Video';
+
+  @override
+  String get groupTotal => 'Total';
+
+  @override
+  String get groupSize => 'Ukuran';
+
+  @override
+  String get groupNoMedia => 'Tidak ada media';
+
+  @override
+  String get groupNoMediaDescription => 'Belum ada foto atau video di grup ini';
+
+  @override
+  String get groupDocuments => 'Dokumen';
+
+  @override
+  String get groupNoFiles => 'Tidak ada file';
+
+  @override
+  String get groupNoFilesDescription => 'Belum ada file di grup ini';
+
+  @override
+  String groupDownloadStarted(String filename) {
+    return 'Mengunduh $filename...';
+  }
+
+  @override
+  String get contactNoCommonGroups => 'Tidak ada grup bersama';
+
+  @override
+  String get contactNoCommonGroupsDescription =>
+      'Kamu tidak memiliki grup bersama';
+
+  @override
+  String get chatVoiceMessage => 'Suara';
+
+  @override
+  String get chatMessage => 'Pesan';
+
+  @override
+  String get conversationHideChat => 'Sembunyikan';
+
+  @override
+  String get settingsQuickReply => 'Balasan cepat';
+
+  @override
+  String get commonTranslate => 'Terjemahkan';
+
+  @override
+  String get contactCreateTag => 'Create Tag';
+
+  @override
+  String get contactEnterTagName => 'Enter tag name';
+
+  @override
+  String get contactEditTag => 'Edit Tag';
+
+  @override
+  String get contactDeleteTag => 'Delete Tag';
+
+  @override
+  String contactDeleteTagConfirm(String tagName) {
+    return 'Are you sure you want to delete the tag \"$tagName\"?';
+  }
+
+  @override
+  String get contactNoTags => 'No tags yet';
+
+  @override
+  String get contactFriendPermissions => 'Friend Permissions';
+
+  @override
+  String get contactSetChatOnly => 'Set as Chat-only';
+
+  @override
+  String get contactChatOnlyDesc =>
+      'Can only chat with you, other content will be hidden';
+
+  @override
+  String get contactHideMyMoments => 'Hide My Moments';
+
+  @override
+  String get contactHideMyMomentsDesc => 'This friend cannot see my Moments';
+
+  @override
+  String get contactHideTheirMoments => 'Hide Their Moments';
+
+  @override
+  String get contactHideTheirMomentsDesc => 'Don\'t see this friend\'s Moments';
+
+  @override
+  String get contactHideMyStatus => 'Hide My Status';
+
+  @override
+  String get contactHideMyStatusDesc =>
+      'This friend cannot see my status updates';
+
+  @override
+  String get contactNoChatOnlyFriends => 'No chat-only friends';
+
+  @override
+  String get contactNoOfficialAccounts => 'No official accounts';
+
+  @override
+  String get contactFollowOfficialAccountsDesc =>
+      'Follow official accounts to get the latest updates';
+
+  @override
+  String get contactNoServiceAccounts => 'No service accounts';
+
+  @override
+  String get contactSubscribeServiceAccountsDesc =>
+      'Subscribe to service accounts for convenient services';
+
+  @override
+  String get contactNoEnterpriseContacts => 'No enterprise contacts';
+
+  @override
+  String get contactEnterpriseContactsDesc =>
+      'Enterprise contacts will be displayed here';
+
+  @override
+  String get profileCardPack => 'Card Pack';
+
+  @override
+  String get profileOrders => 'Orders';
+
+  @override
+  String get profileNoOrders => 'No orders';
+
+  @override
+  String get profileOrdersDesc => 'Your orders will be displayed here';
+
+  @override
+  String get profileNoCards => 'No cards';
+
+  @override
+  String get profileCardsDesc => 'Your cards will be displayed here';
+
+  @override
+  String get favoriteEnterTagsHint => 'Enter tags separated by commas';
+
+  @override
+  String get favoriteTagsUpdated => 'Tags updated';
+
+  @override
+  String get favoriteForwardedContent => 'Content forwarded';
+
+  @override
+  String get favoriteEnterNoteContent => 'Enter note content';
+
+  @override
+  String get favoriteNoteAdded => 'Note added';
+
+  @override
+  String get favoriteLinkTitle => 'Link title';
+
+  @override
+  String get favoriteLinkUrl => 'https://';
+
+  @override
+  String get favoriteLinkAdded => 'Link added';
+
+  @override
+  String get contactPhotoAdded => 'Photo added';
+
+  @override
+  String get contactEnterPhone => 'Enter phone number';
+
+  @override
+  String commonConversationWithId(String roomId) {
+    return 'Percakapan: $roomId';
+  }
+
+  @override
+  String commonContactWithId(String userId) {
+    return 'Kontak: $userId';
+  }
+
+  @override
+  String get commonDiscover => 'Jelajahi';
+
+  @override
+  String commonDeveloping(String title) {
+    return '$title\n(Segera hadir)';
+  }
+
+  @override
+  String get commonPageNotFound => 'Halaman tidak ditemukan';
+
+  @override
+  String get commonBackToHome => 'Kembali ke Beranda';
+
+  @override
+  String get settingsMessageNotifications => 'Notifikasi pesan';
+
+  @override
+  String get settingsReceiveNewMessageNotifications =>
+      'Terima notifikasi pesan baru';
+
+  @override
+  String get settingsShowMessagePreview => 'Tampilkan pratinjau pesan';
+
+  @override
+  String get settingsShowMessageContentInNotification =>
+      'Tampilkan isi pesan di notifikasi';
+
+  @override
+  String get settingsNotificationSound => 'Suara notifikasi';
+
+  @override
+  String get settingsPlaySoundOnMessage => 'Putar suara saat menerima pesan';
+
+  @override
+  String get commonVibration => 'Getaran';
+
+  @override
+  String get settingsVibrateOnMessage => 'Getar saat menerima pesan';
+
+  @override
+  String get settingsDoNotDisturbMode => 'Jangan ganggu';
+
+  @override
+  String get settingsDoNotDisturbDescription =>
+      'Tidak menerima notifikasi selama waktu yang ditentukan';
+
+  @override
+  String get settingsStartTime => 'Waktu mulai';
+
+  @override
+  String get settingsEndTime => 'Waktu selesai';
+
+  @override
+  String get settingsDeleteQuickReply => 'Hapus balasan cepat';
+
+  @override
+  String get settingsEditQuickReply => 'Edit balasan cepat';
+
+  @override
+  String get settingsAddQuickReply => 'Tambah balasan cepat';
+
+  @override
+  String get settingsManageQuickReplies => 'Kelola balasan cepat';
+
+  @override
+  String get settingsNoQuickReplies => 'Tidak ada balasan cepat';
+
+  @override
+  String get settingsDefaultQuickReplies =>
+      'Balasan cepat default akan ditampilkan';
+
+  @override
+  String get settingsWhoCanSee => 'Siapa yang dapat melihat';
+
+  @override
+  String get settingsLastSeen => 'Terakhir dilihat';
+
+  @override
+  String get settingsHiddenChats => 'Chat tersembunyi';
+
+  @override
+  String get settingsMessagesLabel => 'Pesan';
+
+  @override
+  String get settingsAllowStrangerMessages => 'Izinkan pesan dari orang asing';
+
+  @override
+  String get settingsReceiveMessagesFromNonContacts =>
+      'Terima pesan dari non-kontak';
+
+  @override
+  String get settingsReadReceipts => 'Tanda baca';
+
+  @override
+  String get settingsLetOthersKnowYouRead =>
+      'Biarkan orang lain tahu Anda telah membaca pesan mereka';
+
+  @override
+  String get settingsTypingIndicator => 'Indikator mengetik';
+
+  @override
+  String get settingsLetOthersKnowYouTyping =>
+      'Biarkan orang lain tahu Anda sedang mengetik';
+
+  @override
+  String get settingsEveryone => 'Semua orang';
+
+  @override
+  String get settingsContactsOnly => 'Hanya kontak';
+
+  @override
+  String get settingsNobody => 'Tidak ada';
+
+  @override
+  String settingsWhoCanSeeTitle(String title) {
+    return 'Siapa yang bisa melihat $title';
+  }
+
+  @override
+  String settingsVersionInfo(String version) {
+    return 'Versi $version';
+  }
+
+  @override
+  String get settingsCheckForUpdates => 'Periksa pembaruan';
+
+  @override
+  String get settingsOpenSourceLicenses => 'Lisensi open source';
+
+  @override
+  String get settingsFeedbackAndSuggestions => 'Masukan dan saran';
+
+  @override
+  String get settingsBuiltOnMatrix => 'Dibangun di atas protokol Matrix';
+
+  @override
+  String get settingsNoHiddenChats => 'Tidak ada chat tersembunyi';
+
+  @override
+  String get settingsNoHiddenChatsDescription =>
+      'Chat yang kamu sembunyikan akan muncul di sini';
+
+  @override
+  String get settingsUnhideChat => 'Tampilkan';
+
+  @override
+  String get settingsDarkMode => 'Mode gelap';
+
+  @override
+  String get settingsFontSize => 'Ukuran font';
+
+  @override
+  String get settingsBubbleStyle => 'Gaya gelembung';
+
+  @override
+  String get settingsFollowSystem => 'Ikuti sistem';
+
+  @override
+  String get settingsAutoSwitchBySystem =>
+      'Beralih otomatis sesuai pengaturan sistem';
+
+  @override
+  String get settingsLightMode => 'Mode terang';
+
+  @override
+  String get settingsAlwaysUseLightTheme => 'Selalu gunakan tema terang';
+
+  @override
+  String get settingsDarkModeOption => 'Mode gelap';
+
+  @override
+  String get settingsAlwaysUseDarkTheme => 'Selalu gunakan tema gelap';
+
+  @override
+  String get settingsFontSizeSmall => 'Kecil';
+
+  @override
+  String get settingsFontSizeStandard => 'Standar';
+
+  @override
+  String get settingsFontSizeLarge => 'Besar';
+
+  @override
+  String get settingsFontSizeExtraLarge => 'Sangat besar';
+
+  @override
+  String get settingsBubbleStyleWechat => 'Gaya WeChat';
+
+  @override
+  String get settingsBubbleStyleWechatDesc => 'Gaya gelembung klasik WeChat';
+
+  @override
+  String get settingsBubbleStyleModern => 'Gaya modern';
+
+  @override
+  String get settingsBubbleStyleModernDesc =>
+      'Gaya gelembung modern yang bersih';
+
+  @override
+  String get settingsBubbleStyleClassic => 'Gaya klasik';
+
+  @override
+  String get settingsBubbleStyleClassicDesc => 'Gaya gelembung tradisional';
+
+  @override
+  String get discoverVideoChannels => 'Saluran';
+
+  @override
+  String get discoverLive => 'Siaran';
+
+  @override
+  String get discoverListen => 'Dengarkan';
+
+  @override
+  String get discoverWatch => 'Tonton';
+
+  @override
+  String get discoverSearchDiscover => 'Cari';
+
+  @override
+  String get discoverNearbyPeople => 'Sekitar';
+
+  @override
+  String get discoverGames => 'Permainan';
+
+  @override
+  String get discoverMiniPrograms => 'Mini Program';
+
+  @override
+  String get chatAlreadyInCall => 'Sedang dalam panggilan';
+
+  @override
+  String get commonConnectionFailed => 'Koneksi gagal';
+
+  @override
+  String get chatCallRejected => 'Panggilan ditolak';
+
+  @override
+  String get chatNoAnswer => 'Tidak ada jawaban';
+
+  @override
+  String get commonClose => 'Tutup';
+
+  @override
+  String get chatSelectContact => 'Pilih Kontak';
+
+  @override
+  String get chatVoteRemoved => 'Pilihan dihapus';
+
+  @override
+  String get chatVoteChanged => 'Pilihan diubah';
+
+  @override
+  String get chatVoted => 'Memilih';
+
+  @override
+  String chatReplyTo(String name) {
+    return 'Balas ke $name';
+  }
+
+  @override
+  String get chatCurrentLocation => 'Lokasi Saat Ini';
+
+  @override
+  String chatNearbyPlace(int index) {
+    return 'Tempat Terdekat $index';
+  }
+
+  @override
+  String chatApproximateDistance(String distance) {
+    return 'Sekitar $distance';
+  }
+
+  @override
+  String get chatAddress => 'Alamat';
+
+  @override
+  String get chatLatitude => 'Garis Lintang';
+
+  @override
+  String get chatLongitude => 'Garis Bujur';
+
+  @override
+  String get groupDescriptionUpdated => 'Deskripsi grup diperbarui';
+
+  @override
+  String get groupAvatarUpdated => 'Avatar grup diperbarui';
+
+  @override
+  String get callDecline => 'Tolak';
+
+  @override
+  String get callAnswer => 'Jawab';
+
+  @override
+  String get callIncomingVideoCall => 'Panggilan video masuk';
+
+  @override
+  String get callIncomingVoiceCall => 'Panggilan suara masuk';
+
+  @override
+  String get callVideoCallInProgress => 'Panggilan video';
+
+  @override
+  String get callVoiceCallInProgress => 'Panggilan suara';
+
+  @override
+  String get callReconnectingCall => 'Menghubungkan ulang...';
 
   @override
   String get callEnded => 'Panggilan berakhir';
@@ -3988,620 +3331,382 @@ class SId extends S {
   String get callFailed => 'Panggilan gagal';
 
   @override
-  String get checkForUpdates => 'Periksa pembaruan';
+  String get callLivekitNotConfigured => 'LiveKit belum dikonfigurasi';
 
   @override
-  String get confirmClearChatHistory =>
-      'Apakah Anda yakin ingin menghapus riwayat chat?';
-
-  @override
-  String get createGroupToChat => 'Buat grup untuk mulai berbincang';
-
-  @override
-  String get darkMode => 'Mode gelap';
-
-  @override
-  String get darkModeOption => 'Mode gelap';
-
-  @override
-  String get doNotDisturbDescription =>
-      'Tidak menerima notifikasi selama waktu yang ditentukan';
-
-  @override
-  String get doNotDisturbMode => 'Jangan ganggu';
-
-  @override
-  String get editGroupAnnouncement => 'Edit pengumuman grup';
-
-  @override
-  String get editGroupDescription => 'Edit deskripsi grup';
-
-  @override
-  String get enterGroupAnnouncement => 'Masukkan pengumuman grup';
-
-  @override
-  String errorWithMessage(String message) {
-    return 'Kesalahan: $message';
+  String callJoinMeetingFailed(String error) {
+    return 'Gagal bergabung ke meeting: $error';
   }
 
   @override
-  String get feedbackAndSuggestions => 'Masukan dan saran';
-
-  @override
-  String get followSystem => 'Ikuti sistem';
-
-  @override
-  String get fontSize => 'Ukuran font';
-
-  @override
-  String get fontSizeExtraLarge => 'Sangat besar';
-
-  @override
-  String get fontSizeLarge => 'Besar';
-
-  @override
-  String get fontSizeSmall => 'Kecil';
-
-  @override
-  String get fontSizeStandard => 'Standar';
-
-  @override
-  String get incomingVideoCall => 'Panggilan video masuk';
-
-  @override
-  String get incomingVoiceCall => 'Panggilan suara masuk';
-
-  @override
-  String get letOthersKnowYouRead =>
-      'Biarkan orang lain tahu Anda telah membaca pesan mereka';
-
-  @override
-  String get letOthersKnowYouTyping =>
-      'Biarkan orang lain tahu Anda sedang mengetik';
-
-  @override
-  String get lightMode => 'Mode terang';
-
-  @override
-  String memberCountClickToCopy(int count) {
-    return '$count anggota, klik untuk menyalin ID grup';
+  String callScreenShareFailed(String error) {
+    return 'Berbagi layar gagal: $error';
   }
 
   @override
-  String get messageNotifications => 'Notifikasi pesan';
+  String get profileN42BeanTitle => 'N42 Bean';
 
   @override
-  String get messagesLabel => 'Pesan';
+  String get profileNoN42Bean => 'Tidak ada N42 Bean';
 
   @override
-  String get musicLinkLabel => 'Link musik';
+  String get profileN42BeanDetails => 'Detail N42 Bean';
 
   @override
-  String get noMediaUrlAvailable => 'URL media tidak tersedia';
-
-  @override
-  String get noPermissionToEditGroupName =>
-      'Anda tidak memiliki izin untuk mengubah nama grup';
-
-  @override
-  String get receiveMessagesFromNonContacts => 'Terima pesan dari non-kontak';
-
-  @override
-  String get receiveNewMessageNotifications => 'Terima notifikasi pesan baru';
-
-  @override
-  String get reconnectingCall => 'Menghubungkan ulang...';
-
-  @override
-  String get redPacketTransferCannotForward =>
-      'Angpao dan transfer tidak dapat diteruskan';
-
-  @override
-  String get showMessageContentInNotification =>
-      'Tampilkan isi pesan di notifikasi';
-
-  @override
-  String get showMessagePreview => 'Tampilkan pratinjau pesan';
-
-  @override
-  String get typingIndicator => 'Indikator mengetik';
-
-  @override
-  String versionInfo(String version) {
-    return 'Versi $version';
-  }
-
-  @override
-  String get vibration => 'Getaran';
-
-  @override
-  String get videoCallInProgress => 'Panggilan video';
-
-  @override
-  String get voiceCallInProgress => 'Panggilan suara';
-
-  @override
-  String whoCanSeeTitle(String title) {
-    return 'Siapa yang bisa melihat $title';
-  }
-
-  @override
-  String get emailAddress => 'Alamat email';
-
-  @override
-  String get enterEmailAddress => 'Masukkan alamat email';
-
-  @override
-  String get emailRecoveryHint => 'Digunakan untuk pemulihan kata sandi';
-
-  @override
-  String get invalidEmailFormat => 'Masukkan alamat email yang valid';
-
-  @override
-  String get optional => 'Opsional';
-
-  @override
-  String get resetPassword => 'Reset kata sandi';
-
-  @override
-  String get resetPasswordTitle => 'Reset kata sandi Anda';
-
-  @override
-  String get enterRegisteredEmail =>
-      'Masukkan alamat email yang Anda daftarkan';
-
-  @override
-  String get sendResetCode => 'Kirim kode reset';
-
-  @override
-  String resetCodeSent(String email) {
-    return 'Kode reset dikirim ke $email';
-  }
-
-  @override
-  String get enterResetCode => 'Masukkan kode reset';
-
-  @override
-  String get setNewPassword => 'Atur kata sandi baru';
-
-  @override
-  String get confirmNewPassword => 'Konfirmasi kata sandi baru';
-
-  @override
-  String get newPassword => 'Kata sandi baru';
-
-  @override
-  String get passwordResetSuccess =>
-      'Kata sandi berhasil direset. Silakan masuk dengan kata sandi baru Anda.';
-
-  @override
-  String get resetPasswordFailed => 'Gagal mereset kata sandi';
-
-  @override
-  String get changePassword => 'Ubah kata sandi';
-
-  @override
-  String get currentPassword => 'Kata sandi saat ini';
-
-  @override
-  String get enterCurrentPassword => 'Masukkan kata sandi saat ini';
-
-  @override
-  String get enterNewPassword => 'Masukkan kata sandi baru';
-
-  @override
-  String get passwordChanged =>
-      'Kata sandi berhasil diubah. Silakan masuk dengan kata sandi baru Anda.';
-
-  @override
-  String get changePasswordFailed => 'Gagal mengubah kata sandi';
-
-  @override
-  String get incorrectCurrentPassword => 'Kata sandi saat ini salah';
-
-  @override
-  String get newPasswordMustBeDifferent =>
-      'Kata sandi baru harus berbeda dari kata sandi saat ini';
-
-  @override
-  String get changePasswordInfo =>
-      'Setelah mengubah kata sandi, Anda akan keluar dan perlu masuk dengan kata sandi baru.';
-
-  @override
-  String get passwordRequirements => 'Persyaratan kata sandi:';
-
-  @override
-  String get securityNote =>
-      'Untuk keamanan, Anda perlu masuk ulang di semua perangkat setelah mengubah kata sandi.';
-
-  @override
-  String get security => 'Keamanan';
-
-  @override
-  String get currentBoundEmail => 'Email yang terhubung saat ini';
-
-  @override
-  String get newEmailAddress => 'Alamat email baru';
-
-  @override
-  String get enterNewEmail => 'Masukkan alamat email baru';
-
-  @override
-  String get verificationCode => 'Kode verifikasi';
-
-  @override
-  String get verificationCodeSent => 'Kode verifikasi terkirim';
-
-  @override
-  String get codeSentTo => 'Kode verifikasi dikirim ke';
-
-  @override
-  String get didNotReceiveCode => 'Tidak menerima kode?';
-
-  @override
-  String get emailChangedSuccess => 'Email berhasil diubah';
-
-  @override
-  String get changeEmailFailed => 'Gagal mengubah email';
-
-  @override
-  String get emailSecurityNote =>
-      'Email Anda digunakan untuk pemulihan kata sandi. Jaga keamanannya.';
-
-  @override
-  String get googleLogin => 'Masuk dengan Google';
-
-  @override
-  String get appleLogin => 'Masuk dengan Apple';
-
-  @override
-  String get facebookLogin => 'Masuk dengan Facebook';
-
-  @override
-  String get twitterLogin => 'Masuk dengan Twitter';
-
-  @override
-  String get wechatLogin => 'Masuk dengan WeChat';
-
-  @override
-  String get wechat => 'WeChat';
-
-  @override
-  String get facebook => 'Facebook';
-
-  @override
-  String get twitter => 'Twitter';
-
-  @override
-  String get wechatNotInstalled => 'Silakan instal WeChat terlebih dahulu';
-
-  @override
-  String get wechatLoginFailed => 'Login WeChat gagal';
-
-  @override
-  String get facebookLoginFailed => 'Login Facebook gagal';
-
-  @override
-  String get twitterLoginFailed => 'Login Twitter gagal';
-
-  @override
-  String get twitterNotConfigured => 'Login Twitter tidak dikonfigurasi';
-
-  @override
-  String get socialLoginCancelled => 'Login dibatalkan';
-
-  @override
-  String get socialLoginFailed => 'Login sosial gagal';
-
-  @override
-  String get language => 'Bahasa';
-
-  @override
-  String get languageChanged => 'Bahasa diubah';
-
-  @override
-  String get biometricLogin => '生物识别登录';
-
-  @override
-  String loginWithBiometric(Object type) {
-    return '使用$type登录';
-  }
-
-  @override
-  String get biometricLoginEnabled => '生物识别登录已启用';
-
-  @override
-  String get biometricLoginDisabled => '生物识别登录已禁用';
-
-  @override
-  String get enableBiometricLogin => '启用生物识别登录';
-
-  @override
-  String get disableBiometricLogin => '禁用生物识别登录';
-
-  @override
-  String get biometricNotAvailable => '此设备不支持生物识别';
-
-  @override
-  String get biometricNotEnrolled => '未录入生物识别数据，请在设备设置中设置';
-
-  @override
-  String get biometricAuthFailed => '生物识别验证失败';
-
-  @override
-  String get biometricAuthCancelled => '验证已取消';
-
-  @override
-  String get biometricLockedOut => '尝试次数过多，请稍后再试';
-
-  @override
-  String get useBiometricToLogin => '使用生物识别快速登录';
-
-  @override
-  String get authenticateToLogin => '验证身份以登录';
-
-  @override
-  String get authenticateToEnable => '验证身份以启用生物识别登录';
-
-  @override
-  String get faceId => '面容 ID';
-
-  @override
-  String get touchId => '触控 ID';
-
-  @override
-  String get fingerprint => '指纹';
-
-  @override
-  String get biometric => '生物识别';
-
-  @override
-  String get biometricEnabled => '已启用 - 使用生物识别登录';
-
-  @override
-  String get biometricDisabled => '已禁用 - 点击启用';
-
-  @override
-  String get biometricNeedRelogin => '请退出后重新登录以启用生物识别';
-
-  @override
-  String get or => '或';
-
-  @override
-  String get n42BeanTitle => 'N42 Bean';
-
-  @override
-  String get n42BeanDetails => 'Detail N42 Bean';
-
-  @override
-  String get noN42Bean => 'Tidak ada N42 Bean';
-
-  @override
-  String get n42BeanDescription =>
+  String get profileN42BeanDescription =>
       'N42 Bean adalah token untuk menukarkan barang virtual dan layanan di N42. Saat ini tersedia untuk:';
 
   @override
-  String get n42BeanFeature1 => 'Stiker dan tema eksklusif anggota';
+  String get profileN42BeanFeature1 => 'Stiker dan tema eksklusif anggota';
 
   @override
-  String get n42BeanFeature2 => 'Kustomisasi gelembung chat';
+  String get profileN42BeanFeature2 => 'Kustomisasi gelembung chat';
 
   @override
-  String get n42BeanFeature3 => 'Kustomisasi sampul amplop merah';
+  String get profileN42BeanFeature3 => 'Kustomisasi sampul amplop merah';
 
   @override
-  String get n42BeanFeature4 => 'Lencana nama panggilan eksklusif';
+  String get profileN42BeanFeature4 => 'Lencana nama panggilan eksklusif';
 
   @override
-  String get n42BeanFeature5 => 'Hak istimewa chat grup';
+  String get profileN42BeanFeature5 => 'Hak istimewa chat grup';
 
   @override
-  String get n42BeanFeature6 => 'Perluasan penyimpanan cloud';
+  String get profileN42BeanFeature6 => 'Perluasan penyimpanan cloud';
 
   @override
-  String get n42BeanFeature7 => 'Filter kecantikan panggilan video';
+  String get profileN42BeanFeature7 => 'Filter kecantikan panggilan video';
 
   @override
-  String get n42BeanFeature8 => 'Kustomisasi latar belakang Moments';
+  String get profileN42BeanFeature8 => 'Kustomisasi latar belakang Moments';
 
   @override
-  String get n42BeanFeature9 => 'Prioritas layanan pelanggan VIP';
+  String get profileN42BeanFeature9 => 'Prioritas layanan pelanggan VIP';
 
   @override
-  String get gotIt => 'Mengerti';
+  String get profileGotIt => 'Mengerti';
 
   @override
-  String get noN42BeanRecords => 'Tidak ada catatan N42 Bean';
+  String get profileNoN42BeanRecords => 'Tidak ada catatan N42 Bean';
 
   @override
-  String get cameraPermissionRestricted =>
-      'Akses kamera dibatasi pada perangkat ini';
+  String get profileMoodAndThoughts => 'Suasana Hati & Pikiran';
 
   @override
-  String get passkeyLabel => 'Passkey';
+  String get profileStatusHappy => 'Senang';
 
   @override
-  String get googleLabel => 'Google';
+  String get profileStatusCracked => 'Hancur';
 
   @override
-  String get appleLabel => 'Apple';
+  String get profileStatusLucky => 'Beruntung';
 
   @override
-  String get ssoLabel => 'SSO';
+  String get profileStatusSunny => 'Cerah';
 
   @override
-  String get amountHintZero => '0.00';
+  String get profileStatusTired => 'Lelah';
 
   @override
-  String get matrixIdHint => '@username:server.com';
+  String get profileStatusDaydream => 'Melamun';
 
   @override
-  String get serverAddressHint => 'https://m.si46.world';
+  String get profileStatusRushing => 'Terburu-buru';
 
   @override
-  String get emailExampleHint => 'example@email.com';
+  String get profileStatusOverthinking => 'Berpikir Berlebihan';
 
   @override
-  String get verificationCodePlaceholder => '------';
+  String get profileStatusEnergized => 'Berenergi';
 
   @override
-  String get enterPokeSuffixHint => '输入戳一戳后缀，例如：的肩膀';
+  String get profileWorkAndStudy => 'Kerja & Belajar';
 
   @override
-  String get groupAlbum => '群相册';
+  String get profileStatusWorking => 'Bekerja';
 
   @override
-  String get groupFiles => '群文件';
+  String get profileStatusStudying => 'Belajar';
 
   @override
-  String get images => '图片';
+  String get profileStatusBusy => 'Sibuk';
 
   @override
-  String get videos => '视频';
+  String get profileStatusSlacking => 'Santai';
 
   @override
-  String get total => '全部';
+  String get profileStatusTraveling => 'Bepergian';
 
   @override
-  String get size => '大小';
+  String get profileStatusGoingHome => 'Pulang';
 
   @override
-  String get noMedia => '暂无媒体';
+  String get profileStatusDnd => 'Jangan Ganggu';
 
   @override
-  String get noMediaDescription => '此群还没有图片或视频';
+  String get profileActivities => 'Aktivitas';
 
   @override
-  String get documents => '文档';
+  String get profileStatusHanging => 'Nongkrong';
 
   @override
-  String get noFiles => '暂无文件';
+  String get profileStatusCheckIn => 'Check In';
 
   @override
-  String get noFilesDescription => '此群还没有文件';
+  String get profileStatusExercising => 'Berolahraga';
 
   @override
-  String downloadStarted(String filename) {
-    return '正在下载 $filename...';
+  String get profileStatusCoffee => 'Kopi';
+
+  @override
+  String get profileStatusBubbleTea => 'Boba';
+
+  @override
+  String get profileStatusEating => 'Makan';
+
+  @override
+  String get profileStatusParenting => 'Mengasuh';
+
+  @override
+  String get profileStatusSavingWorld => 'Menyelamatkan Dunia';
+
+  @override
+  String get profileStatusSelfie => 'Selfie';
+
+  @override
+  String get profileRest => 'Istirahat';
+
+  @override
+  String get profileStatusRetreat => 'Istirahat';
+
+  @override
+  String get profileStatusHome => 'Di Rumah';
+
+  @override
+  String get profileStatusSleeping => 'Tidur';
+
+  @override
+  String get profileStatusCatLover => 'Pecinta Kucing';
+
+  @override
+  String get profileStatusDogWalking => 'Jalan-jalan dengan Anjing';
+
+  @override
+  String get profileStatusGaming => 'Bermain Game';
+
+  @override
+  String get profileStatusListening => 'Mendengarkan';
+
+  @override
+  String get profileEditAddress => 'Edit Alamat';
+
+  @override
+  String get profileRecipient => 'Penerima';
+
+  @override
+  String get profileEnterRecipientName => 'Masukkan nama penerima';
+
+  @override
+  String get profilePhoneNumber => 'Nomor Telepon';
+
+  @override
+  String get profileEnterPhoneNumber => 'Masukkan nomor telepon';
+
+  @override
+  String get profileRegionHint => 'Provinsi/Kota/Kabupaten';
+
+  @override
+  String get profileDetailedAddress => 'Alamat Lengkap';
+
+  @override
+  String get profileDetailedAddressHint => 'Jalan, nomor gedung, dll.';
+
+  @override
+  String get profileSetAsDefaultAddress => 'Atur sebagai alamat default';
+
+  @override
+  String get profilePleaseCompleteInfo => 'Silakan lengkapi semua kolom';
+
+  @override
+  String get profileEditInvoice => 'Edit Faktur';
+
+  @override
+  String get profileInvoiceType => 'Jenis faktur: ';
+
+  @override
+  String get profileCompanyName => 'Nama Perusahaan';
+
+  @override
+  String get profilePersonalName => 'Nama Pribadi';
+
+  @override
+  String get profileEnterCompanyName => 'Masukkan nama perusahaan';
+
+  @override
+  String get profileEnterName => 'Masukkan nama';
+
+  @override
+  String get profileTaxIdNumber => 'NPWP';
+
+  @override
+  String get profileEnterTaxIdNumber => 'Masukkan NPWP';
+
+  @override
+  String get profileBankNameOptional => 'Nama Bank (Opsional)';
+
+  @override
+  String get profileEnterBankName => 'Masukkan nama bank';
+
+  @override
+  String get profileBankAccountOptional => 'Rekening Bank (Opsional)';
+
+  @override
+  String get profileEnterBankAccount => 'Masukkan rekening bank';
+
+  @override
+  String get profileCompanyAddressOptional => 'Alamat Perusahaan (Opsional)';
+
+  @override
+  String get profileEnterCompanyAddress => 'Masukkan alamat perusahaan';
+
+  @override
+  String get profileCompanyPhoneOptional => 'Telepon Perusahaan (Opsional)';
+
+  @override
+  String get profileEnterCompanyPhone => 'Masukkan telepon perusahaan';
+
+  @override
+  String get profileSetAsDefaultInvoice => 'Atur sebagai faktur default';
+
+  @override
+  String get profileRingtoneVibrate => 'Getar';
+
+  @override
+  String get profileRingtoneSilent => 'Senyap';
+
+  @override
+  String get profileVibrateMode => 'Mode getar';
+
+  @override
+  String get profileSilentMode => 'Mode senyap';
+
+  @override
+  String profilePlayFailed(String ringtoneName) {
+    return 'Gagal memutar: $ringtoneName';
   }
 
   @override
-  String get noCommonGroups => '暂无共同群组';
-
-  @override
-  String get noCommonGroupsDescription => '你们没有共同加入的群组';
-
-  @override
-  String get pinMessage => '置顶';
-
-  @override
-  String get unpinMessage => '取消置顶';
-
-  @override
-  String get voiceMessage => '语音';
-
-  @override
-  String get message => '消息';
-
-  @override
-  String get hideChat => '隐藏';
-
-  @override
-  String get unhideChat => '取消隐藏';
-
-  @override
-  String get hiddenChats => '隐藏的聊天';
-
-  @override
-  String get noHiddenChats => '没有隐藏的聊天';
-
-  @override
-  String get noHiddenChatsDescription => '你隐藏的聊天会显示在这里';
-
-  @override
-  String get quickReply => '快捷回复';
-
-  @override
-  String get manageQuickReplies => '管理快捷回复';
-
-  @override
-  String get addQuickReply => '添加快捷回复';
-
-  @override
-  String get editQuickReply => '编辑快捷回复';
-
-  @override
-  String get deleteQuickReply => '删除快捷回复';
-
-  @override
-  String get noQuickReplies => '暂无快捷回复';
-
-  @override
-  String get defaultQuickReplies => '将显示默认快捷回复';
-
-  @override
-  String get translate => '翻译';
-
-  @override
-  String get translating => '翻译中...';
-
-  @override
-  String get translationFailed => '翻译失败';
-
-  @override
-  String translatedFrom(String language) {
-    return '翻译自$language';
+  String profilePlaying(String ringtoneName) {
+    return 'Memutar: $ringtoneName';
   }
 
   @override
-  String get showOriginal => '显示原文';
+  String get profileStop => 'Berhenti';
 
   @override
-  String get hideTranslation => '隐藏翻译';
+  String get profileSelectRingtone => 'Pilih Nada Dering';
 
   @override
-  String get translation => '翻译';
+  String get profileLoadingRingtones => 'Memuat nada dering...';
 
   @override
-  String get story => '状态';
+  String get profileNoRingtonesFound => 'Tidak ada nada dering ditemukan';
 
   @override
-  String get myStory => '我的状态';
-
-  @override
-  String get addToStory => '发布状态';
-
-  @override
-  String get storyExpired => '状态已过期';
-
-  @override
-  String storyExpiresIn(String time) {
-    return '$time后过期';
+  String mainMessagesWithCount(int count) {
+    return 'Pesan($count)';
   }
 
   @override
-  String get viewers => '浏览者';
+  String get storyViewers => 'Penonton';
 
   @override
-  String get noViewers => '暂无浏览';
+  String get storyNoViewers => 'Belum ada penonton';
 
   @override
-  String viewersCount(int count) {
-    return '$count人浏览';
+  String get storyReplyToStory => 'Balas cerita...';
+
+  @override
+  String get commonCopiedToClipboard => 'Disalin ke papan klip';
+
+  @override
+  String get commonMore => 'Lainnya';
+
+  @override
+  String get commonTranslating => 'Menerjemahkan...';
+
+  @override
+  String commonTranslatedFrom(String language) {
+    return 'Diterjemahkan dari $language';
   }
 
   @override
-  String get replyToStory => '回复状态...';
+  String get commonTranslation => 'Terjemahan';
 
   @override
-  String get createStory => '发布状态';
+  String get commonTranslationFailed => 'Terjemahan gagal';
 
   @override
-  String get storySettings => '状态设置';
+  String get commonAllRead => 'Semua dibaca';
 
   @override
-  String get whoCanSeeMyStory => '谁可以看我的状态';
+  String commonReadCount(int count) {
+    return '$count dibaca';
+  }
 
   @override
-  String get storyPrivacy => '状态隐私';
+  String get commonYouRecalledMessage => 'Anda menarik sebuah pesan';
+
+  @override
+  String get commonMessageRecalled => 'Pesan ditarik';
+
+  @override
+  String get commonReEdit => 'Edit ulang';
+
+  @override
+  String get commonWalletArea => 'Area dompet';
+
+  @override
+  String get callIncomingCall => 'Panggilan masuk';
+
+  @override
+  String get callMissedCall => 'Panggilan tidak terjawab';
+
+  @override
+  String get groupRemoveAdmin => 'Hapus Admin';
+
+  @override
+  String get chatSelectCurrency => 'Pilih mata uang';
+
+  @override
+  String get chatSelectEmoji => 'Pilih emoji';
+
+  @override
+  String get chatSelectRedPacketCover => 'Pilih sampul';
+
+  @override
+  String get groupSetAsAdmin => 'Atur sebagai Admin';
+
+  @override
+  String get chatVideoPlaybackFailed => 'Pemutaran video gagal';
+
+  @override
+  String get groupViewProfile => 'Lihat Profil';
+
+  @override
+  String get favoriteAddLinkComingSoon => 'Fitur tambah tautan segera hadir';
+
+  @override
+  String get favoriteNewNoteComingSoon => 'Fitur catatan baru segera hadir';
+
+  @override
+  String get qrcodeSaveFeatureComingSoon => 'Fitur simpan segera hadir';
+
+  @override
+  String get qrcodeShareFeatureComingSoon => 'Fitur bagikan segera hadir';
+
+  @override
+  String qrcodeProcessFailed(String error) {
+    return 'Gagal memproses kode QR: $error';
+  }
 }
