@@ -6,9 +6,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/entities/android_params.dart';
+import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
+import 'package:flutter_callkit_incoming/entities/ios_params.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:matrix/matrix.dart' as matrix;
+import 'package:uuid/uuid.dart';
 
+import '../../services/voip/call_manager.dart';
 import 'push_notification_service.dart';
 
 /// 后台消息处理器 - 必须是顶级函数
@@ -220,15 +226,24 @@ class FirebasePushService implements IPushNotificationService {
       return;
     }
 
-    // 过滤通话相关的推送（由 CallKit 处理）
+    // 过滤通话相关的推送
     final eventType = message.data['type'] as String?;
+    if (eventType == 'm.call.invite') {
+      _isInCall = true;
+      debugPrint('FirebasePushService: Set isInCall=true for incoming call');
+      // 前台保护：如果 CallManager 尚未初始化或尚未处理此来电，
+      // 主动触发 CallKit 作为 fallback（避免 sync 未建立时来电丢失）
+      final callManager = CallManager();
+      if (!callManager.isInitialized || !callManager.isInCall) {
+        debugPrint('FirebasePushService: CallManager not handling call, showing CallKit as fallback');
+        _showBackgroundCallKit(message).catchError((Object e) {
+          debugPrint('FirebasePushService: Failed to show foreground CallKit fallback: $e');
+        });
+      }
+      return;
+    }
     if (eventType != null && eventType.startsWith('m.call.')) {
       debugPrint('FirebasePushService: Skipping foreground notification for call event: $eventType');
-      // 收到来电推送时，立即设置通话状态，防止后续消息通知
-      if (eventType == 'm.call.invite') {
-        _isInCall = true;
-        debugPrint('FirebasePushService: Set isInCall=true for incoming call');
-      }
       return;
     }
 
@@ -277,10 +292,32 @@ class FirebasePushService implements IPushNotificationService {
     }
   }
 
+  /// 测试入口：处理后台消息
+  @visibleForTesting
+  static Future<void> handleBackgroundMessageForTest(RemoteMessage message) =>
+      _handleBackgroundMessage(message);
+
+  /// 测试入口：显示后台 CallKit
+  @visibleForTesting
+  static Future<void> showBackgroundCallKitForTest(RemoteMessage message) =>
+      _showBackgroundCallKit(message);
+
   /// 处理后台消息（静态方法）
   static Future<void> _handleBackgroundMessage(RemoteMessage message) async {
-    // 过滤通话相关的推送（由 CallKit 处理）
     final eventType = message.data['type'] as String?;
+
+    // m.call.invite: 后台来电，直接触发 CallKit 显示来电界面
+    if (eventType == 'm.call.invite') {
+      debugPrint('FirebasePushService: Background call invite received, showing CallKit');
+      try {
+        await _showBackgroundCallKit(message);
+      } catch (e) {
+        debugPrint('FirebasePushService: Failed to show background CallKit: $e');
+      }
+      return;
+    }
+
+    // 其他 m.call.* 事件（如 m.call.hangup, m.call.candidates）跳过
     if (eventType != null && eventType.startsWith('m.call.')) {
       debugPrint('FirebasePushService: Skipping background notification for call event: $eventType');
       return;
@@ -350,6 +387,54 @@ class FirebasePushService implements IPushNotificationService {
         payload: payload,
       );
     }
+  }
+
+  /// 后台推送触发 CallKit 来电界面（静态方法，可在后台 isolate 中调用）
+  static Future<void> _showBackgroundCallKit(RemoteMessage message) async {
+    final roomId = message.data['room_id'] as String?;
+    final senderId = message.data['sender'] as String?;
+    final senderName = message.data['sender_display_name'] as String?
+        ?? message.notification?.title
+        ?? senderId
+        ?? 'Unknown';
+
+    final callId = const Uuid().v4();
+
+    final params = CallKitParams(
+      id: callId,
+      nameCaller: senderName,
+      appName: 'N42 Chat',
+      handle: senderId ?? '',
+      type: 0, // 默认语音（后台推送无法确定通话类型）
+      duration: 60000,
+      extra: <String, dynamic>{
+        'callerId': senderId,
+        'roomId': roomId,
+      },
+      android: const AndroidParams(
+        isCustomNotification: true,
+        isShowLogo: true,
+        ringtonePath: 'ringtone_default',
+        backgroundColor: '#0955fa',
+        actionColor: '#4CAF50',
+        textColor: '#ffffff',
+      ),
+      ios: const IOSParams(
+        iconName: 'CallKitLogo',
+        handleType: 'generic',
+        supportsVideo: true,
+        maximumCallGroups: 1,
+        maximumCallsPerCallGroup: 1,
+        audioSessionMode: 'videoChat',
+        audioSessionActive: true,
+        audioSessionPreferredSampleRate: 44100.0,
+        audioSessionPreferredIOBufferDuration: 0.005,
+        ringtonePath: 'ringtone_default',
+      ),
+    );
+
+    await FlutterCallkitIncoming.showCallkitIncoming(params);
+    debugPrint('FirebasePushService: Background CallKit shown for call $callId from $senderName');
   }
 
   /// 处理通知点击

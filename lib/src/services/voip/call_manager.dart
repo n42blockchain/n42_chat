@@ -358,24 +358,38 @@ class CallManager {
     // 设置通话状态，禁用所有消息通知
     N42Chat.pushService?.setInCall(true);
 
-    // 获取本地化字符串
-    final context = _navigatorKey?.currentContext;
-    final l10n = context != null ? S.of(context) : null;
+    // 检查是否已有活跃的 CallKit 来电（由后台推送触发）
+    // 避免重复显示来电界面
+    bool alreadyShowing = false;
+    try {
+      final activeCalls = await _notificationService.getActiveCalls();
+      alreadyShowing = activeCalls.isNotEmpty;
+    } catch (e) {
+      debugPrint('CallManager: Failed to check active calls: $e');
+    }
 
-    // 显示来电通知
-    await _notificationService.showIncomingCall(
-      callerId: session.peerId,
-      callerName: session.peerName,
-      callerAvatarUrl: session.peerAvatarUrl,
-      isVideo: session.type == CallType.video,
-      roomId: session.roomId,
-      textAccept: l10n?.callAnswer ?? 'Answer',
-      textDecline: l10n?.callDecline ?? 'Decline',
-      missedCallText: l10n?.callMissedCall ?? 'Missed call',
-      callbackText: l10n?.chatCallBack ?? 'Call back',
-      incomingCallChannelName: l10n?.callIncomingCall ?? 'Incoming call',
-      missedCallChannelName: l10n?.callMissedCall ?? 'Missed call',
-    );
+    if (!alreadyShowing) {
+      // 获取本地化字符串
+      final context = _navigatorKey?.currentContext;
+      final l10n = context != null ? S.of(context) : null;
+
+      // 显示来电通知
+      await _notificationService.showIncomingCall(
+        callerId: session.peerId,
+        callerName: session.peerName,
+        callerAvatarUrl: session.peerAvatarUrl,
+        isVideo: session.type == CallType.video,
+        roomId: session.roomId,
+        textAccept: l10n?.callAnswer ?? 'Answer',
+        textDecline: l10n?.callDecline ?? 'Decline',
+        missedCallText: l10n?.callMissedCall ?? 'Missed call',
+        callbackText: l10n?.chatCallBack ?? 'Call back',
+        incomingCallChannelName: l10n?.callIncomingCall ?? 'Incoming call',
+        missedCallChannelName: l10n?.callMissedCall ?? 'Missed call',
+      );
+    } else {
+      debugPrint('CallManager: CallKit already showing from background push, skipping duplicate');
+    }
 
     // 直接导航到来电界面（如果应用在前台）
     _navigateToCallScreen(isIncoming: true, session: session);
