@@ -159,12 +159,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     required Uint8List imageBytes,
     required String filename,
     String? mimeType,
+    int? selfDestructAfter,
   }) async {
     final eventId = await _messageDataSource.sendImageMessage(
       roomId,
       imageBytes: imageBytes,
       filename: filename,
       mimeType: mimeType,
+      selfDestructAfter: selfDestructAfter,
     );
     if (eventId == null) return null;
 
@@ -198,6 +200,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     required String filename,
     String? mimeType,
     Uint8List? thumbnailBytes,
+    int? selfDestructAfter,
   }) async {
     final eventId = await _messageDataSource.sendVideoMessage(
       roomId,
@@ -205,6 +208,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       filename: filename,
       mimeType: mimeType,
       thumbnailBytes: thumbnailBytes,
+      selfDestructAfter: selfDestructAfter,
     );
     if (eventId == null) return null;
 
@@ -1020,6 +1024,127 @@ class MessageRepositoryImpl implements IMessageRepository {
       limit: limit,
       beforeEventId: beforeEventId,
     );
+  }
+
+  // ============================================
+  // 消息线程 (MSC3440)
+  // ============================================
+
+  @override
+  Future<List<MessageEntity>> getThreadMessages(
+    String roomId,
+    String threadRootEventId, {
+    int limit = 50,
+    String? fromEventId,
+  }) async {
+    return await _messageDataSource.getThreadMessages(
+      roomId,
+      threadRootEventId,
+      limit: limit,
+      fromToken: fromEventId,
+    );
+  }
+
+  @override
+  Stream<List<MessageEntity>> watchThreadMessages(
+    String roomId,
+    String threadRootEventId,
+  ) {
+    return _messageDataSource.watchThreadMessages(roomId, threadRootEventId);
+  }
+
+  @override
+  Future<MessageEntity?> sendThreadTextMessage(
+    String roomId,
+    String threadRootEventId,
+    String text,
+  ) async {
+    final eventId = await _messageDataSource.sendThreadMessage(
+      roomId,
+      threadRootEventId,
+      text,
+    );
+    if (eventId == null) return null;
+
+    return MessageEntity(
+      id: eventId,
+      roomId: roomId,
+      senderId: _clientManager.client?.userID ?? '',
+      senderName: _clientManager.client?.userID ?? '',
+      content: text,
+      type: MessageType.text,
+      timestamp: DateTime.now(),
+      status: MessageStatus.sending,
+      isFromMe: true,
+      threadRootId: threadRootEventId,
+    );
+  }
+
+  @override
+  Future<MessageEntity?> sendThreadImageMessage(
+    String roomId,
+    String threadRootEventId, {
+    required Uint8List imageBytes,
+    required String filename,
+    String? mimeType,
+  }) async {
+    final eventId = await _messageDataSource.sendThreadImageMessage(
+      roomId,
+      threadRootEventId,
+      imageBytes: imageBytes,
+      filename: filename,
+      mimeType: mimeType,
+    );
+    if (eventId == null) return null;
+
+    return MessageEntity(
+      id: eventId,
+      roomId: roomId,
+      senderId: _clientManager.client?.userID ?? '',
+      senderName: _clientManager.client?.userID ?? '',
+      content: filename,
+      type: MessageType.image,
+      timestamp: DateTime.now(),
+      status: MessageStatus.sending,
+      isFromMe: true,
+      threadRootId: threadRootEventId,
+    );
+  }
+
+  @override
+  Future<MessageEntity?> sendThreadFileMessage(
+    String roomId,
+    String threadRootEventId, {
+    required Uint8List fileBytes,
+    required String filename,
+    String? mimeType,
+  }) async {
+    final eventId = await _messageDataSource.sendThreadFileMessage(
+      roomId,
+      threadRootEventId,
+      fileBytes: fileBytes,
+      filename: filename,
+      mimeType: mimeType,
+    );
+    if (eventId == null) return null;
+
+    return MessageEntity(
+      id: eventId,
+      roomId: roomId,
+      senderId: _clientManager.client?.userID ?? '',
+      senderName: _clientManager.client?.userID ?? '',
+      content: filename,
+      type: MessageType.file,
+      timestamp: DateTime.now(),
+      status: MessageStatus.sending,
+      isFromMe: true,
+      threadRootId: threadRootEventId,
+    );
+  }
+
+  @override
+  Future<List<MessageEntity>> getRoomThreadRoots(String roomId) async {
+    return await _messageDataSource.getRoomThreadRoots(roomId);
   }
 }
 

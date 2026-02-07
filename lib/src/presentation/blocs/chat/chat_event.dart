@@ -71,15 +71,17 @@ class SendImageMessage extends ChatEvent {
   final Uint8List imageBytes;
   final String filename;
   final String? mimeType;
+  final int? selfDestructAfter;
 
   const SendImageMessage({
     required this.imageBytes,
     required this.filename,
     this.mimeType,
+    this.selfDestructAfter,
   });
 
   @override
-  List<Object?> get props => [imageBytes, filename, mimeType];
+  List<Object?> get props => [imageBytes, filename, mimeType, selfDestructAfter];
 }
 
 /// 发送语音消息
@@ -122,16 +124,18 @@ class SendVideoMessage extends ChatEvent {
   final String filename;
   final String? mimeType;
   final Uint8List? thumbnailBytes;
+  final int? selfDestructAfter;
 
   const SendVideoMessage({
     required this.videoBytes,
     required this.filename,
     this.mimeType,
     this.thumbnailBytes,
+    this.selfDestructAfter,
   });
 
   @override
-  List<Object?> get props => [videoBytes, filename, mimeType, thumbnailBytes];
+  List<Object?> get props => [videoBytes, filename, mimeType, thumbnailBytes, selfDestructAfter];
 }
 
 /// 发送位置消息
@@ -210,6 +214,16 @@ class SetReplyTarget extends ChatEvent {
   final MessageEntity? message;
 
   const SetReplyTarget(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+/// 设置编辑目标（进入编辑模式）
+class SetEditTarget extends ChatEvent {
+  final MessageEntity? message;
+
+  const SetEditTarget(this.message);
 
   @override
   List<Object?> get props => [message];

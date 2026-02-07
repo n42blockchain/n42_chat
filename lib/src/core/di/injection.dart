@@ -51,6 +51,14 @@ import '../../presentation/blocs/search/search_bloc.dart';
 import '../../presentation/blocs/transfer/transfer_bloc.dart';
 import '../../presentation/blocs/moment/moment_bloc.dart';
 import '../../presentation/blocs/story/story_bloc.dart';
+import '../../presentation/blocs/thread/thread_bloc.dart';
+import '../../presentation/blocs/voice_room/voice_room_bloc.dart';
+import '../../data/datasources/matrix/matrix_voice_room_datasource.dart';
+import '../services/username_service.dart';
+import '../services/ens_cache_service.dart';
+import '../../data/repositories/voice_room_repository_impl.dart';
+import '../../domain/repositories/voice_room_repository.dart';
+import '../../services/voip/voice_room_service.dart';
 
 /// 全局GetIt实例
 final GetIt getIt = GetIt.instance;
@@ -134,6 +142,19 @@ Future<void> _registerServices() async {
     );
   }
 
+  // 用户名服务
+  getIt.registerLazySingleton<UsernameService>(
+    () => UsernameService(getIt<MatrixClientManager>()),
+  );
+
+  // ENS 缓存服务
+  getIt.registerLazySingleton<EnsCacheService>(
+    () => EnsCacheService(
+      clientManager: getIt<MatrixClientManager>(),
+      walletBridge: getIt<IWalletBridge>(),
+    ),
+  );
+
   // 翻译服务
   getIt.registerLazySingleton<ITranslationService>(
     () => GoogleTranslationService(
@@ -201,6 +222,11 @@ Future<void> _registerDataSources() async {
   getIt.registerLazySingleton<MatrixStoryDataSource>(
     () => MatrixStoryDataSource(getIt<MatrixClientManager>()),
   );
+
+  // Matrix 语音房间数据源
+  getIt.registerLazySingleton<MatrixVoiceRoomDataSource>(
+    () => MatrixVoiceRoomDataSource(getIt<MatrixClientManager>()),
+  );
 }
 
 /// 注册仓库
@@ -243,6 +269,7 @@ void _registerRepositories() {
     () => GroupRepositoryImpl(
       getIt<MatrixGroupDataSource>(),
       getIt<MatrixClientManager>(),
+      walletBridge: getIt<IWalletBridge>(),
     ),
   );
 
@@ -260,6 +287,8 @@ void _registerRepositories() {
     () => SearchRepositoryImpl(
       getIt<MatrixSearchDataSource>(),
       getIt<MatrixClientManager>(),
+      ensCacheService: getIt<EnsCacheService>(),
+      usernameService: getIt<UsernameService>(),
     ),
   );
 
@@ -291,6 +320,13 @@ void _registerRepositories() {
     () => StoryRepositoryImpl(
       getIt<MatrixStoryDataSource>(),
       getIt<SecureStorageDataSource>(),
+    ),
+  );
+
+  // 语音房间仓库
+  getIt.registerLazySingleton<IVoiceRoomRepository>(
+    () => VoiceRoomRepositoryImpl(
+      getIt<MatrixVoiceRoomDataSource>(),
     ),
   );
 }
@@ -362,6 +398,28 @@ void _registerBlocs() {
   // Story BLoC
   getIt.registerFactory<StoryBloc>(
     () => StoryBloc(getIt<IStoryRepository>()),
+  );
+
+  // 线程 BLoC
+  getIt.registerFactory<ThreadBloc>(
+    () => ThreadBloc(
+      messageRepository: getIt<IMessageRepository>(),
+    ),
+  );
+
+  // 语音房间服务
+  getIt.registerLazySingleton<VoiceRoomService>(
+    () => VoiceRoomService(
+      repository: getIt<IVoiceRoomRepository>(),
+    ),
+  );
+
+  // 语音房间 BLoC
+  getIt.registerFactory<VoiceRoomBloc>(
+    () => VoiceRoomBloc(
+      repository: getIt<IVoiceRoomRepository>(),
+      voiceRoomService: getIt<VoiceRoomService>(),
+    ),
   );
 }
 

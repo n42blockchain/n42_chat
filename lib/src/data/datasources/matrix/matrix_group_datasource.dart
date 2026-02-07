@@ -528,6 +528,38 @@ class MatrixGroupDataSource {
   }
 
   // ============================================
+  // 代币门控
+  // ============================================
+
+  static const String _tokenGateEventType = 'n42.token_gate';
+
+  /// 获取代币门控配置
+  Map<String, dynamic>? getTokenGateConfig(String roomId) {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return null;
+
+    try {
+      final stateEvent = room.getState(_tokenGateEventType);
+      return stateEvent?.content;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// 设置代币门控配置
+  Future<void> setTokenGateConfig(String roomId, Map<String, dynamic> config) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) throw Exception('Room not found');
+
+    await _client!.setRoomStateWithKey(
+      roomId,
+      _tokenGateEventType,
+      '',
+      config,
+    );
+  }
+
+  // ============================================
   // 监听
   // ============================================
 

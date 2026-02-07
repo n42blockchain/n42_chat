@@ -10,6 +10,8 @@ import '../../widgets/chat/message_status_indicator.dart' as indicator;
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/chat/message_reaction_bar.dart';
+import '../../widgets/chat/edit_history_sheet.dart';
+import '../../widgets/chat/thread_indicator.dart';
 
 /// 消息列表项
 class MessageItem extends StatelessWidget {
@@ -64,6 +66,9 @@ class MessageItem extends StatelessWidget {
   /// 引用块点击回调 - 用于跳转到被引用的消息
   final void Function(String messageId)? onReplyQuoteTap;
 
+  /// 线程点击回调 - 用于导航到线程详情页
+  final void Function(MessageEntity message)? onThreadTap;
+
   const MessageItem({
     super.key,
     required this.message,
@@ -83,6 +88,7 @@ class MessageItem extends StatelessWidget {
     this.onContactCardTap,
     this.onCallBack,
     this.onReplyQuoteTap,
+    this.onThreadTap,
   });
 
   @override
@@ -271,7 +277,7 @@ class MessageItem extends StatelessWidget {
     
     // 如果有回复，添加回复引用块
     if (message.hasReply && message.replyToContent != null) {
-      return Column(
+      content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -281,7 +287,22 @@ class MessageItem extends StatelessWidget {
         ],
       );
     }
-    
+
+    // 如果是线程根消息，在内容下方显示线程指示器
+    if (message.isThreadRoot) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          content,
+          ThreadIndicator(
+            message: message,
+            onTap: () => onThreadTap?.call(message),
+          ),
+        ],
+      );
+    }
+
     return content;
   }
   
@@ -354,12 +375,52 @@ class MessageItem extends StatelessWidget {
         ? AppColors.messageTextSent  // 黑色
         : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
 
-    return Text(
+    final textWidget = Text(
       message.content,
       style: TextStyle(
         fontSize: 16,
         color: textColor,
         height: 1.4,
+      ),
+    );
+
+    // 如果消息被编辑过，在文字下方显示 "已编辑" 标签
+    if (message.isEdited) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          textWidget,
+          const SizedBox(height: 2),
+          GestureDetector(
+            onTap: () => _showEditHistory(context),
+            child: Text(
+              S.of(context)?.chatEdited ?? 'Edited',
+              style: TextStyle(
+                fontSize: 10,
+                color: message.isFromMe
+                    ? AppColors.messageTextSent.withValues(alpha: 0.5)
+                    : (isDark ? Colors.grey[500] : Colors.grey),
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return textWidget;
+  }
+
+  /// 显示编辑历史
+  void _showEditHistory(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => EditHistorySheet(
+        roomId: message.roomId,
+        messageId: message.id,
       ),
     );
   }
@@ -579,6 +640,10 @@ class MessageItem extends StatelessWidget {
       width: metadata?.width,
       height: metadata?.height,
       onTap: onTap,
+      isViewOnce: message.isSelfDestructing,
+      isExpired: message.isExpired,
+      isViewed: message.isDestructionStarted && !message.isExpired,
+      isFromMe: message.isFromMe,
     );
   }
 
@@ -620,6 +685,102 @@ class MessageItem extends StatelessWidget {
     final thumbnailUrl = metadata?.thumbnailUrl;
     final durationMs = metadata?.duration;
     final fileSize = metadata?.size;
+    final s = S.of(context);
+
+    // View Once 视频消息（接收方）
+    if (message.isSelfDestructing && !message.isFromMe) {
+      if (message.isExpired || message.isDestructionStarted) {
+        // 已过期或已查看
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            width: 200,
+            height: 120,
+            color: AppColors.placeholder,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    message.isExpired ? Icons.timer_off : Icons.visibility,
+                    color: AppColors.textTertiary,
+                    size: 28,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    message.isExpired
+                        ? (s?.chatViewOnceExpired ?? 'Expired')
+                        : (s?.chatViewOnceViewed ?? 'Viewed'),
+                    style: const TextStyle(
+                      color: AppColors.textTertiary,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }
+
+      // 未查看 — 模糊蒙版
+      return GestureDetector(
+        onTap: onTap,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            width: 200,
+            height: 120,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.grey[400]!,
+                  Colors.grey[600]!,
+                ],
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.lock,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    s?.chatViewOnceVideo ?? 'View Once Video',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    s?.chatViewOnceTap ?? 'Tap to view',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.7),
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return GestureDetector(
       onTap: onTap,
@@ -729,6 +890,33 @@ class MessageItem extends StatelessWidget {
                 ),
               ),
             ),
+            // View Once 标记（发送方）
+            if (message.isSelfDestructing && message.isFromMe)
+              Positioned(
+                left: 8,
+                bottom: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.timer, size: 12, color: Colors.white),
+                      const SizedBox(width: 3),
+                      Text(
+                        s?.chatViewOnce ?? 'View Once',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),

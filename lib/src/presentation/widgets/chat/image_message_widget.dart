@@ -42,6 +42,18 @@ class ImageMessageWidget extends StatefulWidget {
   /// 圆角
   final double borderRadius;
 
+  /// 是否是 View Once（阅后即焚）消息
+  final bool isViewOnce;
+
+  /// View Once 消息是否已过期
+  final bool isExpired;
+
+  /// View Once 消息是否已查看
+  final bool isViewed;
+
+  /// 是否是自己发送的
+  final bool isFromMe;
+
   const ImageMessageWidget({
     super.key,
     required this.imageUrl,
@@ -53,6 +65,10 @@ class ImageMessageWidget extends StatefulWidget {
     this.maxHeight = 300,
     this.minSize = 100,
     this.borderRadius = 4,
+    this.isViewOnce = false,
+    this.isExpired = false,
+    this.isViewed = false,
+    this.isFromMe = false,
   });
 
   @override
@@ -146,6 +162,12 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
   @override
   Widget build(BuildContext context) {
     final size = _calculateSize();
+
+    // View Once 消息特殊显示
+    if (widget.isViewOnce && !widget.isFromMe) {
+      return _buildViewOnceOverlay(context, size);
+    }
+
     final url = _effectiveUrl;
 
     // 如果 URL 为空，显示占位符
@@ -160,7 +182,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
       headers['Authorization'] = 'Bearer $accessToken';
     }
 
-    return GestureDetector(
+    Widget imageWidget = GestureDetector(
       onTap: widget.onTap,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(widget.borderRadius),
@@ -179,6 +201,142 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
               debugPrint('ImageMessageWidget: Failed to load image: $url, error: $error');
               return _buildError(size, canRetry: _retryCount < _maxRetries);
             },
+          ),
+        ),
+      ),
+    );
+
+    // 发送方的 View Once 消息显示标记
+    if (widget.isViewOnce && widget.isFromMe) {
+      imageWidget = Stack(
+        children: [
+          imageWidget,
+          Positioned(
+            left: 6,
+            bottom: 6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.timer, size: 12, color: Colors.white),
+                  const SizedBox(width: 3),
+                  Text(
+                    S.of(context)?.chatViewOnce ?? 'View Once',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return imageWidget;
+  }
+
+  /// View Once 消息蒙版（接收方）
+  Widget _buildViewOnceOverlay(BuildContext context, Size size) {
+    final s = S.of(context);
+
+    // 已过期或已查看
+    if (widget.isExpired || widget.isViewed) {
+      return GestureDetector(
+        onTap: null, // 已过期/已查看不可再点击
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+          child: Container(
+            width: size.width,
+            height: size.height * 0.6,
+            color: AppColors.placeholder,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    widget.isExpired ? Icons.timer_off : Icons.visibility,
+                    color: AppColors.textTertiary,
+                    size: 28,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    widget.isExpired
+                        ? (s?.chatViewOnceExpired ?? 'Expired')
+                        : (s?.chatViewOnceViewed ?? 'Viewed'),
+                    style: const TextStyle(
+                      color: AppColors.textTertiary,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // 未查看 — 模糊蒙版
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(widget.borderRadius),
+        child: Container(
+          width: size.width,
+          height: size.height * 0.6,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.grey[400]!,
+                Colors.grey[600]!,
+              ],
+            ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.lock,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  s?.chatViewOncePhoto ?? 'View Once Photo',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  s?.chatViewOnceTap ?? 'Tap to view',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

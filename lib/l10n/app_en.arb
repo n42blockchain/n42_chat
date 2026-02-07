@@ -1865,5 +1865,131 @@
   "callNoMessagesYet": "No messages yet.\nSend a message to get started.",
   "callTypeMessage": "Type a message...",
   "callYouSender": "You",
-  "callChatLabel": "Chat"
+  "callChatLabel": "Chat",
+
+  "chatEdited": "Edited",
+  "chatEditHistory": "Edit History",
+  "chatOriginalMessage": "Original",
+  "chatEditedAt": "Edited at {time}",
+  "@chatEditedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+
+  "chatViewOnce": "View Once",
+  "chatViewOncePhoto": "View Once Photo",
+  "chatViewOnceVideo": "View Once Video",
+  "chatViewOnceViewed": "Viewed",
+  "chatViewOnceExpired": "Expired",
+  "chatViewOnceTap": "Tap to view",
+
+  "chatAutoFaceBlur": "Auto face blur",
+  "chatAutoFaceBlurDesc": "Automatically blur faces when sending photos",
+
+  "threadReplyInThread": "Reply in thread",
+  "threadReplies": "{count} replies",
+  "@threadReplies": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "threadReply": "1 reply",
+  "threadLatestReply": "Latest: {preview}",
+  "@threadLatestReply": {
+    "placeholders": {
+      "preview": {"type": "String"}
+    }
+  },
+  "threadTitle": "Thread",
+  "threadReplyPlaceholder": "Reply in thread...",
+  "threadParticipants": "{count} participants",
+  "@threadParticipants": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "voiceRoomTitle": "Voice Room",
+  "voiceRoomCreate": "Create Voice Room",
+  "voiceRoomJoin": "Join",
+  "voiceRoomLeave": "Leave",
+  "voiceRoomEnd": "End Room",
+  "voiceRoomRaiseHand": "Raise Hand",
+  "voiceRoomLowerHand": "Lower Hand",
+  "voiceRoomMute": "Mute",
+  "voiceRoomUnmute": "Unmute",
+  "voiceRoomHost": "Host",
+  "voiceRoomSpeakers": "Speakers",
+  "voiceRoomListeners": "Listeners",
+  "voiceRoomLive": "LIVE",
+  "voiceRoomEnded": "Ended",
+  "voiceRoomScheduled": "Scheduled",
+  "voiceRoomApprove": "Approve",
+  "voiceRoomDemote": "Move to Listener",
+  "voiceRoomHandRaised": "{name} raised their hand",
+  "@voiceRoomHandRaised": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "voiceRoomName": "Room name",
+  "voiceRoomTopic": "Topic (optional)",
+  "voiceRoomNoActive": "No active voice rooms",
+  "voiceRoomConnecting": "Connecting...",
+
+  "usernameTitle": "Username",
+  "usernameSet": "Set Username",
+  "usernameChange": "Change Username",
+  "usernamePlaceholder": "Enter username",
+  "usernameAvailable": "Username available",
+  "usernameUnavailable": "Username already taken",
+  "usernameInvalid": "3-30 characters, lowercase letters, numbers, underscore. Must start with a letter.",
+  "usernameReserved": "This username is reserved",
+  "usernameSaved": "Username saved",
+  "usernameSearchHint": "Search by @username",
+
+  "ensName": "ENS Name",
+  "ensLinked": "Linked to ENS",
+  "ensResolving": "Resolving ENS...",
+  "ensNotFound": "ENS name not found",
+
+  "tokenGateTitle": "Token Gate",
+  "tokenGateEnable": "Enable Token Gate",
+  "tokenGateDisable": "Disable Token Gate",
+  "tokenGateAddRule": "Add Rule",
+  "tokenGateRemoveRule": "Remove Rule",
+  "tokenGateContractAddress": "Contract Address",
+  "tokenGateMinBalance": "Minimum Balance",
+  "tokenGateTokenId": "Token ID (ERC-1155)",
+  "tokenGateChainId": "Chain ID",
+  "tokenGateVerifying": "Verifying token holdings...",
+  "tokenGateVerified": "Verification passed",
+  "tokenGateDenied": "You do not meet the token requirements",
+  "tokenGateOperatorAnd": "Must meet ALL rules",
+  "tokenGateOperatorOr": "Must meet ANY rule",
+  "tokenGateRuleErc20": "ERC-20 Token",
+  "tokenGateRuleErc721": "NFT (ERC-721)",
+  "tokenGateRuleErc1155": "Multi-Token (ERC-1155)",
+  "tokenGateRuleNative": "Native Token",
+  "tokenGateSaved": "Token gate saved",
+  "tokenGateEnableDescription": "Require members to hold tokens to join",
+  "tokenGateOperator": "Rule Logic",
+  "tokenGateRules": "Rules",
+  "tokenGateSymbol": "Symbol (optional)",
+  "tokenGateChain": "Chain",
+  "tokenGateTokenStandard": "Token Standard",
+  "tokenGateDenialMessage": "Denial Message",
+  "tokenGateDenialMessageHint": "Message shown when verification fails",
+  "tokenGateVerifyTitle": "Token Verification",
+  "tokenGateVerifyPassed": "Verification Passed",
+  "tokenGateVerifyFailed": "Verification Failed",
+  "tokenGateRetryVerify": "Retry",
+  "tokenGateRequired": "Required",
+  "tokenGateYourBalance": "Your balance",
+  "tokenGateRulesActive": "rules active",
+  "tokenGateDisabled": "Disabled",
+  "ensNotBound": "Not bound"
 }

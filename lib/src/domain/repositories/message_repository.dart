@@ -45,6 +45,7 @@ abstract class IMessageRepository {
     required Uint8List imageBytes,
     required String filename,
     String? mimeType,
+    int? selfDestructAfter,
   });
 
   /// 发送语音消息
@@ -63,6 +64,7 @@ abstract class IMessageRepository {
     required String filename,
     String? mimeType,
     Uint8List? thumbnailBytes,
+    int? selfDestructAfter,
   });
 
   /// 发送文件消息
@@ -258,6 +260,57 @@ abstract class IMessageRepository {
   ///
   /// 自动删除所有已过期的阅后即焚消息
   Future<void> destroyExpiredMessages(String roomId);
+
+  // ============================================
+  // 消息线程 (MSC3440)
+  // ============================================
+
+  /// 获取线程内的消息列表
+  ///
+  /// [roomId] 房间 ID
+  /// [threadRootEventId] 线程根事件 ID
+  /// [limit] 获取数量限制
+  /// [fromEventId] 分页游标
+  Future<List<MessageEntity>> getThreadMessages(
+    String roomId,
+    String threadRootEventId, {
+    int limit = 50,
+    String? fromEventId,
+  });
+
+  /// 监听线程消息更新
+  Stream<List<MessageEntity>> watchThreadMessages(
+    String roomId,
+    String threadRootEventId,
+  );
+
+  /// 在线程内发送文本消息
+  Future<MessageEntity?> sendThreadTextMessage(
+    String roomId,
+    String threadRootEventId,
+    String text,
+  );
+
+  /// 在线程内发送图片消息
+  Future<MessageEntity?> sendThreadImageMessage(
+    String roomId,
+    String threadRootEventId, {
+    required Uint8List imageBytes,
+    required String filename,
+    String? mimeType,
+  });
+
+  /// 在线程内发送文件消息
+  Future<MessageEntity?> sendThreadFileMessage(
+    String roomId,
+    String threadRootEventId, {
+    required Uint8List fileBytes,
+    required String filename,
+    String? mimeType,
+  });
+
+  /// 获取房间内所有线程根消息
+  Future<List<MessageEntity>> getRoomThreadRoots(String roomId);
 
   /// 获取房间媒体文件列表
   ///

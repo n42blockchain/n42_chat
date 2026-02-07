@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/group_entity.dart';
+import '../../../domain/entities/token_gate_entity.dart';
 
 /// 群聊状态基类
 abstract class GroupState extends Equatable {
@@ -92,6 +93,20 @@ class GroupOperationSuccess extends GroupState {
 
   @override
   List<Object?> get props => [message];
+}
+
+/// 代币门控验证结果
+class TokenGateVerified extends GroupState {
+  final String roomId;
+  final TokenGateVerificationResult result;
+
+  const TokenGateVerified({
+    required this.roomId,
+    required this.result,
+  });
+
+  @override
+  List<Object?> get props => [roomId, result];
 }
 
 /// 群聊加载失败

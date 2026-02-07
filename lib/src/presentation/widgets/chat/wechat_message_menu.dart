@@ -42,6 +42,9 @@ class WeChatMessageMenu extends StatelessWidget {
   final VoidCallback? onPin; // 置顶消息
   final VoidCallback? onUnpin; // 取消置顶
   final VoidCallback? onTranslate; // 翻译消息
+  final VoidCallback? onViewEditHistory; // 查看编辑历史
+  final VoidCallback? onReplyInThread; // 在线程中回复
+  final VoidCallback? onEdit; // 编辑消息
 
   /// 表情回应回调
   final void Function(String emoji)? onReaction;
@@ -69,6 +72,9 @@ class WeChatMessageMenu extends StatelessWidget {
     this.onPin,
     this.onUnpin,
     this.onTranslate,
+    this.onViewEditHistory,
+    this.onReplyInThread,
+    this.onEdit,
     this.onReaction,
   });
 
@@ -290,6 +296,28 @@ class WeChatMessageMenu extends StatelessWidget {
                   },
                 ),
                 const SizedBox(width: 20),
+                // 编辑消息（仅自己发送的文本消息）
+                if (message.isFromMe && message.type == MessageType.text && onEdit != null)
+                  _buildMenuItem(
+                    icon: Icons.edit_outlined,
+                    label: S.of(context)?.commonEdit ?? 'Edit',
+                    onTap: () {
+                      onDismiss();
+                      onEdit?.call();
+                    },
+                  ),
+                if (message.isFromMe && message.type == MessageType.text && onEdit != null) const SizedBox(width: 20),
+                // 在线程中回复
+                if (onReplyInThread != null)
+                  _buildMenuItem(
+                    icon: Icons.forum_outlined,
+                    label: S.of(context)?.threadReplyInThread ?? 'Thread',
+                    onTap: () {
+                      onDismiss();
+                      onReplyInThread?.call();
+                    },
+                  ),
+                if (onReplyInThread != null) const SizedBox(width: 20),
                 // 翻译按钮（仅文本消息显示）
                 if (message.type == MessageType.text && onTranslate != null)
                   _buildMenuItem(
@@ -301,6 +329,17 @@ class WeChatMessageMenu extends StatelessWidget {
                     },
                   ),
                 if (message.type == MessageType.text && onTranslate != null) const SizedBox(width: 20),
+                // 编辑历史按钮（当消息已编辑时显示）
+                if (message.isEdited && onViewEditHistory != null)
+                  _buildMenuItem(
+                    icon: Icons.history,
+                    label: S.of(context)?.chatEditHistory ?? 'History',
+                    onTap: () {
+                      onDismiss();
+                      onViewEditHistory?.call();
+                    },
+                  ),
+                if (message.isEdited && onViewEditHistory != null) const SizedBox(width: 20),
                 // 置顶/取消置顶按钮（仅在有权限时显示）
                 if (canPin)
                   isPinned
@@ -657,6 +696,7 @@ class MessageMenuHelper {
     VoidCallback? onResend,
     VoidCallback? onSave,
     VoidCallback? onTranslate,
+    VoidCallback? onReplyInThread,
     void Function(String emoji)? onReaction,
     bool isFavorited = false,
   }) {
@@ -693,6 +733,7 @@ class MessageMenuHelper {
         onResend: onResend,
         onSave: onSave,
         onTranslate: onTranslate,
+        onReplyInThread: onReplyInThread,
         onReaction: onReaction,
       ),
     );

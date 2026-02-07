@@ -47,6 +47,15 @@ class ContactEntity extends Equatable {
   /// 标签列表
   final List<String> tags;
 
+  /// N42 用户名
+  final String? n42Username;
+
+  /// 钱包地址
+  final String? walletAddress;
+
+  /// ENS 域名
+  final String? ensName;
+
   const ContactEntity({
     required this.userId,
     required this.displayName,
@@ -59,6 +68,9 @@ class ContactEntity extends Equatable {
     this.isFriend = false,
     this.directRoomId,
     this.tags = const [],
+    this.n42Username,
+    this.walletAddress,
+    this.ensName,
   });
 
   /// 获取用户名部分
@@ -170,6 +182,9 @@ class ContactEntity extends Equatable {
         isFriend,
         directRoomId,
         tags,
+        n42Username,
+        walletAddress,
+        ensName,
       ];
 
   ContactEntity copyWith({
@@ -184,6 +199,9 @@ class ContactEntity extends Equatable {
     bool? isFriend,
     String? directRoomId,
     List<String>? tags,
+    String? n42Username,
+    String? walletAddress,
+    String? ensName,
   }) {
     return ContactEntity(
       userId: userId ?? this.userId,
@@ -197,6 +215,9 @@ class ContactEntity extends Equatable {
       isFriend: isFriend ?? this.isFriend,
       directRoomId: directRoomId ?? this.directRoomId,
       tags: tags ?? this.tags,
+      n42Username: n42Username ?? this.n42Username,
+      walletAddress: walletAddress ?? this.walletAddress,
+      ensName: ensName ?? this.ensName,
     );
   }
 }

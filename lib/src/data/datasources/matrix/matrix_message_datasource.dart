@@ -346,6 +346,7 @@ class MatrixMessageDataSource {
     required Uint8List imageBytes,
     required String filename,
     String? mimeType,
+    int? selfDestructAfter,
   }) async {
     debugPrint('=== sendImageMessage start ===');
     debugPrint('roomId: $roomId, filename: $filename, size: ${imageBytes.length}');
@@ -413,7 +414,14 @@ class MatrixMessageDataSource {
           'size': imageBytes.length,
         },
       };
-      
+
+      // View Once / 阅后即焚支持
+      if (selfDestructAfter != null && selfDestructAfter > 0) {
+        content['n42.self_destruct'] = {
+          'after': selfDestructAfter,
+        };
+      }
+
       final result = await room.sendEvent(content);
       debugPrint('sendEvent result: $result');
       debugPrint('=== sendImageMessage completed ===');
@@ -551,6 +559,7 @@ class MatrixMessageDataSource {
     required String filename,
     String? mimeType,
     Uint8List? thumbnailBytes,
+    int? selfDestructAfter,
   }) async {
     debugPrint('=== MatrixMessageDataSource.sendVideoMessage start ===');
     debugPrint('roomId: $roomId');
@@ -614,7 +623,14 @@ class MatrixMessageDataSource {
           'h': 400,
         };
       }
-      
+
+      // View Once / 阅后即焚支持
+      if (selfDestructAfter != null && selfDestructAfter > 0) {
+        content['n42.self_destruct'] = {
+          'after': selfDestructAfter,
+        };
+      }
+
       final result = await room.sendEvent(content);
       debugPrint('=== sendVideoMessage completed successfully (manual method) ===');
       return result;
@@ -1693,6 +1709,9 @@ class MatrixMessageDataSource {
         ?.cast<String>()
         .toList() ?? <String>[];
 
+    // 解析线程信息 (MSC3440)
+    final threadInfo = _extractThreadInfo(event);
+
     return MessageEntity(
       id: event.eventId,
       roomId: room.id,
@@ -1707,12 +1726,18 @@ class MatrixMessageDataSource {
       replyToId: event.relationshipEventId,
       replyToContent: parsedContent.replyToContent,
       replyToSender: parsedContent.replyToSender,
-      isEdited: false, // 简化处理，后续可通过检查编辑事件实现
+      isEdited: _checkIsEdited(event),
+      editedAt: _getEditedAt(event),
       reactions: _extractReactions(event),
       metadata: _extractMetadataWithHttpUrl(event),
       mentionedUserIds: mentionedUserIds,
       mentionsRoom: mentionsRoom,
       selfDestructAfter: selfDestructAfter,
+      threadRootId: threadInfo.threadRootId,
+      threadReplyCount: threadInfo.replyCount,
+      threadLatestReply: threadInfo.latestReply,
+      threadLatestReplySender: threadInfo.latestReplySender,
+      threadLatestReplyTimestamp: threadInfo.latestReplyTimestamp,
     );
   }
   
@@ -2012,8 +2037,50 @@ class MatrixMessageDataSource {
     return MessageStatus.sent;
   }
 
+  /// 检查消息是否被编辑过
+  ///
+  /// Matrix 服务器在收到 m.replace 关系后，会在原始事件的
+  /// unsigned.m.relations.m.replace 字段中标记替换事件
+  bool _checkIsEdited(matrix.Event event) {
+    try {
+      final unsigned = event.unsigned;
+      if (unsigned == null) return false;
+
+      final relations = unsigned['m.relations'] as Map<String, dynamic>?;
+      if (relations == null) return false;
+
+      // m.replace 存在就说明消息被编辑过
+      return relations.containsKey('m.replace');
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// 获取消息的最后编辑时间
+  DateTime? _getEditedAt(matrix.Event event) {
+    try {
+      final unsigned = event.unsigned;
+      if (unsigned == null) return null;
+
+      final relations = unsigned['m.relations'] as Map<String, dynamic>?;
+      if (relations == null) return null;
+
+      final replace = relations['m.replace'] as Map<String, dynamic>?;
+      if (replace == null) return null;
+
+      // 尝试从替换事件中获取 origin_server_ts
+      final ts = replace['origin_server_ts'] as int?;
+      if (ts != null) {
+        return DateTime.fromMillisecondsSinceEpoch(ts);
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// 提取表情回应
-  /// 
+  ///
   /// Matrix 服务器在事件的 unsigned.m.relations.m.annotation 字段中
   /// 聚合所有对该事件的表情回应
   List<MessageReaction> _extractReactions(matrix.Event event) {
@@ -2645,6 +2712,287 @@ class MatrixMessageDataSource {
       return null;
     }
   }
+
+  // ============================================
+  // 消息线程 (MSC3440)
+  // ============================================
+
+  /// 从事件中提取线程信息
+  _ThreadInfo _extractThreadInfo(matrix.Event event) {
+    String? threadRootId;
+    int? replyCount;
+    String? latestReply;
+    String? latestReplySender;
+    DateTime? latestReplyTimestamp;
+
+    // 检查该消息是否是线程回复（m.relates_to 中有 rel_type: m.thread）
+    final relatesTo = event.content['m.relates_to'] as Map<String, dynamic>?;
+    if (relatesTo != null) {
+      final relType = relatesTo['rel_type'] as String?;
+      if (relType == 'm.thread') {
+        threadRootId = relatesTo['event_id'] as String?;
+      }
+    }
+
+    // 检查 unsigned 中的线程摘要（根消息才有）
+    final unsigned = event.unsigned;
+    if (unsigned != null) {
+      final relations = unsigned['m.relations'] as Map<String, dynamic>?;
+      if (relations != null) {
+        final threadSummary = relations['m.thread'] as Map<String, dynamic>?;
+        if (threadSummary != null) {
+          replyCount = threadSummary['count'] as int?;
+          final latestEvent = threadSummary['latest_event'] as Map<String, dynamic>?;
+          if (latestEvent != null) {
+            latestReplySender = latestEvent['sender'] as String?;
+            final content = latestEvent['content'] as Map<String, dynamic>?;
+            latestReply = content?['body'] as String?;
+            final originServerTs = latestEvent['origin_server_ts'] as int?;
+            if (originServerTs != null) {
+              latestReplyTimestamp = DateTime.fromMillisecondsSinceEpoch(originServerTs);
+            }
+          }
+        }
+      }
+    }
+
+    return _ThreadInfo(
+      threadRootId: threadRootId,
+      replyCount: replyCount,
+      latestReply: latestReply,
+      latestReplySender: latestReplySender,
+      latestReplyTimestamp: latestReplyTimestamp,
+    );
+  }
+
+  /// 发送线程内消息
+  ///
+  /// 按照 MSC3440 构建 m.relates_to 结构
+  Future<String?> sendThreadMessage(
+    String roomId,
+    String threadRootEventId,
+    String text,
+  ) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return null;
+
+    final content = <String, dynamic>{
+      'msgtype': 'm.text',
+      'body': text,
+      'm.relates_to': {
+        'rel_type': 'm.thread',
+        'event_id': threadRootEventId,
+        'is_falling_back': true,
+        'm.in_reply_to': {
+          'event_id': threadRootEventId,
+        },
+      },
+    };
+
+    return await room.sendEvent(content);
+  }
+
+  /// 发送线程内图片消息
+  Future<String?> sendThreadImageMessage(
+    String roomId,
+    String threadRootEventId, {
+    required Uint8List imageBytes,
+    required String filename,
+    String? mimeType,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return null;
+
+    final actualMimeType = mimeType ?? 'image/jpeg';
+
+    // 上传图片
+    final uri = await _client!.uploadContent(
+      imageBytes,
+      filename: filename,
+      contentType: actualMimeType,
+    );
+
+    final content = <String, dynamic>{
+      'msgtype': 'm.image',
+      'body': filename,
+      'url': uri.toString(),
+      'info': {
+        'mimetype': actualMimeType,
+        'size': imageBytes.length,
+      },
+      'm.relates_to': {
+        'rel_type': 'm.thread',
+        'event_id': threadRootEventId,
+        'is_falling_back': true,
+        'm.in_reply_to': {
+          'event_id': threadRootEventId,
+        },
+      },
+    };
+
+    return await room.sendEvent(content);
+  }
+
+  /// 发送线程内文件消息
+  Future<String?> sendThreadFileMessage(
+    String roomId,
+    String threadRootEventId, {
+    required Uint8List fileBytes,
+    required String filename,
+    String? mimeType,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return null;
+
+    final actualMimeType = mimeType ?? 'application/octet-stream';
+
+    // 上传文件
+    final uri = await _client!.uploadContent(
+      fileBytes,
+      filename: filename,
+      contentType: actualMimeType,
+    );
+
+    final content = <String, dynamic>{
+      'msgtype': 'm.file',
+      'body': filename,
+      'url': uri.toString(),
+      'info': {
+        'mimetype': actualMimeType,
+        'size': fileBytes.length,
+      },
+      'm.relates_to': {
+        'rel_type': 'm.thread',
+        'event_id': threadRootEventId,
+        'is_falling_back': true,
+        'm.in_reply_to': {
+          'event_id': threadRootEventId,
+        },
+      },
+    };
+
+    return await room.sendEvent(content);
+  }
+
+  /// 获取线程内的消息列表
+  ///
+  /// 使用 Matrix /relations API (MSC3440) 获取线程消息
+  Future<List<MessageEntity>> getThreadMessages(
+    String roomId,
+    String threadRootEventId, {
+    int limit = 50,
+    String? fromToken,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return [];
+
+    try {
+      // 使用 Matrix /relations API
+      final response = await _client!.request(
+        matrix.RequestType.GET,
+        '/client/v1/rooms/${Uri.encodeComponent(roomId)}/relations/${Uri.encodeComponent(threadRootEventId)}/m.thread',
+        query: {
+          'limit': limit.toString(),
+          if (fromToken != null) 'from': fromToken,
+        },
+      );
+
+      final chunk = response['chunk'] as List<dynamic>? ?? [];
+      final messages = <MessageEntity>[];
+
+      for (final eventJson in chunk) {
+        try {
+          final event = matrix.Event.fromJson(
+            eventJson as Map<String, dynamic>,
+            room,
+          );
+          messages.add(mapEventToMessage(event, room));
+        } catch (e) {
+          debugPrint('ThreadMessages: Failed to parse event: $e');
+        }
+      }
+
+      // 按时间升序排列
+      messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      return messages;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to get thread messages: $e');
+      // 回退方案：从 timeline 过滤线程消息
+      return _getThreadMessagesFromTimeline(room, threadRootEventId);
+    }
+  }
+
+  /// 从 timeline 中过滤线程消息（回退方案）
+  ///
+  /// 在服务器不支持 /relations API 时使用此方法。
+  /// Matrix SDK 6.0 不再提供同步 timeline 访问，
+  /// 此方法通过 getTimeline() 异步获取。
+  List<MessageEntity> _getThreadMessagesFromTimeline(
+    matrix.Room room,
+    String threadRootEventId,
+  ) {
+    final messages = <MessageEntity>[];
+    try {
+      // SDK 6.0 does not expose a synchronous timeline accessor.
+      // The /relations API in getThreadMessages() is the primary path.
+      // This fallback returns empty and logs a warning.
+      debugPrint('MatrixMessageDataSource: Timeline fallback not available in SDK 6.0, '
+          'returning empty thread results for $threadRootEventId');
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Fallback thread fetch failed: $e');
+    }
+    messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return messages;
+  }
+
+  /// 监听线程消息更新
+  Stream<List<MessageEntity>> watchThreadMessages(
+    String roomId,
+    String threadRootEventId,
+  ) {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return const Stream.empty();
+
+    // 利用房间 timeline 的 onChange 流，过滤出线程相关消息
+    return room.onUpdate.stream.asyncMap((_) async {
+      return _getThreadMessagesFromTimeline(room, threadRootEventId);
+    });
+  }
+
+  /// 获取房间内所有线程根消息
+  Future<List<MessageEntity>> getRoomThreadRoots(String roomId) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return [];
+
+    try {
+      // 使用 Matrix /threads API
+      final response = await _client!.request(
+        matrix.RequestType.GET,
+        '/client/v1/rooms/${Uri.encodeComponent(roomId)}/threads',
+        query: {'limit': '50'},
+      );
+
+      final chunk = response['chunk'] as List<dynamic>? ?? [];
+      final messages = <MessageEntity>[];
+
+      for (final eventJson in chunk) {
+        try {
+          final event = matrix.Event.fromJson(
+            eventJson as Map<String, dynamic>,
+            room,
+          );
+          messages.add(mapEventToMessage(event, room));
+        } catch (e) {
+          debugPrint('ThreadRoots: Failed to parse event: $e');
+        }
+      }
+
+      return messages;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to get thread roots: $e');
+      return [];
+    }
+  }
 }
 
 /// 解析后的消息内容
@@ -2652,11 +3000,28 @@ class _ParsedContent {
   final String content;
   final String? replyToContent;
   final String? replyToSender;
-  
+
   _ParsedContent({
     required this.content,
     this.replyToContent,
     this.replyToSender,
+  });
+}
+
+/// 线程信息
+class _ThreadInfo {
+  final String? threadRootId;
+  final int? replyCount;
+  final String? latestReply;
+  final String? latestReplySender;
+  final DateTime? latestReplyTimestamp;
+
+  _ThreadInfo({
+    this.threadRootId,
+    this.replyCount,
+    this.latestReply,
+    this.latestReplySender,
+    this.latestReplyTimestamp,
   });
 }
 

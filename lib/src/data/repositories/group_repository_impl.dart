@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/group_entity.dart';
+import '../../domain/entities/token_gate_entity.dart';
 import '../../domain/repositories/group_repository.dart';
+import '../../integration/wallet_bridge.dart';
 import '../datasources/matrix/matrix_group_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 
@@ -12,8 +15,13 @@ import '../datasources/matrix/matrix_client_manager.dart';
 class GroupRepositoryImpl implements IGroupRepository {
   final MatrixGroupDataSource _groupDataSource;
   final MatrixClientManager _clientManager;
+  final IWalletBridge? _walletBridge;
 
-  GroupRepositoryImpl(this._groupDataSource, this._clientManager);
+  GroupRepositoryImpl(
+    this._groupDataSource,
+    this._clientManager, {
+    IWalletBridge? walletBridge,
+  }) : _walletBridge = walletBridge;
 
   @override
   Future<List<GroupEntity>> getGroups() async {
@@ -198,6 +206,97 @@ class GroupRepositoryImpl implements IGroupRepository {
   }
 
   // ============================================
+  // 代币门控
+  // ============================================
+
+  @override
+  Future<TokenGateConfig?> getTokenGate(String roomId) async {
+    try {
+      final data = _groupDataSource.getTokenGateConfig(roomId);
+      if (data == null) return null;
+      return TokenGateConfig.fromJson(data);
+    } catch (e) {
+      debugPrint('GroupRepository: Failed to get token gate: $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<void> setTokenGate(String roomId, TokenGateConfig config) async {
+    await _groupDataSource.setTokenGateConfig(roomId, config.toJson());
+  }
+
+  @override
+  Future<TokenGateVerificationResult> verifyTokenGate(String roomId) async {
+    if (_walletBridge == null) {
+      return TokenGateVerificationResult.error('Wallet not connected');
+    }
+
+    final config = await getTokenGate(roomId);
+    if (config == null || !config.enabled || config.rules.isEmpty) {
+      return const TokenGateVerificationResult(passed: true);
+    }
+
+    final ruleResults = <TokenGateRuleResult>[];
+
+    for (final rule in config.rules) {
+      try {
+        BigInt actualBalance;
+
+        switch (rule.tokenStandard) {
+          case TokenStandard.erc20:
+            actualBalance = await _walletBridge!.getErc20Balance(
+              contractAddress: rule.contractAddress ?? '',
+              chainId: rule.chainId,
+            );
+            break;
+          case TokenStandard.erc721:
+            final nftCount = await _walletBridge!.getErc721Balance(
+              contractAddress: rule.contractAddress ?? '',
+              chainId: rule.chainId,
+            );
+            actualBalance = BigInt.from(nftCount);
+            break;
+          case TokenStandard.erc1155:
+            actualBalance = await _walletBridge!.getErc1155Balance(
+              contractAddress: rule.contractAddress ?? '',
+              tokenId: rule.tokenId ?? BigInt.zero,
+              chainId: rule.chainId,
+            );
+            break;
+          case TokenStandard.native:
+            final balanceStr = await _walletBridge!.getBalance('ETH');
+            final balanceDouble = double.tryParse(balanceStr) ?? 0;
+            actualBalance = BigInt.from(balanceDouble * 1e18);
+            break;
+        }
+
+        ruleResults.add(TokenGateRuleResult(
+          rule: rule,
+          passed: actualBalance >= rule.minBalance,
+          actualBalance: actualBalance,
+        ));
+      } catch (e) {
+        ruleResults.add(TokenGateRuleResult(
+          rule: rule,
+          passed: false,
+          actualBalance: BigInt.zero,
+          errorMessage: e.toString(),
+        ));
+      }
+    }
+
+    final passed = config.operator == GateOperator.and
+        ? ruleResults.every((r) => r.passed)
+        : ruleResults.any((r) => r.passed);
+
+    return TokenGateVerificationResult(
+      passed: passed,
+      ruleResults: ruleResults,
+    );
+  }
+
+  // ============================================
   // 辅助方法
   // ============================================
 
@@ -219,6 +318,15 @@ class GroupRepositoryImpl implements IGroupRepository {
     // 获取置顶消息ID列表
     final pinnedEventIds = _groupDataSource.getPinnedEventIds(room.id);
 
+    // Read token gate config
+    TokenGateConfig? tokenGateConfig;
+    try {
+      final tokenGateData = _groupDataSource.getTokenGateConfig(room.id);
+      if (tokenGateData != null) {
+        tokenGateConfig = TokenGateConfig.fromJson(tokenGateData);
+      }
+    } catch (_) {}
+
     return GroupEntity(
       roomId: room.id,
       name: room.getLocalizedDisplayname(),
@@ -235,6 +343,7 @@ class GroupRepositoryImpl implements IGroupRepository {
       canInvite: _groupDataSource.canInviteMembers(room.id),
       canKick: _groupDataSource.canKickMembers(room.id),
       canChangeSettings: _groupDataSource.canChangeSettings(room.id),
+      tokenGate: tokenGateConfig,
     );
   }
 

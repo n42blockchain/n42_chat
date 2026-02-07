@@ -6,8 +6,13 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/di/injection.dart';
+import '../../../core/services/ens_cache_service.dart';
+import '../../../core/services/username_service.dart';
+import '../../../integration/wallet_bridge.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../widgets/common/ens_badge.dart';
 
 /// 编辑资料页面
 class EditProfilePage extends StatefulWidget {
@@ -29,6 +34,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _statusController;
   File? _selectedAvatar;
   bool _isLoading = false;
+  String? _ensName;
+  String? _n42Username;
 
   @override
   void initState() {
@@ -39,6 +46,31 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _statusController = TextEditingController(
       text: widget.profile.statusMessage,
     );
+    _loadEnsAndUsername();
+  }
+
+  Future<void> _loadEnsAndUsername() async {
+    // Load ENS name
+    try {
+      final walletBridge = getIt<IWalletBridge>();
+      final address = walletBridge.walletAddress;
+      if (address != null) {
+        final ensCacheService = getIt<EnsCacheService>();
+        final ensName = await ensCacheService.lookupEnsName(address);
+        if (mounted && ensName != null) {
+          setState(() => _ensName = ensName);
+        }
+      }
+    } catch (_) {}
+
+    // Load username
+    try {
+      final usernameService = getIt<UsernameService>();
+      final username = await usernameService.getMyUsername();
+      if (mounted && username != null) {
+        setState(() => _n42Username = username);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -210,28 +242,94 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
           const SizedBox(height: 24),
 
-          // 用户ID（只读）
+          // 用户名 + ENS + Matrix ID
           Container(
             color: isDark ? AppColors.surfaceDark : AppColors.surface,
             padding: const EdgeInsets.all(16),
-            child: Row(
+            child: Column(
               children: [
-                Text(
-                  'Matrix ID',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                // 用户名
+                GestureDetector(
+                  onTap: () async {
+                    final result = await Navigator.of(context).pushNamed('/setUsername');
+                    if (result is String && mounted) {
+                      setState(() => _n42Username = result);
+                    }
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        S.of(context)?.usernameTitle ?? 'Username',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: isDark ? Colors.white : AppColors.textPrimary,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        _n42Username != null ? '@$_n42Username' : (S.of(context)?.commonNotSet ?? 'Not set'),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: _n42Username != null
+                              ? (isDark ? Colors.white : AppColors.textPrimary)
+                              : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.chevron_right, size: 20, color: AppColors.textSecondary),
+                    ],
                   ),
                 ),
-                const Spacer(),
-                Text(
-                  widget.profile.userId,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
-                  ),
+
+                Divider(color: isDark ? AppColors.dividerDark : AppColors.divider),
+
+                // ENS 域名
+                Row(
+                  children: [
+                    Text(
+                      'ENS',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: isDark ? Colors.white : AppColors.textPrimary,
+                      ),
+                    ),
+                    const Spacer(),
+                    if (_ensName != null)
+                      EnsBadge(ensName: _ensName!)
+                    else
+                      Text(
+                        S.of(context)?.ensNotBound ?? 'Not bound',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                        ),
+                      ),
+                  ],
+                ),
+
+                Divider(color: isDark ? AppColors.dividerDark : AppColors.divider),
+
+                // Matrix ID
+                Row(
+                  children: [
+                    Text(
+                      'Matrix ID',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: isDark ? Colors.white : AppColors.textPrimary,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      widget.profile.userId,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

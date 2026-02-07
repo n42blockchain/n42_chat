@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import 'contact_entity.dart';
+import 'token_gate_entity.dart';
 
 /// 群成员角色
 enum GroupRole {
@@ -254,6 +255,9 @@ class GroupEntity extends Equatable {
   /// 频道分类
   final String? category;
 
+  /// 代币门控配置
+  final TokenGateConfig? tokenGate;
+
   const GroupEntity({
     required this.roomId,
     required this.name,
@@ -279,6 +283,7 @@ class GroupEntity extends Equatable {
     this.channelUsername,
     this.isVerified = false,
     this.category,
+    this.tokenGate,
   });
 
   /// 是否有置顶消息
@@ -338,6 +343,7 @@ class GroupEntity extends Equatable {
         channelUsername,
         isVerified,
         category,
+        tokenGate,
       ];
 
   GroupEntity copyWith({
@@ -365,6 +371,7 @@ class GroupEntity extends Equatable {
     String? channelUsername,
     bool? isVerified,
     String? category,
+    TokenGateConfig? tokenGate,
   }) {
     return GroupEntity(
       roomId: roomId ?? this.roomId,
@@ -391,6 +398,7 @@ class GroupEntity extends Equatable {
       channelUsername: channelUsername ?? this.channelUsername,
       isVerified: isVerified ?? this.isVerified,
       category: category ?? this.category,
+      tokenGate: tokenGate ?? this.tokenGate,
     );
   }
 

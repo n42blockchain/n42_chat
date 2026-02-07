@@ -431,6 +431,34 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 // TODO: 实现
               },
             ),
+
+            Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
+
+            // 代币门控
+            ListTile(
+              leading: Icon(
+                Icons.token,
+                color: group.tokenGate?.enabled == true
+                    ? const Color(0xFF5298FF)
+                    : null,
+              ),
+              title: Text(S.of(context)?.tokenGateTitle ?? 'Token Gate'),
+              subtitle: Text(
+                group.tokenGate?.enabled == true
+                    ? ('${group.tokenGate!.rules.length} ${S.of(context)?.tokenGateRulesActive ?? 'rules active'}')
+                    : (S.of(context)?.tokenGateDisabled ?? 'Disabled'),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.of(context).pushNamed(
+                  '/tokenGateSettings',
+                  arguments: {
+                    'roomId': widget.roomId,
+                    'config': group.tokenGate,
+                  },
+                );
+              },
+            ),
           ],
         ],
       ),
