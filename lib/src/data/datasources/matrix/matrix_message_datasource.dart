@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../domain/entities/group_album_entity.dart';
+import '../../../domain/entities/group_file_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'matrix_client_manager.dart';
 
@@ -1712,13 +1713,29 @@ class MatrixMessageDataSource {
     // 解析线程信息 (MSC3440)
     final threadInfo = _extractThreadInfo(event);
 
+    // 对 n42.contact_card 消息，从 event.content 提取完整名片信息构建多行格式 body
+    // 使得 message_item.dart 中 _parseContactCard 可以正确解析 userId/displayName/avatarUrl
+    String messageContent = parsedContent.content;
+    if (event.content['msgtype'] == 'n42.contact_card') {
+      final contactUserId = event.content['user_id'] as String? ?? '';
+      final contactDisplayName = event.content['display_name'] as String? ?? '';
+      final contactAvatarUrl = event.content['avatar_url'] as String? ?? '';
+      final buffer = StringBuffer('[Contact Card]\n');
+      buffer.writeln('Name:$contactDisplayName');
+      buffer.writeln('ID:$contactUserId');
+      if (contactAvatarUrl.isNotEmpty) {
+        buffer.writeln('Avatar:$contactAvatarUrl');
+      }
+      messageContent = buffer.toString().trimRight();
+    }
+
     return MessageEntity(
       id: event.eventId,
       roomId: room.id,
       senderId: event.senderId,
       senderName: sender.calcDisplayname(),
       senderAvatarUrl: avatarHttpUrl,
-      content: parsedContent.content,
+      content: messageContent,
       type: _mapMessageType(event),
       timestamp: event.originServerTs,
       status: _mapMessageStatus(event),
@@ -1925,6 +1942,10 @@ class MatrixMessageDataSource {
         // 检查是否是音乐分享消息
         if (event.content['msgtype'] == 'n42.music') {
           return MessageType.music;
+        }
+        // 检查是否是联系人名片消息
+        if (event.content['msgtype'] == 'n42.contact_card') {
+          return MessageType.contactCard;
         }
         // 尝试从内容中检测媒体类型（处理 bridge 发送的特殊格式）
         final detectedType = _detectMediaTypeFromContent(event);
@@ -2593,6 +2614,186 @@ class MatrixMessageDataSource {
     } catch (e) {
       debugPrint('MatrixMessageDataSource: Failed to extract poll metadata: $e');
       return null;
+    }
+  }
+
+  // ============================================
+  // 群文件管理
+  // ============================================
+
+  /// 获取房间文件列表
+  Future<List<GroupFileEntity>> getRoomFiles(
+    String roomId, {
+    GroupFileType? type,
+    int limit = 50,
+    String? fromEventId,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return [];
+
+    try {
+      final timeline = await room.getTimeline();
+      await timeline.requestHistory(historyCount: limit * 3);
+
+      final allEvents = timeline.events;
+      final files = <GroupFileEntity>[];
+      bool foundFromEvent = fromEventId == null;
+
+      for (final event in allEvents) {
+        if (!foundFromEvent) {
+          if (event.eventId == fromEventId) {
+            foundFromEvent = true;
+          }
+          continue;
+        }
+
+        final msgType = event.messageType;
+        if (msgType != matrix.MessageTypes.File &&
+            msgType != matrix.MessageTypes.Image &&
+            msgType != matrix.MessageTypes.Video &&
+            msgType != matrix.MessageTypes.Audio) {
+          continue;
+        }
+
+        final info = event.content['info'] as Map<String, dynamic>?;
+        final mxcUrl = event.content['url'] as String?;
+        if (mxcUrl == null || mxcUrl.isEmpty) continue;
+
+        final mimeType = info?['mimetype'] as String? ?? 'application/octet-stream';
+        final fileType = GroupFileEntity.typeFromMime(mimeType);
+
+        // 应用类型筛选
+        if (type != null && fileType != type) continue;
+
+        final sender = event.senderFromMemoryOrFallback;
+        final thumbnailMxc = info?['thumbnail_url'] as String?;
+
+        files.add(GroupFileEntity(
+          eventId: event.eventId,
+          name: event.body.isNotEmpty ? event.body : 'unnamed',
+          url: mxcUrl,
+          httpUrl: _convertMxcToHttp(mxcUrl),
+          size: info?['size'] as int? ?? 0,
+          mimeType: mimeType,
+          fileType: fileType,
+          senderId: event.senderId,
+          senderName: sender.calcDisplayname(),
+          sentAt: event.originServerTs,
+          roomId: roomId,
+          thumbnailUrl: _convertMxcToHttp(thumbnailMxc),
+          width: info?['w'] as int?,
+          height: info?['h'] as int?,
+          duration: info?['duration'] as int?,
+        ));
+
+        if (files.length >= limit) break;
+      }
+
+      debugPrint('MatrixMessageDataSource: Found ${files.length} files in room $roomId');
+      return files;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to get room files: $e');
+      return [];
+    }
+  }
+
+  // ============================================
+  // 联系人名片
+  // ============================================
+
+  /// 发送联系人名片消息
+  Future<String?> sendContactCard(
+    String roomId, {
+    required String userId,
+    required String displayName,
+    String? avatarUrl,
+    String? matrixId,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return null;
+
+    try {
+      final eventId = await room.sendEvent({
+        'msgtype': 'n42.contact_card',
+        'body': '[Contact Card] $displayName',
+        'user_id': userId,
+        'display_name': displayName,
+        if (avatarUrl != null) 'avatar_url': avatarUrl,
+        if (matrixId != null) 'matrix_id': matrixId,
+      });
+      return eventId;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to send contact card: $e');
+      return null;
+    }
+  }
+
+  // ============================================
+  // 实时位置共享
+  // ============================================
+
+  /// 开始实时位置共享
+  Future<void> startLiveLocation(String roomId, int durationMinutes) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return;
+
+    try {
+      await _client!.setRoomStateWithKey(
+        roomId,
+        'n42.live_location',
+        _client!.userID!,
+        {
+          'sharing': true,
+          'duration_minutes': durationMinutes,
+          'started_at': DateTime.now().toIso8601String(),
+          'expires_at': DateTime.now()
+              .add(Duration(minutes: durationMinutes))
+              .toIso8601String(),
+        },
+      );
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to start live location: $e');
+      rethrow;
+    }
+  }
+
+  /// 更新实时位置
+  Future<void> updateLiveLocation(
+    String roomId,
+    double latitude,
+    double longitude,
+    double? accuracy,
+  ) async {
+    try {
+      await _client!.setRoomStateWithKey(
+        roomId,
+        'n42.live_location.update',
+        _client!.userID!,
+        {
+          'latitude': latitude,
+          'longitude': longitude,
+          if (accuracy != null) 'accuracy': accuracy,
+          'updated_at': DateTime.now().toIso8601String(),
+        },
+      );
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to update live location: $e');
+    }
+  }
+
+  /// 停止实时位置共享
+  Future<void> stopLiveLocation(String roomId) async {
+    try {
+      await _client!.setRoomStateWithKey(
+        roomId,
+        'n42.live_location',
+        _client!.userID!,
+        {
+          'sharing': false,
+        },
+      );
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to stop live location: $e');
     }
   }
 

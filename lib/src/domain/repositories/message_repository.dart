@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../entities/group_album_entity.dart';
+import '../entities/group_file_entity.dart';
 import '../entities/message_entity.dart';
 
 /// 消息仓库接口
@@ -323,6 +324,18 @@ abstract class IMessageRepository {
     AlbumFilter? filter,
     int limit = 50,
     String? beforeEventId,
+  });
+
+  // ============================================
+  // 群文件管理
+  // ============================================
+
+  /// 获取房间文件列表
+  Future<List<GroupFileEntity>> getRoomFiles(
+    String roomId, {
+    GroupFileType? type,
+    int limit = 50,
+    String? fromEventId,
   });
 }
 

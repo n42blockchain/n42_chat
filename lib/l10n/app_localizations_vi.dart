@@ -4224,4 +4224,85 @@ class SVi extends S {
 
   @override
   String get ensNotBound => '未绑定';
+
+  @override
+  String get liveLocation => 'Live Location';
+
+  @override
+  String get stopLiveLocation => 'Stop Sharing';
+
+  @override
+  String get startLiveLocation => 'Start Sharing';
+
+  @override
+  String get selectDuration => 'Select Duration';
+
+  @override
+  String get groupChatFiles => 'Chat Files';
+
+  @override
+  String get groupLinks => 'Links';
+
+  @override
+  String get groupNoLinks => 'No links yet';
+
+  @override
+  String get chatBackground => 'Chat Background';
+
+  @override
+  String get solidColors => 'Solid Colors';
+
+  @override
+  String get gradients => 'Gradients';
+
+  @override
+  String get defaultBackground => 'Default';
+
+  @override
+  String get settingsFontSizeSlider => 'Font Size';
+
+  @override
+  String get autoDownload => 'Auto-Download';
+
+  @override
+  String get images => 'Images';
+
+  @override
+  String get voice => 'Voice';
+
+  @override
+  String get video => 'Video';
+
+  @override
+  String get files => 'Files';
+
+  @override
+  String get mobileData => 'Mobile Data';
+
+  @override
+  String get roaming => 'Roaming';
+
+  @override
+  String get storageManagement => 'Storage';
+
+  @override
+  String get totalUsage => 'Total Usage';
+
+  @override
+  String get cache => 'Cache';
+
+  @override
+  String get other => 'Other';
+
+  @override
+  String get clearCache => 'Clear Cache';
+
+  @override
+  String get cacheCleared => 'Cache cleared';
+
+  @override
+  String get clearCacheFailed => 'Failed to clear cache';
+
+  @override
+  String get confirmClearCache => 'Clear all cache data?';
 }

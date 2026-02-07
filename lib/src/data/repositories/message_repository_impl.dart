@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/group_album_entity.dart';
+import '../../domain/entities/group_file_entity.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/repositories/message_repository.dart';
 import '../datasources/local/secure_storage_datasource.dart';
@@ -1145,6 +1146,21 @@ class MessageRepositoryImpl implements IMessageRepository {
   @override
   Future<List<MessageEntity>> getRoomThreadRoots(String roomId) async {
     return await _messageDataSource.getRoomThreadRoots(roomId);
+  }
+
+  @override
+  Future<List<GroupFileEntity>> getRoomFiles(
+    String roomId, {
+    GroupFileType? type,
+    int limit = 50,
+    String? fromEventId,
+  }) async {
+    return await _messageDataSource.getRoomFiles(
+      roomId,
+      type: type,
+      limit: limit,
+      fromEventId: fromEventId,
+    );
   }
 }
 

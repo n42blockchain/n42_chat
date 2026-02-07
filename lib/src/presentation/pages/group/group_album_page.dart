@@ -12,16 +12,21 @@ import '../../blocs/group_album/group_album_bloc.dart';
 import '../../blocs/group_album/group_album_event.dart';
 import '../../blocs/group_album/group_album_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../media/media_preview_page.dart';
 
 /// 群相册页面
 class GroupAlbumPage extends StatelessWidget {
   final String roomId;
   final String groupName;
 
+  /// 嵌入模式：为 true 时不显示 Scaffold+AppBar，仅返回内容部分
+  final bool embedded;
+
   const GroupAlbumPage({
     super.key,
     required this.roomId,
     required this.groupName,
+    this.embedded = false,
   });
 
   @override
@@ -30,15 +35,16 @@ class GroupAlbumPage extends StatelessWidget {
       create: (_) => GroupAlbumBloc(
         messageRepository: GetIt.instance<IMessageRepository>(),
       )..add(LoadGroupAlbum(roomId: roomId)),
-      child: _GroupAlbumView(groupName: groupName),
+      child: _GroupAlbumView(groupName: groupName, embedded: embedded),
     );
   }
 }
 
 class _GroupAlbumView extends StatefulWidget {
   final String groupName;
+  final bool embedded;
 
-  const _GroupAlbumView({required this.groupName});
+  const _GroupAlbumView({required this.groupName, this.embedded = false});
 
   @override
   State<_GroupAlbumView> createState() => _GroupAlbumViewState();
@@ -79,12 +85,92 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
     }
   }
 
+  Widget _buildTabBar(BuildContext context) {
+    final isDark = context.isDarkMode;
+    return TabBar(
+      controller: _tabController,
+      labelColor: AppColors.primary,
+      unselectedLabelColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+      indicatorColor: AppColors.primary,
+      tabs: [
+        Tab(text: S.of(context)?.commonAll ?? 'All'),
+        Tab(text: S.of(context)?.groupImages ?? 'Images'),
+        Tab(text: S.of(context)?.groupVideos ?? 'Videos'),
+      ],
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    return BlocBuilder<GroupAlbumBloc, GroupAlbumState>(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return Center(
+            child: N42Loading(message: S.of(context)?.commonLoading ?? 'Loading...'),
+          );
+        }
+
+        if (state.error != null) {
+          return Center(
+            child: N42EmptyState.error(
+              title: S.of(context)?.commonLoadFailed ?? 'Load failed',
+              description: state.error,
+              buttonText: S.of(context)?.commonRetry ?? 'Retry',
+              onButtonPressed: () {
+                context.read<GroupAlbumBloc>().add(const RefreshGroupAlbum());
+              },
+            ),
+          );
+        }
+
+        final filteredGroups = state.filteredDateGroups;
+        if (filteredGroups.isEmpty) {
+          return Center(
+            child: N42EmptyState.noData(
+              title: S.of(context)?.groupNoMedia ?? 'No media',
+              description: S.of(context)?.groupNoMediaDescription ??
+                  'No photos or videos in this group yet',
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () async {
+            context.read<GroupAlbumBloc>().add(const RefreshGroupAlbum());
+          },
+          child: CustomScrollView(
+            slivers: [
+              // 统计信息
+              SliverToBoxAdapter(
+                child: _buildStats(context, state),
+              ),
+              // 按日期分组显示
+              ...filteredGroups.map((group) => _buildDateGroup(context, group)),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+
+    // 嵌入模式：不显示 Scaffold+AppBar，仅返回 TabBar + body
+    if (widget.embedded) {
+      return Column(
+        children: [
+          Material(
+            color: cardColor,
+            child: _buildTabBar(context),
+          ),
+          Expanded(child: _buildContent(context)),
+        ],
+      );
+    }
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -103,67 +189,12 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
           icon: Icon(Icons.arrow_back, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-          indicatorColor: AppColors.primary,
-          tabs: [
-            Tab(text: S.of(context)?.commonAll ?? 'All'),
-            Tab(text: S.of(context)?.groupImages ?? 'Images'),
-            Tab(text: S.of(context)?.groupVideos ?? 'Videos'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(46),
+          child: _buildTabBar(context),
         ),
       ),
-      body: BlocBuilder<GroupAlbumBloc, GroupAlbumState>(
-        builder: (context, state) {
-          if (state.isLoading) {
-            return Center(
-              child: N42Loading(message: S.of(context)?.commonLoading ?? 'Loading...'),
-            );
-          }
-
-          if (state.error != null) {
-            return Center(
-              child: N42EmptyState.error(
-                title: S.of(context)?.commonLoadFailed ?? 'Load failed',
-                description: state.error,
-                buttonText: S.of(context)?.commonRetry ?? 'Retry',
-                onButtonPressed: () {
-                  context.read<GroupAlbumBloc>().add(const RefreshGroupAlbum());
-                },
-              ),
-            );
-          }
-
-          final filteredGroups = state.filteredDateGroups;
-          if (filteredGroups.isEmpty) {
-            return Center(
-              child: N42EmptyState.noData(
-                title: S.of(context)?.groupNoMedia ?? 'No media',
-                description: S.of(context)?.groupNoMediaDescription ??
-                    'No photos or videos in this group yet',
-              ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              context.read<GroupAlbumBloc>().add(const RefreshGroupAlbum());
-            },
-            child: CustomScrollView(
-              slivers: [
-                // 统计信息
-                SliverToBoxAdapter(
-                  child: _buildStats(context, state),
-                ),
-                // 按日期分组显示
-                ...filteredGroups.map((group) => _buildDateGroup(context, group)),
-              ],
-            ),
-          );
-        },
-      ),
+      body: _buildContent(context),
     );
   }
 
@@ -337,7 +368,26 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
   }
 
   void _viewMedia(BuildContext context, AlbumMediaEntity media) {
-    // TODO: 实现媒体预览
-    debugPrint('View media: ${media.eventId}');
+    final state = context.read<GroupAlbumBloc>().state;
+    final allMedia = state.filteredDateGroups
+        .expand((g) => g.media)
+        .toList();
+
+    final index = allMedia.indexWhere((m) => m.eventId == media.eventId);
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MediaPreviewPage(
+          items: allMedia.map((m) => MediaItem(
+            url: m.httpUrl ?? '',
+            thumbnailUrl: m.thumbnailUrl,
+            isVideo: m.isVideo,
+            senderName: m.senderName,
+            sentAt: m.sentAt,
+          )).toList(),
+          initialIndex: index >= 0 ? index : 0,
+        ),
+      ),
+    );
   }
 }

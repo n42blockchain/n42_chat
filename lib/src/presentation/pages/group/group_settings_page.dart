@@ -11,6 +11,7 @@ import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import 'group_media_hub_page.dart';
 
 /// 群设置页面
 class GroupSettingsPage extends StatefulWidget {
@@ -391,6 +392,25 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       child: Column(
         children: [
+          // 聊天文件
+          ListTile(
+            leading: const Icon(Icons.folder_outlined),
+            title: Text(S.of(context)?.groupChatFiles ?? 'Chat Files'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => GroupMediaHubPage(
+                    roomId: widget.roomId,
+                    groupName: group.name,
+                  ),
+                ),
+              );
+            },
+          ),
+
+          Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
+
           // 群公告
           ListTile(
             title: Text(S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement'),

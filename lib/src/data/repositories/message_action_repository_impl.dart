@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/message_reaction_entity.dart';
 import '../../domain/repositories/message_action_repository.dart';
@@ -217,6 +219,18 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
   @override
   Future<bool> isMessageSaved(String messageId) async {
     return _savedMessages.any((m) => m.id == messageId);
+  }
+
+  @override
+  Future<void> editFavoriteTags(String favoriteId, List<String> tags) async {
+    // 标签存储在本地，后续可以扩展
+    debugPrint('MessageActionRepositoryImpl: editFavoriteTags $favoriteId -> $tags');
+  }
+
+  @override
+  Future<void> editFavoriteRemark(String favoriteId, String remark) async {
+    // 备注存储在本地，后续可以扩展
+    debugPrint('MessageActionRepositoryImpl: editFavoriteRemark $favoriteId -> $remark');
   }
 }
 

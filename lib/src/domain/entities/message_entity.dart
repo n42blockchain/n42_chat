@@ -40,6 +40,8 @@ enum MessageType {
   voiceCall,
   /// 视频通话
   videoCall,
+  /// 联系人名片
+  contactCard,
   /// 未知类型
   unknown,
 }

@@ -1264,6 +1264,70 @@ class SecureStorageDataSource {
   }
 
   // ============================================
+  // 聊天背景
+  // ============================================
+
+  /// 设置聊天背景
+  Future<void> setChatBackground(String roomId, String backgroundPath) async {
+    await _storage.write(key: 'n42_chat_background_$roomId', value: backgroundPath);
+  }
+
+  /// 获取聊天背景
+  Future<String?> getChatBackground(String roomId) async {
+    return await _storage.read(key: 'n42_chat_background_$roomId');
+  }
+
+  /// 设置默认聊天背景
+  Future<void> setDefaultChatBackground(String backgroundPath) async {
+    await _storage.write(key: 'n42_chat_default_background', value: backgroundPath);
+  }
+
+  /// 获取默认聊天背景
+  Future<String?> getDefaultChatBackground() async {
+    return await _storage.read(key: 'n42_chat_default_background');
+  }
+
+  // ============================================
+  // 字体大小
+  // ============================================
+
+  /// 设置消息字体大小
+  Future<void> setMessageFontSize(double size) async {
+    await _storage.write(key: 'n42_chat_message_font_size', value: size.toString());
+  }
+
+  /// 获取消息字体大小
+  Future<double> getMessageFontSize() async {
+    final value = await _storage.read(key: 'n42_chat_message_font_size');
+    return double.tryParse(value ?? '') ?? 16.0;
+  }
+
+  // ============================================
+  // 自动下载设置
+  // ============================================
+
+  /// 保存自动下载设置
+  Future<void> saveAutoDownloadSettings(Map<String, dynamic> settings) async {
+    final json = settings.entries.map((e) => '${e.key}=${e.value}').join(',');
+    await _storage.write(key: 'n42_chat_auto_download_settings', value: json);
+  }
+
+  /// 获取自动下载设置
+  Future<Map<String, dynamic>> getAutoDownloadSettings() async {
+    final value = await _storage.read(key: 'n42_chat_auto_download_settings');
+    if (value == null || value.isEmpty) return {};
+
+    final map = <String, dynamic>{};
+    for (final pair in value.split(',')) {
+      final parts = pair.split('=');
+      if (parts.length == 2) {
+        map[parts[0]] = parts[1] == 'true' ? true : (parts[1] == 'false' ? false : parts[1]);
+      }
+    }
+    return map;
+  }
+
+  // ============================================
   // 清理
   // ============================================
 

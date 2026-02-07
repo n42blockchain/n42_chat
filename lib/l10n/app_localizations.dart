@@ -7848,6 +7848,168 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'未绑定'**
   String get ensNotBound;
+
+  /// No description provided for @liveLocation.
+  ///
+  /// In zh, this message translates to:
+  /// **'实时位置'**
+  String get liveLocation;
+
+  /// No description provided for @stopLiveLocation.
+  ///
+  /// In zh, this message translates to:
+  /// **'停止共享'**
+  String get stopLiveLocation;
+
+  /// No description provided for @startLiveLocation.
+  ///
+  /// In zh, this message translates to:
+  /// **'开始共享'**
+  String get startLiveLocation;
+
+  /// No description provided for @selectDuration.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择共享时长'**
+  String get selectDuration;
+
+  /// No description provided for @groupChatFiles.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天文件'**
+  String get groupChatFiles;
+
+  /// No description provided for @groupLinks.
+  ///
+  /// In zh, this message translates to:
+  /// **'链接'**
+  String get groupLinks;
+
+  /// No description provided for @groupNoLinks.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无链接'**
+  String get groupNoLinks;
+
+  /// No description provided for @chatBackground.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天背景'**
+  String get chatBackground;
+
+  /// No description provided for @solidColors.
+  ///
+  /// In zh, this message translates to:
+  /// **'纯色'**
+  String get solidColors;
+
+  /// No description provided for @gradients.
+  ///
+  /// In zh, this message translates to:
+  /// **'渐变'**
+  String get gradients;
+
+  /// No description provided for @defaultBackground.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认'**
+  String get defaultBackground;
+
+  /// No description provided for @settingsFontSizeSlider.
+  ///
+  /// In zh, this message translates to:
+  /// **'字体大小'**
+  String get settingsFontSizeSlider;
+
+  /// No description provided for @autoDownload.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动下载'**
+  String get autoDownload;
+
+  /// No description provided for @images.
+  ///
+  /// In zh, this message translates to:
+  /// **'图片'**
+  String get images;
+
+  /// No description provided for @voice.
+  ///
+  /// In zh, this message translates to:
+  /// **'语音'**
+  String get voice;
+
+  /// No description provided for @video.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频'**
+  String get video;
+
+  /// No description provided for @files.
+  ///
+  /// In zh, this message translates to:
+  /// **'文件'**
+  String get files;
+
+  /// No description provided for @mobileData.
+  ///
+  /// In zh, this message translates to:
+  /// **'移动数据'**
+  String get mobileData;
+
+  /// No description provided for @roaming.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫游'**
+  String get roaming;
+
+  /// No description provided for @storageManagement.
+  ///
+  /// In zh, this message translates to:
+  /// **'存储管理'**
+  String get storageManagement;
+
+  /// No description provided for @totalUsage.
+  ///
+  /// In zh, this message translates to:
+  /// **'总用量'**
+  String get totalUsage;
+
+  /// No description provided for @cache.
+  ///
+  /// In zh, this message translates to:
+  /// **'缓存'**
+  String get cache;
+
+  /// No description provided for @other.
+  ///
+  /// In zh, this message translates to:
+  /// **'其他'**
+  String get other;
+
+  /// No description provided for @clearCache.
+  ///
+  /// In zh, this message translates to:
+  /// **'清理缓存'**
+  String get clearCache;
+
+  /// No description provided for @cacheCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'缓存已清除'**
+  String get cacheCleared;
+
+  /// No description provided for @clearCacheFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'清理缓存失败'**
+  String get clearCacheFailed;
+
+  /// No description provided for @confirmClearCache.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认清理所有缓存数据？'**
+  String get confirmClearCache;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

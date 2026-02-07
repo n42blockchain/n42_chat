@@ -23,6 +23,9 @@ class ChatMorePanel extends StatefulWidget {
   /// 位置回调
   final VoidCallback? onLocationPressed;
 
+  /// 实时位置回调
+  final VoidCallback? onLiveLocationPressed;
+
   /// 红包回调
   final VoidCallback? onRedPacketPressed;
 
@@ -74,6 +77,7 @@ class ChatMorePanel extends StatefulWidget {
     this.onCameraPressed,
     this.onVideoCallPressed,
     this.onLocationPressed,
+    this.onLiveLocationPressed,
     this.onRedPacketPressed,
     this.onTransferPressed,
     this.onFilePressed,
@@ -259,6 +263,12 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                         label: S.of(context)?.chatAutoFaceBlur ?? 'Face Blur',
                         onTap: widget.onFaceBlurPressed,
                         iconColor: widget.isFaceBlur ? AppColors.primary : null,
+                      ),
+                      _MoreItem(
+                        icon: Icons.share_location,
+                        label: S.of(context)?.liveLocation ?? 'Live Location',
+                        onTap: widget.onLiveLocationPressed,
+                        iconColor: Colors.teal,
                       ),
                     ],
                   ),

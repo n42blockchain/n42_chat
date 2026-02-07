@@ -646,3 +646,19 @@ class ConnectionStatusChanged extends ChatEvent {
   @override
   List<Object?> get props => [isConnected];
 }
+
+/// 发送联系人名片消息
+class SendContactCardMessage extends ChatEvent {
+  final String userId;
+  final String displayName;
+  final String? avatarUrl;
+
+  const SendContactCardMessage({
+    required this.userId,
+    required this.displayName,
+    this.avatarUrl,
+  });
+
+  @override
+  List<Object?> get props => [userId, displayName, avatarUrl];
+}

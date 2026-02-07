@@ -239,6 +239,46 @@ abstract class Routes {
       '/group/${Uri.encodeComponent(roomId)}/token-gate/verify';
 
   // ============================================
+  // 媒体中心
+  // ============================================
+
+  /// 媒体预览
+  static const String mediaPreview = '/preview/media';
+  static const String mediaPreviewName = 'mediaPreview';
+
+  /// 群媒体中心
+  static const String groupMediaHub = '/group/:roomId/media-hub';
+  static const String groupMediaHubName = 'groupMediaHub';
+
+  /// 生成群媒体中心路径
+  static String groupMediaHubPath(String roomId) =>
+      '/group/${Uri.encodeComponent(roomId)}/media-hub';
+
+  /// 实时位置
+  static const String liveLocation = '/chat/:roomId/live-location';
+  static const String liveLocationName = 'liveLocation';
+
+  /// 生成实时位置路径
+  static String liveLocationPath(String roomId) =>
+      '/chat/${Uri.encodeComponent(roomId)}/live-location';
+
+  // ============================================
+  // 设置子页面
+  // ============================================
+
+  /// 存储管理
+  static const String storageManagement = '/settings/storage';
+  static const String storageManagementName = 'storageManagement';
+
+  /// 聊天背景
+  static const String chatBackground = '/settings/chat-background';
+  static const String chatBackgroundName = 'chatBackground';
+
+  /// 自动下载设置
+  static const String autoDownload = '/settings/auto-download';
+  static const String autoDownloadName = 'autoDownload';
+
+  // ============================================
   // 其他
   // ============================================
 

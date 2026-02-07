@@ -4153,4 +4153,85 @@ class SZh extends S {
 
   @override
   String get ensNotBound => '未绑定';
+
+  @override
+  String get liveLocation => '实时位置';
+
+  @override
+  String get stopLiveLocation => '停止共享';
+
+  @override
+  String get startLiveLocation => '开始共享';
+
+  @override
+  String get selectDuration => '选择共享时长';
+
+  @override
+  String get groupChatFiles => '聊天文件';
+
+  @override
+  String get groupLinks => '链接';
+
+  @override
+  String get groupNoLinks => '暂无链接';
+
+  @override
+  String get chatBackground => '聊天背景';
+
+  @override
+  String get solidColors => '纯色';
+
+  @override
+  String get gradients => '渐变';
+
+  @override
+  String get defaultBackground => '默认';
+
+  @override
+  String get settingsFontSizeSlider => '字体大小';
+
+  @override
+  String get autoDownload => '自动下载';
+
+  @override
+  String get images => '图片';
+
+  @override
+  String get voice => '语音';
+
+  @override
+  String get video => '视频';
+
+  @override
+  String get files => '文件';
+
+  @override
+  String get mobileData => '移动数据';
+
+  @override
+  String get roaming => '漫游';
+
+  @override
+  String get storageManagement => '存储管理';
+
+  @override
+  String get totalUsage => '总用量';
+
+  @override
+  String get cache => '缓存';
+
+  @override
+  String get other => '其他';
+
+  @override
+  String get clearCache => '清理缓存';
+
+  @override
+  String get cacheCleared => '缓存已清除';
+
+  @override
+  String get clearCacheFailed => '清理缓存失败';
+
+  @override
+  String get confirmClearCache => '确认清理所有缓存数据？';
 }

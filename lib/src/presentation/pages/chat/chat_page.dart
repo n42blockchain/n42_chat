@@ -21,7 +21,9 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/services/in_app_notification_service.dart';
 import '../../../core/utils/face_blur_util.dart';
+import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../n42_chat.dart';
 
@@ -59,6 +61,7 @@ import '../contact/contact_detail_page.dart';
 import '../search/chat_search_bar.dart';
 import 'chat_detail_page.dart';
 import 'message_item.dart';
+import 'live_location_page.dart';
 import 'thread_detail_page.dart';
 import 'viewers/pdf_viewer_page.dart';
 
@@ -141,6 +144,9 @@ class _ChatPageState extends State<ChatPage> {
   // 投票防抖 - 正在投票的pollId集合
   final Set<String> _votingPollIds = {};
 
+  // 聊天背景 key（如 solid_0, gradient_1, default 等）
+  String? _backgroundKey;
+
   @override
   void initState() {
     super.initState();
@@ -178,6 +184,12 @@ class _ChatPageState extends State<ChatPage> {
         setState(() {});
       }
     });
+
+    // 加载聊天背景
+    _loadBackground();
+
+    // 设置当前聊天房间（应用内通知过滤）
+    InAppNotificationService.instance.setCurrentChatRoom(widget.conversation.id);
 
     // 设置通话错误回调
     N42Chat.callManager?.onError = _handleCallError;
@@ -265,6 +277,64 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  /// 加载聊天背景设置
+  Future<void> _loadBackground() async {
+    final storage = getIt<SecureStorageDataSource>();
+    // 先尝试获取房间特定背景
+    var bg = await storage.getChatBackground(widget.conversation.id);
+    // 如果没有，尝试默认背景
+    bg ??= await storage.getDefaultChatBackground();
+    if (mounted && bg != null) {
+      setState(() => _backgroundKey = bg);
+    }
+  }
+
+  /// 构建聊天背景装饰
+  BoxDecoration? _buildBackgroundDecoration() {
+    final key = _backgroundKey;
+    if (key == null || key == 'default') return null;
+
+    // 纯色背景预设
+    const solidColors = [
+      Color(0xFFEDEDED),
+      Color(0xFFD6E4F0),
+      Color(0xFFD4EDDA),
+      Color(0xFFFFF3CD),
+      Color(0xFFF8D7DA),
+      Color(0xFFE2D9F3),
+      Color(0xFFD1ECF1),
+      Color(0xFF343A40),
+    ];
+
+    // 渐变背景预设
+    const gradients = [
+      [Color(0xFF667EEA), Color(0xFF764BA2)],
+      [Color(0xFFF093FB), Color(0xFFF5576C)],
+      [Color(0xFF4FACFE), Color(0xFF00F2FE)],
+      [Color(0xFF43E97B), Color(0xFF38F9D7)],
+    ];
+
+    if (key.startsWith('solid_')) {
+      final index = int.tryParse(key.substring(6));
+      if (index != null && index >= 0 && index < solidColors.length) {
+        return BoxDecoration(color: solidColors[index]);
+      }
+    } else if (key.startsWith('gradient_')) {
+      final index = int.tryParse(key.substring(9));
+      if (index != null && index >= 0 && index < gradients.length) {
+        return BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: gradients[index],
+          ),
+        );
+      }
+    }
+
+    return null;
+  }
+
   /// 切换人脸模糊设置
   Future<void> _toggleFaceBlur() async {
     final newValue = !_autoFaceBlur;
@@ -283,6 +353,9 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     // 清除当前活跃房间
     N42Chat.pushService?.setActiveRoom(null);
+
+    // 清除当前聊天房间（应用内通知过滤）
+    InAppNotificationService.instance.setCurrentChatRoom(null);
 
     // 清除通话错误回调
     if (N42Chat.callManager?.onError == _handleCallError) {
@@ -1181,18 +1254,21 @@ class _ChatPageState extends State<ChatPage> {
 
               // 消息列表
               Expanded(
-                child: Stack(
-                  children: [
-                    _buildMessageList(),
+                child: Container(
+                  decoration: _buildBackgroundDecoration(),
+                  child: Stack(
+                    children: [
+                      _buildMessageList(),
 
-                    // 回到底部按钮
-                    if (_showScrollToBottom)
-                      Positioned(
-                        right: 16,
-                        bottom: 16,
-                        child: _buildScrollToBottomButton(),
-                      ),
-                  ],
+                      // 回到底部按钮
+                      if (_showScrollToBottom)
+                        Positioned(
+                          right: 16,
+                          bottom: 16,
+                          child: _buildScrollToBottomButton(),
+                        ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -1464,6 +1540,16 @@ class _ChatPageState extends State<ChatPage> {
         setState(() {
           _isViewOnce = !_isViewOnce;
         });
+      },
+      onLiveLocationPressed: () {
+        _hideMorePanel();
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => LiveLocationPage(
+              roomId: widget.conversation.id,
+            ),
+          ),
+        );
       },
       isFaceBlur: _autoFaceBlur,
       onFaceBlurPressed: _toggleFaceBlur,

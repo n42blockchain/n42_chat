@@ -8,6 +8,8 @@ import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'quick_replies_page.dart';
+import 'storage_management_page.dart';
+import 'auto_download_settings_page.dart';
 
 /// 设置页面
 class SettingsPage extends StatelessWidget {
@@ -118,6 +120,40 @@ class SettingsPage extends StatelessWidget {
                 iconColor: Colors.blue,
                 title: S.of(context)?.settingsLanguage ?? 'Language',
                 onTap: onLanguage,
+                isDark: isDark,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // 设置组2.5：存储与下载
+          _SettingsGroup(
+            children: [
+              _SettingsItem(
+                icon: Icons.storage,
+                iconColor: Colors.blueGrey,
+                title: S.of(context)?.storageManagement ?? 'Storage',
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const StorageManagementPage(),
+                    ),
+                  );
+                },
+                isDark: isDark,
+              ),
+              _SettingsItem(
+                icon: Icons.download,
+                iconColor: Colors.lightBlue,
+                title: S.of(context)?.autoDownload ?? 'Auto-Download',
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const AutoDownloadSettingsPage(),
+                    ),
+                  );
+                },
                 isDark: isDark,
               ),
             ],
