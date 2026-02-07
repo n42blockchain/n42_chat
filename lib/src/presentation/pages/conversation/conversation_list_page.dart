@@ -46,12 +46,16 @@ class ConversationListPage extends StatefulWidget {
   /// 是否显示 AppBar（嵌入到主框架时可设为 false）
   final bool showAppBar;
 
+  /// 当前选中的会话 ID（iPad 分屏模式下高亮显示）
+  final String? selectedConversationId;
+
   const ConversationListPage({
     super.key,
     this.onConversationTap,
     this.onAddPressed,
     this.onSearchTap,
     this.showAppBar = true,
+    this.selectedConversationId,
   });
 
   @override
@@ -470,6 +474,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                     index: entry.key,
                     child: ConversationTile(
                       conversation: entry.value,
+                      isSelected: widget.selectedConversationId == entry.value.id,
                       onTap: () => _onConversationTap(entry.value),
                       onLongPress: () =>
                           _onConversationLongPress(context, entry.value),
@@ -498,6 +503,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                   index: entry.key,
                   child: ConversationTile(
                     conversation: entry.value,
+                    isSelected: widget.selectedConversationId == entry.value.id,
                     onTap: () => _onConversationTap(entry.value),
                     onLongPress: () =>
                         _onConversationLongPress(context, entry.value),
@@ -522,10 +528,13 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
   void _showAddMenu() {
     final isDark = context.isDarkMode;
-    
+
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
+      constraints: MediaQuery.of(context).size.width >= 600
+          ? const BoxConstraints(maxWidth: 400)
+          : null,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
@@ -667,10 +676,13 @@ class _ConversationListPageState extends State<ConversationListPage> {
   void _showConversationMenu(
       BuildContext context, ConversationEntity conversation) {
     final isDark = context.isDarkMode;
-    
+
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
+      constraints: MediaQuery.of(context).size.width >= 600
+          ? const BoxConstraints(maxWidth: 400)
+          : null,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF2C2C2E) : Colors.white,

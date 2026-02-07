@@ -94,7 +94,10 @@ class MessageBubble extends StatelessWidget {
         final availableWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : MediaQuery.of(context).size.width;
-        final maxWidth = availableWidth * maxWidthFactor;
+        // 限制气泡绝对最大宽度为 400px，避免在 iPad 上过宽
+        final double maxWidth;
+        final calculated = availableWidth * maxWidthFactor;
+        maxWidth = calculated > 400 ? 400 : calculated;
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

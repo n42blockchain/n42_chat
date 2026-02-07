@@ -18,11 +18,15 @@ class ConversationTile extends StatelessWidget {
   /// 长按回调
   final VoidCallback? onLongPress;
 
+  /// 是否被选中（iPad 分屏模式下高亮当前会话）
+  final bool isSelected;
+
   const ConversationTile({
     super.key,
     required this.conversation,
     this.onTap,
     this.onLongPress,
+    this.isSelected = false,
   });
   
   /// 获取显示名称（私聊时优先使用备注名）
@@ -44,9 +48,14 @@ class ConversationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = conversation.isPinned
-        ? (isDark ? const Color(0xFF252525) : const Color(0xFFF5F5F5))
-        : (isDark ? AppColors.surfaceDark : AppColors.surface);
+    final Color bgColor;
+    if (isSelected) {
+      bgColor = isDark ? const Color(0xFF2A3A50) : const Color(0xFFE3EFFD);
+    } else if (conversation.isPinned) {
+      bgColor = isDark ? const Color(0xFF252525) : const Color(0xFFF5F5F5);
+    } else {
+      bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
