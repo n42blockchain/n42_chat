@@ -44,6 +44,7 @@
   "chatCopied": "Copied",
   "storySendMessageHint": "Send a message",
   "commonMicrophonePermissionRequired": "Please allow microphone permission",
+  "chatMicrophonePermissionDeniedPermanent": "Microphone permission has been denied. Please enable it in system settings to use voice messages.",
   "commonStartRecordingFailed": "Failed to start recording: {error}",
   "commonRecordingTooShort": "Recording too short",
   "commonStopRecordingFailed": "Failed to stop recording: {error}",
@@ -103,6 +104,7 @@
   "commonN42RedPacket": "N42 Red Packet",
   "commonClaimed": "Claimed",
   "commonAllClaimed": "All claimed",
+  "chatReadAloud": "Read Aloud",
   "chatReply": "Reply",
   "commonEdit": "Edit",
   "chatSelectForwardTarget": "Select Forward Target",
@@ -904,6 +906,21 @@
   "settingsResetEncryptionTitle": "Reset Encryption",
   "settingsResetEncryptionWarning": "Warning: This will delete all your encryption keys. You will not be able to decrypt previous encrypted messages. This action cannot be undone.",
   "settingsReset": "Reset",
+  "settingsBackupSuccess": "Keys backed up successfully",
+  "settingsBackupFailed": "Backup failed",
+  "settingsRecoveryKey": "Recovery Key",
+  "settingsRecoveryKeySaveWarning": "Please save this recovery key in a safe place. You will need it to restore your encrypted messages on a new device.",
+  "settingsRecoveryKeySaved": "I have saved it",
+  "settingsRestoreSuccess": "Keys restored successfully",
+  "settingsRestoreFailed": "Restore failed",
+  "settingsPassword": "Password",
+  "settingsEnterRecoveryKey": "Enter recovery key",
+  "settingsEnterPassword": "Enter password",
+  "settingsExportSuccess": "Keys exported to server backup successfully",
+  "settingsExportNeedBackupFirst": "Please create a key backup first",
+  "settingsExportFailed": "Export failed",
+  "settingsResetSuccess": "Encryption reset successful",
+  "settingsResetFailed": "Reset failed",
   "callLeaveMeetingConfirm": "Are you sure you want to leave the meeting?",
   "chatPokedSomeone": "poked {name}{suffix}",
   "@chatPokedSomeone": {
@@ -1733,5 +1750,120 @@
         "type": "String"
       }
     }
-  }
+  },
+
+  "securityDeviceIdRequired": "Device ID is required",
+  "securityVerificationStartFailed": "Failed to start verification: {error}",
+  "@securityVerificationStartFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securityVerificationFailed": "Verification failed",
+  "securityVerificationFailedWithReason": "Verification failed: {reason}",
+  "@securityVerificationFailedWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "securityEmojiMismatchRejected": "Verification rejected - emoji did not match",
+  "securityWaitingForDeviceAccept": "Waiting for the other device to accept...",
+  "securityVerifyDevice": "Verify this device",
+  "securityConfirmEmojiMatch": "Confirm the emoji below are displayed on both devices, in the same order",
+  "securityEmojiDontMatch": "They don't match",
+  "securityEmojiMatch": "They match",
+  "securityWaitingForDeviceConfirm": "Waiting for the other device to confirm...",
+  "securityVerificationSuccess": "Verification successful!",
+  "securityDeviceVerifiedTrusted": "This device is now verified and trusted.",
+  "securityCompareEmoji": "Compare the emoji on both devices",
+  "securityCompareNumbers": "Compare the numbers on both devices",
+  "commonTryAgain": "Try Again",
+  "commonDone": "Done",
+
+  "chatExportTitle": "Export Chat",
+  "chatExportSuccess": "Export successful",
+  "chatExportFailed": "Export failed: {error}",
+  "@chatExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chatExportFormat": "Export Format",
+  "chatExportHtmlDesc": "Readable in any browser with styled layout",
+  "chatExportJsonDesc": "Machine-readable structured data format",
+  "chatExportDateRange": "Date Range",
+  "chatExportAll": "All Messages",
+  "chatExportLastWeek": "Last 7 Days",
+  "chatExportLastMonth": "Last Month",
+  "chatExportLast3Months": "Last 3 Months",
+  "chatExportMessageCount": "Messages to export",
+  "chatExportButton": "Export & Share",
+  "chatMediaGallery": "Media Gallery",
+  "chatExportHistory": "Export Chat History",
+
+  "pdfLoadFailed": "Failed to load PDF",
+  "pdfPageIndicator": "{current} / {total}",
+  "@pdfPageIndicator": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+
+  "mediaAll": "All",
+  "mediaImages": "Images",
+  "mediaVideos": "Videos",
+  "mediaFiles": "Files",
+  "mediaAudio": "Audio",
+  "mediaItemsCount": "{count} items",
+  "@mediaItemsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "mediaNoMediaFound": "No media found",
+
+  "spacesTitle": "Communities",
+  "spacesCreate": "Create Community",
+  "spacesJoined": "Joined",
+  "spacesDiscover": "Discover",
+  "spacesNoJoined": "No communities joined yet",
+  "spacesExplore": "Explore Communities",
+  "spacesNoPublic": "No public communities found",
+  "spacesJoin": "Join",
+  "spacesSubSpaces": "Sub-Communities",
+  "spacesChannels": "Channels",
+  "spacesMembersCount": "{count} members",
+  "@spacesMembersCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "spacesPublic": "Public",
+  "spacesPrivate": "Private",
+  "spacesSuggested": "Suggested",
+  "spacesChannelsCount": "{count} channels",
+  "@spacesChannelsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "callInCallChat": "In-Call Chat",
+  "callMessagesCount": "{count} messages",
+  "@callMessagesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "callNoMessagesYet": "No messages yet.\nSend a message to get started.",
+  "callTypeMessage": "Type a message...",
+  "callYouSender": "You",
+  "callChatLabel": "Chat"
 }

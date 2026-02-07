@@ -132,6 +132,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     if (state == CallState.connected) {
       _pulseController.stop();
       _startHideControlsTimer();
+      // 确保 iOS 上音频路由初始状态正确（听筒模式）
+      try {
+        Helper.setSpeakerphoneOn(false);
+      } catch (e) {
+        debugPrint('CallScreen: Failed to set initial audio route: $e');
+      }
     } else if (state == CallState.ended || state == CallState.failed) {
       // 延迟关闭页面
       Future.delayed(const Duration(seconds: 1), () {
@@ -399,28 +405,39 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   /// 语音通话控制按钮 - 微信风格
   Widget _buildVoiceControlsWeChat() {
+    final l10n = S.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // 静音
-          _buildWeChatControlButton(
-            icon: _isMuted ? Icons.mic_off : Icons.mic,
-            label: _isMuted ? '取消静音' : '静音',
-            isActive: _isMuted,
-            onTap: _toggleMute,
-          ),
+          // 上行：功能按钮
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // 静音
+              _buildWeChatControlButton(
+                icon: _isMuted ? Icons.mic_off : Icons.mic,
+                label: _isMuted
+                    ? (l10n?.callUnmuteLabel ?? 'Unmute')
+                    : (l10n?.callMuteLabel ?? 'Mute'),
+                isActive: _isMuted,
+                onTap: _toggleMute,
+              ),
 
-          // 扬声器
-          _buildWeChatControlButton(
-            icon: _isSpeakerOn ? Icons.volume_up : Icons.volume_down,
-            label: _isSpeakerOn ? '听筒' : '扬声器',
-            isActive: _isSpeakerOn,
-            onTap: _toggleSpeaker,
+              // 扬声器
+              _buildWeChatControlButton(
+                icon: _isSpeakerOn ? Icons.volume_up : Icons.volume_down,
+                label: _isSpeakerOn
+                    ? (l10n?.chatSpeakerOff ?? 'Speaker Off')
+                    : (l10n?.chatSpeakerOn ?? 'Speaker'),
+                isActive: _isSpeakerOn,
+                onTap: _toggleSpeaker,
+              ),
+            ],
           ),
-
-          // 挂断
+          const SizedBox(height: 24),
+          // 下行：挂断按钮居中
           _buildWeChatHangupButton(),
         ],
       ),
@@ -493,14 +510,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildWeChatHangupButton() {
+    final l10n = S.of(context);
     return GestureDetector(
       onTap: _hangup,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 70,
+            height: 70,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: _hangupColor,
@@ -508,15 +526,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             child: const Icon(
               Icons.call_end,
               color: Colors.white,
-              size: 28,
+              size: 32,
             ),
           ),
           const SizedBox(height: 10),
           Text(
-            '挂断',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
-              fontSize: 12,
+            l10n?.chatHangUp ?? 'Hang Up',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
             ),
           ),
         ],
@@ -676,39 +694,50 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       );
     }
 
+    final l10n = S.of(context);
     return Positioned(
       bottom: 60,
       left: 0,
       right: 0,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // 静音
-            _buildWeChatControlButton(
-              icon: _isMuted ? Icons.mic_off : Icons.mic,
-              label: _isMuted ? '取消静音' : '静音',
-              isActive: _isMuted,
-              onTap: _toggleMute,
-            ),
+            // 上行：功能按钮
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // 静音
+                _buildWeChatControlButton(
+                  icon: _isMuted ? Icons.mic_off : Icons.mic,
+                  label: _isMuted
+                      ? (l10n?.callUnmuteLabel ?? 'Unmute')
+                      : (l10n?.callMuteLabel ?? 'Mute'),
+                  isActive: _isMuted,
+                  onTap: _toggleMute,
+                ),
 
-            // 视频开关
-            _buildWeChatControlButton(
-              icon: _isVideoEnabled ? Icons.videocam : Icons.videocam_off,
-              label: _isVideoEnabled ? '关闭摄像头' : '开启摄像头',
-              isActive: !_isVideoEnabled,
-              onTap: _toggleVideo,
-            ),
+                // 视频开关
+                _buildWeChatControlButton(
+                  icon: _isVideoEnabled ? Icons.videocam : Icons.videocam_off,
+                  label: _isVideoEnabled
+                      ? (l10n?.chatCameraOff ?? 'Camera Off')
+                      : (l10n?.chatCameraOn ?? 'Camera On'),
+                  isActive: !_isVideoEnabled,
+                  onTap: _toggleVideo,
+                ),
 
-            // 切换摄像头
-            _buildWeChatControlButton(
-              icon: Icons.cameraswitch,
-              label: '翻转',
-              onTap: _switchCamera,
+                // 切换摄像头
+                _buildWeChatControlButton(
+                  icon: Icons.cameraswitch,
+                  label: l10n?.callSwitchCameraLabel ?? 'Switch',
+                  onTap: _switchCamera,
+                ),
+              ],
             ),
-
-            // 挂断
+            const SizedBox(height: 24),
+            // 下行：挂断按钮居中
             _buildWeChatHangupButton(),
           ],
         ),
@@ -763,8 +792,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     });
   }
 
-  void _toggleSpeaker() {
-    widget.webRTCService.toggleSpeaker();
+  Future<void> _toggleSpeaker() async {
+    await widget.webRTCService.toggleSpeaker();
     setState(() {
       _isSpeakerOn = widget.webRTCService.isSpeakerOn;
     });

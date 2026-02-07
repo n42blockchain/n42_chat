@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../moment/moment_list_page.dart';
 import '../qrcode/scan_qr_page.dart';
+import '../space/space_list_page.dart';
 
 /// 发现页面（仿微信）
 class DiscoverPage extends StatelessWidget {
@@ -113,6 +114,23 @@ class DiscoverPage extends StatelessWidget {
                 iconWidget: _SearchIcon(),
                 title: l10n?.discoverSearchDiscover ?? 'Search',
                 onTap: () => _showComingSoon(context, l10n?.discoverSearchDiscover ?? 'Search'),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
+          // 社区/Communities
+          _buildGroupCard(
+            context,
+            isDark,
+            children: [
+              _buildMenuItem(
+                context,
+                isDark: isDark,
+                iconWidget: const Icon(Icons.groups, color: Color(0xFF7B68EE), size: 26),
+                title: l10n?.spacesTitle ?? 'Communities',
+                onTap: () => _openCommunities(context),
               ),
             ],
           ),
@@ -240,6 +258,12 @@ class DiscoverPage extends StatelessWidget {
   void _openMoments(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const MomentListPage()),
+    );
+  }
+
+  void _openCommunities(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const SpaceListPage()),
     );
   }
 

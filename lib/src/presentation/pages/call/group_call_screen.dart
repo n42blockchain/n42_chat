@@ -14,6 +14,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../services/voip/livekit_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../widgets/chat/in_call_chat_panel.dart';
 import '../../widgets/common/n42_avatar.dart';
 
 // VideoTrackRenderer 存根实现
@@ -643,6 +644,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               onPressed: _toggleScreenShare,
             ),
 
+            // 通话中聊天
+            _buildControlButton(
+              icon: Icons.chat_bubble_outline,
+              label: S.of(context)?.callChatLabel ?? 'Chat',
+              onPressed: _openInCallChat,
+            ),
+
             // 切换摄像头
             _buildControlButton(
               icon: Icons.cameraswitch,
@@ -885,6 +893,17 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     });
   }
   
+  void _openInCallChat() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => InCallChatPanel(
+        liveKitService: widget.liveKitService,
+      ),
+    );
+  }
+
   void _switchCamera() {
     widget.liveKitService.switchCamera();
   }

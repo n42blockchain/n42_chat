@@ -75,7 +75,7 @@ import 'app_localizations_zh.dart';
 /// property.
 abstract class S {
   S(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -97,11 +97,11 @@ abstract class S {
   /// of delegates is preferred or required.
   static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
       <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
@@ -118,7 +118,7 @@ abstract class S {
     Locale('ru'),
     Locale('tr'),
     Locale('vi'),
-    Locale('zh')
+    Locale('zh'),
   ];
 
   /// No description provided for @commonRetry.
@@ -385,6 +385,12 @@ abstract class S {
   /// **'请允许使用麦克风权限'**
   String get commonMicrophonePermissionRequired;
 
+  /// No description provided for @chatMicrophonePermissionDeniedPermanent.
+  ///
+  /// In zh, this message translates to:
+  /// **'麦克风权限已被拒绝，请在系统设置中开启以使用语音消息功能。'**
+  String get chatMicrophonePermissionDeniedPermanent;
+
   /// No description provided for @commonStartRecordingFailed.
   ///
   /// In zh, this message translates to:
@@ -570,6 +576,12 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'已被领完'**
   String get commonAllClaimed;
+
+  /// No description provided for @chatReadAloud.
+  ///
+  /// In zh, this message translates to:
+  /// **'朗读'**
+  String get chatReadAloud;
 
   /// No description provided for @chatReply.
   ///
@@ -3925,6 +3937,96 @@ abstract class S {
   /// **'重置'**
   String get settingsReset;
 
+  /// No description provided for @settingsBackupSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'密钥备份成功'**
+  String get settingsBackupSuccess;
+
+  /// No description provided for @settingsBackupFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份失败'**
+  String get settingsBackupFailed;
+
+  /// No description provided for @settingsRecoveryKey.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复密钥'**
+  String get settingsRecoveryKey;
+
+  /// No description provided for @settingsRecoveryKeySaveWarning.
+  ///
+  /// In zh, this message translates to:
+  /// **'请将此恢复密钥保存在安全的地方。您需要它在新设备上恢复加密消息。'**
+  String get settingsRecoveryKeySaveWarning;
+
+  /// No description provided for @settingsRecoveryKeySaved.
+  ///
+  /// In zh, this message translates to:
+  /// **'我已保存'**
+  String get settingsRecoveryKeySaved;
+
+  /// No description provided for @settingsRestoreSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'密钥恢复成功'**
+  String get settingsRestoreSuccess;
+
+  /// No description provided for @settingsRestoreFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复失败'**
+  String get settingsRestoreFailed;
+
+  /// No description provided for @settingsPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码'**
+  String get settingsPassword;
+
+  /// No description provided for @settingsEnterRecoveryKey.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入恢复密钥'**
+  String get settingsEnterRecoveryKey;
+
+  /// No description provided for @settingsEnterPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入密码'**
+  String get settingsEnterPassword;
+
+  /// No description provided for @settingsExportSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'密钥已成功导出到服务端备份'**
+  String get settingsExportSuccess;
+
+  /// No description provided for @settingsExportNeedBackupFirst.
+  ///
+  /// In zh, this message translates to:
+  /// **'请先创建密钥备份'**
+  String get settingsExportNeedBackupFirst;
+
+  /// No description provided for @settingsExportFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出失败'**
+  String get settingsExportFailed;
+
+  /// No description provided for @settingsResetSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'加密重置成功'**
+  String get settingsResetSuccess;
+
+  /// No description provided for @settingsResetFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置失败'**
+  String get settingsResetFailed;
+
   /// No description provided for @callLeaveMeetingConfirm.
   ///
   /// In zh, this message translates to:
@@ -6828,6 +6930,378 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'处理二维码失败: {error}'**
   String qrcodeProcessFailed(String error);
+
+  /// No description provided for @securityDeviceIdRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'需要设备 ID'**
+  String get securityDeviceIdRequired;
+
+  /// No description provided for @securityVerificationStartFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'启动验证失败: {error}'**
+  String securityVerificationStartFailed(String error);
+
+  /// No description provided for @securityVerificationFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证失败'**
+  String get securityVerificationFailed;
+
+  /// No description provided for @securityVerificationFailedWithReason.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证失败: {reason}'**
+  String securityVerificationFailedWithReason(String reason);
+
+  /// No description provided for @securityEmojiMismatchRejected.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证被拒绝 - 表情不匹配'**
+  String get securityEmojiMismatchRejected;
+
+  /// No description provided for @securityWaitingForDeviceAccept.
+  ///
+  /// In zh, this message translates to:
+  /// **'等待另一台设备接受...'**
+  String get securityWaitingForDeviceAccept;
+
+  /// No description provided for @securityVerifyDevice.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证此设备'**
+  String get securityVerifyDevice;
+
+  /// No description provided for @securityConfirmEmojiMatch.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认以下表情符号在两台设备上以相同顺序显示'**
+  String get securityConfirmEmojiMatch;
+
+  /// No description provided for @securityEmojiDontMatch.
+  ///
+  /// In zh, this message translates to:
+  /// **'不匹配'**
+  String get securityEmojiDontMatch;
+
+  /// No description provided for @securityEmojiMatch.
+  ///
+  /// In zh, this message translates to:
+  /// **'匹配'**
+  String get securityEmojiMatch;
+
+  /// No description provided for @securityWaitingForDeviceConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'等待另一台设备确认...'**
+  String get securityWaitingForDeviceConfirm;
+
+  /// No description provided for @securityVerificationSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证成功！'**
+  String get securityVerificationSuccess;
+
+  /// No description provided for @securityDeviceVerifiedTrusted.
+  ///
+  /// In zh, this message translates to:
+  /// **'此设备已验证并可信任。'**
+  String get securityDeviceVerifiedTrusted;
+
+  /// No description provided for @securityCompareEmoji.
+  ///
+  /// In zh, this message translates to:
+  /// **'比较两台设备上的表情符号'**
+  String get securityCompareEmoji;
+
+  /// No description provided for @securityCompareNumbers.
+  ///
+  /// In zh, this message translates to:
+  /// **'比较两台设备上的数字'**
+  String get securityCompareNumbers;
+
+  /// No description provided for @commonTryAgain.
+  ///
+  /// In zh, this message translates to:
+  /// **'重试'**
+  String get commonTryAgain;
+
+  /// No description provided for @commonDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'完成'**
+  String get commonDone;
+
+  /// No description provided for @chatExportTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出聊天记录'**
+  String get chatExportTitle;
+
+  /// No description provided for @chatExportSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出成功'**
+  String get chatExportSuccess;
+
+  /// No description provided for @chatExportFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出失败: {error}'**
+  String chatExportFailed(String error);
+
+  /// No description provided for @chatExportFormat.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出格式'**
+  String get chatExportFormat;
+
+  /// No description provided for @chatExportHtmlDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'可在任何浏览器中打开的精美排版'**
+  String get chatExportHtmlDesc;
+
+  /// No description provided for @chatExportJsonDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'机器可读的结构化数据格式'**
+  String get chatExportJsonDesc;
+
+  /// No description provided for @chatExportDateRange.
+  ///
+  /// In zh, this message translates to:
+  /// **'日期范围'**
+  String get chatExportDateRange;
+
+  /// No description provided for @chatExportAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部消息'**
+  String get chatExportAll;
+
+  /// No description provided for @chatExportLastWeek.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近7天'**
+  String get chatExportLastWeek;
+
+  /// No description provided for @chatExportLastMonth.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近一个月'**
+  String get chatExportLastMonth;
+
+  /// No description provided for @chatExportLast3Months.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近三个月'**
+  String get chatExportLast3Months;
+
+  /// No description provided for @chatExportMessageCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'待导出消息'**
+  String get chatExportMessageCount;
+
+  /// No description provided for @chatExportButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出并分享'**
+  String get chatExportButton;
+
+  /// No description provided for @chatMediaGallery.
+  ///
+  /// In zh, this message translates to:
+  /// **'媒体文件'**
+  String get chatMediaGallery;
+
+  /// No description provided for @chatExportHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出聊天记录'**
+  String get chatExportHistory;
+
+  /// No description provided for @pdfLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载 PDF 失败'**
+  String get pdfLoadFailed;
+
+  /// No description provided for @pdfPageIndicator.
+  ///
+  /// In zh, this message translates to:
+  /// **'{current} / {total}'**
+  String pdfPageIndicator(int current, int total);
+
+  /// No description provided for @mediaAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部'**
+  String get mediaAll;
+
+  /// No description provided for @mediaImages.
+  ///
+  /// In zh, this message translates to:
+  /// **'图片'**
+  String get mediaImages;
+
+  /// No description provided for @mediaVideos.
+  ///
+  /// In zh, this message translates to:
+  /// **'视频'**
+  String get mediaVideos;
+
+  /// No description provided for @mediaFiles.
+  ///
+  /// In zh, this message translates to:
+  /// **'文件'**
+  String get mediaFiles;
+
+  /// No description provided for @mediaAudio.
+  ///
+  /// In zh, this message translates to:
+  /// **'音频'**
+  String get mediaAudio;
+
+  /// No description provided for @mediaItemsCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 项'**
+  String mediaItemsCount(int count);
+
+  /// No description provided for @mediaNoMediaFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无媒体文件'**
+  String get mediaNoMediaFound;
+
+  /// No description provided for @spacesTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'社区'**
+  String get spacesTitle;
+
+  /// No description provided for @spacesCreate.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建社区'**
+  String get spacesCreate;
+
+  /// No description provided for @spacesJoined.
+  ///
+  /// In zh, this message translates to:
+  /// **'已加入'**
+  String get spacesJoined;
+
+  /// No description provided for @spacesDiscover.
+  ///
+  /// In zh, this message translates to:
+  /// **'发现'**
+  String get spacesDiscover;
+
+  /// No description provided for @spacesNoJoined.
+  ///
+  /// In zh, this message translates to:
+  /// **'还没有加入任何社区'**
+  String get spacesNoJoined;
+
+  /// No description provided for @spacesExplore.
+  ///
+  /// In zh, this message translates to:
+  /// **'探索社区'**
+  String get spacesExplore;
+
+  /// No description provided for @spacesNoPublic.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有找到公共社区'**
+  String get spacesNoPublic;
+
+  /// No description provided for @spacesJoin.
+  ///
+  /// In zh, this message translates to:
+  /// **'加入'**
+  String get spacesJoin;
+
+  /// No description provided for @spacesSubSpaces.
+  ///
+  /// In zh, this message translates to:
+  /// **'子社区'**
+  String get spacesSubSpaces;
+
+  /// No description provided for @spacesChannels.
+  ///
+  /// In zh, this message translates to:
+  /// **'频道'**
+  String get spacesChannels;
+
+  /// No description provided for @spacesMembersCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 位成员'**
+  String spacesMembersCount(int count);
+
+  /// No description provided for @spacesPublic.
+  ///
+  /// In zh, this message translates to:
+  /// **'公开'**
+  String get spacesPublic;
+
+  /// No description provided for @spacesPrivate.
+  ///
+  /// In zh, this message translates to:
+  /// **'私密'**
+  String get spacesPrivate;
+
+  /// No description provided for @spacesSuggested.
+  ///
+  /// In zh, this message translates to:
+  /// **'推荐'**
+  String get spacesSuggested;
+
+  /// No description provided for @spacesChannelsCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 个频道'**
+  String spacesChannelsCount(int count);
+
+  /// No description provided for @callInCallChat.
+  ///
+  /// In zh, this message translates to:
+  /// **'通话中聊天'**
+  String get callInCallChat;
+
+  /// No description provided for @callMessagesCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 条消息'**
+  String callMessagesCount(int count);
+
+  /// No description provided for @callNoMessagesYet.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无消息\n发送一条消息开始聊天'**
+  String get callNoMessagesYet;
+
+  /// No description provided for @callTypeMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入消息...'**
+  String get callTypeMessage;
+
+  /// No description provided for @callYouSender.
+  ///
+  /// In zh, this message translates to:
+  /// **'我'**
+  String get callYouSender;
+
+  /// No description provided for @callChatLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天'**
+  String get callChatLabel;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
@@ -6840,21 +7314,21 @@ class _SDelegate extends LocalizationsDelegate<S> {
 
   @override
   bool isSupported(Locale locale) => <String>[
-        'de',
-        'en',
-        'es',
-        'fr',
-        'id',
-        'it',
-        'ja',
-        'ko',
-        'pl',
-        'pt',
-        'ru',
-        'tr',
-        'vi',
-        'zh'
-      ].contains(locale.languageCode);
+    'de',
+    'en',
+    'es',
+    'fr',
+    'id',
+    'it',
+    'ja',
+    'ko',
+    'pl',
+    'pt',
+    'ru',
+    'tr',
+    'vi',
+    'zh',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_SDelegate old) => false;
@@ -6894,8 +7368,9 @@ S lookupS(Locale locale) {
   }
 
   throw FlutterError(
-      'S.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'S.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
 }

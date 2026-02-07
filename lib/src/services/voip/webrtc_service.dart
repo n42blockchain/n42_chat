@@ -208,32 +208,22 @@ class WebRTCService {
       }
     });
 
-    // 同时监听房间事件（用于接收房间内的通话事件）
-    _client.onEvent.stream.listen((eventUpdate) {
-      // 只处理 timeline 和 decryptedTimelineQueue 类型的事件
-      if (eventUpdate.type != matrix.EventUpdateType.timeline &&
-          eventUpdate.type != matrix.EventUpdateType.decryptedTimelineQueue) {
-        return;
-      }
-
-      // 从 content 中获取事件类型
-      final eventType = eventUpdate.content['type'] as String?;
+    // 同时监听房间时间线事件（用于接收房间内的通话事件）
+    // Matrix 6.0: onEvent 已弃用，改用 onTimelineEvent（已解密的 Event 对象）
+    _client.onTimelineEvent.stream.listen((event) {
+      final eventType = event.type;
 
       // 只处理通话相关事件
-      if (eventType == null || !eventType.startsWith('m.call.')) return;
+      if (!eventType.startsWith('m.call.')) return;
 
-      // 从 EventUpdate 构造简化的事件数据
-      _handleRoomCallEvent(eventUpdate, eventType);
+      _handleRoomCallEvent(event, eventType);
     });
   }
 
   /// 处理房间内的通话事件
-  void _handleRoomCallEvent(matrix.EventUpdate eventUpdate, String eventType) {
-    final content = eventUpdate.content;
-    final roomId = eventUpdate.roomID;
-
-    // 获取发送者 ID（在 room timeline 事件中）
-    final senderId = content['sender'] as String? ?? '';
+  void _handleRoomCallEvent(matrix.Event event, String eventType) {
+    final roomId = event.room.id;
+    final senderId = event.senderId;
 
     debugPrint('WebRTCService: Room call event $eventType from $senderId in $roomId');
 
@@ -242,7 +232,7 @@ class WebRTCService {
       type: eventType,
       senderId: senderId,
       roomId: roomId,
-      content: content['content'] as Map<String, dynamic>? ?? content,
+      content: event.content,
     );
 
     switch (eventType) {
@@ -560,7 +550,12 @@ class WebRTCService {
   /// 切换扬声器
   Future<void> toggleSpeaker() async {
     _isSpeakerOn = !_isSpeakerOn;
-    await Helper.setSpeakerphoneOn(_isSpeakerOn);
+    try {
+      await Helper.setSpeakerphoneOn(_isSpeakerOn);
+    } catch (e) {
+      debugPrint('WebRTCService: Failed to set speakerphone: $e');
+      _isSpeakerOn = !_isSpeakerOn; // 回滚状态
+    }
     debugPrint('WebRTCService: Speaker ${_isSpeakerOn ? "on" : "off"}');
   }
   
@@ -674,6 +669,14 @@ class WebRTCService {
   
   /// 获取本地媒体流
   Future<void> _getUserMedia(CallType type) async {
+    // 通话前确保 iOS 音频会话处于正确的 category（.playAndRecord）
+    // 防止被其他模块（如 LiveActivity 音效）设置的 .playback 污染
+    try {
+      await Helper.setSpeakerphoneOn(false);
+    } catch (e) {
+      debugPrint('WebRTCService: Failed to initialize audio route: $e');
+    }
+
     // 获取音频处理配置
     final audioConfig = _config.audioProcessing;
 

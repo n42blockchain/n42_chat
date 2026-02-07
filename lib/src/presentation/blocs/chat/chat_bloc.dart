@@ -1088,8 +1088,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     await _messagesSubscription?.cancel();
     _messagesSubscription = null;
+    await _syncStatusSubscription?.cancel();
+    _syncStatusSubscription = null;
+    _retryTimer?.cancel();
+    _retryTimer = null;
+    _pendingRetryMessages.clear();
     _currentRoomId = null;
-    _locallyDeletedMessageIds.clear(); // 清除已删除消息ID集合
+    _locallyDeletedMessageIds.clear();
     if (!isClosed) {
       emit(ChatState.initial());
     }

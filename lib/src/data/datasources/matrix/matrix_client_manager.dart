@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter_vodozemac/flutter_vodozemac.dart' as vodozemac;
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
@@ -99,6 +99,10 @@ class MatrixClientManager {
     _isInitializing = true;
 
     try {
+      // 初始化 vodozemac 加密后端（必须在 Client.init() 之前）
+      await vodozemac.init();
+      debugPrint('MatrixClientManager: vodozemac initialized');
+
       // 获取数据库路径
       String dbPath;
       if (databasePath != null) {
@@ -114,43 +118,25 @@ class MatrixClientManager {
         try {
           await io_helper.ensureDirectoryExists(dbPath);
           debugPrint('MatrixClientManager: Created database directory');
-
-          // 初始化 Hive（必须在使用 HiveCollectionsDatabase 之前）
-          debugPrint('MatrixClientManager: Initializing Hive at: $dbPath');
-          Hive.init(dbPath);
-          debugPrint('MatrixClientManager: Hive initialized');
         } catch (e) {
-          debugPrint('MatrixClientManager: Could not initialize Hive: $e');
-          // 继续尝试，让 Matrix SDK 自己处理
+          debugPrint('MatrixClientManager: Could not create directory: $e');
         }
       }
 
-      // 创建 Hive 数据库实例并先打开它
-      // ignore: deprecated_member_use
-      // TODO: Migrate to MatrixSdkDatabase when stable
-      debugPrint('MatrixClientManager: Creating HiveCollectionsDatabase...');
-      final database = HiveCollectionsDatabase(
-        clientName,
-        dbPath,
-      );
-      
-      // 先打开数据库，确保所有 boxes 都已初始化
-      debugPrint('MatrixClientManager: Opening database...');
-      await database.open();
-      debugPrint('MatrixClientManager: Database opened successfully');
-      
-      // 创建客户端（端到端加密由 flutter_olm 自动支持）
+      // 使用 MatrixSdkDatabase（Matrix 6.0 推荐，基于 drift/sqlite）
+      debugPrint('MatrixClientManager: Creating MatrixSdkDatabase...');
+      final database = await MatrixSdkDatabase.init(clientName);
+
+      // 创建客户端（端到端加密由 flutter_vodozemac 自动支持）
       _client = Client(
         clientName,
-        databaseBuilder: (_) => database,
+        database: database,
         supportedLoginTypes: {
           AuthenticationTypes.password,
           AuthenticationTypes.sso,
         },
         logLevel: kDebugMode ? Level.verbose : Level.warning,
-        // 加密配置：启用自动密钥恢复和密钥请求
         importantStateEvents: {
-          // 重要的状态事件，需要优先同步
           EventTypes.Encryption,
         },
       );
@@ -228,9 +214,9 @@ class MatrixClientManager {
     _ensureInitialized();
 
     try {
-      // 设置homeserver
+      // 设置homeserver（6.0 返回 record tuple，这里只需确认连接成功）
       final homeserverUri = Uri.parse(homeserver);
-      await _client!.checkHomeserver(homeserverUri);
+      final (_, _, _, _) = await _client!.checkHomeserver(homeserverUri);
 
       // 登录
       final response = await _client!.login(
@@ -264,7 +250,7 @@ class MatrixClientManager {
 
     try {
       final homeserverUri = Uri.parse(homeserver);
-      await _client!.checkHomeserver(homeserverUri);
+      final (_, _, _, _) = await _client!.checkHomeserver(homeserverUri);
 
       // 使用token恢复登录
       await _client!.init(
@@ -410,7 +396,11 @@ class MatrixClientManager {
     _ensureInitialized();
     _ensureLoggedIn();
 
-    await _client!.setDisplayName(_client!.userID!, displayName);
+    await _client!.setProfileField(
+      _client!.userID!,
+      'displayname',
+      {'displayname': displayName},
+    );
   }
 
   /// 更新头像
@@ -495,7 +485,11 @@ class MatrixClientManager {
       
       // 设置头像 URL
       debugPrint('Setting avatar URL...');
-      await _client!.setAvatarUrl(_client!.userID!, mxcUri);
+      await _client!.setProfileField(
+        _client!.userID!,
+        'avatar_url',
+        {'avatar_url': mxcUri.toString()},
+      );
       debugPrint('Avatar URL set successfully');
       
       // 验证头像是否设置成功

@@ -38,11 +38,12 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
     final s = S.of(context);
 
     return BlocListener<MomentBloc, MomentState>(
+      listenWhen: (previous, current) =>
+          previous.isPosting && !current.isPosting,
       listener: (context, state) {
-        if (state.isPosting == false && !state.hasError) {
+        if (!state.hasError) {
           Navigator.of(context).pop();
-        }
-        if (state.hasError) {
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.errorMessage ?? 'Error')),
           );

@@ -463,6 +463,9 @@ class MessageMetadata extends Equatable {
   /// 是否已结束
   final bool? pollEnded;
 
+  /// 是否匿名投票
+  final bool? isAnonymousPoll;
+
   // ============================================
   // 音乐属性
   // ============================================
@@ -530,6 +533,7 @@ class MessageMetadata extends Equatable {
     this.totalVoters,
     this.maxSelections,
     this.pollEnded,
+    this.isAnonymousPoll,
     this.musicTitle,
     this.musicArtist,
     this.musicUrl,
@@ -594,6 +598,7 @@ class MessageMetadata extends Equatable {
         totalVoters,
         maxSelections,
         pollEnded,
+        isAnonymousPoll,
         musicTitle,
         musicArtist,
         musicUrl,
@@ -612,12 +617,14 @@ class MessageMetadata extends Equatable {
     Map<String, int>? voteCounts,
     int? totalVoters,
     List<String>? myVotes,
+    bool? isAnonymousPoll,
   }) => MessageMetadata(
     pollQuestion: pollQuestion,
     pollOptions: pollOptions,
     pollOptionIds: pollOptionIds,
     maxSelections: maxSelections,
     pollEnded: pollEnded ?? this.pollEnded,
+    isAnonymousPoll: isAnonymousPoll ?? this.isAnonymousPoll,
     voteCounts: voteCounts ?? this.voteCounts,
     totalVoters: totalVoters ?? this.totalVoters,
     myVotes: myVotes ?? this.myVotes,
@@ -677,6 +684,7 @@ class MessageMetadata extends Equatable {
     pollOptionIds: pollOptionIds,
     maxSelections: maxSelections,
     pollEnded: pollEnded,
+    isAnonymousPoll: isAnonymousPoll,
     voteCounts: voteCounts,
     totalVoters: totalVoters,
     myVotes: myVotes,
@@ -691,6 +699,9 @@ class MessageMetadata extends Equatable {
     callRoomId: callRoomId,
     callPeerId: callPeerId,
   );
+
+  /// 是否是匿名投票
+  bool get isAnonymous => isAnonymousPoll == true;
 
   /// 是否有转录文本
   bool get hasTranscription =>

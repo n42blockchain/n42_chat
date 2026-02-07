@@ -144,6 +144,10 @@ class SEn extends S {
       'Please allow microphone permission';
 
   @override
+  String get chatMicrophonePermissionDeniedPermanent =>
+      'Microphone permission has been denied. Please enable it in system settings to use voice messages.';
+
+  @override
   String commonStartRecordingFailed(String error) {
     return 'Failed to start recording: $error';
   }
@@ -249,6 +253,9 @@ class SEn extends S {
 
   @override
   String get commonAllClaimed => 'All claimed';
+
+  @override
+  String get chatReadAloud => 'Read Aloud';
 
   @override
   String get chatReply => 'Reply';
@@ -2103,6 +2110,54 @@ class SEn extends S {
   String get settingsReset => 'Reset';
 
   @override
+  String get settingsBackupSuccess => 'Keys backed up successfully';
+
+  @override
+  String get settingsBackupFailed => 'Backup failed';
+
+  @override
+  String get settingsRecoveryKey => 'Recovery Key';
+
+  @override
+  String get settingsRecoveryKeySaveWarning =>
+      'Please save this recovery key in a safe place. You will need it to restore your encrypted messages on a new device.';
+
+  @override
+  String get settingsRecoveryKeySaved => 'I have saved it';
+
+  @override
+  String get settingsRestoreSuccess => 'Keys restored successfully';
+
+  @override
+  String get settingsRestoreFailed => 'Restore failed';
+
+  @override
+  String get settingsPassword => 'Password';
+
+  @override
+  String get settingsEnterRecoveryKey => 'Enter recovery key';
+
+  @override
+  String get settingsEnterPassword => 'Enter password';
+
+  @override
+  String get settingsExportSuccess =>
+      'Keys exported to server backup successfully';
+
+  @override
+  String get settingsExportNeedBackupFirst =>
+      'Please create a key backup first';
+
+  @override
+  String get settingsExportFailed => 'Export failed';
+
+  @override
+  String get settingsResetSuccess => 'Encryption reset successful';
+
+  @override
+  String get settingsResetFailed => 'Reset failed';
+
+  @override
   String get callLeaveMeetingConfirm =>
       'Are you sure you want to leave the meeting?';
 
@@ -3686,4 +3741,212 @@ class SEn extends S {
   String qrcodeProcessFailed(String error) {
     return 'Failed to process QR code: $error';
   }
+
+  @override
+  String get securityDeviceIdRequired => 'Device ID is required';
+
+  @override
+  String securityVerificationStartFailed(String error) {
+    return 'Failed to start verification: $error';
+  }
+
+  @override
+  String get securityVerificationFailed => 'Verification failed';
+
+  @override
+  String securityVerificationFailedWithReason(String reason) {
+    return 'Verification failed: $reason';
+  }
+
+  @override
+  String get securityEmojiMismatchRejected =>
+      'Verification rejected - emoji did not match';
+
+  @override
+  String get securityWaitingForDeviceAccept =>
+      'Waiting for the other device to accept...';
+
+  @override
+  String get securityVerifyDevice => 'Verify this device';
+
+  @override
+  String get securityConfirmEmojiMatch =>
+      'Confirm the emoji below are displayed on both devices, in the same order';
+
+  @override
+  String get securityEmojiDontMatch => 'They don\'t match';
+
+  @override
+  String get securityEmojiMatch => 'They match';
+
+  @override
+  String get securityWaitingForDeviceConfirm =>
+      'Waiting for the other device to confirm...';
+
+  @override
+  String get securityVerificationSuccess => 'Verification successful!';
+
+  @override
+  String get securityDeviceVerifiedTrusted =>
+      'This device is now verified and trusted.';
+
+  @override
+  String get securityCompareEmoji => 'Compare the emoji on both devices';
+
+  @override
+  String get securityCompareNumbers => 'Compare the numbers on both devices';
+
+  @override
+  String get commonTryAgain => 'Try Again';
+
+  @override
+  String get commonDone => 'Done';
+
+  @override
+  String get chatExportTitle => 'Export Chat';
+
+  @override
+  String get chatExportSuccess => 'Export successful';
+
+  @override
+  String chatExportFailed(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String get chatExportFormat => 'Export Format';
+
+  @override
+  String get chatExportHtmlDesc => 'Readable in any browser with styled layout';
+
+  @override
+  String get chatExportJsonDesc => 'Machine-readable structured data format';
+
+  @override
+  String get chatExportDateRange => 'Date Range';
+
+  @override
+  String get chatExportAll => 'All Messages';
+
+  @override
+  String get chatExportLastWeek => 'Last 7 Days';
+
+  @override
+  String get chatExportLastMonth => 'Last Month';
+
+  @override
+  String get chatExportLast3Months => 'Last 3 Months';
+
+  @override
+  String get chatExportMessageCount => 'Messages to export';
+
+  @override
+  String get chatExportButton => 'Export & Share';
+
+  @override
+  String get chatMediaGallery => 'Media Gallery';
+
+  @override
+  String get chatExportHistory => 'Export Chat History';
+
+  @override
+  String get pdfLoadFailed => 'Failed to load PDF';
+
+  @override
+  String pdfPageIndicator(int current, int total) {
+    return '$current / $total';
+  }
+
+  @override
+  String get mediaAll => 'All';
+
+  @override
+  String get mediaImages => 'Images';
+
+  @override
+  String get mediaVideos => 'Videos';
+
+  @override
+  String get mediaFiles => 'Files';
+
+  @override
+  String get mediaAudio => 'Audio';
+
+  @override
+  String mediaItemsCount(int count) {
+    return '$count items';
+  }
+
+  @override
+  String get mediaNoMediaFound => 'No media found';
+
+  @override
+  String get spacesTitle => 'Communities';
+
+  @override
+  String get spacesCreate => 'Create Community';
+
+  @override
+  String get spacesJoined => 'Joined';
+
+  @override
+  String get spacesDiscover => 'Discover';
+
+  @override
+  String get spacesNoJoined => 'No communities joined yet';
+
+  @override
+  String get spacesExplore => 'Explore Communities';
+
+  @override
+  String get spacesNoPublic => 'No public communities found';
+
+  @override
+  String get spacesJoin => 'Join';
+
+  @override
+  String get spacesSubSpaces => 'Sub-Communities';
+
+  @override
+  String get spacesChannels => 'Channels';
+
+  @override
+  String spacesMembersCount(int count) {
+    return '$count members';
+  }
+
+  @override
+  String get spacesPublic => 'Public';
+
+  @override
+  String get spacesPrivate => 'Private';
+
+  @override
+  String get spacesSuggested => 'Suggested';
+
+  @override
+  String spacesChannelsCount(int count) {
+    return '$count channels';
+  }
+
+  @override
+  String get callInCallChat => 'In-Call Chat';
+
+  @override
+  String callMessagesCount(int count) {
+    return '$count messages';
+  }
+
+  @override
+  String get callNoMessagesYet =>
+      'No messages yet.\nSend a message to get started.';
+
+  @override
+  String get callTypeMessage => 'Type a message...';
+
+  @override
+  String get callYouSender => 'You';
+
+  @override
+  String get callChatLabel => 'Chat';
 }

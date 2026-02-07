@@ -51,6 +51,7 @@
   "chatCopied": "已复制",
   "storySendMessageHint": "发送消息",
   "commonMicrophonePermissionRequired": "请允许使用麦克风权限",
+  "chatMicrophonePermissionDeniedPermanent": "麦克风权限已被拒绝，请在系统设置中开启以使用语音消息功能。",
   "commonStartRecordingFailed": "开始录音失败: {error}",
   "@commonStartRecordingFailed": {
     "placeholders": {
@@ -124,6 +125,7 @@
   "commonN42RedPacket": "N42红包",
   "commonClaimed": "已领取",
   "commonAllClaimed": "已被领完",
+  "chatReadAloud": "朗读",
   "chatReply": "回复",
   "commonEdit": "编辑",
   "chatSelectForwardTarget": "选择转发对象",
@@ -1056,6 +1058,21 @@
   "settingsResetEncryptionTitle": "重置加密",
   "settingsResetEncryptionWarning": "警告：这将删除您所有的加密密钥。您将无法解密之前的加密消息。此操作不可撤销。",
   "settingsReset": "重置",
+  "settingsBackupSuccess": "密钥备份成功",
+  "settingsBackupFailed": "备份失败",
+  "settingsRecoveryKey": "恢复密钥",
+  "settingsRecoveryKeySaveWarning": "请将此恢复密钥保存在安全的地方。您需要它在新设备上恢复加密消息。",
+  "settingsRecoveryKeySaved": "我已保存",
+  "settingsRestoreSuccess": "密钥恢复成功",
+  "settingsRestoreFailed": "恢复失败",
+  "settingsPassword": "密码",
+  "settingsEnterRecoveryKey": "输入恢复密钥",
+  "settingsEnterPassword": "输入密码",
+  "settingsExportSuccess": "密钥已成功导出到服务端备份",
+  "settingsExportNeedBackupFirst": "请先创建密钥备份",
+  "settingsExportFailed": "导出失败",
+  "settingsResetSuccess": "加密重置成功",
+  "settingsResetFailed": "重置失败",
   "callLeaveMeetingConfirm": "确定要离开会议吗？",
   "chatPokedSomeone": "拍了拍「{name}」{suffix}",
   "@chatPokedSomeone": {
@@ -1908,5 +1925,120 @@
         "type": "String"
       }
     }
-  }
+  },
+
+  "securityDeviceIdRequired": "需要设备 ID",
+  "securityVerificationStartFailed": "启动验证失败: {error}",
+  "@securityVerificationStartFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securityVerificationFailed": "验证失败",
+  "securityVerificationFailedWithReason": "验证失败: {reason}",
+  "@securityVerificationFailedWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "securityEmojiMismatchRejected": "验证被拒绝 - 表情不匹配",
+  "securityWaitingForDeviceAccept": "等待另一台设备接受...",
+  "securityVerifyDevice": "验证此设备",
+  "securityConfirmEmojiMatch": "确认以下表情符号在两台设备上以相同顺序显示",
+  "securityEmojiDontMatch": "不匹配",
+  "securityEmojiMatch": "匹配",
+  "securityWaitingForDeviceConfirm": "等待另一台设备确认...",
+  "securityVerificationSuccess": "验证成功！",
+  "securityDeviceVerifiedTrusted": "此设备已验证并可信任。",
+  "securityCompareEmoji": "比较两台设备上的表情符号",
+  "securityCompareNumbers": "比较两台设备上的数字",
+  "commonTryAgain": "重试",
+  "commonDone": "完成",
+
+  "chatExportTitle": "导出聊天记录",
+  "chatExportSuccess": "导出成功",
+  "chatExportFailed": "导出失败: {error}",
+  "@chatExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chatExportFormat": "导出格式",
+  "chatExportHtmlDesc": "可在任何浏览器中打开的精美排版",
+  "chatExportJsonDesc": "机器可读的结构化数据格式",
+  "chatExportDateRange": "日期范围",
+  "chatExportAll": "全部消息",
+  "chatExportLastWeek": "最近7天",
+  "chatExportLastMonth": "最近一个月",
+  "chatExportLast3Months": "最近三个月",
+  "chatExportMessageCount": "待导出消息",
+  "chatExportButton": "导出并分享",
+  "chatMediaGallery": "媒体文件",
+  "chatExportHistory": "导出聊天记录",
+
+  "pdfLoadFailed": "加载 PDF 失败",
+  "pdfPageIndicator": "{current} / {total}",
+  "@pdfPageIndicator": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+
+  "mediaAll": "全部",
+  "mediaImages": "图片",
+  "mediaVideos": "视频",
+  "mediaFiles": "文件",
+  "mediaAudio": "音频",
+  "mediaItemsCount": "{count} 项",
+  "@mediaItemsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "mediaNoMediaFound": "暂无媒体文件",
+
+  "spacesTitle": "社区",
+  "spacesCreate": "创建社区",
+  "spacesJoined": "已加入",
+  "spacesDiscover": "发现",
+  "spacesNoJoined": "还没有加入任何社区",
+  "spacesExplore": "探索社区",
+  "spacesNoPublic": "没有找到公共社区",
+  "spacesJoin": "加入",
+  "spacesSubSpaces": "子社区",
+  "spacesChannels": "频道",
+  "spacesMembersCount": "{count} 位成员",
+  "@spacesMembersCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "spacesPublic": "公开",
+  "spacesPrivate": "私密",
+  "spacesSuggested": "推荐",
+  "spacesChannelsCount": "{count} 个频道",
+  "@spacesChannelsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "callInCallChat": "通话中聊天",
+  "callMessagesCount": "{count} 条消息",
+  "@callMessagesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "callNoMessagesYet": "暂无消息\n发送一条消息开始聊天",
+  "callTypeMessage": "输入消息...",
+  "callYouSender": "我",
+  "callChatLabel": "聊天"
 }
