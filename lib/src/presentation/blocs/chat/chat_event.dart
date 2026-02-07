@@ -613,3 +613,22 @@ class ClearTranslation extends ChatEvent {
   @override
   List<Object?> get props => [messageId];
 }
+
+// ============================================
+// 离线消息自动重试事件
+// ============================================
+
+/// 连接恢复后自动重试待发送的消息
+class RetryPendingMessages extends ChatEvent {
+  const RetryPendingMessages();
+}
+
+/// 连接状态变化
+class ConnectionStatusChanged extends ChatEvent {
+  final bool isConnected;
+
+  const ConnectionStatusChanged(this.isConnected);
+
+  @override
+  List<Object?> get props => [isConnected];
+}

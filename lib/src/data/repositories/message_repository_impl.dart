@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../domain/entities/group_album_entity.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/repositories/message_repository.dart';
 import '../datasources/local/secure_storage_datasource.dart';
@@ -1004,6 +1005,21 @@ class MessageRepositoryImpl implements IMessageRepository {
     } catch (e) {
       debugPrint('MessageRepositoryImpl: Error destroying expired messages: $e');
     }
+  }
+
+  @override
+  Future<List<AlbumMediaEntity>> getRoomMedia(
+    String roomId, {
+    AlbumFilter? filter,
+    int limit = 50,
+    String? beforeEventId,
+  }) async {
+    return await _messageDataSource.getRoomMedia(
+      roomId,
+      filter: filter,
+      limit: limit,
+      beforeEventId: beforeEventId,
+    );
   }
 }
 

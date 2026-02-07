@@ -322,6 +322,7 @@ void _registerBlocs() {
       secureStorage: getIt<SecureStorageDataSource>(),
       groupRepository: getIt<IGroupRepository>(),
       translationService: getIt<ITranslationService>(),
+      clientManager: getIt<MatrixClientManager>(),
     ),
   );
 

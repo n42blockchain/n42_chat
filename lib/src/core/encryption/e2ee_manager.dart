@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:matrix/encryption/utils/key_verification.dart' as kv;
 import 'package:matrix/matrix.dart' as matrix;
 
 /// 端到端加密管理器
@@ -5,6 +7,9 @@ import 'package:matrix/matrix.dart' as matrix;
 /// 封装Matrix SDK的加密功能，提供统一的加密接口
 class E2EEManager {
   final matrix.Client _client;
+
+  /// 缓存的恢复密钥（仅在当前会话中有效）
+  String? _cachedRecoveryKey;
 
   E2EEManager(this._client);
 
@@ -38,7 +43,10 @@ class E2EEManager {
   // 密钥管理
   // ============================================
 
-  /// 导出房间密钥
+  /// 导出房间密钥（上传到服务端备份）
+  ///
+  /// 将所有 inbound group sessions 上传到服务端密钥备份。
+  /// [password] 参数保留以备将来扩展本地加密导出。
   Future<String> exportRoomKeys(String password) async {
     if (!isEncryptionInitialized) {
       throw E2EEException('Encryption not initialized');
@@ -49,39 +57,168 @@ class E2EEManager {
       throw E2EEException('Encryption not available');
     }
 
-    // 简化实现：返回空字符串
-    // 实际导出需要更复杂的处理
-    return '';
+    try {
+      // 上传所有 inbound group sessions 到服务端备份
+      await encryption.keyManager.uploadInboundGroupSessions();
+      debugPrint('E2EEManager: Room keys exported to server backup');
+      return 'exported_to_server_backup';
+    } catch (e) {
+      throw E2EEException('Failed to export room keys: $e');
+    }
   }
 
-  /// 导入房间密钥
+  /// 导入房间密钥（从服务端备份恢复）
+  ///
+  /// 从服务端密钥备份下载并恢复所有 megolm 会话密钥。
+  /// [password] 用于解锁 SSSS 以获取备份密钥。
   Future<int> importRoomKeys(String exportedKeys, String password) async {
     if (!isEncryptionInitialized) {
       throw E2EEException('Encryption not initialized');
     }
 
-    // 简化实现：返回导入的密钥数量
-    return 0;
+    final encryption = _client.encryption;
+    if (encryption == null) {
+      throw E2EEException('Encryption not available');
+    }
+
+    try {
+      // 使用密码解锁 SSSS 并加载所有备份密钥
+      final openSsss = encryption.ssss.open();
+      await openSsss.unlock(passphrase: password);
+      await openSsss.maybeCacheAll();
+
+      // 从服务端备份恢复所有密钥
+      await encryption.keyManager.loadAllKeys();
+      debugPrint('E2EEManager: Room keys imported from server backup');
+      return 1;
+    } catch (e) {
+      throw E2EEException('Failed to import room keys: $e');
+    }
   }
 
   /// 获取恢复密钥（用于跨设备恢复）
+  ///
+  /// 返回当前会话中缓存的恢复密钥。如果没有缓存则返回 null。
+  /// 恢复密钥仅在 [createRecoveryKey] 创建后或 [unlockWithRecoveryKey] 解锁后可用。
   Future<String?> getRecoveryKey() async {
-    // SSSS恢复密钥需要通过开启流程获取
-    return null;
+    return _cachedRecoveryKey;
   }
 
   /// 创建新的恢复密钥
-  Future<String?> createRecoveryKey() async {
+  ///
+  /// 通过 SSSS（安全秘密存储）创建新的恢复密钥。
+  /// 流程：创建 SSSS 密钥 → 初始化 cross-signing → 启用密钥自动上传
+  /// 返回恢复密钥字符串，用户应安全保存此密钥。
+  Future<String?> createRecoveryKey({String? passphrase}) async {
     final encryption = _client.encryption;
     if (encryption == null) return null;
 
-    // 使用SSSS（安全秘密存储）创建恢复密钥
     try {
-      // 简化实现
-      return null;
+      // 1. 通过 SSSS 创建新的默认密钥
+      final openSsss = await encryption.ssss.createKey(passphrase);
+      final recoveryKey = openSsss.recoveryKey;
+      if (recoveryKey == null) {
+        throw E2EEException('Failed to generate recovery key');
+      }
+
+      // 2. 设置为默认密钥
+      await encryption.ssss.setDefaultKeyId(openSsss.keyId);
+
+      // 3. 缓存恢复密钥和解锁的 SSSS
+      _cachedRecoveryKey = recoveryKey;
+
+      // 4. 存储 cross-signing 和 megolm backup 密钥到 SSSS
+      try {
+        await encryption.crossSigning.selfSign(
+          recoveryKey: recoveryKey,
+        );
+      } catch (e) {
+        debugPrint('E2EEManager: Cross-signing self-sign skipped: $e');
+      }
+
+      // 5. 启用密钥自动上传到服务端备份
+      encryption.keyManager.startAutoUploadKeys();
+
+      debugPrint('E2EEManager: Recovery key created successfully');
+      return recoveryKey;
     } catch (e) {
+      if (e is E2EEException) rethrow;
       throw E2EEException('Failed to create recovery key: $e');
     }
+  }
+
+  /// 使用恢复密钥解锁 SSSS 并恢复密钥
+  ///
+  /// 解锁后会缓存恢复密钥，并尝试恢复 cross-signing 和密钥备份
+  Future<void> unlockWithRecoveryKey(String recoveryKey) async {
+    final encryption = _client.encryption;
+    if (encryption == null) {
+      throw E2EEException('Encryption not initialized');
+    }
+
+    try {
+      // 1. 打开 SSSS 并使用恢复密钥解锁
+      final openSsss = encryption.ssss.open();
+      await openSsss.unlock(recoveryKey: recoveryKey);
+
+      // 2. 缓存所有秘密（cross-signing keys, megolm backup key 等）
+      await openSsss.maybeCacheAll();
+
+      // 3. 恢复 cross-signing
+      try {
+        await encryption.crossSigning.selfSign(recoveryKey: recoveryKey);
+      } catch (e) {
+        debugPrint('E2EEManager: Cross-signing recovery skipped: $e');
+      }
+
+      // 4. 缓存恢复密钥
+      _cachedRecoveryKey = recoveryKey;
+
+      // 5. 启用自动密钥上传
+      encryption.keyManager.startAutoUploadKeys();
+
+      debugPrint('E2EEManager: Unlocked with recovery key successfully');
+    } catch (e) {
+      if (e is E2EEException) rethrow;
+      throw E2EEException('Failed to unlock with recovery key: $e');
+    }
+  }
+
+  /// 使用密码解锁 SSSS
+  Future<void> unlockWithPassphrase(String passphrase) async {
+    final encryption = _client.encryption;
+    if (encryption == null) {
+      throw E2EEException('Encryption not initialized');
+    }
+
+    try {
+      final openSsss = encryption.ssss.open();
+      await openSsss.unlock(passphrase: passphrase);
+      await openSsss.maybeCacheAll();
+
+      // 缓存恢复密钥
+      _cachedRecoveryKey = openSsss.recoveryKey;
+
+      try {
+        await encryption.crossSigning.selfSign(passphrase: passphrase);
+      } catch (e) {
+        debugPrint('E2EEManager: Cross-signing with passphrase skipped: $e');
+      }
+
+      encryption.keyManager.startAutoUploadKeys();
+
+      debugPrint('E2EEManager: Unlocked with passphrase successfully');
+    } catch (e) {
+      if (e is E2EEException) rethrow;
+      throw E2EEException('Failed to unlock with passphrase: $e');
+    }
+  }
+
+  /// 检查是否有 SSSS 默认密钥
+  bool get hasSsssDefaultKey {
+    final encryption = _client.encryption;
+    if (encryption == null) return false;
+    return encryption.ssss.defaultKeyId != null;
   }
 
   // ============================================
@@ -223,6 +360,88 @@ class E2EEManager {
     } catch (e) {
       throw E2EEException('Failed to recover cross-signing: $e');
     }
+  }
+
+  // ============================================
+  // SAS 验证 (Short Authentication String)
+  // ============================================
+
+  /// 启动 SAS 验证流程
+  ///
+  /// 向指定用户的设备发起 SAS 验证请求
+  /// 返回 [KeyVerification] 对象用于跟踪验证状态
+  Future<kv.KeyVerification?> startSasVerification(
+    String userId,
+    String deviceId,
+  ) async {
+    final encryption = _client.encryption;
+    if (encryption == null) {
+      throw E2EEException('Encryption not initialized');
+    }
+
+    try {
+      final userKeys = _client.userDeviceKeys[userId];
+      if (userKeys == null) {
+        throw E2EEException('User device keys not found');
+      }
+
+      final deviceKeys = userKeys.deviceKeys[deviceId];
+      if (deviceKeys == null) {
+        throw E2EEException('Device keys not found');
+      }
+
+      final verification = await deviceKeys.startVerification();
+      return verification;
+    } catch (e) {
+      if (e is E2EEException) rethrow;
+      throw E2EEException('Failed to start SAS verification: $e');
+    }
+  }
+
+  /// 接受传入的 SAS 验证请求
+  Future<void> acceptSasVerification(kv.KeyVerification verification) async {
+    try {
+      await verification.acceptVerification();
+    } catch (e) {
+      throw E2EEException('Failed to accept verification: $e');
+    }
+  }
+
+  /// 确认 SAS emoji/数字匹配
+  Future<void> confirmSas(kv.KeyVerification verification) async {
+    try {
+      await verification.acceptSas();
+    } catch (e) {
+      throw E2EEException('Failed to confirm SAS: $e');
+    }
+  }
+
+  /// 拒绝 SAS 验证（emoji/数字不匹配）
+  Future<void> rejectSas(kv.KeyVerification verification) async {
+    try {
+      await verification.rejectSas();
+    } catch (e) {
+      throw E2EEException('Failed to reject SAS: $e');
+    }
+  }
+
+  /// 取消验证流程
+  Future<void> cancelVerification(kv.KeyVerification verification) async {
+    try {
+      await verification.cancel();
+    } catch (e) {
+      throw E2EEException('Failed to cancel verification: $e');
+    }
+  }
+
+  /// 获取 Matrix Client 用于监听验证事件
+  matrix.Client get client => _client;
+
+  /// 监听传入的验证请求
+  ///
+  /// 返回一个 Stream，当有新的验证请求时发出事件
+  Stream<kv.KeyVerification> get onVerificationRequest {
+    return _client.onKeyVerificationRequest.stream;
   }
 
   // ============================================

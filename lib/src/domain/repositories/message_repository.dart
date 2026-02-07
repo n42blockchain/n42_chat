@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../entities/group_album_entity.dart';
 import '../entities/message_entity.dart';
 
 /// 消息仓库接口
@@ -257,5 +258,18 @@ abstract class IMessageRepository {
   ///
   /// 自动删除所有已过期的阅后即焚消息
   Future<void> destroyExpiredMessages(String roomId);
+
+  /// 获取房间媒体文件列表
+  ///
+  /// 从房间 timeline 中提取图片、视频等媒体文件
+  /// [filter] 可按类型、发送者、日期范围筛选
+  /// [limit] 单次获取数量限制
+  /// [beforeEventId] 用于分页，获取此事件之前的媒体
+  Future<List<AlbumMediaEntity>> getRoomMedia(
+    String roomId, {
+    AlbumFilter? filter,
+    int limit = 50,
+    String? beforeEventId,
+  });
 }
 

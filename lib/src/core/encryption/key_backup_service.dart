@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 /// 密钥备份服务
@@ -13,7 +14,7 @@ class KeyBackupService {
     try {
       final encryption = _client.encryption;
       if (encryption == null) return false;
-      
+
       return encryption.keyManager.enabled;
     } catch (e) {
       return false;
@@ -21,6 +22,8 @@ class KeyBackupService {
   }
 
   /// 获取密钥备份信息
+  ///
+  /// 从服务端获取真实的备份版本信息
   Future<KeyBackupInfo?> getBackupInfo() async {
     try {
       final encryption = _client.encryption;
@@ -28,24 +31,34 @@ class KeyBackupService {
 
       if (!encryption.keyManager.enabled) return null;
 
+      final info = await encryption.keyManager.getRoomKeysBackupInfo();
       return KeyBackupInfo(
-        version: '1',
-        algorithm: 'm.megolm_backup.v1.curve25519-aes-sha2',
-        count: 0,
-        etag: '',
+        version: info.version,
+        algorithm: info.algorithm.name,
+        count: info.count,
+        etag: info.etag,
       );
     } catch (e) {
+      debugPrint('KeyBackupService: Failed to get backup info: $e');
       return null;
     }
   }
 
   /// 创建新的密钥备份
+  ///
+  /// 启用服务端密钥备份并开始自动上传 inbound group sessions
   Future<String?> createKeyBackup(String password) async {
     try {
       final encryption = _client.encryption;
       if (encryption == null) return null;
 
-      // 简化实现：Matrix SDK的密钥管理器自动处理备份
+      // 启用自动密钥上传（每次同步后自动上传未备份的密钥）
+      encryption.keyManager.startAutoUploadKeys();
+
+      // 立即触发一次全量上传
+      await encryption.keyManager.uploadInboundGroupSessions();
+
+      debugPrint('KeyBackupService: Key backup created and auto-upload enabled');
       return 'backup_created';
     } catch (e) {
       throw KeyBackupException('Failed to create backup: $e');
@@ -53,6 +66,8 @@ class KeyBackupService {
   }
 
   /// 从密码恢复密钥备份
+  ///
+  /// 使用密码解锁 SSSS，然后通过 SSSS 中存储的 megolm backup 密钥恢复
   Future<int> restoreFromPassword(String password) async {
     try {
       final encryption = _client.encryption;
@@ -60,14 +75,27 @@ class KeyBackupService {
         throw KeyBackupException('Encryption not initialized');
       }
 
-      // 简化实现
-      return 0;
+      // 1. 使用密码解锁 SSSS
+      final openSsss = encryption.ssss.open();
+      await openSsss.unlock(passphrase: password);
+
+      // 2. 缓存所有秘密（包含 megolm backup 密钥）
+      await openSsss.maybeCacheAll();
+
+      // 3. 启用自动密钥上传
+      encryption.keyManager.startAutoUploadKeys();
+
+      debugPrint('KeyBackupService: Restored from password successfully');
+      return 1;
     } catch (e) {
+      if (e is KeyBackupException) rethrow;
       throw KeyBackupException('Failed to restore from password: $e');
     }
   }
 
   /// 从恢复密钥恢复
+  ///
+  /// 使用恢复密钥解锁 SSSS 并恢复所有密钥备份
   Future<int> restoreFromRecoveryKey(String recoveryKey) async {
     try {
       final encryption = _client.encryption;
@@ -75,9 +103,27 @@ class KeyBackupService {
         throw KeyBackupException('Encryption not initialized');
       }
 
-      // 简化实现
-      return 0;
+      // 1. 使用恢复密钥解锁 SSSS
+      final openSsss = encryption.ssss.open();
+      await openSsss.unlock(recoveryKey: recoveryKey);
+
+      // 2. 缓存所有秘密
+      await openSsss.maybeCacheAll();
+
+      // 3. 恢复 cross-signing
+      try {
+        await encryption.crossSigning.selfSign(recoveryKey: recoveryKey);
+      } catch (e) {
+        debugPrint('KeyBackupService: Cross-signing restore skipped: $e');
+      }
+
+      // 4. 启用自动密钥上传
+      encryption.keyManager.startAutoUploadKeys();
+
+      debugPrint('KeyBackupService: Restored from recovery key successfully');
+      return 1;
     } catch (e) {
+      if (e is KeyBackupException) rethrow;
       throw KeyBackupException('Failed to restore from recovery key: $e');
     }
   }
@@ -85,19 +131,29 @@ class KeyBackupService {
   /// 删除密钥备份
   Future<void> deleteKeyBackup() async {
     try {
-      // 简化实现：密钥备份删除需要通过API
+      final encryption = _client.encryption;
+      if (encryption == null) return;
+
+      if (!encryption.keyManager.enabled) return;
+
+      final info = await encryption.keyManager.getRoomKeysBackupInfo();
+      await _client.deleteRoomKeysVersion(info.version);
+      debugPrint('KeyBackupService: Backup version ${info.version} deleted');
     } catch (e) {
       throw KeyBackupException('Failed to delete backup: $e');
     }
   }
 
   /// 备份所有密钥
+  ///
+  /// 立即上传所有未备份的 inbound group sessions 到服务端
   Future<void> backupAllKeys() async {
     try {
       final encryption = _client.encryption;
       if (encryption == null) return;
 
-      // 简化实现：Matrix SDK自动处理密钥备份
+      await encryption.keyManager.uploadInboundGroupSessions();
+      debugPrint('KeyBackupService: All keys uploaded successfully');
     } catch (e) {
       throw KeyBackupException('Failed to backup keys: $e');
     }
