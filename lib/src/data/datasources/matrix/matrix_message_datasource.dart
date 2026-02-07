@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../domain/entities/group_album_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'matrix_client_manager.dart';
 
@@ -2528,6 +2529,123 @@ class MatrixMessageDataSource {
       );
     } catch (e) {
       debugPrint('MatrixMessageDataSource: Failed to extract poll metadata: $e');
+      return null;
+    }
+  }
+
+  // ============================================
+  // 群相册媒体获取
+  // ============================================
+
+  /// 获取房间媒体文件列表
+  ///
+  /// 从 timeline 中提取 m.image、m.video 类型的消息事件
+  Future<List<AlbumMediaEntity>> getRoomMedia(
+    String roomId, {
+    AlbumFilter? filter,
+    int limit = 50,
+    String? beforeEventId,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return [];
+
+    try {
+      final timeline = await room.getTimeline();
+
+      // 请求足够的历史消息以获取媒体
+      await timeline.requestHistory(historyCount: limit * 3);
+
+      // 过滤出媒体事件
+      final allEvents = timeline.events;
+      final mediaEntities = <AlbumMediaEntity>[];
+      bool foundBeforeEvent = beforeEventId == null;
+
+      for (final event in allEvents) {
+        // 处理分页：跳过 beforeEventId 之前（时间更新）的事件
+        if (!foundBeforeEvent) {
+          if (event.eventId == beforeEventId) {
+            foundBeforeEvent = true;
+          }
+          continue;
+        }
+
+        // 只处理媒体消息
+        final msgType = event.messageType;
+        if (msgType != matrix.MessageTypes.Image &&
+            msgType != matrix.MessageTypes.Video) {
+          continue;
+        }
+
+        final entity = _eventToAlbumMedia(event, room);
+        if (entity == null) continue;
+
+        // 应用筛选器
+        if (filter != null && !filter.matches(entity)) continue;
+
+        mediaEntities.add(entity);
+
+        if (mediaEntities.length >= limit) break;
+      }
+
+      debugPrint('MatrixMessageDataSource: Found ${mediaEntities.length} media items in room $roomId');
+      return mediaEntities;
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to get room media: $e');
+      return [];
+    }
+  }
+
+  /// 将 Matrix Event 转换为 AlbumMediaEntity
+  AlbumMediaEntity? _eventToAlbumMedia(matrix.Event event, matrix.Room room) {
+    try {
+      final info = event.content['info'] as Map<String, dynamic>?;
+      final mxcUrl = event.content['url'] as String?;
+      if (mxcUrl == null || mxcUrl.isEmpty) return null;
+
+      final thumbnailMxc = info?['thumbnail_url'] as String?;
+      final mimeType = info?['mimetype'] as String? ?? '';
+      final sender = event.senderFromMemoryOrFallback;
+
+      // 确定媒体类型
+      final bool isVideo = event.messageType == matrix.MessageTypes.Video ||
+          mimeType.startsWith('video/');
+      final mediaType = isVideo ? AlbumMediaType.video : AlbumMediaType.image;
+
+      // 提取视频时长
+      final int? duration = isVideo ? (info?['duration'] as int?) : null;
+
+      return AlbumMediaEntity(
+        eventId: event.eventId,
+        roomId: room.id,
+        url: mxcUrl,
+        httpUrl: _convertMxcToHttp(mxcUrl),
+        thumbnailUrl: _convertMxcToHttp(
+          thumbnailMxc,
+          width: 400,
+          height: 400,
+        ),
+        type: mediaType,
+        mimeType: mimeType.isNotEmpty ? mimeType : 'application/octet-stream',
+        size: info?['size'] as int? ?? 0,
+        width: info?['w'] as int?,
+        height: info?['h'] as int?,
+        duration: duration,
+        senderId: event.senderId,
+        senderName: sender.calcDisplayname(),
+        senderAvatarUrl: _buildHttpUrl(
+          sender.avatarUrl?.toString(),
+          width: 80,
+          height: 80,
+          method: 'crop',
+        ),
+        sentAt: event.originServerTs,
+        caption: event.body.isNotEmpty &&
+                event.body != event.content['filename']
+            ? event.body
+            : null,
+      );
+    } catch (e) {
+      debugPrint('MatrixMessageDataSource: Failed to convert event to album media: $e');
       return null;
     }
   }

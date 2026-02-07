@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' show min;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
 
 import '../../../core/services/speech_to_text_service.dart';
 import '../../../core/services/translation_service.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
@@ -19,6 +22,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final SecureStorageDataSource _secureStorage;
   final IGroupRepository? _groupRepository;
   final ITranslationService? _translationService;
+  final MatrixClientManager? _clientManager;
 
   StreamSubscription<List<MessageEntity>>? _messagesSubscription;
   StreamSubscription<Map<String, dynamic>>? _pollResponsesSubscription;
@@ -33,15 +37,39 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   // 已本地删除的消息ID集合（防止被消息订阅恢复）
   final Set<String> _locallyDeletedMessageIds = {};
 
+  // ============================================
+  // 离线消息自动重试
+  // ============================================
+
+  /// 待重试的消息ID及其重试次数
+  final Map<String, int> _pendingRetryMessages = {};
+
+  /// 最大重试次数
+  static const int _maxRetryCount = 3;
+
+  /// 基础重试间隔（毫秒）
+  static const int _baseRetryDelayMs = 2000;
+
+  /// 同步状态订阅
+  StreamSubscription<SyncStatusUpdate>? _syncStatusSubscription;
+
+  /// 重试定时器
+  Timer? _retryTimer;
+
+  /// 当前是否处于连接状态
+  bool _isConnected = true;
+
   ChatBloc({
     required IMessageRepository messageRepository,
     required SecureStorageDataSource secureStorage,
     IGroupRepository? groupRepository,
     ITranslationService? translationService,
+    MatrixClientManager? clientManager,
   })  : _messageRepository = messageRepository,
         _secureStorage = secureStorage,
         _groupRepository = groupRepository,
         _translationService = translationService,
+        _clientManager = clientManager,
         super(ChatState.initial()) {
     on<InitializeChat>(_onInitializeChat);
     on<LoadMessages>(_onLoadMessages);
@@ -91,6 +119,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<TranslateMessage>(_onTranslateMessage);
     on<TranslationCompleted>(_onTranslationCompleted);
     on<ClearTranslation>(_onClearTranslation);
+    on<RetryPendingMessages>(_onRetryPendingMessages);
+    on<ConnectionStatusChanged>(_onConnectionStatusChanged);
   }
 
   @override
@@ -99,6 +129,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _pollResponsesSubscription?.cancel();
     _destructionTimer?.cancel();
     _scheduledMessageTimer?.cancel();
+    _syncStatusSubscription?.cancel();
+    _retryTimer?.cancel();
     return super.close();
   }
 
@@ -166,6 +198,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // 加载置顶消息
     add(const LoadPinnedMessages());
+
+    // 启动离线消息自动重试监听
+    _setupAutoRetry();
   }
 
   /// 启动阅后即焚销毁定时器
@@ -596,6 +631,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     if (!isClosed) {
       emit(state.copyWith(messages: mergedMessages));
+
+      // 扫描失败消息加入自动重试队列
+      _scanFailedMessages();
     }
   }
 
@@ -2230,6 +2268,119 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ));
 
     debugPrint('ChatBloc: Cleared translation for message ${event.messageId}');
+  }
+
+  // ============================================
+  // 离线消息自动重试
+  // ============================================
+
+  /// 设置同步状态监听，连接恢复后自动重试失败消息
+  void _setupAutoRetry() {
+    _syncStatusSubscription?.cancel();
+    final syncStream = _clientManager?.onSyncStatus;
+    if (syncStream == null) return;
+
+    _syncStatusSubscription = syncStream.listen((status) {
+      if (isClosed) return;
+
+      if (status.status == SyncStatus.finished) {
+        if (!_isConnected) {
+          _isConnected = true;
+          add(const ConnectionStatusChanged(true));
+        }
+        // 同步完成时，自动重试待发消息
+        if (_pendingRetryMessages.isNotEmpty) {
+          add(const RetryPendingMessages());
+        }
+      } else if (status.status == SyncStatus.error) {
+        if (_isConnected) {
+          _isConnected = false;
+          add(const ConnectionStatusChanged(false));
+        }
+      }
+    });
+  }
+
+  /// 将发送失败的消息加入待重试队列
+  void _enqueueForRetry(String messageId) {
+    final currentCount = _pendingRetryMessages[messageId] ?? 0;
+    if (currentCount >= _maxRetryCount) {
+      debugPrint('ChatBloc: Message $messageId exceeded max retry count ($_maxRetryCount), giving up');
+      _pendingRetryMessages.remove(messageId);
+      return;
+    }
+    _pendingRetryMessages[messageId] = currentCount;
+    debugPrint('ChatBloc: Enqueued message $messageId for retry (attempt ${currentCount + 1}/$_maxRetryCount)');
+  }
+
+  /// 连接状态变化处理
+  void _onConnectionStatusChanged(
+    ConnectionStatusChanged event,
+    Emitter<ChatState> emit,
+  ) {
+    debugPrint('ChatBloc: Connection status changed: ${event.isConnected}');
+  }
+
+  /// 自动重试所有待发消息
+  Future<void> _onRetryPendingMessages(
+    RetryPendingMessages event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null || _pendingRetryMessages.isEmpty) return;
+
+    // 取出当前所有待重试的消息
+    final messagesToRetry = Map<String, int>.from(_pendingRetryMessages);
+    debugPrint('ChatBloc: Retrying ${messagesToRetry.length} pending messages');
+
+    for (final entry in messagesToRetry.entries) {
+      final messageId = entry.key;
+      final retryCount = entry.value;
+
+      // 指数退避延迟：2s → 4s → 8s
+      final delayMs = _baseRetryDelayMs * (1 << retryCount);
+      await Future<void>.delayed(Duration(milliseconds: min(delayMs, 8000)));
+
+      if (isClosed) return;
+
+      try {
+        final success = await _messageRepository.resendMessage(
+          _currentRoomId!,
+          messageId,
+        );
+        if (success) {
+          _pendingRetryMessages.remove(messageId);
+          debugPrint('ChatBloc: Message $messageId resent successfully');
+        } else {
+          _handleRetryFailure(messageId, retryCount);
+        }
+      } catch (e) {
+        debugPrint('ChatBloc: Retry failed for $messageId: $e');
+        _handleRetryFailure(messageId, retryCount);
+      }
+    }
+  }
+
+  /// 处理重试失败
+  void _handleRetryFailure(String messageId, int currentRetryCount) {
+    final nextCount = currentRetryCount + 1;
+    if (nextCount >= _maxRetryCount) {
+      _pendingRetryMessages.remove(messageId);
+      debugPrint('ChatBloc: Message $messageId failed after $_maxRetryCount retries, requires manual resend');
+    } else {
+      _pendingRetryMessages[messageId] = nextCount;
+      debugPrint('ChatBloc: Message $messageId retry count updated to $nextCount/$_maxRetryCount');
+    }
+  }
+
+  /// 扫描当前消息列表中发送失败的消息，加入重试队列
+  void _scanFailedMessages() {
+    for (final message in state.messages) {
+      if (message.isFailed && message.isFromMe) {
+        if (!_pendingRetryMessages.containsKey(message.id)) {
+          _enqueueForRetry(message.id);
+        }
+      }
+    }
   }
 }
 

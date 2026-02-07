@@ -2,14 +2,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/group_album_entity.dart';
+import '../../../domain/repositories/message_repository.dart';
 import 'group_album_event.dart';
 import 'group_album_state.dart';
 
 /// 群相册 BLoC
 class GroupAlbumBloc extends Bloc<GroupAlbumEvent, GroupAlbumState> {
-  // TODO: add IMessageRepository dependency when getRoomMedia is implemented
+  final IMessageRepository _messageRepository;
 
-  GroupAlbumBloc() : super(GroupAlbumState.initial()) {
+  GroupAlbumBloc({
+    required IMessageRepository messageRepository,
+  })  : _messageRepository = messageRepository,
+        super(GroupAlbumState.initial()) {
     on<LoadGroupAlbum>(_onLoadGroupAlbum);
     on<LoadMoreAlbum>(_onLoadMoreAlbum);
     on<ChangeAlbumFilter>(_onChangeAlbumFilter);
@@ -26,14 +30,35 @@ class GroupAlbumBloc extends Bloc<GroupAlbumEvent, GroupAlbumState> {
       clearError: true,
     ));
 
-    // TODO: implement getRoomMedia in IMessageRepository
-    emit(state.copyWith(
-      media: [],
-      dateGroups: [],
-      stats: const GroupAlbumStats(),
-      isLoading: false,
-      hasMore: false,
-    ));
+    try {
+      final media = await _messageRepository.getRoomMedia(
+        event.roomId,
+        limit: event.limit,
+      );
+
+      final dateGroups = AlbumDateGroup.groupByDate(media);
+      final stats = GroupAlbumStats.fromMedia(media);
+
+      emit(state.copyWith(
+        media: media,
+        dateGroups: dateGroups,
+        stats: stats,
+        isLoading: false,
+        hasMore: media.length >= event.limit,
+      ));
+
+      debugPrint('GroupAlbumBloc: Loaded ${media.length} media items');
+    } catch (e) {
+      debugPrint('GroupAlbumBloc: Failed to load album: $e');
+      emit(state.copyWith(
+        media: [],
+        dateGroups: [],
+        stats: const GroupAlbumStats(),
+        isLoading: false,
+        hasMore: false,
+        error: 'Failed to load album',
+      ));
+    }
   }
 
   Future<void> _onLoadMoreAlbum(
@@ -44,11 +69,41 @@ class GroupAlbumBloc extends Bloc<GroupAlbumEvent, GroupAlbumState> {
 
     emit(state.copyWith(isLoadingMore: true));
 
-    // TODO: implement getRoomMedia in IMessageRepository for pagination
-    emit(state.copyWith(
-      isLoadingMore: false,
-      hasMore: false,
-    ));
+    try {
+      // 使用最后一条媒体的 eventId 进行分页
+      final lastEventId = state.media.isNotEmpty ? state.media.last.eventId : null;
+
+      final moreMedia = await _messageRepository.getRoomMedia(
+        state.roomId!,
+        limit: 50,
+        beforeEventId: lastEventId,
+      );
+
+      if (moreMedia.isEmpty) {
+        emit(state.copyWith(isLoadingMore: false, hasMore: false));
+        return;
+      }
+
+      final allMedia = [...state.media, ...moreMedia];
+      final dateGroups = AlbumDateGroup.groupByDate(allMedia);
+      final stats = GroupAlbumStats.fromMedia(allMedia);
+
+      emit(state.copyWith(
+        media: allMedia,
+        dateGroups: dateGroups,
+        stats: stats,
+        isLoadingMore: false,
+        hasMore: moreMedia.length >= 50,
+      ));
+
+      debugPrint('GroupAlbumBloc: Loaded ${moreMedia.length} more media items, total: ${allMedia.length}');
+    } catch (e) {
+      debugPrint('GroupAlbumBloc: Failed to load more: $e');
+      emit(state.copyWith(
+        isLoadingMore: false,
+        error: 'Failed to load more',
+      ));
+    }
   }
 
   void _onChangeAlbumFilter(

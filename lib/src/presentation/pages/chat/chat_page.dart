@@ -54,6 +54,7 @@ import '../contact/contact_detail_page.dart';
 import '../search/chat_search_bar.dart';
 import 'chat_detail_page.dart';
 import 'message_item.dart';
+import 'viewers/pdf_viewer_page.dart';
 
 /// 聊天页面
 class ChatPage extends StatefulWidget {
@@ -681,6 +682,29 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     final fileName = message.metadata?.fileName ?? (S.of(context)?.chatUnknownFile ?? 'Unknown file');
+    final mimeType = message.metadata?.mimeType ?? '';
+
+    // PDF 文件使用内置预览器（检查文件名后缀和 MIME 类型）
+    final isPdf = fileName.toLowerCase().endsWith('.pdf') ||
+        mimeType == 'application/pdf';
+    if (isPdf && fileUrl != null) {
+      // 构建认证头用于下载受保护的媒体
+      final accessToken = MatrixClientManager.instance.client?.accessToken;
+      final headers = accessToken != null
+          ? <String, String>{'Authorization': 'Bearer $accessToken'}
+          : null;
+
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => PdfViewerPage(
+            fileName: fileName,
+            url: fileUrl,
+            headers: headers,
+          ),
+        ),
+      );
+      return;
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
