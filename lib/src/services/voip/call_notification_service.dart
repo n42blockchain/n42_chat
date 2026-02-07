@@ -182,7 +182,7 @@ class CallNotificationService {
         supportsVideo: true,
         maximumCallGroups: 1,
         maximumCallsPerCallGroup: 1,
-        audioSessionMode: 'default',
+        audioSessionMode: 'videoChat',
         audioSessionActive: true,
         audioSessionPreferredSampleRate: 44100.0,
         audioSessionPreferredIOBufferDuration: 0.005,

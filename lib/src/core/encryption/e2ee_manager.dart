@@ -355,7 +355,9 @@ class E2EEManager {
     }
 
     try {
-      encryption.ssss.open(recoveryKey);
+      final openSsss = encryption.ssss.open();
+      await openSsss.unlock(recoveryKey: recoveryKey);
+      await openSsss.maybeCacheAll();
       await encryption.crossSigning.selfSign(recoveryKey: recoveryKey);
     } catch (e) {
       throw E2EEException('Failed to recover cross-signing: $e');

@@ -1603,32 +1603,28 @@ class MatrixMessageDataSource {
   // ============================================
 
   /// 监听房间消息更新
+  /// Matrix 6.0: onEvent 已弃用，改用 onTimelineEvent（已解密的 Event 对象）
   Stream<matrix.Event>? watchRoomMessages(String roomId) {
-    return _client?.onEvent.stream.where((eventUpdate) {
-      return eventUpdate.roomID == roomId &&
-          _isMessageEvent(eventUpdate.content);
-    }).map((eventUpdate) {
-      final room = _client!.getRoomById(roomId)!;
-      return matrix.Event.fromJson(eventUpdate.content, room);
+    return _client?.onTimelineEvent.stream.where((event) {
+      return event.room.id == roomId && _isMessageEvent(event);
     });
   }
 
   /// 监听投票响应事件
   Stream<Map<String, dynamic>>? watchPollResponses(String roomId) {
-    return _client?.onEvent.stream.where((eventUpdate) {
-      return eventUpdate.roomID == roomId &&
-          (eventUpdate.content['type'] == 'org.matrix.msc3381.poll.response' ||
-           eventUpdate.content['type'] == 'org.matrix.msc3381.poll.end');
-    }).map((eventUpdate) {
-      final content = eventUpdate.content;
-      final type = content['type'] as String;
-      final relatesTo = content['content']?['m.relates_to'] as Map<String, dynamic>?;
+    return _client?.onTimelineEvent.stream.where((event) {
+      return event.room.id == roomId &&
+          (event.type == 'org.matrix.msc3381.poll.response' ||
+           event.type == 'org.matrix.msc3381.poll.end');
+    }).map((event) {
+      final type = event.type;
+      final relatesTo = event.content['m.relates_to'] as Map<String, dynamic>?;
       final pollEventId = relatesTo?['event_id'] as String?;
 
       if (type == 'org.matrix.msc3381.poll.response') {
-        final pollResponse = content['content']?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
+        final pollResponse = event.content['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
         final answers = pollResponse?['answers'] as List<dynamic>?;
-        final senderId = content['sender'] as String?;
+        final senderId = event.senderId;
 
         return {
           'type': 'vote',

@@ -17,6 +17,8 @@ class MessageMenuSheet extends StatelessWidget {
   final VoidCallback? onReply;
   final VoidCallback? onForward;
   final VoidCallback? onDelete;
+  final VoidCallback? onSpeak;
+  final VoidCallback? onExport;
 
   const MessageMenuSheet({
     super.key,
@@ -25,6 +27,8 @@ class MessageMenuSheet extends StatelessWidget {
     this.onReply,
     this.onForward,
     this.onDelete,
+    this.onSpeak,
+    this.onExport,
   });
 
   @override
@@ -55,6 +59,13 @@ class MessageMenuSheet extends StatelessWidget {
                 icon: Icons.copy,
                 title: S.of(context)?.chatCopy ?? 'Copy',
                 onTap: onCopy,
+              ),
+            if (message.type == MessageType.text && onSpeak != null)
+              _buildMenuItem(
+                context,
+                icon: Icons.volume_up,
+                title: S.of(context)?.chatReadAloud ?? 'Read Aloud',
+                onTap: onSpeak,
               ),
             _buildMenuItem(
               context,

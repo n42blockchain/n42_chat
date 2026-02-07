@@ -83,6 +83,11 @@ class VoiceService {
     return await Permission.microphone.isGranted;
   }
 
+  /// 获取麦克风权限详细状态
+  Future<PermissionStatus> checkPermissionStatus() async {
+    return await Permission.microphone.status;
+  }
+
   /// 开始录音
   Future<bool> startRecording() async {
     if (_isRecording) return false;

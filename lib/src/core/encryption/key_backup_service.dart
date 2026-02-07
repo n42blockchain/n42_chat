@@ -82,7 +82,15 @@ class KeyBackupService {
       // 2. 缓存所有秘密（包含 megolm backup 密钥）
       await openSsss.maybeCacheAll();
 
-      // 3. 启用自动密钥上传
+      // 3. 从服务端备份主动下载所有房间密钥
+      try {
+        await encryption.keyManager.loadAllKeys();
+        debugPrint('KeyBackupService: All room keys loaded from backup');
+      } catch (e) {
+        debugPrint('KeyBackupService: loadAllKeys skipped: $e');
+      }
+
+      // 4. 启用自动密钥上传
       encryption.keyManager.startAutoUploadKeys();
 
       debugPrint('KeyBackupService: Restored from password successfully');
@@ -117,7 +125,15 @@ class KeyBackupService {
         debugPrint('KeyBackupService: Cross-signing restore skipped: $e');
       }
 
-      // 4. 启用自动密钥上传
+      // 4. 从服务端备份主动下载所有房间密钥
+      try {
+        await encryption.keyManager.loadAllKeys();
+        debugPrint('KeyBackupService: All room keys loaded from backup');
+      } catch (e) {
+        debugPrint('KeyBackupService: loadAllKeys skipped: $e');
+      }
+
+      // 5. 启用自动密钥上传
       encryption.keyManager.startAutoUploadKeys();
 
       debugPrint('KeyBackupService: Restored from recovery key successfully');

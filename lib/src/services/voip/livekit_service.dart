@@ -4,6 +4,7 @@
 library;
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:livekit_client/livekit_client.dart';
@@ -194,9 +195,7 @@ class LiveKitService extends ChangeNotifier {
         roomOptions: RoomOptions(
           adaptiveStream: true,
           dynacast: true,
-          defaultAudioPublishOptions: const AudioPublishOptions(
-            audioBitrate: AudioPreset.music,
-          ),
+          defaultAudioPublishOptions: const AudioPublishOptions(),
           defaultVideoPublishOptions: const VideoPublishOptions(
             simulcast: true,
             videoCodec: 'VP8',
@@ -544,6 +543,91 @@ class LiveKitService extends ChangeNotifier {
   }
 
   // ============================================
+  // 通话中聊天 (DataChannel)
+  // ============================================
+
+  /// 通话中聊天消息列表
+  final List<InCallChatMessage> _chatMessages = [];
+
+  /// 聊天消息通知
+  final _chatMessageController = StreamController<InCallChatMessage>.broadcast();
+
+  /// 聊天消息流
+  Stream<InCallChatMessage> get onChatMessage => _chatMessageController.stream;
+
+  /// 获取所有聊天消息
+  List<InCallChatMessage> get chatMessages => List.unmodifiable(_chatMessages);
+
+  /// 发送通话中文本消息
+  ///
+  /// 使用 LiveKit DataChannel 在参与者间传递文本
+  Future<bool> sendChatMessage(String text) async {
+    if (_localParticipant == null || text.trim().isEmpty) return false;
+
+    try {
+      final message = InCallChatMessage(
+        senderId: _localParticipant!.identity,
+        senderName: _localParticipant!.name,
+        content: text.trim(),
+        timestamp: DateTime.now(),
+        isLocal: true,
+      );
+
+      // 通过 DataChannel 发送
+      final data = utf8.encode(jsonEncode({
+        'type': 'chat',
+        'sender': _localParticipant!.identity,
+        'name': _localParticipant!.name,
+        'content': text.trim(),
+        'ts': DateTime.now().millisecondsSinceEpoch,
+      }));
+
+      await _localParticipant!.publishData(data, reliable: true);
+
+      _chatMessages.add(message);
+      if (!_chatMessageController.isClosed) {
+        _chatMessageController.add(message);
+      }
+      notifyListeners();
+
+      debugPrint('LiveKitService: Chat message sent');
+      return true;
+    } catch (e) {
+      debugPrint('LiveKitService: Failed to send chat message: $e');
+      return false;
+    }
+  }
+
+  /// 处理接收到的 DataChannel 消息
+  void _handleDataReceived(List<int> data, RemoteParticipant? participant) {
+    try {
+      final json = jsonDecode(utf8.decode(data)) as Map<String, dynamic>;
+
+      if (json['type'] == 'chat') {
+        final message = InCallChatMessage(
+          senderId: json['sender'] as String? ?? participant?.identity ?? '',
+          senderName: json['name'] as String? ?? participant?.name ?? '',
+          content: json['content'] as String? ?? '',
+          timestamp: DateTime.fromMillisecondsSinceEpoch(
+            json['ts'] as int? ?? DateTime.now().millisecondsSinceEpoch,
+          ),
+          isLocal: false,
+        );
+
+        _chatMessages.add(message);
+        if (!_chatMessageController.isClosed) {
+          _chatMessageController.add(message);
+        }
+        notifyListeners();
+
+        debugPrint('LiveKitService: Chat message received');
+      }
+    } catch (e) {
+      debugPrint('LiveKitService: Failed to parse data message: $e');
+    }
+  }
+
+  // ============================================
   // 私有方法
   // ============================================
 
@@ -626,6 +710,11 @@ class LiveKitService extends ChangeNotifier {
     // 录制状态变化
     _roomListener!.on<RoomRecordingStatusChanged>((event) {
       onRecordingStateChanged?.call(event.activeRecording);
+    });
+
+    // DataChannel 消息（通话中聊天）
+    _roomListener!.on<DataReceivedEvent>((event) {
+      _handleDataReceived(event.data, event.participant);
     });
   }
 
@@ -778,6 +867,7 @@ class LiveKitService extends ChangeNotifier {
     _isMuted = false;
     _isVideoEnabled = true;
     _isScreenSharing = false;
+    _chatMessages.clear();
 
     debugPrint('LiveKitService: Cleaned up');
   }
@@ -788,8 +878,26 @@ class LiveKitService extends ChangeNotifier {
     // 注意: dispose 必须是同步的（ChangeNotifier 要求）
     // 如果需要异步清理，应在调用 dispose 前手动调用 leaveMeeting
     _durationTimer?.cancel();
+    _chatMessageController.close();
     _roomListener?.dispose();
     _room?.dispose();
     super.dispose();
   }
+}
+
+/// 通话中聊天消息
+class InCallChatMessage {
+  final String senderId;
+  final String senderName;
+  final String content;
+  final DateTime timestamp;
+  final bool isLocal;
+
+  const InCallChatMessage({
+    required this.senderId,
+    required this.senderName,
+    required this.content,
+    required this.timestamp,
+    this.isLocal = false,
+  });
 }

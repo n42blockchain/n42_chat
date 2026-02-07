@@ -51,8 +51,8 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         // 保存到相册
         final result = await SaverGallery.saveImage(
           response.bodyBytes,
-          name: 'n42_${DateTime.now().millisecondsSinceEpoch}.jpg',
-          androidExistNotSave: false,
+          fileName: 'n42_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          skipIfExists: false,
         );
 
         if (mounted) {

@@ -143,6 +143,10 @@ class SJa extends S {
   String get commonMicrophonePermissionRequired => 'マイクの使用を許可してください';
 
   @override
+  String get chatMicrophonePermissionDeniedPermanent =>
+      '麦克风权限已被拒绝，请在系统设置中开启以使用语音消息功能。';
+
+  @override
   String commonStartRecordingFailed(String error) {
     return '録音の開始に失敗しました: $error';
   }
@@ -247,6 +251,9 @@ class SJa extends S {
 
   @override
   String get commonAllClaimed => 'すべて受け取り済み';
+
+  @override
+  String get chatReadAloud => '朗读';
 
   @override
   String get chatReply => '返信';
@@ -2073,6 +2080,52 @@ class SJa extends S {
   String get settingsReset => 'リセット';
 
   @override
+  String get settingsBackupSuccess => '密钥备份成功';
+
+  @override
+  String get settingsBackupFailed => '备份失败';
+
+  @override
+  String get settingsRecoveryKey => '恢复密钥';
+
+  @override
+  String get settingsRecoveryKeySaveWarning =>
+      '请将此恢复密钥保存在安全的地方。您需要它在新设备上恢复加密消息。';
+
+  @override
+  String get settingsRecoveryKeySaved => '我已保存';
+
+  @override
+  String get settingsRestoreSuccess => '密钥恢复成功';
+
+  @override
+  String get settingsRestoreFailed => '恢复失败';
+
+  @override
+  String get settingsPassword => '密码';
+
+  @override
+  String get settingsEnterRecoveryKey => '输入恢复密钥';
+
+  @override
+  String get settingsEnterPassword => '输入密码';
+
+  @override
+  String get settingsExportSuccess => '密钥已成功导出到服务端备份';
+
+  @override
+  String get settingsExportNeedBackupFirst => '请先创建密钥备份';
+
+  @override
+  String get settingsExportFailed => '导出失败';
+
+  @override
+  String get settingsResetSuccess => '加密重置成功';
+
+  @override
+  String get settingsResetFailed => '重置失败';
+
+  @override
   String get callLeaveMeetingConfirm => 'ミーティングを退出してもよろしいですか？';
 
   @override
@@ -3634,4 +3687,206 @@ class SJa extends S {
   String qrcodeProcessFailed(String error) {
     return 'QRコードの処理に失敗しました: $error';
   }
+
+  @override
+  String get securityDeviceIdRequired => '需要设备 ID';
+
+  @override
+  String securityVerificationStartFailed(String error) {
+    return '启动验证失败: $error';
+  }
+
+  @override
+  String get securityVerificationFailed => '验证失败';
+
+  @override
+  String securityVerificationFailedWithReason(String reason) {
+    return '验证失败: $reason';
+  }
+
+  @override
+  String get securityEmojiMismatchRejected => '验证被拒绝 - 表情不匹配';
+
+  @override
+  String get securityWaitingForDeviceAccept => '等待另一台设备接受...';
+
+  @override
+  String get securityVerifyDevice => '验证此设备';
+
+  @override
+  String get securityConfirmEmojiMatch => '确认以下表情符号在两台设备上以相同顺序显示';
+
+  @override
+  String get securityEmojiDontMatch => '不匹配';
+
+  @override
+  String get securityEmojiMatch => '匹配';
+
+  @override
+  String get securityWaitingForDeviceConfirm => '等待另一台设备确认...';
+
+  @override
+  String get securityVerificationSuccess => '验证成功！';
+
+  @override
+  String get securityDeviceVerifiedTrusted => '此设备已验证并可信任。';
+
+  @override
+  String get securityCompareEmoji => '比较两台设备上的表情符号';
+
+  @override
+  String get securityCompareNumbers => '比较两台设备上的数字';
+
+  @override
+  String get commonTryAgain => '重试';
+
+  @override
+  String get commonDone => '完成';
+
+  @override
+  String get chatExportTitle => '导出聊天记录';
+
+  @override
+  String get chatExportSuccess => '导出成功';
+
+  @override
+  String chatExportFailed(String error) {
+    return '导出失败: $error';
+  }
+
+  @override
+  String get chatExportFormat => '导出格式';
+
+  @override
+  String get chatExportHtmlDesc => '可在任何浏览器中打开的精美排版';
+
+  @override
+  String get chatExportJsonDesc => '机器可读的结构化数据格式';
+
+  @override
+  String get chatExportDateRange => '日期范围';
+
+  @override
+  String get chatExportAll => '全部消息';
+
+  @override
+  String get chatExportLastWeek => '最近7天';
+
+  @override
+  String get chatExportLastMonth => '最近一个月';
+
+  @override
+  String get chatExportLast3Months => '最近三个月';
+
+  @override
+  String get chatExportMessageCount => '待导出消息';
+
+  @override
+  String get chatExportButton => '导出并分享';
+
+  @override
+  String get chatMediaGallery => '媒体文件';
+
+  @override
+  String get chatExportHistory => '导出聊天记录';
+
+  @override
+  String get pdfLoadFailed => '加载 PDF 失败';
+
+  @override
+  String pdfPageIndicator(int current, int total) {
+    return '$current / $total';
+  }
+
+  @override
+  String get mediaAll => '全部';
+
+  @override
+  String get mediaImages => '图片';
+
+  @override
+  String get mediaVideos => '视频';
+
+  @override
+  String get mediaFiles => '文件';
+
+  @override
+  String get mediaAudio => '音频';
+
+  @override
+  String mediaItemsCount(int count) {
+    return '$count 项';
+  }
+
+  @override
+  String get mediaNoMediaFound => '暂无媒体文件';
+
+  @override
+  String get spacesTitle => '社区';
+
+  @override
+  String get spacesCreate => '创建社区';
+
+  @override
+  String get spacesJoined => '已加入';
+
+  @override
+  String get spacesDiscover => '发现';
+
+  @override
+  String get spacesNoJoined => '还没有加入任何社区';
+
+  @override
+  String get spacesExplore => '探索社区';
+
+  @override
+  String get spacesNoPublic => '没有找到公共社区';
+
+  @override
+  String get spacesJoin => '加入';
+
+  @override
+  String get spacesSubSpaces => '子社区';
+
+  @override
+  String get spacesChannels => '频道';
+
+  @override
+  String spacesMembersCount(int count) {
+    return '$count 位成员';
+  }
+
+  @override
+  String get spacesPublic => '公开';
+
+  @override
+  String get spacesPrivate => '私密';
+
+  @override
+  String get spacesSuggested => '推荐';
+
+  @override
+  String spacesChannelsCount(int count) {
+    return '$count 个频道';
+  }
+
+  @override
+  String get callInCallChat => '通话中聊天';
+
+  @override
+  String callMessagesCount(int count) {
+    return '$count 条消息';
+  }
+
+  @override
+  String get callNoMessagesYet => '暂无消息\n发送一条消息开始聊天';
+
+  @override
+  String get callTypeMessage => '输入消息...';
+
+  @override
+  String get callYouSender => '我';
+
+  @override
+  String get callChatLabel => '聊天';
 }

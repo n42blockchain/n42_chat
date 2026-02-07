@@ -16,6 +16,8 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../contact/contact_detail_page.dart';
+import '../media/media_gallery_page.dart';
+import 'chat_export_page.dart';
 
 /// 聊天详情页面（仿微信）
 class ChatDetailPage extends StatefulWidget {
@@ -412,6 +414,20 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title: S.of(context)?.chatMediaGallery ?? 'Media Gallery',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: () => _openMediaGallery(),
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title: S.of(context)?.chatExportHistory ?? 'Export Chat History',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: () => _openChatExport(),
                 ),
               ],
             ),
@@ -908,6 +924,30 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       // 返回时刷新显示名称
       if (mounted) setState(() {});
     });
+  }
+
+  /// 打开媒体画廊
+  void _openMediaGallery() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MediaGalleryPage(
+          roomId: widget.conversation.id,
+          roomName: widget.conversation.name,
+        ),
+      ),
+    );
+  }
+
+  /// 打开聊天记录导出
+  void _openChatExport() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ChatExportPage(
+          roomId: widget.conversation.id,
+          roomName: widget.conversation.name,
+        ),
+      ),
+    );
   }
 
   void _showClearConfirm() {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import 'markdown_message_widget.dart';
 import 'message_status_indicator.dart';
 
 /// 消息气泡组件
@@ -347,6 +348,8 @@ class TextMessageBubble extends StatelessWidget {
         ? AppColors.messageTextSent  // 黑色
         : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
 
+    final useMarkdown = containsMarkdown(text);
+
     return MessageBubble(
       isSelf: isSelf,
       status: status,
@@ -357,14 +360,16 @@ class TextMessageBubble extends StatelessWidget {
       avatarName: avatarName,
       onAvatarTap: onAvatarTap,
       onResend: onResend,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 16,
-          color: textColor,
-          height: 1.4,
-        ),
-      ),
+      child: useMarkdown
+          ? MarkdownMessageWidget(text: text, isSelf: isSelf)
+          : Text(
+              text,
+              style: TextStyle(
+                fontSize: 16,
+                color: textColor,
+                height: 1.4,
+              ),
+            ),
     );
   }
 }

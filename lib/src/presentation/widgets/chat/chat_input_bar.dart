@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
@@ -167,13 +168,66 @@ class ChatInputBarState extends State<ChatInputBar> {
   }
 
   void _toggleVoiceMode() {
+    final switchingToVoice = !_isVoiceMode;
     setState(() {
-      _isVoiceMode = !_isVoiceMode;
+      _isVoiceMode = switchingToVoice;
     });
-    if (_isVoiceMode) {
+    if (switchingToVoice) {
       _focusNode.unfocus();
+      // 切换到语音模式时预请求麦克风权限（微信方案）
+      _preRequestMicrophonePermission();
     }
     widget.onVoicePressed?.call();
+  }
+
+  /// 预请求麦克风权限
+  ///
+  /// 在切换到语音模式时调用，避免用户按住录音时才弹出权限对话框打断手势。
+  /// 如果权限被永久拒绝，弹出引导对话框让用户去系统设置开启。
+  Future<void> _preRequestMicrophonePermission() async {
+    final status = await _voiceService.checkPermissionStatus();
+    if (status.isGranted) return;
+
+    if (status.isPermanentlyDenied) {
+      if (mounted) _showMicrophonePermissionDeniedDialog();
+      return;
+    }
+
+    // 首次或之前拒绝过（非永久），直接请求
+    final granted = await _voiceService.requestPermission();
+    if (!granted && mounted) {
+      // 请求后仍被拒绝，再次检查是否变为永久拒绝
+      final newStatus = await _voiceService.checkPermissionStatus();
+      if (newStatus.isPermanentlyDenied) {
+        _showMicrophonePermissionDeniedDialog();
+      }
+    }
+  }
+
+  /// 显示麦克风权限被永久拒绝时的引导对话框
+  void _showMicrophonePermissionDeniedDialog() {
+    final l10n = S.of(context);
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n?.commonMicrophonePermissionRequired ?? 'Microphone Permission Required'),
+        content: Text(l10n?.chatMicrophonePermissionDeniedPermanent ??
+            'Microphone permission has been denied. Please enable it in system settings to use voice messages.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              openAppSettings();
+            },
+            child: Text(l10n?.chatGoToSettings ?? 'Go to Settings'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _sendMessage() {

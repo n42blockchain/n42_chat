@@ -10,6 +10,7 @@ import '../../../n42_chat.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../security/sas_verification_page.dart';
 
 /// 安全设置页面
 class SecuritySettingsPage extends StatefulWidget {
@@ -554,7 +555,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              // 实现备份逻辑
+              await _performBackup();
             },
             child: Text(S.of(context)?.settingsBackup ?? 'Backup'),
           ),
@@ -563,27 +564,193 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     );
   }
 
-  void _showRestoreDialog() {
+  Future<void> _performBackup() async {
+    setState(() => _isLoading = true);
+    try {
+      // 1. 创建恢复密钥
+      final recoveryKey = await widget.e2eeManager.createRecoveryKey();
+
+      // 2. 上传所有房间密钥到服务端备份
+      await widget.keyBackupService.backupAllKeys();
+
+      // 3. 刷新备份信息
+      final backupInfo = await widget.keyBackupService.getBackupInfo();
+      setState(() {
+        _backupInfo = backupInfo;
+        _isLoading = false;
+      });
+
+      // 4. 展示恢复密钥给用户保存
+      if (mounted && recoveryKey != null) {
+        _showRecoveryKeyDialog(recoveryKey);
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context)?.settingsBackupSuccess ?? 'Keys backed up successfully')),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${S.of(context)?.settingsBackupFailed ?? 'Backup failed'}: $e')),
+        );
+      }
+    }
+  }
+
+  void _showRecoveryKeyDialog(String recoveryKey) {
     showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.settingsRestoreKeyTitle ?? 'Restore Keys'),
-        content: Text(S.of(context)?.settingsRestoreKeyMessage ?? 'Enter your recovery password or recovery key to restore encrypted messages.'),
+        title: Text(S.of(context)?.settingsRecoveryKey ?? 'Recovery Key'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              S.of(context)?.settingsRecoveryKeySaveWarning ??
+                  'Please save this recovery key in a safe place. You will need it to restore your encrypted messages on a new device.',
+              style: const TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+              ),
+              child: SelectableText(
+                recoveryKey,
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              // 实现恢复逻辑
-            },
-            child: Text(S.of(context)?.settingsRestore ?? 'Restore'),
+            child: Text(S.of(context)?.settingsRecoveryKeySaved ?? 'I have saved it'),
           ),
         ],
       ),
     );
+  }
+
+  void _showRestoreDialog() {
+    final controller = TextEditingController();
+    var isRecoveryKey = true;
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Text(S.of(context)?.settingsRestoreKeyTitle ?? 'Restore Keys'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                S.of(context)?.settingsRestoreKeyMessage ??
+                    'Enter your recovery password or recovery key to restore encrypted messages.',
+                style: const TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  ChoiceChip(
+                    label: Text(S.of(context)?.settingsRecoveryKey ?? 'Recovery Key'),
+                    selected: isRecoveryKey,
+                    onSelected: (v) => setDialogState(() => isRecoveryKey = true),
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: Text(S.of(context)?.settingsPassword ?? 'Password'),
+                    selected: !isRecoveryKey,
+                    onSelected: (v) => setDialogState(() => isRecoveryKey = false),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                obscureText: !isRecoveryKey,
+                decoration: InputDecoration(
+                  hintText: isRecoveryKey
+                      ? (S.of(context)?.settingsEnterRecoveryKey ?? 'Enter recovery key')
+                      : (S.of(context)?.settingsEnterPassword ?? 'Enter password'),
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+                maxLines: isRecoveryKey ? 3 : 1,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                controller.dispose();
+                Navigator.pop(ctx);
+              },
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final input = controller.text.trim();
+                if (input.isEmpty) return;
+                controller.dispose();
+                Navigator.pop(ctx);
+                await _performRestore(input, isRecoveryKey: isRecoveryKey);
+              },
+              child: Text(S.of(context)?.settingsRestore ?? 'Restore'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _performRestore(String input, {required bool isRecoveryKey}) async {
+    setState(() => _isLoading = true);
+    try {
+      if (isRecoveryKey) {
+        await widget.e2eeManager.unlockWithRecoveryKey(input);
+      } else {
+        await widget.e2eeManager.unlockWithPassphrase(input);
+      }
+
+      // 从服务端备份恢复所有密钥
+      if (isRecoveryKey) {
+        await widget.keyBackupService.restoreFromRecoveryKey(input);
+      } else {
+        await widget.keyBackupService.restoreFromPassword(input);
+      }
+
+      // 刷新备份信息
+      final backupInfo = await widget.keyBackupService.getBackupInfo();
+      setState(() {
+        _backupInfo = backupInfo;
+        _isLoading = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context)?.settingsRestoreSuccess ?? 'Keys restored successfully')),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${S.of(context)?.settingsRestoreFailed ?? 'Restore failed'}: $e')),
+        );
+      }
+    }
   }
 
   void _showExportDialog() {
@@ -600,13 +767,48 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              // 实现导出逻辑
+              await _performExport();
             },
             child: Text(S.of(context)?.settingsExport ?? 'Export'),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _performExport() async {
+    setState(() => _isLoading = true);
+    try {
+      // 上传所有密钥到服务端备份
+      await widget.keyBackupService.backupAllKeys();
+
+      // 获取当前恢复密钥（如果有）
+      final recoveryKey = await widget.e2eeManager.getRecoveryKey();
+
+      setState(() => _isLoading = false);
+
+      if (mounted) {
+        if (recoveryKey != null) {
+          _showRecoveryKeyDialog(recoveryKey);
+        } else if (widget.e2eeManager.hasSsssDefaultKey) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(S.of(context)?.settingsExportSuccess ?? 'Keys exported to server backup successfully')),
+          );
+        } else {
+          // 没有恢复密钥，提示先创建
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(S.of(context)?.settingsExportNeedBackupFirst ?? 'Please create a key backup first')),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${S.of(context)?.settingsExportFailed ?? 'Export failed'}: $e')),
+        );
+      }
+    }
   }
 
   void _showDeviceDetails(DeviceInfo device) {
@@ -642,7 +844,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(ctx);
-                  // 验证设备
+                  _startSasVerification(device);
                 },
                 child: Text(S.of(context)?.settingsVerifyThisDevice ?? 'Verify this device'),
               ),
@@ -687,9 +889,29 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              // 实现重置逻辑
+              setState(() => _isLoading = true);
+              try {
+                await widget.keyBackupService.deleteKeyBackup();
+                final backupInfo = await widget.keyBackupService.getBackupInfo();
+                setState(() {
+                  _backupInfo = backupInfo;
+                  _isLoading = false;
+                });
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(S.of(context)?.settingsResetSuccess ?? 'Encryption reset successful')),
+                  );
+                }
+              } catch (e) {
+                setState(() => _isLoading = false);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${S.of(context)?.settingsResetFailed ?? 'Reset failed'}: $e')),
+                  );
+                }
+              }
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: Text(S.of(context)?.settingsReset ?? 'Reset'),
@@ -697,6 +919,38 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         ],
       ),
     );
+  }
+
+  /// 启动 SAS 验证流程
+  void _startSasVerification(DeviceInfo device) {
+    // 获取当前用户 ID
+    final userId = widget.e2eeManager.client.userID;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not logged in')),
+      );
+      return;
+    }
+
+    Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SasVerificationPage(
+          e2eeManager: widget.e2eeManager,
+          userId: userId,
+          deviceId: device.deviceId,
+          deviceName: device.deviceName,
+        ),
+      ),
+    ).then((verified) {
+      if (verified == true) {
+        // 验证成功，刷新设备列表
+        _loadData();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context)?.securityDeviceVerifiedTrusted ?? 'Device verified successfully')),
+        );
+      }
+    });
   }
 }
 

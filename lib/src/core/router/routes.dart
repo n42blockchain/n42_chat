@@ -131,6 +131,58 @@ abstract class Routes {
   static const String videoPlayerName = 'videoPlayer';
 
   // ============================================
+  // Space/社区
+  // ============================================
+
+  /// Space 列表
+  static const String spaceList = '/spaces';
+  static const String spaceListName = 'spaceList';
+
+  /// Space 详情
+  static const String spaceDetail = '/spaces/:spaceId';
+  static const String spaceDetailName = 'spaceDetail';
+
+  /// 生成 Space 详情路径
+  static String spaceDetailPath(String spaceId) =>
+      '/spaces/${Uri.encodeComponent(spaceId)}';
+
+  // ============================================
+  // 媒体画廊
+  // ============================================
+
+  /// 媒体画廊
+  static const String mediaGallery = '/chat/:roomId/media';
+  static const String mediaGalleryName = 'mediaGallery';
+
+  /// 生成媒体画廊路径
+  static String mediaGalleryPath(String roomId) =>
+      '/chat/${Uri.encodeComponent(roomId)}/media';
+
+  /// PDF 预览
+  static const String pdfViewer = '/preview/pdf';
+  static const String pdfViewerName = 'pdfViewer';
+
+  // ============================================
+  // 聊天记录导出
+  // ============================================
+
+  /// 导出聊天记录
+  static const String chatExport = '/chat/:roomId/export';
+  static const String chatExportName = 'chatExport';
+
+  /// 生成导出路径
+  static String chatExportPath(String roomId) =>
+      '/chat/${Uri.encodeComponent(roomId)}/export';
+
+  // ============================================
+  // 安全验证
+  // ============================================
+
+  /// SAS 设备验证
+  static const String sasVerification = '/security/verify';
+  static const String sasVerificationName = 'sasVerification';
+
+  // ============================================
   // 其他
   // ============================================
 
