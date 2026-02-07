@@ -2867,6 +2867,7 @@ Avatar: ${contactAvatar ?? ''}''';
             ),
         ],
       ),
+      showBackButton: widget.onBack != null,
       onBackPressed: widget.onBack ?? () => Navigator.of(context).pop(),
       actions: [
         // 私聊显示通话按钮

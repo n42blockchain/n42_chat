@@ -52,6 +52,7 @@ dependencies:
   # MIT License
   drift: ^2.15.0
   sqlite3_flutter_libs: ^0.5.0
+  sqflite: ^2.3.0
   # BSD-3-Clause License
   flutter_secure_storage: ^9.0.0
   shared_preferences: ^2.2.0

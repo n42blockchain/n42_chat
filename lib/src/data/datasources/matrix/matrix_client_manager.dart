@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:n42_chat/src/core/utils/io_helper.dart' as io_helper;
 
 /// Matrix客户端管理器
@@ -26,6 +27,7 @@ class MatrixClientManager {
   Client? _client;
   bool _isInitialized = false;
   bool _isInitializing = false;
+  bool _vodozemacInitialized = false;
 
   /// 获取Matrix客户端实例
   Client? get client => _client;
@@ -100,8 +102,14 @@ class MatrixClientManager {
 
     try {
       // 初始化 vodozemac 加密后端（必须在 Client.init() 之前）
-      await vodozemac.init();
-      debugPrint('MatrixClientManager: vodozemac initialized');
+      // flutter_rust_bridge 不允许重复初始化，需要单独跟踪状态
+      if (!_vodozemacInitialized) {
+        await vodozemac.init();
+        _vodozemacInitialized = true;
+        debugPrint('MatrixClientManager: vodozemac initialized');
+      } else {
+        debugPrint('MatrixClientManager: vodozemac already initialized, skipping');
+      }
 
       // 获取数据库路径
       String dbPath;
@@ -124,8 +132,20 @@ class MatrixClientManager {
       }
 
       // 使用 MatrixSdkDatabase（Matrix 6.0 推荐，基于 drift/sqlite）
+      // 原生平台必须先打开 sqflite Database 再传入 MatrixSdkDatabase.init()
       debugPrint('MatrixClientManager: Creating MatrixSdkDatabase...');
-      final database = await MatrixSdkDatabase.init(clientName);
+      DatabaseApi database;
+      if (kIsWeb) {
+        database = await MatrixSdkDatabase.init(clientName);
+      } else {
+        final sqfliteDb = await sqflite.openDatabase(
+          p.join(dbPath, '$clientName.db'),
+        );
+        database = await MatrixSdkDatabase.init(
+          clientName,
+          database: sqfliteDb,
+        );
+      }
 
       // 创建客户端（端到端加密由 flutter_vodozemac 自动支持）
       _client = Client(
