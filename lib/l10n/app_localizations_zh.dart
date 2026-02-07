@@ -4234,4 +4234,78 @@ class SZh extends S {
 
   @override
   String get confirmClearCache => '确认清理所有缓存数据？';
+
+  @override
+  String get mapView => '地图视图';
+
+  @override
+  String liveLocationSharingCount(int count) {
+    return '$count 人正在共享位置';
+  }
+
+  @override
+  String get minutes15 => '15 分钟';
+
+  @override
+  String get minutes30 => '30 分钟';
+
+  @override
+  String get hour1 => '1 小时';
+
+  @override
+  String get hours8 => '8 小时';
+
+  @override
+  String get personalCard => '个人名片';
+
+  @override
+  String get downloadFailed => '下载失败';
+
+  @override
+  String get locationExpired => '已过期';
+
+  @override
+  String secondsRemaining(int count) {
+    return '$count秒';
+  }
+
+  @override
+  String minutesRemaining(int count) {
+    return '$count分钟';
+  }
+
+  @override
+  String hoursMinutesRemaining(int hours, int minutes) {
+    return '$hours小时$minutes分钟';
+  }
+
+  @override
+  String get favoriteMessages => '收藏消息';
+
+  @override
+  String get linksCopied => '链接已复制';
+
+  @override
+  String get noLinksFound => '未找到链接';
+
+  @override
+  String get roomStorageRanking => '房间存储排行';
+
+  @override
+  String get downloadComplete => '下载完成';
+
+  @override
+  String get downloading => '下载中...';
+
+  @override
+  String get draftSaved => '草稿已保存';
+
+  @override
+  String get voiceRecording => '语音录制';
+
+  @override
+  String get searchLocation => '搜索地点';
+
+  @override
+  String get tapToSearch => '点击搜索';
 }

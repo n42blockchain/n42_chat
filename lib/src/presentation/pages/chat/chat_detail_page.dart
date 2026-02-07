@@ -18,6 +18,7 @@ import '../../widgets/common/n42_avatar.dart';
 import '../contact/contact_detail_page.dart';
 import '../media/media_gallery_page.dart';
 import 'chat_export_page.dart';
+import '../settings/chat_background_page.dart';
 
 /// 聊天详情页面（仿微信）
 class ChatDetailPage extends StatefulWidget {
@@ -492,7 +493,16 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   title: S.of(context)?.chatSetChatBackground ?? 'Set Chat Background',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatBackgroundPage(
+                          roomId: widget.conversation.id,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

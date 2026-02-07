@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -98,7 +99,7 @@ class ContactCardMessageWidget extends StatelessWidget {
                 ),
               ),
               child: Text(
-                '个人名片',
+                S.of(context)?.personalCard ?? 'Personal Card',
                 style: TextStyle(
                   fontSize: 11,
                   color: isDark

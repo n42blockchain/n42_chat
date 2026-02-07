@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:saver_gallery/saver_gallery.dart';
@@ -23,12 +24,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/in_app_notification_service.dart';
 import '../../../core/utils/face_blur_util.dart';
+import '../../../core/theme/chat_background_presets.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../n42_chat.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/services/download_service.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
@@ -60,6 +63,7 @@ import '../../widgets/wechat_toast.dart';
 import '../contact/contact_detail_page.dart';
 import '../search/chat_search_bar.dart';
 import 'chat_detail_page.dart';
+import '../favorite/favorite_list_page.dart';
 import 'message_item.dart';
 import 'live_location_page.dart';
 import 'thread_detail_page.dart';
@@ -147,6 +151,9 @@ class _ChatPageState extends State<ChatPage> {
   // 聊天背景 key（如 solid_0, gradient_1, default 等）
   String? _backgroundKey;
 
+  // 消息字体大小
+  double _messageFontSize = 16.0;
+
   @override
   void initState() {
     super.initState();
@@ -187,6 +194,12 @@ class _ChatPageState extends State<ChatPage> {
 
     // 加载聊天背景
     _loadBackground();
+
+    // 加载字体大小
+    _loadFontSize();
+
+    // 加载草稿
+    _loadDraft();
 
     // 设置当前聊天房间（应用内通知过滤）
     InAppNotificationService.instance.setCurrentChatRoom(widget.conversation.id);
@@ -289,50 +302,36 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  /// 加载消息字体大小
+  Future<void> _loadFontSize() async {
+    final storage = getIt<SecureStorageDataSource>();
+    final size = await storage.getMessageFontSize();
+    if (mounted) {
+      setState(() => _messageFontSize = size);
+    }
+  }
+
+  /// 加载草稿
+  Future<void> _loadDraft() async {
+    final storage = getIt<SecureStorageDataSource>();
+    final draft = await storage.getDraft(widget.conversation.id);
+    if (mounted && draft != null && draft.isNotEmpty) {
+      _inputController.text = draft;
+      _inputController.selection = TextSelection.fromPosition(
+        TextPosition(offset: draft.length),
+      );
+    }
+  }
+
+  /// 保存草稿
+  void _saveDraft() {
+    final storage = getIt<SecureStorageDataSource>();
+    storage.saveDraft(widget.conversation.id, _inputController.text);
+  }
+
   /// 构建聊天背景装饰
   BoxDecoration? _buildBackgroundDecoration() {
-    final key = _backgroundKey;
-    if (key == null || key == 'default') return null;
-
-    // 纯色背景预设
-    const solidColors = [
-      Color(0xFFEDEDED),
-      Color(0xFFD6E4F0),
-      Color(0xFFD4EDDA),
-      Color(0xFFFFF3CD),
-      Color(0xFFF8D7DA),
-      Color(0xFFE2D9F3),
-      Color(0xFFD1ECF1),
-      Color(0xFF343A40),
-    ];
-
-    // 渐变背景预设
-    const gradients = [
-      [Color(0xFF667EEA), Color(0xFF764BA2)],
-      [Color(0xFFF093FB), Color(0xFFF5576C)],
-      [Color(0xFF4FACFE), Color(0xFF00F2FE)],
-      [Color(0xFF43E97B), Color(0xFF38F9D7)],
-    ];
-
-    if (key.startsWith('solid_')) {
-      final index = int.tryParse(key.substring(6));
-      if (index != null && index >= 0 && index < solidColors.length) {
-        return BoxDecoration(color: solidColors[index]);
-      }
-    } else if (key.startsWith('gradient_')) {
-      final index = int.tryParse(key.substring(9));
-      if (index != null && index >= 0 && index < gradients.length) {
-        return BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: gradients[index],
-          ),
-        );
-      }
-    }
-
-    return null;
+    return ChatBackgroundPresets.resolveDecoration(_backgroundKey);
   }
 
   /// 切换人脸模糊设置
@@ -371,6 +370,9 @@ class _ChatPageState extends State<ChatPage> {
     } catch (e) {
       debugPrint('ChatPage: Error disposing ChatBloc: $e');
     }
+
+    // 保存草稿
+    _saveDraft();
 
     // 移除监听器（必须在 dispose 之前）
     _scrollController.removeListener(_onScroll);
@@ -628,7 +630,7 @@ class _ChatPageState extends State<ChatPage> {
         claimedAmount: amount,
         token: token,
         onOpen: () {
-          // TODO: 调用后端API领取红包
+          // TODO(backend): 调用后端API领取红包
           debugPrint('Opening red packet: ${message.id}');
         },
         onViewDetails: () {
@@ -847,14 +849,50 @@ class _ChatPageState extends State<ChatPage> {
       return;
     }
 
+    if (fileUrl == null) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${S.of(context)?.chatDownloadFile ?? 'Download file'}: $fileName'),
         action: SnackBarAction(
           label: S.of(context)?.chatDownload ?? 'Download',
-          onPressed: () {
-            // TODO: 实现文件下载
-            debugPrint('Download file: $fileUrl');
+          onPressed: () async {
+            try {
+              final downloadService = getIt<DownloadService>();
+              final downloadDir = await DownloadService.getDownloadDirectory();
+              final savePath = '$downloadDir/$fileName';
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(S.of(context)?.downloading ?? 'Downloading...'),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+
+              await downloadService.download(
+                url: fileUrl!,
+                savePath: savePath,
+                fileName: fileName,
+              );
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(S.of(context)?.downloadComplete ?? 'Download complete'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            } catch (e) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${S.of(context)?.downloadFailed ?? 'Download failed'}: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
           },
         ),
       ),
@@ -1113,7 +1151,10 @@ class _ChatPageState extends State<ChatPage> {
           return page;
         },
       ),
-    );
+    ).then((_) {
+      // 返回时刷新背景（用户可能在详情页修改了聊天背景）
+      _loadBackground();
+    });
   }
 
   /// 显示添加成员对话框
@@ -2162,12 +2203,11 @@ class _ChatPageState extends State<ChatPage> {
     );
 
     if (confirmed == true && mounted) {
-      // TODO: 实现实时位置共享功能
-      // 需要建立 WebSocket 连接，持续发送位置更新
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(S.of(context)?.chatRealTimeLocationSharing ?? 'Real-time location sharing in development...'),
-          duration: const Duration(seconds: 2),
+      // 导航到实时位置共享页面
+      Navigator.push<void>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => LiveLocationPage(roomId: widget.conversation.id),
         ),
       );
     }
@@ -2519,9 +2559,10 @@ Avatar: ${contactAvatar ?? ''}''';
   }
 
   void _openFavorites() {
-    // TODO: 实现收藏功能
-    debugPrint('Open favorites');
-    _showFeatureToast(S.of(context)?.chatFavoritesFeature ?? 'Favorites');
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute(builder: (_) => const FavoriteListPage()),
+    );
   }
 
   /// 分享音乐
@@ -2602,13 +2643,13 @@ Avatar: ${contactAvatar ?? ''}''';
   }
 
   void _selectCoupon() {
-    // TODO: 实现选择卡券功能
+    // TODO(backend): 实现选择卡券功能 — 需要卡券系统集成
     debugPrint('Select coupon');
     _showFeatureToast(S.of(context)?.chatCouponsFeature ?? 'Coupons');
   }
 
   void _sendGift() {
-    // TODO: 实现发送礼物功能
+    // TODO(backend): 实现发送礼物功能 — 需要礼物系统集成
     debugPrint('Send gift');
     _showFeatureToast(S.of(context)?.chatGiftFeature ?? 'Gift');
   }
@@ -3256,6 +3297,7 @@ Avatar: ${contactAvatar ?? ''}''';
                           onContactCardTap: _onContactCardTap,
                           onReplyQuoteTap: _scrollToMessage,
                           onThreadTap: _navigateToThread,
+                          messageFontSize: _messageFontSize,
                         ),
                       ),
               ],
@@ -3336,6 +3378,7 @@ Avatar: ${contactAvatar ?? ''}''';
                   currentUserId: _currentUserId,
                   onReactionTap: null, // 多选模式下不响应表情点击
                   onRedPacketTap: null, // 多选模式下不响应红包点击
+                  messageFontSize: _messageFontSize,
                 ),
               ),
             ),
@@ -4500,29 +4543,29 @@ Avatar: ${contactAvatar ?? ''}''';
 
   /// 收藏消息
   void _favoriteMessage(MessageEntity message) {
-    setState(() {
-      if (_favoritedMessageIds.contains(message.id)) {
-        _favoritedMessageIds.remove(message.id);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S.of(context)?.chatUnfavorited ?? 'Unfavorited'),
-            duration: const Duration(seconds: 1),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      } else {
-        _favoritedMessageIds.add(message.id);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S.of(context)?.chatFavorited ?? 'Favorited'),
-            duration: const Duration(seconds: 1),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    });
-    
-    // TODO: 持久化到本地存储或服务器
+    final actionBloc = getIt<MessageActionBloc>();
+
+    if (_favoritedMessageIds.contains(message.id)) {
+      actionBloc.add(action_event.UnsaveMessage(message.id));
+      setState(() => _favoritedMessageIds.remove(message.id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(S.of(context)?.chatUnfavorited ?? 'Unfavorited'),
+          duration: const Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      actionBloc.add(action_event.SaveMessage(message));
+      setState(() => _favoritedMessageIds.add(message.id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(S.of(context)?.chatFavorited ?? 'Favorited'),
+          duration: const Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
   
   /// 添加或移除表情回应
@@ -5062,7 +5105,8 @@ Avatar: ${contactAvatar ?? ''}''';
   }
 
   void _onVoicePressed() {
-    // TODO: 实现语音录制
+    // 语音录制由 ChatInputBar 内部处理（长按录音模式）
+    // 此回调仅用于接收模式切换通知
   }
 
   void _onEmojiPressed() {
@@ -5400,7 +5444,7 @@ class _CallDialogState extends State<_CallDialog> {
   
   Future<void> _initCall() async {
     // 模拟连接过程
-    // TODO: 替换为真正的 VoIP 连接
+    // TODO(backend): 替换为真正的 VoIP 连接（需要 WebRTC/LiveKit 服务）
     // 使用 VoIPService.startCall(widget.roomId, widget.isVideoCall ? CallType.video : CallType.voice)
     
     debugPrint('_CallDialog: Initiating ${widget.isVideoCall ? "video" : "voice"} call');
@@ -5464,24 +5508,24 @@ class _CallDialogState extends State<_CallDialog> {
   void _toggleMute() {
     setState(() => _isMuted = !_isMuted);
     debugPrint('_CallDialog: Mute ${_isMuted ? "on" : "off"}');
-    // TODO: voipService.toggleMute()
+    // TODO(backend): voipService.toggleMute()
   }
   
   void _toggleSpeaker() {
     setState(() => _isSpeakerOn = !_isSpeakerOn);
     debugPrint('_CallDialog: Speaker ${_isSpeakerOn ? "on" : "off"}');
-    // TODO: voipService.toggleSpeaker()
+    // TODO(backend): voipService.toggleSpeaker()
   }
   
   void _toggleCamera() {
     setState(() => _isCameraOff = !_isCameraOff);
     debugPrint('_CallDialog: Camera ${_isCameraOff ? "off" : "on"}');
-    // TODO: voipService.toggleCamera()
+    // TODO(backend): voipService.toggleCamera()
   }
   
   void _endCall() {
     debugPrint('_CallDialog: Ending call, duration: $_callDuration seconds');
-    // TODO: voipService.hangup()
+    // TODO(backend): voipService.hangup()
     widget.onEnd();
   }
 
@@ -6054,6 +6098,55 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
     }
   }
   
+  /// 搜索地点（使用 geocoding）
+  Timer? _searchDebounce;
+
+  void _searchPlaces(String query) {
+    _searchDebounce?.cancel();
+    if (query.trim().isEmpty) {
+      // 清空搜索时恢复附近地点
+      if (_currentPosition != null) {
+        setState(() => _generateNearbyPlaces(_currentPosition!));
+      }
+      return;
+    }
+
+    _searchDebounce = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        final locations = await geocoding.locationFromAddress(query);
+        if (!mounted) return;
+
+        final results = <_NearbyPlace>[];
+        for (final loc in locations.take(5)) {
+          final placemarks = await geocoding.placemarkFromCoordinates(
+            loc.latitude,
+            loc.longitude,
+          );
+          final pm = placemarks.isNotEmpty ? placemarks.first : null;
+          results.add(_NearbyPlace(
+            name: pm?.name ?? query,
+            address: [pm?.street, pm?.locality, pm?.country]
+                .where((s) => s != null && s.isNotEmpty)
+                .join(', '),
+            latitude: loc.latitude,
+            longitude: loc.longitude,
+            icon: Icons.location_on,
+            iconColor: AppColors.primary,
+          ));
+        }
+
+        if (mounted) {
+          setState(() {
+            _nearbyPlaces = results;
+            _selectedPlaceIndex = 0;
+          });
+        }
+      } catch (e) {
+        debugPrint('Place search error: $e');
+      }
+    });
+  }
+
   void _generateNearbyPlaces(Position position) {
     // 生成模拟的附近地点
     // 实际应用中应该使用地图 API 获取真实的 POI 数据
@@ -6279,7 +6372,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
                           ),
                         ),
                         onChanged: (value) {
-                          // TODO: 实现地点搜索
+                          _searchPlaces(value);
                         },
                       ),
                     ),

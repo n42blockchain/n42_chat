@@ -179,7 +179,7 @@ Future<void> _registerServices() async {
 
   // 存储管理服务
   getIt.registerLazySingleton<StorageManagerService>(
-    () => StorageManagerService(),
+    () => StorageManagerService(clientManager: getIt<MatrixClientManager>()),
   );
 }
 
@@ -316,6 +316,7 @@ void _registerRepositories() {
     () => MessageActionRepositoryImpl(
       getIt<MatrixReactionDataSource>(),
       getIt<MatrixClientManager>(),
+      getIt<SecureStorageDataSource>(),
     ),
   );
 

@@ -4305,4 +4305,78 @@ class SVi extends S {
 
   @override
   String get confirmClearCache => 'Clear all cache data?';
+
+  @override
+  String get mapView => 'Map View';
+
+  @override
+  String liveLocationSharingCount(int count) {
+    return '$count people sharing location';
+  }
+
+  @override
+  String get minutes15 => '15 minutes';
+
+  @override
+  String get minutes30 => '30 minutes';
+
+  @override
+  String get hour1 => '1 hour';
+
+  @override
+  String get hours8 => '8 hours';
+
+  @override
+  String get personalCard => 'Personal Card';
+
+  @override
+  String get downloadFailed => 'Download failed';
+
+  @override
+  String get locationExpired => 'Expired';
+
+  @override
+  String secondsRemaining(int count) {
+    return '${count}s';
+  }
+
+  @override
+  String minutesRemaining(int count) {
+    return '${count}min';
+  }
+
+  @override
+  String hoursMinutesRemaining(int hours, int minutes) {
+    return '${hours}h ${minutes}min';
+  }
+
+  @override
+  String get favoriteMessages => 'Favorites';
+
+  @override
+  String get linksCopied => 'Link copied';
+
+  @override
+  String get noLinksFound => 'No links found';
+
+  @override
+  String get roomStorageRanking => 'Room Storage Ranking';
+
+  @override
+  String get downloadComplete => 'Download complete';
+
+  @override
+  String get downloading => 'Downloading...';
+
+  @override
+  String get draftSaved => 'Draft saved';
+
+  @override
+  String get voiceRecording => 'Voice Recording';
+
+  @override
+  String get searchLocation => 'Search Location';
+
+  @override
+  String get tapToSearch => 'Tap to search';
 }
