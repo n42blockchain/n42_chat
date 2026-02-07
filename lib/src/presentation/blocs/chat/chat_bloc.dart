@@ -122,6 +122,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ClearTranslation>(_onClearTranslation);
     on<RetryPendingMessages>(_onRetryPendingMessages);
     on<ConnectionStatusChanged>(_onConnectionStatusChanged);
+    on<SendContactCardMessage>(_onSendContactCardMessage);
   }
 
   @override
@@ -2403,6 +2404,29 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           _enqueueForRetry(message.id);
         }
       }
+    }
+  }
+
+  /// 发送联系人名片消息
+  Future<void> _onSendContactCardMessage(
+    SendContactCardMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+
+    try {
+      await _messageRepository.sendCustomMessage(
+        _currentRoomId!,
+        msgType: 'n42.contact_card',
+        content: '[Contact Card] ${event.displayName}',
+        additionalData: {
+          'user_id': event.userId,
+          'display_name': event.displayName,
+          if (event.avatarUrl != null) 'avatar_url': event.avatarUrl,
+        },
+      );
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to send contact card: $e');
     }
   }
 }

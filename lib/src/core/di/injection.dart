@@ -16,6 +16,9 @@ import '../../data/datasources/matrix/matrix_search_datasource.dart';
 import '../../data/datasources/matrix/matrix_moment_datasource.dart';
 import '../../data/datasources/matrix/matrix_sticker_datasource.dart';
 import '../../data/datasources/matrix/matrix_story_datasource.dart';
+import '../services/download_service.dart';
+import '../services/url_preview_service.dart';
+import '../services/storage_manager_service.dart';
 import '../services/voice_service.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/moment_repository_impl.dart';
@@ -52,6 +55,7 @@ import '../../presentation/blocs/transfer/transfer_bloc.dart';
 import '../../presentation/blocs/moment/moment_bloc.dart';
 import '../../presentation/blocs/story/story_bloc.dart';
 import '../../presentation/blocs/thread/thread_bloc.dart';
+import '../../presentation/blocs/live_location/live_location_bloc.dart';
 import '../../presentation/blocs/voice_room/voice_room_bloc.dart';
 import '../../data/datasources/matrix/matrix_voice_room_datasource.dart';
 import '../services/username_service.dart';
@@ -161,6 +165,21 @@ Future<void> _registerServices() async {
       apiKey: config.googleTranslateApiKey,
       storageDataSource: getIt<SecureStorageDataSource>(),
     ),
+  );
+
+  // 下载服务
+  getIt.registerLazySingleton<DownloadService>(
+    () => DownloadService(),
+  );
+
+  // URL 预览服务
+  getIt.registerLazySingleton<UrlPreviewService>(
+    () => UrlPreviewService(),
+  );
+
+  // 存储管理服务
+  getIt.registerLazySingleton<StorageManagerService>(
+    () => StorageManagerService(),
   );
 }
 
@@ -404,6 +423,13 @@ void _registerBlocs() {
   getIt.registerFactory<ThreadBloc>(
     () => ThreadBloc(
       messageRepository: getIt<IMessageRepository>(),
+    ),
+  );
+
+  // 实时位置 BLoC
+  getIt.registerFactory<LiveLocationBloc>(
+    () => LiveLocationBloc(
+      messageDataSource: getIt<MatrixMessageDataSource>(),
     ),
   );
 

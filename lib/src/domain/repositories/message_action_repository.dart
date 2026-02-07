@@ -87,5 +87,11 @@ abstract class IMessageActionRepository {
 
   /// 检查消息是否已收藏
   Future<bool> isMessageSaved(String messageId);
+
+  /// 编辑收藏标签
+  Future<void> editFavoriteTags(String favoriteId, List<String> tags);
+
+  /// 编辑收藏备注
+  Future<void> editFavoriteRemark(String favoriteId, String remark);
 }
 

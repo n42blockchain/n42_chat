@@ -5,6 +5,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
+import 'chat_background_page.dart';
 
 /// 外观设置页面
 class AppearanceSettingsPage extends StatefulWidget {
@@ -60,6 +61,41 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           // 字体大小设置
           _buildSectionHeader(l10n?.settingsFontSize ?? 'Font Size', isDark),
           _buildFontSizeSection(context, isDark),
+
+          const SizedBox(height: 24),
+
+          // 聊天背景
+          _buildSectionHeader(l10n?.chatBackground ?? 'Chat Background', isDark),
+          Container(
+            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            child: ListTile(
+              leading: const Icon(Icons.wallpaper),
+              title: Text(
+                l10n?.chatBackground ?? 'Chat Background',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                ),
+              ),
+              trailing: Icon(
+                Icons.chevron_right,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ChatBackgroundPage(),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // 字体大小滑块
+          _buildSectionHeader(l10n?.settingsFontSizeSlider ?? 'Font Size Adjustment', isDark),
+          _buildFontSizeSliderSection(context, isDark),
 
           const SizedBox(height: 24),
 
@@ -225,6 +261,98 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
       onTap: () {
         _updateSettings(_settings.copyWith(fontSize: value));
       },
+    );
+  }
+
+  Widget _buildFontSizeSliderSection(BuildContext context, bool isDark) {
+    // 将 FontSize 枚举映射到 slider 值 (0-3)
+    double sliderValue;
+    switch (_settings.fontSize) {
+      case FontSize.small:
+        sliderValue = 0;
+        break;
+      case FontSize.medium:
+        sliderValue = 1;
+        break;
+      case FontSize.large:
+        sliderValue = 2;
+        break;
+      case FontSize.extraLarge:
+        sliderValue = 3;
+        break;
+    }
+
+    final l10n = S.of(context);
+    final labels = [
+      l10n?.settingsFontSizeSmall ?? 'Small',
+      l10n?.settingsFontSizeStandard ?? 'Standard',
+      l10n?.settingsFontSizeLarge ?? 'Large',
+      l10n?.settingsFontSizeExtraLarge ?? 'Extra Large',
+    ];
+
+    return Container(
+      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            labels[sliderValue.round()],
+            style: TextStyle(
+              fontSize: 14 + sliderValue.round() * 2.0,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Slider(
+            value: sliderValue,
+            min: 0,
+            max: 3,
+            divisions: 3,
+            label: labels[sliderValue.round()],
+            activeColor: AppColors.primary,
+            onChanged: (value) {
+              FontSize fontSize;
+              switch (value.round()) {
+                case 0:
+                  fontSize = FontSize.small;
+                  break;
+                case 1:
+                  fontSize = FontSize.medium;
+                  break;
+                case 2:
+                  fontSize = FontSize.large;
+                  break;
+                case 3:
+                  fontSize = FontSize.extraLarge;
+                  break;
+                default:
+                  fontSize = FontSize.medium;
+              }
+              _updateSettings(_settings.copyWith(fontSize: fontSize));
+            },
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'A',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                ),
+              ),
+              Text(
+                'A',
+                style: TextStyle(
+                  fontSize: 22,
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

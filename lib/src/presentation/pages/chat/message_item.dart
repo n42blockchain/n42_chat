@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
+import '../../../core/services/url_preview_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
 import '../../widgets/chat/message_status_indicator.dart' as indicator;
 import '../../widgets/chat/chat_widgets.dart';
+import '../../widgets/chat/contact_card_message_widget.dart';
+import '../../widgets/chat/url_preview_widget.dart';
 import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/chat/message_reaction_bar.dart';
 import '../../widgets/chat/edit_history_sheet.dart';
@@ -268,6 +272,9 @@ class MessageItem extends StatelessWidget {
       case MessageType.music:
         content = _buildMusicMessage(isDark, context);
         break;
+      case MessageType.contactCard:
+        content = _buildContactCardWidget(context);
+        break;
       case MessageType.encrypted:
         content = _buildEncryptedMessage(isDark);
         break;
@@ -384,6 +391,9 @@ class MessageItem extends StatelessWidget {
       ),
     );
 
+    // 检测消息中的 URL，用于显示预览
+    final urlMatch = RegExp(r'https?://\S+').firstMatch(message.content);
+
     // 如果消息被编辑过，在文字下方显示 "已编辑" 标签
     if (message.isEdited) {
       return Column(
@@ -404,6 +414,26 @@ class MessageItem extends StatelessWidget {
                 fontStyle: FontStyle.italic,
               ),
             ),
+          ),
+          if (urlMatch != null)
+            UrlPreviewWidget(
+              url: urlMatch.group(0)!,
+              previewService: getIt<UrlPreviewService>(),
+            ),
+        ],
+      );
+    }
+
+    // 如果有 URL，在文本下方显示 URL 预览
+    if (urlMatch != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          textWidget,
+          UrlPreviewWidget(
+            url: urlMatch.group(0)!,
+            previewService: getIt<UrlPreviewService>(),
           ),
         ],
       );
@@ -476,6 +506,51 @@ class MessageItem extends StatelessWidget {
       debugPrint('Parse contact card error: $e');
     }
     return null;
+  }
+
+  /// 构建名片消息（使用 ContactCardMessageWidget）
+  /// 用于 MessageType.contactCard 类型消息
+  Widget _buildContactCardWidget(BuildContext context) {
+    // 优先从多行格式解析（兼容旧格式）
+    final cardInfo = _parseContactCard(message.content);
+
+    String contactId;
+    String displayName;
+    String? avatarUrl;
+
+    if (cardInfo != null) {
+      contactId = cardInfo['id'] ?? '';
+      displayName = cardInfo['name'] ?? (S.of(context)?.chatUnknownContact ?? 'Unknown Contact');
+      avatarUrl = cardInfo['avatar'];
+    } else {
+      // 从 body 格式 "[Contact Card] displayName" 中解析
+      final body = message.content;
+      if (body.startsWith('[Contact Card] ')) {
+        displayName = body.substring('[Contact Card] '.length).trim();
+      } else if (body.startsWith('[')) {
+        // 其他本地化格式，尝试提取 ] 之后的内容
+        final bracketEnd = body.indexOf(']');
+        displayName = bracketEnd >= 0 && bracketEnd < body.length - 1
+            ? body.substring(bracketEnd + 1).trim()
+            : body;
+      } else {
+        displayName = body.isNotEmpty ? body : (S.of(context)?.chatUnknownContact ?? 'Unknown Contact');
+      }
+      contactId = '';
+      avatarUrl = null;
+    }
+
+    return ContactCardMessageWidget(
+      userId: contactId,
+      displayName: displayName,
+      avatarUrl: avatarUrl,
+      isFromMe: message.isFromMe,
+      onTap: () {
+        if (contactId.isNotEmpty && onContactCardTap != null) {
+          onContactCardTap!(contactId, displayName, avatarUrl);
+        }
+      },
+    );
   }
 
   /// 构建名片消息（微信风格）

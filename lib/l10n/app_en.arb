@@ -1991,5 +1991,37 @@
   "tokenGateYourBalance": "Your balance",
   "tokenGateRulesActive": "rules active",
   "tokenGateDisabled": "Disabled",
-  "ensNotBound": "Not bound"
+  "ensNotBound": "Not bound",
+
+  "liveLocation": "Live Location",
+  "stopLiveLocation": "Stop Sharing",
+  "startLiveLocation": "Start Sharing",
+  "selectDuration": "Select Duration",
+
+  "groupChatFiles": "Chat Files",
+  "groupLinks": "Links",
+  "groupNoLinks": "No links yet",
+
+  "chatBackground": "Chat Background",
+  "solidColors": "Solid Colors",
+  "gradients": "Gradients",
+  "defaultBackground": "Default",
+  "settingsFontSizeSlider": "Font Size",
+
+  "autoDownload": "Auto-Download",
+  "images": "Images",
+  "voice": "Voice",
+  "video": "Video",
+  "files": "Files",
+  "mobileData": "Mobile Data",
+  "roaming": "Roaming",
+
+  "storageManagement": "Storage",
+  "totalUsage": "Total Usage",
+  "cache": "Cache",
+  "other": "Other",
+  "clearCache": "Clear Cache",
+  "cacheCleared": "Cache cleared",
+  "clearCacheFailed": "Failed to clear cache",
+  "confirmClearCache": "Clear all cache data?"
 }

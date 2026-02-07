@@ -2166,5 +2166,37 @@
   "tokenGateYourBalance": "你的余额",
   "tokenGateRulesActive": "条规则生效",
   "tokenGateDisabled": "未启用",
-  "ensNotBound": "未绑定"
+  "ensNotBound": "未绑定",
+
+  "liveLocation": "实时位置",
+  "stopLiveLocation": "停止共享",
+  "startLiveLocation": "开始共享",
+  "selectDuration": "选择共享时长",
+
+  "groupChatFiles": "聊天文件",
+  "groupLinks": "链接",
+  "groupNoLinks": "暂无链接",
+
+  "chatBackground": "聊天背景",
+  "solidColors": "纯色",
+  "gradients": "渐变",
+  "defaultBackground": "默认",
+  "settingsFontSizeSlider": "字体大小",
+
+  "autoDownload": "自动下载",
+  "images": "图片",
+  "voice": "语音",
+  "video": "视频",
+  "files": "文件",
+  "mobileData": "移动数据",
+  "roaming": "漫游",
+
+  "storageManagement": "存储管理",
+  "totalUsage": "总用量",
+  "cache": "缓存",
+  "other": "其他",
+  "clearCache": "清理缓存",
+  "cacheCleared": "缓存已清除",
+  "clearCacheFailed": "清理缓存失败",
+  "confirmClearCache": "确认清理所有缓存数据？"
 }

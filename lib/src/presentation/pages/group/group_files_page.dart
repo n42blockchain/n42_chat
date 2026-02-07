@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/services/download_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/group_file_entity.dart';
+import '../../../domain/repositories/message_repository.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 群文件页面
@@ -11,10 +14,14 @@ class GroupFilesPage extends StatefulWidget {
   final String roomId;
   final String groupName;
 
+  /// 嵌入模式：为 true 时不显示 Scaffold+AppBar，仅返回内容部分
+  final bool embedded;
+
   const GroupFilesPage({
     super.key,
     required this.roomId,
     required this.groupName,
+    this.embedded = false,
   });
 
   @override
@@ -23,6 +30,9 @@ class GroupFilesPage extends StatefulWidget {
 
 class _GroupFilesPageState extends State<GroupFilesPage>
     with SingleTickerProviderStateMixin {
+  final IMessageRepository _messageRepository = GetIt.instance<IMessageRepository>();
+  final DownloadService _downloadService = GetIt.instance<DownloadService>();
+
   late TabController _tabController;
   List<GroupFileEntity> _files = [];
   bool _isLoading = true;
@@ -71,12 +81,24 @@ class _GroupFilesPageState extends State<GroupFilesPage>
       _error = null;
     });
 
-    // TODO: implement getRoomFiles in IMessageRepository
-    if (mounted) {
-      setState(() {
-        _files = [];
-        _isLoading = false;
-      });
+    try {
+      final files = await _messageRepository.getRoomFiles(
+        widget.roomId,
+        type: _currentFilter,
+      );
+      if (mounted) {
+        setState(() {
+          _files = files;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -85,12 +107,42 @@ class _GroupFilesPageState extends State<GroupFilesPage>
     return _files.where((f) => f.fileType == _currentFilter).toList();
   }
 
+  Widget _buildTabBar(BuildContext context) {
+    final isDark = context.isDarkMode;
+    return TabBar(
+      controller: _tabController,
+      labelColor: AppColors.primary,
+      unselectedLabelColor:
+          isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+      indicatorColor: AppColors.primary,
+      tabs: [
+        Tab(text: S.of(context)?.commonAll ?? 'All'),
+        Tab(text: S.of(context)?.groupDocuments ?? 'Docs'),
+        Tab(text: S.of(context)?.groupImages ?? 'Images'),
+        Tab(text: S.of(context)?.groupVideos ?? 'Videos'),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+
+    // 嵌入模式：不显示 Scaffold+AppBar，仅返回 TabBar + body
+    if (widget.embedded) {
+      return Column(
+        children: [
+          Material(
+            color: cardColor,
+            child: _buildTabBar(context),
+          ),
+          Expanded(child: _buildBody(cardColor, textColor)),
+        ],
+      );
+    }
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -109,18 +161,9 @@ class _GroupFilesPageState extends State<GroupFilesPage>
           icon: Icon(Icons.arrow_back, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppColors.primary,
-          unselectedLabelColor:
-              isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-          indicatorColor: AppColors.primary,
-          tabs: [
-            Tab(text: S.of(context)?.commonAll ?? 'All'),
-            Tab(text: S.of(context)?.groupDocuments ?? 'Docs'),
-            Tab(text: S.of(context)?.groupImages ?? 'Images'),
-            Tab(text: S.of(context)?.groupVideos ?? 'Videos'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(46),
+          child: _buildTabBar(context),
         ),
       ),
       body: _buildBody(cardColor, textColor),
@@ -285,18 +328,54 @@ class _GroupFilesPageState extends State<GroupFilesPage>
   }
 
   void _openFile(GroupFileEntity file) {
-    debugPrint('Open file: ${file.name}');
-    // TODO: 实现文件预览
+    if (file.httpUrl != null) {
+      // 对于图片和视频，可以使用媒体预览
+      if (file.isImage || file.isVideo) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => Scaffold(
+              appBar: AppBar(title: Text(file.name)),
+              body: Center(
+                child: file.isImage
+                    ? InteractiveViewer(
+                        child: Image.network(file.httpUrl!),
+                      )
+                    : const Icon(Icons.videocam, size: 64),
+              ),
+            ),
+          ),
+        );
+      }
+    }
   }
 
-  void _downloadFile(GroupFileEntity file) {
-    debugPrint('Download file: ${file.name}');
-    // TODO: 实现文件下载
+  void _downloadFile(GroupFileEntity file) async {
+    if (file.httpUrl == null) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
             S.of(context)?.groupDownloadStarted(file.name) ?? 'Downloading ${file.name}...'),
       ),
     );
+
+    try {
+      final downloadDir = await DownloadService.getDownloadDirectory();
+      final savePath = '$downloadDir/${file.name}';
+      await _downloadService.download(
+        url: file.httpUrl!,
+        savePath: savePath,
+        fileName: file.name,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Download failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

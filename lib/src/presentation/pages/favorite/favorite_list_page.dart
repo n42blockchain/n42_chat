@@ -1,99 +1,41 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../domain/entities/favorite_entity.dart';
+import '../../../domain/entities/message_entity.dart';
+import '../../../domain/repositories/message_action_repository.dart';
+import '../../blocs/favorite/favorite_bloc.dart';
+import '../../blocs/favorite/favorite_event.dart';
+import '../../blocs/favorite/favorite_state.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 收藏列表页面
-class FavoriteListPage extends StatefulWidget {
+class FavoriteListPage extends StatelessWidget {
   const FavoriteListPage({super.key});
 
   @override
-  State<FavoriteListPage> createState() => _FavoriteListPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => FavoriteBloc(
+        repository: GetIt.instance<IMessageActionRepository>(),
+      )..add(const LoadFavorites()),
+      child: const _FavoriteListView(),
+    );
+  }
 }
 
-class _FavoriteListPageState extends State<FavoriteListPage> {
-  // 模拟收藏数据
-  final List<FavoriteEntity> _favorites = [
-    FavoriteEntity(
-      id: '1',
-      type: FavoriteType.text,
-      content: '这是一条收藏的文本消息，可以是任何重要的信息内容，方便以后查看。',
-      sourceSenderName: '张三',
-      sourceRoomName: '工作群',
-      createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-    ),
-    FavoriteEntity(
-      id: '2',
-      type: FavoriteType.image,
-      content: '图片',
-      mediaUrl: 'https://picsum.photos/400/300',
-      thumbnailUrl: 'https://picsum.photos/200/150',
-      sourceSenderName: '李四',
-      sourceRoomName: '朋友圈',
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    FavoriteEntity(
-      id: '3',
-      type: FavoriteType.link,
-      content: 'Flutter官方文档 - 构建漂亮的原生应用',
-      mediaUrl: 'https://flutter.dev',
-      sourceSenderName: '技术分享',
-      createdAt: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-    FavoriteEntity(
-      id: '4',
-      type: FavoriteType.file,
-      content: '项目需求文档.pdf',
-      fileName: '项目需求文档.pdf',
-      fileSize: 2048000,
-      sourceSenderName: '王五',
-      sourceRoomName: '项目组',
-      createdAt: DateTime.now().subtract(const Duration(days: 5)),
-    ),
-    FavoriteEntity(
-      id: '5',
-      type: FavoriteType.note,
-      content: '个人笔记：\n1. 完成首页UI设计\n2. 对接API接口\n3. 测试和修复Bug',
-      createdAt: DateTime.now().subtract(const Duration(days: 7)),
-    ),
-    FavoriteEntity(
-      id: '6',
-      type: FavoriteType.voice,
-      content: '语音消息 0:15',
-      sourceSenderName: '赵六',
-      createdAt: DateTime.now().subtract(const Duration(days: 10)),
-    ),
-  ];
-  
-  FavoriteType? _filterType;
-  String _searchQuery = '';
-  
-  List<FavoriteEntity> get _filteredFavorites {
-    var list = _favorites;
-    
-    if (_filterType != null) {
-      list = list.where((f) => f.type == _filterType).toList();
-    }
-    
-    if (_searchQuery.isNotEmpty) {
-      list = list.where((f) => 
-        f.content.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-        (f.sourceSenderName?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false)
-      ).toList();
-    }
-    
-    return list;
-  }
+class _FavoriteListView extends StatelessWidget {
+  const _FavoriteListView();
 
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    
+
     return Scaffold(
       backgroundColor: bgColor,
       appBar: N42AppBar(
@@ -101,113 +43,142 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: _showSearch,
-          ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _showAddOptions,
+            onPressed: () => _showSearch(context),
           ),
         ],
       ),
       body: Column(
         children: [
           // 类型筛选
-          _buildFilterBar(isDark),
-          
+          _buildFilterBar(context, isDark),
+
           // 收藏列表
           Expanded(
-            child: _filteredFavorites.isEmpty
-                ? _buildEmptyState(isDark)
-                : ListView.builder(
-                    itemCount: _filteredFavorites.length,
+            child: BlocBuilder<FavoriteBloc, FavoriteState>(
+              builder: (context, state) {
+                if (state.isLoading) {
+                  return const Center(child: N42Loading());
+                }
+
+                if (state.error != null) {
+                  return Center(
+                    child: N42EmptyState.error(
+                      title: S.of(context)?.commonLoadFailed ?? 'Load failed',
+                      description: state.error,
+                      buttonText: S.of(context)?.commonRetry ?? 'Retry',
+                      onButtonPressed: () {
+                        context.read<FavoriteBloc>().add(const LoadFavorites());
+                      },
+                    ),
+                  );
+                }
+
+                final favorites = state.filteredFavorites;
+                if (favorites.isEmpty) {
+                  return _buildEmptyState(context, isDark);
+                }
+
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    context.read<FavoriteBloc>().add(const LoadFavorites());
+                  },
+                  child: ListView.builder(
+                    itemCount: favorites.length,
                     itemBuilder: (context, index) {
                       return _buildFavoriteItem(
                         context,
-                        _filteredFavorites[index],
+                        favorites[index],
                         isDark,
                       );
                     },
                   ),
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
-  
-  Widget _buildFilterBar(bool isDark) {
-    final types = [
-      null, // All
-      FavoriteType.text,
-      FavoriteType.image,
-      FavoriteType.link,
-      FavoriteType.file,
-      FavoriteType.note,
+
+  Widget _buildFilterBar(BuildContext context, bool isDark) {
+    final filters = [
+      (null, S.of(context)?.commonAll ?? 'All'),
+      ('text', S.of(context)?.favoriteText ?? 'Text'),
+      ('image', S.of(context)?.commonImage ?? 'Image'),
+      ('link', S.of(context)?.favoriteLinkLabel ?? 'Link'),
+      ('file', S.of(context)?.commonFile ?? 'File'),
+      ('video', 'Video'),
     ];
 
-    final typeLabels = {
-      null: S.of(context)?.commonAll ?? 'All',
-      FavoriteType.text: S.of(context)?.favoriteText ?? 'Text',
-      FavoriteType.image: S.of(context)?.commonImage ?? 'Image',
-      FavoriteType.link: S.of(context)?.favoriteLinkLabel ?? 'Link',
-      FavoriteType.file: S.of(context)?.commonFile ?? 'File',
-      FavoriteType.note: S.of(context)?.favoriteNote ?? 'Note',
-    };
-    
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
-        border: Border(
-          bottom: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
-            width: 0.5,
-          ),
-        ),
-      ),
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: types.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final type = types[index];
-          final isSelected = _filterType == type;
-          
-          return GestureDetector(
-            onTap: () {
-              setState(() => _filterType = type);
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.1)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                typeLabels[type] ?? (S.of(context)?.commonAll ?? 'All'),
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isSelected
-                      ? AppColors.primary
-                      : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
+    return BlocBuilder<FavoriteBloc, FavoriteState>(
+      buildWhen: (prev, curr) => prev.filterType != curr.filterType,
+      builder: (context, state) {
+        return Container(
+          height: 44,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            border: Border(
+              bottom: BorderSide(
+                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                width: 0.5,
               ),
             ),
-          );
-        },
-      ),
+          ),
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: filters.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final (type, label) = filters[index];
+              final isSelected = state.filterType == type;
+
+              return GestureDetector(
+                onTap: () {
+                  context.read<FavoriteBloc>().add(ChangeFavoriteFilter(type));
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primary.withValues(alpha: 0.1)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isSelected
+                          ? AppColors.primary
+                          : (isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondary),
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
-  
-  Widget _buildFavoriteItem(BuildContext context, FavoriteEntity favorite, bool isDark) {
+
+  Widget _buildFavoriteItem(
+    BuildContext context,
+    MessageEntity favorite,
+    bool isDark,
+  ) {
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? Colors.white : AppColors.textPrimary;
-    final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
+    final subtitleColor =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -217,8 +188,7 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => _openFavoriteDetail(favorite),
-          onLongPress: () => _showFavoriteOptions(favorite),
+          onLongPress: () => _showFavoriteOptions(context, favorite),
           borderRadius: BorderRadius.circular(8),
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -226,56 +196,37 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 内容
-                _buildFavoriteContent(favorite, textColor, isDark),
-                
+                Text(
+                  favorite.content,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: textColor,
+                    height: 1.4,
+                  ),
+                ),
+
                 const SizedBox(height: 8),
-                
+
                 // 来源和时间
                 Row(
                   children: [
-                    // 类型图标
-                    Text(
-                      favorite.typeIcon,
-                      style: const TextStyle(fontSize: 12),
+                    Icon(
+                      _getTypeIcon(favorite.type),
+                      size: 14,
+                      color: subtitleColor,
                     ),
                     const SizedBox(width: 4),
-                    
-                    // 来源
-                    if (favorite.sourceSenderName != null) ...[
-                      Text(
-                        favorite.sourceSenderName!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: subtitleColor,
-                        ),
-                      ),
-                      if (favorite.sourceRoomName != null) ...[
-                        Text(
-                          ' · ',
-                          style: TextStyle(color: subtitleColor),
-                        ),
-                        Text(
-                          favorite.sourceRoomName!,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: subtitleColor,
-                          ),
-                        ),
-                      ],
-                    ] else
-                      Text(
-                        S.of(context)?.favoriteMyNotes ?? 'My Notes',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: subtitleColor,
-                        ),
-                      ),
-                    
-                    const Spacer(),
-                    
-                    // 时间
                     Text(
-                      _formatTime(favorite.createdAt),
+                      favorite.senderName,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: subtitleColor,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      _formatTime(context, favorite.timestamp),
                       style: TextStyle(
                         fontSize: 12,
                         color: subtitleColor,
@@ -290,181 +241,26 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
       ),
     );
   }
-  
-  Widget _buildFavoriteContent(FavoriteEntity favorite, Color textColor, bool isDark) {
-    switch (favorite.type) {
-      case FavoriteType.image:
-        return Row(
-          children: [
-            if (favorite.thumbnailUrl != null)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: CachedNetworkImage(
-                  imageUrl: favorite.thumbnailUrl!,
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(
-                    color: Colors.grey[300],
-                  ),
-                  errorWidget: (_, __, ___) => Container(
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.image, color: Colors.grey),
-                  ),
-                ),
-              ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                favorite.content,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: textColor),
-              ),
-            ),
-          ],
-        );
-        
-      case FavoriteType.file:
-        return Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Icon(
-                Icons.insert_drive_file,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    favorite.fileName ?? favorite.content,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: textColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  if (favorite.fileSize != null)
-                    Text(
-                      _formatFileSize(favorite.fileSize!),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        );
-        
-      case FavoriteType.link:
-        return Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Colors.blue.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Icon(
-                Icons.link,
-                color: Colors.blue,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    favorite.content,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: textColor),
-                  ),
-                  if (favorite.mediaUrl != null)
-                    Text(
-                      favorite.mediaUrl!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.blue,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        );
-        
-      case FavoriteType.voice:
-        return Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Colors.orange.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Icon(
-                Icons.mic,
-                color: Colors.orange,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              favorite.content,
-              style: TextStyle(color: textColor),
-            ),
-          ],
-        );
-        
-      case FavoriteType.note:
-        return Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFFBE6),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            favorite.content,
-            maxLines: 4,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Color(0xFF8B7355),
-              height: 1.5,
-            ),
-          ),
-        );
-        
+
+  IconData _getTypeIcon(MessageType type) {
+    switch (type) {
+      case MessageType.text:
+        return Icons.text_fields;
+      case MessageType.image:
+        return Icons.image;
+      case MessageType.video:
+        return Icons.videocam;
+      case MessageType.file:
+        return Icons.insert_drive_file;
+      case MessageType.voice:
+      case MessageType.audio:
+        return Icons.mic;
       default:
-        return Text(
-          favorite.content,
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: textColor,
-            height: 1.4,
-          ),
-        );
+        return Icons.star;
     }
   }
-  
-  Widget _buildEmptyState(bool isDark) {
+
+  Widget _buildEmptyState(BuildContext context, bool isDark) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -472,19 +268,24 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
           Icon(
             Icons.star_border,
             size: 64,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
           const SizedBox(height: 16),
           Text(
             S.of(context)?.favoriteNoFavorites ?? 'No favorites yet',
             style: TextStyle(
               fontSize: 16,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            S.of(context)?.favoriteLongPressToFavorite ?? 'Long press message to favorite',
+            S.of(context)?.favoriteLongPressToFavorite ??
+                'Long press message to favorite',
             style: const TextStyle(
               fontSize: 14,
               color: AppColors.textTertiary,
@@ -494,76 +295,68 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
       ),
     );
   }
-  
-  void _showSearch() {
-    showSearch(
+
+  void _showSearch(BuildContext context) {
+    // 通过 BLoC 搜索
+    showDialog<void>(
       context: context,
-      delegate: _FavoriteSearchDelegate(_favorites),
-    );
-  }
-  
-  void _showAddOptions() {
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.note_add),
-              title: Text(S.of(context)?.favoriteNewNote ?? 'New Note'),
-              onTap: () {
-                Navigator.pop(ctx);
-                _createNote();
-              },
+      builder: (dialogContext) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: Text(S.of(context)?.commonSearch ?? 'Search'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: S.of(context)?.commonSearch ?? 'Search',
+              border: const OutlineInputBorder(),
             ),
-            ListTile(
-              leading: const Icon(Icons.link),
-              title: Text(S.of(context)?.favoriteLink ?? 'Favorite Link'),
-              onTap: () {
-                Navigator.pop(ctx);
-                _addLink();
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                context
+                    .read<FavoriteBloc>()
+                    .add(SearchFavorites(controller.text));
               },
+              child: Text(S.of(context)?.commonConfirm ?? 'OK'),
             ),
           ],
-        ),
-      ),
-    );
-  }
-  
-  void _openFavoriteDetail(FavoriteEntity favorite) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context)?.favoriteOpenItem(favorite.content) ?? 'Open: ${favorite.content}')),
+        );
+      },
     );
   }
 
-  void _showFavoriteOptions(FavoriteEntity favorite) {
+  void _showFavoriteOptions(BuildContext context, MessageEntity favorite) {
     showModalBottomSheet<void>(
       context: context,
-      builder: (ctx) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: Text(S.of(context)?.favoriteEditTags ?? 'Edit Tags'),
-              onTap: () {
-                Navigator.pop(ctx);
-              },
-            ),
             ListTile(
               leading: const Icon(Icons.share),
               title: Text(S.of(context)?.commonForward ?? 'Forward'),
               onTap: () {
-                Navigator.pop(ctx);
+                Navigator.pop(sheetContext);
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: Text(S.of(context)?.commonDelete ?? 'Delete', style: const TextStyle(color: Colors.red)),
+              title: Text(
+                S.of(context)?.commonDelete ?? 'Delete',
+                style: const TextStyle(color: Colors.red),
+              ),
               onTap: () {
-                Navigator.pop(ctx);
-                _deleteFavorite(favorite);
+                Navigator.pop(sheetContext);
+                context
+                    .read<FavoriteBloc>()
+                    .add(DeleteFavorite(favorite.id));
               },
             ),
           ],
@@ -571,48 +364,8 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
       ),
     );
   }
-  
-  void _createNote() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context)?.favoriteNewNoteComingSoon ?? 'New note feature coming soon')),
-    );
-  }
 
-  void _addLink() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context)?.favoriteAddLinkComingSoon ?? 'Add link feature coming soon')),
-    );
-  }
-
-  void _deleteFavorite(FavoriteEntity favorite) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.favoriteDeleteFavorite ?? 'Delete Favorite'),
-        content: Text(S.of(context)?.favoriteDeleteFavoriteConfirm ?? 'Are you sure you want to delete this favorite?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              setState(() {
-                _favorites.removeWhere((f) => f.id == favorite.id);
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(S.of(context)?.favoriteDeleted ?? 'Deleted')),
-              );
-            },
-            child: Text(S.of(context)?.commonDelete ?? 'Delete', style: const TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  String _formatTime(DateTime time) {
+  String _formatTime(BuildContext context, DateTime time) {
     final now = DateTime.now();
     final diff = now.difference(time);
 
@@ -621,82 +374,11 @@ class _FavoriteListPageState extends State<FavoriteListPage> {
     } else if (diff.inDays == 1) {
       return S.of(context)?.favoriteYesterday ?? 'Yesterday';
     } else if (diff.inDays < 7) {
-      return S.of(context)?.favoriteDaysAgoText(diff.inDays) ?? '${diff.inDays} days ago';
+      return S.of(context)?.favoriteDaysAgoText(diff.inDays) ??
+          '${diff.inDays} days ago';
     } else {
-      return S.of(context)?.favoriteDateFormat(time.month, time.day) ?? '${time.month}/${time.day}';
+      return S.of(context)?.favoriteDateFormat(time.month, time.day) ??
+          '${time.month}/${time.day}';
     }
   }
-  
-  String _formatFileSize(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-  }
 }
-
-class _FavoriteSearchDelegate extends SearchDelegate<FavoriteEntity?> {
-  final List<FavoriteEntity> favorites;
-  
-  _FavoriteSearchDelegate(this.favorites);
-  
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: const Icon(Icons.clear),
-        onPressed: () => query = '',
-      ),
-    ];
-  }
-  
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.arrow_back),
-      onPressed: () => close(context, null),
-    );
-  }
-  
-  @override
-  Widget buildResults(BuildContext context) {
-    return _buildSearchResults(context);
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return _buildSearchResults(context);
-  }
-
-  Widget _buildSearchResults(BuildContext context) {
-    final results = favorites.where((f) =>
-      f.content.toLowerCase().contains(query.toLowerCase()) ||
-      (f.sourceSenderName?.toLowerCase().contains(query.toLowerCase()) ?? false)
-    ).toList();
-
-    if (results.isEmpty) {
-      return Center(
-        child: Text(S.of(context)?.favoriteNoSearchResultsFound ?? 'No results found'),
-      );
-    }
-    
-    return ListView.builder(
-      itemCount: results.length,
-      itemBuilder: (context, index) {
-        final favorite = results[index];
-        return ListTile(
-          leading: Text(favorite.typeIcon, style: const TextStyle(fontSize: 24)),
-          title: Text(
-            favorite.content,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          subtitle: favorite.sourceSenderName != null
-              ? Text(favorite.sourceSenderName!)
-              : null,
-          onTap: () => close(context, favorite),
-        );
-      },
-    );
-  }
-}
-
