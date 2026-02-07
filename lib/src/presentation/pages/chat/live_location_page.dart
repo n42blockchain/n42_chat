@@ -85,7 +85,7 @@ class _LiveLocationView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      '地图视图',
+                      S.of(context)?.mapView ?? 'Map View',
                       style: TextStyle(
                         color: isDark ? Colors.white38 : Colors.black26,
                         fontSize: 16,
@@ -94,7 +94,7 @@ class _LiveLocationView extends StatelessWidget {
                     if (state.activeSharings.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Text(
-                        '${state.activeSharings.length} 人正在共享位置',
+                        S.of(context)?.liveLocationSharingCount(state.activeSharings.length) ?? '${state.activeSharings.length} people sharing location',
                         style: TextStyle(
                           color: AppColors.primary,
                           fontSize: 14,
@@ -206,7 +206,7 @@ class _LiveLocationView extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        location.formattedRemaining,
+        _formatRemaining(context, location),
         style: TextStyle(
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
           fontSize: 12,
@@ -218,6 +218,23 @@ class _LiveLocationView extends StatelessWidget {
         size: 20,
       ),
     );
+  }
+
+  String _formatRemaining(BuildContext context, LiveLocationEntity location) {
+    final data = location.remainingTimeData;
+    final l10n = S.of(context);
+    switch (data.type) {
+      case 'expired':
+        return l10n?.locationExpired ?? 'Expired';
+      case 'seconds':
+        return l10n?.secondsRemaining(data.values[0]) ?? '${data.values[0]}s';
+      case 'minutes':
+        return l10n?.minutesRemaining(data.values[0]) ?? '${data.values[0]}min';
+      case 'hoursMinutes':
+        return l10n?.hoursMinutesRemaining(data.values[0], data.values[1]) ?? '${data.values[0]}h ${data.values[1]}min';
+      default:
+        return '';
+    }
   }
 
   void _showDurationPicker(BuildContext context) {
@@ -238,7 +255,7 @@ class _LiveLocationView extends StatelessWidget {
               ),
             ),
             ListTile(
-              title: const Text('15 分钟'),
+              title: Text(S.of(context)?.minutes15 ?? '15 minutes'),
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(
@@ -247,7 +264,7 @@ class _LiveLocationView extends StatelessWidget {
               },
             ),
             ListTile(
-              title: const Text('30 分钟'),
+              title: Text(S.of(context)?.minutes30 ?? '30 minutes'),
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(
@@ -256,7 +273,7 @@ class _LiveLocationView extends StatelessWidget {
               },
             ),
             ListTile(
-              title: const Text('1 小时'),
+              title: Text(S.of(context)?.hour1 ?? '1 hour'),
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(
@@ -265,7 +282,7 @@ class _LiveLocationView extends StatelessWidget {
               },
             ),
             ListTile(
-              title: const Text('8 小时'),
+              title: Text(S.of(context)?.hours8 ?? '8 hours'),
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(

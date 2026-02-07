@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_background_presets.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 
 /// 聊天背景设置页
@@ -19,24 +20,6 @@ class ChatBackgroundPage extends StatefulWidget {
 class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
   final SecureStorageDataSource _storage = GetIt.instance<SecureStorageDataSource>();
   String? _selectedBackground;
-
-  static const List<Color> _solidColors = [
-    Color(0xFFEDEDED),
-    Color(0xFFD6E4F0),
-    Color(0xFFD4EDDA),
-    Color(0xFFFFF3CD),
-    Color(0xFFF8D7DA),
-    Color(0xFFE2D9F3),
-    Color(0xFFD1ECF1),
-    Color(0xFF343A40),
-  ];
-
-  static const List<List<Color>> _gradients = [
-    [Color(0xFF667EEA), Color(0xFF764BA2)],
-    [Color(0xFFF093FB), Color(0xFFF5576C)],
-    [Color(0xFF4FACFE), Color(0xFF00F2FE)],
-    [Color(0xFF43E97B), Color(0xFF38F9D7)],
-  ];
 
   @override
   void initState() {
@@ -155,7 +138,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
     return Wrap(
       spacing: 12,
       runSpacing: 12,
-      children: _solidColors.asMap().entries.map((entry) {
+      children: ChatBackgroundPresets.solidColors.asMap().entries.map((entry) {
         final colorKey = 'solid_${entry.key}';
         final isSelected = _selectedBackground == colorKey;
 
@@ -187,7 +170,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
     return Wrap(
       spacing: 12,
       runSpacing: 12,
-      children: _gradients.asMap().entries.map((entry) {
+      children: ChatBackgroundPresets.gradients.asMap().entries.map((entry) {
         final gradientKey = 'gradient_${entry.key}';
         final isSelected = _selectedBackground == gradientKey;
 

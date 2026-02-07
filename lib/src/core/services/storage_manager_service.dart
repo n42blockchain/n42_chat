@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../data/datasources/matrix/matrix_client_manager.dart';
+
 /// 存储使用信息
 class StorageInfo {
   final int totalSize;
@@ -56,6 +58,10 @@ class RoomStorageInfo {
 
 /// 存储管理服务
 class StorageManagerService {
+  final MatrixClientManager? _clientManager;
+
+  StorageManagerService({MatrixClientManager? clientManager})
+      : _clientManager = clientManager;
   /// 获取存储使用情况
   Future<StorageInfo> getStorageUsage() async {
     try {
@@ -100,9 +106,53 @@ class StorageManagerService {
 
   /// 获取房间存储排行
   Future<List<RoomStorageInfo>> getRoomStorageRanking() async {
-    // 实际实现需要遍历 Matrix 本地缓存
-    // 这里返回空列表，等待与 Matrix SDK 集成
-    return [];
+    try {
+      final client = _clientManager?.client;
+      if (client == null) return [];
+
+      final rooms = client.rooms;
+      final appDir = await getApplicationDocumentsDirectory();
+      final results = <RoomStorageInfo>[];
+
+      for (final room in rooms) {
+        // 检查房间对应的本地缓存目录
+        final roomCacheDir = Directory('${appDir.path}/matrix_cache/${room.id}');
+        int totalSize = 0;
+        int mediaCount = 0;
+        int fileCount = 0;
+
+        if (roomCacheDir.existsSync()) {
+          await for (final entity in roomCacheDir.list(recursive: true)) {
+            if (entity is File) {
+              totalSize += await entity.length();
+              final ext = entity.path.split('.').last.toLowerCase();
+              if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'mov', 'mp3', 'ogg'].contains(ext)) {
+                mediaCount++;
+              } else {
+                fileCount++;
+              }
+            }
+          }
+        }
+
+        if (totalSize > 0) {
+          results.add(RoomStorageInfo(
+            roomId: room.id,
+            roomName: room.getLocalizedDisplayname(),
+            totalSize: totalSize,
+            mediaCount: mediaCount,
+            fileCount: fileCount,
+          ));
+        }
+      }
+
+      // 按大小降序排列
+      results.sort((a, b) => b.totalSize.compareTo(a.totalSize));
+      return results.take(20).toList();
+    } catch (e) {
+      debugPrint('StorageManagerService: Failed to get room ranking: $e');
+      return [];
+    }
   }
 
   /// 清理缓存
@@ -127,10 +177,18 @@ class StorageManagerService {
     }
   }
 
-  /// 清理指定房间的媒体
+  /// 清理指定房间的媒体缓存
   Future<void> clearRoomMedia(String roomId) async {
-    // 需要与 Matrix SDK 集成，清理指定房间的缓存文件
-    debugPrint('StorageManagerService: clearRoomMedia not yet implemented for $roomId');
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final roomCacheDir = Directory('${appDir.path}/matrix_cache/$roomId');
+      if (roomCacheDir.existsSync()) {
+        await roomCacheDir.delete(recursive: true);
+        debugPrint('StorageManagerService: Cleared media cache for $roomId');
+      }
+    } catch (e) {
+      debugPrint('StorageManagerService: Failed to clear room media for $roomId: $e');
+    }
   }
 
   Future<int> _directorySize(Directory dir) async {

@@ -73,6 +73,9 @@ class MessageItem extends StatelessWidget {
   /// 线程点击回调 - 用于导航到线程详情页
   final void Function(MessageEntity message)? onThreadTap;
 
+  /// 消息文本字体大小（用户自定义）
+  final double? messageFontSize;
+
   const MessageItem({
     super.key,
     required this.message,
@@ -93,6 +96,7 @@ class MessageItem extends StatelessWidget {
     this.onCallBack,
     this.onReplyQuoteTap,
     this.onThreadTap,
+    this.messageFontSize,
   });
 
   @override
@@ -385,7 +389,7 @@ class MessageItem extends StatelessWidget {
     final textWidget = Text(
       message.content,
       style: TextStyle(
-        fontSize: 16,
+        fontSize: messageFontSize ?? 16,
         color: textColor,
         height: 1.4,
       ),

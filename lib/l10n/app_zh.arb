@@ -2198,5 +2198,58 @@
   "clearCache": "清理缓存",
   "cacheCleared": "缓存已清除",
   "clearCacheFailed": "清理缓存失败",
-  "confirmClearCache": "确认清理所有缓存数据？"
+  "confirmClearCache": "确认清理所有缓存数据？",
+  "mapView": "地图视图",
+  "liveLocationSharingCount": "{count} 人正在共享位置",
+  "@liveLocationSharingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutes15": "15 分钟",
+  "minutes30": "30 分钟",
+  "hour1": "1 小时",
+  "hours8": "8 小时",
+  "personalCard": "个人名片",
+  "downloadFailed": "下载失败",
+  "locationExpired": "已过期",
+  "secondsRemaining": "{count}秒",
+  "@secondsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesRemaining": "{count}分钟",
+  "@minutesRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursMinutesRemaining": "{hours}小时{minutes}分钟",
+  "@hoursMinutesRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "favoriteMessages": "收藏消息",
+  "linksCopied": "链接已复制",
+  "noLinksFound": "未找到链接",
+  "roomStorageRanking": "房间存储排行",
+  "downloadComplete": "下载完成",
+  "downloading": "下载中...",
+  "draftSaved": "草稿已保存",
+  "voiceRecording": "语音录制",
+  "searchLocation": "搜索地点",
+  "tapToSearch": "点击搜索"
 }

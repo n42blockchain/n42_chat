@@ -27,6 +27,9 @@ class SecureStorageDataSource {
   static const String _keyQuickReplies = 'n42_chat_quick_replies';
   static const String _keyTranslationCache = 'n42_chat_translation_cache';
   static const String _keyTranslationSettings = 'n42_chat_translation_settings';
+  static const String _keyFavoriteMessages = 'n42_chat_favorite_messages';
+  static const String _keyFavoriteMeta = 'n42_chat_favorite_meta';
+  static const String _keyDrafts = 'n42_chat_drafts';
 
   final FlutterSecureStorage _storage;
 
@@ -1308,8 +1311,10 @@ class SecureStorageDataSource {
 
   /// 保存自动下载设置
   Future<void> saveAutoDownloadSettings(Map<String, dynamic> settings) async {
-    final json = settings.entries.map((e) => '${e.key}=${e.value}').join(',');
-    await _storage.write(key: 'n42_chat_auto_download_settings', value: json);
+    await _storage.write(
+      key: 'n42_chat_auto_download_settings',
+      value: jsonEncode(settings),
+    );
   }
 
   /// 获取自动下载设置
@@ -1317,14 +1322,83 @@ class SecureStorageDataSource {
     final value = await _storage.read(key: 'n42_chat_auto_download_settings');
     if (value == null || value.isEmpty) return {};
 
-    final map = <String, dynamic>{};
-    for (final pair in value.split(',')) {
-      final parts = pair.split('=');
-      if (parts.length == 2) {
-        map[parts[0]] = parts[1] == 'true' ? true : (parts[1] == 'false' ? false : parts[1]);
+    try {
+      return (jsonDecode(value) as Map<String, dynamic>);
+    } catch (e) {
+      // 兼容旧的 key=value 格式
+      final map = <String, dynamic>{};
+      for (final pair in value.split(',')) {
+        final parts = pair.split('=');
+        if (parts.length == 2) {
+          map[parts[0]] = parts[1] == 'true' ? true : (parts[1] == 'false' ? false : parts[1]);
+        }
       }
+      return map;
     }
-    return map;
+  }
+
+  // ============================================
+  // 收藏消息持久化
+  // ============================================
+
+  /// 保存收藏消息列表（JSON）
+  Future<void> saveFavoriteMessages(String json) async {
+    await _storage.write(key: _keyFavoriteMessages, value: json);
+  }
+
+  /// 获取收藏消息列表（JSON）
+  Future<String?> getFavoriteMessages() async {
+    return await _storage.read(key: _keyFavoriteMessages);
+  }
+
+  /// 保存收藏元数据（标签+备注）
+  Future<void> saveFavoriteMeta(String json) async {
+    await _storage.write(key: _keyFavoriteMeta, value: json);
+  }
+
+  /// 获取收藏元数据
+  Future<String?> getFavoriteMeta() async {
+    return await _storage.read(key: _keyFavoriteMeta);
+  }
+
+  // ============================================
+  // 草稿持久化
+  // ============================================
+
+  /// 保存房间草稿
+  Future<void> saveDraft(String roomId, String text) async {
+    try {
+      final data = await _storage.read(key: _keyDrafts);
+      Map<String, dynamic> drafts = {};
+      if (data != null) {
+        drafts = jsonDecode(data) as Map<String, dynamic>;
+      }
+      if (text.isEmpty) {
+        drafts.remove(roomId);
+      } else {
+        drafts[roomId] = text;
+      }
+      if (drafts.isEmpty) {
+        await _storage.delete(key: _keyDrafts);
+      } else {
+        await _storage.write(key: _keyDrafts, value: jsonEncode(drafts));
+      }
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to save draft - $e');
+    }
+  }
+
+  /// 获取房间草稿
+  Future<String?> getDraft(String roomId) async {
+    try {
+      final data = await _storage.read(key: _keyDrafts);
+      if (data == null) return null;
+      final drafts = jsonDecode(data) as Map<String, dynamic>;
+      return drafts[roomId] as String?;
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to read draft - $e');
+      return null;
+    }
   }
 
   // ============================================

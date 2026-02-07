@@ -8010,6 +8010,138 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'确认清理所有缓存数据？'**
   String get confirmClearCache;
+
+  /// No description provided for @mapView.
+  ///
+  /// In zh, this message translates to:
+  /// **'地图视图'**
+  String get mapView;
+
+  /// No description provided for @liveLocationSharingCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 人正在共享位置'**
+  String liveLocationSharingCount(int count);
+
+  /// No description provided for @minutes15.
+  ///
+  /// In zh, this message translates to:
+  /// **'15 分钟'**
+  String get minutes15;
+
+  /// No description provided for @minutes30.
+  ///
+  /// In zh, this message translates to:
+  /// **'30 分钟'**
+  String get minutes30;
+
+  /// No description provided for @hour1.
+  ///
+  /// In zh, this message translates to:
+  /// **'1 小时'**
+  String get hour1;
+
+  /// No description provided for @hours8.
+  ///
+  /// In zh, this message translates to:
+  /// **'8 小时'**
+  String get hours8;
+
+  /// No description provided for @personalCard.
+  ///
+  /// In zh, this message translates to:
+  /// **'个人名片'**
+  String get personalCard;
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载失败'**
+  String get downloadFailed;
+
+  /// No description provided for @locationExpired.
+  ///
+  /// In zh, this message translates to:
+  /// **'已过期'**
+  String get locationExpired;
+
+  /// No description provided for @secondsRemaining.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}秒'**
+  String secondsRemaining(int count);
+
+  /// No description provided for @minutesRemaining.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}分钟'**
+  String minutesRemaining(int count);
+
+  /// No description provided for @hoursMinutesRemaining.
+  ///
+  /// In zh, this message translates to:
+  /// **'{hours}小时{minutes}分钟'**
+  String hoursMinutesRemaining(int hours, int minutes);
+
+  /// No description provided for @favoriteMessages.
+  ///
+  /// In zh, this message translates to:
+  /// **'收藏消息'**
+  String get favoriteMessages;
+
+  /// No description provided for @linksCopied.
+  ///
+  /// In zh, this message translates to:
+  /// **'链接已复制'**
+  String get linksCopied;
+
+  /// No description provided for @noLinksFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到链接'**
+  String get noLinksFound;
+
+  /// No description provided for @roomStorageRanking.
+  ///
+  /// In zh, this message translates to:
+  /// **'房间存储排行'**
+  String get roomStorageRanking;
+
+  /// No description provided for @downloadComplete.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载完成'**
+  String get downloadComplete;
+
+  /// No description provided for @downloading.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载中...'**
+  String get downloading;
+
+  /// No description provided for @draftSaved.
+  ///
+  /// In zh, this message translates to:
+  /// **'草稿已保存'**
+  String get draftSaved;
+
+  /// No description provided for @voiceRecording.
+  ///
+  /// In zh, this message translates to:
+  /// **'语音录制'**
+  String get voiceRecording;
+
+  /// No description provided for @searchLocation.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索地点'**
+  String get searchLocation;
+
+  /// No description provided for @tapToSearch.
+  ///
+  /// In zh, this message translates to:
+  /// **'点击搜索'**
+  String get tapToSearch;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -33,13 +33,19 @@ class LiveLocationEntity extends Equatable {
     return remaining > 0 ? remaining : 0;
   }
 
-  /// 格式化剩余时间
-  String get formattedRemaining {
+  /// 剩余时间结构化数据
+  ///
+  /// 返回 (type, values)，UI 层使用 l10n 格式化：
+  /// - expired: 已过期
+  /// - seconds: [count] 秒
+  /// - minutes: [count] 分钟
+  /// - hoursMinutes: [hours, minutes]
+  ({String type, List<int> values}) get remainingTimeData {
     final seconds = remainingSeconds;
-    if (seconds <= 0) return '已过期';
-    if (seconds < 60) return '$seconds秒';
-    if (seconds < 3600) return '${seconds ~/ 60}分钟';
-    return '${seconds ~/ 3600}小时${(seconds % 3600) ~/ 60}分钟';
+    if (seconds <= 0) return (type: 'expired', values: []);
+    if (seconds < 60) return (type: 'seconds', values: [seconds]);
+    if (seconds < 3600) return (type: 'minutes', values: [seconds ~/ 60]);
+    return (type: 'hoursMinutes', values: [seconds ~/ 3600, (seconds % 3600) ~/ 60]);
   }
 
   LiveLocationEntity copyWith({

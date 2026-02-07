@@ -371,7 +371,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Download failed: $e'),
+            content: Text('${S.of(context)?.downloadFailed ?? 'Download failed'}: $e'),
             backgroundColor: Colors.red,
           ),
         );
