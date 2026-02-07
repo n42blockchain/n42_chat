@@ -56,6 +56,18 @@ class ChatMorePanel extends StatefulWidget {
   /// 贴纸回调
   final VoidCallback? onStickerPressed;
 
+  /// View Once（阅后即焚）回调
+  final VoidCallback? onViewOncePressed;
+
+  /// 是否处于 View Once 模式
+  final bool isViewOnce;
+
+  /// 人脸模糊回调
+  final VoidCallback? onFaceBlurPressed;
+
+  /// 是否启用人脸模糊
+  final bool isFaceBlur;
+
   const ChatMorePanel({
     super.key,
     this.onPhotoPressed,
@@ -73,6 +85,10 @@ class ChatMorePanel extends StatefulWidget {
     this.onPollPressed,
     this.onGifPressed,
     this.onStickerPressed,
+    this.onViewOncePressed,
+    this.isViewOnce = false,
+    this.onFaceBlurPressed,
+    this.isFaceBlur = false,
   });
 
   @override
@@ -225,6 +241,25 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                         onTap: widget.onStickerPressed,
                         iconColor: Colors.orange,
                       ),
+                      _MoreItem(
+                        icon: widget.isViewOnce ? Icons.timer : Icons.timer_outlined,
+                        label: S.of(context)?.chatViewOnce ?? 'View Once',
+                        onTap: widget.onViewOncePressed,
+                        iconColor: widget.isViewOnce ? AppColors.primary : null,
+                      ),
+                    ],
+                  ),
+                  // 第三页（设置类）
+                  _buildPage(
+                    context,
+                    isDark,
+                    [
+                      _MoreItem(
+                        icon: widget.isFaceBlur ? Icons.face_retouching_natural : Icons.face,
+                        label: S.of(context)?.chatAutoFaceBlur ?? 'Face Blur',
+                        onTap: widget.onFaceBlurPressed,
+                        iconColor: widget.isFaceBlur ? AppColors.primary : null,
+                      ),
                     ],
                   ),
                 ],
@@ -235,29 +270,19 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
+                children: List.generate(3, (index) => Padding(
+                  padding: EdgeInsets.only(left: index > 0 ? 6 : 0),
+                  child: Container(
                     width: 6,
                     height: 6,
                     decoration: BoxDecoration(
-                      color: _currentPage == 0
+                      color: _currentPage == index
                           ? AppColors.textSecondary
                           : AppColors.textTertiary,
                       shape: BoxShape.circle,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: _currentPage == 1
-                          ? AppColors.textSecondary
-                          : AppColors.textTertiary,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ],
+                )),
               ),
             ),
           ],

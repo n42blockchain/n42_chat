@@ -290,5 +290,86 @@ class MatrixReactionDataSource {
     // 只能编辑自己的消息
     return senderId == _client?.userID;
   }
+
+  /// 获取消息的编辑历史
+  ///
+  /// 通过 Matrix 的 /relations API 获取指定消息的所有 m.replace 事件，
+  /// 返回按时间排序的编辑记录列表（从旧到新）
+  Future<List<EditHistoryEntry>> getEditHistory(
+    String roomId,
+    String eventId,
+  ) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return [];
+
+    try {
+      // 获取原始事件
+      final originalEvent = await room.getEventById(eventId);
+      if (originalEvent == null) return [];
+
+      final entries = <EditHistoryEntry>[];
+
+      // 添加原始版本
+      entries.add(EditHistoryEntry(
+        content: originalEvent.body,
+        editedAt: originalEvent.originServerTs,
+        editorId: originalEvent.senderId,
+        isOriginal: true,
+      ));
+
+      // 通过 timeline 查找所有编辑事件
+      final timeline = await room.getTimeline();
+      for (final event in timeline.events) {
+        // 查找 m.replace 类型的关系事件，并且目标是我们的消息
+        final relatesTo = event.content['m.relates_to'] as Map<String, dynamic>?;
+        if (relatesTo == null) continue;
+
+        final relType = relatesTo['rel_type'] as String?;
+        final targetEventId = relatesTo['event_id'] as String?;
+
+        if (relType == 'm.replace' && targetEventId == eventId) {
+          // 提取编辑后的内容
+          final newContent = event.content['m.new_content'] as Map<String, dynamic>?;
+          final body = newContent?['body'] as String? ?? event.body;
+
+          entries.add(EditHistoryEntry(
+            content: body,
+            editedAt: event.originServerTs,
+            editorId: event.senderId,
+            isOriginal: false,
+          ));
+        }
+      }
+
+      // 按时间排序（从旧到新）
+      entries.sort((a, b) => a.editedAt.compareTo(b.editedAt));
+      return entries;
+    } catch (e) {
+      debugPrint('MatrixReactionDataSource: getEditHistory error: $e');
+      return [];
+    }
+  }
+}
+
+/// 编辑历史条目
+class EditHistoryEntry {
+  /// 消息内容
+  final String content;
+
+  /// 编辑时间
+  final DateTime editedAt;
+
+  /// 编辑者用户ID
+  final String editorId;
+
+  /// 是否是原始版本
+  final bool isOriginal;
+
+  const EditHistoryEntry({
+    required this.content,
+    required this.editedAt,
+    required this.editorId,
+    this.isOriginal = false,
+  });
 }
 

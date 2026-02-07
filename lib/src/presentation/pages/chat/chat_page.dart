@@ -18,8 +18,10 @@ import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/utils/face_blur_util.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../n42_chat.dart';
 
@@ -38,6 +40,8 @@ import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/chat/chat_state.dart';
+import '../../blocs/message_action/message_action_bloc.dart';
+import '../../blocs/message_action/message_action_event.dart' as action_event;
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../blocs/search/search_bloc.dart';
@@ -47,6 +51,7 @@ import '../../widgets/chat/sticker_picker.dart';
 import '../../widgets/chat/red_packet_dialogs.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../sticker/sticker_store_page.dart';
+import '../../widgets/chat/edit_history_sheet.dart';
 import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../widgets/wechat_toast.dart';
@@ -54,6 +59,7 @@ import '../contact/contact_detail_page.dart';
 import '../search/chat_search_bar.dart';
 import 'chat_detail_page.dart';
 import 'message_item.dart';
+import 'thread_detail_page.dart';
 import 'viewers/pdf_viewer_page.dart';
 
 /// 聊天页面
@@ -120,6 +126,12 @@ class _ChatPageState extends State<ChatPage> {
   int _mentionTriggerPosition = -1; // @ 符号的位置
   String _mentionSearchQuery = ''; // @ 后面输入的搜索关键词
   
+  // View Once 模式（阅后即焚媒体）
+  bool _isViewOnce = false;
+
+  // 自动人脸模糊设置
+  bool _autoFaceBlur = false;
+
   // 备注更新订阅
   StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
 
@@ -144,6 +156,9 @@ class _ChatPageState extends State<ChatPage> {
 
     // 获取当前用户ID
     _loadCurrentUserId();
+
+    // 加载人脸模糊设置
+    _loadFaceBlurSetting();
 
     // 获取私聊对方的用户ID
     _loadOtherUserId();
@@ -235,6 +250,35 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  /// 加载人脸模糊设置
+  Future<void> _loadFaceBlurSetting() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final enabled = prefs.getBool('auto_face_blur') ?? false;
+      if (mounted && enabled != _autoFaceBlur) {
+        setState(() {
+          _autoFaceBlur = enabled;
+        });
+      }
+    } catch (e) {
+      debugPrint('ChatPage: Failed to load face blur setting: $e');
+    }
+  }
+
+  /// 切换人脸模糊设置
+  Future<void> _toggleFaceBlur() async {
+    final newValue = !_autoFaceBlur;
+    setState(() {
+      _autoFaceBlur = newValue;
+    });
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('auto_face_blur', newValue);
+    } catch (e) {
+      debugPrint('ChatPage: Failed to save face blur setting: $e');
+    }
+  }
+
   @override
   void dispose() {
     // 清除当前活跃房间
@@ -258,6 +302,9 @@ class _ChatPageState extends State<ChatPage> {
     // 移除监听器（必须在 dispose 之前）
     _scrollController.removeListener(_onScroll);
     _inputFocusNode.removeListener(_onInputFocusChanged);
+
+    // 释放人脸检测器资源
+    FaceBlurUtil.dispose();
 
     // 释放资源
     _scrollController.dispose();
@@ -293,7 +340,23 @@ class _ChatPageState extends State<ChatPage> {
 
   void _sendMessage(String text) {
     if (text.trim().isEmpty) return;
-    context.read<ChatBloc>().add(SendTextMessage(text));
+
+    final chatBloc = context.read<ChatBloc>();
+    final editingMsg = chatBloc.state.editingMessage;
+
+    if (editingMsg != null) {
+      // 编辑模式：通过 MessageActionBloc 发送编辑
+      final actionBloc = getIt<MessageActionBloc>();
+      actionBloc.add(action_event.EditMessage(
+        widget.conversation.id,
+        editingMsg.id,
+        text,
+      ));
+      // 退出编辑模式
+      chatBloc.add(const SetEditTarget(null));
+    } else {
+      chatBloc.add(SendTextMessage(text));
+    }
     _inputController.clear();
   }
 
@@ -386,6 +449,11 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _onMessageTap(MessageEntity message) {
+    // 阅后即焚消息：接收方首次查看时触发销毁倒计时
+    if (message.isSelfDestructing && !message.isDestructionStarted && !message.isFromMe) {
+      context.read<ChatBloc>().add(StartMessageDestruction(message.id));
+    }
+
     // 处理消息点击（如查看图片、播放视频、播放语音等）
     switch (message.type) {
       case MessageType.image:
@@ -1130,9 +1198,16 @@ class _ChatPageState extends State<ChatPage> {
 
               // 回复预览
               if (!_isMultiSelectMode) _buildReplyPreview(),
-              
+
+              // 编辑预览
+              if (!_isMultiSelectMode) _buildEditPreview(),
+
               // @ 提醒成员选择器（群聊时）
               if (_showMentionPicker && !_isMultiSelectMode) _buildMentionPicker(),
+
+              // View Once 提示条
+              if (_isViewOnce && !_isMultiSelectMode && !_showSearchBar)
+                _buildViewOnceIndicator(),
 
               // 多选模式下显示操作栏，否则显示输入栏
               if (_isMultiSelectMode)
@@ -1289,6 +1364,39 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  /// View Once 提示条
+  Widget _buildViewOnceIndicator() {
+    final s = S.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: AppColors.primary.withValues(alpha: 0.1),
+      child: Row(
+        children: [
+          const Icon(Icons.timer, size: 16, color: AppColors.primary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              s?.chatViewOnce ?? 'View Once',
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.primary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isViewOnce = false;
+              });
+            },
+            child: const Icon(Icons.close, size: 18, color: AppColors.textTertiary),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMorePanel() {
     return ChatMorePanel(
       onPhotoPressed: () {
@@ -1351,6 +1459,14 @@ class _ChatPageState extends State<ChatPage> {
         _hideMorePanel();
         _toggleStickerPicker();
       },
+      isViewOnce: _isViewOnce,
+      onViewOncePressed: () {
+        setState(() {
+          _isViewOnce = !_isViewOnce;
+        });
+      },
+      isFaceBlur: _autoFaceBlur,
+      onFaceBlurPressed: _toggleFaceBlur,
     );
   }
 
@@ -1625,7 +1741,15 @@ class _ChatPageState extends State<ChatPage> {
         filename: filename,
         mimeType: mimeType,
         thumbnailBytes: thumbnailBytes,
+        selfDestructAfter: _isViewOnce ? 1 : null,
       ));
+
+      // 发送后重置 View Once 模式
+      if (_isViewOnce) {
+        setState(() {
+          _isViewOnce = false;
+        });
+      }
       
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -1731,16 +1855,31 @@ class _ChatPageState extends State<ChatPage> {
         }
       }
       
+      // 自动检测人脸并模糊
+      if (_autoFaceBlur && !kIsWeb) {
+        debugPrint('FaceBlur: Auto face blur enabled, processing image...');
+        bytes = await FaceBlurUtil.blurFaces(bytes);
+        debugPrint('FaceBlur: Processing complete, image size: ${bytes.length} bytes');
+      }
+
       debugPrint('Final filename: $filename');
       debugPrint('Final mimeType: $mimeType');
       debugPrint('Image size: ${bytes.length} bytes');
       debugPrint('=== Sending image to ChatBloc ===');
-      
+
       context.read<ChatBloc>().add(SendImageMessage(
         imageBytes: bytes,
         filename: filename,
         mimeType: mimeType,
+        selfDestructAfter: _isViewOnce ? 1 : null,
       ));
+
+      // 发送后重置 View Once 模式
+      if (_isViewOnce) {
+        setState(() {
+          _isViewOnce = false;
+        });
+      }
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -3030,6 +3169,7 @@ Avatar: ${contactAvatar ?? ''}''';
                           onRedPacketTap: _onRedPacketTap,
                           onContactCardTap: _onContactCardTap,
                           onReplyQuoteTap: _scrollToMessage,
+                          onThreadTap: _navigateToThread,
                         ),
                       ),
               ],
@@ -3234,6 +3374,82 @@ Avatar: ${contactAvatar ?? ''}''';
     );
   }
   
+  Widget _buildEditPreview() {
+    final l10n = S.of(context);
+    final isDark = context.isDarkMode;
+
+    return BlocBuilder<ChatBloc, ChatState>(
+      buildWhen: (prev, curr) => prev.editingMessage != curr.editingMessage,
+      builder: (_, state) {
+        if (state.editingMessage == null) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            border: Border(
+              top: BorderSide(
+                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                width: 0.5,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 3,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(1.5),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n?.commonEdit ?? 'Edit',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.orange,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      state.editingMessage!.content,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, size: 18),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: 32,
+                  minHeight: 32,
+                ),
+                onPressed: () {
+                  context.read<ChatBloc>().add(const SetEditTarget(null));
+                  _inputController.clear();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   /// 构建多选模式底部工具栏
   Widget _buildMultiSelectBottomBar() {
     final isDark = context.isDarkMode;
@@ -3726,6 +3942,26 @@ Avatar: ${contactAvatar ?? ''}''';
         onUnpin: () {
           debugPrint('Unpin clicked');
           context.read<ChatBloc>().add(UnpinMessage(message.id));
+        },
+        onViewEditHistory: message.isEdited ? () {
+          debugPrint('View edit history clicked');
+          showModalBottomSheet<void>(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (ctx) => EditHistorySheet(
+              roomId: message.roomId,
+              messageId: message.id,
+            ),
+          );
+        } : null,
+        onReplyInThread: () {
+          debugPrint('Reply in thread clicked');
+          _navigateToThread(message);
+        },
+        onEdit: () {
+          debugPrint('Edit clicked');
+          _enterEditMode(message);
         },
       ),
     );
@@ -4517,6 +4753,18 @@ Avatar: ${contactAvatar ?? ''}''';
   void _quoteMessage(MessageEntity message) {
     context.read<ChatBloc>().add(SetReplyTarget(message));
   }
+
+  /// 进入编辑模式
+  void _enterEditMode(MessageEntity message) {
+    // 仅文本消息可编辑
+    if (message.type != MessageType.text || !message.isFromMe) return;
+    context.read<ChatBloc>().add(SetEditTarget(message));
+    _inputController.text = message.content;
+    _inputController.selection = TextSelection.fromPosition(
+      TextPosition(offset: message.content.length),
+    );
+    _inputFocusNode.requestFocus();
+  }
   
   /// 提醒（@某人）
   void _remindMessage(MessageEntity message) {
@@ -4581,6 +4829,18 @@ Avatar: ${contactAvatar ?? ''}''';
   }
   
   /// 搜一搜
+  /// 导航到线程详情页
+  void _navigateToThread(MessageEntity message) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ThreadDetailPage(
+          roomId: widget.conversation.id,
+          threadRootEventId: message.id,
+        ),
+      ),
+    );
+  }
+
   void _searchMessage(MessageEntity message) {
     if (message.type != MessageType.text || message.content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

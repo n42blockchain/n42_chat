@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/entities/token_gate_entity.dart';
+
 /// 群聊事件基类
 abstract class GroupEvent extends Equatable {
   const GroupEvent();
@@ -188,5 +190,26 @@ class RejectGroupInvite extends GroupEvent {
 /// 群列表已更新
 class GroupsUpdated extends GroupEvent {
   const GroupsUpdated();
+}
+
+/// 设置代币门控
+class SetTokenGate extends GroupEvent {
+  final String roomId;
+  final TokenGateConfig config;
+
+  const SetTokenGate(this.roomId, this.config);
+
+  @override
+  List<Object?> get props => [roomId, config];
+}
+
+/// 验证代币门控
+class VerifyTokenGate extends GroupEvent {
+  final String roomId;
+
+  const VerifyTokenGate(this.roomId);
+
+  @override
+  List<Object?> get props => [roomId];
 }
 

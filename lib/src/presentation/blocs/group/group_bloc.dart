@@ -32,6 +32,8 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     on<AcceptGroupInvite>(_onAcceptGroupInvite);
     on<RejectGroupInvite>(_onRejectGroupInvite);
     on<GroupsUpdated>(_onGroupsUpdated);
+    on<SetTokenGate>(_onSetTokenGate);
+    on<VerifyTokenGate>(_onVerifyTokenGate);
   }
 
   Future<void> _onLoadGroups(
@@ -292,6 +294,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     Emitter<GroupState> emit,
   ) async {
     try {
+      // Check token gate before accepting invite
+      final tokenGate = await _groupRepository.getTokenGate(event.roomId);
+      if (tokenGate != null && tokenGate.enabled && tokenGate.rules.isNotEmpty) {
+        final result = await _groupRepository.verifyTokenGate(event.roomId);
+        if (!result.passed) {
+          emit(TokenGateVerified(roomId: event.roomId, result: result));
+          return;
+        }
+      }
+
       await _groupRepository.acceptGroupInvite(event.roomId);
       emit(const GroupOperationSuccess('Joined the group'));
       add(const RefreshGroups());
@@ -318,6 +330,32 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     Emitter<GroupState> emit,
   ) async {
     add(const RefreshGroups());
+  }
+
+  Future<void> _onSetTokenGate(
+    SetTokenGate event,
+    Emitter<GroupState> emit,
+  ) async {
+    try {
+      await _groupRepository.setTokenGate(event.roomId, event.config);
+      emit(const GroupOperationSuccess('Token gate updated'));
+      add(LoadGroupDetails(event.roomId));
+    } catch (e) {
+      emit(GroupError(e.toString()));
+    }
+  }
+
+  Future<void> _onVerifyTokenGate(
+    VerifyTokenGate event,
+    Emitter<GroupState> emit,
+  ) async {
+    try {
+      emit(const GroupLoading());
+      final result = await _groupRepository.verifyTokenGate(event.roomId);
+      emit(TokenGateVerified(roomId: event.roomId, result: result));
+    } catch (e) {
+      emit(GroupError(e.toString()));
+    }
   }
 
   @override

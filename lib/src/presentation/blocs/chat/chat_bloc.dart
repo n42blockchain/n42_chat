@@ -88,6 +88,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<DeleteFailedMessage>(_onDeleteFailedMessage);
     on<ReplyToMessage>(_onReplyToMessage);
     on<SetReplyTarget>(_onSetReplyTarget);
+    on<SetEditTarget>(_onSetEditTarget);
     on<AddReaction>(_onAddReaction);
     on<MarkMessageAsRead>(_onMarkMessageAsRead);
     on<SendTypingNotification>(_onSendTypingNotification);
@@ -555,9 +556,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     MessagesUpdated event,
     Emitter<ChatState> emit,
   ) {
-    // 过滤掉已本地删除的消息
+    // 过滤掉已本地删除的消息和线程内回复消息（线程回复只在线程详情页显示）
     final filteredMessages = event.messages
         .where((m) => !_locallyDeletedMessageIds.contains(m.id))
+        .where((m) => !m.isInThread)
         .toList();
 
     // 构建当前消息的索引 Map (O(n) 而不是 O(n²))
@@ -692,6 +694,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         imageBytes: event.imageBytes,
         filename: event.filename,
         mimeType: event.mimeType,
+        selfDestructAfter: event.selfDestructAfter,
       );
       debugPrint('ChatBloc: Image sent successfully');
       emit(state.copyWith(isSending: false));
@@ -780,6 +783,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         filename: event.filename,
         mimeType: event.mimeType,
         thumbnailBytes: event.thumbnailBytes,
+        selfDestructAfter: event.selfDestructAfter,
       );
       debugPrint('ChatBloc: Video sent successfully');
       emit(state.copyWith(isSending: false));
@@ -950,7 +954,21 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (event.message == null) {
       emit(state.copyWith(clearReplyTarget: true));
     } else {
-      emit(state.copyWith(replyTarget: event.message));
+      // 进入回复模式时清除编辑模式
+      emit(state.copyWith(replyTarget: event.message, clearEditingMessage: true));
+    }
+  }
+
+  /// 设置编辑目标（进入/退出编辑模式）
+  void _onSetEditTarget(
+    SetEditTarget event,
+    Emitter<ChatState> emit,
+  ) {
+    if (event.message == null) {
+      emit(state.copyWith(clearEditingMessage: true));
+    } else {
+      // 进入编辑模式时清除回复目标
+      emit(state.copyWith(editingMessage: event.message, clearReplyTarget: true));
     }
   }
 

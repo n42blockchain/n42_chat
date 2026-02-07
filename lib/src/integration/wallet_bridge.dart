@@ -67,6 +67,54 @@ abstract class IWalletBridge {
 
   /// 获取地址对应的用户信息（如果有）
   Future<WalletUserInfo?> getUserInfoByAddress(String address);
+
+  // ============================================
+  // ENS 集成
+  // ============================================
+
+  /// 正向解析 ENS 域名 → 地址
+  Future<String?> resolveEnsName(String ensName) async => null;
+
+  /// 反向解析 地址 → ENS 域名
+  Future<String?> lookupEnsName(String address) async => null;
+
+  /// 获取 ENS 头像
+  Future<String?> getEnsAvatar(String ensName) async => null;
+
+  /// 批量反向解析 ENS 域名
+  Future<Map<String, String?>> batchLookupEnsNames(List<String> addresses) async {
+    final results = <String, String?>{};
+    for (final addr in addresses) {
+      results[addr] = await lookupEnsName(addr);
+    }
+    return results;
+  }
+
+  // ============================================
+  // 代币门控
+  // ============================================
+
+  /// 查询 ERC-20 余额
+  Future<BigInt> getErc20Balance({
+    required String contractAddress,
+    required int chainId,
+    String? ownerAddress,
+  }) async => BigInt.zero;
+
+  /// 查询 ERC-721 余额（NFT 数量）
+  Future<int> getErc721Balance({
+    required String contractAddress,
+    required int chainId,
+    String? ownerAddress,
+  }) async => 0;
+
+  /// 查询 ERC-1155 余额
+  Future<BigInt> getErc1155Balance({
+    required String contractAddress,
+    required BigInt tokenId,
+    required int chainId,
+    String? ownerAddress,
+  }) async => BigInt.zero;
 }
 
 /// 转账结果
@@ -223,7 +271,7 @@ class WalletUserInfo {
 }
 
 /// 模拟钱包桥接实现（用于测试）
-class MockWalletBridge implements IWalletBridge {
+class MockWalletBridge extends IWalletBridge {
   @override
   bool get isWalletConnected => true;
 

@@ -28,6 +28,9 @@ class ChatState extends Equatable {
   /// 回复目标消息
   final MessageEntity? replyTarget;
 
+  /// 正在编辑的消息（编辑模式）
+  final MessageEntity? editingMessage;
+
   /// 正在输入的用户
   final List<String> typingUsers;
 
@@ -61,6 +64,7 @@ class ChatState extends Equatable {
     this.isSending = false,
     this.error,
     this.replyTarget,
+    this.editingMessage,
     this.typingUsers = const [],
     this.draft,
     this.pinnedMessages = const [],
@@ -81,6 +85,9 @@ class ChatState extends Equatable {
 
   /// 是否有回复目标
   bool get hasReplyTarget => replyTarget != null;
+
+  /// 是否处于编辑模式
+  bool get isEditing => editingMessage != null;
 
   /// 是否有人正在输入
   bool get hasTypingUsers => typingUsers.isNotEmpty;
@@ -122,6 +129,7 @@ class ChatState extends Equatable {
     bool? isSending,
     String? error,
     MessageEntity? replyTarget,
+    MessageEntity? editingMessage,
     List<String>? typingUsers,
     String? draft,
     List<MessageEntity>? pinnedMessages,
@@ -132,6 +140,7 @@ class ChatState extends Equatable {
     Map<String, String>? detectedSourceLanguages,
     bool clearError = false,
     bool clearReplyTarget = false,
+    bool clearEditingMessage = false,
   }) {
     return ChatState(
       roomId: roomId ?? this.roomId,
@@ -142,6 +151,7 @@ class ChatState extends Equatable {
       isSending: isSending ?? this.isSending,
       error: clearError ? null : (error ?? this.error),
       replyTarget: clearReplyTarget ? null : (replyTarget ?? this.replyTarget),
+      editingMessage: clearEditingMessage ? null : (editingMessage ?? this.editingMessage),
       typingUsers: typingUsers ?? this.typingUsers,
       draft: draft ?? this.draft,
       pinnedMessages: pinnedMessages ?? this.pinnedMessages,
@@ -163,6 +173,7 @@ class ChatState extends Equatable {
         isSending,
         error,
         replyTarget,
+        editingMessage,
         typingUsers,
         draft,
         pinnedMessages,

@@ -183,6 +183,62 @@ abstract class Routes {
   static const String sasVerificationName = 'sasVerification';
 
   // ============================================
+  // 消息线程
+  // ============================================
+
+  /// 线程详情页
+  static const String threadDetail = '/chat/:roomId/thread/:threadRootEventId';
+  static const String threadDetailName = 'threadDetail';
+
+  /// 生成线程详情路径
+  static String threadDetailPath(String roomId, String threadRootEventId) =>
+      '/chat/${Uri.encodeComponent(roomId)}/thread/${Uri.encodeComponent(threadRootEventId)}';
+
+  // ============================================
+  // 语音聊天室
+  // ============================================
+
+  /// 语音房间列表
+  static const String voiceRoomList = '/voice-rooms';
+  static const String voiceRoomListName = 'voiceRoomList';
+
+  /// 语音房间详情
+  static const String voiceRoom = '/voice-rooms/:roomId';
+  static const String voiceRoomName = 'voiceRoom';
+
+  /// 生成语音房间路径
+  static String voiceRoomPath(String roomId) =>
+      '/voice-rooms/${Uri.encodeComponent(roomId)}';
+
+  // ============================================
+  // 用户名设置
+  // ============================================
+
+  /// 设置用户名页面
+  static const String setUsername = '/profile/username';
+  static const String setUsernameName = 'setUsername';
+
+  // ============================================
+  // 代币门控
+  // ============================================
+
+  /// 代币门控设置页
+  static const String tokenGateSettings = '/group/:roomId/token-gate';
+  static const String tokenGateSettingsName = 'tokenGateSettings';
+
+  /// 生成代币门控设置路径
+  static String tokenGateSettingsPath(String roomId) =>
+      '/group/${Uri.encodeComponent(roomId)}/token-gate';
+
+  /// 代币门控验证页
+  static const String tokenGateVerify = '/group/:roomId/token-gate/verify';
+  static const String tokenGateVerifyName = 'tokenGateVerify';
+
+  /// 生成代币门控验证路径
+  static String tokenGateVerifyPath(String roomId) =>
+      '/group/${Uri.encodeComponent(roomId)}/token-gate/verify';
+
+  // ============================================
   // 其他
   // ============================================
 

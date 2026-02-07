@@ -132,6 +132,16 @@ class N42ChatRouter {
                     title: l10n?.profileEditProfile ?? 'Edit Profile');
               },
             ),
+            // 设置用户名
+            GoRoute(
+              path: 'username',
+              name: Routes.setUsernameName,
+              builder: (context, state) {
+                final l10n = S.of(context);
+                return _PlaceholderPage(
+                    title: l10n?.usernameSet ?? 'Set Username');
+              },
+            ),
           ],
         ),
 

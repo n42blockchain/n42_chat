@@ -7302,6 +7302,552 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'聊天'**
   String get callChatLabel;
+
+  /// No description provided for @chatEdited.
+  ///
+  /// In zh, this message translates to:
+  /// **'已编辑'**
+  String get chatEdited;
+
+  /// No description provided for @chatEditHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑历史'**
+  String get chatEditHistory;
+
+  /// No description provided for @chatOriginalMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'原始消息'**
+  String get chatOriginalMessage;
+
+  /// No description provided for @chatEditedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑于 {time}'**
+  String chatEditedAt(String time);
+
+  /// No description provided for @chatViewOnce.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅后即焚'**
+  String get chatViewOnce;
+
+  /// No description provided for @chatViewOncePhoto.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅后即焚照片'**
+  String get chatViewOncePhoto;
+
+  /// No description provided for @chatViewOnceVideo.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅后即焚视频'**
+  String get chatViewOnceVideo;
+
+  /// No description provided for @chatViewOnceViewed.
+  ///
+  /// In zh, this message translates to:
+  /// **'已查看'**
+  String get chatViewOnceViewed;
+
+  /// No description provided for @chatViewOnceExpired.
+  ///
+  /// In zh, this message translates to:
+  /// **'已过期'**
+  String get chatViewOnceExpired;
+
+  /// No description provided for @chatViewOnceTap.
+  ///
+  /// In zh, this message translates to:
+  /// **'点击查看'**
+  String get chatViewOnceTap;
+
+  /// No description provided for @chatAutoFaceBlur.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动模糊人脸'**
+  String get chatAutoFaceBlur;
+
+  /// No description provided for @chatAutoFaceBlurDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送照片时自动模糊人脸'**
+  String get chatAutoFaceBlurDesc;
+
+  /// No description provided for @threadReplyInThread.
+  ///
+  /// In zh, this message translates to:
+  /// **'在线程中回复'**
+  String get threadReplyInThread;
+
+  /// No description provided for @threadReplies.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 条回复'**
+  String threadReplies(int count);
+
+  /// No description provided for @threadReply.
+  ///
+  /// In zh, this message translates to:
+  /// **'1 条回复'**
+  String get threadReply;
+
+  /// No description provided for @threadLatestReply.
+  ///
+  /// In zh, this message translates to:
+  /// **'最新: {preview}'**
+  String threadLatestReply(String preview);
+
+  /// No description provided for @threadTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'消息线程'**
+  String get threadTitle;
+
+  /// No description provided for @threadReplyPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'在线程中回复...'**
+  String get threadReplyPlaceholder;
+
+  /// No description provided for @threadParticipants.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 位参与者'**
+  String threadParticipants(int count);
+
+  /// No description provided for @voiceRoomTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'语音聊天室'**
+  String get voiceRoomTitle;
+
+  /// No description provided for @voiceRoomCreate.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建语音房间'**
+  String get voiceRoomCreate;
+
+  /// No description provided for @voiceRoomJoin.
+  ///
+  /// In zh, this message translates to:
+  /// **'加入'**
+  String get voiceRoomJoin;
+
+  /// No description provided for @voiceRoomLeave.
+  ///
+  /// In zh, this message translates to:
+  /// **'离开'**
+  String get voiceRoomLeave;
+
+  /// No description provided for @voiceRoomEnd.
+  ///
+  /// In zh, this message translates to:
+  /// **'结束房间'**
+  String get voiceRoomEnd;
+
+  /// No description provided for @voiceRoomRaiseHand.
+  ///
+  /// In zh, this message translates to:
+  /// **'举手'**
+  String get voiceRoomRaiseHand;
+
+  /// No description provided for @voiceRoomLowerHand.
+  ///
+  /// In zh, this message translates to:
+  /// **'放下手'**
+  String get voiceRoomLowerHand;
+
+  /// No description provided for @voiceRoomMute.
+  ///
+  /// In zh, this message translates to:
+  /// **'静音'**
+  String get voiceRoomMute;
+
+  /// No description provided for @voiceRoomUnmute.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消静音'**
+  String get voiceRoomUnmute;
+
+  /// No description provided for @voiceRoomHost.
+  ///
+  /// In zh, this message translates to:
+  /// **'主持人'**
+  String get voiceRoomHost;
+
+  /// No description provided for @voiceRoomSpeakers.
+  ///
+  /// In zh, this message translates to:
+  /// **'发言者'**
+  String get voiceRoomSpeakers;
+
+  /// No description provided for @voiceRoomListeners.
+  ///
+  /// In zh, this message translates to:
+  /// **'听众'**
+  String get voiceRoomListeners;
+
+  /// No description provided for @voiceRoomLive.
+  ///
+  /// In zh, this message translates to:
+  /// **'直播中'**
+  String get voiceRoomLive;
+
+  /// No description provided for @voiceRoomEnded.
+  ///
+  /// In zh, this message translates to:
+  /// **'已结束'**
+  String get voiceRoomEnded;
+
+  /// No description provided for @voiceRoomScheduled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已预约'**
+  String get voiceRoomScheduled;
+
+  /// No description provided for @voiceRoomApprove.
+  ///
+  /// In zh, this message translates to:
+  /// **'批准发言'**
+  String get voiceRoomApprove;
+
+  /// No description provided for @voiceRoomDemote.
+  ///
+  /// In zh, this message translates to:
+  /// **'移至听众'**
+  String get voiceRoomDemote;
+
+  /// No description provided for @voiceRoomHandRaised.
+  ///
+  /// In zh, this message translates to:
+  /// **'{name} 举手了'**
+  String voiceRoomHandRaised(String name);
+
+  /// No description provided for @voiceRoomName.
+  ///
+  /// In zh, this message translates to:
+  /// **'房间名称'**
+  String get voiceRoomName;
+
+  /// No description provided for @voiceRoomTopic.
+  ///
+  /// In zh, this message translates to:
+  /// **'话题（可选）'**
+  String get voiceRoomTopic;
+
+  /// No description provided for @voiceRoomNoActive.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无活跃的语音房间'**
+  String get voiceRoomNoActive;
+
+  /// No description provided for @voiceRoomConnecting.
+  ///
+  /// In zh, this message translates to:
+  /// **'连接中...'**
+  String get voiceRoomConnecting;
+
+  /// No description provided for @usernameTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名'**
+  String get usernameTitle;
+
+  /// No description provided for @usernameSet.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置用户名'**
+  String get usernameSet;
+
+  /// No description provided for @usernameChange.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改用户名'**
+  String get usernameChange;
+
+  /// No description provided for @usernamePlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入用户名'**
+  String get usernamePlaceholder;
+
+  /// No description provided for @usernameAvailable.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名可用'**
+  String get usernameAvailable;
+
+  /// No description provided for @usernameUnavailable.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名已被占用'**
+  String get usernameUnavailable;
+
+  /// No description provided for @usernameInvalid.
+  ///
+  /// In zh, this message translates to:
+  /// **'3-30个字符，小写字母、数字、下划线，必须以字母开头'**
+  String get usernameInvalid;
+
+  /// No description provided for @usernameReserved.
+  ///
+  /// In zh, this message translates to:
+  /// **'此用户名为保留名称'**
+  String get usernameReserved;
+
+  /// No description provided for @usernameSaved.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名已保存'**
+  String get usernameSaved;
+
+  /// No description provided for @usernameSearchHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'通过 @用户名 搜索'**
+  String get usernameSearchHint;
+
+  /// No description provided for @ensName.
+  ///
+  /// In zh, this message translates to:
+  /// **'ENS 域名'**
+  String get ensName;
+
+  /// No description provided for @ensLinked.
+  ///
+  /// In zh, this message translates to:
+  /// **'已关联 ENS'**
+  String get ensLinked;
+
+  /// No description provided for @ensResolving.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在解析 ENS...'**
+  String get ensResolving;
+
+  /// No description provided for @ensNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到 ENS 域名'**
+  String get ensNotFound;
+
+  /// No description provided for @tokenGateTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'代币门控'**
+  String get tokenGateTitle;
+
+  /// No description provided for @tokenGateEnable.
+  ///
+  /// In zh, this message translates to:
+  /// **'启用代币门控'**
+  String get tokenGateEnable;
+
+  /// No description provided for @tokenGateDisable.
+  ///
+  /// In zh, this message translates to:
+  /// **'禁用代币门控'**
+  String get tokenGateDisable;
+
+  /// No description provided for @tokenGateAddRule.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加规则'**
+  String get tokenGateAddRule;
+
+  /// No description provided for @tokenGateRemoveRule.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除规则'**
+  String get tokenGateRemoveRule;
+
+  /// No description provided for @tokenGateContractAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'合约地址'**
+  String get tokenGateContractAddress;
+
+  /// No description provided for @tokenGateMinBalance.
+  ///
+  /// In zh, this message translates to:
+  /// **'最低余额'**
+  String get tokenGateMinBalance;
+
+  /// No description provided for @tokenGateTokenId.
+  ///
+  /// In zh, this message translates to:
+  /// **'Token ID (ERC-1155)'**
+  String get tokenGateTokenId;
+
+  /// No description provided for @tokenGateChainId.
+  ///
+  /// In zh, this message translates to:
+  /// **'链 ID'**
+  String get tokenGateChainId;
+
+  /// No description provided for @tokenGateVerifying.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在验证代币持有...'**
+  String get tokenGateVerifying;
+
+  /// No description provided for @tokenGateVerified.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证通过'**
+  String get tokenGateVerified;
+
+  /// No description provided for @tokenGateDenied.
+  ///
+  /// In zh, this message translates to:
+  /// **'您未满足代币要求'**
+  String get tokenGateDenied;
+
+  /// No description provided for @tokenGateOperatorAnd.
+  ///
+  /// In zh, this message translates to:
+  /// **'需满足所有规则'**
+  String get tokenGateOperatorAnd;
+
+  /// No description provided for @tokenGateOperatorOr.
+  ///
+  /// In zh, this message translates to:
+  /// **'满足任一规则即可'**
+  String get tokenGateOperatorOr;
+
+  /// No description provided for @tokenGateRuleErc20.
+  ///
+  /// In zh, this message translates to:
+  /// **'ERC-20 代币'**
+  String get tokenGateRuleErc20;
+
+  /// No description provided for @tokenGateRuleErc721.
+  ///
+  /// In zh, this message translates to:
+  /// **'NFT (ERC-721)'**
+  String get tokenGateRuleErc721;
+
+  /// No description provided for @tokenGateRuleErc1155.
+  ///
+  /// In zh, this message translates to:
+  /// **'多代币 (ERC-1155)'**
+  String get tokenGateRuleErc1155;
+
+  /// No description provided for @tokenGateRuleNative.
+  ///
+  /// In zh, this message translates to:
+  /// **'原生代币'**
+  String get tokenGateRuleNative;
+
+  /// No description provided for @tokenGateSaved.
+  ///
+  /// In zh, this message translates to:
+  /// **'代币门控已保存'**
+  String get tokenGateSaved;
+
+  /// No description provided for @tokenGateEnableDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'要求成员持有指定代币才能加入'**
+  String get tokenGateEnableDescription;
+
+  /// No description provided for @tokenGateOperator.
+  ///
+  /// In zh, this message translates to:
+  /// **'规则逻辑'**
+  String get tokenGateOperator;
+
+  /// No description provided for @tokenGateRules.
+  ///
+  /// In zh, this message translates to:
+  /// **'规则列表'**
+  String get tokenGateRules;
+
+  /// No description provided for @tokenGateSymbol.
+  ///
+  /// In zh, this message translates to:
+  /// **'代币符号（可选）'**
+  String get tokenGateSymbol;
+
+  /// No description provided for @tokenGateChain.
+  ///
+  /// In zh, this message translates to:
+  /// **'区块链'**
+  String get tokenGateChain;
+
+  /// No description provided for @tokenGateTokenStandard.
+  ///
+  /// In zh, this message translates to:
+  /// **'代币标准'**
+  String get tokenGateTokenStandard;
+
+  /// No description provided for @tokenGateDenialMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'拒绝消息'**
+  String get tokenGateDenialMessage;
+
+  /// No description provided for @tokenGateDenialMessageHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证失败时显示的消息'**
+  String get tokenGateDenialMessageHint;
+
+  /// No description provided for @tokenGateVerifyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'代币验证'**
+  String get tokenGateVerifyTitle;
+
+  /// No description provided for @tokenGateVerifyPassed.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证通过'**
+  String get tokenGateVerifyPassed;
+
+  /// No description provided for @tokenGateVerifyFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证未通过'**
+  String get tokenGateVerifyFailed;
+
+  /// No description provided for @tokenGateRetryVerify.
+  ///
+  /// In zh, this message translates to:
+  /// **'重新验证'**
+  String get tokenGateRetryVerify;
+
+  /// No description provided for @tokenGateRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'要求'**
+  String get tokenGateRequired;
+
+  /// No description provided for @tokenGateYourBalance.
+  ///
+  /// In zh, this message translates to:
+  /// **'你的余额'**
+  String get tokenGateYourBalance;
+
+  /// No description provided for @tokenGateRulesActive.
+  ///
+  /// In zh, this message translates to:
+  /// **'条规则生效'**
+  String get tokenGateRulesActive;
+
+  /// No description provided for @tokenGateDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'未启用'**
+  String get tokenGateDisabled;
+
+  /// No description provided for @ensNotBound.
+  ///
+  /// In zh, this message translates to:
+  /// **'未绑定'**
+  String get ensNotBound;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

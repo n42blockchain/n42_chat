@@ -137,6 +137,31 @@ class MessageEntity extends Equatable {
   /// 定时发送：消息的预定发送时间（null 表示立即发送）
   final DateTime? scheduledAt;
 
+  // ============================================
+  // 消息线程 (MSC3440)
+  // ============================================
+
+  /// 所属线程根消息 ID（非 null 表示该消息是线程内的回复）
+  final String? threadRootId;
+
+  /// 线程回复数（仅线程根消息有值）
+  final int? threadReplyCount;
+
+  /// 最新回复内容预览
+  final String? threadLatestReply;
+
+  /// 最新回复者
+  final String? threadLatestReplySender;
+
+  /// 最新回复时间
+  final DateTime? threadLatestReplyTimestamp;
+
+  /// 是否是线程根消息（有人在此消息上创建了线程）
+  bool get isThreadRoot => threadReplyCount != null && threadReplyCount! > 0;
+
+  /// 是否在线程内（是某个线程的回复消息）
+  bool get isInThread => threadRootId != null;
+
   const MessageEntity({
     required this.id,
     required this.roomId,
@@ -162,6 +187,11 @@ class MessageEntity extends Equatable {
     this.selfDestructAfter,
     this.destroyedAt,
     this.scheduledAt,
+    this.threadRootId,
+    this.threadReplyCount,
+    this.threadLatestReply,
+    this.threadLatestReplySender,
+    this.threadLatestReplyTimestamp,
   });
 
   /// 是否是文本消息
@@ -268,6 +298,11 @@ class MessageEntity extends Equatable {
         selfDestructAfter,
         destroyedAt,
         scheduledAt,
+        threadRootId,
+        threadReplyCount,
+        threadLatestReply,
+        threadLatestReplySender,
+        threadLatestReplyTimestamp,
       ];
 
   MessageEntity copyWith({
@@ -295,6 +330,11 @@ class MessageEntity extends Equatable {
     int? selfDestructAfter,
     DateTime? destroyedAt,
     DateTime? scheduledAt,
+    String? threadRootId,
+    int? threadReplyCount,
+    String? threadLatestReply,
+    String? threadLatestReplySender,
+    DateTime? threadLatestReplyTimestamp,
   }) {
     return MessageEntity(
       id: id ?? this.id,
@@ -321,6 +361,11 @@ class MessageEntity extends Equatable {
       selfDestructAfter: selfDestructAfter ?? this.selfDestructAfter,
       destroyedAt: destroyedAt ?? this.destroyedAt,
       scheduledAt: scheduledAt ?? this.scheduledAt,
+      threadRootId: threadRootId ?? this.threadRootId,
+      threadReplyCount: threadReplyCount ?? this.threadReplyCount,
+      threadLatestReply: threadLatestReply ?? this.threadLatestReply,
+      threadLatestReplySender: threadLatestReplySender ?? this.threadLatestReplySender,
+      threadLatestReplyTimestamp: threadLatestReplyTimestamp ?? this.threadLatestReplyTimestamp,
     );
   }
 

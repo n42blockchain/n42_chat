@@ -3949,4 +3949,291 @@ class SEn extends S {
 
   @override
   String get callChatLabel => 'Chat';
+
+  @override
+  String get chatEdited => 'Edited';
+
+  @override
+  String get chatEditHistory => 'Edit History';
+
+  @override
+  String get chatOriginalMessage => 'Original';
+
+  @override
+  String chatEditedAt(String time) {
+    return 'Edited at $time';
+  }
+
+  @override
+  String get chatViewOnce => 'View Once';
+
+  @override
+  String get chatViewOncePhoto => 'View Once Photo';
+
+  @override
+  String get chatViewOnceVideo => 'View Once Video';
+
+  @override
+  String get chatViewOnceViewed => 'Viewed';
+
+  @override
+  String get chatViewOnceExpired => 'Expired';
+
+  @override
+  String get chatViewOnceTap => 'Tap to view';
+
+  @override
+  String get chatAutoFaceBlur => 'Auto face blur';
+
+  @override
+  String get chatAutoFaceBlurDesc =>
+      'Automatically blur faces when sending photos';
+
+  @override
+  String get threadReplyInThread => 'Reply in thread';
+
+  @override
+  String threadReplies(int count) {
+    return '$count replies';
+  }
+
+  @override
+  String get threadReply => '1 reply';
+
+  @override
+  String threadLatestReply(String preview) {
+    return 'Latest: $preview';
+  }
+
+  @override
+  String get threadTitle => 'Thread';
+
+  @override
+  String get threadReplyPlaceholder => 'Reply in thread...';
+
+  @override
+  String threadParticipants(int count) {
+    return '$count participants';
+  }
+
+  @override
+  String get voiceRoomTitle => 'Voice Room';
+
+  @override
+  String get voiceRoomCreate => 'Create Voice Room';
+
+  @override
+  String get voiceRoomJoin => 'Join';
+
+  @override
+  String get voiceRoomLeave => 'Leave';
+
+  @override
+  String get voiceRoomEnd => 'End Room';
+
+  @override
+  String get voiceRoomRaiseHand => 'Raise Hand';
+
+  @override
+  String get voiceRoomLowerHand => 'Lower Hand';
+
+  @override
+  String get voiceRoomMute => 'Mute';
+
+  @override
+  String get voiceRoomUnmute => 'Unmute';
+
+  @override
+  String get voiceRoomHost => 'Host';
+
+  @override
+  String get voiceRoomSpeakers => 'Speakers';
+
+  @override
+  String get voiceRoomListeners => 'Listeners';
+
+  @override
+  String get voiceRoomLive => 'LIVE';
+
+  @override
+  String get voiceRoomEnded => 'Ended';
+
+  @override
+  String get voiceRoomScheduled => 'Scheduled';
+
+  @override
+  String get voiceRoomApprove => 'Approve';
+
+  @override
+  String get voiceRoomDemote => 'Move to Listener';
+
+  @override
+  String voiceRoomHandRaised(String name) {
+    return '$name raised their hand';
+  }
+
+  @override
+  String get voiceRoomName => 'Room name';
+
+  @override
+  String get voiceRoomTopic => 'Topic (optional)';
+
+  @override
+  String get voiceRoomNoActive => 'No active voice rooms';
+
+  @override
+  String get voiceRoomConnecting => 'Connecting...';
+
+  @override
+  String get usernameTitle => 'Username';
+
+  @override
+  String get usernameSet => 'Set Username';
+
+  @override
+  String get usernameChange => 'Change Username';
+
+  @override
+  String get usernamePlaceholder => 'Enter username';
+
+  @override
+  String get usernameAvailable => 'Username available';
+
+  @override
+  String get usernameUnavailable => 'Username already taken';
+
+  @override
+  String get usernameInvalid =>
+      '3-30 characters, lowercase letters, numbers, underscore. Must start with a letter.';
+
+  @override
+  String get usernameReserved => 'This username is reserved';
+
+  @override
+  String get usernameSaved => 'Username saved';
+
+  @override
+  String get usernameSearchHint => 'Search by @username';
+
+  @override
+  String get ensName => 'ENS Name';
+
+  @override
+  String get ensLinked => 'Linked to ENS';
+
+  @override
+  String get ensResolving => 'Resolving ENS...';
+
+  @override
+  String get ensNotFound => 'ENS name not found';
+
+  @override
+  String get tokenGateTitle => 'Token Gate';
+
+  @override
+  String get tokenGateEnable => 'Enable Token Gate';
+
+  @override
+  String get tokenGateDisable => 'Disable Token Gate';
+
+  @override
+  String get tokenGateAddRule => 'Add Rule';
+
+  @override
+  String get tokenGateRemoveRule => 'Remove Rule';
+
+  @override
+  String get tokenGateContractAddress => 'Contract Address';
+
+  @override
+  String get tokenGateMinBalance => 'Minimum Balance';
+
+  @override
+  String get tokenGateTokenId => 'Token ID (ERC-1155)';
+
+  @override
+  String get tokenGateChainId => 'Chain ID';
+
+  @override
+  String get tokenGateVerifying => 'Verifying token holdings...';
+
+  @override
+  String get tokenGateVerified => 'Verification passed';
+
+  @override
+  String get tokenGateDenied => 'You do not meet the token requirements';
+
+  @override
+  String get tokenGateOperatorAnd => 'Must meet ALL rules';
+
+  @override
+  String get tokenGateOperatorOr => 'Must meet ANY rule';
+
+  @override
+  String get tokenGateRuleErc20 => 'ERC-20 Token';
+
+  @override
+  String get tokenGateRuleErc721 => 'NFT (ERC-721)';
+
+  @override
+  String get tokenGateRuleErc1155 => 'Multi-Token (ERC-1155)';
+
+  @override
+  String get tokenGateRuleNative => 'Native Token';
+
+  @override
+  String get tokenGateSaved => 'Token gate saved';
+
+  @override
+  String get tokenGateEnableDescription =>
+      'Require members to hold tokens to join';
+
+  @override
+  String get tokenGateOperator => 'Rule Logic';
+
+  @override
+  String get tokenGateRules => 'Rules';
+
+  @override
+  String get tokenGateSymbol => 'Symbol (optional)';
+
+  @override
+  String get tokenGateChain => 'Chain';
+
+  @override
+  String get tokenGateTokenStandard => 'Token Standard';
+
+  @override
+  String get tokenGateDenialMessage => 'Denial Message';
+
+  @override
+  String get tokenGateDenialMessageHint =>
+      'Message shown when verification fails';
+
+  @override
+  String get tokenGateVerifyTitle => 'Token Verification';
+
+  @override
+  String get tokenGateVerifyPassed => 'Verification Passed';
+
+  @override
+  String get tokenGateVerifyFailed => 'Verification Failed';
+
+  @override
+  String get tokenGateRetryVerify => 'Retry';
+
+  @override
+  String get tokenGateRequired => 'Required';
+
+  @override
+  String get tokenGateYourBalance => 'Your balance';
+
+  @override
+  String get tokenGateRulesActive => 'rules active';
+
+  @override
+  String get tokenGateDisabled => 'Disabled';
+
+  @override
+  String get ensNotBound => 'Not bound';
 }

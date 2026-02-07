@@ -3969,4 +3969,287 @@ class SIt extends S {
 
   @override
   String get callChatLabel => '聊天';
+
+  @override
+  String get chatEdited => '已编辑';
+
+  @override
+  String get chatEditHistory => '编辑历史';
+
+  @override
+  String get chatOriginalMessage => '原始消息';
+
+  @override
+  String chatEditedAt(String time) {
+    return '编辑于 $time';
+  }
+
+  @override
+  String get chatViewOnce => '阅后即焚';
+
+  @override
+  String get chatViewOncePhoto => '阅后即焚照片';
+
+  @override
+  String get chatViewOnceVideo => '阅后即焚视频';
+
+  @override
+  String get chatViewOnceViewed => '已查看';
+
+  @override
+  String get chatViewOnceExpired => '已过期';
+
+  @override
+  String get chatViewOnceTap => '点击查看';
+
+  @override
+  String get chatAutoFaceBlur => '自动模糊人脸';
+
+  @override
+  String get chatAutoFaceBlurDesc => '发送照片时自动模糊人脸';
+
+  @override
+  String get threadReplyInThread => '在线程中回复';
+
+  @override
+  String threadReplies(int count) {
+    return '$count 条回复';
+  }
+
+  @override
+  String get threadReply => '1 条回复';
+
+  @override
+  String threadLatestReply(String preview) {
+    return '最新: $preview';
+  }
+
+  @override
+  String get threadTitle => '消息线程';
+
+  @override
+  String get threadReplyPlaceholder => '在线程中回复...';
+
+  @override
+  String threadParticipants(int count) {
+    return '$count 位参与者';
+  }
+
+  @override
+  String get voiceRoomTitle => '语音聊天室';
+
+  @override
+  String get voiceRoomCreate => '创建语音房间';
+
+  @override
+  String get voiceRoomJoin => '加入';
+
+  @override
+  String get voiceRoomLeave => '离开';
+
+  @override
+  String get voiceRoomEnd => '结束房间';
+
+  @override
+  String get voiceRoomRaiseHand => '举手';
+
+  @override
+  String get voiceRoomLowerHand => '放下手';
+
+  @override
+  String get voiceRoomMute => '静音';
+
+  @override
+  String get voiceRoomUnmute => '取消静音';
+
+  @override
+  String get voiceRoomHost => '主持人';
+
+  @override
+  String get voiceRoomSpeakers => '发言者';
+
+  @override
+  String get voiceRoomListeners => '听众';
+
+  @override
+  String get voiceRoomLive => '直播中';
+
+  @override
+  String get voiceRoomEnded => '已结束';
+
+  @override
+  String get voiceRoomScheduled => '已预约';
+
+  @override
+  String get voiceRoomApprove => '批准发言';
+
+  @override
+  String get voiceRoomDemote => '移至听众';
+
+  @override
+  String voiceRoomHandRaised(String name) {
+    return '$name 举手了';
+  }
+
+  @override
+  String get voiceRoomName => '房间名称';
+
+  @override
+  String get voiceRoomTopic => '话题（可选）';
+
+  @override
+  String get voiceRoomNoActive => '暂无活跃的语音房间';
+
+  @override
+  String get voiceRoomConnecting => '连接中...';
+
+  @override
+  String get usernameTitle => '用户名';
+
+  @override
+  String get usernameSet => '设置用户名';
+
+  @override
+  String get usernameChange => '修改用户名';
+
+  @override
+  String get usernamePlaceholder => '输入用户名';
+
+  @override
+  String get usernameAvailable => '用户名可用';
+
+  @override
+  String get usernameUnavailable => '用户名已被占用';
+
+  @override
+  String get usernameInvalid => '3-30个字符，小写字母、数字、下划线，必须以字母开头';
+
+  @override
+  String get usernameReserved => '此用户名为保留名称';
+
+  @override
+  String get usernameSaved => '用户名已保存';
+
+  @override
+  String get usernameSearchHint => '通过 @用户名 搜索';
+
+  @override
+  String get ensName => 'ENS 域名';
+
+  @override
+  String get ensLinked => '已关联 ENS';
+
+  @override
+  String get ensResolving => '正在解析 ENS...';
+
+  @override
+  String get ensNotFound => '未找到 ENS 域名';
+
+  @override
+  String get tokenGateTitle => '代币门控';
+
+  @override
+  String get tokenGateEnable => '启用代币门控';
+
+  @override
+  String get tokenGateDisable => '禁用代币门控';
+
+  @override
+  String get tokenGateAddRule => '添加规则';
+
+  @override
+  String get tokenGateRemoveRule => '删除规则';
+
+  @override
+  String get tokenGateContractAddress => '合约地址';
+
+  @override
+  String get tokenGateMinBalance => '最低余额';
+
+  @override
+  String get tokenGateTokenId => 'Token ID (ERC-1155)';
+
+  @override
+  String get tokenGateChainId => '链 ID';
+
+  @override
+  String get tokenGateVerifying => '正在验证代币持有...';
+
+  @override
+  String get tokenGateVerified => '验证通过';
+
+  @override
+  String get tokenGateDenied => '您未满足代币要求';
+
+  @override
+  String get tokenGateOperatorAnd => '需满足所有规则';
+
+  @override
+  String get tokenGateOperatorOr => '满足任一规则即可';
+
+  @override
+  String get tokenGateRuleErc20 => 'ERC-20 代币';
+
+  @override
+  String get tokenGateRuleErc721 => 'NFT (ERC-721)';
+
+  @override
+  String get tokenGateRuleErc1155 => '多代币 (ERC-1155)';
+
+  @override
+  String get tokenGateRuleNative => '原生代币';
+
+  @override
+  String get tokenGateSaved => '代币门控已保存';
+
+  @override
+  String get tokenGateEnableDescription => '要求成员持有指定代币才能加入';
+
+  @override
+  String get tokenGateOperator => '规则逻辑';
+
+  @override
+  String get tokenGateRules => '规则列表';
+
+  @override
+  String get tokenGateSymbol => '代币符号（可选）';
+
+  @override
+  String get tokenGateChain => '区块链';
+
+  @override
+  String get tokenGateTokenStandard => '代币标准';
+
+  @override
+  String get tokenGateDenialMessage => '拒绝消息';
+
+  @override
+  String get tokenGateDenialMessageHint => '验证失败时显示的消息';
+
+  @override
+  String get tokenGateVerifyTitle => '代币验证';
+
+  @override
+  String get tokenGateVerifyPassed => '验证通过';
+
+  @override
+  String get tokenGateVerifyFailed => '验证未通过';
+
+  @override
+  String get tokenGateRetryVerify => '重新验证';
+
+  @override
+  String get tokenGateRequired => '要求';
+
+  @override
+  String get tokenGateYourBalance => '你的余额';
+
+  @override
+  String get tokenGateRulesActive => '条规则生效';
+
+  @override
+  String get tokenGateDisabled => '未启用';
+
+  @override
+  String get ensNotBound => '未绑定';
 }

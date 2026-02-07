@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../entities/group_entity.dart';
+import '../entities/token_gate_entity.dart';
 
 /// 群聊仓库接口
 abstract class IGroupRepository {
@@ -128,5 +129,18 @@ abstract class IGroupRepository {
 
   /// 拒绝群邀请
   Future<void> rejectGroupInvite(String roomId);
+
+  // ============================================
+  // 代币门控
+  // ============================================
+
+  /// 获取群的代币门控配置
+  Future<TokenGateConfig?> getTokenGate(String roomId);
+
+  /// 设置代币门控配置
+  Future<void> setTokenGate(String roomId, TokenGateConfig config);
+
+  /// 验证当前用户是否满足代币门控条件
+  Future<TokenGateVerificationResult> verifyTokenGate(String roomId);
 }
 

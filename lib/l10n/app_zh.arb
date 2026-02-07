@@ -2040,5 +2040,131 @@
   "callNoMessagesYet": "暂无消息\n发送一条消息开始聊天",
   "callTypeMessage": "输入消息...",
   "callYouSender": "我",
-  "callChatLabel": "聊天"
+  "callChatLabel": "聊天",
+
+  "chatEdited": "已编辑",
+  "chatEditHistory": "编辑历史",
+  "chatOriginalMessage": "原始消息",
+  "chatEditedAt": "编辑于 {time}",
+  "@chatEditedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+
+  "chatViewOnce": "阅后即焚",
+  "chatViewOncePhoto": "阅后即焚照片",
+  "chatViewOnceVideo": "阅后即焚视频",
+  "chatViewOnceViewed": "已查看",
+  "chatViewOnceExpired": "已过期",
+  "chatViewOnceTap": "点击查看",
+
+  "chatAutoFaceBlur": "自动模糊人脸",
+  "chatAutoFaceBlurDesc": "发送照片时自动模糊人脸",
+
+  "threadReplyInThread": "在线程中回复",
+  "threadReplies": "{count} 条回复",
+  "@threadReplies": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "threadReply": "1 条回复",
+  "threadLatestReply": "最新: {preview}",
+  "@threadLatestReply": {
+    "placeholders": {
+      "preview": {"type": "String"}
+    }
+  },
+  "threadTitle": "消息线程",
+  "threadReplyPlaceholder": "在线程中回复...",
+  "threadParticipants": "{count} 位参与者",
+  "@threadParticipants": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "voiceRoomTitle": "语音聊天室",
+  "voiceRoomCreate": "创建语音房间",
+  "voiceRoomJoin": "加入",
+  "voiceRoomLeave": "离开",
+  "voiceRoomEnd": "结束房间",
+  "voiceRoomRaiseHand": "举手",
+  "voiceRoomLowerHand": "放下手",
+  "voiceRoomMute": "静音",
+  "voiceRoomUnmute": "取消静音",
+  "voiceRoomHost": "主持人",
+  "voiceRoomSpeakers": "发言者",
+  "voiceRoomListeners": "听众",
+  "voiceRoomLive": "直播中",
+  "voiceRoomEnded": "已结束",
+  "voiceRoomScheduled": "已预约",
+  "voiceRoomApprove": "批准发言",
+  "voiceRoomDemote": "移至听众",
+  "voiceRoomHandRaised": "{name} 举手了",
+  "@voiceRoomHandRaised": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "voiceRoomName": "房间名称",
+  "voiceRoomTopic": "话题（可选）",
+  "voiceRoomNoActive": "暂无活跃的语音房间",
+  "voiceRoomConnecting": "连接中...",
+
+  "usernameTitle": "用户名",
+  "usernameSet": "设置用户名",
+  "usernameChange": "修改用户名",
+  "usernamePlaceholder": "输入用户名",
+  "usernameAvailable": "用户名可用",
+  "usernameUnavailable": "用户名已被占用",
+  "usernameInvalid": "3-30个字符，小写字母、数字、下划线，必须以字母开头",
+  "usernameReserved": "此用户名为保留名称",
+  "usernameSaved": "用户名已保存",
+  "usernameSearchHint": "通过 @用户名 搜索",
+
+  "ensName": "ENS 域名",
+  "ensLinked": "已关联 ENS",
+  "ensResolving": "正在解析 ENS...",
+  "ensNotFound": "未找到 ENS 域名",
+
+  "tokenGateTitle": "代币门控",
+  "tokenGateEnable": "启用代币门控",
+  "tokenGateDisable": "禁用代币门控",
+  "tokenGateAddRule": "添加规则",
+  "tokenGateRemoveRule": "删除规则",
+  "tokenGateContractAddress": "合约地址",
+  "tokenGateMinBalance": "最低余额",
+  "tokenGateTokenId": "Token ID (ERC-1155)",
+  "tokenGateChainId": "链 ID",
+  "tokenGateVerifying": "正在验证代币持有...",
+  "tokenGateVerified": "验证通过",
+  "tokenGateDenied": "您未满足代币要求",
+  "tokenGateOperatorAnd": "需满足所有规则",
+  "tokenGateOperatorOr": "满足任一规则即可",
+  "tokenGateRuleErc20": "ERC-20 代币",
+  "tokenGateRuleErc721": "NFT (ERC-721)",
+  "tokenGateRuleErc1155": "多代币 (ERC-1155)",
+  "tokenGateRuleNative": "原生代币",
+  "tokenGateSaved": "代币门控已保存",
+  "tokenGateEnableDescription": "要求成员持有指定代币才能加入",
+  "tokenGateOperator": "规则逻辑",
+  "tokenGateRules": "规则列表",
+  "tokenGateSymbol": "代币符号（可选）",
+  "tokenGateChain": "区块链",
+  "tokenGateTokenStandard": "代币标准",
+  "tokenGateDenialMessage": "拒绝消息",
+  "tokenGateDenialMessageHint": "验证失败时显示的消息",
+  "tokenGateVerifyTitle": "代币验证",
+  "tokenGateVerifyPassed": "验证通过",
+  "tokenGateVerifyFailed": "验证未通过",
+  "tokenGateRetryVerify": "重新验证",
+  "tokenGateRequired": "要求",
+  "tokenGateYourBalance": "你的余额",
+  "tokenGateRulesActive": "条规则生效",
+  "tokenGateDisabled": "未启用",
+  "ensNotBound": "未绑定"
 }
