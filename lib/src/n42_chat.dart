@@ -70,6 +70,7 @@ class N42Chat {
 
   /// 推送通知服务
   static FirebasePushService? _pushService;
+  static Completer<void>? _pushInitCompleter;
 
   /// 通话管理器
   static CallManager? _callManager;
@@ -255,7 +256,21 @@ class N42Chat {
   }
 
   /// 初始化推送服务
+  ///
+  /// 使用 Completer 防止并发初始化（auth 恢复可能与初始化并行执行）
   static Future<void> _initializePushService(N42ChatConfig config) async {
+    // 已初始化则跳过
+    if (_pushService != null) return;
+
+    // 防止并发初始化：如果正在初始化中，等待完成
+    if (_pushInitCompleter != null && !_pushInitCompleter!.isCompleted) {
+      debugPrint('N42Chat: Push service initialization already in progress, waiting...');
+      await _pushInitCompleter!.future;
+      return;
+    }
+
+    _pushInitCompleter = Completer<void>();
+
     try {
       // 获取 Matrix 客户端管理器
       final clientManager = getIt<MatrixClientManager>();
@@ -281,7 +296,7 @@ class N42Chat {
         },
       );
 
-      // 初始化
+      // 初始化（包括获取 FCM Token）
       await _pushService!.initialize();
 
       // 如果已登录，立即注册推送
@@ -292,6 +307,8 @@ class N42Chat {
       debugPrint('N42Chat: Push service initialized');
     } catch (e) {
       debugPrint('N42Chat: Failed to initialize push service: $e');
+    } finally {
+      _pushInitCompleter?.complete();
     }
   }
 
@@ -316,8 +333,15 @@ class N42Chat {
 
   /// 注册推送通知
   ///
-  /// 登录成功后调用此方法注册推送
+  /// 登录成功后调用此方法注册推送。
+  /// 如果推送服务正在初始化中（竞态），会等待初始化完成后再注册。
   static Future<void> registerPushNotifications() async {
+    // 等待正在进行的初始化完成
+    if (_pushInitCompleter != null && !_pushInitCompleter!.isCompleted) {
+      debugPrint('N42Chat: Waiting for push service initialization to complete...');
+      await _pushInitCompleter!.future;
+    }
+
     // 如果推送服务未初始化，先初始化
     if (_pushService == null && _config != null && _config!.enablePushNotifications) {
       await _initializePushService(_config!);
@@ -325,6 +349,8 @@ class N42Chat {
 
     if (_pushService != null) {
       await _pushService!.registerForPush();
+    } else {
+      debugPrint('N42Chat: Cannot register push - push service is null');
     }
   }
 
