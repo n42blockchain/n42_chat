@@ -11,6 +11,8 @@ import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
 import '../../widgets/common/n42_avatar.dart';
+import '../chat/viewers/image_viewer_page.dart';
+import '../chat/viewers/video_player_page.dart';
 import 'create_moment_page.dart';
 import 'moment_detail_page.dart';
 
@@ -574,7 +576,26 @@ class _MomentTile extends StatelessWidget {
   }
 
   void _openMediaViewer(BuildContext context, int index) {
-    // TODO: 打开媒体查看器
+    if (index >= moment.media.length) return;
+    final media = moment.media[index];
+    if (media.httpUrl == null) return;
+
+    if (media.isVideo) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => VideoPlayerPage(videoUrl: media.httpUrl!),
+        ),
+      );
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => ImageViewerPage(
+            imageUrl: media.httpUrl!,
+            heroTag: 'moment_media_${moment.id}_$index',
+          ),
+        ),
+      );
+    }
   }
 
   void _showCommentDialog(BuildContext context) {
