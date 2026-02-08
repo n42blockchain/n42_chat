@@ -610,9 +610,10 @@ class MatrixMomentDataSource {
     if (_client?.homeserver == null) return null;
 
     final uri = Uri.parse(mxcUrl);
-    return _client!.homeserver!
-        .resolve('/_matrix/media/v3/download/${uri.host}${uri.path}')
-        .toString();
+    final serverName = uri.host;
+    final mediaId = uri.path.startsWith('/') ? uri.path.substring(1) : uri.path;
+    final homeserver = _client!.homeserver.toString().replaceAll(RegExp(r'/+$'), '');
+    return '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
   }
 
   /// 上传文件

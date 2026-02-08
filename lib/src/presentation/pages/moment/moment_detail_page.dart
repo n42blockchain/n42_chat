@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
 import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
@@ -26,6 +28,14 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
   String? _replyToCommentId;
   String? _replyToUserId;
   String? _replyToUserName;
+
+  Map<String, String> _getAuthHeaders() {
+    final accessToken = MatrixClientManager.instance.client?.accessToken;
+    if (accessToken != null && accessToken.isNotEmpty) {
+      return {'Authorization': 'Bearer $accessToken'};
+    }
+    return {};
+  }
 
   @override
   void dispose() {
@@ -256,10 +266,11 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
             fit: StackFit.expand,
             children: [
               if (media.httpUrl != null)
-                Image.network(
-                  media.httpUrl!,
+                CachedNetworkImage(
+                  imageUrl: media.httpUrl!,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  httpHeaders: _getAuthHeaders(),
+                  errorWidget: (_, __, ___) => Container(
                     color: isDark ? Colors.grey[800] : Colors.grey[200],
                     child: const Icon(Icons.image, size: 48),
                   ),
@@ -300,10 +311,11 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
             fit: StackFit.expand,
             children: [
               if (media.httpUrl != null)
-                Image.network(
-                  media.httpUrl!,
+                CachedNetworkImage(
+                  imageUrl: media.httpUrl!,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  httpHeaders: _getAuthHeaders(),
+                  errorWidget: (_, __, ___) => Container(
                     color: isDark ? Colors.grey[800] : Colors.grey[200],
                     child: const Icon(Icons.image),
                   ),

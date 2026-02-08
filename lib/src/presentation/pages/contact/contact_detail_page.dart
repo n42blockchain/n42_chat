@@ -10,6 +10,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/n42_avatar.dart';
+import '../moment/moment_list_page.dart';
 import 'contact_settings_page.dart';
 
 /// 联系人详情页面（仿微信）
@@ -224,7 +225,13 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                     title: S.of(context)?.commonMoments ?? 'Moments',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const MomentListPage(),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
