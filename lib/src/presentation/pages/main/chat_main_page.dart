@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/services/chat_lock_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/responsive_utils.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -15,6 +16,7 @@ import '../../blocs/conversation/conversation_event.dart';
 import '../../blocs/conversation/conversation_state.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/transfer/transfer_bloc.dart';
+import '../chat/chat_lock_page.dart';
 import '../chat/chat_page.dart';
 import '../contact/add_friend_page.dart';
 import '../contact/contact_list_page.dart';
@@ -241,7 +243,25 @@ class _ChatMainPageState extends State<ChatMainPage> {
   }
 
   /// iPad 分屏模式下，选择会话后更新右侧面板
-  void _onConversationSelectedForSplit(ConversationEntity conversation) {
+  void _onConversationSelectedForSplit(ConversationEntity conversation) async {
+    // Check if chat is locked
+    final lockService = ChatLockService();
+    final isLocked = await lockService.isChatLocked(conversation.id);
+
+    if (isLocked && mounted) {
+      final verified = await Navigator.of(context).push<bool>(
+        MaterialPageRoute<bool>(
+          builder: (_) => ChatLockPage(
+            roomId: conversation.id,
+            chatName: conversation.name,
+          ),
+        ),
+      );
+      if (verified != true || !mounted) return;
+    }
+
+    if (!mounted) return;
+
     setState(() {
       _selectedConversation = conversation;
       // 每次切换会话都创建新的 ChatBloc
@@ -661,7 +681,25 @@ class _ChatTabContent extends StatelessWidget {
     required this.contactBloc,
   });
 
-  void _navigateToChat(BuildContext context, ConversationEntity conversation) {
+  void _navigateToChat(BuildContext context, ConversationEntity conversation) async {
+    // Check if chat is locked
+    final lockService = ChatLockService();
+    final isLocked = await lockService.isChatLocked(conversation.id);
+
+    if (isLocked && context.mounted) {
+      final verified = await Navigator.of(context).push<bool>(
+        MaterialPageRoute<bool>(
+          builder: (_) => ChatLockPage(
+            roomId: conversation.id,
+            chatName: conversation.name,
+          ),
+        ),
+      );
+      if (verified != true || !context.mounted) return;
+    }
+
+    if (!context.mounted) return;
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => MultiBlocProvider(

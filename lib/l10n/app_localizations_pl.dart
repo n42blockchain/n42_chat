@@ -4420,4 +4420,310 @@ class SPl extends S {
 
   @override
   String get tapToSearch => 'Tap to search';
+
+  @override
+  String get settingsThisDevice => '本设备';
+
+  @override
+  String get settingsJustNow => '刚刚';
+
+  @override
+  String get settingsDeviceId => '设备 ID';
+
+  @override
+  String get settingsStatus => '状态';
+
+  @override
+  String get settingsLastActive => '最后活跃';
+
+  @override
+  String get settingsIpAddress => 'IP 地址';
+
+  @override
+  String get settingsRenameDevice => '重命名设备';
+
+  @override
+  String get settingsDeviceNameHint => '输入设备名称';
+
+  @override
+  String get settingsDeviceRenamed => '设备已重命名';
+
+  @override
+  String get settingsRenameFailed => '重命名失败';
+
+  @override
+  String get settingsRemoteLogout => '远程登出';
+
+  @override
+  String settingsRemoteLogoutConfirm(String deviceName) {
+    return '确定要登出「$deviceName」吗？此操作无法撤销。';
+  }
+
+  @override
+  String get settingsDeviceLoggedOut => '设备已登出';
+
+  @override
+  String get settingsLogoutFailed => '登出失败';
+
+  @override
+  String get settingsLogout => '登出';
+
+  @override
+  String get settingsVerifyIdentity => '验证身份';
+
+  @override
+  String get settingsEnterPasswordToConfirm => '请输入密码以确认此操作。';
+
+  @override
+  String get scheduledSendTitle => '定时发送';
+
+  @override
+  String get scheduledSendInOneHour => '1小时后';
+
+  @override
+  String get scheduledSendTonight => '今晚 (20:00)';
+
+  @override
+  String get scheduledSendTomorrowMorning => '明早 (9:00)';
+
+  @override
+  String get scheduledSendCustom => '自定义时间';
+
+  @override
+  String get scheduledMessageLabel => '定时发送';
+
+  @override
+  String get scheduledMessageCancel => '取消定时发送';
+
+  @override
+  String get chatLockTitle => '聊天锁';
+
+  @override
+  String get chatLockEnable => '锁定此聊天';
+
+  @override
+  String get chatLockDisable => '解锁此聊天';
+
+  @override
+  String get chatLockDescription => '锁定的聊天需要通过生物识别或 PIN 码验证才能打开';
+
+  @override
+  String get chatLockVerifyTitle => '聊天已锁定';
+
+  @override
+  String get chatLockVerifySubtitle => '验证后访问此聊天';
+
+  @override
+  String get chatLockVerifyFailed => '验证失败';
+
+  @override
+  String get chatLockEnabled => '聊天已锁定';
+
+  @override
+  String get chatLockDisabled => '聊天已解锁';
+
+  @override
+  String get chatLockPinTitle => '输入 PIN 码';
+
+  @override
+  String get chatLockPinSetTitle => '设置 PIN 码';
+
+  @override
+  String get chatLockPinConfirmTitle => '确认 PIN 码';
+
+  @override
+  String get chatLockPinMismatch => 'PIN 码不一致';
+
+  @override
+  String get chatLockUseBiometric => '使用生物识别';
+
+  @override
+  String get chatLockUsePin => '使用 PIN 码';
+
+  @override
+  String get mediaEditorUndo => '撤销';
+
+  @override
+  String get mediaEditorRedo => '重做';
+
+  @override
+  String get mediaEditorCrop => '裁剪';
+
+  @override
+  String get mediaEditorFilter => '滤镜';
+
+  @override
+  String get mediaEditorDraw => '涂鸦';
+
+  @override
+  String get mediaEditorText => '文字';
+
+  @override
+  String get aiAssistant => 'AI 助手';
+
+  @override
+  String get aiAssistantWelcome => '你好！我是 N42 AI 助手，有什么可以帮你的吗？';
+
+  @override
+  String get aiAssistantNotConfigured => 'AI 服务未配置';
+
+  @override
+  String get aiAssistantSettings => 'AI 设置';
+
+  @override
+  String get aiAssistantClearHistory => '清空对话历史';
+
+  @override
+  String get aiAssistantClearHistoryConfirm => '确定清空所有 AI 对话历史？';
+
+  @override
+  String get aiAssistantStopGenerating => '停止生成';
+
+  @override
+  String get aiAssistantModel => '模型';
+
+  @override
+  String get aiAssistantTemperature => '温度';
+
+  @override
+  String get aiAssistantMaxTokens => '最大令牌数';
+
+  @override
+  String get aiAssistantContextWindow => '上下文窗口';
+
+  @override
+  String get aiAssistantServiceStatus => '服务状态';
+
+  @override
+  String get aiAssistantAvailable => '可用';
+
+  @override
+  String get aiAssistantUnavailable => '不可用';
+
+  @override
+  String get aiSummarize => 'AI 总结';
+
+  @override
+  String aiSummarizeUnread(int count) {
+    return 'AI 总结 $count 条未读消息';
+  }
+
+  @override
+  String get aiSummarizeLoading => '正在总结...';
+
+  @override
+  String get aiSummarizeError => '总结失败';
+
+  @override
+  String get aiRewrite => 'AI 改写';
+
+  @override
+  String get aiRewriteFormal => '正式';
+
+  @override
+  String get aiRewriteCasual => '轻松';
+
+  @override
+  String get aiRewritePlayful => '俏皮';
+
+  @override
+  String get aiRewriteProfessional => '专业';
+
+  @override
+  String get aiRewriteAccept => '使用';
+
+  @override
+  String get aiRewriteCancel => '取消';
+
+  @override
+  String get aiRewriteLoading => '正在改写...';
+
+  @override
+  String get aiLinkSummary => 'AI 摘要';
+
+  @override
+  String get aiLinkSummaryAnalyzing => '正在分析...';
+
+  @override
+  String get chatFolderManagement => '管理文件夹';
+
+  @override
+  String get chatFolderSystem => '系统文件夹';
+
+  @override
+  String get chatFolderCustom => '自定义文件夹';
+
+  @override
+  String get chatFolderEmpty => '暂无自定义文件夹';
+
+  @override
+  String get chatFolderCreate => '创建文件夹';
+
+  @override
+  String get chatFolderEdit => '编辑文件夹';
+
+  @override
+  String get chatFolderNameHint => '文件夹名称';
+
+  @override
+  String get chatFolderAll => '全部';
+
+  @override
+  String get chatFolderUnread => '未读';
+
+  @override
+  String get chatFolderPersonal => '私聊';
+
+  @override
+  String get chatFolderGroups => '群组';
+
+  @override
+  String get chatFolderChannels => '频道';
+
+  @override
+  String get chatFolderMuted => '已静音';
+
+  @override
+  String get storyAddMusic => '添加音乐';
+
+  @override
+  String get storyChangeMusic => '更换音乐';
+
+  @override
+  String get storyBackgroundMusic => '背景音乐';
+
+  @override
+  String get storyMusicPreview => '预览 (最长15秒)';
+
+  @override
+  String get storyChooseFromDevice => '从设备选择';
+
+  @override
+  String get storyUseThisMusic => '使用此音乐';
+
+  @override
+  String get authPasskeyNotSupported => '此设备不支持 Passkey';
+
+  @override
+  String get authPasskeyRegister => '注册 Passkey';
+
+  @override
+  String get authPasskeyNoRegistered => '未注册 Passkey';
+
+  @override
+  String get authPasskeyRegisterHint => '注册 Passkey 以实现无密码登录';
+
+  @override
+  String get authPasskeyNameYours => '为 Passkey 命名';
+
+  @override
+  String get authPasskeyRegistered => 'Passkey 注册成功';
+
+  @override
+  String get authPasskeyDeleted => 'Passkey 已删除';
+
+  @override
+  String authPasskeyDeleteConfirm(String name) {
+    return '删除 Passkey \"$name\"？删除后将无法使用该 Passkey 登录。';
+  }
 }

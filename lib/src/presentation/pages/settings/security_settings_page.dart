@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:matrix/matrix.dart' show AuthenticationPassword, AuthenticationUserIdentifier, MatrixException;
 
 import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
@@ -6,8 +7,8 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
-import '../../../n42_chat.dart';
-import '../../blocs/auth/auth_event.dart';
+import '../../../data/datasources/matrix/matrix_auth_datasource.dart';
+import '../../../services/auth/auth_methods_service.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../security/sas_verification_page.dart';
@@ -39,11 +40,17 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   final BiometricService _biometricService = BiometricService();
   final SecureStorageDataSource _secureStorage = SecureStorageDataSource();
 
+  // Passkey 状态
+  bool _isPasskeySupported = false;
+  List<PasskeyCredential> _registeredPasskeys = [];
+  final AuthMethodsService _authMethodsService = AuthMethodsService();
+
   @override
   void initState() {
     super.initState();
     _loadData();
     _loadBiometricStatus();
+    _loadPasskeyStatus();
   }
 
   Future<void> _loadBiometricStatus() async {
@@ -59,19 +66,74 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     }
   }
 
+  Future<void> _loadPasskeyStatus() async {
+    final isSupported = await _authMethodsService.isPasskeySupported();
+    if (isSupported) {
+      // Try to load registered passkeys
+      final client = widget.e2eeManager.client;
+      final accessToken = client.accessToken;
+      final homeserver = client.homeserver?.toString();
+
+      List<PasskeyCredential> passkeys = [];
+      if (accessToken != null && homeserver != null) {
+        try {
+          passkeys = await _authMethodsService.getRegisteredPasskeys(
+            homeserver: homeserver,
+            accessToken: accessToken,
+          );
+        } catch (e) {
+          debugPrint('SecuritySettings: Failed to load passkeys: $e');
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _isPasskeySupported = true;
+          _registeredPasskeys = passkeys;
+        });
+      }
+    }
+  }
+
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
 
     try {
       final backupInfo = await widget.keyBackupService.getBackupInfo();
+
       // 获取当前用户的设备列表
-      // 注：需要当前用户ID
-      
+      final authDataSource = MatrixAuthDataSource();
+      final matrixDevices = await authDataSource.getDevices();
+      final currentDeviceId = widget.e2eeManager.currentDeviceId;
+      final userId = widget.e2eeManager.client.userID;
+
+      final devices = matrixDevices.map((d) {
+        final isVerified = userId != null
+            ? widget.e2eeManager.isDeviceVerified(userId, d.deviceId)
+            : false;
+        return DeviceInfo(
+          deviceId: d.deviceId,
+          deviceName: d.displayName ?? d.deviceId,
+          isVerified: isVerified,
+          lastSeenTs: d.lastSeenTs,
+          lastSeenIp: d.lastSeenIp,
+          isCurrentDevice: d.deviceId == currentDeviceId,
+        );
+      }).toList()
+        // 当前设备排在最前面
+        ..sort((a, b) {
+          if (a.isCurrentDevice) return -1;
+          if (b.isCurrentDevice) return 1;
+          return (b.lastSeenTs ?? 0).compareTo(a.lastSeenTs ?? 0);
+        });
+
       setState(() {
         _backupInfo = backupInfo;
+        _devices = devices;
         _isLoading = false;
       });
     } catch (e) {
+      debugPrint('SecuritySettingsPage: Failed to load data: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -101,6 +163,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 // 生物识别登录
                 if (_isBiometricAvailable) ...[
                   _buildBiometricSection(isDark),
+                  const SizedBox(height: 16),
+                ],
+
+                // Passkey 管理
+                if (_isPasskeySupported) ...[
+                  _buildPasskeySection(isDark),
                   const SizedBox(height: 16),
                 ],
 
@@ -183,6 +251,254 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         ],
       ),
     );
+  }
+
+  Widget _buildPasskeySection(bool isDark) {
+    return Container(
+      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              'Passkey',
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
+              ),
+            ),
+          ),
+          // Registered passkeys
+          if (_registeredPasskeys.isEmpty)
+            ListTile(
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.key, color: AppColors.primary),
+              ),
+              title: Text(
+                'No passkeys registered',
+                style: TextStyle(
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+              subtitle: Text(
+                'Register a passkey for passwordless login',
+                style: TextStyle(
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
+              ),
+            )
+          else
+            ..._registeredPasskeys.map((passkey) => ListTile(
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.green.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.key, color: Colors.green),
+              ),
+              title: Text(
+                passkey.displayName ?? 'Passkey',
+                style: TextStyle(
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+              subtitle: Text(
+                passkey.credentialId.length > 20
+                    ? '${passkey.credentialId.substring(0, 20)}...'
+                    : passkey.credentialId,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
+                onPressed: () => _deletePasskey(passkey),
+              ),
+            )),
+          // Register button
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: OutlinedButton.icon(
+              onPressed: _registerPasskey,
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Register Passkey'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 44),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _registerPasskey() async {
+    final client = widget.e2eeManager.client;
+    final userId = client.userID;
+    final accessToken = client.accessToken;
+    final homeserver = client.homeserver?.toString();
+
+    if (userId == null || accessToken == null || homeserver == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Not logged in')),
+        );
+      }
+      return;
+    }
+
+    try {
+      // 1. Request challenge
+      final challengeData = await _authMethodsService.requestPasskeyRegistrationChallenge(
+        homeserver: homeserver,
+        userId: userId,
+        accessToken: accessToken,
+      );
+
+      if (challengeData == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Server does not support Passkey (MSC3824)'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
+
+      final challenge = challengeData['challenge'] as String? ?? '';
+
+      // 2. Get display name for the passkey
+      final displayName = await _showPasskeyNameDialog();
+      if (displayName == null) return; // User canceled
+
+      // 3. Register passkey
+      final credential = await _authMethodsService.registerPasskey(
+        userId: userId,
+        username: userId.split(':').first.replaceFirst('@', ''),
+        displayName: displayName,
+        challenge: challenge,
+        homeserver: homeserver,
+        accessToken: accessToken,
+      );
+
+      if (credential != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Passkey registered successfully')),
+        );
+        _loadPasskeyStatus(); // Refresh list
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Passkey registration failed: $e')),
+        );
+      }
+    }
+  }
+
+  Future<String?> _showPasskeyNameDialog() async {
+    final controller = TextEditingController(text: 'My Passkey');
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Name your Passkey'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: 'e.g., iPhone, MacBook',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              controller.dispose();
+              Navigator.pop(ctx);
+            },
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              final name = controller.text.trim();
+              controller.dispose();
+              Navigator.pop(ctx, name.isNotEmpty ? name : 'My Passkey');
+            },
+            child: const Text('Register'),
+          ),
+        ],
+      ),
+    );
+    return result;
+  }
+
+  Future<void> _deletePasskey(PasskeyCredential passkey) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Passkey'),
+        content: Text('Delete passkey "${passkey.displayName ?? 'Passkey'}"? You will no longer be able to use it to log in.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(S.of(context)?.commonDelete ?? 'Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final client = widget.e2eeManager.client;
+    final accessToken = client.accessToken;
+    final homeserver = client.homeserver?.toString();
+
+    if (accessToken == null || homeserver == null) return;
+
+    final success = await _authMethodsService.deletePasskey(
+      homeserver: homeserver,
+      accessToken: accessToken,
+      credentialId: passkey.credentialId,
+    );
+
+    if (mounted) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Passkey deleted')),
+        );
+        _loadPasskeyStatus();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to delete passkey')),
+        );
+      }
+    }
   }
 
   Future<void> _onBiometricToggle(bool enable) async {
@@ -399,40 +715,77 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   Widget _buildDeviceItem(DeviceInfo device, bool isDark) {
+    final lastSeenText = device.lastSeen != null
+        ? _formatLastSeen(device.lastSeen!)
+        : '';
+    final subtitleParts = <String>[];
+    if (device.isCurrentDevice) {
+      subtitleParts.add(S.of(context)?.settingsThisDevice ?? 'This device');
+    }
+    subtitleParts.add(
+      device.isVerified
+          ? (S.of(context)?.settingsVerified ?? 'Verified')
+          : (S.of(context)?.settingsUnverified ?? 'Unverified'),
+    );
+    if (lastSeenText.isNotEmpty) {
+      subtitleParts.add(lastSeenText);
+    }
+
     return ListTile(
       leading: Container(
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: device.isVerified
-              ? Colors.green.withValues(alpha: 0.1)
-              : Colors.orange.withValues(alpha: 0.1),
+          color: device.isCurrentDevice
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : device.isVerified
+                  ? Colors.green.withValues(alpha: 0.1)
+                  : Colors.orange.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
-          Icons.phone_android,
-          color: device.isVerified ? Colors.green : Colors.orange,
+          device.isCurrentDevice ? Icons.smartphone : Icons.phone_android,
+          color: device.isCurrentDevice
+              ? AppColors.primary
+              : device.isVerified
+                  ? Colors.green
+                  : Colors.orange,
         ),
       ),
       title: Text(
         device.deviceName,
         style: TextStyle(
           color: isDark ? Colors.white : AppColors.textPrimary,
+          fontWeight: device.isCurrentDevice ? FontWeight.w600 : FontWeight.normal,
         ),
       ),
       subtitle: Text(
-        device.isVerified ? (S.of(context)?.settingsVerified ?? 'Verified') : (S.of(context)?.settingsUnverified ?? 'Unverified'),
+        subtitleParts.join(' · '),
         style: TextStyle(
-          color: device.isVerified ? Colors.green : Colors.orange,
+          fontSize: 12,
+          color: device.isCurrentDevice
+              ? AppColors.primary
+              : device.isVerified
+                  ? Colors.green
+                  : Colors.orange,
         ),
       ),
       trailing: Icon(
         Icons.chevron_right,
-        color:
-            isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
       ),
       onTap: () => _showDeviceDetails(device),
     );
+  }
+
+  String _formatLastSeen(DateTime lastSeen) {
+    final now = DateTime.now();
+    final diff = now.difference(lastSeen);
+    if (diff.inMinutes < 5) return S.of(context)?.settingsJustNow ?? 'Just now';
+    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
+    if (diff.inDays < 1) return '${diff.inHours}h ago';
+    if (diff.inDays < 30) return '${diff.inDays}d ago';
+    return '${lastSeen.month}/${lastSeen.day}/${lastSeen.year}';
   }
 
   Widget _buildAdvancedSection(bool isDark) {
@@ -812,46 +1165,382 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   void _showDeviceDetails(DeviceInfo device) {
+    final isDark = context.isDarkMode;
     showModalBottomSheet<void>(
       context: context,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              device.deviceName,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              S.of(context)?.settingsDeviceIdLabel(device.deviceId) ?? 'Device ID: ${device.deviceId}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(device.isVerified
-                ? (S.of(context)?.settingsDeviceStatusVerified ?? 'Status: Verified')
-                : (S.of(context)?.settingsDeviceStatusUnverified ?? 'Status: Unverified')),
-            if (device.lastSeen != null) Text(S.of(context)?.settingsLastActiveLabel(device.lastSeen!.toIso8601String()) ?? 'Last active: ${device.lastSeen}'),
-            const SizedBox(height: 16),
-            if (!device.isVerified)
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  _startSasVerification(device);
-                },
-                child: Text(S.of(context)?.settingsVerifyThisDevice ?? 'Verify this device'),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: device.isCurrentDevice
+                          ? AppColors.primary.withValues(alpha: 0.1)
+                          : device.isVerified
+                              ? Colors.green.withValues(alpha: 0.1)
+                              : Colors.orange.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      device.isCurrentDevice ? Icons.smartphone : Icons.phone_android,
+                      color: device.isCurrentDevice
+                          ? AppColors.primary
+                          : device.isVerified ? Colors.green : Colors.orange,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          device.deviceName,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : AppColors.textPrimary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (device.isCurrentDevice)
+                          Text(
+                            S.of(context)?.settingsThisDevice ?? 'This device',
+                            style: TextStyle(fontSize: 13, color: AppColors.primary),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-          ],
+              const SizedBox(height: 16),
+              _buildDeviceDetailRow(
+                S.of(context)?.settingsDeviceId ?? 'Device ID',
+                device.deviceId,
+                isDark,
+              ),
+              _buildDeviceDetailRow(
+                S.of(context)?.settingsStatus ?? 'Status',
+                device.isVerified
+                    ? (S.of(context)?.settingsVerified ?? 'Verified')
+                    : (S.of(context)?.settingsUnverified ?? 'Unverified'),
+                isDark,
+              ),
+              if (device.lastSeen != null)
+                _buildDeviceDetailRow(
+                  S.of(context)?.settingsLastActive ?? 'Last active',
+                  _formatLastSeen(device.lastSeen!),
+                  isDark,
+                ),
+              if (device.lastSeenIp != null && device.lastSeenIp!.isNotEmpty)
+                _buildDeviceDetailRow(
+                  S.of(context)?.settingsIpAddress ?? 'IP address',
+                  device.lastSeenIp!,
+                  isDark,
+                ),
+              const SizedBox(height: 20),
+              // Action buttons
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _showRenameDeviceDialog(device);
+                  },
+                  icon: const Icon(Icons.edit, size: 18),
+                  label: Text(S.of(context)?.settingsRenameDevice ?? 'Rename device'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+              if (!device.isVerified) ...[
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _startSasVerification(device);
+                    },
+                    icon: const Icon(Icons.verified_user, size: 18),
+                    label: Text(S.of(context)?.settingsVerifyThisDevice ?? 'Verify this device'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+              if (!device.isCurrentDevice) ...[
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _showRemoteLogoutConfirmation(device);
+                    },
+                    icon: const Icon(Icons.logout, size: 18),
+                    label: Text(S.of(context)?.settingsRemoteLogout ?? 'Remote logout'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      foregroundColor: AppColors.error,
+                      side: BorderSide(color: AppColors.error),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Widget _buildDeviceDetailRow(String label, String value, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark ? Colors.white : AppColors.textPrimary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRenameDeviceDialog(DeviceInfo device) {
+    final controller = TextEditingController(text: device.deviceName);
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.settingsRenameDevice ?? 'Rename device'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: S.of(context)?.settingsDeviceNameHint ?? 'Enter device name',
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              controller.dispose();
+              Navigator.pop(ctx);
+            },
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final newName = controller.text.trim();
+              controller.dispose();
+              Navigator.pop(ctx);
+              if (newName.isNotEmpty && newName != device.deviceName) {
+                await _renameDevice(device.deviceId, newName);
+              }
+            },
+            child: Text(S.of(context)?.commonSave ?? 'Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _renameDevice(String deviceId, String newName) async {
+    try {
+      final authDataSource = MatrixAuthDataSource();
+      await authDataSource.updateDeviceName(deviceId, newName);
+      await _loadData();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context)?.settingsDeviceRenamed ?? 'Device renamed')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${S.of(context)?.settingsRenameFailed ?? 'Rename failed'}: $e')),
+        );
+      }
+    }
+  }
+
+  void _showRemoteLogoutConfirmation(DeviceInfo device) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.settingsRemoteLogout ?? 'Remote logout'),
+        content: Text(
+          S.of(context)?.settingsRemoteLogoutConfirm(device.deviceName) ??
+              'Are you sure you want to log out "${device.deviceName}"? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _performRemoteLogout(device);
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(S.of(context)?.settingsLogout ?? 'Logout'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _performRemoteLogout(DeviceInfo device) async {
+    setState(() => _isLoading = true);
+    try {
+      final authDataSource = MatrixAuthDataSource();
+      // First attempt without auth (may trigger UIA)
+      try {
+        await authDataSource.deleteDevice(device.deviceId);
+      } on MatrixException catch (e) {
+        if (e.response?.statusCode == 401) {
+          // UIA required - show password dialog
+          if (mounted) {
+            setState(() => _isLoading = false);
+            await _showUiaPasswordDialog(device);
+            return;
+          }
+        }
+        rethrow;
+      }
+      await _loadData();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context)?.settingsDeviceLoggedOut ?? 'Device logged out')),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _showUiaPasswordDialog(DeviceInfo device) async {
+    final passwordController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.settingsVerifyIdentity ?? 'Verify identity'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(S.of(context)?.settingsEnterPasswordToConfirm ?? 'Enter your password to confirm this action.'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: S.of(context)?.settingsPassword ?? 'Password',
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              passwordController.dispose();
+              Navigator.pop(ctx, false);
+            },
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx, true);
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final password = passwordController.text;
+      passwordController.dispose();
+      if (password.isNotEmpty) {
+        setState(() => _isLoading = true);
+        try {
+          final userId = widget.e2eeManager.client.userID ?? '';
+          final auth = AuthenticationPassword(
+            password: password,
+            identifier: AuthenticationUserIdentifier(user: userId),
+          );
+          final authDataSource = MatrixAuthDataSource();
+          await authDataSource.deleteDevice(device.deviceId, auth: auth);
+          await _loadData();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(S.of(context)?.settingsDeviceLoggedOut ?? 'Device logged out')),
+            );
+          }
+        } catch (e) {
+          setState(() => _isLoading = false);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e')),
+            );
+          }
+        }
+      }
+    } else {
+      passwordController.dispose();
+    }
   }
 
   void _setupCrossSigning() async {

@@ -17,14 +17,16 @@ import 'package:uuid/uuid.dart';
 import '../../services/voip/call_manager.dart';
 import 'push_notification_service.dart';
 
-/// 后台消息处理器 - 必须是顶级函数
+/// 后台消息处理器 - 顶级函数，供独立使用 n42_chat 插件时注册。
+///
+/// 在集成到主 app (n42appv2) 时，不应直接注册此函数。
+/// 主 app 应使用 [FirebasePushService.handleBackgroundMessage] 在其统一的
+/// 后台消息处理器中委托 Matrix/Chat 消息。
+/// （全局只允许一个 `FirebaseMessaging.onBackgroundMessage` 处理器）
 @pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // 确保 Firebase 已初始化
+Future<void> firebasePushBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-
-  // 处理后台推送
-  await FirebasePushService._handleBackgroundMessage(message);
+  await FirebasePushService.handleBackgroundMessage(message);
 }
 
 /// Firebase 推送通知服务实现
@@ -69,8 +71,8 @@ class FirebasePushService implements IPushNotificationService {
   StreamSubscription<String>? _tokenRefreshSubscription;
   StreamSubscription<matrix.SyncUpdate>? _syncSubscription;
 
-  /// 静态实例（用于后台处理，保留以便将来使用）
-  static FirebasePushService? _instance; // ignore: unused_field
+  /// 通话状态自动重置定时器（防止 _isInCall 泄漏）
+  Timer? _callStateResetTimer;
 
   /// 通知配置
   NotificationConfig _notificationConfig = const NotificationConfig();
@@ -90,9 +92,7 @@ class FirebasePushService implements IPushNotificationService {
     this.appId = 'com.n42.chat',
     this.pushkeyType = 'http',
     this.onNotificationTap,
-  }) {
-    _instance = this;
-  }
+  });
 
   /// 设置通知配置
   void setNotificationConfig(NotificationConfig config) {
@@ -111,6 +111,17 @@ class FirebasePushService implements IPushNotificationService {
   /// 设置通话状态（通话期间禁用所有消息通知）
   void setInCall(bool inCall) {
     _isInCall = inCall;
+    _callStateResetTimer?.cancel();
+    if (inCall) {
+      // 安全机制：90 秒后自动重置，防止状态泄漏
+      // （正常通话会由 CallManager 主动调用 setInCall(false)）
+      _callStateResetTimer = Timer(const Duration(seconds: 90), () {
+        if (_isInCall) {
+          _isInCall = false;
+          debugPrint('FirebasePushService: Auto-reset _isInCall after timeout');
+        }
+      });
+    }
     debugPrint('FirebasePushService: In call set to $inCall');
   }
 
@@ -125,8 +136,18 @@ class FirebasePushService implements IPushNotificationService {
       // 初始化本地通知
       await _initializeLocalNotifications();
 
-      // 设置后台消息处理器
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      // 注意：后台消息处理器由主 app 统一注册（全局只允许一个）。
+      // 主 app 的处理器会将 Matrix/Chat 消息委托给
+      // FirebasePushService.handleBackgroundMessage()。
+
+      // iOS 前台通知展示选项（确保前台时也能显示系统推送横幅）
+      if (Platform.isIOS) {
+        await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+      }
 
       // 监听前台消息
       _foregroundSubscription = FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
@@ -229,7 +250,7 @@ class FirebasePushService implements IPushNotificationService {
     // 过滤通话相关的推送
     final eventType = message.data['type'] as String?;
     if (eventType == 'm.call.invite') {
-      _isInCall = true;
+      setInCall(true);
       debugPrint('FirebasePushService: Set isInCall=true for incoming call');
       // 前台保护：如果 CallManager 尚未初始化或尚未处理此来电，
       // 主动触发 CallKit 作为 fallback（避免 sync 未建立时来电丢失）
@@ -239,6 +260,14 @@ class FirebasePushService implements IPushNotificationService {
         _showBackgroundCallKit(message).catchError((Object e) {
           debugPrint('FirebasePushService: Failed to show foreground CallKit fallback: $e');
         });
+      }
+      return;
+    }
+    if (eventType == 'm.call.hangup' || eventType == 'm.call.reject') {
+      // 对方挂断或拒接 → 清除通话状态，恢复消息通知
+      if (_isInCall) {
+        setInCall(false);
+        debugPrint('FirebasePushService: Cleared _isInCall on $eventType');
       }
       return;
     }
@@ -292,15 +321,23 @@ class FirebasePushService implements IPushNotificationService {
     }
   }
 
-  /// 测试入口：处理后台消息
-  @visibleForTesting
-  static Future<void> handleBackgroundMessageForTest(RemoteMessage message) =>
+  /// 处理后台推送消息的公开入口
+  ///
+  /// 供主 app 的统一后台消息处理器调用。
+  /// 由于 `FirebaseMessaging.onBackgroundMessage` 全局只能注册一个处理器，
+  /// 主 app 应在其统一处理器中判断消息类型，将 Matrix/Chat 消息委托给此方法。
+  static Future<void> handleBackgroundMessage(RemoteMessage message) =>
       _handleBackgroundMessage(message);
 
   /// 测试入口：显示后台 CallKit
   @visibleForTesting
   static Future<void> showBackgroundCallKitForTest(RemoteMessage message) =>
       _showBackgroundCallKit(message);
+
+  /// 测试入口：处理后台消息（handleBackgroundMessage 的别名）
+  @visibleForTesting
+  static Future<void> handleBackgroundMessageForTest(RemoteMessage message) =>
+      _handleBackgroundMessage(message);
 
   /// 处理后台消息（静态方法）
   static Future<void> _handleBackgroundMessage(RemoteMessage message) async {
@@ -317,7 +354,18 @@ class FirebasePushService implements IPushNotificationService {
       return;
     }
 
-    // 其他 m.call.* 事件（如 m.call.hangup, m.call.candidates）跳过
+    // m.call.hangup/reject: 对方取消或拒接 → 结束后台 CallKit 来电界面
+    if (eventType == 'm.call.hangup' || eventType == 'm.call.reject') {
+      debugPrint('FirebasePushService: Background $eventType received, ending CallKit');
+      try {
+        await FlutterCallkitIncoming.endAllCalls();
+      } catch (e) {
+        debugPrint('FirebasePushService: Failed to end CallKit on $eventType: $e');
+      }
+      return;
+    }
+
+    // 其他 m.call.* 事件（如 m.call.candidates, m.call.answer）跳过
     if (eventType != null && eventType.startsWith('m.call.')) {
       debugPrint('FirebasePushService: Skipping background notification for call event: $eventType');
       return;
@@ -506,12 +554,19 @@ class FirebasePushService implements IPushNotificationService {
     // 过滤通话相关事件（m.call.*）- 这些由 CallKit 通知处理
     final eventType = event.type;
     if (eventType.startsWith('m.call.')) {
-      debugPrint('FirebasePushService: Skipping notification for call event: $eventType');
       // 收到来电事件时，立即设置通话状态，防止后续消息通知
       if (eventType == 'm.call.invite' && event.senderId != _client.userID) {
-        _isInCall = true;
+        setInCall(true);
         debugPrint('FirebasePushService: Set isInCall=true for incoming call event');
       }
+      // 对方挂断或拒接 → 清除通话状态
+      if (eventType == 'm.call.hangup' || eventType == 'm.call.reject') {
+        if (_isInCall) {
+          setInCall(false);
+          debugPrint('FirebasePushService: Cleared _isInCall on sync $eventType');
+        }
+      }
+      debugPrint('FirebasePushService: Skipping notification for call event: $eventType');
       return false;
     }
 
@@ -766,6 +821,7 @@ class FirebasePushService implements IPushNotificationService {
     await _foregroundSubscription?.cancel();
     await _tokenRefreshSubscription?.cancel();
     await _syncSubscription?.cancel();
+    _callStateResetTimer?.cancel();
     _isInitialized = false;
   }
 }

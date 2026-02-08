@@ -58,10 +58,16 @@ import '../../presentation/blocs/thread/thread_bloc.dart';
 import '../../presentation/blocs/live_location/live_location_bloc.dart';
 import '../../presentation/blocs/voice_room/voice_room_bloc.dart';
 import '../../data/datasources/matrix/matrix_voice_room_datasource.dart';
+import '../services/ai_service.dart';
 import '../services/username_service.dart';
 import '../services/ens_cache_service.dart';
+import '../../data/datasources/ai_datasource.dart';
+import '../../data/repositories/ai_repository_impl.dart';
 import '../../data/repositories/voice_room_repository_impl.dart';
+import '../../domain/repositories/ai_repository.dart';
 import '../../domain/repositories/voice_room_repository.dart';
+import '../../presentation/blocs/ai_assistant/ai_assistant_bloc.dart';
+import '../../presentation/blocs/chat_folder/chat_folder_bloc.dart';
 import '../../services/voip/voice_room_service.dart';
 
 /// 全局GetIt实例
@@ -181,6 +187,17 @@ Future<void> _registerServices() async {
   getIt.registerLazySingleton<StorageManagerService>(
     () => StorageManagerService(clientManager: getIt<MatrixClientManager>()),
   );
+
+  // AI 服务（仅当配置了 API Key 时注册）
+  if (config.aiApiKey != null && config.aiApiKey!.isNotEmpty) {
+    getIt.registerLazySingleton<AiService>(
+      () => AiDatasource(
+        apiKey: config.aiApiKey!,
+        baseUrl: config.aiBaseUrl,
+        defaultModel: config.aiModel,
+      ),
+    );
+  }
 }
 
 /// 注册数据源
@@ -349,6 +366,16 @@ void _registerRepositories() {
       getIt<MatrixVoiceRoomDataSource>(),
     ),
   );
+
+  // AI 仓库（仅当 AI 服务已注册时）
+  if (getIt.isRegistered<AiService>()) {
+    getIt.registerLazySingleton<IAiRepository>(
+      () => AiRepositoryImpl(
+        aiService: getIt<AiService>(),
+        storage: getIt<SecureStorageDataSource>(),
+      ),
+    );
+  }
 }
 
 /// 注册用例
@@ -446,6 +473,20 @@ void _registerBlocs() {
     () => VoiceRoomBloc(
       repository: getIt<IVoiceRoomRepository>(),
       voiceRoomService: getIt<VoiceRoomService>(),
+    ),
+  );
+
+  // AI 助手 BLoC（仅当 AI 仓库已注册时）
+  if (getIt.isRegistered<IAiRepository>()) {
+    getIt.registerFactory<AiAssistantBloc>(
+      () => AiAssistantBloc(aiRepository: getIt<IAiRepository>()),
+    );
+  }
+
+  // 聊天文件夹 BLoC
+  getIt.registerFactory<ChatFolderBloc>(
+    () => ChatFolderBloc(
+      storage: getIt<SecureStorageDataSource>(),
     ),
   );
 }

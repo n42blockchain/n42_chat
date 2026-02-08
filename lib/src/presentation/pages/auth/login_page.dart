@@ -13,6 +13,7 @@ import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
+import '../../../services/auth/auth_methods_service.dart';
 import 'register_page.dart';
 import 'email_otp_page.dart';
 import 'reset_password_page.dart';
@@ -988,16 +989,89 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // TODO: 实现真正的 Passkey 登录
-    // 目前显示提示
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(S.of(context)?.authPasskeyRequiresServer ?? 'Passkey login requires server support'),
-        backgroundColor: Colors.orange,
-      ),
-    );
+    try {
+      final authService = AuthMethodsService();
 
-    // context.read<AuthBloc>().add(AuthPasskeyLoginRequested(homeserver: homeserver));
+      // 1. Check platform support
+      final isSupported = await authService.isPasskeySupported();
+      if (!isSupported) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(S.of(context)?.authPasskeyNotSupported ?? 'Passkey is not supported on this device'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
+      }
+
+      // 2. Request authentication challenge from server
+      final challengeData = await authService.requestPasskeyAuthChallenge(
+        homeserver: homeserver,
+      );
+
+      if (challengeData == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(S.of(context)?.authPasskeyRequiresServer ?? 'Passkey login requires server support (MSC3824)'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
+
+      // 3. Authenticate with passkey
+      final challenge = challengeData['challenge'] as String? ?? '';
+      final allowedCredentials = (challengeData['allowed_credentials'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList();
+
+      final result = await authService.authenticateWithPasskey(
+        challenge: challenge,
+        allowedCredentials: allowedCredentials,
+        homeserver: homeserver,
+      );
+
+      if (result == null) {
+        // User canceled
+        return;
+      }
+
+      // 4. Use the login token from the result to authenticate with Matrix
+      final loginToken = result['access_token'] as String?;
+      final userId = result['user_id'] as String?;
+      final deviceId = result['device_id'] as String?;
+      if (loginToken != null && userId != null && deviceId != null && mounted) {
+        context.read<AuthBloc>().add(AuthTokenLoginRequested(
+          homeserver: homeserver,
+          accessToken: loginToken,
+          userId: userId,
+          deviceId: deviceId,
+        ));
+      }
+    } on PlatformException catch (e) {
+      if (e.code == 'USER_CANCELED') return;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Passkey error: ${e.message}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Passkey login failed: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
   
   void _loginWithEmailOtp() {

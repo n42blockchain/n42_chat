@@ -21,12 +21,16 @@ class ConversationTile extends StatelessWidget {
   /// 是否被选中（iPad 分屏模式下高亮当前会话）
   final bool isSelected;
 
+  /// 是否已锁定（显示锁图标）
+  final bool isLocked;
+
   const ConversationTile({
     super.key,
     required this.conversation,
     this.onTap,
     this.onLongPress,
     this.isSelected = false,
+    this.isLocked = false,
   });
   
   /// 获取显示名称（私聊时优先使用备注名）
@@ -196,6 +200,16 @@ class ConversationTile extends StatelessWidget {
             Expanded(
               child: Row(
                 children: [
+                  // 聊天锁标识
+                  if (isLocked)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: Icon(
+                        Icons.lock_outline,
+                        size: 14,
+                        color: AppColors.primary,
+                      ),
+                    ),
                   // 加密标识
                   if (conversation.isEncrypted)
                     const Padding(

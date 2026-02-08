@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/services/chat_lock_service.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -62,9 +63,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   bool _isPinned = false;
   bool _isMuted = false;
   bool _isStrongReminder = false;
+  bool _isChatLocked = false;
 
   // 群名称（可编辑）
   late String _groupName;
+
+  final ChatLockService _chatLockService = ChatLockService();
 
   // 备注更新订阅
   StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
@@ -78,6 +82,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
     // 加载强提醒状态
     _loadStrongReminderStatus();
+
+    // 加载聊天锁状态
+    _loadChatLockStatus();
 
     // 监听备注更新
     _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
@@ -104,6 +111,210 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     }
   }
   
+  Future<void> _loadChatLockStatus() async {
+    final isLocked = await _chatLockService.isChatLocked(widget.conversation.id);
+    if (mounted) {
+      setState(() => _isChatLocked = isLocked);
+    }
+  }
+
+  Future<void> _toggleChatLock(bool enable) async {
+    if (enable) {
+      // 锁定：先验证用户身份（生物识别），然后设置 PIN
+      final biometricAvailable = await _chatLockService.isBiometricAvailable();
+      if (biometricAvailable) {
+        final verified = await _chatLockService.verifyWithBiometric(
+          reason: S.of(context)?.chatLockEnable ?? 'Lock this chat',
+        );
+        if (!verified) return;
+      }
+
+      // 弹出 PIN 设置对话框
+      if (mounted) {
+        final pin = await _showSetPinDialog();
+        await _chatLockService.lockChat(widget.conversation.id, pin: pin);
+        if (mounted) {
+          setState(() => _isChatLocked = true);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(S.of(context)?.chatLockEnabled ?? 'Chat locked')),
+          );
+        }
+      }
+    } else {
+      // 解锁前先验证
+      final biometricAvailable = await _chatLockService.isBiometricAvailable();
+      bool verified = false;
+      if (biometricAvailable) {
+        verified = await _chatLockService.verifyWithBiometric(
+          reason: S.of(context)?.chatLockDisable ?? 'Unlock this chat',
+        );
+      }
+      if (!verified) {
+        // Try PIN
+        final hasPin = await _chatLockService.hasPinSet(widget.conversation.id);
+        if (hasPin && mounted) {
+          verified = await _showVerifyPinDialog();
+        }
+      }
+
+      if (verified) {
+        await _chatLockService.unlockChat(widget.conversation.id);
+        if (mounted) {
+          setState(() => _isChatLocked = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(S.of(context)?.chatLockDisabled ?? 'Chat unlocked')),
+          );
+        }
+      }
+    }
+  }
+
+  Future<String?> _showSetPinDialog() async {
+    final pinController = TextEditingController();
+    final confirmController = TextEditingController();
+    final l10n = S.of(context);
+
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        String? error;
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) => AlertDialog(
+            title: Text(l10n?.chatLockPinSetTitle ?? 'Set PIN'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: pinController,
+                  keyboardType: TextInputType.number,
+                  obscureText: true,
+                  maxLength: 6,
+                  decoration: InputDecoration(
+                    hintText: l10n?.chatLockPinTitle ?? 'Enter PIN',
+                    counterText: '',
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: confirmController,
+                  keyboardType: TextInputType.number,
+                  obscureText: true,
+                  maxLength: 6,
+                  decoration: InputDecoration(
+                    hintText: l10n?.chatLockPinConfirmTitle ?? 'Confirm PIN',
+                    counterText: '',
+                    border: const OutlineInputBorder(),
+                    errorText: error,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  pinController.dispose();
+                  confirmController.dispose();
+                  Navigator.pop(ctx, null);
+                },
+                child: Text(l10n?.commonCancel ?? 'Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final pin = pinController.text;
+                  final confirm = confirmController.text;
+                  if (pin.length < 4) return;
+                  if (pin != confirm) {
+                    setDialogState(() {
+                      error = l10n?.chatLockPinMismatch ?? 'PIN does not match';
+                    });
+                    return;
+                  }
+                  pinController.dispose();
+                  confirmController.dispose();
+                  Navigator.pop(ctx, pin);
+                },
+                child: Text(l10n?.commonConfirm ?? 'Confirm'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<bool> _showVerifyPinDialog() async {
+    final pinController = TextEditingController();
+    final l10n = S.of(context);
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        String? error;
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) => AlertDialog(
+            title: Text(l10n?.chatLockPinTitle ?? 'Enter PIN'),
+            content: TextField(
+              controller: pinController,
+              keyboardType: TextInputType.number,
+              obscureText: true,
+              maxLength: 6,
+              decoration: InputDecoration(
+                counterText: '',
+                border: const OutlineInputBorder(),
+                errorText: error,
+              ),
+              onSubmitted: (_) async {
+                final verified = await _chatLockService.verifyPin(
+                  widget.conversation.id,
+                  pinController.text,
+                );
+                if (verified) {
+                  pinController.dispose();
+                  if (ctx.mounted) Navigator.pop(ctx, true);
+                } else {
+                  setDialogState(() {
+                    error = l10n?.chatLockVerifyFailed ?? 'Verification failed';
+                    pinController.clear();
+                  });
+                }
+              },
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  pinController.dispose();
+                  Navigator.pop(ctx, false);
+                },
+                child: Text(l10n?.commonCancel ?? 'Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final verified = await _chatLockService.verifyPin(
+                    widget.conversation.id,
+                    pinController.text,
+                  );
+                  if (verified) {
+                    pinController.dispose();
+                    if (ctx.mounted) Navigator.pop(ctx, true);
+                  } else {
+                    setDialogState(() {
+                      error = l10n?.chatLockVerifyFailed ?? 'Verification failed';
+                      pinController.clear();
+                    });
+                  }
+                },
+                child: Text(l10n?.commonConfirm ?? 'Confirm'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    return result ?? false;
+  }
+
   @override
   void dispose() {
     _remarkSubscription?.cancel();
@@ -477,6 +688,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     });
                     // 持久化强提醒设置
                     _updateStrongReminderStatus(value);
+                  },
+                ),
+                _buildDivider(dividerColor),
+                _buildSwitchItem(
+                  title: S.of(context)?.chatLockTitle ?? 'Chat lock',
+                  value: _isChatLocked,
+                  textColor: textColor,
+                  onChanged: (value) {
+                    _toggleChatLock(value);
                   },
                 ),
               ],

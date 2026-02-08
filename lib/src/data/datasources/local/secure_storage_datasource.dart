@@ -1402,6 +1402,57 @@ class SecureStorageDataSource {
   }
 
   // ============================================
+  // 通用键值存储（供扩展模块使用）
+  // ============================================
+
+  /// 通用读取
+  Future<String?> read(String key) async {
+    try {
+      return await _storage.read(key: key);
+    } catch (e) {
+      debugPrint('SecureStorage: Read failed for key $key: $e');
+      return null;
+    }
+  }
+
+  /// 通用写入
+  Future<void> write(String key, String value) async {
+    await _storage.write(key: key, value: value);
+  }
+
+  /// 通用删除
+  Future<void> delete(String key) async {
+    await _storage.delete(key: key);
+  }
+
+  // ============================================
+  // 聊天文件夹管理
+  // ============================================
+
+  static const String _keyChatFolders = 'n42_chat_folders';
+
+  /// 保存聊天文件夹列表
+  Future<void> saveChatFolders(List<Map<String, dynamic>> folders) async {
+    await _storage.write(
+      key: _keyChatFolders,
+      value: jsonEncode(folders),
+    );
+  }
+
+  /// 获取聊天文件夹列表
+  Future<List<Map<String, dynamic>>> getChatFolders() async {
+    try {
+      final data = await _storage.read(key: _keyChatFolders);
+      if (data == null) return [];
+      final list = jsonDecode(data) as List<dynamic>;
+      return list.cast<Map<String, dynamic>>();
+    } catch (e) {
+      debugPrint('SecureStorage: Failed to load chat folders: $e');
+      return [];
+    }
+  }
+
+  // ============================================
   // 清理
   // ============================================
 

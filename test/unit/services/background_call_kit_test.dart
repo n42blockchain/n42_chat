@@ -161,10 +161,33 @@ void main() {
       expect(showCalls, hasLength(1));
     });
 
-    test('should skip m.call.hangup without triggering CallKit', () async {
+    test('should end CallKit on m.call.hangup (not show new one)', () async {
       final message = RemoteMessage(
         data: <String, dynamic>{
           'type': 'm.call.hangup',
+          'room_id': '!room:matrix.org',
+        },
+      );
+
+      await FirebasePushService.handleBackgroundMessageForTest(message);
+
+      // 不应触发 showCallkitIncoming
+      final showCalls = callkitCalls.where(
+        (c) => c.method == 'showCallkitIncoming',
+      );
+      expect(showCalls, isEmpty);
+
+      // 应触发 endAllCalls（结束后台来电界面）
+      final endCalls = callkitCalls.where(
+        (c) => c.method == 'endAllCalls',
+      );
+      expect(endCalls, hasLength(1));
+    });
+
+    test('should end CallKit on m.call.reject', () async {
+      final message = RemoteMessage(
+        data: <String, dynamic>{
+          'type': 'm.call.reject',
           'room_id': '!room:matrix.org',
         },
       );
@@ -175,6 +198,11 @@ void main() {
         (c) => c.method == 'showCallkitIncoming',
       );
       expect(showCalls, isEmpty);
+
+      final endCalls = callkitCalls.where(
+        (c) => c.method == 'endAllCalls',
+      );
+      expect(endCalls, hasLength(1));
     });
 
     test('should skip m.call.candidates without triggering CallKit', () async {

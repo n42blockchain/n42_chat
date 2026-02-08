@@ -244,6 +244,63 @@ class UrlPreviewService {
     return match?.group(0);
   }
 
+  /// 获取页面文本内容（用于 AI 摘要）
+  ///
+  /// 提取 HTML 中的可见文本，去除标签和脚本
+  Future<String?> getPageTextContent(String url) async {
+    if (_isPrivateUrl(url)) return null;
+
+    try {
+      final uri = Uri.parse(url);
+      final request = http.Request('GET', uri);
+      request.headers['User-Agent'] = 'Mozilla/5.0 (compatible; N42Bot/1.0)';
+      request.headers['Range'] = 'bytes=0-102400'; // 限 100KB
+
+      final client = http.Client();
+      try {
+        final response = await client.send(request).timeout(
+          const Duration(seconds: 8),
+        );
+
+        if (response.statusCode != 200 && response.statusCode != 206) {
+          return null;
+        }
+
+        final body = await response.stream.bytesToString();
+        return _extractTextContent(body);
+      } finally {
+        client.close();
+      }
+    } catch (e) {
+      debugPrint('UrlPreviewService: Failed to get text content for $url: $e');
+      return null;
+    }
+  }
+
+  /// 从 HTML 中提取可见文本
+  String _extractTextContent(String html) {
+    // 移除 script 和 style 标签及其内容
+    var text = html.replaceAll(
+      RegExp(r'<(script|style|noscript)[^>]*>[\s\S]*?</\1>', caseSensitive: false),
+      ' ',
+    );
+    // 移除 HTML 标签
+    text = text.replaceAll(RegExp(r'<[^>]+>'), ' ');
+    // 解码 HTML 实体
+    text = text
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'");
+    // 合并多个空白字符
+    text = text.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+    // 截取前 4000 字符
+    return text.length > 4000 ? text.substring(0, 4000) : text;
+  }
+
   /// 清除缓存
   void clearCache() {
     _cache.clear();

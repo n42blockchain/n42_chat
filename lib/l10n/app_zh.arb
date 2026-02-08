@@ -2251,5 +2251,134 @@
   "draftSaved": "草稿已保存",
   "voiceRecording": "语音录制",
   "searchLocation": "搜索地点",
-  "tapToSearch": "点击搜索"
+  "tapToSearch": "点击搜索",
+
+  "settingsThisDevice": "本设备",
+  "settingsJustNow": "刚刚",
+  "settingsDeviceId": "设备 ID",
+  "settingsStatus": "状态",
+  "settingsLastActive": "最后活跃",
+  "settingsIpAddress": "IP 地址",
+  "settingsRenameDevice": "重命名设备",
+  "settingsDeviceNameHint": "输入设备名称",
+  "settingsDeviceRenamed": "设备已重命名",
+  "settingsRenameFailed": "重命名失败",
+  "settingsRemoteLogout": "远程登出",
+  "settingsRemoteLogoutConfirm": "确定要登出「{deviceName}」吗？此操作无法撤销。",
+  "@settingsRemoteLogoutConfirm": {
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsDeviceLoggedOut": "设备已登出",
+  "settingsLogoutFailed": "登出失败",
+  "settingsLogout": "登出",
+  "settingsVerifyIdentity": "验证身份",
+  "settingsEnterPasswordToConfirm": "请输入密码以确认此操作。",
+  "commonConfirm": "确认",
+
+  "scheduledSendTitle": "定时发送",
+  "scheduledSendInOneHour": "1小时后",
+  "scheduledSendTonight": "今晚 (20:00)",
+  "scheduledSendTomorrowMorning": "明早 (9:00)",
+  "scheduledSendCustom": "自定义时间",
+  "scheduledMessageLabel": "定时发送",
+  "scheduledMessageCancel": "取消定时发送",
+
+  "chatLockTitle": "聊天锁",
+  "chatLockEnable": "锁定此聊天",
+  "chatLockDisable": "解锁此聊天",
+  "chatLockDescription": "锁定的聊天需要通过生物识别或 PIN 码验证才能打开",
+  "chatLockVerifyTitle": "聊天已锁定",
+  "chatLockVerifySubtitle": "验证后访问此聊天",
+  "chatLockVerifyFailed": "验证失败",
+  "chatLockEnabled": "聊天已锁定",
+  "chatLockDisabled": "聊天已解锁",
+  "chatLockPinTitle": "输入 PIN 码",
+  "chatLockPinSetTitle": "设置 PIN 码",
+  "chatLockPinConfirmTitle": "确认 PIN 码",
+  "chatLockPinMismatch": "PIN 码不一致",
+  "chatLockUseBiometric": "使用生物识别",
+  "chatLockUsePin": "使用 PIN 码",
+
+  "mediaEditorUndo": "撤销",
+  "mediaEditorRedo": "重做",
+  "mediaEditorCrop": "裁剪",
+  "mediaEditorFilter": "滤镜",
+  "mediaEditorDraw": "涂鸦",
+  "mediaEditorText": "文字",
+
+  "aiAssistant": "AI 助手",
+  "aiAssistantWelcome": "你好！我是 N42 AI 助手，有什么可以帮你的吗？",
+  "aiAssistantNotConfigured": "AI 服务未配置",
+  "aiAssistantSettings": "AI 设置",
+  "aiAssistantClearHistory": "清空对话历史",
+  "aiAssistantClearHistoryConfirm": "确定清空所有 AI 对话历史？",
+  "aiAssistantStopGenerating": "停止生成",
+  "aiAssistantModel": "模型",
+  "aiAssistantTemperature": "温度",
+  "aiAssistantMaxTokens": "最大令牌数",
+  "aiAssistantContextWindow": "上下文窗口",
+  "aiAssistantServiceStatus": "服务状态",
+  "aiAssistantAvailable": "可用",
+  "aiAssistantUnavailable": "不可用",
+
+  "aiSummarize": "AI 总结",
+  "aiSummarizeUnread": "AI 总结 {count} 条未读消息",
+  "@aiSummarizeUnread": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "aiSummarizeLoading": "正在总结...",
+  "aiSummarizeError": "总结失败",
+
+  "aiRewrite": "AI 改写",
+  "aiRewriteFormal": "正式",
+  "aiRewriteCasual": "轻松",
+  "aiRewritePlayful": "俏皮",
+  "aiRewriteProfessional": "专业",
+  "aiRewriteAccept": "使用",
+  "aiRewriteCancel": "取消",
+  "aiRewriteLoading": "正在改写...",
+
+  "aiLinkSummary": "AI 摘要",
+  "aiLinkSummaryAnalyzing": "正在分析...",
+
+  "chatFolderManagement": "管理文件夹",
+  "chatFolderSystem": "系统文件夹",
+  "chatFolderCustom": "自定义文件夹",
+  "chatFolderEmpty": "暂无自定义文件夹",
+  "chatFolderCreate": "创建文件夹",
+  "chatFolderEdit": "编辑文件夹",
+  "chatFolderNameHint": "文件夹名称",
+  "chatFolderAll": "全部",
+  "chatFolderUnread": "未读",
+  "chatFolderPersonal": "私聊",
+  "chatFolderGroups": "群组",
+  "chatFolderChannels": "频道",
+  "chatFolderMuted": "已静音",
+
+  "storyAddMusic": "添加音乐",
+  "storyChangeMusic": "更换音乐",
+  "storyBackgroundMusic": "背景音乐",
+  "storyMusicPreview": "预览 (最长15秒)",
+  "storyChooseFromDevice": "从设备选择",
+  "storyUseThisMusic": "使用此音乐",
+
+  "authPasskeyNotSupported": "此设备不支持 Passkey",
+  "authPasskeyRegister": "注册 Passkey",
+  "authPasskeyNoRegistered": "未注册 Passkey",
+  "authPasskeyRegisterHint": "注册 Passkey 以实现无密码登录",
+  "authPasskeyNameYours": "为 Passkey 命名",
+  "authPasskeyRegistered": "Passkey 注册成功",
+  "authPasskeyDeleted": "Passkey 已删除",
+  "authPasskeyDeleteConfirm": "删除 Passkey \"{name}\"？删除后将无法使用该 Passkey 登录。",
+  "@authPasskeyDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  }
 }

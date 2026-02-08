@@ -1450,7 +1450,7 @@ abstract class S {
   /// No description provided for @commonConfirm.
   ///
   /// In zh, this message translates to:
-  /// **'确定'**
+  /// **'确认'**
   String get commonConfirm;
 
   /// No description provided for @groupEnterGroupDescription.
@@ -8142,6 +8142,606 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'点击搜索'**
   String get tapToSearch;
+
+  /// No description provided for @settingsThisDevice.
+  ///
+  /// In zh, this message translates to:
+  /// **'本设备'**
+  String get settingsThisDevice;
+
+  /// No description provided for @settingsJustNow.
+  ///
+  /// In zh, this message translates to:
+  /// **'刚刚'**
+  String get settingsJustNow;
+
+  /// No description provided for @settingsDeviceId.
+  ///
+  /// In zh, this message translates to:
+  /// **'设备 ID'**
+  String get settingsDeviceId;
+
+  /// No description provided for @settingsStatus.
+  ///
+  /// In zh, this message translates to:
+  /// **'状态'**
+  String get settingsStatus;
+
+  /// No description provided for @settingsLastActive.
+  ///
+  /// In zh, this message translates to:
+  /// **'最后活跃'**
+  String get settingsLastActive;
+
+  /// No description provided for @settingsIpAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'IP 地址'**
+  String get settingsIpAddress;
+
+  /// No description provided for @settingsRenameDevice.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名设备'**
+  String get settingsRenameDevice;
+
+  /// No description provided for @settingsDeviceNameHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入设备名称'**
+  String get settingsDeviceNameHint;
+
+  /// No description provided for @settingsDeviceRenamed.
+  ///
+  /// In zh, this message translates to:
+  /// **'设备已重命名'**
+  String get settingsDeviceRenamed;
+
+  /// No description provided for @settingsRenameFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名失败'**
+  String get settingsRenameFailed;
+
+  /// No description provided for @settingsRemoteLogout.
+  ///
+  /// In zh, this message translates to:
+  /// **'远程登出'**
+  String get settingsRemoteLogout;
+
+  /// No description provided for @settingsRemoteLogoutConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要登出「{deviceName}」吗？此操作无法撤销。'**
+  String settingsRemoteLogoutConfirm(String deviceName);
+
+  /// No description provided for @settingsDeviceLoggedOut.
+  ///
+  /// In zh, this message translates to:
+  /// **'设备已登出'**
+  String get settingsDeviceLoggedOut;
+
+  /// No description provided for @settingsLogoutFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'登出失败'**
+  String get settingsLogoutFailed;
+
+  /// No description provided for @settingsLogout.
+  ///
+  /// In zh, this message translates to:
+  /// **'登出'**
+  String get settingsLogout;
+
+  /// No description provided for @settingsVerifyIdentity.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证身份'**
+  String get settingsVerifyIdentity;
+
+  /// No description provided for @settingsEnterPasswordToConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入密码以确认此操作。'**
+  String get settingsEnterPasswordToConfirm;
+
+  /// No description provided for @scheduledSendTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'定时发送'**
+  String get scheduledSendTitle;
+
+  /// No description provided for @scheduledSendInOneHour.
+  ///
+  /// In zh, this message translates to:
+  /// **'1小时后'**
+  String get scheduledSendInOneHour;
+
+  /// No description provided for @scheduledSendTonight.
+  ///
+  /// In zh, this message translates to:
+  /// **'今晚 (20:00)'**
+  String get scheduledSendTonight;
+
+  /// No description provided for @scheduledSendTomorrowMorning.
+  ///
+  /// In zh, this message translates to:
+  /// **'明早 (9:00)'**
+  String get scheduledSendTomorrowMorning;
+
+  /// No description provided for @scheduledSendCustom.
+  ///
+  /// In zh, this message translates to:
+  /// **'自定义时间'**
+  String get scheduledSendCustom;
+
+  /// No description provided for @scheduledMessageLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'定时发送'**
+  String get scheduledMessageLabel;
+
+  /// No description provided for @scheduledMessageCancel.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消定时发送'**
+  String get scheduledMessageCancel;
+
+  /// No description provided for @chatLockTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天锁'**
+  String get chatLockTitle;
+
+  /// No description provided for @chatLockEnable.
+  ///
+  /// In zh, this message translates to:
+  /// **'锁定此聊天'**
+  String get chatLockEnable;
+
+  /// No description provided for @chatLockDisable.
+  ///
+  /// In zh, this message translates to:
+  /// **'解锁此聊天'**
+  String get chatLockDisable;
+
+  /// No description provided for @chatLockDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'锁定的聊天需要通过生物识别或 PIN 码验证才能打开'**
+  String get chatLockDescription;
+
+  /// No description provided for @chatLockVerifyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天已锁定'**
+  String get chatLockVerifyTitle;
+
+  /// No description provided for @chatLockVerifySubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证后访问此聊天'**
+  String get chatLockVerifySubtitle;
+
+  /// No description provided for @chatLockVerifyFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证失败'**
+  String get chatLockVerifyFailed;
+
+  /// No description provided for @chatLockEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天已锁定'**
+  String get chatLockEnabled;
+
+  /// No description provided for @chatLockDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天已解锁'**
+  String get chatLockDisabled;
+
+  /// No description provided for @chatLockPinTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入 PIN 码'**
+  String get chatLockPinTitle;
+
+  /// No description provided for @chatLockPinSetTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置 PIN 码'**
+  String get chatLockPinSetTitle;
+
+  /// No description provided for @chatLockPinConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认 PIN 码'**
+  String get chatLockPinConfirmTitle;
+
+  /// No description provided for @chatLockPinMismatch.
+  ///
+  /// In zh, this message translates to:
+  /// **'PIN 码不一致'**
+  String get chatLockPinMismatch;
+
+  /// No description provided for @chatLockUseBiometric.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用生物识别'**
+  String get chatLockUseBiometric;
+
+  /// No description provided for @chatLockUsePin.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用 PIN 码'**
+  String get chatLockUsePin;
+
+  /// No description provided for @mediaEditorUndo.
+  ///
+  /// In zh, this message translates to:
+  /// **'撤销'**
+  String get mediaEditorUndo;
+
+  /// No description provided for @mediaEditorRedo.
+  ///
+  /// In zh, this message translates to:
+  /// **'重做'**
+  String get mediaEditorRedo;
+
+  /// No description provided for @mediaEditorCrop.
+  ///
+  /// In zh, this message translates to:
+  /// **'裁剪'**
+  String get mediaEditorCrop;
+
+  /// No description provided for @mediaEditorFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'滤镜'**
+  String get mediaEditorFilter;
+
+  /// No description provided for @mediaEditorDraw.
+  ///
+  /// In zh, this message translates to:
+  /// **'涂鸦'**
+  String get mediaEditorDraw;
+
+  /// No description provided for @mediaEditorText.
+  ///
+  /// In zh, this message translates to:
+  /// **'文字'**
+  String get mediaEditorText;
+
+  /// No description provided for @aiAssistant.
+  ///
+  /// In zh, this message translates to:
+  /// **'AI 助手'**
+  String get aiAssistant;
+
+  /// No description provided for @aiAssistantWelcome.
+  ///
+  /// In zh, this message translates to:
+  /// **'你好！我是 N42 AI 助手，有什么可以帮你的吗？'**
+  String get aiAssistantWelcome;
+
+  /// No description provided for @aiAssistantNotConfigured.
+  ///
+  /// In zh, this message translates to:
+  /// **'AI 服务未配置'**
+  String get aiAssistantNotConfigured;
+
+  /// No description provided for @aiAssistantSettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'AI 设置'**
+  String get aiAssistantSettings;
+
+  /// No description provided for @aiAssistantClearHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'清空对话历史'**
+  String get aiAssistantClearHistory;
+
+  /// No description provided for @aiAssistantClearHistoryConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定清空所有 AI 对话历史？'**
+  String get aiAssistantClearHistoryConfirm;
+
+  /// No description provided for @aiAssistantStopGenerating.
+  ///
+  /// In zh, this message translates to:
+  /// **'停止生成'**
+  String get aiAssistantStopGenerating;
+
+  /// No description provided for @aiAssistantModel.
+  ///
+  /// In zh, this message translates to:
+  /// **'模型'**
+  String get aiAssistantModel;
+
+  /// No description provided for @aiAssistantTemperature.
+  ///
+  /// In zh, this message translates to:
+  /// **'温度'**
+  String get aiAssistantTemperature;
+
+  /// No description provided for @aiAssistantMaxTokens.
+  ///
+  /// In zh, this message translates to:
+  /// **'最大令牌数'**
+  String get aiAssistantMaxTokens;
+
+  /// No description provided for @aiAssistantContextWindow.
+  ///
+  /// In zh, this message translates to:
+  /// **'上下文窗口'**
+  String get aiAssistantContextWindow;
+
+  /// No description provided for @aiAssistantServiceStatus.
+  ///
+  /// In zh, this message translates to:
+  /// **'服务状态'**
+  String get aiAssistantServiceStatus;
+
+  /// No description provided for @aiAssistantAvailable.
+  ///
+  /// In zh, this message translates to:
+  /// **'可用'**
+  String get aiAssistantAvailable;
+
+  /// No description provided for @aiAssistantUnavailable.
+  ///
+  /// In zh, this message translates to:
+  /// **'不可用'**
+  String get aiAssistantUnavailable;
+
+  /// No description provided for @aiSummarize.
+  ///
+  /// In zh, this message translates to:
+  /// **'AI 总结'**
+  String get aiSummarize;
+
+  /// No description provided for @aiSummarizeUnread.
+  ///
+  /// In zh, this message translates to:
+  /// **'AI 总结 {count} 条未读消息'**
+  String aiSummarizeUnread(int count);
+
+  /// No description provided for @aiSummarizeLoading.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在总结...'**
+  String get aiSummarizeLoading;
+
+  /// No description provided for @aiSummarizeError.
+  ///
+  /// In zh, this message translates to:
+  /// **'总结失败'**
+  String get aiSummarizeError;
+
+  /// No description provided for @aiRewrite.
+  ///
+  /// In zh, this message translates to:
+  /// **'AI 改写'**
+  String get aiRewrite;
+
+  /// No description provided for @aiRewriteFormal.
+  ///
+  /// In zh, this message translates to:
+  /// **'正式'**
+  String get aiRewriteFormal;
+
+  /// No description provided for @aiRewriteCasual.
+  ///
+  /// In zh, this message translates to:
+  /// **'轻松'**
+  String get aiRewriteCasual;
+
+  /// No description provided for @aiRewritePlayful.
+  ///
+  /// In zh, this message translates to:
+  /// **'俏皮'**
+  String get aiRewritePlayful;
+
+  /// No description provided for @aiRewriteProfessional.
+  ///
+  /// In zh, this message translates to:
+  /// **'专业'**
+  String get aiRewriteProfessional;
+
+  /// No description provided for @aiRewriteAccept.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用'**
+  String get aiRewriteAccept;
+
+  /// No description provided for @aiRewriteCancel.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消'**
+  String get aiRewriteCancel;
+
+  /// No description provided for @aiRewriteLoading.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在改写...'**
+  String get aiRewriteLoading;
+
+  /// No description provided for @aiLinkSummary.
+  ///
+  /// In zh, this message translates to:
+  /// **'AI 摘要'**
+  String get aiLinkSummary;
+
+  /// No description provided for @aiLinkSummaryAnalyzing.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在分析...'**
+  String get aiLinkSummaryAnalyzing;
+
+  /// No description provided for @chatFolderManagement.
+  ///
+  /// In zh, this message translates to:
+  /// **'管理文件夹'**
+  String get chatFolderManagement;
+
+  /// No description provided for @chatFolderSystem.
+  ///
+  /// In zh, this message translates to:
+  /// **'系统文件夹'**
+  String get chatFolderSystem;
+
+  /// No description provided for @chatFolderCustom.
+  ///
+  /// In zh, this message translates to:
+  /// **'自定义文件夹'**
+  String get chatFolderCustom;
+
+  /// No description provided for @chatFolderEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无自定义文件夹'**
+  String get chatFolderEmpty;
+
+  /// No description provided for @chatFolderCreate.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建文件夹'**
+  String get chatFolderCreate;
+
+  /// No description provided for @chatFolderEdit.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑文件夹'**
+  String get chatFolderEdit;
+
+  /// No description provided for @chatFolderNameHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'文件夹名称'**
+  String get chatFolderNameHint;
+
+  /// No description provided for @chatFolderAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部'**
+  String get chatFolderAll;
+
+  /// No description provided for @chatFolderUnread.
+  ///
+  /// In zh, this message translates to:
+  /// **'未读'**
+  String get chatFolderUnread;
+
+  /// No description provided for @chatFolderPersonal.
+  ///
+  /// In zh, this message translates to:
+  /// **'私聊'**
+  String get chatFolderPersonal;
+
+  /// No description provided for @chatFolderGroups.
+  ///
+  /// In zh, this message translates to:
+  /// **'群组'**
+  String get chatFolderGroups;
+
+  /// No description provided for @chatFolderChannels.
+  ///
+  /// In zh, this message translates to:
+  /// **'频道'**
+  String get chatFolderChannels;
+
+  /// No description provided for @chatFolderMuted.
+  ///
+  /// In zh, this message translates to:
+  /// **'已静音'**
+  String get chatFolderMuted;
+
+  /// No description provided for @storyAddMusic.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加音乐'**
+  String get storyAddMusic;
+
+  /// No description provided for @storyChangeMusic.
+  ///
+  /// In zh, this message translates to:
+  /// **'更换音乐'**
+  String get storyChangeMusic;
+
+  /// No description provided for @storyBackgroundMusic.
+  ///
+  /// In zh, this message translates to:
+  /// **'背景音乐'**
+  String get storyBackgroundMusic;
+
+  /// No description provided for @storyMusicPreview.
+  ///
+  /// In zh, this message translates to:
+  /// **'预览 (最长15秒)'**
+  String get storyMusicPreview;
+
+  /// No description provided for @storyChooseFromDevice.
+  ///
+  /// In zh, this message translates to:
+  /// **'从设备选择'**
+  String get storyChooseFromDevice;
+
+  /// No description provided for @storyUseThisMusic.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用此音乐'**
+  String get storyUseThisMusic;
+
+  /// No description provided for @authPasskeyNotSupported.
+  ///
+  /// In zh, this message translates to:
+  /// **'此设备不支持 Passkey'**
+  String get authPasskeyNotSupported;
+
+  /// No description provided for @authPasskeyRegister.
+  ///
+  /// In zh, this message translates to:
+  /// **'注册 Passkey'**
+  String get authPasskeyRegister;
+
+  /// No description provided for @authPasskeyNoRegistered.
+  ///
+  /// In zh, this message translates to:
+  /// **'未注册 Passkey'**
+  String get authPasskeyNoRegistered;
+
+  /// No description provided for @authPasskeyRegisterHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'注册 Passkey 以实现无密码登录'**
+  String get authPasskeyRegisterHint;
+
+  /// No description provided for @authPasskeyNameYours.
+  ///
+  /// In zh, this message translates to:
+  /// **'为 Passkey 命名'**
+  String get authPasskeyNameYours;
+
+  /// No description provided for @authPasskeyRegistered.
+  ///
+  /// In zh, this message translates to:
+  /// **'Passkey 注册成功'**
+  String get authPasskeyRegistered;
+
+  /// No description provided for @authPasskeyDeleted.
+  ///
+  /// In zh, this message translates to:
+  /// **'Passkey 已删除'**
+  String get authPasskeyDeleted;
+
+  /// No description provided for @authPasskeyDeleteConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除 Passkey \"{name}\"？删除后将无法使用该 Passkey 登录。'**
+  String authPasskeyDeleteConfirm(String name);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

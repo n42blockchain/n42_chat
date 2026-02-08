@@ -167,6 +167,10 @@ class MatrixStoryDataSource {
     List<Map<String, dynamic>>? media,
     int? backgroundColor,
     int? textColor,
+    String? musicUrl,
+    String? musicTitle,
+    String? musicArtist,
+    int? musicStartAt,
   }) async {
     final room = await _getOrCreateStoryRoom();
     if (room == null) return null;
@@ -190,6 +194,20 @@ class MatrixStoryDataSource {
     }
     if (textColor != null) {
       eventContent['text_color'] = textColor;
+    }
+
+    // 音乐元数据
+    if (musicUrl != null) {
+      eventContent['music_url'] = musicUrl;
+    }
+    if (musicTitle != null) {
+      eventContent['music_title'] = musicTitle;
+    }
+    if (musicArtist != null) {
+      eventContent['music_artist'] = musicArtist;
+    }
+    if (musicStartAt != null) {
+      eventContent['music_start_at'] = musicStartAt;
     }
 
     try {
@@ -368,6 +386,10 @@ class MatrixStoryDataSource {
         'expires_at': content['expires_at'] as String?,
         'background_color': content['background_color'] as int?,
         'text_color': content['text_color'] as int?,
+        'music_url': content['music_url'] as String?,
+        'music_title': content['music_title'] as String?,
+        'music_artist': content['music_artist'] as String?,
+        'music_start_at': content['music_start_at'] as int?,
         'is_from_me': event.senderId == _currentUserId,
       };
     } catch (e) {

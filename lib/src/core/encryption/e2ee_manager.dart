@@ -489,12 +489,16 @@ class DeviceInfo {
   final String deviceName;
   final bool isVerified;
   final int? lastSeenTs;
+  final String? lastSeenIp;
+  final bool isCurrentDevice;
 
   DeviceInfo({
     required this.deviceId,
     required this.deviceName,
     required this.isVerified,
     this.lastSeenTs,
+    this.lastSeenIp,
+    this.isCurrentDevice = false,
   });
 
   DateTime? get lastSeen =>
