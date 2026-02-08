@@ -289,5 +289,25 @@ abstract class Routes {
   /// 我的二维码
   static const String myQrCode = '/qr/my';
   static const String myQrCodeName = 'myQrCode';
+
+  // ============================================
+  // AI 助手
+  // ============================================
+
+  /// AI 助手页面
+  static const String aiAssistant = '/ai-assistant';
+  static const String aiAssistantName = 'aiAssistant';
+
+  /// AI 助手设置
+  static const String aiAssistantSettings = '/ai-assistant/settings';
+  static const String aiAssistantSettingsName = 'aiAssistantSettings';
+
+  // ============================================
+  // 聊天文件夹
+  // ============================================
+
+  /// 聊天文件夹管理
+  static const String chatFolderManagement = '/settings/chat-folders';
+  static const String chatFolderManagementName = 'chatFolderManagement';
 }
 

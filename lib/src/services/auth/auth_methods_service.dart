@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:fluwx/fluwx.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -233,76 +234,344 @@ class AuthMethodsService {
     }
   }
   
+  /// 从服务端请求 Passkey 注册挑战
+  ///
+  /// [homeserver] Matrix 服务器地址
+  /// [userId] 用户 ID
+  Future<Map<String, dynamic>?> requestPasskeyRegistrationChallenge({
+    required String homeserver,
+    required String userId,
+    String? accessToken,
+  }) async {
+    try {
+      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/register/challenge');
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+      };
+      if (accessToken != null) {
+        headers['Authorization'] = 'Bearer $accessToken';
+      }
+
+      final response = await http.post(uri, headers: headers, body: jsonEncode({
+        'user_id': userId,
+        'rp_id': _passkeyRpId,
+        'rp_name': 'N42 Chat',
+      }));
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+
+      debugPrint('AuthMethodsService: Challenge request failed: ${response.statusCode}');
+      return null;
+    } catch (e) {
+      debugPrint('AuthMethodsService: requestPasskeyRegistrationChallenge failed: $e');
+      return null;
+    }
+  }
+
   /// 注册 Passkey
-  /// 
+  ///
   /// [userId] 用户 ID
   /// [username] 用户名
   /// [displayName] 显示名
   /// [challenge] 从服务端获取的挑战
-  /// 
-  /// 注意：此方法需要使用 passkeys 包的原生实现
-  /// 当前为占位实现，实际使用时需要集成 passkeys 包
+  /// [homeserver] Matrix 服务器地址（用于提交注册结果）
+  ///
+  /// 流程：
+  /// 1. 从服务端获取 registration challenge
+  /// 2. 调用平台 WebAuthn API 创建凭证
+  /// 3. 将凭证信息提交给服务端完成注册
   Future<PasskeyCredential?> registerPasskey({
     required String userId,
     required String username,
     String? displayName,
     required String challenge,
+    String? homeserver,
+    String? accessToken,
   }) async {
     if (!_passkeyInitialized) {
-      throw Exception('Passkey 未初始化');
+      throw Exception('Passkey not initialized');
     }
-    
+
     try {
       debugPrint('AuthMethodsService: Registering passkey for $username');
       debugPrint('AuthMethodsService: RP ID: $_passkeyRpId');
-      debugPrint('AuthMethodsService: Challenge: $challenge');
-      
-      // TODO: 集成 passkeys 包进行实际的 WebAuthn 注册
-      // 这里需要调用平台原生的 WebAuthn API
-      // 在 Android 上使用 FIDO2 API
-      // 在 iOS 上使用 ASAuthorizationController
-      
-      throw UnimplementedError(
-        'Passkey 注册需要集成 passkeys 包。\n'
-        '请参考 https://pub.dev/packages/passkeys 进行集成。'
+
+      // 尝试使用 MethodChannel 调用原生 WebAuthn API
+      final credential = await _createPasskeyCredential(
+        rpId: _passkeyRpId!,
+        rpName: 'N42 Chat',
+        userId: userId,
+        username: username,
+        displayName: displayName ?? username,
+        challenge: challenge,
       );
+
+      if (credential == null) return null;
+
+      // 如果有服务端地址，提交注册结果
+      if (homeserver != null) {
+        await _submitPasskeyRegistration(
+          homeserver: homeserver,
+          credential: credential,
+          accessToken: accessToken,
+        );
+      }
+
+      return credential;
     } catch (e, stackTrace) {
       debugPrint('AuthMethodsService: Passkey registration failed: $e');
       debugPrint('Stack: $stackTrace');
       rethrow;
     }
   }
-  
+
+  /// 提交 Passkey 注册结果到服务端
+  Future<void> _submitPasskeyRegistration({
+    required String homeserver,
+    required PasskeyCredential credential,
+    String? accessToken,
+  }) async {
+    try {
+      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/register/complete');
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+      };
+      if (accessToken != null) {
+        headers['Authorization'] = 'Bearer $accessToken';
+      }
+
+      final response = await http.post(uri, headers: headers, body: jsonEncode({
+        'credential_id': credential.credentialId,
+        'public_key': credential.publicKey,
+        'user_id': credential.userId,
+        'display_name': credential.displayName,
+      }));
+
+      if (response.statusCode != 200) {
+        debugPrint('AuthMethodsService: Submit registration failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('AuthMethodsService: _submitPasskeyRegistration failed: $e');
+    }
+  }
+
+  /// 调用平台原生 WebAuthn API 创建凭证
+  Future<PasskeyCredential?> _createPasskeyCredential({
+    required String rpId,
+    required String rpName,
+    required String userId,
+    required String username,
+    required String displayName,
+    required String challenge,
+  }) async {
+    try {
+      // 使用 MethodChannel 调用原生 API
+      const channel = MethodChannel('n42.chat/passkey');
+
+      final result = await channel.invokeMethod<Map<dynamic, dynamic>>('createCredential', {
+        'rpId': rpId,
+        'rpName': rpName,
+        'userId': userId,
+        'userName': username,
+        'displayName': displayName,
+        'challenge': challenge,
+      });
+
+      if (result == null) return null;
+
+      return PasskeyCredential(
+        credentialId: result['credentialId'] as String,
+        publicKey: result['publicKey'] as String,
+        userId: userId,
+        displayName: displayName,
+      );
+    } on PlatformException catch (e) {
+      if (e.code == 'USER_CANCELED') {
+        debugPrint('AuthMethodsService: User canceled passkey creation');
+        return null;
+      }
+      debugPrint('AuthMethodsService: Platform passkey error: ${e.code} - ${e.message}');
+      rethrow;
+    } catch (e) {
+      debugPrint('AuthMethodsService: _createPasskeyCredential failed: $e');
+      rethrow;
+    }
+  }
+
   /// 使用 Passkey 登录
-  /// 
+  ///
   /// [challenge] 从服务端获取的挑战
   /// [allowedCredentials] 允许的凭证 ID 列表
-  /// 
-  /// 注意：此方法需要使用 passkeys 包的原生实现
-  /// 当前为占位实现，实际使用时需要集成 passkeys 包
+  /// [homeserver] Matrix 服务器地址
+  ///
+  /// 流程：
+  /// 1. 从服务端获取 authentication challenge
+  /// 2. 调用平台 WebAuthn API 进行认证
+  /// 3. 将认证结果提交给服务端获取登录 token
   Future<Map<String, dynamic>?> authenticateWithPasskey({
     required String challenge,
     List<String>? allowedCredentials,
+    String? homeserver,
   }) async {
     if (!_passkeyInitialized) {
-      throw Exception('Passkey 未初始化');
+      throw Exception('Passkey not initialized');
     }
-    
+
     try {
       debugPrint('AuthMethodsService: Authenticating with passkey');
       debugPrint('AuthMethodsService: RP ID: $_passkeyRpId');
-      
-      // TODO: 集成 passkeys 包进行实际的 WebAuthn 认证
-      // 这里需要调用平台原生的 WebAuthn API
-      
-      throw UnimplementedError(
-        'Passkey 认证需要集成 passkeys 包。\n'
-        '请参考 https://pub.dev/packages/passkeys 进行集成。'
+
+      // 调用平台原生 WebAuthn API 进行认证
+      final assertion = await _getPasskeyAssertion(
+        rpId: _passkeyRpId!,
+        challenge: challenge,
+        allowedCredentials: allowedCredentials,
       );
+
+      if (assertion == null) return null;
+
+      // 如果有服务端地址，提交认证结果获取登录 token
+      if (homeserver != null) {
+        return _submitPasskeyAuthentication(
+          homeserver: homeserver,
+          assertion: assertion,
+        );
+      }
+
+      return assertion;
     } catch (e, stackTrace) {
       debugPrint('AuthMethodsService: Passkey authentication failed: $e');
       debugPrint('Stack: $stackTrace');
       rethrow;
+    }
+  }
+
+  /// 调用平台原生 WebAuthn API 进行认证
+  Future<Map<String, dynamic>?> _getPasskeyAssertion({
+    required String rpId,
+    required String challenge,
+    List<String>? allowedCredentials,
+  }) async {
+    try {
+      const channel = MethodChannel('n42.chat/passkey');
+
+      final result = await channel.invokeMethod<Map<dynamic, dynamic>>('getAssertion', {
+        'rpId': rpId,
+        'challenge': challenge,
+        'allowedCredentials': allowedCredentials ?? [],
+      });
+
+      if (result == null) return null;
+
+      return {
+        'credentialId': result['credentialId'] as String,
+        'authenticatorData': result['authenticatorData'] as String,
+        'clientDataJSON': result['clientDataJSON'] as String,
+        'signature': result['signature'] as String,
+        'userHandle': result['userHandle'] as String?,
+      };
+    } on PlatformException catch (e) {
+      if (e.code == 'USER_CANCELED') {
+        debugPrint('AuthMethodsService: User canceled passkey authentication');
+        return null;
+      }
+      debugPrint('AuthMethodsService: Platform passkey auth error: ${e.code} - ${e.message}');
+      rethrow;
+    } catch (e) {
+      debugPrint('AuthMethodsService: _getPasskeyAssertion failed: $e');
+      rethrow;
+    }
+  }
+
+  /// 提交 Passkey 认证结果到服务端
+  Future<Map<String, dynamic>?> _submitPasskeyAuthentication({
+    required String homeserver,
+    required Map<String, dynamic> assertion,
+  }) async {
+    try {
+      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/login');
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(assertion),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+
+      debugPrint('AuthMethodsService: Passkey login failed: ${response.statusCode}');
+      return null;
+    } catch (e) {
+      debugPrint('AuthMethodsService: _submitPasskeyAuthentication failed: $e');
+      return null;
+    }
+  }
+
+  /// 请求 Passkey 认证挑战
+  Future<Map<String, dynamic>?> requestPasskeyAuthChallenge({
+    required String homeserver,
+  }) async {
+    try {
+      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/login/challenge');
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'rp_id': _passkeyRpId}),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+      return null;
+    } catch (e) {
+      debugPrint('AuthMethodsService: requestPasskeyAuthChallenge failed: $e');
+      return null;
+    }
+  }
+
+  /// 获取已注册的 Passkey 列表
+  Future<List<PasskeyCredential>> getRegisteredPasskeys({
+    required String homeserver,
+    required String accessToken,
+  }) async {
+    try {
+      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/credentials');
+      final response = await http.get(uri, headers: {
+        'Authorization': 'Bearer $accessToken',
+      });
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final credentials = data['credentials'] as List<dynamic>? ?? [];
+        return credentials
+            .map((e) => PasskeyCredential.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      debugPrint('AuthMethodsService: getRegisteredPasskeys failed: $e');
+      return [];
+    }
+  }
+
+  /// 删除已注册的 Passkey
+  Future<bool> deletePasskey({
+    required String homeserver,
+    required String accessToken,
+    required String credentialId,
+  }) async {
+    try {
+      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/credentials/$credentialId');
+      final response = await http.delete(uri, headers: {
+        'Authorization': 'Bearer $accessToken',
+      });
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('AuthMethodsService: deletePasskey failed: $e');
+      return false;
     }
   }
   

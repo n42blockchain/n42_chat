@@ -174,6 +174,36 @@ class N42ChatRouter {
             return _PlaceholderPage(title: l10n?.commonCreateGroup ?? 'Create Group');
           },
         ),
+
+        // AI 助手
+        GoRoute(
+          path: Routes.aiAssistant,
+          name: Routes.aiAssistantName,
+          builder: (context, state) {
+            final l10n = S.of(context);
+            return _PlaceholderPage(title: l10n?.aiAssistant ?? 'AI Assistant');
+          },
+          routes: [
+            GoRoute(
+              path: 'settings',
+              name: Routes.aiAssistantSettingsName,
+              builder: (context, state) {
+                final l10n = S.of(context);
+                return _PlaceholderPage(title: l10n?.aiAssistantSettings ?? 'AI Settings');
+              },
+            ),
+          ],
+        ),
+
+        // 聊天文件夹管理
+        GoRoute(
+          path: Routes.chatFolderManagement,
+          name: Routes.chatFolderManagementName,
+          builder: (context, state) {
+            final l10n = S.of(context);
+            return _PlaceholderPage(title: l10n?.chatFolderManagement ?? 'Manage Folders');
+          },
+        ),
       ];
 
   /// 路由重定向

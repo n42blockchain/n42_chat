@@ -161,7 +161,6 @@ class CallNotificationService {
         ...?extra,
       },
       headers: <String, dynamic>{
-        'apiKey': 'YOUR_API_KEY',
         'platform': Platform.isIOS ? 'ios' : 'android',
       },
       android: AndroidParams(

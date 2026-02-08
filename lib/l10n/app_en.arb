@@ -2076,5 +2076,134 @@
   "draftSaved": "Draft saved",
   "voiceRecording": "Voice Recording",
   "searchLocation": "Search Location",
-  "tapToSearch": "Tap to search"
+  "tapToSearch": "Tap to search",
+
+  "settingsThisDevice": "This device",
+  "settingsJustNow": "Just now",
+  "settingsDeviceId": "Device ID",
+  "settingsStatus": "Status",
+  "settingsLastActive": "Last active",
+  "settingsIpAddress": "IP address",
+  "settingsRenameDevice": "Rename device",
+  "settingsDeviceNameHint": "Enter device name",
+  "settingsDeviceRenamed": "Device renamed",
+  "settingsRenameFailed": "Rename failed",
+  "settingsRemoteLogout": "Remote logout",
+  "settingsRemoteLogoutConfirm": "Are you sure you want to log out \"{deviceName}\"? This action cannot be undone.",
+  "@settingsRemoteLogoutConfirm": {
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsDeviceLoggedOut": "Device logged out",
+  "settingsLogoutFailed": "Logout failed",
+  "settingsLogout": "Logout",
+  "settingsVerifyIdentity": "Verify identity",
+  "settingsEnterPasswordToConfirm": "Enter your password to confirm this action.",
+  "commonConfirm": "Confirm",
+
+  "scheduledSendTitle": "Schedule message",
+  "scheduledSendInOneHour": "In 1 hour",
+  "scheduledSendTonight": "Tonight (8:00 PM)",
+  "scheduledSendTomorrowMorning": "Tomorrow morning (9:00 AM)",
+  "scheduledSendCustom": "Pick a date & time",
+  "scheduledMessageLabel": "Scheduled",
+  "scheduledMessageCancel": "Cancel scheduled message",
+
+  "chatLockTitle": "Chat lock",
+  "chatLockEnable": "Lock this chat",
+  "chatLockDisable": "Unlock this chat",
+  "chatLockDescription": "Locked chats require biometric or PIN verification to open",
+  "chatLockVerifyTitle": "Chat locked",
+  "chatLockVerifySubtitle": "Verify to access this chat",
+  "chatLockVerifyFailed": "Verification failed",
+  "chatLockEnabled": "Chat locked",
+  "chatLockDisabled": "Chat unlocked",
+  "chatLockPinTitle": "Enter PIN",
+  "chatLockPinSetTitle": "Set PIN",
+  "chatLockPinConfirmTitle": "Confirm PIN",
+  "chatLockPinMismatch": "PIN does not match",
+  "chatLockUseBiometric": "Use biometric",
+  "chatLockUsePin": "Use PIN",
+
+  "mediaEditorUndo": "Undo",
+  "mediaEditorRedo": "Redo",
+  "mediaEditorCrop": "Crop",
+  "mediaEditorFilter": "Filter",
+  "mediaEditorDraw": "Draw",
+  "mediaEditorText": "Text",
+
+  "aiAssistant": "AI Assistant",
+  "aiAssistantWelcome": "Hello! I'm the N42 AI Assistant. How can I help you?",
+  "aiAssistantNotConfigured": "AI service not configured",
+  "aiAssistantSettings": "AI Settings",
+  "aiAssistantClearHistory": "Clear chat history",
+  "aiAssistantClearHistoryConfirm": "Are you sure you want to clear all AI chat history?",
+  "aiAssistantStopGenerating": "Stop generating",
+  "aiAssistantModel": "Model",
+  "aiAssistantTemperature": "Temperature",
+  "aiAssistantMaxTokens": "Max tokens",
+  "aiAssistantContextWindow": "Context window",
+  "aiAssistantServiceStatus": "Service status",
+  "aiAssistantAvailable": "Available",
+  "aiAssistantUnavailable": "Unavailable",
+
+  "aiSummarize": "AI Summary",
+  "aiSummarizeUnread": "Summarize {count} unread messages",
+  "@aiSummarizeUnread": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "aiSummarizeLoading": "Summarizing...",
+  "aiSummarizeError": "Failed to summarize",
+
+  "aiRewrite": "AI Rewrite",
+  "aiRewriteFormal": "Formal",
+  "aiRewriteCasual": "Casual",
+  "aiRewritePlayful": "Playful",
+  "aiRewriteProfessional": "Professional",
+  "aiRewriteAccept": "Use",
+  "aiRewriteCancel": "Cancel",
+  "aiRewriteLoading": "Rewriting...",
+
+  "aiLinkSummary": "AI Summary",
+  "aiLinkSummaryAnalyzing": "Analyzing...",
+
+  "chatFolderManagement": "Manage Folders",
+  "chatFolderSystem": "System Folders",
+  "chatFolderCustom": "Custom Folders",
+  "chatFolderEmpty": "No custom folders yet",
+  "chatFolderCreate": "Create Folder",
+  "chatFolderEdit": "Edit Folder",
+  "chatFolderNameHint": "Folder name",
+  "chatFolderAll": "All",
+  "chatFolderUnread": "Unread",
+  "chatFolderPersonal": "Personal",
+  "chatFolderGroups": "Groups",
+  "chatFolderChannels": "Channels",
+  "chatFolderMuted": "Muted",
+
+  "storyAddMusic": "Add Music",
+  "storyChangeMusic": "Change Music",
+  "storyBackgroundMusic": "Background Music",
+  "storyMusicPreview": "Preview (max 15s)",
+  "storyChooseFromDevice": "Choose from Device",
+  "storyUseThisMusic": "Use This Music",
+
+  "authPasskeyNotSupported": "Passkey is not supported on this device",
+  "authPasskeyRegister": "Register Passkey",
+  "authPasskeyNoRegistered": "No passkeys registered",
+  "authPasskeyRegisterHint": "Register a passkey for passwordless login",
+  "authPasskeyNameYours": "Name your Passkey",
+  "authPasskeyRegistered": "Passkey registered successfully",
+  "authPasskeyDeleted": "Passkey deleted",
+  "authPasskeyDeleteConfirm": "Delete passkey \"{name}\"? You will no longer be able to use it to log in.",
+  "@authPasskeyDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  }
 }

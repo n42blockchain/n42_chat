@@ -14,8 +14,15 @@ import 'services/voip/call_manager.dart';
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
 import 'core/utils/date_utils.dart';
+import 'domain/entities/conversation_entity.dart';
 import 'domain/entities/user_entity.dart';
 import 'domain/repositories/auth_repository.dart';
+import 'domain/repositories/conversation_repository.dart';
+import 'core/services/chat_lock_service.dart';
+import 'presentation/blocs/chat/chat_bloc.dart';
+import 'presentation/blocs/contact/contact_bloc.dart';
+import 'presentation/pages/chat/chat_lock_page.dart';
+import 'presentation/pages/chat/chat_page.dart';
 import 'presentation/blocs/auth/auth_bloc.dart';
 import 'presentation/blocs/auth/auth_event.dart';
 import 'presentation/blocs/auth/auth_state.dart';
@@ -631,10 +638,72 @@ class N42Chat {
   ///
   /// [roomId] Matrix房间ID
   /// [context] 可选的BuildContext，用于导航
-  static void openConversation(String roomId, {BuildContext? context}) {
+  static Future<void> openConversation(String roomId, {BuildContext? context}) async {
     _ensureInitialized();
-    // TODO: 导航到会话页面
     debugPrint('N42Chat: Open conversation - $roomId');
+
+    final ctx = context ?? _navigatorKey?.currentContext;
+    if (ctx == null) {
+      debugPrint('N42Chat: No context available for navigation');
+      return;
+    }
+
+    try {
+      final repo = getIt<IConversationRepository>();
+      ConversationEntity? conversation = await repo.getConversationById(roomId);
+
+      // If not found locally, try joining the room first
+      if (conversation == null) {
+        try {
+          await repo.joinConversation(roomId);
+          conversation = await repo.getConversationById(roomId);
+        } catch (e) {
+          debugPrint('N42Chat: Failed to join room $roomId: $e');
+        }
+      }
+
+      if (conversation == null) {
+        debugPrint('N42Chat: Conversation not found: $roomId');
+        return;
+      }
+
+      if (!ctx.mounted) return;
+
+      // Check if chat is locked
+      final lockService = ChatLockService();
+      final isLocked = await lockService.isChatLocked(roomId);
+
+      if (isLocked && ctx.mounted) {
+        final verified = await Navigator.of(ctx).push<bool>(
+          MaterialPageRoute<bool>(
+            builder: (_) => ChatLockPage(
+              roomId: roomId,
+              chatName: conversation!.name,
+            ),
+          ),
+        );
+        if (verified != true) return;
+      }
+
+      if (!ctx.mounted) return;
+
+      Navigator.of(ctx).push(
+        MaterialPageRoute<void>(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (_) => getIt<ChatBloc>()),
+              BlocProvider(create: (_) => getIt<ContactBloc>()),
+            ],
+            child: ChatPage(
+              conversation: conversation!,
+              onBack: () => Navigator.of(ctx).pop(),
+            ),
+          ),
+        ),
+      );
+    } catch (e) {
+      debugPrint('N42Chat: Failed to open conversation $roomId: $e');
+    }
   }
 
   /// 创建私聊会话

@@ -32,6 +32,7 @@ import '../../../n42_chat.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/download_service.dart';
+import '../media/media_editor_page.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
@@ -1613,12 +1614,17 @@ class _ChatPageState extends State<ChatPage> {
         maxWidth: 1920,
         maxHeight: 1920,
       );
-      
+
       if (images.isEmpty) return;
-      
-      // 发送选中的图片
-      for (final image in images) {
-        await _sendImage(image);
+
+      // 单张图片时提供编辑选项
+      if (images.length == 1) {
+        await _editAndSendImage(images.first);
+      } else {
+        // 多张图片直接发送
+        for (final image in images) {
+          await _sendImage(image);
+        }
       }
     } catch (e) {
       debugPrint('Pick image error: $e');
@@ -1630,6 +1636,43 @@ class _ChatPageState extends State<ChatPage> {
           ),
         );
       }
+    }
+  }
+
+  /// 打开编辑器编辑图片后发送
+  ///
+  /// 编辑器中确认发送编辑后的图片，取消则不发送。
+  Future<void> _editAndSendImage(XFile image) async {
+    try {
+      final bytes = await image.readAsBytes();
+      if (!mounted) return;
+
+      final editedBytes = await MediaEditorPage.open(
+        context,
+        imageBytes: bytes,
+        filename: image.name,
+      );
+
+      // 用户取消编辑，不发送
+      if (editedBytes == null || !mounted) return;
+
+      final filename = image.name.isNotEmpty ? image.name : 'edited_image.jpg';
+      final mimeType = lookupMimeType(filename) ?? 'image/jpeg';
+
+      context.read<ChatBloc>().add(SendImageMessage(
+        imageBytes: editedBytes,
+        filename: filename,
+        mimeType: mimeType,
+        selfDestructAfter: _isViewOnce ? 1 : null,
+      ));
+
+      if (_isViewOnce) {
+        setState(() => _isViewOnce = false);
+      }
+    } catch (e) {
+      debugPrint('Edit image error: $e');
+      // 编辑器出错时回退到直接发送
+      await _sendImage(image);
     }
   }
 
@@ -1676,7 +1719,7 @@ class _ChatPageState extends State<ChatPage> {
         );
         
         if (image == null) return;
-        await _sendImage(image);
+        await _editAndSendImage(image);
       } else if (choice == 'video') {
         debugPrint('Starting video recording...');
         final video = await picker.pickVideo(
@@ -3829,6 +3872,15 @@ Avatar: ${contactAvatar ?? ''}''';
       onVoicePressed: _onVoicePressed,
       onEmojiPressed: _onEmojiPressed,
       onMorePressed: _onMorePressed,
+      onScheduledSend: (scheduledAt) {
+        final text = _inputController.text.trim();
+        if (text.isNotEmpty) {
+          context.read<ChatBloc>().add(SendScheduledMessage(
+            text: text,
+            scheduledAt: scheduledAt,
+          ));
+        }
+      },
     );
   }
 

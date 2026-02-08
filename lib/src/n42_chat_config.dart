@@ -164,6 +164,24 @@ class N42ChatConfig {
   /// 如果不设置，将使用模拟翻译（仅用于开发测试）
   final String? googleTranslateApiKey;
 
+  /// AI API Key
+  ///
+  /// 用于 AI 聊天助手、摘要、改写等功能
+  /// 支持 OpenAI / Claude / DeepSeek 等兼容 API
+  final String? aiApiKey;
+
+  /// AI API Base URL
+  ///
+  /// AI 服务的 API 基础地址
+  /// 默认为 OpenAI: https://api.openai.com
+  /// 可切换为其他兼容服务: https://api.deepseek.com 等
+  final String aiBaseUrl;
+
+  /// AI 默认模型
+  ///
+  /// 默认使用的 AI 模型名称
+  final String aiModel;
+
   const N42ChatConfig({
     this.defaultHomeserver = 'https://m.si46.world',
     this.enableEncryption = true,
@@ -191,6 +209,9 @@ class N42ChatConfig {
     this.privacyPolicyUrl = 'https://n42.world/privacy',
     this.giphyApiKey,
     this.googleTranslateApiKey,
+    this.aiApiKey,
+    this.aiBaseUrl = 'https://api.openai.com',
+    this.aiModel = 'gpt-4o-mini',
   });
 
   /// 复制并修改配置
@@ -221,6 +242,9 @@ class N42ChatConfig {
     String? privacyPolicyUrl,
     String? giphyApiKey,
     String? googleTranslateApiKey,
+    String? aiApiKey,
+    String? aiBaseUrl,
+    String? aiModel,
   }) {
     return N42ChatConfig(
       defaultHomeserver: defaultHomeserver ?? this.defaultHomeserver,
@@ -250,6 +274,9 @@ class N42ChatConfig {
       privacyPolicyUrl: privacyPolicyUrl ?? this.privacyPolicyUrl,
       giphyApiKey: giphyApiKey ?? this.giphyApiKey,
       googleTranslateApiKey: googleTranslateApiKey ?? this.googleTranslateApiKey,
+      aiApiKey: aiApiKey ?? this.aiApiKey,
+      aiBaseUrl: aiBaseUrl ?? this.aiBaseUrl,
+      aiModel: aiModel ?? this.aiModel,
     );
   }
 }

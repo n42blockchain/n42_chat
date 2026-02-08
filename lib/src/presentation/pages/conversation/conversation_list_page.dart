@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/services/chat_lock_service.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -69,6 +70,8 @@ class _ConversationListPageState extends State<ConversationListPage> {
   late ConversationBloc _conversationBloc;
   // StoryBloc 引用
   StoryBloc? _storyBloc;
+  // 锁定的聊天 ID 集合
+  Set<String> _lockedChatIds = {};
 
   @override
   void initState() {
@@ -79,6 +82,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
     _conversationBloc
       ..add(const LoadConversations())
       ..add(const SubscribeConversations());
+
+    // 加载锁定状态
+    _loadLockedChats();
 
     // 初始化 StoryBloc
     _storyBloc = getIt<StoryBloc>()
@@ -92,6 +98,14 @@ class _ConversationListPageState extends State<ConversationListPage> {
         setState(() {});
       }
     });
+  }
+
+  Future<void> _loadLockedChats() async {
+    final lockService = ChatLockService();
+    final ids = await lockService.getLockedChatIds();
+    if (mounted) {
+      setState(() => _lockedChatIds = ids.toSet());
+    }
   }
 
   @override
@@ -108,6 +122,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
   Future<void> _onRefresh() async {
     context.read<ConversationBloc>().add(const RefreshConversations());
+    _loadLockedChats();
     // 等待刷新完成
     await Future<void>.delayed(const Duration(milliseconds: 500));
   }
@@ -333,7 +348,8 @@ class _ConversationListPageState extends State<ConversationListPage> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => CreateStoryPage(
-          onPost: (content, imageBytes, imageName, backgroundColor, textColor) {
+          onPost: (content, imageBytes, imageName, backgroundColor, textColor,
+              {String? musicFilePath, String? musicTitle}) {
             // 构建媒体输入
             final media = <StoryMediaInput>[];
             if (imageBytes != null && imageName != null) {
@@ -475,6 +491,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                     child: ConversationTile(
                       conversation: entry.value,
                       isSelected: widget.selectedConversationId == entry.value.id,
+                      isLocked: _lockedChatIds.contains(entry.value.id),
                       onTap: () => _onConversationTap(entry.value),
                       onLongPress: () =>
                           _onConversationLongPress(context, entry.value),
@@ -504,6 +521,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                   child: ConversationTile(
                     conversation: entry.value,
                     isSelected: widget.selectedConversationId == entry.value.id,
+                    isLocked: _lockedChatIds.contains(entry.value.id),
                     onTap: () => _onConversationTap(entry.value),
                     onLongPress: () =>
                         _onConversationLongPress(context, entry.value),

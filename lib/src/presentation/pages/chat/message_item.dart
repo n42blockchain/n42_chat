@@ -200,12 +200,45 @@ class MessageItem extends StatelessWidget {
         child: bubble,
       );
     }
-    
+
+    // 定时发送消息标记
+    if (message.isScheduled && !message.isScheduledTimeReached) {
+      bubble = Column(
+        crossAxisAlignment: message.isFromMe
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
+        children: [
+          bubble,
+          Padding(
+            padding: EdgeInsets.only(
+              left: message.isFromMe ? 0 : 56,
+              right: message.isFromMe ? 56 : 0,
+              top: 4,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.schedule, size: 12, color: AppColors.primary),
+                const SizedBox(width: 4),
+                Text(
+                  '${S.of(context)?.scheduledMessageLabel ?? 'Scheduled'} ${_formatScheduledTime(message.scheduledAt!)}',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
     // 如果有表情回应，显示在消息下方
     if (message.reactions.isNotEmpty) {
       return Column(
-        crossAxisAlignment: message.isFromMe 
-            ? CrossAxisAlignment.end 
+        crossAxisAlignment: message.isFromMe
+            ? CrossAxisAlignment.end
             : CrossAxisAlignment.start,
         children: [
           bubble,
@@ -1711,6 +1744,23 @@ class MessageItem extends StatelessWidget {
     final minutes = seconds ~/ 60;
     final secs = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+  }
+
+  String _formatScheduledTime(DateTime scheduledAt) {
+    final now = DateTime.now();
+    final isToday = scheduledAt.year == now.year &&
+        scheduledAt.month == now.month &&
+        scheduledAt.day == now.day;
+    final isTomorrow = scheduledAt.year == now.year &&
+        scheduledAt.month == now.month &&
+        scheduledAt.day == now.day + 1;
+
+    final timeStr =
+        '${scheduledAt.hour.toString().padLeft(2, '0')}:${scheduledAt.minute.toString().padLeft(2, '0')}';
+
+    if (isToday) return timeStr;
+    if (isTomorrow) return 'Tomorrow $timeStr';
+    return '${scheduledAt.month}/${scheduledAt.day} $timeStr';
   }
 }
 

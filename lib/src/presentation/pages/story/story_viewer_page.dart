@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -337,9 +340,95 @@ class _StoryContent extends StatefulWidget {
 class _StoryContentState extends State<_StoryContent> {
   final TextEditingController _replyController = TextEditingController();
   final FocusNode _replyFocusNode = FocusNode();
+  AudioPlayer? _musicPlayer;
+  StreamSubscription<void>? _musicCompleteSubscription;
+  bool _isMusicPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _startMusicIfAvailable();
+  }
+
+  @override
+  void didUpdateWidget(covariant _StoryContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Story 切换时重新处理音乐
+    if (oldWidget.story.id != widget.story.id) {
+      _stopMusic();
+      _startMusicIfAvailable();
+    }
+    // 暂停/恢复
+    if (oldWidget.isPaused != widget.isPaused && _musicPlayer != null) {
+      if (widget.isPaused) {
+        _musicPlayer!.pause();
+      } else if (_isMusicPlaying) {
+        _musicPlayer!.resume();
+      }
+    }
+  }
+
+  void _startMusicIfAvailable() {
+    if (!widget.story.hasMusic) return;
+
+    final musicUrl = widget.story.musicUrl;
+    if (musicUrl == null || musicUrl.isEmpty) return;
+
+    _musicPlayer = AudioPlayer();
+
+    // Determine the source based on URL scheme
+    Source source;
+    if (musicUrl.startsWith('mxc://')) {
+      // Convert MXC URL to HTTP URL
+      final httpUrl = _getMusicHttpUrl(musicUrl);
+      if (httpUrl == null) return;
+      source = UrlSource(httpUrl);
+    } else if (musicUrl.startsWith('http')) {
+      source = UrlSource(musicUrl);
+    } else {
+      // Local file path
+      source = DeviceFileSource(musicUrl);
+    }
+
+    _musicPlayer!.play(source).then((_) {
+      if (mounted) setState(() => _isMusicPlaying = true);
+    }).catchError((e) {
+      debugPrint('StoryViewer: Music playback failed: $e');
+    });
+
+    // Seek to start position if specified
+    final startAt = widget.story.musicStartAt;
+    if (startAt != null && startAt > 0) {
+      _musicPlayer!.seek(Duration(seconds: startAt));
+    }
+
+    _musicCompleteSubscription?.cancel();
+    _musicCompleteSubscription = _musicPlayer!.onPlayerComplete.listen((_) {
+      if (mounted) setState(() => _isMusicPlaying = false);
+    });
+  }
+
+  String? _getMusicHttpUrl(String mxcUrl) {
+    final client = MatrixClientManager.instance.client;
+    if (client?.homeserver == null) return null;
+    final uri = Uri.parse(mxcUrl);
+    return client!.homeserver!
+        .resolve('/_matrix/media/v3/download/${uri.host}${uri.path}')
+        .toString();
+  }
+
+  void _stopMusic() {
+    _musicCompleteSubscription?.cancel();
+    _musicCompleteSubscription = null;
+    _musicPlayer?.stop();
+    _musicPlayer?.dispose();
+    _musicPlayer = null;
+    _isMusicPlaying = false;
+  }
 
   @override
   void dispose() {
+    _stopMusic();
     _replyController.dispose();
     _replyFocusNode.dispose();
     super.dispose();
@@ -597,6 +686,53 @@ class _StoryContentState extends State<_StoryContent> {
             ],
           ),
         ),
+
+        // 音乐指示器
+        if (story.hasMusic) ...[
+          GestureDetector(
+            onTap: () {
+              if (_musicPlayer == null) return;
+              if (_isMusicPlaying) {
+                _musicPlayer!.pause();
+                setState(() => _isMusicPlaying = false);
+              } else {
+                _musicPlayer!.resume();
+                setState(() => _isMusicPlaying = true);
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    _isMusicPlaying ? Icons.music_note : Icons.music_off,
+                    color: Colors.white,
+                    size: 14,
+                  ),
+                  const SizedBox(width: 4),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 80),
+                    child: Text(
+                      story.musicTitle ?? 'Music',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
 
         // 关闭按钮
         IconButton(

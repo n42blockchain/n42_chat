@@ -4391,4 +4391,316 @@ class SEn extends S {
 
   @override
   String get tapToSearch => 'Tap to search';
+
+  @override
+  String get settingsThisDevice => 'This device';
+
+  @override
+  String get settingsJustNow => 'Just now';
+
+  @override
+  String get settingsDeviceId => 'Device ID';
+
+  @override
+  String get settingsStatus => 'Status';
+
+  @override
+  String get settingsLastActive => 'Last active';
+
+  @override
+  String get settingsIpAddress => 'IP address';
+
+  @override
+  String get settingsRenameDevice => 'Rename device';
+
+  @override
+  String get settingsDeviceNameHint => 'Enter device name';
+
+  @override
+  String get settingsDeviceRenamed => 'Device renamed';
+
+  @override
+  String get settingsRenameFailed => 'Rename failed';
+
+  @override
+  String get settingsRemoteLogout => 'Remote logout';
+
+  @override
+  String settingsRemoteLogoutConfirm(String deviceName) {
+    return 'Are you sure you want to log out \"$deviceName\"? This action cannot be undone.';
+  }
+
+  @override
+  String get settingsDeviceLoggedOut => 'Device logged out';
+
+  @override
+  String get settingsLogoutFailed => 'Logout failed';
+
+  @override
+  String get settingsLogout => 'Logout';
+
+  @override
+  String get settingsVerifyIdentity => 'Verify identity';
+
+  @override
+  String get settingsEnterPasswordToConfirm =>
+      'Enter your password to confirm this action.';
+
+  @override
+  String get scheduledSendTitle => 'Schedule message';
+
+  @override
+  String get scheduledSendInOneHour => 'In 1 hour';
+
+  @override
+  String get scheduledSendTonight => 'Tonight (8:00 PM)';
+
+  @override
+  String get scheduledSendTomorrowMorning => 'Tomorrow morning (9:00 AM)';
+
+  @override
+  String get scheduledSendCustom => 'Pick a date & time';
+
+  @override
+  String get scheduledMessageLabel => 'Scheduled';
+
+  @override
+  String get scheduledMessageCancel => 'Cancel scheduled message';
+
+  @override
+  String get chatLockTitle => 'Chat lock';
+
+  @override
+  String get chatLockEnable => 'Lock this chat';
+
+  @override
+  String get chatLockDisable => 'Unlock this chat';
+
+  @override
+  String get chatLockDescription =>
+      'Locked chats require biometric or PIN verification to open';
+
+  @override
+  String get chatLockVerifyTitle => 'Chat locked';
+
+  @override
+  String get chatLockVerifySubtitle => 'Verify to access this chat';
+
+  @override
+  String get chatLockVerifyFailed => 'Verification failed';
+
+  @override
+  String get chatLockEnabled => 'Chat locked';
+
+  @override
+  String get chatLockDisabled => 'Chat unlocked';
+
+  @override
+  String get chatLockPinTitle => 'Enter PIN';
+
+  @override
+  String get chatLockPinSetTitle => 'Set PIN';
+
+  @override
+  String get chatLockPinConfirmTitle => 'Confirm PIN';
+
+  @override
+  String get chatLockPinMismatch => 'PIN does not match';
+
+  @override
+  String get chatLockUseBiometric => 'Use biometric';
+
+  @override
+  String get chatLockUsePin => 'Use PIN';
+
+  @override
+  String get mediaEditorUndo => 'Undo';
+
+  @override
+  String get mediaEditorRedo => 'Redo';
+
+  @override
+  String get mediaEditorCrop => 'Crop';
+
+  @override
+  String get mediaEditorFilter => 'Filter';
+
+  @override
+  String get mediaEditorDraw => 'Draw';
+
+  @override
+  String get mediaEditorText => 'Text';
+
+  @override
+  String get aiAssistant => 'AI Assistant';
+
+  @override
+  String get aiAssistantWelcome =>
+      'Hello! I\'m the N42 AI Assistant. How can I help you?';
+
+  @override
+  String get aiAssistantNotConfigured => 'AI service not configured';
+
+  @override
+  String get aiAssistantSettings => 'AI Settings';
+
+  @override
+  String get aiAssistantClearHistory => 'Clear chat history';
+
+  @override
+  String get aiAssistantClearHistoryConfirm =>
+      'Are you sure you want to clear all AI chat history?';
+
+  @override
+  String get aiAssistantStopGenerating => 'Stop generating';
+
+  @override
+  String get aiAssistantModel => 'Model';
+
+  @override
+  String get aiAssistantTemperature => 'Temperature';
+
+  @override
+  String get aiAssistantMaxTokens => 'Max tokens';
+
+  @override
+  String get aiAssistantContextWindow => 'Context window';
+
+  @override
+  String get aiAssistantServiceStatus => 'Service status';
+
+  @override
+  String get aiAssistantAvailable => 'Available';
+
+  @override
+  String get aiAssistantUnavailable => 'Unavailable';
+
+  @override
+  String get aiSummarize => 'AI Summary';
+
+  @override
+  String aiSummarizeUnread(int count) {
+    return 'Summarize $count unread messages';
+  }
+
+  @override
+  String get aiSummarizeLoading => 'Summarizing...';
+
+  @override
+  String get aiSummarizeError => 'Failed to summarize';
+
+  @override
+  String get aiRewrite => 'AI Rewrite';
+
+  @override
+  String get aiRewriteFormal => 'Formal';
+
+  @override
+  String get aiRewriteCasual => 'Casual';
+
+  @override
+  String get aiRewritePlayful => 'Playful';
+
+  @override
+  String get aiRewriteProfessional => 'Professional';
+
+  @override
+  String get aiRewriteAccept => 'Use';
+
+  @override
+  String get aiRewriteCancel => 'Cancel';
+
+  @override
+  String get aiRewriteLoading => 'Rewriting...';
+
+  @override
+  String get aiLinkSummary => 'AI Summary';
+
+  @override
+  String get aiLinkSummaryAnalyzing => 'Analyzing...';
+
+  @override
+  String get chatFolderManagement => 'Manage Folders';
+
+  @override
+  String get chatFolderSystem => 'System Folders';
+
+  @override
+  String get chatFolderCustom => 'Custom Folders';
+
+  @override
+  String get chatFolderEmpty => 'No custom folders yet';
+
+  @override
+  String get chatFolderCreate => 'Create Folder';
+
+  @override
+  String get chatFolderEdit => 'Edit Folder';
+
+  @override
+  String get chatFolderNameHint => 'Folder name';
+
+  @override
+  String get chatFolderAll => 'All';
+
+  @override
+  String get chatFolderUnread => 'Unread';
+
+  @override
+  String get chatFolderPersonal => 'Personal';
+
+  @override
+  String get chatFolderGroups => 'Groups';
+
+  @override
+  String get chatFolderChannels => 'Channels';
+
+  @override
+  String get chatFolderMuted => 'Muted';
+
+  @override
+  String get storyAddMusic => 'Add Music';
+
+  @override
+  String get storyChangeMusic => 'Change Music';
+
+  @override
+  String get storyBackgroundMusic => 'Background Music';
+
+  @override
+  String get storyMusicPreview => 'Preview (max 15s)';
+
+  @override
+  String get storyChooseFromDevice => 'Choose from Device';
+
+  @override
+  String get storyUseThisMusic => 'Use This Music';
+
+  @override
+  String get authPasskeyNotSupported =>
+      'Passkey is not supported on this device';
+
+  @override
+  String get authPasskeyRegister => 'Register Passkey';
+
+  @override
+  String get authPasskeyNoRegistered => 'No passkeys registered';
+
+  @override
+  String get authPasskeyRegisterHint =>
+      'Register a passkey for passwordless login';
+
+  @override
+  String get authPasskeyNameYours => 'Name your Passkey';
+
+  @override
+  String get authPasskeyRegistered => 'Passkey registered successfully';
+
+  @override
+  String get authPasskeyDeleted => 'Passkey deleted';
+
+  @override
+  String authPasskeyDeleteConfirm(String name) {
+    return 'Delete passkey \"$name\"? You will no longer be able to use it to log in.';
+  }
 }

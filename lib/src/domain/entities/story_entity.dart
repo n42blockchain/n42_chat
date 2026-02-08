@@ -43,6 +43,18 @@ class StoryEntity extends Equatable {
   /// 文字颜色
   final int? textColor;
 
+  /// 背景音乐 URL（MXC URI）
+  final String? musicUrl;
+
+  /// 音乐标题
+  final String? musicTitle;
+
+  /// 音乐艺术家
+  final String? musicArtist;
+
+  /// 音乐播放起始位置（秒）
+  final int? musicStartAt;
+
   const StoryEntity({
     required this.id,
     required this.eventId,
@@ -57,6 +69,10 @@ class StoryEntity extends Equatable {
     this.isViewed = false,
     this.backgroundColor,
     this.textColor,
+    this.musicUrl,
+    this.musicTitle,
+    this.musicArtist,
+    this.musicStartAt,
   });
 
   /// 是否已过期
@@ -88,6 +104,9 @@ class StoryEntity extends Equatable {
     return '${remaining.inMinutes}m';
   }
 
+  /// 是否有背景音乐
+  bool get hasMusic => musicUrl != null && musicUrl!.isNotEmpty;
+
   StoryEntity copyWith({
     String? id,
     String? eventId,
@@ -102,6 +121,10 @@ class StoryEntity extends Equatable {
     bool? isViewed,
     int? backgroundColor,
     int? textColor,
+    String? musicUrl,
+    String? musicTitle,
+    String? musicArtist,
+    int? musicStartAt,
   }) {
     return StoryEntity(
       id: id ?? this.id,
@@ -117,6 +140,10 @@ class StoryEntity extends Equatable {
       isViewed: isViewed ?? this.isViewed,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       textColor: textColor ?? this.textColor,
+      musicUrl: musicUrl ?? this.musicUrl,
+      musicTitle: musicTitle ?? this.musicTitle,
+      musicArtist: musicArtist ?? this.musicArtist,
+      musicStartAt: musicStartAt ?? this.musicStartAt,
     );
   }
 
@@ -141,6 +168,10 @@ class StoryEntity extends Equatable {
       isViewed: json['isViewed'] as bool? ?? false,
       backgroundColor: json['backgroundColor'] as int?,
       textColor: json['textColor'] as int?,
+      musicUrl: json['musicUrl'] as String?,
+      musicTitle: json['musicTitle'] as String?,
+      musicArtist: json['musicArtist'] as String?,
+      musicStartAt: json['musicStartAt'] as int?,
     );
   }
 
@@ -159,6 +190,10 @@ class StoryEntity extends Equatable {
       'isViewed': isViewed,
       'backgroundColor': backgroundColor,
       'textColor': textColor,
+      'musicUrl': musicUrl,
+      'musicTitle': musicTitle,
+      'musicArtist': musicArtist,
+      'musicStartAt': musicStartAt,
     };
   }
 
@@ -177,6 +212,10 @@ class StoryEntity extends Equatable {
         isViewed,
         backgroundColor,
         textColor,
+        musicUrl,
+        musicTitle,
+        musicArtist,
+        musicStartAt,
       ];
 }
 

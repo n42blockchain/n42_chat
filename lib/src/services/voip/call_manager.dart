@@ -259,6 +259,8 @@ class CallManager {
     await _notificationService.endAllCalls();
     // 清除活跃房间
     N42Chat.pushService?.setActiveRoom(null);
+    // 清除通话状态，恢复消息通知
+    N42Chat.pushService?.setInCall(false);
   }
 
   /// 停止来电铃声（不挂断通话）
@@ -311,17 +313,17 @@ class CallManager {
     bool enableAudio = true,
   }) async {
     if (_liveKitService == null) {
-      onError?.call('会议服务未初始化');
+      onError?.call('meeting_not_initialized');
       return false;
     }
-    
+
     if (!_config.hasLiveKitConfig) {
-      onError?.call('LiveKit 未配置');
+      onError?.call('livekit_not_configured');
       return false;
     }
-    
+
     if (isInCall || isInMeeting) {
-      onError?.call('当前正在通话中');
+      onError?.call('already_in_call');
       return false;
     }
     
@@ -460,8 +462,8 @@ class CallManager {
     }
   }
   
-  void _navigateToCallScreen({bool isIncoming = false, CallSession? session}) {
-    debugPrint('CallManager: _navigateToCallScreen called, isIncoming=$isIncoming, _isCallScreenShowing=$_isCallScreenShowing');
+  void _navigateToCallScreen({bool isIncoming = false, CallSession? session, int retryCount = 0}) {
+    debugPrint('CallManager: _navigateToCallScreen called, isIncoming=$isIncoming, _isCallScreenShowing=$_isCallScreenShowing, retry=$retryCount');
 
     if (_isCallScreenShowing) {
       debugPrint('CallManager: Call screen already showing, skipping navigation');
@@ -475,7 +477,15 @@ class CallManager {
 
     final context = _navigatorKey?.currentContext;
     if (context == null) {
-      debugPrint('CallManager: ERROR - navigatorKey.currentContext is null! App might be in background.');
+      // App 从后台唤醒时 context 可能暂时为 null，重试最多 5 次（共等待约 2.5 秒）
+      if (retryCount < 5) {
+        debugPrint('CallManager: Context null, retrying in 500ms (attempt ${retryCount + 1}/5)');
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _navigateToCallScreen(isIncoming: isIncoming, session: session, retryCount: retryCount + 1);
+        });
+      } else {
+        debugPrint('CallManager: ERROR - navigatorKey.currentContext still null after retries');
+      }
       return;
     }
 

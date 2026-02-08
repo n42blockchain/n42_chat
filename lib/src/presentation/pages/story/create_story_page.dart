@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../widgets/story/story_music_picker.dart';
 
 /// Story creation mode
 enum StoryMode {
@@ -26,13 +27,17 @@ class CreateStoryPage extends StatefulWidget {
   /// - imageName: Image filename (for photo story)
   /// - backgroundColor: Background color value (for text story)
   /// - textColor: Text color value (for text story)
+  /// - musicFilePath: Local path to selected music file
+  /// - musicTitle: Music file display name
   final void Function(
     String? content,
     Uint8List? imageBytes,
     String? imageName,
     int? backgroundColor,
-    int? textColor,
-  )? onPost;
+    int? textColor, {
+    String? musicFilePath,
+    String? musicTitle,
+  })? onPost;
 
   @override
   State<CreateStoryPage> createState() => _CreateStoryPageState();
@@ -79,6 +84,9 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
   int _selectedColorIndex = 0;
 
   bool _isPosting = false;
+
+  // Selected music
+  StoryMusicSelection? _musicSelection;
 
   @override
   void dispose() {
@@ -250,6 +258,9 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
             ),
           ),
 
+          // Music selection
+          _buildMusicBar(),
+
           // Color picker
           Container(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
@@ -311,6 +322,9 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               ? _buildImagePreview(isDark)
               : _buildImagePicker(isDark),
         ),
+
+        // Music selection (only show when image is selected)
+        if (_imageBytes != null) _buildMusicBar(),
 
         // Caption input (only show when image is selected)
         if (_imageBytes != null)
@@ -551,6 +565,9 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
 
     setState(() => _isPosting = true);
 
+    final musicPath = _musicSelection?.isEmpty == true ? null : _musicSelection?.filePath;
+    final musicTitle = _musicSelection?.isEmpty == true ? null : _musicSelection?.fileName;
+
     if (_mode == StoryMode.text) {
       widget.onPost?.call(
         _textController.text.trim(),
@@ -558,6 +575,8 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         null,
         _currentBackgroundColor.value,
         _currentTextColor.value,
+        musicFilePath: musicPath,
+        musicTitle: musicTitle,
       );
     } else {
       widget.onPost?.call(
@@ -568,11 +587,93 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         _imageName,
         null,
         null,
+        musicFilePath: musicPath,
+        musicTitle: musicTitle,
       );
     }
 
     // Pop after posting (caller should handle async operations)
     Navigator.of(context).pop();
+  }
+
+  Widget _buildMusicBar() {
+    final hasMusic = _musicSelection != null && _musicSelection!.isEmpty != true;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: GestureDetector(
+        onTap: _showMusicPicker,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: _mode == StoryMode.text
+                ? Colors.white.withOpacity(0.15)
+                : AppColors.primary.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.music_note,
+                size: 16,
+                color: _mode == StoryMode.text
+                    ? _currentTextColor
+                    : AppColors.primary,
+              ),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  hasMusic
+                      ? _musicSelection!.fileName
+                      : 'Add Music',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: _mode == StoryMode.text
+                        ? _currentTextColor
+                        : AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (hasMusic) ...[
+                const SizedBox(width: 6),
+                GestureDetector(
+                  onTap: () {
+                    setState(() => _musicSelection = null);
+                  },
+                  child: Icon(
+                    Icons.close,
+                    size: 14,
+                    color: _mode == StoryMode.text
+                        ? _currentTextColor.withOpacity(0.7)
+                        : Colors.red,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showMusicPicker() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StoryMusicPicker(
+        currentMusicPath: _musicSelection?.filePath,
+        onMusicSelected: (selection) {
+          setState(() => _musicSelection = selection);
+          Navigator.of(context).pop();
+        },
+        onCancel: () => Navigator.of(context).pop(),
+      ),
+    );
   }
 }
 
