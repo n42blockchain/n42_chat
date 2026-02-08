@@ -265,7 +265,18 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              if (media.httpUrl != null)
+              if (media.isVideo)
+                Container(
+                  color: isDark ? Colors.grey[850] : Colors.grey[800],
+                  child: const Center(
+                    child: Icon(
+                      Icons.play_circle_filled,
+                      color: Colors.white70,
+                      size: 64,
+                    ),
+                  ),
+                )
+              else if (media.httpUrl != null)
                 CachedNetworkImage(
                   imageUrl: media.httpUrl!,
                   fit: BoxFit.cover,
@@ -279,14 +290,6 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                 Container(
                   color: isDark ? Colors.grey[800] : Colors.grey[200],
                   child: const Icon(Icons.image, size: 48),
-                ),
-              if (media.isVideo)
-                const Center(
-                  child: Icon(
-                    Icons.play_circle_filled,
-                    color: Colors.white,
-                    size: 64,
-                  ),
                 ),
             ],
           ),
@@ -310,7 +313,18 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              if (media.httpUrl != null)
+              if (media.isVideo)
+                Container(
+                  color: isDark ? Colors.grey[850] : Colors.grey[800],
+                  child: const Center(
+                    child: Icon(
+                      Icons.play_circle_filled,
+                      color: Colors.white70,
+                      size: 32,
+                    ),
+                  ),
+                )
+              else if (media.httpUrl != null)
                 CachedNetworkImage(
                   imageUrl: media.httpUrl!,
                   fit: BoxFit.cover,
@@ -324,14 +338,6 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                 Container(
                   color: isDark ? Colors.grey[800] : Colors.grey[200],
                   child: const Icon(Icons.image),
-                ),
-              if (media.isVideo)
-                const Center(
-                  child: Icon(
-                    Icons.play_circle_filled,
-                    color: Colors.white,
-                    size: 32,
-                  ),
                 ),
             ],
           ),
