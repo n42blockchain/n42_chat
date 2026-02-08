@@ -83,11 +83,11 @@ abstract class IWalletBridge {
 
   /// 批量反向解析 ENS 域名
   Future<Map<String, String?>> batchLookupEnsNames(List<String> addresses) async {
-    final results = <String, String?>{};
-    for (final addr in addresses) {
-      results[addr] = await lookupEnsName(addr);
-    }
-    return results;
+    final futures = addresses.map((addr) async {
+      return MapEntry(addr, await lookupEnsName(addr));
+    });
+    final entries = await Future.wait(futures);
+    return Map.fromEntries(entries);
   }
 
   // ============================================
@@ -154,7 +154,7 @@ class TransferResult {
   /// 创建取消结果
   factory TransferResult.cancelled() => const TransferResult(
         success: false,
-        errorMessage: '用户取消',
+        errorMessage: 'User cancelled',
         errorCode: 'CANCELLED',
       );
 }

@@ -975,7 +975,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
               ),
               const SizedBox(height: 12),
               Text(
-                '聊天模块初始化失败',
+                'Chat initialization failed',
                 style: TextStyle(
                   fontSize: 16,
                   color: subtitleColor,
@@ -984,7 +984,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                '请检查网络连接后重试',
+                'Please check your network and try again',
                 style: TextStyle(
                   fontSize: 14,
                   color: subtitleColor,
@@ -1015,7 +1015,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
                           ),
                         )
                       : const Text(
-                          '重试',
+                          'Retry',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
