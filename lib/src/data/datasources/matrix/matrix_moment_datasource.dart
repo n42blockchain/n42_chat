@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../domain/entities/moment_entity.dart';
@@ -34,19 +35,60 @@ class MatrixMomentDataSource {
 
   String? get _currentUserId => _client?.userID;
 
+  /// 缓存的动态房间引用
+  matrix.Room? _cachedMomentRoom;
+
   /// 获取或创建用户的动态房间
   Future<matrix.Room?> _getOrCreateMomentRoom() async {
-    if (_client == null) return null;
+    if (_client == null) {
+      debugPrint('MatrixMomentDataSource: Client is null');
+      return null;
+    }
+
+    // 先检查缓存
+    if (_cachedMomentRoom != null) {
+      return _cachedMomentRoom;
+    }
+
+    debugPrint('MatrixMomentDataSource: Looking for moment room, '
+        'total rooms: ${_client!.rooms.length}');
 
     // 查找现有的动态房间
     for (final room in _client!.rooms) {
       final tags = room.tags;
       if (tags.containsKey(momentRoomTag)) {
+        debugPrint('MatrixMomentDataSource: Found existing moment room: ${room.id}');
+        _cachedMomentRoom = room;
         return room;
       }
     }
 
+    // 如果房间列表为空，可能同步尚未完成，等待同步
+    if (_client!.rooms.isEmpty) {
+      debugPrint('MatrixMomentDataSource: No rooms found, waiting for sync...');
+      try {
+        await _client!.onSync.stream.first.timeout(
+          const Duration(seconds: 15),
+        );
+        debugPrint('MatrixMomentDataSource: Sync completed, '
+            'rooms: ${_client!.rooms.length}');
+
+        // 同步后再次查找
+        for (final room in _client!.rooms) {
+          final tags = room.tags;
+          if (tags.containsKey(momentRoomTag)) {
+            debugPrint('MatrixMomentDataSource: Found moment room after sync: ${room.id}');
+            _cachedMomentRoom = room;
+            return room;
+          }
+        }
+      } on TimeoutException {
+        debugPrint('MatrixMomentDataSource: Sync timeout, proceeding to create room');
+      }
+    }
+
     // 创建新的动态房间
+    debugPrint('MatrixMomentDataSource: Creating new moment room...');
     try {
       final roomId = await _client!.createRoom(
         name: 'My Moments',
@@ -54,14 +96,46 @@ class MatrixMomentDataSource {
         preset: matrix.CreateRoomPreset.privateChat,
       );
 
+      debugPrint('MatrixMomentDataSource: Room created with id: $roomId');
+
+      // 等待房间出现在本地存储中
+      matrix.Room? room = _client!.getRoomById(roomId);
+
+      if (room == null) {
+        debugPrint('MatrixMomentDataSource: Room not in local store yet, waiting...');
+        // 等待同步将房间带入本地
+        for (var i = 0; i < 10; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+          room = _client!.getRoomById(roomId);
+          if (room != null) break;
+        }
+      }
+
+      if (room == null) {
+        debugPrint('MatrixMomentDataSource: Room still null after waiting, '
+            'trying sync...');
+        try {
+          await _client!.onSync.stream.first.timeout(
+            const Duration(seconds: 10),
+          );
+          room = _client!.getRoomById(roomId);
+        } on TimeoutException {
+          debugPrint('MatrixMomentDataSource: Sync timeout after room creation');
+        }
+      }
+
       // 添加标签
-      final room = _client!.getRoomById(roomId);
       if (room != null) {
         await room.addTag(momentRoomTag);
+        _cachedMomentRoom = room;
+        debugPrint('MatrixMomentDataSource: Moment room ready: ${room.id}');
+      } else {
+        debugPrint('MatrixMomentDataSource: Failed to get room after creation');
       }
 
       return room;
     } catch (e) {
+      debugPrint('MatrixMomentDataSource: Error creating moment room: $e');
       return null;
     }
   }
@@ -94,7 +168,14 @@ class MatrixMomentDataSource {
     List<String> visibilityUserIds = const [],
   }) async {
     final room = await _getOrCreateMomentRoom();
-    if (room == null) throw Exception('Failed to get moment room');
+    if (room == null) {
+      final isLoggedIn = _client?.isLogged() ?? false;
+      final roomCount = _client?.rooms.length ?? 0;
+      throw Exception(
+        'Failed to get moment room '
+        '(logged_in=$isLoggedIn, rooms=$roomCount)',
+      );
+    }
 
     final momentId = 'moment_${DateTime.now().millisecondsSinceEpoch}';
 
