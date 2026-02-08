@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
 import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
@@ -381,10 +383,14 @@ class _MomentTile extends StatelessWidget {
                 if (media.httpUrl != null)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
-                    child: Image.network(
-                      media.httpUrl!,
+                    child: CachedNetworkImage(
+                      imageUrl: media.httpUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.image),
+                      httpHeaders: _getAuthHeaders(),
+                      placeholder: (_, __) => Container(
+                        color: isDark ? Colors.grey[800] : Colors.grey[200],
+                      ),
+                      errorWidget: (_, __, ___) => const Icon(Icons.image),
                     ),
                   )
                 else
@@ -557,6 +563,14 @@ class _MomentTile extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Map<String, String> _getAuthHeaders() {
+    final accessToken = MatrixClientManager.instance.client?.accessToken;
+    if (accessToken != null && accessToken.isNotEmpty) {
+      return {'Authorization': 'Bearer $accessToken'};
+    }
+    return {};
   }
 
   void _openMediaViewer(BuildContext context, int index) {
