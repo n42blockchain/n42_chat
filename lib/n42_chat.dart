@@ -53,6 +53,11 @@ export 'src/domain/entities/user_entity.dart';
 export 'src/integration/wallet_bridge.dart';
 
 // ============================================
+// Mautrix 桥接导出
+// ============================================
+export 'src/integration/bridge/bridge.dart';
+
+// ============================================
 // 推送通知导出
 // ============================================
 export 'src/core/notifications/push_notification_service.dart';
