@@ -161,17 +161,19 @@ class MatrixClientManager {
         },
       );
 
-      // 初始化客户端 - 异步加载，不阻塞启动
-      // 优化：将启动时间从 3s 降至约 0.5s
-      debugPrint('MatrixClientManager: Starting client init (async mode)...');
+      // 初始化客户端
+      // waitForFirstSync: false  → 不阻塞网络同步（快速启动）
+      // waitUntilLoadCompletedLoaded: true → 必须等待本地数据库加载完成
+      //   确保之前缓存的房间/消息可用，否则 UI 会显示空列表
+      debugPrint('MatrixClientManager: Starting client init...');
       await _client!.init(
         waitForFirstSync: false,
-        waitUntilLoadCompletedLoaded: false, // 不等待数据库完全加载，异步进行
+        waitUntilLoadCompletedLoaded: true,
       );
 
       _isInitialized = true;
-      debugPrint('MatrixClientManager: Initialized successfully (async mode)');
-      debugPrint('MatrixClientManager: Logged in: $isLoggedIn');
+      debugPrint('MatrixClientManager: Initialized successfully');
+      debugPrint('MatrixClientManager: Logged in: $isLoggedIn, rooms: ${_client!.rooms.length}');
     } catch (e, stack) {
       debugPrint('MatrixClientManager: Initialize failed: $e');
       debugPrint('Stack: $stack');
@@ -273,12 +275,14 @@ class MatrixClientManager {
       final (_, _, _, _) = await _client!.checkHomeserver(homeserverUri);
 
       // 使用token恢复登录
+      // 显式设置 waitForFirstSync: false，由后续 startSync() 统一处理同步
       await _client!.init(
         newToken: accessToken,
         newUserID: userId,
         newDeviceID: deviceId,
         newDeviceName: 'N42Chat',
         newHomeserver: homeserverUri,
+        waitForFirstSync: false,
       );
 
       debugPrint('MatrixClientManager: Token login successful - $userId');
@@ -307,7 +311,8 @@ class MatrixClientManager {
 
   /// 开始同步
   ///
-  /// [timeout] 同步超时时间
+  /// 启动后台同步循环，并等待首次同步完成以确保房间数据是最新的。
+  /// [timeout] 等待首次同步的超时时间
   /// [fullState] 是否获取完整状态
   Future<void> startSync({
     Duration timeout = const Duration(seconds: 30),
@@ -317,10 +322,20 @@ class MatrixClientManager {
     _ensureLoggedIn();
 
     try {
-      // 开始后台同步
+      // 启动后台同步循环
       _client!.backgroundSync = true;
 
-      debugPrint('MatrixClientManager: Sync started');
+      // 等待首次同步完成，确保从服务器获取最新的房间和消息数据
+      // 如果本地数据库已有缓存（prevBatch != null），同步会增量获取
+      // 如果是全新登录（prevBatch == null），同步会获取完整初始数据
+      debugPrint('MatrixClientManager: Sync enabled, waiting for first sync response...');
+      try {
+        await _client!.onSync.stream.first.timeout(timeout);
+        debugPrint('MatrixClientManager: First sync completed, rooms: ${_client!.rooms.length}');
+      } on TimeoutException {
+        debugPrint('MatrixClientManager: First sync timed out after $timeout, '
+            'continuing with ${_client!.rooms.length} cached rooms');
+      }
     } catch (e) {
       debugPrint('MatrixClientManager: Start sync failed: $e');
       rethrow;
