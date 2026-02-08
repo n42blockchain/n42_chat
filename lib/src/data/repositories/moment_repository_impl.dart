@@ -351,7 +351,6 @@ class MomentRepositoryImpl implements IMomentRepository {
   }
 
   String? _getCurrentUserId() {
-    // 从 datasource 获取当前用户ID
-    return null; // 需要从 client 获取
+    return _momentDataSource.currentUserId;
   }
 }
