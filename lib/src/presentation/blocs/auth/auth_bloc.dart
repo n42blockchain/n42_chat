@@ -78,6 +78,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         status: AuthStatus.authenticated,
         user: user,
       ));
+      // 已登录状态，注册推送通知
+      _registerPushNotifications();
       // 已登录状态，初始化通话管理器
       _initializeCallManager();
     } else {
@@ -263,6 +265,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
       // 恢复会话成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
       add(const LoadUserProfileData());
+      // 恢复会话成功后注册推送通知
+      _registerPushNotifications();
       // 恢复会话成功后初始化通话管理器
       _initializeCallManager();
     } else {
@@ -570,6 +574,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
+        // Google 登录成功后注册推送通知
+        _registerPushNotifications();
         // Google 登录成功后初始化通话管理器
         _initializeCallManager();
       } else {
@@ -626,6 +632,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
+        // Apple 登录成功后注册推送通知
+        _registerPushNotifications();
         // Apple 登录成功后初始化通话管理器
         _initializeCallManager();
       } else {
@@ -720,6 +728,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
+        // Facebook 登录成功后注册推送通知
+        _registerPushNotifications();
         // Facebook 登录成功后初始化通话管理器
         _initializeCallManager();
       } else {
@@ -776,6 +786,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
+        // Twitter 登录成功后注册推送通知
+        _registerPushNotifications();
         // Twitter 登录成功后初始化通话管理器
         _initializeCallManager();
       } else {
@@ -832,6 +844,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
+        // 微信登录成功后注册推送通知
+        _registerPushNotifications();
         // 微信登录成功后初始化通话管理器
         _initializeCallManager();
       } else {
