@@ -75,13 +75,14 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                     final canPost = textValue.text.trim().isNotEmpty ||
                         _selectedMedia.isNotEmpty;
                     return TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        disabledForegroundColor: Colors.grey,
+                      ),
                       onPressed: canPost ? _postMoment : null,
                       child: Text(
                         s?.commonSend ?? 'Post',
-                        style: TextStyle(
-                          color: canPost
-                              ? AppColors.primary
-                              : Colors.grey,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
