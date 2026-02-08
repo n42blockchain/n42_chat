@@ -1,21 +1,24 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/contact_entity.dart';
 import '../../domain/repositories/contact_repository.dart';
 import '../datasources/local/secure_storage_datasource.dart';
 import '../datasources/matrix/matrix_contact_datasource.dart';
+import '../datasources/matrix/matrix_moment_datasource.dart';
 
 /// 联系人仓库实现
 class ContactRepositoryImpl implements IContactRepository {
   final MatrixContactDataSource _contactDataSource;
   final SecureStorageDataSource _storageDataSource;
+  final MatrixMomentDataSource _momentDataSource;
 
   /// 备注缓存
   Map<String, String> _remarkCache = {};
 
-  ContactRepositoryImpl(this._contactDataSource, this._storageDataSource);
+  ContactRepositoryImpl(this._contactDataSource, this._storageDataSource, this._momentDataSource);
 
   /// 加载备注缓存
   Future<void> _loadRemarkCache() async {
@@ -94,7 +97,16 @@ class ContactRepositoryImpl implements IContactRepository {
 
   @override
   Future<String> startDirectChat(String userId) async {
-    return await _contactDataSource.startDirectChat(userId);
+    final roomId = await _contactDataSource.startDirectChat(userId);
+
+    // 发起聊天时，也邀请对方加入我的 Moment 房间
+    try {
+      await _momentDataSource.inviteFriendToMomentRoom(userId);
+    } catch (e) {
+      debugPrint('ContactRepository: Failed to invite to moment room after startDirectChat: $e');
+    }
+
+    return roomId;
   }
 
   @override
@@ -193,7 +205,23 @@ class ContactRepositoryImpl implements IContactRepository {
 
   @override
   Future<void> acceptFriendRequest(String requestId) async {
+    // 1. 接受好友请求（加入聊天房间）
     await _contactDataSource.acceptInvite(requestId);
+
+    // 2. 获取好友的 userId
+    final room = _contactDataSource.getRoomById(requestId);
+    final friendUserId = room?.directChatMatrixID;
+
+    // 3. 邀请好友加入我的 Moment 房间（使好友能看到我的朋友圈）
+    if (friendUserId != null) {
+      debugPrint('ContactRepository: Inviting friend $friendUserId to moment room');
+      try {
+        await _momentDataSource.inviteFriendToMomentRoom(friendUserId);
+      } catch (e) {
+        debugPrint('ContactRepository: Failed to invite to moment room: $e');
+        // 不影响好友请求的接受
+      }
+    }
   }
 
   @override

@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'core/extensions/context_extension.dart';
 import 'core/notifications/firebase_push_service.dart';
 import 'data/datasources/matrix/matrix_client_manager.dart';
+import 'data/datasources/matrix/matrix_moment_datasource.dart';
 import 'services/voip/call_manager.dart';
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
@@ -251,8 +252,45 @@ class N42Chat {
       debugPrint('N42Chat: Failed to check login status for call manager: $e');
     }
 
+    // 设置 Moment 房间邀请自动加入监听
+    _setupMomentInviteListener();
+
     _initialized = true;
     debugPrint('N42Chat: Initialized successfully');
+  }
+
+  /// Moment 房间邀请 sync 监听的订阅
+  static StreamSubscription<matrix.SyncUpdate>? _momentSyncSubscription;
+
+  /// 设置 Moment 房间邀请的 sync 监听
+  ///
+  /// 在每次同步时检查是否有 Moment 房间邀请，自动接受
+  static void _setupMomentInviteListener() {
+    try {
+      final clientManager = getIt<MatrixClientManager>();
+      final client = clientManager.client;
+      if (client == null) {
+        debugPrint('N42Chat: Client null, skipping moment invite listener setup');
+        return;
+      }
+
+      // 取消之前的监听
+      _momentSyncSubscription?.cancel();
+
+      _momentSyncSubscription = client.onSync.stream.listen((_) async {
+        try {
+          final momentDataSource = getIt<MatrixMomentDataSource>();
+          await momentDataSource.processMomentInvites();
+        } catch (e) {
+          // 静默处理，避免影响正常同步
+          debugPrint('N42Chat: Moment invite processing error: $e');
+        }
+      });
+
+      debugPrint('N42Chat: Moment invite listener set up');
+    } catch (e) {
+      debugPrint('N42Chat: Failed to setup moment invite listener: $e');
+    }
   }
 
   /// 初始化推送服务

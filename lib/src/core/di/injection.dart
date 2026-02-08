@@ -297,6 +297,7 @@ void _registerRepositories() {
     () => ContactRepositoryImpl(
       getIt<MatrixContactDataSource>(),
       getIt<SecureStorageDataSource>(),
+      getIt<MatrixMomentDataSource>(),
     ),
   );
 

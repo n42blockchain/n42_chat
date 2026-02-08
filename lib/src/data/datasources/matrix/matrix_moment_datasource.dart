@@ -41,6 +41,9 @@ class MatrixMomentDataSource {
   /// 缓存的动态房间引用
   matrix.Room? _cachedMomentRoom;
 
+  /// Moment 房间邀请原因标识
+  static const String momentInviteReason = 'n42_moments';
+
   /// 获取或创建用户的动态房间
   Future<matrix.Room?> _getOrCreateMomentRoom() async {
     if (_client == null) {
@@ -97,6 +100,19 @@ class MatrixMomentDataSource {
         name: 'My Moments',
         visibility: matrix.Visibility.private,
         preset: matrix.CreateRoomPreset.privateChat,
+        powerLevelContentOverride: {
+          'events': {
+            // 只有房主（power level 50+）才能发布动态
+            momentEventType: 50,
+            // 所有成员（power level 0+）可以点赞和评论
+            momentLikeEventType: 0,
+            momentCommentEventType: 0,
+          },
+          'events_default': 0,
+          'state_default': 50,
+          'invite': 50,
+          'redact': 50,
+        },
       );
 
       debugPrint('MatrixMomentDataSource: Room created with id: $roomId');
@@ -186,10 +202,27 @@ class MatrixMomentDataSource {
     final uploadedMedia = <Map<String, dynamic>>[];
     if (media != null) {
       for (final m in media) {
+        // 确保视频有正确的 mimeType
+        String? contentType = m.mimeType;
+        if (m.isVideo && (contentType == null || contentType.isEmpty)) {
+          final lower = m.filename.toLowerCase();
+          if (lower.endsWith('.mov')) {
+            contentType = 'video/quicktime';
+          } else {
+            contentType = 'video/mp4';
+          }
+        } else if (!m.isVideo && (contentType == null || contentType.isEmpty)) {
+          contentType = 'image/jpeg';
+        }
+
+        debugPrint('MatrixMomentDataSource: Uploading media: '
+            '${m.filename}, type: $contentType, '
+            'size: ${m.bytes.length}, isVideo: ${m.isVideo}');
+
         final uri = await _client!.uploadContent(
           m.bytes,
           filename: m.filename,
-          contentType: m.mimeType,
+          contentType: contentType,
         );
         uploadedMedia.add({
           'url': uri.toString(),
@@ -630,6 +663,150 @@ class MatrixMomentDataSource {
       contentType: mimeType,
     );
     return uri.toString();
+  }
+
+  // ============================================
+  // 好友可见性：邀请与自动加入
+  // ============================================
+
+  /// 邀请好友加入我的 Moment 房间
+  ///
+  /// 在好友关系建立时调用，使好友可以看到我的朋友圈
+  Future<void> inviteFriendToMomentRoom(String userId) async {
+    if (_client == null) return;
+
+    final room = await _getOrCreateMomentRoom();
+    if (room == null) {
+      debugPrint('MatrixMomentDataSource: Cannot invite $userId - moment room is null');
+      return;
+    }
+
+    // 检查用户是否已经在房间中
+    try {
+      final members = room.getParticipants();
+      final alreadyMember = members.any((m) =>
+          m.id == userId && m.membership == matrix.Membership.join);
+      final alreadyInvited = members.any((m) =>
+          m.id == userId && m.membership == matrix.Membership.invite);
+
+      if (alreadyMember || alreadyInvited) {
+        debugPrint('MatrixMomentDataSource: $userId already in moment room');
+        return;
+      }
+    } catch (e) {
+      // getParticipants 可能失败，继续尝试邀请
+    }
+
+    try {
+      debugPrint('MatrixMomentDataSource: Inviting $userId to moment room ${room.id}');
+      await _client!.inviteUser(room.id, userId, reason: momentInviteReason);
+      debugPrint('MatrixMomentDataSource: Successfully invited $userId');
+    } catch (e) {
+      debugPrint('MatrixMomentDataSource: Failed to invite $userId: $e');
+    }
+  }
+
+  /// 处理 Moment 房间邀请
+  ///
+  /// 在同步时调用，自动加入被标记为 Moment 的房间邀请
+  /// 并进行回邀（确保双向可见）
+  Future<void> processMomentInvites() async {
+    if (_client == null) return;
+
+    for (final room in _client!.rooms) {
+      if (room.membership != matrix.Membership.invite) continue;
+
+      // 检查是否是 Moment 房间邀请
+      if (!_isMomentRoomInvite(room)) continue;
+
+      debugPrint('MatrixMomentDataSource: Auto-joining moment room invite: ${room.id}');
+
+      try {
+        // 自动加入
+        await room.join();
+        debugPrint('MatrixMomentDataSource: Joined moment room: ${room.id}');
+
+        // 添加本地标签以标识这是好友的 Moment 房间
+        await room.addTag(momentRoomTag);
+
+        // 获取房间创建者（即该 Moment 房间的拥有者）
+        final creatorId = _getRoomCreatorId(room);
+        if (creatorId != null && creatorId != _client!.userID) {
+          debugPrint('MatrixMomentDataSource: Reciprocal invite for $creatorId');
+          // 回邀：邀请对方加入我的 Moment 房间
+          await inviteFriendToMomentRoom(creatorId);
+        }
+      } catch (e) {
+        debugPrint('MatrixMomentDataSource: Failed to auto-join moment room: $e');
+      }
+    }
+  }
+
+  /// 判断一个邀请是否是 Moment 房间邀请
+  bool _isMomentRoomInvite(matrix.Room room) {
+    // 方法 1: 检查邀请事件的 reason 字段
+    try {
+      final myUserId = _client?.userID;
+      if (myUserId != null) {
+        final memberEvent = room.getState(matrix.EventTypes.RoomMember, myUserId);
+        if (memberEvent != null) {
+          final reason = memberEvent.content['reason'] as String?;
+          if (reason == momentInviteReason) {
+            return true;
+          }
+        }
+      }
+    } catch (e) {
+      // 忽略错误
+    }
+
+    // 方法 2: 检查房间名称（降级方案）
+    try {
+      final name = room.name;
+      if (name == 'My Moments') {
+        return true;
+      }
+    } catch (e) {
+      // 忽略错误
+    }
+
+    return false;
+  }
+
+  /// 获取房间创建者 ID
+  String? _getRoomCreatorId(matrix.Room room) {
+    try {
+      final createEvent = room.getState(matrix.EventTypes.RoomCreate);
+      if (createEvent != null) {
+        return createEvent.senderId;
+      }
+    } catch (e) {
+      // 忽略错误
+    }
+
+    // 降级：尝试从成员中找到不是自己的用户
+    try {
+      final members = room.getParticipants();
+      for (final member in members) {
+        if (member.id != _client?.userID &&
+            member.powerLevel >= 50) {
+          return member.id;
+        }
+      }
+    } catch (e) {
+      // 忽略错误
+    }
+
+    return null;
+  }
+
+  /// 为所有现有好友发送 Moment 房间邀请
+  ///
+  /// 用于一次性迁移：对已有好友发送邀请
+  Future<void> inviteAllFriendsToMomentRoom(List<String> friendUserIds) async {
+    for (final userId in friendUserIds) {
+      await inviteFriendToMomentRoom(userId);
+    }
   }
 }
 

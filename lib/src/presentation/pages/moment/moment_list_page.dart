@@ -336,7 +336,7 @@ class _MomentTile extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    _buildActionButton(context),
+                    _buildInteractionBar(context),
                   ],
                 ),
 
@@ -382,7 +382,22 @@ class _MomentTile extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                if (media.httpUrl != null)
+                if (media.isVideo)
+                  // 视频使用深色占位背景 + 播放图标
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Container(
+                      color: isDark ? Colors.grey[850] : Colors.grey[800],
+                      child: const Center(
+                        child: Icon(
+                          Icons.play_circle_filled,
+                          color: Colors.white70,
+                          size: 48,
+                        ),
+                      ),
+                    ),
+                  )
+                else if (media.httpUrl != null)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: CachedNetworkImage(
@@ -397,14 +412,6 @@ class _MomentTile extends StatelessWidget {
                   )
                 else
                   const Icon(Icons.image),
-                if (media.isVideo)
-                  const Center(
-                    child: Icon(
-                      Icons.play_circle_filled,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  ),
                 if (index == 8 && mediaCount > 9)
                   Container(
                     color: Colors.black54,
@@ -427,63 +434,88 @@ class _MomentTile extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(BuildContext context) {
-    return PopupMenuButton<String>(
-      icon: Icon(
-        Icons.more_horiz,
-        color: isDark ? Colors.grey[400] : Colors.grey[600],
-        size: 20,
-      ),
-      onSelected: (value) {
-        switch (value) {
-          case 'like':
+  /// 交互栏：点赞、评论、删除（一键操作）
+  Widget _buildInteractionBar(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 点赞按钮 - 直接点击切换
+        GestureDetector(
+          onTap: () {
             if (moment.isLikedByMe) {
               context.read<MomentBloc>().add(UnlikeMoment(moment.id));
             } else {
               context.read<MomentBloc>().add(LikeMoment(moment.id));
             }
-            break;
-          case 'comment':
-            _showCommentDialog(context);
-            break;
-          case 'delete':
-            _showDeleteConfirmation(context);
-            break;
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 'like',
-          child: Row(
-            children: [
-              Icon(
-                moment.isLikedByMe ? Icons.favorite : Icons.favorite_border,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(moment.isLikedByMe ? 'Unlike' : 'Like'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: 'comment',
-          child: Row(
-            children: [
-              Icon(Icons.comment_outlined, size: 20),
-              SizedBox(width: 8),
-              Text('Comment'),
-            ],
-          ),
-        ),
-        if (moment.isFromMe)
-          const PopupMenuItem(
-            value: 'delete',
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.delete_outline, size: 20, color: Colors.red),
-                SizedBox(width: 8),
-                Text('Delete', style: TextStyle(color: Colors.red)),
+                Icon(
+                  moment.isLikedByMe ? Icons.favorite : Icons.favorite_border,
+                  size: 18,
+                  color: moment.isLikedByMe
+                      ? Colors.red
+                      : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                ),
+                if (moment.likeCount > 0) ...[
+                  const SizedBox(width: 2),
+                  Text(
+                    '${moment.likeCount}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: moment.isLikedByMe
+                          ? Colors.red
+                          : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                    ),
+                  ),
+                ],
               ],
+            ),
+          ),
+        ),
+
+        // 评论按钮
+        GestureDetector(
+          onTap: () => _showCommentDialog(context),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.comment_outlined,
+                  size: 18,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+                if (moment.commentCount > 0) ...[
+                  const SizedBox(width: 2),
+                  Text(
+                    '${moment.commentCount}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+
+        // 删除按钮（仅自己的动态）
+        if (moment.isFromMe)
+          GestureDetector(
+            onTap: () => _showDeleteConfirmation(context),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Icon(
+                Icons.delete_outline,
+                size: 18,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
             ),
           ),
       ],
@@ -578,12 +610,32 @@ class _MomentTile extends StatelessWidget {
   void _openMediaViewer(BuildContext context, int index) {
     if (index >= moment.media.length) return;
     final media = moment.media[index];
-    if (media.httpUrl == null) return;
+
+    debugPrint('=== Moment Media Viewer ===');
+    debugPrint('Index: $index, isVideo: ${media.isVideo}');
+    debugPrint('MXC URL: ${media.url}');
+    debugPrint('HTTP URL: ${media.httpUrl}');
+    debugPrint('MimeType: ${media.mimeType}');
+
+    if (media.httpUrl == null) {
+      debugPrint('ERROR: httpUrl is null, cannot open viewer');
+      return;
+    }
 
     if (media.isVideo) {
+      // 视频播放需要将 access_token 附加到 URL，
+      // 因为 iOS AVPlayer 对自定义 HTTP headers 的支持不完整，
+      // 后续 range request 可能不携带 Authorization header
+      var videoUrl = media.httpUrl!;
+      final accessToken = MatrixClientManager.instance.client?.accessToken;
+      if (accessToken != null && accessToken.isNotEmpty) {
+        final separator = videoUrl.contains('?') ? '&' : '?';
+        videoUrl = '$videoUrl${separator}access_token=$accessToken';
+      }
+      debugPrint('Opening video player with URL: $videoUrl');
       Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => VideoPlayerPage(videoUrl: media.httpUrl!),
+          builder: (_) => VideoPlayerPage(videoUrl: videoUrl),
         ),
       );
     } else {

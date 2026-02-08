@@ -148,6 +148,11 @@ class MatrixContactDataSource {
   // 联系人操作
   // ============================================
 
+  /// 通过房间ID获取房间
+  matrix.Room? getRoomById(String roomId) {
+    return _client?.getRoomById(roomId);
+  }
+
   /// 检查是否有与用户的私聊
   String? getDirectChatRoomId(String userId) {
     return _client?.getDirectChatFromUserId(userId);
