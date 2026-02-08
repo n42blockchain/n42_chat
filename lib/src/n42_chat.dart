@@ -259,15 +259,17 @@ class N42Chat {
   ///
   /// 使用 Completer 防止并发初始化（auth 恢复可能与初始化并行执行）
   static Future<void> _initializePushService(N42ChatConfig config) async {
-    // 已初始化则跳过
-    if (_pushService != null) return;
-
     // 防止并发初始化：如果正在初始化中，等待完成
     if (_pushInitCompleter != null && !_pushInitCompleter!.isCompleted) {
       debugPrint('N42Chat: Push service initialization already in progress, waiting...');
       await _pushInitCompleter!.future;
-      return;
+      // 如果等待后已初始化成功，直接返回
+      if (_pushService != null) return;
+      // 否则继续尝试初始化
     }
+
+    // 已初始化则跳过
+    if (_pushService != null) return;
 
     _pushInitCompleter = Completer<void>();
 
@@ -280,6 +282,8 @@ class N42Chat {
         debugPrint('N42Chat: Matrix client not initialized, push service will be initialized on login');
         return;
       }
+
+      debugPrint('N42Chat: Creating push service with gateway: ${config.pushGatewayUrl}, appId: ${config.pushAppId}');
 
       // 创建推送服务
       _pushService = FirebasePushService(
@@ -304,11 +308,15 @@ class N42Chat {
         await _pushService!.registerForPush();
       }
 
-      debugPrint('N42Chat: Push service initialized');
+      debugPrint('N42Chat: Push service initialized successfully');
     } catch (e) {
       debugPrint('N42Chat: Failed to initialize push service: $e');
+      // 初始化失败，清除 pushService 以允许后续重试
+      _pushService = null;
     } finally {
-      _pushInitCompleter?.complete();
+      if (_pushInitCompleter != null && !_pushInitCompleter!.isCompleted) {
+        _pushInitCompleter!.complete();
+      }
     }
   }
 
@@ -336,21 +344,27 @@ class N42Chat {
   /// 登录成功后调用此方法注册推送。
   /// 如果推送服务正在初始化中（竞态），会等待初始化完成后再注册。
   static Future<void> registerPushNotifications() async {
+    debugPrint('N42Chat: registerPushNotifications called');
+
     // 等待正在进行的初始化完成
     if (_pushInitCompleter != null && !_pushInitCompleter!.isCompleted) {
       debugPrint('N42Chat: Waiting for push service initialization to complete...');
       await _pushInitCompleter!.future;
     }
 
-    // 如果推送服务未初始化，先初始化
+    // 如果推送服务未初始化，尝试初始化（可能之前因 client 为 null 跳过）
     if (_pushService == null && _config != null && _config!.enablePushNotifications) {
+      debugPrint('N42Chat: Push service is null, attempting initialization...');
       await _initializePushService(_config!);
     }
 
     if (_pushService != null) {
+      debugPrint('N42Chat: Calling registerForPush...');
       await _pushService!.registerForPush();
+      debugPrint('N42Chat: registerForPush completed');
     } else {
-      debugPrint('N42Chat: Cannot register push - push service is null');
+      debugPrint('N42Chat: Cannot register push - push service is null '
+          '(config: ${_config != null}, enablePush: ${_config?.enablePushNotifications})');
     }
   }
 

@@ -125,10 +125,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       N42Chat.notifyUserChanged();
       // 登录成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
       add(const LoadUserProfileData());
-      // 登录成功后注册推送通知
-      _registerPushNotifications();
-      // 登录成功后初始化通话管理器
-      _initializeCallManager();
+      // 登录成功后注册推送通知和初始化通话管理器
+      await _registerPushNotifications();
+      await _initializeCallManager();
     } else {
       emit(state.copyWith(
         status: AuthStatus.error,
@@ -180,10 +179,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
       // 注册成功后自动加载完整用户资料
       add(const LoadUserProfileData());
-      // 注册成功后注册推送通知
-      _registerPushNotifications();
-      // 注册成功后初始化通话管理器
-      _initializeCallManager();
+      // 注册成功后注册推送通知和初始化通话管理器
+      await _registerPushNotifications();
+      await _initializeCallManager();
     } else {
       emit(state.copyWith(
         status: AuthStatus.error,
