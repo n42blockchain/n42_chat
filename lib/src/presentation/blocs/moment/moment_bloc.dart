@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
 import '../../../domain/repositories/moment_repository.dart';
 import 'moment_event.dart';
@@ -254,10 +255,30 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     LikeMoment event,
     Emitter<MomentState> emit,
   ) async {
-    // 乐观更新
+    // 乐观更新：同时更新 isLikedByMe 和 likes 列表
+    final client = MatrixClientManager.instance.client;
+    final currentUserId = client?.userID ?? '';
+    final userId = client?.userID ?? '';
+    // Extract localpart from @user:server format
+    final currentUserName = userId.startsWith('@')
+        ? userId.substring(1).split(':').first
+        : userId;
+
     final updatedMoments = state.moments.map((m) {
       if (m.id == event.momentId) {
-        return m.copyWith(isLikedByMe: true);
+        final alreadyLiked = m.likes.any((l) => l.userId == currentUserId);
+        if (alreadyLiked) return m.copyWith(isLikedByMe: true);
+        return m.copyWith(
+          isLikedByMe: true,
+          likes: [
+            ...m.likes,
+            MomentLike(
+              userId: currentUserId,
+              userName: currentUserName,
+              timestamp: DateTime.now(),
+            ),
+          ],
+        );
       }
       return m;
     }).toList();
@@ -270,7 +291,10 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
       // 回滚
       final revertedMoments = state.moments.map((m) {
         if (m.id == event.momentId) {
-          return m.copyWith(isLikedByMe: false);
+          return m.copyWith(
+            isLikedByMe: false,
+            likes: m.likes.where((l) => l.userId != currentUserId).toList(),
+          );
         }
         return m;
       }).toList();
@@ -287,10 +311,15 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     UnlikeMoment event,
     Emitter<MomentState> emit,
   ) async {
-    // 乐观更新
+    final currentUserId = MatrixClientManager.instance.client?.userID ?? '';
+
+    // 乐观更新：同时移除 likes 列表中的当前用户
     final updatedMoments = state.moments.map((m) {
       if (m.id == event.momentId) {
-        return m.copyWith(isLikedByMe: false);
+        return m.copyWith(
+          isLikedByMe: false,
+          likes: m.likes.where((l) => l.userId != currentUserId).toList(),
+        );
       }
       return m;
     }).toList();

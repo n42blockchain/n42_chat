@@ -35,6 +35,9 @@ class MatrixMomentDataSource {
 
   String? get _currentUserId => _client?.userID;
 
+  /// 公开当前用户ID（供 Repository 使用）
+  String? get currentUserId => _currentUserId;
+
   /// 缓存的动态房间引用
   matrix.Room? _cachedMomentRoom;
 
