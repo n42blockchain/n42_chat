@@ -56,6 +56,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
           backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
           actions: [
             BlocBuilder<MomentBloc, MomentState>(
+              buildWhen: (prev, curr) => prev.isPosting != curr.isPosting,
               builder: (context, state) {
                 if (state.isPosting) {
                   return const Padding(
@@ -68,17 +69,24 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                   );
                 }
 
-                return TextButton(
-                  onPressed: _canPost() ? _postMoment : null,
-                  child: Text(
-                    s?.commonSend ?? 'Post',
-                    style: TextStyle(
-                      color: _canPost()
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                return ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _contentController,
+                  builder: (context, textValue, _) {
+                    final canPost = textValue.text.trim().isNotEmpty ||
+                        _selectedMedia.isNotEmpty;
+                    return TextButton(
+                      onPressed: canPost ? _postMoment : null,
+                      child: Text(
+                        s?.commonSend ?? 'Post',
+                        style: TextStyle(
+                          color: canPost
+                              ? AppColors.primary
+                              : Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -107,7 +115,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                       color: isDark ? Colors.grey[500] : Colors.grey[600],
                     ),
                   ),
-                  onChanged: (_) => setState(() {}),
+                  // Text changes are handled by ValueListenableBuilder on the controller
                 ),
               ),
 
@@ -297,10 +305,6 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
       case MomentVisibility.excluded:
         return 'Exclude Some Friends';
     }
-  }
-
-  bool _canPost() {
-    return _contentController.text.trim().isNotEmpty || _selectedMedia.isNotEmpty;
   }
 
   Future<void> _pickImages() async {
