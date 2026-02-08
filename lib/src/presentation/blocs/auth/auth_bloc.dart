@@ -78,10 +78,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         status: AuthStatus.authenticated,
         user: user,
       ));
-      // 已登录状态，注册推送通知
-      _registerPushNotifications();
-      // 已登录状态，初始化通话管理器
-      _initializeCallManager();
+      // 已登录状态，注册推送通知并初始化通话管理器
+      await _registerPushNotifications();
+      await _initializeCallManager();
     } else {
       emit(state.copyWith(status: AuthStatus.unauthenticated));
     }
@@ -265,10 +264,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
       // 恢复会话成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
       add(const LoadUserProfileData());
-      // 恢复会话成功后注册推送通知
-      _registerPushNotifications();
-      // 恢复会话成功后初始化通话管理器
-      _initializeCallManager();
+      // 恢复会话成功后注册推送通知并初始化通话管理器
+      await _registerPushNotifications();
+      await _initializeCallManager();
     } else {
       emit(state.copyWith(
         status: AuthStatus.unauthenticated,

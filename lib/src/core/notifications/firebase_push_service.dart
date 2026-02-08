@@ -223,16 +223,57 @@ class FirebasePushService implements IPushNotificationService {
       provisional: false,
     );
 
+    debugPrint('FirebasePushService: Permission status: ${settings.authorizationStatus}');
+
     if (settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional) {
-      // 获取 FCM Token
-      _fcmToken = await FirebaseMessaging.instance.getToken();
-
-      // iOS 还需要获取 APNs Token
+      // iOS 需要先等待 APNs Token，FCM Token 依赖它
       if (Platform.isIOS) {
-        _apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+        _apnsToken = await _getAPNsTokenWithRetry();
+        debugPrint('FirebasePushService: APNs token: ${_apnsToken != null ? '${_apnsToken!.substring(0, 10)}...' : 'null'}');
+      }
+
+      // 获取 FCM Token（带重试）
+      _fcmToken = await _getFCMTokenWithRetry();
+      debugPrint('FirebasePushService: FCM token: ${_fcmToken != null ? '${_fcmToken!.substring(0, 10)}...' : 'null'}');
+    } else {
+      debugPrint('FirebasePushService: Notification permission denied');
+    }
+  }
+
+  /// 带重试的 APNs Token 获取（iOS）
+  Future<String?> _getAPNsTokenWithRetry({int maxRetries = 5}) async {
+    for (var i = 0; i < maxRetries; i++) {
+      try {
+        final token = await FirebaseMessaging.instance.getAPNSToken();
+        if (token != null) return token;
+      } catch (e) {
+        debugPrint('FirebasePushService: APNs token attempt ${i + 1} failed: $e');
+      }
+      if (i < maxRetries - 1) {
+        // APNs 注册可能需要时间，逐渐增加等待
+        await Future<void>.delayed(Duration(seconds: (i + 1) * 2));
       }
     }
+    debugPrint('FirebasePushService: Failed to get APNs token after $maxRetries attempts');
+    return null;
+  }
+
+  /// 带重试的 FCM Token 获取
+  Future<String?> _getFCMTokenWithRetry({int maxRetries = 3}) async {
+    for (var i = 0; i < maxRetries; i++) {
+      try {
+        final token = await FirebaseMessaging.instance.getToken();
+        if (token != null) return token;
+      } catch (e) {
+        debugPrint('FirebasePushService: FCM token attempt ${i + 1} failed: $e');
+      }
+      if (i < maxRetries - 1) {
+        await Future<void>.delayed(Duration(seconds: (i + 1) * 2));
+      }
+    }
+    debugPrint('FirebasePushService: Failed to get FCM token after $maxRetries attempts');
+    return null;
   }
 
   /// 处理前台消息
@@ -657,11 +698,28 @@ class FirebasePushService implements IPushNotificationService {
 
   @override
   Future<void> registerForPush() async {
-    if (_fcmToken == null || pushGatewayUrl == null) {
+    // 如果 FCM Token 还没有获取到，尝试获取
+    if (_fcmToken == null) {
+      debugPrint('FirebasePushService: FCM token is null, attempting to get token...');
+      _fcmToken = await _getFCMTokenWithRetry(maxRetries: 2);
+    }
+
+    if (_fcmToken == null) {
+      debugPrint('FirebasePushService: Cannot register push - FCM token is null');
+      return;
+    }
+    if (pushGatewayUrl == null) {
+      debugPrint('FirebasePushService: Cannot register push - pushGatewayUrl is null');
       return;
     }
 
     try {
+      debugPrint('FirebasePushService: Registering pusher...');
+      debugPrint('  appId: $appId');
+      debugPrint('  pushkeyType: $pushkeyType');
+      debugPrint('  gateway: $pushGatewayUrl');
+      debugPrint('  token: ${_fcmToken!.substring(0, 10)}...');
+
       // 注册 Pusher 到 Matrix 服务器
       await _client.postPusher(
         matrix.Pusher(
@@ -678,8 +736,9 @@ class FirebasePushService implements IPushNotificationService {
         ),
         append: false,
       );
+      debugPrint('FirebasePushService: Pusher registered successfully');
     } catch (e) {
-      debugPrint('N42Chat: Failed to register push: $e');
+      debugPrint('FirebasePushService: Failed to register push: $e');
     }
   }
 
