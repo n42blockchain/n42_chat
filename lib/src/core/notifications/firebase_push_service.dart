@@ -227,17 +227,34 @@ class FirebasePushService implements IPushNotificationService {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional) {
+      debugPrint('FirebasePushService: Permission granted, getting tokens...');
+
       // iOS 需要先等待 APNs Token，FCM Token 依赖它
       if (Platform.isIOS) {
         _apnsToken = await _getAPNsTokenWithRetry();
         debugPrint('FirebasePushService: APNs token: ${_apnsToken != null ? '${_apnsToken!.substring(0, 10)}...' : 'null'}');
+        if (_apnsToken == null) {
+          debugPrint('FirebasePushService: WARNING - APNs token is null, iOS push may not work!');
+        }
       }
 
       // 获取 FCM Token（带重试）
       _fcmToken = await _getFCMTokenWithRetry();
       debugPrint('FirebasePushService: FCM token: ${_fcmToken != null ? '${_fcmToken!.substring(0, 10)}...' : 'null'}');
+
+      if (_fcmToken == null) {
+        debugPrint('FirebasePushService: WARNING - FCM token is null after retries!');
+      }
     } else {
-      debugPrint('FirebasePushService: Notification permission denied');
+      debugPrint('FirebasePushService: Notification permission DENIED (${settings.authorizationStatus}). '
+          'Push notifications will NOT work. User must enable in Settings.');
+      // 尝试获取 token（某些 Android 设备即使未授权也能获取 token）
+      if (Platform.isAndroid) {
+        _fcmToken = await _getFCMTokenWithRetry(maxRetries: 1);
+        if (_fcmToken != null) {
+          debugPrint('FirebasePushService: Got FCM token despite permission denied (Android)');
+        }
+      }
     }
   }
 
