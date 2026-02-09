@@ -6,9 +6,13 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
+import '../../blocs/contact/contact_bloc.dart';
+import '../../blocs/contact/contact_state.dart';
 import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
+import '../../blocs/moment/moment_state.dart';
 import '../../widgets/common/n42_avatar.dart';
+import 'moment_forward_sheet.dart';
 
 /// 动态详情页面
 class MomentDetailPage extends StatefulWidget {
@@ -29,6 +33,29 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
   String? _replyToUserId;
   String? _replyToUserName;
 
+  String get _currentUserId =>
+      MatrixClientManager.instance.client?.userID ?? '';
+
+  /// 从 Bloc 状态中获取最新的 moment（实时响应点赞/评论）
+  MomentEntity _getLatestMoment(BuildContext context) {
+    try {
+      final state = context.read<MomentBloc>().state;
+      final found = state.moments.where((m) => m.id == widget.moment.id).firstOrNull;
+      if (found != null) return found;
+    } catch (_) {}
+    return widget.moment;
+  }
+
+  Set<String> _getFriendIds() {
+    try {
+      final contactState = context.read<ContactBloc>().state;
+      if (contactState is ContactLoaded) {
+        return contactState.contacts.map((c) => c.userId).toSet();
+      }
+    } catch (_) {}
+    return {};
+  }
+
   Map<String, String> _getAuthHeaders() {
     final accessToken = MatrixClientManager.instance.client?.accessToken;
     if (accessToken != null && accessToken.isNotEmpty) {
@@ -48,208 +75,233 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = S.of(context);
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-      appBar: AppBar(
-        title: const Text('Moment'),
-        backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 动态内容
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 用户信息
-                        Row(
+    return BlocBuilder<MomentBloc, MomentState>(
+      builder: (context, state) {
+        // 始终从 Bloc 获取最新 moment 数据（响应点赞/评论变化）
+        final moment = _getLatestMoment(context);
+
+        return Scaffold(
+          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          appBar: AppBar(
+            title: Text(s?.momentMoment ?? 'Moment'),
+            backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.share_outlined),
+                onPressed: () => MomentForwardSheet.show(context, moment),
+              ),
+            ],
+          ),
+          body: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 动态内容
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        color: isDark ? AppColors.surfaceDark : Colors.white,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            N42Avatar(
-                              name: widget.moment.userName,
-                              imageUrl: widget.moment.userAvatarUrl,
-                              size: 48,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.moment.userName,
-                                    style: TextStyle(
-                                      color: isDark ? Colors.blue[300] : Colors.blue[700],
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                    ),
+                            // 用户信息
+                            Row(
+                              children: [
+                                N42Avatar(
+                                  name: moment.userName,
+                                  imageUrl: moment.userAvatarUrl,
+                                  size: 48,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        moment.userName,
+                                        style: TextStyle(
+                                          color: isDark ? Colors.blue[300] : Colors.blue[700],
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        moment.formattedTime,
+                                        style: TextStyle(
+                                          color: isDark ? Colors.grey[500] : Colors.grey[600],
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 2),
+                                ),
+                              ],
+                            ),
+
+                            // 文字内容
+                            if (moment.hasContent) ...[
+                              const SizedBox(height: 12),
+                              Text(
+                                moment.content!,
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black87,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+
+                            // 媒体内容
+                            if (moment.hasMedia) ...[
+                              const SizedBox(height: 12),
+                              _buildMediaSection(isDark),
+                            ],
+
+                            // 位置信息
+                            if (moment.hasLocation) ...[
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.location_on,
+                                    size: 16,
+                                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                  ),
+                                  const SizedBox(width: 4),
                                   Text(
-                                    widget.moment.formattedTime,
+                                    moment.location!.displayText,
                                     style: TextStyle(
-                                      color: isDark ? Colors.grey[500] : Colors.grey[600],
-                                      fontSize: 12,
+                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                      fontSize: 13,
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
+                            ],
                           ],
                         ),
-
-                        // 文字内容
-                        if (widget.moment.hasContent) ...[
-                          const SizedBox(height: 12),
-                          Text(
-                            widget.moment.content!,
-                            style: TextStyle(
-                              color: isDark ? Colors.white : Colors.black87,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-
-                        // 媒体内容
-                        if (widget.moment.hasMedia) ...[
-                          const SizedBox(height: 12),
-                          _buildMediaSection(isDark),
-                        ],
-
-                        // 位置信息
-                        if (widget.moment.hasLocation) ...[
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.location_on,
-                                size: 16,
-                                color: isDark ? Colors.grey[400] : Colors.grey[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                widget.moment.location!.displayText,
-                                style: TextStyle(
-                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // 点赞区域
-                  if (widget.moment.likeCount > 0)
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      color: isDark ? AppColors.surfaceDark : Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.favorite,
-                                size: 18,
-                                color: isDark ? Colors.red[300] : Colors.red,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '${widget.moment.likeCount} likes',
-                                style: TextStyle(
-                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: widget.moment.likes.map((like) {
-                              return Chip(
-                                avatar: N42Avatar(
-                                  name: like.userName,
-                                  imageUrl: like.userAvatarUrl,
-                                  size: 24,
-                                ),
-                                label: Text(
-                                  like.userName,
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                                padding: EdgeInsets.zero,
-                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              );
-                            }).toList(),
-                          ),
-                        ],
                       ),
-                    ),
 
-                  const SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
-                  // 评论区域
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.comment,
-                              size: 18,
-                              color: isDark ? Colors.grey[400] : Colors.grey[600],
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${widget.moment.commentCount} comments',
-                              style: TextStyle(
-                                color: isDark ? Colors.grey[400] : Colors.grey[600],
-                                fontWeight: FontWeight.w500,
+                      // 点赞区域（可见性过滤）
+                      Builder(builder: (context) {
+                        final visibleLikes = moment.getVisibleLikes(
+                          currentUserId: _currentUserId,
+                          friendIds: _getFriendIds(),
+                        );
+                        if (visibleLikes.isEmpty) return const SizedBox.shrink();
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          color: isDark ? AppColors.surfaceDark : Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.favorite,
+                                    size: 18,
+                                    color: isDark ? Colors.red[300] : Colors.red,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    s?.momentLikesCount(visibleLikes.length) ?? '${visibleLikes.length} likes',
+                                    style: TextStyle(
+                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        if (widget.moment.comments.isEmpty)
-                          Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(24),
-                              child: Text(
-                                'No comments yet',
-                                style: TextStyle(
-                                  color: isDark ? Colors.grey[500] : Colors.grey[600],
-                                ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: visibleLikes.map((like) {
+                                  return Chip(
+                                    avatar: N42Avatar(
+                                      name: like.userName,
+                                      imageUrl: like.userAvatarUrl,
+                                      size: 24,
+                                    ),
+                                    label: Text(
+                                      like.userName,
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  );
+                                }).toList(),
                               ),
-                            ),
-                          )
-                        else
-                          ...widget.moment.comments.map((comment) => _buildCommentItem(comment, isDark)),
-                      ],
-                    ),
+                            ],
+                          ),
+                        );
+                      }),
+
+                      const SizedBox(height: 8),
+
+                      // 评论区域（可见性过滤）
+                      Builder(builder: (context) {
+                        final visibleComments = moment.getVisibleComments(
+                          currentUserId: _currentUserId,
+                          friendIds: _getFriendIds(),
+                        );
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          color: isDark ? AppColors.surfaceDark : Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.comment,
+                                    size: 18,
+                                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    s?.momentCommentsCount(visibleComments.length) ?? '${visibleComments.length} comments',
+                                    style: TextStyle(
+                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              if (visibleComments.isEmpty)
+                                Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(24),
+                                    child: Text(
+                                      s?.momentNoComments ?? 'No comments yet',
+                                      style: TextStyle(
+                                        color: isDark ? Colors.grey[500] : Colors.grey[600],
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              else
+                                ...visibleComments.map((comment) => _buildCommentItem(comment, isDark)),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
 
-          // 评论输入框
-          _buildCommentInput(isDark, s),
-        ],
-      ),
+              // 评论输入框
+              _buildCommentInput(isDark, s, moment),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -266,22 +318,40 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
             fit: StackFit.expand,
             children: [
               if (media.isVideo)
-                Container(
-                  color: isDark ? Colors.grey[850] : Colors.grey[800],
-                  child: const Center(
-                    child: Icon(
-                      Icons.play_circle_filled,
-                      color: Colors.white70,
-                      size: 64,
+                Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (media.thumbnailUrl != null)
+                      CachedNetworkImage(
+                        imageUrl: media.thumbnailUrl!,
+                        fit: BoxFit.cover,
+                        httpHeaders: _getAuthHeaders(),
+                        placeholder: (_, _) => Container(
+                          color: isDark ? Colors.grey[850] : Colors.grey[800],
+                        ),
+                        errorWidget: (_, _, _) => Container(
+                          color: isDark ? Colors.grey[850] : Colors.grey[800],
+                        ),
+                      )
+                    else
+                      Container(
+                        color: isDark ? Colors.grey[850] : Colors.grey[800],
+                      ),
+                    const Center(
+                      child: Icon(
+                        Icons.play_circle_filled,
+                        color: Colors.white70,
+                        size: 64,
+                      ),
                     ),
-                  ),
+                  ],
                 )
               else if (media.httpUrl != null)
                 CachedNetworkImage(
                   imageUrl: media.httpUrl!,
                   fit: BoxFit.cover,
                   httpHeaders: _getAuthHeaders(),
-                  errorWidget: (_, __, ___) => Container(
+                  errorWidget: (_, _, _) => Container(
                     color: isDark ? Colors.grey[800] : Colors.grey[200],
                     child: const Icon(Icons.image, size: 48),
                   ),
@@ -314,22 +384,40 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
             fit: StackFit.expand,
             children: [
               if (media.isVideo)
-                Container(
-                  color: isDark ? Colors.grey[850] : Colors.grey[800],
-                  child: const Center(
-                    child: Icon(
-                      Icons.play_circle_filled,
-                      color: Colors.white70,
-                      size: 32,
+                Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (media.thumbnailUrl != null)
+                      CachedNetworkImage(
+                        imageUrl: media.thumbnailUrl!,
+                        fit: BoxFit.cover,
+                        httpHeaders: _getAuthHeaders(),
+                        placeholder: (_, _) => Container(
+                          color: isDark ? Colors.grey[850] : Colors.grey[800],
+                        ),
+                        errorWidget: (_, _, _) => Container(
+                          color: isDark ? Colors.grey[850] : Colors.grey[800],
+                        ),
+                      )
+                    else
+                      Container(
+                        color: isDark ? Colors.grey[850] : Colors.grey[800],
+                      ),
+                    const Center(
+                      child: Icon(
+                        Icons.play_circle_filled,
+                        color: Colors.white70,
+                        size: 32,
+                      ),
                     ),
-                  ),
+                  ],
                 )
               else if (media.httpUrl != null)
                 CachedNetworkImage(
                   imageUrl: media.httpUrl!,
                   fit: BoxFit.cover,
                   httpHeaders: _getAuthHeaders(),
-                  errorWidget: (_, __, ___) => Container(
+                  errorWidget: (_, _, _) => Container(
                     color: isDark ? Colors.grey[800] : Colors.grey[200],
                     child: const Icon(Icons.image),
                   ),
@@ -412,7 +500,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
     );
   }
 
-  Widget _buildCommentInput(bool isDark, S? s) {
+  Widget _buildCommentInput(bool isDark, S? s, MomentEntity moment) {
     return Container(
       padding: EdgeInsets.only(
         left: 16,
@@ -434,15 +522,15 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
           IconButton(
             onPressed: () {
               final bloc = context.read<MomentBloc>();
-              if (widget.moment.isLikedByMe) {
-                bloc.add(UnlikeMoment(widget.moment.id));
+              if (moment.isLikedByMe) {
+                bloc.add(UnlikeMoment(moment.id));
               } else {
-                bloc.add(LikeMoment(widget.moment.id));
+                bloc.add(LikeMoment(moment.id));
               }
             },
             icon: Icon(
-              widget.moment.isLikedByMe ? Icons.favorite : Icons.favorite_border,
-              color: widget.moment.isLikedByMe ? Colors.red : null,
+              moment.isLikedByMe ? Icons.favorite : Icons.favorite_border,
+              color: moment.isLikedByMe ? Colors.red : null,
             ),
           ),
 
@@ -460,8 +548,8 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                       controller: _commentController,
                       decoration: InputDecoration(
                         hintText: _replyToUserName != null
-                            ? 'Reply to $_replyToUserName...'
-                            : 'Write a comment...',
+                            ? (s?.momentReplyTo(_replyToUserName!) ?? 'Reply to $_replyToUserName...')
+                            : (s?.momentWriteComment ?? 'Write a comment...'),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -528,11 +616,12 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
   String _formatCommentTime(DateTime timestamp) {
     final now = DateTime.now();
     final diff = now.difference(timestamp);
+    final s = S.of(context);
 
-    if (diff.inMinutes < 1) return 'just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    if (diff.inMinutes < 1) return s?.momentJustNow ?? 'just now';
+    if (diff.inMinutes < 60) return s?.momentMinutesAgo(diff.inMinutes) ?? '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return s?.momentHoursAgo(diff.inHours) ?? '${diff.inHours}h ago';
+    if (diff.inDays < 7) return s?.momentDaysAgo(diff.inDays) ?? '${diff.inDays}d ago';
 
     return '${timestamp.month}/${timestamp.day}';
   }

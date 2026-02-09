@@ -4614,4 +4614,175 @@ class SZh extends S {
   String authPasskeyDeleteConfirm(String name) {
     return '删除 Passkey \"$name\"？删除后将无法使用该 Passkey 登录。';
   }
+
+  @override
+  String get momentVisibilityPublic => '公开';
+
+  @override
+  String get momentVisibilityPrivate => '私密';
+
+  @override
+  String get momentVisibilityPartial => '部分可见';
+
+  @override
+  String get momentVisibilityExcluded => '不给谁看';
+
+  @override
+  String momentUserMoments(String userName) {
+    return '$userName的朋友圈';
+  }
+
+  @override
+  String get momentForwardTo => '转发给';
+
+  @override
+  String get momentForwardSuccess => '转发成功';
+
+  @override
+  String get momentSelectFriends => '选择好友';
+
+  @override
+  String get momentSelectTags => '按标签选择';
+
+  @override
+  String momentSelectedCount(int count) {
+    return '已选择 ($count)';
+  }
+
+  @override
+  String get momentNoMomentsYet => '暂无动态';
+
+  @override
+  String get momentForwardMoment => '转发动态';
+
+  @override
+  String get momentAddComment => '写评论...';
+
+  @override
+  String momentForwardContent(String content) {
+    return '[朋友圈] $content';
+  }
+
+  @override
+  String get momentDeleteMoment => '删除动态';
+
+  @override
+  String get momentDeleteConfirm => '确定要删除这条动态吗？';
+
+  @override
+  String get momentComment => '评论';
+
+  @override
+  String get momentWriteComment => '写评论...';
+
+  @override
+  String get momentLike => '赞';
+
+  @override
+  String get momentUnlike => '取消';
+
+  @override
+  String get momentForward => '转发';
+
+  @override
+  String get momentDelete => '删除';
+
+  @override
+  String get momentReply => '回复';
+
+  @override
+  String get momentMoment => '动态';
+
+  @override
+  String momentLikesCount(int count) {
+    return '$count 个赞';
+  }
+
+  @override
+  String momentCommentsCount(int count) {
+    return '$count 条评论';
+  }
+
+  @override
+  String get momentNoComments => '暂无评论';
+
+  @override
+  String get momentFailedToLoad => '图片加载失败';
+
+  @override
+  String momentReplyTo(String userName) {
+    return '回复 $userName...';
+  }
+
+  @override
+  String get momentNoConversations => '暂无会话';
+
+  @override
+  String get momentJustNow => '刚刚';
+
+  @override
+  String momentMinutesAgo(int count) {
+    return '$count分钟前';
+  }
+
+  @override
+  String momentHoursAgo(int count) {
+    return '$count小时前';
+  }
+
+  @override
+  String momentDaysAgo(int count) {
+    return '$count天前';
+  }
+
+  @override
+  String get chatGroupAnnouncementHint => '输入群公告';
+
+  @override
+  String get chatGroupAnnouncementEmpty => '暂无群公告';
+
+  @override
+  String get chatEditNickname => '编辑群昵称';
+
+  @override
+  String get chatNicknameHint => '输入你在群里的昵称';
+
+  @override
+  String get contactAddPhoneHint => '输入电话号码';
+
+  @override
+  String get contactNotesHint => '添加联系人备忘';
+
+  @override
+  String get reportTitle => '投诉';
+
+  @override
+  String get reportReasonSpam => '垃圾信息';
+
+  @override
+  String get reportReasonHarassment => '骚扰';
+
+  @override
+  String get reportReasonFraud => '欺诈';
+
+  @override
+  String get reportReasonOther => '其他';
+
+  @override
+  String get reportSubmitted => '投诉已提交';
+
+  @override
+  String get reportDescription => '补充说明（选填）';
+
+  @override
+  String get qrcodeSaved => '二维码已保存到相册';
+
+  @override
+  String get chatSendRedPacketInChat => '请在聊天中发送红包';
+
+  @override
+  String get commonSaveFailed => '保存失败';
+
+  @override
+  String get reportSelectReason => '请选择投诉原因';
 }

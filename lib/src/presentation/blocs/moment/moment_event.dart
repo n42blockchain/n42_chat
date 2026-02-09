@@ -25,7 +25,12 @@ class LoadMoments extends MomentEvent {
 
 /// 加载更多动态
 class LoadMoreMoments extends MomentEvent {
-  const LoadMoreMoments();
+  final String? userId;
+
+  const LoadMoreMoments({this.userId});
+
+  @override
+  List<Object?> get props => [userId];
 }
 
 /// 加载用户动态

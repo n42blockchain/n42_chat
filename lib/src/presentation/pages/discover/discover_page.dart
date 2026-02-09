@@ -1,13 +1,19 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../blocs/moment/moment_bloc.dart';
+import '../../blocs/moment/moment_event.dart';
+import '../../blocs/moment/moment_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../widgets/common/n42_avatar.dart';
 import '../moment/moment_list_page.dart';
 import '../qrcode/scan_qr_page.dart';
+import '../search/global_search_page.dart';
 import '../space/space_list_page.dart';
 
 /// 发现页面（仿微信）
@@ -37,40 +43,18 @@ class DiscoverPage extends StatelessWidget {
         children: [
           const SizedBox(height: 8),
 
-          // 朋友圈、视频号、直播
+          // 朋友圈
           _buildGroupCard(
             context,
             isDark,
             children: [
-              _buildMenuItem(
-                context,
-                isDark: isDark,
-                iconWidget: _MomentsIcon(),
-                title: l10n?.commonMoments ?? 'Moments',
-                onTap: () => _openMoments(context),
-              ),
-              _buildDivider(context, isDark),
-              _buildMenuItem(
-                context,
-                isDark: isDark,
-                iconWidget: _ChannelsIcon(),
-                title: l10n?.discoverVideoChannels ?? 'Channels',
-                onTap: () => _showComingSoon(context, l10n?.discoverVideoChannels ?? 'Channels'),
-              ),
-              _buildDivider(context, isDark),
-              _buildMenuItem(
-                context,
-                isDark: isDark,
-                iconWidget: _LiveIcon(),
-                title: l10n?.discoverLive ?? 'Live',
-                onTap: () => _showComingSoon(context, l10n?.discoverLive ?? 'Live'),
-              ),
+              _buildMomentsMenuItem(context, isDark, l10n),
             ],
           ),
 
           const SizedBox(height: 8),
 
-          // 扫一扫、听一听
+          // 扫一扫、搜一搜
           _buildGroupCard(
             context,
             isDark,
@@ -86,34 +70,9 @@ class DiscoverPage extends StatelessWidget {
               _buildMenuItem(
                 context,
                 isDark: isDark,
-                iconWidget: _MusicIcon(),
-                title: l10n?.discoverListen ?? 'Listen',
-                onTap: () => _showComingSoon(context, l10n?.discoverListen ?? 'Listen'),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 8),
-
-          // 看一看、搜一搜
-          _buildGroupCard(
-            context,
-            isDark,
-            children: [
-              _buildMenuItem(
-                context,
-                isDark: isDark,
-                iconWidget: _WatchIcon(),
-                title: l10n?.discoverWatch ?? 'Watch',
-                onTap: () => _showComingSoon(context, l10n?.discoverWatch ?? 'Watch'),
-              ),
-              _buildDivider(context, isDark),
-              _buildMenuItem(
-                context,
-                isDark: isDark,
                 iconWidget: _SearchIcon(),
                 title: l10n?.discoverSearchDiscover ?? 'Search',
-                onTap: () => _showComingSoon(context, l10n?.discoverSearchDiscover ?? 'Search'),
+                onTap: () => _openSearch(context),
               ),
             ],
           ),
@@ -135,47 +94,7 @@ class DiscoverPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 8),
-
-          // 附近的人
-          _buildGroupCard(
-            context,
-            isDark,
-            children: [
-              _buildMenuItem(
-                context,
-                isDark: isDark,
-                iconWidget: _NearbyIcon(),
-                title: l10n?.discoverNearbyPeople ?? 'Nearby',
-                onTap: () => _showComingSoon(context, l10n?.discoverNearbyPeople ?? 'Nearby'),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 8),
-
-          // 游戏、小程序
-          _buildGroupCard(
-            context,
-            isDark,
-            children: [
-              _buildMenuItem(
-                context,
-                isDark: isDark,
-                iconWidget: _GameIcon(),
-                title: l10n?.discoverGames ?? 'Games',
-                onTap: () => _showComingSoon(context, l10n?.discoverGames ?? 'Games'),
-              ),
-              _buildDivider(context, isDark),
-              _buildMenuItem(
-                context,
-                isDark: isDark,
-                iconWidget: _MiniProgramIcon(),
-                title: l10n?.discoverMiniPrograms ?? 'Mini Programs',
-                onTap: () => _showComingSoon(context, l10n?.discoverMiniPrograms ?? 'Mini Programs'),
-              ),
-            ],
-          ),
+          // TODO: 待后端就绪后启用：视频号、直播、听一听、看一看、附近的人、游戏、小程序
 
           const SizedBox(height: 32),
         ],
@@ -255,9 +174,80 @@ class DiscoverPage extends StatelessWidget {
     );
   }
 
+  Widget _buildMomentsMenuItem(BuildContext context, bool isDark, S? l10n) {
+    // 尝试从上层获取 MomentBloc
+    MomentBloc? momentBloc;
+    try {
+      momentBloc = context.read<MomentBloc>();
+    } catch (_) {}
+
+    if (momentBloc == null) {
+      return _buildMenuItem(
+        context,
+        isDark: isDark,
+        iconWidget: _MomentsIcon(),
+        title: l10n?.commonMoments ?? 'Moments',
+        onTap: () => _openMoments(context),
+      );
+    }
+
+    return BlocBuilder<MomentBloc, MomentState>(
+      builder: (context, state) {
+        Widget? trailing;
+        final unread = state.unreadCount;
+        final latestMoment = state.moments.isNotEmpty ? state.moments.first : null;
+
+        if (unread > 0 || latestMoment != null) {
+          trailing = Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (latestMoment != null)
+                N42Avatar(
+                  name: latestMoment.userName,
+                  imageUrl: latestMoment.userAvatarUrl,
+                  size: 32,
+                ),
+              if (unread > 0) ...[
+                const SizedBox(width: 8),
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ],
+          );
+        }
+
+        return _buildMenuItem(
+          context,
+          isDark: isDark,
+          iconWidget: _MomentsIcon(),
+          title: l10n?.commonMoments ?? 'Moments',
+          trailing: trailing,
+          onTap: () => _openMoments(context),
+        );
+      },
+    );
+  }
+
   void _openMoments(BuildContext context) {
+    // 标记已读
+    try {
+      context.read<MomentBloc>().add(const MarkMomentsAsRead());
+    } catch (_) {}
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const MomentListPage()),
+    );
+  }
+
+  void _openSearch(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const GlobalSearchPage()),
     );
   }
 
@@ -267,15 +257,6 @@ class DiscoverPage extends StatelessWidget {
     );
   }
 
-  void _showComingSoon(BuildContext context, String feature) {
-    final l10n = S.of(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n?.commonFeatureComingSoon(feature) ?? '$feature coming soon'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 }
 
 // ==================== 图标组件 ====================
@@ -330,84 +311,7 @@ class _MomentsIconPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// 视频号图标 - 橙色波浪/无限符号
-class _ChannelsIcon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(26, 26),
-      painter: _ChannelsIconPainter(),
-    );
-  }
-}
-
-class _ChannelsIconPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFFF6B00)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round;
-    
-    final w = size.width;
-    final h = size.height;
-    
-    // 画类似∞的波浪形
-    final path = Path();
-    path.moveTo(w * 0.08, h * 0.55);
-    path.cubicTo(
-      w * 0.08, h * 0.2,
-      w * 0.45, h * 0.2,
-      w * 0.5, h * 0.5,
-    );
-    path.cubicTo(
-      w * 0.55, h * 0.8,
-      w * 0.92, h * 0.8,
-      w * 0.92, h * 0.45,
-    );
-    
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-/// 直播图标 - 红色同心圆
-class _LiveIcon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(26, 26),
-      painter: _LiveIconPainter(),
-    );
-  }
-}
-
-class _LiveIconPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    const color = Color(0xFFFF4757);
-    
-    // 外圈描边
-    final outerPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    canvas.drawCircle(center, size.width * 0.38, outerPaint);
-    
-    // 内圈实心
-    final innerPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(center, size.width * 0.15, innerPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
+// TODO: 待后端就绪后启用：_ChannelsIcon, _LiveIcon, _MusicIcon, _WatchIcon, _NearbyIcon, _GameIcon, _MiniProgramIcon
 
 /// 扫一扫图标 - 蓝色扫描框
 class _ScanIcon extends StatelessWidget {
@@ -455,68 +359,6 @@ class _ScanIconPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// 听一听图标 - 粉色音符
-class _MusicIcon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Icon(
-      Icons.music_note,
-      color: Color(0xFFFF69B4),
-      size: 26,
-    );
-  }
-}
-
-/// 看一看图标 - 黄色蜂窝六边形
-class _WatchIcon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(26, 26),
-      painter: _WatchIconPainter(),
-    );
-  }
-}
-
-class _WatchIconPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    const color = Color(0xFFFFB300);
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final r = size.width * 0.38;
-    
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..strokeJoin = StrokeJoin.round;
-    
-    // 六边形
-    final path = Path();
-    for (int i = 0; i < 6; i++) {
-      final angle = (i * 60 - 90) * math.pi / 180;
-      final x = cx + r * math.cos(angle);
-      final y = cy + r * math.sin(angle);
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    path.close();
-    canvas.drawPath(path, paint);
-    
-    // 中心圆点
-    final dotPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(cx, cy), r * 0.22, dotPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
 
 /// 搜一搜图标 - 红色星形放大镜
 class _SearchIcon extends StatelessWidget {
@@ -568,163 +410,3 @@ class _SearchIconPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// 附近的人图标 - 蓝色雷达人形
-class _NearbyIcon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(26, 26),
-      painter: _NearbyIconPainter(),
-    );
-  }
-}
-
-class _NearbyIconPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    const color = Color(0xFF10AEFF);
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.8
-      ..strokeCap = StrokeCap.round;
-    
-    // 左侧弧线
-    canvas.drawArc(
-      Rect.fromCenter(center: Offset(cx, cy), width: size.width * 0.9, height: size.height * 0.9),
-      math.pi * 0.65,
-      math.pi * 0.7,
-      false,
-      paint,
-    );
-    
-    // 右侧弧线
-    canvas.drawArc(
-      Rect.fromCenter(center: Offset(cx, cy), width: size.width * 0.9, height: size.height * 0.9),
-      -math.pi * 0.35,
-      math.pi * 0.7,
-      false,
-      paint,
-    );
-    
-    // 人形 - 头
-    final headPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    canvas.drawCircle(Offset(cx, cy - size.height * 0.1), size.width * 0.1, headPaint);
-    
-    // 人形 - 身体
-    canvas.drawLine(
-      Offset(cx, cy + size.height * 0.02),
-      Offset(cx, cy + size.height * 0.22),
-      headPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-/// 游戏图标 - 绿色钻石
-class _GameIcon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(26, 26),
-      painter: _GameIconPainter(),
-    );
-  }
-}
-
-class _GameIconPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    const color = Color(0xFF4CAF50);
-    final w = size.width;
-    final h = size.height;
-    final p = w * 0.12;
-    
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..strokeJoin = StrokeJoin.round;
-    
-    // 钻石轮廓
-    final path = Path()
-      ..moveTo(w / 2, p) // 顶
-      ..lineTo(w - p, h * 0.35) // 右上
-      ..lineTo(w / 2, h - p) // 底
-      ..lineTo(p, h * 0.35) // 左上
-      ..close();
-    canvas.drawPath(path, paint);
-    
-    // 横线
-    canvas.drawLine(Offset(p, h * 0.35), Offset(w - p, h * 0.35), paint);
-    
-    // 左斜线
-    canvas.drawLine(Offset(w * 0.33, h * 0.35), Offset(w / 2, h - p), paint);
-    
-    // 右斜线
-    canvas.drawLine(Offset(w * 0.67, h * 0.35), Offset(w / 2, h - p), paint);
-    
-    // 顶部两条线
-    canvas.drawLine(Offset(w / 2, p), Offset(w * 0.33, h * 0.35), paint);
-    canvas.drawLine(Offset(w / 2, p), Offset(w * 0.67, h * 0.35), paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-/// 小程序图标 - 紫色S形
-class _MiniProgramIcon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(26, 26),
-      painter: _MiniProgramIconPainter(),
-    );
-  }
-}
-
-class _MiniProgramIconPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    const color = Color(0xFF7B68EE);
-    final w = size.width;
-    final h = size.height;
-    
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round;
-    
-    // S形由两个半圆弧组成
-    // 上半部分 - 向左的弧
-    canvas.drawArc(
-      Rect.fromLTWH(w * 0.2, h * 0.1, w * 0.45, h * 0.4),
-      -math.pi * 0.5,
-      math.pi,
-      false,
-      paint,
-    );
-    
-    // 下半部分 - 向右的弧
-    canvas.drawArc(
-      Rect.fromLTWH(w * 0.35, h * 0.5, w * 0.45, h * 0.4),
-      math.pi * 0.5,
-      math.pi,
-      false,
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}

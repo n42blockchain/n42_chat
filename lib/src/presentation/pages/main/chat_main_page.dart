@@ -15,6 +15,8 @@ import '../../blocs/conversation/conversation_bloc.dart';
 import '../../blocs/conversation/conversation_event.dart';
 import '../../blocs/conversation/conversation_state.dart';
 import '../../blocs/group/group_bloc.dart';
+import '../../blocs/moment/moment_bloc.dart';
+import '../../blocs/moment/moment_event.dart';
 import '../../blocs/transfer/transfer_bloc.dart';
 import '../chat/chat_lock_page.dart';
 import '../chat/chat_page.dart';
@@ -779,7 +781,10 @@ class _DiscoverTabContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DiscoverPage(showAppBar: false);
+    return BlocProvider(
+      create: (_) => getIt<MomentBloc>()..add(const LoadMoments(limit: 1)),
+      child: const DiscoverPage(showAppBar: false),
+    );
   }
 }
 

@@ -7,9 +7,11 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/moment_entity.dart';
+import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
+import 'visibility_selection_page.dart';
 
 /// 发布动态页面
 class CreateMomentPage extends StatefulWidget {
@@ -24,6 +26,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
   final List<_MediaItem> _selectedMedia = [];
   MomentLocation? _location;
   MomentVisibility _visibility = MomentVisibility.public;
+  List<String> _visibilityUserIds = [];
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -298,13 +301,19 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
   String _getVisibilityText(S? s) {
     switch (_visibility) {
       case MomentVisibility.public:
-        return 'Public';
+        return s?.momentVisibilityPublic ?? 'Public';
       case MomentVisibility.private:
-        return 'Private';
+        return s?.momentVisibilityPrivate ?? 'Private';
       case MomentVisibility.partial:
-        return 'Selected Friends';
+        if (_visibilityUserIds.isNotEmpty) {
+          return '${s?.momentVisibilityPartial ?? 'Selected Friends'} (${_visibilityUserIds.length})';
+        }
+        return s?.momentVisibilityPartial ?? 'Selected Friends';
       case MomentVisibility.excluded:
-        return 'Exclude Some Friends';
+        if (_visibilityUserIds.isNotEmpty) {
+          return '${s?.momentVisibilityExcluded ?? 'Exclude Some Friends'} (${_visibilityUserIds.length})';
+        }
+        return s?.momentVisibilityExcluded ?? 'Exclude Some Friends';
     }
   }
 
@@ -365,7 +374,8 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
   }
 
   void _selectVisibility() {
-    showModalBottomSheet(
+    final s = S.of(context);
+    showModalBottomSheet<void>(
       context: context,
       builder: (ctx) => SafeArea(
         child: Column(
@@ -373,58 +383,97 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.public),
-              title: const Text('Public'),
+              title: Text(s?.momentVisibilityPublic ?? 'Public'),
               subtitle: const Text('All friends can see'),
               trailing: _visibility == MomentVisibility.public
                   ? const Icon(Icons.check, color: Colors.green)
                   : null,
               onTap: () {
-                setState(() => _visibility = MomentVisibility.public);
+                setState(() {
+                  _visibility = MomentVisibility.public;
+                  _visibilityUserIds = [];
+                });
                 Navigator.pop(ctx);
               },
             ),
             ListTile(
               leading: const Icon(Icons.lock),
-              title: const Text('Private'),
+              title: Text(s?.momentVisibilityPrivate ?? 'Private'),
               subtitle: const Text('Only you can see'),
               trailing: _visibility == MomentVisibility.private
                   ? const Icon(Icons.check, color: Colors.green)
                   : null,
               onTap: () {
-                setState(() => _visibility = MomentVisibility.private);
+                setState(() {
+                  _visibility = MomentVisibility.private;
+                  _visibilityUserIds = [];
+                });
                 Navigator.pop(ctx);
               },
             ),
             ListTile(
               leading: const Icon(Icons.group),
-              title: const Text('Selected Friends'),
+              title: Text(s?.momentVisibilityPartial ?? 'Selected Friends'),
               subtitle: const Text('Choose who can see'),
               trailing: _visibility == MomentVisibility.partial
                   ? const Icon(Icons.check, color: Colors.green)
                   : null,
               onTap: () {
-                setState(() => _visibility = MomentVisibility.partial);
                 Navigator.pop(ctx);
-                // TODO: 选择好友
+                _selectVisibilityFriends(MomentVisibility.partial);
               },
             ),
             ListTile(
               leading: const Icon(Icons.person_off),
-              title: const Text('Exclude Some Friends'),
+              title: Text(s?.momentVisibilityExcluded ?? 'Exclude Some Friends'),
               subtitle: const Text('Hide from specific friends'),
               trailing: _visibility == MomentVisibility.excluded
                   ? const Icon(Icons.check, color: Colors.green)
                   : null,
               onTap: () {
-                setState(() => _visibility = MomentVisibility.excluded);
                 Navigator.pop(ctx);
-                // TODO: 选择排除的好友
+                _selectVisibilityFriends(MomentVisibility.excluded);
               },
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _selectVisibilityFriends(MomentVisibility visibility) async {
+    // 获取 ContactBloc（如果可用）
+    ContactBloc? contactBloc;
+    try {
+      contactBloc = context.read<ContactBloc>();
+    } catch (_) {}
+
+    final result = await Navigator.of(context).push<List<String>>(
+      MaterialPageRoute<List<String>>(
+        builder: (ctx) {
+          final page = VisibilitySelectionPage(
+            initialSelectedIds: _visibility == visibility ? _visibilityUserIds : [],
+            title: visibility == MomentVisibility.partial
+                ? (S.of(context)?.momentVisibilityPartial ?? 'Selected Friends')
+                : (S.of(context)?.momentVisibilityExcluded ?? 'Exclude Some Friends'),
+          );
+          if (contactBloc != null) {
+            return BlocProvider.value(
+              value: contactBloc,
+              child: page,
+            );
+          }
+          return page;
+        },
+      ),
+    );
+
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _visibility = visibility;
+        _visibilityUserIds = result;
+      });
+    }
   }
 
   void _postMoment() {

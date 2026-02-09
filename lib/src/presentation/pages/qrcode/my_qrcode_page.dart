@@ -1,6 +1,10 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
@@ -18,6 +22,7 @@ class MyQRCodePage extends StatefulWidget {
 }
 
 class _MyQRCodePageState extends State<MyQRCodePage> {
+  final GlobalKey _qrKey = GlobalKey();
   String? _userId;
   String? _displayName;
   String? _avatarUrl;
@@ -74,11 +79,54 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
     }
   }
 
-  void _shareQRCode() {
-    // TODO: 实现分享功能
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context)?.qrcodeShareFeatureComingSoon ?? 'Share feature coming soon')),
-    );
+  Future<void> _shareQRCode() async {
+    try {
+      final bytes = await _captureQRImage();
+      if (bytes == null) return;
+
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile.fromData(bytes, mimeType: 'image/png', name: 'qrcode.png')],
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context)?.commonShareFailed('') ?? 'Share failed')),
+        );
+      }
+    }
+  }
+
+  Future<void> _saveQRCode() async {
+    try {
+      final bytes = await _captureQRImage();
+      if (bytes == null) return;
+
+      // 使用 share_plus 保存（跨平台兼容方式，触发系统分享面板）
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile.fromData(bytes, mimeType: 'image/png', name: 'qrcode.png')],
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context)?.commonSaveFailed ?? 'Save failed')),
+        );
+      }
+    }
+  }
+
+  Future<Uint8List?> _captureQRImage() async {
+    final boundary = _qrKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    if (boundary == null) return null;
+
+    final image = await boundary.toImage(pixelRatio: 3.0);
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    if (byteData == null) return null;
+
+    return byteData.buffer.asUint8List();
   }
 
   @override
@@ -111,7 +159,9 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
         ],
       ),
       body: Center(
-        child: Container(
+        child: RepaintBoundary(
+          key: _qrKey,
+          child: Container(
           margin: const EdgeInsets.all(32),
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -240,6 +290,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
             ],
           ),
         ),
+        ),
       ),
     );
   }
@@ -281,8 +332,8 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) {
-        final isDark = context.isDarkMode;
+      builder: (sheetContext) {
+        final isDark = sheetContext.isDarkMode;
         return Container(
           decoration: BoxDecoration(
             color: isDark ? AppColors.surfaceDark : AppColors.surface,
@@ -303,22 +354,22 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.save_alt),
-                  title: Text(S.of(context)?.qrcodeSaveToAlbum ?? 'Save to Album'),
+                  title: Text(S.of(sheetContext)?.qrcodeSaveToAlbum ?? 'Save to Album'),
                   onTap: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(S.of(context)?.qrcodeSaveFeatureComingSoon ?? 'Save feature coming soon')),
-                    );
+                    Navigator.pop(sheetContext);
+                    _saveQRCode();
                   },
                 ),
                 ListTile(
                   leading: const Icon(Icons.refresh),
-                  title: Text(S.of(context)?.qrcodeChangeStyle ?? 'Change Style'),
+                  title: Text(S.of(sheetContext)?.qrcodeChangeStyle ?? 'Change Style'),
                   onTap: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(S.of(context)?.qrcodeMoreStylesFeatureComingSoon ?? 'More styles coming soon')),
-                    );
+                    Navigator.pop(sheetContext);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(S.of(context)?.qrcodeMoreStylesFeatureComingSoon ?? 'More styles coming soon')),
+                      );
+                    }
                   },
                 ),
                 const SizedBox(height: 8),

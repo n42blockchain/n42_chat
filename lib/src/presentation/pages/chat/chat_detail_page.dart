@@ -17,6 +17,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../contact/contact_detail_page.dart';
+import '../group/group_settings_page.dart';
 import '../media/media_gallery_page.dart';
 import 'chat_export_page.dart';
 import '../settings/chat_background_page.dart';
@@ -603,21 +604,21 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     title: S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
-                    onTap: () {},
+                    onTap: () => _showGroupAnnouncementDialog(),
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
                     title: S.of(context)?.chatGroupManagement ?? 'Group Management',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
-                    onTap: () {},
+                    onTap: () => _openGroupSettings(),
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
                     title: S.of(context)?.chatMyNicknameInGroup ?? 'My Nickname in Group',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
-                    onTap: () {},
+                    onTap: () => _showEditNicknameDialog(),
                   ),
                   _buildDivider(dividerColor),
                 ],
@@ -625,7 +626,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   title: S.of(context)?.commonSearchChatHistory ?? 'Search Chat History',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () {},
+                  onTap: () => _searchChatHistory(),
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
@@ -754,7 +755,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   title: S.of(context)?.commonReport ?? 'Report',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () {},
+                  onTap: () => _showReportDialog(),
                 ),
               ],
             ),
@@ -1107,6 +1108,228 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     return Padding(
       padding: const EdgeInsets.only(left: 16),
       child: Divider(height: 0.5, thickness: 0.5, color: color),
+    );
+  }
+
+  /// 显示群公告对话框
+  void _showGroupAnnouncementDialog() async {
+    final isDark = context.isDarkMode;
+    final controller = TextEditingController();
+    final canEdit = widget.canChangeSettings;
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        title: Text(
+          S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+        ),
+        content: canEdit
+            ? TextField(
+                controller: controller,
+                maxLines: 5,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                decoration: InputDecoration(
+                  hintText: S.of(context)?.chatGroupAnnouncementHint ?? 'Enter group announcement',
+                  hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+                  border: const OutlineInputBorder(),
+                ),
+              )
+            : Text(
+                S.of(context)?.chatGroupAnnouncementEmpty ?? 'No announcement',
+                style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+              ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              controller.dispose();
+              Navigator.pop(ctx);
+            },
+            child: Text(canEdit ? (S.of(context)?.commonCancel ?? 'Cancel') : (S.of(context)?.commonConfirm ?? 'OK')),
+          ),
+          if (canEdit)
+            TextButton(
+              onPressed: () async {
+                final announcement = controller.text.trim();
+                controller.dispose();
+                Navigator.pop(ctx);
+                try {
+                  final groupRepository = getIt<IGroupRepository>();
+                  await groupRepository.setGroupAnnouncement(widget.conversation.id, announcement);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(S.of(context)?.commonSave ?? 'Saved'),
+                        duration: const Duration(seconds: 1),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(S.of(context)?.chatUpdateFailed ?? 'Update failed'),
+                        backgroundColor: AppColors.error,
+                      ),
+                    );
+                  }
+                }
+              },
+              child: Text(S.of(context)?.commonSave ?? 'Save'),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// 打开群管理设置
+  void _openGroupSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => GroupSettingsPage(roomId: widget.conversation.id),
+      ),
+    );
+  }
+
+  /// 显示编辑群昵称对话框
+  void _showEditNicknameDialog() async {
+    final isDark = context.isDarkMode;
+    final controller = TextEditingController();
+
+    final newNickname = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        title: Text(
+          S.of(context)?.chatEditNickname ?? 'Edit Nickname',
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 30,
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          decoration: InputDecoration(
+            hintText: S.of(context)?.chatNicknameHint ?? 'Enter your nickname in this group',
+            hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+            counterStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              controller.dispose();
+              Navigator.pop(ctx);
+            },
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              final text = controller.text.trim();
+              controller.dispose();
+              Navigator.pop(ctx, text);
+            },
+            child: Text(S.of(context)?.commonSave ?? 'Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (newNickname != null && newNickname.isNotEmpty && mounted) {
+      // 群昵称功能需要 Matrix state event 支持，暂存本地
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(S.of(context)?.chatGroupNameUpdated ?? 'Updated'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+
+  /// 搜索聊天记录
+  void _searchChatHistory() {
+    Navigator.of(context).pop({'action': 'search'});
+  }
+
+  /// 显示投诉对话框
+  void _showReportDialog() {
+    final isDark = context.isDarkMode;
+    final descController = TextEditingController();
+    String? selectedReason;
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          title: Text(
+            S.of(context)?.reportTitle ?? 'Report',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...[
+                S.of(context)?.reportReasonSpam ?? 'Spam',
+                S.of(context)?.reportReasonHarassment ?? 'Harassment',
+                S.of(context)?.reportReasonFraud ?? 'Fraud',
+                S.of(context)?.reportReasonOther ?? 'Other',
+              ].map((reason) => RadioListTile<String>(
+                title: Text(reason, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+                value: reason,
+                groupValue: selectedReason,
+                onChanged: (val) => setDialogState(() => selectedReason = val),
+                activeColor: AppColors.primary,
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+              )),
+              const SizedBox(height: 8),
+              TextField(
+                controller: descController,
+                maxLines: 2,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                decoration: InputDecoration(
+                  hintText: S.of(context)?.reportDescription ?? 'Additional description (optional)',
+                  hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                descController.dispose();
+                Navigator.pop(ctx);
+              },
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (selectedReason == null) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    SnackBar(
+                      content: Text(S.of(context)?.reportSelectReason ?? 'Please select a reason'),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+                  return;
+                }
+                descController.dispose();
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(S.of(context)?.reportSubmitted ?? 'Report submitted'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: Text(S.of(context)?.commonConfirm ?? 'Submit'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

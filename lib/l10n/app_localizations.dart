@@ -8742,6 +8742,312 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'删除 Passkey \"{name}\"？删除后将无法使用该 Passkey 登录。'**
   String authPasskeyDeleteConfirm(String name);
+
+  /// No description provided for @momentVisibilityPublic.
+  ///
+  /// In zh, this message translates to:
+  /// **'公开'**
+  String get momentVisibilityPublic;
+
+  /// No description provided for @momentVisibilityPrivate.
+  ///
+  /// In zh, this message translates to:
+  /// **'私密'**
+  String get momentVisibilityPrivate;
+
+  /// No description provided for @momentVisibilityPartial.
+  ///
+  /// In zh, this message translates to:
+  /// **'部分可见'**
+  String get momentVisibilityPartial;
+
+  /// No description provided for @momentVisibilityExcluded.
+  ///
+  /// In zh, this message translates to:
+  /// **'不给谁看'**
+  String get momentVisibilityExcluded;
+
+  /// No description provided for @momentUserMoments.
+  ///
+  /// In zh, this message translates to:
+  /// **'{userName}的朋友圈'**
+  String momentUserMoments(String userName);
+
+  /// No description provided for @momentForwardTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'转发给'**
+  String get momentForwardTo;
+
+  /// No description provided for @momentForwardSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'转发成功'**
+  String get momentForwardSuccess;
+
+  /// No description provided for @momentSelectFriends.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择好友'**
+  String get momentSelectFriends;
+
+  /// No description provided for @momentSelectTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'按标签选择'**
+  String get momentSelectTags;
+
+  /// No description provided for @momentSelectedCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'已选择 ({count})'**
+  String momentSelectedCount(int count);
+
+  /// No description provided for @momentNoMomentsYet.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无动态'**
+  String get momentNoMomentsYet;
+
+  /// No description provided for @momentForwardMoment.
+  ///
+  /// In zh, this message translates to:
+  /// **'转发动态'**
+  String get momentForwardMoment;
+
+  /// No description provided for @momentAddComment.
+  ///
+  /// In zh, this message translates to:
+  /// **'写评论...'**
+  String get momentAddComment;
+
+  /// No description provided for @momentForwardContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'[朋友圈] {content}'**
+  String momentForwardContent(String content);
+
+  /// No description provided for @momentDeleteMoment.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除动态'**
+  String get momentDeleteMoment;
+
+  /// No description provided for @momentDeleteConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要删除这条动态吗？'**
+  String get momentDeleteConfirm;
+
+  /// No description provided for @momentComment.
+  ///
+  /// In zh, this message translates to:
+  /// **'评论'**
+  String get momentComment;
+
+  /// No description provided for @momentWriteComment.
+  ///
+  /// In zh, this message translates to:
+  /// **'写评论...'**
+  String get momentWriteComment;
+
+  /// No description provided for @momentLike.
+  ///
+  /// In zh, this message translates to:
+  /// **'赞'**
+  String get momentLike;
+
+  /// No description provided for @momentUnlike.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消'**
+  String get momentUnlike;
+
+  /// No description provided for @momentForward.
+  ///
+  /// In zh, this message translates to:
+  /// **'转发'**
+  String get momentForward;
+
+  /// No description provided for @momentDelete.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get momentDelete;
+
+  /// No description provided for @momentReply.
+  ///
+  /// In zh, this message translates to:
+  /// **'回复'**
+  String get momentReply;
+
+  /// No description provided for @momentMoment.
+  ///
+  /// In zh, this message translates to:
+  /// **'动态'**
+  String get momentMoment;
+
+  /// No description provided for @momentLikesCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 个赞'**
+  String momentLikesCount(int count);
+
+  /// No description provided for @momentCommentsCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 条评论'**
+  String momentCommentsCount(int count);
+
+  /// No description provided for @momentNoComments.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无评论'**
+  String get momentNoComments;
+
+  /// No description provided for @momentFailedToLoad.
+  ///
+  /// In zh, this message translates to:
+  /// **'图片加载失败'**
+  String get momentFailedToLoad;
+
+  /// No description provided for @momentReplyTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'回复 {userName}...'**
+  String momentReplyTo(String userName);
+
+  /// No description provided for @momentNoConversations.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无会话'**
+  String get momentNoConversations;
+
+  /// No description provided for @momentJustNow.
+  ///
+  /// In zh, this message translates to:
+  /// **'刚刚'**
+  String get momentJustNow;
+
+  /// No description provided for @momentMinutesAgo.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}分钟前'**
+  String momentMinutesAgo(int count);
+
+  /// No description provided for @momentHoursAgo.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}小时前'**
+  String momentHoursAgo(int count);
+
+  /// No description provided for @momentDaysAgo.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count}天前'**
+  String momentDaysAgo(int count);
+
+  /// No description provided for @chatGroupAnnouncementHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入群公告'**
+  String get chatGroupAnnouncementHint;
+
+  /// No description provided for @chatGroupAnnouncementEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无群公告'**
+  String get chatGroupAnnouncementEmpty;
+
+  /// No description provided for @chatEditNickname.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑群昵称'**
+  String get chatEditNickname;
+
+  /// No description provided for @chatNicknameHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入你在群里的昵称'**
+  String get chatNicknameHint;
+
+  /// No description provided for @contactAddPhoneHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入电话号码'**
+  String get contactAddPhoneHint;
+
+  /// No description provided for @contactNotesHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加联系人备忘'**
+  String get contactNotesHint;
+
+  /// No description provided for @reportTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'投诉'**
+  String get reportTitle;
+
+  /// No description provided for @reportReasonSpam.
+  ///
+  /// In zh, this message translates to:
+  /// **'垃圾信息'**
+  String get reportReasonSpam;
+
+  /// No description provided for @reportReasonHarassment.
+  ///
+  /// In zh, this message translates to:
+  /// **'骚扰'**
+  String get reportReasonHarassment;
+
+  /// No description provided for @reportReasonFraud.
+  ///
+  /// In zh, this message translates to:
+  /// **'欺诈'**
+  String get reportReasonFraud;
+
+  /// No description provided for @reportReasonOther.
+  ///
+  /// In zh, this message translates to:
+  /// **'其他'**
+  String get reportReasonOther;
+
+  /// No description provided for @reportSubmitted.
+  ///
+  /// In zh, this message translates to:
+  /// **'投诉已提交'**
+  String get reportSubmitted;
+
+  /// No description provided for @reportDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'补充说明（选填）'**
+  String get reportDescription;
+
+  /// No description provided for @qrcodeSaved.
+  ///
+  /// In zh, this message translates to:
+  /// **'二维码已保存到相册'**
+  String get qrcodeSaved;
+
+  /// No description provided for @chatSendRedPacketInChat.
+  ///
+  /// In zh, this message translates to:
+  /// **'请在聊天中发送红包'**
+  String get chatSendRedPacketInChat;
+
+  /// No description provided for @commonSaveFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存失败'**
+  String get commonSaveFailed;
+
+  /// No description provided for @reportSelectReason.
+  ///
+  /// In zh, this message translates to:
+  /// **'请选择投诉原因'**
+  String get reportSelectReason;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

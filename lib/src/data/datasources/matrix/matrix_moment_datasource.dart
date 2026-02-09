@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
@@ -581,10 +580,14 @@ class MatrixMomentDataSource {
         for (final m in mediaContent) {
           if (m is Map) {
             final mxcUrl = m['url'] as String?;
+            final isVideo = m['type'] == 'video';
             mediaList.add(MomentMedia(
               url: mxcUrl ?? '',
               httpUrl: mxcUrl != null ? _getHttpUrlFromMxc(mxcUrl) : null,
-              type: m['type'] == 'video'
+              thumbnailUrl: (isVideo && mxcUrl != null)
+                  ? _getThumbnailUrlFromMxc(mxcUrl)
+                  : null,
+              type: isVideo
                   ? MomentMediaType.video
                   : MomentMediaType.image,
               width: m['width'] as int?,
@@ -650,6 +653,18 @@ class MatrixMomentDataSource {
     final mediaId = uri.path.startsWith('/') ? uri.path.substring(1) : uri.path;
     final homeserver = _client!.homeserver.toString().replaceAll(RegExp(r'/+$'), '');
     return '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
+  }
+
+  /// 从 mxc:// URL 生成缩略图 HTTP URL（用于视频预览）
+  String? _getThumbnailUrlFromMxc(String mxcUrl) {
+    if (!mxcUrl.startsWith('mxc://')) return null;
+    if (_client?.homeserver == null) return null;
+
+    final uri = Uri.parse(mxcUrl);
+    final serverName = uri.host;
+    final mediaId = uri.path.startsWith('/') ? uri.path.substring(1) : uri.path;
+    final homeserver = _client!.homeserver.toString().replaceAll(RegExp(r'/+$'), '');
+    return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=320&height=320&method=scale';
   }
 
   /// 上传文件

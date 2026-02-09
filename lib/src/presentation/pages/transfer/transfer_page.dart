@@ -10,6 +10,7 @@ import '../../blocs/transfer/transfer_bloc.dart';
 import '../../blocs/transfer/transfer_event.dart';
 import '../../blocs/transfer/transfer_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../qrcode/scan_qr_page.dart';
 
 /// 转账页面
 class TransferPage extends StatefulWidget {
@@ -274,9 +275,8 @@ class _TransferPageState extends State<TransferPage> {
           IconButton(
             icon: const Icon(Icons.qr_code_scanner, size: 20),
             onPressed: () {
-              // TODO: 实现二维码扫描
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(S.of(context)?.transferScanFeatureComingSoon ?? 'Scan feature coming soon...')),
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const ScanQRPage()),
               );
             },
           ),
