@@ -4901,4 +4901,85 @@ class SDe extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => 'Spiele';
+
+  @override
+  String get gameHighScore => 'Bestleistung';
+
+  @override
+  String get gameScore => 'Punkte';
+
+  @override
+  String get gameOver => 'Spiel vorbei';
+
+  @override
+  String get gamePlayAgain => 'Nochmal spielen';
+
+  @override
+  String get gameLeaderboard => 'Bestenliste';
+
+  @override
+  String get gamePause => 'Pausiert';
+
+  @override
+  String get gameResume => 'Tippen zum Fortfahren';
+
+  @override
+  String get gameConfirmExit => 'Spiel beenden?';
+
+  @override
+  String get gameNoScores => 'Noch keine Ergebnisse';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => 'Kacheln zusammenführen bis 2048';
+
+  @override
+  String get gameBlockDrop => 'Block Drop';
+
+  @override
+  String get gameBlockDropDesc => 'Blöcke fallen und Reihen löschen';
+
+  @override
+  String get gameMinesweeper => 'Minesweeper';
+
+  @override
+  String get gameMinesweeperDesc => 'Finde alle sicheren Felder';
+
+  @override
+  String get gameMatch3 => 'Match 3';
+
+  @override
+  String get gameMatch3Desc => 'Verbinde 3 oder mehr Juwelen';
+
+  @override
+  String get gameMinesweeperEasy => 'Leicht';
+
+  @override
+  String get gameMinesweeperMedium => 'Mittel';
+
+  @override
+  String get gameMinesLeft => 'Minen übrig';
+
+  @override
+  String get gameTimeLeft => 'Zeit';
+
+  @override
+  String get gameLevel => 'Level';
+
+  @override
+  String get gameNext => 'Nächstes';
+
+  @override
+  String get gameBestTime => 'Bestzeit';
+
+  @override
+  String get gameNewRecord => 'Neuer Rekord!';
+
+  @override
+  String get gameLines => 'Reihen';
 }

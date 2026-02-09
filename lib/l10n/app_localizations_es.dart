@@ -4905,4 +4905,85 @@ class SEs extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => 'Juegos';
+
+  @override
+  String get gameHighScore => 'Récord';
+
+  @override
+  String get gameScore => 'Puntuación';
+
+  @override
+  String get gameOver => 'Fin del juego';
+
+  @override
+  String get gamePlayAgain => 'Jugar de nuevo';
+
+  @override
+  String get gameLeaderboard => 'Clasificación';
+
+  @override
+  String get gamePause => 'Pausado';
+
+  @override
+  String get gameResume => 'Toca para continuar';
+
+  @override
+  String get gameConfirmExit => '¿Salir del juego?';
+
+  @override
+  String get gameNoScores => 'Sin puntuaciones';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => 'Combina fichas hasta llegar a 2048';
+
+  @override
+  String get gameBlockDrop => 'Block Drop';
+
+  @override
+  String get gameBlockDropDesc => 'Deja caer y elimina líneas';
+
+  @override
+  String get gameMinesweeper => 'Buscaminas';
+
+  @override
+  String get gameMinesweeperDesc => 'Encuentra todas las celdas seguras';
+
+  @override
+  String get gameMatch3 => 'Match 3';
+
+  @override
+  String get gameMatch3Desc => 'Conecta 3 o más gemas';
+
+  @override
+  String get gameMinesweeperEasy => 'Fácil';
+
+  @override
+  String get gameMinesweeperMedium => 'Medio';
+
+  @override
+  String get gameMinesLeft => 'Minas restantes';
+
+  @override
+  String get gameTimeLeft => 'Tiempo';
+
+  @override
+  String get gameLevel => 'Nivel';
+
+  @override
+  String get gameNext => 'Siguiente';
+
+  @override
+  String get gameBestTime => 'Mejor tiempo';
+
+  @override
+  String get gameNewRecord => '¡Nuevo récord!';
+
+  @override
+  String get gameLines => 'Líneas';
 }

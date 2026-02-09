@@ -4875,4 +4875,85 @@ class SEn extends S {
 
   @override
   String get reportSelectReason => 'Please select a reason';
+
+  @override
+  String get gameCenter => 'Games';
+
+  @override
+  String get gameHighScore => 'Best';
+
+  @override
+  String get gameScore => 'Score';
+
+  @override
+  String get gameOver => 'Game Over';
+
+  @override
+  String get gamePlayAgain => 'Play Again';
+
+  @override
+  String get gameLeaderboard => 'Leaderboard';
+
+  @override
+  String get gamePause => 'Paused';
+
+  @override
+  String get gameResume => 'Tap to resume';
+
+  @override
+  String get gameConfirmExit => 'Quit this game?';
+
+  @override
+  String get gameNoScores => 'No scores yet';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => 'Merge tiles to reach 2048';
+
+  @override
+  String get gameBlockDrop => 'Block Drop';
+
+  @override
+  String get gameBlockDropDesc => 'Drop and clear lines';
+
+  @override
+  String get gameMinesweeper => 'Minesweeper';
+
+  @override
+  String get gameMinesweeperDesc => 'Find all safe cells';
+
+  @override
+  String get gameMatch3 => 'Match 3';
+
+  @override
+  String get gameMatch3Desc => 'Match 3 or more gems';
+
+  @override
+  String get gameMinesweeperEasy => 'Easy';
+
+  @override
+  String get gameMinesweeperMedium => 'Medium';
+
+  @override
+  String get gameMinesLeft => 'Mines Left';
+
+  @override
+  String get gameTimeLeft => 'Time';
+
+  @override
+  String get gameLevel => 'Level';
+
+  @override
+  String get gameNext => 'Next';
+
+  @override
+  String get gameBestTime => 'Best Time';
+
+  @override
+  String get gameNewRecord => 'New Record!';
+
+  @override
+  String get gameLines => 'Lines';
 }

@@ -4903,4 +4903,85 @@ class SPt extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => 'Jogos';
+
+  @override
+  String get gameHighScore => 'Recorde';
+
+  @override
+  String get gameScore => 'Pontuação';
+
+  @override
+  String get gameOver => 'Fim de jogo';
+
+  @override
+  String get gamePlayAgain => 'Jogar novamente';
+
+  @override
+  String get gameLeaderboard => 'Classificação';
+
+  @override
+  String get gamePause => 'Pausado';
+
+  @override
+  String get gameResume => 'Toque para continuar';
+
+  @override
+  String get gameConfirmExit => 'Sair do jogo?';
+
+  @override
+  String get gameNoScores => 'Sem pontuações';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => 'Combine peças até chegar a 2048';
+
+  @override
+  String get gameBlockDrop => 'Block Drop';
+
+  @override
+  String get gameBlockDropDesc => 'Solte e elimine linhas';
+
+  @override
+  String get gameMinesweeper => 'Campo Minado';
+
+  @override
+  String get gameMinesweeperDesc => 'Encontre todas as células seguras';
+
+  @override
+  String get gameMatch3 => 'Match 3';
+
+  @override
+  String get gameMatch3Desc => 'Combine 3 ou mais gemas';
+
+  @override
+  String get gameMinesweeperEasy => 'Fácil';
+
+  @override
+  String get gameMinesweeperMedium => 'Médio';
+
+  @override
+  String get gameMinesLeft => 'Minas restantes';
+
+  @override
+  String get gameTimeLeft => 'Tempo';
+
+  @override
+  String get gameLevel => 'Nível';
+
+  @override
+  String get gameNext => 'Próximo';
+
+  @override
+  String get gameBestTime => 'Melhor tempo';
+
+  @override
+  String get gameNewRecord => 'Novo recorde!';
+
+  @override
+  String get gameLines => 'Linhas';
 }

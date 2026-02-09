@@ -4897,4 +4897,85 @@ class SPl extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => 'Gry';
+
+  @override
+  String get gameHighScore => 'Najlepszy';
+
+  @override
+  String get gameScore => 'Wynik';
+
+  @override
+  String get gameOver => 'Koniec gry';
+
+  @override
+  String get gamePlayAgain => 'Zagraj ponownie';
+
+  @override
+  String get gameLeaderboard => 'Ranking';
+
+  @override
+  String get gamePause => 'Pauza';
+
+  @override
+  String get gameResume => 'Dotknij, aby wznowić';
+
+  @override
+  String get gameConfirmExit => 'Wyjść z gry?';
+
+  @override
+  String get gameNoScores => 'Brak wyników';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => 'Łącz kafelki, aby osiągnąć 2048';
+
+  @override
+  String get gameBlockDrop => 'Block Drop';
+
+  @override
+  String get gameBlockDropDesc => 'Upuszczaj i usuwaj linie';
+
+  @override
+  String get gameMinesweeper => 'Saper';
+
+  @override
+  String get gameMinesweeperDesc => 'Znajdź wszystkie bezpieczne pola';
+
+  @override
+  String get gameMatch3 => 'Match 3';
+
+  @override
+  String get gameMatch3Desc => 'Połącz 3 lub więcej klejnotów';
+
+  @override
+  String get gameMinesweeperEasy => 'Łatwy';
+
+  @override
+  String get gameMinesweeperMedium => 'Średni';
+
+  @override
+  String get gameMinesLeft => 'Pozostałe miny';
+
+  @override
+  String get gameTimeLeft => 'Czas';
+
+  @override
+  String get gameLevel => 'Poziom';
+
+  @override
+  String get gameNext => 'Następny';
+
+  @override
+  String get gameBestTime => 'Najlepszy czas';
+
+  @override
+  String get gameNewRecord => 'Nowy rekord!';
+
+  @override
+  String get gameLines => 'Linie';
 }

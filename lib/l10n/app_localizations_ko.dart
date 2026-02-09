@@ -4804,4 +4804,85 @@ class SKo extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => '게임';
+
+  @override
+  String get gameHighScore => '최고';
+
+  @override
+  String get gameScore => '점수';
+
+  @override
+  String get gameOver => '게임 오버';
+
+  @override
+  String get gamePlayAgain => '다시 하기';
+
+  @override
+  String get gameLeaderboard => '순위표';
+
+  @override
+  String get gamePause => '일시정지';
+
+  @override
+  String get gameResume => '탭하여 재개';
+
+  @override
+  String get gameConfirmExit => '게임을 종료하시겠습니까?';
+
+  @override
+  String get gameNoScores => '기록 없음';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => '타일을 합쳐 2048을 만드세요';
+
+  @override
+  String get gameBlockDrop => '블록 드롭';
+
+  @override
+  String get gameBlockDropDesc => '블록을 떨어뜨려 줄을 지우세요';
+
+  @override
+  String get gameMinesweeper => '지뢰찾기';
+
+  @override
+  String get gameMinesweeperDesc => '안전한 칸을 모두 찾으세요';
+
+  @override
+  String get gameMatch3 => '매치 3';
+
+  @override
+  String get gameMatch3Desc => '보석 3개 이상을 연결하세요';
+
+  @override
+  String get gameMinesweeperEasy => '쉬움';
+
+  @override
+  String get gameMinesweeperMedium => '보통';
+
+  @override
+  String get gameMinesLeft => '남은 지뢰';
+
+  @override
+  String get gameTimeLeft => '시간';
+
+  @override
+  String get gameLevel => '레벨';
+
+  @override
+  String get gameNext => '다음';
+
+  @override
+  String get gameBestTime => '최고 기록';
+
+  @override
+  String get gameNewRecord => '신기록!';
+
+  @override
+  String get gameLines => '라인';
 }

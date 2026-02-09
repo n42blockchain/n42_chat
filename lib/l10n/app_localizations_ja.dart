@@ -4804,4 +4804,85 @@ class SJa extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => 'ゲーム';
+
+  @override
+  String get gameHighScore => 'ベスト';
+
+  @override
+  String get gameScore => 'スコア';
+
+  @override
+  String get gameOver => 'ゲームオーバー';
+
+  @override
+  String get gamePlayAgain => 'もう一度';
+
+  @override
+  String get gameLeaderboard => 'ランキング';
+
+  @override
+  String get gamePause => '一時停止中';
+
+  @override
+  String get gameResume => 'タップで再開';
+
+  @override
+  String get gameConfirmExit => 'ゲームを終了しますか？';
+
+  @override
+  String get gameNoScores => '記録なし';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => 'タイルを合体させて2048を目指せ';
+
+  @override
+  String get gameBlockDrop => 'ブロック落とし';
+
+  @override
+  String get gameBlockDropDesc => 'ブロックを落として行を消そう';
+
+  @override
+  String get gameMinesweeper => 'マインスイーパー';
+
+  @override
+  String get gameMinesweeperDesc => '安全なマスを全て見つけよう';
+
+  @override
+  String get gameMatch3 => 'マッチ3';
+
+  @override
+  String get gameMatch3Desc => '3つ以上の宝石を繋げよう';
+
+  @override
+  String get gameMinesweeperEasy => '初級';
+
+  @override
+  String get gameMinesweeperMedium => '中級';
+
+  @override
+  String get gameMinesLeft => '残り地雷数';
+
+  @override
+  String get gameTimeLeft => '時間';
+
+  @override
+  String get gameLevel => 'レベル';
+
+  @override
+  String get gameNext => '次';
+
+  @override
+  String get gameBestTime => 'ベストタイム';
+
+  @override
+  String get gameNewRecord => '新記録！';
+
+  @override
+  String get gameLines => 'ライン';
 }

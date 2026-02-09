@@ -4879,4 +4879,85 @@ class SId extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => 'Permainan';
+
+  @override
+  String get gameHighScore => 'Terbaik';
+
+  @override
+  String get gameScore => 'Skor';
+
+  @override
+  String get gameOver => 'Permainan Selesai';
+
+  @override
+  String get gamePlayAgain => 'Main Lagi';
+
+  @override
+  String get gameLeaderboard => 'Papan Peringkat';
+
+  @override
+  String get gamePause => 'Dijeda';
+
+  @override
+  String get gameResume => 'Ketuk untuk lanjut';
+
+  @override
+  String get gameConfirmExit => 'Keluar dari permainan?';
+
+  @override
+  String get gameNoScores => 'Belum ada skor';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => 'Gabungkan ubin hingga 2048';
+
+  @override
+  String get gameBlockDrop => 'Block Drop';
+
+  @override
+  String get gameBlockDropDesc => 'Jatuhkan dan hapus baris';
+
+  @override
+  String get gameMinesweeper => 'Penyapu Ranjau';
+
+  @override
+  String get gameMinesweeperDesc => 'Temukan semua sel aman';
+
+  @override
+  String get gameMatch3 => 'Match 3';
+
+  @override
+  String get gameMatch3Desc => 'Cocokkan 3 permata atau lebih';
+
+  @override
+  String get gameMinesweeperEasy => 'Mudah';
+
+  @override
+  String get gameMinesweeperMedium => 'Sedang';
+
+  @override
+  String get gameMinesLeft => 'Sisa Ranjau';
+
+  @override
+  String get gameTimeLeft => 'Waktu';
+
+  @override
+  String get gameLevel => 'Level';
+
+  @override
+  String get gameNext => 'Berikutnya';
+
+  @override
+  String get gameBestTime => 'Waktu Terbaik';
+
+  @override
+  String get gameNewRecord => 'Rekor Baru!';
+
+  @override
+  String get gameLines => 'Baris';
 }
