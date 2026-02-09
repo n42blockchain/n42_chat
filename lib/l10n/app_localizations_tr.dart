@@ -4877,4 +4877,85 @@ class STr extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => 'Oyunlar';
+
+  @override
+  String get gameHighScore => 'En İyi';
+
+  @override
+  String get gameScore => 'Puan';
+
+  @override
+  String get gameOver => 'Oyun Bitti';
+
+  @override
+  String get gamePlayAgain => 'Tekrar Oyna';
+
+  @override
+  String get gameLeaderboard => 'Sıralama';
+
+  @override
+  String get gamePause => 'Duraklatıldı';
+
+  @override
+  String get gameResume => 'Devam etmek için dokun';
+
+  @override
+  String get gameConfirmExit => 'Oyundan çıkmak istiyor musunuz?';
+
+  @override
+  String get gameNoScores => 'Henüz skor yok';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => 'Karoları birleştirerek 2048\'e ulaşın';
+
+  @override
+  String get gameBlockDrop => 'Block Drop';
+
+  @override
+  String get gameBlockDropDesc => 'Blokları düşürüp satırları temizleyin';
+
+  @override
+  String get gameMinesweeper => 'Mayın Tarlası';
+
+  @override
+  String get gameMinesweeperDesc => 'Tüm güvenli hücreleri bulun';
+
+  @override
+  String get gameMatch3 => 'Match 3';
+
+  @override
+  String get gameMatch3Desc => '3 veya daha fazla taşı eşleştirin';
+
+  @override
+  String get gameMinesweeperEasy => 'Kolay';
+
+  @override
+  String get gameMinesweeperMedium => 'Orta';
+
+  @override
+  String get gameMinesLeft => 'Kalan Mayın';
+
+  @override
+  String get gameTimeLeft => 'Süre';
+
+  @override
+  String get gameLevel => 'Seviye';
+
+  @override
+  String get gameNext => 'Sonraki';
+
+  @override
+  String get gameBestTime => 'En İyi Süre';
+
+  @override
+  String get gameNewRecord => 'Yeni Rekor!';
+
+  @override
+  String get gameLines => 'Satır';
 }

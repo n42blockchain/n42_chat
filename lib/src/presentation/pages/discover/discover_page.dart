@@ -11,6 +11,7 @@ import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../widgets/common/n42_avatar.dart';
+import '../game/game_center_page.dart';
 import '../moment/moment_list_page.dart';
 import '../qrcode/scan_qr_page.dart';
 import '../search/global_search_page.dart';
@@ -79,6 +80,23 @@ class DiscoverPage extends StatelessWidget {
 
           const SizedBox(height: 8),
 
+          // 游戏
+          _buildGroupCard(
+            context,
+            isDark,
+            children: [
+              _buildMenuItem(
+                context,
+                isDark: isDark,
+                iconWidget: _GameIcon(),
+                title: l10n?.discoverGames ?? 'Games',
+                onTap: () => _openGames(context),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
           // 社区/Communities
           _buildGroupCard(
             context,
@@ -94,7 +112,7 @@ class DiscoverPage extends StatelessWidget {
             ],
           ),
 
-          // TODO: 待后端就绪后启用：视频号、直播、听一听、看一看、附近的人、游戏、小程序
+          // TODO: 待后端就绪后启用：视频号、直播、听一听、看一看、附近的人、小程序
 
           const SizedBox(height: 32),
         ],
@@ -251,6 +269,12 @@ class DiscoverPage extends StatelessWidget {
     );
   }
 
+  void _openGames(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const GameCenterPage()),
+    );
+  }
+
   void _openCommunities(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const SpaceListPage()),
@@ -311,7 +335,76 @@ class _MomentsIconPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// TODO: 待后端就绪后启用：_ChannelsIcon, _LiveIcon, _MusicIcon, _WatchIcon, _NearbyIcon, _GameIcon, _MiniProgramIcon
+// TODO: 待后端就绪后启用：_ChannelsIcon, _LiveIcon, _MusicIcon, _WatchIcon, _NearbyIcon, _MiniProgramIcon
+
+/// 游戏图标 - 游戏手柄
+class _GameIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: const Size(26, 26),
+      painter: _GameIconPainter(),
+    );
+  }
+}
+
+class _GameIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    final bodyPaint = Paint()
+      ..color = const Color(0xFF4FC3F7)
+      ..style = PaintingStyle.fill;
+
+    // Controller body
+    final bodyRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(w * 0.08, h * 0.25, w * 0.84, h * 0.45),
+      const Radius.circular(6),
+    );
+    canvas.drawRRect(bodyRect, bodyPaint);
+
+    // Left grip
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(w * 0.05, h * 0.4, w * 0.2, h * 0.4),
+        const Radius.circular(4),
+      ),
+      bodyPaint,
+    );
+
+    // Right grip
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(w * 0.75, h * 0.4, w * 0.2, h * 0.4),
+        const Radius.circular(4),
+      ),
+      bodyPaint,
+    );
+
+    final btnPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    // D-pad (cross)
+    canvas.drawRect(
+      Rect.fromCenter(center: Offset(w * 0.3, h * 0.47), width: w * 0.04, height: h * 0.18),
+      btnPaint,
+    );
+    canvas.drawRect(
+      Rect.fromCenter(center: Offset(w * 0.3, h * 0.47), width: w * 0.18, height: h * 0.04),
+      btnPaint,
+    );
+
+    // Action buttons (two dots)
+    canvas.drawCircle(Offset(w * 0.65, h * 0.42), w * 0.04, btnPaint);
+    canvas.drawCircle(Offset(w * 0.76, h * 0.52), w * 0.04, btnPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
 
 /// 扫一扫图标 - 蓝色扫描框
 class _ScanIcon extends StatelessWidget {

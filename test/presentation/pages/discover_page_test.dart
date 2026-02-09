@@ -37,7 +37,7 @@ Widget buildTestWidget(Widget child, {MomentBloc? momentBloc}) {
 
 void main() {
   group('DiscoverPage', () {
-    testWidgets('renders 4 menu items (Moments, Scan, Search, Communities)',
+    testWidgets('renders 5 menu items (Moments, Scan, Search, Games, Communities)',
         (tester) async {
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
@@ -67,7 +67,6 @@ void main() {
       expect(find.text('Listen'), findsNothing);
       expect(find.text('Watch'), findsNothing);
       expect(find.text('Nearby'), findsNothing);
-      expect(find.text('Games'), findsNothing);
       expect(find.text('Mini Programs'), findsNothing);
     });
 
@@ -144,9 +143,9 @@ void main() {
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
-      // 发现页应该有 4 个右箭头（Moments、Scan、Search、Communities）
+      // 发现页应该有 5 个右箭头（Moments、Scan、Search、Games、Communities）
       final chevronIcons = find.byIcon(Icons.chevron_right);
-      expect(chevronIcons, findsNWidgets(4));
+      expect(chevronIcons, findsNWidgets(5));
     });
   });
 }

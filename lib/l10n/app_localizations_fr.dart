@@ -4924,4 +4924,85 @@ class SFr extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => 'Jeux';
+
+  @override
+  String get gameHighScore => 'Meilleur';
+
+  @override
+  String get gameScore => 'Score';
+
+  @override
+  String get gameOver => 'Partie terminée';
+
+  @override
+  String get gamePlayAgain => 'Rejouer';
+
+  @override
+  String get gameLeaderboard => 'Classement';
+
+  @override
+  String get gamePause => 'En pause';
+
+  @override
+  String get gameResume => 'Appuyez pour reprendre';
+
+  @override
+  String get gameConfirmExit => 'Quitter le jeu ?';
+
+  @override
+  String get gameNoScores => 'Aucun score';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => 'Fusionnez les tuiles jusqu\'à 2048';
+
+  @override
+  String get gameBlockDrop => 'Block Drop';
+
+  @override
+  String get gameBlockDropDesc => 'Faites tomber et éliminez les lignes';
+
+  @override
+  String get gameMinesweeper => 'Démineur';
+
+  @override
+  String get gameMinesweeperDesc => 'Trouvez toutes les cases sûres';
+
+  @override
+  String get gameMatch3 => 'Match 3';
+
+  @override
+  String get gameMatch3Desc => 'Alignez 3 gemmes ou plus';
+
+  @override
+  String get gameMinesweeperEasy => 'Facile';
+
+  @override
+  String get gameMinesweeperMedium => 'Moyen';
+
+  @override
+  String get gameMinesLeft => 'Mines restantes';
+
+  @override
+  String get gameTimeLeft => 'Temps';
+
+  @override
+  String get gameLevel => 'Niveau';
+
+  @override
+  String get gameNext => 'Suivant';
+
+  @override
+  String get gameBestTime => 'Meilleur temps';
+
+  @override
+  String get gameNewRecord => 'Nouveau record !';
+
+  @override
+  String get gameLines => 'Lignes';
 }

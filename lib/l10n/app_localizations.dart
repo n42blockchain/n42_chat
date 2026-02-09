@@ -9048,6 +9048,168 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'请选择投诉原因'**
   String get reportSelectReason;
+
+  /// No description provided for @gameCenter.
+  ///
+  /// In zh, this message translates to:
+  /// **'游戏中心'**
+  String get gameCenter;
+
+  /// No description provided for @gameHighScore.
+  ///
+  /// In zh, this message translates to:
+  /// **'最高分'**
+  String get gameHighScore;
+
+  /// No description provided for @gameScore.
+  ///
+  /// In zh, this message translates to:
+  /// **'分数'**
+  String get gameScore;
+
+  /// No description provided for @gameOver.
+  ///
+  /// In zh, this message translates to:
+  /// **'游戏结束'**
+  String get gameOver;
+
+  /// No description provided for @gamePlayAgain.
+  ///
+  /// In zh, this message translates to:
+  /// **'再来一局'**
+  String get gamePlayAgain;
+
+  /// No description provided for @gameLeaderboard.
+  ///
+  /// In zh, this message translates to:
+  /// **'排行榜'**
+  String get gameLeaderboard;
+
+  /// No description provided for @gamePause.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂停'**
+  String get gamePause;
+
+  /// No description provided for @gameResume.
+  ///
+  /// In zh, this message translates to:
+  /// **'点击继续'**
+  String get gameResume;
+
+  /// No description provided for @gameConfirmExit.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定退出游戏？'**
+  String get gameConfirmExit;
+
+  /// No description provided for @gameNoScores.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无记录'**
+  String get gameNoScores;
+
+  /// No description provided for @game2048.
+  ///
+  /// In zh, this message translates to:
+  /// **'2048'**
+  String get game2048;
+
+  /// No description provided for @game2048Desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'合并数字到 2048'**
+  String get game2048Desc;
+
+  /// No description provided for @gameBlockDrop.
+  ///
+  /// In zh, this message translates to:
+  /// **'方块消除'**
+  String get gameBlockDrop;
+
+  /// No description provided for @gameBlockDropDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'消除方块行'**
+  String get gameBlockDropDesc;
+
+  /// No description provided for @gameMinesweeper.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫雷'**
+  String get gameMinesweeper;
+
+  /// No description provided for @gameMinesweeperDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'找出所有安全格'**
+  String get gameMinesweeperDesc;
+
+  /// No description provided for @gameMatch3.
+  ///
+  /// In zh, this message translates to:
+  /// **'消消乐'**
+  String get gameMatch3;
+
+  /// No description provided for @gameMatch3Desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'连接3个以上宝石'**
+  String get gameMatch3Desc;
+
+  /// No description provided for @gameMinesweeperEasy.
+  ///
+  /// In zh, this message translates to:
+  /// **'初级'**
+  String get gameMinesweeperEasy;
+
+  /// No description provided for @gameMinesweeperMedium.
+  ///
+  /// In zh, this message translates to:
+  /// **'中级'**
+  String get gameMinesweeperMedium;
+
+  /// No description provided for @gameMinesLeft.
+  ///
+  /// In zh, this message translates to:
+  /// **'剩余雷数'**
+  String get gameMinesLeft;
+
+  /// No description provided for @gameTimeLeft.
+  ///
+  /// In zh, this message translates to:
+  /// **'时间'**
+  String get gameTimeLeft;
+
+  /// No description provided for @gameLevel.
+  ///
+  /// In zh, this message translates to:
+  /// **'等级'**
+  String get gameLevel;
+
+  /// No description provided for @gameNext.
+  ///
+  /// In zh, this message translates to:
+  /// **'下一个'**
+  String get gameNext;
+
+  /// No description provided for @gameBestTime.
+  ///
+  /// In zh, this message translates to:
+  /// **'最佳用时'**
+  String get gameBestTime;
+
+  /// No description provided for @gameNewRecord.
+  ///
+  /// In zh, this message translates to:
+  /// **'新纪录！'**
+  String get gameNewRecord;
+
+  /// No description provided for @gameLines.
+  ///
+  /// In zh, this message translates to:
+  /// **'行数'**
+  String get gameLines;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

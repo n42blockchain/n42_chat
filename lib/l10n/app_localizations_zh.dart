@@ -4785,4 +4785,85 @@ class SZh extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => '游戏中心';
+
+  @override
+  String get gameHighScore => '最高分';
+
+  @override
+  String get gameScore => '分数';
+
+  @override
+  String get gameOver => '游戏结束';
+
+  @override
+  String get gamePlayAgain => '再来一局';
+
+  @override
+  String get gameLeaderboard => '排行榜';
+
+  @override
+  String get gamePause => '暂停';
+
+  @override
+  String get gameResume => '点击继续';
+
+  @override
+  String get gameConfirmExit => '确定退出游戏？';
+
+  @override
+  String get gameNoScores => '暂无记录';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => '合并数字到 2048';
+
+  @override
+  String get gameBlockDrop => '方块消除';
+
+  @override
+  String get gameBlockDropDesc => '消除方块行';
+
+  @override
+  String get gameMinesweeper => '扫雷';
+
+  @override
+  String get gameMinesweeperDesc => '找出所有安全格';
+
+  @override
+  String get gameMatch3 => '消消乐';
+
+  @override
+  String get gameMatch3Desc => '连接3个以上宝石';
+
+  @override
+  String get gameMinesweeperEasy => '初级';
+
+  @override
+  String get gameMinesweeperMedium => '中级';
+
+  @override
+  String get gameMinesLeft => '剩余雷数';
+
+  @override
+  String get gameTimeLeft => '时间';
+
+  @override
+  String get gameLevel => '等级';
+
+  @override
+  String get gameNext => '下一个';
+
+  @override
+  String get gameBestTime => '最佳用时';
+
+  @override
+  String get gameNewRecord => '新纪录！';
+
+  @override
+  String get gameLines => '行数';
 }

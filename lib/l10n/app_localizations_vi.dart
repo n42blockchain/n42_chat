@@ -4856,4 +4856,85 @@ class SVi extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => 'Trò chơi';
+
+  @override
+  String get gameHighScore => 'Tốt nhất';
+
+  @override
+  String get gameScore => 'Điểm';
+
+  @override
+  String get gameOver => 'Kết thúc';
+
+  @override
+  String get gamePlayAgain => 'Chơi lại';
+
+  @override
+  String get gameLeaderboard => 'Bảng xếp hạng';
+
+  @override
+  String get gamePause => 'Tạm dừng';
+
+  @override
+  String get gameResume => 'Chạm để tiếp tục';
+
+  @override
+  String get gameConfirmExit => 'Thoát trò chơi?';
+
+  @override
+  String get gameNoScores => 'Chưa có điểm';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => 'Ghép ô để đạt 2048';
+
+  @override
+  String get gameBlockDrop => 'Block Drop';
+
+  @override
+  String get gameBlockDropDesc => 'Thả và xóa các hàng';
+
+  @override
+  String get gameMinesweeper => 'Dò mìn';
+
+  @override
+  String get gameMinesweeperDesc => 'Tìm tất cả ô an toàn';
+
+  @override
+  String get gameMatch3 => 'Match 3';
+
+  @override
+  String get gameMatch3Desc => 'Nối 3 viên đá quý trở lên';
+
+  @override
+  String get gameMinesweeperEasy => 'Dễ';
+
+  @override
+  String get gameMinesweeperMedium => 'Trung bình';
+
+  @override
+  String get gameMinesLeft => 'Mìn còn lại';
+
+  @override
+  String get gameTimeLeft => 'Thời gian';
+
+  @override
+  String get gameLevel => 'Cấp độ';
+
+  @override
+  String get gameNext => 'Tiếp theo';
+
+  @override
+  String get gameBestTime => 'Thời gian tốt nhất';
+
+  @override
+  String get gameNewRecord => 'Kỷ lục mới!';
+
+  @override
+  String get gameLines => 'Hàng';
 }

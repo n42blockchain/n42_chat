@@ -16,6 +16,7 @@ import '../../data/datasources/matrix/matrix_search_datasource.dart';
 import '../../data/datasources/matrix/matrix_moment_datasource.dart';
 import '../../data/datasources/matrix/matrix_sticker_datasource.dart';
 import '../../data/datasources/matrix/matrix_story_datasource.dart';
+import '../../presentation/pages/game/services/game_score_service.dart';
 import '../services/download_service.dart';
 import '../services/url_preview_service.dart';
 import '../services/storage_manager_service.dart';
@@ -171,6 +172,11 @@ Future<void> _registerServices() async {
       apiKey: config.googleTranslateApiKey,
       storageDataSource: getIt<SecureStorageDataSource>(),
     ),
+  );
+
+  // 游戏分数服务
+  getIt.registerLazySingleton<GameScoreService>(
+    () => GameScoreService(),
   );
 
   // 下载服务

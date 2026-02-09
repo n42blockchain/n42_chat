@@ -4891,4 +4891,85 @@ class SRu extends S {
 
   @override
   String get reportSelectReason => '请选择投诉原因';
+
+  @override
+  String get gameCenter => 'Игры';
+
+  @override
+  String get gameHighScore => 'Лучший';
+
+  @override
+  String get gameScore => 'Очки';
+
+  @override
+  String get gameOver => 'Игра окончена';
+
+  @override
+  String get gamePlayAgain => 'Играть снова';
+
+  @override
+  String get gameLeaderboard => 'Таблица лидеров';
+
+  @override
+  String get gamePause => 'Пауза';
+
+  @override
+  String get gameResume => 'Нажмите для продолжения';
+
+  @override
+  String get gameConfirmExit => 'Выйти из игры?';
+
+  @override
+  String get gameNoScores => 'Нет результатов';
+
+  @override
+  String get game2048 => '2048';
+
+  @override
+  String get game2048Desc => 'Объединяйте плитки до 2048';
+
+  @override
+  String get gameBlockDrop => 'Блоки';
+
+  @override
+  String get gameBlockDropDesc => 'Сбрасывайте и убирайте линии';
+
+  @override
+  String get gameMinesweeper => 'Сапёр';
+
+  @override
+  String get gameMinesweeperDesc => 'Найдите все безопасные клетки';
+
+  @override
+  String get gameMatch3 => 'Три в ряд';
+
+  @override
+  String get gameMatch3Desc => 'Соедините 3 или более камня';
+
+  @override
+  String get gameMinesweeperEasy => 'Лёгкий';
+
+  @override
+  String get gameMinesweeperMedium => 'Средний';
+
+  @override
+  String get gameMinesLeft => 'Осталось мин';
+
+  @override
+  String get gameTimeLeft => 'Время';
+
+  @override
+  String get gameLevel => 'Уровень';
+
+  @override
+  String get gameNext => 'Далее';
+
+  @override
+  String get gameBestTime => 'Лучшее время';
+
+  @override
+  String get gameNewRecord => 'Новый рекорд!';
+
+  @override
+  String get gameLines => 'Линии';
 }
