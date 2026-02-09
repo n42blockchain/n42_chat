@@ -2205,5 +2205,101 @@
     "placeholders": {
       "name": {"type": "String"}
     }
-  }
+  },
+  "momentVisibilityPublic": "Public",
+  "momentVisibilityPrivate": "Private",
+  "momentVisibilityPartial": "Selected Friends",
+  "momentVisibilityExcluded": "Exclude Some Friends",
+  "momentUserMoments": "{userName}'s Moments",
+  "@momentUserMoments": {
+    "placeholders": {
+      "userName": {"type": "String"}
+    }
+  },
+  "momentForwardTo": "Forward to",
+  "momentForwardSuccess": "Forwarded successfully",
+  "momentSelectFriends": "Select Friends",
+  "momentSelectTags": "Select by Tags",
+  "momentSelectedCount": "Selected ({count})",
+  "@momentSelectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "momentNoMomentsYet": "No moments yet",
+  "momentForwardMoment": "Forward Moment",
+  "momentAddComment": "Add a comment...",
+  "momentForwardContent": "[Moment] {content}",
+  "@momentForwardContent": {
+    "placeholders": {
+      "content": {"type": "String"}
+    }
+  },
+  "momentDeleteMoment": "Delete Moment",
+  "momentDeleteConfirm": "Are you sure you want to delete this moment?",
+  "momentComment": "Comment",
+  "momentWriteComment": "Write a comment...",
+  "momentLike": "Like",
+  "momentUnlike": "Unlike",
+  "momentForward": "Forward",
+  "momentDelete": "Delete",
+  "momentReply": "reply",
+  "momentMoment": "Moment",
+  "momentLikesCount": "{count} likes",
+  "@momentLikesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "momentCommentsCount": "{count} comments",
+  "@momentCommentsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "momentNoComments": "No comments yet",
+  "momentFailedToLoad": "Failed to load image",
+  "momentReplyTo": "Reply to {userName}...",
+  "@momentReplyTo": {
+    "placeholders": {
+      "userName": {"type": "String"}
+    }
+  },
+  "momentNoConversations": "No conversations",
+  "momentJustNow": "just now",
+  "momentMinutesAgo": "{count}m ago",
+  "@momentMinutesAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "momentHoursAgo": "{count}h ago",
+  "@momentHoursAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "momentDaysAgo": "{count}d ago",
+  "@momentDaysAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "chatGroupAnnouncementHint": "Enter group announcement",
+  "chatGroupAnnouncementEmpty": "No announcement",
+  "chatEditNickname": "Edit Nickname",
+  "chatNicknameHint": "Enter your nickname in this group",
+  "contactAddPhoneHint": "Enter phone number",
+  "contactNotesHint": "Add notes about this contact",
+  "reportTitle": "Report",
+  "reportReasonSpam": "Spam",
+  "reportReasonHarassment": "Harassment",
+  "reportReasonFraud": "Fraud",
+  "reportReasonOther": "Other",
+  "reportSubmitted": "Report submitted",
+  "reportDescription": "Additional description (optional)",
+  "qrcodeSaved": "QR code saved to album",
+  "chatSendRedPacketInChat": "Please send red packet in chat",
+  "commonSaveFailed": "Save failed",
+  "reportSelectReason": "Please select a reason"
 }

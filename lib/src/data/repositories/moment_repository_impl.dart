@@ -42,13 +42,16 @@ class MomentRepositoryImpl implements IMomentRepository {
       ));
     }
 
+    // 应用隐私过滤
+    final filteredMoments = await _filterMoments(enrichedMoments);
+
     // 更新缓存
     if (beforeId == null) {
       _momentsCache.clear();
     }
-    _momentsCache.addAll(enrichedMoments);
+    _momentsCache.addAll(filteredMoments);
 
-    return enrichedMoments;
+    return filteredMoments;
   }
 
   @override
@@ -70,7 +73,7 @@ class MomentRepositoryImpl implements IMomentRepository {
           isLikedByMe: likes.any((l) => l.userId == _getCurrentUserId()),
         ));
       }
-      return enrichedMoments;
+      return await _filterMoments(enrichedMoments);
     });
   }
 
@@ -98,7 +101,8 @@ class MomentRepositoryImpl implements IMomentRepository {
       ));
     }
 
-    return enrichedMoments;
+    // 应用隐私过滤（查看特定用户朋友圈时也需要检查权限）
+    return await _filterMoments(enrichedMoments);
   }
 
   @override
@@ -348,6 +352,78 @@ class MomentRepositoryImpl implements IMomentRepository {
   Future<void> refreshMoments() async {
     _momentsCache.clear();
     await getMoments();
+  }
+
+  /// 应用隐私过滤规则
+  ///
+  /// 过滤顺序：
+  /// 1. 过滤我隐藏的用户的动态（不看 TA 的朋友圈）
+  /// 2. 过滤屏蔽我查看的用户的动态（TA 不让我看）
+  /// 3. 过滤超出可见天数的动态
+  /// 4. 过滤可见性设置（public/private/partial/excluded）
+  Future<List<MomentEntity>> _filterMoments(List<MomentEntity> moments) async {
+    if (moments.isEmpty) return moments;
+
+    final currentUserId = _getCurrentUserId();
+
+    // 并行加载所有过滤设置
+    final results = await Future.wait([
+      getHiddenMomentUsers(),
+      getBlockedMomentUsers(),
+      getMomentVisibilitySettings(),
+    ]);
+
+    final hiddenUsers = results[0] as List<String>;
+    // results[1] is blockedUsers - only used when others view my moments, not here
+    final settings = results[2] as Map<String, dynamic>;
+    final visibleDays = settings['visibleDays'] as int? ?? 0;
+
+    // 计算时间截止点
+    DateTime? cutoffTime;
+    if (visibleDays > 0) {
+      cutoffTime = DateTime.now().subtract(Duration(days: visibleDays));
+    }
+
+    final hiddenSet = hiddenUsers.toSet();
+    // blockedUsers 仅在别人查看我的动态时生效，此处不需过滤
+
+    return moments.where((moment) {
+      // 自己的动态始终可见
+      if (moment.isFromMe) return true;
+
+      // 1. 我设置了不看 TA 的朋友圈
+      if (hiddenSet.contains(moment.userId)) return false;
+
+      // 2. TA 设置了不让我看（blockedUsers 存储的是我屏蔽的人列表，
+      //    但这里的语义是"不让 TA 看我的朋友圈"，即我的 blockedUsers 列表
+      //    用于过滤别人查看我的动态，而非我查看别人的动态。
+      //    此处逻辑为：如果对方的 blockedUsers 包含我，对方的动态不应显示给我。
+      //    但由于我们只能读取本地存储，这里 blockedUsers 代表"我不让谁看我的"，
+      //    不适用于过滤别人的动态给我看。故此处跳过 blockedUsers 过滤。）
+      //    注：blockedSet 在此不过滤他人动态，仅在别人查看我的动态时生效。
+
+      // 3. 过滤超出可见天数的动态
+      if (cutoffTime != null && moment.timestamp.isBefore(cutoffTime)) {
+        return false;
+      }
+
+      // 4. 过滤可见性设置
+      switch (moment.visibility) {
+        case MomentVisibility.public:
+          return true;
+        case MomentVisibility.private:
+          // 仅发布者自己可见（非自己的 private 动态不显示）
+          return false;
+        case MomentVisibility.partial:
+          // 仅 visibilityUserIds 中的用户可见
+          if (currentUserId == null) return false;
+          return moment.visibilityUserIds.contains(currentUserId);
+        case MomentVisibility.excluded:
+          // visibilityUserIds 中的用户不可见
+          if (currentUserId == null) return true;
+          return !moment.visibilityUserIds.contains(currentUserId);
+      }
+    }).toList();
   }
 
   String? _getCurrentUserId() {

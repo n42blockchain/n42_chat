@@ -4703,4 +4703,176 @@ class SEn extends S {
   String authPasskeyDeleteConfirm(String name) {
     return 'Delete passkey \"$name\"? You will no longer be able to use it to log in.';
   }
+
+  @override
+  String get momentVisibilityPublic => 'Public';
+
+  @override
+  String get momentVisibilityPrivate => 'Private';
+
+  @override
+  String get momentVisibilityPartial => 'Selected Friends';
+
+  @override
+  String get momentVisibilityExcluded => 'Exclude Some Friends';
+
+  @override
+  String momentUserMoments(String userName) {
+    return '$userName\'s Moments';
+  }
+
+  @override
+  String get momentForwardTo => 'Forward to';
+
+  @override
+  String get momentForwardSuccess => 'Forwarded successfully';
+
+  @override
+  String get momentSelectFriends => 'Select Friends';
+
+  @override
+  String get momentSelectTags => 'Select by Tags';
+
+  @override
+  String momentSelectedCount(int count) {
+    return 'Selected ($count)';
+  }
+
+  @override
+  String get momentNoMomentsYet => 'No moments yet';
+
+  @override
+  String get momentForwardMoment => 'Forward Moment';
+
+  @override
+  String get momentAddComment => 'Add a comment...';
+
+  @override
+  String momentForwardContent(String content) {
+    return '[Moment] $content';
+  }
+
+  @override
+  String get momentDeleteMoment => 'Delete Moment';
+
+  @override
+  String get momentDeleteConfirm =>
+      'Are you sure you want to delete this moment?';
+
+  @override
+  String get momentComment => 'Comment';
+
+  @override
+  String get momentWriteComment => 'Write a comment...';
+
+  @override
+  String get momentLike => 'Like';
+
+  @override
+  String get momentUnlike => 'Unlike';
+
+  @override
+  String get momentForward => 'Forward';
+
+  @override
+  String get momentDelete => 'Delete';
+
+  @override
+  String get momentReply => 'reply';
+
+  @override
+  String get momentMoment => 'Moment';
+
+  @override
+  String momentLikesCount(int count) {
+    return '$count likes';
+  }
+
+  @override
+  String momentCommentsCount(int count) {
+    return '$count comments';
+  }
+
+  @override
+  String get momentNoComments => 'No comments yet';
+
+  @override
+  String get momentFailedToLoad => 'Failed to load image';
+
+  @override
+  String momentReplyTo(String userName) {
+    return 'Reply to $userName...';
+  }
+
+  @override
+  String get momentNoConversations => 'No conversations';
+
+  @override
+  String get momentJustNow => 'just now';
+
+  @override
+  String momentMinutesAgo(int count) {
+    return '${count}m ago';
+  }
+
+  @override
+  String momentHoursAgo(int count) {
+    return '${count}h ago';
+  }
+
+  @override
+  String momentDaysAgo(int count) {
+    return '${count}d ago';
+  }
+
+  @override
+  String get chatGroupAnnouncementHint => 'Enter group announcement';
+
+  @override
+  String get chatGroupAnnouncementEmpty => 'No announcement';
+
+  @override
+  String get chatEditNickname => 'Edit Nickname';
+
+  @override
+  String get chatNicknameHint => 'Enter your nickname in this group';
+
+  @override
+  String get contactAddPhoneHint => 'Enter phone number';
+
+  @override
+  String get contactNotesHint => 'Add notes about this contact';
+
+  @override
+  String get reportTitle => 'Report';
+
+  @override
+  String get reportReasonSpam => 'Spam';
+
+  @override
+  String get reportReasonHarassment => 'Harassment';
+
+  @override
+  String get reportReasonFraud => 'Fraud';
+
+  @override
+  String get reportReasonOther => 'Other';
+
+  @override
+  String get reportSubmitted => 'Report submitted';
+
+  @override
+  String get reportDescription => 'Additional description (optional)';
+
+  @override
+  String get qrcodeSaved => 'QR code saved to album';
+
+  @override
+  String get chatSendRedPacketInChat => 'Please send red packet in chat';
+
+  @override
+  String get commonSaveFailed => 'Save failed';
+
+  @override
+  String get reportSelectReason => 'Please select a reason';
 }

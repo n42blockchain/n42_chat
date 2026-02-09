@@ -392,6 +392,34 @@ class MomentEntity extends Equatable {
     return likes.where((like) => friendIds.contains(like.userId)).toList();
   }
 
+  /// 获取当前用户可见的点赞列表
+  ///
+  /// 规则：可以看到自己的、动态发布者的、以及与自己互为好友的人的点赞
+  List<MomentLike> getVisibleLikes({
+    required String currentUserId,
+    required Set<String> friendIds,
+  }) {
+    return likes.where((like) {
+      return like.userId == currentUserId ||
+          like.userId == userId ||
+          friendIds.contains(like.userId);
+    }).toList();
+  }
+
+  /// 获取当前用户可见的评论列表
+  ///
+  /// 规则：可以看到自己的、动态发布者的、以及与自己互为好友的人的评论
+  List<MomentComment> getVisibleComments({
+    required String currentUserId,
+    required Set<String> friendIds,
+  }) {
+    return comments.where((comment) {
+      return comment.userId == currentUserId ||
+          comment.userId == userId ||
+          friendIds.contains(comment.userId);
+    }).toList();
+  }
+
   @override
   List<Object?> get props => [
         id,

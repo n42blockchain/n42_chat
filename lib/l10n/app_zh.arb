@@ -2380,5 +2380,101 @@
     "placeholders": {
       "name": {"type": "String"}
     }
-  }
+  },
+  "momentVisibilityPublic": "公开",
+  "momentVisibilityPrivate": "私密",
+  "momentVisibilityPartial": "部分可见",
+  "momentVisibilityExcluded": "不给谁看",
+  "momentUserMoments": "{userName}的朋友圈",
+  "@momentUserMoments": {
+    "placeholders": {
+      "userName": {"type": "String"}
+    }
+  },
+  "momentForwardTo": "转发给",
+  "momentForwardSuccess": "转发成功",
+  "momentSelectFriends": "选择好友",
+  "momentSelectTags": "按标签选择",
+  "momentSelectedCount": "已选择 ({count})",
+  "@momentSelectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "momentNoMomentsYet": "暂无动态",
+  "momentForwardMoment": "转发动态",
+  "momentAddComment": "写评论...",
+  "momentForwardContent": "[朋友圈] {content}",
+  "@momentForwardContent": {
+    "placeholders": {
+      "content": {"type": "String"}
+    }
+  },
+  "momentDeleteMoment": "删除动态",
+  "momentDeleteConfirm": "确定要删除这条动态吗？",
+  "momentComment": "评论",
+  "momentWriteComment": "写评论...",
+  "momentLike": "赞",
+  "momentUnlike": "取消",
+  "momentForward": "转发",
+  "momentDelete": "删除",
+  "momentReply": "回复",
+  "momentMoment": "动态",
+  "momentLikesCount": "{count} 个赞",
+  "@momentLikesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "momentCommentsCount": "{count} 条评论",
+  "@momentCommentsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "momentNoComments": "暂无评论",
+  "momentFailedToLoad": "图片加载失败",
+  "momentReplyTo": "回复 {userName}...",
+  "@momentReplyTo": {
+    "placeholders": {
+      "userName": {"type": "String"}
+    }
+  },
+  "momentNoConversations": "暂无会话",
+  "momentJustNow": "刚刚",
+  "momentMinutesAgo": "{count}分钟前",
+  "@momentMinutesAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "momentHoursAgo": "{count}小时前",
+  "@momentHoursAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "momentDaysAgo": "{count}天前",
+  "@momentDaysAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "chatGroupAnnouncementHint": "输入群公告",
+  "chatGroupAnnouncementEmpty": "暂无群公告",
+  "chatEditNickname": "编辑群昵称",
+  "chatNicknameHint": "输入你在群里的昵称",
+  "contactAddPhoneHint": "输入电话号码",
+  "contactNotesHint": "添加联系人备忘",
+  "reportTitle": "投诉",
+  "reportReasonSpam": "垃圾信息",
+  "reportReasonHarassment": "骚扰",
+  "reportReasonFraud": "欺诈",
+  "reportReasonOther": "其他",
+  "reportSubmitted": "投诉已提交",
+  "reportDescription": "补充说明（选填）",
+  "qrcodeSaved": "二维码已保存到相册",
+  "chatSendRedPacketInChat": "请在聊天中发送红包",
+  "commonSaveFailed": "保存失败",
+  "reportSelectReason": "请选择投诉原因"
 }

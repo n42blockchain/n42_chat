@@ -7,30 +7,61 @@ import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
+import '../../blocs/contact/contact_bloc.dart';
+import '../../blocs/contact/contact_state.dart';
 import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
 import '../../widgets/common/n42_avatar.dart';
-import '../chat/viewers/image_viewer_page.dart';
 import '../chat/viewers/video_player_page.dart';
 import 'create_moment_page.dart';
-import 'moment_detail_page.dart';
+import 'moment_forward_sheet.dart';
 
 /// 朋友圈列表页面
 class MomentListPage extends StatelessWidget {
-  const MomentListPage({super.key});
+  /// 查看特定用户的朋友圈时传入
+  final String? userId;
+  final String? userName;
+  final String? userAvatarUrl;
+
+  const MomentListPage({
+    super.key,
+    this.userId,
+    this.userName,
+    this.userAvatarUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<MomentBloc>()..add(const LoadMoments()),
-      child: const _MomentListView(),
+      create: (_) {
+        final bloc = getIt<MomentBloc>();
+        if (userId != null) {
+          bloc.add(LoadUserMoments(userId!));
+        } else {
+          bloc.add(const LoadMoments());
+        }
+        return bloc;
+      },
+      child: _MomentListView(
+        userId: userId,
+        userName: userName,
+        userAvatarUrl: userAvatarUrl,
+      ),
     );
   }
 }
 
 class _MomentListView extends StatefulWidget {
-  const _MomentListView();
+  final String? userId;
+  final String? userName;
+  final String? userAvatarUrl;
+
+  const _MomentListView({
+    this.userId,
+    this.userName,
+    this.userAvatarUrl,
+  });
 
   @override
   State<_MomentListView> createState() => _MomentListViewState();
@@ -38,11 +69,36 @@ class _MomentListView extends StatefulWidget {
 
 class _MomentListViewState extends State<_MomentListView> {
   final ScrollController _scrollController = ScrollController();
+  String? _myDisplayName;
+  String? _myAvatarUrl;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    if (!_isUserMode) {
+      _loadMyProfile();
+    }
+  }
+
+  Future<void> _loadMyProfile() async {
+    try {
+      final client = MatrixClientManager.instance.client;
+      if (client != null && client.isLogged()) {
+        final userId = client.userID;
+        if (userId != null) {
+          final profile = await client.getUserProfile(userId);
+          if (mounted) {
+            setState(() {
+              _myDisplayName = profile.displayname;
+              _myAvatarUrl = profile.avatarUrl?.toString();
+            });
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Failed to load my profile for moments: $e');
+    }
   }
 
   @override
@@ -51,10 +107,40 @@ class _MomentListViewState extends State<_MomentListView> {
     super.dispose();
   }
 
+  bool get _isUserMode => widget.userId != null;
+
+  String _getCurrentUserId() {
+    return MatrixClientManager.instance.client?.userID ?? '';
+  }
+
+  String _getCurrentUserName() {
+    // 优先使用从 profile 获取的真实显示名
+    if (_myDisplayName != null && _myDisplayName!.isNotEmpty) {
+      return _myDisplayName!;
+    }
+    // 后备：从 userId 提取 localpart
+    final client = MatrixClientManager.instance.client;
+    if (client == null) return '';
+    final userId = client.userID ?? '';
+    return userId.startsWith('@')
+        ? userId.substring(1).split(':').first
+        : userId;
+  }
+
+  Set<String> _getFriendIds() {
+    try {
+      final contactState = context.read<ContactBloc>().state;
+      if (contactState is ContactLoaded) {
+        return contactState.contacts.map((c) => c.userId).toSet();
+      }
+    } catch (_) {}
+    return {};
+  }
+
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      context.read<MomentBloc>().add(const LoadMoreMoments());
+      context.read<MomentBloc>().add(LoadMoreMoments(userId: widget.userId));
     }
   }
 
@@ -77,16 +163,19 @@ class _MomentListViewState extends State<_MomentListView> {
               background: _buildCoverSection(context, isDark),
             ),
             title: Text(
-              s?.commonMoments ?? 'Moments',
+              _isUserMode
+                  ? (s?.momentUserMoments(widget.userName ?? '') ?? '${widget.userName}\'s Moments')
+                  : (s?.commonMoments ?? 'Moments'),
               style: TextStyle(
                 color: isDark ? Colors.white : Colors.black,
               ),
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.camera_alt_outlined),
-                onPressed: () => _openCreateMoment(context),
-              ),
+              if (!_isUserMode)
+                IconButton(
+                  icon: const Icon(Icons.camera_alt_outlined),
+                  onPressed: () => _openCreateMoment(context),
+                ),
             ],
           ),
 
@@ -112,7 +201,7 @@ class _MomentListViewState extends State<_MomentListView> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No moments yet',
+                          s?.momentNoMomentsYet ?? 'No moments yet',
                           style: TextStyle(
                             color: isDark ? Colors.grey[400] : Colors.grey[600],
                           ),
@@ -139,6 +228,8 @@ class _MomentListViewState extends State<_MomentListView> {
                     return _MomentTile(
                       moment: state.moments[index],
                       isDark: isDark,
+                      friendIds: _getFriendIds(),
+                      currentUserId: _getCurrentUserId(),
                     );
                   },
                   childCount: state.moments.length + (state.hasMore ? 1 : 0),
@@ -148,10 +239,12 @@ class _MomentListViewState extends State<_MomentListView> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openCreateMoment(context),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: _isUserMode
+          ? null
+          : FloatingActionButton(
+              onPressed: () => _openCreateMoment(context),
+              child: const Icon(Icons.add),
+            ),
     );
   }
 
@@ -188,7 +281,9 @@ class _MomentListViewState extends State<_MomentListView> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'My Name',
+                    _isUserMode
+                        ? (widget.userName ?? '')
+                        : _getCurrentUserName(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -209,8 +304,11 @@ class _MomentListViewState extends State<_MomentListView> {
                   border: Border.all(color: Colors.white, width: 2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const N42Avatar(
-                  name: 'My Name',
+                child: N42Avatar(
+                  name: _isUserMode
+                      ? (widget.userName ?? '')
+                      : _getCurrentUserName(),
+                  imageUrl: _isUserMode ? widget.userAvatarUrl : _myAvatarUrl,
                   size: 64,
                   borderRadius: 6,
                 ),
@@ -238,10 +336,14 @@ class _MomentListViewState extends State<_MomentListView> {
 class _MomentTile extends StatelessWidget {
   final MomentEntity moment;
   final bool isDark;
+  final Set<String> friendIds;
+  final String currentUserId;
 
   const _MomentTile({
     required this.moment,
     required this.isDark,
+    required this.friendIds,
+    required this.currentUserId,
   });
 
   @override
@@ -340,7 +442,7 @@ class _MomentTile extends StatelessWidget {
                   ],
                 ),
 
-                // 点赞和评论
+                // 点赞和评论（已在方法内部做可见性过滤）
                 if (moment.likeCount > 0 || moment.commentCount > 0) ...[
                   const SizedBox(height: 8),
                   _buildLikesAndComments(context),
@@ -355,174 +457,313 @@ class _MomentTile extends StatelessWidget {
 
   Widget _buildMediaGrid(BuildContext context) {
     final mediaCount = moment.media.length;
-    final crossAxisCount = mediaCount == 1
-        ? 1
-        : mediaCount <= 4
-            ? 2
-            : 3;
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 4,
-        mainAxisSpacing: 4,
-      ),
-      itemCount: mediaCount > 9 ? 9 : mediaCount,
-      itemBuilder: (context, index) {
-        final media = moment.media[index];
-        return GestureDetector(
-          onTap: () => _openMediaViewer(context, index),
-          child: Container(
-            decoration: BoxDecoration(
-              color: isDark ? Colors.grey[800] : Colors.grey[200],
+    // 微信风格：1张大图特殊处理
+    if (mediaCount == 1) {
+      return _buildSingleMedia(context, moment.media.first, 0);
+    }
+
+    // 微信风格网格：2/4 用 2 列，其他用 3 列
+    final crossAxisCount = mediaCount <= 4 ? 2 : 3;
+    final displayCount = mediaCount > 9 ? 9 : mediaCount;
+
+    // 计算约束宽度（微信风格：不超过屏幕宽度的 2/3）
+    final maxGridWidth = MediaQuery.of(context).size.width * 0.65;
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxGridWidth),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: 4,
+          mainAxisSpacing: 4,
+        ),
+        itemCount: displayCount,
+        itemBuilder: (context, index) {
+          final media = moment.media[index];
+          return GestureDetector(
+            onTap: () => _openMediaViewer(context, index),
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  _buildMediaThumbnail(media),
+                  if (media.isVideo)
+                    const Center(
+                      child: Icon(
+                        Icons.play_circle_filled,
+                        color: Colors.white70,
+                        size: 32,
+                      ),
+                    ),
+                  if (index == 8 && mediaCount > 9)
+                    Container(
+                      color: Colors.black54,
+                      child: Center(
+                        child: Text(
+                          '+${mediaCount - 9}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                if (media.isVideo)
-                  // 视频使用深色占位背景 + 播放图标
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: Container(
-                      color: isDark ? Colors.grey[850] : Colors.grey[800],
-                      child: const Center(
-                        child: Icon(
-                          Icons.play_circle_filled,
-                          color: Colors.white70,
-                          size: 48,
-                        ),
-                      ),
-                    ),
-                  )
-                else if (media.httpUrl != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: CachedNetworkImage(
-                      imageUrl: media.httpUrl!,
-                      fit: BoxFit.cover,
-                      httpHeaders: _getAuthHeaders(),
-                      placeholder: (_, __) => Container(
-                        color: isDark ? Colors.grey[800] : Colors.grey[200],
-                      ),
-                      errorWidget: (_, __, ___) => const Icon(Icons.image),
-                    ),
-                  )
-                else
-                  const Icon(Icons.image),
-                if (index == 8 && mediaCount > 9)
-                  Container(
-                    color: Colors.black54,
-                    child: Center(
-                      child: Text(
-                        '+${mediaCount - 9}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// 单张图片/视频的特殊布局（微信风格：大图，宽度不超过 2/3 屏幕）
+  Widget _buildSingleMedia(BuildContext context, MomentMedia media, int index) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxWidth = screenWidth * 0.65;
+    final maxHeight = screenWidth * 0.65;
+
+    // 计算合适的尺寸
+    double width = maxWidth;
+    double height = maxWidth;
+    if (media.width != null && media.height != null && media.height! > 0) {
+      final ratio = media.width! / media.height!;
+      if (ratio > 1) {
+        // 横图
+        width = maxWidth;
+        height = maxWidth / ratio;
+      } else {
+        // 竖图
+        height = maxHeight;
+        width = maxHeight * ratio;
+      }
+      width = width.clamp(100.0, maxWidth);
+      height = height.clamp(100.0, maxHeight);
+    }
+
+    return GestureDetector(
+      onTap: () => _openMediaViewer(context, index),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: SizedBox(
+          width: width,
+          height: height,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              _buildMediaThumbnail(media),
+              if (media.isVideo)
+                const Center(
+                  child: Icon(
+                    Icons.play_circle_filled,
+                    color: Colors.white70,
+                    size: 48,
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// 构建媒体缩略图（图片或视频缩略图）
+  Widget _buildMediaThumbnail(MomentMedia media) {
+    if (media.isVideo) {
+      if (media.thumbnailUrl != null) {
+        return CachedNetworkImage(
+          imageUrl: media.thumbnailUrl!,
+          fit: BoxFit.cover,
+          httpHeaders: _getAuthHeaders(),
+          placeholder: (_, _) => Container(
+            color: isDark ? Colors.grey[850] : Colors.grey[800],
+          ),
+          errorWidget: (_, _, _) => Container(
+            color: isDark ? Colors.grey[850] : Colors.grey[800],
+          ),
+        );
+      }
+      return Container(
+        color: isDark ? Colors.grey[850] : Colors.grey[800],
+      );
+    }
+
+    if (media.httpUrl != null) {
+      return CachedNetworkImage(
+        imageUrl: media.httpUrl!,
+        fit: BoxFit.cover,
+        httpHeaders: _getAuthHeaders(),
+        placeholder: (_, _) => Container(
+          color: isDark ? Colors.grey[800] : Colors.grey[200],
+        ),
+        errorWidget: (_, _, _) => const Icon(Icons.image),
+      );
+    }
+
+    return const Icon(Icons.image);
+  }
+
+  /// 交互栏（微信风格：点击 "..." 弹出操作面板）
+  Widget _buildInteractionBar(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showActionPopup(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: isDark ? Colors.grey[800] : Colors.grey[200],
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Icon(
+          Icons.more_horiz,
+          size: 18,
+          color: isDark ? Colors.grey[400] : Colors.grey[600],
+        ),
+      ),
+    );
+  }
+
+  /// 微信风格的操作弹出栏
+  void _showActionPopup(BuildContext context) {
+    final renderObject = context.findRenderObject();
+    if (renderObject is! RenderBox || !renderObject.hasSize) return;
+    final position = renderObject.localToGlobal(Offset.zero);
+    final size = renderObject.size;
+
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.transparent,
+      builder: (ctx) {
+        return Stack(
+          children: [
+            // 点击空白区域关闭
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.pop(ctx),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
+            // 操作面板定位在 "..." 按钮左侧
+            Positioned(
+              right: MediaQuery.of(ctx).size.width - position.dx - size.width,
+              top: position.dy - 8,
+              child: Material(
+                borderRadius: BorderRadius.circular(6),
+                color: isDark ? const Color(0xFF4A4A4A) : const Color(0xFF4C4C4C),
+                elevation: 4,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 点赞/取消赞
+                    _buildPopupAction(
+                      ctx,
+                      icon: moment.isLikedByMe
+                          ? Icons.thumb_up
+                          : Icons.thumb_up_outlined,
+                      label: moment.isLikedByMe
+                          ? (S.of(context)?.momentUnlike ?? 'Unlike')
+                          : (S.of(context)?.momentLike ?? 'Like'),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        if (moment.isLikedByMe) {
+                          context.read<MomentBloc>().add(UnlikeMoment(moment.id));
+                        } else {
+                          context.read<MomentBloc>().add(LikeMoment(moment.id));
+                        }
+                      },
+                    ),
+                    Container(width: 1, height: 24, color: Colors.white24),
+                    // 评论
+                    _buildPopupAction(
+                      ctx,
+                      icon: Icons.chat_bubble_outline,
+                      label: S.of(context)?.momentComment ?? 'Comment',
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _showCommentDialog(context);
+                      },
+                    ),
+                    Container(width: 1, height: 24, color: Colors.white24),
+                    // 转发
+                    _buildPopupAction(
+                      ctx,
+                      icon: Icons.share_outlined,
+                      label: S.of(context)?.momentForward ?? 'Forward',
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        MomentForwardSheet.show(context, moment);
+                      },
+                    ),
+                    // 删除（仅自己的动态）
+                    if (moment.isFromMe) ...[
+                      Container(width: 1, height: 24, color: Colors.white24),
+                      _buildPopupAction(
+                        ctx,
+                        icon: Icons.delete_outline,
+                        label: S.of(context)?.momentDelete ?? 'Delete',
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _showDeleteConfirmation(context);
+                        },
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
   }
 
-  /// 交互栏：点赞、评论、删除（一键操作）
-  Widget _buildInteractionBar(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // 点赞按钮 - 直接点击切换
-        GestureDetector(
-          onTap: () {
-            if (moment.isLikedByMe) {
-              context.read<MomentBloc>().add(UnlikeMoment(moment.id));
-            } else {
-              context.read<MomentBloc>().add(LikeMoment(moment.id));
-            }
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  moment.isLikedByMe ? Icons.favorite : Icons.favorite_border,
-                  size: 18,
-                  color: moment.isLikedByMe
-                      ? Colors.red
-                      : (isDark ? Colors.grey[400] : Colors.grey[600]),
-                ),
-                if (moment.likeCount > 0) ...[
-                  const SizedBox(width: 2),
-                  Text(
-                    '${moment.likeCount}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: moment.isLikedByMe
-                          ? Colors.red
-                          : (isDark ? Colors.grey[400] : Colors.grey[600]),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-
-        // 评论按钮
-        GestureDetector(
-          onTap: () => _showCommentDialog(context),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.comment_outlined,
-                  size: 18,
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                ),
-                if (moment.commentCount > 0) ...[
-                  const SizedBox(width: 2),
-                  Text(
-                    '${moment.commentCount}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-
-        // 删除按钮（仅自己的动态）
-        if (moment.isFromMe)
-          GestureDetector(
-            onTap: () => _showDeleteConfirmation(context),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Icon(
-                Icons.delete_outline,
-                size: 18,
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+  Widget _buildPopupAction(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: Colors.white),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
               ),
             ),
-          ),
-      ],
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildLikesAndComments(BuildContext context) {
+    final visibleLikes = moment.getVisibleLikes(
+      currentUserId: currentUserId,
+      friendIds: friendIds,
+    );
+    final visibleComments = moment.getVisibleComments(
+      currentUserId: currentUserId,
+      friendIds: friendIds,
+    );
+
+    if (visibleLikes.isEmpty && visibleComments.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -533,7 +774,7 @@ class _MomentTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 点赞列表
-          if (moment.likeCount > 0) ...[
+          if (visibleLikes.isNotEmpty) ...[
             Row(
               children: [
                 Icon(
@@ -544,7 +785,7 @@ class _MomentTile extends StatelessWidget {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    moment.likes.map((l) => l.userName).join(', '),
+                    visibleLikes.map((l) => l.userName).join(', '),
                     style: TextStyle(
                       color: isDark ? Colors.blue[300] : Colors.blue[700],
                       fontSize: 13,
@@ -555,7 +796,7 @@ class _MomentTile extends StatelessWidget {
                 ),
               ],
             ),
-            if (moment.commentCount > 0)
+            if (visibleComments.isNotEmpty)
               Divider(
                 color: isDark ? Colors.grey[700] : Colors.grey[300],
                 height: 16,
@@ -563,7 +804,7 @@ class _MomentTile extends StatelessWidget {
           ],
 
           // 评论列表
-          ...moment.comments.map((comment) => Padding(
+          ...visibleComments.map((comment) => Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: RichText(
                   text: TextSpan(
@@ -580,7 +821,7 @@ class _MomentTile extends StatelessWidget {
                         ),
                       ),
                       if (comment.isReply) ...[
-                        const TextSpan(text: ' reply '),
+                        TextSpan(text: ' ${S.of(context)?.momentReply ?? 'reply'} '),
                         TextSpan(
                           text: comment.replyToUserName,
                           style: TextStyle(
@@ -611,39 +852,38 @@ class _MomentTile extends StatelessWidget {
     if (index >= moment.media.length) return;
     final media = moment.media[index];
 
-    debugPrint('=== Moment Media Viewer ===');
-    debugPrint('Index: $index, isVideo: ${media.isVideo}');
-    debugPrint('MXC URL: ${media.url}');
-    debugPrint('HTTP URL: ${media.httpUrl}');
-    debugPrint('MimeType: ${media.mimeType}');
-
-    if (media.httpUrl == null) {
-      debugPrint('ERROR: httpUrl is null, cannot open viewer');
-      return;
-    }
+    if (media.httpUrl == null) return;
 
     if (media.isVideo) {
-      // 视频播放需要将 access_token 附加到 URL，
-      // 因为 iOS AVPlayer 对自定义 HTTP headers 的支持不完整，
-      // 后续 range request 可能不携带 Authorization header
-      var videoUrl = media.httpUrl!;
-      final accessToken = MatrixClientManager.instance.client?.accessToken;
-      if (accessToken != null && accessToken.isNotEmpty) {
-        final separator = videoUrl.contains('?') ? '&' : '?';
-        videoUrl = '$videoUrl${separator}access_token=$accessToken';
-      }
-      debugPrint('Opening video player with URL: $videoUrl');
       Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => VideoPlayerPage(videoUrl: videoUrl),
+          builder: (_) => VideoPlayerPage(
+            videoUrl: media.httpUrl!,
+            thumbnailUrl: media.thumbnailUrl,
+          ),
         ),
       );
     } else {
+      // 收集所有图片 URL 用于多图浏览
+      final imageUrls = <String>[];
+      final indexMapping = <int, int>{};
+      var mappedIndex = 0;
+      for (var i = 0; i < moment.media.length; i++) {
+        if (!moment.media[i].isVideo && moment.media[i].httpUrl != null) {
+          imageUrls.add(moment.media[i].httpUrl!);
+          indexMapping[i] = mappedIndex;
+          mappedIndex++;
+        }
+      }
+
+      final initialPage = indexMapping[index] ?? 0;
+
       Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => ImageViewerPage(
-            imageUrl: media.httpUrl!,
-            heroTag: 'moment_media_${moment.id}_$index',
+          builder: (_) => _MomentImageGalleryPage(
+            imageUrls: imageUrls,
+            initialIndex: initialPage,
+            momentId: moment.id,
           ),
         ),
       );
@@ -653,60 +893,166 @@ class _MomentTile extends StatelessWidget {
   void _showCommentDialog(BuildContext context) {
     final controller = TextEditingController();
 
-    showDialog(
+    showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Comment'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLines: 3,
-          decoration: const InputDecoration(
-            hintText: 'Write a comment...',
-            border: OutlineInputBorder(),
+      builder: (ctx) {
+        final s = S.of(context);
+        return AlertDialog(
+          title: Text(s?.momentComment ?? 'Comment'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: s?.momentWriteComment ?? 'Write a comment...',
+              border: const OutlineInputBorder(),
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (controller.text.trim().isNotEmpty) {
-                context.read<MomentBloc>().add(CommentMoment(
-                      momentId: moment.id,
-                      content: controller.text.trim(),
-                    ));
-                Navigator.pop(ctx);
-              }
-            },
-            child: const Text('Send'),
-          ),
-        ],
-      ),
-    );
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(s?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (controller.text.trim().isNotEmpty) {
+                  context.read<MomentBloc>().add(CommentMoment(
+                        momentId: moment.id,
+                        content: controller.text.trim(),
+                      ));
+                  Navigator.pop(ctx);
+                }
+              },
+              child: Text(s?.commonSend ?? 'Send'),
+            ),
+          ],
+        );
+      },
+    ).then((_) => controller.dispose());
   }
 
   void _showDeleteConfirmation(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete Moment'),
-        content: const Text('Are you sure you want to delete this moment?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<MomentBloc>().add(DeleteMoment(moment.id));
-              Navigator.pop(ctx);
-            },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
+      builder: (ctx) {
+        final s = S.of(context);
+        return AlertDialog(
+          title: Text(s?.momentDeleteMoment ?? 'Delete Moment'),
+          content: Text(s?.momentDeleteConfirm ?? 'Are you sure you want to delete this moment?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(s?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.read<MomentBloc>().add(DeleteMoment(moment.id));
+                Navigator.pop(ctx);
+              },
+              child: Text(s?.commonDelete ?? 'Delete', style: const TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// 朋友圈多图全屏浏览页面（微信风格：滑动切换）
+class _MomentImageGalleryPage extends StatefulWidget {
+  final List<String> imageUrls;
+  final int initialIndex;
+  final String momentId;
+
+  const _MomentImageGalleryPage({
+    required this.imageUrls,
+    required this.initialIndex,
+    required this.momentId,
+  });
+
+  @override
+  State<_MomentImageGalleryPage> createState() => _MomentImageGalleryPageState();
+}
+
+class _MomentImageGalleryPageState extends State<_MomentImageGalleryPage> {
+  late PageController _pageController;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    _pageController = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  Map<String, String> _getAuthHeaders() {
+    final accessToken = MatrixClientManager.instance.client?.accessToken;
+    if (accessToken != null && accessToken.isNotEmpty) {
+      return {'Authorization': 'Bearer $accessToken'};
+    }
+    return {};
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+        title: widget.imageUrls.length > 1
+            ? Text(
+                '${_currentIndex + 1}/${widget.imageUrls.length}',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              )
+            : null,
+        centerTitle: true,
+      ),
+      body: GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: PageView.builder(
+          controller: _pageController,
+          itemCount: widget.imageUrls.length,
+          onPageChanged: (index) {
+            setState(() => _currentIndex = index);
+          },
+          itemBuilder: (context, index) {
+            return Center(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: Hero(
+                  tag: 'moment_media_${widget.momentId}_$index',
+                  child: CachedNetworkImage(
+                    imageUrl: widget.imageUrls[index],
+                    fit: BoxFit.contain,
+                    httpHeaders: _getAuthHeaders(),
+                    placeholder: (_, _) => const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    ),
+                    errorWidget: (_, _, _) => Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error, color: Colors.red, size: 48),
+                        const SizedBox(height: 16),
+                        Text(S.of(context)?.momentFailedToLoad ?? 'Failed to load image',
+                            style: const TextStyle(color: Colors.white)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

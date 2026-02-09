@@ -21,8 +21,12 @@ import '../settings/change_password_page.dart';
 import '../settings/language_settings_page.dart';
 import '../settings/security_settings_page.dart';
 import '../settings/settings_page.dart';
+import 'orders_and_cards_page.dart';
 import 'profile_edit_page.dart';
+import 'services_page.dart';
 import 'status_page.dart';
+import '../moment/moment_list_page.dart';
+import '../sticker/sticker_store_page.dart';
 
 /// 我的页面
 class ProfilePage extends StatefulWidget {
@@ -122,7 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 icon: Icons.verified_outlined,
                 iconColor: AppColors.primary,
                 title: S.of(context)?.profileServices ?? 'Services',
-                onTap: () => _showComingSoon(context, S.of(context)?.profileServices ?? 'Services'),
+                onTap: () => _openServices(context),
               ),
             ],
           ),
@@ -149,7 +153,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 icon: Icons.photo_library_outlined,
                 iconColor: const Color(0xFF007AFF),
                 title: S.of(context)?.commonMoments ?? 'Moments',
-                onTap: () => _showComingSoon(context, S.of(context)?.commonMoments ?? 'Moments'),
+                onTap: () => _openMoments(context),
               ),
               _buildDivider(context, isDark),
               _buildMenuItem(
@@ -158,7 +162,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 icon: Icons.card_giftcard_outlined,
                 iconColor: const Color(0xFFFF6B6B),
                 title: S.of(context)?.profileOrdersAndCards ?? 'Orders & Cards',
-                onTap: () => _showComingSoon(context, S.of(context)?.profileOrdersAndCards ?? 'Orders & Cards'),
+                onTap: () => _openOrdersAndCards(context),
               ),
               _buildDivider(context, isDark),
               _buildMenuItem(
@@ -167,7 +171,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 icon: Icons.emoji_emotions_outlined,
                 iconColor: const Color(0xFFFFCC00),
                 title: S.of(context)?.profileStickers ?? 'Stickers',
-                onTap: () => _showComingSoon(context, S.of(context)?.profileStickers ?? 'Stickers'),
+                onTap: () => _openStickers(context),
               ),
             ],
           ),
@@ -454,6 +458,7 @@ class _ProfilePageState extends State<ProfilePage> {
         debugPrint('Failed to sync status: $e');
       }
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.profileStatusSetTo(result) ?? 'Status set to: $result'),
@@ -568,12 +573,28 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(S.of(context)?.commonFeatureComingSoon(feature) ?? '$feature coming soon'),
-        duration: const Duration(seconds: 2),
-      ),
+  void _openServices(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const ServicesPage()),
     );
   }
+
+  void _openMoments(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const MomentListPage()),
+    );
+  }
+
+  void _openOrdersAndCards(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const OrdersAndCardsPage()),
+    );
+  }
+
+  void _openStickers(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const StickerStorePage()),
+    );
+  }
+
 }

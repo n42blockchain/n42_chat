@@ -83,10 +83,19 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     emit(state.copyWith(isLoadingMore: true));
 
     try {
-      final moreMoments = await _momentRepository.getMoments(
-        limit: 20,
-        beforeId: state.lastMomentId,
-      );
+      final List<MomentEntity> moreMoments;
+      if (event.userId != null) {
+        moreMoments = await _momentRepository.getUserMoments(
+          event.userId!,
+          limit: 20,
+          beforeId: state.lastMomentId,
+        );
+      } else {
+        moreMoments = await _momentRepository.getMoments(
+          limit: 20,
+          beforeId: state.lastMomentId,
+        );
+      }
 
       emit(state.copyWith(
         moments: [...state.moments, ...moreMoments],
@@ -313,6 +322,9 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
   ) async {
     final currentUserId = MatrixClientManager.instance.client?.userID ?? '';
 
+    // 保存原始 likes 用于回滚
+    final originalMoments = state.moments;
+
     // 乐观更新：同时移除 likes 列表中的当前用户
     final updatedMoments = state.moments.map((m) {
       if (m.id == event.momentId) {
@@ -329,16 +341,9 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     try {
       await _momentRepository.unlikeMoment(event.momentId);
     } catch (e) {
-      // 回滚
-      final revertedMoments = state.moments.map((m) {
-        if (m.id == event.momentId) {
-          return m.copyWith(isLikedByMe: true);
-        }
-        return m;
-      }).toList();
-
+      // 回滚到原始状态（恢复完整的 likes 列表）
       emit(state.copyWith(
-        moments: revertedMoments,
+        moments: originalMoments,
         errorMessage: e.toString(),
       ));
     }

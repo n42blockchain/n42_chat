@@ -11,7 +11,10 @@ import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../moment/moment_list_page.dart';
+import 'common_groups_page.dart';
+import 'contact_permissions_page.dart';
 import 'contact_settings_page.dart';
+import 'tags_management_page.dart';
 
 /// 联系人详情页面（仿微信）
 class ContactDetailPage extends StatefulWidget {
@@ -228,7 +231,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute<void>(
-                          builder: (_) => const MomentListPage(),
+                          builder: (_) => MomentListPage(
+                            userId: widget.userId,
+                            userName: _effectiveDisplayName,
+                            userAvatarUrl: widget.avatarUrl,
+                          ),
                         ),
                       );
                     },
@@ -441,28 +448,33 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     required String label,
     required VoidCallback onTap,
   }) {
+    final isDark = context.isDarkMode;
+    final borderColor = isDark ? Colors.white10 : Colors.black12;
+    final iconColor = isDark ? Colors.white70 : Colors.black54;
+    final textColor = isDark ? Colors.white : Colors.black;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: InkWell(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             border: Border(
-              top: BorderSide(color: Colors.white10, width: 0.5),
-              bottom: BorderSide(color: Colors.white10, width: 0.5),
+              top: BorderSide(color: borderColor, width: 0.5),
+              bottom: BorderSide(color: borderColor, width: 0.5),
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: Colors.white70, size: 20),
+              Icon(icon, color: iconColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white,
+                  color: textColor,
                 ),
               ),
             ],
@@ -747,21 +759,21 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                   title: S.of(context)?.contactTags ?? 'Tags',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () {},
+                  onTap: () => _openTagsManagement(),
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
                   title: S.of(context)?.contactNotes ?? 'Notes',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () {},
+                  onTap: () => _showNotesDialog(),
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
                   title: S.of(context)?.contactPhotos ?? 'Photos',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () {},
+                  onTap: () => _showPhotosDialog(),
                 ),
               ],
             ),
@@ -777,7 +789,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                   value: S.of(context)?.contactChatMomentsEtc ?? 'Chat, Moments, Sports, etc.',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () {},
+                  onTap: () => _openPermissions(),
                 ),
               ],
             ),
@@ -793,8 +805,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                   value: S.of(context)?.contactGroupCountLabel(0) ?? '0 groups',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () {},
-                  showArrow: false,
+                  onTap: () => _openCommonGroups(),
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
@@ -935,6 +946,92 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     );
   }
   
+  void _openTagsManagement() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const TagsManagementPage(selectMode: true),
+      ),
+    );
+  }
+
+  void _openPermissions() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ContactPermissionsPage(
+          userId: widget.userId,
+          displayName: widget.displayName,
+        ),
+      ),
+    );
+  }
+
+  void _openCommonGroups() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => CommonGroupsPage(
+          userId: widget.userId,
+          displayName: widget.displayName,
+        ),
+      ),
+    );
+  }
+
+  void _showNotesDialog() {
+    final controller = TextEditingController();
+    final isDark = context.isDarkMode;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        title: Text(
+          S.of(context)?.contactNotes ?? 'Notes',
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+        ),
+        content: TextField(
+          controller: controller,
+          maxLines: 4,
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          decoration: InputDecoration(
+            hintText: S.of(context)?.contactNotesHint ?? 'Add notes about this contact',
+            hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              controller.dispose();
+              Navigator.pop(ctx);
+            },
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              controller.dispose();
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(S.of(context)?.commonSave ?? 'Saved'),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+            },
+            child: Text(S.of(context)?.commonSave ?? 'Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPhotosDialog() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(S.of(context)?.commonFeatureComingSoon(S.of(context)?.contactPhotos ?? 'Photos') ?? 'Photos coming soon'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
   void _openEditRemark() {
     Navigator.of(context).push<String?>(
       MaterialPageRoute<String?>(
@@ -1015,6 +1112,57 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     super.dispose();
   }
   
+  void _showAddPhoneDialog() {
+    final phoneController = TextEditingController();
+    final isDark = context.isDarkMode;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        title: Text(
+          S.of(context)?.contactPhone ?? 'Phone',
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+        ),
+        content: TextField(
+          controller: phoneController,
+          keyboardType: TextInputType.phone,
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          decoration: InputDecoration(
+            hintText: S.of(context)?.contactAddPhoneHint ?? 'Enter phone number',
+            hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              phoneController.dispose();
+              Navigator.pop(ctx);
+            },
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              final phone = phoneController.text.trim();
+              phoneController.dispose();
+              Navigator.pop(ctx);
+              if (phone.isNotEmpty) {
+                _phoneController.text = phone;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(S.of(context)?.commonSave ?? 'Saved'),
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              }
+            },
+            child: Text(S.of(context)?.commonSave ?? 'Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _save() async {
     final remark = _remarkController.text.trim();
     final remarkToSave = remark.isEmpty ? null : remark;
@@ -1157,7 +1305,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: InkWell(
-                onTap: () {},
+                onTap: () => _showAddPhoneDialog(),
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -1202,7 +1350,13 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const TagsManagementPage(selectMode: true),
+                    ),
+                  );
+                },
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -1283,7 +1437,14 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(S.of(context)?.commonFeatureComingSoon(S.of(context)?.contactPhotos ?? 'Photos') ?? 'Photos coming soon'),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+                },
                 borderRadius: BorderRadius.circular(8),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

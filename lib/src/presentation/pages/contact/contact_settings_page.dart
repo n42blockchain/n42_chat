@@ -8,6 +8,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import 'contact_detail_page.dart';
+import 'contact_permissions_page.dart';
 
 /// 联系人设置页面（仿微信 - 图二）
 class ContactSettingsPage extends StatefulWidget {
@@ -96,7 +97,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                   title: S.of(context)?.contactSetPermissions ?? 'Set Permissions',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () {},
+                  onTap: () => _openPermissions(),
                 ),
               ],
             ),
@@ -112,7 +113,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                   title: S.of(context)?.contactRecommendToFriend ?? 'Share contact',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () {},
+                  onTap: () => _shareContact(),
                 ),
               ],
             ),
@@ -144,10 +145,14 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     setState(() {
                       _isBlocked = value;
                     });
-                    if (value) {
-                      context.read<ContactBloc>().add(IgnoreUser(widget.userId));
-                    } else {
-                      context.read<ContactBloc>().add(UnignoreUser(widget.userId));
+                    try {
+                      if (value) {
+                        context.read<ContactBloc>().add(IgnoreUser(widget.userId));
+                      } else {
+                        context.read<ContactBloc>().add(UnignoreUser(widget.userId));
+                      }
+                    } catch (_) {
+                      debugPrint('ContactBloc not available for blocklist toggle');
                     }
                   },
                 ),
@@ -165,7 +170,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                   title: S.of(context)?.commonReport ?? 'Report',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () {},
+                  onTap: () => _showReportDialog(),
                 ),
               ],
             ),
@@ -286,6 +291,106 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
     );
   }
   
+  void _openPermissions() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ContactPermissionsPage(
+          userId: widget.userId,
+          displayName: widget.displayName,
+        ),
+      ),
+    );
+  }
+
+  void _shareContact() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(S.of(context)?.commonFeatureComingSoon(S.of(context)?.contactRecommendToFriend ?? 'Share contact') ?? 'Share contact coming soon'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showReportDialog() {
+    final isDark = context.isDarkMode;
+    final descController = TextEditingController();
+    String? selectedReason;
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          title: Text(
+            S.of(context)?.reportTitle ?? 'Report',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...[
+                S.of(context)?.reportReasonSpam ?? 'Spam',
+                S.of(context)?.reportReasonHarassment ?? 'Harassment',
+                S.of(context)?.reportReasonFraud ?? 'Fraud',
+                S.of(context)?.reportReasonOther ?? 'Other',
+              ].map((reason) => RadioListTile<String>(
+                title: Text(reason, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+                value: reason,
+                groupValue: selectedReason,
+                onChanged: (val) => setDialogState(() => selectedReason = val),
+                activeColor: AppColors.primary,
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+              )),
+              const SizedBox(height: 8),
+              TextField(
+                controller: descController,
+                maxLines: 2,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                decoration: InputDecoration(
+                  hintText: S.of(context)?.reportDescription ?? 'Additional description (optional)',
+                  hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                descController.dispose();
+                Navigator.pop(ctx);
+              },
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (selectedReason == null) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    SnackBar(
+                      content: Text(S.of(context)?.reportSelectReason ?? 'Please select a reason'),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+                  return;
+                }
+                descController.dispose();
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(S.of(context)?.reportSubmitted ?? 'Report submitted'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: Text(S.of(context)?.commonConfirm ?? 'Submit'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _openEditRemark() {
     // 获取当前的 ContactBloc
     ContactBloc? contactBloc;

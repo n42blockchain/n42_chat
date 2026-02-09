@@ -4,6 +4,8 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../transfer/receive_page.dart';
+import 'n42_bean_page.dart';
 
 /// 服务页面
 class ServicesPage extends StatelessWidget {
@@ -35,6 +37,11 @@ class ServicesPage extends StatelessWidget {
               label: S.of(context)?.profileN42Bean ?? 'N42 Bean',
               cardColor: cardColor,
               textColor: textColor,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const N42BeanPage()),
+                );
+              },
             ),
             _buildServiceItem(
               context,
@@ -43,6 +50,15 @@ class ServicesPage extends StatelessWidget {
               label: S.of(context)?.commonTransfer ?? 'Transfer',
               cardColor: cardColor,
               textColor: textColor,
+              onTap: () {
+                // 通用转账入口，需要在聊天上下文中使用
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(S.of(context)?.commonFeatureComingSoon(S.of(context)?.commonTransfer ?? 'Transfer') ?? 'Transfer coming soon'),
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              },
             ),
             _buildServiceItem(
               context,
@@ -51,6 +67,14 @@ class ServicesPage extends StatelessWidget {
               label: S.of(context)?.profileRedPacket ?? 'Red Packet',
               cardColor: cardColor,
               textColor: textColor,
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(S.of(context)?.chatSendRedPacketInChat ?? 'Please send red packet in chat'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
             ),
             _buildServiceItem(
               context,
@@ -59,6 +83,11 @@ class ServicesPage extends StatelessWidget {
               label: S.of(context)?.commonPayment ?? 'Payment',
               cardColor: cardColor,
               textColor: textColor,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const ReceivePage()),
+                );
+              },
             ),
             _buildServiceItem(
               context,
@@ -67,6 +96,14 @@ class ServicesPage extends StatelessWidget {
               label: S.of(context)?.profileWallet ?? 'Wallet',
               cardColor: cardColor,
               textColor: textColor,
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(S.of(context)?.commonFeatureComingSoon(S.of(context)?.profileWallet ?? 'Wallet') ?? 'Wallet coming soon'),
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              },
             ),
             _buildServiceItem(
               context,
@@ -75,6 +112,14 @@ class ServicesPage extends StatelessWidget {
               label: S.of(context)?.profileCardPack ?? 'Card Pack',
               cardColor: cardColor,
               textColor: textColor,
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(S.of(context)?.commonFeatureComingSoon(S.of(context)?.profileCardPack ?? 'Card Pack') ?? 'Card Pack coming soon'),
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -89,16 +134,10 @@ class ServicesPage extends StatelessWidget {
     required String label,
     required Color cardColor,
     required Color textColor,
+    VoidCallback? onTap,
   }) {
     return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S.of(context)?.commonFeatureComingSoon(label) ?? '$label coming soon'),
-            duration: const Duration(seconds: 1),
-          ),
-        );
-      },
+      onTap: onTap,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
