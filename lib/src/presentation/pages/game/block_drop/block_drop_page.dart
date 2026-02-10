@@ -48,7 +48,10 @@ class _BlockDropPageState extends State<BlockDropPage> {
   }
 
   void _tick() {
-    if (!mounted || _isPaused || _logic.isGameOver) return;
+    if (!mounted || _isPaused || _logic.isGameOver) {
+      _dropTimer?.cancel();
+      return;
+    }
     setState(() {
       _logic.softDrop();
     });
@@ -57,9 +60,14 @@ class _BlockDropPageState extends State<BlockDropPage> {
       _showGameOver();
       return;
     }
-    // Update timer speed when level changes
+    // 速度变化时，在下一帧重启 Timer（避免在回调中直接重启）
     if (_logic.dropInterval != _lastDropInterval) {
-      _startTimer();
+      _dropTimer?.cancel();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_isPaused && !_logic.isGameOver) {
+          _startTimer();
+        }
+      });
     }
   }
 

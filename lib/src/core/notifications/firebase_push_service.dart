@@ -74,6 +74,9 @@ class FirebasePushService implements IPushNotificationService {
   /// 通话状态自动重置定时器（防止 _isInCall 泄漏）
   Timer? _callStateResetTimer;
 
+  /// 推送注册锁（防止并发注册）
+  bool _isRegistering = false;
+
   /// 通知配置
   NotificationConfig _notificationConfig = const NotificationConfig();
 
@@ -715,6 +718,19 @@ class FirebasePushService implements IPushNotificationService {
 
   @override
   Future<void> registerForPush() async {
+    if (_isRegistering) {
+      debugPrint('FirebasePushService: Push registration already in progress');
+      return;
+    }
+    _isRegistering = true;
+    try {
+      await _registerForPushImpl();
+    } finally {
+      _isRegistering = false;
+    }
+  }
+
+  Future<void> _registerForPushImpl() async {
     // 如果 FCM Token 还没有获取到，尝试获取
     if (_fcmToken == null) {
       debugPrint('FirebasePushService: FCM token is null, attempting to get token...');
