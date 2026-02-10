@@ -104,19 +104,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     if (result.success && result.user != null) {
-      // 保存登录凭据（用于生物识别登录）
-      debugPrint('AuthBloc: Saving credentials for biometric login...');
-      final credentialsSaved = await _secureStorage.saveCredentials(
-        homeserver: event.homeserver,
-        username: event.username,
-        password: event.password,
-      );
-      if (credentialsSaved) {
-        debugPrint('AuthBloc: Credentials saved and verified successfully');
-      } else {
-        debugPrint('AuthBloc: WARNING - Credentials save verification failed!');
-      }
-
       emit(state.copyWith(
         status: AuthStatus.authenticated,
         user: result.user,
@@ -125,9 +112,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       N42Chat.notifyUserChanged();
       // 登录成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
       add(const LoadUserProfileData());
-      // 登录成功后注册推送通知和初始化通话管理器
-      await _registerPushNotifications();
+      // 通话管理器必须在 sync 事件到达前初始化完成，否则来电事件会丢失
       await _initializeCallManager();
+      // 推送注册可以后台执行
+      unawaited(_registerPushNotifications());
     } else {
       emit(state.copyWith(
         status: AuthStatus.error,
@@ -549,7 +537,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (googleResult == null) {
         emit(state.copyWith(
           status: AuthStatus.unauthenticated,
-          errorMessage: '登录已取消',
         ));
         return;
       }
@@ -570,10 +557,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
-        // Google 登录成功后注册推送通知
-        _registerPushNotifications();
-        // Google 登录成功后初始化通话管理器
-        _initializeCallManager();
+        // 通话管理器必须先初始化，确保来电事件监听就绪
+        await _initializeCallManager();
+        unawaited(_registerPushNotifications());
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -583,6 +569,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     } catch (e) {
       debugPrint('AuthBloc: Google login failed - $e');
+      // Google Sign In 未配置时静默回退，不显示错误给用户
+      if (e.toString().contains('未配置')) {
+        emit(state.copyWith(status: AuthStatus.unauthenticated));
+        return;
+      }
       emit(state.copyWith(
         status: AuthStatus.error,
         errorMessage: 'Google 登录失败: $e',
@@ -667,6 +658,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       if (result.success) {
         // SSO 登录需要在浏览器中完成，状态会在回调中更新
+        emit(state.copyWith(
+          status: AuthStatus.unauthenticated,
+        ));
+      } else if (result.errorMessage == 'SSO_REDIRECT_REQUIRED') {
+        // SSO 需要浏览器重定向，这是正常流程，不显示错误
+        debugPrint('AuthBloc: SSO redirect required, waiting for browser callback');
         emit(state.copyWith(
           status: AuthStatus.unauthenticated,
         ));

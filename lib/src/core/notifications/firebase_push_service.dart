@@ -730,17 +730,29 @@ class FirebasePushService implements IPushNotificationService {
       return;
     }
 
+    // iOS: 优先使用 APNs token 作为 pushkey
+    // Sygnal 服务器为 iOS (appId=*.ios) 通常配置 type: apns，需要 APNs device token
+    // Android: 使用 FCM token
+    final String pushkey;
+    if (Platform.isIOS && _apnsToken != null) {
+      pushkey = _apnsToken!;
+      debugPrint('FirebasePushService: iOS using APNs token as pushkey');
+    } else {
+      pushkey = _fcmToken!;
+      debugPrint('FirebasePushService: Using FCM token as pushkey');
+    }
+
     try {
       debugPrint('FirebasePushService: Registering pusher...');
       debugPrint('  appId: $appId');
       debugPrint('  pushkeyType: $pushkeyType');
       debugPrint('  gateway: $pushGatewayUrl');
-      debugPrint('  token: ${_fcmToken!.substring(0, 10)}...');
+      debugPrint('  pushkey: ${pushkey.substring(0, 10)}...');
 
       // 注册 Pusher 到 Matrix 服务器
       await _client.postPusher(
         matrix.Pusher(
-          pushkey: _fcmToken!,
+          pushkey: pushkey,
           kind: pushkeyType,
           appId: appId,
           appDisplayName: 'N42 Chat',
@@ -761,12 +773,19 @@ class FirebasePushService implements IPushNotificationService {
 
   @override
   Future<void> unregisterPush() async {
-    if (_fcmToken == null) return;
+    // 使用与注册时相同的 pushkey
+    final String? pushkey;
+    if (Platform.isIOS && _apnsToken != null) {
+      pushkey = _apnsToken;
+    } else {
+      pushkey = _fcmToken;
+    }
+    if (pushkey == null) return;
 
     try {
       await _client.deletePusher(
         matrix.Pusher(
-          pushkey: _fcmToken!,
+          pushkey: pushkey,
           kind: '',
           appId: appId,
           appDisplayName: 'N42 Chat',

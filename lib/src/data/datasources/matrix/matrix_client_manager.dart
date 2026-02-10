@@ -155,6 +155,9 @@ class MatrixClientManager {
           AuthenticationTypes.password,
           AuthenticationTypes.sso,
         },
+        // 向所有未被阻止的设备分享 Megolm 会话密钥，
+        // 避免因设备未交叉验证而导致 "The sender has not sent us the session key"
+        shareKeysWith: ShareKeysWith.all,
         logLevel: kDebugMode ? Level.verbose : Level.warning,
         importantStateEvents: {
           EventTypes.Encryption,
@@ -315,7 +318,7 @@ class MatrixClientManager {
   /// [timeout] 等待首次同步的超时时间
   /// [fullState] 是否获取完整状态
   Future<void> startSync({
-    Duration timeout = const Duration(seconds: 30),
+    Duration timeout = const Duration(seconds: 8),
     bool fullState = false,
   }) async {
     _ensureInitialized();

@@ -384,21 +384,22 @@ class AuthRepositoryImpl implements IAuthRepository {
     if (userId == null) return null;
 
     try {
-      final profile =
-          await _authDataSource.clientManager.getUserProfile(userId);
+      // 并行请求标准资料和自定义资料
+      final results = await Future.wait([
+        _authDataSource.clientManager.getUserProfile(userId),
+        getUserProfileData(),
+      ]);
+      final profile = results[0] as Profile;
 
       // 手动构建头像 HTTP URL
       String? avatarHttpUrl;
       if (profile.avatarUrl != null) {
         avatarHttpUrl = _buildAvatarHttpUrl(profile.avatarUrl.toString(), client);
       }
-      
+
       // 缓存头像和显示名
       _cachedAvatarUrl = avatarHttpUrl;
       _cachedDisplayName = profile.displayName ?? userId.localpart ?? '';
-      
-      // 加载自定义资料数据
-      await getUserProfileData();
       
       final profileData = _cachedProfileData ?? {};
 
