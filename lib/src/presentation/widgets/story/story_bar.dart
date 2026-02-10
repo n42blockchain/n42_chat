@@ -178,7 +178,7 @@ class StoryBar extends StatelessWidget {
           SizedBox(
             width: avatarSize + 10,
             child: Text(
-              AppLocalizations.of(context)?.storyMyStory ?? 'My Story',
+              S.of(context)?.storyMyStory ?? 'My Story',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
