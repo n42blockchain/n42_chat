@@ -4972,4 +4972,7 @@ class SRu extends S {
 
   @override
   String get gameLines => 'Линии';
+
+  @override
+  String get storyMyStory => '我的动态';
 }

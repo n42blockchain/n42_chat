@@ -4,6 +4,7 @@
 library;
 
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -134,12 +135,14 @@ class WebRTCService {
   
   // 通话计时器
   Timer? _durationTimer;
+  Timer? _callTimeoutTimer;
   
   // ICE 候选缓存
   final List<RTCIceCandidate> _pendingCandidates = [];
 
   // 已处理的 callId 集合（防止 to-device 和 timeline 双通道重复处理）
-  final Set<String> _processedCallIds = {};
+  // 使用 LinkedHashSet 保证插入顺序，evict 时移除最老的条目
+  final LinkedHashSet<String> _processedCallIds = LinkedHashSet<String>();
   
   WebRTCService(this._client) : _config = VoIPConfig();
   
@@ -175,6 +178,7 @@ class WebRTCService {
     await localRenderer.dispose();
     await remoteRenderer.dispose();
     _durationTimer?.cancel();
+    _callTimeoutTimer?.cancel();
     debugPrint('WebRTCService: Disposed');
   }
   
@@ -517,17 +521,17 @@ class WebRTCService {
     required bool isMissed,
   }) async {
     try {
-      // 构建人类可读的消息文本
+      // 构建 fallback 消息文本（英文，实际客户端应按结构化字段渲染）
       String body;
       if (isMissed) {
-        body = isVideo ? '未接视频通话' : '未接语音通话';
+        body = isVideo ? 'Missed video call' : 'Missed voice call';
       } else if (durationSeconds > 0) {
         final minutes = durationSeconds ~/ 60;
         final seconds = durationSeconds % 60;
         final durationStr = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-        body = '通话时长 $durationStr';
+        body = 'Call duration $durationStr';
       } else {
-        body = isVideo ? '视频通话已取消' : '语音通话已取消';
+        body = isVideo ? 'Video call cancelled' : 'Voice call cancelled';
       }
 
       await room.sendEvent({
@@ -1216,6 +1220,8 @@ class WebRTCService {
 
     _durationTimer?.cancel();
     _durationTimer = null;
+    _callTimeoutTimer?.cancel();
+    _callTimeoutTimer = null;
 
     // 停止所有本地媒体轨道
     try {
@@ -1274,7 +1280,8 @@ class WebRTCService {
   
   /// 启动通话超时计时器
   void _startCallTimeout() {
-    Future.delayed(Duration(seconds: _config.callTimeout), () {
+    _callTimeoutTimer?.cancel();
+    _callTimeoutTimer = Timer(Duration(seconds: _config.callTimeout), () {
       if (_state == CallState.ringing) {
         debugPrint('WebRTCService: Call timeout');
         hangup(reason: 'invite_timeout');

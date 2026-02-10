@@ -4978,4 +4978,7 @@ class SPl extends S {
 
   @override
   String get gameLines => 'Linie';
+
+  @override
+  String get storyMyStory => '我的动态';
 }

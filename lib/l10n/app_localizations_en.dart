@@ -4956,4 +4956,7 @@ class SEn extends S {
 
   @override
   String get gameLines => 'Lines';
+
+  @override
+  String get storyMyStory => 'My Story';
 }

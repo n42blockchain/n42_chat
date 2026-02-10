@@ -4982,4 +4982,7 @@ class SDe extends S {
 
   @override
   String get gameLines => 'Reihen';
+
+  @override
+  String get storyMyStory => '我的动态';
 }

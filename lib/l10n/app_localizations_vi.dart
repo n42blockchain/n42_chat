@@ -4937,4 +4937,7 @@ class SVi extends S {
 
   @override
   String get gameLines => 'Hàng';
+
+  @override
+  String get storyMyStory => '我的动态';
 }

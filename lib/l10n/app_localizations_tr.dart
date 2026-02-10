@@ -4958,4 +4958,7 @@ class STr extends S {
 
   @override
   String get gameLines => 'Satır';
+
+  @override
+  String get storyMyStory => '我的动态';
 }

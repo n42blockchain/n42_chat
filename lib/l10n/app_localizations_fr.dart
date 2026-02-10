@@ -5005,4 +5005,7 @@ class SFr extends S {
 
   @override
   String get gameLines => 'Lignes';
+
+  @override
+  String get storyMyStory => '我的动态';
 }

@@ -2503,5 +2503,6 @@
   "gameNext": "下一个",
   "gameBestTime": "最佳用时",
   "gameNewRecord": "新纪录！",
-  "gameLines": "行数"
+  "gameLines": "行数",
+  "storyMyStory": "我的动态"
 }
