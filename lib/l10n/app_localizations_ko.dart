@@ -4885,4 +4885,7 @@ class SKo extends S {
 
   @override
   String get gameLines => '라인';
+
+  @override
+  String get storyMyStory => '我的动态';
 }

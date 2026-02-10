@@ -4960,4 +4960,7 @@ class SId extends S {
 
   @override
   String get gameLines => 'Baris';
+
+  @override
+  String get storyMyStory => '我的动态';
 }

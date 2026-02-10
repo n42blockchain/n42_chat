@@ -4986,4 +4986,7 @@ class SEs extends S {
 
   @override
   String get gameLines => 'Líneas';
+
+  @override
+  String get storyMyStory => '我的动态';
 }

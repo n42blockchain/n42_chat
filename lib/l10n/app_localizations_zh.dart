@@ -4866,4 +4866,7 @@ class SZh extends S {
 
   @override
   String get gameLines => '行数';
+
+  @override
+  String get storyMyStory => '我的动态';
 }

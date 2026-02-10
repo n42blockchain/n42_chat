@@ -4965,4 +4965,7 @@ class SIt extends S {
 
   @override
   String get gameLines => 'Righe';
+
+  @override
+  String get storyMyStory => '我的动态';
 }

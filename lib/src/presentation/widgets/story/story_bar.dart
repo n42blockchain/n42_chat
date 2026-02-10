@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/story_entity.dart';
@@ -177,7 +178,7 @@ class StoryBar extends StatelessWidget {
           SizedBox(
             width: avatarSize + 10,
             child: Text(
-              'My Story',
+              AppLocalizations.of(context)?.storyMyStory ?? 'My Story',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,

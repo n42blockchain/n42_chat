@@ -9210,6 +9210,12 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'行数'**
   String get gameLines;
+
+  /// No description provided for @storyMyStory.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的动态'**
+  String get storyMyStory;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

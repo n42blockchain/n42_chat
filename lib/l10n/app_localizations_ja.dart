@@ -4885,4 +4885,7 @@ class SJa extends S {
 
   @override
   String get gameLines => 'ライン';
+
+  @override
+  String get storyMyStory => '我的动态';
 }
