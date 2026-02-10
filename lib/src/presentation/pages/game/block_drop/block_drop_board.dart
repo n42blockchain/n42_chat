@@ -117,7 +117,15 @@ class _BoardPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _BoardPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _BoardPainter oldDelegate) {
+    if (oldDelegate.cellSize != cellSize) return true;
+    for (int r = 0; r < board.length; r++) {
+      for (int c = 0; c < board[r].length; c++) {
+        if (oldDelegate.board[r][c] != board[r][c]) return true;
+      }
+    }
+    return false;
+  }
 }
 
 class NextPieceWidget extends StatelessWidget {

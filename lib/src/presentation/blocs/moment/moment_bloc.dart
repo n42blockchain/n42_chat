@@ -14,6 +14,9 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
 
   StreamSubscription<List<MomentEntity>>? _momentsSubscription;
 
+  /// 正在处理中的点赞/取消点赞操作（防止重复请求）
+  final Set<String> _pendingLikeOps = {};
+
   MomentBloc(this._momentRepository) : super(MomentState.initial()) {
     on<LoadMoments>(_onLoadMoments);
     on<LoadMoreMoments>(_onLoadMoreMoments);
@@ -34,8 +37,10 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
   }
 
   @override
-  Future<void> close() {
-    _momentsSubscription?.cancel();
+  Future<void> close() async {
+    await _momentsSubscription?.cancel();
+    _momentsSubscription = null;
+    _pendingLikeOps.clear();
     return super.close();
   }
 
@@ -264,6 +269,10 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     LikeMoment event,
     Emitter<MomentState> emit,
   ) async {
+    // 防止重复点赞操作
+    if (_pendingLikeOps.contains(event.momentId)) return;
+    _pendingLikeOps.add(event.momentId);
+
     // 乐观更新：同时更新 isLikedByMe 和 likes 列表
     final client = MatrixClientManager.instance.client;
     final currentUserId = client?.userID ?? '';
@@ -312,6 +321,8 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
         moments: revertedMoments,
         errorMessage: e.toString(),
       ));
+    } finally {
+      _pendingLikeOps.remove(event.momentId);
     }
   }
 
@@ -320,6 +331,10 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     UnlikeMoment event,
     Emitter<MomentState> emit,
   ) async {
+    // 防止重复操作
+    if (_pendingLikeOps.contains(event.momentId)) return;
+    _pendingLikeOps.add(event.momentId);
+
     final currentUserId = MatrixClientManager.instance.client?.userID ?? '';
 
     // 保存原始 likes 用于回滚
@@ -346,6 +361,8 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
         moments: originalMoments,
         errorMessage: e.toString(),
       ));
+    } finally {
+      _pendingLikeOps.remove(event.momentId);
     }
   }
 

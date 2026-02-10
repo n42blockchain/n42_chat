@@ -137,13 +137,17 @@ class WebRTCService {
   Timer? _durationTimer;
   Timer? _callTimeoutTimer;
   
-  // ICE 候选缓存
+  // ICE 候选缓存（限制大小防止内存泄漏）
+  static const int _maxPendingCandidates = 100;
   final List<RTCIceCandidate> _pendingCandidates = [];
 
   // 已处理的 callId 集合（防止 to-device 和 timeline 双通道重复处理）
   // 使用 LinkedHashSet 保证插入顺序，evict 时移除最老的条目
   final LinkedHashSet<String> _processedCallIds = LinkedHashSet<String>();
-  
+
+  // 清理锁：防止并发清理导致竞态
+  bool _isCleaningUp = false;
+
   WebRTCService(this._client) : _config = VoIPConfig();
   
   // ============================================
@@ -284,6 +288,10 @@ class WebRTCService {
 
     // 如果是从 ended/failed 状态发起，先清理旧资源再重置
     if (_state == CallState.ended || _state == CallState.failed) {
+      if (_isCleaningUp) {
+        debugPrint('WebRTCService: Still cleaning up, rejecting new call');
+        return false;
+      }
       debugPrint('WebRTCService: Cleaning up from $_state state before new call');
       await _cleanup();
     }
@@ -378,6 +386,7 @@ class WebRTCService {
 
     if (_peerConnection == null) {
       debugPrint('WebRTCService: ERROR - PeerConnection is null!');
+      await _cleanup();
       onError?.call('answer_failed');
       return false;
     }
@@ -1081,6 +1090,10 @@ class WebRTCService {
           await _peerConnection?.addCandidate(candidate);
           debugPrint('WebRTCService: Added ICE candidate');
         } else {
+          if (_pendingCandidates.length >= _maxPendingCandidates) {
+            debugPrint('WebRTCService: Pending candidates limit reached, dropping oldest');
+            _pendingCandidates.removeAt(0);
+          }
           _pendingCandidates.add(candidate);
           debugPrint('WebRTCService: Cached ICE candidate (no remote description yet)');
         }
@@ -1216,6 +1229,8 @@ class WebRTCService {
   
   /// 清理资源
   Future<void> _cleanup() async {
+    if (_isCleaningUp) return;
+    _isCleaningUp = true;
     debugPrint('WebRTCService: Starting cleanup...');
 
     _durationTimer?.cancel();
@@ -1267,6 +1282,7 @@ class WebRTCService {
     // 立即重置状态为 idle
     _state = CallState.idle;
 
+    _isCleaningUp = false;
     debugPrint('WebRTCService: Cleanup completed, state reset to idle');
   }
   
