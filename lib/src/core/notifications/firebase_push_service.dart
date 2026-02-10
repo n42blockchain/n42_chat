@@ -760,7 +760,10 @@ class FirebasePushService implements IPushNotificationService {
           lang: 'en',
           data: matrix.PusherData(
             url: Uri.parse(pushGatewayUrl!),
-            format: 'event_id_only',
+            // iOS (APNs): 不使用 event_id_only，让 Sygnal 发送完整通知内容
+            // (包含 alert/sound/badge)，否则 APNs 只收到静默推送不会显示给用户。
+            // Android (FCM): 使用 event_id_only，由 Firebase onBackgroundMessage 处理。
+            format: Platform.isIOS ? null : 'event_id_only',
           ),
         ),
         append: false,
