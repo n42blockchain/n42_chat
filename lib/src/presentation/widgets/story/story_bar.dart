@@ -91,7 +91,7 @@ class StoryBar extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(
           horizontal: horizontalPadding,
-          vertical: (height - avatarSize - 24) / 2, // 24 = 名称文本高度 + 间距
+          vertical: (height - (avatarSize + 10) - 24) / 2, // +10 = ring空间, 24 = 间距6 + 文本高度~18
         ),
         itemCount: userStories.length + 1, // +1 for "My Story"
         itemBuilder: (context, index) {

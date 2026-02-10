@@ -132,7 +132,7 @@ class WeChatMessageMenu extends StatelessWidget {
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     // 菜单高度增加表情栏的高度（约60）
-    const menuHeight = 190.0;
+    const menuHeight = 260.0;
     const padding = 8.0;
     
     // 可用高度（减去键盘高度和安全区域）
@@ -280,13 +280,13 @@ class WeChatMessageMenu extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.1),
           ),
           
-          // 第二行按钮
+          // 第二行按钮（使用 Wrap 自动换行防止溢出）
           Padding(
-            padding: const EdgeInsets.only(bottom: 12, left: 8, right: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+            padding: const EdgeInsets.only(bottom: 12, left: 16, right: 8),
+            child: Wrap(
+              spacing: 4,
+              runSpacing: 4,
               children: [
-                const SizedBox(width: 8),
                 _buildMenuItem(
                   icon: Icons.format_quote_outlined,
                   label: S.of(context)?.commonQuote ?? 'Quote',
@@ -295,7 +295,6 @@ class WeChatMessageMenu extends StatelessWidget {
                     onQuote?.call();
                   },
                 ),
-                const SizedBox(width: 20),
                 // 编辑消息（仅自己发送的文本消息）
                 if (message.isFromMe && message.type == MessageType.text && onEdit != null)
                   _buildMenuItem(
@@ -306,7 +305,6 @@ class WeChatMessageMenu extends StatelessWidget {
                       onEdit?.call();
                     },
                   ),
-                if (message.isFromMe && message.type == MessageType.text && onEdit != null) const SizedBox(width: 20),
                 // 在线程中回复
                 if (onReplyInThread != null)
                   _buildMenuItem(
@@ -317,7 +315,6 @@ class WeChatMessageMenu extends StatelessWidget {
                       onReplyInThread?.call();
                     },
                   ),
-                if (onReplyInThread != null) const SizedBox(width: 20),
                 // 翻译按钮（仅文本消息显示）
                 if (message.type == MessageType.text && onTranslate != null)
                   _buildMenuItem(
@@ -328,7 +325,6 @@ class WeChatMessageMenu extends StatelessWidget {
                       onTranslate?.call();
                     },
                   ),
-                if (message.type == MessageType.text && onTranslate != null) const SizedBox(width: 20),
                 // 编辑历史按钮（当消息已编辑时显示）
                 if (message.isEdited && onViewEditHistory != null)
                   _buildMenuItem(
@@ -339,7 +335,6 @@ class WeChatMessageMenu extends StatelessWidget {
                       onViewEditHistory?.call();
                     },
                   ),
-                if (message.isEdited && onViewEditHistory != null) const SizedBox(width: 20),
                 // 置顶/取消置顶按钮（仅在有权限时显示）
                 if (canPin)
                   isPinned
@@ -360,7 +355,6 @@ class WeChatMessageMenu extends StatelessWidget {
                             onPin?.call();
                           },
                         ),
-                if (canPin) const SizedBox(width: 20),
                 _buildMenuItem(
                   icon: Icons.notifications_outlined,
                   label: S.of(context)?.commonRemind ?? 'Remind',
@@ -369,7 +363,6 @@ class WeChatMessageMenu extends StatelessWidget {
                     onRemind?.call();
                   },
                 ),
-                const SizedBox(width: 20),
                 _buildMenuItem(
                   icon: Icons.search,
                   label: S.of(context)?.commonSearch ?? 'Search',

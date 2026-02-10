@@ -17,12 +17,14 @@ class _CallEventData {
   final String senderId;
   final String roomId;
   final Map<String, dynamic> content;
+  final DateTime? originServerTs;
 
   _CallEventData({
     required this.type,
     required this.senderId,
     required this.roomId,
     required this.content,
+    this.originServerTs,
   });
 }
 
@@ -135,6 +137,9 @@ class WebRTCService {
   
   // ICE 候选缓存
   final List<RTCIceCandidate> _pendingCandidates = [];
+
+  // 已处理的 callId 集合（防止 to-device 和 timeline 双通道重复处理）
+  final Set<String> _processedCallIds = {};
   
   WebRTCService(this._client) : _config = VoIPConfig();
   
@@ -227,12 +232,13 @@ class WebRTCService {
 
     debugPrint('WebRTCService: Room call event $eventType from $senderId in $roomId');
 
-    // 创建一个简化的事件对象用于处理
+    // 创建一个简化的事件对象用于处理（携带时间戳用于过期检查）
     final eventData = _CallEventData(
       type: eventType,
       senderId: senderId,
       roomId: roomId,
       content: event.content,
+      originServerTs: event.originServerTs,
     );
 
     switch (eventType) {
@@ -321,16 +327,21 @@ class WebRTCService {
         throw Exception('Room not found');
       }
       
-      await room.sendEvent({
-        'call_id': callId,
-        'party_id': _client.deviceID,
-        'version': '1',
-        'lifetime': _config.callTimeout * 1000,
-        'offer': {
-          'type': 'offer',
-          'sdp': offer.sdp,
+      await _sendCallEvent(
+        room: room,
+        type: 'm.call.invite',
+        content: {
+          'call_id': callId,
+          'party_id': _client.deviceID,
+          'version': '1',
+          'lifetime': _config.callTimeout * 1000,
+          'offer': {
+            'type': 'offer',
+            'sdp': offer.sdp,
+          },
         },
-      }, type: 'm.call.invite');
+        targetUserId: peerId,
+      );
       
       debugPrint('WebRTCService: Call invite sent');
       
@@ -391,15 +402,19 @@ class WebRTCService {
       }
 
       debugPrint('WebRTCService: Sending m.call.answer');
-      await room.sendEvent({
-        'call_id': _currentSession!.callId,
-        'party_id': _client.deviceID,
-        'version': '1',
-        'answer': {
-          'type': 'answer',
-          'sdp': answer.sdp,
+      await _sendCallEvent(
+        room: room,
+        type: 'm.call.answer',
+        content: {
+          'call_id': _currentSession!.callId,
+          'party_id': _client.deviceID,
+          'version': '1',
+          'answer': {
+            'type': 'answer',
+            'sdp': answer.sdp,
+          },
         },
-      }, type: 'm.call.answer');
+      );
 
       // 处理缓存的 ICE 候选
       debugPrint('WebRTCService: Processing pending candidates');
@@ -424,12 +439,16 @@ class WebRTCService {
     try {
       final room = _client.getRoomById(_currentSession!.roomId);
       if (room != null) {
-        await room.sendEvent({
-          'call_id': _currentSession!.callId,
-          'party_id': _client.deviceID,
-          'version': '1',
-          'reason': 'user_busy',
-        }, type: 'm.call.reject');
+        await _sendCallEvent(
+          room: room,
+          type: 'm.call.reject',
+          content: {
+            'call_id': _currentSession!.callId,
+            'party_id': _client.deviceID,
+            'version': '1',
+            'reason': 'user_busy',
+          },
+        );
       }
     } catch (e) {
       debugPrint('WebRTCService: Reject call failed: $e');
@@ -457,15 +476,19 @@ class WebRTCService {
     try {
       final room = _client.getRoomById(roomId);
       if (room != null) {
-        // 发送 m.call.hangup 控制事件
-        await room.sendEvent({
-          'call_id': _currentSession!.callId,
-          'party_id': _client.deviceID,
-          'version': '1',
-          'reason': reason,
-          'duration': durationSeconds,
-          'call_type': isVideo ? 'video' : 'voice',
-        }, type: 'm.call.hangup');
+        // 发送 m.call.hangup 控制事件（双通道）
+        await _sendCallEvent(
+          room: room,
+          type: 'm.call.hangup',
+          content: {
+            'call_id': _currentSession!.callId,
+            'party_id': _client.deviceID,
+            'version': '1',
+            'reason': reason,
+            'duration': durationSeconds,
+            'call_type': isVideo ? 'video' : 'voice',
+          },
+        );
 
         // 发送通话记录消息（作为普通消息显示在聊天中）
         final isMissed = reason == 'invite_timeout' || reason == 'no_answer';
@@ -522,9 +545,28 @@ class WebRTCService {
   }
   
   // ============================================
+  // 通话事件发送
+  // ============================================
+
+  /// 发送通话信令事件
+  ///
+  /// 参照 Matrix SDK (call_session.dart) 的 P2P 通话实现：
+  /// P2P 通话仅通过房间事件发送，由 SDK 自动处理 Megolm 加密。
+  /// 不使用 sendToDeviceEncrypted，避免干扰 Olm 会话状态
+  /// 导致 Megolm 密钥分发失败。
+  Future<void> _sendCallEvent({
+    required matrix.Room room,
+    required String type,
+    required Map<String, dynamic> content,
+    String? targetUserId,
+  }) async {
+    await room.sendEvent(content, type: type);
+  }
+
+  // ============================================
   // 通话控制
   // ============================================
-  
+
   /// 静音/取消静音
   void toggleMute() {
     if (_localStream == null) return;
@@ -764,25 +806,29 @@ class WebRTCService {
     debugPrint('WebRTCService: Added ${_localStream!.getTracks().length} local tracks');
   }
   
-  /// 发送 ICE 候选
+  /// 发送 ICE 候选（双通道）
   Future<void> _sendIceCandidate(RTCIceCandidate candidate) async {
     if (_currentSession == null) return;
-    
+
     try {
       final room = _client.getRoomById(_currentSession!.roomId);
       if (room != null) {
-        await room.sendEvent({
-          'call_id': _currentSession!.callId,
-          'party_id': _client.deviceID,
-          'version': '1',
-          'candidates': [
-            {
-              'candidate': candidate.candidate,
-              'sdpMid': candidate.sdpMid,
-              'sdpMLineIndex': candidate.sdpMLineIndex,
-            }
-          ],
-        }, type: 'm.call.candidates');
+        await _sendCallEvent(
+          room: room,
+          type: 'm.call.candidates',
+          content: {
+            'call_id': _currentSession!.callId,
+            'party_id': _client.deviceID,
+            'version': '1',
+            'candidates': [
+              {
+                'candidate': candidate.candidate,
+                'sdpMid': candidate.sdpMid,
+                'sdpMLineIndex': candidate.sdpMLineIndex,
+              }
+            ],
+          },
+        );
       }
     } catch (e) {
       debugPrint('WebRTCService: Failed to send ICE candidate: $e');
@@ -800,15 +846,23 @@ class WebRTCService {
   /// 处理来电邀请（来自 to-device 事件）
   Future<void> _handleCallInvite(matrix.BasicEventWithSender event) async {
     // 尝试从多个位置获取 room_id
-    final roomId = event.content['room_id'] as String? ??
+    var roomId = event.content['room_id'] as String? ??
         event.content['roomId'] as String? ??
         '';
     debugPrint('WebRTCService: _handleCallInvite to-device event, content keys: ${event.content.keys}, room_id=$roomId');
 
-    // 如果 roomId 为空，跳过（房间事件会有正确的 roomId）
+    // 如果 roomId 为空，尝试通过 senderId 查找 DM 房间
     if (roomId.isEmpty) {
-      debugPrint('WebRTCService: Skipping to-device call invite without room_id');
-      return;
+      final senderId = event.senderId;
+      debugPrint('WebRTCService: room_id missing, trying to find DM room for $senderId');
+      final dmRoom = _client.getDirectChatFromUserId(senderId);
+      if (dmRoom != null) {
+        roomId = dmRoom;
+        debugPrint('WebRTCService: Found DM room $roomId for $senderId');
+      } else {
+        debugPrint('WebRTCService: No DM room found for $senderId, skipping call invite');
+        return;
+      }
     }
 
     final eventData = _CallEventData(
@@ -823,19 +877,6 @@ class WebRTCService {
   /// 处理来电邀请（统一处理）
   Future<void> _handleCallInviteFromRoom(_CallEventData event) async {
     debugPrint('WebRTCService: _handleCallInviteFromRoom called - state=$_state, senderId=${event.senderId}, roomId=${event.roomId}');
-
-    // 允许在 idle、ended、failed 状态时接收来电
-    if (_state != CallState.idle && _state != CallState.ended && _state != CallState.failed) {
-      debugPrint('WebRTCService: Already in a call (state: $_state), rejecting');
-      // 自动拒绝
-      return;
-    }
-
-    // 如果是从 ended/failed 状态接收来电，先清理旧资源再重置
-    if (_state == CallState.ended || _state == CallState.failed) {
-      debugPrint('WebRTCService: Cleaning up from $_state state for incoming call');
-      await _cleanup();
-    }
 
     final senderId = event.senderId;
     final roomId = event.roomId;
@@ -855,6 +896,39 @@ class WebRTCService {
     if (senderId == _client.userID) {
       debugPrint('WebRTCService: Ignoring own call invite');
       return;
+    }
+
+    // 检查通话邀请是否已过期（默认 lifetime 60 秒）
+    final lifetime = content['lifetime'] as int? ?? 60000;
+    if (event.originServerTs != null) {
+      final age = DateTime.now().difference(event.originServerTs!).inMilliseconds;
+      if (age > lifetime) {
+        debugPrint('WebRTCService: Ignoring expired call invite (age: ${age}ms, lifetime: ${lifetime}ms)');
+        return;
+      }
+    }
+
+    // 防止 to-device 和 timeline 双通道重复处理同一通话
+    if (_processedCallIds.contains(callId)) {
+      debugPrint('WebRTCService: Call $callId already processed, skipping duplicate');
+      return;
+    }
+    _processedCallIds.add(callId);
+    // 限制集合大小，避免内存泄漏
+    if (_processedCallIds.length > 50) {
+      _processedCallIds.remove(_processedCallIds.first);
+    }
+
+    // 允许在 idle、ended、failed 状态时接收来电
+    if (_state != CallState.idle && _state != CallState.ended && _state != CallState.failed) {
+      debugPrint('WebRTCService: Already in a call (state: $_state), rejecting');
+      return;
+    }
+
+    // 如果是从 ended/failed 状态接收来电，先清理旧资源再重置
+    if (_state == CallState.ended || _state == CallState.failed) {
+      debugPrint('WebRTCService: Cleaning up from $_state state for incoming call');
+      await _cleanup();
     }
 
     try {
@@ -1056,25 +1130,31 @@ class WebRTCService {
 
     debugPrint('WebRTCService: Remote party hung up');
 
-    // 发送通话记录消息
+    // 缓存通话信息用于发送记录（cleanup 会清空 session）
     final durationSeconds = _currentSession!.duration.inSeconds;
     final isVideo = _currentSession!.type == CallType.video;
-    // 如果是来电状态（还没接听）且对方取消，视为未接来电
     final isMissed = _state == CallState.incoming;
-    final room = _client.getRoomById(_currentSession!.roomId);
-    if (room != null) {
-      await _sendCallRecordMessage(
-        room: room,
-        isVideo: isVideo,
-        durationSeconds: durationSeconds,
-        isMissed: isMissed,
-      );
-    }
+    final roomId = _currentSession!.roomId;
 
-    // 先通知 UI 通话结束
-    onStateChanged?.call(CallState.ended);
+    // 先通知 UI 通话结束，确保 CallScreen 能及时关闭
+    _setState(CallState.ended);
     // 然后清理资源
     await _cleanup();
+
+    // 异步发送通话记录（不阻塞 UI 关闭流程）
+    try {
+      final room = _client.getRoomById(roomId);
+      if (room != null) {
+        await _sendCallRecordMessage(
+          room: room,
+          isVideo: isVideo,
+          durationSeconds: durationSeconds,
+          isMissed: isMissed,
+        );
+      }
+    } catch (e) {
+      debugPrint('WebRTCService: Failed to send call record: $e');
+    }
   }
 
   /// 处理拒绝（来自 to-device 事件）
