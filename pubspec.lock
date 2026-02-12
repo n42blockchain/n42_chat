@@ -852,10 +852,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_vodozemac
-      sha256: "16d4b44dd338689441fe42a80d0184e5c864e9563823de9e7e6371620d2c0590"
+      sha256: ef4c3580a7f2fe8eebb7602c6cba593a42b4a5e5466c372a022f77ccc14914a5
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.1"
+    version: "0.5.0"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -1017,18 +1017,18 @@ packages:
     dependency: transitive
     description:
       name: google_mlkit_commons
-      sha256: "7e9a6d6e66b44aa8cfe944bda9bc3346c52486dd890ca49e5bc98845cda40d7f"
+      sha256: "3e69fea4211727732cc385104e675ad1e40b29f12edd492ee52fa108423a6124"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.0"
+    version: "0.11.1"
   google_mlkit_face_detection:
     dependency: "direct main"
     description:
       name: google_mlkit_face_detection
-      sha256: "65988405c884fd84a4ccc8bded7b5e3e4c33362f6f4eaaa94818bdaaba7bab7d"
+      sha256: "7b6ddcc69dbd6fbfa313fb2d974ad0f0c3a0d1657560f0da6be465baf1889687"
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.0"
+    version: "0.13.2"
   google_sign_in:
     dependency: "direct main"
     description:
@@ -1385,10 +1385,10 @@ packages:
     dependency: "direct main"
     description:
       name: matrix
-      sha256: f1c0cc366a8cd0b9aec6b57f81203c4d9aa9f92793f7ac12ae50410648b070e4
+      sha256: c0214ee99a73957d3c02d54a60afcf9acee577b0924749085d6fdf556e8eba42
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.0"
+    version: "6.1.1"
   meta:
     dependency: transitive
     description:
@@ -2406,10 +2406,10 @@ packages:
     dependency: transitive
     description:
       name: vodozemac
-      sha256: "39144e20740807731871c9248d811ed5a037b21d0aa9ffcfa630954de74139d9"
+      sha256: bbe7dd31d7f623e2aeedb92e4b71a8b519e6109ce1e2911b5a220f6752b65cda
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.5.0"
   wakelock_plus:
     dependency: "direct main"
     description:
