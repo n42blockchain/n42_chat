@@ -436,6 +436,12 @@ class SId extends S {
   String get authEnterUsername => 'Masukkan nama pengguna';
 
   @override
+  String get authUsernameOrEmail => 'Nama Pengguna atau Email';
+
+  @override
+  String get authEnterUsernameOrEmail => 'Masukkan nama pengguna atau email';
+
+  @override
   String get authPassword => 'Kata Sandi';
 
   @override

@@ -436,6 +436,12 @@ class SIt extends S {
   String get authEnterUsername => 'Inserisci nome utente';
 
   @override
+  String get authUsernameOrEmail => 'Nome utente o Email';
+
+  @override
+  String get authEnterUsernameOrEmail => 'Inserisci nome utente o email';
+
+  @override
   String get authPassword => 'Password';
 
   @override

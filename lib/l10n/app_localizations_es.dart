@@ -438,6 +438,12 @@ class SEs extends S {
   String get authEnterUsername => 'Ingresa nombre de usuario';
 
   @override
+  String get authUsernameOrEmail => 'Usuario o Email';
+
+  @override
+  String get authEnterUsernameOrEmail => 'Ingresa usuario o email';
+
+  @override
   String get authPassword => 'Contrasena';
 
   @override

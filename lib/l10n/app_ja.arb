@@ -154,6 +154,8 @@
   "authConnectedTo": "{serverName}に接続済み",
   "authUsername": "ユーザー名",
   "authEnterUsername": "ユーザー名を入力",
+  "authUsernameOrEmail": "ユーザー名またはメール",
+  "authEnterUsernameOrEmail": "ユーザー名またはメールを入力",
   "authPassword": "パスワード",
   "authEnterPassword": "パスワードを入力",
   "authRegisterAccount": "新規登録",

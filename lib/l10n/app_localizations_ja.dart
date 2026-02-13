@@ -429,6 +429,12 @@ class SJa extends S {
   String get authEnterUsername => 'ユーザー名を入力';
 
   @override
+  String get authUsernameOrEmail => 'ユーザー名またはメール';
+
+  @override
+  String get authEnterUsernameOrEmail => 'ユーザー名またはメールを入力';
+
+  @override
   String get authPassword => 'パスワード';
 
   @override

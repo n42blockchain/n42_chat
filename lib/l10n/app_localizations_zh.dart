@@ -429,6 +429,12 @@ class SZh extends S {
   String get authEnterUsername => '请输入用户名';
 
   @override
+  String get authUsernameOrEmail => '用户名或邮箱';
+
+  @override
+  String get authEnterUsernameOrEmail => '请输入用户名或邮箱';
+
+  @override
   String get authPassword => '密码';
 
   @override

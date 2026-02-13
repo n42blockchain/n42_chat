@@ -154,6 +154,8 @@
   "authConnectedTo": "{serverName} sunucusuna bağlandı",
   "authUsername": "Kullanıcı Adı",
   "authEnterUsername": "Kullanıcı adı girin",
+  "authUsernameOrEmail": "Kullanıcı Adı veya E-posta",
+  "authEnterUsernameOrEmail": "Kullanıcı adı veya e-posta girin",
   "authPassword": "Şifre",
   "authEnterPassword": "Şifre girin",
   "authRegisterAccount": "Kayıt Ol",

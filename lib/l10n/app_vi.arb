@@ -154,6 +154,8 @@
   "authConnectedTo": "Da ket noi toi {serverName}",
   "authUsername": "Ten dang nhap",
   "authEnterUsername": "Nhap ten dang nhap",
+  "authUsernameOrEmail": "Ten dang nhap hoac Email",
+  "authEnterUsernameOrEmail": "Nhap ten dang nhap hoac email",
   "authPassword": "Mat khau",
   "authEnterPassword": "Nhap mat khau",
   "authRegisterAccount": "Dang ky",

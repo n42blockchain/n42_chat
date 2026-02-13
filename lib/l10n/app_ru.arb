@@ -154,6 +154,8 @@
   "authConnectedTo": "Подключено к {serverName}",
   "authUsername": "Имя пользователя",
   "authEnterUsername": "Введите имя пользователя",
+  "authUsernameOrEmail": "Имя пользователя или Email",
+  "authEnterUsernameOrEmail": "Введите имя пользователя или email",
   "authPassword": "Пароль",
   "authEnterPassword": "Введите пароль",
   "authRegisterAccount": "Зарегистрироваться",
