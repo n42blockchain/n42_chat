@@ -160,6 +160,8 @@
   "authConnectedTo": "Connected to {serverName}",
   "authUsername": "Username",
   "authEnterUsername": "Enter username",
+  "authUsernameOrEmail": "Username or Email",
+  "authEnterUsernameOrEmail": "Enter username or email",
   "authPassword": "Password",
   "authEnterPassword": "Enter password",
   "authRegisterAccount": "Sign Up",

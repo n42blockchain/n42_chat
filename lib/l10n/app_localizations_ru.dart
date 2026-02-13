@@ -439,6 +439,12 @@ class SRu extends S {
   String get authEnterUsername => 'Введите имя пользователя';
 
   @override
+  String get authUsernameOrEmail => 'Имя пользователя или Email';
+
+  @override
+  String get authEnterUsernameOrEmail => 'Введите имя пользователя или email';
+
+  @override
   String get authPassword => 'Пароль';
 
   @override

@@ -435,6 +435,12 @@ class SDe extends S {
   String get authEnterUsername => 'Benutzername eingeben';
 
   @override
+  String get authUsernameOrEmail => 'Benutzername oder E-Mail';
+
+  @override
+  String get authEnterUsernameOrEmail => 'Benutzername oder E-Mail eingeben';
+
+  @override
   String get authPassword => 'Passwort';
 
   @override

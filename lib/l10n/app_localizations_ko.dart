@@ -430,6 +430,12 @@ class SKo extends S {
   String get authEnterUsername => '아이디 입력';
 
   @override
+  String get authUsernameOrEmail => '아이디 또는 이메일';
+
+  @override
+  String get authEnterUsernameOrEmail => '아이디 또는 이메일 입력';
+
+  @override
   String get authPassword => '비밀번호';
 
   @override

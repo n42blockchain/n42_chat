@@ -433,6 +433,12 @@ class SEn extends S {
   String get authEnterUsername => 'Enter username';
 
   @override
+  String get authUsernameOrEmail => 'Username or Email';
+
+  @override
+  String get authEnterUsernameOrEmail => 'Enter username or email';
+
+  @override
   String get authPassword => 'Password';
 
   @override

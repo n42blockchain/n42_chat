@@ -154,6 +154,8 @@
   "authConnectedTo": "Terhubung ke {serverName}",
   "authUsername": "Nama Pengguna",
   "authEnterUsername": "Masukkan nama pengguna",
+  "authUsernameOrEmail": "Nama Pengguna atau Email",
+  "authEnterUsernameOrEmail": "Masukkan nama pengguna atau email",
   "authPassword": "Kata Sandi",
   "authEnterPassword": "Masukkan kata sandi",
   "authRegisterAccount": "Daftar",

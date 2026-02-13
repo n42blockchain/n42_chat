@@ -438,6 +438,12 @@ class SPt extends S {
   String get authEnterUsername => 'Digite o nome de usuário';
 
   @override
+  String get authUsernameOrEmail => 'Usuário ou Email';
+
+  @override
+  String get authEnterUsernameOrEmail => 'Digite usuário ou email';
+
+  @override
   String get authPassword => 'Senha';
 
   @override

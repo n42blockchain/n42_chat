@@ -154,6 +154,8 @@
   "authConnectedTo": "{serverName}에 연결됨",
   "authUsername": "아이디",
   "authEnterUsername": "아이디 입력",
+  "authUsernameOrEmail": "아이디 또는 이메일",
+  "authEnterUsernameOrEmail": "아이디 또는 이메일 입력",
   "authPassword": "비밀번호",
   "authEnterPassword": "비밀번호 입력",
   "authRegisterAccount": "회원가입",

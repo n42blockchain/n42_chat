@@ -913,6 +913,18 @@ abstract class S {
   /// **'请输入用户名'**
   String get authEnterUsername;
 
+  /// No description provided for @authUsernameOrEmail.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名或邮箱'**
+  String get authUsernameOrEmail;
+
+  /// No description provided for @authEnterUsernameOrEmail.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入用户名或邮箱'**
+  String get authEnterUsernameOrEmail;
+
   /// No description provided for @authPassword.
   ///
   /// In zh, this message translates to:

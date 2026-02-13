@@ -437,6 +437,12 @@ class STr extends S {
   String get authEnterUsername => 'Kullanıcı adı girin';
 
   @override
+  String get authUsernameOrEmail => 'Kullanıcı Adı veya E-posta';
+
+  @override
+  String get authEnterUsernameOrEmail => 'Kullanıcı adı veya e-posta girin';
+
+  @override
   String get authPassword => 'Şifre';
 
   @override

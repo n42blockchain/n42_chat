@@ -438,6 +438,12 @@ class SPl extends S {
   String get authEnterUsername => 'Wprowadz nazwe uzytkownika';
 
   @override
+  String get authUsernameOrEmail => 'Nazwa użytkownika lub Email';
+
+  @override
+  String get authEnterUsernameOrEmail => 'Wprowadź nazwę użytkownika lub email';
+
+  @override
   String get authPassword => 'Haslo';
 
   @override

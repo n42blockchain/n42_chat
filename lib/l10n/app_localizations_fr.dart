@@ -439,6 +439,13 @@ class SFr extends S {
   String get authEnterUsername => 'Entrez le nom d\'utilisateur';
 
   @override
+  String get authUsernameOrEmail => 'Nom d\'utilisateur ou Email';
+
+  @override
+  String get authEnterUsernameOrEmail =>
+      'Entrez le nom d\'utilisateur ou email';
+
+  @override
   String get authPassword => 'Mot de passe';
 
   @override

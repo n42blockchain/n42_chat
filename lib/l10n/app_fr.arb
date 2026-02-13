@@ -154,6 +154,8 @@
   "authConnectedTo": "Connecte a {serverName}",
   "authUsername": "Nom d'utilisateur",
   "authEnterUsername": "Entrez le nom d'utilisateur",
+  "authUsernameOrEmail": "Nom d'utilisateur ou Email",
+  "authEnterUsernameOrEmail": "Entrez le nom d'utilisateur ou email",
   "authPassword": "Mot de passe",
   "authEnterPassword": "Entrez le mot de passe",
   "authRegisterAccount": "S'inscrire",

@@ -435,6 +435,12 @@ class SVi extends S {
   String get authEnterUsername => 'Nhap ten dang nhap';
 
   @override
+  String get authUsernameOrEmail => 'Ten dang nhap hoac Email';
+
+  @override
+  String get authEnterUsernameOrEmail => 'Nhap ten dang nhap hoac email';
+
+  @override
   String get authPassword => 'Mat khau';
 
   @override
