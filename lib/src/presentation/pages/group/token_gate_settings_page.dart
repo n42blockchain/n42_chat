@@ -48,7 +48,7 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
   }
 
   void _addRule() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       builder: (context) => _AddRuleSheet(

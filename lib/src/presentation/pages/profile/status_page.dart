@@ -266,7 +266,7 @@ class _StatusPageState extends State<StatusPage> {
   }
 
   void _showCustomStatusDialog() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.profileWriteStatus ?? 'Write Status'),

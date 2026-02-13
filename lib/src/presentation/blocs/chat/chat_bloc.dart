@@ -233,6 +233,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }).toList();
 
         if (!isClosed) {
+          // ignore: invalid_use_of_visible_for_testing_member
           emit(state.copyWith(messages: updatedMessages));
         }
       } catch (e) {
@@ -1703,6 +1704,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           // 将定时消息添加到消息列表末尾（按时间排序）
           final allMessages = [...state.messages, ...tempMessages];
           allMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          // ignore: invalid_use_of_visible_for_testing_member
           emit(state.copyWith(messages: allMessages));
         }
       } catch (e) {

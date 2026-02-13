@@ -399,7 +399,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
+                MaterialPageRoute<void>(
                   builder: (context) => GroupMediaHubPage(
                     roomId: widget.roomId,
                     groupName: group.name,

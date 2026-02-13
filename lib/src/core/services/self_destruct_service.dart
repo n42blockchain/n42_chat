@@ -146,7 +146,7 @@ class SelfDestructService extends ChangeNotifier {
         final countdown = (remainingMs / 1000).ceil();
 
         // 通知倒计时更新（复制列表以防止迭代时修改）
-        for (final callback in List.from(_countdownCallbacks)) {
+        for (final callback in List<void Function(String, int)>.from(_countdownCallbacks)) {
           try {
             callback(message.id, countdown);
           } catch (e) {
@@ -175,7 +175,7 @@ class SelfDestructService extends ChangeNotifier {
     _trackedMessages.remove(message.id);
 
     // 通知销毁回调（复制列表以防止迭代时修改）
-    for (final callback in List.from(_destructionCallbacks)) {
+    for (final callback in List<void Function(String, String)>.from(_destructionCallbacks)) {
       try {
         callback(message.id, message.roomId);
       } catch (e) {

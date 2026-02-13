@@ -565,7 +565,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: surfaceColor,
       shape: const RoundedRectangleBorder(
@@ -609,7 +609,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: surfaceColor,
       shape: const RoundedRectangleBorder(
@@ -691,7 +691,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
 
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: surfaceColor,
       isScrollControlled: true,
@@ -1141,8 +1141,8 @@ enum OpenRedPacketStatus {
 class SendTransferPage extends StatefulWidget {
   final String receiverName;
   final String? receiverAvatar;
-  final Function(String amount, String token, String? memo) onSend;
-  
+  final void Function(String amount, String token, String? memo) onSend;
+
   const SendTransferPage({
     super.key,
     required this.receiverName,
@@ -1389,7 +1389,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
     final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: surfaceColor,
       shape: const RoundedRectangleBorder(
@@ -1429,8 +1429,8 @@ class _SendTransferPageState extends State<SendTransferPage> {
 class SendTransferDialog extends StatelessWidget {
   final String receiverName;
   final String? receiverAvatar;
-  final Function(String amount, String token, String? memo) onSend;
-  
+  final void Function(String amount, String token, String? memo) onSend;
+
   const SendTransferDialog({
     super.key,
     required this.receiverName,

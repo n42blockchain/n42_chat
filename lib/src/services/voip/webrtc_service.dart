@@ -126,12 +126,12 @@ class WebRTCService {
   bool _isFrontCamera = true;
   
   // 事件回调
-  Function(CallState state)? onStateChanged;
-  Function(CallSession session)? onIncomingCall;
-  Function(MediaStream stream)? onLocalStream;
-  Function(MediaStream stream)? onRemoteStream;
-  Function(String error)? onError;
-  Function(Duration duration)? onDurationUpdate;
+  void Function(CallState state)? onStateChanged;
+  void Function(CallSession session)? onIncomingCall;
+  void Function(MediaStream stream)? onLocalStream;
+  void Function(MediaStream stream)? onRemoteStream;
+  void Function(String error)? onError;
+  void Function(Duration duration)? onDurationUpdate;
   
   // 通话计时器
   Timer? _durationTimer;

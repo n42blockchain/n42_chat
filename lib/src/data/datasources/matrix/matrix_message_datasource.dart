@@ -496,7 +496,7 @@ class MatrixMessageDataSource {
           matrixFile,
           extraContent: {
             // MSC3245 语音消息标记
-            'org.matrix.msc3245.voice': {},
+            'org.matrix.msc3245.voice': <String, dynamic>{},
             // MSC1767 音频消息扩展
             'org.matrix.msc1767.audio': {
               'duration': duration,
@@ -533,12 +533,12 @@ class MatrixMessageDataSource {
           'size': audioBytes.length,
           'duration': duration,
         },
-        'org.matrix.msc3245.voice': {},
+        'org.matrix.msc3245.voice': <String, dynamic>{},
         'org.matrix.msc1767.audio': {
           'duration': duration,
         },
       };
-      
+
       final result = await room.sendEvent(content);
       debugPrint('=== sendVoiceMessage completed successfully (manual method) ===');
       return result;
@@ -1444,7 +1444,7 @@ class MatrixMessageDataSource {
           'rel_type': 'm.reference',
           'event_id': pollEventId,
         },
-        'org.matrix.msc3381.poll.end': {},
+        'org.matrix.msc3381.poll.end': <String, dynamic>{},
         'org.matrix.msc1767.text': 'Poll ended',
       };
 

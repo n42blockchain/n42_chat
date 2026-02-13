@@ -392,7 +392,7 @@ class _StoryContentState extends State<_StoryContent> {
 
     _musicPlayer!.play(source).then((_) {
       if (mounted) setState(() => _isMusicPlaying = true);
-    }).catchError((e) {
+    }).catchError((Object e) {
       debugPrint('StoryViewer: Music playback failed: $e');
     });
 

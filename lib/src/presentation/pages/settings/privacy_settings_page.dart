@@ -252,7 +252,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     String title,
     IconData icon,
     VisibilityLevel value,
-    Function(VisibilityLevel) onChanged,
+    void Function(VisibilityLevel) onChanged,
     bool isDark,
   ) {
     return InkWell(
@@ -377,7 +377,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     BuildContext context,
     String title,
     VisibilityLevel currentValue,
-    Function(VisibilityLevel) onChanged,
+    void Function(VisibilityLevel) onChanged,
   ) async {
     final result = await showModalBottomSheet<VisibilityLevel>(
       context: context,

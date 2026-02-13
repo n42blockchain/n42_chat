@@ -376,7 +376,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
     final index = allMedia.indexWhere((m) => m.eventId == media.eventId);
 
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => MediaPreviewPage(
           items: allMedia.map((m) => MediaItem(
             url: m.httpUrl ?? '',

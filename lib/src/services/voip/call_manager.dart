@@ -46,9 +46,9 @@ class CallManager {
   bool _isCallScreenShowing = false;
   
   // 事件回调
-  Function(CallSession)? onIncomingCall;
-  Function(CallState)? onCallStateChanged;
-  Function(String error)? onError;
+  void Function(CallSession)? onIncomingCall;
+  void Function(CallState)? onCallStateChanged;
+  void Function(String error)? onError;
   
   // ============================================
   // Getters & Setters

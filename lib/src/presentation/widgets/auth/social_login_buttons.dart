@@ -28,7 +28,7 @@ class SocialLoginButtons extends StatefulWidget {
   final VoidCallback? onLoginSuccess;
 
   /// 错误回调
-  final Function(String)? onError;
+  final void Function(String)? onError;
 
   const SocialLoginButtons({
     super.key,

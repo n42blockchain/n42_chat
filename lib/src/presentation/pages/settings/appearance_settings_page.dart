@@ -83,7 +83,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
               ),
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
+                  MaterialPageRoute<void>(
                     builder: (_) => const ChatBackgroundPage(),
                   ),
                 );

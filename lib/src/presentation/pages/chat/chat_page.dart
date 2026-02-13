@@ -1591,7 +1591,7 @@ class _ChatPageState extends State<ChatPage> {
       onLiveLocationPressed: () {
         _hideMorePanel();
         Navigator.of(context).push(
-          MaterialPageRoute(
+          MaterialPageRoute<void>(
             builder: (context) => LiveLocationPage(
               roomId: widget.conversation.id,
             ),

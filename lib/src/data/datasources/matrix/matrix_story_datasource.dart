@@ -32,7 +32,7 @@ class MatrixStoryDataSource {
       StreamController<List<Map<String, dynamic>>>.broadcast();
 
   /// 同步订阅
-  StreamSubscription? _syncSubscription;
+  StreamSubscription<dynamic>? _syncSubscription;
 
   MatrixStoryDataSource(this._clientManager);
 

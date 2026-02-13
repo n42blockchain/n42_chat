@@ -1915,9 +1915,9 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
     // 如果是振动，触发振动
     if (ringtone.key == 'vibrate') {
       unawaited(HapticFeedback.heavyImpact());
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       unawaited(HapticFeedback.heavyImpact());
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       unawaited(HapticFeedback.heavyImpact());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1998,7 +1998,7 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
       }
 
       // 5秒后自动停止
-      await Future.delayed(const Duration(seconds: 5));
+      await Future<void>.delayed(const Duration(seconds: 5));
       if (mounted && _playingRingtone == ringtone.name) {
         await _stopRingtone();
       }
