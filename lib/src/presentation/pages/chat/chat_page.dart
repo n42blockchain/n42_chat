@@ -58,6 +58,8 @@ import '../../widgets/chat/red_packet_dialogs.dart';
 import '../sticker/sticker_store_page.dart';
 import '../../widgets/chat/edit_history_sheet.dart';
 import '../../widgets/chat/wechat_message_menu.dart';
+import '../../widgets/wechat_toast.dart';
+import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../contact/contact_detail_page.dart';
 import '../search/chat_search_bar.dart';

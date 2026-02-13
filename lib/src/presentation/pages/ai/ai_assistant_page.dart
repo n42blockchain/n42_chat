@@ -186,7 +186,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  l10n?.aiNotConfigured ?? 'AI service not configured. Please set API key in settings.',
+                  l10n?.aiAssistantNotConfigured ?? 'AI service not configured. Please set API key in settings.',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 13,
@@ -355,7 +355,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 textInputAction: TextInputAction.newline,
                 enabled: state.isAvailable && !state.isGenerating,
                 decoration: InputDecoration(
-                  hintText: l10n?.aiInputHint ?? 'Ask anything...',
+                  hintText: l10n?.aiAssistantWelcome ?? 'Ask anything...',
                   hintStyle: TextStyle(
                     color: isDark ? Colors.white38 : Colors.black38,
                   ),
@@ -432,8 +432,8 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(l10n?.aiClearHistory ?? 'Clear History'),
-        content: Text(l10n?.aiClearHistoryConfirm ?? 'Are you sure you want to clear all chat history?'),
+        title: Text(l10n?.aiAssistantClearHistory ?? 'Clear History'),
+        content: Text(l10n?.aiAssistantClearHistoryConfirm ?? 'Are you sure you want to clear all chat history?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),

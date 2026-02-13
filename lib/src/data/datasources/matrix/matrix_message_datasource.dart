@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../domain/entities/group_album_entity.dart';
 import '../../../domain/entities/group_file_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'matrix_client_manager.dart';
