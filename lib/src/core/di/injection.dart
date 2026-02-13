@@ -83,7 +83,7 @@ Future<void> configureDependencies(N42ChatConfig config, {IWalletBridge? walletB
 
   // 注册钱包桥接
   getIt.registerSingleton<IWalletBridge>(
-    walletBridge ?? MockWalletBridge(),
+    walletBridge ?? config.walletBridge ?? MockWalletBridge(),
   );
 
   // 注册服务

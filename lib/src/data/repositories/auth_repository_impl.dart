@@ -419,7 +419,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     }
   }
   
-  /// 构建头像 HTTP URL（带 access_token 用于需要认证的服务器）
+  /// 构建头像 HTTP URL（使用认证媒体 API，不在 URL 中暴露 access_token）
   String? _buildAvatarHttpUrl(String? mxcUrl, Client client) {
     if (mxcUrl == null || mxcUrl.isEmpty) return null;
     if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
@@ -434,14 +434,8 @@ class AuthRepositoryImpl implements IAuthRepository {
       final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) return null;
 
-      final accessToken = client.accessToken;
-      if (accessToken == null || accessToken.isEmpty) {
-        // 无 token 时尝试公开 API
-        return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
-      }
-
-      // 使用带 access_token 的媒体 API（用于需要认证的服务器）
-      return '$homeserver/_matrix/media/v3/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop&access_token=$accessToken';
+      // 使用认证媒体 API (Matrix 1.11+)，通过请求头传递 token 而非 URL 参数
+      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
     } catch (e) {
       debugPrint('AuthRepository: Error building avatar URL: $e');
       return null;
