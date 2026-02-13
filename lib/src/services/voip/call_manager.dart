@@ -5,7 +5,6 @@ library;
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
@@ -36,8 +35,6 @@ class CallManager {
   final CallNotificationService _notificationService = CallNotificationService();
   final VoIPConfig _config = VoIPConfig();
   
-  // Matrix 客户端
-  matrix.Client? _client;
   
   // 导航键
   GlobalKey<NavigatorState>? _navigatorKey;
@@ -87,7 +84,6 @@ class CallManager {
       return;
     }
     
-    _client = client;
     _navigatorKey = navigatorKey;
     
     // 初始化通知服务

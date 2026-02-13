@@ -176,7 +176,7 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
           width: 48,
           height: 48,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _buildDefaultAvatar(group.name),
+          errorBuilder: (_, _, _) => _buildDefaultAvatar(group.name),
         ),
       );
     }

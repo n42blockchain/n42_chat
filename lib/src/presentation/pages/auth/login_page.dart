@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -13,9 +12,7 @@ import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
-import '../../../services/auth/auth_methods_service.dart';
 import 'register_page.dart';
-import 'email_otp_page.dart';
 import 'reset_password_page.dart';
 
 /// 登录页面
@@ -238,42 +235,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLogo(bool isDark) {
-    return Column(
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.chat_bubble_rounded,
-            color: Colors.white,
-            size: 40,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'N42 Chat',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          S.of(context)?.authSecureDecentralizedChat ?? 'Secure, decentralized instant messaging',
-          style: TextStyle(
-            fontSize: 14,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-          ),
-        ),
-      ],
-    );
-  }
 
   /// 紧凑版 Logo
   Widget _buildCompactLogo(bool isDark) {
@@ -627,7 +588,7 @@ class _LoginPageState extends State<LoginPage> {
             ? const SizedBox(
                 width: 20,
                 height: 20,
-                child: const CircularProgressIndicator(
+                child: CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
@@ -644,154 +605,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildOtherOptions() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: () {
-                final authBloc = context.read<AuthBloc>();
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => BlocProvider.value(
-                      value: authBloc,
-                      child: const RegisterPage(),
-                    ),
-                  ),
-                );
-              },
-              child: Text(
-                S.of(context)?.authRegisterAccount ?? 'Sign Up',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textLink,
-                ),
-              ),
-            ),
-            const Text(
-              '|',
-              style: TextStyle(
-                color: AppColors.textTertiary,
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                _showForgotPasswordHelp();
-              },
-              child: Text(
-                S.of(context)?.authForgotPassword ?? 'Forgot Password',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textLink,
-                ),
-              ),
-            ),
-          ],
-        ),
-        
-        const SizedBox(height: 32),
-        
-        // 分隔线
-        _buildDivider(),
-        
-        const SizedBox(height: 24),
-        
-        // 其他登录方式
-        _buildAlternativeLoginMethods(),
-      ],
-    );
-  }
-  
-  Widget _buildDivider() {
-    final isDark = context.isDarkMode;
-    final dividerColor = isDark ? Colors.white24 : Colors.black12;
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
-    return Row(
-      children: [
-        Expanded(child: Divider(color: dividerColor)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            S.of(context)?.authOtherLoginMethods ?? 'Other login methods',
-            style: TextStyle(
-              fontSize: 12,
-              color: textColor,
-            ),
-          ),
-        ),
-        Expanded(child: Divider(color: dividerColor)),
-      ],
-    );
-  }
-  
-  Widget _buildAlternativeLoginMethods() {
-    return Column(
-      children: [
-        // 生物识别登录按钮（如果可用且已启用）
-        if (_isBiometricAvailable && _isBiometricEnabled && _hasCredentials) ...[
-          _buildBiometricLoginButton(),
-          const SizedBox(height: 20),
-        ],
-
-        // 第一行：Passkey 和 邮箱验证码
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildLoginMethodButton(
-              icon: Icons.fingerprint,
-              label: S.of(context)?.authPasskeyLabel ?? 'Passkey',
-              onTap: _loginWithPasskey,
-            ),
-            const SizedBox(width: 32),
-            _buildLoginMethodButton(
-              icon: Icons.email_outlined,
-              label: S.of(context)?.authEmailOtp ?? 'Email OTP',
-              onTap: _loginWithEmailOtp,
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 20),
-
-        // 第二行：第三方登录
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildSocialLoginButton(
-              iconPath: null,
-              icon: Icons.g_mobiledata,
-              color: const Color(0xFFDB4437),
-              label: S.of(context)?.authGoogleLabel ?? 'Google',
-              onTap: _loginWithGoogle,
-            ),
-            const SizedBox(width: 24),
-            if (!kIsWeb && (Platform.isIOS || Platform.isMacOS))
-              _buildSocialLoginButton(
-                iconPath: null,
-                icon: Icons.apple,
-                color: context.isDarkMode
-                    ? Colors.white
-                    : Colors.black,
-                label: S.of(context)?.authAppleLabel ?? 'Apple',
-                onTap: _loginWithApple,
-              ),
-            if (!kIsWeb && (Platform.isIOS || Platform.isMacOS))
-              const SizedBox(width: 24),
-            _buildSocialLoginButton(
-              iconPath: null,
-              icon: Icons.login,
-              color: AppColors.primary,
-              label: S.of(context)?.authSsoLabel ?? 'SSO',
-              onTap: _loginWithSso,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
 
   /// 生物识别快捷登录按钮（显示在登录按钮上方）
   Widget _buildBiometricQuickLogin() {
@@ -844,254 +657,12 @@ class _LoginPageState extends State<LoginPage> {
       ],
     );
   }
-
-  Widget _buildBiometricLoginButton() {
-    final bgColor = AppColors.primary.withValues(alpha: 0.1);
-    const iconColor = AppColors.primary;
-
-    // 根据生物识别类型选择图标
-    IconData biometricIcon;
-    if (_biometricTypeDescription.contains('Face')) {
-      biometricIcon = Icons.face;
-    } else if (_biometricTypeDescription.contains('Touch') ||
-        _biometricTypeDescription.contains('Fingerprint')) {
-      biometricIcon = Icons.fingerprint;
-    } else {
-      biometricIcon = Icons.security;
-    }
-
-    return InkWell(
-      onTap: _loginWithBiometric,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.3),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(biometricIcon, color: iconColor, size: 28),
-            const SizedBox(width: 12),
-            Text(
-              S.of(context)?.authLoginWithBiometric(_biometricTypeDescription) ??
-                  'Login with $_biometricTypeDescription',
-              style: const TextStyle(
-                fontSize: 16,
-                color: iconColor,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  Widget _buildLoginMethodButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.surfaceDark : Colors.grey[100];
-    final iconColor = isDark ? Colors.white70 : Colors.black54;
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: iconColor, size: 22),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                color: textColor,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  Widget _buildSocialLoginButton({
-    String? iconPath,
-    IconData? icon,
-    required Color color,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final borderColor = isDark ? Colors.white12 : Colors.black12;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          onTap();
-        },
-        borderRadius: BorderRadius.circular(12),
-        splashColor: color.withValues(alpha: 0.2),
-        highlightColor: color.withValues(alpha: 0.1),
-        child: Ink(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: borderColor),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null)
-                Icon(icon, color: color, size: 28),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  
-  // ============================================
-  // 登录方法
-  // ============================================
   
   void _loginWithBiometric() async {
     // 直接触发生物识别登录
     context.read<AuthBloc>().add(const AuthBiometricLoginRequested());
   }
 
-  void _loginWithPasskey() async {
-    final homeserver = _homeserverController.text.trim();
-    if (homeserver.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-      return;
-    }
-
-    try {
-      final authService = AuthMethodsService();
-
-      // 1. Check platform support
-      final isSupported = await authService.isPasskeySupported();
-      if (!isSupported) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(S.of(context)?.authPasskeyNotSupported ?? 'Passkey is not supported on this device'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-        return;
-      }
-
-      // 2. Request authentication challenge from server
-      final challengeData = await authService.requestPasskeyAuthChallenge(
-        homeserver: homeserver,
-      );
-
-      if (challengeData == null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(S.of(context)?.authPasskeyRequiresServer ?? 'Passkey login requires server support (MSC3824)'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
-        return;
-      }
-
-      // 3. Authenticate with passkey
-      final challenge = challengeData['challenge'] as String? ?? '';
-      final allowedCredentials = (challengeData['allowed_credentials'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList();
-
-      final result = await authService.authenticateWithPasskey(
-        challenge: challenge,
-        allowedCredentials: allowedCredentials,
-        homeserver: homeserver,
-      );
-
-      if (result == null) {
-        // User canceled
-        return;
-      }
-
-      // 4. Use the login token from the result to authenticate with Matrix
-      final loginToken = result['access_token'] as String?;
-      final userId = result['user_id'] as String?;
-      final deviceId = result['device_id'] as String?;
-      if (loginToken != null && userId != null && deviceId != null && mounted) {
-        context.read<AuthBloc>().add(AuthTokenLoginRequested(
-          homeserver: homeserver,
-          accessToken: loginToken,
-          userId: userId,
-          deviceId: deviceId,
-        ));
-      }
-    } on PlatformException catch (e) {
-      if (e.code == 'USER_CANCELED') return;
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Passkey error: ${e.message}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Passkey login failed: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
-  }
-  
-  void _loginWithEmailOtp() {
-    final authBloc = context.read<AuthBloc>();
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => BlocProvider.value(
-          value: authBloc,
-          child: EmailOtpPage(
-            homeserver: _homeserverController.text.trim(),
-          ),
-        ),
-      ),
-    );
-  }
-  
   void _loginWithGoogle() {
     final homeserver = _homeserverController.text.trim();
     if (homeserver.isEmpty) {

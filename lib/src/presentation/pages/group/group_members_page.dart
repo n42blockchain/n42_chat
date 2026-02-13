@@ -299,7 +299,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              this.context.read<GroupBloc>().add(
+              context.read<GroupBloc>().add(
                     KickMember(widget.roomId, member.userId),
                   );
             },

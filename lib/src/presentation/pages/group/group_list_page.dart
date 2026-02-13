@@ -270,7 +270,7 @@ class _GroupListPageState extends State<GroupListPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              this.context.read<GroupBloc>().add(LeaveGroup(group.roomId));
+              context.read<GroupBloc>().add(LeaveGroup(group.roomId));
             },
             child: Text(S.of(context)?.commonLeave ?? 'Leave', style: const TextStyle(color: Colors.red)),
           ),
@@ -293,7 +293,7 @@ class _GroupListPageState extends State<GroupListPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              this.context.read<GroupBloc>().add(DeleteGroup(group.roomId));
+              context.read<GroupBloc>().add(DeleteGroup(group.roomId));
             },
             child: Text(S.of(context)?.commonDissolve ?? 'Dissolve', style: const TextStyle(color: Colors.red)),
           ),

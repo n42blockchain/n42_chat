@@ -178,7 +178,7 @@ class _SpaceListPageState extends State<SpaceListPage>
                 imageUrl: space.avatarUrl!,
                 fit: BoxFit.cover,
                 httpHeaders: headers,
-                errorWidget: (_, __, ___) => _buildSpaceIcon(space),
+                errorWidget: (_, _, _) => _buildSpaceIcon(space),
               )
             : _buildSpaceIcon(space),
       ),

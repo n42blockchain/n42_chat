@@ -318,7 +318,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
           CachedNetworkImage(
             imageUrl: media.thumbnailUrl ?? media.httpUrl ?? '',
             fit: BoxFit.cover,
-            placeholder: (_, __) => Container(
+            placeholder: (_, _) => Container(
               color: Colors.grey[300],
               child: const Center(
                 child: SizedBox(
@@ -328,7 +328,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
                 ),
               ),
             ),
-            errorWidget: (_, __, ___) => Container(
+            errorWidget: (_, _, _) => Container(
               color: Colors.grey[300],
               child: const Icon(Icons.broken_image, color: Colors.grey),
             ),

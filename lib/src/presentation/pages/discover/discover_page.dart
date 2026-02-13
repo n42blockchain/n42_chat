@@ -10,7 +10,6 @@ import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
 import '../../widgets/common/common_widgets.dart';
-import '../../widgets/common/n42_avatar.dart';
 import '../game/game_center_page.dart';
 import '../moment/moment_list_page.dart';
 import '../qrcode/scan_qr_page.dart';

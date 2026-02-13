@@ -297,10 +297,10 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
                 imageUrl: thumbnailUrl,
                 fit: BoxFit.cover,
                 httpHeaders: headers,
-                placeholder: (_, __) => Container(
+                placeholder: (_, _) => Container(
                   color: isDark ? Colors.grey[800] : Colors.grey[200],
                 ),
-                errorWidget: (_, __, ___) => Icon(
+                errorWidget: (_, _, _) => Icon(
                   isVideo ? Icons.videocam : Icons.image,
                   color: Colors.white54,
                 ),

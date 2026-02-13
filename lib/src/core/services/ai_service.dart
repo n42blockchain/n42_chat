@@ -2,6 +2,7 @@
 ///
 /// 提供 AI 补全、摘要、改写、翻译等功能
 /// 支持 OpenAI / Claude 等兼容后端
+library;
 
 /// AI 消息角色
 enum AiRole { system, user, assistant }

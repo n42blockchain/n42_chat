@@ -152,7 +152,7 @@ class SpaceDetailPage extends StatelessWidget {
                 imageUrl: space.avatarUrl!,
                 fit: BoxFit.cover,
                 httpHeaders: headers,
-                errorWidget: (_, __, ___) => Container(
+                errorWidget: (_, _, _) => Container(
                   color: AppColorPalettes.getAvatarColor(space.name),
                 ),
               )

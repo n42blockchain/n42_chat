@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
@@ -245,27 +244,27 @@ class GroupRepositoryImpl implements IGroupRepository {
 
         switch (rule.tokenStandard) {
           case TokenStandard.erc20:
-            actualBalance = await _walletBridge!.getErc20Balance(
+            actualBalance = await _walletBridge.getErc20Balance(
               contractAddress: rule.contractAddress ?? '',
               chainId: rule.chainId,
             );
             break;
           case TokenStandard.erc721:
-            final nftCount = await _walletBridge!.getErc721Balance(
+            final nftCount = await _walletBridge.getErc721Balance(
               contractAddress: rule.contractAddress ?? '',
               chainId: rule.chainId,
             );
             actualBalance = BigInt.from(nftCount);
             break;
           case TokenStandard.erc1155:
-            actualBalance = await _walletBridge!.getErc1155Balance(
+            actualBalance = await _walletBridge.getErc1155Balance(
               contractAddress: rule.contractAddress ?? '',
               tokenId: rule.tokenId ?? BigInt.zero,
               chainId: rule.chainId,
             );
             break;
           case TokenStandard.native:
-            final balanceStr = await _walletBridge!.getBalance('ETH');
+            final balanceStr = await _walletBridge.getBalance('ETH');
             final balanceDouble = double.tryParse(balanceStr) ?? 0;
             actualBalance = BigInt.from(balanceDouble * 1e18);
             break;

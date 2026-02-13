@@ -6,7 +6,6 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/ai_assistant_entity.dart';
 import '../../blocs/ai_assistant/ai_assistant_bloc.dart';
-import '../../blocs/ai_assistant/ai_assistant_event.dart';
 import '../../blocs/ai_assistant/ai_assistant_state.dart';
 import '../../widgets/common/common_widgets.dart';
 

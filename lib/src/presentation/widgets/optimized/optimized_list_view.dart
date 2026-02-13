@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 /// 优化的消息列表视图
 ///
@@ -190,11 +189,6 @@ class _VirtualizedListViewState<T> extends State<VirtualizedListView<T>> {
     }
     super.dispose();
   }
-
-  double _getItemHeight(int index) {
-    return _itemHeights[index] ?? widget.estimatedItemHeight;
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(

@@ -551,7 +551,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               final name = controller.text.trim();
               if (name.isNotEmpty) {
                 Navigator.pop(dialogContext);
-                this.context.read<GroupBloc>().add(UpdateGroupName(widget.roomId, name));
+                context.read<GroupBloc>().add(UpdateGroupName(widget.roomId, name));
               }
             },
             child: Text(S.of(context)?.commonConfirm ?? 'OK'),
@@ -584,7 +584,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              this.context.read<GroupBloc>().add(
+              context.read<GroupBloc>().add(
                     UpdateGroupTopic(widget.roomId, controller.text.trim()),
                   );
             },
@@ -619,7 +619,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             onPressed: () {
               Navigator.pop(dialogContext);
               // 群公告使用 topic 实现
-              this.context.read<GroupBloc>().add(
+              context.read<GroupBloc>().add(
                     UpdateGroupTopic(widget.roomId, controller.text.trim()),
                   );
             },
@@ -653,7 +653,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             onPressed: () {
               Navigator.pop(dialogContext);
               widget.onClearHistory?.call();
-              ScaffoldMessenger.of(this.context).showSnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(S.of(context)?.commonChatHistoryCleared ?? 'Chat history cleared')),
               );
             },
@@ -678,8 +678,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              this.context.read<GroupBloc>().add(LeaveGroup(widget.roomId));
-              Navigator.of(this.context).pop();
+              context.read<GroupBloc>().add(LeaveGroup(widget.roomId));
+              Navigator.of(context).pop();
             },
             child: Text(S.of(context)?.commonLeave ?? 'Leave', style: const TextStyle(color: Colors.red)),
           ),
@@ -702,8 +702,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              this.context.read<GroupBloc>().add(DeleteGroup(widget.roomId));
-              Navigator.of(this.context).pop();
+              context.read<GroupBloc>().add(DeleteGroup(widget.roomId));
+              Navigator.of(context).pop();
             },
             child: Text(S.of(context)?.commonDissolve ?? 'Dissolve', style: const TextStyle(color: Colors.red)),
           ),
@@ -724,7 +724,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               title: Text(S.of(context)?.groupQrCode ?? 'Group QR Code'),
               onTap: () {
                 Navigator.pop(sheetContext);
-                ScaffoldMessenger.of(this.context).showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(S.of(context)?.commonFeatureInDevelopment('') ?? 'Feature in development')),
                 );
               },
@@ -734,7 +734,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               title: Text(S.of(context)?.commonSearchChatHistory ?? 'Search Chat History'),
               onTap: () {
                 Navigator.pop(sheetContext);
-                ScaffoldMessenger.of(this.context).showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(S.of(context)?.commonFeatureInDevelopment('') ?? 'Feature in development')),
                 );
               },

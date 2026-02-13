@@ -218,7 +218,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                   width: 72,
                   height: 72,
                   fit: BoxFit.cover,
-                  errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                  errorWidget: (_, _, _) => const SizedBox.shrink(),
                 ),
               ),
           ],

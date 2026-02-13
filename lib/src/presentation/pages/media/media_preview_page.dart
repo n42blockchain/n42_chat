@@ -180,10 +180,10 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
         child: CachedNetworkImage(
           imageUrl: item.url,
           fit: BoxFit.contain,
-          placeholder: (_, __) => const Center(
+          placeholder: (_, _) => const Center(
             child: CircularProgressIndicator(color: Colors.white),
           ),
-          errorWidget: (_, __, ___) => const Center(
+          errorWidget: (_, _, _) => const Center(
             child: Icon(Icons.broken_image, color: Colors.white54, size: 64),
           ),
         ),
