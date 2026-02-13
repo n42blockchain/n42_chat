@@ -102,7 +102,7 @@ class _ChatOnlyFriendsPageState extends State<ChatOnlyFriendsPage> {
                 )
               : ListView.separated(
                   itemCount: _chatOnlyFriends.length,
-                  separatorBuilder: (_, __) => Padding(
+                  separatorBuilder: (_, _) => Padding(
                     padding: const EdgeInsets.only(left: 72),
                     child: Divider(
                       height: 1,

@@ -182,42 +182,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildLogo(bool isDark) {
-    return Column(
-      children: [
-        Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.person_add_rounded,
-            color: Colors.white,
-            size: 36,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          S.of(context)?.authCreateAccount ?? 'Create Account',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          S.of(context)?.authJoinN42Chat ?? 'Join N42 Chat to start chatting',
-          style: TextStyle(
-            fontSize: 14,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildServerInput(AuthState state, bool isDark) {
     final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
@@ -731,7 +695,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
             : Text(

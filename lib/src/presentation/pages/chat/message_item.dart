@@ -12,7 +12,6 @@ import '../../widgets/chat/message_status_indicator.dart' as indicator;
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/contact_card_message_widget.dart';
 import '../../widgets/chat/url_preview_widget.dart';
-import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/chat/message_reaction_bar.dart';
 import '../../widgets/chat/edit_history_sheet.dart';
 import '../../widgets/chat/thread_indicator.dart';
@@ -1334,7 +1333,7 @@ class MessageItem extends StatelessWidget {
                       child: Image.network(
                         cover,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(
+                        errorBuilder: (_, _, _) => const Icon(
                           Icons.music_note,
                           size: 24,
                           color: AppColors.primary,

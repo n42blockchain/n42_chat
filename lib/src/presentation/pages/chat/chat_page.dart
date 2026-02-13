@@ -57,7 +57,6 @@ import '../../widgets/chat/sticker_picker.dart';
 import '../../widgets/chat/red_packet_dialogs.dart';
 import '../sticker/sticker_store_page.dart';
 import '../../widgets/chat/edit_history_sheet.dart';
-import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/wechat_toast.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -4660,22 +4659,6 @@ Avatar: ${contactAvatar ?? ''}''';
       ),
     );
   }
-  
-  /// 删除发送失败的消息
-  void _deleteFailedMessage(MessageEntity message) {
-    if (message.status != MessageStatus.failed) return;
-    
-    // 从本地和服务器删除失败的消息
-    context.read<ChatBloc>().add(DeleteFailedMessage(message.id));
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(S.of(context)?.chatFailedMessageDeleted ?? 'Failed message deleted'),
-        duration: const Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
 
   /// 本地删除消息（仅从本地移除，对方仍可见）
   Future<void> _deleteMessageLocally(MessageEntity message) async {
@@ -5469,17 +5452,13 @@ class _MessageMenuSheet extends StatelessWidget {
 /// 参考 FluffyChat 的 VoIP 实现
 class _CallDialog extends StatefulWidget {
   final String contactName;
-  final String? contactAvatar;
   final bool isVideoCall;
   final VoidCallback onEnd;
-  final String? roomId; // 可选的房间ID，用于真正的VoIP
 
   const _CallDialog({
     required this.contactName,
-    this.contactAvatar,
     required this.isVideoCall,
     required this.onEnd,
-    this.roomId,
   });
 
   @override
@@ -5503,11 +5482,11 @@ class _CallDialogState extends State<_CallDialog> {
   Future<void> _initCall() async {
     // 模拟连接过程
     // TODO(backend): 替换为真正的 VoIP 连接（需要 WebRTC/LiveKit 服务）
-    // 使用 VoIPService.startCall(widget.roomId, widget.isVideoCall ? CallType.video : CallType.voice)
+    // TODO(backend): 使用 VoIPService.startCall(roomId, isVideoCall ? CallType.video : CallType.voice)
     
     debugPrint('_CallDialog: Initiating ${widget.isVideoCall ? "video" : "voice"} call');
     debugPrint('_CallDialog: Contact: ${widget.contactName}');
-    debugPrint('_CallDialog: Room ID: ${widget.roomId ?? "N/A"}');
+    debugPrint('_CallDialog: Room ID: N/A');
     
     // 模拟呼叫状态变化
     await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -5605,15 +5584,7 @@ class _CallDialogState extends State<_CallDialog> {
                 color: AppColors.primary.withValues(alpha: 0.3),
                 border: Border.all(color: AppColors.primary, width: 3),
               ),
-              child: widget.contactAvatar != null
-                  ? ClipOval(
-                      child: Image.network(
-                        widget.contactAvatar!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _buildAvatarPlaceholder(),
-                      ),
-                    )
-                  : _buildAvatarPlaceholder(),
+              child: _buildAvatarPlaceholder(),
             ),
             
             const SizedBox(height: 24),

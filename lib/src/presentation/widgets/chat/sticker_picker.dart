@@ -312,7 +312,7 @@ class _StickerPickerState extends State<StickerPicker> {
         child: Image.network(
           httpUrl,
           fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported),
+          errorBuilder: (_, _, _) => const Icon(Icons.image_not_supported),
         ),
       );
     }

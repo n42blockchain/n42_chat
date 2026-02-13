@@ -173,7 +173,6 @@ class ChatFolderManagementPage extends StatelessWidget {
 
   void _showCreateDialog(BuildContext context, S? l10n) {
     final nameController = TextEditingController();
-    final isDark = context.isDarkMode;
     String selectedIcon = '📁';
 
     showDialog<void>(

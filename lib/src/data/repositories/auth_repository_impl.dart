@@ -307,7 +307,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       );
 
       final accessToken = response.accessToken ?? '';
-      final userId = response.userId ?? '';
+      final userId = response.userId;
       final deviceId = response.deviceId ?? '';
 
       // 如果注册成功并自动登录

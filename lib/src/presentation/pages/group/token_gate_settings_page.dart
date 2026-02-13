@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/token_gate_entity.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
@@ -84,7 +83,6 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
-    final isDark = context.isDarkMode;
 
     return BlocListener<GroupBloc, GroupState>(
       listener: (context, state) {

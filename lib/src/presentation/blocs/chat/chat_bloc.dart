@@ -2065,8 +2065,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (_currentRoomId == null || _groupRepository == null) return;
 
     try {
-      final pinnedEventIds = await _groupRepository!.getPinnedEventIds(_currentRoomId!);
-      final canPin = _groupRepository!.canPinMessages(_currentRoomId!);
+      final pinnedEventIds = await _groupRepository.getPinnedEventIds(_currentRoomId!);
+      final canPin = _groupRepository.canPinMessages(_currentRoomId!);
 
       // 从当前消息列表中查找置顶消息
       final pinnedMessages = <MessageEntity>[];
@@ -2111,7 +2111,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (_currentRoomId == null || _groupRepository == null) return;
 
     try {
-      await _groupRepository!.pinMessage(_currentRoomId!, event.messageId);
+      await _groupRepository.pinMessage(_currentRoomId!, event.messageId);
       // 重新加载置顶消息
       add(const LoadPinnedMessages());
       debugPrint('ChatBloc: Pinned message ${event.messageId}');
@@ -2129,7 +2129,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (_currentRoomId == null || _groupRepository == null) return;
 
     try {
-      await _groupRepository!.unpinMessage(_currentRoomId!, event.messageId);
+      await _groupRepository.unpinMessage(_currentRoomId!, event.messageId);
       // 重新加载置顶消息
       add(const LoadPinnedMessages());
       debugPrint('ChatBloc: Unpinned message ${event.messageId}');
@@ -2218,7 +2218,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     try {
       debugPrint('ChatBloc: Translating message ${event.messageId} to ${event.targetLanguage}');
 
-      final result = await _translationService!.translate(
+      final result = await _translationService.translate(
         text: message.content,
         targetLanguage: event.targetLanguage,
       );

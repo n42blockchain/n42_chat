@@ -223,7 +223,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget _buildStepIndicator(bool isDark) {
     const activeColor = AppColors.primary;
     final inactiveColor = isDark ? Colors.white24 : Colors.black12;
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -415,7 +414,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   },
             child: Text(
               _resendCountdown > 0
-                  ? '${S.of(context)?.authCanResendAfter(_resendCountdown) ?? 'Can resend after $_resendCountdown seconds'}'
+                  ? S.of(context)?.authCanResendAfter(_resendCountdown) ?? 'Can resend after $_resendCountdown seconds'
                   : S.of(context)?.authResendVerificationCode ?? 'Resend verification code',
               style: TextStyle(
                 color: _resendCountdown > 0 ? hintColor : AppColors.textLink,

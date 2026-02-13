@@ -148,7 +148,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
       controller: scrollController,
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: reversed.length,
-      separatorBuilder: (_, __) => Divider(
+      separatorBuilder: (_, _) => Divider(
         height: 0.5,
         indent: 16,
         endIndent: 16,

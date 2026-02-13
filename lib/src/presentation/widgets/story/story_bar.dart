@@ -286,7 +286,7 @@ class _MyStoryAvatar extends StatelessWidget {
             ? Image.network(
                 imageUrl!,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _buildPlaceholder(context),
+                errorBuilder: (_, _, _) => _buildPlaceholder(context),
               )
             : _buildPlaceholder(context),
       ),

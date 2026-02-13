@@ -174,9 +174,7 @@ class ContactRepositoryImpl implements IContactRepository {
               displayName = profile.displayName!;
             }
             // Also get avatar from profile if not already set
-            if (avatarUrl == null) {
-              avatarUrl = _contactDataSource.getProfileAvatarUrl(profile);
-            }
+            avatarUrl ??= _contactDataSource.getProfileAvatarUrl(profile);
           }
         } catch (e) {
           // Ignore errors, will use fallback

@@ -5,7 +5,6 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
-import '../../widgets/common/common_widgets.dart';
 
 /// 贴纸商店页面
 class StickerStorePage extends StatefulWidget {

@@ -201,7 +201,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? textColor : textColor.withOpacity(0.5),
+              color: isSelected ? textColor : textColor.withValues(alpha: 0.5),
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               fontSize: 16,
             ),
@@ -243,13 +243,13 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   decoration: InputDecoration(
                     hintText: S.of(context)?.storySendMessageHint ?? 'Type something...',
                     hintStyle: TextStyle(
-                      color: _currentTextColor.withOpacity(0.5),
+                      color: _currentTextColor.withValues(alpha: 0.5),
                       fontSize: 28,
                       fontWeight: FontWeight.w500,
                     ),
                     border: InputBorder.none,
                     counterStyle: TextStyle(
-                      color: _currentTextColor.withOpacity(0.7),
+                      color: _currentTextColor.withValues(alpha: 0.7),
                     ),
                   ),
                   onChanged: (_) => setState(() {}),
@@ -300,7 +300,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -339,7 +339,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               color: isDark ? AppColors.surfaceDark : Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -2),
                 ),
@@ -407,7 +407,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -451,7 +451,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -480,7 +480,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
+                color: Colors.black.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -506,7 +506,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
+                  color: Colors.black.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -607,8 +607,8 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: _mode == StoryMode.text
-                ? Colors.white.withOpacity(0.15)
-                : AppColors.primary.withOpacity(0.08),
+                ? Colors.white.withValues(alpha: 0.15)
+                : AppColors.primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
@@ -648,7 +648,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                     Icons.close,
                     size: 14,
                     color: _mode == StoryMode.text
-                        ? _currentTextColor.withOpacity(0.7)
+                        ? _currentTextColor.withValues(alpha: 0.7)
                         : Colors.red,
                   ),
                 ),

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -42,7 +41,6 @@ class _ContactListPageState extends State<ContactListPage> {
   final TextEditingController _searchController = TextEditingController();
   final Map<String, GlobalKey> _letterKeys = {};
 
-  bool _isSearchMode = false;
   late final GroupBloc _groupBloc;
 
   @override
@@ -1376,7 +1374,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
           return ListView.separated(
             padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: requests.length,
-            separatorBuilder: (_, __) => Divider(
+            separatorBuilder: (_, _) => Divider(
               height: 1,
               indent: 72,
               color: isDark ? AppColors.dividerDark : AppColors.divider,

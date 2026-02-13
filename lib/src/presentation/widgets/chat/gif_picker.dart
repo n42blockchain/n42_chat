@@ -360,7 +360,7 @@ class _GifPickerState extends State<GifPicker> {
                 ),
               );
             },
-            errorBuilder: (_, __, ___) => const Icon(
+            errorBuilder: (_, _, _) => const Icon(
               Icons.broken_image_outlined,
               size: 32,
             ),
@@ -386,7 +386,7 @@ class _GifPickerState extends State<GifPicker> {
           Image.network(
             'https://giphy.com/static/img/giphy_logo_small.png',
             height: 12,
-            errorBuilder: (_, __, ___) => Text(
+            errorBuilder: (_, _, _) => Text(
               'GIPHY',
               style: TextStyle(
                 fontSize: 10,

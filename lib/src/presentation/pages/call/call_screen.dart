@@ -249,7 +249,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                       ? _formatDuration(_duration)
                       : _getStatusText(context),
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 15,
                   ),
                 ),
@@ -299,7 +299,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.6),
+                        Colors.black.withValues(alpha: 0.6),
                         Colors.transparent,
                       ],
                     ),
@@ -320,7 +320,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: [
-                        Colors.black.withOpacity(0.6),
+                        Colors.black.withValues(alpha: 0.6),
                         Colors.transparent,
                       ],
                     ),
@@ -387,7 +387,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             width: 3,
           ),
         ),
@@ -500,7 +500,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 12,
             ),
           ),
@@ -600,7 +600,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           height: 140,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(7),
@@ -643,7 +643,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(18),
               ),
               child: const Icon(
@@ -672,7 +672,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                       ? _formatDuration(_duration)
                       : _getStatusText(context),
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 13,
                   ),
                 ),

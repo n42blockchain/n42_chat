@@ -153,7 +153,7 @@ class _CallDialogState extends State<CallDialog> {
                       child: Image.network(
                         widget.contactAvatar!,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _buildAvatarPlaceholder(),
+                        errorBuilder: (_, _, _) => _buildAvatarPlaceholder(),
                       ),
                     )
                   : _buildAvatarPlaceholder(),

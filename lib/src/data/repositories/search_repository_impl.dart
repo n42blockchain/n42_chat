@@ -90,7 +90,7 @@ class SearchRepositoryImpl implements ISearchRepository {
       final usernameQuery = query.substring(1);
       if (usernameQuery.isNotEmpty) {
         try {
-          final usernameResults = await _usernameService!.searchUsernames(usernameQuery);
+          final usernameResults = await _usernameService.searchUsernames(usernameQuery);
           for (final usernameResult in usernameResults) {
             results.add(SearchResultItem(
               type: SearchResultType.contact,
@@ -109,7 +109,7 @@ class SearchRepositoryImpl implements ISearchRepository {
     // .eth/.n42 ENS 域名搜索
     if (_isEnsQuery(query) && _ensCacheService != null) {
       try {
-        final address = await _ensCacheService!.resolveEnsName(query);
+        final address = await _ensCacheService.resolveEnsName(query);
         if (address != null) {
           results.add(SearchResultItem(
             type: SearchResultType.contact,

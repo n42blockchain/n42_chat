@@ -315,7 +315,7 @@ class RedPacketMessageWidget extends StatelessWidget {
                   child: Image.network(
                     coverImageUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
                   ),
                 ),
               ),
