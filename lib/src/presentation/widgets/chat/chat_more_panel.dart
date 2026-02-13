@@ -71,6 +71,9 @@ class ChatMorePanel extends StatefulWidget {
   /// 是否启用人脸模糊
   final bool isFaceBlur;
 
+  /// AI 助手回调
+  final VoidCallback? onAiAssistantPressed;
+
   const ChatMorePanel({
     super.key,
     this.onPhotoPressed,
@@ -93,6 +96,7 @@ class ChatMorePanel extends StatefulWidget {
     this.isViewOnce = false,
     this.onFaceBlurPressed,
     this.isFaceBlur = false,
+    this.onAiAssistantPressed,
   });
 
   @override
@@ -270,6 +274,13 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                         onTap: widget.onLiveLocationPressed,
                         iconColor: Colors.teal,
                       ),
+                      if (widget.onAiAssistantPressed != null)
+                        _MoreItem(
+                          icon: Icons.auto_awesome,
+                          label: S.of(context)?.aiAssistant ?? 'AI',
+                          onTap: widget.onAiAssistantPressed,
+                          iconColor: Colors.deepPurple,
+                        ),
                     ],
                   ),
                 ],
