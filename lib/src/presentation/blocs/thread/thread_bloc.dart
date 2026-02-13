@@ -116,7 +116,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
           add(ThreadMessagesUpdated(messages));
         }
       },
-      onError: (e) {
+      onError: (Object e) {
         debugPrint('ThreadBloc: Thread messages stream error: $e');
       },
     );

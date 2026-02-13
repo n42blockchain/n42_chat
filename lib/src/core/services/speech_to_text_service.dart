@@ -86,7 +86,7 @@ class SpeechToTextService {
     final bytes = await file.readAsBytes();
     final base64Audio = base64Encode(bytes);
 
-    final response = await _dio.post(
+    final response = await _dio.post<Map<String, dynamic>>(
       'https://speech.googleapis.com/v1/speech:recognize?key=$_googleApiKey',
       data: {
         'config': {
@@ -103,7 +103,7 @@ class SpeechToTextService {
     );
 
     if (response.statusCode == 200) {
-      final results = response.data['results'] as List?;
+      final results = response.data?['results'] as List?;
       if (results != null && results.isNotEmpty) {
         final alternatives = results[0]['alternatives'] as List?;
         if (alternatives != null && alternatives.isNotEmpty) {
@@ -128,7 +128,7 @@ class SpeechToTextService {
 
     final bytes = await file.readAsBytes();
 
-    final response = await _dio.post(
+    final response = await _dio.post<Map<String, dynamic>>(
       'https://$_azureRegion.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=$language',
       data: bytes,
       options: Options(
@@ -140,7 +140,7 @@ class SpeechToTextService {
     );
 
     if (response.statusCode == 200) {
-      return response.data['DisplayText'] as String?;
+      return response.data?['DisplayText'] as String?;
     }
 
     return null;
@@ -165,13 +165,13 @@ class SpeechToTextService {
       'language': language.split('-').first, // whisper 使用 'zh', 'en' 等
     });
 
-    final response = await _dio.post(
+    final response = await _dio.post<Map<String, dynamic>>(
       '$_whisperServerUrl/transcribe',
       data: formData,
     );
 
     if (response.statusCode == 200) {
-      return response.data['text'] as String?;
+      return response.data?['text'] as String?;
     }
 
     return null;

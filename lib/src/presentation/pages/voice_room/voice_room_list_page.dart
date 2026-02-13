@@ -88,7 +88,7 @@ class _VoiceRoomListView extends StatelessWidget {
     final nameController = TextEditingController();
     final topicController = TextEditingController();
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(s?.voiceRoomCreate ?? 'Create Voice Room'),

@@ -262,7 +262,7 @@ class _VoiceRoomView extends StatelessWidget {
     VoiceRoomState state,
   ) {
     final s = S.of(context);
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       builder: (sheetContext) => SafeArea(
         child: Column(
@@ -308,7 +308,7 @@ class _VoiceRoomView extends StatelessWidget {
 
   void _confirmEndRoom(BuildContext context) {
     final s = S.of(context);
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(s?.voiceRoomEnd ?? 'End Room'),

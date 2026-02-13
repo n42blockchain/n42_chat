@@ -332,7 +332,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
       // 对于图片和视频，可以使用媒体预览
       if (file.isImage || file.isVideo) {
         Navigator.of(context).push(
-          MaterialPageRoute(
+          MaterialPageRoute<void>(
             builder: (_) => Scaffold(
               appBar: AppBar(title: Text(file.name)),
               body: Center(

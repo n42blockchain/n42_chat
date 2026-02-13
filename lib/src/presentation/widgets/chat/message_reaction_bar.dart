@@ -139,7 +139,7 @@ class _AddReactionButton extends StatelessWidget {
 
 /// 快速反应选择器（长按消息时显示）
 class QuickReactionPicker extends StatelessWidget {
-  final Function(String emoji)? onReactionSelected;
+  final void Function(String emoji)? onReactionSelected;
 
   const QuickReactionPicker({
     super.key,
@@ -184,7 +184,7 @@ class QuickReactionPicker extends StatelessWidget {
 
 /// 完整反应选择器（底部弹出）
 class FullReactionPicker extends StatelessWidget {
-  final Function(String emoji)? onReactionSelected;
+  final void Function(String emoji)? onReactionSelected;
 
   const FullReactionPicker({
     super.key,

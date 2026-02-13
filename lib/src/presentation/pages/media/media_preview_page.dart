@@ -34,7 +34,7 @@ class MediaPreviewPage extends StatefulWidget {
   final List<MediaItem> items;
   final int initialIndex;
   final VoidCallback? onDownload;
-  final Function(int index)? onForward;
+  final void Function(int index)? onForward;
 
   const MediaPreviewPage({
     super.key,

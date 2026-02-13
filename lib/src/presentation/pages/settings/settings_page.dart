@@ -139,7 +139,7 @@ class SettingsPage extends StatelessWidget {
                 title: S.of(context)?.storageManagement ?? 'Storage',
                 onTap: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(
+                    MaterialPageRoute<void>(
                       builder: (_) => const StorageManagementPage(),
                     ),
                   );
@@ -152,7 +152,7 @@ class SettingsPage extends StatelessWidget {
                 title: S.of(context)?.autoDownload ?? 'Auto-Download',
                 onTap: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(
+                    MaterialPageRoute<void>(
                       builder: (_) => const AutoDownloadSettingsPage(),
                     ),
                   );

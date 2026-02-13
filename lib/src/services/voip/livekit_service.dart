@@ -414,7 +414,7 @@ class LiveKitService extends ChangeNotifier {
     // 先禁用麦克风，再重新启用
     try {
       await _localParticipant!.setMicrophoneEnabled(false);
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       await _localParticipant!.setMicrophoneEnabled(!_isMuted);
       debugPrint('LiveKitService: Audio processing updated successfully');
     } catch (e) {

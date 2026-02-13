@@ -246,7 +246,7 @@ class _SpaceListPageState extends State<SpaceListPage>
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
+          MaterialPageRoute<void>(
             builder: (_) => SpaceDetailPage(space: space),
           ),
         );

@@ -208,7 +208,7 @@ class MessageMenu extends StatelessWidget {
 /// 转发选择对话框
 class ForwardDialog extends StatefulWidget {
   final List<ForwardTarget> targets;
-  final Function(List<String> roomIds)? onConfirm;
+  final void Function(List<String> roomIds)? onConfirm;
 
   const ForwardDialog({
     super.key,
