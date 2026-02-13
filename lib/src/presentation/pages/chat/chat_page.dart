@@ -69,6 +69,11 @@ import 'live_location_page.dart';
 import 'thread_detail_page.dart';
 import '../../widgets/chat/quick_reply_sheet.dart';
 import '../settings/quick_replies_page.dart';
+import '../ai/ai_assistant_page.dart';
+import '../../../core/services/ai_service.dart';
+import '../../widgets/chat/ai_summary_bubble.dart';
+import '../../../domain/repositories/ai_repository.dart';
+import '../../widgets/chat/ai_rewrite_bar.dart';
 import 'viewers/pdf_viewer_page.dart';
 
 /// 聊天页面
@@ -149,6 +154,17 @@ class _ChatPageState extends State<ChatPage> {
 
   // 投票防抖 - 正在投票的pollId集合
   final Set<String> _votingPollIds = {};
+
+  // AI 改写状态
+  bool _showRewriteBar = false;
+  String _rewriteOriginalText = '';
+  String? _rewriteResult;
+  bool _isRewriting = false;
+  AiTone? _selectedTone;
+
+  // AI 群聊消息摘要状态
+  String? _aiSummaryResult;
+  bool _isAiSummarizing = false;
 
   // 聊天背景 key（如 solid_0, gradient_1, default 等）
   String? _backgroundKey;
@@ -1330,6 +1346,10 @@ class _ChatPageState extends State<ChatPage> {
               // @ 提醒成员选择器（群聊时）
               if (_showMentionPicker && !_isMultiSelectMode) _buildMentionPicker(),
 
+              // AI 改写栏
+              if (_showRewriteBar && !_isMultiSelectMode)
+                _buildAiRewriteBar(),
+
               // View Once 提示条
               if (_isViewOnce && !_isMultiSelectMode && !_showSearchBar)
                 _buildViewOnceIndicator(),
@@ -1602,6 +1622,10 @@ class _ChatPageState extends State<ChatPage> {
       },
       isFaceBlur: _autoFaceBlur,
       onFaceBlurPressed: _toggleFaceBlur,
+      onAiAssistantPressed: getIt.isRegistered<IAiRepository>() ? () {
+        _hideMorePanel();
+        _openAiAssistant();
+      } : null,
     );
   }
 
@@ -2939,6 +2963,18 @@ Avatar: ${contactAvatar ?? ''}''';
             tooltip: S.of(context)?.chatVideoCall ?? 'Video Call',
           ),
         ],
+        if (getIt.isRegistered<IAiRepository>())
+          IconButton(
+            icon: const Icon(Icons.auto_awesome_outlined),
+            onPressed: () {
+              if (_inputController.text.trim().isNotEmpty) {
+                _showAiRewriteBar();
+              } else {
+                _openAiAssistant();
+              }
+            },
+            tooltip: S.of(context)?.aiAssistant ?? 'AI Assistant',
+          ),
         IconButton(
           icon: const Icon(Icons.search),
           onPressed: _toggleSearch,
@@ -3278,9 +3314,29 @@ Avatar: ${contactAvatar ?? ''}''';
               );
             }
             
-            // 端对端加密提示（在所有消息之上）
+            // 端对端加密提示 + 群聊 AI 摘要（在所有消息之上）
             if (index == state.messages.length) {
-              return _buildEncryptionNotice();
+              final isGroup = widget.conversation.type == ConversationType.group;
+              final aiAvailable = getIt.isRegistered<AiService>();
+              return Column(
+                children: [
+                  _buildEncryptionNotice(),
+                  if (isGroup && aiAvailable) ...[
+                    if (_aiSummaryResult != null || _isAiSummarizing)
+                      AiSummaryBubble(
+                        summary: _aiSummaryResult ?? '',
+                        messageCount: state.messages.where((m) => m.type == MessageType.text).take(50).length,
+                        isLoading: _isAiSummarizing,
+                        onDismiss: () => setState(() { _aiSummaryResult = null; }),
+                      )
+                    else
+                      AiSummarizeButton(
+                        unreadCount: state.messages.where((m) => m.type == MessageType.text).take(50).length,
+                        onTap: _summarizeRecentMessages,
+                      ),
+                  ],
+                ],
+              );
             }
 
             final message = state.messages[index];
@@ -3873,6 +3929,138 @@ Avatar: ${contactAvatar ?? ''}''';
     }
   }
 
+  Widget _buildAiRewriteBar() {
+    return AiRewriteBar(
+      originalText: _rewriteOriginalText,
+      rewrittenText: _rewriteResult,
+      isRewriting: _isRewriting,
+      selectedTone: _selectedTone,
+      onToneSelected: _onRewriteTone,
+      onAccept: (text) {
+        _inputController.text = text;
+        _inputController.selection = TextSelection.fromPosition(
+          TextPosition(offset: text.length),
+        );
+        setState(() {
+          _showRewriteBar = false;
+          _rewriteResult = null;
+          _selectedTone = null;
+        });
+      },
+      onDismiss: () {
+        setState(() {
+          _showRewriteBar = false;
+          _rewriteResult = null;
+          _selectedTone = null;
+        });
+      },
+    );
+  }
+
+  void _onRewriteTone(AiTone tone) {
+    if (!getIt.isRegistered<AiService>()) return;
+    setState(() {
+      _selectedTone = tone;
+      _isRewriting = true;
+      _rewriteResult = null;
+    });
+    getIt<AiService>().rewriteMessage(_rewriteOriginalText, tone).then((result) {
+      if (mounted) {
+        setState(() {
+          _rewriteResult = result;
+          _isRewriting = false;
+        });
+      }
+    }).catchError((Object e) {
+      if (mounted) {
+        setState(() => _isRewriting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('AI rewrite failed: $e')),
+        );
+      }
+    });
+  }
+
+  void _showAiRewriteBar() {
+    final text = _inputController.text.trim();
+    if (text.isEmpty || !getIt.isRegistered<AiService>()) return;
+    setState(() {
+      _rewriteOriginalText = text;
+      _showRewriteBar = true;
+      _rewriteResult = null;
+      _selectedTone = null;
+    });
+  }
+
+  void _translateMessage(MessageEntity message) {
+    if (!getIt.isRegistered<AiService>()) return;
+    final text = message.type == MessageType.text ? message.content : '';
+    if (text.isEmpty) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(S.of(context)?.aiSummarizeLoading ?? 'Translating...')),
+    );
+
+    final targetLang = Localizations.localeOf(context).languageCode == 'zh' ? 'English' : '中文';
+    getIt<AiService>().translateMessage(text, targetLang).then((result) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        showDialog<void>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(S.of(context)?.commonTranslate ?? 'Translate'),
+            content: SelectableText(result),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(S.of(context)?.commonConfirm ?? 'OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    }).catchError((Object e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Translate failed: $e')),
+        );
+      }
+    });
+  }
+
+  void _openAiAssistant() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const AiAssistantPage(),
+      ),
+    );
+  }
+
+  /// 群聊消息摘要
+  void _summarizeRecentMessages() {
+    if (!getIt.isRegistered<AiService>() || _isAiSummarizing) return;
+    final messages = context.read<ChatBloc>().state.messages;
+    final textMessages = messages
+        .where((m) => m.type == MessageType.text && m.content.trim().isNotEmpty)
+        .take(50)
+        .toList()
+        .reversed;
+    if (textMessages.isEmpty) return;
+    final texts = textMessages.map((m) => '${m.senderName}: ${m.content}').join('\n');
+    setState(() { _isAiSummarizing = true; _aiSummaryResult = null; });
+    getIt<AiService>().summarize(texts).then((result) {
+      if (mounted) setState(() { _aiSummaryResult = result; _isAiSummarizing = false; });
+    }).catchError((Object e) {
+      if (mounted) {
+        setState(() => _isAiSummarizing = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Summarize failed: $e')),
+        );
+      }
+    });
+  }
+
   void _onQuickReplyPressed() {
     showQuickReplySheet(
       context: context,
@@ -4179,6 +4367,10 @@ Avatar: ${contactAvatar ?? ''}''';
           debugPrint('Edit clicked');
           _enterEditMode(message);
         },
+        onTranslate: (getIt.isRegistered<AiService>() && message.type == MessageType.text) ? () {
+          debugPrint('Translate clicked');
+          _translateMessage(message);
+        } : null,
       ),
     );
 

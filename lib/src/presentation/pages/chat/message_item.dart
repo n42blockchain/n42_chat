@@ -12,6 +12,8 @@ import '../../widgets/chat/message_status_indicator.dart' as indicator;
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/contact_card_message_widget.dart';
 import '../../widgets/chat/url_preview_widget.dart';
+import '../../widgets/chat/ai_link_summary_card.dart';
+import '../../../core/services/ai_service.dart';
 import '../../widgets/chat/message_reaction_bar.dart';
 import '../../widgets/chat/edit_history_sheet.dart';
 import '../../widgets/chat/thread_indicator.dart';
@@ -456,6 +458,8 @@ class MessageItem extends StatelessWidget {
               url: urlMatch.group(0)!,
               previewService: getIt<UrlPreviewService>(),
             ),
+          if (urlMatch != null && getIt.isRegistered<AiService>())
+            _AiLinkSummaryWrapper(url: urlMatch.group(0)!),
         ],
       );
     }
@@ -471,6 +475,8 @@ class MessageItem extends StatelessWidget {
             url: urlMatch.group(0)!,
             previewService: getIt<UrlPreviewService>(),
           ),
+          if (getIt.isRegistered<AiService>())
+            _AiLinkSummaryWrapper(url: urlMatch.group(0)!),
         ],
       );
     }
@@ -1814,5 +1820,40 @@ class _MapGridPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// AI 链接摘要包装器
+///
+/// 自管理 loading/result 状态，内嵌在 UrlPreviewWidget 下方
+class _AiLinkSummaryWrapper extends StatefulWidget {
+  final String url;
+  const _AiLinkSummaryWrapper({required this.url});
+  @override
+  State<_AiLinkSummaryWrapper> createState() => _AiLinkSummaryWrapperState();
+}
+
+class _AiLinkSummaryWrapperState extends State<_AiLinkSummaryWrapper> {
+  String? _summary;
+  bool _isLoading = false;
+
+  void _generate() async {
+    setState(() => _isLoading = true);
+    try {
+      final result = await getIt<AiService>().summarizeUrl(widget.url, '');
+      if (mounted) setState(() { _summary = result; _isLoading = false; });
+    } catch (_) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AiLinkSummaryCard(
+      url: widget.url,
+      summary: _summary,
+      isLoading: _isLoading,
+      onGenerate: _generate,
+    );
+  }
 }
 
