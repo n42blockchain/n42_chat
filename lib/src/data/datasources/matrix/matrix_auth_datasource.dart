@@ -216,8 +216,9 @@ class MatrixAuthDataSource {
               auth: authWithSession,
             );
           }
-        } catch (_) {
+        } catch (e) {
           // 解析或处理失败，继续抛出原始异常
+          debugPrint('Error: $e');
         }
       }
       rethrow;

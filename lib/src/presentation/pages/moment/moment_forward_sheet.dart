@@ -26,7 +26,9 @@ class MomentForwardSheet extends StatefulWidget {
     ConversationBloc? conversationBloc;
     try {
       conversationBloc = context.read<ConversationBloc>();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
 
     return showModalBottomSheet<void>(
       context: context,

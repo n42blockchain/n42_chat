@@ -1071,6 +1071,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       await _messageRepository.markAsRead(_currentRoomId!, event.messageId);
     } catch (e) {
       // 静默失败
+      debugPrint('Error: $e');
     }
   }
 
@@ -1097,6 +1098,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       );
     } catch (e) {
       // 静默失败
+      debugPrint('Error: $e');
     }
   }
 

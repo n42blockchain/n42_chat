@@ -291,7 +291,8 @@ class SelfDestructTimer {
   static SelfDestructTimer? fromSeconds(int seconds) {
     try {
       return presets.firstWhere((p) => p.seconds == seconds);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error: $e');
       return null;
     }
   }

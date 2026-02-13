@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'matrix_client_manager.dart';
@@ -227,6 +228,7 @@ class MatrixStoryDataSource {
       await room.redactEvent(eventId);
     } catch (e) {
       // 忽略错误
+      debugPrint('Error: $e');
     }
   }
 
@@ -337,6 +339,7 @@ class MatrixStoryDataSource {
       }
     } catch (e) {
       // 忽略错误
+      debugPrint('Error: $e');
     }
 
     return viewers;

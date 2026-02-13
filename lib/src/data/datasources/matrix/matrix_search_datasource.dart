@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'matrix_client_manager.dart';
@@ -166,6 +167,7 @@ class MatrixSearchDataSource {
       }
     } catch (e) {
       // 搜索失败
+      debugPrint('Error: $e');
     }
 
     return results;
@@ -207,6 +209,7 @@ class MatrixSearchDataSource {
         if (results.length >= limit) break;
       } catch (e) {
         // 继续搜索其他房间
+        debugPrint('Error: $e');
       }
     }
 

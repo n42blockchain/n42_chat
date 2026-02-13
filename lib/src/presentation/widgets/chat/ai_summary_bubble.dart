@@ -127,6 +127,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
   }
 
   Widget _buildLoading() {
+    final l10n = S.of(context);
     return Row(
       children: [
         SizedBox(

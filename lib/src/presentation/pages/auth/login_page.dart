@@ -495,11 +495,13 @@ class _LoginPageState extends State<LoginPage> {
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
 
+    final isEmail = _usernameController.text.contains('@');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.authUsername ?? 'Username',
+          S.of(context)?.authUsernameOrEmail ?? 'Username or Email',
           style: TextStyle(
             fontSize: 14,
             color: labelColor,
@@ -510,7 +512,7 @@ class _LoginPageState extends State<LoginPage> {
           controller: _usernameController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.authEnterUsername ?? 'Enter username',
+            hintText: S.of(context)?.authEnterUsernameOrEmail ?? 'Enter username or email',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -523,14 +525,16 @@ class _LoginPageState extends State<LoginPage> {
               vertical: 14,
             ),
             prefixIcon: Icon(
-              Icons.person_outline,
+              isEmail ? Icons.email_outlined : Icons.person_outline,
               color: hintColor,
             ),
           ),
+          keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
+          onChanged: (_) => setState(() {}),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.authEnterUsername ?? 'Please enter username';
+              return S.of(context)?.authEnterUsernameOrEmail ?? 'Please enter username or email';
             }
             return null;
           },

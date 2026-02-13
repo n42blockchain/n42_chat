@@ -80,7 +80,9 @@ class MatrixClientManager {
       debugPrint('MatrixClientManager: Force reinitializing, disposing old client...');
       try {
         await _client!.dispose();
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('Error: $e');
+      }
       _client = null;
       _isInitialized = false;
     }
@@ -184,7 +186,9 @@ class MatrixClientManager {
       if (_client != null) {
         try {
           await _client!.dispose();
-        } catch (_) {}
+        } catch (e) {
+          debugPrint('Error: $e');
+        }
         _client = null;
       }
       _isInitialized = false;
@@ -667,7 +671,8 @@ class MatrixClientManager {
         final errcode = errorJson['errcode'] as String?;
         final error = errorJson['error'] as String?;
         throw Exception('Upload failed: $errcode - $error');
-      } catch (_) {
+      } catch (e) {
+        debugPrint('Error: $e');
         throw Exception('Upload failed with status ${response.statusCode}');
       }
     } catch (e) {

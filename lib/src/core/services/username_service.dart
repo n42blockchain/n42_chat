@@ -173,7 +173,8 @@ class UsernameService {
     try {
       final accountData = _client!.accountData[_accountDataKey];
       return accountData?.content['username'] as String?;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error: $e');
       return null;
     }
   }
@@ -190,7 +191,8 @@ class UsernameService {
       final stateEvent = room.getState(_claimEventType, username);
       final userId = stateEvent?.content['user_id'] as String?;
       return (userId != null && userId.isNotEmpty) ? userId : null;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error: $e');
       return null;
     }
   }

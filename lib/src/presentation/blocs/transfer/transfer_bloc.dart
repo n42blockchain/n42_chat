@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/transfer_entity.dart';
@@ -85,6 +86,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       emit(currentState.copyWith(balances: newBalances));
     } catch (e) {
       // 忽略余额加载错误
+      debugPrint('Error: $e');
     }
   }
 

@@ -82,6 +82,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       }
     } catch (e) {
       // ContactBloc 可能不可用，忽略
+      debugPrint('Error: $e');
     }
   }
   
@@ -126,6 +127,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       hasContactBloc = true;
     } catch (e) {
       // ContactBloc 不可用
+      debugPrint('Error: $e');
     }
     
     Widget scaffold = Scaffold(
@@ -572,6 +574,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
+      debugPrint('Error: $e');
     }
 
     Navigator.of(context).push(
@@ -610,6 +613,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
+      debugPrint('Error: $e');
     }
     
     Navigator.of(context).push(
@@ -689,6 +693,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
       }
     } catch (e) {
       // ContactBloc 可能不可用
+      debugPrint('Error: $e');
     }
   }
 
@@ -709,6 +714,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
       hasContactBloc = true;
     } catch (e) {
       // ContactBloc 不可用
+      debugPrint('Error: $e');
     }
     
     Widget scaffold = Scaffold(
@@ -1042,6 +1048,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
             contactBloc = context.read<ContactBloc>();
           } catch (e) {
             // ContactBloc 可能不可用
+            debugPrint('Error: $e');
           }
           
           final page = EditRemarkPage(

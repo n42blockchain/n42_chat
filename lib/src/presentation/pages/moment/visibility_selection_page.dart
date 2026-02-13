@@ -68,7 +68,9 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
       if (state is ContactLoaded) {
         return state.contacts;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
     return [];
   }
 

@@ -153,6 +153,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
       hasContactBloc = true;
     } catch (e) {
       // ContactBloc 不可用
+      debugPrint('Error: $e');
     }
 
     final scaffold = Scaffold(

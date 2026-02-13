@@ -541,7 +541,8 @@ class MatrixGroupDataSource {
     try {
       final stateEvent = room.getState(_tokenGateEventType);
       return stateEvent?.content;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error: $e');
       return null;
     }
   }

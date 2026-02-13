@@ -37,7 +37,6 @@ class EmojiPicker extends StatefulWidget {
 
 class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int _currentCategory = 0;
 
   // 表情分类（仅包含图标和表情列表，界面只显示图标）
   static const List<_EmojiCategory> _categories = [
@@ -178,13 +177,7 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
   void initState() {
     super.initState();
     _tabController = TabController(length: _categories.length, vsync: this);
-    _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
-        setState(() {
-          _currentCategory = _tabController.index;
-        });
-      }
-    });
+    // TabController 已通过 TabBar/TabBarView 自动管理索引切换
   }
 
   @override
