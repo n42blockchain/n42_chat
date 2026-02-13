@@ -26,7 +26,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
         return Scaffold(
           backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
           appBar: N42AppBar(
-            title: l10n?.aiSettings ?? 'AI Settings',
+            title: l10n?.aiAssistantSettings ?? 'AI Settings',
           ),
           body: ListView(
             children: [
@@ -36,18 +36,18 @@ class AiAssistantSettingsPage extends StatelessWidget {
               _buildSection(
                 context,
                 isDark,
-                title: l10n?.aiAssistantInfo ?? 'Assistant',
+                title: l10n?.aiAssistant ?? 'Assistant',
                 children: [
                   _buildInfoTile(
                     context, isDark,
                     icon: Icons.smart_toy_outlined,
-                    title: l10n?.aiAssistantName ?? 'Name',
+                    title: l10n?.aiAssistant ?? 'Name',
                     subtitle: assistant.name,
                   ),
                   _buildInfoTile(
                     context, isDark,
                     icon: Icons.memory_outlined,
-                    title: l10n?.aiModel ?? 'Model',
+                    title: l10n?.aiAssistantModel ?? 'Model',
                     subtitle: assistant.model,
                   ),
                 ],
@@ -59,24 +59,24 @@ class AiAssistantSettingsPage extends StatelessWidget {
               _buildSection(
                 context,
                 isDark,
-                title: l10n?.aiParameters ?? 'Parameters',
+                title: l10n?.aiAssistantSettings ?? 'Parameters',
                 children: [
                   _buildInfoTile(
                     context, isDark,
                     icon: Icons.thermostat_outlined,
-                    title: l10n?.aiTemperature ?? 'Temperature',
+                    title: l10n?.aiAssistantTemperature ?? 'Temperature',
                     subtitle: assistant.temperature.toStringAsFixed(1),
                   ),
                   _buildInfoTile(
                     context, isDark,
                     icon: Icons.token_outlined,
-                    title: l10n?.aiMaxTokens ?? 'Max Tokens',
+                    title: l10n?.aiAssistantMaxTokens ?? 'Max Tokens',
                     subtitle: assistant.maxTokens.toString(),
                   ),
                   _buildInfoTile(
                     context, isDark,
                     icon: Icons.history_outlined,
-                    title: l10n?.aiContextWindow ?? 'Context Window',
+                    title: l10n?.aiAssistantContextWindow ?? 'Context Window',
                     subtitle: '${assistant.contextWindow} messages',
                   ),
                 ],
@@ -88,15 +88,15 @@ class AiAssistantSettingsPage extends StatelessWidget {
               _buildSection(
                 context,
                 isDark,
-                title: l10n?.aiServiceStatus ?? 'Service Status',
+                title: l10n?.aiAssistantServiceStatus ?? 'Service Status',
                 children: [
                   _buildInfoTile(
                     context, isDark,
                     icon: state.isAvailable ? Icons.check_circle_outline : Icons.error_outline,
-                    title: l10n?.aiServiceAvailability ?? 'Availability',
+                    title: l10n?.aiAssistantServiceStatus ?? 'Availability',
                     subtitle: state.isAvailable
-                        ? (l10n?.aiServiceAvailable ?? 'Available')
-                        : (l10n?.aiServiceUnavailable ?? 'Not configured'),
+                        ? (l10n?.aiAssistantAvailable ?? 'Available')
+                        : (l10n?.aiAssistantUnavailable ?? 'Not configured'),
                     subtitleColor: state.isAvailable ? Colors.green : Colors.orange,
                   ),
                 ],
