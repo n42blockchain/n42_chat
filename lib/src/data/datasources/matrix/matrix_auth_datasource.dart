@@ -374,6 +374,13 @@ class MatrixAuthDataSource {
 
       debugPrint('MatrixAuthDataSource: Password reset email requested, sid: ${response.sid}');
       return true;
+    } on MatrixException catch (e) {
+      debugPrint('MatrixAuthDataSource: Request password reset email failed: $e');
+      // 服务器不支持该端点（M_UNRECOGNIZED: Not Found）
+      if (e.errcode == 'M_UNRECOGNIZED') {
+        throw Exception('Server does not support email password reset');
+      }
+      rethrow;
     } catch (e) {
       debugPrint('MatrixAuthDataSource: Request password reset email failed: $e');
       rethrow;

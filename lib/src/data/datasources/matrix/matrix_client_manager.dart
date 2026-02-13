@@ -224,10 +224,10 @@ class MatrixClientManager {
   // 认证
   // ============================================
 
-  /// 使用用户名密码登录
+  /// 使用用户名或邮箱+密码登录
   ///
   /// [homeserver] Matrix服务器地址
-  /// [username] 用户名（不含@和服务器部分）
+  /// [username] 用户名或邮箱地址
   /// [password] 密码
   /// [deviceName] 设备名称
   Future<LoginResponse> login({
@@ -243,10 +243,28 @@ class MatrixClientManager {
       final homeserverUri = Uri.parse(homeserver);
       final (_, _, _, _) = await _client!.checkHomeserver(homeserverUri);
 
+      // 检测是否为邮箱格式（包含 @ 且 @ 后有域名部分）
+      final isEmail = username.contains('@') && username.indexOf('@') > 0 &&
+          username.indexOf('@') < username.length - 1 &&
+          username.substring(username.indexOf('@') + 1).contains('.');
+
+      // 根据输入类型选择认证标识
+      final AuthenticationIdentifier identifier;
+      if (isEmail) {
+        identifier = AuthenticationThirdPartyIdentifier(
+          medium: 'email',
+          address: username,
+        );
+        debugPrint('MatrixClientManager: Using email identifier for login');
+      } else {
+        identifier = AuthenticationUserIdentifier(user: username);
+        debugPrint('MatrixClientManager: Using username identifier for login');
+      }
+
       // 登录
       final response = await _client!.login(
         LoginType.mLoginPassword,
-        identifier: AuthenticationUserIdentifier(user: username),
+        identifier: identifier,
         password: password,
         initialDeviceDisplayName: deviceName ?? 'N42Chat',
       );
