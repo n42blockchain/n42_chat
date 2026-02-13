@@ -206,6 +206,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
       await widget.e2eeManager.rejectSas(_verification!);
     } catch (e) {
       // ignore
+      debugPrint('Error: $e');
     }
 
     setState(() {
@@ -221,6 +222,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         await widget.e2eeManager.cancelVerification(_verification!);
       } catch (e) {
         // ignore
+        debugPrint('Error: $e');
       }
     }
     if (mounted) Navigator.pop(context, false);

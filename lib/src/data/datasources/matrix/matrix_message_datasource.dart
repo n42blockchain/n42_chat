@@ -1807,9 +1807,10 @@ class MatrixMessageDataSource {
             try {
               final replyUser = room.unsafeGetUserFromMemoryOrFallback(userId);
               replyToSender = replyUser.calcDisplayname();
-            } catch (_) {
+            } catch (e) {
               // 如果获取用户失败，使用 userId 的用户名部分
               replyToSender = userId.split(':').first.replaceFirst('@', '');
+              debugPrint('Error: $e');
             }
           }
         }
@@ -2071,7 +2072,8 @@ class MatrixMessageDataSource {
 
       // m.replace 存在就说明消息被编辑过
       return relations.containsKey('m.replace');
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error: $e');
       return false;
     }
   }
@@ -2094,7 +2096,8 @@ class MatrixMessageDataSource {
         return DateTime.fromMillisecondsSinceEpoch(ts);
       }
       return null;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error: $e');
       return null;
     }
   }

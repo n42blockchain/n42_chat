@@ -398,6 +398,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
+      debugPrint('Error: $e');
     }
     
     Navigator.of(context).push(

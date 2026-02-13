@@ -69,6 +69,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         }
       } catch (e) {
         // Apple Sign-In 不可用
+        debugPrint('Error: $e');
       }
     }
 
@@ -80,6 +81,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       }
     } catch (e) {
       // WeChat 不可用
+      debugPrint('Error: $e');
     }
   }
 

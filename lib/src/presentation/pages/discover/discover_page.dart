@@ -197,7 +197,9 @@ class DiscoverPage extends StatelessWidget {
     MomentBloc? momentBloc;
     try {
       momentBloc = context.read<MomentBloc>();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
 
     if (momentBloc == null) {
       return _buildMenuItem(
@@ -256,7 +258,9 @@ class DiscoverPage extends StatelessWidget {
     // 标记已读
     try {
       context.read<MomentBloc>().add(const MarkMomentsAsRead());
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
 
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const MomentListPage()),

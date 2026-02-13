@@ -133,7 +133,9 @@ class _MomentListViewState extends State<_MomentListView> {
       if (contactState is ContactLoaded) {
         return contactState.contacts.map((c) => c.userId).toSet();
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
     return {};
   }
 

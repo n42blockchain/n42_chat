@@ -337,6 +337,7 @@ class VoiceService {
           }
         } catch (e) {
           // 忽略错误
+          debugPrint('Error: $e');
         }
       }
     });

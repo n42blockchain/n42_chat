@@ -94,7 +94,6 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
 
   Future<MessageEntity?> _loadRootMessage(String roomId, String eventId) async {
     try {
-      final messages = await _messageRepository.getMessages(roomId, limit: 1);
       // 尝试通过 watchMessage 获取根消息
       final stream = _messageRepository.watchMessage(roomId, eventId);
       final msg = await stream.first.timeout(

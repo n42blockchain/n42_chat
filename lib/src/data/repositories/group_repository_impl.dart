@@ -325,7 +325,9 @@ class GroupRepositoryImpl implements IGroupRepository {
       if (tokenGateData != null) {
         tokenGateConfig = TokenGateConfig.fromJson(tokenGateData);
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
 
     return GroupEntity(
       roomId: room.id,

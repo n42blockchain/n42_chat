@@ -241,7 +241,8 @@ class MatrixVoiceRoomDataSource {
     try {
       final creationContent = room.getState('m.room.create')?.content;
       return creationContent?['type'] == _roomType;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error: $e');
       return false;
     }
   }

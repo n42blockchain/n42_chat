@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -496,6 +495,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       hasContactBloc = true;
     } catch (e) {
       // ContactBloc 不可用
+      debugPrint('Error: $e');
     }
 
     Widget scaffold = Scaffold(
@@ -861,6 +861,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
+      debugPrint('Error: $e');
     }
 
     Navigator.of(context).push(
@@ -1349,6 +1350,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
+      debugPrint('Error: $e');
     }
 
     Navigator.of(context).push(

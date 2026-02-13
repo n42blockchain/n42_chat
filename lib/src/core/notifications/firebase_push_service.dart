@@ -561,8 +561,9 @@ class FirebasePushService implements IPushNotificationService {
         final roomId = data['room_id'] as String?;
         final eventId = data['event_id'] as String?;
         onNotificationTap?.call(roomId, eventId);
-      } catch (_) {
+      } catch (e) {
         // 忽略解析错误
+        debugPrint('Error: $e');
       }
     }
   }
@@ -813,8 +814,9 @@ class FirebasePushService implements IPushNotificationService {
           data: matrix.PusherData(),
         ),
       );
-    } catch (_) {
+    } catch (e) {
       // 忽略注销错误
+      debugPrint('Error: $e');
     }
   }
 
@@ -878,8 +880,9 @@ class FirebasePushService implements IPushNotificationService {
         notificationDetails: details,
         payload: payload,
       );
-    } catch (_) {
+    } catch (e) {
       // 忽略通知显示错误
+      debugPrint('Error: $e');
     }
   }
 

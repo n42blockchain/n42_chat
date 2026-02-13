@@ -61,7 +61,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           setState(() => _ensName = ensName);
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
 
     // Load username
     try {
@@ -70,7 +72,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (mounted && username != null) {
         setState(() => _n42Username = username);
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
   }
 
   @override

@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 import '../../domain/entities/story_entity.dart';
 import '../../domain/repositories/story_repository.dart';
 import '../datasources/local/secure_storage_datasource.dart';
@@ -332,6 +334,7 @@ class StoryRepositoryImpl implements IStoryRepository {
       );
     } catch (e) {
       // 忽略存储错误
+      debugPrint('Error: $e');
     }
   }
 }

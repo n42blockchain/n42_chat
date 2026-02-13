@@ -105,8 +105,9 @@ class MessageRepositoryImpl implements IMessageRepository {
             (e) => e.eventId == messageId,
           );
           yield _messageDataSource.mapEventToMessage(event, room);
-        } catch (_) {
+        } catch (e) {
           // 事件未找到，跳过
+          debugPrint('Error: $e');
         }
       }
     }

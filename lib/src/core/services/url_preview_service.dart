@@ -106,7 +106,8 @@ class UrlPreviewService {
       }
 
       return false;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error: $e');
       return true; // 解析失败视为私有地址，拒绝请求
     }
   }

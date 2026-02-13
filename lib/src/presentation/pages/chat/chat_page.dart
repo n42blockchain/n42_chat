@@ -55,12 +55,10 @@ import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/gif_picker.dart';
 import '../../widgets/chat/sticker_picker.dart';
 import '../../widgets/chat/red_packet_dialogs.dart';
-import '../../../domain/entities/sticker_pack_entity.dart';
 import '../sticker/sticker_store_page.dart';
 import '../../widgets/chat/edit_history_sheet.dart';
 import '../../widgets/chat/wechat_message_menu.dart';
 import '../../widgets/common/common_widgets.dart';
-import '../../widgets/wechat_toast.dart';
 import '../contact/contact_detail_page.dart';
 import '../search/chat_search_bar.dart';
 import 'chat_detail_page.dart';
@@ -681,6 +679,7 @@ class _ChatPageState extends State<ChatPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
+      debugPrint('Error: $e');
     }
 
     // 跳转到联系人详情页面
@@ -950,6 +949,7 @@ class _ChatPageState extends State<ChatPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
+      debugPrint('Error: $e');
     }
     
     // 获取备注名
@@ -1107,6 +1107,7 @@ class _ChatPageState extends State<ChatPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
+      debugPrint('Error: $e');
     }
 
     // 检查是否可以踢人和修改群设置（群主/管理员）
@@ -1233,6 +1234,7 @@ class _ChatPageState extends State<ChatPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
+      debugPrint('Error: $e');
     }
 
     Navigator.of(ctx).push(
@@ -1271,6 +1273,7 @@ class _ChatPageState extends State<ChatPage> {
       hasContactBloc = true;
     } catch (e) {
       // ContactBloc 不可用
+      debugPrint('Error: $e');
     }
 
     Widget content = Stack(
@@ -6061,7 +6064,13 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
     super.initState();
     _getCurrentLocation();
   }
-  
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    super.dispose();
+  }
+
   Future<void> _getCurrentLocation() async {
     try {
       setState(() {

@@ -229,6 +229,12 @@ class N42Chat {
 
     _config = config;
 
+    // 如果之前初始化中途失败，GetIt 可能已有部分注册，需要先重置
+    if (getIt.isRegistered<N42ChatConfig>()) {
+      debugPrint('N42Chat: Resetting previous partial initialization');
+      await resetDependencies();
+    }
+
     // 初始化依赖注入
     await configureDependencies(config);
 

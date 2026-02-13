@@ -180,6 +180,7 @@ class ContactRepositoryImpl implements IContactRepository {
           }
         } catch (e) {
           // Ignore errors, will use fallback
+          debugPrint('Error: $e');
         }
       }
 

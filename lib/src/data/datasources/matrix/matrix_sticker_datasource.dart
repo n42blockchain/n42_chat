@@ -299,6 +299,7 @@ class MatrixStickerDataSource {
         recentList = (data['recent'] as List?)?.cast<Map<String, dynamic>>() ?? [];
       } catch (e) {
         // 账户数据不存在，使用空列表
+        debugPrint('Error: $e');
       }
 
       // 查找现有记录

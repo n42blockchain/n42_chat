@@ -446,7 +446,9 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
     ContactBloc? contactBloc;
     try {
       contactBloc = context.read<ContactBloc>();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
 
     final result = await Navigator.of(context).push<List<String>>(
       MaterialPageRoute<List<String>>(

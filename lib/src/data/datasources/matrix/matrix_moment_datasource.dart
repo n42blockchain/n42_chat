@@ -359,6 +359,7 @@ class MatrixMomentDataSource {
       }
     } catch (e) {
       // 忽略错误
+      debugPrint('Error: $e');
     }
   }
 
@@ -710,6 +711,7 @@ class MatrixMomentDataSource {
       }
     } catch (e) {
       // getParticipants 可能失败，继续尝试邀请
+      debugPrint('Error: $e');
     }
 
     try {
@@ -773,6 +775,7 @@ class MatrixMomentDataSource {
       }
     } catch (e) {
       // 忽略错误
+      debugPrint('Error: $e');
     }
 
     // 方法 2: 检查房间名称（降级方案）
@@ -783,6 +786,7 @@ class MatrixMomentDataSource {
       }
     } catch (e) {
       // 忽略错误
+      debugPrint('Error: $e');
     }
 
     return false;
@@ -797,6 +801,7 @@ class MatrixMomentDataSource {
       }
     } catch (e) {
       // 忽略错误
+      debugPrint('Error: $e');
     }
 
     // 降级：尝试从成员中找到不是自己的用户
@@ -810,6 +815,7 @@ class MatrixMomentDataSource {
       }
     } catch (e) {
       // 忽略错误
+      debugPrint('Error: $e');
     }
 
     return null;

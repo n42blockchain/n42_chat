@@ -272,7 +272,9 @@ class AiDatasource implements AiService {
           }
           if (error is String) return error;
         }
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('Error: $e');
+      }
     }
 
     return switch (e.type) {

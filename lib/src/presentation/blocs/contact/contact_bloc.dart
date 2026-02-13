@@ -265,6 +265,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
       emit(currentState.copyWith(friendRequests: friendRequests));
     } catch (e) {
       // Ignore error for friend requests
+      debugPrint('Error: $e');
     }
   }
 

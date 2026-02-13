@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/game_score.dart';
@@ -28,8 +29,9 @@ class GameScoreService {
       }
 
       await prefs.setStringList(key, existing);
-    } catch (_) {
+    } catch (e) {
       // Score persistence is non-critical; silently ignore storage failures
+      debugPrint('Error: $e');
     }
   }
 
@@ -43,8 +45,9 @@ class GameScoreService {
       for (final s in stored) {
         try {
           scores.add(GameScore.fromJson(jsonDecode(s) as Map<String, dynamic>));
-        } catch (_) {
+        } catch (e) {
           // Skip corrupted entries
+          debugPrint('Error: $e');
         }
       }
 

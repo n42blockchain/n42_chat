@@ -55,7 +55,9 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
               });
             }
           }
-        } catch (_) {}
+        } catch (e) {
+          debugPrint('Error: $e');
+        }
       }
     } catch (e) {
       debugPrint('Failed to load user info: $e');

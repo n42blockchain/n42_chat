@@ -42,7 +42,9 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
       final state = context.read<MomentBloc>().state;
       final found = state.moments.where((m) => m.id == widget.moment.id).firstOrNull;
       if (found != null) return found;
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
     return widget.moment;
   }
 
@@ -52,7 +54,9 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
       if (contactState is ContactLoaded) {
         return contactState.contacts.map((c) => c.userId).toSet();
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
     return {};
   }
 

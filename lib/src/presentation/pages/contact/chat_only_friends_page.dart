@@ -46,7 +46,9 @@ class _ChatOnlyFriendsPageState extends State<ChatOnlyFriendsPage> {
             if (data['chatOnly'] == true) {
               chatOnlyIds.add(contact.userId);
             }
-          } catch (_) {}
+          } catch (e) {
+            debugPrint('Error: $e');
+          }
         }
       }
 

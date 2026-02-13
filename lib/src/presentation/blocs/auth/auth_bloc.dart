@@ -432,9 +432,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ));
       }
     } catch (e) {
+      String errorMsg;
+      final errorStr = e.toString();
+      if (errorStr.contains('Server does not support email password reset')) {
+        errorMsg = '该服务器不支持通过邮箱重置密码';
+      } else {
+        errorMsg = '发送验证码失败: $errorStr';
+      }
       emit(state.copyWith(
         passwordResetStatus: PasswordResetStatus.failed,
-        errorMessage: '发送验证码失败: $e',
+        errorMessage: errorMsg,
       ));
     }
   }

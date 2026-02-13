@@ -147,21 +147,6 @@ class N42Avatar extends StatelessWidget {
     return _buildDefaultAvatar();
   }
 
-  Widget _buildPlaceholder() {
-    return Container(
-      color: AppColors.placeholder,
-      child: Center(
-        child: SizedBox(
-          width: size * 0.4,
-          height: size * 0.4,
-          child: const CircularProgressIndicator(
-            strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildDefaultAvatar() {
     return Container(
