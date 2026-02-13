@@ -300,11 +300,8 @@ class GroupEntity extends Equatable {
 
   /// 获取群主
   GroupMember? get owner {
-    try {
-      return members.firstWhere((m) => m.isOwner);
-    } catch (e) {
-      return null;
-    }
+    final owners = members.where((m) => m.isOwner);
+    return owners.isNotEmpty ? owners.first : null;
   }
 
   /// 获取管理员列表
