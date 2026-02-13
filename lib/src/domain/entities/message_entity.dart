@@ -699,6 +699,12 @@ class MessageMetadata extends Equatable {
     musicArtist: musicArtist,
     musicUrl: musicUrl,
     musicCover: musicCover,
+    callDuration: callDuration,
+    callEnded: callEnded,
+    isMissedCall: isMissedCall,
+    callEndReason: callEndReason,
+    callRoomId: callRoomId,
+    callPeerId: callPeerId,
   );
 
   /// Create a copy with updated transcription fields

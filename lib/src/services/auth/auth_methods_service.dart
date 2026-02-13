@@ -140,7 +140,6 @@ class AuthMethodsService {
 
   // Passkey 配置
   String? _passkeyRpId;
-  String? _passkeyOrigin;
   bool _passkeyInitialized = false;
 
   // Google Sign In
@@ -174,7 +173,7 @@ class AuthMethodsService {
   }) async {
     // 初始化 Passkey 配置
     _passkeyRpId = passkeyRpId ?? 'm.si46.world';
-    _passkeyOrigin = passkeyOrigin ?? 'https://m.si46.world';
+    // passkeyOrigin 参数保留供未来 Web 平台使用
     _passkeyInitialized = true;
     debugPrint('AuthMethodsService: Passkey config initialized');
 
@@ -1082,7 +1081,6 @@ class AuthMethodsService {
   void dispose() {
     _passkeyInitialized = false;
     _passkeyRpId = null;
-    _passkeyOrigin = null;
     _googleSignIn = null;
     _twitterApiKey = null;
     _twitterApiSecret = null;
