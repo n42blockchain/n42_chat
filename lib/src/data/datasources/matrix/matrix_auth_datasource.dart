@@ -518,10 +518,9 @@ class RegistrationTokenAuthenticationData extends AuthenticationData {
 
   RegistrationTokenAuthenticationData({
     required this.token,
-    String? session,
+    super.session,
   }) : super(
           type: 'm.login.registration_token',
-          session: session,
         );
 
   @override
@@ -540,10 +539,9 @@ class PasswordAuthenticationData extends AuthenticationData {
   PasswordAuthenticationData({
     required this.userId,
     required this.password,
-    String? session,
+    super.session,
   }) : super(
           type: 'm.login.password',
-          session: session,
         );
 
   @override

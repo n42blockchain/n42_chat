@@ -388,7 +388,7 @@ void main() {
     });
 
     test('should combine filters', () {
-      final filter = AlbumFilter(
+      const filter = AlbumFilter(
         mediaType: AlbumMediaType.image,
         senderId: '@alice:example.com',
       );

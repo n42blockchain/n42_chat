@@ -228,8 +228,8 @@ void main() {
 
     test('logout should clear both session and credentials', () async {
       // 模拟登出时清除所有凭据
-      final sessionCleared = true;
-      final credentialsCleared = true;
+      const sessionCleared = true;
+      const credentialsCleared = true;
       
       expect(sessionCleared, isTrue);
       expect(credentialsCleared, isTrue);

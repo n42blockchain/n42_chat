@@ -851,8 +851,8 @@ class AuthMethodsService {
           return SocialLoginResult(
             provider: 'twitter',
             accessToken: authResult.authToken,
-            // ignore: deprecated_member_use
             // Twitter API v2 may not provide email
+            // ignore: deprecated_member_use
             email: user?.email,
             displayName: user?.name,
             photoUrl: user?.thumbnailImage,

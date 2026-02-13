@@ -91,10 +91,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
       builder: (context) => _AvatarPickerSheet(
         onCamera: () async {
           final image = await picker.pickImage(source: ImageSource.camera);
+          if (!context.mounted) return;
           Navigator.pop(context, image);
         },
         onGallery: () async {
           final image = await picker.pickImage(source: ImageSource.gallery);
+          if (!context.mounted) return;
           Navigator.pop(context, image);
         },
       ),

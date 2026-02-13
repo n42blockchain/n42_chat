@@ -365,7 +365,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: AppColors.primary,
                     width: 2,
                   ),
@@ -410,7 +410,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.add_photo_alternate_outlined,
                   size: 40,
                   color: AppColors.primary,
@@ -509,18 +509,18 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   color: Colors.black.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.swap_horiz,
                       color: Colors.white,
                       size: 20,
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Text(
                       'Change',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
                       ),
@@ -573,8 +573,8 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         _textController.text.trim(),
         null,
         null,
-        _currentBackgroundColor.value,
-        _currentTextColor.value,
+        _currentBackgroundColor.toARGB32(),
+        _currentTextColor.toARGB32(),
         musicFilePath: musicPath,
         musicTitle: musicTitle,
       );

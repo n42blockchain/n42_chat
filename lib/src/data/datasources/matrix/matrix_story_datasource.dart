@@ -45,7 +45,7 @@ class MatrixStoryDataSource {
     _storyRoom = await _getOrCreateStoryRoom();
 
     // 订阅同步事件以实时更新 Story
-    _syncSubscription?.cancel();
+    await _syncSubscription?.cancel();
     _syncSubscription = _client?.onSync.stream.listen((_) async {
       final stories = await getStories();
       _storyStreamController.add(stories);

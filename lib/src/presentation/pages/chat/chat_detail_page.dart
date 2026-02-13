@@ -123,6 +123,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       // 锁定：先验证用户身份（生物识别），然后设置 PIN
       final biometricAvailable = await _chatLockService.isBiometricAvailable();
       if (biometricAvailable) {
+        if (!mounted) return;
         final verified = await _chatLockService.verifyWithBiometric(
           reason: S.of(context)?.chatLockEnable ?? 'Lock this chat',
         );
@@ -143,6 +144,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     } else {
       // 解锁前先验证
       final biometricAvailable = await _chatLockService.isBiometricAvailable();
+      if (!mounted) return;
       bool verified = false;
       if (biometricAvailable) {
         verified = await _chatLockService.verifyWithBiometric(
@@ -498,7 +500,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       debugPrint('Error: $e');
     }
 
-    Widget scaffold = Scaffold(
+    final Widget scaffold = Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: bgColor,
@@ -1268,7 +1270,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             S.of(context)?.reportTitle ?? 'Report',
             style: TextStyle(color: isDark ? Colors.white : Colors.black),
           ),
-          content: Column(
+          content: RadioGroup<String>(
+            groupValue: selectedReason,
+            onChanged: (val) => setDialogState(() => selectedReason = val),
+            child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ...[
@@ -1279,8 +1284,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ].map((reason) => RadioListTile<String>(
                 title: Text(reason, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
                 value: reason,
-                groupValue: selectedReason,
-                onChanged: (val) => setDialogState(() => selectedReason = val),
                 activeColor: AppColors.primary,
                 contentPadding: EdgeInsets.zero,
                 dense: true,
@@ -1297,6 +1300,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
               ),
             ],
+          ),
           ),
           actions: [
             TextButton(

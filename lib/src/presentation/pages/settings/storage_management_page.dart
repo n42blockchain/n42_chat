@@ -120,7 +120,7 @@ class _StorageManagementPageState extends State<StorageManagementPage> {
             children: [
               Text(
                 info.formattedTotal,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
@@ -190,7 +190,7 @@ class _StorageManagementPageState extends State<StorageManagementPage> {
         Container(
           color: cardColor,
           child: ListTile(
-            leading: Icon(Icons.cleaning_services, color: AppColors.primary),
+            leading: const Icon(Icons.cleaning_services, color: AppColors.primary),
             title: Text(
               S.of(context)?.clearCache ?? 'Clear Cache',
               style: TextStyle(color: textColor),

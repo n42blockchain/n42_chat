@@ -247,7 +247,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
       children: [
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.primary,

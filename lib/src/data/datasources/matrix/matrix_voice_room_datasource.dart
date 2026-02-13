@@ -109,7 +109,10 @@ class MatrixVoiceRoomDataSource {
     final room = _client?.getRoomById(roomId);
     if (room == null) return const Stream.empty();
 
-    return room.onUpdate.stream.asyncMap((_) => _mapRoomToVoiceRoom(room));
+    return room.client.onSync.stream
+        .where((sync) => sync.rooms?.join?.containsKey(roomId) == true ||
+            sync.rooms?.leave?.containsKey(roomId) == true)
+        .asyncMap((_) => _mapRoomToVoiceRoom(room));
   }
 
   /// 加入语音房间

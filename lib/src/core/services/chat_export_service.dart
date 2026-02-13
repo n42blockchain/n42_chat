@@ -86,9 +86,11 @@ class ChatExportService {
       customEnd: customEnd,
     );
 
-    await Share.shareXFiles(
-      [XFile(file.path)],
-      subject: 'Chat export - $roomName',
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(file.path)],
+        subject: 'Chat export - $roomName',
+      ),
     );
   }
 

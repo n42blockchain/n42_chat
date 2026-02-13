@@ -117,7 +117,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
                   child: Divider(height: 1, color: dividerColor),
                 ),
                 _buildToggleItem(
-                  title: S.of(context)?.contactHideTheirMoments ?? "Hide their Moments",
+                  title: S.of(context)?.contactHideTheirMoments ?? 'Hide their Moments',
                   subtitle: S.of(context)?.contactHideTheirMomentsDesc ?? "Don't see this friend's Moments",
                   value: _hideTheirMoments,
                   onChanged: (v) {
@@ -181,7 +181,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
         ],
       ),

@@ -151,7 +151,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
 
-    _scannerController?.stop();
+    unawaited(_scannerController?.stop());
 
     try {
       if (data.startsWith('n42chat://user/')) {
@@ -161,11 +161,12 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         await _startChatWithUser(data);
       } else {
         _showError(S.of(context)?.qrcodeInvalidQrCode ?? 'Invalid QR code');
-        _scannerController?.start();
+        unawaited(_scannerController?.start());
       }
     } catch (e) {
+      if (!mounted) return;
       _showError(S.of(context)?.qrcodeProcessFailed(e.toString()) ?? 'Failed to process QR code: $e');
-      _scannerController?.start();
+      unawaited(_scannerController?.start());
     } finally {
       if (mounted) {
         setState(() => _isProcessing = false);
@@ -180,7 +181,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
 
       if (client == null) {
         _showError(S.of(context)?.commonChatServiceNotConnected ?? 'Chat service not connected');
-        _scannerController?.start();
+        unawaited(_scannerController?.start());
         return;
       }
 
@@ -190,8 +191,9 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         Navigator.of(context).pop({'roomId': roomId, 'userId': userId});
       }
     } catch (e) {
+      if (!mounted) return;
       _showError(S.of(context)?.qrcodeCannotAddFriend(e.toString()) ?? 'Cannot add friend: $e');
-      _scannerController?.start();
+      unawaited(_scannerController?.start());
     }
   }
 

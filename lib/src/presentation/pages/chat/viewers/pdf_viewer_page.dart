@@ -229,9 +229,11 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
 
   Future<void> _sharePdf() async {
     if (widget.filePath == null) return;
-    await Share.shareXFiles(
-      [XFile(widget.filePath!)],
-      subject: widget.fileName,
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(widget.filePath!)],
+        subject: widget.fileName,
+      ),
     );
   }
 }

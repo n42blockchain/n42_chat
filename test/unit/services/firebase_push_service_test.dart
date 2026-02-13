@@ -169,7 +169,7 @@ void main() {
 
   group('background message handler edge cases', () {
     test('should handle m.call.invite without room_id', () async {
-      final message = RemoteMessage(
+      const message = RemoteMessage(
         data: <String, dynamic>{
           'type': 'm.call.invite',
           'sender': '@alice:matrix.org',
@@ -185,7 +185,7 @@ void main() {
     });
 
     test('should use notification title as fallback for sender name', () async {
-      final message = RemoteMessage(
+      const message = RemoteMessage(
         data: <String, dynamic>{
           'type': 'm.call.invite',
           'room_id': '!room:matrix.org',
@@ -202,7 +202,7 @@ void main() {
     });
 
     test('should handle m.call.invite with sender_display_name priority', () async {
-      final message = RemoteMessage(
+      const message = RemoteMessage(
         data: <String, dynamic>{
           'type': 'm.call.invite',
           'sender': '@alice:matrix.org',
@@ -222,13 +222,13 @@ void main() {
     });
 
     test('should call endAllCalls for both hangup and reject in sequence', () async {
-      final hangup = RemoteMessage(
+      const hangup = RemoteMessage(
         data: <String, dynamic>{
           'type': 'm.call.hangup',
           'room_id': '!room:matrix.org',
         },
       );
-      final reject = RemoteMessage(
+      const reject = RemoteMessage(
         data: <String, dynamic>{
           'type': 'm.call.reject',
           'room_id': '!room:matrix.org',

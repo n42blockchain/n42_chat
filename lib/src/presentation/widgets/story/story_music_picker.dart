@@ -80,9 +80,9 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
     try {
       await _audioPlayer.stop();
       // 取消旧的订阅，避免内存泄漏
-      _durationSubscription?.cancel();
-      _positionSubscription?.cancel();
-      _completeSubscription?.cancel();
+      unawaited(_durationSubscription?.cancel());
+      unawaited(_positionSubscription?.cancel());
+      unawaited(_completeSubscription?.cancel());
 
       await _audioPlayer.setSource(DeviceFileSource(path));
       _durationSubscription = _audioPlayer.onDurationChanged.listen((d) {
@@ -134,7 +134,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
       _selectedFileName = null;
       _isPlaying = false;
     });
-    widget.onMusicSelected?.call(StoryMusicSelection.empty());
+    widget.onMusicSelected?.call(const StoryMusicSelection.empty());
   }
 
   @override
@@ -189,7 +189,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
@@ -223,7 +223,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                               ? _position.inMilliseconds / _duration.inMilliseconds
                               : 0,
                           backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                          valueColor: AlwaysStoppedAnimation(AppColors.primary),
+                          valueColor: const AlwaysStoppedAnimation(AppColors.primary),
                         ),
                         const SizedBox(height: 2),
                         Text(

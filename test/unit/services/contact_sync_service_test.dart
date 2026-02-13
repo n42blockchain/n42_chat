@@ -136,7 +136,7 @@ void main() {
         matrixUserId: '@john:matrix.org',
       );
 
-      final result = ContactSyncResult(
+      const result = ContactSyncResult(
         success: true,
         phoneContacts: [phoneContact],
         matchedContacts: [match],

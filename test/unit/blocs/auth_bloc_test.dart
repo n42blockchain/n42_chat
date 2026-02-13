@@ -13,7 +13,7 @@ void main() {
   late MockAuthRepository mockAuthRepository;
   late AuthBloc authBloc;
 
-  final testUser = UserEntity(
+  const testUser = UserEntity(
     userId: '@user:server.com',
     displayName: 'Test User',
   );

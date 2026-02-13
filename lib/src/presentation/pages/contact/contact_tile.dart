@@ -118,7 +118,7 @@ class ContactTile extends StatelessWidget {
               ),
 
               // 右侧附加内容
-              if (trailing != null) trailing!,
+              ?trailing,
             ],
           ),
         ),

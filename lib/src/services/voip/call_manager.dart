@@ -369,7 +369,7 @@ class CallManager {
     if (!alreadyShowing) {
       // 获取本地化字符串
       final context = _navigatorKey?.currentContext;
-      final l10n = context != null ? S.of(context) : null;
+      final l10n = (context != null && context.mounted) ? S.of(context) : null;
 
       // 显示来电通知
       await _notificationService.showIncomingCall(

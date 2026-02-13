@@ -667,8 +667,8 @@ class WebRTCService {
       // 停止并移除当前音轨
       final oldAudioTrack = _localStream!.getAudioTracks().firstOrNull;
       if (oldAudioTrack != null) {
-        oldAudioTrack.stop();
-        _localStream!.removeTrack(oldAudioTrack);
+        await oldAudioTrack.stop();
+        await _localStream!.removeTrack(oldAudioTrack);
       }
 
       // 创建新的音轨（使用更新的约束）
@@ -680,7 +680,7 @@ class WebRTCService {
       final newAudioTrack = newStream.getAudioTracks().firstOrNull;
       if (newAudioTrack != null) {
         // 添加到本地流
-        _localStream!.addTrack(newAudioTrack);
+        await _localStream!.addTrack(newAudioTrack);
 
         // 替换 PeerConnection 中的音轨
         final senders = await _peerConnection!.getSenders();
@@ -696,7 +696,7 @@ class WebRTCService {
       }
 
       // 释放临时流
-      newStream.dispose();
+      unawaited(newStream.dispose());
 
       debugPrint('WebRTCService: Audio processing updated successfully');
     } catch (e) {
@@ -1241,9 +1241,9 @@ class WebRTCService {
     // 停止所有本地媒体轨道
     try {
       _localStream?.getTracks().forEach((track) {
-        track.stop();
+        unawaited(track.stop());
       });
-      _localStream?.dispose();
+      unawaited(_localStream?.dispose());
     } catch (e) {
       debugPrint('WebRTCService: Error disposing local stream: $e');
     }
@@ -1251,7 +1251,7 @@ class WebRTCService {
 
     // 释放远程流
     try {
-      _remoteStream?.dispose();
+      unawaited(_remoteStream?.dispose());
     } catch (e) {
       debugPrint('WebRTCService: Error disposing remote stream: $e');
     }

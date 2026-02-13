@@ -9,7 +9,7 @@ import 'package:n42_chat/src/presentation/pages/contact/contact_settings_page.da
 
 class MockContactBloc extends Mock implements ContactBloc {
   @override
-  ContactState get state => ContactInitial();
+  ContactState get state => const ContactInitial();
 
   @override
   Stream<ContactState> get stream => const Stream.empty();
@@ -46,7 +46,7 @@ void main() {
     testWidgets('renders basic menu items', (tester) async {
       await tester.pumpWidget(
         buildTestWidget(
-          ContactSettingsPage(
+          const ContactSettingsPage(
             userId: '@test:server.com',
             displayName: 'Test User',
           ),
@@ -63,7 +63,7 @@ void main() {
     testWidgets('tapping Report opens report dialog', (tester) async {
       await tester.pumpWidget(
         buildTestWidget(
-          ContactSettingsPage(
+          const ContactSettingsPage(
             userId: '@test:server.com',
             displayName: 'Test User',
           ),
@@ -87,7 +87,7 @@ void main() {
         (tester) async {
       await tester.pumpWidget(
         buildTestWidget(
-          ContactSettingsPage(
+          const ContactSettingsPage(
             userId: '@test:server.com',
             displayName: 'Test User',
           ),
@@ -112,7 +112,7 @@ void main() {
         (tester) async {
       await tester.pumpWidget(
         buildTestWidget(
-          ContactSettingsPage(
+          const ContactSettingsPage(
             userId: '@test:server.com',
             displayName: 'Test User',
           ),
@@ -141,7 +141,7 @@ void main() {
         (tester) async {
       await tester.pumpWidget(
         buildTestWidget(
-          ContactSettingsPage(
+          const ContactSettingsPage(
             userId: '@test:server.com',
             displayName: 'Test User',
           ),
@@ -161,7 +161,7 @@ void main() {
     testWidgets('report dialog can be cancelled', (tester) async {
       await tester.pumpWidget(
         buildTestWidget(
-          ContactSettingsPage(
+          const ContactSettingsPage(
             userId: '@test:server.com',
             displayName: 'Test User',
           ),

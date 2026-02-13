@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -805,7 +807,7 @@ ID：${contact.userId}''';
       
       final contactBloc = context.read<ContactBloc>();
       
-      Navigator.push(
+      unawaited(Navigator.push(
         context,
         MaterialPageRoute<void>(
           builder: (ctx) => MultiBlocProvider(
@@ -819,7 +821,7 @@ ID：${contact.userId}''';
             ),
           ),
         ),
-      );
+      ));
     } catch (e) {
       debugPrint('Start chat error: $e');
       if (mounted) {

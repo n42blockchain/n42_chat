@@ -83,7 +83,7 @@ class AiDatasource implements AiService {
       );
 
       if (response.data == null) {
-        throw AiServiceException('Empty response from server');
+        throw const AiServiceException('Empty response from server');
       }
       final stream = response.data!.stream;
       final buffer = StringBuffer();
@@ -160,11 +160,11 @@ class AiDatasource implements AiService {
 
       final data = response.data;
       if (data == null) {
-        throw AiServiceException('Empty response from server');
+        throw const AiServiceException('Empty response from server');
       }
       final choices = data['choices'] as List<dynamic>?;
       if (choices == null || choices.isEmpty) {
-        throw AiServiceException('No choices in response');
+        throw const AiServiceException('No choices in response');
       }
       final message = choices[0]['message'] as Map<String, dynamic>?;
       final content = message?['content'] as String? ?? '';

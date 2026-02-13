@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:n42_chat/src/services/voip/call_notification_service.dart';
 
 /// 测试 CallNotificationService 的 getActiveCalls() 去重机制

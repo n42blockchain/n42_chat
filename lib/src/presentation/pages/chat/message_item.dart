@@ -217,11 +217,11 @@ class MessageItem extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.schedule, size: 12, color: AppColors.primary),
+                const Icon(Icons.schedule, size: 12, color: AppColors.primary),
                 const SizedBox(width: 4),
                 Text(
                   '${S.of(context)?.scheduledMessageLabel ?? 'Scheduled'} ${_formatScheduledTime(message.scheduledAt!)}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 11,
                     color: AppColors.primary,
                   ),

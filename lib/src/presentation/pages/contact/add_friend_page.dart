@@ -60,7 +60,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         return;
       }
 
-      List<Map<String, dynamic>> results = [];
+      final List<Map<String, dynamic>> results = [];
       
       // 检查是否是完整的 Matrix ID 格式 (@user:server)
       if (query.startsWith('@') && query.contains(':')) {
@@ -162,6 +162,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         Navigator.of(context).pop(roomId);
       }
     } catch (e) {
+      if (!mounted) return;
       _showError(S.of(context)?.contactCreateChatFailed(e.toString()) ?? 'Failed to create chat: $e');
     } finally {
       if (mounted) {

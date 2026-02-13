@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' show AuthenticationPassword, AuthenticationUserIdentifier, MatrixException;
 
@@ -281,7 +283,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.key, color: AppColors.primary),
+                child: const Icon(Icons.key, color: AppColors.primary),
               ),
               title: Text(
                 'No passkeys registered',
@@ -406,7 +408,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Passkey registered successfully')),
         );
-        _loadPasskeyStatus(); // Refresh list
+        unawaited(_loadPasskeyStatus()); // Refresh list
       }
     } catch (e) {
       if (mounted) {
@@ -492,7 +494,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Passkey deleted')),
         );
-        _loadPasskeyStatus();
+        unawaited(_loadPasskeyStatus());
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to delete passkey')),
@@ -520,6 +522,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         return;
       }
 
+      if (!mounted) return;
       // 执行生物识别验证
       final result = await _biometricService.authenticate(
         reason: S.of(context)?.settingsEnableBiometricLogin ?? 'Verify to enable biometric login',
@@ -1229,7 +1232,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                         if (device.isCurrentDevice)
                           Text(
                             S.of(context)?.settingsThisDevice ?? 'This device',
-                            style: TextStyle(fontSize: 13, color: AppColors.primary),
+                            style: const TextStyle(fontSize: 13, color: AppColors.primary),
                           ),
                       ],
                     ),
@@ -1310,7 +1313,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       foregroundColor: AppColors.error,
-                      side: BorderSide(color: AppColors.error),
+                      side: const BorderSide(color: AppColors.error),
                     ),
                   ),
                 ),
@@ -1553,11 +1556,13 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
     try {
       await widget.e2eeManager.initializeCrossSigning();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context)?.settingsCrossSigningSetupSuccess ?? 'Cross-signing setup successful')),
       );
       setState(() {});
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context)?.settingsSetupFailed(e.toString()) ?? 'Setup failed: $e')),
       );
@@ -1632,7 +1637,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         ),
       ),
     ).then((verified) {
-      if (verified == true) {
+      if (verified == true && mounted) {
         // 验证成功，刷新设备列表
         _loadData();
         ScaffoldMessenger.of(context).showSnackBar(

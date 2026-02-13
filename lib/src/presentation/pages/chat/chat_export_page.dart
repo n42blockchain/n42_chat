@@ -94,26 +94,26 @@ class _ChatExportPageState extends State<ChatExportPage> {
           _buildSection(
             title: S.of(context)?.chatExportFormat ?? 'Export Format',
             isDark: isDark,
-            child: Column(
-              children: [
-                _buildRadioTile(
-                  title: 'HTML',
-                  subtitle: S.of(context)?.chatExportHtmlDesc ?? 'Readable in any browser with styled layout',
-                  value: ExportFormat.html,
-                  groupValue: _format,
-                  onChanged: (v) => setState(() => _format = v!),
-                  isDark: isDark,
-                ),
-                Divider(height: 1, indent: 56, color: isDark ? AppColors.dividerDark : AppColors.divider),
-                _buildRadioTile(
-                  title: 'JSON',
-                  subtitle: S.of(context)?.chatExportJsonDesc ?? 'Machine-readable structured data format',
-                  value: ExportFormat.json,
-                  groupValue: _format,
-                  onChanged: (v) => setState(() => _format = v!),
-                  isDark: isDark,
-                ),
-              ],
+            child: RadioGroup<ExportFormat>(
+              groupValue: _format,
+              onChanged: (v) => setState(() => _format = v!),
+              child: Column(
+                children: [
+                  _buildRadioTile(
+                    title: 'HTML',
+                    subtitle: S.of(context)?.chatExportHtmlDesc ?? 'Readable in any browser with styled layout',
+                    value: ExportFormat.html,
+                    isDark: isDark,
+                  ),
+                  Divider(height: 1, indent: 56, color: isDark ? AppColors.dividerDark : AppColors.divider),
+                  _buildRadioTile(
+                    title: 'JSON',
+                    subtitle: S.of(context)?.chatExportJsonDesc ?? 'Machine-readable structured data format',
+                    value: ExportFormat.json,
+                    isDark: isDark,
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -123,25 +123,27 @@ class _ChatExportPageState extends State<ChatExportPage> {
           _buildSection(
             title: S.of(context)?.chatExportDateRange ?? 'Date Range',
             isDark: isDark,
-            child: Column(
-              children: [
-                for (final range in [
-                  (ExportDateRange.all, S.of(context)?.chatExportAll ?? 'All Messages'),
-                  (ExportDateRange.lastWeek, S.of(context)?.chatExportLastWeek ?? 'Last 7 Days'),
-                  (ExportDateRange.lastMonth, S.of(context)?.chatExportLastMonth ?? 'Last Month'),
-                  (ExportDateRange.last3Months, S.of(context)?.chatExportLast3Months ?? 'Last 3 Months'),
-                ]) ...[
-                  _buildRadioTile(
-                    title: range.$2,
-                    value: range.$1,
-                    groupValue: _dateRange,
-                    onChanged: (v) => setState(() => _dateRange = v!),
-                    isDark: isDark,
-                  ),
-                  if (range.$1 != ExportDateRange.last3Months)
-                    Divider(height: 1, indent: 56, color: isDark ? AppColors.dividerDark : AppColors.divider),
+            child: RadioGroup<ExportDateRange>(
+              groupValue: _dateRange,
+              onChanged: (v) => setState(() => _dateRange = v!),
+              child: Column(
+                children: [
+                  for (final range in [
+                    (ExportDateRange.all, S.of(context)?.chatExportAll ?? 'All Messages'),
+                    (ExportDateRange.lastWeek, S.of(context)?.chatExportLastWeek ?? 'Last 7 Days'),
+                    (ExportDateRange.lastMonth, S.of(context)?.chatExportLastMonth ?? 'Last Month'),
+                    (ExportDateRange.last3Months, S.of(context)?.chatExportLast3Months ?? 'Last 3 Months'),
+                  ]) ...[
+                    _buildRadioTile(
+                      title: range.$2,
+                      value: range.$1,
+                      isDark: isDark,
+                    ),
+                    if (range.$1 != ExportDateRange.last3Months)
+                      Divider(height: 1, indent: 56, color: isDark ? AppColors.dividerDark : AppColors.divider),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
 
@@ -234,8 +236,6 @@ class _ChatExportPageState extends State<ChatExportPage> {
     required String title,
     String? subtitle,
     required T value,
-    required T groupValue,
-    required ValueChanged<T?> onChanged,
     required bool isDark,
   }) {
     return RadioListTile<T>(
@@ -255,8 +255,6 @@ class _ChatExportPageState extends State<ChatExportPage> {
             )
           : null,
       value: value,
-      groupValue: groupValue,
-      onChanged: onChanged,
       activeColor: AppColors.primary,
     );
   }

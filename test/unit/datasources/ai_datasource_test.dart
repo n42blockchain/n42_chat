@@ -285,7 +285,7 @@ void main() {
       });
 
       test('should not truncate short content', () async {
-        final shortContent = 'Short page content';
+        const shortContent = 'Short page content';
 
         when(() => mockDio.post<Map<String, dynamic>>(
               any(),

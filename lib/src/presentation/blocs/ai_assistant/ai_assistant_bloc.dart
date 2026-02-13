@@ -105,7 +105,7 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
 
     // 启动流式响应
     try {
-      _streamSubscription?.cancel();
+      unawaited(_streamSubscription?.cancel());
       final stream = _aiRepository.aiService.streamCompletion(
         contextMessages,
         systemPrompt: assistant.systemPrompt,
@@ -211,7 +211,7 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     StopAiGeneration event,
     Emitter<AiAssistantState> emit,
   ) async {
-    _streamSubscription?.cancel();
+    unawaited(_streamSubscription?.cancel());
     _streamSubscription = null;
 
     // 如果有部分文本，直接在此处保存为消息（避免事件重入）

@@ -203,7 +203,7 @@ class ContactSyncService {
             }
 
             // 请求节流
-            await Future.delayed(Duration(milliseconds: _requestDelayMs));
+            await Future.delayed(const Duration(milliseconds: _requestDelayMs));
           } catch (e) {
             // 使用哈希保护隐私信息
             debugPrint('ContactSyncService: Search error for ${_hashForLogging(email)}: $e');
@@ -235,7 +235,7 @@ class ContactSyncService {
             }
 
             // 请求节流
-            await Future.delayed(Duration(milliseconds: _requestDelayMs));
+            await Future.delayed(const Duration(milliseconds: _requestDelayMs));
           } catch (e) {
             debugPrint('ContactSyncService: Search error for phone: $e');
           }

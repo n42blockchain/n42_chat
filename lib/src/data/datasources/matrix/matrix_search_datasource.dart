@@ -34,7 +34,7 @@ class MatrixSearchDataSource {
   }
 
   /// 搜索公开房间
-  Future<List<matrix.PublicRoomsChunk>> searchPublicRooms(
+  Future<List<matrix.PublishedRoomsChunk>> searchPublicRooms(
     String query, {
     int limit = 20,
   }) async {

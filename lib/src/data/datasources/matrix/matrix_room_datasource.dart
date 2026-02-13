@@ -79,7 +79,7 @@ class MatrixRoomDataSource {
     var hash = rooms.length;
     for (final room in rooms) {
       hash ^= room.id.hashCode;
-      hash ^= (room.lastEvent?.originServerTs?.millisecondsSinceEpoch ?? 0);
+      hash ^= (room.lastEvent?.originServerTs.millisecondsSinceEpoch ?? 0);
     }
     return hash;
   }

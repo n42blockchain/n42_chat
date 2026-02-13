@@ -25,7 +25,7 @@ void main() async {
   const inviteCode = 'YOUR_INVITE_CODE_HERE';
 
   // 测试用户
-  var testUsername = 'n42test${Random().nextInt(99999)}';
+  final testUsername = 'n42test${Random().nextInt(99999)}';
   const testPassword = 'N42TestPass123!@#';
 
   print('📡 服务器: $homeserver');

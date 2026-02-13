@@ -458,7 +458,7 @@ class _ProfilePageState extends State<ProfilePage> {
         debugPrint('Failed to sync status: $e');
       }
 
-      if (!mounted) return;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.profileStatusSetTo(result) ?? 'Status set to: $result'),
