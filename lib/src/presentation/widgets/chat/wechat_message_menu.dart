@@ -282,7 +282,7 @@ class WeChatMessageMenu extends StatelessWidget {
           
           // 第二行按钮（使用 Wrap 自动换行防止溢出）
           Padding(
-            padding: const EdgeInsets.only(bottom: 12, left: 16, right: 8),
+            padding: const EdgeInsets.only(bottom: 12, left: 8, right: 8),
             child: Wrap(
               spacing: 4,
               runSpacing: 4,

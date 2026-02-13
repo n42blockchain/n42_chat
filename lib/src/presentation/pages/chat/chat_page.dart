@@ -67,6 +67,8 @@ import '../favorite/favorite_list_page.dart';
 import 'message_item.dart';
 import 'live_location_page.dart';
 import 'thread_detail_page.dart';
+import '../../widgets/chat/quick_reply_sheet.dart';
+import '../settings/quick_replies_page.dart';
 import 'viewers/pdf_viewer_page.dart';
 
 /// 聊天页面
@@ -3871,6 +3873,25 @@ Avatar: ${contactAvatar ?? ''}''';
     }
   }
 
+  void _onQuickReplyPressed() {
+    showQuickReplySheet(
+      context: context,
+      onSelect: (content) {
+        _sendMessage(content);
+      },
+      onManage: () {
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => QuickRepliesPage(
+              storageDataSource: getIt<SecureStorageDataSource>(),
+            ),
+          ),
+        );
+      },
+      storageDataSource: getIt<SecureStorageDataSource>(),
+    );
+  }
+
   Widget _buildInputBar() {
     return ChatInputBar(
       key: _inputBarKey,
@@ -3883,6 +3904,7 @@ Avatar: ${contactAvatar ?? ''}''';
       onVoicePressed: _onVoicePressed,
       onEmojiPressed: _onEmojiPressed,
       onMorePressed: _onMorePressed,
+      onQuickReplyPressed: _onQuickReplyPressed,
       onScheduledSend: (scheduledAt) {
         final text = _inputController.text.trim();
         if (text.isNotEmpty) {
