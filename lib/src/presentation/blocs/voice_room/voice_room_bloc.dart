@@ -103,7 +103,7 @@ class VoiceRoomBloc extends Bloc<VoiceRoomEvent, VoiceRoomState> {
         ));
 
         // 订阅房间更新
-        _roomSubscription?.cancel();
+        unawaited(_roomSubscription?.cancel());
         _roomSubscription = _repository.watchVoiceRoom(event.roomId).listen(
           (room) {
             if (room != null && !isClosed) {
@@ -127,7 +127,7 @@ class VoiceRoomBloc extends Bloc<VoiceRoomEvent, VoiceRoomState> {
     Emitter<VoiceRoomState> emit,
   ) async {
     await _voiceRoomService.leaveRoom();
-    _roomSubscription?.cancel();
+    unawaited(_roomSubscription?.cancel());
     _durationTimer?.cancel();
     emit(state.copyWith(
       clearRoom: true,

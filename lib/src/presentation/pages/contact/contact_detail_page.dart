@@ -130,7 +130,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       debugPrint('Error: $e');
     }
     
-    Widget scaffold = Scaffold(
+    final Widget scaffold = Scaffold(
         backgroundColor: bgColor,
         appBar: AppBar(
           backgroundColor: bgColor,
@@ -717,7 +717,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
       debugPrint('Error: $e');
     }
     
-    Widget scaffold = Scaffold(
+    final Widget scaffold = Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: bgColor,
@@ -1181,13 +1181,14 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     debugPrint('EditRemarkPage: Remark saved to RemarkService');
     
     // 同时通知 ContactBloc 刷新（如果可用）
+    if (!mounted) return;
     try {
       context.read<ContactBloc>().add(SetContactRemark(widget.userId, remarkToSave));
       debugPrint('EditRemarkPage: ContactBloc notified');
     } catch (e) {
       debugPrint('EditRemarkPage: ContactBloc not available: $e');
     }
-    
+
     // 先关闭页面，再显示 Toast（避免 ScaffoldMessenger 冲突）
     if (mounted) {
       Navigator.of(context).pop(remarkToSave);

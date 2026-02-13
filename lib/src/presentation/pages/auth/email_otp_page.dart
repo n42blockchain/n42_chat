@@ -141,6 +141,7 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
         // 返回登录页面或直接登录
         Navigator.of(context).pop(result);
       } else {
+        if (!mounted) return;
         throw Exception(S.of(context)?.authVerificationFailed ?? 'Verification failed');
       }
     } catch (e) {

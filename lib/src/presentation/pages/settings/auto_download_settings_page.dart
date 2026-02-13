@@ -229,7 +229,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
       title: Text(title, style: const TextStyle(fontSize: 14)),
       value: value,
       onChanged: onChanged,
-      activeColor: AppColors.primary,
+      activeThumbColor: AppColors.primary,
       dense: true,
     );
   }

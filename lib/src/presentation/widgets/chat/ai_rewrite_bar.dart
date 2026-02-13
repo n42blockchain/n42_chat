@@ -64,12 +64,12 @@ class AiRewriteBar extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(12, 8, 8, 4),
             child: Row(
               children: [
-                Icon(Icons.auto_fix_high, size: 16, color: AppColors.primary),
+                const Icon(Icons.auto_fix_high, size: 16, color: AppColors.primary),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     l10n?.aiRewrite ?? 'AI Rewrite',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: AppColors.primary,
@@ -113,7 +113,7 @@ class AiRewriteBar extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
               child: Row(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 14,
                     height: 14,
                     child: CircularProgressIndicator(

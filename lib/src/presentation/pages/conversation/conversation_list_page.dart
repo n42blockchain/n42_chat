@@ -122,7 +122,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
   Future<void> _onRefresh() async {
     context.read<ConversationBloc>().add(const RefreshConversations());
-    _loadLockedChats();
+    unawaited(_loadLockedChats());
     // 等待刷新完成
     await Future<void>.delayed(const Duration(milliseconds: 500));
   }
@@ -670,7 +670,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
         ),
       ),
     ).then((roomId) {
-      if (roomId != null) {
+      if (roomId != null && mounted) {
         // 刷新会话列表
         context.read<ConversationBloc>().add(const RefreshConversations());
       }
@@ -685,7 +685,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
         builder: (_) => const AddFriendPage(),
       ),
     ).then((roomId) {
-      if (roomId != null) {
+      if (roomId != null && mounted) {
         // 刷新会话列表
         context.read<ConversationBloc>().add(const RefreshConversations());
       }

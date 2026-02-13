@@ -45,7 +45,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
     try {
       // 订阅群变化
-      _groupsSubscription?.cancel();
+      unawaited(_groupsSubscription?.cancel());
       _groupsSubscription = _groupRepository.watchGroups().listen(
         (groups) {
           add(const GroupsUpdated());

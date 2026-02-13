@@ -162,7 +162,7 @@ class DiscoverPage extends StatelessWidget {
                   ),
                 ),
               ),
-              if (trailing != null) trailing,
+              ?trailing,
               Icon(
                 Icons.chevron_right,
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,

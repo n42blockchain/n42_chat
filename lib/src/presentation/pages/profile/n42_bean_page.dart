@@ -13,7 +13,7 @@ class N42BeanPage extends StatefulWidget {
 }
 
 class _N42BeanPageState extends State<N42BeanPage> {
-  int _beanCount = 0; // N42豆数量
+  final int _beanCount = 0; // N42豆数量
 
   @override
   Widget build(BuildContext context) {

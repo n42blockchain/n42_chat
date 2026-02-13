@@ -528,7 +528,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 ),
               ),
             const SizedBox(width: 8),
-            if (trailing != null) trailing,
+            ?trailing,
           ],
         ),
       ),

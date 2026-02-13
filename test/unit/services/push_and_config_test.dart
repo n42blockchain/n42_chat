@@ -83,7 +83,7 @@ void main() {
 
     test('setNotificationConfig should accept a custom config without errors', () {
       // 设置一个自定义配置，确保不抛出异常
-      final config = NotificationConfig(
+      const config = NotificationConfig(
         enabled: false,
         showPreview: false,
         playSound: false,
@@ -275,7 +275,7 @@ void main() {
 
     test('ShareKeysWith should contain expected values', () {
       // 验证枚举中存在预期的值
-      final values = matrix.ShareKeysWith.values;
+      const values = matrix.ShareKeysWith.values;
       expect(values, contains(matrix.ShareKeysWith.all));
       expect(values, isNotEmpty);
     });

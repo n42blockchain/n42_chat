@@ -117,7 +117,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         await tempFile.writeAsBytes(response.bodyBytes);
 
         // 分享
-        await Share.shareXFiles([XFile(tempFile.path)]);
+        await SharePlus.instance.share(ShareParams(files: [XFile(tempFile.path)]));
 
         // 清理临时文件
         await tempDir.delete(recursive: true);

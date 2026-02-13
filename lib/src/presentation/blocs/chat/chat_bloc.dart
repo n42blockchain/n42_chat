@@ -1149,7 +1149,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     try {
       // 微信拍一拍逻辑：统一使用"拍人者"设置的后缀
       // 例如：拍人者设置后缀"的头"，则无论拍谁都显示"XXX 拍了拍 YYY 的头"
-      String? pokeText = event.pokerPokeText;
+      final String? pokeText = event.pokerPokeText;
       
       debugPrint('ChatBloc: Using poker\'s pokeText: $pokeText');
       

@@ -199,6 +199,7 @@ dependencies:
   # 生物识别 - 面部/指纹登录
   local_auth: ^3.0.0
 
+  flutter_cache_manager: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

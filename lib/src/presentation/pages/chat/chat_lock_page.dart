@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -49,7 +51,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
     }
     // Auto-trigger biometric if available
     if (biometricAvailable) {
-      _verifyBiometric();
+      unawaited(_verifyBiometric());
     } else {
       if (mounted) setState(() => _showPinInput = true);
     }
@@ -118,7 +120,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(40),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.lock,
                     size: 40,
                     color: AppColors.primary,
@@ -153,7 +155,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                   const SizedBox(height: 12),
                   Text(
                     _errorMessage!,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.error,
                     ),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -325,35 +327,37 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
             S.of(context)?.reportTitle ?? 'Report',
             style: TextStyle(color: isDark ? Colors.white : Colors.black),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ...[
-                S.of(context)?.reportReasonSpam ?? 'Spam',
-                S.of(context)?.reportReasonHarassment ?? 'Harassment',
-                S.of(context)?.reportReasonFraud ?? 'Fraud',
-                S.of(context)?.reportReasonOther ?? 'Other',
-              ].map((reason) => RadioListTile<String>(
-                title: Text(reason, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
-                value: reason,
-                groupValue: selectedReason,
-                onChanged: (val) => setDialogState(() => selectedReason = val),
-                activeColor: AppColors.primary,
-                contentPadding: EdgeInsets.zero,
-                dense: true,
-              )),
-              const SizedBox(height: 8),
-              TextField(
-                controller: descController,
-                maxLines: 2,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  hintText: S.of(context)?.reportDescription ?? 'Additional description (optional)',
-                  hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
-                  border: const OutlineInputBorder(),
+          content: RadioGroup<String>(
+            groupValue: selectedReason,
+            onChanged: (val) => setDialogState(() => selectedReason = val),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ...[
+                  S.of(context)?.reportReasonSpam ?? 'Spam',
+                  S.of(context)?.reportReasonHarassment ?? 'Harassment',
+                  S.of(context)?.reportReasonFraud ?? 'Fraud',
+                  S.of(context)?.reportReasonOther ?? 'Other',
+                ].map((reason) => RadioListTile<String>(
+                  title: Text(reason, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+                  value: reason,
+                  activeColor: AppColors.primary,
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                )),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: descController,
+                  maxLines: 2,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  decoration: InputDecoration(
+                    hintText: S.of(context)?.reportDescription ?? 'Additional description (optional)',
+                    hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+                    border: const OutlineInputBorder(),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -449,13 +453,13 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
 
   void _deleteContact() async {
     // 显示加载指示器
-    showDialog<void>(
+    unawaited(showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => const Center(
         child: CircularProgressIndicator(),
       ),
-    );
+    ));
 
     try {
       // 发送删除事件

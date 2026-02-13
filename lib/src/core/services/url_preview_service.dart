@@ -63,7 +63,7 @@ class UrlPreviewService {
       }
       return result;
     } finally {
-      _pending.remove(url);
+      unawaited(_pending.remove(url));
     }
   }
 

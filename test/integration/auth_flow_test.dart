@@ -13,7 +13,7 @@ class MockAuthRepository extends Mock implements IAuthRepository {}
 void main() {
   late MockAuthRepository mockAuthRepository;
 
-  final testUser = UserEntity(
+  const testUser = UserEntity(
     userId: '@user:server.com',
     displayName: 'Test User',
   );
@@ -205,7 +205,7 @@ void main() {
       expect(response['matrix_homeserver'], isNotNull);
 
       // Check if all required credentials are present
-      bool hasAllCredentials = response['matrix_user_id'] != null &&
+      final bool hasAllCredentials = response['matrix_user_id'] != null &&
           response['matrix_access_token'] != null &&
           response['matrix_homeserver'] != null;
 

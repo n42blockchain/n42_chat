@@ -138,7 +138,7 @@ class WalletPage extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               S.of(context)?.commonWalletArea ?? 'Wallet area',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: Color(0xFF888888),
               ),

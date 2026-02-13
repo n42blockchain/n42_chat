@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -702,7 +704,7 @@ class _ChatTabContent extends StatelessWidget {
 
     if (!context.mounted) return;
 
-    Navigator.of(context).push(
+    unawaited(Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => MultiBlocProvider(
           providers: [
@@ -717,7 +719,7 @@ class _ChatTabContent extends StatelessWidget {
       ),
     ).then((_) {
       conversationBloc.add(const RefreshConversations());
-    });
+    }));
   }
 
   @override

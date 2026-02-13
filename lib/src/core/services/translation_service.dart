@@ -118,7 +118,7 @@ class GoogleTranslationService implements ITranslationService {
         body: jsonEncode({
           'q': text,
           'target': targetLanguage,
-          if (sourceLanguage != null) 'source': sourceLanguage,
+          'source': ?sourceLanguage,
         }),
       );
 

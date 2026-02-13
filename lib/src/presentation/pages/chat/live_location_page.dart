@@ -95,7 +95,7 @@ class _LiveLocationView extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         S.of(context)?.liveLocationSharingCount(state.activeSharings.length) ?? '${state.activeSharings.length} people sharing location',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: AppColors.primary,
                           fontSize: 14,
                         ),
@@ -212,7 +212,7 @@ class _LiveLocationView extends StatelessWidget {
           fontSize: 12,
         ),
       ),
-      trailing: Icon(
+      trailing: const Icon(
         Icons.my_location,
         color: AppColors.primary,
         size: 20,

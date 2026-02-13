@@ -108,8 +108,8 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
         title: Text(S.of(context)?.contactEditTag ?? 'Edit Tag'),
         content: TextField(
           controller: controller,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
           ),
           autofocus: true,
         ),

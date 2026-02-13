@@ -814,19 +814,19 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     // 先停止铃声
     await CallManager().stopRingtone();
     // 接听
-    widget.webRTCService.answerCall();
+    await widget.webRTCService.answerCall();
   }
 
   Future<void> _rejectCall() async {
     // 停止铃声
     await CallManager().stopRingtone();
-    widget.webRTCService.rejectCall();
+    await widget.webRTCService.rejectCall();
     if (mounted) Navigator.of(context).pop();
   }
 
   Future<void> _hangup() async {
     // 停止铃声/通知
     await CallManager().stopRingtone();
-    widget.webRTCService.hangup();
+    await widget.webRTCService.hangup();
   }
 }

@@ -111,7 +111,7 @@ class FaceBlurUtil {
 
     for (final faceRect in params.faceRects) {
       // 扩大模糊区域（人脸边界外扩 20%），确保完全覆盖
-      final expandRatio = 0.2;
+      const expandRatio = 0.2;
       final expandW = (faceRect.width * expandRatio).round();
       final expandH = (faceRect.height * expandRatio).round();
 

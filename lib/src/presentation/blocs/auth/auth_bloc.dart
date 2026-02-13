@@ -627,9 +627,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ));
         add(const LoadUserProfileData());
         // Apple 登录成功后注册推送通知
-        _registerPushNotifications();
+        unawaited(_registerPushNotifications());
         // Apple 登录成功后初始化通话管理器
-        _initializeCallManager();
+        unawaited(_initializeCallManager());
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -729,9 +729,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ));
         add(const LoadUserProfileData());
         // Facebook 登录成功后注册推送通知
-        _registerPushNotifications();
+        unawaited(_registerPushNotifications());
         // Facebook 登录成功后初始化通话管理器
-        _initializeCallManager();
+        unawaited(_initializeCallManager());
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -787,9 +787,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ));
         add(const LoadUserProfileData());
         // Twitter 登录成功后注册推送通知
-        _registerPushNotifications();
+        unawaited(_registerPushNotifications());
         // Twitter 登录成功后初始化通话管理器
-        _initializeCallManager();
+        unawaited(_initializeCallManager());
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -845,9 +845,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ));
         add(const LoadUserProfileData());
         // 微信登录成功后注册推送通知
-        _registerPushNotifications();
+        unawaited(_registerPushNotifications());
         // 微信登录成功后初始化通话管理器
-        _initializeCallManager();
+        unawaited(_initializeCallManager());
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -1072,9 +1072,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // 登录成功后自动加载完整用户资料
         add(const LoadUserProfileData());
         // 登录成功后注册推送通知
-        _registerPushNotifications();
+        unawaited(_registerPushNotifications());
         // 登录成功后初始化通话管理器
-        _initializeCallManager();
+        unawaited(_initializeCallManager());
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,

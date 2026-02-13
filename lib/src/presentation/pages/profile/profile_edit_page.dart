@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -415,20 +417,21 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
       final bytes = await image.readAsBytes();
       debugPrint('ProfileEditPage: Image bytes: ${bytes.length}');
-      
+
+      if (!mounted) return;
       if (bytes.isEmpty) {
         throw Exception(S.of(context)?.commonImageDataEmpty ?? 'Image data is empty');
       }
-      
+
       // 确保文件名有正确的扩展名
       String filename = image.name;
       if (!filename.contains('.')) {
         // iOS 相机可能不带扩展名，添加 .jpg
         filename = '$filename.jpg';
       }
-      
+
       debugPrint('ProfileEditPage: Uploading avatar with filename: $filename');
-      
+
       // 上传头像 - BlocConsumer 会监听状态变化并显示结果
       context.read<AuthBloc>().add(UpdateAvatar(
         avatarBytes: bytes,
@@ -478,6 +481,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
 
     if (result != null && result.isNotEmpty && result != currentName) {
+      if (!mounted) return;
       context.read<AuthBloc>().add(UpdateDisplayName(result));
     }
   }
@@ -576,7 +580,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       ),
     );
 
-    if (province != null) {
+    if (province != null && mounted) {
       // 选择城市
       final cities = _getCitiesForRegion(province);
 
@@ -1905,15 +1909,16 @@ class _RingtoneSelectPageState extends State<_RingtoneSelectPage> {
     // 先停止当前播放
     await _stopRingtone();
 
+    if (!mounted) return;
     final s = S.of(context);
 
     // 如果是振动，触发振动
     if (ringtone.key == 'vibrate') {
-      HapticFeedback.heavyImpact();
+      unawaited(HapticFeedback.heavyImpact());
       await Future.delayed(const Duration(milliseconds: 100));
-      HapticFeedback.heavyImpact();
+      unawaited(HapticFeedback.heavyImpact());
       await Future.delayed(const Duration(milliseconds: 100));
-      HapticFeedback.heavyImpact();
+      unawaited(HapticFeedback.heavyImpact());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -279,7 +279,7 @@ void main() {
       });
 
       test('should have correct preset values', () {
-        final presets = SelfDestructTimer.presets;
+        const presets = SelfDestructTimer.presets;
 
         expect(presets[0].seconds, 5);
         expect(presets[0].name, '5 秒');

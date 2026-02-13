@@ -153,7 +153,7 @@ void main() {
         [16, 0, 0, 0],
       ];
 
-      int tilesBefore = 4;
+      const int tilesBefore = 4;
       logic.swipe(Direction.left); // Should not move
 
       int tilesAfter = 0;

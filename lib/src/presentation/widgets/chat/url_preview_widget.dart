@@ -140,7 +140,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
         decoration: BoxDecoration(
           color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(8),
-          border: Border(
+          border: const Border(
             left: BorderSide(
               color: AppColors.primary,
               width: 3,
@@ -163,7 +163,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
                           data.siteName!,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.primary,
                             fontWeight: FontWeight.w500,

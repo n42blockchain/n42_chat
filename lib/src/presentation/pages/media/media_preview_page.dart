@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -73,7 +75,7 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
   }
 
   Future<void> _initVideoPlayer(String url) async {
-    _videoController?.dispose();
+    unawaited(_videoController?.dispose());
     final controller = VideoPlayerController.networkUrl(Uri.parse(url));
     _videoController = controller;
     try {

@@ -5,7 +5,7 @@ import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 void main() {
   group('AuthResult', () {
     test('success should create result with user', () {
-      final user = UserEntity(
+      const user = UserEntity(
         userId: '@user:server.com',
         displayName: 'Test User',
       );
@@ -53,7 +53,7 @@ void main() {
 
   group('HomeserverInfo', () {
     test('should create with required fields', () {
-      final info = HomeserverInfo(
+      const info = HomeserverInfo(
         serverName: 'N42 Matrix',
         serverVersion: '1.0.0',
         supportedLoginTypes: ['m.login.password', 'm.login.sso'],
@@ -68,7 +68,7 @@ void main() {
     });
 
     test('should have default values for optional fields', () {
-      final info = HomeserverInfo(
+      const info = HomeserverInfo(
         serverName: 'Test Server',
         serverVersion: '1.0.0',
         supportedLoginTypes: ['m.login.password'],
@@ -83,7 +83,7 @@ void main() {
 
   group('UserEntity', () {
     test('should create with required fields', () {
-      final user = UserEntity(
+      const user = UserEntity(
         userId: '@user:server.com',
         displayName: 'Test User',
       );
@@ -93,7 +93,7 @@ void main() {
     });
 
     test('should handle optional profile fields', () {
-      final user = UserEntity(
+      const user = UserEntity(
         userId: '@user:server.com',
         displayName: 'Test User',
         avatarUrl: 'https://server.com/avatar.jpg',
@@ -113,12 +113,12 @@ void main() {
     });
 
     test('should support equality', () {
-      final user1 = UserEntity(
+      const user1 = UserEntity(
         userId: '@user:server.com',
         displayName: 'Test User',
       );
 
-      final user2 = UserEntity(
+      const user2 = UserEntity(
         userId: '@user:server.com',
         displayName: 'Test User',
       );
@@ -127,7 +127,7 @@ void main() {
     });
 
     test('should support copyWith', () {
-      final user = UserEntity(
+      const user = UserEntity(
         userId: '@user:server.com',
         displayName: 'Test User',
       );
@@ -276,7 +276,7 @@ void main() {
 
     test('social login response validation', () {
       // 模拟社交登录响应验证
-      Map<String, dynamic> mockResponse = {
+      final Map<String, dynamic> mockResponse = {
         'success': true,
         'matrix_user_id': '@user:server.com',
         'matrix_access_token': 'syt_token_123',
@@ -329,7 +329,7 @@ void main() {
 
     test('get bound accounts should return list', () {
       // 模拟获取已绑定账号列表
-      List<Map<String, String>> mockBoundAccounts = [
+      final List<Map<String, String>> mockBoundAccounts = [
         {'provider': 'google', 'email': 'user@gmail.com'},
         {'provider': 'apple', 'email': 'user@icloud.com'},
       ];

@@ -42,7 +42,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
 
     try {
       // 订阅联系人变化
-      _contactsSubscription?.cancel();
+      unawaited(_contactsSubscription?.cancel());
       _contactsSubscription = _contactRepository.watchContacts().listen(
         (contacts) {
           // 防止在 BLoC 关闭后添加事件
@@ -56,7 +56,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
       );
 
       // 订阅在线状态变化
-      _onlineStatusSubscription?.cancel();
+      unawaited(_onlineStatusSubscription?.cancel());
       _onlineStatusSubscription =
           _contactRepository.watchOnlineStatus().listen(
         (statusMap) {

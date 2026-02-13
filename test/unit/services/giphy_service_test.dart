@@ -114,7 +114,7 @@ void main() {
       });
 
       test('aspectRatio returns 1.0 when height is 0', () {
-        final gif = GiphyGif(
+        const gif = GiphyGif(
           id: 'test',
           title: 'test',
           originalUrl: 'url',

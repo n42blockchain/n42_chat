@@ -302,7 +302,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         const Spacer(),
 
         // 标题
-        Icon(
+        const Icon(
           Icons.security,
           size: 48,
           color: AppColors.primary,

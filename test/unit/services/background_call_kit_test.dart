@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:n42_chat/src/core/notifications/firebase_push_service.dart';
 
 /// 测试后台来电 CallKit 触发逻辑
@@ -51,9 +50,9 @@ void main() {
     return RemoteMessage(
       data: <String, dynamic>{
         'type': type,
-        if (sender != null) 'sender': sender,
-        if (senderDisplayName != null) 'sender_display_name': senderDisplayName,
-        if (roomId != null) 'room_id': roomId,
+        'sender': ?sender,
+        'sender_display_name': ?senderDisplayName,
+        'room_id': ?roomId,
       },
     );
   }
@@ -162,7 +161,7 @@ void main() {
     });
 
     test('should end CallKit on m.call.hangup (not show new one)', () async {
-      final message = RemoteMessage(
+      const message = RemoteMessage(
         data: <String, dynamic>{
           'type': 'm.call.hangup',
           'room_id': '!room:matrix.org',
@@ -185,7 +184,7 @@ void main() {
     });
 
     test('should end CallKit on m.call.reject', () async {
-      final message = RemoteMessage(
+      const message = RemoteMessage(
         data: <String, dynamic>{
           'type': 'm.call.reject',
           'room_id': '!room:matrix.org',
@@ -206,7 +205,7 @@ void main() {
     });
 
     test('should skip m.call.candidates without triggering CallKit', () async {
-      final message = RemoteMessage(
+      const message = RemoteMessage(
         data: <String, dynamic>{
           'type': 'm.call.candidates',
           'room_id': '!room:matrix.org',
@@ -222,7 +221,7 @@ void main() {
     });
 
     test('should skip m.call.answer without triggering CallKit', () async {
-      final message = RemoteMessage(
+      const message = RemoteMessage(
         data: <String, dynamic>{
           'type': 'm.call.answer',
           'room_id': '!room:matrix.org',

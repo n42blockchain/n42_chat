@@ -2439,8 +2439,8 @@ class MatrixMessageDataSource {
     try {
       final uri = Uri.parse(mxcUrl);
       if (width != null && height != null) {
-        // ignore: deprecated_member_use
         // Using synchronous getThumbnail for Uri? return type compatibility
+        // ignore: deprecated_member_use
         return uri.getThumbnail(
           _client!,
           width: width,
@@ -2720,8 +2720,8 @@ class MatrixMessageDataSource {
         'body': '[Contact Card] $displayName',
         'user_id': userId,
         'display_name': displayName,
-        if (avatarUrl != null) 'avatar_url': avatarUrl,
-        if (matrixId != null) 'matrix_id': matrixId,
+        'avatar_url': ?avatarUrl,
+        'matrix_id': ?matrixId,
       });
       return eventId;
     } catch (e) {
@@ -2774,7 +2774,7 @@ class MatrixMessageDataSource {
         {
           'latitude': latitude,
           'longitude': longitude,
-          if (accuracy != null) 'accuracy': accuracy,
+          'accuracy': ?accuracy,
           'updated_at': DateTime.now().toIso8601String(),
         },
       );
@@ -3096,7 +3096,7 @@ class MatrixMessageDataSource {
         '/client/v1/rooms/${Uri.encodeComponent(roomId)}/relations/${Uri.encodeComponent(threadRootEventId)}/m.thread',
         query: {
           'limit': limit.toString(),
-          if (fromToken != null) 'from': fromToken,
+          'from': ?fromToken,
         },
       );
 
@@ -3157,7 +3157,10 @@ class MatrixMessageDataSource {
     if (room == null) return const Stream.empty();
 
     // 利用房间 timeline 的 onChange 流，过滤出线程相关消息
-    return room.onUpdate.stream.asyncMap((_) async {
+    return room.client.onSync.stream
+        .where((sync) => sync.rooms?.join?.containsKey(roomId) == true ||
+            sync.rooms?.leave?.containsKey(roomId) == true)
+        .asyncMap((_) async {
       return _getThreadMessagesFromTimeline(room, threadRootEventId);
     });
   }

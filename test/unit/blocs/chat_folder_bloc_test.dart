@@ -21,7 +21,7 @@ void main() {
     ChatFolderEntity.muted,
   ];
 
-  final customFolder = const ChatFolderEntity(
+  const customFolder = ChatFolderEntity(
     id: 'custom-1',
     name: 'Work',
     icon: '\u{1F4BC}',

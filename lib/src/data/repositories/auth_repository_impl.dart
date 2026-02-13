@@ -351,7 +351,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       final (discoveryInfo, versionsResponse, loginFlows) = 
           await _authDataSource.checkHomeserver(homeserver);
 
-      final baseUrl = discoveryInfo?.mHomeserver?.baseUrl.toString() ?? homeserver;
+      final baseUrl = discoveryInfo?.mHomeserver.baseUrl.toString() ?? homeserver;
 
       return HomeserverInfo(
         serverName: baseUrl,

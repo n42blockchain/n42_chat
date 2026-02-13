@@ -347,9 +347,9 @@ class _ServerTestPageState extends State<ServerTestPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   '服务器: $homeserver',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text(

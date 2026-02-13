@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../core/extensions/context_extension.dart';
 import '../../../domain/entities/token_gate_entity.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
@@ -369,7 +368,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
 
             // Token Standard
             DropdownButtonFormField<TokenStandard>(
-              value: _tokenStandard,
+              initialValue: _tokenStandard,
               decoration: InputDecoration(
                 labelText: s?.tokenGateTokenStandard ?? 'Token Standard',
                 border: const OutlineInputBorder(),
@@ -392,7 +391,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
 
             // Chain
             DropdownButtonFormField<int>(
-              value: _chainId,
+              initialValue: _chainId,
               decoration: InputDecoration(
                 labelText: s?.tokenGateChain ?? 'Chain',
                 border: const OutlineInputBorder(),

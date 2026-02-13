@@ -257,7 +257,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-              child: Icon(Icons.person, size: 18, color: AppColors.primary),
+              child: const Icon(Icons.person, size: 18, color: AppColors.primary),
             ),
           ],
         ],
@@ -501,7 +501,7 @@ class _TypingDotState extends State<_TypingDot> with SingleTickerProviderStateMi
           child: Container(
             width: 6,
             height: 6,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primary,
               shape: BoxShape.circle,
             ),

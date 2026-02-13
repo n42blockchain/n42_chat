@@ -863,6 +863,7 @@ class _ChatPageState extends State<ChatPage> {
               final downloadDir = await DownloadService.getDownloadDirectory();
               final savePath = '$downloadDir/$fileName';
 
+              if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(S.of(context)?.downloading ?? 'Downloading...'),
@@ -1027,7 +1028,7 @@ class _ChatPageState extends State<ChatPage> {
       
       // 微信风格的拍一拍效果
       // 1. 触发震动反馈
-      HapticFeedback.mediumImpact();
+      unawaited(HapticFeedback.mediumImpact());
       
       // 2. 发送拍一拍系统消息
       // 微信规则：使用拍人者自己设置的后缀
@@ -1128,7 +1129,7 @@ class _ChatPageState extends State<ChatPage> {
 
     if (!mounted) return;
 
-    Navigator.of(context).push(
+    unawaited(Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (ctx) {
           final page = ChatDetailPage(
@@ -1157,7 +1158,7 @@ class _ChatPageState extends State<ChatPage> {
     ).then((_) {
       // 返回时刷新背景（用户可能在详情页修改了聊天背景）
       _loadBackground();
-    });
+    }));
   }
 
   /// 显示添加成员对话框
@@ -1277,7 +1278,7 @@ class _ChatPageState extends State<ChatPage> {
       debugPrint('Error: $e');
     }
 
-    Widget content = Stack(
+    final Widget content = Stack(
       children: [
         Scaffold(
           backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
@@ -1859,7 +1860,7 @@ class _ChatPageState extends State<ChatPage> {
       }
       
       // 确定 MIME 类型
-      String mimeType = lookupMimeType(filename) ?? 
+      final String mimeType = lookupMimeType(filename) ?? 
                         lookupMimeType(video.path) ?? 
                         'video/mp4';
       
@@ -1908,7 +1909,8 @@ class _ChatPageState extends State<ChatPage> {
       debugPrint('Video size: ${bytes.length} bytes');
       debugPrint('Thumbnail size: ${thumbnailBytes?.length ?? 0} bytes');
       debugPrint('=== Sending video to ChatBloc ===');
-      
+
+      if (!mounted) return;
       // 使用视频消息发送（带缩略图）
       context.read<ChatBloc>().add(SendVideoMessage(
         videoBytes: bytes,
@@ -2041,6 +2043,7 @@ class _ChatPageState extends State<ChatPage> {
       debugPrint('Image size: ${bytes.length} bytes');
       debugPrint('=== Sending image to ChatBloc ===');
 
+      if (!mounted) return;
       context.read<ChatBloc>().add(SendImageMessage(
         imageBytes: bytes,
         filename: filename,
@@ -2080,7 +2083,7 @@ class _ChatPageState extends State<ChatPage> {
   /// 显示位置选项菜单（微信风格）
   Future<void> _sendLocation() async {
     final isDark = context.isDarkMode;
-    showModalBottomSheet<void>(
+    unawaited(showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
@@ -2189,9 +2192,9 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
       ),
-    );
+    ));
   }
-  
+
   /// 打开位置选择页面
   Future<void> _openLocationPicker() async {
     final result = await Navigator.push<Map<String, dynamic>>(
@@ -2228,6 +2231,7 @@ class _ChatPageState extends State<ChatPage> {
     // 检查位置服务和权限
     if (!await _checkLocationPermission()) return;
 
+    if (!mounted) return;
     // 显示共享确认对话框
     final confirmed = await showDialog<bool>(
       context: context,
@@ -2251,12 +2255,12 @@ class _ChatPageState extends State<ChatPage> {
 
     if (confirmed == true && mounted) {
       // 导航到实时位置共享页面
-      Navigator.push<void>(
+      unawaited(Navigator.push<void>(
         context,
         MaterialPageRoute(
           builder: (_) => LiveLocationPage(roomId: widget.conversation.id),
         ),
-      );
+      ));
     }
   }
 
@@ -2264,7 +2268,7 @@ class _ChatPageState extends State<ChatPage> {
   Future<bool> _checkLocationPermission() async {
     try {
       // 检查位置服务是否启用
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         if (mounted) {
           final shouldOpen = await showDialog<bool>(
@@ -2642,6 +2646,7 @@ Avatar: ${contactAvatar ?? ''}''';
             final mimeType = lookupMimeType(url) ?? 'audio/mpeg';
             final filename = url.split('/').last.split('\\').last;
 
+            if (!mounted) return;
             // 先发送音频文件
             context.read<ChatBloc>().add(SendFileMessage(
               fileBytes: bytes,
@@ -2656,12 +2661,14 @@ Avatar: ${contactAvatar ?? ''}''';
               ),
             );
           } else {
+            if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(S.of(context)?.chatFileNotExist ?? 'File does not exist'), backgroundColor: Colors.red),
             );
           }
         } catch (e) {
           debugPrint('Error sending local music: $e');
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(S.of(context)?.chatSendFailed(e.toString()) ?? 'Send failed: $e'), backgroundColor: Colors.red),
           );
@@ -3058,11 +3065,11 @@ Avatar: ${contactAvatar ?? ''}''';
 
       if (index != -1) {
         // 使用估算位置滚动
-        _scrollController.animateTo(
+        unawaited(_scrollController.animateTo(
           index * 80.0, // 估算每条消息高度
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
-        );
+        ));
         // 滚动后延迟设置高亮
         Future.delayed(const Duration(milliseconds: 350), () {
           if (mounted) {
@@ -3123,7 +3130,7 @@ Avatar: ${contactAvatar ?? ''}''';
             child: Row(
               children: [
                 // 置顶图标
-                Icon(
+                const Icon(
                   Icons.push_pin,
                   size: 16,
                   color: AppColors.primary,
@@ -3137,7 +3144,7 @@ Avatar: ${contactAvatar ?? ''}''';
                     children: [
                       Text(
                         msg.senderName,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: AppColors.primary,
@@ -3170,7 +3177,7 @@ Avatar: ${contactAvatar ?? ''}''';
                       ),
                       child: Text(
                         '${state.currentPinnedIndex + 1}/${state.pinnedMessages.length}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.primary,
                           fontWeight: FontWeight.w500,
@@ -3938,7 +3945,8 @@ Avatar: ${contactAvatar ?? ''}''';
       }
       
       debugPrint('Sending voice: filename=$filename, mimeType=$mimeType, size=${bytes.length}');
-      
+
+      if (!mounted) return;
       context.read<ChatBloc>().add(SendVoiceMessage(
         audioBytes: bytes,
         filename: filename,
@@ -4666,6 +4674,7 @@ Avatar: ${contactAvatar ?? ''}''';
     final confirmed = await _showDeleteConfirmDialog();
     if (!confirmed) return;
 
+    if (!mounted) return;
     // 本地删除
     context.read<ChatBloc>().add(DeleteMessagesLocally([message.id]));
 
@@ -4697,17 +4706,18 @@ Avatar: ${contactAvatar ?? ''}''';
     // 显示撤回确认对话框
     final confirmed = await showRecallConfirmDialog(context);
     if (!confirmed) return;
-    
+
+    if (!mounted) return;
     // 保存撤回的消息内容，用于"重新编辑"
     if (message.type == MessageType.text) {
       _lastRecalledContent = message.content;
     }
-    
+
     // 记录撤回的消息 ID
     setState(() {
       _recalledMessageIds.add(message.id);
     });
-    
+
     // 调用撤回 API
     context.read<ChatBloc>().add(RedactMessage(message.id));
   }
@@ -4808,7 +4818,8 @@ Avatar: ${contactAvatar ?? ''}''';
     );
     
     if (confirmed != true) return;
-    
+
+    if (!mounted) return;
     final chatBloc = context.read<ChatBloc>();
     int redactedCount = 0;
     int localDeletedCount = 0;
@@ -6052,7 +6063,7 @@ class _LocationPickerPageState extends State<_LocationPickerPage> {
       });
 
       // 检查位置服务
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         setState(() {
           _isLoading = false;
@@ -7075,19 +7086,20 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
         // 从文件名中提取歌曲名和歌手（假设格式为 "歌手 - 歌曲名.mp3"）
         String songName = fileName;
         String artist = '未知歌手';
-        
+
         // 去掉扩展名
         if (fileName.contains('.')) {
           songName = fileName.substring(0, fileName.lastIndexOf('.'));
         }
-        
+
         // 尝试分离歌手和歌曲名
         if (songName.contains(' - ')) {
           final parts = songName.split(' - ');
           artist = parts[0].trim();
           songName = parts[1].trim();
         }
-        
+
+        if (!mounted) return;
         // 返回结果，包含文件路径
         Navigator.pop(context, {
           'name': songName,
@@ -7098,6 +7110,7 @@ class _MusicSelectSheetState extends State<_MusicSelectSheet> {
       }
     } catch (e) {
       debugPrint('Error picking audio file: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context)?.chatSelectFileFailed(e.toString()) ?? 'Failed to select file: $e')),
       );
@@ -8001,7 +8014,7 @@ class _ImageViewerPageState extends State<_ImageViewerPage> {
         await tempFile.writeAsBytes(response.bodyBytes);
 
         // 分享
-        await Share.shareXFiles([XFile(tempFile.path)]);
+        await SharePlus.instance.share(ShareParams(files: [XFile(tempFile.path)]));
 
         // 清理临时文件
         await tempDir.delete(recursive: true);

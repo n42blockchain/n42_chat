@@ -771,7 +771,7 @@ class N42Chat {
 
       if (!ctx.mounted) return;
 
-      Navigator.of(ctx).push(
+      unawaited(Navigator.of(ctx).push(
         MaterialPageRoute<void>(
           builder: (_) => MultiBlocProvider(
             providers: [
@@ -784,7 +784,7 @@ class N42Chat {
             ),
           ),
         ),
-      );
+      ));
     } catch (e) {
       debugPrint('N42Chat: Failed to open conversation $roomId: $e');
     }
