@@ -77,6 +77,9 @@ class FirebasePushService implements IPushNotificationService {
   /// 推送注册锁（防止并发注册）
   bool _isRegistering = false;
 
+  /// Pusher 是否已通过服务端验证
+  bool _isPusherVerified = false;
+
   /// 通知配置
   NotificationConfig _notificationConfig = const NotificationConfig();
 
@@ -235,7 +238,7 @@ class FirebasePushService implements IPushNotificationService {
       // iOS 需要先等待 APNs Token，FCM Token 依赖它
       if (Platform.isIOS) {
         _apnsToken = await _getAPNsTokenWithRetry();
-        debugPrint('FirebasePushService: APNs token: ${_apnsToken != null ? '${_apnsToken!.substring(0, 10)}...' : 'null'}');
+        debugPrint('FirebasePushService: APNs token: ${_apnsToken != null ? '${_truncateToken(_apnsToken!)}...' : 'null'}');
         if (_apnsToken == null) {
           debugPrint('FirebasePushService: WARNING - APNs token is null, iOS push may not work!');
         }
@@ -243,7 +246,7 @@ class FirebasePushService implements IPushNotificationService {
 
       // 获取 FCM Token（带重试）
       _fcmToken = await _getFCMTokenWithRetry();
-      debugPrint('FirebasePushService: FCM token: ${_fcmToken != null ? '${_fcmToken!.substring(0, 10)}...' : 'null'}');
+      debugPrint('FirebasePushService: FCM token: ${_fcmToken != null ? '${_truncateToken(_fcmToken!)}...' : 'null'}');
 
       if (_fcmToken == null) {
         debugPrint('FirebasePushService: WARNING - FCM token is null after retries!');
@@ -720,30 +723,32 @@ class FirebasePushService implements IPushNotificationService {
   @override
   Future<void> registerForPush() async {
     if (_isRegistering) {
-      debugPrint('FirebasePushService: Push registration already in progress');
+      debugPrint('[PUSH_REG] Push registration already in progress, skipping');
       return;
     }
     _isRegistering = true;
+    debugPrint('[PUSH_REG] Starting push registration...');
     try {
       await _registerForPushImpl();
     } finally {
       _isRegistering = false;
+      debugPrint('[PUSH_REG] Push registration flow completed (verified=$_isPusherVerified)');
     }
   }
 
   Future<void> _registerForPushImpl() async {
     // 如果 FCM Token 还没有获取到，尝试获取
     if (_fcmToken == null) {
-      debugPrint('FirebasePushService: FCM token is null, attempting to get token...');
+      debugPrint('[PUSH_REG] FCM token is null, attempting to get token...');
       _fcmToken = await _getFCMTokenWithRetry(maxRetries: 2);
     }
 
     if (_fcmToken == null) {
-      debugPrint('FirebasePushService: Cannot register push - FCM token is null');
+      debugPrint('[PUSH_REG_FAIL] Cannot register push - FCM token is null');
       return;
     }
     if (pushGatewayUrl == null) {
-      debugPrint('FirebasePushService: Cannot register push - pushGatewayUrl is null');
+      debugPrint('[PUSH_REG_FAIL] Cannot register push - pushGatewayUrl is null');
       return;
     }
 
@@ -753,42 +758,146 @@ class FirebasePushService implements IPushNotificationService {
     final String pushkey;
     if (Platform.isIOS && _apnsToken != null) {
       pushkey = _apnsToken!;
-      debugPrint('FirebasePushService: iOS using APNs token as pushkey');
+      debugPrint('[PUSH_REG] iOS using APNs token as pushkey');
     } else {
       pushkey = _fcmToken!;
-      debugPrint('FirebasePushService: Using FCM token as pushkey');
+      debugPrint('[PUSH_REG] Using FCM token as pushkey');
     }
 
-    try {
-      debugPrint('FirebasePushService: Registering pusher...');
-      debugPrint('  appId: $appId');
-      debugPrint('  pushkeyType: $pushkeyType');
-      debugPrint('  gateway: $pushGatewayUrl');
-      debugPrint('  pushkey: ${pushkey.substring(0, 10)}...');
+    // 指数退避重试：最多 3 次（初始 + 2 次重试），间隔 4s、8s
+    const maxAttempts = 3;
+    debugPrint('[PUSH_REG] Config: appId=$appId, type=$pushkeyType, '
+        'gateway=$pushGatewayUrl, pushkey=${_truncateToken(pushkey)}...');
 
-      // 注册 Pusher 到 Matrix 服务器
-      await _client.postPusher(
-        matrix.Pusher(
-          pushkey: pushkey,
-          kind: pushkeyType,
-          appId: appId,
-          appDisplayName: 'N42 Chat',
-          deviceDisplayName: _client.deviceName ?? 'Unknown Device',
-          lang: 'en',
-          data: matrix.PusherData(
-            url: Uri.parse(pushGatewayUrl!),
-            // iOS (APNs): 不使用 event_id_only，让 Sygnal 发送完整通知内容
-            // (包含 alert/sound/badge)，否则 APNs 只收到静默推送不会显示给用户。
-            // Android (FCM): 使用 event_id_only，由 Firebase onBackgroundMessage 处理。
-            format: Platform.isIOS ? null : 'event_id_only',
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      // 每次重试前检查登录状态
+      if (!_client.isLogged()) {
+        debugPrint('[PUSH_REG_FAIL] Client not logged in, aborting push registration');
+        return;
+      }
+
+      try {
+        debugPrint('[PUSH_REG] Registering pusher (attempt $attempt/$maxAttempts)...');
+
+        // 注册 Pusher 到 Matrix 服务器
+        await _client.postPusher(
+          matrix.Pusher(
+            pushkey: pushkey,
+            kind: pushkeyType,
+            appId: appId,
+            appDisplayName: 'N42 Chat',
+            deviceDisplayName: _client.deviceName ?? 'Unknown Device',
+            lang: 'en',
+            data: matrix.PusherData(
+              url: Uri.parse(pushGatewayUrl!),
+              // iOS (APNs): 不使用 event_id_only，让 Sygnal 发送完整通知内容
+              // (包含 alert/sound/badge)，否则 APNs 只收到静默推送不会显示给用户。
+              // Android (FCM): 使用 event_id_only，由 Firebase onBackgroundMessage 处理。
+              format: Platform.isIOS ? null : 'event_id_only',
+            ),
           ),
-        ),
-        append: false,
-      );
-      debugPrint('FirebasePushService: Pusher registered successfully');
-    } catch (e) {
-      debugPrint('FirebasePushService: Failed to register push: $e');
+          append: false,
+        );
+        debugPrint('[PUSH_REG_OK] Pusher registered successfully on attempt $attempt');
+
+        // 注册成功后验证 Pusher 是否确实存在于服务器
+        await _verifyPusherRegistration(pushkey);
+        return; // 成功，退出重试循环
+      } catch (e) {
+        debugPrint('[PUSH_REG_FAIL] Attempt $attempt/$maxAttempts failed: $e');
+        if (attempt < maxAttempts) {
+          final delay = Duration(seconds: 4 * attempt); // 4s, 8s
+          debugPrint('[PUSH_REG] Retrying in ${delay.inSeconds}s...');
+          await Future<void>.delayed(delay);
+        } else {
+          debugPrint('[PUSH_REG_FAIL] All $maxAttempts attempts exhausted, push registration failed');
+        }
+      }
     }
+  }
+
+  /// 验证 Pusher 注册是否成功
+  ///
+  /// 调用 getPushers() 确认当前 pushkey 的 Pusher 已存在于服务器
+  Future<void> _verifyPusherRegistration(String pushkey) async {
+    try {
+      final pushers = await _client.getPushers();
+      if (pushers == null) {
+        debugPrint('[PUSH_VERIFY_WARN] getPushers() returned null');
+        _isPusherVerified = false;
+        return;
+      }
+
+      final found = pushers.any(
+        (p) => p.pushkey == pushkey && p.appId == appId,
+      );
+
+      _isPusherVerified = found;
+      if (found) {
+        debugPrint('[PUSH_VERIFY_OK] Pusher verified on server (appId=$appId)');
+      } else {
+        debugPrint('[PUSH_VERIFY_FAIL] Pusher NOT found on server after registration! '
+            'Registered ${pushers.length} pushers, none match appId=$appId');
+      }
+    } catch (e) {
+      debugPrint('[PUSH_VERIFY_FAIL] Verification failed: $e');
+      _isPusherVerified = false;
+    }
+  }
+
+  /// Pusher 是否已通过服务端验证
+  bool get isPusherVerified => _isPusherVerified;
+
+  /// 获取推送诊断信息
+  ///
+  /// 返回当前推送状态的详细信息，用于调试
+  Map<String, dynamic> getDiagnosticInfo() {
+    final String status;
+    if (!_isInitialized) {
+      status = 'not_initialized';
+    } else if (_isPusherVerified) {
+      status = 'registered_verified';
+    } else if (_isRegistering) {
+      status = 'registering';
+    } else {
+      status = 'initialized';
+    }
+
+    return {
+      'status': status,
+      'isInitialized': _isInitialized,
+      'fcmToken': _fcmToken != null ? '${_truncateToken(_fcmToken!)}...' : null,
+      'apnsToken': _apnsToken != null ? '${_truncateToken(_apnsToken!)}...' : null,
+      'pushGatewayUrl': pushGatewayUrl,
+      'appId': appId,
+      'pushkeyType': pushkeyType,
+      'isPusherVerified': _isPusherVerified,
+      'isRegistering': _isRegistering,
+      'clientIsLogged': _client.isLogged(),
+      'platform': Platform.isIOS ? 'iOS' : 'Android',
+    };
+  }
+
+  /// 安全截取 token 前缀用于日志（避免 RangeError）
+  static String _truncateToken(String token, [int length = 10]) {
+    return token.length > length ? token.substring(0, length) : token;
+  }
+
+  /// 强制重新注册推送
+  ///
+  /// 清除验证状态并重新执行注册流程。
+  /// 如果当前有注册正在进行，等待其完成后再触发新的注册。
+  Future<void> forceReRegister() async {
+    debugPrint('[PUSH_REG] Force re-register requested');
+    _isPusherVerified = false;
+
+    // 如果正在注册中，等待其完成后再触发（避免并发竞态）
+    while (_isRegistering) {
+      debugPrint('[PUSH_REG] Waiting for current registration to complete before force re-register...');
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    }
+
+    await registerForPush();
   }
 
   @override
