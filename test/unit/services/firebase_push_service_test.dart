@@ -7,6 +7,15 @@ import 'package:n42_chat/src/core/notifications/firebase_push_service.dart';
 
 class MockMatrixClient extends Mock implements matrix.Client {}
 
+class FakePusher extends Fake implements matrix.Pusher {
+  @override
+  final String pushkey;
+  @override
+  final String appId;
+
+  FakePusher({required this.pushkey, required this.appId});
+}
+
 /// 测试 FirebasePushService 的实例方法：
 /// - setInCall / isInCall 状态管理
 /// - 自动重置定时器（防止 _isInCall 泄漏）
@@ -245,4 +254,179 @@ void main() {
     });
   });
 
+  // ────────────────────────────────────────────
+  // 新增：isPusherVerified 状态管理
+  // ────────────────────────────────────────────
+  group('isPusherVerified', () {
+    late FirebasePushService service;
+
+    setUp(() {
+      service = FirebasePushService(MockMatrixClient());
+    });
+
+    tearDown(() async {
+      await service.dispose();
+    });
+
+    test('should default isPusherVerified to false', () {
+      expect(service.isPusherVerified, isFalse);
+    });
+  });
+
+  // ────────────────────────────────────────────
+  // 新增：getDiagnosticInfo
+  // ────────────────────────────────────────────
+  group('getDiagnosticInfo', () {
+    late FirebasePushService service;
+    late MockMatrixClient mockClient;
+
+    setUp(() {
+      mockClient = MockMatrixClient();
+      when(() => mockClient.isLogged()).thenReturn(false);
+      service = FirebasePushService(
+        mockClient,
+        pushGatewayUrl: 'https://push.example.com',
+        appId: 'com.test.app',
+        pushkeyType: 'http',
+      );
+    });
+
+    tearDown(() async {
+      await service.dispose();
+    });
+
+    test('should return all expected keys', () {
+      final info = service.getDiagnosticInfo();
+
+      expect(info, containsPair('status', 'not_initialized'));
+      expect(info, containsPair('isInitialized', false));
+      expect(info, containsPair('fcmToken', null));
+      expect(info, containsPair('apnsToken', null));
+      expect(info, containsPair('pushGatewayUrl', 'https://push.example.com'));
+      expect(info, containsPair('appId', 'com.test.app'));
+      expect(info, containsPair('pushkeyType', 'http'));
+      expect(info, containsPair('isPusherVerified', false));
+      expect(info, containsPair('isRegistering', false));
+      expect(info, containsPair('clientIsLogged', false));
+      expect(info, contains('platform'));
+    });
+
+    test('should reflect clientIsLogged state', () {
+      when(() => mockClient.isLogged()).thenReturn(true);
+      final info = service.getDiagnosticInfo();
+      expect(info['clientIsLogged'], isTrue);
+    });
+  });
+
+  // ────────────────────────────────────────────
+  // 新增：registerForPush 重试与登录状态检查
+  // ────────────────────────────────────────────
+  group('registerForPush retry behavior', () {
+    late FirebasePushService service;
+    late MockMatrixClient mockClient;
+
+    setUp(() {
+      mockClient = MockMatrixClient();
+      service = FirebasePushService(
+        mockClient,
+        pushGatewayUrl: 'https://push.example.com',
+        appId: 'com.test.app',
+      );
+    });
+
+    tearDown(() async {
+      await service.dispose();
+    });
+
+    test('should not throw when fcmToken is null', () async {
+      // fcmToken 为 null 时应安全返回，不抛异常
+      when(() => mockClient.isLogged()).thenReturn(true);
+      await expectLater(service.registerForPush(), completes);
+    });
+
+    test('should not register concurrently (lock mechanism)', () async {
+      // 并发调用 registerForPush 时第二次应被跳过
+      when(() => mockClient.isLogged()).thenReturn(true);
+
+      // 两次调用都应安全完成
+      final f1 = service.registerForPush();
+      final f2 = service.registerForPush();
+      await Future.wait([f1, f2]);
+      // 不抛异常即通过
+    });
+  });
+
+  // ────────────────────────────────────────────
+  // 新增：forceReRegister
+  // ────────────────────────────────────────────
+  group('forceReRegister', () {
+    late FirebasePushService service;
+    late MockMatrixClient mockClient;
+
+    setUp(() {
+      mockClient = MockMatrixClient();
+      service = FirebasePushService(
+        mockClient,
+        pushGatewayUrl: 'https://push.example.com',
+        appId: 'com.test.app',
+      );
+    });
+
+    tearDown(() async {
+      await service.dispose();
+    });
+
+    test('should not throw when called without prior registration', () async {
+      when(() => mockClient.isLogged()).thenReturn(true);
+      await expectLater(service.forceReRegister(), completes);
+    });
+
+    test('should reset isPusherVerified before re-registering', () async {
+      when(() => mockClient.isLogged()).thenReturn(true);
+      // 初始状态验证
+      expect(service.isPusherVerified, isFalse);
+      await service.forceReRegister();
+      // 因为没有 token，注册不会成功，verified 仍为 false
+      expect(service.isPusherVerified, isFalse);
+    });
+  });
+
+  // ────────────────────────────────────────────
+  // 新增：FirebasePushServiceBuilder
+  // ────────────────────────────────────────────
+  group('FirebasePushServiceBuilder', () {
+    test('should throw when client is not set', () {
+      final builder = FirebasePushServiceBuilder();
+      expect(() => builder.build(), throwsA(isA<StateError>()));
+    });
+
+    test('should build service with all parameters', () {
+      final client = MockMatrixClient();
+      when(() => client.isLogged()).thenReturn(false);
+      final service = FirebasePushServiceBuilder()
+          .withClient(client)
+          .withPushGatewayUrl('https://push.example.com')
+          .withAppId('com.test.builder')
+          .withPushkeyType('http')
+          .withNotificationTapHandler((roomId, eventId) {})
+          .build();
+
+      expect(service, isA<FirebasePushService>());
+      final info = service.getDiagnosticInfo();
+      expect(info['appId'], equals('com.test.builder'));
+      expect(info['pushGatewayUrl'], equals('https://push.example.com'));
+    });
+
+    test('should build service with minimal parameters', () {
+      final client = MockMatrixClient();
+      when(() => client.isLogged()).thenReturn(false);
+      final service = FirebasePushServiceBuilder()
+          .withClient(client)
+          .build();
+
+      expect(service, isA<FirebasePushService>());
+      final info = service.getDiagnosticInfo();
+      expect(info['appId'], equals('com.n42.chat'));
+    });
+  });
 }

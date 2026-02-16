@@ -250,9 +250,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
       // 恢复会话成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
       add(const LoadUserProfileData());
-      // 恢复会话成功后注册推送通知并初始化通话管理器
-      await _registerPushNotifications();
+      // 通话管理器必须在 sync 事件到达前初始化完成，否则来电事件会丢失
       await _initializeCallManager();
+      // 推送注册可以后台执行，不阻塞会话恢复流程
+      unawaited(_registerPushNotifications());
     } else {
       emit(state.copyWith(
         status: AuthStatus.unauthenticated,

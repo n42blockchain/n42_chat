@@ -243,8 +243,11 @@ class N42Chat {
     _authBloc!.add(const AuthRestoreSessionRequested());
 
     // 初始化推送通知服务（如果启用）
+    // 不阻塞主初始化流程：FCM token 获取在无 GMS 设备上可能耗时 60-90 秒
     if (config.enablePushNotifications) {
-      await _initializePushService(config);
+      _initializePushService(config).catchError((Object e) {
+        debugPrint('N42Chat: Push service initialization failed in background: $e');
+      });
     }
 
     // 如果 Matrix 客户端已登录，立即初始化通话管理器
@@ -323,11 +326,11 @@ class N42Chat {
       final client = clientManager.client;
 
       if (client == null) {
-        debugPrint('N42Chat: Matrix client not initialized, push service will be initialized on login');
+        debugPrint('[PUSH_INIT] Matrix client not initialized, push service will be initialized on login');
         return;
       }
 
-      debugPrint('N42Chat: Creating push service with gateway: ${config.pushGatewayUrl}, appId: ${config.pushAppId}');
+      debugPrint('[PUSH_INIT] Creating push service with gateway: ${config.pushGatewayUrl}, appId: ${config.pushAppId}');
 
       // 创建推送服务
       _pushService = FirebasePushService(
@@ -335,7 +338,7 @@ class N42Chat {
         pushGatewayUrl: config.pushGatewayUrl,
         appId: config.pushAppId,
         onNotificationTap: (roomId, eventId) {
-          debugPrint('N42Chat: Notification tapped - roomId: $roomId, eventId: $eventId');
+          debugPrint('[PUSH_TAP] Notification tapped - roomId: $roomId, eventId: $eventId');
           _onNotificationTap?.call(roomId, eventId);
           // 如果有 roomId，导航到对应聊天
           if (roomId != null) {
@@ -346,15 +349,16 @@ class N42Chat {
 
       // 初始化（包括获取 FCM Token）
       await _pushService!.initialize();
+      debugPrint('[PUSH_INIT] Push service initialized, isLogged=${client.isLogged()}');
 
       // 如果已登录，立即注册推送
       if (client.isLogged()) {
         await _pushService!.registerForPush();
       }
 
-      debugPrint('N42Chat: Push service initialized successfully');
+      debugPrint('[PUSH_INIT_OK] Push service ready (verified=${_pushService?.isPusherVerified})');
     } catch (e) {
-      debugPrint('N42Chat: Failed to initialize push service: $e');
+      debugPrint('[PUSH_INIT_FAIL] Failed to initialize push service: $e');
       // 初始化失败，清除 pushService 以允许后续重试
       _pushService = null;
     } finally {
@@ -388,26 +392,26 @@ class N42Chat {
   /// 登录成功后调用此方法注册推送。
   /// 如果推送服务正在初始化中（竞态），会等待初始化完成后再注册。
   static Future<void> registerPushNotifications() async {
-    debugPrint('N42Chat: registerPushNotifications called');
+    debugPrint('[PUSH_CHAIN] registerPushNotifications called');
 
     // 等待正在进行的初始化完成
     if (_pushInitCompleter != null && !_pushInitCompleter!.isCompleted) {
-      debugPrint('N42Chat: Waiting for push service initialization to complete...');
+      debugPrint('[PUSH_CHAIN] Waiting for push service initialization to complete...');
       await _pushInitCompleter!.future;
     }
 
     // 如果推送服务未初始化，尝试初始化（可能之前因 client 为 null 跳过）
     if (_pushService == null && _config != null && _config!.enablePushNotifications) {
-      debugPrint('N42Chat: Push service is null, attempting initialization...');
+      debugPrint('[PUSH_CHAIN] Push service is null, attempting initialization...');
       await _initializePushService(_config!);
     }
 
     if (_pushService != null) {
-      debugPrint('N42Chat: Calling registerForPush...');
+      debugPrint('[PUSH_CHAIN] Calling registerForPush...');
       await _pushService!.registerForPush();
-      debugPrint('N42Chat: registerForPush completed');
+      debugPrint('[PUSH_CHAIN] registerForPush completed (verified=${_pushService!.isPusherVerified})');
     } else {
-      debugPrint('N42Chat: Cannot register push - push service is null '
+      debugPrint('[PUSH_CHAIN_FAIL] Cannot register push - push service is null '
           '(config: ${_config != null}, enablePush: ${_config?.enablePushNotifications})');
     }
   }
@@ -563,7 +567,38 @@ class N42Chat {
       await _pushService!.clearNotificationsForRoom(roomId);
     }
   }
-  
+
+  /// 获取推送诊断信息
+  ///
+  /// 返回推送服务的详细状态，用于调试推送问题。
+  /// 搜索日志中 `[PUSH_REG_OK]` 和 `[PUSH_VERIFY_OK]` 确认注册成功。
+  static Map<String, dynamic> getPushDiagnostics() {
+    if (_pushService == null) {
+      return {
+        'status': 'not_initialized',
+        'config_exists': _config != null,
+        'push_enabled': _config?.enablePushNotifications ?? false,
+      };
+    }
+    return _pushService!.getDiagnosticInfo();
+  }
+
+  /// 强制重新注册推送
+  ///
+  /// 当推送不工作时调用此方法尝试修复。
+  /// 会清除之前的注册状态并重新执行整个注册流程。
+  static Future<void> forceReRegisterPush() async {
+    debugPrint('[PUSH_FORCE] Force re-register push requested');
+    if (_pushService != null) {
+      await _pushService!.forceReRegister();
+    } else {
+      debugPrint('[PUSH_FORCE] Push service is null, attempting full initialization...');
+      if (_config != null && _config!.enablePushNotifications) {
+        await _initializePushService(_config!);
+      }
+    }
+  }
+
   /// 获取全局 AuthBloc
   static AuthBloc get authBloc {
     _ensureInitialized();
