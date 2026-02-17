@@ -123,6 +123,22 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<RetryPendingMessages>(_onRetryPendingMessages);
     on<ConnectionStatusChanged>(_onConnectionStatusChanged);
     on<SendContactCardMessage>(_onSendContactCardMessage);
+    on<DestructionTimesLoaded>(_onDestructionTimesLoaded);
+  }
+
+  /// 处理销毁时间加载完成事件
+  Future<void> _onDestructionTimesLoaded(
+    DestructionTimesLoaded event,
+    Emitter<ChatState> emit,
+  ) async {
+    final updatedMessages = state.messages.map((msg) {
+      final destroyedAt = event.destructionTimes[msg.id];
+      if (destroyedAt != null && msg.isSelfDestructing && !msg.isDestructionStarted) {
+        return msg.copyWith(destroyedAt: destroyedAt);
+      }
+      return msg;
+    }).toList();
+    emit(state.copyWith(messages: updatedMessages));
   }
 
   @override
@@ -222,20 +238,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       try {
         final destructionTimes = await _secureStorage.getMessageDestructionTimes(roomId);
         if (destructionTimes.isEmpty || isClosed) return;
-
-        // 更新消息的销毁时间
-        final updatedMessages = state.messages.map((msg) {
-          final destroyedAt = destructionTimes[msg.id];
-          if (destroyedAt != null && msg.isSelfDestructing && !msg.isDestructionStarted) {
-            return msg.copyWith(destroyedAt: destroyedAt);
-          }
-          return msg;
-        }).toList();
-
-        if (!isClosed) {
-          // ignore: invalid_use_of_visible_for_testing_member
-          emit(state.copyWith(messages: updatedMessages));
-        }
+        add(DestructionTimesLoaded(destructionTimes));
       } catch (e) {
         debugPrint('ChatBloc: Failed to load saved destruction times: $e');
       }

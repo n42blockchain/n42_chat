@@ -222,14 +222,20 @@ class MediaLifecycleService {
         return null;
       }
 
-      // 通过 DownloadService 下载
+      // 通过 DownloadService 下载，传递 metadata 以确保重新注册到生命周期管理
       if (_downloadService != null) {
         await _downloadService.download(
           url: record.mxcUrl,
           savePath: filePath,
           fileName: p.basename(filePath),
+          metadata: {
+            'roomId': record.roomId,
+            if (record.eventId != null) 'eventId': record.eventId!,
+            'mxcUrl': record.mxcUrl,
+            'fileCategory': record.fileCategory,
+            'isThumbnail': record.isThumbnail.toString(),
+          },
         );
-        // 下载完成后会自动通过 DownloadService 再次注册
         return filePath;
       }
       return null;

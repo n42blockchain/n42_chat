@@ -647,6 +647,16 @@ class ConnectionStatusChanged extends ChatEvent {
   List<Object?> get props => [isConnected];
 }
 
+/// 销毁时间加载完成（内部事件，替代 Future.microtask + 直接 emit）
+class DestructionTimesLoaded extends ChatEvent {
+  final Map<String, DateTime> destructionTimes;
+
+  const DestructionTimesLoaded(this.destructionTimes);
+
+  @override
+  List<Object?> get props => [destructionTimes];
+}
+
 /// 发送联系人名片消息
 class SendContactCardMessage extends ChatEvent {
   final String userId;

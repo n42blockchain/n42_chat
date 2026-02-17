@@ -36,10 +36,14 @@ class VoiceRoomBloc extends Bloc<VoiceRoomEvent, VoiceRoomState> {
     on<EndVoiceRoom>(_onEndVoiceRoom);
     on<VoiceRoomUpdated>(_onVoiceRoomUpdated);
     on<ActiveVoiceRoomsUpdated>(_onActiveVoiceRoomsUpdated);
+    on<DurationTick>(_onDurationTick);
 
-    // 监听服务状态
+    // 监听服务状态变化
     _serviceStateSubscription = _voiceRoomService.stateStream.listen((serviceState) {
-      // 服务状态变化由具体事件处理器处理
+      if (isClosed) return;
+      if (!serviceState.isConnected && state.isConnected) {
+        add(const LeaveVoiceRoom());
+      }
     });
 
     // 订阅活跃房间列表
@@ -140,25 +144,41 @@ class VoiceRoomBloc extends Bloc<VoiceRoomEvent, VoiceRoomState> {
   }
 
   Future<void> _onRaiseHand(RaiseHand event, Emitter<VoiceRoomState> emit) async {
-    final success = await _voiceRoomService.raiseHand();
-    if (success) {
-      emit(state.copyWith(isHandRaised: true));
+    try {
+      final success = await _voiceRoomService.raiseHand();
+      if (success) {
+        emit(state.copyWith(isHandRaised: true));
+      }
+    } catch (e) {
+      emit(state.copyWith(error: 'Failed to raise hand: $e'));
     }
   }
 
   Future<void> _onLowerHand(LowerHand event, Emitter<VoiceRoomState> emit) async {
-    final success = await _voiceRoomService.lowerHand();
-    if (success) {
-      emit(state.copyWith(isHandRaised: false));
+    try {
+      final success = await _voiceRoomService.lowerHand();
+      if (success) {
+        emit(state.copyWith(isHandRaised: false));
+      }
+    } catch (e) {
+      emit(state.copyWith(error: 'Failed to lower hand: $e'));
     }
   }
 
   Future<void> _onApproveSpeaker(ApproveSpeaker event, Emitter<VoiceRoomState> emit) async {
-    await _voiceRoomService.approveSpeaker(event.userId);
+    try {
+      await _voiceRoomService.approveSpeaker(event.userId);
+    } catch (e) {
+      emit(state.copyWith(error: 'Failed to approve speaker: $e'));
+    }
   }
 
   Future<void> _onDemoteToListener(DemoteToListener event, Emitter<VoiceRoomState> emit) async {
-    await _voiceRoomService.demoteToListener(event.userId);
+    try {
+      await _voiceRoomService.demoteToListener(event.userId);
+    } catch (e) {
+      emit(state.copyWith(error: 'Failed to demote to listener: $e'));
+    }
   }
 
   Future<void> _onToggleMute(ToggleMute event, Emitter<VoiceRoomState> emit) async {
@@ -182,11 +202,17 @@ class VoiceRoomBloc extends Bloc<VoiceRoomEvent, VoiceRoomState> {
     emit(state.copyWith(activeRooms: event.rooms));
   }
 
+  void _onDurationTick(DurationTick event, Emitter<VoiceRoomState> emit) {
+    if (state.isConnected) {
+      emit(state.copyWith(duration: state.duration + 1));
+    }
+  }
+
   void _startDurationTimer() {
     _durationTimer?.cancel();
     _durationTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!isClosed && state.isConnected) {
-        // Duration 由 UI 层根据 state 更新自行计算
+        add(const DurationTick());
       }
     });
   }

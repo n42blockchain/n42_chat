@@ -73,6 +73,8 @@ class TierMaintenanceResult {
 class DataTierService {
   final MediaLifecycleService _lifecycleService;
   final StorageMonitorService _monitorService;
+  bool _isMaintenanceRunning = false;
+  bool _isEmergencyRunning = false;
 
   DataTierService({
     required MediaLifecycleService lifecycleService,
@@ -93,6 +95,20 @@ class DataTierService {
   /// 1. Warm 层文件：保留缩略图，标记原图可清理
   /// 2. Cold 层文件：清理所有非 pinned 媒体
   Future<TierMaintenanceResult> performMaintenance() async {
+    if (_isMaintenanceRunning) {
+      debugPrint('DataTierService: Maintenance already running, skipping');
+      return const TierMaintenanceResult();
+    }
+    _isMaintenanceRunning = true;
+
+    try {
+      return await _performMaintenanceInternal();
+    } finally {
+      _isMaintenanceRunning = false;
+    }
+  }
+
+  Future<TierMaintenanceResult> _performMaintenanceInternal() async {
     debugPrint('DataTierService: Starting tier maintenance');
     final config = await getTierConfig();
 
@@ -143,6 +159,20 @@ class DataTierService {
   ///
   /// 从最旧的文件开始清理，直到释放至少 100MB
   Future<int> emergencyCleanup() async {
+    if (_isEmergencyRunning) {
+      debugPrint('DataTierService: Emergency cleanup already running, skipping');
+      return 0;
+    }
+    _isEmergencyRunning = true;
+
+    try {
+      return await _emergencyCleanupInternal();
+    } finally {
+      _isEmergencyRunning = false;
+    }
+  }
+
+  Future<int> _emergencyCleanupInternal() async {
     final status = await _monitorService.checkStorageStatus();
     debugPrint(
         'DataTierService: Emergency cleanup triggered (level: ${status.level})');

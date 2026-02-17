@@ -107,7 +107,10 @@ Future<void> configureDependencies(N42ChatConfig config, {IWalletBridge? walletB
 
   // 注册BLoC
   _registerBlocs();
-  
+
+  // 等待所有异步单例初始化完成（如 MediaMetadataDatabase）
+  await getIt.allReady();
+
   // 初始化备注名服务
   await _initializeRemarkService();
 }
@@ -145,10 +148,10 @@ Future<void> _registerServices() async {
     () => clientManager,
   );
 
-  // 语音服务
+  // 语音服务（生命周期由 DI 管理）
   final voiceService = VoiceService();
   await voiceService.initialize();
-  getIt.registerLazySingleton<VoiceService>(() => voiceService);
+  getIt.registerSingleton<VoiceService>(voiceService);
 
   // Giphy 服务 (仅当配置了 API Key 时注册)
   final config = getIt<N42ChatConfig>();

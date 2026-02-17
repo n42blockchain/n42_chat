@@ -55,6 +55,7 @@ class DownloadService {
 
   final Map<String, DownloadTask> _tasks = {};
   final Map<String, StreamController<DownloadTask>> _taskControllers = {};
+  final Map<String, http.Client> _activeClients = {};
   int _activeCount = 0;
   int _taskIdCounter = 0;
 
@@ -109,6 +110,9 @@ class DownloadService {
     final task = _tasks[taskId];
     if (task != null && task.status == DownloadStatus.downloading) {
       task.status = DownloadStatus.cancelled;
+      // 关闭 HTTP client 以中断正在进行的网络流
+      _activeClients[taskId]?.close();
+      _activeClients.remove(taskId);
       _notifyTask(task);
       _activeCount--;
       _processQueue();
@@ -146,9 +150,11 @@ class DownloadService {
     task.status = DownloadStatus.downloading;
     _notifyTask(task);
 
+    final client = http.Client();
+    _activeClients[task.id] = client;
+
     try {
       final request = http.Request('GET', Uri.parse(task.url));
-      final client = http.Client();
       final response = await client.send(request);
 
       if (response.statusCode != 200) {
@@ -160,26 +166,32 @@ class DownloadService {
       await file.parent.create(recursive: true);
       final sink = file.openWrite();
 
-      await for (final chunk in response.stream) {
-        if (task.status == DownloadStatus.cancelled) {
-          await sink.close();
-          client.close();
-          return;
-        }
+      try {
+        await for (final chunk in response.stream) {
+          if (task.status == DownloadStatus.cancelled) {
+            return;
+          }
 
-        sink.add(chunk);
-        task.receivedBytes += chunk.length;
-        if (task.totalBytes > 0) {
-          task.progress = task.receivedBytes / task.totalBytes;
+          sink.add(chunk);
+          task.receivedBytes += chunk.length;
+          if (task.totalBytes > 0) {
+            task.progress = task.receivedBytes / task.totalBytes;
+          } else {
+            // totalBytes 未知时标记为不确定进度
+            task.progress = -1.0;
+          }
+          _notifyTask(task);
         }
-        _notifyTask(task);
+      } finally {
+        await sink.close();
       }
-
-      await sink.close();
-      client.close();
 
       task.status = DownloadStatus.completed;
       task.progress = 1.0;
+      // 更新 totalBytes 为实际接收字节数（如果服务器未提供 Content-Length）
+      if (task.totalBytes == 0) {
+        task.totalBytes = task.receivedBytes;
+      }
       _notifyTask(task);
 
       // 注册到媒体生命周期管理
@@ -200,14 +212,17 @@ class DownloadService {
           }
         }
       } catch (e) {
-        // 注册失败不影响下载流程
         debugPrint('DownloadService: Failed to register media: $e');
       }
     } catch (e) {
-      task.status = DownloadStatus.failed;
-      task.error = e.toString();
-      _notifyTask(task);
+      if (task.status != DownloadStatus.cancelled) {
+        task.status = DownloadStatus.failed;
+        task.error = e.toString();
+        _notifyTask(task);
+      }
     } finally {
+      client.close();
+      _activeClients.remove(task.id);
       _activeCount--;
       _processQueue();
     }

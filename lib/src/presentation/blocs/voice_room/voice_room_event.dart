@@ -100,3 +100,8 @@ class ActiveVoiceRoomsUpdated extends VoiceRoomEvent {
   @override
   List<Object?> get props => [rooms];
 }
+
+/// 通话时长计时器 tick（内部事件）
+class DurationTick extends VoiceRoomEvent {
+  const DurationTick();
+}

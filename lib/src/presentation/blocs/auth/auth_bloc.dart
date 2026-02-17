@@ -54,6 +54,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthCheckBiometricAvailability>(_onCheckBiometricAvailability);
     on<AuthEnableBiometricLogin>(_onEnableBiometricLogin);
     on<AuthDisableBiometricLogin>(_onDisableBiometricLogin);
+    on<AuthTokenLoginRequested>(_onTokenLogin);
+    on<AuthPasskeyLoginRequested>(_onPasskeyLogin);
+    on<AuthRegisterPasskeyRequested>(_onRegisterPasskey);
+    on<AuthRequestEmailOtpRequested>(_onRequestEmailOtp);
+    on<AuthEmailOtpLoginRequested>(_onEmailOtpLogin);
+    on<AuthErrorCleared>(_onErrorCleared);
 
     // 监听登录状态变化
     _loginStateSubscription = _authRepository.loginStateStream.listen(
@@ -1165,6 +1171,109 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         errorMessage: 'Failed to disable biometric login: $e',
       ));
     }
+  }
+
+  // ============================================
+  // Token / Passkey / OTP 登录（待实现）
+  // ============================================
+
+  /// Token 登录
+  Future<void> _onTokenLogin(
+    AuthTokenLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.loading,
+      errorMessage: null,
+    ));
+
+    try {
+      final result = await _authRepository.loginWithToken(
+        homeserver: event.homeserver,
+        accessToken: event.accessToken,
+        userId: event.userId,
+        deviceId: event.deviceId,
+      );
+
+      if (result.success && result.user != null) {
+        emit(state.copyWith(
+          status: AuthStatus.authenticated,
+          user: result.user,
+        ));
+        add(const LoadUserProfileData());
+        await _initializeCallManager();
+        unawaited(_registerPushNotifications());
+      } else {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage ?? 'Token login failed',
+          errorType: result.errorType,
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Token login failed: $e',
+      ));
+    }
+  }
+
+  /// Passkey 登录（功能尚未实现）
+  Future<void> _onPasskeyLogin(
+    AuthPasskeyLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.error,
+      errorMessage: 'Passkey 登录功能尚未实现',
+    ));
+  }
+
+  /// 注册 Passkey（功能尚未实现）
+  Future<void> _onRegisterPasskey(
+    AuthRegisterPasskeyRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.error,
+      errorMessage: 'Passkey 注册功能尚未实现',
+    ));
+  }
+
+  /// 请求邮箱 OTP 验证码（功能尚未实现）
+  Future<void> _onRequestEmailOtp(
+    AuthRequestEmailOtpRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.error,
+      errorMessage: '邮箱 OTP 登录功能尚未实现',
+    ));
+  }
+
+  /// 邮箱 OTP 登录（功能尚未实现）
+  Future<void> _onEmailOtpLogin(
+    AuthEmailOtpLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: AuthStatus.error,
+      errorMessage: '邮箱 OTP 登录功能尚未实现',
+    ));
+  }
+
+  /// 清除错误状态
+  Future<void> _onErrorCleared(
+    AuthErrorCleared event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(
+      errorMessage: null,
+      errorType: null,
+      status: state.user != null
+          ? AuthStatus.authenticated
+          : AuthStatus.unauthenticated,
+    ));
   }
 
   @override

@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_constants.dart';
@@ -111,18 +113,32 @@ class StorageMonitorService {
       // 获取设备剩余空间
       int? deviceFree;
       try {
-        final stat = await _getDeviceFreeSpace();
-        deviceFree = stat;
+        deviceFree = await _getDeviceFreeSpace();
       } catch (_) {}
 
-      final totalMB = storageInfo.totalSize / (1024 * 1024);
+      // 优先基于设备剩余空间判断，回退到 app 占用大小
       StorageLevel level;
-      if (totalMB >= config.criticalThresholdMB) {
-        level = StorageLevel.critical;
-      } else if (totalMB >= config.warningThresholdMB) {
-        level = StorageLevel.warning;
+      if (deviceFree != null) {
+        final freeGB = deviceFree / (1024 * 1024 * 1024);
+        if (freeGB < 0.5) {
+          // 设备剩余空间 < 500MB → critical
+          level = StorageLevel.critical;
+        } else if (freeGB < 2.0) {
+          // 设备剩余空间 < 2GB → warning
+          level = StorageLevel.warning;
+        } else {
+          level = StorageLevel.normal;
+        }
       } else {
-        level = StorageLevel.normal;
+        // 无法获取设备空间时回退到 app 占用判断
+        final totalMB = storageInfo.totalSize / (1024 * 1024);
+        if (totalMB >= config.criticalThresholdMB) {
+          level = StorageLevel.critical;
+        } else if (totalMB >= config.warningThresholdMB) {
+          level = StorageLevel.warning;
+        } else {
+          level = StorageLevel.normal;
+        }
       }
 
       final status = StorageStatus(
@@ -209,10 +225,54 @@ class StorageMonitorService {
   }
 
   /// 获取设备剩余空间（字节）
+  ///
+  /// 通过查询应用文档目录所在卷的可用空间实现。
+  /// 使用 Dart 标准 API `FileSystemEntity.stat()` 不直接提供剩余空间，
+  /// 但可通过 `Process.run` 获取系统级信息。
   Future<int?> _getDeviceFreeSpace() async {
-    // FileStat doesn't provide free space directly.
-    // On supported platforms, use platform-specific method.
-    // For now, return null (unknown).
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      if (Platform.isIOS || Platform.isMacOS) {
+        // macOS/iOS: 使用 df 命令获取可用空间
+        final result = await Process.run(
+          'df',
+          ['-k', appDir.path],
+        );
+        if (result.exitCode == 0) {
+          final lines = (result.stdout as String).trim().split('\n');
+          if (lines.length >= 2) {
+            // df -k 输出第二行：Filesystem 1K-blocks Used Available ...
+            final parts = lines[1].split(RegExp(r'\s+'));
+            if (parts.length >= 4) {
+              final availableKB = int.tryParse(parts[3]);
+              if (availableKB != null) {
+                return availableKB * 1024; // 转为字节
+              }
+            }
+          }
+        }
+      } else if (Platform.isAndroid) {
+        // Android: df 也通常可用
+        final result = await Process.run(
+          'df',
+          [appDir.path],
+        );
+        if (result.exitCode == 0) {
+          final lines = (result.stdout as String).trim().split('\n');
+          if (lines.length >= 2) {
+            final parts = lines[1].split(RegExp(r'\s+'));
+            if (parts.length >= 4) {
+              final availableKB = int.tryParse(parts[3]);
+              if (availableKB != null) {
+                return availableKB * 1024;
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('StorageMonitorService: Failed to get device free space: $e');
+    }
     return null;
   }
 }

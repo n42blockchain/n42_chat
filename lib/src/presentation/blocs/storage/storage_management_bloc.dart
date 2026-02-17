@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/services/media_lifecycle_service.dart';
@@ -101,7 +100,7 @@ class StorageManagementBloc
           .toList();
       emit(state.copyWith(roomStorageList: roomItems));
     } catch (e) {
-      debugPrint('StorageManagementBloc: Failed to load room list: $e');
+      emit(state.copyWith(error: 'Failed to load room storage list: $e'));
     }
   }
 
@@ -113,7 +112,7 @@ class StorageManagementBloc
       final recommendations = await _cleanupService.getRecommendations();
       emit(state.copyWith(recommendations: recommendations));
     } catch (e) {
-      debugPrint('StorageManagementBloc: Failed to load recommendations: $e');
+      emit(state.copyWith(error: 'Failed to load recommendations: $e'));
     }
   }
 
@@ -196,7 +195,7 @@ class StorageManagementBloc
       await _monitorService.saveStorageConfig(updated);
       emit(state.copyWith(storageConfig: updated));
     } catch (e) {
-      debugPrint('StorageManagementBloc: Failed to update config: $e');
+      emit(state.copyWith(error: 'Failed to update storage config: $e'));
     }
   }
 
@@ -236,6 +235,8 @@ class StorageManagementBloc
         isCleaning: false,
         lastCleanupResult: result,
       ));
+      // 删除后刷新存储信息，与 _onCleanupByRoom / _onClearCache 保持一致
+      add(const LoadStorageInfo());
     } catch (e) {
       emit(state.copyWith(
         isCleaning: false,
@@ -251,7 +252,7 @@ class StorageManagementBloc
     try {
       await _lifecycleService.togglePinned(event.filePath, event.pinned);
     } catch (e) {
-      debugPrint('StorageManagementBloc: Failed to toggle pinned: $e');
+      emit(state.copyWith(error: 'Failed to toggle pinned: $e'));
     }
   }
 }
