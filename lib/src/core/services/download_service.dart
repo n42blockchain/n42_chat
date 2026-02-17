@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+
+import 'media_lifecycle_service.dart';
 
 /// 下载任务状态
 enum DownloadStatus {
@@ -25,6 +28,10 @@ class DownloadTask {
   int receivedBytes;
   String? error;
 
+  /// 媒体元数据（用于生命周期管理注册）
+  /// 支持的 key: roomId, eventId, mxcUrl, fileCategory, isThumbnail
+  final Map<String, String>? metadata;
+
   DownloadTask({
     required this.id,
     required this.url,
@@ -35,6 +42,7 @@ class DownloadTask {
     this.totalBytes = 0,
     this.receivedBytes = 0,
     this.error,
+    this.metadata,
   });
 }
 
@@ -57,10 +65,23 @@ class DownloadService {
   /// 下载文件
   ///
   /// 返回下载任务 ID
+  /// 媒体生命周期服务（可选注入）
+  MediaLifecycleService? _mediaLifecycle;
+
+  /// 设置媒体生命周期服务
+  void setMediaLifecycleService(MediaLifecycleService service) {
+    _mediaLifecycle = service;
+  }
+
+  /// 下载文件
+  ///
+  /// 返回下载任务 ID
+  /// [metadata] 用于媒体生命周期管理，支持 key: roomId, eventId, mxcUrl, fileCategory, isThumbnail
   Future<String> download({
     required String url,
     required String savePath,
     String? fileName,
+    Map<String, String>? metadata,
   }) async {
     final taskId = 'download_${_taskIdCounter++}';
     final task = DownloadTask(
@@ -68,6 +89,7 @@ class DownloadService {
       url: url,
       savePath: savePath,
       fileName: fileName,
+      metadata: metadata,
     );
 
     _tasks[taskId] = task;
@@ -159,6 +181,28 @@ class DownloadService {
       task.status = DownloadStatus.completed;
       task.progress = 1.0;
       _notifyTask(task);
+
+      // 注册到媒体生命周期管理
+      try {
+        if (_mediaLifecycle != null && task.metadata != null) {
+          final meta = task.metadata!;
+          final roomId = meta['roomId'];
+          if (roomId != null && roomId.isNotEmpty) {
+            await _mediaLifecycle!.registerMediaFile(
+              filePath: task.savePath,
+              roomId: roomId,
+              mxcUrl: meta['mxcUrl'] ?? task.url,
+              eventId: meta['eventId'],
+              fileCategory: meta['fileCategory'],
+              fileSize: task.totalBytes,
+              isThumbnail: meta['isThumbnail'] == 'true',
+            );
+          }
+        }
+      } catch (e) {
+        // 注册失败不影响下载流程
+        debugPrint('DownloadService: Failed to register media: $e');
+      }
     } catch (e) {
       task.status = DownloadStatus.failed;
       task.error = e.toString();

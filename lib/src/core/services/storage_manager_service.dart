@@ -21,13 +21,13 @@ class StorageInfo {
     this.otherSize = 0,
   });
 
-  String get formattedTotal => _formatSize(totalSize);
-  String get formattedMedia => _formatSize(mediaSize);
-  String get formattedFile => _formatSize(fileSize);
-  String get formattedCache => _formatSize(cacheSize);
-  String get formattedOther => _formatSize(otherSize);
+  String get formattedTotal => formatSize(totalSize);
+  String get formattedMedia => formatSize(mediaSize);
+  String get formattedFile => formatSize(fileSize);
+  String get formattedCache => formatSize(cacheSize);
+  String get formattedOther => formatSize(otherSize);
 
-  static String _formatSize(int bytes) {
+  static String formatSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
     if (bytes < 1024 * 1024 * 1024) {
@@ -53,7 +53,7 @@ class RoomStorageInfo {
     this.fileCount = 0,
   });
 
-  String get formattedSize => StorageInfo._formatSize(totalSize);
+  String get formattedSize => StorageInfo.formatSize(totalSize);
 }
 
 /// 存储管理服务
@@ -62,6 +62,7 @@ class StorageManagerService {
 
   StorageManagerService({MatrixClientManager? clientManager})
       : _clientManager = clientManager;
+
   /// 获取存储使用情况
   Future<StorageInfo> getStorageUsage() async {
     try {
@@ -188,6 +189,137 @@ class StorageManagerService {
       }
     } catch (e) {
       debugPrint('StorageManagerService: Failed to clear room media for $roomId: $e');
+    }
+  }
+
+  /// 获取所有房间存储信息（不限 20 条）
+  Future<List<RoomStorageInfo>> getAllRoomStorage() async {
+    try {
+      final client = _clientManager?.client;
+      if (client == null) return [];
+
+      final rooms = client.rooms;
+      final appDir = await getApplicationDocumentsDirectory();
+      final results = <RoomStorageInfo>[];
+
+      for (final room in rooms) {
+        final roomCacheDir =
+            Directory('${appDir.path}/matrix_cache/${room.id}');
+        int totalSize = 0;
+        int mediaCount = 0;
+        int fileCount = 0;
+
+        if (roomCacheDir.existsSync()) {
+          await for (final entity in roomCacheDir.list(recursive: true)) {
+            if (entity is File) {
+              totalSize += await entity.length();
+              final ext = entity.path.split('.').last.toLowerCase();
+              if ([
+                'jpg', 'jpeg', 'png', 'gif', 'webp',
+                'mp4', 'mov', 'mp3', 'ogg',
+              ].contains(ext)) {
+                mediaCount++;
+              } else {
+                fileCount++;
+              }
+            }
+          }
+        }
+
+        if (totalSize > 0) {
+          results.add(RoomStorageInfo(
+            roomId: room.id,
+            roomName: room.getLocalizedDisplayname(),
+            totalSize: totalSize,
+            mediaCount: mediaCount,
+            fileCount: fileCount,
+          ));
+        }
+      }
+
+      results.sort((a, b) => b.totalSize.compareTo(a.totalSize));
+      return results;
+    } catch (e) {
+      debugPrint('StorageManagerService: Failed to get all room storage: $e');
+      return [];
+    }
+  }
+
+  /// 清理房间媒体（按文件类型）
+  Future<void> clearRoomMediaByCategory(
+    String roomId,
+    List<String> categories,
+  ) async {
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final roomCacheDir =
+          Directory('${appDir.path}/matrix_cache/$roomId');
+      if (!roomCacheDir.existsSync()) return;
+
+      final categoryExts = <String>{};
+      for (final cat in categories) {
+        switch (cat) {
+          case 'image':
+            categoryExts.addAll(
+                ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg']);
+            break;
+          case 'video':
+            categoryExts.addAll(['mp4', 'mov', 'avi', 'mkv', 'webm']);
+            break;
+          case 'audio':
+            categoryExts.addAll(['mp3', 'ogg', 'wav', 'm4a', 'aac']);
+            break;
+          case 'document':
+            categoryExts.addAll([
+              'pdf', 'doc', 'docx', 'xls', 'xlsx',
+              'ppt', 'pptx', 'txt', 'zip', 'rar',
+            ]);
+            break;
+        }
+      }
+
+      await for (final entity in roomCacheDir.list(recursive: true)) {
+        if (entity is File) {
+          final ext = entity.path.split('.').last.toLowerCase();
+          if (categoryExts.contains(ext)) {
+            try {
+              await entity.delete();
+            } catch (_) {}
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint(
+          'StorageManagerService: Failed to clear room media by category: $e');
+    }
+  }
+
+  /// 清理指定日期之前的媒体文件
+  Future<void> clearMediaOlderThan(
+    DateTime date, {
+    String? roomId,
+  }) async {
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final baseDir = roomId != null
+          ? Directory('${appDir.path}/matrix_cache/$roomId')
+          : Directory('${appDir.path}/matrix_cache');
+
+      if (!baseDir.existsSync()) return;
+
+      await for (final entity in baseDir.list(recursive: true)) {
+        if (entity is File) {
+          final stat = await entity.stat();
+          if (stat.modified.isBefore(date)) {
+            try {
+              await entity.delete();
+            } catch (_) {}
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint(
+          'StorageManagerService: Failed to clear old media: $e');
     }
   }
 

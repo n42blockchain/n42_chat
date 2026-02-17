@@ -2331,5 +2331,88 @@
   "gameBestTime": "Best Time",
   "gameNewRecord": "New Record!",
   "gameLines": "Lines",
-  "storyMyStory": "My Story"
+  "storyMyStory": "My Story",
+
+  "storageSmartCleanup": "Smart Cleanup",
+  "storageOldMediaFiles": "Old Media Files",
+  "storageLargeFiles": "Large Files",
+  "storageAppCache": "App Cache",
+  "storageSettings": "Storage Settings",
+  "storageAutoCleanup": "Auto Cleanup",
+  "storageAutoCleanupDesc": "Automatically clean files older than {days} days",
+  "@storageAutoCleanupDesc": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "storageCleanupPeriod": "Cleanup Period",
+  "storagePreserveThumbnails": "Preserve Thumbnails",
+  "storagePreserveThumbnailsDesc": "Keep image thumbnails during cleanup",
+  "storageWarningHigh": "Storage usage is high. Consider cleaning up old files.",
+  "storageWarningCritical": "Storage is critically low. Please clean up to free space.",
+  "storageFreed": "Freed {size} ({count} files)",
+  "@storageFreed": {
+    "placeholders": {
+      "size": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "storageDays": "{days} days",
+  "@storageDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "storageViewAllRooms": "View all {count} rooms",
+  "@storageViewAllRooms": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "storageNoFiles": "No files found",
+  "storageFilePinned": "Pinned",
+  "storageDeleteSelected": "Delete {count} selected files? They can be re-downloaded from the server.",
+  "@storageDeleteSelected": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "backupRestore": "Backup & Restore",
+  "backupCreate": "Create Backup",
+  "backupCreateDesc": "Backup your settings and encryption keys. Messages will be restored from server after re-login.",
+  "backupIncludeKeys": "Include encryption keys",
+  "backupIncludeKeysDesc": "Required for reading encrypted messages",
+  "backupPasswordProtect": "Password protect",
+  "backupEnterPassword": "Enter backup password",
+  "backupHistory": "Backup History",
+  "backupNoBackups": "No backups yet",
+  "backupRestore2": "Restore",
+  "backupDelete": "Delete",
+  "backupDeleteConfirm": "Are you sure you want to delete this backup? This cannot be undone.",
+  "backupRestoreFromFile": "Restore from File",
+  "backupRestoreFromFileDesc": "Import a .n42backup file from another device or previous backup.",
+  "backupChooseFile": "Choose Backup File",
+  "backupRestoring": "Restoring...",
+  "backupCreated": "Backup created: {rooms} rooms, {messages} messages",
+  "@backupCreated": {
+    "placeholders": {
+      "rooms": {"type": "int"},
+      "messages": {"type": "int"}
+    }
+  },
+  "backupRestored": "Restored {settings} settings from {rooms} rooms",
+  "@backupRestored": {
+    "placeholders": {
+      "settings": {"type": "int"},
+      "rooms": {"type": "int"}
+    }
+  },
+  "backupFailed": "Backup failed: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "backupPasswordRequired": "This backup is password-protected"
 }
