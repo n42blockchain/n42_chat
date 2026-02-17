@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -286,8 +285,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       final invites = await _groupRepository.getPendingGroupInvites();
       emit(currentState.copyWith(invites: invites));
     } catch (e) {
-      // Ignore
-      debugPrint('Error: $e');
+      emit(GroupError('Failed to load group invites: $e'));
     }
   }
 

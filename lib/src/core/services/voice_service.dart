@@ -13,13 +13,10 @@ import '../../data/datasources/matrix/matrix_client_manager.dart';
 import '../di/injection.dart';
 
 /// 语音服务
-/// 
+///
 /// 提供语音录制和播放功能
+/// 生命周期由 DI 容器管理，不使用 singleton 模式
 class VoiceService {
-  static final VoiceService _instance = VoiceService._internal();
-  factory VoiceService() => _instance;
-  VoiceService._internal();
-
   final AudioRecorder _recorder = AudioRecorder();
   final AudioPlayer _player = AudioPlayer();
   final _uuid = const Uuid();
@@ -57,9 +54,17 @@ class VoiceService {
   /// 当前播放的URL
   String? get currentPlayingUrl => _currentPlayingUrl;
 
+  // 播放器状态订阅（防止重复监听）
+  StreamSubscription<PlayerState>? _playerStateSubscription;
+  bool _isInitialized = false;
+
   /// 初始化
   Future<void> initialize() async {
-    _player.onPlayerStateChanged.listen((state) {
+    if (_isInitialized) return;
+    _isInitialized = true;
+
+    await _playerStateSubscription?.cancel();
+    _playerStateSubscription = _player.onPlayerStateChanged.listen((state) {
       _isPlaying = state == PlayerState.playing;
       if (state == PlayerState.completed || state == PlayerState.stopped) {
         _currentPlayingUrl = null;
@@ -350,7 +355,10 @@ class VoiceService {
 
   /// 释放资源
   Future<void> dispose() async {
+    _isInitialized = false;
     _recordingTimer?.cancel();
+    await _playerStateSubscription?.cancel();
+    _playerStateSubscription = null;
     await _recorder.dispose();
     await _player.dispose();
     await _recordingStateController.close();

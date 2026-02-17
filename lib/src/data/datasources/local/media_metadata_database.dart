@@ -78,6 +78,29 @@ class MediaMetadataDatabase extends _$MediaMetadataDatabase {
   @override
   int get schemaVersion => 1;
 
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (Migrator m) async {
+          await m.createAll();
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          // 版本升级迁移逻辑
+          // 示例：
+          // if (from < 2) {
+          //   await m.addColumn(mediaFiles, mediaFiles.newColumn);
+          // }
+          debugPrint(
+              'MediaMetadataDatabase: Migrating from v$from to v$to');
+        },
+        beforeOpen: (details) async {
+          if (details.hadUpgrade) {
+            debugPrint(
+                'MediaMetadataDatabase: Schema upgraded from '
+                'v${details.versionBefore} to v${details.versionNow}');
+          }
+        },
+      );
+
   // ============================================
   // 插入与更新
   // ============================================

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
@@ -106,9 +107,9 @@ class GoogleTranslationService implements ITranslationService {
       );
     }
 
-    // 如果没有 API Key，使用模拟翻译
+    // 无 API Key 时返回错误提示，而非假翻译
     if (apiKey == null || apiKey!.isEmpty) {
-      return _mockTranslate(text, targetLanguage, sourceLanguage);
+      return TranslationResult.error('翻译服务不可用：未配置 API Key');
     }
 
     try {
@@ -153,52 +154,9 @@ class GoogleTranslationService implements ITranslationService {
     }
   }
 
-  /// 模拟翻译（用于开发和测试）
-  Future<TranslationResult> _mockTranslate(
-    String text,
-    String targetLanguage,
-    String? sourceLanguage,
-  ) async {
-    // 简单的模拟：添加翻译标记
-    await Future<void>.delayed(const Duration(milliseconds: 500));
-
-    String translatedText;
-    String detectedSource;
-
-    // 检测是否包含中文字符
-    final containsChinese = RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
-
-    if (containsChinese && targetLanguage == 'en') {
-      // 中文翻译成英文（模拟）
-      translatedText = '[EN] $text';
-      detectedSource = 'zh';
-    } else if (!containsChinese && targetLanguage == 'zh') {
-      // 英文翻译成中文（模拟）
-      translatedText = '[中文] $text';
-      detectedSource = 'en';
-    } else {
-      // 其他情况
-      translatedText = '[$targetLanguage] $text';
-      detectedSource = sourceLanguage ?? 'auto';
-    }
-
-    // 保存到缓存
-    await _storageDataSource.saveTranslationCache(
-      _generateCacheKey(text),
-      targetLanguage,
-      translatedText,
-    );
-
-    return TranslationResult(
-      translatedText: translatedText,
-      detectedSourceLanguage: detectedSource,
-      targetLanguage: targetLanguage,
-    );
-  }
-
   String _generateCacheKey(String text) {
-    // 使用文本的哈希作为缓存键
-    return text.hashCode.toString();
+    // 使用 SHA-256 前 16 字符作为稳定的缓存键
+    return sha256.convert(utf8.encode(text)).toString().substring(0, 16);
   }
 
   @override

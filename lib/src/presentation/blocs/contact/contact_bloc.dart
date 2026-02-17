@@ -264,8 +264,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
       final friendRequests = await _contactRepository.getPendingFriendRequests();
       emit(currentState.copyWith(friendRequests: friendRequests));
     } catch (e) {
-      // Ignore error for friend requests
-      debugPrint('Error: $e');
+      emit(ContactError('Failed to load friend requests: $e'));
     }
   }
 

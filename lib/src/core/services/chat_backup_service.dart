@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:pointycastle/export.dart' as pc;
 import 'package:uuid/uuid.dart';
 
 import '../../data/datasources/local/secure_storage_datasource.dart';
@@ -133,6 +135,8 @@ class RestoreResult {
 /// 备份格式: .n42backup = JSON 打包（纯文本，可选密码保护）
 /// 内容: manifest.json + rooms/{roomId}/messages.json + settings/ + encryption/keys.json
 class ChatBackupService {
+  static const String _appVersion = '0.1.0'; // TODO: 从 package_info_plus 动态获取
+
   final MatrixClientManager _clientManager;
   final SecureStorageDataSource _secureStorage;
 
@@ -186,7 +190,7 @@ class ChatBackupService {
       'manifest': {
         'backupId': backupId,
         'createdAt': now.toIso8601String(),
-        'appVersion': '0.1.0',
+        'appVersion': _appVersion,
         'roomCount': rooms.length,
         'includesMedia': includeMedia,
         'includesKeys': includeKeys,
@@ -215,7 +219,7 @@ class ChatBackupService {
           final timeline = await room.getTimeline();
           final events = timeline.events
               .where((e) => e.type == 'm.room.message')
-              .take(10000)
+              .take(1000)
               .map((e) => {
                     'eventId': e.eventId,
                     'sender': e.senderId,
@@ -261,19 +265,10 @@ class ChatBackupService {
     // 写入文件
     final jsonStr = jsonEncode(backupData);
 
-    // 如果有密码，进行简单的 XOR 加密
     if (password != null && password.isNotEmpty) {
-      final keyBytes = sha256.convert(utf8.encode(password)).bytes;
-      final dataBytes = utf8.encode(jsonStr);
-      final encrypted = Uint8List(dataBytes.length);
-      for (var i = 0; i < dataBytes.length; i++) {
-        encrypted[i] = dataBytes[i] ^ keyBytes[i % keyBytes.length];
-      }
-      // 写入标记头 + 加密数据
+      final encryptedBytes = _encryptAes256(utf8.encode(jsonStr), password);
       final file = File(filePath);
-      await file.writeAsBytes(
-        [...utf8.encode('N42ENC:'), ...encrypted],
-      );
+      await file.writeAsBytes(encryptedBytes);
     } else {
       final file = File(filePath);
       await file.writeAsString(jsonStr);
@@ -311,8 +306,15 @@ class ChatBackupService {
         ? client.rooms.where((r) => roomIds.contains(r.id)).toList()
         : client.rooms;
 
-    // 粗估：每条消息约 200 字节，每房间约 500 条
-    int estimated = rooms.length * 500 * 200;
+    // 基于房间活跃度估算：有 lastEvent 的房间按 500 条估计，
+    // 无活动的按 50 条估计。每条约 200 字节 + 每房间元数据约 500 字节。
+    int estimatedMessages = 0;
+    for (final room in rooms) {
+      final hasActivity = room.lastEvent != null;
+      estimatedMessages += hasActivity ? 500 : 50;
+    }
+    int estimated =
+        estimatedMessages * 200 + rooms.length * 500;
     // 设置约 10KB
     estimated += 10 * 1024;
 
@@ -467,9 +469,20 @@ class ChatBackupService {
     final file = File(filePath);
     final bytes = await file.readAsBytes();
 
-    // 检查是否加密
-    final header = utf8.decode(bytes.take(7).toList(), allowMalformed: true);
-    if (header == 'N42ENC:') {
+    // 检查是否使用 v2 加密 (AES-256-CBC)
+    final headerV2 = utf8.decode(bytes.take(8).toList(), allowMalformed: true);
+    if (headerV2 == 'N42ENC2:') {
+      if (password == null || password.isEmpty) {
+        throw StateError('This backup is password-protected');
+      }
+      final decrypted = _decryptAes256(bytes, password);
+      final jsonStr = utf8.decode(decrypted);
+      return jsonDecode(jsonStr) as Map<String, dynamic>;
+    }
+
+    // 兼容旧版 v1 XOR 加密格式（只读）
+    final headerV1 = utf8.decode(bytes.take(7).toList(), allowMalformed: true);
+    if (headerV1 == 'N42ENC:') {
       if (password == null || password.isEmpty) {
         throw StateError('This backup is password-protected');
       }
@@ -487,32 +500,165 @@ class ChatBackupService {
     return jsonDecode(jsonStr) as Map<String, dynamic>;
   }
 
+  /// PBKDF2 密钥派生（使用 pointycastle 实现）
+  static Uint8List _pbkdf2(String password, Uint8List salt,
+      {int iterations = 100000, int keyLength = 32}) {
+    final derivator = pc.PBKDF2KeyDerivator(pc.HMac(pc.SHA256Digest(), 64))
+      ..init(pc.Pbkdf2Parameters(salt, iterations, keyLength));
+    return derivator.process(Uint8List.fromList(utf8.encode(password)));
+  }
+
+  /// AES-256-CBC 加密
+  /// 格式: "N42ENC2:" (8字节) + salt (32字节) + iv (16字节) + 加密数据
+  static Uint8List _encryptAes256(List<int> plaintext, String password) {
+    final random = Random.secure();
+    final salt = Uint8List.fromList(
+        List.generate(32, (_) => random.nextInt(256)));
+    final iv = Uint8List.fromList(
+        List.generate(16, (_) => random.nextInt(256)));
+
+    final key = _pbkdf2(password, salt, iterations: 100000, keyLength: 32);
+
+    // PKCS7 填充
+    const blockSize = 16;
+    final padLength = blockSize - (plaintext.length % blockSize);
+    final padded = Uint8List(plaintext.length + padLength);
+    padded.setRange(0, plaintext.length, plaintext);
+    for (var i = plaintext.length; i < padded.length; i++) {
+      padded[i] = padLength;
+    }
+
+    final cipher = pc.CBCBlockCipher(pc.AESEngine())
+      ..init(true, pc.ParametersWithIV(pc.KeyParameter(key), iv));
+
+    final encrypted = Uint8List(padded.length);
+    for (var offset = 0; offset < padded.length; offset += blockSize) {
+      cipher.processBlock(padded, offset, encrypted, offset);
+    }
+
+    return Uint8List.fromList([
+      ...utf8.encode('N42ENC2:'),
+      ...salt,
+      ...iv,
+      ...encrypted,
+    ]);
+  }
+
+  /// AES-256-CBC 解密
+  static Uint8List _decryptAes256(Uint8List data, String password) {
+    // 跳过头部 "N42ENC2:" (8 字节)
+    final salt = Uint8List.fromList(data.sublist(8, 40));
+    final iv = Uint8List.fromList(data.sublist(40, 56));
+    final ciphertext = Uint8List.fromList(data.sublist(56));
+
+    final key = _pbkdf2(password, salt, iterations: 100000, keyLength: 32);
+
+    final cipher = pc.CBCBlockCipher(pc.AESEngine())
+      ..init(false, pc.ParametersWithIV(pc.KeyParameter(key), iv));
+
+    final decrypted = Uint8List(ciphertext.length);
+    const blockSize = 16;
+    for (var offset = 0; offset < ciphertext.length; offset += blockSize) {
+      cipher.processBlock(ciphertext, offset, decrypted, offset);
+    }
+
+    // 移除 PKCS7 填充
+    final padLength = decrypted.last;
+    if (padLength > 0 && padLength <= blockSize) {
+      return Uint8List.fromList(
+          decrypted.sublist(0, decrypted.length - padLength));
+    }
+    return decrypted;
+  }
+
   /// 读取备份 manifest（快速预览，不需要密码）
+  ///
+  /// 仅读取文件头部来检测加密状态，非加密文件读取前 64KB 解析 manifest。
   Future<BackupPreview?> _readManifest(String filePath) async {
     try {
       final file = File(filePath);
-      final bytes = await file.readAsBytes();
+      if (!file.existsSync()) return null;
 
-      // 加密文件无法快速预览
-      final header = utf8.decode(bytes.take(7).toList(), allowMalformed: true);
-      if (header == 'N42ENC:') return null;
+      // 先读取头部 8 字节检测加密
+      final raf = await file.open(mode: FileMode.read);
+      try {
+        final header = await raf.read(8);
+        final headerStr =
+            utf8.decode(header, allowMalformed: true);
+        if (headerStr == 'N42ENC2:' ||
+            headerStr.startsWith('N42ENC:')) {
+          return null; // 加密文件无法快速预览
+        }
+      } finally {
+        await raf.close();
+      }
 
-      final jsonStr = utf8.decode(bytes);
-      final data = jsonDecode(jsonStr) as Map<String, dynamic>;
-      final manifest = data['manifest'] as Map<String, dynamic>? ?? {};
-      final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
+      // 非加密文件：读取前 64KB 尝试提取 manifest
+      final fileSize = await file.length();
+      final readSize = fileSize < 65536 ? fileSize : 65536;
+      final raf2 = await file.open(mode: FileMode.read);
+      try {
+        final bytes = await raf2.read(readSize);
+        final partial = utf8.decode(bytes, allowMalformed: true);
 
-      return BackupPreview(
-        backupId: manifest['backupId']?.toString() ?? '',
-        createdAt:
-            DateTime.tryParse(manifest['createdAt']?.toString() ?? '') ??
+        // 尝试找到完整的 manifest JSON 块
+        final manifestStart = partial.indexOf('"manifest"');
+        if (manifestStart == -1) return null;
+
+        // 如果文件较小，直接完整解析
+        if (fileSize < 65536) {
+          final data =
+              jsonDecode(partial) as Map<String, dynamic>;
+          final manifest =
+              data['manifest'] as Map<String, dynamic>? ?? {};
+          final rooms =
+              data['rooms'] as Map<String, dynamic>? ?? {};
+          return BackupPreview(
+            backupId: manifest['backupId']?.toString() ?? '',
+            createdAt: DateTime.tryParse(
+                    manifest['createdAt']?.toString() ?? '') ??
                 DateTime.now(),
-        roomCount: rooms.length,
-        roomNames: [],
-        hasMedia: manifest['includesMedia'] == true,
-        hasKeys: manifest['includesKeys'] == true,
-        hasSettings: data.containsKey('settings'),
-      );
+            roomCount: rooms.length,
+            roomNames: [],
+            hasMedia: manifest['includesMedia'] == true,
+            hasKeys: manifest['includesKeys'] == true,
+            hasSettings: data.containsKey('settings'),
+          );
+        }
+
+        // 大文件：仅提取 manifest 部分
+        // 找到 manifest 值的开始 '{' 和匹配的 '}'
+        final objStart = partial.indexOf('{', manifestStart);
+        if (objStart == -1) return null;
+        int depth = 0;
+        int objEnd = -1;
+        for (var i = objStart; i < partial.length; i++) {
+          if (partial[i] == '{') depth++;
+          if (partial[i] == '}') depth--;
+          if (depth == 0) {
+            objEnd = i + 1;
+            break;
+          }
+        }
+        if (objEnd == -1) return null;
+
+        final manifestJson = partial.substring(objStart, objEnd);
+        final manifest =
+            jsonDecode(manifestJson) as Map<String, dynamic>;
+        return BackupPreview(
+          backupId: manifest['backupId']?.toString() ?? '',
+          createdAt: DateTime.tryParse(
+                  manifest['createdAt']?.toString() ?? '') ??
+              DateTime.now(),
+          roomCount: manifest['roomCount'] as int? ?? 0,
+          roomNames: [],
+          hasMedia: manifest['includesMedia'] == true,
+          hasKeys: manifest['includesKeys'] == true,
+          hasSettings: true, // 假定有设置
+        );
+      } finally {
+        await raf2.close();
+      }
     } catch (_) {
       return null;
     }

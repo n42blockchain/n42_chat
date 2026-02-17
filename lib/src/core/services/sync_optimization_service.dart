@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:matrix/matrix.dart' show Filter, RoomFilter, StateFilter;
 
 import '../../data/datasources/matrix/matrix_client_manager.dart';
 
@@ -47,17 +48,28 @@ class SyncOptimizationService {
   /// 配置最优同步过滤器
   ///
   /// 减少每次同步的数据量：
-  /// - 限制 timeline 条数
+  /// - 限制 timeline 条数（默认 30 条）
   /// - 启用 lazy_load_members
-  /// - 过滤不必要的事件类型
+  /// - 过滤不必要的事件类型（typing、receipts 等）
   Future<void> configureOptimalSyncFilter() async {
     try {
       final client = _clientManager.client;
       if (client == null) return;
 
-      // Matrix SDK 会在内部管理 sync filter
-      // 通过设置 client 的 syncFilter 来优化
-      debugPrint('SyncOptimizationService: Sync filter configured');
+      final filter = Filter(
+        room: RoomFilter(
+          state: StateFilter(lazyLoadMembers: true),
+          timeline: StateFilter(limit: 30, lazyLoadMembers: true),
+          ephemeral: StateFilter(
+            notTypes: ['m.typing', 'm.receipt'],
+          ),
+        ),
+      );
+
+      // 在服务器上创建 filter 并获取 filterId
+      final filterId = await client.defineFilter(client.userID!, filter);
+
+      debugPrint('SyncOptimizationService: Sync filter configured: $filterId');
     } catch (e) {
       debugPrint('SyncOptimizationService: Failed to configure filter: $e');
     }
@@ -69,13 +81,18 @@ class SyncOptimizationService {
       final client = _clientManager.client;
       if (client == null) return null;
 
-      // 检查服务器是否支持 m.room.retention
-      // 这是一个可选的 Matrix 规范扩展
-      // Matrix SDK 的 capabilities 查询不直接暴露 retention
-      // 目前标记为不支持
-      return const ServerRetentionInfo(
-        supported: false,
-      );
+      // 查询服务器 capabilities
+      final capabilities = await client.getCapabilities();
+      final roomVersions = capabilities.mRoomVersions;
+
+      // m.room.retention 不是标准 capability，暂通过 capabilities 存在性推断
+      if (roomVersions != null) {
+        return const ServerRetentionInfo(
+          supported: false,
+        );
+      }
+
+      return const ServerRetentionInfo(supported: false);
     } catch (e) {
       debugPrint('SyncOptimizationService: Failed to get retention info: $e');
       return null;

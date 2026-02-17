@@ -360,9 +360,31 @@ class MessageRepositoryImpl implements IMessageRepository {
 
   @override
   Future<bool> removeReaction(String roomId, String messageId, String emoji) async {
-    // Matrix SDK 暂不直接支持移除单个回应
-    // 通常需要发送取消回应的事件
-    return false;
+    try {
+      final room = _client?.getRoomById(roomId);
+      if (room == null) return false;
+
+      // 查找当前用户对该消息的指定 emoji 的反应事件
+      final timeline = await _getOrCreateTimeline(roomId);
+      if (timeline == null) return false;
+
+      final userId = _client?.userID;
+      if (userId == null) return false;
+
+      for (final event in timeline.events) {
+        if (event.type == 'm.reaction' &&
+            event.senderId == userId &&
+            event.content.tryGet<Map<String, dynamic>>('m.relates_to')?['event_id'] == messageId &&
+            event.content.tryGet<Map<String, dynamic>>('m.relates_to')?['key'] == emoji) {
+          await room.redactEvent(event.eventId, reason: 'Remove reaction');
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      debugPrint('MessageRepositoryImpl: Failed to remove reaction: $e');
+      return false;
+    }
   }
 
   @override
