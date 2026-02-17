@@ -182,6 +182,9 @@ class N42ChatConfig {
   /// 默认使用的 AI 模型名称
   final String aiModel;
 
+  /// 存储管理配置
+  final StorageManagementConfig storageManagement;
+
   const N42ChatConfig({
     this.defaultHomeserver = 'https://m.si46.world',
     this.enableEncryption = true,
@@ -212,6 +215,7 @@ class N42ChatConfig {
     this.aiApiKey,
     this.aiBaseUrl = 'https://api.openai.com',
     this.aiModel = 'gpt-4o-mini',
+    this.storageManagement = const StorageManagementConfig(),
   });
 
   /// 复制并修改配置
@@ -245,6 +249,7 @@ class N42ChatConfig {
     String? aiApiKey,
     String? aiBaseUrl,
     String? aiModel,
+    StorageManagementConfig? storageManagement,
   }) {
     return N42ChatConfig(
       defaultHomeserver: defaultHomeserver ?? this.defaultHomeserver,
@@ -277,8 +282,44 @@ class N42ChatConfig {
       aiApiKey: aiApiKey ?? this.aiApiKey,
       aiBaseUrl: aiBaseUrl ?? this.aiBaseUrl,
       aiModel: aiModel ?? this.aiModel,
+      storageManagement: storageManagement ?? this.storageManagement,
     );
   }
+}
+
+/// 存储管理配置
+@immutable
+class StorageManagementConfig {
+  /// 自动清理天数（超过此天数未访问的媒体可被自动清理）
+  final int autoCleanupDays;
+
+  /// 存储预警阈值 (MB)
+  final int warningThresholdMB;
+
+  /// 存储严重阈值 (MB)
+  final int criticalThresholdMB;
+
+  /// 热数据天数
+  final int hotDataDays;
+
+  /// 暖数据天数
+  final int warmDataDays;
+
+  /// 是否启用自动清理
+  final bool autoCleanupEnabled;
+
+  /// 是否保留缩略图
+  final bool preserveThumbnails;
+
+  const StorageManagementConfig({
+    this.autoCleanupDays = 90,
+    this.warningThresholdMB = 500,
+    this.criticalThresholdMB = 1000,
+    this.hotDataDays = 30,
+    this.warmDataDays = 180,
+    this.autoCleanupEnabled = false,
+    this.preserveThumbnails = true,
+  });
 }
 
 /// 同步过滤器配置

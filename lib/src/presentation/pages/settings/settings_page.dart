@@ -8,6 +8,7 @@ import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'quick_replies_page.dart';
+import 'backup_restore_page.dart';
 import 'storage_management_page.dart';
 import 'auto_download_settings_page.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -154,6 +155,19 @@ class SettingsPage extends StatelessWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => const AutoDownloadSettingsPage(),
+                    ),
+                  );
+                },
+                isDark: isDark,
+              ),
+              _SettingsItem(
+                icon: Icons.backup,
+                iconColor: Colors.deepOrange,
+                title: 'Backup & Restore',
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const BackupRestorePage(),
                     ),
                   );
                 },

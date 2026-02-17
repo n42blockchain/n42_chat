@@ -139,3 +139,38 @@ abstract class AppConstants {
   );
 }
 
+/// 存储管理相关常量
+abstract class StorageConstants {
+  StorageConstants._();
+
+  /// 默认自动清理天数
+  static const int defaultCleanupDays = 90;
+
+  /// 存储预警阈值 (MB)
+  static const int defaultWarningThresholdMB = 500;
+
+  /// 存储严重阈值 (MB)
+  static const int defaultCriticalThresholdMB = 1000;
+
+  /// 热数据天数（内存缓存 + 完整媒体）
+  static const int hotDataDays = 30;
+
+  /// 暖数据天数（缩略图 + 按需加载）
+  static const int warmDataDays = 180;
+
+  /// 大文件阈值（字节）- 10MB
+  static const int largeFileThreshold = 10 * 1024 * 1024;
+
+  /// 备份文件扩展名
+  static const String backupExtension = '.n42backup';
+
+  /// 备份目录名
+  static const String backupDirName = 'n42_chat_backups';
+
+  /// 媒体元数据数据库目录名
+  static const String metaDbDirName = 'n42_chat_storage';
+
+  /// 媒体元数据数据库文件名
+  static const String metaDbFileName = 'media_meta.db';
+}
+

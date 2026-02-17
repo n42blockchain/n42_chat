@@ -17,10 +17,17 @@ import '../../data/datasources/matrix/matrix_moment_datasource.dart';
 import '../../data/datasources/matrix/matrix_sticker_datasource.dart';
 import '../../data/datasources/matrix/matrix_story_datasource.dart';
 import '../../presentation/pages/game/services/game_score_service.dart';
+import '../services/chat_backup_service.dart';
+import '../services/data_tier_service.dart';
 import '../services/download_service.dart';
+import '../services/media_lifecycle_service.dart';
+import '../services/storage_cleanup_service.dart';
+import '../services/storage_monitor_service.dart';
+import '../services/sync_optimization_service.dart';
 import '../services/url_preview_service.dart';
 import '../services/storage_manager_service.dart';
 import '../services/voice_service.dart';
+import '../../data/datasources/local/media_metadata_database.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/moment_repository_impl.dart';
 import '../../data/repositories/sticker_repository_impl.dart';
@@ -192,6 +199,63 @@ Future<void> _registerServices() async {
   // 存储管理服务
   getIt.registerLazySingleton<StorageManagerService>(
     () => StorageManagerService(clientManager: getIt<MatrixClientManager>()),
+  );
+
+  // 媒体元数据数据库（异步初始化，延迟获取）
+  getIt.registerSingletonAsync<MediaMetadataDatabase>(
+    () => MediaMetadataDatabase.getInstance(),
+  );
+
+  // 媒体生命周期服务
+  getIt.registerLazySingleton<MediaLifecycleService>(
+    () {
+      final service = MediaLifecycleService(
+        db: getIt<MediaMetadataDatabase>(),
+        downloadService: getIt<DownloadService>(),
+      );
+      // 连接下载服务与生命周期服务
+      getIt<DownloadService>().setMediaLifecycleService(service);
+      return service;
+    },
+  );
+
+  // 存储监控服务
+  getIt.registerLazySingleton<StorageMonitorService>(
+    () => StorageMonitorService(
+      storageManager: getIt<StorageManagerService>(),
+      lifecycleService: getIt<MediaLifecycleService>(),
+    ),
+  );
+
+  // 存储清理建议服务
+  getIt.registerLazySingleton<StorageCleanupService>(
+    () => StorageCleanupService(
+      lifecycleService: getIt<MediaLifecycleService>(),
+      storageManager: getIt<StorageManagerService>(),
+    ),
+  );
+
+  // 聊天备份服务
+  getIt.registerLazySingleton<ChatBackupService>(
+    () => ChatBackupService(
+      clientManager: getIt<MatrixClientManager>(),
+      secureStorage: getIt<SecureStorageDataSource>(),
+    ),
+  );
+
+  // 数据分级服务
+  getIt.registerLazySingleton<DataTierService>(
+    () => DataTierService(
+      lifecycleService: getIt<MediaLifecycleService>(),
+      monitorService: getIt<StorageMonitorService>(),
+    ),
+  );
+
+  // 同步优化服务
+  getIt.registerLazySingleton<SyncOptimizationService>(
+    () => SyncOptimizationService(
+      clientManager: getIt<MatrixClientManager>(),
+    ),
   );
 
   // AI 服务（仅当配置了 API Key 时注册）
