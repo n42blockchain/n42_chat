@@ -25,7 +25,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/in_app_notification_service.dart';
 import '../../../core/utils/face_blur_util.dart';
 import '../../../core/theme/chat_background_presets.dart';
-import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../n42_chat.dart';
 
@@ -310,7 +310,7 @@ class _ChatPageState extends State<ChatPage> {
 
   /// 加载聊天背景设置
   Future<void> _loadBackground() async {
-    final storage = getIt<SecureStorageDataSource>();
+    final storage = getIt<PreferencesDataSource>();
     // 先尝试获取房间特定背景
     var bg = await storage.getChatBackground(widget.conversation.id);
     // 如果没有，尝试默认背景
@@ -322,7 +322,7 @@ class _ChatPageState extends State<ChatPage> {
 
   /// 加载消息字体大小
   Future<void> _loadFontSize() async {
-    final storage = getIt<SecureStorageDataSource>();
+    final storage = getIt<PreferencesDataSource>();
     final size = await storage.getMessageFontSize();
     if (mounted) {
       setState(() => _messageFontSize = size);
@@ -331,7 +331,7 @@ class _ChatPageState extends State<ChatPage> {
 
   /// 加载草稿
   Future<void> _loadDraft() async {
-    final storage = getIt<SecureStorageDataSource>();
+    final storage = getIt<PreferencesDataSource>();
     final draft = await storage.getDraft(widget.conversation.id);
     if (mounted && draft != null && draft.isNotEmpty) {
       _inputController.text = draft;
@@ -343,7 +343,7 @@ class _ChatPageState extends State<ChatPage> {
 
   /// 保存草稿
   void _saveDraft() {
-    final storage = getIt<SecureStorageDataSource>();
+    final storage = getIt<PreferencesDataSource>();
     storage.saveDraft(widget.conversation.id, _inputController.text);
   }
 
@@ -976,7 +976,7 @@ class _ChatPageState extends State<ChatPage> {
     String displayName = message.senderName;
     if (contactBloc != null) {
       final state = contactBloc.state;
-      if (state is ContactLoaded) {
+      if (state.isLoaded) {
         final contact = state.contacts.cast<ContactEntity?>().firstWhere(
           (c) => c?.userId == message.senderId,
           orElse: () => null,
@@ -1185,7 +1185,7 @@ class _ChatPageState extends State<ChatPage> {
     List<ContactEntity> contacts = [];
     try {
       final contactState = context.read<ContactBloc>().state;
-      if (contactState is ContactLoaded) {
+      if (contactState.isLoaded) {
         contacts = contactState.contacts;
       }
     } catch (e) {
@@ -1381,11 +1381,11 @@ class _ChatPageState extends State<ChatPage> {
     if (hasContactBloc) {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state is ContactLoaded) {
+          if (state.status == ContactStatus.loaded) {
             // 联系人加载完成，重新获取对方用户ID
             _loadOtherUserId();
             if (mounted) setState(() {});
-          } else if (state is ContactRemarkUpdated) {
+          } else if (state.status == ContactStatus.remarkUpdated) {
             if (mounted) setState(() {});
           }
         },
@@ -1640,29 +1640,33 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> _pickImage() async {
     try {
       final picker = ImagePicker();
-      final images = await picker.pickMultiImage(
+      final mediaFiles = await picker.pickMultipleMedia(
         imageQuality: 85,
         maxWidth: 1920,
         maxHeight: 1920,
       );
 
-      if (images.isEmpty) return;
+      if (mediaFiles.isEmpty) return;
 
-      // 单张图片时提供编辑选项
-      if (images.length == 1) {
-        await _editAndSendImage(images.first);
-      } else {
-        // 多张图片直接发送
-        for (final image in images) {
-          await _sendImage(image);
+      for (final file in mediaFiles) {
+        final mimeType = lookupMimeType(file.path) ?? '';
+        if (mimeType.startsWith('video/')) {
+          await _sendVideo(file);
+        } else {
+          // 单张图片时提供编辑选项
+          if (mediaFiles.length == 1) {
+            await _editAndSendImage(file);
+          } else {
+            await _sendImage(file);
+          }
         }
       }
     } catch (e) {
-      debugPrint('Pick image error: $e');
+      debugPrint('Pick media error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.commonSelectImageFailed(e.toString()) ?? 'Failed to select image: $e'),
+            content: Text(S.of(context)?.commonSelectImageFailed(e.toString()) ?? 'Failed to select media: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -3696,7 +3700,15 @@ Avatar: ${contactAvatar ?? ''}''';
   Widget _buildMultiSelectBottomBar() {
     final isDark = context.isDarkMode;
     final hasSelection = _selectedMessageIds.isNotEmpty;
-    
+
+    // 是否有可撤回的消息（自己发的、未被撤回的）
+    final stateMessages = context.read<ChatBloc>().state.messages;
+    final hasOwnSelection = hasSelection &&
+        stateMessages.any((m) =>
+            _selectedMessageIds.contains(m.id) &&
+            m.isFromMe &&
+            m.type != MessageType.redacted);
+
     return Container(
       padding: EdgeInsets.only(
         left: 16,
@@ -3728,6 +3740,13 @@ Avatar: ${contactAvatar ?? ''}''';
             label: S.of(context)?.chatCollect ?? 'Collect',
             enabled: hasSelection,
             onTap: hasSelection ? _favoriteSelectedMessages : null,
+          ),
+          _buildMultiSelectAction(
+            icon: Icons.undo,
+            label: '撤回',
+            enabled: hasOwnSelection,
+            onTap: hasOwnSelection ? _recallSelectedMessages : null,
+            isDestructive: true,
           ),
           _buildMultiSelectAction(
             icon: Icons.delete_outline,
@@ -4071,12 +4090,12 @@ Avatar: ${contactAvatar ?? ''}''';
         Navigator.of(context).push(
           MaterialPageRoute<void>(
             builder: (_) => QuickRepliesPage(
-              storageDataSource: getIt<SecureStorageDataSource>(),
+              storageDataSource: getIt<PreferencesDataSource>(),
             ),
           ),
         );
       },
-      storageDataSource: getIt<SecureStorageDataSource>(),
+      storageDataSource: getIt<PreferencesDataSource>(),
     );
   }
 
@@ -5072,7 +5091,72 @@ Avatar: ${contactAvatar ?? ''}''';
 
     _exitMultiSelectMode();
   }
-  
+
+  /// 撤回选中的消息（仅限自己发送的、未撤回的消息）
+  Future<void> _recallSelectedMessages() async {
+    if (_selectedMessageIds.isEmpty) return;
+
+    final messages = context.read<ChatBloc>().state.messages;
+    final myMessages = messages
+        .where((m) =>
+            _selectedMessageIds.contains(m.id) &&
+            m.isFromMe &&
+            m.type != MessageType.redacted)
+        .toList();
+
+    if (myMessages.isEmpty) {
+      _exitMultiSelectMode();
+      return;
+    }
+
+    // 显示确认对话框
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.chatRecall ?? '撤回消息'),
+        content: Text(
+          '确定撤回 ${myMessages.length} 条消息？撤回后所有人将无法看到这些消息。',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              S.of(context)?.chatRecall ?? 'Recall',
+              style: const TextStyle(color: AppColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    if (!mounted) return;
+
+    final chatBloc = context.read<ChatBloc>();
+    for (final msg in myMessages) {
+      chatBloc.add(RedactMessage(msg.id));
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            S.of(context)?.chatRecalledMessages(myMessages.length) ??
+                '已撤回 ${myMessages.length} 条消息',
+          ),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+
+    _exitMultiSelectMode();
+  }
+
   /// 批量转发选中的消息
   Future<void> _forwardSelectedMessages() async {
     if (_selectedMessageIds.isEmpty) return;
