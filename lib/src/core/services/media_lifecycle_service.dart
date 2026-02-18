@@ -70,7 +70,9 @@ class MediaLifecycleService {
           if (file.existsSync()) {
             actualSize = await file.length();
           }
-        } catch (_) {}
+        } catch (e) {
+          debugPrint('MediaLifecycleService: Failed to get file size: $e');
+        }
       }
 
       await _db.registerFile(MediaFilesCompanion(

@@ -114,7 +114,9 @@ class StorageMonitorService {
       int? deviceFree;
       try {
         deviceFree = await _getDeviceFreeSpace();
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('StorageMonitorService: Failed to get device free space: $e');
+      }
 
       // 优先基于设备剩余空间判断，回退到 app 占用大小
       StorageLevel level;

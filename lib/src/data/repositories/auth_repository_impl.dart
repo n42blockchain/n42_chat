@@ -656,7 +656,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String newPassword,
   }) async {
     if (!isLoggedIn) {
-      throw Exception('未登录');
+      throw StateError('Not logged in: cannot perform this operation');
     }
 
     try {
@@ -810,7 +810,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String newEmail,
   }) async {
     if (!isLoggedIn) {
-      throw Exception('未登录');
+      throw StateError('Not logged in: cannot perform this operation');
     }
 
     try {
@@ -832,8 +832,8 @@ class AuthRepositoryImpl implements IAuthRepository {
       final clientSecret = 'n42_email_${DateTime.now().millisecondsSinceEpoch}_${newEmail.hashCode.abs()}';
 
       // 保存 client_secret 以便后续确认使用
-      await _secureStorage.saveSetting('email_change_secret', clientSecret);
-      await _secureStorage.saveSetting('email_change_address', newEmail);
+      await _secureStorage.write('email_change_secret', clientSecret);
+      await _secureStorage.write('email_change_address', newEmail);
 
       // 请求发送验证码到新邮箱
       final response = await client.requestTokenTo3PIDEmail(
@@ -843,7 +843,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       );
 
       // 保存 session ID 用于后续确认
-      await _secureStorage.saveSetting('email_change_sid', response.sid);
+      await _secureStorage.write('email_change_sid', response.sid);
 
       debugPrint('AuthRepository: Email verification sent, sid: ${response.sid}');
       return true;
@@ -859,7 +859,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String code,
   }) async {
     if (!isLoggedIn) {
-      throw Exception('未登录');
+      throw StateError('Not logged in: cannot perform this operation');
     }
 
     try {
@@ -871,8 +871,8 @@ class AuthRepositoryImpl implements IAuthRepository {
       }
 
       // 获取之前保存的验证信息
-      final clientSecret = await _secureStorage.getSetting('email_change_secret');
-      final sid = await _secureStorage.getSetting('email_change_sid');
+      final clientSecret = await _secureStorage.read('email_change_secret');
+      final sid = await _secureStorage.read('email_change_sid');
 
       if (clientSecret == null || sid == null) {
         throw Exception('未找到邮箱验证会话，请重新请求验证码');
@@ -887,9 +887,9 @@ class AuthRepositoryImpl implements IAuthRepository {
       debugPrint('AuthRepository: Verifying email with code: $code, sid: $sid');
 
       // 清除临时保存的验证信息
-      await _secureStorage.removeSetting('email_change_secret');
-      await _secureStorage.removeSetting('email_change_address');
-      await _secureStorage.removeSetting('email_change_sid');
+      await _secureStorage.delete('email_change_secret');
+      await _secureStorage.delete('email_change_address');
+      await _secureStorage.delete('email_change_sid');
 
       debugPrint('AuthRepository: Email changed successfully');
       return true;
