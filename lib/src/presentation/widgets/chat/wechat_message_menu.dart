@@ -189,11 +189,12 @@ class WeChatMessageMenu extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.1),
           ),
           
-          // 第一行按钮
+          // 第一行按钮（使用 Wrap 自动换行防止溢出，与第二行保持一致）
           Padding(
             padding: const EdgeInsets.only(top: 12, left: 8, right: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            child: Wrap(
+              spacing: 4,
+              runSpacing: 4,
               children: [
                 // 文本消息显示复制，图片/视频显示保存
                 if (message.type == MessageType.text)
