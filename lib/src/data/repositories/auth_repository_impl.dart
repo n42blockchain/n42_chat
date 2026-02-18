@@ -17,6 +17,12 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   final _loginStateController = StreamController<bool>.broadcast();
 
+  // 订阅 Matrix SDK 的登录状态变化，用于检测 token 过期
+  StreamSubscription<LoginState>? _matrixLoginStateSubscription;
+
+  // 防止认证流程中的 SDK 状态变化触发误报登出
+  bool _isAuthenticating = false;
+
   AuthRepositoryImpl({
     MatrixAuthDataSource? authDataSource,
     SecureStorageDataSource? secureStorage,
@@ -69,6 +75,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String password,
     bool rememberMe = true,
   }) async {
+    _isAuthenticating = true;
     try {
       // 登录
       final response = await _authDataSource.loginWithPassword(
@@ -80,7 +87,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       final accessToken = response.accessToken;
       final userId = response.userId;
       final deviceId = response.deviceId;
-      
+
       if (accessToken.isEmpty || userId.isEmpty) {
         return AuthResult.failure(
           '登录响应无效',
@@ -109,8 +116,12 @@ class AuthRepositoryImpl implements IAuthRepository {
         await _secureStorage.clearCredentials();
       }
 
-      // 启动同步
-      await _authDataSource.clientManager.startSync();
+      // 后台启动同步 —— 不阻塞登录返回，本地缓存数据立即可用
+      unawaited(
+        _authDataSource.clientManager.startSync().catchError((Object e) {
+          debugPrint('AuthRepository: Background sync error: $e');
+        }),
+      );
 
       // 通知登录状态变化
       _loginStateController.add(true);
@@ -133,6 +144,9 @@ class AuthRepositoryImpl implements IAuthRepository {
         '登录失败: ${e.toString()}',
         type: AuthErrorType.unknown,
       );
+    } finally {
+      _isAuthenticating = false;
+      _startMonitoringLoginState();
     }
   }
 
@@ -143,6 +157,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String userId,
     required String deviceId,
   }) async {
+    _isAuthenticating = true;
     try {
       await _authDataSource.loginWithToken(
         homeserver: homeserver,
@@ -151,7 +166,7 @@ class AuthRepositoryImpl implements IAuthRepository {
         deviceId: deviceId,
       );
 
-      // 保存会话
+      // 保存会话（更新 SecureStorage 中的 token）
       await _saveSession(
         homeserver: homeserver,
         accessToken: accessToken,
@@ -159,8 +174,12 @@ class AuthRepositoryImpl implements IAuthRepository {
         deviceId: deviceId,
       );
 
-      // 启动同步
-      await _authDataSource.clientManager.startSync();
+      // 后台启动同步 —— 不阻塞会话恢复，本地缓存数据立即可用
+      unawaited(
+        _authDataSource.clientManager.startSync().catchError((Object e) {
+          debugPrint('AuthRepository: Background sync error: $e');
+        }),
+      );
 
       _loginStateController.add(true);
 
@@ -176,13 +195,56 @@ class AuthRepositoryImpl implements IAuthRepository {
         '会话恢复失败',
         type: AuthErrorType.tokenExpired,
       );
+    } finally {
+      _isAuthenticating = false;
+      _startMonitoringLoginState();
     }
   }
 
   @override
   Future<AuthResult> restoreSession() async {
+    _isAuthenticating = true;
     try {
-      // 首先尝试使用保存的 token 恢复会话
+      // 快速路径：Matrix SDK 在 initialize() 时已从自身 SQLite DB 加载了会话
+      // 这是"类似微信"的免密登录场景——同一台设备的二次及以后使用
+      if (_authDataSource.isLoggedIn) {
+        final sdkUserId = _authDataSource.userId;
+        debugPrint('AuthRepository: Matrix SDK already logged in as $sdkUserId, fast restore');
+
+        // 后台启动同步，不阻塞会话恢复
+        unawaited(
+          _authDataSource.clientManager.startSync().catchError((Object e) {
+            debugPrint('AuthRepository: Background sync error: $e');
+          }),
+        );
+
+        _loginStateController.add(true);
+
+        // 同步更新 SecureStorage（保持与 SDK 状态一致）
+        final client = _authDataSource.clientManager.client;
+        if (client != null &&
+            client.accessToken != null &&
+            client.userID != null &&
+            client.homeserver != null) {
+          await _saveSession(
+            homeserver: client.homeserver.toString(),
+            accessToken: client.accessToken!,
+            userId: client.userID!,
+            deviceId: client.deviceID ?? '',
+          );
+        }
+
+        final user = await getCurrentUserProfile() ??
+            UserEntity(
+              userId: sdkUserId ?? '',
+              displayName:
+                  sdkUserId?.split(':').first.replaceFirst('@', '') ?? '',
+            );
+        debugPrint('AuthRepository: Session restored (fast path) - ${user.userId}');
+        return AuthResult.success(user);
+      }
+
+      // 慢速路径：SDK 未登录，尝试 SecureStorage 中保存的 token
       final session = await _secureStorage.getSession();
       if (session != null) {
         final homeserver = session['homeserver'];
@@ -206,7 +268,7 @@ class AuthRepositoryImpl implements IAuthRepository {
             debugPrint('AuthRepository: Session restored with token');
             return result;
           }
-          
+
           debugPrint('AuthRepository: Token restore failed, trying credentials...');
         }
       }
@@ -224,14 +286,14 @@ class AuthRepositoryImpl implements IAuthRepository {
             homeserver: homeserver,
             username: username,
             password: password,
-            rememberMe: true, // 保持记住状态
+            rememberMe: true,
           );
 
           if (result.success) {
             debugPrint('AuthRepository: Auto-login successful');
             return result;
           }
-          
+
           debugPrint('AuthRepository: Auto-login failed: ${result.errorMessage}');
         }
       }
@@ -245,11 +307,18 @@ class AuthRepositoryImpl implements IAuthRepository {
         '会话恢复失败',
         type: AuthErrorType.tokenExpired,
       );
+    } finally {
+      _isAuthenticating = false;
+      _startMonitoringLoginState();
     }
   }
 
   @override
   Future<void> logout() async {
+    // 停止监听 Matrix SDK 登录状态（防止登出流程触发误报）
+    await _matrixLoginStateSubscription?.cancel();
+    _matrixLoginStateSubscription = null;
+
     try {
       // 停止同步
       _authDataSource.clientManager.stopSync();
@@ -319,7 +388,12 @@ class AuthRepositoryImpl implements IAuthRepository {
           deviceId: deviceId,
         );
 
-        await _authDataSource.clientManager.startSync();
+        // 后台启动同步，不阻塞注册成功后的返回
+        unawaited(
+          _authDataSource.clientManager.startSync().catchError((Object e) {
+            debugPrint('AuthRepository: Background sync error: $e');
+          }),
+        );
         _loginStateController.add(true);
 
         final user = UserEntity(
@@ -995,7 +1069,31 @@ class AuthRepositoryImpl implements IAuthRepository {
   }
 
   void dispose() {
+    _matrixLoginStateSubscription?.cancel();
     _loginStateController.close();
+  }
+
+  /// 开始监听 Matrix SDK 的登录状态变化
+  ///
+  /// 当 SDK 在 sync 过程中收到 M_UNKNOWN_TOKEN（token 过期/被撤销）时，
+  /// 会发出 [LoginState.loggedOut]，此处将其传播到 [loginStateStream]，
+  /// 从而让 AuthBloc 正确导航到登录页面。
+  void _startMonitoringLoginState() {
+    _matrixLoginStateSubscription?.cancel();
+    final stream = _authDataSource.clientManager.onLoginStateChanged;
+    if (stream == null) return;
+    _matrixLoginStateSubscription = stream.listen((loginState) {
+      // 认证流程（login/restore）期间忽略状态变化，避免二次 init 触发误报
+      if (_isAuthenticating) return;
+      if (loginState == LoginState.loggedOut ||
+          loginState == LoginState.softLoggedOut) {
+        debugPrint(
+          'AuthRepository: Matrix SDK reported $loginState '
+          '(token expired or revoked), propagating logout',
+        );
+        _loginStateController.add(false);
+      }
+    });
   }
 }
 

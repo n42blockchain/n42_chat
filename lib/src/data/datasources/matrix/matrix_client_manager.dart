@@ -294,10 +294,16 @@ class MatrixClientManager {
   }) async {
     _ensureInitialized();
 
+    // 如果 SDK 已使用相同用户登录（从自身 SQLite DB 恢复），跳过二次 init
+    // 二次 init 会短暂重置状态，造成不必要的开销和潜在竞态
+    if (isLoggedIn && this.userId == userId) {
+      debugPrint('MatrixClientManager: Already logged in as $userId, skipping re-init');
+      return;
+    }
+
     try {
       final homeserverUri = Uri.parse(homeserver);
-      final (_, _, _, _) = await _client!.checkHomeserver(homeserverUri);
-
+      // 不调用 checkHomeserver — 恢复已知会话时跳过此额外网络往返
       // 使用token恢复登录
       // 显式设置 waitForFirstSync: false，由后续 startSync() 统一处理同步
       await _client!.init(
@@ -336,10 +342,10 @@ class MatrixClientManager {
   /// 开始同步
   ///
   /// 启动后台同步循环，并等待首次同步完成以确保房间数据是最新的。
-  /// [timeout] 等待首次同步的超时时间
+  /// [timeout] 等待首次同步的超时时间（默认 3s，避免阻塞登录流程）
   /// [fullState] 是否获取完整状态
   Future<void> startSync({
-    Duration timeout = const Duration(seconds: 8),
+    Duration timeout = const Duration(seconds: 3),
     bool fullState = false,
   }) async {
     _ensureInitialized();
