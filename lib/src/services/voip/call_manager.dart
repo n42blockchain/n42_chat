@@ -44,7 +44,11 @@ class CallManager {
 
   // 是否已显示通话界面
   bool _isCallScreenShowing = false;
-  
+
+  // 锁屏接听标志：用户在锁屏/通知栏点击接听但 Matrix 邀请尚未到达时设为 true。
+  // 当 _handleIncomingCall() 被调用时，若此标志为 true，则自动接听而非显示来电界面。
+  bool _pendingAnswer = false;
+
   // 事件回调
   void Function(CallSession)? onIncomingCall;
   void Function(CallState)? onCallStateChanged;
@@ -109,8 +113,31 @@ class CallManager {
     
     _isInitialized = true;
     debugPrint('CallManager: Initialized');
+
+    // 检查是否有在 app 冷启动期间（CallManager 尚未就绪时）用户已点击接听的缓存事件。
+    // 若有，设置 _pendingAnswer 标志，待 Matrix 邀请到达时自动接听。
+    unawaited(Future.microtask(() async {
+      final pending = _notificationService.consumePendingAcceptAction();
+      if (pending != null) {
+        final (_, callInfo) = pending;
+        debugPrint('CallManager: Found pending accept action from ${callInfo.callerName} '
+            '(fired before CallManager was ready), setting _pendingAnswer=true');
+        _pendingAnswer = true;
+      }
+
+      // 同时检查系统中是否有活跃的 CallKit 通话记录
+      try {
+        final activeCalls = await _notificationService.getActiveCalls();
+        if (activeCalls.isNotEmpty) {
+          debugPrint('CallManager: ${activeCalls.length} active CallKit call(s) found '
+              'after initialization — awaiting Matrix sync to deliver invite');
+        }
+      } catch (e) {
+        debugPrint('CallManager: Error checking active calls: $e');
+      }
+    }));
   }
-  
+
   /// 配置 TURN 服务器
   void configureTurn({
     required List<String> uris,
@@ -238,6 +265,9 @@ class CallManager {
     final session = _webRTCService!.currentSession;
     debugPrint('CallManager: current state=$state, session=${session != null ? "exists (callId=${session.callId})" : "null"}');
 
+    // 清除锁屏接听标志（用户已主动接听）
+    _pendingAnswer = false;
+
     // 立即停止来电铃声和通知
     await _notificationService.endAllCalls();
 
@@ -356,6 +386,25 @@ class CallManager {
     // 设置通话状态，禁用所有消息通知
     N42Chat.pushService?.setInCall(true);
 
+    // === 锁屏接听自动应答 ===
+    // 用户在锁屏/通知栏点击接听，但 Matrix 邀请此时才到达时，自动接听
+    if (_pendingAnswer) {
+      _pendingAnswer = false;
+      debugPrint('CallManager: Auto-answering call (user tapped Accept before Matrix invite arrived)');
+      // 清除 CallKit 通知
+      await _notificationService.endAllCalls();
+      // 直接接听
+      final success = await _webRTCService!.answerCall();
+      if (success) {
+        _navigateToCallScreen(isIncoming: true, session: session);
+      } else {
+        debugPrint('CallManager: Auto-answer failed, falling through to show incoming screen');
+        _navigateToCallScreen(isIncoming: true, session: session);
+      }
+      onIncomingCall?.call(session);
+      return;
+    }
+
     // 检查是否已有活跃的 CallKit 来电（由后台推送触发）
     // 避免重复显示来电界面
     bool alreadyShowing = false;
@@ -473,14 +522,15 @@ class CallManager {
 
     final context = _navigatorKey?.currentContext;
     if (context == null) {
-      // App 从后台唤醒时 context 可能暂时为 null，重试最多 5 次（共等待约 2.5 秒）
-      if (retryCount < 5) {
-        debugPrint('CallManager: Context null, retrying in 500ms (attempt ${retryCount + 1}/5)');
-        Future.delayed(const Duration(milliseconds: 500), () {
+      // App 冷启动时 context 可能暂时为 null，重试最多 10 次（间隔 1s，共等待约 10s）
+      // 覆盖 app 从锁屏/killed 状态启动后 UI 就绪所需的时间
+      if (retryCount < 10) {
+        debugPrint('CallManager: Context null, retrying in 1s (attempt ${retryCount + 1}/10)');
+        Future.delayed(const Duration(seconds: 1), () {
           _navigateToCallScreen(isIncoming: isIncoming, session: session, retryCount: retryCount + 1);
         });
       } else {
-        debugPrint('CallManager: ERROR - navigatorKey.currentContext still null after retries');
+        debugPrint('CallManager: ERROR - navigatorKey.currentContext still null after 10 retries (10s)');
       }
       return;
     }

@@ -59,28 +59,49 @@ class IncomingCallInfo {
 class CallNotificationService {
   static final CallNotificationService _instance = CallNotificationService._internal();
   factory CallNotificationService() => _instance;
-  CallNotificationService._internal();
-  
+
+  /// 构造函数中立即开始监听 CallKit 事件，防止 app 从锁屏/冷启动时丢失
+  /// action_call_accept 事件（用户在通知中点击接听但 Flutter 引擎尚未就绪的情况）
+  CallNotificationService._internal() {
+    FlutterCallkitIncoming.onEvent.listen(_handleCallKitEvent);
+    debugPrint('CallNotificationService: Event listener attached in constructor');
+  }
+
   final _uuid = const Uuid();
-  
+
   // 事件流
   final _callActionController = StreamController<(CallAction, IncomingCallInfo)>.broadcast();
   Stream<(CallAction, IncomingCallInfo)> get callActions => _callActionController.stream;
-  
+
   // 当前 CallKit 通话 ID
   String? _currentCallId;
 
   /// 获取当前 CallKit 通话 ID
   String? get currentCallId => _currentCallId;
-  
-  /// 初始化
+
+  // 锁屏接听缓存：当用户从通知栏/锁屏点击"接听"时，app 可能尚未初始化，
+  // 在此暂存该动作，CallManager.initialize() 完成后取出并自动接听。
+  (CallAction, IncomingCallInfo)? _pendingAcceptAction;
+  DateTime? _pendingAcceptTime;
+  static const Duration _kPendingActionTtl = Duration(seconds: 90);
+
+  /// 取出并清除待处理的接听动作（TTL 内有效）
+  (CallAction, IncomingCallInfo)? consumePendingAcceptAction() {
+    final action = _pendingAcceptAction;
+    final time = _pendingAcceptTime;
+    _pendingAcceptAction = null;
+    _pendingAcceptTime = null;
+    if (action == null || time == null) return null;
+    if (DateTime.now().difference(time) > _kPendingActionTtl) {
+      debugPrint('CallNotificationService: Pending accept action expired (TTL exceeded)');
+      return null;
+    }
+    return action;
+  }
+
+  /// 初始化（事件监听已在构造函数中设置，此处仅作日志标记）
   Future<void> initialize() async {
-    // 监听 CallKit 事件
-    FlutterCallkitIncoming.onEvent.listen((event) {
-      _handleCallKitEvent(event);
-    });
-    
-    debugPrint('CallNotificationService: Initialized');
+    debugPrint('CallNotificationService: Initialized (listener was attached in constructor)');
   }
   
   /// 处理 CallKit 事件
@@ -98,7 +119,10 @@ class CallNotificationService {
     if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_incoming') {
       debugPrint('CallNotificationService: Incoming call from ${callInfo.callerName}');
     } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_accept') {
-      debugPrint('CallNotificationService: Call accepted');
+      debugPrint('CallNotificationService: Call accepted by user');
+      // 同时存入缓存，防止 CallManager 尚未初始化时事件丢失
+      _pendingAcceptAction = (CallAction.accept, callInfo);
+      _pendingAcceptTime = DateTime.now();
       _callActionController.add((CallAction.accept, callInfo));
     } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_decline') {
       debugPrint('CallNotificationService: Call declined');
