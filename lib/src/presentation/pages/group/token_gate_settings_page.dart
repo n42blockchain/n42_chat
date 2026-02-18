@@ -6,6 +6,7 @@ import '../../../domain/entities/token_gate_entity.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
+import '../../helpers/bloc_message_helper.dart';
 
 /// 代币门控设置页面
 class TokenGateSettingsPage extends StatefulWidget {
@@ -85,16 +86,16 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
 
     return BlocListener<GroupBloc, GroupState>(
       listener: (context, state) {
-        if (state is GroupOperationSuccess) {
+        if (state.status == GroupStatus.success) {
           setState(() => _isSaving = false);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(s?.tokenGateSaved ?? 'Token gate saved')),
           );
           Navigator.of(context).pop(true);
-        } else if (state is GroupError) {
+        } else if (state.status == GroupStatus.error && state.errorMessage != null) {
           setState(() => _isSaving = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+            SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!)), backgroundColor: Colors.red),
           );
         }
       },

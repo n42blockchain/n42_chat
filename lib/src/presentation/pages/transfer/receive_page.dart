@@ -10,6 +10,7 @@ import '../../../integration/wallet_bridge.dart';
 import '../../blocs/transfer/transfer_bloc.dart';
 import '../../blocs/transfer/transfer_event.dart';
 import '../../blocs/transfer/transfer_state.dart';
+import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 收款页面
@@ -79,11 +80,11 @@ class _ReceivePageState extends State<ReceivePage> {
 
     return BlocConsumer<TransferBloc, TransferState>(
       listener: (context, state) {
-        if (state is PaymentRequestCreated) {
-          Navigator.pop(context, state.request);
-        } else if (state is TransferFailure) {
+        if (state.status == TransferBlocStatus.paymentCreated) {
+          Navigator.pop(context, state.paymentRequest!);
+        } else if (state.status == TransferBlocStatus.failure && state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error)),
+            SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!))),
           );
         }
       },
@@ -91,7 +92,7 @@ class _ReceivePageState extends State<ReceivePage> {
         String? walletAddress;
         List<TokenInfo> tokens = [];
 
-        if (state is WalletInfoLoaded) {
+        if (state.status == TransferBlocStatus.walletLoaded) {
           walletAddress = state.walletAddress;
           tokens = state.tokens;
 
@@ -121,7 +122,7 @@ class _ReceivePageState extends State<ReceivePage> {
     TransferState state,
     bool isDark,
   ) {
-    if (state is TransferProcessing) {
+    if (state.isProcessing) {
       return const Center(child: CircularProgressIndicator());
     }
 

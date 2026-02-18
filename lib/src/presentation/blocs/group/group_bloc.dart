@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/group_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
+import '../bloc_message_keys.dart';
 import 'group_event.dart';
 import 'group_state.dart';
 
@@ -13,7 +14,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
   StreamSubscription<List<GroupEntity>>? _groupsSubscription;
 
-  GroupBloc(this._groupRepository) : super(const GroupInitial()) {
+  GroupBloc(this._groupRepository) : super(const GroupState.initial()) {
     on<LoadGroups>(_onLoadGroups);
     on<RefreshGroups>(_onRefreshGroups);
     on<LoadGroupDetails>(_onLoadGroupDetails);
@@ -40,7 +41,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     LoadGroups event,
     Emitter<GroupState> emit,
   ) async {
-    emit(const GroupLoading());
+    emit(state.copyWith(status: GroupStatus.loading));
 
     try {
       // 订阅群变化
@@ -54,9 +55,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       final groups = await _groupRepository.getGroups();
       final invites = await _groupRepository.getPendingGroupInvites();
 
-      emit(GroupListLoaded(groups: groups, invites: invites));
+      emit(state.copyWith(
+        status: GroupStatus.loaded,
+        groups: groups,
+        invites: invites,
+      ));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -68,9 +76,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       final groups = await _groupRepository.getGroups();
       final invites = await _groupRepository.getPendingGroupInvites();
 
-      emit(GroupListLoaded(groups: groups, invites: invites));
+      emit(state.copyWith(
+        status: GroupStatus.loaded,
+        groups: groups,
+        invites: invites,
+      ));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -78,23 +93,30 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     LoadGroupDetails event,
     Emitter<GroupState> emit,
   ) async {
-    emit(const GroupLoading());
+    emit(state.copyWith(status: GroupStatus.loading));
 
     try {
       final group = await _groupRepository.getGroup(event.roomId);
       if (group == null) {
-        emit(const GroupError('Group not found'));
+        emit(state.copyWith(
+          status: GroupStatus.error,
+          errorMessage: BlocMessageKeys.groupNotFound,
+        ));
         return;
       }
 
       final members = await _groupRepository.getGroupMembers(event.roomId);
 
-      emit(GroupDetailsLoaded(
-        group: group,
+      emit(state.copyWith(
+        status: GroupStatus.loaded,
+        currentGroup: group,
         members: members,
       ));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -102,15 +124,14 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     LoadGroupMembers event,
     Emitter<GroupState> emit,
   ) async {
-    if (state is! GroupDetailsLoaded) return;
-
-    final currentState = state as GroupDetailsLoaded;
-
     try {
       final members = await _groupRepository.getGroupMembers(event.roomId);
-      emit(currentState.copyWith(members: members));
+      emit(state.copyWith(members: members));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -118,7 +139,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     CreateGroup event,
     Emitter<GroupState> emit,
   ) async {
-    emit(const GroupLoading());
+    emit(state.copyWith(status: GroupStatus.loading));
 
     try {
       final roomId = await _groupRepository.createGroup(
@@ -130,9 +151,15 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         avatar: event.avatar,
       );
 
-      emit(GroupCreated(roomId));
+      emit(state.copyWith(
+        status: GroupStatus.created,
+        createdRoomId: roomId,
+      ));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -144,23 +171,30 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     required String errorPrefix,
     required Emitter<GroupState> emit,
   }) async {
-    final currentState = state;
     try {
       await operation();
       final group = await _groupRepository.getGroup(roomId);
       if (group != null) {
         final members = await _groupRepository.getGroupMembers(roomId);
-        emit(GroupDetailsLoaded(group: group, members: members));
+        emit(state.copyWith(
+          currentGroup: group,
+          members: members,
+        ));
       }
-      emit(GroupOperationSuccess(successMessage));
+      emit(state.copyWith(
+        status: GroupStatus.success,
+        successMessage: successMessage,
+      ));
     } catch (e) {
-      if (currentState is GroupDetailsLoaded) emit(currentState);
       // Extract clean error message without "Exception:" prefix
       String errorMessage = e.toString();
       if (errorMessage.startsWith('Exception: ')) {
         errorMessage = errorMessage.substring(11);
       }
-      emit(GroupError(errorMessage));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: errorMessage,
+      ));
     }
   }
 
@@ -168,7 +202,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       _updateGroupProperty(
         roomId: event.roomId,
         operation: () => _groupRepository.setGroupName(event.roomId, event.name),
-        successMessage: 'Group name updated',
+        successMessage: BlocMessageKeys.groupNameUpdated,
         errorPrefix: 'Failed to update group name',
         emit: emit,
       );
@@ -177,7 +211,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       _updateGroupProperty(
         roomId: event.roomId,
         operation: () => _groupRepository.setGroupTopic(event.roomId, event.topic),
-        successMessage: 'Group description updated',
+        successMessage: BlocMessageKeys.groupDescriptionUpdated,
         errorPrefix: 'Failed to update group description',
         emit: emit,
       );
@@ -186,7 +220,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       _updateGroupProperty(
         roomId: event.roomId,
         operation: () => _groupRepository.setGroupAvatar(event.roomId, event.avatar),
-        successMessage: 'Group avatar updated',
+        successMessage: BlocMessageKeys.groupAvatarUpdated,
         errorPrefix: 'Failed to update group avatar',
         emit: emit,
       );
@@ -197,10 +231,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.inviteUsers(event.roomId, event.userIds);
-      emit(GroupOperationSuccess('Invited ${event.userIds.length} member(s)'));
+      emit(state.copyWith(
+        status: GroupStatus.success,
+        successMessage: '${BlocMessageKeys.groupMembersInvited}:${event.userIds.length}',
+      ));
       add(LoadGroupMembers(event.roomId));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -214,10 +254,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         event.userId,
         reason: event.reason,
       );
-      emit(const GroupOperationSuccess('Member removed'));
+      emit(state.copyWith(
+        status: GroupStatus.success,
+        successMessage: BlocMessageKeys.groupMemberRemoved,
+      ));
       add(LoadGroupMembers(event.roomId));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -227,10 +273,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.setAsAdmin(event.roomId, event.userId);
-      emit(const GroupOperationSuccess('Set as admin'));
+      emit(state.copyWith(
+        status: GroupStatus.success,
+        successMessage: BlocMessageKeys.groupSetAsAdmin,
+      ));
       add(LoadGroupMembers(event.roomId));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -240,10 +292,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.removeAdmin(event.roomId, event.userId);
-      emit(const GroupOperationSuccess('Admin removed'));
+      emit(state.copyWith(
+        status: GroupStatus.success,
+        successMessage: BlocMessageKeys.groupAdminRemoved,
+      ));
       add(LoadGroupMembers(event.roomId));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -253,10 +311,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.leaveGroup(event.roomId);
-      emit(const GroupOperationSuccess('Left the group'));
+      emit(state.copyWith(
+        status: GroupStatus.success,
+        successMessage: BlocMessageKeys.groupLeft,
+      ));
       add(const RefreshGroups());
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -266,10 +330,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.deleteGroup(event.roomId);
-      emit(const GroupOperationSuccess('Group disbanded'));
+      emit(state.copyWith(
+        status: GroupStatus.success,
+        successMessage: BlocMessageKeys.groupDisbanded,
+      ));
       add(const RefreshGroups());
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -277,15 +347,14 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     LoadGroupInvites event,
     Emitter<GroupState> emit,
   ) async {
-    if (state is! GroupListLoaded) return;
-
-    final currentState = state as GroupListLoaded;
-
     try {
       final invites = await _groupRepository.getPendingGroupInvites();
-      emit(currentState.copyWith(invites: invites));
+      emit(state.copyWith(invites: invites));
     } catch (e) {
-      emit(GroupError('Failed to load group invites: $e'));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -299,16 +368,26 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       if (tokenGate != null && tokenGate.enabled && tokenGate.rules.isNotEmpty) {
         final result = await _groupRepository.verifyTokenGate(event.roomId);
         if (!result.passed) {
-          emit(TokenGateVerified(roomId: event.roomId, result: result));
+          emit(state.copyWith(
+            status: GroupStatus.tokenGateVerified,
+            tokenGateRoomId: event.roomId,
+            tokenGateResult: result,
+          ));
           return;
         }
       }
 
       await _groupRepository.acceptGroupInvite(event.roomId);
-      emit(const GroupOperationSuccess('Joined the group'));
+      emit(state.copyWith(
+        status: GroupStatus.success,
+        successMessage: BlocMessageKeys.groupJoined,
+      ));
       add(const RefreshGroups());
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -318,10 +397,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.rejectGroupInvite(event.roomId);
-      emit(const GroupOperationSuccess('Invitation declined'));
+      emit(state.copyWith(
+        status: GroupStatus.success,
+        successMessage: BlocMessageKeys.groupInviteDeclined,
+      ));
       add(const LoadGroupInvites());
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -338,10 +423,16 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       await _groupRepository.setTokenGate(event.roomId, event.config);
-      emit(const GroupOperationSuccess('Token gate updated'));
+      emit(state.copyWith(
+        status: GroupStatus.success,
+        successMessage: BlocMessageKeys.groupTokenGateUpdated,
+      ));
       add(LoadGroupDetails(event.roomId));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -350,11 +441,18 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     Emitter<GroupState> emit,
   ) async {
     try {
-      emit(const GroupLoading());
+      emit(state.copyWith(status: GroupStatus.loading));
       final result = await _groupRepository.verifyTokenGate(event.roomId);
-      emit(TokenGateVerified(roomId: event.roomId, result: result));
+      emit(state.copyWith(
+        status: GroupStatus.tokenGateVerified,
+        tokenGateRoomId: event.roomId,
+        tokenGateResult: result,
+      ));
     } catch (e) {
-      emit(GroupError(e.toString()));
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -364,4 +462,3 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     return super.close();
   }
 }
-

@@ -4965,4 +4965,184 @@ class SEn extends S {
 
   @override
   String get storyMyStory => 'My Story';
+
+  @override
+  String get storageSmartCleanup => 'Smart Cleanup';
+
+  @override
+  String get storageOldMediaFiles => 'Old Media Files';
+
+  @override
+  String get storageLargeFiles => 'Large Files';
+
+  @override
+  String get storageAppCache => 'App Cache';
+
+  @override
+  String get storageSettings => 'Storage Settings';
+
+  @override
+  String get storageAutoCleanup => 'Auto Cleanup';
+
+  @override
+  String storageAutoCleanupDesc(int days) {
+    return 'Automatically clean files older than $days days';
+  }
+
+  @override
+  String get storageCleanupPeriod => 'Cleanup Period';
+
+  @override
+  String get storagePreserveThumbnails => 'Preserve Thumbnails';
+
+  @override
+  String get storagePreserveThumbnailsDesc =>
+      'Keep image thumbnails during cleanup';
+
+  @override
+  String get storageWarningHigh =>
+      'Storage usage is high. Consider cleaning up old files.';
+
+  @override
+  String get storageWarningCritical =>
+      'Storage is critically low. Please clean up to free space.';
+
+  @override
+  String storageFreed(String size, int count) {
+    return 'Freed $size ($count files)';
+  }
+
+  @override
+  String storageDays(int days) {
+    return '$days days';
+  }
+
+  @override
+  String storageViewAllRooms(int count) {
+    return 'View all $count rooms';
+  }
+
+  @override
+  String get storageNoFiles => 'No files found';
+
+  @override
+  String get storageFilePinned => 'Pinned';
+
+  @override
+  String storageDeleteSelected(int count) {
+    return 'Delete $count selected files? They can be re-downloaded from the server.';
+  }
+
+  @override
+  String get backupRestore => 'Backup & Restore';
+
+  @override
+  String get backupCreate => 'Create Backup';
+
+  @override
+  String get backupCreateDesc =>
+      'Backup your settings and encryption keys. Messages will be restored from server after re-login.';
+
+  @override
+  String get backupIncludeKeys => 'Include encryption keys';
+
+  @override
+  String get backupIncludeKeysDesc => 'Required for reading encrypted messages';
+
+  @override
+  String get backupPasswordProtect => 'Password protect';
+
+  @override
+  String get backupEnterPassword => 'Enter backup password';
+
+  @override
+  String get backupHistory => 'Backup History';
+
+  @override
+  String get backupNoBackups => 'No backups yet';
+
+  @override
+  String get backupRestore2 => 'Restore';
+
+  @override
+  String get backupDelete => 'Delete';
+
+  @override
+  String get backupDeleteConfirm =>
+      'Are you sure you want to delete this backup? This cannot be undone.';
+
+  @override
+  String get backupRestoreFromFile => 'Restore from File';
+
+  @override
+  String get backupRestoreFromFileDesc =>
+      'Import a .n42backup file from another device or previous backup.';
+
+  @override
+  String get backupChooseFile => 'Choose Backup File';
+
+  @override
+  String get backupRestoring => 'Restoring...';
+
+  @override
+  String backupCreated(int rooms, int messages) {
+    return 'Backup created: $rooms rooms, $messages messages';
+  }
+
+  @override
+  String backupRestored(int settings, int rooms) {
+    return 'Restored $settings settings from $rooms rooms';
+  }
+
+  @override
+  String backupFailed(String error) {
+    return 'Backup failed: $error';
+  }
+
+  @override
+  String get backupPasswordRequired => 'This backup is password-protected';
+
+  @override
+  String get blocGroupNotFound => 'Group not found';
+
+  @override
+  String blocGroupMembersInvited(int count) {
+    return 'Invited $count member(s)';
+  }
+
+  @override
+  String get blocGroupMemberRemoved => 'Member removed';
+
+  @override
+  String get blocGroupAdminRemoved => 'Admin removed';
+
+  @override
+  String get blocGroupLeft => 'Left the group';
+
+  @override
+  String get blocGroupDisbanded => 'Group disbanded';
+
+  @override
+  String get blocGroupJoined => 'Joined the group';
+
+  @override
+  String get blocGroupInviteDeclined => 'Invitation declined';
+
+  @override
+  String get blocGroupTokenGateUpdated => 'Token gate updated';
+
+  @override
+  String get blocTransferProcessing => 'Processing transfer...';
+
+  @override
+  String get blocTransferCancelled => 'Transfer cancelled';
+
+  @override
+  String get blocTransferFailed => 'Transfer failed';
+
+  @override
+  String get blocPaymentProcessing => 'Processing payment...';
+
+  @override
+  String get blocPaymentFailed => 'Payment failed';
 }

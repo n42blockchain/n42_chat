@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/transfer_entity.dart';
 import '../../../domain/repositories/transfer_repository.dart';
 import '../../../integration/wallet_bridge.dart';
+import '../bloc_message_keys.dart';
 import 'transfer_event.dart';
 import 'transfer_state.dart';
 
@@ -13,7 +14,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
   final IWalletBridge _walletBridge;
 
   TransferBloc(this._transferRepository, this._walletBridge)
-      : super(const TransferInitial()) {
+      : super(const TransferState.initial()) {
     on<LoadWalletInfo>(_onLoadWalletInfo);
     on<LoadTokens>(_onLoadTokens);
     on<LoadTokenBalance>(_onLoadTokenBalance);
@@ -43,14 +44,18 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
         }
       }
 
-      emit(WalletInfoLoaded(
-        isConnected: isConnected,
+      emit(state.copyWith(
+        status: TransferBlocStatus.walletLoaded,
+        isWalletConnected: isConnected,
         walletAddress: walletAddress,
         tokens: tokens,
         balances: balances,
       ));
     } catch (e) {
-      emit(TransferFailure(e.toString()));
+      emit(state.copyWith(
+        status: TransferBlocStatus.failure,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -58,17 +63,19 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     LoadTokens event,
     Emitter<TransferState> emit,
   ) async {
-    if (state is! WalletInfoLoaded) {
+    if (state.status == TransferBlocStatus.initial) {
       add(const LoadWalletInfo());
       return;
     }
 
     try {
       final tokens = await _transferRepository.getSupportedTokens();
-      final currentState = state as WalletInfoLoaded;
-      emit(currentState.copyWith(tokens: tokens));
+      emit(state.copyWith(tokens: tokens));
     } catch (e) {
-      emit(TransferFailure(e.toString()));
+      emit(state.copyWith(
+        status: TransferBlocStatus.failure,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -76,14 +83,11 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     LoadTokenBalance event,
     Emitter<TransferState> emit,
   ) async {
-    if (state is! WalletInfoLoaded) return;
-
     try {
       final balance = await _transferRepository.getTokenBalance(event.token);
-      final currentState = state as WalletInfoLoaded;
-      final newBalances = Map<String, String>.from(currentState.balances);
+      final newBalances = Map<String, String>.from(state.balances);
       newBalances[event.token] = balance;
-      emit(currentState.copyWith(balances: newBalances));
+      emit(state.copyWith(balances: newBalances));
     } catch (e) {
       // 忽略余额加载错误
       debugPrint('Error: $e');
@@ -94,7 +98,10 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     InitiateTransfer event,
     Emitter<TransferState> emit,
   ) async {
-    emit(const TransferProcessing('Processing transfer...'));
+    emit(state.copyWith(
+      status: TransferBlocStatus.processing,
+      processingMessage: BlocMessageKeys.transferProcessing,
+    ));
 
     try {
       final transfer = await _transferRepository.initiateTransfer(
@@ -106,14 +113,26 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       );
 
       if (transfer.isSuccess) {
-        emit(TransferSuccess(transfer));
+        emit(state.copyWith(
+          status: TransferBlocStatus.success,
+          lastTransfer: transfer,
+        ));
       } else if (transfer.status == TransferStatus.cancelled) {
-        emit(const TransferFailure('Transfer cancelled'));
+        emit(state.copyWith(
+          status: TransferBlocStatus.failure,
+          errorMessage: BlocMessageKeys.transferCancelled,
+        ));
       } else {
-        emit(TransferFailure(transfer.failureReason ?? 'Transfer failed'));
+        emit(state.copyWith(
+          status: TransferBlocStatus.failure,
+          errorMessage: transfer.failureReason ?? BlocMessageKeys.transferFailed,
+        ));
       }
     } catch (e) {
-      emit(TransferFailure(e.toString()));
+      emit(state.copyWith(
+        status: TransferBlocStatus.failure,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -121,7 +140,10 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     CreatePaymentRequest event,
     Emitter<TransferState> emit,
   ) async {
-    emit(const TransferProcessing('Creating payment request...'));
+    emit(state.copyWith(
+      status: TransferBlocStatus.processing,
+      processingMessage: BlocMessageKeys.paymentProcessing,
+    ));
 
     try {
       final request = await _transferRepository.createPaymentRequest(
@@ -136,9 +158,15 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
         request: request,
       );
 
-      emit(PaymentRequestCreated(request));
+      emit(state.copyWith(
+        status: TransferBlocStatus.paymentCreated,
+        paymentRequest: request,
+      ));
     } catch (e) {
-      emit(TransferFailure(e.toString()));
+      emit(state.copyWith(
+        status: TransferBlocStatus.failure,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -146,7 +174,10 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     FulfillPaymentRequest event,
     Emitter<TransferState> emit,
   ) async {
-    emit(const TransferProcessing('Processing payment...'));
+    emit(state.copyWith(
+      status: TransferBlocStatus.processing,
+      processingMessage: BlocMessageKeys.paymentProcessing,
+    ));
 
     try {
       final transfer = await _transferRepository.fulfillPaymentRequest(
@@ -158,12 +189,21 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       );
 
       if (transfer.isSuccess) {
-        emit(TransferSuccess(transfer));
+        emit(state.copyWith(
+          status: TransferBlocStatus.success,
+          lastTransfer: transfer,
+        ));
       } else {
-        emit(TransferFailure(transfer.failureReason ?? 'Payment failed'));
+        emit(state.copyWith(
+          status: TransferBlocStatus.failure,
+          errorMessage: transfer.failureReason ?? BlocMessageKeys.paymentFailed,
+        ));
       }
     } catch (e) {
-      emit(TransferFailure(e.toString()));
+      emit(state.copyWith(
+        status: TransferBlocStatus.failure,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
@@ -178,9 +218,10 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       userInfo = await _walletBridge.getUserInfoByAddress(event.address);
     }
 
-    emit(AddressValidated(
-      address: event.address,
-      isValid: isValid,
+    emit(state.copyWith(
+      status: TransferBlocStatus.addressValidated,
+      validatedAddress: event.address,
+      isAddressValid: isValid,
       userInfo: userInfo,
     ));
   }
@@ -192,4 +233,3 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     add(const LoadWalletInfo());
   }
 }
-

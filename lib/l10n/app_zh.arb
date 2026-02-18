@@ -1506,6 +1506,11 @@
   "settingsLanguageChanged": "语言已更改",
   "settingsBiometricLogin": "生物识别登录",
   "authLoginWithBiometric": "使用{type}登录",
+  "@authLoginWithBiometric": {
+    "placeholders": {
+      "type": {"type": "Object"}
+    }
+  },
   "settingsBiometricLoginEnabled": "生物识别登录已启用",
   "settingsBiometricLoginDisabled": "生物识别登录已禁用",
   "settingsEnableBiometricLogin": "启用生物识别登录",
@@ -2515,17 +2520,43 @@
   "storageSettings": "存储设置",
   "storageAutoCleanup": "自动清理",
   "storageAutoCleanupDesc": "自动清理 {days} 天以上未访问的文件",
+  "@storageAutoCleanupDesc": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
   "storageCleanupPeriod": "清理周期",
   "storagePreserveThumbnails": "保留缩略图",
   "storagePreserveThumbnailsDesc": "清理时保留图片缩略图",
   "storageWarningHigh": "存储空间较高，建议清理旧文件。",
   "storageWarningCritical": "存储空间严重不足，请立即清理。",
   "storageFreed": "已释放 {size}（{count} 个文件）",
+  "@storageFreed": {
+    "placeholders": {
+      "size": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
   "storageDays": "{days} 天",
+  "@storageDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
   "storageViewAllRooms": "查看全部 {count} 个房间",
+  "@storageViewAllRooms": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "storageNoFiles": "暂无文件",
   "storageFilePinned": "已保留",
   "storageDeleteSelected": "删除 {count} 个选中文件？文件可从服务器重新下载。",
+  "@storageDeleteSelected": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
 
   "backupRestore": "备份与恢复",
   "backupCreate": "创建备份",
@@ -2544,7 +2575,43 @@
   "backupChooseFile": "选择备份文件",
   "backupRestoring": "恢复中...",
   "backupCreated": "备份已创建：{rooms} 个房间，{messages} 条消息",
+  "@backupCreated": {
+    "placeholders": {
+      "rooms": {"type": "int"},
+      "messages": {"type": "int"}
+    }
+  },
   "backupRestored": "已恢复 {settings} 项设置（来自 {rooms} 个房间）",
+  "@backupRestored": {
+    "placeholders": {
+      "settings": {"type": "int"},
+      "rooms": {"type": "int"}
+    }
+  },
   "backupFailed": "备份失败：{error}",
-  "backupPasswordRequired": "此备份需要密码"
+  "@backupFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "backupPasswordRequired": "此备份需要密码",
+  "blocGroupNotFound": "群组未找到",
+  "blocGroupMembersInvited": "已邀请{count}位成员",
+  "@blocGroupMembersInvited": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "blocGroupMemberRemoved": "成员已移除",
+  "blocGroupAdminRemoved": "已取消管理员",
+  "blocGroupLeft": "已退出群聊",
+  "blocGroupDisbanded": "群聊已解散",
+  "blocGroupJoined": "已加入群聊",
+  "blocGroupInviteDeclined": "已拒绝邀请",
+  "blocGroupTokenGateUpdated": "Token 门槛已更新",
+  "blocTransferProcessing": "转账处理中...",
+  "blocTransferCancelled": "转账已取消",
+  "blocTransferFailed": "转账失败",
+  "blocPaymentProcessing": "支付处理中...",
+  "blocPaymentFailed": "支付失败"
 }

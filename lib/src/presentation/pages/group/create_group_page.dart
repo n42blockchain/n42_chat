@@ -14,6 +14,7 @@ import '../../blocs/contact/contact_state.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
+import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../contact/contact_tile.dart';
 
@@ -95,11 +96,11 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 
     return BlocListener<GroupBloc, GroupState>(
       listener: (context, state) {
-        if (state is GroupCreated) {
-          Navigator.of(context).pop(state.roomId);
-        } else if (state is GroupError) {
+        if (state.status == GroupStatus.created) {
+          Navigator.of(context).pop(state.createdRoomId!);
+        } else if (state.status == GroupStatus.error && state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
+            SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!))),
           );
         }
       },
@@ -187,7 +188,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                 color: isDark ? AppColors.surfaceDark : AppColors.surface,
                 child: BlocBuilder<ContactBloc, ContactState>(
                   builder: (context, state) {
-                    if (state is! ContactLoaded) return const SizedBox.shrink();
+                    if (!state.isLoaded) return const SizedBox.shrink();
 
                     final selectedContacts = state.contacts
                         .where((c) => _selectedUserIds.contains(c.userId))
@@ -226,11 +227,11 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
             Expanded(
               child: BlocBuilder<ContactBloc, ContactState>(
                 builder: (context, state) {
-                  if (state is ContactLoading) {
+                  if (state.isLoading) {
                     return const N42Loading();
                   }
 
-                  if (state is! ContactLoaded) {
+                  if (!state.isLoaded) {
                     return N42EmptyState(
                       icon: Icons.contacts_outlined,
                       title: S.of(context)?.commonNoContacts ?? 'No contacts',
