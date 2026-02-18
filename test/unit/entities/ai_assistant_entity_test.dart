@@ -15,7 +15,7 @@ void main() {
       expect(assistant.name, 'Test Assistant');
       expect(assistant.avatar, isNull);
       expect(assistant.systemPrompt, 'You are a helpful AI assistant.');
-      expect(assistant.model, 'gpt-4o-mini');
+      expect(assistant.model, isNull);
       expect(assistant.contextWindow, 20);
       expect(assistant.temperature, 0.7);
       expect(assistant.maxTokens, 2048);
@@ -30,7 +30,7 @@ void main() {
       expect(d.name, 'N42 AI');
       expect(d.avatar, '🤖');
       expect(d.systemPrompt, contains('N42 AI'));
-      expect(d.model, 'gpt-4o-mini');
+      expect(d.model, isNull);
       expect(d.contextWindow, 20);
       expect(d.temperature, 0.7);
       expect(d.maxTokens, 2048);
@@ -131,7 +131,7 @@ void main() {
       expect(entity.name, 'Minimal');
       expect(entity.avatar, isNull);
       expect(entity.systemPrompt, 'You are a helpful AI assistant.');
-      expect(entity.model, 'gpt-4o-mini');
+      expect(entity.model, isNull);
       expect(entity.contextWindow, 20);
       expect(entity.temperature, 0.7);
       expect(entity.maxTokens, 2048);
