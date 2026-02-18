@@ -8,7 +8,7 @@ import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
 
 import '../../../core/services/speech_to_text_service.dart';
 import '../../../core/services/translation_service.dart';
-import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
@@ -19,7 +19,7 @@ import 'chat_state.dart';
 /// 聊天BLoC
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final IMessageRepository _messageRepository;
-  final SecureStorageDataSource _secureStorage;
+  final PreferencesDataSource _secureStorage;
   final IGroupRepository? _groupRepository;
   final ITranslationService? _translationService;
   final MatrixClientManager? _clientManager;
@@ -61,7 +61,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   ChatBloc({
     required IMessageRepository messageRepository,
-    required SecureStorageDataSource secureStorage,
+    required PreferencesDataSource secureStorage,
     IGroupRepository? groupRepository,
     ITranslationService? translationService,
     MatrixClientManager? clientManager,
@@ -579,6 +579,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       final currentMsg = currentMessagesMap[newMsg.id];
       if (currentMsg == null) return newMsg;
 
+      // 防止已撤回的消息被 sync 事件"恢复"成原始内容。
+      // Matrix 协议保证消息一旦被 redact 就永远是 redacted，但本地乐观更新时
+      // 可能 sync 先带来旧事件（历史分页等），需在此兜底。
+      if (currentMsg.type == MessageType.redacted &&
+          newMsg.type != MessageType.redacted) {
+        return currentMsg;
+      }
+
       // 如果当前消息有 reactions 但新消息没有，保留当前的 reactions
       if (currentMsg.reactions.isNotEmpty && newMsg.reactions.isEmpty) {
         newMsg = newMsg.copyWith(reactions: currentMsg.reactions);
@@ -842,11 +850,32 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   /// 撤回消息
+  ///
+  /// 遵循 Matrix 规范与微信行为：撤回不删除消息条目，而是将其原地更新为
+  /// [MessageType.redacted]，保持消息在列表中的位置，仅内容替换为"已撤回"提示。
+  ///
+  /// 旧逻辑（直接删除）会导致：
+  ///   撤回 → 消息消失 → 服务器确认后 BLoC 删除 → sync 到来 → 消息重新出现
+  /// 新逻辑（原地标记）：
+  ///   撤回 → 消息立即标记为 redacted（UI 持续显示"已撤回"）→ sync 到来不变
   Future<void> _onRedactMessage(
     RedactMessage event,
     Emitter<ChatState> emit,
   ) async {
     if (_currentRoomId == null) return;
+
+    // 保存原始消息列表，用于失败时回滚
+    final originalMessages = List<MessageEntity>.unmodifiable(state.messages);
+
+    // 立即在本地将消息标记为已撤回（乐观更新）
+    // 使消息立即显示为"已撤回"提示，而不是消失
+    final optimisticMessages = state.messages.map((m) {
+      if (m.id == event.messageId) {
+        return m.copyWith(type: MessageType.redacted, content: '');
+      }
+      return m;
+    }).toList();
+    emit(state.copyWith(messages: optimisticMessages));
 
     try {
       await _messageRepository.redactMessage(
@@ -854,14 +883,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         event.messageId,
         reason: event.reason,
       );
-      
-      // 从本地列表中移除消息
-      final updatedMessages = state.messages
-          .where((m) => m.id != event.messageId)
-          .toList();
-      emit(state.copyWith(messages: updatedMessages));
+      // 服务器确认后无需额外操作：
+      // Matrix sync 会将该事件重新推回，_onMessagesUpdated 中会以
+      // MessageType.redacted 合并，与当前状态一致，不会产生闪烁。
     } catch (e) {
-      emit(state.copyWith(error: 'Failed to recall'));
+      // 服务器撤回失败：回滚乐观更新，恢复原始消息列表
+      debugPrint('ChatBloc: Failed to redact message ${event.messageId}: $e');
+      emit(state.copyWith(
+        messages: originalMessages,
+        error: 'Failed to recall',
+      ));
     }
   }
   
