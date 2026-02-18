@@ -10,6 +10,7 @@ import '../../../domain/entities/group_entity.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
+import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'group_media_hub_page.dart';
 
@@ -41,12 +42,13 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
     return BlocConsumer<GroupBloc, GroupState>(
       listener: (context, state) {
-        if (state is GroupError) {
-          // Map English error messages to localized strings
+        if (state.status == GroupStatus.error && state.errorMessage != null) {
           final s = S.of(context);
-          String message = state.message;
+          String message = state.errorMessage!;
           if (message.contains('do not have permission') || message.contains('permission')) {
             message = s?.groupNoPermissionToEditGroupName ?? message;
+          } else {
+            message = resolveBlocMessage(context, message);
           }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -54,34 +56,24 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               backgroundColor: Colors.red,
             ),
           );
-        } else if (state is GroupOperationSuccess) {
-          // Map English success messages to localized strings
-          final s = S.of(context);
-          String message = state.message;
-          if (message == 'Group name updated') {
-            message = s?.chatGroupNameUpdated ?? message;
-          } else if (message == 'Group description updated') {
-            message = s?.groupDescriptionUpdated ?? message;
-          } else if (message == 'Group avatar updated') {
-            message = s?.groupAvatarUpdated ?? message;
-          }
+        } else if (state.status == GroupStatus.success && state.successMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(message),
+              content: Text(resolveBlocMessage(context, state.successMessage!)),
               backgroundColor: Colors.green,
             ),
           );
         }
       },
       builder: (context, state) {
-        if (state is GroupLoading) {
+        if (state.isLoading) {
           return Scaffold(
             appBar: N42AppBar(title: S.of(context)?.groupProfile ?? 'Group Info'),
             body: const N42Loading(),
           );
         }
 
-        if (state is! GroupDetailsLoaded) {
+        if (state.currentGroup == null) {
           return Scaffold(
             appBar: N42AppBar(title: S.of(context)?.groupProfile ?? 'Group Info'),
             body: N42EmptyState(
@@ -96,8 +88,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     );
   }
 
-  Widget _buildBody(GroupDetailsLoaded state, bool isDark) {
-    final group = state.group;
+  Widget _buildBody(GroupState state, bool isDark) {
+    final group = state.currentGroup!;
     final members = state.members;
 
     return Scaffold(

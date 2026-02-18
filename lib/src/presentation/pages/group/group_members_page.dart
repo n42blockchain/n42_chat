@@ -8,6 +8,7 @@ import '../../../domain/entities/group_entity.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
+import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 群成员管理页面
@@ -50,22 +51,22 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
       ),
       body: BlocConsumer<GroupBloc, GroupState>(
         listener: (context, state) {
-          if (state is GroupError) {
+          if (state.status == GroupStatus.error && state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!))),
             );
-          } else if (state is GroupOperationSuccess) {
+          } else if (state.status == GroupStatus.success && state.successMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text(resolveBlocMessage(context, state.successMessage!))),
             );
           }
         },
         builder: (context, state) {
-          if (state is GroupLoading) {
+          if (state.isLoading) {
             return const N42Loading();
           }
 
-          if (state is! GroupDetailsLoaded) {
+          if (state.currentGroup == null) {
             return N42EmptyState(
               icon: Icons.error_outline,
               title: S.of(context)?.commonLoadFailed ?? 'Load failed',
@@ -78,8 +79,8 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     );
   }
 
-  Widget _buildBody(GroupDetailsLoaded state, bool isDark) {
-    final group = state.group;
+  Widget _buildBody(GroupState state, bool isDark) {
+    final group = state.currentGroup!;
     var members = state.members;
 
     // 搜索过滤
@@ -122,7 +123,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           alignment: Alignment.centerLeft,
           child: Text(
-            S.of(context)?.groupTotalMembers(state.group.memberCount) ?? '${state.group.memberCount} members',
+            S.of(context)?.groupTotalMembers(state.currentGroup!.memberCount) ?? '${state.currentGroup!.memberCount} members',
             style: TextStyle(
               fontSize: 13,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,

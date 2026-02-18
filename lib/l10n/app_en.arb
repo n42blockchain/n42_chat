@@ -2414,5 +2414,24 @@
       "error": {"type": "String"}
     }
   },
-  "backupPasswordRequired": "This backup is password-protected"
+  "backupPasswordRequired": "This backup is password-protected",
+  "blocGroupNotFound": "Group not found",
+  "blocGroupMembersInvited": "Invited {count} member(s)",
+  "@blocGroupMembersInvited": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "blocGroupMemberRemoved": "Member removed",
+  "blocGroupAdminRemoved": "Admin removed",
+  "blocGroupLeft": "Left the group",
+  "blocGroupDisbanded": "Group disbanded",
+  "blocGroupJoined": "Joined the group",
+  "blocGroupInviteDeclined": "Invitation declined",
+  "blocGroupTokenGateUpdated": "Token gate updated",
+  "blocTransferProcessing": "Processing transfer...",
+  "blocTransferCancelled": "Transfer cancelled",
+  "blocTransferFailed": "Transfer failed",
+  "blocPaymentProcessing": "Processing payment...",
+  "blocPaymentFailed": "Payment failed"
 }

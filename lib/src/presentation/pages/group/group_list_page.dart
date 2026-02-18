@@ -8,6 +8,7 @@ import '../../../domain/entities/group_entity.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
+import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 群聊列表页面
@@ -45,22 +46,22 @@ class _GroupListPageState extends State<GroupListPage> {
       ),
       body: BlocConsumer<GroupBloc, GroupState>(
         listener: (context, state) {
-          if (state is GroupError) {
+          if (state.status == GroupStatus.error && state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!))),
             );
-          } else if (state is GroupOperationSuccess) {
+          } else if (state.status == GroupStatus.success && state.successMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text(resolveBlocMessage(context, state.successMessage!))),
             );
           }
         },
         builder: (context, state) {
-          if (state is GroupLoading) {
+          if (state.isLoading) {
             return const N42Loading();
           }
 
-          if (state is GroupListLoaded) {
+          if (state.status == GroupStatus.loaded) {
             return _buildGroupList(state, isDark);
           }
 
@@ -74,7 +75,7 @@ class _GroupListPageState extends State<GroupListPage> {
     );
   }
 
-  Widget _buildGroupList(GroupListLoaded state, bool isDark) {
+  Widget _buildGroupList(GroupState state, bool isDark) {
     if (state.groups.isEmpty && state.invites.isEmpty) {
       return Center(
         child: N42EmptyState(

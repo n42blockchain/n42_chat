@@ -4894,4 +4894,178 @@ class SKo extends S {
 
   @override
   String get storyMyStory => '我的动态';
+
+  @override
+  String get storageSmartCleanup => '智能清理';
+
+  @override
+  String get storageOldMediaFiles => '旧媒体文件';
+
+  @override
+  String get storageLargeFiles => '大文件';
+
+  @override
+  String get storageAppCache => '应用缓存';
+
+  @override
+  String get storageSettings => '存储设置';
+
+  @override
+  String get storageAutoCleanup => '自动清理';
+
+  @override
+  String storageAutoCleanupDesc(int days) {
+    return '自动清理 $days 天以上未访问的文件';
+  }
+
+  @override
+  String get storageCleanupPeriod => '清理周期';
+
+  @override
+  String get storagePreserveThumbnails => '保留缩略图';
+
+  @override
+  String get storagePreserveThumbnailsDesc => '清理时保留图片缩略图';
+
+  @override
+  String get storageWarningHigh => '存储空间较高，建议清理旧文件。';
+
+  @override
+  String get storageWarningCritical => '存储空间严重不足，请立即清理。';
+
+  @override
+  String storageFreed(String size, int count) {
+    return '已释放 $size（$count 个文件）';
+  }
+
+  @override
+  String storageDays(int days) {
+    return '$days 天';
+  }
+
+  @override
+  String storageViewAllRooms(int count) {
+    return '查看全部 $count 个房间';
+  }
+
+  @override
+  String get storageNoFiles => '暂无文件';
+
+  @override
+  String get storageFilePinned => '已保留';
+
+  @override
+  String storageDeleteSelected(int count) {
+    return '删除 $count 个选中文件？文件可从服务器重新下载。';
+  }
+
+  @override
+  String get backupRestore => '备份与恢复';
+
+  @override
+  String get backupCreate => '创建备份';
+
+  @override
+  String get backupCreateDesc => '备份设置和加密密钥。消息将在重新登录后从服务器恢复。';
+
+  @override
+  String get backupIncludeKeys => '包含加密密钥';
+
+  @override
+  String get backupIncludeKeysDesc => '读取加密消息所必需';
+
+  @override
+  String get backupPasswordProtect => '密码保护';
+
+  @override
+  String get backupEnterPassword => '输入备份密码';
+
+  @override
+  String get backupHistory => '备份历史';
+
+  @override
+  String get backupNoBackups => '暂无备份';
+
+  @override
+  String get backupRestore2 => '恢复';
+
+  @override
+  String get backupDelete => '删除';
+
+  @override
+  String get backupDeleteConfirm => '确定删除此备份？此操作不可撤销。';
+
+  @override
+  String get backupRestoreFromFile => '从文件恢复';
+
+  @override
+  String get backupRestoreFromFileDesc => '导入来自其他设备或之前备份的 .n42backup 文件。';
+
+  @override
+  String get backupChooseFile => '选择备份文件';
+
+  @override
+  String get backupRestoring => '恢复中...';
+
+  @override
+  String backupCreated(int rooms, int messages) {
+    return '备份已创建：$rooms 个房间，$messages 条消息';
+  }
+
+  @override
+  String backupRestored(int settings, int rooms) {
+    return '已恢复 $settings 项设置（来自 $rooms 个房间）';
+  }
+
+  @override
+  String backupFailed(String error) {
+    return '备份失败：$error';
+  }
+
+  @override
+  String get backupPasswordRequired => '此备份需要密码';
+
+  @override
+  String get blocGroupNotFound => '群组未找到';
+
+  @override
+  String blocGroupMembersInvited(int count) {
+    return '已邀请$count位成员';
+  }
+
+  @override
+  String get blocGroupMemberRemoved => '成员已移除';
+
+  @override
+  String get blocGroupAdminRemoved => '已取消管理员';
+
+  @override
+  String get blocGroupLeft => '已退出群聊';
+
+  @override
+  String get blocGroupDisbanded => '群聊已解散';
+
+  @override
+  String get blocGroupJoined => '已加入群聊';
+
+  @override
+  String get blocGroupInviteDeclined => '已拒绝邀请';
+
+  @override
+  String get blocGroupTokenGateUpdated => 'Token 门槛已更新';
+
+  @override
+  String get blocTransferProcessing => '转账处理中...';
+
+  @override
+  String get blocTransferCancelled => '转账已取消';
+
+  @override
+  String get blocTransferFailed => '转账失败';
+
+  @override
+  String get blocPaymentProcessing => '支付处理中...';
+
+  @override
+  String get blocPaymentFailed => '支付失败';
 }

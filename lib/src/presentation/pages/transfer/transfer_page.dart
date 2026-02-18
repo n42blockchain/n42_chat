@@ -9,6 +9,7 @@ import '../../../integration/wallet_bridge.dart';
 import '../../blocs/transfer/transfer_bloc.dart';
 import '../../blocs/transfer/transfer_event.dart';
 import '../../blocs/transfer/transfer_state.dart';
+import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../qrcode/scan_qr_page.dart';
 
@@ -109,16 +110,16 @@ class _TransferPageState extends State<TransferPage> {
 
     return BlocConsumer<TransferBloc, TransferState>(
       listener: (context, state) {
-        if (state is AddressValidated) {
+        if (state.status == TransferBlocStatus.addressValidated) {
           setState(() {
-            _isAddressValid = state.isValid;
+            _isAddressValid = state.isAddressValid!;
             _recipientInfo = state.userInfo;
           });
-        } else if (state is TransferSuccess) {
-          Navigator.pop(context, state.transfer);
-        } else if (state is TransferFailure) {
+        } else if (state.status == TransferBlocStatus.success) {
+          Navigator.pop(context, state.lastTransfer!);
+        } else if (state.status == TransferBlocStatus.failure && state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error)),
+            SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!))),
           );
         }
       },
@@ -139,14 +140,18 @@ class _TransferPageState extends State<TransferPage> {
   }
 
   Widget _buildBody(TransferState state, bool isDark) {
-    if (state is TransferProcessing) {
+    if (state.isProcessing) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
-            Text(state.message),
+            Builder(builder: (ctx) => Text(
+              state.processingMessage != null
+                  ? resolveBlocMessage(ctx, state.processingMessage!)
+                  : '...',
+            )),
           ],
         ),
       );
@@ -155,7 +160,7 @@ class _TransferPageState extends State<TransferPage> {
     List<TokenInfo> tokens = [];
     Map<String, String> balances = {};
 
-    if (state is WalletInfoLoaded) {
+    if (state.status == TransferBlocStatus.walletLoaded) {
       tokens = state.tokens;
       balances = state.balances;
 

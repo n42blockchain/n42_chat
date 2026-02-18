@@ -9228,6 +9228,318 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'我的动态'**
   String get storyMyStory;
+
+  /// No description provided for @storageSmartCleanup.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能清理'**
+  String get storageSmartCleanup;
+
+  /// No description provided for @storageOldMediaFiles.
+  ///
+  /// In zh, this message translates to:
+  /// **'旧媒体文件'**
+  String get storageOldMediaFiles;
+
+  /// No description provided for @storageLargeFiles.
+  ///
+  /// In zh, this message translates to:
+  /// **'大文件'**
+  String get storageLargeFiles;
+
+  /// No description provided for @storageAppCache.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用缓存'**
+  String get storageAppCache;
+
+  /// No description provided for @storageSettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'存储设置'**
+  String get storageSettings;
+
+  /// No description provided for @storageAutoCleanup.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动清理'**
+  String get storageAutoCleanup;
+
+  /// No description provided for @storageAutoCleanupDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动清理 {days} 天以上未访问的文件'**
+  String storageAutoCleanupDesc(int days);
+
+  /// No description provided for @storageCleanupPeriod.
+  ///
+  /// In zh, this message translates to:
+  /// **'清理周期'**
+  String get storageCleanupPeriod;
+
+  /// No description provided for @storagePreserveThumbnails.
+  ///
+  /// In zh, this message translates to:
+  /// **'保留缩略图'**
+  String get storagePreserveThumbnails;
+
+  /// No description provided for @storagePreserveThumbnailsDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'清理时保留图片缩略图'**
+  String get storagePreserveThumbnailsDesc;
+
+  /// No description provided for @storageWarningHigh.
+  ///
+  /// In zh, this message translates to:
+  /// **'存储空间较高，建议清理旧文件。'**
+  String get storageWarningHigh;
+
+  /// No description provided for @storageWarningCritical.
+  ///
+  /// In zh, this message translates to:
+  /// **'存储空间严重不足，请立即清理。'**
+  String get storageWarningCritical;
+
+  /// No description provided for @storageFreed.
+  ///
+  /// In zh, this message translates to:
+  /// **'已释放 {size}（{count} 个文件）'**
+  String storageFreed(String size, int count);
+
+  /// No description provided for @storageDays.
+  ///
+  /// In zh, this message translates to:
+  /// **'{days} 天'**
+  String storageDays(int days);
+
+  /// No description provided for @storageViewAllRooms.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看全部 {count} 个房间'**
+  String storageViewAllRooms(int count);
+
+  /// No description provided for @storageNoFiles.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无文件'**
+  String get storageNoFiles;
+
+  /// No description provided for @storageFilePinned.
+  ///
+  /// In zh, this message translates to:
+  /// **'已保留'**
+  String get storageFilePinned;
+
+  /// No description provided for @storageDeleteSelected.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除 {count} 个选中文件？文件可从服务器重新下载。'**
+  String storageDeleteSelected(int count);
+
+  /// No description provided for @backupRestore.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份与恢复'**
+  String get backupRestore;
+
+  /// No description provided for @backupCreate.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建备份'**
+  String get backupCreate;
+
+  /// No description provided for @backupCreateDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份设置和加密密钥。消息将在重新登录后从服务器恢复。'**
+  String get backupCreateDesc;
+
+  /// No description provided for @backupIncludeKeys.
+  ///
+  /// In zh, this message translates to:
+  /// **'包含加密密钥'**
+  String get backupIncludeKeys;
+
+  /// No description provided for @backupIncludeKeysDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'读取加密消息所必需'**
+  String get backupIncludeKeysDesc;
+
+  /// No description provided for @backupPasswordProtect.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码保护'**
+  String get backupPasswordProtect;
+
+  /// No description provided for @backupEnterPassword.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入备份密码'**
+  String get backupEnterPassword;
+
+  /// No description provided for @backupHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份历史'**
+  String get backupHistory;
+
+  /// No description provided for @backupNoBackups.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无备份'**
+  String get backupNoBackups;
+
+  /// No description provided for @backupRestore2.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复'**
+  String get backupRestore2;
+
+  /// No description provided for @backupDelete.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get backupDelete;
+
+  /// No description provided for @backupDeleteConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定删除此备份？此操作不可撤销。'**
+  String get backupDeleteConfirm;
+
+  /// No description provided for @backupRestoreFromFile.
+  ///
+  /// In zh, this message translates to:
+  /// **'从文件恢复'**
+  String get backupRestoreFromFile;
+
+  /// No description provided for @backupRestoreFromFileDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入来自其他设备或之前备份的 .n42backup 文件。'**
+  String get backupRestoreFromFileDesc;
+
+  /// No description provided for @backupChooseFile.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择备份文件'**
+  String get backupChooseFile;
+
+  /// No description provided for @backupRestoring.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复中...'**
+  String get backupRestoring;
+
+  /// No description provided for @backupCreated.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份已创建：{rooms} 个房间，{messages} 条消息'**
+  String backupCreated(int rooms, int messages);
+
+  /// No description provided for @backupRestored.
+  ///
+  /// In zh, this message translates to:
+  /// **'已恢复 {settings} 项设置（来自 {rooms} 个房间）'**
+  String backupRestored(int settings, int rooms);
+
+  /// No description provided for @backupFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份失败：{error}'**
+  String backupFailed(String error);
+
+  /// No description provided for @backupPasswordRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'此备份需要密码'**
+  String get backupPasswordRequired;
+
+  /// No description provided for @blocGroupNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'群组未找到'**
+  String get blocGroupNotFound;
+
+  /// No description provided for @blocGroupMembersInvited.
+  ///
+  /// In zh, this message translates to:
+  /// **'已邀请{count}位成员'**
+  String blocGroupMembersInvited(int count);
+
+  /// No description provided for @blocGroupMemberRemoved.
+  ///
+  /// In zh, this message translates to:
+  /// **'成员已移除'**
+  String get blocGroupMemberRemoved;
+
+  /// No description provided for @blocGroupAdminRemoved.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消管理员'**
+  String get blocGroupAdminRemoved;
+
+  /// No description provided for @blocGroupLeft.
+  ///
+  /// In zh, this message translates to:
+  /// **'已退出群聊'**
+  String get blocGroupLeft;
+
+  /// No description provided for @blocGroupDisbanded.
+  ///
+  /// In zh, this message translates to:
+  /// **'群聊已解散'**
+  String get blocGroupDisbanded;
+
+  /// No description provided for @blocGroupJoined.
+  ///
+  /// In zh, this message translates to:
+  /// **'已加入群聊'**
+  String get blocGroupJoined;
+
+  /// No description provided for @blocGroupInviteDeclined.
+  ///
+  /// In zh, this message translates to:
+  /// **'已拒绝邀请'**
+  String get blocGroupInviteDeclined;
+
+  /// No description provided for @blocGroupTokenGateUpdated.
+  ///
+  /// In zh, this message translates to:
+  /// **'Token 门槛已更新'**
+  String get blocGroupTokenGateUpdated;
+
+  /// No description provided for @blocTransferProcessing.
+  ///
+  /// In zh, this message translates to:
+  /// **'转账处理中...'**
+  String get blocTransferProcessing;
+
+  /// No description provided for @blocTransferCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'转账已取消'**
+  String get blocTransferCancelled;
+
+  /// No description provided for @blocTransferFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'转账失败'**
+  String get blocTransferFailed;
+
+  /// No description provided for @blocPaymentProcessing.
+  ///
+  /// In zh, this message translates to:
+  /// **'支付处理中...'**
+  String get blocPaymentProcessing;
+
+  /// No description provided for @blocPaymentFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'支付失败'**
+  String get blocPaymentFailed;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
