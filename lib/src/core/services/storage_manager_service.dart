@@ -234,7 +234,9 @@ class StorageManagerService {
           if (categoryExts.contains(ext)) {
             try {
               await entity.delete();
-            } catch (_) {}
+            } catch (e) {
+              debugPrint('StorageManagerService: Failed to delete file: $e');
+            }
           }
         }
       }
@@ -264,7 +266,9 @@ class StorageManagerService {
           if (stat.modified.isBefore(date)) {
             try {
               await entity.delete();
-            } catch (_) {}
+            } catch (e) {
+              debugPrint('StorageManagerService: Failed to delete file: $e');
+            }
           }
         }
       }
