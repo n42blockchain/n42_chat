@@ -3362,17 +3362,25 @@ Avatar: ${contactAvatar ?? ''}''';
               _shouldShowTimeSeparator(message, previousMessage)
             );
 
-            // 检查消息是否被撤回
-            if (_recalledMessageIds.contains(message.id)) {
+            // 检查消息是否被撤回：
+            // 1. BLoC state 中已是 redacted 类型（服务端确认或乐观更新）
+            // 2. 本会话中通过长按菜单撤回的消息（_recalledMessageIds 追踪）
+            // 两个条件满足任意一个即显示"已撤回"提示；
+            // 长按菜单撤回的消息（最后一条）额外显示"重新编辑"按钮。
+            final isRecalled = message.type == MessageType.redacted ||
+                _recalledMessageIds.contains(message.id);
+            if (isRecalled) {
+              // 仅对本会话内通过长按菜单撤回的最后一条消息提供"重新编辑"
+              final canReEdit = message.isFromMe &&
+                  _recalledMessageIds.contains(message.id) &&
+                  _lastRecalledContent != null;
               return Column(
                 children: [
                   if (showTimeSeparator)
                     TimeSeparator(dateTime: message.timestamp),
                   RecalledMessageWidget(
                     isFromMe: message.isFromMe,
-                    onReEdit: message.isFromMe && _lastRecalledContent != null
-                        ? () => _onReEditRecalledMessage()
-                        : null,
+                    onReEdit: canReEdit ? () => _onReEditRecalledMessage() : null,
                   ),
                 ],
               );
