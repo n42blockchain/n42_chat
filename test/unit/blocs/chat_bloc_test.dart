@@ -488,7 +488,7 @@ void main() {
   // =========================================================================
 
   group('RedactMessage', () {
-    test('removes message from list on success', () async {
+    test('optimistically marks message as redacted on success', () async {
       when(() => mockRepository.redactMessage(any(), any(), reason: any(named: 'reason')))
           .thenAnswer((_) async => true);
 
@@ -498,8 +498,12 @@ void main() {
       bloc.add(const RedactMessage('\$event1'));
       await Future<void>.delayed(const Duration(milliseconds: 200));
 
-      expect(bloc.state.messages.length, initialCount - 1);
-      expect(bloc.state.messages.any((m) => m.id == '\$event1'), false);
+      // 乐观更新：消息保留在列表中，type 改为 redacted（不删除）
+      expect(bloc.state.messages.length, initialCount);
+      expect(
+        bloc.state.messages.any((m) => m.id == '\$event1' && m.type == MessageType.redacted),
+        isTrue,
+      );
 
       await bloc.close();
     });
