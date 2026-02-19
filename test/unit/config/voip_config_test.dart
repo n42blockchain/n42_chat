@@ -337,8 +337,11 @@ void main() {
 
   group('VoIPConfig singleton', () {
     setUp(() {
-      // Reset singleton state before each test
+      // reset() only clears TURN/LiveKit credentials. Restore all mutable
+      // fields explicitly so tests are order-independent.
       VoIPConfig().reset();
+      VoIPConfig().setAudioProcessing(const AudioProcessingConfig());
+      VoIPConfig().setBackgroundProcessing(const BackgroundProcessingConfig());
     });
 
     test('same instance returned by factory', () {
@@ -384,6 +387,21 @@ void main() {
     test('updateFromTurnResponse updates ttl when provided', () {
       VoIPConfig().updateFromTurnResponse({'uris': ['turn:x.com'], 'ttl': 3600});
       expect(VoIPConfig().turnTtl, 3600);
+    });
+
+    test('updateFromTurnResponse with empty uris list leaves hasTurnConfig false', () {
+      VoIPConfig().updateFromTurnResponse({'uris': <String>[], 'username': 'u', 'password': 'p'});
+      expect(VoIPConfig().hasTurnConfig, isFalse);
+    });
+
+    test('updateFromTurnResponse without username leaves turnUsername null', () {
+      VoIPConfig().updateFromTurnResponse({'uris': ['turn:x.com']});
+      expect(VoIPConfig().turnUsername, isNull);
+    });
+
+    test('updateFromTurnResponse with ttl=0 stores zero', () {
+      VoIPConfig().updateFromTurnResponse({'uris': ['turn:x.com'], 'ttl': 0});
+      expect(VoIPConfig().turnTtl, 0);
     });
 
     test('getIceServers includes TURN server when configured', () {
@@ -452,6 +470,23 @@ void main() {
     test('backgroundProcessing getter returns config with current mode', () {
       final bp = VoIPConfig().backgroundProcessing;
       expect(bp.mode, BackgroundMode.none);
+    });
+
+    test('setBackgroundProcessing updates backgroundMode', () {
+      VoIPConfig().setBackgroundProcessing(BackgroundProcessingConfig.lightBlur);
+      expect(VoIPConfig().backgroundMode, BackgroundMode.blur);
+    });
+
+    test('setUp restores audio defaults between tests (order-independence check)', () {
+      // Verify setUp correctly restores audio flags mutated by setAudioProcessing.
+      // If setUp were incomplete, this test would fail when run after
+      // "setAudioProcessing updates fields".
+      expect(VoIPConfig().enableNoiseSuppression, isTrue);
+      expect(VoIPConfig().enableEnhancedAudioMode, isFalse);
+    });
+
+    test('setUp restores background defaults between tests (order-independence check)', () {
+      expect(VoIPConfig().backgroundMode, BackgroundMode.none);
     });
   });
 }

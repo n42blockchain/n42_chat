@@ -18,6 +18,12 @@ void main() {
       expect(config.defaultHomeserver, isNotEmpty);
     });
 
+    test('defaultHomeserver uses HTTPS scheme', () {
+      // Regression guard: an accidental http:// default would silently send
+      // login credentials over an unencrypted transport.
+      expect(config.defaultHomeserver, startsWith('https://'));
+    });
+
     test('enableEncryption defaults to true', () {
       expect(config.enableEncryption, isTrue);
     });

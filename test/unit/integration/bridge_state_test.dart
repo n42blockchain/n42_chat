@@ -347,8 +347,26 @@ void main() {
       expect(BridgeBotCommand.loginToken('abc123').toMessage(), 'login-token abc123');
     });
 
+    test('loginToken with spaces in token embeds them verbatim (injection risk)', () {
+      // toMessage() joins arguments with a plain space. A token containing
+      // spaces produces a message that bridge bots may parse as multiple
+      // commands. This test documents the current behavior; callers must
+      // validate that tokens contain no whitespace before passing them here.
+      final msg = BridgeBotCommand.loginToken('abc logout').toMessage();
+      expect(msg, 'login-token abc logout');
+    });
+
+    test('loginToken with empty string produces trailing space', () {
+      expect(BridgeBotCommand.loginToken('').toMessage(), 'login-token ');
+    });
+
     test('bridgeRoom produces "bridge <remoteId>"', () {
       expect(BridgeBotCommand.bridgeRoom('chat123').toMessage(), 'bridge chat123');
+    });
+
+    test('bridgeRoom with spaces in remoteId embeds them verbatim', () {
+      // Same verbatim-embedding behavior as loginToken; document it here.
+      expect(BridgeBotCommand.bridgeRoom('chat 123').toMessage(), 'bridge chat 123');
     });
 
     test('unbridgeRoom produces "unbridge"', () {
