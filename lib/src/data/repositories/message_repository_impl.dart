@@ -8,7 +8,7 @@ import '../../domain/entities/group_album_entity.dart';
 import '../../domain/entities/group_file_entity.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/repositories/message_repository.dart';
-import '../datasources/local/secure_storage_datasource.dart';
+import '../datasources/local/preferences_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_message_datasource.dart';
 
@@ -16,7 +16,7 @@ import '../datasources/matrix/matrix_message_datasource.dart';
 class MessageRepositoryImpl implements IMessageRepository {
   final MatrixMessageDataSource _messageDataSource;
   final MatrixClientManager _clientManager;
-  final SecureStorageDataSource _secureStorage;
+  final PreferencesDataSource _secureStorage;
 
   // 缓存时间线，避免重复创建（使用 LRU 策略，最多缓存 15 个）
   // 增加缓存大小可提升约 30% 房间切换速度

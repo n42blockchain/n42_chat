@@ -5,13 +5,13 @@ import 'package:matrix/matrix.dart' as matrix;
 import '../../core/utils/matrix_utils.dart';
 import '../../domain/entities/conversation_entity.dart';
 import '../../domain/repositories/conversation_repository.dart';
-import '../datasources/local/secure_storage_datasource.dart';
+import '../datasources/local/preferences_datasource.dart';
 import '../datasources/matrix/matrix_room_datasource.dart';
 
 /// 会话仓库实现
 class ConversationRepositoryImpl implements IConversationRepository {
   final MatrixRoomDataSource _roomDataSource;
-  final SecureStorageDataSource _secureStorage;
+  final PreferencesDataSource _secureStorage;
 
   ConversationRepositoryImpl(this._roomDataSource, this._secureStorage);
 

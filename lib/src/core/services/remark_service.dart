@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../../data/datasources/local/secure_storage_datasource.dart';
+import '../../data/datasources/local/preferences_datasource.dart';
 import '../di/injection.dart';
 
 /// 全局备注名服务
@@ -36,7 +36,7 @@ class RemarkService {
     if (_initialized) return;
     
     try {
-      final storage = getIt<SecureStorageDataSource>();
+      final storage = getIt<PreferencesDataSource>();
       final remarks = await storage.getContactRemarks();
       _remarkCache.clear();
       _remarkCache.addAll(remarks);
@@ -68,7 +68,7 @@ class RemarkService {
   /// 设置用户的备注名
   Future<void> setRemark(String userId, String? remark) async {
     try {
-      final storage = getIt<SecureStorageDataSource>();
+      final storage = getIt<PreferencesDataSource>();
       await storage.setContactRemark(userId, remark);
       
       if (remark == null || remark.isEmpty) {

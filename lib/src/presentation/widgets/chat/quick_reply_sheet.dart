@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/quick_reply_entity.dart';
 
 /// 快捷回复选择弹窗
@@ -15,7 +15,7 @@ class QuickReplySheet extends StatefulWidget {
   final VoidCallback? onManage;
 
   /// 安全存储数据源
-  final SecureStorageDataSource storageDataSource;
+  final PreferencesDataSource storageDataSource;
 
   const QuickReplySheet({
     super.key,
@@ -234,7 +234,7 @@ Future<void> showQuickReplySheet({
   required BuildContext context,
   required void Function(String content) onSelect,
   VoidCallback? onManage,
-  required SecureStorageDataSource storageDataSource,
+  required PreferencesDataSource storageDataSource,
 }) {
   return showModalBottomSheet<void>(
     context: context,

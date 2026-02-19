@@ -4,7 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-import '../../data/datasources/local/secure_storage_datasource.dart';
+import '../../data/datasources/local/preferences_datasource.dart';
 
 /// 翻译服务接口
 abstract class ITranslationService {
@@ -78,11 +78,11 @@ class TranslationLanguage {
 /// Google 翻译服务实现
 class GoogleTranslationService implements ITranslationService {
   final String? apiKey;
-  final SecureStorageDataSource _storageDataSource;
+  final PreferencesDataSource _storageDataSource;
 
   GoogleTranslationService({
     this.apiKey,
-    required SecureStorageDataSource storageDataSource,
+    required PreferencesDataSource storageDataSource,
   }) : _storageDataSource = storageDataSource;
 
   static const String _baseUrl =

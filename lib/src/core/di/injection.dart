@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import '../services/giphy_service.dart';
 import '../services/remark_service.dart';
 import '../services/translation_service.dart';
+import '../../data/datasources/local/preferences_datasource.dart';
 import '../../data/datasources/local/secure_storage_datasource.dart';
 import '../../data/datasources/matrix/matrix_auth_datasource.dart';
 import '../../data/datasources/matrix/matrix_client_manager.dart';
@@ -180,7 +181,7 @@ Future<void> _registerServices() async {
   getIt.registerLazySingleton<ITranslationService>(
     () => GoogleTranslationService(
       apiKey: config.googleTranslateApiKey,
-      storageDataSource: getIt<SecureStorageDataSource>(),
+      storageDataSource: getIt<PreferencesDataSource>(),
     ),
   );
 
@@ -275,9 +276,14 @@ Future<void> _registerServices() async {
 
 /// 注册数据源
 Future<void> _registerDataSources() async {
-  // 安全存储
+  // 安全存储（仅敏感数据：会话、凭据、多账号、生物识别）
   getIt.registerLazySingleton<SecureStorageDataSource>(
     () => SecureStorageDataSource(),
+  );
+
+  // 偏好设置存储（非敏感数据：外观、备注、草稿等）
+  getIt.registerLazySingleton<PreferencesDataSource>(
+    () => PreferencesDataSource(),
   );
 
   // Matrix认证数据源
@@ -352,7 +358,7 @@ void _registerRepositories() {
   getIt.registerLazySingleton<IConversationRepository>(
     () => ConversationRepositoryImpl(
       getIt<MatrixRoomDataSource>(),
-      getIt<SecureStorageDataSource>(),
+      getIt<PreferencesDataSource>(),
     ),
   );
 
@@ -361,7 +367,7 @@ void _registerRepositories() {
     () => MessageRepositoryImpl(
       getIt<MatrixMessageDataSource>(),
       getIt<MatrixClientManager>(),
-      getIt<SecureStorageDataSource>(),
+      getIt<PreferencesDataSource>(),
     ),
   );
 
@@ -369,7 +375,7 @@ void _registerRepositories() {
   getIt.registerLazySingleton<IContactRepository>(
     () => ContactRepositoryImpl(
       getIt<MatrixContactDataSource>(),
-      getIt<SecureStorageDataSource>(),
+      getIt<PreferencesDataSource>(),
       getIt<MatrixMomentDataSource>(),
     ),
   );
@@ -407,7 +413,7 @@ void _registerRepositories() {
     () => MessageActionRepositoryImpl(
       getIt<MatrixReactionDataSource>(),
       getIt<MatrixClientManager>(),
-      getIt<SecureStorageDataSource>(),
+      getIt<PreferencesDataSource>(),
     ),
   );
 
@@ -415,7 +421,7 @@ void _registerRepositories() {
   getIt.registerLazySingleton<IMomentRepository>(
     () => MomentRepositoryImpl(
       getIt<MatrixMomentDataSource>(),
-      getIt<SecureStorageDataSource>(),
+      getIt<PreferencesDataSource>(),
     ),
   );
 
@@ -430,7 +436,7 @@ void _registerRepositories() {
   getIt.registerLazySingleton<IStoryRepository>(
     () => StoryRepositoryImpl(
       getIt<MatrixStoryDataSource>(),
-      getIt<SecureStorageDataSource>(),
+      getIt<PreferencesDataSource>(),
     ),
   );
 
@@ -446,7 +452,7 @@ void _registerRepositories() {
     getIt.registerLazySingleton<IAiRepository>(
       () => AiRepositoryImpl(
         aiService: getIt<AiService>(),
-        storage: getIt<SecureStorageDataSource>(),
+        storage: getIt<PreferencesDataSource>(),
       ),
     );
   }
@@ -468,7 +474,7 @@ void _registerBlocs() {
   getIt.registerFactory<ConversationBloc>(
     () => ConversationBloc(
       conversationRepository: getIt<IConversationRepository>(),
-      storageDataSource: getIt<SecureStorageDataSource>(),
+      storageDataSource: getIt<PreferencesDataSource>(),
     ),
   );
 
@@ -476,7 +482,7 @@ void _registerBlocs() {
   getIt.registerFactory<ChatBloc>(
     () => ChatBloc(
       messageRepository: getIt<IMessageRepository>(),
-      secureStorage: getIt<SecureStorageDataSource>(),
+      secureStorage: getIt<PreferencesDataSource>(),
       groupRepository: getIt<IGroupRepository>(),
       translationService: getIt<ITranslationService>(),
       clientManager: getIt<MatrixClientManager>(),
@@ -560,7 +566,7 @@ void _registerBlocs() {
   // 聊天文件夹 BLoC
   getIt.registerFactory<ChatFolderBloc>(
     () => ChatFolderBloc(
-      storage: getIt<SecureStorageDataSource>(),
+      storage: getIt<PreferencesDataSource>(),
     ),
   );
 }

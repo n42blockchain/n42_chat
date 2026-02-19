@@ -5,14 +5,14 @@ import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/contact_entity.dart';
 import '../../domain/repositories/contact_repository.dart';
-import '../datasources/local/secure_storage_datasource.dart';
+import '../datasources/local/preferences_datasource.dart';
 import '../datasources/matrix/matrix_contact_datasource.dart';
 import '../datasources/matrix/matrix_moment_datasource.dart';
 
 /// 联系人仓库实现
 class ContactRepositoryImpl implements IContactRepository {
   final MatrixContactDataSource _contactDataSource;
-  final SecureStorageDataSource _storageDataSource;
+  final PreferencesDataSource _storageDataSource;
   final MatrixMomentDataSource _momentDataSource;
 
   /// 备注缓存

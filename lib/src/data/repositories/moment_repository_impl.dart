@@ -3,13 +3,13 @@ import 'dart:typed_data';
 
 import '../../domain/entities/moment_entity.dart';
 import '../../domain/repositories/moment_repository.dart';
-import '../datasources/local/secure_storage_datasource.dart';
+import '../datasources/local/preferences_datasource.dart';
 import '../datasources/matrix/matrix_moment_datasource.dart';
 
 /// 动态仓库实现
 class MomentRepositoryImpl implements IMomentRepository {
   final MatrixMomentDataSource _momentDataSource;
-  final SecureStorageDataSource _storageDataSource;
+  final PreferencesDataSource _storageDataSource;
 
   /// 动态缓存
   final List<MomentEntity> _momentsCache = [];

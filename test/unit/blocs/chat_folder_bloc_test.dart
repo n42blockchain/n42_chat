@@ -1,13 +1,13 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.dart';
+import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/domain/entities/chat_folder_entity.dart';
 import 'package:n42_chat/src/presentation/blocs/chat_folder/chat_folder_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/chat_folder/chat_folder_event.dart';
 import 'package:n42_chat/src/presentation/blocs/chat_folder/chat_folder_state.dart';
 
-class MockSecureStorage extends Mock implements SecureStorageDataSource {}
+class MockSecureStorage extends Mock implements PreferencesDataSource {}
 
 void main() {
   late MockSecureStorage mockStorage;
