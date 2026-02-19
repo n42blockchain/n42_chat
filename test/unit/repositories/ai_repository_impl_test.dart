@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/services/ai_service.dart';
-import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.dart';
+import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/data/repositories/ai_repository_impl.dart';
 import 'package:n42_chat/src/domain/entities/ai_assistant_entity.dart';
 
 class MockAiService extends Mock implements AiService {}
 
-class MockSecureStorage extends Mock implements SecureStorageDataSource {}
+class MockSecureStorage extends Mock implements PreferencesDataSource {}
 
 void main() {
   late AiRepositoryImpl repository;

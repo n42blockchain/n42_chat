@@ -4,16 +4,16 @@ import 'package:flutter/foundation.dart';
 
 import '../../domain/entities/story_entity.dart';
 import '../../domain/repositories/story_repository.dart';
-import '../datasources/local/secure_storage_datasource.dart';
+import '../datasources/local/preferences_datasource.dart';
 import '../datasources/matrix/matrix_story_datasource.dart';
 
 /// Story 仓库实现
 ///
 /// 使用 MatrixStoryDataSource 进行网络操作，
-/// 使用 SecureStorageDataSource 追踪本地已查看的 Story
+/// 使用 PreferencesDataSource 追踪本地已查看的 Story
 class StoryRepositoryImpl implements IStoryRepository {
   final MatrixStoryDataSource _storyDataSource;
-  final SecureStorageDataSource _storageDataSource;
+  final PreferencesDataSource _storageDataSource;
 
   /// 本地已查看 Story ID 存储键
   static const String _viewedStoriesKey = 'n42_viewed_stories';

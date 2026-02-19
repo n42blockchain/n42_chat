@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/message_reaction_entity.dart';
 import '../../domain/repositories/message_action_repository.dart';
-import '../datasources/local/secure_storage_datasource.dart';
+import '../datasources/local/preferences_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_reaction_datasource.dart';
 
@@ -13,7 +13,7 @@ import '../datasources/matrix/matrix_reaction_datasource.dart';
 class MessageActionRepositoryImpl implements IMessageActionRepository {
   final MatrixReactionDataSource _reactionDataSource;
   final MatrixClientManager _clientManager;
-  final SecureStorageDataSource _storage;
+  final PreferencesDataSource _storage;
 
   // 内存缓存
   List<MessageEntity>? _cachedSavedMessages;

@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../../core/services/ai_service.dart';
 import '../../domain/entities/ai_assistant_entity.dart';
 import '../../domain/repositories/ai_repository.dart';
-import '../datasources/local/secure_storage_datasource.dart';
+import '../datasources/local/preferences_datasource.dart';
 
 /// AI 仓库实现
 class AiRepositoryImpl implements IAiRepository {
@@ -13,11 +13,11 @@ class AiRepositoryImpl implements IAiRepository {
   static const String _keyChatHistoryPrefix = 'n42_chat_ai_history_';
 
   final AiService _aiService;
-  final SecureStorageDataSource _storage;
+  final PreferencesDataSource _storage;
 
   AiRepositoryImpl({
     required AiService aiService,
-    required SecureStorageDataSource storage,
+    required PreferencesDataSource storage,
   })  : _aiService = aiService,
         _storage = storage;
 

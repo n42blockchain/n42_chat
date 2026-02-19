@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/quick_reply_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 快捷回复管理页面
 class QuickRepliesPage extends StatefulWidget {
-  final SecureStorageDataSource storageDataSource;
+  final PreferencesDataSource storageDataSource;
 
   const QuickRepliesPage({
     super.key,

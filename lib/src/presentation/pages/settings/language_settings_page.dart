@@ -4,7 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../n42_chat.dart';
 import '../../widgets/common/common_widgets.dart';
 
@@ -46,7 +46,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
   }
 
   Future<void> _loadCurrentLanguage() async {
-    final storage = getIt<SecureStorageDataSource>();
+    final storage = getIt<PreferencesDataSource>();
     final savedLanguage = await storage.getSetting(_languageSettingKey);
     if (savedLanguage != null && mounted) {
       setState(() {
@@ -63,7 +63,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
     });
 
     // 保存到本地存储
-    final storage = getIt<SecureStorageDataSource>();
+    final storage = getIt<PreferencesDataSource>();
     await storage.saveSetting(_languageSettingKey, locale.languageCode);
 
     // 更新 N42Chat 的语言设置

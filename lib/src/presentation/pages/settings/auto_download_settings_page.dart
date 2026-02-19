@@ -4,7 +4,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../data/datasources/local/preferences_datasource.dart';
 
 /// 自动下载设置页
 class AutoDownloadSettingsPage extends StatefulWidget {
@@ -15,7 +15,7 @@ class AutoDownloadSettingsPage extends StatefulWidget {
 }
 
 class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
-  final SecureStorageDataSource _storage = GetIt.instance<SecureStorageDataSource>();
+  final PreferencesDataSource _storage = GetIt.instance<PreferencesDataSource>();
 
   // WiFi 设置
   bool _wifiImages = true;

@@ -5,7 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_background_presets.dart';
-import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../data/datasources/local/preferences_datasource.dart';
 
 /// 聊天背景设置页
 class ChatBackgroundPage extends StatefulWidget {
@@ -18,7 +18,7 @@ class ChatBackgroundPage extends StatefulWidget {
 }
 
 class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
-  final SecureStorageDataSource _storage = GetIt.instance<SecureStorageDataSource>();
+  final PreferencesDataSource _storage = GetIt.instance<PreferencesDataSource>();
   String? _selectedBackground;
 
   @override
