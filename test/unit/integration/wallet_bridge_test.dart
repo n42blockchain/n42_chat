@@ -333,6 +333,16 @@ void main() {
       test('returns false for 43 chars (one too long)', () {
         expect(mock.isValidAddress('0x${'a' * 41}'), isFalse);
       });
+
+      test('non-hex chars with correct length are accepted by mock (known gap)', () {
+        // MockWalletBridge only checks prefix and length — it does NOT verify
+        // that characters 2-41 are valid hexadecimal digits.
+        // '0x' + 40 'Z' chars (Z is not valid hex) → mock returns true.
+        // Production IWalletBridge implementations MUST add hex-char validation.
+        const nonHex = '0xZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ';
+        expect(nonHex.length, 42);
+        expect(mock.isValidAddress(nonHex), isTrue); // mock limitation
+      });
     });
   });
 }
