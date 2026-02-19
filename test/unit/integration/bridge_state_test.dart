@@ -29,28 +29,15 @@ void main() {
   // ─────────────────────────────────────────────────
 
   group('BridgeConnectionStatus enum', () {
-    test('has notAvailable value', () {
-      expect(BridgeConnectionStatus.notAvailable, isA<BridgeConnectionStatus>());
-    });
-
-    test('has disconnected value', () {
-      expect(BridgeConnectionStatus.disconnected, isA<BridgeConnectionStatus>());
-    });
-
-    test('has connecting value', () {
-      expect(BridgeConnectionStatus.connecting, isA<BridgeConnectionStatus>());
-    });
-
-    test('has connected value', () {
-      expect(BridgeConnectionStatus.connected, isA<BridgeConnectionStatus>());
-    });
-
-    test('has error value', () {
-      expect(BridgeConnectionStatus.error, isA<BridgeConnectionStatus>());
-    });
-
-    test('has reconnecting value', () {
-      expect(BridgeConnectionStatus.reconnecting, isA<BridgeConnectionStatus>());
+    test('contains all six expected values', () {
+      expect(BridgeConnectionStatus.values, containsAll([
+        BridgeConnectionStatus.notAvailable,
+        BridgeConnectionStatus.disconnected,
+        BridgeConnectionStatus.connecting,
+        BridgeConnectionStatus.connected,
+        BridgeConnectionStatus.error,
+        BridgeConnectionStatus.reconnecting,
+      ]));
     });
 
     test('six values total', () {
@@ -118,6 +105,14 @@ void main() {
     test('false when status is error', () {
       expect(_state(BridgeConnectionStatus.error).isConnected, isFalse);
     });
+
+    test('false when status is reconnecting', () {
+      expect(_state(BridgeConnectionStatus.reconnecting).isConnected, isFalse);
+    });
+
+    test('false when status is notAvailable', () {
+      expect(_state(BridgeConnectionStatus.notAvailable).isConnected, isFalse);
+    });
   });
 
   group('BridgeState.isLoading', () {
@@ -181,6 +176,20 @@ void main() {
     test('false when connecting', () {
       expect(
         _state(BridgeConnectionStatus.connecting, isAvailable: true).canLogin,
+        isFalse,
+      );
+    });
+
+    test('false when error (cannot start new login during error state)', () {
+      expect(
+        _state(BridgeConnectionStatus.error, isAvailable: true).canLogin,
+        isFalse,
+      );
+    });
+
+    test('false when notAvailable', () {
+      expect(
+        _state(BridgeConnectionStatus.notAvailable, isAvailable: false).canLogin,
         isFalse,
       );
     });

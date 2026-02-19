@@ -96,8 +96,11 @@ void main() {
   // PaymentRequest
   // ─────────────────────────────────────────────────
 
+  // Fixed test date — avoids wall-clock dependency in all PaymentRequest tests.
+  final _created = DateTime.utc(2024, 1, 1);
+
   group('PaymentRequest constructor', () {
-    final created = DateTime.utc(2024, 1, 1);
+    final created = _created;
 
     test('stores required fields', () {
       final r = PaymentRequest(
@@ -120,7 +123,7 @@ void main() {
       final r = PaymentRequest(
         requestId: 'r', amount: '1', token: 'ETH',
         receiverAddress: '0x', qrCodeData: 'qr',
-        createdAt: DateTime.now(),
+        createdAt: _created,
       );
       expect(r.memo, isNull);
     });
@@ -129,7 +132,7 @@ void main() {
       final r = PaymentRequest(
         requestId: 'r', amount: '1', token: 'ETH',
         receiverAddress: '0x', qrCodeData: 'qr',
-        createdAt: DateTime.now(),
+        createdAt: _created,
       );
       expect(r.expiresAt, isNull);
     });
@@ -140,17 +143,17 @@ void main() {
       final r = PaymentRequest(
         requestId: 'r', amount: '1', token: 'ETH',
         receiverAddress: '0x', qrCodeData: 'qr',
-        createdAt: DateTime.now(),
+        createdAt: _created,
       );
       expect(r.isExpired, isFalse);
     });
 
-    test('returns false when expiresAt is in the future', () {
+    test('returns false when expiresAt is far in the future', () {
       final r = PaymentRequest(
         requestId: 'r', amount: '1', token: 'ETH',
         receiverAddress: '0x', qrCodeData: 'qr',
-        createdAt: DateTime.now(),
-        expiresAt: DateTime.now().add(const Duration(hours: 1)),
+        createdAt: _created,
+        expiresAt: DateTime.utc(2100, 1, 1), // deterministic far-future
       );
       expect(r.isExpired, isFalse);
     });
@@ -159,8 +162,8 @@ void main() {
       final r = PaymentRequest(
         requestId: 'r', amount: '1', token: 'ETH',
         receiverAddress: '0x', qrCodeData: 'qr',
-        createdAt: DateTime.now(),
-        expiresAt: DateTime.now().subtract(const Duration(seconds: 1)),
+        createdAt: _created,
+        expiresAt: DateTime.utc(2000, 1, 1), // deterministic past date
       );
       expect(r.isExpired, isTrue);
     });
@@ -171,7 +174,7 @@ void main() {
       final r = PaymentRequest(
         requestId: 'r', amount: '2.5', token: 'USDT',
         receiverAddress: '0x', qrCodeData: 'qr',
-        createdAt: DateTime.now(),
+        createdAt: _created,
       );
       expect(r.formattedAmount, '2.5 USDT');
     });
@@ -180,7 +183,7 @@ void main() {
       final r = PaymentRequest(
         requestId: 'r', amount: '1', token: 'ETH',
         receiverAddress: '0x', qrCodeData: 'qr',
-        createdAt: DateTime.now(),
+        createdAt: _created,
       );
       expect(r.formattedAmount, '1 ETH');
     });
@@ -284,6 +287,18 @@ void main() {
         username: 'Bob',
       );
       expect(u.displayName, 'Bob');
+    });
+
+    test('falls back to shortened address when username is empty string', () {
+      // username != null but username.isEmpty → should use address fallback
+      const u = WalletUserInfo(
+        address: '0xAbCdEf1234567890ABCD',
+        username: '',
+      );
+      final dn = u.displayName;
+      expect(dn, isNot(''));
+      // Should be the shortened address, not the empty username
+      expect(dn, contains('...'));
     });
   });
 
