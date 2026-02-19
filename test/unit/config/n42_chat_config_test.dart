@@ -178,6 +178,14 @@ void main() {
       base.copyWith(enableEncryption: false);
       expect(base.enableEncryption, isTrue);
     });
+
+    test('limitation: aiApiKey cannot be cleared to null via copyWith', () {
+      // copyWith uses `??` — passing null silently preserves the existing value.
+      // To clear a nullable field, reconstruct the config directly.
+      final withKey = base.copyWith(aiApiKey: 'key-123');
+      final attempt = withKey.copyWith(aiApiKey: null);
+      expect(attempt.aiApiKey, 'key-123'); // null was silently ignored
+    });
   });
 
   // ─────────────────────────────────────────────────
