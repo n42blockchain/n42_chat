@@ -45,21 +45,21 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
       ),
       body: BlocConsumer<GroupBloc, GroupState>(
         listener: (context, state) {
-          if (state is TokenGateVerified && state.result.passed) {
+          if (state.status == GroupStatus.tokenGateVerified && state.tokenGateResult!.passed) {
             Navigator.of(context).pop(true);
           }
         },
         builder: (context, state) {
-          if (state is GroupLoading) {
+          if (state.isLoading) {
             return _buildVerifying(s);
           }
 
-          if (state is TokenGateVerified) {
-            return _buildResult(state.result, s, isDark);
+          if (state.status == GroupStatus.tokenGateVerified) {
+            return _buildResult(state.tokenGateResult!, s, isDark);
           }
 
-          if (state is GroupError) {
-            return _buildError(state.message, s);
+          if (state.status == GroupStatus.error) {
+            return _buildError(state.errorMessage!, s);
           }
 
           return _buildVerifying(s);

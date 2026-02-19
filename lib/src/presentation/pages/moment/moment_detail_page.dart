@@ -7,7 +7,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
-import '../../blocs/contact/contact_state.dart';
 import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
@@ -51,7 +50,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
   Set<String> _getFriendIds() {
     try {
       final contactState = context.read<ContactBloc>().state;
-      if (contactState is ContactLoaded) {
+      if (contactState.isLoaded) {
         return contactState.contacts.map((c) => c.userId).toSet();
       }
     } catch (e) {

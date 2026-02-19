@@ -172,7 +172,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
           // 当联系人备注更新时，刷新界面显示备注名
-          if (state is ContactRemarkUpdated || state is ContactLoaded) {
+          if (state.status == ContactStatus.remarkUpdated || state.status == ContactStatus.loaded) {
             if (mounted) setState(() {});
           }
         },

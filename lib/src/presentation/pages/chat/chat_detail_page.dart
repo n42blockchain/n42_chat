@@ -772,7 +772,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     if (hasContactBloc) {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state is ContactRemarkUpdated || state is ContactLoaded) {
+          if (state.status == ContactStatus.remarkUpdated || state.status == ContactStatus.loaded) {
             if (mounted) setState(() {});
           }
         },

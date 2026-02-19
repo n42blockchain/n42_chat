@@ -16,8 +16,8 @@ class AiAssistantEntity extends Equatable {
   /// 系统提示词
   final String systemPrompt;
 
-  /// 使用的模型名称
-  final String model;
+  /// 使用的模型名称（null 表示使用 AI 服务配置的默认模型）
+  final String? model;
 
   /// 上下文窗口大小（保留多少轮历史对话）
   final int contextWindow;
@@ -39,7 +39,7 @@ class AiAssistantEntity extends Equatable {
     required this.name,
     this.avatar,
     this.systemPrompt = 'You are a helpful AI assistant.',
-    this.model = 'gpt-4o-mini',
+    this.model,
     this.contextWindow = 20,
     this.temperature = 0.7,
     this.maxTokens = 2048,
@@ -56,7 +56,6 @@ class AiAssistantEntity extends Equatable {
         'You are N42 AI, a helpful assistant integrated into N42 Chat. '
         'You can answer questions, help with tasks, and have natural conversations. '
         'Be concise, helpful, and friendly. Respond in the same language as the user.',
-    model: 'gpt-4o-mini',
     contextWindow: 20,
     temperature: 0.7,
     maxTokens: 2048,
@@ -109,7 +108,7 @@ class AiAssistantEntity extends Equatable {
       name: json['name'] as String,
       avatar: json['avatar'] as String?,
       systemPrompt: json['systemPrompt'] as String? ?? 'You are a helpful AI assistant.',
-      model: json['model'] as String? ?? 'gpt-4o-mini',
+      model: json['model'] as String?,
       contextWindow: json['contextWindow'] as int? ?? 20,
       temperature: (json['temperature'] as num?)?.toDouble() ?? 0.7,
       maxTokens: json['maxTokens'] as int? ?? 2048,

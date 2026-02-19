@@ -69,7 +69,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   void _loadContact() {
     try {
       final contactState = context.read<ContactBloc>().state;
-      if (contactState is ContactLoaded) {
+      if (contactState.isLoaded) {
         final contact = contactState.contacts.where(
           (c) => c.userId == widget.userId
         ).firstOrNull;
@@ -289,9 +289,9 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     if (hasContactBloc) {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state is ContactRemarkUpdated && state.userId == widget.userId) {
+          if (state.status == ContactStatus.remarkUpdated && state.updatedRemarkUserId == widget.userId) {
             _loadContact();
-          } else if (state is ContactLoaded) {
+          } else if (state.status == ContactStatus.loaded) {
             _loadContact();
           }
         },
@@ -681,7 +681,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     // 备用：从 ContactBloc 获取
     try {
       final contactState = context.read<ContactBloc>().state;
-      if (contactState is ContactLoaded) {
+      if (contactState.isLoaded) {
         final contact = contactState.contacts.where(
           (c) => c.userId == widget.userId
         ).firstOrNull;
@@ -844,11 +844,11 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     if (hasContactBloc) {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state is ContactRemarkUpdated && state.userId == widget.userId) {
+          if (state.status == ContactStatus.remarkUpdated && state.updatedRemarkUserId == widget.userId) {
             setState(() {
-              _currentRemark = state.remark;
+              _currentRemark = state.updatedRemark;
             });
-          } else if (state is ContactLoaded) {
+          } else if (state.status == ContactStatus.loaded) {
             _loadRemark();
           }
         },

@@ -468,7 +468,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
 
       // 等待状态变化
       await for (final state in bloc.stream) {
-        if (state is ContactDeleted && state.userId == widget.userId) {
+        if (state.status == ContactStatus.deleted && state.deletedUserId == widget.userId) {
           // 删除成功
           if (mounted) {
             Navigator.of(context).pop(); // 关闭加载指示器
@@ -478,19 +478,19 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
             Navigator.of(context).pop(); // 关闭联系人详情页面
           }
           break;
-        } else if (state is ContactError) {
+        } else if (state.status == ContactStatus.error) {
           // 删除失败
           if (mounted) {
             Navigator.of(context).pop(); // 关闭加载指示器
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),
+                content: Text(state.errorMessage ?? ''),
                 backgroundColor: AppColors.error,
               ),
             );
           }
           break;
-        } else if (state is ContactLoaded) {
+        } else if (state.status == ContactStatus.loaded) {
           // 联系人列表已刷新，说明删除成功
           if (mounted) {
             Navigator.of(context).pop(); // 关闭加载指示器

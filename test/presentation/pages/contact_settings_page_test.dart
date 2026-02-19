@@ -9,7 +9,7 @@ import 'package:n42_chat/src/presentation/pages/contact/contact_settings_page.da
 
 class MockContactBloc extends Mock implements ContactBloc {
   @override
-  ContactState get state => const ContactInitial();
+  ContactState get state => const ContactState.initial();
 
   @override
   Stream<ContactState> get stream => const Stream.empty();
