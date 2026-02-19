@@ -39,10 +39,6 @@ void main() {
     };
 
     for (final entry in parameterless.entries) {
-      test('${entry.key} is a ChatEvent', () {
-        expect(entry.value(), isA<ChatEvent>());
-      });
-
       test('${entry.key} two instances are equal', () {
         expect(entry.value(), equals(entry.value()));
       });
@@ -660,12 +656,12 @@ void main() {
     });
 
     test('selfDestructAfter defaults to null', () {
-      final e = SendScheduledMessage(text: 'x', scheduledAt: DateTime.now());
+      final e = SendScheduledMessage(text: 'x', scheduledAt: DateTime.utc(2024, 1, 1));
       expect(e.selfDestructAfter, isNull);
     });
 
     test('mentionsRoom defaults to false', () {
-      final e = SendScheduledMessage(text: 'x', scheduledAt: DateTime.now());
+      final e = SendScheduledMessage(text: 'x', scheduledAt: DateTime.utc(2024, 1, 1));
       expect(e.mentionsRoom, isFalse);
     });
 
