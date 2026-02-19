@@ -110,26 +110,26 @@ class _ContactListPageState extends State<ContactListPage> {
           Expanded(
             child: BlocConsumer<ContactBloc, ContactState>(
               listener: (context, state) {
-                if (state is ChatStarted) {
+                if (state.status == ContactStatus.chatStarted) {
                   Navigator.of(context).pushNamed(
-                    '/chat/${state.roomId}',
+                    '/chat/${state.startedChatRoomId}',
                   );
-                } else if (state is ContactError) {
+                } else if (state.status == ContactStatus.error) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(state.message)),
+                    SnackBar(content: Text(state.errorMessage ?? '')),
                   );
                 }
               },
               builder: (context, state) {
-                if (state is ContactLoading) {
+                if (state.isLoading) {
                   return const N42Loading();
                 }
 
-                if (state is ContactError) {
+                if (state.status == ContactStatus.error) {
                   return N42EmptyState(
                     icon: Icons.error_outline,
                     title: S.of(context)?.commonLoadFailed ?? 'Load failed',
-                    description: state.message,
+                    description: state.errorMessage,
                     buttonText: S.of(context)?.commonRetry ?? 'Retry',
                     onButtonPressed: () {
                       context.read<ContactBloc>().add(const LoadContacts());
@@ -137,7 +137,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   );
                 }
 
-                if (state is ContactLoaded) {
+                if (state.isLoaded) {
                   return _buildContactList(state, isDark);
                 }
 
@@ -190,7 +190,7 @@ class _ContactListPageState extends State<ContactListPage> {
     );
   }
 
-  Widget _buildContactList(ContactLoaded state, bool isDark) {
+  Widget _buildContactList(ContactState state, bool isDark) {
     // 搜索模式
     if (state.searchQuery.isNotEmpty) {
       return _buildSearchResults(state, isDark);
@@ -291,7 +291,7 @@ class _ContactListPageState extends State<ContactListPage> {
     );
   }
 
-  Widget _buildSearchResults(ContactLoaded state, bool isDark) {
+  Widget _buildSearchResults(ContactState state, bool isDark) {
     final localResults = state.filteredContacts;
     final globalResults = state.searchResults;
 
@@ -337,7 +337,7 @@ class _ContactListPageState extends State<ContactListPage> {
     );
   }
 
-  Widget _buildFunctionEntries(ContactLoaded state, bool isDark) {
+  Widget _buildFunctionEntries(ContactState state, bool isDark) {
     final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     
     return Container(
@@ -372,7 +372,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   bloc: _groupBloc,
                   builder: (context, groupState) {
                     int inviteCount = 0;
-                    if (groupState is GroupListLoaded) {
+                    if (groupState.status == GroupStatus.loaded) {
                       inviteCount = groupState.invites.length;
                     }
                     return _buildFunctionItem(
@@ -1344,7 +1344,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
       ),
       body: BlocBuilder<ContactBloc, ContactState>(
         builder: (context, state) {
-          if (state is! ContactLoaded) {
+          if (!state.isLoaded) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -1582,22 +1582,22 @@ class _GroupListPageState extends State<_GroupListPage> {
       body: BlocConsumer<GroupBloc, GroupState>(
         bloc: _groupBloc,
         listener: (context, state) {
-          if (state is GroupError) {
+          if (state.status == GroupStatus.error) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text(state.errorMessage!)),
             );
-          } else if (state is GroupOperationSuccess) {
+          } else if (state.status == GroupStatus.success) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text(state.successMessage!)),
             );
           }
         },
         builder: (context, state) {
-          if (state is GroupLoading) {
+          if (state.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state is GroupListLoaded) {
+          if (state.status == GroupStatus.loaded) {
             return _buildGroupList(state, isDark);
           }
 
@@ -1641,7 +1641,7 @@ class _GroupListPageState extends State<_GroupListPage> {
     );
   }
 
-  Widget _buildGroupList(GroupListLoaded state, bool isDark) {
+  Widget _buildGroupList(GroupState state, bool isDark) {
     if (state.groups.isEmpty && state.invites.isEmpty) {
       return _buildEmptyState(isDark);
     }

@@ -2,14 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/chat_folder_entity.dart';
 import 'chat_folder_event.dart';
 import 'chat_folder_state.dart';
 
 /// 聊天文件夹 BLoC
 class ChatFolderBloc extends Bloc<ChatFolderEvent, ChatFolderState> {
-  final SecureStorageDataSource _storage;
+  final PreferencesDataSource _storage;
   final Uuid _uuid = const Uuid();
 
   /// 默认系统文件夹列表
@@ -23,7 +23,7 @@ class ChatFolderBloc extends Bloc<ChatFolderEvent, ChatFolderState> {
   ];
 
   ChatFolderBloc({
-    required SecureStorageDataSource storage,
+    required PreferencesDataSource storage,
   })  : _storage = storage,
         super(ChatFolderState.initial()) {
     on<LoadChatFolders>(_onLoad);

@@ -3,26 +3,35 @@ import 'package:equatable/equatable.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 
-/// 联系人状态基类
-abstract class ContactState extends Equatable {
-  const ContactState();
+/// 联系人状态枚举
+enum ContactStatus {
+  /// 初始状态
+  initial,
 
-  @override
-  List<Object?> get props => [];
+  /// 加载中
+  loading,
+
+  /// 已加载
+  loaded,
+
+  /// 开始聊天成功
+  chatStarted,
+
+  /// 备注更新成功
+  remarkUpdated,
+
+  /// 联系人已删除
+  deleted,
+
+  /// 错误
+  error,
 }
 
-/// 联系人初始状态
-class ContactInitial extends ContactState {
-  const ContactInitial();
-}
+/// 联系人状态（单一 State + copyWith 模式）
+class ContactState extends Equatable {
+  /// 当前状态
+  final ContactStatus status;
 
-/// 联系人加载中
-class ContactLoading extends ContactState {
-  const ContactLoading();
-}
-
-/// 联系人加载完成
-class ContactLoaded extends ContactState {
   /// 所有联系人
   final List<ContactEntity> contacts;
 
@@ -50,8 +59,27 @@ class ContactLoaded extends ContactState {
   /// 是否正在全局搜索
   final bool isGlobalSearching;
 
-  const ContactLoaded({
-    required this.contacts,
+  /// 开始聊天的 roomId
+  final String? startedChatRoomId;
+
+  /// 开始聊天的 userId
+  final String? startedChatUserId;
+
+  /// 更新备注的 userId
+  final String? updatedRemarkUserId;
+
+  /// 更新后的备注
+  final String? updatedRemark;
+
+  /// 删除的联系人 userId
+  final String? deletedUserId;
+
+  /// 错误消息
+  final String? errorMessage;
+
+  const ContactState({
+    this.status = ContactStatus.initial,
+    this.contacts = const [],
     this.filteredContacts = const [],
     this.searchResults = const [],
     this.friendRequests = const [],
@@ -60,22 +88,27 @@ class ContactLoaded extends ContactState {
     this.searchQuery = '',
     this.isSearching = false,
     this.isGlobalSearching = false,
+    this.startedChatRoomId,
+    this.startedChatUserId,
+    this.updatedRemarkUserId,
+    this.updatedRemark,
+    this.deletedUserId,
+    this.errorMessage,
   });
 
-  @override
-  List<Object?> get props => [
-        contacts,
-        filteredContacts,
-        searchResults,
-        friendRequests,
-        groupedContacts,
-        indexLetters,
-        searchQuery,
-        isSearching,
-        isGlobalSearching,
-      ];
+  const ContactState.initial() : this();
 
-  ContactLoaded copyWith({
+  /// 是否正在加载
+  bool get isLoading => status == ContactStatus.loading;
+
+  /// 是否已加载
+  bool get isLoaded => status == ContactStatus.loaded || contacts.isNotEmpty;
+
+  /// 是否有错误
+  bool get hasError => status == ContactStatus.error && errorMessage != null;
+
+  ContactState copyWith({
+    ContactStatus? status,
     List<ContactEntity>? contacts,
     List<ContactEntity>? filteredContacts,
     List<ContactEntity>? searchResults,
@@ -85,8 +118,15 @@ class ContactLoaded extends ContactState {
     String? searchQuery,
     bool? isSearching,
     bool? isGlobalSearching,
+    String? startedChatRoomId,
+    String? startedChatUserId,
+    String? updatedRemarkUserId,
+    String? updatedRemark,
+    String? deletedUserId,
+    String? errorMessage,
   }) {
-    return ContactLoaded(
+    return ContactState(
+      status: status ?? this.status,
       contacts: contacts ?? this.contacts,
       filteredContacts: filteredContacts ?? this.filteredContacts,
       searchResults: searchResults ?? this.searchResults,
@@ -96,55 +136,35 @@ class ContactLoaded extends ContactState {
       searchQuery: searchQuery ?? this.searchQuery,
       isSearching: isSearching ?? this.isSearching,
       isGlobalSearching: isGlobalSearching ?? this.isGlobalSearching,
+      startedChatRoomId: startedChatRoomId,
+      startedChatUserId: startedChatUserId,
+      updatedRemarkUserId: updatedRemarkUserId,
+      updatedRemark: updatedRemark,
+      deletedUserId: deletedUserId,
+      errorMessage: errorMessage,
     );
   }
-}
-
-/// 联系人加载失败
-class ContactError extends ContactState {
-  final String message;
-
-  const ContactError(this.message);
 
   @override
-  List<Object?> get props => [message];
-}
-
-/// 开始聊天成功
-class ChatStarted extends ContactState {
-  final String roomId;
-  final String userId;
-
-  const ChatStarted({
-    required this.roomId,
-    required this.userId,
-  });
-
-  @override
-  List<Object?> get props => [roomId, userId];
-}
-
-/// 备注设置成功
-class ContactRemarkUpdated extends ContactState {
-  final String userId;
-  final String? remark;
-
-  const ContactRemarkUpdated({
-    required this.userId,
-    this.remark,
-  });
+  List<Object?> get props => [
+        status,
+        contacts,
+        filteredContacts,
+        searchResults,
+        friendRequests,
+        groupedContacts,
+        indexLetters,
+        searchQuery,
+        isSearching,
+        isGlobalSearching,
+        startedChatRoomId,
+        startedChatUserId,
+        updatedRemarkUserId,
+        updatedRemark,
+        deletedUserId,
+        errorMessage,
+      ];
 
   @override
-  List<Object?> get props => [userId, remark];
+  String toString() => 'ContactState(status: $status, contacts: ${contacts.length})';
 }
-
-/// 联系人删除成功
-class ContactDeleted extends ContactState {
-  final String userId;
-
-  const ContactDeleted(this.userId);
-
-  @override
-  List<Object?> get props => [userId];
-}
-

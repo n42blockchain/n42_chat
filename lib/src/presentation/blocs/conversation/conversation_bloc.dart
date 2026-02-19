@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import 'conversation_event.dart';
@@ -12,13 +12,13 @@ import 'conversation_state.dart';
 /// 会话列表BLoC
 class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   final IConversationRepository _conversationRepository;
-  final SecureStorageDataSource _storageDataSource;
+  final PreferencesDataSource _storageDataSource;
 
   StreamSubscription<List<ConversationEntity>>? _conversationsSubscription;
 
   ConversationBloc({
     required IConversationRepository conversationRepository,
-    required SecureStorageDataSource storageDataSource,
+    required PreferencesDataSource storageDataSource,
   })  : _conversationRepository = conversationRepository,
         _storageDataSource = storageDataSource,
         super(ConversationState.initial()) {

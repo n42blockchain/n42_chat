@@ -77,7 +77,11 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     SendAiMessage event,
     Emitter<AiAssistantState> emit,
   ) async {
-    if (state.isGenerating || !_aiRepository.isAvailable) return;
+    debugPrint('AiAssistantBloc: SendMessage "${event.text}", isGenerating=${state.isGenerating}, isAvailable=${_aiRepository.isAvailable}');
+    if (state.isGenerating || !_aiRepository.isAvailable) {
+      debugPrint('AiAssistantBloc: SendMessage blocked - isGenerating=${state.isGenerating}, isAvailable=${_aiRepository.isAvailable}');
+      return;
+    }
 
     final assistant = state.assistant ?? AiAssistantEntity.defaultAssistant;
 
@@ -106,6 +110,7 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     // 启动流式响应
     try {
       unawaited(_streamSubscription?.cancel());
+      debugPrint('AiAssistantBloc: Starting stream completion with model=${assistant.model}, contextMessages=${contextMessages.length}');
       final stream = _aiRepository.aiService.streamCompletion(
         contextMessages,
         systemPrompt: assistant.systemPrompt,
@@ -119,14 +124,17 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
           if (!isClosed) add(AiStreamChunkReceived(chunk));
         },
         onDone: () {
+          debugPrint('AiAssistantBloc: Stream completed');
           if (!isClosed) add(const AiStreamCompleted());
         },
         onError: (Object error) {
+          debugPrint('AiAssistantBloc: Stream error in listener: $error');
           if (!isClosed) add(AiStreamError(error.toString()));
         },
       );
+      debugPrint('AiAssistantBloc: Stream subscription started');
     } catch (e) {
-      debugPrint('AiAssistantBloc: Stream error: $e');
+      debugPrint('AiAssistantBloc: Stream setup error: $e');
       emit(state.copyWith(
         isGenerating: false,
         error: e.toString(),

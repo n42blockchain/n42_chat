@@ -47,7 +47,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
                     context, isDark,
                     icon: Icons.memory_outlined,
                     title: l10n?.aiAssistantModel ?? 'Model',
-                    subtitle: assistant.model,
+                    subtitle: assistant.model ?? 'Default',
                   ),
                 ],
               ),

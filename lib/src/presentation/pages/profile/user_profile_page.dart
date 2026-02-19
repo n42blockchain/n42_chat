@@ -46,7 +46,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       final bloc = context.read<ContactBloc>();
       final state = bloc.state;
 
-      if (state is ContactLoaded) {
+      if (state.isLoaded) {
         // 首先从本地联系人中查找
         final contact = state.contacts.cast<ContactEntity?>().firstWhere(
           (c) => c?.userId == widget.userId,
@@ -87,12 +87,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state is ChatStarted && state.userId == widget.userId) {
+          if (state.status == ContactStatus.chatStarted && state.startedChatUserId == widget.userId) {
             // 导航到聊天页面
-            Navigator.of(context).pushReplacementNamed('/chat/${state.roomId}');
-          } else if (state is ContactError) {
+            Navigator.of(context).pushReplacementNamed('/chat/${state.startedChatRoomId}');
+          } else if (state.status == ContactStatus.error) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text(state.errorMessage ?? '')),
             );
           }
         },
@@ -435,9 +435,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           // 加入黑名单
           ListTile(
             title: Text(
-              context.read<ContactBloc>().state is ContactLoaded &&
-                      (context.read<ContactBloc>().state as ContactLoaded)
-                          .contacts
+              context.read<ContactBloc>().state.contacts
                           .any((c) => c.userId == widget.userId && c.isBlocked)
                   ? (S.of(context)?.profileRemoveFromBlacklist ?? 'Remove from Blacklist')
                   : (S.of(context)?.profileAddToBlacklist ?? 'Add to Blacklist'),
@@ -524,9 +522,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void _toggleBlock() {
-    final isBlocked = context.read<ContactBloc>().state is ContactLoaded &&
-        (context.read<ContactBloc>().state as ContactLoaded)
-            .contacts
+    final isBlocked = context.read<ContactBloc>().state.contacts
             .any((c) => c.userId == widget.userId && c.isBlocked);
 
     showDialog<void>(
