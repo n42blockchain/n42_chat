@@ -44,6 +44,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   /// 待重试的消息ID及其重试次数
   final Map<String, int> _pendingRetryMessages = {};
 
+  /// 已耗尽自动重试次数的消息ID集合
+  ///
+  /// 防止 _scanFailedMessages 在 _pendingRetryMessages 移除 key 后
+  /// 将同一消息重新以计数 0 加入队列，导致无限死循环。
+  final Set<String> _permanentlyFailedMessages = {};
+
   /// 最大重试次数
   static const int _maxRetryCount = 3;
 
@@ -844,6 +850,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     try {
       await _messageRepository.resendMessage(_currentRoomId!, event.messageId);
+      // 旧的 EventStatus.error 事件仍在 SDK 时间线中，将其 ID 加入本地删除集合
+      // 防止 _scanFailedMessages 将旧事件重新入队形成死循环。
+      _locallyDeletedMessageIds.add(event.messageId);
+      // 允许新事件（由 resendMessage 创建）被自动重试系统处理
+      _permanentlyFailedMessages.remove(event.messageId);
     } catch (e) {
       emit(state.copyWith(error: 'Failed to resend'));
     }
@@ -1149,6 +1160,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _retryTimer?.cancel();
     _retryTimer = null;
     _pendingRetryMessages.clear();
+    _permanentlyFailedMessages.clear();
     _currentRoomId = null;
     _locallyDeletedMessageIds.clear();
     if (!isClosed) {
@@ -2365,10 +2377,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// 将发送失败的消息加入待重试队列
   void _enqueueForRetry(String messageId) {
+    // 已永久放弃的消息不再重试，避免 _pendingRetryMessages 移除 key 后
+    // 下次调用 ?? 0 使计数清零导致死循环。
+    if (_permanentlyFailedMessages.contains(messageId)) return;
+
     final currentCount = _pendingRetryMessages[messageId] ?? 0;
     if (currentCount >= _maxRetryCount) {
       debugPrint('ChatBloc: Message $messageId exceeded max retry count ($_maxRetryCount), giving up');
       _pendingRetryMessages.remove(messageId);
+      _permanentlyFailedMessages.add(messageId);
       return;
     }
     _pendingRetryMessages[messageId] = currentCount;
@@ -2411,7 +2428,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         );
         if (success) {
           _pendingRetryMessages.remove(messageId);
-          debugPrint('ChatBloc: Message $messageId resent successfully');
+          // 旧的 EventStatus.error 事件仍在 SDK 时间线中，将其 ID 加入本地删除集合
+          // 使 _onMessagesUpdated 过滤掉它，防止 _scanFailedMessages 反复发现并重入队。
+          _locallyDeletedMessageIds.add(messageId);
+          debugPrint('ChatBloc: Message $messageId resent successfully, old event hidden');
         } else {
           _handleRetryFailure(messageId, retryCount);
         }
@@ -2427,6 +2447,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final nextCount = currentRetryCount + 1;
     if (nextCount >= _maxRetryCount) {
       _pendingRetryMessages.remove(messageId);
+      // 标记为永久失败，防止 _scanFailedMessages 重新以计数 0 入队
+      _permanentlyFailedMessages.add(messageId);
       debugPrint('ChatBloc: Message $messageId failed after $_maxRetryCount retries, requires manual resend');
     } else {
       _pendingRetryMessages[messageId] = nextCount;
@@ -2438,6 +2460,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   void _scanFailedMessages() {
     for (final message in state.messages) {
       if (message.isFailed && message.isFromMe) {
+        // 已永久放弃或正在排队的消息跳过
+        if (_permanentlyFailedMessages.contains(message.id)) continue;
         if (!_pendingRetryMessages.containsKey(message.id)) {
           _enqueueForRetry(message.id);
         }

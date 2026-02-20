@@ -154,11 +154,9 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     unawaited(_scannerController?.stop());
 
     try {
-      if (data.startsWith('n42chat://user/')) {
-        final userId = data.replaceFirst('n42chat://user/', '');
+      final userId = _extractUserId(data);
+      if (userId != null) {
         await _startChatWithUser(userId);
-      } else if (data.startsWith('@') && data.contains(':')) {
-        await _startChatWithUser(data);
       } else {
         _showError(S.of(context)?.qrcodeInvalidQrCode ?? 'Invalid QR code');
         unawaited(_scannerController?.start());
@@ -195,6 +193,15 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       _showError(S.of(context)?.qrcodeCannotAddFriend(e.toString()) ?? 'Cannot add friend: $e');
       unawaited(_scannerController?.start());
     }
+  }
+
+  /// 从各种格式的 QR 数据中提取 Matrix userId，无法识别时返回 null
+  String? _extractUserId(String data) {
+    for (final prefix in ['n42chat://user/', 'n42chat:user:', 'n42://user/']) {
+      if (data.startsWith(prefix)) return data.substring(prefix.length);
+    }
+    if (data.startsWith('@') && data.contains(':')) return data;
+    return null;
   }
 
   void _showError(String message) {

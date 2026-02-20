@@ -3,9 +3,13 @@
 // Apache License 2.0 and MIT License.
 // See LICENSE file in the project root for full license information.
 
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../../l10n/app_localizations.dart';
@@ -32,6 +36,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   ChewieController? _chewieController;
   bool _isLoading = true;
   String? _error;
+  File? _tempVideoFile;
 
   @override
   void initState() {
@@ -66,11 +71,35 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
       }
 
       // 创建视频控制器
+      // iOS AVFoundation 在 HTTP 重定向时会丢弃 Authorization header，
+      // 导致 Matrix 媒体 CDN 重定向后 403/401。
+      // 解决方案：iOS 上先用 http 包（正确保留 headers 跟随重定向）
+      // 流式下载到临时文件，再用 VideoPlayerController.file() 播放本地文件。
       debugPrint('Creating VideoPlayerController...');
-      _controller = VideoPlayerController.networkUrl(
-        Uri.parse(widget.videoUrl),
-        httpHeaders: headers,
-      );
+      if (Platform.isIOS) {
+        debugPrint('iOS: streaming download with auth headers to temp file...');
+        final request = http.Request('GET', Uri.parse(widget.videoUrl));
+        request.headers.addAll(headers);
+        final streamResponse = await http.Client().send(request);
+        if (streamResponse.statusCode != 200) {
+          throw Exception('Video download failed: ${streamResponse.statusCode}');
+        }
+        final dir = await getTemporaryDirectory();
+        final file = File(
+            '${dir.path}/video_${DateTime.now().millisecondsSinceEpoch}.mp4');
+        final sink = file.openWrite();
+        await streamResponse.stream.pipe(sink);
+        await sink.close();
+        _tempVideoFile = file;
+        debugPrint(
+            'iOS: temp file ready, size: ${await file.length()} bytes');
+        _controller = VideoPlayerController.file(file);
+      } else {
+        _controller = VideoPlayerController.networkUrl(
+          Uri.parse(widget.videoUrl),
+          httpHeaders: headers,
+        );
+      }
 
       debugPrint('Initializing video controller...');
       await _controller.initialize();
@@ -128,6 +157,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   void dispose() {
     _chewieController?.dispose();
     _controller.dispose();
+    _tempVideoFile?.delete().ignore();
     super.dispose();
   }
 
