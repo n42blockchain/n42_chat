@@ -774,7 +774,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: QrImageView(
-                  data: 'n42chat:user:$userId',
+                  data: 'n42chat://user/$userId',
                   version: QrVersions.auto,
                   size: 200,
                 ),

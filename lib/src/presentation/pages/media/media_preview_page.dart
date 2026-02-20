@@ -1,9 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
+
+import '../../../core/di/injection.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 
 /// 媒体项数据
 class MediaItem {
@@ -53,6 +59,8 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
   late int _currentIndex;
   bool _showToolbar = true;
   VideoPlayerController? _videoController;
+  // 累计创建的临时文件，在 dispose 时统一清理
+  final _tempFiles = <File>[];
 
   @override
   void initState() {
@@ -69,6 +77,9 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
   @override
   void dispose() {
     _videoController?.dispose();
+    for (final f in _tempFiles) {
+      f.delete().ignore();
+    }
     _pageController.dispose();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
@@ -76,7 +87,51 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
 
   Future<void> _initVideoPlayer(String url) async {
     unawaited(_videoController?.dispose());
-    final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+    _videoController = null;
+
+    // 获取 Matrix access token（图集页面没有传入 headers，需要自行获取）
+    String? accessToken;
+    try {
+      accessToken = getIt<MatrixClientManager>().client?.accessToken;
+    } catch (_) {}
+
+    final headers = <String, String>{
+      if (accessToken != null) 'Authorization': 'Bearer $accessToken',
+    };
+
+    VideoPlayerController controller;
+    // iOS：AVFoundation 在 HTTP 重定向时丢弃 Authorization header，
+    // 需要先将视频流式下载至临时文件再播放。
+    if (Platform.isIOS && accessToken != null) {
+      try {
+        final request = http.Request('GET', Uri.parse(url));
+        request.headers.addAll(headers);
+        final streamResponse = await http.Client().send(request);
+        if (streamResponse.statusCode == 200) {
+          final dir = await getTemporaryDirectory();
+          final file = File(
+              '${dir.path}/preview_${DateTime.now().millisecondsSinceEpoch}.mp4');
+          final sink = file.openWrite();
+          await streamResponse.stream.pipe(sink);
+          await sink.close();
+          _tempFiles.add(file);
+          controller = VideoPlayerController.file(file);
+        } else {
+          debugPrint(
+              'iOS video download returned ${streamResponse.statusCode}, falling back');
+          controller = VideoPlayerController.networkUrl(Uri.parse(url));
+        }
+      } catch (e) {
+        debugPrint('iOS video download error, falling back: $e');
+        controller = VideoPlayerController.networkUrl(Uri.parse(url));
+      }
+    } else {
+      controller = VideoPlayerController.networkUrl(
+        Uri.parse(url),
+        httpHeaders: headers,
+      );
+    }
+
     _videoController = controller;
     try {
       await controller.initialize();
