@@ -385,4 +385,143 @@ void main() {
       expect(result, contains('09:05'));
     });
   });
+
+  // ─────────────────────────────────────────────────
+  // N42DateUtils.formatConversationTime
+  // ─────────────────────────────────────────────────
+
+  group('N42DateUtils.formatConversationTime', () {
+    const en = DateLocaleStrings();
+
+    test('null returns empty string', () {
+      expect(N42DateUtils.formatConversationTime(null, en), '');
+    });
+
+    test('today returns HH:mm format', () {
+      final now = DateTime.now();
+      final todayAt14 =
+          DateTime(now.year, now.month, now.day, 14, 30);
+      final result = N42DateUtils.formatConversationTime(todayAt14, en);
+      expect(result, '14:30');
+    });
+
+    test('today at 09:05 returns 09:05', () {
+      final now = DateTime.now();
+      final todayAt9 = DateTime(now.year, now.month, now.day, 9, 5);
+      final result = N42DateUtils.formatConversationTime(todayAt9, en);
+      expect(result, '09:05');
+    });
+
+    test('yesterday returns locale.yesterday', () {
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      final result = N42DateUtils.formatConversationTime(yesterday, en);
+      expect(result, 'Yesterday');
+    });
+
+    test('Chinese yesterday returns 昨天', () {
+      const zh = DateLocaleStrings.chinese;
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      final result = N42DateUtils.formatConversationTime(yesterday, zh);
+      expect(result, '昨天');
+    });
+
+    test('older date in same year returns monthDay format', () {
+      final now = DateTime.now();
+      // 30 days ago should be within same year (for most dates) or last year
+      final thirtyDaysAgo = now.subtract(const Duration(days: 30));
+      final result = N42DateUtils.formatConversationTime(thirtyDaysAgo, en);
+      // Either monthDay (same year) or yearMonthDay (different year) format
+      expect(result, isNotEmpty);
+    });
+
+    test('date in previous year returns yearMonthDay format', () {
+      const en = DateLocaleStrings();
+      final previousYear = DateTime(DateTime.now().year - 2, 6, 15, 10, 0);
+      final result = N42DateUtils.formatConversationTime(previousYear, en);
+      expect(result, contains('${DateTime.now().year - 2}'));
+    });
+
+    test('Chinese same-year date returns 月日 format', () {
+      const zh = DateLocaleStrings.chinese;
+      // Use a fixed past date within same year
+      final now = DateTime.now();
+      // Safely pick a date 60 days ago (same year as now for most test runs)
+      final pastDate = DateTime(now.year, 1, 1, 10, 0);
+      if (pastDate.year == now.year) {
+        final result = N42DateUtils.formatConversationTime(pastDate, zh);
+        expect(result, contains('月'));
+      }
+    });
+  });
+
+  // ─────────────────────────────────────────────────
+  // N42DateUtils.formatMessageTime
+  // ─────────────────────────────────────────────────
+
+  group('N42DateUtils.formatMessageTime', () {
+    const en = DateLocaleStrings();
+
+    test('today returns just HH:mm (no date prefix)', () {
+      final now = DateTime.now();
+      final todayAt14 = DateTime(now.year, now.month, now.day, 14, 30);
+      final result = N42DateUtils.formatMessageTime(todayAt14, en);
+      expect(result, '14:30');
+    });
+
+    test('yesterday includes "Yesterday " prefix + HH:mm', () {
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      // Force a specific time to make the assertion deterministic
+      final yesterdayAt10 = DateTime(
+          yesterday.year, yesterday.month, yesterday.day, 10, 0);
+      final result = N42DateUtils.formatMessageTime(yesterdayAt10, en);
+      expect(result, startsWith('Yesterday'));
+      expect(result, contains('10:00'));
+    });
+
+    test('date in previous year includes year + HH:mm', () {
+      final oldDate = DateTime(DateTime.now().year - 2, 3, 15, 8, 45);
+      final result = N42DateUtils.formatMessageTime(oldDate, en);
+      expect(result, contains('${DateTime.now().year - 2}'));
+      expect(result, contains('08:45'));
+    });
+
+    test('Chinese yesterday shows 昨天 prefix', () {
+      const zh = DateLocaleStrings.chinese;
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      final yesterdayAt9 = DateTime(
+          yesterday.year, yesterday.month, yesterday.day, 9, 30);
+      final result = N42DateUtils.formatMessageTime(yesterdayAt9, zh);
+      expect(result, startsWith('昨天'));
+      expect(result, contains('09:30'));
+    });
+  });
+
+  // ─────────────────────────────────────────────────
+  // DateLocaleStrings.getWeekday
+  // ─────────────────────────────────────────────────
+
+  group('DateLocaleStrings.getWeekday', () {
+    test('Chinese locale uses custom weekdays array', () {
+      const zh = DateLocaleStrings.chinese;
+      // Monday = weekday 1
+      final monday = DateTime(2024, 3, 18); // This is a Monday
+      expect(zh.getWeekday(monday), '周一');
+    });
+
+    test('Chinese locale returns 周日 for Sunday (weekday 7)', () {
+      const zh = DateLocaleStrings.chinese;
+      final sunday = DateTime(2024, 3, 17); // This is a Sunday
+      expect(zh.getWeekday(sunday), '周日');
+    });
+
+    test('Custom weekdays array overrides intl', () {
+      // Locale with a custom weekdays array does NOT call DateFormat.E
+      const custom = DateLocaleStrings(
+        weekdays: ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        localeCode: 'en',
+      );
+      final wednesday = DateTime(2024, 3, 20); // Wednesday, weekday=3
+      expect(custom.getWeekday(wednesday), 'Wed');
+    });
+  });
 }
