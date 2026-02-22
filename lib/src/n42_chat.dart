@@ -32,6 +32,7 @@ import 'presentation/pages/auth/register_page.dart';
 import 'presentation/pages/auth/welcome_page.dart';
 import 'presentation/pages/main/chat_main_page.dart';
 import 'presentation/pages/profile/profile_page.dart';
+import 'presentation/pages/settings/change_email_page.dart' as chat_settings;
 
 /// N42 Chat 模块主入口类
 ///
@@ -245,9 +246,9 @@ class N42Chat {
     // 初始化推送通知服务（如果启用）
     // 不阻塞主初始化流程：FCM token 获取在无 GMS 设备上可能耗时 60-90 秒
     if (config.enablePushNotifications) {
-      _initializePushService(config).catchError((Object e) {
+      unawaited(_initializePushService(config).catchError((Object e) {
         debugPrint('N42Chat: Push service initialization failed in background: $e');
-      });
+      }));
     }
 
     // 如果 Matrix 客户端已登录，立即初始化通话管理器
@@ -603,6 +604,29 @@ class N42Chat {
   static AuthBloc get authBloc {
     _ensureInitialized();
     return _authBloc!;
+  }
+
+  /// 打开 Chat 账户修改邮箱页面
+  ///
+  /// 在主应用完成 N42 账户邮箱修改后，调用此方法引导用户同步 Chat 账户邮箱。
+  /// Chat 修改邮箱需要提供当前密码进行身份验证。
+  ///
+  /// 返回 `true` 表示 Chat 邮箱也修改成功，`null` / `false` 表示用户取消或失败。
+  ///
+  /// ```dart
+  /// final synced = await N42Chat.openChangeEmailPage(context);
+  /// ```
+  static Future<bool?> openChangeEmailPage(BuildContext context) {
+    _ensureInitialized();
+    return Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: _authBloc!,
+          child: const chat_settings.ChangeEmailPage(),
+        ),
+      ),
+    );
   }
 
   /// 获取聊天主Widget
