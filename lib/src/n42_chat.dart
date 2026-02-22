@@ -606,16 +606,10 @@ class N42Chat {
     return _authBloc!;
   }
 
-  /// 打开 Chat 账户修改邮箱页面
+  /// 打开 Chat 账户修改邮箱页面（完整 UI 流程）
   ///
-  /// 在主应用完成 N42 账户邮箱修改后，调用此方法引导用户同步 Chat 账户邮箱。
-  /// Chat 修改邮箱需要提供当前密码进行身份验证。
-  ///
-  /// 返回 `true` 表示 Chat 邮箱也修改成功，`null` / `false` 表示用户取消或失败。
-  ///
-  /// ```dart
-  /// final synced = await N42Chat.openChangeEmailPage(context);
-  /// ```
+  /// 适合在主应用完成 N42 账户邮箱修改后，引导用户同步 Chat 账户邮箱。
+  /// 返回 `true` 表示用户完成了 Chat 邮箱修改。
   static Future<bool?> openChangeEmailPage(BuildContext context) {
     _ensureInitialized();
     return Navigator.push<bool>(
@@ -626,6 +620,80 @@ class N42Chat {
           child: const chat_settings.ChangeEmailPage(),
         ),
       ),
+    );
+  }
+
+  /// 请求修改 Chat 账户邮箱验证码（第一步）
+  ///
+  /// 在主应用 N42 邮箱修改成功后调用，向新邮箱发送 Chat 验证码。
+  /// [password] 当前账户密码（Matrix 验证用）
+  /// [newEmail] 新邮箱地址
+  ///
+  /// 成功时 Future 完成，失败时抛出异常（含错误描述）。
+  /// 超时时间 30 秒。
+  static Future<void> requestChatEmailChange(
+      String password, String newEmail) {
+    _ensureInitialized();
+    final completer = Completer<void>();
+    late StreamSubscription<AuthState> sub;
+    sub = _authBloc!.stream.listen((state) {
+      if (completer.isCompleted) {
+        sub.cancel();
+        return;
+      }
+      if (state.changeEmailStatus == ChangeEmailStatus.codeSent) {
+        sub.cancel();
+        completer.complete();
+      } else if (state.changeEmailStatus == ChangeEmailStatus.failed) {
+        sub.cancel();
+        completer.completeError(
+            state.errorMessage ?? 'Failed to send verification code');
+      }
+    });
+    _authBloc!.add(AuthRequestChangeEmailRequested(
+        password: password, newEmail: newEmail));
+    return completer.future.timeout(
+      const Duration(seconds: 30),
+      onTimeout: () {
+        sub.cancel();
+        throw TimeoutException('Chat email code request timed out');
+      },
+    );
+  }
+
+  /// 确认修改 Chat 账户邮箱（第二步）
+  ///
+  /// [newEmail] 新邮箱地址（与请求时一致）
+  /// [code]     用户收到的 6 位验证码
+  ///
+  /// 成功时 Future 完成，失败时抛出异常（含错误描述）。
+  /// 超时时间 30 秒。
+  static Future<void> confirmChatEmailChange(String newEmail, String code) {
+    _ensureInitialized();
+    final completer = Completer<void>();
+    late StreamSubscription<AuthState> sub;
+    sub = _authBloc!.stream.listen((state) {
+      if (completer.isCompleted) {
+        sub.cancel();
+        return;
+      }
+      if (state.changeEmailStatus == ChangeEmailStatus.success) {
+        sub.cancel();
+        completer.complete();
+      } else if (state.changeEmailStatus == ChangeEmailStatus.failed) {
+        sub.cancel();
+        completer.completeError(
+            state.errorMessage ?? 'Failed to update chat email');
+      }
+    });
+    _authBloc!
+        .add(AuthConfirmChangeEmailRequested(newEmail: newEmail, code: code));
+    return completer.future.timeout(
+      const Duration(seconds: 30),
+      onTimeout: () {
+        sub.cancel();
+        throw TimeoutException('Chat email confirmation timed out');
+      },
     );
   }
 
