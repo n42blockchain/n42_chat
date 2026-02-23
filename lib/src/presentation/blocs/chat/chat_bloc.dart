@@ -2116,26 +2116,19 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       final pinnedEventIds = await _groupRepository.getPinnedEventIds(_currentRoomId!);
       final canPin = _groupRepository.canPinMessages(_currentRoomId!);
 
-      // 从当前消息列表中查找置顶消息
+      // 从当前消息列表中查找置顶消息（优先内存缓存，fallback 远程拉取）
       final pinnedMessages = <MessageEntity>[];
       for (final eventId in pinnedEventIds) {
-        final msg = state.messages.firstWhere(
-          (m) => m.id == eventId,
-          orElse: () => MessageEntity(
-            id: eventId,
-            roomId: _currentRoomId!,
-            senderId: '',
-            senderName: '',
-            content: '[Message not loaded]',
-            timestamp: DateTime.now(),
-            type: MessageType.text,
-            status: MessageStatus.sent,
-            isFromMe: false,
-          ),
-        );
-        // 只添加真实加载的消息
-        if (msg.senderId.isNotEmpty) {
-          pinnedMessages.add(msg);
+        // 快速路径：已在内存中
+        final cached = state.messages.where((m) => m.id == eventId).firstOrNull;
+        if (cached != null) {
+          pinnedMessages.add(cached);
+          continue;
+        }
+        // 慢速路径：从服务器/本地 DB 获取（历史置顶消息尚未分页到内存）
+        final fetched = await _groupRepository.getMessageById(_currentRoomId!, eventId);
+        if (fetched != null) {
+          pinnedMessages.add(fetched);
         }
       }
 
