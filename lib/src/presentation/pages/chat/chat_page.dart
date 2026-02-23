@@ -51,7 +51,7 @@ import '../../widgets/chat/sticker_picker.dart';
 import '../../widgets/chat/red_packet_dialogs.dart';
 import '../sticker/sticker_store_page.dart';
 import '../../widgets/chat/edit_history_sheet.dart';
-import '../../widgets/wechat_toast.dart';
+import '../../widgets/common/wechat_toast.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../contact/contact_detail_page.dart';
