@@ -2433,5 +2433,46 @@
   "blocTransferCancelled": "Transfer cancelled",
   "blocTransferFailed": "Transfer failed",
   "blocPaymentProcessing": "Processing payment...",
-  "blocPaymentFailed": "Payment failed"
+  "blocPaymentFailed": "Payment failed",
+
+  "groupMaxMembers": "Member Limit",
+  "groupMaxMembersUnlimited": "Unlimited",
+  "groupMaxMembersHint": "Enter limit (leave empty for unlimited)",
+  "groupMaxMembersUpdated": "Member limit updated",
+  "groupFull": "Group is at capacity",
+
+  "groupChannels": "Topic Channels",
+  "groupChannelsEmpty": "No channels yet",
+  "groupChannelsCount": "channels",
+  "groupChannelCreate": "New Channel",
+  "groupChannelName": "Channel Name",
+  "groupChannelTopic": "Channel Topic (optional)",
+  "groupChannelDelete": "Delete Channel",
+  "groupChannelDeleteConfirm": "Delete this channel? All messages will be lost.",
+
+  "groupBotSettings": "Bot Settings",
+  "groupBotEnabled": "Enable Bot",
+  "groupBotWelcomeMessage": "Welcome Message Template",
+  "groupBotWelcomeHint": "Use 'name' as placeholder for new member name",
+  "groupBotConfigUpdated": "Bot settings updated",
+
+  "groupContentFilter": "Content Filter",
+  "groupContentFilterEnabled": "Enable Keyword Filter",
+  "groupContentFilterReplace": "Replace with ***",
+  "groupContentFilterHide": "Hide Message",
+  "groupContentFilterAddWord": "Add Keyword",
+  "groupContentFilterUpdated": "Content filter updated",
+
+  "chatSlashCommands": "Commands",
+  "chatCommandPoll": "/poll — Create a poll",
+  "chatCommandAnnounce": "/announce — Send announcement",
+  "chatCommandWelcome": "/welcome — Set welcome message",
+
+  "chatReportMessage": "Report",
+  "chatReportReason": "Report Reason",
+  "chatReportSpam": "Spam",
+  "chatReportHarassment": "Harassment",
+  "chatReportInappropriate": "Inappropriate Content",
+  "chatReportOther": "Other",
+  "chatReportSuccess": "Report submitted"
 }

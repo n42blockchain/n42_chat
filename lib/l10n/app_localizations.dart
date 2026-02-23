@@ -9540,6 +9540,216 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'支付失败'**
   String get blocPaymentFailed;
+
+  /// No description provided for @groupMaxMembers.
+  ///
+  /// In zh, this message translates to:
+  /// **'群人数上限'**
+  String get groupMaxMembers;
+
+  /// No description provided for @groupMaxMembersUnlimited.
+  ///
+  /// In zh, this message translates to:
+  /// **'不限'**
+  String get groupMaxMembersUnlimited;
+
+  /// No description provided for @groupMaxMembersHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入上限（留空表示不限）'**
+  String get groupMaxMembersHint;
+
+  /// No description provided for @groupMaxMembersUpdated.
+  ///
+  /// In zh, this message translates to:
+  /// **'群人数上限已更新'**
+  String get groupMaxMembersUpdated;
+
+  /// No description provided for @groupFull.
+  ///
+  /// In zh, this message translates to:
+  /// **'群已满员'**
+  String get groupFull;
+
+  /// No description provided for @groupChannels.
+  ///
+  /// In zh, this message translates to:
+  /// **'话题频道'**
+  String get groupChannels;
+
+  /// No description provided for @groupChannelsEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无话题频道'**
+  String get groupChannelsEmpty;
+
+  /// No description provided for @groupChannelsCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'个频道'**
+  String get groupChannelsCount;
+
+  /// No description provided for @groupChannelCreate.
+  ///
+  /// In zh, this message translates to:
+  /// **'新建频道'**
+  String get groupChannelCreate;
+
+  /// No description provided for @groupChannelName.
+  ///
+  /// In zh, this message translates to:
+  /// **'频道名称'**
+  String get groupChannelName;
+
+  /// No description provided for @groupChannelTopic.
+  ///
+  /// In zh, this message translates to:
+  /// **'频道话题（可选）'**
+  String get groupChannelTopic;
+
+  /// No description provided for @groupChannelDelete.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除频道'**
+  String get groupChannelDelete;
+
+  /// No description provided for @groupChannelDeleteConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认删除此频道？消息不可恢复。'**
+  String get groupChannelDeleteConfirm;
+
+  /// No description provided for @groupBotSettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'Bot 设置'**
+  String get groupBotSettings;
+
+  /// No description provided for @groupBotEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'启用 Bot'**
+  String get groupBotEnabled;
+
+  /// No description provided for @groupBotWelcomeMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'欢迎语模板'**
+  String get groupBotWelcomeMessage;
+
+  /// No description provided for @groupBotWelcomeHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'用 \'name\' 作为新成员名字占位符'**
+  String get groupBotWelcomeHint;
+
+  /// No description provided for @groupBotConfigUpdated.
+  ///
+  /// In zh, this message translates to:
+  /// **'Bot 设置已更新'**
+  String get groupBotConfigUpdated;
+
+  /// No description provided for @groupContentFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'关键词过滤'**
+  String get groupContentFilter;
+
+  /// No description provided for @groupContentFilterEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'启用关键词过滤'**
+  String get groupContentFilterEnabled;
+
+  /// No description provided for @groupContentFilterReplace.
+  ///
+  /// In zh, this message translates to:
+  /// **'替换为 ***'**
+  String get groupContentFilterReplace;
+
+  /// No description provided for @groupContentFilterHide.
+  ///
+  /// In zh, this message translates to:
+  /// **'隐藏消息'**
+  String get groupContentFilterHide;
+
+  /// No description provided for @groupContentFilterAddWord.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加关键词'**
+  String get groupContentFilterAddWord;
+
+  /// No description provided for @groupContentFilterUpdated.
+  ///
+  /// In zh, this message translates to:
+  /// **'内容过滤设置已更新'**
+  String get groupContentFilterUpdated;
+
+  /// No description provided for @chatSlashCommands.
+  ///
+  /// In zh, this message translates to:
+  /// **'指令'**
+  String get chatSlashCommands;
+
+  /// No description provided for @chatCommandPoll.
+  ///
+  /// In zh, this message translates to:
+  /// **'/poll — 创建投票'**
+  String get chatCommandPoll;
+
+  /// No description provided for @chatCommandAnnounce.
+  ///
+  /// In zh, this message translates to:
+  /// **'/announce — 发布公告'**
+  String get chatCommandAnnounce;
+
+  /// No description provided for @chatCommandWelcome.
+  ///
+  /// In zh, this message translates to:
+  /// **'/welcome — 设置欢迎语'**
+  String get chatCommandWelcome;
+
+  /// No description provided for @chatReportMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'举报'**
+  String get chatReportMessage;
+
+  /// No description provided for @chatReportReason.
+  ///
+  /// In zh, this message translates to:
+  /// **'举报原因'**
+  String get chatReportReason;
+
+  /// No description provided for @chatReportSpam.
+  ///
+  /// In zh, this message translates to:
+  /// **'垃圾信息'**
+  String get chatReportSpam;
+
+  /// No description provided for @chatReportHarassment.
+  ///
+  /// In zh, this message translates to:
+  /// **'骚扰'**
+  String get chatReportHarassment;
+
+  /// No description provided for @chatReportInappropriate.
+  ///
+  /// In zh, this message translates to:
+  /// **'违规内容'**
+  String get chatReportInappropriate;
+
+  /// No description provided for @chatReportOther.
+  ///
+  /// In zh, this message translates to:
+  /// **'其他'**
+  String get chatReportOther;
+
+  /// No description provided for @chatReportSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'举报已提交'**
+  String get chatReportSuccess;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

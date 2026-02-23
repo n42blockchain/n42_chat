@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 
 /// 聊天状态
@@ -55,6 +56,12 @@ class ChatState extends Equatable {
   /// 翻译检测到的源语言 (messageId -> sourceLanguage)
   final Map<String, String> detectedSourceLanguages;
 
+  /// 当前房间的关键词过滤配置
+  final ContentFilterConfig? contentFilter;
+
+  /// 待处理的斜杠命令（null 表示无）
+  final String? pendingCommand;
+
   const ChatState({
     this.roomId,
     this.messages = const [],
@@ -73,6 +80,8 @@ class ChatState extends Equatable {
     this.translatedMessages = const {},
     this.translatingMessageIds = const {},
     this.detectedSourceLanguages = const {},
+    this.contentFilter,
+    this.pendingCommand,
   });
 
   /// 初始状态
@@ -138,9 +147,12 @@ class ChatState extends Equatable {
     Map<String, String>? translatedMessages,
     Set<String>? translatingMessageIds,
     Map<String, String>? detectedSourceLanguages,
+    ContentFilterConfig? contentFilter,
+    String? pendingCommand,
     bool clearError = false,
     bool clearReplyTarget = false,
     bool clearEditingMessage = false,
+    bool clearPendingCommand = false,
   }) {
     return ChatState(
       roomId: roomId ?? this.roomId,
@@ -160,6 +172,8 @@ class ChatState extends Equatable {
       translatedMessages: translatedMessages ?? this.translatedMessages,
       translatingMessageIds: translatingMessageIds ?? this.translatingMessageIds,
       detectedSourceLanguages: detectedSourceLanguages ?? this.detectedSourceLanguages,
+      contentFilter: contentFilter ?? this.contentFilter,
+      pendingCommand: clearPendingCommand ? null : (pendingCommand ?? this.pendingCommand),
     );
   }
 
@@ -182,6 +196,8 @@ class ChatState extends Equatable {
         translatedMessages,
         translatingMessageIds,
         detectedSourceLanguages,
+        contentFilter,
+        pendingCommand,
       ];
 }
 

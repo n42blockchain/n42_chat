@@ -327,6 +327,17 @@ abstract class IMessageRepository {
   });
 
   // ============================================
+  // 举报
+  // ============================================
+
+  /// 举报消息（Matrix reportEvent API）
+  Future<void> reportMessage(
+    String roomId,
+    String eventId, {
+    required String reason,
+  });
+
+  // ============================================
   // 群文件管理
   // ============================================
 

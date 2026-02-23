@@ -672,3 +672,25 @@ class SendContactCardMessage extends ChatEvent {
   @override
   List<Object?> get props => [userId, displayName, avatarUrl];
 }
+
+/// 执行斜杠命令
+class ExecuteSlashCommand extends ChatEvent {
+  final String command; // 命令名（如 "announce"）
+  final String args;    // 命令参数部分
+
+  const ExecuteSlashCommand({required this.command, required this.args});
+
+  @override
+  List<Object?> get props => [command, args];
+}
+
+/// 举报消息
+class ReportMessage extends ChatEvent {
+  final String messageId;
+  final String reason;
+
+  const ReportMessage(this.messageId, this.reason);
+
+  @override
+  List<Object?> get props => [messageId, reason];
+}

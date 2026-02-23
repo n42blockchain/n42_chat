@@ -10,6 +10,7 @@ import '../../../core/services/speech_to_text_service.dart';
 import '../../../core/services/translation_service.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
@@ -130,6 +131,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ConnectionStatusChanged>(_onConnectionStatusChanged);
     on<SendContactCardMessage>(_onSendContactCardMessage);
     on<DestructionTimesLoaded>(_onDestructionTimesLoaded);
+    on<ExecuteSlashCommand>(_onExecuteSlashCommand);
+    on<ReportMessage>(_onReportMessage);
   }
 
   /// 处理销毁时间加载完成事件
@@ -225,6 +228,22 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // 启动离线消息自动重试监听
     _setupAutoRetry();
+
+    // 加载关键词过滤配置
+    _loadContentFilter(event.roomId, emit);
+  }
+
+  void _loadContentFilter(String roomId, Emitter<ChatState> emit) {
+    Future.microtask(() async {
+      try {
+        final filter = await _groupRepository?.getContentFilter(roomId);
+        if (!isClosed) {
+          emit(state.copyWith(contentFilter: filter));
+        }
+      } catch (e) {
+        // content filter 不影响聊天主流程，静默忽略错误
+      }
+    });
   }
 
   /// 启动阅后即焚销毁定时器
@@ -371,6 +390,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
       // 获取消息的反应聚合结果
       mergedMessages = await _loadReactionAggregations(event.roomId, mergedMessages);
+
+      // 应用关键词过滤
+      mergedMessages = _applyContentFilter(mergedMessages);
 
       emit(state.copyWith(
         messages: mergedMessages,
@@ -664,6 +686,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) async {
     if (_currentRoomId == null || event.text.trim().isEmpty) return;
+
+    // 斜杠命令拦截
+    final trimmed = event.text.trim();
+    if (trimmed.startsWith('/')) {
+      final parts = trimmed.substring(1).split(RegExp(r'\s+'));
+      final cmd = parts.isNotEmpty ? parts[0].toLowerCase() : '';
+      final args = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+      add(ExecuteSlashCommand(command: cmd, args: args));
+      return;
+    }
 
     emit(state.copyWith(isSending: true, clearError: true));
 
@@ -2483,6 +2515,73 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     } catch (e) {
       debugPrint('ChatBloc: Failed to send contact card: $e');
     }
+  }
+
+  /// 执行斜杠命令
+  Future<void> _onExecuteSlashCommand(
+    ExecuteSlashCommand event,
+    Emitter<ChatState> emit,
+  ) async {
+    switch (event.command) {
+      case 'announce':
+        if (event.args.isNotEmpty && _currentRoomId != null) {
+          add(SendSystemNotice(event.args));
+        }
+        break;
+      case 'poll':
+        // BLoC 无 context，通过 pendingCommand 信号通知 UI 打开 Poll 对话框
+        emit(state.copyWith(pendingCommand: 'poll'));
+        break;
+      default:
+        debugPrint('ChatBloc: Unknown slash command: ${event.command}');
+    }
+  }
+
+  /// 举报消息
+  Future<void> _onReportMessage(
+    ReportMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (_currentRoomId == null) return;
+    try {
+      await _messageRepository.reportMessage(
+        _currentRoomId!,
+        event.messageId,
+        reason: event.reason,
+      );
+      // 通过 error 字段发送成功信号（使用特殊前缀区分）
+      emit(state.copyWith(error: 'success:report'));
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to report message: $e');
+      emit(state.copyWith(error: 'Failed to report message'));
+    }
+  }
+
+  /// 应用关键词过滤
+  List<MessageEntity> _applyContentFilter(List<MessageEntity> messages) {
+    final filter = state.contentFilter;
+    if (filter == null || !filter.enabled || filter.forbiddenWords.isEmpty) {
+      return messages;
+    }
+    final pattern = RegExp(
+      filter.forbiddenWords.map(RegExp.escape).join('|'),
+      caseSensitive: false,
+    );
+    final filtered = <MessageEntity>[];
+    for (final m in messages) {
+      if (m.type != MessageType.text) {
+        filtered.add(m);
+        continue;
+      }
+      final hasBadWord = pattern.hasMatch(m.content);
+      if (!hasBadWord) {
+        filtered.add(m);
+      } else if (filter.action == FilterAction.replace) {
+        filtered.add(m.copyWith(content: m.content.replaceAll(pattern, '***')));
+      }
+      // FilterAction.hide: 不加入列表，即隐藏
+    }
+    return filtered;
   }
 }
 

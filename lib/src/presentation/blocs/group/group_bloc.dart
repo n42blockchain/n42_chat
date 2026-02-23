@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../domain/entities/bot_config_entity.dart';
+import '../../../domain/entities/channel_entity.dart';
+import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../bloc_message_keys.dart';
@@ -35,6 +38,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     on<GroupsUpdated>(_onGroupsUpdated);
     on<SetTokenGate>(_onSetTokenGate);
     on<VerifyTokenGate>(_onVerifyTokenGate);
+    on<SetMaxMembers>(_onSetMaxMembers);
+    on<SetContentFilter>(_onSetContentFilter);
+    on<SetBotConfig>(_onSetBotConfig);
+    on<LoadChannels>(_onLoadChannels);
+    on<CreateChannel>(_onCreateChannel);
+    on<UpdateChannel>(_onUpdateChannel);
+    on<DeleteChannel>(_onDeleteChannel);
   }
 
   Future<void> _onLoadGroups(
@@ -225,10 +235,105 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         emit: emit,
       );
 
+  Future<void> _onLoadChannels(LoadChannels event, Emitter<GroupState> emit) async {
+    try {
+      final channels = await _groupRepository.getChannels(event.roomId);
+      emit(state.copyWith(channels: channels));
+    } catch (e) {
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onCreateChannel(CreateChannel event, Emitter<GroupState> emit) async {
+    try {
+      await _groupRepository.createChannel(
+        event.parentRoomId,
+        name: event.name,
+        topic: event.topic,
+      );
+      final channels = await _groupRepository.getChannels(event.parentRoomId);
+      emit(state.copyWith(
+        channels: channels,
+        status: GroupStatus.success,
+        successMessage: 'Channel created',
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onUpdateChannel(UpdateChannel event, Emitter<GroupState> emit) async {
+    try {
+      await _groupRepository.updateChannel(
+        event.parentRoomId,
+        event.channelRoomId,
+        name: event.name,
+        topic: event.topic,
+      );
+      final channels = await _groupRepository.getChannels(event.parentRoomId);
+      emit(state.copyWith(channels: channels, status: GroupStatus.success, successMessage: 'Channel updated'));
+    } catch (e) {
+      emit(state.copyWith(status: GroupStatus.error, errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteChannel(DeleteChannel event, Emitter<GroupState> emit) async {
+    try {
+      await _groupRepository.deleteChannel(event.parentRoomId, event.channelRoomId);
+      final channels = await _groupRepository.getChannels(event.parentRoomId);
+      emit(state.copyWith(channels: channels, status: GroupStatus.success, successMessage: 'Channel deleted'));
+    } catch (e) {
+      emit(state.copyWith(status: GroupStatus.error, errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onSetBotConfig(SetBotConfig event, Emitter<GroupState> emit) =>
+      _updateGroupProperty(
+        roomId: event.roomId,
+        operation: () => _groupRepository.setBotConfig(event.roomId, event.config),
+        successMessage: BlocMessageKeys.groupBotConfigUpdated,
+        errorPrefix: 'Failed to update bot config',
+        emit: emit,
+      );
+
+  Future<void> _onSetContentFilter(SetContentFilter event, Emitter<GroupState> emit) =>
+      _updateGroupProperty(
+        roomId: event.roomId,
+        operation: () => _groupRepository.setContentFilter(event.roomId, event.config),
+        successMessage: BlocMessageKeys.groupContentFilterUpdated,
+        errorPrefix: 'Failed to update content filter',
+        emit: emit,
+      );
+
+  Future<void> _onSetMaxMembers(SetMaxMembers event, Emitter<GroupState> emit) =>
+      _updateGroupProperty(
+        roomId: event.roomId,
+        operation: () => _groupRepository.setMaxMembers(event.roomId, event.maxMembers),
+        successMessage: BlocMessageKeys.groupMaxMembersUpdated,
+        errorPrefix: 'Failed to update max members',
+        emit: emit,
+      );
+
   Future<void> _onInviteMembers(
     InviteMembers event,
     Emitter<GroupState> emit,
   ) async {
+    // 检查群人数上限
+    final group = state.currentGroup;
+    if (group != null && group.isFull) {
+      emit(state.copyWith(
+        status: GroupStatus.error,
+        errorMessage: BlocMessageKeys.groupFull,
+      ));
+      return;
+    }
+
     try {
       await _groupRepository.inviteUsers(event.roomId, event.userIds);
       emit(state.copyWith(

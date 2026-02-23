@@ -12,6 +12,9 @@ import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
 import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
+import 'bot_settings_page.dart';
+import 'content_filter_settings_page.dart';
+import 'group_channels_page.dart';
 import 'group_media_hub_page.dart';
 
 /// 群设置页面
@@ -446,6 +449,71 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
             Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
 
+            // 话题频道
+            ListTile(
+              leading: const Icon(Icons.forum_outlined),
+              title: Text(S.of(context)?.groupChannels ?? 'Topic Channels'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => GroupChannelsPage(roomId: widget.roomId),
+                  ),
+                );
+              },
+            ),
+
+            Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
+
+            // Bot 设置（仅管理员可见）
+            if (group.canChangeSettings) ...[
+              ListTile(
+                leading: const Icon(Icons.smart_toy_outlined),
+                title: Text(S.of(context)?.groupBotSettings ?? 'Bot Settings'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => BotSettingsPage(roomId: widget.roomId),
+                    ),
+                  );
+                },
+              ),
+              Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
+            ],
+
+            // 关键词过滤（仅管理员可见）
+            if (group.canChangeSettings) ...[
+              ListTile(
+                leading: const Icon(Icons.filter_list),
+                title: Text(S.of(context)?.groupContentFilter ?? 'Content Filter'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => ContentFilterSettingsPage(roomId: widget.roomId),
+                    ),
+                  );
+                },
+              ),
+              Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
+            ],
+
+            // 群人数上限
+            ListTile(
+              leading: const Icon(Icons.people_outline),
+              title: Text(S.of(context)?.groupMaxMembers ?? 'Member Limit'),
+              subtitle: Text(
+                group.maxMembers == null
+                    ? (S.of(context)?.groupMaxMembersUnlimited ?? 'Unlimited')
+                    : '${group.memberCount} / ${group.maxMembers}',
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _showMaxMembersDialog(group),
+            ),
+
+            Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
+
             // 代币门控
             ListTile(
               leading: Icon(
@@ -617,6 +685,47 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                   );
             },
             child: Text(S.of(context)?.groupPublish ?? 'Publish'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showMaxMembersDialog(GroupEntity group) {
+    final controller = TextEditingController(
+      text: group.maxMembers?.toString() ?? '',
+    );
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)?.groupMaxMembers ?? 'Member Limit'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: S.of(context)?.groupMaxMembersHint ?? 'Enter limit (leave empty for unlimited)',
+                border: const OutlineInputBorder(),
+              ),
+              autofocus: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              final text = controller.text.trim();
+              final value = text.isEmpty ? null : int.tryParse(text);
+              context.read<GroupBloc>().add(SetMaxMembers(widget.roomId, value));
+            },
+            child: Text(S.of(context)?.commonConfirm ?? 'OK'),
           ),
         ],
       ),

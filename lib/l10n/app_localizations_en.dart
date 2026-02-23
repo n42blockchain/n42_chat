@@ -5145,4 +5145,111 @@ class SEn extends S {
 
   @override
   String get blocPaymentFailed => 'Payment failed';
+
+  @override
+  String get groupMaxMembers => 'Member Limit';
+
+  @override
+  String get groupMaxMembersUnlimited => 'Unlimited';
+
+  @override
+  String get groupMaxMembersHint => 'Enter limit (leave empty for unlimited)';
+
+  @override
+  String get groupMaxMembersUpdated => 'Member limit updated';
+
+  @override
+  String get groupFull => 'Group is at capacity';
+
+  @override
+  String get groupChannels => 'Topic Channels';
+
+  @override
+  String get groupChannelsEmpty => 'No channels yet';
+
+  @override
+  String get groupChannelsCount => 'channels';
+
+  @override
+  String get groupChannelCreate => 'New Channel';
+
+  @override
+  String get groupChannelName => 'Channel Name';
+
+  @override
+  String get groupChannelTopic => 'Channel Topic (optional)';
+
+  @override
+  String get groupChannelDelete => 'Delete Channel';
+
+  @override
+  String get groupChannelDeleteConfirm =>
+      'Delete this channel? All messages will be lost.';
+
+  @override
+  String get groupBotSettings => 'Bot Settings';
+
+  @override
+  String get groupBotEnabled => 'Enable Bot';
+
+  @override
+  String get groupBotWelcomeMessage => 'Welcome Message Template';
+
+  @override
+  String get groupBotWelcomeHint =>
+      'Use \'name\' as placeholder for new member name';
+
+  @override
+  String get groupBotConfigUpdated => 'Bot settings updated';
+
+  @override
+  String get groupContentFilter => 'Content Filter';
+
+  @override
+  String get groupContentFilterEnabled => 'Enable Keyword Filter';
+
+  @override
+  String get groupContentFilterReplace => 'Replace with ***';
+
+  @override
+  String get groupContentFilterHide => 'Hide Message';
+
+  @override
+  String get groupContentFilterAddWord => 'Add Keyword';
+
+  @override
+  String get groupContentFilterUpdated => 'Content filter updated';
+
+  @override
+  String get chatSlashCommands => 'Commands';
+
+  @override
+  String get chatCommandPoll => '/poll — Create a poll';
+
+  @override
+  String get chatCommandAnnounce => '/announce — Send announcement';
+
+  @override
+  String get chatCommandWelcome => '/welcome — Set welcome message';
+
+  @override
+  String get chatReportMessage => 'Report';
+
+  @override
+  String get chatReportReason => 'Report Reason';
+
+  @override
+  String get chatReportSpam => 'Spam';
+
+  @override
+  String get chatReportHarassment => 'Harassment';
+
+  @override
+  String get chatReportInappropriate => 'Inappropriate Content';
+
+  @override
+  String get chatReportOther => 'Other';
+
+  @override
+  String get chatReportSuccess => 'Report submitted';
 }

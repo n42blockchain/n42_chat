@@ -5141,4 +5141,109 @@ class STr extends S {
 
   @override
   String get blocPaymentFailed => '支付失败';
+
+  @override
+  String get groupMaxMembers => '群人数上限';
+
+  @override
+  String get groupMaxMembersUnlimited => '不限';
+
+  @override
+  String get groupMaxMembersHint => '输入上限（留空表示不限）';
+
+  @override
+  String get groupMaxMembersUpdated => '群人数上限已更新';
+
+  @override
+  String get groupFull => '群已满员';
+
+  @override
+  String get groupChannels => '话题频道';
+
+  @override
+  String get groupChannelsEmpty => '暂无话题频道';
+
+  @override
+  String get groupChannelsCount => '个频道';
+
+  @override
+  String get groupChannelCreate => '新建频道';
+
+  @override
+  String get groupChannelName => '频道名称';
+
+  @override
+  String get groupChannelTopic => '频道话题（可选）';
+
+  @override
+  String get groupChannelDelete => '删除频道';
+
+  @override
+  String get groupChannelDeleteConfirm => '确认删除此频道？消息不可恢复。';
+
+  @override
+  String get groupBotSettings => 'Bot 设置';
+
+  @override
+  String get groupBotEnabled => '启用 Bot';
+
+  @override
+  String get groupBotWelcomeMessage => '欢迎语模板';
+
+  @override
+  String get groupBotWelcomeHint => '用 \'name\' 作为新成员名字占位符';
+
+  @override
+  String get groupBotConfigUpdated => 'Bot 设置已更新';
+
+  @override
+  String get groupContentFilter => '关键词过滤';
+
+  @override
+  String get groupContentFilterEnabled => '启用关键词过滤';
+
+  @override
+  String get groupContentFilterReplace => '替换为 ***';
+
+  @override
+  String get groupContentFilterHide => '隐藏消息';
+
+  @override
+  String get groupContentFilterAddWord => '添加关键词';
+
+  @override
+  String get groupContentFilterUpdated => '内容过滤设置已更新';
+
+  @override
+  String get chatSlashCommands => '指令';
+
+  @override
+  String get chatCommandPoll => '/poll — 创建投票';
+
+  @override
+  String get chatCommandAnnounce => '/announce — 发布公告';
+
+  @override
+  String get chatCommandWelcome => '/welcome — 设置欢迎语';
+
+  @override
+  String get chatReportMessage => '举报';
+
+  @override
+  String get chatReportReason => '举报原因';
+
+  @override
+  String get chatReportSpam => '垃圾信息';
+
+  @override
+  String get chatReportHarassment => '骚扰';
+
+  @override
+  String get chatReportInappropriate => '违规内容';
+
+  @override
+  String get chatReportOther => '其他';
+
+  @override
+  String get chatReportSuccess => '举报已提交';
 }

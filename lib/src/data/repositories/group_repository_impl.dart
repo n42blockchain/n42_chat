@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../domain/entities/bot_config_entity.dart';
+import '../../domain/entities/channel_entity.dart';
+import '../../domain/entities/content_filter_entity.dart';
 import '../../domain/entities/group_entity.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/token_gate_entity.dart';
@@ -227,6 +230,71 @@ class GroupRepositoryImpl implements IGroupRepository {
   }
 
   // ============================================
+  // 群人数上限
+  // ============================================
+
+  @override
+  Future<int?> getMaxMembers(String roomId) async =>
+      _groupDataSource.getMaxMembers(roomId);
+
+  @override
+  Future<void> setMaxMembers(String roomId, int? maxMembers) async =>
+      _groupDataSource.setMaxMembers(roomId, maxMembers);
+
+  // ============================================
+  // 子频道管理
+  // ============================================
+
+  @override
+  Future<List<ChannelEntity>> getChannels(String parentRoomId) async =>
+      _groupDataSource.getChannels(parentRoomId);
+
+  @override
+  Future<String> createChannel(
+    String parentRoomId, {
+    required String name,
+    String? topic,
+  }) async =>
+      _groupDataSource.createChannel(parentRoomId, name: name, topic: topic);
+
+  @override
+  Future<void> updateChannel(
+    String parentRoomId,
+    String channelRoomId, {
+    String? name,
+    String? topic,
+  }) async =>
+      _groupDataSource.updateChannel(parentRoomId, channelRoomId, name: name, topic: topic);
+
+  @override
+  Future<void> deleteChannel(String parentRoomId, String channelRoomId) async =>
+      _groupDataSource.deleteChannel(parentRoomId, channelRoomId);
+
+  // ============================================
+  // Bot 配置
+  // ============================================
+
+  @override
+  Future<BotConfig?> getBotConfig(String roomId) async =>
+      _groupDataSource.getBotConfig(roomId);
+
+  @override
+  Future<void> setBotConfig(String roomId, BotConfig config) async =>
+      _groupDataSource.setBotConfig(roomId, config);
+
+  // ============================================
+  // 关键词过滤
+  // ============================================
+
+  @override
+  Future<ContentFilterConfig?> getContentFilter(String roomId) async =>
+      _groupDataSource.getContentFilter(roomId);
+
+  @override
+  Future<void> setContentFilter(String roomId, ContentFilterConfig config) async =>
+      _groupDataSource.setContentFilter(roomId, config);
+
+  // ============================================
   // 代币门控
   // ============================================
 
@@ -358,6 +426,7 @@ class GroupRepositoryImpl implements IGroupRepository {
       announcement: room.topic,
       pinnedEventIds: pinnedEventIds,
       memberCount: joinedCount + invitedCount,
+      maxMembers: _groupDataSource.getMaxMembers(room.id),
       members: members?.map((u) => _mapUserToGroupMember(room.id, u)).toList() ?? [],
       isEncrypted: room.encrypted,
       isPublic: room.joinRules == matrix.JoinRules.public,
