@@ -20,6 +20,11 @@ class BlocMessageKeys {
   static const groupJoined = 'group_joined';
   static const groupInviteDeclined = 'group_invite_declined';
   static const groupTokenGateUpdated = 'group_token_gate_updated';
+  static const groupMaxMembersUpdated = 'group_max_members_updated';
+  static const groupFull = 'group_full';
+  static const groupContentFilterUpdated = 'group_content_filter_updated';
+  static const groupBotConfigUpdated = 'group_bot_config_updated';
+  static const chatReportSuccess = 'chat_report_success';
 
   // Transfer
   static const transferProcessing = 'transfer_processing';

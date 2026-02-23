@@ -1184,5 +1184,18 @@ class MessageRepositoryImpl implements IMessageRepository {
       fromEventId: fromEventId,
     );
   }
+
+  @override
+  Future<void> reportMessage(
+    String roomId,
+    String eventId, {
+    required String reason,
+  }) async {
+    final client = _clientManager.client;
+    if (client == null) throw Exception('Matrix client not initialized');
+    final room = client.getRoomById(roomId);
+    if (room == null) throw Exception('Room not found');
+    await client.reportEvent(roomId, eventId, score: -100, reason: reason);
+  }
 }
 

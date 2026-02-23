@@ -2613,5 +2613,46 @@
   "blocTransferCancelled": "转账已取消",
   "blocTransferFailed": "转账失败",
   "blocPaymentProcessing": "支付处理中...",
-  "blocPaymentFailed": "支付失败"
+  "blocPaymentFailed": "支付失败",
+
+  "groupMaxMembers": "群人数上限",
+  "groupMaxMembersUnlimited": "不限",
+  "groupMaxMembersHint": "输入上限（留空表示不限）",
+  "groupMaxMembersUpdated": "群人数上限已更新",
+  "groupFull": "群已满员",
+
+  "groupChannels": "话题频道",
+  "groupChannelsEmpty": "暂无话题频道",
+  "groupChannelsCount": "个频道",
+  "groupChannelCreate": "新建频道",
+  "groupChannelName": "频道名称",
+  "groupChannelTopic": "频道话题（可选）",
+  "groupChannelDelete": "删除频道",
+  "groupChannelDeleteConfirm": "确认删除此频道？消息不可恢复。",
+
+  "groupBotSettings": "Bot 设置",
+  "groupBotEnabled": "启用 Bot",
+  "groupBotWelcomeMessage": "欢迎语模板",
+  "groupBotWelcomeHint": "用 'name' 作为新成员名字占位符",
+  "groupBotConfigUpdated": "Bot 设置已更新",
+
+  "groupContentFilter": "关键词过滤",
+  "groupContentFilterEnabled": "启用关键词过滤",
+  "groupContentFilterReplace": "替换为 ***",
+  "groupContentFilterHide": "隐藏消息",
+  "groupContentFilterAddWord": "添加关键词",
+  "groupContentFilterUpdated": "内容过滤设置已更新",
+
+  "chatSlashCommands": "指令",
+  "chatCommandPoll": "/poll — 创建投票",
+  "chatCommandAnnounce": "/announce — 发布公告",
+  "chatCommandWelcome": "/welcome — 设置欢迎语",
+
+  "chatReportMessage": "举报",
+  "chatReportReason": "举报原因",
+  "chatReportSpam": "垃圾信息",
+  "chatReportHarassment": "骚扰",
+  "chatReportInappropriate": "违规内容",
+  "chatReportOther": "其他",
+  "chatReportSuccess": "举报已提交"
 }

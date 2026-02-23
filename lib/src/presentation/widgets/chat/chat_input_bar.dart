@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
+import 'slash_command_picker.dart';
 
 /// 语音录音结果回调
 typedef VoiceRecordCallback = void Function(String path, Duration duration);
@@ -81,6 +82,9 @@ class ChatInputBar extends StatefulWidget {
   /// 焦点节点
   final FocusNode? focusNode;
 
+  /// 斜杠命令 /poll 回调（由 UI 层打开投票对话框）
+  final VoidCallback? onCommandPoll;
+
   const ChatInputBar({
     super.key,
     this.onSendText,
@@ -102,6 +106,7 @@ class ChatInputBar extends StatefulWidget {
     this.maxLines = 5,
     this.controller,
     this.focusNode,
+    this.onCommandPoll,
   });
 
   @override
@@ -114,6 +119,8 @@ class ChatInputBarState extends State<ChatInputBar> {
   bool _isVoiceMode = false;
   bool _hasText = false;
   bool _showFormattingBar = false;
+  bool _showCommandPicker = false;
+  String _commandQuery = '';
 
   // 录音状态
   bool _isRecording = false;
@@ -165,6 +172,37 @@ class ChatInputBarState extends State<ChatInputBar> {
       });
     }
     widget.onChanged?.call(_controller.text);
+
+    // 斜杠命令检测：以 "/" 开头且无空格时显示选择器
+    final text = _controller.text;
+    final showPicker = text.startsWith('/') && !text.contains(' ');
+    final newQuery = showPicker ? text.substring(1) : '';
+    if (_showCommandPicker != showPicker || _commandQuery != newQuery) {
+      setState(() {
+        _showCommandPicker = showPicker;
+        _commandQuery = newQuery;
+      });
+    }
+  }
+
+  void _handleCommandSelect(SlashCommandItem item) {
+    setState(() => _showCommandPicker = false);
+    if (item.command == 'poll') {
+      _controller.clear();
+      widget.onCommandPoll?.call();
+    } else if (item.command == 'announce') {
+      const prefix = '/announce ';
+      _controller.value = TextEditingValue(
+        text: prefix,
+        selection: TextSelection.collapsed(offset: prefix.length),
+      );
+    } else if (item.command == 'welcome') {
+      const prefix = '/welcome ';
+      _controller.value = TextEditingValue(
+        text: prefix,
+        selection: TextSelection.collapsed(offset: prefix.length),
+      );
+    }
   }
 
   void _onFocusChanged() {
@@ -390,6 +428,17 @@ class ChatInputBarState extends State<ChatInputBar> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // 斜杠命令选择器
+            AnimatedSize(
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeInOut,
+              child: _showCommandPicker
+                  ? SlashCommandPicker(
+                      query: _commandQuery,
+                      onSelect: _handleCommandSelect,
+                    )
+                  : const SizedBox.shrink(),
+            ),
             AnimatedSize(
               duration: const Duration(milliseconds: 150),
               curve: Curves.easeInOut,

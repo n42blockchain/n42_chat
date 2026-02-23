@@ -1,5 +1,8 @@
 import 'dart:typed_data';
 
+import '../entities/bot_config_entity.dart';
+import '../entities/channel_entity.dart';
+import '../entities/content_filter_entity.dart';
 import '../entities/group_entity.dart';
 import '../entities/message_entity.dart';
 import '../entities/token_gate_entity.dart';
@@ -73,6 +76,61 @@ abstract class IGroupRepository {
 
   /// 检查当前用户是否可以置顶消息
   bool canPinMessages(String roomId);
+
+  // ============================================
+  // 群人数上限
+  // ============================================
+
+  /// 获取群人数上限（null = 不限）
+  Future<int?> getMaxMembers(String roomId);
+
+  /// 设置群人数上限（null = 取消上限）
+  Future<void> setMaxMembers(String roomId, int? maxMembers);
+
+  // ============================================
+  // 关键词过滤
+  // ============================================
+
+  /// 获取关键词过滤配置
+  Future<ContentFilterConfig?> getContentFilter(String roomId);
+
+  /// 设置关键词过滤配置
+  Future<void> setContentFilter(String roomId, ContentFilterConfig config);
+
+  // ============================================
+  // Bot 配置
+  // ============================================
+
+  /// 获取 Bot 配置
+  Future<BotConfig?> getBotConfig(String roomId);
+
+  /// 设置 Bot 配置
+  Future<void> setBotConfig(String roomId, BotConfig config);
+
+  // ============================================
+  // 子频道管理
+  // ============================================
+
+  /// 获取父群组的所有子频道
+  Future<List<ChannelEntity>> getChannels(String parentRoomId);
+
+  /// 创建子频道（返回新频道的 roomId）
+  Future<String> createChannel(
+    String parentRoomId, {
+    required String name,
+    String? topic,
+  });
+
+  /// 更新子频道信息
+  Future<void> updateChannel(
+    String parentRoomId,
+    String channelRoomId, {
+    String? name,
+    String? topic,
+  });
+
+  /// 删除子频道
+  Future<void> deleteChannel(String parentRoomId, String channelRoomId);
 
   /// 通过事件 ID 获取单条消息（用于置顶栏加载不在内存中的历史消息）
   Future<MessageEntity?> getMessageById(String roomId, String eventId);

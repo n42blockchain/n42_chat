@@ -191,6 +191,9 @@ class GroupEntity extends Equatable {
   /// 成员数量
   final int memberCount;
 
+  /// 群人数上限（null = 不限）
+  final int? maxMembers;
+
   /// 成员列表
   final List<GroupMember> members;
 
@@ -266,6 +269,7 @@ class GroupEntity extends Equatable {
     this.announcement,
     this.pinnedEventIds = const [],
     this.memberCount = 0,
+    this.maxMembers,
     this.members = const [],
     this.isEncrypted = false,
     this.isPublic = false,
@@ -285,6 +289,12 @@ class GroupEntity extends Equatable {
     this.category,
     this.tokenGate,
   });
+
+  /// 群是否已满员
+  bool get isFull => maxMembers != null && memberCount >= maxMembers!;
+
+  /// 容量占比（0.0~1.0），null 表示不限
+  double? get capacityRatio => maxMembers == null ? null : memberCount / maxMembers!;
 
   /// 是否有置顶消息
   bool get hasPinnedMessages => pinnedEventIds.isNotEmpty;
@@ -323,6 +333,7 @@ class GroupEntity extends Equatable {
         announcement,
         pinnedEventIds,
         memberCount,
+        maxMembers,
         members,
         isEncrypted,
         isPublic,
@@ -351,6 +362,8 @@ class GroupEntity extends Equatable {
     String? announcement,
     List<String>? pinnedEventIds,
     int? memberCount,
+    int? maxMembers,
+    bool clearMaxMembers = false,
     List<GroupMember>? members,
     bool? isEncrypted,
     bool? isPublic,
@@ -378,6 +391,7 @@ class GroupEntity extends Equatable {
       announcement: announcement ?? this.announcement,
       pinnedEventIds: pinnedEventIds ?? this.pinnedEventIds,
       memberCount: memberCount ?? this.memberCount,
+      maxMembers: clearMaxMembers ? null : (maxMembers ?? this.maxMembers),
       members: members ?? this.members,
       isEncrypted: isEncrypted ?? this.isEncrypted,
       isPublic: isPublic ?? this.isPublic,

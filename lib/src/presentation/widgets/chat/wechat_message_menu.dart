@@ -45,6 +45,7 @@ class WeChatMessageMenu extends StatelessWidget {
   final VoidCallback? onViewEditHistory; // 查看编辑历史
   final VoidCallback? onReplyInThread; // 在线程中回复
   final VoidCallback? onEdit; // 编辑消息
+  final VoidCallback? onReport; // 举报消息
 
   /// 表情回应回调
   final void Function(String emoji)? onReaction;
@@ -75,6 +76,7 @@ class WeChatMessageMenu extends StatelessWidget {
     this.onViewEditHistory,
     this.onReplyInThread,
     this.onEdit,
+    this.onReport,
     this.onReaction,
   });
 
@@ -372,6 +374,16 @@ class WeChatMessageMenu extends StatelessWidget {
                     onSearch?.call();
                   },
                 ),
+                // 举报（不举报自己的消息）
+                if (!message.isFromMe && onReport != null)
+                  _buildMenuItem(
+                    icon: Icons.flag_outlined,
+                    label: S.of(context)?.chatReportMessage ?? 'Report',
+                    onTap: () {
+                      onDismiss();
+                      onReport?.call();
+                    },
+                  ),
               ],
             ),
           ),

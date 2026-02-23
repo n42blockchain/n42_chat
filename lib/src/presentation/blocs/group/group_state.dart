@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/entities/channel_entity.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../../domain/entities/token_gate_entity.dart';
 
@@ -59,6 +60,9 @@ class GroupState extends Equatable {
   /// 代币门控验证的 roomId
   final String? tokenGateRoomId;
 
+  /// 当前群组的子频道列表
+  final List<ChannelEntity> channels;
+
   const GroupState({
     this.status = GroupStatus.initial,
     this.groups = const [],
@@ -70,6 +74,7 @@ class GroupState extends Equatable {
     this.errorMessage,
     this.tokenGateResult,
     this.tokenGateRoomId,
+    this.channels = const [],
   });
 
   const GroupState.initial() : this();
@@ -94,6 +99,7 @@ class GroupState extends Equatable {
     String? errorMessage,
     TokenGateVerificationResult? tokenGateResult,
     String? tokenGateRoomId,
+    List<ChannelEntity>? channels,
   }) {
     return GroupState(
       status: status ?? this.status,
@@ -106,6 +112,7 @@ class GroupState extends Equatable {
       errorMessage: errorMessage,
       tokenGateResult: tokenGateResult ?? this.tokenGateResult,
       tokenGateRoomId: tokenGateRoomId ?? this.tokenGateRoomId,
+      channels: channels ?? this.channels,
     );
   }
 
@@ -121,6 +128,7 @@ class GroupState extends Equatable {
         errorMessage,
         tokenGateResult,
         tokenGateRoomId,
+        channels,
       ];
 
   @override

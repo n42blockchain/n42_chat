@@ -46,6 +46,16 @@ String resolveBlocMessage(BuildContext context, String key) {
       return l10n.blocGroupInviteDeclined;
     case BlocMessageKeys.groupTokenGateUpdated:
       return l10n.blocGroupTokenGateUpdated;
+    case BlocMessageKeys.groupMaxMembersUpdated:
+      return l10n.groupMaxMembersUpdated;
+    case BlocMessageKeys.groupFull:
+      return l10n.groupFull;
+    case BlocMessageKeys.groupContentFilterUpdated:
+      return l10n.groupContentFilterUpdated;
+    case BlocMessageKeys.groupBotConfigUpdated:
+      return l10n.groupBotConfigUpdated;
+    case BlocMessageKeys.chatReportSuccess:
+      return l10n.chatReportSuccess;
 
     // Transfer
     case BlocMessageKeys.transferProcessing:

@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../domain/entities/bot_config_entity.dart';
+import '../../../domain/entities/channel_entity.dart';
+import '../../../domain/entities/content_filter_entity.dart';
 import 'matrix_client_manager.dart';
 
 /// Matrix群聊数据源
@@ -525,6 +528,225 @@ class MatrixGroupDataSource {
 
     // 检查是否可以发送 m.room.pinned_events 状态事件
     return room.canSendEvent('m.room.pinned_events');
+  }
+
+  // ============================================
+  // 群人数上限
+  // ============================================
+
+  static const String _roomSettingsEventType = 'n42.room.settings';
+
+  /// 获取群人数上限（null = 不限）
+  int? getMaxMembers(String roomId) {
+    final room = _client?.getRoomById(roomId);
+    final state = room?.getState(_roomSettingsEventType);
+    final val = state?.content['max_members'];
+    return val is int ? val : null;
+  }
+
+  /// 设置群人数上限（null = 取消上限）
+  Future<void> setMaxMembers(String roomId, int? maxMembers) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) throw Exception('Room not found');
+    final current = Map<String, dynamic>.from(
+      room.getState(_roomSettingsEventType)?.content ?? {},
+    );
+    if (maxMembers == null) {
+      current.remove('max_members');
+    } else {
+      current['max_members'] = maxMembers;
+    }
+    await room.client.setRoomStateWithKey(roomId, _roomSettingsEventType, '', current);
+  }
+
+  // ============================================
+  // 关键词过滤
+  // ============================================
+
+  static const String _contentFilterEventType = 'n42.room.content_filter';
+
+  /// 获取关键词过滤配置
+  ContentFilterConfig? getContentFilter(String roomId) {
+    final room = _client?.getRoomById(roomId);
+    final state = room?.getState(_contentFilterEventType);
+    if (state == null) return null;
+    try {
+      return ContentFilterConfig.fromJson(state.content);
+    } catch (e) {
+      debugPrint('getContentFilter error: $e');
+      return null;
+    }
+  }
+
+  /// 设置关键词过滤配置
+  Future<void> setContentFilter(String roomId, ContentFilterConfig config) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) throw Exception('Room not found');
+    await room.client.setRoomStateWithKey(
+      roomId,
+      _contentFilterEventType,
+      '',
+      config.toJson(),
+    );
+  }
+
+  // ============================================
+  // 子频道管理
+  // ============================================
+
+  static const String _channelsEventType = 'n42.room.channels';
+
+  /// 获取子频道列表
+  List<ChannelEntity> getChannels(String parentRoomId) {
+    final room = _client?.getRoomById(parentRoomId);
+    final state = room?.getState(_channelsEventType);
+    final list = state?.content['channels'] as List? ?? [];
+    final channels = list.map((e) {
+      final channelRoom = _client?.getRoomById(e['room_id'] as String? ?? '');
+      return ChannelEntity(
+        roomId: e['room_id'] as String? ?? '',
+        parentRoomId: parentRoomId,
+        name: e['name'] as String? ?? '',
+        topic: e['topic'] as String?,
+        order: e['order'] as int? ?? 0,
+        unreadCount: channelRoom?.notificationCount ?? 0,
+      );
+    }).toList();
+    channels.sort((a, b) => a.order.compareTo(b.order));
+    return channels;
+  }
+
+  /// 创建子频道
+  Future<String> createChannel(
+    String parentRoomId, {
+    required String name,
+    String? topic,
+  }) async {
+    if (_client == null) throw Exception('Matrix client not initialized');
+    final members = await getGroupMembers(parentRoomId);
+    final memberIds = members
+        .map((m) => m.id)
+        .where((id) => id != _client!.userID)
+        .toList();
+
+    final channelRoomId = await _client!.createRoom(
+      name: name,
+      topic: topic,
+      invite: memberIds,
+      preset: matrix.CreateRoomPreset.privateChat,
+      initialState: [
+        matrix.StateEvent(
+          type: 'n42.room.channel_meta',
+          stateKey: '',
+          content: {'parent_room_id': parentRoomId},
+        ),
+      ],
+    );
+
+    final existing = getChannels(parentRoomId);
+    final updated = [
+      ...existing.map(_channelToMap),
+      {
+        'room_id': channelRoomId,
+        'name': name,
+        'topic': topic,
+        'order': existing.length,
+      },
+    ];
+    await _client!.setRoomStateWithKey(
+      parentRoomId,
+      _channelsEventType,
+      '',
+      {'channels': updated},
+    );
+    return channelRoomId;
+  }
+
+  /// 更新子频道信息
+  Future<void> updateChannel(
+    String parentRoomId,
+    String channelRoomId, {
+    String? name,
+    String? topic,
+  }) async {
+    if (_client == null) throw Exception('Matrix client not initialized');
+    final existing = getChannels(parentRoomId);
+    final updated = existing.map((c) {
+      if (c.roomId != channelRoomId) return _channelToMap(c);
+      return {
+        ..._channelToMap(c),
+        if (name != null) 'name': name,
+        if (topic != null) 'topic': topic,
+      };
+    }).toList();
+    await _client!.setRoomStateWithKey(
+      parentRoomId,
+      _channelsEventType,
+      '',
+      {'channels': updated},
+    );
+  }
+
+  /// 删除子频道
+  Future<void> deleteChannel(String parentRoomId, String channelRoomId) async {
+    if (_client == null) throw Exception('Matrix client not initialized');
+    final existing = getChannels(parentRoomId);
+    final updated = existing
+        .where((c) => c.roomId != channelRoomId)
+        .map(_channelToMap)
+        .toList();
+    // 重新排序
+    for (var i = 0; i < updated.length; i++) {
+      (updated[i] as Map<String, dynamic>)['order'] = i;
+    }
+    await _client!.setRoomStateWithKey(
+      parentRoomId,
+      _channelsEventType,
+      '',
+      {'channels': updated},
+    );
+    // 将频道房间标记为离开（非强制）
+    try {
+      await _client!.leaveRoom(channelRoomId);
+    } catch (_) {}
+  }
+
+  Map<String, dynamic> _channelToMap(ChannelEntity c) => {
+        'room_id': c.roomId,
+        'name': c.name,
+        'topic': c.topic,
+        'order': c.order,
+      };
+
+  // ============================================
+  // Bot 配置
+  // ============================================
+
+  static const String _botConfigEventType = 'n42.room.bot_config';
+
+  /// 获取 Bot 配置
+  BotConfig? getBotConfig(String roomId) {
+    final room = _client?.getRoomById(roomId);
+    final state = room?.getState(_botConfigEventType);
+    if (state == null) return null;
+    try {
+      return BotConfig.fromJson(state.content);
+    } catch (e) {
+      debugPrint('getBotConfig error: $e');
+      return null;
+    }
+  }
+
+  /// 设置 Bot 配置
+  Future<void> setBotConfig(String roomId, BotConfig config) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) throw Exception('Room not found');
+    await room.client.setRoomStateWithKey(
+      roomId,
+      _botConfigEventType,
+      '',
+      config.toJson(),
+    );
   }
 
   // ============================================

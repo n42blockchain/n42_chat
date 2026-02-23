@@ -4398,10 +4398,61 @@ Avatar: ${contactAvatar ?? ''}''';
           debugPrint('Translate clicked');
           _translateMessage(message);
         } : null,
+        onReport: message.isFromMe ? null : () {
+          debugPrint('Report clicked');
+          _showReportDialog(message);
+        },
       ),
     );
 
     overlay.insert(overlayEntry);
+  }
+
+  void _showReportDialog(MessageEntity message) {
+    final l10n = S.of(context);
+    String? selectedReason;
+    final reasons = [
+      l10n?.chatReportSpam ?? 'Spam',
+      l10n?.chatReportHarassment ?? 'Harassment',
+      l10n?.chatReportInappropriate ?? 'Inappropriate Content',
+      l10n?.chatReportOther ?? 'Other',
+    ];
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Text(l10n?.chatReportMessage ?? 'Report'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: reasons.map((reason) {
+              return RadioListTile<String>(
+                title: Text(reason),
+                value: reason,
+                groupValue: selectedReason,
+                onChanged: (v) => setDialogState(() => selectedReason = v),
+              );
+            }).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(l10n?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: selectedReason == null
+                  ? null
+                  : () {
+                      Navigator.pop(dialogContext);
+                      context.read<ChatBloc>().add(
+                            ReportMessage(message.id, selectedReason!),
+                          );
+                    },
+              child: Text(l10n?.commonConfirm ?? 'OK'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   /// 保存媒体文件（图片/视频）

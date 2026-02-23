@@ -2,6 +2,9 @@ import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/entities/bot_config_entity.dart';
+import '../../../domain/entities/channel_entity.dart';
+import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/token_gate_entity.dart';
 
 /// 群聊事件基类
@@ -211,5 +214,96 @@ class VerifyTokenGate extends GroupEvent {
 
   @override
   List<Object?> get props => [roomId];
+}
+
+/// 设置 Bot 配置
+class SetBotConfig extends GroupEvent {
+  final String roomId;
+  final BotConfig config;
+
+  const SetBotConfig(this.roomId, this.config);
+
+  @override
+  List<Object?> get props => [roomId, config];
+}
+
+/// 设置关键词过滤
+class SetContentFilter extends GroupEvent {
+  final String roomId;
+  final ContentFilterConfig config;
+
+  const SetContentFilter(this.roomId, this.config);
+
+  @override
+  List<Object?> get props => [roomId, config];
+}
+
+/// 设置群人数上限
+class SetMaxMembers extends GroupEvent {
+  final String roomId;
+  final int? maxMembers; // null = 取消上限
+
+  const SetMaxMembers(this.roomId, this.maxMembers);
+
+  @override
+  List<Object?> get props => [roomId, maxMembers];
+}
+
+/// 加载子频道列表
+class LoadChannels extends GroupEvent {
+  final String roomId;
+
+  const LoadChannels(this.roomId);
+
+  @override
+  List<Object?> get props => [roomId];
+}
+
+/// 创建子频道
+class CreateChannel extends GroupEvent {
+  final String parentRoomId;
+  final String name;
+  final String? topic;
+
+  const CreateChannel({
+    required this.parentRoomId,
+    required this.name,
+    this.topic,
+  });
+
+  @override
+  List<Object?> get props => [parentRoomId, name, topic];
+}
+
+/// 更新子频道
+class UpdateChannel extends GroupEvent {
+  final String parentRoomId;
+  final String channelRoomId;
+  final String? name;
+  final String? topic;
+
+  const UpdateChannel({
+    required this.parentRoomId,
+    required this.channelRoomId,
+    this.name,
+    this.topic,
+  });
+
+  @override
+  List<Object?> get props => [parentRoomId, channelRoomId, name, topic];
+}
+
+/// 删除子频道
+class DeleteChannel extends GroupEvent {
+  final String parentRoomId;
+  final String channelRoomId;
+
+  const DeleteChannel({
+    required this.parentRoomId,
+    required this.channelRoomId,
+  });
+
+  @override
+  List<Object?> get props => [parentRoomId, channelRoomId];
 }
 
