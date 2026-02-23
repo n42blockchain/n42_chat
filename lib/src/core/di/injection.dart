@@ -386,6 +386,7 @@ void _registerRepositories() {
       getIt<MatrixGroupDataSource>(),
       getIt<MatrixClientManager>(),
       walletBridge: getIt<IWalletBridge>(),
+      messageDataSource: getIt<MatrixMessageDataSource>(),
     ),
   );
 

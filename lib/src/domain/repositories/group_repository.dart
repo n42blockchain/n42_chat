@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../entities/group_entity.dart';
+import '../entities/message_entity.dart';
 import '../entities/token_gate_entity.dart';
 
 /// 群聊仓库接口
@@ -72,6 +73,9 @@ abstract class IGroupRepository {
 
   /// 检查当前用户是否可以置顶消息
   bool canPinMessages(String roomId);
+
+  /// 通过事件 ID 获取单条消息（用于置顶栏加载不在内存中的历史消息）
+  Future<MessageEntity?> getMessageById(String roomId, String eventId);
 
   // ============================================
   // 成员管理

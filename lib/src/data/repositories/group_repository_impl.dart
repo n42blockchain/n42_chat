@@ -4,23 +4,28 @@ import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/group_entity.dart';
+import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/token_gate_entity.dart';
 import '../../domain/repositories/group_repository.dart';
 import '../../integration/wallet_bridge.dart';
 import '../datasources/matrix/matrix_group_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
+import '../datasources/matrix/matrix_message_datasource.dart';
 
 /// 群聊仓库实现
 class GroupRepositoryImpl implements IGroupRepository {
   final MatrixGroupDataSource _groupDataSource;
   final MatrixClientManager _clientManager;
   final IWalletBridge? _walletBridge;
+  final MatrixMessageDataSource? _messageDataSource;
 
   GroupRepositoryImpl(
     this._groupDataSource,
     this._clientManager, {
     IWalletBridge? walletBridge,
-  }) : _walletBridge = walletBridge;
+    MatrixMessageDataSource? messageDataSource,
+  })  : _walletBridge = walletBridge,
+        _messageDataSource = messageDataSource;
 
   @override
   Future<List<GroupEntity>> getGroups() async {
@@ -202,6 +207,23 @@ class GroupRepositoryImpl implements IGroupRepository {
   @override
   bool canPinMessages(String roomId) {
     return _groupDataSource.canPinMessages(roomId);
+  }
+
+  @override
+  Future<MessageEntity?> getMessageById(String roomId, String eventId) async {
+    final msgDs = _messageDataSource;
+    if (msgDs == null) return null;
+
+    final client = _clientManager.client;
+    if (client == null) return null;
+
+    final room = client.getRoomById(roomId);
+    if (room == null) return null;
+
+    final event = await room.getEventById(eventId);
+    if (event == null) return null;
+
+    return msgDs.mapEventToMessage(event, room);
   }
 
   // ============================================

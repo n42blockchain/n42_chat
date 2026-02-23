@@ -113,7 +113,8 @@ class ChatInputBarState extends State<ChatInputBar> {
   late FocusNode _focusNode;
   bool _isVoiceMode = false;
   bool _hasText = false;
-  
+  bool _showFormattingBar = false;
+
   // 录音状态
   bool _isRecording = false;
   bool _cancelRecording = false;
@@ -386,57 +387,157 @@ class ChatInputBarState extends State<ChatInputBar> {
       ),
       child: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              // 语音/键盘切换按钮
-              if (widget.showVoiceButton)
-                _buildIconButton(
-                  icon: _isVoiceMode ? Icons.keyboard : Icons.mic,
-                  onPressed: _toggleVoiceMode,
-                  isDark: isDark,
-                ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedSize(
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeInOut,
+              child: _showFormattingBar
+                  ? _buildFormattingBar(isDark)
+                  : const SizedBox.shrink(),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // 语音/键盘切换按钮
+                  if (widget.showVoiceButton)
+                    _buildIconButton(
+                      icon: _isVoiceMode ? Icons.keyboard : Icons.mic,
+                      onPressed: _toggleVoiceMode,
+                      isDark: isDark,
+                    ),
 
-              // 输入区域
-              Expanded(
-                child: _isVoiceMode
-                    ? _buildVoiceButton(isDark)
-                    : _buildTextField(isDark),
+                  // 输入区域
+                  Expanded(
+                    child: _isVoiceMode
+                        ? _buildVoiceButton(isDark)
+                        : _buildTextField(isDark),
+                  ),
+
+                  // 快捷回复按钮
+                  if (widget.showQuickReplyButton)
+                    _buildIconButton(
+                      icon: Icons.flash_on_outlined,
+                      onPressed: widget.onQuickReplyPressed,
+                      isDark: isDark,
+                    ),
+
+                  // 表情按钮
+                  if (widget.showEmojiButton)
+                    _buildIconButton(
+                      icon: Icons.emoji_emotions_outlined,
+                      onPressed: widget.onEmojiPressed,
+                      isDark: isDark,
+                    ),
+
+                  // 格式化工具栏切换按钮
+                  _buildIconButton(
+                    icon: Icons.text_format,
+                    onPressed: () =>
+                        setState(() => _showFormattingBar = !_showFormattingBar),
+                    isDark: isDark,
+                  ),
+
+                  // 更多/发送按钮
+                  _hasText
+                      ? _buildSendButton()
+                      : (widget.showMoreButton
+                          ? _buildIconButton(
+                              icon: Icons.add_circle_outline,
+                              onPressed: widget.onMorePressed,
+                              isDark: isDark,
+                            )
+                          : const SizedBox.shrink()),
+                ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-              // 快捷回复按钮
-              if (widget.showQuickReplyButton)
-                _buildIconButton(
-                  icon: Icons.flash_on_outlined,
-                  onPressed: widget.onQuickReplyPressed,
-                  isDark: isDark,
-                ),
+  Widget _buildFormattingBar(bool isDark) {
+    return Container(
+      height: 40,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildFormatButton(label: 'B', prefix: '**', suffix: '**', bold: true),
+          _buildFormatButton(label: 'I', prefix: '*', suffix: '*', italic: true),
+          _buildFormatButton(label: 'S', prefix: '~~', suffix: '~~', strikethrough: true),
+          _buildFormatButton(label: '<>', prefix: '`', suffix: '`'),
+          _buildFormatButton(label: '```', prefix: '```\n', suffix: '\n```'),
+          _buildFormatButton(label: '>', prefix: '\n> ', suffix: ''),
+        ],
+      ),
+    );
+  }
 
-              // 表情按钮
-              if (widget.showEmojiButton)
-                _buildIconButton(
-                  icon: Icons.emoji_emotions_outlined,
-                  onPressed: widget.onEmojiPressed,
-                  isDark: isDark,
-                ),
-
-              // 更多/发送按钮
-              _hasText
-                  ? _buildSendButton()
-                  : (widget.showMoreButton
-                      ? _buildIconButton(
-                          icon: Icons.add_circle_outline,
-                          onPressed: widget.onMorePressed,
-                          isDark: isDark,
-                        )
-                      : const SizedBox.shrink()),
-            ],
+  Widget _buildFormatButton({
+    required String label,
+    required String prefix,
+    required String suffix,
+    bool bold = false,
+    bool italic = false,
+    bool strikethrough = false,
+  }) {
+    return GestureDetector(
+      onTap: () => _applyMarkdownFormat(prefix, suffix),
+      child: Container(
+        width: 40,
+        height: 32,
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+            fontStyle: italic ? FontStyle.italic : FontStyle.normal,
+            decoration: strikethrough ? TextDecoration.lineThrough : null,
+            fontSize: 14,
           ),
         ),
       ),
     );
+  }
+
+  void _applyMarkdownFormat(String prefix, String suffix) {
+    final ctrl = _controller;
+    final sel = ctrl.selection;
+    final text = ctrl.text;
+
+    if (sel.isValid && !sel.isCollapsed) {
+      // 有选中文本 → 包裹
+      final selected = text.substring(sel.start, sel.end);
+      final newText = text.replaceRange(sel.start, sel.end, '$prefix$selected$suffix');
+      ctrl.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(
+          offset: sel.end + prefix.length + suffix.length,
+        ),
+      );
+    } else {
+      // 无选中 → 插入模板，光标停在 prefix 之后（中间）
+      final pos = sel.isValid ? sel.baseOffset : text.length;
+      final newText = text.replaceRange(pos, pos, '$prefix$suffix');
+      ctrl.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: pos + prefix.length),
+      );
+    }
   }
 
   Widget _buildIconButton({
