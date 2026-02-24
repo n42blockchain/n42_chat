@@ -2474,5 +2474,67 @@
   "chatReportHarassment": "Harassment",
   "chatReportInappropriate": "Inappropriate Content",
   "chatReportOther": "Other",
-  "chatReportSuccess": "Report submitted"
+  "chatReportSuccess": "Report submitted",
+
+  "spacesName": "Community Name",
+  "spacesNameHint": "e.g. Crypto Traders",
+  "spacesNameRequired": "Name is required",
+  "spacesDescription": "Description",
+  "spacesDescriptionHint": "What is this community about?",
+  "spacesType": "Community Type",
+  "spacesPublicDesc": "Anyone can discover and join",
+  "spacesPrivateDesc": "Only invited members can join",
+  "spacesNotFound": "Community not found",
+  "spacesSearch": "Search communities...",
+  "spacesMembers": "Members",
+  "spacesNoChannels": "No channels yet",
+  "spacesLeave": "Leave Community",
+  "spacesLeaveConfirm": "Are you sure you want to leave \"{name}\"?",
+  "@spacesLeaveConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "spacesDelete": "Delete Community",
+  "spacesDeleteConfirm": "This will permanently delete \"{name}\" and all its channels. This action cannot be undone.",
+  "@spacesDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "spacesCreateChannel": "Add Channel",
+  "spacesChannelName": "Channel Name",
+  "spacesChannelTopic": "Topic (optional)",
+  "spacesDeleteChannel": "Delete Channel",
+  "spacesDeleteChannelConfirm": "Are you sure you want to delete \"#{name}\"?",
+  "@spacesDeleteChannelConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "spacesEditName": "Edit Name",
+  "spacesEditDescription": "Edit Description",
+  "spacesViewAllMembers": "View all {count} members",
+  "@spacesViewAllMembers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "spacesKickMemberTitle": "Kick {name}",
+  "@spacesKickMemberTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "spacesBanMemberTitle": "Ban {name}",
+  "@spacesBanMemberTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "spacesPromoteAdmin": "Promote to Admin",
+  "spacesDemoteAdmin": "Remove Admin",
+  "spacesInviteMember": "Invite Member",
+  "spacesInviteMemberUserId": "User ID (e.g. @user:server.com)",
+  "spacesSave": "Save"
 }

@@ -5260,4 +5260,109 @@ class SRu extends S {
 
   @override
   String get chatReportSuccess => '举报已提交';
+
+  @override
+  String get spacesName => '社区名称';
+
+  @override
+  String get spacesNameHint => '例如：加密交易者';
+
+  @override
+  String get spacesNameRequired => '请输入社区名称';
+
+  @override
+  String get spacesDescription => '简介';
+
+  @override
+  String get spacesDescriptionHint => '介绍一下这个社区';
+
+  @override
+  String get spacesType => '社区类型';
+
+  @override
+  String get spacesPublicDesc => '任何人均可发现并加入';
+
+  @override
+  String get spacesPrivateDesc => '仅受邀成员可加入';
+
+  @override
+  String get spacesNotFound => '社区不存在';
+
+  @override
+  String get spacesSearch => '搜索社区...';
+
+  @override
+  String get spacesMembers => '成员';
+
+  @override
+  String get spacesNoChannels => '暂无频道';
+
+  @override
+  String get spacesLeave => '退出社区';
+
+  @override
+  String spacesLeaveConfirm(String name) {
+    return '确定要退出「$name」吗？';
+  }
+
+  @override
+  String get spacesDelete => '解散社区';
+
+  @override
+  String spacesDeleteConfirm(String name) {
+    return '此操作将永久删除「$name」及其所有频道，且不可撤销。';
+  }
+
+  @override
+  String get spacesCreateChannel => '创建频道';
+
+  @override
+  String get spacesChannelName => '频道名称';
+
+  @override
+  String get spacesChannelTopic => '话题（可选）';
+
+  @override
+  String get spacesDeleteChannel => '删除频道';
+
+  @override
+  String spacesDeleteChannelConfirm(String name) {
+    return '确定要删除频道「#$name」吗？';
+  }
+
+  @override
+  String get spacesEditName => '修改名称';
+
+  @override
+  String get spacesEditDescription => '修改简介';
+
+  @override
+  String spacesViewAllMembers(int count) {
+    return '查看全部 $count 位成员';
+  }
+
+  @override
+  String spacesKickMemberTitle(String name) {
+    return '踢出 $name';
+  }
+
+  @override
+  String spacesBanMemberTitle(String name) {
+    return '封禁 $name';
+  }
+
+  @override
+  String get spacesPromoteAdmin => '设为管理员';
+
+  @override
+  String get spacesDemoteAdmin => '撤销管理员';
+
+  @override
+  String get spacesInviteMember => '邀请成员';
+
+  @override
+  String get spacesInviteMemberUserId => '用户 ID（如 @user:server.com）';
+
+  @override
+  String get spacesSave => '保存';
 }

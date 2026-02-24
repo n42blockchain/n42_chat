@@ -9750,6 +9750,192 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'举报已提交'**
   String get chatReportSuccess;
+
+  /// No description provided for @spacesName.
+  ///
+  /// In zh, this message translates to:
+  /// **'社区名称'**
+  String get spacesName;
+
+  /// No description provided for @spacesNameHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'例如：加密交易者'**
+  String get spacesNameHint;
+
+  /// No description provided for @spacesNameRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入社区名称'**
+  String get spacesNameRequired;
+
+  /// No description provided for @spacesDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'简介'**
+  String get spacesDescription;
+
+  /// No description provided for @spacesDescriptionHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'介绍一下这个社区'**
+  String get spacesDescriptionHint;
+
+  /// No description provided for @spacesType.
+  ///
+  /// In zh, this message translates to:
+  /// **'社区类型'**
+  String get spacesType;
+
+  /// No description provided for @spacesPublicDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'任何人均可发现并加入'**
+  String get spacesPublicDesc;
+
+  /// No description provided for @spacesPrivateDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅受邀成员可加入'**
+  String get spacesPrivateDesc;
+
+  /// No description provided for @spacesNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'社区不存在'**
+  String get spacesNotFound;
+
+  /// No description provided for @spacesSearch.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索社区...'**
+  String get spacesSearch;
+
+  /// No description provided for @spacesMembers.
+  ///
+  /// In zh, this message translates to:
+  /// **'成员'**
+  String get spacesMembers;
+
+  /// No description provided for @spacesNoChannels.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无频道'**
+  String get spacesNoChannels;
+
+  /// No description provided for @spacesLeave.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出社区'**
+  String get spacesLeave;
+
+  /// No description provided for @spacesLeaveConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要退出「{name}」吗？'**
+  String spacesLeaveConfirm(String name);
+
+  /// No description provided for @spacesDelete.
+  ///
+  /// In zh, this message translates to:
+  /// **'解散社区'**
+  String get spacesDelete;
+
+  /// No description provided for @spacesDeleteConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'此操作将永久删除「{name}」及其所有频道，且不可撤销。'**
+  String spacesDeleteConfirm(String name);
+
+  /// No description provided for @spacesCreateChannel.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建频道'**
+  String get spacesCreateChannel;
+
+  /// No description provided for @spacesChannelName.
+  ///
+  /// In zh, this message translates to:
+  /// **'频道名称'**
+  String get spacesChannelName;
+
+  /// No description provided for @spacesChannelTopic.
+  ///
+  /// In zh, this message translates to:
+  /// **'话题（可选）'**
+  String get spacesChannelTopic;
+
+  /// No description provided for @spacesDeleteChannel.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除频道'**
+  String get spacesDeleteChannel;
+
+  /// No description provided for @spacesDeleteChannelConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要删除频道「#{name}」吗？'**
+  String spacesDeleteChannelConfirm(String name);
+
+  /// No description provided for @spacesEditName.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改名称'**
+  String get spacesEditName;
+
+  /// No description provided for @spacesEditDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改简介'**
+  String get spacesEditDescription;
+
+  /// No description provided for @spacesViewAllMembers.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看全部 {count} 位成员'**
+  String spacesViewAllMembers(int count);
+
+  /// No description provided for @spacesKickMemberTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'踢出 {name}'**
+  String spacesKickMemberTitle(String name);
+
+  /// No description provided for @spacesBanMemberTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'封禁 {name}'**
+  String spacesBanMemberTitle(String name);
+
+  /// No description provided for @spacesPromoteAdmin.
+  ///
+  /// In zh, this message translates to:
+  /// **'设为管理员'**
+  String get spacesPromoteAdmin;
+
+  /// No description provided for @spacesDemoteAdmin.
+  ///
+  /// In zh, this message translates to:
+  /// **'撤销管理员'**
+  String get spacesDemoteAdmin;
+
+  /// No description provided for @spacesInviteMember.
+  ///
+  /// In zh, this message translates to:
+  /// **'邀请成员'**
+  String get spacesInviteMember;
+
+  /// No description provided for @spacesInviteMemberUserId.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户 ID（如 @user:server.com）'**
+  String get spacesInviteMemberUserId;
+
+  /// No description provided for @spacesSave.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存'**
+  String get spacesSave;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

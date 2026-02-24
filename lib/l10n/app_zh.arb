@@ -2654,5 +2654,67 @@
   "chatReportHarassment": "骚扰",
   "chatReportInappropriate": "违规内容",
   "chatReportOther": "其他",
-  "chatReportSuccess": "举报已提交"
+  "chatReportSuccess": "举报已提交",
+
+  "spacesName": "社区名称",
+  "spacesNameHint": "例如：加密交易者",
+  "spacesNameRequired": "请输入社区名称",
+  "spacesDescription": "简介",
+  "spacesDescriptionHint": "介绍一下这个社区",
+  "spacesType": "社区类型",
+  "spacesPublicDesc": "任何人均可发现并加入",
+  "spacesPrivateDesc": "仅受邀成员可加入",
+  "spacesNotFound": "社区不存在",
+  "spacesSearch": "搜索社区...",
+  "spacesMembers": "成员",
+  "spacesNoChannels": "暂无频道",
+  "spacesLeave": "退出社区",
+  "spacesLeaveConfirm": "确定要退出「{name}」吗？",
+  "@spacesLeaveConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "spacesDelete": "解散社区",
+  "spacesDeleteConfirm": "此操作将永久删除「{name}」及其所有频道，且不可撤销。",
+  "@spacesDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "spacesCreateChannel": "创建频道",
+  "spacesChannelName": "频道名称",
+  "spacesChannelTopic": "话题（可选）",
+  "spacesDeleteChannel": "删除频道",
+  "spacesDeleteChannelConfirm": "确定要删除频道「#{name}」吗？",
+  "@spacesDeleteChannelConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "spacesEditName": "修改名称",
+  "spacesEditDescription": "修改简介",
+  "spacesViewAllMembers": "查看全部 {count} 位成员",
+  "@spacesViewAllMembers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "spacesKickMemberTitle": "踢出 {name}",
+  "@spacesKickMemberTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "spacesBanMemberTitle": "封禁 {name}",
+  "@spacesBanMemberTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "spacesPromoteAdmin": "设为管理员",
+  "spacesDemoteAdmin": "撤销管理员",
+  "spacesInviteMember": "邀请成员",
+  "spacesInviteMemberUserId": "用户 ID（如 @user:server.com）",
+  "spacesSave": "保存"
 }

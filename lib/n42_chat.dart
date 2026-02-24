@@ -46,6 +46,7 @@ export 'src/domain/entities/conversation_entity.dart';
 export 'src/domain/entities/message_entity.dart';
 export 'src/domain/entities/contact_entity.dart';
 export 'src/domain/entities/user_entity.dart';
+export 'src/domain/entities/space_entity.dart';
 
 // ============================================
 // 集成接口导出

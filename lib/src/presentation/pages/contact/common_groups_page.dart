@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 
@@ -47,13 +49,53 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
       _error = null;
     });
 
-    // TODO: implement getCommonGroups in IGroupRepository
-    if (mounted) {
-      setState(() {
-        _groups = [];
-        _isLoading = false;
-      });
+    try {
+      final client = MatrixClientManager.instance.client;
+      if (client == null) throw Exception('Matrix client not initialized');
+
+      // 从本地内存中查找与目标用户共同的群组：
+      // 过滤出非 Space、非直聊、且对方也是成员的所有房间
+      final commonGroups = client.rooms.where((room) {
+        // 排除 Space 类型房间
+        final createEvent = room.getState(matrix.EventTypes.RoomCreate);
+        if (createEvent?.content['type'] == 'm.space') return false;
+        // 排除直聊房间（DM）
+        if (room.isDirectChat) return false;
+        // 检查 widget.userId 是否在成员列表中
+        return room.getParticipants().any((u) => u.id == widget.userId);
+      }).map(_roomToGroupEntity).toList();
+
+      if (mounted) {
+        setState(() {
+          _groups = commonGroups;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  /// 将 Matrix Room 转换为 GroupEntity（轻量级，仅展示所需字段）
+  GroupEntity _roomToGroupEntity(matrix.Room room) {
+    final members = room.getParticipants();
+
+    return GroupEntity(
+      roomId: room.id,
+      name: room.name,
+      topic: room.topic.isNotEmpty ? room.topic : null,
+      avatarUrl: room.avatar?.toString(),
+      memberCount: room.summary.mJoinedMemberCount ?? members.length,
+      members: [],
+      isPublic: room.joinRules == matrix.JoinRules.public,
+      createdAt: DateTime.now(),
+      myRole: GroupRole.member,
+    );
   }
 
   @override
