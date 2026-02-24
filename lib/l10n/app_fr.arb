@@ -1840,5 +1840,34 @@
         "type": "String"
       }
     }
-  }
+  },
+  "web3SearchHint": "@matrix:id  •  adresse 0x  •  name.eth",
+  "web3SearchPlaceholder": "Rechercher par ID, wallet ou ENS...",
+  "web3WalletAddress": "Adresse du wallet",
+  "web3AddressCopied": "Adresse copiée",
+  "web3Copy": "Copier",
+  "web3SendMessage": "Envoyer un message",
+  "web3SendToWallet": "Message au wallet",
+  "web3WalletOnlyHint": "Cette adresse n'a pas de compte N42. Le message sera livré quand il rejoindra.",
+  "web3NftAvatar": "Avatar NFT",
+  "web3ResolveFailed": "Échec de la résolution d'identité",
+  "web3EnsNotFound": "Nom ENS \"{name}\" introuvable",
+  "@web3EnsNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "web3NoN42AccountTitle": "Pas de compte N42",
+  "web3ShareInvite": "Partager l'invitation",
+  "nftPickerTitle": "Sélectionner un avatar NFT",
+  "nftPickerTabPopular": "Populaire",
+  "nftPickerTabCustom": "Personnalisé",
+  "nftPickerVerifyOwnership": "Vérifier la propriété et prévisualiser",
+  "nftPickerUseAsAvatar": "Utiliser comme avatar",
+  "nftPickerNotOwned": "Vous ne possédez pas ce NFT",
+  "nftPickerInfoTitle": "Avatar NFT — Vérifié sur la chaîne",
+  "nftPickerPopularCollections": "Collections populaires",
+  "nftPickerWalletHint": "Connectez votre wallet N42 pour découvrir vos NFT sur 236+ chaînes."
 }

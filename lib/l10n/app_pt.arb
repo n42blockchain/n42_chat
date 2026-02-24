@@ -1840,5 +1840,34 @@
         "type": "String"
       }
     }
-  }
+  },
+  "web3SearchHint": "@matrix:id  •  endereço 0x  •  name.eth",
+  "web3SearchPlaceholder": "Pesquisar por ID, carteira ou ENS...",
+  "web3WalletAddress": "Endereço da carteira",
+  "web3AddressCopied": "Endereço copiado",
+  "web3Copy": "Copiar",
+  "web3SendMessage": "Enviar mensagem",
+  "web3SendToWallet": "Mensagem para carteira",
+  "web3WalletOnlyHint": "Este endereço não tem conta N42. A mensagem será entregue quando entrar.",
+  "web3NftAvatar": "Avatar NFT",
+  "web3ResolveFailed": "Falha ao resolver identidade",
+  "web3EnsNotFound": "Nome ENS \"{name}\" não encontrado",
+  "@web3EnsNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "web3NoN42AccountTitle": "Sem conta N42",
+  "web3ShareInvite": "Partilhar convite",
+  "nftPickerTitle": "Selecionar avatar NFT",
+  "nftPickerTabPopular": "Popular",
+  "nftPickerTabCustom": "Personalizado",
+  "nftPickerVerifyOwnership": "Verificar propriedade e pré-visualizar",
+  "nftPickerUseAsAvatar": "Usar como avatar",
+  "nftPickerNotOwned": "Você não possui este NFT",
+  "nftPickerInfoTitle": "Avatar NFT — Verificado na chain",
+  "nftPickerPopularCollections": "Coleções populares",
+  "nftPickerWalletHint": "Conecte sua carteira N42 para descobrir seus NFTs em mais de 236 cadeias."
 }

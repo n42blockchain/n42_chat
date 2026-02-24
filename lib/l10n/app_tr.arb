@@ -1840,5 +1840,34 @@
         "type": "String"
       }
     }
-  }
+  },
+  "web3SearchHint": "@matrix:id  •  0x adres  •  name.eth",
+  "web3SearchPlaceholder": "ID, cüzdan veya ENS ile ara...",
+  "web3WalletAddress": "Cüzdan adresi",
+  "web3AddressCopied": "Adres kopyalandı",
+  "web3Copy": "Kopyala",
+  "web3SendMessage": "Mesaj gönder",
+  "web3SendToWallet": "Cüzdana mesaj",
+  "web3WalletOnlyHint": "Bu adresin N42 hesabı yok. Katıldıklarında mesaj iletilecek.",
+  "web3NftAvatar": "NFT Avatar",
+  "web3ResolveFailed": "Kimlik çözümlenemedi",
+  "web3EnsNotFound": "ENS adı \"{name}\" bulunamadı",
+  "@web3EnsNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "web3NoN42AccountTitle": "N42 hesabı yok",
+  "web3ShareInvite": "Daveti paylaş",
+  "nftPickerTitle": "NFT avatar seç",
+  "nftPickerTabPopular": "Popüler",
+  "nftPickerTabCustom": "Özel",
+  "nftPickerVerifyOwnership": "Sahipliği doğrula ve önizle",
+  "nftPickerUseAsAvatar": "Avatar olarak kullan",
+  "nftPickerNotOwned": "Bu NFT'ye sahip değilsiniz",
+  "nftPickerInfoTitle": "NFT Avatar — Zincir Üzeri Doğrulama",
+  "nftPickerPopularCollections": "Popüler koleksiyonlar",
+  "nftPickerWalletHint": "N42 cüzdanınızı bağlayarak 236+ zincirde NFT'lerinizi otomatik keşfedin."
 }

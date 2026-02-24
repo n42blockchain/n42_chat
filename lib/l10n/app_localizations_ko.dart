@@ -5366,4 +5366,98 @@ class SKo extends S {
   String redPacketGrabbedViral(String amount, String token) {
     return '🧧 빨간 봉투를 받았습니다 • $amount $token';
   }
+
+  @override
+  String get web3SearchHint => '@matrix:id  •  0x 지갑 주소  •  name.eth';
+
+  @override
+  String get web3SearchPlaceholder => 'ID, 지갑, ENS로 검색...';
+
+  @override
+  String get web3WalletAddress => '지갑 주소';
+
+  @override
+  String get web3AddressCopied => '주소가 복사되었습니다';
+
+  @override
+  String get web3Copy => '복사';
+
+  @override
+  String get web3SendMessage => '메시지 보내기';
+
+  @override
+  String get web3SendToWallet => '지갑으로 메시지';
+
+  @override
+  String get web3WalletOnlyHint => '이 주소에 N42 계정이 없습니다. 가입 후 메시지가 전달됩니다.';
+
+  @override
+  String get web3NftAvatar => 'NFT 아바타';
+
+  @override
+  String get web3ResolveFailed => '신원 확인 실패';
+
+  @override
+  String web3EnsNotFound(String name) {
+    return 'ENS 이름 \"$name\"을 찾을 수 없음';
+  }
+
+  @override
+  String get web3NoN42AccountTitle => 'N42 계정 없음';
+
+  @override
+  String get web3NoN42AccountDesc => '该钱包地址尚无 N42 账号。您可以分享 N42 邀请链接邀请对方加入。';
+
+  @override
+  String get web3ShareInvite => '초대 공유';
+
+  @override
+  String get nftPickerTitle => 'NFT 아바타 선택';
+
+  @override
+  String get nftPickerTabPopular => '인기';
+
+  @override
+  String get nftPickerTabCustom => '커스텀';
+
+  @override
+  String get nftPickerChain => '链';
+
+  @override
+  String get nftPickerContract => '合约地址';
+
+  @override
+  String get nftPickerTokenId => 'Token ID';
+
+  @override
+  String get nftPickerVerifyOwnership => '소유권 확인 및 미리보기';
+
+  @override
+  String get nftPickerUseAsAvatar => '아바타로 사용';
+
+  @override
+  String get nftPickerPreview => '预览';
+
+  @override
+  String get nftPickerNotOwned => '이 NFT를 소유하고 있지 않습니다';
+
+  @override
+  String get nftPickerInvalidTokenId => '无效的 Token ID';
+
+  @override
+  String get nftPickerEnterBoth => '请输入合约地址和 Token ID';
+
+  @override
+  String get nftPickerInfoTitle => 'NFT 아바타 — 온체인 인증';
+
+  @override
+  String get nftPickerInfoDesc =>
+      '绑定您持有的 NFT 作为头像。任何人均可在链上验证归属权。在 N42 全应用中以金色边框标识。';
+
+  @override
+  String get nftPickerPopularCollections => '인기 콜렉션';
+
+  @override
+  String get nftPickerWalletHint =>
+      'N42 지갑을 연결하여 236개 이상의 체인에서 NFT를 자동으로 검색하세요.';
 }

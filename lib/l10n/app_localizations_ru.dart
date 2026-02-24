@@ -5455,4 +5455,99 @@ class SRu extends S {
   String redPacketGrabbedViral(String amount, String token) {
     return '🧧 Получил красный конверт • $amount $token';
   }
+
+  @override
+  String get web3SearchHint => '@matrix:id  •  адрес 0x  •  name.eth';
+
+  @override
+  String get web3SearchPlaceholder => 'Поиск по ID, кошельку или ENS...';
+
+  @override
+  String get web3WalletAddress => 'Адрес кошелька';
+
+  @override
+  String get web3AddressCopied => 'Адрес скопирован';
+
+  @override
+  String get web3Copy => 'Копировать';
+
+  @override
+  String get web3SendMessage => 'Отправить сообщение';
+
+  @override
+  String get web3SendToWallet => 'Сообщение на кошелёк';
+
+  @override
+  String get web3WalletOnlyHint =>
+      'У этого адреса ещё нет аккаунта N42. Сообщение будет доставлено после регистрации.';
+
+  @override
+  String get web3NftAvatar => 'NFT-аватар';
+
+  @override
+  String get web3ResolveFailed => 'Не удалось определить идентификатор';
+
+  @override
+  String web3EnsNotFound(String name) {
+    return 'ENS-имя \"$name\" не найдено';
+  }
+
+  @override
+  String get web3NoN42AccountTitle => 'Нет аккаунта N42';
+
+  @override
+  String get web3NoN42AccountDesc => '该钱包地址尚无 N42 账号。您可以分享 N42 邀请链接邀请对方加入。';
+
+  @override
+  String get web3ShareInvite => 'Поделиться приглашением';
+
+  @override
+  String get nftPickerTitle => 'Выбрать NFT-аватар';
+
+  @override
+  String get nftPickerTabPopular => 'Популярные';
+
+  @override
+  String get nftPickerTabCustom => 'Настраиваемый';
+
+  @override
+  String get nftPickerChain => '链';
+
+  @override
+  String get nftPickerContract => '合约地址';
+
+  @override
+  String get nftPickerTokenId => 'Token ID';
+
+  @override
+  String get nftPickerVerifyOwnership => 'Подтвердить право собственности';
+
+  @override
+  String get nftPickerUseAsAvatar => 'Использовать как аватар';
+
+  @override
+  String get nftPickerPreview => '预览';
+
+  @override
+  String get nftPickerNotOwned => 'Вы не владеете этим NFT';
+
+  @override
+  String get nftPickerInvalidTokenId => '无效的 Token ID';
+
+  @override
+  String get nftPickerEnterBoth => '请输入合约地址和 Token ID';
+
+  @override
+  String get nftPickerInfoTitle => 'NFT-аватар — on-chain верификация';
+
+  @override
+  String get nftPickerInfoDesc =>
+      '绑定您持有的 NFT 作为头像。任何人均可在链上验证归属权。在 N42 全应用中以金色边框标识。';
+
+  @override
+  String get nftPickerPopularCollections => 'Популярные коллекции';
+
+  @override
+  String get nftPickerWalletHint =>
+      'Подключите кошелёк N42, чтобы автоматически находить NFT в 236+ сетях.';
 }

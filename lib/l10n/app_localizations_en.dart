@@ -5447,4 +5447,100 @@ class SEn extends S {
   String redPacketGrabbedViral(String amount, String token) {
     return '🧧 grabbed a red packet • $amount $token';
   }
+
+  @override
+  String get web3SearchHint => '@matrix:id  •  0x wallet address  •  name.eth';
+
+  @override
+  String get web3SearchPlaceholder => 'Search by ID, wallet, or ENS...';
+
+  @override
+  String get web3WalletAddress => 'Wallet Address';
+
+  @override
+  String get web3AddressCopied => 'Address copied';
+
+  @override
+  String get web3Copy => 'Copy';
+
+  @override
+  String get web3SendMessage => 'Send Message';
+
+  @override
+  String get web3SendToWallet => 'Message Wallet';
+
+  @override
+  String get web3WalletOnlyHint =>
+      'This address has no N42 account yet. Message will be delivered when they join.';
+
+  @override
+  String get web3NftAvatar => 'NFT Avatar';
+
+  @override
+  String get web3ResolveFailed => 'Failed to resolve identity';
+
+  @override
+  String web3EnsNotFound(String name) {
+    return 'ENS name \"$name\" not found';
+  }
+
+  @override
+  String get web3NoN42AccountTitle => 'No N42 Account';
+
+  @override
+  String get web3NoN42AccountDesc =>
+      'This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.';
+
+  @override
+  String get web3ShareInvite => 'Share Invite';
+
+  @override
+  String get nftPickerTitle => 'Select NFT Avatar';
+
+  @override
+  String get nftPickerTabPopular => 'Popular';
+
+  @override
+  String get nftPickerTabCustom => 'Custom';
+
+  @override
+  String get nftPickerChain => 'Chain';
+
+  @override
+  String get nftPickerContract => 'Contract Address';
+
+  @override
+  String get nftPickerTokenId => 'Token ID';
+
+  @override
+  String get nftPickerVerifyOwnership => 'Verify Ownership & Preview';
+
+  @override
+  String get nftPickerUseAsAvatar => 'Use as Avatar';
+
+  @override
+  String get nftPickerPreview => 'Preview';
+
+  @override
+  String get nftPickerNotOwned => 'You do not own this NFT';
+
+  @override
+  String get nftPickerInvalidTokenId => 'Invalid token ID';
+
+  @override
+  String get nftPickerEnterBoth => 'Enter contract address and token ID';
+
+  @override
+  String get nftPickerInfoTitle => 'NFT Avatar — Verified On-Chain';
+
+  @override
+  String get nftPickerInfoDesc =>
+      'Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.';
+
+  @override
+  String get nftPickerPopularCollections => 'Popular Collections';
+
+  @override
+  String get nftPickerWalletHint =>
+      'Connect your N42 wallet to automatically discover your NFTs across 236+ chains.';
 }

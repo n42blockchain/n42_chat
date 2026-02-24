@@ -5443,4 +5443,100 @@ class SId extends S {
   String redPacketGrabbedViral(String amount, String token) {
     return '🧧 Mendapat amplop merah • $amount $token';
   }
+
+  @override
+  String get web3SearchHint => '@matrix:id  •  alamat 0x  •  name.eth';
+
+  @override
+  String get web3SearchPlaceholder =>
+      'Cari berdasarkan ID, dompet, atau ENS...';
+
+  @override
+  String get web3WalletAddress => 'Alamat dompet';
+
+  @override
+  String get web3AddressCopied => 'Alamat disalin';
+
+  @override
+  String get web3Copy => 'Salin';
+
+  @override
+  String get web3SendMessage => 'Kirim pesan';
+
+  @override
+  String get web3SendToWallet => 'Pesan ke dompet';
+
+  @override
+  String get web3WalletOnlyHint =>
+      'Alamat ini belum memiliki akun N42. Pesan akan terkirim setelah bergabung.';
+
+  @override
+  String get web3NftAvatar => 'Avatar NFT';
+
+  @override
+  String get web3ResolveFailed => 'Gagal memuat identitas';
+
+  @override
+  String web3EnsNotFound(String name) {
+    return 'Nama ENS \"$name\" tidak ditemukan';
+  }
+
+  @override
+  String get web3NoN42AccountTitle => 'Tidak ada akun N42';
+
+  @override
+  String get web3NoN42AccountDesc => '该钱包地址尚无 N42 账号。您可以分享 N42 邀请链接邀请对方加入。';
+
+  @override
+  String get web3ShareInvite => 'Bagikan undangan';
+
+  @override
+  String get nftPickerTitle => 'Pilih avatar NFT';
+
+  @override
+  String get nftPickerTabPopular => 'Populer';
+
+  @override
+  String get nftPickerTabCustom => 'Kustom';
+
+  @override
+  String get nftPickerChain => '链';
+
+  @override
+  String get nftPickerContract => '合约地址';
+
+  @override
+  String get nftPickerTokenId => 'Token ID';
+
+  @override
+  String get nftPickerVerifyOwnership => 'Verifikasi kepemilikan & pratinjau';
+
+  @override
+  String get nftPickerUseAsAvatar => 'Gunakan sebagai avatar';
+
+  @override
+  String get nftPickerPreview => '预览';
+
+  @override
+  String get nftPickerNotOwned => 'Anda tidak memiliki NFT ini';
+
+  @override
+  String get nftPickerInvalidTokenId => '无效的 Token ID';
+
+  @override
+  String get nftPickerEnterBoth => '请输入合约地址和 Token ID';
+
+  @override
+  String get nftPickerInfoTitle => 'Avatar NFT — Terverifikasi on-chain';
+
+  @override
+  String get nftPickerInfoDesc =>
+      '绑定您持有的 NFT 作为头像。任何人均可在链上验证归属权。在 N42 全应用中以金色边框标识。';
+
+  @override
+  String get nftPickerPopularCollections => 'Koleksi populer';
+
+  @override
+  String get nftPickerWalletHint =>
+      'Hubungkan dompet N42 Anda untuk menemukan NFT Anda di 236+ rantai.';
 }

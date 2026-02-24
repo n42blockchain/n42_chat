@@ -1840,5 +1840,34 @@
         "type": "String"
       }
     }
-  }
+  },
+  "web3SearchHint": "@matrix:id  •  dirección 0x  •  name.eth",
+  "web3SearchPlaceholder": "Buscar por ID, wallet o ENS...",
+  "web3WalletAddress": "Dirección de wallet",
+  "web3AddressCopied": "Dirección copiada",
+  "web3Copy": "Copiar",
+  "web3SendMessage": "Enviar mensaje",
+  "web3SendToWallet": "Mensaje al wallet",
+  "web3WalletOnlyHint": "Esta dirección no tiene cuenta N42. El mensaje se entregará cuando se registre.",
+  "web3NftAvatar": "Avatar NFT",
+  "web3ResolveFailed": "Error al resolver identidad",
+  "web3EnsNotFound": "Nombre ENS \"{name}\" no encontrado",
+  "@web3EnsNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "web3NoN42AccountTitle": "Sin cuenta N42",
+  "web3ShareInvite": "Compartir invitación",
+  "nftPickerTitle": "Seleccionar avatar NFT",
+  "nftPickerTabPopular": "Popular",
+  "nftPickerTabCustom": "Personalizado",
+  "nftPickerVerifyOwnership": "Verificar propiedad y previsualizar",
+  "nftPickerUseAsAvatar": "Usar como avatar",
+  "nftPickerNotOwned": "No posees este NFT",
+  "nftPickerInfoTitle": "Avatar NFT — Verificado en cadena",
+  "nftPickerPopularCollections": "Colecciones populares",
+  "nftPickerWalletHint": "Conecta tu wallet N42 para descubrir automáticamente tus NFT en 236+ cadenas."
 }

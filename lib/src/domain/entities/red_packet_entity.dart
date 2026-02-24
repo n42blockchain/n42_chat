@@ -1,4 +1,4 @@
-/// Red packet domain entity
+/// Red packet domain entity.
 ///
 /// Models a group/P2P red packet sent inside a chat room.
 /// Tracks all claims and computes derived stats (best luck, remaining, etc.).
@@ -10,7 +10,7 @@ enum RedPacketType {
 }
 
 /// Lifecycle state of a red packet.
-enum RedPacketStatus {
+enum RedPacketLifecycle {
   active,    // Still has unclaimed slots and not expired
   completed, // All packets claimed
   expired,   // 24-hour window passed with remaining packets (auto-refund)
@@ -65,10 +65,10 @@ class RedPacketEntity {
   bool get isExpired => DateTime.now().isAfter(expiresAt);
   bool get isCompleted => remainingCount <= 0;
 
-  RedPacketStatus get status {
-    if (isCompleted) return RedPacketStatus.completed;
-    if (isExpired) return RedPacketStatus.expired;
-    return RedPacketStatus.active;
+  RedPacketLifecycle get lifecycle {
+    if (isCompleted) return RedPacketLifecycle.completed;
+    if (isExpired) return RedPacketLifecycle.expired;
+    return RedPacketLifecycle.active;
   }
 
   /// The claim with the highest amount — the social "best luck" winner.
