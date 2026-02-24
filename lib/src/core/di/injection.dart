@@ -73,10 +73,14 @@ import '../services/ens_cache_service.dart';
 import '../../data/datasources/ai_datasource.dart';
 import '../../data/repositories/ai_repository_impl.dart';
 import '../../data/repositories/voice_room_repository_impl.dart';
+import '../../data/datasources/matrix/matrix_space_datasource.dart';
+import '../../data/repositories/space_repository_impl.dart';
 import '../../domain/repositories/ai_repository.dart';
 import '../../domain/repositories/voice_room_repository.dart';
+import '../../domain/repositories/space_repository.dart';
 import '../../presentation/blocs/ai_assistant/ai_assistant_bloc.dart';
 import '../../presentation/blocs/chat_folder/chat_folder_bloc.dart';
+import '../../presentation/blocs/space/space_bloc.dart';
 import '../../services/voip/voice_room_service.dart';
 
 /// 全局GetIt实例
@@ -342,6 +346,11 @@ Future<void> _registerDataSources() async {
   getIt.registerLazySingleton<MatrixVoiceRoomDataSource>(
     () => MatrixVoiceRoomDataSource(getIt<MatrixClientManager>()),
   );
+
+  // Matrix Space 数据源
+  getIt.registerLazySingleton<MatrixSpaceDataSource>(
+    () => MatrixSpaceDataSource(getIt<MatrixClientManager>()),
+  );
 }
 
 /// 注册仓库
@@ -446,6 +455,11 @@ void _registerRepositories() {
     () => VoiceRoomRepositoryImpl(
       getIt<MatrixVoiceRoomDataSource>(),
     ),
+  );
+
+  // Space 社群仓库
+  getIt.registerLazySingleton<ISpaceRepository>(
+    () => SpaceRepositoryImpl(getIt<MatrixSpaceDataSource>()),
   );
 
   // AI 仓库（仅当 AI 服务已注册时）
@@ -569,6 +583,11 @@ void _registerBlocs() {
     () => ChatFolderBloc(
       storage: getIt<PreferencesDataSource>(),
     ),
+  );
+
+  // Space 社群 BLoC
+  getIt.registerFactory<SpaceBloc>(
+    () => SpaceBloc(repository: getIt<ISpaceRepository>()),
   );
 }
 

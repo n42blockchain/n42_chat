@@ -5252,4 +5252,109 @@ class SEn extends S {
 
   @override
   String get chatReportSuccess => 'Report submitted';
+
+  @override
+  String get spacesName => 'Community Name';
+
+  @override
+  String get spacesNameHint => 'e.g. Crypto Traders';
+
+  @override
+  String get spacesNameRequired => 'Name is required';
+
+  @override
+  String get spacesDescription => 'Description';
+
+  @override
+  String get spacesDescriptionHint => 'What is this community about?';
+
+  @override
+  String get spacesType => 'Community Type';
+
+  @override
+  String get spacesPublicDesc => 'Anyone can discover and join';
+
+  @override
+  String get spacesPrivateDesc => 'Only invited members can join';
+
+  @override
+  String get spacesNotFound => 'Community not found';
+
+  @override
+  String get spacesSearch => 'Search communities...';
+
+  @override
+  String get spacesMembers => 'Members';
+
+  @override
+  String get spacesNoChannels => 'No channels yet';
+
+  @override
+  String get spacesLeave => 'Leave Community';
+
+  @override
+  String spacesLeaveConfirm(String name) {
+    return 'Are you sure you want to leave \"$name\"?';
+  }
+
+  @override
+  String get spacesDelete => 'Delete Community';
+
+  @override
+  String spacesDeleteConfirm(String name) {
+    return 'This will permanently delete \"$name\" and all its channels. This action cannot be undone.';
+  }
+
+  @override
+  String get spacesCreateChannel => 'Add Channel';
+
+  @override
+  String get spacesChannelName => 'Channel Name';
+
+  @override
+  String get spacesChannelTopic => 'Topic (optional)';
+
+  @override
+  String get spacesDeleteChannel => 'Delete Channel';
+
+  @override
+  String spacesDeleteChannelConfirm(String name) {
+    return 'Are you sure you want to delete \"#$name\"?';
+  }
+
+  @override
+  String get spacesEditName => 'Edit Name';
+
+  @override
+  String get spacesEditDescription => 'Edit Description';
+
+  @override
+  String spacesViewAllMembers(int count) {
+    return 'View all $count members';
+  }
+
+  @override
+  String spacesKickMemberTitle(String name) {
+    return 'Kick $name';
+  }
+
+  @override
+  String spacesBanMemberTitle(String name) {
+    return 'Ban $name';
+  }
+
+  @override
+  String get spacesPromoteAdmin => 'Promote to Admin';
+
+  @override
+  String get spacesDemoteAdmin => 'Remove Admin';
+
+  @override
+  String get spacesInviteMember => 'Invite Member';
+
+  @override
+  String get spacesInviteMemberUserId => 'User ID (e.g. @user:server.com)';
+
+  @override
+  String get spacesSave => 'Save';
 }
