@@ -2804,5 +2804,42 @@
         "type": "String"
       }
     }
-  }
+  },
+  "web3SearchHint": "@matrix:id  •  0x 錢包地址  •  name.eth",
+  "web3SearchPlaceholder": "搜索 ID、錢包地址或 ENS...",
+  "web3WalletAddress": "錢包地址",
+  "web3AddressCopied": "地址已复制",
+  "web3Copy": "复制",
+  "web3SendMessage": "发消息",
+  "web3SendToWallet": "发送到錢包",
+  "web3WalletOnlyHint": "该地址尚无 N42 账号。对方加入后消息将自动送达。",
+  "web3NftAvatar": "NFT 头像",
+  "web3ResolveFailed": "身份解析失败",
+  "web3EnsNotFound": "ENS 名称“{name}”未找到",
+  "@web3EnsNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "web3NoN42AccountTitle": "无 N42 账号",
+  "web3NoN42AccountDesc": "该钱包地址尚无 N42 账号。您可以分享 N42 邀请链接邀请对方加入。",
+  "web3ShareInvite": "分享邀请",
+  "nftPickerTitle": "选择 NFT 头像",
+  "nftPickerTabPopular": "热门",
+  "nftPickerTabCustom": "自定义",
+  "nftPickerChain": "链",
+  "nftPickerContract": "合约地址",
+  "nftPickerTokenId": "Token ID",
+  "nftPickerVerifyOwnership": "验证所有权并预览",
+  "nftPickerUseAsAvatar": "用作头像",
+  "nftPickerPreview": "预览",
+  "nftPickerNotOwned": "您不拥有这个 NFT",
+  "nftPickerInvalidTokenId": "无效的 Token ID",
+  "nftPickerEnterBoth": "请输入合约地址和 Token ID",
+  "nftPickerInfoTitle": "NFT 头像 — 链上身份验证",
+  "nftPickerInfoDesc": "绑定您持有的 NFT 作为头像。任何人均可在链上验证归属权。在 N42 全应用中以金色边框标识。",
+  "nftPickerPopularCollections": "热门 NFT 项目",
+  "nftPickerWalletHint": "连接 N42 錢包，自动发现您在 236+ 条链上持有的 NFT。"
 }

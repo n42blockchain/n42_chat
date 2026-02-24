@@ -10104,6 +10104,186 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'🧧 抢到了红包 • {amount} {token}'**
   String redPacketGrabbedViral(String amount, String token);
+
+  /// No description provided for @web3SearchHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'@matrix:id  •  0x 錢包地址  •  name.eth'**
+  String get web3SearchHint;
+
+  /// No description provided for @web3SearchPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索 ID、錢包地址或 ENS...'**
+  String get web3SearchPlaceholder;
+
+  /// No description provided for @web3WalletAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'錢包地址'**
+  String get web3WalletAddress;
+
+  /// No description provided for @web3AddressCopied.
+  ///
+  /// In zh, this message translates to:
+  /// **'地址已复制'**
+  String get web3AddressCopied;
+
+  /// No description provided for @web3Copy.
+  ///
+  /// In zh, this message translates to:
+  /// **'复制'**
+  String get web3Copy;
+
+  /// No description provided for @web3SendMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'发消息'**
+  String get web3SendMessage;
+
+  /// No description provided for @web3SendToWallet.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送到錢包'**
+  String get web3SendToWallet;
+
+  /// No description provided for @web3WalletOnlyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'该地址尚无 N42 账号。对方加入后消息将自动送达。'**
+  String get web3WalletOnlyHint;
+
+  /// No description provided for @web3NftAvatar.
+  ///
+  /// In zh, this message translates to:
+  /// **'NFT 头像'**
+  String get web3NftAvatar;
+
+  /// No description provided for @web3ResolveFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'身份解析失败'**
+  String get web3ResolveFailed;
+
+  /// No description provided for @web3EnsNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'ENS 名称“{name}”未找到'**
+  String web3EnsNotFound(String name);
+
+  /// No description provided for @web3NoN42AccountTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'无 N42 账号'**
+  String get web3NoN42AccountTitle;
+
+  /// No description provided for @web3NoN42AccountDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'该钱包地址尚无 N42 账号。您可以分享 N42 邀请链接邀请对方加入。'**
+  String get web3NoN42AccountDesc;
+
+  /// No description provided for @web3ShareInvite.
+  ///
+  /// In zh, this message translates to:
+  /// **'分享邀请'**
+  String get web3ShareInvite;
+
+  /// No description provided for @nftPickerTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择 NFT 头像'**
+  String get nftPickerTitle;
+
+  /// No description provided for @nftPickerTabPopular.
+  ///
+  /// In zh, this message translates to:
+  /// **'热门'**
+  String get nftPickerTabPopular;
+
+  /// No description provided for @nftPickerTabCustom.
+  ///
+  /// In zh, this message translates to:
+  /// **'自定义'**
+  String get nftPickerTabCustom;
+
+  /// No description provided for @nftPickerChain.
+  ///
+  /// In zh, this message translates to:
+  /// **'链'**
+  String get nftPickerChain;
+
+  /// No description provided for @nftPickerContract.
+  ///
+  /// In zh, this message translates to:
+  /// **'合约地址'**
+  String get nftPickerContract;
+
+  /// No description provided for @nftPickerTokenId.
+  ///
+  /// In zh, this message translates to:
+  /// **'Token ID'**
+  String get nftPickerTokenId;
+
+  /// No description provided for @nftPickerVerifyOwnership.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证所有权并预览'**
+  String get nftPickerVerifyOwnership;
+
+  /// No description provided for @nftPickerUseAsAvatar.
+  ///
+  /// In zh, this message translates to:
+  /// **'用作头像'**
+  String get nftPickerUseAsAvatar;
+
+  /// No description provided for @nftPickerPreview.
+  ///
+  /// In zh, this message translates to:
+  /// **'预览'**
+  String get nftPickerPreview;
+
+  /// No description provided for @nftPickerNotOwned.
+  ///
+  /// In zh, this message translates to:
+  /// **'您不拥有这个 NFT'**
+  String get nftPickerNotOwned;
+
+  /// No description provided for @nftPickerInvalidTokenId.
+  ///
+  /// In zh, this message translates to:
+  /// **'无效的 Token ID'**
+  String get nftPickerInvalidTokenId;
+
+  /// No description provided for @nftPickerEnterBoth.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入合约地址和 Token ID'**
+  String get nftPickerEnterBoth;
+
+  /// No description provided for @nftPickerInfoTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'NFT 头像 — 链上身份验证'**
+  String get nftPickerInfoTitle;
+
+  /// No description provided for @nftPickerInfoDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'绑定您持有的 NFT 作为头像。任何人均可在链上验证归属权。在 N42 全应用中以金色边框标识。'**
+  String get nftPickerInfoDesc;
+
+  /// No description provided for @nftPickerPopularCollections.
+  ///
+  /// In zh, this message translates to:
+  /// **'热门 NFT 项目'**
+  String get nftPickerPopularCollections;
+
+  /// No description provided for @nftPickerWalletHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'连接 N42 錢包，自动发现您在 236+ 条链上持有的 NFT。'**
+  String get nftPickerWalletHint;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

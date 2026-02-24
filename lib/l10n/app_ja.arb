@@ -1840,5 +1840,34 @@
         "type": "String"
       }
     }
-  }
+  },
+  "web3SearchHint": "@matrix:id  •  0x ウォレット  •  name.eth",
+  "web3SearchPlaceholder": "ID・ウォレット・ENS で検索...",
+  "web3WalletAddress": "ウォレットアドレス",
+  "web3AddressCopied": "アドレスをコピーしました",
+  "web3Copy": "コピー",
+  "web3SendMessage": "メッセージを送る",
+  "web3SendToWallet": "ウォレットにメッセージ",
+  "web3WalletOnlyHint": "このアドレスはまだ N42 アカウントがありません。参加後にメッセージが届きます。",
+  "web3NftAvatar": "NFT アバター",
+  "web3ResolveFailed": "アイデンティティの解決に失敗しました",
+  "web3EnsNotFound": "ENS 名「{name}」が見つかりません",
+  "@web3EnsNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "web3NoN42AccountTitle": "N42 アカウントなし",
+  "web3ShareInvite": "招待を共有",
+  "nftPickerTitle": "NFT アバターを選択",
+  "nftPickerTabPopular": "人気",
+  "nftPickerTabCustom": "カスタム",
+  "nftPickerVerifyOwnership": "所有権を確認してプレビュー",
+  "nftPickerUseAsAvatar": "アバターとして使用",
+  "nftPickerNotOwned": "このNFTを所有していません",
+  "nftPickerInfoTitle": "NFT アバター — オンチェーン確認済み",
+  "nftPickerPopularCollections": "人気コレクション",
+  "nftPickerWalletHint": "N42 ウォレットを接続して、236 以上のチェーンの NFT を自動検出します。"
 }

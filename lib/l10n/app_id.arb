@@ -1840,5 +1840,34 @@
         "type": "String"
       }
     }
-  }
+  },
+  "web3SearchHint": "@matrix:id  •  alamat 0x  •  name.eth",
+  "web3SearchPlaceholder": "Cari berdasarkan ID, dompet, atau ENS...",
+  "web3WalletAddress": "Alamat dompet",
+  "web3AddressCopied": "Alamat disalin",
+  "web3Copy": "Salin",
+  "web3SendMessage": "Kirim pesan",
+  "web3SendToWallet": "Pesan ke dompet",
+  "web3WalletOnlyHint": "Alamat ini belum memiliki akun N42. Pesan akan terkirim setelah bergabung.",
+  "web3NftAvatar": "Avatar NFT",
+  "web3ResolveFailed": "Gagal memuat identitas",
+  "web3EnsNotFound": "Nama ENS \"{name}\" tidak ditemukan",
+  "@web3EnsNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "web3NoN42AccountTitle": "Tidak ada akun N42",
+  "web3ShareInvite": "Bagikan undangan",
+  "nftPickerTitle": "Pilih avatar NFT",
+  "nftPickerTabPopular": "Populer",
+  "nftPickerTabCustom": "Kustom",
+  "nftPickerVerifyOwnership": "Verifikasi kepemilikan & pratinjau",
+  "nftPickerUseAsAvatar": "Gunakan sebagai avatar",
+  "nftPickerNotOwned": "Anda tidak memiliki NFT ini",
+  "nftPickerInfoTitle": "Avatar NFT — Terverifikasi on-chain",
+  "nftPickerPopularCollections": "Koleksi populer",
+  "nftPickerWalletHint": "Hubungkan dompet N42 Anda untuk menemukan NFT Anda di 236+ rantai."
 }

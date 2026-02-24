@@ -77,6 +77,11 @@ export 'src/domain/entities/mini_app_entity.dart';
 export 'src/domain/entities/red_packet_entity.dart';
 export 'src/presentation/pages/mini_app/mini_app_market_page.dart';
 export 'src/presentation/pages/mini_app/mini_app_page.dart';
+
+// ============================================
+// Web3 身份 / NFT 头像导出
+// ============================================
+export 'src/presentation/pages/profile/nft_avatar_picker_page.dart';
 export 'src/presentation/blocs/on_chain_notification/on_chain_notification_bloc.dart';
 export 'src/presentation/blocs/on_chain_notification/on_chain_notification_event.dart';
 export 'src/presentation/blocs/on_chain_notification/on_chain_notification_state.dart';

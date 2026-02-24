@@ -1840,5 +1840,34 @@
         "type": "String"
       }
     }
-  }
+  },
+  "web3SearchHint": "@matrix:id  •  адрес 0x  •  name.eth",
+  "web3SearchPlaceholder": "Поиск по ID, кошельку или ENS...",
+  "web3WalletAddress": "Адрес кошелька",
+  "web3AddressCopied": "Адрес скопирован",
+  "web3Copy": "Копировать",
+  "web3SendMessage": "Отправить сообщение",
+  "web3SendToWallet": "Сообщение на кошелёк",
+  "web3WalletOnlyHint": "У этого адреса ещё нет аккаунта N42. Сообщение будет доставлено после регистрации.",
+  "web3NftAvatar": "NFT-аватар",
+  "web3ResolveFailed": "Не удалось определить идентификатор",
+  "web3EnsNotFound": "ENS-имя \"{name}\" не найдено",
+  "@web3EnsNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "web3NoN42AccountTitle": "Нет аккаунта N42",
+  "web3ShareInvite": "Поделиться приглашением",
+  "nftPickerTitle": "Выбрать NFT-аватар",
+  "nftPickerTabPopular": "Популярные",
+  "nftPickerTabCustom": "Настраиваемый",
+  "nftPickerVerifyOwnership": "Подтвердить право собственности",
+  "nftPickerUseAsAvatar": "Использовать как аватар",
+  "nftPickerNotOwned": "Вы не владеете этим NFT",
+  "nftPickerInfoTitle": "NFT-аватар — on-chain верификация",
+  "nftPickerPopularCollections": "Популярные коллекции",
+  "nftPickerWalletHint": "Подключите кошелёк N42, чтобы автоматически находить NFT в 236+ сетях."
 }

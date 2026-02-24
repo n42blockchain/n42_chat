@@ -1840,5 +1840,34 @@
         "type": "String"
       }
     }
-  }
+  },
+  "web3SearchHint": "@matrix:id  •  indirizzo 0x  •  name.eth",
+  "web3SearchPlaceholder": "Cerca per ID, wallet o ENS...",
+  "web3WalletAddress": "Indirizzo wallet",
+  "web3AddressCopied": "Indirizzo copiato",
+  "web3Copy": "Copia",
+  "web3SendMessage": "Invia messaggio",
+  "web3SendToWallet": "Messaggio al wallet",
+  "web3WalletOnlyHint": "Questo indirizzo non ha ancora un account N42. Il messaggio verrà consegnato quando si unisce.",
+  "web3NftAvatar": "Avatar NFT",
+  "web3ResolveFailed": "Risoluzione identità fallita",
+  "web3EnsNotFound": "Nome ENS \"{name}\" non trovato",
+  "@web3EnsNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "web3NoN42AccountTitle": "Nessun account N42",
+  "web3ShareInvite": "Condividi invito",
+  "nftPickerTitle": "Seleziona avatar NFT",
+  "nftPickerTabPopular": "Popolari",
+  "nftPickerTabCustom": "Personalizzato",
+  "nftPickerVerifyOwnership": "Verifica proprietà e anteprima",
+  "nftPickerUseAsAvatar": "Usa come avatar",
+  "nftPickerNotOwned": "Non possiedi questo NFT",
+  "nftPickerInfoTitle": "Avatar NFT — Verificato on-chain",
+  "nftPickerPopularCollections": "Collezioni popolari",
+  "nftPickerWalletHint": "Connetti il tuo wallet N42 per scoprire automaticamente i tuoi NFT su 236+ chain."
 }

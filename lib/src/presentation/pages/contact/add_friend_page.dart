@@ -5,10 +5,63 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../integration/wallet_bridge.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'phone_contacts_page.dart';
 
+// ─── Input type detection ─────────────────────────────────────────────────────
+
+enum _InputType {
+  matrixId,      // @user:server.com
+  walletAddress, // 0x...
+  ensName,       // xxx.eth / xxx.lens / xxx.cb.id
+  username,      // anything else
+}
+
+_InputType _detectInputType(String input) {
+  final q = input.trim();
+  if (q.startsWith('@') && q.contains(':')) return _InputType.matrixId;
+  if (RegExp(r'^0x[0-9a-fA-F]{40}$').hasMatch(q)) return _InputType.walletAddress;
+  if (q.endsWith('.eth') ||
+      q.endsWith('.lens') ||
+      q.endsWith('.cb.id') ||
+      q.endsWith('.bnb') ||
+      q.endsWith('.bit')) {
+    return _InputType.ensName;
+  }
+  return _InputType.username;
+}
+
+// ─── Resolved Web3 identity ───────────────────────────────────────────────────
+
+class _Web3Identity {
+  final String address;
+  final String? ensName;
+  final String? avatarUrl;
+  final String? matrixUserId;
+  final String? displayName;
+  final bool isNftAvatar;
+
+  const _Web3Identity({
+    required this.address,
+    this.ensName,
+    this.avatarUrl,
+    this.matrixUserId,
+    this.displayName,
+    this.isNftAvatar = false,
+  });
+
+  bool get isN42User => matrixUserId != null;
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 /// 添加好友页面
+///
+/// Supports three input types:
+/// - Matrix ID  (@user:server) — existing search
+/// - Wallet address (0x...) — resolves via IWalletBridge
+/// - ENS name (xxx.eth) — resolves via IWalletBridge.resolveEnsName
 class AddFriendPage extends StatefulWidget {
   const AddFriendPage({super.key});
 
@@ -19,11 +72,14 @@ class AddFriendPage extends StatefulWidget {
 class _AddFriendPageState extends State<AddFriendPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  
+
   bool _isSearching = false;
   bool _isLoading = false;
   List<Map<String, dynamic>> _searchResults = [];
   String? _errorMessage;
+
+  // Web3 identity resolved from wallet address / ENS
+  _Web3Identity? _web3Identity;
 
   @override
   void initState() {
@@ -38,6 +94,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
     super.dispose();
   }
 
+  // ─── Search ────────────────────────────────────────────────────────────
+
   Future<void> _searchUser() async {
     final query = _searchController.text.trim();
     if (query.isEmpty) return;
@@ -46,75 +104,182 @@ class _AddFriendPageState extends State<AddFriendPage> {
       _isLoading = true;
       _errorMessage = null;
       _searchResults = [];
+      _web3Identity = null;
     });
 
+    final type = _detectInputType(query);
+
+    switch (type) {
+      case _InputType.walletAddress:
+        await _resolveByWallet(query);
+      case _InputType.ensName:
+        await _resolveByEns(query);
+      case _InputType.matrixId:
+      case _InputType.username:
+        await _searchByMatrixId(query);
+    }
+  }
+
+  // ─── Web3 resolution: wallet address ─────────────────────────────────
+
+  Future<void> _resolveByWallet(String address) async {
+    try {
+      final walletBridge = getIt<IWalletBridge>();
+
+      // Parallel: ENS reverse lookup + N42 user lookup
+      final results = await Future.wait([
+        walletBridge.lookupEnsName(address).catchError((_) => null),
+        walletBridge.getUserInfoByAddress(address).catchError((_) => null),
+      ]);
+
+      final ensName = results[0] as String?;
+      final userInfo = results[1] as WalletUserInfo?;
+
+      // Fetch ENS avatar if ENS name resolved
+      String? avatarUrl;
+      if (ensName != null) {
+        avatarUrl = await walletBridge
+            .getEnsAvatar(ensName)
+            .catchError((_) => null);
+      }
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _isSearching = true;
+          _web3Identity = _Web3Identity(
+            address: address,
+            ensName: ensName,
+            avatarUrl: avatarUrl,
+            matrixUserId: userInfo?.matrixUserId,
+            displayName: userInfo?.displayName ?? ensName,
+          );
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = S.of(context)?.web3ResolveFailed ??
+              'Failed to resolve wallet identity';
+        });
+      }
+    }
+  }
+
+  // ─── Web3 resolution: ENS name ────────────────────────────────────────
+
+  Future<void> _resolveByEns(String ensName) async {
+    try {
+      final walletBridge = getIt<IWalletBridge>();
+
+      final address = await walletBridge.resolveEnsName(ensName);
+      if (address == null) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _isSearching = true;
+            _errorMessage = S.of(context)?.web3EnsNotFound(ensName) ??
+                'ENS name "$ensName" not found';
+          });
+        }
+        return;
+      }
+
+      // Parallel: ENS avatar + N42 user lookup
+      final results = await Future.wait([
+        walletBridge.getEnsAvatar(ensName).catchError((_) => null),
+        walletBridge.getUserInfoByAddress(address).catchError((_) => null),
+      ]);
+
+      final avatarUrl = results[0] as String?;
+      final userInfo = results[1] as WalletUserInfo?;
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _isSearching = true;
+          _web3Identity = _Web3Identity(
+            address: address,
+            ensName: ensName,
+            avatarUrl: avatarUrl,
+            matrixUserId: userInfo?.matrixUserId,
+            displayName: userInfo?.displayName ?? ensName,
+            isNftAvatar: false, // ENS avatar may or may not be NFT
+          );
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage =
+              S.of(context)?.web3ResolveFailed ?? 'Failed to resolve ENS';
+        });
+      }
+    }
+  }
+
+  // ─── Matrix user search (existing) ───────────────────────────────────
+
+  Future<void> _searchByMatrixId(String query) async {
     try {
       final clientManager = getIt<MatrixClientManager>();
       final client = clientManager.client;
-      
+
       if (client == null) {
         setState(() {
-          _errorMessage = S.of(context)?.commonChatServiceNotConnected ?? 'Chat service not connected';
+          _errorMessage = S.of(context)?.commonChatServiceNotConnected ??
+              'Chat service not connected';
           _isLoading = false;
         });
         return;
       }
 
       final List<Map<String, dynamic>> results = [];
-      
-      // 检查是否是完整的 Matrix ID 格式 (@user:server)
+
+      // Direct Matrix ID
       if (query.startsWith('@') && query.contains(':')) {
-        // 直接尝试获取该用户的资料
         try {
           final profile = await client.getProfileFromUserId(query);
-          final localpart = query.split(':').first.replaceFirst('@', '');
+          final localpart =
+              query.split(':').first.replaceFirst('@', '');
           results.add({
             'userId': query,
             'displayName': profile.displayName ?? localpart,
             'avatarUrl': profile.avatarUrl?.toString(),
           });
-        } catch (e) {
-          debugPrint('Failed to get profile for $query: $e');
-        }
+        } catch (_) {}
       } else {
-        // 构建可能的 Matrix ID
+        // Build full Matrix ID
         final homeserver = client.homeserver?.host ?? '';
-        String fullUserId = query;
-        
-        // 如果输入不包含 @，添加 @
-        if (!query.startsWith('@')) {
-          fullUserId = '@$query';
-        }
-        
-        // 如果不包含 :server，添加当前服务器
+        var fullUserId = query.startsWith('@') ? query : '@$query';
         if (!fullUserId.contains(':') && homeserver.isNotEmpty) {
           fullUserId = '$fullUserId:$homeserver';
         }
-        
-        // 尝试直接获取用户资料
+
         if (fullUserId.contains(':')) {
           try {
-            final profile = await client.getProfileFromUserId(fullUserId);
-            final localpart = fullUserId.split(':').first.replaceFirst('@', '');
+            final profile =
+                await client.getProfileFromUserId(fullUserId);
+            final localpart =
+                fullUserId.split(':').first.replaceFirst('@', '');
             results.add({
               'userId': fullUserId,
               'displayName': profile.displayName ?? localpart,
               'avatarUrl': profile.avatarUrl?.toString(),
             });
-          } catch (e) {
-            debugPrint('Failed to get profile for $fullUserId: $e');
-          }
+          } catch (_) {}
         }
-        
-        // 同时搜索用户目录
+
+        // Directory search
         try {
-          final response = await client.searchUserDirectory(query, limit: 20);
-          
+          final response =
+              await client.searchUserDirectory(query, limit: 20);
           for (final user in response.results) {
-            // 避免重复添加
-            final exists = results.any((r) => r['userId'] == user.userId);
-            if (!exists) {
-              final localpart = user.userId.split(':').first.replaceFirst('@', '');
+            if (!results.any((r) => r['userId'] == user.userId)) {
+              final localpart =
+                  user.userId.split(':').first.replaceFirst('@', '');
               results.add({
                 'userId': user.userId,
                 'displayName': user.displayName ?? localpart,
@@ -122,26 +287,30 @@ class _AddFriendPageState extends State<AddFriendPage> {
               });
             }
           }
-        } catch (e) {
-          debugPrint('Search user directory failed: $e');
-        }
+        } catch (_) {}
       }
-      
+
       setState(() {
         _searchResults = results;
         _isLoading = false;
         _isSearching = true;
         if (results.isEmpty) {
-          _errorMessage = S.of(context)?.contactUserNotFoundHint(query) ?? 'User "$query" not found\n\nTips:\n• Try entering full user ID, e.g. @username:server.com\n• Check the username spelling';
+          _errorMessage =
+              S.of(context)?.contactUserNotFoundHint(query) ??
+                  'User "$query" not found';
         }
       });
     } catch (e) {
       setState(() {
-        _errorMessage = S.of(context)?.contactSearchFailed(e.toString()) ?? 'Search failed: $e';
+        _errorMessage =
+            S.of(context)?.contactSearchFailed(e.toString()) ??
+                'Search failed: $e';
         _isLoading = false;
       });
     }
   }
+
+  // ─── DM creation ──────────────────────────────────────────────────────
 
   Future<void> _startDirectChat(String userId) async {
     setState(() => _isLoading = true);
@@ -149,25 +318,21 @@ class _AddFriendPageState extends State<AddFriendPage> {
     try {
       final clientManager = getIt<MatrixClientManager>();
       final client = clientManager.client;
-      
+
       if (client == null) {
-        _showError(S.of(context)?.commonChatServiceNotConnected ?? 'Chat service not connected');
+        _showError(S.of(context)?.commonChatServiceNotConnected ??
+            'Chat service not connected');
         return;
       }
 
-      // 创建或获取私聊房间
       final roomId = await client.startDirectChat(userId);
-      
-      if (mounted) {
-        Navigator.of(context).pop(roomId);
-      }
+      if (mounted) Navigator.of(context).pop(roomId);
     } catch (e) {
       if (!mounted) return;
-      _showError(S.of(context)?.contactCreateChatFailed(e.toString()) ?? 'Failed to create chat: $e');
+      _showError(S.of(context)?.contactCreateChatFailed(e.toString()) ??
+          'Failed to create chat: $e');
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -175,32 +340,28 @@ class _AddFriendPageState extends State<AddFriendPage> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(message),
-          backgroundColor: AppColors.error,
-        ),
+            content: Text(message),
+            backgroundColor: AppColors.error),
       );
     }
   }
 
   Future<void> _openPhoneContacts() async {
     final result = await Navigator.of(context).push<String>(
-      MaterialPageRoute(
-        builder: (_) => const PhoneContactsPage(),
-      ),
+      MaterialPageRoute(builder: (_) => const PhoneContactsPage()),
     );
-
-    // 如果从通讯录页面返回了房间 ID，关闭当前页面并返回
-    if (result != null && mounted) {
-      Navigator.of(context).pop(result);
-    }
+    if (result != null && mounted) Navigator.of(context).pop(result);
   }
+
+  // ─── Build ────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor:
+          isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
         title: S.of(context)?.commonAddFriend ?? 'Add Friend',
         leading: IconButton(
@@ -210,7 +371,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
       ),
       body: Column(
         children: [
-          // 搜索栏
+          // ── Search bar
           Container(
             color: isDark ? AppColors.surfaceDark : AppColors.surface,
             padding: const EdgeInsets.all(16),
@@ -218,10 +379,13 @@ class _AddFriendPageState extends State<AddFriendPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  S.of(context)?.contactEnterUserIdOrUsername ?? 'Enter user ID or username to search',
+                  S.of(context)?.web3SearchHint ??
+                      '@matrix:id  •  0x wallet address  •  name.eth',
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -231,29 +395,38 @@ class _AddFriendPageState extends State<AddFriendPage> {
                       child: Container(
                         height: 44,
                         decoration: BoxDecoration(
-                          color: isDark ? AppColors.backgroundDark : AppColors.inputBackground,
+                          color: isDark
+                              ? AppColors.backgroundDark
+                              : AppColors.inputBackground,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
                           controller: _searchController,
                           focusNode: _focusNode,
                           decoration: InputDecoration(
-                            hintText: S.of(context)?.commonMatrixIdHint ?? '@username:server.com',
+                            hintText: S.of(context)?.web3SearchPlaceholder ??
+                                'Search by ID, wallet, or ENS...',
                             hintStyle: TextStyle(
                               fontSize: 14,
-                              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                              color: isDark
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.textSecondary,
                             ),
                             prefixIcon: Icon(
                               Icons.search,
                               size: 20,
-                              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                              color: isDark
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.textSecondary,
                             ),
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
                           ),
                           style: TextStyle(
                             fontSize: 14,
-                            color: isDark ? Colors.white : AppColors.textPrimary,
+                            color:
+                                isDark ? Colors.white : AppColors.textPrimary,
                           ),
                           onSubmitted: (_) => _searchUser(),
                         ),
@@ -275,19 +448,26 @@ class _AddFriendPageState extends State<AddFriendPage> {
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
+                                  strokeWidth: 2, color: Colors.white),
                             )
                           : Text(S.of(context)?.commonSearch ?? 'Search'),
                     ),
                   ],
                 ),
+
+                // Input type hint chip
+                if (_searchController.text.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  _InputTypeChip(
+                    query: _searchController.text,
+                    isDark: isDark,
+                  ),
+                ],
               ],
             ),
           ),
 
-          // 从通讯录导入选项
+          // ── Phone contacts entry
           Container(
             color: isDark ? AppColors.surfaceDark : AppColors.surface,
             margin: const EdgeInsets.only(top: 8),
@@ -299,11 +479,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
-                  Icons.contacts,
-                  color: AppColors.primary,
-                  size: 22,
-                ),
+                child: const Icon(Icons.contacts,
+                    color: AppColors.primary, size: 22),
               ),
               title: Text(
                 'From Contacts',
@@ -316,33 +493,32 @@ class _AddFriendPageState extends State<AddFriendPage> {
                 'Find friends from your phone contacts',
                 style: TextStyle(
                   fontSize: 13,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
                 ),
               ),
-              trailing: Icon(
-                Icons.chevron_right,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-              ),
-              onTap: () => _openPhoneContacts(),
+              trailing: Icon(Icons.chevron_right,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary),
+              onTap: _openPhoneContacts,
             ),
           ),
 
-          // 错误信息
+          // ── Error
           if (_errorMessage != null)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               color: AppColors.error.withValues(alpha: 0.1),
-              child: Text(
-                _errorMessage!,
-                style: const TextStyle(color: AppColors.error, fontSize: 13),
-              ),
+              child: Text(_errorMessage!,
+                  style: const TextStyle(
+                      color: AppColors.error, fontSize: 13)),
             ),
 
-          // 搜索结果
-          Expanded(
-            child: _buildContent(isDark),
-          ),
+          // ── Results
+          Expanded(child: _buildContent(isDark)),
         ],
       ),
     );
@@ -350,45 +526,44 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
   Widget _buildContent(bool isDark) {
     if (_isLoading) {
-      return N42Loading(message: S.of(context)?.contactSearching ?? 'Searching...');
+      return N42Loading(
+          message: S.of(context)?.contactSearching ?? 'Searching...');
     }
 
     if (!_isSearching) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.person_search,
-              size: 64,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              S.of(context)?.contactSearchUserToChat ?? 'Search user to start chatting',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              S.of(context)?.contactMatrixIdExample ?? 'You can enter a full Matrix ID\ne.g. @user:matrix.n42.network',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                color: isDark ? AppColors.textSecondaryDark.withValues(alpha: 0.7) : AppColors.textSecondary.withValues(alpha: 0.7),
-              ),
-            ),
-          ],
+      return _SearchEmptyState(isDark: isDark);
+    }
+
+    // Web3 identity card result
+    if (_web3Identity != null) {
+      return SingleChildScrollView(
+        child: Web3IdentityCard(
+          walletAddress: _web3Identity!.address,
+          ensName: _web3Identity!.ensName,
+          avatarUrl: _web3Identity!.avatarUrl,
+          displayName: _web3Identity!.displayName,
+          isN42User: _web3Identity!.isN42User,
+          isEnsVerified: _web3Identity!.ensName != null,
+          isNftAvatar: _web3Identity!.isNftAvatar,
+          isDark: isDark,
+          onMessage: () {
+            if (_web3Identity!.matrixUserId != null) {
+              _startDirectChat(_web3Identity!.matrixUserId!);
+            } else {
+              // No N42 account: show info dialog
+              _showWalletOnlyDialog();
+            }
+          },
         ),
       );
     }
 
+    // Matrix user list result
     if (_searchResults.isEmpty) {
       return N42EmptyState.noSearchResult(
-        description: S.of(context)?.contactUserNotFound(_searchController.text) ?? 'User "${_searchController.text}" not found',
+        description:
+            S.of(context)?.contactUserNotFound(_searchController.text) ??
+                'User "${_searchController.text}" not found',
       );
     }
 
@@ -413,7 +588,9 @@ class _AddFriendPageState extends State<AddFriendPage> {
         size: 48,
       ),
       title: Text(
-        displayName.isNotEmpty ? displayName : userId.split(':').first.replaceFirst('@', ''),
+        displayName.isNotEmpty
+            ? displayName
+            : userId.split(':').first.replaceFirst('@', ''),
         style: TextStyle(
           fontWeight: FontWeight.w500,
           color: isDark ? Colors.white : AppColors.textPrimary,
@@ -423,7 +600,9 @@ class _AddFriendPageState extends State<AddFriendPage> {
         userId,
         style: TextStyle(
           fontSize: 13,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: isDark
+              ? AppColors.textSecondaryDark
+              : AppColors.textSecondary,
         ),
       ),
       trailing: OutlinedButton(
@@ -437,5 +616,230 @@ class _AddFriendPageState extends State<AddFriendPage> {
       ),
     );
   }
+
+  void _showWalletOnlyDialog() {
+    final l10n = S.of(context);
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n?.web3NoN42AccountTitle ?? 'No N42 Account'),
+        content: Text(
+          l10n?.web3NoN42AccountDesc ??
+              'This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n?.web3ShareInvite ?? 'Share Invite'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
+// ─── Input type hint chip ────────────────────────────────────────────────────
+
+class _InputTypeChip extends StatelessWidget {
+  final String query;
+  final bool isDark;
+
+  const _InputTypeChip({required this.query, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final type = _detectInputType(query);
+
+    String label;
+    Color color;
+    IconData icon;
+
+    switch (type) {
+      case _InputType.walletAddress:
+        label = 'Wallet Address';
+        color = Colors.orange;
+        icon = Icons.account_balance_wallet_outlined;
+      case _InputType.ensName:
+        label = 'ENS / Domain';
+        color = const Color(0xFF5298FF);
+        icon = Icons.verified_outlined;
+      case _InputType.matrixId:
+        label = 'Matrix ID';
+        color = AppColors.primary;
+        icon = Icons.person_outline;
+      case _InputType.username:
+        label = 'Username';
+        color = Colors.teal;
+        icon = Icons.alternate_email;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: color,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Empty state ─────────────────────────────────────────────────────────────
+
+class _SearchEmptyState extends StatelessWidget {
+  final bool isDark;
+
+  const _SearchEmptyState({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = S.of(context);
+    final color =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.person_search, size: 56, color: color),
+          const SizedBox(height: 16),
+          Text(
+            l10n?.contactSearchUserToChat ?? 'Search user to start chatting',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontSize: 15, color: color, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 24),
+          // Search method cards
+          _SearchMethodRow(isDark: isDark, l10n: l10n),
+        ],
+      ),
+    );
+  }
+}
+
+class _SearchMethodRow extends StatelessWidget {
+  final bool isDark;
+  final S? l10n;
+
+  const _SearchMethodRow({required this.isDark, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _MethodCard(
+          icon: Icons.person_outline,
+          color: AppColors.primary,
+          title: 'Matrix ID',
+          desc: '@user:server.com',
+          isDark: isDark,
+        ),
+        const SizedBox(height: 8),
+        _MethodCard(
+          icon: Icons.account_balance_wallet_outlined,
+          color: Colors.orange,
+          title: l10n?.web3WalletAddress ?? 'Wallet Address',
+          desc: '0x71C7...6b6e',
+          isDark: isDark,
+        ),
+        const SizedBox(height: 8),
+        _MethodCard(
+          icon: Icons.verified_outlined,
+          color: const Color(0xFF5298FF),
+          title: 'ENS / Domain',
+          desc: 'vitalik.eth • alice.lens',
+          isDark: isDark,
+        ),
+      ],
+    );
+  }
+}
+
+class _MethodCard extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String desc;
+  final bool isDark;
+
+  const _MethodCard({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.desc,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: isDark ? Colors.white10 : AppColors.divider,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 17, color: color),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color:
+                      isDark ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+              Text(
+                desc,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontFamily: 'monospace',
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

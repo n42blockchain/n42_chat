@@ -5419,4 +5419,97 @@ class SVi extends S {
   String redPacketGrabbedViral(String amount, String token) {
     return '🧧 抢到了红包 • $amount $token';
   }
+
+  @override
+  String get web3SearchHint => '@matrix:id  •  0x 錢包地址  •  name.eth';
+
+  @override
+  String get web3SearchPlaceholder => '搜索 ID、錢包地址或 ENS...';
+
+  @override
+  String get web3WalletAddress => '錢包地址';
+
+  @override
+  String get web3AddressCopied => '地址已复制';
+
+  @override
+  String get web3Copy => '复制';
+
+  @override
+  String get web3SendMessage => '发消息';
+
+  @override
+  String get web3SendToWallet => '发送到錢包';
+
+  @override
+  String get web3WalletOnlyHint => '该地址尚无 N42 账号。对方加入后消息将自动送达。';
+
+  @override
+  String get web3NftAvatar => 'NFT 头像';
+
+  @override
+  String get web3ResolveFailed => '身份解析失败';
+
+  @override
+  String web3EnsNotFound(String name) {
+    return 'ENS 名称“$name”未找到';
+  }
+
+  @override
+  String get web3NoN42AccountTitle => '无 N42 账号';
+
+  @override
+  String get web3NoN42AccountDesc => '该钱包地址尚无 N42 账号。您可以分享 N42 邀请链接邀请对方加入。';
+
+  @override
+  String get web3ShareInvite => '分享邀请';
+
+  @override
+  String get nftPickerTitle => '选择 NFT 头像';
+
+  @override
+  String get nftPickerTabPopular => '热门';
+
+  @override
+  String get nftPickerTabCustom => '自定义';
+
+  @override
+  String get nftPickerChain => '链';
+
+  @override
+  String get nftPickerContract => '合约地址';
+
+  @override
+  String get nftPickerTokenId => 'Token ID';
+
+  @override
+  String get nftPickerVerifyOwnership => '验证所有权并预览';
+
+  @override
+  String get nftPickerUseAsAvatar => '用作头像';
+
+  @override
+  String get nftPickerPreview => '预览';
+
+  @override
+  String get nftPickerNotOwned => '您不拥有这个 NFT';
+
+  @override
+  String get nftPickerInvalidTokenId => '无效的 Token ID';
+
+  @override
+  String get nftPickerEnterBoth => '请输入合约地址和 Token ID';
+
+  @override
+  String get nftPickerInfoTitle => 'NFT 头像 — 链上身份验证';
+
+  @override
+  String get nftPickerInfoDesc =>
+      '绑定您持有的 NFT 作为头像。任何人均可在链上验证归属权。在 N42 全应用中以金色边框标识。';
+
+  @override
+  String get nftPickerPopularCollections => '热门 NFT 项目';
+
+  @override
+  String get nftPickerWalletHint => '连接 N42 錢包，自动发现您在 236+ 条链上持有的 NFT。';
 }
