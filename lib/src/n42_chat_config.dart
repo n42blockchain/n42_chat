@@ -3,6 +3,61 @@ import 'package:flutter/material.dart';
 import 'core/theme/n42_chat_theme.dart';
 import 'integration/wallet_bridge.dart';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Push Protocol 配置
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Push Protocol 链上事件推送配置
+///
+/// Push Protocol 是去中心化通知协议（https://push.org），
+/// 支持通过钱包地址接收来自各 DApp 频道的链上事件通知。
+///
+/// ## 示例
+/// ```dart
+/// N42ChatConfig(
+///   pushProtocol: PushProtocolConfig(
+///     enabled: true,
+///     chainId: 1, // 以太坊主网
+///   ),
+/// )
+/// ```
+@immutable
+class PushProtocolConfig {
+  /// 是否启用链上事件推送
+  ///
+  /// 默认为 `true`，设置为 `false` 可完全禁用该功能
+  final bool enabled;
+
+  /// 链 ID
+  ///
+  /// - 1: 以太坊主网 (Ethereum Mainnet)
+  /// - 137: Polygon Mainnet
+  /// - 56: BNB Smart Chain
+  /// - 其他 EVM 兼容链 ID
+  /// 默认为 1（以太坊主网）
+  final int chainId;
+
+  /// 自定义 Push Protocol API 基础地址
+  ///
+  /// 生产环境: `https://backend.epns.io/apis`（默认）
+  /// 测试环境: `https://staging.backend.epns.io/apis`
+  final String? apiBaseUrl;
+
+  /// 轮询间隔
+  ///
+  /// 后台定期拉取新通知的频率。
+  /// 过短会增加功耗和 API 请求量，建议不低于 30 秒。
+  /// 默认 60 秒。
+  final Duration pollInterval;
+
+  const PushProtocolConfig({
+    this.enabled = true,
+    this.chainId = 1,
+    this.apiBaseUrl,
+    this.pollInterval = const Duration(minutes: 1),
+  });
+}
+
 /// N42 Chat 模块配置
 ///
 /// 通过此类配置聊天模块的各种行为和外观
@@ -185,6 +240,12 @@ class N42ChatConfig {
   /// 存储管理配置
   final StorageManagementConfig storageManagement;
 
+  /// Push Protocol 链上事件推送配置
+  ///
+  /// 为 null 时禁用链上事件推送功能。
+  /// 传入 [PushProtocolConfig] 实例以启用。
+  final PushProtocolConfig? pushProtocol;
+
   const N42ChatConfig({
     this.defaultHomeserver = 'https://m.si46.world',
     this.enableEncryption = true,
@@ -216,6 +277,7 @@ class N42ChatConfig {
     this.aiBaseUrl = 'https://api.openai.com',
     this.aiModel = 'gpt-4o-mini',
     this.storageManagement = const StorageManagementConfig(),
+    this.pushProtocol,
   });
 
   /// 复制并修改配置
@@ -250,6 +312,7 @@ class N42ChatConfig {
     String? aiBaseUrl,
     String? aiModel,
     StorageManagementConfig? storageManagement,
+    PushProtocolConfig? pushProtocol,
   }) {
     return N42ChatConfig(
       defaultHomeserver: defaultHomeserver ?? this.defaultHomeserver,
@@ -283,6 +346,7 @@ class N42ChatConfig {
       aiBaseUrl: aiBaseUrl ?? this.aiBaseUrl,
       aiModel: aiModel ?? this.aiModel,
       storageManagement: storageManagement ?? this.storageManagement,
+      pushProtocol: pushProtocol ?? this.pushProtocol,
     );
   }
 }

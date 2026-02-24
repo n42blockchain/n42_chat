@@ -5293,4 +5293,19 @@ class SKo extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => '온체인 이벤트';
+
+  @override
+  String get onChainMarkAllRead => '모두 읽음';
+
+  @override
+  String get onChainNoNotifications => '아직 온체인 이벤트 없음';
+
+  @override
+  String get onChainNoNotificationsDesc => '구독한 채널의 이벤트가 여기에 표시됩니다';
+
+  @override
+  String get onChainViewDetails => '자세히 보기';
 }

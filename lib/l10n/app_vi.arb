@@ -1797,5 +1797,10 @@
   "gameNext": "Tiếp theo",
   "gameBestTime": "Thời gian tốt nhất",
   "gameNewRecord": "Kỷ lục mới!",
-  "gameLines": "Hàng"
+  "gameLines": "Hàng",
+  "onChainNotificationsTitle": "Sự kiện On-chain",
+  "onChainMarkAllRead": "Đánh dấu tất cả đã đọc",
+  "onChainNoNotifications": "Chưa có sự kiện on-chain",
+  "onChainNoNotificationsDesc": "Sự kiện từ các kênh đã đăng ký sẽ xuất hiện ở đây",
+  "onChainViewDetails": "Xem chi tiết"
 }

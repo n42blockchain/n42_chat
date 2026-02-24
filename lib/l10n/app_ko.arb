@@ -1797,5 +1797,10 @@
   "gameNext": "다음",
   "gameBestTime": "최고 기록",
   "gameNewRecord": "신기록!",
-  "gameLines": "라인"
+  "gameLines": "라인",
+  "onChainNotificationsTitle": "온체인 이벤트",
+  "onChainMarkAllRead": "모두 읽음",
+  "onChainNoNotifications": "아직 온체인 이벤트 없음",
+  "onChainNoNotificationsDesc": "구독한 채널의 이벤트가 여기에 표시됩니다",
+  "onChainViewDetails": "자세히 보기"
 }

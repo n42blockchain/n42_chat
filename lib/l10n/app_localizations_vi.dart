@@ -5345,4 +5345,20 @@ class SVi extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => 'Sự kiện On-chain';
+
+  @override
+  String get onChainMarkAllRead => 'Đánh dấu tất cả đã đọc';
+
+  @override
+  String get onChainNoNotifications => 'Chưa có sự kiện on-chain';
+
+  @override
+  String get onChainNoNotificationsDesc =>
+      'Sự kiện từ các kênh đã đăng ký sẽ xuất hiện ở đây';
+
+  @override
+  String get onChainViewDetails => 'Xem chi tiết';
 }

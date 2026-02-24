@@ -5366,4 +5366,20 @@ class STr extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => 'Zincir Üstü Olaylar';
+
+  @override
+  String get onChainMarkAllRead => 'Tümünü okundu işaretle';
+
+  @override
+  String get onChainNoNotifications => 'Henüz zincir üstü olay yok';
+
+  @override
+  String get onChainNoNotificationsDesc =>
+      'Abone olunan kanallardan olaylar burada görünecek';
+
+  @override
+  String get onChainViewDetails => 'Ayrıntıları gör';
 }

@@ -5380,4 +5380,20 @@ class SRu extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => 'События в блокчейне';
+
+  @override
+  String get onChainMarkAllRead => 'Отметить все прочитанными';
+
+  @override
+  String get onChainNoNotifications => 'Событий в блокчейне пока нет';
+
+  @override
+  String get onChainNoNotificationsDesc =>
+      'События из подписанных каналов появятся здесь';
+
+  @override
+  String get onChainViewDetails => 'Посмотреть детали';
 }

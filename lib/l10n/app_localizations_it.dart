@@ -5373,4 +5373,20 @@ class SIt extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => 'Eventi on-chain';
+
+  @override
+  String get onChainMarkAllRead => 'Segna tutto come letto';
+
+  @override
+  String get onChainNoNotifications => 'Nessun evento on-chain ancora';
+
+  @override
+  String get onChainNoNotificationsDesc =>
+      'Gli eventi dai canali iscritti appariranno qui';
+
+  @override
+  String get onChainViewDetails => 'Visualizza dettagli';
 }

@@ -5373,4 +5373,20 @@ class SEn extends S {
 
   @override
   String get chatTimerOff => 'Off';
+
+  @override
+  String get onChainNotificationsTitle => 'On-chain Events';
+
+  @override
+  String get onChainMarkAllRead => 'Mark all read';
+
+  @override
+  String get onChainNoNotifications => 'No on-chain events yet';
+
+  @override
+  String get onChainNoNotificationsDesc =>
+      'Events from subscribed channels will appear here';
+
+  @override
+  String get onChainViewDetails => 'View details';
 }

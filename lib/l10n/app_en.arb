@@ -2542,5 +2542,10 @@
   "settingsScreenshotProtectionDesc": "Prevent screenshots and screen recording",
   "chatSelfDestructTimer": "Self-destruct",
   "chatTimerPickerTitle": "Self-destruct Timer",
-  "chatTimerOff": "Off"
+  "chatTimerOff": "Off",
+  "onChainNotificationsTitle": "On-chain Events",
+  "onChainMarkAllRead": "Mark all read",
+  "onChainNoNotifications": "No on-chain events yet",
+  "onChainNoNotificationsDesc": "Events from subscribed channels will appear here",
+  "onChainViewDetails": "View details"
 }

@@ -47,6 +47,7 @@ export 'src/domain/entities/message_entity.dart';
 export 'src/domain/entities/contact_entity.dart';
 export 'src/domain/entities/user_entity.dart';
 export 'src/domain/entities/space_entity.dart';
+export 'src/domain/entities/on_chain_notification_entity.dart';
 
 // ============================================
 // 集成接口导出
@@ -63,6 +64,14 @@ export 'src/integration/bridge/bridge.dart';
 // ============================================
 export 'src/core/notifications/push_notification_service.dart';
 export 'src/core/notifications/firebase_push_service.dart';
+
+// ============================================
+// 链上事件通知导出
+// ============================================
+export 'src/presentation/pages/notification/on_chain_notifications_page.dart';
+export 'src/presentation/blocs/on_chain_notification/on_chain_notification_bloc.dart';
+export 'src/presentation/blocs/on_chain_notification/on_chain_notification_event.dart';
+export 'src/presentation/blocs/on_chain_notification/on_chain_notification_state.dart';
 
 // ============================================
 // UI组件导出

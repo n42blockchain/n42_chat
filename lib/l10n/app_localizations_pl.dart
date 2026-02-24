@@ -5386,4 +5386,20 @@ class SPl extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => 'Zdarzenia on-chain';
+
+  @override
+  String get onChainMarkAllRead => 'Oznacz wszystkie jako przeczytane';
+
+  @override
+  String get onChainNoNotifications => 'Brak zdarzeń on-chain';
+
+  @override
+  String get onChainNoNotificationsDesc =>
+      'Zdarzenia z subskrybowanych kanałów pojawią się tutaj';
+
+  @override
+  String get onChainViewDetails => 'Wyświetl szczegóły';
 }
