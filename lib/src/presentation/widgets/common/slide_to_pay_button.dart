@@ -50,6 +50,7 @@ class _SlideToPayButtonState extends State<SlideToPayButton>
   bool _isCompleted = false;
 
   late AnimationController _resetController;
+  late CurvedAnimation _resetCurve;
 
   // Stored at the moment spring-back starts, so _onReset() can interpolate.
   double _springStart = 0.0;
@@ -70,10 +71,15 @@ class _SlideToPayButtonState extends State<SlideToPayButton>
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) _resetController.reset();
       });
+    _resetCurve = CurvedAnimation(
+      parent: _resetController,
+      curve: Curves.easeOutCubic,
+    );
   }
 
   @override
   void dispose() {
+    _resetCurve.dispose();
     _resetController.dispose();
     super.dispose();
   }
@@ -116,11 +122,7 @@ class _SlideToPayButtonState extends State<SlideToPayButton>
     if (mounted && !_isCompleted) {
       setState(() {
         // Ease from _springStart → 0 as controller goes 0 → 1
-        _dragProgress = _springStart *
-            (1.0 - CurvedAnimation(
-                  parent: _resetController,
-                  curve: Curves.easeOutCubic,
-                ).value);
+        _dragProgress = _springStart * (1.0 - _resetCurve.value);
       });
     }
   }

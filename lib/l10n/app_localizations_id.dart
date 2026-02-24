@@ -5485,7 +5485,8 @@ class SId extends S {
   String get web3NoN42AccountTitle => 'Tidak ada akun N42';
 
   @override
-  String get web3NoN42AccountDesc => '该钱包地址尚无 N42 账号。您可以分享 N42 邀请链接邀请对方加入。';
+  String get web3NoN42AccountDesc =>
+      'This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.';
 
   @override
   String get web3ShareInvite => 'Bagikan undangan';
@@ -5500,10 +5501,10 @@ class SId extends S {
   String get nftPickerTabCustom => 'Kustom';
 
   @override
-  String get nftPickerChain => '链';
+  String get nftPickerChain => 'Chain';
 
   @override
-  String get nftPickerContract => '合约地址';
+  String get nftPickerContract => 'Contract Address';
 
   @override
   String get nftPickerTokenId => 'Token ID';
@@ -5515,23 +5516,23 @@ class SId extends S {
   String get nftPickerUseAsAvatar => 'Gunakan sebagai avatar';
 
   @override
-  String get nftPickerPreview => '预览';
+  String get nftPickerPreview => 'Preview';
 
   @override
   String get nftPickerNotOwned => 'Anda tidak memiliki NFT ini';
 
   @override
-  String get nftPickerInvalidTokenId => '无效的 Token ID';
+  String get nftPickerInvalidTokenId => 'Invalid token ID';
 
   @override
-  String get nftPickerEnterBoth => '请输入合约地址和 Token ID';
+  String get nftPickerEnterBoth => 'Enter contract address and token ID';
 
   @override
   String get nftPickerInfoTitle => 'Avatar NFT — Terverifikasi on-chain';
 
   @override
   String get nftPickerInfoDesc =>
-      '绑定您持有的 NFT 作为头像。任何人均可在链上验证归属权。在 N42 全应用中以金色边框标识。';
+      'Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.';
 
   @override
   String get nftPickerPopularCollections => 'Koleksi populer';

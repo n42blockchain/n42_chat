@@ -5396,120 +5396,123 @@ class SVi extends S {
   String get miniAppNoResults => 'Không tìm thấy ứng dụng';
 
   @override
-  String get slideToPayLabel => '→→→  滑动确认';
+  String get slideToPayLabel => '→→→  Slide to confirm';
 
   @override
-  String get slideToPayConfirming => '确认中...';
+  String get slideToPayConfirming => 'Confirming...';
 
   @override
-  String get redPacketBestLuck => '最佳手气';
+  String get redPacketBestLuck => 'Best Luck';
 
   @override
-  String get redPacketBestLuckCongrats => '最佳手气！你抢到了最多！';
+  String get redPacketBestLuckCongrats => 'You got the best luck! 👑';
 
   @override
   String redPacketStats(int claimed, int total) {
-    return '$claimed / $total 个已领取';
+    return '$claimed / $total grabbed';
   }
 
   @override
-  String get redPacketStatsTotal => '共计';
+  String get redPacketStatsTotal => 'Total: null null';
 
   @override
   String redPacketGrabbedViral(String amount, String token) {
-    return '🧧 抢到了红包 • $amount $token';
+    return 'I grabbed a $amount $token red packet! 🧧';
   }
 
   @override
-  String get web3SearchHint => '@matrix:id  •  0x 錢包地址  •  name.eth';
+  String get web3SearchHint => '@matrix:id  •  0x wallet address  •  name.eth';
 
   @override
-  String get web3SearchPlaceholder => '搜索 ID、錢包地址或 ENS...';
+  String get web3SearchPlaceholder => 'Search by ID, wallet, or ENS...';
 
   @override
-  String get web3WalletAddress => '錢包地址';
+  String get web3WalletAddress => 'Wallet Address';
 
   @override
-  String get web3AddressCopied => '地址已复制';
+  String get web3AddressCopied => 'Address copied';
 
   @override
-  String get web3Copy => '复制';
+  String get web3Copy => 'Copy';
 
   @override
-  String get web3SendMessage => '发消息';
+  String get web3SendMessage => 'Send Message';
 
   @override
-  String get web3SendToWallet => '发送到錢包';
+  String get web3SendToWallet => 'Message Wallet';
 
   @override
-  String get web3WalletOnlyHint => '该地址尚无 N42 账号。对方加入后消息将自动送达。';
+  String get web3WalletOnlyHint =>
+      'This address has no N42 account yet. Message will be delivered when they join.';
 
   @override
-  String get web3NftAvatar => 'NFT 头像';
+  String get web3NftAvatar => 'NFT Avatar';
 
   @override
-  String get web3ResolveFailed => '身份解析失败';
+  String get web3ResolveFailed => 'Failed to resolve identity';
 
   @override
   String web3EnsNotFound(String name) {
-    return 'ENS 名称“$name”未找到';
+    return 'ENS name \"$name\" not found';
   }
 
   @override
-  String get web3NoN42AccountTitle => '无 N42 账号';
+  String get web3NoN42AccountTitle => 'No N42 Account';
 
   @override
-  String get web3NoN42AccountDesc => '该钱包地址尚无 N42 账号。您可以分享 N42 邀请链接邀请对方加入。';
+  String get web3NoN42AccountDesc =>
+      'This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.';
 
   @override
-  String get web3ShareInvite => '分享邀请';
+  String get web3ShareInvite => 'Share Invite';
 
   @override
-  String get nftPickerTitle => '选择 NFT 头像';
+  String get nftPickerTitle => 'Select NFT Avatar';
 
   @override
-  String get nftPickerTabPopular => '热门';
+  String get nftPickerTabPopular => 'Popular';
 
   @override
-  String get nftPickerTabCustom => '自定义';
+  String get nftPickerTabCustom => 'Custom';
 
   @override
-  String get nftPickerChain => '链';
+  String get nftPickerChain => 'Chain';
 
   @override
-  String get nftPickerContract => '合约地址';
+  String get nftPickerContract => 'Contract Address';
 
   @override
   String get nftPickerTokenId => 'Token ID';
 
   @override
-  String get nftPickerVerifyOwnership => '验证所有权并预览';
+  String get nftPickerVerifyOwnership => 'Verify Ownership & Preview';
 
   @override
-  String get nftPickerUseAsAvatar => '用作头像';
+  String get nftPickerUseAsAvatar => 'Use as Avatar';
 
   @override
-  String get nftPickerPreview => '预览';
+  String get nftPickerPreview => 'Preview';
 
   @override
-  String get nftPickerNotOwned => '您不拥有这个 NFT';
+  String get nftPickerNotOwned => 'You do not own this NFT';
 
   @override
-  String get nftPickerInvalidTokenId => '无效的 Token ID';
+  String get nftPickerInvalidTokenId => 'Invalid token ID';
 
   @override
-  String get nftPickerEnterBoth => '请输入合约地址和 Token ID';
+  String get nftPickerEnterBoth => 'Enter contract address and token ID';
 
   @override
-  String get nftPickerInfoTitle => 'NFT 头像 — 链上身份验证';
+  String get nftPickerInfoTitle => 'NFT Avatar — Verified On-Chain';
 
   @override
   String get nftPickerInfoDesc =>
-      '绑定您持有的 NFT 作为头像。任何人均可在链上验证归属权。在 N42 全应用中以金色边框标识。';
+      'Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.';
 
   @override
-  String get nftPickerPopularCollections => '热门 NFT 项目';
+  String get nftPickerPopularCollections => 'Popular Collections';
 
   @override
-  String get nftPickerWalletHint => '连接 N42 錢包，自动发现您在 236+ 条链上持有的 NFT。';
+  String get nftPickerWalletHint =>
+      'Connect your N42 wallet to automatically discover your NFTs across 236+ chains.';
 }

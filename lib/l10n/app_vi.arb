@@ -1813,5 +1813,79 @@
   "miniAppSearch": "Tìm kiếm ứng dụng...",
   "miniAppFeatured": "Nổi bật",
   "miniAppAllApps": "Tất cả ứng dụng",
-  "miniAppNoResults": "Không tìm thấy ứng dụng"
+  "miniAppNoResults": "Không tìm thấy ứng dụng",
+  "slideToPayLabel": "→→→  Slide to confirm",
+  "slideToPayConfirming": "Confirming...",
+  "redPacketBestLuck": "Best Luck",
+  "redPacketBestLuckCongrats": "You got the best luck! 👑",
+  "redPacketStats": "{claimed} / {total} grabbed",
+  "@redPacketStats": {
+    "placeholders": {
+      "claimed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "redPacketStatsTotal": "Total: {amount} {token}",
+  "@redPacketStatsTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
+    }
+  },
+  "redPacketGrabbedViral": "I grabbed a {amount} {token} red packet! 🧧",
+  "@redPacketGrabbedViral": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
+    }
+  },
+  "web3SearchHint": "@matrix:id  •  0x wallet address  •  name.eth",
+  "web3SearchPlaceholder": "Search by ID, wallet, or ENS...",
+  "web3WalletAddress": "Wallet Address",
+  "web3AddressCopied": "Address copied",
+  "web3Copy": "Copy",
+  "web3SendMessage": "Send Message",
+  "web3SendToWallet": "Message Wallet",
+  "web3WalletOnlyHint": "This address has no N42 account yet. Message will be delivered when they join.",
+  "web3NftAvatar": "NFT Avatar",
+  "web3ResolveFailed": "Failed to resolve identity",
+  "web3EnsNotFound": "ENS name \"{name}\" not found",
+  "@web3EnsNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "web3NoN42AccountTitle": "No N42 Account",
+  "web3NoN42AccountDesc": "This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.",
+  "web3ShareInvite": "Share Invite",
+  "nftPickerTitle": "Select NFT Avatar",
+  "nftPickerTabPopular": "Popular",
+  "nftPickerTabCustom": "Custom",
+  "nftPickerChain": "Chain",
+  "nftPickerContract": "Contract Address",
+  "nftPickerTokenId": "Token ID",
+  "nftPickerVerifyOwnership": "Verify Ownership & Preview",
+  "nftPickerUseAsAvatar": "Use as Avatar",
+  "nftPickerPreview": "Preview",
+  "nftPickerNotOwned": "You do not own this NFT",
+  "nftPickerInvalidTokenId": "Invalid token ID",
+  "nftPickerEnterBoth": "Enter contract address and token ID",
+  "nftPickerInfoTitle": "NFT Avatar — Verified On-Chain",
+  "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.",
+  "nftPickerPopularCollections": "Popular Collections",
+  "nftPickerWalletHint": "Connect your N42 wallet to automatically discover your NFTs across 236+ chains."
 }

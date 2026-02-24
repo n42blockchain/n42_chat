@@ -1869,5 +1869,13 @@
   "nftPickerNotOwned": "Non possiedi questo NFT",
   "nftPickerInfoTitle": "Avatar NFT — Verificato on-chain",
   "nftPickerPopularCollections": "Collezioni popolari",
-  "nftPickerWalletHint": "Connetti il tuo wallet N42 per scoprire automaticamente i tuoi NFT su 236+ chain."
+  "nftPickerWalletHint": "Connetti il tuo wallet N42 per scoprire automaticamente i tuoi NFT su 236+ chain.",
+  "web3NoN42AccountDesc": "This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.",
+  "nftPickerChain": "Chain",
+  "nftPickerContract": "Contract Address",
+  "nftPickerTokenId": "Token ID",
+  "nftPickerPreview": "Preview",
+  "nftPickerInvalidTokenId": "Invalid token ID",
+  "nftPickerEnterBoth": "Enter contract address and token ID",
+  "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42."
 }

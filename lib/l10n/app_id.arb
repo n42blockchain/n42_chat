@@ -1869,5 +1869,13 @@
   "nftPickerNotOwned": "Anda tidak memiliki NFT ini",
   "nftPickerInfoTitle": "Avatar NFT — Terverifikasi on-chain",
   "nftPickerPopularCollections": "Koleksi populer",
-  "nftPickerWalletHint": "Hubungkan dompet N42 Anda untuk menemukan NFT Anda di 236+ rantai."
+  "nftPickerWalletHint": "Hubungkan dompet N42 Anda untuk menemukan NFT Anda di 236+ rantai.",
+  "web3NoN42AccountDesc": "This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.",
+  "nftPickerChain": "Chain",
+  "nftPickerContract": "Contract Address",
+  "nftPickerTokenId": "Token ID",
+  "nftPickerPreview": "Preview",
+  "nftPickerInvalidTokenId": "Invalid token ID",
+  "nftPickerEnterBoth": "Enter contract address and token ID",
+  "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42."
 }

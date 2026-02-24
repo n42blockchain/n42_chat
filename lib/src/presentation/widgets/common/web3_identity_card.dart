@@ -186,7 +186,7 @@ class Web3IdentityCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.copy_rounded,
+                        const Icon(Icons.copy_rounded,
                             size: 14, color: AppColors.primary),
                         const SizedBox(width: 4),
                         Text(
@@ -284,9 +284,9 @@ class _AvatarWithRing extends StatelessWidget {
     return Container(
       width: size + 4,
       height: size + 4,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFFFFD700), Color(0xFFFF8C00), Color(0xFFFFD700)],
           stops: [0.0, 0.5, 1.0],
         ),
@@ -359,9 +359,9 @@ class _N42Badge extends StatelessWidget {
           width: 0.5,
         ),
       ),
-      child: Text(
+      child: const Text(
         'N42',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 10,
           color: AppColors.primary,
           fontWeight: FontWeight.w600,

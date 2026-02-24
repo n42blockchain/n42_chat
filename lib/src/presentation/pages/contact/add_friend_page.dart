@@ -22,11 +22,12 @@ _InputType _detectInputType(String input) {
   final q = input.trim();
   if (q.startsWith('@') && q.contains(':')) return _InputType.matrixId;
   if (RegExp(r'^0x[0-9a-fA-F]{40}$').hasMatch(q)) return _InputType.walletAddress;
-  if (q.endsWith('.eth') ||
-      q.endsWith('.lens') ||
-      q.endsWith('.cb.id') ||
-      q.endsWith('.bnb') ||
-      q.endsWith('.bit')) {
+  // ENS: requires at least 1 label char before the TLD dot (e.g. "a.eth")
+  if ((q.endsWith('.eth') && q.length > 4) ||
+      (q.endsWith('.lens') && q.length > 5) ||
+      (q.endsWith('.cb.id') && q.length > 6) ||
+      (q.endsWith('.bnb') && q.length > 4) ||
+      (q.endsWith('.bit') && q.length > 4)) {
     return _InputType.ensName;
   }
   return _InputType.username;
