@@ -335,7 +335,7 @@
   "commonLeaveGroup": "退出群聊",
   "groupChangeGroupName": "修改群名称",
   "commonEnterGroupName": "请输入群名称",
-  "commonConfirm": "确定",
+  "commonConfirm": "确认",
   "groupEnterGroupDescription": "请输入群简介",
   "groupPublish": "发布",
   "chatClearHistoryConfirm": "确定要清空聊天记录吗？此操作不可恢复。",
@@ -1508,7 +1508,9 @@
   "authLoginWithBiometric": "使用{type}登录",
   "@authLoginWithBiometric": {
     "placeholders": {
-      "type": {"type": "Object"}
+      "type": {
+        "type": "Object"
+      }
     }
   },
   "settingsBiometricLoginEnabled": "生物识别登录已启用",
@@ -1933,7 +1935,6 @@
       }
     }
   },
-
   "securityDeviceIdRequired": "需要设备 ID",
   "securityVerificationStartFailed": "启动验证失败: {error}",
   "@securityVerificationStartFailed": {
@@ -1965,7 +1966,6 @@
   "securityCompareNumbers": "比较两台设备上的数字",
   "commonTryAgain": "重试",
   "commonDone": "完成",
-
   "chatExportTitle": "导出聊天记录",
   "chatExportSuccess": "导出成功",
   "chatExportFailed": "导出失败: {error}",
@@ -1988,16 +1988,18 @@
   "chatExportButton": "导出并分享",
   "chatMediaGallery": "媒体文件",
   "chatExportHistory": "导出聊天记录",
-
   "pdfLoadFailed": "加载 PDF 失败",
   "pdfPageIndicator": "{current} / {total}",
   "@pdfPageIndicator": {
     "placeholders": {
-      "current": {"type": "int"},
-      "total": {"type": "int"}
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
-
   "mediaAll": "全部",
   "mediaImages": "图片",
   "mediaVideos": "视频",
@@ -2006,11 +2008,12 @@
   "mediaItemsCount": "{count} 项",
   "@mediaItemsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "mediaNoMediaFound": "暂无媒体文件",
-
   "spacesTitle": "社区",
   "spacesCreate": "创建社区",
   "spacesJoined": "已加入",
@@ -2024,7 +2027,9 @@
   "spacesMembersCount": "{count} 位成员",
   "@spacesMembersCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "spacesPublic": "公开",
@@ -2033,22 +2038,24 @@
   "spacesChannelsCount": "{count} 个频道",
   "@spacesChannelsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "callInCallChat": "通话中聊天",
   "callMessagesCount": "{count} 条消息",
   "@callMessagesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "callNoMessagesYet": "暂无消息\n发送一条消息开始聊天",
   "callTypeMessage": "输入消息...",
   "callYouSender": "我",
   "callChatLabel": "聊天",
-
   "chatEdited": "已编辑",
   "chatEditHistory": "编辑历史",
   "chatOriginalMessage": "原始消息",
@@ -2060,29 +2067,30 @@
       }
     }
   },
-
   "chatViewOnce": "阅后即焚",
   "chatViewOncePhoto": "阅后即焚照片",
   "chatViewOnceVideo": "阅后即焚视频",
   "chatViewOnceViewed": "已查看",
   "chatViewOnceExpired": "已过期",
   "chatViewOnceTap": "点击查看",
-
   "chatAutoFaceBlur": "自动模糊人脸",
   "chatAutoFaceBlurDesc": "发送照片时自动模糊人脸",
-
   "threadReplyInThread": "在线程中回复",
   "threadReplies": "{count} 条回复",
   "@threadReplies": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "threadReply": "1 条回复",
   "threadLatestReply": "最新: {preview}",
   "@threadLatestReply": {
     "placeholders": {
-      "preview": {"type": "String"}
+      "preview": {
+        "type": "String"
+      }
     }
   },
   "threadTitle": "消息线程",
@@ -2090,10 +2098,11 @@
   "threadParticipants": "{count} 位参与者",
   "@threadParticipants": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "voiceRoomTitle": "语音聊天室",
   "voiceRoomCreate": "创建语音房间",
   "voiceRoomJoin": "加入",
@@ -2114,14 +2123,15 @@
   "voiceRoomHandRaised": "{name} 举手了",
   "@voiceRoomHandRaised": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "voiceRoomName": "房间名称",
   "voiceRoomTopic": "话题（可选）",
   "voiceRoomNoActive": "暂无活跃的语音房间",
   "voiceRoomConnecting": "连接中...",
-
   "usernameTitle": "用户名",
   "usernameSet": "设置用户名",
   "usernameChange": "修改用户名",
@@ -2132,12 +2142,10 @@
   "usernameReserved": "此用户名为保留名称",
   "usernameSaved": "用户名已保存",
   "usernameSearchHint": "通过 @用户名 搜索",
-
   "ensName": "ENS 域名",
   "ensLinked": "已关联 ENS",
   "ensResolving": "正在解析 ENS...",
   "ensNotFound": "未找到 ENS 域名",
-
   "tokenGateTitle": "代币门控",
   "tokenGateEnable": "启用代币门控",
   "tokenGateDisable": "禁用代币门控",
@@ -2174,22 +2182,18 @@
   "tokenGateRulesActive": "条规则生效",
   "tokenGateDisabled": "未启用",
   "ensNotBound": "未绑定",
-
   "liveLocation": "实时位置",
   "stopLiveLocation": "停止共享",
   "startLiveLocation": "开始共享",
   "selectDuration": "选择共享时长",
-
   "groupChatFiles": "聊天文件",
   "groupLinks": "链接",
   "groupNoLinks": "暂无链接",
-
   "chatBackground": "聊天背景",
   "solidColors": "纯色",
   "gradients": "渐变",
   "defaultBackground": "默认",
   "settingsFontSizeSlider": "字体大小",
-
   "autoDownload": "自动下载",
   "images": "图片",
   "voice": "语音",
@@ -2197,7 +2201,6 @@
   "files": "文件",
   "mobileData": "移动数据",
   "roaming": "漫游",
-
   "storageManagement": "存储管理",
   "totalUsage": "总用量",
   "cache": "缓存",
@@ -2259,7 +2262,6 @@
   "voiceRecording": "语音录制",
   "searchLocation": "搜索地点",
   "tapToSearch": "点击搜索",
-
   "settingsThisDevice": "本设备",
   "settingsJustNow": "刚刚",
   "settingsDeviceId": "设备 ID",
@@ -2284,8 +2286,6 @@
   "settingsLogout": "登出",
   "settingsVerifyIdentity": "验证身份",
   "settingsEnterPasswordToConfirm": "请输入密码以确认此操作。",
-  "commonConfirm": "确认",
-
   "scheduledSendTitle": "定时发送",
   "scheduledSendInOneHour": "1小时后",
   "scheduledSendTonight": "今晚 (20:00)",
@@ -2293,7 +2293,6 @@
   "scheduledSendCustom": "自定义时间",
   "scheduledMessageLabel": "定时发送",
   "scheduledMessageCancel": "取消定时发送",
-
   "chatLockTitle": "聊天锁",
   "chatLockEnable": "锁定此聊天",
   "chatLockDisable": "解锁此聊天",
@@ -2309,14 +2308,12 @@
   "chatLockPinMismatch": "PIN 码不一致",
   "chatLockUseBiometric": "使用生物识别",
   "chatLockUsePin": "使用 PIN 码",
-
   "mediaEditorUndo": "撤销",
   "mediaEditorRedo": "重做",
   "mediaEditorCrop": "裁剪",
   "mediaEditorFilter": "滤镜",
   "mediaEditorDraw": "涂鸦",
   "mediaEditorText": "文字",
-
   "aiAssistant": "AI 助手",
   "aiAssistantWelcome": "你好！我是 N42 AI 助手，有什么可以帮你的吗？",
   "aiAssistantNotConfigured": "AI 服务未配置",
@@ -2331,17 +2328,17 @@
   "aiAssistantServiceStatus": "服务状态",
   "aiAssistantAvailable": "可用",
   "aiAssistantUnavailable": "不可用",
-
   "aiSummarize": "AI 总结",
   "aiSummarizeUnread": "AI 总结 {count} 条未读消息",
   "@aiSummarizeUnread": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "aiSummarizeLoading": "正在总结...",
   "aiSummarizeError": "总结失败",
-
   "aiRewrite": "AI 改写",
   "aiRewriteFormal": "正式",
   "aiRewriteCasual": "轻松",
@@ -2350,10 +2347,8 @@
   "aiRewriteAccept": "使用",
   "aiRewriteCancel": "取消",
   "aiRewriteLoading": "正在改写...",
-
   "aiLinkSummary": "AI 摘要",
   "aiLinkSummaryAnalyzing": "正在分析...",
-
   "chatFolderManagement": "管理文件夹",
   "chatFolderSystem": "系统文件夹",
   "chatFolderCustom": "自定义文件夹",
@@ -2367,14 +2362,12 @@
   "chatFolderGroups": "群组",
   "chatFolderChannels": "频道",
   "chatFolderMuted": "已静音",
-
   "storyAddMusic": "添加音乐",
   "storyChangeMusic": "更换音乐",
   "storyBackgroundMusic": "背景音乐",
   "storyMusicPreview": "预览 (最长15秒)",
   "storyChooseFromDevice": "从设备选择",
   "storyUseThisMusic": "使用此音乐",
-
   "authPasskeyNotSupported": "此设备不支持 Passkey",
   "authPasskeyRegister": "注册 Passkey",
   "authPasskeyNoRegistered": "未注册 Passkey",
@@ -2385,7 +2378,9 @@
   "authPasskeyDeleteConfirm": "删除 Passkey \"{name}\"？删除后将无法使用该 Passkey 登录。",
   "@authPasskeyDeleteConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "momentVisibilityPublic": "公开",
@@ -2395,7 +2390,9 @@
   "momentUserMoments": "{userName}的朋友圈",
   "@momentUserMoments": {
     "placeholders": {
-      "userName": {"type": "String"}
+      "userName": {
+        "type": "String"
+      }
     }
   },
   "momentForwardTo": "转发给",
@@ -2405,7 +2402,9 @@
   "momentSelectedCount": "已选择 ({count})",
   "@momentSelectedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "momentNoMomentsYet": "暂无动态",
@@ -2414,7 +2413,9 @@
   "momentForwardContent": "[朋友圈] {content}",
   "@momentForwardContent": {
     "placeholders": {
-      "content": {"type": "String"}
+      "content": {
+        "type": "String"
+      }
     }
   },
   "momentDeleteMoment": "删除动态",
@@ -2430,13 +2431,17 @@
   "momentLikesCount": "{count} 个赞",
   "@momentLikesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "momentCommentsCount": "{count} 条评论",
   "@momentCommentsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "momentNoComments": "暂无评论",
@@ -2444,7 +2449,9 @@
   "momentReplyTo": "回复 {userName}...",
   "@momentReplyTo": {
     "placeholders": {
-      "userName": {"type": "String"}
+      "userName": {
+        "type": "String"
+      }
     }
   },
   "momentNoConversations": "暂无会话",
@@ -2452,19 +2459,25 @@
   "momentMinutesAgo": "{count}分钟前",
   "@momentMinutesAgo": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "momentHoursAgo": "{count}小时前",
   "@momentHoursAgo": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "momentDaysAgo": "{count}天前",
   "@momentDaysAgo": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "chatGroupAnnouncementHint": "输入群公告",
@@ -2512,7 +2525,6 @@
   "gameNewRecord": "新纪录！",
   "gameLines": "行数",
   "storyMyStory": "我的动态",
-
   "storageSmartCleanup": "智能清理",
   "storageOldMediaFiles": "旧媒体文件",
   "storageLargeFiles": "大文件",
@@ -2522,7 +2534,9 @@
   "storageAutoCleanupDesc": "自动清理 {days} 天以上未访问的文件",
   "@storageAutoCleanupDesc": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "storageCleanupPeriod": "清理周期",
@@ -2533,20 +2547,28 @@
   "storageFreed": "已释放 {size}（{count} 个文件）",
   "@storageFreed": {
     "placeholders": {
-      "size": {"type": "String"},
-      "count": {"type": "int"}
+      "size": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "storageDays": "{days} 天",
   "@storageDays": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "storageViewAllRooms": "查看全部 {count} 个房间",
   "@storageViewAllRooms": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "storageNoFiles": "暂无文件",
@@ -2554,10 +2576,11 @@
   "storageDeleteSelected": "删除 {count} 个选中文件？文件可从服务器重新下载。",
   "@storageDeleteSelected": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "backupRestore": "备份与恢复",
   "backupCreate": "创建备份",
   "backupCreateDesc": "备份设置和加密密钥。消息将在重新登录后从服务器恢复。",
@@ -2577,21 +2600,31 @@
   "backupCreated": "备份已创建：{rooms} 个房间，{messages} 条消息",
   "@backupCreated": {
     "placeholders": {
-      "rooms": {"type": "int"},
-      "messages": {"type": "int"}
+      "rooms": {
+        "type": "int"
+      },
+      "messages": {
+        "type": "int"
+      }
     }
   },
   "backupRestored": "已恢复 {settings} 项设置（来自 {rooms} 个房间）",
   "@backupRestored": {
     "placeholders": {
-      "settings": {"type": "int"},
-      "rooms": {"type": "int"}
+      "settings": {
+        "type": "int"
+      },
+      "rooms": {
+        "type": "int"
+      }
     }
   },
   "backupFailed": "备份失败：{error}",
   "@backupFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "backupPasswordRequired": "此备份需要密码",
@@ -2599,7 +2632,9 @@
   "blocGroupMembersInvited": "已邀请{count}位成员",
   "@blocGroupMembersInvited": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "blocGroupMemberRemoved": "成员已移除",
@@ -2614,13 +2649,11 @@
   "blocTransferFailed": "转账失败",
   "blocPaymentProcessing": "支付处理中...",
   "blocPaymentFailed": "支付失败",
-
   "groupMaxMembers": "群人数上限",
   "groupMaxMembersUnlimited": "不限",
   "groupMaxMembersHint": "输入上限（留空表示不限）",
   "groupMaxMembersUpdated": "群人数上限已更新",
   "groupFull": "群已满员",
-
   "groupChannels": "话题频道",
   "groupChannelsEmpty": "暂无话题频道",
   "groupChannelsCount": "个频道",
@@ -2629,25 +2662,21 @@
   "groupChannelTopic": "频道话题（可选）",
   "groupChannelDelete": "删除频道",
   "groupChannelDeleteConfirm": "确认删除此频道？消息不可恢复。",
-
   "groupBotSettings": "Bot 设置",
   "groupBotEnabled": "启用 Bot",
   "groupBotWelcomeMessage": "欢迎语模板",
   "groupBotWelcomeHint": "用 'name' 作为新成员名字占位符",
   "groupBotConfigUpdated": "Bot 设置已更新",
-
   "groupContentFilter": "关键词过滤",
   "groupContentFilterEnabled": "启用关键词过滤",
   "groupContentFilterReplace": "替换为 ***",
   "groupContentFilterHide": "隐藏消息",
   "groupContentFilterAddWord": "添加关键词",
   "groupContentFilterUpdated": "内容过滤设置已更新",
-
   "chatSlashCommands": "指令",
   "chatCommandPoll": "/poll — 创建投票",
   "chatCommandAnnounce": "/announce — 发布公告",
   "chatCommandWelcome": "/welcome — 设置欢迎语",
-
   "chatReportMessage": "举报",
   "chatReportReason": "举报原因",
   "chatReportSpam": "垃圾信息",
@@ -2655,7 +2684,6 @@
   "chatReportInappropriate": "违规内容",
   "chatReportOther": "其他",
   "chatReportSuccess": "举报已提交",
-
   "spacesName": "社区名称",
   "spacesNameHint": "例如：加密交易者",
   "spacesNameRequired": "请输入社区名称",
@@ -2672,14 +2700,18 @@
   "spacesLeaveConfirm": "确定要退出「{name}」吗？",
   "@spacesLeaveConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "spacesDelete": "解散社区",
   "spacesDeleteConfirm": "此操作将永久删除「{name}」及其所有频道，且不可撤销。",
   "@spacesDeleteConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "spacesCreateChannel": "创建频道",
@@ -2689,7 +2721,9 @@
   "spacesDeleteChannelConfirm": "确定要删除频道「#{name}」吗？",
   "@spacesDeleteChannelConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "spacesEditName": "修改名称",
@@ -2697,19 +2731,25 @@
   "spacesViewAllMembers": "查看全部 {count} 位成员",
   "@spacesViewAllMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "spacesKickMemberTitle": "踢出 {name}",
   "@spacesKickMemberTitle": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "spacesBanMemberTitle": "封禁 {name}",
   "@spacesBanMemberTitle": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "spacesPromoteAdmin": "设为管理员",
@@ -2717,7 +2757,6 @@
   "spacesInviteMember": "邀请成员",
   "spacesInviteMemberUserId": "用户 ID（如 @user:server.com）",
   "spacesSave": "保存",
-  "settingsSecurity": "安全",
   "settingsScreenshotProtection": "截图防护",
   "settingsScreenshotProtectionDesc": "防止截图和屏幕录制",
   "chatSelfDestructTimer": "阅后即焚",
@@ -2738,5 +2777,32 @@
   "miniAppSearch": "搜索应用...",
   "miniAppFeatured": "精选",
   "miniAppAllApps": "全部应用",
-  "miniAppNoResults": "未找到应用"
+  "miniAppNoResults": "未找到应用",
+  "slideToPayLabel": "→→→  滑动确认",
+  "slideToPayConfirming": "确认中...",
+  "redPacketBestLuck": "最佳手气",
+  "redPacketBestLuckCongrats": "最佳手气！你抢到了最多！",
+  "redPacketStats": "{claimed} / {total} 个已领取",
+  "@redPacketStats": {
+    "placeholders": {
+      "claimed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "redPacketStatsTotal": "共计",
+  "redPacketGrabbedViral": "🧧 抢到了红包 • {amount} {token}",
+  "@redPacketGrabbedViral": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
+    }
+  }
 }

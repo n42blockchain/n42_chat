@@ -5341,4 +5341,29 @@ class SJa extends S {
 
   @override
   String get miniAppNoResults => 'アプリが見つかりません';
+
+  @override
+  String get slideToPayLabel => '→→→  スライドして確認';
+
+  @override
+  String get slideToPayConfirming => '確認中...';
+
+  @override
+  String get redPacketBestLuck => 'ベストラック';
+
+  @override
+  String get redPacketBestLuckCongrats => 'ベストラック！一番多く獲得しました！';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total 受取済';
+  }
+
+  @override
+  String get redPacketStatsTotal => '合計';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 赤い封筒を受け取りました • $amount $token';
+  }
 }

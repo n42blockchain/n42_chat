@@ -5435,4 +5435,30 @@ class SPl extends S {
 
   @override
   String get miniAppNoResults => 'Nie znaleziono aplikacji';
+
+  @override
+  String get slideToPayLabel => '→→→  Przesuń, aby potwierdzić';
+
+  @override
+  String get slideToPayConfirming => 'Potwierdzanie...';
+
+  @override
+  String get redPacketBestLuck => 'Najlepsze szczęście';
+
+  @override
+  String get redPacketBestLuckCongrats =>
+      'Najlepsze szczęście! Dostałeś najwięcej!';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total odebrano';
+  }
+
+  @override
+  String get redPacketStatsTotal => 'łącznie';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 Otrzymał czerwoną kopertę • $amount $token';
+  }
 }

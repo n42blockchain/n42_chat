@@ -1813,5 +1813,32 @@
   "miniAppSearch": "Cari aplikasi...",
   "miniAppFeatured": "Unggulan",
   "miniAppAllApps": "Semua Aplikasi",
-  "miniAppNoResults": "Aplikasi tidak ditemukan"
+  "miniAppNoResults": "Aplikasi tidak ditemukan",
+  "slideToPayLabel": "→→→  Geser untuk konfirmasi",
+  "slideToPayConfirming": "Mengkonfirmasi...",
+  "redPacketBestLuck": "Keberuntungan terbaik",
+  "redPacketBestLuckCongrats": "Keberuntungan terbaik! Kamu dapat paling banyak!",
+  "redPacketStats": "{claimed} / {total} diklaim",
+  "@redPacketStats": {
+    "placeholders": {
+      "claimed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "redPacketStatsTotal": "total",
+  "redPacketGrabbedViral": "🧧 Mendapat amplop merah • {amount} {token}",
+  "@redPacketGrabbedViral": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -5443,4 +5443,29 @@ class SEs extends S {
 
   @override
   String get miniAppNoResults => 'No se encontraron apps';
+
+  @override
+  String get slideToPayLabel => '→→→  Desliza para confirmar';
+
+  @override
+  String get slideToPayConfirming => 'Confirmando...';
+
+  @override
+  String get redPacketBestLuck => 'Mejor suerte';
+
+  @override
+  String get redPacketBestLuckCongrats => '¡Mejor suerte! ¡Recibiste más!';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total reclamados';
+  }
+
+  @override
+  String get redPacketStatsTotal => 'total';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 Recibió un sobre rojo • $amount $token';
+  }
 }

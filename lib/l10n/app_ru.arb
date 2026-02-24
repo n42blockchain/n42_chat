@@ -1813,5 +1813,32 @@
   "miniAppSearch": "Поиск приложений...",
   "miniAppFeatured": "Рекомендуемые",
   "miniAppAllApps": "Все приложения",
-  "miniAppNoResults": "Приложения не найдены"
+  "miniAppNoResults": "Приложения не найдены",
+  "slideToPayLabel": "→→→  Проведите для подтверждения",
+  "slideToPayConfirming": "Подтверждение...",
+  "redPacketBestLuck": "Лучшая удача",
+  "redPacketBestLuckCongrats": "Лучшая удача! Вы получили больше всех!",
+  "redPacketStats": "{claimed} / {total} получено",
+  "@redPacketStats": {
+    "placeholders": {
+      "claimed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "redPacketStatsTotal": "итого",
+  "redPacketGrabbedViral": "🧧 Получил красный конверт • {amount} {token}",
+  "@redPacketGrabbedViral": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
+    }
+  }
 }

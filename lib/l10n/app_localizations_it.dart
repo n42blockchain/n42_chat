@@ -5422,4 +5422,30 @@ class SIt extends S {
 
   @override
   String get miniAppNoResults => 'Nessuna app trovata';
+
+  @override
+  String get slideToPayLabel => '→→→  Scorri per confermare';
+
+  @override
+  String get slideToPayConfirming => 'Confermando...';
+
+  @override
+  String get redPacketBestLuck => 'Miglior fortuna';
+
+  @override
+  String get redPacketBestLuckCongrats =>
+      'Miglior fortuna! Hai ottenuto di più!';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total riscattati';
+  }
+
+  @override
+  String get redPacketStatsTotal => 'totale';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 Ha ricevuto una busta rossa • $amount $token';
+  }
 }

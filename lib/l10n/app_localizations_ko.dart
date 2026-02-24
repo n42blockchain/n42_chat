@@ -5341,4 +5341,29 @@ class SKo extends S {
 
   @override
   String get miniAppNoResults => '앱을 찾을 수 없습니다';
+
+  @override
+  String get slideToPayLabel => '→→→  밀어서 확인';
+
+  @override
+  String get slideToPayConfirming => '확인 중...';
+
+  @override
+  String get redPacketBestLuck => '최고의 행운';
+
+  @override
+  String get redPacketBestLuckCongrats => '최고의 행운! 가장 많이 받았어요!';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total 수령';
+  }
+
+  @override
+  String get redPacketStatsTotal => '총';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 빨간 봉투를 받았습니다 • $amount $token';
+  }
 }

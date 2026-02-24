@@ -5429,4 +5429,30 @@ class SRu extends S {
 
   @override
   String get miniAppNoResults => 'Приложения не найдены';
+
+  @override
+  String get slideToPayLabel => '→→→  Проведите для подтверждения';
+
+  @override
+  String get slideToPayConfirming => 'Подтверждение...';
+
+  @override
+  String get redPacketBestLuck => 'Лучшая удача';
+
+  @override
+  String get redPacketBestLuckCongrats =>
+      'Лучшая удача! Вы получили больше всех!';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total получено';
+  }
+
+  @override
+  String get redPacketStatsTotal => 'итого';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 Получил красный конверт • $amount $token';
+  }
 }

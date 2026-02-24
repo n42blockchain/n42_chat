@@ -8,25 +8,30 @@ import '../../../core/theme/app_colors.dart';
 class RedPacketDetailPage extends StatelessWidget {
   /// 发送者名称
   final String senderName;
-  
+
   /// 发送者头像
   final String? senderAvatar;
-  
+
   /// 红包祝福语
   final String? greeting;
-  
-  /// 领取金额
+
+  /// 当前用户领取的金额（null 表示未领取）
   final String? claimedAmount;
-  
+
   /// 代币类型
   final String token;
-  
+
   /// 是否已领取
   final bool isClaimed;
-  
+
   /// 领取者列表
   final List<RedPacketClaimer>? claimers;
-  
+
+  // ── Stats (optional — shown as summary bar above claim list)
+  final int? totalCount;
+  final int? claimedCount;
+  final String? totalAmount;
+
   const RedPacketDetailPage({
     super.key,
     required this.senderName,
@@ -36,8 +41,11 @@ class RedPacketDetailPage extends StatelessWidget {
     this.token = 'CNY',
     this.isClaimed = false,
     this.claimers,
+    this.totalCount,
+    this.claimedCount,
+    this.totalAmount,
   });
-  
+
   String _currencyUnit(BuildContext context) {
     switch (token) {
       case 'CNY':
@@ -50,14 +58,14 @@ class RedPacketDetailPage extends StatelessWidget {
         return token;
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: CustomScrollView(
         slivers: [
-          // 顶部红色区域
+          // ── Red gradient header ──────────────────────────────────────────
           SliverToBoxAdapter(
             child: Container(
               decoration: const BoxDecoration(
@@ -65,34 +73,36 @@ class RedPacketDetailPage extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [Color(0xFFE64340), Color(0xFFD63030), Colors.black],
-                  stops: [0.0, 0.4, 1.0],
+                  stops: [0.0, 0.45, 1.0],
                 ),
               ),
               child: SafeArea(
                 bottom: false,
                 child: Column(
                   children: [
-                    // AppBar
+                    // AppBar row
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Row(
                         children: [
                           IconButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 32),
+                            icon: const Icon(Icons.chevron_left,
+                                color: Colors.white, size: 32),
                           ),
                           const Spacer(),
                           IconButton(
                             onPressed: () {},
-                            icon: const Icon(Icons.more_horiz, color: Colors.white),
+                            icon: const Icon(Icons.more_horiz,
+                                color: Colors.white),
                           ),
                         ],
                       ),
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
-                    // 发送者信息
+
+                    // Sender info
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -105,13 +115,17 @@ class RedPacketDetailPage extends StatelessWidget {
                           child: senderAvatar == null
                               ? Text(
                                   senderName.isNotEmpty ? senderName[0] : '?',
-                                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 )
                               : null,
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          S.of(context)?.commonSenderSentRedPacket(senderName) ?? '$senderName sent a red packet',
+                          S.of(context)?.commonSenderSentRedPacket(senderName) ??
+                              '$senderName sent a red packet',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 17,
@@ -120,23 +134,24 @@ class RedPacketDetailPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 12),
-                    
-                    // 祝福语
+
+                    // Greeting
                     Text(
-                      greeting ?? S.of(context)?.commonRedPacketDefaultGreeting ?? 'Best wishes',
+                      greeting ??
+                          S.of(context)?.commonRedPacketDefaultGreeting ??
+                          'Best wishes',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 15,
                       ),
                     ),
-                    
+
                     const SizedBox(height: 32),
-                    
-                    // 金额显示
+
+                    // Claimed amount for current user
                     if (isClaimed && claimedAmount != null) ...[
-                      // 金额显示 - 使用 FittedBox 自适应长数字
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: FittedBox(
@@ -167,16 +182,17 @@ class RedPacketDetailPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       GestureDetector(
                         onTap: () {},
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              S.of(context)?.commonSavedToBalance ?? 'Saved to balance, can transfer directly',
+                              S.of(context)?.commonSavedToBalance ??
+                                  'Saved to balance, can transfer directly',
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.7),
                                 fontSize: 14,
@@ -190,12 +206,13 @@ class RedPacketDetailPage extends StatelessWidget {
                           ],
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
-                      // 表情回复按钮
+
+                      // Emoji reply button
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
@@ -210,11 +227,14 @@ class RedPacketDetailPage extends StatelessWidget {
                                 color: Colors.orange.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Center(child: Text('🐕', style: TextStyle(fontSize: 20))),
+                              child: const Center(
+                                  child: Text('🐕',
+                                      style: TextStyle(fontSize: 20))),
                             ),
                             const SizedBox(width: 12),
                             Text(
-                              S.of(context)?.commonReplyWithEmoji ?? 'Reply with this emoji',
+                              S.of(context)?.commonReplyWithEmoji ??
+                                  'Reply with this emoji',
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.9),
                                 fontSize: 14,
@@ -225,84 +245,219 @@ class RedPacketDetailPage extends StatelessWidget {
                       ),
                     ] else ...[
                       Text(
-                        S.of(context)?.commonRedPacketExpiredOrEmpty ?? 'Red packet expired/all claimed',
+                        S.of(context)?.commonRedPacketExpiredOrEmpty ??
+                            'Red packet expired/all claimed',
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 16,
                         ),
                       ),
                     ],
-                    
+
                     const SizedBox(height: 40),
                   ],
                 ),
               ),
             ),
           ),
-          
-          // 领取记录
-          if (claimers != null && claimers!.isNotEmpty)
+
+          // ── Stats bar ────────────────────────────────────────────────────
+          if (totalCount != null)
             SliverToBoxAdapter(
-              child: Container(
-                color: Colors.black,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Divider(height: 1, color: Colors.white10),
-                    ...claimers!.map((claimer) => _buildClaimerItem(context, claimer)),
-                  ],
-                ),
+              child: _StatsBar(
+                claimedCount: claimedCount ?? 0,
+                totalCount: totalCount!,
+                totalAmount: totalAmount,
+                token: token,
+                currencyUnit: _currencyUnit(context),
               ),
             ),
+
+          // ── Claim list ───────────────────────────────────────────────────
+          if (claimers != null && claimers!.isNotEmpty)
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => _ClaimerRow(
+                  claimer: claimers![index],
+                  currencyUnit: _currencyUnit(context),
+                ),
+                childCount: claimers!.length,
+              ),
+            ),
+
+          // Bottom padding
+          const SliverToBoxAdapter(child: SizedBox(height: 32)),
         ],
       ),
     );
   }
-  
-  Widget _buildClaimerItem(BuildContext context, RedPacketClaimer claimer) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
+}
+
+// ─── Stats bar ───────────────────────────────────────────────────────────────
+
+class _StatsBar extends StatelessWidget {
+  final int claimedCount;
+  final int totalCount;
+  final String? totalAmount;
+  final String token;
+  final String currencyUnit;
+
+  const _StatsBar({
+    required this.claimedCount,
+    required this.totalCount,
+    required this.totalAmount,
+    required this.token,
+    required this.currencyUnit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = S.of(context);
+    final statsText = l10n?.redPacketStats(claimedCount, totalCount) ??
+        '$claimedCount / $totalCount claimed';
+    final amountText = totalAmount != null
+        ? '  •  $totalAmount $currencyUnit ${l10n?.redPacketStatsTotal ?? 'total'}'
+        : '';
+
+    return Container(
+      color: Colors.black,
+      child: Column(
         children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: Colors.white24,
-            backgroundImage: claimer.avatarUrl != null
-                ? NetworkImage(claimer.avatarUrl!)
-                : null,
-            child: claimer.avatarUrl == null
-                ? Text(
-                    claimer.name.isNotEmpty ? claimer.name[0] : '?',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                  )
-                : null,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          const Divider(height: 1, color: Colors.white10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
               children: [
                 Text(
-                  claimer.name,
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
-                if (claimer.claimTime != null)
-                  Text(
-                    claimer.claimTime!,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
-                      fontSize: 13,
-                    ),
+                  '$statsText$amountText',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    fontSize: 13,
                   ),
+                ),
               ],
             ),
           ),
+          const Divider(height: 1, color: Colors.white10),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Claim row ────────────────────────────────────────────────────────────────
+
+class _ClaimerRow extends StatelessWidget {
+  final RedPacketClaimer claimer;
+  final String currencyUnit;
+
+  const _ClaimerRow({required this.claimer, required this.currencyUnit});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = S.of(context);
+
+    return Container(
+      color: Colors.black,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            // Avatar
+            CircleAvatar(
+              radius: 22,
+              backgroundColor: Colors.white24,
+              backgroundImage: claimer.avatarUrl != null
+                  ? NetworkImage(claimer.avatarUrl!)
+                  : null,
+              child: claimer.avatarUrl == null
+                  ? Text(
+                      claimer.name.isNotEmpty ? claimer.name[0] : '?',
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 12),
+
+            // Name + time
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        claimer.name,
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 16),
+                      ),
+                      if (claimer.isBestLuck) ...[
+                        const SizedBox(width: 6),
+                        _BestLuckBadge(
+                            label: l10n?.redPacketBestLuck ?? 'Best Luck'),
+                      ],
+                    ],
+                  ),
+                  if (claimer.claimTime != null)
+                    Text(
+                      claimer.claimTime!,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        fontSize: 13,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // Amount — gold if best luck
+            Text(
+              '${claimer.amount}$currencyUnit',
+              style: TextStyle(
+                color: claimer.isBestLuck
+                    ? const Color(0xFFFFD700)
+                    : Colors.white70,
+                fontSize: 16,
+                fontWeight: claimer.isBestLuck
+                    ? FontWeight.w600
+                    : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Best luck badge ─────────────────────────────────────────────────────────
+
+class _BestLuckBadge extends StatelessWidget {
+  final String label;
+
+  const _BestLuckBadge({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('👑', style: TextStyle(fontSize: 10)),
+          const SizedBox(width: 2),
           Text(
-            '${claimer.amount}${_currencyUnit(context)}',
+            label,
             style: const TextStyle(
-              color: Color(0xFFFFD700),
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -311,18 +466,24 @@ class RedPacketDetailPage extends StatelessWidget {
   }
 }
 
-/// 红包领取者信息
+// ─── Data models ─────────────────────────────────────────────────────────────
+
+/// Display model for a single claim row in the detail page.
 class RedPacketClaimer {
   final String name;
   final String? avatarUrl;
   final String amount;
   final String? claimTime;
-  
+
+  /// Whether this claimer holds the "best luck" position (highest amount).
+  final bool isBestLuck;
+
   const RedPacketClaimer({
     required this.name,
     this.avatarUrl,
     required this.amount,
     this.claimTime,
+    this.isBestLuck = false,
   });
 }
 
@@ -333,7 +494,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
   final String token;
   final String? memo;
   final VoidCallback onConfirm;
-  
+
   const ConfirmReceiveDialog({
     super.key,
     required this.senderName,
@@ -342,7 +503,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
     this.memo,
     required this.onConfirm,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -364,42 +525,62 @@ class ConfirmReceiveDialog extends StatelessWidget {
                 color: const Color(0xFFF9A825).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.account_balance_wallet, size: 32, color: Color(0xFFF9A825)),
+              child: const Icon(Icons.account_balance_wallet,
+                  size: 32, color: Color(0xFFF9A825)),
             ),
             const SizedBox(height: 16),
-            
-            Text(S.of(context)?.commonReceivedTransfer ?? 'Received Transfer', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+
+            Text(
+              S.of(context)?.commonReceivedTransfer ?? 'Received Transfer',
+              style: const TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
 
-            Text(S.of(context)?.commonFromSender(senderName, senderName) ?? 'From $senderName', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+            Text(
+              S.of(context)?.commonFromSender(senderName, senderName) ??
+                  'From $senderName',
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
             const SizedBox(height: 24),
-            
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(amount, style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Color(0xFFF9A825))),
+                Text(
+                  amount,
+                  style: const TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFF9A825)),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 6),
-                  child: Text(' $token', style: const TextStyle(fontSize: 16, color: Color(0xFFF9A825))),
+                  child: Text(' $token',
+                      style: const TextStyle(
+                          fontSize: 16, color: Color(0xFFF9A825))),
                 ),
               ],
             ),
-            
+
             if (memo != null && memo!.isNotEmpty) ...[
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.grey[100],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(memo!, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                child: Text(memo!,
+                    style:
+                        TextStyle(fontSize: 14, color: Colors.grey[600])),
               ),
             ],
-            
+
             const SizedBox(height: 24),
-            
+
             SizedBox(
               width: double.infinity,
               height: 44,
@@ -411,10 +592,15 @@ class ConfirmReceiveDialog extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFF9A825),
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                   elevation: 0,
                 ),
-                child: Text(S.of(context)?.commonConfirmReceive ?? 'Confirm Receipt', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                child: Text(
+                  S.of(context)?.commonConfirmReceive ?? 'Confirm Receipt',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600),
+                ),
               ),
             ),
           ],

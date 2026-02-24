@@ -1813,5 +1813,32 @@
   "miniAppSearch": "앱 검색...",
   "miniAppFeatured": "추천",
   "miniAppAllApps": "전체 앱",
-  "miniAppNoResults": "앱을 찾을 수 없습니다"
+  "miniAppNoResults": "앱을 찾을 수 없습니다",
+  "slideToPayLabel": "→→→  밀어서 확인",
+  "slideToPayConfirming": "확인 중...",
+  "redPacketBestLuck": "최고의 행운",
+  "redPacketBestLuckCongrats": "최고의 행운! 가장 많이 받았어요!",
+  "redPacketStats": "{claimed} / {total} 수령",
+  "@redPacketStats": {
+    "placeholders": {
+      "claimed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "redPacketStatsTotal": "총",
+  "redPacketGrabbedViral": "🧧 빨간 봉투를 받았습니다 • {amount} {token}",
+  "@redPacketGrabbedViral": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
+    }
+  }
 }

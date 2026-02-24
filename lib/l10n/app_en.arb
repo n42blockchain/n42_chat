@@ -2558,5 +2558,26 @@
   "miniAppSearch": "Search apps...",
   "miniAppFeatured": "Featured",
   "miniAppAllApps": "All Apps",
-  "miniAppNoResults": "No apps found"
+  "miniAppNoResults": "No apps found",
+
+  "slideToPayLabel": "→→→  Slide to confirm",
+  "slideToPayConfirming": "Confirming...",
+
+  "redPacketBestLuck": "Best Luck",
+  "redPacketBestLuckCongrats": "Best Luck! You got the most!",
+  "redPacketStats": "{claimed} / {total} claimed",
+  "@redPacketStats": {
+    "placeholders": {
+      "claimed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "redPacketStatsTotal": "total",
+  "redPacketGrabbedViral": "🧧 grabbed a red packet • {amount} {token}",
+  "@redPacketGrabbedViral": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "token": { "type": "String" }
+    }
+  }
 }

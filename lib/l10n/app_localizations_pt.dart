@@ -5441,4 +5441,29 @@ class SPt extends S {
 
   @override
   String get miniAppNoResults => 'Nenhum app encontrado';
+
+  @override
+  String get slideToPayLabel => '→→→  Deslize para confirmar';
+
+  @override
+  String get slideToPayConfirming => 'Confirmando...';
+
+  @override
+  String get redPacketBestLuck => 'Melhor sorte';
+
+  @override
+  String get redPacketBestLuckCongrats => 'Melhor sorte! Você recebeu mais!';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total resgatados';
+  }
+
+  @override
+  String get redPacketStatsTotal => 'total';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 Recebeu um envelope vermelho • $amount $token';
+  }
 }
