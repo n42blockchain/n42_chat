@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/giphy_service.dart';
 import '../services/remark_service.dart';
@@ -82,6 +83,12 @@ import '../../presentation/blocs/ai_assistant/ai_assistant_bloc.dart';
 import '../../presentation/blocs/chat_folder/chat_folder_bloc.dart';
 import '../../presentation/blocs/space/space_bloc.dart';
 import '../../services/voip/voice_room_service.dart';
+import '../../data/datasources/push_protocol/push_protocol_datasource.dart';
+import '../../data/repositories/on_chain_notification_repository_impl.dart';
+import '../../domain/repositories/on_chain_notification_repository.dart';
+import '../../presentation/blocs/on_chain_notification/on_chain_notification_bloc.dart';
+import '../services/on_chain_notification_service.dart';
+import '../services/in_app_notification_service.dart';
 
 /// 全局GetIt实例
 final GetIt getIt = GetIt.instance;
@@ -276,6 +283,20 @@ Future<void> _registerServices() async {
       ),
     );
   }
+
+  // 链上事件推送后台服务（仅当 Push Protocol 启用时注册）
+  final ppConfig = config.pushProtocol;
+  if (ppConfig != null && ppConfig.enabled) {
+    getIt.registerLazySingleton<OnChainNotificationService>(
+      () => OnChainNotificationService(
+        repository: getIt<IOnChainNotificationRepository>(),
+        walletBridge: getIt<IWalletBridge>(),
+        inAppNotificationService: InAppNotificationService.instance,
+        chainId: ppConfig.chainId,
+        pollInterval: ppConfig.pollInterval,
+      ),
+    );
+  }
 }
 
 /// 注册数据源
@@ -351,6 +372,20 @@ Future<void> _registerDataSources() async {
   getIt.registerLazySingleton<MatrixSpaceDataSource>(
     () => MatrixSpaceDataSource(getIt<MatrixClientManager>()),
   );
+
+  // Push Protocol 数据源（链上事件通知，仅在启用时注册）
+  final ppConfig = getIt<N42ChatConfig>().pushProtocol;
+  if (ppConfig != null && ppConfig.enabled) {
+    getIt.registerSingletonAsync<PushProtocolDatasource>(
+      () async {
+        final prefs = await SharedPreferences.getInstance();
+        return PushProtocolDatasource(
+          prefs: prefs,
+          baseUrl: ppConfig.apiBaseUrl,
+        );
+      },
+    );
+  }
 }
 
 /// 注册仓库
@@ -471,6 +506,16 @@ void _registerRepositories() {
       ),
     );
   }
+
+  // 链上事件通知仓库（仅当 Push Protocol 数据源已注册时）
+  if (getIt.isRegistered<PushProtocolDatasource>()) {
+    getIt.registerSingletonAsync<IOnChainNotificationRepository>(
+      () async {
+        final ds = await getIt.getAsync<PushProtocolDatasource>();
+        return OnChainNotificationRepositoryImpl(ds);
+      },
+    );
+  }
 }
 
 /// 注册用例
@@ -589,6 +634,18 @@ void _registerBlocs() {
   getIt.registerFactory<SpaceBloc>(
     () => SpaceBloc(repository: getIt<ISpaceRepository>()),
   );
+
+  // 链上事件通知 BLoC（仅当 Push Protocol 仓库已注册时）
+  if (getIt.isRegistered<IOnChainNotificationRepository>()) {
+    final ppCfg = getIt<N42ChatConfig>().pushProtocol;
+    getIt.registerFactory<OnChainNotificationBloc>(
+      () => OnChainNotificationBloc(
+        repository: getIt<IOnChainNotificationRepository>(),
+        walletBridge: getIt<IWalletBridge>(),
+        chainId: ppCfg?.chainId ?? 1,
+      ),
+    );
+  }
 }
 
 /// 重置依赖（用于测试）

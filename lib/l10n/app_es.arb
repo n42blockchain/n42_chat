@@ -1797,5 +1797,10 @@
   "gameNext": "Siguiente",
   "gameBestTime": "Mejor tiempo",
   "gameNewRecord": "¡Nuevo récord!",
-  "gameLines": "Líneas"
+  "gameLines": "Líneas",
+  "onChainNotificationsTitle": "Eventos on-chain",
+  "onChainMarkAllRead": "Marcar todo como leído",
+  "onChainNoNotifications": "Aún no hay eventos on-chain",
+  "onChainNoNotificationsDesc": "Los eventos de los canales suscritos aparecerán aquí",
+  "onChainViewDetails": "Ver detalles"
 }

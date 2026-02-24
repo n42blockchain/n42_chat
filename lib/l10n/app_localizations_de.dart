@@ -5390,4 +5390,20 @@ class SDe extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => 'On-chain-Ereignisse';
+
+  @override
+  String get onChainMarkAllRead => 'Alle als gelesen markieren';
+
+  @override
+  String get onChainNoNotifications => 'Noch keine On-chain-Ereignisse';
+
+  @override
+  String get onChainNoNotificationsDesc =>
+      'Ereignisse von abonnierten Kanälen werden hier angezeigt';
+
+  @override
+  String get onChainViewDetails => 'Details anzeigen';
 }

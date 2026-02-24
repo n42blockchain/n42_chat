@@ -5274,4 +5274,19 @@ class SZh extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => '链上事件';
+
+  @override
+  String get onChainMarkAllRead => '全部已读';
+
+  @override
+  String get onChainNoNotifications => '暂无链上事件';
+
+  @override
+  String get onChainNoNotificationsDesc => '来自订阅频道的事件通知将在此显示';
+
+  @override
+  String get onChainViewDetails => '查看详情';
 }

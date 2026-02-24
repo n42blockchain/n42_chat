@@ -5394,4 +5394,20 @@ class SEs extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => 'Eventos on-chain';
+
+  @override
+  String get onChainMarkAllRead => 'Marcar todo como leído';
+
+  @override
+  String get onChainNoNotifications => 'Aún no hay eventos on-chain';
+
+  @override
+  String get onChainNoNotificationsDesc =>
+      'Los eventos de los canales suscritos aparecerán aquí';
+
+  @override
+  String get onChainViewDetails => 'Ver detalles';
 }

@@ -5293,4 +5293,19 @@ class SJa extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => 'チェーンイベント';
+
+  @override
+  String get onChainMarkAllRead => 'すべて既読';
+
+  @override
+  String get onChainNoNotifications => 'オンチェーンイベントはまだありません';
+
+  @override
+  String get onChainNoNotificationsDesc => '購読チャンネルのイベントがここに表示されます';
+
+  @override
+  String get onChainViewDetails => '詳細を見る';
 }

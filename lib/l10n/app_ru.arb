@@ -1797,5 +1797,10 @@
   "gameNext": "Далее",
   "gameBestTime": "Лучшее время",
   "gameNewRecord": "Новый рекорд!",
-  "gameLines": "Линии"
+  "gameLines": "Линии",
+  "onChainNotificationsTitle": "События в блокчейне",
+  "onChainMarkAllRead": "Отметить все прочитанными",
+  "onChainNoNotifications": "Событий в блокчейне пока нет",
+  "onChainNoNotificationsDesc": "События из подписанных каналов появятся здесь",
+  "onChainViewDetails": "Посмотреть детали"
 }

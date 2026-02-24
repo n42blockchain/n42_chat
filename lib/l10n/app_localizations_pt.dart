@@ -5392,4 +5392,20 @@ class SPt extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => 'Eventos On-chain';
+
+  @override
+  String get onChainMarkAllRead => 'Marcar todos como lidos';
+
+  @override
+  String get onChainNoNotifications => 'Nenhum evento on-chain ainda';
+
+  @override
+  String get onChainNoNotificationsDesc =>
+      'Eventos dos canais inscritos aparecerão aqui';
+
+  @override
+  String get onChainViewDetails => 'Ver detalhes';
 }

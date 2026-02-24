@@ -5368,4 +5368,20 @@ class SId extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => 'Peristiwa On-chain';
+
+  @override
+  String get onChainMarkAllRead => 'Tandai semua dibaca';
+
+  @override
+  String get onChainNoNotifications => 'Belum ada peristiwa on-chain';
+
+  @override
+  String get onChainNoNotificationsDesc =>
+      'Peristiwa dari saluran yang dilanggani akan muncul di sini';
+
+  @override
+  String get onChainViewDetails => 'Lihat detail';
 }

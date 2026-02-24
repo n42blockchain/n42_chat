@@ -1797,5 +1797,10 @@
   "gameNext": "次",
   "gameBestTime": "ベストタイム",
   "gameNewRecord": "新記録！",
-  "gameLines": "ライン"
+  "gameLines": "ライン",
+  "onChainNotificationsTitle": "チェーンイベント",
+  "onChainMarkAllRead": "すべて既読",
+  "onChainNoNotifications": "オンチェーンイベントはまだありません",
+  "onChainNoNotificationsDesc": "購読チャンネルのイベントがここに表示されます",
+  "onChainViewDetails": "詳細を見る"
 }

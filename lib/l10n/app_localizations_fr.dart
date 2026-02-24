@@ -5414,4 +5414,20 @@ class SFr extends S {
 
   @override
   String get chatTimerOff => '关闭';
+
+  @override
+  String get onChainNotificationsTitle => 'Événements on-chain';
+
+  @override
+  String get onChainMarkAllRead => 'Tout marquer comme lu';
+
+  @override
+  String get onChainNoNotifications => 'Pas encore d\'événements on-chain';
+
+  @override
+  String get onChainNoNotificationsDesc =>
+      'Les événements des canaux abonnés apparaîtront ici';
+
+  @override
+  String get onChainViewDetails => 'Voir les détails';
 }

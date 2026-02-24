@@ -2722,5 +2722,10 @@
   "settingsScreenshotProtectionDesc": "防止截图和屏幕录制",
   "chatSelfDestructTimer": "阅后即焚",
   "chatTimerPickerTitle": "设置阅后即焚时间",
-  "chatTimerOff": "关闭"
+  "chatTimerOff": "关闭",
+  "onChainNotificationsTitle": "链上事件",
+  "onChainMarkAllRead": "全部已读",
+  "onChainNoNotifications": "暂无链上事件",
+  "onChainNoNotificationsDesc": "来自订阅频道的事件通知将在此显示",
+  "onChainViewDetails": "查看详情"
 }

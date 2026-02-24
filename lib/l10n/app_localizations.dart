@@ -9966,6 +9966,36 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'关闭'**
   String get chatTimerOff;
+
+  /// No description provided for @onChainNotificationsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'链上事件'**
+  String get onChainNotificationsTitle;
+
+  /// No description provided for @onChainMarkAllRead.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部已读'**
+  String get onChainMarkAllRead;
+
+  /// No description provided for @onChainNoNotifications.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无链上事件'**
+  String get onChainNoNotifications;
+
+  /// No description provided for @onChainNoNotificationsDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'来自订阅频道的事件通知将在此显示'**
+  String get onChainNoNotificationsDesc;
+
+  /// No description provided for @onChainViewDetails.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看详情'**
+  String get onChainViewDetails;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
