@@ -344,11 +344,15 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
               imageUrl: _resolvedImageUrl!,
               isDark: isDark,
               l10n: l10n,
-              onConfirm: () => _confirmSelection(
-                _resolvedImageUrl!,
-                _contractController.text.trim(),
-                int.parse(_tokenIdController.text.trim()),
-              ),
+              onConfirm: () {
+                final tokenId = int.tryParse(_tokenIdController.text.trim());
+                if (tokenId == null) return; // Guard: text may have changed
+                _confirmSelection(
+                  _resolvedImageUrl!,
+                  _contractController.text.trim(),
+                  tokenId,
+                );
+              },
             ),
             const SizedBox(height: 24),
           ],
@@ -420,9 +424,9 @@ class _NftPreview extends StatelessWidget {
         Container(
           width: 100,
           height: 100,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               colors: [Color(0xFFFFD700), Color(0xFFFF8C00), Color(0xFFFFD700)],
             ),
           ),
@@ -443,7 +447,7 @@ class _NftPreview extends StatelessWidget {
                     : Image.network(
                         imageUrl,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
+                        errorBuilder: (_, _, _) => Container(
                           color: Colors.grey[300],
                           child: const Icon(Icons.broken_image,
                               size: 40, color: Colors.grey),
@@ -583,7 +587,7 @@ class _ChainSelector extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _chains.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
           final chain = _chains[i];
           final selected = chain.id == selectedChainId;
