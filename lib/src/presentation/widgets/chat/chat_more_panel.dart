@@ -74,6 +74,12 @@ class ChatMorePanel extends StatefulWidget {
   /// AI 助手回调
   final VoidCallback? onAiAssistantPressed;
 
+  /// 阅后即焚定时器回调
+  final VoidCallback? onSelfDestructTimerPressed;
+
+  /// 当前阅后即焚定时器（秒，null 表示关闭）
+  final int? selfDestructAfter;
+
   const ChatMorePanel({
     super.key,
     this.onPhotoPressed,
@@ -97,6 +103,8 @@ class ChatMorePanel extends StatefulWidget {
     this.onFaceBlurPressed,
     this.isFaceBlur = false,
     this.onAiAssistantPressed,
+    this.onSelfDestructTimerPressed,
+    this.selfDestructAfter,
   });
 
   @override
@@ -273,6 +281,14 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                         label: S.of(context)?.liveLocation ?? 'Live Location',
                         onTap: widget.onLiveLocationPressed,
                         iconColor: Colors.teal,
+                      ),
+                      _MoreItem(
+                        icon: widget.selfDestructAfter != null
+                            ? Icons.timer
+                            : Icons.timer_outlined,
+                        label: S.of(context)?.chatSelfDestructTimer ?? 'Timer',
+                        onTap: widget.onSelfDestructTimerPressed,
+                        iconColor: widget.selfDestructAfter != null ? Colors.orange : null,
                       ),
                       if (widget.onAiAssistantPressed != null)
                         _MoreItem(

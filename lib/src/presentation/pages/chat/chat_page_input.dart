@@ -135,6 +135,104 @@ extension _ChatPageInputMethods on _ChatPageState {
     );
   }
 
+  /// 阅后即焚定时器提示条
+  Widget _buildSelfDestructTimerBar() {
+    final seconds = _selfDestructAfter!;
+    final label = SelfDestructService.formatDuration(seconds);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: Colors.orange.withValues(alpha: 0.1),
+      child: Row(
+        children: [
+          const Icon(Icons.timer_outlined, size: 16, color: Colors.orange),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              '${S.of(context)?.chatSelfDestructTimer ?? 'Self-destruct'}: $label',
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.orange,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => setState(() => _selfDestructAfter = null),
+            child: const Icon(Icons.close, size: 18, color: AppColors.textTertiary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 显示阅后即焚定时器选择器
+  Future<void> _showSelfDestructTimerPicker() async {
+    final isDark = context.isDarkMode;
+    final l10n = S.of(context);
+
+    final result = await showModalBottomSheet<int?>(
+      context: context,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  l10n?.chatTimerPickerTitle ?? 'Self-destruct Timer',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              const Divider(height: 1),
+              // 关闭选项
+              ListTile(
+                leading: Icon(
+                  Icons.timer_off_outlined,
+                  color: _selfDestructAfter == null ? AppColors.primary : null,
+                ),
+                title: Text(l10n?.chatTimerOff ?? 'Off'),
+                trailing: _selfDestructAfter == null
+                    ? const Icon(Icons.check, color: AppColors.primary)
+                    : null,
+                onTap: () => Navigator.pop(ctx, -1),
+              ),
+              const Divider(height: 1),
+              // 预设时间列表
+              ...SelfDestructTimer.presets.map((preset) => ListTile(
+                    leading: Icon(
+                      Icons.timer_outlined,
+                      color: _selfDestructAfter == preset.seconds
+                          ? Colors.orange
+                          : null,
+                    ),
+                    title: Text(preset.name),
+                    trailing: _selfDestructAfter == preset.seconds
+                        ? const Icon(Icons.check, color: Colors.orange)
+                        : null,
+                    onTap: () => Navigator.pop(ctx, preset.seconds),
+                  )),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _selfDestructAfter = result == -1 ? null : result;
+      });
+    }
+  }
+
   /// View Once 提示条
   Widget _buildViewOnceIndicator() {
     final s = S.of(context);
@@ -248,6 +346,11 @@ extension _ChatPageInputMethods on _ChatPageState {
       },
       isFaceBlur: _autoFaceBlur,
       onFaceBlurPressed: _toggleFaceBlur,
+      selfDestructAfter: _selfDestructAfter,
+      onSelfDestructTimerPressed: () {
+        _hideMorePanel();
+        _showSelfDestructTimerPicker();
+      },
       onAiAssistantPressed: getIt.isRegistered<IAiRepository>() ? () {
         _hideMorePanel();
         _openAiAssistant();

@@ -5330,4 +5330,19 @@ class SVi extends S {
 
   @override
   String get spacesSave => '保存';
+
+  @override
+  String get settingsScreenshotProtection => '截图防护';
+
+  @override
+  String get settingsScreenshotProtectionDesc => '防止截图和屏幕录制';
+
+  @override
+  String get chatSelfDestructTimer => '阅后即焚';
+
+  @override
+  String get chatTimerPickerTitle => '设置阅后即焚时间';
+
+  @override
+  String get chatTimerOff => '关闭';
 }

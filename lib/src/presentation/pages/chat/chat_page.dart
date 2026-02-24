@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/in_app_notification_service.dart';
+import '../../../core/services/self_destruct_service.dart';
 import '../../../core/utils/face_blur_util.dart';
 import '../../../core/theme/chat_background_presets.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
@@ -157,6 +158,9 @@ class _ChatPageState extends State<ChatPage> {
 
   // View Once 模式（阅后即焚媒体）
   bool _isViewOnce = false;
+
+  // 文字消息阅后即焚定时器（秒，null 表示关闭）
+  int? _selfDestructAfter;
 
   // 自动人脸模糊设置
   bool _autoFaceBlur = false;
@@ -463,7 +467,10 @@ class _ChatPageState extends State<ChatPage> {
       // 退出编辑模式
       chatBloc.add(const SetEditTarget(null));
     } else {
-      chatBloc.add(SendTextMessage(text));
+      chatBloc.add(SendTextMessage(
+        text,
+        selfDestructAfter: _selfDestructAfter,
+      ));
     }
     _inputController.clear();
   }
@@ -864,6 +871,10 @@ class _ChatPageState extends State<ChatPage> {
               // View Once 提示条
               if (_isViewOnce && !_isMultiSelectMode && !_showSearchBar)
                 _buildViewOnceIndicator(),
+
+              // 阅后即焚定时器提示条
+              if (_selfDestructAfter != null && !_isMultiSelectMode && !_showSearchBar)
+                _buildSelfDestructTimerBar(),
 
               // 多选模式下显示操作栏，否则显示输入栏
               if (_isMultiSelectMode)

@@ -5357,4 +5357,20 @@ class SEn extends S {
 
   @override
   String get spacesSave => 'Save';
+
+  @override
+  String get settingsScreenshotProtection => 'Screenshot Protection';
+
+  @override
+  String get settingsScreenshotProtectionDesc =>
+      'Prevent screenshots and screen recording';
+
+  @override
+  String get chatSelfDestructTimer => 'Self-destruct';
+
+  @override
+  String get chatTimerPickerTitle => 'Self-destruct Timer';
+
+  @override
+  String get chatTimerOff => 'Off';
 }

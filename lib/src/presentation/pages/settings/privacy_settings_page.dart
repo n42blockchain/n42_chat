@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/services/screenshot_protection_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
@@ -30,11 +33,22 @@ class PrivacySettingsPage extends StatefulWidget {
 
 class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
   late PrivacySettings _settings;
+  bool _screenshotProtection = false;
 
   @override
   void initState() {
     super.initState();
     _settings = widget.settings;
+    _loadScreenshotProtection();
+  }
+
+  Future<void> _loadScreenshotProtection() async {
+    await ScreenshotProtectionService.instance.initialize();
+    if (mounted) {
+      setState(() {
+        _screenshotProtection = ScreenshotProtectionService.instance.isGlobalEnabled;
+      });
+    }
   }
 
   void _updateSettings(PrivacySettings newSettings) {
@@ -162,6 +176,30 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               ],
             ),
           ),
+
+          // 仅 Android 显示截图防护
+          if (Platform.isAndroid) ...[
+            const SizedBox(height: 16),
+            _buildSectionHeader(l10n?.settingsSecurity ?? 'Security', isDark),
+            Container(
+              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              child: _buildSwitchTile(
+                title: l10n?.settingsScreenshotProtection ?? 'Screenshot Protection',
+                subtitle: l10n?.settingsScreenshotProtectionDesc ??
+                    'Prevent screenshots and screen recording',
+                icon: Icons.screenshot_monitor_outlined,
+                value: _screenshotProtection,
+                onChanged: (value) async {
+                  await ScreenshotProtectionService.instance.setEnabled(value);
+                  if (mounted) setState(() => _screenshotProtection = value);
+                },
+                isDark: isDark,
+                iconColor: Colors.red,
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -198,6 +236,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     required bool value,
     required ValueChanged<bool> onChanged,
     required bool isDark,
+    Color? iconColor,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -207,7 +246,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: AppColors.primary,
+              color: iconColor ?? AppColors.primary,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(icon, color: Colors.white, size: 20),

@@ -2536,5 +2536,11 @@
   "spacesDemoteAdmin": "Remove Admin",
   "spacesInviteMember": "Invite Member",
   "spacesInviteMemberUserId": "User ID (e.g. @user:server.com)",
-  "spacesSave": "Save"
+  "spacesSave": "Save",
+  "settingsSecurity": "Security",
+  "settingsScreenshotProtection": "Screenshot Protection",
+  "settingsScreenshotProtectionDesc": "Prevent screenshots and screen recording",
+  "chatSelfDestructTimer": "Self-destruct",
+  "chatTimerPickerTitle": "Self-destruct Timer",
+  "chatTimerOff": "Off"
 }
