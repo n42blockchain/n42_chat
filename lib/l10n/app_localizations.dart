@@ -9996,6 +9996,72 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'查看详情'**
   String get onChainViewDetails;
+
+  /// No description provided for @chatCommandHelp.
+  ///
+  /// In zh, this message translates to:
+  /// **'/help — 查看所有命令'**
+  String get chatCommandHelp;
+
+  /// No description provided for @chatCommandPrice.
+  ///
+  /// In zh, this message translates to:
+  /// **'/price — 查询代币价格'**
+  String get chatCommandPrice;
+
+  /// No description provided for @chatCommandBalance.
+  ///
+  /// In zh, this message translates to:
+  /// **'/balance — 查看钱包余额'**
+  String get chatCommandBalance;
+
+  /// No description provided for @chatCommandChains.
+  ///
+  /// In zh, this message translates to:
+  /// **'/chains — 查看 236+ 条支持链'**
+  String get chatCommandChains;
+
+  /// No description provided for @chatMiniApps.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用'**
+  String get chatMiniApps;
+
+  /// No description provided for @miniAppMarketTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'小程序'**
+  String get miniAppMarketTitle;
+
+  /// No description provided for @miniAppCategoryAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部'**
+  String get miniAppCategoryAll;
+
+  /// No description provided for @miniAppSearch.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索应用...'**
+  String get miniAppSearch;
+
+  /// No description provided for @miniAppFeatured.
+  ///
+  /// In zh, this message translates to:
+  /// **'精选'**
+  String get miniAppFeatured;
+
+  /// No description provided for @miniAppAllApps.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部应用'**
+  String get miniAppAllApps;
+
+  /// No description provided for @miniAppNoResults.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到应用'**
+  String get miniAppNoResults;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

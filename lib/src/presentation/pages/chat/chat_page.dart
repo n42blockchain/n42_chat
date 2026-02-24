@@ -81,6 +81,10 @@ import '../../widgets/chat/member_picker_sheet.dart';
 import '../../widgets/chat/multi_forward_sheet.dart';
 import '../../widgets/chat/music_select_sheet.dart';
 import '../../widgets/chat/poll_create_sheet.dart';
+import '../mini_app/mini_app_market_page.dart';
+import '../../../core/services/bot_command_processor.dart';
+import '../../../domain/entities/bot_command_entity.dart';
+import '../../../integration/wallet_bridge.dart';
 
 part 'chat_page_app_bar.dart';
 part 'chat_page_message_list.dart';
@@ -453,18 +457,26 @@ class _ChatPageState extends State<ChatPage> {
   void _sendMessage(String text) {
     if (text.trim().isEmpty) return;
 
+    // 斜杠命令拦截（编辑模式下不拦截）
     final chatBloc = context.read<ChatBloc>();
     final editingMsg = chatBloc.state.editingMessage;
 
+    if (editingMsg == null &&
+        text.startsWith('/') &&
+        !text.startsWith('/ ') &&
+        text.length > 1) {
+      _inputController.clear();
+      _processBotCommand(text);
+      return;
+    }
+
     if (editingMsg != null) {
-      // 编辑模式：通过 MessageActionBloc 发送编辑
       final actionBloc = getIt<MessageActionBloc>();
       actionBloc.add(action_event.EditMessage(
         widget.conversation.id,
         editingMsg.id,
         text,
       ));
-      // 退出编辑模式
       chatBloc.add(const SetEditTarget(null));
     } else {
       chatBloc.add(SendTextMessage(
@@ -473,6 +485,43 @@ class _ChatPageState extends State<ChatPage> {
       ));
     }
     _inputController.clear();
+  }
+
+  /// 处理 Bot 斜杠命令
+  Future<void> _processBotCommand(String text) async {
+    final processor = BotCommandProcessor(walletBridge: getIt<IWalletBridge>());
+    final result = await processor.processRaw(text);
+
+    if (!mounted) return;
+
+    switch (result.type) {
+      case BotCommandResultType.showPanel:
+        _showBotResultPanel(result.panelTitle!, result.panelContent!);
+      case BotCommandResultType.sendMessage:
+        context.read<ChatBloc>().add(SendTextMessage(result.messageText!));
+      case BotCommandResultType.error:
+        _showBotResultPanel(
+          '⚠️ Command Error',
+          result.errorMessage ?? 'Unknown error',
+        );
+      case BotCommandResultType.unknown:
+        _showBotResultPanel(
+          '❓ Unknown Command',
+          'Type /help to see available commands.',
+        );
+      case BotCommandResultType.dismiss:
+        break;
+    }
+  }
+
+  /// 展示 Bot 命令结果底部面板
+  void _showBotResultPanel(String title, String content) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _BotResultSheet(title: title, content: content),
+    );
   }
 
   void _onInputChanged(String text) {
@@ -916,5 +965,89 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     return content;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bot 命令结果展示面板
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _BotResultSheet extends StatelessWidget {
+  final String title;
+  final String content;
+
+  const _BotResultSheet({required this.title, required this.content});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.6,
+      ),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 拖拽条
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(top: 8),
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white24 : Colors.black12,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          // 标题行
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 8, 0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 20),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          // 内容（可滚动）
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Text(
+                content,
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.6,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
   }
 }

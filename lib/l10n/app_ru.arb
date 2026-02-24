@@ -1802,5 +1802,16 @@
   "onChainMarkAllRead": "Отметить все прочитанными",
   "onChainNoNotifications": "Событий в блокчейне пока нет",
   "onChainNoNotificationsDesc": "События из подписанных каналов появятся здесь",
-  "onChainViewDetails": "Посмотреть детали"
+  "onChainViewDetails": "Посмотреть детали",
+  "chatCommandHelp": "/help — Показать все команды",
+  "chatCommandPrice": "/price — Получить цену токена",
+  "chatCommandBalance": "/balance — Показать баланс кошелька",
+  "chatCommandChains": "/chains — Список 236+ поддерживаемых сетей",
+  "chatMiniApps": "Приложения",
+  "miniAppMarketTitle": "Мини-приложения",
+  "miniAppCategoryAll": "Все",
+  "miniAppSearch": "Поиск приложений...",
+  "miniAppFeatured": "Рекомендуемые",
+  "miniAppAllApps": "Все приложения",
+  "miniAppNoResults": "Приложения не найдены"
 }

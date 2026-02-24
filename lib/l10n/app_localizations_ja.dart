@@ -5308,4 +5308,37 @@ class SJa extends S {
 
   @override
   String get onChainViewDetails => '詳細を見る';
+
+  @override
+  String get chatCommandHelp => '/help — 全コマンドを表示';
+
+  @override
+  String get chatCommandPrice => '/price — トークン価格を取得';
+
+  @override
+  String get chatCommandBalance => '/balance — ウォレット残高を表示';
+
+  @override
+  String get chatCommandChains => '/chains — 236以上のチェーン一覧';
+
+  @override
+  String get chatMiniApps => 'アプリ';
+
+  @override
+  String get miniAppMarketTitle => 'ミニアプリ';
+
+  @override
+  String get miniAppCategoryAll => 'すべて';
+
+  @override
+  String get miniAppSearch => 'アプリを検索...';
+
+  @override
+  String get miniAppFeatured => '注目';
+
+  @override
+  String get miniAppAllApps => 'すべてのアプリ';
+
+  @override
+  String get miniAppNoResults => 'アプリが見つかりません';
 }

@@ -5289,4 +5289,37 @@ class SZh extends S {
 
   @override
   String get onChainViewDetails => '查看详情';
+
+  @override
+  String get chatCommandHelp => '/help — 查看所有命令';
+
+  @override
+  String get chatCommandPrice => '/price — 查询代币价格';
+
+  @override
+  String get chatCommandBalance => '/balance — 查看钱包余额';
+
+  @override
+  String get chatCommandChains => '/chains — 查看 236+ 条支持链';
+
+  @override
+  String get chatMiniApps => '应用';
+
+  @override
+  String get miniAppMarketTitle => '小程序';
+
+  @override
+  String get miniAppCategoryAll => '全部';
+
+  @override
+  String get miniAppSearch => '搜索应用...';
+
+  @override
+  String get miniAppFeatured => '精选';
+
+  @override
+  String get miniAppAllApps => '全部应用';
+
+  @override
+  String get miniAppNoResults => '未找到应用';
 }

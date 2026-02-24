@@ -5308,4 +5308,37 @@ class SKo extends S {
 
   @override
   String get onChainViewDetails => '자세히 보기';
+
+  @override
+  String get chatCommandHelp => '/help — 모든 명령 보기';
+
+  @override
+  String get chatCommandPrice => '/price — 토큰 가격 조회';
+
+  @override
+  String get chatCommandBalance => '/balance — 지갑 잔액 보기';
+
+  @override
+  String get chatCommandChains => '/chains — 236+ 지원 체인 목록';
+
+  @override
+  String get chatMiniApps => '앱';
+
+  @override
+  String get miniAppMarketTitle => '미니 앱';
+
+  @override
+  String get miniAppCategoryAll => '전체';
+
+  @override
+  String get miniAppSearch => '앱 검색...';
+
+  @override
+  String get miniAppFeatured => '추천';
+
+  @override
+  String get miniAppAllApps => '전체 앱';
+
+  @override
+  String get miniAppNoResults => '앱을 찾을 수 없습니다';
 }

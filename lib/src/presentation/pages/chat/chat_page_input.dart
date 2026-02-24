@@ -355,6 +355,18 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         _openAiAssistant();
       } : null,
+      onMiniAppsPressed: () {
+        _hideMorePanel();
+        _openMiniApps();
+      },
+    );
+  }
+
+  void _openMiniApps() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MiniAppMarketPage(roomId: widget.conversation.id),
+      ),
     );
   }
 

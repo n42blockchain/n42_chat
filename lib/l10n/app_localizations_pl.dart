@@ -5402,4 +5402,37 @@ class SPl extends S {
 
   @override
   String get onChainViewDetails => 'Wyświetl szczegóły';
+
+  @override
+  String get chatCommandHelp => '/help — Pokaż wszystkie polecenia';
+
+  @override
+  String get chatCommandPrice => '/price — Pobierz cenę tokena';
+
+  @override
+  String get chatCommandBalance => '/balance — Pokaż saldo portfela';
+
+  @override
+  String get chatCommandChains => '/chains — Lista 236+ wspieranych sieci';
+
+  @override
+  String get chatMiniApps => 'Aplikacje';
+
+  @override
+  String get miniAppMarketTitle => 'Mini Aplikacje';
+
+  @override
+  String get miniAppCategoryAll => 'Wszystkie';
+
+  @override
+  String get miniAppSearch => 'Szukaj aplikacji...';
+
+  @override
+  String get miniAppFeatured => 'Polecane';
+
+  @override
+  String get miniAppAllApps => 'Wszystkie Aplikacje';
+
+  @override
+  String get miniAppNoResults => 'Nie znaleziono aplikacji';
 }

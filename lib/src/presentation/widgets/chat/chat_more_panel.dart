@@ -80,6 +80,9 @@ class ChatMorePanel extends StatefulWidget {
   /// 当前阅后即焚定时器（秒，null 表示关闭）
   final int? selfDestructAfter;
 
+  /// Mini Apps 回调
+  final VoidCallback? onMiniAppsPressed;
+
   const ChatMorePanel({
     super.key,
     this.onPhotoPressed,
@@ -105,6 +108,7 @@ class ChatMorePanel extends StatefulWidget {
     this.onAiAssistantPressed,
     this.onSelfDestructTimerPressed,
     this.selfDestructAfter,
+    this.onMiniAppsPressed,
   });
 
   @override
@@ -200,6 +204,12 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                         icon: Icons.swap_horiz,
                         label: S.of(context)?.commonTransfer ?? 'Transfer',
                         onTap: widget.onTransferPressed,
+                      ),
+                      _MoreItem(
+                        icon: Icons.apps_rounded,
+                        label: S.of(context)?.chatMiniApps ?? 'Apps',
+                        onTap: widget.onMiniAppsPressed,
+                        iconColor: Colors.indigo,
                       ),
                       _MoreItem(
                         icon: Icons.folder_outlined,

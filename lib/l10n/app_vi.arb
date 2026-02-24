@@ -1802,5 +1802,16 @@
   "onChainMarkAllRead": "Đánh dấu tất cả đã đọc",
   "onChainNoNotifications": "Chưa có sự kiện on-chain",
   "onChainNoNotificationsDesc": "Sự kiện từ các kênh đã đăng ký sẽ xuất hiện ở đây",
-  "onChainViewDetails": "Xem chi tiết"
+  "onChainViewDetails": "Xem chi tiết",
+  "chatCommandHelp": "/help — Xem tất cả lệnh",
+  "chatCommandPrice": "/price — Lấy giá token",
+  "chatCommandBalance": "/balance — Xem số dư ví",
+  "chatCommandChains": "/chains — Danh sách 236+ chain",
+  "chatMiniApps": "Ứng dụng",
+  "miniAppMarketTitle": "Mini App",
+  "miniAppCategoryAll": "Tất cả",
+  "miniAppSearch": "Tìm kiếm ứng dụng...",
+  "miniAppFeatured": "Nổi bật",
+  "miniAppAllApps": "Tất cả ứng dụng",
+  "miniAppNoResults": "Không tìm thấy ứng dụng"
 }

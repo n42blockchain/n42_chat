@@ -5396,4 +5396,37 @@ class SRu extends S {
 
   @override
   String get onChainViewDetails => 'Посмотреть детали';
+
+  @override
+  String get chatCommandHelp => '/help — Показать все команды';
+
+  @override
+  String get chatCommandPrice => '/price — Получить цену токена';
+
+  @override
+  String get chatCommandBalance => '/balance — Показать баланс кошелька';
+
+  @override
+  String get chatCommandChains => '/chains — Список 236+ поддерживаемых сетей';
+
+  @override
+  String get chatMiniApps => 'Приложения';
+
+  @override
+  String get miniAppMarketTitle => 'Мини-приложения';
+
+  @override
+  String get miniAppCategoryAll => 'Все';
+
+  @override
+  String get miniAppSearch => 'Поиск приложений...';
+
+  @override
+  String get miniAppFeatured => 'Рекомендуемые';
+
+  @override
+  String get miniAppAllApps => 'Все приложения';
+
+  @override
+  String get miniAppNoResults => 'Приложения не найдены';
 }

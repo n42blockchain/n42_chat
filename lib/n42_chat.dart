@@ -69,6 +69,13 @@ export 'src/core/notifications/firebase_push_service.dart';
 // 链上事件通知导出
 // ============================================
 export 'src/presentation/pages/notification/on_chain_notifications_page.dart';
+
+// ============================================
+// Mini App 框架导出
+// ============================================
+export 'src/domain/entities/mini_app_entity.dart';
+export 'src/presentation/pages/mini_app/mini_app_market_page.dart';
+export 'src/presentation/pages/mini_app/mini_app_page.dart';
 export 'src/presentation/blocs/on_chain_notification/on_chain_notification_bloc.dart';
 export 'src/presentation/blocs/on_chain_notification/on_chain_notification_event.dart';
 export 'src/presentation/blocs/on_chain_notification/on_chain_notification_state.dart';

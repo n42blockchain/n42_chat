@@ -1802,5 +1802,16 @@
   "onChainMarkAllRead": "Oznacz wszystkie jako przeczytane",
   "onChainNoNotifications": "Brak zdarzeń on-chain",
   "onChainNoNotificationsDesc": "Zdarzenia z subskrybowanych kanałów pojawią się tutaj",
-  "onChainViewDetails": "Wyświetl szczegóły"
+  "onChainViewDetails": "Wyświetl szczegóły",
+  "chatCommandHelp": "/help — Pokaż wszystkie polecenia",
+  "chatCommandPrice": "/price — Pobierz cenę tokena",
+  "chatCommandBalance": "/balance — Pokaż saldo portfela",
+  "chatCommandChains": "/chains — Lista 236+ wspieranych sieci",
+  "chatMiniApps": "Aplikacje",
+  "miniAppMarketTitle": "Mini Aplikacje",
+  "miniAppCategoryAll": "Wszystkie",
+  "miniAppSearch": "Szukaj aplikacji...",
+  "miniAppFeatured": "Polecane",
+  "miniAppAllApps": "Wszystkie Aplikacje",
+  "miniAppNoResults": "Nie znaleziono aplikacji"
 }

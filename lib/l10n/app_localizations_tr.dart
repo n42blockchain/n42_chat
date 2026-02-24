@@ -5382,4 +5382,37 @@ class STr extends S {
 
   @override
   String get onChainViewDetails => 'Ayrıntıları gör';
+
+  @override
+  String get chatCommandHelp => '/help — Tüm komutları göster';
+
+  @override
+  String get chatCommandPrice => '/price — Token fiyatını al';
+
+  @override
+  String get chatCommandBalance => '/balance — Cüzdan bakiyesini göster';
+
+  @override
+  String get chatCommandChains => '/chains — 236+ desteklenen ağı listele';
+
+  @override
+  String get chatMiniApps => 'Uygulamalar';
+
+  @override
+  String get miniAppMarketTitle => 'Mini Uygulamalar';
+
+  @override
+  String get miniAppCategoryAll => 'Tümü';
+
+  @override
+  String get miniAppSearch => 'Uygulama ara...';
+
+  @override
+  String get miniAppFeatured => 'Öne Çıkanlar';
+
+  @override
+  String get miniAppAllApps => 'Tüm Uygulamalar';
+
+  @override
+  String get miniAppNoResults => 'Uygulama bulunamadı';
 }

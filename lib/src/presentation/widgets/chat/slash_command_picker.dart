@@ -33,6 +33,30 @@ class SlashCommandPicker extends StatelessWidget {
     final l10n = S.of(context);
     return [
       SlashCommandItem(
+        command: 'help',
+        usage: '/help',
+        description: l10n?.chatCommandHelp ?? '/help — Show all commands',
+        icon: Icons.help_outline,
+      ),
+      SlashCommandItem(
+        command: 'price',
+        usage: '/price <token>',
+        description: l10n?.chatCommandPrice ?? '/price — Get token price',
+        icon: Icons.show_chart,
+      ),
+      SlashCommandItem(
+        command: 'balance',
+        usage: '/balance',
+        description: l10n?.chatCommandBalance ?? '/balance — Show wallet balance',
+        icon: Icons.account_balance_wallet_outlined,
+      ),
+      SlashCommandItem(
+        command: 'chains',
+        usage: '/chains',
+        description: l10n?.chatCommandChains ?? '/chains — List 236+ supported chains',
+        icon: Icons.hub_outlined,
+      ),
+      SlashCommandItem(
         command: 'poll',
         usage: '/poll',
         description: l10n?.chatCommandPoll ?? '/poll — Create a poll',
@@ -82,7 +106,7 @@ class SlashCommandPicker extends StatelessWidget {
       child: ListView.separated(
         shrinkWrap: true,
         itemCount: commands.length,
-        separatorBuilder: (_, __) => Divider(
+        separatorBuilder: (context, index) => Divider(
           height: 1,
           indent: 56,
           color: isDark ? AppColors.dividerDark : AppColors.divider,

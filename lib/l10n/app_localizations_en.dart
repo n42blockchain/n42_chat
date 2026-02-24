@@ -5389,4 +5389,37 @@ class SEn extends S {
 
   @override
   String get onChainViewDetails => 'View details';
+
+  @override
+  String get chatCommandHelp => '/help — Show all commands';
+
+  @override
+  String get chatCommandPrice => '/price — Get token price';
+
+  @override
+  String get chatCommandBalance => '/balance — Show wallet balance';
+
+  @override
+  String get chatCommandChains => '/chains — List 236+ supported chains';
+
+  @override
+  String get chatMiniApps => 'Apps';
+
+  @override
+  String get miniAppMarketTitle => 'Mini Apps';
+
+  @override
+  String get miniAppCategoryAll => 'All';
+
+  @override
+  String get miniAppSearch => 'Search apps...';
+
+  @override
+  String get miniAppFeatured => 'Featured';
+
+  @override
+  String get miniAppAllApps => 'All Apps';
+
+  @override
+  String get miniAppNoResults => 'No apps found';
 }

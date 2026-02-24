@@ -5389,4 +5389,37 @@ class SIt extends S {
 
   @override
   String get onChainViewDetails => 'Visualizza dettagli';
+
+  @override
+  String get chatCommandHelp => '/help — Mostra tutti i comandi';
+
+  @override
+  String get chatCommandPrice => '/price — Ottieni il prezzo del token';
+
+  @override
+  String get chatCommandBalance => '/balance — Mostra il saldo del portafoglio';
+
+  @override
+  String get chatCommandChains => '/chains — Elenca 236+ reti supportate';
+
+  @override
+  String get chatMiniApps => 'App';
+
+  @override
+  String get miniAppMarketTitle => 'Mini App';
+
+  @override
+  String get miniAppCategoryAll => 'Tutte';
+
+  @override
+  String get miniAppSearch => 'Cerca app...';
+
+  @override
+  String get miniAppFeatured => 'In evidenza';
+
+  @override
+  String get miniAppAllApps => 'Tutte le App';
+
+  @override
+  String get miniAppNoResults => 'Nessuna app trovata';
 }

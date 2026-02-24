@@ -2547,5 +2547,16 @@
   "onChainMarkAllRead": "Mark all read",
   "onChainNoNotifications": "No on-chain events yet",
   "onChainNoNotificationsDesc": "Events from subscribed channels will appear here",
-  "onChainViewDetails": "View details"
+  "onChainViewDetails": "View details",
+  "chatCommandHelp": "/help — Show all commands",
+  "chatCommandPrice": "/price — Get token price",
+  "chatCommandBalance": "/balance — Show wallet balance",
+  "chatCommandChains": "/chains — List 236+ supported chains",
+  "chatMiniApps": "Apps",
+  "miniAppMarketTitle": "Mini Apps",
+  "miniAppCategoryAll": "All",
+  "miniAppSearch": "Search apps...",
+  "miniAppFeatured": "Featured",
+  "miniAppAllApps": "All Apps",
+  "miniAppNoResults": "No apps found"
 }
