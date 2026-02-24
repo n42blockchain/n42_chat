@@ -1813,5 +1813,32 @@
   "miniAppSearch": "アプリを検索...",
   "miniAppFeatured": "注目",
   "miniAppAllApps": "すべてのアプリ",
-  "miniAppNoResults": "アプリが見つかりません"
+  "miniAppNoResults": "アプリが見つかりません",
+  "slideToPayLabel": "→→→  スライドして確認",
+  "slideToPayConfirming": "確認中...",
+  "redPacketBestLuck": "ベストラック",
+  "redPacketBestLuckCongrats": "ベストラック！一番多く獲得しました！",
+  "redPacketStats": "{claimed} / {total} 受取済",
+  "@redPacketStats": {
+    "placeholders": {
+      "claimed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "redPacketStatsTotal": "合計",
+  "redPacketGrabbedViral": "🧧 赤い封筒を受け取りました • {amount} {token}",
+  "@redPacketGrabbedViral": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
+    }
+  }
 }

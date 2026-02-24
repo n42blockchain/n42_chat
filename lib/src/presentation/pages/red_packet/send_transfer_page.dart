@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../widgets/common/slide_to_pay_button.dart';
 
 class SendTransferPage extends StatefulWidget {
   final String receiverName;
@@ -227,22 +228,15 @@ class _SendTransferPageState extends State<SendTransferPage> {
 
             const SizedBox(height: 32),
 
-            // 转账按钮
+            // 滑动确认转账（微信支付风格 — 防止误触）
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _send,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF9A825),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    elevation: 0,
-                  ),
-                  child: Text(S.of(context)?.transferConfirmTransfer ?? 'Confirm Transfer', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
-                ),
+              child: SlideToPayButton(
+                label: S.of(context)?.slideToPayLabel ?? '→→→  Slide to confirm',
+                confirmingLabel:
+                    S.of(context)?.slideToPayConfirming ?? 'Confirming...',
+                trackColor: const Color(0xFFF9A825),
+                onConfirmed: _send,
               ),
             ),
           ],

@@ -5322,4 +5322,29 @@ class SZh extends S {
 
   @override
   String get miniAppNoResults => '未找到应用';
+
+  @override
+  String get slideToPayLabel => '→→→  滑动确认';
+
+  @override
+  String get slideToPayConfirming => '确认中...';
+
+  @override
+  String get redPacketBestLuck => '最佳手气';
+
+  @override
+  String get redPacketBestLuckCongrats => '最佳手气！你抢到了最多！';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total 个已领取';
+  }
+
+  @override
+  String get redPacketStatsTotal => '共计';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 抢到了红包 • $amount $token';
+  }
 }

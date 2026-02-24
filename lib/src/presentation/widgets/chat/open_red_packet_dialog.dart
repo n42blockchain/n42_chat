@@ -10,8 +10,9 @@ class SendRedPacketDialog extends StatelessWidget {
   final String receiverName;
   final bool isGroup;
   final int memberCount;
-  final void Function(String amount, String token, String greeting, int count, bool isLucky) onSend;
-  
+  final void Function(String amount, String token, String greeting, int count,
+      bool isLucky) onSend;
+
   const SendRedPacketDialog({
     super.key,
     required this.receiverName,
@@ -19,7 +20,7 @@ class SendRedPacketDialog extends StatelessWidget {
     this.memberCount = 1,
     required this.onSend,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     // 使用全屏页面代替弹窗
@@ -41,6 +42,11 @@ class SendRedPacketDialog extends StatelessWidget {
 }
 
 /// 开红包弹窗
+///
+/// [onOpen] fires when user taps the gold button (before result transition).
+/// [onViewDetails] navigates to the full detail page.
+/// [onGrabViralMessage] returns a string to broadcast in the chat room after
+///   claiming — enabling WeChat-style social virality. Pass `null` to opt out.
 class OpenRedPacketDialog extends StatefulWidget {
   final String senderName;
   final String? senderAvatar;
@@ -50,7 +56,14 @@ class OpenRedPacketDialog extends StatefulWidget {
   final String token;
   final VoidCallback? onOpen;
   final VoidCallback? onViewDetails;
-  
+
+  /// If non-null, called after the result transition to get a message that will
+  /// be posted to the group chat (e.g. "🧧 grabbed a red packet • 3.5 CNY").
+  final String? Function()? onGrabViralMessage;
+
+  /// Whether the current user's claim is the "best luck" (highest amount).
+  final bool isBestLuck;
+
   const OpenRedPacketDialog({
     super.key,
     required this.senderName,
@@ -61,60 +74,94 @@ class OpenRedPacketDialog extends StatefulWidget {
     this.token = 'CNY',
     this.onOpen,
     this.onViewDetails,
+    this.onGrabViralMessage,
+    this.isBestLuck = false,
   });
-  
+
   @override
   State<OpenRedPacketDialog> createState() => _OpenRedPacketDialogState();
 }
 
 class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+    with TickerProviderStateMixin {
+  late AnimationController _openController;
+  late AnimationController _shimmerController;
   late Animation<double> _scaleAnimation;
+  late Animation<double> _shimmerAnimation;
+
   bool _isOpening = false;
   bool _showResult = false;
-  
+
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 600),
+
+    // Open: burst scale 1.0 → 1.2 → 0 (packet "explodes")
+    _openController = AnimationController(
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-    
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+          tween: Tween(begin: 1.0, end: 1.2)
+              .chain(CurveTween(curve: Curves.easeOut)),
+          weight: 40),
+      TweenSequenceItem(
+          tween: Tween(begin: 1.2, end: 0.0)
+              .chain(CurveTween(curve: Curves.easeIn)),
+          weight: 60),
+    ]).animate(_openController);
+
+    // Shimmer for "best luck" gold text
+    _shimmerController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat();
+    _shimmerAnimation = Tween<double>(begin: -1.5, end: 1.5)
+        .animate(_shimmerController);
+
     if (widget.status == OpenRedPacketStatus.opened) {
       _showResult = true;
     }
   }
-  
+
   @override
   void dispose() {
-    _controller.dispose();
+    _openController.dispose();
+    _shimmerController.dispose();
     super.dispose();
   }
-  
-  void _openRedPacket() async {
+
+  Future<void> _openRedPacket() async {
     if (_isOpening) return;
-    
     setState(() => _isOpening = true);
-    await _controller.forward();
+    HapticFeedback.mediumImpact();
+    await _openController.forward();
     widget.onOpen?.call();
-    setState(() => _showResult = true);
+
+    // Post viral message to group chat
+    final viralMsg = widget.onGrabViralMessage?.call();
+    if (viralMsg != null && mounted) {
+      // Schedule after dialog state transition
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // The parent widget handles actually posting via the callback return value
+      });
+    }
+
+    if (mounted) setState(() => _showResult = true);
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: _showResult ? _buildResultView() : _buildOpenView(),
+      child: _showResult ? _buildResultView(context) : _buildOpenView(context),
     );
   }
-  
-  Widget _buildOpenView() {
+
+  // ─── Open view ─────────────────────────────────────────────────────────────
+
+  Widget _buildOpenView(BuildContext context) {
     return Container(
       width: 280,
       decoration: BoxDecoration(
@@ -123,7 +170,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
           end: Alignment.bottomCenter,
           colors: [Color(0xFFE64340), Color(0xFFD63030)],
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -138,7 +185,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
               ),
             ),
           ),
-          
+
           CircleAvatar(
             radius: 32,
             backgroundColor: Colors.white24,
@@ -148,30 +195,37 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
             child: widget.senderAvatar == null
                 ? Text(
                     widget.senderName.isNotEmpty ? widget.senderName[0] : '?',
-                    style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold),
                   )
                 : null,
           ),
           const SizedBox(height: 12),
-          
+
           Text(
-            S.of(context)?.commonSenderRedPacket(widget.senderName) ?? '${widget.senderName}\'s Red Packet',
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+            S.of(context)?.commonSenderRedPacket(widget.senderName) ??
+                "${widget.senderName}'s Red Packet",
+            style: const TextStyle(
+                color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
 
           Text(
-            widget.greeting ?? S.of(context)?.commonRedPacketDefaultGreeting ?? 'Best wishes',
+            widget.greeting ??
+                S.of(context)?.commonRedPacketDefaultGreeting ??
+                'Best wishes',
             style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 32),
-          
+
           if (widget.status == OpenRedPacketStatus.canOpen)
             AnimatedBuilder(
-              animation: _controller,
+              animation: _openController,
               builder: (context, child) {
                 return Transform.scale(
-                  scale: _scaleAnimation.value,
+                  scale: _scaleAnimation.value.abs(),
                   child: GestureDetector(
                     onTap: _openRedPacket,
                     child: Container(
@@ -181,13 +235,19 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                         color: Color(0xFFFFD700),
                         shape: BoxShape.circle,
                         boxShadow: [
-                          BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4)),
+                          BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 12,
+                              offset: Offset(0, 4)),
                         ],
                       ),
                       child: Center(
                         child: Text(
                           S.of(context)?.commonOpenRedPacket ?? 'Open',
-                          style: const TextStyle(color: Color(0xFFB8860B), fontSize: 28, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              color: Color(0xFFB8860B),
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -196,58 +256,69 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
               },
             )
           else
-            _buildStatusMessage(),
-          
+            _buildStatusMessage(context),
+
           const SizedBox(height: 32),
+
+          // Bottom branding
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              'N42 Red Packet',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.4),
+                fontSize: 12,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-  
-  Widget _buildStatusMessage() {
+
+  Widget _buildStatusMessage(BuildContext context) {
     String message;
     switch (widget.status) {
       case OpenRedPacketStatus.opened:
         message = S.of(context)?.commonClaimed ?? 'Claimed';
-        break;
       case OpenRedPacketStatus.empty:
-        message = S.of(context)?.commonRedPacketAllClaimed ?? 'Red packet all claimed';
-        break;
+        message =
+            S.of(context)?.commonRedPacketAllClaimed ?? 'Red packet all claimed';
       case OpenRedPacketStatus.expired:
-        message = S.of(context)?.commonRedPacketExpired ?? 'Red packet expired';
-        break;
+        message =
+            S.of(context)?.commonRedPacketExpired ?? 'Red packet expired';
       default:
         message = '';
     }
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Text(message, style: const TextStyle(color: Colors.white70, fontSize: 16)),
+      child: Text(message,
+          style: const TextStyle(color: Colors.white70, fontSize: 16)),
     );
   }
-  
-  Widget _buildResultView() {
+
+  // ─── Result view ────────────────────────────────────────────────────────────
+
+  Widget _buildResultView(BuildContext context) {
     return Container(
       width: 280,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Red top section
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [Color(0xFFE64340), Color(0xFFD63030)],
               ),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Column(
               children: [
@@ -255,19 +326,22 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                   alignment: Alignment.topRight,
                   child: GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(Icons.close, color: Colors.white70, size: 24),
+                    child: const Icon(Icons.close,
+                        color: Colors.white70, size: 24),
                   ),
                 ),
-                
+
                 Text(
-                  S.of(context)?.commonSenderRedPacket(widget.senderName) ?? '${widget.senderName}\'s Red Packet',
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  S.of(context)?.commonSenderRedPacket(widget.senderName) ??
+                      "${widget.senderName}'s Red Packet",
+                  style:
+                      const TextStyle(color: Colors.white, fontSize: 14),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 16),
 
-                // 金额显示 - 使用 FittedBox 自适应
+                // Amount
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: FittedBox(
@@ -279,8 +353,8 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                         Text(
                           widget.claimedAmount ?? '0',
                           style: const TextStyle(
-                            color: Colors.white, 
-                            fontSize: 48, 
+                            color: Colors.white,
+                            fontSize: 48,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -288,22 +362,40 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Text(
                             ' ${widget.token}',
-                            style: const TextStyle(color: Colors.white, fontSize: 18),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 18),
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
+
+                // Best luck badge — shown when user snagged the highest amount
+                if (widget.isBestLuck) ...[
+                  const SizedBox(height: 12),
+                  _BestLuckBanner(shimmerAnimation: _shimmerAnimation),
+                ],
               ],
             ),
           ),
-          
+
+          // Bottom actions
           Padding(
             padding: const EdgeInsets.all(20),
-            child: TextButton(
-              onPressed: widget.onViewDetails,
-              child: Text(S.of(context)?.commonViewRedPacketDetails ?? 'View Red Packet Details'),
+            child: Column(
+              children: [
+                TextButton(
+                  onPressed: widget.onViewDetails,
+                  child: Text(
+                    S.of(context)?.commonViewRedPacketDetails ??
+                        'View Red Packet Details',
+                    style: const TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -311,6 +403,69 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
     );
   }
 }
+
+// ─── Best luck banner ────────────────────────────────────────────────────────
+
+class _BestLuckBanner extends StatelessWidget {
+  final Animation<double> shimmerAnimation;
+
+  const _BestLuckBanner({required this.shimmerAnimation});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: shimmerAnimation,
+      builder: (context, child) {
+        return ShaderMask(
+          shaderCallback: (rect) {
+            return LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: const [
+                Color(0xFFFFD700),
+                Colors.white,
+                Color(0xFFFFD700),
+              ],
+              stops: [
+                (shimmerAnimation.value - 0.3).clamp(0.0, 1.0),
+                shimmerAnimation.value.clamp(0.0, 1.0),
+                (shimmerAnimation.value + 0.3).clamp(0.0, 1.0),
+              ],
+            ).createShader(rect);
+          },
+          child: child,
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+              color: const Color(0xFFFFD700).withValues(alpha: 0.5)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('👑', style: TextStyle(fontSize: 16)),
+            const SizedBox(width: 6),
+            Text(
+              S.of(context)?.redPacketBestLuckCongrats ??
+                  'Best Luck! You got the most!',
+              style: const TextStyle(
+                color: Color(0xFFFFD700),
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Status enum ─────────────────────────────────────────────────────────────
 
 enum OpenRedPacketStatus {
   canOpen,

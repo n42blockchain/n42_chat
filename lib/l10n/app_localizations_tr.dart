@@ -5415,4 +5415,29 @@ class STr extends S {
 
   @override
   String get miniAppNoResults => 'Uygulama bulunamadı';
+
+  @override
+  String get slideToPayLabel => '→→→  Onaylamak için kaydırın';
+
+  @override
+  String get slideToPayConfirming => 'Onaylanıyor...';
+
+  @override
+  String get redPacketBestLuck => 'En iyi şans';
+
+  @override
+  String get redPacketBestLuckCongrats => 'En iyi şans! En çok siz aldınız!';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total talep edildi';
+  }
+
+  @override
+  String get redPacketStatsTotal => 'toplam';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 Kırmızı zarf aldı • $amount $token';
+  }
 }

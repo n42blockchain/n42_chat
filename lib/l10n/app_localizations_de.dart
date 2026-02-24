@@ -5439,4 +5439,30 @@ class SDe extends S {
 
   @override
   String get miniAppNoResults => 'Keine Apps gefunden';
+
+  @override
+  String get slideToPayLabel => '→→→  Zum Bestätigen schieben';
+
+  @override
+  String get slideToPayConfirming => 'Wird bestätigt...';
+
+  @override
+  String get redPacketBestLuck => 'Bestes Glück';
+
+  @override
+  String get redPacketBestLuckCongrats =>
+      'Bestes Glück! Sie haben am meisten bekommen!';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total beansprucht';
+  }
+
+  @override
+  String get redPacketStatsTotal => 'gesamt';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 Ein rotes Paket erhalten • $amount $token';
+  }
 }

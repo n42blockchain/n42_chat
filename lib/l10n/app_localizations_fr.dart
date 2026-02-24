@@ -5463,4 +5463,30 @@ class SFr extends S {
 
   @override
   String get miniAppNoResults => 'Aucune app trouvée';
+
+  @override
+  String get slideToPayLabel => '→→→  Glissez pour confirmer';
+
+  @override
+  String get slideToPayConfirming => 'Confirmation...';
+
+  @override
+  String get redPacketBestLuck => 'Meilleure chance';
+
+  @override
+  String get redPacketBestLuckCongrats =>
+      'Meilleure chance ! Vous avez obtenu le plus !';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total réclamés';
+  }
+
+  @override
+  String get redPacketStatsTotal => 'total';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 A reçu une enveloppe rouge • $amount $token';
+  }
 }

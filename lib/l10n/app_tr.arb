@@ -1813,5 +1813,32 @@
   "miniAppSearch": "Uygulama ara...",
   "miniAppFeatured": "Öne Çıkanlar",
   "miniAppAllApps": "Tüm Uygulamalar",
-  "miniAppNoResults": "Uygulama bulunamadı"
+  "miniAppNoResults": "Uygulama bulunamadı",
+  "slideToPayLabel": "→→→  Onaylamak için kaydırın",
+  "slideToPayConfirming": "Onaylanıyor...",
+  "redPacketBestLuck": "En iyi şans",
+  "redPacketBestLuckCongrats": "En iyi şans! En çok siz aldınız!",
+  "redPacketStats": "{claimed} / {total} talep edildi",
+  "@redPacketStats": {
+    "placeholders": {
+      "claimed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "redPacketStatsTotal": "toplam",
+  "redPacketGrabbedViral": "🧧 Kırmızı zarf aldı • {amount} {token}",
+  "@redPacketGrabbedViral": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
+    }
+  }
 }

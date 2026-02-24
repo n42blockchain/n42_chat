@@ -5422,4 +5422,29 @@ class SEn extends S {
 
   @override
   String get miniAppNoResults => 'No apps found';
+
+  @override
+  String get slideToPayLabel => '→→→  Slide to confirm';
+
+  @override
+  String get slideToPayConfirming => 'Confirming...';
+
+  @override
+  String get redPacketBestLuck => 'Best Luck';
+
+  @override
+  String get redPacketBestLuckCongrats => 'Best Luck! You got the most!';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total claimed';
+  }
+
+  @override
+  String get redPacketStatsTotal => 'total';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 grabbed a red packet • $amount $token';
+  }
 }

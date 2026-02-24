@@ -1813,5 +1813,32 @@
   "miniAppSearch": "Szukaj aplikacji...",
   "miniAppFeatured": "Polecane",
   "miniAppAllApps": "Wszystkie Aplikacje",
-  "miniAppNoResults": "Nie znaleziono aplikacji"
+  "miniAppNoResults": "Nie znaleziono aplikacji",
+  "slideToPayLabel": "→→→  Przesuń, aby potwierdzić",
+  "slideToPayConfirming": "Potwierdzanie...",
+  "redPacketBestLuck": "Najlepsze szczęście",
+  "redPacketBestLuckCongrats": "Najlepsze szczęście! Dostałeś najwięcej!",
+  "redPacketStats": "{claimed} / {total} odebrano",
+  "@redPacketStats": {
+    "placeholders": {
+      "claimed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "redPacketStatsTotal": "łącznie",
+  "redPacketGrabbedViral": "🧧 Otrzymał czerwoną kopertę • {amount} {token}",
+  "@redPacketGrabbedViral": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
+    }
+  }
 }

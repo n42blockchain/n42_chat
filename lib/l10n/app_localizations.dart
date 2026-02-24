@@ -10062,6 +10062,48 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'未找到应用'**
   String get miniAppNoResults;
+
+  /// No description provided for @slideToPayLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'→→→  滑动确认'**
+  String get slideToPayLabel;
+
+  /// No description provided for @slideToPayConfirming.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认中...'**
+  String get slideToPayConfirming;
+
+  /// No description provided for @redPacketBestLuck.
+  ///
+  /// In zh, this message translates to:
+  /// **'最佳手气'**
+  String get redPacketBestLuck;
+
+  /// No description provided for @redPacketBestLuckCongrats.
+  ///
+  /// In zh, this message translates to:
+  /// **'最佳手气！你抢到了最多！'**
+  String get redPacketBestLuckCongrats;
+
+  /// No description provided for @redPacketStats.
+  ///
+  /// In zh, this message translates to:
+  /// **'{claimed} / {total} 个已领取'**
+  String redPacketStats(int claimed, int total);
+
+  /// No description provided for @redPacketStatsTotal.
+  ///
+  /// In zh, this message translates to:
+  /// **'共计'**
+  String get redPacketStatsTotal;
+
+  /// No description provided for @redPacketGrabbedViral.
+  ///
+  /// In zh, this message translates to:
+  /// **'🧧 抢到了红包 • {amount} {token}'**
+  String redPacketGrabbedViral(String amount, String token);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

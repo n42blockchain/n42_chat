@@ -5417,4 +5417,30 @@ class SId extends S {
 
   @override
   String get miniAppNoResults => 'Aplikasi tidak ditemukan';
+
+  @override
+  String get slideToPayLabel => '→→→  Geser untuk konfirmasi';
+
+  @override
+  String get slideToPayConfirming => 'Mengkonfirmasi...';
+
+  @override
+  String get redPacketBestLuck => 'Keberuntungan terbaik';
+
+  @override
+  String get redPacketBestLuckCongrats =>
+      'Keberuntungan terbaik! Kamu dapat paling banyak!';
+
+  @override
+  String redPacketStats(int claimed, int total) {
+    return '$claimed / $total diklaim';
+  }
+
+  @override
+  String get redPacketStatsTotal => 'total';
+
+  @override
+  String redPacketGrabbedViral(String amount, String token) {
+    return '🧧 Mendapat amplop merah • $amount $token';
+  }
 }
