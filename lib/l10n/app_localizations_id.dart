@@ -5384,4 +5384,37 @@ class SId extends S {
 
   @override
   String get onChainViewDetails => 'Lihat detail';
+
+  @override
+  String get chatCommandHelp => '/help — Lihat semua perintah';
+
+  @override
+  String get chatCommandPrice => '/price — Dapatkan harga token';
+
+  @override
+  String get chatCommandBalance => '/balance — Lihat saldo dompet';
+
+  @override
+  String get chatCommandChains => '/chains — Daftar 236+ jaringan';
+
+  @override
+  String get chatMiniApps => 'Aplikasi';
+
+  @override
+  String get miniAppMarketTitle => 'Mini App';
+
+  @override
+  String get miniAppCategoryAll => 'Semua';
+
+  @override
+  String get miniAppSearch => 'Cari aplikasi...';
+
+  @override
+  String get miniAppFeatured => 'Unggulan';
+
+  @override
+  String get miniAppAllApps => 'Semua Aplikasi';
+
+  @override
+  String get miniAppNoResults => 'Aplikasi tidak ditemukan';
 }

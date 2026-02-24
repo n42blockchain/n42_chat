@@ -5408,4 +5408,37 @@ class SPt extends S {
 
   @override
   String get onChainViewDetails => 'Ver detalhes';
+
+  @override
+  String get chatCommandHelp => '/help — Ver todos os comandos';
+
+  @override
+  String get chatCommandPrice => '/price — Obter preço do token';
+
+  @override
+  String get chatCommandBalance => '/balance — Ver saldo da carteira';
+
+  @override
+  String get chatCommandChains => '/chains — Listar 236+ redes suportadas';
+
+  @override
+  String get chatMiniApps => 'Apps';
+
+  @override
+  String get miniAppMarketTitle => 'Mini Apps';
+
+  @override
+  String get miniAppCategoryAll => 'Todos';
+
+  @override
+  String get miniAppSearch => 'Pesquisar apps...';
+
+  @override
+  String get miniAppFeatured => 'Destaque';
+
+  @override
+  String get miniAppAllApps => 'Todos os Apps';
+
+  @override
+  String get miniAppNoResults => 'Nenhum app encontrado';
 }

@@ -5430,4 +5430,37 @@ class SFr extends S {
 
   @override
   String get onChainViewDetails => 'Voir les détails';
+
+  @override
+  String get chatCommandHelp => '/help — Voir toutes les commandes';
+
+  @override
+  String get chatCommandPrice => '/price — Obtenir le prix du token';
+
+  @override
+  String get chatCommandBalance => '/balance — Voir le solde du portefeuille';
+
+  @override
+  String get chatCommandChains => '/chains — Lister 236+ réseaux supportés';
+
+  @override
+  String get chatMiniApps => 'Apps';
+
+  @override
+  String get miniAppMarketTitle => 'Mini Apps';
+
+  @override
+  String get miniAppCategoryAll => 'Tout';
+
+  @override
+  String get miniAppSearch => 'Rechercher des apps...';
+
+  @override
+  String get miniAppFeatured => 'À la une';
+
+  @override
+  String get miniAppAllApps => 'Toutes les Apps';
+
+  @override
+  String get miniAppNoResults => 'Aucune app trouvée';
 }

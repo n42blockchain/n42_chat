@@ -1802,5 +1802,16 @@
   "onChainMarkAllRead": "すべて既読",
   "onChainNoNotifications": "オンチェーンイベントはまだありません",
   "onChainNoNotificationsDesc": "購読チャンネルのイベントがここに表示されます",
-  "onChainViewDetails": "詳細を見る"
+  "onChainViewDetails": "詳細を見る",
+  "chatCommandHelp": "/help — 全コマンドを表示",
+  "chatCommandPrice": "/price — トークン価格を取得",
+  "chatCommandBalance": "/balance — ウォレット残高を表示",
+  "chatCommandChains": "/chains — 236以上のチェーン一覧",
+  "chatMiniApps": "アプリ",
+  "miniAppMarketTitle": "ミニアプリ",
+  "miniAppCategoryAll": "すべて",
+  "miniAppSearch": "アプリを検索...",
+  "miniAppFeatured": "注目",
+  "miniAppAllApps": "すべてのアプリ",
+  "miniAppNoResults": "アプリが見つかりません"
 }

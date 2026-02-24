@@ -1802,5 +1802,16 @@
   "onChainMarkAllRead": "Tümünü okundu işaretle",
   "onChainNoNotifications": "Henüz zincir üstü olay yok",
   "onChainNoNotificationsDesc": "Abone olunan kanallardan olaylar burada görünecek",
-  "onChainViewDetails": "Ayrıntıları gör"
+  "onChainViewDetails": "Ayrıntıları gör",
+  "chatCommandHelp": "/help — Tüm komutları göster",
+  "chatCommandPrice": "/price — Token fiyatını al",
+  "chatCommandBalance": "/balance — Cüzdan bakiyesini göster",
+  "chatCommandChains": "/chains — 236+ desteklenen ağı listele",
+  "chatMiniApps": "Uygulamalar",
+  "miniAppMarketTitle": "Mini Uygulamalar",
+  "miniAppCategoryAll": "Tümü",
+  "miniAppSearch": "Uygulama ara...",
+  "miniAppFeatured": "Öne Çıkanlar",
+  "miniAppAllApps": "Tüm Uygulamalar",
+  "miniAppNoResults": "Uygulama bulunamadı"
 }

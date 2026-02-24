@@ -5406,4 +5406,37 @@ class SDe extends S {
 
   @override
   String get onChainViewDetails => 'Details anzeigen';
+
+  @override
+  String get chatCommandHelp => '/help — Alle Befehle anzeigen';
+
+  @override
+  String get chatCommandPrice => '/price — Token-Preis abrufen';
+
+  @override
+  String get chatCommandBalance => '/balance — Wallet-Guthaben anzeigen';
+
+  @override
+  String get chatCommandChains => '/chains — 236+ unterstützte Netzwerke';
+
+  @override
+  String get chatMiniApps => 'Apps';
+
+  @override
+  String get miniAppMarketTitle => 'Mini-Apps';
+
+  @override
+  String get miniAppCategoryAll => 'Alle';
+
+  @override
+  String get miniAppSearch => 'Apps suchen...';
+
+  @override
+  String get miniAppFeatured => 'Empfohlen';
+
+  @override
+  String get miniAppAllApps => 'Alle Apps';
+
+  @override
+  String get miniAppNoResults => 'Keine Apps gefunden';
 }

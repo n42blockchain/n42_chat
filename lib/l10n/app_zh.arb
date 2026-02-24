@@ -2727,5 +2727,16 @@
   "onChainMarkAllRead": "全部已读",
   "onChainNoNotifications": "暂无链上事件",
   "onChainNoNotificationsDesc": "来自订阅频道的事件通知将在此显示",
-  "onChainViewDetails": "查看详情"
+  "onChainViewDetails": "查看详情",
+  "chatCommandHelp": "/help — 查看所有命令",
+  "chatCommandPrice": "/price — 查询代币价格",
+  "chatCommandBalance": "/balance — 查看钱包余额",
+  "chatCommandChains": "/chains — 查看 236+ 条支持链",
+  "chatMiniApps": "应用",
+  "miniAppMarketTitle": "小程序",
+  "miniAppCategoryAll": "全部",
+  "miniAppSearch": "搜索应用...",
+  "miniAppFeatured": "精选",
+  "miniAppAllApps": "全部应用",
+  "miniAppNoResults": "未找到应用"
 }

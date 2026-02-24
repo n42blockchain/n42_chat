@@ -5361,4 +5361,37 @@ class SVi extends S {
 
   @override
   String get onChainViewDetails => 'Xem chi tiết';
+
+  @override
+  String get chatCommandHelp => '/help — Xem tất cả lệnh';
+
+  @override
+  String get chatCommandPrice => '/price — Lấy giá token';
+
+  @override
+  String get chatCommandBalance => '/balance — Xem số dư ví';
+
+  @override
+  String get chatCommandChains => '/chains — Danh sách 236+ chain';
+
+  @override
+  String get chatMiniApps => 'Ứng dụng';
+
+  @override
+  String get miniAppMarketTitle => 'Mini App';
+
+  @override
+  String get miniAppCategoryAll => 'Tất cả';
+
+  @override
+  String get miniAppSearch => 'Tìm kiếm ứng dụng...';
+
+  @override
+  String get miniAppFeatured => 'Nổi bật';
+
+  @override
+  String get miniAppAllApps => 'Tất cả ứng dụng';
+
+  @override
+  String get miniAppNoResults => 'Không tìm thấy ứng dụng';
 }

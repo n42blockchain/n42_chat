@@ -5410,4 +5410,37 @@ class SEs extends S {
 
   @override
   String get onChainViewDetails => 'Ver detalles';
+
+  @override
+  String get chatCommandHelp => '/help — Ver todos los comandos';
+
+  @override
+  String get chatCommandPrice => '/price — Obtener precio del token';
+
+  @override
+  String get chatCommandBalance => '/balance — Ver saldo de la billetera';
+
+  @override
+  String get chatCommandChains => '/chains — Listar 236+ redes soportadas';
+
+  @override
+  String get chatMiniApps => 'Apps';
+
+  @override
+  String get miniAppMarketTitle => 'Mini Apps';
+
+  @override
+  String get miniAppCategoryAll => 'Todas';
+
+  @override
+  String get miniAppSearch => 'Buscar apps...';
+
+  @override
+  String get miniAppFeatured => 'Destacados';
+
+  @override
+  String get miniAppAllApps => 'Todas las Apps';
+
+  @override
+  String get miniAppNoResults => 'No se encontraron apps';
 }

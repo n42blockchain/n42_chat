@@ -1802,5 +1802,16 @@
   "onChainMarkAllRead": "Tandai semua dibaca",
   "onChainNoNotifications": "Belum ada peristiwa on-chain",
   "onChainNoNotificationsDesc": "Peristiwa dari saluran yang dilanggani akan muncul di sini",
-  "onChainViewDetails": "Lihat detail"
+  "onChainViewDetails": "Lihat detail",
+  "chatCommandHelp": "/help — Lihat semua perintah",
+  "chatCommandPrice": "/price — Dapatkan harga token",
+  "chatCommandBalance": "/balance — Lihat saldo dompet",
+  "chatCommandChains": "/chains — Daftar 236+ jaringan",
+  "chatMiniApps": "Aplikasi",
+  "miniAppMarketTitle": "Mini App",
+  "miniAppCategoryAll": "Semua",
+  "miniAppSearch": "Cari aplikasi...",
+  "miniAppFeatured": "Unggulan",
+  "miniAppAllApps": "Semua Aplikasi",
+  "miniAppNoResults": "Aplikasi tidak ditemukan"
 }
