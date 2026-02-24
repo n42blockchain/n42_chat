@@ -85,6 +85,7 @@ import '../mini_app/mini_app_market_page.dart';
 import '../../../core/services/bot_command_processor.dart';
 import '../../../domain/entities/bot_command_entity.dart';
 import '../../../integration/wallet_bridge.dart';
+import '../group/group_topics_page.dart';
 
 part 'chat_page_app_bar.dart';
 part 'chat_page_message_list.dart';

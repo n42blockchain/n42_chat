@@ -5551,4 +5551,32 @@ class SRu extends S {
   @override
   String get nftPickerWalletHint =>
       'Подключите кошелёк N42, чтобы автоматически находить NFT в 236+ сетях.';
+
+  @override
+  String get profileBindNftAvatar => 'Bind NFT Avatar';
+
+  @override
+  String get profileChangeAvatar => 'Change Avatar';
+
+  @override
+  String get groupTopics => 'Topics';
+
+  @override
+  String get groupTopicsEmpty => 'No topics yet';
+
+  @override
+  String get syncInProgress => 'Syncing message history...';
+
+  @override
+  String get recoveryKeyReminderTitle => 'Protect your messages';
+
+  @override
+  String get recoveryKeyReminderDesc =>
+      'Create a recovery key to securely sync encrypted messages across devices';
+
+  @override
+  String get recoveryKeySetupNow => 'Set up now';
+
+  @override
+  String get recoveryKeyRemindLater => 'Remind me later';
 }

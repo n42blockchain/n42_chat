@@ -2841,5 +2841,14 @@
   "nftPickerInfoTitle": "NFT 头像 — 链上身份验证",
   "nftPickerInfoDesc": "绑定您持有的 NFT 作为头像。任何人均可在链上验证归属权。在 N42 全应用中以金色边框标识。",
   "nftPickerPopularCollections": "热门 NFT 项目",
-  "nftPickerWalletHint": "连接 N42 錢包，自动发现您在 236+ 条链上持有的 NFT。"
+  "nftPickerWalletHint": "连接 N42 錢包，自动发现您在 236+ 条链上持有的 NFT。",
+  "profileBindNftAvatar": "绑定 NFT 头像",
+  "profileChangeAvatar": "更换头像",
+  "groupTopics": "群话题",
+  "groupTopicsEmpty": "暂无话题",
+  "syncInProgress": "正在同步历史消息...",
+  "recoveryKeyReminderTitle": "保护您的消息",
+  "recoveryKeyReminderDesc": "创建恢复密钥以在多设备上安全同步加密消息",
+  "recoveryKeySetupNow": "立即设置",
+  "recoveryKeyRemindLater": "稍后提醒"
 }

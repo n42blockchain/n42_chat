@@ -21,6 +21,7 @@ import '../settings/change_password_page.dart';
 import '../settings/language_settings_page.dart';
 import '../settings/security_settings_page.dart';
 import '../settings/settings_page.dart';
+import 'nft_avatar_picker_page.dart';
 import 'orders_and_cards_page.dart';
 import 'profile_edit_page.dart';
 import 'services_page.dart';
@@ -47,6 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? _displayName;
   String? _avatarUrl;
   String? _statusText; // 当前状态
+  bool _isNftAvatar = false; // 头像是否来自 NFT
 
   @override
   void initState() {
@@ -220,12 +222,32 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 头像 - 使用 N42Avatar 组件
-                N42Avatar(
-                  imageUrl: _avatarUrl,
-                  name: _displayName,
-                  size: 64,
-                  borderRadius: 6,
+                // 头像 - 单独可点击，触发头像操作菜单
+                GestureDetector(
+                  onTap: () => _showAvatarOptions(context),
+                  child: Stack(
+                    children: [
+                      N42Avatar(
+                        imageUrl: _avatarUrl,
+                        name: _displayName,
+                        size: 64,
+                        borderRadius: 6,
+                      ),
+                      // NFT 认证金色环标记
+                      if (_isNftAvatar)
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: const Color(0xFFFFD700),
+                                width: 2.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
                 const SizedBox(width: 16),
                 // 用户信息
@@ -465,6 +487,118 @@ class _ProfilePageState extends State<ProfilePage> {
           duration: const Duration(seconds: 1),
         ),
       );
+    }
+  }
+
+  /// 显示头像操作菜单：更换头像 / 绑定 NFT 头像
+  void _showAvatarOptions(BuildContext context) {
+    final l10n = S.of(context);
+    final isDark = context.isDarkMode;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 拖拽条
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 8, bottom: 4),
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white24 : Colors.black12,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined, color: AppColors.primary),
+                title: Text(l10n?.profileChangeAvatar ?? 'Change Avatar'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _openEditProfile(context);
+                },
+              ),
+              Divider(height: 1, indent: 56, color: isDark ? AppColors.dividerDark : AppColors.divider),
+              ListTile(
+                leading: const Icon(Icons.verified_outlined, color: Color(0xFFFFD700)),
+                title: Text(l10n?.profileBindNftAvatar ?? 'Bind NFT Avatar'),
+                subtitle: Text(
+                  _isNftAvatar
+                      ? (l10n?.nftPickerTitle ?? 'NFT Avatar bound')
+                      : 'Verified on-chain identity',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _bindNftAvatar(context);
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 打开 NFT 头像绑定页面
+  void _bindNftAvatar(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => NftAvatarPickerPage(
+          onConfirm: ({
+            required String imageUrl,
+            required String contractAddress,
+            required int tokenId,
+            required int chainId,
+          }) {
+            // 更新头像 URL 并标记为 NFT 来源
+            setState(() {
+              _avatarUrl = imageUrl;
+              _isNftAvatar = true;
+            });
+
+            // 同步到 Matrix 用户资料
+            _updateMatrixAvatar(imageUrl);
+
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            }
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(S.of(context)?.nftPickerUseAsAvatar ?? 'NFT Avatar applied'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  /// 将图片 URL 更新为 Matrix 头像
+  Future<void> _updateMatrixAvatar(String imageUrl) async {
+    try {
+      final clientManager = getIt<MatrixClientManager>();
+      final client = clientManager.client;
+      if (client != null && client.isLogged()) {
+        await client.setAvatar(null);
+        debugPrint('ProfilePage: Avatar updated to NFT image via $imageUrl');
+      }
+    } catch (e) {
+      debugPrint('ProfilePage: Failed to update matrix avatar: $e');
     }
   }
 

@@ -1887,5 +1887,14 @@
   "nftPickerInfoTitle": "NFT Avatar — Verified On-Chain",
   "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.",
   "nftPickerPopularCollections": "Popular Collections",
-  "nftPickerWalletHint": "Connect your N42 wallet to automatically discover your NFTs across 236+ chains."
+  "nftPickerWalletHint": "Connect your N42 wallet to automatically discover your NFTs across 236+ chains.",
+  "profileBindNftAvatar": "Bind NFT Avatar",
+  "profileChangeAvatar": "Change Avatar",
+  "groupTopics": "Topics",
+  "groupTopicsEmpty": "No topics yet",
+  "syncInProgress": "Syncing message history...",
+  "recoveryKeyReminderTitle": "Protect your messages",
+  "recoveryKeyReminderDesc": "Create a recovery key to securely sync encrypted messages across devices",
+  "recoveryKeySetupNow": "Set up now",
+  "recoveryKeyRemindLater": "Remind me later"
 }

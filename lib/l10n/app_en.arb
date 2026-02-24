@@ -1753,7 +1753,6 @@
       }
     }
   },
-
   "securityDeviceIdRequired": "Device ID is required",
   "securityVerificationStartFailed": "Failed to start verification: {error}",
   "@securityVerificationStartFailed": {
@@ -1785,7 +1784,6 @@
   "securityCompareNumbers": "Compare the numbers on both devices",
   "commonTryAgain": "Try Again",
   "commonDone": "Done",
-
   "chatExportTitle": "Export Chat",
   "chatExportSuccess": "Export successful",
   "chatExportFailed": "Export failed: {error}",
@@ -1808,16 +1806,18 @@
   "chatExportButton": "Export & Share",
   "chatMediaGallery": "Media Gallery",
   "chatExportHistory": "Export Chat History",
-
   "pdfLoadFailed": "Failed to load PDF",
   "pdfPageIndicator": "{current} / {total}",
   "@pdfPageIndicator": {
     "placeholders": {
-      "current": {"type": "int"},
-      "total": {"type": "int"}
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
-
   "mediaAll": "All",
   "mediaImages": "Images",
   "mediaVideos": "Videos",
@@ -1826,11 +1826,12 @@
   "mediaItemsCount": "{count} items",
   "@mediaItemsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "mediaNoMediaFound": "No media found",
-
   "spacesTitle": "Communities",
   "spacesCreate": "Create Community",
   "spacesJoined": "Joined",
@@ -1844,7 +1845,9 @@
   "spacesMembersCount": "{count} members",
   "@spacesMembersCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "spacesPublic": "Public",
@@ -1853,22 +1856,24 @@
   "spacesChannelsCount": "{count} channels",
   "@spacesChannelsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "callInCallChat": "In-Call Chat",
   "callMessagesCount": "{count} messages",
   "@callMessagesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "callNoMessagesYet": "No messages yet.\nSend a message to get started.",
   "callTypeMessage": "Type a message...",
   "callYouSender": "You",
   "callChatLabel": "Chat",
-
   "chatEdited": "Edited",
   "chatEditHistory": "Edit History",
   "chatOriginalMessage": "Original",
@@ -1880,29 +1885,30 @@
       }
     }
   },
-
   "chatViewOnce": "View Once",
   "chatViewOncePhoto": "View Once Photo",
   "chatViewOnceVideo": "View Once Video",
   "chatViewOnceViewed": "Viewed",
   "chatViewOnceExpired": "Expired",
   "chatViewOnceTap": "Tap to view",
-
   "chatAutoFaceBlur": "Auto face blur",
   "chatAutoFaceBlurDesc": "Automatically blur faces when sending photos",
-
   "threadReplyInThread": "Reply in thread",
   "threadReplies": "{count} replies",
   "@threadReplies": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "threadReply": "1 reply",
   "threadLatestReply": "Latest: {preview}",
   "@threadLatestReply": {
     "placeholders": {
-      "preview": {"type": "String"}
+      "preview": {
+        "type": "String"
+      }
     }
   },
   "threadTitle": "Thread",
@@ -1910,10 +1916,11 @@
   "threadParticipants": "{count} participants",
   "@threadParticipants": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "voiceRoomTitle": "Voice Room",
   "voiceRoomCreate": "Create Voice Room",
   "voiceRoomJoin": "Join",
@@ -1934,14 +1941,15 @@
   "voiceRoomHandRaised": "{name} raised their hand",
   "@voiceRoomHandRaised": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "voiceRoomName": "Room name",
   "voiceRoomTopic": "Topic (optional)",
   "voiceRoomNoActive": "No active voice rooms",
   "voiceRoomConnecting": "Connecting...",
-
   "usernameTitle": "Username",
   "usernameSet": "Set Username",
   "usernameChange": "Change Username",
@@ -1952,12 +1960,10 @@
   "usernameReserved": "This username is reserved",
   "usernameSaved": "Username saved",
   "usernameSearchHint": "Search by @username",
-
   "ensName": "ENS Name",
   "ensLinked": "Linked to ENS",
   "ensResolving": "Resolving ENS...",
   "ensNotFound": "ENS name not found",
-
   "tokenGateTitle": "Token Gate",
   "tokenGateEnable": "Enable Token Gate",
   "tokenGateDisable": "Disable Token Gate",
@@ -1994,22 +2000,18 @@
   "tokenGateRulesActive": "rules active",
   "tokenGateDisabled": "Disabled",
   "ensNotBound": "Not bound",
-
   "liveLocation": "Live Location",
   "stopLiveLocation": "Stop Sharing",
   "startLiveLocation": "Start Sharing",
   "selectDuration": "Select Duration",
-
   "groupChatFiles": "Chat Files",
   "groupLinks": "Links",
   "groupNoLinks": "No links yet",
-
   "chatBackground": "Chat Background",
   "solidColors": "Solid Colors",
   "gradients": "Gradients",
   "defaultBackground": "Default",
   "settingsFontSizeSlider": "Font Size",
-
   "autoDownload": "Auto-Download",
   "images": "Images",
   "voice": "Voice",
@@ -2017,7 +2019,6 @@
   "files": "Files",
   "mobileData": "Mobile Data",
   "roaming": "Roaming",
-
   "storageManagement": "Storage",
   "totalUsage": "Total Usage",
   "cache": "Cache",
@@ -2079,7 +2080,6 @@
   "voiceRecording": "Voice Recording",
   "searchLocation": "Search Location",
   "tapToSearch": "Tap to search",
-
   "settingsThisDevice": "This device",
   "settingsJustNow": "Just now",
   "settingsDeviceId": "Device ID",
@@ -2104,8 +2104,6 @@
   "settingsLogout": "Logout",
   "settingsVerifyIdentity": "Verify identity",
   "settingsEnterPasswordToConfirm": "Enter your password to confirm this action.",
-  "commonConfirm": "Confirm",
-
   "scheduledSendTitle": "Schedule message",
   "scheduledSendInOneHour": "In 1 hour",
   "scheduledSendTonight": "Tonight (8:00 PM)",
@@ -2113,7 +2111,6 @@
   "scheduledSendCustom": "Pick a date & time",
   "scheduledMessageLabel": "Scheduled",
   "scheduledMessageCancel": "Cancel scheduled message",
-
   "chatLockTitle": "Chat lock",
   "chatLockEnable": "Lock this chat",
   "chatLockDisable": "Unlock this chat",
@@ -2129,14 +2126,12 @@
   "chatLockPinMismatch": "PIN does not match",
   "chatLockUseBiometric": "Use biometric",
   "chatLockUsePin": "Use PIN",
-
   "mediaEditorUndo": "Undo",
   "mediaEditorRedo": "Redo",
   "mediaEditorCrop": "Crop",
   "mediaEditorFilter": "Filter",
   "mediaEditorDraw": "Draw",
   "mediaEditorText": "Text",
-
   "aiAssistant": "AI Assistant",
   "aiAssistantWelcome": "Hello! I'm the N42 AI Assistant. How can I help you?",
   "aiAssistantNotConfigured": "AI service not configured",
@@ -2151,17 +2146,17 @@
   "aiAssistantServiceStatus": "Service status",
   "aiAssistantAvailable": "Available",
   "aiAssistantUnavailable": "Unavailable",
-
   "aiSummarize": "AI Summary",
   "aiSummarizeUnread": "Summarize {count} unread messages",
   "@aiSummarizeUnread": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "aiSummarizeLoading": "Summarizing...",
   "aiSummarizeError": "Failed to summarize",
-
   "aiRewrite": "AI Rewrite",
   "aiRewriteFormal": "Formal",
   "aiRewriteCasual": "Casual",
@@ -2170,10 +2165,8 @@
   "aiRewriteAccept": "Use",
   "aiRewriteCancel": "Cancel",
   "aiRewriteLoading": "Rewriting...",
-
   "aiLinkSummary": "AI Summary",
   "aiLinkSummaryAnalyzing": "Analyzing...",
-
   "chatFolderManagement": "Manage Folders",
   "chatFolderSystem": "System Folders",
   "chatFolderCustom": "Custom Folders",
@@ -2187,14 +2180,12 @@
   "chatFolderGroups": "Groups",
   "chatFolderChannels": "Channels",
   "chatFolderMuted": "Muted",
-
   "storyAddMusic": "Add Music",
   "storyChangeMusic": "Change Music",
   "storyBackgroundMusic": "Background Music",
   "storyMusicPreview": "Preview (max 15s)",
   "storyChooseFromDevice": "Choose from Device",
   "storyUseThisMusic": "Use This Music",
-
   "authPasskeyNotSupported": "Passkey is not supported on this device",
   "authPasskeyRegister": "Register Passkey",
   "authPasskeyNoRegistered": "No passkeys registered",
@@ -2205,7 +2196,9 @@
   "authPasskeyDeleteConfirm": "Delete passkey \"{name}\"? You will no longer be able to use it to log in.",
   "@authPasskeyDeleteConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "momentVisibilityPublic": "Public",
@@ -2215,7 +2208,9 @@
   "momentUserMoments": "{userName}'s Moments",
   "@momentUserMoments": {
     "placeholders": {
-      "userName": {"type": "String"}
+      "userName": {
+        "type": "String"
+      }
     }
   },
   "momentForwardTo": "Forward to",
@@ -2225,7 +2220,9 @@
   "momentSelectedCount": "Selected ({count})",
   "@momentSelectedCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "momentNoMomentsYet": "No moments yet",
@@ -2234,7 +2231,9 @@
   "momentForwardContent": "[Moment] {content}",
   "@momentForwardContent": {
     "placeholders": {
-      "content": {"type": "String"}
+      "content": {
+        "type": "String"
+      }
     }
   },
   "momentDeleteMoment": "Delete Moment",
@@ -2250,13 +2249,17 @@
   "momentLikesCount": "{count} likes",
   "@momentLikesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "momentCommentsCount": "{count} comments",
   "@momentCommentsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "momentNoComments": "No comments yet",
@@ -2264,7 +2267,9 @@
   "momentReplyTo": "Reply to {userName}...",
   "@momentReplyTo": {
     "placeholders": {
-      "userName": {"type": "String"}
+      "userName": {
+        "type": "String"
+      }
     }
   },
   "momentNoConversations": "No conversations",
@@ -2272,19 +2277,25 @@
   "momentMinutesAgo": "{count}m ago",
   "@momentMinutesAgo": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "momentHoursAgo": "{count}h ago",
   "@momentHoursAgo": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "momentDaysAgo": "{count}d ago",
   "@momentDaysAgo": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "chatGroupAnnouncementHint": "Enter group announcement",
@@ -2332,7 +2343,6 @@
   "gameNewRecord": "New Record!",
   "gameLines": "Lines",
   "storyMyStory": "My Story",
-
   "storageSmartCleanup": "Smart Cleanup",
   "storageOldMediaFiles": "Old Media Files",
   "storageLargeFiles": "Large Files",
@@ -2342,7 +2352,9 @@
   "storageAutoCleanupDesc": "Automatically clean files older than {days} days",
   "@storageAutoCleanupDesc": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "storageCleanupPeriod": "Cleanup Period",
@@ -2353,20 +2365,28 @@
   "storageFreed": "Freed {size} ({count} files)",
   "@storageFreed": {
     "placeholders": {
-      "size": {"type": "String"},
-      "count": {"type": "int"}
+      "size": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "storageDays": "{days} days",
   "@storageDays": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "storageViewAllRooms": "View all {count} rooms",
   "@storageViewAllRooms": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "storageNoFiles": "No files found",
@@ -2374,10 +2394,11 @@
   "storageDeleteSelected": "Delete {count} selected files? They can be re-downloaded from the server.",
   "@storageDeleteSelected": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "backupRestore": "Backup & Restore",
   "backupCreate": "Create Backup",
   "backupCreateDesc": "Backup your settings and encryption keys. Messages will be restored from server after re-login.",
@@ -2397,21 +2418,31 @@
   "backupCreated": "Backup created: {rooms} rooms, {messages} messages",
   "@backupCreated": {
     "placeholders": {
-      "rooms": {"type": "int"},
-      "messages": {"type": "int"}
+      "rooms": {
+        "type": "int"
+      },
+      "messages": {
+        "type": "int"
+      }
     }
   },
   "backupRestored": "Restored {settings} settings from {rooms} rooms",
   "@backupRestored": {
     "placeholders": {
-      "settings": {"type": "int"},
-      "rooms": {"type": "int"}
+      "settings": {
+        "type": "int"
+      },
+      "rooms": {
+        "type": "int"
+      }
     }
   },
   "backupFailed": "Backup failed: {error}",
   "@backupFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "backupPasswordRequired": "This backup is password-protected",
@@ -2419,7 +2450,9 @@
   "blocGroupMembersInvited": "Invited {count} member(s)",
   "@blocGroupMembersInvited": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "blocGroupMemberRemoved": "Member removed",
@@ -2434,13 +2467,11 @@
   "blocTransferFailed": "Transfer failed",
   "blocPaymentProcessing": "Processing payment...",
   "blocPaymentFailed": "Payment failed",
-
   "groupMaxMembers": "Member Limit",
   "groupMaxMembersUnlimited": "Unlimited",
   "groupMaxMembersHint": "Enter limit (leave empty for unlimited)",
   "groupMaxMembersUpdated": "Member limit updated",
   "groupFull": "Group is at capacity",
-
   "groupChannels": "Topic Channels",
   "groupChannelsEmpty": "No channels yet",
   "groupChannelsCount": "channels",
@@ -2449,25 +2480,21 @@
   "groupChannelTopic": "Channel Topic (optional)",
   "groupChannelDelete": "Delete Channel",
   "groupChannelDeleteConfirm": "Delete this channel? All messages will be lost.",
-
   "groupBotSettings": "Bot Settings",
   "groupBotEnabled": "Enable Bot",
   "groupBotWelcomeMessage": "Welcome Message Template",
   "groupBotWelcomeHint": "Use 'name' as placeholder for new member name",
   "groupBotConfigUpdated": "Bot settings updated",
-
   "groupContentFilter": "Content Filter",
   "groupContentFilterEnabled": "Enable Keyword Filter",
   "groupContentFilterReplace": "Replace with ***",
   "groupContentFilterHide": "Hide Message",
   "groupContentFilterAddWord": "Add Keyword",
   "groupContentFilterUpdated": "Content filter updated",
-
   "chatSlashCommands": "Commands",
   "chatCommandPoll": "/poll — Create a poll",
   "chatCommandAnnounce": "/announce — Send announcement",
   "chatCommandWelcome": "/welcome — Set welcome message",
-
   "chatReportMessage": "Report",
   "chatReportReason": "Report Reason",
   "chatReportSpam": "Spam",
@@ -2475,7 +2502,6 @@
   "chatReportInappropriate": "Inappropriate Content",
   "chatReportOther": "Other",
   "chatReportSuccess": "Report submitted",
-
   "spacesName": "Community Name",
   "spacesNameHint": "e.g. Crypto Traders",
   "spacesNameRequired": "Name is required",
@@ -2492,14 +2518,18 @@
   "spacesLeaveConfirm": "Are you sure you want to leave \"{name}\"?",
   "@spacesLeaveConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "spacesDelete": "Delete Community",
   "spacesDeleteConfirm": "This will permanently delete \"{name}\" and all its channels. This action cannot be undone.",
   "@spacesDeleteConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "spacesCreateChannel": "Add Channel",
@@ -2509,7 +2539,9 @@
   "spacesDeleteChannelConfirm": "Are you sure you want to delete \"#{name}\"?",
   "@spacesDeleteChannelConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "spacesEditName": "Edit Name",
@@ -2517,19 +2549,25 @@
   "spacesViewAllMembers": "View all {count} members",
   "@spacesViewAllMembers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "spacesKickMemberTitle": "Kick {name}",
   "@spacesKickMemberTitle": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "spacesBanMemberTitle": "Ban {name}",
   "@spacesBanMemberTitle": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "spacesPromoteAdmin": "Promote to Admin",
@@ -2537,7 +2575,6 @@
   "spacesInviteMember": "Invite Member",
   "spacesInviteMemberUserId": "User ID (e.g. @user:server.com)",
   "spacesSave": "Save",
-  "settingsSecurity": "Security",
   "settingsScreenshotProtection": "Screenshot Protection",
   "settingsScreenshotProtectionDesc": "Prevent screenshots and screen recording",
   "chatSelfDestructTimer": "Self-destruct",
@@ -2559,28 +2596,33 @@
   "miniAppFeatured": "Featured",
   "miniAppAllApps": "All Apps",
   "miniAppNoResults": "No apps found",
-
   "slideToPayLabel": "→→→  Slide to confirm",
   "slideToPayConfirming": "Confirming...",
-
   "redPacketBestLuck": "Best Luck",
   "redPacketBestLuckCongrats": "Best Luck! You got the most!",
   "redPacketStats": "{claimed} / {total} claimed",
   "@redPacketStats": {
     "placeholders": {
-      "claimed": { "type": "int" },
-      "total": { "type": "int" }
+      "claimed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "redPacketStatsTotal": "total",
   "redPacketGrabbedViral": "🧧 grabbed a red packet • {amount} {token}",
   "@redPacketGrabbedViral": {
     "placeholders": {
-      "amount": { "type": "String" },
-      "token": { "type": "String" }
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
     }
   },
-
   "web3SearchHint": "@matrix:id  •  0x wallet address  •  name.eth",
   "web3SearchPlaceholder": "Search by ID, wallet, or ENS...",
   "web3WalletAddress": "Wallet Address",
@@ -2594,13 +2636,14 @@
   "web3EnsNotFound": "ENS name \"{name}\" not found",
   "@web3EnsNotFound": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "web3NoN42AccountTitle": "No N42 Account",
   "web3NoN42AccountDesc": "This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.",
   "web3ShareInvite": "Share Invite",
-
   "nftPickerTitle": "Select NFT Avatar",
   "nftPickerTabPopular": "Popular",
   "nftPickerTabCustom": "Custom",
@@ -2616,5 +2659,14 @@
   "nftPickerInfoTitle": "NFT Avatar — Verified On-Chain",
   "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.",
   "nftPickerPopularCollections": "Popular Collections",
-  "nftPickerWalletHint": "Connect your N42 wallet to automatically discover your NFTs across 236+ chains."
+  "nftPickerWalletHint": "Connect your N42 wallet to automatically discover your NFTs across 236+ chains.",
+  "profileBindNftAvatar": "Bind NFT Avatar",
+  "profileChangeAvatar": "Change Avatar",
+  "groupTopics": "Topics",
+  "groupTopicsEmpty": "No topics yet",
+  "syncInProgress": "Syncing message history...",
+  "recoveryKeyReminderTitle": "Protect your messages",
+  "recoveryKeyReminderDesc": "Create a recovery key to securely sync encrypted messages across devices",
+  "recoveryKeySetupNow": "Set up now",
+  "recoveryKeyRemindLater": "Remind me later"
 }

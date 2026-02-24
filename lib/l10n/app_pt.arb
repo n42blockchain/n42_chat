@@ -1877,5 +1877,14 @@
   "nftPickerPreview": "Preview",
   "nftPickerInvalidTokenId": "Invalid token ID",
   "nftPickerEnterBoth": "Enter contract address and token ID",
-  "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42."
+  "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.",
+  "profileBindNftAvatar": "Bind NFT Avatar",
+  "profileChangeAvatar": "Change Avatar",
+  "groupTopics": "Topics",
+  "groupTopicsEmpty": "No topics yet",
+  "syncInProgress": "Syncing message history...",
+  "recoveryKeyReminderTitle": "Protect your messages",
+  "recoveryKeyReminderDesc": "Create a recovery key to securely sync encrypted messages across devices",
+  "recoveryKeySetupNow": "Set up now",
+  "recoveryKeyRemindLater": "Remind me later"
 }

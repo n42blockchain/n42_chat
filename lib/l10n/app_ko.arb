@@ -1877,5 +1877,14 @@
   "nftPickerPreview": "Preview",
   "nftPickerInvalidTokenId": "Invalid token ID",
   "nftPickerEnterBoth": "Enter contract address and token ID",
-  "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42."
+  "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.",
+  "profileBindNftAvatar": "NFT 아바타 연결",
+  "profileChangeAvatar": "아바타 변경",
+  "groupTopics": "주제",
+  "groupTopicsEmpty": "주제가 없습니다",
+  "syncInProgress": "메시지 기록 동기화 중...",
+  "recoveryKeyReminderTitle": "메시지를 보호하세요",
+  "recoveryKeyReminderDesc": "여러 기기에서 암호화된 메시지를 안전하게 동기화하려면 복구 키를 만드세요",
+  "recoveryKeySetupNow": "지금 설정",
+  "recoveryKeyRemindLater": "나중에 알림"
 }

@@ -5440,4 +5440,31 @@ class SZh extends S {
 
   @override
   String get nftPickerWalletHint => '连接 N42 錢包，自动发现您在 236+ 条链上持有的 NFT。';
+
+  @override
+  String get profileBindNftAvatar => '绑定 NFT 头像';
+
+  @override
+  String get profileChangeAvatar => '更换头像';
+
+  @override
+  String get groupTopics => '群话题';
+
+  @override
+  String get groupTopicsEmpty => '暂无话题';
+
+  @override
+  String get syncInProgress => '正在同步历史消息...';
+
+  @override
+  String get recoveryKeyReminderTitle => '保护您的消息';
+
+  @override
+  String get recoveryKeyReminderDesc => '创建恢复密钥以在多设备上安全同步加密消息';
+
+  @override
+  String get recoveryKeySetupNow => '立即设置';
+
+  @override
+  String get recoveryKeyRemindLater => '稍后提醒';
 }

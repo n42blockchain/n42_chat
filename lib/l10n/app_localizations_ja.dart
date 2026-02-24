@@ -5460,4 +5460,32 @@ class SJa extends S {
 
   @override
   String get nftPickerWalletHint => 'N42 ウォレットを接続して、236 以上のチェーンの NFT を自動検出します。';
+
+  @override
+  String get profileBindNftAvatar => 'NFTアバターをバインド';
+
+  @override
+  String get profileChangeAvatar => 'アバターを変更';
+
+  @override
+  String get groupTopics => 'トピック';
+
+  @override
+  String get groupTopicsEmpty => 'トピックがありません';
+
+  @override
+  String get syncInProgress => 'メッセージ履歴を同期中...';
+
+  @override
+  String get recoveryKeyReminderTitle => 'メッセージを保護';
+
+  @override
+  String get recoveryKeyReminderDesc =>
+      '複数のデバイスで暗号化されたメッセージを安全に同期するために回復キーを作成してください';
+
+  @override
+  String get recoveryKeySetupNow => '今すぐ設定';
+
+  @override
+  String get recoveryKeyRemindLater => '後で通知';
 }

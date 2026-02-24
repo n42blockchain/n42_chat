@@ -5564,4 +5564,32 @@ class SEs extends S {
   @override
   String get nftPickerWalletHint =>
       'Conecta tu wallet N42 para descubrir automáticamente tus NFT en 236+ cadenas.';
+
+  @override
+  String get profileBindNftAvatar => 'Vincular avatar NFT';
+
+  @override
+  String get profileChangeAvatar => 'Cambiar avatar';
+
+  @override
+  String get groupTopics => 'Temas';
+
+  @override
+  String get groupTopicsEmpty => 'Sin temas aún';
+
+  @override
+  String get syncInProgress => 'Sincronizando historial de mensajes...';
+
+  @override
+  String get recoveryKeyReminderTitle => 'Protege tus mensajes';
+
+  @override
+  String get recoveryKeyReminderDesc =>
+      'Crea una clave de recuperación para sincronizar mensajes cifrados en todos los dispositivos';
+
+  @override
+  String get recoveryKeySetupNow => 'Configurar ahora';
+
+  @override
+  String get recoveryKeyRemindLater => 'Recordar después';
 }

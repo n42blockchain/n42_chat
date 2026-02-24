@@ -18,15 +18,21 @@ import '../../blocs/conversation/conversation_bloc.dart';
 import '../../blocs/conversation/conversation_event.dart';
 import '../../blocs/conversation/conversation_state.dart';
 import '../../blocs/group/group_bloc.dart';
+import '../../blocs/on_chain_notification/on_chain_notification_bloc.dart';
+import '../../blocs/on_chain_notification/on_chain_notification_event.dart';
+import '../../blocs/on_chain_notification/on_chain_notification_state.dart';
 import '../../blocs/search/search_bloc.dart';
 import '../../blocs/story/story_bloc.dart';
 import '../../blocs/story/story_event.dart';
 import '../../blocs/story/story_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../widgets/common/sync_progress_overlay.dart';
+import '../../widgets/settings/recovery_key_reminder_dialog.dart';
 import '../../widgets/animations/fade_animation.dart';
 import '../../widgets/story/story_bar.dart';
 import '../contact/add_friend_page.dart';
 import '../group/create_group_page.dart';
+import '../notification/on_chain_notifications_page.dart';
 import '../qrcode/scan_qr_page.dart';
 import '../search/global_search_page.dart';
 import '../story/create_story_page.dart';
@@ -159,14 +165,34 @@ class _ConversationListPageState extends State<ConversationListPage> {
     final scaffold = Scaffold(
       backgroundColor: bgColor,
       appBar: widget.showAppBar ? _buildAppBar(isDark) : null,
-      body: _storyBloc != null
-          ? BlocProvider<StoryBloc>.value(
-              value: _storyBloc!,
-              child: _buildBody(isDark),
-            )
-          : _buildBody(isDark),
+      body: Stack(
+        children: [
+          _storyBloc != null
+              ? BlocProvider<StoryBloc>.value(
+                  value: _storyBloc!,
+                  child: _buildBody(isDark),
+                )
+              : _buildBody(isDark),
+          // P0.5: 恢复密钥提醒 Banner（底部固定）
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: const RecoveryKeyReminderBanner(),
+          ),
+          // P0.5: 首次同步进度覆盖层
+          const SyncProgressOverlay(),
+        ],
+      ),
     );
-    
+
+    // 用 BlocProvider 包装提供链上通知 Bloc（用于铃铛 Badge）
+    Widget result = BlocProvider<OnChainNotificationBloc>(
+      create: (_) => getIt<OnChainNotificationBloc>()
+        ..add(const LoadOnChainNotifications()),
+      child: scaffold,
+    );
+
     // 如果有 ContactBloc，用 BlocListener 包装来监听备注更新
     if (hasContactBloc) {
       return BlocListener<ContactBloc, ContactState>(
@@ -176,11 +202,11 @@ class _ConversationListPageState extends State<ConversationListPage> {
             if (mounted) setState(() {});
           }
         },
-        child: scaffold,
+        child: result,
       );
     }
-    
-    return scaffold;
+
+    return result;
   }
 
   /// 构建页面主体
@@ -419,6 +445,53 @@ class _ConversationListPageState extends State<ConversationListPage> {
           ),
         ),
         actions: [
+          // 链上通知铃铛（带未读 Badge）
+          BlocBuilder<OnChainNotificationBloc, OnChainNotificationState>(
+            builder: (context, notifState) {
+              final unread = notifState.unreadCount;
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.notifications_outlined,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
+                    ),
+                    tooltip: S.of(context)?.onChainNotificationsTitle ?? 'Notifications',
+                    onPressed: () {
+                      final bloc = context.read<OnChainNotificationBloc>();
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => BlocProvider<OnChainNotificationBloc>.value(
+                            value: bloc,
+                            child: const OnChainNotificationsPage(),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  if (unread > 0)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          unread > 99 ? '99+' : '$unread',
+                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           IconButton(
             icon: Icon(
               Icons.add_circle_outline,

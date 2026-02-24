@@ -10284,6 +10284,60 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'连接 N42 錢包，自动发现您在 236+ 条链上持有的 NFT。'**
   String get nftPickerWalletHint;
+
+  /// No description provided for @profileBindNftAvatar.
+  ///
+  /// In zh, this message translates to:
+  /// **'绑定 NFT 头像'**
+  String get profileBindNftAvatar;
+
+  /// No description provided for @profileChangeAvatar.
+  ///
+  /// In zh, this message translates to:
+  /// **'更换头像'**
+  String get profileChangeAvatar;
+
+  /// No description provided for @groupTopics.
+  ///
+  /// In zh, this message translates to:
+  /// **'群话题'**
+  String get groupTopics;
+
+  /// No description provided for @groupTopicsEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无话题'**
+  String get groupTopicsEmpty;
+
+  /// No description provided for @syncInProgress.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在同步历史消息...'**
+  String get syncInProgress;
+
+  /// No description provided for @recoveryKeyReminderTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'保护您的消息'**
+  String get recoveryKeyReminderTitle;
+
+  /// No description provided for @recoveryKeyReminderDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建恢复密钥以在多设备上安全同步加密消息'**
+  String get recoveryKeyReminderDesc;
+
+  /// No description provided for @recoveryKeySetupNow.
+  ///
+  /// In zh, this message translates to:
+  /// **'立即设置'**
+  String get recoveryKeySetupNow;
+
+  /// No description provided for @recoveryKeyRemindLater.
+  ///
+  /// In zh, this message translates to:
+  /// **'稍后提醒'**
+  String get recoveryKeyRemindLater;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
