@@ -46,6 +46,21 @@ extension _ChatPageAppBarMethods on _ChatPageState {
             tooltip: S.of(context)?.chatVideoCall ?? 'Video Call',
           ),
         ],
+        // 群聊：话题按钮（如果有子频道）
+        if (widget.conversation.isGroup)
+          IconButton(
+            icon: const Icon(Icons.forum_outlined),
+            tooltip: S.of(context)?.groupTopics ?? 'Topics',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => GroupTopicsPage(
+                    roomId: widget.conversation.id,
+                  ),
+                ),
+              );
+            },
+          ),
         if (getIt.isRegistered<IAiRepository>())
           IconButton(
             icon: const Icon(Icons.auto_awesome_outlined),

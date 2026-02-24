@@ -202,6 +202,26 @@ class ChatInputBarState extends State<ChatInputBar> {
         text: prefix,
         selection: TextSelection.collapsed(offset: prefix.length),
       );
+    } else if (item.command == 'price') {
+      // /price 需要参数，填入前缀让用户继续输入 token 符号
+      const prefix = '/price ';
+      _controller.value = TextEditingValue(
+        text: prefix,
+        selection: TextSelection.collapsed(offset: prefix.length),
+      );
+      _focusNode.requestFocus();
+    } else {
+      // /help, /balance, /chains 等无参数命令：直接填入并提交
+      final cmd = '/${item.command}';
+      _controller.value = TextEditingValue(
+        text: cmd,
+        selection: TextSelection.collapsed(offset: cmd.length),
+      );
+      // 延迟一帧后触发发送，让 UI 更新先行
+      Future<void>.microtask(() {
+        widget.onSendText?.call(cmd);
+        _controller.clear();
+      });
     }
   }
 

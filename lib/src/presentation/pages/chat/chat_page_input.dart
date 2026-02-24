@@ -16,6 +16,7 @@ extension _ChatPageInputMethods on _ChatPageState {
       onEmojiPressed: _onEmojiPressed,
       onMorePressed: _onMorePressed,
       onQuickReplyPressed: _onQuickReplyPressed,
+      onCommandPoll: _createPoll,
       onScheduledSend: (scheduledAt) {
         final text = _inputController.text.trim();
         if (text.isNotEmpty) {

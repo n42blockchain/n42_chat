@@ -5461,4 +5461,32 @@ class SKo extends S {
   @override
   String get nftPickerWalletHint =>
       'N42 지갑을 연결하여 236개 이상의 체인에서 NFT를 자동으로 검색하세요.';
+
+  @override
+  String get profileBindNftAvatar => 'NFT 아바타 연결';
+
+  @override
+  String get profileChangeAvatar => '아바타 변경';
+
+  @override
+  String get groupTopics => '주제';
+
+  @override
+  String get groupTopicsEmpty => '주제가 없습니다';
+
+  @override
+  String get syncInProgress => '메시지 기록 동기화 중...';
+
+  @override
+  String get recoveryKeyReminderTitle => '메시지를 보호하세요';
+
+  @override
+  String get recoveryKeyReminderDesc =>
+      '여러 기기에서 암호화된 메시지를 안전하게 동기화하려면 복구 키를 만드세요';
+
+  @override
+  String get recoveryKeySetupNow => '지금 설정';
+
+  @override
+  String get recoveryKeyRemindLater => '나중에 알림';
 }

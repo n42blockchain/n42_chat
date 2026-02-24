@@ -5561,4 +5561,32 @@ class SDe extends S {
   @override
   String get nftPickerWalletHint =>
       'Verbinden Sie Ihre N42-Wallet, um Ihre NFTs auf 236+ Ketten zu entdecken.';
+
+  @override
+  String get profileBindNftAvatar => 'NFT-Avatar verknüpfen';
+
+  @override
+  String get profileChangeAvatar => 'Avatar ändern';
+
+  @override
+  String get groupTopics => 'Themen';
+
+  @override
+  String get groupTopicsEmpty => 'Noch keine Themen';
+
+  @override
+  String get syncInProgress => 'Nachrichtenverlauf wird synchronisiert...';
+
+  @override
+  String get recoveryKeyReminderTitle => 'Schütze deine Nachrichten';
+
+  @override
+  String get recoveryKeyReminderDesc =>
+      'Erstelle einen Wiederherstellungsschlüssel, um verschlüsselte Nachrichten sicher auf mehreren Geräten zu synchronisieren';
+
+  @override
+  String get recoveryKeySetupNow => 'Jetzt einrichten';
+
+  @override
+  String get recoveryKeyRemindLater => 'Später erinnern';
 }

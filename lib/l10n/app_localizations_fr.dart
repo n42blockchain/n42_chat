@@ -5586,4 +5586,32 @@ class SFr extends S {
   @override
   String get nftPickerWalletHint =>
       'Connectez votre wallet N42 pour découvrir vos NFT sur 236+ chaînes.';
+
+  @override
+  String get profileBindNftAvatar => 'Lier un avatar NFT';
+
+  @override
+  String get profileChangeAvatar => 'Changer l avatar';
+
+  @override
+  String get groupTopics => 'Sujets';
+
+  @override
+  String get groupTopicsEmpty => 'Aucun sujet pour l instant';
+
+  @override
+  String get syncInProgress => 'Synchronisation de l historique...';
+
+  @override
+  String get recoveryKeyReminderTitle => 'Protégez vos messages';
+
+  @override
+  String get recoveryKeyReminderDesc =>
+      'Créez une clé de récupération pour synchroniser vos messages chiffrés sur plusieurs appareils';
+
+  @override
+  String get recoveryKeySetupNow => 'Configurer maintenant';
+
+  @override
+  String get recoveryKeyRemindLater => 'Me rappeler plus tard';
 }

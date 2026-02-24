@@ -5536,4 +5536,32 @@ class STr extends S {
   @override
   String get nftPickerWalletHint =>
       'N42 cüzdanınızı bağlayarak 236+ zincirde NFT\'lerinizi otomatik keşfedin.';
+
+  @override
+  String get profileBindNftAvatar => 'Bind NFT Avatar';
+
+  @override
+  String get profileChangeAvatar => 'Change Avatar';
+
+  @override
+  String get groupTopics => 'Topics';
+
+  @override
+  String get groupTopicsEmpty => 'No topics yet';
+
+  @override
+  String get syncInProgress => 'Syncing message history...';
+
+  @override
+  String get recoveryKeyReminderTitle => 'Protect your messages';
+
+  @override
+  String get recoveryKeyReminderDesc =>
+      'Create a recovery key to securely sync encrypted messages across devices';
+
+  @override
+  String get recoveryKeySetupNow => 'Set up now';
+
+  @override
+  String get recoveryKeyRemindLater => 'Remind me later';
 }
