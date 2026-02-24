@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_windowmanager/flutter_windowmanager.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 截图防护服务
@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// iOS: 目前无可靠的 API 级别截图拦截，暂不支持。
 class ScreenshotProtectionService {
   static const _prefKey = 'screenshot_protection_enabled';
+  static const _channel = MethodChannel('ai.n42.www/window_flags');
 
   static ScreenshotProtectionService? _instance;
 
@@ -58,11 +59,7 @@ class ScreenshotProtectionService {
   Future<void> _applyFlag(bool enable) async {
     if (!Platform.isAndroid) return;
     try {
-      if (enable) {
-        await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
-      } else {
-        await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
-      }
+      await _channel.invokeMethod<void>('setFlagSecure', enable);
     } catch (e) {
       debugPrint('ScreenshotProtectionService: Failed to apply FLAG_SECURE: $e');
     }
