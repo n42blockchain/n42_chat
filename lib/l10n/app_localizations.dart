@@ -9936,6 +9936,36 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'保存'**
   String get spacesSave;
+
+  /// No description provided for @settingsScreenshotProtection.
+  ///
+  /// In zh, this message translates to:
+  /// **'截图防护'**
+  String get settingsScreenshotProtection;
+
+  /// No description provided for @settingsScreenshotProtectionDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'防止截图和屏幕录制'**
+  String get settingsScreenshotProtectionDesc;
+
+  /// No description provided for @chatSelfDestructTimer.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅后即焚'**
+  String get chatSelfDestructTimer;
+
+  /// No description provided for @chatTimerPickerTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置阅后即焚时间'**
+  String get chatTimerPickerTitle;
+
+  /// No description provided for @chatTimerOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get chatTimerOff;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

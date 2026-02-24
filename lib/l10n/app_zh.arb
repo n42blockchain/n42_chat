@@ -2716,5 +2716,11 @@
   "spacesDemoteAdmin": "撤销管理员",
   "spacesInviteMember": "邀请成员",
   "spacesInviteMemberUserId": "用户 ID（如 @user:server.com）",
-  "spacesSave": "保存"
+  "spacesSave": "保存",
+  "settingsSecurity": "安全",
+  "settingsScreenshotProtection": "截图防护",
+  "settingsScreenshotProtectionDesc": "防止截图和屏幕录制",
+  "chatSelfDestructTimer": "阅后即焚",
+  "chatTimerPickerTitle": "设置阅后即焚时间",
+  "chatTimerOff": "关闭"
 }
