@@ -17,7 +17,18 @@ import '../../pages/settings/security_settings_page.dart';
 /// const RecoveryKeyReminderBanner()
 /// ```
 class RecoveryKeyReminderBanner extends StatefulWidget {
-  const RecoveryKeyReminderBanner({super.key});
+  const RecoveryKeyReminderBanner({
+    super.key,
+    this.keyBackupService,
+    this.initialShouldShow,
+  });
+
+  /// 可选依赖注入，为 null 时从 getIt 获取（测试时传入 mock）。
+  final KeyBackupService? keyBackupService;
+
+  /// 仅供测试使用：直接指定 banner 显示状态，跳过异步检查。
+  @visibleForTesting
+  final bool? initialShouldShow;
 
   @override
   State<RecoveryKeyReminderBanner> createState() =>
@@ -34,7 +45,13 @@ class _RecoveryKeyReminderBannerState
   @override
   void initState() {
     super.initState();
-    _checkBackupStatus();
+    if (widget.initialShouldShow != null) {
+      // 测试专用：直接使用指定状态，跳过异步检查
+      _shouldShow = widget.initialShouldShow!;
+      _checked = true;
+    } else {
+      _checkBackupStatus();
+    }
   }
 
   Future<void> _checkBackupStatus() async {
@@ -49,7 +66,8 @@ class _RecoveryKeyReminderBannerState
 
     // 检查密钥备份状态
     try {
-      final keyBackupService = getIt<KeyBackupService>();
+      final keyBackupService =
+          widget.keyBackupService ?? getIt<KeyBackupService>();
       final backupInfo = await keyBackupService.getBackupInfo();
       if (mounted) {
         setState(() {
