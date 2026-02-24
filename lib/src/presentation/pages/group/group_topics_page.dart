@@ -118,7 +118,7 @@ class _GroupTopicsBody extends StatelessWidget {
                         // 普通话题
                         if (regular.isNotEmpty) ...[
                           if (pinned.isNotEmpty)
-                            _buildSectionHeader(context, isDark, Icons.tag, 'Topics'),
+                            _buildSectionHeader(context, isDark, Icons.tag, l10n?.groupTopics ?? 'Topics'),
                           ...regular.map((c) => _buildTopicTile(context, c, isDark)),
                         ],
 
@@ -348,6 +348,9 @@ class _GroupTopicsBody extends StatelessWidget {
           ),
         );
       },
-    );
+    ).whenComplete(() {
+      nameController.dispose();
+      topicController.dispose();
+    });
   }
 }
