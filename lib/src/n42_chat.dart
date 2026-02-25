@@ -284,6 +284,19 @@ class N42Chat {
     debugPrint('N42Chat: Initialized successfully');
     _initCompleter!.complete();
     } catch (e) {
+      debugPrint('N42Chat: Initialization failed, cleaning up: $e');
+      // 清理已分配资源，使外部调用方可以重新初始化
+      try {
+        await _authBloc?.close();
+        _authBloc = null;
+      } catch (_) {}
+      try {
+        if (getIt.isRegistered<N42ChatConfig>()) {
+          await resetDependencies();
+        }
+      } catch (_) {}
+      _initialized = false;
+      _config = null;
       _initCompleter!.completeError(e);
       rethrow;
     } finally {

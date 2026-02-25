@@ -58,17 +58,34 @@ class SecureStorageDataSource {
       final data = await _storage.read(key: _keySession);
       if (data == null) return null;
 
-      final json = jsonDecode(data) as Map<String, dynamic>;
+      late final Map<String, dynamic> json;
+      try {
+        json = jsonDecode(data) as Map<String, dynamic>;
+      } on FormatException catch (e) {
+        debugPrint('SecureStorage: Session data corrupted (JSON), clearing: $e');
+        await _storage.delete(key: _keySession);
+        return null;
+      }
+
+      // 使用可空转型（as String?），字段缺失时返回 null 而非抛 TypeError
+      final homeserver = json['homeserver'] as String?;
+      final accessToken = json['accessToken'] as String?;
+      final userId = json['userId'] as String?;
+      final deviceId = json['deviceId'] as String?;
+
+      if (homeserver == null || accessToken == null ||
+          userId == null || deviceId == null) {
+        debugPrint('SecureStorage: Session data incomplete (missing required fields), clearing');
+        await _storage.delete(key: _keySession);
+        return null;
+      }
+
       return {
-        'homeserver': json['homeserver'] as String,
-        'accessToken': json['accessToken'] as String,
-        'userId': json['userId'] as String,
-        'deviceId': json['deviceId'] as String,
+        'homeserver': homeserver,
+        'accessToken': accessToken,
+        'userId': userId,
+        'deviceId': deviceId,
       };
-    } on FormatException catch (e) {
-      debugPrint('SecureStorage: Session data corrupted, clearing: $e');
-      await _storage.delete(key: _keySession);
-      return null;
     } catch (e) {
       debugPrint('SecureStorage: Failed to read session - $e');
       return null;

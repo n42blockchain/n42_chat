@@ -1065,11 +1065,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         return;
       }
 
+      final accessToken = session['accessToken'];
+      final userId = session['userId'];
+      final deviceId = session['deviceId'];
+
+      if (accessToken == null || userId == null || deviceId == null) {
+        emit(state.copyWith(
+          status: AuthStatus.unauthenticated,
+          errorMessage: '会话数据不完整，请重新登录',
+        ));
+        return;
+      }
+
       final result = await _authRepository.loginWithToken(
         homeserver: session['homeserver'] ?? credentials['homeserver'] ?? '',
-        accessToken: session['accessToken']!,
-        userId: session['userId']!,
-        deviceId: session['deviceId']!,
+        accessToken: accessToken,
+        userId: userId,
+        deviceId: deviceId,
       );
 
       if (result.success && result.user != null) {

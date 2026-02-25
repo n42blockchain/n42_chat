@@ -448,30 +448,31 @@ void main() {
 
   group('AuthChangePasswordRequested', () {
     test('stores old and new password', () {
-      const e = AuthChangePasswordRequested(
+      final e = AuthChangePasswordRequested(
         oldPassword: 'old123', newPassword: 'new456');
       expect(e.oldPassword, 'old123');
       expect(e.newPassword, 'new456');
     });
 
-    test('same fields → equal', () {
+    // 每个实例含唯一 _id，两次构造永远不相等（防止 BLoC Equatable 去重）
+    test('same fields → NOT equal (each instance is unique)', () {
       expect(
-        const AuthChangePasswordRequested(oldPassword: 'o', newPassword: 'n'),
-        equals(const AuthChangePasswordRequested(
-          oldPassword: 'o', newPassword: 'n')),
+        AuthChangePasswordRequested(oldPassword: 'o', newPassword: 'n'),
+        isNot(equals(AuthChangePasswordRequested(
+          oldPassword: 'o', newPassword: 'n'))),
       );
     });
 
     test('different newPassword → not equal', () {
       expect(
-        const AuthChangePasswordRequested(oldPassword: 'o', newPassword: 'a'),
-        isNot(equals(const AuthChangePasswordRequested(
+        AuthChangePasswordRequested(oldPassword: 'o', newPassword: 'a'),
+        isNot(equals(AuthChangePasswordRequested(
           oldPassword: 'o', newPassword: 'b'))),
       );
     });
 
     test('is an AuthEvent', () {
-      expect(const AuthChangePasswordRequested(
+      expect(AuthChangePasswordRequested(
         oldPassword: 'o', newPassword: 'n'), isA<AuthEvent>());
     });
   });

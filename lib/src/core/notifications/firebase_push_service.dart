@@ -128,8 +128,10 @@ class FirebasePushService implements IPushNotificationService {
 
   /// 设置通话状态（通话期间禁用所有消息通知）
   void setInCall(bool inCall) {
-    _isInCall = inCall;
+    // 先取消旧 timer，再修改状态，避免 timer 回调读到新状态后立即重置
     _callStateResetTimer?.cancel();
+    _callStateResetTimer = null;
+    _isInCall = inCall;
     if (inCall) {
       // 安全机制：10 分钟后自动重置，防止状态泄漏
       // （正常通话会由 CallManager 主动调用 setInCall(false)）
@@ -197,6 +199,15 @@ class FirebasePushService implements IPushNotificationService {
       _isInitialized = true;
     } catch (e) {
       debugPrint('N42Chat: Failed to initialize push service: $e');
+      // 清理已创建的订阅，防止资源泄漏
+      await _foregroundSubscription?.cancel();
+      _foregroundSubscription = null;
+      await _messageOpenedSubscription?.cancel();
+      _messageOpenedSubscription = null;
+      await _tokenRefreshSubscription?.cancel();
+      _tokenRefreshSubscription = null;
+      await _syncSubscription?.cancel();
+      _syncSubscription = null;
     }
   }
 
@@ -563,9 +574,13 @@ class FirebasePushService implements IPushNotificationService {
 
   /// 处理通知点击
   void _handleNotificationTap(RemoteMessage message) {
-    final roomId = message.data['room_id'] as String?;
-    final eventId = message.data['event_id'] as String?;
-    onNotificationTap?.call(roomId, eventId);
+    try {
+      final roomId = message.data['room_id'] as String?;
+      final eventId = message.data['event_id'] as String?;
+      onNotificationTap?.call(roomId, eventId);
+    } catch (e) {
+      debugPrint('FirebasePushService: Error in notification tap handler: $e');
+    }
   }
 
   /// 本地通知点击响应
@@ -735,7 +750,8 @@ class FirebasePushService implements IPushNotificationService {
   @override
   Future<void> registerForPush() async {
     if (_isRegistering) {
-      debugPrint('[PUSH_REG] Push registration already in progress, skipping');
+      debugPrint('[PUSH_REG] Push registration already in progress, waiting...');
+      await _registrationCompleter?.future;
       return;
     }
     _isRegistering = true;

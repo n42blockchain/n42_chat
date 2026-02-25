@@ -81,10 +81,18 @@ class MatrixClientManager {
     // 如果强制重新初始化，先清理旧的客户端
     if (forceReinit && _client != null) {
       debugPrint('MatrixClientManager: Force reinitializing, disposing old client...');
+      // 若有进行中的 Completer，先令其以错误终止，避免等待者永久挂起
+      if (_initCompleter != null && !_initCompleter!.isCompleted) {
+        _initCompleter!.completeError(
+          StateError('MatrixClientManager: Interrupted by forceReinit'),
+        );
+      }
+      _initCompleter = null;
+      _isInitializing = false;
       try {
         await _client!.dispose();
       } catch (e) {
-        debugPrint('Error: $e');
+        debugPrint('MatrixClientManager: Error disposing old client: $e');
       }
       _client = null;
       _isInitialized = false;

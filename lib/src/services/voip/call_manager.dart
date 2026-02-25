@@ -117,12 +117,16 @@ class CallManager {
     // 检查是否有在 app 冷启动期间（CallManager 尚未就绪时）用户已点击接听的缓存事件。
     // 若有，设置 _pendingAnswer 标志，待 Matrix 邀请到达时自动接听。
     unawaited(Future.microtask(() async {
-      final pending = _notificationService.consumePendingAcceptAction();
-      if (pending != null) {
-        final (_, callInfo) = pending;
-        debugPrint('CallManager: Found pending accept action from ${callInfo.callerName} '
-            '(fired before CallManager was ready), setting _pendingAnswer=true');
-        _pendingAnswer = true;
+      try {
+        final pending = _notificationService.consumePendingAcceptAction();
+        if (pending != null) {
+          final (_, callInfo) = pending;
+          debugPrint('CallManager: Found pending accept action from ${callInfo.callerName}, '
+              'setting _pendingAnswer=true');
+          _pendingAnswer = true;
+        }
+      } catch (e) {
+        debugPrint('CallManager: Error checking pending accept action: $e');
       }
 
       // 同时检查系统中是否有活跃的 CallKit 通话记录
@@ -531,7 +535,15 @@ class CallManager {
       if (retryCount < 10) {
         debugPrint('CallManager: Context null, retrying in 1s (attempt ${retryCount + 1}/10)');
         Future.delayed(const Duration(seconds: 1), () {
-          _navigateToCallScreen(isIncoming: isIncoming, session: session, retryCount: retryCount + 1);
+          if (_isInitialized) {
+            _navigateToCallScreen(
+              isIncoming: isIncoming,
+              session: session,
+              retryCount: retryCount + 1,
+            );
+          } else {
+            debugPrint('CallManager: Retry cancelled - CallManager was disposed');
+          }
         });
       } else {
         debugPrint('CallManager: ERROR - navigatorKey.currentContext still null after 10 retries (10s)');
