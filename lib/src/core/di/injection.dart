@@ -106,7 +106,7 @@ Future<void> configureDependencies(N42ChatConfig config, {IWalletBridge? walletB
   );
 
   // 注册服务
-  await _registerServices();
+  await _registerServices(config);
 
   // 注册数据源
   await _registerDataSources();
@@ -139,15 +139,15 @@ Future<void> _initializeRemarkService() async {
 }
 
 /// 注册服务
-Future<void> _registerServices() async {
+Future<void> _registerServices(N42ChatConfig config) async {
   // Matrix客户端管理器
   final clientManager = MatrixClientManager.instance;
-  
+
   // 尝试初始化 Matrix 客户端（包括 Hive 数据库）
   // 如果失败，允许后续在登录/注册时再次尝试
   if (!clientManager.isInitialized) {
     try {
-      await clientManager.initialize();
+      await clientManager.initialize(config: config);
     } catch (e) {
       // 初始化失败时记录错误，但不阻塞依赖注入
       // 后续在登录/注册时会再次尝试初始化
@@ -166,7 +166,6 @@ Future<void> _registerServices() async {
   getIt.registerSingleton<VoiceService>(voiceService);
 
   // Giphy 服务 (仅当配置了 API Key 时注册)
-  final config = getIt<N42ChatConfig>();
   if (config.giphyApiKey != null && config.giphyApiKey!.isNotEmpty) {
     getIt.registerLazySingleton<GiphyService>(
       () => GiphyService(
@@ -315,6 +314,7 @@ Future<void> _registerDataSources() async {
   getIt.registerLazySingleton<MatrixAuthDataSource>(
     () => MatrixAuthDataSource(
       clientManager: getIt<MatrixClientManager>(),
+      secureStorage: getIt<SecureStorageDataSource>(),
     ),
   );
 
@@ -525,8 +525,9 @@ void _registerUseCases() {
 
 /// 注册BLoC
 void _registerBlocs() {
-  // 认证BLoC - 使用Factory模式，每次获取新实例
-  getIt.registerFactory<AuthBloc>(
+  // 认证BLoC - 使用 LazySingleton，保持与 N42Chat._authBloc 引用一致
+  // 如需重置（重新登录），由 resetDependencies() 统一处理
+  getIt.registerLazySingleton<AuthBloc>(
     () => AuthBloc(authRepository: getIt<IAuthRepository>()),
   );
 

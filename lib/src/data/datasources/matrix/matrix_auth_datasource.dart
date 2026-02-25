@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart';
+import 'package:uuid/uuid.dart';
 
+import '../local/secure_storage_datasource.dart';
 import 'matrix_client_manager.dart';
 
 /// Matrix认证数据源
@@ -9,10 +11,13 @@ import 'matrix_client_manager.dart';
 /// 封装Matrix SDK的认证相关操作
 class MatrixAuthDataSource {
   final MatrixClientManager _clientManager;
+  final SecureStorageDataSource? _secureStorage;
 
   MatrixAuthDataSource({
     MatrixClientManager? clientManager,
-  }) : _clientManager = clientManager ?? MatrixClientManager.instance;
+    SecureStorageDataSource? secureStorage,
+  })  : _clientManager = clientManager ?? MatrixClientManager.instance,
+        _secureStorage = secureStorage;
 
   /// 获取客户端管理器
   MatrixClientManager get clientManager => _clientManager;
@@ -241,13 +246,13 @@ class MatrixAuthDataSource {
     await client.checkHomeserver(homeserverUri);
 
     try {
-      // Matrix SDK 可能没有直接的 usernameAvailable 方法
-      // 通过尝试注册来检查用户名是否可用
-      // 这里简化处理，返回 true
-      return true;
-    } catch (e) {
-      // 用户名不可用会抛出异常
-      return false;
+      final available = await client.checkUsernameAvailability(username);
+      return available ?? true;
+    } on MatrixException catch (e) {
+      if (e.errcode == 'M_USER_IN_USE' || e.errcode == 'M_FORBIDDEN') {
+        return false;
+      }
+      rethrow;
     }
   }
 
@@ -362,8 +367,8 @@ class MatrixAuthDataSource {
       final homeserverUri = Uri.parse(homeserver);
       await client.checkHomeserver(homeserverUri);
 
-      // 生成唯一的 client_secret
-      final clientSecret = 'n42_${DateTime.now().millisecondsSinceEpoch}_${email.hashCode.abs()}';
+      // 生成唯一的 client_secret（UUID v4，不可预测）
+      final clientSecret = const Uuid().v4();
 
       // 调用 Matrix API 请求密码重置邮件
       // 注意：这需要服务器配置了 SMTP 发送邮件
@@ -373,7 +378,11 @@ class MatrixAuthDataSource {
         1, // sendAttempt
       );
 
-      debugPrint('MatrixAuthDataSource: Password reset email requested, sid: ${response.sid}');
+      // 持久化 clientSecret 和 sid，供 confirmPasswordReset 使用
+      await _secureStorage?.write('pwd_reset_secret', clientSecret);
+      await _secureStorage?.write('pwd_reset_sid', response.sid);
+
+      debugPrint('MatrixAuthDataSource: Password reset email requested');
       return true;
     } on MatrixException catch (e) {
       debugPrint('MatrixAuthDataSource: Request password reset email failed: $e');
@@ -412,20 +421,25 @@ class MatrixAuthDataSource {
       final homeserverUri = Uri.parse(homeserver);
       await client.checkHomeserver(homeserverUri);
 
-      // Matrix 标准流程：邮件验证后使用 session token 设置新密码
-      // 这里需要服务端实现验证码验证逻辑
-      // 简化实现：直接调用设置密码 API
+      // 从安全存储读取之前请求时保存的 clientSecret 和 sid
+      final clientSecret = await _secureStorage?.read('pwd_reset_secret')
+          ?? const Uuid().v4();
+      final savedSid = await _secureStorage?.read('pwd_reset_sid') ?? code;
 
-      // 创建邮箱验证认证数据
+      // 创建邮箱验证认证数据（使用与请求时相同的 clientSecret）
       final auth = AuthenticationThreePidCreds(
         type: 'm.login.email.identity',
         threepidCreds: ThreepidCreds(
-          sid: code, // 使用验证码作为 session id
-          clientSecret: 'n42_reset_${email.hashCode.abs()}',
+          sid: savedSid,
+          clientSecret: clientSecret,
         ),
       );
 
       await client.changePassword(newPassword, auth: auth);
+
+      // 清除已用的重置凭据
+      await _secureStorage?.delete('pwd_reset_secret');
+      await _secureStorage?.delete('pwd_reset_sid');
 
       debugPrint('MatrixAuthDataSource: Password reset confirmed');
       return true;

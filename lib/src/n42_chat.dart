@@ -239,7 +239,8 @@ class N42Chat {
     // 初始化依赖注入
     await configureDependencies(config);
 
-    // 创建全局 AuthBloc 并尝试恢复会话
+    // 创建全局 AuthBloc 并尝试恢复会话（防御性关闭旧实例）
+    await _authBloc?.close();
     _authBloc = getIt<AuthBloc>();
     _authBloc!.add(const AuthRestoreSessionRequested());
 
@@ -770,14 +771,19 @@ class N42Chat {
   /// [password] 密码
   ///
   /// 抛出 [N42ChatException] 当登录失败时
+  ///
+  /// **注意**：此 API 为预留接口，当前版本请通过 [AuthBloc] 完成认证流程。
+  /// 直接调用会抛出 [UnimplementedError]。
   static Future<void> login({
     required String homeserver,
     required String username,
     required String password,
   }) async {
     _ensureInitialized();
-    // TODO: 实现Matrix登录
-    debugPrint('N42Chat: Login - $username@$homeserver');
+    throw UnimplementedError(
+      'N42Chat.login() is not implemented. '
+      'Use AuthBloc to authenticate instead.',
+    );
   }
 
   /// 使用已有Token登录
@@ -788,6 +794,9 @@ class N42Chat {
   /// [accessToken] 访问令牌
   /// [userId] 用户ID (格式: @user:server.com)
   /// [deviceId] 设备ID
+  ///
+  /// **注意**：此 API 为预留接口，当前版本请通过 [AuthBloc] 完成认证流程。
+  /// 直接调用会抛出 [UnimplementedError]。
   static Future<void> loginWithToken({
     required String homeserver,
     required String accessToken,
@@ -795,17 +804,24 @@ class N42Chat {
     required String deviceId,
   }) async {
     _ensureInitialized();
-    // TODO: 实现Token登录
-    debugPrint('N42Chat: Login with token - $userId');
+    throw UnimplementedError(
+      'N42Chat.loginWithToken() is not implemented. '
+      'Use AuthBloc to authenticate instead.',
+    );
   }
 
   /// 登出当前用户
   ///
   /// 清除本地会话数据和缓存
+  ///
+  /// **注意**：此 API 为预留接口，当前版本请通过 [AuthBloc] 完成认证流程。
+  /// 直接调用会抛出 [UnimplementedError]。
   static Future<void> logout() async {
     _ensureInitialized();
-    // TODO: 实现登出
-    debugPrint('N42Chat: Logout');
+    throw UnimplementedError(
+      'N42Chat.logout() is not implemented. '
+      'Use AuthBloc to authenticate instead.',
+    );
   }
 
   /// 是否已登录
@@ -945,13 +961,37 @@ class N42Chat {
 
   /// 释放资源
   ///
-  /// 在应用退出前调用
+  /// 在应用退出前调用，完整清理所有持有的资源
   static Future<void> dispose() async {
     if (!_initialized) return;
 
-    // TODO: 停止同步
-    // TODO: 关闭数据库连接
-    // TODO: 清理资源
+    // 1. 关闭 AuthBloc（取消 loginStateStream 订阅）
+    await _authBloc?.close();
+    _authBloc = null;
+
+    // 2. 停止 VoIP 通话管理器
+    try {
+      final callManager = getIt<CallManager>();
+      await callManager.dispose();
+    } catch (_) {}
+    _callManager = null;
+
+    // 3. 释放推送服务
+    await _pushService?.dispose();
+    _pushService = null;
+
+    // 4. 停止 Matrix 同步 + 关闭数据库
+    try {
+      final clientManager = getIt<MatrixClientManager>();
+      clientManager.stopSync();
+      final matrixClient = clientManager.client;
+      if (matrixClient != null) {
+        await matrixClient.database.close();
+      }
+    } catch (_) {}
+
+    // 5. 重置依赖注入容器
+    await resetDependencies();
 
     _initialized = false;
     _config = null;

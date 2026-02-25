@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -427,14 +428,28 @@ class AuthRepositoryImpl implements IAuthRepository {
 
       final baseUrl = discoveryInfo?.mHomeserver.baseUrl.toString() ?? homeserver;
 
+      // 探测服务器是否开放注册：尝试查询用户名可用性
+      // 200 → 开放注册；403 M_FORBIDDEN → 禁止注册；其他异常默认允许
+      bool supportsRegistration = true;
+      try {
+        await _authDataSource.clientManager.client
+            ?.checkUsernameAvailability('_probe_test');
+      } on MatrixException catch (e) {
+        if (e.errcode == 'M_FORBIDDEN') {
+          supportsRegistration = false;
+        }
+      } catch (_) {
+        // 网络错误等不影响其他功能，默认 true
+      }
+
       return HomeserverInfo(
         serverName: baseUrl,
-        serverVersion: versionsResponse.versions.isNotEmpty 
-            ? versionsResponse.versions.last 
+        serverVersion: versionsResponse.versions.isNotEmpty
+            ? versionsResponse.versions.last
             : '',
         supportedLoginTypes:
             loginFlows.map((f) => f.type).whereType<String>().toList(),
-        supportsRegistration: true, // 假设支持，实际需要检查
+        supportsRegistration: supportsRegistration,
       );
     } catch (e) {
       debugPrint('AuthRepository: Check homeserver failed - $e');
@@ -660,10 +675,8 @@ class AuthRepositoryImpl implements IAuthRepository {
         'n42.user.profile',
       );
 
-      debugPrint('AuthRepository: Got account data: $data');
-
       _cachedProfileData = data;
-      debugPrint('AuthRepository: Cached profile data - pokeText: ${data['pokeText']}');
+      debugPrint('AuthRepository: Profile data loaded (${data.keys.length} fields)');
       return data;
     } catch (e) {
       debugPrint('AuthRepository: Get profile data failed - $e');
@@ -820,16 +833,12 @@ class AuthRepositoryImpl implements IAuthRepository {
         }
       }
 
-      // 如果没有 Matrix 凭证，创建一个临时用户实体
-      // 实际应用中可能需要进一步处理
-      final user = UserEntity(
-        userId: response.matrixUserId ?? '@${response.uuid}:n42.network',
-        displayName: response.nickname ?? displayName ?? email?.split('@').first ?? 'User',
-        avatarUrl: response.avatar,
+      // 社交登录未返回 Matrix 凭证，无法建立 Matrix 会话
+      debugPrint('AuthRepository: Social login missing Matrix credentials');
+      return AuthResult.failure(
+        '社交登录成功但未获得 Matrix 凭证，请联系客服',
+        type: AuthErrorType.serverError,
       );
-
-      debugPrint('AuthRepository: Social login successful - ${user.userId}');
-      return AuthResult.success(user);
     } catch (e) {
       debugPrint('AuthRepository: Social login failed - $e');
       return AuthResult.failure(
@@ -902,8 +911,8 @@ class AuthRepositoryImpl implements IAuthRepository {
         throw StateError('User ID not available');
       }
 
-      // 生成 client_secret 用于验证流程
-      final clientSecret = 'n42_email_${DateTime.now().millisecondsSinceEpoch}_${newEmail.hashCode.abs()}';
+      // 生成 client_secret 用于验证流程（UUID v4，不可预测）
+      final clientSecret = const Uuid().v4();
 
       // 保存 client_secret 以便后续确认使用
       await _secureStorage.write('email_change_secret', clientSecret);
@@ -952,13 +961,15 @@ class AuthRepositoryImpl implements IAuthRepository {
         throw Exception('未找到邮箱验证会话，请重新请求验证码');
       }
 
-      // 使用验证码完成 3PID 绑定
-      // 注意：Matrix 标准 3PID 绑定需要 identity server 支持
-      // 这里简化处理，直接确认邮箱变更
-      // TODO: 实现完整的 3PID 绑定流程
-
-      // 验证验证码（通过后端 API 或 Matrix UIA 流程）
-      debugPrint('AuthRepository: Verifying email with code: $code, sid: $sid');
+      // 调用 Matrix add3PID 完成 3PID 邮箱绑定
+      try {
+        await client.add3PID(clientSecret, sid);
+      } on MatrixException catch (e) {
+        if (e.errcode == 'M_THREEPID_AUTH_FAILED') {
+          throw Exception('邮箱验证失败，请检查验证码是否正确');
+        }
+        rethrow;
+      }
 
       // 清除临时保存的验证信息
       await _secureStorage.delete('email_change_secret');

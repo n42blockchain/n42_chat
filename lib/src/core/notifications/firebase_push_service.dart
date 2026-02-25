@@ -77,11 +77,19 @@ class FirebasePushService implements IPushNotificationService {
   /// 推送注册锁（防止并发注册）
   bool _isRegistering = false;
 
+  /// 当前注册完成通知器（供 forceReRegister 等待）
+  Completer<void>? _registrationCompleter;
+
   /// Pusher 是否已通过服务端验证
   bool _isPusherVerified = false;
 
   /// 通知配置
   NotificationConfig _notificationConfig = const NotificationConfig();
+
+  /// 通知 ID 计数器（避免时间戳碰撞）
+  static int _notificationIdCounter = 0;
+  static int _nextNotificationId() =>
+      (_notificationIdCounter++ & 0x7FFFFFFF);
 
   /// 当前活跃的房间 ID（用户正在查看的房间不弹通知）
   String? _activeRoomId;
@@ -467,8 +475,8 @@ class FirebasePushService implements IPushNotificationService {
         'event_id': eventId,
       });
 
-      // 使用时间戳生成唯一通知 ID
-      final notificationId = DateTime.now().millisecondsSinceEpoch % 2147483647;
+      // 使用原子计数器生成唯一通知 ID（避免时间戳在同一毫秒内碰撞）
+      final notificationId = _nextNotificationId();
 
       final androidDetails = AndroidNotificationDetails(
         _channel.id,
@@ -727,11 +735,14 @@ class FirebasePushService implements IPushNotificationService {
       return;
     }
     _isRegistering = true;
+    _registrationCompleter = Completer<void>();
     debugPrint('[PUSH_REG] Starting push registration...');
     try {
       await _registerForPushImpl();
     } finally {
       _isRegistering = false;
+      _registrationCompleter?.complete();
+      _registrationCompleter = null;
       debugPrint('[PUSH_REG] Push registration flow completed (verified=$_isPusherVerified)');
     }
   }
@@ -891,10 +902,10 @@ class FirebasePushService implements IPushNotificationService {
     debugPrint('[PUSH_REG] Force re-register requested');
     _isPusherVerified = false;
 
-    // 如果正在注册中，等待其完成后再触发（避免并发竞态）
-    while (_isRegistering) {
+    // 如果正在注册中，等待其完成后再触发（Completer 替代 busy-wait）
+    if (_isRegistering) {
       debugPrint('[PUSH_REG] Waiting for current registration to complete before force re-register...');
-      await Future<void>.delayed(const Duration(milliseconds: 500));
+      await _registrationCompleter?.future;
     }
 
     await registerForPush();
@@ -953,8 +964,8 @@ class FirebasePushService implements IPushNotificationService {
         'event_id': eventId,
       });
 
-      // 使用时间戳生成唯一通知 ID
-      final notificationId = DateTime.now().millisecondsSinceEpoch % 2147483647;
+      // 使用原子计数器生成唯一通知 ID（避免时间戳在同一毫秒内碰撞）
+      final notificationId = _nextNotificationId();
 
       // Android 通知详情
       final androidDetails = AndroidNotificationDetails(
