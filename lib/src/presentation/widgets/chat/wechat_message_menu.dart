@@ -448,14 +448,22 @@ class WeChatMessageMenu extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: color, size: 24),
+              Icon(icon, color: color, size: 22),
               const SizedBox(height: 5),
-              Text(
-                label,
-                style: TextStyle(color: color, fontSize: 11),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              // FittedBox: 先尝试最多两行；若仍放不下则等比缩小字号，
+              // 避免出现截断省略号，也适配多语言较长译文。
+              SizedBox(
+                height: 28,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    label,
+                    style: TextStyle(color: color, fontSize: 11),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                  ),
+                ),
               ),
             ],
           ),
