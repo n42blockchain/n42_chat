@@ -507,29 +507,35 @@ class _ConversationListPageState extends State<ConversationListPage> {
   Widget _buildSearchBar(bool isDark) {
     return Container(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: GestureDetector(
         onTap: widget.onSearchTap ?? _navigateToSearch,
         child: Container(
-          height: 36,
+          height: 40,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7),
-            borderRadius: BorderRadius.circular(8),
+            color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF0F0F5),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.06)
+                  : Colors.black.withValues(alpha: 0.06),
+              width: 1,
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.search,
-                size: 20,
-                color: isDark ? Colors.white54 : Colors.black45,
+                Icons.search_rounded,
+                size: 18,
+                color: isDark ? Colors.white38 : Colors.black38,
               ),
               const SizedBox(width: 6),
               Text(
                 S.of(context)?.commonSearch ?? 'Search',
                 style: TextStyle(
                   fontSize: 15,
-                  color: isDark ? Colors.white54 : Colors.black45,
+                  color: isDark ? Colors.white38 : Colors.black38,
                 ),
               ),
             ],
