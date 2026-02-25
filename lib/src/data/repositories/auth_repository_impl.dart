@@ -23,6 +23,8 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   // 防止认证流程中的 SDK 状态变化触发误报登出
   bool _isAuthenticating = false;
+  // 并发登录互斥
+  Completer<void>? _authInProgress;
 
   AuthRepositoryImpl({
     MatrixAuthDataSource? authDataSource,
@@ -76,6 +78,10 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String password,
     bool rememberMe = true,
   }) async {
+    if (_authInProgress != null && !_authInProgress!.isCompleted) {
+      return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+    }
+    _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
       // 登录
@@ -109,7 +115,6 @@ class AuthRepositoryImpl implements IAuthRepository {
         await _secureStorage.saveCredentials(
           homeserver: homeserver,
           username: username,
-          password: password,
         );
         debugPrint('AuthRepository: Credentials saved for auto-login');
       } else {
@@ -147,6 +152,8 @@ class AuthRepositoryImpl implements IAuthRepository {
       );
     } finally {
       _isAuthenticating = false;
+      _authInProgress?.complete();
+      _authInProgress = null;
       _startMonitoringLoginState();
     }
   }
@@ -158,6 +165,10 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String userId,
     required String deviceId,
   }) async {
+    if (_authInProgress != null && !_authInProgress!.isCompleted) {
+      return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+    }
+    _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
       await _authDataSource.loginWithToken(
@@ -198,12 +209,18 @@ class AuthRepositoryImpl implements IAuthRepository {
       );
     } finally {
       _isAuthenticating = false;
+      _authInProgress?.complete();
+      _authInProgress = null;
       _startMonitoringLoginState();
     }
   }
 
   @override
   Future<AuthResult> restoreSession() async {
+    if (_authInProgress != null && !_authInProgress!.isCompleted) {
+      return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+    }
+    _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
       // 快速路径：Matrix SDK 在 initialize() 时已从自身 SQLite DB 加载了会话
@@ -274,33 +291,8 @@ class AuthRepositoryImpl implements IAuthRepository {
         }
       }
 
-      // Token 恢复失败，尝试使用保存的凭据重新登录
-      final credentials = await _secureStorage.getCredentials();
-      if (credentials != null) {
-        final homeserver = credentials['homeserver'];
-        final username = credentials['username'];
-        final password = credentials['password'];
-
-        if (homeserver != null && username != null && password != null) {
-          debugPrint('AuthRepository: Trying auto-login with credentials...');
-          final result = await login(
-            homeserver: homeserver,
-            username: username,
-            password: password,
-            rememberMe: true,
-          );
-
-          if (result.success) {
-            debugPrint('AuthRepository: Auto-login successful');
-            return result;
-          }
-
-          debugPrint('AuthRepository: Auto-login failed: ${result.errorMessage}');
-        }
-      }
-
-      // 既没有有效的 token，也没有有效的凭据
-      debugPrint('AuthRepository: No valid session or credentials found');
+      // Token 恢复失败，要求重新认证（仿微信策略：不自动重试密码登录）
+      debugPrint('AuthRepository: No valid session found, re-authentication required');
       return AuthResult.notLoggedIn();
     } catch (e) {
       debugPrint('AuthRepository: Restore session failed - $e');
@@ -310,6 +302,8 @@ class AuthRepositoryImpl implements IAuthRepository {
       );
     } finally {
       _isAuthenticating = false;
+      _authInProgress?.complete();
+      _authInProgress = null;
       _startMonitoringLoginState();
     }
   }
@@ -519,6 +513,10 @@ class AuthRepositoryImpl implements IAuthRepository {
       final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
 
       if (serverName.isEmpty || mediaId.isEmpty) return null;
+      if (serverName.contains('/') || serverName.contains('..')) {
+        debugPrint('AuthRepository: Rejected invalid mxc serverName');
+        return null;
+      }
 
       final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) return null;
@@ -925,8 +923,12 @@ class AuthRepositoryImpl implements IAuthRepository {
         1, // sendAttempt
       );
 
-      // 保存 session ID 用于后续确认
+      // 保存 session ID 和过期时间用于后续确认
       await _secureStorage.write('email_change_sid', response.sid);
+      await _secureStorage.write(
+        'email_change_expires_at',
+        DateTime.now().add(const Duration(hours: 1)).toIso8601String(),
+      );
 
       debugPrint('AuthRepository: Email verification sent, sid: ${response.sid}');
       return true;
@@ -961,6 +963,19 @@ class AuthRepositoryImpl implements IAuthRepository {
         throw Exception('未找到邮箱验证会话，请重新请求验证码');
       }
 
+      // 检查验证码是否已过期（1 小时有效期）
+      final expiresAtStr = await _secureStorage.read('email_change_expires_at');
+      if (expiresAtStr != null) {
+        final expiresAt = DateTime.tryParse(expiresAtStr);
+        if (expiresAt != null && DateTime.now().isAfter(expiresAt)) {
+          await _secureStorage.delete('email_change_secret');
+          await _secureStorage.delete('email_change_address');
+          await _secureStorage.delete('email_change_sid');
+          await _secureStorage.delete('email_change_expires_at');
+          throw Exception('验证码已过期，请重新请求');
+        }
+      }
+
       // 调用 Matrix add3PID 完成 3PID 邮箱绑定
       try {
         await client.add3PID(clientSecret, sid);
@@ -975,6 +990,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       await _secureStorage.delete('email_change_secret');
       await _secureStorage.delete('email_change_address');
       await _secureStorage.delete('email_change_sid');
+      await _secureStorage.delete('email_change_expires_at');
 
       debugPrint('AuthRepository: Email changed successfully');
       return true;

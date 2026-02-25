@@ -99,7 +99,12 @@ class MatrixClientManager {
         waitCount++;
       }
       if (_isInitialized) return;
-      // 如果等待超时且仍未初始化，继续尝试初始化
+      if (_isInitializing) {
+        throw StateError(
+          'MatrixClientManager: Concurrent initialization timed out (10s). '
+          'Previous initialization is still in progress.',
+        );
+      }
     }
 
     _isInitializing = true;
@@ -654,10 +659,11 @@ class MatrixClientManager {
     }
     request.bodyBytes = content;
     
+    final httpClient = http.Client();
     try {
-      final streamedResponse = await http.Client().send(request);
+      final streamedResponse = await httpClient.send(request);
       final response = await http.Response.fromStream(streamedResponse);
-      
+
       debugPrint('MatrixClientManager: Upload response status: ${response.statusCode}');
       
       if (response.statusCode == 200) {
@@ -691,9 +697,11 @@ class MatrixClientManager {
     } catch (e) {
       debugPrint('MatrixClientManager: Upload error: $e');
       rethrow;
+    } finally {
+      httpClient.close();
     }
   }
-  
+
   /// 使用传统端点上传文件（作为 fallback）
   Future<Uri?> _uploadContentLegacy(
     Uint8List content, {
@@ -715,9 +723,15 @@ class MatrixClientManager {
     }
     request.bodyBytes = content;
     
-    final streamedResponse = await http.Client().send(request);
-    final response = await http.Response.fromStream(streamedResponse);
-    
+    final httpClient2 = http.Client();
+    final http.Response response;
+    try {
+      final streamedResponse = await httpClient2.send(request);
+      response = await http.Response.fromStream(streamedResponse);
+    } finally {
+      httpClient2.close();
+    }
+
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
       final contentUri = json['content_uri'] as String?;

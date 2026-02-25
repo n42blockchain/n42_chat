@@ -83,6 +83,12 @@ class N42Chat {
   /// 通知点击回调
   static void Function(String? roomId, String? eventId)? _onNotificationTap;
 
+  /// Moment 邀请节流时间戳（10 秒内不重复处理）
+  static DateTime? _lastMomentInviteCheck;
+
+  /// TURN 凭据自动刷新定时器
+  static Timer? _turnRefreshTimer;
+
   /// 用户变化流控制器
   static final StreamController<UserEntity?> _userStreamController =
       StreamController<UserEntity?>.broadcast();
@@ -289,11 +295,16 @@ class N42Chat {
       _momentSyncSubscription?.cancel();
 
       _momentSyncSubscription = client.onSync.stream.listen((_) async {
+        final now = DateTime.now();
+        if (_lastMomentInviteCheck != null &&
+            now.difference(_lastMomentInviteCheck!) < const Duration(seconds: 10)) {
+          return;
+        }
+        _lastMomentInviteCheck = now;
         try {
           final momentDataSource = getIt<MatrixMomentDataSource>();
           await momentDataSource.processMomentInvites();
         } catch (e) {
-          // 静默处理，避免影响正常同步
           debugPrint('N42Chat: Moment invite processing error: $e');
         }
       });
@@ -457,6 +468,7 @@ class N42Chat {
             password: turnServers.password,
             ttl: turnServers.ttl,
           );
+          _scheduleTurnRefresh(client, turnServers.ttl);
           debugPrint('N42Chat: TURN servers configured');
         } else {
           debugPrint('N42Chat: No TURN servers available');
@@ -554,6 +566,34 @@ class N42Chat {
   static Future<void> disposeCallManager() async {
     await _callManager?.dispose();
     _callManager = null;
+  }
+
+  /// 安排 TURN 凭据到期前自动刷新
+  static void _scheduleTurnRefresh(matrix.Client c, int ttl) {
+    _turnRefreshTimer?.cancel();
+    if (ttl <= 0) return;
+    final refreshAfter = Duration(
+      seconds: (ttl - 60).clamp(60, ttl),
+    );
+    _turnRefreshTimer = Timer(refreshAfter, () async {
+      debugPrint('N42Chat: Refreshing TURN credentials (TTL expiring)');
+      try {
+        final client = getIt<MatrixClientManager>().client;
+        if (client == null || _callManager == null) return;
+        final fresh = await client.getTurnServer();
+        if (fresh.uris.isNotEmpty) {
+          _callManager!.configureTurn(
+            uris: fresh.uris,
+            username: fresh.username,
+            password: fresh.password,
+            ttl: fresh.ttl,
+          );
+          _scheduleTurnRefresh(client, fresh.ttl);
+        }
+      } catch (e) {
+        debugPrint('N42Chat: TURN refresh failed: $e');
+      }
+    });
   }
 
   /// 清除所有通知
@@ -927,7 +967,9 @@ class N42Chat {
             ),
           ),
         ),
-      ));
+      ).catchError((Object e) {
+        debugPrint('N42Chat: Navigation error for room $roomId: $e');
+      }));
     } catch (e) {
       debugPrint('N42Chat: Failed to open conversation $roomId: $e');
     }
@@ -976,7 +1018,9 @@ class N42Chat {
     } catch (_) {}
     _callManager = null;
 
-    // 3. 释放推送服务
+    // 3. 释放推送服务和 TURN 刷新定时器
+    _turnRefreshTimer?.cancel();
+    _turnRefreshTimer = null;
     await _pushService?.dispose();
     _pushService = null;
 

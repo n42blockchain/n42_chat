@@ -87,21 +87,19 @@ class SecureStorageDataSource {
   // 登录凭据管理（用于自动登录）
   // ============================================
 
-  /// 保存登录凭据（用于自动登录）
+  /// 保存登录凭据（用于自动登录，仿微信策略：仅记住 homeserver + username）
   Future<bool> saveCredentials({
     required String homeserver,
     required String username,
-    required String password,
   }) async {
     final credentialsData = {
       'homeserver': homeserver,
       'username': username,
-      'password': password,
       'savedAt': DateTime.now().toIso8601String(),
     };
 
     final jsonValue = jsonEncode(credentialsData);
-    debugPrint('SecureStorage: Saving credentials for $username with key: $_keyCredentials');
+    debugPrint('SecureStorage: Saving credentials for [user]...');
 
     try {
       await _storage.write(
@@ -116,7 +114,7 @@ class SecureStorageDataSource {
         return false;
       }
 
-      debugPrint('SecureStorage: Credentials saved and verified for $username');
+      debugPrint('SecureStorage: Credentials saved and verified');
       return true;
     } catch (e) {
       debugPrint('SecureStorage: ERROR saving credentials - $e');
@@ -133,11 +131,10 @@ class SecureStorageDataSource {
       if (data == null) return null;
 
       final json = jsonDecode(data) as Map<String, dynamic>;
-      debugPrint('SecureStorage: Parsed credentials for ${json['username']}');
+      debugPrint('SecureStorage: Credentials loaded');
       return {
         'homeserver': json['homeserver'] as String,
         'username': json['username'] as String,
-        'password': json['password'] as String,
       };
     } catch (e) {
       debugPrint('SecureStorage: Failed to read credentials - $e');
