@@ -379,6 +379,7 @@ class CallManager {
   // ============================================
   
   void _handleIncomingCall(CallSession session) async {
+    try {
     debugPrint('CallManager: Incoming call from ${session.peerName}');
 
     // 设置活跃房间，禁用该房间的消息通知
@@ -442,6 +443,9 @@ class CallManager {
     _navigateToCallScreen(isIncoming: true, session: session);
 
     onIncomingCall?.call(session);
+    } catch (e, stack) {
+      debugPrint('CallManager: Error handling incoming call: $e\n$stack');
+    }
   }
   
   void _handleCallStateChanged(CallState state) {
@@ -578,11 +582,16 @@ class CallManager {
   /// 释放资源
   Future<void> dispose() async {
     await _webRTCService?.dispose();
+    _webRTCService = null;
     // LiveKitService.dispose() 是同步的（ChangeNotifier 要求）
     // 如需异步清理，应先调用 leaveMeeting()
     await _liveKitService?.leaveMeeting();
     _liveKitService?.dispose();
+    _liveKitService = null;
     _notificationService.dispose();
+    _navigatorKey = null;
+    _isCallScreenShowing = false;
+    _pendingAnswer = false;
     _isInitialized = false;
     debugPrint('CallManager: Disposed');
   }

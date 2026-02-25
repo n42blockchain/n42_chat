@@ -28,6 +28,7 @@ class MatrixClientManager {
   bool _isInitialized = false;
   bool _isInitializing = false;
   bool _vodozemacInitialized = false;
+  Completer<void>? _initCompleter;
 
   /// 获取Matrix客户端实例
   Client? get client => _client;
@@ -89,24 +90,13 @@ class MatrixClientManager {
       _isInitialized = false;
     }
 
-    // 防止并发初始化
-    if (_isInitializing) {
-      debugPrint('MatrixClientManager: Already initializing, waiting...');
-      // 等待初始化完成
-      int waitCount = 0;
-      while (_isInitializing && waitCount < 100) {
-        await Future<void>.delayed(const Duration(milliseconds: 100));
-        waitCount++;
-      }
-      if (_isInitialized) return;
-      if (_isInitializing) {
-        throw StateError(
-          'MatrixClientManager: Concurrent initialization timed out (10s). '
-          'Previous initialization is still in progress.',
-        );
-      }
+    // 防止并发初始化：第二次调用等待第一次完成
+    if (_initCompleter != null) {
+      debugPrint('MatrixClientManager: Already initializing, waiting for completion...');
+      return _initCompleter!.future;
     }
 
+    _initCompleter = Completer<void>();
     _isInitializing = true;
 
     try {
@@ -172,7 +162,7 @@ class MatrixClientManager {
           AuthenticationTypes.sso,
         },
         shareKeysWith: shareKeysWith,
-        logLevel: kDebugMode ? Level.verbose : Level.warning,
+        logLevel: kDebugMode ? Level.debug : Level.warning,
         importantStateEvents: {
           EventTypes.Encryption,
         },
@@ -191,6 +181,7 @@ class MatrixClientManager {
       _isInitialized = true;
       debugPrint('MatrixClientManager: Initialized successfully');
       debugPrint('MatrixClientManager: Logged in: $isLoggedIn, rooms: ${_client!.rooms.length}');
+      _initCompleter!.complete();
     } catch (e, stack) {
       debugPrint('MatrixClientManager: Initialize failed: $e');
       debugPrint('Stack: $stack');
@@ -204,9 +195,11 @@ class MatrixClientManager {
         _client = null;
       }
       _isInitialized = false;
+      _initCompleter!.completeError(e, stack);
       rethrow;
     } finally {
       _isInitializing = false;
+      _initCompleter = null;
     }
   }
 
@@ -661,7 +654,10 @@ class MatrixClientManager {
     
     final httpClient = http.Client();
     try {
-      final streamedResponse = await httpClient.send(request);
+      final streamedResponse = await httpClient.send(request).timeout(
+        const Duration(minutes: 2),
+        onTimeout: () => throw TimeoutException('HTTP upload timed out after 2 minutes'),
+      );
       final response = await http.Response.fromStream(streamedResponse);
 
       debugPrint('MatrixClientManager: Upload response status: ${response.statusCode}');
@@ -726,7 +722,10 @@ class MatrixClientManager {
     final httpClient2 = http.Client();
     final http.Response response;
     try {
-      final streamedResponse = await httpClient2.send(request);
+      final streamedResponse = await httpClient2.send(request).timeout(
+        const Duration(minutes: 2),
+        onTimeout: () => throw TimeoutException('HTTP upload timed out after 2 minutes'),
+      );
       response = await http.Response.fromStream(streamedResponse);
     } finally {
       httpClient2.close();

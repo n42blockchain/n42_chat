@@ -68,6 +68,7 @@ class FirebasePushService implements IPushNotificationService {
   String? _apnsToken;
   bool _isInitialized = false;
   StreamSubscription<RemoteMessage>? _foregroundSubscription;
+  StreamSubscription<RemoteMessage>? _messageOpenedSubscription;
   StreamSubscription<String>? _tokenRefreshSubscription;
   StreamSubscription<matrix.SyncUpdate>? _syncSubscription;
 
@@ -90,6 +91,9 @@ class FirebasePushService implements IPushNotificationService {
   static int _notificationIdCounter = 0;
   static int _nextNotificationId() =>
       (_notificationIdCounter++ & 0x7FFFFFFF);
+
+  /// 房间 ID → 最后一条通知 ID 的映射（用于 clearNotificationsForRoom）
+  final Map<String, int> _roomNotificationIds = {};
 
   /// 当前活跃的房间 ID（用户正在查看的房间不弹通知）
   String? _activeRoomId;
@@ -167,7 +171,7 @@ class FirebasePushService implements IPushNotificationService {
       _foregroundSubscription = FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
 
       // 监听通知点击（从后台打开）
-      FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
+      _messageOpenedSubscription = FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
 
       // 检查是否通过通知启动应用
       final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
@@ -966,6 +970,10 @@ class FirebasePushService implements IPushNotificationService {
 
       // 使用原子计数器生成唯一通知 ID（避免时间戳在同一毫秒内碰撞）
       final notificationId = _nextNotificationId();
+      // 记录 roomId → notificationId 映射，供 clearNotificationsForRoom 使用
+      if (roomId != null) {
+        _roomNotificationIds[roomId] = notificationId;
+      }
 
       // Android 通知详情
       final androidDetails = AndroidNotificationDetails(
@@ -1009,8 +1017,10 @@ class FirebasePushService implements IPushNotificationService {
   @override
   Future<void> clearNotificationsForRoom(String roomId) async {
     if (_localNotifications == null) return;
-    final notificationId = roomId.hashCode;
-    await _localNotifications!.cancel(id: notificationId);
+    final notificationId = _roomNotificationIds.remove(roomId);
+    if (notificationId != null) {
+      await _localNotifications!.cancel(id: notificationId);
+    }
   }
 
   @override
@@ -1056,9 +1066,11 @@ class FirebasePushService implements IPushNotificationService {
   /// 释放资源
   Future<void> dispose() async {
     await _foregroundSubscription?.cancel();
+    await _messageOpenedSubscription?.cancel();
     await _tokenRefreshSubscription?.cancel();
     await _syncSubscription?.cancel();
     _callStateResetTimer?.cancel();
+    _roomNotificationIds.clear();
     _isInitialized = false;
   }
 }

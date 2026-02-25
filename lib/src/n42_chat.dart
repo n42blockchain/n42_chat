@@ -62,6 +62,7 @@ class N42Chat {
 
   static bool _initialized = false;
   static N42ChatConfig? _config;
+  static Completer<void>? _initCompleter;
   static ThemeMode _themeMode = ThemeMode.system;
   static Locale _locale = const Locale('en');
   static final List<void Function(ThemeMode)> _themeListeners = [];
@@ -233,7 +234,14 @@ class N42Chat {
       debugPrint('N42Chat: Already initialized');
       return;
     }
+    // 防止并发调用：第二次调用等待第一次完成
+    if (_initCompleter != null) {
+      debugPrint('N42Chat: Initialization in progress, waiting...');
+      return _initCompleter!.future;
+    }
+    _initCompleter = Completer<void>();
 
+    try {
     _config = config;
 
     // 如果之前初始化中途失败，GetIt 可能已有部分注册，需要先重置
@@ -274,6 +282,13 @@ class N42Chat {
 
     _initialized = true;
     debugPrint('N42Chat: Initialized successfully');
+    _initCompleter!.complete();
+    } catch (e) {
+      _initCompleter!.completeError(e);
+      rethrow;
+    } finally {
+      _initCompleter = null;
+    }
   }
 
   /// Moment 房间邀请 sync 监听的订阅
