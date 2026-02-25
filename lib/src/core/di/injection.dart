@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -215,9 +217,14 @@ Future<void> _registerServices(N42ChatConfig config) async {
     () => StorageManagerService(clientManager: getIt<MatrixClientManager>()),
   );
 
-  // 媒体元数据数据库（异步初始化，延迟获取）
+  // 媒体元数据数据库（异步初始化，延迟获取，30 秒超时）
   getIt.registerSingletonAsync<MediaMetadataDatabase>(
-    () => MediaMetadataDatabase.getInstance(),
+    () => MediaMetadataDatabase.getInstance().timeout(
+      const Duration(seconds: 30),
+      onTimeout: () => throw TimeoutException(
+        'MediaMetadataDatabase initialization timed out after 30s',
+      ),
+    ),
   );
 
   // 媒体生命周期服务
@@ -396,6 +403,7 @@ void _registerRepositories() {
       authDataSource: getIt<MatrixAuthDataSource>(),
       secureStorage: getIt<SecureStorageDataSource>(),
     ),
+    dispose: (repo) => (repo as AuthRepositoryImpl).dispose(),
   );
 
   // 会话仓库

@@ -127,12 +127,12 @@ class FirebasePushService implements IPushNotificationService {
     _isInCall = inCall;
     _callStateResetTimer?.cancel();
     if (inCall) {
-      // 安全机制：90 秒后自动重置，防止状态泄漏
+      // 安全机制：10 分钟后自动重置，防止状态泄漏
       // （正常通话会由 CallManager 主动调用 setInCall(false)）
-      _callStateResetTimer = Timer(const Duration(seconds: 90), () {
+      _callStateResetTimer = Timer(const Duration(minutes: 10), () {
         if (_isInCall) {
           _isInCall = false;
-          debugPrint('FirebasePushService: Auto-reset _isInCall after timeout');
+          debugPrint('FirebasePushService: Auto-reset _isInCall after 10min safety timeout');
         }
       });
     }
