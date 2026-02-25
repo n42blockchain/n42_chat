@@ -246,6 +246,14 @@ class N42ChatConfig {
   /// 传入 [PushProtocolConfig] 实例以启用。
   final PushProtocolConfig? pushProtocol;
 
+  /// 是否与所有设备（含未验证）共享 E2EE 密钥
+  ///
+  /// - `true`（默认）：向所有未被阻止的设备分享 Megolm 会话密钥，
+  ///   避免"The sender has not sent us the session key"错误，兼容性最好。
+  /// - `false`：仅与已完成交叉验证的设备共享密钥，安全性更高，
+  ///   适用于安全敏感部署，但未验证设备无法解密历史消息。
+  final bool shareE2eeKeysWithAllDevices;
+
   const N42ChatConfig({
     this.defaultHomeserver = 'https://m.si46.world',
     this.enableEncryption = true,
@@ -278,6 +286,7 @@ class N42ChatConfig {
     this.aiModel = 'gpt-4o-mini',
     this.storageManagement = const StorageManagementConfig(),
     this.pushProtocol,
+    this.shareE2eeKeysWithAllDevices = true,
   });
 
   /// 复制并修改配置
@@ -313,6 +322,7 @@ class N42ChatConfig {
     String? aiModel,
     StorageManagementConfig? storageManagement,
     PushProtocolConfig? pushProtocol,
+    bool? shareE2eeKeysWithAllDevices,
   }) {
     return N42ChatConfig(
       defaultHomeserver: defaultHomeserver ?? this.defaultHomeserver,
@@ -347,6 +357,8 @@ class N42ChatConfig {
       aiModel: aiModel ?? this.aiModel,
       storageManagement: storageManagement ?? this.storageManagement,
       pushProtocol: pushProtocol ?? this.pushProtocol,
+      shareE2eeKeysWithAllDevices:
+          shareE2eeKeysWithAllDevices ?? this.shareE2eeKeysWithAllDevices,
     );
   }
 }

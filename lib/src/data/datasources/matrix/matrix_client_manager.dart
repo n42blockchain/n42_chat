@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:n42_chat/src/core/utils/io_helper.dart' as io_helper;
+import 'package:n42_chat/src/n42_chat_config.dart';
 
 /// Matrix客户端管理器
 ///
@@ -64,10 +65,12 @@ class MatrixClientManager {
   /// [clientName] 客户端名称，用于设备识别
   /// [databasePath] 数据库存储路径，为空则使用默认路径
   /// [forceReinit] 强制重新初始化
+  /// [config] N42ChatConfig，用于读取安全配置（如 shareE2eeKeysWithAllDevices）
   Future<void> initialize({
     String clientName = 'N42Chat',
     String? databasePath,
     bool forceReinit = false,
+    N42ChatConfig? config,
   }) async {
     if (_isInitialized && !forceReinit) {
       debugPrint('MatrixClientManager: Already initialized');
@@ -148,6 +151,13 @@ class MatrixClientManager {
         );
       }
 
+      // 读取 E2EE 密钥共享策略：
+      // - shareE2eeKeysWithAllDevices=true (默认)：向所有未阻止设备共享，兼容性最好
+      // - shareE2eeKeysWithAllDevices=false：仅与已交叉验证设备共享，安全性更高
+      final shareKeysWith = (config?.shareE2eeKeysWithAllDevices ?? true)
+          ? ShareKeysWith.all
+          : ShareKeysWith.crossVerified;
+
       // 创建客户端（端到端加密由 flutter_vodozemac 自动支持）
       _client = Client(
         clientName,
@@ -156,9 +166,7 @@ class MatrixClientManager {
           AuthenticationTypes.password,
           AuthenticationTypes.sso,
         },
-        // 向所有未被阻止的设备分享 Megolm 会话密钥，
-        // 避免因设备未交叉验证而导致 "The sender has not sent us the session key"
-        shareKeysWith: ShareKeysWith.all,
+        shareKeysWith: shareKeysWith,
         logLevel: kDebugMode ? Level.verbose : Level.warning,
         importantStateEvents: {
           EventTypes.Encryption,

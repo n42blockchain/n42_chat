@@ -635,8 +635,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         add(const LoadUserProfileData());
         // Apple 登录成功后注册推送通知
         unawaited(_registerPushNotifications());
-        // Apple 登录成功后初始化通话管理器
-        unawaited(_initializeCallManager());
+        // 通话管理器必须在 sync 到达前初始化完成
+        await _initializeCallManager();
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -737,8 +737,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         add(const LoadUserProfileData());
         // Facebook 登录成功后注册推送通知
         unawaited(_registerPushNotifications());
-        // Facebook 登录成功后初始化通话管理器
-        unawaited(_initializeCallManager());
+        // 通话管理器必须在 sync 到达前初始化完成
+        await _initializeCallManager();
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -795,8 +795,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         add(const LoadUserProfileData());
         // Twitter 登录成功后注册推送通知
         unawaited(_registerPushNotifications());
-        // Twitter 登录成功后初始化通话管理器
-        unawaited(_initializeCallManager());
+        // 通话管理器必须在 sync 到达前初始化完成
+        await _initializeCallManager();
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -853,8 +853,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         add(const LoadUserProfileData());
         // 微信登录成功后注册推送通知
         unawaited(_registerPushNotifications());
-        // 微信登录成功后初始化通话管理器
-        unawaited(_initializeCallManager());
+        // 通话管理器必须在 sync 到达前初始化完成
+        await _initializeCallManager();
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,

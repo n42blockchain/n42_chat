@@ -19,9 +19,9 @@ class SecureStorageDataSource {
   SecureStorageDataSource({FlutterSecureStorage? storage})
       : _storage = storage ??
             const FlutterSecureStorage(
-              aOptions: AndroidOptions(),
+              aOptions: AndroidOptions(encryptedSharedPreferences: true),
               iOptions: IOSOptions(
-                accessibility: KeychainAccessibility.first_unlock,
+                accessibility: KeychainAccessibility.first_unlock_this_device,
               ),
             );
 
