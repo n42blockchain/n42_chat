@@ -704,7 +704,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String email,
   }) async {
     try {
-      debugPrint('AuthRepository: Requesting password reset for $email');
+      debugPrint('AuthRepository: Requesting password reset');
 
       // 调用 Matrix 邮箱重置 API
       // POST /_matrix/client/v3/account/password/email/requestToken
@@ -729,7 +729,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String newPassword,
   }) async {
     try {
-      debugPrint('AuthRepository: Confirming password reset for $email');
+      debugPrint('AuthRepository: Confirming password reset');
 
       // 调用重置密码确认 API
       final success = await _authDataSource.confirmPasswordReset(

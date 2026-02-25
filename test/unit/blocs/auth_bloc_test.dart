@@ -170,7 +170,7 @@ void main() {
         when(() => mockAuthRepository.logout()).thenAnswer((_) async {});
         return AuthBloc(authRepository: mockAuthRepository);
       },
-      act: (bloc) => bloc.add(const AuthChangePasswordRequested(
+      act: (bloc) => bloc.add(AuthChangePasswordRequested(
         oldPassword: 'oldPass123',
         newPassword: 'newPass456',
       )),
@@ -196,7 +196,7 @@ void main() {
             )).thenAnswer((_) async => false);
         return AuthBloc(authRepository: mockAuthRepository);
       },
-      act: (bloc) => bloc.add(const AuthChangePasswordRequested(
+      act: (bloc) => bloc.add(AuthChangePasswordRequested(
         oldPassword: 'wrongOldPass',
         newPassword: 'newPass456',
       )),

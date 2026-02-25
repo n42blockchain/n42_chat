@@ -219,12 +219,16 @@ Future<void> _registerServices(N42ChatConfig config) async {
 
   // 媒体元数据数据库（异步初始化，延迟获取，30 秒超时）
   getIt.registerSingletonAsync<MediaMetadataDatabase>(
-    () => MediaMetadataDatabase.getInstance().timeout(
-      const Duration(seconds: 30),
-      onTimeout: () => throw TimeoutException(
-        'MediaMetadataDatabase initialization timed out after 30s',
-      ),
-    ),
+    () async {
+      try {
+        return await MediaMetadataDatabase.getInstance().timeout(
+          const Duration(seconds: 30),
+        );
+      } on TimeoutException {
+        debugPrint('DI: MediaMetadataDatabase timed out after 30s, rethrowing for caller to handle');
+        rethrow;
+      }
+    },
   );
 
   // 媒体生命周期服务

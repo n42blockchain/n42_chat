@@ -168,15 +168,20 @@ class MatrixAuthDataSource {
         try {
           final rawBody = e.response?.body;
           if (rawBody == null || rawBody.isEmpty) rethrow;
-          
-          // 解析响应体为 Map（body 是 JSON 字符串）
-          final decoded = jsonDecode(rawBody);
-          if (decoded is! Map<String, dynamic>) rethrow;
-          
-          final body = decoded;
+
+          late final Map<String, dynamic> body;
+          try {
+            final decoded = jsonDecode(rawBody);
+            if (decoded is! Map<String, dynamic>) rethrow;
+            body = decoded;
+          } on FormatException catch (fe) {
+            debugPrint('MatrixAuthDataSource: Register UIA - server returned non-JSON body: $fe');
+            rethrow; // 继续抛出原始 MatrixException
+          }
+
           final session = body['session']?.toString();
           final flows = body['flows'];
-          
+
           // 检查是否需要 registration_token
           bool needsToken = false;
           if (flows is List) {
@@ -197,7 +202,7 @@ class MatrixAuthDataSource {
               token: registrationToken,
               session: session,
             );
-            
+
             return await finalClient.register(
               username: username,
               password: password,
@@ -205,9 +210,9 @@ class MatrixAuthDataSource {
               auth: authWithSession,
             );
           }
-        } catch (e) {
+        } catch (innerError) {
           // 解析或处理失败，继续抛出原始异常
-          debugPrint('Error: $e');
+          debugPrint('MatrixAuthDataSource: Register UIA parse error: $innerError');
         }
       }
       rethrow;
