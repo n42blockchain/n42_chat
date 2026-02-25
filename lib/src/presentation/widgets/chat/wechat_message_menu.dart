@@ -82,6 +82,12 @@ class WeChatMessageMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    // 动态宽度：贴近微信/WhatsApp 占屏比，留 12px 边距
+    final menuWidth = (screenWidth - 24.0).clamp(300.0, 420.0);
+    final left = _calculateLeft(context, menuWidth);
+    final top = _calculateTop(context);
+
     return GestureDetector(
       onTap: onDismiss,
       behavior: HitTestBehavior.opaque,
@@ -89,15 +95,12 @@ class WeChatMessageMenu extends StatelessWidget {
         color: Colors.transparent,
         child: Stack(
           children: [
-            // 半透明背景
-            Container(
-              color: Colors.black.withValues(alpha: 0.3),
-            ),
-            // 菜单
+            Container(color: Colors.black.withValues(alpha: 0.45)),
             Positioned(
-              left: _calculateLeft(context),
-              top: _calculateTop(context),
-              child: _buildMenuContent(context),
+              left: left,
+              top: top,
+              width: menuWidth,
+              child: _buildMenuContent(context, menuWidth),
             ),
           ],
         ),
@@ -105,26 +108,16 @@ class WeChatMessageMenu extends StatelessWidget {
     );
   }
 
-  double _calculateLeft(BuildContext context) {
+  double _calculateLeft(BuildContext context, double menuWidth) {
     final screenWidth = MediaQuery.of(context).size.width;
-    const menuWidth = 340.0;
-    
-    // 居中或根据消息位置调整
     double left = (screenWidth - menuWidth) / 2;
-    
-    // 如果消息在屏幕左侧，菜单稍微偏右
     if (position.dx < screenWidth / 3) {
-      left = position.dx;
+      left = 12;
+    } else if (position.dx > screenWidth * 2 / 3) {
+      left = screenWidth - menuWidth - 12;
     }
-    // 如果消息在屏幕右侧，菜单稍微偏左
-    else if (position.dx > screenWidth * 2 / 3) {
-      left = position.dx - menuWidth + messageSize.width;
-    }
-    
-    // 确保不超出屏幕
-    if (left < 16) left = 16;
-    if (left + menuWidth > screenWidth - 16) left = screenWidth - menuWidth - 16;
-    
+    if (left < 12) left = 12;
+    if (left + menuWidth > screenWidth - 12) left = screenWidth - menuWidth - 12;
     return left;
   }
 
@@ -133,190 +126,183 @@ class WeChatMessageMenu extends StatelessWidget {
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    // 菜单高度增加表情栏的高度（约60）
-    const menuHeight = 260.0;
+    // 表情胶囊(66) + 间距(10) + 卡片两段各2行(2×88+24) ≈ 450
+    const menuHeight = 450.0;
     const padding = 8.0;
-    
-    // 可用高度（减去键盘高度和安全区域）
+
     final availableHeight = screenHeight - keyboardHeight - bottomPadding;
-    
-    // 默认显示在消息上方
+
     double top = position.dy - menuHeight - padding;
-    
-    // 如果上方空间不够，显示在下方
     if (top < topPadding + 60) {
       top = position.dy + messageSize.height + padding;
     }
-    
-    // 如果下方被键盘遮挡，调整到键盘上方
     if (top + menuHeight > availableHeight - 20) {
-      // 优先显示在消息上方
       top = position.dy - menuHeight - padding;
-      
-      // 如果上方还是不够，显示在可用区域中央
       if (top < topPadding + 60) {
         top = (topPadding + 60 + availableHeight - menuHeight) / 2;
       }
     }
-    
-    // 最终确保不超出可见区域
     top = top.clamp(topPadding + 20, availableHeight - menuHeight - 20);
-    
     return top;
   }
 
-  Widget _buildMenuContent(BuildContext context) {
+  Widget _buildMenuContent(BuildContext context, double menuWidth) {
     final s = S.of(context);
-    return Container(
-      width: 340,
-      decoration: BoxDecoration(
-        color: const Color(0xFF4C4C4C),
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // 表情胶囊（WhatsApp 风格：独立圆角胶囊，与操作卡分离）
+        _buildReactionBar(),
+        const SizedBox(height: 8),
+        // 主操作卡片
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF2C2C2E),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildReactionBar(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 第一组：复制/保存、转发、收藏、撤回/重发、删除、多选
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
+                child: _buildMenuGrid([
+                  if (message.type == MessageType.text)
+                    _buildMenuItem(
+                      icon: Icons.content_copy_outlined,
+                      label: s?.chatCopy ?? 'Copy',
+                      onTap: () { onDismiss(); onCopy?.call(); },
+                    )
+                  else if (message.type == MessageType.image ||
+                      message.type == MessageType.video)
+                    _buildMenuItem(
+                      icon: Icons.download_outlined,
+                      label: s?.commonSave ?? 'Save',
+                      onTap: () { onDismiss(); onSave?.call(); },
+                    ),
+                  if (onForward != null)
+                    _buildMenuItem(
+                      icon: Icons.shortcut_outlined,
+                      label: s?.commonForward ?? 'Forward',
+                      onTap: () { onDismiss(); onForward?.call(); },
+                    ),
+                  _buildMenuItem(
+                    icon: isFavorited ? Icons.star : Icons.star_border_outlined,
+                    label: isFavorited
+                        ? (s?.commonUnfavorite ?? 'Unfav')
+                        : (s?.commonFavorite ?? 'Fav'),
+                    isHighlighted: isFavorited,
+                    onTap: () { onDismiss(); onFavorite?.call(); },
+                  ),
+                  if (message.isFromMe && message.status == MessageStatus.failed)
+                    _buildMenuItem(
+                      icon: Icons.refresh,
+                      label: s?.settingsResend ?? 'Resend',
+                      onTap: () { onDismiss(); onResend?.call(); },
+                    ),
+                  if (message.isFromMe && message.status != MessageStatus.failed)
+                    _buildMenuItem(
+                      icon: Icons.undo_outlined,
+                      label: s?.chatRecall ?? 'Recall',
+                      onTap: () { onDismiss(); onRecall?.call(); },
+                    ),
+                  _buildMenuItem(
+                    icon: Icons.delete_outline,
+                    label: s?.commonDelete ?? 'Delete',
+                    onTap: () { onDismiss(); onDelete?.call(); },
+                  ),
+                  _buildMenuItem(
+                    icon: Icons.checklist_outlined,
+                    label: s?.chatSelectMessages ?? 'Select',
+                    onTap: () { onDismiss(); onMultiSelect?.call(); },
+                  ),
+                ]),
+              ),
 
-          Container(height: 0.5, color: Colors.white.withValues(alpha: 0.1)),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                height: 0.5,
+                color: Colors.white.withValues(alpha: 0.12),
+              ),
 
-          // 第一组：复制/保存、转发、收藏、撤回/重发、删除、多选
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 10, 8, 6),
-            child: _buildMenuGrid([
-              if (message.type == MessageType.text)
-                _buildMenuItem(
-                  icon: Icons.content_copy_outlined,
-                  label: s?.chatCopy ?? 'Copy',
-                  onTap: () { onDismiss(); onCopy?.call(); },
-                )
-              else if (message.type == MessageType.image ||
-                  message.type == MessageType.video)
-                _buildMenuItem(
-                  icon: Icons.download_outlined,
-                  label: s?.commonSave ?? 'Save',
-                  onTap: () { onDismiss(); onSave?.call(); },
-                ),
-              if (onForward != null)
-                _buildMenuItem(
-                  icon: Icons.shortcut_outlined,
-                  label: s?.commonForward ?? 'Forward',
-                  onTap: () { onDismiss(); onForward?.call(); },
-                ),
-              _buildMenuItem(
-                icon: isFavorited ? Icons.star : Icons.star_border_outlined,
-                label: isFavorited
-                    ? (s?.commonUnfavorite ?? 'Unfav')
-                    : (s?.commonFavorite ?? 'Fav'),
-                isHighlighted: isFavorited,
-                onTap: () { onDismiss(); onFavorite?.call(); },
+              // 第二组：引用、编辑、Thread、翻译、历史、置顶、提醒、搜索、举报
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
+                child: _buildMenuGrid([
+                  _buildMenuItem(
+                    icon: Icons.format_quote_outlined,
+                    label: s?.commonQuote ?? 'Quote',
+                    onTap: () { onDismiss(); onQuote?.call(); },
+                  ),
+                  if (message.isFromMe &&
+                      message.type == MessageType.text &&
+                      onEdit != null)
+                    _buildMenuItem(
+                      icon: Icons.edit_outlined,
+                      label: s?.commonEdit ?? 'Edit',
+                      onTap: () { onDismiss(); onEdit?.call(); },
+                    ),
+                  if (onReplyInThread != null)
+                    _buildMenuItem(
+                      icon: Icons.forum_outlined,
+                      label: s?.threadReplyInThread ?? 'Thread',
+                      onTap: () { onDismiss(); onReplyInThread?.call(); },
+                    ),
+                  if (message.type == MessageType.text && onTranslate != null)
+                    _buildMenuItem(
+                      icon: Icons.translate,
+                      label: s?.commonTranslate ?? 'Translate',
+                      onTap: () { onDismiss(); onTranslate?.call(); },
+                    ),
+                  if (message.isEdited && onViewEditHistory != null)
+                    _buildMenuItem(
+                      icon: Icons.history,
+                      label: s?.chatEditHistory ?? 'History',
+                      onTap: () { onDismiss(); onViewEditHistory?.call(); },
+                    ),
+                  if (canPin)
+                    isPinned
+                        ? _buildMenuItem(
+                            icon: Icons.push_pin,
+                            label: s?.conversationUnpin ?? 'Unpin',
+                            isHighlighted: true,
+                            onTap: () { onDismiss(); onUnpin?.call(); },
+                          )
+                        : _buildMenuItem(
+                            icon: Icons.push_pin_outlined,
+                            label: s?.conversationPin ?? 'Pin',
+                            onTap: () { onDismiss(); onPin?.call(); },
+                          ),
+                  _buildMenuItem(
+                    icon: Icons.notifications_outlined,
+                    label: s?.commonRemind ?? 'Remind',
+                    onTap: () { onDismiss(); onRemind?.call(); },
+                  ),
+                  _buildMenuItem(
+                    icon: Icons.search,
+                    label: s?.commonSearch ?? 'Search',
+                    onTap: () { onDismiss(); onSearch?.call(); },
+                  ),
+                  if (!message.isFromMe && onReport != null)
+                    _buildMenuItem(
+                      icon: Icons.flag_outlined,
+                      label: s?.chatReportMessage ?? 'Report',
+                      onTap: () { onDismiss(); onReport?.call(); },
+                    ),
+                ]),
               ),
-              if (message.isFromMe && message.status == MessageStatus.failed)
-                _buildMenuItem(
-                  icon: Icons.refresh,
-                  label: s?.settingsResend ?? 'Resend',
-                  onTap: () { onDismiss(); onResend?.call(); },
-                ),
-              if (message.isFromMe && message.status != MessageStatus.failed)
-                _buildMenuItem(
-                  icon: Icons.undo_outlined,
-                  label: s?.chatRecall ?? 'Recall',
-                  onTap: () { onDismiss(); onRecall?.call(); },
-                ),
-              _buildMenuItem(
-                icon: Icons.delete_outline,
-                label: s?.commonDelete ?? 'Delete',
-                onTap: () { onDismiss(); onDelete?.call(); },
-              ),
-              _buildMenuItem(
-                icon: Icons.checklist_outlined,
-                label: s?.chatSelectMessages ?? 'Select',
-                onTap: () { onDismiss(); onMultiSelect?.call(); },
-              ),
-            ]),
+            ],
           ),
-
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 6),
-            height: 0.5,
-            color: Colors.white.withValues(alpha: 0.1),
-          ),
-
-          // 第二组：引用、编辑、Thread、翻译、历史、置顶、提醒、搜索、举报
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 6, 8, 12),
-            child: _buildMenuGrid([
-              _buildMenuItem(
-                icon: Icons.format_quote_outlined,
-                label: s?.commonQuote ?? 'Quote',
-                onTap: () { onDismiss(); onQuote?.call(); },
-              ),
-              if (message.isFromMe &&
-                  message.type == MessageType.text &&
-                  onEdit != null)
-                _buildMenuItem(
-                  icon: Icons.edit_outlined,
-                  label: s?.commonEdit ?? 'Edit',
-                  onTap: () { onDismiss(); onEdit?.call(); },
-                ),
-              if (onReplyInThread != null)
-                _buildMenuItem(
-                  icon: Icons.forum_outlined,
-                  label: s?.threadReplyInThread ?? 'Thread',
-                  onTap: () { onDismiss(); onReplyInThread?.call(); },
-                ),
-              if (message.type == MessageType.text && onTranslate != null)
-                _buildMenuItem(
-                  icon: Icons.translate,
-                  label: s?.commonTranslate ?? 'Translate',
-                  onTap: () { onDismiss(); onTranslate?.call(); },
-                ),
-              if (message.isEdited && onViewEditHistory != null)
-                _buildMenuItem(
-                  icon: Icons.history,
-                  label: s?.chatEditHistory ?? 'History',
-                  onTap: () { onDismiss(); onViewEditHistory?.call(); },
-                ),
-              if (canPin)
-                isPinned
-                    ? _buildMenuItem(
-                        icon: Icons.push_pin,
-                        label: s?.conversationUnpin ?? 'Unpin',
-                        isHighlighted: true,
-                        onTap: () { onDismiss(); onUnpin?.call(); },
-                      )
-                    : _buildMenuItem(
-                        icon: Icons.push_pin_outlined,
-                        label: s?.conversationPin ?? 'Pin',
-                        onTap: () { onDismiss(); onPin?.call(); },
-                      ),
-              _buildMenuItem(
-                icon: Icons.notifications_outlined,
-                label: s?.commonRemind ?? 'Remind',
-                onTap: () { onDismiss(); onRemind?.call(); },
-              ),
-              _buildMenuItem(
-                icon: Icons.search,
-                label: s?.commonSearch ?? 'Search',
-                onTap: () { onDismiss(); onSearch?.call(); },
-              ),
-              if (!message.isFromMe && onReport != null)
-                _buildMenuItem(
-                  icon: Icons.flag_outlined,
-                  label: s?.chatReportMessage ?? 'Report',
-                  onTap: () { onDismiss(); onReport?.call(); },
-                ),
-            ]),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -345,10 +331,21 @@ class WeChatMessageMenu extends StatelessWidget {
     return Column(children: rows);
   }
 
-  /// 构建表情快速回应栏
+  /// 构建表情快速回应栏（WhatsApp 风格独立胶囊）
   Widget _buildReactionBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2C2C2E),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -370,16 +367,16 @@ class WeChatMessageMenu extends StatelessWidget {
           onDismiss();
           onReaction?.call(emoji);
         },
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(24),
         splashColor: Colors.white.withValues(alpha: 0.2),
         highlightColor: Colors.white.withValues(alpha: 0.1),
         child: Container(
-          width: 44,
-          height: 44,
+          width: 48,
+          height: 48,
           alignment: Alignment.center,
           child: Text(
             emoji,
-            style: const TextStyle(fontSize: 28),
+            style: const TextStyle(fontSize: 32),
           ),
         ),
       ),
@@ -444,22 +441,22 @@ class WeChatMessageMenu extends StatelessWidget {
         splashColor: Colors.white.withValues(alpha: 0.1),
         highlightColor: Colors.white.withValues(alpha: 0.05),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: color, size: 22),
-              const SizedBox(height: 5),
+              Icon(icon, color: color, size: 26),
+              const SizedBox(height: 6),
               // FittedBox: 先尝试最多两行；若仍放不下则等比缩小字号，
               // 避免出现截断省略号，也适配多语言较长译文。
               SizedBox(
-                height: 28,
+                height: 32,
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.topCenter,
                   child: Text(
                     label,
-                    style: TextStyle(color: color, fontSize: 11),
+                    style: TextStyle(color: color, fontSize: 12.5),
                     textAlign: TextAlign.center,
                     maxLines: 2,
                   ),
