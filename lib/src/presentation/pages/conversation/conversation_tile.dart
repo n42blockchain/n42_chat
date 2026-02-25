@@ -70,13 +70,13 @@ class ConversationTile extends StatelessWidget {
             onTap: onTap,
             onLongPress: onLongPress,
             child: Container(
-              height: 72,
+              height: 76,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
                   // 头像（带未读红点）
                   _buildAvatar(isDark),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
 
                   // 内容
                   Expanded(
@@ -87,9 +87,9 @@ class ConversationTile extends StatelessWidget {
             ),
           ),
         ),
-        // 分割线
+        // 分割线（左边距与头像对齐）
         Container(
-          margin: const EdgeInsets.only(left: 76),
+          margin: const EdgeInsets.only(left: 80),
           height: 0.5,
           color: isDark ? AppColors.dividerDark : AppColors.divider,
         ),
@@ -111,16 +111,16 @@ class ConversationTile extends StatelessWidget {
         key: ValueKey('group_${conversation.id}_$avatarKey'),
         memberAvatars: conversation.memberAvatarUrls!,
         memberNames: conversation.memberNames,
-        size: 48,
-        borderRadius: 8,
+        size: 50,
+        borderRadius: 12,
       );
     } else {
       // 私聊或两人群聊：使用普通头像
       avatarWidget = N42Avatar(
         imageUrl: conversation.avatarUrl,
         name: conversation.name,
-        size: 48,
-        borderRadius: 8, // 微信风格圆角
+        size: 50,
+        borderRadius: 12,
       );
     }
     
@@ -171,7 +171,7 @@ class ConversationTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.badge,
         borderRadius: BorderRadius.circular(9),
-        // 微信风格：无白色边框
+        border: Border.all(color: Colors.white, width: 1.5),
       ),
       child: Center(
         child: Text(

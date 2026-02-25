@@ -231,14 +231,14 @@ class _ProfilePageState extends State<ProfilePage> {
                         imageUrl: _avatarUrl,
                         name: _displayName,
                         size: 64,
-                        borderRadius: 6,
+                        borderRadius: 14,
                       ),
                       // NFT 认证金色环标记
                       if (_isNftAvatar)
                         Positioned.fill(
                           child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(6),
+                              borderRadius: BorderRadius.circular(14),
                               border: Border.all(
                                 color: const Color(0xFFFFD700),
                                 width: 2.5,

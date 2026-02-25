@@ -519,16 +519,24 @@ class _ChatMainPageState extends State<ChatMainPage> {
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.07),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: (isDark ? AppColors.dividerDark : AppColors.divider)
+                .withValues(alpha: 0.6),
             width: 0.5,
           ),
         ),
       ),
       child: SafeArea(
         child: SizedBox(
-          height: 56,
+          height: 60,
           child: Builder(
             builder: (ctx) {
               final l10n = S.of(ctx);
@@ -597,29 +605,48 @@ class _ChatMainPageState extends State<ChatMainPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Stack(
+              alignment: Alignment.center,
               clipBehavior: Clip.none,
               children: [
-                Icon(
-                  isSelected ? activeIcon : icon,
-                  color: color,
-                  size: 24,
-                ),
-                if (badge > 0)
-                  Positioned(
-                    right: -10,
-                    top: -6,
-                    child: _buildBadge(badge),
+                // 动画选中背景胶囊
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  width: isSelected ? 44 : 0,
+                  height: isSelected ? 28 : 0,
+                  decoration: BoxDecoration(
+                    color: selectedColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(14),
                   ),
+                ),
+                // 图标 + badge 叠加
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(
+                      isSelected ? activeIcon : icon,
+                      color: color,
+                      size: 24,
+                    ),
+                    if (badge > 0)
+                      Positioned(
+                        right: -10,
+                        top: -6,
+                        child: _buildBadge(badge),
+                      ),
+                  ],
+                ),
               ],
             ),
-            const SizedBox(height: 2),
-            Text(
-              label,
+            const SizedBox(height: 3),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
               style: TextStyle(
                 color: color,
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
+              child: Text(label),
             ),
           ],
         ),

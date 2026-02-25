@@ -175,7 +175,7 @@ class MessageBubble extends StatelessWidget {
     if (accessToken != null && accessToken.isNotEmpty) {
       headers['Authorization'] = 'Bearer $accessToken';
     }
-    
+
     return GestureDetector(
       onTap: onAvatarTap,
       onDoubleTap: onAvatarDoubleTap,
@@ -184,7 +184,14 @@ class MessageBubble extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           color: AppColors.placeholder,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
         clipBehavior: Clip.antiAlias,
         child: avatarUrl != null && avatarUrl!.isNotEmpty
@@ -245,26 +252,26 @@ class MessageBubble extends StatelessWidget {
             ? AppColors.bubbleSelf
             : (isDark ? AppColors.bubbleOtherDark : AppColors.bubbleOther));
 
-    // 微信风格的气泡圆角 - 发送方右上角小圆角，接收方左上角小圆角
+    // 现代风格气泡圆角：大圆角 + 尾部小角（发送方右上/接收方左上）
     final borderRadius = isSelf
         ? const BorderRadius.only(
-            topLeft: Radius.circular(12),
+            topLeft: Radius.circular(18),
             topRight: Radius.circular(4),
-            bottomLeft: Radius.circular(12),
-            bottomRight: Radius.circular(12),
+            bottomLeft: Radius.circular(18),
+            bottomRight: Radius.circular(18),
           )
         : const BorderRadius.only(
             topLeft: Radius.circular(4),
-            topRight: Radius.circular(12),
-            bottomLeft: Radius.circular(12),
-            bottomRight: Radius.circular(12),
+            topRight: Radius.circular(18),
+            bottomLeft: Radius.circular(18),
+            bottomRight: Radius.circular(18),
           );
 
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: borderRadius,
