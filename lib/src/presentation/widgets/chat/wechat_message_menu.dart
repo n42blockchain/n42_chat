@@ -166,10 +166,11 @@ class WeChatMessageMenu extends StatelessWidget {
   }
 
   Widget _buildMenuContent(BuildContext context) {
+    final s = S.of(context);
     return Container(
       width: 340,
       decoration: BoxDecoration(
-        color: const Color(0xFF4C4C4C), // 微信深灰色
+        color: const Color(0xFF4C4C4C),
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
@@ -182,214 +183,166 @@ class WeChatMessageMenu extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 表情快速回应栏（类似WhatsApp/Element风格）
           _buildReactionBar(),
-          
-          // 分隔线
+
+          Container(height: 0.5, color: Colors.white.withValues(alpha: 0.1)),
+
+          // 第一组：复制/保存、转发、收藏、撤回/重发、删除、多选
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 10, 8, 6),
+            child: _buildMenuGrid([
+              if (message.type == MessageType.text)
+                _buildMenuItem(
+                  icon: Icons.content_copy_outlined,
+                  label: s?.chatCopy ?? 'Copy',
+                  onTap: () { onDismiss(); onCopy?.call(); },
+                )
+              else if (message.type == MessageType.image ||
+                  message.type == MessageType.video)
+                _buildMenuItem(
+                  icon: Icons.download_outlined,
+                  label: s?.commonSave ?? 'Save',
+                  onTap: () { onDismiss(); onSave?.call(); },
+                ),
+              if (onForward != null)
+                _buildMenuItem(
+                  icon: Icons.shortcut_outlined,
+                  label: s?.commonForward ?? 'Forward',
+                  onTap: () { onDismiss(); onForward?.call(); },
+                ),
+              _buildMenuItem(
+                icon: isFavorited ? Icons.star : Icons.star_border_outlined,
+                label: isFavorited
+                    ? (s?.commonUnfavorite ?? 'Unfav')
+                    : (s?.commonFavorite ?? 'Fav'),
+                isHighlighted: isFavorited,
+                onTap: () { onDismiss(); onFavorite?.call(); },
+              ),
+              if (message.isFromMe && message.status == MessageStatus.failed)
+                _buildMenuItem(
+                  icon: Icons.refresh,
+                  label: s?.settingsResend ?? 'Resend',
+                  onTap: () { onDismiss(); onResend?.call(); },
+                ),
+              if (message.isFromMe && message.status != MessageStatus.failed)
+                _buildMenuItem(
+                  icon: Icons.undo_outlined,
+                  label: s?.chatRecall ?? 'Recall',
+                  onTap: () { onDismiss(); onRecall?.call(); },
+                ),
+              _buildMenuItem(
+                icon: Icons.delete_outline,
+                label: s?.commonDelete ?? 'Delete',
+                onTap: () { onDismiss(); onDelete?.call(); },
+              ),
+              _buildMenuItem(
+                icon: Icons.checklist_outlined,
+                label: s?.chatSelectMessages ?? 'Select',
+                onTap: () { onDismiss(); onMultiSelect?.call(); },
+              ),
+            ]),
+          ),
+
           Container(
+            margin: const EdgeInsets.symmetric(vertical: 6),
             height: 0.5,
             color: Colors.white.withValues(alpha: 0.1),
           ),
-          
-          // 第一行按钮（使用 Wrap 自动换行防止溢出，与第二行保持一致）
+
+          // 第二组：引用、编辑、Thread、翻译、历史、置顶、提醒、搜索、举报
           Padding(
-            padding: const EdgeInsets.only(top: 12, left: 8, right: 8),
-            child: Wrap(
-              spacing: 4,
-              runSpacing: 4,
-              children: [
-                // 文本消息显示复制，图片/视频显示保存
-                if (message.type == MessageType.text)
-                  _buildMenuItem(
-                    icon: Icons.content_copy_outlined,
-                    label: S.of(context)?.chatCopy ?? 'Copy',
-                    onTap: () {
-                      onDismiss();
-                      onCopy?.call();
-                    },
-                  )
-                else if (message.type == MessageType.image || message.type == MessageType.video)
-                  _buildMenuItem(
-                    icon: Icons.download_outlined,
-                    label: S.of(context)?.commonSave ?? 'Save',
-                    onTap: () {
-                      onDismiss();
-                      onSave?.call();
-                    },
-                  ),
-                if (onForward != null)
-                  _buildMenuItem(
-                    icon: Icons.shortcut_outlined,
-                    label: S.of(context)?.commonForward ?? 'Forward',
-                    onTap: () {
-                      onDismiss();
-                      onForward?.call();
-                    },
-                  ),
+            padding: const EdgeInsets.fromLTRB(8, 6, 8, 12),
+            child: _buildMenuGrid([
+              _buildMenuItem(
+                icon: Icons.format_quote_outlined,
+                label: s?.commonQuote ?? 'Quote',
+                onTap: () { onDismiss(); onQuote?.call(); },
+              ),
+              if (message.isFromMe &&
+                  message.type == MessageType.text &&
+                  onEdit != null)
                 _buildMenuItem(
-                  icon: isFavorited ? Icons.star : Icons.star_border_outlined,
-                  label: isFavorited ? (S.of(context)?.commonUnfavorite ?? 'Unfav') : (S.of(context)?.commonFavorite ?? 'Favorite'),
-                  isHighlighted: isFavorited,
-                  onTap: () {
-                    onDismiss();
-                    onFavorite?.call();
-                  },
+                  icon: Icons.edit_outlined,
+                  label: s?.commonEdit ?? 'Edit',
+                  onTap: () { onDismiss(); onEdit?.call(); },
                 ),
-                // 发送失败的消息显示"重发"
-                if (message.isFromMe && message.status == MessageStatus.failed)
-                  _buildMenuItem(
-                    icon: Icons.refresh,
-                    label: S.of(context)?.settingsResend ?? 'Resend',
-                    onTap: () {
-                      onDismiss();
-                      onResend?.call();
-                    },
-                  ),
-                // 自己发送的消息显示"撤回"（撤回后双方都不可见）
-                if (message.isFromMe && message.status != MessageStatus.failed)
-                  _buildMenuItem(
-                    icon: Icons.undo_outlined,
-                    label: S.of(context)?.chatRecall ?? 'Recall',
-                    onTap: () {
-                      onDismiss();
-                      onRecall?.call();
-                    },
-                  ),
-                // 所有消息都可以删除（仅本地删除）
+              if (onReplyInThread != null)
                 _buildMenuItem(
-                  icon: Icons.delete_outline,
-                  label: S.of(context)?.commonDelete ?? 'Delete',
-                  onTap: () {
-                    onDismiss();
-                    onDelete?.call();
-                  },
+                  icon: Icons.forum_outlined,
+                  label: s?.threadReplyInThread ?? 'Thread',
+                  onTap: () { onDismiss(); onReplyInThread?.call(); },
                 ),
+              if (message.type == MessageType.text && onTranslate != null)
                 _buildMenuItem(
-                  icon: Icons.checklist_outlined,
-                  label: S.of(context)?.chatSelectMessages ?? 'Select',
-                  onTap: () {
-                    onDismiss();
-                    onMultiSelect?.call();
-                  },
+                  icon: Icons.translate,
+                  label: s?.commonTranslate ?? 'Translate',
+                  onTap: () { onDismiss(); onTranslate?.call(); },
                 ),
-              ],
-            ),
-          ),
-          
-          // 分隔线
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            height: 0.5,
-            color: Colors.white.withValues(alpha: 0.1),
-          ),
-          
-          // 第二行按钮（使用 Wrap 自动换行防止溢出）
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12, left: 8, right: 8),
-            child: Wrap(
-              spacing: 4,
-              runSpacing: 4,
-              children: [
+              if (message.isEdited && onViewEditHistory != null)
                 _buildMenuItem(
-                  icon: Icons.format_quote_outlined,
-                  label: S.of(context)?.commonQuote ?? 'Quote',
-                  onTap: () {
-                    onDismiss();
-                    onQuote?.call();
-                  },
+                  icon: Icons.history,
+                  label: s?.chatEditHistory ?? 'History',
+                  onTap: () { onDismiss(); onViewEditHistory?.call(); },
                 ),
-                // 编辑消息（仅自己发送的文本消息）
-                if (message.isFromMe && message.type == MessageType.text && onEdit != null)
-                  _buildMenuItem(
-                    icon: Icons.edit_outlined,
-                    label: S.of(context)?.commonEdit ?? 'Edit',
-                    onTap: () {
-                      onDismiss();
-                      onEdit?.call();
-                    },
-                  ),
-                // 在线程中回复
-                if (onReplyInThread != null)
-                  _buildMenuItem(
-                    icon: Icons.forum_outlined,
-                    label: S.of(context)?.threadReplyInThread ?? 'Thread',
-                    onTap: () {
-                      onDismiss();
-                      onReplyInThread?.call();
-                    },
-                  ),
-                // 翻译按钮（仅文本消息显示）
-                if (message.type == MessageType.text && onTranslate != null)
-                  _buildMenuItem(
-                    icon: Icons.translate,
-                    label: S.of(context)?.commonTranslate ?? 'Translate',
-                    onTap: () {
-                      onDismiss();
-                      onTranslate?.call();
-                    },
-                  ),
-                // 编辑历史按钮（当消息已编辑时显示）
-                if (message.isEdited && onViewEditHistory != null)
-                  _buildMenuItem(
-                    icon: Icons.history,
-                    label: S.of(context)?.chatEditHistory ?? 'History',
-                    onTap: () {
-                      onDismiss();
-                      onViewEditHistory?.call();
-                    },
-                  ),
-                // 置顶/取消置顶按钮（仅在有权限时显示）
-                if (canPin)
-                  isPinned
-                      ? _buildMenuItem(
-                          icon: Icons.push_pin,
-                          label: S.of(context)?.conversationUnpin ?? 'Unpin',
-                          isHighlighted: true,
-                          onTap: () {
-                            onDismiss();
-                            onUnpin?.call();
-                          },
-                        )
-                      : _buildMenuItem(
-                          icon: Icons.push_pin_outlined,
-                          label: S.of(context)?.conversationPin ?? 'Pin',
-                          onTap: () {
-                            onDismiss();
-                            onPin?.call();
-                          },
-                        ),
+              if (canPin)
+                isPinned
+                    ? _buildMenuItem(
+                        icon: Icons.push_pin,
+                        label: s?.conversationUnpin ?? 'Unpin',
+                        isHighlighted: true,
+                        onTap: () { onDismiss(); onUnpin?.call(); },
+                      )
+                    : _buildMenuItem(
+                        icon: Icons.push_pin_outlined,
+                        label: s?.conversationPin ?? 'Pin',
+                        onTap: () { onDismiss(); onPin?.call(); },
+                      ),
+              _buildMenuItem(
+                icon: Icons.notifications_outlined,
+                label: s?.commonRemind ?? 'Remind',
+                onTap: () { onDismiss(); onRemind?.call(); },
+              ),
+              _buildMenuItem(
+                icon: Icons.search,
+                label: s?.commonSearch ?? 'Search',
+                onTap: () { onDismiss(); onSearch?.call(); },
+              ),
+              if (!message.isFromMe && onReport != null)
                 _buildMenuItem(
-                  icon: Icons.notifications_outlined,
-                  label: S.of(context)?.commonRemind ?? 'Remind',
-                  onTap: () {
-                    onDismiss();
-                    onRemind?.call();
-                  },
+                  icon: Icons.flag_outlined,
+                  label: s?.chatReportMessage ?? 'Report',
+                  onTap: () { onDismiss(); onReport?.call(); },
                 ),
-                _buildMenuItem(
-                  icon: Icons.search,
-                  label: S.of(context)?.commonSearch ?? 'Search',
-                  onTap: () {
-                    onDismiss();
-                    onSearch?.call();
-                  },
-                ),
-                // 举报（不举报自己的消息）
-                if (!message.isFromMe && onReport != null)
-                  _buildMenuItem(
-                    icon: Icons.flag_outlined,
-                    label: S.of(context)?.chatReportMessage ?? 'Report',
-                    onTap: () {
-                      onDismiss();
-                      onReport?.call();
-                    },
-                  ),
-              ],
-            ),
+            ]),
           ),
         ],
       ),
     );
+  }
+
+  /// 5列等宽网格布局：每行恰好 5 个格子，不足则以空占位补全，
+  /// 彻底消除 Wrap 尾行孤立按钮和文字换行问题。
+  Widget _buildMenuGrid(List<Widget?> items) {
+    const int cols = 5;
+    final visible = items.whereType<Widget>().toList();
+    if (visible.isEmpty) return const SizedBox.shrink();
+
+    final rows = <Widget>[];
+    for (int i = 0; i < visible.length; i += cols) {
+      final end = (i + cols).clamp(0, visible.length);
+      final rowItems = visible.sublist(i, end);
+      rows.add(Row(
+        children: [
+          ...rowItems.map((w) => Expanded(child: w)),
+          // 空占位保证每行等宽对齐
+          ...List.generate(
+            cols - rowItems.length,
+            (_) => const Expanded(child: SizedBox()),
+          ),
+        ],
+      ));
+    }
+    return Column(children: rows);
   }
 
   /// 构建表情快速回应栏
@@ -482,6 +435,7 @@ class WeChatMessageMenu extends StatelessWidget {
     VoidCallback? onTap,
     bool isHighlighted = false,
   }) {
+    final color = isHighlighted ? Colors.amber : Colors.white;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -489,24 +443,19 @@ class WeChatMessageMenu extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         splashColor: Colors.white.withValues(alpha: 0.1),
         highlightColor: Colors.white.withValues(alpha: 0.05),
-        child: Container(
-          width: 58,
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                color: isHighlighted ? Colors.amber : Colors.white,
-                size: 24,
-              ),
-              const SizedBox(height: 6),
+              Icon(icon, color: color, size: 24),
+              const SizedBox(height: 5),
               Text(
                 label,
-                style: TextStyle(
-                  color: isHighlighted ? Colors.amber : Colors.white,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: color, fontSize: 11),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
