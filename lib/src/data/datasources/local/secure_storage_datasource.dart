@@ -65,6 +65,10 @@ class SecureStorageDataSource {
         'userId': json['userId'] as String,
         'deviceId': json['deviceId'] as String,
       };
+    } on FormatException catch (e) {
+      debugPrint('SecureStorage: Session data corrupted, clearing: $e');
+      await _storage.delete(key: _keySession);
+      return null;
     } catch (e) {
       debugPrint('SecureStorage: Failed to read session - $e');
       return null;

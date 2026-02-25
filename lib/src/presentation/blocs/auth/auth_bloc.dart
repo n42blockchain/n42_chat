@@ -633,10 +633,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
-        // Apple 登录成功后注册推送通知
-        unawaited(_registerPushNotifications());
-        // 通话管理器必须在 sync 到达前初始化完成
+        // 通话管理器必须在 sync 到达前初始化完成（先于推送注册）
         await _initializeCallManager();
+        unawaited(_registerPushNotifications());
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -735,10 +734,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
-        // Facebook 登录成功后注册推送通知
-        unawaited(_registerPushNotifications());
-        // 通话管理器必须在 sync 到达前初始化完成
+        // 通话管理器必须在 sync 到达前初始化完成（先于推送注册）
         await _initializeCallManager();
+        unawaited(_registerPushNotifications());
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -793,10 +791,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
-        // Twitter 登录成功后注册推送通知
-        unawaited(_registerPushNotifications());
-        // 通话管理器必须在 sync 到达前初始化完成
+        // 通话管理器必须在 sync 到达前初始化完成（先于推送注册）
         await _initializeCallManager();
+        unawaited(_registerPushNotifications());
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -851,10 +848,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           user: result.user,
         ));
         add(const LoadUserProfileData());
-        // 微信登录成功后注册推送通知
-        unawaited(_registerPushNotifications());
-        // 通话管理器必须在 sync 到达前初始化完成
+        // 通话管理器必须在 sync 到达前初始化完成（先于推送注册）
         await _initializeCallManager();
+        unawaited(_registerPushNotifications());
       } else {
         emit(state.copyWith(
           status: AuthStatus.error,
@@ -1059,16 +1055,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         return;
       }
 
-      // 生物识别成功，使用保存的凭据登录
-      final homeserver = credentials['homeserver']!;
-      final username = credentials['username']!;
-      final password = credentials['password']!;
+      // 生物识别成功，使用已保存的 session token 恢复登录（仿微信策略：密码不再存储）
+      final session = await _secureStorage.getSession();
+      if (session == null) {
+        emit(state.copyWith(
+          status: AuthStatus.unauthenticated,
+          errorMessage: '会话已失效，请重新登录',
+        ));
+        return;
+      }
 
-      final result = await _authRepository.login(
-        homeserver: homeserver,
-        username: username,
-        password: password,
-        rememberMe: true,
+      final result = await _authRepository.loginWithToken(
+        homeserver: session['homeserver'] ?? credentials['homeserver'] ?? '',
+        accessToken: session['accessToken']!,
+        userId: session['userId']!,
+        deviceId: session['deviceId']!,
       );
 
       if (result.success && result.user != null) {

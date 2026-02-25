@@ -132,29 +132,13 @@ class MatrixAuthDataSource {
     String? registrationToken,
   }) async {
     // 确保客户端已初始化
-    // 如果未初始化，尝试初始化；如果初始化失败，强制重新初始化
     if (!_clientManager.isInitialized) {
-      try {
-        await _clientManager.initialize();
-      } catch (e) {
-        // 如果初始化失败，尝试强制重新初始化
-        debugPrint('MatrixAuthDataSource: Initial init failed: $e, force reinit...');
-        await Future<void>.delayed(const Duration(milliseconds: 500));
-        await _clientManager.initialize(forceReinit: true);
-      }
-    }
-
-    // 再次检查客户端状态
-    final client = _clientManager.client;
-    if (client == null) {
-      // 最后一次尝试
-      debugPrint('MatrixAuthDataSource: Client still null, final attempt...');
-      await _clientManager.initialize(forceReinit: true);
+      await _clientManager.initialize();
     }
 
     final finalClient = _clientManager.client;
     if (finalClient == null) {
-      throw StateError('Matrix client not initialized after multiple attempts');
+      throw StateError('Matrix client is not initialized');
     }
 
     // 设置homeserver
@@ -422,9 +406,11 @@ class MatrixAuthDataSource {
       await client.checkHomeserver(homeserverUri);
 
       // 从安全存储读取之前请求时保存的 clientSecret 和 sid
-      final clientSecret = await _secureStorage?.read('pwd_reset_secret')
-          ?? const Uuid().v4();
-      final savedSid = await _secureStorage?.read('pwd_reset_sid') ?? code;
+      final clientSecret = await _secureStorage?.read('pwd_reset_secret');
+      final savedSid = await _secureStorage?.read('pwd_reset_sid');
+      if (clientSecret == null || savedSid == null || savedSid.isEmpty) {
+        throw StateError('密码重置会话已失效，请重新请求验证码');
+      }
 
       // 创建邮箱验证认证数据（使用与请求时相同的 clientSecret）
       final auth = AuthenticationThreePidCreds(
@@ -504,7 +490,7 @@ class SessionCredentials {
 
   Map<String, dynamic> toJson() => {
         'homeserver': homeserver,
-        'accessToken': accessToken,
+        // accessToken excluded — sensitive credential, must not be serialized
         'userId': userId,
         'deviceId': deviceId,
         'deviceName': deviceName,

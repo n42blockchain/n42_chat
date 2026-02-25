@@ -30,7 +30,7 @@ class AuthLoginRequested extends AuthEvent {
   });
 
   @override
-  List<Object?> get props => [homeserver, username, password, rememberMe];
+  List<Object?> get props => [homeserver, username, rememberMe];
 }
 
 /// 登出请求
@@ -55,7 +55,7 @@ class AuthRegisterRequested extends AuthEvent {
   });
 
   @override
-  List<Object?> get props => [homeserver, username, password, email, registrationToken];
+  List<Object?> get props => [homeserver, username, email, registrationToken];
 }
 
 /// 检查Homeserver
@@ -293,7 +293,7 @@ class AuthConfirmPasswordResetRequested extends AuthEvent {
   });
 
   @override
-  List<Object?> get props => [homeserver, email, code, newPassword];
+  List<Object?> get props => [homeserver, email, code];
 }
 
 /// 修改密码请求
@@ -307,7 +307,7 @@ class AuthChangePasswordRequested extends AuthEvent {
   });
 
   @override
-  List<Object?> get props => [oldPassword, newPassword];
+  List<Object?> get props => [];
 }
 
 // ============================================
@@ -325,7 +325,7 @@ class AuthRequestChangeEmailRequested extends AuthEvent {
   });
 
   @override
-  List<Object?> get props => [password, newEmail];
+  List<Object?> get props => [newEmail];
 }
 
 /// 确认修改绑定邮箱

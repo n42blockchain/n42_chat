@@ -25,6 +25,11 @@ class AuthRepositoryImpl implements IAuthRepository {
   bool _isAuthenticating = false;
   // 并发登录互斥
   Completer<void>? _authInProgress;
+  // dispose 后禁止再向已关闭的 StreamController 发送事件
+  bool _isDisposed = false;
+  // pokeText 同步并发计数
+  int _activePokeSyncs = 0;
+  static const int _maxConcurrentPokeSyncs = 3;
 
   AuthRepositoryImpl({
     MatrixAuthDataSource? authDataSource,
@@ -130,7 +135,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       );
 
       // 通知登录状态变化
-      _loginStateController.add(true);
+      if (!_isDisposed) _loginStateController.add(true);
 
       // 加载用户资料（包括头像）
       final userProfile = await getCurrentUserProfile();
@@ -193,7 +198,7 @@ class AuthRepositoryImpl implements IAuthRepository {
         }),
       );
 
-      _loginStateController.add(true);
+      if (!_isDisposed) _loginStateController.add(true);
 
       final user = UserEntity(
         userId: userId,
@@ -236,7 +241,7 @@ class AuthRepositoryImpl implements IAuthRepository {
           }),
         );
 
-        _loginStateController.add(true);
+        if (!_isDisposed) _loginStateController.add(true);
 
         // 同步更新 SecureStorage（保持与 SDK 状态一致）
         final client = _authDataSource.clientManager.client;
@@ -339,7 +344,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       _cachedAvatarUrl = null;
       _cachedDisplayName = null;
 
-      _loginStateController.add(false);
+      if (!_isDisposed) _loginStateController.add(false);
       debugPrint('AuthRepository: Logout successful');
     } catch (e) {
       debugPrint('AuthRepository: Logout error - $e');
@@ -349,7 +354,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       _cachedProfileData = null;
       _cachedAvatarUrl = null;
       _cachedDisplayName = null;
-      _loginStateController.add(false);
+      if (!_isDisposed) _loginStateController.add(false);
     }
   }
 
@@ -389,7 +394,7 @@ class AuthRepositoryImpl implements IAuthRepository {
             debugPrint('AuthRepository: Background sync error: $e');
           }),
         );
-        _loginStateController.add(true);
+        if (!_isDisposed) _loginStateController.add(true);
 
         final user = UserEntity(
           userId: userId,
@@ -625,13 +630,18 @@ class AuthRepositoryImpl implements IAuthRepository {
   
   /// 将 pokeText 同步到所有已加入的房间
   Future<void> _syncPokeTextToRooms(String pokeText) async {
-    final client = _authDataSource.clientManager.client;
-    if (client == null) return;
-    
+    if (_activePokeSyncs >= _maxConcurrentPokeSyncs) {
+      debugPrint('AuthRepository: Skipping poke sync, too many concurrent syncs ($_activePokeSyncs)');
+      return;
+    }
+    _activePokeSyncs++;
     try {
+      final client = _authDataSource.clientManager.client;
+      if (client == null) return;
+
       // 获取所有已加入的房间
       final rooms = client.rooms.where((room) => room.membership == Membership.join);
-      
+
       for (final room in rooms) {
         try {
           // 设置房间状态事件，以便其他成员可以读取
@@ -649,6 +659,8 @@ class AuthRepositoryImpl implements IAuthRepository {
       }
     } catch (e) {
       debugPrint('AuthRepository: Failed to sync pokeText to rooms: $e');
+    } finally {
+      _activePokeSyncs--;
     }
   }
 
@@ -1096,6 +1108,7 @@ class AuthRepositoryImpl implements IAuthRepository {
   }
 
   void dispose() {
+    _isDisposed = true;
     _matrixLoginStateSubscription?.cancel();
     _loginStateController.close();
   }
@@ -1118,7 +1131,7 @@ class AuthRepositoryImpl implements IAuthRepository {
           'AuthRepository: Matrix SDK reported $loginState '
           '(token expired or revoked), propagating logout',
         );
-        _loginStateController.add(false);
+        if (!_isDisposed) _loginStateController.add(false);
       }
     });
   }
