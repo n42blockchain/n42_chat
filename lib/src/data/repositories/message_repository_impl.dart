@@ -915,7 +915,15 @@ class MessageRepositoryImpl implements IMessageRepository {
   }
 
   bool _isDisplayableEvent(matrix.Event event) {
-    // 过滤出可显示的消息类型
+    // 过滤掉编辑替换事件（m.replace）：编辑事件的 type 仍是 m.room.message，
+    // 仅凭 type 无法区分，必须检查 m.relates_to.rel_type。
+    // matrix-dart-sdk 理论上会在 Timeline 层聚合编辑事件，但部分版本下
+    // 编辑事件仍会出现在 timeline.events 中，导致 UI 新增一条重复消息。
+    final relatesTo = event.content['m.relates_to'];
+    if (relatesTo is Map && relatesTo['rel_type'] == 'm.replace') {
+      return false;
+    }
+
     return event.type == matrix.EventTypes.Message ||
         event.type == matrix.EventTypes.Encrypted ||
         event.type == matrix.EventTypes.Sticker ||
