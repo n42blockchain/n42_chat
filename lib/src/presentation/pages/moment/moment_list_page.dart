@@ -428,7 +428,7 @@ class _MomentTile extends StatelessWidget {
                   const SizedBox(height: 8),
                 ],
 
-                // 时间和操作
+                // 时间、可见性图标和操作
                 Row(
                   children: [
                     Text(
@@ -438,6 +438,12 @@ class _MomentTile extends StatelessWidget {
                         fontSize: 12,
                       ),
                     ),
+                    // 自己的动态显示可见性状态（非公开时显示图标，微信风格）
+                    if (moment.isFromMe &&
+                        moment.visibility != MomentVisibility.public) ...[
+                      const SizedBox(width: 4),
+                      _buildVisibilityBadge(context),
+                    ],
                     const Spacer(),
                     _buildInteractionBar(context),
                   ],
@@ -607,6 +613,42 @@ class _MomentTile extends StatelessWidget {
     }
 
     return const Icon(Icons.image);
+  }
+
+  /// 可见性角标（仅自己动态的非公开状态，微信风格）
+  Widget _buildVisibilityBadge(BuildContext context) {
+    final s = S.of(context);
+    switch (moment.visibility) {
+      case MomentVisibility.private:
+        return Tooltip(
+          message: s?.momentVisibilityPrivate ?? 'Private',
+          child: Icon(
+            Icons.lock_outline,
+            size: 13,
+            color: isDark ? Colors.grey[400] : Colors.grey[500],
+          ),
+        );
+      case MomentVisibility.partial:
+        return Tooltip(
+          message: s?.momentVisibilityPartial ?? 'Selected Friends',
+          child: Icon(
+            Icons.group_outlined,
+            size: 13,
+            color: isDark ? Colors.grey[400] : Colors.grey[500],
+          ),
+        );
+      case MomentVisibility.excluded:
+        return Tooltip(
+          message: s?.momentVisibilityExcluded ?? 'Exclude Some Friends',
+          child: Icon(
+            Icons.person_off_outlined,
+            size: 13,
+            color: isDark ? Colors.grey[400] : Colors.grey[500],
+          ),
+        );
+      case MomentVisibility.public:
+        return const SizedBox.shrink();
+    }
   }
 
   /// 交互栏（微信风格：点击 "..." 弹出操作面板）

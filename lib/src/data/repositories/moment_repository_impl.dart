@@ -193,6 +193,7 @@ class MomentRepositoryImpl implements IMomentRepository {
         width: video.width,
         height: video.height,
         duration: video.duration,
+        thumbnailBytes: thumbnailBytes,
       ),
     ];
 

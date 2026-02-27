@@ -103,6 +103,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
       debugPrint('Initializing video controller...');
       await _controller.initialize();
+      // Seek to first frame to avoid black screen on some platforms
+      await _controller.seekTo(Duration.zero);
       debugPrint('Video controller initialized successfully');
       debugPrint('Video duration: ${_controller.value.duration}');
       debugPrint('Video size: ${_controller.value.size}');
