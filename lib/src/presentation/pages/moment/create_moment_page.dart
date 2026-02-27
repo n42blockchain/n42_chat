@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
@@ -12,6 +15,8 @@ import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
 import 'visibility_selection_page.dart';
+
+const _kLastVisibilityKey = 'moment_last_visibility';
 
 /// 发布动态页面
 class CreateMomentPage extends StatefulWidget {
@@ -28,6 +33,40 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
   MomentVisibility _visibility = MomentVisibility.public;
   List<String> _visibilityUserIds = [];
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLastVisibility();
+  }
+
+  Future<void> _loadLastVisibility() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getString(_kLastVisibilityKey);
+      if (saved != null && mounted) {
+        final v = MomentVisibility.values.firstWhere(
+          (e) => e.name == saved,
+          orElse: () => MomentVisibility.public,
+        );
+        // partial/excluded 需要重新选择好友，只恢复 public/private
+        if (v == MomentVisibility.public || v == MomentVisibility.private) {
+          setState(() => _visibility = v);
+        }
+      }
+    } catch (e) {
+      debugPrint('Failed to load last visibility: $e');
+    }
+  }
+
+  Future<void> _saveLastVisibility(MomentVisibility v) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_kLastVisibilityKey, v.name);
+    } catch (e) {
+      debugPrint('Failed to save last visibility: $e');
+    }
+  }
 
   @override
   void dispose() {
@@ -234,10 +273,20 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.memory(
-                      media.bytes,
-                      fit: BoxFit.cover,
-                    ),
+                    child: media.isVideo
+                        ? (media.thumbnailBytes != null
+                            ? Image.memory(
+                                media.thumbnailBytes!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, _, _) => Container(
+                                  color: Colors.grey[850],
+                                ),
+                              )
+                            : Container(color: Colors.grey[850]))
+                        : Image.memory(
+                            media.bytes,
+                            fit: BoxFit.cover,
+                          ),
                   ),
                   if (media.isVideo)
                     const Center(
@@ -349,10 +398,26 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
 
     if (video != null) {
       final bytes = await video.readAsBytes();
+
+      // 提取视频首帧作为缩略图（Matrix thumbnail API 不支持视频）
+      Uint8List? thumbnailBytes;
+      try {
+        thumbnailBytes = await VideoThumbnail.thumbnailData(
+          video: video.path,
+          imageFormat: ImageFormat.JPEG,
+          maxWidth: 640,
+          quality: 80,
+          timeMs: 0,
+        );
+      } catch (e) {
+        debugPrint('Failed to extract video thumbnail: $e');
+      }
+
       setState(() {
         _selectedMedia.clear();
         _selectedMedia.add(_MediaItem(
           bytes: bytes,
+          thumbnailBytes: thumbnailBytes,
           filename: video.name,
           mimeType: video.mimeType,
           isVideo: true,
@@ -393,6 +458,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                   _visibility = MomentVisibility.public;
                   _visibilityUserIds = [];
                 });
+                unawaited(_saveLastVisibility(MomentVisibility.public));
                 Navigator.pop(ctx);
               },
             ),
@@ -408,6 +474,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                   _visibility = MomentVisibility.private;
                   _visibilityUserIds = [];
                 });
+                unawaited(_saveLastVisibility(MomentVisibility.private));
                 Navigator.pop(ctx);
               },
             ),
@@ -475,6 +542,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
         _visibility = visibility;
         _visibilityUserIds = result;
       });
+      unawaited(_saveLastVisibility(visibility));
     }
   }
 
@@ -496,6 +564,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
             ? null
             : _contentController.text.trim(),
         videoBytes: video.bytes,
+        thumbnailBytes: video.thumbnailBytes,
         filename: video.filename,
         mimeType: video.mimeType,
         location: _location,
@@ -526,12 +595,15 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
 /// 媒体项
 class _MediaItem {
   final Uint8List bytes;
+  /// 视频缩略图帧（使用 video_thumbnail 提取的首帧 JPEG）
+  final Uint8List? thumbnailBytes;
   final String filename;
   final String? mimeType;
   final bool isVideo;
 
   const _MediaItem({
     required this.bytes,
+    this.thumbnailBytes,
     required this.filename,
     this.mimeType,
     required this.isVideo,

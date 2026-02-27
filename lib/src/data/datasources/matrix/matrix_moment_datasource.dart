@@ -223,6 +223,23 @@ class MatrixMomentDataSource {
           filename: m.filename,
           contentType: contentType,
         );
+
+        // 视频单独上传缩略图（Matrix thumbnail API 不支持视频缩略图）
+        String? thumbnailMxcUrl;
+        if (m.isVideo && m.thumbnailBytes != null) {
+          try {
+            final thumbUri = await _client!.uploadContent(
+              m.thumbnailBytes!,
+              filename: '${m.filename}_thumb.jpg',
+              contentType: 'image/jpeg',
+            );
+            thumbnailMxcUrl = thumbUri.toString();
+            debugPrint('MatrixMomentDataSource: Video thumbnail uploaded: $thumbnailMxcUrl');
+          } catch (e) {
+            debugPrint('MatrixMomentDataSource: Failed to upload video thumbnail: $e');
+          }
+        }
+
         uploadedMedia.add({
           'url': uri.toString(),
           'type': m.isVideo ? 'video' : 'image',
@@ -231,6 +248,7 @@ class MatrixMomentDataSource {
           'duration': m.duration,
           'mimeType': m.mimeType,
           'size': m.bytes.length,
+          'thumbnail_url': thumbnailMxcUrl,
         });
       }
     }
@@ -582,12 +600,17 @@ class MatrixMomentDataSource {
           if (m is Map) {
             final mxcUrl = m['url'] as String?;
             final isVideo = m['type'] == 'video';
+            // 视频缩略图：使用上传时存储的 thumbnail_url（Matrix thumbnail API 不支持视频）
+            final storedThumbnailMxcUrl = m['thumbnail_url'] as String?;
+            String? resolvedThumbnailUrl;
+            if (isVideo && storedThumbnailMxcUrl != null) {
+              resolvedThumbnailUrl = _getHttpUrlFromMxc(storedThumbnailMxcUrl);
+            }
+
             mediaList.add(MomentMedia(
               url: mxcUrl ?? '',
               httpUrl: mxcUrl != null ? _getHttpUrlFromMxc(mxcUrl) : null,
-              thumbnailUrl: (isVideo && mxcUrl != null)
-                  ? _getThumbnailUrlFromMxc(mxcUrl)
-                  : null,
+              thumbnailUrl: resolvedThumbnailUrl,
               type: isVideo
                   ? MomentMediaType.video
                   : MomentMediaType.image,
@@ -654,18 +677,6 @@ class MatrixMomentDataSource {
     final mediaId = uri.path.startsWith('/') ? uri.path.substring(1) : uri.path;
     final homeserver = _client!.homeserver.toString().replaceAll(RegExp(r'/+$'), '');
     return '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
-  }
-
-  /// 从 mxc:// URL 生成缩略图 HTTP URL（用于视频预览）
-  String? _getThumbnailUrlFromMxc(String mxcUrl) {
-    if (!mxcUrl.startsWith('mxc://')) return null;
-    if (_client?.homeserver == null) return null;
-
-    final uri = Uri.parse(mxcUrl);
-    final serverName = uri.host;
-    final mediaId = uri.path.startsWith('/') ? uri.path.substring(1) : uri.path;
-    final homeserver = _client!.homeserver.toString().replaceAll(RegExp(r'/+$'), '');
-    return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=320&height=320&method=scale';
   }
 
   /// 上传文件
@@ -839,6 +850,8 @@ class MomentMediaData {
   final int? width;
   final int? height;
   final int? duration;
+  /// 视频缩略图字节（本地提取的帧，上传后存 thumbnail_url）
+  final Uint8List? thumbnailBytes;
 
   const MomentMediaData({
     required this.bytes,
@@ -847,6 +860,7 @@ class MomentMediaData {
     this.width,
     this.height,
     this.duration,
+    this.thumbnailBytes,
   });
 
   bool get isVideo {
