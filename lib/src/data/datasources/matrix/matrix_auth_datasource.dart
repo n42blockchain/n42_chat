@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/di/injection.dart';
+import '../../../core/encryption/e2ee_manager.dart';
 import '../local/secure_storage_datasource.dart';
 import 'matrix_client_manager.dart';
 
@@ -46,12 +48,17 @@ class MatrixAuthDataSource {
       await _clientManager.initialize();
     }
 
-    return await _clientManager.login(
+    final response = await _clientManager.login(
       homeserver: homeserver,
       username: username,
       password: password,
       deviceName: deviceName,
     );
+
+    // 登录成功后自动初始化 cross-signing
+    _autoSetupCrossSigning();
+
+    return response;
   }
 
   /// 使用Token恢复登录
@@ -71,6 +78,27 @@ class MatrixAuthDataSource {
       userId: userId,
       deviceId: deviceId,
     );
+
+    // Token 登录后自动初始化 cross-signing
+    _autoSetupCrossSigning();
+  }
+
+  Future<void>? _autoSetupFuture;
+
+  /// 登录后异步初始化 cross-signing（不阻塞登录流程）
+  void _autoSetupCrossSigning() {
+    _autoSetupFuture?.ignore();
+    _autoSetupFuture = _doAutoSetup();
+  }
+
+  Future<void> _doAutoSetup() async {
+    try {
+      if (getIt.isRegistered<E2EEManager>()) {
+        await getIt<E2EEManager>().autoSetupAfterLogin();
+      }
+    } catch (e) {
+      debugPrint('MatrixAuthDataSource: Auto cross-signing setup failed: $e');
+    }
   }
 
   /// 检查Homeserver是否有效

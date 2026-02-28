@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_lock_service.dart';
+import '../../../core/services/on_chain_notification_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/responsive_utils.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -75,10 +76,22 @@ class _ChatMainPageState extends State<ChatMainPage> {
     _pageController = PageController();
     _conversationBloc = getIt<ConversationBloc>();
     _contactBloc = getIt<ContactBloc>();
+
+    // 启动链上事件推送轮询服务
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (getIt.isRegistered<OnChainNotificationService>()) {
+        getIt<OnChainNotificationService>().start(context);
+      }
+    });
   }
 
   @override
   void dispose() {
+    // 停止链上事件推送轮询服务
+    if (getIt.isRegistered<OnChainNotificationService>()) {
+      getIt<OnChainNotificationService>().stop();
+    }
     _pageController.dispose();
     _conversationBloc.close();
     _contactBloc.close();

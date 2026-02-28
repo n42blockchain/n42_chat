@@ -328,6 +328,46 @@ class E2EEManager {
   // 跨设备签名验证 (Cross-Signing)
   // ============================================
 
+  bool _autoSetupInProgress = false;
+
+  /// 登录后自动设置 cross-signing
+  ///
+  /// 检查是否已初始化 cross-signing，若未初始化则尝试自动设置。
+  /// 失败时静默处理，不阻塞登录流程。
+  Future<void> autoSetupAfterLogin() async {
+    if (!isEncryptionInitialized || _autoSetupInProgress) {
+      debugPrint('E2EEManager: Encryption not initialized or setup already in progress, skipping');
+      return;
+    }
+
+    _autoSetupInProgress = true;
+    try {
+      if (isCrossSigningEnabled) {
+        debugPrint('E2EEManager: Cross-signing already enabled');
+        return;
+      }
+
+      // 尝试自签名（如果有 SSSS 密钥可用）
+      if (hasSsssDefaultKey) {
+        final cachedKey = _cachedRecoveryKey;
+        if (cachedKey != null) {
+          await recoverCrossSigning(cachedKey);
+          debugPrint('E2EEManager: Cross-signing recovered with cached key');
+          return;
+        }
+      }
+
+      // 尝试直接 self-sign（新设备、首次登录场景）
+      await initializeCrossSigning();
+      debugPrint('E2EEManager: Cross-signing auto-initialized');
+    } catch (e) {
+      // 非致命：部分场景下 self-sign 需要用户交互（如输入恢复密钥）
+      debugPrint('E2EEManager: Auto cross-signing setup failed (non-fatal): $e');
+    } finally {
+      _autoSetupInProgress = false;
+    }
+  }
+
   /// 是否已设置跨设备签名
   bool get isCrossSigningEnabled {
     return _client.encryption?.crossSigning.enabled ?? false;
