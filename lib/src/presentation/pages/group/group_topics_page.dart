@@ -101,30 +101,34 @@ class _GroupTopicsBody extends StatelessWidget {
               : null,
           body: state.isLoading
               ? const N42Loading()
-              : channels.isEmpty
-                  ? N42EmptyState(
-                      icon: Icons.forum_outlined,
-                      title: l10n?.groupTopicsEmpty ?? 'No topics yet',
-                    )
-                  : ListView(
+              : Builder(builder: (context) {
+                  // 始终插入 General 条目作为父房间入口
+                  final effectivePinned = pinned;
+                  final effectiveRegular = [
+                    ChannelEntity.general(roomId),
+                    ...regular,
+                  ];
+
+                  return ListView(
                       children: [
                         // 置顶话题
-                        if (pinned.isNotEmpty) ...[
+                        if (effectivePinned.isNotEmpty) ...[
                           _buildSectionHeader(context, isDark, Icons.push_pin_outlined,
                               l10n?.groupChannels ?? 'Pinned'),
-                          ...pinned.map((c) => _buildTopicTile(context, c, isDark, isPinned: true)),
+                          ...effectivePinned.map((c) => _buildTopicTile(context, c, isDark, isPinned: true)),
                         ],
 
                         // 普通话题
-                        if (regular.isNotEmpty) ...[
-                          if (pinned.isNotEmpty)
+                        if (effectiveRegular.isNotEmpty) ...[
+                          if (effectivePinned.isNotEmpty)
                             _buildSectionHeader(context, isDark, Icons.tag, l10n?.groupTopics ?? 'Topics'),
-                          ...regular.map((c) => _buildTopicTile(context, c, isDark)),
+                          ...effectiveRegular.map((c) => _buildTopicTile(context, c, isDark)),
                         ],
 
                         const SizedBox(height: 80), // FAB 间距
                       ],
-                    ),
+                    );
+                }),
         );
       },
     );

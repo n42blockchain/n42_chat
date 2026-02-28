@@ -1,10 +1,42 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../domain/entities/on_chain_notification_entity.dart';
 import '../../domain/repositories/on_chain_notification_repository.dart';
 import '../../integration/wallet_bridge.dart';
 import 'in_app_notification_service.dart';
+
+/// 通知类型过滤器
+///
+/// 控制哪些类型的链上通知会被显示
+class OnChainNotificationFilter {
+  final Set<OnChainNotificationType> enabledTypes;
+
+  const OnChainNotificationFilter({
+    this.enabledTypes = const {
+      OnChainNotificationType.transfer,
+      OnChainNotificationType.nft,
+      OnChainNotificationType.defi,
+      OnChainNotificationType.governance,
+      OnChainNotificationType.security,
+      OnChainNotificationType.general,
+    },
+  });
+
+  bool isTypeEnabled(OnChainNotificationType type) =>
+      enabledTypes.contains(type);
+
+  OnChainNotificationFilter copyWith({Set<OnChainNotificationType>? enabledTypes}) {
+    return OnChainNotificationFilter(
+      enabledTypes: enabledTypes ?? this.enabledTypes,
+    );
+  }
+
+  /// 全部启用
+  static const all = OnChainNotificationFilter();
+}
 
 /// 链上事件推送后台服务
 ///
@@ -21,6 +53,13 @@ class OnChainNotificationService {
   Set<String> _seenIds = {};
   bool _isFirstPoll = true;
   bool _isRunning = false;
+  bool _pollInProgress = false;
+
+  /// 通知类型过滤器
+  OnChainNotificationFilter filter = const OnChainNotificationFilter();
+
+  /// 通知点击导航回调（由外部注入，用于导航到通知列表页）
+  VoidCallback? onNavigateToNotifications;
 
   OnChainNotificationService({
     required IOnChainNotificationRepository repository,
@@ -43,7 +82,13 @@ class OnChainNotificationService {
     if (_isRunning) return;
     _isRunning = true;
     _poll(context);
-    _timer = Timer.periodic(_pollInterval, (_) => _poll(context));
+    _timer = Timer.periodic(_pollInterval, (_) {
+      if (!context.mounted) {
+        stop();
+        return;
+      }
+      _poll(context);
+    });
   }
 
   /// 停止轮询
@@ -57,8 +102,14 @@ class OnChainNotificationService {
   Future<void> pollNow(BuildContext context) => _poll(context);
 
   Future<void> _poll(BuildContext context) async {
+    if (_pollInProgress) return;
+    _pollInProgress = true;
+
     final walletAddress = _walletBridge.walletAddress;
-    if (walletAddress == null || walletAddress.isEmpty) return;
+    if (walletAddress == null || walletAddress.isEmpty) {
+      _pollInProgress = false;
+      return;
+    }
 
     try {
       final notifications = await _repository.fetchNotifications(
@@ -77,6 +128,10 @@ class OnChainNotificationService {
       for (final notif in notifications) {
         if (!_seenIds.contains(notif.id) && !notif.isRead) {
           _seenIds.add(notif.id);
+
+          // 按类型过滤
+          if (!filter.isTypeEnabled(notif.type)) continue;
+
           if (context.mounted) {
             _inAppService.show(
               context,
@@ -84,7 +139,7 @@ class OnChainNotificationService {
                 title: notif.channelName,
                 body: notif.title,
                 avatarUrl: notif.imageUrl,
-                onTap: notif.ctaUrl != null ? () {} : null,
+                onTap: () => _handleNotificationTap(notif),
               ),
             );
           }
@@ -92,6 +147,25 @@ class OnChainNotificationService {
       }
     } catch (e) {
       debugPrint('OnChainNotificationService: poll error: $e');
+    } finally {
+      _pollInProgress = false;
+    }
+  }
+
+  /// 处理通知点击：有 ctaUrl 则打开浏览器，否则导航到通知列表页
+  Future<void> _handleNotificationTap(OnChainNotificationEntity notif) async {
+    final url = notif.ctaUrl;
+    if (url != null && url.isNotEmpty) {
+      final uri = Uri.tryParse(url);
+      if (uri != null) {
+        try {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } catch (e) {
+          debugPrint('OnChainNotificationService: Failed to launch URL: $e');
+        }
+      }
+    } else {
+      onNavigateToNotifications?.call();
     }
   }
 }

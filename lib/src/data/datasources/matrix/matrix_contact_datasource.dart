@@ -282,6 +282,56 @@ class MatrixContactDataSource {
   }
 
   // ============================================
+  // NFT 头像存储
+  // ============================================
+
+  static const String _nftAvatarEventType = 'n42.nft_avatar';
+
+  /// 获取用户的 NFT 头像数据
+  Map<String, dynamic>? getNftAvatarData() {
+    if (_client == null) return null;
+    try {
+      final data = _client!.accountData[_nftAvatarEventType];
+      return data?.content;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// 存储 NFT 头像数据到 Matrix account data
+  Future<void> setNftAvatarData({
+    required String contractAddress,
+    required int tokenId,
+    required int chainId,
+    required String imageUrl,
+  }) async {
+    final userId = _client?.userID;
+    if (_client == null || userId == null) return;
+    await _client!.setAccountData(
+      userId,
+      _nftAvatarEventType,
+      {
+        'contract_address': contractAddress,
+        'token_id': tokenId,
+        'chain_id': chainId,
+        'image_url': imageUrl,
+        'updated_at': DateTime.now().toIso8601String(),
+      },
+    );
+  }
+
+  /// 清除 NFT 头像数据
+  Future<void> clearNftAvatarData() async {
+    final userId = _client?.userID;
+    if (_client == null || userId == null) return;
+    await _client!.setAccountData(
+      userId,
+      _nftAvatarEventType,
+      {'cleared': true},
+    );
+  }
+
+  // ============================================
   // 监听
   // ============================================
 

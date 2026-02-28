@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/bot_config_entity.dart';
@@ -16,6 +17,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   final IGroupRepository _groupRepository;
 
   StreamSubscription<List<GroupEntity>>? _groupsSubscription;
+  final Map<String, StreamSubscription<String>> _memberJoinSubscriptions = {};
 
   GroupBloc(this._groupRepository) : super(const GroupState.initial()) {
     on<LoadGroups>(_onLoadGroups);
@@ -45,6 +47,8 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     on<CreateChannel>(_onCreateChannel);
     on<UpdateChannel>(_onUpdateChannel);
     on<DeleteChannel>(_onDeleteChannel);
+    on<SubscribeToMemberJoins>(_onSubscribeToMemberJoins);
+    on<MemberJoined>(_onMemberJoined);
   }
 
   Future<void> _onLoadGroups(
@@ -561,9 +565,65 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     }
   }
 
+  Future<void> _onSubscribeToMemberJoins(
+    SubscribeToMemberJoins event,
+    Emitter<GroupState> emit,
+  ) async {
+    // 移除并取消已有订阅
+    final oldSub = _memberJoinSubscriptions.remove(event.roomId);
+    await oldSub?.cancel();
+
+    // 检查是否有 Bot 配置且启用了欢迎消息
+    final botConfig = await _groupRepository.getBotConfig(event.roomId);
+    if (botConfig == null || !botConfig.enabled || botConfig.welcomeMessage == null) {
+      return;
+    }
+
+    // 订阅成员加入事件
+    _memberJoinSubscriptions[event.roomId] =
+        _groupRepository.watchMemberJoinEvents(event.roomId).listen(
+      (userId) => add(MemberJoined(event.roomId, userId)),
+      onError: (Object e) {
+        debugPrint('GroupBloc: Member join stream error: $e');
+        _memberJoinSubscriptions.remove(event.roomId);
+      },
+      onDone: () => _memberJoinSubscriptions.remove(event.roomId),
+    );
+  }
+
+  Future<void> _onMemberJoined(
+    MemberJoined event,
+    Emitter<GroupState> emit,
+  ) async {
+    try {
+      final botConfig = await _groupRepository.getBotConfig(event.roomId);
+      if (botConfig == null || !botConfig.enabled || botConfig.welcomeMessage == null) {
+        return;
+      }
+
+      // 获取成员信息以替换 {name} 占位符
+      final members = await _groupRepository.getGroupMembers(event.roomId);
+      final member = members.where((m) => m.userId == event.userId).firstOrNull;
+      final memberName = member?.displayName ?? event.userId.split(':').first.replaceFirst('@', '');
+
+      // 替换占位符
+      final message = botConfig.welcomeMessage!.replaceAll('{name}', memberName);
+
+      // 发送 notice 消息
+      await _groupRepository.sendBotNotice(event.roomId, message);
+      debugPrint('GroupBloc: Sent welcome message to ${event.userId} in ${event.roomId}');
+    } catch (e) {
+      debugPrint('GroupBloc: Failed to send welcome message: $e');
+    }
+  }
+
   @override
-  Future<void> close() {
-    _groupsSubscription?.cancel();
+  Future<void> close() async {
+    try { await _groupsSubscription?.cancel(); } catch (_) {}
+    for (final sub in _memberJoinSubscriptions.values) {
+      try { await sub.cancel(); } catch (_) {}
+    }
+    _memberJoinSubscriptions.clear();
     return super.close();
   }
 }

@@ -788,5 +788,52 @@ class MatrixGroupDataSource {
 
   /// 监听群变化
   Stream<void>? get onGroupsChanged => _client?.onSync.stream;
+
+  /// 监听指定房间的成员加入事件
+  ///
+  /// 返回新加入成员的 userId Stream
+  Stream<String> watchMemberJoinEvents(String roomId) {
+    final client = _client;
+    if (client == null) return const Stream.empty();
+
+    return client.onSync.stream
+        .where((sync) => sync.rooms?.join?.containsKey(roomId) == true)
+        .expand((sync) {
+      final joinRoom = sync.rooms?.join?[roomId];
+      if (joinRoom == null) return <String>[];
+      final timeline = joinRoom.timeline?.events ?? [];
+      final joinEvents = <String>[];
+      for (final event in timeline) {
+        if (event.type == 'm.room.member' &&
+            event.content['membership'] == 'join') {
+          // 检查是否是新加入（之前不是 join 状态）
+          final prevMembership = event.prevContent?['membership'];
+          if (prevMembership != 'join') {
+            final joinedUserId = event.stateKey;
+            if (joinedUserId != null && joinedUserId != client.userID) {
+              joinEvents.add(joinedUserId);
+            }
+          }
+        }
+      }
+      return joinEvents;
+    });
+  }
+
+  /// 发送 notice 消息（Bot 消息）
+  Future<void> sendBotNotice(String roomId, String message) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return;
+    try {
+      await room.sendEvent({
+        'msgtype': 'm.notice',
+        'body': message,
+        'n42.bot': true,
+      });
+    } catch (e) {
+      debugPrint('MatrixGroupDataSource: Failed to send bot notice: $e');
+      rethrow;
+    }
+  }
 }
 

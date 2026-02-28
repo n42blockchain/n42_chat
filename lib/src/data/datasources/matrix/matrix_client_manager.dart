@@ -8,6 +8,8 @@ import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:n42_chat/src/core/di/injection.dart';
+import 'package:n42_chat/src/core/services/sync_optimization_service.dart';
 import 'package:n42_chat/src/core/utils/io_helper.dart' as io_helper;
 import 'package:n42_chat/src/n42_chat_config.dart';
 
@@ -366,6 +368,19 @@ class MatrixClientManager {
     _ensureLoggedIn();
 
     try {
+      // 配置同步过滤器（timeline.limit:30 + lazy_load_members）
+      try {
+        if (!getIt.isRegistered<SyncOptimizationService>()) {
+          debugPrint('MatrixClientManager: SyncOptimizationService not registered, skipping filter config');
+        } else {
+        final syncService = getIt<SyncOptimizationService>();
+        await syncService.configureOptimalSyncFilter();
+        debugPrint('MatrixClientManager: Sync filter configured');
+        }
+      } catch (e) {
+        debugPrint('MatrixClientManager: Failed to configure sync filter (non-fatal): $e');
+      }
+
       // 启动后台同步循环
       _client!.backgroundSync = true;
 
