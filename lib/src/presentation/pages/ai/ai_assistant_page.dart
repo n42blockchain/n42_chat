@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
@@ -195,9 +196,70 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 ),
               ),
             ],
+            // Web3 快捷建议 chips
+            if (state.isAvailable) ...[
+              const SizedBox(height: 24),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: [
+                  _buildSuggestionChip(
+                    context,
+                    l10n?.aiSuggestionGasFee ?? 'What is Gas fee?',
+                    Icons.local_gas_station_outlined,
+                  ),
+                  _buildSuggestionChip(
+                    context,
+                    l10n?.aiSuggestionDefi ?? 'DeFi Beginner Guide',
+                    Icons.account_balance_outlined,
+                  ),
+                  _buildSuggestionChip(
+                    context,
+                    l10n?.aiSuggestionSecurity ?? 'How to check contract security',
+                    Icons.security_outlined,
+                  ),
+                  _buildSuggestionChip(
+                    context,
+                    l10n?.aiSuggestionBridge ?? 'Cross-chain bridging',
+                    Icons.swap_horiz_outlined,
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSuggestionChip(
+    BuildContext context,
+    String label,
+    IconData icon,
+  ) {
+    final isDark = context.isDarkMode;
+    return ActionChip(
+      avatar: Icon(icon, size: 16, color: AppColors.primary),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 13,
+          color: isDark ? Colors.white70 : Colors.black87,
+        ),
+      ),
+      backgroundColor: isDark
+          ? AppColors.primary.withValues(alpha: 0.15)
+          : AppColors.primary.withValues(alpha: 0.08),
+      side: BorderSide(
+        color: AppColors.primary.withValues(alpha: 0.2),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      onPressed: () {
+        context.read<AiAssistantBloc>().add(SendAiMessage(label));
+      },
     );
   }
 
@@ -239,16 +301,46 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               ),
               child: GestureDetector(
                 onLongPress: () => _copyMessage(message.content),
-                child: SelectableText(
-                  message.content,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: isUser
-                        ? Colors.white
-                        : (isDark ? Colors.white : Colors.black87),
-                    height: 1.4,
-                  ),
-                ),
+                child: isUser
+                    ? SelectableText(
+                        message.content,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.white,
+                          height: 1.4,
+                        ),
+                      )
+                    : MarkdownBody(
+                        data: message.content,
+                        selectable: true,
+                        styleSheet: MarkdownStyleSheet(
+                          p: TextStyle(
+                            fontSize: 15,
+                            color: isDark ? Colors.white : Colors.black87,
+                            height: 1.4,
+                          ),
+                          code: TextStyle(
+                            fontSize: 13,
+                            color: isDark ? Colors.greenAccent.shade200 : Colors.green.shade800,
+                            backgroundColor: isDark
+                                ? Colors.black26
+                                : Colors.grey.shade100,
+                            fontFamily: 'monospace',
+                          ),
+                          codeblockDecoration: BoxDecoration(
+                            color: isDark ? Colors.black26 : Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          listBullet: TextStyle(
+                            fontSize: 15,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                          strong: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                      ),
               ),
             ),
           ),

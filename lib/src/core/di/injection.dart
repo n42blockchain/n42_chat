@@ -91,6 +91,8 @@ import '../../domain/repositories/on_chain_notification_repository.dart';
 import '../../presentation/blocs/on_chain_notification/on_chain_notification_bloc.dart';
 import '../services/on_chain_notification_service.dart';
 import '../services/in_app_notification_service.dart';
+import '../services/red_packet_service.dart';
+import '../../data/datasources/local/local_red_packet_service.dart';
 
 /// 全局GetIt实例
 final GetIt getIt = GetIt.instance;
@@ -189,13 +191,19 @@ Future<void> _registerServices(N42ChatConfig config) async {
     ),
   );
 
-  // 翻译服务
-  getIt.registerLazySingleton<ITranslationService>(
-    () => GoogleTranslationService(
+  // 翻译服务：优先使用 AI 翻译（始终可用），回退到 Google Translate
+  getIt.registerLazySingleton<ITranslationService>(() {
+    if (config.aiApiKey != null && config.aiApiKey!.isNotEmpty) {
+      return AiTranslationService(
+        aiService: getIt<AiService>(),
+        storageDataSource: getIt<PreferencesDataSource>(),
+      );
+    }
+    return GoogleTranslationService(
       apiKey: config.googleTranslateApiKey,
       storageDataSource: getIt<PreferencesDataSource>(),
-    ),
-  );
+    );
+  });
 
   // 游戏分数服务
   getIt.registerLazySingleton<GameScoreService>(
@@ -293,6 +301,11 @@ Future<void> _registerServices(N42ChatConfig config) async {
       ),
     );
   }
+
+  // 红包服务（本地实现，过渡方案）
+  getIt.registerLazySingleton<IRedPacketService>(
+    () => LocalRedPacketService(),
+  );
 
   // 链上事件推送后台服务（仅当 Push Protocol 启用时注册）
   final ppConfig = config.pushProtocol;
@@ -632,7 +645,10 @@ void _registerBlocs() {
   // AI 助手 BLoC（仅当 AI 仓库已注册时）
   if (getIt.isRegistered<IAiRepository>()) {
     getIt.registerFactory<AiAssistantBloc>(
-      () => AiAssistantBloc(aiRepository: getIt<IAiRepository>()),
+      () => AiAssistantBloc(
+        aiRepository: getIt<IAiRepository>(),
+        walletBridge: getIt.isRegistered<IWalletBridge>() ? getIt<IWalletBridge>() : null,
+      ),
     );
   }
 

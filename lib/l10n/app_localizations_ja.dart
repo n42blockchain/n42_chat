@@ -2756,6 +2756,22 @@ class SJa extends S {
   String get settingsLanguageChanged => '言語が変更されました';
 
   @override
+  String get settingsTranslation => '翻訳';
+
+  @override
+  String get settingsTranslateTextTo => 'テキストの翻訳先';
+
+  @override
+  String get settingsTranslateDescription => 'メッセージを翻訳する言語を選択してください。';
+
+  @override
+  String get settingsAutoTranslate => '受信メッセージを自動翻訳';
+
+  @override
+  String get settingsAutoTranslateDescription =>
+      'チャットで受信したメッセージを選択した言語に自動翻訳します。';
+
+  @override
   String get settingsBiometricLogin => '生体認証ログイン';
 
   @override
@@ -5488,4 +5504,88 @@ class SJa extends S {
 
   @override
   String get recoveryKeyRemindLater => '後で通知';
+
+  @override
+  String get channelReadOnly => '管理者のみ投稿可能なチャンネルです';
+
+  @override
+  String get channelSubscribers => '登録者';
+
+  @override
+  String get channelVerified => '認証済みチャンネル';
+
+  @override
+  String get redPacketHistory => 'お年玉履歴';
+
+  @override
+  String get redPacketSent => '送信済み';
+
+  @override
+  String get redPacketReceived => '受信済み';
+
+  @override
+  String get redPacketExpired => '期限切れ';
+
+  @override
+  String get redPacketClaimed => '受領済み';
+
+  @override
+  String get redPacketInsufficientBalance => '残高不足';
+
+  @override
+  String selfDestructCountdown(String time) {
+    return '$time後に削除';
+  }
+
+  @override
+  String get messageDestroyed => 'メッセージは削除されました';
+
+  @override
+  String miniAppPermissionDenied(String permission) {
+    return '権限がありません：$permission';
+  }
+
+  @override
+  String get aiSuggestionGasFee => 'ガス代とは？';
+
+  @override
+  String get aiSuggestionDefi => 'DeFi入門';
+
+  @override
+  String get aiSuggestionSecurity => 'コントラクトの安全性確認方法';
+
+  @override
+  String get aiSuggestionBridge => 'クロスチェーンブリッジ';
+
+  @override
+  String get channelDiscoverTitle => 'チャンネルを探す';
+
+  @override
+  String get channelDiscoverSearch => 'チャンネルを検索...';
+
+  @override
+  String get channelJoin => '参加';
+
+  @override
+  String get channelJoined => '参加中';
+
+  @override
+  String get channelCategory => 'カテゴリ';
+
+  @override
+  String slowModeCooldown(int seconds) {
+    return 'スローモード：$seconds秒お待ちください';
+  }
+
+  @override
+  String get addressCopyAction => 'アドレスをコピー';
+
+  @override
+  String get addressSendMessage => 'メッセージを送る';
+
+  @override
+  String get addressViewProfile => 'プロフィールを見る';
+
+  @override
+  String get sendToAddress => 'ウォレットアドレスに送信';
 }

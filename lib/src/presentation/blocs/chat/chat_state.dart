@@ -56,11 +56,29 @@ class ChatState extends Equatable {
   /// 翻译检测到的源语言 (messageId -> sourceLanguage)
   final Map<String, String> detectedSourceLanguages;
 
+  /// 是否自动翻译收到的消息
+  final bool autoTranslate;
+
+  /// 默认翻译目标语言
+  final String defaultTargetLanguage;
+
   /// 当前房间的关键词过滤配置
   final ContentFilterConfig? contentFilter;
 
   /// 待处理的斜杠命令（null 表示无）
   final String? pendingCommand;
+
+  /// 是否为频道（公告频道）
+  final bool isChannel;
+
+  /// 当前用户是否可以在此房间发送消息
+  final bool canSendMessages;
+
+  /// 慢速模式间隔（秒），0 表示无慢速模式
+  final int slowModeInterval;
+
+  /// 上次发送消息的时间
+  final DateTime? lastMessageSentAt;
 
   const ChatState({
     this.roomId,
@@ -80,8 +98,14 @@ class ChatState extends Equatable {
     this.translatedMessages = const {},
     this.translatingMessageIds = const {},
     this.detectedSourceLanguages = const {},
+    this.autoTranslate = false,
+    this.defaultTargetLanguage = 'en',
     this.contentFilter,
     this.pendingCommand,
+    this.isChannel = false,
+    this.canSendMessages = true,
+    this.slowModeInterval = 0,
+    this.lastMessageSentAt,
   });
 
   /// 初始状态
@@ -147,8 +171,14 @@ class ChatState extends Equatable {
     Map<String, String>? translatedMessages,
     Set<String>? translatingMessageIds,
     Map<String, String>? detectedSourceLanguages,
+    bool? autoTranslate,
+    String? defaultTargetLanguage,
     ContentFilterConfig? contentFilter,
     String? pendingCommand,
+    bool? isChannel,
+    bool? canSendMessages,
+    int? slowModeInterval,
+    DateTime? lastMessageSentAt,
     bool clearError = false,
     bool clearReplyTarget = false,
     bool clearEditingMessage = false,
@@ -172,8 +202,14 @@ class ChatState extends Equatable {
       translatedMessages: translatedMessages ?? this.translatedMessages,
       translatingMessageIds: translatingMessageIds ?? this.translatingMessageIds,
       detectedSourceLanguages: detectedSourceLanguages ?? this.detectedSourceLanguages,
+      autoTranslate: autoTranslate ?? this.autoTranslate,
+      defaultTargetLanguage: defaultTargetLanguage ?? this.defaultTargetLanguage,
       contentFilter: contentFilter ?? this.contentFilter,
       pendingCommand: clearPendingCommand ? null : (pendingCommand ?? this.pendingCommand),
+      isChannel: isChannel ?? this.isChannel,
+      canSendMessages: canSendMessages ?? this.canSendMessages,
+      slowModeInterval: slowModeInterval ?? this.slowModeInterval,
+      lastMessageSentAt: lastMessageSentAt ?? this.lastMessageSentAt,
     );
   }
 
@@ -196,8 +232,14 @@ class ChatState extends Equatable {
         translatedMessages,
         translatingMessageIds,
         detectedSourceLanguages,
+        autoTranslate,
+        defaultTargetLanguage,
         contentFilter,
         pendingCommand,
+        isChannel,
+        canSendMessages,
+        slowModeInterval,
+        lastMessageSentAt,
       ];
 }
 

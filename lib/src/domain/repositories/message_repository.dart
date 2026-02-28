@@ -56,6 +56,7 @@ abstract class IMessageRepository {
     required String filename,
     required int duration,
     String? mimeType,
+    int? selfDestructAfter,
   });
 
   /// 发送视频消息
@@ -74,6 +75,7 @@ abstract class IMessageRepository {
     required Uint8List fileBytes,
     required String filename,
     String? mimeType,
+    int? selfDestructAfter,
   });
 
   /// 发送位置消息

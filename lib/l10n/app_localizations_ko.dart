@@ -2756,6 +2756,22 @@ class SKo extends S {
   String get settingsLanguageChanged => '언어가 변경되었습니다';
 
   @override
+  String get settingsTranslation => '번역';
+
+  @override
+  String get settingsTranslateTextTo => '텍스트 번역 대상';
+
+  @override
+  String get settingsTranslateDescription => '메시지를 번역할 언어를 선택하세요.';
+
+  @override
+  String get settingsAutoTranslate => '수신 메시지 자동 번역';
+
+  @override
+  String get settingsAutoTranslateDescription =>
+      '채팅에서 수신한 메시지를 선택한 언어로 자동 번역합니다.';
+
+  @override
   String get settingsBiometricLogin => '생체 인식 로그인';
 
   @override
@@ -5489,4 +5505,88 @@ class SKo extends S {
 
   @override
   String get recoveryKeyRemindLater => '나중에 알림';
+
+  @override
+  String get channelReadOnly => '관리자만 이 채널에 게시할 수 있습니다';
+
+  @override
+  String get channelSubscribers => '구독자';
+
+  @override
+  String get channelVerified => '인증된 채널';
+
+  @override
+  String get redPacketHistory => '홍바오 기록';
+
+  @override
+  String get redPacketSent => '보낸 것';
+
+  @override
+  String get redPacketReceived => '받은 것';
+
+  @override
+  String get redPacketExpired => '만료됨';
+
+  @override
+  String get redPacketClaimed => '수령됨';
+
+  @override
+  String get redPacketInsufficientBalance => '잔액 부족';
+
+  @override
+  String selfDestructCountdown(String time) {
+    return '$time 후 삭제';
+  }
+
+  @override
+  String get messageDestroyed => '메시지가 삭제되었습니다';
+
+  @override
+  String miniAppPermissionDenied(String permission) {
+    return '권한 부족: $permission';
+  }
+
+  @override
+  String get aiSuggestionGasFee => '가스비란?';
+
+  @override
+  String get aiSuggestionDefi => 'DeFi 입문';
+
+  @override
+  String get aiSuggestionSecurity => '컨트랙트 보안 확인 방법';
+
+  @override
+  String get aiSuggestionBridge => '크로스체인 브리지';
+
+  @override
+  String get channelDiscoverTitle => '채널 탐색';
+
+  @override
+  String get channelDiscoverSearch => '채널 검색...';
+
+  @override
+  String get channelJoin => '가입';
+
+  @override
+  String get channelJoined => '가입됨';
+
+  @override
+  String get channelCategory => '카테고리';
+
+  @override
+  String slowModeCooldown(int seconds) {
+    return '슬로우 모드: $seconds초 대기';
+  }
+
+  @override
+  String get addressCopyAction => '주소 복사';
+
+  @override
+  String get addressSendMessage => '메시지 보내기';
+
+  @override
+  String get addressViewProfile => '프로필 보기';
+
+  @override
+  String get sendToAddress => '지갑 주소로 메시지 보내기';
 }

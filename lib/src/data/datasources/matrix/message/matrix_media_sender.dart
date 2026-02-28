@@ -119,6 +119,7 @@ class MatrixMediaSender {
     required String filename,
     required int duration,
     String? mimeType,
+    int? selfDestructAfter,
   }) async {
     debugPrint('=== MatrixMessageDataSource.sendVoiceMessage start ===');
     debugPrint('roomId: $roomId');
@@ -178,6 +179,8 @@ class MatrixMediaSender {
             'org.matrix.msc1767.audio': {
               'duration': duration,
             },
+            if (selfDestructAfter != null)
+              'n42.self_destruct': {'seconds': selfDestructAfter},
           },
         );
 
@@ -214,6 +217,8 @@ class MatrixMediaSender {
         'org.matrix.msc1767.audio': {
           'duration': duration,
         },
+        if (selfDestructAfter != null)
+          'n42.self_destruct': {'seconds': selfDestructAfter},
       };
 
       final result = await room.sendEvent(content);
@@ -327,6 +332,7 @@ class MatrixMediaSender {
     required Uint8List fileBytes,
     required String filename,
     String? mimeType,
+    int? selfDestructAfter,
   }) async {
     debugPrint('=== MatrixMessageDataSource.sendFileMessage start ===');
     debugPrint('roomId: $roomId');
@@ -357,7 +363,12 @@ class MatrixMediaSender {
           mimeType: actualMimeType,
         );
 
-        final result = await room.sendFileEvent(matrixFile);
+        final result = await room.sendFileEvent(
+          matrixFile,
+          extraContent: selfDestructAfter != null
+              ? {'n42.self_destruct': {'seconds': selfDestructAfter}}
+              : null,
+        );
 
         debugPrint('sendFileEvent result: $result');
         debugPrint('=== sendFileMessage completed successfully (SDK method) ===');
@@ -388,6 +399,8 @@ class MatrixMediaSender {
           'mimetype': actualMimeType,
           'size': fileBytes.length,
         },
+        if (selfDestructAfter != null)
+          'n42.self_destruct': {'seconds': selfDestructAfter},
       };
 
       final result = await room.sendEvent(content);

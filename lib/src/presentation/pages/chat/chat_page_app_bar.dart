@@ -10,25 +10,49 @@ extension _ChatPageAppBarMethods on _ChatPageState {
     }
 
     return N42AppBar(
-      titleWidget: Column(
-        children: [
-          Text(
-            _getDisplayName(),
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-            ),
-          ),
-          if (widget.conversation.type == ConversationType.group)
-            Text(
-              S.of(context)?.commonMemberCount(widget.conversation.memberCount) ?? '${widget.conversation.memberCount} members',
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
+      titleWidget: BlocBuilder<ChatBloc, ChatState>(
+        buildWhen: (prev, curr) => prev.isChannel != curr.isChannel,
+        builder: (context, chatState) {
+          return Column(
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (chatState.isChannel)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: Icon(
+                        Icons.campaign,
+                        size: 18,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      ),
+                    ),
+                  Flexible(
+                    child: Text(
+                      _getDisplayName(),
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-            ),
-        ],
+              if (widget.conversation.type == ConversationType.group)
+                Text(
+                  chatState.isChannel
+                      ? '${widget.conversation.memberCount} ${S.of(context)?.channelSubscribers ?? 'subscribers'}'
+                      : (S.of(context)?.commonMemberCount(widget.conversation.memberCount) ?? '${widget.conversation.memberCount} members'),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+            ],
+          );
+        },
       ),
       showBackButton: widget.onBack != null,
       onBackPressed: widget.onBack ?? () => Navigator.of(context).pop(),

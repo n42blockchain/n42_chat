@@ -181,6 +181,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     required String filename,
     required int duration,
     String? mimeType,
+    int? selfDestructAfter,
   }) async {
     final eventId = await _messageDataSource.sendVoiceMessage(
       roomId,
@@ -188,6 +189,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       filename: filename,
       duration: duration,
       mimeType: mimeType,
+      selfDestructAfter: selfDestructAfter,
     );
     if (eventId == null) return null;
 
@@ -222,12 +224,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     required Uint8List fileBytes,
     required String filename,
     String? mimeType,
+    int? selfDestructAfter,
   }) async {
     final eventId = await _messageDataSource.sendFileMessage(
       roomId,
       fileBytes: fileBytes,
       filename: filename,
       mimeType: mimeType,
+      selfDestructAfter: selfDestructAfter,
     );
     if (eventId == null) return null;
 

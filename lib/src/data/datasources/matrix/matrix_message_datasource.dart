@@ -145,12 +145,14 @@ class MatrixMessageDataSource {
     required String filename,
     required int duration,
     String? mimeType,
+    int? selfDestructAfter,
   }) => _sender.sendVoiceMessage(
     roomId,
     audioBytes: audioBytes,
     filename: filename,
     duration: duration,
     mimeType: mimeType,
+    selfDestructAfter: selfDestructAfter,
   );
 
   /// 发送视频消息
@@ -176,11 +178,13 @@ class MatrixMessageDataSource {
     required Uint8List fileBytes,
     required String filename,
     String? mimeType,
+    int? selfDestructAfter,
   }) => _sender.sendFileMessage(
     roomId,
     fileBytes: fileBytes,
     filename: filename,
     mimeType: mimeType,
+    selfDestructAfter: selfDestructAfter,
   );
 
   /// 发送位置消息

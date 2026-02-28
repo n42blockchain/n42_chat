@@ -7,7 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// 截图防护服务
 ///
 /// Android: 通过 FLAG_SECURE 阻止截图和录屏。
-/// iOS: 目前无可靠的 API 级别截图拦截，暂不支持。
+/// iOS: 通过 MethodChannel 调用原生代码设置隐私保护覆盖层，
+///       并监听 UIApplicationUserDidTakeScreenshotNotification。
 class ScreenshotProtectionService {
   static const _prefKey = 'screenshot_protection_enabled';
   static const _channel = MethodChannel('ai.n42.www/window_flags');
@@ -57,11 +58,18 @@ class ScreenshotProtectionService {
   }
 
   Future<void> _applyFlag(bool enable) async {
-    if (!Platform.isAndroid) return;
-    try {
-      await _channel.invokeMethod<void>('setFlagSecure', enable);
-    } catch (e) {
-      debugPrint('ScreenshotProtectionService: Failed to apply FLAG_SECURE: $e');
+    if (Platform.isAndroid) {
+      try {
+        await _channel.invokeMethod<void>('setFlagSecure', enable);
+      } catch (e) {
+        debugPrint('ScreenshotProtectionService: Failed to apply FLAG_SECURE: $e');
+      }
+    } else if (Platform.isIOS) {
+      try {
+        await _channel.invokeMethod<void>('setScreenProtection', enable);
+      } catch (e) {
+        debugPrint('ScreenshotProtectionService: Failed to apply iOS screen protection: $e');
+      }
     }
   }
 }

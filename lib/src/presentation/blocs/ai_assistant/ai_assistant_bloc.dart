@@ -7,19 +7,23 @@ import 'package:uuid/uuid.dart';
 import '../../../core/services/ai_service.dart';
 import '../../../domain/entities/ai_assistant_entity.dart';
 import '../../../domain/repositories/ai_repository.dart';
+import '../../../integration/wallet_bridge.dart';
 import 'ai_assistant_event.dart';
 import 'ai_assistant_state.dart';
 
 /// AI 助手 BLoC
 class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
   final IAiRepository _aiRepository;
+  final IWalletBridge? _walletBridge;
   final Uuid _uuid = const Uuid();
 
   StreamSubscription<String>? _streamSubscription;
 
   AiAssistantBloc({
     required IAiRepository aiRepository,
+    IWalletBridge? walletBridge,
   })  : _aiRepository = aiRepository,
+        _walletBridge = walletBridge,
         super(AiAssistantState.initial()) {
     on<InitializeAiAssistant>(_onInitialize);
     on<SendAiMessage>(_onSendMessage);
@@ -336,6 +340,9 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
   }
 
   /// 构建上下文消息（保留窗口内的最近 N 轮对话）
+  ///
+  /// 如果钱包已连接，会在上下文开头注入一条系统消息描述用户钱包状态，
+  /// 以便 AI 理解"我的余额"等上下文。
   List<AiMessage> _buildContextMessages(
     List<AiChatMessage> messages,
     AiAssistantEntity assistant,
@@ -345,11 +352,29 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
         ? messages.sublist(messages.length - contextSize)
         : messages;
 
-    return recentMessages.map((m) {
+    final result = <AiMessage>[];
+
+    // 注入钱包上下文（如果已连接）
+    if (_walletBridge != null && _walletBridge.isWalletConnected) {
+      final address = _walletBridge.walletAddress ?? '';
+      final shortAddr = address.length > 10
+          ? '${address.substring(0, 6)}...${address.substring(address.length - 4)}'
+          : address;
+      result.add(AiMessage(
+        role: AiRole.system,
+        content: 'User has a connected wallet (address: $shortAddr). '
+            'You can reference their wallet when discussing transactions, '
+            'balances, or DeFi operations.',
+      ));
+    }
+
+    result.addAll(recentMessages.map((m) {
       return AiMessage(
         role: m.isUser ? AiRole.user : AiRole.assistant,
         content: m.content,
       );
-    }).toList();
+    }));
+
+    return result;
   }
 }

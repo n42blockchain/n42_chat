@@ -90,16 +90,18 @@ class SendVoiceMessage extends ChatEvent {
   final String filename;
   final int duration;
   final String? mimeType;
+  final int? selfDestructAfter;
 
   const SendVoiceMessage({
     required this.audioBytes,
     required this.filename,
     required this.duration,
     this.mimeType,
+    this.selfDestructAfter,
   });
 
   @override
-  List<Object?> get props => [audioBytes, filename, duration, mimeType];
+  List<Object?> get props => [audioBytes, filename, duration, mimeType, selfDestructAfter];
 }
 
 /// 发送文件消息
@@ -107,15 +109,17 @@ class SendFileMessage extends ChatEvent {
   final Uint8List fileBytes;
   final String filename;
   final String? mimeType;
+  final int? selfDestructAfter;
 
   const SendFileMessage({
     required this.fileBytes,
     required this.filename,
     this.mimeType,
+    this.selfDestructAfter,
   });
 
   @override
-  List<Object?> get props => [fileBytes, filename, mimeType];
+  List<Object?> get props => [fileBytes, filename, mimeType, selfDestructAfter];
 }
 
 /// 发送视频消息（带缩略图）
@@ -628,6 +632,34 @@ class ClearTranslation extends ChatEvent {
   List<Object?> get props => [messageId];
 }
 
+/// 更新翻译设置
+class UpdateTranslationSettings extends ChatEvent {
+  final bool? autoTranslate;
+  final String? defaultTargetLanguage;
+
+  const UpdateTranslationSettings({
+    this.autoTranslate,
+    this.defaultTargetLanguage,
+  });
+
+  @override
+  List<Object?> get props => [autoTranslate, defaultTargetLanguage];
+}
+
+/// 翻译设置加载完成（内部事件）
+class TranslationSettingsLoaded extends ChatEvent {
+  final bool autoTranslate;
+  final String defaultTargetLanguage;
+
+  const TranslationSettingsLoaded({
+    required this.autoTranslate,
+    required this.defaultTargetLanguage,
+  });
+
+  @override
+  List<Object?> get props => [autoTranslate, defaultTargetLanguage];
+}
+
 // ============================================
 // 离线消息自动重试事件
 // ============================================
@@ -682,6 +714,22 @@ class ExecuteSlashCommand extends ChatEvent {
 
   @override
   List<Object?> get props => [command, args];
+}
+
+/// 房间信息加载完成（频道判断、发言权限等）
+class RoomInfoLoaded extends ChatEvent {
+  final bool isChannel;
+  final bool canSendMessages;
+  final int slowModeInterval;
+
+  const RoomInfoLoaded({
+    required this.isChannel,
+    required this.canSendMessages,
+    this.slowModeInterval = 0,
+  });
+
+  @override
+  List<Object?> get props => [isChannel, canSendMessages, slowModeInterval];
 }
 
 /// 举报消息

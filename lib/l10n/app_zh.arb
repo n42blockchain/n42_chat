@@ -1504,6 +1504,11 @@
   "commonWechat": "微信",
   "settingsLanguage": "语言",
   "settingsLanguageChanged": "语言已更改",
+  "settingsTranslation": "翻译",
+  "settingsTranslateTextTo": "将文字翻译为",
+  "settingsTranslateDescription": "选择你希望将消息翻译成的语言。",
+  "settingsAutoTranslate": "自动翻译聊天中收到的消息",
+  "settingsAutoTranslateDescription": "自动将聊天中收到的消息翻译为你选择的语言。",
   "settingsBiometricLogin": "生物识别登录",
   "authLoginWithBiometric": "使用{type}登录",
   "@authLoginWithBiometric": {
@@ -2850,5 +2855,46 @@
   "recoveryKeyReminderTitle": "保护您的消息",
   "recoveryKeyReminderDesc": "创建恢复密钥以在多设备上安全同步加密消息",
   "recoveryKeySetupNow": "立即设置",
-  "recoveryKeyRemindLater": "稍后提醒"
+  "recoveryKeyRemindLater": "稍后提醒",
+  "channelReadOnly": "仅管理员可在此频道发言",
+  "channelSubscribers": "订阅者",
+  "channelVerified": "已认证频道",
+  "redPacketHistory": "红包记录",
+  "redPacketSent": "已发出",
+  "redPacketReceived": "已收到",
+  "redPacketExpired": "已过期",
+  "redPacketClaimed": "已领取",
+  "redPacketInsufficientBalance": "余额不足",
+  "selfDestructCountdown": "{time} 后销毁",
+  "@selfDestructCountdown": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "messageDestroyed": "消息已销毁",
+  "miniAppPermissionDenied": "权限不足：{permission}",
+  "@miniAppPermissionDenied": {
+    "placeholders": {
+      "permission": {"type": "String"}
+    }
+  },
+  "aiSuggestionGasFee": "什么是 Gas 费？",
+  "aiSuggestionDefi": "DeFi 入门",
+  "aiSuggestionSecurity": "如何检查合约安全",
+  "aiSuggestionBridge": "跨链桥接",
+  "channelDiscoverTitle": "发现频道",
+  "channelDiscoverSearch": "搜索频道...",
+  "channelJoin": "加入",
+  "channelJoined": "已加入",
+  "channelCategory": "分类",
+  "slowModeCooldown": "慢速模式：请等待 {seconds} 秒",
+  "@slowModeCooldown": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "addressCopyAction": "复制地址",
+  "addressSendMessage": "发消息",
+  "addressViewProfile": "查看资料",
+  "sendToAddress": "通过钱包地址发消息"
 }

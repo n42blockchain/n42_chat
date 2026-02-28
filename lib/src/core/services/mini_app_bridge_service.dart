@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../domain/entities/mini_app_entity.dart';
 import '../../integration/wallet_bridge.dart';
 
 /// Mini App <-> Native 通信消息
@@ -41,6 +42,7 @@ class _BridgeMessage {
 class MiniAppBridgeService {
   final IWalletBridge _walletBridge;
   final String _roomId;
+  final MiniAppEntity? _app;
 
   /// 外部回调：Mini App 要发送消息到聊天室
   final void Function(String text)? onSendMessage;
@@ -51,10 +53,18 @@ class MiniAppBridgeService {
   MiniAppBridgeService({
     required IWalletBridge walletBridge,
     required String roomId,
+    MiniAppEntity? app,
     this.onSendMessage,
     this.onClose,
   })  : _walletBridge = walletBridge,
-        _roomId = roomId;
+        _roomId = roomId,
+        _app = app;
+
+  /// 检查 Mini App 是否拥有指定权限
+  bool _hasPermission(MiniAppPermission permission) {
+    if (_app == null) return true; // 未指定 app 时默认允许
+    return _app.permissions.contains(permission);
+  }
 
   /// 向 WebViewController 注册所有 JS Channel
   void registerChannels(WebViewController controller, BuildContext context) {
@@ -122,6 +132,12 @@ class MiniAppBridgeService {
         N42ChatChannel.postMessage(JSON.stringify({method: 'close'}));
       },
     },
+
+    lifecycle: {
+      onPause: null,
+      onResume: null,
+      onDestroy: null,
+    },
   };
 
   console.log('[N42 MiniApp Bridge] Initialized. Chains: 236+');
@@ -142,26 +158,81 @@ class MiniAppBridgeService {
 
       switch (message.method) {
         case 'getAddress':
+          if (!_hasPermission(MiniAppPermission.walletAddress)) {
+            await _resolveCallback(controller, message.id, false,
+                '"Permission denied: walletAddress"');
+            break;
+          }
           final address = _walletBridge.walletAddress ?? '';
           await _resolveCallback(controller, message.id, true, '"$address"');
 
         case 'getBalance':
-          // 向 IWalletBridge 请求余额（未来扩展）
-          await _resolveCallback(controller, message.id, true, 'null');
+          if (!_hasPermission(MiniAppPermission.walletBalance)) {
+            await _resolveCallback(controller, message.id, false,
+                '"Permission denied: walletBalance"');
+            break;
+          }
+          try {
+            final chainId = message.params?['chainId'] as String? ?? 'ETH';
+            final balance = await _walletBridge.getBalance(chainId);
+            await _resolveCallback(
+              controller, message.id, true, '"$balance"',
+            );
+          } catch (e) {
+            debugPrint('MiniAppBridge: getBalance error: $e');
+            await _resolveCallback(
+              controller, message.id, false, '"Failed to get balance: $e"',
+            );
+          }
 
         case 'requestTransaction':
+          if (!_hasPermission(MiniAppPermission.walletTransaction)) {
+            await _resolveCallback(controller, message.id, false,
+                '"Permission denied: walletTransaction"');
+            break;
+          }
           if (!context.mounted) break;
           final confirmed = await _showTransactionConfirmDialog(
             context,
             message.params,
           );
           if (confirmed) {
-            await _resolveCallback(
-              controller,
-              message.id,
-              true,
-              '{"status":"confirmed"}',
-            );
+            try {
+              final toAddress = message.params?['to'] as String? ?? '';
+              final amount = message.params?['amount'] as String? ?? '0';
+              final token = message.params?['token'] as String? ?? 'ETH';
+              final memo = message.params?['memo'] as String?;
+              final result = await _walletBridge.requestTransfer(
+                toAddress: toAddress,
+                amount: amount,
+                token: token,
+                memo: memo,
+              );
+              if (result.success) {
+                final txHash = result.transactionHash ?? '';
+                await _resolveCallback(
+                  controller,
+                  message.id,
+                  true,
+                  '{"status":"confirmed","txHash":"$txHash"}',
+                );
+              } else {
+                await _resolveCallback(
+                  controller,
+                  message.id,
+                  false,
+                  '"${result.errorMessage ?? 'Transaction failed'}"',
+                );
+              }
+            } catch (e) {
+              debugPrint('MiniAppBridge: requestTransaction error: $e');
+              await _resolveCallback(
+                controller,
+                message.id,
+                false,
+                '"Transaction failed: $e"',
+              );
+            }
           } else {
             await _resolveCallback(
               controller,
