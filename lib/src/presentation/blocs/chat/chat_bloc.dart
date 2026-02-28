@@ -155,10 +155,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<TranslateMessage>(onTranslateMessage);
     on<TranslationCompleted>(onTranslationCompleted);
     on<ClearTranslation>(onClearTranslation);
+    on<UpdateTranslationSettings>(onUpdateTranslationSettings);
+    on<TranslationSettingsLoaded>(_onTranslationSettingsLoaded);
 
     // 离线重试
     on<RetryPendingMessages>(onRetryPendingMessages);
     on<ConnectionStatusChanged>(onConnectionStatusChanged);
+
+    // 房间信息（频道/权限）
+    on<RoomInfoLoaded>(_onRoomInfoLoaded);
   }
 
   /// 处理销毁时间加载完成事件
@@ -257,6 +262,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // 加载关键词过滤配置
     _loadContentFilter(event.roomId, emit);
+
+    // 加载翻译设置
+    _loadTranslationSettings();
+
+    // 加载房间信息（频道/权限判断）
+    _loadRoomInfo(event.roomId);
   }
 
   void _loadContentFilter(String roomId, Emitter<ChatState> emit) {
@@ -268,6 +279,24 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }
       } catch (e) {
         // content filter 不影响聊天主流程，静默忽略错误
+      }
+    });
+  }
+
+  void _loadTranslationSettings() {
+    Future.microtask(() async {
+      try {
+        final settings = await _secureStorage.getTranslationSettings();
+        if (!isClosed && settings != null) {
+          add(TranslationSettingsLoaded(
+            autoTranslate: settings['autoTranslate'] as bool? ?? false,
+            defaultTargetLanguage:
+                settings['defaultTargetLanguage'] as String? ??
+                    getDeviceLanguageCode(),
+          ));
+        }
+      } catch (e) {
+        debugPrint('ChatBloc: Failed to load translation settings: $e');
       }
     });
   }

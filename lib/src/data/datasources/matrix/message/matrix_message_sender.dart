@@ -46,12 +46,14 @@ class MatrixMessageSender {
     required String filename,
     required int duration,
     String? mimeType,
+    int? selfDestructAfter,
   }) => _mediaSender.sendVoiceMessage(
     roomId,
     audioBytes: audioBytes,
     filename: filename,
     duration: duration,
     mimeType: mimeType,
+    selfDestructAfter: selfDestructAfter,
   );
 
   /// 发送视频消息
@@ -77,11 +79,13 @@ class MatrixMessageSender {
     required Uint8List fileBytes,
     required String filename,
     String? mimeType,
+    int? selfDestructAfter,
   }) => _mediaSender.sendFileMessage(
     roomId,
     fileBytes: fileBytes,
     filename: filename,
     mimeType: mimeType,
+    selfDestructAfter: selfDestructAfter,
   );
 
   // ============================================

@@ -4,6 +4,45 @@ part of 'chat_page.dart';
 /// 输入栏、表情选择器、贴纸选择器、更多面板、录音浮层相关方法
 extension _ChatPageInputMethods on _ChatPageState {
   Widget _buildInputBar() {
+    // 频道只读模式：非管理员不能在公告频道发言
+    final chatState = context.read<ChatBloc>().state;
+    if (!chatState.canSendMessages) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF1E1E1E)
+              : const Color(0xFFF5F5F5),
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey.shade800
+                  : Colors.grey.shade300,
+              width: 0.5,
+            ),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.campaign_outlined,
+              size: 16,
+              color: Colors.grey.shade500,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              S.of(context)?.channelReadOnly ?? 'Only admins can post in this channel',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return ChatInputBar(
       key: _inputBarKey,
       controller: _inputController,

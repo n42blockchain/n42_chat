@@ -671,6 +671,15 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 onTap: () => _navigateToAddFriend(ctx),
               ),
 
+              // 钱包地址发消息
+              _buildAddMenuItem(
+                ctx,
+                icon: Icons.account_balance_wallet_outlined,
+                iconColor: const Color(0xFFFF9500),
+                title: S.of(context)?.sendToAddress ?? 'Send to Address',
+                onTap: () => _navigateToAddFriend(ctx),
+              ),
+
               // 扫一扫
               _buildAddMenuItem(
                 ctx,

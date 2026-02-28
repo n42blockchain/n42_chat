@@ -632,4 +632,118 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     debugPrint('ChatBloc: Cleared translation for message ${event.messageId}');
   }
+
+  /// 更新翻译设置
+  Future<void> onUpdateTranslationSettings(
+    UpdateTranslationSettings event,
+    Emitter<ChatState> emit,
+  ) async {
+    final newAutoTranslate = event.autoTranslate ?? state.autoTranslate;
+    final newTargetLang =
+        event.defaultTargetLanguage ?? state.defaultTargetLanguage;
+
+    emit(state.copyWith(
+      autoTranslate: newAutoTranslate,
+      defaultTargetLanguage: newTargetLang,
+    ));
+
+    // 持久化设置
+    try {
+      await _secureStorage.saveTranslationSettings(
+        autoTranslate: newAutoTranslate,
+        defaultTargetLanguage: newTargetLang,
+      );
+    } catch (e) {
+      debugPrint('ChatBloc: Failed to save translation settings: $e');
+    }
+
+    // 如果刚开启自动翻译，对当前可见的未翻译消息触发翻译
+    if (newAutoTranslate) {
+      _autoTranslateMessages(emit);
+    }
+  }
+
+  /// 翻译设置加载完成
+  void _onTranslationSettingsLoaded(
+    TranslationSettingsLoaded event,
+    Emitter<ChatState> emit,
+  ) {
+    emit(state.copyWith(
+      autoTranslate: event.autoTranslate,
+      defaultTargetLanguage: event.defaultTargetLanguage,
+    ));
+
+    if (event.autoTranslate) {
+      _autoTranslateMessages(emit);
+    }
+  }
+
+  /// 自动翻译未翻译的消息（每次最多 5 条，防止 API 洪水）
+  void _autoTranslateMessages(Emitter<ChatState> emit) {
+    if (_translationService == null) return;
+
+    final targetLang = state.defaultTargetLanguage;
+    final messagesToTranslate = state.messages
+        .where((m) =>
+            !m.isFromMe &&
+            m.type == MessageType.text &&
+            m.content.trim().isNotEmpty &&
+            !state.translatedMessages.containsKey(m.id) &&
+            !state.translatingMessageIds.contains(m.id))
+        .take(5)
+        .toList();
+
+    for (final msg in messagesToTranslate) {
+      // 检测消息语言，与目标语言相同则跳过
+      _translationService.detectLanguage(msg.content).then((detected) {
+        if (detected != targetLang && !isClosed) {
+          add(TranslateMessage(
+            messageId: msg.id,
+            targetLanguage: targetLang,
+          ));
+        }
+      });
+    }
+  }
+
+  // ============================================
+  // 房间信息（频道/权限）
+  // ============================================
+
+  /// 加载房间信息以判断频道类型和发言权限
+  void _loadRoomInfo(String roomId) {
+    Future.microtask(() async {
+      if (_groupRepository == null) return;
+      try {
+        final group = await _groupRepository.getGroup(roomId);
+        if (group == null || isClosed) return;
+
+        final isChannel = group.isChannel;
+        // 频道中：如果 membersCanSpeak == false 且当前用户不是管理员，则不能发言
+        final canSend = !isChannel ||
+            group.membersCanSpeak ||
+            group.isAdmin;
+
+        add(RoomInfoLoaded(
+          isChannel: isChannel,
+          canSendMessages: canSend,
+          slowModeInterval: group.slowModeInterval,
+        ));
+      } catch (e) {
+        debugPrint('ChatBloc: Failed to load room info: $e');
+      }
+    });
+  }
+
+  /// 处理房间信息加载完成
+  void _onRoomInfoLoaded(
+    RoomInfoLoaded event,
+    Emitter<ChatState> emit,
+  ) {
+    emit(state.copyWith(
+      isChannel: event.isChannel,
+      canSendMessages: event.canSendMessages,
+      slowModeInterval: event.slowModeInterval,
+    ));
+  }
 }

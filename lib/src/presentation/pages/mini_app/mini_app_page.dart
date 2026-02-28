@@ -31,7 +31,7 @@ class MiniAppPage extends StatefulWidget {
   State<MiniAppPage> createState() => _MiniAppPageState();
 }
 
-class _MiniAppPageState extends State<MiniAppPage> {
+class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
   late WebViewController _webController;
   late MiniAppBridgeService _bridge;
   bool _isLoading = true;
@@ -41,13 +41,41 @@ class _MiniAppPageState extends State<MiniAppPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initWebView();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    // 通知 Mini App 即将销毁
+    _webController.runJavaScript(
+      'if(window.n42&&window.n42.lifecycle.onDestroy)window.n42.lifecycle.onDestroy();',
+    );
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+        _webController.runJavaScript(
+          'if(window.n42&&window.n42.lifecycle.onPause)window.n42.lifecycle.onPause();',
+        );
+      case AppLifecycleState.resumed:
+        _webController.runJavaScript(
+          'if(window.n42&&window.n42.lifecycle.onResume)window.n42.lifecycle.onResume();',
+        );
+      default:
+        break;
+    }
   }
 
   void _initWebView() {
     _bridge = MiniAppBridgeService(
       walletBridge: getIt<IWalletBridge>(),
       roomId: widget.roomId,
+      app: widget.app,
       onSendMessage: _onBridgeSendMessage,
       onClose: () => Navigator.of(context).pop(),
     );

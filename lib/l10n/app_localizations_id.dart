@@ -2817,6 +2817,21 @@ class SId extends S {
   String get settingsLanguageChanged => 'Bahasa diubah';
 
   @override
+  String get settingsTranslation => '翻译';
+
+  @override
+  String get settingsTranslateTextTo => '将文字翻译为';
+
+  @override
+  String get settingsTranslateDescription => '选择你希望将消息翻译成的语言。';
+
+  @override
+  String get settingsAutoTranslate => '自动翻译聊天中收到的消息';
+
+  @override
+  String get settingsAutoTranslateDescription => '自动将聊天中收到的消息翻译为你选择的语言。';
+
+  @override
   String get settingsBiometricLogin => 'Login biometrik';
 
   @override
@@ -5568,4 +5583,88 @@ class SId extends S {
 
   @override
   String get recoveryKeyRemindLater => 'Remind me later';
+
+  @override
+  String get channelReadOnly => '仅管理员可在此频道发言';
+
+  @override
+  String get channelSubscribers => '订阅者';
+
+  @override
+  String get channelVerified => '已认证频道';
+
+  @override
+  String get redPacketHistory => '红包记录';
+
+  @override
+  String get redPacketSent => '已发出';
+
+  @override
+  String get redPacketReceived => '已收到';
+
+  @override
+  String get redPacketExpired => '已过期';
+
+  @override
+  String get redPacketClaimed => '已领取';
+
+  @override
+  String get redPacketInsufficientBalance => '余额不足';
+
+  @override
+  String selfDestructCountdown(String time) {
+    return '$time 后销毁';
+  }
+
+  @override
+  String get messageDestroyed => '消息已销毁';
+
+  @override
+  String miniAppPermissionDenied(String permission) {
+    return '权限不足：$permission';
+  }
+
+  @override
+  String get aiSuggestionGasFee => '什么是 Gas 费？';
+
+  @override
+  String get aiSuggestionDefi => 'DeFi 入门';
+
+  @override
+  String get aiSuggestionSecurity => '如何检查合约安全';
+
+  @override
+  String get aiSuggestionBridge => '跨链桥接';
+
+  @override
+  String get channelDiscoverTitle => '发现频道';
+
+  @override
+  String get channelDiscoverSearch => '搜索频道...';
+
+  @override
+  String get channelJoin => '加入';
+
+  @override
+  String get channelJoined => '已加入';
+
+  @override
+  String get channelCategory => '分类';
+
+  @override
+  String slowModeCooldown(int seconds) {
+    return '慢速模式：请等待 $seconds 秒';
+  }
+
+  @override
+  String get addressCopyAction => '复制地址';
+
+  @override
+  String get addressSendMessage => '发消息';
+
+  @override
+  String get addressViewProfile => '查看资料';
+
+  @override
+  String get sendToAddress => '通过钱包地址发消息';
 }

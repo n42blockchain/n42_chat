@@ -15,6 +15,7 @@ import '../moment/moment_list_page.dart';
 import '../qrcode/scan_qr_page.dart';
 import '../search/global_search_page.dart';
 import '../space/space_list_page.dart';
+import 'channel_discover_page.dart';
 
 /// 发现页面（仿微信）
 class DiscoverPage extends StatelessWidget {
@@ -107,6 +108,23 @@ class DiscoverPage extends StatelessWidget {
                 iconWidget: const Icon(Icons.groups, color: Color(0xFF7B68EE), size: 26),
                 title: l10n?.spacesTitle ?? 'Communities',
                 onTap: () => _openCommunities(context),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
+          // 频道发现
+          _buildGroupCard(
+            context,
+            isDark,
+            children: [
+              _buildMenuItem(
+                context,
+                isDark: isDark,
+                iconWidget: const Icon(Icons.campaign, color: Color(0xFFFF6B6B), size: 26),
+                title: l10n?.channelDiscoverTitle ?? 'Channels',
+                onTap: () => _openChannelDiscover(context),
               ),
             ],
           ),
@@ -281,6 +299,12 @@ class DiscoverPage extends StatelessWidget {
   void _openCommunities(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const SpaceListPage()),
+    );
+  }
+
+  void _openChannelDiscover(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const ChannelDiscoverPage()),
     );
   }
 

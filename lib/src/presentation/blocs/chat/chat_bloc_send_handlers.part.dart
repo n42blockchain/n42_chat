@@ -22,6 +22,18 @@ extension ChatBlocSendHandlers on ChatBloc {
       return;
     }
 
+    // 慢速模式检查
+    if (state.slowModeInterval > 0 && state.lastMessageSentAt != null) {
+      final elapsed = DateTime.now().difference(state.lastMessageSentAt!).inSeconds;
+      if (elapsed < state.slowModeInterval) {
+        final remaining = state.slowModeInterval - elapsed;
+        emit(state.copyWith(
+          error: 'Slow mode: wait ${remaining}s',
+        ));
+        return;
+      }
+    }
+
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
@@ -32,7 +44,11 @@ extension ChatBlocSendHandlers on ChatBloc {
           state.replyTarget!.id,
           event.text,
         );
-        emit(state.copyWith(isSending: false, clearReplyTarget: true));
+        emit(state.copyWith(
+          isSending: false,
+          clearReplyTarget: true,
+          lastMessageSentAt: DateTime.now(),
+        ));
       } else {
         await _messageRepository.sendTextMessage(
           _currentRoomId!,
@@ -41,7 +57,10 @@ extension ChatBlocSendHandlers on ChatBloc {
           mentionedUserIds: event.mentionedUserIds,
           mentionsRoom: event.mentionsRoom,
         );
-        emit(state.copyWith(isSending: false));
+        emit(state.copyWith(
+          isSending: false,
+          lastMessageSentAt: DateTime.now(),
+        ));
       }
     } catch (e) {
       emit(state.copyWith(
@@ -104,6 +123,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         filename: event.filename,
         duration: event.duration,
         mimeType: event.mimeType,
+        selfDestructAfter: event.selfDestructAfter,
       );
       debugPrint('ChatBloc: Voice sent successfully');
       emit(state.copyWith(isSending: false));
@@ -132,6 +152,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         fileBytes: event.fileBytes,
         filename: event.filename,
         mimeType: event.mimeType,
+        selfDestructAfter: event.selfDestructAfter,
       );
       emit(state.copyWith(isSending: false));
     } catch (e) {

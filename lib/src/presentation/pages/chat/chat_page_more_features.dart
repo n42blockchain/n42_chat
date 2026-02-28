@@ -201,7 +201,48 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     );
   }
 
-  void _doSendRedPacket(String amount, String token, String greeting, int count, bool isLucky) {
+  Future<void> _doSendRedPacket(String amount, String token, String greeting, int count, bool isLucky) async {
+    final l10n = S.of(context);
+    final walletBridge = getIt<IWalletBridge>();
+
+    // 余额校验
+    try {
+      final balance = await walletBridge.getBalance(token);
+      final balanceNum = double.tryParse(balance) ?? 0;
+      final amountNum = double.tryParse(amount) ?? 0;
+      if (balanceNum < amountNum) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n?.redPacketInsufficientBalance ?? 'Insufficient balance'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+    } catch (e) {
+      debugPrint('Red packet balance check failed: $e');
+    }
+
+    // 创建红包
+    try {
+      final redPacketService = getIt<IRedPacketService>();
+      final currentUserId = await getIt<IMessageRepository>().getCurrentUserId() ?? '';
+      await redPacketService.createRedPacket(
+        roomId: context.read<ChatBloc>().state.roomId ?? '',
+        totalAmount: double.tryParse(amount) ?? 0,
+        totalCount: count,
+        token: token,
+        type: isLucky ? RedPacketType.lucky : RedPacketType.normal,
+        greeting: greeting,
+        senderId: currentUserId,
+        senderName: _getDisplayName(),
+      );
+    } catch (e) {
+      debugPrint('Red packet creation failed: $e');
+    }
+
     // 发送红包消息
     final metadata = MessageMetadata(
       amount: amount,
@@ -209,6 +250,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       transferStatus: 'pending',
     );
 
+    if (!mounted) return;
     context.read<ChatBloc>().add(SendCustomMessage(
       content: greeting,
       type: MessageType.redPacket,
@@ -218,7 +260,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     // 显示发送成功提示
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.chatRedPacketSent(amount, token) ?? 'Sent $amount $token red packet'),
+        content: Text(l10n?.chatRedPacketSent(amount, token) ?? 'Sent $amount $token red packet'),
         backgroundColor: AppColors.success,
       ),
     );

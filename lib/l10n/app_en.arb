@@ -1375,6 +1375,11 @@
   "commonWechat": "WeChat",
   "settingsLanguage": "Language",
   "settingsLanguageChanged": "Language changed",
+  "settingsTranslation": "Translation",
+  "settingsTranslateTextTo": "Translate text to",
+  "settingsTranslateDescription": "Select the language you want messages to be translated into.",
+  "settingsAutoTranslate": "Auto-translate received messages",
+  "settingsAutoTranslateDescription": "Automatically translate messages received in chat to your selected language.",
   "settingsBiometricLogin": "Biometric Login",
   "authLoginWithBiometric": "Login with {type}",
   "@authLoginWithBiometric": {
@@ -2668,5 +2673,46 @@
   "recoveryKeyReminderTitle": "Protect your messages",
   "recoveryKeyReminderDesc": "Create a recovery key to securely sync encrypted messages across devices",
   "recoveryKeySetupNow": "Set up now",
-  "recoveryKeyRemindLater": "Remind me later"
+  "recoveryKeyRemindLater": "Remind me later",
+  "channelReadOnly": "Only admins can post in this channel",
+  "channelSubscribers": "subscribers",
+  "channelVerified": "Verified channel",
+  "redPacketHistory": "Red Packet History",
+  "redPacketSent": "Sent",
+  "redPacketReceived": "Received",
+  "redPacketExpired": "Expired",
+  "redPacketClaimed": "Claimed",
+  "redPacketInsufficientBalance": "Insufficient balance",
+  "selfDestructCountdown": "Self-destruct in {time}",
+  "@selfDestructCountdown": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "messageDestroyed": "Message destroyed",
+  "miniAppPermissionDenied": "Permission denied: {permission}",
+  "@miniAppPermissionDenied": {
+    "placeholders": {
+      "permission": {"type": "String"}
+    }
+  },
+  "aiSuggestionGasFee": "What is Gas fee?",
+  "aiSuggestionDefi": "DeFi Beginner Guide",
+  "aiSuggestionSecurity": "How to check contract security",
+  "aiSuggestionBridge": "Cross-chain bridging",
+  "channelDiscoverTitle": "Discover Channels",
+  "channelDiscoverSearch": "Search channels...",
+  "channelJoin": "Join",
+  "channelJoined": "Joined",
+  "channelCategory": "Category",
+  "slowModeCooldown": "Slow mode: wait {seconds}s",
+  "@slowModeCooldown": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "addressCopyAction": "Copy Address",
+  "addressSendMessage": "Send Message",
+  "addressViewProfile": "View Profile",
+  "sendToAddress": "Send to wallet address"
 }

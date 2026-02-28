@@ -109,9 +109,44 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
         status: redPacketStatus,
         claimedAmount: amount,
         token: token,
-        onOpen: () {
-          // TODO(backend): 调用后端API领取红包
-          debugPrint('Opening red packet: ${message.id}');
+        onOpen: () async {
+          try {
+            final redPacketService = getIt<IRedPacketService>();
+            final currentUserId =
+                await getIt<IMessageRepository>().getCurrentUserId() ?? '';
+            final claim = await redPacketService.claimRedPacket(
+              redPacketId: message.id,
+              userId: currentUserId,
+              userName: _getDisplayName(),
+            );
+            if (claim != null && mounted) {
+              Navigator.of(ctx).pop();
+              // 跳转红包详情页显示领取结果
+              if (mounted) {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => RedPacketDetailPage(
+                      senderName: senderName,
+                      senderAvatar: message.senderAvatarUrl,
+                      greeting: greeting,
+                      claimedAmount: claim.amount.toStringAsFixed(2),
+                      token: token,
+                      isClaimed: true,
+                      claimers: [
+                        RedPacketClaimer(
+                          name: _getDisplayName(),
+                          amount: claim.amount.toStringAsFixed(2),
+                          claimTime: _formatTime(claim.claimedAt),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+            }
+          } catch (e) {
+            debugPrint('Red packet claim error: $e');
+          }
         },
         onViewDetails: () {
           Navigator.of(ctx).pop();

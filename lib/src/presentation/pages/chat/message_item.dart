@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
@@ -201,6 +204,36 @@ class MessageItem extends StatelessWidget {
         ),
         child: bubble,
       );
+    }
+
+    // 阅后即焚倒计时覆盖层
+    if (message.isSelfDestructing) {
+      if (message.isDestructionStarted) {
+        bubble = SelfDestructOverlay(
+          message: message,
+          child: bubble,
+        );
+      } else {
+        // 未开始倒计时的消息显示 timer 图标提示
+        bubble = Column(
+          crossAxisAlignment: message.isFromMe
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
+          children: [
+            bubble,
+            Padding(
+              padding: EdgeInsets.only(
+                left: message.isFromMe ? 0 : 56,
+                right: message.isFromMe ? 56 : 0,
+                top: 2,
+              ),
+              child: SelfDestructPendingIcon(
+                durationSeconds: message.selfDestructAfter!,
+              ),
+            ),
+          ],
+        );
+      }
     }
 
     // 定时发送消息标记
@@ -421,13 +454,10 @@ class MessageItem extends StatelessWidget {
         ? AppColors.messageTextSent  // 黑色
         : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
 
-    final textWidget = Text(
+    final textWidget = _buildRichTextWithAddresses(
       message.content,
-      style: TextStyle(
-        fontSize: messageFontSize ?? 16,
-        color: textColor,
-        height: 1.4,
-      ),
+      textColor,
+      context,
     );
 
     // 检测消息中的 URL，用于显示预览
@@ -1124,53 +1154,38 @@ class MessageItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 地图预览区域 - 微信/WhatsApp风格
+          // 地图预览区域 - OSM 静态瓦片
           Container(
             height: 100,
             decoration: const BoxDecoration(
               color: Color(0xFFE8EEF0),
               borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
             ),
+            clipBehavior: Clip.antiAlias,
             child: Stack(
               children: [
-                // 地图网格背景
-                CustomPaint(
-                  size: const Size(220, 100),
-                  painter: MapGridPainter(),
-                ),
+                // OSM 瓦片地图
+                if (latitude != null && longitude != null)
+                  Positioned.fill(
+                    child: Image.network(
+                      _osmTileUrl(latitude, longitude, 15),
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, e, st) => const Center(
+                        child: Icon(Icons.map, size: 32, color: Color(0xFFB0BEC5)),
+                      ),
+                    ),
+                  ),
                 // 中心位置标记
                 Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.location_on,
-                          color: AppColors.primary,
-                          size: 24,
-                        ),
-                      ),
-                      // 位置标记阴影
-                      Container(
-                        width: 8,
-                        height: 4,
-                        margin: const EdgeInsets.only(top: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
+                  child: Icon(
+                    Icons.location_on,
+                    color: AppColors.primary,
+                    size: 28,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -1767,6 +1782,151 @@ class MessageItem extends StatelessWidget {
     if (isToday) return timeStr;
     if (isTomorrow) return 'Tomorrow $timeStr';
     return '${scheduledAt.month}/${scheduledAt.day} $timeStr';
+  }
+
+  /// 根据经纬度和 zoom 生成 OSM 瓦片 URL
+  static String _osmTileUrl(double lat, double lng, int zoom) {
+    final x = ((lng + 180) / 360 * (1 << zoom)).floor();
+    final latRad = lat * math.pi / 180;
+    final y = ((1 - math.log(math.tan(latRad) + 1 / math.cos(latRad)) / math.pi) / 2 * (1 << zoom)).floor();
+    return 'https://tile.openstreetmap.org/$zoom/$x/$y.png';
+  }
+
+  // ============================================
+  // 地址检测
+  // ============================================
+
+  /// 匹配 0x 地址（40位十六进制）和 ENS 域名（*.eth）
+  static final _addressRegex = RegExp(
+    r'(0x[a-fA-F0-9]{40})|([a-zA-Z0-9][\w.-]*\.eth)\b',
+  );
+
+  /// 构建包含可点击地址的富文本
+  Widget _buildRichTextWithAddresses(
+    String text,
+    Color textColor,
+    BuildContext context,
+  ) {
+    final matches = _addressRegex.allMatches(text).toList();
+    if (matches.isEmpty) {
+      return Text(
+        text,
+        style: TextStyle(
+          fontSize: messageFontSize ?? 16,
+          color: textColor,
+          height: 1.4,
+        ),
+      );
+    }
+
+    final spans = <InlineSpan>[];
+    var lastEnd = 0;
+
+    for (final match in matches) {
+      // 添加匹配前的普通文本
+      if (match.start > lastEnd) {
+        spans.add(TextSpan(
+          text: text.substring(lastEnd, match.start),
+        ));
+      }
+
+      // 添加可点击的地址 span
+      final addr = match.group(0)!;
+      spans.add(WidgetSpan(
+        alignment: PlaceholderAlignment.baseline,
+        baseline: TextBaseline.alphabetic,
+        child: GestureDetector(
+          onTap: () => _showAddressActions(context, addr),
+          child: Text(
+            addr,
+            style: TextStyle(
+              fontSize: messageFontSize ?? 16,
+              color: AppColors.primary,
+              decoration: TextDecoration.underline,
+              decorationColor: AppColors.primary.withValues(alpha: 0.5),
+              height: 1.4,
+            ),
+          ),
+        ),
+      ));
+
+      lastEnd = match.end;
+    }
+
+    // 添加最后一段普通文本
+    if (lastEnd < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(lastEnd),
+      ));
+    }
+
+    return Text.rich(
+      TextSpan(
+        style: TextStyle(
+          fontSize: messageFontSize ?? 16,
+          color: textColor,
+          height: 1.4,
+        ),
+        children: spans,
+      ),
+    );
+  }
+
+  /// 显示地址操作选项
+  void _showAddressActions(BuildContext context, String address) {
+    final l10n = S.of(context);
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                address.length > 20
+                    ? '${address.substring(0, 10)}...${address.substring(address.length - 8)}'
+                    : address,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(Icons.copy),
+              title: Text(l10n?.addressCopyAction ?? 'Copy Address'),
+              onTap: () {
+                Navigator.pop(ctx);
+                // 复制到剪贴板
+                final data = ClipboardData(text: address);
+                Clipboard.setData(data);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.send),
+              title: Text(l10n?.addressSendMessage ?? 'Send Message'),
+              onTap: () {
+                Navigator.pop(ctx);
+                // 跳转到通过钱包地址添加好友页
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 }
 

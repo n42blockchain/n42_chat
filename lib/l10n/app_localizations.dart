@@ -5155,6 +5155,36 @@ abstract class S {
   /// **'语言已更改'**
   String get settingsLanguageChanged;
 
+  /// No description provided for @settingsTranslation.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻译'**
+  String get settingsTranslation;
+
+  /// No description provided for @settingsTranslateTextTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'将文字翻译为'**
+  String get settingsTranslateTextTo;
+
+  /// No description provided for @settingsTranslateDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择你希望将消息翻译成的语言。'**
+  String get settingsTranslateDescription;
+
+  /// No description provided for @settingsAutoTranslate.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动翻译聊天中收到的消息'**
+  String get settingsAutoTranslate;
+
+  /// No description provided for @settingsAutoTranslateDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动将聊天中收到的消息翻译为你选择的语言。'**
+  String get settingsAutoTranslateDescription;
+
   /// No description provided for @settingsBiometricLogin.
   ///
   /// In zh, this message translates to:
@@ -10338,6 +10368,162 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'稍后提醒'**
   String get recoveryKeyRemindLater;
+
+  /// No description provided for @channelReadOnly.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅管理员可在此频道发言'**
+  String get channelReadOnly;
+
+  /// No description provided for @channelSubscribers.
+  ///
+  /// In zh, this message translates to:
+  /// **'订阅者'**
+  String get channelSubscribers;
+
+  /// No description provided for @channelVerified.
+  ///
+  /// In zh, this message translates to:
+  /// **'已认证频道'**
+  String get channelVerified;
+
+  /// No description provided for @redPacketHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'红包记录'**
+  String get redPacketHistory;
+
+  /// No description provided for @redPacketSent.
+  ///
+  /// In zh, this message translates to:
+  /// **'已发出'**
+  String get redPacketSent;
+
+  /// No description provided for @redPacketReceived.
+  ///
+  /// In zh, this message translates to:
+  /// **'已收到'**
+  String get redPacketReceived;
+
+  /// No description provided for @redPacketExpired.
+  ///
+  /// In zh, this message translates to:
+  /// **'已过期'**
+  String get redPacketExpired;
+
+  /// No description provided for @redPacketClaimed.
+  ///
+  /// In zh, this message translates to:
+  /// **'已领取'**
+  String get redPacketClaimed;
+
+  /// No description provided for @redPacketInsufficientBalance.
+  ///
+  /// In zh, this message translates to:
+  /// **'余额不足'**
+  String get redPacketInsufficientBalance;
+
+  /// No description provided for @selfDestructCountdown.
+  ///
+  /// In zh, this message translates to:
+  /// **'{time} 后销毁'**
+  String selfDestructCountdown(String time);
+
+  /// No description provided for @messageDestroyed.
+  ///
+  /// In zh, this message translates to:
+  /// **'消息已销毁'**
+  String get messageDestroyed;
+
+  /// No description provided for @miniAppPermissionDenied.
+  ///
+  /// In zh, this message translates to:
+  /// **'权限不足：{permission}'**
+  String miniAppPermissionDenied(String permission);
+
+  /// No description provided for @aiSuggestionGasFee.
+  ///
+  /// In zh, this message translates to:
+  /// **'什么是 Gas 费？'**
+  String get aiSuggestionGasFee;
+
+  /// No description provided for @aiSuggestionDefi.
+  ///
+  /// In zh, this message translates to:
+  /// **'DeFi 入门'**
+  String get aiSuggestionDefi;
+
+  /// No description provided for @aiSuggestionSecurity.
+  ///
+  /// In zh, this message translates to:
+  /// **'如何检查合约安全'**
+  String get aiSuggestionSecurity;
+
+  /// No description provided for @aiSuggestionBridge.
+  ///
+  /// In zh, this message translates to:
+  /// **'跨链桥接'**
+  String get aiSuggestionBridge;
+
+  /// No description provided for @channelDiscoverTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'发现频道'**
+  String get channelDiscoverTitle;
+
+  /// No description provided for @channelDiscoverSearch.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索频道...'**
+  String get channelDiscoverSearch;
+
+  /// No description provided for @channelJoin.
+  ///
+  /// In zh, this message translates to:
+  /// **'加入'**
+  String get channelJoin;
+
+  /// No description provided for @channelJoined.
+  ///
+  /// In zh, this message translates to:
+  /// **'已加入'**
+  String get channelJoined;
+
+  /// No description provided for @channelCategory.
+  ///
+  /// In zh, this message translates to:
+  /// **'分类'**
+  String get channelCategory;
+
+  /// No description provided for @slowModeCooldown.
+  ///
+  /// In zh, this message translates to:
+  /// **'慢速模式：请等待 {seconds} 秒'**
+  String slowModeCooldown(int seconds);
+
+  /// No description provided for @addressCopyAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'复制地址'**
+  String get addressCopyAction;
+
+  /// No description provided for @addressSendMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'发消息'**
+  String get addressSendMessage;
+
+  /// No description provided for @addressViewProfile.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看资料'**
+  String get addressViewProfile;
+
+  /// No description provided for @sendToAddress.
+  ///
+  /// In zh, this message translates to:
+  /// **'通过钱包地址发消息'**
+  String get sendToAddress;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

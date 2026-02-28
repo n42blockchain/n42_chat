@@ -2801,6 +2801,23 @@ class SEn extends S {
   String get settingsLanguageChanged => 'Language changed';
 
   @override
+  String get settingsTranslation => 'Translation';
+
+  @override
+  String get settingsTranslateTextTo => 'Translate text to';
+
+  @override
+  String get settingsTranslateDescription =>
+      'Select the language you want messages to be translated into.';
+
+  @override
+  String get settingsAutoTranslate => 'Auto-translate received messages';
+
+  @override
+  String get settingsAutoTranslateDescription =>
+      'Automatically translate messages received in chat to your selected language.';
+
+  @override
   String get settingsBiometricLogin => 'Biometric Login';
 
   @override
@@ -5571,4 +5588,88 @@ class SEn extends S {
 
   @override
   String get recoveryKeyRemindLater => 'Remind me later';
+
+  @override
+  String get channelReadOnly => 'Only admins can post in this channel';
+
+  @override
+  String get channelSubscribers => 'subscribers';
+
+  @override
+  String get channelVerified => 'Verified channel';
+
+  @override
+  String get redPacketHistory => 'Red Packet History';
+
+  @override
+  String get redPacketSent => 'Sent';
+
+  @override
+  String get redPacketReceived => 'Received';
+
+  @override
+  String get redPacketExpired => 'Expired';
+
+  @override
+  String get redPacketClaimed => 'Claimed';
+
+  @override
+  String get redPacketInsufficientBalance => 'Insufficient balance';
+
+  @override
+  String selfDestructCountdown(String time) {
+    return 'Self-destruct in $time';
+  }
+
+  @override
+  String get messageDestroyed => 'Message destroyed';
+
+  @override
+  String miniAppPermissionDenied(String permission) {
+    return 'Permission denied: $permission';
+  }
+
+  @override
+  String get aiSuggestionGasFee => 'What is Gas fee?';
+
+  @override
+  String get aiSuggestionDefi => 'DeFi Beginner Guide';
+
+  @override
+  String get aiSuggestionSecurity => 'How to check contract security';
+
+  @override
+  String get aiSuggestionBridge => 'Cross-chain bridging';
+
+  @override
+  String get channelDiscoverTitle => 'Discover Channels';
+
+  @override
+  String get channelDiscoverSearch => 'Search channels...';
+
+  @override
+  String get channelJoin => 'Join';
+
+  @override
+  String get channelJoined => 'Joined';
+
+  @override
+  String get channelCategory => 'Category';
+
+  @override
+  String slowModeCooldown(int seconds) {
+    return 'Slow mode: wait ${seconds}s';
+  }
+
+  @override
+  String get addressCopyAction => 'Copy Address';
+
+  @override
+  String get addressSendMessage => 'Send Message';
+
+  @override
+  String get addressViewProfile => 'View Profile';
+
+  @override
+  String get sendToAddress => 'Send to wallet address';
 }
