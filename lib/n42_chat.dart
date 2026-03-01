@@ -52,6 +52,7 @@ export 'src/domain/entities/on_chain_notification_entity.dart';
 // ============================================
 // 集成接口导出
 // ============================================
+export 'src/integration/api_hub_bridge.dart';
 export 'src/integration/wallet_bridge.dart';
 
 // ============================================
