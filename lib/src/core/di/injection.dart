@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/giphy_service.dart';
 import '../services/remark_service.dart';
+import '../services/mymemory_translation_service.dart';
 import '../services/translation_service.dart';
 import '../../data/datasources/local/preferences_datasource.dart';
 import '../../data/datasources/local/secure_storage_datasource.dart';
@@ -54,6 +55,7 @@ import '../../domain/repositories/transfer_repository.dart';
 import '../../domain/repositories/moment_repository.dart';
 import '../../domain/repositories/sticker_repository.dart';
 import '../../domain/repositories/story_repository.dart';
+import '../../integration/api_hub_bridge.dart';
 import '../../integration/wallet_bridge.dart';
 import '../../n42_chat_config.dart';
 import '../../presentation/blocs/auth/auth_bloc.dart';
@@ -94,6 +96,34 @@ import '../services/in_app_notification_service.dart';
 import '../services/red_packet_service.dart';
 import '../../data/datasources/local/local_red_packet_service.dart';
 
+// P2.1 Protocol Abstraction
+import '../../domain/protocols/messaging_protocol.dart';
+import '../../data/protocols/matrix_protocol.dart';
+import '../../data/protocols/protocol_registry.dart';
+
+// P2.2 Governance
+import '../../data/datasources/governance/snapshot_graphql_datasource.dart';
+import '../../data/datasources/governance/snapshot_hub_datasource.dart';
+import '../../data/repositories/governance_repository_impl.dart';
+import '../../domain/repositories/governance_repository.dart';
+import '../../presentation/blocs/governance/governance_bloc.dart';
+
+// P2.3 Social Graph
+import '../../data/datasources/social/debank_datasource.dart';
+import '../../data/datasources/social/alchemy_social_datasource.dart';
+import '../../data/datasources/social/on_chain_identity_datasource.dart';
+import '../../data/repositories/social_graph_repository_impl.dart';
+import '../../domain/repositories/social_graph_repository.dart';
+import '../services/social_graph_service.dart';
+import '../../presentation/blocs/social/social_graph_bloc.dart';
+
+// P2.4 Points Economy
+import '../../data/datasources/points/points_api_datasource.dart';
+import '../../data/repositories/points_repository_impl.dart';
+import '../../domain/repositories/points_repository.dart';
+import '../services/points_tracking_service.dart';
+import '../../presentation/blocs/points/points_bloc.dart';
+
 /// 全局GetIt实例
 final GetIt getIt = GetIt.instance;
 
@@ -107,6 +137,11 @@ Future<void> configureDependencies(N42ChatConfig config, {IWalletBridge? walletB
   // 注册钱包桥接
   getIt.registerSingleton<IWalletBridge>(
     walletBridge ?? config.walletBridge ?? MockWalletBridge(),
+  );
+
+  // 注册 API Hub 桥接
+  getIt.registerSingleton<IApiHubBridge>(
+    config.apiHubBridge ?? MockApiHubBridge(),
   );
 
   // 注册服务
@@ -191,16 +226,26 @@ Future<void> _registerServices(N42ChatConfig config) async {
     ),
   );
 
-  // 翻译服务：优先使用 AI 翻译（始终可用），回退到 Google Translate
+  // 翻译服务 fallback chain:
+  // 1. Google Translate（有 API key 时）
+  // 2. AI Translation（有 AI key 时）
+  // 3. MyMemory（免费 fallback，无需任何 key）
   getIt.registerLazySingleton<ITranslationService>(() {
+    final hasGoogleKey = config.googleTranslateApiKey != null &&
+        config.googleTranslateApiKey!.isNotEmpty;
+    if (hasGoogleKey) {
+      return GoogleTranslationService(
+        apiKey: config.googleTranslateApiKey,
+        storageDataSource: getIt<PreferencesDataSource>(),
+      );
+    }
     if (config.aiApiKey != null && config.aiApiKey!.isNotEmpty) {
       return AiTranslationService(
         aiService: getIt<AiService>(),
         storageDataSource: getIt<PreferencesDataSource>(),
       );
     }
-    return GoogleTranslationService(
-      apiKey: config.googleTranslateApiKey,
+    return MyMemoryTranslationService(
       storageDataSource: getIt<PreferencesDataSource>(),
     );
   });
@@ -320,6 +365,46 @@ Future<void> _registerServices(N42ChatConfig config) async {
       ),
     );
   }
+
+  // ─── P2.1 协议抽象层 ───────────────────────────────────────────────────
+  if (config.enableProtocolAbstraction) {
+    getIt.registerLazySingleton<ProtocolRegistry>(() => ProtocolRegistry());
+    getIt.registerLazySingleton<IMessagingProtocol>(
+      () {
+        final protocol = MatrixProtocol(
+          clientManager: getIt<MatrixClientManager>(),
+          roomDataSource: getIt<MatrixRoomDataSource>(),
+          messageDataSource: getIt<MatrixMessageDataSource>(),
+          contactDataSource: getIt<MatrixContactDataSource>(),
+        );
+        // 自动注册到 ProtocolRegistry
+        getIt<ProtocolRegistry>().register(protocol);
+        return protocol;
+      },
+      dispose: (protocol) => (protocol as MatrixProtocol).dispose(),
+    );
+  }
+
+  // ─── P2.3 社交图谱服务 ─────────────────────────────────────────────────
+  if (config.enableSocialGraph) {
+    getIt.registerLazySingleton<SocialGraphService>(
+      () => SocialGraphService(
+        debank: getIt<DeBankDatasource>(),
+        alchemy: getIt<AlchemySocialDatasource>(),
+      ),
+    );
+  }
+
+  // ─── P2.4 积分追踪服务 ─────────────────────────────────────────────────
+  if (config.enablePoints && config.pointsApiBaseUrl != null) {
+    getIt.registerLazySingleton<PointsTrackingService>(
+      () => PointsTrackingService(
+        repository: getIt<IPointsRepository>(),
+        clientManager: getIt<MatrixClientManager>(),
+      ),
+      dispose: (svc) => svc.dispose(),
+    );
+  }
 }
 
 /// 注册数据源
@@ -408,6 +493,50 @@ Future<void> _registerDataSources() async {
           baseUrl: ppConfig.apiBaseUrl,
         );
       },
+    );
+  }
+
+  final config = getIt<N42ChatConfig>();
+
+  // ─── P2.2 Governance 数据源 ────────────────────────────────────────────
+  if (config.enableGovernance) {
+    getIt.registerLazySingleton<SnapshotGraphQLDatasource>(
+      () => SnapshotGraphQLDatasource(),
+      dispose: (ds) => ds.dispose(),
+    );
+    getIt.registerLazySingleton<SnapshotHubDatasource>(
+      () => SnapshotHubDatasource(
+        walletBridge: getIt<IWalletBridge>(),
+        hubEndpoint: config.snapshotHubUrl,
+      ),
+      dispose: (ds) => ds.dispose(),
+    );
+  }
+
+  // ─── P2.3 Social Graph 数据源 ──────────────────────────────────────────
+  if (config.enableSocialGraph) {
+    getIt.registerLazySingleton<DeBankDatasource>(
+      () => DeBankDatasource(apiKey: config.debankApiKey),
+      dispose: (ds) => ds.dispose(),
+    );
+    getIt.registerLazySingleton<AlchemySocialDatasource>(
+      () => AlchemySocialDatasource(apiKey: config.alchemyApiKey ?? ''),
+      dispose: (ds) => ds.dispose(),
+    );
+    getIt.registerLazySingleton<OnChainIdentityDatasource>(
+      () => OnChainIdentityDatasource(),
+      dispose: (ds) => ds.dispose(),
+    );
+  }
+
+  // ─── P2.4 Points 数据源 ────────────────────────────────────────────────
+  if (config.enablePoints && config.pointsApiBaseUrl != null) {
+    getIt.registerLazySingleton<PointsApiDatasource>(
+      () => PointsApiDatasource(
+        baseUrl: config.pointsApiBaseUrl!,
+        getAccessToken: () => null, // TODO: 从 auth 获取 access token
+      ),
+      dispose: (ds) => ds.dispose(),
     );
   }
 }
@@ -539,6 +668,34 @@ void _registerRepositories() {
         final ds = await getIt.getAsync<PushProtocolDatasource>();
         return OnChainNotificationRepositoryImpl(ds);
       },
+    );
+  }
+
+  // ─── P2.2 Governance 仓库 ──────────────────────────────────────────────
+  if (getIt.isRegistered<SnapshotGraphQLDatasource>()) {
+    getIt.registerLazySingleton<IGovernanceRepository>(
+      () => GovernanceRepositoryImpl(
+        graphql: getIt<SnapshotGraphQLDatasource>(),
+        hub: getIt<SnapshotHubDatasource>(),
+      ),
+    );
+  }
+
+  // ─── P2.3 Social Graph 仓库 ───────────────────────────────────────────
+  if (getIt.isRegistered<DeBankDatasource>()) {
+    getIt.registerLazySingleton<ISocialGraphRepository>(
+      () => SocialGraphRepositoryImpl(
+        debank: getIt<DeBankDatasource>(),
+        identity: getIt<OnChainIdentityDatasource>(),
+        graphService: getIt<SocialGraphService>(),
+      ),
+    );
+  }
+
+  // ─── P2.4 Points 仓库 ─────────────────────────────────────────────────
+  if (getIt.isRegistered<PointsApiDatasource>()) {
+    getIt.registerLazySingleton<IPointsRepository>(
+      () => PointsRepositoryImpl(api: getIt<PointsApiDatasource>()),
     );
   }
 }
@@ -673,6 +830,27 @@ void _registerBlocs() {
         walletBridge: getIt<IWalletBridge>(),
         chainId: ppCfg?.chainId ?? 1,
       ),
+    );
+  }
+
+  // ─── P2.2 Governance BLoC ─────────────────────────────────────────────
+  if (getIt.isRegistered<IGovernanceRepository>()) {
+    getIt.registerFactory<GovernanceBloc>(
+      () => GovernanceBloc(repository: getIt<IGovernanceRepository>()),
+    );
+  }
+
+  // ─── P2.3 Social Graph BLoC ───────────────────────────────────────────
+  if (getIt.isRegistered<ISocialGraphRepository>()) {
+    getIt.registerFactory<SocialGraphBloc>(
+      () => SocialGraphBloc(repository: getIt<ISocialGraphRepository>()),
+    );
+  }
+
+  // ─── P2.4 Points BLoC ─────────────────────────────────────────────────
+  if (getIt.isRegistered<IPointsRepository>()) {
+    getIt.registerFactory<PointsBloc>(
+      () => PointsBloc(repository: getIt<IPointsRepository>()),
     );
   }
 }

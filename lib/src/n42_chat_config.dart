@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'core/theme/n42_chat_theme.dart';
+import 'integration/api_hub_bridge.dart';
 import 'integration/wallet_bridge.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -134,6 +135,11 @@ class N42ChatConfig {
   /// 提供此接口以启用聊天中的加密货币转账功能
   final IWalletBridge? walletBridge;
 
+  /// API Hub 桥接器
+  ///
+  /// 提供此接口以启用市场数据、新闻和 URL 安全检测功能
+  final IApiHubBridge? apiHubBridge;
+
   /// 消息点击回调
   ///
   /// 当用户点击消息时触发
@@ -254,6 +260,56 @@ class N42ChatConfig {
   ///   适用于安全敏感部署，但未验证设备无法解密历史消息。
   final bool shareE2eeKeysWithAllDevices;
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // P2 功能配置
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /// 是否启用协议抽象层 (P2.1)
+  ///
+  /// 启用后，通过 [ProtocolRegistry] 管理多协议注册/切换，
+  /// 为未来接入 XMTP、Waku 等去中心化协议做准备。
+  final bool enableProtocolAbstraction;
+
+  /// 是否启用 DAO 治理投票 (P2.2)
+  ///
+  /// 启用后，群组可绑定 Snapshot Space，支持创建提案、投票、查看结果。
+  final bool enableGovernance;
+
+  /// Snapshot Hub URL (P2.2)
+  ///
+  /// Snapshot Hub API 地址，用于提交签名投票/提案。
+  /// 默认: `https://hub.snapshot.org`
+  final String? snapshotHubUrl;
+
+  /// 是否启用链上社交图谱 (P2.3)
+  ///
+  /// 启用后，根据链上数据（代币持仓、NFT 收藏、链使用）
+  /// 推荐相似用户和社交关系。
+  final bool enableSocialGraph;
+
+  /// DeBank Open API Key (P2.3)
+  ///
+  /// 用于查询用户链上持仓和资产数据。
+  /// 从 https://open.debank.com/ 获取
+  final String? debankApiKey;
+
+  /// Alchemy API Key (P2.3)
+  ///
+  /// 用于查询 NFT 持仓和 Token 余额。
+  /// 从 https://www.alchemy.com/ 获取
+  final String? alchemyApiKey;
+
+  /// 是否启用积分经济 (P2.4)
+  ///
+  /// 启用后，群组内可配置积分系统，激励活跃参与和高质量内容。
+  final bool enablePoints;
+
+  /// 积分 API 基础地址 (P2.4)
+  ///
+  /// N42 后端积分服务的 REST API 地址。
+  /// 例如: `https://api.n42.world`
+  final String? pointsApiBaseUrl;
+
   const N42ChatConfig({
     this.defaultHomeserver = 'https://m.si46.world',
     this.enableEncryption = true,
@@ -264,6 +320,7 @@ class N42ChatConfig {
     this.syncFilter = const SyncFilterConfig(),
     this.customTheme,
     this.walletBridge,
+    this.apiHubBridge,
     this.onMessageTap,
     this.onAvatarTap,
     this.onLinkTap,
@@ -287,6 +344,14 @@ class N42ChatConfig {
     this.storageManagement = const StorageManagementConfig(),
     this.pushProtocol,
     this.shareE2eeKeysWithAllDevices = true,
+    this.enableProtocolAbstraction = false,
+    this.enableGovernance = false,
+    this.snapshotHubUrl,
+    this.enableSocialGraph = false,
+    this.debankApiKey,
+    this.alchemyApiKey,
+    this.enablePoints = false,
+    this.pointsApiBaseUrl,
   });
 
   /// 复制并修改配置
@@ -300,6 +365,7 @@ class N42ChatConfig {
     SyncFilterConfig? syncFilter,
     N42ChatTheme? customTheme,
     IWalletBridge? walletBridge,
+    IApiHubBridge? apiHubBridge,
     void Function(String roomId, String eventId)? onMessageTap,
     void Function(String userId)? onAvatarTap,
     Future<void> Function(String url)? onLinkTap,
@@ -323,6 +389,14 @@ class N42ChatConfig {
     StorageManagementConfig? storageManagement,
     PushProtocolConfig? pushProtocol,
     bool? shareE2eeKeysWithAllDevices,
+    bool? enableProtocolAbstraction,
+    bool? enableGovernance,
+    String? snapshotHubUrl,
+    bool? enableSocialGraph,
+    String? debankApiKey,
+    String? alchemyApiKey,
+    bool? enablePoints,
+    String? pointsApiBaseUrl,
   }) {
     return N42ChatConfig(
       defaultHomeserver: defaultHomeserver ?? this.defaultHomeserver,
@@ -335,6 +409,7 @@ class N42ChatConfig {
       syncFilter: syncFilter ?? this.syncFilter,
       customTheme: customTheme ?? this.customTheme,
       walletBridge: walletBridge ?? this.walletBridge,
+      apiHubBridge: apiHubBridge ?? this.apiHubBridge,
       onMessageTap: onMessageTap ?? this.onMessageTap,
       onAvatarTap: onAvatarTap ?? this.onAvatarTap,
       onLinkTap: onLinkTap ?? this.onLinkTap,
@@ -359,6 +434,15 @@ class N42ChatConfig {
       pushProtocol: pushProtocol ?? this.pushProtocol,
       shareE2eeKeysWithAllDevices:
           shareE2eeKeysWithAllDevices ?? this.shareE2eeKeysWithAllDevices,
+      enableProtocolAbstraction:
+          enableProtocolAbstraction ?? this.enableProtocolAbstraction,
+      enableGovernance: enableGovernance ?? this.enableGovernance,
+      snapshotHubUrl: snapshotHubUrl ?? this.snapshotHubUrl,
+      enableSocialGraph: enableSocialGraph ?? this.enableSocialGraph,
+      debankApiKey: debankApiKey ?? this.debankApiKey,
+      alchemyApiKey: alchemyApiKey ?? this.alchemyApiKey,
+      enablePoints: enablePoints ?? this.enablePoints,
+      pointsApiBaseUrl: pointsApiBaseUrl ?? this.pointsApiBaseUrl,
     );
   }
 }
