@@ -204,5 +204,15 @@ abstract class IGroupRepository {
 
   /// 验证当前用户是否满足代币门控条件
   Future<TokenGateVerificationResult> verifyTokenGate(String roomId);
+
+  // ============================================
+  // 成员加入监听
+  // ============================================
+
+  /// 监听指定房间的成员加入事件，返回新加入成员的 userId Stream
+  Stream<String> watchMemberJoinEvents(String roomId);
+
+  /// 发送 Bot notice 消息
+  Future<void> sendBotNotice(String roomId, String message);
 }
 

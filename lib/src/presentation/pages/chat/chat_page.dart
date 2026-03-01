@@ -72,6 +72,7 @@ import '../../../core/services/translation_service.dart';
 import '../../widgets/chat/ai_summary_bubble.dart';
 import '../../../domain/repositories/ai_repository.dart';
 import '../../widgets/chat/ai_rewrite_bar.dart';
+import '../../widgets/chat/translated_message.dart';
 import 'viewers/pdf_viewer_page.dart';
 import 'image_viewer_page.dart';
 import 'location_picker_page.dart';
@@ -842,6 +843,38 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  /// 处理 BLoC 发出的 pendingCommand 信号
+  void _handlePendingCommand(String command) {
+    switch (command) {
+      case 'poll':
+        _showPollCreateSheet();
+        break;
+      case 'welcome':
+        // TODO: 导航到 BotSettingsPage（Batch 2 实现）
+        break;
+      default:
+        debugPrint('ChatPage: Unknown pending command: $command');
+    }
+  }
+
+  /// 展示投票创建底部弹窗
+  void _showPollCreateSheet() {
+    showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => const PollCreateSheet(),
+    ).then((result) {
+      if (result != null && mounted) {
+        context.read<ChatBloc>().add(SendPollMessage(
+          question: result['question'] as String,
+          options: List<String>.from(result['options'] as List),
+          maxSelections: result['maxSelections'] as int? ?? 1,
+        ));
+      }
+    });
+  }
+
   Widget _buildScrollToBottomButton() {
     return FloatingActionButton.small(
       onPressed: _scrollToBottom,
@@ -952,23 +985,39 @@ class _ChatPageState extends State<ChatPage> {
       ],
     );
 
-    // 如果有 ContactBloc，用 BlocListener 包装来监听备注更新
-    if (hasContactBloc) {
-      return BlocListener<ContactBloc, ContactState>(
+    // 使用 MultiBlocListener 包装：1) pendingCommand 信号 2) ContactBloc 备注更新
+    final List<BlocListener<dynamic, dynamic>> listeners = [
+      BlocListener<ChatBloc, ChatState>(
+        listenWhen: (prev, curr) => prev.pendingCommand != curr.pendingCommand,
         listener: (context, state) {
-          if (state.status == ContactStatus.loaded) {
-            // 联系人加载完成，重新获取对方用户ID
-            _loadOtherUserId();
-            if (mounted) setState(() {});
-          } else if (state.status == ContactStatus.remarkUpdated) {
-            if (mounted) setState(() {});
-          }
+          if (state.pendingCommand == null) return;
+          final command = state.pendingCommand!;
+          // 立即清除信号，防止重复触发
+          context.read<ChatBloc>().add(const ClearPendingCommand());
+          _handlePendingCommand(command);
         },
-        child: content,
+      ),
+    ];
+
+    if (hasContactBloc) {
+      listeners.add(
+        BlocListener<ContactBloc, ContactState>(
+          listener: (context, state) {
+            if (state.status == ContactStatus.loaded) {
+              _loadOtherUserId();
+              if (mounted) setState(() {});
+            } else if (state.status == ContactStatus.remarkUpdated) {
+              if (mounted) setState(() {});
+            }
+          },
+        ),
       );
     }
 
-    return content;
+    return MultiBlocListener(
+      listeners: listeners,
+      child: content,
+    );
   }
 }
 

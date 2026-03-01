@@ -155,9 +155,16 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
           debugPrint('Edit clicked');
           _enterEditMode(message);
         },
-        onTranslate: (getIt.isRegistered<AiService>() && message.type == MessageType.text) ? () {
+        onTranslate: (getIt.isRegistered<ITranslationService>() && message.type == MessageType.text) ? () {
           debugPrint('Translate clicked');
-          _translateMessage(message);
+          final chatBloc = context.read<ChatBloc>();
+          final targetLang = chatBloc.state.defaultTargetLanguage.isNotEmpty
+              ? chatBloc.state.defaultTargetLanguage
+              : getTargetLanguage(null);
+          chatBloc.add(TranslateMessage(
+            messageId: message.id,
+            targetLanguage: targetLang,
+          ));
         } : null,
         onReport: message.isFromMe ? null : () {
           debugPrint('Report clicked');

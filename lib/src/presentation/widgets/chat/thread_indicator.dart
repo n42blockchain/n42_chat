@@ -29,6 +29,8 @@ class ThreadIndicator extends StatelessWidget {
         ? (s?.threadReply ?? '1 reply')
         : (s?.threadReplies(replyCount) ?? '$replyCount replies');
 
+    final hasUnread = (message.threadUnreadCount ?? 0) > 0;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -55,6 +57,18 @@ class ThreadIndicator extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
+            // 线程未读红点
+            if (hasUnread) ...[
+              const SizedBox(width: 4),
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
             if (message.threadLatestReply != null) ...[
               const SizedBox(width: 8),
               Flexible(

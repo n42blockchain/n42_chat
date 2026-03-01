@@ -24,6 +24,7 @@ class ThreadInfo {
   final String? latestReply;
   final String? latestReplySender;
   final DateTime? latestReplyTimestamp;
+  final int? unreadCount;
 
   ThreadInfo({
     this.threadRootId,
@@ -31,6 +32,7 @@ class ThreadInfo {
     this.latestReply,
     this.latestReplySender,
     this.latestReplyTimestamp,
+    this.unreadCount,
   });
 }
 
@@ -79,6 +81,10 @@ class MatrixEventMapper {
     // 解析线程信息 (MSC3440)
     final threadInfo = extractThreadInfo(event);
 
+    // 检测 Bot 消息：n42.bot 标记 或 msgtype 为 m.notice
+    final isBotMessage = event.content['n42.bot'] == true ||
+        event.messageType == matrix.MessageTypes.Notice;
+
     // 对 n42.contact_card 消息，从 event.content 提取完整名片信息构建多行格式 body
     // 使得 message_item.dart 中 _parseContactCard 可以正确解析 userId/displayName/avatarUrl
     String messageContent = parsedContent.content;
@@ -121,6 +127,8 @@ class MatrixEventMapper {
       threadLatestReply: threadInfo.latestReply,
       threadLatestReplySender: threadInfo.latestReplySender,
       threadLatestReplyTimestamp: threadInfo.latestReplyTimestamp,
+      isBotMessage: isBotMessage,
+      threadUnreadCount: threadInfo.unreadCount,
     );
   }
 
@@ -583,6 +591,7 @@ class MatrixEventMapper {
     String? latestReply;
     String? latestReplySender;
     DateTime? latestReplyTimestamp;
+    int? unreadCount;
 
     final relatesTo = event.content['m.relates_to'] as Map<String, dynamic>?;
     if (relatesTo != null) {
@@ -599,6 +608,13 @@ class MatrixEventMapper {
         final threadSummary = relations['m.thread'] as Map<String, dynamic>?;
         if (threadSummary != null) {
           replyCount = threadSummary['count'] as int?;
+
+          // 提取线程未读数（MSC3440 扩展）
+          final unreadNotifications = threadSummary['unread_notifications'] as Map<String, dynamic>?;
+          if (unreadNotifications != null) {
+            unreadCount = unreadNotifications['notification_count'] as int?;
+          }
+
           final latestEvent = threadSummary['latest_event'] as Map<String, dynamic>?;
           if (latestEvent != null) {
             latestReplySender = latestEvent['sender'] as String?;
@@ -619,6 +635,7 @@ class MatrixEventMapper {
       latestReply: latestReply,
       latestReplySender: latestReplySender,
       latestReplyTimestamp: latestReplyTimestamp,
+      unreadCount: unreadCount,
     );
   }
 }

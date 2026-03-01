@@ -636,28 +636,32 @@ class ClearTranslation extends ChatEvent {
 class UpdateTranslationSettings extends ChatEvent {
   final bool? autoTranslate;
   final String? defaultTargetLanguage;
+  final bool? smartReplyTranslate;
 
   const UpdateTranslationSettings({
     this.autoTranslate,
     this.defaultTargetLanguage,
+    this.smartReplyTranslate,
   });
 
   @override
-  List<Object?> get props => [autoTranslate, defaultTargetLanguage];
+  List<Object?> get props => [autoTranslate, defaultTargetLanguage, smartReplyTranslate];
 }
 
 /// 翻译设置加载完成（内部事件）
 class TranslationSettingsLoaded extends ChatEvent {
   final bool autoTranslate;
   final String defaultTargetLanguage;
+  final bool smartReplyTranslate;
 
   const TranslationSettingsLoaded({
     required this.autoTranslate,
     required this.defaultTargetLanguage,
+    this.smartReplyTranslate = false,
   });
 
   @override
-  List<Object?> get props => [autoTranslate, defaultTargetLanguage];
+  List<Object?> get props => [autoTranslate, defaultTargetLanguage, smartReplyTranslate];
 }
 
 // ============================================
@@ -730,6 +734,14 @@ class RoomInfoLoaded extends ChatEvent {
 
   @override
   List<Object?> get props => [isChannel, canSendMessages, slowModeInterval];
+}
+
+/// 清除待处理的斜杠命令信号
+class ClearPendingCommand extends ChatEvent {
+  const ClearPendingCommand();
+
+  @override
+  List<Object?> get props => [];
 }
 
 /// 举报消息

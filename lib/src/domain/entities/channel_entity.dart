@@ -55,6 +55,17 @@ class ChannelEntity extends Equatable {
     );
   }
 
+  /// 创建代表主房间的 "General" 合成频道
+  factory ChannelEntity.general(String roomId) {
+    return ChannelEntity(
+      roomId: roomId,
+      parentRoomId: roomId,
+      name: 'General',
+      topic: null,
+      order: -1,
+    );
+  }
+
   @override
   List<Object?> get props => [
         roomId,

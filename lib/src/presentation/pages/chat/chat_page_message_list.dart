@@ -124,6 +124,12 @@ extension _ChatPageMessageListMethods on _ChatPageState {
             _messageKeys.putIfAbsent(message.id, () => GlobalKey());
             final messageKey = _messageKeys[message.id]!;
 
+            // 翻译状态
+            final translatedText = state.translatedMessages[message.id];
+            final isTranslatingMsg = state.translatingMessageIds.contains(message.id);
+            final detectedLang = state.detectedSourceLanguages[message.id];
+            final hasTranslation = translatedText != null || isTranslatingMsg;
+
             return Column(
               children: [
                 if (showTimeSeparator)
@@ -159,6 +165,23 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                           messageFontSize: _messageFontSize,
                         ),
                       ),
+                // 微信风格：翻译结果显示在消息气泡下方
+                if (hasTranslation && !_isMultiSelectMode)
+                  TranslatedMessageWidget(
+                    translatedText: translatedText ?? '',
+                    detectedSourceLanguage: detectedLang,
+                    isTranslating: isTranslatingMsg,
+                    isFromMe: message.isFromMe,
+                  ),
+                // 智能回复翻译：显示原文
+                if (state.smartReplyOriginals.containsKey(message.id) &&
+                    message.isFromMe &&
+                    !_isMultiSelectMode)
+                  TranslatedMessageWidget(
+                    translatedText: state.smartReplyOriginals[message.id]!,
+                    isFromMe: true,
+                    isOriginalDisplay: true,
+                  ),
               ],
             );
           },

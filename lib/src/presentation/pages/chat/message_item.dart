@@ -182,12 +182,36 @@ class MessageItem extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 56, bottom: 2),
-            child: Text(
-              displayName,
-              style: TextStyle(
-                fontSize: 12,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  displayName,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  ),
+                ),
+                if (message.isBotMessage) ...[
+                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'BOT',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
           bubble,

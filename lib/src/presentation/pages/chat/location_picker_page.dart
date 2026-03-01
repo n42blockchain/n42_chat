@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
+import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -23,11 +25,17 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
   String _currentAddress = 'Getting location...';
   bool _isLoading = true;
   String? _errorMessage;
-  
+
+  // 地图控制器
+  final MapController _mapController = MapController();
+
+  // 地图中心点（拖动地图时更新）
+  LatLng? _mapCenter;
+
   // 附近地点列表
   List<NearbyPlace> _nearbyPlaces = [];
   int _selectedPlaceIndex = 0;
-  
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +45,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
   @override
   void dispose() {
     _searchDebounce?.cancel();
+    _mapController.dispose();
     super.dispose();
   }
 
@@ -77,7 +86,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         });
         return;
       }
-      
+
       // 获取当前位置
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
@@ -85,17 +94,18 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
           timeLimit: Duration(seconds: 15),
         ),
       );
-      
+
       setState(() {
         _currentPosition = position;
+        _mapCenter = LatLng(position.latitude, position.longitude);
       });
-      
+
       // 获取地址
       await _getAddressFromPosition(position);
-      
+
       // 生成附近地点
       _generateNearbyPlaces(position);
-      
+
       setState(() {
         _isLoading = false;
       });
@@ -109,26 +119,14 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
 
   Future<void> _getAddressFromPosition(Position position) async {
     try {
-      // 使用简单的坐标显示，因为 geocoding 可能需要 API key
       setState(() {
         _currentAddress = '${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}';
       });
-      
-      // 尝试使用 geocoding 获取地址
-      // 注意：这可能需要配置 API key
-      // final placemarks = await placemarkFromCoordinates(
-      //   position.latitude,
-      //   position.longitude,
-      // );
-      // if (placemarks.isNotEmpty) {
-      //   final place = placemarks.first;
-      //   _currentAddress = '${place.locality ?? ''} ${place.street ?? ''}';
-      // }
     } catch (e) {
       debugPrint('Get address error: $e');
     }
   }
-  
+
   /// 搜索地点（使用 geocoding）
   Timer? _searchDebounce;
 
@@ -171,6 +169,13 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
             _nearbyPlaces = results;
             _selectedPlaceIndex = 0;
           });
+          // 移动地图到第一个搜索结果
+          if (results.isNotEmpty) {
+            _mapController.move(
+              LatLng(results.first.latitude, results.first.longitude),
+              15.0,
+            );
+          }
         }
       } catch (e) {
         debugPrint('Place search error: $e');
@@ -179,8 +184,6 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
   }
 
   void _generateNearbyPlaces(Position position) {
-    // 生成模拟的附近地点
-    // 实际应用中应该使用地图 API 获取真实的 POI 数据
     final l10n = S.of(context);
     final myLocation = l10n?.chatMyLocation ?? 'My Location';
     final currentLocation = l10n?.chatCurrentLocation ?? 'Current Location';
@@ -202,7 +205,6 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         icon: Icons.location_on,
         iconColor: Colors.red,
       ),
-      // 模拟附近地点（实际应从地图 API 获取）
       NearbyPlace(
         name: l10n?.chatNearbyPlace(1) ?? 'Nearby Place 1',
         address: l10n?.chatApproximateDistance('100m') ?? 'About 100m',
@@ -229,7 +231,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
       ),
     ];
   }
-  
+
   void _confirmLocation() {
     if (_currentPosition == null) return;
 
@@ -245,10 +247,19 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
     });
   }
 
+  void _moveToCurrentLocation() {
+    if (_currentPosition != null) {
+      _mapController.move(
+        LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+        15.0,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    
+
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
       appBar: AppBar(
@@ -322,47 +333,38 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                 )
               : Column(
                   children: [
-                    // 地图预览区域
-                    Container(
+                    // 地图预览区域 - 交互式 FlutterMap
+                    SizedBox(
                       height: 200,
-                      width: double.infinity,
-                      color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF2F2F7),
                       child: Stack(
                         children: [
-                          // 地图占位符
-                          Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.map,
-                                  size: 48,
-                                  color: isDark ? Colors.white38 : Colors.black26,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  S.of(context)?.chatMapPreview ?? 'Map Preview',
-                                  style: TextStyle(
-                                    color: isDark ? Colors.white38 : Colors.black26,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _currentAddress,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark ? Colors.white54 : Colors.black54,
-                                  ),
-                                ),
-                              ],
+                          FlutterMap(
+                            mapController: _mapController,
+                            options: MapOptions(
+                              initialCenter: _mapCenter ?? const LatLng(0, 0),
+                              initialZoom: 15.0,
+                              onPositionChanged: (pos, hasGesture) {
+                                if (hasGesture) {
+                                  _mapCenter = pos.center;
+                                }
+                              },
                             ),
+                            children: [
+                              TileLayer(
+                                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                userAgentPackageName: 'com.n42.wallet',
+                              ),
+                            ],
                           ),
-                          // 中心标记
+                          // 中心固定 pin（地图拖动时 pin 不动）
                           const Center(
-                            child: Icon(
-                              Icons.location_on,
-                              color: Colors.red,
-                              size: 40,
+                            child: Padding(
+                              padding: EdgeInsets.only(bottom: 20),
+                              child: Icon(
+                                Icons.location_on,
+                                color: Colors.red,
+                                size: 40,
+                              ),
                             ),
                           ),
                           // 重新定位按钮
@@ -370,7 +372,8 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                             right: 16,
                             bottom: 16,
                             child: FloatingActionButton.small(
-                              onPressed: _getCurrentLocation,
+                              heroTag: 'relocate',
+                              onPressed: _moveToCurrentLocation,
                               backgroundColor: Colors.white,
                               child: const Icon(
                                 Icons.my_location,
@@ -390,8 +393,8 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                           hintText: S.of(context)?.chatSearchLocation ?? 'Search location',
                           prefixIcon: const Icon(Icons.search),
                           filled: true,
-                          fillColor: isDark 
-                              ? const Color(0xFF3A3A3C) 
+                          fillColor: isDark
+                              ? const Color(0xFF3A3A3C)
                               : const Color(0xFFF2F2F7),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -414,7 +417,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                         itemBuilder: (context, index) {
                           final place = _nearbyPlaces[index];
                           final isSelected = index == _selectedPlaceIndex;
-                          
+
                           return ListTile(
                             leading: Container(
                               width: 40,
@@ -433,8 +436,8 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               place.name,
                               style: TextStyle(
                                 color: isDark ? Colors.white : Colors.black,
-                                fontWeight: isSelected 
-                                    ? FontWeight.w600 
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
                                     : FontWeight.normal,
                               ),
                             ),
@@ -455,6 +458,11 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               setState(() {
                                 _selectedPlaceIndex = index;
                               });
+                              // 移动地图到选中的地点
+                              _mapController.move(
+                                LatLng(place.latitude, place.longitude),
+                                15.0,
+                              );
                             },
                           );
                         },
@@ -486,7 +494,7 @@ class NearbyPlace {
 }
 
 /// 位置详情页面 - 微信/WhatsApp风格
-class ChatLocationDetailPage extends StatelessWidget {
+class ChatLocationDetailPage extends StatefulWidget {
   final double latitude;
   final double longitude;
   final String locationName;
@@ -498,57 +506,80 @@ class ChatLocationDetailPage extends StatelessWidget {
   });
 
   @override
+  State<ChatLocationDetailPage> createState() => _ChatLocationDetailPageState();
+}
+
+class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
+  late final MapController _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapController = MapController();
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
+    final center = LatLng(widget.latitude, widget.longitude);
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: Stack(
         children: [
-          // 地图区域（占满屏幕）
+          // 全屏地图
           Positioned.fill(
-            child: Container(
-              color: const Color(0xFFE8EEF0),
-              child: CustomPaint(
-                painter: _LargeMapPainter(),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // 位置标记
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.location_on,
-                          color: AppColors.primary,
-                          size: 32,
-                        ),
-                      ),
-                      // 标记阴影
-                      Container(
-                        width: 16,
-                        height: 6,
-                        margin: const EdgeInsets.only(top: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+            child: FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: center,
+                initialZoom: 15.0,
               ),
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.n42.wallet',
+                ),
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: center,
+                      width: 56,
+                      height: 56,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.location_on,
+                              color: AppColors.primary,
+                              size: 24,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           // 顶部导航栏
@@ -645,7 +676,7 @@ class ChatLocationDetailPage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  locationName,
+                                  widget.locationName,
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
@@ -654,7 +685,7 @@ class ChatLocationDetailPage extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${latitude.toStringAsFixed(6)}, ${longitude.toStringAsFixed(6)}',
+                                  '${widget.latitude.toStringAsFixed(6)}, ${widget.longitude.toStringAsFixed(6)}',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
@@ -676,7 +707,7 @@ class ChatLocationDetailPage extends StatelessWidget {
                               label: S.of(context)?.chatCopy ?? 'Copy',
                               isDark: isDark,
                               onTap: () {
-                                Clipboard.setData(ClipboardData(text: '$latitude, $longitude'));
+                                Clipboard.setData(ClipboardData(text: '${widget.latitude}, ${widget.longitude}'));
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(S.of(context)?.commonAddressCopied ?? 'Coordinates copied'),
@@ -693,7 +724,7 @@ class ChatLocationDetailPage extends StatelessWidget {
                             flex: 2,
                             child: ElevatedButton.icon(
                               onPressed: () async {
-                                final url = 'https://maps.google.com/?q=$latitude,$longitude';
+                                final url = 'https://maps.google.com/?q=${widget.latitude},${widget.longitude}';
                                 final uri = Uri.parse(url);
                                 if (await canLaunchUrl(uri)) {
                                   await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -773,58 +804,3 @@ class _LocationActionButton extends StatelessWidget {
     );
   }
 }
-
-/// 大地图网格绘制器
-class _LargeMapPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFD4DDE0)
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
-
-    // 绘制网格线
-    const spacing = 40.0;
-    for (double y = 0; y < size.height; y += spacing) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-    for (double x = 0; x < size.width; x += spacing) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-
-    // 绘制主干道
-    final mainPaint = Paint()
-      ..color = const Color(0xFFC0CDD2)
-      ..strokeWidth = 3.0
-      ..style = PaintingStyle.stroke;
-
-    // 水平主干道
-    canvas.drawLine(
-      Offset(0, size.height * 0.4),
-      Offset(size.width, size.height * 0.4),
-      mainPaint,
-    );
-    canvas.drawLine(
-      Offset(0, size.height * 0.7),
-      Offset(size.width, size.height * 0.7),
-      mainPaint,
-    );
-
-    // 垂直主干道
-    canvas.drawLine(
-      Offset(size.width * 0.3, 0),
-      Offset(size.width * 0.3, size.height),
-      mainPaint,
-    );
-    canvas.drawLine(
-      Offset(size.width * 0.6, 0),
-      Offset(size.width * 0.6, size.height),
-      mainPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-/// 联系人名片选择底部弹窗

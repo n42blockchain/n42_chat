@@ -36,6 +36,28 @@ class UserProfileEntity extends Equatable {
   /// 是否已验证手机
   final bool phoneVerified;
 
+  // ============================================
+  // NFT 头像字段
+  // ============================================
+
+  /// NFT 合约地址
+  final String? nftContractAddress;
+
+  /// NFT Token ID
+  final int? nftTokenId;
+
+  /// NFT 所在链 ID
+  final int? nftChainId;
+
+  /// NFT 头像图片 URL（已解析的 HTTPS URL）
+  final String? nftImageUrl;
+
+  /// 是否使用 NFT 头像
+  bool get hasNftAvatar =>
+      nftContractAddress != null &&
+      nftTokenId != null &&
+      nftImageUrl != null;
+
   const UserProfileEntity({
     required this.userId,
     this.displayName,
@@ -48,6 +70,10 @@ class UserProfileEntity extends Equatable {
     this.isOnline = false,
     this.emailVerified = false,
     this.phoneVerified = false,
+    this.nftContractAddress,
+    this.nftTokenId,
+    this.nftChainId,
+    this.nftImageUrl,
   });
 
   /// 获取有效显示名称
@@ -105,6 +131,10 @@ class UserProfileEntity extends Equatable {
         isOnline,
         emailVerified,
         phoneVerified,
+        nftContractAddress,
+        nftTokenId,
+        nftChainId,
+        nftImageUrl,
       ];
 
   UserProfileEntity copyWith({
@@ -119,6 +149,10 @@ class UserProfileEntity extends Equatable {
     bool? isOnline,
     bool? emailVerified,
     bool? phoneVerified,
+    String? nftContractAddress,
+    int? nftTokenId,
+    int? nftChainId,
+    String? nftImageUrl,
   }) {
     return UserProfileEntity(
       userId: userId ?? this.userId,
@@ -132,6 +166,10 @@ class UserProfileEntity extends Equatable {
       isOnline: isOnline ?? this.isOnline,
       emailVerified: emailVerified ?? this.emailVerified,
       phoneVerified: phoneVerified ?? this.phoneVerified,
+      nftContractAddress: nftContractAddress ?? this.nftContractAddress,
+      nftTokenId: nftTokenId ?? this.nftTokenId,
+      nftChainId: nftChainId ?? this.nftChainId,
+      nftImageUrl: nftImageUrl ?? this.nftImageUrl,
     );
   }
 }

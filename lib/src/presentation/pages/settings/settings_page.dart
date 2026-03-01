@@ -8,6 +8,7 @@ import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'quick_replies_page.dart';
+import 'translation_settings_page.dart';
 import 'backup_restore_page.dart';
 import 'storage_management_page.dart';
 import 'auto_download_settings_page.dart';
@@ -124,6 +125,13 @@ class SettingsPage extends StatelessWidget {
                 iconColor: Colors.blue,
                 title: S.of(context)?.settingsLanguage ?? 'Language',
                 onTap: onLanguage,
+                isDark: isDark,
+              ),
+              _SettingsItem(
+                icon: Icons.translate,
+                iconColor: Colors.teal,
+                title: S.of(context)?.settingsTranslation ?? 'Translation',
+                onTap: () => _navigateToTranslation(context),
                 isDark: isDark,
               ),
             ],
@@ -363,6 +371,14 @@ class SettingsPage extends StatelessWidget {
     } catch (e) {
       debugPrint('SettingsPage: Failed to open bridges: $e');
     }
+  }
+
+  void _navigateToTranslation(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const TranslationSettingsPage(),
+      ),
+    );
   }
 
   void _navigateToQuickReplies(BuildContext context) {

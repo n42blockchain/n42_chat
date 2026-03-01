@@ -339,6 +339,16 @@ extension ChatBlocMessageHandlers on ChatBloc {
 
       // 扫描失败消息加入自动重试队列
       ChatBlocRetryHandlers(this).scanFailedMessages();
+
+      // 自动翻译新收到的消息
+      if (state.autoTranslate && _translationService != null) {
+        _autoTranslateMessages(emit);
+      }
+
+      // 智能回复翻译：检测对方最近消息语言
+      if (state.smartReplyTranslate && _translationService != null) {
+        _detectRecipientLanguage(emit);
+      }
     }
   }
 

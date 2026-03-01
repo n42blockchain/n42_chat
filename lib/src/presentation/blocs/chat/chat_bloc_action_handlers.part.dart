@@ -351,6 +351,14 @@ extension ChatBlocActionHandlers on ChatBloc {
     }
   }
 
+  /// 清除待处理的斜杠命令信号
+  void _onClearPendingCommand(
+    ClearPendingCommand event,
+    Emitter<ChatState> emit,
+  ) {
+    emit(state.copyWith(clearPendingCommand: true));
+  }
+
   /// 执行斜杠命令
   Future<void> onExecuteSlashCommand(
     ExecuteSlashCommand event,

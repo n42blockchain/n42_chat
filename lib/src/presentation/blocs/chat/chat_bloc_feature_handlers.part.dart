@@ -641,10 +641,12 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     final newAutoTranslate = event.autoTranslate ?? state.autoTranslate;
     final newTargetLang =
         event.defaultTargetLanguage ?? state.defaultTargetLanguage;
+    final newSmartReply = event.smartReplyTranslate ?? state.smartReplyTranslate;
 
     emit(state.copyWith(
       autoTranslate: newAutoTranslate,
       defaultTargetLanguage: newTargetLang,
+      smartReplyTranslate: newSmartReply,
     ));
 
     // 持久化设置
@@ -652,6 +654,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       await _secureStorage.saveTranslationSettings(
         autoTranslate: newAutoTranslate,
         defaultTargetLanguage: newTargetLang,
+        smartReplyTranslate: newSmartReply,
       );
     } catch (e) {
       debugPrint('ChatBloc: Failed to save translation settings: $e');
@@ -660,6 +663,11 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     // 如果刚开启自动翻译，对当前可见的未翻译消息触发翻译
     if (newAutoTranslate) {
       _autoTranslateMessages(emit);
+    }
+
+    // 如果刚开启智能回复翻译，立即检测对方语言
+    if (newSmartReply && _translationService != null) {
+      _detectRecipientLanguage(emit);
     }
   }
 
@@ -671,10 +679,16 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     emit(state.copyWith(
       autoTranslate: event.autoTranslate,
       defaultTargetLanguage: event.defaultTargetLanguage,
+      smartReplyTranslate: event.smartReplyTranslate,
     ));
 
     if (event.autoTranslate) {
       _autoTranslateMessages(emit);
+    }
+
+    // 如果智能回复翻译已开启，立即检测对方语言
+    if (event.smartReplyTranslate && _translationService != null) {
+      _detectRecipientLanguage(emit);
     }
   }
 
@@ -704,6 +718,40 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         }
       });
     }
+  }
+
+  // ============================================
+  // 智能回复翻译 — 对方语言检测
+  // ============================================
+
+  /// 检测对方最近消息的语言
+  ///
+  /// 从 state.messages 中取最近一条非自己的文本消息，
+  /// 用 translationService.detectLanguage() 检测语言。
+  /// 使用 BLoC 自身的 emit 方法（因为在异步回调中 Emitter 已失效）。
+  void _detectRecipientLanguage(Emitter<ChatState> emit) {
+    if (_translationService == null) return;
+
+    // 找最近一条非自己的文本消息
+    final recipientMsg = state.messages.where(
+      (m) => !m.isFromMe && m.type == MessageType.text && m.content.trim().isNotEmpty,
+    ).firstOrNull;
+
+    if (recipientMsg == null) return;
+
+    // 保存 BLoC 的 emit 引用（避免与参数名 emit 冲突）
+    // ignore: invalid_use_of_visible_for_testing_member
+    final blocEmit = this.emit;
+
+    // detectLanguage 基于字符集正则，几乎即时完成
+    _translationService.detectLanguage(recipientMsg.content).then((detected) {
+      if (detected != null && !isClosed && state.detectedRecipientLanguage != detected) {
+        blocEmit(state.copyWith(detectedRecipientLanguage: detected));
+        debugPrint('ChatBloc: Detected recipient language: $detected');
+      }
+    }).catchError((Object e) {
+      debugPrint('ChatBloc: Failed to detect recipient language: $e');
+    });
   }
 
   // ============================================

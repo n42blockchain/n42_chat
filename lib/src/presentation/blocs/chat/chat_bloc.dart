@@ -121,6 +121,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendTypingNotification>(onSendTypingNotification);
     on<ClearChatHistory>(onClearChatHistory);
     on<ExecuteSlashCommand>(onExecuteSlashCommand);
+    on<ClearPendingCommand>(_onClearPendingCommand);
     on<ReportMessage>(onReportMessage);
 
     // 投票
@@ -293,6 +294,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
             defaultTargetLanguage:
                 settings['defaultTargetLanguage'] as String? ??
                     getDeviceLanguageCode(),
+            smartReplyTranslate: settings['smartReplyTranslate'] as bool? ?? false,
           ));
         }
       } catch (e) {

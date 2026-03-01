@@ -115,6 +115,13 @@ abstract class IWalletBridge {
     required int chainId,
     String? ownerAddress,
   }) async => BigInt.zero;
+
+  /// 查询 ERC-721 tokenURI（用于 NFT 元数据解析）
+  Future<String?> getErc721TokenUri({
+    required String contractAddress,
+    required int tokenId,
+    required int chainId,
+  }) async => null;
 }
 
 /// 转账结果

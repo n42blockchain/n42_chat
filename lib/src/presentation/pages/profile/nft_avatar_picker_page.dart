@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/services/nft_metadata_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../integration/wallet_bridge.dart';
 
@@ -106,12 +107,24 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
         return;
       }
 
-      // For now, show the collection avatar placeholder
-      // A full implementation would call the token URI → fetch metadata JSON → extract image
+      // 获取 tokenURI 并解析元数据中的图片 URL
+      String? imageUrl;
+      final tokenUri = await walletBridge.getErc721TokenUri(
+        contractAddress: contract,
+        tokenId: tokenId,
+        chainId: _selectedChainId,
+      );
+
+      if (tokenUri != null && tokenUri.isNotEmpty) {
+        final metadataService = getIt.isRegistered<NftMetadataService>()
+            ? getIt<NftMetadataService>()
+            : NftMetadataService();
+        imageUrl = await metadataService.resolveImageUrl(tokenUri);
+      }
+
       setState(() {
         _isResolving = false;
-        // Placeholder: in a real implementation, fetch tokenURI → metadata → image
-        _resolvedImageUrl = 'nft://$contract/$tokenId@$_selectedChainId';
+        _resolvedImageUrl = imageUrl ?? 'nft://$contract/$tokenId@$_selectedChainId';
       });
     } catch (e) {
       setState(() {
