@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:url_launcher/url_launcher.dart';
 
+import '../l10n/app_localizations.dart';
 import 'core/extensions/context_extension.dart';
 import 'core/notifications/firebase_push_service.dart';
 import 'data/datasources/matrix/matrix_client_manager.dart';
@@ -1095,11 +1096,24 @@ class _N42ChatEntryWidget extends StatefulWidget {
 }
 
 class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
+  Locale _currentLocale = N42Chat._locale;
+
+  void _onLocaleChanged(Locale locale) {
+    if (mounted) setState(() => _currentLocale = locale);
+  }
+
   @override
   void initState() {
     super.initState();
+    N42Chat.addLocaleListener(_onLocaleChanged);
     // 检查当前登录状态
     N42Chat.authBloc.add(const AuthCheckRequested());
+  }
+
+  @override
+  void dispose() {
+    N42Chat._localeListeners.remove(_onLocaleChanged);
+    super.dispose();
   }
 
   void _navigateToLogin(BuildContext context) {
@@ -1133,34 +1147,39 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: N42Chat.authBloc,
-      child: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, state) {
-          // 检查中或初始状态 - 显示加载
-          if (state.status == AuthStatus.initial || 
-              state.status == AuthStatus.checking) {
-            return const _LoadingPage();
-          }
+    return Localizations.override(
+      context: context,
+      locale: _currentLocale,
+      delegates: S.localizationsDelegates,
+      child: BlocProvider.value(
+        value: N42Chat.authBloc,
+        child: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            // 检查中或初始状态 - 显示加载
+            if (state.status == AuthStatus.initial ||
+                state.status == AuthStatus.checking) {
+              return const _LoadingPage();
+            }
 
-          // 已登录 - 显示主框架（微信风格底部Tab）
-          if (state.isAuthenticated) {
-            return ChatMainPage(
-              onBackToMain: () {
-                // 返回主应用 - 由外部处理
-                Navigator.of(context).maybePop();
-              },
+            // 已登录 - 显示主框架（微信风格底部Tab）
+            if (state.isAuthenticated) {
+              return ChatMainPage(
+                onBackToMain: () {
+                  // 返回主应用 - 由外部处理
+                  Navigator.of(context).maybePop();
+                },
+              );
+            }
+
+            // 未登录 - 显示欢迎页面
+            return WelcomePage(
+              onLogin: () => _navigateToLogin(context),
+              onRegister: () => _navigateToRegister(context),
+              onTermsOfService: () => _launchUrl(N42Chat._config?.termsOfServiceUrl ?? 'https://n42.world/terms'),
+              onPrivacyPolicy: () => _launchUrl(N42Chat._config?.privacyPolicyUrl ?? 'https://n42.world/privacy'),
             );
-          }
-
-          // 未登录 - 显示欢迎页面
-          return WelcomePage(
-            onLogin: () => _navigateToLogin(context),
-            onRegister: () => _navigateToRegister(context),
-            onTermsOfService: () => _launchUrl(N42Chat._config?.termsOfServiceUrl ?? 'https://n42.world/terms'),
-            onPrivacyPolicy: () => _launchUrl(N42Chat._config?.privacyPolicyUrl ?? 'https://n42.world/privacy'),
-          );
-        },
+          },
+        ),
       ),
     );
   }
