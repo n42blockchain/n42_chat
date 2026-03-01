@@ -386,6 +386,18 @@ class GroupRepositoryImpl implements IGroupRepository {
   }
 
   // ============================================
+  // 成员加入监听
+  // ============================================
+
+  @override
+  Stream<String> watchMemberJoinEvents(String roomId) =>
+      _groupDataSource.watchMemberJoinEvents(roomId);
+
+  @override
+  Future<void> sendBotNotice(String roomId, String message) =>
+      _groupDataSource.sendBotNotice(roomId, message);
+
+  // ============================================
   // 辅助方法
   // ============================================
 

@@ -34,33 +34,85 @@ extension ChatBlocSendHandlers on ChatBloc {
       }
     }
 
+    // 智能回复翻译：发送前自动翻译为对方语言
+    String textToSend = event.text;
+    String? originalText;
+
+    if (state.smartReplyTranslate &&
+        _translationService != null &&
+        state.detectedRecipientLanguage != null) {
+      final recipientLang = state.detectedRecipientLanguage!;
+      final userLang = getDeviceLanguageCode();
+      if (recipientLang != userLang) {
+        try {
+          final result = await _translationService.translate(
+            text: event.text,
+            targetLanguage: recipientLang,
+          );
+          if (result.success && result.translatedText.isNotEmpty) {
+            textToSend = result.translatedText;
+            originalText = event.text;
+          }
+        } catch (e) {
+          debugPrint('ChatBloc: Smart reply translation failed, sending original: $e');
+        }
+      }
+    }
+
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
       // 如果有回复目标，使用回复功能
       if (state.replyTarget != null) {
-        await _messageRepository.replyToMessage(
+        final sentMsg = await _messageRepository.replyToMessage(
           _currentRoomId!,
           state.replyTarget!.id,
-          event.text,
+          textToSend,
         );
-        emit(state.copyWith(
+        var newState = state.copyWith(
           isSending: false,
           clearReplyTarget: true,
           lastMessageSentAt: DateTime.now(),
-        ));
+        );
+        // 记录智能回复原文
+        if (originalText != null && sentMsg != null) {
+          final newOriginals = Map<String, String>.from(newState.smartReplyOriginals)
+            ..[sentMsg.id] = originalText;
+          // 超过 100 条时清理最早的
+          if (newOriginals.length > 100) {
+            final keysToRemove = newOriginals.keys.take(newOriginals.length - 100).toList();
+            for (final k in keysToRemove) {
+              newOriginals.remove(k);
+            }
+          }
+          newState = newState.copyWith(smartReplyOriginals: newOriginals);
+        }
+        emit(newState);
       } else {
-        await _messageRepository.sendTextMessage(
+        final sentMsg = await _messageRepository.sendTextMessage(
           _currentRoomId!,
-          event.text,
+          textToSend,
           selfDestructAfter: event.selfDestructAfter,
           mentionedUserIds: event.mentionedUserIds,
           mentionsRoom: event.mentionsRoom,
         );
-        emit(state.copyWith(
+        var newState = state.copyWith(
           isSending: false,
           lastMessageSentAt: DateTime.now(),
-        ));
+        );
+        // 记录智能回复原文
+        if (originalText != null && sentMsg != null) {
+          final newOriginals = Map<String, String>.from(newState.smartReplyOriginals)
+            ..[sentMsg.id] = originalText;
+          if (newOriginals.length > 100) {
+            final keysToRemove = newOriginals.keys.take(newOriginals.length - 100).toList();
+            for (final k in keysToRemove) {
+              newOriginals.remove(k);
+            }
+          }
+          newState = newState.copyWith(smartReplyOriginals: newOriginals);
+        }
+        emit(newState);
       }
     } catch (e) {
       emit(state.copyWith(

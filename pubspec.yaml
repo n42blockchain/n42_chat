@@ -144,11 +144,14 @@ dependencies:
   pdfx: ^2.9.0
   
   # ============================================
-  # Location - 位置服务
+  # Location & Maps - 位置服务与地图
   # ============================================
   # MIT License
   geolocator: ^14.0.0
   geocoding: ^4.0.0
+  # BSD License - OpenStreetMap 地图组件
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
   
   # ============================================
   # URL Launcher - 启动外部应用

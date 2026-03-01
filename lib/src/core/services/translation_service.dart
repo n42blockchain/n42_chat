@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../data/datasources/local/preferences_datasource.dart';
+import 'ai_service.dart';
 
 /// 翻译服务接口
 abstract class ITranslationService {
@@ -187,6 +188,118 @@ class GoogleTranslationService implements ITranslationService {
       TranslationLanguage(code: 'pt', name: 'Portuguese', localizedName: 'Português'),
       TranslationLanguage(code: 'ru', name: 'Russian', localizedName: 'Русский'),
       TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
+    ];
+  }
+}
+
+/// AI 翻译服务实现（委托给 AiService）
+class AiTranslationService implements ITranslationService {
+  final AiService _aiService;
+  final PreferencesDataSource _storageDataSource;
+
+  AiTranslationService({
+    required AiService aiService,
+    required PreferencesDataSource storageDataSource,
+  })  : _aiService = aiService,
+        _storageDataSource = storageDataSource;
+
+  /// 语言代码到自然语言名称的映射（AI 需要 "Chinese" 而非 "zh"）
+  static const _languageNames = {
+    'zh': 'Chinese',
+    'en': 'English',
+    'ja': 'Japanese',
+    'ko': 'Korean',
+    'fr': 'French',
+    'de': 'German',
+    'es': 'Spanish',
+    'pt': 'Portuguese',
+    'ru': 'Russian',
+    'ar': 'Arabic',
+  };
+
+  @override
+  Future<TranslationResult> translate({
+    required String text,
+    required String targetLanguage,
+    String? sourceLanguage,
+  }) async {
+    // 检查缓存
+    final cacheKey = _generateCacheKey(text);
+    final cached = await _storageDataSource.getTranslationCache(
+      cacheKey,
+      targetLanguage,
+    );
+    if (cached != null) {
+      return TranslationResult(
+        translatedText: cached,
+        detectedSourceLanguage: sourceLanguage,
+        targetLanguage: targetLanguage,
+      );
+    }
+
+    try {
+      final targetName = _languageNames[targetLanguage] ?? targetLanguage;
+      final translatedText = await _aiService.translateMessage(text, targetName);
+
+      // 保存到缓存
+      await _storageDataSource.saveTranslationCache(
+        cacheKey,
+        targetLanguage,
+        translatedText,
+      );
+
+      final detectedSource = sourceLanguage ?? await detectLanguage(text);
+
+      return TranslationResult(
+        translatedText: translatedText,
+        detectedSourceLanguage: detectedSource,
+        targetLanguage: targetLanguage,
+      );
+    } catch (e) {
+      debugPrint('AiTranslationService: Translation error: $e');
+      return TranslationResult.error('Translation failed: $e');
+    }
+  }
+
+  String _generateCacheKey(String text) {
+    return sha256.convert(utf8.encode(text)).toString().substring(0, 16);
+  }
+
+  @override
+  Future<String?> detectLanguage(String text) async {
+    final containsChinese = RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
+    final containsJapanese =
+        RegExp(r'[\u3040-\u309f\u30a0-\u30ff]').hasMatch(text);
+    final containsKorean = RegExp(r'[\uac00-\ud7af]').hasMatch(text);
+
+    if (containsChinese) return 'zh';
+    if (containsJapanese) return 'ja';
+    if (containsKorean) return 'ko';
+    return 'en';
+  }
+
+  @override
+  List<TranslationLanguage> getSupportedLanguages() {
+    return const [
+      TranslationLanguage(code: 'zh', name: 'Chinese', localizedName: '中文'),
+      TranslationLanguage(
+          code: 'en', name: 'English', localizedName: 'English'),
+      TranslationLanguage(
+          code: 'ja', name: 'Japanese', localizedName: '日本語'),
+      TranslationLanguage(
+          code: 'ko', name: 'Korean', localizedName: '한국어'),
+      TranslationLanguage(
+          code: 'fr', name: 'French', localizedName: 'Français'),
+      TranslationLanguage(
+          code: 'de', name: 'German', localizedName: 'Deutsch'),
+      TranslationLanguage(
+          code: 'es', name: 'Spanish', localizedName: 'Español'),
+      TranslationLanguage(
+          code: 'pt', name: 'Portuguese', localizedName: 'Português'),
+      TranslationLanguage(
+          code: 'ru', name: 'Russian', localizedName: 'Русский'),
+      TranslationLanguage(
+          code: 'ar', name: 'Arabic', localizedName: 'العربية'),
     ];
   }
 }

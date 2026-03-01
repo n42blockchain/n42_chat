@@ -12,6 +12,8 @@ import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../data/datasources/matrix/matrix_auth_datasource.dart';
 import '../../../services/auth/auth_methods_service.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../widgets/settings/recovery_key_display_dialog.dart';
+import '../../widgets/settings/recovery_key_import_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../security/sas_verification_page.dart';
 
@@ -675,6 +677,22 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             onTap: _showExportDialog,
             isDark: isDark,
           ),
+          _buildDivider(isDark),
+          _buildListItem(
+            icon: Icons.vpn_key,
+            title: 'Show Recovery Key',
+            subtitle: 'Display your recovery key for backup',
+            onTap: _showRecoveryKey,
+            isDark: isDark,
+          ),
+          _buildDivider(isDark),
+          _buildListItem(
+            icon: Icons.upload_file,
+            title: 'Import Recovery Key',
+            subtitle: 'Restore messages using a recovery key',
+            onTap: _importRecoveryKey,
+            isDark: isDark,
+          ),
         ],
       ),
     );
@@ -1165,6 +1183,44 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         );
       }
     }
+  }
+
+  /// 展示恢复密钥
+  Future<void> _showRecoveryKey() async {
+    setState(() => _isLoading = true);
+    try {
+      // 尝试获取已有恢复密钥
+      var recoveryKey = await widget.e2eeManager.getRecoveryKey();
+
+      // 如果没有恢复密钥，创建一个
+      if (recoveryKey == null) {
+        recoveryKey = await widget.e2eeManager.createRecoveryKey();
+      }
+
+      setState(() => _isLoading = false);
+
+      if (mounted && recoveryKey != null) {
+        await RecoveryKeyDisplayDialog.show(context, recoveryKey);
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to create recovery key'),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
+  }
+
+  /// 导入恢复密钥
+  Future<void> _importRecoveryKey() async {
+    await RecoveryKeyImportDialog.show(context, widget.keyBackupService);
   }
 
   void _showDeviceDetails(DeviceInfo device) {

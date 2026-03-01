@@ -1091,6 +1091,7 @@ class PreferencesDataSource {
   Future<void> saveTranslationSettings({
     String? defaultTargetLanguage,
     bool? autoTranslate,
+    bool? smartReplyTranslate,
   }) async {
     try {
       final current = await getTranslationSettings() ?? {};
@@ -1099,6 +1100,9 @@ class PreferencesDataSource {
       }
       if (autoTranslate != null) {
         current['autoTranslate'] = autoTranslate;
+      }
+      if (smartReplyTranslate != null) {
+        current['smartReplyTranslate'] = smartReplyTranslate;
       }
       current['updatedAt'] = DateTime.now().toIso8601String();
 

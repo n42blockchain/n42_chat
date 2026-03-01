@@ -62,6 +62,15 @@ class ChatState extends Equatable {
   /// 默认翻译目标语言
   final String defaultTargetLanguage;
 
+  /// 是否启用智能回复翻译（发送时自动翻译为对方语言）
+  final bool smartReplyTranslate;
+
+  /// 检测到的对方最近消息语言
+  final String? detectedRecipientLanguage;
+
+  /// 智能回复原文映射 (messageId → 我方原文)
+  final Map<String, String> smartReplyOriginals;
+
   /// 当前房间的关键词过滤配置
   final ContentFilterConfig? contentFilter;
 
@@ -100,6 +109,9 @@ class ChatState extends Equatable {
     this.detectedSourceLanguages = const {},
     this.autoTranslate = false,
     this.defaultTargetLanguage = 'en',
+    this.smartReplyTranslate = false,
+    this.detectedRecipientLanguage,
+    this.smartReplyOriginals = const {},
     this.contentFilter,
     this.pendingCommand,
     this.isChannel = false,
@@ -173,6 +185,9 @@ class ChatState extends Equatable {
     Map<String, String>? detectedSourceLanguages,
     bool? autoTranslate,
     String? defaultTargetLanguage,
+    bool? smartReplyTranslate,
+    String? detectedRecipientLanguage,
+    Map<String, String>? smartReplyOriginals,
     ContentFilterConfig? contentFilter,
     String? pendingCommand,
     bool? isChannel,
@@ -204,6 +219,9 @@ class ChatState extends Equatable {
       detectedSourceLanguages: detectedSourceLanguages ?? this.detectedSourceLanguages,
       autoTranslate: autoTranslate ?? this.autoTranslate,
       defaultTargetLanguage: defaultTargetLanguage ?? this.defaultTargetLanguage,
+      smartReplyTranslate: smartReplyTranslate ?? this.smartReplyTranslate,
+      detectedRecipientLanguage: detectedRecipientLanguage ?? this.detectedRecipientLanguage,
+      smartReplyOriginals: smartReplyOriginals ?? this.smartReplyOriginals,
       contentFilter: contentFilter ?? this.contentFilter,
       pendingCommand: clearPendingCommand ? null : (pendingCommand ?? this.pendingCommand),
       isChannel: isChannel ?? this.isChannel,
@@ -234,6 +252,9 @@ class ChatState extends Equatable {
         detectedSourceLanguages,
         autoTranslate,
         defaultTargetLanguage,
+        smartReplyTranslate,
+        detectedRecipientLanguage,
+        smartReplyOriginals,
         contentFilter,
         pendingCommand,
         isChannel,

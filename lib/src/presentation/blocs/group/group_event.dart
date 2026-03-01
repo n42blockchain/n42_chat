@@ -307,3 +307,24 @@ class DeleteChannel extends GroupEvent {
   List<Object?> get props => [parentRoomId, channelRoomId];
 }
 
+/// 订阅成员加入事件（用于 Bot 自动欢迎）
+class SubscribeToMemberJoins extends GroupEvent {
+  final String roomId;
+
+  const SubscribeToMemberJoins(this.roomId);
+
+  @override
+  List<Object?> get props => [roomId];
+}
+
+/// 成员加入时内部触发（Bot 自动发送欢迎消息）
+class MemberJoined extends GroupEvent {
+  final String roomId;
+  final String userId;
+
+  const MemberJoined(this.roomId, this.userId);
+
+  @override
+  List<Object?> get props => [roomId, userId];
+}
+

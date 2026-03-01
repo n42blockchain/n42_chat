@@ -44,6 +44,9 @@ class N42Avatar extends StatelessWidget {
   /// 占位图标
   final IconData placeholderIcon;
 
+  /// 是否是 NFT 头像（显示金色边框和 NFT 徽章）
+  final bool isNftAvatar;
+
   const N42Avatar({
     super.key,
     this.imageUrl,
@@ -56,17 +59,77 @@ class N42Avatar extends StatelessWidget {
     this.onTap,
     this.localImagePath,
     this.placeholderIcon = Icons.person,
+    this.isNftAvatar = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    Widget avatar = _buildAvatar();
+
+    // NFT 头像：金色渐变边框 + NFT 徽章
+    if (isNftAvatar) {
+      avatar = _buildNftAvatarWrapper(avatar);
+    }
+
     return GestureDetector(
       onTap: onTap,
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          _buildAvatar(),
+          avatar,
           if (showOnlineStatus) _buildOnlineIndicator(),
+          if (isNftAvatar) _buildNftBadge(),
         ],
+      ),
+    );
+  }
+
+  /// NFT 头像金色渐变边框
+  Widget _buildNftAvatarWrapper(Widget avatar) {
+    const borderWidth = 2.5;
+    return Container(
+      width: size + borderWidth * 2,
+      height: size + borderWidth * 2,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFD700), Color(0xFFFFA500), Color(0xFFFFD700)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(borderRadius + borderWidth),
+      ),
+      padding: const EdgeInsets.all(borderWidth),
+      child: avatar,
+    );
+  }
+
+  /// NFT 徽章（右下角）
+  Widget _buildNftBadge() {
+    final badgeSize = size * 0.32;
+    return Positioned(
+      right: -2,
+      bottom: -2,
+      child: Container(
+        width: badgeSize,
+        height: badgeSize * 0.7,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+          ),
+          borderRadius: BorderRadius.circular(3),
+          border: Border.all(color: Colors.white, width: 1),
+        ),
+        child: Center(
+          child: Text(
+            'NFT',
+            style: TextStyle(
+              fontSize: badgeSize * 0.3,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -164,6 +164,12 @@ class MessageEntity extends Equatable {
   /// 是否在线程内（是某个线程的回复消息）
   bool get isInThread => threadRootId != null;
 
+  /// 是否是 Bot 消息
+  final bool isBotMessage;
+
+  /// 线程未读消息数
+  final int? threadUnreadCount;
+
   const MessageEntity({
     required this.id,
     required this.roomId,
@@ -194,6 +200,8 @@ class MessageEntity extends Equatable {
     this.threadLatestReply,
     this.threadLatestReplySender,
     this.threadLatestReplyTimestamp,
+    this.isBotMessage = false,
+    this.threadUnreadCount,
   });
 
   /// 是否是文本消息
@@ -305,6 +313,8 @@ class MessageEntity extends Equatable {
         threadLatestReply,
         threadLatestReplySender,
         threadLatestReplyTimestamp,
+        isBotMessage,
+        threadUnreadCount,
       ];
 
   MessageEntity copyWith({
@@ -337,6 +347,8 @@ class MessageEntity extends Equatable {
     String? threadLatestReply,
     String? threadLatestReplySender,
     DateTime? threadLatestReplyTimestamp,
+    bool? isBotMessage,
+    int? threadUnreadCount,
   }) {
     return MessageEntity(
       id: id ?? this.id,
@@ -368,6 +380,8 @@ class MessageEntity extends Equatable {
       threadLatestReply: threadLatestReply ?? this.threadLatestReply,
       threadLatestReplySender: threadLatestReplySender ?? this.threadLatestReplySender,
       threadLatestReplyTimestamp: threadLatestReplyTimestamp ?? this.threadLatestReplyTimestamp,
+      isBotMessage: isBotMessage ?? this.isBotMessage,
+      threadUnreadCount: threadUnreadCount ?? this.threadUnreadCount,
     );
   }
 

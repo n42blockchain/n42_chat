@@ -1,0 +1,184 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../domain/repositories/governance_repository.dart';
+import 'governance_event.dart';
+import 'governance_state.dart';
+
+/// BLoC for governance/voting operations.
+///
+/// Manages the lifecycle of proposals, votes, and governance spaces
+/// through the [IGovernanceRepository] interface.
+class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
+  final IGovernanceRepository _repository;
+
+  GovernanceBloc({required IGovernanceRepository repository})
+      : _repository = repository,
+        super(const GovernanceState()) {
+    on<GovernanceLoadSpace>(_onLoadSpace);
+    on<GovernanceLoadProposals>(_onLoadProposals);
+    on<GovernanceLoadMoreProposals>(_onLoadMoreProposals);
+    on<GovernanceLoadProposalDetail>(_onLoadProposalDetail);
+    on<GovernanceCastVote>(_onCastVote);
+    on<GovernanceCreateProposal>(_onCreateProposal);
+  }
+
+  Future<void> _onLoadSpace(
+    GovernanceLoadSpace event,
+    Emitter<GovernanceState> emit,
+  ) async {
+    emit(state.copyWith(status: GovernanceStatus.loading));
+    try {
+      final space = await _repository.getSpace(event.spaceId);
+      emit(state.copyWith(status: GovernanceStatus.loaded, space: space));
+    } catch (e, stackTrace) {
+      debugPrint('Failed to load space: $e\n$stackTrace');
+      emit(state.copyWith(
+        status: GovernanceStatus.error,
+        errorMessage: _formatError(e),
+      ));
+    }
+  }
+
+  Future<void> _onLoadProposals(
+    GovernanceLoadProposals event,
+    Emitter<GovernanceState> emit,
+  ) async {
+    emit(state.copyWith(
+      status: GovernanceStatus.loading,
+      filterState: event.filterState,
+    ));
+    try {
+      final proposals = await _repository.getProposals(
+        event.spaceId,
+        state: event.filterState,
+      );
+      emit(state.copyWith(
+        status: GovernanceStatus.loaded,
+        proposals: proposals,
+        hasMoreProposals: proposals.length >= 20,
+      ));
+    } catch (e, stackTrace) {
+      debugPrint('Failed to load proposals: $e\n$stackTrace');
+      emit(state.copyWith(
+        status: GovernanceStatus.error,
+        errorMessage: _formatError(e),
+      ));
+    }
+  }
+
+  Future<void> _onLoadMoreProposals(
+    GovernanceLoadMoreProposals event,
+    Emitter<GovernanceState> emit,
+  ) async {
+    final currentSpace = state.space;
+    if (!state.hasMoreProposals || currentSpace == null) return;
+
+    try {
+      final moreProposals = await _repository.getProposals(
+        currentSpace.id,
+        state: state.filterState,
+        skip: state.proposals.length,
+      );
+      emit(state.copyWith(
+        proposals: [...state.proposals, ...moreProposals],
+        hasMoreProposals: moreProposals.length >= 20,
+      ));
+    } catch (e) {
+      debugPrint('Failed to load more proposals: $e');
+    }
+  }
+
+  Future<void> _onLoadProposalDetail(
+    GovernanceLoadProposalDetail event,
+    Emitter<GovernanceState> emit,
+  ) async {
+    emit(state.copyWith(status: GovernanceStatus.loading));
+    try {
+      final proposal = await _repository.getProposal(event.proposalId);
+      final votes = await _repository.getVotes(event.proposalId);
+      emit(state.copyWith(
+        status: GovernanceStatus.loaded,
+        selectedProposal: proposal,
+        votes: votes,
+      ));
+    } catch (e, stackTrace) {
+      debugPrint('Failed to load proposal detail: $e\n$stackTrace');
+      emit(state.copyWith(
+        status: GovernanceStatus.error,
+        errorMessage: _formatError(e),
+      ));
+    }
+  }
+
+  Future<void> _onCastVote(
+    GovernanceCastVote event,
+    Emitter<GovernanceState> emit,
+  ) async {
+    emit(state.copyWith(status: GovernanceStatus.voting));
+    try {
+      await _repository.castVote(
+        spaceId: event.spaceId,
+        proposalId: event.proposalId,
+        choice: event.choice,
+        reason: event.reason,
+      );
+      // Reload proposal to get updated scores
+      final proposal = await _repository.getProposal(event.proposalId);
+      final votes = await _repository.getVotes(event.proposalId);
+      emit(state.copyWith(
+        status: GovernanceStatus.voted,
+        selectedProposal: proposal,
+        votes: votes,
+      ));
+    } catch (e, stackTrace) {
+      debugPrint('Failed to cast vote: $e\n$stackTrace');
+      emit(state.copyWith(
+        status: GovernanceStatus.error,
+        errorMessage: _formatError(e),
+      ));
+    }
+  }
+
+  Future<void> _onCreateProposal(
+    GovernanceCreateProposal event,
+    Emitter<GovernanceState> emit,
+  ) async {
+    emit(state.copyWith(status: GovernanceStatus.creating));
+    try {
+      await _repository.createProposal(
+        spaceId: event.spaceId,
+        title: event.title,
+        body: event.body,
+        choices: event.choices,
+        startTime: event.startTime,
+        endTime: event.endTime,
+      );
+      emit(state.copyWith(status: GovernanceStatus.created));
+    } catch (e, stackTrace) {
+      debugPrint('Failed to create proposal: $e\n$stackTrace');
+      emit(state.copyWith(
+        status: GovernanceStatus.error,
+        errorMessage: _formatError(e),
+      ));
+    }
+  }
+
+  /// Sanitize error messages for display, stripping sensitive details
+  /// such as URLs, API keys, or internal stack information.
+  String _formatError(Object error) {
+    final message = error.toString();
+    // Remove Exception/Error prefix for cleaner display
+    final cleaned = message
+        .replaceAll(RegExp(r'^Exception:\s*'), '')
+        .replaceAll(RegExp(r'^StateError:\s*'), '');
+    // Strip potential API keys or tokens (hex strings > 20 chars)
+    final sanitized =
+        cleaned.replaceAll(RegExp(r'[a-fA-F0-9]{20,}'), '[redacted]');
+    // Cap length to prevent overly verbose error messages in UI
+    if (sanitized.length > 200) {
+      return '${sanitized.substring(0, 200)}...';
+    }
+    return sanitized;
+  }
+}

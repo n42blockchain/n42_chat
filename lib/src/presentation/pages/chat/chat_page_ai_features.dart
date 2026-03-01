@@ -66,43 +66,6 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
     });
   }
 
-  void _translateMessage(MessageEntity message) {
-    if (!getIt.isRegistered<AiService>()) return;
-    final text = message.type == MessageType.text ? message.content : '';
-    if (text.isEmpty) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context)?.aiSummarizeLoading ?? 'Translating...')),
-    );
-
-    final targetLang = Localizations.localeOf(context).languageCode == 'zh' ? 'English' : '中文';
-    getIt<AiService>().translateMessage(text, targetLang).then((result) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        showDialog<void>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text(S.of(context)?.commonTranslate ?? 'Translate'),
-            content: SelectableText(result),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: Text(S.of(context)?.commonConfirm ?? 'OK'),
-              ),
-            ],
-          ),
-        );
-      }
-    }).catchError((Object e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Translate failed: $e')),
-        );
-      }
-    });
-  }
-
   void _openAiAssistant() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(

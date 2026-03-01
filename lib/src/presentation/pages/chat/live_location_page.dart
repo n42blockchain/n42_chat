@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:get_it/get_it.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
@@ -36,7 +38,7 @@ class LiveLocationPage extends StatelessWidget {
   }
 }
 
-class _LiveLocationView extends StatelessWidget {
+class _LiveLocationView extends StatefulWidget {
   final String roomId;
   final LiveLocationState state;
 
@@ -46,8 +48,101 @@ class _LiveLocationView extends StatelessWidget {
   });
 
   @override
+  State<_LiveLocationView> createState() => _LiveLocationViewState();
+}
+
+class _LiveLocationViewState extends State<_LiveLocationView> {
+  final MapController _mapController = MapController();
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  /// 计算所有用户位置的中心点
+  LatLng _computeCenter() {
+    final sharings = widget.state.activeSharings.values.toList();
+    if (sharings.isEmpty) return const LatLng(0, 0);
+    if (sharings.length == 1) {
+      return LatLng(sharings.first.latitude, sharings.first.longitude);
+    }
+    double latSum = 0, lngSum = 0;
+    for (final loc in sharings) {
+      latSum += loc.latitude;
+      lngSum += loc.longitude;
+    }
+    return LatLng(latSum / sharings.length, lngSum / sharings.length);
+  }
+
+  /// 为每个分享者生成 Marker
+  List<Marker> _buildMarkers() {
+    return widget.state.activeSharings.values.map((location) {
+      return Marker(
+        point: LatLng(location.latitude, location.longitude),
+        width: 48,
+        height: 48,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: location.avatarUrl != null
+                    ? Image.network(
+                        location.avatarUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, e, st) => Center(
+                          child: Text(
+                            location.displayName.isNotEmpty
+                                ? location.displayName[0].toUpperCase()
+                                : '?',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          location.displayName.isNotEmpty
+                              ? location.displayName[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
+    final center = _computeCenter();
+    final markers = _buildMarkers();
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
@@ -70,40 +165,22 @@ class _LiveLocationView extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // 地图区域（占位）
+          // 地图区域
           Expanded(
-            child: Container(
-              color: isDark ? Colors.grey[900] : Colors.grey[200],
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.map,
-                      size: 64,
-                      color: isDark ? Colors.white38 : Colors.black26,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      S.of(context)?.mapView ?? 'Map View',
-                      style: TextStyle(
-                        color: isDark ? Colors.white38 : Colors.black26,
-                        fontSize: 16,
-                      ),
-                    ),
-                    if (state.activeSharings.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        S.of(context)?.liveLocationSharingCount(state.activeSharings.length) ?? '${state.activeSharings.length} people sharing location',
-                        style: const TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+            child: FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: center,
+                initialZoom: widget.state.activeSharings.isEmpty ? 2.0 : 14.0,
               ),
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.n42.wallet',
+                ),
+                if (markers.isNotEmpty)
+                  MarkerLayer(markers: markers),
+              ],
             ),
           ),
 
@@ -133,22 +210,22 @@ class _LiveLocationView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // 共享者列表
-            if (state.activeSharings.isNotEmpty)
-              ...state.activeSharings.values.map(
+            if (widget.state.activeSharings.isNotEmpty)
+              ...widget.state.activeSharings.values.map(
                 (location) => _buildSharingItem(context, location),
               ),
 
             // 开始/停止共享按钮
             Padding(
               padding: const EdgeInsets.all(16),
-              child: state.isSharing
+              child: widget.state.isSharing
                   ? SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
                           context
                               .read<LiveLocationBloc>()
-                              .add(StopLiveLocation(roomId: roomId));
+                              .add(StopLiveLocation(roomId: widget.roomId));
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
@@ -217,6 +294,13 @@ class _LiveLocationView extends StatelessWidget {
         color: AppColors.primary,
         size: 20,
       ),
+      onTap: () {
+        // 点击用户名片时移动地图到该用户位置
+        _mapController.move(
+          LatLng(location.latitude, location.longitude),
+          15.0,
+        );
+      },
     );
   }
 
@@ -259,7 +343,7 @@ class _LiveLocationView extends StatelessWidget {
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(
-                      StartLiveLocation(roomId: roomId, durationMinutes: 15),
+                      StartLiveLocation(roomId: widget.roomId, durationMinutes: 15),
                     );
               },
             ),
@@ -268,7 +352,7 @@ class _LiveLocationView extends StatelessWidget {
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(
-                      StartLiveLocation(roomId: roomId, durationMinutes: 30),
+                      StartLiveLocation(roomId: widget.roomId, durationMinutes: 30),
                     );
               },
             ),
@@ -277,7 +361,7 @@ class _LiveLocationView extends StatelessWidget {
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(
-                      StartLiveLocation(roomId: roomId, durationMinutes: 60),
+                      StartLiveLocation(roomId: widget.roomId, durationMinutes: 60),
                     );
               },
             ),
@@ -286,7 +370,7 @@ class _LiveLocationView extends StatelessWidget {
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(
-                      StartLiveLocation(roomId: roomId, durationMinutes: 480),
+                      StartLiveLocation(roomId: widget.roomId, durationMinutes: 480),
                     );
               },
             ),

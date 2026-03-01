@@ -86,7 +86,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<void> _pickAvatar() async {
     final picker = ImagePicker();
-    final result = await showModalBottomSheet<XFile?>(
+    final result = await showModalBottomSheet<dynamic>(
       context: context,
       builder: (context) => _AvatarPickerSheet(
         onCamera: () async {
@@ -99,10 +99,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
           if (!context.mounted) return;
           Navigator.pop(context, image);
         },
+        onNftAvatar: () {
+          Navigator.pop(context, 'nft');
+        },
       ),
     );
 
-    if (result != null) {
+    if (result == 'nft') {
+      // 导航到 NFT 头像选择页
+      if (mounted) {
+        await Navigator.of(context).pushNamed('/nftAvatarPicker');
+      }
+    } else if (result is XFile) {
       setState(() {
         _selectedAvatar = File(result.path);
       });
@@ -405,10 +413,12 @@ class _FormField extends StatelessWidget {
 class _AvatarPickerSheet extends StatelessWidget {
   final VoidCallback? onCamera;
   final VoidCallback? onGallery;
+  final VoidCallback? onNftAvatar;
 
   const _AvatarPickerSheet({
     this.onCamera,
     this.onGallery,
+    this.onNftAvatar,
   });
 
   @override
@@ -434,6 +444,12 @@ class _AvatarPickerSheet extends StatelessWidget {
               leading: const Icon(Icons.photo_library),
               title: Text(S.of(context)?.profileChooseFromGallery ?? 'Choose from Gallery'),
               onTap: onGallery,
+            ),
+            ListTile(
+              leading: const Icon(Icons.diamond_outlined, color: Color(0xFFFFD700)),
+              title: const Text('NFT Avatar'),
+              subtitle: const Text('Use an NFT as your avatar'),
+              onTap: onNftAvatar,
             ),
             const SizedBox(height: 8),
             N42Button.text(
