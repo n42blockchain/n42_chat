@@ -24,6 +24,9 @@ import '../../data/datasources/matrix/matrix_story_datasource.dart';
 import '../../presentation/pages/game/services/game_score_service.dart';
 import '../services/chat_backup_service.dart';
 import '../services/data_tier_service.dart';
+import '../services/archive_integrity_service.dart';
+import '../services/archive_search_service.dart';
+import '../services/message_archive_service.dart';
 import '../services/download_service.dart';
 import '../services/media_lifecycle_service.dart';
 import '../services/storage_cleanup_service.dart';
@@ -32,6 +35,7 @@ import '../services/sync_optimization_service.dart';
 import '../services/url_preview_service.dart';
 import '../services/storage_manager_service.dart';
 import '../services/voice_service.dart';
+import '../../data/datasources/local/archive_database.dart';
 import '../../data/datasources/local/media_metadata_database.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/moment_repository_impl.dart';
@@ -284,6 +288,42 @@ Future<void> _registerServices(N42ChatConfig config) async {
     },
   );
 
+  // 归档数据库（异步初始化，延迟获取，30 秒超时）
+  getIt.registerSingletonAsync<ArchiveDatabase>(
+    () async {
+      try {
+        return await ArchiveDatabase.getInstance().timeout(
+          const Duration(seconds: 30),
+        );
+      } on TimeoutException {
+        debugPrint('DI: ArchiveDatabase timed out after 30s, rethrowing for caller to handle');
+        rethrow;
+      }
+    },
+  );
+
+  // 消息归档服务
+  getIt.registerLazySingleton<MessageArchiveService>(
+    () => MessageArchiveService(
+      db: getIt<ArchiveDatabase>(),
+      clientManager: getIt<MatrixClientManager>(),
+    ),
+  );
+
+  // 归档完整性服务
+  getIt.registerLazySingleton<ArchiveIntegrityService>(
+    () => ArchiveIntegrityService(
+      db: getIt<ArchiveDatabase>(),
+    ),
+  );
+
+  // 归档搜索服务
+  getIt.registerLazySingleton<ArchiveSearchService>(
+    () => ArchiveSearchService(
+      db: getIt<ArchiveDatabase>(),
+    ),
+  );
+
   // 媒体生命周期服务
   getIt.registerLazySingleton<MediaLifecycleService>(
     () {
@@ -318,6 +358,7 @@ Future<void> _registerServices(N42ChatConfig config) async {
     () => ChatBackupService(
       clientManager: getIt<MatrixClientManager>(),
       secureStorage: getIt<SecureStorageDataSource>(),
+      archiveService: getIt<MessageArchiveService>(),
     ),
   );
 
@@ -326,6 +367,7 @@ Future<void> _registerServices(N42ChatConfig config) async {
     () => DataTierService(
       lifecycleService: getIt<MediaLifecycleService>(),
       monitorService: getIt<StorageMonitorService>(),
+      archiveService: getIt<MessageArchiveService>(),
     ),
   );
 
@@ -566,6 +608,7 @@ void _registerRepositories() {
       getIt<MatrixMessageDataSource>(),
       getIt<MatrixClientManager>(),
       getIt<PreferencesDataSource>(),
+      archiveService: getIt<MessageArchiveService>(),
     ),
   );
 

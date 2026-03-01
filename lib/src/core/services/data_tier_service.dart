@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:matrix/matrix.dart' as matrix;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_constants.dart';
 import 'media_lifecycle_service.dart';
+import 'message_archive_service.dart';
 import 'storage_monitor_service.dart';
 
 /// 数据层级
@@ -73,14 +75,30 @@ class TierMaintenanceResult {
 class DataTierService {
   final MediaLifecycleService _lifecycleService;
   final StorageMonitorService _monitorService;
+  MessageArchiveService? _archiveService;
+  matrix.Client? _matrixClient;
   bool _isMaintenanceRunning = false;
   bool _isEmergencyRunning = false;
 
   DataTierService({
     required MediaLifecycleService lifecycleService,
     required StorageMonitorService monitorService,
+    MessageArchiveService? archiveService,
+    matrix.Client? matrixClient,
   })  : _lifecycleService = lifecycleService,
-        _monitorService = monitorService;
+        _monitorService = monitorService,
+        _archiveService = archiveService,
+        _matrixClient = matrixClient;
+
+  /// 延迟注入归档服务（避免循环依赖）
+  void setArchiveService(MessageArchiveService service) {
+    _archiveService = service;
+  }
+
+  /// 设置 Matrix 客户端引用（用于获取活跃房间列表）
+  void setMatrixClient(matrix.Client client) {
+    _matrixClient = client;
+  }
 
   /// 判断消息所属数据层级
   DataTier getMessageTier(DateTime timestamp) {
@@ -111,6 +129,11 @@ class DataTierService {
   Future<TierMaintenanceResult> _performMaintenanceInternal() async {
     debugPrint('DataTierService: Starting tier maintenance');
     final config = await getTierConfig();
+
+    // 在清理冷数据之前，先归档消息到 archive.db
+    if (_archiveService != null && config.autoMaintenanceEnabled) {
+      await _archiveActiveRooms();
+    }
 
     int warmProcessed = 0;
     int coldCleaned = 0;
@@ -245,6 +268,28 @@ class DataTierService {
           'tier_auto_maintenance', config.autoMaintenanceEnabled);
     } catch (e) {
       debugPrint('DataTierService: Failed to save config: $e');
+    }
+  }
+
+  /// 归档所有活跃房间的消息
+  Future<void> _archiveActiveRooms() async {
+    final archive = _archiveService;
+    if (archive == null) return;
+
+    try {
+      final rooms = _matrixClient?.rooms ?? [];
+      final roomIds = rooms.map((r) => r.id).toList();
+
+      debugPrint('DataTierService: Archiving ${roomIds.length} rooms');
+      for (final roomId in roomIds) {
+        try {
+          await archive.archiveRoom(roomId);
+        } catch (e) {
+          debugPrint('DataTierService: Failed to archive room $roomId: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('DataTierService: Archive operation failed: $e');
     }
   }
 }

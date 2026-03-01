@@ -4,11 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../core/services/message_archive_service.dart';
 import '../../domain/entities/group_album_entity.dart';
 import '../../domain/entities/group_file_entity.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/repositories/message_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
+import '../mappers/archived_message_mapper.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_message_datasource.dart';
 
@@ -17,6 +19,8 @@ class MessageRepositoryImpl implements IMessageRepository {
   final MatrixMessageDataSource _messageDataSource;
   final MatrixClientManager _clientManager;
   final PreferencesDataSource _secureStorage;
+  MessageArchiveService? _archiveService;
+  final ArchivedMessageMapper _archiveMapper = const ArchivedMessageMapper();
 
   // 缓存时间线，避免重复创建（使用 LRU 策略，最多缓存 15 个）
   // 增加缓存大小可提升约 30% 房间切换速度
@@ -32,8 +36,14 @@ class MessageRepositoryImpl implements IMessageRepository {
   MessageRepositoryImpl(
     this._messageDataSource,
     this._clientManager,
-    this._secureStorage,
-  );
+    this._secureStorage, {
+    MessageArchiveService? archiveService,
+  }) : _archiveService = archiveService;
+
+  /// 延迟注入归档服务
+  void setArchiveService(MessageArchiveService service) {
+    _archiveService = service;
+  }
 
   matrix.Client? get _client => _clientManager.client;
 
@@ -64,7 +74,35 @@ class MessageRepositoryImpl implements IMessageRepository {
     }
 
     final events = displayableEvents.take(limit).toList();
-    return events.map((e) => _messageDataSource.mapEventToMessage(e, room)).toList();
+    final messages = events.map((e) => _messageDataSource.mapEventToMessage(e, room)).toList();
+
+    // 归档回退：初始加载时如果消息不足，补充归档数据
+    if (messages.length < limit && _archiveService != null) {
+      final oldestTs = events.isNotEmpty
+          ? events.last.originServerTs.millisecondsSinceEpoch
+          : null;
+      if (oldestTs != null) {
+        try {
+          final archived = await _archiveService!.getArchivedMessages(
+            roomId,
+            beforeTimestamp: oldestTs,
+            limit: limit - messages.length,
+          );
+          if (archived.isNotEmpty) {
+            debugPrint('MessageRepositoryImpl: Supplemented ${archived.length} messages from archive');
+            final archivedEntities = _archiveMapper.toEntities(
+              archived,
+              currentUserId: _client?.userID,
+            );
+            return [...messages, ...archivedEntities];
+          }
+        } catch (e) {
+          debugPrint('MessageRepositoryImpl: Archive supplement failed: $e');
+        }
+      }
+    }
+
+    return messages;
   }
 
   @override
@@ -125,13 +163,41 @@ class MessageRepositoryImpl implements IMessageRepository {
 
     final beforeCount = timeline.events.length;
     debugPrint('MessageRepositoryImpl: loadMoreMessages - before: $beforeCount events');
-    
+
     await timeline.requestHistory(historyCount: limit);
-    
+
     final afterCount = timeline.events.length;
     debugPrint('MessageRepositoryImpl: loadMoreMessages - after: $afterCount events (+${afterCount - beforeCount})');
 
-    return _getMessagesFromTimeline(timeline, room);
+    final messages = _getMessagesFromTimeline(timeline, room);
+
+    // 归档回退：服务器无更多历史时，从 archive.db 加载
+    if (afterCount == beforeCount && _archiveService != null) {
+      final oldestTs = timeline.events.isNotEmpty
+          ? timeline.events.last.originServerTs.millisecondsSinceEpoch
+          : null;
+      if (oldestTs != null) {
+        try {
+          final archived = await _archiveService!.getArchivedMessages(
+            roomId,
+            beforeTimestamp: oldestTs,
+            limit: limit,
+          );
+          if (archived.isNotEmpty) {
+            debugPrint('MessageRepositoryImpl: Loaded ${archived.length} messages from archive');
+            final archivedEntities = _archiveMapper.toEntities(
+              archived,
+              currentUserId: _client?.userID,
+            );
+            return [...messages, ...archivedEntities];
+          }
+        } catch (e) {
+          debugPrint('MessageRepositoryImpl: Archive fallback failed: $e');
+        }
+      }
+    }
+
+    return messages;
   }
 
   @override
