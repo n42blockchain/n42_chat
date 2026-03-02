@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import '../utils/debug_log.dart';
 
 /// TTS 播放状态
 enum TtsState {
@@ -39,7 +39,7 @@ class TtsService {
     try {
       await tts.setSharedInstance(true);
     } catch (e) {
-      debugPrint('TtsService: Failed to initialize: $e');
+      debugLog('TtsService: Failed to initialize: $e');
       return;
     }
     _tts = tts;
@@ -62,7 +62,7 @@ class TtsService {
     });
 
     _tts!.setErrorHandler((msg) {
-      debugPrint('TtsService: Error - $msg');
+      debugLog('TtsService: Error - $msg');
       _state = TtsState.stopped;
       _currentMessageId = null;
       _stateController.add(_state);

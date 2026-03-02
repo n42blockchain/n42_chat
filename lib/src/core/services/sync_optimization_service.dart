@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' show Filter, RoomFilter, StateFilter;
 
 import '../../data/datasources/matrix/matrix_client_manager.dart';
+import '../utils/debug_log.dart';
 
 /// 服务端保留策略信息
 class ServerRetentionInfo {
@@ -69,9 +69,9 @@ class SyncOptimizationService {
       // 在服务器上创建 filter 并获取 filterId
       final filterId = await client.defineFilter(client.userID!, filter);
 
-      debugPrint('SyncOptimizationService: Sync filter configured: $filterId');
+      debugLog('SyncOptimizationService: Sync filter configured: $filterId');
     } catch (e) {
-      debugPrint('SyncOptimizationService: Failed to configure filter: $e');
+      debugLog('SyncOptimizationService: Failed to configure filter: $e');
     }
   }
 
@@ -94,7 +94,7 @@ class SyncOptimizationService {
 
       return const ServerRetentionInfo(supported: false);
     } catch (e) {
-      debugPrint('SyncOptimizationService: Failed to get retention info: $e');
+      debugLog('SyncOptimizationService: Failed to get retention info: $e');
       return null;
     }
   }

@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../../domain/entities/message_entity.dart';
 import 'matrix_metadata_extractor.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// 解析后的消息内容
 class ParsedContent {
@@ -185,7 +185,7 @@ class MatrixEventMapper {
             } catch (e) {
               // 如果获取用户失败，使用 userId 的用户名部分
               replyToSender = userId.split(':').first.replaceFirst('@', '');
-              debugPrint('Error: $e');
+              debugLog('Error: $e');
             }
           }
         }
@@ -220,7 +220,7 @@ class MatrixEventMapper {
     if (event.type == 'm.call.hangup') {
       final callType = event.content['call_type'] as String?;
       final callId = event.content['call_id'] as String?;
-      debugPrint('_mapMessageType: m.call.hangup - callId=$callId, call_type=$callType');
+      debugLog('_mapMessageType: m.call.hangup - callId=$callId, call_type=$callType');
       return callType == 'video' ? MessageType.videoCall : MessageType.voiceCall;
     }
 
@@ -230,7 +230,7 @@ class MatrixEventMapper {
     // 检查是否是通话记录消息
     if (msgType == 'n42.call.record') {
       final callType = event.content['call_type'] as String?;
-      debugPrint('_mapMessageType: n42.call.record - call_type=$callType');
+      debugLog('_mapMessageType: n42.call.record - call_type=$callType');
       return callType == 'video' ? MessageType.videoCall : MessageType.voiceCall;
     }
 
@@ -239,7 +239,7 @@ class MatrixEventMapper {
       final contentMsgType = event.content['msgtype'] as String?;
       final body = event.body;
       final plaintextBody = event.plaintextBody;
-      debugPrint('_mapMessageType: Encrypted event - msgType=$msgType, contentMsgType=$contentMsgType, body=$body, plaintextBody=$plaintextBody');
+      debugLog('_mapMessageType: Encrypted event - msgType=$msgType, contentMsgType=$contentMsgType, body=$body, plaintextBody=$plaintextBody');
 
       String? effectiveMsgType;
       if (msgType.isNotEmpty && msgType != 'm.bad.encrypted') {
@@ -248,7 +248,7 @@ class MatrixEventMapper {
         effectiveMsgType = contentMsgType;
       }
 
-      debugPrint('_mapMessageType: effectiveMsgType=$effectiveMsgType');
+      debugLog('_mapMessageType: effectiveMsgType=$effectiveMsgType');
 
       if (effectiveMsgType == matrix.MessageTypes.Audio) {
         return MessageType.audio;
@@ -268,17 +268,17 @@ class MatrixEventMapper {
 
       if ((body.isNotEmpty && body != 'Encrypted event') ||
           (plaintextBody.isNotEmpty && plaintextBody != body)) {
-        debugPrint('_mapMessageType: Encrypted message with valid body, treating as text');
+        debugLog('_mapMessageType: Encrypted message with valid body, treating as text');
         return MessageType.text;
       }
 
-      debugPrint('_mapMessageType: Encrypted message not decrypted');
+      debugLog('_mapMessageType: Encrypted message not decrypted');
       return MessageType.encrypted;
     }
 
-    debugPrint('_mapMessageType: msgType=$msgType, eventType=${event.type}, senderId=${event.senderId}');
+    debugLog('_mapMessageType: msgType=$msgType, eventType=${event.type}, senderId=${event.senderId}');
     if (event.content['url'] != null) {
-      debugPrint('_mapMessageType: has url=${event.content['url']}, info=${event.content['info']}');
+      debugLog('_mapMessageType: has url=${event.content['url']}, info=${event.content['info']}');
     }
 
     switch (msgType) {
@@ -325,7 +325,7 @@ class MatrixEventMapper {
     final mimeType = info?['mimetype'] as String? ?? '';
     final filename = (event.content['filename'] as String?) ?? event.body;
 
-    debugPrint('_detectFileType: mimeType=$mimeType, filename=$filename');
+    debugLog('_detectFileType: mimeType=$mimeType, filename=$filename');
 
     if (mimeType.startsWith('image/')) return MessageType.image;
     if (mimeType.startsWith('video/')) return MessageType.video;
@@ -364,18 +364,18 @@ class MatrixEventMapper {
     final info = event.content['info'] as Map<String, dynamic>?;
     final mimeType = info?['mimetype'] as String? ?? '';
 
-    debugPrint('_detectMediaTypeFromContent: url=$url, mimeType=$mimeType');
+    debugLog('_detectMediaTypeFromContent: url=$url, mimeType=$mimeType');
 
     if (mimeType.startsWith('image/')) {
-      debugPrint('_detectMediaTypeFromContent: detected as image');
+      debugLog('_detectMediaTypeFromContent: detected as image');
       return MessageType.image;
     }
     if (mimeType.startsWith('video/')) {
-      debugPrint('_detectMediaTypeFromContent: detected as video');
+      debugLog('_detectMediaTypeFromContent: detected as video');
       return MessageType.video;
     }
     if (mimeType.startsWith('audio/')) {
-      debugPrint('_detectMediaTypeFromContent: detected as audio');
+      debugLog('_detectMediaTypeFromContent: detected as audio');
       return MessageType.audio;
     }
 
@@ -384,11 +384,11 @@ class MatrixEventMapper {
         lowerUrl.endsWith('.jpg') ||
         lowerUrl.endsWith('.png') ||
         lowerUrl.endsWith('.gif')) {
-      debugPrint('_detectMediaTypeFromContent: detected as image from URL');
+      debugLog('_detectMediaTypeFromContent: detected as image from URL');
       return MessageType.image;
     }
 
-    debugPrint('_detectMediaTypeFromContent: has url but unknown type, treating as file');
+    debugLog('_detectMediaTypeFromContent: has url but unknown type, treating as file');
     return MessageType.file;
   }
 
@@ -417,7 +417,7 @@ class MatrixEventMapper {
 
       return relations.containsKey('m.replace');
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
       return false;
     }
   }
@@ -440,7 +440,7 @@ class MatrixEventMapper {
       }
       return null;
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
       return null;
     }
   }
@@ -478,10 +478,10 @@ class MatrixEventMapper {
       }
 
       if (reactions.isNotEmpty) {
-        debugPrint('Extracted ${reactions.length} reactions for event ${event.eventId}');
+        debugLog('Extracted ${reactions.length} reactions for event ${event.eventId}');
       }
     } catch (e) {
-      debugPrint('Error extracting reactions: $e');
+      debugLog('Error extracting reactions: $e');
     }
 
     return reactions;
@@ -496,7 +496,7 @@ class MatrixEventMapper {
     }
 
     if (!mxcUrl.startsWith('mxc://')) {
-      debugPrint('Invalid mxc URL: $mxcUrl');
+      debugLog('Invalid mxc URL: $mxcUrl');
       return null;
     }
 
@@ -506,13 +506,13 @@ class MatrixEventMapper {
       final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
 
       if (serverName.isEmpty || mediaId.isEmpty) {
-        debugPrint('Invalid mxc URL format: $mxcUrl');
+        debugLog('Invalid mxc URL format: $mxcUrl');
         return null;
       }
 
       final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) {
-        debugPrint('No homeserver configured');
+        debugLog('No homeserver configured');
         return null;
       }
 
@@ -523,10 +523,10 @@ class MatrixEventMapper {
         url = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
       }
 
-      debugPrint('Built media URL: $url (mxcUrl: $mxcUrl)');
+      debugLog('Built media URL: $url (mxcUrl: $mxcUrl)');
       return url;
     } catch (e) {
-      debugPrint('Error building HTTP URL: $e');
+      debugLog('Error building HTTP URL: $e');
       return null;
     }
   }

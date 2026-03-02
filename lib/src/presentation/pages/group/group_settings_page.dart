@@ -16,6 +16,7 @@ import 'bot_settings_page.dart';
 import 'content_filter_settings_page.dart';
 import 'group_channels_page.dart';
 import 'group_media_hub_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 群设置页面
 class GroupSettingsPage extends StatefulWidget {
@@ -176,7 +177,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    debugPrint('Group name tapped: canChangeSettings=${group.canChangeSettings}, myRole=${group.myRole}');
+                    debugLog('Group name tapped: canChangeSettings=${group.canChangeSettings}, myRole=${group.myRole}');
                     if (group.canChangeSettings) {
                       _editGroupName(group);
                     } else {

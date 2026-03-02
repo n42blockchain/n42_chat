@@ -64,7 +64,7 @@ extension ChatBlocActionHandlers on ChatBloc {
       // MessageType.redacted 合并，与当前状态一致，不会产生闪烁。
     } catch (e) {
       // 服务器撤回失败：回滚乐观更新，恢复原始消息列表
-      debugPrint('ChatBloc: Failed to redact message ${event.messageId}: $e');
+      debugLog('ChatBloc: Failed to redact message ${event.messageId}: $e');
       emit(state.copyWith(
         messages: originalMessages,
         error: 'Failed to recall',
@@ -83,7 +83,7 @@ extension ChatBlocActionHandlers on ChatBloc {
 
     // 将删除的消息ID添加到内存集合中，防止被消息订阅恢复
     _locallyDeletedMessageIds.addAll(idsToDelete);
-    debugPrint('ChatBloc: Locally deleted message IDs: $idsToDelete');
+    debugLog('ChatBloc: Locally deleted message IDs: $idsToDelete');
 
     // 立即更新 UI
     final updatedMessages = state.messages
@@ -97,9 +97,9 @@ extension ChatBlocActionHandlers on ChatBloc {
         _currentRoomId!,
         event.messageIds,
       );
-      debugPrint('ChatBloc: Persisted ${event.messageIds.length} deleted message IDs to storage');
+      debugLog('ChatBloc: Persisted ${event.messageIds.length} deleted message IDs to storage');
     } catch (e) {
-      debugPrint('ChatBloc: Failed to persist deleted message IDs: $e');
+      debugLog('ChatBloc: Failed to persist deleted message IDs: $e');
     }
   }
 
@@ -113,7 +113,7 @@ extension ChatBlocActionHandlers on ChatBloc {
     final roomId = _currentRoomId!;
     final messageId = event.messageId;
 
-    debugPrint('ChatBloc: Deleting failed message: $messageId');
+    debugLog('ChatBloc: Deleting failed message: $messageId');
 
     // 先从 UI 中移除
     _locallyDeletedMessageIds.add(messageId);
@@ -128,9 +128,9 @@ extension ChatBlocActionHandlers on ChatBloc {
     // 然后尝试从服务器/本地数据库中删除（不需要 emit，所以可以在 bloc 关闭后继续）
     try {
       await _messageRepository.deleteFailedMessage(roomId, messageId);
-      debugPrint('ChatBloc: Successfully deleted failed message from server/local');
+      debugLog('ChatBloc: Successfully deleted failed message from server/local');
     } catch (e) {
-      debugPrint('ChatBloc: Error deleting failed message: $e');
+      debugLog('ChatBloc: Error deleting failed message: $e');
     }
   }
 
@@ -255,9 +255,9 @@ extension ChatBlocActionHandlers on ChatBloc {
         event.messageId,
         event.emoji,
       );
-      debugPrint('ChatBloc: Reaction $event.emoji added to message ${event.messageId}');
+      debugLog('ChatBloc: Reaction $event.emoji added to message ${event.messageId}');
     } catch (e) {
-      debugPrint('ChatBloc: Failed to add reaction: $e');
+      debugLog('ChatBloc: Failed to add reaction: $e');
       emit(state.copyWith(error: 'Failed to add reaction'));
     }
   }
@@ -275,14 +275,14 @@ extension ChatBlocActionHandlers on ChatBloc {
       // 检查隐私设置：是否允许发送已读回执
       final shouldSendReadReceipts = await _secureStorage.shouldShowReadReceipts();
       if (!shouldSendReadReceipts) {
-        debugPrint('ChatBloc: Skipping read receipt due to privacy settings');
+        debugLog('ChatBloc: Skipping read receipt due to privacy settings');
         return;
       }
 
       await _messageRepository.markAsRead(_currentRoomId!, event.messageId);
     } catch (e) {
       // 静默失败
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
 
@@ -299,7 +299,7 @@ extension ChatBlocActionHandlers on ChatBloc {
       // 检查隐私设置：是否允许发送输入状态
       final shouldSendTypingIndicator = await _secureStorage.shouldShowTypingIndicator();
       if (!shouldSendTypingIndicator) {
-        debugPrint('ChatBloc: Skipping typing notification due to privacy settings');
+        debugLog('ChatBloc: Skipping typing notification due to privacy settings');
         return;
       }
 
@@ -309,7 +309,7 @@ extension ChatBlocActionHandlers on ChatBloc {
       );
     } catch (e) {
       // 静默失败
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
 
@@ -338,7 +338,7 @@ extension ChatBlocActionHandlers on ChatBloc {
     ClearChatHistory event,
     Emitter<ChatState> emit,
   ) async {
-    debugPrint('ChatBloc: Clearing chat history for room $_currentRoomId');
+    debugLog('ChatBloc: Clearing chat history for room $_currentRoomId');
 
     // 清空本地消息列表
     _locallyDeletedMessageIds.addAll(state.messages.map((m) => m.id));
@@ -375,7 +375,7 @@ extension ChatBlocActionHandlers on ChatBloc {
         emit(state.copyWith(pendingCommand: 'poll'));
         break;
       default:
-        debugPrint('ChatBloc: Unknown slash command: ${event.command}');
+        debugLog('ChatBloc: Unknown slash command: ${event.command}');
     }
   }
 
@@ -394,7 +394,7 @@ extension ChatBlocActionHandlers on ChatBloc {
       // 通过 error 字段发送成功信号（使用特殊前缀区分）
       emit(state.copyWith(error: 'success:report'));
     } catch (e) {
-      debugPrint('ChatBloc: Failed to report message: $e');
+      debugLog('ChatBloc: Failed to report message: $e');
       emit(state.copyWith(error: 'Failed to report message'));
     }
   }

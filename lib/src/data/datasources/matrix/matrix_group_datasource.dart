@@ -1,10 +1,11 @@
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../domain/entities/bot_config_entity.dart';
 import '../../../domain/entities/channel_entity.dart';
 import '../../../domain/entities/content_filter_entity.dart';
 import 'matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Matrix群聊数据源
 ///
@@ -109,7 +110,7 @@ class MatrixGroupDataSource {
     final canChange = room.canSendEvent('m.room.name');
     final userId = _client?.userID;
     final powerLevel = userId != null ? room.getPowerLevelByUserId(userId) : 0;
-    debugPrint('setGroupName: roomId=$roomId, name=$name, canSendEvent=$canChange, powerLevel=$powerLevel');
+    debugLog('setGroupName: roomId=$roomId, name=$name, canSendEvent=$canChange, powerLevel=$powerLevel');
 
     if (!canChange && powerLevel < 50) {
       throw Exception('You do not have permission to change the group name');
@@ -117,9 +118,9 @@ class MatrixGroupDataSource {
 
     try {
       await room.setName(name);
-      debugPrint('setGroupName: Success');
+      debugLog('setGroupName: Success');
     } catch (e) {
-      debugPrint('setGroupName error: $e');
+      debugLog('setGroupName error: $e');
       // 如果是权限错误，提供更友好的消息
       final errorStr = e.toString().toLowerCase();
       if (errorStr.contains('forbidden') || errorStr.contains('permission') || errorStr.contains('403')) {
@@ -306,7 +307,7 @@ class MatrixGroupDataSource {
 
     // 检查是否可以发送 m.room.name 状态事件
     final canSendNameEvent = room.canSendEvent('m.room.name');
-    debugPrint('canChangeSettings: roomId=$roomId, canSendEvent(m.room.name)=$canSendNameEvent');
+    debugLog('canChangeSettings: roomId=$roomId, canSendEvent(m.room.name)=$canSendNameEvent');
 
     // 如果 SDK 说可以，直接返回 true
     if (canSendNameEvent) return true;
@@ -317,12 +318,12 @@ class MatrixGroupDataSource {
       final userId = _client?.userID;
       if (userId != null) {
         final powerLevel = room.getPowerLevelByUserId(userId);
-        debugPrint('canChangeSettings: userId=$userId, powerLevel=$powerLevel');
+        debugLog('canChangeSettings: userId=$userId, powerLevel=$powerLevel');
         // 权限级别 >= 50 通常表示版主或管理员
         if (powerLevel >= 50) return true;
       }
     } catch (e) {
-      debugPrint('canChangeSettings: Error checking power level: $e');
+      debugLog('canChangeSettings: Error checking power level: $e');
     }
 
     return false;
@@ -573,7 +574,7 @@ class MatrixGroupDataSource {
     try {
       return ContentFilterConfig.fromJson(state.content);
     } catch (e) {
-      debugPrint('getContentFilter error: $e');
+      debugLog('getContentFilter error: $e');
       return null;
     }
   }
@@ -732,7 +733,7 @@ class MatrixGroupDataSource {
     try {
       return BotConfig.fromJson(state.content);
     } catch (e) {
-      debugPrint('getBotConfig error: $e');
+      debugLog('getBotConfig error: $e');
       return null;
     }
   }
@@ -764,7 +765,7 @@ class MatrixGroupDataSource {
       final stateEvent = room.getState(_tokenGateEventType);
       return stateEvent?.content;
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
       return null;
     }
   }
@@ -831,7 +832,7 @@ class MatrixGroupDataSource {
         'n42.bot': true,
       });
     } catch (e) {
-      debugPrint('MatrixGroupDataSource: Failed to send bot notice: $e');
+      debugLog('MatrixGroupDataSource: Failed to send bot notice: $e');
       rethrow;
     }
   }

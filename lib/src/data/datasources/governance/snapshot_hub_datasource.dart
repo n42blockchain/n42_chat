@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../integration/wallet_bridge.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Snapshot Hub datasource for submitting signed votes and proposals.
 ///
@@ -67,7 +67,7 @@ class SnapshotHubDatasource {
       );
     }
 
-    debugPrint('Vote submitted successfully for proposal $proposalId');
+    debugLog('Vote submitted successfully for proposal $proposalId');
   }
 
   /// Create a proposal via EIP-712 signature
@@ -123,7 +123,7 @@ class SnapshotHubDatasource {
 
     final responseBody = jsonDecode(response.body) as Map<String, dynamic>;
     final proposalId = responseBody['id'] as String? ?? '';
-    debugPrint('Proposal created: $proposalId');
+    debugLog('Proposal created: $proposalId');
     return proposalId;
   }
 
@@ -155,23 +155,17 @@ class SnapshotHubDatasource {
     };
   }
 
-  /// Sign a message via the wallet bridge.
-  ///
-  /// Currently a placeholder that throws [UnimplementedError].
-  /// Proper implementation requires adding a `signTypedData` method
-  /// to [IWalletBridge] for EIP-712 typed data signing.
+  /// Sign EIP-712 typed data via the wallet bridge.
   Future<String> _signMessage(String message) async {
     if (!_walletBridge.isWalletConnected) {
       throw StateError('Wallet not connected for signing');
     }
-    // TODO: Implement proper EIP-712 signTypedData via IWalletBridge
-    // Currently requires IWalletBridge to add a signTypedData method.
-    // This is a placeholder that will be replaced when wallet bridge
-    // supports typed data signing.
-    throw UnimplementedError(
-      'EIP-712 signTypedData not yet available in IWalletBridge. '
-      'Add signTypedData method to IWalletBridge to enable Snapshot voting.',
-    );
+
+    final signature = await _walletBridge.signTypedData(message);
+    if (signature == null) {
+      throw StateError('Wallet signing was rejected or not supported');
+    }
+    return signature;
   }
 
   /// Release resources

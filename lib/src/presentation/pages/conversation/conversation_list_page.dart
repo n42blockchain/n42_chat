@@ -38,6 +38,8 @@ import '../search/global_search_page.dart';
 import '../story/create_story_page.dart';
 import '../story/story_viewer_page.dart';
 import 'conversation_tile.dart';
+import '../../../core/utils/debug_log.dart';
+import '../../../n42_chat.dart';
 
 /// 会话列表页面（仿微信）
 class ConversationListPage extends StatefulWidget {
@@ -159,7 +161,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
       hasContactBloc = true;
     } catch (e) {
       // ContactBloc 不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     final scaffold = Scaffold(
@@ -364,10 +366,15 @@ class _ConversationListPageState extends State<ConversationListPage> {
   }
 
   /// 处理 Story 回复
-  void _handleStoryReply(String userId, String storyId, String message) {
-    // TODO: 实现创建私聊并发送带 Story 引用的消息
-    // 可以通过 ConversationBloc 或 MessageBloc 来实现
-    debugPrint('Reply to story $storyId from user $userId: $message');
+  void _handleStoryReply(String userId, String storyId, String message) async {
+    debugLog('Reply to story $storyId from user $userId: $message');
+    try {
+      final roomId = await N42Chat.createDirectMessage(userId);
+      if (!mounted) return;
+      await N42Chat.openConversation(roomId, context: context);
+    } catch (e) {
+      debugLog('ConversationListPage: Failed to create DM for story reply: $e');
+    }
   }
 
   /// 添加新 Story

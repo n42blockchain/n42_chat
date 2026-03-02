@@ -12,6 +12,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../../widgets/story/story_progress_bar.dart';
 import 'story_viewers_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Story 查看器页面
 ///
@@ -393,7 +394,7 @@ class _StoryContentState extends State<_StoryContent> {
     _musicPlayer!.play(source).then((_) {
       if (mounted) setState(() => _isMusicPlaying = true);
     }).catchError((Object e) {
-      debugPrint('StoryViewer: Music playback failed: $e');
+      debugLog('StoryViewer: Music playback failed: $e');
     });
 
     // Seek to start position if specified

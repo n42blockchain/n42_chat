@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:flutter/foundation.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 
 import '../../data/datasources/local/media_metadata_database.dart';
 import 'download_service.dart';
+import '../utils/debug_log.dart';
 
 /// 媒体文件清理结果
 class CleanupResult {
@@ -71,7 +71,7 @@ class MediaLifecycleService {
             actualSize = await file.length();
           }
         } catch (e) {
-          debugPrint('MediaLifecycleService: Failed to get file size: $e');
+          debugLog('MediaLifecycleService: Failed to get file size: $e');
         }
       }
 
@@ -90,7 +90,7 @@ class MediaLifecycleService {
         isPinned: const Value(false),
       ));
     } catch (e) {
-      debugPrint('MediaLifecycleService: Failed to register file: $e');
+      debugLog('MediaLifecycleService: Failed to register file: $e');
     }
   }
 
@@ -99,7 +99,7 @@ class MediaLifecycleService {
     try {
       await _db.touchFile(filePath);
     } catch (e) {
-      debugPrint('MediaLifecycleService: Failed to touch file: $e');
+      debugLog('MediaLifecycleService: Failed to touch file: $e');
     }
   }
 
@@ -171,7 +171,7 @@ class MediaLifecycleService {
         deleted++;
       } catch (e) {
         errors++;
-        debugPrint('MediaLifecycleService: Failed to delete $path: $e');
+        debugLog('MediaLifecycleService: Failed to delete $path: $e');
       }
     }
 
@@ -180,7 +180,7 @@ class MediaLifecycleService {
       try {
         await _db.markCleaned(filePaths);
       } catch (e) {
-        debugPrint('MediaLifecycleService: Failed to mark cleaned: $e');
+        debugLog('MediaLifecycleService: Failed to mark cleaned: $e');
       }
     }
 
@@ -196,20 +196,20 @@ class MediaLifecycleService {
     int olderThanDays = 90,
     bool preserveThumbnails = true,
   }) async {
-    debugPrint(
+    debugLog(
         'MediaLifecycleService: Auto cleanup started (older than $olderThanDays days)');
     final files = await _db.getCleanableFiles(
       olderThanDays: olderThanDays,
     );
 
     if (files.isEmpty) {
-      debugPrint('MediaLifecycleService: No files to cleanup');
+      debugLog('MediaLifecycleService: No files to cleanup');
       return const CleanupResult();
     }
 
     final paths = files.map((f) => f.filePath).toList();
     final result = await cleanupFiles(paths);
-    debugPrint(
+    debugLog(
         'MediaLifecycleService: Cleaned ${result.filesDeleted} files, freed ${result.bytesFreed} bytes');
     return result;
   }
@@ -219,7 +219,7 @@ class MediaLifecycleService {
     try {
       final record = await _db.getCleanedFile(filePath);
       if (record == null || record.mxcUrl.isEmpty) {
-        debugPrint(
+        debugLog(
             'MediaLifecycleService: No mxcUrl for redownload: $filePath');
         return null;
       }
@@ -242,7 +242,7 @@ class MediaLifecycleService {
       }
       return null;
     } catch (e) {
-      debugPrint('MediaLifecycleService: Redownload failed: $e');
+      debugLog('MediaLifecycleService: Redownload failed: $e');
       return null;
     }
   }
@@ -267,7 +267,7 @@ class MediaLifecycleService {
       Duration(hours: cleanupIntervalHours),
       (_) => autoCleanup(),
     );
-    debugPrint('MediaLifecycleService: Auto cleanup scheduled');
+    debugLog('MediaLifecycleService: Auto cleanup scheduled');
   }
 
   /// 停止自动清理定时器

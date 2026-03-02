@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../data/datasources/matrix/matrix_client_manager.dart';
 import '../utils/username_validator.dart';
+import '../utils/debug_log.dart';
 
 /// 用户名服务
 ///
@@ -43,7 +43,7 @@ class UsernameService {
 
       return _registryRoomId;
     } catch (e) {
-      debugPrint('UsernameService: Failed to get registry room: $e');
+      debugLog('UsernameService: Failed to get registry room: $e');
       return null;
     }
   }
@@ -84,7 +84,7 @@ class UsernameService {
 
       return true;
     } catch (e) {
-      debugPrint('UsernameService: Failed to claim username: $e');
+      debugLog('UsernameService: Failed to claim username: $e');
       return false;
     }
   }
@@ -111,7 +111,7 @@ class UsernameService {
       await _saveToAccountData(null);
       return true;
     } catch (e) {
-      debugPrint('UsernameService: Failed to release username: $e');
+      debugLog('UsernameService: Failed to release username: $e');
       return false;
     }
   }
@@ -162,7 +162,7 @@ class UsernameService {
 
       return results;
     } catch (e) {
-      debugPrint('UsernameService: Failed to search usernames: $e');
+      debugLog('UsernameService: Failed to search usernames: $e');
       return [];
     }
   }
@@ -174,7 +174,7 @@ class UsernameService {
       final accountData = _client!.accountData[_accountDataKey];
       return accountData?.content['username'] as String?;
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
       return null;
     }
   }
@@ -192,7 +192,7 @@ class UsernameService {
       final userId = stateEvent?.content['user_id'] as String?;
       return (userId != null && userId.isNotEmpty) ? userId : null;
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
       return null;
     }
   }
@@ -207,7 +207,7 @@ class UsernameService {
       updated['username'] = username;
       await _client!.setAccountData(_client!.userID!, _accountDataKey, updated);
     } catch (e) {
-      debugPrint('UsernameService: Failed to save account data: $e');
+      debugLog('UsernameService: Failed to save account data: $e');
     }
   }
 }

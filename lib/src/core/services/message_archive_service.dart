@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:path_provider/path_provider.dart';
 
 import '../../data/datasources/local/archive_database.dart';
 import '../../data/datasources/matrix/matrix_client_manager.dart';
+import '../utils/debug_log.dart';
 
 /// 归档操作结果
 class ArchiveResult {
@@ -74,7 +74,7 @@ class MessageArchiveService {
 
     // 检查磁盘空间
     if (!await _hasSufficientDiskSpace()) {
-      debugPrint('MessageArchiveService: Insufficient disk space, skipping archive');
+      debugLog('MessageArchiveService: Insufficient disk space, skipping archive');
       return ArchiveResult(
         roomId: roomId,
         archivedCount: 0,
@@ -117,7 +117,7 @@ class MessageArchiveService {
       try {
         await timeline.requestHistory(historyCount: batchSize);
       } catch (e) {
-        debugPrint('MessageArchiveService: requestHistory failed: $e');
+        debugLog('MessageArchiveService: requestHistory failed: $e');
         break;
       }
       final after = timeline.events.length;
@@ -152,7 +152,7 @@ class MessageArchiveService {
         companions.add(_eventToCompanion(event, roomId));
       } catch (e) {
         skipped++;
-        debugPrint('MessageArchiveService: Failed to convert event ${event.eventId}: $e');
+        debugLog('MessageArchiveService: Failed to convert event ${event.eventId}: $e');
       }
     }
 
@@ -184,7 +184,7 @@ class MessageArchiveService {
       duration: sw.elapsed,
     );
 
-    debugPrint('MessageArchiveService: $result');
+    debugLog('MessageArchiveService: $result');
     return result;
   }
 
@@ -328,7 +328,7 @@ class MessageArchiveService {
       if (stat.type == FileSystemEntityType.notFound) return false;
       return true;
     } catch (e) {
-      debugPrint('MessageArchiveService: Disk space check failed: $e');
+      debugLog('MessageArchiveService: Disk space check failed: $e');
       return true; // 检查失败时默认允许
     }
   }

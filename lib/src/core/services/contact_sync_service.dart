@@ -1,12 +1,13 @@
+import 'dart:typed_data';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
 import '../../data/datasources/matrix/matrix_client_manager.dart';
+import '../utils/debug_log.dart';
 
 /// 手机通讯录联系人
 class PhoneContact {
@@ -91,7 +92,7 @@ class ContactSyncService {
     try {
       return await FlutterContacts.requestPermission(readonly: true);
     } catch (e) {
-      debugPrint('ContactSyncService: Permission check error: $e');
+      debugLog('ContactSyncService: Permission check error: $e');
       return false;
     }
   }
@@ -101,7 +102,7 @@ class ContactSyncService {
     try {
       return await FlutterContacts.requestPermission(readonly: true);
     } catch (e) {
-      debugPrint('ContactSyncService: Permission request error: $e');
+      debugLog('ContactSyncService: Permission request error: $e');
       return false;
     }
   }
@@ -113,7 +114,7 @@ class ContactSyncService {
     try {
       final hasAccess = await requestPermission();
       if (!hasAccess) {
-        debugPrint('ContactSyncService: No contacts permission');
+        debugLog('ContactSyncService: No contacts permission');
         return [];
       }
 
@@ -132,7 +133,7 @@ class ContactSyncService {
         photoBytes: withPhoto ? c.photo : null,
       )).toList();
     } catch (e) {
-      debugPrint('ContactSyncService: Get contacts error: $e');
+      debugLog('ContactSyncService: Get contacts error: $e');
       return [];
     }
   }
@@ -165,7 +166,7 @@ class ContactSyncService {
   }) async {
     final client = _clientManager.client;
     if (client == null) {
-      debugPrint('ContactSyncService: Matrix client not available');
+      debugLog('ContactSyncService: Matrix client not available');
       return [];
     }
 
@@ -206,7 +207,7 @@ class ContactSyncService {
             await Future<void>.delayed(const Duration(milliseconds: _requestDelayMs));
           } catch (e) {
             // 使用哈希保护隐私信息
-            debugPrint('ContactSyncService: Search error for ${_hashForLogging(email)}: $e');
+            debugLog('ContactSyncService: Search error for ${_hashForLogging(email)}: $e');
           }
         }
 
@@ -237,7 +238,7 @@ class ContactSyncService {
             // 请求节流
             await Future<void>.delayed(const Duration(milliseconds: _requestDelayMs));
           } catch (e) {
-            debugPrint('ContactSyncService: Search error for phone: $e');
+            debugLog('ContactSyncService: Search error for phone: $e');
           }
         }
 

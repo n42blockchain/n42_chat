@@ -17,6 +17,7 @@ import 'profile_invoice_manage_page.dart';
 import 'profile_ringtone_select_page.dart';
 
 import 'n42_bean_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 个人资料编辑页面
 /// 
@@ -45,12 +46,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        debugPrint('ProfileEditPage: AuthState changed - status: ${state.status}, isUploading: $_isUploading');
+        debugLog('ProfileEditPage: AuthState changed - status: ${state.status}, isUploading: $_isUploading');
         
         // 监听状态变化
         if (_isUploading) {
           if (state.status == AuthStatus.authenticated) {
-            debugPrint('ProfileEditPage: Avatar upload succeeded');
+            debugLog('ProfileEditPage: Avatar upload succeeded');
             setState(() => _isUploading = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -59,7 +60,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               ),
             );
           } else if (state.status == AuthStatus.error) {
-            debugPrint('ProfileEditPage: Avatar upload failed - ${state.errorMessage}');
+            debugLog('ProfileEditPage: Avatar upload failed - ${state.errorMessage}');
             setState(() => _isUploading = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -397,7 +398,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     if (source == null) return;
 
     try {
-      debugPrint('ProfileEditPage: Picking image from $source');
+      debugLog('ProfileEditPage: Picking image from $source');
       
       final XFile? image = await _imagePicker.pickImage(
         source: source,
@@ -407,16 +408,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       );
 
       if (image == null) {
-        debugPrint('ProfileEditPage: No image selected');
+        debugLog('ProfileEditPage: No image selected');
         return;
       }
 
-      debugPrint('ProfileEditPage: Image selected: ${image.path}, name: ${image.name}');
+      debugLog('ProfileEditPage: Image selected: ${image.path}, name: ${image.name}');
       
       setState(() => _isUploading = true);
 
       final bytes = await image.readAsBytes();
-      debugPrint('ProfileEditPage: Image bytes: ${bytes.length}');
+      debugLog('ProfileEditPage: Image bytes: ${bytes.length}');
 
       if (!mounted) return;
       if (bytes.isEmpty) {
@@ -430,7 +431,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         filename = '$filename.jpg';
       }
 
-      debugPrint('ProfileEditPage: Uploading avatar with filename: $filename');
+      debugLog('ProfileEditPage: Uploading avatar with filename: $filename');
 
       // 上传头像 - BlocConsumer 会监听状态变化并显示结果
       context.read<AuthBloc>().add(UpdateAvatar(
@@ -438,8 +439,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         filename: filename,
       ));
     } catch (e, stackTrace) {
-      debugPrint('ProfileEditPage: Pick image error: $e');
-      debugPrint('ProfileEditPage: Stack trace: $stackTrace');
+      debugLog('ProfileEditPage: Pick image error: $e');
+      debugLog('ProfileEditPage: Stack trace: $stackTrace');
       if (mounted) {
         setState(() => _isUploading = false);
         ScaffoldMessenger.of(context).showSnackBar(

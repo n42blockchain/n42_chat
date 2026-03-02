@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 import 'media_lifecycle_service.dart';
+import '../utils/debug_log.dart';
 
 /// 下载任务状态
 enum DownloadStatus {
@@ -212,7 +212,7 @@ class DownloadService {
           }
         }
       } catch (e) {
-        debugPrint('DownloadService: Failed to register media: $e');
+        debugLog('DownloadService: Failed to register media: $e');
       }
     } catch (e) {
       if (task.status != DownloadStatus.cancelled) {

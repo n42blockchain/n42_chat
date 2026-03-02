@@ -11,6 +11,7 @@ import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import 'contact_detail_page.dart';
 import 'contact_permissions_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 联系人设置页面（仿微信 - 图二）
 class ContactSettingsPage extends StatefulWidget {
@@ -154,7 +155,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                         context.read<ContactBloc>().add(UnignoreUser(widget.userId));
                       }
                     } catch (_) {
-                      debugPrint('ContactBloc not available for blocklist toggle');
+                      debugLog('ContactBloc not available for blocklist toggle');
                     }
                   },
                 ),
@@ -402,7 +403,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
     
     Navigator.of(context).push(

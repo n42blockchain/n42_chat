@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../utils/debug_log.dart';
 
 /// URL 预览数据
 class UrlPreviewData {
@@ -107,7 +107,7 @@ class UrlPreviewService {
 
       return false;
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
       return true; // 解析失败视为私有地址，拒绝请求
     }
   }
@@ -138,7 +138,7 @@ class UrlPreviewService {
         client.close();
       }
     } catch (e) {
-      debugPrint('UrlPreviewService: Failed to fetch preview for $url: $e');
+      debugLog('UrlPreviewService: Failed to fetch preview for $url: $e');
       return null;
     }
   }
@@ -273,7 +273,7 @@ class UrlPreviewService {
         client.close();
       }
     } catch (e) {
-      debugPrint('UrlPreviewService: Failed to get text content for $url: $e');
+      debugLog('UrlPreviewService: Failed to get text content for $url: $e');
       return null;
     }
   }

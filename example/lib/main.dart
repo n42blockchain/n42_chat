@@ -25,7 +25,7 @@ void main() async {
       defaultHomeserver: 'https://matrix.org',
       enableEncryption: true,
       enablePushNotifications: true,
-      walletBridge: MockWalletBridge(), // 使用模拟钱包
+      walletBridge: NoOpWalletBridge(), // 未集成钱包时的安全降级
       onMessageTap: (roomId, eventId) {
         debugPrint('Message tapped: $roomId / $eventId');
       },

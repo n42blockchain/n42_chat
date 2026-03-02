@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 位置选择页面（微信风格）
 class ChatLocationPickerPage extends StatefulWidget {
@@ -123,7 +124,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         _currentAddress = '${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}';
       });
     } catch (e) {
-      debugPrint('Get address error: $e');
+      debugLog('Get address error: $e');
     }
   }
 
@@ -178,7 +179,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
           }
         }
       } catch (e) {
-        debugPrint('Place search error: $e');
+        debugLog('Place search error: $e');
       }
     });
   }

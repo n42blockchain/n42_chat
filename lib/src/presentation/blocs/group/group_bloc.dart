@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/bot_config_entity.dart';
@@ -11,6 +10,7 @@ import '../../../domain/repositories/group_repository.dart';
 import '../bloc_message_keys.dart';
 import 'group_event.dart';
 import 'group_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 群聊BLoC
 class GroupBloc extends Bloc<GroupEvent, GroupState> {
@@ -584,7 +584,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         _groupRepository.watchMemberJoinEvents(event.roomId).listen(
       (userId) => add(MemberJoined(event.roomId, userId)),
       onError: (Object e) {
-        debugPrint('GroupBloc: Member join stream error: $e');
+        debugLog('GroupBloc: Member join stream error: $e');
         _memberJoinSubscriptions.remove(event.roomId);
       },
       onDone: () => _memberJoinSubscriptions.remove(event.roomId),
@@ -611,9 +611,9 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
       // 发送 notice 消息
       await _groupRepository.sendBotNotice(event.roomId, message);
-      debugPrint('GroupBloc: Sent welcome message to ${event.userId} in ${event.roomId}');
+      debugLog('GroupBloc: Sent welcome message to ${event.userId} in ${event.roomId}');
     } catch (e) {
-      debugPrint('GroupBloc: Failed to send welcome message: $e');
+      debugLog('GroupBloc: Failed to send welcome message: $e');
     }
   }
 

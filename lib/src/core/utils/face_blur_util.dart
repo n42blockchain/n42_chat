@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
+import 'debug_log.dart';
 
 /// 人脸自动模糊工具类
 ///
@@ -44,7 +45,7 @@ class FaceBlurUtil {
       final faces = await _detectFaces(imageBytes);
       return faces.isNotEmpty;
     } catch (e) {
-      debugPrint('FaceBlurUtil.hasFaces error: $e');
+      debugLog('FaceBlurUtil.hasFaces error: $e');
       return false;
     }
   }
@@ -62,11 +63,11 @@ class FaceBlurUtil {
     try {
       final faces = await _detectFaces(imageBytes);
       if (faces.isEmpty) {
-        debugPrint('FaceBlurUtil: No faces detected, returning original image');
+        debugLog('FaceBlurUtil: No faces detected, returning original image');
         return imageBytes;
       }
 
-      debugPrint('FaceBlurUtil: Detected ${faces.length} face(s), applying blur');
+      debugLog('FaceBlurUtil: Detected ${faces.length} face(s), applying blur');
 
       // 在 isolate 中处理图片模糊（避免阻塞 UI 线程）
       return await compute(
@@ -78,7 +79,7 @@ class FaceBlurUtil {
         ),
       );
     } catch (e) {
-      debugPrint('FaceBlurUtil.blurFaces error: $e');
+      debugLog('FaceBlurUtil.blurFaces error: $e');
       return imageBytes;
     }
   }

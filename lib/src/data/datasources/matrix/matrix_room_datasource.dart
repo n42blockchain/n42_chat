@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Matrix房间数据源
 ///
@@ -299,14 +300,14 @@ class MatrixRoomDataSource {
     final eventId = room.lastEvent?.eventId;
     // 验证 eventId 格式（Matrix 事件 ID 以 $ 开头）
     if (eventId == null || eventId.isEmpty || !eventId.startsWith('\$')) {
-      debugPrint('MatrixRoomDataSource: Invalid eventId format for markRoomAsRead: $eventId');
+      debugLog('MatrixRoomDataSource: Invalid eventId format for markRoomAsRead: $eventId');
       return;
     }
 
     try {
       await room.setReadMarker(eventId, mRead: eventId);
     } catch (e) {
-      debugPrint('MatrixRoomDataSource: markRoomAsRead error: $e');
+      debugLog('MatrixRoomDataSource: markRoomAsRead error: $e');
       // 忽略标记已读失败，不影响用户体验
     }
   }
@@ -339,7 +340,7 @@ class MatrixRoomDataSource {
         // 对于未解密的消息，messageType 会返回 'm.bad.encrypted' 或类似值
         final msgType = event.messageType;
         final body = event.body;
-        debugPrint('MatrixRoomDatasource: Encrypted event - msgType=$msgType, body=$body');
+        debugLog('MatrixRoomDatasource: Encrypted event - msgType=$msgType, body=$body');
         if (msgType == matrix.MessageTypes.Audio) {
           return '[Voice]';
         } else if (msgType == matrix.MessageTypes.Video) {
@@ -358,7 +359,7 @@ class MatrixRoomDataSource {
           }
         }
         // 消息尚未解密或解密失败
-        debugPrint('MatrixRoomDatasource: Encrypted message not decrypted, returning [Encrypted]');
+        debugLog('MatrixRoomDatasource: Encrypted message not decrypted, returning [Encrypted]');
         return '[Encrypted]';
       case matrix.EventTypes.Sticker:
         return '[Sticker]';

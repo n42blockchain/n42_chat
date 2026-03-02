@@ -1,7 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../n42_chat.dart';
+import '../di/injection.dart';
+import '../../domain/repositories/conversation_repository.dart';
+import '../../presentation/blocs/chat/chat_bloc.dart';
+import '../../presentation/blocs/contact/contact_bloc.dart';
+import '../../presentation/pages/ai/ai_assistant_page.dart';
+import '../../presentation/pages/ai/ai_assistant_settings_page.dart';
+import '../../presentation/pages/auth/login_page.dart';
+import '../../presentation/pages/chat/chat_folder_management_page.dart';
+import '../../presentation/pages/chat/chat_page.dart';
+import '../../presentation/pages/contact/add_friend_page.dart';
+import '../../presentation/pages/contact/contact_detail_page.dart';
+import '../../presentation/pages/contact/contact_list_page.dart';
+import '../../presentation/pages/conversation/conversation_list_page.dart';
+import '../../presentation/pages/discover/discover_page.dart';
+import '../../presentation/pages/group/create_group_page.dart';
+import '../../presentation/pages/profile/edit_profile_page.dart';
+import '../../presentation/pages/profile/profile_page.dart';
+import '../../presentation/pages/profile/set_username_page.dart';
+import '../../presentation/pages/search/global_search_page.dart';
+import '../../presentation/pages/settings/settings_page.dart';
+import '../../domain/entities/conversation_entity.dart';
+import '../../domain/entities/user_profile_entity.dart';
 import 'routes.dart';
 
 /// N42 Chat 路由配置
@@ -14,8 +38,12 @@ class N42ChatRouter {
 
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
+  static GoRouter? _router;
+
   /// 获取完整的路由器（独立运行模式）
-  static GoRouter get router => GoRouter(
+  ///
+  /// 使用懒加载单例模式，避免每次访问创建新实例导致路由状态丢失。
+  static GoRouter get router => _router ??= GoRouter(
         navigatorKey: _rootNavigatorKey,
         initialLocation: Routes.conversationList,
         debugLogDiagnostics: true,
@@ -41,10 +69,7 @@ class N42ChatRouter {
         GoRoute(
           path: Routes.conversationList,
           name: Routes.conversationListName,
-          builder: (context, state) {
-            final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.commonMessages ?? 'Messages');
-          },
+          builder: (context, state) => const ConversationListPage(),
           routes: [
             // 会话详情
             GoRoute(
@@ -52,10 +77,11 @@ class N42ChatRouter {
               name: Routes.chatName,
               builder: (context, state) {
                 final roomId = state.pathParameters['roomId']!;
-                final l10n = S.of(context);
-                return _PlaceholderPage(
-                    title: l10n?.commonConversationWithId(roomId) ??
-                        'Conversation: $roomId');
+                final conversation = state.extra as ConversationEntity?;
+                return _ChatPageLoader(
+                  roomId: roomId,
+                  conversation: conversation,
+                );
               },
             ),
           ],
@@ -65,10 +91,7 @@ class N42ChatRouter {
         GoRoute(
           path: Routes.contacts,
           name: Routes.contactsName,
-          builder: (context, state) {
-            final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.commonContacts ?? 'Contacts');
-          },
+          builder: (context, state) => const ContactListPage(),
           routes: [
             // 联系人详情
             GoRoute(
@@ -76,20 +99,19 @@ class N42ChatRouter {
               name: Routes.contactDetailName,
               builder: (context, state) {
                 final userId = state.pathParameters['userId']!;
-                final l10n = S.of(context);
-                return _PlaceholderPage(
-                    title: l10n?.commonContactWithId(userId) ?? 'Contact: $userId');
+                final extra = state.extra as Map<String, dynamic>?;
+                return ContactDetailPage(
+                  userId: userId,
+                  displayName: extra?['displayName'] as String? ?? userId,
+                  avatarUrl: extra?['avatarUrl'] as String?,
+                );
               },
             ),
             // 添加联系人
             GoRoute(
               path: 'add',
               name: Routes.addContactName,
-              builder: (context, state) {
-                final l10n = S.of(context);
-                return _PlaceholderPage(
-                    title: l10n?.commonAddFriend ?? 'Add Friend');
-              },
+              builder: (context, state) => const AddFriendPage(),
             ),
           ],
         ),
@@ -98,49 +120,38 @@ class N42ChatRouter {
         GoRoute(
           path: Routes.discover,
           name: Routes.discoverName,
-          builder: (context, state) {
-            final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.commonDiscover ?? 'Discover');
-          },
+          builder: (context, state) => const DiscoverPage(),
         ),
 
         // 个人中心
         GoRoute(
           path: Routes.profile,
           name: Routes.profileName,
-          builder: (context, state) {
-            final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.commonMe ?? 'Me');
-          },
+          builder: (context, state) => const ProfilePage(),
           routes: [
             // 设置
             GoRoute(
               path: 'settings',
               name: Routes.settingsName,
-              builder: (context, state) {
-                final l10n = S.of(context);
-                return _PlaceholderPage(title: l10n?.commonSettings ?? 'Settings');
-              },
+              builder: (context, state) => const SettingsPage(),
             ),
             // 编辑资料
             GoRoute(
               path: 'edit',
               name: Routes.editProfileName,
               builder: (context, state) {
-                final l10n = S.of(context);
-                return _PlaceholderPage(
-                    title: l10n?.profileEditProfile ?? 'Edit Profile');
+                final profile = state.extra as UserProfileEntity?;
+                if (profile == null) {
+                  return const _FallbackPage(title: 'Edit Profile');
+                }
+                return EditProfilePage(profile: profile);
               },
             ),
             // 设置用户名
             GoRoute(
               path: 'username',
               name: Routes.setUsernameName,
-              builder: (context, state) {
-                final l10n = S.of(context);
-                return _PlaceholderPage(
-                    title: l10n?.usernameSet ?? 'Set Username');
-              },
+              builder: (context, state) => const SetUsernamePage(),
             ),
           ],
         ),
@@ -149,48 +160,34 @@ class N42ChatRouter {
         GoRoute(
           path: Routes.login,
           name: Routes.loginName,
-          builder: (context, state) {
-            final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.authLogin ?? 'Log In');
-          },
+          builder: (context, state) => const LoginPage(),
         ),
 
         // 搜索
         GoRoute(
           path: Routes.search,
           name: Routes.searchName,
-          builder: (context, state) {
-            final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.commonSearch ?? 'Search');
-          },
+          builder: (context, state) => const GlobalSearchPage(),
         ),
 
         // 创建群聊
         GoRoute(
           path: Routes.createGroup,
           name: Routes.createGroupName,
-          builder: (context, state) {
-            final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.commonCreateGroup ?? 'Create Group');
-          },
+          builder: (context, state) => const CreateGroupPage(),
         ),
 
         // AI 助手
         GoRoute(
           path: Routes.aiAssistant,
           name: Routes.aiAssistantName,
-          builder: (context, state) {
-            final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.aiAssistant ?? 'AI Assistant');
-          },
+          builder: (context, state) => const AiAssistantPage(),
           routes: [
             GoRoute(
               path: 'settings',
               name: Routes.aiAssistantSettingsName,
-              builder: (context, state) {
-                final l10n = S.of(context);
-                return _PlaceholderPage(title: l10n?.aiAssistantSettings ?? 'AI Settings');
-              },
+              builder: (context, state) =>
+                  const AiAssistantSettingsPage(),
             ),
           ],
         ),
@@ -199,26 +196,23 @@ class N42ChatRouter {
         GoRoute(
           path: Routes.chatFolderManagement,
           name: Routes.chatFolderManagementName,
-          builder: (context, state) {
-            final l10n = S.of(context);
-            return _PlaceholderPage(title: l10n?.chatFolderManagement ?? 'Manage Folders');
-          },
+          builder: (context, state) =>
+              const ChatFolderManagementPage(),
         ),
       ];
 
-  /// 路由重定向
+  /// 路由重定向（auth guard）
   static String? _handleRedirect(BuildContext context, GoRouterState state) {
-    // TODO: 检查登录状态
-    // final isLoggedIn = N42Chat.isLoggedIn;
-    // final isLoginPage = state.matchedLocation == Routes.login;
+    final isLoggedIn = N42Chat.isLoggedIn;
+    final isLoginPage = state.matchedLocation == Routes.login;
 
-    // if (!isLoggedIn && !isLoginPage) {
-    //   return Routes.login;
-    // }
+    if (!isLoggedIn && !isLoginPage) {
+      return Routes.login;
+    }
 
-    // if (isLoggedIn && isLoginPage) {
-    //   return Routes.conversationList;
-    // }
+    if (isLoggedIn && isLoginPage) {
+      return Routes.conversationList;
+    }
 
     return null;
   }
@@ -235,7 +229,6 @@ class N42ChatRouter {
       transitionDuration: const Duration(milliseconds: 300),
       reverseTransitionDuration: const Duration(milliseconds: 300),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        // 滑动进入
         const begin = Offset(1.0, 0.0);
         const end = Offset.zero;
         const curve = Curves.easeInOut;
@@ -253,31 +246,101 @@ class N42ChatRouter {
   }
 }
 
-/// 占位页面（开发中）
-class _PlaceholderPage extends StatelessWidget {
-  final String title;
+/// ChatPage 需要 ConversationEntity，此 loader 从 roomId 异步加载
+class _ChatPageLoader extends StatefulWidget {
+  final String roomId;
+  final ConversationEntity? conversation;
 
-  const _PlaceholderPage({required this.title});
+  const _ChatPageLoader({
+    required this.roomId,
+    this.conversation,
+  });
+
+  @override
+  State<_ChatPageLoader> createState() => _ChatPageLoaderState();
+}
+
+class _ChatPageLoaderState extends State<_ChatPageLoader> {
+  ConversationEntity? _conversation;
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.conversation != null) {
+      _conversation = widget.conversation;
+      _loading = false;
+    } else {
+      _loadConversation();
+    }
+  }
+
+  Future<void> _loadConversation() async {
+    try {
+      final repo = getIt<IConversationRepository>();
+      final conv = await repo.getConversationById(widget.roomId);
+      if (!mounted) return;
+      if (conv == null) {
+        setState(() {
+          _error = 'Conversation not found: ${widget.roomId}';
+          _loading = false;
+        });
+      } else {
+        setState(() {
+          _conversation = conv;
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = S.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: const Color(0xFFF7F7F7),
-        foregroundColor: const Color(0xFF181818),
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_error != null || _conversation == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Error')),
+        body: Center(child: Text(_error ?? 'Unknown error')),
+      );
+    }
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => getIt<ChatBloc>()),
+        BlocProvider(create: (_) => getIt<ContactBloc>()),
+      ],
+      child: ChatPage(
+        conversation: _conversation!,
+        onBack: () => Navigator.of(context).pop(),
       ),
-      backgroundColor: const Color(0xFFEDEDED),
+    );
+  }
+}
+
+/// EditProfilePage 需要 profile 对象，如果未传递则显示提示
+class _FallbackPage extends StatelessWidget {
+  final String title;
+  const _FallbackPage({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
       body: Center(
-        child: Text(
-          l10n?.commonDeveloping(title) ?? '$title\n(Coming soon)',
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 16,
-            color: Color(0xFF888888),
-          ),
-        ),
+        child: Text('$title\n(Navigate with required data)',
+            textAlign: TextAlign.center),
       ),
     );
   }
@@ -341,4 +404,3 @@ class _ErrorPage extends StatelessWidget {
     );
   }
 }
-

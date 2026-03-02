@@ -127,6 +127,7 @@ import '../../data/repositories/points_repository_impl.dart';
 import '../../domain/repositories/points_repository.dart';
 import '../services/points_tracking_service.dart';
 import '../../presentation/blocs/points/points_bloc.dart';
+import '../utils/debug_log.dart';
 
 /// 全局GetIt实例
 final GetIt getIt = GetIt.instance;
@@ -140,7 +141,7 @@ Future<void> configureDependencies(N42ChatConfig config, {IWalletBridge? walletB
 
   // 注册钱包桥接
   getIt.registerSingleton<IWalletBridge>(
-    walletBridge ?? config.walletBridge ?? MockWalletBridge(),
+    walletBridge ?? config.walletBridge ?? NoOpWalletBridge(),
   );
 
   // 注册 API Hub 桥接
@@ -175,9 +176,9 @@ Future<void> _initializeRemarkService() async {
   try {
     final remarkService = RemarkService.instance;
     await remarkService.initialize();
-    debugPrint('RemarkService initialized successfully');
+    debugLog('RemarkService initialized successfully');
   } catch (e) {
-    debugPrint('Failed to initialize RemarkService: $e');
+    debugLog('Failed to initialize RemarkService: $e');
   }
 }
 
@@ -194,8 +195,8 @@ Future<void> _registerServices(N42ChatConfig config) async {
     } catch (e) {
       // 初始化失败时记录错误，但不阻塞依赖注入
       // 后续在登录/注册时会再次尝试初始化
-      debugPrint('MatrixClientManager: Initial initialization failed: $e');
-      debugPrint('MatrixClientManager: Will retry on login/register');
+      debugLog('MatrixClientManager: Initial initialization failed: $e');
+      debugLog('MatrixClientManager: Will retry on login/register');
     }
   }
   
@@ -282,7 +283,7 @@ Future<void> _registerServices(N42ChatConfig config) async {
           const Duration(seconds: 30),
         );
       } on TimeoutException {
-        debugPrint('DI: MediaMetadataDatabase timed out after 30s, rethrowing for caller to handle');
+        debugLog('DI: MediaMetadataDatabase timed out after 30s, rethrowing for caller to handle');
         rethrow;
       }
     },
@@ -296,7 +297,7 @@ Future<void> _registerServices(N42ChatConfig config) async {
           const Duration(seconds: 30),
         );
       } on TimeoutException {
-        debugPrint('DI: ArchiveDatabase timed out after 30s, rethrowing for caller to handle');
+        debugLog('DI: ArchiveDatabase timed out after 30s, rethrowing for caller to handle');
         rethrow;
       }
     },
@@ -576,7 +577,10 @@ Future<void> _registerDataSources() async {
     getIt.registerLazySingleton<PointsApiDatasource>(
       () => PointsApiDatasource(
         baseUrl: config.pointsApiBaseUrl!,
-        getAccessToken: () => null, // TODO: 从 auth 获取 access token
+        getAccessToken: () {
+          final client = MatrixClientManager.instance.client;
+          return client?.accessToken;
+        },
       ),
       dispose: (ds) => ds.dispose(),
     );
@@ -744,8 +748,12 @@ void _registerRepositories() {
 }
 
 /// 注册用例
+///
+/// 当前架构中 BLoC 直接依赖 Repository，无 UseCase 中间层。
+/// domain/usecases/ 目录尚未创建。如果后续需要引入 UseCase 层
+/// （例如跨 Repository 的业务编排），在此处注册。
 void _registerUseCases() {
-  // TODO: 注册各种UseCase
+  // BLoC → Repository 直连模式，暂无独立 UseCase 需注册
 }
 
 /// 注册BLoC

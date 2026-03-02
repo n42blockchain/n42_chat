@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -8,6 +7,7 @@ import '../../../data/datasources/matrix/matrix_message_datasource.dart';
 import '../../../domain/entities/live_location_entity.dart';
 import 'live_location_event.dart';
 import 'live_location_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 class LiveLocationBloc extends Bloc<LiveLocationEvent, LiveLocationState> {
   final MatrixMessageDataSource _messageDataSource;
@@ -163,7 +163,7 @@ class LiveLocationBloc extends Bloc<LiveLocationEvent, LiveLocationState> {
         accuracy: position.accuracy,
       ));
     } catch (e) {
-      debugPrint('LiveLocationBloc: Failed to get position: $e');
+      debugLog('LiveLocationBloc: Failed to get position: $e');
     }
   }
 

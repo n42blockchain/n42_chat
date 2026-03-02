@@ -1,6 +1,6 @@
+import 'dart:typed_data';
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
 
@@ -13,6 +13,7 @@ import '../datasources/local/preferences_datasource.dart';
 import '../mappers/archived_message_mapper.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_message_datasource.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 消息仓库实现
 class MessageRepositoryImpl implements IMessageRepository {
@@ -63,13 +64,13 @@ class MessageRepositoryImpl implements IMessageRepository {
     var displayableEvents = timeline.events.where((e) => _isDisplayableEvent(e)).toList();
     
     if (displayableEvents.length < limit) {
-      debugPrint('MessageRepositoryImpl: Only ${displayableEvents.length} displayable events, requesting more...');
+      debugLog('MessageRepositoryImpl: Only ${displayableEvents.length} displayable events, requesting more...');
       try {
         await timeline.requestHistory(historyCount: limit * 2);
         displayableEvents = timeline.events.where((e) => _isDisplayableEvent(e)).toList();
-        debugPrint('MessageRepositoryImpl: After requestHistory, ${displayableEvents.length} displayable events');
+        debugLog('MessageRepositoryImpl: After requestHistory, ${displayableEvents.length} displayable events');
       } catch (e) {
-        debugPrint('MessageRepositoryImpl: Failed to request more history: $e');
+        debugLog('MessageRepositoryImpl: Failed to request more history: $e');
       }
     }
 
@@ -89,7 +90,7 @@ class MessageRepositoryImpl implements IMessageRepository {
             limit: limit - messages.length,
           );
           if (archived.isNotEmpty) {
-            debugPrint('MessageRepositoryImpl: Supplemented ${archived.length} messages from archive');
+            debugLog('MessageRepositoryImpl: Supplemented ${archived.length} messages from archive');
             final archivedEntities = _archiveMapper.toEntities(
               archived,
               currentUserId: _client?.userID,
@@ -97,7 +98,7 @@ class MessageRepositoryImpl implements IMessageRepository {
             return [...messages, ...archivedEntities];
           }
         } catch (e) {
-          debugPrint('MessageRepositoryImpl: Archive supplement failed: $e');
+          debugLog('MessageRepositoryImpl: Archive supplement failed: $e');
         }
       }
     }
@@ -144,7 +145,7 @@ class MessageRepositoryImpl implements IMessageRepository {
           yield _messageDataSource.mapEventToMessage(event, room);
         } catch (e) {
           // 事件未找到，跳过
-          debugPrint('Error: $e');
+          debugLog('Error: $e');
         }
       }
     }
@@ -162,12 +163,12 @@ class MessageRepositoryImpl implements IMessageRepository {
     if (timeline == null) return [];
 
     final beforeCount = timeline.events.length;
-    debugPrint('MessageRepositoryImpl: loadMoreMessages - before: $beforeCount events');
+    debugLog('MessageRepositoryImpl: loadMoreMessages - before: $beforeCount events');
 
     await timeline.requestHistory(historyCount: limit);
 
     final afterCount = timeline.events.length;
-    debugPrint('MessageRepositoryImpl: loadMoreMessages - after: $afterCount events (+${afterCount - beforeCount})');
+    debugLog('MessageRepositoryImpl: loadMoreMessages - after: $afterCount events (+${afterCount - beforeCount})');
 
     final messages = _getMessagesFromTimeline(timeline, room);
 
@@ -184,7 +185,7 @@ class MessageRepositoryImpl implements IMessageRepository {
             limit: limit,
           );
           if (archived.isNotEmpty) {
-            debugPrint('MessageRepositoryImpl: Loaded ${archived.length} messages from archive');
+            debugLog('MessageRepositoryImpl: Loaded ${archived.length} messages from archive');
             final archivedEntities = _archiveMapper.toEntities(
               archived,
               currentUserId: _client?.userID,
@@ -192,7 +193,7 @@ class MessageRepositoryImpl implements IMessageRepository {
             return [...messages, ...archivedEntities];
           }
         } catch (e) {
-          debugPrint('MessageRepositoryImpl: Archive fallback failed: $e');
+          debugLog('MessageRepositoryImpl: Archive fallback failed: $e');
         }
       }
     }
@@ -452,7 +453,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       }
       return false;
     } catch (e) {
-      debugPrint('MessageRepositoryImpl: Failed to remove reaction: $e');
+      debugLog('MessageRepositoryImpl: Failed to remove reaction: $e');
       return false;
     }
   }
@@ -476,15 +477,15 @@ class MessageRepositoryImpl implements IMessageRepository {
   @override
   Future<Uint8List?> downloadMedia(String mxcUrl) async {
     try {
-      debugPrint('downloadMedia: Attempting to download from $mxcUrl');
+      debugLog('downloadMedia: Attempting to download from $mxcUrl');
       if (_client == null) {
-        debugPrint('downloadMedia: Client is null');
+        debugLog('downloadMedia: Client is null');
         return null;
       }
 
       // 解析 mxc:// URL
       if (!mxcUrl.startsWith('mxc://')) {
-        debugPrint('downloadMedia: Invalid mxc URL: $mxcUrl');
+        debugLog('downloadMedia: Invalid mxc URL: $mxcUrl');
         return null;
       }
 
@@ -493,7 +494,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
 
       if (serverName.isEmpty || mediaId.isEmpty) {
-        debugPrint('downloadMedia: Invalid mxc URL components: server=$serverName, mediaId=$mediaId');
+        debugLog('downloadMedia: Invalid mxc URL components: server=$serverName, mediaId=$mediaId');
         return null;
       }
 
@@ -502,7 +503,7 @@ class MessageRepositoryImpl implements IMessageRepository {
 
       // 方法1: 使用 Matrix 1.11+ 认证媒体端点 (直接 HTTP 请求)
       final authenticatedUrl = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
-      debugPrint('downloadMedia: Trying authenticated URL: $authenticatedUrl');
+      debugLog('downloadMedia: Trying authenticated URL: $authenticatedUrl');
 
       try {
         final response = await http.get(
@@ -512,18 +513,18 @@ class MessageRepositoryImpl implements IMessageRepository {
           },
         ).timeout(const Duration(seconds: 30));
 
-        debugPrint('downloadMedia: Auth endpoint response: ${response.statusCode}, size: ${response.bodyBytes.length}');
+        debugLog('downloadMedia: Auth endpoint response: ${response.statusCode}, size: ${response.bodyBytes.length}');
 
         if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
           return response.bodyBytes;
         }
       } catch (e) {
-        debugPrint('downloadMedia: Auth endpoint error: $e');
+        debugLog('downloadMedia: Auth endpoint error: $e');
       }
 
       // 方法2: 使用传统媒体端点 v3
       final legacyUrl = '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
-      debugPrint('downloadMedia: Trying legacy v3 URL: $legacyUrl');
+      debugLog('downloadMedia: Trying legacy v3 URL: $legacyUrl');
 
       try {
         final response = await http.get(
@@ -533,50 +534,50 @@ class MessageRepositoryImpl implements IMessageRepository {
           },
         ).timeout(const Duration(seconds: 30));
 
-        debugPrint('downloadMedia: Legacy v3 response: ${response.statusCode}, size: ${response.bodyBytes.length}');
+        debugLog('downloadMedia: Legacy v3 response: ${response.statusCode}, size: ${response.bodyBytes.length}');
 
         if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
           return response.bodyBytes;
         }
       } catch (e) {
-        debugPrint('downloadMedia: Legacy v3 error: $e');
+        debugLog('downloadMedia: Legacy v3 error: $e');
       }
 
       // 方法3: 使用 SDK 的 getDownloadLink (无认证，适用于公开媒体)
-      debugPrint('downloadMedia: Trying SDK getDownloadLink');
+      debugLog('downloadMedia: Trying SDK getDownloadLink');
       try {
         // ignore: deprecated_member_use
         final downloadLink = uri.getDownloadLink(_client!);
-        debugPrint('downloadMedia: SDK download link: $downloadLink');
+        debugLog('downloadMedia: SDK download link: $downloadLink');
 
         final response = await http.get(downloadLink).timeout(const Duration(seconds: 30));
-        debugPrint('downloadMedia: SDK link response: ${response.statusCode}, size: ${response.bodyBytes.length}');
+        debugLog('downloadMedia: SDK link response: ${response.statusCode}, size: ${response.bodyBytes.length}');
 
         if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
           return response.bodyBytes;
         }
       } catch (e) {
-        debugPrint('downloadMedia: SDK link error: $e');
+        debugLog('downloadMedia: SDK link error: $e');
       }
 
       // 方法4: 使用 Matrix SDK httpClient (带自动认证)
-      debugPrint('downloadMedia: Trying Matrix SDK httpClient');
+      debugLog('downloadMedia: Trying Matrix SDK httpClient');
       try {
         final sdkResponse = await _client!.httpClient.get(Uri.parse(authenticatedUrl));
-        debugPrint('downloadMedia: SDK httpClient response: ${sdkResponse.statusCode}, size: ${sdkResponse.bodyBytes.length}');
+        debugLog('downloadMedia: SDK httpClient response: ${sdkResponse.statusCode}, size: ${sdkResponse.bodyBytes.length}');
 
         if (sdkResponse.statusCode == 200 && sdkResponse.bodyBytes.isNotEmpty) {
           return sdkResponse.bodyBytes;
         }
       } catch (e) {
-        debugPrint('downloadMedia: SDK httpClient error: $e');
+        debugLog('downloadMedia: SDK httpClient error: $e');
       }
 
-      debugPrint('downloadMedia: All methods failed');
+      debugLog('downloadMedia: All methods failed');
       return null;
     } catch (e, stackTrace) {
-      debugPrint('downloadMedia: Error downloading media: $e');
-      debugPrint('downloadMedia: Stack trace: $stackTrace');
+      debugLog('downloadMedia: Error downloading media: $e');
+      debugLog('downloadMedia: Stack trace: $stackTrace');
       return null;
     }
   }
@@ -595,11 +596,11 @@ class MessageRepositoryImpl implements IMessageRepository {
     String? thumbnailUrl,
   }) async {
     try {
-      debugPrint('forwardMediaMessage: roomId=$roomId, mxcUrl=$mxcUrl, msgType=$msgType');
+      debugLog('forwardMediaMessage: roomId=$roomId, mxcUrl=$mxcUrl, msgType=$msgType');
 
       final room = _client?.getRoomById(roomId);
       if (room == null) {
-        debugPrint('forwardMediaMessage: Room not found');
+        debugLog('forwardMediaMessage: Room not found');
         return null;
       }
 
@@ -628,15 +629,15 @@ class MessageRepositoryImpl implements IMessageRepository {
         content['filename'] = filename;
       }
 
-      debugPrint('forwardMediaMessage: Sending content: $content');
+      debugLog('forwardMediaMessage: Sending content: $content');
       final eventId = await room.sendEvent(content);
-      debugPrint('forwardMediaMessage: Event sent: $eventId');
+      debugLog('forwardMediaMessage: Event sent: $eventId');
 
       if (eventId == null) return null;
       return _getMessageById(roomId, eventId);
     } catch (e, stackTrace) {
-      debugPrint('forwardMediaMessage: Error: $e');
-      debugPrint('forwardMediaMessage: Stack trace: $stackTrace');
+      debugLog('forwardMediaMessage: Error: $e');
+      debugLog('forwardMediaMessage: Stack trace: $stackTrace');
       return null;
     }
   }
@@ -652,7 +653,7 @@ class MessageRepositoryImpl implements IMessageRepository {
         notice: notice,
       );
     } catch (e) {
-      debugPrint('MessageRepositoryImpl: Failed to send notice: $e');
+      debugLog('MessageRepositoryImpl: Failed to send notice: $e');
       return null;
     }
   }
@@ -668,7 +669,7 @@ class MessageRepositoryImpl implements IMessageRepository {
         userId: userId,
       );
     } catch (e) {
-      debugPrint('MessageRepositoryImpl: Failed to get member pokeText: $e');
+      debugLog('MessageRepositoryImpl: Failed to get member pokeText: $e');
       return null;
     }
   }
@@ -686,7 +687,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     int maxSelections = 1,
   }) async {
     try {
-      debugPrint('MessageRepositoryImpl: Sending poll - question: $question, options: $options');
+      debugLog('MessageRepositoryImpl: Sending poll - question: $question, options: $options');
       final eventId = await _messageDataSource.sendPollMessage(
         roomId,
         question: question,
@@ -694,7 +695,7 @@ class MessageRepositoryImpl implements IMessageRepository {
         maxSelections: maxSelections,
       );
       if (eventId != null) {
-        debugPrint('MessageRepositoryImpl: Poll sent successfully - eventId: $eventId');
+        debugLog('MessageRepositoryImpl: Poll sent successfully - eventId: $eventId');
         
         // 获取发送者名称
         String senderName = '';
@@ -726,7 +727,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       }
       return null;
     } catch (e) {
-      debugPrint('MessageRepositoryImpl: Failed to send poll: $e');
+      debugLog('MessageRepositoryImpl: Failed to send poll: $e');
       rethrow;
     }
   }
@@ -742,7 +743,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     int maxSelections = 1,
   }) async {
     try {
-      debugPrint('MessageRepositoryImpl: Sending forwarded poll snapshot - question: $question');
+      debugLog('MessageRepositoryImpl: Sending forwarded poll snapshot - question: $question');
       final eventId = await _messageDataSource.sendForwardedPollSnapshot(
         roomId,
         question: question,
@@ -753,7 +754,7 @@ class MessageRepositoryImpl implements IMessageRepository {
         maxSelections: maxSelections,
       );
       if (eventId != null) {
-        debugPrint('MessageRepositoryImpl: Forwarded poll sent successfully - eventId: $eventId');
+        debugLog('MessageRepositoryImpl: Forwarded poll sent successfully - eventId: $eventId');
 
         // 获取发送者名称
         String senderName = '';
@@ -790,7 +791,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       }
       return null;
     } catch (e) {
-      debugPrint('MessageRepositoryImpl: Failed to send forwarded poll snapshot: $e');
+      debugLog('MessageRepositoryImpl: Failed to send forwarded poll snapshot: $e');
       rethrow;
     }
   }
@@ -802,14 +803,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     required List<String> selectedOptionIds,
   }) async {
     try {
-      debugPrint('MessageRepositoryImpl: Voting on poll - pollEventId: $pollEventId, options: $selectedOptionIds');
+      debugLog('MessageRepositoryImpl: Voting on poll - pollEventId: $pollEventId, options: $selectedOptionIds');
       return await _messageDataSource.voteOnPoll(
         roomId,
         pollEventId: pollEventId,
         selectedOptionIds: selectedOptionIds,
       );
     } catch (e) {
-      debugPrint('MessageRepositoryImpl: Failed to vote on poll: $e');
+      debugLog('MessageRepositoryImpl: Failed to vote on poll: $e');
       rethrow;
     }
   }
@@ -822,7 +823,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     try {
       return await _messageDataSource.getPollAggregations(roomId, pollEventId);
     } catch (e) {
-      debugPrint('MessageRepositoryImpl: Failed to get poll aggregations: $e');
+      debugLog('MessageRepositoryImpl: Failed to get poll aggregations: $e');
       return null;
     }
   }
@@ -837,7 +838,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     try {
       return await _messageDataSource.endPoll(roomId, pollEventId);
     } catch (e) {
-      debugPrint('MessageRepositoryImpl: Failed to end poll: $e');
+      debugLog('MessageRepositoryImpl: Failed to end poll: $e');
       return false;
     }
   }
@@ -850,7 +851,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     try {
       return await _messageDataSource.getReactionAggregations(roomId, eventId);
     } catch (e) {
-      debugPrint('MessageRepositoryImpl: Failed to get reaction aggregations: $e');
+      debugLog('MessageRepositoryImpl: Failed to get reaction aggregations: $e');
       return null;
     }
   }
@@ -863,7 +864,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     Map<String, dynamic>? additionalData,
   }) async {
     try {
-      debugPrint('MessageRepositoryImpl: Sending custom message - type: $msgType');
+      debugLog('MessageRepositoryImpl: Sending custom message - type: $msgType');
       
       // 构建消息内容
       final messageContent = <String, dynamic>{
@@ -878,7 +879,7 @@ class MessageRepositoryImpl implements IMessageRepository {
         content: messageContent,
       );
     } catch (e) {
-      debugPrint('MessageRepositoryImpl: Failed to send custom message: $e');
+      debugLog('MessageRepositoryImpl: Failed to send custom message: $e');
       rethrow;
     }
   }
@@ -903,7 +904,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     while (_timelines.length >= _maxTimelineCacheSize && _timelineAccessOrder.isNotEmpty) {
       final oldestRoomId = _timelineAccessOrder.removeAt(0);
       _timelines.remove(oldestRoomId);
-      debugPrint('MessageRepositoryImpl: Evicted timeline cache for room $oldestRoomId (LRU)');
+      debugLog('MessageRepositoryImpl: Evicted timeline cache for room $oldestRoomId (LRU)');
     }
 
     final timeline = await room.getTimeline();
@@ -913,12 +914,12 @@ class MessageRepositoryImpl implements IMessageRepository {
     // 优化：降低阈值和请求数量，减少约 60% 网络请求
     // 大多数场景下 20 条消息已足够首屏显示
     if (requestHistory && timeline.events.length < 20) {
-      debugPrint('MessageRepositoryImpl: Timeline has ${timeline.events.length} events, requesting more history...');
+      debugLog('MessageRepositoryImpl: Timeline has ${timeline.events.length} events, requesting more history...');
       try {
         await timeline.requestHistory(historyCount: 30);
-        debugPrint('MessageRepositoryImpl: After requestHistory, timeline has ${timeline.events.length} events');
+        debugLog('MessageRepositoryImpl: After requestHistory, timeline has ${timeline.events.length} events');
       } catch (e) {
-        debugPrint('MessageRepositoryImpl: Failed to request history: $e');
+        debugLog('MessageRepositoryImpl: Failed to request history: $e');
       }
     }
 
@@ -971,7 +972,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       final (_, cachedAt) = value;
       return now.difference(cachedAt) >= _messageCacheExpiry;
     });
-    debugPrint('MessageRepositoryImpl: Cleaned message cache, remaining: ${_messageEntityCache.length}');
+    debugLog('MessageRepositoryImpl: Cleaned message cache, remaining: ${_messageEntityCache.length}');
   }
 
   Future<MessageEntity?> _getMessageById(String roomId, String eventId) async {
@@ -1094,21 +1095,21 @@ class MessageRepositoryImpl implements IMessageRepository {
 
       if (expiredMessageIds.isEmpty) return;
 
-      debugPrint('MessageRepositoryImpl: Destroying ${expiredMessageIds.length} expired messages');
+      debugLog('MessageRepositoryImpl: Destroying ${expiredMessageIds.length} expired messages');
 
       // 撤回过期消息
       for (final messageId in expiredMessageIds) {
         try {
           await redactMessage(roomId, messageId, reason: 'Self-destructed');
         } catch (e) {
-          debugPrint('MessageRepositoryImpl: Failed to redact message $messageId: $e');
+          debugLog('MessageRepositoryImpl: Failed to redact message $messageId: $e');
         }
       }
 
       // 清除销毁时间记录
       await _secureStorage.clearMessageDestructionTimes(roomId, expiredMessageIds);
     } catch (e) {
-      debugPrint('MessageRepositoryImpl: Error destroying expired messages: $e');
+      debugLog('MessageRepositoryImpl: Error destroying expired messages: $e');
     }
   }
 

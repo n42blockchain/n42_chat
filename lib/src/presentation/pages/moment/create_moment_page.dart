@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -15,6 +16,7 @@ import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
 import 'visibility_selection_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 const _kLastVisibilityKey = 'moment_last_visibility';
 
@@ -55,7 +57,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
         }
       }
     } catch (e) {
-      debugPrint('Failed to load last visibility: $e');
+      debugLog('Failed to load last visibility: $e');
     }
   }
 
@@ -64,7 +66,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_kLastVisibilityKey, v.name);
     } catch (e) {
-      debugPrint('Failed to save last visibility: $e');
+      debugLog('Failed to save last visibility: $e');
     }
   }
 
@@ -410,7 +412,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
           timeMs: 0,
         );
       } catch (e) {
-        debugPrint('Failed to extract video thumbnail: $e');
+        debugLog('Failed to extract video thumbnail: $e');
       }
 
       setState(() {
@@ -427,15 +429,32 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
   }
 
   Future<void> _selectLocation() async {
-    // TODO: 实现位置选择
-    // 暂时使用模拟数据
-    setState(() {
-      _location = const MomentLocation(
-        latitude: 39.9042,
-        longitude: 116.4074,
-        name: 'Beijing',
+    try {
+      final permission = await Geolocator.checkPermission();
+      final resolved = (permission == LocationPermission.denied)
+          ? await Geolocator.requestPermission()
+          : permission;
+      if (resolved == LocationPermission.deniedForever ||
+          resolved == LocationPermission.denied) {
+        debugLog('_selectLocation: location permission denied');
+        setState(() => _location = null);
+        return;
+      }
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+        ),
       );
-    });
+      setState(() {
+        _location = MomentLocation(
+          latitude: pos.latitude,
+          longitude: pos.longitude,
+        );
+      });
+    } catch (e) {
+      debugLog('_selectLocation error: $e');
+      setState(() => _location = null);
+    }
   }
 
   void _selectVisibility() {
@@ -514,7 +533,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
     try {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     final result = await Navigator.of(context).push<List<String>>(

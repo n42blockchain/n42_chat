@@ -7,6 +7,7 @@ import '../../domain/entities/on_chain_notification_entity.dart';
 import '../../domain/repositories/on_chain_notification_repository.dart';
 import '../../integration/wallet_bridge.dart';
 import 'in_app_notification_service.dart';
+import '../utils/debug_log.dart';
 
 /// 通知类型过滤器
 ///
@@ -146,7 +147,7 @@ class OnChainNotificationService {
         }
       }
     } catch (e) {
-      debugPrint('OnChainNotificationService: poll error: $e');
+      debugLog('OnChainNotificationService: poll error: $e');
     } finally {
       _pollInProgress = false;
     }
@@ -161,7 +162,7 @@ class OnChainNotificationService {
         try {
           await launchUrl(uri, mode: LaunchMode.externalApplication);
         } catch (e) {
-          debugPrint('OnChainNotificationService: Failed to launch URL: $e');
+          debugLog('OnChainNotificationService: Failed to launch URL: $e');
         }
       }
     } else {

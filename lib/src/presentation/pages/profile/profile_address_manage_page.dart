@@ -5,6 +5,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 class AddressManagePage extends StatefulWidget {
   const AddressManagePage({super.key});
@@ -53,7 +54,7 @@ class AddressManagePageState extends State<AddressManagePage> {
             return;
           }
         } catch (e) {
-          debugPrint('No saved addresses: $e');
+          debugLog('No saved addresses: $e');
         }
       }
       
@@ -61,7 +62,7 @@ class AddressManagePageState extends State<AddressManagePage> {
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint('Load addresses error: $e');
+      debugLog('Load addresses error: $e');
       setState(() {
         _isLoading = false;
       });
@@ -87,10 +88,10 @@ class AddressManagePageState extends State<AddressManagePage> {
           'n42.user.addresses',
           {'addresses': addressList},
         );
-        debugPrint('Addresses saved successfully');
+        debugLog('Addresses saved successfully');
       }
     } catch (e) {
-      debugPrint('Save addresses error: $e');
+      debugLog('Save addresses error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${S.of(context)?.profileSaveAddressFailed ?? 'Save address failed'}: $e')),

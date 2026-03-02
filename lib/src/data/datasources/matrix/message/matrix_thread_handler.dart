@@ -1,9 +1,10 @@
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../../domain/entities/message_entity.dart';
 import '../matrix_client_manager.dart';
 import 'matrix_event_mapper.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// Matrix 消息线程处理器 (MSC3440)
 ///
@@ -159,7 +160,7 @@ class MatrixThreadHandler {
           );
           messages.add(_eventMapper.mapEventToMessage(event, room));
         } catch (e) {
-          debugPrint('ThreadMessages: Failed to parse event: $e');
+          debugLog('ThreadMessages: Failed to parse event: $e');
         }
       }
 
@@ -167,7 +168,7 @@ class MatrixThreadHandler {
       messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
       return messages;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to get thread messages: $e');
+      debugLog('MatrixMessageDataSource: Failed to get thread messages: $e');
       // 回退方案：从 timeline 过滤线程消息
       return _getThreadMessagesFromTimeline(room, threadRootEventId);
     }
@@ -187,10 +188,10 @@ class MatrixThreadHandler {
       // SDK 6.0 does not expose a synchronous timeline accessor.
       // The /relations API in getThreadMessages() is the primary path.
       // This fallback returns empty and logs a warning.
-      debugPrint('MatrixMessageDataSource: Timeline fallback not available in SDK 6.0, '
+      debugLog('MatrixMessageDataSource: Timeline fallback not available in SDK 6.0, '
           'returning empty thread results for $threadRootEventId');
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Fallback thread fetch failed: $e');
+      debugLog('MatrixMessageDataSource: Fallback thread fetch failed: $e');
     }
     messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return messages;
@@ -237,13 +238,13 @@ class MatrixThreadHandler {
           );
           messages.add(_eventMapper.mapEventToMessage(event, room));
         } catch (e) {
-          debugPrint('ThreadRoots: Failed to parse event: $e');
+          debugLog('ThreadRoots: Failed to parse event: $e');
         }
       }
 
       return messages;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to get thread roots: $e');
+      debugLog('MatrixMessageDataSource: Failed to get thread roots: $e');
       return [];
     }
   }

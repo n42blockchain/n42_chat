@@ -69,6 +69,62 @@ String resolveBlocMessage(BuildContext context, String key) {
     case BlocMessageKeys.paymentFailed:
       return l10n.blocPaymentFailed;
 
+    // Auth — password
+    case BlocMessageKeys.authSendVerificationCodeFailed:
+      return l10n.blocAuthSendVerificationCodeFailed;
+    case BlocMessageKeys.authServerNoEmailPasswordReset:
+      return l10n.blocAuthServerNoEmailPasswordReset;
+    case BlocMessageKeys.authResetPasswordFailed:
+      return l10n.blocAuthResetPasswordFailed;
+    case BlocMessageKeys.authChangePasswordFailed:
+      return l10n.blocAuthChangePasswordFailed;
+    case BlocMessageKeys.authOldPasswordWrong:
+      return l10n.blocAuthOldPasswordWrong;
+
+    // Auth — social login
+    case BlocMessageKeys.authLoginCancelled:
+      return l10n.blocAuthLoginCancelled;
+    case BlocMessageKeys.authGoogleLoginFailed:
+      return l10n.blocAuthGoogleLoginFailed;
+    case BlocMessageKeys.authAppleLoginFailed:
+      return l10n.blocAuthAppleLoginFailed;
+    case BlocMessageKeys.authSsoLoginFailed:
+      return l10n.blocAuthSsoLoginFailed;
+    case BlocMessageKeys.authFacebookLoginFailed:
+      return l10n.blocAuthFacebookLoginFailed;
+    case BlocMessageKeys.authTwitterLoginFailed:
+      return l10n.blocAuthTwitterLoginFailed;
+    case BlocMessageKeys.authWeChatLoginFailed:
+      return l10n.blocAuthWeChatLoginFailed;
+    case BlocMessageKeys.authWeChatNotConfigured:
+      return l10n.blocAuthWeChatNotConfigured;
+    case BlocMessageKeys.authWeChatNotInstalled:
+      return l10n.blocAuthWeChatNotInstalled;
+
+    // Auth — email
+    case BlocMessageKeys.authPasswordWrong:
+      return l10n.blocAuthPasswordWrong;
+    case BlocMessageKeys.authEmailAlreadyBound:
+      return l10n.blocAuthEmailAlreadyBound;
+    case BlocMessageKeys.authChangeEmailFailed:
+      return l10n.blocAuthChangeEmailFailed;
+    case BlocMessageKeys.authVerificationCodeInvalid:
+      return l10n.blocAuthVerificationCodeInvalid;
+
+    // Auth — session
+    case BlocMessageKeys.authSessionExpired:
+      return l10n.blocAuthSessionExpired;
+    case BlocMessageKeys.authSessionIncomplete:
+      return l10n.blocAuthSessionIncomplete;
+
+    // Auth — unimplemented
+    case BlocMessageKeys.authPasskeyNotImplemented:
+      return l10n.blocAuthPasskeyNotImplemented;
+    case BlocMessageKeys.authPasskeyRegisterNotImplemented:
+      return l10n.blocAuthPasskeyRegisterNotImplemented;
+    case BlocMessageKeys.authEmailOtpNotImplemented:
+      return l10n.blocAuthEmailOtpNotImplemented;
+
     default:
       return key;
   }

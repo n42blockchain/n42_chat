@@ -23,6 +23,7 @@ import '../../widgets/common/common_widgets.dart';
 import '../chat/chat_page.dart';
 import '../group/create_group_page.dart';
 import 'contact_tile.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 通讯录页面（仿微信）
 class ContactListPage extends StatefulWidget {
@@ -716,7 +717,7 @@ ID：${contact.userId}''';
         );
       }
     } catch (e) {
-      debugPrint('Recommend to friend error: $e');
+      debugLog('Recommend to friend error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -823,7 +824,7 @@ ID：${contact.userId}''';
         ),
       ));
     } catch (e) {
-      debugPrint('Start chat error: $e');
+      debugLog('Start chat error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1909,7 +1910,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
         });
       }
     } catch (e) {
-      debugPrint('Failed to load contacts: $e');
+      debugLog('Failed to load contacts: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;

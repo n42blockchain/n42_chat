@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/ringtone/system_ringtone_service.dart';
+import '../../../core/utils/debug_log.dart';
 
 class RingtoneSelectPage extends StatefulWidget {
   final String currentRingtone;
@@ -87,7 +88,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
         });
       }
     } catch (e) {
-      debugPrint('加载铃声失败: $e');
+      debugLog('加载铃声失败: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -201,7 +202,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
         await _stopRingtone();
       }
     } catch (e) {
-      debugPrint('播放铃声失败: $e');
+      debugLog('播放铃声失败: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -222,7 +223,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
     try {
       await _ringtoneService.stopRingtone();
     } catch (e) {
-      debugPrint('停止铃声失败: $e');
+      debugLog('停止铃声失败: $e');
     }
     if (mounted && _playingRingtone != null) {
       setState(() {

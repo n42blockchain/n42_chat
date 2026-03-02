@@ -1,11 +1,12 @@
+import 'dart:ui';
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../data/datasources/local/preferences_datasource.dart';
 import 'ai_service.dart';
+import '../utils/debug_log.dart';
 
 /// 翻译服务接口
 abstract class ITranslationService {
@@ -150,7 +151,7 @@ class GoogleTranslationService implements ITranslationService {
 
       return TranslationResult.error('Translation failed: ${response.statusCode}');
     } catch (e) {
-      debugPrint('Translation error: $e');
+      debugLog('Translation error: $e');
       return TranslationResult.error('Translation failed: $e');
     }
   }
@@ -256,7 +257,7 @@ class AiTranslationService implements ITranslationService {
         targetLanguage: targetLanguage,
       );
     } catch (e) {
-      debugPrint('AiTranslationService: Translation error: $e');
+      debugLog('AiTranslationService: Translation error: $e');
       return TranslationResult.error('Translation failed: $e');
     }
   }

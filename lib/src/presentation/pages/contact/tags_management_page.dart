@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 标签管理页面
 class TagsManagementPage extends StatefulWidget {
@@ -46,7 +47,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
         final List<dynamic> list = jsonDecode(tagsJson) as List<dynamic>;
         _tags = list.map((e) => TagData.fromJson(e as Map<String, dynamic>)).toList();
       } catch (e) {
-        debugPrint('Failed to load tags: $e');
+        debugLog('Failed to load tags: $e');
       }
     }
     if (mounted) {

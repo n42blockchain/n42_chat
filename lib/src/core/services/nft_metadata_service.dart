@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../utils/debug_log.dart';
 
 /// NFT 元数据解析服务
 ///
@@ -43,10 +43,10 @@ class NftMetadataService {
       if (response.statusCode == 200) {
         return json.decode(response.body) as Map<String, dynamic>;
       }
-      debugPrint('NftMetadataService: HTTP ${response.statusCode} for $resolvedUrl');
+      debugLog('NftMetadataService: HTTP ${response.statusCode} for $resolvedUrl');
       return null;
     } catch (e) {
-      debugPrint('NftMetadataService: Failed to fetch metadata from $tokenUri: $e');
+      debugLog('NftMetadataService: Failed to fetch metadata from $tokenUri: $e');
       return null;
     }
   }
@@ -72,7 +72,7 @@ class NftMetadataService {
 
       return resolveUri(imageField);
     } catch (e) {
-      debugPrint('NftMetadataService: Failed to resolve image URL: $e');
+      debugLog('NftMetadataService: Failed to resolve image URL: $e');
       return null;
     }
   }
@@ -135,7 +135,7 @@ class NftMetadataService {
       }
       return null;
     } catch (e) {
-      debugPrint('NftMetadataService: Failed to decode data URI: $e');
+      debugLog('NftMetadataService: Failed to decode data URI: $e');
       return null;
     }
   }

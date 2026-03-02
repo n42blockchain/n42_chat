@@ -12,6 +12,7 @@ import 'package:n42_chat/src/core/di/injection.dart';
 import 'package:n42_chat/src/core/services/sync_optimization_service.dart';
 import 'package:n42_chat/src/core/utils/io_helper.dart' as io_helper;
 import 'package:n42_chat/src/n42_chat_config.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Matrix客户端管理器
 ///
@@ -76,13 +77,13 @@ class MatrixClientManager {
     N42ChatConfig? config,
   }) async {
     if (_isInitialized && !forceReinit) {
-      debugPrint('MatrixClientManager: Already initialized');
+      debugLog('MatrixClientManager: Already initialized');
       return;
     }
 
     // 如果强制重新初始化，先清理旧的客户端
     if (forceReinit && _client != null) {
-      debugPrint('MatrixClientManager: Force reinitializing, disposing old client...');
+      debugLog('MatrixClientManager: Force reinitializing, disposing old client...');
       // 若有进行中的 Completer，先令其以错误终止，避免等待者永久挂起
       if (_initCompleter != null && !_initCompleter!.isCompleted) {
         _initCompleter!.completeError(
@@ -94,7 +95,7 @@ class MatrixClientManager {
       try {
         await _client!.dispose();
       } catch (e) {
-        debugPrint('MatrixClientManager: Error disposing old client: $e');
+        debugLog('MatrixClientManager: Error disposing old client: $e');
       }
       _client = null;
       _isInitialized = false;
@@ -102,7 +103,7 @@ class MatrixClientManager {
 
     // 防止并发初始化：第二次调用等待第一次完成
     if (_initCompleter != null) {
-      debugPrint('MatrixClientManager: Already initializing, waiting for completion...');
+      debugLog('MatrixClientManager: Already initializing, waiting for completion...');
       return _initCompleter!.future;
     }
 
@@ -115,9 +116,9 @@ class MatrixClientManager {
       if (!_vodozemacInitialized) {
         await vodozemac.init();
         _vodozemacInitialized = true;
-        debugPrint('MatrixClientManager: vodozemac initialized');
+        debugLog('MatrixClientManager: vodozemac initialized');
       } else {
-        debugPrint('MatrixClientManager: vodozemac already initialized, skipping');
+        debugLog('MatrixClientManager: vodozemac already initialized, skipping');
       }
 
       // 获取数据库路径
@@ -128,21 +129,21 @@ class MatrixClientManager {
         dbPath = await _getDefaultDatabasePath();
       }
 
-      debugPrint('MatrixClientManager: Using database path: $dbPath');
+      debugLog('MatrixClientManager: Using database path: $dbPath');
 
       // 确保数据库目录存在（仅在非 Web 平台）
       if (!kIsWeb && dbPath.isNotEmpty) {
         try {
           await io_helper.ensureDirectoryExists(dbPath);
-          debugPrint('MatrixClientManager: Created database directory');
+          debugLog('MatrixClientManager: Created database directory');
         } catch (e) {
-          debugPrint('MatrixClientManager: Could not create directory: $e');
+          debugLog('MatrixClientManager: Could not create directory: $e');
         }
       }
 
       // 使用 MatrixSdkDatabase（Matrix 6.0 推荐，基于 drift/sqlite）
       // 原生平台必须先打开 sqflite Database 再传入 MatrixSdkDatabase.init()
-      debugPrint('MatrixClientManager: Creating MatrixSdkDatabase...');
+      debugLog('MatrixClientManager: Creating MatrixSdkDatabase...');
       DatabaseApi database;
       if (kIsWeb) {
         database = await MatrixSdkDatabase.init(clientName);
@@ -182,25 +183,25 @@ class MatrixClientManager {
       // waitForFirstSync: false  → 不阻塞网络同步（快速启动）
       // waitUntilLoadCompletedLoaded: true → 必须等待本地数据库加载完成
       //   确保之前缓存的房间/消息可用，否则 UI 会显示空列表
-      debugPrint('MatrixClientManager: Starting client init...');
+      debugLog('MatrixClientManager: Starting client init...');
       await _client!.init(
         waitForFirstSync: false,
         waitUntilLoadCompletedLoaded: true,
       );
 
       _isInitialized = true;
-      debugPrint('MatrixClientManager: Initialized successfully');
-      debugPrint('MatrixClientManager: Logged in: $isLoggedIn, rooms: ${_client!.rooms.length}');
+      debugLog('MatrixClientManager: Initialized successfully');
+      debugLog('MatrixClientManager: Logged in: $isLoggedIn, rooms: ${_client!.rooms.length}');
       _initCompleter!.complete();
     } catch (e, stack) {
-      debugPrint('MatrixClientManager: Initialize failed: $e');
-      debugPrint('Stack: $stack');
+      debugLog('MatrixClientManager: Initialize failed: $e');
+      debugLog('Stack: $stack');
       // 清理失败的初始化
       if (_client != null) {
         try {
           await _client!.dispose();
         } catch (e) {
-          debugPrint('Error: $e');
+          debugLog('Error: $e');
         }
         _client = null;
       }
@@ -226,14 +227,14 @@ class MatrixClientManager {
       final dbDir = p.join(dir.path, 'n42_chat_db');
       return dbDir;
     } catch (e) {
-      debugPrint('MatrixClientManager: Failed to get documents directory: $e');
+      debugLog('MatrixClientManager: Failed to get documents directory: $e');
       // 尝试使用应用支持目录
       try {
         final supportDir = await getApplicationSupportDirectory();
         final dbDir = p.join(supportDir.path, 'n42_chat_db');
         return dbDir;
       } catch (e2) {
-        debugPrint('MatrixClientManager: Failed to get support directory: $e2');
+        debugLog('MatrixClientManager: Failed to get support directory: $e2');
         return '';
       }
     }
@@ -274,10 +275,10 @@ class MatrixClientManager {
           medium: 'email',
           address: username,
         );
-        debugPrint('MatrixClientManager: Using email identifier for login');
+        debugLog('MatrixClientManager: Using email identifier for login');
       } else {
         identifier = AuthenticationUserIdentifier(user: username);
-        debugPrint('MatrixClientManager: Using username identifier for login');
+        debugLog('MatrixClientManager: Using username identifier for login');
       }
 
       // 登录
@@ -288,10 +289,10 @@ class MatrixClientManager {
         initialDeviceDisplayName: deviceName ?? 'N42Chat',
       );
 
-      debugPrint('MatrixClientManager: Login successful - ${response.userId}');
+      debugLog('MatrixClientManager: Login successful - ${response.userId}');
       return response;
     } catch (e) {
-      debugPrint('MatrixClientManager: Login failed: $e');
+      debugLog('MatrixClientManager: Login failed: $e');
       rethrow;
     }
   }
@@ -313,7 +314,7 @@ class MatrixClientManager {
     // 如果 SDK 已使用相同用户登录（从自身 SQLite DB 恢复），跳过二次 init
     // 二次 init 会短暂重置状态，造成不必要的开销和潜在竞态
     if (isLoggedIn && this.userId == userId) {
-      debugPrint('MatrixClientManager: Already logged in as $userId, skipping re-init');
+      debugLog('MatrixClientManager: Already logged in as $userId, skipping re-init');
       return;
     }
 
@@ -331,9 +332,9 @@ class MatrixClientManager {
         waitForFirstSync: false,
       );
 
-      debugPrint('MatrixClientManager: Token login successful - $userId');
+      debugLog('MatrixClientManager: Token login successful - $userId');
     } catch (e) {
-      debugPrint('MatrixClientManager: Token login failed: $e');
+      debugLog('MatrixClientManager: Token login failed: $e');
       rethrow;
     }
   }
@@ -344,9 +345,9 @@ class MatrixClientManager {
 
     try {
       await _client!.logout();
-      debugPrint('MatrixClientManager: Logout successful');
+      debugLog('MatrixClientManager: Logout successful');
     } catch (e) {
-      debugPrint('MatrixClientManager: Logout failed: $e');
+      debugLog('MatrixClientManager: Logout failed: $e');
       // 即使登出失败也清理本地状态
     }
   }
@@ -371,14 +372,14 @@ class MatrixClientManager {
       // 配置同步过滤器（timeline.limit:30 + lazy_load_members）
       try {
         if (!getIt.isRegistered<SyncOptimizationService>()) {
-          debugPrint('MatrixClientManager: SyncOptimizationService not registered, skipping filter config');
+          debugLog('MatrixClientManager: SyncOptimizationService not registered, skipping filter config');
         } else {
         final syncService = getIt<SyncOptimizationService>();
         await syncService.configureOptimalSyncFilter();
-        debugPrint('MatrixClientManager: Sync filter configured');
+        debugLog('MatrixClientManager: Sync filter configured');
         }
       } catch (e) {
-        debugPrint('MatrixClientManager: Failed to configure sync filter (non-fatal): $e');
+        debugLog('MatrixClientManager: Failed to configure sync filter (non-fatal): $e');
       }
 
       // 启动后台同步循环
@@ -387,16 +388,16 @@ class MatrixClientManager {
       // 等待首次同步完成，确保从服务器获取最新的房间和消息数据
       // 如果本地数据库已有缓存（prevBatch != null），同步会增量获取
       // 如果是全新登录（prevBatch == null），同步会获取完整初始数据
-      debugPrint('MatrixClientManager: Sync enabled, waiting for first sync response...');
+      debugLog('MatrixClientManager: Sync enabled, waiting for first sync response...');
       try {
         await _client!.onSync.stream.first.timeout(timeout);
-        debugPrint('MatrixClientManager: First sync completed, rooms: ${_client!.rooms.length}');
+        debugLog('MatrixClientManager: First sync completed, rooms: ${_client!.rooms.length}');
       } on TimeoutException {
-        debugPrint('MatrixClientManager: First sync timed out after $timeout, '
+        debugLog('MatrixClientManager: First sync timed out after $timeout, '
             'continuing with ${_client!.rooms.length} cached rooms');
       }
     } catch (e) {
-      debugPrint('MatrixClientManager: Start sync failed: $e');
+      debugLog('MatrixClientManager: Start sync failed: $e');
       rethrow;
     }
   }
@@ -405,7 +406,7 @@ class MatrixClientManager {
   void stopSync() {
     if (_client != null) {
       _client!.backgroundSync = false;
-      debugPrint('MatrixClientManager: Sync stopped');
+      debugLog('MatrixClientManager: Sync stopped');
     }
   }
 
@@ -503,23 +504,23 @@ class MatrixClientManager {
   /// 1. 先上传文件到 Matrix 服务器获取 mxc:// URI
   /// 2. 然后调用 setAvatar 设置用户头像
   Future<void> setAvatar(Uint8List avatarBytes, String filename) async {
-    debugPrint('=== MatrixClientManager.setAvatar start ===');
-    debugPrint('filename: $filename');
-    debugPrint('avatarBytes.length: ${avatarBytes.length}');
+    debugLog('=== MatrixClientManager.setAvatar start ===');
+    debugLog('filename: $filename');
+    debugLog('avatarBytes.length: ${avatarBytes.length}');
     
     _ensureInitialized();
     _ensureLoggedIn();
 
     // 检查文件是否为空
     if (avatarBytes.isEmpty) {
-      debugPrint('ERROR: Avatar bytes is empty');
+      debugLog('ERROR: Avatar bytes is empty');
       throw Exception('头像数据为空');
     }
     
     // 检查文件大小（限制 10MB）
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (avatarBytes.length > maxSize) {
-      debugPrint('ERROR: Avatar too large: ${avatarBytes.length} bytes');
+      debugLog('ERROR: Avatar too large: ${avatarBytes.length} bytes');
       throw Exception('头像文件过大，最大支持 10MB');
     }
 
@@ -544,13 +545,13 @@ class MatrixClientManager {
       actualFilename = actualFilename.replaceAll(RegExp(r'\.(heic|heif)$', caseSensitive: false), '.jpg');
     }
     
-    debugPrint('Final filename: $actualFilename');
-    debugPrint('Final mimeType: $mimeType');
-    debugPrint('User ID: ${_client!.userID}');
+    debugLog('Final filename: $actualFilename');
+    debugLog('Final mimeType: $mimeType');
+    debugLog('User ID: ${_client!.userID}');
     
     try {
       // 直接使用 SDK 的 uploadContent 方法（最可靠）
-      debugPrint('Uploading avatar with SDK uploadContent...');
+      debugLog('Uploading avatar with SDK uploadContent...');
       Uri? mxcUri;
       
       try {
@@ -559,11 +560,11 @@ class MatrixClientManager {
           filename: actualFilename,
           contentType: mimeType,
         );
-        debugPrint('SDK upload successful: $mxcUri');
+        debugLog('SDK upload successful: $mxcUri');
       } catch (sdkError) {
-        debugPrint('SDK uploadContent failed: $sdkError');
+        debugLog('SDK uploadContent failed: $sdkError');
         // 尝试手动上传
-        debugPrint('Trying manual upload...');
+        debugLog('Trying manual upload...');
         mxcUri = await _uploadContentAuthenticated(
           avatarBytes,
           filename: actualFilename,
@@ -575,25 +576,25 @@ class MatrixClientManager {
         throw Exception('上传头像失败');
       }
       
-      debugPrint('Avatar uploaded: $mxcUri');
+      debugLog('Avatar uploaded: $mxcUri');
       
       // 设置头像 URL
-      debugPrint('Setting avatar URL...');
+      debugLog('Setting avatar URL...');
       await _client!.setProfileField(
         _client!.userID!,
         'avatar_url',
         {'avatar_url': mxcUri.toString()},
       );
-      debugPrint('Avatar URL set successfully');
+      debugLog('Avatar URL set successfully');
       
       // 验证头像是否设置成功
       final profile = await _client!.getProfileFromUserId(_client!.userID!);
-      debugPrint('New avatar URL: ${profile.avatarUrl}');
+      debugLog('New avatar URL: ${profile.avatarUrl}');
       
-      debugPrint('=== setAvatar completed successfully ===');
+      debugLog('=== setAvatar completed successfully ===');
     } catch (e, stackTrace) {
-      debugPrint('=== setAvatar ERROR: $e ===');
-      debugPrint('Stack: $stackTrace');
+      debugLog('=== setAvatar ERROR: $e ===');
+      debugLog('Stack: $stackTrace');
       rethrow;
     }
   }
@@ -610,10 +611,10 @@ class MatrixClientManager {
       final hasUnstableFeature = 
           versionsResponse.unstableFeatures?['org.matrix.msc3916.stable'] == true;
       
-      debugPrint('MatrixClientManager: supportsV111=$supportsV111, hasUnstableFeature=$hasUnstableFeature');
+      debugLog('MatrixClientManager: supportsV111=$supportsV111, hasUnstableFeature=$hasUnstableFeature');
       return supportsV111 || hasUnstableFeature;
     } catch (e) {
-      debugPrint('MatrixClientManager: Error checking authenticated media support: $e');
+      debugLog('MatrixClientManager: Error checking authenticated media support: $e');
       return false;
     }
   }
@@ -653,7 +654,7 @@ class MatrixClientManager {
     }
 
     final supportsAuth = await _supportsAuthenticatedMedia();
-    debugPrint('MatrixClientManager: supportsAuthenticatedMedia=$supportsAuth');
+    debugLog('MatrixClientManager: supportsAuthenticatedMedia=$supportsAuth');
     
     // 根据服务器能力选择端点
     final path = supportsAuth 
@@ -664,9 +665,9 @@ class MatrixClientManager {
       queryParameters: filename != null ? {'filename': filename} : null,
     );
     
-    debugPrint('MatrixClientManager: Uploading to: $uri');
-    debugPrint('MatrixClientManager: Content size: ${content.length} bytes');
-    debugPrint('MatrixClientManager: Content type: $contentType');
+    debugLog('MatrixClientManager: Uploading to: $uri');
+    debugLog('MatrixClientManager: Content size: ${content.length} bytes');
+    debugLog('MatrixClientManager: Content type: $contentType');
     
     final request = http.Request('POST', uri);
     request.headers['Authorization'] = 'Bearer ${_client!.accessToken}';
@@ -683,23 +684,23 @@ class MatrixClientManager {
       );
       final response = await http.Response.fromStream(streamedResponse);
 
-      debugPrint('MatrixClientManager: Upload response status: ${response.statusCode}');
+      debugLog('MatrixClientManager: Upload response status: ${response.statusCode}');
       
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         final contentUri = json['content_uri'] as String?;
         if (contentUri != null) {
-          debugPrint('MatrixClientManager: Upload successful: $contentUri');
+          debugLog('MatrixClientManager: Upload successful: $contentUri');
           return Uri.parse(contentUri);
         }
       }
       
       // 上传失败，打印错误信息
-      debugPrint('MatrixClientManager: Upload failed: ${response.body}');
+      debugLog('MatrixClientManager: Upload failed: ${response.body}');
       
       // 如果使用认证端点失败，尝试传统端点
       if (supportsAuth && response.statusCode == 403) {
-        debugPrint('MatrixClientManager: Auth endpoint failed, trying legacy endpoint...');
+        debugLog('MatrixClientManager: Auth endpoint failed, trying legacy endpoint...');
         return _uploadContentLegacy(content, filename: filename, contentType: contentType);
       }
       
@@ -710,11 +711,11 @@ class MatrixClientManager {
         final error = errorJson['error'] as String?;
         throw Exception('Upload failed: $errcode - $error');
       } catch (e) {
-        debugPrint('Error: $e');
+        debugLog('Error: $e');
         throw Exception('Upload failed with status ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('MatrixClientManager: Upload error: $e');
+      debugLog('MatrixClientManager: Upload error: $e');
       rethrow;
     } finally {
       httpClient.close();
@@ -733,7 +734,7 @@ class MatrixClientManager {
       queryParameters: filename != null ? {'filename': filename} : null,
     );
     
-    debugPrint('MatrixClientManager: Uploading (legacy) to: $uri');
+    debugLog('MatrixClientManager: Uploading (legacy) to: $uri');
     
     final request = http.Request('POST', uri);
     request.headers['Authorization'] = 'Bearer ${_client!.accessToken}';
@@ -762,7 +763,7 @@ class MatrixClientManager {
       }
     }
     
-    debugPrint('MatrixClientManager: Legacy upload failed: ${response.body}');
+    debugLog('MatrixClientManager: Legacy upload failed: ${response.body}');
     return null;
   }
 
@@ -780,7 +781,7 @@ class MatrixClientManager {
     }
 
     _isInitialized = false;
-    debugPrint('MatrixClientManager: Disposed');
+    debugLog('MatrixClientManager: Disposed');
   }
 
   // ============================================

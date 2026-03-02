@@ -92,6 +92,8 @@ import '../../../domain/entities/bot_command_entity.dart';
 import '../../../integration/bridge/bridge_platform.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../group/group_topics_page.dart';
+import '../group/bot_settings_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 part 'chat_page_app_bar.dart';
 part 'chat_page_message_list.dart';
@@ -235,7 +237,7 @@ class _ChatPageState extends State<ChatPage> {
       // 如果是当前会话的联系人备注更新，刷新界面
       final targetUserId = _otherUserId ?? widget.conversation.id;
       if (event.userId == targetUserId && mounted) {
-        debugPrint('ChatPage: Remark updated for $targetUserId, refreshing UI');
+        debugLog('ChatPage: Remark updated for $targetUserId, refreshing UI');
         setState(() {});
       }
     });
@@ -300,7 +302,7 @@ class _ChatPageState extends State<ChatPage> {
 
     // 直接使用 conversation.directUserId
     _otherUserId = widget.conversation.directUserId;
-    debugPrint('ChatPage: directUserId=$_otherUserId for room ${widget.conversation.id}');
+    debugLog('ChatPage: directUserId=$_otherUserId for room ${widget.conversation.id}');
   }
 
   void _onInputFocusChanged() {
@@ -317,9 +319,9 @@ class _ChatPageState extends State<ChatPage> {
     try {
       final authRepository = getIt<IAuthRepository>();
       _currentUserId = authRepository.currentUser?.userId;
-      debugPrint('ChatPage: Loaded current user ID: $_currentUserId');
+      debugLog('ChatPage: Loaded current user ID: $_currentUserId');
     } catch (e) {
-      debugPrint('ChatPage: Failed to load current user ID: $e');
+      debugLog('ChatPage: Failed to load current user ID: $e');
     }
   }
 
@@ -334,7 +336,7 @@ class _ChatPageState extends State<ChatPage> {
         });
       }
     } catch (e) {
-      debugPrint('ChatPage: Failed to load face blur setting: $e');
+      debugLog('ChatPage: Failed to load face blur setting: $e');
     }
   }
 
@@ -392,7 +394,7 @@ class _ChatPageState extends State<ChatPage> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('auto_face_blur', newValue);
     } catch (e) {
-      debugPrint('ChatPage: Failed to save face blur setting: $e');
+      debugLog('ChatPage: Failed to save face blur setting: $e');
     }
   }
 
@@ -416,7 +418,7 @@ class _ChatPageState extends State<ChatPage> {
     try {
       context.read<ChatBloc>().add(const DisposeChat());
     } catch (e) {
-      debugPrint('ChatPage: Error disposing ChatBloc: $e');
+      debugLog('ChatPage: Error disposing ChatBloc: $e');
     }
 
     // 保存草稿
@@ -713,7 +715,7 @@ class _ChatPageState extends State<ChatPage> {
 
       return '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
     } catch (e) {
-      debugPrint('_convertMxcToHttpUrl error: $e');
+      debugLog('_convertMxcToHttpUrl error: $e');
       return null;
     }
   }
@@ -823,7 +825,7 @@ class _ChatPageState extends State<ChatPage> {
 
       return true;
     } catch (e) {
-      debugPrint('Check location permission error: $e');
+      debugLog('Check location permission error: $e');
       return false;
     }
   }
@@ -840,7 +842,7 @@ class _ChatPageState extends State<ChatPage> {
         'avatarUrl': m.avatarUrl ?? '',
       }).toList();
     } catch (e) {
-      debugPrint('Error loading group members: $e');
+      debugLog('Error loading group members: $e');
       return [];
     }
   }
@@ -852,10 +854,14 @@ class _ChatPageState extends State<ChatPage> {
         _showPollCreateSheet();
         break;
       case 'welcome':
-        // TODO: 导航到 BotSettingsPage（Batch 2 实现）
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => BotSettingsPage(roomId: widget.conversation.id),
+          ),
+        );
         break;
       default:
-        debugPrint('ChatPage: Unknown pending command: $command');
+        debugLog('ChatPage: Unknown pending command: $command');
     }
   }
 
@@ -899,7 +905,7 @@ class _ChatPageState extends State<ChatPage> {
       hasContactBloc = true;
     } catch (e) {
       // ContactBloc 不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     final Widget content = Stack(

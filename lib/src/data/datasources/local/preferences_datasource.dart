@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 偏好设置数据源
 ///
@@ -74,7 +74,7 @@ class PreferencesDataSource {
     final p = await prefs;
     await p.setString(_keyAppearanceSettings, jsonEncode(data));
 
-    debugPrint('Preferences: Appearance settings saved');
+    debugLog('Preferences: Appearance settings saved');
   }
 
   /// 获取外观设置
@@ -92,7 +92,7 @@ class PreferencesDataSource {
         'bubbleStyle': json['bubbleStyle'] as String?,
       };
     } catch (e) {
-      debugPrint('Preferences: Failed to read appearance settings - $e');
+      debugLog('Preferences: Failed to read appearance settings - $e');
       return null;
     }
   }
@@ -128,7 +128,7 @@ class PreferencesDataSource {
       final json = jsonDecode(data) as Map<String, dynamic>;
       return json.map((key, value) => MapEntry(key, value.toString()));
     } catch (e) {
-      debugPrint('Preferences: Failed to read contact remarks - $e');
+      debugLog('Preferences: Failed to read contact remarks - $e');
       return {};
     }
   }
@@ -156,7 +156,7 @@ class PreferencesDataSource {
     }
     await p.setString(_keyContactRemarks, jsonEncode(remarks));
 
-    debugPrint('Preferences: Contact remark set for $userId');
+    debugLog('Preferences: Contact remark set for $userId');
   }
 
   /// 获取联系人备注（独立 key，O(1) 读取）
@@ -186,7 +186,7 @@ class PreferencesDataSource {
         (key, value) => MapEntry(key, value == true || value == 'true'),
       );
     } catch (e) {
-      debugPrint('Preferences: Failed to read strong reminders - $e');
+      debugLog('Preferences: Failed to read strong reminders - $e');
       return {};
     }
   }
@@ -214,7 +214,7 @@ class PreferencesDataSource {
     }
     await p.setString(_keyStrongReminders, jsonEncode(reminders));
 
-    debugPrint('Preferences: Strong reminder set for $roomId: $enabled');
+    debugLog('Preferences: Strong reminder set for $roomId: $enabled');
   }
 
   /// 获取强提醒状态（独立 key，O(1) 读取）
@@ -279,7 +279,7 @@ class PreferencesDataSource {
 
       return roomData.cast<String>().toSet();
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to read locally deleted messages - $e',
       );
       return {};
@@ -319,11 +319,11 @@ class PreferencesDataSource {
         jsonEncode(allData),
       );
 
-      debugPrint(
+      debugLog(
         'Preferences: Marked ${messageIds.length} messages as locally deleted in $roomId',
       );
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to mark messages as locally deleted - $e',
       );
     }
@@ -348,11 +348,11 @@ class PreferencesDataSource {
         );
       }
 
-      debugPrint(
+      debugLog(
         'Preferences: Cleared locally deleted messages for $roomId',
       );
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to clear locally deleted messages - $e',
       );
     }
@@ -388,11 +388,11 @@ class PreferencesDataSource {
         jsonEncode(allData),
       );
 
-      debugPrint(
+      debugLog(
         'Preferences: Set destruction time for message $messageId in $roomId',
       );
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to set message destruction time - $e',
       );
     }
@@ -415,7 +415,7 @@ class PreferencesDataSource {
         return MapEntry(key, DateTime.parse(value as String));
       });
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to read message destruction times - $e',
       );
       return {};
@@ -464,11 +464,11 @@ class PreferencesDataSource {
         );
       }
 
-      debugPrint(
+      debugLog(
         'Preferences: Cleared ${messageIds.length} destruction time records in $roomId',
       );
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to clear message destruction times - $e',
       );
     }
@@ -493,11 +493,11 @@ class PreferencesDataSource {
         );
       }
 
-      debugPrint(
+      debugLog(
         'Preferences: Cleared all destruction time records in $roomId',
       );
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to clear all destruction times - $e',
       );
     }
@@ -536,7 +536,7 @@ class PreferencesDataSource {
     final p = await prefs;
     await p.setString(_keyPrivacySettings, jsonEncode(data));
 
-    debugPrint('Preferences: Privacy settings saved');
+    debugLog('Preferences: Privacy settings saved');
   }
 
   /// 获取隐私设置
@@ -548,7 +548,7 @@ class PreferencesDataSource {
 
       return jsonDecode(data) as Map<String, dynamic>;
     } catch (e) {
-      debugPrint('Preferences: Failed to read privacy settings - $e');
+      debugLog('Preferences: Failed to read privacy settings - $e');
       return null;
     }
   }
@@ -574,7 +574,7 @@ class PreferencesDataSource {
     final p = await prefs;
     await p.setString(_keyPrivacySettings, jsonEncode(current));
 
-    debugPrint('Preferences: Privacy setting updated - $key: $value');
+    debugLog('Preferences: Privacy setting updated - $key: $value');
   }
 
   // ============================================
@@ -632,11 +632,11 @@ class PreferencesDataSource {
         jsonEncode(allData),
       );
 
-      debugPrint(
+      debugLog(
         'Preferences: Scheduled message saved - $messageId for $scheduledAt',
       );
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to save scheduled message - $e',
       );
     }
@@ -657,7 +657,7 @@ class PreferencesDataSource {
 
       return roomMessages.cast<Map<String, dynamic>>();
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to read scheduled messages - $e',
       );
       return [];
@@ -695,7 +695,7 @@ class PreferencesDataSource {
 
       return dueMessages;
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to get due scheduled messages - $e',
       );
       return [];
@@ -735,11 +735,11 @@ class PreferencesDataSource {
         );
       }
 
-      debugPrint(
+      debugLog(
         'Preferences: Scheduled message removed - $messageId',
       );
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to remove scheduled message - $e',
       );
     }
@@ -764,11 +764,11 @@ class PreferencesDataSource {
         );
       }
 
-      debugPrint(
+      debugLog(
         'Preferences: Cleared all scheduled messages for $roomId',
       );
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to clear scheduled messages - $e',
       );
     }
@@ -799,7 +799,7 @@ class PreferencesDataSource {
       if (data == null) return null;
       return jsonDecode(data) as Map<String, dynamic>;
     } catch (e) {
-      debugPrint('Preferences: Failed to read moment settings - $e');
+      debugLog('Preferences: Failed to read moment settings - $e');
       return null;
     }
   }
@@ -818,7 +818,7 @@ class PreferencesDataSource {
       if (data == null) return null;
       return (jsonDecode(data) as List).cast<String>();
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to read hidden moment users - $e',
       );
       return null;
@@ -839,7 +839,7 @@ class PreferencesDataSource {
       if (data == null) return null;
       return (jsonDecode(data) as List).cast<String>();
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to read blocked moment users - $e',
       );
       return null;
@@ -860,7 +860,7 @@ class PreferencesDataSource {
       if (data == null) return null;
       return DateTime.parse(data);
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to read moment last read time - $e',
       );
       return null;
@@ -879,7 +879,7 @@ class PreferencesDataSource {
       if (data == null) return {};
       return (jsonDecode(data) as List).cast<String>().toSet();
     } catch (e) {
-      debugPrint('Preferences: Failed to read hidden chats - $e');
+      debugLog('Preferences: Failed to read hidden chats - $e');
       return {};
     }
   }
@@ -891,9 +891,9 @@ class PreferencesDataSource {
       ids.add(roomId);
       final p = await prefs;
       await p.setString(_keyHiddenChats, jsonEncode(ids.toList()));
-      debugPrint('Preferences: Chat hidden - $roomId');
+      debugLog('Preferences: Chat hidden - $roomId');
     } catch (e) {
-      debugPrint('Preferences: Failed to hide chat - $e');
+      debugLog('Preferences: Failed to hide chat - $e');
     }
   }
 
@@ -904,9 +904,9 @@ class PreferencesDataSource {
       ids.remove(roomId);
       final p = await prefs;
       await p.setString(_keyHiddenChats, jsonEncode(ids.toList()));
-      debugPrint('Preferences: Chat unhidden - $roomId');
+      debugLog('Preferences: Chat unhidden - $roomId');
     } catch (e) {
-      debugPrint('Preferences: Failed to unhide chat - $e');
+      debugLog('Preferences: Failed to unhide chat - $e');
     }
   }
 
@@ -931,7 +931,7 @@ class PreferencesDataSource {
       }
       return (jsonDecode(data) as List).cast<Map<String, dynamic>>();
     } catch (e) {
-      debugPrint('Preferences: Failed to read quick replies - $e');
+      debugLog('Preferences: Failed to read quick replies - $e');
       return _getDefaultQuickReplies();
     }
   }
@@ -964,9 +964,9 @@ class PreferencesDataSource {
     try {
       final p = await prefs;
       await p.setString(_keyQuickReplies, jsonEncode(replies));
-      debugPrint('Preferences: Quick replies saved');
+      debugLog('Preferences: Quick replies saved');
     } catch (e) {
-      debugPrint('Preferences: Failed to save quick replies - $e');
+      debugLog('Preferences: Failed to save quick replies - $e');
     }
   }
 
@@ -983,7 +983,7 @@ class PreferencesDataSource {
       replies.add(newReply);
       await saveQuickReplies(replies);
     } catch (e) {
-      debugPrint('Preferences: Failed to add quick reply - $e');
+      debugLog('Preferences: Failed to add quick reply - $e');
     }
   }
 
@@ -994,7 +994,7 @@ class PreferencesDataSource {
       replies.removeWhere((r) => r['id'] == id);
       await saveQuickReplies(replies);
     } catch (e) {
-      debugPrint('Preferences: Failed to remove quick reply - $e');
+      debugLog('Preferences: Failed to remove quick reply - $e');
     }
   }
 
@@ -1008,7 +1008,7 @@ class PreferencesDataSource {
         await saveQuickReplies(replies);
       }
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to update quick reply last used - $e',
       );
     }
@@ -1045,7 +1045,7 @@ class PreferencesDataSource {
 
       await p.setString(_keyTranslationCache, jsonEncode(cache));
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to save translation cache - $e',
       );
     }
@@ -1065,7 +1065,7 @@ class PreferencesDataSource {
       final key = '${messageId}_$targetLanguage';
       return cache[key] as String?;
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to read translation cache - $e',
       );
       return null;
@@ -1080,7 +1080,7 @@ class PreferencesDataSource {
       if (data == null) return null;
       return jsonDecode(data) as Map<String, dynamic>;
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to read translation settings - $e',
       );
       return null;
@@ -1112,7 +1112,7 @@ class PreferencesDataSource {
         jsonEncode(current),
       );
     } catch (e) {
-      debugPrint(
+      debugLog(
         'Preferences: Failed to save translation settings - $e',
       );
     }
@@ -1248,7 +1248,7 @@ class PreferencesDataSource {
         await p.setString(key, text);
       }
     } catch (e) {
-      debugPrint('Preferences: Failed to save draft - $e');
+      debugLog('Preferences: Failed to save draft - $e');
     }
   }
 
@@ -1258,7 +1258,7 @@ class PreferencesDataSource {
       final p = await prefs;
       return p.getString('n42_chat_draft_$roomId');
     } catch (e) {
-      debugPrint('Preferences: Failed to read draft - $e');
+      debugLog('Preferences: Failed to read draft - $e');
       return null;
     }
   }
@@ -1273,7 +1273,7 @@ class PreferencesDataSource {
       final p = await prefs;
       return p.getString(key);
     } catch (e) {
-      debugPrint('Preferences: Read failed for key $key: $e');
+      debugLog('Preferences: Read failed for key $key: $e');
       return null;
     }
   }
@@ -1311,7 +1311,7 @@ class PreferencesDataSource {
       final list = jsonDecode(data) as List<dynamic>;
       return list.cast<Map<String, dynamic>>();
     } catch (e) {
-      debugPrint('Preferences: Failed to load chat folders: $e');
+      debugLog('Preferences: Failed to load chat folders: $e');
       return [];
     }
   }

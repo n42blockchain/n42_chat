@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/debug_log.dart';
 
 /// 截图防护服务
 ///
@@ -62,13 +62,13 @@ class ScreenshotProtectionService {
       try {
         await _channel.invokeMethod<void>('setFlagSecure', enable);
       } catch (e) {
-        debugPrint('ScreenshotProtectionService: Failed to apply FLAG_SECURE: $e');
+        debugLog('ScreenshotProtectionService: Failed to apply FLAG_SECURE: $e');
       }
     } else if (Platform.isIOS) {
       try {
         await _channel.invokeMethod<void>('setScreenProtection', enable);
       } catch (e) {
-        debugPrint('ScreenshotProtectionService: Failed to apply iOS screen protection: $e');
+        debugLog('ScreenshotProtectionService: Failed to apply iOS screen protection: $e');
       }
     }
   }

@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Matrix Story 数据源
 ///
@@ -228,7 +228,7 @@ class MatrixStoryDataSource {
       await room.redactEvent(eventId);
     } catch (e) {
       // 忽略错误
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
 
@@ -339,7 +339,7 @@ class MatrixStoryDataSource {
       }
     } catch (e) {
       // 忽略错误
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     return viewers;

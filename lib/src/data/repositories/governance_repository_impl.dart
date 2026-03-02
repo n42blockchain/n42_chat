@@ -1,3 +1,4 @@
+import '../../core/utils/debug_log.dart';
 import '../../domain/entities/governance/governance_space.dart';
 import '../../domain/entities/governance/proposal_entity.dart';
 import '../../domain/entities/governance/vote_entity.dart';
@@ -83,11 +84,27 @@ class GovernanceRepositoryImpl implements IGovernanceRepository {
     String voter,
     int blockNumber,
   ) async {
-    // Voting power is typically calculated by Snapshot backend
-    // based on the space's strategies. For now, return 0 and
-    // let the UI handle the "unknown" case.
-    // TODO: Integrate with Snapshot score API when available
-    return 0;
+    try {
+      final space = await _graphql.getSpace(spaceId);
+      final strategies = space['strategies'] as List<dynamic>?;
+      final network = space['network'] as String? ?? '1';
+
+      if (strategies == null || strategies.isEmpty) return 0;
+
+      final scores = await _graphql.getScores(
+        spaceId: spaceId,
+        network: network,
+        strategies: strategies,
+        addresses: [voter],
+        snapshot: blockNumber,
+      );
+
+      if (scores.isEmpty) return 0;
+      return (scores[voter] as num?)?.toDouble() ?? 0;
+    } catch (e) {
+      debugLog('GovernanceRepository: getVotingPower failed for $voter in $spaceId: $e');
+      return 0;
+    }
   }
 
   @override

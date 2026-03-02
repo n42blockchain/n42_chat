@@ -1,10 +1,11 @@
+import 'dart:typed_data';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../matrix_client_manager.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// Matrix 媒体文件上传器
 ///
@@ -28,10 +29,10 @@ class MatrixMediaUploader {
       final hasUnstableFeature =
           versionsResponse.unstableFeatures?['org.matrix.msc3916.stable'] == true;
 
-      debugPrint('MatrixMessageDataSource: supportsV111=$supportsV111, hasUnstableFeature=$hasUnstableFeature');
+      debugLog('MatrixMessageDataSource: supportsV111=$supportsV111, hasUnstableFeature=$hasUnstableFeature');
       return supportsV111 || hasUnstableFeature;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Error checking authenticated media support: $e');
+      debugLog('MatrixMessageDataSource: Error checking authenticated media support: $e');
       return false;
     }
   }
@@ -76,7 +77,7 @@ class MatrixMediaUploader {
     }
 
     final supportsAuth = await supportsAuthenticatedMedia();
-    debugPrint('MatrixMessageDataSource: supportsAuthenticatedMedia=$supportsAuth');
+    debugLog('MatrixMessageDataSource: supportsAuthenticatedMedia=$supportsAuth');
 
     // 根据服务器能力选择端点
     final path = supportsAuth
@@ -87,9 +88,9 @@ class MatrixMediaUploader {
       queryParameters: filename != null ? {'filename': filename} : null,
     );
 
-    debugPrint('MatrixMessageDataSource: Uploading to: $uri');
-    debugPrint('MatrixMessageDataSource: Content size: ${content.length} bytes');
-    debugPrint('MatrixMessageDataSource: Content type: $contentType');
+    debugLog('MatrixMessageDataSource: Uploading to: $uri');
+    debugLog('MatrixMessageDataSource: Content size: ${content.length} bytes');
+    debugLog('MatrixMessageDataSource: Content type: $contentType');
 
     final request = http.Request('POST', uri);
     request.headers['Authorization'] = 'Bearer ${client.accessToken}';
@@ -102,35 +103,35 @@ class MatrixMediaUploader {
       final streamedResponse = await http.Client().send(request);
       final response = await http.Response.fromStream(streamedResponse);
 
-      debugPrint('MatrixMessageDataSource: Upload response status: ${response.statusCode}');
+      debugLog('MatrixMessageDataSource: Upload response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         final contentUri = json['content_uri'] as String?;
         if (contentUri != null) {
-          debugPrint('MatrixMessageDataSource: Upload successful: $contentUri');
+          debugLog('MatrixMessageDataSource: Upload successful: $contentUri');
           return Uri.parse(contentUri);
         }
       }
 
       // 上传失败，尝试显示错误信息
-      debugPrint('MatrixMessageDataSource: Upload failed: ${response.body}');
+      debugLog('MatrixMessageDataSource: Upload failed: ${response.body}');
 
       // 如果使用认证端点失败 (403/404)，尝试传统端点
       if (supportsAuth && (response.statusCode == 403 || response.statusCode == 404)) {
-        debugPrint('MatrixMessageDataSource: Auth endpoint failed (${response.statusCode}), trying legacy endpoint...');
+        debugLog('MatrixMessageDataSource: Auth endpoint failed (${response.statusCode}), trying legacy endpoint...');
         return _uploadContentLegacy(content, filename: filename, contentType: contentType);
       }
 
       // 如果传统端点也失败，再尝试一次不同的上传方式
       if (!supportsAuth && (response.statusCode == 403 || response.statusCode == 404)) {
-        debugPrint('MatrixMessageDataSource: Legacy endpoint failed, trying SDK upload...');
+        debugLog('MatrixMessageDataSource: Legacy endpoint failed, trying SDK upload...');
         // 使用 SDK 自带的上传方法
         try {
           final mxcUri = await client.uploadContent(content, filename: filename, contentType: contentType);
           return mxcUri;
         } catch (sdkError) {
-          debugPrint('MatrixMessageDataSource: SDK upload also failed: $sdkError');
+          debugLog('MatrixMessageDataSource: SDK upload also failed: $sdkError');
         }
       }
 
@@ -147,18 +148,18 @@ class MatrixMediaUploader {
         throw Exception('Upload failed with status ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Upload error: $e');
+      debugLog('MatrixMessageDataSource: Upload error: $e');
       // 如果是我们抛出的异常，直接重新抛出
       if (e is Exception && e.toString().contains('Upload failed')) {
         rethrow;
       }
       // 否则尝试使用 SDK 自带的上传方法
-      debugPrint('MatrixMessageDataSource: Trying SDK upload as last resort...');
+      debugLog('MatrixMessageDataSource: Trying SDK upload as last resort...');
       try {
         final mxcUri = await client.uploadContent(content, filename: filename, contentType: contentType);
         return mxcUri;
       } catch (sdkError) {
-        debugPrint('MatrixMessageDataSource: SDK upload failed: $sdkError');
+        debugLog('MatrixMessageDataSource: SDK upload failed: $sdkError');
         rethrow;
       }
     }
@@ -177,7 +178,7 @@ class MatrixMediaUploader {
       queryParameters: filename != null ? {'filename': filename} : null,
     );
 
-    debugPrint('MatrixMessageDataSource: Uploading (legacy) to: $uri');
+    debugLog('MatrixMessageDataSource: Uploading (legacy) to: $uri');
 
     try {
       final request = http.Request('POST', uri);
@@ -190,34 +191,34 @@ class MatrixMediaUploader {
       final streamedResponse = await http.Client().send(request);
       final response = await http.Response.fromStream(streamedResponse);
 
-      debugPrint('MatrixMessageDataSource: Legacy upload response: ${response.statusCode}');
+      debugLog('MatrixMessageDataSource: Legacy upload response: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         final contentUri = json['content_uri'] as String?;
         if (contentUri != null) {
-          debugPrint('MatrixMessageDataSource: Legacy upload successful: $contentUri');
+          debugLog('MatrixMessageDataSource: Legacy upload successful: $contentUri');
           return Uri.parse(contentUri);
         }
       }
 
-      debugPrint('MatrixMessageDataSource: Legacy upload failed: ${response.body}');
+      debugLog('MatrixMessageDataSource: Legacy upload failed: ${response.body}');
 
       // 如果传统端点也失败，使用 SDK 内置方法
-      debugPrint('MatrixMessageDataSource: Trying SDK uploadContent...');
+      debugLog('MatrixMessageDataSource: Trying SDK uploadContent...');
       final mxcUri = await client.uploadContent(content, filename: filename, contentType: contentType);
-      debugPrint('MatrixMessageDataSource: SDK upload successful: $mxcUri');
+      debugLog('MatrixMessageDataSource: SDK upload successful: $mxcUri');
       return mxcUri;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Legacy upload error: $e');
+      debugLog('MatrixMessageDataSource: Legacy upload error: $e');
       // 最后尝试 SDK 方法
       try {
-        debugPrint('MatrixMessageDataSource: Last resort - SDK uploadContent...');
+        debugLog('MatrixMessageDataSource: Last resort - SDK uploadContent...');
         final mxcUri = await client.uploadContent(content, filename: filename, contentType: contentType);
-        debugPrint('MatrixMessageDataSource: SDK upload successful: $mxcUri');
+        debugLog('MatrixMessageDataSource: SDK upload successful: $mxcUri');
         return mxcUri;
       } catch (sdkError) {
-        debugPrint('MatrixMessageDataSource: All upload methods failed: $sdkError');
+        debugLog('MatrixMessageDataSource: All upload methods failed: $sdkError');
         rethrow;
       }
     }

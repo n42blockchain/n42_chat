@@ -36,7 +36,9 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
   bool _isVerifying = false;
   int _resendCountdown = 0;
   Timer? _countdownTimer;
-  
+  String? _otpSid;
+  String? _otpClientSecret;
+
   final AuthMethodsService _authService = AuthMethodsService();
 
   @override
@@ -79,15 +81,17 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
     });
 
     try {
-      final success = await _authService.requestEmailOtp(
+      final otpResult = await _authService.requestEmailOtp(
         email: email,
         homeserver: widget.homeserver,
       );
-      
-      if (success && mounted) {
+
+      if (otpResult != null && mounted) {
         setState(() {
           _isEmailSent = true;
           _isSending = false;
+          _otpSid = otpResult['sid'];
+          _otpClientSecret = otpResult['clientSecret'];
         });
         _startCountdown();
         _pinputFocusNode.requestFocus();
@@ -125,6 +129,8 @@ class _EmailOtpPageState extends State<EmailOtpPage> {
       final result = await _authService.verifyEmailOtp(
         email: _emailController.text.trim(),
         otp: otp,
+        sid: _otpSid!,
+        clientSecret: _otpClientSecret!,
         homeserver: widget.homeserver,
       );
       

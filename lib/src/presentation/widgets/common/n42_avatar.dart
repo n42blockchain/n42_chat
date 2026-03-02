@@ -4,6 +4,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 微信风格头像组件
 ///
@@ -176,7 +177,7 @@ class N42Avatar extends StatelessWidget {
         ),
         placeholder: (context, url) => _buildFallbackAvatar(),
         errorWidget: (context, url, error) {
-          debugPrint('N42Avatar: Failed to load image: $url, error: $error');
+          debugLog('N42Avatar: Failed to load image: $url, error: $error');
           // 加载失败时，如果有名字则显示字母头像，否则显示默认图标
           return _buildFallbackAvatar();
         },

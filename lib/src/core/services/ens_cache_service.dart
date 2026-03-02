@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../integration/wallet_bridge.dart';
+import '../utils/debug_log.dart';
 
 /// ENS 缓存服务
 ///
@@ -47,7 +47,7 @@ class EnsCacheService {
       }
       return address;
     } catch (e) {
-      debugPrint('EnsCacheService: Failed to resolve ENS: $e');
+      debugLog('EnsCacheService: Failed to resolve ENS: $e');
       return null;
     }
   }
@@ -69,7 +69,7 @@ class EnsCacheService {
       }
       return ensName;
     } catch (e) {
-      debugPrint('EnsCacheService: Failed to lookup ENS: $e');
+      debugLog('EnsCacheService: Failed to lookup ENS: $e');
       return null;
     }
   }
@@ -132,7 +132,7 @@ class EnsCacheService {
         }
       }
     } catch (e) {
-      debugPrint('EnsCacheService: Failed to restore cache: $e');
+      debugLog('EnsCacheService: Failed to restore cache: $e');
     }
   }
 
@@ -165,7 +165,7 @@ class EnsCacheService {
         },
       );
     } catch (e) {
-      debugPrint('EnsCacheService: Failed to persist cache: $e');
+      debugLog('EnsCacheService: Failed to persist cache: $e');
     }
   }
 }

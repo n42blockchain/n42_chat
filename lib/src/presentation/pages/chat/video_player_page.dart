@@ -6,6 +6,7 @@ import 'package:video_player/video_player.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 class ChatVideoPlayerPage extends StatefulWidget {
   final String videoUrl;
@@ -34,9 +35,9 @@ class _ChatVideoPlayerPageState extends State<ChatVideoPlayerPage> {
 
   Future<void> _initializePlayer() async {
     try {
-      debugPrint('=== Video Player Initialization ===');
-      debugPrint('Video URL: ${widget.videoUrl}');
-      debugPrint('Thumbnail URL: ${widget.thumbnailUrl}');
+      debugLog('=== Video Player Initialization ===');
+      debugLog('Video URL: ${widget.videoUrl}');
+      debugLog('Thumbnail URL: ${widget.thumbnailUrl}');
 
       // Validate video URL
       if (widget.videoUrl.isEmpty) {
@@ -48,9 +49,9 @@ class _ChatVideoPlayerPageState extends State<ChatVideoPlayerPage> {
       try {
         final matrixManager = getIt<MatrixClientManager>();
         accessToken = matrixManager.client?.accessToken;
-        debugPrint('Access token obtained: ${accessToken != null ? 'Yes (${accessToken.length} chars)' : 'No'}');
+        debugLog('Access token obtained: ${accessToken != null ? 'Yes (${accessToken.length} chars)' : 'No'}');
       } catch (e) {
-        debugPrint('Failed to get access token: $e');
+        debugLog('Failed to get access token: $e');
       }
 
       final headers = <String, String>{};
@@ -59,17 +60,17 @@ class _ChatVideoPlayerPageState extends State<ChatVideoPlayerPage> {
       }
 
       // 创建视频控制器
-      debugPrint('Creating VideoPlayerController...');
+      debugLog('Creating VideoPlayerController...');
       _controller = VideoPlayerController.networkUrl(
         Uri.parse(widget.videoUrl),
         httpHeaders: headers,
       );
 
-      debugPrint('Initializing video controller...');
+      debugLog('Initializing video controller...');
       await _controller.initialize();
-      debugPrint('Video controller initialized successfully');
-      debugPrint('Video duration: ${_controller.value.duration}');
-      debugPrint('Video size: ${_controller.value.size}');
+      debugLog('Video controller initialized successfully');
+      debugLog('Video duration: ${_controller.value.duration}');
+      debugLog('Video size: ${_controller.value.size}');
 
       _chewieController = ChewieController(
         videoPlayerController: _controller,
@@ -105,9 +106,9 @@ class _ChatVideoPlayerPageState extends State<ChatVideoPlayerPage> {
         });
       }
     } catch (e, stackTrace) {
-      debugPrint('=== Video Player Error ===');
-      debugPrint('Error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugLog('=== Video Player Error ===');
+      debugLog('Error: $e');
+      debugLog('Stack trace: $stackTrace');
       if (mounted) {
         setState(() {
           _isLoading = false;

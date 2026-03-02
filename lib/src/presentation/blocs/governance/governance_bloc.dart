@@ -1,9 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/repositories/governance_repository.dart';
 import 'governance_event.dart';
 import 'governance_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// BLoC for governance/voting operations.
 ///
@@ -32,7 +32,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
       final space = await _repository.getSpace(event.spaceId);
       emit(state.copyWith(status: GovernanceStatus.loaded, space: space));
     } catch (e, stackTrace) {
-      debugPrint('Failed to load space: $e\n$stackTrace');
+      debugLog('Failed to load space: $e\n$stackTrace');
       emit(state.copyWith(
         status: GovernanceStatus.error,
         errorMessage: _formatError(e),
@@ -59,7 +59,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
         hasMoreProposals: proposals.length >= 20,
       ));
     } catch (e, stackTrace) {
-      debugPrint('Failed to load proposals: $e\n$stackTrace');
+      debugLog('Failed to load proposals: $e\n$stackTrace');
       emit(state.copyWith(
         status: GovernanceStatus.error,
         errorMessage: _formatError(e),
@@ -85,7 +85,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
         hasMoreProposals: moreProposals.length >= 20,
       ));
     } catch (e) {
-      debugPrint('Failed to load more proposals: $e');
+      debugLog('Failed to load more proposals: $e');
     }
   }
 
@@ -103,7 +103,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
         votes: votes,
       ));
     } catch (e, stackTrace) {
-      debugPrint('Failed to load proposal detail: $e\n$stackTrace');
+      debugLog('Failed to load proposal detail: $e\n$stackTrace');
       emit(state.copyWith(
         status: GovernanceStatus.error,
         errorMessage: _formatError(e),
@@ -132,7 +132,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
         votes: votes,
       ));
     } catch (e, stackTrace) {
-      debugPrint('Failed to cast vote: $e\n$stackTrace');
+      debugLog('Failed to cast vote: $e\n$stackTrace');
       emit(state.copyWith(
         status: GovernanceStatus.error,
         errorMessage: _formatError(e),
@@ -156,7 +156,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
       );
       emit(state.copyWith(status: GovernanceStatus.created));
     } catch (e, stackTrace) {
-      debugPrint('Failed to create proposal: $e\n$stackTrace');
+      debugLog('Failed to create proposal: $e\n$stackTrace');
       emit(state.copyWith(
         status: GovernanceStatus.error,
         errorMessage: _formatError(e),

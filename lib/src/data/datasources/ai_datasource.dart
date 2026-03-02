@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../core/services/ai_service.dart';
+import '../../core/utils/debug_log.dart';
 
 /// AI API 数据源实现
 ///
@@ -119,12 +119,12 @@ class AiDatasource implements AiService {
             }
           } catch (e) {
             // 跳过无法解析的行
-            debugPrint('AiDatasource: Failed to parse SSE data: $e');
+            debugLog('AiDatasource: Failed to parse SSE data: $e');
           }
         }
       }
     } on DioException catch (e) {
-      debugPrint('AiDatasource: Stream completion error: ${e.message}');
+      debugLog('AiDatasource: Stream completion error: ${e.message}');
       final errorMsg = _parseErrorMessage(e);
       throw AiServiceException(errorMsg);
     }
@@ -177,7 +177,7 @@ class AiDatasource implements AiService {
         model: data['model'] as String?,
       );
     } on DioException catch (e) {
-      debugPrint('AiDatasource: Completion error: ${e.message}');
+      debugLog('AiDatasource: Completion error: ${e.message}');
       final errorMsg = _parseErrorMessage(e);
       throw AiServiceException(errorMsg);
     }
@@ -273,7 +273,7 @@ class AiDatasource implements AiService {
           if (error is String) return error;
         }
       } catch (e) {
-        debugPrint('Error: $e');
+        debugLog('Error: $e');
       }
     }
 

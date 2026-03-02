@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 系统铃声信息
 class SystemRingtone {
@@ -60,7 +60,7 @@ class SystemRingtoneService {
     try {
       final List<dynamic>? result = await _channel.invokeMethod('getAvailableRingtones');
       if (result == null) {
-        debugPrint('SystemRingtoneService: No ringtones returned from platform');
+        debugLog('SystemRingtoneService: No ringtones returned from platform');
         return _getDefaultRingtones();
       }
 
@@ -68,16 +68,16 @@ class SystemRingtoneService {
           .map((e) => SystemRingtone.fromMap(e as Map<dynamic, dynamic>))
           .toList();
 
-      debugPrint('SystemRingtoneService: Found ${_cachedRingtones!.length} ringtones');
+      debugLog('SystemRingtoneService: Found ${_cachedRingtones!.length} ringtones');
       return _cachedRingtones!;
     } on PlatformException catch (e) {
-      debugPrint('SystemRingtoneService: Platform error - ${e.message}');
+      debugLog('SystemRingtoneService: Platform error - ${e.message}');
       return _getDefaultRingtones();
     } on MissingPluginException catch (e) {
-      debugPrint('SystemRingtoneService: Plugin not implemented - $e');
+      debugLog('SystemRingtoneService: Plugin not implemented - $e');
       return _getDefaultRingtones();
     } catch (e) {
-      debugPrint('SystemRingtoneService: Error getting ringtones - $e');
+      debugLog('SystemRingtoneService: Error getting ringtones - $e');
       return _getDefaultRingtones();
     }
   }
@@ -88,10 +88,10 @@ class SystemRingtoneService {
       final result = await _channel.invokeMethod<bool>('playRingtone', {'uri': uri});
       return result ?? false;
     } on PlatformException catch (e) {
-      debugPrint('SystemRingtoneService: Failed to play ringtone - ${e.message}');
+      debugLog('SystemRingtoneService: Failed to play ringtone - ${e.message}');
       return false;
     } catch (e) {
-      debugPrint('SystemRingtoneService: Error playing ringtone - $e');
+      debugLog('SystemRingtoneService: Error playing ringtone - $e');
       return false;
     }
   }
@@ -101,7 +101,7 @@ class SystemRingtoneService {
     try {
       await _channel.invokeMethod('stopRingtone');
     } catch (e) {
-      debugPrint('SystemRingtoneService: Error stopping ringtone - $e');
+      debugLog('SystemRingtoneService: Error stopping ringtone - $e');
     }
   }
 
@@ -110,7 +110,7 @@ class SystemRingtoneService {
     try {
       return await _channel.invokeMethod<String>('getDefaultRingtoneUri');
     } catch (e) {
-      debugPrint('SystemRingtoneService: Error getting default ringtone - $e');
+      debugLog('SystemRingtoneService: Error getting default ringtone - $e');
       return null;
     }
   }

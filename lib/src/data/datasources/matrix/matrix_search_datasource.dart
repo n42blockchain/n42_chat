@@ -1,7 +1,13 @@
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
+
 import 'package:matrix/matrix.dart' as matrix;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
+
+const _kSearchHistoryKey = 'n42_chat_search_history';
+const _kSearchHistoryLimit = 50;
 
 /// Matrix搜索数据源
 ///
@@ -167,7 +173,7 @@ class MatrixSearchDataSource {
       }
     } catch (e) {
       // 搜索失败
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     return results;
@@ -209,7 +215,7 @@ class MatrixSearchDataSource {
         if (results.length >= limit) break;
       } catch (e) {
         // 继续搜索其他房间
-        debugPrint('Error: $e');
+        debugLog('Error: $e');
       }
     }
 
@@ -234,20 +240,45 @@ class MatrixSearchDataSource {
   // ============================================
 
   /// 获取最近的搜索记录
-  /// 注：这需要本地存储实现，这里只是接口定义
   Future<List<String>> getRecentSearches({int limit = 10}) async {
-    // TODO: 从本地存储读取
-    return [];
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_kSearchHistoryKey);
+      if (raw == null) return [];
+      final list = (jsonDecode(raw) as List).cast<String>();
+      return list.take(limit).toList();
+    } catch (e) {
+      debugLog('MatrixSearchDataSource.getRecentSearches error: $e');
+      return [];
+    }
   }
 
-  /// 保存搜索记录
+  /// 保存搜索记录（去重后插到队首，最多保留 $_kSearchHistoryLimit 条）
   Future<void> saveSearchQuery(String query) async {
-    // TODO: 保存到本地存储
+    if (query.trim().isEmpty) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_kSearchHistoryKey);
+      final list = raw != null ? (jsonDecode(raw) as List).cast<String>() : <String>[];
+      list.remove(query);
+      list.insert(0, query);
+      if (list.length > _kSearchHistoryLimit) {
+        list.removeRange(_kSearchHistoryLimit, list.length);
+      }
+      await prefs.setString(_kSearchHistoryKey, jsonEncode(list));
+    } catch (e) {
+      debugLog('MatrixSearchDataSource.saveSearchQuery error: $e');
+    }
   }
 
   /// 清除搜索历史
   Future<void> clearSearchHistory() async {
-    // TODO: 清除本地存储
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_kSearchHistoryKey);
+    } catch (e) {
+      debugLog('MatrixSearchDataSource.clearSearchHistory error: $e');
+    }
   }
 }
 

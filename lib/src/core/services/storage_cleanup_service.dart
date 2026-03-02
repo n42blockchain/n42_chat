@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
 
 import '../constants/app_constants.dart';
 import 'media_lifecycle_service.dart';
 import 'storage_manager_service.dart';
+import '../utils/debug_log.dart';
 
 /// 清理建议类型
 enum CleanupRecommendationType {
@@ -138,7 +138,7 @@ class StorageCleanupService {
       recommendations.sort(
           (a, b) => b.estimatedBytes.compareTo(a.estimatedBytes));
     } catch (e) {
-      debugPrint('StorageCleanupService: Failed to get recommendations: $e');
+      debugLog('StorageCleanupService: Failed to get recommendations: $e');
     }
 
     return recommendations;

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/services/remark_service.dart';
@@ -8,6 +7,7 @@ import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import 'contact_event.dart';
 import 'contact_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 联系人BLoC
 class ContactBloc extends Bloc<ContactEvent, ContactState> {
@@ -51,7 +51,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
           }
         },
         onError: (Object error) {
-          debugPrint('ContactBloc: Contacts stream error: $error');
+          debugLog('ContactBloc: Contacts stream error: $error');
         },
       );
 
@@ -66,14 +66,14 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
           }
         },
         onError: (Object error) {
-          debugPrint('ContactBloc: Online status stream error: $error');
+          debugLog('ContactBloc: Online status stream error: $error');
         },
       );
 
       final contacts = await _contactRepository.getContacts();
-      debugPrint('ContactBloc: LoadContacts - Loaded ${contacts.length} contacts');
+      debugLog('ContactBloc: LoadContacts - Loaded ${contacts.length} contacts');
       for (final contact in contacts) {
-        debugPrint('ContactBloc: Contact userId=${contact.userId}, directRoomId=${contact.directRoomId}, remark=${contact.remark}');
+        debugLog('ContactBloc: Contact userId=${contact.userId}, directRoomId=${contact.directRoomId}, remark=${contact.remark}');
       }
 
       final friendRequests = await _contactRepository.getPendingFriendRequests();
@@ -99,7 +99,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     RefreshContacts event,
     Emitter<ContactState> emit,
   ) async {
-    debugPrint('ContactBloc: RefreshContacts triggered');
+    debugLog('ContactBloc: RefreshContacts triggered');
     if (state.status == ContactStatus.initial) {
       add(const LoadContacts());
       return;
@@ -107,12 +107,12 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
 
     try {
       final contacts = await _contactRepository.getContacts();
-      debugPrint('ContactBloc: Loaded ${contacts.length} contacts');
+      debugLog('ContactBloc: Loaded ${contacts.length} contacts');
 
       // 打印备注信息
       for (final c in contacts) {
         if (c.remark != null && c.remark!.isNotEmpty) {
-          debugPrint('ContactBloc: Contact ${c.userId} has remark: ${c.remark}');
+          debugLog('ContactBloc: Contact ${c.userId} has remark: ${c.remark}');
         }
       }
 
@@ -334,15 +334,15 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     Emitter<ContactState> emit,
   ) async {
     try {
-      debugPrint('ContactBloc: Setting remark for ${event.userId} to "${event.remark}"');
+      debugLog('ContactBloc: Setting remark for ${event.userId} to "${event.remark}"');
 
       // 同时保存到 RemarkService（全局本地缓存）
       await RemarkService.instance.setRemark(event.userId, event.remark);
-      debugPrint('ContactBloc: Remark saved to RemarkService');
+      debugLog('ContactBloc: Remark saved to RemarkService');
 
       // 保存到 ContactRepository
       await _contactRepository.setContactRemark(event.userId, event.remark);
-      debugPrint('ContactBloc: Remark saved to ContactRepository');
+      debugLog('ContactBloc: Remark saved to ContactRepository');
 
       // 发送成功状态
       emit(state.copyWith(
@@ -350,13 +350,13 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
         updatedRemarkUserId: event.userId,
         updatedRemark: event.remark,
       ));
-      debugPrint('ContactBloc: Emitted remarkUpdated');
+      debugLog('ContactBloc: Emitted remarkUpdated');
 
       // 刷新联系人列表以更新备注
       add(const RefreshContacts());
-      debugPrint('ContactBloc: Added RefreshContacts event');
+      debugLog('ContactBloc: Added RefreshContacts event');
     } catch (e) {
-      debugPrint('ContactBloc: Error setting remark - $e');
+      debugLog('ContactBloc: Error setting remark - $e');
       emit(state.copyWith(
         status: ContactStatus.error,
         errorMessage: e.toString(),
@@ -369,11 +369,11 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     Emitter<ContactState> emit,
   ) async {
     try {
-      debugPrint('ContactBloc: Deleting contact ${event.userId}');
+      debugLog('ContactBloc: Deleting contact ${event.userId}');
 
       // 删除联系人
       await _contactRepository.deleteContact(event.userId);
-      debugPrint('ContactBloc: Contact deleted successfully');
+      debugLog('ContactBloc: Contact deleted successfully');
 
       // 同时清除 RemarkService 中的备注
       await RemarkService.instance.setRemark(event.userId, null);
@@ -383,13 +383,13 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
         status: ContactStatus.deleted,
         deletedUserId: event.userId,
       ));
-      debugPrint('ContactBloc: Emitted deleted');
+      debugLog('ContactBloc: Emitted deleted');
 
       // 刷新联系人列表
       add(const RefreshContacts());
-      debugPrint('ContactBloc: Added RefreshContacts event');
+      debugLog('ContactBloc: Added RefreshContacts event');
     } catch (e) {
-      debugPrint('ContactBloc: Error deleting contact - $e');
+      debugLog('ContactBloc: Error deleting contact - $e');
       emit(state.copyWith(
         status: ContactStatus.error,
         errorMessage: e.toString(),

@@ -10,6 +10,7 @@ import '../../../services/auth/auth_methods_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 社交登录按钮组件
 ///
@@ -69,7 +70,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         }
       } catch (e) {
         // Apple Sign-In 不可用
-        debugPrint('Error: $e');
+        debugLog('Error: $e');
       }
     }
 
@@ -81,7 +82,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       }
     } catch (e) {
       // WeChat 不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
 

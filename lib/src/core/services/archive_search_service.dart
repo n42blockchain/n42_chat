@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
 
 import '../../data/datasources/local/archive_database.dart';
 import '../../data/mappers/archived_message_mapper.dart';
 import '../../domain/entities/message_entity.dart';
+import '../utils/debug_log.dart';
 
 /// 归档搜索结果
 class ArchiveSearchResult {
@@ -75,7 +75,7 @@ class ArchiveSearchService {
         );
       }).toList();
     } catch (e) {
-      debugPrint('ArchiveSearchService: Search failed: $e');
+      debugLog('ArchiveSearchService: Search failed: $e');
       return [];
     }
   }
@@ -89,7 +89,7 @@ class ArchiveSearchService {
     try {
       return await _db.searchCount(query, roomId: roomId);
     } catch (e) {
-      debugPrint('ArchiveSearchService: Count failed: $e');
+      debugLog('ArchiveSearchService: Count failed: $e');
       return 0;
     }
   }

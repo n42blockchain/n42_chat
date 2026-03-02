@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../utils/debug_log.dart';
 
 /// Giphy API 响应中的 GIF 数据
 class GiphyGif {
@@ -112,7 +112,7 @@ class GiphyService {
   })  : _config = config,
         _client = client ?? http.Client() {
     if (_config.apiKey.isEmpty || _config.apiKey == 'YOUR_GIPHY_API_KEY') {
-      debugPrint('WARNING: GiphyService initialized without valid API key');
+      debugLog('WARNING: GiphyService initialized without valid API key');
     }
   }
 
@@ -156,11 +156,11 @@ class GiphyService {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
         return _parseResponse(json, offset);
       } else {
-        debugPrint('Giphy search failed: ${response.statusCode}');
+        debugLog('Giphy search failed: ${response.statusCode}');
         return GiphySearchResult(gifs: const [], totalCount: 0, offset: offset);
       }
     } catch (e) {
-      debugPrint('Giphy search error: $e');
+      debugLog('Giphy search error: $e');
       return GiphySearchResult(gifs: const [], totalCount: 0, offset: offset);
     }
   }
@@ -192,11 +192,11 @@ class GiphyService {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
         return _parseResponse(json, offset);
       } else {
-        debugPrint('Giphy trending failed: ${response.statusCode}');
+        debugLog('Giphy trending failed: ${response.statusCode}');
         return GiphySearchResult(gifs: const [], totalCount: 0, offset: offset);
       }
     } catch (e) {
-      debugPrint('Giphy trending error: $e');
+      debugLog('Giphy trending error: $e');
       return GiphySearchResult(gifs: const [], totalCount: 0, offset: offset);
     }
   }
@@ -221,7 +221,7 @@ class GiphyService {
       }
       return null;
     } catch (e) {
-      debugPrint('Giphy get by id error: $e');
+      debugLog('Giphy get by id error: $e');
       return null;
     }
   }
@@ -254,7 +254,7 @@ class GiphyService {
       }
       return null;
     } catch (e) {
-      debugPrint('Giphy random error: $e');
+      debugLog('Giphy random error: $e');
       return null;
     }
   }

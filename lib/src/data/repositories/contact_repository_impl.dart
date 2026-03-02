@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/contact_entity.dart';
@@ -8,6 +7,7 @@ import '../../domain/repositories/contact_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
 import '../datasources/matrix/matrix_contact_datasource.dart';
 import '../datasources/matrix/matrix_moment_datasource.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 联系人仓库实现
 class ContactRepositoryImpl implements IContactRepository {
@@ -103,7 +103,7 @@ class ContactRepositoryImpl implements IContactRepository {
     try {
       await _momentDataSource.inviteFriendToMomentRoom(userId);
     } catch (e) {
-      debugPrint('ContactRepository: Failed to invite to moment room after startDirectChat: $e');
+      debugLog('ContactRepository: Failed to invite to moment room after startDirectChat: $e');
     }
 
     return roomId;
@@ -178,7 +178,7 @@ class ContactRepositoryImpl implements IContactRepository {
           }
         } catch (e) {
           // Ignore errors, will use fallback
-          debugPrint('Error: $e');
+          debugLog('Error: $e');
         }
       }
 
@@ -213,11 +213,11 @@ class ContactRepositoryImpl implements IContactRepository {
 
     // 3. 邀请好友加入我的 Moment 房间（使好友能看到我的朋友圈）
     if (friendUserId != null) {
-      debugPrint('ContactRepository: Inviting friend $friendUserId to moment room');
+      debugLog('ContactRepository: Inviting friend $friendUserId to moment room');
       try {
         await _momentDataSource.inviteFriendToMomentRoom(friendUserId);
       } catch (e) {
-        debugPrint('ContactRepository: Failed to invite to moment room: $e');
+        debugLog('ContactRepository: Failed to invite to moment room: $e');
         // 不影响好友请求的接受
       }
     }

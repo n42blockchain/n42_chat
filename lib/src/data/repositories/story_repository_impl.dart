@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 
 import '../../domain/entities/story_entity.dart';
 import '../../domain/repositories/story_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
 import '../datasources/matrix/matrix_story_datasource.dart';
+import '../../core/utils/debug_log.dart';
 
 /// Story 仓库实现
 ///
@@ -334,7 +334,7 @@ class StoryRepositoryImpl implements IStoryRepository {
       );
     } catch (e) {
       // 忽略存储错误
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
 }

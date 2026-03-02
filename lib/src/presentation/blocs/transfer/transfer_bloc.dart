@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/transfer_entity.dart';
@@ -7,6 +6,7 @@ import '../../../integration/wallet_bridge.dart';
 import '../bloc_message_keys.dart';
 import 'transfer_event.dart';
 import 'transfer_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 转账BLoC
 class TransferBloc extends Bloc<TransferEvent, TransferState> {
@@ -90,7 +90,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       emit(state.copyWith(balances: newBalances));
     } catch (e) {
       // 忽略余额加载错误
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
 

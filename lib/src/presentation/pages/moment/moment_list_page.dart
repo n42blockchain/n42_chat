@@ -15,6 +15,7 @@ import '../../widgets/common/n42_avatar.dart';
 import '../chat/viewers/video_player_page.dart';
 import 'create_moment_page.dart';
 import 'moment_forward_sheet.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 朋友圈列表页面
 class MomentListPage extends StatelessWidget {
@@ -96,7 +97,7 @@ class _MomentListViewState extends State<_MomentListView> {
         }
       }
     } catch (e) {
-      debugPrint('Failed to load my profile for moments: $e');
+      debugLog('Failed to load my profile for moments: $e');
     }
   }
 
@@ -133,7 +134,7 @@ class _MomentListViewState extends State<_MomentListView> {
         return contactState.contacts.map((c) => c.userId).toSet();
       }
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
     return {};
   }

@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 
 import '../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../domain/entities/points/reward_rule.dart';
 import '../../domain/repositories/points_repository.dart';
+import '../utils/debug_log.dart';
 
 /// Service that automatically tracks user actions and awards points.
 ///
@@ -33,7 +33,7 @@ class PointsTrackingService {
 
     final client = _clientManager.client;
     if (client == null) {
-      debugPrint('PointsTrackingService: Cannot start - client not available');
+      debugLog('PointsTrackingService: Cannot start - client not available');
       return;
     }
 
@@ -42,7 +42,7 @@ class PointsTrackingService {
     });
     _isTracking = true; // Only set after subscription is successfully created
 
-    debugPrint('PointsTrackingService: Started tracking');
+    debugLog('PointsTrackingService: Started tracking');
   }
 
   /// Stop tracking events.
@@ -50,7 +50,7 @@ class PointsTrackingService {
     _syncSubscription?.cancel();
     _syncSubscription = null;
     _isTracking = false;
-    debugPrint('PointsTrackingService: Stopped tracking');
+    debugLog('PointsTrackingService: Stopped tracking');
   }
 
   /// Award daily login points for a user in a room.
@@ -74,7 +74,7 @@ class PointsTrackingService {
         );
       }
     } catch (e) {
-      debugPrint('PointsTrackingService: Failed to award daily login: $e');
+      debugLog('PointsTrackingService: Failed to award daily login: $e');
     }
   }
 
@@ -111,7 +111,7 @@ class PointsTrackingService {
         }
       }
     } catch (e) {
-      debugPrint('PointsTrackingService: Error processing sync: $e');
+      debugLog('PointsTrackingService: Error processing sync: $e');
     }
   }
 
@@ -189,7 +189,7 @@ class PointsTrackingService {
         description: '${action.name} reward',
       );
     } catch (e) {
-      debugPrint('PointsTrackingService: Failed to award points: $e');
+      debugLog('PointsTrackingService: Failed to award points: $e');
     }
   }
 }

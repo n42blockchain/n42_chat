@@ -28,6 +28,7 @@ import 'services_page.dart';
 import 'status_page.dart';
 import '../moment/moment_list_page.dart';
 import '../sticker/sticker_store_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 我的页面
 class ProfilePage extends StatefulWidget {
@@ -88,11 +89,11 @@ class _ProfilePageState extends State<ProfilePage> {
             }
           }
         } catch (e) {
-          debugPrint('Failed to get avatar: $e');
+          debugLog('Failed to get avatar: $e');
         }
       }
     } catch (e) {
-      debugPrint('Failed to load user info: $e');
+      debugLog('Failed to load user info: $e');
     }
   }
 
@@ -477,7 +478,7 @@ class _ProfilePageState extends State<ProfilePage> {
         final contactRepository = getIt<IContactRepository>();
         await contactRepository.setMyStatus(result);
       } catch (e) {
-        debugPrint('Failed to sync status: $e');
+        debugLog('Failed to sync status: $e');
       }
 
       if (!context.mounted) return;
@@ -595,10 +596,10 @@ class _ProfilePageState extends State<ProfilePage> {
       final client = clientManager.client;
       if (client != null && client.isLogged()) {
         await client.setAvatar(null);
-        debugPrint('ProfilePage: Avatar updated to NFT image via $imageUrl');
+        debugLog('ProfilePage: Avatar updated to NFT image via $imageUrl');
       }
     } catch (e) {
-      debugPrint('ProfilePage: Failed to update matrix avatar: $e');
+      debugLog('ProfilePage: Failed to update matrix avatar: $e');
     }
   }
 

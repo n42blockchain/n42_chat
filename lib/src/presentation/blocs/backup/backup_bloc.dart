@@ -1,9 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/services/chat_backup_service.dart';
 import 'backup_event.dart';
 import 'backup_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 备份 BLoC
 class BackupBloc extends Bloc<BackupEvent, BackupState> {
@@ -52,7 +52,7 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
         password: event.password,
         onProgress: (progress) {
           // BLoC 不能在回调中 emit，进度通过日志跟踪
-          debugPrint('Backup progress: ${(progress * 100).toInt()}%');
+          debugLog('Backup progress: ${(progress * 100).toInt()}%');
         },
       );
       emit(state.copyWith(
@@ -118,7 +118,7 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
         restoreSettings: event.restoreSettings,
         restoreKeys: event.restoreKeys,
         onProgress: (progress) {
-          debugPrint('Restore progress: ${(progress * 100).toInt()}%');
+          debugLog('Restore progress: ${(progress * 100).toInt()}%');
         },
       );
 
@@ -153,7 +153,7 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
       );
       emit(state.copyWith(sizeEstimate: estimate));
     } catch (e) {
-      debugPrint('BackupBloc: Failed to estimate size: $e');
+      debugLog('BackupBloc: Failed to estimate size: $e');
     }
   }
 }

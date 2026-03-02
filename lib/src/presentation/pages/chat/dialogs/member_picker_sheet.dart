@@ -9,6 +9,7 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../domain/repositories/group_repository.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// 群成员选择器底部弹窗（用于@提醒）
 class MemberPickerSheet extends StatefulWidget {
@@ -61,7 +62,7 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint('Error loading members: $e');
+      debugLog('Error loading members: $e');
       setState(() => _isLoading = false);
     }
   }

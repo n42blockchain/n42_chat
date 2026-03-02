@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 安全存储数据源
 ///
@@ -49,7 +49,7 @@ class SecureStorageDataSource {
       value: jsonEncode(sessionData),
     );
 
-    debugPrint('SecureStorage: Session saved for $userId');
+    debugLog('SecureStorage: Session saved for $userId');
   }
 
   /// 获取保存的会话
@@ -62,7 +62,7 @@ class SecureStorageDataSource {
       try {
         json = jsonDecode(data) as Map<String, dynamic>;
       } on FormatException catch (e) {
-        debugPrint('SecureStorage: Session data corrupted (JSON), clearing: $e');
+        debugLog('SecureStorage: Session data corrupted (JSON), clearing: $e');
         await _storage.delete(key: _keySession);
         return null;
       }
@@ -75,7 +75,7 @@ class SecureStorageDataSource {
 
       if (homeserver == null || accessToken == null ||
           userId == null || deviceId == null) {
-        debugPrint('SecureStorage: Session data incomplete (missing required fields), clearing');
+        debugLog('SecureStorage: Session data incomplete (missing required fields), clearing');
         await _storage.delete(key: _keySession);
         return null;
       }
@@ -87,7 +87,7 @@ class SecureStorageDataSource {
         'deviceId': deviceId,
       };
     } catch (e) {
-      debugPrint('SecureStorage: Failed to read session - $e');
+      debugLog('SecureStorage: Failed to read session - $e');
       return null;
     }
   }
@@ -95,7 +95,7 @@ class SecureStorageDataSource {
   /// 清除会话
   Future<void> clearSession() async {
     await _storage.delete(key: _keySession);
-    debugPrint('SecureStorage: Session cleared');
+    debugLog('SecureStorage: Session cleared');
   }
 
   /// 检查是否有保存的会话
@@ -120,7 +120,7 @@ class SecureStorageDataSource {
     };
 
     final jsonValue = jsonEncode(credentialsData);
-    debugPrint('SecureStorage: Saving credentials for [user]...');
+    debugLog('SecureStorage: Saving credentials for [user]...');
 
     try {
       await _storage.write(
@@ -131,14 +131,14 @@ class SecureStorageDataSource {
       // 验证保存是否成功 - 立即读取回来
       final verifyData = await _storage.read(key: _keyCredentials);
       if (verifyData == null) {
-        debugPrint('SecureStorage: ERROR - Credentials verification failed, read returned null');
+        debugLog('SecureStorage: ERROR - Credentials verification failed, read returned null');
         return false;
       }
 
-      debugPrint('SecureStorage: Credentials saved and verified');
+      debugLog('SecureStorage: Credentials saved and verified');
       return true;
     } catch (e) {
-      debugPrint('SecureStorage: ERROR saving credentials - $e');
+      debugLog('SecureStorage: ERROR saving credentials - $e');
       return false;
     }
   }
@@ -146,19 +146,19 @@ class SecureStorageDataSource {
   /// 获取保存的登录凭据
   Future<Map<String, String>?> getCredentials() async {
     try {
-      debugPrint('SecureStorage: Reading credentials with key: $_keyCredentials');
+      debugLog('SecureStorage: Reading credentials with key: $_keyCredentials');
       final data = await _storage.read(key: _keyCredentials);
-      debugPrint('SecureStorage: Read data: ${data != null ? "found" : "null"}');
+      debugLog('SecureStorage: Read data: ${data != null ? "found" : "null"}');
       if (data == null) return null;
 
       final json = jsonDecode(data) as Map<String, dynamic>;
-      debugPrint('SecureStorage: Credentials loaded');
+      debugLog('SecureStorage: Credentials loaded');
       return {
         'homeserver': json['homeserver'] as String,
         'username': json['username'] as String,
       };
     } catch (e) {
-      debugPrint('SecureStorage: Failed to read credentials - $e');
+      debugLog('SecureStorage: Failed to read credentials - $e');
       return null;
     }
   }
@@ -166,7 +166,7 @@ class SecureStorageDataSource {
   /// 清除登录凭据
   Future<void> clearCredentials() async {
     await _storage.delete(key: _keyCredentials);
-    debugPrint('SecureStorage: Credentials cleared');
+    debugLog('SecureStorage: Credentials cleared');
   }
 
   /// 检查是否有保存的凭据
@@ -205,7 +205,7 @@ class SecureStorageDataSource {
       value: jsonEncode(accounts),
     );
 
-    debugPrint('SecureStorage: Account added - $userId');
+    debugLog('SecureStorage: Account added - $userId');
   }
 
   /// 获取所有账号
@@ -219,7 +219,7 @@ class SecureStorageDataSource {
         (key, value) => MapEntry(key, value as Map<String, dynamic>),
       );
     } catch (e) {
-      debugPrint('SecureStorage: Failed to read accounts - $e');
+      debugLog('SecureStorage: Failed to read accounts - $e');
       return {};
     }
   }
@@ -238,7 +238,7 @@ class SecureStorageDataSource {
       );
     }
 
-    debugPrint('SecureStorage: Account removed - $userId');
+    debugLog('SecureStorage: Account removed - $userId');
   }
 
   /// 获取账号数量
@@ -269,7 +269,7 @@ class SecureStorageDataSource {
       value: jsonEncode(data),
     );
 
-    debugPrint('SecureStorage: Biometric settings saved - enabled: $enabled');
+    debugLog('SecureStorage: Biometric settings saved - enabled: $enabled');
   }
 
   /// 获取生物识别设置
@@ -280,7 +280,7 @@ class SecureStorageDataSource {
 
       return jsonDecode(data) as Map<String, dynamic>;
     } catch (e) {
-      debugPrint('SecureStorage: Failed to read biometric settings - $e');
+      debugLog('SecureStorage: Failed to read biometric settings - $e');
       return null;
     }
   }
@@ -306,7 +306,7 @@ class SecureStorageDataSource {
   /// 禁用生物识别登录
   Future<void> disableBiometricLogin() async {
     await _storage.delete(key: _keyBiometricSettings);
-    debugPrint('SecureStorage: Biometric settings cleared');
+    debugLog('SecureStorage: Biometric settings cleared');
   }
 
   /// 获取生物识别绑定的用户名
@@ -330,7 +330,7 @@ class SecureStorageDataSource {
     try {
       return await _storage.read(key: key);
     } catch (e) {
-      debugPrint('SecureStorage: Read failed for key $key: $e');
+      debugLog('SecureStorage: Read failed for key $key: $e');
       return null;
     }
   }
@@ -352,7 +352,7 @@ class SecureStorageDataSource {
   /// 清除所有数据
   Future<void> clearAll() async {
     await _storage.deleteAll();
-    debugPrint('SecureStorage: All data cleared');
+    debugLog('SecureStorage: All data cleared');
   }
 
   /// 检查存储是否可用
@@ -363,7 +363,7 @@ class SecureStorageDataSource {
       await _storage.delete(key: testKey);
       return true;
     } catch (e) {
-      debugPrint('SecureStorage: Storage not available - $e');
+      debugLog('SecureStorage: Storage not available - $e');
       return false;
     }
   }

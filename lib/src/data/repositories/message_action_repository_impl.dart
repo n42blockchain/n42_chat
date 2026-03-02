@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/message_reaction_entity.dart';
@@ -8,6 +7,7 @@ import '../../domain/repositories/message_action_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_reaction_datasource.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 消息操作仓库实现
 class MessageActionRepositoryImpl implements IMessageActionRepository {
@@ -259,7 +259,7 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
           .toList();
       return _cachedSavedMessages!;
     } catch (e) {
-      debugPrint('MessageActionRepository: Failed to load saved messages - $e');
+      debugLog('MessageActionRepository: Failed to load saved messages - $e');
       _cachedSavedMessages = [];
       return _cachedSavedMessages!;
     }
@@ -270,7 +270,7 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
       final jsonStr = jsonEncode(messages.map(_messageToJson).toList());
       await _storage.saveFavoriteMessages(jsonStr);
     } catch (e) {
-      debugPrint('MessageActionRepository: Failed to persist saved messages - $e');
+      debugLog('MessageActionRepository: Failed to persist saved messages - $e');
     }
   }
 
@@ -314,7 +314,7 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
       );
       return _cachedFavoriteMeta!;
     } catch (e) {
-      debugPrint('MessageActionRepository: Failed to load favorite meta - $e');
+      debugLog('MessageActionRepository: Failed to load favorite meta - $e');
       _cachedFavoriteMeta = {};
       return _cachedFavoriteMeta!;
     }
@@ -324,7 +324,7 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
     try {
       await _storage.saveFavoriteMeta(jsonEncode(meta));
     } catch (e) {
-      debugPrint('MessageActionRepository: Failed to persist favorite meta - $e');
+      debugLog('MessageActionRepository: Failed to persist favorite meta - $e');
     }
   }
 

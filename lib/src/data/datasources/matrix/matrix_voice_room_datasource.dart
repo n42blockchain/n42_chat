@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../domain/entities/voice_room_entity.dart';
 import 'matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Matrix 语音房间数据源
 ///
@@ -69,7 +69,7 @@ class MatrixVoiceRoomDataSource {
 
       return roomId;
     } catch (e) {
-      debugPrint('MatrixVoiceRoomDataSource: Failed to create voice room: $e');
+      debugLog('MatrixVoiceRoomDataSource: Failed to create voice room: $e');
       return null;
     }
   }
@@ -121,7 +121,7 @@ class MatrixVoiceRoomDataSource {
       await _client?.joinRoom(roomId);
       return true;
     } catch (e) {
-      debugPrint('MatrixVoiceRoomDataSource: Failed to join voice room: $e');
+      debugLog('MatrixVoiceRoomDataSource: Failed to join voice room: $e');
       return false;
     }
   }
@@ -133,7 +133,7 @@ class MatrixVoiceRoomDataSource {
       await room?.leave();
       return true;
     } catch (e) {
-      debugPrint('MatrixVoiceRoomDataSource: Failed to leave voice room: $e');
+      debugLog('MatrixVoiceRoomDataSource: Failed to leave voice room: $e');
       return false;
     }
   }
@@ -151,7 +151,7 @@ class MatrixVoiceRoomDataSource {
       }, type: _handRaiseEventType);
       return true;
     } catch (e) {
-      debugPrint('MatrixVoiceRoomDataSource: Failed to raise hand: $e');
+      debugLog('MatrixVoiceRoomDataSource: Failed to raise hand: $e');
       return false;
     }
   }
@@ -169,7 +169,7 @@ class MatrixVoiceRoomDataSource {
       }, type: _handRaiseEventType);
       return true;
     } catch (e) {
-      debugPrint('MatrixVoiceRoomDataSource: Failed to lower hand: $e');
+      debugLog('MatrixVoiceRoomDataSource: Failed to lower hand: $e');
       return false;
     }
   }
@@ -192,7 +192,7 @@ class MatrixVoiceRoomDataSource {
       );
       return true;
     } catch (e) {
-      debugPrint('MatrixVoiceRoomDataSource: Failed to approve speaker: $e');
+      debugLog('MatrixVoiceRoomDataSource: Failed to approve speaker: $e');
       return false;
     }
   }
@@ -215,7 +215,7 @@ class MatrixVoiceRoomDataSource {
       );
       return true;
     } catch (e) {
-      debugPrint('MatrixVoiceRoomDataSource: Failed to demote to listener: $e');
+      debugLog('MatrixVoiceRoomDataSource: Failed to demote to listener: $e');
       return false;
     }
   }
@@ -234,7 +234,7 @@ class MatrixVoiceRoomDataSource {
       );
       return true;
     } catch (e) {
-      debugPrint('MatrixVoiceRoomDataSource: Failed to end voice room: $e');
+      debugLog('MatrixVoiceRoomDataSource: Failed to end voice room: $e');
       return false;
     }
   }
@@ -245,7 +245,7 @@ class MatrixVoiceRoomDataSource {
       final creationContent = room.getState('m.room.create')?.content;
       return creationContent?['type'] == _roomType;
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
       return false;
     }
   }
@@ -309,7 +309,7 @@ class MatrixVoiceRoomDataSource {
             : null,
       );
     } catch (e) {
-      debugPrint('MatrixVoiceRoomDataSource: Failed to map voice room: $e');
+      debugLog('MatrixVoiceRoomDataSource: Failed to map voice room: $e');
       return null;
     }
   }

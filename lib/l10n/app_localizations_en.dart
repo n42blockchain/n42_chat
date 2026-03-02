@@ -5672,4 +5672,81 @@ class SEn extends S {
 
   @override
   String get sendToAddress => 'Send to wallet address';
+
+  @override
+  String get blocAuthSendVerificationCodeFailed =>
+      'Failed to send verification code';
+
+  @override
+  String get blocAuthServerNoEmailPasswordReset =>
+      'This server does not support email password reset';
+
+  @override
+  String get blocAuthResetPasswordFailed => 'Failed to reset password';
+
+  @override
+  String get blocAuthChangePasswordFailed => 'Failed to change password';
+
+  @override
+  String get blocAuthOldPasswordWrong => 'Incorrect current password';
+
+  @override
+  String get blocAuthLoginCancelled => 'Login cancelled';
+
+  @override
+  String get blocAuthGoogleLoginFailed => 'Google login failed';
+
+  @override
+  String get blocAuthAppleLoginFailed => 'Apple login failed';
+
+  @override
+  String get blocAuthSsoLoginFailed => 'SSO login failed';
+
+  @override
+  String get blocAuthFacebookLoginFailed => 'Facebook login failed';
+
+  @override
+  String get blocAuthTwitterLoginFailed => 'Twitter login failed';
+
+  @override
+  String get blocAuthWeChatLoginFailed => 'WeChat login failed';
+
+  @override
+  String get blocAuthWeChatNotConfigured => 'WeChat login not configured';
+
+  @override
+  String get blocAuthWeChatNotInstalled => 'Please install WeChat first';
+
+  @override
+  String get blocAuthPasswordWrong => 'Incorrect password';
+
+  @override
+  String get blocAuthEmailAlreadyBound =>
+      'This email is already bound to another account';
+
+  @override
+  String get blocAuthChangeEmailFailed => 'Failed to change email';
+
+  @override
+  String get blocAuthVerificationCodeInvalid =>
+      'Verification code is incorrect or expired';
+
+  @override
+  String get blocAuthSessionExpired => 'Session expired, please login again';
+
+  @override
+  String get blocAuthSessionIncomplete =>
+      'Session data incomplete, please login again';
+
+  @override
+  String get blocAuthPasskeyNotImplemented =>
+      'Passkey login is not yet available';
+
+  @override
+  String get blocAuthPasskeyRegisterNotImplemented =>
+      'Passkey registration is not yet available';
+
+  @override
+  String get blocAuthEmailOtpNotImplemented =>
+      'Email OTP login is not yet available';
 }

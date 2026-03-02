@@ -1,6 +1,6 @@
+import 'dart:typed_data';
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/bot_config_entity.dart';
@@ -14,6 +14,7 @@ import '../../integration/wallet_bridge.dart';
 import '../datasources/matrix/matrix_group_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_message_datasource.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 群聊仓库实现
 class GroupRepositoryImpl implements IGroupRepository {
@@ -305,7 +306,7 @@ class GroupRepositoryImpl implements IGroupRepository {
       if (data == null) return null;
       return TokenGateConfig.fromJson(data);
     } catch (e) {
-      debugPrint('GroupRepository: Failed to get token gate: $e');
+      debugLog('GroupRepository: Failed to get token gate: $e');
       return null;
     }
   }
@@ -427,7 +428,7 @@ class GroupRepositoryImpl implements IGroupRepository {
         tokenGateConfig = TokenGateConfig.fromJson(tokenGateData);
       }
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     return GroupEntity(

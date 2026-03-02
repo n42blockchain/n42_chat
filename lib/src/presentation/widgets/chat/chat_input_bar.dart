@@ -8,6 +8,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 import 'slash_command_picker.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 语音录音结果回调
 typedef VoiceRecordCallback = void Function(String path, Duration duration);
@@ -328,7 +329,7 @@ class ChatInputBarState extends State<ChatInputBar> {
         }
       }
     } catch (e) {
-      debugPrint('Start recording error: $e');
+      debugLog('Start recording error: $e');
       _forceResetRecordingState();
       if (mounted) {
         final messenger = ScaffoldMessenger.of(context);
@@ -385,7 +386,7 @@ class ChatInputBarState extends State<ChatInputBar> {
         }
       }
     } catch (e) {
-      debugPrint('Stop recording error: $e');
+      debugLog('Stop recording error: $e');
       _forceResetRecordingState();
       if (mounted) {
         final messenger = ScaffoldMessenger.of(context);
@@ -423,7 +424,7 @@ class ChatInputBarState extends State<ChatInputBar> {
     try {
       await _voiceService.cancelRecording();
     } catch (e) {
-      debugPrint('Cancel recording error: $e');
+      debugLog('Cancel recording error: $e');
     } finally {
       _forceResetRecordingState();
     }

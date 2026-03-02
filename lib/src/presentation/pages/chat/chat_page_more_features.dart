@@ -222,7 +222,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         return;
       }
     } catch (e) {
-      debugPrint('Red packet balance check failed: $e');
+      debugLog('Red packet balance check failed: $e');
     }
 
     // 创建红包
@@ -240,7 +240,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         senderName: _getDisplayName(),
       );
     } catch (e) {
-      debugPrint('Red packet creation failed: $e');
+      debugLog('Red packet creation failed: $e');
     }
 
     // 发送红包消息
@@ -304,7 +304,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
 
   /// 发送名片
   Future<void> _sendContactCard() async {
-    debugPrint('Send contact card');
+    debugLog('Send contact card');
 
     // 预先获取本地化字符串，确保使用正确的语言
     final l10n = S.of(context);
@@ -429,7 +429,7 @@ Avatar: ${contactAvatar ?? ''}''';
 
   /// 分享音乐
   Future<void> _shareMusic() async {
-    debugPrint('Share music');
+    debugLog('Share music');
 
     // 显示音乐选择对话框
     final result = await showModalBottomSheet<Map<String, dynamic>>(
@@ -478,7 +478,7 @@ Avatar: ${contactAvatar ?? ''}''';
             );
           }
         } catch (e) {
-          debugPrint('Error sending local music: $e');
+          debugLog('Error sending local music: $e');
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(S.of(context)?.chatSendFailed(e.toString()) ?? 'Send failed: $e'), backgroundColor: Colors.red),
@@ -509,13 +509,13 @@ Avatar: ${contactAvatar ?? ''}''';
 
   void _selectCoupon() {
     // TODO(backend): 实现选择卡券功能 — 需要卡券系统集成
-    debugPrint('Select coupon');
+    debugLog('Select coupon');
     _showFeatureToast(S.of(context)?.chatCouponsFeature ?? 'Coupons');
   }
 
   void _sendGift() {
     // TODO(backend): 实现发送礼物功能 — 需要礼物系统集成
-    debugPrint('Send gift');
+    debugLog('Send gift');
     _showFeatureToast(S.of(context)?.chatGiftFeature ?? 'Gift');
   }
 
@@ -533,7 +533,7 @@ Avatar: ${contactAvatar ?? ''}''';
       final options = result['options'] as List<String>;
       final maxSelections = result['maxSelections'] as int? ?? 1;
 
-      debugPrint('ChatPage: Creating poll - question: $question, options: $options, maxSelections: $maxSelections');
+      debugLog('ChatPage: Creating poll - question: $question, options: $options, maxSelections: $maxSelections');
 
       context.read<ChatBloc>().add(SendPollMessage(
         question: question,
@@ -547,7 +547,7 @@ Avatar: ${contactAvatar ?? ''}''';
   Future<void> _showGifPicker() async {
     final gif = await showGifPicker(context);
     if (gif != null && mounted) {
-      debugPrint('ChatPage: Sending GIF - ${gif.title}');
+      debugLog('ChatPage: Sending GIF - ${gif.title}');
       context.read<ChatBloc>().add(SendGifMessage(
         gifUrl: gif.originalUrl,
         previewUrl: gif.previewUrl,
@@ -572,7 +572,7 @@ Avatar: ${contactAvatar ?? ''}''';
 
   /// 发送贴纸消息
   void _onStickerSelected(Sticker sticker, String packId) {
-    debugPrint('ChatPage: Sending sticker ${sticker.id} from pack $packId');
+    debugLog('ChatPage: Sending sticker ${sticker.id} from pack $packId');
     context.read<ChatBloc>().add(SendStickerMessage(
       stickerId: sticker.id,
       packId: packId,
@@ -606,7 +606,7 @@ Avatar: ${contactAvatar ?? ''}''';
   void _onPollVote(String pollEventId, String optionId, List<String> currentVotes, int maxSelections) {
     // 防止重复投票 - 如果正在处理投票，忽略新的点击
     if (_votingPollIds.contains(pollEventId)) {
-      debugPrint('ChatPage: Ignoring duplicate vote on poll $pollEventId');
+      debugLog('ChatPage: Ignoring duplicate vote on poll $pollEventId');
       return;
     }
 
@@ -629,7 +629,7 @@ Avatar: ${contactAvatar ?? ''}''';
       actionMessage = s?.chatVoted ?? 'Voted';
     }
 
-    debugPrint('ChatPage: Voting on poll $pollEventId, new votes: $newVotes');
+    debugLog('ChatPage: Voting on poll $pollEventId, new votes: $newVotes');
 
     // 标记正在投票
     setState(() {
@@ -661,7 +661,7 @@ Avatar: ${contactAvatar ?? ''}''';
 
   /// 结束投票
   void _onEndPoll(String pollEventId) async {
-    debugPrint('ChatPage: Ending poll $pollEventId');
+    debugLog('ChatPage: Ending poll $pollEventId');
 
     final confirm = await showDialog<bool>(
       context: context,

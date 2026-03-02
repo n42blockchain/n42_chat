@@ -15,6 +15,7 @@ import 'auto_download_settings_page.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../bridge/bridge_list_page.dart';
 import '../../../integration/bridge/bridge_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 设置页面
 class SettingsPage extends StatelessWidget {
@@ -369,7 +370,7 @@ class SettingsPage extends StatelessWidget {
         );
       }
     } catch (e) {
-      debugPrint('SettingsPage: Failed to open bridges: $e');
+      debugLog('SettingsPage: Failed to open bridges: $e');
     }
   }
 

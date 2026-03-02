@@ -1,10 +1,11 @@
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../../domain/entities/message_entity.dart';
 import '../matrix_client_manager.dart';
 import 'matrix_media_sender.dart';
 import 'matrix_media_uploader.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// Matrix 消息发送器
 ///
@@ -147,32 +148,32 @@ class MatrixMessageSender {
     required double longitude,
     String? description,
   }) async {
-    debugPrint('=== MatrixMessageDataSource.sendLocationMessage start ===');
-    debugPrint('roomId: $roomId');
-    debugPrint('latitude: $latitude');
-    debugPrint('longitude: $longitude');
-    debugPrint('description: $description');
+    debugLog('=== MatrixMessageDataSource.sendLocationMessage start ===');
+    debugLog('roomId: $roomId');
+    debugLog('latitude: $latitude');
+    debugLog('longitude: $longitude');
+    debugLog('description: $description');
 
     try {
       // 检查客户端
       if (_client == null) {
-        debugPrint('ERROR: Matrix client is null');
+        debugLog('ERROR: Matrix client is null');
         throw Exception('Matrix 客户端未初始化');
       }
 
       // 检查登录状态
       if (!_client!.isLogged()) {
-        debugPrint('ERROR: Not logged in');
+        debugLog('ERROR: Not logged in');
         throw Exception('未登录');
       }
 
       // 获取房间
       final room = _client!.getRoomById(roomId);
       if (room == null) {
-        debugPrint('ERROR: Room not found: $roomId');
+        debugLog('ERROR: Room not found: $roomId');
         throw Exception('房间不存在: $roomId');
       }
-      debugPrint('Room found: ${room.getLocalizedDisplayname()}');
+      debugLog('Room found: ${room.getLocalizedDisplayname()}');
 
       // 构建 geo URI (标准格式) - 使用固定小数位避免精度问题
       final latStr = latitude.toStringAsFixed(6);
@@ -196,23 +197,23 @@ class MatrixMessageSender {
         },
       };
 
-      debugPrint('Location content: $content');
-      debugPrint('Calling room.sendEvent...');
+      debugLog('Location content: $content');
+      debugLog('Calling room.sendEvent...');
 
       final result = await room.sendEvent(content);
-      debugPrint('sendEvent result: $result');
+      debugLog('sendEvent result: $result');
 
       if (result == null || result.isEmpty) {
-        debugPrint('WARNING: sendEvent returned null or empty result');
+        debugLog('WARNING: sendEvent returned null or empty result');
       }
 
-      debugPrint('=== sendLocationMessage completed successfully ===');
+      debugLog('=== sendLocationMessage completed successfully ===');
       return result;
     } catch (e, stackTrace) {
-      debugPrint('=== sendLocationMessage ERROR ===');
-      debugPrint('Error: $e');
-      debugPrint('Error type: ${e.runtimeType}');
-      debugPrint('Stack trace: $stackTrace');
+      debugLog('=== sendLocationMessage ERROR ===');
+      debugLog('Error: $e');
+      debugLog('Error type: ${e.runtimeType}');
+      debugLog('Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -228,24 +229,24 @@ class MatrixMessageSender {
     int? height,
     String? title,
   }) async {
-    debugPrint('=== MatrixMessageDataSource.sendGifMessage start ===');
-    debugPrint('roomId: $roomId');
-    debugPrint('gifUrl: $gifUrl');
+    debugLog('=== MatrixMessageDataSource.sendGifMessage start ===');
+    debugLog('roomId: $roomId');
+    debugLog('gifUrl: $gifUrl');
 
     try {
       if (_client == null) {
-        debugPrint('ERROR: Matrix client is null');
+        debugLog('ERROR: Matrix client is null');
         throw Exception('Matrix 客户端未初始化');
       }
 
       if (!_client!.isLogged()) {
-        debugPrint('ERROR: Not logged in');
+        debugLog('ERROR: Not logged in');
         throw Exception('未登录');
       }
 
       final room = _client!.getRoomById(roomId);
       if (room == null) {
-        debugPrint('ERROR: Room not found: $roomId');
+        debugLog('ERROR: Room not found: $roomId');
         throw Exception('房间不存在: $roomId');
       }
 
@@ -269,18 +270,18 @@ class MatrixMessageSender {
         },
       };
 
-      debugPrint('GIF content: $content');
-      debugPrint('Calling room.sendEvent...');
+      debugLog('GIF content: $content');
+      debugLog('Calling room.sendEvent...');
 
       final result = await room.sendEvent(content);
-      debugPrint('sendEvent result: $result');
+      debugLog('sendEvent result: $result');
 
-      debugPrint('=== sendGifMessage completed successfully ===');
+      debugLog('=== sendGifMessage completed successfully ===');
       return result;
     } catch (e, stackTrace) {
-      debugPrint('=== sendGifMessage ERROR ===');
-      debugPrint('Error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugLog('=== sendGifMessage ERROR ===');
+      debugLog('Error: $e');
+      debugLog('Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -301,33 +302,33 @@ class MatrixMessageSender {
     String? mimeType,
     int? size,
   }) async {
-    debugPrint('=== MatrixMessageDataSource.sendStickerMessage start ===');
-    debugPrint('roomId: $roomId');
-    debugPrint('stickerId: $stickerId');
-    debugPrint('packId: $packId');
-    debugPrint('url: $url');
+    debugLog('=== MatrixMessageDataSource.sendStickerMessage start ===');
+    debugLog('roomId: $roomId');
+    debugLog('stickerId: $stickerId');
+    debugLog('packId: $packId');
+    debugLog('url: $url');
 
     try {
       if (_client == null) {
-        debugPrint('ERROR: Matrix client is null');
+        debugLog('ERROR: Matrix client is null');
         throw Exception('Matrix 客户端未初始化');
       }
 
       if (!_client!.isLogged()) {
-        debugPrint('ERROR: Not logged in');
+        debugLog('ERROR: Not logged in');
         throw Exception('未登录');
       }
 
       final room = _client!.getRoomById(roomId);
       if (room == null) {
-        debugPrint('ERROR: Room not found: $roomId');
+        debugLog('ERROR: Room not found: $roomId');
         throw Exception('房间不存在: $roomId');
       }
 
       // 如果是 emoji 贴纸，发送为文本消息
       if (url.startsWith('emoji:')) {
         final emojiChar = url.substring(6);
-        debugPrint('Sending emoji sticker as text: $emojiChar');
+        debugLog('Sending emoji sticker as text: $emojiChar');
         return await room.sendTextEvent(emojiChar);
       }
 
@@ -351,18 +352,18 @@ class MatrixMessageSender {
         },
       };
 
-      debugPrint('Sticker content: $content');
-      debugPrint('Calling room.sendEvent with type m.sticker...');
+      debugLog('Sticker content: $content');
+      debugLog('Calling room.sendEvent with type m.sticker...');
 
       final result = await room.sendEvent(content, type: matrix.EventTypes.Sticker);
-      debugPrint('sendEvent result: $result');
+      debugLog('sendEvent result: $result');
 
-      debugPrint('=== sendStickerMessage completed successfully ===');
+      debugLog('=== sendStickerMessage completed successfully ===');
       return result;
     } catch (e, stackTrace) {
-      debugPrint('=== sendStickerMessage ERROR ===');
-      debugPrint('Error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugLog('=== sendStickerMessage ERROR ===');
+      debugLog('Error: $e');
+      debugLog('Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -406,7 +407,7 @@ class MatrixMessageSender {
   }) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) {
-      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      debugLog('MatrixMessageDataSource: Room not found: $roomId');
       return null;
     }
 
@@ -419,7 +420,7 @@ class MatrixMessageSender {
         'formatted_body': '<em>$notice</em>',
       });
 
-      debugPrint('MatrixMessageDataSource: Notice sent with eventId: $eventId');
+      debugLog('MatrixMessageDataSource: Notice sent with eventId: $eventId');
 
       // 返回临时消息实体
       return MessageEntity(
@@ -434,7 +435,7 @@ class MatrixMessageSender {
         status: MessageStatus.sent,
       );
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to send notice: $e');
+      debugLog('MatrixMessageDataSource: Failed to send notice: $e');
       rethrow;
     }
   }
@@ -461,7 +462,7 @@ class MatrixMessageSender {
       });
       return eventId;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to send contact card: $e');
+      debugLog('MatrixMessageDataSource: Failed to send contact card: $e');
       return null;
     }
   }

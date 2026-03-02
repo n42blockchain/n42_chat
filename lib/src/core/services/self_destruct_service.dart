@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
+import '../utils/debug_log.dart';
 
 /// 阅后即焚消息管理服务
 ///
@@ -37,7 +38,7 @@ class SelfDestructService extends ChangeNotifier {
     final localTime = DateTime.now();
     _serverTimeOffsetMs = serverTime.millisecondsSinceEpoch -
                           localTime.millisecondsSinceEpoch;
-    debugPrint('SelfDestructService: Server time offset set to ${_serverTimeOffsetMs}ms');
+    debugLog('SelfDestructService: Server time offset set to ${_serverTimeOffsetMs}ms');
   }
 
   /// 获取同步后的当前时间
@@ -94,7 +95,7 @@ class SelfDestructService extends ChangeNotifier {
   /// 当消息被阅读时调用此方法开始倒计时
   MessageEntity startTracking(MessageEntity message) {
     if (!message.isSelfDestructing) {
-      debugPrint('SelfDestructService: Message ${message.id} is not self-destructing');
+      debugLog('SelfDestructService: Message ${message.id} is not self-destructing');
       return message;
     }
 
@@ -150,7 +151,7 @@ class SelfDestructService extends ChangeNotifier {
           try {
             callback(message.id, countdown);
           } catch (e) {
-            debugPrint('SelfDestructService: Countdown callback error: $e');
+            debugLog('SelfDestructService: Countdown callback error: $e');
           }
         }
 
@@ -161,13 +162,13 @@ class SelfDestructService extends ChangeNotifier {
       },
     );
 
-    debugPrint('SelfDestructService: Started timer for ${message.id}, '
+    debugLog('SelfDestructService: Started timer for ${message.id}, '
         '$remainingSeconds seconds remaining');
   }
 
   /// 触发消息销毁
   void _triggerDestruction(MessageEntity message) {
-    debugPrint('SelfDestructService: Destroying message ${message.id}');
+    debugLog('SelfDestructService: Destroying message ${message.id}');
 
     // 清理追踪数据
     _timers[message.id]?.cancel();
@@ -179,7 +180,7 @@ class SelfDestructService extends ChangeNotifier {
       try {
         callback(message.id, message.roomId);
       } catch (e) {
-        debugPrint('SelfDestructService: Destruction callback error: $e');
+        debugLog('SelfDestructService: Destruction callback error: $e');
       }
     }
 
@@ -292,7 +293,7 @@ class SelfDestructTimer {
     try {
       return presets.firstWhere((p) => p.seconds == seconds);
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
       return null;
     }
   }

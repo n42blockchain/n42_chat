@@ -10,6 +10,7 @@ import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
 import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../n42_chat.dart';
 
 /// 群成员管理页面
 class GroupMembersPage extends StatefulWidget {
@@ -238,12 +239,18 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             ListTile(
               leading: const Icon(Icons.chat_bubble_outline),
               title: Text(S.of(this.context)?.commonSendMessage ?? 'Send Message'),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
-                // TODO: 创建私聊
-                ScaffoldMessenger.of(this.context).showSnackBar(
-                  SnackBar(content: Text(S.of(this.context)?.commonFeatureInDevelopment('') ?? 'Feature in development...')),
-                );
+                try {
+                  final roomId = await N42Chat.createDirectMessage(member.userId);
+                  if (!this.context.mounted) return;
+                  await N42Chat.openConversation(roomId, context: this.context);
+                } catch (e) {
+                  if (!this.context.mounted) return;
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    SnackBar(content: Text(S.of(this.context)?.commonFeatureInDevelopment('') ?? 'Feature in development...')),
+                  );
+                }
               },
             ),
 

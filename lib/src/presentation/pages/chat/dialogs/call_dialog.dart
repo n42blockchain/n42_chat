@@ -3,22 +3,24 @@
 // Apache License 2.0 and MIT License.
 // See LICENSE file in the project root for full license information.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/debug_log.dart';
+import '../../../../services/voip/call_manager.dart';
+import '../../../../services/voip/webrtc_service.dart';
 
-/// 通话对话框
+/// 通话对话框（轻量浮层）
 ///
-/// 当前为模拟实现，真正的 VoIP 通话需要集成 WebRTC
+/// 作为通话发起后的过渡 UI 使用。真正的通话控制通过 CallManager 单例
+/// 和底层 WebRTCService 执行，保证与 CallScreen（全屏通话页）使用同一
+/// 服务实例，避免状态不一致。
 ///
-/// 实现步骤:
-/// 1. 添加 flutter_webrtc 依赖
-/// 2. 配置 STUN/TURN 服务器
-/// 3. 实现 ICE 候选人交换
-/// 4. 管理本地和远程媒体流
-///
-/// 参考 FluffyChat 的 VoIP 实现
+/// 注意：此 Dialog 仅在调用方还没有路由到 CallScreen 的短暂窗口内显示。
+/// 完整的通话 UI 请参考 call_screen.dart。
 class CallDialog extends StatefulWidget {
   final String contactName;
   final String? contactAvatar;
@@ -46,6 +48,11 @@ class _CallDialogState extends State<CallDialog> {
   int _callDuration = 0;
   bool _isConnecting = true;
   String? _callStatusKey;
+  Timer? _durationTimer;
+
+  /// 获取底层 WebRTCService 实例（通过 CallManager 单例）。
+  /// 返回 null 表示通话尚未初始化，按钮动作应静默忽略。
+  WebRTCService? get _webRTCService => CallManager().webRTCService;
 
   @override
   void initState() {
@@ -54,9 +61,9 @@ class _CallDialogState extends State<CallDialog> {
   }
 
   Future<void> _initCall() async {
-    debugPrint('CallDialog: Initiating ${widget.isVideoCall ? "video" : "voice"} call');
-    debugPrint('CallDialog: Contact: ${widget.contactName}');
-    debugPrint('CallDialog: Room ID: ${widget.roomId ?? "N/A"}');
+    debugLog('CallDialog: Initiating ${widget.isVideoCall ? "video" : "voice"} call');
+    debugLog('CallDialog: Contact: ${widget.contactName}');
+    debugLog('CallDialog: Room ID: ${widget.roomId ?? "N/A"}');
 
     await Future<void>.delayed(const Duration(milliseconds: 500));
     if (mounted) {
@@ -79,16 +86,17 @@ class _CallDialogState extends State<CallDialog> {
   }
 
   void _startTimer() {
-    Future.doWhile(() async {
-      await Future<void>.delayed(const Duration(seconds: 1));
+    _durationTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted && !_isConnecting) {
-        setState(() {
-          _callDuration++;
-        });
-        return true;
+        setState(() => _callDuration++);
       }
-      return false;
     });
+  }
+
+  @override
+  void dispose() {
+    _durationTimer?.cancel();
+    super.dispose();
   }
 
   String _formatDuration(int seconds) {
@@ -111,22 +119,48 @@ class _CallDialogState extends State<CallDialog> {
   }
 
   void _toggleMute() {
-    setState(() => _isMuted = !_isMuted);
-    debugPrint('CallDialog: Mute ${_isMuted ? "on" : "off"}');
+    final service = _webRTCService;
+    if (service == null) {
+      debugLog('CallDialog: toggleMute skipped — WebRTCService not ready');
+      return;
+    }
+    service.toggleMute();
+    setState(() => _isMuted = service.isMuted);
+    debugLog('CallDialog: Mute ${_isMuted ? "on" : "off"}');
   }
 
-  void _toggleSpeaker() {
-    setState(() => _isSpeakerOn = !_isSpeakerOn);
-    debugPrint('CallDialog: Speaker ${_isSpeakerOn ? "on" : "off"}');
+  Future<void> _toggleSpeaker() async {
+    final service = _webRTCService;
+    if (service == null) {
+      debugLog('CallDialog: toggleSpeaker skipped — WebRTCService not ready');
+      return;
+    }
+    await service.toggleSpeaker();
+    setState(() => _isSpeakerOn = service.isSpeakerOn);
+    debugLog('CallDialog: Speaker ${_isSpeakerOn ? "on" : "off"}');
   }
 
   void _toggleCamera() {
-    setState(() => _isCameraOff = !_isCameraOff);
-    debugPrint('CallDialog: Camera ${_isCameraOff ? "off" : "on"}');
+    final service = _webRTCService;
+    if (service == null) {
+      debugLog('CallDialog: toggleCamera skipped — WebRTCService not ready');
+      return;
+    }
+    // toggleVideo 控制本地视频轨道的 enabled 状态
+    service.toggleVideo();
+    setState(() => _isCameraOff = !service.isVideoEnabled);
+    debugLog('CallDialog: Camera ${_isCameraOff ? "off" : "on"}');
   }
 
-  void _endCall() {
-    debugPrint('CallDialog: Ending call, duration: $_callDuration seconds');
+  Future<void> _endCall() async {
+    debugLog('CallDialog: Ending call, duration: $_callDuration seconds');
+    _durationTimer?.cancel();
+    try {
+      // 通过 CallManager 挂断，确保信令发送、通知清除等逻辑统一执行
+      await CallManager().hangupCall();
+    } catch (e) {
+      debugLog('CallDialog: Error during hangup: $e');
+    }
     widget.onEnd();
   }
 
@@ -204,7 +238,9 @@ class _CallDialogState extends State<CallDialog> {
                       ? (S.of(context)?.chatSpeakerOff ?? 'Speaker Off')
                       : (S.of(context)?.chatSpeakerOn ?? 'Speaker'),
                   isActive: _isSpeakerOn,
-                  onTap: _toggleSpeaker,
+                  // ignore: avoid_void_async — GestureDetector requires VoidCallback;
+                  // _toggleSpeaker is async to await platform speaker API
+                  onTap: () => _toggleSpeaker(),
                 ),
                 if (widget.isVideoCall)
                   _buildControlButton(
@@ -222,7 +258,8 @@ class _CallDialogState extends State<CallDialog> {
 
             // 挂断按钮
             GestureDetector(
-              onTap: _endCall,
+              // ignore: avoid_void_async
+              onTap: () => _endCall(),
               child: Container(
                 width: 72,
                 height: 72,

@@ -16,6 +16,7 @@ import '../../widgets/settings/recovery_key_display_dialog.dart';
 import '../../widgets/settings/recovery_key_import_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../security/sas_verification_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 安全设置页面
 class SecuritySettingsPage extends StatefulWidget {
@@ -86,7 +87,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             accessToken: accessToken,
           );
         } catch (e) {
-          debugPrint('SecuritySettings: Failed to load passkeys: $e');
+          debugLog('SecuritySettings: Failed to load passkeys: $e');
         }
       }
 
@@ -137,7 +138,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint('SecuritySettingsPage: Failed to load data: $e');
+      debugLog('SecuritySettingsPage: Failed to load data: $e');
       setState(() => _isLoading = false);
     }
   }

@@ -1,8 +1,9 @@
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../matrix_client_manager.dart';
 import 'matrix_media_uploader.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// Matrix 媒体消息发送器
 ///
@@ -25,8 +26,8 @@ class MatrixMediaSender {
     String? mimeType,
     int? selfDestructAfter,
   }) async {
-    debugPrint('=== sendImageMessage start ===');
-    debugPrint('roomId: $roomId, filename: $filename, size: ${imageBytes.length}');
+    debugLog('=== sendImageMessage start ===');
+    debugLog('roomId: $roomId, filename: $filename, size: ${imageBytes.length}');
 
     try {
       if (_client == null || !_client!.isLogged()) {
@@ -51,10 +52,10 @@ class MatrixMediaSender {
         actualMimeType = 'image/jpeg';
       }
 
-      debugPrint('MIME type: $actualMimeType');
+      debugLog('MIME type: $actualMimeType');
 
       // 直接使用 SDK 的 uploadContent 方法（最可靠）
-      debugPrint('Uploading with SDK uploadContent...');
+      debugLog('Uploading with SDK uploadContent...');
       Uri? mxcUri;
 
       try {
@@ -63,11 +64,11 @@ class MatrixMediaSender {
           filename: filename,
           contentType: actualMimeType,
         );
-        debugPrint('SDK upload successful: $mxcUri');
+        debugLog('SDK upload successful: $mxcUri');
       } catch (sdkUploadError) {
-        debugPrint('SDK uploadContent failed: $sdkUploadError');
+        debugLog('SDK uploadContent failed: $sdkUploadError');
         // 尝试手动上传
-        debugPrint('Trying manual upload...');
+        debugLog('Trying manual upload...');
         mxcUri = await _uploader.uploadContentAuthenticated(
           imageBytes,
           filename: filename,
@@ -79,7 +80,7 @@ class MatrixMediaSender {
         throw Exception('上传图片失败');
       }
 
-      debugPrint('Upload successful: $mxcUri');
+      debugLog('Upload successful: $mxcUri');
 
       // 发送消息事件
       final content = <String, dynamic>{
@@ -100,12 +101,12 @@ class MatrixMediaSender {
       }
 
       final result = await room.sendEvent(content);
-      debugPrint('sendEvent result: $result');
-      debugPrint('=== sendImageMessage completed ===');
+      debugLog('sendEvent result: $result');
+      debugLog('=== sendImageMessage completed ===');
       return result;
     } catch (e, stackTrace) {
-      debugPrint('=== sendImageMessage ERROR: $e ===');
-      debugPrint('Stack: $stackTrace');
+      debugLog('=== sendImageMessage ERROR: $e ===');
+      debugLog('Stack: $stackTrace');
       rethrow;
     }
   }
@@ -121,11 +122,11 @@ class MatrixMediaSender {
     String? mimeType,
     int? selfDestructAfter,
   }) async {
-    debugPrint('=== MatrixMessageDataSource.sendVoiceMessage start ===');
-    debugPrint('roomId: $roomId');
-    debugPrint('filename: $filename');
-    debugPrint('duration: $duration ms');
-    debugPrint('audioBytes.length: ${audioBytes.length}');
+    debugLog('=== MatrixMessageDataSource.sendVoiceMessage start ===');
+    debugLog('roomId: $roomId');
+    debugLog('filename: $filename');
+    debugLog('duration: $duration ms');
+    debugLog('audioBytes.length: ${audioBytes.length}');
 
     try {
       if (_client == null) {
@@ -158,10 +159,10 @@ class MatrixMediaSender {
         actualMimeType = 'audio/webm';
       }
 
-      debugPrint('Final mimeType: $actualMimeType');
+      debugLog('Final mimeType: $actualMimeType');
 
       // 方法1: 使用 SDK 内置的 sendFileEvent
-      debugPrint('Trying SDK sendFileEvent for audio...');
+      debugLog('Trying SDK sendFileEvent for audio...');
       try {
         final matrixFile = matrix.MatrixAudioFile(
           bytes: audioBytes,
@@ -184,13 +185,13 @@ class MatrixMediaSender {
           },
         );
 
-        debugPrint('sendFileEvent result: $result');
-        debugPrint('=== sendVoiceMessage completed successfully (SDK method) ===');
+        debugLog('sendFileEvent result: $result');
+        debugLog('=== sendVoiceMessage completed successfully (SDK method) ===');
         return result;
       } catch (sdkError, sdkStack) {
-        debugPrint('SDK sendFileEvent for audio failed: $sdkError');
-        debugPrint('Stack: $sdkStack');
-        debugPrint('Falling back to manual upload...');
+        debugLog('SDK sendFileEvent for audio failed: $sdkError');
+        debugLog('Stack: $sdkStack');
+        debugLog('Falling back to manual upload...');
       }
 
       // 方法2: 手动上传
@@ -222,12 +223,12 @@ class MatrixMediaSender {
       };
 
       final result = await room.sendEvent(content);
-      debugPrint('=== sendVoiceMessage completed successfully (manual method) ===');
+      debugLog('=== sendVoiceMessage completed successfully (manual method) ===');
       return result;
     } catch (e, stackTrace) {
-      debugPrint('=== sendVoiceMessage ERROR ===');
-      debugPrint('Error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugLog('=== sendVoiceMessage ERROR ===');
+      debugLog('Error: $e');
+      debugLog('Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -243,10 +244,10 @@ class MatrixMediaSender {
     Uint8List? thumbnailBytes,
     int? selfDestructAfter,
   }) async {
-    debugPrint('=== MatrixMessageDataSource.sendVideoMessage start ===');
-    debugPrint('roomId: $roomId');
-    debugPrint('filename: $filename');
-    debugPrint('videoBytes.length: ${videoBytes.length}');
+    debugLog('=== MatrixMessageDataSource.sendVideoMessage start ===');
+    debugLog('roomId: $roomId');
+    debugLog('filename: $filename');
+    debugLog('videoBytes.length: ${videoBytes.length}');
 
     try {
       if (_client == null) {
@@ -264,7 +265,7 @@ class MatrixMediaSender {
       final actualMimeType = mimeType ?? 'video/mp4';
 
       // 总是使用手动上传方式，因为SDK方法不支持缩略图上传
-      debugPrint('Using manual upload for video with thumbnail support...');
+      debugLog('Using manual upload for video with thumbnail support...');
 
       // 手动上传视频
       final mxcUri = await _uploader.uploadContentAuthenticated(
@@ -314,12 +315,12 @@ class MatrixMediaSender {
       }
 
       final result = await room.sendEvent(content);
-      debugPrint('=== sendVideoMessage completed successfully (manual method) ===');
+      debugLog('=== sendVideoMessage completed successfully (manual method) ===');
       return result;
     } catch (e, stackTrace) {
-      debugPrint('=== sendVideoMessage ERROR ===');
-      debugPrint('Error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugLog('=== sendVideoMessage ERROR ===');
+      debugLog('Error: $e');
+      debugLog('Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -334,10 +335,10 @@ class MatrixMediaSender {
     String? mimeType,
     int? selfDestructAfter,
   }) async {
-    debugPrint('=== MatrixMessageDataSource.sendFileMessage start ===');
-    debugPrint('roomId: $roomId');
-    debugPrint('filename: $filename');
-    debugPrint('fileBytes.length: ${fileBytes.length}');
+    debugLog('=== MatrixMessageDataSource.sendFileMessage start ===');
+    debugLog('roomId: $roomId');
+    debugLog('filename: $filename');
+    debugLog('fileBytes.length: ${fileBytes.length}');
 
     try {
       if (_client == null) {
@@ -355,7 +356,7 @@ class MatrixMediaSender {
       final actualMimeType = mimeType ?? 'application/octet-stream';
 
       // 方法1: 使用 SDK 内置的 sendFileEvent
-      debugPrint('Trying SDK sendFileEvent for file...');
+      debugLog('Trying SDK sendFileEvent for file...');
       try {
         final matrixFile = matrix.MatrixFile(
           bytes: fileBytes,
@@ -370,13 +371,13 @@ class MatrixMediaSender {
               : null,
         );
 
-        debugPrint('sendFileEvent result: $result');
-        debugPrint('=== sendFileMessage completed successfully (SDK method) ===');
+        debugLog('sendFileEvent result: $result');
+        debugLog('=== sendFileMessage completed successfully (SDK method) ===');
         return result;
       } catch (sdkError, sdkStack) {
-        debugPrint('SDK sendFileEvent for file failed: $sdkError');
-        debugPrint('Stack: $sdkStack');
-        debugPrint('Falling back to manual upload...');
+        debugLog('SDK sendFileEvent for file failed: $sdkError');
+        debugLog('Stack: $sdkStack');
+        debugLog('Falling back to manual upload...');
       }
 
       // 方法2: 手动上传
@@ -404,12 +405,12 @@ class MatrixMediaSender {
       };
 
       final result = await room.sendEvent(content);
-      debugPrint('=== sendFileMessage completed successfully (manual method) ===');
+      debugLog('=== sendFileMessage completed successfully (manual method) ===');
       return result;
     } catch (e, stackTrace) {
-      debugPrint('=== sendFileMessage ERROR ===');
-      debugPrint('Error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugLog('=== sendFileMessage ERROR ===');
+      debugLog('Error: $e');
+      debugLog('Stack trace: $stackTrace');
       rethrow;
     }
   }

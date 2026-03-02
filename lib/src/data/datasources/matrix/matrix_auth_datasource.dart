@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart';
 import 'package:uuid/uuid.dart';
 
@@ -7,6 +6,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/encryption/e2ee_manager.dart';
 import '../local/secure_storage_datasource.dart';
 import 'matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Matrix认证数据源
 ///
@@ -97,7 +97,7 @@ class MatrixAuthDataSource {
         await getIt<E2EEManager>().autoSetupAfterLogin();
       }
     } catch (e) {
-      debugPrint('MatrixAuthDataSource: Auto cross-signing setup failed: $e');
+      debugLog('MatrixAuthDataSource: Auto cross-signing setup failed: $e');
     }
   }
 
@@ -203,7 +203,7 @@ class MatrixAuthDataSource {
             if (decoded is! Map<String, dynamic>) rethrow;
             body = decoded;
           } on FormatException catch (fe) {
-            debugPrint('MatrixAuthDataSource: Register UIA - server returned non-JSON body: $fe');
+            debugLog('MatrixAuthDataSource: Register UIA - server returned non-JSON body: $fe');
             rethrow; // 继续抛出原始 MatrixException
           }
 
@@ -240,7 +240,7 @@ class MatrixAuthDataSource {
           }
         } catch (innerError) {
           // 解析或处理失败，继续抛出原始异常
-          debugPrint('MatrixAuthDataSource: Register UIA parse error: $innerError');
+          debugLog('MatrixAuthDataSource: Register UIA parse error: $innerError');
         }
       }
       rethrow;
@@ -399,17 +399,17 @@ class MatrixAuthDataSource {
       await _secureStorage?.write('pwd_reset_secret', clientSecret);
       await _secureStorage?.write('pwd_reset_sid', response.sid);
 
-      debugPrint('MatrixAuthDataSource: Password reset email requested');
+      debugLog('MatrixAuthDataSource: Password reset email requested');
       return true;
     } on MatrixException catch (e) {
-      debugPrint('MatrixAuthDataSource: Request password reset email failed: $e');
+      debugLog('MatrixAuthDataSource: Request password reset email failed: $e');
       // 服务器不支持该端点（M_UNRECOGNIZED: Not Found）
       if (e.errcode == 'M_UNRECOGNIZED') {
         throw Exception('Server does not support email password reset');
       }
       rethrow;
     } catch (e) {
-      debugPrint('MatrixAuthDataSource: Request password reset email failed: $e');
+      debugLog('MatrixAuthDataSource: Request password reset email failed: $e');
       rethrow;
     }
   }
@@ -460,10 +460,10 @@ class MatrixAuthDataSource {
       await _secureStorage?.delete('pwd_reset_secret');
       await _secureStorage?.delete('pwd_reset_sid');
 
-      debugPrint('MatrixAuthDataSource: Password reset confirmed');
+      debugLog('MatrixAuthDataSource: Password reset confirmed');
       return true;
     } catch (e) {
-      debugPrint('MatrixAuthDataSource: Confirm password reset failed: $e');
+      debugLog('MatrixAuthDataSource: Confirm password reset failed: $e');
       rethrow;
     }
   }
@@ -496,10 +496,10 @@ class MatrixAuthDataSource {
       // 调用 Matrix 修改密码 API
       await client.changePassword(newPassword, auth: auth);
 
-      debugPrint('MatrixAuthDataSource: Password changed successfully');
+      debugLog('MatrixAuthDataSource: Password changed successfully');
       return true;
     } catch (e) {
-      debugPrint('MatrixAuthDataSource: Change password failed: $e');
+      debugLog('MatrixAuthDataSource: Change password failed: $e');
       rethrow;
     }
   }

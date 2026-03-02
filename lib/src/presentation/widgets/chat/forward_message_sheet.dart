@@ -5,6 +5,7 @@ import '../../../core/di/injection.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/conversation_repository.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 转发消息对话框
 class ForwardMessageSheet extends StatefulWidget {
@@ -46,7 +47,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
         });
       }
     } catch (e) {
-      debugPrint('Error loading conversations: $e');
+      debugLog('Error loading conversations: $e');
       if (mounted) {
         setState(() => _isLoading = false);
       }

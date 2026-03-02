@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' show min;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
 
@@ -16,6 +15,7 @@ import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 part 'chat_bloc_message_handlers.part.dart';
 part 'chat_bloc_send_handlers.part.dart';
@@ -228,10 +228,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           isLoading: false,
           hasMore: true,
         ));
-        debugPrint('ChatBloc: Displayed ${filteredMessages.length} cached messages instantly');
+        debugLog('ChatBloc: Displayed ${filteredMessages.length} cached messages instantly');
       }
     } catch (e) {
-      debugPrint('ChatBloc: Failed to load cached messages: $e');
+      debugLog('ChatBloc: Failed to load cached messages: $e');
     }
 
     // 订阅消息更新（后台同步）
@@ -298,7 +298,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           ));
         }
       } catch (e) {
-        debugPrint('ChatBloc: Failed to load translation settings: $e');
+        debugLog('ChatBloc: Failed to load translation settings: $e');
       }
     });
   }
@@ -322,7 +322,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         if (destructionTimes.isEmpty || isClosed) return;
         add(DestructionTimesLoaded(destructionTimes));
       } catch (e) {
-        debugPrint('ChatBloc: Failed to load saved destruction times: $e');
+        debugLog('ChatBloc: Failed to load saved destruction times: $e');
       }
     });
   }
@@ -341,7 +341,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         // 触发完整消息加载（包含 reactions 和 polls）
         add(LoadMessages(roomId));
       } catch (e) {
-        debugPrint('ChatBloc: Background load failed: $e');
+        debugLog('ChatBloc: Background load failed: $e');
       }
     });
   }
@@ -352,9 +352,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       try {
         final persistedDeletedIds = await _messageRepository.getLocallyDeletedMessageIds(roomId);
         _locallyDeletedMessageIds.addAll(persistedDeletedIds);
-        debugPrint('ChatBloc: Loaded ${persistedDeletedIds.length} locally deleted message IDs from storage');
+        debugLog('ChatBloc: Loaded ${persistedDeletedIds.length} locally deleted message IDs from storage');
       } catch (e) {
-        debugPrint('ChatBloc: Failed to load locally deleted message IDs: $e');
+        debugLog('ChatBloc: Failed to load locally deleted message IDs: $e');
       }
     });
   }
@@ -392,7 +392,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }
       },
       onError: (Object error) {
-        debugPrint('ChatBloc: Poll responses stream error: $error');
+        debugLog('ChatBloc: Poll responses stream error: $error');
       },
     );
   }
@@ -448,7 +448,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           emit(state.copyWith(messages: allMessages));
         }
       } catch (e) {
-        debugPrint('ChatBloc: Failed to load scheduled messages: $e');
+        debugLog('ChatBloc: Failed to load scheduled messages: $e');
       }
     });
   }

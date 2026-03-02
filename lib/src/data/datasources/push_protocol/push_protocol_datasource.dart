@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Push Protocol HTTP 数据源
 ///
@@ -61,7 +61,7 @@ class PushProtocolDatasource {
         // 地址在 Push Protocol 上没有历史通知（正常情况）
         return [];
       }
-      debugPrint('PushProtocolDatasource: fetchNotifications error: ${e.message}');
+      debugLog('PushProtocolDatasource: fetchNotifications error: ${e.message}');
       rethrow;
     }
   }

@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 
 import '../../domain/entities/voice_room_entity.dart';
 import '../../domain/repositories/voice_room_repository.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 语音房间服务
 ///
@@ -52,10 +52,10 @@ class VoiceRoomService {
       _isConnected = true;
 
       _emitState();
-      debugPrint('VoiceRoomService: Joined room $roomId as ${role.name}');
+      debugLog('VoiceRoomService: Joined room $roomId as ${role.name}');
       return true;
     } catch (e) {
-      debugPrint('VoiceRoomService: Failed to join room: $e');
+      debugLog('VoiceRoomService: Failed to join room: $e');
       return false;
     }
   }
@@ -67,7 +67,7 @@ class VoiceRoomService {
     try {
       await _repository.leaveVoiceRoom(_currentRoomId!);
     } catch (e) {
-      debugPrint('VoiceRoomService: Failed to leave room: $e');
+      debugLog('VoiceRoomService: Failed to leave room: $e');
     } finally {
       _isConnected = false;
       _isMuted = true;

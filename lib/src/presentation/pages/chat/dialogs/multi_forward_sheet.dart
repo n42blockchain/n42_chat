@@ -10,6 +10,7 @@ import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../domain/entities/conversation_entity.dart';
 import '../../../../domain/repositories/conversation_repository.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// 批量转发选择器底部弹窗
 class MultiForwardSheet extends StatefulWidget {
@@ -56,7 +57,7 @@ class _MultiForwardSheetState extends State<MultiForwardSheet> {
         });
       }
     } catch (e) {
-      debugPrint('Error loading conversations: $e');
+      debugLog('Error loading conversations: $e');
       if (mounted) {
         setState(() => _isLoading = false);
       }

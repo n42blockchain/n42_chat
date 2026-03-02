@@ -1,10 +1,11 @@
+import 'dart:typed_data';
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 
 import '../../domain/entities/sticker_pack_entity.dart';
 import '../../domain/repositories/sticker_repository.dart';
 import '../datasources/matrix/matrix_sticker_datasource.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 贴纸仓库实现
 class StickerRepositoryImpl implements IStickerRepository {
@@ -35,6 +36,7 @@ class StickerRepositoryImpl implements IStickerRepository {
     int offset = 0,
     String? category,
   }) async {
+    // Built-in sample stickers — replace with Matrix sticker pack API (m.sticker_pack)
     // TODO: 从贴纸商店 API 获取
     // 目前返回一些示例贴纸包
     return _getSampleStorePacks().skip(offset).take(limit).toList();
@@ -224,7 +226,7 @@ class StickerRepositoryImpl implements IStickerRepository {
       }
       return null;
     } catch (e) {
-      debugPrint('StickerRepositoryImpl: Failed to create custom pack: $e');
+      debugLog('StickerRepositoryImpl: Failed to create custom pack: $e');
       return null;
     }
   }
@@ -273,7 +275,7 @@ class StickerRepositoryImpl implements IStickerRepository {
       }
       return success;
     } catch (e) {
-      debugPrint('StickerRepositoryImpl: Failed to add sticker: $e');
+      debugLog('StickerRepositoryImpl: Failed to add sticker: $e');
       return false;
     }
   }
@@ -300,7 +302,7 @@ class StickerRepositoryImpl implements IStickerRepository {
       }
       return success;
     } catch (e) {
-      debugPrint('StickerRepositoryImpl: Failed to remove sticker: $e');
+      debugLog('StickerRepositoryImpl: Failed to remove sticker: $e');
       return false;
     }
   }
@@ -328,7 +330,7 @@ class StickerRepositoryImpl implements IStickerRepository {
       }
       return success;
     } catch (e) {
-      debugPrint('StickerRepositoryImpl: Failed to rename pack: $e');
+      debugLog('StickerRepositoryImpl: Failed to rename pack: $e');
       return false;
     }
   }
@@ -336,7 +338,7 @@ class StickerRepositoryImpl implements IStickerRepository {
   @override
   Future<StickerPack?> importPack(String shareUrl) async {
     // TODO: 实现从分享链接导入贴纸包
-    debugPrint('StickerRepositoryImpl: Import pack from $shareUrl');
+    debugLog('StickerRepositoryImpl: Import pack from $shareUrl');
     return null;
   }
 

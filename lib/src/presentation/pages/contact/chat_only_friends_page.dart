@@ -11,6 +11,7 @@ import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'contact_tile.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 仅聊天的朋友列表页面
 class ChatOnlyFriendsPage extends StatefulWidget {
@@ -47,7 +48,7 @@ class _ChatOnlyFriendsPageState extends State<ChatOnlyFriendsPage> {
               chatOnlyIds.add(contact.userId);
             }
           } catch (e) {
-            debugPrint('Error: $e');
+            debugLog('Error: $e');
           }
         }
       }
@@ -61,7 +62,7 @@ class _ChatOnlyFriendsPageState extends State<ChatOnlyFriendsPage> {
         });
       }
     } catch (e) {
-      debugPrint('Failed to load chat-only friends: $e');
+      debugLog('Failed to load chat-only friends: $e');
       if (mounted) {
         setState(() => _isLoading = false);
       }

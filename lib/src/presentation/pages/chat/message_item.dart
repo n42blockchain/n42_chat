@@ -21,6 +21,7 @@ import '../../widgets/chat/message_reaction_bar.dart';
 import '../../widgets/chat/edit_history_sheet.dart';
 import '../../widgets/chat/thread_indicator.dart';
 import 'message_item_helpers.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 消息列表项
 class MessageItem extends StatelessWidget {
@@ -600,7 +601,7 @@ class MessageItem extends StatelessWidget {
         };
       }
     } catch (e) {
-      debugPrint('Parse contact card error: $e');
+      debugLog('Parse contact card error: $e');
     }
     return null;
   }

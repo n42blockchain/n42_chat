@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/encryption/utils/key_verification.dart' as kv;
 import 'package:matrix/matrix.dart' as matrix;
+import '../utils/debug_log.dart';
 
 /// 端到端加密管理器
 ///
@@ -60,7 +60,7 @@ class E2EEManager {
     try {
       // 上传所有 inbound group sessions 到服务端备份
       await encryption.keyManager.uploadInboundGroupSessions();
-      debugPrint('E2EEManager: Room keys exported to server backup');
+      debugLog('E2EEManager: Room keys exported to server backup');
       return 'exported_to_server_backup';
     } catch (e) {
       throw E2EEException('Failed to export room keys: $e');
@@ -89,7 +89,7 @@ class E2EEManager {
 
       // 从服务端备份恢复所有密钥
       await encryption.keyManager.loadAllKeys();
-      debugPrint('E2EEManager: Room keys imported from server backup');
+      debugLog('E2EEManager: Room keys imported from server backup');
       return 1;
     } catch (e) {
       throw E2EEException('Failed to import room keys: $e');
@@ -133,13 +133,13 @@ class E2EEManager {
           recoveryKey: recoveryKey,
         );
       } catch (e) {
-        debugPrint('E2EEManager: Cross-signing self-sign skipped: $e');
+        debugLog('E2EEManager: Cross-signing self-sign skipped: $e');
       }
 
       // 5. 启用密钥自动上传到服务端备份
       encryption.keyManager.startAutoUploadKeys();
 
-      debugPrint('E2EEManager: Recovery key created successfully');
+      debugLog('E2EEManager: Recovery key created successfully');
       return recoveryKey;
     } catch (e) {
       if (e is E2EEException) rethrow;
@@ -168,7 +168,7 @@ class E2EEManager {
       try {
         await encryption.crossSigning.selfSign(recoveryKey: recoveryKey);
       } catch (e) {
-        debugPrint('E2EEManager: Cross-signing recovery skipped: $e');
+        debugLog('E2EEManager: Cross-signing recovery skipped: $e');
       }
 
       // 4. 缓存恢复密钥
@@ -177,7 +177,7 @@ class E2EEManager {
       // 5. 启用自动密钥上传
       encryption.keyManager.startAutoUploadKeys();
 
-      debugPrint('E2EEManager: Unlocked with recovery key successfully');
+      debugLog('E2EEManager: Unlocked with recovery key successfully');
     } catch (e) {
       if (e is E2EEException) rethrow;
       throw E2EEException('Failed to unlock with recovery key: $e');
@@ -202,12 +202,12 @@ class E2EEManager {
       try {
         await encryption.crossSigning.selfSign(passphrase: passphrase);
       } catch (e) {
-        debugPrint('E2EEManager: Cross-signing with passphrase skipped: $e');
+        debugLog('E2EEManager: Cross-signing with passphrase skipped: $e');
       }
 
       encryption.keyManager.startAutoUploadKeys();
 
-      debugPrint('E2EEManager: Unlocked with passphrase successfully');
+      debugLog('E2EEManager: Unlocked with passphrase successfully');
     } catch (e) {
       if (e is E2EEException) rethrow;
       throw E2EEException('Failed to unlock with passphrase: $e');
@@ -336,14 +336,14 @@ class E2EEManager {
   /// 失败时静默处理，不阻塞登录流程。
   Future<void> autoSetupAfterLogin() async {
     if (!isEncryptionInitialized || _autoSetupInProgress) {
-      debugPrint('E2EEManager: Encryption not initialized or setup already in progress, skipping');
+      debugLog('E2EEManager: Encryption not initialized or setup already in progress, skipping');
       return;
     }
 
     _autoSetupInProgress = true;
     try {
       if (isCrossSigningEnabled) {
-        debugPrint('E2EEManager: Cross-signing already enabled');
+        debugLog('E2EEManager: Cross-signing already enabled');
         return;
       }
 
@@ -352,17 +352,17 @@ class E2EEManager {
         final cachedKey = _cachedRecoveryKey;
         if (cachedKey != null) {
           await recoverCrossSigning(cachedKey);
-          debugPrint('E2EEManager: Cross-signing recovered with cached key');
+          debugLog('E2EEManager: Cross-signing recovered with cached key');
           return;
         }
       }
 
       // 尝试直接 self-sign（新设备、首次登录场景）
       await initializeCrossSigning();
-      debugPrint('E2EEManager: Cross-signing auto-initialized');
+      debugLog('E2EEManager: Cross-signing auto-initialized');
     } catch (e) {
       // 非致命：部分场景下 self-sign 需要用户交互（如输入恢复密钥）
-      debugPrint('E2EEManager: Auto cross-signing setup failed (non-fatal): $e');
+      debugLog('E2EEManager: Auto cross-signing setup failed (non-fatal): $e');
     } finally {
       _autoSetupInProgress = false;
     }

@@ -4,7 +4,7 @@
 /// 这些参数需要从服务端获取或在初始化时配置
 library;
 
-import 'package:flutter/foundation.dart';
+import '../../core/utils/debug_log.dart';
 
 /// VoIP 配置类
 class VoIPConfig {
@@ -111,7 +111,7 @@ class VoIPConfig {
     enableAutoGainControl = config.autoGainControl;
     enableHighPassFilter = config.highPassFilter;
     enableEnhancedAudioMode = config.enhancedMode;
-    debugPrint('VoIPConfig: Audio processing updated - NS: $enableNoiseSuppression, AEC: $enableEchoCancellation, AGC: $enableAutoGainControl');
+    debugLog('VoIPConfig: Audio processing updated - NS: $enableNoiseSuppression, AEC: $enableEchoCancellation, AGC: $enableAutoGainControl');
   }
 
   // ============================================
@@ -144,7 +144,7 @@ class VoIPConfig {
     backgroundMode = config.mode;
     backgroundBlurRadius = config.blurRadius;
     virtualBackgroundUrl = config.virtualBackgroundUrl;
-    debugPrint('VoIPConfig: Background processing updated - mode: $backgroundMode, blur: $backgroundBlurRadius');
+    debugLog('VoIPConfig: Background processing updated - mode: $backgroundMode, blur: $backgroundBlurRadius');
   }
 
   // ============================================
@@ -187,7 +187,7 @@ class VoIPConfig {
     recordingBitRate = config.bitRate;
     recordingMaxDuration = config.maxDuration;
     recordingSavePath = config.savePath;
-    debugPrint('VoIPConfig: Call recording updated - enabled: $enableCallRecording, autoStart: $autoStartRecording');
+    debugLog('VoIPConfig: Call recording updated - enabled: $enableCallRecording, autoStart: $autoStartRecording');
   }
 
   // ============================================
@@ -246,7 +246,7 @@ class VoIPConfig {
     if (response['ttl'] != null) {
       turnTtl = response['ttl'] as int;
     }
-    debugPrint('VoIPConfig: Updated TURN config with ${turnUris.length} URIs');
+    debugLog('VoIPConfig: Updated TURN config with ${turnUris.length} URIs');
   }
   
   /// 配置 LiveKit
@@ -258,7 +258,7 @@ class VoIPConfig {
     liveKitUrl = url;
     liveKitApiKey = apiKey;
     liveKitApiSecret = apiSecret;
-    debugPrint('VoIPConfig: LiveKit configured with URL: $url');
+    debugLog('VoIPConfig: LiveKit configured with URL: $url');
   }
   
   /// 检查是否已配置 TURN

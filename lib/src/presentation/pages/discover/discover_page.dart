@@ -16,6 +16,7 @@ import '../qrcode/scan_qr_page.dart';
 import '../search/global_search_page.dart';
 import '../space/space_list_page.dart';
 import 'channel_discover_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 发现页面（仿微信）
 class DiscoverPage extends StatelessWidget {
@@ -215,7 +216,7 @@ class DiscoverPage extends StatelessWidget {
     try {
       momentBloc = context.read<MomentBloc>();
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     if (momentBloc == null) {
@@ -276,7 +277,7 @@ class DiscoverPage extends StatelessWidget {
     try {
       context.read<MomentBloc>().add(const MarkMomentsAsRead());
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     Navigator.of(context).push(

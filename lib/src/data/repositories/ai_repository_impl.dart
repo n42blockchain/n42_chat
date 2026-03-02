@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 
 import '../../core/services/ai_service.dart';
 import '../../domain/entities/ai_assistant_entity.dart';
 import '../../domain/repositories/ai_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
+import '../../core/utils/debug_log.dart';
 
 /// AI 仓库实现
 class AiRepositoryImpl implements IAiRepository {
@@ -44,7 +44,7 @@ class AiRepositoryImpl implements IAiRepository {
       }
       return assistants;
     } catch (e) {
-      debugPrint('AiRepository: Failed to load assistants: $e');
+      debugLog('AiRepository: Failed to load assistants: $e');
       return [AiAssistantEntity.defaultAssistant];
     }
   }
@@ -71,7 +71,7 @@ class AiRepositoryImpl implements IAiRepository {
       final data = jsonEncode(assistants.map((a) => a.toJson()).toList());
       await _storage.write(_keyAssistants, data);
     } catch (e) {
-      debugPrint('AiRepository: Failed to save assistant: $e');
+      debugLog('AiRepository: Failed to save assistant: $e');
     }
   }
 
@@ -86,7 +86,7 @@ class AiRepositoryImpl implements IAiRepository {
       // 同时清除该助手的历史
       await clearChatHistory(assistantId);
     } catch (e) {
-      debugPrint('AiRepository: Failed to delete assistant: $e');
+      debugLog('AiRepository: Failed to delete assistant: $e');
     }
   }
 
@@ -100,7 +100,7 @@ class AiRepositoryImpl implements IAiRepository {
           .map((e) => AiChatMessage.fromJson(e as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      debugPrint('AiRepository: Failed to load chat history: $e');
+      debugLog('AiRepository: Failed to load chat history: $e');
       return [];
     }
   }
@@ -119,7 +119,7 @@ class AiRepositoryImpl implements IAiRepository {
       final data = jsonEncode(trimmed.map((m) => m.toJson()).toList());
       await _storage.write('$_keyChatHistoryPrefix$assistantId', data);
     } catch (e) {
-      debugPrint('AiRepository: Failed to save chat message: $e');
+      debugLog('AiRepository: Failed to save chat message: $e');
     }
   }
 
@@ -128,7 +128,7 @@ class AiRepositoryImpl implements IAiRepository {
     try {
       await _storage.delete('$_keyChatHistoryPrefix$assistantId');
     } catch (e) {
-      debugPrint('AiRepository: Failed to clear chat history: $e');
+      debugLog('AiRepository: Failed to clear chat history: $e');
     }
   }
 }

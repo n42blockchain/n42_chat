@@ -73,70 +73,70 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
         isPinned: isPinned,
         canPin: canPin,
         onDismiss: () {
-          debugPrint('Menu dismissed');
+          debugLog('Menu dismissed');
           overlayEntry.remove();
         },
         onCopy: () {
-          debugPrint('Copy clicked');
+          debugLog('Copy clicked');
           _copyMessage(message);
         },
         // 红包和转账消息不能转发
         onForward: (message.type == MessageType.redPacket || message.type == MessageType.transfer)
             ? null
             : () {
-                debugPrint('Forward clicked');
+                debugLog('Forward clicked');
                 _forwardMessage(message);
               },
         onFavorite: () {
-          debugPrint('Favorite clicked');
+          debugLog('Favorite clicked');
           _favoriteMessage(message);
         },
         onRecall: () {
-          debugPrint('Recall clicked');
+          debugLog('Recall clicked');
           _recallMessage(message);
         },
         onMultiSelect: () {
-          debugPrint('MultiSelect clicked');
+          debugLog('MultiSelect clicked');
           _enterMultiSelectMode();
         },
         onQuote: () {
-          debugPrint('Quote clicked');
+          debugLog('Quote clicked');
           _quoteMessage(message);
         },
         onRemind: () {
-          debugPrint('Remind clicked');
+          debugLog('Remind clicked');
           _remindMessage(message);
         },
         onSearch: () {
-          debugPrint('Search clicked');
+          debugLog('Search clicked');
           _searchMessage(message);
         },
         onDelete: () {
-          debugPrint('Delete message locally clicked');
+          debugLog('Delete message locally clicked');
           _deleteMessageLocally(message);
         },
         onResend: () {
-          debugPrint('Resend clicked');
+          debugLog('Resend clicked');
           _onResend(message);
         },
         onSave: () {
-          debugPrint('Save clicked');
+          debugLog('Save clicked');
           _saveMedia(message);
         },
         onReaction: (emoji) {
-          debugPrint('Reaction clicked: $emoji');
+          debugLog('Reaction clicked: $emoji');
           _addReaction(message, emoji);
         },
         onPin: () {
-          debugPrint('Pin clicked');
+          debugLog('Pin clicked');
           context.read<ChatBloc>().add(PinMessage(message.id));
         },
         onUnpin: () {
-          debugPrint('Unpin clicked');
+          debugLog('Unpin clicked');
           context.read<ChatBloc>().add(UnpinMessage(message.id));
         },
         onViewEditHistory: message.isEdited ? () {
-          debugPrint('View edit history clicked');
+          debugLog('View edit history clicked');
           showModalBottomSheet<void>(
             context: context,
             isScrollControlled: true,
@@ -148,15 +148,15 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
           );
         } : null,
         onReplyInThread: () {
-          debugPrint('Reply in thread clicked');
+          debugLog('Reply in thread clicked');
           _navigateToThread(message);
         },
         onEdit: () {
-          debugPrint('Edit clicked');
+          debugLog('Edit clicked');
           _enterEditMode(message);
         },
         onTranslate: (getIt.isRegistered<ITranslationService>() && message.type == MessageType.text) ? () {
-          debugPrint('Translate clicked');
+          debugLog('Translate clicked');
           final chatBloc = context.read<ChatBloc>();
           final targetLang = chatBloc.state.defaultTargetLanguage.isNotEmpty
               ? chatBloc.state.defaultTargetLanguage
@@ -167,7 +167,7 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
           ));
         } : null,
         onReport: message.isFromMe ? null : () {
-          debugPrint('Report clicked');
+          debugLog('Report clicked');
           _showReportDialog(message);
         },
       ),

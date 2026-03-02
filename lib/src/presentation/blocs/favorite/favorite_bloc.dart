@@ -1,9 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/repositories/message_action_repository.dart';
 import 'favorite_event.dart';
 import 'favorite_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
   final IMessageActionRepository _repository;
@@ -34,7 +34,7 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
         filterType: event.filterType,
       ));
     } catch (e) {
-      debugPrint('FavoriteBloc: Failed to load favorites: $e');
+      debugLog('FavoriteBloc: Failed to load favorites: $e');
       emit(state.copyWith(
         isLoading: false,
         error: e.toString(),
@@ -60,7 +60,7 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
           .toList();
       emit(state.copyWith(favorites: updated));
     } catch (e) {
-      debugPrint('FavoriteBloc: Failed to delete favorite: $e');
+      debugLog('FavoriteBloc: Failed to delete favorite: $e');
       emit(state.copyWith(error: e.toString()));
     }
   }
@@ -74,7 +74,7 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
       // 重新加载
       add(const LoadFavorites());
     } catch (e) {
-      debugPrint('FavoriteBloc: Failed to edit tags: $e');
+      debugLog('FavoriteBloc: Failed to edit tags: $e');
       emit(state.copyWith(error: e.toString()));
     }
   }
@@ -88,7 +88,7 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
       // 重新加载
       add(const LoadFavorites());
     } catch (e) {
-      debugPrint('FavoriteBloc: Failed to edit remark: $e');
+      debugLog('FavoriteBloc: Failed to edit remark: $e');
       emit(state.copyWith(error: e.toString()));
     }
   }
