@@ -9,6 +9,10 @@ extension _ChatPageAppBarMethods on _ChatPageState {
       return _buildMultiSelectAppBar(isDark);
     }
 
+    // 检测桥接平台
+    final bridgePlatform =
+        BridgeDetectionUtils.detectFromConversation(widget.conversation);
+
     return N42AppBar(
       titleWidget: BlocBuilder<ChatBloc, ChatState>(
         buildWhen: (prev, curr) => prev.isChannel != curr.isChannel,
@@ -25,6 +29,16 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                         Icons.campaign,
                         size: 18,
                         color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      ),
+                    ),
+                  // 桥接平台小图标
+                  if (bridgePlatform != null)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: Icon(
+                        BridgePlatformRegistry.getInfo(bridgePlatform).icon,
+                        size: 16,
+                        color: BridgePlatformRegistry.getInfo(bridgePlatform).brandColor,
                       ),
                     ),
                   Flexible(

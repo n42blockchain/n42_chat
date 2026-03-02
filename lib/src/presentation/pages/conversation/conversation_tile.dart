@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/bridge_detection_utils.dart';
 import '../../../core/utils/date_utils.dart';
 import '../../../domain/entities/conversation_entity.dart';
+import '../../../integration/bridge/bridge_platform.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 会话列表项（仿微信）
@@ -99,7 +101,7 @@ class ConversationTile extends StatelessWidget {
 
   Widget _buildAvatar(bool isDark) {
     Widget avatarWidget;
-    
+
     // 三人及以上群聊：使用九宫格头像
     if (conversation.type == ConversationType.group &&
         conversation.memberAvatarUrls != null &&
@@ -123,23 +125,36 @@ class ConversationTile extends StatelessWidget {
         borderRadius: 12,
       );
     }
-    
-    // 未读消息红点/红色数字
-    if (conversation.unreadCount > 0) {
-      return Stack(
-        clipBehavior: Clip.none,
-        children: [
-          avatarWidget,
+
+    // 检测桥接平台
+    final bridgePlatform =
+        BridgeDetectionUtils.detectFromConversation(conversation);
+
+    final hasUnread = conversation.unreadCount > 0;
+    final hasBridge = bridgePlatform != null;
+
+    if (!hasUnread && !hasBridge) return avatarWidget;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        avatarWidget,
+        // 未读红点
+        if (hasUnread)
           Positioned(
             top: -4,
             right: -4,
             child: _buildUnreadBadge(),
           ),
-        ],
-      );
-    }
-    
-    return avatarWidget;
+        // 桥接平台 badge
+        if (hasBridge)
+          Positioned(
+            bottom: -2,
+            right: -2,
+            child: _BridgeBadge(platform: bridgePlatform),
+          ),
+      ],
+    );
   }
 
   Widget _buildUnreadBadge() {
@@ -313,5 +328,39 @@ class ConversationTile extends StatelessWidget {
     }
 
     return conversation.lastMessage!;
+  }
+}
+
+/// 桥接平台小图标 badge（16x16 圆形，白底 + 平台 brand color 图标）
+class _BridgeBadge extends StatelessWidget {
+  final BridgePlatform platform;
+
+  const _BridgeBadge({required this.platform});
+
+  @override
+  Widget build(BuildContext context) {
+    final info = BridgePlatformRegistry.getInfo(platform);
+    return Container(
+      width: 18,
+      height: 18,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Icon(
+          info.icon,
+          size: 11,
+          color: info.brandColor,
+        ),
+      ),
+    );
   }
 }
