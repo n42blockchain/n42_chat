@@ -416,7 +416,7 @@ class MessageItem extends StatelessWidget {
         : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05));
 
     final textColor = message.isFromMe
-        ? AppColors.messageTextSent.withValues(alpha: 0.8)
+        ? AppColors.sentText(isDark).withValues(alpha: 0.8)
         : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary);
 
     // 包装 GestureDetector 以支持点击跳转到原消息
@@ -475,7 +475,7 @@ class MessageItem extends StatelessWidget {
     // 微信中绿色气泡的文字是黑色，灰色气泡的文字也是黑色
     // 深色模式下，对方的灰色气泡文字是白色
     final textColor = message.isFromMe
-        ? AppColors.messageTextSent  // 黑色
+        ? AppColors.sentText(isDark)  // 黑色
         : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
 
     final textWidget = _buildRichTextWithAddresses(
@@ -502,7 +502,7 @@ class MessageItem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 color: message.isFromMe
-                    ? AppColors.messageTextSent.withValues(alpha: 0.5)
+                    ? AppColors.sentText(isDark).withValues(alpha: 0.5)
                     : (isDark ? Colors.grey[500] : Colors.grey),
                 fontStyle: FontStyle.italic,
               ),
@@ -667,7 +667,7 @@ class MessageItem extends StatelessWidget {
         width: 220,
         decoration: BoxDecoration(
           color: message.isFromMe
-              ? AppColors.bubbleSelf
+              ? AppColors.selfBubble(isDark)
               : (isDark ? AppColors.bubbleOtherDark : AppColors.bubbleOther),
           borderRadius: BorderRadius.circular(4),
         ),
@@ -694,7 +694,7 @@ class MessageItem extends StatelessWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: message.isFromMe
-                                ? AppColors.messageTextSent
+                                ? AppColors.sentText(isDark)
                                 : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived),
                           ),
                           maxLines: 1,
@@ -706,7 +706,7 @@ class MessageItem extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             color: message.isFromMe
-                                ? AppColors.messageTextSent.withValues(alpha: 0.6)
+                                ? AppColors.sentText(isDark).withValues(alpha: 0.6)
                                 : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
                           ),
                           maxLines: 1,
@@ -737,7 +737,7 @@ class MessageItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   color: message.isFromMe
-                      ? AppColors.messageTextSent.withValues(alpha: 0.5)
+                      ? AppColors.sentText(isDark).withValues(alpha: 0.5)
                       : (isDark ? AppColors.textSecondaryDark : AppColors.textTertiary),
                 ),
               ),
@@ -1136,7 +1136,7 @@ class MessageItem extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     color: message.isFromMe
-                        ? AppColors.messageTextSent
+                        ? AppColors.sentText(isDark)
                         : (isDark
                             ? AppColors.textPrimaryDark
                             : AppColors.messageTextReceived),
@@ -1256,7 +1256,7 @@ class MessageItem extends StatelessWidget {
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: message.isFromMe
-                              ? AppColors.messageTextSent
+                              ? AppColors.sentText(isDark)
                               : (isDark
                                   ? AppColors.textPrimaryDark
                                   : AppColors.messageTextReceived),
@@ -1268,7 +1268,7 @@ class MessageItem extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11,
                             color: message.isFromMe
-                                ? AppColors.messageTextSent.withValues(alpha: 0.7)
+                                ? AppColors.sentText(isDark).withValues(alpha: 0.7)
                                 : AppColors.textSecondary,
                           ),
                         ),
@@ -1404,7 +1404,7 @@ class MessageItem extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: message.isFromMe
-                          ? AppColors.messageTextSent
+                          ? AppColors.sentText(isDark)
                           : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
                     ),
                     maxLines: 1,
@@ -1416,7 +1416,7 @@ class MessageItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       color: message.isFromMe
-                          ? AppColors.messageTextSent.withValues(alpha: 0.7)
+                          ? AppColors.sentText(isDark).withValues(alpha: 0.7)
                           : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
                     ),
                     maxLines: 1,
@@ -1518,7 +1518,7 @@ class MessageItem extends StatelessWidget {
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: message.isFromMe
-                  ? AppColors.messageTextSent
+                  ? AppColors.sentText(isDark)
                   : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived),
             ),
           ),
@@ -1696,7 +1696,7 @@ class MessageItem extends StatelessWidget {
     final textColor = isMissed && !message.isFromMe
         ? AppColors.error
         : (message.isFromMe
-            ? AppColors.messageTextSent
+            ? AppColors.sentText(isDark)
             : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived));
 
     final iconColor = isMissed && !message.isFromMe

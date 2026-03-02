@@ -51,7 +51,7 @@ class MarkdownMessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final textColor = isSelf
-        ? AppColors.messageTextSent
+        ? AppColors.sentText(isDark)
         : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
 
     final linkColor = isSelf

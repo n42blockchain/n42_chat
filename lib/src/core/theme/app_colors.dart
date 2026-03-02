@@ -120,14 +120,24 @@ abstract class AppColors {
   /// 消息文字 - 接收方
   static const Color messageTextReceived = Color(0xFF000000);
 
-  /// 自己发送的消息气泡
+  /// 自己发送的消息气泡 - 浅色
   static const Color bubbleSelf = Color(0xFF95EC69);
+
+  /// 自己发送的消息气泡 - 深色
+  static const Color bubbleSelfDark = Color(0xFF3EB575);
 
   /// 对方发送的消息气泡 - 浅色
   static const Color bubbleOther = Color(0xFFFFFFFF);
 
   /// 对方发送的消息气泡 - 深色
   static const Color bubbleOtherDark = Color(0xFF2C2C2C);
+
+  /// 获取自己气泡颜色（适配深浅色）
+  static Color selfBubble(bool isDark) => isDark ? bubbleSelfDark : bubbleSelf;
+
+  /// 获取发送方文字颜色（适配深浅色）
+  static Color sentText(bool isDark) =>
+      isDark ? const Color(0xFFFFFFFF) : messageTextSent;
 
   // ============================================
   // 状态颜色
