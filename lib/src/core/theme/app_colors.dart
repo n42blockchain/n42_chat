@@ -212,8 +212,8 @@ abstract class AppColors {
   /// 红包
   static const Color redPacket = Color(0xFFFD9B2D);
 
-  /// 时间分隔器背景
-  static const Color timeSeparator = Color(0xCCCCCCCC);
+  /// 时间分隔器文字（已弃用背景色，改为纯文字）
+  static const Color timeSeparator = Color(0xFF808080);
 }
 
 /// 颜色调色板
