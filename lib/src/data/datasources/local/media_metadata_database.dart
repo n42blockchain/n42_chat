@@ -5,6 +5,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import '../../../core/utils/debug_log.dart';
 
 part 'media_metadata_database.g.dart';
 
@@ -89,12 +90,12 @@ class MediaMetadataDatabase extends _$MediaMetadataDatabase {
           // if (from < 2) {
           //   await m.addColumn(mediaFiles, mediaFiles.newColumn);
           // }
-          debugPrint(
+          debugLog(
               'MediaMetadataDatabase: Migrating from v$from to v$to');
         },
         beforeOpen: (details) async {
           if (details.hadUpgrade) {
-            debugPrint(
+            debugLog(
                 'MediaMetadataDatabase: Schema upgraded from '
                 'v${details.versionBefore} to v${details.versionNow}');
           }

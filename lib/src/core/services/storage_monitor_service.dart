@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_constants.dart';
 import 'media_lifecycle_service.dart';
 import 'storage_manager_service.dart';
+import '../utils/debug_log.dart';
 
 /// 存储级别
 enum StorageLevel { normal, warning, critical }
@@ -115,7 +115,7 @@ class StorageMonitorService {
       try {
         deviceFree = await _getDeviceFreeSpace();
       } catch (e) {
-        debugPrint('StorageMonitorService: Failed to get device free space: $e');
+        debugLog('StorageMonitorService: Failed to get device free space: $e');
       }
 
       // 优先基于设备剩余空间判断，回退到 app 占用大小
@@ -155,7 +155,7 @@ class StorageMonitorService {
       _statusController.add(status);
       return status;
     } catch (e) {
-      debugPrint('StorageMonitorService: Failed to check status: $e');
+      debugLog('StorageMonitorService: Failed to check status: $e');
       return const StorageStatus();
     }
   }
@@ -177,7 +177,7 @@ class StorageMonitorService {
             prefs.getBool('storage_preserve_thumbs') ?? true,
       );
     } catch (e) {
-      debugPrint('StorageMonitorService: Failed to get config: $e');
+      debugLog('StorageMonitorService: Failed to get config: $e');
       return const StorageConfig();
     }
   }
@@ -195,7 +195,7 @@ class StorageMonitorService {
       await prefs.setBool(
           'storage_preserve_thumbs', config.preserveThumbnails);
     } catch (e) {
-      debugPrint('StorageMonitorService: Failed to save config: $e');
+      debugLog('StorageMonitorService: Failed to save config: $e');
     }
   }
 
@@ -273,7 +273,7 @@ class StorageMonitorService {
         }
       }
     } catch (e) {
-      debugPrint('StorageMonitorService: Failed to get device free space: $e');
+      debugLog('StorageMonitorService: Failed to get device free space: $e');
     }
     return null;
   }

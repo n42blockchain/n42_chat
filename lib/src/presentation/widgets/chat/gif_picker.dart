@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/giphy_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// GIF 选择回调
 typedef GifSelectedCallback = void Function(GiphyGif gif);
@@ -63,7 +64,7 @@ class _GifPickerState extends State<GifPicker> {
         _searchController.addListener(_onSearchChanged);
       }
     } catch (e) {
-      debugPrint('GifPicker: GiphyService not available: $e');
+      debugLog('GifPicker: GiphyService not available: $e');
     }
   }
 

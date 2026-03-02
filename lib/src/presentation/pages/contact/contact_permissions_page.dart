@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 联系人权限设置页面
 class ContactPermissionsPage extends StatefulWidget {
@@ -49,7 +50,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
           _hideMyStatus = data['hideMyStatus'] as bool? ?? false;
         });
       } catch (e) {
-        debugPrint('Failed to load permissions: $e');
+        debugLog('Failed to load permissions: $e');
       }
     }
   }

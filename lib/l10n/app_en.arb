@@ -2686,14 +2686,18 @@
   "selfDestructCountdown": "Self-destruct in {time}",
   "@selfDestructCountdown": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "messageDestroyed": "Message destroyed",
   "miniAppPermissionDenied": "Permission denied: {permission}",
   "@miniAppPermissionDenied": {
     "placeholders": {
-      "permission": {"type": "String"}
+      "permission": {
+        "type": "String"
+      }
     }
   },
   "aiSuggestionGasFee": "What is Gas fee?",
@@ -2708,11 +2712,36 @@
   "slowModeCooldown": "Slow mode: wait {seconds}s",
   "@slowModeCooldown": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "addressCopyAction": "Copy Address",
   "addressSendMessage": "Send Message",
   "addressViewProfile": "View Profile",
-  "sendToAddress": "Send to wallet address"
+  "sendToAddress": "Send to wallet address",
+  "blocAuthSendVerificationCodeFailed": "Failed to send verification code",
+  "blocAuthServerNoEmailPasswordReset": "This server does not support email password reset",
+  "blocAuthResetPasswordFailed": "Failed to reset password",
+  "blocAuthChangePasswordFailed": "Failed to change password",
+  "blocAuthOldPasswordWrong": "Incorrect current password",
+  "blocAuthLoginCancelled": "Login cancelled",
+  "blocAuthGoogleLoginFailed": "Google login failed",
+  "blocAuthAppleLoginFailed": "Apple login failed",
+  "blocAuthSsoLoginFailed": "SSO login failed",
+  "blocAuthFacebookLoginFailed": "Facebook login failed",
+  "blocAuthTwitterLoginFailed": "Twitter login failed",
+  "blocAuthWeChatLoginFailed": "WeChat login failed",
+  "blocAuthWeChatNotConfigured": "WeChat login not configured",
+  "blocAuthWeChatNotInstalled": "Please install WeChat first",
+  "blocAuthPasswordWrong": "Incorrect password",
+  "blocAuthEmailAlreadyBound": "This email is already bound to another account",
+  "blocAuthChangeEmailFailed": "Failed to change email",
+  "blocAuthVerificationCodeInvalid": "Verification code is incorrect or expired",
+  "blocAuthSessionExpired": "Session expired, please login again",
+  "blocAuthSessionIncomplete": "Session data incomplete, please login again",
+  "blocAuthPasskeyNotImplemented": "Passkey login is not yet available",
+  "blocAuthPasskeyRegisterNotImplemented": "Passkey registration is not yet available",
+  "blocAuthEmailOtpNotImplemented": "Email OTP login is not yet available"
 }

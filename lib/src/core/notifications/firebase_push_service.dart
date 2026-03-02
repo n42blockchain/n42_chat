@@ -16,6 +16,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../services/voip/call_manager.dart';
 import 'push_notification_service.dart';
+import '../utils/debug_log.dart';
 
 /// 后台消息处理器 - 顶级函数，供独立使用 n42_chat 插件时注册。
 ///
@@ -120,7 +121,7 @@ class FirebasePushService implements IPushNotificationService {
   /// 设置当前活跃房间（正在查看的房间不弹通知）
   void setActiveRoom(String? roomId) {
     _activeRoomId = roomId;
-    debugPrint('FirebasePushService: Active room set to $roomId');
+    debugLog('FirebasePushService: Active room set to $roomId');
   }
 
   /// 获取当前活跃房间
@@ -138,11 +139,11 @@ class FirebasePushService implements IPushNotificationService {
       _callStateResetTimer = Timer(const Duration(minutes: 10), () {
         if (_isInCall) {
           _isInCall = false;
-          debugPrint('FirebasePushService: Auto-reset _isInCall after 10min safety timeout');
+          debugLog('FirebasePushService: Auto-reset _isInCall after 10min safety timeout');
         }
       });
     }
-    debugPrint('FirebasePushService: In call set to $inCall');
+    debugLog('FirebasePushService: In call set to $inCall');
   }
 
   /// 获取是否正在通话
@@ -198,7 +199,7 @@ class FirebasePushService implements IPushNotificationService {
 
       _isInitialized = true;
     } catch (e) {
-      debugPrint('N42Chat: Failed to initialize push service: $e');
+      debugLog('N42Chat: Failed to initialize push service: $e');
       // 清理已创建的订阅，防止资源泄漏
       await _foregroundSubscription?.cancel();
       _foregroundSubscription = null;
@@ -252,36 +253,36 @@ class FirebasePushService implements IPushNotificationService {
       provisional: false,
     );
 
-    debugPrint('FirebasePushService: Permission status: ${settings.authorizationStatus}');
+    debugLog('FirebasePushService: Permission status: ${settings.authorizationStatus}');
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional) {
-      debugPrint('FirebasePushService: Permission granted, getting tokens...');
+      debugLog('FirebasePushService: Permission granted, getting tokens...');
 
       // iOS 需要先等待 APNs Token，FCM Token 依赖它
       if (Platform.isIOS) {
         _apnsToken = await _getAPNsTokenWithRetry();
-        debugPrint('FirebasePushService: APNs token: ${_apnsToken != null ? '${_truncateToken(_apnsToken!)}...' : 'null'}');
+        debugLog('FirebasePushService: APNs token: ${_apnsToken != null ? '${_truncateToken(_apnsToken!)}...' : 'null'}');
         if (_apnsToken == null) {
-          debugPrint('FirebasePushService: WARNING - APNs token is null, iOS push may not work!');
+          debugLog('FirebasePushService: WARNING - APNs token is null, iOS push may not work!');
         }
       }
 
       // 获取 FCM Token（带重试）
       _fcmToken = await _getFCMTokenWithRetry();
-      debugPrint('FirebasePushService: FCM token: ${_fcmToken != null ? '${_truncateToken(_fcmToken!)}...' : 'null'}');
+      debugLog('FirebasePushService: FCM token: ${_fcmToken != null ? '${_truncateToken(_fcmToken!)}...' : 'null'}');
 
       if (_fcmToken == null) {
-        debugPrint('FirebasePushService: WARNING - FCM token is null after retries!');
+        debugLog('FirebasePushService: WARNING - FCM token is null after retries!');
       }
     } else {
-      debugPrint('FirebasePushService: Notification permission DENIED (${settings.authorizationStatus}). '
+      debugLog('FirebasePushService: Notification permission DENIED (${settings.authorizationStatus}). '
           'Push notifications will NOT work. User must enable in Settings.');
       // 尝试获取 token（某些 Android 设备即使未授权也能获取 token）
       if (Platform.isAndroid) {
         _fcmToken = await _getFCMTokenWithRetry(maxRetries: 1);
         if (_fcmToken != null) {
-          debugPrint('FirebasePushService: Got FCM token despite permission denied (Android)');
+          debugLog('FirebasePushService: Got FCM token despite permission denied (Android)');
         }
       }
     }
@@ -294,14 +295,14 @@ class FirebasePushService implements IPushNotificationService {
         final token = await FirebaseMessaging.instance.getAPNSToken();
         if (token != null) return token;
       } catch (e) {
-        debugPrint('FirebasePushService: APNs token attempt ${i + 1} failed: $e');
+        debugLog('FirebasePushService: APNs token attempt ${i + 1} failed: $e');
       }
       if (i < maxRetries - 1) {
         // APNs 注册可能需要时间，逐渐增加等待
         await Future<void>.delayed(Duration(seconds: (i + 1) * 2));
       }
     }
-    debugPrint('FirebasePushService: Failed to get APNs token after $maxRetries attempts');
+    debugLog('FirebasePushService: Failed to get APNs token after $maxRetries attempts');
     return null;
   }
 
@@ -312,13 +313,13 @@ class FirebasePushService implements IPushNotificationService {
         final token = await FirebaseMessaging.instance.getToken();
         if (token != null) return token;
       } catch (e) {
-        debugPrint('FirebasePushService: FCM token attempt ${i + 1} failed: $e');
+        debugLog('FirebasePushService: FCM token attempt ${i + 1} failed: $e');
       }
       if (i < maxRetries - 1) {
         await Future<void>.delayed(Duration(seconds: (i + 1) * 2));
       }
     }
-    debugPrint('FirebasePushService: Failed to get FCM token after $maxRetries attempts');
+    debugLog('FirebasePushService: Failed to get FCM token after $maxRetries attempts');
     return null;
   }
 
@@ -330,7 +331,7 @@ class FirebasePushService implements IPushNotificationService {
 
     // 通话期间禁用所有消息通知
     if (_isInCall) {
-      debugPrint('FirebasePushService: Skipping foreground notification during call');
+      debugLog('FirebasePushService: Skipping foreground notification during call');
       return;
     }
 
@@ -338,14 +339,14 @@ class FirebasePushService implements IPushNotificationService {
     final eventType = message.data['type'] as String?;
     if (eventType == 'm.call.invite') {
       setInCall(true);
-      debugPrint('FirebasePushService: Set isInCall=true for incoming call');
+      debugLog('FirebasePushService: Set isInCall=true for incoming call');
       // 前台保护：如果 CallManager 尚未初始化或尚未处理此来电，
       // 主动触发 CallKit 作为 fallback（避免 sync 未建立时来电丢失）
       final callManager = CallManager();
       if (!callManager.isInitialized || !callManager.isInCall) {
-        debugPrint('FirebasePushService: CallManager not handling call, showing CallKit as fallback');
+        debugLog('FirebasePushService: CallManager not handling call, showing CallKit as fallback');
         _showBackgroundCallKit(message).catchError((Object e) {
-          debugPrint('FirebasePushService: Failed to show foreground CallKit fallback: $e');
+          debugLog('FirebasePushService: Failed to show foreground CallKit fallback: $e');
         });
       }
       return;
@@ -354,12 +355,12 @@ class FirebasePushService implements IPushNotificationService {
       // 对方挂断或拒接 → 清除通话状态，恢复消息通知
       if (_isInCall) {
         setInCall(false);
-        debugPrint('FirebasePushService: Cleared _isInCall on $eventType');
+        debugLog('FirebasePushService: Cleared _isInCall on $eventType');
       }
       return;
     }
     if (eventType != null && eventType.startsWith('m.call.')) {
-      debugPrint('FirebasePushService: Skipping foreground notification for call event: $eventType');
+      debugLog('FirebasePushService: Skipping foreground notification for call event: $eventType');
       return;
     }
 
@@ -432,29 +433,29 @@ class FirebasePushService implements IPushNotificationService {
 
     // m.call.invite: 后台来电，直接触发 CallKit 显示来电界面
     if (eventType == 'm.call.invite') {
-      debugPrint('FirebasePushService: Background call invite received, showing CallKit');
+      debugLog('FirebasePushService: Background call invite received, showing CallKit');
       try {
         await _showBackgroundCallKit(message);
       } catch (e) {
-        debugPrint('FirebasePushService: Failed to show background CallKit: $e');
+        debugLog('FirebasePushService: Failed to show background CallKit: $e');
       }
       return;
     }
 
     // m.call.hangup/reject: 对方取消或拒接 → 结束后台 CallKit 来电界面
     if (eventType == 'm.call.hangup' || eventType == 'm.call.reject') {
-      debugPrint('FirebasePushService: Background $eventType received, ending CallKit');
+      debugLog('FirebasePushService: Background $eventType received, ending CallKit');
       try {
         await FlutterCallkitIncoming.endAllCalls();
       } catch (e) {
-        debugPrint('FirebasePushService: Failed to end CallKit on $eventType: $e');
+        debugLog('FirebasePushService: Failed to end CallKit on $eventType: $e');
       }
       return;
     }
 
     // 其他 m.call.* 事件（如 m.call.candidates, m.call.answer）跳过
     if (eventType != null && eventType.startsWith('m.call.')) {
-      debugPrint('FirebasePushService: Skipping background notification for call event: $eventType');
+      debugLog('FirebasePushService: Skipping background notification for call event: $eventType');
       return;
     }
 
@@ -569,7 +570,7 @@ class FirebasePushService implements IPushNotificationService {
     );
 
     await FlutterCallkitIncoming.showCallkitIncoming(params);
-    debugPrint('FirebasePushService: Background CallKit shown for call $callId from $senderName');
+    debugLog('FirebasePushService: Background CallKit shown for call $callId from $senderName');
   }
 
   /// 处理通知点击
@@ -579,7 +580,7 @@ class FirebasePushService implements IPushNotificationService {
       final eventId = message.data['event_id'] as String?;
       onNotificationTap?.call(roomId, eventId);
     } catch (e) {
-      debugPrint('FirebasePushService: Error in notification tap handler: $e');
+      debugLog('FirebasePushService: Error in notification tap handler: $e');
     }
   }
 
@@ -593,7 +594,7 @@ class FirebasePushService implements IPushNotificationService {
         onNotificationTap?.call(roomId, eventId);
       } catch (e) {
         // 忽略解析错误
-        debugPrint('Error: $e');
+        debugLog('Error: $e');
       }
     }
   }
@@ -617,7 +618,7 @@ class FirebasePushService implements IPushNotificationService {
     // 首次同步时，只记录时间，不弹通知（避免历史消息弹通知）
     if (_lastSyncTime == null) {
       _lastSyncTime = syncTime;
-      debugPrint('FirebasePushService: First sync, skipping notifications for historical messages');
+      debugLog('FirebasePushService: First sync, skipping notifications for historical messages');
       return;
     }
 
@@ -639,7 +640,7 @@ class FirebasePushService implements IPushNotificationService {
   bool _shouldShowNotification(matrix.MatrixEvent event, String roomId) {
     // 通话期间禁用所有消息通知
     if (_isInCall) {
-      debugPrint('FirebasePushService: Skipping notification during call');
+      debugLog('FirebasePushService: Skipping notification during call');
       return false;
     }
 
@@ -649,16 +650,16 @@ class FirebasePushService implements IPushNotificationService {
       // 收到来电事件时，立即设置通话状态，防止后续消息通知
       if (eventType == 'm.call.invite' && event.senderId != _client.userID) {
         setInCall(true);
-        debugPrint('FirebasePushService: Set isInCall=true for incoming call event');
+        debugLog('FirebasePushService: Set isInCall=true for incoming call event');
       }
       // 对方挂断或拒接 → 清除通话状态
       if (eventType == 'm.call.hangup' || eventType == 'm.call.reject') {
         if (_isInCall) {
           setInCall(false);
-          debugPrint('FirebasePushService: Cleared _isInCall on sync $eventType');
+          debugLog('FirebasePushService: Cleared _isInCall on sync $eventType');
         }
       }
-      debugPrint('FirebasePushService: Skipping notification for call event: $eventType');
+      debugLog('FirebasePushService: Skipping notification for call event: $eventType');
       return false;
     }
 
@@ -670,7 +671,7 @@ class FirebasePushService implements IPushNotificationService {
 
     // 不显示当前正在查看的房间的消息
     if (_activeRoomId == roomId) {
-      debugPrint('FirebasePushService: Skipping notification for active room $roomId');
+      debugLog('FirebasePushService: Skipping notification for active room $roomId');
       return false;
     }
 
@@ -681,7 +682,7 @@ class FirebasePushService implements IPushNotificationService {
       // 给 5 秒的容差，避免网络延迟导致的问题
       final threshold = _lastSyncTime!.subtract(const Duration(seconds: 5));
       if (originServerTs.isBefore(threshold)) {
-        debugPrint('FirebasePushService: Skipping notification for old message (${originServerTs.toIso8601String()})');
+        debugLog('FirebasePushService: Skipping notification for old message (${originServerTs.toIso8601String()})');
         return false;
       }
     }
@@ -750,36 +751,36 @@ class FirebasePushService implements IPushNotificationService {
   @override
   Future<void> registerForPush() async {
     if (_isRegistering) {
-      debugPrint('[PUSH_REG] Push registration already in progress, waiting...');
+      debugLog('[PUSH_REG] Push registration already in progress, waiting...');
       await _registrationCompleter?.future;
       return;
     }
     _isRegistering = true;
     _registrationCompleter = Completer<void>();
-    debugPrint('[PUSH_REG] Starting push registration...');
+    debugLog('[PUSH_REG] Starting push registration...');
     try {
       await _registerForPushImpl();
     } finally {
       _isRegistering = false;
       _registrationCompleter?.complete();
       _registrationCompleter = null;
-      debugPrint('[PUSH_REG] Push registration flow completed (verified=$_isPusherVerified)');
+      debugLog('[PUSH_REG] Push registration flow completed (verified=$_isPusherVerified)');
     }
   }
 
   Future<void> _registerForPushImpl() async {
     // 如果 FCM Token 还没有获取到，尝试获取
     if (_fcmToken == null) {
-      debugPrint('[PUSH_REG] FCM token is null, attempting to get token...');
+      debugLog('[PUSH_REG] FCM token is null, attempting to get token...');
       _fcmToken = await _getFCMTokenWithRetry(maxRetries: 2);
     }
 
     if (_fcmToken == null) {
-      debugPrint('[PUSH_REG_FAIL] Cannot register push - FCM token is null');
+      debugLog('[PUSH_REG_FAIL] Cannot register push - FCM token is null');
       return;
     }
     if (pushGatewayUrl == null) {
-      debugPrint('[PUSH_REG_FAIL] Cannot register push - pushGatewayUrl is null');
+      debugLog('[PUSH_REG_FAIL] Cannot register push - pushGatewayUrl is null');
       return;
     }
 
@@ -789,26 +790,26 @@ class FirebasePushService implements IPushNotificationService {
     final String pushkey;
     if (Platform.isIOS && _apnsToken != null) {
       pushkey = _apnsToken!;
-      debugPrint('[PUSH_REG] iOS using APNs token as pushkey');
+      debugLog('[PUSH_REG] iOS using APNs token as pushkey');
     } else {
       pushkey = _fcmToken!;
-      debugPrint('[PUSH_REG] Using FCM token as pushkey');
+      debugLog('[PUSH_REG] Using FCM token as pushkey');
     }
 
     // 指数退避重试：最多 3 次（初始 + 2 次重试），间隔 4s、8s
     const maxAttempts = 3;
-    debugPrint('[PUSH_REG] Config: appId=$appId, type=$pushkeyType, '
+    debugLog('[PUSH_REG] Config: appId=$appId, type=$pushkeyType, '
         'gateway=$pushGatewayUrl, pushkey=${_truncateToken(pushkey)}...');
 
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       // 每次重试前检查登录状态
       if (!_client.isLogged()) {
-        debugPrint('[PUSH_REG_FAIL] Client not logged in, aborting push registration');
+        debugLog('[PUSH_REG_FAIL] Client not logged in, aborting push registration');
         return;
       }
 
       try {
-        debugPrint('[PUSH_REG] Registering pusher (attempt $attempt/$maxAttempts)...');
+        debugLog('[PUSH_REG] Registering pusher (attempt $attempt/$maxAttempts)...');
 
         // 注册 Pusher 到 Matrix 服务器
         await _client.postPusher(
@@ -829,19 +830,19 @@ class FirebasePushService implements IPushNotificationService {
           ),
           append: false,
         );
-        debugPrint('[PUSH_REG_OK] Pusher registered successfully on attempt $attempt');
+        debugLog('[PUSH_REG_OK] Pusher registered successfully on attempt $attempt');
 
         // 注册成功后验证 Pusher 是否确实存在于服务器
         await _verifyPusherRegistration(pushkey);
         return; // 成功，退出重试循环
       } catch (e) {
-        debugPrint('[PUSH_REG_FAIL] Attempt $attempt/$maxAttempts failed: $e');
+        debugLog('[PUSH_REG_FAIL] Attempt $attempt/$maxAttempts failed: $e');
         if (attempt < maxAttempts) {
           final delay = Duration(seconds: 4 * attempt); // 4s, 8s
-          debugPrint('[PUSH_REG] Retrying in ${delay.inSeconds}s...');
+          debugLog('[PUSH_REG] Retrying in ${delay.inSeconds}s...');
           await Future<void>.delayed(delay);
         } else {
-          debugPrint('[PUSH_REG_FAIL] All $maxAttempts attempts exhausted, push registration failed');
+          debugLog('[PUSH_REG_FAIL] All $maxAttempts attempts exhausted, push registration failed');
         }
       }
     }
@@ -854,7 +855,7 @@ class FirebasePushService implements IPushNotificationService {
     try {
       final pushers = await _client.getPushers();
       if (pushers == null) {
-        debugPrint('[PUSH_VERIFY_WARN] getPushers() returned null');
+        debugLog('[PUSH_VERIFY_WARN] getPushers() returned null');
         _isPusherVerified = false;
         return;
       }
@@ -865,13 +866,13 @@ class FirebasePushService implements IPushNotificationService {
 
       _isPusherVerified = found;
       if (found) {
-        debugPrint('[PUSH_VERIFY_OK] Pusher verified on server (appId=$appId)');
+        debugLog('[PUSH_VERIFY_OK] Pusher verified on server (appId=$appId)');
       } else {
-        debugPrint('[PUSH_VERIFY_FAIL] Pusher NOT found on server after registration! '
+        debugLog('[PUSH_VERIFY_FAIL] Pusher NOT found on server after registration! '
             'Registered ${pushers.length} pushers, none match appId=$appId');
       }
     } catch (e) {
-      debugPrint('[PUSH_VERIFY_FAIL] Verification failed: $e');
+      debugLog('[PUSH_VERIFY_FAIL] Verification failed: $e');
       _isPusherVerified = false;
     }
   }
@@ -919,12 +920,12 @@ class FirebasePushService implements IPushNotificationService {
   /// 清除验证状态并重新执行注册流程。
   /// 如果当前有注册正在进行，等待其完成后再触发新的注册。
   Future<void> forceReRegister() async {
-    debugPrint('[PUSH_REG] Force re-register requested');
+    debugLog('[PUSH_REG] Force re-register requested');
     _isPusherVerified = false;
 
     // 如果正在注册中，等待其完成后再触发（Completer 替代 busy-wait）
     if (_isRegistering) {
-      debugPrint('[PUSH_REG] Waiting for current registration to complete before force re-register...');
+      debugLog('[PUSH_REG] Waiting for current registration to complete before force re-register...');
       await _registrationCompleter?.future;
     }
 
@@ -956,7 +957,7 @@ class FirebasePushService implements IPushNotificationService {
       );
     } catch (e) {
       // 忽略注销错误
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
 
@@ -1026,7 +1027,7 @@ class FirebasePushService implements IPushNotificationService {
       );
     } catch (e) {
       // 忽略通知显示错误
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
 

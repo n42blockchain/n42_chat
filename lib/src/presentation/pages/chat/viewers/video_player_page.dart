@@ -15,6 +15,7 @@ import 'package:video_player/video_player.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// 视频播放器页面
 class VideoPlayerPage extends StatefulWidget {
@@ -46,9 +47,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
 
   Future<void> _initializePlayer() async {
     try {
-      debugPrint('=== Video Player Initialization ===');
-      debugPrint('Video URL: ${widget.videoUrl}');
-      debugPrint('Thumbnail URL: ${widget.thumbnailUrl}');
+      debugLog('=== Video Player Initialization ===');
+      debugLog('Video URL: ${widget.videoUrl}');
+      debugLog('Thumbnail URL: ${widget.thumbnailUrl}');
 
       // Validate video URL
       if (widget.videoUrl.isEmpty) {
@@ -60,9 +61,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
       try {
         final matrixManager = getIt<MatrixClientManager>();
         accessToken = matrixManager.client?.accessToken;
-        debugPrint('Access token obtained: ${accessToken != null ? 'Yes (${accessToken.length} chars)' : 'No'}');
+        debugLog('Access token obtained: ${accessToken != null ? 'Yes (${accessToken.length} chars)' : 'No'}');
       } catch (e) {
-        debugPrint('Failed to get access token: $e');
+        debugLog('Failed to get access token: $e');
       }
 
       final headers = <String, String>{};
@@ -75,9 +76,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
       // 导致 Matrix 媒体 CDN 重定向后 403/401。
       // 解决方案：iOS 上先用 http 包（正确保留 headers 跟随重定向）
       // 流式下载到临时文件，再用 VideoPlayerController.file() 播放本地文件。
-      debugPrint('Creating VideoPlayerController...');
+      debugLog('Creating VideoPlayerController...');
       if (Platform.isIOS) {
-        debugPrint('iOS: streaming download with auth headers to temp file...');
+        debugLog('iOS: streaming download with auth headers to temp file...');
         final request = http.Request('GET', Uri.parse(widget.videoUrl));
         request.headers.addAll(headers);
         final streamResponse = await http.Client().send(request);
@@ -91,7 +92,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         await streamResponse.stream.pipe(sink);
         await sink.close();
         _tempVideoFile = file;
-        debugPrint(
+        debugLog(
             'iOS: temp file ready, size: ${await file.length()} bytes');
         _controller = VideoPlayerController.file(file);
       } else {
@@ -101,13 +102,13 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         );
       }
 
-      debugPrint('Initializing video controller...');
+      debugLog('Initializing video controller...');
       await _controller.initialize();
       // Seek to first frame to avoid black screen on some platforms
       await _controller.seekTo(Duration.zero);
-      debugPrint('Video controller initialized successfully');
-      debugPrint('Video duration: ${_controller.value.duration}');
-      debugPrint('Video size: ${_controller.value.size}');
+      debugLog('Video controller initialized successfully');
+      debugLog('Video duration: ${_controller.value.duration}');
+      debugLog('Video size: ${_controller.value.size}');
 
       _chewieController = ChewieController(
         videoPlayerController: _controller,
@@ -143,9 +144,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         });
       }
     } catch (e, stackTrace) {
-      debugPrint('=== Video Player Error ===');
-      debugPrint('Error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugLog('=== Video Player Error ===');
+      debugLog('Error: $e');
+      debugLog('Stack trace: $stackTrace');
       if (mounted) {
         setState(() {
           _isLoading = false;

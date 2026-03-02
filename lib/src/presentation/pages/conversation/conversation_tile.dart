@@ -185,7 +185,7 @@ class ConversationTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(
         color: AppColors.badge,
-        borderRadius: BorderRadius.circular(9),
+        borderRadius: BorderRadius.circular(4),
         border: Border.all(color: Colors.white, width: 1.5),
       ),
       child: Center(

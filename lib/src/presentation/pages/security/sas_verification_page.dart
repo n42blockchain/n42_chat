@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'emoji_verification_widget.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// SAS 验证状态
 enum SasVerificationStep {
@@ -206,7 +207,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
       await widget.e2eeManager.rejectSas(_verification!);
     } catch (e) {
       // ignore
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     setState(() {
@@ -222,7 +223,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         await widget.e2eeManager.cancelVerification(_verification!);
       } catch (e) {
         // ignore
-        debugPrint('Error: $e');
+        debugLog('Error: $e');
       }
     }
     if (mounted) Navigator.pop(context, false);

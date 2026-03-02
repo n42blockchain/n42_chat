@@ -12,6 +12,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 我的二维码页面
 class MyQRCodePage extends StatefulWidget {
@@ -56,11 +57,11 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
             }
           }
         } catch (e) {
-          debugPrint('Error: $e');
+          debugLog('Error: $e');
         }
       }
     } catch (e) {
-      debugPrint('Failed to load user info: $e');
+      debugLog('Failed to load user info: $e');
     }
   }
 

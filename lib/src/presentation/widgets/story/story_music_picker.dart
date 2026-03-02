@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Story 音乐选择/搜索组件
 ///
@@ -72,7 +73,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
         }
       }
     } catch (e) {
-      debugPrint('StoryMusicPicker: Pick failed: $e');
+      debugLog('StoryMusicPicker: Pick failed: $e');
     }
   }
 
@@ -104,7 +105,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
       await _audioPlayer.resume();
       setState(() => _isPlaying = true);
     } catch (e) {
-      debugPrint('StoryMusicPicker: Preview failed: $e');
+      debugLog('StoryMusicPicker: Preview failed: $e');
     }
   }
 

@@ -5,6 +5,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import '../../../core/utils/debug_log.dart';
 
 part 'archive_database.g.dart';
 
@@ -134,11 +135,11 @@ class ArchiveDatabase extends _$ArchiveDatabase {
           );
         },
         onUpgrade: (Migrator m, int from, int to) async {
-          debugPrint('ArchiveDatabase: Migrating from v$from to v$to');
+          debugLog('ArchiveDatabase: Migrating from v$from to v$to');
         },
         beforeOpen: (details) async {
           if (details.hadUpgrade) {
-            debugPrint(
+            debugLog(
               'ArchiveDatabase: Schema upgraded from '
               'v${details.versionBefore} to v${details.versionNow}',
             );

@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../models/governance/snapshot_proposal_model.dart';
 import '../../models/governance/snapshot_vote_model.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Snapshot GraphQL API datasource for querying proposals and votes.
 ///
@@ -49,7 +49,7 @@ class SnapshotGraphQLDatasource {
 
     if (data.containsKey('errors')) {
       final errors = data['errors'];
-      debugPrint('Snapshot GraphQL errors: $errors');
+      debugLog('Snapshot GraphQL errors: $errors');
       throw Exception('GraphQL errors: $errors');
     }
 
@@ -217,6 +217,54 @@ class SnapshotGraphQLDatasource {
 
     final data = await _query(query, variables: {'id': spaceId});
     return data['space'] as Map<String, dynamic>;
+  }
+
+  /// Query voting power scores via Snapshot score API.
+  ///
+  /// Returns a map of address → score.
+  Future<Map<String, double>> getScores({
+    required String spaceId,
+    required String network,
+    required List<dynamic> strategies,
+    required List<String> addresses,
+    int? snapshot,
+  }) async {
+    const scoreEndpoint = 'https://score.snapshot.org/api/scores';
+    final response = await _httpClient
+        .post(
+          Uri.parse(scoreEndpoint),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'params': {
+              'space': spaceId,
+              'network': network,
+              'snapshot': snapshot ?? 'latest',
+              'strategies': strategies,
+              'addresses': addresses,
+            },
+          }),
+        )
+        .timeout(const Duration(seconds: 30));
+
+    if (response.statusCode != 200) {
+      throw Exception('Snapshot score API error: ${response.statusCode}');
+    }
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    final result = data['result'] as Map<String, dynamic>?;
+    if (result == null) return {};
+
+    final scores = <String, double>{};
+    final scoresList = result['scores'] as List<dynamic>? ?? [];
+    for (final scoreMap in scoresList) {
+      if (scoreMap is Map<String, dynamic>) {
+        for (final entry in scoreMap.entries) {
+          scores[entry.key] = (scores[entry.key] ?? 0) +
+              (entry.value as num).toDouble();
+        }
+      }
+    }
+    return scores;
   }
 
   /// Release resources

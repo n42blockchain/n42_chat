@@ -46,9 +46,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         emit(state.copyWith(messages: updatedMessages));
       }
 
-      debugPrint('ChatBloc: Started destruction countdown for message ${event.messageId}, will destroy at $destroyedAt');
+      debugLog('ChatBloc: Started destruction countdown for message ${event.messageId}, will destroy at $destroyedAt');
     } catch (e) {
-      debugPrint('ChatBloc: Failed to start message destruction: $e');
+      debugLog('ChatBloc: Failed to start message destruction: $e');
     }
   }
 
@@ -73,7 +73,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     if (expiredMessageIds.isEmpty) return;
 
-    debugPrint('ChatBloc: Destroying ${expiredMessageIds.length} expired messages');
+    debugLog('ChatBloc: Destroying ${expiredMessageIds.length} expired messages');
 
     // 从本地列表中移除
     _locallyDeletedMessageIds.addAll(expiredMessageIds);
@@ -94,7 +94,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           reason: 'Self-destructed',
         );
       } catch (e) {
-        debugPrint('ChatBloc: Failed to redact expired message $messageId: $e');
+        debugLog('ChatBloc: Failed to redact expired message $messageId: $e');
       }
     }
 
@@ -175,9 +175,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         emit(state.copyWith(messages: [tempMessage, ...state.messages]));
       }
 
-      debugPrint('ChatBloc: Scheduled message saved - $tempId for ${event.scheduledAt}');
+      debugLog('ChatBloc: Scheduled message saved - $tempId for ${event.scheduledAt}');
     } catch (e) {
-      debugPrint('ChatBloc: Failed to schedule message: $e');
+      debugLog('ChatBloc: Failed to schedule message: $e');
       if (!isClosed) {
         emit(state.copyWith(error: 'Failed to schedule message'));
       }
@@ -204,9 +204,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         emit(state.copyWith(messages: updatedMessages));
       }
 
-      debugPrint('ChatBloc: Scheduled message cancelled - ${event.messageId}');
+      debugLog('ChatBloc: Scheduled message cancelled - ${event.messageId}');
     } catch (e) {
-      debugPrint('ChatBloc: Failed to cancel scheduled message: $e');
+      debugLog('ChatBloc: Failed to cancel scheduled message: $e');
     }
   }
 
@@ -220,7 +220,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       final dueMessages = await _secureStorage.getDueScheduledMessages();
       if (dueMessages.isEmpty) return;
 
-      debugPrint('ChatBloc: Found ${dueMessages.length} due scheduled messages');
+      debugLog('ChatBloc: Found ${dueMessages.length} due scheduled messages');
 
       for (final msg in dueMessages) {
         final roomId = msg['roomId'] as String;
@@ -251,13 +251,13 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             emit(state.copyWith(messages: updatedMessages));
           }
 
-          debugPrint('ChatBloc: Sent scheduled message - $messageId');
+          debugLog('ChatBloc: Sent scheduled message - $messageId');
         } catch (e) {
-          debugPrint('ChatBloc: Failed to send scheduled message $messageId: $e');
+          debugLog('ChatBloc: Failed to send scheduled message $messageId: $e');
         }
       }
     } catch (e) {
-      debugPrint('ChatBloc: Failed to process due scheduled messages: $e');
+      debugLog('ChatBloc: Failed to process due scheduled messages: $e');
     }
   }
 
@@ -276,7 +276,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       // 查找消息
       final messageIndex = state.messages.indexWhere((m) => m.id == event.messageId);
       if (messageIndex == -1) {
-        debugPrint('ChatBloc: Message not found for transcription: ${event.messageId}');
+        debugLog('ChatBloc: Message not found for transcription: ${event.messageId}');
         return;
       }
 
@@ -284,13 +284,13 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
       // 检查是否是语音消息
       if (message.type != MessageType.voice && message.type != MessageType.audio) {
-        debugPrint('ChatBloc: Message is not a voice message: ${message.type}');
+        debugLog('ChatBloc: Message is not a voice message: ${message.type}');
         return;
       }
 
       // 检查是否已经有转录结果
       if (message.metadata?.hasTranscription == true) {
-        debugPrint('ChatBloc: Message already has transcription');
+        debugLog('ChatBloc: Message already has transcription');
         return;
       }
 
@@ -321,12 +321,12 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             audioPath = tempFile.path;
           }
         } catch (e) {
-          debugPrint('ChatBloc: Failed to download voice message: $e');
+          debugLog('ChatBloc: Failed to download voice message: $e');
         }
       }
 
       if (audioPath == null) {
-        debugPrint('ChatBloc: No audio path available for transcription');
+        debugLog('ChatBloc: No audio path available for transcription');
         add(VoiceTranscriptionCompleted(
           messageId: event.messageId,
           success: false,
@@ -337,7 +337,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       // 调用语音转文字服务
       final speechService = SpeechToTextService();
       if (!speechService.isConfigured) {
-        debugPrint('ChatBloc: Speech-to-text service not configured');
+        debugLog('ChatBloc: Speech-to-text service not configured');
         add(VoiceTranscriptionCompleted(
           messageId: event.messageId,
           success: false,
@@ -358,7 +358,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       ));
 
     } catch (e) {
-      debugPrint('ChatBloc: Failed to transcribe voice message: $e');
+      debugLog('ChatBloc: Failed to transcribe voice message: $e');
       add(VoiceTranscriptionCompleted(
         messageId: event.messageId,
         success: false,
@@ -391,9 +391,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     }
 
     if (event.success) {
-      debugPrint('ChatBloc: Voice transcription completed: ${event.transcription}');
+      debugLog('ChatBloc: Voice transcription completed: ${event.transcription}');
     } else {
-      debugPrint('ChatBloc: Voice transcription failed for message ${event.messageId}');
+      debugLog('ChatBloc: Voice transcription failed for message ${event.messageId}');
     }
   }
 
@@ -434,9 +434,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         currentPinnedIndex: 0,
       ));
 
-      debugPrint('ChatBloc: Loaded ${pinnedMessages.length} pinned messages, canPin=$canPin');
+      debugLog('ChatBloc: Loaded ${pinnedMessages.length} pinned messages, canPin=$canPin');
     } catch (e) {
-      debugPrint('ChatBloc: Failed to load pinned messages: $e');
+      debugLog('ChatBloc: Failed to load pinned messages: $e');
     }
   }
 
@@ -451,9 +451,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       await _groupRepository.pinMessage(_currentRoomId!, event.messageId);
       // 重新加载置顶消息
       add(const LoadPinnedMessages());
-      debugPrint('ChatBloc: Pinned message ${event.messageId}');
+      debugLog('ChatBloc: Pinned message ${event.messageId}');
     } catch (e) {
-      debugPrint('ChatBloc: Failed to pin message: $e');
+      debugLog('ChatBloc: Failed to pin message: $e');
       emit(state.copyWith(error: 'Failed to pin message: $e'));
     }
   }
@@ -469,9 +469,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       await _groupRepository.unpinMessage(_currentRoomId!, event.messageId);
       // 重新加载置顶消息
       add(const LoadPinnedMessages());
-      debugPrint('ChatBloc: Unpinned message ${event.messageId}');
+      debugLog('ChatBloc: Unpinned message ${event.messageId}');
     } catch (e) {
-      debugPrint('ChatBloc: Failed to unpin message: $e');
+      debugLog('ChatBloc: Failed to unpin message: $e');
       emit(state.copyWith(error: 'Failed to unpin message: $e'));
     }
   }
@@ -504,7 +504,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     Emitter<ChatState> emit,
   ) async {
     if (_translationService == null) {
-      debugPrint('ChatBloc: Translation service not available');
+      debugLog('ChatBloc: Translation service not available');
       add(TranslationCompleted(
         messageId: event.messageId,
         success: false,
@@ -515,14 +515,14 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     // 检查是否已经在翻译中
     if (state.isTranslating(event.messageId)) {
-      debugPrint('ChatBloc: Message ${event.messageId} is already being translated');
+      debugLog('ChatBloc: Message ${event.messageId} is already being translated');
       return;
     }
 
     // 检查是否已有翻译结果
     final existingTranslation = state.getTranslation(event.messageId);
     if (existingTranslation != null) {
-      debugPrint('ChatBloc: Message ${event.messageId} already has translation');
+      debugLog('ChatBloc: Message ${event.messageId} already has translation');
       return;
     }
 
@@ -543,7 +543,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     );
 
     if (message.id.isEmpty || message.type != MessageType.text) {
-      debugPrint('ChatBloc: Cannot translate message - not a text message');
+      debugLog('ChatBloc: Cannot translate message - not a text message');
       return;
     }
 
@@ -553,7 +553,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     emit(state.copyWith(translatingMessageIds: newTranslatingIds));
 
     try {
-      debugPrint('ChatBloc: Translating message ${event.messageId} to ${event.targetLanguage}');
+      debugLog('ChatBloc: Translating message ${event.messageId} to ${event.targetLanguage}');
 
       final result = await _translationService.translate(
         text: message.content,
@@ -568,7 +568,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         error: result.error,
       ));
     } catch (e) {
-      debugPrint('ChatBloc: Translation error: $e');
+      debugLog('ChatBloc: Translation error: $e');
       add(TranslationCompleted(
         messageId: event.messageId,
         success: false,
@@ -603,7 +603,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         detectedSourceLanguages: newDetectedLanguages,
       ));
 
-      debugPrint('ChatBloc: Translation completed for message ${event.messageId}');
+      debugLog('ChatBloc: Translation completed for message ${event.messageId}');
     } else {
       // 翻译失败
       emit(state.copyWith(
@@ -611,7 +611,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         error: event.error ?? 'Translation failed',
       ));
 
-      debugPrint('ChatBloc: Translation failed for message ${event.messageId}: ${event.error}');
+      debugLog('ChatBloc: Translation failed for message ${event.messageId}: ${event.error}');
     }
   }
 
@@ -630,7 +630,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       detectedSourceLanguages: newDetectedLanguages,
     ));
 
-    debugPrint('ChatBloc: Cleared translation for message ${event.messageId}');
+    debugLog('ChatBloc: Cleared translation for message ${event.messageId}');
   }
 
   /// 更新翻译设置
@@ -657,7 +657,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         smartReplyTranslate: newSmartReply,
       );
     } catch (e) {
-      debugPrint('ChatBloc: Failed to save translation settings: $e');
+      debugLog('ChatBloc: Failed to save translation settings: $e');
     }
 
     // 如果刚开启自动翻译，对当前可见的未翻译消息触发翻译
@@ -747,10 +747,10 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     _translationService.detectLanguage(recipientMsg.content).then((detected) {
       if (detected != null && !isClosed && state.detectedRecipientLanguage != detected) {
         blocEmit(state.copyWith(detectedRecipientLanguage: detected));
-        debugPrint('ChatBloc: Detected recipient language: $detected');
+        debugLog('ChatBloc: Detected recipient language: $detected');
       }
     }).catchError((Object e) {
-      debugPrint('ChatBloc: Failed to detect recipient language: $e');
+      debugLog('ChatBloc: Failed to detect recipient language: $e');
     });
   }
 
@@ -778,7 +778,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           slowModeInterval: group.slowModeInterval,
         ));
       } catch (e) {
-        debugPrint('ChatBloc: Failed to load room info: $e');
+        debugLog('ChatBloc: Failed to load room info: $e');
       }
     });
   }

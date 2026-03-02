@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -11,6 +10,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../data/datasources/matrix/matrix_client_manager.dart';
 import '../di/injection.dart';
+import '../utils/debug_log.dart';
 
 /// 语音服务
 ///
@@ -101,7 +101,7 @@ class VoiceService {
     if (!await hasPermission()) {
       final granted = await requestPermission();
       if (!granted) {
-        debugPrint('VoiceService: Microphone permission not granted');
+        debugLog('VoiceService: Microphone permission not granted');
         return false;
       }
     }
@@ -139,7 +139,7 @@ class VoiceService {
 
       return true;
     } catch (e) {
-      debugPrint('Start recording error: $e');
+      debugLog('Start recording error: $e');
       return false;
     }
   }
@@ -180,7 +180,7 @@ class VoiceService {
 
       return null;
     } catch (e) {
-      debugPrint('Stop recording error: $e');
+      debugLog('Stop recording error: $e');
       _isRecording = false;
       return null;
     }
@@ -213,7 +213,7 @@ class VoiceService {
         cancelled: true,
       ));
     } catch (e) {
-      debugPrint('Cancel recording error: $e');
+      debugLog('Cancel recording error: $e');
       _isRecording = false;
     }
   }
@@ -238,7 +238,7 @@ class VoiceService {
           if (localPath != null) {
             await _player.play(DeviceFileSource(localPath));
           } else {
-            debugPrint('Failed to download audio file');
+            debugLog('Failed to download audio file');
             _currentPlayingUrl = null;
           }
         } else {
@@ -249,7 +249,7 @@ class VoiceService {
         await _player.play(DeviceFileSource(url));
       }
     } catch (e) {
-      debugPrint('Play voice error: $e');
+      debugLog('Play voice error: $e');
       _currentPlayingUrl = null;
     }
   }
@@ -263,7 +263,7 @@ class VoiceService {
         final matrixManager = getIt<MatrixClientManager>();
         accessToken = matrixManager.client?.accessToken;
       } catch (e) {
-        debugPrint('Failed to get access token: $e');
+        debugLog('Failed to get access token: $e');
       }
       
       // 创建请求
@@ -285,17 +285,17 @@ class VoiceService {
           final file = File('${dir.path}/$filename');
           await file.writeAsBytes(bytes);
           
-          debugPrint('Downloaded audio to: ${file.path}');
+          debugLog('Downloaded audio to: ${file.path}');
           return file.path;
         } else {
-          debugPrint('Failed to download audio: ${response.statusCode}');
+          debugLog('Failed to download audio: ${response.statusCode}');
           return null;
         }
       } finally {
         client.close();
       }
     } catch (e) {
-      debugPrint('Download audio error: $e');
+      debugLog('Download audio error: $e');
       return null;
     }
   }
@@ -342,7 +342,7 @@ class VoiceService {
           }
         } catch (e) {
           // 忽略错误
-          debugPrint('Error: $e');
+          debugLog('Error: $e');
         }
       }
     });

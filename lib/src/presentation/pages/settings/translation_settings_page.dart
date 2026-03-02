@@ -7,6 +7,7 @@ import '../../../core/services/translation_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// WeChat 风格翻译设置页面
 class TranslationSettingsPage extends StatefulWidget {
@@ -73,7 +74,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
       );
       widget.onSettingsChanged?.call(_autoTranslate, _targetLanguage, _smartReplyTranslate);
     } catch (e) {
-      debugPrint('TranslationSettingsPage: Failed to save: $e');
+      debugLog('TranslationSettingsPage: Failed to save: $e');
     }
   }
 

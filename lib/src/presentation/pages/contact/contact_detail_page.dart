@@ -15,6 +15,7 @@ import 'common_groups_page.dart';
 import 'contact_permissions_page.dart';
 import 'contact_settings_page.dart';
 import 'tags_management_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 联系人详情页面（仿微信）
 class ContactDetailPage extends StatefulWidget {
@@ -82,7 +83,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       }
     } catch (e) {
       // ContactBloc 可能不可用，忽略
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
   
@@ -127,7 +128,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       hasContactBloc = true;
     } catch (e) {
       // ContactBloc 不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
     
     final Widget scaffold = Scaffold(
@@ -574,7 +575,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     Navigator.of(context).push(
@@ -613,7 +614,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
     
     Navigator.of(context).push(
@@ -693,7 +694,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
       }
     } catch (e) {
       // ContactBloc 可能不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
 
@@ -714,7 +715,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
       hasContactBloc = true;
     } catch (e) {
       // ContactBloc 不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
     
     final Widget scaffold = Scaffold(
@@ -1048,7 +1049,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
             contactBloc = context.read<ContactBloc>();
           } catch (e) {
             // ContactBloc 可能不可用
-            debugPrint('Error: $e');
+            debugLog('Error: $e');
           }
           
           final page = EditRemarkPage(
@@ -1174,19 +1175,19 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     final remark = _remarkController.text.trim();
     final remarkToSave = remark.isEmpty ? null : remark;
     
-    debugPrint('EditRemarkPage: Saving remark for userId=${widget.userId}, remark=$remark');
+    debugLog('EditRemarkPage: Saving remark for userId=${widget.userId}, remark=$remark');
     
     // 使用 RemarkService 保存备注名（全局本地存储）
     await RemarkService.instance.setRemark(widget.userId, remarkToSave);
-    debugPrint('EditRemarkPage: Remark saved to RemarkService');
+    debugLog('EditRemarkPage: Remark saved to RemarkService');
     
     // 同时通知 ContactBloc 刷新（如果可用）
     if (!mounted) return;
     try {
       context.read<ContactBloc>().add(SetContactRemark(widget.userId, remarkToSave));
-      debugPrint('EditRemarkPage: ContactBloc notified');
+      debugLog('EditRemarkPage: ContactBloc notified');
     } catch (e) {
-      debugPrint('EditRemarkPage: ContactBloc not available: $e');
+      debugLog('EditRemarkPage: ContactBloc not available: $e');
     }
 
     // 先关闭页面，再显示 Toast（避免 ScaffoldMessenger 冲突）

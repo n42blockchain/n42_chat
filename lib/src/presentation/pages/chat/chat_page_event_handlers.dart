@@ -145,7 +145,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
               }
             }
           } catch (e) {
-            debugPrint('Red packet claim error: $e');
+            debugLog('Red packet claim error: $e');
           }
         },
         onViewDetails: () {
@@ -176,7 +176,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
 
   /// 名片消息点击 - 跳转到用户资料页添加好友
   void _onContactCardTap(String contactId, String contactName, String? avatarUrl) {
-    debugPrint('Contact card tapped: $contactName ($contactId), avatar: $avatarUrl');
+    debugLog('Contact card tapped: $contactName ($contactId), avatar: $avatarUrl');
 
     // 获取当前的 ContactBloc
     ContactBloc? contactBloc;
@@ -184,7 +184,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     // 跳转到联系人详情页面
@@ -226,7 +226,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     }
 
     if (imageUrl == null || imageUrl.isEmpty) {
-      debugPrint('_viewImage: No valid URL found for image');
+      debugLog('_viewImage: No valid URL found for image');
       return;
     }
 
@@ -243,27 +243,27 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
 
   /// 播放视频
   void _playVideo(MessageEntity message) {
-    debugPrint('=== _playVideo called ===');
-    debugPrint('Message ID: ${message.id}');
-    debugPrint('Message type: ${message.type}');
-    debugPrint('Metadata httpUrl: ${message.metadata?.httpUrl}');
-    debugPrint('Metadata mediaUrl: ${message.metadata?.mediaUrl}');
-    debugPrint('Metadata thumbnailUrl: ${message.metadata?.thumbnailUrl}');
+    debugLog('=== _playVideo called ===');
+    debugLog('Message ID: ${message.id}');
+    debugLog('Message type: ${message.type}');
+    debugLog('Metadata httpUrl: ${message.metadata?.httpUrl}');
+    debugLog('Metadata mediaUrl: ${message.metadata?.mediaUrl}');
+    debugLog('Metadata thumbnailUrl: ${message.metadata?.thumbnailUrl}');
 
     String? videoUrl = message.metadata?.httpUrl;
 
     // 如果 httpUrl 为空，尝试从 mediaUrl 转换
     if (videoUrl == null || videoUrl.isEmpty) {
       final mxcUrl = message.metadata?.mediaUrl;
-      debugPrint('httpUrl is empty, trying to convert from mxcUrl: $mxcUrl');
+      debugLog('httpUrl is empty, trying to convert from mxcUrl: $mxcUrl');
       if (mxcUrl != null && mxcUrl.startsWith('mxc://')) {
         videoUrl = _convertMxcToHttpUrl(mxcUrl);
-        debugPrint('Converted to httpUrl: $videoUrl');
+        debugLog('Converted to httpUrl: $videoUrl');
       }
     }
 
     if (videoUrl == null || videoUrl.isEmpty) {
-      debugPrint('ERROR: Video URL is still empty after conversion attempt');
+      debugLog('ERROR: Video URL is still empty after conversion attempt');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.chatInvalidVideoUrl ?? 'Invalid video URL'),
@@ -278,8 +278,8 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     if (thumbnailUrl != null && thumbnailUrl.startsWith('mxc://')) {
       thumbnailUrl = _convertMxcToHttpUrl(thumbnailUrl);
     }
-    debugPrint('Final videoUrl: $videoUrl');
-    debugPrint('Final thumbnailUrl: $thumbnailUrl');
+    debugLog('Final videoUrl: $videoUrl');
+    debugLog('Final thumbnailUrl: $thumbnailUrl');
 
     Navigator.push(
       context,
@@ -430,7 +430,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     // 获取备注名
@@ -489,21 +489,21 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
         myDisplayName = currentUser?.displayName ?? (S.of(context)?.commonMe ?? 'Me');
         myUserId = currentUser?.userId;
 
-        debugPrint('Poke: currentUser.displayName=$myDisplayName, userId=$myUserId');
+        debugLog('Poke: currentUser.displayName=$myDisplayName, userId=$myUserId');
 
         // 从仓库获取 pokeText
         final profileData = await authRepository.getUserProfileData();
         myPokeText = profileData?['pokeText'] as String?;
-        debugPrint('Poke from repository: pokeText=$myPokeText, fullData=$profileData');
+        debugLog('Poke from repository: pokeText=$myPokeText, fullData=$profileData');
       } catch (e) {
-        debugPrint('Poke: Failed to get user info: $e');
+        debugLog('Poke: Failed to get user info: $e');
       }
 
       // 获取被拍用户的显示名（优先使用备注名）
       final targetName = RemarkService.instance.getDisplayName(message.senderId, message.senderName);
       final targetUserId = message.senderId;
 
-      debugPrint('Poke: targetName=$targetName, targetUserId=$targetUserId, finalPokeText=$myPokeText');
+      debugLog('Poke: targetName=$targetName, targetUserId=$targetUserId, finalPokeText=$myPokeText');
 
       // 微信风格的拍一拍效果
       // 1. 触发震动反馈
@@ -522,7 +522,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       // 3. 显示拍一拍动画效果（SnackBar）
       _showPokeAnimation(message, myPokeText: myPokeText);
     } catch (e) {
-      debugPrint('Poke error: $e');
+      debugLog('Poke error: $e');
     }
   }
 
@@ -533,7 +533,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     required String targetUserId,
     String? pokeText,
   }) {
-    debugPrint('Sending poke message: pokerName=$pokerName, targetName=$targetName, pokeText=$pokeText');
+    debugLog('Sending poke message: pokerName=$pokerName, targetName=$targetName, pokeText=$pokeText');
 
     // 使用新的 SendPokeMessage 事件，让 ChatBloc 处理 pokeText 的获取
     context.read<ChatBloc>().add(SendPokeMessage(
@@ -550,12 +550,12 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     // 格式：拍了拍「星驰」的头（如果设置了后缀"的头"）
     // 优先使用备注名
     final targetDisplayName = RemarkService.instance.getDisplayName(message.senderId, message.senderName);
-    debugPrint('ShowPokeAnimation: targetName=$targetDisplayName, myPokeText=$myPokeText');
+    debugLog('ShowPokeAnimation: targetName=$targetDisplayName, myPokeText=$myPokeText');
 
     final displayText = S.of(context)?.chatPokedSomeone(targetDisplayName, myPokeText ?? '')
         ?? 'poked $targetDisplayName${myPokeText ?? ''}';
 
-    debugPrint('ShowPokeAnimation: displayText=$displayText');
+    debugLog('ShowPokeAnimation: displayText=$displayText');
 
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -600,7 +600,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     // 检查是否可以踢人和修改群设置（群主/管理员）
@@ -612,9 +612,9 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
         final group = await groupRepository.getGroup(widget.conversation.id);
         canKickMembers = group?.canKick ?? false;
         canChangeSettings = group?.canChangeSettings ?? false;
-        debugPrint('ChatPage: Group permissions - canKick=$canKickMembers, canChangeSettings=$canChangeSettings');
+        debugLog('ChatPage: Group permissions - canKick=$canKickMembers, canChangeSettings=$canChangeSettings');
       } catch (e) {
-        debugPrint('Failed to get group info: $e');
+        debugLog('Failed to get group info: $e');
       }
     }
 
@@ -662,7 +662,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
         contacts = contactState.contacts;
       }
     } catch (e) {
-      debugPrint('Failed to get contacts: $e');
+      debugLog('Failed to get contacts: $e');
     }
 
     if (contacts.isEmpty) {
@@ -727,7 +727,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     Navigator.of(ctx).push(

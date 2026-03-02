@@ -1,10 +1,11 @@
+import 'dart:typed_data';
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../domain/entities/sticker_pack_entity.dart';
 import 'matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Matrix 贴纸数据源
 ///
@@ -56,7 +57,7 @@ class MatrixStickerDataSource {
 
       return packs;
     } catch (e) {
-      debugPrint('MatrixStickerDataSource: Failed to get installed packs: $e');
+      debugLog('MatrixStickerDataSource: Failed to get installed packs: $e');
       // 返回内置贴纸包作为后备
       return await _getBuiltinPacks();
     }
@@ -72,7 +73,7 @@ class MatrixStickerDataSource {
 
       return _parseStickerPack(packId, data);
     } catch (e) {
-      debugPrint('MatrixStickerDataSource: Failed to get pack $packId: $e');
+      debugLog('MatrixStickerDataSource: Failed to get pack $packId: $e');
       return null;
     }
   }
@@ -116,7 +117,7 @@ class MatrixStickerDataSource {
         stickers: stickers,
       );
     } catch (e) {
-      debugPrint('MatrixStickerDataSource: Failed to parse pack: $e');
+      debugLog('MatrixStickerDataSource: Failed to parse pack: $e');
       return null;
     }
   }
@@ -172,7 +173,7 @@ class MatrixStickerDataSource {
 
       return true;
     } catch (e) {
-      debugPrint('MatrixStickerDataSource: Failed to install pack: $e');
+      debugLog('MatrixStickerDataSource: Failed to install pack: $e');
       return false;
     }
   }
@@ -193,7 +194,7 @@ class MatrixStickerDataSource {
 
       return true;
     } catch (e) {
-      debugPrint('MatrixStickerDataSource: Failed to uninstall pack: $e');
+      debugLog('MatrixStickerDataSource: Failed to uninstall pack: $e');
       return false;
     }
   }
@@ -278,7 +279,7 @@ class MatrixStickerDataSource {
 
       return result;
     } catch (e) {
-      debugPrint('MatrixStickerDataSource: Failed to get recent stickers: $e');
+      debugLog('MatrixStickerDataSource: Failed to get recent stickers: $e');
       return [];
     }
   }
@@ -298,7 +299,7 @@ class MatrixStickerDataSource {
         recentList = (data['recent'] as List?)?.cast<Map<String, dynamic>>() ?? [];
       } catch (e) {
         // 账户数据不存在，使用空列表
-        debugPrint('Error: $e');
+        debugLog('Error: $e');
       }
 
       // 查找现有记录
@@ -339,7 +340,7 @@ class MatrixStickerDataSource {
         {'recent': recentList},
       );
     } catch (e) {
-      debugPrint('MatrixStickerDataSource: Failed to record sticker usage: $e');
+      debugLog('MatrixStickerDataSource: Failed to record sticker usage: $e');
     }
   }
 
@@ -354,7 +355,7 @@ class MatrixStickerDataSource {
         {'recent': []},
       );
     } catch (e) {
-      debugPrint('MatrixStickerDataSource: Failed to clear recent stickers: $e');
+      debugLog('MatrixStickerDataSource: Failed to clear recent stickers: $e');
     }
   }
 
@@ -374,7 +375,7 @@ class MatrixStickerDataSource {
       );
       return uri.toString();
     } catch (e) {
-      debugPrint('MatrixStickerDataSource: Failed to upload sticker: $e');
+      debugLog('MatrixStickerDataSource: Failed to upload sticker: $e');
       return null;
     }
   }
@@ -421,7 +422,7 @@ class MatrixStickerDataSource {
 
       return await room.sendEvent(content, type: 'm.sticker');
     } catch (e) {
-      debugPrint('MatrixStickerDataSource: Failed to send sticker: $e');
+      debugLog('MatrixStickerDataSource: Failed to send sticker: $e');
       return null;
     }
   }

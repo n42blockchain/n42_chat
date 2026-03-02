@@ -1,10 +1,11 @@
+import 'dart:typed_data';
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../domain/entities/moment_entity.dart';
 import 'matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Matrix 动态数据源
 ///
@@ -46,7 +47,7 @@ class MatrixMomentDataSource {
   /// 获取或创建用户的动态房间
   Future<matrix.Room?> _getOrCreateMomentRoom() async {
     if (_client == null) {
-      debugPrint('MatrixMomentDataSource: Client is null');
+      debugLog('MatrixMomentDataSource: Client is null');
       return null;
     }
 
@@ -55,14 +56,14 @@ class MatrixMomentDataSource {
       return _cachedMomentRoom;
     }
 
-    debugPrint('MatrixMomentDataSource: Looking for moment room, '
+    debugLog('MatrixMomentDataSource: Looking for moment room, '
         'total rooms: ${_client!.rooms.length}');
 
     // 查找现有的动态房间
     for (final room in _client!.rooms) {
       final tags = room.tags;
       if (tags.containsKey(momentRoomTag)) {
-        debugPrint('MatrixMomentDataSource: Found existing moment room: ${room.id}');
+        debugLog('MatrixMomentDataSource: Found existing moment room: ${room.id}');
         _cachedMomentRoom = room;
         return room;
       }
@@ -70,30 +71,30 @@ class MatrixMomentDataSource {
 
     // 如果房间列表为空，可能同步尚未完成，等待同步
     if (_client!.rooms.isEmpty) {
-      debugPrint('MatrixMomentDataSource: No rooms found, waiting for sync...');
+      debugLog('MatrixMomentDataSource: No rooms found, waiting for sync...');
       try {
         await _client!.onSync.stream.first.timeout(
           const Duration(seconds: 15),
         );
-        debugPrint('MatrixMomentDataSource: Sync completed, '
+        debugLog('MatrixMomentDataSource: Sync completed, '
             'rooms: ${_client!.rooms.length}');
 
         // 同步后再次查找
         for (final room in _client!.rooms) {
           final tags = room.tags;
           if (tags.containsKey(momentRoomTag)) {
-            debugPrint('MatrixMomentDataSource: Found moment room after sync: ${room.id}');
+            debugLog('MatrixMomentDataSource: Found moment room after sync: ${room.id}');
             _cachedMomentRoom = room;
             return room;
           }
         }
       } on TimeoutException {
-        debugPrint('MatrixMomentDataSource: Sync timeout, proceeding to create room');
+        debugLog('MatrixMomentDataSource: Sync timeout, proceeding to create room');
       }
     }
 
     // 创建新的动态房间
-    debugPrint('MatrixMomentDataSource: Creating new moment room...');
+    debugLog('MatrixMomentDataSource: Creating new moment room...');
     try {
       final roomId = await _client!.createRoom(
         name: 'My Moments',
@@ -114,13 +115,13 @@ class MatrixMomentDataSource {
         },
       );
 
-      debugPrint('MatrixMomentDataSource: Room created with id: $roomId');
+      debugLog('MatrixMomentDataSource: Room created with id: $roomId');
 
       // 等待房间出现在本地存储中
       matrix.Room? room = _client!.getRoomById(roomId);
 
       if (room == null) {
-        debugPrint('MatrixMomentDataSource: Room not in local store yet, waiting...');
+        debugLog('MatrixMomentDataSource: Room not in local store yet, waiting...');
         // 等待同步将房间带入本地
         for (var i = 0; i < 10; i++) {
           await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -130,7 +131,7 @@ class MatrixMomentDataSource {
       }
 
       if (room == null) {
-        debugPrint('MatrixMomentDataSource: Room still null after waiting, '
+        debugLog('MatrixMomentDataSource: Room still null after waiting, '
             'trying sync...');
         try {
           await _client!.onSync.stream.first.timeout(
@@ -138,7 +139,7 @@ class MatrixMomentDataSource {
           );
           room = _client!.getRoomById(roomId);
         } on TimeoutException {
-          debugPrint('MatrixMomentDataSource: Sync timeout after room creation');
+          debugLog('MatrixMomentDataSource: Sync timeout after room creation');
         }
       }
 
@@ -146,14 +147,14 @@ class MatrixMomentDataSource {
       if (room != null) {
         await room.addTag(momentRoomTag);
         _cachedMomentRoom = room;
-        debugPrint('MatrixMomentDataSource: Moment room ready: ${room.id}');
+        debugLog('MatrixMomentDataSource: Moment room ready: ${room.id}');
       } else {
-        debugPrint('MatrixMomentDataSource: Failed to get room after creation');
+        debugLog('MatrixMomentDataSource: Failed to get room after creation');
       }
 
       return room;
     } catch (e) {
-      debugPrint('MatrixMomentDataSource: Error creating moment room: $e');
+      debugLog('MatrixMomentDataSource: Error creating moment room: $e');
       return null;
     }
   }
@@ -214,7 +215,7 @@ class MatrixMomentDataSource {
           contentType = 'image/jpeg';
         }
 
-        debugPrint('MatrixMomentDataSource: Uploading media: '
+        debugLog('MatrixMomentDataSource: Uploading media: '
             '${m.filename}, type: $contentType, '
             'size: ${m.bytes.length}, isVideo: ${m.isVideo}');
 
@@ -234,9 +235,9 @@ class MatrixMomentDataSource {
               contentType: 'image/jpeg',
             );
             thumbnailMxcUrl = thumbUri.toString();
-            debugPrint('MatrixMomentDataSource: Video thumbnail uploaded: $thumbnailMxcUrl');
+            debugLog('MatrixMomentDataSource: Video thumbnail uploaded: $thumbnailMxcUrl');
           } catch (e) {
-            debugPrint('MatrixMomentDataSource: Failed to upload video thumbnail: $e');
+            debugLog('MatrixMomentDataSource: Failed to upload video thumbnail: $e');
           }
         }
 
@@ -377,7 +378,7 @@ class MatrixMomentDataSource {
       }
     } catch (e) {
       // 忽略错误
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
 
@@ -704,7 +705,7 @@ class MatrixMomentDataSource {
 
     final room = await _getOrCreateMomentRoom();
     if (room == null) {
-      debugPrint('MatrixMomentDataSource: Cannot invite $userId - moment room is null');
+      debugLog('MatrixMomentDataSource: Cannot invite $userId - moment room is null');
       return;
     }
 
@@ -717,20 +718,20 @@ class MatrixMomentDataSource {
           m.id == userId && m.membership == matrix.Membership.invite);
 
       if (alreadyMember || alreadyInvited) {
-        debugPrint('MatrixMomentDataSource: $userId already in moment room');
+        debugLog('MatrixMomentDataSource: $userId already in moment room');
         return;
       }
     } catch (e) {
       // getParticipants 可能失败，继续尝试邀请
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     try {
-      debugPrint('MatrixMomentDataSource: Inviting $userId to moment room ${room.id}');
+      debugLog('MatrixMomentDataSource: Inviting $userId to moment room ${room.id}');
       await _client!.inviteUser(room.id, userId, reason: momentInviteReason);
-      debugPrint('MatrixMomentDataSource: Successfully invited $userId');
+      debugLog('MatrixMomentDataSource: Successfully invited $userId');
     } catch (e) {
-      debugPrint('MatrixMomentDataSource: Failed to invite $userId: $e');
+      debugLog('MatrixMomentDataSource: Failed to invite $userId: $e');
     }
   }
 
@@ -747,12 +748,12 @@ class MatrixMomentDataSource {
       // 检查是否是 Moment 房间邀请
       if (!_isMomentRoomInvite(room)) continue;
 
-      debugPrint('MatrixMomentDataSource: Auto-joining moment room invite: ${room.id}');
+      debugLog('MatrixMomentDataSource: Auto-joining moment room invite: ${room.id}');
 
       try {
         // 自动加入
         await room.join();
-        debugPrint('MatrixMomentDataSource: Joined moment room: ${room.id}');
+        debugLog('MatrixMomentDataSource: Joined moment room: ${room.id}');
 
         // 添加本地标签以标识这是好友的 Moment 房间
         await room.addTag(momentRoomTag);
@@ -760,12 +761,12 @@ class MatrixMomentDataSource {
         // 获取房间创建者（即该 Moment 房间的拥有者）
         final creatorId = _getRoomCreatorId(room);
         if (creatorId != null && creatorId != _client!.userID) {
-          debugPrint('MatrixMomentDataSource: Reciprocal invite for $creatorId');
+          debugLog('MatrixMomentDataSource: Reciprocal invite for $creatorId');
           // 回邀：邀请对方加入我的 Moment 房间
           await inviteFriendToMomentRoom(creatorId);
         }
       } catch (e) {
-        debugPrint('MatrixMomentDataSource: Failed to auto-join moment room: $e');
+        debugLog('MatrixMomentDataSource: Failed to auto-join moment room: $e');
       }
     }
   }
@@ -786,7 +787,7 @@ class MatrixMomentDataSource {
       }
     } catch (e) {
       // 忽略错误
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     // 方法 2: 检查房间名称（降级方案）
@@ -797,7 +798,7 @@ class MatrixMomentDataSource {
       }
     } catch (e) {
       // 忽略错误
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     return false;
@@ -812,7 +813,7 @@ class MatrixMomentDataSource {
       }
     } catch (e) {
       // 忽略错误
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     // 降级：尝试从成员中找到不是自己的用户
@@ -826,7 +827,7 @@ class MatrixMomentDataSource {
       }
     } catch (e) {
       // 忽略错误
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     return null;

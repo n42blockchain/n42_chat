@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../data/datasources/local/preferences_datasource.dart';
@@ -8,6 +7,7 @@ import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import 'conversation_event.dart';
 import 'conversation_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 会话列表BLoC
 class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
@@ -118,7 +118,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         }
       },
       onError: (Object error) {
-        debugPrint('ConversationBloc: Conversations stream error: $error');
+        debugLog('ConversationBloc: Conversations stream error: $error');
       },
     );
   }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 图片消息组件
 ///
@@ -89,20 +90,20 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
 
     // 如果不是 mxc:// URL，返回 null
     if (!mxcUrl.startsWith('mxc://')) {
-      debugPrint('ImageMessageWidget: Invalid URL format: $mxcUrl');
+      debugLog('ImageMessageWidget: Invalid URL format: $mxcUrl');
       return null;
     }
 
     try {
       final client = MatrixClientManager.instance.client;
       if (client == null) {
-        debugPrint('ImageMessageWidget: Client is null, cannot convert mxc URL');
+        debugLog('ImageMessageWidget: Client is null, cannot convert mxc URL');
         return null;
       }
 
       final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) {
-        debugPrint('ImageMessageWidget: No homeserver configured');
+        debugLog('ImageMessageWidget: No homeserver configured');
         return null;
       }
 
@@ -112,16 +113,16 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
       final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
 
       if (serverName.isEmpty || mediaId.isEmpty) {
-        debugPrint('ImageMessageWidget: Invalid mxc URL format: $mxcUrl');
+        debugLog('ImageMessageWidget: Invalid mxc URL format: $mxcUrl');
         return null;
       }
 
       // 构建认证媒体 URL (Matrix 1.11+)
       final httpUrl = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
-      debugPrint('ImageMessageWidget: Converted mxc URL to: $httpUrl');
+      debugLog('ImageMessageWidget: Converted mxc URL to: $httpUrl');
       return httpUrl;
     } catch (e) {
-      debugPrint('ImageMessageWidget: Error converting mxc URL: $e');
+      debugLog('ImageMessageWidget: Error converting mxc URL: $e');
       return null;
     }
   }
@@ -137,7 +138,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
         url = httpUrl;
       } else {
         // 转换失败，返回空字符串触发错误状态
-        debugPrint('ImageMessageWidget: Failed to convert mxc URL, will show error state');
+        debugLog('ImageMessageWidget: Failed to convert mxc URL, will show error state');
         return '';
       }
     }
@@ -197,7 +198,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
             fadeOutDuration: const Duration(milliseconds: 200),
             placeholder: (context, url) => _buildPlaceholder(size),
             errorWidget: (context, url, error) {
-              debugPrint('ImageMessageWidget: Failed to load image: $url, error: $error');
+              debugLog('ImageMessageWidget: Failed to load image: $url, error: $error');
               return _buildError(size, canRetry: _retryCount < _maxRetries);
             },
           ),
@@ -475,7 +476,7 @@ class ImageGridWidget extends StatelessWidget {
       // 构建认证媒体 URL (Matrix 1.11+)
       return '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
     } catch (e) {
-      debugPrint('ImageGridWidget: Error converting mxc URL: $e');
+      debugLog('ImageGridWidget: Error converting mxc URL: $e');
       return url;
     }
   }

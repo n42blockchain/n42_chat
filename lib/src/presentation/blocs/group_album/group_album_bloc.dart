@@ -1,10 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/group_album_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
 import 'group_album_event.dart';
 import 'group_album_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 群相册 BLoC
 class GroupAlbumBloc extends Bloc<GroupAlbumEvent, GroupAlbumState> {
@@ -47,9 +47,9 @@ class GroupAlbumBloc extends Bloc<GroupAlbumEvent, GroupAlbumState> {
         hasMore: media.length >= event.limit,
       ));
 
-      debugPrint('GroupAlbumBloc: Loaded ${media.length} media items');
+      debugLog('GroupAlbumBloc: Loaded ${media.length} media items');
     } catch (e) {
-      debugPrint('GroupAlbumBloc: Failed to load album: $e');
+      debugLog('GroupAlbumBloc: Failed to load album: $e');
       emit(state.copyWith(
         media: [],
         dateGroups: [],
@@ -96,9 +96,9 @@ class GroupAlbumBloc extends Bloc<GroupAlbumEvent, GroupAlbumState> {
         hasMore: moreMedia.length >= 50,
       ));
 
-      debugPrint('GroupAlbumBloc: Loaded ${moreMedia.length} more media items, total: ${allMedia.length}');
+      debugLog('GroupAlbumBloc: Loaded ${moreMedia.length} more media items, total: ${allMedia.length}');
     } catch (e) {
-      debugPrint('GroupAlbumBloc: Failed to load more: $e');
+      debugLog('GroupAlbumBloc: Failed to load more: $e');
       emit(state.copyWith(
         isLoadingMore: false,
         error: 'Failed to load more',

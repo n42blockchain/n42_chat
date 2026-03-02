@@ -76,15 +76,15 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
 
   /// 执行转发
   Future<void> _doForwardMessage(MessageEntity message, String targetRoomId) async {
-    debugPrint('Forward message: ${message.id} from ${widget.conversation.id} to $targetRoomId');
-    debugPrint('Message type: ${message.type}, content: ${message.content}');
+    debugLog('Forward message: ${message.id} from ${widget.conversation.id} to $targetRoomId');
+    debugLog('Message type: ${message.type}, content: ${message.content}');
 
     // 直接使用简单转发，避免重复发送问题
     // （之前的 repository.forwardMessage 可能发送成功但返回 null，导致 fallback 再次发送）
     try {
       await _simpleForwardMessage(message, targetRoomId);
     } catch (e) {
-      debugPrint('Forward message error: $e');
+      debugLog('Forward message error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -112,7 +112,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
           // 优先使用直接转发 mxc URL 的方式（Matrix SDK 推荐方式）
           final mediaUrl = message.metadata?.mediaUrl;
           if (mediaUrl != null) {
-            debugPrint('Forward image: Using direct mxc URL forward (recommended)');
+            debugLog('Forward image: Using direct mxc URL forward (recommended)');
             final result = await messageRepository.forwardMediaMessage(
               targetRoomId,
               mxcUrl: mediaUrl,
@@ -126,7 +126,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
             );
             if (result == null) {
               // 直接转发失败，尝试下载后重新上传
-              debugPrint('Forward image: Direct forward failed, trying download and re-upload');
+              debugLog('Forward image: Direct forward failed, trying download and re-upload');
               final imageBytes = await messageRepository.downloadMedia(mediaUrl);
               if (imageBytes != null) {
                 await messageRepository.sendImageMessage(
@@ -149,7 +149,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
           // 优先使用直接转发 mxc URL 的方式
           final videoUrl = message.metadata?.mediaUrl;
           if (videoUrl != null) {
-            debugPrint('Forward video: Using direct mxc URL forward (recommended)');
+            debugLog('Forward video: Using direct mxc URL forward (recommended)');
             final result = await messageRepository.forwardMediaMessage(
               targetRoomId,
               mxcUrl: videoUrl,
@@ -164,7 +164,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
             );
             if (result == null) {
               // 直接转发失败，尝试下载后重新上传
-              debugPrint('Forward video: Direct forward failed, trying download and re-upload');
+              debugLog('Forward video: Direct forward failed, trying download and re-upload');
               final videoBytes = await messageRepository.downloadMedia(videoUrl);
               if (videoBytes != null) {
                 await messageRepository.sendVideoMessage(
@@ -186,7 +186,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
           // 优先使用直接转发 mxc URL 的方式
           final audioUrl = message.metadata?.mediaUrl;
           if (audioUrl != null) {
-            debugPrint('Forward audio: Using direct mxc URL forward (recommended)');
+            debugLog('Forward audio: Using direct mxc URL forward (recommended)');
             final result = await messageRepository.forwardMediaMessage(
               targetRoomId,
               mxcUrl: audioUrl,
@@ -198,7 +198,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
             );
             if (result == null) {
               // 直接转发失败，尝试下载后重新上传
-              debugPrint('Forward audio: Direct forward failed, trying download and re-upload');
+              debugLog('Forward audio: Direct forward failed, trying download and re-upload');
               final audioBytes = await messageRepository.downloadMedia(audioUrl);
               if (audioBytes != null) {
                 await messageRepository.sendVoiceMessage(
@@ -223,18 +223,18 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
           final httpUrl = message.metadata?.httpUrl;
           final fileName = message.metadata?.fileName ?? message.content;
           final originalSize = message.metadata?.size;
-          debugPrint('Forward file: mediaUrl=$fileUrl, httpUrl=$httpUrl, fileName=$fileName, originalSize=$originalSize');
+          debugLog('Forward file: mediaUrl=$fileUrl, httpUrl=$httpUrl, fileName=$fileName, originalSize=$originalSize');
 
           // 尝试使用 mediaUrl 或 httpUrl 下载
           Uint8List? fileBytes;
           if (fileUrl != null && fileUrl.isNotEmpty) {
-            debugPrint('Downloading file from mxc URL: $fileUrl');
+            debugLog('Downloading file from mxc URL: $fileUrl');
             fileBytes = await messageRepository.downloadMedia(fileUrl);
-            debugPrint('Download result from mxc: ${fileBytes?.length ?? 0} bytes');
+            debugLog('Download result from mxc: ${fileBytes?.length ?? 0} bytes');
           }
 
           if (fileBytes == null && httpUrl != null && httpUrl.isNotEmpty) {
-            debugPrint('Fallback: downloading from HTTP URL: $httpUrl');
+            debugLog('Fallback: downloading from HTTP URL: $httpUrl');
             try {
               // Matrix 1.11+ 需要认证的媒体访问，需要添加 Authorization header
               final headers = <String, String>{};
@@ -245,26 +245,26 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
                   headers['Authorization'] = 'Bearer ${matrixClient!.accessToken}';
                 }
               } catch (e) {
-                debugPrint('Could not get access token: $e');
+                debugLog('Could not get access token: $e');
               }
 
               final response = await http.get(Uri.parse(httpUrl), headers: headers);
               if (response.statusCode == 200) {
                 fileBytes = response.bodyBytes;
-                debugPrint('Download result from http: ${fileBytes.length} bytes');
+                debugLog('Download result from http: ${fileBytes.length} bytes');
               } else {
-                debugPrint('HTTP download failed with status: ${response.statusCode}');
+                debugLog('HTTP download failed with status: ${response.statusCode}');
               }
             } catch (e) {
-              debugPrint('HTTP download failed: $e');
+              debugLog('HTTP download failed: $e');
             }
           }
 
           if (fileBytes != null && fileBytes.isNotEmpty) {
-            debugPrint('File downloaded successfully, size: ${fileBytes.length}');
+            debugLog('File downloaded successfully, size: ${fileBytes.length}');
             // 验证文件大小是否正确
             if (originalSize != null && fileBytes.length != originalSize) {
-              debugPrint('Warning: Downloaded file size (${fileBytes.length}) differs from original ($originalSize)');
+              debugLog('Warning: Downloaded file size (${fileBytes.length}) differs from original ($originalSize)');
             }
             await messageRepository.sendFileMessage(
               targetRoomId,
@@ -273,7 +273,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
               mimeType: message.metadata?.mimeType,
             );
           } else {
-            debugPrint('File download failed, cannot forward file');
+            debugLog('File download failed, cannot forward file');
             // 不再发送文本替代，而是抛出异常让用户知道转发失败
             throw Exception('Unable to download file for forwarding');
           }
@@ -316,13 +316,13 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
                 voteCounts = (aggregations['voteCounts'] as Map<String, dynamic>?)
                     ?.cast<String, int>() ?? voteCounts;
                 totalVoters = aggregations['totalVoters'] as int? ?? totalVoters;
-                debugPrint('Forward poll: fetched latest aggregations - voteCounts=$voteCounts, totalVoters=$totalVoters');
+                debugLog('Forward poll: fetched latest aggregations - voteCounts=$voteCounts, totalVoters=$totalVoters');
               }
             } catch (e) {
-              debugPrint('Forward poll: failed to fetch aggregations, using cached data: $e');
+              debugLog('Forward poll: failed to fetch aggregations, using cached data: $e');
             }
 
-            debugPrint('Forward poll snapshot: question=$question, options=$options, voteCounts=$voteCounts');
+            debugLog('Forward poll snapshot: question=$question, options=$options, voteCounts=$voteCounts');
 
             // 确保有optionIds，如果没有则生成
             final effectiveOptionIds = optionIds ?? List.generate(options.length, (i) => 'option_$i');
@@ -380,7 +380,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         );
       }
     } catch (e) {
-      debugPrint('Simple forward error: $e');
+      debugLog('Simple forward error: $e');
       // 重新抛出异常，让上层处理
       rethrow;
     }
@@ -437,7 +437,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
     final existingReaction = message.reactions.where((r) => r.key == emoji).firstOrNull;
     final isRemoving = existingReaction != null && existingReaction.isMe;
 
-    debugPrint('${isRemoving ? "Removing" : "Adding"} reaction $emoji to message ${message.id}');
+    debugLog('${isRemoving ? "Removing" : "Adding"} reaction $emoji to message ${message.id}');
 
     // 通过 ChatBloc 发送表情回应（toggle 逻辑在 bloc 中处理）
     context.read<ChatBloc>().add(AddReaction(
@@ -768,7 +768,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         await _simpleForwardMessage(message, targetRoomId);
         successCount++;
       } catch (e) {
-        debugPrint('Forward message failed: $e');
+        debugLog('Forward message failed: $e');
         failCount++;
       }
     }
@@ -936,7 +936,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         }
       }
     } catch (e) {
-      debugPrint('Save media error: $e');
+      debugLog('Save media error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(S.of(context)?.chatErrorWithMessage(e.toString()) ?? 'Error: $e')),

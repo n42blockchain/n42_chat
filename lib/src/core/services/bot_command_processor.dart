@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../domain/entities/bot_command_entity.dart';
 import '../../integration/wallet_bridge.dart';
+import '../utils/debug_log.dart';
 
 /// Bot 命令处理器
 ///
@@ -153,7 +153,7 @@ class BotCommandProcessor {
         return BotCommandResult.error('Token "$symbol" not found.\nTry using the full name (e.g., /price bitcoin)');
       }
     } catch (e) {
-      debugPrint('BotCommandProcessor price error: $e');
+      debugLog('BotCommandProcessor price error: $e');
       return BotCommandResult.error('Failed to fetch price. Please try again.');
     }
 

@@ -11,6 +11,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import 'group_album_page.dart';
 import 'group_files_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 群媒体中心页面
 ///
@@ -172,7 +173,7 @@ class _LinksTabState extends State<_LinksTab> {
         });
       }
     } catch (e) {
-      debugPrint('LinksTab: Failed to load links: $e');
+      debugLog('LinksTab: Failed to load links: $e');
       if (mounted) {
         setState(() => _isLoading = false);
       }

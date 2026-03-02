@@ -2868,14 +2868,18 @@
   "selfDestructCountdown": "{time} 后销毁",
   "@selfDestructCountdown": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "messageDestroyed": "消息已销毁",
   "miniAppPermissionDenied": "权限不足：{permission}",
   "@miniAppPermissionDenied": {
     "placeholders": {
-      "permission": {"type": "String"}
+      "permission": {
+        "type": "String"
+      }
     }
   },
   "aiSuggestionGasFee": "什么是 Gas 费？",
@@ -2890,11 +2894,36 @@
   "slowModeCooldown": "慢速模式：请等待 {seconds} 秒",
   "@slowModeCooldown": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "addressCopyAction": "复制地址",
   "addressSendMessage": "发消息",
   "addressViewProfile": "查看资料",
-  "sendToAddress": "通过钱包地址发消息"
+  "sendToAddress": "通过钱包地址发消息",
+  "blocAuthSendVerificationCodeFailed": "发送验证码失败",
+  "blocAuthServerNoEmailPasswordReset": "该服务器不支持通过邮箱重置密码",
+  "blocAuthResetPasswordFailed": "重置密码失败",
+  "blocAuthChangePasswordFailed": "修改密码失败",
+  "blocAuthOldPasswordWrong": "原密码错误",
+  "blocAuthLoginCancelled": "登录已取消",
+  "blocAuthGoogleLoginFailed": "Google 登录失败",
+  "blocAuthAppleLoginFailed": "Apple 登录失败",
+  "blocAuthSsoLoginFailed": "SSO 登录失败",
+  "blocAuthFacebookLoginFailed": "Facebook 登录失败",
+  "blocAuthTwitterLoginFailed": "Twitter 登录失败",
+  "blocAuthWeChatLoginFailed": "微信登录失败",
+  "blocAuthWeChatNotConfigured": "微信登录未配置",
+  "blocAuthWeChatNotInstalled": "请先安装微信",
+  "blocAuthPasswordWrong": "密码错误",
+  "blocAuthEmailAlreadyBound": "该邮箱已被其他账号绑定",
+  "blocAuthChangeEmailFailed": "修改邮箱失败",
+  "blocAuthVerificationCodeInvalid": "验证码错误或已过期",
+  "blocAuthSessionExpired": "会话已失效，请重新登录",
+  "blocAuthSessionIncomplete": "会话数据不完整，请重新登录",
+  "blocAuthPasskeyNotImplemented": "Passkey 登录功能尚未实现",
+  "blocAuthPasskeyRegisterNotImplemented": "Passkey 注册功能尚未实现",
+  "blocAuthEmailOtpNotImplemented": "邮箱 OTP 登录功能尚未实现"
 }

@@ -11,6 +11,7 @@ import '../../../domain/entities/contact_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../contact/tags_management_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 可见性好友选择页面
 ///
@@ -57,7 +58,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
         }
       }
     } catch (e) {
-      debugPrint('Failed to load tags: $e');
+      debugLog('Failed to load tags: $e');
     }
   }
 
@@ -68,7 +69,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
         return state.contacts;
       }
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
     return [];
   }

@@ -20,6 +20,7 @@ import '../group/group_settings_page.dart';
 import '../media/media_gallery_page.dart';
 import 'chat_export_page.dart';
 import '../settings/chat_background_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 聊天详情页面（仿微信）
 class ChatDetailPage extends StatefulWidget {
@@ -90,7 +91,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
       final targetUserId = widget.conversation.directUserId;
       if (targetUserId != null && event.userId == targetUserId && mounted) {
-        debugPrint('ChatDetailPage: Remark updated for $targetUserId, refreshing UI');
+        debugLog('ChatDetailPage: Remark updated for $targetUserId, refreshing UI');
         setState(() {});
       }
     });
@@ -107,7 +108,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         });
       }
     } catch (e) {
-      debugPrint('ChatDetailPage: Failed to load strong reminder status: $e');
+      debugLog('ChatDetailPage: Failed to load strong reminder status: $e');
     }
   }
   
@@ -349,9 +350,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     try {
       final repository = getIt<IConversationRepository>();
       await repository.setMuted(widget.conversation.id, muted);
-      debugPrint('ChatDetailPage: Mute status updated to $muted');
+      debugLog('ChatDetailPage: Mute status updated to $muted');
     } catch (e) {
-      debugPrint('ChatDetailPage: Failed to update mute status: $e');
+      debugLog('ChatDetailPage: Failed to update mute status: $e');
       // 恢复原状态
       if (mounted) {
         setState(() {
@@ -363,13 +364,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   /// 更新置顶状态
   Future<void> _updatePinnedStatus(bool pinned) async {
-    debugPrint('ChatDetailPage: _updatePinnedStatus called with pinned=$pinned, roomId=${widget.conversation.id}');
+    debugLog('ChatDetailPage: _updatePinnedStatus called with pinned=$pinned, roomId=${widget.conversation.id}');
     try {
       final repository = getIt<IConversationRepository>();
       await repository.setPinned(widget.conversation.id, pinned);
-      debugPrint('ChatDetailPage: Pin status updated successfully to $pinned');
+      debugLog('ChatDetailPage: Pin status updated successfully to $pinned');
     } catch (e) {
-      debugPrint('ChatDetailPage: Failed to update pin status: $e');
+      debugLog('ChatDetailPage: Failed to update pin status: $e');
       // 恢复原状态
       if (mounted) {
         setState(() {
@@ -384,9 +385,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     try {
       final repository = getIt<IConversationRepository>();
       await repository.setStrongReminder(widget.conversation.id, enabled);
-      debugPrint('ChatDetailPage: Strong reminder status updated to $enabled');
+      debugLog('ChatDetailPage: Strong reminder status updated to $enabled');
     } catch (e) {
-      debugPrint('ChatDetailPage: Failed to update strong reminder status: $e');
+      debugLog('ChatDetailPage: Failed to update strong reminder status: $e');
       // 恢复原状态
       if (mounted) {
         setState(() {
@@ -467,7 +468,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         );
       }
     } catch (e) {
-      debugPrint('ChatDetailPage: Failed to update group name: $e');
+      debugLog('ChatDetailPage: Failed to update group name: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -497,7 +498,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       hasContactBloc = true;
     } catch (e) {
       // ContactBloc 不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     final Widget scaffold = Scaffold(
@@ -672,7 +673,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   value: _isPinned,
                   textColor: textColor,
                   onChanged: (value) {
-                    debugPrint('ChatDetailPage: Pin switch toggled to $value');
+                    debugLog('ChatDetailPage: Pin switch toggled to $value');
                     setState(() {
                       _isPinned = value;
                     });
@@ -863,7 +864,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     Navigator.of(context).push(
@@ -912,7 +913,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       widget.onAddMember!();
     } else {
       // TODO: 默认实现
-      debugPrint('Add member to group');
+      debugLog('Add member to group');
     }
   }
 
@@ -922,7 +923,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       // 显示选择成员的对话框
       _showRemoveMemberDialog();
     } else {
-      debugPrint('Remove member from group');
+      debugLog('Remove member from group');
     }
   }
 
@@ -1076,7 +1077,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          debugPrint('ChatDetailPage: Switch row tapped for $title, current value: $value');
+          debugLog('ChatDetailPage: Switch row tapped for $title, current value: $value');
           onChanged(!value);
         },
         child: Padding(
@@ -1095,7 +1096,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               Switch.adaptive(
                 value: value,
                 onChanged: (newValue) {
-                  debugPrint('ChatDetailPage: Switch widget toggled for $title to $newValue');
+                  debugLog('ChatDetailPage: Switch widget toggled for $title to $newValue');
                   onChanged(newValue);
                 },
                 activeTrackColor: AppColors.primary,
@@ -1343,7 +1344,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final otherUserId = _getOtherUserId();
     if (otherUserId == null) {
       // 无法获取用户ID，使用房间ID作为后备
-      debugPrint('ChatDetailPage: Cannot get other user ID, using room ID as fallback');
+      debugLog('ChatDetailPage: Cannot get other user ID, using room ID as fallback');
     }
     
     final userId = otherUserId ?? widget.conversation.id;
@@ -1354,7 +1355,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       contactBloc = context.read<ContactBloc>();
     } catch (e) {
       // ContactBloc 可能不可用
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     Navigator.of(context).push(
@@ -1495,7 +1496,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
         });
       }
     } catch (e) {
-      debugPrint('Error loading members: $e');
+      debugLog('Error loading members: $e');
       if (mounted) {
         setState(() => _isLoading = false);
       }

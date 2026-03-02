@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'bridge_platform.dart';
 import 'bridge_state.dart';
+import '../../core/utils/debug_log.dart';
 
 /// Service for interacting with Mautrix bridge bots via Matrix messages.
 ///
@@ -86,7 +86,7 @@ class BridgeBotService {
       try {
         await queryStatus(entry.key);
       } catch (e) {
-        debugPrint('BridgeBotService: Failed to query ${entry.key}: $e');
+        debugLog('BridgeBotService: Failed to query ${entry.key}: $e');
       }
     }
   }
@@ -187,7 +187,7 @@ class BridgeBotService {
 
     // Send the command message
     final message = command.toMessage();
-    debugPrint('BridgeBotService: Sending to ${platform.name}: $message');
+    debugLog('BridgeBotService: Sending to ${platform.name}: $message');
 
     await room.sendTextEvent(message);
 

@@ -37,13 +37,13 @@ extension ChatBlocRetryHandlers on ChatBloc {
 
     final currentCount = _pendingRetryMessages[messageId] ?? 0;
     if (currentCount >= ChatBloc._maxRetryCount) {
-      debugPrint('ChatBloc: Message $messageId exceeded max retry count (${ChatBloc._maxRetryCount}), giving up');
+      debugLog('ChatBloc: Message $messageId exceeded max retry count (${ChatBloc._maxRetryCount}), giving up');
       _pendingRetryMessages.remove(messageId);
       _permanentlyFailedMessages.add(messageId);
       return;
     }
     _pendingRetryMessages[messageId] = currentCount;
-    debugPrint('ChatBloc: Enqueued message $messageId for retry (attempt ${currentCount + 1}/${ChatBloc._maxRetryCount})');
+    debugLog('ChatBloc: Enqueued message $messageId for retry (attempt ${currentCount + 1}/${ChatBloc._maxRetryCount})');
   }
 
   /// 连接状态变化处理
@@ -51,7 +51,7 @@ extension ChatBlocRetryHandlers on ChatBloc {
     ConnectionStatusChanged event,
     Emitter<ChatState> emit,
   ) {
-    debugPrint('ChatBloc: Connection status changed: ${event.isConnected}');
+    debugLog('ChatBloc: Connection status changed: ${event.isConnected}');
   }
 
   /// 自动重试所有待发消息
@@ -63,7 +63,7 @@ extension ChatBlocRetryHandlers on ChatBloc {
 
     // 取出当前所有待重试的消息
     final messagesToRetry = Map<String, int>.from(_pendingRetryMessages);
-    debugPrint('ChatBloc: Retrying ${messagesToRetry.length} pending messages');
+    debugLog('ChatBloc: Retrying ${messagesToRetry.length} pending messages');
 
     for (final entry in messagesToRetry.entries) {
       final messageId = entry.key;
@@ -85,12 +85,12 @@ extension ChatBlocRetryHandlers on ChatBloc {
           // 旧的 EventStatus.error 事件仍在 SDK 时间线中，将其 ID 加入本地删除集合
           // 使 onMessagesUpdated 过滤掉它，防止 scanFailedMessages 反复发现并重入队。
           _locallyDeletedMessageIds.add(messageId);
-          debugPrint('ChatBloc: Message $messageId resent successfully, old event hidden');
+          debugLog('ChatBloc: Message $messageId resent successfully, old event hidden');
         } else {
           _handleRetryFailure(messageId, retryCount);
         }
       } catch (e) {
-        debugPrint('ChatBloc: Retry failed for $messageId: $e');
+        debugLog('ChatBloc: Retry failed for $messageId: $e');
         _handleRetryFailure(messageId, retryCount);
       }
     }
@@ -103,10 +103,10 @@ extension ChatBlocRetryHandlers on ChatBloc {
       _pendingRetryMessages.remove(messageId);
       // 标记为永久失败，防止 scanFailedMessages 重新以计数 0 入队
       _permanentlyFailedMessages.add(messageId);
-      debugPrint('ChatBloc: Message $messageId failed after ${ChatBloc._maxRetryCount} retries, requires manual resend');
+      debugLog('ChatBloc: Message $messageId failed after ${ChatBloc._maxRetryCount} retries, requires manual resend');
     } else {
       _pendingRetryMessages[messageId] = nextCount;
-      debugPrint('ChatBloc: Message $messageId retry count updated to $nextCount/${ChatBloc._maxRetryCount}');
+      debugLog('ChatBloc: Message $messageId retry count updated to $nextCount/${ChatBloc._maxRetryCount}');
     }
   }
 

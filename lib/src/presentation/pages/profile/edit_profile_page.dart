@@ -13,6 +13,7 @@ import '../../../integration/wallet_bridge.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../widgets/common/ens_badge.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 编辑资料页面
 class EditProfilePage extends StatefulWidget {
@@ -62,7 +63,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         }
       }
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     // Load username
@@ -73,7 +74,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         setState(() => _n42Username = username);
       }
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
   }
 

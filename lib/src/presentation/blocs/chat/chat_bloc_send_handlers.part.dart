@@ -54,7 +54,7 @@ extension ChatBlocSendHandlers on ChatBloc {
             originalText = event.text;
           }
         } catch (e) {
-          debugPrint('ChatBloc: Smart reply translation failed, sending original: $e');
+          debugLog('ChatBloc: Smart reply translation failed, sending original: $e');
         }
       }
     }
@@ -128,14 +128,14 @@ extension ChatBlocSendHandlers on ChatBloc {
     Emitter<ChatState> emit,
   ) async {
     if (_currentRoomId == null) {
-      debugPrint('ChatBloc: Cannot send image - no room ID');
+      debugLog('ChatBloc: Cannot send image - no room ID');
       return;
     }
 
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
-      debugPrint('ChatBloc: Sending image ${event.filename}, size: ${event.imageBytes.length}');
+      debugLog('ChatBloc: Sending image ${event.filename}, size: ${event.imageBytes.length}');
       await _messageRepository.sendImageMessage(
         _currentRoomId!,
         imageBytes: event.imageBytes,
@@ -143,11 +143,11 @@ extension ChatBlocSendHandlers on ChatBloc {
         mimeType: event.mimeType,
         selfDestructAfter: event.selfDestructAfter,
       );
-      debugPrint('ChatBloc: Image sent successfully');
+      debugLog('ChatBloc: Image sent successfully');
       emit(state.copyWith(isSending: false));
     } catch (e, stackTrace) {
-      debugPrint('ChatBloc: Send image error - $e');
-      debugPrint('ChatBloc: Stack trace - $stackTrace');
+      debugLog('ChatBloc: Send image error - $e');
+      debugLog('ChatBloc: Stack trace - $stackTrace');
       emit(state.copyWith(
         isSending: false,
         error: 'Failed to send image: $e',
@@ -161,14 +161,14 @@ extension ChatBlocSendHandlers on ChatBloc {
     Emitter<ChatState> emit,
   ) async {
     if (_currentRoomId == null) {
-      debugPrint('ChatBloc: Cannot send voice - no room ID');
+      debugLog('ChatBloc: Cannot send voice - no room ID');
       return;
     }
 
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
-      debugPrint('ChatBloc: Sending voice ${event.filename}, size: ${event.audioBytes.length}, duration: ${event.duration}ms');
+      debugLog('ChatBloc: Sending voice ${event.filename}, size: ${event.audioBytes.length}, duration: ${event.duration}ms');
       await _messageRepository.sendVoiceMessage(
         _currentRoomId!,
         audioBytes: event.audioBytes,
@@ -177,11 +177,11 @@ extension ChatBlocSendHandlers on ChatBloc {
         mimeType: event.mimeType,
         selfDestructAfter: event.selfDestructAfter,
       );
-      debugPrint('ChatBloc: Voice sent successfully');
+      debugLog('ChatBloc: Voice sent successfully');
       emit(state.copyWith(isSending: false));
     } catch (e, stackTrace) {
-      debugPrint('ChatBloc: Send voice error - $e');
-      debugPrint('ChatBloc: Stack trace - $stackTrace');
+      debugLog('ChatBloc: Send voice error - $e');
+      debugLog('ChatBloc: Stack trace - $stackTrace');
       emit(state.copyWith(
         isSending: false,
         error: 'Failed to send voice: $e',
@@ -225,7 +225,7 @@ extension ChatBlocSendHandlers on ChatBloc {
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
-      debugPrint('ChatBloc: Sending video with thumbnail: ${event.thumbnailBytes?.length ?? 0} bytes');
+      debugLog('ChatBloc: Sending video with thumbnail: ${event.thumbnailBytes?.length ?? 0} bytes');
       await _messageRepository.sendVideoMessage(
         _currentRoomId!,
         videoBytes: event.videoBytes,
@@ -234,11 +234,11 @@ extension ChatBlocSendHandlers on ChatBloc {
         thumbnailBytes: event.thumbnailBytes,
         selfDestructAfter: event.selfDestructAfter,
       );
-      debugPrint('ChatBloc: Video sent successfully');
+      debugLog('ChatBloc: Video sent successfully');
       emit(state.copyWith(isSending: false));
     } catch (e, stackTrace) {
-      debugPrint('ChatBloc: Send video error - $e');
-      debugPrint('ChatBloc: Stack trace - $stackTrace');
+      debugLog('ChatBloc: Send video error - $e');
+      debugLog('ChatBloc: Stack trace - $stackTrace');
       emit(state.copyWith(
         isSending: false,
         error: 'Failed to send video: $e',
@@ -277,14 +277,14 @@ extension ChatBlocSendHandlers on ChatBloc {
     Emitter<ChatState> emit,
   ) async {
     if (_currentRoomId == null) {
-      debugPrint('ChatBloc: Cannot send GIF - no room ID');
+      debugLog('ChatBloc: Cannot send GIF - no room ID');
       return;
     }
 
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
-      debugPrint('ChatBloc: Sending GIF from ${event.gifUrl}');
+      debugLog('ChatBloc: Sending GIF from ${event.gifUrl}');
       await _messageRepository.sendGifMessage(
         _currentRoomId!,
         gifUrl: event.gifUrl,
@@ -293,11 +293,11 @@ extension ChatBlocSendHandlers on ChatBloc {
         height: event.height,
         title: event.title,
       );
-      debugPrint('ChatBloc: GIF sent successfully');
+      debugLog('ChatBloc: GIF sent successfully');
       emit(state.copyWith(isSending: false));
     } catch (e, stackTrace) {
-      debugPrint('ChatBloc: Send GIF error - $e');
-      debugPrint('ChatBloc: Stack trace - $stackTrace');
+      debugLog('ChatBloc: Send GIF error - $e');
+      debugLog('ChatBloc: Stack trace - $stackTrace');
       emit(state.copyWith(
         isSending: false,
         error: 'Failed to send GIF: $e',
@@ -311,14 +311,14 @@ extension ChatBlocSendHandlers on ChatBloc {
     Emitter<ChatState> emit,
   ) async {
     if (_currentRoomId == null) {
-      debugPrint('ChatBloc: Cannot send sticker - no room ID');
+      debugLog('ChatBloc: Cannot send sticker - no room ID');
       return;
     }
 
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
-      debugPrint('ChatBloc: Sending sticker ${event.stickerId} from pack ${event.packId}');
+      debugLog('ChatBloc: Sending sticker ${event.stickerId} from pack ${event.packId}');
       await _messageRepository.sendStickerMessage(
         _currentRoomId!,
         stickerId: event.stickerId,
@@ -332,11 +332,11 @@ extension ChatBlocSendHandlers on ChatBloc {
         mimeType: event.mimeType,
         size: event.size,
       );
-      debugPrint('ChatBloc: Sticker sent successfully');
+      debugLog('ChatBloc: Sticker sent successfully');
       emit(state.copyWith(isSending: false));
     } catch (e, stackTrace) {
-      debugPrint('ChatBloc: Send sticker error - $e');
-      debugPrint('ChatBloc: Stack trace - $stackTrace');
+      debugLog('ChatBloc: Send sticker error - $e');
+      debugLog('ChatBloc: Stack trace - $stackTrace');
       emit(state.copyWith(
         isSending: false,
         error: 'Failed to send sticker: $e',
@@ -352,7 +352,7 @@ extension ChatBlocSendHandlers on ChatBloc {
     if (_currentRoomId == null) return;
 
     try {
-      debugPrint('ChatBloc: Sending custom message - type: ${event.type}, content: ${event.content}');
+      debugLog('ChatBloc: Sending custom message - type: ${event.type}, content: ${event.content}');
 
       // 获取当前用户ID
       final currentUserId = await _messageRepository.getCurrentUserId() ?? '';
@@ -421,7 +421,7 @@ extension ChatBlocSendHandlers on ChatBloc {
       }
 
       if (eventId != null) {
-        debugPrint('ChatBloc: Custom message sent - eventId: $eventId');
+        debugLog('ChatBloc: Custom message sent - eventId: $eventId');
 
         // 更新消息状态为已发送
         if (!isClosed) {
@@ -454,7 +454,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         }
       }
     } catch (e) {
-      debugPrint('ChatBloc: Failed to send custom message: $e');
+      debugLog('ChatBloc: Failed to send custom message: $e');
       if (!isClosed) {
         emit(state.copyWith(error: 'Failed to send: $e'));
       }
@@ -480,7 +480,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         },
       );
     } catch (e) {
-      debugPrint('ChatBloc: Failed to send contact card: $e');
+      debugLog('ChatBloc: Failed to send contact card: $e');
     }
   }
 
@@ -496,9 +496,9 @@ extension ChatBlocSendHandlers on ChatBloc {
         roomId: _currentRoomId!,
         notice: event.notice,
       );
-      debugPrint('ChatBloc: System notice sent: ${event.notice}');
+      debugLog('ChatBloc: System notice sent: ${event.notice}');
     } catch (e) {
-      debugPrint('ChatBloc: Failed to send system notice: $e');
+      debugLog('ChatBloc: Failed to send system notice: $e');
     }
   }
 
@@ -514,7 +514,7 @@ extension ChatBlocSendHandlers on ChatBloc {
       // 例如：拍人者设置后缀"的头"，则无论拍谁都显示"XXX 拍了拍 YYY 的头"
       final String? pokeText = event.pokerPokeText;
 
-      debugPrint('ChatBloc: Using poker\'s pokeText: $pokeText');
+      debugLog('ChatBloc: Using poker\'s pokeText: $pokeText');
 
       // 构造拍一拍消息
       String pokeMessage;
@@ -524,7 +524,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         pokeMessage = '「${event.pokerName}」拍了拍「${event.targetName}」';
       }
 
-      debugPrint('ChatBloc: Sending poke message: $pokeMessage');
+      debugLog('ChatBloc: Sending poke message: $pokeMessage');
 
       // 发送系统消息
       await _messageRepository.sendNoticeMessage(
@@ -532,9 +532,9 @@ extension ChatBlocSendHandlers on ChatBloc {
         notice: pokeMessage,
       );
 
-      debugPrint('ChatBloc: Poke message sent successfully');
+      debugLog('ChatBloc: Poke message sent successfully');
     } catch (e) {
-      debugPrint('ChatBloc: Failed to send poke message: $e');
+      debugLog('ChatBloc: Failed to send poke message: $e');
     }
   }
 }

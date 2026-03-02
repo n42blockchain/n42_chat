@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../../../core/utils/debug_log.dart';
 
 /// 社交登录 API 数据源
 ///
@@ -107,7 +107,7 @@ class SocialAuthApi {
         body['access_token'] = accessToken;
       }
 
-      debugPrint('SocialAuthApi: Logging in with $provider');
+      debugLog('SocialAuthApi: Logging in with $provider');
 
       final response = await _client.post(
         uri,
@@ -118,7 +118,7 @@ class SocialAuthApi {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
 
       if (data['code'] == 200 && data['data'] != null) {
-        debugPrint('SocialAuthApi: Login successful');
+        debugLog('SocialAuthApi: Login successful');
         return SocialLoginResponse.success(
           uuid: data['data']['uuid'] as String?,
           token: data['data']['token'] as String?,
@@ -132,11 +132,11 @@ class SocialAuthApi {
         );
       } else {
         final error = (data['err'] ?? 'Login failed').toString();
-        debugPrint('SocialAuthApi: Login failed - $error');
+        debugLog('SocialAuthApi: Login failed - $error');
         return SocialLoginResponse.failure(error);
       }
     } catch (e) {
-      debugPrint('SocialAuthApi: Error - $e');
+      debugLog('SocialAuthApi: Error - $e');
       return SocialLoginResponse.failure(e.toString());
     }
   }
@@ -173,7 +173,7 @@ class SocialAuthApi {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       return data['code'] == 200;
     } catch (e) {
-      debugPrint('SocialAuthApi: Bind failed - $e');
+      debugLog('SocialAuthApi: Bind failed - $e');
       return false;
     }
   }
@@ -203,7 +203,7 @@ class SocialAuthApi {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       return data['code'] == 200;
     } catch (e) {
-      debugPrint('SocialAuthApi: Unbind failed - $e');
+      debugLog('SocialAuthApi: Unbind failed - $e');
       return false;
     }
   }
@@ -235,7 +235,7 @@ class SocialAuthApi {
       }
       return [];
     } catch (e) {
-      debugPrint('SocialAuthApi: Get accounts failed - $e');
+      debugLog('SocialAuthApi: Get accounts failed - $e');
       return [];
     }
   }

@@ -1,10 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../../domain/entities/group_album_entity.dart';
 import '../../../../domain/entities/group_file_entity.dart';
 import '../matrix_client_manager.dart';
 import 'matrix_event_mapper.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// Matrix 房间媒体和文件处理器
 ///
@@ -89,10 +89,10 @@ class MatrixRoomMedia {
         if (files.length >= limit) break;
       }
 
-      debugPrint('MatrixMessageDataSource: Found ${files.length} files in room $roomId');
+      debugLog('MatrixMessageDataSource: Found ${files.length} files in room $roomId');
       return files;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to get room files: $e');
+      debugLog('MatrixMessageDataSource: Failed to get room files: $e');
       return [];
     }
   }
@@ -151,10 +151,10 @@ class MatrixRoomMedia {
         if (mediaEntities.length >= limit) break;
       }
 
-      debugPrint('MatrixMessageDataSource: Found ${mediaEntities.length} media items in room $roomId');
+      debugLog('MatrixMessageDataSource: Found ${mediaEntities.length} media items in room $roomId');
       return mediaEntities;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to get room media: $e');
+      debugLog('MatrixMessageDataSource: Failed to get room media: $e');
       return [];
     }
   }
@@ -209,7 +209,7 @@ class MatrixRoomMedia {
             : null,
       );
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to convert event to album media: $e');
+      debugLog('MatrixMessageDataSource: Failed to convert event to album media: $e');
       return null;
     }
   }

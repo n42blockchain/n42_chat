@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import '../utils/debug_log.dart';
 
 /// 语音转文字服务
 /// 
@@ -63,11 +63,11 @@ class SpeechToTextService {
         case SpeechProvider.whisper:
           return await _transcribeWithWhisper(audioPath, language);
         case SpeechProvider.none:
-          debugPrint('Speech-to-Text: No provider configured');
+          debugLog('Speech-to-Text: No provider configured');
           return null;
       }
     } catch (e) {
-      debugPrint('Speech-to-Text error: $e');
+      debugLog('Speech-to-Text error: $e');
       return null;
     }
   }

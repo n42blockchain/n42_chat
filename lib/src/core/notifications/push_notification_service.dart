@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' as matrix;
+import '../utils/debug_log.dart';
 
 /// 推送通知服务
 ///
@@ -231,7 +232,7 @@ class PushNotificationService implements IPushNotificationService {
     // 注：实际实现需要使用 flutter_local_notifications 包
     // 这里只提供接口定义
     
-    debugPrint('Showing notification: $title - $body');
+    debugLog('Showing notification: $title - $body');
   }
 
   @override

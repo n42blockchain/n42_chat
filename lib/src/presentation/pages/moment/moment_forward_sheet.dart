@@ -10,6 +10,7 @@ import '../../../domain/entities/moment_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
 import '../../widgets/common/n42_avatar.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 转发朋友圈动态到聊天的底部弹窗
 class MomentForwardSheet extends StatefulWidget {
@@ -27,7 +28,7 @@ class MomentForwardSheet extends StatefulWidget {
     try {
       conversationBloc = context.read<ConversationBloc>();
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
 
     return showModalBottomSheet<void>(

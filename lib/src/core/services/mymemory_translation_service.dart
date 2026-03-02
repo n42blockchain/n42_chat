@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../data/datasources/local/preferences_datasource.dart';
 import 'translation_service.dart';
+import '../utils/debug_log.dart';
 
 /// MyMemory 免费翻译服务实现
 ///
@@ -88,7 +88,7 @@ class MyMemoryTranslationService implements ITranslationService {
         targetLanguage: targetLanguage,
       );
     } catch (e) {
-      debugPrint('MyMemoryTranslationService: Translation error: $e');
+      debugLog('MyMemoryTranslationService: Translation error: $e');
       return TranslationResult.error('Translation failed: $e');
     }
   }

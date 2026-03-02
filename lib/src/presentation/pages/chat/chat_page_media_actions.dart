@@ -28,7 +28,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         }
       }
     } catch (e) {
-      debugPrint('Pick media error: $e');
+      debugLog('Pick media error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -71,7 +71,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         setState(() => _isViewOnce = false);
       }
     } catch (e) {
-      debugPrint('Edit image error: $e');
+      debugLog('Edit image error: $e');
       // 编辑器出错时回退到直接发送
       await _sendImage(image);
     }
@@ -122,23 +122,23 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         if (image == null) return;
         await _editAndSendImage(image);
       } else if (choice == 'video') {
-        debugPrint('Starting video recording...');
+        debugLog('Starting video recording...');
         final video = await picker.pickVideo(
           source: ImageSource.camera,
           maxDuration: const Duration(minutes: 5),
         );
 
-        debugPrint('Video picker returned: ${video?.path ?? "null"}');
+        debugLog('Video picker returned: ${video?.path ?? "null"}');
 
         if (video == null) {
-          debugPrint('Video is null - user may have cancelled or recording failed');
+          debugLog('Video is null - user may have cancelled or recording failed');
           return;
         }
 
         // 验证视频文件存在
         final videoFile = File(video.path);
         if (!await videoFile.exists()) {
-          debugPrint('Video file does not exist at path: ${video.path}');
+          debugLog('Video file does not exist at path: ${video.path}');
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -151,10 +151,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         }
 
         final fileSize = await videoFile.length();
-        debugPrint('Video file exists, size: $fileSize bytes');
+        debugLog('Video file exists, size: $fileSize bytes');
 
         if (fileSize == 0) {
-          debugPrint('Video file is empty');
+          debugLog('Video file is empty');
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -169,7 +169,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         await _sendVideo(video);
       }
     } catch (e) {
-      debugPrint('Take photo/video error: $e');
+      debugLog('Take photo/video error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -183,9 +183,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
 
   Future<void> _sendVideo(XFile video) async {
     try {
-      debugPrint('=== _sendVideo start ===');
-      debugPrint('Video path: ${video.path}');
-      debugPrint('Video name: ${video.name}');
+      debugLog('=== _sendVideo start ===');
+      debugLog('Video path: ${video.path}');
+      debugLog('Video name: ${video.name}');
 
       // 显示发送中提示
       if (mounted) {
@@ -202,10 +202,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       try {
         bytes = await video.readAsBytes();
       } catch (e) {
-        debugPrint('XFile.readAsBytes failed, trying File: $e');
+        debugLog('XFile.readAsBytes failed, trying File: $e');
         final file = File(video.path);
         if (!await file.exists()) {
-          debugPrint('Video file not found: ${video.path}');
+          debugLog('Video file not found: ${video.path}');
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -220,7 +220,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       }
 
       if (bytes.isEmpty) {
-        debugPrint('Video bytes is empty');
+        debugLog('Video bytes is empty');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -277,7 +277,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       // 生成视频缩略图（第一帧）
       Uint8List? thumbnailBytes;
       try {
-        debugPrint('Generating video thumbnail...');
+        debugLog('Generating video thumbnail...');
         final thumbnailPath = await VideoThumbnail.thumbnailFile(
           video: video.path,
           thumbnailPath: (await Directory.systemTemp.createTemp()).path,
@@ -290,21 +290,21 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
           final thumbnailFile = File(thumbnailPath);
           if (await thumbnailFile.exists()) {
             thumbnailBytes = await thumbnailFile.readAsBytes();
-            debugPrint('Thumbnail generated: ${thumbnailBytes.length} bytes');
+            debugLog('Thumbnail generated: ${thumbnailBytes.length} bytes');
             // 清理临时文件
             await thumbnailFile.delete();
           }
         }
       } catch (e) {
-        debugPrint('Failed to generate thumbnail: $e');
+        debugLog('Failed to generate thumbnail: $e');
         // 缩略图生成失败不阻止视频发送
       }
 
-      debugPrint('Final filename: $filename');
-      debugPrint('Final mimeType: $mimeType');
-      debugPrint('Video size: ${bytes.length} bytes');
-      debugPrint('Thumbnail size: ${thumbnailBytes?.length ?? 0} bytes');
-      debugPrint('=== Sending video to ChatBloc ===');
+      debugLog('Final filename: $filename');
+      debugLog('Final mimeType: $mimeType');
+      debugLog('Video size: ${bytes.length} bytes');
+      debugLog('Thumbnail size: ${thumbnailBytes?.length ?? 0} bytes');
+      debugLog('=== Sending video to ChatBloc ===');
 
       if (!mounted) return;
       // 使用视频消息发送（带缩略图）
@@ -333,8 +333,8 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         );
       }
     } catch (e, stackTrace) {
-      debugPrint('Send video error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugLog('Send video error: $e');
+      debugLog('Stack trace: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -348,9 +348,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
 
   Future<void> _sendImage(XFile image) async {
     try {
-      debugPrint('=== _sendImage start ===');
-      debugPrint('Image path: ${image.path}');
-      debugPrint('Image name: ${image.name}');
+      debugLog('=== _sendImage start ===');
+      debugLog('Image path: ${image.path}');
+      debugLog('Image name: ${image.name}');
 
       // 读取图片字节 - 优先使用 XFile.readAsBytes() 因为它支持所有平台
       Uint8List bytes;
@@ -358,10 +358,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         bytes = await image.readAsBytes();
       } catch (e) {
         // 如果 XFile.readAsBytes 失败，尝试使用 File
-        debugPrint('XFile.readAsBytes failed, trying File: $e');
+        debugLog('XFile.readAsBytes failed, trying File: $e');
         final file = File(image.path);
         if (!await file.exists()) {
-          debugPrint('Image file not found: ${image.path}');
+          debugLog('Image file not found: ${image.path}');
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -376,7 +376,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       }
 
       if (bytes.isEmpty) {
-        debugPrint('Image bytes is empty');
+        debugLog('Image bytes is empty');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -429,15 +429,15 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
 
       // 自动检测人脸并模糊
       if (_autoFaceBlur && !kIsWeb) {
-        debugPrint('FaceBlur: Auto face blur enabled, processing image...');
+        debugLog('FaceBlur: Auto face blur enabled, processing image...');
         bytes = await FaceBlurUtil.blurFaces(bytes);
-        debugPrint('FaceBlur: Processing complete, image size: ${bytes.length} bytes');
+        debugLog('FaceBlur: Processing complete, image size: ${bytes.length} bytes');
       }
 
-      debugPrint('Final filename: $filename');
-      debugPrint('Final mimeType: $mimeType');
-      debugPrint('Image size: ${bytes.length} bytes');
-      debugPrint('=== Sending image to ChatBloc ===');
+      debugLog('Final filename: $filename');
+      debugLog('Final mimeType: $mimeType');
+      debugLog('Image size: ${bytes.length} bytes');
+      debugLog('=== Sending image to ChatBloc ===');
 
       if (!mounted) return;
       context.read<ChatBloc>().add(SendImageMessage(
@@ -463,8 +463,8 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         );
       }
     } catch (e, stackTrace) {
-      debugPrint('Send image error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugLog('Send image error: $e');
+      debugLog('Stack trace: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -489,14 +489,14 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       // 发送选中的文件
       for (final file in result.files) {
         if (file.bytes == null || file.bytes!.isEmpty) {
-          debugPrint('File bytes is empty: ${file.name}');
+          debugLog('File bytes is empty: ${file.name}');
           continue;
         }
 
         await _sendFile(file);
       }
     } catch (e) {
-      debugPrint('Pick file error: $e');
+      debugLog('Pick file error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -512,7 +512,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     try {
       final bytes = file.bytes;
       if (bytes == null || bytes.isEmpty) {
-        debugPrint('File bytes is null or empty');
+        debugLog('File bytes is null or empty');
         return;
       }
 
@@ -534,7 +534,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         return;
       }
 
-      debugPrint('Sending file: $filename, size: $fileSize bytes, mimeType: $mimeType');
+      debugLog('Sending file: $filename, size: $fileSize bytes, mimeType: $mimeType');
 
       context.read<ChatBloc>().add(SendFileMessage(
         fileBytes: bytes,
@@ -551,7 +551,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         );
       }
     } catch (e) {
-      debugPrint('Send file error: $e');
+      debugLog('Send file error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -564,12 +564,12 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
   }
 
   Future<void> _sendVoiceMessage(String path, Duration duration) async {
-    debugPrint('Sending voice message: path=$path, duration=${duration.inSeconds}s');
+    debugLog('Sending voice message: path=$path, duration=${duration.inSeconds}s');
 
     try {
       final file = File(path);
       if (!await file.exists()) {
-        debugPrint('Voice file not found: $path');
+        debugLog('Voice file not found: $path');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -582,10 +582,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       }
 
       final fileSize = await file.length();
-      debugPrint('Voice file size: $fileSize bytes');
+      debugLog('Voice file size: $fileSize bytes');
 
       if (fileSize == 0) {
-        debugPrint('Voice file is empty');
+        debugLog('Voice file is empty');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -612,7 +612,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         mimeType = 'audio/mpeg';
       }
 
-      debugPrint('Sending voice: filename=$filename, mimeType=$mimeType, size=${bytes.length}');
+      debugLog('Sending voice: filename=$filename, mimeType=$mimeType, size=${bytes.length}');
 
       if (!mounted) return;
       context.read<ChatBloc>().add(SendVoiceMessage(
@@ -625,9 +625,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       // 删除临时文件
       try {
         await file.delete();
-        debugPrint('Temporary voice file deleted');
+        debugLog('Temporary voice file deleted');
       } catch (e) {
-        debugPrint('Failed to delete temp file: $e');
+        debugLog('Failed to delete temp file: $e');
       }
 
       if (mounted) {
@@ -639,8 +639,8 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         );
       }
     } catch (e, stackTrace) {
-      debugPrint('Send voice message error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugLog('Send voice message error: $e');
+      debugLog('Stack trace: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

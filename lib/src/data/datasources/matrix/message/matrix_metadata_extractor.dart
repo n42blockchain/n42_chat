@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../../domain/entities/message_entity.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// Matrix 消息元数据提取器
 ///
@@ -37,7 +37,7 @@ class MatrixMetadataExtractor {
     // 音频信息
     if (event.messageType == matrix.MessageTypes.Audio) {
       final httpUrl = _convertMxcToHttp(mxcUrl);
-      debugPrint('Audio message metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, senderId=${event.senderId}, status=${event.status}');
+      debugLog('Audio message metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, senderId=${event.senderId}, status=${event.status}');
       return MessageMetadata(
         mediaUrl: mxcUrl,
         httpUrl: httpUrl,
@@ -51,7 +51,7 @@ class MatrixMetadataExtractor {
     if (event.messageType == matrix.MessageTypes.Video) {
       final httpUrl = _convertMxcToHttp(mxcUrl);
       final thumbnailHttpUrl = _convertMxcToHttp(thumbnailMxc, width: 400, height: 400);
-      debugPrint('Video metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, thumbnailMxc=$thumbnailMxc, thumbnailHttpUrl=$thumbnailHttpUrl');
+      debugLog('Video metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, thumbnailMxc=$thumbnailMxc, thumbnailHttpUrl=$thumbnailHttpUrl');
       return MessageMetadata(
         mediaUrl: mxcUrl,
         httpUrl: httpUrl,
@@ -139,7 +139,7 @@ class MatrixMetadataExtractor {
       final duration = event.content['duration'] as int? ?? 0;
       final isMissed = event.content['missed'] as bool? ?? false;
 
-      debugPrint('_extractMetadataWithHttpUrl: n42.call.record - duration=$duration, missed=$isMissed');
+      debugLog('_extractMetadataWithHttpUrl: n42.call.record - duration=$duration, missed=$isMissed');
 
       return MessageMetadata(
         callDuration: duration,
@@ -163,7 +163,7 @@ class MatrixMetadataExtractor {
                        reason == 'no_answer' ||
                        reason == 'user_hangup' && event.senderId != _client?.userID);
 
-      debugPrint('_extractMetadataWithHttpUrl: m.call.hangup - reason=$reason, duration=$duration, isMissed=$isMissed');
+      debugLog('_extractMetadataWithHttpUrl: m.call.hangup - reason=$reason, duration=$duration, isMissed=$isMissed');
 
       return MessageMetadata(
         callDuration: duration,
@@ -179,11 +179,11 @@ class MatrixMetadataExtractor {
     // 这对于 mautrix-wechat 等 bridge 发送的消息很重要
     if (mxcUrl != null && mxcUrl.isNotEmpty) {
       final mimeType = info?['mimetype'] as String? ?? '';
-      debugPrint('_extractMetadataWithHttpUrl fallback: mxcUrl=$mxcUrl, mimeType=$mimeType');
+      debugLog('_extractMetadataWithHttpUrl fallback: mxcUrl=$mxcUrl, mimeType=$mimeType');
 
       // 根据 MIME 类型返回适当的元数据
       if (mimeType.startsWith('image/')) {
-        debugPrint('_extractMetadataWithHttpUrl: detected image from MIME type');
+        debugLog('_extractMetadataWithHttpUrl: detected image from MIME type');
         return MessageMetadata(
           mediaUrl: mxcUrl,
           httpUrl: _convertMxcToHttp(mxcUrl),
@@ -196,7 +196,7 @@ class MatrixMetadataExtractor {
       }
 
       if (mimeType.startsWith('video/')) {
-        debugPrint('_extractMetadataWithHttpUrl: detected video from MIME type');
+        debugLog('_extractMetadataWithHttpUrl: detected video from MIME type');
         return MessageMetadata(
           mediaUrl: mxcUrl,
           httpUrl: _convertMxcToHttp(mxcUrl),
@@ -210,7 +210,7 @@ class MatrixMetadataExtractor {
       }
 
       if (mimeType.startsWith('audio/')) {
-        debugPrint('_extractMetadataWithHttpUrl: detected audio from MIME type');
+        debugLog('_extractMetadataWithHttpUrl: detected audio from MIME type');
         return MessageMetadata(
           mediaUrl: mxcUrl,
           httpUrl: _convertMxcToHttp(mxcUrl),
@@ -221,7 +221,7 @@ class MatrixMetadataExtractor {
       }
 
       // 如果有 URL 但无法确定类型，作为文件处理
-      debugPrint('_extractMetadataWithHttpUrl: has url but unknown type, treating as file');
+      debugLog('_extractMetadataWithHttpUrl: has url but unknown type, treating as file');
       return MessageMetadata(
         mediaUrl: mxcUrl,
         httpUrl: _convertMxcToHttp(mxcUrl),
@@ -350,7 +350,7 @@ class MatrixMetadataExtractor {
           }
         }
       } catch (e) {
-        debugPrint('MatrixMessageDataSource: Error parsing poll aggregation: $e');
+        debugLog('MatrixMessageDataSource: Error parsing poll aggregation: $e');
       }
 
       // 检查是否是转发的投票快照
@@ -393,7 +393,7 @@ class MatrixMetadataExtractor {
         myVotes: myVotes,
       );
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to extract poll metadata: $e');
+      debugLog('MatrixMessageDataSource: Failed to extract poll metadata: $e');
       return null;
     }
   }

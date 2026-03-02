@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/n42_chat.dart';
+import '../mocks/mock_wallet_bridge.dart';
 
 void main() {
   group('IWalletBridge interface', () {

@@ -5,6 +5,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 class InvoiceManagePage extends StatefulWidget {
   const InvoiceManagePage({super.key});
@@ -56,7 +57,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
             return;
           }
         } catch (e) {
-          debugPrint('No saved invoices: $e');
+          debugLog('No saved invoices: $e');
         }
       }
       
@@ -64,7 +65,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint('Load invoices error: $e');
+      debugLog('Load invoices error: $e');
       setState(() {
         _isLoading = false;
       });
@@ -93,10 +94,10 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
           'n42.user.invoices',
           {'invoices': invoiceList},
         );
-        debugPrint('Invoices saved successfully');
+        debugLog('Invoices saved successfully');
       }
     } catch (e) {
-      debugPrint('Save invoices error: $e');
+      debugLog('Save invoices error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${S.of(context)?.profileSaveInvoiceFailed ?? 'Save invoice failed'}: $e')),

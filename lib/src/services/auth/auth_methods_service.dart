@@ -15,6 +15,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:twitter_login/twitter_login.dart';
+import '../../core/utils/debug_log.dart';
 
 // Passkey 相关类型定义（简化版，实际需要使用 passkeys 包）
 // 由于 passkeys 包在某些环境下可能有兼容性问题，这里使用简化实现
@@ -175,19 +176,19 @@ class AuthMethodsService {
     _passkeyRpId = passkeyRpId ?? 'm.si46.world';
     // passkeyOrigin 参数保留供未来 Web 平台使用
     _passkeyInitialized = true;
-    debugPrint('AuthMethodsService: Passkey config initialized');
+    debugLog('AuthMethodsService: Passkey config initialized');
 
     // 初始化 Google Sign In (google_sign_in 7.x 使用 singleton 模式)
     // GoogleSignIn 7.x 不再需要手动初始化，使用 GoogleSignIn.instance
     _googleSignIn = GoogleSignIn.instance;
-    debugPrint('AuthMethodsService: Google Sign In initialized');
+    debugLog('AuthMethodsService: Google Sign In initialized');
 
     // 初始化 Twitter 配置
     _twitterApiKey = twitterApiKey;
     _twitterApiSecret = twitterApiSecret;
     _twitterRedirectUri = twitterRedirectUri ?? 'n42chat://';
     if (_twitterApiKey != null && _twitterApiSecret != null) {
-      debugPrint('AuthMethodsService: Twitter config initialized');
+      debugLog('AuthMethodsService: Twitter config initialized');
     }
 
     // 初始化微信 SDK
@@ -207,16 +208,16 @@ class AuthMethodsService {
               _handleWeChatAuthResponse(response);
             }
           });
-          debugPrint('AuthMethodsService: WeChat SDK initialized');
+          debugLog('AuthMethodsService: WeChat SDK initialized');
         } else {
-          debugPrint('AuthMethodsService: WeChat not installed');
+          debugLog('AuthMethodsService: WeChat not installed');
         }
       } catch (e) {
-        debugPrint('AuthMethodsService: WeChat init failed - $e');
+        debugLog('AuthMethodsService: WeChat init failed - $e');
       }
     }
 
-    debugPrint('AuthMethodsService: Initialized');
+    debugLog('AuthMethodsService: Initialized');
   }
   
   // ============================================
@@ -261,10 +262,10 @@ class AuthMethodsService {
         return jsonDecode(response.body) as Map<String, dynamic>;
       }
 
-      debugPrint('AuthMethodsService: Challenge request failed: ${response.statusCode}');
+      debugLog('AuthMethodsService: Challenge request failed: ${response.statusCode}');
       return null;
     } catch (e) {
-      debugPrint('AuthMethodsService: requestPasskeyRegistrationChallenge failed: $e');
+      debugLog('AuthMethodsService: requestPasskeyRegistrationChallenge failed: $e');
       return null;
     }
   }
@@ -294,8 +295,8 @@ class AuthMethodsService {
     }
 
     try {
-      debugPrint('AuthMethodsService: Registering passkey for $username');
-      debugPrint('AuthMethodsService: RP ID: $_passkeyRpId');
+      debugLog('AuthMethodsService: Registering passkey for $username');
+      debugLog('AuthMethodsService: RP ID: $_passkeyRpId');
 
       // 尝试使用 MethodChannel 调用原生 WebAuthn API
       final credential = await _createPasskeyCredential(
@@ -320,8 +321,8 @@ class AuthMethodsService {
 
       return credential;
     } catch (e, stackTrace) {
-      debugPrint('AuthMethodsService: Passkey registration failed: $e');
-      debugPrint('Stack: $stackTrace');
+      debugLog('AuthMethodsService: Passkey registration failed: $e');
+      debugLog('Stack: $stackTrace');
       rethrow;
     }
   }
@@ -349,10 +350,10 @@ class AuthMethodsService {
       }));
 
       if (response.statusCode != 200) {
-        debugPrint('AuthMethodsService: Submit registration failed: ${response.statusCode}');
+        debugLog('AuthMethodsService: Submit registration failed: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('AuthMethodsService: _submitPasskeyRegistration failed: $e');
+      debugLog('AuthMethodsService: _submitPasskeyRegistration failed: $e');
     }
   }
 
@@ -388,13 +389,13 @@ class AuthMethodsService {
       );
     } on PlatformException catch (e) {
       if (e.code == 'USER_CANCELED') {
-        debugPrint('AuthMethodsService: User canceled passkey creation');
+        debugLog('AuthMethodsService: User canceled passkey creation');
         return null;
       }
-      debugPrint('AuthMethodsService: Platform passkey error: ${e.code} - ${e.message}');
+      debugLog('AuthMethodsService: Platform passkey error: ${e.code} - ${e.message}');
       rethrow;
     } catch (e) {
-      debugPrint('AuthMethodsService: _createPasskeyCredential failed: $e');
+      debugLog('AuthMethodsService: _createPasskeyCredential failed: $e');
       rethrow;
     }
   }
@@ -419,8 +420,8 @@ class AuthMethodsService {
     }
 
     try {
-      debugPrint('AuthMethodsService: Authenticating with passkey');
-      debugPrint('AuthMethodsService: RP ID: $_passkeyRpId');
+      debugLog('AuthMethodsService: Authenticating with passkey');
+      debugLog('AuthMethodsService: RP ID: $_passkeyRpId');
 
       // 调用平台原生 WebAuthn API 进行认证
       final assertion = await _getPasskeyAssertion(
@@ -441,8 +442,8 @@ class AuthMethodsService {
 
       return assertion;
     } catch (e, stackTrace) {
-      debugPrint('AuthMethodsService: Passkey authentication failed: $e');
-      debugPrint('Stack: $stackTrace');
+      debugLog('AuthMethodsService: Passkey authentication failed: $e');
+      debugLog('Stack: $stackTrace');
       rethrow;
     }
   }
@@ -473,13 +474,13 @@ class AuthMethodsService {
       };
     } on PlatformException catch (e) {
       if (e.code == 'USER_CANCELED') {
-        debugPrint('AuthMethodsService: User canceled passkey authentication');
+        debugLog('AuthMethodsService: User canceled passkey authentication');
         return null;
       }
-      debugPrint('AuthMethodsService: Platform passkey auth error: ${e.code} - ${e.message}');
+      debugLog('AuthMethodsService: Platform passkey auth error: ${e.code} - ${e.message}');
       rethrow;
     } catch (e) {
-      debugPrint('AuthMethodsService: _getPasskeyAssertion failed: $e');
+      debugLog('AuthMethodsService: _getPasskeyAssertion failed: $e');
       rethrow;
     }
   }
@@ -501,10 +502,10 @@ class AuthMethodsService {
         return jsonDecode(response.body) as Map<String, dynamic>;
       }
 
-      debugPrint('AuthMethodsService: Passkey login failed: ${response.statusCode}');
+      debugLog('AuthMethodsService: Passkey login failed: ${response.statusCode}');
       return null;
     } catch (e) {
-      debugPrint('AuthMethodsService: _submitPasskeyAuthentication failed: $e');
+      debugLog('AuthMethodsService: _submitPasskeyAuthentication failed: $e');
       return null;
     }
   }
@@ -526,7 +527,7 @@ class AuthMethodsService {
       }
       return null;
     } catch (e) {
-      debugPrint('AuthMethodsService: requestPasskeyAuthChallenge failed: $e');
+      debugLog('AuthMethodsService: requestPasskeyAuthChallenge failed: $e');
       return null;
     }
   }
@@ -551,7 +552,7 @@ class AuthMethodsService {
       }
       return [];
     } catch (e) {
-      debugPrint('AuthMethodsService: getRegisteredPasskeys failed: $e');
+      debugLog('AuthMethodsService: getRegisteredPasskeys failed: $e');
       return [];
     }
   }
@@ -569,7 +570,7 @@ class AuthMethodsService {
       });
       return response.statusCode == 200;
     } catch (e) {
-      debugPrint('AuthMethodsService: deletePasskey failed: $e');
+      debugLog('AuthMethodsService: deletePasskey failed: $e');
       return false;
     }
   }
@@ -579,66 +580,102 @@ class AuthMethodsService {
   // ============================================
   
   /// 请求发送邮箱验证码
-  /// 
+  ///
+  /// 调用 Matrix homeserver 的邮箱验证 API。
+  /// 需要 homeserver 支持 `m.login.email.identity` 登录流程。
+  ///
   /// [email] 邮箱地址
   /// [homeserver] Matrix 服务器地址
-  Future<bool> requestEmailOtp({
+  ///
+  /// 返回包含 `sid` 和 `clientSecret` 的 Map，用于后续 [verifyEmailOtp] 调用。
+  /// 失败时返回 null。
+  Future<Map<String, String>?> requestEmailOtp({
     required String email,
     required String homeserver,
   }) async {
     try {
-      debugPrint('AuthMethodsService: Requesting email OTP for $email');
-      
-      // TODO: 调用服务端 API 发送验证码
-      // 这需要 Matrix 服务器支持邮箱登录流程
-      // 或者自定义的邮箱验证 API
-      
-      // 示例：调用 Matrix 邮箱验证 API
-      // POST /_matrix/client/v3/register/email/requestToken
-      // {
-      //   "client_secret": "unique_client_secret",
-      //   "email": "email@example.com",
-      //   "send_attempt": 1
-      // }
-      
-      // 暂时返回 true 表示成功发送
-      await Future<void>.delayed(const Duration(seconds: 1)); // 模拟网络延迟
-      
-      debugPrint('AuthMethodsService: Email OTP sent');
-      return true;
+      debugLog('AuthMethodsService: Requesting email OTP for $email');
+
+      final clientSecret = 'n42_${DateTime.now().millisecondsSinceEpoch}';
+      final uri = Uri.parse(
+        '$homeserver/_matrix/client/v3/register/email/requestToken',
+      );
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'client_secret': clientSecret,
+          'email': email,
+          'send_attempt': 1,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final sid = data['sid'] as String?;
+        if (sid == null) {
+          debugLog('AuthMethodsService: Email OTP response missing sid');
+          return null;
+        }
+        debugLog('AuthMethodsService: Email OTP sent');
+        return {'sid': sid, 'clientSecret': clientSecret};
+      }
+
+      debugLog('AuthMethodsService: Email OTP request failed: ${response.statusCode} ${response.body}');
+      return null;
     } catch (e) {
-      debugPrint('AuthMethodsService: Request email OTP failed: $e');
+      debugLog('AuthMethodsService: Request email OTP failed: $e');
       rethrow;
     }
   }
-  
+
   /// 验证邮箱验证码
-  /// 
+  ///
+  /// 向 Matrix homeserver 提交 email 验证码进行验证。
+  ///
   /// [email] 邮箱地址
   /// [otp] 验证码
+  /// [sid] 从 [requestEmailOtp] 返回的 session ID
+  /// [clientSecret] 从 [requestEmailOtp] 返回的 client secret
   /// [homeserver] Matrix 服务器地址
   Future<Map<String, dynamic>?> verifyEmailOtp({
     required String email,
     required String otp,
+    required String sid,
+    required String clientSecret,
     required String homeserver,
   }) async {
     try {
-      debugPrint('AuthMethodsService: Verifying email OTP');
-      
-      // TODO: 调用服务端 API 验证验证码
-      // 验证成功后返回登录凭证
-      
-      // 暂时返回模拟数据
-      await Future<void>.delayed(const Duration(seconds: 1));
-      
-      // 如果验证成功，返回登录所需的信息
-      return {
-        'verified': true,
-        'email': email,
-        'session': 'email_session_token',
-      };
+      debugLog('AuthMethodsService: Verifying email OTP');
+
+      final uri = Uri.parse(
+        '$homeserver/_matrix/client/v3/register/email/submitToken',
+      );
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'token': otp,
+          'client_secret': clientSecret,
+          'sid': sid,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        if (data['success'] == true) {
+          return {
+            'verified': true,
+            'email': email,
+            'sid': data['sid'],
+          };
+        }
+      }
+
+      debugLog('AuthMethodsService: OTP verification failed: ${response.statusCode}');
+      return null;
     } catch (e) {
-      debugPrint('AuthMethodsService: Verify email OTP failed: $e');
+      debugLog('AuthMethodsService: Verify email OTP failed: $e');
       rethrow;
     }
   }
@@ -659,11 +696,11 @@ class AuthMethodsService {
   /// - accessToken 需要单独请求 authorization
   Future<SocialLoginResult?> signInWithGoogle() async {
     if (_googleSignIn == null) {
-      throw Exception('Google Sign In 未配置');
+      throw Exception('Google Sign In not configured');
     }
 
     try {
-      debugPrint('AuthMethodsService: Starting Google Sign In');
+      debugLog('AuthMethodsService: Starting Google Sign In');
 
       // google_sign_in 7.x: 使用 authenticate() 方法
       final account = await _googleSignIn!.authenticate(
@@ -680,10 +717,10 @@ class AuthMethodsService {
         );
         accessToken = authorization?.accessToken;
       } catch (e) {
-        debugPrint('AuthMethodsService: Failed to get access token: $e');
+        debugLog('AuthMethodsService: Failed to get access token: $e');
       }
 
-      debugPrint('AuthMethodsService: Google Sign In success: ${account.email}');
+      debugLog('AuthMethodsService: Google Sign In success: ${account.email}');
 
       return SocialLoginResult(
         provider: 'google',
@@ -695,14 +732,14 @@ class AuthMethodsService {
       );
     } on GoogleSignInException catch (e) {
       if (e.code == GoogleSignInExceptionCode.canceled) {
-        debugPrint('AuthMethodsService: Google Sign In cancelled');
+        debugLog('AuthMethodsService: Google Sign In cancelled');
         return null;
       }
-      debugPrint('AuthMethodsService: Google Sign In failed: $e');
+      debugLog('AuthMethodsService: Google Sign In failed: $e');
       rethrow;
     } catch (e, stackTrace) {
-      debugPrint('AuthMethodsService: Google Sign In failed: $e');
-      debugPrint('Stack: $stackTrace');
+      debugLog('AuthMethodsService: Google Sign In failed: $e');
+      debugLog('Stack: $stackTrace');
       rethrow;
     }
   }
@@ -727,7 +764,7 @@ class AuthMethodsService {
   /// Apple 登录
   Future<SocialLoginResult?> signInWithApple() async {
     try {
-      debugPrint('AuthMethodsService: Starting Apple Sign In');
+      debugLog('AuthMethodsService: Starting Apple Sign In');
       
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -736,7 +773,7 @@ class AuthMethodsService {
         ],
       );
       
-      debugPrint('AuthMethodsService: Apple Sign In success');
+      debugLog('AuthMethodsService: Apple Sign In success');
       
       return SocialLoginResult(
         provider: 'apple',
@@ -752,8 +789,8 @@ class AuthMethodsService {
         },
       );
     } catch (e, stackTrace) {
-      debugPrint('AuthMethodsService: Apple Sign In failed: $e');
-      debugPrint('Stack: $stackTrace');
+      debugLog('AuthMethodsService: Apple Sign In failed: $e');
+      debugLog('Stack: $stackTrace');
       rethrow;
     }
   }
@@ -771,7 +808,7 @@ class AuthMethodsService {
   /// Facebook 登录
   Future<SocialLoginResult?> signInWithFacebook() async {
     try {
-      debugPrint('AuthMethodsService: Starting Facebook Sign In');
+      debugLog('AuthMethodsService: Starting Facebook Sign In');
 
       final LoginResult result = await FacebookAuth.instance.login(
         permissions: ['email', 'public_profile'],
@@ -780,7 +817,7 @@ class AuthMethodsService {
       if (result.status == LoginStatus.success) {
         final AccessToken? accessToken = result.accessToken;
         if (accessToken == null) {
-          debugPrint('AuthMethodsService: Facebook access token is null');
+          debugLog('AuthMethodsService: Facebook access token is null');
           return null;
         }
 
@@ -789,7 +826,7 @@ class AuthMethodsService {
           fields: 'email,name,picture.width(200)',
         );
 
-        debugPrint('AuthMethodsService: Facebook Sign In success');
+        debugLog('AuthMethodsService: Facebook Sign In success');
 
         return SocialLoginResult(
           provider: 'facebook',
@@ -799,15 +836,15 @@ class AuthMethodsService {
           photoUrl: userData['picture']?['data']?['url'] as String?,
         );
       } else if (result.status == LoginStatus.cancelled) {
-        debugPrint('AuthMethodsService: Facebook Sign In cancelled');
+        debugLog('AuthMethodsService: Facebook Sign In cancelled');
         return null;
       } else {
-        debugPrint('AuthMethodsService: Facebook Sign In failed: ${result.message}');
+        debugLog('AuthMethodsService: Facebook Sign In failed: ${result.message}');
         throw Exception(result.message ?? 'Facebook login failed');
       }
     } catch (e, stackTrace) {
-      debugPrint('AuthMethodsService: Facebook Sign In failed: $e');
-      debugPrint('Stack: $stackTrace');
+      debugLog('AuthMethodsService: Facebook Sign In failed: $e');
+      debugLog('Stack: $stackTrace');
       rethrow;
     }
   }
@@ -829,11 +866,11 @@ class AuthMethodsService {
   /// Twitter 登录
   Future<SocialLoginResult?> signInWithTwitter() async {
     if (!isTwitterSignInAvailable()) {
-      throw Exception('Twitter 登录未配置');
+      throw Exception('Twitter login not configured');
     }
 
     try {
-      debugPrint('AuthMethodsService: Starting Twitter Sign In');
+      debugLog('AuthMethodsService: Starting Twitter Sign In');
 
       final twitterLogin = TwitterLogin(
         apiKey: _twitterApiKey!,
@@ -846,7 +883,7 @@ class AuthMethodsService {
       switch (authResult.status) {
         case TwitterLoginStatus.loggedIn:
           final user = authResult.user;
-          debugPrint('AuthMethodsService: Twitter Sign In success');
+          debugLog('AuthMethodsService: Twitter Sign In success');
 
           return SocialLoginResult(
             provider: 'twitter',
@@ -864,19 +901,19 @@ class AuthMethodsService {
           );
 
         case TwitterLoginStatus.cancelledByUser:
-          debugPrint('AuthMethodsService: Twitter Sign In cancelled');
+          debugLog('AuthMethodsService: Twitter Sign In cancelled');
           return null;
 
         case TwitterLoginStatus.error:
-          debugPrint('AuthMethodsService: Twitter Sign In error: ${authResult.errorMessage}');
+          debugLog('AuthMethodsService: Twitter Sign In error: ${authResult.errorMessage}');
           throw Exception(authResult.errorMessage ?? 'Twitter login failed');
 
         default:
           return null;
       }
     } catch (e, stackTrace) {
-      debugPrint('AuthMethodsService: Twitter Sign In failed: $e');
-      debugPrint('Stack: $stackTrace');
+      debugLog('AuthMethodsService: Twitter Sign In failed: $e');
+      debugLog('Stack: $stackTrace');
       rethrow;
     }
   }
@@ -898,16 +935,16 @@ class AuthMethodsService {
   /// 微信登录
   Future<SocialLoginResult?> signInWithWeChat() async {
     if (!_weChatInitialized) {
-      throw Exception('微信 SDK 未初始化');
+      throw Exception('WeChat SDK not initialized');
     }
 
     final isInstalled = await Fluwx().isWeChatInstalled;
     if (!isInstalled) {
-      throw Exception('请先安装微信');
+      throw Exception('WeChat app not installed');
     }
 
     try {
-      debugPrint('AuthMethodsService: Starting WeChat Sign In');
+      debugLog('AuthMethodsService: Starting WeChat Sign In');
 
       _weChatLoginCompleter = Completer<SocialLoginResult?>();
 
@@ -920,7 +957,7 @@ class AuthMethodsService {
       );
 
       if (!result) {
-        debugPrint('AuthMethodsService: WeChat auth request failed');
+        debugLog('AuthMethodsService: WeChat auth request failed');
         _weChatLoginCompleter?.complete(null);
         return null;
       }
@@ -929,15 +966,15 @@ class AuthMethodsService {
       final loginResult = await _weChatLoginCompleter!.future.timeout(
         const Duration(minutes: 2),
         onTimeout: () {
-          debugPrint('AuthMethodsService: WeChat login timeout');
+          debugLog('AuthMethodsService: WeChat login timeout');
           return null;
         },
       );
 
       return loginResult;
     } catch (e, stackTrace) {
-      debugPrint('AuthMethodsService: WeChat Sign In failed: $e');
-      debugPrint('Stack: $stackTrace');
+      debugLog('AuthMethodsService: WeChat Sign In failed: $e');
+      debugLog('Stack: $stackTrace');
       // 只有在 Completer 未完成时才调用 completeError
       if (_weChatLoginCompleter != null && !_weChatLoginCompleter!.isCompleted) {
         _weChatLoginCompleter!.completeError(e);
@@ -953,7 +990,7 @@ class AuthMethodsService {
     }
 
     if (response.code != null && response.code!.isNotEmpty) {
-      debugPrint('AuthMethodsService: WeChat auth success');
+      debugLog('AuthMethodsService: WeChat auth success');
 
       // 微信登录成功，返回 code 供后端换取 access_token
       _weChatLoginCompleter!.complete(SocialLoginResult(
@@ -967,7 +1004,7 @@ class AuthMethodsService {
         },
       ));
     } else {
-      debugPrint('AuthMethodsService: WeChat auth failed: ${response.errStr}');
+      debugLog('AuthMethodsService: WeChat auth failed: ${response.errStr}');
       if (response.errCode == -2) {
         // 用户取消
         _weChatLoginCompleter!.complete(null);
@@ -1041,14 +1078,14 @@ class AuthMethodsService {
           }
         }
 
-        debugPrint(
+        debugLog(
             'AuthMethodsService: Found ${providers.length} SSO providers');
         return providers;
       }
 
       return [];
     } catch (e) {
-      debugPrint('AuthMethodsService: Get SSO providers failed: $e');
+      debugLog('AuthMethodsService: Get SSO providers failed: $e');
       return [];
     }
   }

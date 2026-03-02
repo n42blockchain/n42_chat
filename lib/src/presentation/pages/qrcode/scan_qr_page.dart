@@ -8,6 +8,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import 'my_qrcode_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Scan QR page
 class ScanQRPage extends StatefulWidget {
@@ -62,7 +63,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
 
     try {
       var status = await Permission.camera.status;
-      debugPrint('Camera permission initial status: $status');
+      debugLog('Camera permission initial status: $status');
 
       // Handle granted or limited (iOS 14+ limited access is still usable for camera)
       if (status.isGranted || status.isLimited) {
@@ -77,7 +78,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       // If denied, try to request permission
       if (status.isDenied) {
         status = await Permission.camera.request();
-        debugPrint('Camera permission after request: $status');
+        debugLog('Camera permission after request: $status');
 
         if (status.isGranted || status.isLimited) {
           _initScanner();
@@ -116,7 +117,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         _permissionError = S.of(context)?.qrcodeCameraPermissionRequired ?? 'Camera permission is required to scan QR code';
       });
     } catch (e) {
-      debugPrint('Camera permission check error: $e');
+      debugLog('Camera permission check error: $e');
       setState(() {
         _hasPermission = false;
         _isCheckingPermission = false;

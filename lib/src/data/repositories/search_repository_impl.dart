@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/contact_entity.dart';
@@ -10,6 +9,7 @@ import '../../core/services/ens_cache_service.dart';
 import '../../core/services/username_service.dart';
 import '../datasources/matrix/matrix_search_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 搜索仓库实现
 class SearchRepositoryImpl implements ISearchRepository {
@@ -101,7 +101,7 @@ class SearchRepositoryImpl implements ISearchRepository {
             ));
           }
         } catch (e) {
-          debugPrint('SearchRepository: Username search failed: $e');
+          debugLog('SearchRepository: Username search failed: $e');
         }
       }
     }
@@ -120,7 +120,7 @@ class SearchRepositoryImpl implements ISearchRepository {
           ));
         }
       } catch (e) {
-        debugPrint('SearchRepository: ENS search failed: $e');
+        debugLog('SearchRepository: ENS search failed: $e');
       }
     }
 

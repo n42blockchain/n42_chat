@@ -1,12 +1,13 @@
+import 'dart:typed_data';
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
 import 'thread_event.dart';
 import 'thread_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 消息线程 BLoC
 ///
@@ -83,7 +84,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       // 订阅线程消息更新
       _subscribeToThreadMessages(event.roomId, event.threadRootEventId);
     } catch (e) {
-      debugPrint('ThreadBloc: Failed to initialize thread: $e');
+      debugLog('ThreadBloc: Failed to initialize thread: $e');
       emit(state.copyWith(
         isLoading: false,
         error: e.toString(),
@@ -101,7 +102,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       );
       return msg;
     } catch (e) {
-      debugPrint('ThreadBloc: Failed to load root message: $e');
+      debugLog('ThreadBloc: Failed to load root message: $e');
       return null;
     }
   }
@@ -117,7 +118,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
         }
       },
       onError: (Object e) {
-        debugPrint('ThreadBloc: Thread messages stream error: $e');
+        debugLog('ThreadBloc: Thread messages stream error: $e');
       },
     );
   }
@@ -194,7 +195,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       );
       emit(state.copyWith(isSending: false));
     } catch (e) {
-      debugPrint('ThreadBloc: Failed to send thread message: $e');
+      debugLog('ThreadBloc: Failed to send thread message: $e');
       emit(state.copyWith(isSending: false, error: e.toString()));
     }
   }

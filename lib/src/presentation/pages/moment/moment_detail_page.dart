@@ -12,6 +12,7 @@ import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
 import '../../widgets/common/n42_avatar.dart';
 import 'moment_forward_sheet.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 动态详情页面
 class MomentDetailPage extends StatefulWidget {
@@ -42,7 +43,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
       final found = state.moments.where((m) => m.id == widget.moment.id).firstOrNull;
       if (found != null) return found;
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
     return widget.moment;
   }
@@ -54,7 +55,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
         return contactState.contacts.map((c) => c.userId).toSet();
       }
     } catch (e) {
-      debugPrint('Error: $e');
+      debugLog('Error: $e');
     }
     return {};
   }

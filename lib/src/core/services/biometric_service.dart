@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart' as local_auth;
+import '../utils/debug_log.dart';
 
 /// 生物识别类型（使用 N42 前缀避免与 local_auth 冲突）
 enum N42BiometricType {
@@ -83,19 +83,19 @@ class BiometricService {
   /// 检查设备是否支持生物识别
   Future<bool> isAvailable() async {
     try {
-      debugPrint('BiometricService: Checking biometric availability...');
+      debugLog('BiometricService: Checking biometric availability...');
       final canCheck = await _localAuth.canCheckBiometrics;
-      debugPrint('BiometricService: canCheckBiometrics = $canCheck');
+      debugLog('BiometricService: canCheckBiometrics = $canCheck');
       final isSupported = await _localAuth.isDeviceSupported();
-      debugPrint('BiometricService: isDeviceSupported = $isSupported');
+      debugLog('BiometricService: isDeviceSupported = $isSupported');
       final result = canCheck || isSupported;
-      debugPrint('BiometricService: isAvailable result = $result');
+      debugLog('BiometricService: isAvailable result = $result');
       return result;
     } on PlatformException catch (e) {
-      debugPrint('BiometricService: isAvailable PlatformException - $e');
+      debugLog('BiometricService: isAvailable PlatformException - $e');
       return false;
     } catch (e) {
-      debugPrint('BiometricService: isAvailable error - $e');
+      debugLog('BiometricService: isAvailable error - $e');
       return false;
     }
   }
@@ -106,7 +106,7 @@ class BiometricService {
       final biometrics = await _localAuth.getAvailableBiometrics();
       return biometrics.map((type) => _mapBiometricType(type)).toList();
     } on PlatformException catch (e) {
-      debugPrint('BiometricService: getAvailableBiometrics error - $e');
+      debugLog('BiometricService: getAvailableBiometrics error - $e');
       return [];
     }
   }
@@ -170,7 +170,7 @@ class BiometricService {
         );
       }
     } on PlatformException catch (e) {
-      debugPrint('BiometricService: authenticate error - $e');
+      debugLog('BiometricService: authenticate error - $e');
       return _handlePlatformException(e);
     }
   }
@@ -180,7 +180,7 @@ class BiometricService {
     try {
       return await _localAuth.stopAuthentication();
     } on PlatformException catch (e) {
-      debugPrint('BiometricService: cancelAuthentication error - $e');
+      debugLog('BiometricService: cancelAuthentication error - $e');
       return false;
     }
   }

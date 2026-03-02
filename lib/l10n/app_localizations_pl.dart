@@ -5684,4 +5684,73 @@ class SPl extends S {
 
   @override
   String get sendToAddress => '通过钱包地址发消息';
+
+  @override
+  String get blocAuthSendVerificationCodeFailed => '发送验证码失败';
+
+  @override
+  String get blocAuthServerNoEmailPasswordReset => '该服务器不支持通过邮箱重置密码';
+
+  @override
+  String get blocAuthResetPasswordFailed => '重置密码失败';
+
+  @override
+  String get blocAuthChangePasswordFailed => '修改密码失败';
+
+  @override
+  String get blocAuthOldPasswordWrong => '原密码错误';
+
+  @override
+  String get blocAuthLoginCancelled => '登录已取消';
+
+  @override
+  String get blocAuthGoogleLoginFailed => 'Google 登录失败';
+
+  @override
+  String get blocAuthAppleLoginFailed => 'Apple 登录失败';
+
+  @override
+  String get blocAuthSsoLoginFailed => 'SSO 登录失败';
+
+  @override
+  String get blocAuthFacebookLoginFailed => 'Facebook 登录失败';
+
+  @override
+  String get blocAuthTwitterLoginFailed => 'Twitter 登录失败';
+
+  @override
+  String get blocAuthWeChatLoginFailed => '微信登录失败';
+
+  @override
+  String get blocAuthWeChatNotConfigured => '微信登录未配置';
+
+  @override
+  String get blocAuthWeChatNotInstalled => '请先安装微信';
+
+  @override
+  String get blocAuthPasswordWrong => '密码错误';
+
+  @override
+  String get blocAuthEmailAlreadyBound => '该邮箱已被其他账号绑定';
+
+  @override
+  String get blocAuthChangeEmailFailed => '修改邮箱失败';
+
+  @override
+  String get blocAuthVerificationCodeInvalid => '验证码错误或已过期';
+
+  @override
+  String get blocAuthSessionExpired => '会话已失效，请重新登录';
+
+  @override
+  String get blocAuthSessionIncomplete => '会话数据不完整，请重新登录';
+
+  @override
+  String get blocAuthPasskeyNotImplemented => 'Passkey 登录功能尚未实现';
+
+  @override
+  String get blocAuthPasskeyRegisterNotImplemented => 'Passkey 注册功能尚未实现';
+
+  @override
+  String get blocAuthEmailOtpNotImplemented => '邮箱 OTP 登录功能尚未实现';
 }

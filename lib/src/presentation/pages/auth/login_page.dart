@@ -14,6 +14,7 @@ import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import 'register_page.dart';
 import 'reset_password_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 登录页面
 ///
@@ -56,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
         : '';
 
     // 调试日志
-    debugPrint('LoginPage: Biometric check - available: $isAvailable, enabled: $isEnabled, hasCredentials: $hasCredentials');
+    debugLog('LoginPage: Biometric check - available: $isAvailable, enabled: $isEnabled, hasCredentials: $hasCredentials');
 
     if (mounted) {
       setState(() {

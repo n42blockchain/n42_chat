@@ -10,7 +10,7 @@ extension ChatBlocPollHandlers on ChatBloc {
     if (_currentRoomId == null) return;
 
     try {
-      debugPrint('ChatBloc: Sending poll - question: ${event.question}, options: ${event.options}');
+      debugLog('ChatBloc: Sending poll - question: ${event.question}, options: ${event.options}');
 
       final message = await _messageRepository.sendPollMessage(
         _currentRoomId!,
@@ -20,11 +20,11 @@ extension ChatBlocPollHandlers on ChatBloc {
       );
 
       if (message != null) {
-        debugPrint('ChatBloc: Poll sent successfully - eventId: ${message.id}');
+        debugLog('ChatBloc: Poll sent successfully - eventId: ${message.id}');
         // 消息会通过订阅自动更新
       }
     } catch (e) {
-      debugPrint('ChatBloc: Failed to send poll: $e');
+      debugLog('ChatBloc: Failed to send poll: $e');
       if (!isClosed) {
         emit(state.copyWith(error: 'Failed to send poll'));
       }
@@ -39,7 +39,7 @@ extension ChatBlocPollHandlers on ChatBloc {
     if (_currentRoomId == null) return;
 
     try {
-      debugPrint('ChatBloc: Voting on poll - pollEventId: ${event.pollEventId}, options: ${event.selectedOptionIds}');
+      debugLog('ChatBloc: Voting on poll - pollEventId: ${event.pollEventId}, options: ${event.selectedOptionIds}');
 
       final success = await _messageRepository.voteOnPoll(
         _currentRoomId!,
@@ -48,7 +48,7 @@ extension ChatBlocPollHandlers on ChatBloc {
       );
 
       if (success && !isClosed) {
-        debugPrint('ChatBloc: Vote submitted successfully, fetching fresh poll data');
+        debugLog('ChatBloc: Vote submitted successfully, fetching fresh poll data');
 
         // 从服务器获取最新的投票聚合数据
         final freshAggregations = await _messageRepository.getPollAggregations(
@@ -72,15 +72,15 @@ extension ChatBlocPollHandlers on ChatBloc {
               totalVoters = freshAggregations['totalVoters'] as int? ?? 0;
               newMyVotes = (freshAggregations['myVotes'] as List<dynamic>?)
                   ?.cast<String>() ?? event.selectedOptionIds;
-              debugPrint('ChatBloc: Using fresh poll data - voteCounts: $newVoteCounts, totalVoters: $totalVoters, myVotes: $newMyVotes');
+              debugLog('ChatBloc: Using fresh poll data - voteCounts: $newVoteCounts, totalVoters: $totalVoters, myVotes: $newMyVotes');
             } else {
               // 如果获取失败，使用本地计算的数据
-              debugPrint('ChatBloc: Fresh poll data unavailable, using local calculation');
+              debugLog('ChatBloc: Fresh poll data unavailable, using local calculation');
               newVoteCounts = Map<String, int>.from(oldMetadata.voteCounts ?? {});
               final oldMyVotes = List<String>.from(oldMetadata.myVotes ?? []);
               newMyVotes = List<String>.from(event.selectedOptionIds);
 
-              debugPrint('ChatBloc: oldMyVotes: $oldMyVotes, newMyVotes: $newMyVotes');
+              debugLog('ChatBloc: oldMyVotes: $oldMyVotes, newMyVotes: $newMyVotes');
 
               // 减少之前投票但现在取消的选项的票数
               for (final optionId in oldMyVotes) {
@@ -88,7 +88,7 @@ extension ChatBlocPollHandlers on ChatBloc {
                   final currentCount = newVoteCounts[optionId] ?? 0;
                   if (currentCount > 0) {
                     newVoteCounts[optionId] = currentCount - 1;
-                    debugPrint('ChatBloc: Decreased vote count for $optionId to ${newVoteCounts[optionId]}');
+                    debugLog('ChatBloc: Decreased vote count for $optionId to ${newVoteCounts[optionId]}');
                   }
                 }
               }
@@ -97,7 +97,7 @@ extension ChatBlocPollHandlers on ChatBloc {
               for (final optionId in newMyVotes) {
                 if (!oldMyVotes.contains(optionId)) {
                   newVoteCounts[optionId] = (newVoteCounts[optionId] ?? 0) + 1;
-                  debugPrint('ChatBloc: Increased vote count for $optionId to ${newVoteCounts[optionId]}');
+                  debugLog('ChatBloc: Increased vote count for $optionId to ${newVoteCounts[optionId]}');
                 }
               }
 
@@ -124,7 +124,7 @@ extension ChatBlocPollHandlers on ChatBloc {
         emit(state.copyWith(messages: updatedMessages));
       }
     } catch (e) {
-      debugPrint('ChatBloc: Failed to vote: $e');
+      debugLog('ChatBloc: Failed to vote: $e');
       if (!isClosed) {
         emit(state.copyWith(error: 'Failed to vote'));
       }
@@ -141,7 +141,7 @@ extension ChatBlocPollHandlers on ChatBloc {
     // 如果是当前用户的投票，已在 _onVoteOnPoll 中处理
     if (event.isCurrentUser) return;
 
-    debugPrint('ChatBloc: Poll response received - poll: ${event.pollEventId}, from: ${event.senderId}');
+    debugLog('ChatBloc: Poll response received - poll: ${event.pollEventId}, from: ${event.senderId}');
 
     final updatedMessages = state.messages.map((msg) {
       if (msg.id == event.pollEventId && msg.metadata != null) {
@@ -177,7 +177,7 @@ extension ChatBlocPollHandlers on ChatBloc {
     if (_currentRoomId == null) return;
 
     try {
-      debugPrint('ChatBloc: Ending poll - poll: ${event.pollEventId}');
+      debugLog('ChatBloc: Ending poll - poll: ${event.pollEventId}');
 
       // 调用 API 结束投票
       final success = await _messageRepository.endPoll(
@@ -197,13 +197,13 @@ extension ChatBlocPollHandlers on ChatBloc {
         }).toList();
 
         emit(state.copyWith(messages: updatedMessages));
-        debugPrint('ChatBloc: Poll ended successfully');
+        debugLog('ChatBloc: Poll ended successfully');
       } else {
-        debugPrint('ChatBloc: Failed to end poll');
+        debugLog('ChatBloc: Failed to end poll');
         emit(state.copyWith(error: 'Failed to end poll'));
       }
     } catch (e) {
-      debugPrint('ChatBloc: Error ending poll: $e');
+      debugLog('ChatBloc: Error ending poll: $e');
       emit(state.copyWith(error: 'Error ending poll: $e'));
     }
   }
@@ -215,7 +215,7 @@ extension ChatBlocPollHandlers on ChatBloc {
   ) async {
     if (isClosed) return;
 
-    debugPrint('ChatBloc: Poll ended - poll: ${event.pollEventId}');
+    debugLog('ChatBloc: Poll ended - poll: ${event.pollEventId}');
 
     final updatedMessages = state.messages.map((msg) {
       if (msg.id == event.pollEventId && msg.metadata != null) {

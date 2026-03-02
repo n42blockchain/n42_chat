@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,6 +5,7 @@ import '../constants/app_constants.dart';
 import 'media_lifecycle_service.dart';
 import 'message_archive_service.dart';
 import 'storage_monitor_service.dart';
+import '../utils/debug_log.dart';
 
 /// 数据层级
 enum DataTier {
@@ -114,7 +114,7 @@ class DataTierService {
   /// 2. Cold 层文件：清理所有非 pinned 媒体
   Future<TierMaintenanceResult> performMaintenance() async {
     if (_isMaintenanceRunning) {
-      debugPrint('DataTierService: Maintenance already running, skipping');
+      debugLog('DataTierService: Maintenance already running, skipping');
       return const TierMaintenanceResult();
     }
     _isMaintenanceRunning = true;
@@ -127,7 +127,7 @@ class DataTierService {
   }
 
   Future<TierMaintenanceResult> _performMaintenanceInternal() async {
-    debugPrint('DataTierService: Starting tier maintenance');
+    debugLog('DataTierService: Starting tier maintenance');
     final config = await getTierConfig();
 
     // 在清理冷数据之前，先归档消息到 archive.db
@@ -168,7 +168,7 @@ class DataTierService {
       totalFreed += result.bytesFreed;
     }
 
-    debugPrint(
+    debugLog(
         'DataTierService: Maintenance done. Warm: $warmProcessed, Cold: $coldCleaned, Freed: $totalFreed bytes');
 
     return TierMaintenanceResult(
@@ -183,7 +183,7 @@ class DataTierService {
   /// 从最旧的文件开始清理，直到释放至少 100MB
   Future<int> emergencyCleanup() async {
     if (_isEmergencyRunning) {
-      debugPrint('DataTierService: Emergency cleanup already running, skipping');
+      debugLog('DataTierService: Emergency cleanup already running, skipping');
       return 0;
     }
     _isEmergencyRunning = true;
@@ -197,7 +197,7 @@ class DataTierService {
 
   Future<int> _emergencyCleanupInternal() async {
     final status = await _monitorService.checkStorageStatus();
-    debugPrint(
+    debugLog(
         'DataTierService: Emergency cleanup triggered (level: ${status.level})');
     const targetFreeBytes = 100 * 1024 * 1024; // 100MB
     int totalFreed = 0;
@@ -237,7 +237,7 @@ class DataTierService {
       totalFreed += result.bytesFreed;
     }
 
-    debugPrint('DataTierService: Emergency cleanup freed $totalFreed bytes');
+    debugLog('DataTierService: Emergency cleanup freed $totalFreed bytes');
     return totalFreed;
   }
 
@@ -267,7 +267,7 @@ class DataTierService {
       await prefs.setBool(
           'tier_auto_maintenance', config.autoMaintenanceEnabled);
     } catch (e) {
-      debugPrint('DataTierService: Failed to save config: $e');
+      debugLog('DataTierService: Failed to save config: $e');
     }
   }
 
@@ -280,16 +280,16 @@ class DataTierService {
       final rooms = _matrixClient?.rooms ?? [];
       final roomIds = rooms.map((r) => r.id).toList();
 
-      debugPrint('DataTierService: Archiving ${roomIds.length} rooms');
+      debugLog('DataTierService: Archiving ${roomIds.length} rooms');
       for (final roomId in roomIds) {
         try {
           await archive.archiveRoom(roomId);
         } catch (e) {
-          debugPrint('DataTierService: Failed to archive room $roomId: $e');
+          debugLog('DataTierService: Failed to archive room $roomId: $e');
         }
       }
     } catch (e) {
-      debugPrint('DataTierService: Archive operation failed: $e');
+      debugLog('DataTierService: Archive operation failed: $e');
     }
   }
 }

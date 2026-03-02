@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../matrix_client_manager.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// Matrix 消息操作
 ///
@@ -36,7 +36,7 @@ class MatrixMessageOperations {
     if (room == null) return false;
 
     try {
-      debugPrint('Deleting failed message: $eventId in room $roomId');
+      debugLog('Deleting failed message: $eventId in room $roomId');
 
       // 获取时间线
       final timeline = await room.getTimeline();
@@ -46,26 +46,26 @@ class MatrixMessageOperations {
       try {
         event = timeline.events.firstWhere((e) => e.eventId == eventId);
       } catch (_) {
-        debugPrint('Event not found in timeline: $eventId');
+        debugLog('Event not found in timeline: $eventId');
       }
 
       if (event != null) {
-        debugPrint('Event status: ${event.status}');
+        debugLog('Event status: ${event.status}');
 
         // 如果事件是发送失败或正在发送状态
         if (event.status == matrix.EventStatus.error ||
             event.status == matrix.EventStatus.sending) {
-          debugPrint('Removing failed/sending event from database: $eventId');
+          debugLog('Removing failed/sending event from database: $eventId');
 
           // 尝试从本地数据库删除
           final database = _client?.database;
           if (database != null) {
             try {
               await database.removeEvent(eventId, roomId);
-              debugPrint('Successfully removed event from database');
+              debugLog('Successfully removed event from database');
               return true;
             } catch (e) {
-              debugPrint('Error removing from database: $e');
+              debugLog('Error removing from database: $e');
             }
           }
         }
@@ -73,12 +73,12 @@ class MatrixMessageOperations {
         // 如果事件已发送到服务器，尝试 redact
         if (event.status == matrix.EventStatus.sent ||
             event.status == matrix.EventStatus.synced) {
-          debugPrint('Redacting synced event: $eventId');
+          debugLog('Redacting synced event: $eventId');
           try {
             await room.redactEvent(eventId);
             return true;
           } catch (e) {
-            debugPrint('Error redacting event: $e');
+            debugLog('Error redacting event: $e');
           }
         }
       }
@@ -88,16 +88,16 @@ class MatrixMessageOperations {
       if (database != null) {
         try {
           await database.removeEvent(eventId, roomId);
-          debugPrint('Successfully removed event from database (fallback)');
+          debugLog('Successfully removed event from database (fallback)');
           return true;
         } catch (e) {
-          debugPrint('Error removing from database (fallback): $e');
+          debugLog('Error removing from database (fallback): $e');
         }
       }
 
       return false;
     } catch (e) {
-      debugPrint('Error deleting failed message: $e');
+      debugLog('Error deleting failed message: $e');
       return false;
     }
   }
@@ -166,14 +166,14 @@ class MatrixMessageOperations {
 
     // 验证 eventId 格式（Matrix 事件 ID 以 $ 开头）
     if (eventId.isEmpty || !eventId.startsWith('\$')) {
-      debugPrint('MatrixMessageDataSource: Invalid eventId format: $eventId');
+      debugLog('MatrixMessageDataSource: Invalid eventId format: $eventId');
       return;
     }
 
     try {
       await room.setReadMarker(eventId, mRead: eventId);
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: markMessageAsRead error: $e');
+      debugLog('MatrixMessageDataSource: markMessageAsRead error: $e');
       // 忽略标记已读失败，不影响用户体验
     }
   }
@@ -199,7 +199,7 @@ class MatrixMessageOperations {
   }) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) {
-      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      debugLog('MatrixMessageDataSource: Room not found: $roomId');
       return null;
     }
 
@@ -211,14 +211,14 @@ class MatrixMessageOperations {
       if (stateEvent != null) {
         final content = stateEvent.content;
         final pokeText = content['pokeText'] as String?;
-        debugPrint('MatrixMessageDataSource: Found pokeText for $userId: $pokeText');
+        debugLog('MatrixMessageDataSource: Found pokeText for $userId: $pokeText');
         return pokeText;
       }
 
-      debugPrint('MatrixMessageDataSource: No pokeText found for $userId in room $roomId');
+      debugLog('MatrixMessageDataSource: No pokeText found for $userId in room $roomId');
       return null;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to get member pokeText: $e');
+      debugLog('MatrixMessageDataSource: Failed to get member pokeText: $e');
       return null;
     }
   }
@@ -232,7 +232,7 @@ class MatrixMessageOperations {
   }) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) {
-      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      debugLog('MatrixMessageDataSource: Room not found: $roomId');
       return;
     }
 
@@ -243,9 +243,9 @@ class MatrixMessageOperations {
         _client!.userID!,
         {'pokeText': pokeText},
       );
-      debugPrint('MatrixMessageDataSource: Set pokeText in room $roomId: $pokeText');
+      debugLog('MatrixMessageDataSource: Set pokeText in room $roomId: $pokeText');
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to set member pokeText: $e');
+      debugLog('MatrixMessageDataSource: Failed to set member pokeText: $e');
     }
   }
 
@@ -273,7 +273,7 @@ class MatrixMessageOperations {
         },
       );
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to start live location: $e');
+      debugLog('MatrixMessageDataSource: Failed to start live location: $e');
       rethrow;
     }
   }
@@ -298,7 +298,7 @@ class MatrixMessageOperations {
         },
       );
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to update live location: $e');
+      debugLog('MatrixMessageDataSource: Failed to update live location: $e');
     }
   }
 
@@ -314,7 +314,7 @@ class MatrixMessageOperations {
         },
       );
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to stop live location: $e');
+      debugLog('MatrixMessageDataSource: Failed to stop live location: $e');
     }
   }
 }

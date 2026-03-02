@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
@@ -10,6 +9,7 @@ import '../../../domain/repositories/ai_repository.dart';
 import '../../../integration/wallet_bridge.dart';
 import 'ai_assistant_event.dart';
 import 'ai_assistant_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// AI 助手 BLoC
 class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
@@ -68,7 +68,7 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
         isAvailable: _aiRepository.isAvailable,
       ));
     } catch (e) {
-      debugPrint('AiAssistantBloc: Initialize failed: $e');
+      debugLog('AiAssistantBloc: Initialize failed: $e');
       emit(state.copyWith(
         isLoading: false,
         error: 'Failed to initialize AI assistant',
@@ -81,9 +81,9 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     SendAiMessage event,
     Emitter<AiAssistantState> emit,
   ) async {
-    debugPrint('AiAssistantBloc: SendMessage "${event.text}", isGenerating=${state.isGenerating}, isAvailable=${_aiRepository.isAvailable}');
+    debugLog('AiAssistantBloc: SendMessage "${event.text}", isGenerating=${state.isGenerating}, isAvailable=${_aiRepository.isAvailable}');
     if (state.isGenerating || !_aiRepository.isAvailable) {
-      debugPrint('AiAssistantBloc: SendMessage blocked - isGenerating=${state.isGenerating}, isAvailable=${_aiRepository.isAvailable}');
+      debugLog('AiAssistantBloc: SendMessage blocked - isGenerating=${state.isGenerating}, isAvailable=${_aiRepository.isAvailable}');
       return;
     }
 
@@ -114,7 +114,7 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     // 启动流式响应
     try {
       unawaited(_streamSubscription?.cancel());
-      debugPrint('AiAssistantBloc: Starting stream completion with model=${assistant.model}, contextMessages=${contextMessages.length}');
+      debugLog('AiAssistantBloc: Starting stream completion with model=${assistant.model}, contextMessages=${contextMessages.length}');
       final stream = _aiRepository.aiService.streamCompletion(
         contextMessages,
         systemPrompt: assistant.systemPrompt,
@@ -128,17 +128,17 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
           if (!isClosed) add(AiStreamChunkReceived(chunk));
         },
         onDone: () {
-          debugPrint('AiAssistantBloc: Stream completed');
+          debugLog('AiAssistantBloc: Stream completed');
           if (!isClosed) add(const AiStreamCompleted());
         },
         onError: (Object error) {
-          debugPrint('AiAssistantBloc: Stream error in listener: $error');
+          debugLog('AiAssistantBloc: Stream error in listener: $error');
           if (!isClosed) add(AiStreamError(error.toString()));
         },
       );
-      debugPrint('AiAssistantBloc: Stream subscription started');
+      debugLog('AiAssistantBloc: Stream subscription started');
     } catch (e) {
-      debugPrint('AiAssistantBloc: Stream setup error: $e');
+      debugLog('AiAssistantBloc: Stream setup error: $e');
       emit(state.copyWith(
         isGenerating: false,
         error: e.toString(),
@@ -271,7 +271,7 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
         isSummarizing: false,
       ));
     } catch (e) {
-      debugPrint('AiAssistantBloc: Summarize failed: $e');
+      debugLog('AiAssistantBloc: Summarize failed: $e');
       emit(state.copyWith(
         isSummarizing: false,
         error: 'Failed to summarize: $e',
@@ -301,7 +301,7 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
         isRewriting: false,
       ));
     } catch (e) {
-      debugPrint('AiAssistantBloc: Rewrite failed: $e');
+      debugLog('AiAssistantBloc: Rewrite failed: $e');
       emit(state.copyWith(
         isRewriting: false,
         error: 'Failed to rewrite: $e',
@@ -331,7 +331,7 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
         isSummarizingLink: false,
       ));
     } catch (e) {
-      debugPrint('AiAssistantBloc: Link summarize failed: $e');
+      debugLog('AiAssistantBloc: Link summarize failed: $e');
       emit(state.copyWith(
         isSummarizingLink: false,
         error: 'Failed to summarize link: $e',

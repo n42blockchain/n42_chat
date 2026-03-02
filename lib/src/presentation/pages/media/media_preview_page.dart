@@ -10,6 +10,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 媒体项数据
 class MediaItem {
@@ -117,12 +118,12 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
           _tempFiles.add(file);
           controller = VideoPlayerController.file(file);
         } else {
-          debugPrint(
+          debugLog(
               'iOS video download returned ${streamResponse.statusCode}, falling back');
           controller = VideoPlayerController.networkUrl(Uri.parse(url));
         }
       } catch (e) {
-        debugPrint('iOS video download error, falling back: $e');
+        debugLog('iOS video download error, falling back: $e');
         controller = VideoPlayerController.networkUrl(Uri.parse(url));
       }
     } else {
@@ -138,7 +139,7 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
       await controller.play();
       if (mounted) setState(() {});
     } catch (e) {
-      debugPrint('Video player init failed: $e');
+      debugLog('Video player init failed: $e');
     }
   }
 

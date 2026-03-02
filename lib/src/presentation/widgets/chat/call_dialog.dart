@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 通话对话框
 /// 
@@ -48,9 +49,9 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
     // TODO(backend): 替换为真正的 VoIP 连接（需要 WebRTC/LiveKit 服务）
     // TODO(backend): 使用 VoIPService.startCall(roomId, isVideoCall ? CallType.video : CallType.voice)
     
-    debugPrint('ChatCallDialog: Initiating ${widget.isVideoCall ? "video" : "voice"} call');
-    debugPrint('ChatCallDialog: Contact: ${widget.contactName}');
-    debugPrint('ChatCallDialog: Room ID: N/A');
+    debugLog('ChatCallDialog: Initiating ${widget.isVideoCall ? "video" : "voice"} call');
+    debugLog('ChatCallDialog: Contact: ${widget.contactName}');
+    debugLog('ChatCallDialog: Room ID: N/A');
     
     // 模拟呼叫状态变化
     await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -108,24 +109,24 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
   
   void _toggleMute() {
     setState(() => _isMuted = !_isMuted);
-    debugPrint('ChatCallDialog: Mute ${_isMuted ? "on" : "off"}');
+    debugLog('ChatCallDialog: Mute ${_isMuted ? "on" : "off"}');
     // TODO(backend): voipService.toggleMute()
   }
   
   void _toggleSpeaker() {
     setState(() => _isSpeakerOn = !_isSpeakerOn);
-    debugPrint('ChatCallDialog: Speaker ${_isSpeakerOn ? "on" : "off"}');
+    debugLog('ChatCallDialog: Speaker ${_isSpeakerOn ? "on" : "off"}');
     // TODO(backend): voipService.toggleSpeaker()
   }
   
   void _toggleCamera() {
     setState(() => _isCameraOff = !_isCameraOff);
-    debugPrint('ChatCallDialog: Camera ${_isCameraOff ? "off" : "on"}');
+    debugLog('ChatCallDialog: Camera ${_isCameraOff ? "off" : "on"}');
     // TODO(backend): voipService.toggleCamera()
   }
   
   void _endCall() {
-    debugPrint('ChatCallDialog: Ending call, duration: $_callDuration seconds');
+    debugLog('ChatCallDialog: Ending call, duration: $_callDuration seconds');
     // TODO(backend): voipService.hangup()
     widget.onEnd();
   }

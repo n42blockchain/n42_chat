@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/debug_log.dart';
 
 class MusicSelectSheet extends StatefulWidget {
   final bool isDark;
@@ -92,7 +93,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
         });
       }
     } catch (e) {
-      debugPrint('Error picking audio file: $e');
+      debugLog('Error picking audio file: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context)?.chatSelectFileFailed(e.toString()) ?? 'Failed to select file: $e')),

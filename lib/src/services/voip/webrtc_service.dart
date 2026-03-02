@@ -6,11 +6,11 @@ library;
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'voip_config.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 内部通话事件数据（用于统一处理不同来源的事件）
 class _CallEventData {
@@ -170,7 +170,7 @@ class WebRTCService {
   Future<void> initialize() async {
     await localRenderer.initialize();
     await remoteRenderer.initialize();
-    debugPrint('WebRTCService: Renderers initialized');
+    debugLog('WebRTCService: Renderers initialized');
     
     // 监听 Matrix VoIP 事件
     _setupMatrixEventListeners();
@@ -183,23 +183,23 @@ class WebRTCService {
     await remoteRenderer.dispose();
     _durationTimer?.cancel();
     _callTimeoutTimer?.cancel();
-    debugPrint('WebRTCService: Disposed');
+    debugLog('WebRTCService: Disposed');
   }
   
   /// 设置 Matrix 事件监听
   ///
   /// 使用 Matrix SDK 的 onCallEvents 流处理通话事件
   void _setupMatrixEventListeners() {
-    debugPrint('WebRTCService: Setting up Matrix event listeners');
+    debugLog('WebRTCService: Setting up Matrix event listeners');
 
     // 监听所有通话事件
     _client.onCallEvents.stream.listen((events) {
-      debugPrint('WebRTCService: Received ${events.length} call events');
+      debugLog('WebRTCService: Received ${events.length} call events');
       for (final event in events) {
         final type = event.type;
         final senderId = event.senderId;
 
-        debugPrint('WebRTCService: Received $type from $senderId, content=${event.content}');
+        debugLog('WebRTCService: Received $type from $senderId, content=${event.content}');
 
         switch (type) {
           case matrix.EventTypes.CallInvite:
@@ -238,7 +238,7 @@ class WebRTCService {
     final roomId = event.room.id;
     final senderId = event.senderId;
 
-    debugPrint('WebRTCService: Room call event $eventType from $senderId in $roomId');
+    debugLog('WebRTCService: Room call event $eventType from $senderId in $roomId');
 
     // 创建一个简化的事件对象用于处理（携带时间戳用于过期检查）
     final eventData = _CallEventData(
@@ -282,17 +282,17 @@ class WebRTCService {
   }) async {
     // 允许在 idle、ended、failed 状态时发起新通话
     if (_state != CallState.idle && _state != CallState.ended && _state != CallState.failed) {
-      debugPrint('WebRTCService: Already in a call, state: $_state');
+      debugLog('WebRTCService: Already in a call, state: $_state');
       return false;
     }
 
     // 如果是从 ended/failed 状态发起，先清理旧资源再重置
     if (_state == CallState.ended || _state == CallState.failed) {
       if (_isCleaningUp) {
-        debugPrint('WebRTCService: Still cleaning up, rejecting new call');
+        debugLog('WebRTCService: Still cleaning up, rejecting new call');
         return false;
       }
-      debugPrint('WebRTCService: Cleaning up from $_state state before new call');
+      debugLog('WebRTCService: Cleaning up from $_state state before new call');
       await _cleanup();
     }
     
@@ -355,15 +355,15 @@ class WebRTCService {
         targetUserId: peerId,
       );
       
-      debugPrint('WebRTCService: Call invite sent');
+      debugLog('WebRTCService: Call invite sent');
       
       // 启动超时计时器
       _startCallTimeout();
       
       return true;
     } catch (e, stackTrace) {
-      debugPrint('WebRTCService: Start call failed: $e');
-      debugPrint('Stack: $stackTrace');
+      debugLog('WebRTCService: Start call failed: $e');
+      debugLog('Stack: $stackTrace');
       _setState(CallState.failed);
       onError?.call('call_failed');
       await _cleanup();
@@ -377,15 +377,15 @@ class WebRTCService {
   
   /// 接听来电
   Future<bool> answerCall() async {
-    debugPrint('WebRTCService: answerCall - state=$_state, session=$_currentSession, peerConnection=$_peerConnection');
+    debugLog('WebRTCService: answerCall - state=$_state, session=$_currentSession, peerConnection=$_peerConnection');
 
     if (_state != CallState.incoming || _currentSession == null) {
-      debugPrint('WebRTCService: No incoming call to answer - state=$_state, session=${_currentSession != null}');
+      debugLog('WebRTCService: No incoming call to answer - state=$_state, session=${_currentSession != null}');
       return false;
     }
 
     if (_peerConnection == null) {
-      debugPrint('WebRTCService: ERROR - PeerConnection is null!');
+      debugLog('WebRTCService: ERROR - PeerConnection is null!');
       await _cleanup();
       onError?.call('answer_failed');
       return false;
@@ -395,17 +395,17 @@ class WebRTCService {
       _setState(CallState.connecting);
 
       // 获取本地媒体流
-      debugPrint('WebRTCService: Getting user media for ${_currentSession!.type}');
+      debugLog('WebRTCService: Getting user media for ${_currentSession!.type}');
       await _getUserMedia(_currentSession!.type);
 
       // 添加本地轨道
-      debugPrint('WebRTCService: Adding local tracks');
+      debugLog('WebRTCService: Adding local tracks');
       _addLocalTracks();
 
       // 创建 Answer
-      debugPrint('WebRTCService: Creating answer');
+      debugLog('WebRTCService: Creating answer');
       final answer = await _peerConnection!.createAnswer();
-      debugPrint('WebRTCService: Setting local description');
+      debugLog('WebRTCService: Setting local description');
       await _peerConnection!.setLocalDescription(answer);
 
       // 发送 m.call.answer
@@ -414,7 +414,7 @@ class WebRTCService {
         throw Exception('Room not found: ${_currentSession!.roomId}');
       }
 
-      debugPrint('WebRTCService: Sending m.call.answer');
+      debugLog('WebRTCService: Sending m.call.answer');
       await _sendCallEvent(
         room: room,
         type: 'm.call.answer',
@@ -430,14 +430,14 @@ class WebRTCService {
       );
 
       // 处理缓存的 ICE 候选
-      debugPrint('WebRTCService: Processing pending candidates');
+      debugLog('WebRTCService: Processing pending candidates');
       await _processPendingCandidates();
 
-      debugPrint('WebRTCService: Call answered successfully');
+      debugLog('WebRTCService: Call answered successfully');
       return true;
     } catch (e, stackTrace) {
-      debugPrint('WebRTCService: Answer call failed: $e');
-      debugPrint('WebRTCService: Stack trace: $stackTrace');
+      debugLog('WebRTCService: Answer call failed: $e');
+      debugLog('WebRTCService: Stack trace: $stackTrace');
       _setState(CallState.failed);
       onError?.call('answer_failed');
       await _cleanup();
@@ -464,7 +464,7 @@ class WebRTCService {
         );
       }
     } catch (e) {
-      debugPrint('WebRTCService: Reject call failed: $e');
+      debugLog('WebRTCService: Reject call failed: $e');
     }
 
     // 先通知 UI 通话结束
@@ -513,7 +513,7 @@ class WebRTCService {
         );
       }
     } catch (e) {
-      debugPrint('WebRTCService: Hangup failed: $e');
+      debugLog('WebRTCService: Hangup failed: $e');
     }
 
     // 先通知 UI 通话结束
@@ -551,9 +551,9 @@ class WebRTCService {
         'missed': isMissed,
       }, type: matrix.EventTypes.Message);
 
-      debugPrint('WebRTCService: Sent call record message: $body');
+      debugLog('WebRTCService: Sent call record message: $body');
     } catch (e) {
-      debugPrint('WebRTCService: Failed to send call record message: $e');
+      debugLog('WebRTCService: Failed to send call record message: $e');
     }
   }
   
@@ -588,7 +588,7 @@ class WebRTCService {
     _localStream!.getAudioTracks().forEach((track) {
       track.enabled = !_isMuted;
     });
-    debugPrint('WebRTCService: Mute ${_isMuted ? "enabled" : "disabled"}');
+    debugLog('WebRTCService: Mute ${_isMuted ? "enabled" : "disabled"}');
   }
   
   /// 开启/关闭视频
@@ -599,7 +599,7 @@ class WebRTCService {
     _localStream!.getVideoTracks().forEach((track) {
       track.enabled = _isVideoEnabled;
     });
-    debugPrint('WebRTCService: Video ${_isVideoEnabled ? "enabled" : "disabled"}');
+    debugLog('WebRTCService: Video ${_isVideoEnabled ? "enabled" : "disabled"}');
   }
   
   /// 切换扬声器
@@ -608,10 +608,10 @@ class WebRTCService {
     try {
       await Helper.setSpeakerphoneOn(_isSpeakerOn);
     } catch (e) {
-      debugPrint('WebRTCService: Failed to set speakerphone: $e');
+      debugLog('WebRTCService: Failed to set speakerphone: $e');
       _isSpeakerOn = !_isSpeakerOn; // 回滚状态
     }
-    debugPrint('WebRTCService: Speaker ${_isSpeakerOn ? "on" : "off"}');
+    debugLog('WebRTCService: Speaker ${_isSpeakerOn ? "on" : "off"}');
   }
   
   /// 切换前后摄像头
@@ -622,7 +622,7 @@ class WebRTCService {
     if (videoTrack != null) {
       await Helper.switchCamera(videoTrack);
       _isFrontCamera = !_isFrontCamera;
-      debugPrint('WebRTCService: Camera switched to ${_isFrontCamera ? "front" : "back"}');
+      debugLog('WebRTCService: Camera switched to ${_isFrontCamera ? "front" : "back"}');
     }
   }
 
@@ -656,12 +656,12 @@ class WebRTCService {
   /// WebRTC 需要重新创建音轨来应用新设置
   Future<void> _updateAudioProcessing() async {
     if (_localStream == null || _peerConnection == null) {
-      debugPrint('WebRTCService: Cannot update audio processing - no active call');
+      debugLog('WebRTCService: Cannot update audio processing - no active call');
       return;
     }
 
     final audioConfig = _config.audioProcessing;
-    debugPrint('WebRTCService: Updating audio processing: $audioConfig');
+    debugLog('WebRTCService: Updating audio processing: $audioConfig');
 
     try {
       // 停止并移除当前音轨
@@ -698,9 +698,9 @@ class WebRTCService {
       // 释放临时流
       unawaited(newStream.dispose());
 
-      debugPrint('WebRTCService: Audio processing updated successfully');
+      debugLog('WebRTCService: Audio processing updated successfully');
     } catch (e) {
-      debugPrint('WebRTCService: Failed to update audio processing: $e');
+      debugLog('WebRTCService: Failed to update audio processing: $e');
     }
   }
   
@@ -717,7 +717,7 @@ class WebRTCService {
       );
       _config.updateFromTurnResponse(response);
     } catch (e) {
-      debugPrint('WebRTCService: Failed to load TURN servers: $e');
+      debugLog('WebRTCService: Failed to load TURN servers: $e');
       // 使用公共 STUN 作为降级方案
     }
   }
@@ -729,7 +729,7 @@ class WebRTCService {
     try {
       await Helper.setSpeakerphoneOn(false);
     } catch (e) {
-      debugPrint('WebRTCService: Failed to initialize audio route: $e');
+      debugLog('WebRTCService: Failed to initialize audio route: $e');
     }
 
     // 获取音频处理配置
@@ -747,13 +747,13 @@ class WebRTCService {
       } : false,
     };
 
-    debugPrint('WebRTCService: Getting media with audio processing: $audioConfig');
+    debugLog('WebRTCService: Getting media with audio processing: $audioConfig');
 
     _localStream = await navigator.mediaDevices.getUserMedia(constraints);
     localRenderer.srcObject = _localStream;
     onLocalStream?.call(_localStream!);
 
-    debugPrint('WebRTCService: Got local stream with ${_localStream!.getTracks().length} tracks');
+    debugLog('WebRTCService: Got local stream with ${_localStream!.getTracks().length} tracks');
   }
   
   /// 创建 PeerConnection
@@ -767,7 +767,7 @@ class WebRTCService {
     
     // 监听 ICE 连接状态
     _peerConnection!.onIceConnectionState = (state) {
-      debugPrint('WebRTCService: ICE connection state: $state');
+      debugLog('WebRTCService: ICE connection state: $state');
       
       switch (state) {
         case RTCIceConnectionState.RTCIceConnectionStateConnected:
@@ -797,7 +797,7 @@ class WebRTCService {
     
     // 监听远程流
     _peerConnection!.onTrack = (event) {
-      debugPrint('WebRTCService: Got remote track: ${event.track.kind}');
+      debugLog('WebRTCService: Got remote track: ${event.track.kind}');
       if (event.streams.isNotEmpty) {
         _remoteStream = event.streams[0];
         remoteRenderer.srcObject = _remoteStream;
@@ -805,7 +805,7 @@ class WebRTCService {
       }
     };
     
-    debugPrint('WebRTCService: PeerConnection created');
+    debugLog('WebRTCService: PeerConnection created');
   }
   
   /// 添加本地轨道
@@ -816,7 +816,7 @@ class WebRTCService {
       _peerConnection!.addTrack(track, _localStream!);
     });
     
-    debugPrint('WebRTCService: Added ${_localStream!.getTracks().length} local tracks');
+    debugLog('WebRTCService: Added ${_localStream!.getTracks().length} local tracks');
   }
   
   /// 发送 ICE 候选（双通道）
@@ -844,7 +844,7 @@ class WebRTCService {
         );
       }
     } catch (e) {
-      debugPrint('WebRTCService: Failed to send ICE candidate: $e');
+      debugLog('WebRTCService: Failed to send ICE candidate: $e');
     }
   }
   
@@ -862,18 +862,18 @@ class WebRTCService {
     var roomId = event.content['room_id'] as String? ??
         event.content['roomId'] as String? ??
         '';
-    debugPrint('WebRTCService: _handleCallInvite to-device event, content keys: ${event.content.keys}, room_id=$roomId');
+    debugLog('WebRTCService: _handleCallInvite to-device event, content keys: ${event.content.keys}, room_id=$roomId');
 
     // 如果 roomId 为空，尝试通过 senderId 查找 DM 房间
     if (roomId.isEmpty) {
       final senderId = event.senderId;
-      debugPrint('WebRTCService: room_id missing, trying to find DM room for $senderId');
+      debugLog('WebRTCService: room_id missing, trying to find DM room for $senderId');
       final dmRoom = _client.getDirectChatFromUserId(senderId);
       if (dmRoom != null) {
         roomId = dmRoom;
-        debugPrint('WebRTCService: Found DM room $roomId for $senderId');
+        debugLog('WebRTCService: Found DM room $roomId for $senderId');
       } else {
-        debugPrint('WebRTCService: No DM room found for $senderId, skipping call invite');
+        debugLog('WebRTCService: No DM room found for $senderId, skipping call invite');
         return;
       }
     }
@@ -889,7 +889,7 @@ class WebRTCService {
 
   /// 处理来电邀请（统一处理）
   Future<void> _handleCallInviteFromRoom(_CallEventData event) async {
-    debugPrint('WebRTCService: _handleCallInviteFromRoom called - state=$_state, senderId=${event.senderId}, roomId=${event.roomId}');
+    debugLog('WebRTCService: _handleCallInviteFromRoom called - state=$_state, senderId=${event.senderId}, roomId=${event.roomId}');
 
     final senderId = event.senderId;
     final roomId = event.roomId;
@@ -898,16 +898,16 @@ class WebRTCService {
     final callId = content['call_id'] as String?;
     final offer = content['offer'] as Map<String, dynamic>?;
 
-    debugPrint('WebRTCService: Call invite - callId: $callId, senderId: $senderId, roomId: $roomId');
+    debugLog('WebRTCService: Call invite - callId: $callId, senderId: $senderId, roomId: $roomId');
 
     if (callId == null || offer == null || senderId.isEmpty) {
-      debugPrint('WebRTCService: Invalid call invite - missing required fields');
+      debugLog('WebRTCService: Invalid call invite - missing required fields');
       return;
     }
 
     // 忽略自己发起的通话
     if (senderId == _client.userID) {
-      debugPrint('WebRTCService: Ignoring own call invite');
+      debugLog('WebRTCService: Ignoring own call invite');
       return;
     }
 
@@ -916,14 +916,14 @@ class WebRTCService {
     if (event.originServerTs != null) {
       final age = DateTime.now().difference(event.originServerTs!).inMilliseconds;
       if (age > lifetime) {
-        debugPrint('WebRTCService: Ignoring expired call invite (age: ${age}ms, lifetime: ${lifetime}ms)');
+        debugLog('WebRTCService: Ignoring expired call invite (age: ${age}ms, lifetime: ${lifetime}ms)');
         return;
       }
     }
 
     // 防止 to-device 和 timeline 双通道重复处理同一通话
     if (_processedCallIds.contains(callId)) {
-      debugPrint('WebRTCService: Call $callId already processed, skipping duplicate');
+      debugLog('WebRTCService: Call $callId already processed, skipping duplicate');
       return;
     }
     _processedCallIds.add(callId);
@@ -934,13 +934,13 @@ class WebRTCService {
 
     // 允许在 idle、ended、failed 状态时接收来电
     if (_state != CallState.idle && _state != CallState.ended && _state != CallState.failed) {
-      debugPrint('WebRTCService: Already in a call (state: $_state), rejecting');
+      debugLog('WebRTCService: Already in a call (state: $_state), rejecting');
       return;
     }
 
     // 如果是从 ended/failed 状态接收来电，先清理旧资源再重置
     if (_state == CallState.ended || _state == CallState.failed) {
-      debugPrint('WebRTCService: Cleaning up from $_state state for incoming call');
+      debugLog('WebRTCService: Cleaning up from $_state state for incoming call');
       await _cleanup();
     }
 
@@ -956,7 +956,7 @@ class WebRTCService {
       final sdpType = offer['type'] as String?;
 
       if (sdp == null || sdpType == null) {
-        debugPrint('WebRTCService: Invalid SDP in offer');
+        debugLog('WebRTCService: Invalid SDP in offer');
         return;
       }
 
@@ -984,13 +984,13 @@ class WebRTCService {
       );
 
       _setState(CallState.incoming);
-      debugPrint('WebRTCService: About to call onIncomingCall callback, callback is ${onIncomingCall != null ? "SET" : "NULL"}');
+      debugLog('WebRTCService: About to call onIncomingCall callback, callback is ${onIncomingCall != null ? "SET" : "NULL"}');
       onIncomingCall?.call(_currentSession!);
 
-      debugPrint('WebRTCService: Incoming ${isVideo ? "video" : "voice"} call from ${_currentSession!.peerName}');
+      debugLog('WebRTCService: Incoming ${isVideo ? "video" : "voice"} call from ${_currentSession!.peerName}');
     } catch (e, stackTrace) {
-      debugPrint('WebRTCService: Failed to handle call invite: $e');
-      debugPrint('Stack: $stackTrace');
+      debugLog('WebRTCService: Failed to handle call invite: $e');
+      debugLog('Stack: $stackTrace');
     }
   }
   
@@ -1011,16 +1011,16 @@ class WebRTCService {
     final callId = content['call_id'] as String?;
     final answer = content['answer'] as Map<String, dynamic>?;
 
-    debugPrint('WebRTCService: Call answer - callId: $callId, currentCallId: ${_currentSession?.callId}');
+    debugLog('WebRTCService: Call answer - callId: $callId, currentCallId: ${_currentSession?.callId}');
 
     if (callId != _currentSession?.callId || answer == null) {
-      debugPrint('WebRTCService: Ignoring call answer - callId mismatch or no answer');
+      debugLog('WebRTCService: Ignoring call answer - callId mismatch or no answer');
       return;
     }
 
     // 忽略自己的应答
     if (event.senderId == _client.userID) {
-      debugPrint('WebRTCService: Ignoring own call answer');
+      debugLog('WebRTCService: Ignoring own call answer');
       return;
     }
 
@@ -1029,7 +1029,7 @@ class WebRTCService {
       final sdpType = answer['type'] as String?;
 
       if (sdp == null || sdpType == null) {
-        debugPrint('WebRTCService: Invalid SDP in answer');
+        debugLog('WebRTCService: Invalid SDP in answer');
         return;
       }
 
@@ -1041,10 +1041,10 @@ class WebRTCService {
       await _processPendingCandidates();
 
       _setState(CallState.connecting);
-      debugPrint('WebRTCService: Call answered successfully');
+      debugLog('WebRTCService: Call answered successfully');
     } catch (e, stackTrace) {
-      debugPrint('WebRTCService: Failed to handle call answer: $e');
-      debugPrint('Stack: $stackTrace');
+      debugLog('WebRTCService: Failed to handle call answer: $e');
+      debugLog('Stack: $stackTrace');
     }
   }
   
@@ -1074,7 +1074,7 @@ class WebRTCService {
       return;
     }
 
-    debugPrint('WebRTCService: Processing ${candidates.length} ICE candidates');
+    debugLog('WebRTCService: Processing ${candidates.length} ICE candidates');
 
     for (final candidateData in candidates) {
       if (candidateData is! Map<String, dynamic>) continue;
@@ -1088,17 +1088,17 @@ class WebRTCService {
       try {
         if (_peerConnection?.getRemoteDescription() != null) {
           await _peerConnection?.addCandidate(candidate);
-          debugPrint('WebRTCService: Added ICE candidate');
+          debugLog('WebRTCService: Added ICE candidate');
         } else {
           if (_pendingCandidates.length >= _maxPendingCandidates) {
-            debugPrint('WebRTCService: Pending candidates limit reached, dropping oldest');
+            debugLog('WebRTCService: Pending candidates limit reached, dropping oldest');
             _pendingCandidates.removeAt(0);
           }
           _pendingCandidates.add(candidate);
-          debugPrint('WebRTCService: Cached ICE candidate (no remote description yet)');
+          debugLog('WebRTCService: Cached ICE candidate (no remote description yet)');
         }
       } catch (e) {
-        debugPrint('WebRTCService: Failed to add ICE candidate: $e');
+        debugLog('WebRTCService: Failed to add ICE candidate: $e');
       }
     }
   }
@@ -1120,11 +1120,11 @@ class WebRTCService {
     final callId = content['call_id'] as String?;
     final reason = content['reason'] as String?;
 
-    debugPrint('WebRTCService: Call hangup - callId: $callId, reason: $reason, senderId: ${event.senderId}, currentCallId: ${_currentSession?.callId}, state: $_state');
+    debugLog('WebRTCService: Call hangup - callId: $callId, reason: $reason, senderId: ${event.senderId}, currentCallId: ${_currentSession?.callId}, state: $_state');
 
     // 忽略自己的挂断事件
     if (event.senderId == _client.userID) {
-      debugPrint('WebRTCService: Ignoring own hangup event');
+      debugLog('WebRTCService: Ignoring own hangup event');
       return;
     }
 
@@ -1133,7 +1133,7 @@ class WebRTCService {
     if (_currentSession == null) {
       // 没有当前会话，但如果状态不是 idle，也需要清理
       if (_state != CallState.idle) {
-        debugPrint('WebRTCService: No current session but state is $_state, cleaning up');
+        debugLog('WebRTCService: No current session but state is $_state, cleaning up');
         onStateChanged?.call(CallState.ended);
         await _cleanup();
       }
@@ -1141,11 +1141,11 @@ class WebRTCService {
     }
 
     if (callId != _currentSession!.callId) {
-      debugPrint('WebRTCService: Ignoring hangup - callId mismatch');
+      debugLog('WebRTCService: Ignoring hangup - callId mismatch');
       return;
     }
 
-    debugPrint('WebRTCService: Remote party hung up');
+    debugLog('WebRTCService: Remote party hung up');
 
     // 缓存通话信息用于发送记录（cleanup 会清空 session）
     final durationSeconds = _currentSession!.duration.inSeconds;
@@ -1170,7 +1170,7 @@ class WebRTCService {
         );
       }
     } catch (e) {
-      debugPrint('WebRTCService: Failed to send call record: $e');
+      debugLog('WebRTCService: Failed to send call record: $e');
     }
   }
 
@@ -1191,20 +1191,20 @@ class WebRTCService {
     final callId = content['call_id'] as String?;
     final reason = content['reason'] as String?;
 
-    debugPrint('WebRTCService: Call reject - callId: $callId, reason: $reason, senderId: ${event.senderId}');
+    debugLog('WebRTCService: Call reject - callId: $callId, reason: $reason, senderId: ${event.senderId}');
 
     if (callId != _currentSession?.callId) {
-      debugPrint('WebRTCService: Ignoring reject - callId mismatch');
+      debugLog('WebRTCService: Ignoring reject - callId mismatch');
       return;
     }
 
     // 忽略自己的拒绝事件
     if (event.senderId == _client.userID) {
-      debugPrint('WebRTCService: Ignoring own reject event');
+      debugLog('WebRTCService: Ignoring own reject event');
       return;
     }
 
-    debugPrint('WebRTCService: Call rejected by remote party');
+    debugLog('WebRTCService: Call rejected by remote party');
 
     // 发送通话记录消息（对方拒绝 = 未接通）
     if (_currentSession != null) {
@@ -1231,7 +1231,7 @@ class WebRTCService {
   Future<void> _cleanup() async {
     if (_isCleaningUp) return;
     _isCleaningUp = true;
-    debugPrint('WebRTCService: Starting cleanup...');
+    debugLog('WebRTCService: Starting cleanup...');
 
     _durationTimer?.cancel();
     _durationTimer = null;
@@ -1245,7 +1245,7 @@ class WebRTCService {
       });
       unawaited(_localStream?.dispose());
     } catch (e) {
-      debugPrint('WebRTCService: Error disposing local stream: $e');
+      debugLog('WebRTCService: Error disposing local stream: $e');
     }
     _localStream = null;
 
@@ -1253,7 +1253,7 @@ class WebRTCService {
     try {
       unawaited(_remoteStream?.dispose());
     } catch (e) {
-      debugPrint('WebRTCService: Error disposing remote stream: $e');
+      debugLog('WebRTCService: Error disposing remote stream: $e');
     }
     _remoteStream = null;
 
@@ -1265,7 +1265,7 @@ class WebRTCService {
     try {
       await _peerConnection?.close();
     } catch (e) {
-      debugPrint('WebRTCService: Error closing peer connection: $e');
+      debugLog('WebRTCService: Error closing peer connection: $e');
     }
     _peerConnection = null;
 
@@ -1283,13 +1283,13 @@ class WebRTCService {
     _state = CallState.idle;
 
     _isCleaningUp = false;
-    debugPrint('WebRTCService: Cleanup completed, state reset to idle');
+    debugLog('WebRTCService: Cleanup completed, state reset to idle');
   }
   
   /// 设置状态
   void _setState(CallState newState) {
     if (_state == newState) return;
-    debugPrint('WebRTCService: State changing from $_state to $newState');
+    debugLog('WebRTCService: State changing from $_state to $newState');
     _state = newState;
     onStateChanged?.call(_state);
   }
@@ -1299,7 +1299,7 @@ class WebRTCService {
     _callTimeoutTimer?.cancel();
     _callTimeoutTimer = Timer(Duration(seconds: _config.callTimeout), () {
       if (_state == CallState.ringing) {
-        debugPrint('WebRTCService: Call timeout');
+        debugLog('WebRTCService: Call timeout');
         hangup(reason: 'invite_timeout');
         onError?.call('no_answer');
       }

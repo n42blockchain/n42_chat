@@ -5,6 +5,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../domain/entities/mini_app_entity.dart';
 import '../../integration/wallet_bridge.dart';
+import '../utils/debug_log.dart';
 
 /// Mini App <-> Native 通信消息
 class _BridgeMessage {
@@ -179,7 +180,7 @@ class MiniAppBridgeService {
               controller, message.id, true, '"$balance"',
             );
           } catch (e) {
-            debugPrint('MiniAppBridge: getBalance error: $e');
+            debugLog('MiniAppBridge: getBalance error: $e');
             await _resolveCallback(
               controller, message.id, false, '"Failed to get balance: $e"',
             );
@@ -225,7 +226,7 @@ class MiniAppBridgeService {
                 );
               }
             } catch (e) {
-              debugPrint('MiniAppBridge: requestTransaction error: $e');
+              debugLog('MiniAppBridge: requestTransaction error: $e');
               await _resolveCallback(
                 controller,
                 message.id,
@@ -243,7 +244,7 @@ class MiniAppBridgeService {
           }
       }
     } catch (e) {
-      debugPrint('MiniAppBridge: wallet message error: $e');
+      debugLog('MiniAppBridge: wallet message error: $e');
     }
   }
 
@@ -258,7 +259,7 @@ class MiniAppBridgeService {
           onClose?.call();
       }
     } catch (e) {
-      debugPrint('MiniAppBridge: chat message error: $e');
+      debugLog('MiniAppBridge: chat message error: $e');
     }
   }
 

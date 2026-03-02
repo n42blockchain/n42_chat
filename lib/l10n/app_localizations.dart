@@ -10524,6 +10524,144 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'通过钱包地址发消息'**
   String get sendToAddress;
+
+  /// No description provided for @blocAuthSendVerificationCodeFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送验证码失败'**
+  String get blocAuthSendVerificationCodeFailed;
+
+  /// No description provided for @blocAuthServerNoEmailPasswordReset.
+  ///
+  /// In zh, this message translates to:
+  /// **'该服务器不支持通过邮箱重置密码'**
+  String get blocAuthServerNoEmailPasswordReset;
+
+  /// No description provided for @blocAuthResetPasswordFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置密码失败'**
+  String get blocAuthResetPasswordFailed;
+
+  /// No description provided for @blocAuthChangePasswordFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改密码失败'**
+  String get blocAuthChangePasswordFailed;
+
+  /// No description provided for @blocAuthOldPasswordWrong.
+  ///
+  /// In zh, this message translates to:
+  /// **'原密码错误'**
+  String get blocAuthOldPasswordWrong;
+
+  /// No description provided for @blocAuthLoginCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'登录已取消'**
+  String get blocAuthLoginCancelled;
+
+  /// No description provided for @blocAuthGoogleLoginFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'Google 登录失败'**
+  String get blocAuthGoogleLoginFailed;
+
+  /// No description provided for @blocAuthAppleLoginFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'Apple 登录失败'**
+  String get blocAuthAppleLoginFailed;
+
+  /// No description provided for @blocAuthSsoLoginFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'SSO 登录失败'**
+  String get blocAuthSsoLoginFailed;
+
+  /// No description provided for @blocAuthFacebookLoginFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'Facebook 登录失败'**
+  String get blocAuthFacebookLoginFailed;
+
+  /// No description provided for @blocAuthTwitterLoginFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'Twitter 登录失败'**
+  String get blocAuthTwitterLoginFailed;
+
+  /// No description provided for @blocAuthWeChatLoginFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'微信登录失败'**
+  String get blocAuthWeChatLoginFailed;
+
+  /// No description provided for @blocAuthWeChatNotConfigured.
+  ///
+  /// In zh, this message translates to:
+  /// **'微信登录未配置'**
+  String get blocAuthWeChatNotConfigured;
+
+  /// No description provided for @blocAuthWeChatNotInstalled.
+  ///
+  /// In zh, this message translates to:
+  /// **'请先安装微信'**
+  String get blocAuthWeChatNotInstalled;
+
+  /// No description provided for @blocAuthPasswordWrong.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码错误'**
+  String get blocAuthPasswordWrong;
+
+  /// No description provided for @blocAuthEmailAlreadyBound.
+  ///
+  /// In zh, this message translates to:
+  /// **'该邮箱已被其他账号绑定'**
+  String get blocAuthEmailAlreadyBound;
+
+  /// No description provided for @blocAuthChangeEmailFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改邮箱失败'**
+  String get blocAuthChangeEmailFailed;
+
+  /// No description provided for @blocAuthVerificationCodeInvalid.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证码错误或已过期'**
+  String get blocAuthVerificationCodeInvalid;
+
+  /// No description provided for @blocAuthSessionExpired.
+  ///
+  /// In zh, this message translates to:
+  /// **'会话已失效，请重新登录'**
+  String get blocAuthSessionExpired;
+
+  /// No description provided for @blocAuthSessionIncomplete.
+  ///
+  /// In zh, this message translates to:
+  /// **'会话数据不完整，请重新登录'**
+  String get blocAuthSessionIncomplete;
+
+  /// No description provided for @blocAuthPasskeyNotImplemented.
+  ///
+  /// In zh, this message translates to:
+  /// **'Passkey 登录功能尚未实现'**
+  String get blocAuthPasskeyNotImplemented;
+
+  /// No description provided for @blocAuthPasskeyRegisterNotImplemented.
+  ///
+  /// In zh, this message translates to:
+  /// **'Passkey 注册功能尚未实现'**
+  String get blocAuthPasskeyRegisterNotImplemented;
+
+  /// No description provided for @blocAuthEmailOtpNotImplemented.
+  ///
+  /// In zh, this message translates to:
+  /// **'邮箱 OTP 登录功能尚未实现'**
+  String get blocAuthEmailOtpNotImplemented;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

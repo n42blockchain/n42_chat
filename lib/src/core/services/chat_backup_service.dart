@@ -1,9 +1,9 @@
+import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pointycastle/export.dart' as pc;
@@ -13,6 +13,7 @@ import '../../data/datasources/local/secure_storage_datasource.dart';
 import '../../data/datasources/matrix/matrix_client_manager.dart';
 import '../constants/app_constants.dart';
 import 'message_archive_service.dart';
+import '../utils/debug_log.dart';
 
 /// 备份结果
 class BackupResult {
@@ -249,7 +250,7 @@ class ChatBackupService {
 
         (backupData['rooms'] as Map<String, dynamic>)[room.id] = roomData;
       } catch (e) {
-        debugPrint('ChatBackupService: Failed to export room ${room.id}: $e');
+        debugLog('ChatBackupService: Failed to export room ${room.id}: $e');
       }
 
       onProgress?.call(0.1 + 0.7 * (i + 1) / rooms.length);
@@ -270,7 +271,7 @@ class ChatBackupService {
       }
       backupData['settings'] = settings;
     } catch (e) {
-      debugPrint('ChatBackupService: Failed to export settings: $e');
+      debugLog('ChatBackupService: Failed to export settings: $e');
     }
 
     onProgress?.call(0.85);
@@ -362,7 +363,7 @@ class ChatBackupService {
             includesKeys: preview?.hasKeys ?? false,
           ));
         } catch (e) {
-          debugPrint('ChatBackupService: Failed to read backup: $e');
+          debugLog('ChatBackupService: Failed to read backup: $e');
         }
       }
     }
@@ -456,7 +457,7 @@ class ChatBackupService {
             });
           }
         } catch (e) {
-          debugPrint('ChatBackupService: Timeline error for ${room.id}: $e');
+          debugLog('ChatBackupService: Timeline error for ${room.id}: $e');
         }
 
         // 2. 从归档获取历史消息（突破 1000 条限制）
@@ -488,7 +489,7 @@ class ChatBackupService {
               });
             }
           } catch (e) {
-            debugPrint('ChatBackupService: Archive error for ${room.id}: $e');
+            debugLog('ChatBackupService: Archive error for ${room.id}: $e');
           }
         }
 
@@ -496,7 +497,7 @@ class ChatBackupService {
         messageCount += messages.length;
         (backupData['rooms'] as Map<String, dynamic>)[room.id] = roomData;
       } catch (e) {
-        debugPrint('ChatBackupService: Failed to backup room ${room.id}: $e');
+        debugLog('ChatBackupService: Failed to backup room ${room.id}: $e');
       }
 
       onProgress?.call(0.1 + 0.7 * (i + 1) / rooms.length);

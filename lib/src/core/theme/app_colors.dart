@@ -132,12 +132,11 @@ abstract class AppColors {
   /// 对方发送的消息气泡 - 深色
   static const Color bubbleOtherDark = Color(0xFF2C2C2C);
 
-  /// 获取自己气泡颜色（适配深浅色）
+  /// 自己气泡颜色（微信风格：浅色亮绿，深色暗绿）
   static Color selfBubble(bool isDark) => isDark ? bubbleSelfDark : bubbleSelf;
 
-  /// 获取发送方文字颜色（适配深浅色）
-  static Color sentText(bool isDark) =>
-      isDark ? const Color(0xFFFFFFFF) : messageTextSent;
+  /// 发送消息文字颜色（微信风格：始终黑色，不论深浅模式）
+  static Color sentText(bool isDark) => messageTextSent;
 
   // ============================================
   // 状态颜色

@@ -32,4 +32,39 @@ class BlocMessageKeys {
   static const transferFailed = 'transfer_failed';
   static const paymentProcessing = 'payment_processing';
   static const paymentFailed = 'payment_failed';
+
+  // Auth — password reset
+  static const authSendVerificationCodeFailed = 'auth_send_verification_code_failed';
+  static const authServerNoEmailPasswordReset = 'auth_server_no_email_password_reset';
+  static const authResetPasswordFailed = 'auth_reset_password_failed';
+
+  // Auth — password change
+  static const authChangePasswordFailed = 'auth_change_password_failed';
+  static const authOldPasswordWrong = 'auth_old_password_wrong';
+
+  // Auth — social login
+  static const authLoginCancelled = 'auth_login_cancelled';
+  static const authGoogleLoginFailed = 'auth_google_login_failed';
+  static const authAppleLoginFailed = 'auth_apple_login_failed';
+  static const authSsoLoginFailed = 'auth_sso_login_failed';
+  static const authFacebookLoginFailed = 'auth_facebook_login_failed';
+  static const authTwitterLoginFailed = 'auth_twitter_login_failed';
+  static const authWeChatLoginFailed = 'auth_wechat_login_failed';
+  static const authWeChatNotConfigured = 'auth_wechat_not_configured';
+  static const authWeChatNotInstalled = 'auth_wechat_not_installed';
+
+  // Auth — email
+  static const authPasswordWrong = 'auth_password_wrong';
+  static const authEmailAlreadyBound = 'auth_email_already_bound';
+  static const authChangeEmailFailed = 'auth_change_email_failed';
+  static const authVerificationCodeInvalid = 'auth_verification_code_invalid';
+
+  // Auth — session
+  static const authSessionExpired = 'auth_session_expired';
+  static const authSessionIncomplete = 'auth_session_incomplete';
+
+  // Auth — unimplemented
+  static const authPasskeyNotImplemented = 'auth_passkey_not_implemented';
+  static const authPasskeyRegisterNotImplemented = 'auth_passkey_register_not_implemented';
+  static const authEmailOtpNotImplemented = 'auth_email_otp_not_implemented';
 }

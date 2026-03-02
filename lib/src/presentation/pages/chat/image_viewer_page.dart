@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 class ChatImageViewerPage extends StatefulWidget {
   final String imageUrl;
@@ -77,7 +78,7 @@ class _ChatImageViewerPageState extends State<ChatImageViewerPage> {
         }
       }
     } catch (e) {
-      debugPrint('Save image error: $e');
+      debugLog('Save image error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -117,7 +118,7 @@ class _ChatImageViewerPageState extends State<ChatImageViewerPage> {
         await tempDir.delete(recursive: true);
       }
     } catch (e) {
-      debugPrint('Share image error: $e');
+      debugLog('Share image error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

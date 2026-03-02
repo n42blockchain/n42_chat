@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
+import '../utils/debug_log.dart';
 
 /// 密钥备份服务
 ///
@@ -39,7 +39,7 @@ class KeyBackupService {
         etag: info.etag,
       );
     } catch (e) {
-      debugPrint('KeyBackupService: Failed to get backup info: $e');
+      debugLog('KeyBackupService: Failed to get backup info: $e');
       return null;
     }
   }
@@ -58,7 +58,7 @@ class KeyBackupService {
       // 立即触发一次全量上传
       await encryption.keyManager.uploadInboundGroupSessions();
 
-      debugPrint('KeyBackupService: Key backup created and auto-upload enabled');
+      debugLog('KeyBackupService: Key backup created and auto-upload enabled');
       return 'backup_created';
     } catch (e) {
       throw KeyBackupException('Failed to create backup: $e');
@@ -85,15 +85,15 @@ class KeyBackupService {
       // 3. 从服务端备份主动下载所有房间密钥
       try {
         await encryption.keyManager.loadAllKeys();
-        debugPrint('KeyBackupService: All room keys loaded from backup');
+        debugLog('KeyBackupService: All room keys loaded from backup');
       } catch (e) {
-        debugPrint('KeyBackupService: loadAllKeys skipped: $e');
+        debugLog('KeyBackupService: loadAllKeys skipped: $e');
       }
 
       // 4. 启用自动密钥上传
       encryption.keyManager.startAutoUploadKeys();
 
-      debugPrint('KeyBackupService: Restored from password successfully');
+      debugLog('KeyBackupService: Restored from password successfully');
       return 1;
     } catch (e) {
       if (e is KeyBackupException) rethrow;
@@ -122,21 +122,21 @@ class KeyBackupService {
       try {
         await encryption.crossSigning.selfSign(recoveryKey: recoveryKey);
       } catch (e) {
-        debugPrint('KeyBackupService: Cross-signing restore skipped: $e');
+        debugLog('KeyBackupService: Cross-signing restore skipped: $e');
       }
 
       // 4. 从服务端备份主动下载所有房间密钥
       try {
         await encryption.keyManager.loadAllKeys();
-        debugPrint('KeyBackupService: All room keys loaded from backup');
+        debugLog('KeyBackupService: All room keys loaded from backup');
       } catch (e) {
-        debugPrint('KeyBackupService: loadAllKeys skipped: $e');
+        debugLog('KeyBackupService: loadAllKeys skipped: $e');
       }
 
       // 5. 启用自动密钥上传
       encryption.keyManager.startAutoUploadKeys();
 
-      debugPrint('KeyBackupService: Restored from recovery key successfully');
+      debugLog('KeyBackupService: Restored from recovery key successfully');
       return 1;
     } catch (e) {
       if (e is KeyBackupException) rethrow;
@@ -154,7 +154,7 @@ class KeyBackupService {
 
       final info = await encryption.keyManager.getRoomKeysBackupInfo();
       await _client.deleteRoomKeysVersion(info.version);
-      debugPrint('KeyBackupService: Backup version ${info.version} deleted');
+      debugLog('KeyBackupService: Backup version ${info.version} deleted');
     } catch (e) {
       throw KeyBackupException('Failed to delete backup: $e');
     }
@@ -169,7 +169,7 @@ class KeyBackupService {
       if (encryption == null) return;
 
       await encryption.keyManager.uploadInboundGroupSessions();
-      debugPrint('KeyBackupService: All keys uploaded successfully');
+      debugLog('KeyBackupService: All keys uploaded successfully');
     } catch (e) {
       throw KeyBackupException('Failed to backup keys: $e');
     }

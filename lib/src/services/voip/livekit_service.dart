@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:livekit_client/livekit_client.dart';
 
 import 'voip_config.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 会议状态
 enum MeetingState {
@@ -175,7 +176,7 @@ class LiveKitService extends ChangeNotifier {
     bool enableAudio = true,
   }) async {
     if (_state != MeetingState.idle) {
-      debugPrint('LiveKitService: Already in a meeting');
+      debugLog('LiveKitService: Already in a meeting');
       return false;
     }
 
@@ -213,7 +214,7 @@ class LiveKitService extends ChangeNotifier {
           ),
         ),
       );
-      debugPrint('LiveKitService: Room created with audio processing: $audioConfig');
+      debugLog('LiveKitService: Room created with audio processing: $audioConfig');
 
       // 设置事件监听
       _setupRoomListeners();
@@ -259,11 +260,11 @@ class LiveKitService extends ChangeNotifier {
       _startDurationTimer();
       _notifyParticipantsChanged();
 
-      debugPrint('LiveKitService: Joined meeting $roomName');
+      debugLog('LiveKitService: Joined meeting $roomName');
       return true;
     } catch (e, stackTrace) {
-      debugPrint('LiveKitService: Join meeting failed: $e');
-      debugPrint('Stack: $stackTrace');
+      debugLog('LiveKitService: Join meeting failed: $e');
+      debugLog('Stack: $stackTrace');
       _setState(MeetingState.failed);
       onError?.call(MeetingErrorType.joinFailed, e.toString());
       await _cleanup();
@@ -278,12 +279,12 @@ class LiveKitService extends ChangeNotifier {
     try {
       await _room!.disconnect();
     } catch (e) {
-      debugPrint('LiveKitService: Leave meeting failed: $e');
+      debugLog('LiveKitService: Leave meeting failed: $e');
     }
 
     await _cleanup();
     _setState(MeetingState.disconnected);
-    debugPrint('LiveKitService: Left meeting');
+    debugLog('LiveKitService: Left meeting');
   }
 
   // ============================================
@@ -298,7 +299,7 @@ class LiveKitService extends ChangeNotifier {
     await _localParticipant!.setMicrophoneEnabled(!_isMuted);
 
     _updateLocalParticipant();
-    debugPrint('LiveKitService: Microphone ${_isMuted ? "muted" : "unmuted"}');
+    debugLog('LiveKitService: Microphone ${_isMuted ? "muted" : "unmuted"}');
   }
 
   /// 切换摄像头
@@ -309,7 +310,7 @@ class LiveKitService extends ChangeNotifier {
     await _localParticipant!.setCameraEnabled(_isVideoEnabled);
 
     _updateLocalParticipant();
-    debugPrint('LiveKitService: Camera ${_isVideoEnabled ? "enabled" : "disabled"}');
+    debugLog('LiveKitService: Camera ${_isVideoEnabled ? "enabled" : "disabled"}');
   }
 
   /// 切换前后摄像头
@@ -327,7 +328,7 @@ class LiveKitService extends ChangeNotifier {
             ? CameraPosition.back
             : CameraPosition.front;
         await videoTrack.setCameraPosition(newPosition);
-        debugPrint('LiveKitService: Camera switched to $newPosition');
+        debugLog('LiveKitService: Camera switched to $newPosition');
       }
     }
   }
@@ -340,10 +341,10 @@ class LiveKitService extends ChangeNotifier {
       await _localParticipant!.setScreenShareEnabled(true);
       _isScreenSharing = true;
       _updateLocalParticipant();
-      debugPrint('LiveKitService: Screen share started');
+      debugLog('LiveKitService: Screen share started');
       return true;
     } catch (e) {
-      debugPrint('LiveKitService: Start screen share failed: $e');
+      debugLog('LiveKitService: Start screen share failed: $e');
       onError?.call(MeetingErrorType.screenShareFailed, e.toString());
       return false;
     }
@@ -357,9 +358,9 @@ class LiveKitService extends ChangeNotifier {
       await _localParticipant!.setScreenShareEnabled(false);
       _isScreenSharing = false;
       _updateLocalParticipant();
-      debugPrint('LiveKitService: Screen share stopped');
+      debugLog('LiveKitService: Screen share stopped');
     } catch (e) {
-      debugPrint('LiveKitService: Stop screen share failed: $e');
+      debugLog('LiveKitService: Stop screen share failed: $e');
     }
   }
 
@@ -408,7 +409,7 @@ class LiveKitService extends ChangeNotifier {
     if (_localParticipant == null) return;
 
     final audioConfig = _config.audioProcessing;
-    debugPrint('LiveKitService: Updating audio processing: $audioConfig');
+    debugLog('LiveKitService: Updating audio processing: $audioConfig');
 
     // LiveKit 需要重新发布音轨来应用新的音频处理设置
     // 先禁用麦克风，再重新启用
@@ -416,9 +417,9 @@ class LiveKitService extends ChangeNotifier {
       await _localParticipant!.setMicrophoneEnabled(false);
       await Future<void>.delayed(const Duration(milliseconds: 100));
       await _localParticipant!.setMicrophoneEnabled(!_isMuted);
-      debugPrint('LiveKitService: Audio processing updated successfully');
+      debugLog('LiveKitService: Audio processing updated successfully');
     } catch (e) {
-      debugPrint('LiveKitService: Failed to update audio processing: $e');
+      debugLog('LiveKitService: Failed to update audio processing: $e');
     }
 
     notifyListeners();
@@ -481,12 +482,12 @@ class LiveKitService extends ChangeNotifier {
   /// 这里提供了配置更新的框架，实际的视频处理需要配合 UI 层实现
   Future<void> _updateBackgroundProcessing() async {
     final bgConfig = _config.backgroundProcessing;
-    debugPrint('LiveKitService: Updating background processing: $bgConfig');
+    debugLog('LiveKitService: Updating background processing: $bgConfig');
 
     // LiveKit 背景模糊通过 LocalVideoTrack 的处理器实现
     // 需要重新设置视频轨道来应用新设置
     if (_localParticipant == null || !_isVideoEnabled) {
-      debugPrint('LiveKitService: No active video to apply background processing');
+      debugLog('LiveKitService: No active video to apply background processing');
       notifyListeners();
       return;
     }
@@ -502,26 +503,26 @@ class LiveKitService extends ChangeNotifier {
         // 根据背景模式应用不同的处理
         switch (_config.backgroundMode) {
           case BackgroundMode.blur:
-            debugPrint('LiveKitService: Background blur enabled with radius: ${_config.backgroundBlurRadius}');
+            debugLog('LiveKitService: Background blur enabled with radius: ${_config.backgroundBlurRadius}');
             // 实际的模糊处理需要通过 VideoProcessor 实现
             // 这里记录配置，由 UI 层应用实际的视觉效果
             break;
           case BackgroundMode.virtualBackground:
-            debugPrint('LiveKitService: Virtual background set: ${_config.virtualBackgroundUrl}');
+            debugLog('LiveKitService: Virtual background set: ${_config.virtualBackgroundUrl}');
             // 虚拟背景需要使用人像分割和图像合成
             break;
           case BackgroundMode.solidColor:
-            debugPrint('LiveKitService: Solid color background applied');
+            debugLog('LiveKitService: Solid color background applied');
             break;
           case BackgroundMode.none:
-            debugPrint('LiveKitService: Background processing disabled');
+            debugLog('LiveKitService: Background processing disabled');
             break;
         }
       }
 
       notifyListeners();
     } catch (e) {
-      debugPrint('LiveKitService: Failed to update background processing: $e');
+      debugLog('LiveKitService: Failed to update background processing: $e');
     }
   }
 
@@ -529,17 +530,27 @@ class LiveKitService extends ChangeNotifier {
   // 录制控制
   // ============================================
 
-  /// 开始录制（需要服务端支持）
+  /// 开始录制（服务端功能，当前不可用）
+  ///
+  /// 录制需要服务端通过 LiveKit Egress API 驱动，客户端仅负责发起请求。
+  /// 完整流程：
+  ///   1. 客户端调用自有后端接口（需鉴权）发起录制任务
+  ///   2. 后端使用 LiveKit Server SDK 调用 EgressClient.startRoomCompositeEgress()
+  ///   3. 后端返回 egressId，客户端持有用于后续停止/查询
+  ///
+  /// 此功能尚未实现，调用方应检查返回值并向用户展示"录制功能即将上线"提示。
   Future<bool> startRecording() async {
-    // TODO: 实现服务端录制 API 调用
-    debugPrint('LiveKitService: Recording requires server-side implementation');
+    debugLog('LiveKitService: startRecording called — '
+        'server-side Egress API integration not yet implemented; returning false');
     return false;
   }
 
-  /// 停止录制
+  /// 停止录制（服务端功能，当前不可用）
+  ///
+  /// 需配合 startRecording() 返回的 egressId 调用后端停止接口。
   Future<void> stopRecording() async {
-    // TODO: 实现服务端录制 API 调用
-    debugPrint('LiveKitService: Stop recording requires server-side implementation');
+    debugLog('LiveKitService: stopRecording called — '
+        'server-side Egress API integration not yet implemented; no-op');
   }
 
   // ============================================
@@ -590,10 +601,10 @@ class LiveKitService extends ChangeNotifier {
       }
       notifyListeners();
 
-      debugPrint('LiveKitService: Chat message sent');
+      debugLog('LiveKitService: Chat message sent');
       return true;
     } catch (e) {
-      debugPrint('LiveKitService: Failed to send chat message: $e');
+      debugLog('LiveKitService: Failed to send chat message: $e');
       return false;
     }
   }
@@ -620,10 +631,10 @@ class LiveKitService extends ChangeNotifier {
         }
         notifyListeners();
 
-        debugPrint('LiveKitService: Chat message received');
+        debugLog('LiveKitService: Chat message received');
       }
     } catch (e) {
-      debugPrint('LiveKitService: Failed to parse data message: $e');
+      debugLog('LiveKitService: Failed to parse data message: $e');
     }
   }
 
@@ -693,17 +704,17 @@ class LiveKitService extends ChangeNotifier {
 
     // 连接状态变化
     _roomListener!.on<RoomDisconnectedEvent>((event) {
-      debugPrint('LiveKitService: Room disconnected: ${event.reason}');
+      debugLog('LiveKitService: Room disconnected: ${event.reason}');
       _setState(MeetingState.disconnected);
     });
 
     _roomListener!.on<RoomReconnectingEvent>((event) {
-      debugPrint('LiveKitService: Room reconnecting');
+      debugLog('LiveKitService: Room reconnecting');
       _setState(MeetingState.reconnecting);
     });
 
     _roomListener!.on<RoomReconnectedEvent>((event) {
-      debugPrint('LiveKitService: Room reconnected');
+      debugLog('LiveKitService: Room reconnected');
       _setState(MeetingState.connected);
     });
 
@@ -736,7 +747,7 @@ class LiveKitService extends ChangeNotifier {
     _participants[participant.identity] = meetingParticipant;
     onParticipantJoined?.call(meetingParticipant);
 
-    debugPrint('LiveKitService: Participant joined: ${participant.name}');
+    debugLog('LiveKitService: Participant joined: ${participant.name}');
   }
 
   /// 更新远程参与者
@@ -834,7 +845,7 @@ class LiveKitService extends ChangeNotifier {
     _state = newState;
     onStateChanged?.call(_state);
     notifyListeners();
-    debugPrint('LiveKitService: State changed to $_state');
+    debugLog('LiveKitService: State changed to $_state');
   }
 
   /// 启动通话时长计时器
@@ -869,7 +880,7 @@ class LiveKitService extends ChangeNotifier {
     _isScreenSharing = false;
     _chatMessages.clear();
 
-    debugPrint('LiveKitService: Cleaned up');
+    debugLog('LiveKitService: Cleaned up');
   }
 
   /// 释放资源

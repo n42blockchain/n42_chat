@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
+import 'debug_log.dart';
 
 /// Matrix 工具类
 ///
@@ -34,7 +34,7 @@ class MatrixUtils {
 
     // 验证是否是有效的 mxc:// URL
     if (!mxcUrl.startsWith('mxc://')) {
-      debugPrint('MatrixUtils: Invalid mxc URL: $mxcUrl');
+      debugLog('MatrixUtils: Invalid mxc URL: $mxcUrl');
       return null;
     }
 
@@ -45,13 +45,13 @@ class MatrixUtils {
       final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
       
       if (serverName.isEmpty || mediaId.isEmpty) {
-        debugPrint('MatrixUtils: Invalid mxc URL format: $mxcUrl');
+        debugLog('MatrixUtils: Invalid mxc URL format: $mxcUrl');
         return null;
       }
 
       final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) {
-        debugPrint('MatrixUtils: No homeserver configured');
+        debugLog('MatrixUtils: No homeserver configured');
         return null;
       }
       
@@ -69,7 +69,7 @@ class MatrixUtils {
       
       return url;
     } catch (e) {
-      debugPrint('MatrixUtils: Error converting mxc URL: $e');
+      debugLog('MatrixUtils: Error converting mxc URL: $e');
       return null;
     }
   }

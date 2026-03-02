@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
@@ -6,6 +5,7 @@ import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/chat_folder_entity.dart';
 import 'chat_folder_event.dart';
 import 'chat_folder_state.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 聊天文件夹 BLoC
 class ChatFolderBloc extends Bloc<ChatFolderEvent, ChatFolderState> {
@@ -56,7 +56,7 @@ class ChatFolderBloc extends Bloc<ChatFolderEvent, ChatFolderState> {
         isLoading: false,
       ));
     } catch (e) {
-      debugPrint('ChatFolderBloc: Load failed: $e');
+      debugLog('ChatFolderBloc: Load failed: $e');
       emit(state.copyWith(
         folders: _systemFolders,
         isLoading: false,
@@ -98,7 +98,7 @@ class ChatFolderBloc extends Bloc<ChatFolderEvent, ChatFolderState> {
       // 持久化
       await _saveFolders(updatedFolders);
     } catch (e) {
-      debugPrint('ChatFolderBloc: Create failed: $e');
+      debugLog('ChatFolderBloc: Create failed: $e');
       emit(state.copyWith(error: 'Failed to create folder'));
     }
   }
@@ -117,7 +117,7 @@ class ChatFolderBloc extends Bloc<ChatFolderEvent, ChatFolderState> {
       emit(state.copyWith(folders: updatedFolders));
       await _saveFolders(updatedFolders);
     } catch (e) {
-      debugPrint('ChatFolderBloc: Update failed: $e');
+      debugLog('ChatFolderBloc: Update failed: $e');
       emit(state.copyWith(error: 'Failed to update folder'));
     }
   }
@@ -148,7 +148,7 @@ class ChatFolderBloc extends Bloc<ChatFolderEvent, ChatFolderState> {
       ));
       await _saveFolders(updatedFolders);
     } catch (e) {
-      debugPrint('ChatFolderBloc: Delete failed: $e');
+      debugLog('ChatFolderBloc: Delete failed: $e');
       emit(state.copyWith(error: 'Failed to delete folder'));
     }
   }
@@ -170,7 +170,7 @@ class ChatFolderBloc extends Bloc<ChatFolderEvent, ChatFolderState> {
           .toList();
       await _storage.saveChatFolders(customFolders);
     } catch (e) {
-      debugPrint('ChatFolderBloc: Save failed: $e');
+      debugLog('ChatFolderBloc: Save failed: $e');
     }
   }
 }

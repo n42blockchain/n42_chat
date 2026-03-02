@@ -122,6 +122,21 @@ abstract class IWalletBridge {
     required int tokenId,
     required int chainId,
   }) async => null;
+
+  // ============================================
+  // 消息签名（治理投票等）
+  // ============================================
+
+  /// 签名普通消息（personal_sign）
+  ///
+  /// 返回签名的十六进制字符串，如果钱包不支持或用户拒绝则返回 null。
+  Future<String?> signMessage(String message) async => null;
+
+  /// 签名 EIP-712 类型化数据（signTypedData_v4）
+  ///
+  /// [typedDataJson] 完整的 EIP-712 JSON 字符串
+  /// 返回签名的十六进制字符串。
+  Future<String?> signTypedData(String typedDataJson) async => null;
 }
 
 /// 转账结果
@@ -277,36 +292,22 @@ class WalletUserInfo {
   }
 }
 
-/// 模拟钱包桥接实现（用于测试）
-class MockWalletBridge extends IWalletBridge {
+/// 无操作钱包桥接（未集成钱包时的安全降级）
+///
+/// 所有操作返回 null/空值/失败，不含任何硬编码测试数据。
+/// 生产环境中宿主 App 必须通过 [N42ChatConfig.walletBridge] 注入真实实现。
+class NoOpWalletBridge extends IWalletBridge {
   @override
-  bool get isWalletConnected => true;
+  bool get isWalletConnected => false;
 
   @override
-  String? get walletAddress => '0x1234567890abcdef1234567890abcdef12345678';
+  String? get walletAddress => null;
 
   @override
-  Future<List<TokenInfo>> getSupportedTokens() async {
-    return const [
-      TokenInfo(
-        symbol: 'ETH',
-        name: 'Ethereum',
-        decimals: 18,
-        isNative: true,
-      ),
-      TokenInfo(
-        symbol: 'USDT',
-        name: 'Tether USD',
-        decimals: 6,
-        contractAddress: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-      ),
-    ];
-  }
+  Future<List<TokenInfo>> getSupportedTokens() async => const [];
 
   @override
-  Future<String> getBalance(String token) async {
-    return token == 'ETH' ? '1.5' : '100.00';
-  }
+  Future<String> getBalance(String token) async => '0';
 
   @override
   Future<TransferResult> requestTransfer({
@@ -315,8 +316,7 @@ class MockWalletBridge extends IWalletBridge {
     required String token,
     String? memo,
   }) async {
-    await Future<void>.delayed(const Duration(seconds: 2));
-    return TransferResult.success('0x${'1234' * 16}');
+    return TransferResult.failure('Wallet not connected');
   }
 
   @override
@@ -325,22 +325,11 @@ class MockWalletBridge extends IWalletBridge {
     required String token,
     String? memo,
   }) async {
-    return PaymentRequest(
-      requestId: DateTime.now().millisecondsSinceEpoch.toString(),
-      amount: amount,
-      token: token,
-      receiverAddress: walletAddress!,
-      memo: memo,
-      qrCodeData: 'n42://pay?address=$walletAddress&amount=$amount&token=$token',
-      createdAt: DateTime.now(),
-      expiresAt: DateTime.now().add(const Duration(minutes: 30)),
-    );
+    throw StateError('Wallet not connected');
   }
 
   @override
-  Future<void> showReceiveQRCode() async {
-    // 显示收款二维码
-  }
+  Future<void> showReceiveQRCode() async {}
 
   @override
   bool isValidAddress(String address) {
@@ -348,8 +337,6 @@ class MockWalletBridge extends IWalletBridge {
   }
 
   @override
-  Future<WalletUserInfo?> getUserInfoByAddress(String address) async {
-    return null;
-  }
+  Future<WalletUserInfo?> getUserInfoByAddress(String address) async => null;
 }
 

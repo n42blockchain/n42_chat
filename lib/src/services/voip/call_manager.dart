@@ -16,6 +16,7 @@ import 'livekit_service.dart';
 import 'call_notification_service.dart';
 import '../../presentation/pages/call/call_screen.dart';
 import '../../presentation/pages/call/group_call_screen.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 通话管理器
 /// 
@@ -61,7 +62,7 @@ class CallManager {
   /// 更新导航键（在 N42Chat.setNavigatorKey() 中调用）
   void setNavigatorKey(GlobalKey<NavigatorState>? key) {
     _navigatorKey = key;
-    debugPrint('CallManager: Navigator key updated');
+    debugLog('CallManager: Navigator key updated');
   }
 
   VoIPConfig get config => _config;
@@ -84,7 +85,7 @@ class CallManager {
     GlobalKey<NavigatorState>? navigatorKey,
   }) async {
     if (_isInitialized) {
-      debugPrint('CallManager: Already initialized');
+      debugLog('CallManager: Already initialized');
       return;
     }
     
@@ -112,7 +113,7 @@ class CallManager {
     _liveKitService = LiveKitService();
     
     _isInitialized = true;
-    debugPrint('CallManager: Initialized');
+    debugLog('CallManager: Initialized');
 
     // 检查是否有在 app 冷启动期间（CallManager 尚未就绪时）用户已点击接听的缓存事件。
     // 若有，设置 _pendingAnswer 标志，待 Matrix 邀请到达时自动接听。
@@ -121,23 +122,23 @@ class CallManager {
         final pending = _notificationService.consumePendingAcceptAction();
         if (pending != null) {
           final (_, callInfo) = pending;
-          debugPrint('CallManager: Found pending accept action from ${callInfo.callerName}, '
+          debugLog('CallManager: Found pending accept action from ${callInfo.callerName}, '
               'setting _pendingAnswer=true');
           _pendingAnswer = true;
         }
       } catch (e) {
-        debugPrint('CallManager: Error checking pending accept action: $e');
+        debugLog('CallManager: Error checking pending accept action: $e');
       }
 
       // 同时检查系统中是否有活跃的 CallKit 通话记录
       try {
         final activeCalls = await _notificationService.getActiveCalls();
         if (activeCalls.isNotEmpty) {
-          debugPrint('CallManager: ${activeCalls.length} active CallKit call(s) found '
+          debugLog('CallManager: ${activeCalls.length} active CallKit call(s) found '
               'after initialization — awaiting Matrix sync to deliver invite');
         }
       } catch (e) {
-        debugPrint('CallManager: Error checking active calls: $e');
+        debugLog('CallManager: Error checking active calls: $e');
       }
     }));
   }
@@ -153,7 +154,7 @@ class CallManager {
     _config.turnUsername = username;
     _config.turnPassword = password;
     if (ttl != null) _config.turnTtl = ttl;
-    debugPrint('CallManager: TURN configured with ${uris.length} URIs');
+    debugLog('CallManager: TURN configured with ${uris.length} URIs');
   }
   
   /// 配置 LiveKit
@@ -257,17 +258,17 @@ class CallManager {
   
   /// 接听来电
   Future<bool> answerCall() async {
-    debugPrint('CallManager: answerCall called');
-    debugPrint('CallManager: _isInitialized=$_isInitialized, _webRTCService=${_webRTCService != null ? "exists" : "null"}');
+    debugLog('CallManager: answerCall called');
+    debugLog('CallManager: _isInitialized=$_isInitialized, _webRTCService=${_webRTCService != null ? "exists" : "null"}');
 
     if (_webRTCService == null) {
-      debugPrint('CallManager: ERROR - webRTCService is null in answerCall');
+      debugLog('CallManager: ERROR - webRTCService is null in answerCall');
       return false;
     }
 
     final state = _webRTCService!.state;
     final session = _webRTCService!.currentSession;
-    debugPrint('CallManager: current state=$state, session=${session != null ? "exists (callId=${session.callId})" : "null"}');
+    debugLog('CallManager: current state=$state, session=${session != null ? "exists (callId=${session.callId})" : "null"}');
 
     // 清除锁屏接听标志（用户已主动接听）
     _pendingAnswer = false;
@@ -276,7 +277,7 @@ class CallManager {
     await _notificationService.endAllCalls();
 
     final success = await _webRTCService!.answerCall();
-    debugPrint('CallManager: answerCall result=$success');
+    debugLog('CallManager: answerCall result=$success');
     if (success) {
       _navigateToCallScreen(isIncoming: true, session: session);
     }
@@ -384,7 +385,7 @@ class CallManager {
   
   void _handleIncomingCall(CallSession session) async {
     try {
-    debugPrint('CallManager: Incoming call from ${session.peerName}');
+    debugLog('CallManager: Incoming call from ${session.peerName}');
 
     // 设置活跃房间，禁用该房间的消息通知
     N42Chat.pushService?.setActiveRoom(session.roomId);
@@ -395,7 +396,7 @@ class CallManager {
     // 用户在锁屏/通知栏点击接听，但 Matrix 邀请此时才到达时，自动接听
     if (_pendingAnswer) {
       _pendingAnswer = false;
-      debugPrint('CallManager: Auto-answering call (user tapped Accept before Matrix invite arrived)');
+      debugLog('CallManager: Auto-answering call (user tapped Accept before Matrix invite arrived)');
       // 清除 CallKit 通知
       await _notificationService.endAllCalls();
       // 直接接听
@@ -403,7 +404,7 @@ class CallManager {
       if (success) {
         _navigateToCallScreen(isIncoming: true, session: session);
       } else {
-        debugPrint('CallManager: Auto-answer failed, falling through to show incoming screen');
+        debugLog('CallManager: Auto-answer failed, falling through to show incoming screen');
         _navigateToCallScreen(isIncoming: true, session: session);
       }
       onIncomingCall?.call(session);
@@ -417,7 +418,7 @@ class CallManager {
       final activeCalls = await _notificationService.getActiveCalls();
       alreadyShowing = activeCalls.isNotEmpty;
     } catch (e) {
-      debugPrint('CallManager: Failed to check active calls: $e');
+      debugLog('CallManager: Failed to check active calls: $e');
     }
 
     if (!alreadyShowing) {
@@ -440,7 +441,7 @@ class CallManager {
         missedCallChannelName: l10n?.callMissedCall ?? 'Missed call',
       );
     } else {
-      debugPrint('CallManager: CallKit already showing from background push, skipping duplicate');
+      debugLog('CallManager: CallKit already showing from background push, skipping duplicate');
     }
 
     // 直接导航到来电界面（如果应用在前台）
@@ -448,12 +449,12 @@ class CallManager {
 
     onIncomingCall?.call(session);
     } catch (e, stack) {
-      debugPrint('CallManager: Error handling incoming call: $e\n$stack');
+      debugLog('CallManager: Error handling incoming call: $e\n$stack');
     }
   }
   
   void _handleCallStateChanged(CallState state) {
-    debugPrint('CallManager: Call state changed to $state');
+    debugLog('CallManager: Call state changed to $state');
 
     if (state == CallState.connected) {
       final callKitId = _notificationService.currentCallId;
@@ -462,7 +463,7 @@ class CallManager {
       }
       // 确保通话界面已显示
       if (!_isCallScreenShowing) {
-        debugPrint('CallManager: Call connected but screen not showing, navigating now');
+        debugLog('CallManager: Call connected but screen not showing, navigating now');
         _navigateToCallScreen();
       }
     } else if (state == CallState.ended || state == CallState.failed) {
@@ -516,15 +517,15 @@ class CallManager {
   }
   
   void _navigateToCallScreen({bool isIncoming = false, CallSession? session, int retryCount = 0}) {
-    debugPrint('CallManager: _navigateToCallScreen called, isIncoming=$isIncoming, _isCallScreenShowing=$_isCallScreenShowing, retry=$retryCount');
+    debugLog('CallManager: _navigateToCallScreen called, isIncoming=$isIncoming, _isCallScreenShowing=$_isCallScreenShowing, retry=$retryCount');
 
     if (_isCallScreenShowing) {
-      debugPrint('CallManager: Call screen already showing, skipping navigation');
+      debugLog('CallManager: Call screen already showing, skipping navigation');
       return;
     }
 
     if (_navigatorKey == null) {
-      debugPrint('CallManager: ERROR - navigatorKey is null! Did you call N42Chat.setNavigatorKey()?');
+      debugLog('CallManager: ERROR - navigatorKey is null! Did you call N42Chat.setNavigatorKey()?');
       return;
     }
 
@@ -533,7 +534,7 @@ class CallManager {
       // App 冷启动时 context 可能暂时为 null，重试最多 10 次（间隔 1s，共等待约 10s）
       // 覆盖 app 从锁屏/killed 状态启动后 UI 就绪所需的时间
       if (retryCount < 10) {
-        debugPrint('CallManager: Context null, retrying in 1s (attempt ${retryCount + 1}/10)');
+        debugLog('CallManager: Context null, retrying in 1s (attempt ${retryCount + 1}/10)');
         Future.delayed(const Duration(seconds: 1), () {
           if (_isInitialized) {
             _navigateToCallScreen(
@@ -542,21 +543,21 @@ class CallManager {
               retryCount: retryCount + 1,
             );
           } else {
-            debugPrint('CallManager: Retry cancelled - CallManager was disposed');
+            debugLog('CallManager: Retry cancelled - CallManager was disposed');
           }
         });
       } else {
-        debugPrint('CallManager: ERROR - navigatorKey.currentContext still null after 10 retries (10s)');
+        debugLog('CallManager: ERROR - navigatorKey.currentContext still null after 10 retries (10s)');
       }
       return;
     }
 
     if (_webRTCService == null) {
-      debugPrint('CallManager: ERROR - webRTCService is null!');
+      debugLog('CallManager: ERROR - webRTCService is null!');
       return;
     }
 
-    debugPrint('CallManager: Navigating to CallScreen');
+    debugLog('CallManager: Navigating to CallScreen');
     _isCallScreenShowing = true;
 
     Navigator.of(context).push(
@@ -568,7 +569,7 @@ class CallManager {
         ),
       ),
     ).then((_) {
-      debugPrint('CallManager: CallScreen closed');
+      debugLog('CallManager: CallScreen closed');
       _isCallScreenShowing = false;
     });
   }
@@ -605,7 +606,7 @@ class CallManager {
     _isCallScreenShowing = false;
     _pendingAnswer = false;
     _isInitialized = false;
-    debugPrint('CallManager: Disposed');
+    debugLog('CallManager: Disposed');
   }
 }
 

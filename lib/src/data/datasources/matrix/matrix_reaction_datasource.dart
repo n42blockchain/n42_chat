@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'matrix_client_manager.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// Matrix消息反应数据源
 class MatrixReactionDataSource {
@@ -170,21 +170,21 @@ class MatrixReactionDataSource {
     String eventId, {
     String? reason,
   }) async {
-    debugPrint('MatrixReactionDataSource: redactMessage called - roomId=$roomId, eventId=$eventId, reason=$reason');
+    debugLog('MatrixReactionDataSource: redactMessage called - roomId=$roomId, eventId=$eventId, reason=$reason');
 
     final room = _client?.getRoomById(roomId);
     if (room == null) {
-      debugPrint('MatrixReactionDataSource: Room not found: $roomId');
+      debugLog('MatrixReactionDataSource: Room not found: $roomId');
       throw Exception('Room not found');
     }
 
     try {
-      debugPrint('MatrixReactionDataSource: Calling room.redactEvent...');
+      debugLog('MatrixReactionDataSource: Calling room.redactEvent...');
       final result = await room.redactEvent(eventId, reason: reason);
-      debugPrint('MatrixReactionDataSource: redactEvent completed, result=$result');
+      debugLog('MatrixReactionDataSource: redactEvent completed, result=$result');
     } catch (e, stackTrace) {
-      debugPrint('MatrixReactionDataSource: redactEvent failed: $e');
-      debugPrint('MatrixReactionDataSource: Stack: $stackTrace');
+      debugLog('MatrixReactionDataSource: redactEvent failed: $e');
+      debugLog('MatrixReactionDataSource: Stack: $stackTrace');
       rethrow;
     }
   }
@@ -345,7 +345,7 @@ class MatrixReactionDataSource {
       entries.sort((a, b) => a.editedAt.compareTo(b.editedAt));
       return entries;
     } catch (e) {
-      debugPrint('MatrixReactionDataSource: getEditHistory error: $e');
+      debugLog('MatrixReactionDataSource: getEditHistory error: $e');
       return [];
     }
   }

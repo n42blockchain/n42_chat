@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 语音转文字回调
 typedef VoiceToTextCallback = Future<String?> Function(String voiceUrl);
@@ -124,7 +125,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
   }
 
   void _handleTap() {
-    debugPrint('VoiceMessageWidget: _handleTap called, voiceUrl=${widget.voiceUrl}, isSelf=${widget.isSelf}');
+    debugLog('VoiceMessageWidget: _handleTap called, voiceUrl=${widget.voiceUrl}, isSelf=${widget.isSelf}');
     
     if (widget.onTap != null) {
       widget.onTap!();
@@ -133,7 +134,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
     
     // 默认播放逻辑
     if (widget.voiceUrl == null || widget.voiceUrl!.isEmpty) {
-      debugPrint('VoiceMessageWidget: voiceUrl is null or empty, cannot play');
+      debugLog('VoiceMessageWidget: voiceUrl is null or empty, cannot play');
       // 提示用户
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -145,10 +146,10 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
     }
     
     if (_isPlaying) {
-      debugPrint('VoiceMessageWidget: stopping playback');
+      debugLog('VoiceMessageWidget: stopping playback');
       _voiceService.stop();
     } else {
-      debugPrint('VoiceMessageWidget: starting playback: ${widget.voiceUrl}');
+      debugLog('VoiceMessageWidget: starting playback: ${widget.voiceUrl}');
       _voiceService.play(widget.voiceUrl!);
     }
   }

@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '../../data/datasources/local/archive_database.dart';
+import '../utils/debug_log.dart';
 
 /// 归档导入结果
 class ImportResult {
@@ -90,7 +91,7 @@ class ArchiveIntegrityService {
         ? 1.0 - (compressed.length / rawBytes.length)
         : 0.0;
 
-    debugPrint(
+    debugLog(
       'ArchiveIntegrityService: Exported Q$quarter - '
       '${messages.length} messages, '
       '${rawBytes.length} → ${compressed.length} bytes '
@@ -161,7 +162,7 @@ class ArchiveIntegrityService {
             companions.add(companion);
           }
         } catch (e) {
-          debugPrint('ArchiveIntegrityService: Failed to parse line: $e');
+          debugLog('ArchiveIntegrityService: Failed to parse line: $e');
         }
       }
 
@@ -176,7 +177,7 @@ class ArchiveIntegrityService {
       // 批量插入
       final inserted = await _db.insertMessages(companions);
 
-      debugPrint(
+      debugLog(
         'ArchiveIntegrityService: Imported $inserted messages '
         'from ${compressedFile.path}',
       );
@@ -280,7 +281,7 @@ class ArchiveIntegrityService {
         archivedAt: Value(DateTime.now()),
       );
     } catch (e) {
-      debugPrint('ArchiveIntegrityService: Deserialize error: $e');
+      debugLog('ArchiveIntegrityService: Deserialize error: $e');
       return null;
     }
   }

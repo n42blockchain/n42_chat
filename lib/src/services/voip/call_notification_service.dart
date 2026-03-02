@@ -6,13 +6,13 @@ library;
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_callkit_incoming/entities/android_params.dart';
 import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
 import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/entities/notification_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:uuid/uuid.dart';
+import '../../core/utils/debug_log.dart';
 
 /// 来电动作类型
 enum CallAction {
@@ -64,7 +64,7 @@ class CallNotificationService {
   /// action_call_accept 事件（用户在通知中点击接听但 Flutter 引擎尚未就绪的情况）
   CallNotificationService._internal() {
     FlutterCallkitIncoming.onEvent.listen(_handleCallKitEvent);
-    debugPrint('CallNotificationService: Event listener attached in constructor');
+    debugLog('CallNotificationService: Event listener attached in constructor');
   }
 
   final _uuid = const Uuid();
@@ -93,7 +93,7 @@ class CallNotificationService {
     _pendingAcceptTime = null;
     if (action == null || time == null) return null;
     if (DateTime.now().difference(time) > _kPendingActionTtl) {
-      debugPrint('CallNotificationService: Pending accept action expired (TTL exceeded)');
+      debugLog('CallNotificationService: Pending accept action expired (TTL exceeded)');
       return null;
     }
     return action;
@@ -101,7 +101,7 @@ class CallNotificationService {
 
   /// 初始化（事件监听已在构造函数中设置，此处仅作日志标记）
   Future<void> initialize() async {
-    debugPrint('CallNotificationService: Initialized (listener was attached in constructor)');
+    debugLog('CallNotificationService: Initialized (listener was attached in constructor)');
   }
   
   /// 处理 CallKit 事件
@@ -109,7 +109,7 @@ class CallNotificationService {
     if (event == null) return;
     
     final eventName = event.event as String?;
-    debugPrint('CallNotificationService: Event - $eventName');
+    debugLog('CallNotificationService: Event - $eventName');
     
     final body = event.body;
     if (body == null) return;
@@ -117,29 +117,29 @@ class CallNotificationService {
     final callInfo = IncomingCallInfo.fromMap(body as Map<String, dynamic>);
     
     if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_incoming') {
-      debugPrint('CallNotificationService: Incoming call from ${callInfo.callerName}');
+      debugLog('CallNotificationService: Incoming call from ${callInfo.callerName}');
     } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_accept') {
-      debugPrint('CallNotificationService: Call accepted by user');
+      debugLog('CallNotificationService: Call accepted by user');
       // 同时存入缓存，防止 CallManager 尚未初始化时事件丢失
       _pendingAcceptAction = (CallAction.accept, callInfo);
       _pendingAcceptTime = DateTime.now();
       _callActionController.add((CallAction.accept, callInfo));
     } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_decline') {
-      debugPrint('CallNotificationService: Call declined');
+      debugLog('CallNotificationService: Call declined');
       _callActionController.add((CallAction.decline, callInfo));
       _currentCallId = null;
     } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_timeout') {
-      debugPrint('CallNotificationService: Call timeout');
+      debugLog('CallNotificationService: Call timeout');
       _callActionController.add((CallAction.timeout, callInfo));
       _currentCallId = null;
     } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_callback') {
-      debugPrint('CallNotificationService: Callback');
+      debugLog('CallNotificationService: Callback');
       _callActionController.add((CallAction.callback, callInfo));
     } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_ended') {
-      debugPrint('CallNotificationService: Call ended');
+      debugLog('CallNotificationService: Call ended');
       _currentCallId = null;
     } else if (eventName == 'com.hiennv.flutter_callkit_incoming.action_call_start') {
-      debugPrint('CallNotificationService: Call started');
+      debugLog('CallNotificationService: Call started');
     }
   }
   
@@ -219,7 +219,7 @@ class CallNotificationService {
     
     await FlutterCallkitIncoming.showCallkitIncoming(params);
     
-    debugPrint('CallNotificationService: Showing incoming call $callId from $callerName');
+    debugLog('CallNotificationService: Showing incoming call $callId from $callerName');
     
     return callId;
   }
@@ -264,7 +264,7 @@ class CallNotificationService {
 
     await FlutterCallkitIncoming.startCall(params);
     
-    debugPrint('CallNotificationService: Starting outgoing call $callId to $calleeName');
+    debugLog('CallNotificationService: Starting outgoing call $callId to $calleeName');
     
     return callId;
   }
@@ -272,21 +272,21 @@ class CallNotificationService {
   /// 更新通话状态为已连接
   Future<void> setCallConnected(String callId) async {
     await FlutterCallkitIncoming.setCallConnected(callId);
-    debugPrint('CallNotificationService: Call $callId connected');
+    debugLog('CallNotificationService: Call $callId connected');
   }
   
   /// 结束通话
   Future<void> endCall(String callId) async {
     await FlutterCallkitIncoming.endCall(callId);
     _currentCallId = null;
-    debugPrint('CallNotificationService: Call $callId ended');
+    debugLog('CallNotificationService: Call $callId ended');
   }
   
   /// 结束所有通话
   Future<void> endAllCalls() async {
     await FlutterCallkitIncoming.endAllCalls();
     _currentCallId = null;
-    debugPrint('CallNotificationService: All calls ended');
+    debugLog('CallNotificationService: All calls ended');
   }
   
   /// 获取当前活动通话
@@ -331,13 +331,13 @@ class CallNotificationService {
     );
     
     await FlutterCallkitIncoming.showMissCallNotification(params);
-    debugPrint('CallNotificationService: Showing missed call from $callerName');
+    debugLog('CallNotificationService: Showing missed call from $callerName');
   }
   
   /// 清除未接来电通知
   Future<void> clearMissedCalls() async {
     // 实现清除未接来电通知的逻辑
-    debugPrint('CallNotificationService: Cleared missed calls');
+    debugLog('CallNotificationService: Cleared missed calls');
   }
   
   /// 释放资源

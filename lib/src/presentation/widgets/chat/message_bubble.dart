@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import 'markdown_message_widget.dart';
 import 'message_status_indicator.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 消息气泡组件
 ///
@@ -184,7 +185,7 @@ class MessageBubble extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           color: AppColors.placeholder,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(4),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.08),
@@ -203,7 +204,7 @@ class MessageBubble extends StatelessWidget {
                 httpHeaders: headers,
                 placeholder: (context, url) => _buildDefaultAvatar(),
                 errorWidget: (context, url, error) {
-                  debugPrint('MessageBubble: Failed to load avatar: $url, error: $error');
+                  debugLog('MessageBubble: Failed to load avatar: $url, error: $error');
                   return _buildDefaultAvatar();
                 },
               )

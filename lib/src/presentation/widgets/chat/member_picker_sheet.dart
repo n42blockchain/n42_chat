@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/repositories/group_repository.dart';
+import '../../../core/utils/debug_log.dart';
 
 class MemberPickerSheet extends StatefulWidget {
   final String roomId;
@@ -54,7 +55,7 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint('Error loading members: $e');
+      debugLog('Error loading members: $e');
       setState(() => _isLoading = false);
     }
   }

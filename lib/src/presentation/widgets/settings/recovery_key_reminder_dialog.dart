@@ -6,6 +6,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../pages/settings/security_settings_page.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 恢复密钥提醒 Banner
 ///
@@ -76,7 +77,7 @@ class _RecoveryKeyReminderBannerState
         });
       }
     } catch (e) {
-      debugPrint('RecoveryKeyReminderBanner: Failed to check backup: $e');
+      debugLog('RecoveryKeyReminderBanner: Failed to check backup: $e');
       if (mounted) setState(() => _checked = true);
     }
   }

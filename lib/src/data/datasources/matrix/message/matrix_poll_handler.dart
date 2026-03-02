@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../matrix_client_manager.dart';
+import '../../../../core/utils/debug_log.dart';
 
 /// Matrix 投票操作处理器
 ///
@@ -24,7 +24,7 @@ class MatrixPollHandler {
   }) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) {
-      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      debugLog('MatrixMessageDataSource: Room not found: $roomId');
       return null;
     }
 
@@ -61,10 +61,10 @@ class MatrixPollHandler {
         type: 'org.matrix.msc3381.poll.start',
       );
 
-      debugPrint('MatrixMessageDataSource: Poll sent successfully: $eventId');
+      debugLog('MatrixMessageDataSource: Poll sent successfully: $eventId');
       return eventId;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to send poll: $e');
+      debugLog('MatrixMessageDataSource: Failed to send poll: $e');
       rethrow;
     }
   }
@@ -83,7 +83,7 @@ class MatrixPollHandler {
   }) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) {
-      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      debugLog('MatrixMessageDataSource: Room not found: $roomId');
       return null;
     }
 
@@ -137,10 +137,10 @@ class MatrixPollHandler {
         type: 'org.matrix.msc3381.poll.start',
       );
 
-      debugPrint('MatrixMessageDataSource: Forwarded poll snapshot sent: $eventId');
+      debugLog('MatrixMessageDataSource: Forwarded poll snapshot sent: $eventId');
       return eventId;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to send forwarded poll: $e');
+      debugLog('MatrixMessageDataSource: Failed to send forwarded poll: $e');
       rethrow;
     }
   }
@@ -155,7 +155,7 @@ class MatrixPollHandler {
   }) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) {
-      debugPrint('MatrixMessageDataSource: Room not found: $roomId');
+      debugLog('MatrixMessageDataSource: Room not found: $roomId');
       return false;
     }
 
@@ -176,10 +176,10 @@ class MatrixPollHandler {
         type: 'org.matrix.msc3381.poll.response',
       );
 
-      debugPrint('MatrixMessageDataSource: Vote submitted successfully');
+      debugLog('MatrixMessageDataSource: Vote submitted successfully');
       return true;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to vote: $e');
+      debugLog('MatrixMessageDataSource: Failed to vote: $e');
       return false;
     }
   }
@@ -206,7 +206,7 @@ class MatrixPollHandler {
 
       return true;
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to end poll: $e');
+      debugLog('MatrixMessageDataSource: Failed to end poll: $e');
       return false;
     }
   }
@@ -263,7 +263,7 @@ class MatrixPollHandler {
         'reactions': reactions,
       };
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to get reaction aggregations: $e');
+      debugLog('MatrixMessageDataSource: Failed to get reaction aggregations: $e');
       return null;
     }
   }
@@ -351,7 +351,7 @@ class MatrixPollHandler {
         return answers != null && answers.isNotEmpty;
       }).length;
 
-      debugPrint('MatrixMessageDataSource: Poll $pollEventId - voteCounts: $voteCounts, totalVoters: $totalVoters, myVotes: $myVotes');
+      debugLog('MatrixMessageDataSource: Poll $pollEventId - voteCounts: $voteCounts, totalVoters: $totalVoters, myVotes: $myVotes');
 
       return {
         'voteCounts': voteCounts,
@@ -360,7 +360,7 @@ class MatrixPollHandler {
         'pollEnded': pollEnded,
       };
     } catch (e) {
-      debugPrint('MatrixMessageDataSource: Failed to get poll aggregations: $e');
+      debugLog('MatrixMessageDataSource: Failed to get poll aggregations: $e');
       return null;
     }
   }

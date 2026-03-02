@@ -5,6 +5,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
+import '../../../core/utils/debug_log.dart';
 
 class ContactCardSelectSheet extends StatefulWidget {
   final bool isDark;
@@ -45,7 +46,7 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
         });
       }
     } catch (e) {
-      debugPrint('Failed to load contacts: $e');
+      debugLog('Failed to load contacts: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;

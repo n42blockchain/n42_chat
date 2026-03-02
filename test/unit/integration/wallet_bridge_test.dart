@@ -5,6 +5,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/src/integration/wallet_bridge.dart';
+import '../../mocks/mock_wallet_bridge.dart';
 
 void main() {
   // ─────────────────────────────────────────────────

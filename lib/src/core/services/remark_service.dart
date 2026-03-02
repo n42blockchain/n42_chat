@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 
 import '../../data/datasources/local/preferences_datasource.dart';
 import '../di/injection.dart';
+import '../utils/debug_log.dart';
 
 /// 全局备注名服务
 /// 
@@ -41,9 +41,9 @@ class RemarkService {
       _remarkCache.clear();
       _remarkCache.addAll(remarks);
       _initialized = true;
-      debugPrint('RemarkService: Initialized with ${_remarkCache.length} remarks');
+      debugLog('RemarkService: Initialized with ${_remarkCache.length} remarks');
     } catch (e) {
-      debugPrint('RemarkService: Failed to initialize - $e');
+      debugLog('RemarkService: Failed to initialize - $e');
     }
   }
   
@@ -77,13 +77,13 @@ class RemarkService {
         _remarkCache[userId] = remark;
       }
       
-      debugPrint('RemarkService: Set remark for $userId to "$remark"');
+      debugLog('RemarkService: Set remark for $userId to "$remark"');
       
       // 发出备注更新事件
       _remarkUpdateController.add(RemarkUpdateEvent(userId: userId, remark: remark));
-      debugPrint('RemarkService: Emitted RemarkUpdateEvent');
+      debugLog('RemarkService: Emitted RemarkUpdateEvent');
     } catch (e) {
-      debugPrint('RemarkService: Failed to set remark - $e');
+      debugLog('RemarkService: Failed to set remark - $e');
     }
   }
   

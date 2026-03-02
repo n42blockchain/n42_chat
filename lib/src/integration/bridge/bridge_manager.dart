@@ -6,6 +6,7 @@ import 'package:matrix/matrix.dart' as matrix;
 import 'bridge_bot_service.dart';
 import 'bridge_platform.dart';
 import 'bridge_state.dart';
+import '../../core/utils/debug_log.dart';
 
 /// High-level manager for all Mautrix bridge connections.
 ///
@@ -87,7 +88,7 @@ class BridgeManager {
     );
 
     _initialized = true;
-    debugPrint('BridgeManager: Initialized with ${availableBridges.length} available bridges');
+    debugLog('BridgeManager: Initialized with ${availableBridges.length} available bridges');
   }
 
   /// Refresh the status of all connected bridges
@@ -97,7 +98,7 @@ class BridgeManager {
       try {
         await _botService.queryStatus(state.platform);
       } catch (e) {
-        debugPrint('BridgeManager: Failed to refresh ${state.platform}: $e');
+        debugLog('BridgeManager: Failed to refresh ${state.platform}: $e');
       }
     }
   }

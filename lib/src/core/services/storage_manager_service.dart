@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../data/datasources/matrix/matrix_client_manager.dart';
+import '../utils/debug_log.dart';
 
 /// 存储使用信息
 class StorageInfo {
@@ -139,7 +139,7 @@ class StorageManagerService {
       _cacheTimestamp = DateTime.now();
       return info;
     } catch (e) {
-      debugPrint('StorageManagerService: Failed to get storage usage: $e');
+      debugLog('StorageManagerService: Failed to get storage usage: $e');
       return const StorageInfo();
     }
   }
@@ -169,13 +169,13 @@ class StorageManagerService {
               await entity.delete(recursive: true);
             }
           } catch (e) {
-            debugPrint('StorageManagerService: Failed to delete ${entity.path}: $e');
+            debugLog('StorageManagerService: Failed to delete ${entity.path}: $e');
           }
         }
       }
       invalidateCache();
     } catch (e) {
-      debugPrint('StorageManagerService: Failed to clear cache: $e');
+      debugLog('StorageManagerService: Failed to clear cache: $e');
     }
   }
 
@@ -187,10 +187,10 @@ class StorageManagerService {
       if (roomCacheDir.existsSync()) {
         await roomCacheDir.delete(recursive: true);
         invalidateCache();
-        debugPrint('StorageManagerService: Cleared media cache for $roomId');
+        debugLog('StorageManagerService: Cleared media cache for $roomId');
       }
     } catch (e) {
-      debugPrint('StorageManagerService: Failed to clear room media for $roomId: $e');
+      debugLog('StorageManagerService: Failed to clear room media for $roomId: $e');
     }
   }
 
@@ -235,14 +235,14 @@ class StorageManagerService {
             try {
               await entity.delete();
             } catch (e) {
-              debugPrint('StorageManagerService: Failed to delete file: $e');
+              debugLog('StorageManagerService: Failed to delete file: $e');
             }
           }
         }
       }
       invalidateCache();
     } catch (e) {
-      debugPrint(
+      debugLog(
           'StorageManagerService: Failed to clear room media by category: $e');
     }
   }
@@ -267,14 +267,14 @@ class StorageManagerService {
             try {
               await entity.delete();
             } catch (e) {
-              debugPrint('StorageManagerService: Failed to delete file: $e');
+              debugLog('StorageManagerService: Failed to delete file: $e');
             }
           }
         }
       }
       invalidateCache();
     } catch (e) {
-      debugPrint(
+      debugLog(
           'StorageManagerService: Failed to clear old media: $e');
     }
   }
@@ -324,7 +324,7 @@ class StorageManagerService {
       results.sort((a, b) => b.totalSize.compareTo(a.totalSize));
       return results;
     } catch (e) {
-      debugPrint('StorageManagerService: Failed to scan room storage: $e');
+      debugLog('StorageManagerService: Failed to scan room storage: $e');
       return [];
     }
   }
@@ -338,7 +338,7 @@ class StorageManagerService {
         }
       }
     } catch (e) {
-      debugPrint('StorageManagerService: Failed to calculate directory size: $e');
+      debugLog('StorageManagerService: Failed to calculate directory size: $e');
     }
     return size;
   }

@@ -14,6 +14,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../services/voip/call_manager.dart';
 import '../../../services/voip/webrtc_service.dart';
 import '../../widgets/common/n42_avatar.dart';
+import '../../../core/utils/debug_log.dart';
 
 /// 通话页面
 class CallScreen extends StatefulWidget {
@@ -136,7 +137,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       try {
         Helper.setSpeakerphoneOn(false);
       } catch (e) {
-        debugPrint('CallScreen: Failed to set initial audio route: $e');
+        debugLog('CallScreen: Failed to set initial audio route: $e');
       }
     } else if (state == CallState.ended || state == CallState.failed) {
       // 延迟关闭页面

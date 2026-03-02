@@ -112,7 +112,7 @@ extension ChatBlocMessageHandlers on ChatBloc {
           }
         }
       } catch (e) {
-        debugPrint('ChatBloc: Failed to load poll aggregations for ${pollMsg.id}: $e');
+        debugLog('ChatBloc: Failed to load poll aggregations for ${pollMsg.id}: $e');
       }
     }
 
@@ -145,7 +145,7 @@ extension ChatBlocMessageHandlers on ChatBloc {
           );
           return (msg.id, aggregations);
         } catch (e) {
-          debugPrint('ChatBloc: Failed to load reaction aggregations for ${msg.id}: $e');
+          debugLog('ChatBloc: Failed to load reaction aggregations for ${msg.id}: $e');
           return (msg.id, null);
         }
       });
@@ -232,7 +232,7 @@ extension ChatBlocMessageHandlers on ChatBloc {
         }
       },
       onError: (Object error) {
-        debugPrint('ChatBloc: Messages stream error: $error');
+        debugLog('ChatBloc: Messages stream error: $error');
       },
     );
   }

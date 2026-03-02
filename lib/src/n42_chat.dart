@@ -18,8 +18,10 @@ import 'core/di/injection.dart';
 import 'core/utils/date_utils.dart';
 import 'domain/entities/conversation_entity.dart';
 import 'domain/entities/user_entity.dart';
+import 'core/router/app_router.dart';
 import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/conversation_repository.dart';
+import 'domain/repositories/group_repository.dart';
 import 'core/services/chat_lock_service.dart';
 import 'presentation/blocs/chat/chat_bloc.dart';
 import 'presentation/blocs/contact/contact_bloc.dart';
@@ -34,6 +36,7 @@ import 'presentation/pages/auth/welcome_page.dart';
 import 'presentation/pages/main/chat_main_page.dart';
 import 'presentation/pages/profile/profile_page.dart';
 import 'presentation/pages/settings/change_email_page.dart' as chat_settings;
+import 'core/utils/debug_log.dart';
 
 /// N42 Chat 模块主入口类
 ///
@@ -92,7 +95,7 @@ class N42Chat {
   static Timer? _turnRefreshTimer;
 
   /// 用户变化流控制器
-  static final StreamController<UserEntity?> _userStreamController =
+  static StreamController<UserEntity?> _userStreamController =
       StreamController<UserEntity?>.broadcast();
 
   /// 用户变化流
@@ -111,7 +114,7 @@ class N42Chat {
   static void notifyUserChanged() {
     final user = currentUser;
     _userStreamController.add(user);
-    debugPrint('N42Chat: User changed notification - ${user?.displayName}');
+    debugLog('N42Chat: User changed notification - ${user?.displayName}');
   }
 
   /// 获取当前配置
@@ -152,7 +155,7 @@ class N42Chat {
       for (final listener in _themeListeners) {
         listener(mode);
       }
-      debugPrint('N42Chat: Theme mode changed to $mode');
+      debugLog('N42Chat: Theme mode changed to $mode');
     }
   }
 
@@ -190,7 +193,7 @@ class N42Chat {
       for (final listener in _localeListeners) {
         listener(locale);
       }
-      debugPrint('N42Chat: Locale changed to $locale');
+      debugLog('N42Chat: Locale changed to $locale');
     }
   }
 
@@ -232,12 +235,12 @@ class N42Chat {
   /// ```
   static Future<void> initialize(N42ChatConfig config) async {
     if (_initialized) {
-      debugPrint('N42Chat: Already initialized');
+      debugLog('N42Chat: Already initialized');
       return;
     }
     // 防止并发调用：第二次调用等待第一次完成
     if (_initCompleter != null) {
-      debugPrint('N42Chat: Initialization in progress, waiting...');
+      debugLog('N42Chat: Initialization in progress, waiting...');
       return _initCompleter!.future;
     }
     _initCompleter = Completer<void>();
@@ -245,9 +248,14 @@ class N42Chat {
     try {
     _config = config;
 
+    // 重建用户变化流（dispose 后 controller 已关闭，需要新实例）
+    if (_userStreamController.isClosed) {
+      _userStreamController = StreamController<UserEntity?>.broadcast();
+    }
+
     // 如果之前初始化中途失败，GetIt 可能已有部分注册，需要先重置
     if (getIt.isRegistered<N42ChatConfig>()) {
-      debugPrint('N42Chat: Resetting previous partial initialization');
+      debugLog('N42Chat: Resetting previous partial initialization');
       await resetDependencies();
     }
 
@@ -263,7 +271,7 @@ class N42Chat {
     // 不阻塞主初始化流程：FCM token 获取在无 GMS 设备上可能耗时 60-90 秒
     if (config.enablePushNotifications) {
       unawaited(_initializePushService(config).catchError((Object e) {
-        debugPrint('N42Chat: Push service initialization failed in background: $e');
+        debugLog('N42Chat: Push service initialization failed in background: $e');
       }));
     }
 
@@ -271,21 +279,21 @@ class N42Chat {
     try {
       final clientManager = getIt<MatrixClientManager>();
       if (clientManager.client?.isLogged() == true) {
-        debugPrint('N42Chat: Matrix client is logged in, initializing call manager');
+        debugLog('N42Chat: Matrix client is logged in, initializing call manager');
         await initializeCallManager();
       }
     } catch (e) {
-      debugPrint('N42Chat: Failed to check login status for call manager: $e');
+      debugLog('N42Chat: Failed to check login status for call manager: $e');
     }
 
     // 设置 Moment 房间邀请自动加入监听
     _setupMomentInviteListener();
 
     _initialized = true;
-    debugPrint('N42Chat: Initialized successfully');
+    debugLog('N42Chat: Initialized successfully');
     _initCompleter!.complete();
     } catch (e) {
-      debugPrint('N42Chat: Initialization failed, cleaning up: $e');
+      debugLog('N42Chat: Initialization failed, cleaning up: $e');
       // 清理已分配资源，使外部调用方可以重新初始化
       try {
         await _authBloc?.close();
@@ -316,7 +324,7 @@ class N42Chat {
       final clientManager = getIt<MatrixClientManager>();
       final client = clientManager.client;
       if (client == null) {
-        debugPrint('N42Chat: Client null, skipping moment invite listener setup');
+        debugLog('N42Chat: Client null, skipping moment invite listener setup');
         return;
       }
 
@@ -334,13 +342,13 @@ class N42Chat {
           final momentDataSource = getIt<MatrixMomentDataSource>();
           await momentDataSource.processMomentInvites();
         } catch (e) {
-          debugPrint('N42Chat: Moment invite processing error: $e');
+          debugLog('N42Chat: Moment invite processing error: $e');
         }
       });
 
-      debugPrint('N42Chat: Moment invite listener set up');
+      debugLog('N42Chat: Moment invite listener set up');
     } catch (e) {
-      debugPrint('N42Chat: Failed to setup moment invite listener: $e');
+      debugLog('N42Chat: Failed to setup moment invite listener: $e');
     }
   }
 
@@ -350,7 +358,7 @@ class N42Chat {
   static Future<void> _initializePushService(N42ChatConfig config) async {
     // 防止并发初始化：如果正在初始化中，等待完成
     if (_pushInitCompleter != null && !_pushInitCompleter!.isCompleted) {
-      debugPrint('N42Chat: Push service initialization already in progress, waiting...');
+      debugLog('N42Chat: Push service initialization already in progress, waiting...');
       await _pushInitCompleter!.future;
       // 如果等待后已初始化成功，直接返回
       if (_pushService != null) return;
@@ -368,11 +376,11 @@ class N42Chat {
       final client = clientManager.client;
 
       if (client == null) {
-        debugPrint('[PUSH_INIT] Matrix client not initialized, push service will be initialized on login');
+        debugLog('[PUSH_INIT] Matrix client not initialized, push service will be initialized on login');
         return;
       }
 
-      debugPrint('[PUSH_INIT] Creating push service with gateway: ${config.pushGatewayUrl}, appId: ${config.pushAppId}');
+      debugLog('[PUSH_INIT] Creating push service with gateway: ${config.pushGatewayUrl}, appId: ${config.pushAppId}');
 
       // 创建推送服务
       _pushService = FirebasePushService(
@@ -380,7 +388,7 @@ class N42Chat {
         pushGatewayUrl: config.pushGatewayUrl,
         appId: config.pushAppId,
         onNotificationTap: (roomId, eventId) {
-          debugPrint('[PUSH_TAP] Notification tapped - roomId: $roomId, eventId: $eventId');
+          debugLog('[PUSH_TAP] Notification tapped - roomId: $roomId, eventId: $eventId');
           _onNotificationTap?.call(roomId, eventId);
           // 如果有 roomId，导航到对应聊天
           if (roomId != null) {
@@ -391,16 +399,16 @@ class N42Chat {
 
       // 初始化（包括获取 FCM Token）
       await _pushService!.initialize();
-      debugPrint('[PUSH_INIT] Push service initialized, isLogged=${client.isLogged()}');
+      debugLog('[PUSH_INIT] Push service initialized, isLogged=${client.isLogged()}');
 
       // 如果已登录，立即注册推送
       if (client.isLogged()) {
         await _pushService!.registerForPush();
       }
 
-      debugPrint('[PUSH_INIT_OK] Push service ready (verified=${_pushService?.isPusherVerified})');
+      debugLog('[PUSH_INIT_OK] Push service ready (verified=${_pushService?.isPusherVerified})');
     } catch (e) {
-      debugPrint('[PUSH_INIT_FAIL] Failed to initialize push service: $e');
+      debugLog('[PUSH_INIT_FAIL] Failed to initialize push service: $e');
       // 初始化失败，清除 pushService 以允许后续重试
       _pushService = null;
     } finally {
@@ -434,26 +442,26 @@ class N42Chat {
   /// 登录成功后调用此方法注册推送。
   /// 如果推送服务正在初始化中（竞态），会等待初始化完成后再注册。
   static Future<void> registerPushNotifications() async {
-    debugPrint('[PUSH_CHAIN] registerPushNotifications called');
+    debugLog('[PUSH_CHAIN] registerPushNotifications called');
 
     // 等待正在进行的初始化完成
     if (_pushInitCompleter != null && !_pushInitCompleter!.isCompleted) {
-      debugPrint('[PUSH_CHAIN] Waiting for push service initialization to complete...');
+      debugLog('[PUSH_CHAIN] Waiting for push service initialization to complete...');
       await _pushInitCompleter!.future;
     }
 
     // 如果推送服务未初始化，尝试初始化（可能之前因 client 为 null 跳过）
     if (_pushService == null && _config != null && _config!.enablePushNotifications) {
-      debugPrint('[PUSH_CHAIN] Push service is null, attempting initialization...');
+      debugLog('[PUSH_CHAIN] Push service is null, attempting initialization...');
       await _initializePushService(_config!);
     }
 
     if (_pushService != null) {
-      debugPrint('[PUSH_CHAIN] Calling registerForPush...');
+      debugLog('[PUSH_CHAIN] Calling registerForPush...');
       await _pushService!.registerForPush();
-      debugPrint('[PUSH_CHAIN] registerForPush completed (verified=${_pushService!.isPusherVerified})');
+      debugLog('[PUSH_CHAIN] registerForPush completed (verified=${_pushService!.isPusherVerified})');
     } else {
-      debugPrint('[PUSH_CHAIN_FAIL] Cannot register push - push service is null '
+      debugLog('[PUSH_CHAIN_FAIL] Cannot register push - push service is null '
           '(config: ${_config != null}, enablePush: ${_config?.enablePushNotifications})');
     }
   }
@@ -476,7 +484,7 @@ class N42Chat {
       final client = clientManager.client;
 
       if (client == null) {
-        debugPrint('N42Chat: Matrix client not initialized, call manager will be initialized later');
+        debugLog('N42Chat: Matrix client not initialized, call manager will be initialized later');
         return;
       }
 
@@ -489,7 +497,7 @@ class N42Chat {
       // 配置 TURN 服务器（从 Matrix 服务器获取）
       try {
         final turnServers = await client.getTurnServer();
-        debugPrint('N42Chat: TURN servers response: ${turnServers.uris}');
+        debugLog('N42Chat: TURN servers response: ${turnServers.uris}');
         if (turnServers.uris.isNotEmpty) {
           _callManager!.configureTurn(
             uris: turnServers.uris,
@@ -498,20 +506,20 @@ class N42Chat {
             ttl: turnServers.ttl,
           );
           _scheduleTurnRefresh(client, turnServers.ttl);
-          debugPrint('N42Chat: TURN servers configured');
+          debugLog('N42Chat: TURN servers configured');
         } else {
-          debugPrint('N42Chat: No TURN servers available');
+          debugLog('N42Chat: No TURN servers available');
         }
       } catch (e) {
-        debugPrint('N42Chat: Failed to get TURN servers: $e');
+        debugLog('N42Chat: Failed to get TURN servers: $e');
       }
 
       // 从 well-known 获取 LiveKit 配置
       await _discoverLiveKitConfig(client);
 
-      debugPrint('N42Chat: Call manager initialized');
+      debugLog('N42Chat: Call manager initialized');
     } catch (e) {
-      debugPrint('N42Chat: Failed to initialize call manager: $e');
+      debugLog('N42Chat: Failed to initialize call manager: $e');
     }
   }
 
@@ -523,16 +531,16 @@ class N42Chat {
 
       // 获取 well-known 配置
       final wellKnownUrl = Uri.parse('${homeserver.origin}/.well-known/matrix/client');
-      debugPrint('N42Chat: Fetching well-known from $wellKnownUrl');
+      debugLog('N42Chat: Fetching well-known from $wellKnownUrl');
 
       final response = await client.httpClient.get(wellKnownUrl);
       if (response.statusCode != 200) {
-        debugPrint('N42Chat: Well-known request failed: ${response.statusCode}');
+        debugLog('N42Chat: Well-known request failed: ${response.statusCode}');
         return;
       }
 
       final wellKnown = jsonDecode(response.body) as Map<String, dynamic>;
-      debugPrint('N42Chat: Well-known response: $wellKnown');
+      debugLog('N42Chat: Well-known response: $wellKnown');
 
       // 检查 rtc_foci (Matrix VoIP focus 配置)
       // 格式参考: https://spec.matrix.org/latest/client-server-api/#mhomesserver
@@ -545,7 +553,7 @@ class N42Chat {
               // livekit_service_url 是 JWT 服务 URL，用于获取访问令牌
               final jwtServiceUrl = focus['livekit_service_url'] as String?;
               final liveKitAlias = focus['livekit_alias'] as String?;
-              debugPrint('N42Chat: Found LiveKit JWT service: $jwtServiceUrl, alias=$liveKitAlias');
+              debugLog('N42Chat: Found LiveKit JWT service: $jwtServiceUrl, alias=$liveKitAlias');
 
               if (jwtServiceUrl != null) {
                 // 保存 JWT URL
@@ -558,7 +566,7 @@ class N42Chat {
 
                 if (_callManager != null) {
                   _callManager!.configureLiveKit(url: wsUrl);
-                  debugPrint('N42Chat: LiveKit WebSocket configured: $wsUrl');
+                  debugLog('N42Chat: LiveKit WebSocket configured: $wsUrl');
                 }
                 break;
               }
@@ -574,16 +582,16 @@ class N42Chat {
         final jwtUrl = liveKitConfig['jwt_url'] as String?;
         if (wsUrl != null) {
           _callManager!.configureLiveKit(url: wsUrl);
-          debugPrint('N42Chat: LiveKit configured from n42.livekit: $wsUrl');
+          debugLog('N42Chat: LiveKit configured from n42.livekit: $wsUrl');
         }
         // 保存 JWT URL 供后续使用
         if (jwtUrl != null) {
           _liveKitJwtUrl = jwtUrl;
-          debugPrint('N42Chat: LiveKit JWT URL: $jwtUrl');
+          debugLog('N42Chat: LiveKit JWT URL: $jwtUrl');
         }
       }
     } catch (e) {
-      debugPrint('N42Chat: Failed to discover LiveKit config: $e');
+      debugLog('N42Chat: Failed to discover LiveKit config: $e');
     }
   }
 
@@ -605,7 +613,7 @@ class N42Chat {
       seconds: (ttl - 60).clamp(60, ttl),
     );
     _turnRefreshTimer = Timer(refreshAfter, () async {
-      debugPrint('N42Chat: Refreshing TURN credentials (TTL expiring)');
+      debugLog('N42Chat: Refreshing TURN credentials (TTL expiring)');
       try {
         final client = getIt<MatrixClientManager>().client;
         if (client == null || _callManager == null) return;
@@ -620,7 +628,7 @@ class N42Chat {
           _scheduleTurnRefresh(client, fresh.ttl);
         }
       } catch (e) {
-        debugPrint('N42Chat: TURN refresh failed: $e');
+        debugLog('N42Chat: TURN refresh failed: $e');
       }
     });
   }
@@ -659,11 +667,11 @@ class N42Chat {
   /// 当推送不工作时调用此方法尝试修复。
   /// 会清除之前的注册状态并重新执行整个注册流程。
   static Future<void> forceReRegisterPush() async {
-    debugPrint('[PUSH_FORCE] Force re-register push requested');
+    debugLog('[PUSH_FORCE] Force re-register push requested');
     if (_pushService != null) {
       await _pushService!.forceReRegister();
     } else {
-      debugPrint('[PUSH_FORCE] Push service is null, attempting full initialization...');
+      debugLog('[PUSH_FORCE] Push service is null, attempting full initialization...');
       if (_config != null && _config!.enablePushNotifications) {
         await _initializePushService(_config!);
       }
@@ -829,8 +837,7 @@ class N42Chat {
   /// ```
   static List<RouteBase> routes() {
     _ensureInitialized();
-    // TODO: 返回聊天相关路由
-    return [];
+    return N42ChatRouter.routes;
   }
 
   /// 使用用户名密码登录
@@ -926,8 +933,13 @@ class N42Chat {
   /// ```
   static Stream<int> get unreadCountStream {
     _ensureInitialized();
-    // TODO: 返回Matrix客户端的未读消息流
-    return const Stream<int>.empty();
+    try {
+      final repo = getIt<IConversationRepository>();
+      return repo.watchTotalUnreadCount();
+    } catch (e) {
+      debugLog('N42Chat: Failed to get unread count stream: $e');
+      return const Stream<int>.empty();
+    }
   }
 
   /// 打开指定会话
@@ -936,11 +948,11 @@ class N42Chat {
   /// [context] 可选的BuildContext，用于导航
   static Future<void> openConversation(String roomId, {BuildContext? context}) async {
     _ensureInitialized();
-    debugPrint('N42Chat: Open conversation - $roomId');
+    debugLog('N42Chat: Open conversation - $roomId');
 
     final ctx = context ?? _navigatorKey?.currentContext;
     if (ctx == null) {
-      debugPrint('N42Chat: No context available for navigation');
+      debugLog('N42Chat: No context available for navigation');
       return;
     }
 
@@ -954,12 +966,12 @@ class N42Chat {
           await repo.joinConversation(roomId);
           conversation = await repo.getConversationById(roomId);
         } catch (e) {
-          debugPrint('N42Chat: Failed to join room $roomId: $e');
+          debugLog('N42Chat: Failed to join room $roomId: $e');
         }
       }
 
       if (conversation == null) {
-        debugPrint('N42Chat: Conversation not found: $roomId');
+        debugLog('N42Chat: Conversation not found: $roomId');
         return;
       }
 
@@ -997,10 +1009,10 @@ class N42Chat {
           ),
         ),
       ).catchError((Object e) {
-        debugPrint('N42Chat: Navigation error for room $roomId: $e');
+        debugLog('N42Chat: Navigation error for room $roomId: $e');
       }));
     } catch (e) {
-      debugPrint('N42Chat: Failed to open conversation $roomId: $e');
+      debugLog('N42Chat: Failed to open conversation $roomId: $e');
     }
   }
 
@@ -1010,9 +1022,9 @@ class N42Chat {
   /// 返回创建的房间ID
   static Future<String> createDirectMessage(String userId) async {
     _ensureInitialized();
-    // TODO: 创建或获取DM房间
-    debugPrint('N42Chat: Create DM with - $userId');
-    return '';
+    final repo = getIt<IConversationRepository>();
+    final conversation = await repo.createDirectChat(userId);
+    return conversation.id;
   }
 
   /// 创建群聊
@@ -1025,9 +1037,11 @@ class N42Chat {
     List<String> inviteUserIds = const [],
   }) async {
     _ensureInitialized();
-    // TODO: 创建群聊房间
-    debugPrint('N42Chat: Create group - $name');
-    return '';
+    final repo = getIt<IGroupRepository>();
+    return await repo.createGroup(
+      name: name,
+      inviteUserIds: inviteUserIds,
+    );
   }
 
   /// 释放资源
@@ -1063,12 +1077,15 @@ class N42Chat {
       }
     } catch (_) {}
 
-    // 5. 重置依赖注入容器
+    // 5. 关闭用户变化流
+    await _userStreamController.close();
+
+    // 6. 重置依赖注入容器
     await resetDependencies();
 
     _initialized = false;
     _config = null;
-    debugPrint('N42Chat: Disposed');
+    debugLog('N42Chat: Disposed');
   }
 
   /// 确保已初始化
@@ -1263,7 +1280,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
         setState(() {});
       }
     } catch (e) {
-      debugPrint('N42Chat retry initialization failed: $e');
+      debugLog('N42Chat retry initialization failed: $e');
     } finally {
       if (mounted) {
         setState(() {
