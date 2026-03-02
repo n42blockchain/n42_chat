@@ -59,6 +59,7 @@ export 'src/integration/wallet_bridge.dart';
 // Mautrix 桥接导出
 // ============================================
 export 'src/integration/bridge/bridge.dart';
+export 'src/core/utils/bridge_detection_utils.dart';
 
 // ============================================
 // 推送通知导出

@@ -4,14 +4,15 @@ import 'package:n42_chat/n42_chat.dart';
 
 void main() {
   group('BridgePlatform enum', () {
-    test('should have 15 platforms', () {
-      expect(BridgePlatform.values.length, 15);
+    test('should have 16 platforms', () {
+      expect(BridgePlatform.values.length, 16);
     });
 
     test('should include all expected platforms', () {
       expect(BridgePlatform.values, containsAll([
         BridgePlatform.discord,
-        BridgePlatform.meta,
+        BridgePlatform.messenger,
+        BridgePlatform.instagram,
         BridgePlatform.twitter,
         BridgePlatform.linkedin,
         BridgePlatform.whatsapp,
@@ -79,23 +80,39 @@ void main() {
         expect(info.brandColor, isA<Color>());
       }
     });
+
+    test('ghostPrefix should be set for deployed bridges', () {
+      final deployed = [
+        BridgePlatform.whatsapp,
+        BridgePlatform.messenger,
+        BridgePlatform.instagram,
+        BridgePlatform.telegram,
+        BridgePlatform.discord,
+        BridgePlatform.signal,
+      ];
+      for (final p in deployed) {
+        final info = BridgePlatformRegistry.getInfo(p);
+        expect(info.ghostPrefix, isNotEmpty,
+            reason: '${info.displayName} should have a ghostPrefix');
+      }
+    });
   });
 
   group('BridgePlatformRegistry', () {
-    test('allPlatforms should return 15 platforms', () {
-      expect(BridgePlatformRegistry.allPlatforms.length, 15);
+    test('allPlatforms should return 16 platforms', () {
+      expect(BridgePlatformRegistry.allPlatforms.length, 16);
     });
 
     test('activePlatforms should exclude low-maintenance bridges', () {
       final active = BridgePlatformRegistry.activePlatforms;
-      expect(active.length, 12); // 15 - 3 low maintenance
+      expect(active.length, 14); // 16 - 2 inactive (iMessage, Google Chat)
       expect(active.every((p) => p.isActive), isTrue);
     });
 
     test('groupedByStatus should separate active and inactive', () {
       final grouped = BridgePlatformRegistry.groupedByStatus;
-      expect(grouped[true]?.length, 12); // Active
-      expect(grouped[false]?.length, 3); // Telegram, iMessage, Google Chat
+      expect(grouped[true]?.length, 14); // Active
+      expect(grouped[false]?.length, 2); // iMessage, Google Chat
     });
 
     test('findByBotUsername should find existing bot', () {
@@ -115,6 +132,16 @@ void main() {
         expect(usernames.add(info.botUsername), isTrue,
             reason: '${info.botUsername} is duplicated');
       }
+    });
+
+    test('findByBotUsername should find messenger and instagram separately', () {
+      final messenger = BridgePlatformRegistry.findByBotUsername('messengerbot');
+      expect(messenger, isNotNull);
+      expect(messenger!.platform, BridgePlatform.messenger);
+
+      final instagram = BridgePlatformRegistry.findByBotUsername('instagrambot');
+      expect(instagram, isNotNull);
+      expect(instagram!.platform, BridgePlatform.instagram);
     });
   });
 
@@ -148,15 +175,85 @@ void main() {
       expect(info.authMethods, contains(BridgeAuthMethod.qrCode));
     });
 
-    test('Telegram should be marked as inactive', () {
+    test('Telegram should be active', () {
       final info = BridgePlatformRegistry.getInfo(BridgePlatform.telegram);
-      expect(info.isActive, isFalse);
-      expect(info.language, 'Python');
+      expect(info.isActive, isTrue);
     });
 
     test('IRC should support no-auth login', () {
       final info = BridgePlatformRegistry.getInfo(BridgePlatform.irc);
       expect(info.authMethods, contains(BridgeAuthMethod.none));
+    });
+
+    test('Messenger and Instagram should have independent bot usernames', () {
+      final messenger = BridgePlatformRegistry.getInfo(BridgePlatform.messenger);
+      final instagram = BridgePlatformRegistry.getInfo(BridgePlatform.instagram);
+      expect(messenger.botUsername, 'messengerbot');
+      expect(instagram.botUsername, 'instagrambot');
+      expect(messenger.botUsername, isNot(instagram.botUsername));
+    });
+  });
+
+  group('BridgeDetectionUtils', () {
+    test('should detect WhatsApp from ghost MXID', () {
+      final result = BridgeDetectionUtils.detectFromUserId(
+          '@whatsapp_1234567890:m.si46.world');
+      expect(result, BridgePlatform.whatsapp);
+    });
+
+    test('should detect Messenger from ghost MXID', () {
+      final result = BridgeDetectionUtils.detectFromUserId(
+          '@messenger_john:m.si46.world');
+      expect(result, BridgePlatform.messenger);
+    });
+
+    test('should detect Instagram from ghost MXID', () {
+      final result = BridgeDetectionUtils.detectFromUserId(
+          '@instagram_user42:m.si46.world');
+      expect(result, BridgePlatform.instagram);
+    });
+
+    test('should detect Telegram from ghost MXID', () {
+      final result = BridgeDetectionUtils.detectFromUserId(
+          '@telegram_9876:m.si46.world');
+      expect(result, BridgePlatform.telegram);
+    });
+
+    test('should return null for non-bridged user', () {
+      final result = BridgeDetectionUtils.detectFromUserId(
+          '@alice:m.si46.world');
+      expect(result, isNull);
+    });
+
+    test('should detect from conversation directUserId', () {
+      const conv = ConversationEntity(
+        id: '!room:server',
+        name: 'Test',
+        directUserId: '@whatsapp_123:server',
+      );
+      final result = BridgeDetectionUtils.detectFromConversation(conv);
+      expect(result, BridgePlatform.whatsapp);
+    });
+
+    test('should detect from conversation memberIds', () {
+      const conv = ConversationEntity(
+        id: '!room:server',
+        name: 'Group',
+        type: ConversationType.group,
+        memberIds: ['@alice:server', '@telegram_456:server'],
+      );
+      final result = BridgeDetectionUtils.detectFromConversation(conv);
+      expect(result, BridgePlatform.telegram);
+    });
+
+    test('should return null for non-bridged conversation', () {
+      const conv = ConversationEntity(
+        id: '!room:server',
+        name: 'Normal Chat',
+        directUserId: '@bob:server',
+      );
+      final result = BridgeDetectionUtils.detectFromConversation(conv);
+      expect(result, isNull);
     });
   });
 }

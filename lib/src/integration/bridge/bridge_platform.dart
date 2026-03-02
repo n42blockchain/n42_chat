@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 /// Matrix Application Service on the homeserver.
 enum BridgePlatform {
   discord,
-  meta, // Facebook Messenger + Instagram
+  messenger,
+  instagram,
   twitter,
   linkedin,
   whatsapp,
@@ -63,6 +64,9 @@ class BridgePlatformInfo {
   /// Whether relay mode is supported (bridging without login)
   final bool supportsRelay;
 
+  /// Ghost user MXID prefix (used to identify bridged users)
+  final String ghostPrefix;
+
   const BridgePlatformInfo({
     required this.platform,
     required this.displayName,
@@ -77,6 +81,7 @@ class BridgePlatformInfo {
     this.supportsDM = true,
     this.supportsGroups = true,
     this.supportsRelay = false,
+    this.ghostPrefix = '',
   });
 
   /// Get the full bot Matrix user ID for a given homeserver
@@ -122,16 +127,29 @@ class BridgePlatformRegistry {
       description: 'Bridge Discord servers and DMs',
       authMethods: [BridgeAuthMethod.apiToken, BridgeAuthMethod.qrCode],
       supportsRelay: true,
+      ghostPrefix: 'discord_',
     ),
-    BridgePlatform.meta: BridgePlatformInfo(
-      platform: BridgePlatform.meta,
-      displayName: 'Messenger & Instagram',
-      botUsername: 'metabot',
+    BridgePlatform.messenger: BridgePlatformInfo(
+      platform: BridgePlatform.messenger,
+      displayName: 'Messenger',
+      botUsername: 'messengerbot',
       repoName: 'meta',
       icon: Icons.messenger_outline,
       brandColor: Color(0xFF0084FF),
-      description: 'Bridge Facebook Messenger and Instagram DMs',
+      description: 'Bridge Facebook Messenger DMs',
       authMethods: [BridgeAuthMethod.emailPassword],
+      ghostPrefix: 'messenger_',
+    ),
+    BridgePlatform.instagram: BridgePlatformInfo(
+      platform: BridgePlatform.instagram,
+      displayName: 'Instagram',
+      botUsername: 'instagrambot',
+      repoName: 'meta',
+      icon: Icons.camera_alt_outlined,
+      brandColor: Color(0xFFE4405F),
+      description: 'Bridge Instagram DMs',
+      authMethods: [BridgeAuthMethod.emailPassword],
+      ghostPrefix: 'instagram_',
     ),
     BridgePlatform.twitter: BridgePlatformInfo(
       platform: BridgePlatform.twitter,
@@ -165,6 +183,7 @@ class BridgePlatformRegistry {
       description: 'Bridge WhatsApp via linked device',
       authMethods: [BridgeAuthMethod.qrCode],
       supportsRelay: true,
+      ghostPrefix: 'whatsapp_',
     ),
     BridgePlatform.signal: BridgePlatformInfo(
       platform: BridgePlatform.signal,
@@ -176,6 +195,7 @@ class BridgePlatformRegistry {
       description: 'Bridge Signal messages via linked device',
       authMethods: [BridgeAuthMethod.qrCode, BridgeAuthMethod.phoneVerification],
       supportsRelay: true,
+      ghostPrefix: 'signal_',
     ),
     BridgePlatform.googleMessages: BridgePlatformInfo(
       platform: BridgePlatform.googleMessages,
@@ -247,11 +267,10 @@ class BridgePlatformRegistry {
       repoName: 'telegram',
       icon: Icons.send,
       brandColor: Color(0xFF2AABEE),
-      isActive: false,
-      language: 'Python',
-      description: 'Bridge Telegram chats (Go rewrite in progress)',
+      description: 'Bridge Telegram chats',
       authMethods: [BridgeAuthMethod.phoneVerification],
       supportsRelay: true,
+      ghostPrefix: 'telegram_',
     ),
     BridgePlatform.imessage: BridgePlatformInfo(
       platform: BridgePlatform.imessage,
