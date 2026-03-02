@@ -4,9 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_utils.dart';
 
-/// 时间分隔器
-///
-/// 用于聊天消息之间显示时间
+/// 时间分隔器（微信风格：无背景，纯灰色文字居中）
 class TimeSeparator extends StatelessWidget {
   /// 时间
   final DateTime dateTime;
@@ -22,21 +20,15 @@ class TimeSeparator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.timeSeparator,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            customText ?? N42DateUtils.formatMessageTime(dateTime),
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.white,
-            ),
+        child: Text(
+          customText ?? N42DateUtils.formatMessageTime(dateTime),
+          style: TextStyle(
+            fontSize: 12,
+            color: isDark ? const Color(0xFF808080) : AppColors.textTertiary,
           ),
         ),
       ),

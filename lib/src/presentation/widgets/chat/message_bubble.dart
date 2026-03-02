@@ -252,19 +252,19 @@ class MessageBubble extends StatelessWidget {
             ? AppColors.bubbleSelf
             : (isDark ? AppColors.bubbleOtherDark : AppColors.bubbleOther));
 
-    // 现代风格气泡圆角：大圆角 + 尾部小角（发送方右上/接收方左上）
+    // 微信风格气泡圆角
     final borderRadius = isSelf
         ? const BorderRadius.only(
-            topLeft: Radius.circular(18),
+            topLeft: Radius.circular(14),
             topRight: Radius.circular(4),
-            bottomLeft: Radius.circular(18),
-            bottomRight: Radius.circular(18),
+            bottomLeft: Radius.circular(14),
+            bottomRight: Radius.circular(14),
           )
         : const BorderRadius.only(
             topLeft: Radius.circular(4),
-            topRight: Radius.circular(18),
-            bottomLeft: Radius.circular(18),
-            bottomRight: Radius.circular(18),
+            topRight: Radius.circular(14),
+            bottomLeft: Radius.circular(14),
+            bottomRight: Radius.circular(14),
           );
 
     return GestureDetector(

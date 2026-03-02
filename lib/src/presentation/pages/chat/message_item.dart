@@ -181,7 +181,7 @@ class MessageItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 56, bottom: 2),
+            padding: const EdgeInsets.only(left: 60, bottom: 4),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -189,7 +189,7 @@ class MessageItem extends StatelessWidget {
                   displayName,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                    color: isDark ? const Color(0xFF999999) : AppColors.textSecondary,
                   ),
                 ),
                 if (message.isBotMessage) ...[
