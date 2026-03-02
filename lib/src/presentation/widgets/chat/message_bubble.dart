@@ -249,7 +249,7 @@ class MessageBubble extends StatelessWidget {
   Widget _buildBubble(bool isDark) {
     final bgColor = bubbleColor ??
         (isSelf
-            ? AppColors.bubbleSelf
+            ? AppColors.selfBubble(isDark)
             : (isDark ? AppColors.bubbleOtherDark : AppColors.bubbleOther));
 
     // 微信风格气泡圆角
@@ -352,9 +352,8 @@ class TextMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    // 微信中绿色气泡的文字是黑色，深色模式下对方的灰色气泡文字是白色
     final textColor = isSelf
-        ? AppColors.messageTextSent  // 黑色
+        ? AppColors.sentText(isDark)
         : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
 
     final useMarkdown = containsMarkdown(text);

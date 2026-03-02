@@ -190,8 +190,9 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
   @override
   Widget build(BuildContext context) {
     final width = _calculateWidth();
-    final iconColor = widget.isSelf ? AppColors.messageTextSent : AppColors.primary;
-    final textColor = widget.isSelf ? AppColors.messageTextSent : AppColors.textPrimary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = widget.isSelf ? AppColors.sentText(isDark) : AppColors.primary;
+    final textColor = widget.isSelf ? AppColors.sentText(isDark) : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
 
     return Column(
       crossAxisAlignment: 
@@ -287,9 +288,9 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                 _convertedText!,
                 style: TextStyle(
                   fontSize: 14,
-                  color: widget.isSelf 
-                      ? AppColors.messageTextSent 
-                      : AppColors.textPrimary,
+                  color: widget.isSelf
+                      ? AppColors.sentText(isDark)
+                      : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
                   height: 1.4,
                 ),
               ),
