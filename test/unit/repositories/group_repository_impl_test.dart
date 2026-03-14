@@ -8,6 +8,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_group_datasource.dart';
 import 'package:n42_chat/src/data/repositories/group_repository_impl.dart';
+import 'package:n42_chat/src/domain/entities/group_entity.dart';
 
 class MockMatrixGroupDataSource extends Mock
     implements MatrixGroupDataSource {}
@@ -20,11 +21,16 @@ class MockRoom extends Mock implements matrix.Room {}
 
 class MockUser extends Mock implements matrix.User {}
 
+class MockEvent extends Mock implements matrix.Event {}
+
 void main() {
   late GroupRepositoryImpl repository;
   late MockMatrixGroupDataSource mockGroupDS;
   late MockMatrixClientManager mockClientMgr;
   late MockClient mockClient;
+  late MockRoom mockRoom;
+  late MockEvent mockChannelMetaEvent;
+  late MockEvent mockPowerLevelsEvent;
 
   const testRoomId = '!group1:matrix.org';
 
@@ -36,11 +42,64 @@ void main() {
     mockGroupDS = MockMatrixGroupDataSource();
     mockClientMgr = MockMatrixClientManager();
     mockClient = MockClient();
+    mockRoom = MockRoom();
+    mockChannelMetaEvent = MockEvent();
+    mockPowerLevelsEvent = MockEvent();
     repository = GroupRepositoryImpl(mockGroupDS, mockClientMgr);
 
     when(() => mockClientMgr.client).thenReturn(mockClient);
     when(() => mockClient.userID).thenReturn('@me:matrix.org');
   });
+
+  void stubBaseRoom({
+    required matrix.JoinRules joinRules,
+    Map<String, Object?>? channelMeta,
+    Map<String, Object?>? powerLevels,
+  }) {
+    when(() => mockGroupDS.getGroup(testRoomId)).thenReturn(mockRoom);
+    when(() => mockGroupDS.getGroupMembers(testRoomId))
+        .thenAnswer((_) async => []);
+    when(() => mockGroupDS.getGroupAvatarUrl(testRoomId)).thenReturn(null);
+    when(() => mockGroupDS.isGroupOwner(testRoomId, any())).thenReturn(false);
+    when(() => mockGroupDS.isGroupAdmin(testRoomId, any())).thenReturn(false);
+    when(() => mockGroupDS.getPinnedEventIds(testRoomId)).thenReturn([]);
+    when(() => mockGroupDS.getTokenGateConfig(testRoomId)).thenReturn(null);
+    when(() => mockGroupDS.getMaxMembers(testRoomId)).thenReturn(null);
+    when(() => mockGroupDS.canInviteMembers(testRoomId)).thenReturn(false);
+    when(() => mockGroupDS.canKickMembers(testRoomId)).thenReturn(false);
+    when(() => mockGroupDS.canChangeSettings(testRoomId)).thenReturn(true);
+    when(() => mockGroupDS.canSendStateEvent(
+          any(),
+          any(),
+          fallbackMinPowerLevel: any(named: 'fallbackMinPowerLevel'),
+        )).thenReturn(false);
+
+    when(() => mockRoom.id).thenReturn(testRoomId);
+    when(() => mockRoom.getLocalizedDisplayname()).thenReturn('Announcements');
+    when(() => mockRoom.topic).thenReturn('Read-only updates');
+    when(() => mockRoom.encrypted).thenReturn(false);
+    when(() => mockRoom.joinRules).thenReturn(joinRules);
+    when(() => mockRoom.summary).thenReturn(
+      matrix.RoomSummary.fromJson({
+        'm.joined_member_count': 12,
+        'm.invited_member_count': 3,
+      }),
+    );
+
+    when(() => mockRoom.getState('n42.room.channel_meta')).thenReturn(
+      channelMeta == null ? null : mockChannelMetaEvent,
+    );
+    if (channelMeta != null) {
+      when(() => mockChannelMetaEvent.content).thenReturn(channelMeta);
+    }
+
+    when(() => mockRoom.getState(matrix.EventTypes.RoomPowerLevels)).thenReturn(
+      powerLevels == null ? null : mockPowerLevelsEvent,
+    );
+    if (powerLevels != null) {
+      when(() => mockPowerLevelsEvent.content).thenReturn(powerLevels);
+    }
+  }
 
   group('createGroup', () {
     test('creates group and returns roomId', () async {
@@ -128,6 +187,51 @@ void main() {
       final groups = await repository.getGroups();
 
       expect(groups, isEmpty);
+    });
+  });
+
+  group('getGroup', () {
+    test('maps channel metadata to channel entity fields', () async {
+      stubBaseRoom(
+        joinRules: matrix.JoinRules.invite,
+        channelMeta: const {
+          'parent_room_id': '!parent:matrix.org',
+          'members_can_speak': false,
+          'show_member_list': false,
+          'slow_mode_interval': 30,
+        },
+      );
+
+      final group = await repository.getGroup(testRoomId);
+
+      expect(group, isNotNull);
+      expect(group!.isChannel, isTrue);
+      expect(group.subscriberCount, 15);
+      expect(group.joinRule, JoinRule.invite);
+      expect(group.membersCanSpeak, isFalse);
+      expect(group.showMemberList, isFalse);
+      expect(group.slowModeInterval, 30);
+    });
+
+    test('falls back to room power levels when channel meta omits speak flag', () async {
+      stubBaseRoom(
+        joinRules: matrix.JoinRules.public,
+        channelMeta: const {
+          'parent_room_id': '!parent:matrix.org',
+        },
+        powerLevels: const {
+          'events_default': 50,
+        },
+      );
+
+      final group = await repository.getGroup(testRoomId);
+
+      expect(group, isNotNull);
+      expect(group!.isChannel, isTrue);
+      expect(group.joinRule, JoinRule.public);
+      expect(group.membersCanSpeak, isFalse);
+      expect(group.showMemberList, isFalse);
+      expect(group.slowModeInterval, 0);
     });
   });
 

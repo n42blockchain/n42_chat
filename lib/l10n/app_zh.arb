@@ -647,7 +647,6 @@
     }
   },
   "authEnterValidServerAddress": "请输入有效的服务器地址",
-  "authEmailOtp": "邮箱验证码",
   "authEnterServerAddressFirst": "请先输入服务器地址",
   "authPasskeyRequiresServer": "Passkey登录需要服务器支持",
   "authLoginAgreement": "登录即表示同意",
@@ -1754,6 +1753,10 @@
   "chatLongitude": "经度",
   "groupDescriptionUpdated": "群简介已更新",
   "groupAvatarUpdated": "群头像已更新",
+  "groupVisibilityUpdated": "群可见性已更新",
+  "groupChannelCreated": "频道已创建",
+  "groupChannelUpdated": "频道已更新",
+  "groupChannelDeleted": "频道已删除",
   "callDecline": "拒绝",
   "callAnswer": "接听",
   "callIncomingVideoCall": "视频来电",
@@ -2376,11 +2379,11 @@
   "authPasskeyNotSupported": "此设备不支持 Passkey",
   "authPasskeyRegister": "注册 Passkey",
   "authPasskeyNoRegistered": "未注册 Passkey",
-  "authPasskeyRegisterHint": "注册 Passkey 以实现无密码登录",
+  "authPasskeyRegisterHint": "为当前账号注册 Passkey，独立 Passkey 登录入口后续开放。",
   "authPasskeyNameYours": "为 Passkey 命名",
-  "authPasskeyRegistered": "Passkey 注册成功",
-  "authPasskeyDeleted": "Passkey 已删除",
-  "authPasskeyDeleteConfirm": "删除 Passkey \"{name}\"？删除后将无法使用该 Passkey 登录。",
+  "authPasskeyRegistered": "Passkey 已保存到当前账号",
+  "authPasskeyDeleted": "Passkey 已从当前账号移除",
+  "authPasskeyDeleteConfirm": "删除 Passkey \"{name}\"？如需后续使用 Passkey 登录，需要重新注册。",
   "@authPasskeyDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -2922,8 +2925,5 @@
   "blocAuthChangeEmailFailed": "修改邮箱失败",
   "blocAuthVerificationCodeInvalid": "验证码错误或已过期",
   "blocAuthSessionExpired": "会话已失效，请重新登录",
-  "blocAuthSessionIncomplete": "会话数据不完整，请重新登录",
-  "blocAuthPasskeyNotImplemented": "Passkey 登录功能尚未实现",
-  "blocAuthPasskeyRegisterNotImplemented": "Passkey 注册功能尚未实现",
-  "blocAuthEmailOtpNotImplemented": "邮箱 OTP 登录功能尚未实现"
+  "blocAuthSessionIncomplete": "会话数据不完整，请重新登录"
 }

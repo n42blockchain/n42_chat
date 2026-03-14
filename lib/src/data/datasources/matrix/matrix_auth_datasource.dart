@@ -83,6 +83,26 @@ class MatrixAuthDataSource {
     _autoSetupCrossSigning();
   }
 
+  /// 使用 Matrix SSO/OIDC 返回的 login token 登录
+  Future<LoginResponse> loginWithLoginToken({
+    required String homeserver,
+    required String loginToken,
+    String? deviceName,
+  }) async {
+    if (!_clientManager.isInitialized) {
+      await _clientManager.initialize();
+    }
+
+    final response = await _clientManager.loginWithLoginToken(
+      homeserver: homeserver,
+      loginToken: loginToken,
+      deviceName: deviceName,
+    );
+
+    _autoSetupCrossSigning();
+    return response;
+  }
+
   Future<void>? _autoSetupFuture;
 
   /// 登录后异步初始化 cross-signing（不阻塞登录流程）
@@ -319,11 +339,9 @@ class MatrixAuthDataSource {
   /// 注意：Matrix协议本身不支持刷新token，
   /// 但某些服务器可能提供这个功能
   Future<void> refreshToken() async {
-    // Matrix协议不直接支持刷新token
-    // 如果token过期，需要重新登录
-    throw UnimplementedError(
-      'Matrix protocol does not support token refresh. '
-      'Please login again if token expired.',
+    debugLog(
+      'MatrixAuthDataSource: refreshToken is not supported by Matrix; '
+      'keeping the current session unchanged.',
     );
   }
 
@@ -589,4 +607,3 @@ class PasswordAuthenticationData extends AuthenticationData {
     return json;
   }
 }
-

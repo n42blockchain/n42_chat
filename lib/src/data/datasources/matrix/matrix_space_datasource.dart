@@ -17,6 +17,17 @@ class MatrixSpaceDataSource {
 
   matrix.Client? get _client => _clientManager.client;
 
+  void _ensureCanSendStateEvent(
+    matrix.Room room,
+    String eventType, {
+    required String action,
+  }) {
+    if (room.canSendEvent(eventType)) {
+      return;
+    }
+    throw Exception('You do not have permission to $action');
+  }
+
   // ============================================
   // Space 查询
   // ============================================
@@ -167,16 +178,31 @@ class MatrixSpaceDataSource {
 
   Future<void> setSpaceName(String spaceId, String name) async {
     final room = _getRoom(spaceId);
+    _ensureCanSendStateEvent(
+      room,
+      'm.room.name',
+      action: 'edit the community name',
+    );
     await room.setName(name);
   }
 
   Future<void> setSpaceDescription(String spaceId, String description) async {
     final room = _getRoom(spaceId);
+    _ensureCanSendStateEvent(
+      room,
+      'm.room.topic',
+      action: 'edit the community description',
+    );
     await room.setDescription(description);
   }
 
   Future<void> setSpaceAvatar(String spaceId, Uint8List avatar) async {
     final room = _getRoom(spaceId);
+    _ensureCanSendStateEvent(
+      room,
+      'm.room.avatar',
+      action: 'edit the community avatar',
+    );
     final matrixFile = matrix.MatrixFile(bytes: avatar, name: 'avatar.png');
     await room.setAvatar(matrixFile);
   }
@@ -193,6 +219,12 @@ class MatrixSpaceDataSource {
     bool isPublic = true,
   }) async {
     if (_client == null) throw Exception('Matrix client not initialized');
+    final spaceRoom = _getRoom(spaceId);
+    _ensureCanSendStateEvent(
+      spaceRoom,
+      'm.space.child',
+      action: 'manage channels in this community',
+    );
 
     // 1. 创建普通频道房间
     final channelId = await _client!.createRoom(
@@ -239,6 +271,12 @@ class MatrixSpaceDataSource {
   /// 从 Space 中移除频道（删除 m.space.child 事件并解散房间）
   Future<void> deleteChannel(String spaceId, String channelId) async {
     if (_client == null) throw Exception('Matrix client not initialized');
+    final spaceRoom = _getRoom(spaceId);
+    _ensureCanSendStateEvent(
+      spaceRoom,
+      'm.space.child',
+      action: 'manage channels in this community',
+    );
 
     // 移除 Space 子关系（发送空内容 = 删除）
     await _client!.setRoomStateWithKey(
@@ -266,18 +304,27 @@ class MatrixSpaceDataSource {
   /// 邀请用户加入 Space
   Future<void> inviteMember(String spaceId, String userId) async {
     final room = _getRoom(spaceId);
+    if (!room.canInvite) {
+      throw Exception('You do not have permission to invite members');
+    }
     await room.invite(userId);
   }
 
   /// 踢出成员
   Future<void> kickMember(String spaceId, String userId, {String? reason}) async {
     final room = _getRoom(spaceId);
+    if (!room.canKick) {
+      throw Exception('You do not have permission to remove members');
+    }
     await room.kick(userId);
   }
 
   /// 封禁成员
   Future<void> banMember(String spaceId, String userId, {String? reason}) async {
     final room = _getRoom(spaceId);
+    if (!room.canKick) {
+      throw Exception('You do not have permission to ban members');
+    }
     await room.ban(userId);
   }
 
@@ -285,6 +332,11 @@ class MatrixSpaceDataSource {
   Future<void> setMemberPowerLevel(
       String spaceId, String userId, int powerLevel) async {
     final room = _getRoom(spaceId);
+    _ensureCanSendStateEvent(
+      room,
+      matrix.EventTypes.RoomPowerLevels,
+      action: 'change member roles',
+    );
     await room.setPower(userId, powerLevel);
   }
 

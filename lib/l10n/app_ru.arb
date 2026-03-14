@@ -477,7 +477,6 @@
     }
   },
   "authEnterValidServerAddress": "Пожалуйста, введите действительный адрес сервера",
-  "authEmailOtp": "Код подтверждения по email",
   "authEnterServerAddressFirst": "Сначала введите адрес сервера",
   "authPasskeyRequiresServer": "Для входа через Passkey требуется поддержка сервера",
   "authLoginAgreement": "Входя в систему, вы соглашаетесь с ",

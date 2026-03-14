@@ -8,6 +8,7 @@ import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../n42_chat.dart';
 
 /// 群话题频道列表页面
 class GroupChannelsPage extends StatefulWidget {
@@ -23,6 +24,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
   @override
   void initState() {
     super.initState();
+    context.read<GroupBloc>().add(LoadGroupDetails(widget.roomId));
     context.read<GroupBloc>().add(LoadChannels(widget.roomId));
   }
 
@@ -37,7 +39,9 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
 
         return Scaffold(
           appBar: N42AppBar(title: l10n?.groupChannels ?? 'Topic Channels'),
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          backgroundColor: isDark
+              ? AppColors.backgroundDark
+              : AppColors.background,
           floatingActionButton: canManage
               ? FloatingActionButton(
                   onPressed: () => _showCreateChannelDialog(context),
@@ -52,14 +56,19 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
                 )
               : ListView.separated(
                   itemCount: state.channels.length,
-                  separatorBuilder: (_, __) => Divider(
+                  separatorBuilder: (_, _) => Divider(
                     height: 1,
                     indent: 16,
                     color: isDark ? AppColors.dividerDark : AppColors.divider,
                   ),
                   itemBuilder: (context, index) {
                     final channel = state.channels[index];
-                    return _buildChannelTile(context, channel, canManage, isDark);
+                    return _buildChannelTile(
+                      context,
+                      channel,
+                      canManage,
+                      isDark,
+                    );
                   },
                 ),
         );
@@ -91,7 +100,9 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
               ),
             )
           : null,
@@ -108,8 +119,10 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
               ),
             )
           : null,
-      onTap: () => Navigator.of(context).pushNamed('/chat/${channel.roomId}'),
-      onLongPress: canManage ? () => _showChannelOptions(context, channel) : null,
+      onTap: () => N42Chat.openConversation(channel.roomId, context: context),
+      onLongPress: canManage
+          ? () => _showChannelOptions(context, channel)
+          : null,
     );
   }
 
@@ -136,7 +149,8 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
             TextField(
               controller: topicController,
               decoration: InputDecoration(
-                labelText: l10n?.groupChannelTopic ?? 'Channel Topic (optional)',
+                labelText:
+                    l10n?.groupChannelTopic ?? 'Channel Topic (optional)',
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -152,13 +166,15 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
               final name = nameController.text.trim();
               if (name.isEmpty) return;
               Navigator.pop(dialogContext);
-              context.read<GroupBloc>().add(CreateChannel(
-                    parentRoomId: widget.roomId,
-                    name: name,
-                    topic: topicController.text.trim().isEmpty
-                        ? null
-                        : topicController.text.trim(),
-                  ));
+              context.read<GroupBloc>().add(
+                CreateChannel(
+                  parentRoomId: widget.roomId,
+                  name: name,
+                  topic: topicController.text.trim().isEmpty
+                      ? null
+                      : topicController.text.trim(),
+                ),
+              );
             },
             child: Text(l10n?.commonConfirm ?? 'OK'),
           ),
@@ -223,7 +239,8 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
             TextField(
               controller: topicController,
               decoration: InputDecoration(
-                labelText: l10n?.groupChannelTopic ?? 'Channel Topic (optional)',
+                labelText:
+                    l10n?.groupChannelTopic ?? 'Channel Topic (optional)',
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -237,14 +254,16 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              context.read<GroupBloc>().add(UpdateChannel(
-                    parentRoomId: widget.roomId,
-                    channelRoomId: channel.roomId,
-                    name: nameController.text.trim(),
-                    topic: topicController.text.trim().isEmpty
-                        ? null
-                        : topicController.text.trim(),
-                  ));
+              context.read<GroupBloc>().add(
+                UpdateChannel(
+                  parentRoomId: widget.roomId,
+                  channelRoomId: channel.roomId,
+                  name: nameController.text.trim(),
+                  topic: topicController.text.trim().isEmpty
+                      ? null
+                      : topicController.text.trim(),
+                ),
+              );
             },
             child: Text(l10n?.commonConfirm ?? 'OK'),
           ),
@@ -259,7 +278,10 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n?.groupChannelDelete ?? 'Delete Channel'),
-        content: Text(l10n?.groupChannelDeleteConfirm ?? 'Delete this channel? All messages will be lost.'),
+        content: Text(
+          l10n?.groupChannelDeleteConfirm ??
+              'Delete this channel? All messages will be lost.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -268,10 +290,12 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              context.read<GroupBloc>().add(DeleteChannel(
-                    parentRoomId: widget.roomId,
-                    channelRoomId: channel.roomId,
-                  ));
+              context.read<GroupBloc>().add(
+                DeleteChannel(
+                  parentRoomId: widget.roomId,
+                  channelRoomId: channel.roomId,
+                ),
+              );
             },
             child: Text(
               l10n?.commonDelete ?? 'Delete',

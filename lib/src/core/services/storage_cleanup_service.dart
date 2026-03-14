@@ -62,13 +62,16 @@ class StorageCleanupService {
         _storageManager = storageManager;
 
   /// 生成清理建议列表（按可释放空间排序）
-  Future<List<CleanupRecommendation>> getRecommendations() async {
+  Future<List<CleanupRecommendation>> getRecommendations({
+    bool preserveThumbnails = true,
+  }) async {
     final recommendations = <CleanupRecommendation>[];
 
     try {
       // 1. 旧媒体建议（90天以上未访问）
       final oldFiles = await _lifecycleService.getCleanableFiles(
         olderThanDays: StorageConstants.defaultCleanupDays,
+        preserveThumbnails: preserveThumbnails,
       );
       if (oldFiles.isNotEmpty) {
         int totalSize = 0;
@@ -89,6 +92,7 @@ class StorageCleanupService {
       // 2. 大文件建议（10MB+）
       final largeFiles = await _lifecycleService.getCleanableFiles(
         minFileSizeBytes: StorageConstants.largeFileThreshold,
+        preserveThumbnails: preserveThumbnails,
       );
       if (largeFiles.isNotEmpty) {
         int totalSize = 0;
@@ -146,7 +150,9 @@ class StorageCleanupService {
 
   /// 执行单条建议
   Future<CleanupResult> executeRecommendation(
-      CleanupRecommendation recommendation) async {
+    CleanupRecommendation recommendation, {
+    bool preserveThumbnails = true,
+  }) async {
     switch (recommendation.type) {
       case CleanupRecommendationType.oldMedia:
       case CleanupRecommendationType.largeFiles:
@@ -159,7 +165,10 @@ class StorageCleanupService {
         );
       case CleanupRecommendationType.roomSpecific:
         if (recommendation.roomId != null) {
-          return cleanupByRoom(roomId: recommendation.roomId!);
+          return cleanupByRoom(
+            roomId: recommendation.roomId!,
+            preserveThumbnails: preserveThumbnails,
+          );
         }
         return const CleanupResult();
     }
@@ -170,6 +179,7 @@ class StorageCleanupService {
     required String roomId,
     List<String>? fileCategories,
     DateTime? olderThan,
+    bool preserveThumbnails = true,
   }) async {
     var result = const CleanupResult();
 
@@ -181,6 +191,7 @@ class StorageCleanupService {
           olderThanDays: olderThan != null
               ? DateTime.now().difference(olderThan).inDays
               : null,
+          preserveThumbnails: preserveThumbnails,
         );
         if (files.isNotEmpty) {
           result = result +
@@ -194,6 +205,7 @@ class StorageCleanupService {
         olderThanDays: olderThan != null
             ? DateTime.now().difference(olderThan).inDays
             : null,
+        preserveThumbnails: preserveThumbnails,
       );
       if (files.isNotEmpty) {
         result = await _lifecycleService
@@ -209,6 +221,7 @@ class StorageCleanupService {
     DateTime? startDate,
     DateTime? endDate,
     List<String>? fileCategories,
+    bool preserveThumbnails = true,
   }) async {
     final olderThanDays =
         endDate != null ? DateTime.now().difference(endDate).inDays : null;
@@ -219,6 +232,7 @@ class StorageCleanupService {
         final files = await _lifecycleService.getCleanableFiles(
           olderThanDays: olderThanDays,
           fileCategory: category,
+          preserveThumbnails: preserveThumbnails,
         );
         if (files.isNotEmpty) {
           result = result +
@@ -231,6 +245,7 @@ class StorageCleanupService {
 
     final files = await _lifecycleService.getCleanableFiles(
       olderThanDays: olderThanDays,
+      preserveThumbnails: preserveThumbnails,
     );
     if (files.isEmpty) return const CleanupResult();
     return _lifecycleService

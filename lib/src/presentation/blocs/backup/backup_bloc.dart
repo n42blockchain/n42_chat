@@ -58,8 +58,10 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
       emit(state.copyWith(
         isCreating: false,
         progress: 1.0,
-        successMessage:
-            'Backup created: ${result.roomCount} rooms, ${result.messageCount} messages',
+        successMessage: _composeMessage(
+          'Backup created: ${result.roomCount} rooms, ${result.messageCount} messages',
+          result.warnings,
+        ),
       ));
       // 刷新列表
       add(const LoadBackupList());
@@ -130,8 +132,12 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
       } else {
         emit(state.copyWith(
           isRestoring: false,
-          successMessage:
-              'Restored ${result.settingsRestored} settings from ${result.roomsRestored} rooms',
+          successMessage: _composeMessage(
+            result.roomsRestored > 0
+                ? 'Restored ${result.settingsRestored} settings from ${result.roomsRestored} rooms'
+                : 'Restored ${result.settingsRestored} settings. Messages will sync from server after login.',
+            result.warnings,
+          ),
         ));
       }
     } catch (e) {
@@ -155,5 +161,10 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
     } catch (e) {
       debugLog('BackupBloc: Failed to estimate size: $e');
     }
+  }
+
+  String _composeMessage(String base, List<String> warnings) {
+    if (warnings.isEmpty) return base;
+    return '$base ${warnings.join(' ')}';
   }
 }

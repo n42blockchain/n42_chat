@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/services/biometric_service.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../domain/entities/user_entity.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../n42_chat.dart' show N42Chat;
 import '../../../services/auth/auth_methods_service.dart';
@@ -20,15 +21,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final BiometricService _biometricService;
   final SecureStorageDataSource _secureStorage;
   StreamSubscription<bool>? _loginStateSubscription;
+  bool _logoutInProgress = false;
 
   AuthBloc({
     required IAuthRepository authRepository,
     BiometricService? biometricService,
     SecureStorageDataSource? secureStorage,
-  })  : _authRepository = authRepository,
-        _biometricService = biometricService ?? BiometricService(),
-        _secureStorage = secureStorage ?? SecureStorageDataSource(),
-        super(const AuthState.initial()) {
+  }) : _authRepository = authRepository,
+       _biometricService = biometricService ?? BiometricService(),
+       _secureStorage = secureStorage ?? SecureStorageDataSource(),
+       super(const AuthState.initial()) {
     on<AuthCheckRequested>(_onCheckRequested);
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
@@ -56,20 +58,38 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthEnableBiometricLogin>(_onEnableBiometricLogin);
     on<AuthDisableBiometricLogin>(_onDisableBiometricLogin);
     on<AuthTokenLoginRequested>(_onTokenLogin);
-    on<AuthPasskeyLoginRequested>(_onPasskeyLogin);
-    on<AuthRegisterPasskeyRequested>(_onRegisterPasskey);
-    on<AuthRequestEmailOtpRequested>(_onRequestEmailOtp);
-    on<AuthEmailOtpLoginRequested>(_onEmailOtpLogin);
+    on<AuthLoginTokenLoginRequested>(_onLoginTokenLogin);
     on<AuthErrorCleared>(_onErrorCleared);
 
     // 监听登录状态变化
-    _loginStateSubscription = _authRepository.loginStateStream.listen(
-      (isLoggedIn) {
-        if (!isLoggedIn && state.status == AuthStatus.authenticated) {
-          add(const AuthLogoutRequested());
-        }
-      },
-    );
+    _loginStateSubscription = _authRepository.loginStateStream.listen((
+      isLoggedIn,
+    ) {
+      final shouldForceLogout =
+          !isLoggedIn &&
+          !_logoutInProgress &&
+          state.status != AuthStatus.initial &&
+          state.status != AuthStatus.unauthenticated &&
+          state.status != AuthStatus.error;
+      if (shouldForceLogout) {
+        add(const AuthLogoutRequested());
+      }
+    });
+  }
+
+  Future<void> _completeAuthenticatedFlow(
+    UserEntity user,
+    Emitter<AuthState> emit, {
+    bool refreshProfile = true,
+  }) async {
+    emit(state.copyWith(status: AuthStatus.authenticated, user: user));
+    N42Chat.notifyUserChanged();
+    if (refreshProfile) {
+      add(const LoadUserProfileData());
+    }
+    // 通话管理器必须在 sync 到达前初始化完成（先于推送注册）
+    await _initializeCallManager();
+    unawaited(_registerPushNotifications());
   }
 
   /// 检查当前认证状态
@@ -81,10 +101,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     if (_authRepository.isLoggedIn) {
       final user = _authRepository.currentUser;
-      emit(state.copyWith(
-        status: AuthStatus.authenticated,
-        user: user,
-      ));
+      emit(state.copyWith(status: AuthStatus.authenticated, user: user));
+      N42Chat.notifyUserChanged();
       // 已登录状态，注册推送通知并初始化通话管理器
       await _registerPushNotifications();
       await _initializeCallManager();
@@ -98,10 +116,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      status: AuthStatus.loading,
-      errorMessage: null,
-    ));
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
     final result = await _authRepository.login(
       homeserver: event.homeserver,
@@ -111,24 +126,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     if (result.success && result.user != null) {
-      emit(state.copyWith(
-        status: AuthStatus.authenticated,
-        user: result.user,
-      ));
-      // 通知主应用用户信息变化
-      N42Chat.notifyUserChanged();
-      // 登录成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
-      add(const LoadUserProfileData());
-      // 通话管理器必须在 sync 事件到达前初始化完成，否则来电事件会丢失
-      await _initializeCallManager();
-      // 推送注册可以后台执行
-      unawaited(_registerPushNotifications());
+      await _completeAuthenticatedFlow(result.user!, emit);
     } else {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: result.errorMessage ?? 'Login failed',
-        errorType: result.errorType,
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage ?? 'Login failed',
+          errorType: result.errorType,
+        ),
+      );
     }
   }
 
@@ -137,16 +143,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthLogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
+    if (_logoutInProgress) {
+      return;
+    }
+    _logoutInProgress = true;
     emit(state.copyWith(status: AuthStatus.loading));
 
     // 登出前取消推送注册
     await _unregisterPushNotifications();
 
-    await _authRepository.logout();
+    try {
+      await _authRepository.logout();
+      await N42Chat.disposeCallManager();
+      N42Chat.notifyUserChanged();
 
-    emit(const AuthState.initial().copyWith(
-      status: AuthStatus.unauthenticated,
-    ));
+      emit(
+        const AuthState.initial().copyWith(status: AuthStatus.unauthenticated),
+      );
+    } finally {
+      _logoutInProgress = false;
+    }
   }
 
   /// 注册
@@ -154,10 +170,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthRegisterRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      status: AuthStatus.loading,
-      errorMessage: null,
-    ));
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
     final result = await _authRepository.register(
       homeserver: event.homeserver,
@@ -168,21 +181,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     if (result.success && result.user != null) {
-      emit(state.copyWith(
-        status: AuthStatus.authenticated,
-        user: result.user,
-      ));
-      // 注册成功后自动加载完整用户资料
-      add(const LoadUserProfileData());
-      // 注册成功后注册推送通知和初始化通话管理器
-      await _registerPushNotifications();
-      await _initializeCallManager();
+      await _completeAuthenticatedFlow(result.user!, emit);
     } else {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: result.errorMessage ?? 'Registration failed',
-        errorType: result.errorType,
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage ?? 'Registration failed',
+          errorType: result.errorType,
+        ),
+      );
     }
   }
 
@@ -221,23 +228,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthHomeserverCheckRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      homeserverStatus: HomeserverStatus.checking,
-      homeserverInfo: null,
-    ));
+    emit(
+      state.copyWith(
+        homeserverStatus: HomeserverStatus.checking,
+        homeserverInfo: null,
+      ),
+    );
 
     try {
       final info = await _authRepository.checkHomeserver(event.homeserver);
-      emit(state.copyWith(
-        homeserverStatus: HomeserverStatus.valid,
-        homeserverInfo: info,
-        lastCheckedHomeserver: event.homeserver,
-      ));
+      emit(
+        state.copyWith(
+          homeserverStatus: HomeserverStatus.valid,
+          homeserverInfo: info,
+          lastCheckedHomeserver: event.homeserver,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        homeserverStatus: HomeserverStatus.invalid,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          homeserverStatus: HomeserverStatus.invalid,
+          errorMessage: e.toString(),
+        ),
+      );
     }
   }
 
@@ -251,20 +264,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await _authRepository.restoreSession();
 
     if (result.success && result.user != null) {
-      emit(state.copyWith(
-        status: AuthStatus.authenticated,
-        user: result.user,
-      ));
-      // 恢复会话成功后自动加载完整用户资料（包括 pokeText 等自定义字段）
-      add(const LoadUserProfileData());
-      // 通话管理器必须在 sync 事件到达前初始化完成，否则来电事件会丢失
-      await _initializeCallManager();
-      // 推送注册可以后台执行，不阻塞会话恢复流程
-      unawaited(_registerPushNotifications());
+      await _completeAuthenticatedFlow(result.user!, emit);
     } else {
-      emit(state.copyWith(
-        status: AuthStatus.unauthenticated,
-      ));
+      emit(state.copyWith(status: AuthStatus.unauthenticated));
     }
   }
 
@@ -275,30 +277,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(state.copyWith(status: AuthStatus.loading));
-      
+
       final success = await _authRepository.updateAvatar(
         event.avatarBytes,
         event.filename,
       );
-      
+
       if (success) {
         // 刷新用户信息
         final user = _authRepository.currentUser;
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: user,
-        ));
+        emit(state.copyWith(status: AuthStatus.authenticated, user: user));
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: 'Avatar upload failed',
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: 'Avatar upload failed',
+          ),
+        );
       }
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Avatar upload failed: $e',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Avatar upload failed: $e',
+        ),
+      );
     }
   }
 
@@ -309,27 +312,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(state.copyWith(status: AuthStatus.loading));
-      
-      final success = await _authRepository.updateDisplayName(event.displayName);
-      
+
+      final success = await _authRepository.updateDisplayName(
+        event.displayName,
+      );
+
       if (success) {
         // 刷新用户信息
         final user = _authRepository.currentUser;
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: user,
-        ));
+        emit(state.copyWith(status: AuthStatus.authenticated, user: user));
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: 'Update nickname failed',
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: 'Update nickname failed',
+          ),
+        );
       }
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Update nickname failed: $e',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Update nickname failed: $e',
+        ),
+      );
     }
   }
 
@@ -340,19 +346,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       emit(state.copyWith(status: AuthStatus.loading));
-      
+
       // 更新显示名（如果有）
       if (event.displayName != null) {
         await _authRepository.updateDisplayName(event.displayName!);
       }
-      
+
       // 更新自定义资料数据（性别、地区、签名、拍一拍、来电铃声）
-      final hasProfileChanges = event.gender != null || 
-                                 event.region != null || 
-                                 event.signature != null ||
-                                 event.pokeText != null ||
-                                 event.ringtone != null;
-      
+      final hasProfileChanges =
+          event.gender != null ||
+          event.region != null ||
+          event.signature != null ||
+          event.pokeText != null ||
+          event.ringtone != null;
+
       if (hasProfileChanges) {
         await _authRepository.updateUserProfileData(
           gender: event.gender,
@@ -362,25 +369,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           ringtone: event.ringtone,
         );
       }
-      
+
       // 重新加载用户资料以获取最新数据
       await _authRepository.getUserProfileData();
-      
+
       // 刷新用户信息
       final user = _authRepository.currentUser;
-      debugLog('AuthBloc: Updated user profile - pokeText: ${user?.pokeText}, ringtone: ${user?.ringtone}');
-      emit(state.copyWith(
-        status: AuthStatus.authenticated,
-        user: user,
-      ));
+      debugLog(
+        'AuthBloc: Updated user profile - pokeText: ${user?.pokeText}, ringtone: ${user?.ringtone}',
+      );
+      emit(state.copyWith(status: AuthStatus.authenticated, user: user));
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Update profile failed: $e',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Update profile failed: $e',
+        ),
+      );
     }
   }
-  
+
   /// 加载用户资料数据
   Future<void> _onLoadUserProfileData(
     LoadUserProfileData event,
@@ -388,16 +396,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       debugLog('AuthBloc: Loading user profile data...');
-      
+
       // 获取最新的用户资料（包含头像和显示名）
       final user = await _authRepository.getCurrentUserProfile();
-      
+
       if (user != null) {
-        debugLog('AuthBloc: User profile loaded - displayName: ${user.displayName}, avatarUrl: ${user.avatarUrl}');
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: user,
-        ));
+        debugLog(
+          'AuthBloc: User profile loaded - displayName: ${user.displayName}, avatarUrl: ${user.avatarUrl}',
+        );
+        emit(state.copyWith(status: AuthStatus.authenticated, user: user));
         // 通知主应用用户信息变化（头像/昵称更新）
         N42Chat.notifyUserChanged();
       } else {
@@ -418,10 +425,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthRequestPasswordResetRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      passwordResetStatus: PasswordResetStatus.sendingCode,
-      errorMessage: null,
-    ));
+    emit(
+      state.copyWith(
+        passwordResetStatus: PasswordResetStatus.sendingCode,
+        errorMessage: null,
+      ),
+    );
 
     try {
       final success = await _authRepository.requestPasswordReset(
@@ -430,14 +439,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (success) {
-        emit(state.copyWith(
-          passwordResetStatus: PasswordResetStatus.codeSent,
-        ));
+        emit(state.copyWith(passwordResetStatus: PasswordResetStatus.codeSent));
       } else {
-        emit(state.copyWith(
-          passwordResetStatus: PasswordResetStatus.failed,
-          errorMessage: BlocMessageKeys.authSendVerificationCodeFailed,
-        ));
+        emit(
+          state.copyWith(
+            passwordResetStatus: PasswordResetStatus.failed,
+            errorMessage: BlocMessageKeys.authSendVerificationCodeFailed,
+          ),
+        );
       }
     } catch (e) {
       String errorMsg;
@@ -447,10 +456,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else {
         errorMsg = BlocMessageKeys.authSendVerificationCodeFailed;
       }
-      emit(state.copyWith(
-        passwordResetStatus: PasswordResetStatus.failed,
-        errorMessage: errorMsg,
-      ));
+      emit(
+        state.copyWith(
+          passwordResetStatus: PasswordResetStatus.failed,
+          errorMessage: errorMsg,
+        ),
+      );
     }
   }
 
@@ -459,10 +470,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthConfirmPasswordResetRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      passwordResetStatus: PasswordResetStatus.resetting,
-      errorMessage: null,
-    ));
+    emit(
+      state.copyWith(
+        passwordResetStatus: PasswordResetStatus.resetting,
+        errorMessage: null,
+      ),
+    );
 
     try {
       final success = await _authRepository.confirmPasswordReset(
@@ -473,20 +486,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (success) {
-        emit(state.copyWith(
-          passwordResetStatus: PasswordResetStatus.success,
-        ));
+        emit(state.copyWith(passwordResetStatus: PasswordResetStatus.success));
       } else {
-        emit(state.copyWith(
-          passwordResetStatus: PasswordResetStatus.failed,
-          errorMessage: BlocMessageKeys.authResetPasswordFailed,
-        ));
+        emit(
+          state.copyWith(
+            passwordResetStatus: PasswordResetStatus.failed,
+            errorMessage: BlocMessageKeys.authResetPasswordFailed,
+          ),
+        );
       }
     } catch (e) {
-      emit(state.copyWith(
-        passwordResetStatus: PasswordResetStatus.failed,
-        errorMessage: BlocMessageKeys.authResetPasswordFailed,
-      ));
+      emit(
+        state.copyWith(
+          passwordResetStatus: PasswordResetStatus.failed,
+          errorMessage: BlocMessageKeys.authResetPasswordFailed,
+        ),
+      );
     }
   }
 
@@ -495,10 +510,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthChangePasswordRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      changePasswordStatus: ChangePasswordStatus.changing,
-      errorMessage: null,
-    ));
+    emit(
+      state.copyWith(
+        changePasswordStatus: ChangePasswordStatus.changing,
+        errorMessage: null,
+      ),
+    );
 
     try {
       final success = await _authRepository.changePassword(
@@ -507,16 +524,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (success) {
-        emit(state.copyWith(
-          changePasswordStatus: ChangePasswordStatus.success,
-        ));
+        emit(
+          state.copyWith(changePasswordStatus: ChangePasswordStatus.success),
+        );
         // 修改密码成功后自动登出
         add(const AuthLogoutRequested());
       } else {
-        emit(state.copyWith(
-          changePasswordStatus: ChangePasswordStatus.failed,
-          errorMessage: BlocMessageKeys.authChangePasswordFailed,
-        ));
+        emit(
+          state.copyWith(
+            changePasswordStatus: ChangePasswordStatus.failed,
+            errorMessage: BlocMessageKeys.authChangePasswordFailed,
+          ),
+        );
       }
     } catch (e) {
       String errorMessage = BlocMessageKeys.authChangePasswordFailed;
@@ -524,10 +543,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           e.toString().contains('M_UNAUTHORIZED')) {
         errorMessage = BlocMessageKeys.authOldPasswordWrong;
       }
-      emit(state.copyWith(
-        changePasswordStatus: ChangePasswordStatus.failed,
-        errorMessage: errorMessage,
-      ));
+      emit(
+        state.copyWith(
+          changePasswordStatus: ChangePasswordStatus.failed,
+          errorMessage: errorMessage,
+        ),
+      );
     }
   }
 
@@ -540,19 +561,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthGoogleLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      status: AuthStatus.loading,
-      errorMessage: null,
-    ));
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
     try {
       final authService = AuthMethodsService();
       final googleResult = await authService.signInWithGoogle();
 
       if (googleResult == null) {
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-        ));
+        emit(state.copyWith(status: AuthStatus.unauthenticated));
         return;
       }
 
@@ -567,20 +583,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (result.success && result.user != null) {
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: result.user,
-        ));
-        add(const LoadUserProfileData());
-        // 通话管理器必须先初始化，确保来电事件监听就绪
-        await _initializeCallManager();
-        unawaited(_registerPushNotifications());
+        await _completeAuthenticatedFlow(result.user!, emit);
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: result.errorMessage ?? BlocMessageKeys.authGoogleLoginFailed,
-          errorType: result.errorType,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage:
+                result.errorMessage ?? BlocMessageKeys.authGoogleLoginFailed,
+            errorType: result.errorType,
+          ),
+        );
       }
     } catch (e) {
       debugLog('AuthBloc: Google login failed - $e');
@@ -589,10 +601,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(state.copyWith(status: AuthStatus.unauthenticated));
         return;
       }
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: BlocMessageKeys.authGoogleLoginFailed,
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: BlocMessageKeys.authGoogleLoginFailed,
+        ),
+      );
     }
   }
 
@@ -601,20 +615,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthAppleLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      status: AuthStatus.loading,
-      errorMessage: null,
-    ));
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
     try {
       final authService = AuthMethodsService();
       final appleResult = await authService.signInWithApple();
 
       if (appleResult == null) {
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-          errorMessage: BlocMessageKeys.authLoginCancelled,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            errorMessage: BlocMessageKeys.authLoginCancelled,
+          ),
+        );
         return;
       }
 
@@ -626,30 +639,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         accessToken: appleResult.accessToken,
         email: appleResult.email,
         displayName: appleResult.displayName,
+        extra: appleResult.extra,
       );
 
       if (result.success && result.user != null) {
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: result.user,
-        ));
-        add(const LoadUserProfileData());
-        // 通话管理器必须在 sync 到达前初始化完成（先于推送注册）
-        await _initializeCallManager();
-        unawaited(_registerPushNotifications());
+        await _completeAuthenticatedFlow(result.user!, emit);
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: result.errorMessage ?? BlocMessageKeys.authAppleLoginFailed,
-          errorType: result.errorType,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage:
+                result.errorMessage ?? BlocMessageKeys.authAppleLoginFailed,
+            errorType: result.errorType,
+          ),
+        );
       }
     } catch (e) {
       debugLog('AuthBloc: Apple login failed - $e');
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: BlocMessageKeys.authAppleLoginFailed,
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: BlocMessageKeys.authAppleLoginFailed,
+        ),
+      );
     }
   }
 
@@ -658,10 +670,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthSsoLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      status: AuthStatus.loading,
-      errorMessage: null,
-    ));
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
     try {
       // 获取 SSO 登录 URL 并启动浏览器
@@ -672,28 +681,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       if (result.success) {
         // SSO 登录需要在浏览器中完成，状态会在回调中更新
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-        ));
+        emit(state.copyWith(status: AuthStatus.unauthenticated));
       } else if (result.errorMessage == 'SSO_REDIRECT_REQUIRED') {
         // SSO 需要浏览器重定向，这是正常流程，不显示错误
-        debugLog('AuthBloc: SSO redirect required, waiting for browser callback');
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-        ));
+        debugLog(
+          'AuthBloc: SSO redirect required, waiting for browser callback',
+        );
+        emit(state.copyWith(status: AuthStatus.unauthenticated));
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: result.errorMessage ?? BlocMessageKeys.authSsoLoginFailed,
-          errorType: result.errorType,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage:
+                result.errorMessage ?? BlocMessageKeys.authSsoLoginFailed,
+            errorType: result.errorType,
+          ),
+        );
       }
     } catch (e) {
       debugLog('AuthBloc: SSO login failed - $e');
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: BlocMessageKeys.authSsoLoginFailed,
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: BlocMessageKeys.authSsoLoginFailed,
+        ),
+      );
     }
   }
 
@@ -702,20 +714,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthFacebookLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      status: AuthStatus.loading,
-      errorMessage: null,
-    ));
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
     try {
       final authService = AuthMethodsService();
       final facebookResult = await authService.signInWithFacebook();
 
       if (facebookResult == null) {
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-          errorMessage: BlocMessageKeys.authLoginCancelled,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            errorMessage: BlocMessageKeys.authLoginCancelled,
+          ),
+        );
         return;
       }
 
@@ -730,27 +741,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (result.success && result.user != null) {
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: result.user,
-        ));
-        add(const LoadUserProfileData());
-        // 通话管理器必须在 sync 到达前初始化完成（先于推送注册）
-        await _initializeCallManager();
-        unawaited(_registerPushNotifications());
+        await _completeAuthenticatedFlow(result.user!, emit);
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: result.errorMessage ?? BlocMessageKeys.authFacebookLoginFailed,
-          errorType: result.errorType,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage:
+                result.errorMessage ?? BlocMessageKeys.authFacebookLoginFailed,
+            errorType: result.errorType,
+          ),
+        );
       }
     } catch (e) {
       debugLog('AuthBloc: Facebook login failed - $e');
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: BlocMessageKeys.authFacebookLoginFailed,
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: BlocMessageKeys.authFacebookLoginFailed,
+        ),
+      );
     }
   }
 
@@ -759,20 +768,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthTwitterLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      status: AuthStatus.loading,
-      errorMessage: null,
-    ));
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
     try {
       final authService = AuthMethodsService();
       final twitterResult = await authService.signInWithTwitter();
 
       if (twitterResult == null) {
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-          errorMessage: BlocMessageKeys.authLoginCancelled,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            errorMessage: BlocMessageKeys.authLoginCancelled,
+          ),
+        );
         return;
       }
 
@@ -787,27 +795,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (result.success && result.user != null) {
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: result.user,
-        ));
-        add(const LoadUserProfileData());
-        // 通话管理器必须在 sync 到达前初始化完成（先于推送注册）
-        await _initializeCallManager();
-        unawaited(_registerPushNotifications());
+        await _completeAuthenticatedFlow(result.user!, emit);
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: result.errorMessage ?? BlocMessageKeys.authTwitterLoginFailed,
-          errorType: result.errorType,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage:
+                result.errorMessage ?? BlocMessageKeys.authTwitterLoginFailed,
+            errorType: result.errorType,
+          ),
+        );
       }
     } catch (e) {
       debugLog('AuthBloc: Twitter login failed - $e');
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: BlocMessageKeys.authTwitterLoginFailed,
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: BlocMessageKeys.authTwitterLoginFailed,
+        ),
+      );
     }
   }
 
@@ -816,20 +822,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthWeChatLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      status: AuthStatus.loading,
-      errorMessage: null,
-    ));
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
     try {
       final authService = AuthMethodsService();
       final weChatResult = await authService.signInWithWeChat();
 
       if (weChatResult == null) {
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-          errorMessage: BlocMessageKeys.authLoginCancelled,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            errorMessage: BlocMessageKeys.authLoginCancelled,
+          ),
+        );
         return;
       }
 
@@ -837,27 +842,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await _authRepository.loginWithSocialToken(
         homeserver: event.homeserver,
         provider: 'wechat',
-        idToken: weChatResult.accessToken,  // 这是授权码
+        idToken: weChatResult.accessToken, // 这是授权码
         accessToken: null,
         email: null,
         displayName: null,
       );
 
       if (result.success && result.user != null) {
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: result.user,
-        ));
-        add(const LoadUserProfileData());
-        // 通话管理器必须在 sync 到达前初始化完成（先于推送注册）
-        await _initializeCallManager();
-        unawaited(_registerPushNotifications());
+        await _completeAuthenticatedFlow(result.user!, emit);
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: result.errorMessage ?? BlocMessageKeys.authWeChatLoginFailed,
-          errorType: result.errorType,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage:
+                result.errorMessage ?? BlocMessageKeys.authWeChatLoginFailed,
+            errorType: result.errorType,
+          ),
+        );
       }
     } catch (e) {
       debugLog('AuthBloc: WeChat login failed - $e');
@@ -868,10 +869,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else if (e.toString().contains('not installed')) {
         errorMsg = BlocMessageKeys.authWeChatNotInstalled;
       }
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: errorMsg,
-      ));
+      emit(state.copyWith(status: AuthStatus.error, errorMessage: errorMsg));
     }
   }
 
@@ -884,10 +882,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthRequestChangeEmailRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      changeEmailStatus: ChangeEmailStatus.sendingCode,
-      errorMessage: null,
-    ));
+    emit(
+      state.copyWith(
+        changeEmailStatus: ChangeEmailStatus.sendingCode,
+        errorMessage: null,
+      ),
+    );
 
     try {
       final success = await _authRepository.requestChangeEmail(
@@ -896,14 +896,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (success) {
-        emit(state.copyWith(
-          changeEmailStatus: ChangeEmailStatus.codeSent,
-        ));
+        emit(state.copyWith(changeEmailStatus: ChangeEmailStatus.codeSent));
       } else {
-        emit(state.copyWith(
-          changeEmailStatus: ChangeEmailStatus.failed,
-          errorMessage: BlocMessageKeys.authSendVerificationCodeFailed,
-        ));
+        emit(
+          state.copyWith(
+            changeEmailStatus: ChangeEmailStatus.failed,
+            errorMessage: BlocMessageKeys.authSendVerificationCodeFailed,
+          ),
+        );
       }
     } catch (e) {
       String errorMessage = BlocMessageKeys.authSendVerificationCodeFailed;
@@ -913,10 +913,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else if (e.toString().contains('M_THREEPID_IN_USE')) {
         errorMessage = BlocMessageKeys.authEmailAlreadyBound;
       }
-      emit(state.copyWith(
-        changeEmailStatus: ChangeEmailStatus.failed,
-        errorMessage: errorMessage,
-      ));
+      emit(
+        state.copyWith(
+          changeEmailStatus: ChangeEmailStatus.failed,
+          errorMessage: errorMessage,
+        ),
+      );
     }
   }
 
@@ -925,10 +927,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthConfirmChangeEmailRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      changeEmailStatus: ChangeEmailStatus.confirming,
-      errorMessage: null,
-    ));
+    emit(
+      state.copyWith(
+        changeEmailStatus: ChangeEmailStatus.confirming,
+        errorMessage: null,
+      ),
+    );
 
     try {
       final success = await _authRepository.confirmChangeEmail(
@@ -937,25 +941,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (success) {
-        emit(state.copyWith(
-          changeEmailStatus: ChangeEmailStatus.success,
-          boundEmail: event.newEmail,
-        ));
+        emit(
+          state.copyWith(
+            changeEmailStatus: ChangeEmailStatus.success,
+            boundEmail: event.newEmail,
+          ),
+        );
       } else {
-        emit(state.copyWith(
-          changeEmailStatus: ChangeEmailStatus.failed,
-          errorMessage: BlocMessageKeys.authChangeEmailFailed,
-        ));
+        emit(
+          state.copyWith(
+            changeEmailStatus: ChangeEmailStatus.failed,
+            errorMessage: BlocMessageKeys.authChangeEmailFailed,
+          ),
+        );
       }
     } catch (e) {
       String errorMessage = BlocMessageKeys.authChangeEmailFailed;
       if (e.toString().contains('M_THREEPID_AUTH_FAILED')) {
         errorMessage = BlocMessageKeys.authVerificationCodeInvalid;
       }
-      emit(state.copyWith(
-        changeEmailStatus: ChangeEmailStatus.failed,
-        errorMessage: errorMessage,
-      ));
+      emit(
+        state.copyWith(
+          changeEmailStatus: ChangeEmailStatus.failed,
+          errorMessage: errorMessage,
+        ),
+      );
     }
   }
 
@@ -966,9 +976,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       final email = await _authRepository.getBoundEmail();
-      emit(state.copyWith(
-        boundEmail: email,
-      ));
+      emit(state.copyWith(boundEmail: email));
     } catch (e) {
       debugLog('AuthBloc: Get bound email failed - $e');
     }
@@ -990,13 +998,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           ? await _biometricService.getBiometricTypeDescription()
           : null;
 
-      emit(state.copyWith(
-        isBiometricAvailable: isAvailable,
-        isBiometricEnabled: isEnabled,
-        biometricTypeDescription: typeDescription,
-      ));
+      emit(
+        state.copyWith(
+          isBiometricAvailable: isAvailable,
+          isBiometricEnabled: isEnabled,
+          biometricTypeDescription: typeDescription,
+        ),
+      );
 
-      debugLog('AuthBloc: Biometric availability - available: $isAvailable, enabled: $isEnabled, type: $typeDescription');
+      debugLog(
+        'AuthBloc: Biometric availability - available: $isAvailable, enabled: $isEnabled, type: $typeDescription',
+      );
     } catch (e) {
       debugLog('AuthBloc: Check biometric availability failed - $e');
     }
@@ -1007,39 +1019,42 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthBiometricLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      status: AuthStatus.loading,
-      errorMessage: null,
-    ));
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
     try {
       // 检查生物识别是否可用
       final isAvailable = await _biometricService.isAvailable();
       if (!isAvailable) {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: 'Biometric authentication not available',
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: 'Biometric authentication not available',
+          ),
+        );
         return;
       }
 
       // 检查是否已启用生物识别
       final isEnabled = await _secureStorage.isBiometricEnabled();
       if (!isEnabled) {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: 'Biometric login not enabled',
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: 'Biometric login not enabled',
+          ),
+        );
         return;
       }
 
       // 获取保存的凭据
       final credentials = await _secureStorage.getCredentials();
       if (credentials == null) {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: 'No saved credentials found',
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: 'No saved credentials found',
+          ),
+        );
         return;
       }
 
@@ -1049,20 +1064,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (!biometricResult.success) {
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-          errorMessage: biometricResult.errorMessage,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            errorMessage: biometricResult.errorMessage,
+          ),
+        );
         return;
       }
 
       // 生物识别成功，使用已保存的 session token 恢复登录（仿微信策略：密码不再存储）
       final session = await _secureStorage.getSession();
       if (session == null) {
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-          errorMessage: BlocMessageKeys.authSessionExpired,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            errorMessage: BlocMessageKeys.authSessionExpired,
+          ),
+        );
         return;
       }
 
@@ -1071,10 +1090,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final deviceId = session['deviceId'];
 
       if (accessToken == null || userId == null || deviceId == null) {
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-          errorMessage: BlocMessageKeys.authSessionIncomplete,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            errorMessage: BlocMessageKeys.authSessionIncomplete,
+          ),
+        );
         return;
       }
 
@@ -1086,10 +1107,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (result.success && result.user != null) {
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: result.user,
-        ));
+        emit(
+          state.copyWith(status: AuthStatus.authenticated, user: result.user),
+        );
         // 登录成功后自动加载完整用户资料
         add(const LoadUserProfileData());
         // 登录成功后注册推送通知
@@ -1097,18 +1117,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // 登录成功后初始化通话管理器
         unawaited(_initializeCallManager());
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: result.errorMessage ?? 'Login failed',
-          errorType: result.errorType,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: result.errorMessage ?? 'Login failed',
+            errorType: result.errorType,
+          ),
+        );
       }
     } catch (e) {
       debugLog('AuthBloc: Biometric login failed - $e');
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Biometric login failed: $e',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Biometric login failed: $e',
+        ),
+      );
     }
   }
 
@@ -1121,18 +1145,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // 检查生物识别是否可用
       final isAvailable = await _biometricService.isAvailable();
       if (!isAvailable) {
-        emit(state.copyWith(
-          errorMessage: 'Biometric authentication not available on this device',
-        ));
+        emit(
+          state.copyWith(
+            errorMessage:
+                'Biometric authentication not available on this device',
+          ),
+        );
         return;
       }
 
       // 获取当前保存的凭据
       final credentials = await _secureStorage.getCredentials();
       if (credentials == null) {
-        emit(state.copyWith(
-          errorMessage: 'Please login first to enable biometric login',
-        ));
+        emit(
+          state.copyWith(
+            errorMessage: 'Please login first to enable biometric login',
+          ),
+        );
         return;
       }
 
@@ -1148,21 +1177,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           username: credentials['username']!,
         );
 
-        emit(state.copyWith(
-          isBiometricEnabled: true,
-        ));
+        emit(state.copyWith(isBiometricEnabled: true));
 
         debugLog('AuthBloc: Biometric login enabled');
       } else {
-        emit(state.copyWith(
-          errorMessage: result.errorMessage ?? 'Biometric authentication failed',
-        ));
+        emit(
+          state.copyWith(
+            errorMessage:
+                result.errorMessage ?? 'Biometric authentication failed',
+          ),
+        );
       }
     } catch (e) {
       debugLog('AuthBloc: Enable biometric login failed - $e');
-      emit(state.copyWith(
-        errorMessage: 'Failed to enable biometric login: $e',
-      ));
+      emit(
+        state.copyWith(errorMessage: 'Failed to enable biometric login: $e'),
+      );
     }
   }
 
@@ -1174,21 +1204,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await _secureStorage.disableBiometricLogin();
 
-      emit(state.copyWith(
-        isBiometricEnabled: false,
-      ));
+      emit(state.copyWith(isBiometricEnabled: false));
 
       debugLog('AuthBloc: Biometric login disabled');
     } catch (e) {
       debugLog('AuthBloc: Disable biometric login failed - $e');
-      emit(state.copyWith(
-        errorMessage: 'Failed to disable biometric login: $e',
-      ));
+      emit(
+        state.copyWith(errorMessage: 'Failed to disable biometric login: $e'),
+      );
     }
   }
 
   // ============================================
-  // Token / Passkey / OTP 登录（待实现）
+  // Token 登录
   // ============================================
 
   /// Token 登录
@@ -1196,10 +1224,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthTokenLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      status: AuthStatus.loading,
-      errorMessage: null,
-    ));
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
     try {
       final result = await _authRepository.loginWithToken(
@@ -1210,70 +1235,59 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (result.success && result.user != null) {
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: result.user,
-        ));
-        add(const LoadUserProfileData());
-        await _initializeCallManager();
-        unawaited(_registerPushNotifications());
+        await _completeAuthenticatedFlow(result.user!, emit);
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: result.errorMessage ?? 'Token login failed',
-          errorType: result.errorType,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: result.errorMessage ?? 'Token login failed',
+            errorType: result.errorType,
+          ),
+        );
       }
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Token login failed: $e',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Token login failed: $e',
+        ),
+      );
     }
   }
 
-  /// Passkey 登录（功能尚未实现）
-  Future<void> _onPasskeyLogin(
-    AuthPasskeyLoginRequested event,
+  /// Matrix login token 登录（SSO/OIDC 回调）
+  Future<void> _onLoginTokenLogin(
+    AuthLoginTokenLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      status: AuthStatus.error,
-      errorMessage: BlocMessageKeys.authPasskeyNotImplemented,
-    ));
-  }
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
-  /// 注册 Passkey（功能尚未实现）
-  Future<void> _onRegisterPasskey(
-    AuthRegisterPasskeyRequested event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(state.copyWith(
-      status: AuthStatus.error,
-      errorMessage: BlocMessageKeys.authPasskeyRegisterNotImplemented,
-    ));
-  }
+    try {
+      final result = await _authRepository.loginWithLoginToken(
+        homeserver: event.homeserver,
+        loginToken: event.loginToken,
+      );
 
-  /// 请求邮箱 OTP 验证码（功能尚未实现）
-  Future<void> _onRequestEmailOtp(
-    AuthRequestEmailOtpRequested event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(state.copyWith(
-      status: AuthStatus.error,
-      errorMessage: BlocMessageKeys.authEmailOtpNotImplemented,
-    ));
-  }
-
-  /// 邮箱 OTP 登录（功能尚未实现）
-  Future<void> _onEmailOtpLogin(
-    AuthEmailOtpLoginRequested event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(state.copyWith(
-      status: AuthStatus.error,
-      errorMessage: BlocMessageKeys.authEmailOtpNotImplemented,
-    ));
+      if (result.success && result.user != null) {
+        await _completeAuthenticatedFlow(result.user!, emit);
+      } else {
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: result.errorMessage ?? 'SSO token login failed',
+            errorType: result.errorType,
+          ),
+        );
+      }
+    } catch (e) {
+      debugLog('AuthBloc: Login token login failed - $e');
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'SSO token login failed: $e',
+        ),
+      );
+    }
   }
 
   /// 清除错误状态
@@ -1281,13 +1295,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthErrorCleared event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(
-      errorMessage: null,
-      errorType: null,
-      status: state.user != null
-          ? AuthStatus.authenticated
-          : AuthStatus.unauthenticated,
-    ));
+    emit(
+      state.copyWith(
+        errorMessage: null,
+        errorType: null,
+        status: state.user != null
+            ? AuthStatus.authenticated
+            : AuthStatus.unauthenticated,
+      ),
+    );
   }
 
   @override
@@ -1296,4 +1312,3 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     return super.close();
   }
 }
-

@@ -1,20 +1,23 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/router/routes.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../n42_chat.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
+import '../main/chat_main_page.dart';
+import '../../widgets/auth/social_login_buttons.dart';
 import 'register_page.dart';
 import 'reset_password_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../helpers/bloc_message_helper.dart';
 
 /// 登录页面
 ///
@@ -28,7 +31,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _homeserverController = TextEditingController(text: 'https://m.si46.world');
+  final _homeserverController = TextEditingController(
+    text: N42Chat.config?.defaultHomeserver ?? 'https://m.si46.world',
+  );
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _biometricService = BiometricService();
@@ -57,7 +62,9 @@ class _LoginPageState extends State<LoginPage> {
         : '';
 
     // 调试日志
-    debugLog('LoginPage: Biometric check - available: $isAvailable, enabled: $isEnabled, hasCredentials: $hasCredentials');
+    debugLog(
+      'LoginPage: Biometric check - available: $isAvailable, enabled: $isEnabled, hasCredentials: $hasCredentials',
+    );
 
     if (mounted) {
       setState(() {
@@ -87,15 +94,42 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  void _handleAuthSuccess() {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop(true);
+      return;
+    }
+
+    final router = GoRouter.maybeOf(context);
+    if (router != null) {
+      router.go(Routes.conversationList);
+      return;
+    }
+
+    navigator.pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider.value(
+          value: context.read<AuthBloc>(),
+          child: ChatMainPage(
+            onBackToMain: () => Navigator.of(context).maybePop(),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _onLogin() {
     if (_formKey.currentState?.validate() ?? false) {
       // 微信策略：始终保持登录状态
-      context.read<AuthBloc>().add(AuthLoginRequested(
-            homeserver: _homeserverController.text.trim(),
-            username: _usernameController.text.trim(),
-            password: _passwordController.text,
-            rememberMe: true, // 始终记住登录
-          ));
+      context.read<AuthBloc>().add(
+        AuthLoginRequested(
+          homeserver: _homeserverController.text.trim(),
+          username: _usernameController.text.trim(),
+          password: _passwordController.text,
+          rememberMe: true, // 始终记住登录
+        ),
+      );
     }
   }
 
@@ -111,7 +145,10 @@ class _LoginPageState extends State<LoginPage> {
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first'),
+          content: Text(
+            S.of(context)?.authEnterServerAddressFirst ??
+                'Please enter server address first',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
@@ -134,8 +171,10 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
@@ -158,17 +197,19 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state.hasError) {
+            final message = state.errorMessage != null
+                ? resolveBlocMessage(context, state.errorMessage!)
+                : (S.of(context)?.authLoginFailed('') ?? 'Login failed');
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? S.of(context)?.authLoginFailed('') ?? 'Login failed'),
+                content: Text(message),
                 backgroundColor: AppColors.error,
               ),
             );
           }
 
           if (state.isAuthenticated) {
-            // 登录成功，返回上一页或跳转到主页
-            Navigator.of(context).maybePop(true);
+            _handleAuthSuccess();
           }
         },
         builder: (context, state) {
@@ -203,7 +244,9 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 20),
 
                   // 生物识别快捷登录（如果已启用且有凭据）- 显示在登录按钮上方
-                  if (_isBiometricAvailable && _isBiometricEnabled && _hasCredentials) ...[
+                  if (_isBiometricAvailable &&
+                      _isBiometricEnabled &&
+                      _hasCredentials) ...[
                     _buildBiometricQuickLogin(),
                     const SizedBox(height: 12),
                     _buildOrDivider(),
@@ -221,7 +264,10 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 16),
 
                   // 第三方登录
-                  _buildSocialLogins(),
+                  SocialLoginButtons(
+                    isAgreedToTerms: true,
+                    homeserverBuilder: () => _homeserverController.text.trim(),
+                  ),
 
                   const SizedBox(height: 16),
 
@@ -235,7 +281,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 
   /// 紧凑版 Logo
   Widget _buildCompactLogo(bool isDark) {
@@ -264,67 +309,24 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: isDark
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
               ),
             ),
             Text(
-              S.of(context)?.authSecureDecentralizedChat ?? 'Secure, decentralized messaging',
+              S.of(context)?.authSecureDecentralizedChat ??
+                  'Secure, decentralized messaging',
               style: TextStyle(
                 fontSize: 12,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
               ),
             ),
           ],
         ),
       ],
-    );
-  }
-
-  /// 第三方登录
-  Widget _buildSocialLogins() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildSocialButton(
-          icon: Icons.g_mobiledata,
-          color: const Color(0xFFDB4437),
-          onTap: _loginWithGoogle,
-        ),
-        if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) ...[
-          const SizedBox(width: 20),
-          _buildSocialButton(
-            icon: Icons.apple,
-            color: context.isDarkMode ? Colors.white : Colors.black,
-            onTap: _loginWithApple,
-          ),
-        ],
-        const SizedBox(width: 20),
-        _buildSocialButton(
-          icon: Icons.login,
-          color: Colors.blue,
-          onTap: _loginWithSso,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSocialButton({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
-        ),
-        child: Icon(icon, color: color, size: 28),
-      ),
     );
   }
 
@@ -347,24 +349,15 @@ class _LoginPageState extends State<LoginPage> {
           },
           child: Text(
             S.of(context)?.authRegisterAccount ?? 'Sign Up',
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textLink,
-            ),
+            style: const TextStyle(fontSize: 14, color: AppColors.textLink),
           ),
         ),
-        const Text(
-          '|',
-          style: TextStyle(color: AppColors.textTertiary),
-        ),
+        const Text('|', style: TextStyle(color: AppColors.textTertiary)),
         TextButton(
           onPressed: _showForgotPasswordHelp,
           child: Text(
             S.of(context)?.authForgotPassword ?? 'Forgot Password',
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textLink,
-            ),
+            style: const TextStyle(fontSize: 14, color: AppColors.textLink),
           ),
         ),
       ],
@@ -372,27 +365,34 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildServerInput(AuthState state, bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final inputBgColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           S.of(context)?.authServerAddress ?? 'Server Address',
-          style: TextStyle(
-            fontSize: 14,
-            color: labelColor,
-          ),
+          style: TextStyle(fontSize: 14, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _homeserverController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.authServerAddressHint ?? 'https://m.si46.world',
+            hintText:
+                S.of(context)?.authServerAddressHint ??
+                (N42Chat.config?.defaultHomeserver ?? 'https://m.si46.world'),
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -412,27 +412,31 @@ class _LoginPageState extends State<LoginPage> {
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.primary,
+                        ),
                       ),
                     ),
                   )
                 : state.isHomeserverValid
-                    ? const Icon(Icons.check_circle, color: AppColors.success)
-                    : IconButton(
-                        icon: Icon(Icons.refresh, color: hintColor),
-                        onPressed: _checkHomeserver,
-                      ),
+                ? const Icon(Icons.check_circle, color: AppColors.success)
+                : IconButton(
+                    icon: Icon(Icons.refresh, color: hintColor),
+                    onPressed: _checkHomeserver,
+                  ),
           ),
           keyboardType: TextInputType.url,
           textInputAction: TextInputAction.next,
+          onChanged: (_) => setState(() {}),
           onEditingComplete: _checkHomeserver,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.authEnterServerAddress ?? 'Please enter server address';
+              return S.of(context)?.authEnterServerAddress ??
+                  'Please enter server address';
             }
             if (!value.startsWith('http://') && !value.startsWith('https://')) {
-              return S.of(context)?.authEnterValidServerAddress ?? 'Please enter a valid server address';
+              return S.of(context)?.authEnterValidServerAddress ??
+                  'Please enter a valid server address';
             }
             return null;
           },
@@ -441,10 +445,7 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(height: 4),
           Text(
             '✓ ${S.of(context)?.authConnectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.success,
-            ),
+            style: const TextStyle(fontSize: 12, color: AppColors.success),
           ),
         ],
       ],
@@ -452,10 +453,18 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildUsernameInput(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final inputBgColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     final isEmail = _usernameController.text.contains('@');
 
@@ -464,17 +473,16 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Text(
           S.of(context)?.authUsernameOrEmail ?? 'Username or Email',
-          style: TextStyle(
-            fontSize: 14,
-            color: labelColor,
-          ),
+          style: TextStyle(fontSize: 14, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _usernameController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.authEnterUsernameOrEmail ?? 'Enter username or email',
+            hintText:
+                S.of(context)?.authEnterUsernameOrEmail ??
+                'Enter username or email',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -496,7 +504,8 @@ class _LoginPageState extends State<LoginPage> {
           onChanged: (_) => setState(() {}),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.authEnterUsernameOrEmail ?? 'Please enter username or email';
+              return S.of(context)?.authEnterUsernameOrEmail ??
+                  'Please enter username or email';
             }
             return null;
           },
@@ -506,20 +515,25 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildPasswordInput(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final inputBgColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           S.of(context)?.authPassword ?? 'Password',
-          style: TextStyle(
-            fontSize: 14,
-            color: labelColor,
-          ),
+          style: TextStyle(fontSize: 14, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -538,10 +552,7 @@ class _LoginPageState extends State<LoginPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.lock_outline,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.lock_outline, color: hintColor),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -559,7 +570,8 @@ class _LoginPageState extends State<LoginPage> {
           onFieldSubmitted: (_) => _onLogin(),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.authEnterPassword ?? 'Please enter password';
+              return S.of(context)?.authEnterPassword ??
+                  'Please enter password';
             }
             return null;
           },
@@ -580,9 +592,7 @@ class _LoginPageState extends State<LoginPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),
         child: state.isLoading
@@ -605,7 +615,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 
   /// 生物识别快捷登录按钮（显示在登录按钮上方）
   Widget _buildBiometricQuickLogin() {
@@ -632,9 +641,7 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         minimumSize: const Size(double.infinity, 52),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -642,7 +649,9 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildOrDivider() {
     final isDark = context.isDarkMode;
     final dividerColor = isDark ? Colors.white24 : Colors.black12;
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Row(
       children: [
@@ -658,71 +667,25 @@ class _LoginPageState extends State<LoginPage> {
       ],
     );
   }
-  
+
   void _loginWithBiometric() async {
     // 直接触发生物识别登录
     context.read<AuthBloc>().add(const AuthBiometricLoginRequested());
   }
 
-  void _loginWithGoogle() {
-    final homeserver = _homeserverController.text.trim();
-    if (homeserver.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-      return;
-    }
-
-    // 触发 AuthBloc 的 Google 登录事件
-    context.read<AuthBloc>().add(AuthGoogleLoginRequested(homeserver: homeserver));
-  }
-
-  void _loginWithApple() {
-    final homeserver = _homeserverController.text.trim();
-    if (homeserver.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-      return;
-    }
-
-    // 触发 AuthBloc 的 Apple 登录事件
-    context.read<AuthBloc>().add(AuthAppleLoginRequested(homeserver: homeserver));
-  }
-
-  void _loginWithSso() async {
-    final homeserver = _homeserverController.text.trim();
-    if (homeserver.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-      return;
-    }
-    
-    context.read<AuthBloc>().add(AuthSsoLoginRequested(homeserver: homeserver));
-  }
-
   Widget _buildAgreement(bool isDark) {
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textTertiary;
+    final textColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textTertiary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Text.rich(
         TextSpan(
-          text: S.of(context)?.authLoginAgreement ?? 'By logging in, you agree to ',
-          style: TextStyle(
-            fontSize: 12,
-            color: textColor,
-          ),
+          text:
+              S.of(context)?.authLoginAgreement ??
+              'By logging in, you agree to ',
+          style: TextStyle(fontSize: 12, color: textColor),
           children: [
             TextSpan(
               text: S.of(context)?.authTermsOfService ?? 'Terms of Service',
@@ -744,4 +707,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-

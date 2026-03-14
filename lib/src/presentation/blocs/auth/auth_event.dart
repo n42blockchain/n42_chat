@@ -91,6 +91,20 @@ class AuthTokenLoginRequested extends AuthEvent {
   List<Object?> get props => [homeserver, accessToken, userId, deviceId];
 }
 
+/// Matrix login token 登录请求（SSO/OIDC 回调）
+class AuthLoginTokenLoginRequested extends AuthEvent {
+  final String homeserver;
+  final String loginToken;
+
+  const AuthLoginTokenLoginRequested({
+    required this.homeserver,
+    required this.loginToken,
+  });
+
+  @override
+  List<Object?> get props => [homeserver, loginToken];
+}
+
 /// 清除错误
 class AuthErrorCleared extends AuthEvent {
   const AuthErrorCleared();
@@ -150,51 +164,6 @@ class LoadUserProfileData extends AuthEvent {
 // ============================================
 // 多种登录方式事件
 // ============================================
-
-/// Passkey 登录请求
-class AuthPasskeyLoginRequested extends AuthEvent {
-  final String homeserver;
-  
-  const AuthPasskeyLoginRequested({required this.homeserver});
-  
-  @override
-  List<Object?> get props => [homeserver];
-}
-
-/// 注册 Passkey
-class AuthRegisterPasskeyRequested extends AuthEvent {
-  const AuthRegisterPasskeyRequested();
-}
-
-/// 请求邮箱验证码
-class AuthRequestEmailOtpRequested extends AuthEvent {
-  final String homeserver;
-  final String email;
-  
-  const AuthRequestEmailOtpRequested({
-    required this.homeserver,
-    required this.email,
-  });
-  
-  @override
-  List<Object?> get props => [homeserver, email];
-}
-
-/// 邮箱验证码登录请求
-class AuthEmailOtpLoginRequested extends AuthEvent {
-  final String homeserver;
-  final String email;
-  final String otp;
-  
-  const AuthEmailOtpLoginRequested({
-    required this.homeserver,
-    required this.email,
-    required this.otp,
-  });
-  
-  @override
-  List<Object?> get props => [homeserver, email, otp];
-}
 
 /// Google 登录请求
 class AuthGoogleLoginRequested extends AuthEvent {
@@ -373,4 +342,3 @@ class AuthEnableBiometricLogin extends AuthEvent {
 class AuthDisableBiometricLogin extends AuthEvent {
   const AuthDisableBiometricLogin();
 }
-

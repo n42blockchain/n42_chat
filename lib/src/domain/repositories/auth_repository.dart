@@ -161,6 +161,13 @@ abstract class IAuthRepository {
     String? accessToken,
     String? email,
     String? displayName,
+    Map<String, dynamic>? extra,
+  });
+
+  /// 使用 Matrix SSO 回调返回的 login token 登录
+  Future<AuthResult> loginWithLoginToken({
+    required String homeserver,
+    required String loginToken,
   });
 
   /// 启动 SSO 登录
@@ -310,4 +317,3 @@ class HomeserverInfo {
   String toString() =>
       'HomeserverInfo($serverName, v$serverVersion, types: $supportedLoginTypes)';
 }
-

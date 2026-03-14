@@ -228,6 +228,46 @@ class MessageArchiveService {
     return _db.getArchivedRoomIds();
   }
 
+  /// 导入外部备份中的归档消息
+  Future<int> importArchivedMessages(
+    String roomId,
+    List<ArchivedMessagesCompanion> entries,
+  ) async {
+    if (entries.isEmpty) return 0;
+
+    final inserted = await _db.insertMessages(entries);
+    if (inserted == 0) return 0;
+
+    final metadata = await _db.getMetadata(roomId);
+    final latestTs = entries
+        .map((entry) => entry.originServerTs.value)
+        .fold<int>(0, (maxTs, ts) => ts > maxTs ? ts : maxTs);
+    final latestEventId = entries.firstWhere(
+      (entry) => entry.originServerTs.value == latestTs,
+      orElse: () => entries.last,
+    ).eventId.value;
+
+    await _db.updateMetadata(
+      ArchiveMetadataCompanion(
+        roomId: Value(roomId),
+        lastArchivedEventId: Value(latestEventId),
+        lastArchivedTs: Value(
+          latestTs > (metadata?.lastArchivedTs ?? 0)
+              ? latestTs
+              : (metadata?.lastArchivedTs ?? 0),
+        ),
+        totalArchived: Value(await _db.getMessageCount(roomId)),
+        lastArchiveTime: Value(DateTime.now()),
+      ),
+    );
+
+    return inserted;
+  }
+
+  Future<bool> isEventArchived(String eventId) async {
+    return _db.isEventArchived(eventId);
+  }
+
   // ============================================
   // 内部方法
   // ============================================

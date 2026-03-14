@@ -22,6 +22,7 @@ import '../../blocs/group/group_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../chat/chat_page.dart';
 import '../group/create_group_page.dart';
+import '../../../n42_chat.dart';
 import 'contact_tile.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -29,11 +30,8 @@ import '../../../core/utils/debug_log.dart';
 class ContactListPage extends StatefulWidget {
   /// 是否显示 AppBar（嵌入到主框架时可设为 false）
   final bool showAppBar;
-  
-  const ContactListPage({
-    super.key,
-    this.showAppBar = true,
-  });
+
+  const ContactListPage({super.key, this.showAppBar = true});
 
   @override
   State<ContactListPage> createState() => _ContactListPageState();
@@ -89,19 +87,21 @@ class _ContactListPageState extends State<ContactListPage> {
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: widget.showAppBar ? N42AppBar(
-        title: S.of(context)?.commonContacts ?? 'Contacts',
-        showBackButton: false,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.person_add_outlined,
-              color: isDark ? Colors.white : AppColors.textPrimary,
-            ),
-            onPressed: _showAddContactDialog,
-          ),
-        ],
-      ) : null,
+      appBar: widget.showAppBar
+          ? N42AppBar(
+              title: S.of(context)?.commonContacts ?? 'Contacts',
+              showBackButton: false,
+              actions: [
+                IconButton(
+                  icon: Icon(
+                    Icons.person_add_outlined,
+                    color: isDark ? Colors.white : AppColors.textPrimary,
+                  ),
+                  onPressed: _showAddContactDialog,
+                ),
+              ],
+            )
+          : null,
       body: Column(
         children: [
           // 搜索栏（始终显示）
@@ -112,9 +112,11 @@ class _ContactListPageState extends State<ContactListPage> {
             child: BlocConsumer<ContactBloc, ContactState>(
               listener: (context, state) {
                 if (state.status == ContactStatus.chatStarted) {
-                  Navigator.of(context).pushNamed(
-                    '/chat/${state.startedChatRoomId}',
-                  );
+                  final roomId = state.startedChatRoomId;
+                  if (roomId == null || roomId.isEmpty) {
+                    return;
+                  }
+                  unawaited(N42Chat.openConversation(roomId, context: context));
                 } else if (state.status == ContactStatus.error) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(state.errorMessage ?? '')),
@@ -145,7 +147,9 @@ class _ContactListPageState extends State<ContactListPage> {
                 return N42EmptyState(
                   icon: Icons.contacts_outlined,
                   title: S.of(context)?.commonNoContacts ?? 'No contacts',
-                  description: S.of(context)?.contactAddFriendsToChat ?? 'Add friends to start chatting',
+                  description:
+                      S.of(context)?.contactAddFriendsToChat ??
+                      'Add friends to start chatting',
                 );
               },
             ),
@@ -217,9 +221,7 @@ class _ContactListPageState extends State<ContactListPage> {
             controller: _scrollController,
             slivers: [
               // 功能入口
-              SliverToBoxAdapter(
-                child: _buildFunctionEntries(state, isDark),
-              ),
+              SliverToBoxAdapter(child: _buildFunctionEntries(state, isDark)),
 
               // 按字母分组的联系人
               for (final letter in state.indexLetters) ...[
@@ -230,29 +232,28 @@ class _ContactListPageState extends State<ContactListPage> {
                 ),
                 // 该字母下的联系人
                 SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final contacts = state.groupedContacts[letter]!;
-                      return Column(
-                        children: [
-                          ContactTile(
-                            contact: contacts[index],
-                            onTap: () => _onContactTap(contacts[index]),
-                            onLongPress: () => _showContactMenu(contacts[index]),
-                          ),
-                          if (index < contacts.length - 1)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 72),
-                              child: Divider(
-                                height: 1,
-                                color: isDark ? AppColors.dividerDark : AppColors.divider,
-                              ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final contacts = state.groupedContacts[letter]!;
+                    return Column(
+                      children: [
+                        ContactTile(
+                          contact: contacts[index],
+                          onTap: () => _onContactTap(contacts[index]),
+                          onLongPress: () => _showContactMenu(contacts[index]),
+                        ),
+                        if (index < contacts.length - 1)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 72),
+                            child: Divider(
+                              height: 1,
+                              color: isDark
+                                  ? AppColors.dividerDark
+                                  : AppColors.divider,
                             ),
-                        ],
-                      );
-                    },
-                    childCount: state.groupedContacts[letter]?.length ?? 0,
-                  ),
+                          ),
+                      ],
+                    );
+                  }, childCount: state.groupedContacts[letter]?.length ?? 0),
                 ),
               ],
 
@@ -303,7 +304,9 @@ class _ContactListPageState extends State<ContactListPage> {
       return N42EmptyState(
         icon: Icons.search_off,
         title: S.of(context)?.contactNotFound ?? 'Contact not found',
-        description: S.of(context)?.contactTryOtherKeywords ?? 'Try other keywords or global search',
+        description:
+            S.of(context)?.contactTryOtherKeywords ??
+            'Try other keywords or global search',
       );
     }
 
@@ -311,11 +314,16 @@ class _ContactListPageState extends State<ContactListPage> {
       children: [
         // 本地搜索结果
         if (localResults.isNotEmpty) ...[
-          _buildSectionHeader(S.of(context)?.commonContacts ?? 'Contacts', isDark),
-          ...localResults.map((contact) => ContactTile(
-                contact: contact,
-                onTap: () => _onContactTap(contact),
-              )),
+          _buildSectionHeader(
+            S.of(context)?.commonContacts ?? 'Contacts',
+            isDark,
+          ),
+          ...localResults.map(
+            (contact) => ContactTile(
+              contact: contact,
+              onTap: () => _onContactTap(contact),
+            ),
+          ),
         ],
 
         // 正在搜索指示器
@@ -327,12 +335,17 @@ class _ContactListPageState extends State<ContactListPage> {
 
         // 全局搜索结果
         if (globalResults.isNotEmpty) ...[
-          _buildSectionHeader(S.of(context)?.contactSearchResults ?? 'Search Results', isDark),
-          ...globalResults.map((contact) => ContactTile(
-                contact: contact,
-                showOnlineStatus: false,
-                onTap: () => _onContactTap(contact),
-              )),
+          _buildSectionHeader(
+            S.of(context)?.contactSearchResults ?? 'Search Results',
+            isDark,
+          ),
+          ...globalResults.map(
+            (contact) => ContactTile(
+              contact: contact,
+              showOnlineStatus: false,
+              onTap: () => _onContactTap(contact),
+            ),
+          ),
         ],
       ],
     );
@@ -340,7 +353,7 @@ class _ContactListPageState extends State<ContactListPage> {
 
   Widget _buildFunctionEntries(ContactState state, bool isDark) {
     final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    
+
     return Container(
       color: surfaceColor,
       child: Column(
@@ -354,15 +367,17 @@ class _ContactListPageState extends State<ContactListPage> {
             onTap: _showFriendRequestsPage,
           ),
           _buildItemDivider(isDark),
-          
+
           // 仅聊天的朋友
           _buildFunctionItem(
             isDark: isDark,
             icon: _ChatOnlyFriendIcon(),
             title: S.of(context)?.contactChatOnlyFriends ?? 'Chat-only Friends',
-            onTap: () => _showComingSoon(S.of(context)?.contactChatOnlyFriends ?? 'Chat-only Friends'),
+            onTap: () => _showComingSoon(
+              S.of(context)?.contactChatOnlyFriends ?? 'Chat-only Friends',
+            ),
           ),
-          
+
           const SizedBox(height: 8),
           Container(
             color: surfaceColor,
@@ -392,7 +407,8 @@ class _ContactListPageState extends State<ContactListPage> {
                   isDark: isDark,
                   icon: _TagIcon(),
                   title: S.of(context)?.contactTags ?? 'Tags',
-                  onTap: () => _showComingSoon(S.of(context)?.contactTags ?? 'Tags'),
+                  onTap: () =>
+                      _showComingSoon(S.of(context)?.contactTags ?? 'Tags'),
                 ),
                 _buildItemDivider(isDark),
 
@@ -400,8 +416,13 @@ class _ContactListPageState extends State<ContactListPage> {
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _OfficialAccountIcon(),
-                  title: S.of(context)?.contactOfficialAccounts ?? 'Official Accounts',
-                  onTap: () => _showComingSoon(S.of(context)?.contactOfficialAccounts ?? 'Official Accounts'),
+                  title:
+                      S.of(context)?.contactOfficialAccounts ??
+                      'Official Accounts',
+                  onTap: () => _showComingSoon(
+                    S.of(context)?.contactOfficialAccounts ??
+                        'Official Accounts',
+                  ),
                 ),
                 _buildItemDivider(isDark),
 
@@ -409,8 +430,12 @@ class _ContactListPageState extends State<ContactListPage> {
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _ServiceAccountIcon(),
-                  title: S.of(context)?.contactServiceAccounts ?? 'Service Accounts',
-                  onTap: () => _showComingSoon(S.of(context)?.contactServiceAccounts ?? 'Service Accounts'),
+                  title:
+                      S.of(context)?.contactServiceAccounts ??
+                      'Service Accounts',
+                  onTap: () => _showComingSoon(
+                    S.of(context)?.contactServiceAccounts ?? 'Service Accounts',
+                  ),
                 ),
                 _buildItemDivider(isDark),
 
@@ -418,13 +443,18 @@ class _ContactListPageState extends State<ContactListPage> {
                 _buildFunctionItem(
                   isDark: isDark,
                   icon: _EnterpriseContactIcon(),
-                  title: S.of(context)?.contactEnterpriseContacts ?? 'Enterprise Contacts',
-                  onTap: () => _showComingSoon(S.of(context)?.contactEnterpriseContacts ?? 'Enterprise Contacts'),
+                  title:
+                      S.of(context)?.contactEnterpriseContacts ??
+                      'Enterprise Contacts',
+                  onTap: () => _showComingSoon(
+                    S.of(context)?.contactEnterpriseContacts ??
+                        'Enterprise Contacts',
+                  ),
                 ),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 8),
         ],
       ),
@@ -440,7 +470,7 @@ class _ContactListPageState extends State<ContactListPage> {
   }) {
     final textColor = isDark ? Colors.white : AppColors.textPrimary;
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    
+
     return Material(
       color: bgColor,
       child: InkWell(
@@ -449,24 +479,20 @@ class _ContactListPageState extends State<ContactListPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              SizedBox(
-                width: 44,
-                height: 44,
-                child: icon,
-              ),
+              SizedBox(width: 44, height: 44, child: icon),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: textColor,
-                  ),
+                  style: TextStyle(fontSize: 16, color: textColor),
                 ),
               ),
               if (badgeCount > 0)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.error,
                     borderRadius: BorderRadius.circular(10),
@@ -478,7 +504,9 @@ class _ContactListPageState extends State<ContactListPage> {
                 ),
               Icon(
                 Icons.chevron_right,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
                 size: 20,
               ),
             ],
@@ -544,7 +572,10 @@ class _ContactListPageState extends State<ContactListPage> {
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.commonFeatureComingSoon(feature) ?? '$feature coming soon'),
+        content: Text(
+          S.of(context)?.commonFeatureComingSoon(feature) ??
+              '$feature coming soon',
+        ),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -553,11 +584,11 @@ class _ContactListPageState extends State<ContactListPage> {
   void _onContactTap(ContactEntity contact) {
     _startChatWithContact(contact);
   }
-  
+
   /// 显示联系人操作菜单
   void _showContactMenu(ContactEntity contact) {
     final isDark = context.isDarkMode;
-    
+
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -619,7 +650,9 @@ class _ContactListPageState extends State<ContactListPage> {
               // 推荐给朋友
               ListTile(
                 leading: const Icon(Icons.person_add_alt_1_outlined),
-                title: Text(S.of(context)?.contactRecommendToFriend ?? 'Share contact'),
+                title: Text(
+                  S.of(context)?.contactRecommendToFriend ?? 'Share contact',
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   _recommendToFriend(contact);
@@ -637,11 +670,18 @@ class _ContactListPageState extends State<ContactListPage> {
               // 添加到桌面
               ListTile(
                 leading: const Icon(Icons.add_to_home_screen),
-                title: Text(S.of(context)?.contactAddToHomeScreen ?? 'Add to home screen'),
+                title: Text(
+                  S.of(context)?.contactAddToHomeScreen ?? 'Add to home screen',
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(S.of(context)?.commonFeatureInDevelopment('') ?? 'Feature in development')),
+                    SnackBar(
+                      content: Text(
+                        S.of(context)?.commonFeatureInDevelopment('') ??
+                            'Feature in development',
+                      ),
+                    ),
                   );
                 },
               ),
@@ -659,23 +699,21 @@ class _ContactListPageState extends State<ContactListPage> {
       ),
     );
   }
-  
+
   /// 推荐给朋友
   Future<void> _recommendToFriend(ContactEntity contact) async {
     final isDark = context.isDarkMode;
-    
+
     final selectedContact = await showModalBottomSheet<ContactEntity>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _RecommendContactSheet(
-        excludeUserId: contact.userId,
-        isDark: isDark,
-      ),
+      builder: (context) =>
+          _RecommendContactSheet(excludeUserId: contact.userId, isDark: isDark),
     );
-    
+
     if (selectedContact == null || !mounted) return;
-    
+
     try {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -684,7 +722,10 @@ class _ContactListPageState extends State<ContactListPage> {
               const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(width: 12),
               Text(S.of(context)?.contactSendingCard ?? 'Sending card...'),
@@ -693,25 +734,36 @@ class _ContactListPageState extends State<ContactListPage> {
           duration: const Duration(seconds: 2),
         ),
       );
-      
+
       final contactRepository = getIt<IContactRepository>();
-      final roomId = await contactRepository.startDirectChat(selectedContact.userId);
-      
-      final cardContent = '''[名片]
+      final roomId = await contactRepository.startDirectChat(
+        selectedContact.userId,
+      );
+
+      final cardContent =
+          '''[名片]
 联系人：${contact.effectiveDisplayName}
 ID：${contact.userId}''';
-      
+
       final chatBloc = getIt<ChatBloc>();
       chatBloc.add(InitializeChat(roomId));
-      
+
       await Future<void>.delayed(const Duration(milliseconds: 500));
       chatBloc.add(SendTextMessage(cardContent));
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.contactRecommendedCardTo(contact.effectiveDisplayName, selectedContact.effectiveDisplayName) ?? 'Recommended ${contact.effectiveDisplayName}\'s card to ${selectedContact.effectiveDisplayName}'),
+            content: Text(
+              S
+                      .of(context)
+                      ?.contactRecommendedCardTo(
+                        contact.effectiveDisplayName,
+                        selectedContact.effectiveDisplayName,
+                      ) ??
+                  'Recommended ${contact.effectiveDisplayName}\'s card to ${selectedContact.effectiveDisplayName}',
+            ),
             backgroundColor: AppColors.success,
           ),
         );
@@ -722,14 +774,17 @@ ID：${contact.userId}''';
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.contactRecommendFailed(e.toString()) ?? 'Recommend failed: $e'),
+            content: Text(
+              S.of(context)?.contactRecommendFailed(e.toString()) ??
+                  'Recommend failed: $e',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
       }
     }
   }
-  
+
   /// 设置联系人备注
   void _setContactRemark(ContactEntity contact) {
     final controller = TextEditingController(text: contact.remark);
@@ -741,7 +796,8 @@ ID：${contact.userId}''';
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            hintText: S.of(context)?.contactEnterRemarkName ?? 'Enter remark name',
+            hintText:
+                S.of(context)?.contactEnterRemarkName ?? 'Enter remark name',
             border: const OutlineInputBorder(),
             suffixIcon: IconButton(
               icon: const Icon(Icons.clear),
@@ -757,10 +813,12 @@ ID：${contact.userId}''';
           ),
           ElevatedButton(
             onPressed: () {
+              final remark = controller.text.trim();
               Navigator.pop(dialogContext);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(S.of(context)?.contactRemarkSetTo(controller.text) ?? 'Remark set to: ${controller.text}'),
+              context.read<ContactBloc>().add(
+                SetContactRemark(
+                  contact.userId,
+                  remark.isEmpty ? null : remark,
                 ),
               );
             },
@@ -770,7 +828,7 @@ ID：${contact.userId}''';
       ),
     );
   }
-  
+
   Future<void> _startChatWithContact(ContactEntity contact) async {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -780,7 +838,10 @@ ID：${contact.userId}''';
               const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(width: 12),
               Text(S.of(context)?.contactOpeningChat ?? 'Opening chat...'),
@@ -789,13 +850,13 @@ ID：${contact.userId}''';
           duration: const Duration(seconds: 2),
         ),
       );
-      
+
       final contactRepository = getIt<IContactRepository>();
       final roomId = await contactRepository.startDirectChat(contact.userId);
-      
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      
+
       final conversation = ConversationEntity(
         id: roomId,
         name: contact.effectiveDisplayName,
@@ -805,31 +866,36 @@ ID：${contact.userId}''';
         lastMessageTime: null,
         unreadCount: 0,
       );
-      
+
       final contactBloc = context.read<ContactBloc>();
-      
-      unawaited(Navigator.push(
-        context,
-        MaterialPageRoute<void>(
-          builder: (ctx) => MultiBlocProvider(
-            providers: [
-              BlocProvider(create: (_) => getIt<ChatBloc>()),
-              BlocProvider.value(value: contactBloc),
-            ],
-            child: ChatPage(
-              conversation: conversation,
-              onBack: () => Navigator.of(ctx).pop(),
+
+      unawaited(
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (ctx) => MultiBlocProvider(
+              providers: [
+                BlocProvider(create: (_) => getIt<ChatBloc>()),
+                BlocProvider.value(value: contactBloc),
+              ],
+              child: ChatPage(
+                conversation: conversation,
+                onBack: () => Navigator.of(ctx).pop(),
+              ),
             ),
           ),
         ),
-      ));
+      );
     } catch (e) {
       debugLog('Start chat error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.contactOpenChatFailed(e.toString()) ?? 'Open chat failed: $e'),
+            content: Text(
+              S.of(context)?.contactOpenChatFailed(e.toString()) ??
+                  'Open chat failed: $e',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -927,10 +993,10 @@ class _NewFriendPainter extends CustomPainter {
     final paint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.fill;
-    
+
     final cx = size.width / 2;
     final cy = size.height / 2;
-    
+
     // 主人形
     canvas.drawCircle(Offset(cx - 4, cy - 6), 6, paint);
     final bodyPath = Path()
@@ -940,7 +1006,7 @@ class _NewFriendPainter extends CustomPainter {
     paint.strokeWidth = 4;
     paint.strokeCap = StrokeCap.round;
     canvas.drawPath(bodyPath, paint);
-    
+
     // 加号
     paint.strokeWidth = 2.5;
     canvas.drawLine(Offset(cx + 10, cy - 2), Offset(cx + 10, cy + 10), paint);
@@ -992,10 +1058,7 @@ class _TagIcon extends StatelessWidget {
         color: const Color(0xFF3E7FE1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: CustomPaint(
-        size: const Size(44, 44),
-        painter: _TagPainter(),
-      ),
+      child: CustomPaint(size: const Size(44, 44), painter: _TagPainter()),
     );
   }
 }
@@ -1006,10 +1069,10 @@ class _TagPainter extends CustomPainter {
     final paint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.fill;
-    
+
     final cx = size.width / 2;
     final cy = size.height / 2;
-    
+
     // 标签形状
     final path = Path()
       ..moveTo(cx - 10, cy - 10)
@@ -1019,7 +1082,7 @@ class _TagPainter extends CustomPainter {
       ..lineTo(cx - 10, cy + 12)
       ..close();
     canvas.drawPath(path, paint);
-    
+
     // 小圆孔
     paint.color = const Color(0xFF3E7FE1);
     canvas.drawCircle(Offset(cx - 4, cy - 4), 3, paint);
@@ -1054,17 +1117,17 @@ class _OfficialAccountPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
-    
+
     final cx = size.width / 2;
     final cy = size.height / 2;
-    
+
     // 文档外框
     final rect = RRect.fromRectAndRadius(
       Rect.fromCenter(center: Offset(cx, cy), width: 22, height: 26),
       const Radius.circular(2),
     );
     canvas.drawRRect(rect, paint);
-    
+
     // 横线
     canvas.drawLine(Offset(cx - 6, cy - 6), Offset(cx + 6, cy - 6), paint);
     canvas.drawLine(Offset(cx - 6, cy), Offset(cx + 6, cy), paint);
@@ -1101,17 +1164,17 @@ class _ServiceAccountPainter extends CustomPainter {
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
-    
+
     final cx = size.width / 2;
     final cy = size.height / 2;
-    
+
     // 信封外框
     final rect = RRect.fromRectAndRadius(
       Rect.fromCenter(center: Offset(cx, cy), width: 24, height: 18),
       const Radius.circular(2),
     );
     canvas.drawRRect(rect, paint);
-    
+
     // 信封V形
     final path = Path()
       ..moveTo(cx - 11, cy - 7)
@@ -1149,26 +1212,30 @@ class _EnterpriseContactPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
-    
+
     final cx = size.width / 2;
     final cy = size.height / 2;
-    
+
     // 左对话框
     final leftPath = Path()
-      ..addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(cx - 14, cy - 9, 14, 12),
-        const Radius.circular(3),
-      ));
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(cx - 14, cy - 9, 14, 12),
+          const Radius.circular(3),
+        ),
+      );
     canvas.drawPath(leftPath, paint);
-    
+
     // 右对话框
     final rightPath = Path()
-      ..addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(cx + 2, cy - 3, 12, 10),
-        const Radius.circular(3),
-      ));
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(cx + 2, cy - 3, 12, 10),
+          const Radius.circular(3),
+        ),
+      );
     canvas.drawPath(rightPath, paint);
-    
+
     // 箭头
     canvas.drawLine(Offset(cx - 6, cy + 3), Offset(cx - 6, cy + 9), paint);
     canvas.drawLine(Offset(cx + 6, cy + 7), Offset(cx + 6, cy + 11), paint);
@@ -1183,10 +1250,7 @@ class _WeChatIndexBar extends StatefulWidget {
   final List<String> letters;
   final ValueChanged<String> onLetterTap;
 
-  const _WeChatIndexBar({
-    required this.letters,
-    required this.onLetterTap,
-  });
+  const _WeChatIndexBar({required this.letters, required this.onLetterTap});
 
   @override
   State<_WeChatIndexBar> createState() => _WeChatIndexBarState();
@@ -1279,8 +1343,8 @@ class _WeChatIndexBarState extends State<_WeChatIndexBar> {
             decoration: BoxDecoration(
               color: _isDragging
                   ? (isDark
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : Colors.black.withValues(alpha: 0.05))
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : Colors.black.withValues(alpha: 0.05))
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
@@ -1294,19 +1358,23 @@ class _WeChatIndexBarState extends State<_WeChatIndexBar> {
                     child: Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isActive ? AppColors.primary : Colors.transparent,
+                        color: isActive
+                            ? AppColors.primary
+                            : Colors.transparent,
                         shape: BoxShape.circle,
                       ),
                       child: Text(
                         letter,
                         style: TextStyle(
                           fontSize: 10,
-                          fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                          fontWeight: isActive
+                              ? FontWeight.bold
+                              : FontWeight.w500,
                           color: isActive
                               ? Colors.white
                               : (isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary),
+                                    ? AppColors.textSecondaryDark
+                                    : AppColors.textSecondary),
                         ),
                       ),
                     ),
@@ -1335,7 +1403,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(S.of(context)?.contactNewFriends ?? 'New Friends'),
@@ -1363,17 +1431,15 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    S.of(context)?.contactNoFriendRequests ?? 'No friend requests',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
+                    S.of(context)?.contactNoFriendRequests ??
+                        'No friend requests',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                   ),
                 ],
               ),
             );
           }
-          
+
           return ListView.separated(
             padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: requests.length,
@@ -1391,10 +1457,12 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
       ),
     );
   }
-  
+
   Widget _buildRequestItem(FriendRequest request, bool isDark) {
     // Use userId for consistent color generation, userName for display
-    final colorSource = request.userId.isNotEmpty ? request.userId : request.userName;
+    final colorSource = request.userId.isNotEmpty
+        ? request.userId
+        : request.userName;
     final displayName = request.userName == 'Unknown User'
         ? (S.of(context)?.commonUnknownUser ?? 'Unknown User')
         : request.userName;
@@ -1404,7 +1472,8 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
       leading: CircleAvatar(
         radius: 24,
         backgroundColor: _getColorFromName(colorSource),
-        backgroundImage: request.userAvatarUrl != null && request.userAvatarUrl!.isNotEmpty
+        backgroundImage:
+            request.userAvatarUrl != null && request.userAvatarUrl!.isNotEmpty
             ? NetworkImage(request.userAvatarUrl!)
             : null,
         child: request.userAvatarUrl == null || request.userAvatarUrl!.isEmpty
@@ -1469,7 +1538,10 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
     context.read<ContactBloc>().add(AcceptFriendRequest(request.id));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.contactAcceptedFriendRequest(request.userName) ?? 'Accepted ${request.userName}\'s friend request'),
+        content: Text(
+          S.of(context)?.contactAcceptedFriendRequest(request.userName) ??
+              'Accepted ${request.userName}\'s friend request',
+        ),
         backgroundColor: Colors.green,
       ),
     );
@@ -1479,11 +1551,14 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
     context.read<ContactBloc>().add(RejectFriendRequest(request.id));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.contactRejectedFriendRequest(request.userName) ?? 'Rejected ${request.userName}\'s friend request'),
+        content: Text(
+          S.of(context)?.contactRejectedFriendRequest(request.userName) ??
+              'Rejected ${request.userName}\'s friend request',
+        ),
       ),
     );
   }
-  
+
   Color _getColorFromName(String name) {
     return AppColorPalettes.getAvatarColor(name);
   }
@@ -1584,13 +1659,13 @@ class _GroupListPageState extends State<_GroupListPage> {
         bloc: _groupBloc,
         listener: (context, state) {
           if (state.status == GroupStatus.error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage!)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
           } else if (state.status == GroupStatus.success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.successMessage!)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
           }
         },
         builder: (context, state) {
@@ -1655,7 +1730,10 @@ class _GroupListPageState extends State<_GroupListPage> {
         children: [
           // 群邀请
           if (state.invites.isNotEmpty) ...[
-            _buildSectionHeader(S.of(context)?.commonGroupInvites ?? 'Group Invites', isDark),
+            _buildSectionHeader(
+              S.of(context)?.commonGroupInvites ?? 'Group Invites',
+              isDark,
+            ),
             ...state.invites.map((invite) => _buildInviteTile(invite, isDark)),
           ],
 
@@ -1705,17 +1783,22 @@ class _GroupListPageState extends State<_GroupListPage> {
           ),
         ),
         subtitle: Text(
-          S.of(context)?.commonMemberCount(group.memberCount) ?? '${group.memberCount} members',
+          S.of(context)?.commonMemberCount(group.memberCount) ??
+              '${group.memberCount} members',
           style: TextStyle(
             fontSize: 13,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
         ),
         trailing: group.isEncrypted
             ? Icon(
                 Icons.lock,
                 size: 16,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
               )
             : null,
         onTap: () => _navigateToChat(group.roomId),
@@ -1743,10 +1826,7 @@ class _GroupListPageState extends State<_GroupListPage> {
         ),
         subtitle: Text(
           S.of(context)?.commonInvitedToJoinGroup ?? 'Invited to join group',
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.primary,
-          ),
+          style: const TextStyle(fontSize: 13, color: AppColors.primary),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1878,12 +1958,12 @@ class _GroupListPageState extends State<_GroupListPage> {
 class _RecommendContactSheet extends StatefulWidget {
   final String excludeUserId;
   final bool isDark;
-  
+
   const _RecommendContactSheet({
     required this.excludeUserId,
     required this.isDark,
   });
-  
+
   @override
   State<_RecommendContactSheet> createState() => _RecommendContactSheetState();
 }
@@ -1892,20 +1972,22 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
   String _searchQuery = '';
   List<ContactEntity> _contacts = [];
   bool _isLoading = true;
-  
+
   @override
   void initState() {
     super.initState();
     _loadContacts();
   }
-  
+
   Future<void> _loadContacts() async {
     try {
       final contactRepository = getIt<IContactRepository>();
       final contacts = await contactRepository.getContacts();
       if (mounted) {
         setState(() {
-          _contacts = contacts.where((c) => c.userId != widget.excludeUserId).toList();
+          _contacts = contacts
+              .where((c) => c.userId != widget.excludeUserId)
+              .toList();
           _isLoading = false;
         });
       }
@@ -1918,15 +2000,20 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
       }
     }
   }
-  
+
   List<ContactEntity> get _filteredContacts {
     if (_searchQuery.isEmpty) return _contacts;
-    return _contacts.where((c) => 
-      c.effectiveDisplayName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-      c.userId.toLowerCase().contains(_searchQuery.toLowerCase())
-    ).toList();
+    return _contacts
+        .where(
+          (c) =>
+              c.effectiveDisplayName.toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ||
+              c.userId.toLowerCase().contains(_searchQuery.toLowerCase()),
+        )
+        .toList();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1950,7 +2037,8 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
             child: Row(
               children: [
                 Text(
-                  S.of(context)?.contactSelectFriendToRecommend ?? 'Select friend to recommend',
+                  S.of(context)?.contactSelectFriendToRecommend ??
+                      'Select friend to recommend',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -1973,11 +2061,12 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
             padding: const EdgeInsets.all(12),
             child: TextField(
               decoration: InputDecoration(
-                hintText: S.of(context)?.commonSearchContacts ?? 'Search contacts',
+                hintText:
+                    S.of(context)?.commonSearchContacts ?? 'Search contacts',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
-                fillColor: widget.isDark 
-                    ? const Color(0xFF3A3A3C) 
+                fillColor: widget.isDark
+                    ? const Color(0xFF3A3A3C)
                     : const Color(0xFFF2F2F7),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -1996,41 +2085,44 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _filteredContacts.isEmpty
-                    ? Center(
-                        child: Text(
-                          S.of(context)?.contactNoContactsFound ?? 'No contacts found',
+                ? Center(
+                    child: Text(
+                      S.of(context)?.contactNoContactsFound ??
+                          'No contacts found',
+                      style: TextStyle(
+                        color: widget.isDark ? Colors.white54 : Colors.black54,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: _filteredContacts.length,
+                    itemBuilder: (context, index) {
+                      final contact = _filteredContacts[index];
+                      return ListTile(
+                        leading: N42Avatar(
+                          imageUrl: contact.avatarUrl,
+                          name: contact.effectiveDisplayName,
+                          size: 44,
+                        ),
+                        title: Text(
+                          contact.effectiveDisplayName,
                           style: TextStyle(
-                            color: widget.isDark ? Colors.white54 : Colors.black54,
+                            color: widget.isDark ? Colors.white : Colors.black,
                           ),
                         ),
-                      )
-                    : ListView.builder(
-                        itemCount: _filteredContacts.length,
-                        itemBuilder: (context, index) {
-                          final contact = _filteredContacts[index];
-                          return ListTile(
-                            leading: N42Avatar(
-                              imageUrl: contact.avatarUrl,
-                              name: contact.effectiveDisplayName,
-                              size: 44,
-                            ),
-                            title: Text(
-                              contact.effectiveDisplayName,
-                              style: TextStyle(
-                                color: widget.isDark ? Colors.white : Colors.black,
-                              ),
-                            ),
-                            subtitle: Text(
-                              contact.userId,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: widget.isDark ? Colors.white54 : Colors.black54,
-                              ),
-                            ),
-                            onTap: () => Navigator.pop(context, contact),
-                          );
-                        },
-                      ),
+                        subtitle: Text(
+                          contact.userId,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: widget.isDark
+                                ? Colors.white54
+                                : Colors.black54,
+                          ),
+                        ),
+                        onTap: () => Navigator.pop(context, contact),
+                      );
+                    },
+                  ),
           ),
         ],
       ),

@@ -154,11 +154,16 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   /// 批量插入归档消息（忽略已存在的）
   Future<int> insertMessages(List<ArchivedMessagesCompanion> entries) async {
     int inserted = 0;
-    await batch((b) {
+    await transaction(() async {
       for (final entry in entries) {
-        b.insert(archivedMessages, entry, mode: InsertMode.insertOrIgnore);
+        final rowId = await into(archivedMessages).insert(
+          entry,
+          mode: InsertMode.insertOrIgnore,
+        );
+        if (rowId > 0) {
+          inserted++;
+        }
       }
-      inserted = entries.length;
     });
     return inserted;
   }

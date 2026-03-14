@@ -22,21 +22,9 @@ class MockStorageDataSource extends Mock implements PreferencesDataSource {}
 // ---------------------------------------------------------------------------
 
 const _testConversations = <ConversationEntity>[
-  ConversationEntity(
-    id: '!room1:server.com',
-    name: 'Room 1',
-    unreadCount: 5,
-  ),
-  ConversationEntity(
-    id: '!room2:server.com',
-    name: 'Room 2',
-    isPinned: true,
-  ),
-  ConversationEntity(
-    id: '!room3:server.com',
-    name: 'Room 3',
-    isMuted: true,
-  ),
+  ConversationEntity(id: '!room1:server.com', name: 'Room 1', unreadCount: 5),
+  ConversationEntity(id: '!room2:server.com', name: 'Room 2', isPinned: true),
+  ConversationEntity(id: '!room3:server.com', name: 'Room 3', isMuted: true),
 ];
 
 const _newConversation = ConversationEntity(
@@ -53,14 +41,15 @@ void main() {
     mockStorageDataSource = MockStorageDataSource();
 
     // Default stub for hidden chats (used by _separateConversations path)
-    when(() => mockStorageDataSource.getHiddenChatIds())
-        .thenAnswer((_) async => <String>{});
+    when(
+      () => mockStorageDataSource.getHiddenChatIds(),
+    ).thenAnswer((_) async => <String>{});
   });
 
   ConversationBloc buildBloc() => ConversationBloc(
-        conversationRepository: mockRepository,
-        storageDataSource: mockStorageDataSource,
-      );
+    conversationRepository: mockRepository,
+    storageDataSource: mockStorageDataSource,
+  );
 
   // =========================================================================
   // Initial state
@@ -83,16 +72,17 @@ void main() {
     blocTest<ConversationBloc, ConversationState>(
       'emits [loading, loaded] on success',
       build: () {
-        when(() => mockRepository.getConversations())
-            .thenAnswer((_) async => _testConversations);
-        when(() => mockRepository.getTotalUnreadCount())
-            .thenAnswer((_) async => 5);
+        when(
+          () => mockRepository.getConversations(),
+        ).thenAnswer((_) async => _testConversations);
+        when(
+          () => mockRepository.getTotalUnreadCount(),
+        ).thenAnswer((_) async => 5);
         return buildBloc();
       },
       act: (bloc) => bloc.add(const LoadConversations()),
       expect: () => [
-        isA<ConversationState>()
-            .having((s) => s.isLoading, 'isLoading', true),
+        isA<ConversationState>().having((s) => s.isLoading, 'isLoading', true),
         isA<ConversationState>()
             .having((s) => s.isLoading, 'isLoading', false)
             .having((s) => s.conversations.length, 'conversations.length', 3)
@@ -105,14 +95,14 @@ void main() {
     blocTest<ConversationBloc, ConversationState>(
       'emits error when loading fails',
       build: () {
-        when(() => mockRepository.getConversations())
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockRepository.getConversations(),
+        ).thenThrow(Exception('Network error'));
         return buildBloc();
       },
       act: (bloc) => bloc.add(const LoadConversations()),
       expect: () => [
-        isA<ConversationState>()
-            .having((s) => s.isLoading, 'isLoading', true),
+        isA<ConversationState>().having((s) => s.isLoading, 'isLoading', true),
         isA<ConversationState>()
             .having((s) => s.isLoading, 'isLoading', false)
             .having((s) => s.error, 'error', isNotNull),
@@ -128,16 +118,21 @@ void main() {
     blocTest<ConversationBloc, ConversationState>(
       'emits [refreshing, refreshed] on success',
       build: () {
-        when(() => mockRepository.getConversations())
-            .thenAnswer((_) async => _testConversations);
-        when(() => mockRepository.getTotalUnreadCount())
-            .thenAnswer((_) async => 5);
+        when(
+          () => mockRepository.getConversations(),
+        ).thenAnswer((_) async => _testConversations);
+        when(
+          () => mockRepository.getTotalUnreadCount(),
+        ).thenAnswer((_) async => 5);
         return buildBloc();
       },
       act: (bloc) => bloc.add(const RefreshConversations()),
       expect: () => [
-        isA<ConversationState>()
-            .having((s) => s.isRefreshing, 'isRefreshing', true),
+        isA<ConversationState>().having(
+          (s) => s.isRefreshing,
+          'isRefreshing',
+          true,
+        ),
         isA<ConversationState>()
             .having((s) => s.isRefreshing, 'isRefreshing', false)
             .having((s) => s.conversations.length, 'conversations.length', 3),
@@ -147,14 +142,18 @@ void main() {
     blocTest<ConversationBloc, ConversationState>(
       'emits error when refresh fails',
       build: () {
-        when(() => mockRepository.getConversations())
-            .thenThrow(Exception('Timeout'));
+        when(
+          () => mockRepository.getConversations(),
+        ).thenThrow(Exception('Timeout'));
         return buildBloc();
       },
       act: (bloc) => bloc.add(const RefreshConversations()),
       expect: () => [
-        isA<ConversationState>()
-            .having((s) => s.isRefreshing, 'isRefreshing', true),
+        isA<ConversationState>().having(
+          (s) => s.isRefreshing,
+          'isRefreshing',
+          true,
+        ),
         isA<ConversationState>()
             .having((s) => s.isRefreshing, 'isRefreshing', false)
             .having((s) => s.error, 'error', isNotNull),
@@ -170,18 +169,21 @@ void main() {
     blocTest<ConversationBloc, ConversationState>(
       'toggles muted and updates local state on success',
       build: () {
-        when(() => mockRepository.setMuted(any(), any()))
-            .thenAnswer((_) async {});
+        when(
+          () => mockRepository.setMuted(any(), any()),
+        ).thenAnswer((_) async {});
         return buildBloc();
       },
       seed: () => ConversationState.initial().copyWith(
         conversations: _testConversations,
         isLoading: false,
       ),
-      act: (bloc) => bloc.add(const SetConversationMuted(
-        conversationId: '!room1:server.com',
-        muted: true,
-      )),
+      act: (bloc) => bloc.add(
+        const SetConversationMuted(
+          conversationId: '!room1:server.com',
+          muted: true,
+        ),
+      ),
       expect: () => [
         isA<ConversationState>().having(
           (s) => s.conversations
@@ -192,29 +194,32 @@ void main() {
         ),
       ],
       verify: (_) {
-        verify(() => mockRepository.setMuted('!room1:server.com', true))
-            .called(1);
+        verify(
+          () => mockRepository.setMuted('!room1:server.com', true),
+        ).called(1);
       },
     );
 
     blocTest<ConversationBloc, ConversationState>(
       'emits error when setMuted fails',
       build: () {
-        when(() => mockRepository.setMuted(any(), any()))
-            .thenThrow(Exception('Not allowed'));
+        when(
+          () => mockRepository.setMuted(any(), any()),
+        ).thenThrow(Exception('Not allowed'));
         return buildBloc();
       },
       seed: () => ConversationState.initial().copyWith(
         conversations: _testConversations,
         isLoading: false,
       ),
-      act: (bloc) => bloc.add(const SetConversationMuted(
-        conversationId: '!room1:server.com',
-        muted: true,
-      )),
+      act: (bloc) => bloc.add(
+        const SetConversationMuted(
+          conversationId: '!room1:server.com',
+          muted: true,
+        ),
+      ),
       expect: () => [
-        isA<ConversationState>()
-            .having((s) => s.error, 'error', isNotNull),
+        isA<ConversationState>().having((s) => s.error, 'error', isNotNull),
       ],
     );
   });
@@ -227,18 +232,21 @@ void main() {
     blocTest<ConversationBloc, ConversationState>(
       'pins conversation and separates into pinned list',
       build: () {
-        when(() => mockRepository.setPinned(any(), any()))
-            .thenAnswer((_) async {});
+        when(
+          () => mockRepository.setPinned(any(), any()),
+        ).thenAnswer((_) async {});
         return buildBloc();
       },
       seed: () => ConversationState.initial().copyWith(
         conversations: _testConversations,
         isLoading: false,
       ),
-      act: (bloc) => bloc.add(const SetConversationPinned(
-        conversationId: '!room1:server.com',
-        pinned: true,
-      )),
+      act: (bloc) => bloc.add(
+        const SetConversationPinned(
+          conversationId: '!room1:server.com',
+          pinned: true,
+        ),
+      ),
       expect: () => [
         isA<ConversationState>()
             .having(
@@ -255,29 +263,32 @@ void main() {
             ),
       ],
       verify: (_) {
-        verify(() => mockRepository.setPinned('!room1:server.com', true))
-            .called(1);
+        verify(
+          () => mockRepository.setPinned('!room1:server.com', true),
+        ).called(1);
       },
     );
 
     blocTest<ConversationBloc, ConversationState>(
       'emits error when setPinned fails',
       build: () {
-        when(() => mockRepository.setPinned(any(), any()))
-            .thenThrow(Exception('Failed'));
+        when(
+          () => mockRepository.setPinned(any(), any()),
+        ).thenThrow(Exception('Failed'));
         return buildBloc();
       },
       seed: () => ConversationState.initial().copyWith(
         conversations: _testConversations,
         isLoading: false,
       ),
-      act: (bloc) => bloc.add(const SetConversationPinned(
-        conversationId: '!room1:server.com',
-        pinned: true,
-      )),
+      act: (bloc) => bloc.add(
+        const SetConversationPinned(
+          conversationId: '!room1:server.com',
+          pinned: true,
+        ),
+      ),
       expect: () => [
-        isA<ConversationState>()
-            .having((s) => s.error, 'error', isNotNull),
+        isA<ConversationState>().having((s) => s.error, 'error', isNotNull),
       ],
     );
   });
@@ -290,8 +301,9 @@ void main() {
     blocTest<ConversationBloc, ConversationState>(
       'removes conversation from list on success',
       build: () {
-        when(() => mockRepository.deleteConversation(any()))
-            .thenAnswer((_) async {});
+        when(
+          () => mockRepository.deleteConversation(any()),
+        ).thenAnswer((_) async {});
         return buildBloc();
       },
       seed: () => ConversationState.initial().copyWith(
@@ -301,11 +313,7 @@ void main() {
       act: (bloc) => bloc.add(const DeleteConversation('!room1:server.com')),
       expect: () => [
         isA<ConversationState>()
-            .having(
-              (s) => s.conversations.length,
-              'conversations.length',
-              2,
-            )
+            .having((s) => s.conversations.length, 'conversations.length', 2)
             .having(
               (s) => s.conversations.any((c) => c.id == '!room1:server.com'),
               'room1 still present',
@@ -313,16 +321,18 @@ void main() {
             ),
       ],
       verify: (_) {
-        verify(() => mockRepository.deleteConversation('!room1:server.com'))
-            .called(1);
+        verify(
+          () => mockRepository.deleteConversation('!room1:server.com'),
+        ).called(1);
       },
     );
 
     blocTest<ConversationBloc, ConversationState>(
       'emits error when delete fails',
       build: () {
-        when(() => mockRepository.deleteConversation(any()))
-            .thenThrow(Exception('Cannot delete'));
+        when(
+          () => mockRepository.deleteConversation(any()),
+        ).thenThrow(Exception('Cannot delete'));
         return buildBloc();
       },
       seed: () => ConversationState.initial().copyWith(
@@ -331,8 +341,7 @@ void main() {
       ),
       act: (bloc) => bloc.add(const DeleteConversation('!room1:server.com')),
       expect: () => [
-        isA<ConversationState>()
-            .having((s) => s.error, 'error', isNotNull),
+        isA<ConversationState>().having((s) => s.error, 'error', isNotNull),
       ],
     );
   });
@@ -345,47 +354,60 @@ void main() {
     blocTest<ConversationBloc, ConversationState>(
       'emits newConversationId on success and triggers refresh',
       build: () {
-        when(() => mockRepository.createDirectChat(any()))
-            .thenAnswer((_) async => _newConversation);
+        when(
+          () => mockRepository.createDirectChat(any()),
+        ).thenAnswer((_) async => _newConversation);
         // Stub refresh path
-        when(() => mockRepository.getConversations())
-            .thenAnswer((_) async => [..._testConversations, _newConversation]);
-        when(() => mockRepository.getTotalUnreadCount())
-            .thenAnswer((_) async => 5);
+        when(
+          () => mockRepository.getConversations(),
+        ).thenAnswer((_) async => [..._testConversations, _newConversation]);
+        when(
+          () => mockRepository.getTotalUnreadCount(),
+        ).thenAnswer((_) async => 5);
         return buildBloc();
       },
-      act: (bloc) =>
-          bloc.add(const CreateDirectChat('@user:server.com')),
+      act: (bloc) => bloc.add(const CreateDirectChat('@user:server.com')),
       expect: () => [
         // First: newConversationId set
         isA<ConversationState>()
-            .having((s) => s.newConversationId, 'newConversationId',
-                '!newroom:server.com'),
+            .having(
+              (s) => s.newConversationId,
+              'newConversationId',
+              '!newroom:server.com',
+            )
+            .having(
+              (s) => s.conversations.any((c) => c.id == '!newroom:server.com'),
+              'new conversation inserted before refresh',
+              isTrue,
+            ),
         // Then: RefreshConversations triggered internally
-        isA<ConversationState>()
-            .having((s) => s.isRefreshing, 'isRefreshing', true),
+        isA<ConversationState>().having(
+          (s) => s.isRefreshing,
+          'isRefreshing',
+          true,
+        ),
         isA<ConversationState>()
             .having((s) => s.isRefreshing, 'isRefreshing', false)
             .having((s) => s.conversations.length, 'conversations.length', 4),
       ],
       verify: (_) {
-        verify(() => mockRepository.createDirectChat('@user:server.com'))
-            .called(1);
+        verify(
+          () => mockRepository.createDirectChat('@user:server.com'),
+        ).called(1);
       },
     );
 
     blocTest<ConversationBloc, ConversationState>(
       'emits error when create fails',
       build: () {
-        when(() => mockRepository.createDirectChat(any()))
-            .thenThrow(Exception('User not found'));
+        when(
+          () => mockRepository.createDirectChat(any()),
+        ).thenThrow(Exception('User not found'));
         return buildBloc();
       },
-      act: (bloc) =>
-          bloc.add(const CreateDirectChat('@noone:server.com')),
+      act: (bloc) => bloc.add(const CreateDirectChat('@noone:server.com')),
       expect: () => [
-        isA<ConversationState>()
-            .having((s) => s.error, 'error', isNotNull),
+        isA<ConversationState>().having((s) => s.error, 'error', isNotNull),
       ],
     );
   });
@@ -398,8 +420,9 @@ void main() {
     blocTest<ConversationBloc, ConversationState>(
       'emits search results on success',
       build: () {
-        when(() => mockRepository.searchConversations(any()))
-            .thenAnswer((_) async => [_testConversations.first]);
+        when(
+          () => mockRepository.searchConversations(any()),
+        ).thenAnswer((_) async => [_testConversations.first]);
         return buildBloc();
       },
       act: (bloc) => bloc.add(const SearchConversations('Room 1')),
@@ -409,9 +432,11 @@ void main() {
             .having((s) => s.isSearching, 'isSearching', true)
             .having((s) => s.searchQuery, 'searchQuery', 'Room 1'),
         // Then: results
-        isA<ConversationState>()
-            .having((s) => s.filteredConversations?.length,
-                'filteredConversations.length', 1),
+        isA<ConversationState>().having(
+          (s) => s.filteredConversations?.length,
+          'filteredConversations.length',
+          1,
+        ),
       ],
     );
 
@@ -428,7 +453,11 @@ void main() {
       expect: () => [
         isA<ConversationState>()
             .having((s) => s.isSearching, 'isSearching', false)
-            .having((s) => s.filteredConversations, 'filteredConversations', isNull),
+            .having(
+              (s) => s.filteredConversations,
+              'filteredConversations',
+              isNull,
+            ),
       ],
     );
   });
@@ -441,8 +470,7 @@ void main() {
     blocTest<ConversationBloc, ConversationState>(
       'calls repository and updates unread count optimistically',
       build: () {
-        when(() => mockRepository.markAsRead(any()))
-            .thenAnswer((_) async {});
+        when(() => mockRepository.markAsRead(any())).thenAnswer((_) async {});
         return buildBloc();
       },
       seed: () => ConversationState.initial().copyWith(
@@ -467,8 +495,7 @@ void main() {
             ),
       ],
       verify: (_) {
-        verify(() => mockRepository.markAsRead('!room1:server.com'))
-            .called(1);
+        verify(() => mockRepository.markAsRead('!room1:server.com')).called(1);
       },
     );
   });
@@ -481,7 +508,7 @@ void main() {
     blocTest<ConversationBloc, ConversationState>(
       'updates conversations and recalculates unread count',
       build: () => buildBloc(),
-      act: (bloc) => bloc.add(ConversationsUpdated(_testConversations)),
+      act: (bloc) => bloc.add(const ConversationsUpdated(_testConversations)),
       expect: () => [
         isA<ConversationState>()
             .having((s) => s.conversations.length, 'conversations.length', 3)

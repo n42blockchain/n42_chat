@@ -189,12 +189,15 @@ class MediaMetadataDatabase extends _$MediaMetadataDatabase {
     String? roomId,
     String? fileCategory,
     int? minFileSizeBytes,
+    bool preserveThumbnails = true,
   }) async {
     final query = select(mediaFiles)
       ..where((t) {
         var expr = t.isCleaned.equals(false) &
-            t.isThumbnail.equals(false) &
             t.isPinned.equals(false);
+        if (preserveThumbnails) {
+          expr = expr & t.isThumbnail.equals(false);
+        }
         if (olderThanDays != null) {
           final cutoff =
               DateTime.now().subtract(Duration(days: olderThanDays));
@@ -279,7 +282,9 @@ class MediaMetadataDatabase extends _$MediaMetadataDatabase {
   }
 
   /// 获取总媒体统计
-  Future<TotalMediaStats> getTotalStats() async {
+  Future<TotalMediaStats> getTotalStats({
+    bool preserveThumbnails = true,
+  }) async {
     final query = selectOnly(mediaFiles)
       ..where(mediaFiles.isCleaned.equals(false))
       ..addColumns([
@@ -288,9 +293,14 @@ class MediaMetadataDatabase extends _$MediaMetadataDatabase {
       ]);
     final row = await query.getSingleOrNull();
     final cleanableQuery = selectOnly(mediaFiles)
-      ..where(mediaFiles.isCleaned.equals(false) &
-          mediaFiles.isThumbnail.equals(false) &
-          mediaFiles.isPinned.equals(false))
+      ..where(() {
+        var expr = mediaFiles.isCleaned.equals(false) &
+            mediaFiles.isPinned.equals(false);
+        if (preserveThumbnails) {
+          expr = expr & mediaFiles.isThumbnail.equals(false);
+        }
+        return expr;
+      }())
       ..addColumns([mediaFiles.fileSize.sum()]);
     final cleanableRow = await cleanableQuery.getSingleOrNull();
 

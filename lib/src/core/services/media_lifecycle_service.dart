@@ -118,8 +118,10 @@ class MediaLifecycleService {
   }
 
   /// 获取总媒体统计
-  Future<TotalMediaStats> getTotalStats() async {
-    return _db.getTotalStats();
+  Future<TotalMediaStats> getTotalStats({
+    bool preserveThumbnails = true,
+  }) async {
+    return _db.getTotalStats(preserveThumbnails: preserveThumbnails);
   }
 
   /// 获取房间内的媒体文件列表
@@ -145,12 +147,14 @@ class MediaLifecycleService {
     String? roomId,
     String? fileCategory,
     int? minFileSizeBytes,
+    bool preserveThumbnails = true,
   }) async {
     return _db.getCleanableFiles(
       olderThanDays: olderThanDays,
       roomId: roomId,
       fileCategory: fileCategory,
       minFileSizeBytes: minFileSizeBytes,
+      preserveThumbnails: preserveThumbnails,
     );
   }
 
@@ -200,6 +204,7 @@ class MediaLifecycleService {
         'MediaLifecycleService: Auto cleanup started (older than $olderThanDays days)');
     final files = await _db.getCleanableFiles(
       olderThanDays: olderThanDays,
+      preserveThumbnails: preserveThumbnails,
     );
 
     if (files.isEmpty) {

@@ -26,23 +26,30 @@ void main() {
     });
 
     group('Email OTP', () {
-      test('requestEmailOtp should return success', () async {
-        final result = await service.requestEmailOtp(
-          email: 'test@example.com',
-          homeserver: 'https://m.si46.world',
-        );
-        expect(result, isTrue);
-      });
+      test(
+        'requestEmailOtp should gracefully handle non-success response',
+        () async {
+          final result = await service.requestEmailOtp(
+            email: 'test@example.com',
+            homeserver: 'https://m.si46.world',
+          );
+          expect(result, isNull);
+        },
+      );
 
-      test('verifyEmailOtp should return verification result', () async {
-        final result = await service.verifyEmailOtp(
-          email: 'test@example.com',
-          otp: '123456',
-          homeserver: 'https://m.si46.world',
-        );
-        expect(result, isNotNull);
-        expect(result!['verified'], isTrue);
-      });
+      test(
+        'verifyEmailOtp should gracefully handle non-success response',
+        () async {
+          final result = await service.verifyEmailOtp(
+            email: 'test@example.com',
+            otp: '123456',
+            sid: 'test-sid',
+            clientSecret: 'test-client-secret',
+            homeserver: 'https://m.si46.world',
+          );
+          expect(result, isNull);
+        },
+      );
     });
 
     group('SSO', () {
@@ -51,7 +58,7 @@ void main() {
           homeserver: 'https://m.si46.world',
           redirectUrl: 'https://app.n42.chat/callback',
         );
-        
+
         expect(url, contains('/_matrix/client/v3/login/sso/redirect'));
         expect(url, contains('redirectUrl='));
       });
@@ -94,7 +101,7 @@ void main() {
       );
 
       final json = credential.toJson();
-      
+
       expect(json['credentialId'], equals('cred123'));
       expect(json['publicKey'], equals('pubkey123'));
       expect(json['userId'], equals('@user:server.com'));
@@ -110,14 +117,14 @@ void main() {
       };
 
       final credential = PasskeyCredential.fromJson(json);
-      
+
       expect(credential.credentialId, equals('cred123'));
       expect(credential.publicKey, equals('pubkey123'));
       expect(credential.userId, equals('@user:server.com'));
       expect(credential.displayName, equals('Test User'));
     });
   });
-  
+
   group('AuthMethod Enum', () {
     test('should have all expected auth methods', () {
       expect(AuthMethod.values, contains(AuthMethod.password));
@@ -134,6 +141,10 @@ void main() {
 
     setUp(() {
       service = AuthMethodsService();
+    });
+
+    tearDown(() {
+      service.dispose();
     });
 
     test('isFacebookSignInAvailable should return true', () {
@@ -162,19 +173,28 @@ void main() {
       service = AuthMethodsService();
     });
 
-    test('isTwitterSignInAvailable should return false when not configured', () {
-      final result = service.isTwitterSignInAvailable();
-      expect(result, isFalse);
+    tearDown(() {
+      service.dispose();
     });
+
+    test(
+      'isTwitterSignInAvailable should return false when not configured',
+      () {
+        final result = service.isTwitterSignInAvailable();
+        expect(result, isFalse);
+      },
+    );
 
     test('signInWithTwitter should throw when not configured', () async {
       expect(
         () => service.signInWithTwitter(),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('Twitter 登录未配置'),
-        )),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Twitter login not configured'),
+          ),
+        ),
       );
     });
   });
@@ -186,21 +206,55 @@ void main() {
       service = AuthMethodsService();
     });
 
-    test('isWeChatSignInAvailable should return false when not initialized', () async {
-      final result = await service.isWeChatSignInAvailable();
-      expect(result, isFalse);
+    tearDown(() {
+      service.dispose();
     });
+
+    test(
+      'isWeChatSignInAvailable should return false when not initialized',
+      () async {
+        final result = await service.isWeChatSignInAvailable();
+        expect(result, isFalse);
+      },
+    );
 
     test('signInWithWeChat should throw when not initialized', () async {
       expect(
         () => service.signInWithWeChat(),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('微信 SDK 未初始化'),
-        )),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('WeChat SDK not initialized'),
+          ),
+        ),
       );
     });
+  });
+
+  group('Google Login', () {
+    late AuthMethodsService service;
+
+    setUp(() {
+      service = AuthMethodsService();
+      service.dispose();
+    });
+
+    tearDown(() {
+      service.dispose();
+    });
+
+    test(
+      'initialize should not expose Google login after init failure',
+      () async {
+        await service.initialize(
+          googleClientId: 'invalid-google-client-id',
+          googleServerClientId: 'invalid-google-server-client-id',
+        );
+
+        expect(service.isGoogleSignInAvailable(), isFalse);
+      },
+    );
   });
 
   group('SocialLoginResult for new providers', () {
@@ -242,7 +296,7 @@ void main() {
     test('should create WeChat result with code', () {
       final result = SocialLoginResult(
         provider: 'wechat',
-        accessToken: 'wechat_auth_code',  // WeChat 返回授权码
+        accessToken: 'wechat_auth_code', // WeChat 返回授权码
         extra: {
           'code': 'wechat_auth_code',
           'state': 'n42_chat_12345',

@@ -18,7 +18,6 @@ void main() {
     ['AuthRestoreSessionRequested', () => const AuthRestoreSessionRequested()],
     ['AuthErrorCleared', () => const AuthErrorCleared()],
     ['LoadUserProfileData', () => const LoadUserProfileData()],
-    ['AuthRegisterPasskeyRequested', () => const AuthRegisterPasskeyRequested()],
     ['AuthGetBoundEmailRequested', () => const AuthGetBoundEmailRequested()],
     ['AuthBiometricLoginRequested', () => const AuthBiometricLoginRequested()],
     ['AuthCheckBiometricAvailability', () => const AuthCheckBiometricAvailability()],
@@ -298,75 +297,6 @@ void main() {
   // ─────────────────────────────────────────────────
   // Social login events (single homeserver field)
   // ─────────────────────────────────────────────────
-
-  group('AuthPasskeyLoginRequested', () {
-    test('stores homeserver', () {
-      expect(const AuthPasskeyLoginRequested(homeserver: 'h').homeserver, 'h');
-    });
-
-    test('same homeserver → equal', () {
-      expect(const AuthPasskeyLoginRequested(homeserver: 'h'),
-          equals(const AuthPasskeyLoginRequested(homeserver: 'h')));
-    });
-
-    test('is an AuthEvent', () {
-      expect(const AuthPasskeyLoginRequested(homeserver: 'h'), isA<AuthEvent>());
-    });
-  });
-
-  group('AuthRequestEmailOtpRequested', () {
-    test('stores homeserver and email', () {
-      const e = AuthRequestEmailOtpRequested(
-        homeserver: 'https://matrix.org', email: 'alice@example.com');
-      expect(e.homeserver, 'https://matrix.org');
-      expect(e.email, 'alice@example.com');
-    });
-
-    test('same fields → equal', () {
-      expect(
-        const AuthRequestEmailOtpRequested(homeserver: 'h', email: 'e@e.com'),
-        equals(const AuthRequestEmailOtpRequested(homeserver: 'h', email: 'e@e.com')),
-      );
-    });
-
-    test('is an AuthEvent', () {
-      expect(const AuthRequestEmailOtpRequested(homeserver: 'h', email: 'e@e.com'),
-          isA<AuthEvent>());
-    });
-  });
-
-  group('AuthEmailOtpLoginRequested', () {
-    test('stores homeserver, email, otp', () {
-      const e = AuthEmailOtpLoginRequested(
-        homeserver: 'h', email: 'e@e.com', otp: '123456');
-      expect(e.homeserver, 'h');
-      expect(e.email, 'e@e.com');
-      expect(e.otp, '123456');
-    });
-
-    test('same fields → equal', () {
-      expect(
-        const AuthEmailOtpLoginRequested(
-          homeserver: 'h', email: 'e@e.com', otp: '111'),
-        equals(const AuthEmailOtpLoginRequested(
-          homeserver: 'h', email: 'e@e.com', otp: '111')),
-      );
-    });
-
-    test('different otp → not equal', () {
-      expect(
-        const AuthEmailOtpLoginRequested(
-          homeserver: 'h', email: 'e@e.com', otp: '111'),
-        isNot(equals(const AuthEmailOtpLoginRequested(
-          homeserver: 'h', email: 'e@e.com', otp: '222'))),
-      );
-    });
-
-    test('is an AuthEvent', () {
-      expect(const AuthEmailOtpLoginRequested(
-        homeserver: 'h', email: 'e@e.com', otp: '111'), isA<AuthEvent>());
-    });
-  });
 
   group('AuthSsoLoginRequested', () {
     test('stores homeserver', () {

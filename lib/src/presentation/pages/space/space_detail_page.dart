@@ -18,6 +18,11 @@ import '../../blocs/space/space_event.dart';
 import '../../blocs/space/space_state.dart';
 import '../chat/chat_page.dart';
 
+enum _PendingSpaceNavigationAction {
+  leave,
+  delete,
+}
+
 /// 社区详情页面
 ///
 /// 通过 [spaceId] 从 [SpaceBloc] 加载 Space 详情，
@@ -33,6 +38,8 @@ class SpaceDetailPage extends StatefulWidget {
 }
 
 class _SpaceDetailPageState extends State<SpaceDetailPage> {
+  _PendingSpaceNavigationAction? _pendingNavigationAction;
+
   @override
   void initState() {
     super.initState();
@@ -52,6 +59,7 @@ class _SpaceDetailPageState extends State<SpaceDetailPage> {
               prev.operationSuccess != curr.operationSuccess,
       listener: (context, state) {
         if (state.errorMessage != null) {
+          _pendingNavigationAction = null;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content: Text(state.errorMessage!),
@@ -62,6 +70,10 @@ class _SpaceDetailPageState extends State<SpaceDetailPage> {
         if (state.operationSuccess != null) {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(state.operationSuccess!)));
+          if (_pendingNavigationAction != null) {
+            _pendingNavigationAction = null;
+            Navigator.of(context).maybePop();
+          }
           context.read<SpaceBloc>().add(const ClearSpaceError());
         }
       },
@@ -87,9 +99,21 @@ class _SpaceDetailPageState extends State<SpaceDetailPage> {
           members: state.currentMembers,
           isOperating: state.isOperating,
           isLoadingMembers: state.isLoadingMembers,
+          onLeaveConfirmed: _handleLeaveConfirmed,
+          onDeleteConfirmed: _handleDeleteConfirmed,
         );
       },
     );
+  }
+
+  void _handleLeaveConfirmed() {
+    _pendingNavigationAction = _PendingSpaceNavigationAction.leave;
+    context.read<SpaceBloc>().add(LeaveSpace(widget.spaceId));
+  }
+
+  void _handleDeleteConfirmed() {
+    _pendingNavigationAction = _PendingSpaceNavigationAction.delete;
+    context.read<SpaceBloc>().add(DeleteSpace(widget.spaceId));
   }
 }
 
@@ -102,12 +126,16 @@ class _SpaceDetailScaffold extends StatelessWidget {
   final List<GroupMember> members;
   final bool isOperating;
   final bool isLoadingMembers;
+  final VoidCallback onLeaveConfirmed;
+  final VoidCallback onDeleteConfirmed;
 
   const _SpaceDetailScaffold({
     required this.space,
     required this.members,
     required this.isOperating,
     required this.isLoadingMembers,
+    required this.onLeaveConfirmed,
+    required this.onDeleteConfirmed,
   });
 
   bool get _isAdmin {
@@ -723,9 +751,8 @@ class _SpaceDetailScaffold extends StatelessWidget {
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
-              context.read<SpaceBloc>().add(LeaveSpace(space.id));
               Navigator.pop(ctx);
-              Navigator.pop(context); // 返回列表页
+              onLeaveConfirmed();
             },
             child: Text(S.of(context)?.spacesLeave ?? 'Leave'),
           ),
@@ -813,10 +840,8 @@ class _SpaceDetailScaffold extends StatelessWidget {
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
-              context.read<SpaceBloc>().add(DeleteSpace(space.id));
               Navigator.pop(ctx);
-              Navigator.pop(context);
-              Navigator.pop(context);
+              onDeleteConfirmed();
             },
             child: Text(S.of(context)?.commonDelete ?? 'Delete'),
           ),
@@ -920,6 +945,45 @@ class _MembersBottomSheet extends StatelessWidget {
     required this.scrollController,
   });
 
+  GroupMember? get _currentUser {
+    final myId = MatrixClientManager.instance.client?.userID;
+    if (myId == null) return null;
+    for (final member in members) {
+      if (member.userId == myId) {
+        return member;
+      }
+    }
+    return null;
+  }
+
+  bool _canManageMember(GroupMember member) {
+    final currentUser = _currentUser;
+    final myId = currentUser?.userId;
+    if (!isAdmin || currentUser == null || member.userId == myId || member.isOwner) {
+      return false;
+    }
+
+    if (currentUser.isOwner) {
+      return true;
+    }
+
+    return !member.isAdmin;
+  }
+
+  bool _canPromoteToAdmin(GroupMember member) {
+    final currentUser = _currentUser;
+    return currentUser?.isOwner == true &&
+        member.role == GroupRole.member &&
+        member.userId != currentUser?.userId;
+  }
+
+  bool _canDemoteAdmin(GroupMember member) {
+    final currentUser = _currentUser;
+    return currentUser?.isOwner == true &&
+        member.role == GroupRole.admin &&
+        member.userId != currentUser?.userId;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
@@ -994,10 +1058,10 @@ class _MembersBottomSheet extends StatelessWidget {
                             : AppColors.textSecondary),
                   ),
                   trailing: _buildRoleBadge(m.role, isDark),
-                  onLongPress: isAdmin &&
-                          m.role != GroupRole.owner
-                      ? () => _showMemberActions(ctx, m)
-                      : null,
+                  onLongPress:
+                      _canManageMember(m) || _canPromoteToAdmin(m) || _canDemoteAdmin(m)
+                          ? () => _showMemberActions(ctx, m)
+                          : null,
                 );
               },
             ),
@@ -1039,7 +1103,7 @@ class _MembersBottomSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // 设为/撤销管理员
-            if (member.role == GroupRole.member)
+            if (_canPromoteToAdmin(member))
               ListTile(
                 leading: const Icon(Icons.star_outline, color: Colors.blue),
                 title: Text(
@@ -1051,7 +1115,7 @@ class _MembersBottomSheet extends StatelessWidget {
                   Navigator.pop(context);
                 },
               )
-            else if (member.role == GroupRole.admin)
+            else if (_canDemoteAdmin(member))
               ListTile(
                 leading: const Icon(Icons.star, color: Colors.orange),
                 title: Text(
@@ -1064,42 +1128,44 @@ class _MembersBottomSheet extends StatelessWidget {
                 },
               ),
             // 踢出
-            ListTile(
-              leading: const Icon(Icons.person_remove_outlined,
-                  color: Colors.orange),
-              title: Text(
-                S.of(context)?.spacesKickMemberTitle(
-                        member.displayName.isNotEmpty
-                            ? member.displayName
-                            : member.userId) ??
-                    'Kick ${member.displayName.isNotEmpty ? member.displayName : member.userId}',
+            if (_canManageMember(member))
+              ListTile(
+                leading: const Icon(Icons.person_remove_outlined,
+                    color: Colors.orange),
+                title: Text(
+                  S.of(context)?.spacesKickMemberTitle(
+                          member.displayName.isNotEmpty
+                              ? member.displayName
+                              : member.userId) ??
+                      'Kick ${member.displayName.isNotEmpty ? member.displayName : member.userId}',
+                ),
+                onTap: () {
+                  context
+                      .read<SpaceBloc>()
+                      .add(KickMember(spaceId, member.userId));
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
               ),
-              onTap: () {
-                context
-                    .read<SpaceBloc>()
-                    .add(KickMember(spaceId, member.userId));
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-            ),
             // 封禁
-            ListTile(
-              leading: const Icon(Icons.block, color: Colors.red),
-              title: Text(
-                S.of(context)?.spacesBanMemberTitle(
-                        member.displayName.isNotEmpty
-                            ? member.displayName
-                            : member.userId) ??
-                    'Ban ${member.displayName.isNotEmpty ? member.displayName : member.userId}',
+            if (_canManageMember(member))
+              ListTile(
+                leading: const Icon(Icons.block, color: Colors.red),
+                title: Text(
+                  S.of(context)?.spacesBanMemberTitle(
+                          member.displayName.isNotEmpty
+                              ? member.displayName
+                              : member.userId) ??
+                      'Ban ${member.displayName.isNotEmpty ? member.displayName : member.userId}',
+                ),
+                onTap: () {
+                  context
+                      .read<SpaceBloc>()
+                      .add(BanMember(spaceId, member.userId));
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
               ),
-              onTap: () {
-                context
-                    .read<SpaceBloc>()
-                    .add(BanMember(spaceId, member.userId));
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-            ),
           ],
         ),
       ),

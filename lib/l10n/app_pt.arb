@@ -477,7 +477,6 @@
     }
   },
   "authEnterValidServerAddress": "Por favor, digite um endereço de servidor válido",
-  "authEmailOtp": "Código por E-mail",
   "authEnterServerAddressFirst": "Por favor, digite o endereço do servidor primeiro",
   "authPasskeyRequiresServer": "Login com Passkey requer suporte do servidor",
   "authLoginAgreement": "Ao entrar, você concorda com ",

@@ -8,8 +8,6 @@ import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart' as sqflite;
-import 'package:n42_chat/src/core/di/injection.dart';
-import 'package:n42_chat/src/core/services/sync_optimization_service.dart';
 import 'package:n42_chat/src/core/utils/io_helper.dart' as io_helper;
 import 'package:n42_chat/src/n42_chat_config.dart';
 import '../../../core/utils/debug_log.dart';
@@ -29,9 +27,9 @@ class MatrixClientManager {
 
   Client? _client;
   bool _isInitialized = false;
-  bool _isInitializing = false;
   bool _vodozemacInitialized = false;
   Completer<void>? _initCompleter;
+  Duration _syncWaitTimeout = const Duration(seconds: 3);
 
   /// 获取Matrix客户端实例
   Client? get client => _client;
@@ -56,9 +54,8 @@ class MatrixClientManager {
       _client?.onLoginStateChanged.stream;
 
   /// 房间更新流
-  Stream<String>? get onRoomUpdate => _client?.onSync.stream.map(
-        (sync) => sync.rooms?.join?.keys.first ?? '',
-      );
+  Stream<String>? get onRoomUpdate =>
+      _client?.onSync.stream.map((sync) => sync.rooms?.join?.keys.first ?? '');
 
   // ============================================
   // 初始化
@@ -83,7 +80,9 @@ class MatrixClientManager {
 
     // 如果强制重新初始化，先清理旧的客户端
     if (forceReinit && _client != null) {
-      debugLog('MatrixClientManager: Force reinitializing, disposing old client...');
+      debugLog(
+        'MatrixClientManager: Force reinitializing, disposing old client...',
+      );
       // 若有进行中的 Completer，先令其以错误终止，避免等待者永久挂起
       if (_initCompleter != null && !_initCompleter!.isCompleted) {
         _initCompleter!.completeError(
@@ -91,7 +90,6 @@ class MatrixClientManager {
         );
       }
       _initCompleter = null;
-      _isInitializing = false;
       try {
         await _client!.dispose();
       } catch (e) {
@@ -103,14 +101,17 @@ class MatrixClientManager {
 
     // 防止并发初始化：第二次调用等待第一次完成
     if (_initCompleter != null) {
-      debugLog('MatrixClientManager: Already initializing, waiting for completion...');
+      debugLog(
+        'MatrixClientManager: Already initializing, waiting for completion...',
+      );
       return _initCompleter!.future;
     }
 
     _initCompleter = Completer<void>();
-    _isInitializing = true;
 
     try {
+      _syncWaitTimeout = config?.syncTimeout ?? const Duration(seconds: 3);
+
       // 初始化 vodozemac 加密后端（必须在 Client.init() 之前）
       // flutter_rust_bridge 不允许重复初始化，需要单独跟踪状态
       if (!_vodozemacInitialized) {
@@ -118,7 +119,9 @@ class MatrixClientManager {
         _vodozemacInitialized = true;
         debugLog('MatrixClientManager: vodozemac initialized');
       } else {
-        debugLog('MatrixClientManager: vodozemac already initialized, skipping');
+        debugLog(
+          'MatrixClientManager: vodozemac already initialized, skipping',
+        );
       }
 
       // 获取数据库路径
@@ -163,6 +166,18 @@ class MatrixClientManager {
       final shareKeysWith = (config?.shareE2eeKeysWithAllDevices ?? true)
           ? ShareKeysWith.all
           : ShareKeysWith.crossVerified;
+      final syncFilterConfig = config?.syncFilter ?? const SyncFilterConfig();
+      final syncFilter = Filter(
+        room: RoomFilter(
+          includeLeave: syncFilterConfig.includeLeaveRooms,
+          state: StateFilter(lazyLoadMembers: syncFilterConfig.lazyLoadMembers),
+          timeline: StateFilter(
+            limit: syncFilterConfig.timelineLimit,
+            lazyLoadMembers: syncFilterConfig.lazyLoadMembers,
+          ),
+          ephemeral: StateFilter(notTypes: ['m.typing', 'm.receipt']),
+        ),
+      );
 
       // 创建客户端（端到端加密由 flutter_vodozemac 自动支持）
       _client = Client(
@@ -171,12 +186,12 @@ class MatrixClientManager {
         supportedLoginTypes: {
           AuthenticationTypes.password,
           AuthenticationTypes.sso,
+          AuthenticationTypes.token,
         },
         shareKeysWith: shareKeysWith,
         logLevel: kDebugMode ? Level.debug : Level.warning,
-        importantStateEvents: {
-          EventTypes.Encryption,
-        },
+        importantStateEvents: {EventTypes.Encryption},
+        syncFilter: syncFilter,
       );
 
       // 初始化客户端
@@ -191,7 +206,9 @@ class MatrixClientManager {
 
       _isInitialized = true;
       debugLog('MatrixClientManager: Initialized successfully');
-      debugLog('MatrixClientManager: Logged in: $isLoggedIn, rooms: ${_client!.rooms.length}');
+      debugLog(
+        'MatrixClientManager: Logged in: $isLoggedIn, rooms: ${_client!.rooms.length}',
+      );
       _initCompleter!.complete();
     } catch (e, stack) {
       debugLog('MatrixClientManager: Initialize failed: $e');
@@ -209,7 +226,6 @@ class MatrixClientManager {
       _initCompleter!.completeError(e, stack);
       rethrow;
     } finally {
-      _isInitializing = false;
       _initCompleter = null;
     }
   }
@@ -220,7 +236,7 @@ class MatrixClientManager {
       // Web 平台使用空路径，Hive 会使用 IndexedDB
       return '';
     }
-    
+
     try {
       final dir = await getApplicationDocumentsDirectory();
       // 使用子目录来存储数据库
@@ -264,7 +280,9 @@ class MatrixClientManager {
       final (_, _, _, _) = await _client!.checkHomeserver(homeserverUri);
 
       // 检测是否为邮箱格式（包含 @ 且 @ 后有域名部分）
-      final isEmail = username.contains('@') && username.indexOf('@') > 0 &&
+      final isEmail =
+          username.contains('@') &&
+          username.indexOf('@') > 0 &&
           username.indexOf('@') < username.length - 1 &&
           username.substring(username.indexOf('@') + 1).contains('.');
 
@@ -314,7 +332,9 @@ class MatrixClientManager {
     // 如果 SDK 已使用相同用户登录（从自身 SQLite DB 恢复），跳过二次 init
     // 二次 init 会短暂重置状态，造成不必要的开销和潜在竞态
     if (isLoggedIn && this.userId == userId) {
-      debugLog('MatrixClientManager: Already logged in as $userId, skipping re-init');
+      debugLog(
+        'MatrixClientManager: Already logged in as $userId, skipping re-init',
+      );
       return;
     }
 
@@ -339,6 +359,34 @@ class MatrixClientManager {
     }
   }
 
+  /// 使用 Matrix login token 登录（SSO/OIDC 回调）
+  Future<LoginResponse> loginWithLoginToken({
+    required String homeserver,
+    required String loginToken,
+    String? deviceName,
+  }) async {
+    _ensureInitialized();
+
+    try {
+      final homeserverUri = Uri.parse(homeserver);
+      await _client!.checkHomeserver(homeserverUri);
+
+      final response = await _client!.login(
+        LoginType.mLoginToken,
+        token: loginToken,
+        initialDeviceDisplayName: deviceName ?? 'N42Chat',
+      );
+
+      debugLog(
+        'MatrixClientManager: Login token login successful - ${response.userId}',
+      );
+      return response;
+    } catch (e) {
+      debugLog('MatrixClientManager: Login token login failed: $e');
+      rethrow;
+    }
+  }
+
   /// 登出
   Future<void> logout() async {
     if (_client == null) return;
@@ -359,42 +407,33 @@ class MatrixClientManager {
   /// 开始同步
   ///
   /// 启动后台同步循环，并等待首次同步完成以确保房间数据是最新的。
-  /// [timeout] 等待首次同步的超时时间（默认 3s，避免阻塞登录流程）
+  /// [timeout] 等待首次同步的超时时间；未传入时使用配置值
   /// [fullState] 是否获取完整状态
-  Future<void> startSync({
-    Duration timeout = const Duration(seconds: 3),
-    bool fullState = false,
-  }) async {
+  Future<void> startSync({Duration? timeout, bool fullState = false}) async {
     _ensureInitialized();
     _ensureLoggedIn();
+    final effectiveTimeout = timeout ?? _syncWaitTimeout;
 
     try {
-      // 配置同步过滤器（timeline.limit:30 + lazy_load_members）
-      try {
-        if (!getIt.isRegistered<SyncOptimizationService>()) {
-          debugLog('MatrixClientManager: SyncOptimizationService not registered, skipping filter config');
-        } else {
-        final syncService = getIt<SyncOptimizationService>();
-        await syncService.configureOptimalSyncFilter();
-        debugLog('MatrixClientManager: Sync filter configured');
-        }
-      } catch (e) {
-        debugLog('MatrixClientManager: Failed to configure sync filter (non-fatal): $e');
-      }
-
       // 启动后台同步循环
       _client!.backgroundSync = true;
 
       // 等待首次同步完成，确保从服务器获取最新的房间和消息数据
       // 如果本地数据库已有缓存（prevBatch != null），同步会增量获取
       // 如果是全新登录（prevBatch == null），同步会获取完整初始数据
-      debugLog('MatrixClientManager: Sync enabled, waiting for first sync response...');
+      debugLog(
+        'MatrixClientManager: Sync enabled, waiting for first sync response...',
+      );
       try {
-        await _client!.onSync.stream.first.timeout(timeout);
-        debugLog('MatrixClientManager: First sync completed, rooms: ${_client!.rooms.length}');
+        await _client!.onSync.stream.first.timeout(effectiveTimeout);
+        debugLog(
+          'MatrixClientManager: First sync completed, rooms: ${_client!.rooms.length}',
+        );
       } on TimeoutException {
-        debugLog('MatrixClientManager: First sync timed out after $timeout, '
-            'continuing with ${_client!.rooms.length} cached rooms');
+        debugLog(
+          'MatrixClientManager: First sync timed out after $effectiveTimeout, '
+          'continuing with ${_client!.rooms.length} cached rooms',
+        );
       }
     } catch (e) {
       debugLog('MatrixClientManager: Start sync failed: $e');
@@ -491,15 +530,13 @@ class MatrixClientManager {
     _ensureInitialized();
     _ensureLoggedIn();
 
-    await _client!.setProfileField(
-      _client!.userID!,
-      'displayname',
-      {'displayname': displayName},
-    );
+    await _client!.setProfileField(_client!.userID!, 'displayname', {
+      'displayname': displayName,
+    });
   }
 
   /// 更新头像
-  /// 
+  ///
   /// Matrix 头像上传流程:
   /// 1. 先上传文件到 Matrix 服务器获取 mxc:// URI
   /// 2. 然后调用 setAvatar 设置用户头像
@@ -507,7 +544,7 @@ class MatrixClientManager {
     debugLog('=== MatrixClientManager.setAvatar start ===');
     debugLog('filename: $filename');
     debugLog('avatarBytes.length: ${avatarBytes.length}');
-    
+
     _ensureInitialized();
     _ensureLoggedIn();
 
@@ -516,7 +553,7 @@ class MatrixClientManager {
       debugLog('ERROR: Avatar bytes is empty');
       throw Exception('头像数据为空');
     }
-    
+
     // 检查文件大小（限制 10MB）
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (avatarBytes.length > maxSize) {
@@ -529,7 +566,7 @@ class MatrixClientManager {
     if (!actualFilename.contains('.')) {
       actualFilename = '$actualFilename.jpg';
     }
-    
+
     // 根据文件名确定 MIME 类型
     String mimeType = 'image/jpeg';
     final lowerFilename = actualFilename.toLowerCase();
@@ -539,21 +576,25 @@ class MatrixClientManager {
       mimeType = 'image/gif';
     } else if (lowerFilename.endsWith('.webp')) {
       mimeType = 'image/webp';
-    } else if (lowerFilename.endsWith('.heic') || lowerFilename.endsWith('.heif')) {
+    } else if (lowerFilename.endsWith('.heic') ||
+        lowerFilename.endsWith('.heif')) {
       // HEIC/HEIF 需要转换为 JPEG，因为 Matrix 服务器可能不支持
       mimeType = 'image/jpeg';
-      actualFilename = actualFilename.replaceAll(RegExp(r'\.(heic|heif)$', caseSensitive: false), '.jpg');
+      actualFilename = actualFilename.replaceAll(
+        RegExp(r'\.(heic|heif)$', caseSensitive: false),
+        '.jpg',
+      );
     }
-    
+
     debugLog('Final filename: $actualFilename');
     debugLog('Final mimeType: $mimeType');
     debugLog('User ID: ${_client!.userID}');
-    
+
     try {
       // 直接使用 SDK 的 uploadContent 方法（最可靠）
       debugLog('Uploading avatar with SDK uploadContent...');
       Uri? mxcUri;
-      
+
       try {
         mxcUri = await _client!.uploadContent(
           avatarBytes,
@@ -571,26 +612,24 @@ class MatrixClientManager {
           contentType: mimeType,
         );
       }
-      
+
       if (mxcUri == null) {
         throw Exception('上传头像失败');
       }
-      
+
       debugLog('Avatar uploaded: $mxcUri');
-      
+
       // 设置头像 URL
       debugLog('Setting avatar URL...');
-      await _client!.setProfileField(
-        _client!.userID!,
-        'avatar_url',
-        {'avatar_url': mxcUri.toString()},
-      );
+      await _client!.setProfileField(_client!.userID!, 'avatar_url', {
+        'avatar_url': mxcUri.toString(),
+      });
       debugLog('Avatar URL set successfully');
-      
+
       // 验证头像是否设置成功
       final profile = await _client!.getProfileFromUserId(_client!.userID!);
       debugLog('New avatar URL: ${profile.avatarUrl}');
-      
+
       debugLog('=== setAvatar completed successfully ===');
     } catch (e, stackTrace) {
       debugLog('=== setAvatar ERROR: $e ===');
@@ -598,7 +637,7 @@ class MatrixClientManager {
       rethrow;
     }
   }
-  
+
   /// 检查服务器是否支持认证媒体上传
   Future<bool> _supportsAuthenticatedMedia() async {
     try {
@@ -608,27 +647,32 @@ class MatrixClientManager {
         (v) => _isVersionGreaterThanOrEqualTo(v, 'v1.11'),
       );
       // 或者检查 unstable feature
-      final hasUnstableFeature = 
-          versionsResponse.unstableFeatures?['org.matrix.msc3916.stable'] == true;
-      
-      debugLog('MatrixClientManager: supportsV111=$supportsV111, hasUnstableFeature=$hasUnstableFeature');
+      final hasUnstableFeature =
+          versionsResponse.unstableFeatures?['org.matrix.msc3916.stable'] ==
+          true;
+
+      debugLog(
+        'MatrixClientManager: supportsV111=$supportsV111, hasUnstableFeature=$hasUnstableFeature',
+      );
       return supportsV111 || hasUnstableFeature;
     } catch (e) {
-      debugLog('MatrixClientManager: Error checking authenticated media support: $e');
+      debugLog(
+        'MatrixClientManager: Error checking authenticated media support: $e',
+      );
       return false;
     }
   }
-  
+
   bool _isVersionGreaterThanOrEqualTo(String version, String target) {
     try {
       final vParts = version.replaceAll('v', '').split('.');
       final tParts = target.replaceAll('v', '').split('.');
-      
+
       final vMajor = int.tryParse(vParts[0]) ?? 0;
       final vMinor = vParts.length > 1 ? (int.tryParse(vParts[1]) ?? 0) : 0;
       final tMajor = int.tryParse(tParts[0]) ?? 0;
       final tMinor = tParts.length > 1 ? (int.tryParse(tParts[1]) ?? 0) : 0;
-      
+
       if (vMajor > tMajor) return true;
       if (vMajor < tMajor) return false;
       return vMinor >= tMinor;
@@ -655,37 +699,42 @@ class MatrixClientManager {
 
     final supportsAuth = await _supportsAuthenticatedMedia();
     debugLog('MatrixClientManager: supportsAuthenticatedMedia=$supportsAuth');
-    
+
     // 根据服务器能力选择端点
-    final path = supportsAuth 
-        ? '_matrix/client/v1/media/upload'  // 认证媒体端点 (MSC3916)
-        : '_matrix/media/v3/upload';         // 传统端点
-    
+    final path = supportsAuth
+        ? '_matrix/client/v1/media/upload' // 认证媒体端点 (MSC3916)
+        : '_matrix/media/v3/upload'; // 传统端点
+
     final uri = Uri.parse('${_client!.homeserver}/$path').replace(
       queryParameters: filename != null ? {'filename': filename} : null,
     );
-    
+
     debugLog('MatrixClientManager: Uploading to: $uri');
     debugLog('MatrixClientManager: Content size: ${content.length} bytes');
     debugLog('MatrixClientManager: Content type: $contentType');
-    
+
     final request = http.Request('POST', uri);
     request.headers['Authorization'] = 'Bearer ${_client!.accessToken}';
     if (contentType != null) {
       request.headers['Content-Type'] = contentType;
     }
     request.bodyBytes = content;
-    
+
     final httpClient = http.Client();
     try {
-      final streamedResponse = await httpClient.send(request).timeout(
-        const Duration(minutes: 2),
-        onTimeout: () => throw TimeoutException('HTTP upload timed out after 2 minutes'),
-      );
+      final streamedResponse = await httpClient
+          .send(request)
+          .timeout(
+            const Duration(minutes: 2),
+            onTimeout: () =>
+                throw TimeoutException('HTTP upload timed out after 2 minutes'),
+          );
       final response = await http.Response.fromStream(streamedResponse);
 
-      debugLog('MatrixClientManager: Upload response status: ${response.statusCode}');
-      
+      debugLog(
+        'MatrixClientManager: Upload response status: ${response.statusCode}',
+      );
+
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         final contentUri = json['content_uri'] as String?;
@@ -694,16 +743,22 @@ class MatrixClientManager {
           return Uri.parse(contentUri);
         }
       }
-      
+
       // 上传失败，打印错误信息
       debugLog('MatrixClientManager: Upload failed: ${response.body}');
-      
+
       // 如果使用认证端点失败，尝试传统端点
       if (supportsAuth && response.statusCode == 403) {
-        debugLog('MatrixClientManager: Auth endpoint failed, trying legacy endpoint...');
-        return _uploadContentLegacy(content, filename: filename, contentType: contentType);
+        debugLog(
+          'MatrixClientManager: Auth endpoint failed, trying legacy endpoint...',
+        );
+        return _uploadContentLegacy(
+          content,
+          filename: filename,
+          contentType: contentType,
+        );
       }
-      
+
       // 解析错误信息
       try {
         final errorJson = jsonDecode(response.body);
@@ -729,27 +784,31 @@ class MatrixClientManager {
     String? contentType,
   }) async {
     if (_client == null) return null;
-    
-    final uri = Uri.parse('${_client!.homeserver}/_matrix/media/v3/upload').replace(
-      queryParameters: filename != null ? {'filename': filename} : null,
-    );
-    
+
+    final uri = Uri.parse('${_client!.homeserver}/_matrix/media/v3/upload')
+        .replace(
+          queryParameters: filename != null ? {'filename': filename} : null,
+        );
+
     debugLog('MatrixClientManager: Uploading (legacy) to: $uri');
-    
+
     final request = http.Request('POST', uri);
     request.headers['Authorization'] = 'Bearer ${_client!.accessToken}';
     if (contentType != null) {
       request.headers['Content-Type'] = contentType;
     }
     request.bodyBytes = content;
-    
+
     final httpClient2 = http.Client();
     final http.Response response;
     try {
-      final streamedResponse = await httpClient2.send(request).timeout(
-        const Duration(minutes: 2),
-        onTimeout: () => throw TimeoutException('HTTP upload timed out after 2 minutes'),
-      );
+      final streamedResponse = await httpClient2
+          .send(request)
+          .timeout(
+            const Duration(minutes: 2),
+            onTimeout: () =>
+                throw TimeoutException('HTTP upload timed out after 2 minutes'),
+          );
       response = await http.Response.fromStream(streamedResponse);
     } finally {
       httpClient2.close();
@@ -762,7 +821,7 @@ class MatrixClientManager {
         return Uri.parse(contentUri);
       }
     }
-    
+
     debugLog('MatrixClientManager: Legacy upload failed: ${response.body}');
     return null;
   }
@@ -803,4 +862,3 @@ class MatrixClientManager {
     }
   }
 }
-

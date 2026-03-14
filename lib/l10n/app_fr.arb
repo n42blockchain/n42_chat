@@ -477,7 +477,6 @@
     }
   },
   "authEnterValidServerAddress": "Veuillez entrer une adresse de serveur valide",
-  "authEmailOtp": "OTP par e-mail",
   "authEnterServerAddressFirst": "Veuillez d'abord entrer l'adresse du serveur",
   "authPasskeyRequiresServer": "La connexion par cle d'acces necessite le support du serveur",
   "authLoginAgreement": "En vous connectant, vous acceptez ",
