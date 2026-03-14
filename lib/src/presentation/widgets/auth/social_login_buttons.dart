@@ -2,15 +2,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../n42_chat.dart' show N42Chat;
 import '../../../services/auth/auth_methods_service.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../helpers/bloc_message_helper.dart';
 
 /// 社交登录按钮组件
 ///
@@ -19,8 +22,8 @@ class SocialLoginButtons extends StatefulWidget {
   /// 是否已同意用户协议
   final bool isAgreedToTerms;
 
-  /// 服务器地址
-  final String homeserver;
+  /// 服务器地址获取器
+  final String Function() homeserverBuilder;
 
   /// 协议未同意时的回调
   final VoidCallback? onTermsNotAgreed;
@@ -34,7 +37,7 @@ class SocialLoginButtons extends StatefulWidget {
   const SocialLoginButtons({
     super.key,
     required this.isAgreedToTerms,
-    required this.homeserver,
+    required this.homeserverBuilder,
     this.onTermsNotAgreed,
     this.onLoginSuccess,
     this.onError,
@@ -46,8 +49,11 @@ class SocialLoginButtons extends StatefulWidget {
 
 class _SocialLoginButtonsState extends State<SocialLoginButtons> {
   final AuthMethodsService _authService = AuthMethodsService();
+  bool _isGoogleAvailable = false;
+  bool _isFacebookAvailable = false;
   bool _isGoogleLoading = false;
   bool _isAppleLoading = false;
+  bool _isSsoLoading = false;
   bool _isFacebookLoading = false;
   bool _isTwitterLoading = false;
   bool _isWeChatLoading = false;
@@ -61,6 +67,13 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
   }
 
   Future<void> _checkAvailability() async {
+    if (mounted) {
+      setState(() {
+        _isGoogleAvailable = _authService.isGoogleSignInAvailable();
+        _isFacebookAvailable = _authService.isFacebookSignInAvailable();
+      });
+    }
+
     // 检查 Apple 登录可用性
     if (Platform.isIOS || Platform.isMacOS) {
       try {
@@ -89,14 +102,81 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final config = N42Chat.config;
+    final buttons = <Widget>[
+      if ((config?.enableGoogleLogin ?? true) && _isGoogleAvailable)
+        _buildSocialButton(
+          onTap: _isGoogleLoading ? null : _handleGoogleSignIn,
+          icon: Icons.g_mobiledata,
+          isLoading: _isGoogleLoading,
+          tooltip: S.of(context)?.authGoogleLabel ?? 'Google',
+          backgroundColor: Colors.white,
+          iconColor: Colors.red,
+        ),
+      if ((config?.enableAppleLogin ?? true) && _isAppleAvailable)
+        _buildSocialButton(
+          onTap: _isAppleLoading ? null : _handleAppleSignIn,
+          icon: Icons.apple,
+          isLoading: _isAppleLoading,
+          tooltip: S.of(context)?.authAppleLabel ?? 'Apple',
+          backgroundColor: isDark ? Colors.white : Colors.black,
+          iconColor: isDark ? Colors.black : Colors.white,
+        ),
+      if (config?.enableSsoLogin ?? false)
+        _buildSocialButton(
+          onTap: _isSsoLoading ? null : _handleSsoSignIn,
+          icon: Icons.login,
+          isLoading: _isSsoLoading,
+          tooltip: S.of(context)?.authSsoLabel ?? 'SSO',
+          backgroundColor: Colors.blue,
+          iconColor: Colors.white,
+        ),
+      if ((config?.enableFacebookLogin ?? false) && _isFacebookAvailable)
+        _buildSocialButton(
+          onTap: _isFacebookLoading ? null : _handleFacebookSignIn,
+          icon: Icons.facebook,
+          isLoading: _isFacebookLoading,
+          tooltip: 'Facebook',
+          backgroundColor: const Color(0xFF1877F2),
+          iconColor: Colors.white,
+        ),
+      if ((config?.enableTwitterLogin ?? false) &&
+          _authService.isTwitterSignInAvailable())
+        _buildSocialButton(
+          onTap: _isTwitterLoading ? null : _handleTwitterSignIn,
+          icon: Icons.alternate_email,
+          isLoading: _isTwitterLoading,
+          tooltip: 'Twitter',
+          backgroundColor: Colors.black,
+          iconColor: Colors.white,
+        ),
+      if ((config?.enableWeChatLogin ?? false) && _isWeChatAvailable)
+        _buildSocialButton(
+          onTap: _isWeChatLoading ? null : _handleWeChatSignIn,
+          icon: Icons.chat_bubble,
+          isLoading: _isWeChatLoading,
+          tooltip: S.of(context)?.commonWechat ?? 'WeChat',
+          backgroundColor: const Color(0xFF07C160),
+          iconColor: Colors.white,
+        ),
+    ];
+
+    if (buttons.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated) {
           widget.onLoginSuccess?.call();
-        } else if (state.status == AuthStatus.error && state.errorMessage != null) {
-          widget.onError?.call(state.errorMessage!);
+        } else if (state.status == AuthStatus.error &&
+            state.errorMessage != null) {
+          widget.onError?.call(
+            resolveBlocMessage(context, state.errorMessage!),
+          );
         }
       },
       child: Column(
@@ -107,24 +187,18 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
             child: Row(
               children: [
                 Expanded(
-                  child: Divider(
-                    color: textColor.withValues(alpha: 0.3),
-                  ),
+                  child: Divider(color: textColor.withValues(alpha: 0.3)),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    S.of(context)?.authOtherLoginMethods ?? 'Other login methods',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: textColor,
-                    ),
+                    S.of(context)?.authOtherLoginMethods ??
+                        'Other login methods',
+                    style: TextStyle(fontSize: 13, color: textColor),
                   ),
                 ),
                 Expanded(
-                  child: Divider(
-                    color: textColor.withValues(alpha: 0.3),
-                  ),
+                  child: Divider(color: textColor.withValues(alpha: 0.3)),
                 ),
               ],
             ),
@@ -135,65 +209,14 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
             alignment: WrapAlignment.center,
             spacing: 16,
             runSpacing: 12,
-            children: [
-              // Google 登录
-              _buildSocialButton(
-                onTap: _isGoogleLoading ? null : _handleGoogleSignIn,
-                icon: Icons.g_mobiledata,
-                isLoading: _isGoogleLoading,
-                tooltip: S.of(context)?.authGoogleLabel ?? 'Google',
-                backgroundColor: Colors.white,
-                iconColor: Colors.red,
-              ),
-
-              // Apple 登录 (仅 iOS/macOS)
-              if (_isAppleAvailable)
-                _buildSocialButton(
-                  onTap: _isAppleLoading ? null : _handleAppleSignIn,
-                  icon: Icons.apple,
-                  isLoading: _isAppleLoading,
-                  tooltip: S.of(context)?.authAppleLabel ?? 'Apple',
-                  backgroundColor: isDark ? Colors.white : Colors.black,
-                  iconColor: isDark ? Colors.black : Colors.white,
-                ),
-
-              // Facebook 登录
-              _buildSocialButton(
-                onTap: _isFacebookLoading ? null : _handleFacebookSignIn,
-                icon: Icons.facebook,
-                isLoading: _isFacebookLoading,
-                tooltip: 'Facebook',
-                backgroundColor: const Color(0xFF1877F2),
-                iconColor: Colors.white,
-              ),
-
-              // Twitter 登录
-              if (_authService.isTwitterSignInAvailable())
-                _buildSocialButton(
-                  onTap: _isTwitterLoading ? null : _handleTwitterSignIn,
-                  icon: Icons.alternate_email,  // Twitter/X 图标替代
-                  isLoading: _isTwitterLoading,
-                  tooltip: 'Twitter',
-                  backgroundColor: Colors.black,
-                  iconColor: Colors.white,
-                ),
-
-              // 微信登录
-              if (_isWeChatAvailable)
-                _buildSocialButton(
-                  onTap: _isWeChatLoading ? null : _handleWeChatSignIn,
-                  icon: Icons.chat_bubble,  // 使用聊天气泡图标替代
-                  isLoading: _isWeChatLoading,
-                  tooltip: S.of(context)?.commonWechat ?? 'WeChat',
-                  backgroundColor: const Color(0xFF07C160),
-                  iconColor: Colors.white,
-                ),
-            ],
+            children: buttons,
           ),
         ],
       ),
     );
   }
+
+  String get _homeserver => widget.homeserverBuilder().trim();
 
   Widget _buildSocialButton({
     required VoidCallback? onTap,
@@ -217,9 +240,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
             color: backgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isDark
-                  ? AppColors.dividerDark
-                  : AppColors.divider,
+              color: isDark ? AppColors.dividerDark : AppColors.divider,
             ),
             boxShadow: [
               BoxShadow(
@@ -241,11 +262,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
                       ),
                     ),
                   )
-                : Icon(
-                    icon,
-                    size: 28,
-                    color: iconColor,
-                  ),
+                : Icon(icon, size: 28, color: iconColor),
           ),
         ),
       ),
@@ -258,8 +275,11 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
 
-    if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
+    if (_homeserver.isEmpty) {
+      widget.onError?.call(
+        S.of(context)?.authEnterServerAddressFirst ??
+            'Please enter server address first',
+      );
       return;
     }
 
@@ -268,9 +288,9 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     try {
       // 触发 Google 登录事件
       if (mounted) {
-        context.read<AuthBloc>().add(AuthGoogleLoginRequested(
-          homeserver: widget.homeserver,
-        ));
+        context.read<AuthBloc>().add(
+          AuthGoogleLoginRequested(homeserver: _homeserver),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -289,8 +309,11 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
 
-    if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
+    if (_homeserver.isEmpty) {
+      widget.onError?.call(
+        S.of(context)?.authEnterServerAddressFirst ??
+            'Please enter server address first',
+      );
       return;
     }
 
@@ -299,9 +322,9 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     try {
       // 触发 Apple 登录事件
       if (mounted) {
-        context.read<AuthBloc>().add(AuthAppleLoginRequested(
-          homeserver: widget.homeserver,
-        ));
+        context.read<AuthBloc>().add(
+          AuthAppleLoginRequested(homeserver: _homeserver),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -320,8 +343,11 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
 
-    if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
+    if (_homeserver.isEmpty) {
+      widget.onError?.call(
+        S.of(context)?.authEnterServerAddressFirst ??
+            'Please enter server address first',
+      );
       return;
     }
 
@@ -330,9 +356,9 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     try {
       // 触发 Facebook 登录事件
       if (mounted) {
-        context.read<AuthBloc>().add(AuthFacebookLoginRequested(
-          homeserver: widget.homeserver,
-        ));
+        context.read<AuthBloc>().add(
+          AuthFacebookLoginRequested(homeserver: _homeserver),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -345,14 +371,71 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     }
   }
 
+  Future<void> _handleSsoSignIn() async {
+    if (!widget.isAgreedToTerms) {
+      widget.onTermsNotAgreed?.call();
+      return;
+    }
+
+    if (_homeserver.isEmpty) {
+      widget.onError?.call(
+        S.of(context)?.authEnterServerAddressFirst ??
+            'Please enter server address first',
+      );
+      return;
+    }
+
+    setState(() => _isSsoLoading = true);
+
+    try {
+      final config = N42Chat.config;
+      final configuredRedirect = config?.ssoRedirectUrl.trim() ?? '';
+      final baseRedirect = configuredRedirect.isNotEmpty
+          ? configuredRedirect
+          : 'n42://auth/sso';
+      final baseRedirectUri = Uri.parse(baseRedirect);
+      final redirectUri = baseRedirectUri.replace(
+        queryParameters: <String, String>{
+          ...baseRedirectUri.queryParameters,
+          'homeserver': _homeserver,
+        },
+      );
+      final loginUri = Uri.parse(
+        _authService.getSsoLoginUrl(
+          homeserver: _homeserver,
+          redirectUrl: redirectUri.toString(),
+        ),
+      );
+
+      final launched = await launchUrl(
+        loginUri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && mounted) {
+        widget.onError?.call('Failed to open SSO login page');
+      }
+    } catch (e) {
+      if (mounted) {
+        widget.onError?.call(e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSsoLoading = false);
+      }
+    }
+  }
+
   Future<void> _handleTwitterSignIn() async {
     if (!widget.isAgreedToTerms) {
       widget.onTermsNotAgreed?.call();
       return;
     }
 
-    if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
+    if (_homeserver.isEmpty) {
+      widget.onError?.call(
+        S.of(context)?.authEnterServerAddressFirst ??
+            'Please enter server address first',
+      );
       return;
     }
 
@@ -361,9 +444,9 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     try {
       // 触发 Twitter 登录事件
       if (mounted) {
-        context.read<AuthBloc>().add(AuthTwitterLoginRequested(
-          homeserver: widget.homeserver,
-        ));
+        context.read<AuthBloc>().add(
+          AuthTwitterLoginRequested(homeserver: _homeserver),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -382,8 +465,11 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
 
-    if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
+    if (_homeserver.isEmpty) {
+      widget.onError?.call(
+        S.of(context)?.authEnterServerAddressFirst ??
+            'Please enter server address first',
+      );
       return;
     }
 
@@ -392,9 +478,9 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     try {
       // 触发微信登录事件
       if (mounted) {
-        context.read<AuthBloc>().add(AuthWeChatLoginRequested(
-          homeserver: widget.homeserver,
-        ));
+        context.read<AuthBloc>().add(
+          AuthWeChatLoginRequested(homeserver: _homeserver),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -413,11 +499,7 @@ class GoogleSignInButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
 
-  const GoogleSignInButton({
-    super.key,
-    this.onPressed,
-    this.isLoading = false,
-  });
+  const GoogleSignInButton({super.key, this.onPressed, this.isLoading = false});
 
   @override
   Widget build(BuildContext context) {
@@ -451,11 +533,7 @@ class AppleSignInButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
 
-  const AppleSignInButton({
-    super.key,
-    this.onPressed,
-    this.isLoading = false,
-  });
+  const AppleSignInButton({super.key, this.onPressed, this.isLoading = false});
 
   @override
   Widget build(BuildContext context) {
@@ -469,22 +547,15 @@ class AppleSignInButton extends StatelessWidget {
               height: 20,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
-          : Icon(
-              Icons.apple,
-              color: isDark ? Colors.black : Colors.white,
-            ),
+          : Icon(Icons.apple, color: isDark ? Colors.black : Colors.white),
       label: Text(
         S.of(context)?.commonAppleLogin ?? 'Sign in with Apple',
-        style: TextStyle(
-          color: isDark ? Colors.black : Colors.white,
-        ),
+        style: TextStyle(color: isDark ? Colors.black : Colors.white),
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: isDark ? Colors.white : Colors.black,
         minimumSize: const Size(double.infinity, 48),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }

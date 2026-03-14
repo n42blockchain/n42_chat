@@ -13,10 +13,79 @@ import '../../../core/utils/debug_log.dart';
 class MatrixGroupDataSource {
   final MatrixClientManager _clientManager;
 
+  static const String _channelMetaEventType = 'n42.room.channel_meta';
+  static const String _channelsEventType = 'n42.room.channels';
+  static const String _roomSettingsEventType = 'n42.room.settings';
+  static const String _contentFilterEventType = 'n42.room.content_filter';
+  static const String _botConfigEventType = 'n42.room.bot_config';
+  static const String _tokenGateEventType = 'n42.token_gate';
+
   MatrixGroupDataSource(this._clientManager);
 
   /// 获取Matrix客户端
   matrix.Client? get _client => _clientManager.client;
+
+  matrix.Room _getRequiredRoom(String roomId) {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      throw Exception('Room not found: $roomId');
+    }
+    return room;
+  }
+
+  void _ensureCanSendStateEvent(
+    matrix.Room room,
+    String eventType, {
+    required String action,
+  }) {
+    if (_canSendStateEvent(room, eventType)) {
+      return;
+    }
+
+    final userId = _client?.userID;
+    final powerLevel = userId != null ? room.getPowerLevelByUserId(userId) : 0;
+    debugLog(
+      'MatrixGroupDataSource: Permission denied for $action, '
+      'roomId=${room.id}, eventType=$eventType, powerLevel=$powerLevel',
+    );
+    throw Exception('You do not have permission to $action');
+  }
+
+  bool canSendStateEvent(
+    String roomId,
+    String eventType, {
+    int? fallbackMinPowerLevel,
+  }) {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      return false;
+    }
+    return _canSendStateEvent(
+      room,
+      eventType,
+      fallbackMinPowerLevel: fallbackMinPowerLevel,
+    );
+  }
+
+  bool _canSendStateEvent(
+    matrix.Room room,
+    String eventType, {
+    int? fallbackMinPowerLevel,
+  }) {
+    if (room.canSendEvent(eventType)) {
+      return true;
+    }
+
+    if (fallbackMinPowerLevel == null) {
+      return false;
+    }
+
+    final userId = _client?.userID;
+    if (userId == null) {
+      return false;
+    }
+    return room.getPowerLevelByUserId(userId) >= fallbackMinPowerLevel;
+  }
 
   // ============================================
   // 群聊创建
@@ -138,8 +207,12 @@ class MatrixGroupDataSource {
 
   /// 设置群话题/描述
   Future<void> setGroupTopic(String roomId, String topic) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) return;
+    final room = _getRequiredRoom(roomId);
+    _ensureCanSendStateEvent(
+      room,
+      'm.room.topic',
+      action: 'change the group description',
+    );
     await room.setDescription(topic);
   }
 
@@ -174,8 +247,12 @@ class MatrixGroupDataSource {
 
   /// 设置群头像
   Future<void> setGroupAvatar(String roomId, Uint8List avatar) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) return;
+    final room = _getRequiredRoom(roomId);
+    _ensureCanSendStateEvent(
+      room,
+      'm.room.avatar',
+      action: 'change the group avatar',
+    );
 
     final matrixFile = matrix.MatrixFile(bytes: avatar, name: 'avatar.png');
     await room.setAvatar(matrixFile);
@@ -387,8 +464,12 @@ class MatrixGroupDataSource {
 
   /// 设置群可见性
   Future<void> setGroupVisibility(String roomId, bool isPublic) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) return;
+    final room = _getRequiredRoom(roomId);
+    _ensureCanSendStateEvent(
+      room,
+      'm.room.join_rules',
+      action: 'change the group visibility',
+    );
 
     await room.setJoinRules(
       isPublic ? matrix.JoinRules.public : matrix.JoinRules.invite,
@@ -535,8 +616,6 @@ class MatrixGroupDataSource {
   // 群人数上限
   // ============================================
 
-  static const String _roomSettingsEventType = 'n42.room.settings';
-
   /// 获取群人数上限（null = 不限）
   int? getMaxMembers(String roomId) {
     final room = _client?.getRoomById(roomId);
@@ -547,8 +626,12 @@ class MatrixGroupDataSource {
 
   /// 设置群人数上限（null = 取消上限）
   Future<void> setMaxMembers(String roomId, int? maxMembers) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) throw Exception('Room not found');
+    final room = _getRequiredRoom(roomId);
+    _ensureCanSendStateEvent(
+      room,
+      _roomSettingsEventType,
+      action: 'change the member limit',
+    );
     final current = Map<String, dynamic>.from(
       room.getState(_roomSettingsEventType)?.content ?? {},
     );
@@ -563,8 +646,6 @@ class MatrixGroupDataSource {
   // ============================================
   // 关键词过滤
   // ============================================
-
-  static const String _contentFilterEventType = 'n42.room.content_filter';
 
   /// 获取关键词过滤配置
   ContentFilterConfig? getContentFilter(String roomId) {
@@ -581,8 +662,12 @@ class MatrixGroupDataSource {
 
   /// 设置关键词过滤配置
   Future<void> setContentFilter(String roomId, ContentFilterConfig config) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) throw Exception('Room not found');
+    final room = _getRequiredRoom(roomId);
+    _ensureCanSendStateEvent(
+      room,
+      _contentFilterEventType,
+      action: 'change the content filter',
+    );
     await room.client.setRoomStateWithKey(
       roomId,
       _contentFilterEventType,
@@ -594,8 +679,6 @@ class MatrixGroupDataSource {
   // ============================================
   // 子频道管理
   // ============================================
-
-  static const String _channelsEventType = 'n42.room.channels';
 
   /// 获取子频道列表
   List<ChannelEntity> getChannels(String parentRoomId) {
@@ -624,6 +707,12 @@ class MatrixGroupDataSource {
     String? topic,
   }) async {
     if (_client == null) throw Exception('Matrix client not initialized');
+    final parentRoom = _getRequiredRoom(parentRoomId);
+    _ensureCanSendStateEvent(
+      parentRoom,
+      _channelsEventType,
+      action: 'manage channels',
+    );
     final members = await getGroupMembers(parentRoomId);
     final memberIds = members
         .map((m) => m.id)
@@ -635,11 +724,32 @@ class MatrixGroupDataSource {
       topic: topic,
       invite: memberIds,
       preset: matrix.CreateRoomPreset.privateChat,
+      powerLevelContentOverride: {
+        'invite': 50,
+        'kick': 50,
+        'ban': 50,
+        'redact': 50,
+        'state_default': 50,
+        'events_default': 50,
+        'events': {
+          'm.room.name': 50,
+          'm.room.topic': 50,
+          'm.room.avatar': 50,
+          'm.room.message': 50,
+          'm.sticker': 50,
+          'm.reaction': 50,
+        },
+      },
       initialState: [
         matrix.StateEvent(
-          type: 'n42.room.channel_meta',
+          type: _channelMetaEventType,
           stateKey: '',
-          content: {'parent_room_id': parentRoomId},
+          content: {
+            'parent_room_id': parentRoomId,
+            'members_can_speak': false,
+            'show_member_list': false,
+            'slow_mode_interval': 0,
+          },
         ),
       ],
     );
@@ -671,14 +781,28 @@ class MatrixGroupDataSource {
     String? topic,
   }) async {
     if (_client == null) throw Exception('Matrix client not initialized');
+    final parentRoom = _getRequiredRoom(parentRoomId);
+    _ensureCanSendStateEvent(
+      parentRoom,
+      _channelsEventType,
+      action: 'manage channels',
+    );
     final existing = getChannels(parentRoomId);
+    final targetChannel = existing.where((c) => c.roomId == channelRoomId).firstOrNull;
+    if (targetChannel == null) {
+      throw Exception('Channel not found: $channelRoomId');
+    }
     final updated = existing.map((c) {
-      if (c.roomId != channelRoomId) return _channelToMap(c);
-      return {
-        ..._channelToMap(c),
-        if (name != null) 'name': name,
-        if (topic != null) 'topic': topic,
-      };
+      final channelData = _channelToMap(c);
+      if (c.roomId == channelRoomId) {
+        if (name != null) {
+          channelData['name'] = name;
+        }
+        if (topic != null) {
+          channelData['topic'] = topic;
+        }
+      }
+      return channelData;
     }).toList();
     await _client!.setRoomStateWithKey(
       parentRoomId,
@@ -686,19 +810,46 @@ class MatrixGroupDataSource {
       '',
       {'channels': updated},
     );
+
+    final channelRoom = _getRequiredRoom(channelRoomId);
+    if (name != null && name.isNotEmpty && name != targetChannel.name) {
+      _ensureCanSendStateEvent(
+        channelRoom,
+        'm.room.name',
+        action: 'update the channel name',
+      );
+      await channelRoom.setName(name);
+    }
+    if (topic != null && topic != targetChannel.topic) {
+      _ensureCanSendStateEvent(
+        channelRoom,
+        'm.room.topic',
+        action: 'update the channel topic',
+      );
+      await channelRoom.setDescription(topic);
+    }
   }
 
   /// 删除子频道
   Future<void> deleteChannel(String parentRoomId, String channelRoomId) async {
     if (_client == null) throw Exception('Matrix client not initialized');
+    final parentRoom = _getRequiredRoom(parentRoomId);
+    _ensureCanSendStateEvent(
+      parentRoom,
+      _channelsEventType,
+      action: 'manage channels',
+    );
     final existing = getChannels(parentRoomId);
+    if (!existing.any((c) => c.roomId == channelRoomId)) {
+      throw Exception('Channel not found: $channelRoomId');
+    }
     final updated = existing
         .where((c) => c.roomId != channelRoomId)
         .map(_channelToMap)
         .toList();
     // 重新排序
     for (var i = 0; i < updated.length; i++) {
-      (updated[i] as Map<String, dynamic>)['order'] = i;
+      updated[i]['order'] = i;
     }
     await _client!.setRoomStateWithKey(
       parentRoomId,
@@ -723,8 +874,6 @@ class MatrixGroupDataSource {
   // Bot 配置
   // ============================================
 
-  static const String _botConfigEventType = 'n42.room.bot_config';
-
   /// 获取 Bot 配置
   BotConfig? getBotConfig(String roomId) {
     final room = _client?.getRoomById(roomId);
@@ -740,8 +889,12 @@ class MatrixGroupDataSource {
 
   /// 设置 Bot 配置
   Future<void> setBotConfig(String roomId, BotConfig config) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) throw Exception('Room not found');
+    final room = _getRequiredRoom(roomId);
+    _ensureCanSendStateEvent(
+      room,
+      _botConfigEventType,
+      action: 'change the bot settings',
+    );
     await room.client.setRoomStateWithKey(
       roomId,
       _botConfigEventType,
@@ -753,8 +906,6 @@ class MatrixGroupDataSource {
   // ============================================
   // 代币门控
   // ============================================
-
-  static const String _tokenGateEventType = 'n42.token_gate';
 
   /// 获取代币门控配置
   Map<String, dynamic>? getTokenGateConfig(String roomId) {
@@ -772,8 +923,12 @@ class MatrixGroupDataSource {
 
   /// 设置代币门控配置
   Future<void> setTokenGateConfig(String roomId, Map<String, dynamic> config) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) throw Exception('Room not found');
+    final room = _getRequiredRoom(roomId);
+    _ensureCanSendStateEvent(
+      room,
+      _tokenGateEventType,
+      action: 'change the token gate',
+    );
 
     await _client!.setRoomStateWithKey(
       roomId,
@@ -837,4 +992,3 @@ class MatrixGroupDataSource {
     }
   }
 }
-

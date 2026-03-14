@@ -218,6 +218,33 @@ class GroupEntity extends Equatable {
   /// 当前用户是否可以修改设置
   final bool canChangeSettings;
 
+  /// 当前用户是否可以修改群名称
+  final bool canEditName;
+
+  /// 当前用户是否可以修改群头像
+  final bool canEditAvatar;
+
+  /// 当前用户是否可以修改群描述/公告
+  final bool canEditDescription;
+
+  /// 当前用户是否可以修改群可见性
+  final bool canChangeVisibility;
+
+  /// 当前用户是否可以管理群频道
+  final bool canManageChannels;
+
+  /// 当前用户是否可以管理 Bot 配置
+  final bool canManageBot;
+
+  /// 当前用户是否可以管理内容过滤
+  final bool canManageContentFilter;
+
+  /// 当前用户是否可以设置人数上限
+  final bool canManageMemberLimit;
+
+  /// 当前用户是否可以管理 Token Gate
+  final bool canManageTokenGate;
+
   // ============================================
   // 频道/超级群属性
   // ============================================
@@ -278,6 +305,15 @@ class GroupEntity extends Equatable {
     this.canInvite = false,
     this.canKick = false,
     this.canChangeSettings = false,
+    this.canEditName = false,
+    this.canEditAvatar = false,
+    this.canEditDescription = false,
+    this.canChangeVisibility = false,
+    this.canManageChannels = false,
+    this.canManageBot = false,
+    this.canManageContentFilter = false,
+    this.canManageMemberLimit = false,
+    this.canManageTokenGate = false,
     this.groupType = GroupType.group,
     this.subscriberCount = 0,
     this.joinRule = JoinRule.invite,
@@ -342,6 +378,15 @@ class GroupEntity extends Equatable {
         canInvite,
         canKick,
         canChangeSettings,
+        canEditName,
+        canEditAvatar,
+        canEditDescription,
+        canChangeVisibility,
+        canManageChannels,
+        canManageBot,
+        canManageContentFilter,
+        canManageMemberLimit,
+        canManageTokenGate,
         groupType,
         subscriberCount,
         joinRule,
@@ -372,6 +417,15 @@ class GroupEntity extends Equatable {
     bool? canInvite,
     bool? canKick,
     bool? canChangeSettings,
+    bool? canEditName,
+    bool? canEditAvatar,
+    bool? canEditDescription,
+    bool? canChangeVisibility,
+    bool? canManageChannels,
+    bool? canManageBot,
+    bool? canManageContentFilter,
+    bool? canManageMemberLimit,
+    bool? canManageTokenGate,
     GroupType? groupType,
     int? subscriberCount,
     JoinRule? joinRule,
@@ -400,6 +454,17 @@ class GroupEntity extends Equatable {
       canInvite: canInvite ?? this.canInvite,
       canKick: canKick ?? this.canKick,
       canChangeSettings: canChangeSettings ?? this.canChangeSettings,
+      canEditName: canEditName ?? this.canEditName,
+      canEditAvatar: canEditAvatar ?? this.canEditAvatar,
+      canEditDescription: canEditDescription ?? this.canEditDescription,
+      canChangeVisibility: canChangeVisibility ?? this.canChangeVisibility,
+      canManageChannels: canManageChannels ?? this.canManageChannels,
+      canManageBot: canManageBot ?? this.canManageBot,
+      canManageContentFilter:
+          canManageContentFilter ?? this.canManageContentFilter,
+      canManageMemberLimit:
+          canManageMemberLimit ?? this.canManageMemberLimit,
+      canManageTokenGate: canManageTokenGate ?? this.canManageTokenGate,
       groupType: groupType ?? this.groupType,
       subscriberCount: subscriberCount ?? this.subscriberCount,
       joinRule: joinRule ?? this.joinRule,
@@ -463,4 +528,3 @@ class GroupEntity extends Equatable {
     );
   }
 }
-

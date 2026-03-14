@@ -477,7 +477,6 @@
     }
   },
   "authEnterValidServerAddress": "올바른 서버 주소를 입력해주세요",
-  "authEmailOtp": "이메일 OTP",
   "authEnterServerAddressFirst": "먼저 서버 주소를 입력해주세요",
   "authPasskeyRequiresServer": "패스키 로그인은 서버 지원이 필요합니다",
   "authLoginAgreement": "로그인하면 다음에 동의하는 것으로 간주됩니다 ",

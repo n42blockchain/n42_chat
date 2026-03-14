@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/bot_config_entity.dart';
-import '../../../domain/entities/channel_entity.dart';
 import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/token_gate_entity.dart';
 
@@ -98,6 +97,17 @@ class UpdateGroupAvatar extends GroupEvent {
 
   @override
   List<Object?> get props => [roomId, avatar];
+}
+
+/// 更新群可见性
+class UpdateGroupVisibility extends GroupEvent {
+  final String roomId;
+  final bool isPublic;
+
+  const UpdateGroupVisibility(this.roomId, this.isPublic);
+
+  @override
+  List<Object?> get props => [roomId, isPublic];
 }
 
 /// 邀请成员
@@ -327,4 +337,3 @@ class MemberJoined extends GroupEvent {
   @override
   List<Object?> get props => [roomId, userId];
 }
-

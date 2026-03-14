@@ -477,7 +477,6 @@
     }
   },
   "authEnterValidServerAddress": "Por favor ingresa una direccion de servidor valida",
-  "authEmailOtp": "OTP por correo",
   "authEnterServerAddressFirst": "Por favor ingresa la direccion del servidor primero",
   "authPasskeyRequiresServer": "El inicio de sesion con Passkey requiere soporte del servidor",
   "authLoginAgreement": "Al iniciar sesion, aceptas ",

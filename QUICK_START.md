@@ -1,5 +1,7 @@
 # N42 Matrix Chat 快速启动指南
 
+> 注：本文是历史构建提示与开发流程记录，不代表当前代码库的真实功能状态。实际对外能力以 `README.md`、源码和集成文档为准。
+
 ## 🚀 开始之前
 
 ### 环境要求
@@ -238,7 +240,7 @@ UI要求：简洁表单，绿色按钮，加载状态，错误提示。
 3. lib/src/presentation/pages/profile/
    - profile_page.dart (个人卡片+功能列表)
    - settings_page.dart
-   - edit_profile_page.dart
+   - profile_edit_page.dart
 
 4. 相关BLoC和数据层
 
@@ -291,12 +293,24 @@ class N42Chat {
   static Future<void> initialize(N42ChatConfig config);
   static Widget chatWidget();
   static List<RouteBase> routes();
-  static Future<void> login(...);
-  static Future<void> loginWithToken(...);
+  static Future<void> login({
+    required String homeserver,
+    required String username,
+    required String password,
+  });
+  static Future<void> loginWithToken({
+    required String homeserver,
+    required String accessToken,
+    required String userId,
+    required String deviceId,
+  });
   static Future<void> logout();
+  static Future<void> purgeLocalData();
   static bool get isLoggedIn;
+  static Stream<AuthStatus> get authStatusStream;
   static Stream<int> get unreadCountStream;
-  static void openConversation(String roomId);
+  static Future<void> openConversation(String roomId);
+  static Future<void> openUserProfile(String userId);
   static Future<void> dispose();
 }
 ```
@@ -427,4 +441,3 @@ flutter pub run build_runner build
 ---
 
 > 💡 提示：建议每完成一个Phase就进行一次git commit，便于回滚和追踪。
-

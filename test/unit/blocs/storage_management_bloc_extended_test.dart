@@ -79,7 +79,9 @@ void main() {
         .thenAnswer((_) async => _status);
     when(() => mockMonitor.getStorageConfig())
         .thenAnswer((_) async => _config);
-    when(() => mockCleanup.getRecommendations())
+    when(() => mockCleanup.getRecommendations(
+          preserveThumbnails: any(named: 'preserveThumbnails'),
+        ))
         .thenAnswer((_) async => <CleanupRecommendation>[]);
     when(() => mockManager.getRoomStorageRanking())
         .thenAnswer((_) async => <RoomStorageInfo>[_roomInfo]);
@@ -161,7 +163,10 @@ void main() {
       'success — emits isCleaning, then result, then reloads storage',
       build: buildBloc,
       setUp: () {
-        when(() => mockCleanup.executeRecommendation(any()))
+        when(() => mockCleanup.executeRecommendation(
+              any(),
+              preserveThumbnails: any(named: 'preserveThumbnails'),
+            ))
             .thenAnswer((_) async => _cleanupResult);
         stubLoadStorageInfoSuccess();
       },
@@ -183,7 +188,10 @@ void main() {
       'failure — emits isCleaning then error, no LoadStorageInfo',
       build: buildBloc,
       setUp: () {
-        when(() => mockCleanup.executeRecommendation(any()))
+        when(() => mockCleanup.executeRecommendation(
+              any(),
+              preserveThumbnails: any(named: 'preserveThumbnails'),
+            ))
             .thenThrow(Exception('cleanup failed'));
       },
       act: (bloc) => bloc.add(const ExecuteCleanup(_recommendation)),
@@ -211,6 +219,7 @@ void main() {
             roomId: any(named: 'roomId'),
             fileCategories: any(named: 'fileCategories'),
             olderThan: any(named: 'olderThan'),
+            preserveThumbnails: any(named: 'preserveThumbnails'),
           ),
         ).thenAnswer((_) async => _cleanupResult);
         stubLoadStorageInfoSuccess();
@@ -238,6 +247,7 @@ void main() {
             roomId: any(named: 'roomId'),
             fileCategories: any(named: 'fileCategories'),
             olderThan: any(named: 'olderThan'),
+            preserveThumbnails: any(named: 'preserveThumbnails'),
           ),
         ).thenThrow(Exception('room cleanup failed'));
       },
@@ -338,7 +348,9 @@ void main() {
       'success — emits updated recommendations',
       build: buildBloc,
       setUp: () {
-        when(() => mockCleanup.getRecommendations())
+        when(() => mockCleanup.getRecommendations(
+              preserveThumbnails: any(named: 'preserveThumbnails'),
+            ))
             .thenAnswer((_) async => <CleanupRecommendation>[_recommendation]);
       },
       act: (bloc) => bloc.add(const LoadRecommendations()),
@@ -352,7 +364,9 @@ void main() {
       'failure — emits error',
       build: buildBloc,
       setUp: () {
-        when(() => mockCleanup.getRecommendations())
+        when(() => mockCleanup.getRecommendations(
+              preserveThumbnails: any(named: 'preserveThumbnails'),
+            ))
             .thenThrow(Exception('rec error'));
       },
       act: (bloc) => bloc.add(const LoadRecommendations()),

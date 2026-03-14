@@ -57,6 +57,7 @@ class ContactRepositoryImpl implements IContactRepository {
 
   @override
   Future<ContactEntity?> getContactById(String userId) async {
+    await _loadRemarkCache();
     final profile = await _contactDataSource.getUserProfile(userId);
     if (profile == null) return null;
 
@@ -298,6 +299,7 @@ class ContactRepositoryImpl implements IContactRepository {
       // 在线状态需要异步获取，这里默认离线
       presence: PresenceStatus.offline,
       remark: remark,
+      isBlocked: _contactDataSource.isUserIgnored(user.id),
       directRoomId: directRoomId,
       isFriend: directRoomId != null,
     );
@@ -316,6 +318,7 @@ class ContactRepositoryImpl implements IContactRepository {
       // 在线状态需要异步获取，这里默认离线
       presence: PresenceStatus.offline,
       remark: remark,
+      isBlocked: _contactDataSource.isUserIgnored(userId),
       directRoomId: directRoomId,
       isFriend: directRoomId != null,
     );
@@ -357,4 +360,3 @@ class ContactRepositoryImpl implements IContactRepository {
     await _storageDataSource.setContactRemark(userId, null);
   }
 }
-

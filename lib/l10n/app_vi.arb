@@ -477,7 +477,6 @@
     }
   },
   "authEnterValidServerAddress": "Vui long nhap dia chi may chu hop le",
-  "authEmailOtp": "OTP Email",
   "authEnterServerAddressFirst": "Vui long nhap dia chi may chu truoc",
   "authPasskeyRequiresServer": "Dang nhap Passkey can ho tro may chu",
   "authLoginAgreement": "Bang viec dang nhap, ban dong y voi ",

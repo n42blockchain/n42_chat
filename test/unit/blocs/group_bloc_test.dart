@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:n42_chat/src/domain/entities/channel_entity.dart';
 import 'package:n42_chat/src/domain/entities/group_entity.dart';
 import 'package:n42_chat/src/domain/entities/token_gate_entity.dart';
 import 'package:n42_chat/src/domain/repositories/group_repository.dart';
@@ -25,6 +26,7 @@ class FakeTokenGateConfig extends Fake implements TokenGateConfig {}
 
 const _roomId1 = '!room1:server.com';
 const _roomId2 = '!room2:server.com';
+const _channelRoomId = '!channel1:server.com';
 
 const _testGroup1 = GroupEntity(
   roomId: _roomId1,
@@ -58,6 +60,13 @@ const _testMembers = [_testMember1, _testMember2];
 const _testInvite = GroupEntity(
   roomId: '!invite1:server.com',
   name: 'Invite Group',
+);
+
+const _testChannel = ChannelEntity(
+  roomId: _channelRoomId,
+  parentRoomId: _roomId1,
+  name: 'Announcements',
+  topic: 'Read-only updates',
 );
 
 // ---------------------------------------------------------------------------
@@ -798,7 +807,6 @@ void main() {
     blocTest<GroupBloc, GroupState>(
       'emits states with success message "Group avatar updated"',
       build: () {
-        final avatar = Uint8List.fromList([1, 2, 3]);
         when(() => mockRepository.setGroupAvatar(_roomId1, any()))
             .thenAnswer((_) async {});
         when(() => mockRepository.getGroup(_roomId1))
@@ -814,6 +822,142 @@ void main() {
         isA<GroupState>()
             .having((s) => s.status, 'status', GroupStatus.success)
             .having((s) => s.successMessage, 'successMessage', BlocMessageKeys.groupAvatarUpdated),
+      ],
+    );
+  });
+
+  // =========================================================================
+  // UpdateGroupVisibility
+  // =========================================================================
+
+  group('UpdateGroupVisibility', () {
+    blocTest<GroupBloc, GroupState>(
+      'emits states with updated public visibility and success message',
+      build: () {
+        when(() => mockRepository.setGroupVisibility(_roomId1, true))
+            .thenAnswer((_) async {});
+        when(() => mockRepository.getGroup(_roomId1)).thenAnswer(
+          (_) async => _testGroup1.copyWith(isPublic: true),
+        );
+        when(() => mockRepository.getGroupMembers(_roomId1))
+            .thenAnswer((_) async => _testMembers);
+        return GroupBloc(mockRepository);
+      },
+      act: (bloc) => bloc.add(const UpdateGroupVisibility(_roomId1, true)),
+      expect: () => [
+        isA<GroupState>().having(
+          (s) => s.currentGroup?.isPublic,
+          'currentGroup.isPublic',
+          true,
+        ),
+        isA<GroupState>()
+            .having((s) => s.status, 'status', GroupStatus.success)
+            .having(
+              (s) => s.successMessage,
+              'successMessage',
+              BlocMessageKeys.groupVisibilityUpdated,
+            ),
+      ],
+    );
+  });
+
+  // =========================================================================
+  // Channel management
+  // =========================================================================
+
+  group('CreateChannel', () {
+    blocTest<GroupBloc, GroupState>(
+      'emits updated channels and localized success key',
+      build: () {
+        when(() => mockRepository.createChannel(
+              _roomId1,
+              name: 'Announcements',
+              topic: 'Read-only updates',
+            )).thenAnswer((_) async => _testChannel.roomId);
+        when(() => mockRepository.getChannels(_roomId1))
+            .thenAnswer((_) async => [_testChannel]);
+        return GroupBloc(mockRepository);
+      },
+      act: (bloc) => bloc.add(const CreateChannel(
+            parentRoomId: _roomId1,
+            name: 'Announcements',
+            topic: 'Read-only updates',
+          )),
+      expect: () => [
+        isA<GroupState>()
+            .having((s) => s.channels, 'channels', [_testChannel])
+            .having((s) => s.status, 'status', GroupStatus.success)
+            .having(
+              (s) => s.successMessage,
+              'successMessage',
+              BlocMessageKeys.groupChannelCreated,
+            ),
+      ],
+    );
+  });
+
+  group('UpdateChannel', () {
+    blocTest<GroupBloc, GroupState>(
+      'emits updated channels and localized success key',
+      build: () {
+        when(() => mockRepository.updateChannel(
+              _roomId1,
+              _testChannel.roomId,
+              name: 'Release Notes',
+              topic: 'Official updates',
+            )).thenAnswer((_) async {});
+        when(() => mockRepository.getChannels(_roomId1)).thenAnswer(
+          (_) async => [
+            _testChannel.copyWith(
+              name: 'Release Notes',
+              topic: 'Official updates',
+            ),
+          ],
+        );
+        return GroupBloc(mockRepository);
+      },
+      act: (bloc) => bloc.add(const UpdateChannel(
+            parentRoomId: _roomId1,
+            channelRoomId: _channelRoomId,
+            name: 'Release Notes',
+            topic: 'Official updates',
+          )),
+      expect: () => [
+        isA<GroupState>()
+            .having((s) => s.channels.first.name, 'channels.first.name', 'Release Notes')
+            .having((s) => s.status, 'status', GroupStatus.success)
+            .having(
+              (s) => s.successMessage,
+              'successMessage',
+              BlocMessageKeys.groupChannelUpdated,
+            ),
+      ],
+    );
+  });
+
+  group('DeleteChannel', () {
+    blocTest<GroupBloc, GroupState>(
+      'emits remaining channels and localized success key',
+      build: () {
+        when(() => mockRepository.deleteChannel(_roomId1, _testChannel.roomId))
+            .thenAnswer((_) async {});
+        when(() => mockRepository.getChannels(_roomId1))
+            .thenAnswer((_) async => const []);
+        return GroupBloc(mockRepository);
+      },
+      act: (bloc) => bloc.add(const DeleteChannel(
+            parentRoomId: _roomId1,
+            channelRoomId: _channelRoomId,
+          )),
+      expect: () => [
+        isA<GroupState>()
+            .having((s) => s.channels, 'channels', isEmpty)
+            .having((s) => s.status, 'status', GroupStatus.success)
+            .having(
+              (s) => s.successMessage,
+              'successMessage',
+              BlocMessageKeys.groupChannelDeleted,
+            ),
       ],
     );
   });
@@ -987,7 +1131,7 @@ void main() {
             ),
           ],
         );
-        final verificationResult = const TokenGateVerificationResult(
+        const verificationResult = TokenGateVerificationResult(
           passed: false,
           errorMessage: 'Insufficient balance',
         );

@@ -67,6 +67,18 @@ class _ProfilePageState extends State<ProfilePage> {
           _userId = client.userID;
           _displayName = client.userID?.split(':').first.replaceFirst('@', '') ?? 'User';
         });
+
+        try {
+          final contactRepository = getIt<IContactRepository>();
+          final status = await contactRepository.getMyStatus();
+          if (mounted) {
+            setState(() {
+              _statusText = status;
+            });
+          }
+        } catch (e) {
+          debugLog('Failed to get my status: $e');
+        }
         
         // 异步获取头像
         try {
@@ -293,12 +305,17 @@ class _ProfilePageState extends State<ProfilePage> {
                                       child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
                                     ),
                                     TextButton(
-                                      onPressed: () {
+                                      onPressed: () async {
+                                        final messenger = ScaffoldMessenger.of(context);
+                                        final clearedText =
+                                            S.of(context)?.profileStatusCleared ??
+                                            'Status cleared';
                                         Navigator.pop(ctx);
-                                        setState(() => _statusText = null);
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        await _clearStatus();
+                                        if (!mounted) return;
+                                        messenger.showSnackBar(
                                           SnackBar(
-                                            content: Text(S.of(context)?.profileStatusCleared ?? 'Status cleared'),
+                                            content: Text(clearedText),
                                             duration: const Duration(seconds: 1),
                                           ),
                                         );
@@ -491,6 +508,19 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _clearStatus() async {
+    setState(() {
+      _statusText = null;
+    });
+
+    try {
+      final contactRepository = getIt<IContactRepository>();
+      await contactRepository.setMyStatus(null);
+    } catch (e) {
+      debugLog('Failed to clear status: $e');
+    }
+  }
+
   /// 显示头像操作菜单：更换头像 / 绑定 NFT 头像
   void _showAvatarOptions(BuildContext context) {
     final l10n = S.of(context);
@@ -595,8 +625,9 @@ class _ProfilePageState extends State<ProfilePage> {
       final clientManager = getIt<MatrixClientManager>();
       final client = clientManager.client;
       if (client != null && client.isLogged()) {
-        await client.setAvatar(null);
-        debugLog('ProfilePage: Avatar updated to NFT image via $imageUrl');
+        debugLog(
+          'ProfilePage: Skip Matrix avatar sync for external NFT image $imageUrl',
+        );
       }
     } catch (e) {
       debugLog('ProfilePage: Failed to update matrix avatar: $e');
@@ -672,32 +703,9 @@ class _ProfilePageState extends State<ProfilePage> {
           },
           onLogout: () {
             Navigator.of(context).pop();
-            _logout(context);
+            context.read<AuthBloc>().add(const AuthLogoutRequested());
           },
         ),
-      ),
-    );
-  }
-
-  void _logout(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.commonLogout ?? 'Log Out'),
-        content: Text(S.of(context)?.commonLogoutConfirm ?? 'Are you sure you want to log out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.read<AuthBloc>().add(const AuthLogoutRequested());
-            },
-            child: Text(S.of(context)?.commonLogout ?? 'Log Out', style: const TextStyle(color: AppColors.error)),
-          ),
-        ],
       ),
     );
   }

@@ -477,7 +477,6 @@
     }
   },
   "authEnterValidServerAddress": "Lütfen geçerli bir sunucu adresi girin",
-  "authEmailOtp": "E-posta OTP",
   "authEnterServerAddressFirst": "Lütfen önce sunucu adresi girin",
   "authPasskeyRequiresServer": "Passkey girişi sunucu desteği gerektirir",
   "authLoginAgreement": "Giriş yaparak kabul etmiş olursunuz ",

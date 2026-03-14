@@ -1,17 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart' as matrix;
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
 import 'core/extensions/context_extension.dart';
 import 'core/notifications/firebase_push_service.dart';
+import 'data/datasources/local/secure_storage_datasource.dart';
 import 'data/datasources/matrix/matrix_client_manager.dart';
 import 'data/datasources/matrix/matrix_moment_datasource.dart';
+import 'services/auth/auth_methods_service.dart';
 import 'services/voip/call_manager.dart';
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
@@ -35,6 +39,7 @@ import 'presentation/pages/auth/register_page.dart';
 import 'presentation/pages/auth/welcome_page.dart';
 import 'presentation/pages/main/chat_main_page.dart';
 import 'presentation/pages/profile/profile_page.dart';
+import 'presentation/pages/profile/user_profile_page.dart';
 import 'presentation/pages/settings/change_email_page.dart' as chat_settings;
 import 'core/utils/debug_log.dart';
 
@@ -71,6 +76,10 @@ class N42Chat {
   static Locale _locale = const Locale('en');
   static final List<void Function(ThemeMode)> _themeListeners = [];
   static final List<void Function(Locale)> _localeListeners = [];
+  static String? _pendingNotificationRoomId;
+  static String? _pendingNotificationEventId;
+  static String? _lastHandledNotificationKey;
+  static DateTime? _lastHandledNotificationAt;
 
   /// 全局 AuthBloc 实例（单例）
   static AuthBloc? _authBloc;
@@ -131,17 +140,18 @@ class N42Chat {
     _navigatorKey = key;
     // 同步更新 CallManager 的导航键
     _callManager?.setNavigatorKey(key);
+    _flushPendingNotificationTap();
   }
 
   /// 获取当前主题模式
   static ThemeMode get themeMode => _themeMode;
 
   /// 设置主题模式
-  /// 
+  ///
   /// 用于与主应用同步主题设置
-  /// 
+  ///
   /// [mode] Flutter 的 ThemeMode (system/light/dark)
-  /// 
+  ///
   /// ```dart
   /// // 在主应用中同步主题
   /// ref.listen(themeModeProvider, (previous, next) {
@@ -188,7 +198,9 @@ class N42Chat {
     if (_locale != locale) {
       _locale = locale;
       // 更新日期工具类的本地化
-      N42DateUtils.setLocale(DateLocaleStrings.fromLocaleCode(locale.languageCode));
+      N42DateUtils.setLocale(
+        DateLocaleStrings.fromLocaleCode(locale.languageCode),
+      );
       // 通知所有监听器
       for (final listener in _localeListeners) {
         listener(locale);
@@ -208,7 +220,7 @@ class N42Chat {
   }
 
   /// 判断当前是否为深色模式
-  /// 
+  ///
   /// 需要传入 BuildContext 来判断系统主题
   static bool isDarkMode(BuildContext context) {
     switch (_themeMode) {
@@ -246,52 +258,60 @@ class N42Chat {
     _initCompleter = Completer<void>();
 
     try {
-    _config = config;
+      _config = config;
+      await _initializeAuthMethods(config);
 
-    // 重建用户变化流（dispose 后 controller 已关闭，需要新实例）
-    if (_userStreamController.isClosed) {
-      _userStreamController = StreamController<UserEntity?>.broadcast();
-    }
-
-    // 如果之前初始化中途失败，GetIt 可能已有部分注册，需要先重置
-    if (getIt.isRegistered<N42ChatConfig>()) {
-      debugLog('N42Chat: Resetting previous partial initialization');
-      await resetDependencies();
-    }
-
-    // 初始化依赖注入
-    await configureDependencies(config);
-
-    // 创建全局 AuthBloc 并尝试恢复会话（防御性关闭旧实例）
-    await _authBloc?.close();
-    _authBloc = getIt<AuthBloc>();
-    _authBloc!.add(const AuthRestoreSessionRequested());
-
-    // 初始化推送通知服务（如果启用）
-    // 不阻塞主初始化流程：FCM token 获取在无 GMS 设备上可能耗时 60-90 秒
-    if (config.enablePushNotifications) {
-      unawaited(_initializePushService(config).catchError((Object e) {
-        debugLog('N42Chat: Push service initialization failed in background: $e');
-      }));
-    }
-
-    // 如果 Matrix 客户端已登录，立即初始化通话管理器
-    try {
-      final clientManager = getIt<MatrixClientManager>();
-      if (clientManager.client?.isLogged() == true) {
-        debugLog('N42Chat: Matrix client is logged in, initializing call manager');
-        await initializeCallManager();
+      // 重建用户变化流（dispose 后 controller 已关闭，需要新实例）
+      if (_userStreamController.isClosed) {
+        _userStreamController = StreamController<UserEntity?>.broadcast();
       }
-    } catch (e) {
-      debugLog('N42Chat: Failed to check login status for call manager: $e');
-    }
 
-    // 设置 Moment 房间邀请自动加入监听
-    _setupMomentInviteListener();
+      // 如果之前初始化中途失败，GetIt 可能已有部分注册，需要先重置
+      if (getIt.isRegistered<N42ChatConfig>()) {
+        debugLog('N42Chat: Resetting previous partial initialization');
+        await resetDependencies();
+      }
 
-    _initialized = true;
-    debugLog('N42Chat: Initialized successfully');
-    _initCompleter!.complete();
+      // 初始化依赖注入
+      await configureDependencies(config);
+
+      // 创建全局 AuthBloc 并尝试恢复会话（防御性关闭旧实例）
+      await _authBloc?.close();
+      _authBloc = getIt<AuthBloc>();
+      _authBloc!.add(const AuthRestoreSessionRequested());
+
+      // 初始化推送通知服务（如果启用）
+      // 不阻塞主初始化流程：FCM token 获取在无 GMS 设备上可能耗时 60-90 秒
+      if (config.enablePushNotifications) {
+        unawaited(
+          _initializePushService(config).catchError((Object e) {
+            debugLog(
+              'N42Chat: Push service initialization failed in background: $e',
+            );
+          }),
+        );
+      }
+
+      // 如果 Matrix 客户端已登录，立即初始化通话管理器
+      try {
+        final clientManager = getIt<MatrixClientManager>();
+        if (clientManager.client?.isLogged() == true) {
+          debugLog(
+            'N42Chat: Matrix client is logged in, initializing call manager',
+          );
+          await initializeCallManager();
+        }
+      } catch (e) {
+        debugLog('N42Chat: Failed to check login status for call manager: $e');
+      }
+
+      // 设置 Moment 房间邀请自动加入监听
+      _setupMomentInviteListener();
+
+      _initialized = true;
+      _flushPendingNotificationTap();
+      debugLog('N42Chat: Initialized successfully');
+      _initCompleter!.complete();
     } catch (e) {
       debugLog('N42Chat: Initialization failed, cleaning up: $e');
       // 清理已分配资源，使外部调用方可以重新初始化
@@ -310,6 +330,24 @@ class N42Chat {
       rethrow;
     } finally {
       _initCompleter = null;
+    }
+  }
+
+  static Future<void> _initializeAuthMethods(N42ChatConfig config) async {
+    final rpId = Uri.tryParse(config.defaultHomeserver)?.host;
+    try {
+      await AuthMethodsService().initialize(
+        googleClientId: config.googleClientId,
+        googleServerClientId: config.googleServerClientId,
+        passkeyRpId: (rpId != null && rpId.isNotEmpty) ? rpId : null,
+        twitterApiKey: config.twitterApiKey,
+        twitterApiSecret: config.twitterApiSecret,
+        twitterRedirectUri: config.twitterRedirectUri,
+        weChatAppId: config.weChatAppId,
+        weChatUniversalLink: config.weChatUniversalLink,
+      );
+    } catch (e) {
+      debugLog('N42Chat: Auth methods initialization failed: $e');
     }
   }
 
@@ -334,7 +372,8 @@ class N42Chat {
       _momentSyncSubscription = client.onSync.stream.listen((_) async {
         final now = DateTime.now();
         if (_lastMomentInviteCheck != null &&
-            now.difference(_lastMomentInviteCheck!) < const Duration(seconds: 10)) {
+            now.difference(_lastMomentInviteCheck!) <
+                const Duration(seconds: 10)) {
           return;
         }
         _lastMomentInviteCheck = now;
@@ -358,7 +397,9 @@ class N42Chat {
   static Future<void> _initializePushService(N42ChatConfig config) async {
     // 防止并发初始化：如果正在初始化中，等待完成
     if (_pushInitCompleter != null && !_pushInitCompleter!.isCompleted) {
-      debugLog('N42Chat: Push service initialization already in progress, waiting...');
+      debugLog(
+        'N42Chat: Push service initialization already in progress, waiting...',
+      );
       await _pushInitCompleter!.future;
       // 如果等待后已初始化成功，直接返回
       if (_pushService != null) return;
@@ -376,11 +417,15 @@ class N42Chat {
       final client = clientManager.client;
 
       if (client == null) {
-        debugLog('[PUSH_INIT] Matrix client not initialized, push service will be initialized on login');
+        debugLog(
+          '[PUSH_INIT] Matrix client not initialized, push service will be initialized on login',
+        );
         return;
       }
 
-      debugLog('[PUSH_INIT] Creating push service with gateway: ${config.pushGatewayUrl}, appId: ${config.pushAppId}');
+      debugLog(
+        '[PUSH_INIT] Creating push service with gateway: ${config.pushGatewayUrl}, appId: ${config.pushAppId}',
+      );
 
       // 创建推送服务
       _pushService = FirebasePushService(
@@ -388,25 +433,27 @@ class N42Chat {
         pushGatewayUrl: config.pushGatewayUrl,
         appId: config.pushAppId,
         onNotificationTap: (roomId, eventId) {
-          debugLog('[PUSH_TAP] Notification tapped - roomId: $roomId, eventId: $eventId');
-          _onNotificationTap?.call(roomId, eventId);
-          // 如果有 roomId，导航到对应聊天
-          if (roomId != null) {
-            openConversation(roomId);
-          }
+          debugLog(
+            '[PUSH_TAP] Notification tapped - roomId: $roomId, eventId: $eventId',
+          );
+          handleNotificationTap(roomId: roomId, eventId: eventId);
         },
       );
 
       // 初始化（包括获取 FCM Token）
       await _pushService!.initialize();
-      debugLog('[PUSH_INIT] Push service initialized, isLogged=${client.isLogged()}');
+      debugLog(
+        '[PUSH_INIT] Push service initialized, isLogged=${client.isLogged()}',
+      );
 
       // 如果已登录，立即注册推送
       if (client.isLogged()) {
         await _pushService!.registerForPush();
       }
 
-      debugLog('[PUSH_INIT_OK] Push service ready (verified=${_pushService?.isPusherVerified})');
+      debugLog(
+        '[PUSH_INIT_OK] Push service ready (verified=${_pushService?.isPusherVerified})',
+      );
     } catch (e) {
       debugLog('[PUSH_INIT_FAIL] Failed to initialize push service: $e');
       // 初始化失败，清除 pushService 以允许后续重试
@@ -432,6 +479,61 @@ class N42Chat {
     void Function(String? roomId, String? eventId) handler,
   ) {
     _onNotificationTap = handler;
+    _flushPendingNotificationTap();
+  }
+
+  /// 供宿主应用在更早的推送生命周期中转发聊天通知点击。
+  ///
+  /// 当 Chat 尚未完成初始化或 navigator 尚不可用时，先缓存此次点击，
+  /// 待初始化完成后再自动打开对应会话。
+  static void handleNotificationTap({String? roomId, String? eventId}) {
+    _onNotificationTap?.call(roomId, eventId);
+    _routeNotificationTap(roomId: roomId, eventId: eventId);
+  }
+
+  static void _routeNotificationTap({String? roomId, String? eventId}) {
+    if (roomId == null) return;
+
+    final ctx = _navigatorKey?.currentContext;
+    if (!_initialized || ctx == null) {
+      _pendingNotificationRoomId = roomId;
+      _pendingNotificationEventId = eventId;
+      debugLog(
+        'N42Chat: Queued notification tap until initialization is ready '
+        '(roomId=$roomId, eventId=$eventId)',
+      );
+      return;
+    }
+
+    final key = '$roomId|${eventId ?? ''}';
+    final now = DateTime.now();
+    if (_lastHandledNotificationKey == key &&
+        _lastHandledNotificationAt != null &&
+        now.difference(_lastHandledNotificationAt!) <
+            const Duration(seconds: 2)) {
+      debugLog('N42Chat: Skipping duplicate notification tap for $key');
+      return;
+    }
+    _lastHandledNotificationKey = key;
+    _lastHandledNotificationAt = now;
+
+    unawaited(
+      openConversation(roomId).catchError((Object e) {
+        debugLog('N42Chat: Failed to open notification room $roomId: $e');
+      }),
+    );
+  }
+
+  static void _flushPendingNotificationTap() {
+    final roomId = _pendingNotificationRoomId;
+    if (roomId == null) return;
+    final ctx = _navigatorKey?.currentContext;
+    if (!_initialized || ctx == null) return;
+
+    final eventId = _pendingNotificationEventId;
+    _pendingNotificationRoomId = null;
+    _pendingNotificationEventId = null;
+    _routeNotificationTap(roomId: roomId, eventId: eventId);
   }
 
   /// 获取推送服务
@@ -446,23 +548,33 @@ class N42Chat {
 
     // 等待正在进行的初始化完成
     if (_pushInitCompleter != null && !_pushInitCompleter!.isCompleted) {
-      debugLog('[PUSH_CHAIN] Waiting for push service initialization to complete...');
+      debugLog(
+        '[PUSH_CHAIN] Waiting for push service initialization to complete...',
+      );
       await _pushInitCompleter!.future;
     }
 
     // 如果推送服务未初始化，尝试初始化（可能之前因 client 为 null 跳过）
-    if (_pushService == null && _config != null && _config!.enablePushNotifications) {
-      debugLog('[PUSH_CHAIN] Push service is null, attempting initialization...');
+    if (_pushService == null &&
+        _config != null &&
+        _config!.enablePushNotifications) {
+      debugLog(
+        '[PUSH_CHAIN] Push service is null, attempting initialization...',
+      );
       await _initializePushService(_config!);
     }
 
     if (_pushService != null) {
       debugLog('[PUSH_CHAIN] Calling registerForPush...');
       await _pushService!.registerForPush();
-      debugLog('[PUSH_CHAIN] registerForPush completed (verified=${_pushService!.isPusherVerified})');
+      debugLog(
+        '[PUSH_CHAIN] registerForPush completed (verified=${_pushService!.isPusherVerified})',
+      );
     } else {
-      debugLog('[PUSH_CHAIN_FAIL] Cannot register push - push service is null '
-          '(config: ${_config != null}, enablePush: ${_config?.enablePushNotifications})');
+      debugLog(
+        '[PUSH_CHAIN_FAIL] Cannot register push - push service is null '
+        '(config: ${_config != null}, enablePush: ${_config?.enablePushNotifications})',
+      );
     }
   }
 
@@ -484,7 +596,9 @@ class N42Chat {
       final client = clientManager.client;
 
       if (client == null) {
-        debugLog('N42Chat: Matrix client not initialized, call manager will be initialized later');
+        debugLog(
+          'N42Chat: Matrix client not initialized, call manager will be initialized later',
+        );
         return;
       }
 
@@ -530,7 +644,9 @@ class N42Chat {
       if (homeserver == null) return;
 
       // 获取 well-known 配置
-      final wellKnownUrl = Uri.parse('${homeserver.origin}/.well-known/matrix/client');
+      final wellKnownUrl = Uri.parse(
+        '${homeserver.origin}/.well-known/matrix/client',
+      );
       debugLog('N42Chat: Fetching well-known from $wellKnownUrl');
 
       final response = await client.httpClient.get(wellKnownUrl);
@@ -544,7 +660,8 @@ class N42Chat {
 
       // 检查 rtc_foci (Matrix VoIP focus 配置)
       // 格式参考: https://spec.matrix.org/latest/client-server-api/#mhomesserver
-      final rtcFoci = wellKnown['org.matrix.msc4143.rtc_foci'] as List<dynamic>?;
+      final rtcFoci =
+          wellKnown['org.matrix.msc4143.rtc_foci'] as List<dynamic>?;
       if (rtcFoci != null && rtcFoci.isNotEmpty) {
         for (final focus in rtcFoci) {
           if (focus is Map<String, dynamic>) {
@@ -553,7 +670,9 @@ class N42Chat {
               // livekit_service_url 是 JWT 服务 URL，用于获取访问令牌
               final jwtServiceUrl = focus['livekit_service_url'] as String?;
               final liveKitAlias = focus['livekit_alias'] as String?;
-              debugLog('N42Chat: Found LiveKit JWT service: $jwtServiceUrl, alias=$liveKitAlias');
+              debugLog(
+                'N42Chat: Found LiveKit JWT service: $jwtServiceUrl, alias=$liveKitAlias',
+              );
 
               if (jwtServiceUrl != null) {
                 // 保存 JWT URL
@@ -609,9 +728,7 @@ class N42Chat {
   static void _scheduleTurnRefresh(matrix.Client c, int ttl) {
     _turnRefreshTimer?.cancel();
     if (ttl <= 0) return;
-    final refreshAfter = Duration(
-      seconds: (ttl - 60).clamp(60, ttl),
-    );
+    final refreshAfter = Duration(seconds: (ttl - 60).clamp(60, ttl));
     _turnRefreshTimer = Timer(refreshAfter, () async {
       debugLog('N42Chat: Refreshing TURN credentials (TTL expiring)');
       try {
@@ -671,7 +788,9 @@ class N42Chat {
     if (_pushService != null) {
       await _pushService!.forceReRegister();
     } else {
-      debugLog('[PUSH_FORCE] Push service is null, attempting full initialization...');
+      debugLog(
+        '[PUSH_FORCE] Push service is null, attempting full initialization...',
+      );
       if (_config != null && _config!.enablePushNotifications) {
         await _initializePushService(_config!);
       }
@@ -683,6 +802,13 @@ class N42Chat {
     _ensureInitialized();
     return _authBloc!;
   }
+
+  /// 当前认证状态
+  static AuthStatus get authStatus => authBloc.state.status;
+
+  /// 认证状态变化流
+  static Stream<AuthStatus> get authStatusStream =>
+      authBloc.stream.map((state) => state.status).distinct();
 
   /// 打开 Chat 账户修改邮箱页面（完整 UI 流程）
   ///
@@ -709,8 +835,7 @@ class N42Chat {
   ///
   /// 成功时 Future 完成，失败时抛出异常（含错误描述）。
   /// 超时时间 30 秒。
-  static Future<void> requestChatEmailChange(
-      String password, String newEmail) {
+  static Future<void> requestChatEmailChange(String password, String newEmail) {
     _ensureInitialized();
     final completer = Completer<void>();
     late StreamSubscription<AuthState> sub;
@@ -725,11 +850,13 @@ class N42Chat {
       } else if (state.changeEmailStatus == ChangeEmailStatus.failed) {
         sub.cancel();
         completer.completeError(
-            state.errorMessage ?? 'Failed to send verification code');
+          state.errorMessage ?? 'Failed to send verification code',
+        );
       }
     });
-    _authBloc!.add(AuthRequestChangeEmailRequested(
-        password: password, newEmail: newEmail));
+    _authBloc!.add(
+      AuthRequestChangeEmailRequested(password: password, newEmail: newEmail),
+    );
     return completer.future.timeout(
       const Duration(seconds: 30),
       onTimeout: () {
@@ -761,11 +888,13 @@ class N42Chat {
       } else if (state.changeEmailStatus == ChangeEmailStatus.failed) {
         sub.cancel();
         completer.completeError(
-            state.errorMessage ?? 'Failed to update chat email');
+          state.errorMessage ?? 'Failed to update chat email',
+        );
       }
     });
-    _authBloc!
-        .add(AuthConfirmChangeEmailRequested(newEmail: newEmail, code: code));
+    _authBloc!.add(
+      AuthConfirmChangeEmailRequested(newEmail: newEmail, code: code),
+    );
     return completer.future.timeout(
       const Duration(seconds: 30),
       onTimeout: () {
@@ -778,7 +907,7 @@ class N42Chat {
   /// 获取聊天主Widget
   ///
   /// 返回会话列表页面，可直接嵌入TabView或Navigator
-  /// 
+  ///
   /// 根据登录状态自动显示：
   /// - 已登录：显示会话列表页面
   /// - 未登录：显示欢迎页面，可登录/注册
@@ -847,18 +976,22 @@ class N42Chat {
   /// [password] 密码
   ///
   /// 抛出 [N42ChatException] 当登录失败时
-  ///
-  /// **注意**：此 API 为预留接口，当前版本请通过 [AuthBloc] 完成认证流程。
-  /// 直接调用会抛出 [UnimplementedError]。
   static Future<void> login({
     required String homeserver,
     required String username,
     required String password,
   }) async {
     _ensureInitialized();
-    throw UnimplementedError(
-      'N42Chat.login() is not implemented. '
-      'Use AuthBloc to authenticate instead.',
+    await _runAuthEvent(
+      event: AuthLoginRequested(
+        homeserver: homeserver,
+        username: username,
+        password: password,
+        rememberMe: true,
+      ),
+      isSuccess: (state) => state.status == AuthStatus.authenticated,
+      defaultErrorMessage: 'Failed to login',
+      timeoutMessage: 'N42Chat.login() timed out',
     );
   }
 
@@ -870,9 +1003,6 @@ class N42Chat {
   /// [accessToken] 访问令牌
   /// [userId] 用户ID (格式: @user:server.com)
   /// [deviceId] 设备ID
-  ///
-  /// **注意**：此 API 为预留接口，当前版本请通过 [AuthBloc] 完成认证流程。
-  /// 直接调用会抛出 [UnimplementedError]。
   static Future<void> loginWithToken({
     required String homeserver,
     required String accessToken,
@@ -880,23 +1010,147 @@ class N42Chat {
     required String deviceId,
   }) async {
     _ensureInitialized();
-    throw UnimplementedError(
-      'N42Chat.loginWithToken() is not implemented. '
-      'Use AuthBloc to authenticate instead.',
+    await _runAuthEvent(
+      event: AuthTokenLoginRequested(
+        homeserver: homeserver,
+        accessToken: accessToken,
+        userId: userId,
+        deviceId: deviceId,
+      ),
+      isSuccess: (state) => state.status == AuthStatus.authenticated,
+      defaultErrorMessage: 'Failed to login with token',
+      timeoutMessage: 'N42Chat.loginWithToken() timed out',
+    );
+  }
+
+  /// 使用 Matrix SSO/OIDC 回调返回的 login token 登录
+  static Future<void> loginWithLoginToken({
+    required String homeserver,
+    required String loginToken,
+  }) async {
+    _ensureInitialized();
+    await _runAuthEvent(
+      event: AuthLoginTokenLoginRequested(
+        homeserver: homeserver,
+        loginToken: loginToken,
+      ),
+      isSuccess: (state) => state.status == AuthStatus.authenticated,
+      defaultErrorMessage: 'Failed to login with login token',
+      timeoutMessage: 'N42Chat.loginWithLoginToken() timed out',
     );
   }
 
   /// 登出当前用户
   ///
   /// 清除本地会话数据和缓存
-  ///
-  /// **注意**：此 API 为预留接口，当前版本请通过 [AuthBloc] 完成认证流程。
-  /// 直接调用会抛出 [UnimplementedError]。
   static Future<void> logout() async {
     _ensureInitialized();
-    throw UnimplementedError(
-      'N42Chat.logout() is not implemented. '
-      'Use AuthBloc to authenticate instead.',
+    final bloc = _authBloc;
+    if (bloc == null) {
+      throw StateError('N42Chat AuthBloc is not available.');
+    }
+    if (bloc.state.status == AuthStatus.unauthenticated && !isLoggedIn) {
+      return;
+    }
+
+    final completer = Completer<void>();
+    late final StreamSubscription<AuthState> sub;
+    sub = bloc.stream.listen((state) {
+      if (completer.isCompleted) {
+        sub.cancel();
+        return;
+      }
+      if (state.status == AuthStatus.unauthenticated ||
+          state.status == AuthStatus.initial) {
+        sub.cancel();
+        completer.complete();
+      } else if (state.status == AuthStatus.error) {
+        sub.cancel();
+        completer.completeError(
+          N42ChatException(state.errorMessage ?? 'Failed to logout'),
+        );
+      }
+    });
+
+    bloc.add(const AuthLogoutRequested());
+    await completer.future.timeout(
+      const Duration(seconds: 15),
+      onTimeout: () {
+        sub.cancel();
+        throw TimeoutException('N42Chat.logout() timed out');
+      },
+    );
+  }
+
+  /// 清理本地持久化的 chat 数据。
+  ///
+  /// 用于账号注销后的强制清理，可在未初始化时调用。
+  static Future<void> purgeLocalData() async {
+    try {
+      final secureStorage = getIt.isRegistered<SecureStorageDataSource>()
+          ? getIt<SecureStorageDataSource>()
+          : SecureStorageDataSource();
+      await secureStorage.clearAll();
+    } catch (e) {
+      debugLog('N42Chat: Failed to clear secure storage: $e');
+    }
+
+    try {
+      final docsDir = await getApplicationDocumentsDirectory();
+      final supportDir = await getApplicationSupportDirectory();
+
+      await _deleteDirectoryIfExists(Directory('${docsDir.path}/n42_chat_db'));
+      await _deleteDirectoryIfExists(
+        Directory('${supportDir.path}/n42_chat_db'),
+      );
+      await _deleteDirectoryIfExists(
+        Directory('${docsDir.path}/n42_chat_storage'),
+      );
+      await _deleteDirectoryIfExists(
+        Directory('${docsDir.path}/n42_chat_archives'),
+      );
+      await _deleteDirectoryIfExists(Directory('${docsDir.path}/matrix_cache'));
+    } catch (e) {
+      debugLog('N42Chat: Failed to clear local chat directories: $e');
+    }
+  }
+
+  static Future<void> _runAuthEvent({
+    required AuthEvent event,
+    required bool Function(AuthState state) isSuccess,
+    required String defaultErrorMessage,
+    required String timeoutMessage,
+  }) async {
+    final bloc = _authBloc;
+    if (bloc == null) {
+      throw StateError('N42Chat AuthBloc is not available.');
+    }
+
+    final completer = Completer<void>();
+    late final StreamSubscription<AuthState> sub;
+    sub = bloc.stream.listen((state) {
+      if (completer.isCompleted) {
+        sub.cancel();
+        return;
+      }
+      if (isSuccess(state)) {
+        sub.cancel();
+        completer.complete();
+      } else if (state.status == AuthStatus.error) {
+        sub.cancel();
+        completer.completeError(
+          N42ChatException(state.errorMessage ?? defaultErrorMessage),
+        );
+      }
+    });
+
+    bloc.add(event);
+    await completer.future.timeout(
+      const Duration(seconds: 30),
+      onTimeout: () {
+        sub.cancel();
+        throw TimeoutException(timeoutMessage);
+      },
     );
   }
 
@@ -946,7 +1200,10 @@ class N42Chat {
   ///
   /// [roomId] Matrix房间ID
   /// [context] 可选的BuildContext，用于导航
-  static Future<void> openConversation(String roomId, {BuildContext? context}) async {
+  static Future<void> openConversation(
+    String roomId, {
+    BuildContext? context,
+  }) async {
     _ensureInitialized();
     debugLog('N42Chat: Open conversation - $roomId');
 
@@ -984,10 +1241,8 @@ class N42Chat {
       if (isLocked && ctx.mounted) {
         final verified = await Navigator.of(ctx).push<bool>(
           MaterialPageRoute<bool>(
-            builder: (_) => ChatLockPage(
-              roomId: roomId,
-              chatName: conversation!.name,
-            ),
+            builder: (_) =>
+                ChatLockPage(roomId: roomId, chatName: conversation!.name),
           ),
         );
         if (verified != true) return;
@@ -995,22 +1250,26 @@ class N42Chat {
 
       if (!ctx.mounted) return;
 
-      unawaited(Navigator.of(ctx).push(
-        MaterialPageRoute<void>(
-          builder: (_) => MultiBlocProvider(
-            providers: [
-              BlocProvider(create: (_) => getIt<ChatBloc>()),
-              BlocProvider(create: (_) => getIt<ContactBloc>()),
-            ],
-            child: ChatPage(
-              conversation: conversation!,
-              onBack: () => Navigator.of(ctx).pop(),
-            ),
-          ),
-        ),
-      ).catchError((Object e) {
-        debugLog('N42Chat: Navigation error for room $roomId: $e');
-      }));
+      unawaited(
+        Navigator.of(ctx)
+            .push(
+              MaterialPageRoute<void>(
+                builder: (_) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(create: (_) => getIt<ChatBloc>()),
+                    BlocProvider(create: (_) => getIt<ContactBloc>()),
+                  ],
+                  child: ChatPage(
+                    conversation: conversation!,
+                    onBack: () => Navigator.of(ctx).pop(),
+                  ),
+                ),
+              ),
+            )
+            .catchError((Object e) {
+              debugLog('N42Chat: Navigation error for room $roomId: $e');
+            }),
+      );
     } catch (e) {
       debugLog('N42Chat: Failed to open conversation $roomId: $e');
     }
@@ -1027,6 +1286,44 @@ class N42Chat {
     return conversation.id;
   }
 
+  /// 打开用户资料页
+  ///
+  /// [userId] Matrix 用户 ID
+  /// [context] 可选的 BuildContext，用于导航
+  static Future<void> openUserProfile(
+    String userId, {
+    BuildContext? context,
+  }) async {
+    _ensureInitialized();
+    debugLog('N42Chat: Open user profile - $userId');
+
+    final ctx = context ?? _navigatorKey?.currentContext;
+    if (ctx == null) {
+      debugLog('N42Chat: No context available for user profile navigation');
+      return;
+    }
+
+    if (!ctx.mounted) return;
+
+    await Navigator.of(ctx).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider(
+          create: (_) => getIt<ContactBloc>(),
+          child: UserProfilePage(
+            userId: userId,
+            onChatStarted: (roomId, profileContext) async {
+              if (Navigator.of(profileContext).canPop()) {
+                Navigator.of(profileContext).pop();
+              }
+              if (!ctx.mounted) return;
+              await openConversation(roomId, context: ctx);
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   /// 创建群聊
   ///
   /// [name] 群名称
@@ -1038,10 +1335,7 @@ class N42Chat {
   }) async {
     _ensureInitialized();
     final repo = getIt<IGroupRepository>();
-    return await repo.createGroup(
-      name: name,
-      inviteUserIds: inviteUserIds,
-    );
+    return await repo.createGroup(name: name, inviteUserIds: inviteUserIds);
   }
 
   /// 释放资源
@@ -1067,14 +1361,12 @@ class N42Chat {
     await _pushService?.dispose();
     _pushService = null;
 
-    // 4. 停止 Matrix 同步 + 关闭数据库
+    // 4. 释放 Matrix 生命周期资源
     try {
+      await _momentSyncSubscription?.cancel();
+      _momentSyncSubscription = null;
       final clientManager = getIt<MatrixClientManager>();
-      clientManager.stopSync();
-      final matrixClient = clientManager.client;
-      if (matrixClient != null) {
-        await matrixClient.database.close();
-      }
+      await clientManager.dispose();
     } catch (_) {}
 
     // 5. 关闭用户变化流
@@ -1097,10 +1389,17 @@ class N42Chat {
       );
     }
   }
+
+  static Future<void> _deleteDirectoryIfExists(Directory directory) async {
+    if (!await directory.exists()) {
+      return;
+    }
+    await directory.delete(recursive: true);
+  }
 }
 
 /// N42 Chat 入口Widget
-/// 
+///
 /// 根据登录状态自动切换页面：
 /// - 检查中：显示加载页
 /// - 已登录：显示会话列表
@@ -1192,8 +1491,13 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
             return WelcomePage(
               onLogin: () => _navigateToLogin(context),
               onRegister: () => _navigateToRegister(context),
-              onTermsOfService: () => _launchUrl(N42Chat._config?.termsOfServiceUrl ?? 'https://n42.world/terms'),
-              onPrivacyPolicy: () => _launchUrl(N42Chat._config?.privacyPolicyUrl ?? 'https://n42.world/privacy'),
+              onTermsOfService: () => _launchUrl(
+                N42Chat._config?.termsOfServiceUrl ?? 'https://n42.world/terms',
+              ),
+              onPrivacyPolicy: () => _launchUrl(
+                N42Chat._config?.privacyPolicyUrl ??
+                    'https://n42.world/privacy',
+              ),
             );
           },
         ),
@@ -1209,9 +1513,11 @@ class _LoadingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    
+
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEDEDED),
+      backgroundColor: isDark
+          ? const Color(0xFF1E1E1E)
+          : const Color(0xFFEDEDED),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1267,7 +1573,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
 
   Future<void> _retry() async {
     if (_isRetrying) return;
-    
+
     setState(() {
       _isRetrying = true;
     });
@@ -1301,7 +1607,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
     final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEDEDED);
     final textColor = isDark ? Colors.white : const Color(0xFF181818);
     final subtitleColor = isDark ? Colors.white70 : const Color(0xFF888888);
-    
+
     return Scaffold(
       backgroundColor: bgColor,
       body: Center(
@@ -1335,19 +1641,13 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
               const SizedBox(height: 12),
               Text(
                 'Chat initialization failed',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: subtitleColor,
-                ),
+                style: TextStyle(fontSize: 16, color: subtitleColor),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
                 'Please check your network and try again',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: subtitleColor,
-                ),
+                style: TextStyle(fontSize: 14, color: subtitleColor),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
@@ -1370,7 +1670,9 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : const Text(
@@ -1463,9 +1765,11 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
             onLogin: () => _navigateToLogin(context),
             onRegister: () => _navigateToRegister(context),
             onTermsOfService: () => _launchUrl(
-                N42Chat._config?.termsOfServiceUrl ?? 'https://n42.world/terms'),
+              N42Chat._config?.termsOfServiceUrl ?? 'https://n42.world/terms',
+            ),
             onPrivacyPolicy: () => _launchUrl(
-                N42Chat._config?.privacyPolicyUrl ?? 'https://n42.world/privacy'),
+              N42Chat._config?.privacyPolicyUrl ?? 'https://n42.world/privacy',
+            ),
           );
         },
       ),
@@ -1479,13 +1783,8 @@ class N42ChatException implements Exception {
   final String? code;
   final dynamic originalError;
 
-  const N42ChatException(
-    this.message, {
-    this.code,
-    this.originalError,
-  });
+  const N42ChatException(this.message, {this.code, this.originalError});
 
   @override
   String toString() => 'N42ChatException: $message (code: $code)';
 }
-

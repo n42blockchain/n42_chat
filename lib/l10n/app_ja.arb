@@ -477,7 +477,6 @@
     }
   },
   "authEnterValidServerAddress": "有効なサーバーアドレスを入力してください",
-  "authEmailOtp": "メールOTP",
   "authEnterServerAddressFirst": "先にサーバーアドレスを入力してください",
   "authPasskeyRequiresServer": "パスキーログインにはサーバーのサポートが必要です",
   "authLoginAgreement": "ログインすることで、以下に同意したものとみなします ",

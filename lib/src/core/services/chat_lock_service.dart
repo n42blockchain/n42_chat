@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,6 +13,7 @@ import 'biometric_service.dart';
 class ChatLockService {
   static const String _lockedChatsKey = 'chat_lock_locked_chats';
   static const String _chatPinPrefix = 'chat_lock_pin_';
+  static const String _chatPinSaltPrefix = 'chat_lock_pin_salt_';
 
   final BiometricService _biometricService;
 
@@ -74,7 +76,17 @@ class ChatLockService {
     final prefs = await SharedPreferences.getInstance();
     final storedHash = prefs.getString('$_chatPinPrefix$roomId');
     if (storedHash == null) return false;
-    return _hashPin(pin) == storedHash;
+
+    final salt = prefs.getString('$_chatPinSaltPrefix$roomId');
+    if (salt != null && salt.isNotEmpty) {
+      return _hashPin(pin, salt) == storedHash;
+    }
+
+    final verified = _hashLegacyPin(pin) == storedHash;
+    if (verified) {
+      await _savePinHash(roomId, pin);
+    }
+    return verified;
   }
 
   /// 检查聊天是否设置了 PIN 码
@@ -86,18 +98,32 @@ class ChatLockService {
   /// 保存 PIN 码哈希
   Future<void> _savePinHash(String roomId, String pin) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('$_chatPinPrefix$roomId', _hashPin(pin));
+    final salt = _generateSalt();
+    await prefs.setString('$_chatPinSaltPrefix$roomId', salt);
+    await prefs.setString('$_chatPinPrefix$roomId', _hashPin(pin, salt));
   }
 
   /// 移除 PIN 码
   Future<void> _removePinHash(String roomId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('$_chatPinPrefix$roomId');
+    await prefs.remove('$_chatPinSaltPrefix$roomId');
   }
 
   /// 对 PIN 码进行哈希
-  String _hashPin(String pin) {
+  String _hashPin(String pin, String salt) {
+    final bytes = utf8.encode('$salt:$pin');
+    return sha256.convert(bytes).toString();
+  }
+
+  String _hashLegacyPin(String pin) {
     final bytes = utf8.encode(pin);
     return sha256.convert(bytes).toString();
+  }
+
+  String _generateSalt() {
+    final random = Random.secure();
+    final bytes = List<int>.generate(16, (_) => random.nextInt(256));
+    return base64UrlEncode(bytes);
   }
 }

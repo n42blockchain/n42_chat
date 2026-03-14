@@ -20,6 +20,8 @@ class MockUser extends Mock implements matrix.User {}
 
 class MockRoom extends Mock implements matrix.Room {}
 
+class MockProfile extends Mock implements matrix.Profile {}
+
 void main() {
   late ContactRepositoryImpl repository;
   late MockMatrixContactDataSource mockContactDS;
@@ -58,12 +60,18 @@ void main() {
       when(() => user1.avatarUrl).thenReturn(null);
       when(() => mockContactDS.getUserDisplayName(user1)).thenReturn('Bob');
       when(() => mockContactDS.getUserAvatarUrl(user1)).thenReturn(null);
+      when(() => mockContactDS.isUserIgnored('@bob:matrix.org')).thenReturn(
+        false,
+      );
 
       when(() => user2.id).thenReturn('@alice:matrix.org');
       when(() => user2.displayName).thenReturn('Alice');
       when(() => user2.avatarUrl).thenReturn(null);
       when(() => mockContactDS.getUserDisplayName(user2)).thenReturn('Alice');
       when(() => mockContactDS.getUserAvatarUrl(user2)).thenReturn(null);
+      when(() => mockContactDS.isUserIgnored('@alice:matrix.org')).thenReturn(
+        true,
+      );
 
       when(() => mockContactDS.getDirectChatContacts())
           .thenReturn([user1, user2]);
@@ -80,6 +88,8 @@ void main() {
       // Sorted alphabetically: Alice before Bob
       expect(contacts[0].displayName, 'Alice');
       expect(contacts[1].displayName, 'Bob');
+      expect(contacts[0].isBlocked, isTrue);
+      expect(contacts[1].isBlocked, isFalse);
     });
   });
 
@@ -112,6 +122,36 @@ void main() {
       final result = await repository.startDirectChat(userId);
 
       expect(result, roomId);
+    });
+  });
+
+  group('getContactById', () {
+    test('loads remark cache before mapping remote profile', () async {
+      final profile = MockProfile();
+      const userId = '@alice:matrix.org';
+
+      when(() => mockStorageDS.getContactRemarks()).thenAnswer(
+        (_) async => {userId: 'Alice Remark'},
+      );
+      when(() => mockContactDS.getUserProfile(userId))
+          .thenAnswer((_) async => profile);
+      when(() => profile.displayName).thenReturn('Alice');
+      when(() => mockContactDS.getProfileAvatarUrl(profile)).thenReturn(
+        'https://cdn.example/avatar.png',
+      );
+      when(() => mockContactDS.getDirectChatRoomId(userId)).thenReturn(
+        '!dm-alice:matrix.org',
+      );
+      when(() => mockContactDS.isUserIgnored(userId)).thenReturn(true);
+
+      final contact = await repository.getContactById(userId);
+
+      expect(contact, isNotNull);
+      expect(contact!.remark, 'Alice Remark');
+      expect(contact.avatarUrl, 'https://cdn.example/avatar.png');
+      expect(contact.directRoomId, '!dm-alice:matrix.org');
+      expect(contact.isFriend, isTrue);
+      expect(contact.isBlocked, isTrue);
     });
   });
 

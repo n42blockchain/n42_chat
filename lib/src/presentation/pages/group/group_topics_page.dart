@@ -10,6 +10,7 @@ import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'group_channels_page.dart';
+import '../../../n42_chat.dart';
 
 /// 群话题列表页面（用户视角，Telegram Topics 风格）
 ///
@@ -30,7 +31,9 @@ class _GroupTopicsPageState extends State<GroupTopicsPage> {
   @override
   void initState() {
     super.initState();
-    _groupBloc = getIt<GroupBloc>()..add(LoadChannels(widget.roomId));
+    _groupBloc = getIt<GroupBloc>()
+      ..add(LoadGroupDetails(widget.roomId))
+      ..add(LoadChannels(widget.roomId));
   }
 
   @override
@@ -65,15 +68,17 @@ class _GroupTopicsBody extends StatelessWidget {
 
         // 分区：置顶（order == 0 或名称含 announcement）+ 普通
         final pinned = channels
-            .where((c) => c.order == 0 || c.name.toLowerCase().contains('announce'))
+            .where(
+              (c) => c.order == 0 || c.name.toLowerCase().contains('announce'),
+            )
             .toList();
-        final regular = channels
-            .where((c) => !pinned.contains(c))
-            .toList()
+        final regular = channels.where((c) => !pinned.contains(c)).toList()
           ..sort((a, b) => a.order.compareTo(b.order));
 
         return Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          backgroundColor: isDark
+              ? AppColors.backgroundDark
+              : AppColors.background,
           appBar: N42AppBar(
             title: l10n?.groupTopics ?? 'Topics',
             actions: [
@@ -101,48 +106,76 @@ class _GroupTopicsBody extends StatelessWidget {
               : null,
           body: state.isLoading
               ? const N42Loading()
-              : Builder(builder: (context) {
-                  // 始终插入 General 条目作为父房间入口
-                  final effectivePinned = pinned;
-                  final effectiveRegular = [
-                    ChannelEntity.general(roomId),
-                    ...regular,
-                  ];
+              : Builder(
+                  builder: (context) {
+                    // 始终插入 General 条目作为父房间入口
+                    final effectivePinned = pinned;
+                    final effectiveRegular = [
+                      ChannelEntity.general(roomId),
+                      ...regular,
+                    ];
 
-                  return ListView(
+                    return ListView(
                       children: [
                         // 置顶话题
                         if (effectivePinned.isNotEmpty) ...[
-                          _buildSectionHeader(context, isDark, Icons.push_pin_outlined,
-                              l10n?.groupChannels ?? 'Pinned'),
-                          ...effectivePinned.map((c) => _buildTopicTile(context, c, isDark, isPinned: true)),
+                          _buildSectionHeader(
+                            context,
+                            isDark,
+                            Icons.push_pin_outlined,
+                            l10n?.groupChannels ?? 'Pinned',
+                          ),
+                          ...effectivePinned.map(
+                            (c) => _buildTopicTile(
+                              context,
+                              c,
+                              isDark,
+                              isPinned: true,
+                            ),
+                          ),
                         ],
 
                         // 普通话题
                         if (effectiveRegular.isNotEmpty) ...[
                           if (effectivePinned.isNotEmpty)
-                            _buildSectionHeader(context, isDark, Icons.tag, l10n?.groupTopics ?? 'Topics'),
-                          ...effectiveRegular.map((c) => _buildTopicTile(context, c, isDark)),
+                            _buildSectionHeader(
+                              context,
+                              isDark,
+                              Icons.tag,
+                              l10n?.groupTopics ?? 'Topics',
+                            ),
+                          ...effectiveRegular.map(
+                            (c) => _buildTopicTile(context, c, isDark),
+                          ),
                         ],
 
                         const SizedBox(height: 80), // FAB 间距
                       ],
                     );
-                }),
+                  },
+                ),
         );
       },
     );
   }
 
   Widget _buildSectionHeader(
-      BuildContext context, bool isDark, IconData icon, String label) {
+    BuildContext context,
+    bool isDark,
+    IconData icon,
+    String label,
+  ) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
       child: Row(
         children: [
-          Icon(icon,
-              size: 14,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+          Icon(
+            icon,
+            size: 14,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
+          ),
           const SizedBox(width: 6),
           Text(
             label.toUpperCase(),
@@ -150,7 +183,9 @@ class _GroupTopicsBody extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
           ),
         ],
@@ -158,8 +193,12 @@ class _GroupTopicsBody extends StatelessWidget {
     );
   }
 
-  Widget _buildTopicTile(BuildContext context, ChannelEntity channel, bool isDark,
-      {bool isPinned = false}) {
+  Widget _buildTopicTile(
+    BuildContext context,
+    ChannelEntity channel,
+    bool isDark, {
+    bool isPinned = false,
+  }) {
     final lastMsg = channel.lastMessage;
     final unread = channel.unreadCount;
 
@@ -168,7 +207,10 @@ class _GroupTopicsBody extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
+            ),
             leading: Container(
               width: 44,
               height: 44,
@@ -205,22 +247,24 @@ class _GroupTopicsBody extends StatelessWidget {
                     ),
                   )
                 : (channel.topic != null
-                    ? Text(
-                        channel.topic!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
-                        ),
-                      )
-                    : null),
+                      ? Text(
+                          channel.topic!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondary,
+                          ),
+                        )
+                      : null),
             trailing: unread > 0
                 ? Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(12),
@@ -232,8 +276,7 @@ class _GroupTopicsBody extends StatelessWidget {
                   )
                 : null,
             onTap: () {
-              Navigator.of(context)
-                  .pushNamed('/chat/${Uri.encodeComponent(channel.roomId)}');
+              N42Chat.openConversation(channel.roomId, context: context);
             },
           ),
           Divider(
@@ -258,12 +301,14 @@ class _GroupTopicsBody extends StatelessWidget {
         final isDark = Theme.of(sheetCtx).brightness == Brightness.dark;
         return Padding(
           padding: EdgeInsets.only(
-              bottom: MediaQuery.of(sheetCtx).viewInsets.bottom),
+            bottom: MediaQuery.of(sheetCtx).viewInsets.bottom,
+          ),
           child: Container(
             decoration: BoxDecoration(
               color: isDark ? AppColors.surfaceDark : AppColors.surface,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
             ),
             child: SafeArea(
               child: Padding(
@@ -322,26 +367,30 @@ class _GroupTopicsBody extends StatelessWidget {
                           backgroundColor: AppColors.primary,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                         onPressed: () {
                           final name = nameController.text.trim();
                           if (name.isEmpty) return;
                           Navigator.pop(sheetCtx);
-                          context.read<GroupBloc>().add(CreateChannel(
-                                parentRoomId: roomId,
-                                name: name,
-                                topic: topicController.text.trim().isEmpty
-                                    ? null
-                                    : topicController.text.trim(),
-                              ));
+                          context.read<GroupBloc>().add(
+                            CreateChannel(
+                              parentRoomId: roomId,
+                              name: name,
+                              topic: topicController.text.trim().isEmpty
+                                  ? null
+                                  : topicController.text.trim(),
+                            ),
+                          );
                         },
                         child: Text(
                           l10n?.commonConfirm ?? 'Create',
                           style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600),
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),

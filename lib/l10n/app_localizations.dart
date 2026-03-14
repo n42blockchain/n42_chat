@@ -2557,12 +2557,6 @@ abstract class S {
   /// **'请输入有效的服务器地址'**
   String get authEnterValidServerAddress;
 
-  /// No description provided for @authEmailOtp.
-  ///
-  /// In zh, this message translates to:
-  /// **'邮箱验证码'**
-  String get authEmailOtp;
-
   /// No description provided for @authEnterServerAddressFirst.
   ///
   /// In zh, this message translates to:
@@ -6193,6 +6187,30 @@ abstract class S {
   /// **'群头像已更新'**
   String get groupAvatarUpdated;
 
+  /// No description provided for @groupVisibilityUpdated.
+  ///
+  /// In zh, this message translates to:
+  /// **'群可见性已更新'**
+  String get groupVisibilityUpdated;
+
+  /// No description provided for @groupChannelCreated.
+  ///
+  /// In zh, this message translates to:
+  /// **'频道已创建'**
+  String get groupChannelCreated;
+
+  /// No description provided for @groupChannelUpdated.
+  ///
+  /// In zh, this message translates to:
+  /// **'频道已更新'**
+  String get groupChannelUpdated;
+
+  /// No description provided for @groupChannelDeleted.
+  ///
+  /// In zh, this message translates to:
+  /// **'频道已删除'**
+  String get groupChannelDeleted;
+
   /// No description provided for @callDecline.
   ///
   /// In zh, this message translates to:
@@ -8758,7 +8776,7 @@ abstract class S {
   /// No description provided for @authPasskeyRegisterHint.
   ///
   /// In zh, this message translates to:
-  /// **'注册 Passkey 以实现无密码登录'**
+  /// **'为当前账号注册 Passkey，独立 Passkey 登录入口后续开放。'**
   String get authPasskeyRegisterHint;
 
   /// No description provided for @authPasskeyNameYours.
@@ -8770,19 +8788,19 @@ abstract class S {
   /// No description provided for @authPasskeyRegistered.
   ///
   /// In zh, this message translates to:
-  /// **'Passkey 注册成功'**
+  /// **'Passkey 已保存到当前账号'**
   String get authPasskeyRegistered;
 
   /// No description provided for @authPasskeyDeleted.
   ///
   /// In zh, this message translates to:
-  /// **'Passkey 已删除'**
+  /// **'Passkey 已从当前账号移除'**
   String get authPasskeyDeleted;
 
   /// No description provided for @authPasskeyDeleteConfirm.
   ///
   /// In zh, this message translates to:
-  /// **'删除 Passkey \"{name}\"？删除后将无法使用该 Passkey 登录。'**
+  /// **'删除 Passkey \"{name}\"？如需后续使用 Passkey 登录，需要重新注册。'**
   String authPasskeyDeleteConfirm(String name);
 
   /// No description provided for @momentVisibilityPublic.
@@ -10644,24 +10662,6 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'会话数据不完整，请重新登录'**
   String get blocAuthSessionIncomplete;
-
-  /// No description provided for @blocAuthPasskeyNotImplemented.
-  ///
-  /// In zh, this message translates to:
-  /// **'Passkey 登录功能尚未实现'**
-  String get blocAuthPasskeyNotImplemented;
-
-  /// No description provided for @blocAuthPasskeyRegisterNotImplemented.
-  ///
-  /// In zh, this message translates to:
-  /// **'Passkey 注册功能尚未实现'**
-  String get blocAuthPasskeyRegisterNotImplemented;
-
-  /// No description provided for @blocAuthEmailOtpNotImplemented.
-  ///
-  /// In zh, this message translates to:
-  /// **'邮箱 OTP 登录功能尚未实现'**
-  String get blocAuthEmailOtpNotImplemented;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

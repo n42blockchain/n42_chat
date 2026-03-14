@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:n42_chat/src/core/constants/app_constants.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/services/media_lifecycle_service.dart';
 import 'package:n42_chat/src/core/services/storage_cleanup_service.dart';
@@ -149,6 +150,7 @@ void main() {
           minFileSizeBytes: any(named: 'minFileSizeBytes'),
           roomId: any(named: 'roomId'),
           fileCategory: any(named: 'fileCategory'),
+          preserveThumbnails: any(named: 'preserveThumbnails'),
         ),
       ).thenAnswer((_) async => []);
       when(() => mockStorage.getStorageUsage())
@@ -167,17 +169,18 @@ void main() {
           minFileSizeBytes: any(named: 'minFileSizeBytes'),
           roomId: any(named: 'roomId'),
           fileCategory: any(named: 'fileCategory'),
+          preserveThumbnails: any(named: 'preserveThumbnails'),
         ),
       ).thenAnswer((_) async => []);
       when(() => mockStorage.getStorageUsage())
           .thenAnswer((_) async => const StorageInfo(cacheSize: 0));
       when(() => mockLifecycle.getAllRoomStats())
           .thenAnswer((_) async => [
-                RoomMediaStatsResult(
+                const RoomMediaStatsResult(
                   roomId: '!big-room:s',
                   totalSize: 5 * 1024 * 1024, // 5 MB — above 1MB threshold
                   totalCount: 20,
-                  categories: const {},
+                  categories: {},
                 ),
               ]);
 
@@ -194,17 +197,18 @@ void main() {
           minFileSizeBytes: any(named: 'minFileSizeBytes'),
           roomId: any(named: 'roomId'),
           fileCategory: any(named: 'fileCategory'),
+          preserveThumbnails: any(named: 'preserveThumbnails'),
         ),
       ).thenAnswer((_) async => []);
       when(() => mockStorage.getStorageUsage())
           .thenAnswer((_) async => const StorageInfo());
       when(() => mockLifecycle.getAllRoomStats())
           .thenAnswer((_) async => [
-                RoomMediaStatsResult(
+                const RoomMediaStatsResult(
                   roomId: '!small-room:s',
                   totalSize: 500 * 1024, // 500 KB — below 1MB threshold
                   totalCount: 5,
-                  categories: const {},
+                  categories: {},
                 ),
               ]);
 
@@ -219,6 +223,7 @@ void main() {
           minFileSizeBytes: any(named: 'minFileSizeBytes'),
           roomId: any(named: 'roomId'),
           fileCategory: any(named: 'fileCategory'),
+          preserveThumbnails: any(named: 'preserveThumbnails'),
         ),
       ).thenAnswer((_) async => []);
       when(() => mockStorage.getStorageUsage())
@@ -237,6 +242,7 @@ void main() {
           minFileSizeBytes: any(named: 'minFileSizeBytes'),
           roomId: any(named: 'roomId'),
           fileCategory: any(named: 'fileCategory'),
+          preserveThumbnails: any(named: 'preserveThumbnails'),
         ),
       ).thenThrow(Exception('DB error'));
 
@@ -304,6 +310,34 @@ void main() {
       final result = await buildService().executeRecommendation(rec);
       expect(result.filesDeleted, 0);
       expect(result.bytesFreed, 0);
+    });
+
+    test('forwards preserveThumbnails=false when generating recommendations', () async {
+      when(
+        () => mockLifecycle.getCleanableFiles(
+          olderThanDays: any(named: 'olderThanDays'),
+          minFileSizeBytes: any(named: 'minFileSizeBytes'),
+          roomId: any(named: 'roomId'),
+          fileCategory: any(named: 'fileCategory'),
+          preserveThumbnails: any(named: 'preserveThumbnails'),
+        ),
+      ).thenAnswer((_) async => []);
+      when(() => mockStorage.getStorageUsage())
+          .thenAnswer((_) async => const StorageInfo());
+      when(() => mockLifecycle.getAllRoomStats())
+          .thenAnswer((_) async => []);
+
+      await buildService().getRecommendations(preserveThumbnails: false);
+
+      verify(
+        () => mockLifecycle.getCleanableFiles(
+          olderThanDays: StorageConstants.defaultCleanupDays,
+          minFileSizeBytes: null,
+          roomId: null,
+          fileCategory: null,
+          preserveThumbnails: false,
+        ),
+      ).called(1);
     });
   });
 }

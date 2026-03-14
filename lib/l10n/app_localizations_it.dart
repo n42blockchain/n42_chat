@@ -1357,9 +1357,6 @@ class SIt extends S {
       'Inserisci un indirizzo server valido';
 
   @override
-  String get authEmailOtp => 'OTP email';
-
-  @override
   String get authEnterServerAddressFirst =>
       'Inserisci prima l\'indirizzo del server';
 
@@ -3382,6 +3379,18 @@ class SIt extends S {
   String get groupAvatarUpdated => 'Avatar gruppo aggiornato';
 
   @override
+  String get groupVisibilityUpdated => '群可见性已更新';
+
+  @override
+  String get groupChannelCreated => '频道已创建';
+
+  @override
+  String get groupChannelUpdated => '频道已更新';
+
+  @override
+  String get groupChannelDeleted => '频道已删除';
+
+  @override
   String get callDecline => 'Rifiuta';
 
   @override
@@ -4719,20 +4728,20 @@ class SIt extends S {
   String get authPasskeyNoRegistered => '未注册 Passkey';
 
   @override
-  String get authPasskeyRegisterHint => '注册 Passkey 以实现无密码登录';
+  String get authPasskeyRegisterHint => '为当前账号注册 Passkey，独立 Passkey 登录入口后续开放。';
 
   @override
   String get authPasskeyNameYours => '为 Passkey 命名';
 
   @override
-  String get authPasskeyRegistered => 'Passkey 注册成功';
+  String get authPasskeyRegistered => 'Passkey 已保存到当前账号';
 
   @override
-  String get authPasskeyDeleted => 'Passkey 已删除';
+  String get authPasskeyDeleted => 'Passkey 已从当前账号移除';
 
   @override
   String authPasskeyDeleteConfirm(String name) {
-    return '删除 Passkey \"$name\"？删除后将无法使用该 Passkey 登录。';
+    return '删除 Passkey \"$name\"？如需后续使用 Passkey 登录，需要重新注册。';
   }
 
   @override
@@ -5731,13 +5740,4 @@ class SIt extends S {
 
   @override
   String get blocAuthSessionIncomplete => '会话数据不完整，请重新登录';
-
-  @override
-  String get blocAuthPasskeyNotImplemented => 'Passkey 登录功能尚未实现';
-
-  @override
-  String get blocAuthPasskeyRegisterNotImplemented => 'Passkey 注册功能尚未实现';
-
-  @override
-  String get blocAuthEmailOtpNotImplemented => '邮箱 OTP 登录功能尚未实现';
 }

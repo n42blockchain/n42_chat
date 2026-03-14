@@ -2,9 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../domain/entities/bot_config_entity.dart';
-import '../../../domain/entities/channel_entity.dart';
-import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../bloc_message_keys.dart';
@@ -28,6 +25,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     on<UpdateGroupName>(_onUpdateGroupName);
     on<UpdateGroupTopic>(_onUpdateGroupTopic);
     on<UpdateGroupAvatar>(_onUpdateGroupAvatar);
+    on<UpdateGroupVisibility>(_onUpdateGroupVisibility);
     on<InviteMembers>(_onInviteMembers);
     on<KickMember>(_onKickMember);
     on<SetAsAdmin>(_onSetAsAdmin);
@@ -239,6 +237,21 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         emit: emit,
       );
 
+  Future<void> _onUpdateGroupVisibility(
+    UpdateGroupVisibility event,
+    Emitter<GroupState> emit,
+  ) =>
+      _updateGroupProperty(
+        roomId: event.roomId,
+        operation: () => _groupRepository.setGroupVisibility(
+          event.roomId,
+          event.isPublic,
+        ),
+        successMessage: BlocMessageKeys.groupVisibilityUpdated,
+        errorPrefix: 'Failed to update group visibility',
+        emit: emit,
+      );
+
   Future<void> _onLoadChannels(LoadChannels event, Emitter<GroupState> emit) async {
     try {
       final channels = await _groupRepository.getChannels(event.roomId);
@@ -262,7 +275,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       emit(state.copyWith(
         channels: channels,
         status: GroupStatus.success,
-        successMessage: 'Channel created',
+        successMessage: BlocMessageKeys.groupChannelCreated,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -281,7 +294,11 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         topic: event.topic,
       );
       final channels = await _groupRepository.getChannels(event.parentRoomId);
-      emit(state.copyWith(channels: channels, status: GroupStatus.success, successMessage: 'Channel updated'));
+      emit(state.copyWith(
+        channels: channels,
+        status: GroupStatus.success,
+        successMessage: BlocMessageKeys.groupChannelUpdated,
+      ));
     } catch (e) {
       emit(state.copyWith(status: GroupStatus.error, errorMessage: e.toString()));
     }
@@ -291,7 +308,11 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     try {
       await _groupRepository.deleteChannel(event.parentRoomId, event.channelRoomId);
       final channels = await _groupRepository.getChannels(event.parentRoomId);
-      emit(state.copyWith(channels: channels, status: GroupStatus.success, successMessage: 'Channel deleted'));
+      emit(state.copyWith(
+        channels: channels,
+        status: GroupStatus.success,
+        successMessage: BlocMessageKeys.groupChannelDeleted,
+      ));
     } catch (e) {
       emit(state.copyWith(status: GroupStatus.error, errorMessage: e.toString()));
     }

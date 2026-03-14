@@ -11,6 +11,10 @@ class BlocMessageKeys {
   static const groupNameUpdated = 'group_name_updated';
   static const groupDescriptionUpdated = 'group_description_updated';
   static const groupAvatarUpdated = 'group_avatar_updated';
+  static const groupVisibilityUpdated = 'group_visibility_updated';
+  static const groupChannelCreated = 'group_channel_created';
+  static const groupChannelUpdated = 'group_channel_updated';
+  static const groupChannelDeleted = 'group_channel_deleted';
   static const groupMembersInvited = 'group_members_invited';
   static const groupMemberRemoved = 'group_member_removed';
   static const groupSetAsAdmin = 'group_set_as_admin';
@@ -63,8 +67,4 @@ class BlocMessageKeys {
   static const authSessionExpired = 'auth_session_expired';
   static const authSessionIncomplete = 'auth_session_incomplete';
 
-  // Auth — unimplemented
-  static const authPasskeyNotImplemented = 'auth_passkey_not_implemented';
-  static const authPasskeyRegisterNotImplemented = 'auth_passkey_register_not_implemented';
-  static const authEmailOtpNotImplemented = 'auth_email_otp_not_implemented';
 }

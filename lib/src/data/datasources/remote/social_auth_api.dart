@@ -40,11 +40,17 @@ class SocialAuthApi {
   Future<SocialLoginResponse> loginWithApple({
     required String idToken,
     required String authorizationCode,
+    String? rawNonce,
   }) async {
-    return _loginWithSocialToken(
+    return _loginWithCustomPayload(
       provider: 'apple',
-      idToken: idToken,
-      accessToken: authorizationCode,
+      body: {
+        'provider': 'apple',
+        'id_token': idToken,
+        'authorization_code': authorizationCode,
+        'source': 'app',
+        if (rawNonce != null && rawNonce.isNotEmpty) 'nonce': rawNonce,
+      },
     );
   }
 
@@ -94,18 +100,21 @@ class SocialAuthApi {
     required String idToken,
     String? accessToken,
   }) async {
+    final body = {
+      'provider': provider,
+      'id_token': idToken,
+      'source': 'app',
+      'access_token': ?accessToken,
+    };
+    return _loginWithCustomPayload(provider: provider, body: body);
+  }
+
+  Future<SocialLoginResponse> _loginWithCustomPayload({
+    required String provider,
+    required Map<String, dynamic> body,
+  }) async {
     try {
       final uri = Uri.parse('$baseUrl/v1/user/loginSocial');
-
-      final body = {
-        'provider': provider,
-        'id_token': idToken,
-        'source': 'app',
-      };
-
-      if (accessToken != null) {
-        body['access_token'] = accessToken;
-      }
 
       debugLog('SocialAuthApi: Logging in with $provider');
 

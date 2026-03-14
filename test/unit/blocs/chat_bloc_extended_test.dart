@@ -48,44 +48,53 @@ void main() {
 
   /// Stub everything that InitializeChat triggers
   void stubInitDefaults() {
-    when(() => mockRepo.getMessages(any(), limit: any(named: 'limit')))
-        .thenAnswer((_) async => [_msg]);
-    when(() => mockRepo.watchMessages(any()))
-        .thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockRepo.getMessages(any(), limit: any(named: 'limit')),
+    ).thenAnswer((_) async => [_msg]);
+    when(
+      () => mockRepo.watchMessages(any()),
+    ).thenAnswer((_) => const Stream.empty());
     when(() => mockRepo.watchPollResponses(any())).thenReturn(null);
     when(() => mockRepo.markAsRead(any(), any())).thenAnswer((_) async {});
-    when(() => mockRepo.getLocallyDeletedMessageIds(any()))
-        .thenAnswer((_) async => <String>{});
-    when(() => mockRepo.getPollAggregations(any(), any()))
-        .thenAnswer((_) async => null);
-    when(() => mockRepo.getReactionAggregations(any(), any()))
-        .thenAnswer((_) async => null);
-    when(() => mockRepo.loadMoreMessages(any(), limit: any(named: 'limit')))
-        .thenAnswer((_) async => <MessageEntity>[]);
-    when(() => mockPrefs.getMessageDestructionTimes(any()))
-        .thenAnswer((_) async => <String, DateTime>{});
-    when(() => mockPrefs.getScheduledMessages(any()))
-        .thenAnswer((_) async => <Map<String, dynamic>>[]);
-    when(() => mockPrefs.shouldShowReadReceipts())
-        .thenAnswer((_) async => true);
-    when(() => mockPrefs.shouldShowTypingIndicator())
-        .thenAnswer((_) async => true);
-    when(() => mockPrefs.getDueScheduledMessages())
-        .thenAnswer((_) async => <Map<String, dynamic>>[]);
+    when(
+      () => mockRepo.getLocallyDeletedMessageIds(any()),
+    ).thenAnswer((_) async => <String>{});
+    when(
+      () => mockRepo.getPollAggregations(any(), any()),
+    ).thenAnswer((_) async => null);
+    when(
+      () => mockRepo.getReactionAggregations(any(), any()),
+    ).thenAnswer((_) async => null);
+    when(
+      () => mockRepo.loadMoreMessages(any(), limit: any(named: 'limit')),
+    ).thenAnswer((_) async => <MessageEntity>[]);
+    when(
+      () => mockPrefs.getMessageDestructionTimes(any()),
+    ).thenAnswer((_) async => <String, DateTime>{});
+    when(
+      () => mockPrefs.getScheduledMessages(any()),
+    ).thenAnswer((_) async => <Map<String, dynamic>>[]);
+    when(
+      () => mockPrefs.shouldShowReadReceipts(),
+    ).thenAnswer((_) async => true);
+    when(
+      () => mockPrefs.shouldShowTypingIndicator(),
+    ).thenAnswer((_) async => true);
+    when(
+      () => mockPrefs.getDueScheduledMessages(),
+    ).thenAnswer((_) async => <Map<String, dynamic>>[]);
   }
 
   /// Builds a basic bloc (no group repo)
-  ChatBloc buildBloc() => ChatBloc(
-        messageRepository: mockRepo,
-        secureStorage: mockPrefs,
-      );
+  ChatBloc buildBloc() =>
+      ChatBloc(messageRepository: mockRepo, secureStorage: mockPrefs);
 
   /// Builds a bloc with a group repository
   ChatBloc buildBlocWithGroupRepo() => ChatBloc(
-        messageRepository: mockRepo,
-        secureStorage: mockPrefs,
-        groupRepository: mockGroupRepo,
-      );
+    messageRepository: mockRepo,
+    secureStorage: mockPrefs,
+    groupRepository: mockGroupRepo,
+  );
 
   /// Initialize the bloc with _roomId and wait for async ops to settle.
   /// Returns the bloc ready for the next event.
@@ -115,25 +124,19 @@ void main() {
         roomId: _roomId,
         translatingMessageIds: {'\$m1'},
       ),
-      act: (bloc) => bloc.add(const TranslationCompleted(
-        messageId: '\$m1',
-        translatedText: '你好',
-        detectedSourceLanguage: 'en',
-        success: true,
-      )),
+      act: (bloc) => bloc.add(
+        const TranslationCompleted(
+          messageId: '\$m1',
+          translatedText: '你好',
+          detectedSourceLanguage: 'en',
+          success: true,
+        ),
+      ),
       expect: () => [
         isA<ChatState>()
             .having((s) => s.translatingMessageIds, 'translating', isEmpty)
-            .having(
-              (s) => s.translatedMessages['\$m1'],
-              'translation',
-              '你好',
-            )
-            .having(
-              (s) => s.detectedSourceLanguages['\$m1'],
-              'lang',
-              'en',
-            ),
+            .having((s) => s.translatedMessages['\$m1'], 'translation', '你好')
+            .having((s) => s.detectedSourceLanguages['\$m1'], 'lang', 'en'),
       ],
     );
 
@@ -144,11 +147,13 @@ void main() {
         roomId: _roomId,
         translatingMessageIds: {'\$m1'},
       ),
-      act: (bloc) => bloc.add(const TranslationCompleted(
-        messageId: '\$m1',
-        success: false,
-        error: 'quota exceeded',
-      )),
+      act: (bloc) => bloc.add(
+        const TranslationCompleted(
+          messageId: '\$m1',
+          success: false,
+          error: 'quota exceeded',
+        ),
+      ),
       expect: () => [
         isA<ChatState>()
             .having((s) => s.translatingMessageIds, 'translating', isEmpty)
@@ -212,8 +217,7 @@ void main() {
       ),
       act: (bloc) => bloc.add(const NavigatePinnedMessage(1)),
       expect: () => [
-        isA<ChatState>()
-            .having((s) => s.currentPinnedIndex, 'index', 1),
+        isA<ChatState>().having((s) => s.currentPinnedIndex, 'index', 1),
       ],
     );
 
@@ -226,8 +230,7 @@ void main() {
       ),
       act: (bloc) => bloc.add(const NavigatePinnedMessage(1)),
       expect: () => [
-        isA<ChatState>()
-            .having((s) => s.currentPinnedIndex, 'index', 0),
+        isA<ChatState>().having((s) => s.currentPinnedIndex, 'index', 0),
       ],
     );
 
@@ -240,8 +243,7 @@ void main() {
       ),
       act: (bloc) => bloc.add(const NavigatePinnedMessage(-1)),
       expect: () => [
-        isA<ChatState>()
-            .having((s) => s.currentPinnedIndex, 'index', 2),
+        isA<ChatState>().having((s) => s.currentPinnedIndex, 'index', 2),
       ],
     );
   });
@@ -273,10 +275,12 @@ void main() {
 
   group('SendTypingNotification', () {
     test('sends notification when privacy setting allows it', () async {
-      when(() => mockPrefs.shouldShowTypingIndicator())
-          .thenAnswer((_) async => true);
-      when(() => mockRepo.sendTypingNotification(any(), any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockPrefs.shouldShowTypingIndicator(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRepo.sendTypingNotification(any(), any()),
+      ).thenAnswer((_) async {});
 
       final bloc = buildBloc();
       await initBloc(bloc);
@@ -289,8 +293,9 @@ void main() {
     });
 
     test('skips notification when privacy setting blocks it', () async {
-      when(() => mockPrefs.shouldShowTypingIndicator())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockPrefs.shouldShowTypingIndicator(),
+      ).thenAnswer((_) async => false);
 
       final bloc = buildBloc();
       await initBloc(bloc);
@@ -309,11 +314,12 @@ void main() {
 
   group('SendSystemNotice', () {
     test('sends notice to repository', () async {
-      when(() => mockRepo.sendNoticeMessage(
-                roomId: any(named: 'roomId'),
-                notice: any(named: 'notice'),
-              ))
-          .thenAnswer((_) async => null);
+      when(
+        () => mockRepo.sendNoticeMessage(
+          roomId: any(named: 'roomId'),
+          notice: any(named: 'notice'),
+        ),
+      ).thenAnswer((_) async => null);
 
       final bloc = buildBloc();
       await initBloc(bloc);
@@ -321,10 +327,53 @@ void main() {
       bloc.add(const SendSystemNotice('hello'));
       await Future<void>.delayed(const Duration(milliseconds: 50));
 
-      verify(() => mockRepo.sendNoticeMessage(
-            roomId: _roomId,
-            notice: 'hello',
-          )).called(1);
+      verify(
+        () => mockRepo.sendNoticeMessage(roomId: _roomId, notice: 'hello'),
+      ).called(1);
+      await bloc.close();
+    });
+  });
+
+  // ─────────────────────────────────────────────────
+  // SendContactCardMessage
+  // ─────────────────────────────────────────────────
+
+  group('SendContactCardMessage', () {
+    test('clears reply target after success', () async {
+      when(
+        () => mockRepo.sendCustomMessage(
+          any(),
+          msgType: any(named: 'msgType'),
+          content: any(named: 'content'),
+          additionalData: any(named: 'additionalData'),
+        ),
+      ).thenAnswer((_) async => '\$contact1');
+
+      final bloc = buildBloc();
+      await initBloc(bloc);
+
+      bloc.add(SetReplyTarget(_msg));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      bloc.add(
+        const SendContactCardMessage(
+          userId: '@bob:server.com',
+          displayName: 'Bob',
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      expect(bloc.state.replyTarget, isNull);
+      expect(bloc.state.lastMessageSentAt, isNotNull);
+      verify(
+        () => mockRepo.sendCustomMessage(
+          _roomId,
+          msgType: 'n42.contact_card',
+          content: '[Contact Card] Bob',
+          additionalData: {'user_id': '@bob:server.com', 'display_name': 'Bob'},
+        ),
+      ).called(1);
+
       await bloc.close();
     });
   });
@@ -335,21 +384,24 @@ void main() {
 
   group('SendPokeMessage', () {
     test('sends poke message to repository', () async {
-      when(() => mockRepo.sendNoticeMessage(
-                roomId: any(named: 'roomId'),
-                notice: any(named: 'notice'),
-              ))
-          .thenAnswer((_) async => null);
+      when(
+        () => mockRepo.sendNoticeMessage(
+          roomId: any(named: 'roomId'),
+          notice: any(named: 'notice'),
+        ),
+      ).thenAnswer((_) async => null);
 
       final bloc = buildBloc();
       await initBloc(bloc);
 
-      bloc.add(const SendPokeMessage(
-        pokerName: 'Alice',
-        targetUserId: '@bob:s',
-        targetName: 'Bob',
-        pokerPokeText: '的头',
-      ));
+      bloc.add(
+        const SendPokeMessage(
+          pokerName: 'Alice',
+          targetUserId: '@bob:s',
+          targetName: 'Bob',
+          pokerPokeText: '的头',
+        ),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 50));
 
       // The poke text should be included in the notice message
@@ -365,26 +417,31 @@ void main() {
     });
 
     test('sends poke without suffix when pokeText is null', () async {
-      when(() => mockRepo.sendNoticeMessage(
-                roomId: any(named: 'roomId'),
-                notice: any(named: 'notice'),
-              ))
-          .thenAnswer((_) async => null);
+      when(
+        () => mockRepo.sendNoticeMessage(
+          roomId: any(named: 'roomId'),
+          notice: any(named: 'notice'),
+        ),
+      ).thenAnswer((_) async => null);
 
       final bloc = buildBloc();
       await initBloc(bloc);
 
-      bloc.add(const SendPokeMessage(
-        pokerName: 'Alice',
-        targetUserId: '@bob:s',
-        targetName: 'Bob',
-      ));
+      bloc.add(
+        const SendPokeMessage(
+          pokerName: 'Alice',
+          targetUserId: '@bob:s',
+          targetName: 'Bob',
+        ),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 50));
 
-      verify(() => mockRepo.sendNoticeMessage(
-            roomId: any(named: 'roomId'),
-            notice: any(named: 'notice'),
-          )).called(1);
+      verify(
+        () => mockRepo.sendNoticeMessage(
+          roomId: any(named: 'roomId'),
+          notice: any(named: 'notice'),
+        ),
+      ).called(1);
       await bloc.close();
     });
   });
@@ -395,8 +452,9 @@ void main() {
 
   group('DeleteFailedMessage', () {
     test('removes message from state and calls repository', () async {
-      when(() => mockRepo.deleteFailedMessage(any(), any()))
-          .thenAnswer((_) async => true);
+      when(
+        () => mockRepo.deleteFailedMessage(any(), any()),
+      ).thenAnswer((_) async => true);
 
       final bloc = buildBloc();
       await initBloc(bloc);
@@ -425,16 +483,19 @@ void main() {
 
   group('ReplyToMessage', () {
     test('success — clears isSending and reply target', () async {
-      when(() => mockRepo.replyToMessage(any(), any(), any()))
-          .thenAnswer((_) async => _msg);
+      when(
+        () => mockRepo.replyToMessage(any(), any(), any()),
+      ).thenAnswer((_) async => _msg);
 
       final bloc = buildBloc();
       await initBloc(bloc);
 
-      bloc.add(const ReplyToMessage(
-        replyToMessageId: '\$original',
-        text: 'reply text',
-      ));
+      bloc.add(
+        const ReplyToMessage(
+          replyToMessageId: '\$original',
+          text: 'reply text',
+        ),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       expect(bloc.state.isSending, isFalse);
@@ -442,16 +503,19 @@ void main() {
     });
 
     test('failure — emits error', () async {
-      when(() => mockRepo.replyToMessage(any(), any(), any()))
-          .thenThrow(Exception('network error'));
+      when(
+        () => mockRepo.replyToMessage(any(), any(), any()),
+      ).thenThrow(Exception('network error'));
 
       final bloc = buildBloc();
       await initBloc(bloc);
 
-      bloc.add(const ReplyToMessage(
-        replyToMessageId: '\$original',
-        text: 'reply text',
-      ));
+      bloc.add(
+        const ReplyToMessage(
+          replyToMessageId: '\$original',
+          text: 'reply text',
+        ),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       expect(bloc.state.error, isNotNull);
@@ -465,8 +529,9 @@ void main() {
 
   group('LoadPinnedMessages', () {
     test('emits empty pinnedMessages when no pinned events', () async {
-      when(() => mockGroupRepo.getPinnedEventIds(any()))
-          .thenAnswer((_) async => <String>[]);
+      when(
+        () => mockGroupRepo.getPinnedEventIds(any()),
+      ).thenAnswer((_) async => <String>[]);
       when(() => mockGroupRepo.canPinMessages(any())).thenReturn(true);
 
       final bloc = buildBlocWithGroupRepo();
@@ -481,8 +546,9 @@ void main() {
     });
 
     test('emits pinnedMessages matched from current message list', () async {
-      when(() => mockGroupRepo.getPinnedEventIds(any()))
-          .thenAnswer((_) async => [_msg.id]);
+      when(
+        () => mockGroupRepo.getPinnedEventIds(any()),
+      ).thenAnswer((_) async => [_msg.id]);
       when(() => mockGroupRepo.canPinMessages(any())).thenReturn(false);
 
       final bloc = buildBlocWithGroupRepo();
@@ -505,10 +571,12 @@ void main() {
 
   group('PinMessage', () {
     test('success — calls groupRepository.pinMessage', () async {
-      when(() => mockGroupRepo.pinMessage(any(), any()))
-          .thenAnswer((_) async {});
-      when(() => mockGroupRepo.getPinnedEventIds(any()))
-          .thenAnswer((_) async => <String>[]);
+      when(
+        () => mockGroupRepo.pinMessage(any(), any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockGroupRepo.getPinnedEventIds(any()),
+      ).thenAnswer((_) async => <String>[]);
       when(() => mockGroupRepo.canPinMessages(any())).thenReturn(true);
 
       final bloc = buildBlocWithGroupRepo();
@@ -522,8 +590,9 @@ void main() {
     });
 
     test('failure — emits error', () async {
-      when(() => mockGroupRepo.pinMessage(any(), any()))
-          .thenThrow(Exception('pin failed'));
+      when(
+        () => mockGroupRepo.pinMessage(any(), any()),
+      ).thenThrow(Exception('pin failed'));
 
       final bloc = buildBlocWithGroupRepo();
       await initBloc(bloc);
@@ -542,10 +611,12 @@ void main() {
 
   group('UnpinMessage', () {
     test('success — calls groupRepository.unpinMessage', () async {
-      when(() => mockGroupRepo.unpinMessage(any(), any()))
-          .thenAnswer((_) async {});
-      when(() => mockGroupRepo.getPinnedEventIds(any()))
-          .thenAnswer((_) async => <String>[]);
+      when(
+        () => mockGroupRepo.unpinMessage(any(), any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockGroupRepo.getPinnedEventIds(any()),
+      ).thenAnswer((_) async => <String>[]);
       when(() => mockGroupRepo.canPinMessages(any())).thenReturn(true);
 
       final bloc = buildBlocWithGroupRepo();
@@ -559,8 +630,9 @@ void main() {
     });
 
     test('failure — emits error', () async {
-      when(() => mockGroupRepo.unpinMessage(any(), any()))
-          .thenThrow(Exception('unpin failed'));
+      when(
+        () => mockGroupRepo.unpinMessage(any(), any()),
+      ).thenThrow(Exception('unpin failed'));
 
       final bloc = buildBlocWithGroupRepo();
       await initBloc(bloc);

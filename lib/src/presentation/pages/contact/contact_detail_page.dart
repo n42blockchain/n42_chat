@@ -1101,6 +1101,8 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
   late TextEditingController _remarkController;
   late TextEditingController _phoneController;
   late TextEditingController _memoController;
+  bool _isSaving = false;
+  String? _pendingRemarkToSave;
   
   @override
   void initState() {
@@ -1172,27 +1174,32 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
   }
 
   void _save() async {
+    if (_isSaving) return;
+
     final remark = _remarkController.text.trim();
     final remarkToSave = remark.isEmpty ? null : remark;
     
     debugLog('EditRemarkPage: Saving remark for userId=${widget.userId}, remark=$remark');
-    
-    // 使用 RemarkService 保存备注名（全局本地存储）
-    await RemarkService.instance.setRemark(widget.userId, remarkToSave);
-    debugLog('EditRemarkPage: Remark saved to RemarkService');
-    
-    // 同时通知 ContactBloc 刷新（如果可用）
+
     if (!mounted) return;
     try {
+      setState(() {
+        _isSaving = true;
+        _pendingRemarkToSave = remarkToSave;
+      });
       context.read<ContactBloc>().add(SetContactRemark(widget.userId, remarkToSave));
       debugLog('EditRemarkPage: ContactBloc notified');
     } catch (e) {
       debugLog('EditRemarkPage: ContactBloc not available: $e');
-    }
-
-    // 先关闭页面，再显示 Toast（避免 ScaffoldMessenger 冲突）
-    if (mounted) {
-      Navigator.of(context).pop(remarkToSave);
+      await RemarkService.instance.setRemark(widget.userId, remarkToSave);
+      debugLog('EditRemarkPage: Remark saved to RemarkService fallback');
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _pendingRemarkToSave = null;
+        });
+        Navigator.of(context).pop(remarkToSave);
+      }
     }
   }
 
@@ -1205,7 +1212,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     final hintColor = isDark ? Colors.white38 : Colors.black38;
     final labelColor = isDark ? Colors.white54 : Colors.black54;
     
-    return Scaffold(
+    final scaffold = Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: bgColor,
@@ -1239,20 +1246,29 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: GestureDetector(
-              onTap: _save,
+              onTap: _isSaving ? null : _save,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text(
-                  S.of(context)?.contactDoneButton ?? 'Done',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.white,
-                  ),
-                ),
+                child: _isSaving
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        S.of(context)?.contactDoneButton ?? 'Done',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.white,
+                        ),
+                      ),
               ),
             ),
           ),
@@ -1479,6 +1495,42 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
         ),
       ),
     );
+
+    try {
+      context.read<ContactBloc>();
+      return BlocListener<ContactBloc, ContactState>(
+        listenWhen: (previous, current) =>
+            _isSaving &&
+            (previous.status != current.status ||
+                previous.updatedRemarkUserId != current.updatedRemarkUserId ||
+                previous.errorMessage != current.errorMessage),
+        listener: (context, state) {
+          if (state.status == ContactStatus.remarkUpdated &&
+              state.updatedRemarkUserId == widget.userId) {
+            final savedRemark = _pendingRemarkToSave;
+            setState(() {
+              _isSaving = false;
+              _pendingRemarkToSave = null;
+            });
+            Navigator.of(context).pop(savedRemark);
+          } else if (state.status == ContactStatus.error) {
+            final errorMessage = state.errorMessage ?? 'Failed to save remark';
+            setState(() {
+              _isSaving = false;
+              _pendingRemarkToSave = null;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(errorMessage),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        },
+        child: scaffold,
+      );
+    } catch (_) {
+      return scaffold;
+    }
   }
 }
-

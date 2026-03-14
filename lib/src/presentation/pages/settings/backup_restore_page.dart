@@ -99,7 +99,6 @@ class _BackupSection extends StatefulWidget {
 }
 
 class _BackupSectionState extends State<_BackupSection> {
-  bool _includeKeys = false;
   bool _usePassword = false;
   final _passwordController = TextEditingController();
 
@@ -142,24 +141,22 @@ class _BackupSectionState extends State<_BackupSection> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              'Backup your settings and encryption keys. '
+              'Backup your local chat settings. '
               'Messages will be restored from server after re-login.',
               style: TextStyle(fontSize: 13, color: secondaryColor),
             ),
           ),
           const SizedBox(height: 12),
-          CheckboxListTile(
+          ListTile(
+            leading: const Icon(Icons.key_outlined, color: Colors.orange),
             title: Text(
-              'Include encryption keys',
+              'Encryption keys are managed separately',
               style: TextStyle(fontSize: 15, color: textColor),
             ),
             subtitle: Text(
-              'Required for reading encrypted messages',
+              'Use Security > Recovery Key to back up encrypted message access.',
               style: TextStyle(fontSize: 12, color: secondaryColor),
             ),
-            value: _includeKeys,
-            activeColor: AppColors.primary,
-            onChanged: (v) => setState(() => _includeKeys = v ?? false),
           ),
           CheckboxListTile(
             title: Text(
@@ -195,7 +192,6 @@ class _BackupSectionState extends State<_BackupSection> {
                     ? null
                     : () {
                         context.read<BackupBloc>().add(CreateBackup(
-                              includeKeys: _includeKeys,
                               password: _usePassword
                                   ? _passwordController.text
                                   : null,
@@ -398,7 +394,8 @@ class _RestoreSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              'Import a .n42backup file from another device or previous backup.',
+              'Import a .n42backup file from another device or previous backup. '
+              'Encryption keys are restored separately with your Recovery Key.',
               style: TextStyle(fontSize: 13, color: secondaryColor),
             ),
           ),

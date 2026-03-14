@@ -477,7 +477,6 @@
     }
   },
   "authEnterValidServerAddress": "Wprowadz prawidlowy adres serwera",
-  "authEmailOtp": "Kod OTP z e-maila",
   "authEnterServerAddressFirst": "Najpierw wprowadz adres serwera",
   "authPasskeyRequiresServer": "Logowanie kluczem dostepu wymaga wsparcia serwera",
   "authLoginAgreement": "Logujac sie, akceptujesz ",

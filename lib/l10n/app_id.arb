@@ -477,7 +477,6 @@
     }
   },
   "authEnterValidServerAddress": "Silakan masukkan alamat server yang valid",
-  "authEmailOtp": "OTP Email",
   "authEnterServerAddressFirst": "Silakan masukkan alamat server terlebih dahulu",
   "authPasskeyRequiresServer": "Login passkey memerlukan dukungan server",
   "authLoginAgreement": "Dengan masuk, Anda menyetujui ",

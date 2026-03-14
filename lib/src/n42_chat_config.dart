@@ -140,6 +140,57 @@ class N42ChatConfig {
   /// 提供此接口以启用市场数据、新闻和 URL 安全检测功能
   final IApiHubBridge? apiHubBridge;
 
+  /// 是否显示 Google 登录入口
+  final bool enableGoogleLogin;
+
+  /// 是否显示 Apple 登录入口
+  final bool enableAppleLogin;
+
+  /// 是否显示 Facebook 登录入口
+  final bool enableFacebookLogin;
+
+  /// 是否显示 Twitter 登录入口
+  final bool enableTwitterLogin;
+
+  /// 是否显示微信登录入口
+  final bool enableWeChatLogin;
+
+  /// 是否显示 SSO 登录入口
+  ///
+  /// 当前仅应在宿主已经打通浏览器回调流程时启用。
+  final bool enableSsoLogin;
+
+  /// Google Sign-In OAuth Client ID
+  ///
+  /// 宿主已使用 google-services / 原生配置兜底时可不传；
+  /// 若未提供原生配置，可通过这里显式注入。
+  final String? googleClientId;
+
+  /// Google Sign-In Server Client ID
+  ///
+  /// 用于后端交换 access token / 验证身份。
+  final String? googleServerClientId;
+
+  /// Twitter API Key
+  final String? twitterApiKey;
+
+  /// Twitter API Secret
+  final String? twitterApiSecret;
+
+  /// Twitter 回调地址
+  final String? twitterRedirectUri;
+
+  /// WeChat App ID
+  final String? weChatAppId;
+
+  /// WeChat Universal Link
+  final String? weChatUniversalLink;
+
+  /// Matrix SSO 浏览器回调地址
+  ///
+  /// 默认使用 `n42://auth/sso`。
+  final String ssoRedirectUrl;
+
   /// 消息点击回调
   ///
   /// 当用户点击消息时触发
@@ -321,6 +372,20 @@ class N42ChatConfig {
     this.customTheme,
     this.walletBridge,
     this.apiHubBridge,
+    this.enableGoogleLogin = true,
+    this.enableAppleLogin = true,
+    this.enableFacebookLogin = false,
+    this.enableTwitterLogin = false,
+    this.enableWeChatLogin = false,
+    this.enableSsoLogin = false,
+    this.googleClientId,
+    this.googleServerClientId,
+    this.twitterApiKey,
+    this.twitterApiSecret,
+    this.twitterRedirectUri,
+    this.weChatAppId,
+    this.weChatUniversalLink,
+    this.ssoRedirectUrl = 'n42://auth/sso',
     this.onMessageTap,
     this.onAvatarTap,
     this.onLinkTap,
@@ -366,6 +431,20 @@ class N42ChatConfig {
     N42ChatTheme? customTheme,
     IWalletBridge? walletBridge,
     IApiHubBridge? apiHubBridge,
+    bool? enableGoogleLogin,
+    bool? enableAppleLogin,
+    bool? enableFacebookLogin,
+    bool? enableTwitterLogin,
+    bool? enableWeChatLogin,
+    bool? enableSsoLogin,
+    String? googleClientId,
+    String? googleServerClientId,
+    String? twitterApiKey,
+    String? twitterApiSecret,
+    String? twitterRedirectUri,
+    String? weChatAppId,
+    String? weChatUniversalLink,
+    String? ssoRedirectUrl,
     void Function(String roomId, String eventId)? onMessageTap,
     void Function(String userId)? onAvatarTap,
     Future<void> Function(String url)? onLinkTap,
@@ -410,6 +489,21 @@ class N42ChatConfig {
       customTheme: customTheme ?? this.customTheme,
       walletBridge: walletBridge ?? this.walletBridge,
       apiHubBridge: apiHubBridge ?? this.apiHubBridge,
+      enableGoogleLogin: enableGoogleLogin ?? this.enableGoogleLogin,
+      enableAppleLogin: enableAppleLogin ?? this.enableAppleLogin,
+      enableFacebookLogin: enableFacebookLogin ?? this.enableFacebookLogin,
+      enableTwitterLogin: enableTwitterLogin ?? this.enableTwitterLogin,
+      enableWeChatLogin: enableWeChatLogin ?? this.enableWeChatLogin,
+      enableSsoLogin: enableSsoLogin ?? this.enableSsoLogin,
+      googleClientId: googleClientId ?? this.googleClientId,
+      googleServerClientId:
+          googleServerClientId ?? this.googleServerClientId,
+      twitterApiKey: twitterApiKey ?? this.twitterApiKey,
+      twitterApiSecret: twitterApiSecret ?? this.twitterApiSecret,
+      twitterRedirectUri: twitterRedirectUri ?? this.twitterRedirectUri,
+      weChatAppId: weChatAppId ?? this.weChatAppId,
+      weChatUniversalLink: weChatUniversalLink ?? this.weChatUniversalLink,
+      ssoRedirectUrl: ssoRedirectUrl ?? this.ssoRedirectUrl,
       onMessageTap: onMessageTap ?? this.onMessageTap,
       onAvatarTap: onAvatarTap ?? this.onAvatarTap,
       onLinkTap: onLinkTap ?? this.onLinkTap,
@@ -500,4 +594,3 @@ class SyncFilterConfig {
     this.lazyLoadMembers = true,
   });
 }
-

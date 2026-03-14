@@ -18,6 +18,8 @@ import '../../core/utils/debug_log.dart';
 
 /// 群聊仓库实现
 class GroupRepositoryImpl implements IGroupRepository {
+  static const String _channelMetaEventType = 'n42.room.channel_meta';
+
   final MatrixGroupDataSource _groupDataSource;
   final MatrixClientManager _clientManager;
   final IWalletBridge? _walletBridge;
@@ -405,6 +407,73 @@ class GroupRepositoryImpl implements IGroupRepository {
   GroupEntity _mapRoomToGroupEntity(matrix.Room room, {List<matrix.User>? members}) {
     final avatarUrlStr = _groupDataSource.getGroupAvatarUrl(room.id);
     final myUserId = _clientManager.client?.userID;
+    final channelMeta = room.getState(_channelMetaEventType)?.content;
+    final isChannel = channelMeta?['parent_room_id'] != null;
+    final joinRule = _mapJoinRule(room.joinRules);
+    final powerLevels = room.getState(matrix.EventTypes.RoomPowerLevels)?.content;
+    final eventLevels = powerLevels?['events'] as Map?;
+    final messagePowerLevel =
+        _asInt(eventLevels?['m.room.message']) ?? _asInt(powerLevels?['events_default']) ?? 0;
+    final membersCanSpeak =
+        channelMeta?['members_can_speak'] as bool? ?? messagePowerLevel <= 0;
+    final showMemberList =
+        channelMeta?['show_member_list'] as bool? ?? !isChannel;
+    final slowModeInterval = _asInt(channelMeta?['slow_mode_interval']) ?? 0;
+    final canEditName = _groupDataSource.canSendStateEvent(
+      room.id,
+      'm.room.name',
+      fallbackMinPowerLevel: 50,
+    );
+    final canEditAvatar = _groupDataSource.canSendStateEvent(
+      room.id,
+      'm.room.avatar',
+      fallbackMinPowerLevel: 50,
+    );
+    final canEditDescription = _groupDataSource.canSendStateEvent(
+      room.id,
+      'm.room.topic',
+      fallbackMinPowerLevel: 50,
+    );
+    final canChangeVisibility = _groupDataSource.canSendStateEvent(
+      room.id,
+      'm.room.join_rules',
+      fallbackMinPowerLevel: 50,
+    );
+    final canManageChannels = _groupDataSource.canSendStateEvent(
+      room.id,
+      'n42.room.channels',
+      fallbackMinPowerLevel: 50,
+    );
+    final canManageBot = _groupDataSource.canSendStateEvent(
+      room.id,
+      'n42.room.bot_config',
+      fallbackMinPowerLevel: 50,
+    );
+    final canManageContentFilter = _groupDataSource.canSendStateEvent(
+      room.id,
+      'n42.room.content_filter',
+      fallbackMinPowerLevel: 50,
+    );
+    final canManageMemberLimit = _groupDataSource.canSendStateEvent(
+      room.id,
+      'n42.room.settings',
+      fallbackMinPowerLevel: 50,
+    );
+    final canManageTokenGate = _groupDataSource.canSendStateEvent(
+      room.id,
+      'n42.token_gate',
+      fallbackMinPowerLevel: 50,
+    );
+    final canChangeSettings = _groupDataSource.canChangeSettings(room.id) ||
+        canEditName ||
+        canEditAvatar ||
+        canEditDescription ||
+        canChangeVisibility ||
+        canManageChannels ||
+        canManageBot ||
+        canManageContentFilter ||
+        canManageMemberLimit ||
+        canManageTokenGate;
 
     GroupRole myRole = GroupRole.member;
     if (_groupDataSource.isGroupOwner(room.id, myUserId)) {
@@ -447,7 +516,22 @@ class GroupRepositoryImpl implements IGroupRepository {
       myRole: myRole,
       canInvite: _groupDataSource.canInviteMembers(room.id),
       canKick: _groupDataSource.canKickMembers(room.id),
-      canChangeSettings: _groupDataSource.canChangeSettings(room.id),
+      canChangeSettings: canChangeSettings,
+      canEditName: canEditName,
+      canEditAvatar: canEditAvatar,
+      canEditDescription: canEditDescription,
+      canChangeVisibility: canChangeVisibility,
+      canManageChannels: canManageChannels,
+      canManageBot: canManageBot,
+      canManageContentFilter: canManageContentFilter,
+      canManageMemberLimit: canManageMemberLimit,
+      canManageTokenGate: canManageTokenGate,
+      groupType: isChannel ? GroupType.channel : GroupType.group,
+      subscriberCount: isChannel ? joinedCount + invitedCount : 0,
+      joinRule: joinRule,
+      membersCanSpeak: membersCanSpeak,
+      showMemberList: showMemberList,
+      slowModeInterval: slowModeInterval,
       tokenGate: tokenGateConfig,
     );
   }
@@ -504,5 +588,26 @@ class GroupRepositoryImpl implements IGroupRepository {
       return null;
     }
   }
-}
 
+  JoinRule _mapJoinRule(matrix.JoinRules? joinRules) {
+    switch (joinRules) {
+      case matrix.JoinRules.public:
+        return JoinRule.public;
+      case matrix.JoinRules.knock:
+        return JoinRule.knock;
+      case matrix.JoinRules.restricted:
+      case matrix.JoinRules.knockRestricted:
+        return JoinRule.restricted;
+      case matrix.JoinRules.private:
+      case matrix.JoinRules.invite:
+      case null:
+        return JoinRule.invite;
+    }
+  }
+
+  int? _asInt(Object? value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '');
+  }
+}

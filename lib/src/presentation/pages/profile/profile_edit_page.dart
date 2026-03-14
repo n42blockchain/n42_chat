@@ -29,9 +29,23 @@ class ProfileEditPage extends StatefulWidget {
   State<ProfileEditPage> createState() => _ProfileEditPageState();
 }
 
+enum _PendingProfileOperation {
+  avatar,
+  displayName,
+  gender,
+  region,
+  pokeText,
+  signature,
+  ringtone,
+}
+
 class _ProfileEditPageState extends State<ProfileEditPage> {
   final ImagePicker _imagePicker = ImagePicker();
-  bool _isUploading = false;
+  _PendingProfileOperation? _pendingOperation;
+  String? _pendingSuccessMessage;
+  String? _pendingErrorFallback;
+
+  bool get _isUploading => _pendingOperation == _PendingProfileOperation.avatar;
 
   @override
   void initState() {
@@ -46,25 +60,41 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        debugLog('ProfileEditPage: AuthState changed - status: ${state.status}, isUploading: $_isUploading');
-        
-        // 监听状态变化
-        if (_isUploading) {
-          if (state.status == AuthStatus.authenticated) {
-            debugLog('ProfileEditPage: Avatar upload succeeded');
-            setState(() => _isUploading = false);
+        debugLog(
+          'ProfileEditPage: AuthState changed - status: ${state.status}, pendingOperation: $_pendingOperation',
+        );
+
+        if (_pendingOperation == null) {
+          return;
+        }
+
+        if (state.status == AuthStatus.authenticated) {
+          final successMessage = _pendingSuccessMessage;
+          setState(() {
+            _pendingOperation = null;
+            _pendingSuccessMessage = null;
+            _pendingErrorFallback = null;
+          });
+          if (successMessage != null && successMessage.isNotEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.profileAvatarUpdated ?? 'Avatar updated'),
+                content: Text(successMessage),
                 backgroundColor: Colors.green,
               ),
             );
-          } else if (state.status == AuthStatus.error) {
-            debugLog('ProfileEditPage: Avatar upload failed - ${state.errorMessage}');
-            setState(() => _isUploading = false);
+          }
+        } else if (state.status == AuthStatus.error) {
+          final errorMessage = state.errorMessage ?? _pendingErrorFallback;
+          debugLog('ProfileEditPage: Profile operation failed - $errorMessage');
+          setState(() {
+            _pendingOperation = null;
+            _pendingSuccessMessage = null;
+            _pendingErrorFallback = null;
+          });
+          if (errorMessage != null && errorMessage.isNotEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? (S.of(context)?.profileAvatarUploadFailed ?? 'Avatar upload failed')),
+                content: Text(errorMessage),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -367,6 +397,20 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     }
   }
 
+  void _dispatchProfileOperation({
+    required _PendingProfileOperation operation,
+    String? successMessage,
+    String? errorFallback,
+    required void Function(AuthBloc bloc) dispatch,
+  }) {
+    setState(() {
+      _pendingOperation = operation;
+      _pendingSuccessMessage = successMessage;
+      _pendingErrorFallback = errorFallback;
+    });
+    dispatch(context.read<AuthBloc>());
+  }
+
   Future<void> _pickAvatar() async {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
@@ -414,8 +458,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
       debugLog('ProfileEditPage: Image selected: ${image.path}, name: ${image.name}');
       
-      setState(() => _isUploading = true);
-
       final bytes = await image.readAsBytes();
       debugLog('ProfileEditPage: Image bytes: ${bytes.length}');
 
@@ -433,16 +475,27 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
       debugLog('ProfileEditPage: Uploading avatar with filename: $filename');
 
-      // 上传头像 - BlocConsumer 会监听状态变化并显示结果
-      context.read<AuthBloc>().add(UpdateAvatar(
-        avatarBytes: bytes,
-        filename: filename,
-      ));
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.avatar,
+        successMessage: S.of(context)?.profileAvatarUpdated ?? 'Avatar updated',
+        errorFallback:
+            S.of(context)?.profileAvatarUploadFailed ?? 'Avatar upload failed',
+        dispatch: (bloc) => bloc.add(
+          UpdateAvatar(
+            avatarBytes: bytes,
+            filename: filename,
+          ),
+        ),
+      );
     } catch (e, stackTrace) {
       debugLog('ProfileEditPage: Pick image error: $e');
       debugLog('ProfileEditPage: Stack trace: $stackTrace');
       if (mounted) {
-        setState(() => _isUploading = false);
+        setState(() {
+          _pendingOperation = null;
+          _pendingSuccessMessage = null;
+          _pendingErrorFallback = null;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${S.of(context)?.commonSelectImageFailed ?? 'Failed to select image'}: $e'),
@@ -483,7 +536,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     if (result != null && result.isNotEmpty && result != currentName) {
       if (!mounted) return;
-      context.read<AuthBloc>().add(UpdateDisplayName(result));
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.displayName,
+        errorFallback: 'Update nickname failed',
+        dispatch: (bloc) => bloc.add(UpdateDisplayName(result)),
+      );
     }
   }
 
@@ -514,13 +571,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
 
     if (result != null && mounted) {
-      context.read<AuthBloc>().add(UpdateUserProfile(gender: result));
       final genderText = result == 'male' ? (S.of(context)?.profileMale ?? 'Male') : (S.of(context)?.profileFemale ?? 'Female');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(S.of(context)?.profileGenderSetTo(genderText) ?? 'Gender set to: $genderText'),
-          duration: const Duration(seconds: 1),
-        ),
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.gender,
+        successMessage:
+            S.of(context)?.profileGenderSetTo(genderText) ??
+            'Gender set to: $genderText',
+        errorFallback: 'Update profile failed',
+        dispatch: (bloc) => bloc.add(UpdateUserProfile(gender: result)),
       );
     }
   }
@@ -624,12 +682,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         );
 
         if (city != null && mounted) {
-          context.read<AuthBloc>().add(UpdateUserProfile(region: city));
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(S.of(context)?.profileRegionSetTo(city) ?? 'Region set to: $city'),
-              duration: const Duration(seconds: 1),
-            ),
+          _dispatchProfileOperation(
+            operation: _PendingProfileOperation.region,
+            successMessage:
+                S.of(context)?.profileRegionSetTo(city) ??
+                'Region set to: $city',
+            errorFallback: 'Update profile failed',
+            dispatch: (bloc) => bloc.add(UpdateUserProfile(region: city)),
           );
         }
       }
@@ -702,12 +761,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
 
     if (result != null && mounted) {
-      context.read<AuthBloc>().add(UpdateUserProfile(pokeText: result));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.isEmpty ? (S.of(context)?.profilePokeCleared ?? 'Poke cleared') : (S.of(context)?.profilePokeSetTo(result) ?? 'Poke set to: poked me$result')),
-          duration: const Duration(seconds: 1),
-        ),
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.pokeText,
+        successMessage: result.isEmpty
+            ? (S.of(context)?.profilePokeCleared ?? 'Poke cleared')
+            : (S.of(context)?.profilePokeSetTo(result) ??
+                'Poke set to: poked me$result'),
+        errorFallback: 'Update profile failed',
+        dispatch: (bloc) => bloc.add(UpdateUserProfile(pokeText: result)),
       );
     }
   }
@@ -741,12 +802,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
 
     if (result != null && result != currentSignature && mounted) {
-      context.read<AuthBloc>().add(UpdateUserProfile(signature: result));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.isEmpty ? (S.of(context)?.profileSignatureCleared ?? 'Signature cleared') : (S.of(context)?.profileSignatureUpdated ?? 'Signature updated')),
-          duration: const Duration(seconds: 1),
-        ),
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.signature,
+        successMessage: result.isEmpty
+            ? (S.of(context)?.profileSignatureCleared ?? 'Signature cleared')
+            : (S.of(context)?.profileSignatureUpdated ?? 'Signature updated'),
+        errorFallback: 'Update profile failed',
+        dispatch: (bloc) => bloc.add(UpdateUserProfile(signature: result)),
       );
     }
   }
@@ -810,12 +872,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
 
     if (result != null && result != currentRingtone && mounted) {
-      context.read<AuthBloc>().add(UpdateUserProfile(ringtone: result));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(S.of(context)?.profileRingtoneSetTo(result) ?? 'Ringtone set to: $result'),
-          duration: const Duration(seconds: 1),
-        ),
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.ringtone,
+        successMessage:
+            S.of(context)?.profileRingtoneSetTo(result) ??
+            'Ringtone set to: $result',
+        errorFallback: 'Update profile failed',
+        dispatch: (bloc) => bloc.add(UpdateUserProfile(ringtone: result)),
       );
     }
   }

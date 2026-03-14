@@ -359,6 +359,7 @@ Future<void> _registerServices(N42ChatConfig config) async {
     () => ChatBackupService(
       clientManager: getIt<MatrixClientManager>(),
       secureStorage: getIt<SecureStorageDataSource>(),
+      preferencesStorage: getIt<PreferencesDataSource>(),
       archiveService: getIt<MessageArchiveService>(),
     ),
   );
@@ -919,4 +920,3 @@ extension GetItExtension on GetIt {
   /// 获取配置
   N42ChatConfig get config => get<N42ChatConfig>();
 }
-

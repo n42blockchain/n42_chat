@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../n42_chat.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
+import '../main/chat_main_page.dart';
+import '../../helpers/bloc_message_helper.dart';
 
 /// 注册页面
 ///
@@ -20,7 +25,9 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  final _homeserverController = TextEditingController(text: 'https://m.si46.world');
+  final _homeserverController = TextEditingController(
+    text: N42Chat.config?.defaultHomeserver ?? 'https://m.si46.world',
+  );
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -46,11 +53,39 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  void _handleAuthSuccess() {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop(true);
+      return;
+    }
+
+    final router = GoRouter.maybeOf(context);
+    if (router != null) {
+      router.go(Routes.conversationList);
+      return;
+    }
+
+    navigator.pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider.value(
+          value: context.read<AuthBloc>(),
+          child: ChatMainPage(
+            onBackToMain: () => Navigator.of(context).maybePop(),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _onRegister() {
     if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.authPleaseAgreeToTerms ?? 'Please read and agree to the Terms of Service and Privacy Policy'),
+          content: Text(
+            S.of(context)?.authPleaseAgreeToTerms ??
+                'Please read and agree to the Terms of Service and Privacy Policy',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
@@ -60,13 +95,15 @@ class _RegisterPageState extends State<RegisterPage> {
     if (_formKey.currentState?.validate() ?? false) {
       final inviteCode = _inviteCodeController.text.trim();
       final email = _emailController.text.trim();
-      context.read<AuthBloc>().add(AuthRegisterRequested(
-            homeserver: _homeserverController.text.trim(),
-            username: _usernameController.text.trim(),
-            password: _passwordController.text,
-            email: email.isNotEmpty ? email : null,
-            registrationToken: inviteCode.isNotEmpty ? inviteCode : null,
-          ));
+      context.read<AuthBloc>().add(
+        AuthRegisterRequested(
+          homeserver: _homeserverController.text.trim(),
+          username: _usernameController.text.trim(),
+          password: _passwordController.text,
+          email: email.isNotEmpty ? email : null,
+          registrationToken: inviteCode.isNotEmpty ? inviteCode : null,
+        ),
+      );
     }
   }
 
@@ -81,8 +118,10 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
@@ -105,17 +144,19 @@ class _RegisterPageState extends State<RegisterPage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state.hasError) {
+            final message = state.errorMessage != null
+                ? resolveBlocMessage(context, state.errorMessage!)
+                : (S.of(context)?.authRegisterFailed ?? 'Registration failed');
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? (S.of(context)?.authRegisterFailed ?? 'Registration failed')),
+                content: Text(message),
                 backgroundColor: AppColors.error,
               ),
             );
           }
 
           if (state.isAuthenticated) {
-            // 注册成功，返回上一页或跳转到主页
-            Navigator.of(context).maybePop(true);
+            _handleAuthSuccess();
           }
         },
         builder: (context, state) {
@@ -182,29 +223,35 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-
   Widget _buildServerInput(AuthState state, bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final inputBgColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           S.of(context)?.authServerAddress ?? 'Server Address',
-          style: TextStyle(
-            fontSize: 14,
-            color: labelColor,
-          ),
+          style: TextStyle(fontSize: 14, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _homeserverController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.authServerAddressHint ?? 'https://m.si46.world',
+            hintText:
+                S.of(context)?.authServerAddressHint ??
+                (N42Chat.config?.defaultHomeserver ?? 'https://m.si46.world'),
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -224,27 +271,31 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.primary,
+                        ),
                       ),
                     ),
                   )
                 : state.isHomeserverValid
-                    ? const Icon(Icons.check_circle, color: AppColors.success)
-                    : IconButton(
-                        icon: Icon(Icons.refresh, color: hintColor),
-                        onPressed: _checkHomeserver,
-                      ),
+                ? const Icon(Icons.check_circle, color: AppColors.success)
+                : IconButton(
+                    icon: Icon(Icons.refresh, color: hintColor),
+                    onPressed: _checkHomeserver,
+                  ),
           ),
           keyboardType: TextInputType.url,
           textInputAction: TextInputAction.next,
+          onChanged: (_) => setState(() {}),
           onEditingComplete: _checkHomeserver,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.authEnterServerAddress ?? 'Please enter server address';
+              return S.of(context)?.authEnterServerAddress ??
+                  'Please enter server address';
             }
             if (!value.startsWith('http://') && !value.startsWith('https://')) {
-              return S.of(context)?.authEnterValidServerAddress ?? 'Please enter a valid server address';
+              return S.of(context)?.authEnterValidServerAddress ??
+                  'Please enter a valid server address';
             }
             return null;
           },
@@ -253,10 +304,7 @@ class _RegisterPageState extends State<RegisterPage> {
           const SizedBox(height: 4),
           Text(
             '✓ ${S.of(context)?.authConnectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.success,
-            ),
+            style: const TextStyle(fontSize: 12, color: AppColors.success),
           ),
         ],
       ],
@@ -264,20 +312,25 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _buildUsernameInput(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final inputBgColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           S.of(context)?.authUsername ?? 'Username',
-          style: TextStyle(
-            fontSize: 14,
-            color: labelColor,
-          ),
+          style: TextStyle(fontSize: 14, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -285,7 +338,9 @@ class _RegisterPageState extends State<RegisterPage> {
           style: TextStyle(color: textColor, fontSize: 16),
           maxLength: 20,
           decoration: InputDecoration(
-            hintText: S.of(context)?.authUsernameHint ?? '3-20 chars, letters/numbers/_',
+            hintText:
+                S.of(context)?.authUsernameHint ??
+                '3-20 chars, letters/numbers/_',
             hintStyle: TextStyle(color: hintColor, fontSize: 14),
             filled: true,
             fillColor: inputBgColor,
@@ -297,25 +352,26 @@ class _RegisterPageState extends State<RegisterPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.person_outline,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.person_outline, color: hintColor),
             counterText: '',
           ),
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.authEnterUsername ?? 'Please enter username';
+              return S.of(context)?.authEnterUsername ??
+                  'Please enter username';
             }
             if (value.length < 3) {
-              return S.of(context)?.authUsernameMinLength ?? 'Username must be at least 3 characters';
+              return S.of(context)?.authUsernameMinLength ??
+                  'Username must be at least 3 characters';
             }
             if (value.length > 20) {
-              return S.of(context)?.authUsernameMaxLength ?? 'Username must be at most 20 characters';
+              return S.of(context)?.authUsernameMaxLength ??
+                  'Username must be at most 20 characters';
             }
             if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-              return S.of(context)?.authUsernameFormat ?? 'Username can only contain letters, numbers, and underscores';
+              return S.of(context)?.authUsernameFormat ??
+                  'Username can only contain letters, numbers, and underscores';
             }
             return null;
           },
@@ -325,10 +381,18 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _buildEmailInput(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final inputBgColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,18 +401,12 @@ class _RegisterPageState extends State<RegisterPage> {
           children: [
             Text(
               S.of(context)?.authEmailAddress ?? 'Email Address',
-              style: TextStyle(
-                fontSize: 14,
-                color: labelColor,
-              ),
+              style: TextStyle(fontSize: 14, color: labelColor),
             ),
             const SizedBox(width: 4),
             Text(
               '(${S.of(context)?.authOptional ?? 'Optional'})',
-              style: TextStyle(
-                fontSize: 12,
-                color: hintColor,
-              ),
+              style: TextStyle(fontSize: 12, color: hintColor),
             ),
           ],
         ),
@@ -357,7 +415,8 @@ class _RegisterPageState extends State<RegisterPage> {
           controller: _emailController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.commonEnterEmailAddress ?? 'Enter email address',
+            hintText:
+                S.of(context)?.commonEnterEmailAddress ?? 'Enter email address',
             hintStyle: TextStyle(color: hintColor, fontSize: 14),
             filled: true,
             fillColor: inputBgColor,
@@ -369,10 +428,7 @@ class _RegisterPageState extends State<RegisterPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.email_outlined,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.email_outlined, color: hintColor),
           ),
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
@@ -381,7 +437,8 @@ class _RegisterPageState extends State<RegisterPage> {
             if (value != null && value.isNotEmpty) {
               final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
               if (!emailRegex.hasMatch(value)) {
-                return S.of(context)?.commonInvalidEmailFormat ?? 'Please enter a valid email address';
+                return S.of(context)?.commonInvalidEmailFormat ??
+                    'Please enter a valid email address';
               }
             }
             return null;
@@ -390,30 +447,32 @@ class _RegisterPageState extends State<RegisterPage> {
         const SizedBox(height: 4),
         Text(
           S.of(context)?.authEmailRecoveryHint ?? 'Used for password recovery',
-          style: TextStyle(
-            fontSize: 11,
-            color: hintColor,
-          ),
+          style: TextStyle(fontSize: 11, color: hintColor),
         ),
       ],
     );
   }
 
   Widget _buildPasswordInput(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final inputBgColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           S.of(context)?.authPassword ?? 'Password',
-          style: TextStyle(
-            fontSize: 14,
-            color: labelColor,
-          ),
+          style: TextStyle(fontSize: 14, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -432,10 +491,7 @@ class _RegisterPageState extends State<RegisterPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.lock_outline,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.lock_outline, color: hintColor),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -452,10 +508,12 @@ class _RegisterPageState extends State<RegisterPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.authEnterPassword ?? 'Please enter password';
+              return S.of(context)?.authEnterPassword ??
+                  'Please enter password';
             }
             if (value.length < 8) {
-              return S.of(context)?.commonPasswordMinLength ?? 'Password must be at least 8 characters';
+              return S.of(context)?.commonPasswordMinLength ??
+                  'Password must be at least 8 characters';
             }
             return null;
           },
@@ -465,27 +523,33 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _buildConfirmPasswordInput(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final inputBgColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           S.of(context)?.authConfirmPassword ?? 'Confirm Password',
-          style: TextStyle(
-            fontSize: 14,
-            color: labelColor,
-          ),
+          style: TextStyle(fontSize: 14, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _confirmPasswordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.commonReenterPassword ?? 'Re-enter password',
+            hintText:
+                S.of(context)?.commonReenterPassword ?? 'Re-enter password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -497,13 +561,12 @@ class _RegisterPageState extends State<RegisterPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.lock_outline,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.lock_outline, color: hintColor),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                _obscureConfirmPassword
+                    ? Icons.visibility_off
+                    : Icons.visibility,
                 color: hintColor,
               ),
               onPressed: () {
@@ -518,10 +581,12 @@ class _RegisterPageState extends State<RegisterPage> {
           onFieldSubmitted: (_) => _onRegister(),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.commonReenterPassword ?? 'Please re-enter password';
+              return S.of(context)?.commonReenterPassword ??
+                  'Please re-enter password';
             }
             if (value != _passwordController.text) {
-              return S.of(context)?.commonPasswordsDoNotMatch ?? 'Passwords do not match';
+              return S.of(context)?.commonPasswordsDoNotMatch ??
+                  'Passwords do not match';
             }
             return null;
           },
@@ -531,10 +596,18 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _buildInviteCodeInput(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final inputBgColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -555,11 +628,9 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(width: 4),
               Text(
-                S.of(context)?.authInviteCodeBuiltIn ?? 'Invite Code (Built-in)',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: labelColor,
-                ),
+                S.of(context)?.authInviteCodeBuiltIn ??
+                    'Invite Code (Built-in)',
+                style: TextStyle(fontSize: 14, color: labelColor),
               ),
               const Spacer(),
               if (!_showInviteCode)
@@ -581,7 +652,8 @@ class _RegisterPageState extends State<RegisterPage> {
             style: TextStyle(color: textColor, fontSize: 14),
             maxLines: 2,
             decoration: InputDecoration(
-              hintText: S.of(context)?.authEnterInviteCode ?? 'Enter invite code',
+              hintText:
+                  S.of(context)?.authEnterInviteCode ?? 'Enter invite code',
               hintStyle: TextStyle(color: hintColor),
               filled: true,
               fillColor: inputBgColor,
@@ -593,19 +665,14 @@ class _RegisterPageState extends State<RegisterPage> {
                 horizontal: 16,
                 vertical: 12,
               ),
-              prefixIcon: Icon(
-                Icons.vpn_key_outlined,
-                color: hintColor,
-              ),
+              prefixIcon: Icon(Icons.vpn_key_outlined, color: hintColor),
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            S.of(context)?.authInviteCodeBuiltInNote ?? 'Invite code is built-in, usually no need to modify',
-            style: TextStyle(
-              fontSize: 11,
-              color: hintColor,
-            ),
+            S.of(context)?.authInviteCodeBuiltInNote ??
+                'Invite code is built-in, usually no need to modify',
+            style: TextStyle(fontSize: 11, color: hintColor),
           ),
         ],
       ],
@@ -613,8 +680,10 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _buildAgreementCheckbox(bool isDark) {
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    
+    final textColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -646,24 +715,20 @@ class _RegisterPageState extends State<RegisterPage> {
             },
             child: Text.rich(
               TextSpan(
-                text: S.of(context)?.authIHaveReadAndAgree ?? 'I have read and agree to ',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: textColor,
-                ),
+                text:
+                    S.of(context)?.authIHaveReadAndAgree ??
+                    'I have read and agree to ',
+                style: TextStyle(fontSize: 13, color: textColor),
                 children: [
                   TextSpan(
-                    text: S.of(context)?.authTermsOfService ?? 'Terms of Service',
-                    style: const TextStyle(
-                      color: AppColors.textLink,
-                    ),
+                    text:
+                        S.of(context)?.authTermsOfService ?? 'Terms of Service',
+                    style: const TextStyle(color: AppColors.textLink),
                   ),
                   TextSpan(text: S.of(context)?.authAnd ?? ' and '),
                   TextSpan(
                     text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
-                    style: const TextStyle(
-                      color: AppColors.textLink,
-                    ),
+                    style: const TextStyle(color: AppColors.textLink),
                   ),
                 ],
               ),
@@ -684,9 +749,7 @@ class _RegisterPageState extends State<RegisterPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),
         child: state.isLoading
@@ -711,17 +774,16 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _buildLoginLink(bool isDark) {
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           S.of(context)?.authAlreadyHaveAccount ?? 'Already have an account?',
-          style: TextStyle(
-            fontSize: 14,
-            color: textColor,
-          ),
+          style: TextStyle(fontSize: 14, color: textColor),
         ),
         TextButton(
           onPressed: () {
@@ -740,4 +802,3 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 }
-

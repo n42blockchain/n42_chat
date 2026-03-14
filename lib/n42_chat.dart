@@ -31,6 +31,7 @@ library;
 // ============================================
 export 'src/n42_chat.dart';
 export 'src/n42_chat_config.dart';
+export 'src/presentation/blocs/auth/auth_state.dart';
 
 // ============================================
 // 主题导出

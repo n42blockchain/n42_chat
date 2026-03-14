@@ -1,14 +1,16 @@
-import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:drift/drift.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pointycastle/export.dart' as pc;
 import 'package:uuid/uuid.dart';
 
+import '../../data/datasources/local/archive_database.dart';
+import '../../data/datasources/local/preferences_datasource.dart';
 import '../../data/datasources/local/secure_storage_datasource.dart';
 import '../../data/datasources/matrix/matrix_client_manager.dart';
 import '../constants/app_constants.dart';
@@ -23,6 +25,7 @@ class BackupResult {
   final int roomCount;
   final int messageCount;
   final DateTime createdAt;
+  final List<String> warnings;
 
   const BackupResult({
     required this.backupId,
@@ -31,6 +34,7 @@ class BackupResult {
     required this.roomCount,
     required this.messageCount,
     required this.createdAt,
+    this.warnings = const [],
   });
 }
 
@@ -121,15 +125,18 @@ class RestoreResult {
   final int settingsRestored;
   final bool keysRestored;
   final List<String> errors;
+  final List<String> warnings;
 
   const RestoreResult({
     this.roomsRestored = 0,
     this.settingsRestored = 0,
     this.keysRestored = false,
     this.errors = const [],
+    this.warnings = const [],
   });
 
   bool get hasErrors => errors.isNotEmpty;
+  bool get hasWarnings => warnings.isNotEmpty;
 }
 
 /// 聊天备份与恢复服务
@@ -138,10 +145,34 @@ class RestoreResult {
 /// 内容: manifest.json + rooms/{roomId}/messages.json + settings/ + encryption/keys.json
 class ChatBackupService {
   static const String _appVersion = '0.1.0'; // TODO: 从 package_info_plus 动态获取
+  static const String _backupSettingPreferencesKey = 'n42_chat_settings';
+  static const String _backupAppearancePreferencesKey =
+      'n42_chat_appearance_settings';
+  static const String _backupAutoDownloadPreferencesKey =
+      'n42_chat_auto_download_settings';
+  static const String _backupMessageFontPreferencesKey =
+      'n42_chat_message_font_size';
+  static const String _backupTranslationPreferencesKey =
+      'n42_chat_translation_settings';
+  static const String _legacyLanguageKey = 'language';
+  static const String _legacyThemeModeKey = 'theme_mode';
+  static const String _legacyFontSizeKey = 'chat_font_size';
+  static const String _legacyAutoDownloadKey = 'auto_download';
+  static const Set<String> _supportedPreferenceBackupKeys = {
+    _backupSettingPreferencesKey,
+    _backupAppearancePreferencesKey,
+    _backupAutoDownloadPreferencesKey,
+    _backupMessageFontPreferencesKey,
+    _backupTranslationPreferencesKey,
+  };
+  static const String _unsupportedKeyBackupWarning =
+      'Encryption keys are backed up separately via Recovery Key in Security settings and are not included in .n42backup files.';
 
   final MatrixClientManager _clientManager;
   final SecureStorageDataSource _secureStorage;
+  final PreferencesDataSource _preferencesStorage;
   MessageArchiveService? _archiveService;
+  final Future<Directory> Function()? _backupDirProvider;
 
   /// SharedPreferences key: 最后增量备份时间戳（毫秒）
   static const String _keyLastIncrementalBackupTs =
@@ -150,10 +181,14 @@ class ChatBackupService {
   ChatBackupService({
     required MatrixClientManager clientManager,
     required SecureStorageDataSource secureStorage,
+    required PreferencesDataSource preferencesStorage,
     MessageArchiveService? archiveService,
+    Future<Directory> Function()? backupDirProvider,
   })  : _clientManager = clientManager,
         _secureStorage = secureStorage,
-        _archiveService = archiveService;
+        _preferencesStorage = preferencesStorage,
+        _archiveService = archiveService,
+        _backupDirProvider = backupDirProvider;
 
   /// 延迟注入归档服务
   void setArchiveService(MessageArchiveService service) {
@@ -162,6 +197,14 @@ class ChatBackupService {
 
   /// 获取备份目录
   Future<Directory> _getBackupDir() async {
+    if (_backupDirProvider != null) {
+      final provided = await _backupDirProvider();
+      if (!provided.existsSync()) {
+        provided.createSync(recursive: true);
+      }
+      return provided;
+    }
+
     final appDir = await getApplicationDocumentsDirectory();
     final backupDir =
         Directory(p.join(appDir.path, StorageConstants.backupDirName));
@@ -182,6 +225,7 @@ class ChatBackupService {
     final backupId = const Uuid().v4();
     final now = DateTime.now();
     final backupDir = await _getBackupDir();
+    final warnings = <String>[];
     final fileName =
         'backup_${now.year}${now.month.toString().padLeft(2, '0')}'
         '${now.day.toString().padLeft(2, '0')}_'
@@ -199,6 +243,9 @@ class ChatBackupService {
 
     onProgress?.call(0.1);
 
+    final includesKeysInBackup =
+        await _collectKeyBackupSupport(includeKeys, warnings);
+
     // 构建备份数据
     final backupData = <String, dynamic>{
       'manifest': {
@@ -207,7 +254,7 @@ class ChatBackupService {
         'appVersion': _appVersion,
         'roomCount': rooms.length,
         'includesMedia': includeMedia,
-        'includesKeys': includeKeys,
+        'includesKeys': includesKeysInBackup,
       },
       'rooms': <String, dynamic>{},
       'settings': <String, dynamic>{},
@@ -259,15 +306,15 @@ class ChatBackupService {
     // 导出设置
     try {
       final settingsKeys = [
-        'chat_font_size',
-        'notification_enabled',
-        'theme_mode',
-        'language',
-        'auto_download',
+        _backupSettingPreferencesKey,
+        _backupAppearancePreferencesKey,
+        _backupAutoDownloadPreferencesKey,
+        _backupMessageFontPreferencesKey,
+        _backupTranslationPreferencesKey,
       ];
       final settings = <String, String?>{};
       for (final key in settingsKeys) {
-        settings[key] = await _secureStorage.read(key);
+        settings[key] = await _preferencesStorage.read(key);
       }
       backupData['settings'] = settings;
     } catch (e) {
@@ -299,6 +346,7 @@ class ChatBackupService {
       roomCount: rooms.length,
       messageCount: messageCount,
       createdAt: now,
+      warnings: warnings,
     );
   }
 
@@ -563,6 +611,7 @@ class ChatBackupService {
 
       final archiveDb = _archiveService!;
       final roomEntries = rooms.entries.toList();
+      var roomsRestored = 0;
 
       for (var i = 0; i < roomEntries.length; i++) {
         final entry = roomEntries[i];
@@ -570,31 +619,36 @@ class ChatBackupService {
         final roomData = entry.value as Map<String, dynamic>;
         final messages =
             (roomData['messages'] as List<dynamic>?) ?? [];
+        final companions = <ArchivedMessagesCompanion>[];
 
         for (final msg in messages) {
           try {
             final msgMap = msg as Map<String, dynamic>;
-            final ts = msgMap['ts'] as int? ??
-                (DateTime.tryParse(msgMap['timestamp']?.toString() ?? '')
-                        ?.millisecondsSinceEpoch ??
-                    0);
-            if (ts == 0) continue;
-
-            final archived = await archiveDb.getArchivedMessages(
-              roomId,
-              beforeTimestamp: ts + 1,
-              limit: 1,
-            );
-            // 跳过已存在的消息
-            if (archived.isNotEmpty &&
-                archived.first.eventId == msgMap['eventId']) {
+            final eventId = msgMap['eventId']?.toString();
+            if (eventId == null || eventId.isEmpty) {
               continue;
             }
 
-            // 消息已记录到恢复统计中
-            // 实际写入在后续版本中通过 ArchiveDatabase 直接操作
+            if (await archiveDb.isEventArchived(eventId)) {
+              continue;
+            }
+
+            final companion = _backupMessageToArchiveCompanion(roomId, msgMap);
+            if (companion != null) {
+              companions.add(companion);
+            }
           } catch (e) {
             errors.add('Failed to restore message in $roomId: $e');
+          }
+        }
+
+        if (companions.isNotEmpty) {
+          final inserted = await archiveDb.importArchivedMessages(
+            roomId,
+            companions,
+          );
+          if (inserted > 0) {
+            roomsRestored++;
           }
         }
 
@@ -602,7 +656,7 @@ class ChatBackupService {
       }
 
       return RestoreResult(
-        roomsRestored: rooms.length,
+        roomsRestored: roomsRestored,
         settingsRestored: 0,
         errors: errors,
       );
@@ -676,20 +730,21 @@ class ChatBackupService {
     try {
       final data =
           await _readBackupData(backupFilePath, password: password);
-      final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
-      final settings = data['settings'] as Map<String, dynamic>? ?? {};
+      final rawSettings = data['settings'] as Map<String, dynamic>? ?? {};
 
       int settingsRestored = 0;
       final errors = <String>[];
+      final warnings = <String>[];
 
       onProgress?.call(0.1);
 
       // 恢复设置
-      if (restoreSettings && settings.isNotEmpty) {
+      if (restoreSettings && rawSettings.isNotEmpty) {
+        final settings = await _normalizeRestorableSettings(rawSettings);
         for (final entry in settings.entries) {
           try {
             if (entry.value != null) {
-              await _secureStorage.write(entry.key, entry.value.toString());
+              await _preferencesStorage.write(entry.key, entry.value.toString());
               settingsRestored++;
             }
           } catch (e) {
@@ -700,6 +755,10 @@ class ChatBackupService {
 
       onProgress?.call(0.5);
 
+      if (restoreKeys) {
+        warnings.add(_unsupportedKeyBackupWarning);
+      }
+
       // 注意：消息恢复依赖 Matrix 同步机制
       // 本地备份主要用于保留设置和加密密钥
       // 消息会在重新登录后从服务器同步
@@ -707,14 +766,163 @@ class ChatBackupService {
       onProgress?.call(1.0);
 
       return RestoreResult(
-        roomsRestored: rooms.length,
+        roomsRestored: 0,
         settingsRestored: settingsRestored,
-        keysRestored: restoreKeys,
+        keysRestored: false,
         errors: errors,
+        warnings: warnings,
       );
     } catch (e) {
       return RestoreResult(errors: ['Restore failed: $e']);
     }
+  }
+
+  Future<bool> _collectKeyBackupSupport(
+    bool includeKeys,
+    List<String> warnings,
+  ) async {
+    if (!includeKeys) return false;
+    warnings.add(_unsupportedKeyBackupWarning);
+    return false;
+  }
+
+  Future<Map<String, String?>> _normalizeRestorableSettings(
+    Map<String, dynamic> rawSettings,
+  ) async {
+    final nestedSettings = rawSettings['preferences'];
+    if (nestedSettings is Map<String, dynamic>) {
+      return nestedSettings.map(
+        (key, value) => MapEntry(key, value?.toString()),
+      );
+    }
+
+    final normalized = <String, String?>{};
+    for (final key in _supportedPreferenceBackupKeys) {
+      if (rawSettings.containsKey(key)) {
+        normalized[key] = rawSettings[key]?.toString();
+      }
+    }
+
+    final legacySettings = await _normalizeLegacyRestorableSettings(
+      rawSettings.map((key, value) => MapEntry(key, value?.toString())),
+    );
+    normalized.addAll(legacySettings);
+    return normalized;
+  }
+
+  Future<Map<String, String?>> _normalizeLegacyRestorableSettings(
+    Map<String, String?> rawSettings,
+  ) async {
+    final migrated = <String, String?>{};
+
+    final legacyLanguage = rawSettings[_legacyLanguageKey];
+    if (legacyLanguage != null && legacyLanguage.isNotEmpty) {
+      migrated[_backupSettingPreferencesKey] = await _mergeJsonPreferenceMap(
+        _backupSettingPreferencesKey,
+        <String, String>{'n42_chat_language': legacyLanguage},
+      );
+    }
+
+    final legacyThemeMode = rawSettings[_legacyThemeModeKey];
+    if (legacyThemeMode != null && legacyThemeMode.isNotEmpty) {
+      migrated[_backupAppearancePreferencesKey] = await _mergeJsonPreferenceMap(
+        _backupAppearancePreferencesKey,
+        <String, String>{
+          'themeMode': legacyThemeMode,
+        },
+        defaults: const <String, String>{
+          'fontSize': 'medium',
+          'bubbleStyle': 'wechat',
+        },
+      );
+    }
+
+    final legacyFontSize = rawSettings[_legacyFontSizeKey];
+    if (legacyFontSize != null && legacyFontSize.isNotEmpty) {
+      migrated[_backupMessageFontPreferencesKey] = legacyFontSize;
+    }
+
+    final legacyAutoDownload = rawSettings[_legacyAutoDownloadKey];
+    if (legacyAutoDownload != null && legacyAutoDownload.isNotEmpty) {
+      migrated[_backupAutoDownloadPreferencesKey] = legacyAutoDownload;
+    }
+
+    return migrated;
+  }
+
+  ArchivedMessagesCompanion? _backupMessageToArchiveCompanion(
+    String roomId,
+    Map<String, dynamic> msgMap,
+  ) {
+    final eventId = msgMap['eventId']?.toString();
+    final senderId = msgMap['sender']?.toString();
+    final ts = msgMap['ts'] as int? ??
+        DateTime.tryParse(msgMap['timestamp']?.toString() ?? '')
+            ?.millisecondsSinceEpoch;
+    if (eventId == null || eventId.isEmpty || senderId == null || ts == null) {
+      return null;
+    }
+
+    final rawType = msgMap['type']?.toString();
+    final eventType = rawType == null ||
+            rawType.isEmpty ||
+            (rawType.startsWith('m.') &&
+                rawType != 'm.room.message' &&
+                rawType != 'm.room.encrypted' &&
+                rawType != 'm.sticker')
+        ? 'm.room.message'
+        : rawType;
+    final msgtype = msgMap['msgtype']?.toString() ??
+        (eventType == 'm.room.message' ? rawType : null);
+    final body = msgMap['body']?.toString();
+    final formattedBody = msgMap['formattedBody']?.toString();
+    final relatesTo = msgMap['relatesTo'];
+    final mediaInfo = msgMap['mediaInfo'];
+    final isEncrypted = msgMap['isEncrypted'] == true;
+
+    return ArchivedMessagesCompanion(
+      eventId: Value(eventId),
+      roomId: Value(roomId),
+      senderId: Value(senderId),
+      originServerTs: Value(ts),
+      type: Value(eventType),
+      body: Value(body),
+      formattedBody: Value(formattedBody),
+      msgtype: Value(msgtype),
+      relatesTo: Value(
+        relatesTo == null ? null : jsonEncode(relatesTo),
+      ),
+      mediaInfo: Value(
+        mediaInfo == null ? null : jsonEncode(mediaInfo),
+      ),
+      isEncrypted: Value(isEncrypted),
+      decryptedBody: Value(
+        msgMap['decryptedBody']?.toString() ?? (isEncrypted ? body : null),
+      ),
+      quarter: Value(timestampToQuarter(ts)),
+      archivedAt: Value(DateTime.now()),
+    );
+  }
+
+  Future<String> _mergeJsonPreferenceMap(
+    String key,
+    Map<String, String> updates, {
+    Map<String, String> defaults = const <String, String>{},
+  }) async {
+    final current = await _preferencesStorage.read(key);
+    final merged = <String, dynamic>{...defaults};
+    if (current != null && current.isNotEmpty) {
+      try {
+        final currentJson = jsonDecode(current);
+        if (currentJson is Map<String, dynamic>) {
+          merged.addAll(currentJson);
+        }
+      } catch (_) {
+        // Ignore corrupt local values and overwrite with migrated backup data.
+      }
+    }
+    merged.addAll(updates);
+    return jsonEncode(merged);
   }
 
   /// 读取备份数据
