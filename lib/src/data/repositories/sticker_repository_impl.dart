@@ -39,7 +39,11 @@ class StickerRepositoryImpl implements IStickerRepository {
     // Built-in sample stickers — replace with Matrix sticker pack API (m.sticker_pack)
     // TODO: 从贴纸商店 API 获取
     // 目前返回一些示例贴纸包
-    return _getSampleStorePacks().skip(offset).take(limit).toList();
+    final packs = _filterStorePacks(
+      _getSampleStorePacks(),
+      category: category,
+    );
+    return packs.skip(offset).take(limit).toList();
   }
 
   List<StickerPack> _getSampleStorePacks() {
@@ -176,7 +180,7 @@ class StickerRepositoryImpl implements IStickerRepository {
         pack.name.toLowerCase().contains(queryLower) ||
         (pack.description?.toLowerCase().contains(queryLower) ?? false));
 
-    return [...installedMatches, ...storeMatches];
+    return _dedupePacksById([...installedMatches, ...storeMatches]);
   }
 
   @override
@@ -362,6 +366,49 @@ class StickerRepositoryImpl implements IStickerRepository {
 
   void _invalidateCache() {
     _installedPacksCache = null;
+  }
+
+  List<StickerPack> _filterStorePacks(
+    Iterable<StickerPack> packs, {
+    String? category,
+  }) {
+    final filtered = category == null
+        ? packs.toList()
+        : packs.where((pack) => _matchesStoreCategory(pack, category)).toList();
+
+    if (category == 'popular') {
+      filtered.sort((a, b) => b.downloadCount.compareTo(a.downloadCount));
+    } else if (category == 'new') {
+      filtered.sort((a, b) => b.id.compareTo(a.id));
+    }
+
+    return filtered;
+  }
+
+  bool _matchesStoreCategory(StickerPack pack, String category) {
+    switch (category) {
+      case 'popular':
+      case 'new':
+        return true;
+      case 'animals':
+        return pack.id.contains('animal');
+      case 'emotions':
+        return pack.id.contains('emotion');
+      case 'food':
+        return pack.id.contains('food');
+      case 'celebration':
+        return pack.id.contains('celebration');
+      default:
+        return false;
+    }
+  }
+
+  List<StickerPack> _dedupePacksById(Iterable<StickerPack> packs) {
+    final deduped = <String, StickerPack>{};
+    for (final pack in packs) {
+      deduped.putIfAbsent(pack.id, () => pack);
+    }
+    return deduped.values.toList();
   }
 
   void _notifyInstalledPacksChanged() {

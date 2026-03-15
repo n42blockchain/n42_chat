@@ -1,6 +1,5 @@
 import 'dart:async';
 
-
 import '../../domain/entities/voice_room_entity.dart';
 import '../../domain/repositories/voice_room_repository.dart';
 import '../../core/utils/debug_log.dart';
@@ -11,6 +10,7 @@ import '../../core/utils/debug_log.dart';
 /// 管理音频流、角色切换和静音状态。
 class VoiceRoomService {
   final IVoiceRoomRepository _repository;
+  final String? Function()? _currentUserIdProvider;
 
   bool _isConnected = false;
   bool _isMuted = true;
@@ -21,7 +21,9 @@ class VoiceRoomService {
 
   VoiceRoomService({
     required IVoiceRoomRepository repository,
-  }) : _repository = repository;
+    String? Function()? currentUserIdProvider,
+  })  : _repository = repository,
+        _currentUserIdProvider = currentUserIdProvider;
 
   /// 当前是否已连接
   bool get isConnected => _isConnected;
@@ -47,8 +49,12 @@ class VoiceRoomService {
       final joined = await _repository.joinVoiceRoom(roomId);
       if (!joined) return false;
 
-      // 根据角色决定是否启用音频
-      _isMuted = role == VoiceRoomRole.listener;
+      final room = await _repository.getVoiceRoom(roomId);
+      if (room != null) {
+        syncFromRoom(room, fallbackRole: role);
+      } else {
+        _isMuted = role == VoiceRoomRole.listener;
+      }
       _isConnected = true;
 
       _emitState();
@@ -105,9 +111,49 @@ class VoiceRoomService {
   Future<void> toggleMute() async {
     if (_currentRoomId == null || _myRole == VoiceRoomRole.listener) return;
 
-    _isMuted = !_isMuted;
-    await _repository.toggleMute(_currentRoomId!, _isMuted);
+    final nextMuted = !_isMuted;
+    final success = await _repository.toggleMute(_currentRoomId!, nextMuted);
+    if (!success) {
+      throw StateError('Failed to toggle voice room mute state');
+    }
+
+    _isMuted = nextMuted;
     _emitState();
+  }
+
+  /// 从房间参与者列表同步当前用户的真实角色和静音状态。
+  void syncFromRoom(
+    VoiceRoomEntity room, {
+    VoiceRoomRole? fallbackRole,
+  }) {
+    final currentUserId = _currentUserIdProvider?.call();
+    VoiceRoomParticipant? selfParticipant;
+
+    if (currentUserId != null) {
+      for (final participant in room.participants) {
+        if (participant.userId == currentUserId) {
+          selfParticipant = participant;
+          break;
+        }
+      }
+    }
+
+    final previousRole = _myRole;
+    final nextRole = selfParticipant?.role ??
+        ((currentUserId != null && room.creatorId == currentUserId)
+            ? VoiceRoomRole.host
+            : (fallbackRole ?? _myRole));
+
+    _myRole = nextRole;
+
+    if (selfParticipant != null) {
+      _isMuted = selfParticipant.isMuted;
+    } else if (nextRole == VoiceRoomRole.listener) {
+      _isMuted = true;
+    } else if (previousRole == VoiceRoomRole.listener &&
+        nextRole != VoiceRoomRole.listener) {
+      _isMuted = false;
+    }
   }
 
   /// 更新角色（当 power_level 变化时调用）

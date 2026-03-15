@@ -309,6 +309,8 @@ void main() {
     test('stores filePaths', () {
       const e = DeleteSelectedFiles(['/a/b.png', '/c/d.mp4']);
       expect(e.filePaths, ['/a/b.png', '/c/d.mp4']);
+      expect(e.roomId, isNull);
+      expect(e.filterCategory, isNull);
     });
 
     test('empty filePaths stored', () {
@@ -319,6 +321,23 @@ void main() {
       expect(
         const DeleteSelectedFiles(['/a', '/b']),
         equals(const DeleteSelectedFiles(['/a', '/b'])),
+      );
+    });
+
+    test('room context participates in equality', () {
+      expect(
+        const DeleteSelectedFiles(
+          ['/a'],
+          roomId: '!room:server',
+          filterCategory: 'image',
+        ),
+        equals(
+          const DeleteSelectedFiles(
+            ['/a'],
+            roomId: '!room:server',
+            filterCategory: 'image',
+          ),
+        ),
       );
     });
 

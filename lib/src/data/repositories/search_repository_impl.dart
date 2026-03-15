@@ -18,16 +18,13 @@ class SearchRepositoryImpl implements ISearchRepository {
   final EnsCacheService? _ensCacheService;
   final UsernameService? _usernameService;
 
-  // 本地搜索历史
-  final List<String> _searchHistory = [];
-
   SearchRepositoryImpl(
     this._searchDataSource,
     this._clientManager, {
     EnsCacheService? ensCacheService,
     UsernameService? usernameService,
-  })  : _ensCacheService = ensCacheService,
-        _usernameService = usernameService;
+  }) : _ensCacheService = ensCacheService,
+       _usernameService = usernameService;
 
   @override
   Future<SearchResults> searchGlobal(
@@ -82,7 +79,10 @@ class SearchRepositoryImpl implements ISearchRepository {
   }
 
   @override
-  Future<List<SearchResultItem>> searchContacts(String query, {int limit = 20}) async {
+  Future<List<SearchResultItem>> searchContacts(
+    String query, {
+    int limit = 20,
+  }) async {
     final results = <SearchResultItem>[];
 
     // @username 搜索
@@ -90,15 +90,19 @@ class SearchRepositoryImpl implements ISearchRepository {
       final usernameQuery = query.substring(1);
       if (usernameQuery.isNotEmpty) {
         try {
-          final usernameResults = await _usernameService.searchUsernames(usernameQuery);
+          final usernameResults = await _usernameService.searchUsernames(
+            usernameQuery,
+          );
           for (final usernameResult in usernameResults) {
-            results.add(SearchResultItem(
-              type: SearchResultType.contact,
-              id: usernameResult.userId,
-              title: '@${usernameResult.username}',
-              subtitle: usernameResult.userId,
-              matchedKeyword: query,
-            ));
+            results.add(
+              SearchResultItem(
+                type: SearchResultType.contact,
+                id: usernameResult.userId,
+                title: '@${usernameResult.username}',
+                subtitle: usernameResult.userId,
+                matchedKeyword: query,
+              ),
+            );
           }
         } catch (e) {
           debugLog('SearchRepository: Username search failed: $e');
@@ -111,13 +115,16 @@ class SearchRepositoryImpl implements ISearchRepository {
       try {
         final address = await _ensCacheService.resolveEnsName(query);
         if (address != null) {
-          results.add(SearchResultItem(
-            type: SearchResultType.contact,
-            id: 'ens:$query',
-            title: query,
-            subtitle: '${address.substring(0, 6)}...${address.substring(address.length - 4)}',
-            matchedKeyword: query,
-          ));
+          results.add(
+            SearchResultItem(
+              type: SearchResultType.contact,
+              id: 'ens:$query',
+              title: query,
+              subtitle:
+                  '${address.substring(0, 6)}...${address.substring(address.length - 4)}',
+              matchedKeyword: query,
+            ),
+          );
         }
       } catch (e) {
         debugLog('SearchRepository: ENS search failed: $e');
@@ -126,10 +133,12 @@ class SearchRepositoryImpl implements ISearchRepository {
 
     // 常规本地联系人搜索
     final users = _searchDataSource.searchLocalContacts(query);
-    results.addAll(users.take(limit).map((user) {
-      final contact = _mapUserToContact(user);
-      return SearchResultItem.fromContact(contact, matchedKeyword: query);
-    }));
+    results.addAll(
+      users.take(limit).map((user) {
+        final contact = _mapUserToContact(user);
+        return SearchResultItem.fromContact(contact, matchedKeyword: query);
+      }),
+    );
 
     return results.take(limit).toList();
   }
@@ -137,27 +146,47 @@ class SearchRepositoryImpl implements ISearchRepository {
   /// 检查查询是否为 ENS 域名格式
   bool _isEnsQuery(String query) {
     final lower = query.toLowerCase().trim();
-    const ensSuffixes = ['.eth', '.n42', '.xyz', '.app', '.luxe', '.kred', '.art'];
+    const ensSuffixes = [
+      '.eth',
+      '.n42',
+      '.xyz',
+      '.app',
+      '.luxe',
+      '.kred',
+      '.art',
+    ];
     return ensSuffixes.any((suffix) => lower.endsWith(suffix));
   }
 
   @override
-  Future<List<SearchResultItem>> searchGroups(String query, {int limit = 20}) async {
+  Future<List<SearchResultItem>> searchGroups(
+    String query, {
+    int limit = 20,
+  }) async {
     final rooms = _searchDataSource.searchLocalGroups(query);
 
     return rooms.take(limit).map((room) {
       final conversation = _mapRoomToConversation(room);
-      return SearchResultItem.fromConversation(conversation, matchedKeyword: query);
+      return SearchResultItem.fromConversation(
+        conversation,
+        matchedKeyword: query,
+      );
     }).toList();
   }
 
   @override
-  Future<List<SearchResultItem>> searchConversations(String query, {int limit = 20}) async {
+  Future<List<SearchResultItem>> searchConversations(
+    String query, {
+    int limit = 20,
+  }) async {
     final rooms = _searchDataSource.searchLocalConversations(query);
 
     return rooms.take(limit).map((room) {
       final conversation = _mapRoomToConversation(room);
-      return SearchResultItem.fromConversation(conversation, matchedKeyword: query);
+      return SearchResultItem.fromConversation(
+        conversation,
+        matchedKeyword: query,
+      );
     }).toList();
   }
 
@@ -260,34 +289,22 @@ class SearchRepositoryImpl implements ISearchRepository {
 
   @override
   Future<List<String>> getRecentSearches({int limit = 10}) async {
-    return _searchHistory.take(limit).toList();
+    return _searchDataSource.getRecentSearches(limit: limit);
   }
 
   @override
   Future<void> saveSearchQuery(String query) async {
-    final trimmed = query.trim();
-    if (trimmed.isEmpty) return;
-
-    // 移除重复项
-    _searchHistory.remove(trimmed);
-
-    // 添加到开头
-    _searchHistory.insert(0, trimmed);
-
-    // 保持最多20条
-    if (_searchHistory.length > 20) {
-      _searchHistory.removeLast();
-    }
+    await _searchDataSource.saveSearchQuery(query.trim());
   }
 
   @override
   Future<void> deleteSearchQuery(String query) async {
-    _searchHistory.remove(query);
+    await _searchDataSource.deleteSearchQuery(query);
   }
 
   @override
   Future<void> clearSearchHistory() async {
-    _searchHistory.clear();
+    await _searchDataSource.clearSearchHistory();
   }
 
   // ============================================
@@ -307,22 +324,23 @@ class SearchRepositoryImpl implements ISearchRepository {
       avatarUrl: avatarUrl,
     );
   }
-  
+
   /// 构建头像 HTTP URL（不再在 URL 中添加 access_token，改用请求头认证）
   String? _buildAvatarHttpUrl(String? mxcUrl, matrix.Client client) {
     if (mxcUrl == null || mxcUrl.isEmpty) return null;
     if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-    
+
     try {
       final uri = Uri.parse(mxcUrl);
       final serverName = uri.host;
       final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-      
+
       if (serverName.isEmpty || mediaId.isEmpty) return null;
-      
-      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+
+      final homeserver =
+          client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) return null;
-      
+
       // 使用认证媒体 API (Matrix 1.11+)
       return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
     } catch (e) {
@@ -341,7 +359,9 @@ class SearchRepositoryImpl implements ISearchRepository {
       lastMessage: lastEvent?.body,
       lastMessageTime: lastEvent?.originServerTs,
       unreadCount: room.notificationCount,
-      type: room.isDirectChat ? ConversationType.direct : ConversationType.group,
+      type: room.isDirectChat
+          ? ConversationType.direct
+          : ConversationType.group,
       memberCount: room.summary.mJoinedMemberCount ?? 0,
     );
   }

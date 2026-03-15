@@ -12,6 +12,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/story_entity.dart';
+import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
@@ -159,14 +160,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
     // 检查 ContactBloc 是否可用
-    bool hasContactBloc = false;
-    try {
-      context.read<ContactBloc>();
-      hasContactBloc = true;
-    } catch (e) {
-      // ContactBloc 不可用
-      debugLog('Error: $e');
-    }
+    final hasContactBloc = context.read<ContactBloc?>() != null;
 
     final scaffold = Scaffold(
       backgroundColor: bgColor,
@@ -342,9 +336,10 @@ class _ConversationListPageState extends State<ConversationListPage> {
             allUserStories: [myStory],
             initialUserIndex: 0,
             currentUserId: currentUserId,
-            onStoryViewed: () {
+            onStoryViewed: (_) {
               // 自己的 Story 不需要记录查看
             },
+            onDeleteStory: _handleStoryDelete,
           ),
         ),
       );
@@ -368,18 +363,13 @@ class _ConversationListPageState extends State<ConversationListPage> {
           allUserStories: state.userStories,
           initialUserIndex: userIndex,
           currentUserId: currentUserId,
-          onStoryViewed: () {
-            // 记录查看 Story
-            final currentStory = userStory.stories.isNotEmpty
-                ? userStory.stories.first
-                : null;
-            if (currentStory != null) {
-              _storyBloc?.add(ViewStory(currentStory.id));
-            }
+          onStoryViewed: (story) {
+            _storyBloc?.add(ViewStory(story.id));
           },
+          onDeleteStory: _handleStoryDelete,
           onReply: (userId, storyId, message) {
             // 回复 Story：创建私聊并发送消息
-            _handleStoryReply(userId, storyId, message);
+            return _handleStoryReply(userId, storyId, message);
           },
         ),
       ),
@@ -387,14 +377,66 @@ class _ConversationListPageState extends State<ConversationListPage> {
   }
 
   /// 处理 Story 回复
-  void _handleStoryReply(String userId, String storyId, String message) async {
+  Future<bool> _handleStoryReply(
+    String userId,
+    String storyId,
+    String message,
+  ) async {
     debugLog('Reply to story $storyId from user $userId: $message');
     try {
       final roomId = await N42Chat.createDirectMessage(userId);
-      if (!mounted) return;
+      final trimmedMessage = message.trim();
+      if (trimmedMessage.isNotEmpty) {
+        await getIt<IMessageRepository>().sendTextMessage(
+          roomId,
+          trimmedMessage,
+        );
+      }
+      if (!mounted) return false;
       await N42Chat.openConversation(roomId, context: context);
+      return true;
     } catch (e) {
       debugLog('ConversationListPage: Failed to create DM for story reply: $e');
+      if (!mounted) return false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to send story reply')),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> _handleStoryDelete(StoryEntity story) async {
+    final storyBloc = _storyBloc;
+    if (storyBloc == null) {
+      return false;
+    }
+
+    final initialVersion = storyBloc.state.deleteActionVersion;
+    final completer = Completer<bool>();
+    late final StreamSubscription<StoryState> subscription;
+
+    subscription = storyBloc.stream.listen((state) {
+      if (state.deleteActionVersion == initialVersion) {
+        return;
+      }
+      if (state.deleteActionStoryId != story.id) {
+        return;
+      }
+      if (completer.isCompleted) {
+        return;
+      }
+      completer.complete(state.deleteActionStatus == StoryDeleteActionStatus.success);
+    });
+
+    storyBloc.add(DeleteStory(story.id));
+
+    try {
+      return await completer.future.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => false,
+      );
+    } finally {
+      await subscription.cancel();
     }
   }
 
@@ -402,63 +444,12 @@ class _ConversationListPageState extends State<ConversationListPage> {
   void _onAddStory() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => CreateStoryPage(
-          onPost:
-              (
-                content,
-                imageBytes,
-                imageName,
-                backgroundColor,
-                textColor, {
-                String? musicFilePath,
-                String? musicTitle,
-              }) {
-                // 构建媒体输入
-                final media = <StoryMediaInput>[];
-                if (imageBytes != null && imageName != null) {
-                  media.add(
-                    StoryMediaInput(
-                      type: StoryMediaType.image,
-                      bytes: imageBytes,
-                      filename: imageName,
-                      mimeType: _getMimeType(imageName),
-                    ),
-                  );
-                }
-
-                // 发布 Story
-                _storyBloc?.add(
-                  PostStory(
-                    content: content,
-                    media: media,
-                    backgroundColor: backgroundColor,
-                    textColor: textColor,
-                  ),
-                );
-              },
+        builder: (_) => BlocProvider<StoryBloc>.value(
+          value: _storyBloc!,
+          child: const CreateStoryPage(),
         ),
       ),
     );
-  }
-
-  /// 根据文件名获取 MIME 类型
-  String? _getMimeType(String filename) {
-    final ext = filename.split('.').last.toLowerCase();
-    switch (ext) {
-      case 'jpg':
-      case 'jpeg':
-        return 'image/jpeg';
-      case 'png':
-        return 'image/png';
-      case 'gif':
-        return 'image/gif';
-      case 'webp':
-        return 'image/webp';
-      case 'heic':
-        return 'image/heic';
-      default:
-        return 'image/jpeg';
-    }
   }
 
   PreferredSizeWidget _buildAppBar(bool isDark) {

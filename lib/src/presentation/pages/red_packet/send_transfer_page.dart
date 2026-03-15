@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -9,7 +11,7 @@ import '../../widgets/common/slide_to_pay_button.dart';
 class SendTransferPage extends StatefulWidget {
   final String receiverName;
   final String? receiverAvatar;
-  final void Function(String amount, String token, String? memo) onSend;
+  final Future<bool> Function(String amount, String token, String? memo) onSend;
 
   const SendTransferPage({
     super.key,
@@ -27,6 +29,8 @@ class _SendTransferPageState extends State<SendTransferPage> {
   final _memoController = TextEditingController();
   
   String _selectedToken = 'CNY';
+  var _isSending = false;
+  var _submitAttempt = 0;
   final List<String> _tokens = ['CNY', 'ETH', 'USDT', 'BTC'];
   
   /// 获取当前币种的小数位数限制
@@ -71,7 +75,9 @@ class _SendTransferPageState extends State<SendTransferPage> {
     super.dispose();
   }
   
-  void _send() {
+  Future<void> _send() async {
+    if (_isSending) return;
+
     final amount = _amountController.text.trim();
     if (amount.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -79,13 +85,26 @@ class _SendTransferPageState extends State<SendTransferPage> {
       );
       return;
     }
-    
-    widget.onSend(
+
+    setState(() => _isSending = true);
+
+    final success = await widget.onSend(
       amount,
       _selectedToken,
       _memoController.text.trim().isNotEmpty ? _memoController.text.trim() : null,
     );
-    Navigator.of(context).pop();
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.of(context).pop();
+      return;
+    }
+
+    setState(() {
+      _isSending = false;
+      _submitAttempt += 1;
+    });
   }
   
   @override
@@ -232,11 +251,14 @@ class _SendTransferPageState extends State<SendTransferPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SlideToPayButton(
+                key: ValueKey('send_transfer_submit_$_submitAttempt'),
                 label: S.of(context)?.slideToPayLabel ?? '→→→  Slide to confirm',
                 confirmingLabel:
                     S.of(context)?.slideToPayConfirming ?? 'Confirming...',
                 trackColor: const Color(0xFFF9A825),
-                onConfirmed: _send,
+                onConfirmed: () {
+                  unawaited(_send());
+                },
               ),
             ),
           ],
@@ -290,7 +312,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
 class SendTransferDialog extends StatelessWidget {
   final String receiverName;
   final String? receiverAvatar;
-  final void Function(String amount, String token, String? memo) onSend;
+  final Future<bool> Function(String amount, String token, String? memo) onSend;
 
   const SendTransferDialog({
     super.key,

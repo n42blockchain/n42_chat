@@ -38,25 +38,24 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
   ) async {
     if (state.isLoading) return;
 
-    emit(state.copyWith(
-      isLoading: true,
-      clearError: true,
-    ));
+    emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
       final userStories = await _storyRepository.getStories();
       final myStories = await _storyRepository.getMyStories();
 
-      emit(state.copyWith(
-        userStories: userStories,
-        myStories: myStories,
-        isLoading: false,
-      ));
+      emit(
+        state.copyWith(
+          userStories: userStories,
+          myStories: myStories,
+          isLoading: false,
+          currentUserId: myStories.isNotEmpty
+              ? myStories.first.userId
+              : state.currentUserId,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      ));
+      emit(state.copyWith(isLoading: false, error: e.toString()));
     }
   }
 
@@ -67,11 +66,11 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
   ) async {
     await _storiesSubscription?.cancel();
 
-    _storiesSubscription = _storyRepository.watchStories().listen(
-      (userStories) {
-        add(StoriesUpdated(userStories));
-      },
-    );
+    _storiesSubscription = _storyRepository.watchStories().listen((
+      userStories,
+    ) {
+      add(StoriesUpdated(userStories));
+    });
   }
 
   /// 取消订阅 Story 更新
@@ -84,27 +83,23 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
   }
 
   /// 发布新 Story
-  Future<void> _onPostStory(
-    PostStory event,
-    Emitter<StoryState> emit,
-  ) async {
-    emit(state.copyWith(
-      isPosting: true,
-      clearError: true,
-    ));
+  Future<void> _onPostStory(PostStory event, Emitter<StoryState> emit) async {
+    emit(state.copyWith(isPosting: true, clearError: true));
 
     try {
       // 转换 StoryMediaInput 到 StoryMediaData
       final mediaDataList = event.media
-          .map((input) => StoryMediaData(
-                bytes: input.bytes,
-                filename: input.filename,
-                mimeType: input.mimeType,
-                type: input.type,
-                width: input.width,
-                height: input.height,
-                duration: input.duration,
-              ))
+          .map(
+            (input) => StoryMediaData(
+              bytes: input.bytes,
+              filename: input.filename,
+              mimeType: input.mimeType,
+              type: input.type,
+              width: input.width,
+              height: input.height,
+              duration: input.duration,
+            ),
+          )
           .toList();
 
       final story = await _storyRepository.postStory(
@@ -119,16 +114,10 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
         emit(state.copyWith(isPosting: false));
         add(const LoadStories());
       } else {
-        emit(state.copyWith(
-          isPosting: false,
-          error: 'Failed to post story',
-        ));
+        emit(state.copyWith(isPosting: false, error: 'Failed to post story'));
       }
     } catch (e) {
-      emit(state.copyWith(
-        isPosting: false,
-        error: e.toString(),
-      ));
+      emit(state.copyWith(isPosting: false, error: e.toString()));
     }
   }
 
@@ -140,18 +129,31 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
     try {
       await _storyRepository.deleteStory(event.storyId);
 
+      emit(
+        state.copyWith(
+          clearError: true,
+          deleteActionVersion: state.deleteActionVersion + 1,
+          deleteActionStoryId: event.storyId,
+          deleteActionStatus: StoryDeleteActionStatus.success,
+        ),
+      );
+
       // 删除成功后重新加载 Stories
       add(const LoadStories());
     } catch (e) {
-      emit(state.copyWith(error: e.toString()));
+      emit(
+        state.copyWith(
+          error: e.toString(),
+          deleteActionVersion: state.deleteActionVersion + 1,
+          deleteActionStoryId: event.storyId,
+          deleteActionStatus: StoryDeleteActionStatus.failure,
+        ),
+      );
     }
   }
 
   /// 记录查看 Story
-  Future<void> _onViewStory(
-    ViewStory event,
-    Emitter<StoryState> emit,
-  ) async {
+  Future<void> _onViewStory(ViewStory event, Emitter<StoryState> emit) async {
     try {
       await _storyRepository.recordView(event.storyId);
 
@@ -175,10 +177,14 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
   }
 
   /// Stories 更新（来自订阅）
-  void _onStoriesUpdated(
-    StoriesUpdated event,
-    Emitter<StoryState> emit,
-  ) {
-    emit(state.copyWith(userStories: event.userStories));
+  void _onStoriesUpdated(StoriesUpdated event, Emitter<StoryState> emit) {
+    final myStories = state.currentUserId == null
+        ? state.myStories
+        : event.userStories
+              .where((userStory) => userStory.userId == state.currentUserId)
+              .expand((userStory) => userStory.stories)
+              .toList();
+
+    emit(state.copyWith(userStories: event.userStories, myStories: myStories));
   }
 }

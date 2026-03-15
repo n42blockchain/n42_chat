@@ -194,15 +194,17 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         receiverName: _getDisplayName(),
         isGroup: widget.conversation.isGroup,
         memberCount: widget.conversation.memberCount,
-        onSend: (amount, token, greeting, count, isLucky) {
-          _doSendRedPacket(amount, token, greeting, count, isLucky);
+        onSend: (amount, token, greeting, count, isLucky) async {
+          return _doSendRedPacket(amount, token, greeting, count, isLucky);
         },
       ),
     );
   }
 
-  Future<void> _doSendRedPacket(String amount, String token, String greeting, int count, bool isLucky) async {
+  Future<bool> _doSendRedPacket(String amount, String token, String greeting, int count, bool isLucky) async {
     final l10n = S.of(context);
+    final chatBloc = context.read<ChatBloc>();
+    final roomId = chatBloc.state.roomId ?? '';
     final walletBridge = getIt<IWalletBridge>();
 
     // 余额校验
@@ -219,18 +221,19 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
             ),
           );
         }
-        return;
+        return false;
       }
     } catch (e) {
       debugLog('Red packet balance check failed: $e');
     }
 
     // 创建红包
+    late final RedPacketEntity redPacket;
     try {
       final redPacketService = getIt<IRedPacketService>();
       final currentUserId = await getIt<IMessageRepository>().getCurrentUserId() ?? '';
-      await redPacketService.createRedPacket(
-        roomId: context.read<ChatBloc>().state.roomId ?? '',
+      redPacket = await redPacketService.createRedPacket(
+        roomId: roomId,
         totalAmount: double.tryParse(amount) ?? 0,
         totalCount: count,
         token: token,
@@ -241,6 +244,15 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       );
     } catch (e) {
       debugLog('Red packet creation failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to create red packet'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return false;
     }
 
     // 发送红包消息
@@ -248,10 +260,11 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       amount: amount,
       token: token,
       transferStatus: 'pending',
+      redPacketId: redPacket.id,
     );
 
-    if (!mounted) return;
-    context.read<ChatBloc>().add(SendCustomMessage(
+    if (!mounted) return false;
+    chatBloc.add(SendCustomMessage(
       content: greeting,
       type: MessageType.redPacket,
       metadata: metadata,
@@ -264,6 +277,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         backgroundColor: AppColors.success,
       ),
     );
+    return true;
   }
 
   void _sendTransfer() {
@@ -272,14 +286,16 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       builder: (context) => SendTransferDialog(
         receiverName: _getDisplayName(),
         receiverAvatar: widget.conversation.avatarUrl,
-        onSend: (amount, token, memo) {
-          _doSendTransfer(amount, token, memo);
+        onSend: (amount, token, memo) async {
+          return _doSendTransfer(amount, token, memo);
         },
       ),
     );
   }
 
-  void _doSendTransfer(String amount, String token, String? memo) {
+  Future<bool> _doSendTransfer(String amount, String token, String? memo) async {
+    if (!mounted) return false;
+
     // 发送转账消息
     final metadata = MessageMetadata(
       amount: amount,
@@ -300,6 +316,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         backgroundColor: AppColors.primary,
       ),
     );
+    return true;
   }
 
   /// 发送名片

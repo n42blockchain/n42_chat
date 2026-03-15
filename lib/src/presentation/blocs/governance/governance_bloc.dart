@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../domain/entities/governance/proposal_entity.dart';
 import '../../../domain/repositories/governance_repository.dart';
 import 'governance_event.dart';
 import 'governance_state.dart';
@@ -99,6 +100,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
       final votes = await _repository.getVotes(event.proposalId);
       emit(state.copyWith(
         status: GovernanceStatus.loaded,
+        proposals: _mergeProposalIntoList(state.proposals, proposal),
         selectedProposal: proposal,
         votes: votes,
       ));
@@ -128,6 +130,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
       final votes = await _repository.getVotes(event.proposalId);
       emit(state.copyWith(
         status: GovernanceStatus.voted,
+        proposals: _mergeProposalIntoList(state.proposals, proposal),
         selectedProposal: proposal,
         votes: votes,
       ));
@@ -180,5 +183,19 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
       return '${sanitized.substring(0, 200)}...';
     }
     return sanitized;
+  }
+
+  List<ProposalEntity> _mergeProposalIntoList(
+    List<ProposalEntity> proposals,
+    ProposalEntity proposal,
+  ) {
+    final index = proposals.indexWhere((item) => item.id == proposal.id);
+    if (index == -1) {
+      return proposals;
+    }
+
+    final updated = List<ProposalEntity>.from(proposals);
+    updated[index] = proposal;
+    return updated;
   }
 }

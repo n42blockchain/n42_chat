@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
@@ -40,6 +41,9 @@ class VoiceMessageWidget extends StatefulWidget {
   /// 转换后的文字（如果已经转换过）
   final String? convertedText;
 
+  /// 语音服务（测试或宿主注入）
+  final VoiceService? voiceService;
+
   const VoiceMessageWidget({
     super.key,
     required this.duration,
@@ -49,6 +53,7 @@ class VoiceMessageWidget extends StatefulWidget {
     this.onTap,
     this.onConvertToText,
     this.convertedText,
+    this.voiceService,
   });
 
   @override
@@ -58,7 +63,8 @@ class VoiceMessageWidget extends StatefulWidget {
 class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  final VoiceService _voiceService = VoiceService();
+  late final VoiceService _voiceService;
+  late final bool _ownsVoiceService;
   
   bool _isPlaying = false;
   bool _isConverting = false;
@@ -68,6 +74,11 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
   @override
   void initState() {
     super.initState();
+    _voiceService = widget.voiceService ??
+        (getIt.isRegistered<VoiceService>() ? getIt<VoiceService>() : VoiceService());
+    _ownsVoiceService = widget.voiceService == null && !getIt.isRegistered<VoiceService>();
+    unawaited(_voiceService.initialize());
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -110,6 +121,9 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
   void dispose() {
     _playbackSubscription?.cancel();
     _animationController.dispose();
+    if (_ownsVoiceService) {
+      unawaited(_voiceService.dispose());
+    }
     super.dispose();
   }
 

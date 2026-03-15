@@ -413,6 +413,8 @@ extension ChatBlocSendHandlers on ChatBloc {
             'amount': event.metadata?.amount ?? '0',
             'token': event.metadata?.token ?? 'ETH',
             'status': 'pending',
+            if (event.metadata?.redPacketId != null)
+              'red_packet_id': event.metadata!.redPacketId,
           },
         );
       } else if (event.type == MessageType.transfer) {

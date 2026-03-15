@@ -32,6 +32,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
   String? _replyToCommentId;
   String? _replyToUserId;
   String? _replyToUserName;
+  bool _isSubmittingComment = false;
 
   String get _currentUserId =>
       MatrixClientManager.instance.client?.userID ?? '';
@@ -49,8 +50,12 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
   }
 
   Set<String> _getFriendIds() {
+    final contactBloc = context.read<ContactBloc?>();
+    if (contactBloc == null) {
+      return {};
+    }
     try {
-      final contactState = context.read<ContactBloc>().state;
+      final contactState = contactBloc.state;
       if (contactState.isLoaded) {
         return contactState.contacts.map((c) => c.userId).toSet();
       }
@@ -79,7 +84,37 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = S.of(context);
 
-    return BlocBuilder<MomentBloc, MomentState>(
+    return BlocConsumer<MomentBloc, MomentState>(
+      listenWhen: (previous, current) =>
+          _isSubmittingComment &&
+          previous.commentSubmissionVersion != current.commentSubmissionVersion,
+      listener: (context, state) {
+        if (state.commentSubmissionMomentId != widget.moment.id) {
+          return;
+        }
+        if (state.commentSubmissionStatus ==
+            MomentCommentSubmissionStatus.success) {
+          setState(() {
+            _isSubmittingComment = false;
+            _commentController.clear();
+            _replyToCommentId = null;
+            _replyToUserId = null;
+            _replyToUserName = null;
+          });
+          return;
+        }
+        if (state.commentSubmissionStatus ==
+            MomentCommentSubmissionStatus.failure) {
+          setState(() {
+            _isSubmittingComment = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage ?? (s?.commonRetry ?? 'Retry')),
+            ),
+          );
+        }
+      },
       builder: (context, state) {
         // 始终从 Bloc 获取最新 moment 数据（响应点赞/评论变化）
         final moment = _getLatestMoment(context);
@@ -575,7 +610,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
 
           // 发送按钮
           IconButton(
-            onPressed: _sendComment,
+            onPressed: _isSubmittingComment ? null : _sendComment,
             icon: Icon(
               Icons.send,
               color: Theme.of(context).primaryColor,
@@ -604,7 +639,11 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
 
   void _sendComment() {
     final text = _commentController.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty || _isSubmittingComment) return;
+
+    setState(() {
+      _isSubmittingComment = true;
+    });
 
     context.read<MomentBloc>().add(CommentMoment(
           momentId: widget.moment.id,
@@ -612,9 +651,6 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
           replyToCommentId: _replyToCommentId,
           replyToUserId: _replyToUserId,
         ));
-
-    _commentController.clear();
-    _clearReplyTarget();
   }
 
   String _formatCommentTime(DateTime timestamp) {

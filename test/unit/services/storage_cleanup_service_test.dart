@@ -10,6 +10,30 @@ class MockMediaLifecycleService extends Mock implements MediaLifecycleService {}
 
 class MockStorageManagerService extends Mock implements StorageManagerService {}
 
+MediaFile _mediaFile({
+  required String path,
+  required int size,
+  required DateTime lastAccessedAt,
+  String roomId = '!room:s',
+  String category = 'image',
+}) {
+  return MediaFile(
+    filePath: path,
+    mxcUrl: '',
+    roomId: roomId,
+    eventId: null,
+    fileCategory: category,
+    mimeType: 'image/jpeg',
+    fileSize: size,
+    isThumbnail: false,
+    downloadedAt: lastAccessedAt,
+    lastAccessedAt: lastAccessedAt,
+    isCleaned: false,
+    cleanedAt: null,
+    isPinned: false,
+  );
+}
+
 void main() {
   late MockMediaLifecycleService mockLifecycle;
   late MockStorageManagerService mockStorage;
@@ -20,9 +44,9 @@ void main() {
   });
 
   StorageCleanupService buildService() => StorageCleanupService(
-        lifecycleService: mockLifecycle,
-        storageManager: mockStorage,
-      );
+    lifecycleService: mockLifecycle,
+    storageManager: mockStorage,
+  );
 
   // ─────────────────────────────────────────────────
   // Pure data classes — no mocking needed
@@ -153,42 +177,67 @@ void main() {
           preserveThumbnails: any(named: 'preserveThumbnails'),
         ),
       ).thenAnswer((_) async => []);
-      when(() => mockStorage.getStorageUsage())
-          .thenAnswer((_) async => const StorageInfo());
-      when(() => mockLifecycle.getAllRoomStats())
-          .thenAnswer((_) async => []);
+      when(
+        () => mockStorage.getStorageUsage(),
+      ).thenAnswer((_) async => const StorageInfo());
+      when(() => mockLifecycle.getAllRoomStats()).thenAnswer((_) async => []);
 
       final recs = await buildService().getRecommendations();
       expect(recs, isEmpty);
     });
 
-    test('includes roomSpecific recommendation for large rooms (>1MB)', () async {
-      when(
-        () => mockLifecycle.getCleanableFiles(
-          olderThanDays: any(named: 'olderThanDays'),
-          minFileSizeBytes: any(named: 'minFileSizeBytes'),
-          roomId: any(named: 'roomId'),
-          fileCategory: any(named: 'fileCategory'),
-          preserveThumbnails: any(named: 'preserveThumbnails'),
-        ),
-      ).thenAnswer((_) async => []);
-      when(() => mockStorage.getStorageUsage())
-          .thenAnswer((_) async => const StorageInfo(cacheSize: 0));
-      when(() => mockLifecycle.getAllRoomStats())
-          .thenAnswer((_) async => [
-                const RoomMediaStatsResult(
-                  roomId: '!big-room:s',
-                  totalSize: 5 * 1024 * 1024, // 5 MB — above 1MB threshold
-                  totalCount: 20,
-                  categories: {},
-                ),
-              ]);
+    test(
+      'includes roomSpecific recommendation for large rooms (>1MB)',
+      () async {
+        when(
+          () => mockLifecycle.getCleanableFiles(
+            olderThanDays: any(named: 'olderThanDays'),
+            minFileSizeBytes: any(named: 'minFileSizeBytes'),
+            roomId: any(named: 'roomId'),
+            fileCategory: any(named: 'fileCategory'),
+            preserveThumbnails: any(named: 'preserveThumbnails'),
+          ),
+        ).thenAnswer((_) async => []);
+        when(
+          () => mockStorage.getStorageUsage(),
+        ).thenAnswer((_) async => const StorageInfo(cacheSize: 0));
+        when(() => mockLifecycle.getAllRoomStats()).thenAnswer(
+          (_) async => [
+            const RoomMediaStatsResult(
+              roomId: '!big-room:s',
+              totalSize: 5 * 1024 * 1024, // 5 MB — above 1MB threshold
+              totalCount: 20,
+              categories: {},
+            ),
+          ],
+        );
+        when(
+          () => mockLifecycle.getCleanableFiles(
+            olderThanDays: any(named: 'olderThanDays'),
+            minFileSizeBytes: any(named: 'minFileSizeBytes'),
+            roomId: '!big-room:s',
+            fileCategory: any(named: 'fileCategory'),
+            preserveThumbnails: any(named: 'preserveThumbnails'),
+          ),
+        ).thenAnswer(
+          (_) async => [
+            _mediaFile(
+              path: '/tmp/big-room.jpg',
+              size: 2 * 1024 * 1024,
+              lastAccessedAt: DateTime(2025, 1, 1),
+              roomId: '!big-room:s',
+            ),
+          ],
+        );
 
-      final recs = await buildService().getRecommendations();
-      expect(recs.length, 1);
-      expect(recs.first.type, CleanupRecommendationType.roomSpecific);
-      expect(recs.first.roomId, '!big-room:s');
-    });
+        final recs = await buildService().getRecommendations();
+        expect(recs.length, 1);
+        expect(recs.first.type, CleanupRecommendationType.roomSpecific);
+        expect(recs.first.roomId, '!big-room:s');
+        expect(recs.first.estimatedBytes, 2 * 1024 * 1024);
+        expect(recs.first.filePaths, ['/tmp/big-room.jpg']);
+      },
+    );
 
     test('skips small rooms (<1MB) from room stats', () async {
       when(
@@ -200,21 +249,55 @@ void main() {
           preserveThumbnails: any(named: 'preserveThumbnails'),
         ),
       ).thenAnswer((_) async => []);
-      when(() => mockStorage.getStorageUsage())
-          .thenAnswer((_) async => const StorageInfo());
-      when(() => mockLifecycle.getAllRoomStats())
-          .thenAnswer((_) async => [
-                const RoomMediaStatsResult(
-                  roomId: '!small-room:s',
-                  totalSize: 500 * 1024, // 500 KB — below 1MB threshold
-                  totalCount: 5,
-                  categories: {},
-                ),
-              ]);
+      when(
+        () => mockStorage.getStorageUsage(),
+      ).thenAnswer((_) async => const StorageInfo());
+      when(() => mockLifecycle.getAllRoomStats()).thenAnswer(
+        (_) async => [
+          const RoomMediaStatsResult(
+            roomId: '!small-room:s',
+            totalSize: 500 * 1024, // 500 KB — below 1MB threshold
+            totalCount: 5,
+            categories: {},
+          ),
+        ],
+      );
 
       final recs = await buildService().getRecommendations();
       expect(recs, isEmpty);
     });
+
+    test(
+      'skips roomSpecific recommendation when room total is large but nothing is cleanable',
+      () async {
+        when(
+          () => mockLifecycle.getCleanableFiles(
+            olderThanDays: any(named: 'olderThanDays'),
+            minFileSizeBytes: any(named: 'minFileSizeBytes'),
+            roomId: any(named: 'roomId'),
+            fileCategory: any(named: 'fileCategory'),
+            preserveThumbnails: any(named: 'preserveThumbnails'),
+          ),
+        ).thenAnswer((_) async => []);
+        when(
+          () => mockStorage.getStorageUsage(),
+        ).thenAnswer((_) async => const StorageInfo());
+        when(() => mockLifecycle.getAllRoomStats()).thenAnswer(
+          (_) async => [
+            const RoomMediaStatsResult(
+              roomId: '!thumbnail-only:s',
+              totalSize: 10 * 1024 * 1024,
+              totalCount: 50,
+              categories: {},
+            ),
+          ],
+        );
+
+        final recs = await buildService().getRecommendations();
+
+        expect(recs, isEmpty);
+      },
+    );
 
     test('includes cache recommendation when cacheSize > 0', () async {
       when(
@@ -226,13 +309,16 @@ void main() {
           preserveThumbnails: any(named: 'preserveThumbnails'),
         ),
       ).thenAnswer((_) async => []);
-      when(() => mockStorage.getStorageUsage())
-          .thenAnswer((_) async => const StorageInfo(cacheSize: 2 * 1024 * 1024));
-      when(() => mockLifecycle.getAllRoomStats())
-          .thenAnswer((_) async => []);
+      when(
+        () => mockStorage.getStorageUsage(),
+      ).thenAnswer((_) async => const StorageInfo(cacheSize: 2 * 1024 * 1024));
+      when(() => mockLifecycle.getAllRoomStats()).thenAnswer((_) async => []);
 
       final recs = await buildService().getRecommendations();
-      expect(recs.any((r) => r.type == CleanupRecommendationType.cache), isTrue);
+      expect(
+        recs.any((r) => r.type == CleanupRecommendationType.cache),
+        isTrue,
+      );
     });
 
     test('returns empty list on exception (defensive)', () async {
@@ -277,8 +363,10 @@ void main() {
 
     test('oldMedia type calls cleanupFiles with file paths', () async {
       const cleanupResult = CleanupResult(filesDeleted: 3, bytesFreed: 3072);
-      when(() => mockLifecycle.cleanupFiles(any()))
-          .thenAnswer((_) async => cleanupResult);
+      when(
+        () => mockLifecycle.cleanupFiles(any()),
+      ).thenAnswer((_) async => cleanupResult);
+      when(() => mockStorage.invalidateCache()).thenReturn(null);
 
       const rec = CleanupRecommendation(
         type: CleanupRecommendationType.oldMedia,
@@ -291,9 +379,14 @@ void main() {
 
       final result = await buildService().executeRecommendation(rec);
 
-      verify(() => mockLifecycle.cleanupFiles(
-            ['/tmp/a.jpg', '/tmp/b.jpg', '/tmp/c.jpg'],
-          )).called(1);
+      verify(
+        () => mockLifecycle.cleanupFiles([
+          '/tmp/a.jpg',
+          '/tmp/b.jpg',
+          '/tmp/c.jpg',
+        ]),
+      ).called(1);
+      verify(() => mockStorage.invalidateCache()).called(1);
       expect(result.filesDeleted, 3);
     });
 
@@ -312,7 +405,42 @@ void main() {
       expect(result.bytesFreed, 0);
     });
 
-    test('forwards preserveThumbnails=false when generating recommendations', () async {
+    test(
+      'forwards preserveThumbnails=false when generating recommendations',
+      () async {
+        when(
+          () => mockLifecycle.getCleanableFiles(
+            olderThanDays: any(named: 'olderThanDays'),
+            minFileSizeBytes: any(named: 'minFileSizeBytes'),
+            roomId: any(named: 'roomId'),
+            fileCategory: any(named: 'fileCategory'),
+            preserveThumbnails: any(named: 'preserveThumbnails'),
+          ),
+        ).thenAnswer((_) async => []);
+        when(
+          () => mockStorage.getStorageUsage(),
+        ).thenAnswer((_) async => const StorageInfo());
+        when(() => mockLifecycle.getAllRoomStats()).thenAnswer((_) async => []);
+
+        await buildService().getRecommendations(preserveThumbnails: false);
+
+        verify(
+          () => mockLifecycle.getCleanableFiles(
+            olderThanDays: StorageConstants.defaultCleanupDays,
+            minFileSizeBytes: null,
+            roomId: null,
+            fileCategory: null,
+            preserveThumbnails: false,
+          ),
+        ).called(1);
+      },
+    );
+  });
+
+  group('StorageCleanupService.cleanupByDateRange', () {
+    test('respects both startDate and endDate when filtering files', () async {
+      final startDate = DateTime(2025, 1, 10);
+      final endDate = DateTime(2025, 1, 20);
       when(
         () => mockLifecycle.getCleanableFiles(
           olderThanDays: any(named: 'olderThanDays'),
@@ -321,23 +449,57 @@ void main() {
           fileCategory: any(named: 'fileCategory'),
           preserveThumbnails: any(named: 'preserveThumbnails'),
         ),
-      ).thenAnswer((_) async => []);
-      when(() => mockStorage.getStorageUsage())
-          .thenAnswer((_) async => const StorageInfo());
-      when(() => mockLifecycle.getAllRoomStats())
-          .thenAnswer((_) async => []);
+      ).thenAnswer(
+        (_) async => [
+          _mediaFile(
+            path: '/tmp/before.jpg',
+            size: 100,
+            lastAccessedAt: DateTime(2025, 1, 5),
+          ),
+          _mediaFile(
+            path: '/tmp/inside.jpg',
+            size: 200,
+            lastAccessedAt: DateTime(2025, 1, 15),
+          ),
+          _mediaFile(
+            path: '/tmp/after.jpg',
+            size: 300,
+            lastAccessedAt: DateTime(2025, 1, 25),
+          ),
+        ],
+      );
+      when(() => mockLifecycle.cleanupFiles(any())).thenAnswer(
+        (_) async => const CleanupResult(filesDeleted: 1, bytesFreed: 200),
+      );
+      when(() => mockStorage.invalidateCache()).thenReturn(null);
 
-      await buildService().getRecommendations(preserveThumbnails: false);
+      final result = await buildService().cleanupByDateRange(
+        startDate: startDate,
+        endDate: endDate,
+      );
 
-      verify(
+      verify(() => mockLifecycle.cleanupFiles(['/tmp/inside.jpg'])).called(1);
+      verify(() => mockStorage.invalidateCache()).called(1);
+      expect(result.filesDeleted, 1);
+      expect(result.bytesFreed, 200);
+    });
+
+    test('returns empty result when startDate is after endDate', () async {
+      final result = await buildService().cleanupByDateRange(
+        startDate: DateTime(2025, 2, 1),
+        endDate: DateTime(2025, 1, 1),
+      );
+
+      expect(result, const CleanupResult());
+      verifyNever(
         () => mockLifecycle.getCleanableFiles(
-          olderThanDays: StorageConstants.defaultCleanupDays,
-          minFileSizeBytes: null,
-          roomId: null,
-          fileCategory: null,
-          preserveThumbnails: false,
+          olderThanDays: any(named: 'olderThanDays'),
+          minFileSizeBytes: any(named: 'minFileSizeBytes'),
+          roomId: any(named: 'roomId'),
+          fileCategory: any(named: 'fileCategory'),
+          preserveThumbnails: any(named: 'preserveThumbnails'),
         ),
-      ).called(1);
+      );
     });
   });
 }

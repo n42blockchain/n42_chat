@@ -39,6 +39,8 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
   bool _showLeaderboard = true;
   List<RewardRule> _rules = [];
   bool _isDirty = false;
+  bool _isSaving = false;
+  bool _hasAppliedInitialConfig = false;
 
   @override
   void initState() {
@@ -76,6 +78,8 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
   }
 
   void _save() {
+    if (_isSaving) return;
+
     final dailyLimit = int.tryParse(_dailyLimitController.text);
     final config = PointsConfig(
       roomId: widget.roomId,
@@ -92,8 +96,8 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
       dailyEarnLimit: dailyLimit,
     );
 
+    setState(() => _isSaving = true);
     context.read<PointsBloc>().add(PointsUpdateConfig(config: config));
-    setState(() => _isDirty = false);
   }
 
   @override
@@ -123,12 +127,20 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
       ),
       body: BlocConsumer<PointsBloc, PointsState>(
         listener: (context, state) {
-          if (state.config != null &&
-              state.status == PointsStatus.loaded &&
-              !_isDirty) {
+          final shouldApplyInitialConfig =
+              !_hasAppliedInitialConfig && state.config != null && state.status == PointsStatus.loaded;
+          final shouldApplySavedConfig =
+              _isSaving && state.config != null && state.status == PointsStatus.loaded;
+
+          if (shouldApplyInitialConfig || shouldApplySavedConfig) {
             _applyConfig(state.config!);
+            _hasAppliedInitialConfig = true;
+            _isSaving = false;
           }
           if (state.status == PointsStatus.error) {
+            if (_isSaving) {
+              setState(() => _isSaving = false);
+            }
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content:

@@ -37,7 +37,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
   /// 防抖转换器
   EventTransformer<T> _debounce<T>(Duration duration) {
-    return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
+    return (events, mapper) => events.debounceTime(duration).switchMap(mapper);
   }
 
   Future<void> _onPerformSearch(
@@ -61,11 +61,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       );
       final history = await _searchRepository.getRecentSearches();
 
-      emit(SearchLoaded(
-        results: results,
-        selectedType: event.type ?? SearchResultType.all,
-        recentSearches: history,
-      ));
+      emit(
+        SearchLoaded(
+          results: results,
+          selectedType: event.type ?? SearchResultType.all,
+          recentSearches: history,
+        ),
+      );
     } catch (e) {
       emit(SearchError(e.toString()));
     }
@@ -139,10 +141,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     }
   }
 
-  void _onChangeSearchType(
-    ChangeSearchType event,
-    Emitter<SearchState> emit,
-  ) {
+  void _onChangeSearchType(ChangeSearchType event, Emitter<SearchState> emit) {
     if (state is SearchLoaded) {
       final currentState = state as SearchLoaded;
       emit(currentState.copyWith(selectedType: event.type));
@@ -156,22 +155,19 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final query = event.query.trim();
 
     if (query.isEmpty) {
-      emit(ChatSearchState(
-        results: ChatSearchResults(roomId: event.roomId),
-      ));
+      emit(ChatSearchState(results: ChatSearchResults(roomId: event.roomId)));
       return;
     }
 
-    emit(ChatSearchState(
-      results: ChatSearchResults(roomId: event.roomId, query: query),
-      isSearching: true,
-    ));
+    emit(
+      ChatSearchState(
+        results: ChatSearchResults(roomId: event.roomId, query: query),
+        isSearching: true,
+      ),
+    );
 
     try {
-      final results = await _searchRepository.searchInChat(
-        event.roomId,
-        query,
-      );
+      final results = await _searchRepository.searchInChat(event.roomId, query);
       emit(ChatSearchState(results: results));
     } catch (e) {
       emit(SearchError(e.toString()));
@@ -185,11 +181,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     if (state is ChatSearchState) {
       final currentState = state as ChatSearchState;
       if (currentState.results.hasNext) {
-        emit(currentState.copyWith(
-          results: currentState.results.copyWith(
-            currentIndex: currentState.results.currentIndex + 1,
+        emit(
+          currentState.copyWith(
+            results: currentState.results.copyWith(
+              currentIndex: currentState.results.currentIndex + 1,
+            ),
           ),
-        ));
+        );
       }
     }
   }
@@ -201,11 +199,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     if (state is ChatSearchState) {
       final currentState = state as ChatSearchState;
       if (currentState.results.hasPrevious) {
-        emit(currentState.copyWith(
-          results: currentState.results.copyWith(
-            currentIndex: currentState.results.currentIndex - 1,
+        emit(
+          currentState.copyWith(
+            results: currentState.results.copyWith(
+              currentIndex: currentState.results.currentIndex - 1,
+            ),
           ),
-        ));
+        );
       }
     }
   }
@@ -217,11 +217,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     if (state is ChatSearchState) {
       final currentState = state as ChatSearchState;
       if (event.index >= 0 && event.index < currentState.results.totalCount) {
-        emit(currentState.copyWith(
-          results: currentState.results.copyWith(
-            currentIndex: event.index,
+        emit(
+          currentState.copyWith(
+            results: currentState.results.copyWith(currentIndex: event.index),
           ),
-        ));
+        );
       }
     }
   }
@@ -247,4 +247,3 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     }
   }
 }
-

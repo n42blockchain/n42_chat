@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -31,16 +33,16 @@ void main() {
       'emits SearchInitial with history from repository',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.getRecentSearches())
-            .thenAnswer((_) async => ['alice', 'bob']);
+        when(
+          () => mockRepo.getRecentSearches(),
+        ).thenAnswer((_) async => ['alice', 'bob']);
       },
       act: (bloc) => bloc.add(const ClearSearch()),
       expect: () => [
-        isA<SearchInitial>().having(
-          (s) => s.recentSearches,
-          'recentSearches',
-          ['alice', 'bob'],
-        ),
+        isA<SearchInitial>().having((s) => s.recentSearches, 'recentSearches', [
+          'alice',
+          'bob',
+        ]),
       ],
     );
   });
@@ -50,16 +52,16 @@ void main() {
       'emits SearchInitial with history',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.getRecentSearches())
-            .thenAnswer((_) async => ['term1', 'term2']);
+        when(
+          () => mockRepo.getRecentSearches(),
+        ).thenAnswer((_) async => ['term1', 'term2']);
       },
       act: (bloc) => bloc.add(const LoadSearchHistory()),
       expect: () => [
-        isA<SearchInitial>().having(
-          (s) => s.recentSearches,
-          'recentSearches',
-          ['term1', 'term2'],
-        ),
+        isA<SearchInitial>().having((s) => s.recentSearches, 'recentSearches', [
+          'term1',
+          'term2',
+        ]),
       ],
     );
   });
@@ -88,14 +90,16 @@ void main() {
       'emits SearchInitial with history when query is empty',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.getRecentSearches())
-            .thenAnswer((_) async => ['prev']);
+        when(
+          () => mockRepo.getRecentSearches(),
+        ).thenAnswer((_) async => ['prev']);
       },
       act: (bloc) => bloc.add(const PerformSearch('')),
       wait: const Duration(milliseconds: 400),
       expect: () => [
-        isA<SearchInitial>()
-            .having((s) => s.recentSearches, 'recentSearches', ['prev']),
+        isA<SearchInitial>().having((s) => s.recentSearches, 'recentSearches', [
+          'prev',
+        ]),
       ],
     );
 
@@ -103,10 +107,10 @@ void main() {
       'emits [SearchLoading, SearchLoaded] on success',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.searchGlobal(any(), type: any(named: 'type')))
-            .thenAnswer((_) async => const SearchResults(query: 'alice'));
-        when(() => mockRepo.getRecentSearches())
-            .thenAnswer((_) async => []);
+        when(
+          () => mockRepo.searchGlobal(any(), type: any(named: 'type')),
+        ).thenAnswer((_) async => const SearchResults(query: 'alice'));
+        when(() => mockRepo.getRecentSearches()).thenAnswer((_) async => []);
       },
       act: (bloc) => bloc.add(const PerformSearch('alice')),
       wait: const Duration(milliseconds: 400),
@@ -120,23 +124,22 @@ void main() {
       'emits [SearchLoading, SearchError] on failure',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.searchGlobal(any(), type: any(named: 'type')))
-            .thenThrow(Exception('Search failed'));
+        when(
+          () => mockRepo.searchGlobal(any(), type: any(named: 'type')),
+        ).thenThrow(Exception('Search failed'));
       },
       act: (bloc) => bloc.add(const PerformSearch('query')),
       wait: const Duration(milliseconds: 400),
-      expect: () => [
-        isA<SearchLoading>(),
-        isA<SearchError>(),
-      ],
+      expect: () => [isA<SearchLoading>(), isA<SearchError>()],
     );
 
     blocTest<SearchBloc, SearchState>(
       'debounces multiple rapid searches',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.searchGlobal(any(), type: any(named: 'type')))
-            .thenAnswer((_) async => const SearchResults());
+        when(
+          () => mockRepo.searchGlobal(any(), type: any(named: 'type')),
+        ).thenAnswer((_) async => const SearchResults());
         when(() => mockRepo.getRecentSearches()).thenAnswer((_) async => []);
       },
       act: (bloc) {
@@ -147,8 +150,59 @@ void main() {
       wait: const Duration(milliseconds: 500),
       verify: (_) {
         // Only 1 actual search call (debounced)
-        verify(() => mockRepo.searchGlobal('alice', type: any(named: 'type')))
-            .called(1);
+        verify(
+          () => mockRepo.searchGlobal('alice', type: any(named: 'type')),
+        ).called(1);
+      },
+    );
+
+    test(
+      'keeps the latest results when an older request finishes later',
+      () async {
+        final oldCompleter = Completer<SearchResults>();
+        final newCompleter = Completer<SearchResults>();
+
+        when(
+          () => mockRepo.searchGlobal('old', type: any(named: 'type')),
+        ).thenAnswer((_) => oldCompleter.future);
+        when(
+          () => mockRepo.searchGlobal('new', type: any(named: 'type')),
+        ).thenAnswer((_) => newCompleter.future);
+        when(() => mockRepo.getRecentSearches()).thenAnswer((_) async => []);
+
+        final bloc = buildBloc();
+
+        bloc.add(const PerformSearch('old'));
+        await Future<void>.delayed(const Duration(milliseconds: 350));
+
+        bloc.add(const PerformSearch('new'));
+        await Future<void>.delayed(const Duration(milliseconds: 350));
+
+        newCompleter.complete(const SearchResults(query: 'new'));
+        await pumpEventQueue();
+
+        expect(
+          bloc.state,
+          isA<SearchLoaded>().having(
+            (s) => s.results.query,
+            'results.query',
+            'new',
+          ),
+        );
+
+        oldCompleter.complete(const SearchResults(query: 'old'));
+        await pumpEventQueue();
+
+        expect(
+          bloc.state,
+          isA<SearchLoaded>().having(
+            (s) => s.results.query,
+            'results.query',
+            'new',
+          ),
+        );
+
+        await bloc.close();
       },
     );
   });
@@ -161,9 +215,7 @@ void main() {
         results: SearchResults(),
         selectedType: SearchResultType.all,
       ),
-      act: (bloc) => bloc.add(
-        const ChangeSearchType(SearchResultType.contact),
-      ),
+      act: (bloc) => bloc.add(const ChangeSearchType(SearchResultType.contact)),
       expect: () => [
         isA<SearchLoaded>().having(
           (s) => s.selectedType,
@@ -176,10 +228,8 @@ void main() {
     blocTest<SearchBloc, SearchState>(
       'does nothing when state is not SearchLoaded',
       build: buildBloc,
-      act: (bloc) => bloc.add(
-        const ChangeSearchType(SearchResultType.message),
-      ),
-      expect: () => [],
+      act: (bloc) => bloc.add(const ChangeSearchType(SearchResultType.message)),
+      expect: () => <SearchState>[],
     );
   });
 
@@ -189,17 +239,16 @@ void main() {
       build: buildBloc,
       setUp: () {
         when(() => mockRepo.deleteSearchQuery(any())).thenAnswer((_) async {});
-        when(() => mockRepo.getRecentSearches())
-            .thenAnswer((_) async => ['bob']);
+        when(
+          () => mockRepo.getRecentSearches(),
+        ).thenAnswer((_) async => ['bob']);
       },
       seed: () => const SearchInitial(recentSearches: ['alice', 'bob']),
       act: (bloc) => bloc.add(const DeleteSearchHistoryItem('alice')),
       expect: () => [
-        isA<SearchInitial>().having(
-          (s) => s.recentSearches,
-          'recentSearches',
-          ['bob'],
-        ),
+        isA<SearchInitial>().having((s) => s.recentSearches, 'recentSearches', [
+          'bob',
+        ]),
       ],
     );
   });

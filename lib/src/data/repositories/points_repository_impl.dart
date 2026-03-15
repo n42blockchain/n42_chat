@@ -83,14 +83,16 @@ class PointsRepositoryImpl implements IPointsRepository {
       'showLeaderboard': config.showLeaderboard,
       'dailyEarnLimit': config.dailyEarnLimit,
       'rules': config.rules
-          .map((r) => {
-                'id': r.id,
-                'action': r.action.name,
-                'points': r.points,
-                'dailyLimit': r.dailyLimit,
-                'cooldownSeconds': r.cooldown?.inSeconds,
-                'isEnabled': r.isEnabled,
-              })
+          .map(
+            (r) => {
+              'id': r.id,
+              'action': r.action.name,
+              'points': r.points,
+              'dailyLimit': r.dailyLimit,
+              'cooldownSeconds': r.cooldown?.inSeconds,
+              'isEnabled': r.isEnabled,
+            },
+          )
           .toList(),
     });
   }
@@ -125,19 +127,26 @@ class PointsRepositoryImpl implements IPointsRepository {
 
   PointsConfig _parseConfig(Map<String, dynamic> data) {
     final rulesData = data['rules'] as List<dynamic>? ?? [];
-    final rules = rulesData.map((r) {
-      final ruleMap = r as Map<String, dynamic>;
-      return RewardRule(
-        id: ruleMap['id'] as String? ?? '',
-        action: _parseAction(ruleMap['action'] as String? ?? ''),
-        points: ruleMap['points'] as int? ?? 0,
-        dailyLimit: ruleMap['dailyLimit'] as int?,
-        cooldown: ruleMap['cooldownSeconds'] != null
-            ? Duration(seconds: ruleMap['cooldownSeconds'] as int)
-            : null,
-        isEnabled: ruleMap['isEnabled'] as bool? ?? true,
-      );
-    }).toList();
+    final rules = rulesData
+        .whereType<Map<String, dynamic>>()
+        .map((ruleMap) {
+          final action = _parseAction(ruleMap['action'] as String? ?? '');
+          if (action == null) {
+            return null;
+          }
+          return RewardRule(
+            id: ruleMap['id'] as String? ?? '',
+            action: action,
+            points: ruleMap['points'] as int? ?? 0,
+            dailyLimit: ruleMap['dailyLimit'] as int?,
+            cooldown: ruleMap['cooldownSeconds'] != null
+                ? Duration(seconds: ruleMap['cooldownSeconds'] as int)
+                : null,
+            isEnabled: ruleMap['isEnabled'] as bool? ?? true,
+          );
+        })
+        .whereType<RewardRule>()
+        .toList();
 
     return PointsConfig(
       roomId: data['roomId'] as String? ?? '',
@@ -151,11 +160,13 @@ class PointsRepositoryImpl implements IPointsRepository {
     );
   }
 
-  PointsAction _parseAction(String action) {
-    return PointsAction.values.firstWhere(
-      (a) => a.name == action,
-      orElse: () => PointsAction.sendMessage,
-    );
+  PointsAction? _parseAction(String action) {
+    for (final candidate in PointsAction.values) {
+      if (candidate.name == action) {
+        return candidate;
+      }
+    }
+    return null;
   }
 
   RedemptionItem _parseRedemptionItem(Map<String, dynamic> json) {

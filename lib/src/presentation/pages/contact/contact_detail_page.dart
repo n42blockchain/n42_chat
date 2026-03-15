@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -52,6 +54,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   bool _isStarred = false;
   bool _isFriend = false;
   bool _isAddingFriend = false;
+  StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
 
   @override
   void initState() {
@@ -59,32 +62,83 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadContact();
     });
+    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen(
+      _handleRemarkUpdate,
+    );
   }
-  
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _loadContact();
-  }
-  
+
   void _loadContact() {
-    try {
-      final contactState = context.read<ContactBloc>().state;
-      if (contactState.isLoaded) {
-        final contact = contactState.contacts.where(
-          (c) => c.userId == widget.userId
-        ).firstOrNull;
-        if (mounted) {
+    final contactBloc = _maybeContactBloc();
+    if (contactBloc == null) return;
+
+    final contactState = contactBloc.state;
+    if (contactState.isLoaded) {
+      final contact = contactState.contacts.where(
+        (ContactEntity c) => c.userId == widget.userId
+      ).firstOrNull;
+      if (mounted) {
+        final nextContact = _mergeRemarkIntoContact(contact);
+        final nextIsFriend = nextContact != null;
+        if (_contact != nextContact || _isFriend != nextIsFriend) {
           setState(() {
-            _contact = contact;
-            _isFriend = contact != null;
+            _contact = nextContact;
+            _isFriend = nextIsFriend;
           });
         }
       }
-    } catch (e) {
-      // ContactBloc 可能不可用，忽略
-      debugLog('Error: $e');
     }
+  }
+
+  ContactBloc? _maybeContactBloc() {
+    return context.read<ContactBloc?>();
+  }
+
+  ContactEntity? _mergeRemarkIntoContact(ContactEntity? contact) {
+    if (contact == null) return null;
+    final cachedRemark = RemarkService.instance.getRemark(widget.userId);
+    if (cachedRemark == contact.remark) {
+      return contact;
+    }
+    return _copyContactWithRemark(contact, cachedRemark);
+  }
+
+  ContactEntity _copyContactWithRemark(ContactEntity contact, String? remark) {
+    return ContactEntity(
+      userId: contact.userId,
+      displayName: contact.displayName,
+      avatarUrl: contact.avatarUrl,
+      presence: contact.presence,
+      lastActiveTime: contact.lastActiveTime,
+      statusMessage: contact.statusMessage,
+      remark: remark,
+      isBlocked: contact.isBlocked,
+      isFriend: contact.isFriend,
+      directRoomId: contact.directRoomId,
+      tags: contact.tags,
+      n42Username: contact.n42Username,
+      walletAddress: contact.walletAddress,
+      ensName: contact.ensName,
+    );
+  }
+
+  void _handleRemarkUpdate(RemarkUpdateEvent event) {
+    if (!mounted || event.userId != widget.userId) return;
+    setState(() {
+      final baseContact =
+          _contact ??
+          ContactEntity(
+            userId: widget.userId,
+            displayName: widget.displayName,
+            avatarUrl: widget.avatarUrl,
+          );
+      _contact = _copyContactWithRemark(baseContact, event.remark);
+    });
+  }
+
+  @override
+  void dispose() {
+    _remarkSubscription?.cancel();
+    super.dispose();
   }
   
   String get _effectiveDisplayName {
@@ -122,14 +176,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
     
     // 检查 ContactBloc 是否可用
-    bool hasContactBloc = false;
-    try {
-      context.read<ContactBloc>();
-      hasContactBloc = true;
-    } catch (e) {
-      // ContactBloc 不可用
-      debugLog('Error: $e');
-    }
+    final hasContactBloc = _maybeContactBloc() != null;
     
     final Widget scaffold = Scaffold(
         backgroundColor: bgColor,
@@ -291,7 +338,12 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
           if (state.status == ContactStatus.remarkUpdated && state.updatedRemarkUserId == widget.userId) {
-            _loadContact();
+            _handleRemarkUpdate(
+              RemarkUpdateEvent(
+                userId: widget.userId,
+                remark: state.updatedRemark,
+              ),
+            );
           } else if (state.status == ContactStatus.loaded) {
             _loadContact();
           }
@@ -570,13 +622,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
 
   void _openSettings() {
     // 获取当前的 ContactBloc
-    ContactBloc? contactBloc;
-    try {
-      contactBloc = context.read<ContactBloc>();
-    } catch (e) {
-      // ContactBloc 可能不可用
-      debugLog('Error: $e');
-    }
+    final contactBloc = _maybeContactBloc();
 
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -609,13 +655,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   
   void _openFriendInfo() {
     // 获取当前的 ContactBloc
-    ContactBloc? contactBloc;
-    try {
-      contactBloc = context.read<ContactBloc>();
-    } catch (e) {
-      // ContactBloc 可能不可用
-      debugLog('Error: $e');
-    }
+    final contactBloc = _maybeContactBloc();
     
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -624,7 +664,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
             userId: widget.userId,
             displayName: widget.displayName,
             avatarUrl: widget.avatarUrl,
-            remark: _contact?.remark,
+            remark: RemarkService.instance.getRemark(widget.userId) ?? _contact?.remark,
           );
           
           if (contactBloc != null) {
@@ -661,12 +701,22 @@ class FriendInfoPage extends StatefulWidget {
 
 class _FriendInfoPageState extends State<FriendInfoPage> {
   String? _currentRemark;
+  StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
   
   @override
   void initState() {
     super.initState();
     _currentRemark = widget.remark;
     _loadRemark();
+    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen(
+      _handleRemarkUpdate,
+    );
+  }
+
+  @override
+  void dispose() {
+    _remarkSubscription?.cancel();
+    super.dispose();
   }
   
   void _loadRemark() {
@@ -680,22 +730,31 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     }
     
     // 备用：从 ContactBloc 获取
-    try {
-      final contactState = context.read<ContactBloc>().state;
-      if (contactState.isLoaded) {
-        final contact = contactState.contacts.where(
-          (c) => c.userId == widget.userId
-        ).firstOrNull;
-        if (contact != null && mounted) {
-          setState(() {
-            _currentRemark = contact.remark;
-          });
-        }
+    final contactBloc = _maybeContactBloc();
+    if (contactBloc == null) return;
+
+    final contactState = contactBloc.state;
+    if (contactState.isLoaded) {
+      final contact = contactState.contacts.where(
+        (ContactEntity c) => c.userId == widget.userId
+      ).firstOrNull;
+      if (contact != null && mounted) {
+        setState(() {
+          _currentRemark = contact.remark;
+        });
       }
-    } catch (e) {
-      // ContactBloc 可能不可用
-      debugLog('Error: $e');
     }
+  }
+
+  ContactBloc? _maybeContactBloc() {
+    return context.read<ContactBloc?>();
+  }
+
+  void _handleRemarkUpdate(RemarkUpdateEvent event) {
+    if (!mounted || event.userId != widget.userId) return;
+    setState(() {
+      _currentRemark = event.remark;
+    });
   }
 
   @override
@@ -709,14 +768,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
     
     // 检查 ContactBloc 是否可用
-    bool hasContactBloc = false;
-    try {
-      context.read<ContactBloc>();
-      hasContactBloc = true;
-    } catch (e) {
-      // ContactBloc 不可用
-      debugLog('Error: $e');
-    }
+    final hasContactBloc = _maybeContactBloc() != null;
     
     final Widget scaffold = Scaffold(
       backgroundColor: bgColor,
@@ -846,9 +898,12 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
           if (state.status == ContactStatus.remarkUpdated && state.updatedRemarkUserId == widget.userId) {
-            setState(() {
-              _currentRemark = state.updatedRemark;
-            });
+            _handleRemarkUpdate(
+              RemarkUpdateEvent(
+                userId: widget.userId,
+                remark: state.updatedRemark,
+              ),
+            );
           } else if (state.status == ContactStatus.loaded) {
             _loadRemark();
           }
@@ -1496,41 +1551,40 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
       ),
     );
 
-    try {
-      context.read<ContactBloc>();
-      return BlocListener<ContactBloc, ContactState>(
-        listenWhen: (previous, current) =>
-            _isSaving &&
-            (previous.status != current.status ||
-                previous.updatedRemarkUserId != current.updatedRemarkUserId ||
-                previous.errorMessage != current.errorMessage),
-        listener: (context, state) {
-          if (state.status == ContactStatus.remarkUpdated &&
-              state.updatedRemarkUserId == widget.userId) {
-            final savedRemark = _pendingRemarkToSave;
-            setState(() {
-              _isSaving = false;
-              _pendingRemarkToSave = null;
-            });
-            Navigator.of(context).pop(savedRemark);
-          } else if (state.status == ContactStatus.error) {
-            final errorMessage = state.errorMessage ?? 'Failed to save remark';
-            setState(() {
-              _isSaving = false;
-              _pendingRemarkToSave = null;
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(errorMessage),
-                backgroundColor: AppColors.error,
-              ),
-            );
-          }
-        },
-        child: scaffold,
-      );
-    } catch (_) {
+    if (context.read<ContactBloc?>() == null) {
       return scaffold;
     }
+
+    return BlocListener<ContactBloc, ContactState>(
+      listenWhen: (previous, current) =>
+          _isSaving &&
+          (previous.status != current.status ||
+              previous.updatedRemarkUserId != current.updatedRemarkUserId ||
+              previous.errorMessage != current.errorMessage),
+      listener: (context, state) {
+        if (state.status == ContactStatus.remarkUpdated &&
+            state.updatedRemarkUserId == widget.userId) {
+          final savedRemark = _pendingRemarkToSave;
+          setState(() {
+            _isSaving = false;
+            _pendingRemarkToSave = null;
+          });
+          Navigator.of(context).pop(savedRemark);
+        } else if (state.status == ContactStatus.error) {
+          final errorMessage = state.errorMessage ?? 'Failed to save remark';
+          setState(() {
+            _isSaving = false;
+            _pendingRemarkToSave = null;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      },
+      child: scaffold,
+    );
   }
 }

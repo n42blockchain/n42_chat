@@ -35,11 +35,13 @@ class MomentRepositoryImpl implements IMomentRepository {
       final likes = await _momentDataSource.getMomentLikes(moment.id);
       final comments = await _momentDataSource.getMomentComments(moment.id);
 
-      enrichedMoments.add(moment.copyWith(
-        likes: likes,
-        comments: comments,
-        isLikedByMe: likes.any((l) => l.userId == _getCurrentUserId()),
-      ));
+      enrichedMoments.add(
+        moment.copyWith(
+          likes: likes,
+          comments: comments,
+          isLikedByMe: likes.any((l) => l.userId == _getCurrentUserId()),
+        ),
+      );
     }
 
     // 应用隐私过滤
@@ -50,6 +52,7 @@ class MomentRepositoryImpl implements IMomentRepository {
       _momentsCache.clear();
     }
     _momentsCache.addAll(filteredMoments);
+    await _updateUnreadCount(_momentsCache);
 
     return filteredMoments;
   }
@@ -67,13 +70,17 @@ class MomentRepositoryImpl implements IMomentRepository {
         final likes = await _momentDataSource.getMomentLikes(moment.id);
         final comments = await _momentDataSource.getMomentComments(moment.id);
 
-        enrichedMoments.add(moment.copyWith(
-          likes: likes,
-          comments: comments,
-          isLikedByMe: likes.any((l) => l.userId == _getCurrentUserId()),
-        ));
+        enrichedMoments.add(
+          moment.copyWith(
+            likes: likes,
+            comments: comments,
+            isLikedByMe: likes.any((l) => l.userId == _getCurrentUserId()),
+          ),
+        );
       }
-      return await _filterMoments(enrichedMoments);
+      final filteredMoments = await _filterMoments(enrichedMoments);
+      await _updateUnreadCount(filteredMoments);
+      return filteredMoments;
     });
   }
 
@@ -94,11 +101,13 @@ class MomentRepositoryImpl implements IMomentRepository {
       final likes = await _momentDataSource.getMomentLikes(moment.id);
       final comments = await _momentDataSource.getMomentComments(moment.id);
 
-      enrichedMoments.add(moment.copyWith(
-        likes: likes,
-        comments: comments,
-        isLikedByMe: likes.any((l) => l.userId == _getCurrentUserId()),
-      ));
+      enrichedMoments.add(
+        moment.copyWith(
+          likes: likes,
+          comments: comments,
+          isLikedByMe: likes.any((l) => l.userId == _getCurrentUserId()),
+        ),
+      );
     }
 
     // 应用隐私过滤（查看特定用户朋友圈时也需要检查权限）
@@ -113,11 +122,14 @@ class MomentRepositoryImpl implements IMomentRepository {
     final likes = await _momentDataSource.getMomentLikes(momentId);
     final comments = await _momentDataSource.getMomentComments(momentId);
 
-    return moment.copyWith(
+    final enrichedMoment = moment.copyWith(
       likes: likes,
       comments: comments,
       isLikedByMe: likes.any((l) => l.userId == _getCurrentUserId()),
     );
+
+    final visibleMoments = await _filterMoments([enrichedMoment]);
+    return visibleMoments.isEmpty ? null : visibleMoments.first;
   }
 
   @override
@@ -151,13 +163,15 @@ class MomentRepositoryImpl implements IMomentRepository {
     List<String> visibilityUserIds = const [],
   }) async {
     final mediaData = images
-        .map((img) => MomentMediaData(
-              bytes: img.bytes,
-              filename: img.filename,
-              mimeType: img.mimeType,
-              width: img.width,
-              height: img.height,
-            ))
+        .map(
+          (img) => MomentMediaData(
+            bytes: img.bytes,
+            filename: img.filename,
+            mimeType: img.mimeType,
+            width: img.width,
+            height: img.height,
+          ),
+        )
         .toList();
 
     final momentId = await _momentDataSource.postMoment(
@@ -355,6 +369,22 @@ class MomentRepositoryImpl implements IMomentRepository {
     await getMoments();
   }
 
+  Future<void> _updateUnreadCount(List<MomentEntity> moments) async {
+    final currentUserId = _getCurrentUserId();
+    final lastReadTime = await _storageDataSource.getMomentLastReadTime();
+    if (lastReadTime == null) {
+      _unreadCount = moments
+          .where((moment) => !_isFromCurrentUser(moment, currentUserId))
+          .length;
+      return;
+    }
+
+    _unreadCount = moments.where((moment) {
+      if (_isFromCurrentUser(moment, currentUserId)) return false;
+      return moment.timestamp.isAfter(lastReadTime);
+    }).length;
+  }
+
   /// 应用隐私过滤规则
   ///
   /// 过滤顺序：
@@ -390,7 +420,7 @@ class MomentRepositoryImpl implements IMomentRepository {
 
     return moments.where((moment) {
       // 自己的动态始终可见
-      if (moment.isFromMe) return true;
+      if (_isFromCurrentUser(moment, currentUserId)) return true;
 
       // 1. 我设置了不看 TA 的朋友圈
       if (hiddenSet.contains(moment.userId)) return false;
@@ -429,5 +459,12 @@ class MomentRepositoryImpl implements IMomentRepository {
 
   String? _getCurrentUserId() {
     return _momentDataSource.currentUserId;
+  }
+
+  bool _isFromCurrentUser(MomentEntity moment, String? currentUserId) {
+    if (moment.isFromMe) {
+      return true;
+    }
+    return currentUserId != null && moment.userId == currentUserId;
   }
 }

@@ -139,6 +139,46 @@ void main() {
     });
   });
 
+  group('MessageMetadata preserves red packet metadata', () {
+    test('copyWithPoll keeps redPacketId and transfer fields', () {
+      const meta = MessageMetadata(
+        amount: '8.88',
+        token: 'CNY',
+        transferStatus: 'pending',
+        redPacketId: 'rp_123',
+      );
+
+      final updated = meta.copyWithPoll(
+        voteCounts: const {'a': 1},
+        totalVoters: 1,
+      );
+
+      expect(updated.amount, '8.88');
+      expect(updated.token, 'CNY');
+      expect(updated.transferStatus, 'pending');
+      expect(updated.redPacketId, 'rp_123');
+    });
+
+    test('copyWithTranscription keeps redPacketId and transfer fields', () {
+      const meta = MessageMetadata(
+        amount: '8.88',
+        token: 'CNY',
+        transferStatus: 'pending',
+        redPacketId: 'rp_123',
+      );
+
+      final updated = meta.copyWithTranscription(
+        transcription: 'hello',
+        transcriptionStatus: TranscriptionStatus.success,
+      );
+
+      expect(updated.amount, '8.88');
+      expect(updated.token, 'CNY');
+      expect(updated.transferStatus, 'pending');
+      expect(updated.redPacketId, 'rp_123');
+    });
+  });
+
   // ─────────────────────────────────────────────────
   // MessageReaction.count and props
   // ─────────────────────────────────────────────────

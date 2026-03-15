@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -49,9 +51,9 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     // 通知 Mini App 即将销毁
-    _webController.runJavaScript(
+    unawaited(_runJavaScriptSafely(
       'if(window.n42&&window.n42.lifecycle.onDestroy)window.n42.lifecycle.onDestroy();',
-    );
+    ));
     super.dispose();
   }
 
@@ -59,13 +61,13 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.paused:
-        _webController.runJavaScript(
+        unawaited(_runJavaScriptSafely(
           'if(window.n42&&window.n42.lifecycle.onPause)window.n42.lifecycle.onPause();',
-        );
+        ));
       case AppLifecycleState.resumed:
-        _webController.runJavaScript(
+        unawaited(_runJavaScriptSafely(
           'if(window.n42&&window.n42.lifecycle.onResume)window.n42.lifecycle.onResume();',
-        );
+        ));
       default:
         break;
     }
@@ -77,7 +79,11 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
       roomId: widget.roomId,
       app: widget.app,
       onSendMessage: _onBridgeSendMessage,
-      onClose: () => Navigator.of(context).pop(),
+      onClose: () {
+        if (mounted && Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
     );
 
     _webController = WebViewController()
@@ -85,17 +91,22 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
       ..setBackgroundColor(Colors.white)
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageStarted: (_) => setState(() {
-            _isLoading = true;
-            _errorMessage = null;
-          }),
+          onPageStarted: (_) {
+            if (!mounted) return;
+            setState(() {
+              _isLoading = true;
+              _errorMessage = null;
+            });
+          },
           onPageFinished: (_) async {
             // 注入 bridge 初始化脚本
             await _webController.runJavaScript(_bridge.initScript);
             if (mounted) setState(() => _isLoading = false);
           },
-          onProgress: (progress) =>
-              setState(() => _loadProgress = progress),
+          onProgress: (progress) {
+            if (!mounted) return;
+            setState(() => _loadProgress = progress);
+          },
           onWebResourceError: (error) {
             if (mounted) {
               setState(() {
@@ -128,6 +139,14 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
       context.read<ChatBloc>().add(SendTextMessage(text));
     } catch (_) {
       // ChatBloc 可能不在 context 中（独立打开时）
+    }
+  }
+
+  Future<void> _runJavaScriptSafely(String script) async {
+    try {
+      await _webController.runJavaScript(script);
+    } catch (_) {
+      // 页面销毁或 WebView 尚未就绪时，生命周期通知允许静默失败。
     }
   }
 

@@ -292,15 +292,19 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
     );
   }
 
-  void _navigateToCreate() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
+  Future<void> _navigateToCreate() async {
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
         builder: (_) => BlocProvider.value(
           value: context.read<GovernanceBloc>(),
           child: CreateProposalPage(spaceId: widget.spaceId),
         ),
       ),
     );
+
+    if (created == true && mounted) {
+      _loadProposals();
+    }
   }
 }
 

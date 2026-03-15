@@ -12,7 +12,7 @@ class GovernanceSpace extends Equatable {
   final List<String> members;
   final int proposalsCount;
   final int followersCount;
-  final Map<String, dynamic>? strategies;
+  final List<Map<String, dynamic>> strategies;
   final Map<String, dynamic>? filters;
 
   const GovernanceSpace({
@@ -26,7 +26,7 @@ class GovernanceSpace extends Equatable {
     this.members = const [],
     this.proposalsCount = 0,
     this.followersCount = 0,
-    this.strategies,
+    this.strategies = const [],
     this.filters,
   });
 
@@ -41,7 +41,7 @@ class GovernanceSpace extends Equatable {
     List<String>? members,
     int? proposalsCount,
     int? followersCount,
-    Map<String, dynamic>? strategies,
+    List<Map<String, dynamic>>? strategies,
     Map<String, dynamic>? filters,
   }) {
     return GovernanceSpace(

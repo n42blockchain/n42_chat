@@ -231,8 +231,21 @@ class _StickerStorePageState extends State<StickerStorePage>
   Widget _buildStoreList(bool isDark) {
     final filteredPacks = _storePacks.where((pack) {
       if (_selectedCategory == null) return true;
-      // 简单的分类过滤逻辑
-      return true;
+      switch (_selectedCategory) {
+        case 'popular':
+        case 'new':
+          return true;
+        case 'animals':
+          return pack.id.contains('animal');
+        case 'emotions':
+          return pack.id.contains('emotion');
+        case 'food':
+          return pack.id.contains('food');
+        case 'celebration':
+          return pack.id.contains('celebration');
+        default:
+          return false;
+      }
     }).toList();
 
     if (filteredPacks.isEmpty) {

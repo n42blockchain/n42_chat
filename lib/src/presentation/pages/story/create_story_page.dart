@@ -1,43 +1,23 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/entities/story_entity.dart';
+import '../../blocs/story/story_bloc.dart';
+import '../../blocs/story/story_event.dart';
+import '../../blocs/story/story_state.dart';
 import '../../widgets/story/story_music_picker.dart';
 
 /// Story creation mode
-enum StoryMode {
-  text,
-  photo,
-}
+enum StoryMode { text, photo }
 
 /// Create Story page for posting text or photo stories
 class CreateStoryPage extends StatefulWidget {
-  const CreateStoryPage({
-    super.key,
-    this.onPost,
-  });
-
-  /// Callback when user posts a story
-  /// Parameters:
-  /// - content: Text content (for text story) or caption (for photo story)
-  /// - imageBytes: Image data (for photo story)
-  /// - imageName: Image filename (for photo story)
-  /// - backgroundColor: Background color value (for text story)
-  /// - textColor: Text color value (for text story)
-  /// - musicFilePath: Local path to selected music file
-  /// - musicTitle: Music file display name
-  final void Function(
-    String? content,
-    Uint8List? imageBytes,
-    String? imageName,
-    int? backgroundColor,
-    int? textColor, {
-    String? musicFilePath,
-    String? musicTitle,
-  })? onPost;
+  const CreateStoryPage({super.key});
 
   @override
   State<CreateStoryPage> createState() => _CreateStoryPageState();
@@ -55,35 +35,15 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
 
   // Color options for text story background
   static const List<_ColorOption> _colorOptions = [
-    _ColorOption(
-      background: Color(0xFF1A73E8),
-      text: Colors.white,
-    ),
-    _ColorOption(
-      background: Color(0xFF34A853),
-      text: Colors.white,
-    ),
-    _ColorOption(
-      background: Color(0xFFEA4335),
-      text: Colors.white,
-    ),
-    _ColorOption(
-      background: Color(0xFFFBBC04),
-      text: Colors.black,
-    ),
-    _ColorOption(
-      background: Color(0xFF9C27B0),
-      text: Colors.white,
-    ),
-    _ColorOption(
-      background: Color(0xFF212121),
-      text: Colors.white,
-    ),
+    _ColorOption(background: Color(0xFF1A73E8), text: Colors.white),
+    _ColorOption(background: Color(0xFF34A853), text: Colors.white),
+    _ColorOption(background: Color(0xFFEA4335), text: Colors.white),
+    _ColorOption(background: Color(0xFFFBBC04), text: Colors.black),
+    _ColorOption(background: Color(0xFF9C27B0), text: Colors.white),
+    _ColorOption(background: Color(0xFF212121), text: Colors.white),
   ];
 
   int _selectedColorIndex = 0;
-
-  bool _isPosting = false;
 
   // Selected music
   StoryMusicSelection? _musicSelection;
@@ -113,51 +73,78 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = S.of(context);
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-      appBar: AppBar(
-        backgroundColor: _mode == StoryMode.text
-            ? _currentBackgroundColor
-            : (isDark ? AppColors.surfaceDark : Colors.white),
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.close,
-            color: _mode == StoryMode.text
-                ? _currentTextColor
-                : (isDark ? Colors.white : Colors.black),
+    return BlocListener<StoryBloc, StoryState>(
+      listenWhen: (previous, current) =>
+          previous.isPosting && !current.isPosting,
+      listener: (context, state) {
+        if (!mounted) return;
+        if (state.hasError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.error ?? 'Failed to post story')),
+          );
+          return;
+        }
+        Navigator.of(context).pop();
+      },
+      child: Scaffold(
+        backgroundColor: isDark
+            ? AppColors.backgroundDark
+            : AppColors.background,
+        appBar: AppBar(
+          backgroundColor: _mode == StoryMode.text
+              ? _currentBackgroundColor
+              : (isDark ? AppColors.surfaceDark : Colors.white),
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.close,
+              color: _mode == StoryMode.text
+                  ? _currentTextColor
+                  : (isDark ? Colors.white : Colors.black),
+            ),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: _buildModeSelector(isDark),
-        centerTitle: true,
-        actions: [
-          _isPosting
-              ? const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                )
-              : TextButton(
+          title: _buildModeSelector(isDark),
+          centerTitle: true,
+          actions: [
+            BlocBuilder<StoryBloc, StoryState>(
+              buildWhen: (previous, current) =>
+                  previous.isPosting != current.isPosting ||
+                  previous.error != current.error,
+              builder: (context, state) {
+                if (state.isPosting) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  );
+                }
+
+                return TextButton(
                   onPressed: _canPost ? _postStory : null,
                   child: Text(
                     s?.commonSend ?? 'Post',
                     style: TextStyle(
                       color: _canPost
                           ? (_mode == StoryMode.text
-                              ? _currentTextColor
-                              : Theme.of(context).primaryColor)
+                                ? _currentTextColor
+                                : Theme.of(context).primaryColor)
                           : Colors.grey,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-        ],
+                );
+              },
+            ),
+          ],
+        ),
+        body: _mode == StoryMode.text
+            ? _buildTextMode()
+            : _buildPhotoMode(isDark),
       ),
-      body: _mode == StoryMode.text ? _buildTextMode() : _buildPhotoMode(isDark),
     );
   }
 
@@ -241,7 +228,9 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                     fontWeight: FontWeight.w500,
                   ),
                   decoration: InputDecoration(
-                    hintText: S.of(context)?.storySendMessageHint ?? 'Type something...',
+                    hintText:
+                        S.of(context)?.storySendMessageHint ??
+                        'Type something...',
                     hintStyle: TextStyle(
                       color: _currentTextColor.withValues(alpha: 0.5),
                       fontSize: 28,
@@ -459,10 +448,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.memory(
-              _imageBytes!,
-              fit: BoxFit.contain,
-            ),
+            child: Image.memory(_imageBytes!, fit: BoxFit.contain),
           ),
         ),
 
@@ -483,11 +469,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 color: Colors.black.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.close,
-                color: Colors.white,
-                size: 24,
-              ),
+              child: const Icon(Icons.close, color: Colors.white, size: 24),
             ),
           ),
         ),
@@ -512,11 +494,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.swap_horiz,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                    Icon(Icons.swap_horiz, color: Colors.white, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'Change',
@@ -553,51 +531,58 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to pick image: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to pick image: $e')));
       }
     }
   }
 
   void _postStory() {
-    if (!_canPost || _isPosting) return;
+    final storyBloc = context.read<StoryBloc>();
+    if (!_canPost || storyBloc.state.isPosting) return;
 
-    setState(() => _isPosting = true);
-
-    final musicPath = _musicSelection?.isEmpty == true ? null : _musicSelection?.filePath;
-    final musicTitle = _musicSelection?.isEmpty == true ? null : _musicSelection?.fileName;
-
-    if (_mode == StoryMode.text) {
-      widget.onPost?.call(
-        _textController.text.trim(),
-        null,
-        null,
-        _currentBackgroundColor.toARGB32(),
-        _currentTextColor.toARGB32(),
-        musicFilePath: musicPath,
-        musicTitle: musicTitle,
-      );
-    } else {
-      widget.onPost?.call(
-        _captionController.text.trim().isEmpty
-            ? null
-            : _captionController.text.trim(),
-        _imageBytes,
-        _imageName,
-        null,
-        null,
-        musicFilePath: musicPath,
-        musicTitle: musicTitle,
+    final media = <StoryMediaInput>[];
+    if (_imageBytes != null && _imageName != null) {
+      media.add(
+        StoryMediaInput(
+          type: StoryMediaType.image,
+          bytes: _imageBytes!,
+          filename: _imageName!,
+          mimeType: _getMimeType(_imageName!),
+        ),
       );
     }
 
-    // Pop after posting (caller should handle async operations)
-    Navigator.of(context).pop();
+    storyBloc.add(
+      PostStory(
+        content: _mode == StoryMode.text
+            ? _textController.text.trim()
+            : (_captionController.text.trim().isEmpty
+                  ? null
+                  : _captionController.text.trim()),
+        media: media,
+        backgroundColor: _mode == StoryMode.text
+            ? _currentBackgroundColor.toARGB32()
+            : null,
+        textColor: _mode == StoryMode.text
+            ? _currentTextColor.toARGB32()
+            : null,
+      ),
+    );
+  }
+
+  String _getMimeType(String filename) {
+    final lower = filename.toLowerCase();
+    if (lower.endsWith('.png')) return 'image/png';
+    if (lower.endsWith('.webp')) return 'image/webp';
+    if (lower.endsWith('.gif')) return 'image/gif';
+    return 'image/jpeg';
   }
 
   Widget _buildMusicBar() {
-    final hasMusic = _musicSelection != null && _musicSelection!.isEmpty != true;
+    final hasMusic =
+        _musicSelection != null && _musicSelection!.isEmpty != true;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -624,9 +609,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
-                  hasMusic
-                      ? _musicSelection!.fileName
-                      : 'Add Music',
+                  hasMusic ? _musicSelection!.fileName : 'Add Music',
                   style: TextStyle(
                     fontSize: 13,
                     color: _mode == StoryMode.text
@@ -679,10 +662,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
 
 /// Color option for text story background
 class _ColorOption {
-  const _ColorOption({
-    required this.background,
-    required this.text,
-  });
+  const _ColorOption({required this.background, required this.text});
 
   final Color background;
   final Color text;

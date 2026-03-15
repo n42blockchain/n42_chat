@@ -21,9 +21,9 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
     required DeBankDatasource debank,
     required OnChainIdentityDatasource identity,
     required SocialGraphService graphService,
-  })  : _debank = debank,
-        _identity = identity,
-        _graphService = graphService;
+  }) : _debank = debank,
+       _identity = identity,
+       _graphService = graphService;
 
   /// Validate that [address] looks like a plausible blockchain address.
   ///
@@ -75,7 +75,13 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
 
     // Connections are derived from the recommendation engine
     final recommendations = await getRecommendations(address, limit: 50);
-    return recommendations.expand((r) => r.connections).toList();
+    final deduped = <String, SocialConnection>{};
+    for (final connection in recommendations.expand((r) => r.connections)) {
+      final key =
+          '${connection.fromAddress.toLowerCase()}|${connection.toAddress.toLowerCase()}|${connection.type.name}';
+      deduped.putIfAbsent(key, () => connection);
+    }
+    return deduped.values.toList(growable: false);
   }
 
   @override
@@ -91,10 +97,7 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
   }
 
   @override
-  Future<double> calculateSimilarity(
-    String addressA,
-    String addressB,
-  ) async {
+  Future<double> calculateSimilarity(String addressA, String addressB) async {
     if (!_isValidAddress(addressA)) {
       throw ArgumentError('Invalid addressA: $addressA');
     }
@@ -108,11 +111,24 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
 
   @override
   Future<List<SocialProfile>> searchProfiles(String query) async {
+    final normalizedQuery = query.trim();
+    if (normalizedQuery.isEmpty) {
+      return [];
+    }
+
+    if (_isValidAddress(normalizedQuery)) {
+      try {
+        return [await getProfile(normalizedQuery)];
+      } catch (_) {
+        return [SocialProfile(address: normalizedQuery)];
+      }
+    }
+
     // Try resolving the query as ENS, Lens, or Farcaster in parallel
     final results = await Future.wait([
-      _identity.resolveENS(query),
-      _identity.resolveLensHandle(query),
-      _identity.resolveFarcaster(query),
+      _identity.resolveENS(normalizedQuery),
+      _identity.resolveLensHandle(normalizedQuery),
+      _identity.resolveFarcaster(normalizedQuery),
     ]);
 
     final profiles = <SocialProfile>[];
