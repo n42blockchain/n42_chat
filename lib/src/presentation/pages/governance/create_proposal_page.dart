@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -129,7 +131,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     );
   }
 
-  void _submitProposal() {
+  Future<void> _submitProposal() async {
     if (!_formKey.currentState!.validate()) return;
 
     final choices = _choiceControllers
@@ -145,7 +147,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     }
 
     // Confirm submission
-    showDialog<bool>(
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Create Proposal'),
@@ -165,20 +167,20 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
           ),
         ],
       ),
-    ).then((confirmed) {
-      if (confirmed == true && mounted) {
-        context.read<GovernanceBloc>().add(
-              GovernanceCreateProposal(
-                spaceId: widget.spaceId,
-                title: _titleController.text.trim(),
-                body: _bodyController.text.trim(),
-                choices: choices,
-                startTime: _startTime,
-                endTime: _endTime,
-              ),
-            );
-      }
-    });
+    );
+
+    if (confirmed == true && mounted) {
+      context.read<GovernanceBloc>().add(
+            GovernanceCreateProposal(
+              spaceId: widget.spaceId,
+              title: _titleController.text.trim(),
+              body: _bodyController.text.trim(),
+              choices: choices,
+              startTime: _startTime,
+              endTime: _endTime,
+            ),
+          );
+    }
   }
 
   @override
@@ -201,7 +203,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                 backgroundColor: AppColors.success,
               ),
             );
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
           } else if (state.status == GovernanceStatus.error &&
               state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -541,7 +543,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
-        onPressed: isCreating ? null : _submitProposal,
+        onPressed: isCreating
+            ? null
+            : () {
+                unawaited(_submitProposal());
+              },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor:

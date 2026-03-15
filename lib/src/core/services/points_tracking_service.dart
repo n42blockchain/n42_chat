@@ -1,7 +1,7 @@
 import 'dart:async';
 
-
 import '../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../domain/entities/points/points_config.dart';
 import '../../domain/entities/points/reward_rule.dart';
 import '../../domain/repositories/points_repository.dart';
 import '../utils/debug_log.dart';
@@ -16,13 +16,14 @@ class PointsTrackingService {
 
   StreamSubscription<dynamic>? _syncSubscription;
   final Map<String, DateTime> _lastActionTimes = {};
+  final Map<String, PointsConfig> _configCache = {};
   bool _isTracking = false;
 
   PointsTrackingService({
     required IPointsRepository repository,
     required MatrixClientManager clientManager,
-  })  : _repository = repository,
-        _clientManager = clientManager;
+  }) : _repository = repository,
+       _clientManager = clientManager;
 
   /// Whether the service is currently tracking events.
   bool get isTracking => _isTracking;
@@ -59,16 +60,27 @@ class PointsTrackingService {
   /// before sending the award request.
   Future<void> awardDailyLogin(String userId, String roomId) async {
     try {
+      final settings = await _resolveRuleSettings(
+        roomId: roomId,
+        action: PointsAction.dailyLogin,
+        fallbackPoints: 5,
+        fallbackDailyLimit: 1,
+      );
+      if (!settings.isEnabled || settings.points <= 0) {
+        return;
+      }
+
       final count = await _repository.getDailyEarnCount(
         userId,
         roomId,
         PointsAction.dailyLogin.name,
       );
-      if (count == 0) {
+      final dailyLimit = settings.dailyLimit ?? 1;
+      if (count < dailyLimit) {
         await _repository.awardPoints(
           userId: userId,
           roomId: roomId,
-          amount: 5,
+          amount: settings.points,
           actionType: PointsAction.dailyLogin.name,
           description: 'Daily login bonus',
         );
@@ -82,6 +94,7 @@ class PointsTrackingService {
   void dispose() {
     stopTracking();
     _lastActionTimes.clear();
+    _configCache.clear();
   }
 
   // ---------------------------------------------------------------------------
@@ -165,11 +178,24 @@ class PointsTrackingService {
     required PointsAction action,
     required int points,
   }) async {
+    final settings = await _resolveRuleSettings(
+      roomId: roomId,
+      action: action,
+      fallbackPoints: points,
+      fallbackCooldown: const Duration(seconds: 5),
+      fallbackDailyLimit: 50,
+    );
+    if (!settings.isEnabled || settings.points <= 0) {
+      return;
+    }
+
     // Cooldown check: prevent rapid-fire awards (5-second minimum gap)
     final key = '$userId:$roomId:${action.name}';
     final lastTime = _lastActionTimes[key];
-    if (lastTime != null &&
-        DateTime.now().difference(lastTime).inSeconds < 5) {
+    final cooldown = settings.cooldown;
+    if (cooldown != null &&
+        lastTime != null &&
+        DateTime.now().difference(lastTime) < cooldown) {
       return;
     }
     _lastActionTimes[key] = DateTime.now();
@@ -177,14 +203,17 @@ class PointsTrackingService {
     try {
       // Daily limit check: prevent excessive point farming
       final dailyCount = await _repository.getDailyEarnCount(
-        userId, roomId, action.name,
+        userId,
+        roomId,
+        action.name,
       );
-      if (dailyCount >= 50) return; // Default daily cap of 50 per action
+      final dailyLimit = settings.dailyLimit;
+      if (dailyLimit != null && dailyCount >= dailyLimit) return;
 
       await _repository.awardPoints(
         userId: userId,
         roomId: roomId,
-        amount: points,
+        amount: settings.points,
         actionType: action.name,
         description: '${action.name} reward',
       );
@@ -192,4 +221,76 @@ class PointsTrackingService {
       debugLog('PointsTrackingService: Failed to award points: $e');
     }
   }
+
+  Future<_EffectiveRuleSettings> _resolveRuleSettings({
+    required String roomId,
+    required PointsAction action,
+    required int fallbackPoints,
+    Duration? fallbackCooldown,
+    int? fallbackDailyLimit,
+  }) async {
+    try {
+      final config = await _getConfig(roomId);
+      if (config == null || !config.isEnabled) {
+        return _EffectiveRuleSettings.disabled();
+      }
+
+      final rule = config.rules
+          .where((candidate) => candidate.action == action)
+          .cast<RewardRule?>()
+          .firstWhere((candidate) => candidate != null, orElse: () => null);
+      if (rule == null) {
+        return _EffectiveRuleSettings(
+          points: fallbackPoints,
+          cooldown: fallbackCooldown,
+          dailyLimit: fallbackDailyLimit,
+          isEnabled: true,
+        );
+      }
+
+      return _EffectiveRuleSettings(
+        points: rule.points,
+        cooldown: rule.cooldown ?? fallbackCooldown,
+        dailyLimit:
+            rule.dailyLimit ?? config.dailyEarnLimit ?? fallbackDailyLimit,
+        isEnabled: rule.isEnabled,
+      );
+    } catch (e) {
+      debugLog('PointsTrackingService: Failed to resolve rule config: $e');
+      return _EffectiveRuleSettings(
+        points: fallbackPoints,
+        cooldown: fallbackCooldown,
+        dailyLimit: fallbackDailyLimit,
+        isEnabled: true,
+      );
+    }
+  }
+
+  Future<PointsConfig?> _getConfig(String roomId) async {
+    final cached = _configCache[roomId];
+    if (cached != null) {
+      return cached;
+    }
+
+    final config = await _repository.getConfig(roomId);
+    _configCache[roomId] = config;
+    return config;
+  }
+}
+
+class _EffectiveRuleSettings {
+  final int points;
+  final Duration? cooldown;
+  final int? dailyLimit;
+  final bool isEnabled;
+
+  const _EffectiveRuleSettings({
+    required this.points,
+    this.cooldown,
+    this.dailyLimit,
+    required this.isEnabled,
+  });
+
+  factory _EffectiveRuleSettings.disabled() =>
+      const _EffectiveRuleSettings(points: 0, isEnabled: false);
 }

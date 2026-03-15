@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 import 'slash_command_picker.dart';
@@ -86,6 +87,9 @@ class ChatInputBar extends StatefulWidget {
   /// 斜杠命令 /poll 回调（由 UI 层打开投票对话框）
   final VoidCallback? onCommandPoll;
 
+  /// 语音服务（测试或宿主注入）
+  final VoiceService? voiceService;
+
   const ChatInputBar({
     super.key,
     this.onSendText,
@@ -108,6 +112,7 @@ class ChatInputBar extends StatefulWidget {
     this.controller,
     this.focusNode,
     this.onCommandPoll,
+    this.voiceService,
   });
 
   @override
@@ -129,11 +134,17 @@ class ChatInputBarState extends State<ChatInputBar> {
   Duration _recordingDuration = Duration.zero;
   StreamSubscription<RecordingState>? _recordingSubscription;
   
-  final VoiceService _voiceService = VoiceService();
+  late final VoiceService _voiceService;
+  late final bool _ownsVoiceService;
 
   @override
   void initState() {
     super.initState();
+    _voiceService = widget.voiceService ??
+        (getIt.isRegistered<VoiceService>() ? getIt<VoiceService>() : VoiceService());
+    _ownsVoiceService = widget.voiceService == null && !getIt.isRegistered<VoiceService>();
+    unawaited(_voiceService.initialize());
+
     _controller = widget.controller ?? TextEditingController();
     _focusNode = widget.focusNode ?? FocusNode();
     _hasText = _controller.text.isNotEmpty;
@@ -156,6 +167,9 @@ class ChatInputBarState extends State<ChatInputBar> {
   @override
   void dispose() {
     _recordingSubscription?.cancel();
+    if (_ownsVoiceService) {
+      unawaited(_voiceService.dispose());
+    }
     if (widget.controller == null) {
       _controller.dispose();
     }
@@ -193,20 +207,20 @@ class ChatInputBarState extends State<ChatInputBar> {
       widget.onCommandPoll?.call();
     } else if (item.command == 'announce') {
       const prefix = '/announce ';
-      _controller.value = TextEditingValue(
+      _controller.value = const TextEditingValue(
         text: prefix,
         selection: TextSelection.collapsed(offset: prefix.length),
       );
     } else if (item.command == 'welcome') {
       const prefix = '/welcome ';
-      _controller.value = TextEditingValue(
+      _controller.value = const TextEditingValue(
         text: prefix,
         selection: TextSelection.collapsed(offset: prefix.length),
       );
     } else if (item.command == 'price') {
       // /price 需要参数，填入前缀让用户继续输入 token 符号
       const prefix = '/price ';
-      _controller.value = TextEditingValue(
+      _controller.value = const TextEditingValue(
         text: prefix,
         selection: TextSelection.collapsed(offset: prefix.length),
       );

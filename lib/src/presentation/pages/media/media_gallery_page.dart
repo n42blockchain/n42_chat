@@ -1,14 +1,21 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/services/download_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/matrix_utils.dart' as n42_matrix_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/media_folder_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../chat/viewers/pdf_viewer_page.dart';
+import 'media_preview_page.dart';
 
 /// 媒体画廊页面
 ///
@@ -101,6 +108,13 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
     }).toList()
       ..sort((a, b) => b.date.compareTo(a.date));
   }
+
+  List<MediaItem> get _previewItems => _filteredMessages
+      .where((message) =>
+          message.type == MessageType.image || message.type == MessageType.video)
+      .map(_toMediaItem)
+      .whereType<MediaItem>()
+      .toList();
 
   @override
   Widget build(BuildContext context) {
@@ -275,14 +289,12 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
     MessageEntity message,
     bool isDark,
   ) {
-    final thumbnailUrl = message.metadata?.thumbnailUrl ?? message.metadata?.httpUrl;
+    final thumbnailUrl = _resolveThumbnailUrl(message);
     final headers = _buildAuthHeaders(thumbnailUrl);
     final isVideo = message.type == MessageType.video;
 
     return GestureDetector(
-      onTap: () {
-        // 打开对应的预览器
-      },
+      onTap: () => _openMediaPreview(message),
       child: Container(
         decoration: BoxDecoration(
           color: isDark ? Colors.grey[800] : Colors.grey[200],
@@ -421,8 +433,132 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
         ],
       ),
       onTap: () {
-        // 打开文件预览
+        _openFileMessage(message);
       },
+    );
+  }
+
+  void _openFileMessage(MessageEntity message) {
+    final meta = message.metadata;
+    final fileName = meta?.fileName ?? 'Unknown file';
+    final mimeType = meta?.mimeType?.toLowerCase();
+    final fileUrl = _resolveMediaUrl(meta?.httpUrl ?? meta?.mediaUrl);
+    if (fileUrl == null) return;
+
+    final isPdf =
+        mimeType?.contains('pdf') == true || fileName.toLowerCase().endsWith('.pdf');
+    if (isPdf) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => PdfViewerPage(
+            fileName: fileName,
+            url: fileUrl,
+            headers: _buildAuthHeaders(fileUrl),
+          ),
+        ),
+      );
+      return;
+    }
+
+    unawaited(_downloadFile(message, fileUrl));
+  }
+
+  Future<void> _downloadFile(MessageEntity message, String fileUrl) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final fileName = message.metadata?.fileName ?? 'download.bin';
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(S.of(context)?.downloading ?? 'Downloading...'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+
+    try {
+      final downloadService = getIt<DownloadService>();
+      final downloadDir = await DownloadService.getDownloadDirectory();
+      final savePath = '$downloadDir/$fileName';
+
+      await downloadService.download(
+        url: fileUrl,
+        savePath: savePath,
+        fileName: fileName,
+      );
+
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(S.of(context)?.downloadComplete ?? 'Download complete'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('${S.of(context)?.downloadFailed ?? 'Download failed'}: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _openMediaPreview(MessageEntity message) {
+    final previewItems = _previewItems;
+    final initialIndex =
+        previewItems.indexWhere((item) => item.heroTag == message.id);
+    if (initialIndex < 0) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MediaPreviewPage(
+          items: previewItems,
+          initialIndex: initialIndex,
+        ),
+      ),
+    );
+  }
+
+  MediaItem? _toMediaItem(MessageEntity message) {
+    final mediaUrl = _resolveMediaUrl(
+      message.metadata?.httpUrl ?? message.metadata?.mediaUrl,
+    );
+    if (mediaUrl == null) return null;
+
+    return MediaItem(
+      url: mediaUrl,
+      thumbnailUrl: _resolveThumbnailUrl(message),
+      heroTag: message.id,
+      isVideo: message.type == MessageType.video,
+      caption: message.content,
+      senderName: message.senderName,
+      sentAt: message.timestamp,
+    );
+  }
+
+  String? _resolveThumbnailUrl(MessageEntity message) {
+    return _resolveMediaUrl(
+      message.metadata?.thumbnailUrl ??
+          message.metadata?.httpUrl ??
+          message.metadata?.mediaUrl,
+      width: 400,
+      height: 400,
+    );
+  }
+
+  String? _resolveMediaUrl(
+    String? url, {
+    int? width,
+    int? height,
+  }) {
+    if (url == null || url.isEmpty) return null;
+    if (!url.startsWith('mxc://')) return url;
+
+    return n42_matrix_utils.MatrixUtils.mxcToHttp(
+      url,
+      client: MatrixClientManager.instance.client,
+      width: width,
+      height: height,
     );
   }
 

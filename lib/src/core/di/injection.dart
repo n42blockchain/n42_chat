@@ -840,6 +840,7 @@ void _registerBlocs() {
   getIt.registerLazySingleton<VoiceRoomService>(
     () => VoiceRoomService(
       repository: getIt<IVoiceRoomRepository>(),
+      currentUserIdProvider: () => getIt<MatrixClientManager>().userId,
     ),
   );
 

@@ -238,10 +238,21 @@ class StorageManagementBloc
     emit(state.copyWith(isCleaning: true));
     try {
       final result = await _lifecycleService.cleanupFiles(event.filePaths);
+      if (result.filesDeleted > 0 || result.bytesFreed > 0) {
+        _storageManager.invalidateCache();
+      }
       emit(state.copyWith(
         isCleaning: false,
         lastCleanupResult: result,
       ));
+      if (event.roomId != null) {
+        add(
+          LoadRoomMediaDetail(
+            roomId: event.roomId!,
+            filterCategory: event.filterCategory,
+          ),
+        );
+      }
       // 删除后刷新存储信息，与 _onCleanupByRoom / _onClearCache 保持一致
       add(const LoadStorageInfo());
     } catch (e) {

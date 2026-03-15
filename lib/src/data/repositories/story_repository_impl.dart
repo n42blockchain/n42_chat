@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-
 import '../../domain/entities/story_entity.dart';
 import '../../domain/repositories/story_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
@@ -114,6 +113,11 @@ class StoryRepositoryImpl implements IStoryRepository {
       if (eventId != null) {
         await _storyDataSource.deleteStory(eventId);
       }
+      return;
+    }
+
+    if (storyId.startsWith(r'$')) {
+      await _storyDataSource.deleteStory(storyId);
     }
   }
 
@@ -135,7 +139,8 @@ class StoryRepositoryImpl implements IStoryRepository {
         userId: data['user_id'] as String? ?? '',
         userName: data['user_name'] as String? ?? '',
         avatarUrl: data['avatar_url'] as String?,
-        viewedAt: DateTime.tryParse(data['viewed_at'] as String? ?? '') ??
+        viewedAt:
+            DateTime.tryParse(data['viewed_at'] as String? ?? '') ??
             DateTime.now(),
       );
     }).toList();
@@ -186,17 +191,21 @@ class StoryRepositoryImpl implements IStoryRepository {
 
       final allViewed = stories.every((s) => s.isViewed);
       final lastUpdated = stories.isNotEmpty
-          ? stories.map((s) => s.createdAt).reduce((a, b) => a.isAfter(b) ? a : b)
+          ? stories
+                .map((s) => s.createdAt)
+                .reduce((a, b) => a.isAfter(b) ? a : b)
           : DateTime.now();
 
-      userStoriesList.add(UserStories(
-        userId: userId,
-        userName: info['user_name'] as String? ?? userId,
-        avatarUrl: info['user_avatar_url'] as String?,
-        stories: stories,
-        allViewed: allViewed,
-        lastUpdated: lastUpdated,
-      ));
+      userStoriesList.add(
+        UserStories(
+          userId: userId,
+          userName: info['user_name'] as String? ?? userId,
+          avatarUrl: info['user_avatar_url'] as String?,
+          stories: stories,
+          allViewed: allViewed,
+          lastUpdated: lastUpdated,
+        ),
+      );
     }
 
     // 按最后更新时间排序，未读的排在前面
@@ -232,10 +241,11 @@ class StoryRepositoryImpl implements IStoryRepository {
 
     // 解析创建时间和过期时间
     final createdAt =
-        DateTime.tryParse(data['created_at'] as String? ?? '') ?? DateTime.now();
+        DateTime.tryParse(data['created_at'] as String? ?? '') ??
+        DateTime.now();
     final expiresAt =
         DateTime.tryParse(data['expires_at'] as String? ?? '') ??
-            createdAt.add(const Duration(hours: 24));
+        createdAt.add(const Duration(hours: 24));
 
     // 判断是否已查看
     final isViewed = viewedIds.contains(id) || viewedIds.contains(eventId);
@@ -260,7 +270,9 @@ class StoryRepositoryImpl implements IStoryRepository {
   /// 将媒体 Map 转换为 StoryMedia
   StoryMedia _mapToStoryMedia(Map<String, dynamic> data) {
     final typeStr = data['type'] as String? ?? 'image';
-    final type = typeStr == 'video' ? StoryMediaType.video : StoryMediaType.image;
+    final type = typeStr == 'video'
+        ? StoryMediaType.video
+        : StoryMediaType.image;
 
     return StoryMedia(
       type: type,

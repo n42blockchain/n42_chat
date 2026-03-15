@@ -32,10 +32,14 @@ class StoryViewerPage extends StatefulWidget {
   final int initialStoryIndex;
 
   /// Story 被查看时的回调
-  final VoidCallback? onStoryViewed;
+  final void Function(StoryEntity story)? onStoryViewed;
 
   /// 回复 Story 的回调
-  final void Function(String userId, String storyId, String message)? onReply;
+  final Future<bool> Function(String userId, String storyId, String message)?
+      onReply;
+
+  /// 删除我的 Story 的回调
+  final Future<bool> Function(StoryEntity story)? onDeleteStory;
 
   /// 当前用户 ID（用于判断是否是自己的 Story）
   final String? currentUserId;
@@ -47,6 +51,7 @@ class StoryViewerPage extends StatefulWidget {
     this.initialStoryIndex = 0,
     this.onStoryViewed,
     this.onReply,
+    this.onDeleteStory,
     this.currentUserId,
   });
 
@@ -115,7 +120,7 @@ class _StoryViewerPageState extends State<StoryViewerPage> {
 
   /// 通知 Story 被查看
   void _notifyStoryViewed() {
-    widget.onStoryViewed?.call();
+    widget.onStoryViewed?.call(_currentUserStories.stories[_currentStoryIndex]);
   }
 
   /// 切换到下一个 Story
@@ -211,26 +216,30 @@ class _StoryViewerPageState extends State<StoryViewerPage> {
       _isPaused = true;
     });
 
-    Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (_) => StoryViewersPage(
-          storyId: story.id,
-          viewers: story.viewedBy,
-        ),
-      ),
-    ).then((_) {
-      // 恢复播放
-      if (mounted) {
-        setState(() {
-          _isPaused = false;
+    Navigator.of(context)
+        .push<void>(
+          MaterialPageRoute(
+            builder: (_) =>
+                StoryViewersPage(storyId: story.id, viewers: story.viewedBy),
+          ),
+        )
+        .then((_) {
+          // 恢复播放
+          if (mounted) {
+            setState(() {
+              _isPaused = false;
+            });
+          }
         });
-      }
-    });
   }
 
   /// 发送回复
-  void _sendReply(String userId, String storyId, String message) {
-    widget.onReply?.call(userId, storyId, message);
+  Future<bool> _sendReply(String userId, String storyId, String message) async {
+    final replyHandler = widget.onReply;
+    if (replyHandler == null) {
+      return false;
+    }
+    return replyHandler(userId, storyId, message);
   }
 
   /// 处理点击事件（左侧/右侧区域）
@@ -275,7 +284,8 @@ class _StoryViewerPageState extends State<StoryViewerPage> {
           final story = userStories.stories[storyIndex];
           final isCurrentUser = userIndex == _currentUserIndex;
 
-          final isMyStory = widget.currentUserId != null &&
+          final isMyStory =
+              widget.currentUserId != null &&
               userStories.userId == widget.currentUserId;
 
           return _StoryContent(
@@ -292,7 +302,12 @@ class _StoryViewerPageState extends State<StoryViewerPage> {
             onProgressTap: _jumpToStory,
             onClose: _close,
             onViewersPressed: isMyStory ? () => _showViewers(story) : null,
-            onReply: !isMyStory ? (message) => _sendReply(userStories.userId, story.id, message) : null,
+            onDeleteStory: isMyStory && widget.onDeleteStory != null
+                ? () => widget.onDeleteStory!(story)
+                : null,
+            onReply: !isMyStory
+                ? (message) => _sendReply(userStories.userId, story.id, message)
+                : null,
           );
         },
       ),
@@ -315,7 +330,8 @@ class _StoryContent extends StatefulWidget {
   final void Function(int) onProgressTap;
   final VoidCallback onClose;
   final VoidCallback? onViewersPressed;
-  final void Function(String)? onReply;
+  final Future<bool> Function()? onDeleteStory;
+  final Future<bool> Function(String)? onReply;
 
   const _StoryContent({
     required this.userStories,
@@ -331,6 +347,7 @@ class _StoryContent extends StatefulWidget {
     required this.onProgressTap,
     required this.onClose,
     this.onViewersPressed,
+    this.onDeleteStory,
     this.onReply,
   });
 
@@ -344,6 +361,8 @@ class _StoryContentState extends State<_StoryContent> {
   AudioPlayer? _musicPlayer;
   StreamSubscription<void>? _musicCompleteSubscription;
   bool _isMusicPlaying = false;
+  bool _isDeletingStory = false;
+  bool _isSendingReply = false;
 
   @override
   void initState() {
@@ -358,6 +377,10 @@ class _StoryContentState extends State<_StoryContent> {
     if (oldWidget.story.id != widget.story.id) {
       _stopMusic();
       _startMusicIfAvailable();
+      _replyController.clear();
+      _replyFocusNode.unfocus();
+      _isDeletingStory = false;
+      _isSendingReply = false;
     }
     // 暂停/恢复
     if (oldWidget.isPaused != widget.isPaused && _musicPlayer != null) {
@@ -391,11 +414,14 @@ class _StoryContentState extends State<_StoryContent> {
       source = DeviceFileSource(musicUrl);
     }
 
-    _musicPlayer!.play(source).then((_) {
-      if (mounted) setState(() => _isMusicPlaying = true);
-    }).catchError((Object e) {
-      debugLog('StoryViewer: Music playback failed: $e');
-    });
+    _musicPlayer!
+        .play(source)
+        .then((_) {
+          if (mounted) setState(() => _isMusicPlaying = true);
+        })
+        .catchError((Object e) {
+          debugLog('StoryViewer: Music playback failed: $e');
+        });
 
     // Seek to start position if specified
     final startAt = widget.story.musicStartAt;
@@ -441,8 +467,10 @@ class _StoryContentState extends State<_StoryContent> {
   Duration get storyDuration => widget.storyDuration;
   bool get isPaused => widget.isPaused;
   void Function(TapUpDetails) get onTap => widget.onTap;
-  void Function(LongPressStartDetails) get onLongPressStart => widget.onLongPressStart;
-  void Function(LongPressEndDetails) get onLongPressEnd => widget.onLongPressEnd;
+  void Function(LongPressStartDetails) get onLongPressStart =>
+      widget.onLongPressStart;
+  void Function(LongPressEndDetails) get onLongPressEnd =>
+      widget.onLongPressEnd;
   VoidCallback get onStoryComplete => widget.onStoryComplete;
   void Function(int) get onProgressTap => widget.onProgressTap;
   VoidCallback get onClose => widget.onClose;
@@ -529,11 +557,7 @@ class _StoryContentState extends State<_StoryContent> {
           errorWidget: (context, url, error) => Container(
             color: Colors.grey[900],
             child: const Center(
-              child: Icon(
-                Icons.broken_image,
-                color: Colors.white54,
-                size: 64,
-              ),
+              child: Icon(Icons.broken_image, color: Colors.white54, size: 64),
             ),
           ),
         );
@@ -557,12 +581,9 @@ class _StoryContentState extends State<_StoryContent> {
               imageUrl: thumbnailUrl,
               fit: BoxFit.cover,
               httpHeaders: headers,
-              placeholder: (context, url) => Container(
-                color: Colors.grey[900],
-              ),
-              errorWidget: (context, url, error) => Container(
-                color: Colors.grey[900],
-              ),
+              placeholder: (context, url) => Container(color: Colors.grey[900]),
+              errorWidget: (context, url, error) =>
+                  Container(color: Colors.grey[900]),
             ),
             // 视频播放图标
             const Center(
@@ -592,10 +613,7 @@ class _StoryContentState extends State<_StoryContent> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Colors.black54,
-                Colors.transparent,
-              ],
+              colors: [Colors.black54, Colors.transparent],
             ),
           ),
         ),
@@ -607,10 +625,7 @@ class _StoryContentState extends State<_StoryContent> {
             gradient: LinearGradient(
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
-              colors: [
-                Colors.black38,
-                Colors.transparent,
-              ],
+              colors: [Colors.black38, Colors.transparent],
             ),
           ),
         ),
@@ -720,10 +735,7 @@ class _StoryContentState extends State<_StoryContent> {
                     constraints: const BoxConstraints(maxWidth: 80),
                     child: Text(
                       story.musicTitle ?? 'Music',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 11),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -738,11 +750,7 @@ class _StoryContentState extends State<_StoryContent> {
         // 关闭按钮
         IconButton(
           onPressed: onClose,
-          icon: const Icon(
-            Icons.close,
-            color: Colors.white,
-            size: 28,
-          ),
+          icon: const Icon(Icons.close, color: Colors.white, size: 28),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
         ),
@@ -767,11 +775,7 @@ class _StoryContentState extends State<_StoryContent> {
           fontWeight: FontWeight.w600,
           height: 1.4,
           shadows: const [
-            Shadow(
-              color: Colors.black26,
-              offset: Offset(1, 1),
-              blurRadius: 4,
-            ),
+            Shadow(color: Colors.black26, offset: Offset(1, 1), blurRadius: 4),
           ],
         ),
       ),
@@ -785,35 +789,63 @@ class _StoryContentState extends State<_StoryContent> {
     // 自己的 Story：显示查看者按钮
     if (widget.isMyStory) {
       final viewCount = story.viewCount;
-      return GestureDetector(
-        onTap: widget.onViewersPressed,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Icon(
-                Icons.visibility_outlined,
-                color: Colors.white.withValues(alpha: 0.8),
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                viewCount > 0
-                    ? '$viewCount ${l10n?.storyViewers ?? "viewers"}'
-                    : (l10n?.storyNoViewers ?? 'No viewers yet'),
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: 14,
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: _isDeletingStory ? null : widget.onViewersPressed,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.visibility_outlined,
+                      color: Colors.white.withValues(alpha: 0.8),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      viewCount > 0
+                          ? '$viewCount ${l10n?.storyViewers ?? "viewers"}'
+                          : (l10n?.storyNoViewers ?? 'No viewers yet'),
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Colors.white.withValues(alpha: 0.6),
+                      size: 20,
+                    ),
+                  ],
                 ),
               ),
-              const Spacer(),
-              Icon(
-                Icons.chevron_right,
-                color: Colors.white.withValues(alpha: 0.6),
-                size: 20,
+            ),
+            if (widget.onDeleteStory != null) ...[
+              const SizedBox(width: 8),
+              IconButton(
+                key: const Key('story_delete_button'),
+                onPressed: _isDeletingStory ? null : _confirmDeleteStory,
+                icon: _isDeletingStory
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Icon(
+                        Icons.delete_outline,
+                        color: Colors.white.withValues(alpha: 0.85),
+                        size: 22,
+                      ),
+                tooltip: l10n?.commonDelete ?? 'Delete',
               ),
             ],
-          ),
+          ],
         ),
       );
     }
@@ -838,10 +870,8 @@ class _StoryContentState extends State<_StoryContent> {
                 child: TextField(
                   controller: _replyController,
                   focusNode: _replyFocusNode,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                  ),
+                  enabled: !_isSendingReply,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                   decoration: InputDecoration(
                     hintText: l10n?.storyReplyToStory ?? 'Reply to story...',
                     hintStyle: TextStyle(
@@ -862,12 +892,10 @@ class _StoryContentState extends State<_StoryContent> {
             ),
             const SizedBox(width: 8),
             IconButton(
-              onPressed: () => _handleReplySubmit(_replyController.text),
-              icon: const Icon(
-                Icons.send,
-                color: Colors.white,
-                size: 22,
-              ),
+              onPressed: _isSendingReply
+                  ? null
+                  : () => _handleReplySubmit(_replyController.text),
+              icon: const Icon(Icons.send, color: Colors.white, size: 22),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
@@ -879,13 +907,93 @@ class _StoryContentState extends State<_StoryContent> {
     return const SizedBox(height: 16);
   }
 
-  void _handleReplySubmit(String text) {
+  Future<void> _handleReplySubmit(String text) async {
     final message = text.trim();
-    if (message.isEmpty) return;
+    if (message.isEmpty || _isSendingReply) return;
 
-    widget.onReply?.call(message);
-    _replyController.clear();
-    _replyFocusNode.unfocus();
+    setState(() {
+      _isSendingReply = true;
+    });
+
+    var succeeded = false;
+    try {
+      succeeded =
+          await (widget.onReply?.call(message) ?? Future<bool>.value(false));
+    } catch (_) {
+      succeeded = false;
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _isSendingReply = false;
+      if (succeeded) {
+        _replyController.clear();
+      }
+    });
+
+    if (succeeded) {
+      _replyFocusNode.unfocus();
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(S.of(context)?.commonRetry ?? 'Failed to send reply'),
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteStory() async {
+    final onDelete = widget.onDeleteStory;
+    if (onDelete == null || _isDeletingStory) {
+      return;
+    }
+    final l10n = S.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n?.commonDelete ?? 'Delete'),
+        content: const Text('Delete this story?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            key: const Key('story_delete_confirm_button'),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n?.commonDelete ?? 'Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    setState(() {
+      _isDeletingStory = true;
+    });
+
+    final deleted = await onDelete();
+    if (!mounted) return;
+
+    setState(() {
+      _isDeletingStory = false;
+    });
+
+    if (deleted) {
+      widget.onClose();
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n?.commonRetry ?? 'Failed to delete story'),
+      ),
+    );
   }
 
   /// 格式化时间为 "X 小时前" 等格式

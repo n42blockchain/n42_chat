@@ -496,6 +496,9 @@ class MessageMetadata extends Equatable {
   /// 交易哈希
   final String? txHash;
 
+  /// 红包 ID（用于领取和查询真实红包状态）
+  final String? redPacketId;
+
   // ============================================
   // 投票属性
   // ============================================
@@ -586,6 +589,7 @@ class MessageMetadata extends Equatable {
     this.token,
     this.transferStatus,
     this.txHash,
+    this.redPacketId,
     this.pollQuestion,
     this.pollOptions,
     this.pollOptionIds,
@@ -651,6 +655,7 @@ class MessageMetadata extends Equatable {
         token,
         transferStatus,
         txHash,
+        redPacketId,
         pollQuestion,
         pollOptions,
         pollOptionIds,
@@ -709,6 +714,7 @@ class MessageMetadata extends Equatable {
     token: token,
     transferStatus: transferStatus,
     txHash: txHash,
+    redPacketId: redPacketId,
     musicTitle: musicTitle,
     musicArtist: musicArtist,
     musicUrl: musicUrl,
@@ -746,6 +752,7 @@ class MessageMetadata extends Equatable {
     token: token,
     transferStatus: transferStatus,
     txHash: txHash,
+    redPacketId: redPacketId,
     pollQuestion: pollQuestion,
     pollOptions: pollOptions,
     pollOptionIds: pollOptionIds,
@@ -802,4 +809,3 @@ class MessageReaction extends Equatable {
   @override
   List<Object?> get props => [key, userIds, isMe];
 }
-

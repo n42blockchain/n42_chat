@@ -112,6 +112,7 @@ class MatrixMetadataExtractor {
         amount: event.content['amount'] as String?,
         token: event.content['token'] as String?,
         transferStatus: event.content['status'] as String?,
+        redPacketId: event.content['red_packet_id'] as String?,
       );
     }
 

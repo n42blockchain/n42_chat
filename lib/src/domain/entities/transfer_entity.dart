@@ -4,12 +4,16 @@ import 'package:equatable/equatable.dart';
 enum TransferStatus {
   /// 等待中
   pending,
+
   /// 处理中
   processing,
+
   /// 已完成
   completed,
+
   /// 失败
   failed,
+
   /// 已取消
   cancelled,
 }
@@ -18,6 +22,7 @@ enum TransferStatus {
 enum TransferDirection {
   /// 发送
   sent,
+
   /// 接收
   received,
 }
@@ -29,6 +34,9 @@ class TransferEntity extends Equatable {
 
   /// 关联的消息事件ID
   final String? eventId;
+
+  /// 关联的房间ID
+  final String? roomId;
 
   /// 发送方地址
   final String senderAddress;
@@ -84,6 +92,7 @@ class TransferEntity extends Equatable {
   const TransferEntity({
     required this.id,
     this.eventId,
+    this.roomId,
     required this.senderAddress,
     required this.receiverAddress,
     this.senderUserId,
@@ -149,30 +158,32 @@ class TransferEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        eventId,
-        senderAddress,
-        receiverAddress,
-        senderUserId,
-        receiverUserId,
-        amount,
-        token,
-        tokenName,
-        tokenIcon,
-        transactionHash,
-        status,
-        memo,
-        createdAt,
-        completedAt,
-        failureReason,
-        confirmations,
-        fee,
-        feeToken,
-      ];
+    id,
+    eventId,
+    roomId,
+    senderAddress,
+    receiverAddress,
+    senderUserId,
+    receiverUserId,
+    amount,
+    token,
+    tokenName,
+    tokenIcon,
+    transactionHash,
+    status,
+    memo,
+    createdAt,
+    completedAt,
+    failureReason,
+    confirmations,
+    fee,
+    feeToken,
+  ];
 
   TransferEntity copyWith({
     String? id,
     String? eventId,
+    String? roomId,
     String? senderAddress,
     String? receiverAddress,
     String? senderUserId,
@@ -194,6 +205,7 @@ class TransferEntity extends Equatable {
     return TransferEntity(
       id: id ?? this.id,
       eventId: eventId ?? this.eventId,
+      roomId: roomId ?? this.roomId,
       senderAddress: senderAddress ?? this.senderAddress,
       receiverAddress: receiverAddress ?? this.receiverAddress,
       senderUserId: senderUserId ?? this.senderUserId,
@@ -219,6 +231,7 @@ class TransferEntity extends Equatable {
     return TransferEntity(
       id: json['id'] as String,
       eventId: json['event_id'] as String?,
+      roomId: json['room_id'] as String?,
       senderAddress: json['sender_address'] as String,
       receiverAddress: json['receiver_address'] as String,
       senderUserId: json['sender_user_id'] as String?,
@@ -249,6 +262,7 @@ class TransferEntity extends Equatable {
     return {
       'id': id,
       'event_id': eventId,
+      'room_id': roomId,
       'sender_address': senderAddress,
       'receiver_address': receiverAddress,
       'sender_user_id': senderUserId,
@@ -311,7 +325,9 @@ class TransferMessageContent {
   });
 
   /// 从消息内容创建
-  factory TransferMessageContent.fromMessageContent(Map<String, dynamic> content) {
+  factory TransferMessageContent.fromMessageContent(
+    Map<String, dynamic> content,
+  ) {
     return TransferMessageContent(
       transferId: content['transfer_id'] as String? ?? '',
       senderAddress: content['sender_address'] as String? ?? '',
@@ -383,7 +399,9 @@ class PaymentRequestContent {
   }
 
   /// 从消息内容创建
-  factory PaymentRequestContent.fromMessageContent(Map<String, dynamic> content) {
+  factory PaymentRequestContent.fromMessageContent(
+    Map<String, dynamic> content,
+  ) {
     return PaymentRequestContent(
       requestId: content['request_id'] as String? ?? '',
       receiverAddress: content['receiver_address'] as String? ?? '',
@@ -410,4 +428,3 @@ class PaymentRequestContent {
     };
   }
 }
-

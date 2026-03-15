@@ -63,7 +63,10 @@ class MiniAppBridgeService {
 
   /// 检查 Mini App 是否拥有指定权限
   bool _hasPermission(MiniAppPermission permission) {
-    if (_app == null) return true; // 未指定 app 时默认允许
+    if (_app == null) {
+      // 没有清单时只保留低风险只读能力，避免把交易或发消息默认放开。
+      return permission == MiniAppPermission.walletAddress;
+    }
     return _app.permissions.contains(permission);
   }
 
@@ -85,6 +88,9 @@ class MiniAppBridgeService {
   String get initScript => '''
 (function() {
   if (window.n42) return; // 防止重复注入
+
+  var _canChatRead = ${_hasPermission(MiniAppPermission.chatRead)};
+  var _canChatSend = ${_hasPermission(MiniAppPermission.chatSend)};
 
   // ─── Promise 响应追踪 ───
   var _pendingCallbacks = {};
@@ -125,12 +131,18 @@ class MiniAppBridgeService {
     },
 
     chat: {
-      getRoomId: function() { return '${_roomId.replaceAll("'", "\\'")}'; },
+      getRoomId: function() {
+        if (!_canChatRead) return null;
+        return '${_roomId.replaceAll("'", "\\'")}';
+      },
       sendMessage: function(text) {
+        if (!_canChatSend || typeof text !== 'string' || !text.trim()) return false;
         N42ChatChannel.postMessage(JSON.stringify({method: 'sendMessage', params: {text: text}}));
+        return true;
       },
       close: function() {
         N42ChatChannel.postMessage(JSON.stringify({method: 'close'}));
+        return true;
       },
     },
 
@@ -253,8 +265,12 @@ class MiniAppBridgeService {
       final message = _BridgeMessage.fromJson(msg.message);
       switch (message.method) {
         case 'sendMessage':
+          if (!_hasPermission(MiniAppPermission.chatSend)) return;
           final text = message.params?['text'] as String?;
-          if (text != null && text.isNotEmpty) onSendMessage?.call(text);
+          final trimmed = text?.trim();
+          if (trimmed != null && trimmed.isNotEmpty) {
+            onSendMessage?.call(trimmed);
+          }
         case 'close':
           onClose?.call();
       }

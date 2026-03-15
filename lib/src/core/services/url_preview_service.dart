@@ -32,6 +32,15 @@ class UrlPreviewService {
   static const int _maxCacheSize = 100;
   static const Duration _cacheTtl = Duration(hours: 1);
 
+  UrlPreviewService({
+    http.Client Function()? clientFactory,
+    DateTime Function()? now,
+  })  : _clientFactory = clientFactory ?? http.Client.new,
+        _now = now ?? DateTime.now;
+
+  final http.Client Function() _clientFactory;
+  final DateTime Function() _now;
+
   final LinkedHashMap<String, _CachedPreview> _cache = LinkedHashMap();
   final Map<String, Future<UrlPreviewData?>> _pending = {};
 
@@ -39,7 +48,7 @@ class UrlPreviewService {
   Future<UrlPreviewData?> getPreview(String url) async {
     // 检查缓存
     final cached = _cache[url];
-    if (cached != null && !cached.isExpired) {
+    if (cached != null && !cached.isExpired(_now)) {
       // 移到末尾（LRU）
       _cache.remove(url);
       _cache[url] = cached;
@@ -63,7 +72,10 @@ class UrlPreviewService {
       }
       return result;
     } finally {
-      unawaited(_pending.remove(url));
+      final removed = _pending.remove(url);
+      if (removed != null) {
+        unawaited(removed);
+      }
     }
   }
 
@@ -77,7 +89,7 @@ class UrlPreviewService {
       if (uri.scheme != 'http' && uri.scheme != 'https') return true;
 
       // 检查 localhost
-      if (host == 'localhost' || host == '127.0.0.1' || host == '::1') {
+      if (host == 'localhost' || host == '::1') {
         return true;
       }
 
@@ -89,6 +101,7 @@ class UrlPreviewService {
       if (parts.length == 4) {
         final first = int.tryParse(parts[0]);
         final second = int.tryParse(parts[1]);
+        if (first == 127) return true; // 127.0.0.0/8 loopback
         if (first == 10) return true; // 10.0.0.0/8
         if (first == 172 && second != null && second >= 16 && second <= 31) {
           return true; // 172.16.0.0/12
@@ -122,7 +135,7 @@ class UrlPreviewService {
       request.headers['User-Agent'] = 'Mozilla/5.0 (compatible; N42Bot/1.0)';
       request.headers['Range'] = 'bytes=0-51200'; // 限 50KB
 
-      final client = http.Client();
+      final client = _clientFactory();
       try {
         final response = await client.send(request).timeout(
           const Duration(seconds: 5),
@@ -151,12 +164,12 @@ class UrlPreviewService {
 
     // 解析 og:* meta 标签
     final metaRegex = RegExp(
-      r'<meta\s+[^>]*(?:property|name)\s*=\s*"([^"]*)"[^>]*content\s*=\s*"([^"]*)"[^>]*/?>',
+      r'''<meta\s+[^>]*(?:property|name)\s*=\s*["']([^"']*)["'][^>]*content\s*=\s*["']([^"']*)["'][^>]*/?>''',
       caseSensitive: false,
     );
     // 也匹配 content 在前的情况
     final metaRegex2 = RegExp(
-      r'<meta\s+[^>]*content\s*=\s*"([^"]*)"[^>]*(?:property|name)\s*=\s*"([^"]*)"[^>]*/?>',
+      r'''<meta\s+[^>]*content\s*=\s*["']([^"']*)["'][^>]*(?:property|name)\s*=\s*["']([^"']*)["'][^>]*/?>''',
       caseSensitive: false,
     );
 
@@ -232,7 +245,7 @@ class UrlPreviewService {
     if (_cache.length >= _maxCacheSize) {
       _cache.remove(_cache.keys.first);
     }
-    _cache[url] = _CachedPreview(data: data, cachedAt: DateTime.now());
+    _cache[url] = _CachedPreview(data: data, cachedAt: _now());
   }
 
   /// 从文本中提取第一个 URL
@@ -257,7 +270,7 @@ class UrlPreviewService {
       request.headers['User-Agent'] = 'Mozilla/5.0 (compatible; N42Bot/1.0)';
       request.headers['Range'] = 'bytes=0-102400'; // 限 100KB
 
-      final client = http.Client();
+      final client = _clientFactory();
       try {
         final response = await client.send(request).timeout(
           const Duration(seconds: 8),
@@ -313,7 +326,6 @@ class _CachedPreview {
   final DateTime cachedAt;
 
   _CachedPreview({required this.data, required this.cachedAt});
-
-  bool get isExpired =>
-      DateTime.now().difference(cachedAt) > UrlPreviewService._cacheTtl;
+  bool isExpired(DateTime Function() now) =>
+      now().difference(cachedAt) > UrlPreviewService._cacheTtl;
 }

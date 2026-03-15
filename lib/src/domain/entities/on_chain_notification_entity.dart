@@ -2,12 +2,12 @@ import 'package:equatable/equatable.dart';
 
 /// 链上事件通知类型
 enum OnChainNotificationType {
-  transfer,   // 代币转账
-  nft,        // NFT 铸造/转移
-  defi,       // DeFi 操作（清算、流动性等）
+  transfer, // 代币转账
+  nft, // NFT 铸造/转移
+  defi, // DeFi 操作（清算、流动性等）
   governance, // 治理提案/投票
-  security,   // 安全警告
-  general,    // 通用公告
+  security, // 安全警告
+  general, // 通用公告
 }
 
 /// 链上事件通知实体
@@ -81,7 +81,6 @@ class OnChainNotificationEntity extends Equatable {
   factory OnChainNotificationEntity.fromPushProtocol(
     Map<String, dynamic> json,
   ) {
-    final payloadId = (json['payload_id'] ?? json['payloadId'])?.toString() ?? '';
     final sender = json['sender']?.toString() ?? '';
     final epochStr = json['epoch']?.toString() ?? '';
     final payload = json['payload'] as Map<String, dynamic>? ?? {};
@@ -106,6 +105,9 @@ class OnChainNotificationEntity extends Equatable {
     final notifBody = (notification['body'] as String? ?? '').trim();
     final amsg = (data['amsg'] as String? ?? '').trim();
     final body = notifBody.isNotEmpty ? notifBody : amsg;
+    final payloadId =
+        (json['payload_id'] ?? json['payloadId'])?.toString() ?? '';
+    final fallbackId = '$sender|$epochStr|$title|$body';
 
     // CTA URL
     final acta = (data['acta'] as String? ?? '').trim();
@@ -122,7 +124,7 @@ class OnChainNotificationEntity extends Equatable {
     }
 
     return OnChainNotificationEntity(
-      id: payloadId,
+      id: payloadId.isNotEmpty ? payloadId : fallbackId,
       title: title.isEmpty ? 'On-chain Notification' : title,
       body: body,
       imageUrl: imageUrl,
@@ -175,5 +177,12 @@ class OnChainNotificationEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, title, body, channelAddress, timestamp, isRead];
+  List<Object?> get props => [
+    id,
+    title,
+    body,
+    channelAddress,
+    timestamp,
+    isRead,
+  ];
 }

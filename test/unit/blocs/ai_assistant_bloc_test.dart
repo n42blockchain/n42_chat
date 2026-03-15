@@ -247,6 +247,29 @@ void main() {
     );
 
     blocTest<AiAssistantBloc, AiAssistantState>(
+      'ClearAiChatHistory should also stop active generation',
+      build: () {
+        when(() => mockAiRepository.clearChatHistory(any()))
+            .thenAnswer((_) async {});
+        return AiAssistantBloc(aiRepository: mockAiRepository);
+      },
+      seed: () => AiAssistantState(
+        assistant: defaultAssistant,
+        messages: [testMessage],
+        isGenerating: true,
+        streamingText: 'partial',
+        isLoading: false,
+      ),
+      act: (bloc) => bloc.add(const ClearAiChatHistory()),
+      expect: () => [
+        isA<AiAssistantState>()
+            .having((s) => s.messages, 'messages', isEmpty)
+            .having((s) => s.isGenerating, 'isGenerating', isFalse)
+            .having((s) => s.streamingText, 'streamingText', isEmpty),
+      ],
+    );
+
+    blocTest<AiAssistantBloc, AiAssistantState>(
       'SwitchAiAssistant should switch and load history',
       build: () {
         when(() => mockAiRepository.getChatHistory(anotherAssistant.id))
@@ -270,6 +293,30 @@ void main() {
         verify(() => mockAiRepository.getChatHistory(anotherAssistant.id))
             .called(1);
       },
+    );
+
+    blocTest<AiAssistantBloc, AiAssistantState>(
+      'SwitchAiAssistant should stop current generation before switching',
+      build: () {
+        when(() => mockAiRepository.getChatHistory(anotherAssistant.id))
+            .thenAnswer((_) async => [testMessage]);
+        return AiAssistantBloc(aiRepository: mockAiRepository);
+      },
+      seed: () => AiAssistantState(
+        assistant: defaultAssistant,
+        messages: const [],
+        isGenerating: true,
+        streamingText: 'partial response',
+        isLoading: false,
+      ),
+      act: (bloc) => bloc.add(SwitchAiAssistant(anotherAssistant)),
+      expect: () => [
+        isA<AiAssistantState>()
+            .having((s) => s.assistant, 'assistant', anotherAssistant)
+            .having((s) => s.messages, 'messages', hasLength(1))
+            .having((s) => s.isGenerating, 'isGenerating', isFalse)
+            .having((s) => s.streamingText, 'streamingText', isEmpty),
+      ],
     );
 
     blocTest<AiAssistantBloc, AiAssistantState>(

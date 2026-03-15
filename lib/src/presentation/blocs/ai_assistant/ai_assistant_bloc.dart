@@ -48,7 +48,13 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     InitializeAiAssistant event,
     Emitter<AiAssistantState> emit,
   ) async {
-    emit(state.copyWith(isLoading: true, clearError: true));
+    await _cancelActiveStream();
+    emit(state.copyWith(
+      isLoading: true,
+      isGenerating: false,
+      streamingText: '',
+      clearError: true,
+    ));
 
     try {
       final assistant = event.assistantId != null
@@ -159,6 +165,7 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     AiStreamCompleted event,
     Emitter<AiAssistantState> emit,
   ) async {
+    _streamSubscription = null;
     final assistant = state.assistant ?? AiAssistantEntity.defaultAssistant;
     final responseText = state.streamingText;
 
@@ -191,6 +198,8 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     AiStreamError event,
     Emitter<AiAssistantState> emit,
   ) {
+    unawaited(_streamSubscription?.cancel());
+    _streamSubscription = null;
     emit(state.copyWith(
       isGenerating: false,
       streamingText: '',
@@ -202,19 +211,28 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     ClearAiChatHistory event,
     Emitter<AiAssistantState> emit,
   ) async {
+    await _cancelActiveStream();
     final assistant = state.assistant ?? AiAssistantEntity.defaultAssistant;
     await _aiRepository.clearChatHistory(assistant.id);
-    emit(state.copyWith(messages: [], clearError: true));
+    emit(state.copyWith(
+      messages: [],
+      isGenerating: false,
+      streamingText: '',
+      clearError: true,
+    ));
   }
 
   Future<void> _onSwitchAssistant(
     SwitchAiAssistant event,
     Emitter<AiAssistantState> emit,
   ) async {
+    await _cancelActiveStream();
     final history = await _aiRepository.getChatHistory(event.assistant.id);
     emit(state.copyWith(
       assistant: event.assistant,
       messages: history,
+      isGenerating: false,
+      streamingText: '',
       clearError: true,
     ));
   }
@@ -376,5 +394,10 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     }));
 
     return result;
+  }
+
+  Future<void> _cancelActiveStream() async {
+    await _streamSubscription?.cancel();
+    _streamSubscription = null;
   }
 }

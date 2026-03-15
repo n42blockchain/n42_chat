@@ -38,7 +38,14 @@ class _VoiceRoomView extends StatelessWidget {
     final s = S.of(context);
     final theme = Theme.of(context);
 
-    return BlocBuilder<VoiceRoomBloc, VoiceRoomState>(
+    return BlocConsumer<VoiceRoomBloc, VoiceRoomState>(
+      listenWhen: (previous, current) =>
+          previous.isConnected && !current.isConnected,
+      listener: (context, state) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
       builder: (context, state) {
         final room = state.room;
 
@@ -211,7 +218,6 @@ class _VoiceRoomView extends StatelessWidget {
             color: Colors.red.shade300,
             onTap: () {
               context.read<VoiceRoomBloc>().add(const LeaveVoiceRoom());
-              Navigator.of(context).pop();
             },
           ),
         ],

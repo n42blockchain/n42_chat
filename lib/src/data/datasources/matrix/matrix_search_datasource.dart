@@ -7,7 +7,7 @@ import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
 
 const _kSearchHistoryKey = 'n42_chat_search_history';
-const _kSearchHistoryLimit = 50;
+const _kSearchHistoryLimit = 20;
 
 /// Matrix搜索数据源
 ///
@@ -25,14 +25,14 @@ class MatrixSearchDataSource {
   // ============================================
 
   /// 搜索用户
-  Future<List<matrix.Profile>> searchUsers(String query, {int limit = 20}) async {
+  Future<List<matrix.Profile>> searchUsers(
+    String query, {
+    int limit = 20,
+  }) async {
     if (_client == null || query.trim().isEmpty) return [];
 
     try {
-      final result = await _client!.searchUserDirectory(
-        query,
-        limit: limit,
-      );
+      final result = await _client!.searchUserDirectory(query, limit: limit);
       return result.results;
     } catch (e) {
       return [];
@@ -104,7 +104,7 @@ class MatrixSearchDataSource {
     }).toList();
   }
 
-  /// 搜索本地会话（包括私聊和群聊）
+  /// 搜索本地会话（私聊）
   List<matrix.Room> searchLocalConversations(String query) {
     if (_client == null || query.trim().isEmpty) return [];
 
@@ -112,6 +112,7 @@ class MatrixSearchDataSource {
 
     return _client!.rooms.where((room) {
       if (room.membership != matrix.Membership.join) return false;
+      if (!room.isDirectChat) return false;
 
       final name = room.getLocalizedDisplayname().toLowerCase();
       final topic = room.topic.toLowerCase();
@@ -202,10 +203,7 @@ class MatrixSearchDataSource {
 
           final body = event.body.toLowerCase();
           if (body.contains(lowerQuery)) {
-            results.add(MessageSearchResult(
-              event: event,
-              room: room,
-            ));
+            results.add(MessageSearchResult(event: event, room: room));
             roomResultCount++;
 
             if (roomResultCount >= limitPerRoom) break;
@@ -259,7 +257,9 @@ class MatrixSearchDataSource {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_kSearchHistoryKey);
-      final list = raw != null ? (jsonDecode(raw) as List).cast<String>() : <String>[];
+      final list = raw != null
+          ? (jsonDecode(raw) as List).cast<String>()
+          : <String>[];
       list.remove(query);
       list.insert(0, query);
       if (list.length > _kSearchHistoryLimit) {
@@ -280,6 +280,22 @@ class MatrixSearchDataSource {
       debugLog('MatrixSearchDataSource.clearSearchHistory error: $e');
     }
   }
+
+  /// 删除单条搜索记录
+  Future<void> deleteSearchQuery(String query) async {
+    if (query.trim().isEmpty) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_kSearchHistoryKey);
+      if (raw == null) return;
+
+      final list = (jsonDecode(raw) as List).cast<String>();
+      list.remove(query);
+      await prefs.setString(_kSearchHistoryKey, jsonEncode(list));
+    } catch (e) {
+      debugLog('MatrixSearchDataSource.deleteSearchQuery error: $e');
+    }
+  }
 }
 
 /// 消息搜索结果
@@ -287,9 +303,5 @@ class MessageSearchResult {
   final matrix.Event event;
   final matrix.Room room;
 
-  MessageSearchResult({
-    required this.event,
-    required this.room,
-  });
+  MessageSearchResult({required this.event, required this.room});
 }
-

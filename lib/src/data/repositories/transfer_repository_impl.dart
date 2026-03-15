@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 
+import '../../core/utils/debug_log.dart';
 import '../../domain/entities/transfer_entity.dart';
 import '../../domain/repositories/transfer_repository.dart';
 import '../../integration/wallet_bridge.dart';
@@ -42,6 +43,7 @@ class TransferRepositoryImpl implements ITransferRepository {
     final transferId = const Uuid().v4();
     final transfer = TransferEntity(
       id: transferId,
+      roomId: roomId,
       senderAddress: senderAddress,
       receiverAddress: receiverAddress,
       senderUserId: _clientManager.client?.userID,
@@ -84,7 +86,18 @@ class TransferRepositoryImpl implements ITransferRepository {
 
     // 发送转账消息到聊天室
     if (result.success) {
-      await sendTransferMessage(roomId: roomId, transfer: updatedTransfer);
+      try {
+        final eventId = await sendTransferMessage(
+          roomId: roomId,
+          transfer: updatedTransfer,
+        );
+        updatedTransfer = updatedTransfer.copyWith(eventId: eventId);
+        _transfersCache[transferId] = updatedTransfer;
+      } catch (e) {
+        debugLog(
+          'TransferRepository: transfer succeeded but chat message failed: $e',
+        );
+      }
     }
 
     return updatedTransfer;
@@ -185,10 +198,7 @@ class TransferRepositoryImpl implements ITransferRepository {
 
   @override
   Future<List<TransferEntity>> getTransfersByRoom(String roomId) async {
-    // 目前从缓存中获取，实际应该从消息历史中解析
-    return _transfersCache.values
-        .where((t) => t.eventId != null)
-        .toList()
+    return _transfersCache.values.where((t) => t.roomId == roomId).toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
@@ -237,4 +247,3 @@ class TransferRepositoryImpl implements ITransferRepository {
   @override
   bool get isWalletConnected => _walletBridge.isWalletConnected;
 }
-

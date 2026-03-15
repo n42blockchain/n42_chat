@@ -1,5 +1,6 @@
-// Tests for SearchRepositoryImpl — focuses on pure in-memory search history
-// (saveSearchQuery, getRecentSearches, deleteSearchQuery, clearSearchHistory)
+// Tests for SearchRepositoryImpl — focuses on persistent search history
+// delegation (saveSearchQuery, getRecentSearches, deleteSearchQuery,
+// clearSearchHistory)
 // and lightweight delegation tests that require no Matrix connection.
 //
 // Matrix-dependent paths (searchGlobal with results, searchContacts via Matrix,
@@ -11,7 +12,8 @@ import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart'
 import 'package:n42_chat/src/data/datasources/matrix/matrix_search_datasource.dart';
 import 'package:n42_chat/src/data/repositories/search_repository_impl.dart';
 
-class MockMatrixSearchDataSource extends Mock implements MatrixSearchDataSource {}
+class MockMatrixSearchDataSource extends Mock
+    implements MatrixSearchDataSource {}
 
 class MockMatrixClientManager extends Mock implements MatrixClientManager {}
 
@@ -19,10 +21,41 @@ void main() {
   late SearchRepositoryImpl repository;
   late MockMatrixSearchDataSource mockDataSource;
   late MockMatrixClientManager mockClientManager;
+  late List<String> persistedHistory;
 
   setUp(() {
     mockDataSource = MockMatrixSearchDataSource();
     mockClientManager = MockMatrixClientManager();
+    persistedHistory = <String>[];
+
+    when(
+      () => mockDataSource.getRecentSearches(limit: any(named: 'limit')),
+    ).thenAnswer((invocation) async {
+      final limit = invocation.namedArguments[#limit] as int? ?? 10;
+      return persistedHistory.take(limit).toList();
+    });
+    when(() => mockDataSource.saveSearchQuery(any())).thenAnswer((
+      invocation,
+    ) async {
+      final query = (invocation.positionalArguments.first as String).trim();
+      if (query.isEmpty) return;
+
+      persistedHistory.remove(query);
+      persistedHistory.insert(0, query);
+      if (persistedHistory.length > 20) {
+        persistedHistory.removeRange(20, persistedHistory.length);
+      }
+    });
+    when(() => mockDataSource.deleteSearchQuery(any())).thenAnswer((
+      invocation,
+    ) async {
+      final query = invocation.positionalArguments.first as String;
+      persistedHistory.remove(query);
+    });
+    when(() => mockDataSource.clearSearchHistory()).thenAnswer((_) async {
+      persistedHistory.clear();
+    });
+
     repository = SearchRepositoryImpl(
       mockDataSource,
       mockClientManager,
@@ -55,7 +88,7 @@ void main() {
   });
 
   // ─────────────────────────────────────────────────
-  // In-memory search history
+  // Persistent search history delegation
   // ─────────────────────────────────────────────────
 
   group('getRecentSearches — initial state', () {
@@ -76,6 +109,7 @@ void main() {
 
       final history = await repository.getRecentSearches();
       expect(history, contains('bitcoin'));
+      verify(() => mockDataSource.saveSearchQuery('bitcoin')).called(1);
     });
 
     test('most recent query appears first', () async {
@@ -103,6 +137,7 @@ void main() {
 
       final history = await repository.getRecentSearches();
       expect(history, isEmpty);
+      verify(() => mockDataSource.saveSearchQuery('')).called(2);
     });
 
     test('caps history at 20 entries (oldest entry is dropped)', () async {
@@ -140,6 +175,7 @@ void main() {
       final history = await repository.getRecentSearches();
       expect(history, isNot(contains('beta')));
       expect(history, containsAll(['alpha', 'gamma']));
+      verify(() => mockDataSource.deleteSearchQuery('beta')).called(1);
     });
 
     test('is a no-op when query not in history', () async {
@@ -175,6 +211,7 @@ void main() {
 
       final history = await repository.getRecentSearches();
       expect(history, isEmpty);
+      verify(() => mockDataSource.clearSearchHistory()).called(1);
     });
 
     test('subsequent saves work normally after clear', () async {
@@ -188,10 +225,7 @@ void main() {
 
     test('clearing empty history does not throw', () async {
       // History is already empty — should be a safe no-op.
-      await expectLater(
-        repository.clearSearchHistory(),
-        completes,
-      );
+      await expectLater(repository.clearSearchHistory(), completes);
     });
   });
 
@@ -200,18 +234,26 @@ void main() {
   // ─────────────────────────────────────────────────
 
   group('searchInChat — empty query', () {
-    test('returns empty ChatSearchResults without calling datasource', () async {
-      // Stub necessary Matrix calls to return empty lists.
-      when(() => mockDataSource.searchMessagesInRoom(any(), any(), limit: any(named: 'limit')))
-          .thenAnswer((_) async => []);
+    test(
+      'returns empty ChatSearchResults without calling datasource',
+      () async {
+        // Stub necessary Matrix calls to return empty lists.
+        when(
+          () => mockDataSource.searchMessagesInRoom(
+            any(),
+            any(),
+            limit: any(named: 'limit'),
+          ),
+        ).thenAnswer((_) async => []);
 
-      final result = await repository.searchInChat('!room:server', '');
+        final result = await repository.searchInChat('!room:server', '');
 
-      expect(result.isEmpty, isTrue);
-      expect(result.roomId, '!room:server');
-      expect(result.messages, isEmpty);
-      // Empty query short-circuits before calling datasource.
-      verifyNever(() => mockDataSource.searchMessagesInRoom(any(), any()));
-    });
+        expect(result.isEmpty, isTrue);
+        expect(result.roomId, '!room:server');
+        expect(result.messages, isEmpty);
+        // Empty query short-circuits before calling datasource.
+        verifyNever(() => mockDataSource.searchMessagesInRoom(any(), any()));
+      },
+    );
   });
 }

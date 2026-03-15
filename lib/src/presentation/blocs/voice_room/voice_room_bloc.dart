@@ -98,6 +98,9 @@ class VoiceRoomBloc extends Bloc<VoiceRoomEvent, VoiceRoomState> {
       final joined = await _voiceRoomService.joinRoom(event.roomId);
       if (joined) {
         final room = await _repository.getVoiceRoom(event.roomId);
+        if (room != null) {
+          _voiceRoomService.syncFromRoom(room);
+        }
         emit(state.copyWith(
           room: room,
           isConnected: true,
@@ -182,8 +185,12 @@ class VoiceRoomBloc extends Bloc<VoiceRoomEvent, VoiceRoomState> {
   }
 
   Future<void> _onToggleMute(ToggleMute event, Emitter<VoiceRoomState> emit) async {
-    await _voiceRoomService.toggleMute();
-    emit(state.copyWith(isMuted: _voiceRoomService.isMuted));
+    try {
+      await _voiceRoomService.toggleMute();
+      emit(state.copyWith(isMuted: _voiceRoomService.isMuted, clearError: true));
+    } catch (e) {
+      emit(state.copyWith(error: 'Failed to toggle mute: $e'));
+    }
   }
 
   Future<void> _onEndVoiceRoom(EndVoiceRoom event, Emitter<VoiceRoomState> emit) async {
@@ -195,7 +202,12 @@ class VoiceRoomBloc extends Bloc<VoiceRoomEvent, VoiceRoomState> {
   }
 
   void _onVoiceRoomUpdated(VoiceRoomUpdated event, Emitter<VoiceRoomState> emit) {
-    emit(state.copyWith(room: event.room));
+    _voiceRoomService.syncFromRoom(event.room);
+    emit(state.copyWith(
+      room: event.room,
+      myRole: _voiceRoomService.myRole,
+      isMuted: _voiceRoomService.isMuted,
+    ));
   }
 
   void _onActiveVoiceRoomsUpdated(ActiveVoiceRoomsUpdated event, Emitter<VoiceRoomState> emit) {

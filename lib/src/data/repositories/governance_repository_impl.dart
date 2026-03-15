@@ -17,12 +17,13 @@ class GovernanceRepositoryImpl implements IGovernanceRepository {
   GovernanceRepositoryImpl({
     required SnapshotGraphQLDatasource graphql,
     required SnapshotHubDatasource hub,
-  })  : _graphql = graphql,
-        _hub = hub;
+  }) : _graphql = graphql,
+       _hub = hub;
 
   @override
   Future<GovernanceSpace> getSpace(String spaceId) async {
     final data = await _graphql.getSpace(spaceId);
+    final rawStrategies = data['strategies'] as List<dynamic>? ?? const [];
     return GovernanceSpace(
       id: data['id'] as String,
       name: data['name'] as String? ?? '',
@@ -34,7 +35,9 @@ class GovernanceRepositoryImpl implements IGovernanceRepository {
       members: (data['members'] as List<dynamic>?)?.cast<String>() ?? [],
       proposalsCount: data['proposals_count'] as int? ?? 0,
       followersCount: data['followers_count'] as int? ?? 0,
-      strategies: data['strategies'] as Map<String, dynamic>?,
+      strategies: rawStrategies.whereType<Map<String, dynamic>>().toList(
+        growable: false,
+      ),
       filters: data['filters'] as Map<String, dynamic>?,
     );
   }
@@ -102,7 +105,9 @@ class GovernanceRepositoryImpl implements IGovernanceRepository {
       if (scores.isEmpty) return 0;
       return (scores[voter] as num?)?.toDouble() ?? 0;
     } catch (e) {
-      debugLog('GovernanceRepository: getVotingPower failed for $voter in $spaceId: $e');
+      debugLog(
+        'GovernanceRepository: getVotingPower failed for $voter in $spaceId: $e',
+      );
       return 0;
     }
   }

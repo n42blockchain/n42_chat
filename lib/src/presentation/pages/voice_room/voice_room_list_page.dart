@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/router/routes.dart';
 import '../../../domain/entities/voice_room_entity.dart';
 import '../../../domain/repositories/voice_room_repository.dart';
 import '../../../services/voip/voice_room_service.dart';
@@ -42,43 +44,52 @@ class _VoiceRoomListView extends StatelessWidget {
         onPressed: () => _showCreateDialog(context),
         child: const Icon(Icons.add),
       ),
-      body: BlocBuilder<VoiceRoomBloc, VoiceRoomState>(
-        builder: (context, state) {
-          if (state.isLoading && state.activeRooms.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (state.activeRooms.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.mic_none,
-                    size: 64,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    s?.voiceRoomNoActive ?? 'No active voice rooms',
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: state.activeRooms.length,
-            itemBuilder: (context, index) {
-              final room = state.activeRooms[index];
-              return _VoiceRoomCard(room: room);
-            },
-          );
+      body: BlocListener<VoiceRoomBloc, VoiceRoomState>(
+        listenWhen: (previous, current) =>
+            !previous.isConnected &&
+            current.isConnected &&
+            current.room != null,
+        listener: (context, state) {
+          context.push(Routes.voiceRoomPath(state.room!.roomId));
         },
+        child: BlocBuilder<VoiceRoomBloc, VoiceRoomState>(
+          builder: (context, state) {
+            if (state.isLoading && state.activeRooms.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (state.activeRooms.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.mic_none,
+                      size: 64,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      s?.voiceRoomNoActive ?? 'No active voice rooms',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: state.activeRooms.length,
+              itemBuilder: (context, index) {
+                final room = state.activeRooms[index];
+                return _VoiceRoomCard(room: room);
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -153,7 +164,7 @@ class _VoiceRoomCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          context.read<VoiceRoomBloc>().add(JoinVoiceRoom(room.roomId));
+          context.push(Routes.voiceRoomPath(room.roomId));
         },
         child: Padding(
           padding: const EdgeInsets.all(16),

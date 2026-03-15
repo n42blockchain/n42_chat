@@ -31,6 +31,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
     MiniAppCategory.nft,
     MiniAppCategory.finance,
     MiniAppCategory.games,
+    MiniAppCategory.social,
     MiniAppCategory.tools,
   ];
 
@@ -194,7 +195,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: featured.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemBuilder: (context, index) =>
                 _FeaturedCard(
                   app: featured[index],

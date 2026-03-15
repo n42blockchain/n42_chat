@@ -128,8 +128,12 @@ class _MomentListViewState extends State<_MomentListView> {
   }
 
   Set<String> _getFriendIds() {
+    final contactBloc = context.read<ContactBloc?>();
+    if (contactBloc == null) {
+      return {};
+    }
     try {
-      final contactState = context.read<ContactBloc>().state;
+      final contactState = contactBloc.state;
       if (contactState.isLoaded) {
         return contactState.contacts.map((c) => c.userId).toSet();
       }
@@ -935,69 +939,198 @@ class _MomentTile extends StatelessWidget {
   }
 
   void _showCommentDialog(BuildContext context) {
-    final controller = TextEditingController();
-
     showDialog<void>(
       context: context,
-      builder: (ctx) {
-        final s = S.of(context);
-        return AlertDialog(
-          title: Text(s?.momentComment ?? 'Comment'),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            maxLines: 3,
-            decoration: InputDecoration(
-              hintText: s?.momentWriteComment ?? 'Write a comment...',
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(s?.commonCancel ?? 'Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (controller.text.trim().isNotEmpty) {
-                  context.read<MomentBloc>().add(CommentMoment(
-                        momentId: moment.id,
-                        content: controller.text.trim(),
-                      ));
-                  Navigator.pop(ctx);
-                }
-              },
-              child: Text(s?.commonSend ?? 'Send'),
-            ),
-          ],
-        );
-      },
-    ).then((_) => controller.dispose());
+      builder: (_) => _MomentCommentDialog(momentId: moment.id),
+    );
   }
 
   void _showDeleteConfirmation(BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (ctx) {
-        final s = S.of(context);
-        return AlertDialog(
-          title: Text(s?.momentDeleteMoment ?? 'Delete Moment'),
-          content: Text(s?.momentDeleteConfirm ?? 'Are you sure you want to delete this moment?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(s?.commonCancel ?? 'Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                context.read<MomentBloc>().add(DeleteMoment(moment.id));
-                Navigator.pop(ctx);
-              },
-              child: Text(s?.commonDelete ?? 'Delete', style: const TextStyle(color: Colors.red)),
-            ),
-          ],
+      builder: (_) => _MomentDeleteDialog(momentId: moment.id),
+    );
+  }
+}
+
+class _MomentCommentDialog extends StatefulWidget {
+  final String momentId;
+
+  const _MomentCommentDialog({required this.momentId});
+
+  @override
+  State<_MomentCommentDialog> createState() => _MomentCommentDialogState();
+}
+
+class _MomentCommentDialogState extends State<_MomentCommentDialog> {
+  final TextEditingController _controller = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final text = _controller.text.trim();
+    if (text.isEmpty || _isSubmitting) {
+      return;
+    }
+    setState(() {
+      _isSubmitting = true;
+    });
+    context.read<MomentBloc>().add(
+          CommentMoment(
+            momentId: widget.momentId,
+            content: text,
+          ),
         );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+
+    return BlocListener<MomentBloc, MomentState>(
+      listenWhen: (previous, current) =>
+          _isSubmitting &&
+          previous.commentSubmissionVersion != current.commentSubmissionVersion,
+      listener: (context, state) {
+        if (state.commentSubmissionMomentId != widget.momentId) {
+          return;
+        }
+        if (state.commentSubmissionStatus ==
+            MomentCommentSubmissionStatus.success) {
+          setState(() {
+            _isSubmitting = false;
+          });
+          Navigator.of(context).pop();
+          return;
+        }
+        if (state.commentSubmissionStatus ==
+            MomentCommentSubmissionStatus.failure) {
+          setState(() {
+            _isSubmitting = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage ?? (s?.commonRetry ?? 'Retry')),
+            ),
+          );
+        }
       },
+      child: AlertDialog(
+        title: Text(s?.momentComment ?? 'Comment'),
+        content: TextField(
+          controller: _controller,
+          autofocus: true,
+          maxLines: 3,
+          enabled: !_isSubmitting,
+          decoration: InputDecoration(
+            hintText: s?.momentWriteComment ?? 'Write a comment...',
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
+            child: Text(s?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: _isSubmitting ? null : _submit,
+            child: _isSubmitting
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(s?.commonSend ?? 'Send'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MomentDeleteDialog extends StatefulWidget {
+  final String momentId;
+
+  const _MomentDeleteDialog({required this.momentId});
+
+  @override
+  State<_MomentDeleteDialog> createState() => _MomentDeleteDialogState();
+}
+
+class _MomentDeleteDialogState extends State<_MomentDeleteDialog> {
+  bool _isDeleting = false;
+
+  void _delete() {
+    if (_isDeleting) {
+      return;
+    }
+    setState(() {
+      _isDeleting = true;
+    });
+    context.read<MomentBloc>().add(DeleteMoment(widget.momentId));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+
+    return BlocListener<MomentBloc, MomentState>(
+      listenWhen: (previous, current) =>
+          _isDeleting &&
+          previous.deleteActionVersion != current.deleteActionVersion,
+      listener: (context, state) {
+        if (state.deleteActionMomentId != widget.momentId) {
+          return;
+        }
+        if (state.deleteActionStatus == MomentDeleteActionStatus.success) {
+          setState(() {
+            _isDeleting = false;
+          });
+          Navigator.of(context).pop();
+          return;
+        }
+        if (state.deleteActionStatus == MomentDeleteActionStatus.failure) {
+          setState(() {
+            _isDeleting = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage ?? (s?.commonRetry ?? 'Retry')),
+            ),
+          );
+        }
+      },
+      child: AlertDialog(
+        title: Text(s?.momentDeleteMoment ?? 'Delete Moment'),
+        content: Text(
+          s?.momentDeleteConfirm ??
+              'Are you sure you want to delete this moment?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: _isDeleting ? null : () => Navigator.of(context).pop(),
+            child: Text(s?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: _isDeleting ? null : _delete,
+            child: _isDeleting
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(
+                    s?.commonDelete ?? 'Delete',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

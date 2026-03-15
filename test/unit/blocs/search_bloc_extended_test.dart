@@ -17,15 +17,15 @@ import 'package:n42_chat/src/presentation/blocs/search/search_state.dart';
 class _MockSearchRepository extends Mock implements ISearchRepository {}
 
 MessageEntity _makeMsg(String id) => MessageEntity(
-      id: id,
-      roomId: '!r:s',
-      senderId: '@alice:s',
-      senderName: 'Alice',
-      content: 'text',
-      timestamp: DateTime(2025),
-      type: MessageType.text,
-      status: MessageStatus.sent,
-    );
+  id: id,
+  roomId: '!r:s',
+  senderId: '@alice:s',
+  senderName: 'Alice',
+  content: 'text',
+  timestamp: DateTime(2025),
+  type: MessageType.text,
+  status: MessageStatus.sent,
+);
 
 void main() {
   late _MockSearchRepository mockRepo;
@@ -50,8 +50,9 @@ void main() {
       'delegates to PerformSearch with type=contact and emits results',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.searchGlobal(any(), type: any(named: 'type')))
-            .thenAnswer((_) async => const SearchResults(query: 'alice'));
+        when(
+          () => mockRepo.searchGlobal(any(), type: any(named: 'type')),
+        ).thenAnswer((_) async => const SearchResults(query: 'alice'));
         when(() => mockRepo.getRecentSearches()).thenAnswer((_) async => []);
       },
       act: (bloc) => bloc.add(const SearchContacts('alice')),
@@ -74,8 +75,9 @@ void main() {
       'delegates to PerformSearch with type=group and emits results',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.searchGlobal(any(), type: any(named: 'type')))
-            .thenAnswer((_) async => const SearchResults(query: 'devs'));
+        when(
+          () => mockRepo.searchGlobal(any(), type: any(named: 'type')),
+        ).thenAnswer((_) async => const SearchResults(query: 'devs'));
         when(() => mockRepo.getRecentSearches()).thenAnswer((_) async => []);
       },
       act: (bloc) => bloc.add(const SearchGroups('devs')),
@@ -98,15 +100,19 @@ void main() {
       'without roomId — delegates to PerformSearch with type=message',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.searchGlobal(any(), type: any(named: 'type')))
-            .thenAnswer((_) async => const SearchResults(query: 'hello'));
+        when(
+          () => mockRepo.searchGlobal(any(), type: any(named: 'type')),
+        ).thenAnswer((_) async => const SearchResults(query: 'hello'));
         when(() => mockRepo.getRecentSearches()).thenAnswer((_) async => []);
       },
       act: (bloc) => bloc.add(const SearchMessages('hello')),
       wait: const Duration(milliseconds: 400),
       expect: () => [
-        isA<SearchLoading>()
-            .having((s) => s.type, 'type', SearchResultType.message),
+        isA<SearchLoading>().having(
+          (s) => s.type,
+          'type',
+          SearchResultType.message,
+        ),
         isA<SearchLoaded>(),
       ],
     );
@@ -115,19 +121,23 @@ void main() {
       'with roomId — delegates to SearchInChat and emits ChatSearchState',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.searchInChat(any(), any()))
-            .thenAnswer((_) async => const ChatSearchResults(
-                  roomId: '!r:s',
-                  query: 'hello',
-                ));
+        when(() => mockRepo.searchInChat(any(), any())).thenAnswer(
+          (_) async => const ChatSearchResults(roomId: '!r:s', query: 'hello'),
+        );
       },
       act: (bloc) => bloc.add(const SearchMessages('hello', roomId: '!r:s')),
       wait: const Duration(milliseconds: 400),
       expect: () => [
-        isA<ChatSearchState>()
-            .having((s) => s.isSearching, 'isSearching', isTrue),
-        isA<ChatSearchState>()
-            .having((s) => s.isSearching, 'isSearching', isFalse),
+        isA<ChatSearchState>().having(
+          (s) => s.isSearching,
+          'isSearching',
+          isTrue,
+        ),
+        isA<ChatSearchState>().having(
+          (s) => s.isSearching,
+          'isSearching',
+          isFalse,
+        ),
       ],
     );
   });
@@ -164,8 +174,11 @@ void main() {
       act: (bloc) => bloc.add(const SearchInChat('!r:s', 'hello')),
       wait: const Duration(milliseconds: 400),
       expect: () => [
-        isA<ChatSearchState>()
-            .having((s) => s.isSearching, 'isSearching', isTrue),
+        isA<ChatSearchState>().having(
+          (s) => s.isSearching,
+          'isSearching',
+          isTrue,
+        ),
         isA<ChatSearchState>()
             .having((s) => s.isSearching, 'isSearching', isFalse)
             .having((s) => s.results.messages.length, 'messages.length', 1),
@@ -176,14 +189,18 @@ void main() {
       'repository error — emits SearchError',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.searchInChat(any(), any()))
-            .thenThrow(Exception('connection error'));
+        when(
+          () => mockRepo.searchInChat(any(), any()),
+        ).thenThrow(Exception('connection error'));
       },
       act: (bloc) => bloc.add(const SearchInChat('!r:s', 'fail')),
       wait: const Duration(milliseconds: 400),
       expect: () => [
-        isA<ChatSearchState>()
-            .having((s) => s.isSearching, 'isSearching', isTrue),
+        isA<ChatSearchState>().having(
+          (s) => s.isSearching,
+          'isSearching',
+          isTrue,
+        ),
         isA<SearchError>(),
       ],
     );
@@ -208,8 +225,11 @@ void main() {
       ),
       act: (bloc) => bloc.add(const NavigateToNextResult()),
       expect: () => [
-        isA<ChatSearchState>()
-            .having((s) => s.results.currentIndex, 'currentIndex', 1),
+        isA<ChatSearchState>().having(
+          (s) => s.results.currentIndex,
+          'currentIndex',
+          1,
+        ),
       ],
     );
 
@@ -224,14 +244,14 @@ void main() {
         ),
       ),
       act: (bloc) => bloc.add(const NavigateToNextResult()),
-      expect: () => [],
+      expect: () => <SearchState>[],
     );
 
     blocTest<SearchBloc, SearchState>(
       'does nothing when state is not ChatSearchState',
       build: buildBloc,
       act: (bloc) => bloc.add(const NavigateToNextResult()),
-      expect: () => [],
+      expect: () => <SearchState>[],
     );
   });
 
@@ -254,8 +274,11 @@ void main() {
       ),
       act: (bloc) => bloc.add(const NavigateToPreviousResult()),
       expect: () => [
-        isA<ChatSearchState>()
-            .having((s) => s.results.currentIndex, 'currentIndex', 0),
+        isA<ChatSearchState>().having(
+          (s) => s.results.currentIndex,
+          'currentIndex',
+          0,
+        ),
       ],
     );
 
@@ -270,14 +293,14 @@ void main() {
         ),
       ),
       act: (bloc) => bloc.add(const NavigateToPreviousResult()),
-      expect: () => [],
+      expect: () => <SearchState>[],
     );
 
     blocTest<SearchBloc, SearchState>(
       'does nothing when state is not ChatSearchState',
       build: buildBloc,
       act: (bloc) => bloc.add(const NavigateToPreviousResult()),
-      expect: () => [],
+      expect: () => <SearchState>[],
     );
   });
 
@@ -300,8 +323,11 @@ void main() {
       ),
       act: (bloc) => bloc.add(const NavigateToResultIndex(2)),
       expect: () => [
-        isA<ChatSearchState>()
-            .having((s) => s.results.currentIndex, 'currentIndex', 2),
+        isA<ChatSearchState>().having(
+          (s) => s.results.currentIndex,
+          'currentIndex',
+          2,
+        ),
       ],
     );
 
@@ -316,7 +342,7 @@ void main() {
         ),
       ),
       act: (bloc) => bloc.add(const NavigateToResultIndex(10)),
-      expect: () => [],
+      expect: () => <SearchState>[],
     );
 
     blocTest<SearchBloc, SearchState>(
@@ -330,14 +356,14 @@ void main() {
         ),
       ),
       act: (bloc) => bloc.add(const NavigateToResultIndex(-1)),
-      expect: () => [],
+      expect: () => <SearchState>[],
     );
 
     blocTest<SearchBloc, SearchState>(
       'does nothing when state is not ChatSearchState',
       build: buildBloc,
       act: (bloc) => bloc.add(const NavigateToResultIndex(0)),
-      expect: () => [],
+      expect: () => <SearchState>[],
     );
   });
 
@@ -350,7 +376,7 @@ void main() {
       'does nothing when state is not ChatSearchState',
       build: buildBloc,
       act: (bloc) => bloc.add(const LoadMoreChatResults()),
-      expect: () => [],
+      expect: () => <SearchState>[],
     );
 
     blocTest<SearchBloc, SearchState>(
@@ -360,7 +386,7 @@ void main() {
         results: ChatSearchResults(roomId: '!r:s', hasMore: false),
       ),
       act: (bloc) => bloc.add(const LoadMoreChatResults()),
-      expect: () => [],
+      expect: () => <SearchState>[],
     );
 
     blocTest<SearchBloc, SearchState>(
@@ -385,8 +411,11 @@ void main() {
       ),
       act: (bloc) => bloc.add(const LoadMoreChatResults()),
       expect: () => [
-        isA<ChatSearchState>()
-            .having((s) => s.isSearching, 'isSearching', isTrue),
+        isA<ChatSearchState>().having(
+          (s) => s.isSearching,
+          'isSearching',
+          isTrue,
+        ),
         isA<ChatSearchState>()
             .having((s) => s.isSearching, 'isSearching', isFalse)
             .having((s) => s.results.messages.length, 'messages.length', 2),
@@ -397,8 +426,9 @@ void main() {
       'resets isSearching to false on repository failure',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.loadMoreChatSearchResults(any()))
-            .thenThrow(Exception('network error'));
+        when(
+          () => mockRepo.loadMoreChatSearchResults(any()),
+        ).thenThrow(Exception('network error'));
       },
       seed: () => const ChatSearchState(
         results: ChatSearchResults(
@@ -409,10 +439,16 @@ void main() {
       ),
       act: (bloc) => bloc.add(const LoadMoreChatResults()),
       expect: () => [
-        isA<ChatSearchState>()
-            .having((s) => s.isSearching, 'isSearching', isTrue),
-        isA<ChatSearchState>()
-            .having((s) => s.isSearching, 'isSearching', isFalse),
+        isA<ChatSearchState>().having(
+          (s) => s.isSearching,
+          'isSearching',
+          isTrue,
+        ),
+        isA<ChatSearchState>().having(
+          (s) => s.isSearching,
+          'isSearching',
+          isFalse,
+        ),
       ],
     );
   });

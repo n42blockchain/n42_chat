@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,6 +11,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../domain/entities/user_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../../n42_chat.dart';
 import '../../blocs/auth/auth_bloc.dart';
@@ -50,11 +53,34 @@ class _ProfilePageState extends State<ProfilePage> {
   String? _avatarUrl;
   String? _statusText; // 当前状态
   bool _isNftAvatar = false; // 头像是否来自 NFT
+  StreamSubscription<UserEntity?>? _userSubscription;
 
   @override
   void initState() {
     super.initState();
     _loadUserInfo();
+    _userSubscription = N42Chat.userStream.listen(_handleUserChanged);
+  }
+
+  @override
+  void dispose() {
+    _userSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _handleUserChanged(UserEntity? user) {
+    if (!mounted) return;
+    if (user == null) {
+      setState(() {
+        _userId = null;
+        _displayName = null;
+        _avatarUrl = null;
+        _statusText = null;
+        _isNftAvatar = false;
+      });
+      return;
+    }
+    unawaited(_loadUserInfo());
   }
 
   Future<void> _loadUserInfo() async {
@@ -103,6 +129,14 @@ class _ProfilePageState extends State<ProfilePage> {
         } catch (e) {
           debugLog('Failed to get avatar: $e');
         }
+      } else if (mounted) {
+        setState(() {
+          _userId = null;
+          _displayName = null;
+          _avatarUrl = null;
+          _statusText = null;
+          _isNftAvatar = false;
+        });
       }
     } catch (e) {
       debugLog('Failed to load user info: $e');

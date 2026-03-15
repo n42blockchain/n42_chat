@@ -50,6 +50,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     final greeting = message.content.isNotEmpty ? message.content : (S.of(context)?.chatRedPacketGreeting ?? 'Best wishes');
     final amount = metadata?.amount;
     final token = metadata?.token ?? 'CNY';
+    final redPacketId = metadata?.redPacketId ?? message.id;
 
     // 获取发送者显示名称（优先使用备注名）
     final senderName = RemarkService.instance.getDisplayName(
@@ -115,34 +116,32 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
             final currentUserId =
                 await getIt<IMessageRepository>().getCurrentUserId() ?? '';
             final claim = await redPacketService.claimRedPacket(
-              redPacketId: message.id,
+              redPacketId: redPacketId,
               userId: currentUserId,
               userName: _getDisplayName(),
             );
-            if (claim != null && mounted) {
+            if (claim != null && mounted && ctx.mounted) {
               Navigator.of(ctx).pop();
-              // 跳转红包详情页显示领取结果
-              if (mounted) {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => RedPacketDetailPage(
-                      senderName: senderName,
-                      senderAvatar: message.senderAvatarUrl,
-                      greeting: greeting,
-                      claimedAmount: claim.amount.toStringAsFixed(2),
-                      token: token,
-                      isClaimed: true,
-                      claimers: [
-                        RedPacketClaimer(
-                          name: _getDisplayName(),
-                          amount: claim.amount.toStringAsFixed(2),
-                          claimTime: _formatTime(claim.claimedAt),
-                        ),
-                      ],
-                    ),
+              if (!mounted) return;
+              await Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => RedPacketDetailPage(
+                    senderName: senderName,
+                    senderAvatar: message.senderAvatarUrl,
+                    greeting: greeting,
+                    claimedAmount: claim.amount.toStringAsFixed(2),
+                    token: token,
+                    isClaimed: true,
+                    claimers: [
+                      RedPacketClaimer(
+                        name: _getDisplayName(),
+                        amount: claim.amount.toStringAsFixed(2),
+                        claimTime: _formatTime(claim.claimedAt),
+                      ),
+                    ],
                   ),
-                );
-              }
+                ),
+              );
             }
           } catch (e) {
             debugLog('Red packet claim error: $e');
