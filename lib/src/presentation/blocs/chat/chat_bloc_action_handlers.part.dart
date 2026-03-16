@@ -65,10 +65,9 @@ extension ChatBlocActionHandlers on ChatBloc {
     } catch (e) {
       // 服务器撤回失败：回滚乐观更新，恢复原始消息列表
       debugLog('ChatBloc: Failed to redact message ${event.messageId}: $e');
-      emit(state.copyWith(
-        messages: originalMessages,
-        error: 'Failed to recall',
-      ));
+      emit(
+        state.copyWith(messages: originalMessages, error: 'Failed to recall'),
+      );
     }
   }
 
@@ -97,7 +96,9 @@ extension ChatBlocActionHandlers on ChatBloc {
         _currentRoomId!,
         event.messageIds,
       );
-      debugLog('ChatBloc: Persisted ${event.messageIds.length} deleted message IDs to storage');
+      debugLog(
+        'ChatBloc: Persisted ${event.messageIds.length} deleted message IDs to storage',
+      );
     } catch (e) {
       debugLog('ChatBloc: Failed to persist deleted message IDs: $e');
     }
@@ -128,7 +129,9 @@ extension ChatBlocActionHandlers on ChatBloc {
     // 然后尝试从服务器/本地数据库中删除（不需要 emit，所以可以在 bloc 关闭后继续）
     try {
       await _messageRepository.deleteFailedMessage(roomId, messageId);
-      debugLog('ChatBloc: Successfully deleted failed message from server/local');
+      debugLog(
+        'ChatBloc: Successfully deleted failed message from server/local',
+      );
     } catch (e) {
       debugLog('ChatBloc: Error deleting failed message: $e');
     }
@@ -148,47 +151,42 @@ extension ChatBlocActionHandlers on ChatBloc {
         _currentRoomId!,
         event.replyToMessageId,
         event.text,
+        selfDestructAfter: event.selfDestructAfter,
+        mentionedUserIds: event.mentionedUserIds,
+        mentionsRoom: event.mentionsRoom,
       );
       emit(state.copyWith(isSending: false, clearReplyTarget: true));
     } catch (e) {
-      emit(state.copyWith(
-        isSending: false,
-        error: 'Failed to reply',
-      ));
+      emit(state.copyWith(isSending: false, error: 'Failed to reply'));
     }
   }
 
   /// 设置回复目标
-  void onSetReplyTarget(
-    SetReplyTarget event,
-    Emitter<ChatState> emit,
-  ) {
+  void onSetReplyTarget(SetReplyTarget event, Emitter<ChatState> emit) {
     if (event.message == null) {
       emit(state.copyWith(clearReplyTarget: true));
     } else {
       // 进入回复模式时清除编辑模式
-      emit(state.copyWith(replyTarget: event.message, clearEditingMessage: true));
+      emit(
+        state.copyWith(replyTarget: event.message, clearEditingMessage: true),
+      );
     }
   }
 
   /// 设置编辑目标（进入/退出编辑模式）
-  void onSetEditTarget(
-    SetEditTarget event,
-    Emitter<ChatState> emit,
-  ) {
+  void onSetEditTarget(SetEditTarget event, Emitter<ChatState> emit) {
     if (event.message == null) {
       emit(state.copyWith(clearEditingMessage: true));
     } else {
       // 进入编辑模式时清除回复目标
-      emit(state.copyWith(editingMessage: event.message, clearReplyTarget: true));
+      emit(
+        state.copyWith(editingMessage: event.message, clearReplyTarget: true),
+      );
     }
   }
 
   /// 添加表情回应
-  Future<void> onAddReaction(
-    AddReaction event,
-    Emitter<ChatState> emit,
-  ) async {
+  Future<void> onAddReaction(AddReaction event, Emitter<ChatState> emit) async {
     if (_currentRoomId == null) return;
 
     try {
@@ -212,7 +210,8 @@ extension ChatBlocActionHandlers on ChatBloc {
                   .toList();
               if (newUserIds.isEmpty) {
                 // 没有人回应了，移除整个表情
-                newReactions = [...msg.reactions]..removeAt(existingReactionIndex);
+                newReactions = [...msg.reactions]
+                  ..removeAt(existingReactionIndex);
               } else {
                 newReactions = [...msg.reactions];
                 newReactions[existingReactionIndex] = MessageReaction(
@@ -255,7 +254,9 @@ extension ChatBlocActionHandlers on ChatBloc {
         event.messageId,
         event.emoji,
       );
-      debugLog('ChatBloc: Reaction $event.emoji added to message ${event.messageId}');
+      debugLog(
+        'ChatBloc: Reaction $event.emoji added to message ${event.messageId}',
+      );
     } catch (e) {
       debugLog('ChatBloc: Failed to add reaction: $e');
       emit(state.copyWith(error: 'Failed to add reaction'));
@@ -273,7 +274,8 @@ extension ChatBlocActionHandlers on ChatBloc {
 
     try {
       // 检查隐私设置：是否允许发送已读回执
-      final shouldSendReadReceipts = await _secureStorage.shouldShowReadReceipts();
+      final shouldSendReadReceipts = await _secureStorage
+          .shouldShowReadReceipts();
       if (!shouldSendReadReceipts) {
         debugLog('ChatBloc: Skipping read receipt due to privacy settings');
         return;
@@ -297,9 +299,12 @@ extension ChatBlocActionHandlers on ChatBloc {
 
     try {
       // 检查隐私设置：是否允许发送输入状态
-      final shouldSendTypingIndicator = await _secureStorage.shouldShowTypingIndicator();
+      final shouldSendTypingIndicator = await _secureStorage
+          .shouldShowTypingIndicator();
       if (!shouldSendTypingIndicator) {
-        debugLog('ChatBloc: Skipping typing notification due to privacy settings');
+        debugLog(
+          'ChatBloc: Skipping typing notification due to privacy settings',
+        );
         return;
       }
 
@@ -314,10 +319,7 @@ extension ChatBlocActionHandlers on ChatBloc {
   }
 
   /// 清理聊天室
-  Future<void> onDisposeChat(
-    DisposeChat event,
-    Emitter<ChatState> emit,
-  ) async {
+  Future<void> onDisposeChat(DisposeChat event, Emitter<ChatState> emit) async {
     await _messagesSubscription?.cancel();
     _messagesSubscription = null;
     await _syncStatusSubscription?.cancel();
@@ -344,10 +346,7 @@ extension ChatBlocActionHandlers on ChatBloc {
     _locallyDeletedMessageIds.addAll(state.messages.map((m) => m.id));
 
     if (!isClosed) {
-      emit(state.copyWith(
-        messages: [],
-        clearError: true,
-      ));
+      emit(state.copyWith(messages: [], clearError: true));
     }
   }
 

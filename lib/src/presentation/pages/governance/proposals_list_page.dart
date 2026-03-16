@@ -59,9 +59,9 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
 
   void _onScroll() {
     if (_isNearBottom) {
-      context
-          .read<GovernanceBloc>()
-          .add(const GovernanceLoadMoreProposals());
+      context.read<GovernanceBloc>().add(
+            GovernanceLoadMoreProposals(spaceId: widget.spaceId),
+          );
     }
   }
 
@@ -118,7 +118,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
                       vertical: 8,
                     ),
                     itemCount: state.proposals.length +
-                        (state.hasMoreProposals ? 1 : 0),
+                        (state.isLoadingMoreProposals ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index >= state.proposals.length) {
                         return const Padding(

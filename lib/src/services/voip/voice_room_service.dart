@@ -43,6 +43,15 @@ class VoiceRoomService {
   /// 发言者模式：启用音频发送，不启用视频
   Future<bool> joinRoom(String roomId, {VoiceRoomRole role = VoiceRoomRole.listener}) async {
     try {
+      if (_isConnected && _currentRoomId == roomId) {
+        debugLog('VoiceRoomService: Already connected to room $roomId');
+        return true;
+      }
+
+      if (_isConnected && _currentRoomId != null && _currentRoomId != roomId) {
+        await leaveRoom();
+      }
+
       _currentRoomId = roomId;
       _myRole = role;
 

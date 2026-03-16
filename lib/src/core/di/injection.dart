@@ -33,6 +33,7 @@ import '../services/storage_monitor_service.dart';
 import '../services/sync_optimization_service.dart';
 import '../services/url_preview_service.dart';
 import '../services/storage_manager_service.dart';
+import '../services/speech_to_text_service.dart';
 import '../services/voice_service.dart';
 import '../../data/datasources/local/archive_database.dart';
 import '../../data/datasources/local/media_metadata_database.dart';
@@ -134,7 +135,10 @@ final GetIt getIt = GetIt.instance;
 /// 配置依赖注入
 ///
 /// 在N42Chat.initialize()中调用
-Future<void> configureDependencies(N42ChatConfig config, {IWalletBridge? walletBridge}) async {
+Future<void> configureDependencies(
+  N42ChatConfig config, {
+  IWalletBridge? walletBridge,
+}) async {
   // 注册配置
   getIt.registerSingleton<N42ChatConfig>(config);
 
@@ -198,22 +202,50 @@ Future<void> _registerServices(N42ChatConfig config) async {
       debugLog('MatrixClientManager: Will retry on login/register');
     }
   }
-  
+
   getIt.registerLazySingleton<MatrixClientManager>(
     () => clientManager,
+    dispose: (manager) => manager.dispose(),
   );
 
   // 语音服务（生命周期由 DI 管理）
   final voiceService = VoiceService();
   await voiceService.initialize();
-  getIt.registerSingleton<VoiceService>(voiceService);
+  getIt.registerSingleton<VoiceService>(
+    voiceService,
+    dispose: (service) => service.dispose(),
+  );
 
-  // Giphy 服务 (仅当配置了 API Key 时注册)
-  if (config.giphyApiKey != null && config.giphyApiKey!.isNotEmpty) {
+  final speechService = SpeechToTextService()..resetConfiguration();
+  if (config.speechUseProxyEndpoint) {
+    if (config.speechGoogleBaseUrl != null &&
+        config.speechGoogleBaseUrl!.isNotEmpty) {
+      speechService.configureGoogleProxy(
+        baseUrl: config.speechGoogleBaseUrl!,
+        authToken: config.proxyAuthToken,
+      );
+    } else if (config.speechAzureBaseUrl != null &&
+        config.speechAzureBaseUrl!.isNotEmpty) {
+      speechService.configureAzureProxy(
+        baseUrl: config.speechAzureBaseUrl!,
+        authToken: config.proxyAuthToken,
+      );
+    }
+  }
+
+  // Giphy 服务（配置了 API Key 或代理端点时注册）
+  if ((config.giphyApiKey != null && config.giphyApiKey!.isNotEmpty) ||
+      config.giphyUseProxyEndpoint) {
     getIt.registerLazySingleton<GiphyService>(
       () => GiphyService(
-        config: GiphyConfig(apiKey: config.giphyApiKey!),
+        config: GiphyConfig(
+          apiKey: config.giphyApiKey ?? '',
+          baseUrl: config.giphyBaseUrl,
+          authToken: config.proxyAuthToken,
+          useProxyEndpoint: config.giphyUseProxyEndpoint,
+        ),
       ),
+      dispose: (service) => service.dispose(),
     );
   }
 
@@ -235,7 +267,8 @@ Future<void> _registerServices(N42ChatConfig config) async {
   // 2. AI Translation（有 AI key 或代理端点时）
   // 3. MyMemory（免费 fallback，无需任何 key）
   getIt.registerLazySingleton<ITranslationService>(() {
-    final hasGoogleKey = config.googleTranslateApiKey != null &&
+    final hasGoogleKey =
+        config.googleTranslateApiKey != null &&
         config.googleTranslateApiKey!.isNotEmpty;
     if (hasGoogleKey) {
       return GoogleTranslationService(
@@ -256,19 +289,16 @@ Future<void> _registerServices(N42ChatConfig config) async {
   });
 
   // 游戏分数服务
-  getIt.registerLazySingleton<GameScoreService>(
-    () => GameScoreService(),
-  );
+  getIt.registerLazySingleton<GameScoreService>(() => GameScoreService());
 
   // 下载服务
   getIt.registerLazySingleton<DownloadService>(
     () => DownloadService(),
+    dispose: (service) => service.dispose(),
   );
 
   // URL 预览服务
-  getIt.registerLazySingleton<UrlPreviewService>(
-    () => UrlPreviewService(),
-  );
+  getIt.registerLazySingleton<UrlPreviewService>(() => UrlPreviewService());
 
   // 存储管理服务
   getIt.registerLazySingleton<StorageManagerService>(
@@ -276,32 +306,32 @@ Future<void> _registerServices(N42ChatConfig config) async {
   );
 
   // 媒体元数据数据库（异步初始化，延迟获取，30 秒超时）
-  getIt.registerSingletonAsync<MediaMetadataDatabase>(
-    () async {
-      try {
-        return await MediaMetadataDatabase.getInstance().timeout(
-          const Duration(seconds: 30),
-        );
-      } on TimeoutException {
-        debugLog('DI: MediaMetadataDatabase timed out after 30s, rethrowing for caller to handle');
-        rethrow;
-      }
-    },
-  );
+  getIt.registerSingletonAsync<MediaMetadataDatabase>(() async {
+    try {
+      return await MediaMetadataDatabase.getInstance().timeout(
+        const Duration(seconds: 30),
+      );
+    } on TimeoutException {
+      debugLog(
+        'DI: MediaMetadataDatabase timed out after 30s, rethrowing for caller to handle',
+      );
+      rethrow;
+    }
+  });
 
   // 归档数据库（异步初始化，延迟获取，30 秒超时）
-  getIt.registerSingletonAsync<ArchiveDatabase>(
-    () async {
-      try {
-        return await ArchiveDatabase.getInstance().timeout(
-          const Duration(seconds: 30),
-        );
-      } on TimeoutException {
-        debugLog('DI: ArchiveDatabase timed out after 30s, rethrowing for caller to handle');
-        rethrow;
-      }
-    },
-  );
+  getIt.registerSingletonAsync<ArchiveDatabase>(() async {
+    try {
+      return await ArchiveDatabase.getInstance().timeout(
+        const Duration(seconds: 30),
+      );
+    } on TimeoutException {
+      debugLog(
+        'DI: ArchiveDatabase timed out after 30s, rethrowing for caller to handle',
+      );
+      rethrow;
+    }
+  });
 
   // 消息归档服务
   getIt.registerLazySingleton<MessageArchiveService>(
@@ -313,30 +343,24 @@ Future<void> _registerServices(N42ChatConfig config) async {
 
   // 归档完整性服务
   getIt.registerLazySingleton<ArchiveIntegrityService>(
-    () => ArchiveIntegrityService(
-      db: getIt<ArchiveDatabase>(),
-    ),
+    () => ArchiveIntegrityService(db: getIt<ArchiveDatabase>()),
   );
 
   // 归档搜索服务
   getIt.registerLazySingleton<ArchiveSearchService>(
-    () => ArchiveSearchService(
-      db: getIt<ArchiveDatabase>(),
-    ),
+    () => ArchiveSearchService(db: getIt<ArchiveDatabase>()),
   );
 
   // 媒体生命周期服务
-  getIt.registerLazySingleton<MediaLifecycleService>(
-    () {
-      final service = MediaLifecycleService(
-        db: getIt<MediaMetadataDatabase>(),
-        downloadService: getIt<DownloadService>(),
-      );
-      // 连接下载服务与生命周期服务
-      getIt<DownloadService>().setMediaLifecycleService(service);
-      return service;
-    },
-  );
+  getIt.registerLazySingleton<MediaLifecycleService>(() {
+    final service = MediaLifecycleService(
+      db: getIt<MediaMetadataDatabase>(),
+      downloadService: getIt<DownloadService>(),
+    );
+    // 连接下载服务与生命周期服务
+    getIt<DownloadService>().setMediaLifecycleService(service);
+    return service;
+  }, dispose: (service) => service.dispose());
 
   // 存储监控服务
   getIt.registerLazySingleton<StorageMonitorService>(
@@ -344,6 +368,7 @@ Future<void> _registerServices(N42ChatConfig config) async {
       storageManager: getIt<StorageManagerService>(),
       lifecycleService: getIt<MediaLifecycleService>(),
     ),
+    dispose: (service) => service.dispose(),
   );
 
   // 存储清理建议服务
@@ -375,9 +400,7 @@ Future<void> _registerServices(N42ChatConfig config) async {
 
   // 同步优化服务
   getIt.registerLazySingleton<SyncOptimizationService>(
-    () => SyncOptimizationService(
-      clientManager: getIt<MatrixClientManager>(),
-    ),
+    () => SyncOptimizationService(clientManager: getIt<MatrixClientManager>()),
   );
 
   // AI 服务（配置了 API Key 或代理端点时注册）
@@ -390,13 +413,12 @@ Future<void> _registerServices(N42ChatConfig config) async {
         defaultModel: config.aiModel,
         useProxyEndpoint: config.aiUseProxyEndpoint,
       ),
+      dispose: (service) => service.dispose(),
     );
   }
 
   // 红包服务（本地实现，过渡方案）
-  getIt.registerLazySingleton<IRedPacketService>(
-    () => LocalRedPacketService(),
-  );
+  getIt.registerLazySingleton<IRedPacketService>(() => LocalRedPacketService());
 
   // 链上事件推送后台服务（仅当 Push Protocol 启用时注册）
   final ppConfig = config.pushProtocol;
@@ -415,20 +437,17 @@ Future<void> _registerServices(N42ChatConfig config) async {
   // ─── P2.1 协议抽象层 ───────────────────────────────────────────────────
   if (config.enableProtocolAbstraction) {
     getIt.registerLazySingleton<ProtocolRegistry>(() => ProtocolRegistry());
-    getIt.registerLazySingleton<IMessagingProtocol>(
-      () {
-        final protocol = MatrixProtocol(
-          clientManager: getIt<MatrixClientManager>(),
-          roomDataSource: getIt<MatrixRoomDataSource>(),
-          messageDataSource: getIt<MatrixMessageDataSource>(),
-          contactDataSource: getIt<MatrixContactDataSource>(),
-        );
-        // 自动注册到 ProtocolRegistry
-        getIt<ProtocolRegistry>().register(protocol);
-        return protocol;
-      },
-      dispose: (protocol) => (protocol as MatrixProtocol).dispose(),
-    );
+    getIt.registerLazySingleton<IMessagingProtocol>(() {
+      final protocol = MatrixProtocol(
+        clientManager: getIt<MatrixClientManager>(),
+        roomDataSource: getIt<MatrixRoomDataSource>(),
+        messageDataSource: getIt<MatrixMessageDataSource>(),
+        contactDataSource: getIt<MatrixContactDataSource>(),
+      );
+      // 自动注册到 ProtocolRegistry
+      getIt<ProtocolRegistry>().register(protocol);
+      return protocol;
+    }, dispose: (protocol) => (protocol as MatrixProtocol).dispose());
   }
 
   // ─── P2.3 社交图谱服务 ─────────────────────────────────────────────────
@@ -531,15 +550,10 @@ Future<void> _registerDataSources() async {
   // Push Protocol 数据源（链上事件通知，仅在启用时注册）
   final ppConfig = getIt<N42ChatConfig>().pushProtocol;
   if (ppConfig != null && ppConfig.enabled) {
-    getIt.registerSingletonAsync<PushProtocolDatasource>(
-      () async {
-        final prefs = await SharedPreferences.getInstance();
-        return PushProtocolDatasource(
-          prefs: prefs,
-          baseUrl: ppConfig.apiBaseUrl,
-        );
-      },
-    );
+    getIt.registerSingletonAsync<PushProtocolDatasource>(() async {
+      final prefs = await SharedPreferences.getInstance();
+      return PushProtocolDatasource(prefs: prefs, baseUrl: ppConfig.apiBaseUrl);
+    });
   }
 
   final config = getIt<N42ChatConfig>();
@@ -562,11 +576,21 @@ Future<void> _registerDataSources() async {
   // ─── P2.3 Social Graph 数据源 ──────────────────────────────────────────
   if (config.enableSocialGraph) {
     getIt.registerLazySingleton<DeBankDatasource>(
-      () => DeBankDatasource(apiKey: config.debankApiKey),
+      () => DeBankDatasource(
+        baseUrl: config.debankBaseUrl,
+        apiKey: config.debankApiKey,
+        authToken: config.proxyAuthToken,
+        useProxyEndpoint: config.debankUseProxyEndpoint,
+      ),
       dispose: (ds) => ds.dispose(),
     );
     getIt.registerLazySingleton<AlchemySocialDatasource>(
-      () => AlchemySocialDatasource(apiKey: config.alchemyApiKey ?? ''),
+      () => AlchemySocialDatasource(
+        apiKey: config.alchemyApiKey ?? '',
+        baseUrl: config.alchemyBaseUrl,
+        authToken: config.proxyAuthToken,
+        useProxyEndpoint: config.alchemyUseProxyEndpoint,
+      ),
       dispose: (ds) => ds.dispose(),
     );
     getIt.registerLazySingleton<OnChainIdentityDatasource>(
@@ -676,9 +700,7 @@ void _registerRepositories() {
 
   // 贴纸仓库
   getIt.registerLazySingleton<IStickerRepository>(
-    () => StickerRepositoryImpl(
-      getIt<MatrixStickerDataSource>(),
-    ),
+    () => StickerRepositoryImpl(getIt<MatrixStickerDataSource>()),
   );
 
   // Story 仓库
@@ -691,9 +713,7 @@ void _registerRepositories() {
 
   // 语音房间仓库
   getIt.registerLazySingleton<IVoiceRoomRepository>(
-    () => VoiceRoomRepositoryImpl(
-      getIt<MatrixVoiceRoomDataSource>(),
-    ),
+    () => VoiceRoomRepositoryImpl(getIt<MatrixVoiceRoomDataSource>()),
   );
 
   // Space 社群仓库
@@ -713,12 +733,10 @@ void _registerRepositories() {
 
   // 链上事件通知仓库（仅当 Push Protocol 数据源已注册时）
   if (getIt.isRegistered<PushProtocolDatasource>()) {
-    getIt.registerSingletonAsync<IOnChainNotificationRepository>(
-      () async {
-        final ds = await getIt.getAsync<PushProtocolDatasource>();
-        return OnChainNotificationRepositoryImpl(ds);
-      },
-    );
+    getIt.registerSingletonAsync<IOnChainNotificationRepository>(() async {
+      final ds = await getIt.getAsync<PushProtocolDatasource>();
+      return OnChainNotificationRepositoryImpl(ds);
+    });
   }
 
   // ─── P2.2 Governance 仓库 ──────────────────────────────────────────────
@@ -792,16 +810,11 @@ void _registerBlocs() {
   );
 
   // 群聊BLoC
-  getIt.registerFactory<GroupBloc>(
-    () => GroupBloc(getIt<IGroupRepository>()),
-  );
+  getIt.registerFactory<GroupBloc>(() => GroupBloc(getIt<IGroupRepository>()));
 
   // 转账BLoC
   getIt.registerFactory<TransferBloc>(
-    () => TransferBloc(
-      getIt<ITransferRepository>(),
-      getIt<IWalletBridge>(),
-    ),
+    () => TransferBloc(getIt<ITransferRepository>(), getIt<IWalletBridge>()),
   );
 
   // 搜索BLoC
@@ -820,22 +833,16 @@ void _registerBlocs() {
   );
 
   // Story BLoC
-  getIt.registerFactory<StoryBloc>(
-    () => StoryBloc(getIt<IStoryRepository>()),
-  );
+  getIt.registerFactory<StoryBloc>(() => StoryBloc(getIt<IStoryRepository>()));
 
   // 线程 BLoC
   getIt.registerFactory<ThreadBloc>(
-    () => ThreadBloc(
-      messageRepository: getIt<IMessageRepository>(),
-    ),
+    () => ThreadBloc(messageRepository: getIt<IMessageRepository>()),
   );
 
   // 实时位置 BLoC
   getIt.registerFactory<LiveLocationBloc>(
-    () => LiveLocationBloc(
-      messageDataSource: getIt<MatrixMessageDataSource>(),
-    ),
+    () => LiveLocationBloc(messageDataSource: getIt<MatrixMessageDataSource>()),
   );
 
   // 语音房间服务
@@ -844,6 +851,7 @@ void _registerBlocs() {
       repository: getIt<IVoiceRoomRepository>(),
       currentUserIdProvider: () => getIt<MatrixClientManager>().userId,
     ),
+    dispose: (service) => service.dispose(),
   );
 
   // 语音房间 BLoC
@@ -859,16 +867,16 @@ void _registerBlocs() {
     getIt.registerFactory<AiAssistantBloc>(
       () => AiAssistantBloc(
         aiRepository: getIt<IAiRepository>(),
-        walletBridge: getIt.isRegistered<IWalletBridge>() ? getIt<IWalletBridge>() : null,
+        walletBridge: getIt.isRegistered<IWalletBridge>()
+            ? getIt<IWalletBridge>()
+            : null,
       ),
     );
   }
 
   // 聊天文件夹 BLoC
   getIt.registerFactory<ChatFolderBloc>(
-    () => ChatFolderBloc(
-      storage: getIt<PreferencesDataSource>(),
-    ),
+    () => ChatFolderBloc(storage: getIt<PreferencesDataSource>()),
   );
 
   // Space 社群 BLoC

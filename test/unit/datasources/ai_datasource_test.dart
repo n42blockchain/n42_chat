@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -155,6 +158,39 @@ void main() {
         expect(result.model, equals('gpt-4o-mini'));
       });
 
+      test('should support content-part arrays in completion responses',
+          () async {
+        when(() => mockDio.post<Map<String, dynamic>>(
+              any(),
+              data: any(named: 'data'),
+              options: any(named: 'options'),
+            )).thenAnswer((_) async => Response<Map<String, dynamic>>(
+              data: {
+                'choices': [
+                  {
+                    'message': {
+                      'role': 'assistant',
+                      'content': [
+                        {'type': 'text', 'text': 'Hello '},
+                        {'type': 'text', 'text': 'world'},
+                      ],
+                    },
+                  },
+                ],
+                'usage': {'prompt_tokens': 4, 'completion_tokens': 2},
+                'model': 'gpt-4o-mini',
+              },
+              statusCode: 200,
+              requestOptions: RequestOptions(path: '/v1/chat/completions'),
+            ));
+
+        final result = await datasource.completion(
+          [const AiMessage(role: AiRole.user, content: 'Hello')],
+        );
+
+        expect(result.text, equals('Hello world'));
+      });
+
       test('should throw AiServiceException on DioException', () async {
         when(() => mockDio.post<Map<String, dynamic>>(
               any(),
@@ -239,6 +275,97 @@ void main() {
             (e) => e.message,
             'message',
             contains('exceeds limit'),
+          )),
+        );
+      });
+
+      test('should parse utf8 content split across chunks', () async {
+        final fullResponse = utf8.encode(
+          'data: {"choices":[{"delta":{"content":"你"}}]}\n'
+          'data: {"choices":[{"delta":{"content":"好"}}]}',
+        );
+        final firstChunk = Uint8List.fromList(fullResponse.sublist(0, 38));
+        final secondChunk = Uint8List.fromList(fullResponse.sublist(38));
+
+        when(() => mockDio.post<ResponseBody>(
+              any(),
+              data: any(named: 'data'),
+              options: any(named: 'options'),
+            )).thenAnswer(
+          (_) async => Response<ResponseBody>(
+            data: ResponseBody(
+              Stream<Uint8List>.fromIterable([firstChunk, secondChunk]),
+              200,
+            ),
+            statusCode: 200,
+            requestOptions: RequestOptions(path: '/v1/chat/completions'),
+          ),
+        );
+
+        final chunks = await datasource.streamCompletion(
+          [const AiMessage(role: AiRole.user, content: 'Hello')],
+        ).toList();
+
+        expect(chunks, ['你', '好']);
+      });
+
+      test('should parse streamed content-part arrays', () async {
+        final fullResponse = utf8.encode(
+          'data: {"choices":[{"delta":{"content":[{"type":"text","text":"Hello "}]}}]}\n'
+          'data: {"choices":[{"delta":{"content":[{"type":"text","text":"world"}]}}]}\n'
+          'data: [DONE]\n',
+        );
+
+        when(() => mockDio.post<ResponseBody>(
+              any(),
+              data: any(named: 'data'),
+              options: any(named: 'options'),
+            )).thenAnswer(
+          (_) async => Response<ResponseBody>(
+            data: ResponseBody(
+              Stream<Uint8List>.value(Uint8List.fromList(fullResponse)),
+              200,
+            ),
+            statusCode: 200,
+            requestOptions: RequestOptions(path: '/v1/chat/completions'),
+          ),
+        );
+
+        final chunks = await datasource.streamCompletion(
+          [const AiMessage(role: AiRole.user, content: 'Hello')],
+        ).toList();
+
+        expect(chunks, ['Hello ', 'world']);
+      });
+
+      test('should surface inline stream error payloads', () async {
+        final fullResponse = utf8.encode(
+          'data: {"error":{"message":"Model overloaded"}}\n',
+        );
+
+        when(() => mockDio.post<ResponseBody>(
+              any(),
+              data: any(named: 'data'),
+              options: any(named: 'options'),
+            )).thenAnswer(
+          (_) async => Response<ResponseBody>(
+            data: ResponseBody(
+              Stream<Uint8List>.value(Uint8List.fromList(fullResponse)),
+              200,
+            ),
+            statusCode: 200,
+            requestOptions: RequestOptions(path: '/v1/chat/completions'),
+          ),
+        );
+
+        expect(
+          () => datasource.streamCompletion(
+            [const AiMessage(role: AiRole.user, content: 'Hello')],
+          ).toList(),
+          throwsA(isA<AiServiceException>().having(
+            (e) => e.message,
+            'message',
+            'Model overloaded',
           )),
         );
       });

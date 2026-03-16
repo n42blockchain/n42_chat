@@ -93,6 +93,44 @@ void main() {
     });
   });
 
+  group('replyToMessage', () {
+    test('delegates reply metadata to datasource', () async {
+      when(
+        () => mockMsgDS.replyToMessage(
+          testRoomId,
+          testEventId,
+          testText,
+          selfDestructAfter: 15,
+          mentionedUserIds: ['@bob:matrix.org'],
+          mentionsRoom: true,
+        ),
+      ).thenAnswer((_) async => '\$reply-event');
+      when(
+        () => mockRoom.getEventById('\$reply-event'),
+      ).thenAnswer((_) async => null);
+
+      await repository.replyToMessage(
+        testRoomId,
+        testEventId,
+        testText,
+        selfDestructAfter: 15,
+        mentionedUserIds: ['@bob:matrix.org'],
+        mentionsRoom: true,
+      );
+
+      verify(
+        () => mockMsgDS.replyToMessage(
+          testRoomId,
+          testEventId,
+          testText,
+          selfDestructAfter: 15,
+          mentionedUserIds: ['@bob:matrix.org'],
+          mentionsRoom: true,
+        ),
+      ).called(1);
+    });
+  });
+
   group('redactMessage', () {
     test('delegates to datasource and returns success', () async {
       when(

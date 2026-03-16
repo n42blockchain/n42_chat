@@ -39,6 +39,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
 
   DateTime _startTime = DateTime.now().add(const Duration(hours: 1));
   DateTime _endTime = DateTime.now().add(const Duration(days: 3));
+  bool _submitInFlight = false;
 
   @override
   void dispose() {
@@ -170,6 +171,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     );
 
     if (confirmed == true && mounted) {
+      setState(() => _submitInFlight = true);
       context.read<GovernanceBloc>().add(
             GovernanceCreateProposal(
               spaceId: widget.spaceId,
@@ -195,17 +197,21 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
         elevation: 0.5,
       ),
       body: BlocConsumer<GovernanceBloc, GovernanceState>(
+        listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
-          if (state.status == GovernanceStatus.created) {
+          if (_submitInFlight && state.status == GovernanceStatus.created) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Proposal created successfully!'),
                 backgroundColor: AppColors.success,
               ),
             );
+            _submitInFlight = false;
             Navigator.of(context).pop(true);
-          } else if (state.status == GovernanceStatus.error &&
+          } else if (_submitInFlight &&
+              state.status == GovernanceStatus.error &&
               state.errorMessage != null) {
+            setState(() => _submitInFlight = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage!),
@@ -215,7 +221,8 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
           }
         },
         builder: (context, state) {
-          final isCreating = state.status == GovernanceStatus.creating;
+          final isCreating =
+              _submitInFlight && state.status == GovernanceStatus.creating;
 
           return Stack(
             children: [

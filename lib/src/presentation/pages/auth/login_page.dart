@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/services/biometric_service.dart';
@@ -32,7 +33,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _homeserverController = TextEditingController(
-    text: N42Chat.config?.defaultHomeserver ?? 'https://m.si46.world',
+    text: N42Chat.config?.defaultHomeserver ?? AppConstants.defaultHomeserver,
   );
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -392,7 +393,8 @@ class _LoginPageState extends State<LoginPage> {
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.authServerAddressHint ??
-                (N42Chat.config?.defaultHomeserver ?? 'https://m.si46.world'),
+                (N42Chat.config?.defaultHomeserver ??
+                    AppConstants.defaultHomeserver),
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,

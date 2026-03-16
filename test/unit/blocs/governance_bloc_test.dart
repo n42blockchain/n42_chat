@@ -32,6 +32,18 @@ void main() {
     scoresTotal: 42,
   );
 
+  final extraProposal = ProposalEntity(
+    id: 'proposal-2',
+    spaceId: 'space-1',
+    title: 'More proposal',
+    body: 'More body',
+    author: '0xdef',
+    state: ProposalState.active,
+    choices: const ['For', 'Against'],
+    startTime: DateTime(2026, 1, 2, 10),
+    endTime: DateTime(2026, 1, 5, 10),
+  );
+
   const freshVotes = <VoteEntity>[];
 
   setUp(() {
@@ -61,11 +73,18 @@ void main() {
       ),
       act: (bloc) => bloc.add(const GovernanceLoadProposalDetail('proposal-1')),
       expect: () => [
-        isA<GovernanceState>()
-            .having((s) => s.status, 'status', GovernanceStatus.loading),
+        isA<GovernanceState>().having(
+          (s) => s.status,
+          'status',
+          GovernanceStatus.loading,
+        ),
         isA<GovernanceState>()
             .having((s) => s.status, 'status', GovernanceStatus.loaded)
-            .having((s) => s.selectedProposal?.title, 'selected title', 'Fresh title')
+            .having(
+              (s) => s.selectedProposal?.title,
+              'selected title',
+              'Fresh title',
+            )
             .having((s) => s.proposals.first.title, 'list title', 'Fresh title')
             .having((s) => s.proposals.first.votesCount, 'votesCount', 3),
       ],
@@ -108,14 +127,168 @@ void main() {
         ),
       ),
       expect: () => [
-        isA<GovernanceState>()
-            .having((s) => s.status, 'status', GovernanceStatus.voting),
+        isA<GovernanceState>().having(
+          (s) => s.status,
+          'status',
+          GovernanceStatus.voting,
+        ),
         isA<GovernanceState>()
             .having((s) => s.status, 'status', GovernanceStatus.voted)
-            .having((s) => s.selectedProposal?.title, 'selected title', 'Fresh title')
+            .having(
+              (s) => s.selectedProposal?.title,
+              'selected title',
+              'Fresh title',
+            )
             .having((s) => s.proposals.first.title, 'list title', 'Fresh title')
             .having((s) => s.proposals.first.votesCount, 'votesCount', 3),
       ],
+    );
+
+    blocTest<GovernanceBloc, GovernanceState>(
+      'load proposals clears a previously selected filter when filterState is null',
+      setUp: () {
+        when(
+          () => mockRepository.getProposals(
+            'space-1',
+            state: any(named: 'state'),
+            first: any(named: 'first'),
+            skip: any(named: 'skip'),
+          ),
+        ).thenAnswer((_) async => [staleProposal]);
+      },
+      build: () => GovernanceBloc(repository: mockRepository),
+      seed: () => GovernanceState(
+        status: GovernanceStatus.loaded,
+        proposals: [staleProposal],
+        filterState: ProposalState.active,
+      ),
+      act: (bloc) =>
+          bloc.add(const GovernanceLoadProposals(spaceId: 'space-1')),
+      expect: () => [
+        isA<GovernanceState>()
+            .having((s) => s.status, 'status', GovernanceStatus.loading)
+            .having((s) => s.filterState, 'filterState', isNull),
+        isA<GovernanceState>()
+            .having((s) => s.status, 'status', GovernanceStatus.loaded)
+            .having((s) => s.filterState, 'filterState', isNull),
+      ],
+      verify: (_) {
+        verify(
+          () => mockRepository.getProposals(
+            'space-1',
+            state: null,
+            first: any(named: 'first'),
+            skip: any(named: 'skip'),
+          ),
+        ).called(1);
+      },
+    );
+
+    blocTest<GovernanceBloc, GovernanceState>(
+      'load more proposals uses event spaceId even when space state is not loaded',
+      setUp: () {
+        when(
+          () => mockRepository.getProposals(
+            'space-1',
+            state: any(named: 'state'),
+            first: any(named: 'first'),
+            skip: any(named: 'skip'),
+          ),
+        ).thenAnswer((_) async => [extraProposal]);
+      },
+      build: () => GovernanceBloc(repository: mockRepository),
+      seed: () => GovernanceState(
+        status: GovernanceStatus.loaded,
+        proposals: [staleProposal],
+        hasMoreProposals: true,
+        filterState: ProposalState.active,
+      ),
+      act: (bloc) =>
+          bloc.add(const GovernanceLoadMoreProposals(spaceId: 'space-1')),
+      expect: () => [
+        isA<GovernanceState>()
+            .having(
+              (s) => s.isLoadingMoreProposals,
+              'isLoadingMoreProposals',
+              true,
+            )
+            .having((s) => s.proposals.length, 'proposal count', 1),
+        isA<GovernanceState>()
+            .having((s) => s.proposals.length, 'proposal count', 2)
+            .having(
+              (s) => s.proposals.last.title,
+              'last proposal',
+              'More proposal',
+            )
+            .having(
+              (s) => s.isLoadingMoreProposals,
+              'isLoadingMoreProposals',
+              false,
+            )
+            .having((s) => s.hasMoreProposals, 'hasMoreProposals', false),
+      ],
+      verify: (_) {
+        verify(
+          () => mockRepository.getProposals(
+            'space-1',
+            state: ProposalState.active,
+            first: any(named: 'first'),
+            skip: 1,
+          ),
+        ).called(1);
+      },
+    );
+
+    blocTest<GovernanceBloc, GovernanceState>(
+      'load more proposals ignores duplicate requests while a page is already loading',
+      setUp: () {
+        when(
+          () => mockRepository.getProposals(
+            'space-1',
+            state: any(named: 'state'),
+            first: any(named: 'first'),
+            skip: any(named: 'skip'),
+          ),
+        ).thenAnswer((_) async {
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+          return [extraProposal];
+        });
+      },
+      build: () => GovernanceBloc(repository: mockRepository),
+      seed: () => GovernanceState(
+        status: GovernanceStatus.loaded,
+        proposals: [staleProposal],
+        hasMoreProposals: true,
+      ),
+      act: (bloc) async {
+        bloc.add(const GovernanceLoadMoreProposals(spaceId: 'space-1'));
+        bloc.add(const GovernanceLoadMoreProposals(spaceId: 'space-1'));
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+      },
+      expect: () => [
+        isA<GovernanceState>().having(
+          (s) => s.isLoadingMoreProposals,
+          'isLoadingMoreProposals',
+          true,
+        ),
+        isA<GovernanceState>()
+            .having(
+              (s) => s.isLoadingMoreProposals,
+              'isLoadingMoreProposals',
+              false,
+            )
+            .having((s) => s.proposals.length, 'proposal count', 2),
+      ],
+      verify: (_) {
+        verify(
+          () => mockRepository.getProposals(
+            'space-1',
+            state: null,
+            first: any(named: 'first'),
+            skip: 1,
+          ),
+        ).called(1);
+      },
     );
   });
 }

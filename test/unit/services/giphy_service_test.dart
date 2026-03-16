@@ -175,6 +175,31 @@ void main() {
 
         expect(result.offset, equals(25));
       });
+
+      test('supports proxy endpoints with bearer auth', () async {
+        final proxyClient = MockClient((request) async {
+          expect(request.url.toString(), contains('/v1/giphy/trending'));
+          expect(request.url.queryParameters['offset'], '25');
+          expect(request.headers['authorization'], 'Bearer proxy-token');
+          return http.Response(jsonEncode(mockGifResponse), 200);
+        });
+
+        final proxyService = GiphyService(
+          config: const GiphyConfig(
+            apiKey: '',
+            baseUrl: 'https://api.n42.ai/proxy/v1/giphy',
+            authToken: 'proxy-token',
+            useProxyEndpoint: true,
+          ),
+          client: proxyClient,
+        );
+
+        final result = await proxyService.getTrendingGifs(offset: 25);
+
+        expect(result.gifs.length, equals(2));
+        expect(result.offset, equals(25));
+        proxyService.dispose();
+      });
     });
 
     group('getRandomGif', () {

@@ -287,7 +287,14 @@ void main() {
 
     test('uses replyToMessage when reply target is set', () async {
       when(
-        () => mockRepository.replyToMessage(any(), any(), any()),
+        () => mockRepository.replyToMessage(
+          any(),
+          any(),
+          any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
       ).thenAnswer((_) async => _testMessages.first);
 
       final bloc = await buildInitializedBloc();
@@ -304,11 +311,62 @@ void main() {
       expect(bloc.state.isSending, false);
       expect(bloc.state.replyTarget, isNull);
       verify(
-        () => mockRepository.replyToMessage(_roomId, '\$event1', 'Reply text'),
+        () => mockRepository.replyToMessage(
+          _roomId,
+          '\$event1',
+          'Reply text',
+          selfDestructAfter: null,
+          mentionedUserIds: null,
+          mentionsRoom: false,
+        ),
       ).called(1);
 
       await bloc.close();
     });
+
+    test(
+      'passes mention and self-destruct metadata through reply sends',
+      () async {
+        when(
+          () => mockRepository.replyToMessage(
+            any(),
+            any(),
+            any(),
+            selfDestructAfter: any(named: 'selfDestructAfter'),
+            mentionedUserIds: any(named: 'mentionedUserIds'),
+            mentionsRoom: any(named: 'mentionsRoom'),
+          ),
+        ).thenAnswer((_) async => _testMessages.first);
+
+        final bloc = await buildInitializedBloc();
+
+        bloc.add(SetReplyTarget(_testMessages.first));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        bloc.add(
+          const SendTextMessage(
+            'Reply with metadata',
+            selfDestructAfter: 30,
+            mentionedUserIds: ['@user3:server.com'],
+            mentionsRoom: true,
+          ),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+
+        verify(
+          () => mockRepository.replyToMessage(
+            _roomId,
+            '\$event1',
+            'Reply with metadata',
+            selfDestructAfter: 30,
+            mentionedUserIds: ['@user3:server.com'],
+            mentionsRoom: true,
+          ),
+        ).called(1);
+
+        await bloc.close();
+      },
+    );
 
     test('emits error when send fails', () async {
       when(

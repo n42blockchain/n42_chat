@@ -54,7 +54,7 @@ import 'core/utils/debug_log.dart';
 /// ```dart
 /// // 初始化
 /// await N42Chat.initialize(N42ChatConfig(
-///   defaultHomeserver: 'https://matrix.org',
+///   defaultHomeserver: 'https://m.si46.world',
 /// ));
 ///
 /// // 获取聊天Widget嵌入TabView
@@ -241,7 +241,7 @@ class N42Chat {
   ///
   /// ```dart
   /// await N42Chat.initialize(N42ChatConfig(
-  ///   defaultHomeserver: 'https://matrix.org',
+  ///   defaultHomeserver: 'https://m.si46.world',
   ///   enableEncryption: true,
   /// ));
   /// ```
@@ -259,6 +259,7 @@ class N42Chat {
 
     try {
       _config = config;
+      N42ChatRouter.configure(enableDebugLogs: config.enableDebugLogs);
       await _initializeAuthMethods(config);
 
       // 重建用户变化流（dispose 后 controller 已关闭，需要新实例）
@@ -269,6 +270,7 @@ class N42Chat {
       // 如果之前初始化中途失败，GetIt 可能已有部分注册，需要先重置
       if (getIt.isRegistered<N42ChatConfig>()) {
         debugLog('N42Chat: Resetting previous partial initialization');
+        N42ChatRouter.reset(preserveDebugLogging: true);
         await resetDependencies();
       }
 
@@ -320,12 +322,17 @@ class N42Chat {
         _authBloc = null;
       } catch (_) {}
       try {
+        await _cleanupRuntimeResources();
+      } catch (_) {}
+      try {
         if (getIt.isRegistered<N42ChatConfig>()) {
+          N42ChatRouter.reset();
           await resetDependencies();
         }
       } catch (_) {}
       _initialized = false;
       _config = null;
+      _liveKitJwtUrl = null;
       _initCompleter!.completeError(e);
       rethrow;
     } finally {
@@ -720,8 +727,11 @@ class N42Chat {
 
   /// 释放通话管理器
   static Future<void> disposeCallManager() async {
+    _turnRefreshTimer?.cancel();
+    _turnRefreshTimer = null;
     await _callManager?.dispose();
     _callManager = null;
+    _liveKitJwtUrl = null;
   }
 
   /// 安排 TURN 凭据到期前自动刷新
@@ -1342,42 +1352,60 @@ class N42Chat {
   ///
   /// 在应用退出前调用，完整清理所有持有的资源
   static Future<void> dispose() async {
-    if (!_initialized) return;
+    if (!_initialized &&
+        _authBloc == null &&
+        _pushService == null &&
+        _callManager == null &&
+        !getIt.isRegistered<N42ChatConfig>()) {
+      return;
+    }
 
     // 1. 关闭 AuthBloc（取消 loginStateStream 订阅）
     await _authBloc?.close();
     _authBloc = null;
 
-    // 2. 停止 VoIP 通话管理器
-    try {
-      final callManager = getIt<CallManager>();
-      await callManager.dispose();
-    } catch (_) {}
-    _callManager = null;
+    // 2. 释放运行时资源
+    await _cleanupRuntimeResources();
 
-    // 3. 释放推送服务和 TURN 刷新定时器
-    _turnRefreshTimer?.cancel();
-    _turnRefreshTimer = null;
-    await _pushService?.dispose();
-    _pushService = null;
-
-    // 4. 释放 Matrix 生命周期资源
-    try {
-      await _momentSyncSubscription?.cancel();
-      _momentSyncSubscription = null;
-      final clientManager = getIt<MatrixClientManager>();
-      await clientManager.dispose();
-    } catch (_) {}
-
-    // 5. 关闭用户变化流
+    // 3. 关闭用户变化流
     await _userStreamController.close();
 
-    // 6. 重置依赖注入容器
-    await resetDependencies();
+    // 4. 重置依赖注入容器和路由缓存
+    N42ChatRouter.reset();
+    if (getIt.isRegistered<N42ChatConfig>()) {
+      await resetDependencies();
+    }
 
     _initialized = false;
     _config = null;
+    _liveKitJwtUrl = null;
     debugLog('N42Chat: Disposed');
+  }
+
+  static Future<void> _cleanupRuntimeResources() async {
+    _turnRefreshTimer?.cancel();
+    _turnRefreshTimer = null;
+
+    try {
+      await _momentSyncSubscription?.cancel();
+    } catch (_) {}
+    _momentSyncSubscription = null;
+
+    try {
+      await _callManager?.dispose();
+    } catch (_) {}
+    _callManager = null;
+
+    try {
+      await _pushService?.dispose();
+    } catch (_) {}
+    _pushService = null;
+    _pushInitCompleter = null;
+    _lastMomentInviteCheck = null;
+    _pendingNotificationRoomId = null;
+    _pendingNotificationEventId = null;
+    _lastHandledNotificationKey = null;
+    _lastHandledNotificationAt = null;
   }
 
   /// 确保已初始化

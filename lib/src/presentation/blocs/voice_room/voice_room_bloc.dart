@@ -198,6 +198,8 @@ class VoiceRoomBloc extends Bloc<VoiceRoomEvent, VoiceRoomState> {
     final success = await _repository.endVoiceRoom(state.room!.roomId);
     if (success) {
       add(const LeaveVoiceRoom());
+    } else {
+      emit(state.copyWith(error: 'Failed to end voice room'));
     }
   }
 

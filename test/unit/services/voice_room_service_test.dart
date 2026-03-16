@@ -23,11 +23,12 @@ void main() {
   });
 
   VoiceRoomEntity buildRoom({
+    String roomId = '!voice:server',
     VoiceRoomRole myRole = VoiceRoomRole.listener,
     bool isMuted = true,
   }) {
     return VoiceRoomEntity(
-      roomId: '!voice:server',
+      roomId: roomId,
       name: 'Voice Room',
       creatorId: '@host:server',
       participants: [
@@ -80,5 +81,42 @@ void main() {
 
     await expectLater(service.toggleMute(), throwsStateError);
     expect(service.isMuted, isFalse);
+  });
+
+  test('joinRoom does not rejoin repository when already connected to same room', () async {
+    when(() => mockRepository.joinVoiceRoom('!voice:server'))
+        .thenAnswer((_) async => true);
+    when(() => mockRepository.getVoiceRoom('!voice:server'))
+        .thenAnswer((_) async => buildRoom());
+
+    expect(await service.joinRoom('!voice:server'), isTrue);
+    expect(await service.joinRoom('!voice:server'), isTrue);
+
+    verify(() => mockRepository.joinVoiceRoom('!voice:server')).called(1);
+    verify(() => mockRepository.getVoiceRoom('!voice:server')).called(1);
+  });
+
+  test('joinRoom leaves previous room before joining a different room', () async {
+    when(() => mockRepository.joinVoiceRoom('!voice:server'))
+        .thenAnswer((_) async => true);
+    when(() => mockRepository.getVoiceRoom('!voice:server'))
+        .thenAnswer((_) async => buildRoom(roomId: '!voice:server'));
+    when(() => mockRepository.leaveVoiceRoom('!voice:server'))
+        .thenAnswer((_) async => true);
+    when(() => mockRepository.joinVoiceRoom('!voice-2:server'))
+        .thenAnswer((_) async => true);
+    when(() => mockRepository.getVoiceRoom('!voice-2:server'))
+        .thenAnswer((_) async => buildRoom(roomId: '!voice-2:server'));
+
+    expect(await service.joinRoom('!voice:server'), isTrue);
+    expect(await service.joinRoom('!voice-2:server'), isTrue);
+
+    verifyInOrder([
+      () => mockRepository.joinVoiceRoom('!voice:server'),
+      () => mockRepository.getVoiceRoom('!voice:server'),
+      () => mockRepository.leaveVoiceRoom('!voice:server'),
+      () => mockRepository.joinVoiceRoom('!voice-2:server'),
+      () => mockRepository.getVoiceRoom('!voice-2:server'),
+    ]);
   });
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'bridge_platform.dart';
@@ -30,10 +31,9 @@ class BridgeBotService {
   /// Subscription for listening to Matrix timeline events
   StreamSubscription<matrix.Event>? _eventSubscription;
 
-  BridgeBotService({
-    required matrix.Client client,
-  })  : _client = client,
-        _homeserverDomain = _extractDomain(client.homeserver) {
+  BridgeBotService({required matrix.Client client})
+    : _client = client,
+      _homeserverDomain = _extractDomain(client.homeserver) {
     _initializeStates();
   }
 
@@ -47,13 +47,11 @@ class BridgeBotService {
       _stateController.stream;
 
   /// Get current states
-  Map<BridgePlatform, BridgeState> get states =>
-      Map.unmodifiable(_states);
+  Map<BridgePlatform, BridgeState> get states => Map.unmodifiable(_states);
 
   /// Get state for a specific platform
   BridgeState getState(BridgePlatform platform) {
-    return _states[platform] ??
-        BridgeState(platform: platform);
+    return _states[platform] ?? BridgeState(platform: platform);
   }
 
   /// Initialize states for all platforms
@@ -66,8 +64,9 @@ class BridgeBotService {
   /// Start listening for bridge bot messages
   Future<void> startListening() async {
     await _eventSubscription?.cancel();
-    _eventSubscription =
-        _client.onTimelineEvent.stream.listen(_handleTimelineEvent);
+    _eventSubscription = _client.onTimelineEvent.stream.listen(
+      _handleTimelineEvent,
+    );
   }
 
   /// Discover which bridges are available on the homeserver
@@ -181,6 +180,13 @@ class BridgeBotService {
       );
     }
 
+    if (_pendingResponses.containsKey(roomId)) {
+      return const BridgeBotResponse(
+        text: 'Another bridge command is already in progress',
+        isSuccess: false,
+      );
+    }
+
     // Create a completer for the response
     final completer = Completer<BridgeBotResponse>();
     _pendingResponses[roomId] = completer;
@@ -206,9 +212,10 @@ class BridgeBotService {
 
   /// Login to a bridge platform
   Future<BridgeBotResponse> login(BridgePlatform platform) async {
-    _updateState(platform, (s) => s.copyWith(
-      status: BridgeConnectionStatus.connecting,
-    ));
+    _updateState(
+      platform,
+      (s) => s.copyWith(status: BridgeConnectionStatus.connecting),
+    );
     _notifyStateChange();
 
     final response = await sendCommand(platform, BridgeBotCommand.login);
@@ -218,9 +225,10 @@ class BridgeBotService {
 
   /// Login with QR code
   Future<BridgeBotResponse> loginWithQR(BridgePlatform platform) async {
-    _updateState(platform, (s) => s.copyWith(
-      status: BridgeConnectionStatus.connecting,
-    ));
+    _updateState(
+      platform,
+      (s) => s.copyWith(status: BridgeConnectionStatus.connecting),
+    );
     _notifyStateChange();
 
     final response = await sendCommand(platform, BridgeBotCommand.loginQR());
@@ -232,12 +240,15 @@ class BridgeBotService {
   Future<BridgeBotResponse> logout(BridgePlatform platform) async {
     final response = await sendCommand(platform, BridgeBotCommand.logout);
 
-    _updateState(platform, (s) => s.copyWith(
-      status: BridgeConnectionStatus.disconnected,
-      remoteUsername: null,
-      statusMessage: null,
-      errorMessage: null,
-    ));
+    _updateState(
+      platform,
+      (s) => s.copyWith(
+        status: BridgeConnectionStatus.disconnected,
+        remoteUsername: null,
+        statusMessage: null,
+        errorMessage: null,
+      ),
+    );
     _notifyStateChange();
 
     return response;
@@ -296,7 +307,10 @@ class BridgeBotService {
     if (lowerText.contains('logged in') || lowerText.contains('connected')) {
       detectedStatus = BridgeConnectionStatus.connected;
       // Try to extract username
-      final usernameMatch = RegExp(r'logged in as (.+?)[\s\n]').firstMatch(text);
+      final usernameMatch = RegExp(
+        r'logged in as (.+?)(?:[\s\n]|$)',
+        caseSensitive: false,
+      ).firstMatch(text);
       remoteUsername = usernameMatch?.group(1);
     } else if (lowerText.contains('not logged in') ||
         lowerText.contains('not connected') ||
@@ -323,23 +337,28 @@ class BridgeBotService {
   }
 
   /// Process a status response and update bridge state
-  void _processStatusResponse(BridgePlatform platform, BridgeBotResponse response) {
+  void _processStatusResponse(
+    BridgePlatform platform,
+    BridgeBotResponse response,
+  ) {
     if (response.detectedStatus != null) {
-      _updateState(platform, (s) => s.copyWith(
-        status: response.detectedStatus,
-        remoteUsername: response.remoteUsername ?? s.remoteUsername,
-        statusMessage: response.text,
-        errorMessage: response.detectedStatus == BridgeConnectionStatus.error
-            ? response.text
-            : null,
-        lastConnected: response.detectedStatus == BridgeConnectionStatus.connected
-            ? DateTime.now()
-            : s.lastConnected,
-      ));
+      _updateState(
+        platform,
+        (s) => s.copyWith(
+          status: response.detectedStatus,
+          remoteUsername: response.remoteUsername ?? s.remoteUsername,
+          statusMessage: response.text,
+          errorMessage: response.detectedStatus == BridgeConnectionStatus.error
+              ? response.text
+              : null,
+          lastConnected:
+              response.detectedStatus == BridgeConnectionStatus.connected
+              ? DateTime.now()
+              : s.lastConnected,
+        ),
+      );
     } else {
-      _updateState(platform, (s) => s.copyWith(
-        statusMessage: response.text,
-      ));
+      _updateState(platform, (s) => s.copyWith(statusMessage: response.text));
     }
     _notifyStateChange();
   }
@@ -349,8 +368,9 @@ class BridgeBotService {
     BridgePlatform platform,
     BridgeState Function(BridgeState) updater,
   ) {
-    _states[platform] = updater(_states[platform] ??
-        BridgeState(platform: platform));
+    _states[platform] = updater(
+      _states[platform] ?? BridgeState(platform: platform),
+    );
   }
 
   /// Notify listeners of state changes
@@ -368,10 +388,43 @@ class BridgeBotService {
   List<BridgeState> get availableBridges =>
       _states.values.where((s) => s.isAvailable).toList();
 
+  @visibleForTesting
+  void registerManagementRoomForTest(BridgePlatform platform, String roomId) {
+    _managementRoomIds[platform] = roomId;
+    _updateState(
+      platform,
+      (state) => state.copyWith(
+        managementRoomId: roomId,
+        isAvailable: true,
+        status: BridgeConnectionStatus.disconnected,
+      ),
+    );
+  }
+
+  @visibleForTesting
+  void injectResponseForTest({required String roomId, required String text}) {
+    final completer = _pendingResponses.remove(roomId);
+    completer?.complete(_parseResponse(text));
+  }
+
   /// Release resources
   Future<void> dispose() async {
     await _eventSubscription?.cancel();
-    await _stateController.close();
+    if (_stateController.isClosed) {
+      _pendingResponses.clear();
+      return;
+    }
+    for (final completer in _pendingResponses.values) {
+      if (!completer.isCompleted) {
+        completer.complete(
+          const BridgeBotResponse(
+            text: 'Bridge service disposed',
+            isSuccess: false,
+          ),
+        );
+      }
+    }
     _pendingResponses.clear();
+    await _stateController.close();
   }
 }

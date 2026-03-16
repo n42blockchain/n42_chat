@@ -4,6 +4,15 @@ import 'core/theme/n42_chat_theme.dart';
 import 'integration/api_hub_bridge.dart';
 import 'integration/wallet_bridge.dart';
 
+const Object _copyWithUndefined = Object();
+
+T? _nullableCopyWithValue<T>(Object? value, T? fallback) {
+  if (identical(value, _copyWithUndefined)) {
+    return fallback;
+  }
+  return value as T?;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Push Protocol 配置
 // ─────────────────────────────────────────────────────────────────────────────
@@ -67,7 +76,7 @@ class PushProtocolConfig {
 ///
 /// ```dart
 /// N42ChatConfig(
-///   defaultHomeserver: 'https://matrix.org',
+///   defaultHomeserver: 'https://m.si46.world',
 ///   enableEncryption: true,
 /// )
 /// ```
@@ -209,11 +218,8 @@ class N42ChatConfig {
   /// 转账请求回调
   ///
   /// 当用户发起转账请求时触发
-  final Future<bool> Function(
-    String toAddress,
-    String amount,
-    String token,
-  )? onTransferRequest;
+  final Future<bool> Function(String toAddress, String amount, String token)?
+  onTransferRequest;
 
   /// 是否显示在线状态
   final bool showPresence;
@@ -266,15 +272,29 @@ class N42ChatConfig {
 
   /// Giphy API Key
   ///
-  /// 用于 GIF 搜索功能。从 https://developers.giphy.com/ 获取
-  /// 如果不设置，GIF 功能将不可用
+  /// 用于直连 Giphy 时的 API Key。
+  /// 若启用代理模式，可留空并改由 [proxyAuthToken] 访问服务端代理。
   final String? giphyApiKey;
+
+  /// Giphy API Base URL
+  ///
+  /// 直连模式默认使用 Giphy 官方地址。
+  /// 代理模式下可传入类似 `https://api.n42.ai/proxy/v1/giphy`。
+  final String giphyBaseUrl;
+
+  /// 是否将 [giphyBaseUrl] 视为代理端点。
+  final bool giphyUseProxyEndpoint;
 
   /// Google Translate API Key
   ///
   /// 用于消息翻译功能。从 Google Cloud Console 获取
   /// 如果不设置，将使用模拟翻译（仅用于开发测试）
   final String? googleTranslateApiKey;
+
+  /// 代理服务访问令牌
+  ///
+  /// 用于访问受保护的 N42 proxy 路由，不是第三方服务自己的 API key。
+  final String? proxyAuthToken;
 
   /// AI API Key
   ///
@@ -298,6 +318,24 @@ class N42ChatConfig {
   ///
   /// 为 `true` 时，AI 数据源不会再自动拼接 `/v1/chat/completions`。
   final bool aiUseProxyEndpoint;
+
+  /// Google Speech 代理端点
+  final String? speechGoogleBaseUrl;
+
+  /// Azure Speech 代理端点
+  final String? speechAzureBaseUrl;
+
+  /// 是否将 Speech 地址视为代理端点。
+  final bool speechUseProxyEndpoint;
+
+  /// Market API 基础地址
+  ///
+  /// 直连模式默认使用 CoinGecko 公共 API。
+  /// 代理模式下可传入类似 `https://api.n42.ai/proxy/v1/market`。
+  final String marketBaseUrl;
+
+  /// 是否将 [marketBaseUrl] 视为代理端点。
+  final bool marketUseProxyEndpoint;
 
   /// 存储管理配置
   final StorageManagementConfig storageManagement;
@@ -345,15 +383,33 @@ class N42ChatConfig {
 
   /// DeBank Open API Key (P2.3)
   ///
-  /// 用于查询用户链上持仓和资产数据。
-  /// 从 https://open.debank.com/ 获取
+  /// 用于直连查询用户链上持仓和资产数据。
+  /// 若启用代理模式，可留空并改由 [proxyAuthToken] 访问服务端代理。
   final String? debankApiKey;
+
+  /// DeBank API 基础地址
+  ///
+  /// 直连模式默认使用 DeBank 官方地址。
+  /// 代理模式下可传入类似 `https://api.n42.ai/proxy/v1/debank`。
+  final String debankBaseUrl;
+
+  /// 是否将 [debankBaseUrl] 视为代理端点。
+  final bool debankUseProxyEndpoint;
 
   /// Alchemy API Key (P2.3)
   ///
-  /// 用于查询 NFT 持仓和 Token 余额。
-  /// 从 https://www.alchemy.com/ 获取
+  /// 用于直连查询 NFT 持仓和 Token 余额。
+  /// 若启用代理模式，可留空并改由 [proxyAuthToken] 访问服务端代理。
   final String? alchemyApiKey;
+
+  /// Alchemy API 基础地址
+  ///
+  /// 直连模式默认使用官方 `eth-mainnet` 端点。
+  /// 代理模式下可传入类似 `https://api.n42.ai/proxy/v1/alchemy/eth-mainnet`。
+  final String alchemyBaseUrl;
+
+  /// 是否将 [alchemyBaseUrl] 视为代理端点。
+  final bool alchemyUseProxyEndpoint;
 
   /// 是否启用积分经济 (P2.4)
   ///
@@ -407,11 +463,19 @@ class N42ChatConfig {
     this.termsOfServiceUrl = 'https://n42.world/terms',
     this.privacyPolicyUrl = 'https://n42.world/privacy',
     this.giphyApiKey,
+    this.giphyBaseUrl = 'https://api.giphy.com/v1/gifs',
+    this.giphyUseProxyEndpoint = false,
     this.googleTranslateApiKey,
+    this.proxyAuthToken,
     this.aiApiKey,
     this.aiBaseUrl = 'https://api.openai.com',
     this.aiModel = 'gpt-4o-mini',
     this.aiUseProxyEndpoint = false,
+    this.speechGoogleBaseUrl,
+    this.speechAzureBaseUrl,
+    this.speechUseProxyEndpoint = false,
+    this.marketBaseUrl = 'https://api.coingecko.com/api/v3',
+    this.marketUseProxyEndpoint = false,
     this.storageManagement = const StorageManagementConfig(),
     this.pushProtocol,
     this.shareE2eeKeysWithAllDevices = true,
@@ -420,7 +484,11 @@ class N42ChatConfig {
     this.snapshotHubUrl,
     this.enableSocialGraph = false,
     this.debankApiKey,
+    this.debankBaseUrl = 'https://open-api.debank.com/v1',
+    this.debankUseProxyEndpoint = false,
     this.alchemyApiKey,
+    this.alchemyBaseUrl = 'https://eth-mainnet.g.alchemy.com/v2',
+    this.alchemyUseProxyEndpoint = false,
     this.enablePoints = false,
     this.pointsApiBaseUrl,
   });
@@ -430,31 +498,31 @@ class N42ChatConfig {
     String? defaultHomeserver,
     bool? enableEncryption,
     bool? enablePushNotifications,
-    String? pushGatewayUrl,
+    Object? pushGatewayUrl = _copyWithUndefined,
     String? pushAppId,
     Duration? syncTimeout,
     SyncFilterConfig? syncFilter,
-    N42ChatTheme? customTheme,
-    IWalletBridge? walletBridge,
-    IApiHubBridge? apiHubBridge,
+    Object? customTheme = _copyWithUndefined,
+    Object? walletBridge = _copyWithUndefined,
+    Object? apiHubBridge = _copyWithUndefined,
     bool? enableGoogleLogin,
     bool? enableAppleLogin,
     bool? enableFacebookLogin,
     bool? enableTwitterLogin,
     bool? enableWeChatLogin,
     bool? enableSsoLogin,
-    String? googleClientId,
-    String? googleServerClientId,
-    String? twitterApiKey,
-    String? twitterApiSecret,
-    String? twitterRedirectUri,
-    String? weChatAppId,
-    String? weChatUniversalLink,
+    Object? googleClientId = _copyWithUndefined,
+    Object? googleServerClientId = _copyWithUndefined,
+    Object? twitterApiKey = _copyWithUndefined,
+    Object? twitterApiSecret = _copyWithUndefined,
+    Object? twitterRedirectUri = _copyWithUndefined,
+    Object? weChatAppId = _copyWithUndefined,
+    Object? weChatUniversalLink = _copyWithUndefined,
     String? ssoRedirectUrl,
-    void Function(String roomId, String eventId)? onMessageTap,
-    void Function(String userId)? onAvatarTap,
-    Future<void> Function(String url)? onLinkTap,
-    Future<bool> Function(String, String, String)? onTransferRequest,
+    Object? onMessageTap = _copyWithUndefined,
+    Object? onAvatarTap = _copyWithUndefined,
+    Object? onLinkTap = _copyWithUndefined,
+    Object? onTransferRequest = _copyWithUndefined,
     bool? showPresence,
     bool? showReadReceipts,
     bool? enableMessageDelete,
@@ -463,58 +531,116 @@ class N42ChatConfig {
     int? maxFileSize,
     int? maxVoiceDuration,
     bool? enableDebugLogs,
-    String? databaseName,
+    Object? databaseName = _copyWithUndefined,
     String? termsOfServiceUrl,
     String? privacyPolicyUrl,
-    String? giphyApiKey,
-    String? googleTranslateApiKey,
-    String? aiApiKey,
+    Object? giphyApiKey = _copyWithUndefined,
+    String? giphyBaseUrl,
+    bool? giphyUseProxyEndpoint,
+    Object? googleTranslateApiKey = _copyWithUndefined,
+    Object? proxyAuthToken = _copyWithUndefined,
+    Object? aiApiKey = _copyWithUndefined,
     String? aiBaseUrl,
     String? aiModel,
     bool? aiUseProxyEndpoint,
+    Object? speechGoogleBaseUrl = _copyWithUndefined,
+    Object? speechAzureBaseUrl = _copyWithUndefined,
+    bool? speechUseProxyEndpoint,
+    String? marketBaseUrl,
+    bool? marketUseProxyEndpoint,
     StorageManagementConfig? storageManagement,
-    PushProtocolConfig? pushProtocol,
+    Object? pushProtocol = _copyWithUndefined,
     bool? shareE2eeKeysWithAllDevices,
     bool? enableProtocolAbstraction,
     bool? enableGovernance,
-    String? snapshotHubUrl,
+    Object? snapshotHubUrl = _copyWithUndefined,
     bool? enableSocialGraph,
-    String? debankApiKey,
-    String? alchemyApiKey,
+    Object? debankApiKey = _copyWithUndefined,
+    String? debankBaseUrl,
+    bool? debankUseProxyEndpoint,
+    Object? alchemyApiKey = _copyWithUndefined,
+    String? alchemyBaseUrl,
+    bool? alchemyUseProxyEndpoint,
     bool? enablePoints,
-    String? pointsApiBaseUrl,
+    Object? pointsApiBaseUrl = _copyWithUndefined,
   }) {
     return N42ChatConfig(
       defaultHomeserver: defaultHomeserver ?? this.defaultHomeserver,
       enableEncryption: enableEncryption ?? this.enableEncryption,
       enablePushNotifications:
           enablePushNotifications ?? this.enablePushNotifications,
-      pushGatewayUrl: pushGatewayUrl ?? this.pushGatewayUrl,
+      pushGatewayUrl: _nullableCopyWithValue<String>(
+        pushGatewayUrl,
+        this.pushGatewayUrl,
+      ),
       pushAppId: pushAppId ?? this.pushAppId,
       syncTimeout: syncTimeout ?? this.syncTimeout,
       syncFilter: syncFilter ?? this.syncFilter,
-      customTheme: customTheme ?? this.customTheme,
-      walletBridge: walletBridge ?? this.walletBridge,
-      apiHubBridge: apiHubBridge ?? this.apiHubBridge,
+      customTheme: _nullableCopyWithValue<N42ChatTheme>(
+        customTheme,
+        this.customTheme,
+      ),
+      walletBridge: _nullableCopyWithValue<IWalletBridge>(
+        walletBridge,
+        this.walletBridge,
+      ),
+      apiHubBridge: _nullableCopyWithValue<IApiHubBridge>(
+        apiHubBridge,
+        this.apiHubBridge,
+      ),
       enableGoogleLogin: enableGoogleLogin ?? this.enableGoogleLogin,
       enableAppleLogin: enableAppleLogin ?? this.enableAppleLogin,
       enableFacebookLogin: enableFacebookLogin ?? this.enableFacebookLogin,
       enableTwitterLogin: enableTwitterLogin ?? this.enableTwitterLogin,
       enableWeChatLogin: enableWeChatLogin ?? this.enableWeChatLogin,
       enableSsoLogin: enableSsoLogin ?? this.enableSsoLogin,
-      googleClientId: googleClientId ?? this.googleClientId,
-      googleServerClientId:
-          googleServerClientId ?? this.googleServerClientId,
-      twitterApiKey: twitterApiKey ?? this.twitterApiKey,
-      twitterApiSecret: twitterApiSecret ?? this.twitterApiSecret,
-      twitterRedirectUri: twitterRedirectUri ?? this.twitterRedirectUri,
-      weChatAppId: weChatAppId ?? this.weChatAppId,
-      weChatUniversalLink: weChatUniversalLink ?? this.weChatUniversalLink,
+      googleClientId: _nullableCopyWithValue<String>(
+        googleClientId,
+        this.googleClientId,
+      ),
+      googleServerClientId: _nullableCopyWithValue<String>(
+        googleServerClientId,
+        this.googleServerClientId,
+      ),
+      twitterApiKey: _nullableCopyWithValue<String>(
+        twitterApiKey,
+        this.twitterApiKey,
+      ),
+      twitterApiSecret: _nullableCopyWithValue<String>(
+        twitterApiSecret,
+        this.twitterApiSecret,
+      ),
+      twitterRedirectUri: _nullableCopyWithValue<String>(
+        twitterRedirectUri,
+        this.twitterRedirectUri,
+      ),
+      weChatAppId: _nullableCopyWithValue<String>(
+        weChatAppId,
+        this.weChatAppId,
+      ),
+      weChatUniversalLink: _nullableCopyWithValue<String>(
+        weChatUniversalLink,
+        this.weChatUniversalLink,
+      ),
       ssoRedirectUrl: ssoRedirectUrl ?? this.ssoRedirectUrl,
-      onMessageTap: onMessageTap ?? this.onMessageTap,
-      onAvatarTap: onAvatarTap ?? this.onAvatarTap,
-      onLinkTap: onLinkTap ?? this.onLinkTap,
-      onTransferRequest: onTransferRequest ?? this.onTransferRequest,
+      onMessageTap:
+          _nullableCopyWithValue<void Function(String roomId, String eventId)>(
+            onMessageTap,
+            this.onMessageTap,
+          ),
+      onAvatarTap: _nullableCopyWithValue<void Function(String userId)>(
+        onAvatarTap,
+        this.onAvatarTap,
+      ),
+      onLinkTap: _nullableCopyWithValue<Future<void> Function(String url)>(
+        onLinkTap,
+        this.onLinkTap,
+      ),
+      onTransferRequest:
+          _nullableCopyWithValue<Future<bool> Function(String, String, String)>(
+            onTransferRequest,
+            this.onTransferRequest,
+          ),
       showPresence: showPresence ?? this.showPresence,
       showReadReceipts: showReadReceipts ?? this.showReadReceipts,
       enableMessageDelete: enableMessageDelete ?? this.enableMessageDelete,
@@ -523,28 +649,78 @@ class N42ChatConfig {
       maxFileSize: maxFileSize ?? this.maxFileSize,
       maxVoiceDuration: maxVoiceDuration ?? this.maxVoiceDuration,
       enableDebugLogs: enableDebugLogs ?? this.enableDebugLogs,
-      databaseName: databaseName ?? this.databaseName,
+      databaseName: _nullableCopyWithValue<String>(
+        databaseName,
+        this.databaseName,
+      ),
       termsOfServiceUrl: termsOfServiceUrl ?? this.termsOfServiceUrl,
       privacyPolicyUrl: privacyPolicyUrl ?? this.privacyPolicyUrl,
-      giphyApiKey: giphyApiKey ?? this.giphyApiKey,
-      googleTranslateApiKey: googleTranslateApiKey ?? this.googleTranslateApiKey,
-      aiApiKey: aiApiKey ?? this.aiApiKey,
+      giphyApiKey: _nullableCopyWithValue<String>(
+        giphyApiKey,
+        this.giphyApiKey,
+      ),
+      giphyBaseUrl: giphyBaseUrl ?? this.giphyBaseUrl,
+      giphyUseProxyEndpoint:
+          giphyUseProxyEndpoint ?? this.giphyUseProxyEndpoint,
+      googleTranslateApiKey: _nullableCopyWithValue<String>(
+        googleTranslateApiKey,
+        this.googleTranslateApiKey,
+      ),
+      proxyAuthToken: _nullableCopyWithValue<String>(
+        proxyAuthToken,
+        this.proxyAuthToken,
+      ),
+      aiApiKey: _nullableCopyWithValue<String>(aiApiKey, this.aiApiKey),
       aiBaseUrl: aiBaseUrl ?? this.aiBaseUrl,
       aiModel: aiModel ?? this.aiModel,
       aiUseProxyEndpoint: aiUseProxyEndpoint ?? this.aiUseProxyEndpoint,
+      speechGoogleBaseUrl: _nullableCopyWithValue<String>(
+        speechGoogleBaseUrl,
+        this.speechGoogleBaseUrl,
+      ),
+      speechAzureBaseUrl: _nullableCopyWithValue<String>(
+        speechAzureBaseUrl,
+        this.speechAzureBaseUrl,
+      ),
+      speechUseProxyEndpoint:
+          speechUseProxyEndpoint ?? this.speechUseProxyEndpoint,
+      marketBaseUrl: marketBaseUrl ?? this.marketBaseUrl,
+      marketUseProxyEndpoint:
+          marketUseProxyEndpoint ?? this.marketUseProxyEndpoint,
       storageManagement: storageManagement ?? this.storageManagement,
-      pushProtocol: pushProtocol ?? this.pushProtocol,
+      pushProtocol: _nullableCopyWithValue<PushProtocolConfig>(
+        pushProtocol,
+        this.pushProtocol,
+      ),
       shareE2eeKeysWithAllDevices:
           shareE2eeKeysWithAllDevices ?? this.shareE2eeKeysWithAllDevices,
       enableProtocolAbstraction:
           enableProtocolAbstraction ?? this.enableProtocolAbstraction,
       enableGovernance: enableGovernance ?? this.enableGovernance,
-      snapshotHubUrl: snapshotHubUrl ?? this.snapshotHubUrl,
+      snapshotHubUrl: _nullableCopyWithValue<String>(
+        snapshotHubUrl,
+        this.snapshotHubUrl,
+      ),
       enableSocialGraph: enableSocialGraph ?? this.enableSocialGraph,
-      debankApiKey: debankApiKey ?? this.debankApiKey,
-      alchemyApiKey: alchemyApiKey ?? this.alchemyApiKey,
+      debankApiKey: _nullableCopyWithValue<String>(
+        debankApiKey,
+        this.debankApiKey,
+      ),
+      debankBaseUrl: debankBaseUrl ?? this.debankBaseUrl,
+      debankUseProxyEndpoint:
+          debankUseProxyEndpoint ?? this.debankUseProxyEndpoint,
+      alchemyApiKey: _nullableCopyWithValue<String>(
+        alchemyApiKey,
+        this.alchemyApiKey,
+      ),
+      alchemyBaseUrl: alchemyBaseUrl ?? this.alchemyBaseUrl,
+      alchemyUseProxyEndpoint:
+          alchemyUseProxyEndpoint ?? this.alchemyUseProxyEndpoint,
       enablePoints: enablePoints ?? this.enablePoints,
-      pointsApiBaseUrl: pointsApiBaseUrl ?? this.pointsApiBaseUrl,
+      pointsApiBaseUrl: _nullableCopyWithValue<String>(
+        pointsApiBaseUrl,
+        this.pointsApiBaseUrl,
+      ),
     );
   }
 }

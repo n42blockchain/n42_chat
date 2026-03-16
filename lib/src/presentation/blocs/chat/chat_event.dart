@@ -63,7 +63,12 @@ class SendTextMessage extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [text, selfDestructAfter, mentionedUserIds, mentionsRoom];
+  List<Object?> get props => [
+    text,
+    selfDestructAfter,
+    mentionedUserIds,
+    mentionsRoom,
+  ];
 }
 
 /// 发送图片消息
@@ -81,7 +86,12 @@ class SendImageMessage extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [imageBytes, filename, mimeType, selfDestructAfter];
+  List<Object?> get props => [
+    imageBytes,
+    filename,
+    mimeType,
+    selfDestructAfter,
+  ];
 }
 
 /// 发送语音消息
@@ -101,7 +111,13 @@ class SendVoiceMessage extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [audioBytes, filename, duration, mimeType, selfDestructAfter];
+  List<Object?> get props => [
+    audioBytes,
+    filename,
+    duration,
+    mimeType,
+    selfDestructAfter,
+  ];
 }
 
 /// 发送文件消息
@@ -139,7 +155,13 @@ class SendVideoMessage extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [videoBytes, filename, mimeType, thumbnailBytes, selfDestructAfter];
+  List<Object?> get props => [
+    videoBytes,
+    filename,
+    mimeType,
+    thumbnailBytes,
+    selfDestructAfter,
+  ];
 }
 
 /// 发送位置消息
@@ -203,14 +225,26 @@ class DeleteFailedMessage extends ChatEvent {
 class ReplyToMessage extends ChatEvent {
   final String replyToMessageId;
   final String text;
+  final int? selfDestructAfter;
+  final List<String>? mentionedUserIds;
+  final bool mentionsRoom;
 
   const ReplyToMessage({
     required this.replyToMessageId,
     required this.text,
+    this.selfDestructAfter,
+    this.mentionedUserIds,
+    this.mentionsRoom = false,
   });
 
   @override
-  List<Object?> get props => [replyToMessageId, text];
+  List<Object?> get props => [
+    replyToMessageId,
+    text,
+    selfDestructAfter,
+    mentionedUserIds,
+    mentionsRoom,
+  ];
 }
 
 /// 设置回复目标
@@ -238,10 +272,7 @@ class AddReaction extends ChatEvent {
   final String messageId;
   final String emoji;
 
-  const AddReaction({
-    required this.messageId,
-    required this.emoji,
-  });
+  const AddReaction({required this.messageId, required this.emoji});
 
   @override
   List<Object?> get props => [messageId, emoji];
@@ -307,7 +338,12 @@ class SendPokeMessage extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [pokerName, targetUserId, targetName, pokerPokeText];
+  List<Object?> get props => [
+    pokerName,
+    targetUserId,
+    targetName,
+    pokerPokeText,
+  ];
 }
 
 /// 发送投票消息
@@ -355,7 +391,12 @@ class PollResponseReceived extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [pollEventId, selectedOptionIds, senderId, isCurrentUser];
+  List<Object?> get props => [
+    pollEventId,
+    selectedOptionIds,
+    senderId,
+    isCurrentUser,
+  ];
 }
 
 /// 结束投票事件（主动结束）
@@ -445,7 +486,13 @@ class SendScheduledMessage extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [text, scheduledAt, selfDestructAfter, mentionedUserIds, mentionsRoom];
+  List<Object?> get props => [
+    text,
+    scheduledAt,
+    selfDestructAfter,
+    mentionedUserIds,
+    mentionsRoom,
+  ];
 }
 
 /// 取消定时消息
@@ -542,7 +589,18 @@ class SendStickerMessage extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [stickerId, packId, url, httpUrl, name, emoji, width, height, mimeType, size];
+  List<Object?> get props => [
+    stickerId,
+    packId,
+    url,
+    httpUrl,
+    name,
+    emoji,
+    width,
+    height,
+    mimeType,
+    size,
+  ];
 }
 
 // ============================================
@@ -619,7 +677,13 @@ class TranslationCompleted extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [messageId, translatedText, detectedSourceLanguage, success, error];
+  List<Object?> get props => [
+    messageId,
+    translatedText,
+    detectedSourceLanguage,
+    success,
+    error,
+  ];
 }
 
 /// 清除消息翻译
@@ -645,7 +709,11 @@ class UpdateTranslationSettings extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [autoTranslate, defaultTargetLanguage, smartReplyTranslate];
+  List<Object?> get props => [
+    autoTranslate,
+    defaultTargetLanguage,
+    smartReplyTranslate,
+  ];
 }
 
 /// 翻译设置加载完成（内部事件）
@@ -661,7 +729,11 @@ class TranslationSettingsLoaded extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [autoTranslate, defaultTargetLanguage, smartReplyTranslate];
+  List<Object?> get props => [
+    autoTranslate,
+    defaultTargetLanguage,
+    smartReplyTranslate,
+  ];
 }
 
 // ============================================
@@ -712,7 +784,7 @@ class SendContactCardMessage extends ChatEvent {
 /// 执行斜杠命令
 class ExecuteSlashCommand extends ChatEvent {
   final String command; // 命令名（如 "announce"）
-  final String args;    // 命令参数部分
+  final String args; // 命令参数部分
 
   const ExecuteSlashCommand({required this.command, required this.args});
 

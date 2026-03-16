@@ -484,7 +484,14 @@ void main() {
   group('ReplyToMessage', () {
     test('success — clears isSending and reply target', () async {
       when(
-        () => mockRepo.replyToMessage(any(), any(), any()),
+        () => mockRepo.replyToMessage(
+          any(),
+          any(),
+          any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
       ).thenAnswer((_) async => _msg);
 
       final bloc = buildBloc();
@@ -504,7 +511,14 @@ void main() {
 
     test('failure — emits error', () async {
       when(
-        () => mockRepo.replyToMessage(any(), any(), any()),
+        () => mockRepo.replyToMessage(
+          any(),
+          any(),
+          any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
       ).thenThrow(Exception('network error'));
 
       final bloc = buildBloc();
@@ -519,6 +533,46 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       expect(bloc.state.error, isNotNull);
+      await bloc.close();
+    });
+
+    test('passes optional metadata to repository', () async {
+      when(
+        () => mockRepo.replyToMessage(
+          any(),
+          any(),
+          any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
+      ).thenAnswer((_) async => _msg);
+
+      final bloc = buildBloc();
+      await initBloc(bloc);
+
+      bloc.add(
+        const ReplyToMessage(
+          replyToMessageId: '\$original',
+          text: 'reply text',
+          selfDestructAfter: 10,
+          mentionedUserIds: ['@bob:server.com'],
+          mentionsRoom: true,
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      verify(
+        () => mockRepo.replyToMessage(
+          _roomId,
+          '\$original',
+          'reply text',
+          selfDestructAfter: 10,
+          mentionedUserIds: ['@bob:server.com'],
+          mentionsRoom: true,
+        ),
+      ).called(1);
+
       await bloc.close();
     });
   });

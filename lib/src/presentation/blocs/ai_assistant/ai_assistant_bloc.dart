@@ -18,6 +18,8 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
   final Uuid _uuid = const Uuid();
 
   StreamSubscription<String>? _streamSubscription;
+  int _nextRequestId = 0;
+  int? _activeRequestId;
 
   AiAssistantBloc({
     required IAiRepository aiRepository,
@@ -111,8 +113,8 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
       clearError: true,
     ));
 
-    // 保存用户消息
-    await _aiRepository.saveChatMessage(assistant.id, userMessage);
+    // 保存用户消息失败不应打断生成主链路
+    await _persistMessageBestEffort(assistant.id, userMessage);
 
     // 构建 AI 消息列表（保留上下文窗口内的消息）
     final contextMessages = _buildContextMessages(updatedMessages, assistant);
@@ -120,6 +122,8 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     // 启动流式响应
     try {
       unawaited(_streamSubscription?.cancel());
+      final requestId = ++_nextRequestId;
+      _activeRequestId = requestId;
       debugLog('AiAssistantBloc: Starting stream completion with model=${assistant.model}, contextMessages=${contextMessages.length}');
       final stream = _aiRepository.aiService.streamCompletion(
         contextMessages,
@@ -131,20 +135,23 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
 
       _streamSubscription = stream.listen(
         (chunk) {
-          if (!isClosed) add(AiStreamChunkReceived(chunk));
+          if (!isClosed) add(AiStreamChunkReceived(chunk, requestId: requestId));
         },
         onDone: () {
           debugLog('AiAssistantBloc: Stream completed');
-          if (!isClosed) add(const AiStreamCompleted());
+          if (!isClosed) add(AiStreamCompleted(requestId: requestId));
         },
         onError: (Object error) {
           debugLog('AiAssistantBloc: Stream error in listener: $error');
-          if (!isClosed) add(AiStreamError(error.toString()));
+          if (!isClosed) {
+            add(AiStreamError(error.toString(), requestId: requestId));
+          }
         },
       );
       debugLog('AiAssistantBloc: Stream subscription started');
     } catch (e) {
       debugLog('AiAssistantBloc: Stream setup error: $e');
+      _activeRequestId = null;
       emit(state.copyWith(
         isGenerating: false,
         error: e.toString(),
@@ -156,6 +163,9 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     AiStreamChunkReceived event,
     Emitter<AiAssistantState> emit,
   ) {
+    if (event.requestId != null && event.requestId != _activeRequestId) {
+      return;
+    }
     emit(state.copyWith(
       streamingText: state.streamingText + event.chunk,
     ));
@@ -165,6 +175,10 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     AiStreamCompleted event,
     Emitter<AiAssistantState> emit,
   ) async {
+    if (event.requestId != null && event.requestId != _activeRequestId) {
+      return;
+    }
+    _activeRequestId = null;
     _streamSubscription = null;
     final assistant = state.assistant ?? AiAssistantEntity.defaultAssistant;
     final responseText = state.streamingText;
@@ -190,14 +204,18 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
       streamingText: '',
     ));
 
-    // 保存 AI 响应
-    await _aiRepository.saveChatMessage(assistant.id, aiMessage);
+    // 保存 AI 响应失败不影响本次会话可用性
+    await _persistMessageBestEffort(assistant.id, aiMessage);
   }
 
   void _onStreamError(
     AiStreamError event,
     Emitter<AiAssistantState> emit,
   ) {
+    if (event.requestId != null && event.requestId != _activeRequestId) {
+      return;
+    }
+    _activeRequestId = null;
     unawaited(_streamSubscription?.cancel());
     _streamSubscription = null;
     emit(state.copyWith(
@@ -213,13 +231,22 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
   ) async {
     await _cancelActiveStream();
     final assistant = state.assistant ?? AiAssistantEntity.defaultAssistant;
-    await _aiRepository.clearChatHistory(assistant.id);
-    emit(state.copyWith(
-      messages: [],
-      isGenerating: false,
-      streamingText: '',
-      clearError: true,
-    ));
+    try {
+      await _aiRepository.clearChatHistory(assistant.id);
+      emit(state.copyWith(
+        messages: [],
+        isGenerating: false,
+        streamingText: '',
+        clearError: true,
+      ));
+    } catch (e) {
+      debugLog('AiAssistantBloc: Clear history failed: $e');
+      emit(state.copyWith(
+        isGenerating: false,
+        streamingText: '',
+        error: 'Failed to clear chat history',
+      ));
+    }
   }
 
   Future<void> _onSwitchAssistant(
@@ -227,22 +254,32 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
     Emitter<AiAssistantState> emit,
   ) async {
     await _cancelActiveStream();
-    final history = await _aiRepository.getChatHistory(event.assistant.id);
-    emit(state.copyWith(
-      assistant: event.assistant,
-      messages: history,
-      isGenerating: false,
-      streamingText: '',
-      clearError: true,
-    ));
+    try {
+      final history = await _aiRepository.getChatHistory(event.assistant.id);
+      emit(state.copyWith(
+        assistant: event.assistant,
+        messages: history,
+        isGenerating: false,
+        streamingText: '',
+        clearError: true,
+      ));
+    } catch (e) {
+      debugLog('AiAssistantBloc: Switch assistant failed: $e');
+      emit(state.copyWith(
+        assistant: event.assistant,
+        messages: const [],
+        isGenerating: false,
+        streamingText: '',
+        error: 'Failed to load assistant history',
+      ));
+    }
   }
 
   Future<void> _onStopGeneration(
     StopAiGeneration event,
     Emitter<AiAssistantState> emit,
   ) async {
-    unawaited(_streamSubscription?.cancel());
-    _streamSubscription = null;
+    await _cancelActiveStream();
 
     // 如果有部分文本，直接在此处保存为消息（避免事件重入）
     final partialText = state.streamingText;
@@ -260,7 +297,7 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
         isGenerating: false,
         streamingText: '',
       ));
-      await _aiRepository.saveChatMessage(assistant.id, aiMessage);
+      await _persistMessageBestEffort(assistant.id, aiMessage);
     } else {
       emit(state.copyWith(isGenerating: false));
     }
@@ -397,7 +434,22 @@ class AiAssistantBloc extends Bloc<AiAssistantEvent, AiAssistantState> {
   }
 
   Future<void> _cancelActiveStream() async {
+    _activeRequestId = null;
     await _streamSubscription?.cancel();
     _streamSubscription = null;
+  }
+
+  Future<void> _persistMessageBestEffort(
+    String assistantId,
+    AiChatMessage message,
+  ) async {
+    try {
+      await _aiRepository.saveChatMessage(assistantId, message);
+    } catch (e) {
+      debugLog(
+        'AiAssistantBloc: Failed to persist message for assistant '
+        '$assistantId: $e',
+      );
+    }
   }
 }

@@ -36,7 +36,12 @@ class GovernanceLoadProposals extends GovernanceEvent {
 
 /// Load more proposals (pagination)
 class GovernanceLoadMoreProposals extends GovernanceEvent {
-  const GovernanceLoadMoreProposals();
+  final String spaceId;
+
+  const GovernanceLoadMoreProposals({required this.spaceId});
+
+  @override
+  List<Object?> get props => [spaceId];
 }
 
 /// Load a single proposal detail with its votes

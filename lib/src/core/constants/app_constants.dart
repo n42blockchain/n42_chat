@@ -20,14 +20,14 @@ abstract class AppConstants {
   // ============================================
 
   /// 默认Matrix服务器
-  static const String defaultHomeserver = 'https://matrix.org';
+  static const String defaultHomeserver = 'https://m.si46.world';
 
   /// 支持的Matrix服务器列表
   static const List<String> popularHomeservers = [
+    defaultHomeserver,
     'https://matrix.org',
     'https://matrix.im',
     'https://tchncs.de',
-    'https://nitro.chat',
   ];
 
   /// 同步超时时间（秒）
@@ -124,13 +124,19 @@ abstract class AppConstants {
   // ============================================
 
   /// Matrix用户ID正则
-  static final RegExp matrixIdPattern = RegExp(r'^@[a-zA-Z0-9._=\-/]+:[a-zA-Z0-9.\-]+$');
+  static final RegExp matrixIdPattern = RegExp(
+    r'^@[a-zA-Z0-9._=\-/]+:[a-zA-Z0-9.\-]+$',
+  );
 
   /// Matrix房间ID正则
-  static final RegExp roomIdPattern = RegExp(r'^![a-zA-Z0-9]+:[a-zA-Z0-9.\-]+$');
+  static final RegExp roomIdPattern = RegExp(
+    r'^![a-zA-Z0-9]+:[a-zA-Z0-9.\-]+$',
+  );
 
   /// Matrix房间别名正则
-  static final RegExp roomAliasPattern = RegExp(r'^#[a-zA-Z0-9._=\-]+:[a-zA-Z0-9.\-]+$');
+  static final RegExp roomAliasPattern = RegExp(
+    r'^#[a-zA-Z0-9._=\-]+:[a-zA-Z0-9.\-]+$',
+  );
 
   /// URL正则
   static final RegExp urlPattern = RegExp(
@@ -173,4 +179,3 @@ abstract class StorageConstants {
   /// 媒体元数据数据库文件名
   static const String metaDbFileName = 'media_meta.db';
 }
-
