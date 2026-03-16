@@ -92,48 +92,50 @@ class AiDatasource implements AiService {
       if (response.data == null) {
         throw const AiServiceException('Empty response from server');
       }
-      final stream = response.data!.stream;
-      final buffer = StringBuffer();
+      final lines = utf8.decoder
+          .bind(response.data!.stream)
+          .transform(const LineSplitter());
 
-      await for (final chunk in stream) {
-        buffer.write(utf8.decode(chunk));
+      await for (final rawLine in lines) {
+        final line = rawLine.trim();
+        if (line.isEmpty || line.startsWith(':')) continue;
+        if (!line.startsWith('data: ')) continue;
 
-        // 处理 SSE 数据
-        var bufferStr = buffer.toString();
-        while (bufferStr.contains('\n')) {
-          final newlineIndex = bufferStr.indexOf('\n');
-          final line = bufferStr.substring(0, newlineIndex).trim();
-          bufferStr = bufferStr.substring(newlineIndex + 1);
-          buffer
-            ..clear()
-            ..write(bufferStr);
+        final data = line.substring(6).trim();
+        if (data == '[DONE]') return;
 
-          if (line.isEmpty || line.startsWith(':')) continue;
-          if (!line.startsWith('data: ')) continue;
+        Map<String, dynamic> json;
+        try {
+          json = jsonDecode(data) as Map<String, dynamic>;
+        } catch (e) {
+          // 跳过无法解析的行
+          debugLog('AiDatasource: Failed to parse SSE data: $e');
+          continue;
+        }
 
-          final data = line.substring(6).trim();
-          if (data == '[DONE]') return;
+        final errorMessage = _extractInlineErrorMessage(json);
+        if (errorMessage != null) {
+          throw AiServiceException(errorMessage);
+        }
 
-          try {
-            final json = jsonDecode(data) as Map<String, dynamic>;
-            final choices = json['choices'] as List<dynamic>?;
-            if (choices == null || choices.isEmpty) continue;
+        final choices = json['choices'] as List<dynamic>?;
+        if (choices == null || choices.isEmpty) continue;
 
-            final delta = choices[0]['delta'] as Map<String, dynamic>?;
-            final content = delta?['content'] as String?;
-            if (content != null) {
-              yield content;
-            }
-          } catch (e) {
-            // 跳过无法解析的行
-            debugLog('AiDatasource: Failed to parse SSE data: $e');
-          }
+        final delta = choices[0]['delta'] as Map<String, dynamic>?;
+        final content = _extractMessageText(delta?['content']) ??
+            _extractMessageText(delta?['text']);
+        if (content != null && content.isNotEmpty) {
+          yield content;
         }
       }
     } on DioException catch (e) {
       debugLog('AiDatasource: Stream completion error: ${e.message}');
       final errorMsg = _parseErrorMessage(e);
       throw AiServiceException(errorMsg);
+    } catch (e) {
+      if (e is AiServiceException) rethrow;
+      debugLog('AiDatasource: Stream completion read error: $e');
+      throw AiServiceException('Failed to read streaming response: $e');
     }
   }
 
@@ -174,7 +176,9 @@ class AiDatasource implements AiService {
         throw const AiServiceException('No choices in response');
       }
       final message = choices[0]['message'] as Map<String, dynamic>?;
-      final content = message?['content'] as String? ?? '';
+      final content = _extractMessageText(message?['content']) ??
+          _extractMessageText(message?['text']) ??
+          '';
       final usage = data['usage'] as Map<String, dynamic>?;
 
       return AiCompletionResult(
@@ -290,6 +294,65 @@ class AiDatasource implements AiService {
       DioExceptionType.connectionError => 'Connection failed',
       _ => e.message ?? 'Unknown error',
     };
+  }
+
+  String? _extractInlineErrorMessage(Map<String, dynamic> data) {
+    final error = data['error'];
+    if (error is String && error.isNotEmpty) {
+      return error;
+    }
+    if (error is Map<String, dynamic>) {
+      final message = error['message'];
+      if (message is String && message.isNotEmpty) {
+        return message;
+      }
+    }
+    return null;
+  }
+
+  String? _extractMessageText(dynamic content) {
+    if (content is String) {
+      return content;
+    }
+    if (content is List) {
+      final buffer = StringBuffer();
+      for (final part in content) {
+        final text = _extractTextPart(part);
+        if (text != null && text.isNotEmpty) {
+          buffer.write(text);
+        }
+      }
+      final combined = buffer.toString();
+      return combined.isEmpty ? null : combined;
+    }
+    return _extractTextPart(content);
+  }
+
+  String? _extractTextPart(dynamic part) {
+    if (part is String) {
+      return part;
+    }
+    if (part is! Map<String, dynamic>) {
+      return null;
+    }
+
+    final directText = part['text'];
+    if (directText is String && directText.isNotEmpty) {
+      return directText;
+    }
+    if (directText is Map<String, dynamic>) {
+      final value = directText['value'];
+      if (value is String && value.isNotEmpty) {
+        return value;
+      }
+    }
+
+    final nestedContent = part['content'];
+    if (nestedContent is String && nestedContent.isNotEmpty) {
+      return nestedContent;
+    }
+
+    return null;
   }
 
   @override

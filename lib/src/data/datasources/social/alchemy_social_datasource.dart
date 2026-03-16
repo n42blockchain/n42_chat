@@ -7,23 +7,39 @@ import 'package:http/http.dart' as http;
 /// Uses Alchemy's NFT API v3 and Token API to query user holdings
 /// and discover common collection owners for social recommendations.
 ///
-/// **Security note**: The Alchemy API key is passed in the URL path as
-/// required by the v2 API. All error messages are sanitized to strip
-/// the key before being thrown.
+/// **Security note**: Direct mode passes the Alchemy API key in the URL path
+/// as required by the v2 API. Proxy mode uses the host app's bearer token
+/// instead. All error messages are sanitized before being thrown.
 class AlchemySocialDatasource {
   final String _apiKey;
   final String _baseUrl;
+  final String? _authToken;
+  final bool _useProxyEndpoint;
   final http.Client _httpClient;
 
   AlchemySocialDatasource({
     required String apiKey,
     String? baseUrl,
+    String? authToken,
+    bool useProxyEndpoint = false,
     http.Client? httpClient,
-  })  : _apiKey = apiKey,
-        _baseUrl = baseUrl ?? 'https://eth-mainnet.g.alchemy.com/v2',
-        _httpClient = httpClient ?? http.Client();
+  }) : _apiKey = apiKey,
+       _baseUrl = baseUrl ?? 'https://eth-mainnet.g.alchemy.com/v2',
+       _authToken = authToken,
+       _useProxyEndpoint = useProxyEndpoint,
+       _httpClient = httpClient ?? http.Client();
 
-  String get _endpoint => '$_baseUrl/$_apiKey';
+  String get _normalizedBaseUrl => _baseUrl.endsWith('/')
+      ? _baseUrl.substring(0, _baseUrl.length - 1)
+      : _baseUrl;
+
+  String get _endpoint =>
+      _useProxyEndpoint ? _normalizedBaseUrl : '$_normalizedBaseUrl/$_apiKey';
+
+  Map<String, String> get _headers => {
+    if (_useProxyEndpoint && _authToken != null && _authToken.isNotEmpty)
+      'Authorization': 'Bearer $_authToken',
+  };
 
   /// Strip the API key from error messages to prevent accidental exposure
   /// in logs or crash reports.
@@ -54,7 +70,7 @@ class AlchemySocialDatasource {
 
     try {
       final response = await _httpClient
-          .get(uri)
+          .get(uri, headers: _headers)
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode != 200) {
@@ -77,8 +93,8 @@ class AlchemySocialDatasource {
     try {
       final response = await _httpClient
           .post(
-            Uri.parse(_endpoint),
-            headers: {'Content-Type': 'application/json'},
+            Uri.parse(_useProxyEndpoint ? '$_endpoint/' : _endpoint),
+            headers: {'Content-Type': 'application/json', ..._headers},
             body: jsonEncode({
               'jsonrpc': '2.0',
               'id': 1,
@@ -106,13 +122,13 @@ class AlchemySocialDatasource {
   ///
   /// Useful for finding users who share common NFT interests.
   Future<List<String>> getCollectionOwners(String contractAddress) async {
-    final uri = Uri.parse('$_endpoint/getOwnersForContract').replace(
-      queryParameters: {'contractAddress': contractAddress},
-    );
+    final uri = Uri.parse(
+      '$_endpoint/getOwnersForContract',
+    ).replace(queryParameters: {'contractAddress': contractAddress});
 
     try {
       final response = await _httpClient
-          .get(uri)
+          .get(uri, headers: _headers)
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode != 200) {

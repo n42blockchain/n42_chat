@@ -2,6 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart' as sqlite;
 
 /// Matrix服务器测试页面
 ///
@@ -31,7 +34,8 @@ class _ServerTestPageState extends State<ServerTestPage> {
   @override
   void initState() {
     super.initState();
-    _testUsername = 'n42_test_${DateTime.now().millisecondsSinceEpoch % 100000}';
+    _testUsername =
+        'n42_test_${DateTime.now().millisecondsSinceEpoch % 100000}';
   }
 
   @override
@@ -101,7 +105,6 @@ class _ServerTestPageState extends State<ServerTestPage> {
 
       // 13. 登出
       await _runTest('用户登出', _testLogout);
-
     } catch (e) {
       _addResult('测试异常', false, e.toString());
     } finally {
@@ -128,7 +131,9 @@ class _ServerTestPageState extends State<ServerTestPage> {
 
   void _addResult(String name, bool success, String message) {
     setState(() {
-      _testResults.add(TestResult(name: name, success: success, message: message));
+      _testResults.add(
+        TestResult(name: name, success: success, message: message),
+      );
     });
   }
 
@@ -137,9 +142,15 @@ class _ServerTestPageState extends State<ServerTestPage> {
   // ============================================
 
   Future<void> _testInitClient() async {
-    _client = Client(
-      'N42ChatServerTest',
+    final tempDir = await getTemporaryDirectory();
+    final sqfliteDb = await sqlite.openDatabase(
+      p.join(tempDir.path, 'n42_chat_server_test_page.db'),
     );
+    final database = await MatrixSdkDatabase.init(
+      'N42ChatServerTest',
+      database: sqfliteDb,
+    );
+    _client = Client('N42ChatServerTest', database: database);
   }
 
   Future<void> _testConnectServer() async {
@@ -185,7 +196,9 @@ class _ServerTestPageState extends State<ServerTestPage> {
     try {
       // 检查用户名是否可用
       try {
-        final available = await _client!.checkUsernameAvailability(_testUsername);
+        final available = await _client!.checkUsernameAvailability(
+          _testUsername,
+        );
         if (available != true) {
           // 用户名不可用，生成新的
           _testUsername = 'n42_test_${Random().nextInt(99999)}';
@@ -253,8 +266,13 @@ class _ServerTestPageState extends State<ServerTestPage> {
       throw Exception('未登录');
     }
 
-    final newDisplayName = 'N42 Test User ${DateTime.now().millisecondsSinceEpoch % 1000}';
-    await _client!.setDisplayName(_client!.userID!, newDisplayName);
+    final newDisplayName =
+        'N42 Test User ${DateTime.now().millisecondsSinceEpoch % 1000}';
+    await _client!.request(
+      RequestType.PUT,
+      '/client/v3/profile/${Uri.encodeComponent(_client!.userID!)}/displayname',
+      data: <String, Object?>{'displayname': newDisplayName},
+    );
     debugPrint('更新显示名称为: $newDisplayName');
   }
 
@@ -382,9 +400,7 @@ class _ServerTestPageState extends State<ServerTestPage> {
           // 测试结果列表
           Expanded(
             child: _testResults.isEmpty
-                ? const Center(
-                    child: Text('点击下方按钮开始测试'),
-                  )
+                ? const Center(child: Text('点击下方按钮开始测试'))
                 : ListView.builder(
                     itemCount: _testResults.length,
                     itemBuilder: (context, index) {

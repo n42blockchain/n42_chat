@@ -51,7 +51,8 @@ class DateLocaleStrings {
   static String _defaultHoursAgoOnline(int count) => '${count}h ago';
   static String _defaultDaysAgoOnline(int count) => '${count}d ago';
   static String _defaultMonthDay(int month, int day) => '$month/$day';
-  static String _defaultYearMonthDay(int year, int month, int day) => '$year/$month/$day';
+  static String _defaultYearMonthDay(int year, int month, int day) =>
+      '$year/$month/$day';
 
   /// Chinese locale strings
   static const DateLocaleStrings chinese = DateLocaleStrings(
@@ -65,7 +66,7 @@ class DateLocaleStrings {
     minutesAgoOnline: _chineseMinutesAgoOnline,
     hoursAgoOnline: _chineseHoursAgoOnline,
     daysAgoOnline: _chineseDaysAgoOnline,
-    weekdays: ['', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
+    weekdays: ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'],
     localeCode: 'zh',
     monthDay: _chineseMonthDay,
     yearMonthDay: _chineseYearMonthDay,
@@ -78,7 +79,8 @@ class DateLocaleStrings {
   static String _chineseHoursAgoOnline(int count) => '$count小时前在线';
   static String _chineseDaysAgoOnline(int count) => '$count天前在线';
   static String _chineseMonthDay(int month, int day) => '$month月$day日';
-  static String _chineseYearMonthDay(int year, int month, int day) => '$year年$month月$day日';
+  static String _chineseYearMonthDay(int year, int month, int day) =>
+      '$year年$month月$day日';
 
   /// 根据语言代码创建本地化字符串
   static DateLocaleStrings fromLocaleCode(String localeCode) {
@@ -111,7 +113,10 @@ abstract class N42DateUtils {
   /// - 本周: 显示星期几
   /// - 今年: 显示月-日 (如 12-25)
   /// - 更早: 显示年-月-日 (如 2023-12-25)
-  static String formatConversationTime(DateTime? dateTime, [DateLocaleStrings? locale]) {
+  static String formatConversationTime(
+    DateTime? dateTime, [
+    DateLocaleStrings? locale,
+  ]) {
     if (dateTime == null) return '';
     locale ??= _defaultLocale;
 
@@ -142,7 +147,10 @@ abstract class N42DateUtils {
   /// 格式化消息时间（完整格式）
   ///
   /// 用于消息详情页的时间分隔线
-  static String formatMessageTime(DateTime dateTime, [DateLocaleStrings? locale]) {
+  static String formatMessageTime(
+    DateTime dateTime, [
+    DateLocaleStrings? locale,
+  ]) {
     locale ??= _defaultLocale;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -160,14 +168,18 @@ abstract class N42DateUtils {
     } else if (dateTime.year == now.year) {
       dateStr = '${locale.monthDay(dateTime.month, dateTime.day)} ';
     } else {
-      dateStr = '${locale.yearMonthDay(dateTime.year, dateTime.month, dateTime.day)} ';
+      dateStr =
+          '${locale.yearMonthDay(dateTime.year, dateTime.month, dateTime.day)} ';
     }
 
     return '$dateStr${DateFormat('HH:mm').format(dateTime)}';
   }
 
   /// 格式化消息详情时间（用于消息详情）
-  static String formatMessageDetailTime(DateTime dateTime, [DateLocaleStrings? locale]) {
+  static String formatMessageDetailTime(
+    DateTime dateTime, [
+    DateLocaleStrings? locale,
+  ]) {
     locale ??= _defaultLocale;
     return '${locale.yearMonthDay(dateTime.year, dateTime.month, dateTime.day)} ${DateFormat('HH:mm').format(dateTime)}';
   }
@@ -180,7 +192,10 @@ abstract class N42DateUtils {
   /// - 昨天
   /// - x天前 (< 7天)
   /// - 日期
-  static String formatRelativeTime(DateTime dateTime, [DateLocaleStrings? locale]) {
+  static String formatRelativeTime(
+    DateTime dateTime, [
+    DateLocaleStrings? locale,
+  ]) {
     locale ??= _defaultLocale;
     final now = DateTime.now();
     final difference = now.difference(dateTime);
@@ -218,7 +233,10 @@ abstract class N42DateUtils {
   }
 
   /// 格式化在线状态时间
-  static String formatLastSeen(DateTime? lastSeen, [DateLocaleStrings? locale]) {
+  static String formatLastSeen(
+    DateTime? lastSeen, [
+    DateLocaleStrings? locale,
+  ]) {
     locale ??= _defaultLocale;
     if (lastSeen == null) return locale.offline;
 
@@ -251,4 +269,3 @@ abstract class N42DateUtils {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 }
-

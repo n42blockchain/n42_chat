@@ -3,9 +3,11 @@ import '../../domain/entities/social/social_connection.dart';
 import '../../domain/entities/social/social_profile.dart';
 import '../../domain/entities/social/social_recommendation.dart';
 import '../../domain/repositories/social_graph_repository.dart';
+import '../../core/utils/debug_log.dart';
 import '../datasources/social/debank_datasource.dart';
 import '../datasources/social/on_chain_identity_datasource.dart';
 import '../models/social/debank_portfolio_model.dart';
+import '../models/social/social_similarity_model.dart';
 
 /// Implementation of [ISocialGraphRepository].
 ///
@@ -47,16 +49,25 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
       throw ArgumentError('Invalid address: $address');
     }
 
-    // Fetch portfolio, chains, and identities in parallel
-    final results = await Future.wait([
-      _debank.getUserPortfolio(address),
-      _debank.getUsedChains(address),
-      _identity.getReverseIdentities(address),
-    ]);
+    final portfolioFuture = _withFallback(
+      () => _debank.getUserPortfolio(address),
+      const DeBankPortfolioModel(),
+      'getUserPortfolio($address)',
+    );
+    final chainsFuture = _withFallback(
+      () => _debank.getUsedChains(address),
+      const <String>[],
+      'getUsedChains($address)',
+    );
+    final identitiesFuture = _withFallback(
+      () => _identity.getReverseIdentities(address),
+      const <String, String?>{},
+      'getReverseIdentities($address)',
+    );
 
-    final portfolio = results[0] as DeBankPortfolioModel;
-    final chains = results[1] as List<String>;
-    final identities = results[2] as Map<String, String?>;
+    final portfolio = await portfolioFuture;
+    final chains = await chainsFuture;
+    final identities = await identitiesFuture;
 
     return SocialProfile(
       address: address,
@@ -97,16 +108,17 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
   }
 
   @override
-  Future<double> calculateSimilarity(String addressA, String addressB) async {
+  Future<SocialSimilarityModel> calculateSimilarity(
+    String addressA,
+    String addressB,
+  ) async {
     if (!_isValidAddress(addressA)) {
       throw ArgumentError('Invalid addressA: $addressA');
     }
     if (!_isValidAddress(addressB)) {
       throw ArgumentError('Invalid addressB: $addressB');
     }
-
-    final result = await _graphService.calculateSimilarity(addressA, addressB);
-    return result.totalScore;
+    return _graphService.calculateSimilarity(addressA, addressB);
   }
 
   @override
@@ -124,12 +136,22 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
       }
     }
 
-    // Try resolving the query as ENS, Lens, or Farcaster in parallel
-    final results = await Future.wait([
-      _identity.resolveENS(normalizedQuery),
-      _identity.resolveLensHandle(normalizedQuery),
-      _identity.resolveFarcaster(normalizedQuery),
-    ]);
+    final ensFuture = _withFallback<String?>(
+      () => _identity.resolveENS(normalizedQuery),
+      null,
+      'resolveENS($normalizedQuery)',
+    );
+    final lensFuture = _withFallback<String?>(
+      () => _identity.resolveLensHandle(normalizedQuery),
+      null,
+      'resolveLensHandle($normalizedQuery)',
+    );
+    final farcasterFuture = _withFallback<String?>(
+      () => _identity.resolveFarcaster(normalizedQuery),
+      null,
+      'resolveFarcaster($normalizedQuery)',
+    );
+    final results = await Future.wait([ensFuture, lensFuture, farcasterFuture]);
 
     final profiles = <SocialProfile>[];
     final seen = <String>{};
@@ -156,5 +178,18 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
   void dispose() {
     _debank.dispose();
     _identity.dispose();
+  }
+
+  Future<T> _withFallback<T>(
+    Future<T> Function() loader,
+    T fallback,
+    String label,
+  ) async {
+    try {
+      return await loader();
+    } catch (e) {
+      debugLog('SocialGraphRepository: $label failed: $e');
+      return fallback;
+    }
   }
 }

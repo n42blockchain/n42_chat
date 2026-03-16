@@ -38,15 +38,31 @@ class _VoiceRoomView extends StatelessWidget {
     final s = S.of(context);
     final theme = Theme.of(context);
 
-    return BlocConsumer<VoiceRoomBloc, VoiceRoomState>(
-      listenWhen: (previous, current) =>
-          previous.isConnected && !current.isConnected,
-      listener: (context, state) {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-      },
-      builder: (context, state) {
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<VoiceRoomBloc, VoiceRoomState>(
+          listenWhen: (previous, current) =>
+              previous.isConnected && !current.isConnected,
+          listener: (context, state) {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+          },
+        ),
+        BlocListener<VoiceRoomBloc, VoiceRoomState>(
+          listenWhen: (previous, current) =>
+              previous.error != current.error &&
+              current.error != null &&
+              current.error!.isNotEmpty,
+          listener: (context, state) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.error!)),
+            );
+          },
+        ),
+      ],
+      child: BlocBuilder<VoiceRoomBloc, VoiceRoomState>(
+        builder: (context, state) {
         final room = state.room;
 
         if (room == null) {
@@ -139,7 +155,8 @@ class _VoiceRoomView extends StatelessWidget {
             ],
           ),
         );
-      },
+        },
+      ),
     );
   }
 
@@ -328,7 +345,6 @@ class _VoiceRoomView extends StatelessWidget {
             onPressed: () {
               context.read<VoiceRoomBloc>().add(const EndVoiceRoom());
               Navigator.pop(dialogContext);
-              Navigator.of(context).pop();
             },
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             child: Text(s?.voiceRoomEnd ?? 'End Room'),

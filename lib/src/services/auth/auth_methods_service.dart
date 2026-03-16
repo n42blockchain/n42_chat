@@ -166,6 +166,7 @@ class AuthMethodsService {
   String? _weChatUniversalLink;
   bool _weChatInitialized = false;
   Completer<SocialLoginResult?>? _weChatLoginCompleter;
+  WeChatResponseSubscriber? _weChatResponseListener;
 
   // ============================================
   // 初始化
@@ -223,19 +224,17 @@ class AuthMethodsService {
           appId: _weChatAppId!,
           universalLink: _weChatUniversalLink!,
         );
-        _weChatInitialized = await Fluwx().isWeChatInstalled;
-        if (_weChatInitialized) {
-          // 监听微信登录响应
-          Fluwx().addSubscriber((response) {
-            if (response is WeChatAuthResponse) {
-              _handleWeChatAuthResponse(response);
-            }
-          });
+        _weChatInitialized = true;
+        _ensureWeChatResponseListener();
+        final isInstalled = await Fluwx().isWeChatInstalled;
+        if (isInstalled) {
           debugLog('AuthMethodsService: WeChat SDK initialized');
         } else {
           debugLog('AuthMethodsService: WeChat not installed');
         }
       } catch (e) {
+        _removeWeChatResponseListener();
+        _weChatInitialized = false;
         debugLog('AuthMethodsService: WeChat init failed - $e');
       }
     }
@@ -1008,6 +1007,9 @@ class AuthMethodsService {
     if (!_weChatInitialized) {
       throw Exception('WeChat SDK not initialized');
     }
+    if (_weChatLoginCompleter != null && !_weChatLoginCompleter!.isCompleted) {
+      throw StateError('WeChat login already in progress');
+    }
 
     final isInstalled = await Fluwx().isWeChatInstalled;
     if (!isInstalled) {
@@ -1052,6 +1054,8 @@ class AuthMethodsService {
         _weChatLoginCompleter!.completeError(e);
       }
       rethrow;
+    } finally {
+      _weChatLoginCompleter = null;
     }
   }
 
@@ -1202,8 +1206,33 @@ class AuthMethodsService {
     return digest.toString();
   }
 
+  void _ensureWeChatResponseListener() {
+    if (_weChatResponseListener != null) {
+      return;
+    }
+
+    _weChatResponseListener = (response) {
+      if (response is WeChatAuthResponse) {
+        _handleWeChatAuthResponse(response);
+      }
+    };
+    Fluwx().addSubscriber(_weChatResponseListener!);
+  }
+
+  void _removeWeChatResponseListener() {
+    if (_weChatResponseListener == null) {
+      return;
+    }
+    Fluwx().removeSubscriber(_weChatResponseListener!);
+    _weChatResponseListener = null;
+  }
+
   /// 释放资源
   void dispose() {
+    if (_weChatLoginCompleter != null && !_weChatLoginCompleter!.isCompleted) {
+      _weChatLoginCompleter!.complete(null);
+    }
+    _removeWeChatResponseListener();
     _passkeyInitialized = false;
     _passkeyRpId = null;
     _googleSignIn = null;

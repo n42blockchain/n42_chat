@@ -39,12 +39,7 @@ class BiometricResult {
   factory BiometricResult.failure({
     required String message,
     BiometricErrorCode? code,
-  }) =>
-      BiometricResult(
-        success: false,
-        errorMessage: message,
-        errorCode: code,
-      );
+  }) => BiometricResult(success: false, errorMessage: message, errorCode: code);
 }
 
 /// 生物识别错误代码
@@ -78,7 +73,8 @@ enum BiometricErrorCode {
 class BiometricService {
   final local_auth.LocalAuthentication _localAuth;
 
-  BiometricService() : _localAuth = local_auth.LocalAuthentication();
+  BiometricService({local_auth.LocalAuthentication? localAuth})
+    : _localAuth = localAuth ?? local_auth.LocalAuthentication();
 
   /// 检查设备是否支持生物识别
   Future<bool> isAvailable() async {
@@ -88,7 +84,7 @@ class BiometricService {
       debugLog('BiometricService: canCheckBiometrics = $canCheck');
       final isSupported = await _localAuth.isDeviceSupported();
       debugLog('BiometricService: isDeviceSupported = $isSupported');
-      final result = canCheck || isSupported;
+      final result = canCheck && isSupported;
       debugLog('BiometricService: isAvailable result = $result');
       return result;
     } on PlatformException catch (e) {
@@ -194,24 +190,33 @@ class BiometricService {
       case 'NotAvailable':
         code = BiometricErrorCode.notAvailable;
         message = 'Biometric authentication not available';
+      case 'NotSupported':
+        code = BiometricErrorCode.notSupported;
+        message = 'Biometric authentication is not supported on this device';
       case 'NotEnrolled':
         code = BiometricErrorCode.notEnrolled;
         message = 'No biometrics enrolled';
+      case 'PasscodeNotSet':
+        code = BiometricErrorCode.notEnrolled;
+        message = 'Set a device passcode before using biometric authentication';
+      case 'UserCanceled':
+      case 'userCanceled':
+      case 'systemCanceled':
+        code = BiometricErrorCode.userCanceled;
+        message = 'Authentication was canceled';
       case 'LockedOut':
         code = BiometricErrorCode.lockedOut;
         message = 'Too many attempts. Please try again later.';
       case 'PermanentlyLockedOut':
         code = BiometricErrorCode.permanentlyLockedOut;
-        message = 'Biometric authentication is locked. Please use another method.';
+        message =
+            'Biometric authentication is locked. Please use another method.';
       default:
         code = BiometricErrorCode.unknown;
         message = e.message ?? 'Unknown error';
     }
 
-    return BiometricResult.failure(
-      message: message,
-      code: code,
-    );
+    return BiometricResult.failure(message: message, code: code);
   }
 
   /// 映射生物识别类型

@@ -72,6 +72,15 @@ class GiphyConfig {
   /// API Key - 必须在运行时配置
   final String apiKey;
 
+  /// API Base URL
+  final String baseUrl;
+
+  /// 代理认证令牌
+  final String? authToken;
+
+  /// 是否使用代理端点
+  final bool useProxyEndpoint;
+
   /// 每页数量
   final int pageSize;
 
@@ -80,6 +89,9 @@ class GiphyConfig {
 
   const GiphyConfig({
     required this.apiKey,
+    this.baseUrl = 'https://api.giphy.com/v1/gifs',
+    this.authToken,
+    this.useProxyEndpoint = false,
     this.pageSize = 25,
     this.defaultRating = 'g',
   });
@@ -96,9 +108,6 @@ class GiphyConfig {
 /// );
 /// ```
 class GiphyService {
-  /// API Base URL
-  static const String _baseUrl = 'https://api.giphy.com/v1/gifs';
-
   final http.Client _client;
   final GiphyConfig _config;
 
@@ -111,13 +120,28 @@ class GiphyService {
     http.Client? client,
   })  : _config = config,
         _client = client ?? http.Client() {
-    if (_config.apiKey.isEmpty || _config.apiKey == 'YOUR_GIPHY_API_KEY') {
+    if (!_config.useProxyEndpoint &&
+        (_config.apiKey.isEmpty || _config.apiKey == 'YOUR_GIPHY_API_KEY')) {
       debugLog('WARNING: GiphyService initialized without valid API key');
     }
   }
 
   /// 每页数量
   int get _pageSize => _config.pageSize;
+
+  String get _baseUrl => _config.baseUrl.endsWith('/')
+      ? _config.baseUrl.substring(0, _config.baseUrl.length - 1)
+      : _config.baseUrl;
+
+  Map<String, String> _headers([Map<String, String>? extra]) {
+    return {
+      if (_config.useProxyEndpoint &&
+          _config.authToken != null &&
+          _config.authToken!.isNotEmpty)
+        'Authorization': 'Bearer ${_config.authToken}',
+      ...?extra,
+    };
+  }
 
   /// 搜索 GIF
   ///
@@ -139,18 +163,19 @@ class GiphyService {
     }
 
     try {
-      final uri = Uri.parse('$_baseUrl/search').replace(
-        queryParameters: {
-          'api_key': _config.apiKey,
-          'q': query,
-          'limit': effectiveLimit.toString(),
-          'offset': offset.toString(),
-          'rating': rating,
-          'lang': lang,
-        },
-      );
+      final queryParams = <String, String>{
+        'q': query,
+        'limit': effectiveLimit.toString(),
+        'offset': offset.toString(),
+        'rating': rating,
+        'lang': lang,
+      };
+      if (!_config.useProxyEndpoint) {
+        queryParams['api_key'] = _config.apiKey;
+      }
 
-      final response = await _client.get(uri);
+      final uri = Uri.parse('$_baseUrl/search').replace(queryParameters: queryParams);
+      final response = await _client.get(uri, headers: _headers());
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
@@ -177,16 +202,17 @@ class GiphyService {
   }) async {
     final effectiveLimit = limit ?? _pageSize;
     try {
-      final uri = Uri.parse('$_baseUrl/trending').replace(
-        queryParameters: {
-          'api_key': _config.apiKey,
-          'limit': effectiveLimit.toString(),
-          'offset': offset.toString(),
-          'rating': rating,
-        },
-      );
+      final queryParams = <String, String>{
+        'limit': effectiveLimit.toString(),
+        'offset': offset.toString(),
+        'rating': rating,
+      };
+      if (!_config.useProxyEndpoint) {
+        queryParams['api_key'] = _config.apiKey;
+      }
 
-      final response = await _client.get(uri);
+      final uri = Uri.parse('$_baseUrl/trending').replace(queryParameters: queryParams);
+      final response = await _client.get(uri, headers: _headers());
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
@@ -203,6 +229,11 @@ class GiphyService {
 
   /// 通过 ID 获取 GIF
   Future<GiphyGif?> getGifById(String id) async {
+    if (_config.useProxyEndpoint) {
+      debugLog('Giphy get by id is not supported via proxy endpoint');
+      return null;
+    }
+
     try {
       final uri = Uri.parse('$_baseUrl/$id').replace(
         queryParameters: {
@@ -230,6 +261,11 @@ class GiphyService {
   ///
   /// [tag] 可选的标签过滤
   Future<GiphyGif?> getRandomGif({String? tag}) async {
+    if (_config.useProxyEndpoint) {
+      debugLog('Giphy random is not supported via proxy endpoint');
+      return null;
+    }
+
     try {
       final queryParams = <String, String>{
         'api_key': _config.apiKey,

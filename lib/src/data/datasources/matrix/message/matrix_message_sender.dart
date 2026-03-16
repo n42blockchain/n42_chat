@@ -5,6 +5,7 @@ import '../../../../domain/entities/message_entity.dart';
 import '../matrix_client_manager.dart';
 import 'matrix_media_sender.dart';
 import 'matrix_media_uploader.dart';
+import 'matrix_text_message_content.dart';
 import '../../../../core/utils/debug_log.dart';
 
 /// Matrix 消息发送器
@@ -108,30 +109,16 @@ class MatrixMessageSender {
     final room = _client?.getRoomById(roomId);
     if (room == null) return null;
 
-    // 构建消息内容
-    final content = <String, dynamic>{
-      'msgtype': 'm.text',
-      'body': text,
-    };
-
-    // 添加 m.mentions 字段（Matrix 规范）
-    if (mentionsRoom || (mentionedUserIds != null && mentionedUserIds.isNotEmpty)) {
-      content['m.mentions'] = <String, dynamic>{
-        if (mentionsRoom) 'room': true,
-        if (mentionedUserIds != null && mentionedUserIds.isNotEmpty)
-          'user_ids': mentionedUserIds,
-      };
-    }
-
-    // 添加阅后即焚字段
-    if (selfDestructAfter != null && selfDestructAfter > 0) {
-      content['n42.self_destruct'] = {
-        'after': selfDestructAfter,
-      };
-    }
+    final content = buildTextMessageContent(
+      text,
+      selfDestructAfter: selfDestructAfter,
+      mentionedUserIds: mentionedUserIds,
+      mentionsRoom: mentionsRoom,
+      currentUserId: _client?.userID,
+    );
 
     // 如果有特殊字段，使用 sendEvent；否则使用 sendTextEvent
-    if (content.length > 2) {
+    if (hasExtendedTextMetadata(content)) {
       return await room.sendEvent(content);
     }
 
@@ -252,9 +239,7 @@ class MatrixMessageSender {
 
       // 构建 GIF 消息内容
       // 使用 m.image 类型但添加 GIF 相关元数据
-      final info = <String, dynamic>{
-        'mimetype': 'image/gif',
-      };
+      final info = <String, dynamic>{'mimetype': 'image/gif'};
       if (width != null) info['w'] = width;
       if (height != null) info['h'] = height;
 
@@ -264,10 +249,7 @@ class MatrixMessageSender {
         'url': gifUrl,
         'info': info,
         // 添加自定义字段标识 GIF 来源
-        'org.n42.gif': {
-          'source': 'giphy',
-          'preview_url': previewUrl,
-        },
+        'org.n42.gif': {'source': 'giphy', 'preview_url': previewUrl},
       };
 
       debugLog('GIF content: $content');
@@ -333,9 +315,7 @@ class MatrixMessageSender {
       }
 
       // 构建贴纸消息内容 (使用 m.sticker 事件类型)
-      final info = <String, dynamic>{
-        'mimetype': mimeType ?? 'image/png',
-      };
+      final info = <String, dynamic>{'mimetype': mimeType ?? 'image/png'};
       if (width != null) info['w'] = width;
       if (height != null) info['h'] = height;
       if (size != null) info['size'] = size;
@@ -355,7 +335,10 @@ class MatrixMessageSender {
       debugLog('Sticker content: $content');
       debugLog('Calling room.sendEvent with type m.sticker...');
 
-      final result = await room.sendEvent(content, type: matrix.EventTypes.Sticker);
+      final result = await room.sendEvent(
+        content,
+        type: matrix.EventTypes.Sticker,
+      );
       debugLog('sendEvent result: $result');
 
       debugLog('=== sendStickerMessage completed successfully ===');

@@ -102,6 +102,9 @@ extension ChatBlocSendHandlers on ChatBloc {
           _currentRoomId!,
           state.replyTarget!.id,
           textToSend,
+          selfDestructAfter: event.selfDestructAfter,
+          mentionedUserIds: event.mentionedUserIds,
+          mentionsRoom: event.mentionsRoom,
         );
         var newState = state.copyWith(
           isSending: false,

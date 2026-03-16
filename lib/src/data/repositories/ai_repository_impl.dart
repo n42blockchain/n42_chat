@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 
 import '../../core/services/ai_service.dart';
@@ -14,6 +15,7 @@ class AiRepositoryImpl implements IAiRepository {
 
   final AiService _aiService;
   final PreferencesDataSource _storage;
+  final Map<String, Future<void>> _writeQueues = {};
 
   AiRepositoryImpl({
     required AiService aiService,
@@ -61,15 +63,17 @@ class AiRepositoryImpl implements IAiRepository {
   @override
   Future<void> saveAssistant(AiAssistantEntity assistant) async {
     try {
-      final assistants = await getAssistants();
-      final index = assistants.indexWhere((a) => a.id == assistant.id);
-      if (index >= 0) {
-        assistants[index] = assistant;
-      } else {
-        assistants.add(assistant);
-      }
-      final data = jsonEncode(assistants.map((a) => a.toJson()).toList());
-      await _storage.write(_keyAssistants, data);
+      await _serializeWrite(_keyAssistants, () async {
+        final assistants = await getAssistants();
+        final index = assistants.indexWhere((a) => a.id == assistant.id);
+        if (index >= 0) {
+          assistants[index] = assistant;
+        } else {
+          assistants.add(assistant);
+        }
+        final data = jsonEncode(assistants.map((a) => a.toJson()).toList());
+        await _storage.write(_keyAssistants, data);
+      });
     } catch (e) {
       debugLog('AiRepository: Failed to save assistant: $e');
     }
@@ -79,11 +83,12 @@ class AiRepositoryImpl implements IAiRepository {
   Future<void> deleteAssistant(String assistantId) async {
     if (assistantId == 'default') return; // 不允许删除默认助手
     try {
-      final assistants = await getAssistants();
-      assistants.removeWhere((a) => a.id == assistantId);
-      final data = jsonEncode(assistants.map((a) => a.toJson()).toList());
-      await _storage.write(_keyAssistants, data);
-      // 同时清除该助手的历史
+      await _serializeWrite(_keyAssistants, () async {
+        final assistants = await getAssistants();
+        assistants.removeWhere((a) => a.id == assistantId);
+        final data = jsonEncode(assistants.map((a) => a.toJson()).toList());
+        await _storage.write(_keyAssistants, data);
+      });
       await clearChatHistory(assistantId);
     } catch (e) {
       debugLog('AiRepository: Failed to delete assistant: $e');
@@ -107,17 +112,20 @@ class AiRepositoryImpl implements IAiRepository {
 
   @override
   Future<void> saveChatMessage(String assistantId, AiChatMessage message) async {
+    final historyKey = _historyKey(assistantId);
     try {
-      final history = await getChatHistory(assistantId);
-      history.add(message);
+      await _serializeWrite(historyKey, () async {
+        final history = await getChatHistory(assistantId);
+        history.add(message);
 
-      // 保持最近 100 条消息
-      final trimmed = history.length > 100
-          ? history.sublist(history.length - 100)
-          : history;
+        // 保持最近 100 条消息
+        final trimmed = history.length > 100
+            ? history.sublist(history.length - 100)
+            : history;
 
-      final data = jsonEncode(trimmed.map((m) => m.toJson()).toList());
-      await _storage.write('$_keyChatHistoryPrefix$assistantId', data);
+        final data = jsonEncode(trimmed.map((m) => m.toJson()).toList());
+        await _storage.write(historyKey, data);
+      });
     } catch (e) {
       debugLog('AiRepository: Failed to save chat message: $e');
     }
@@ -125,10 +133,32 @@ class AiRepositoryImpl implements IAiRepository {
 
   @override
   Future<void> clearChatHistory(String assistantId) async {
+    final historyKey = _historyKey(assistantId);
     try {
-      await _storage.delete('$_keyChatHistoryPrefix$assistantId');
+      await _serializeWrite(historyKey, () => _storage.delete(historyKey));
     } catch (e) {
       debugLog('AiRepository: Failed to clear chat history: $e');
+    }
+  }
+
+  String _historyKey(String assistantId) => '$_keyChatHistoryPrefix$assistantId';
+
+  Future<void> _serializeWrite(
+    String key,
+    Future<void> Function() operation,
+  ) async {
+    final previous = _writeQueues[key] ?? Future<void>.value();
+    final completer = Completer<void>();
+    _writeQueues[key] = completer.future;
+
+    try {
+      await previous.catchError((_) {});
+      await operation();
+    } finally {
+      completer.complete();
+      if (identical(_writeQueues[key], completer.future)) {
+        unawaited(_writeQueues.remove(key));
+      }
     }
   }
 }

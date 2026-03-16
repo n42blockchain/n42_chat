@@ -75,6 +75,7 @@ class N42ChatRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static GoRouter? _router;
+  static bool _debugLogDiagnosticsEnabled = false;
 
   /// 获取完整的路由器（独立运行模式）
   ///
@@ -82,11 +83,29 @@ class N42ChatRouter {
   static GoRouter get router => _router ??= GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: Routes.conversationList,
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: debugLogDiagnosticsEnabled,
     routes: routes,
     errorBuilder: (context, state) => _ErrorPage(error: state.error),
     redirect: _handleRedirect,
   );
+
+  static bool get debugLogDiagnosticsEnabled => _debugLogDiagnosticsEnabled;
+
+  static void configure({required bool enableDebugLogs}) {
+    final shouldResetRouter = _debugLogDiagnosticsEnabled != enableDebugLogs;
+    _debugLogDiagnosticsEnabled = enableDebugLogs;
+    if (shouldResetRouter) {
+      reset(preserveDebugLogging: true);
+    }
+  }
+
+  static void reset({bool preserveDebugLogging = false}) {
+    _router?.dispose();
+    _router = null;
+    if (!preserveDebugLogging) {
+      _debugLogDiagnosticsEnabled = false;
+    }
+  }
 
   /// 获取路由列表（嵌入模式）
   ///

@@ -48,6 +48,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
     emit(state.copyWith(
       status: GovernanceStatus.loading,
       filterState: event.filterState,
+      isLoadingMoreProposals: false,
     ));
     try {
       final proposals = await _repository.getProposals(
@@ -58,12 +59,14 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
         status: GovernanceStatus.loaded,
         proposals: proposals,
         hasMoreProposals: proposals.length >= 20,
+        isLoadingMoreProposals: false,
       ));
     } catch (e, stackTrace) {
       debugLog('Failed to load proposals: $e\n$stackTrace');
       emit(state.copyWith(
         status: GovernanceStatus.error,
         errorMessage: _formatError(e),
+        isLoadingMoreProposals: false,
       ));
     }
   }
@@ -72,21 +75,24 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
     GovernanceLoadMoreProposals event,
     Emitter<GovernanceState> emit,
   ) async {
-    final currentSpace = state.space;
-    if (!state.hasMoreProposals || currentSpace == null) return;
+    if (!state.hasMoreProposals || state.isLoadingMoreProposals) return;
+
+    emit(state.copyWith(isLoadingMoreProposals: true));
 
     try {
       final moreProposals = await _repository.getProposals(
-        currentSpace.id,
+        event.spaceId,
         state: state.filterState,
         skip: state.proposals.length,
       );
       emit(state.copyWith(
         proposals: [...state.proposals, ...moreProposals],
         hasMoreProposals: moreProposals.length >= 20,
+        isLoadingMoreProposals: false,
       ));
     } catch (e) {
       debugLog('Failed to load more proposals: $e');
+      emit(state.copyWith(isLoadingMoreProposals: false));
     }
   }
 

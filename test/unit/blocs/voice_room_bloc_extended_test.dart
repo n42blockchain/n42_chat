@@ -259,6 +259,22 @@ void main() {
     );
 
     blocTest<VoiceRoomBloc, VoiceRoomState>(
+      'emits error when endVoiceRoom returns false',
+      build: () {
+        when(() => mockRepo.endVoiceRoom(any()))
+            .thenAnswer((_) async => false);
+        return buildBloc();
+      },
+      seed: () => VoiceRoomState(room: _makeRoom()),
+      act: (bloc) => bloc.add(const EndVoiceRoom()),
+      expect: () => [
+        isA<VoiceRoomState>()
+            .having((s) => s.room, 'room', isNotNull)
+            .having((s) => s.error, 'error', 'Failed to end voice room'),
+      ],
+    );
+
+    blocTest<VoiceRoomBloc, VoiceRoomState>(
       'does not emit when room is null',
       build: buildBloc,
       // Default state has no room

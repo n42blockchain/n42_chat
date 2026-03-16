@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/mini_app_bridge_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/utils/debug_log.dart';
 import '../../../domain/entities/mini_app_entity.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../blocs/chat/chat_bloc.dart';
@@ -34,8 +35,8 @@ class MiniAppPage extends StatefulWidget {
 }
 
 class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
-  late WebViewController _webController;
-  late MiniAppBridgeService _bridge;
+  WebViewController? _webController;
+  late final MiniAppBridgeService _bridge;
   bool _isLoading = true;
   String? _errorMessage;
   int _loadProgress = 0;
@@ -74,6 +75,15 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
   }
 
   void _initWebView() {
+    final initialUri = normalizeTrustedMiniAppUri(widget.app.url);
+    if (initialUri == null) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Invalid mini app URL';
+      });
+      return;
+    }
+
     _bridge = MiniAppBridgeService(
       walletBridge: getIt<IWalletBridge>(),
       roomId: widget.roomId,
@@ -86,7 +96,8 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
       },
     );
 
-    _webController = WebViewController()
+    final controller = WebViewController();
+    controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.white)
       ..setNavigationDelegate(
@@ -99,9 +110,29 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
             });
           },
           onPageFinished: (_) async {
-            // 注入 bridge 初始化脚本
-            await _webController.runJavaScript(_bridge.initScript);
-            if (mounted) setState(() => _isLoading = false);
+            final currentUrl = await controller.currentUrl();
+            if (!isTrustedMiniAppNavigationUrl(
+              appUrl: widget.app.url,
+              candidateUrl: currentUrl,
+            )) {
+              debugLog(
+                'MiniAppPage: blocked bridge injection for untrusted URL: $currentUrl',
+              );
+              if (!mounted) return;
+              setState(() {
+                _isLoading = false;
+                _errorMessage = 'Blocked untrusted mini app origin';
+              });
+              return;
+            }
+
+            await _runJavaScriptSafely(_bridge.initScript);
+            if (mounted) {
+              setState(() {
+                _isLoading = false;
+                _loadProgress = 100;
+              });
+            }
           },
           onProgress: (progress) {
             if (!mounted) return;
@@ -116,21 +147,27 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
             }
           },
           onNavigationRequest: (request) {
-            // 只允许加载 HTTPS 页面（安全沙箱）
-            final uri = Uri.tryParse(request.url);
-            if (uri != null && uri.scheme == 'https') {
+            if (isTrustedMiniAppNavigationUrl(
+              appUrl: widget.app.url,
+              candidateUrl: request.url,
+            )) {
               return NavigationDecision.navigate;
             }
+
+            debugLog(
+              'MiniAppPage: blocked navigation outside trusted origin: ${request.url}',
+            );
             return NavigationDecision.prevent;
           },
         ),
       );
+    _webController = controller;
 
     // 注册 JS Channel（必须在 loadRequest 之前）
-    _bridge.registerChannels(_webController, context);
+    _bridge.registerChannels(controller, context);
 
     // 加载 Mini App URL
-    _webController.loadRequest(Uri.parse(widget.app.url));
+    unawaited(_loadInitialUrl(initialUri));
   }
 
   void _onBridgeSendMessage(String text) {
@@ -143,11 +180,44 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
   }
 
   Future<void> _runJavaScriptSafely(String script) async {
+    final controller = _webController;
+    if (controller == null) return;
     try {
-      await _webController.runJavaScript(script);
+      await controller.runJavaScript(script);
     } catch (_) {
       // 页面销毁或 WebView 尚未就绪时，生命周期通知允许静默失败。
     }
+  }
+
+  Future<void> _loadInitialUrl(Uri initialUri) async {
+    final controller = _webController;
+    if (controller == null) return;
+
+    try {
+      await controller.loadRequest(initialUri);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Failed to load mini app: $e';
+      });
+    }
+  }
+
+  void _retryLoad() {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _loadProgress = 0;
+    });
+
+    final controller = _webController;
+    if (controller != null) {
+      controller.reload();
+      return;
+    }
+
+    _initWebView();
   }
 
   @override
@@ -214,13 +284,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
           // 刷新按钮
           IconButton(
             icon: const Icon(Icons.refresh, size: 20),
-            onPressed: () {
-              setState(() {
-                _isLoading = true;
-                _errorMessage = null;
-              });
-              _webController.reload();
-            },
+            onPressed: _retryLoad,
           ),
         ],
         bottom: _loadProgress < 100 && _isLoading
@@ -243,9 +307,14 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
       return _buildError(l10n, isDark);
     }
 
+    final controller = _webController;
+    if (controller == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Stack(
       children: [
-        WebViewWidget(controller: _webController),
+        WebViewWidget(controller: controller),
         if (_isLoading)
           const Center(child: CircularProgressIndicator()),
       ],
@@ -286,13 +355,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
             ),
             const SizedBox(height: 24),
             OutlinedButton.icon(
-              onPressed: () {
-                setState(() {
-                  _isLoading = true;
-                  _errorMessage = null;
-                });
-                _webController.reload();
-              },
+              onPressed: _retryLoad,
               icon: const Icon(Icons.refresh),
               label: Text(l10n?.commonRetry ?? 'Retry'),
             ),

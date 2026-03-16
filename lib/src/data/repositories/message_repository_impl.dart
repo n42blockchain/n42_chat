@@ -426,12 +426,18 @@ class MessageRepositoryImpl implements IMessageRepository {
   Future<MessageEntity?> replyToMessage(
     String roomId,
     String replyToMessageId,
-    String text,
-  ) async {
+    String text, {
+    int? selfDestructAfter,
+    List<String>? mentionedUserIds,
+    bool mentionsRoom = false,
+  }) async {
     final eventId = await _messageDataSource.replyToMessage(
       roomId,
       replyToMessageId,
       text,
+      selfDestructAfter: selfDestructAfter,
+      mentionedUserIds: mentionedUserIds,
+      mentionsRoom: mentionsRoom,
     );
     if (eventId == null) return null;
 

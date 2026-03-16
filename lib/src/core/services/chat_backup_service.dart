@@ -184,11 +184,11 @@ class ChatBackupService {
     required PreferencesDataSource preferencesStorage,
     MessageArchiveService? archiveService,
     Future<Directory> Function()? backupDirProvider,
-  })  : _clientManager = clientManager,
-        _secureStorage = secureStorage,
-        _preferencesStorage = preferencesStorage,
-        _archiveService = archiveService,
-        _backupDirProvider = backupDirProvider;
+  }) : _clientManager = clientManager,
+       _secureStorage = secureStorage,
+       _preferencesStorage = preferencesStorage,
+       _archiveService = archiveService,
+       _backupDirProvider = backupDirProvider;
 
   /// 延迟注入归档服务
   void setArchiveService(MessageArchiveService service) {
@@ -206,8 +206,9 @@ class ChatBackupService {
     }
 
     final appDir = await getApplicationDocumentsDirectory();
-    final backupDir =
-        Directory(p.join(appDir.path, StorageConstants.backupDirName));
+    final backupDir = Directory(
+      p.join(appDir.path, StorageConstants.backupDirName),
+    );
     if (!backupDir.existsSync()) {
       backupDir.createSync(recursive: true);
     }
@@ -243,8 +244,10 @@ class ChatBackupService {
 
     onProgress?.call(0.1);
 
-    final includesKeysInBackup =
-        await _collectKeyBackupSupport(includeKeys, warnings);
+    final includesKeysInBackup = await _collectKeyBackupSupport(
+      includeKeys,
+      warnings,
+    );
 
     // 构建备份数据
     final backupData = <String, dynamic>{
@@ -255,6 +258,7 @@ class ChatBackupService {
         'roomCount': rooms.length,
         'includesMedia': includeMedia,
         'includesKeys': includesKeysInBackup,
+        'checksum': '',
       },
       'rooms': <String, dynamic>{},
       'settings': <String, dynamic>{},
@@ -281,13 +285,15 @@ class ChatBackupService {
           final events = timeline.events
               .where((e) => e.type == 'm.room.message')
               .take(1000)
-              .map((e) => {
-                    'eventId': e.eventId,
-                    'sender': e.senderId,
-                    'type': e.messageType,
-                    'body': e.body,
-                    'timestamp': e.originServerTs.toIso8601String(),
-                  })
+              .map(
+                (e) => {
+                  'eventId': e.eventId,
+                  'sender': e.senderId,
+                  'type': e.messageType,
+                  'body': e.body,
+                  'timestamp': e.originServerTs.toIso8601String(),
+                },
+              )
               .toList();
           roomData['messages'] = events;
           messageCount += events.length;
@@ -324,15 +330,18 @@ class ChatBackupService {
     onProgress?.call(0.85);
 
     // 写入文件
-    final jsonStr = jsonEncode(backupData);
+    final finalJsonStr = _finalizeBackupJson(backupData);
 
     if (password != null && password.isNotEmpty) {
-      final encryptedBytes = _encryptAes256(utf8.encode(jsonStr), password);
+      final encryptedBytes = _encryptAes256(
+        utf8.encode(finalJsonStr),
+        password,
+      );
       final file = File(filePath);
       await file.writeAsBytes(encryptedBytes);
     } else {
       final file = File(filePath);
-      await file.writeAsString(jsonStr);
+      await file.writeAsString(finalJsonStr);
     }
 
     onProgress?.call(1.0);
@@ -375,8 +384,7 @@ class ChatBackupService {
       final hasActivity = room.lastEvent != null;
       estimatedMessages += hasActivity ? 500 : 50;
     }
-    int estimated =
-        estimatedMessages * 200 + rooms.length * 500;
+    int estimated = estimatedMessages * 200 + rooms.length * 500;
     // 设置约 10KB
     estimated += 10 * 1024;
 
@@ -401,15 +409,18 @@ class ChatBackupService {
           final stat = await entity.stat();
           // 尝试读取 manifest
           final preview = await _readManifest(entity.path);
-          results.add(BackupInfo(
-            backupId: preview?.backupId ?? p.basenameWithoutExtension(entity.path),
-            filePath: entity.path,
-            fileSizeBytes: stat.size,
-            createdAt: preview?.createdAt ?? stat.modified,
-            roomCount: preview?.roomCount ?? 0,
-            includesMedia: preview?.hasMedia ?? false,
-            includesKeys: preview?.hasKeys ?? false,
-          ));
+          results.add(
+            BackupInfo(
+              backupId:
+                  preview?.backupId ?? p.basenameWithoutExtension(entity.path),
+              filePath: entity.path,
+              fileSizeBytes: stat.size,
+              createdAt: preview?.createdAt ?? stat.modified,
+              roomCount: preview?.roomCount ?? 0,
+              includesMedia: preview?.hasMedia ?? false,
+              includesKeys: preview?.hasKeys ?? false,
+            ),
+          );
         } catch (e) {
           debugLog('ChatBackupService: Failed to read backup: $e');
         }
@@ -487,6 +498,17 @@ class ChatBackupService {
         };
 
         final messages = <Map<String, dynamic>>[];
+        final seenEventIds = <String>{};
+
+        void addMessage(Map<String, dynamic> message) {
+          final eventId = message['eventId']?.toString();
+          if (eventId != null &&
+              eventId.isNotEmpty &&
+              !seenEventIds.add(eventId)) {
+            return;
+          }
+          messages.add(message);
+        }
 
         // 1. 从 Timeline 获取热数据（新消息）
         try {
@@ -495,7 +517,7 @@ class ChatBackupService {
             if (e.type != 'm.room.message') continue;
             final ts = e.originServerTs.millisecondsSinceEpoch;
             if (lastBackupTs > 0 && ts <= lastBackupTs) continue;
-            messages.add({
+            addMessage({
               'eventId': e.eventId,
               'sender': e.senderId,
               'type': e.messageType,
@@ -520,7 +542,7 @@ class ChatBackupService {
               if (lastBackupTs > 0 && a.originServerTs <= lastBackupTs) {
                 continue;
               }
-              messages.add({
+              addMessage({
                 'eventId': a.eventId,
                 'sender': a.senderId,
                 'type': a.type,
@@ -554,19 +576,13 @@ class ChatBackupService {
     onProgress?.call(0.85);
 
     // 写入文件
-    final jsonStr = jsonEncode(backupData);
-
-    // 计算内容校验和
-    final contentChecksum = sha256.convert(utf8.encode(jsonStr)).toString();
-    // 更新 manifest 中的 checksum
-    final dataWithChecksum = backupData;
-    (dataWithChecksum['manifest'] as Map<String, dynamic>)['checksum'] =
-        contentChecksum;
-    final finalJsonStr = jsonEncode(dataWithChecksum);
+    final finalJsonStr = _finalizeBackupJson(backupData);
 
     if (password != null && password.isNotEmpty) {
-      final encryptedBytes =
-          _encryptAes256(utf8.encode(finalJsonStr), password);
+      final encryptedBytes = _encryptAes256(
+        utf8.encode(finalJsonStr),
+        password,
+      );
       await File(filePath).writeAsBytes(encryptedBytes);
     } else {
       await File(filePath).writeAsString(finalJsonStr);
@@ -617,8 +633,7 @@ class ChatBackupService {
         final entry = roomEntries[i];
         final roomId = entry.key;
         final roomData = entry.value as Map<String, dynamic>;
-        final messages =
-            (roomData['messages'] as List<dynamic>?) ?? [];
+        final messages = (roomData['messages'] as List<dynamic>?) ?? [];
         final companions = <ArchivedMessagesCompanion>[];
 
         for (final msg in messages) {
@@ -690,12 +705,15 @@ class ChatBackupService {
     final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
 
     final roomNames = rooms.values
-        .map((r) => (r as Map<String, dynamic>)['name']?.toString() ?? 'Unknown')
+        .map(
+          (r) => (r as Map<String, dynamic>)['name']?.toString() ?? 'Unknown',
+        )
         .toList();
 
     return BackupPreview(
       backupId: manifest['backupId']?.toString() ?? '',
-      createdAt: DateTime.tryParse(manifest['createdAt']?.toString() ?? '') ??
+      createdAt:
+          DateTime.tryParse(manifest['createdAt']?.toString() ?? '') ??
           DateTime.now(),
       roomCount: rooms.length,
       roomNames: roomNames,
@@ -706,13 +724,10 @@ class ChatBackupService {
   }
 
   /// 验证备份完整性
-  Future<bool> verifyBackup(
-    String backupFilePath, {
-    String? password,
-  }) async {
+  Future<bool> verifyBackup(String backupFilePath, {String? password}) async {
     try {
-      final data = await _readBackupData(backupFilePath, password: password);
-      return data.containsKey('manifest') && data.containsKey('rooms');
+      await _readBackupData(backupFilePath, password: password);
+      return true;
     } catch (_) {
       return false;
     }
@@ -728,8 +743,7 @@ class ChatBackupService {
     void Function(double progress)? onProgress,
   }) async {
     try {
-      final data =
-          await _readBackupData(backupFilePath, password: password);
+      final data = await _readBackupData(backupFilePath, password: password);
       final rawSettings = data['settings'] as Map<String, dynamic>? ?? {};
 
       int settingsRestored = 0;
@@ -744,7 +758,10 @@ class ChatBackupService {
         for (final entry in settings.entries) {
           try {
             if (entry.value != null) {
-              await _preferencesStorage.write(entry.key, entry.value.toString());
+              await _preferencesStorage.write(
+                entry.key,
+                entry.value.toString(),
+              );
               settingsRestored++;
             }
           } catch (e) {
@@ -827,9 +844,7 @@ class ChatBackupService {
     if (legacyThemeMode != null && legacyThemeMode.isNotEmpty) {
       migrated[_backupAppearancePreferencesKey] = await _mergeJsonPreferenceMap(
         _backupAppearancePreferencesKey,
-        <String, String>{
-          'themeMode': legacyThemeMode,
-        },
+        <String, String>{'themeMode': legacyThemeMode},
         defaults: const <String, String>{
           'fontSize': 'medium',
           'bubbleStyle': 'wechat',
@@ -856,15 +871,18 @@ class ChatBackupService {
   ) {
     final eventId = msgMap['eventId']?.toString();
     final senderId = msgMap['sender']?.toString();
-    final ts = msgMap['ts'] as int? ??
-        DateTime.tryParse(msgMap['timestamp']?.toString() ?? '')
-            ?.millisecondsSinceEpoch;
+    final ts =
+        msgMap['ts'] as int? ??
+        DateTime.tryParse(
+          msgMap['timestamp']?.toString() ?? '',
+        )?.millisecondsSinceEpoch;
     if (eventId == null || eventId.isEmpty || senderId == null || ts == null) {
       return null;
     }
 
     final rawType = msgMap['type']?.toString();
-    final eventType = rawType == null ||
+    final eventType =
+        rawType == null ||
             rawType.isEmpty ||
             (rawType.startsWith('m.') &&
                 rawType != 'm.room.message' &&
@@ -872,7 +890,8 @@ class ChatBackupService {
                 rawType != 'm.sticker')
         ? 'm.room.message'
         : rawType;
-    final msgtype = msgMap['msgtype']?.toString() ??
+    final msgtype =
+        msgMap['msgtype']?.toString() ??
         (eventType == 'm.room.message' ? rawType : null);
     final body = msgMap['body']?.toString();
     final formattedBody = msgMap['formattedBody']?.toString();
@@ -889,12 +908,8 @@ class ChatBackupService {
       body: Value(body),
       formattedBody: Value(formattedBody),
       msgtype: Value(msgtype),
-      relatesTo: Value(
-        relatesTo == null ? null : jsonEncode(relatesTo),
-      ),
-      mediaInfo: Value(
-        mediaInfo == null ? null : jsonEncode(mediaInfo),
-      ),
+      relatesTo: Value(relatesTo == null ? null : jsonEncode(relatesTo)),
+      mediaInfo: Value(mediaInfo == null ? null : jsonEncode(mediaInfo)),
       isEncrypted: Value(isEncrypted),
       decryptedBody: Value(
         msgMap['decryptedBody']?.toString() ?? (isEncrypted ? body : null),
@@ -941,7 +956,7 @@ class ChatBackupService {
       }
       final decrypted = _decryptAes256(bytes, password);
       final jsonStr = utf8.decode(decrypted);
-      return jsonDecode(jsonStr) as Map<String, dynamic>;
+      return _decodeBackupJson(jsonStr);
     }
 
     // 兼容旧版 v1 XOR 加密格式（只读）
@@ -957,16 +972,90 @@ class ChatBackupService {
         decrypted[i] = encryptedData[i] ^ keyBytes[i % keyBytes.length];
       }
       final jsonStr = utf8.decode(decrypted);
-      return jsonDecode(jsonStr) as Map<String, dynamic>;
+      return _decodeBackupJson(jsonStr);
     }
 
     final jsonStr = utf8.decode(bytes);
-    return jsonDecode(jsonStr) as Map<String, dynamic>;
+    return _decodeBackupJson(jsonStr);
+  }
+
+  String _finalizeBackupJson(Map<String, dynamic> backupData) {
+    final manifest = backupData['manifest'] as Map<String, dynamic>;
+    manifest['checksum'] = _computeBackupChecksum(backupData);
+    return jsonEncode(backupData);
+  }
+
+  Map<String, dynamic> _decodeBackupJson(String jsonStr) {
+    final decoded = jsonDecode(jsonStr);
+    if (decoded is! Map<String, dynamic>) {
+      throw const FormatException('Backup payload must be a JSON object');
+    }
+    _validateBackupStructure(decoded);
+    _validateBackupChecksum(decoded);
+    return decoded;
+  }
+
+  void _validateBackupStructure(Map<String, dynamic> backupData) {
+    if (backupData['manifest'] is! Map<String, dynamic>) {
+      throw const FormatException('Backup manifest is missing or invalid');
+    }
+    if (backupData['rooms'] is! Map<String, dynamic>) {
+      throw const FormatException('Backup rooms payload is missing or invalid');
+    }
+  }
+
+  void _validateBackupChecksum(Map<String, dynamic> backupData) {
+    final manifest = backupData['manifest'] as Map<String, dynamic>;
+    final checksum = manifest['checksum']?.toString();
+    if (checksum == null || checksum.isEmpty) {
+      return;
+    }
+
+    final actualChecksum = _computeBackupChecksum(backupData);
+    if (actualChecksum != checksum) {
+      throw const FormatException('Backup checksum mismatch');
+    }
+  }
+
+  String _computeBackupChecksum(Map<String, dynamic> backupData) {
+    final canonicalPayload = _canonicalizeJsonValue(backupData);
+    final payload = jsonEncode(canonicalPayload);
+    return sha256.convert(utf8.encode(payload)).toString();
+  }
+
+  dynamic _canonicalizeJsonValue(dynamic value, {bool omitChecksum = false}) {
+    if (value is Map<String, dynamic>) {
+      final result = <String, dynamic>{};
+      final keys = value.keys.toList()..sort();
+      for (final key in keys) {
+        if (omitChecksum && key == 'checksum') {
+          continue;
+        }
+        result[key] = _canonicalizeJsonValue(
+          value[key],
+          omitChecksum: omitChecksum || key == 'manifest',
+        );
+      }
+      return result;
+    }
+    if (value is List) {
+      return value
+          .map(
+            (entry) =>
+                _canonicalizeJsonValue(entry, omitChecksum: omitChecksum),
+          )
+          .toList(growable: false);
+    }
+    return value;
   }
 
   /// PBKDF2 密钥派生（使用 pointycastle 实现）
-  static Uint8List _pbkdf2(String password, Uint8List salt,
-      {int iterations = 100000, int keyLength = 32}) {
+  static Uint8List _pbkdf2(
+    String password,
+    Uint8List salt, {
+    int iterations = 100000,
+    int keyLength = 32,
+  }) {
     final derivator = pc.PBKDF2KeyDerivator(pc.HMac(pc.SHA256Digest(), 64))
       ..init(pc.Pbkdf2Parameters(salt, iterations, keyLength));
     return derivator.process(Uint8List.fromList(utf8.encode(password)));
@@ -977,9 +1066,11 @@ class ChatBackupService {
   static Uint8List _encryptAes256(List<int> plaintext, String password) {
     final random = Random.secure();
     final salt = Uint8List.fromList(
-        List.generate(32, (_) => random.nextInt(256)));
+      List.generate(32, (_) => random.nextInt(256)),
+    );
     final iv = Uint8List.fromList(
-        List.generate(16, (_) => random.nextInt(256)));
+      List.generate(16, (_) => random.nextInt(256)),
+    );
 
     final key = _pbkdf2(password, salt, iterations: 100000, keyLength: 32);
 
@@ -1010,10 +1101,17 @@ class ChatBackupService {
 
   /// AES-256-CBC 解密
   static Uint8List _decryptAes256(Uint8List data, String password) {
+    if (data.length < 72) {
+      throw const FormatException('Encrypted backup is truncated');
+    }
+
     // 跳过头部 "N42ENC2:" (8 字节)
     final salt = Uint8List.fromList(data.sublist(8, 40));
     final iv = Uint8List.fromList(data.sublist(40, 56));
     final ciphertext = Uint8List.fromList(data.sublist(56));
+    if (ciphertext.isEmpty || ciphertext.length % 16 != 0) {
+      throw const FormatException('Encrypted backup payload is invalid');
+    }
 
     final key = _pbkdf2(password, salt, iterations: 100000, keyLength: 32);
 
@@ -1028,11 +1126,19 @@ class ChatBackupService {
 
     // 移除 PKCS7 填充
     final padLength = decrypted.last;
-    if (padLength > 0 && padLength <= blockSize) {
+    final isValidPadding =
+        padLength > 0 &&
+        padLength <= blockSize &&
+        decrypted.length >= padLength &&
+        decrypted
+            .sublist(decrypted.length - padLength)
+            .every((byte) => byte == padLength);
+    if (isValidPadding) {
       return Uint8List.fromList(
-          decrypted.sublist(0, decrypted.length - padLength));
+        decrypted.sublist(0, decrypted.length - padLength),
+      );
     }
-    return decrypted;
+    throw const FormatException('Encrypted backup password is invalid');
   }
 
   /// 读取备份 manifest（快速预览，不需要密码）
@@ -1047,10 +1153,8 @@ class ChatBackupService {
       final raf = await file.open(mode: FileMode.read);
       try {
         final header = await raf.read(8);
-        final headerStr =
-            utf8.decode(header, allowMalformed: true);
-        if (headerStr == 'N42ENC2:' ||
-            headerStr.startsWith('N42ENC:')) {
+        final headerStr = utf8.decode(header, allowMalformed: true);
+        if (headerStr == 'N42ENC2:' || headerStr.startsWith('N42ENC:')) {
           return null; // 加密文件无法快速预览
         }
       } finally {
@@ -1071,16 +1175,13 @@ class ChatBackupService {
 
         // 如果文件较小，直接完整解析
         if (fileSize < 65536) {
-          final data =
-              jsonDecode(partial) as Map<String, dynamic>;
-          final manifest =
-              data['manifest'] as Map<String, dynamic>? ?? {};
-          final rooms =
-              data['rooms'] as Map<String, dynamic>? ?? {};
+          final data = jsonDecode(partial) as Map<String, dynamic>;
+          final manifest = data['manifest'] as Map<String, dynamic>? ?? {};
+          final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
           return BackupPreview(
             backupId: manifest['backupId']?.toString() ?? '',
-            createdAt: DateTime.tryParse(
-                    manifest['createdAt']?.toString() ?? '') ??
+            createdAt:
+                DateTime.tryParse(manifest['createdAt']?.toString() ?? '') ??
                 DateTime.now(),
             roomCount: rooms.length,
             roomNames: [],
@@ -1107,12 +1208,11 @@ class ChatBackupService {
         if (objEnd == -1) return null;
 
         final manifestJson = partial.substring(objStart, objEnd);
-        final manifest =
-            jsonDecode(manifestJson) as Map<String, dynamic>;
+        final manifest = jsonDecode(manifestJson) as Map<String, dynamic>;
         return BackupPreview(
           backupId: manifest['backupId']?.toString() ?? '',
-          createdAt: DateTime.tryParse(
-                  manifest['createdAt']?.toString() ?? '') ??
+          createdAt:
+              DateTime.tryParse(manifest['createdAt']?.toString() ?? '') ??
               DateTime.now(),
           roomCount: manifest['roomCount'] as int? ?? 0,
           roomNames: [],

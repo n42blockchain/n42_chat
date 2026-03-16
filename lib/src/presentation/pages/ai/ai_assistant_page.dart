@@ -43,13 +43,27 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
+  String? _lastShownError;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController.addListener(_handleDraftChanged);
+  }
 
   @override
   void dispose() {
+    _textController.removeListener(_handleDraftChanged);
     _textController.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _handleDraftChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _scrollToBottom() {
@@ -65,12 +79,20 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
   }
 
   void _sendMessage() {
+    final blocState = context.read<AiAssistantBloc>().state;
+    if (!_canSend(blocState)) return;
+
     final text = _textController.text.trim();
-    if (text.isEmpty) return;
 
     context.read<AiAssistantBloc>().add(SendAiMessage(text));
     _textController.clear();
     _scrollToBottom();
+  }
+
+  bool _canSend(AiAssistantState state) {
+    return state.isAvailable &&
+        !state.isGenerating &&
+        _textController.text.trim().isNotEmpty;
   }
 
   @override
@@ -79,7 +101,19 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
     final l10n = S.of(context);
 
     return BlocConsumer<AiAssistantBloc, AiAssistantState>(
+      listenWhen: (previous, current) =>
+          previous.error != current.error ||
+          previous.isGenerating != current.isGenerating ||
+          previous.messages != current.messages,
       listener: (context, state) {
+        if (state.error == null) {
+          _lastShownError = null;
+        } else if (state.error != _lastShownError) {
+          _lastShownError = state.error;
+          ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+            SnackBar(content: Text(state.error!)),
+          );
+        }
         if (state.isGenerating || state.messages.isNotEmpty) {
           _scrollToBottom();
         }
@@ -414,6 +448,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
     bool isDark,
   ) {
     final l10n = S.of(context);
+    final canSend = _canSend(state);
 
     return Container(
       padding: EdgeInsets.only(
@@ -481,12 +516,12 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             )
           else
             IconButton(
-              onPressed: _sendMessage,
+              onPressed: canSend ? _sendMessage : null,
               icon: Container(
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: canSend ? AppColors.primary : Colors.grey,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(Icons.arrow_upward, color: Colors.white, size: 18),

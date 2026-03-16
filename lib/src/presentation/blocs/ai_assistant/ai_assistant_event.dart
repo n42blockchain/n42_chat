@@ -34,26 +34,33 @@ class SendAiMessage extends AiAssistantEvent {
 /// AI 流式响应片段
 class AiStreamChunkReceived extends AiAssistantEvent {
   final String chunk;
+  final int? requestId;
 
-  const AiStreamChunkReceived(this.chunk);
+  const AiStreamChunkReceived(this.chunk, {this.requestId});
 
   @override
-  List<Object?> get props => [chunk];
+  List<Object?> get props => [chunk, requestId];
 }
 
 /// AI 流式响应完成
 class AiStreamCompleted extends AiAssistantEvent {
-  const AiStreamCompleted();
+  final int? requestId;
+
+  const AiStreamCompleted({this.requestId});
+
+  @override
+  List<Object?> get props => [requestId];
 }
 
 /// AI 流式响应出错
 class AiStreamError extends AiAssistantEvent {
   final String error;
+  final int? requestId;
 
-  const AiStreamError(this.error);
+  const AiStreamError(this.error, {this.requestId});
 
   @override
-  List<Object?> get props => [error];
+  List<Object?> get props => [error, requestId];
 }
 
 /// 清除 AI 会话历史

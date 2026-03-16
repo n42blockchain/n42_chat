@@ -80,10 +80,7 @@ class MatrixMessageDataSource {
   }
 
   /// 加载更多历史消息
-  Future<bool> loadMoreMessages(
-    String roomId, {
-    int count = 50,
-  }) async {
+  Future<bool> loadMoreMessages(String roomId, {int count = 50}) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) return false;
 
@@ -117,7 +114,8 @@ class MatrixMessageDataSource {
     List<String>? mentionedUserIds,
     bool mentionsRoom = false,
   }) => _sender.sendTextMessage(
-    roomId, text,
+    roomId,
+    text,
     selfDestructAfter: selfDestructAfter,
     mentionedUserIds: mentionedUserIds,
     mentionsRoom: mentionsRoom,
@@ -296,8 +294,18 @@ class MatrixMessageDataSource {
   Future<String?> replyToMessage(
     String roomId,
     String replyToEventId,
-    String text,
-  ) => _operations.replyToMessage(roomId, replyToEventId, text);
+    String text, {
+    int? selfDestructAfter,
+    List<String>? mentionedUserIds,
+    bool mentionsRoom = false,
+  }) => _operations.replyToMessage(
+    roomId,
+    replyToEventId,
+    text,
+    selfDestructAfter: selfDestructAfter,
+    mentionedUserIds: mentionedUserIds,
+    mentionsRoom: mentionsRoom,
+  );
 
   /// 编辑消息
   Future<String?> editMessage(
@@ -307,11 +315,8 @@ class MatrixMessageDataSource {
   ) => _operations.editMessage(roomId, originalEventId, newText);
 
   /// 添加消息表情回应
-  Future<bool> addReaction(
-    String roomId,
-    String eventId,
-    String emoji,
-  ) => _operations.addReaction(roomId, eventId, emoji);
+  Future<bool> addReaction(String roomId, String eventId, String emoji) =>
+      _operations.addReaction(roomId, eventId, emoji);
 
   // ============================================
   // 消息已读状态
@@ -389,12 +394,16 @@ class MatrixMessageDataSource {
       _pollHandler.endPoll(roomId, pollEventId);
 
   /// 获取消息的反应聚合结果
-  Future<Map<String, dynamic>?> getReactionAggregations(String roomId, String eventId) =>
-      _pollHandler.getReactionAggregations(roomId, eventId);
+  Future<Map<String, dynamic>?> getReactionAggregations(
+    String roomId,
+    String eventId,
+  ) => _pollHandler.getReactionAggregations(roomId, eventId);
 
   /// 获取投票的聚合结果
-  Future<Map<String, dynamic>?> getPollAggregations(String roomId, String pollEventId) =>
-      _pollHandler.getPollAggregations(roomId, pollEventId);
+  Future<Map<String, dynamic>?> getPollAggregations(
+    String roomId,
+    String pollEventId,
+  ) => _pollHandler.getPollAggregations(roomId, pollEventId);
 
   // ============================================
   // 消息监听
@@ -409,34 +418,36 @@ class MatrixMessageDataSource {
 
   /// 监听投票响应事件
   Stream<Map<String, dynamic>>? watchPollResponses(String roomId) {
-    return _client?.onTimelineEvent.stream.where((event) {
-      return event.room.id == roomId &&
-          (event.type == 'org.matrix.msc3381.poll.response' ||
-           event.type == 'org.matrix.msc3381.poll.end');
-    }).map((event) {
-      final type = event.type;
-      final relatesTo = event.content['m.relates_to'] as Map<String, dynamic>?;
-      final pollEventId = relatesTo?['event_id'] as String?;
+    return _client?.onTimelineEvent.stream
+        .where((event) {
+          return event.room.id == roomId &&
+              (event.type == 'org.matrix.msc3381.poll.response' ||
+                  event.type == 'org.matrix.msc3381.poll.end');
+        })
+        .map((event) {
+          final type = event.type;
+          final relatesTo =
+              event.content['m.relates_to'] as Map<String, dynamic>?;
+          final pollEventId = relatesTo?['event_id'] as String?;
 
-      if (type == 'org.matrix.msc3381.poll.response') {
-        final pollResponse = event.content['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
-        final answers = pollResponse?['answers'] as List<dynamic>?;
-        final senderId = event.senderId;
+          if (type == 'org.matrix.msc3381.poll.response') {
+            final pollResponse =
+                event.content['org.matrix.msc3381.poll.response']
+                    as Map<String, dynamic>?;
+            final answers = pollResponse?['answers'] as List<dynamic>?;
+            final senderId = event.senderId;
 
-        return {
-          'type': 'vote',
-          'pollEventId': pollEventId,
-          'answers': answers ?? [],
-          'senderId': senderId,
-          'isCurrentUser': senderId == _client?.userID,
-        };
-      } else {
-        return {
-          'type': 'end',
-          'pollEventId': pollEventId,
-        };
-      }
-    });
+            return {
+              'type': 'vote',
+              'pollEventId': pollEventId,
+              'answers': answers ?? [],
+              'senderId': senderId,
+              'isCurrentUser': senderId == _client?.userID,
+            };
+          } else {
+            return {'type': 'end', 'pollEventId': pollEventId};
+          }
+        });
   }
 
   /// 监听消息发送状态
@@ -527,7 +538,8 @@ class MatrixMessageDataSource {
     required String filename,
     String? mimeType,
   }) => _threadHandler.sendThreadImageMessage(
-    roomId, threadRootEventId,
+    roomId,
+    threadRootEventId,
     imageBytes: imageBytes,
     filename: filename,
     mimeType: mimeType,
@@ -541,7 +553,8 @@ class MatrixMessageDataSource {
     required String filename,
     String? mimeType,
   }) => _threadHandler.sendThreadFileMessage(
-    roomId, threadRootEventId,
+    roomId,
+    threadRootEventId,
     fileBytes: fileBytes,
     filename: filename,
     mimeType: mimeType,
@@ -554,7 +567,8 @@ class MatrixMessageDataSource {
     int limit = 50,
     String? fromToken,
   }) => _threadHandler.getThreadMessages(
-    roomId, threadRootEventId,
+    roomId,
+    threadRootEventId,
     limit: limit,
     fromToken: fromToken,
   );

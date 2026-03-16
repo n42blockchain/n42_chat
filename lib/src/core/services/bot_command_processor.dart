@@ -11,31 +11,64 @@ import '../utils/debug_log.dart';
 class BotCommandProcessor {
   final IWalletBridge _walletBridge;
   final Dio _dio;
+  final String _priceApiBase;
+  final String? _authToken;
+  final bool _useProxyEndpoint;
 
   /// CoinGecko 免费公共 API（无需 API Key）
-  static const _priceApiBase = 'https://api.coingecko.com/api/v3';
+  static const _defaultPriceApiBase = 'https://api.coingecko.com/api/v3';
 
   /// N42 支持的链数量
   static const _chainCount = 236;
 
   /// N42 代表性链列表（用于 /chains 命令展示）
   static const _featuredChains = [
-    'Ethereum', 'BNB Smart Chain', 'Polygon', 'Arbitrum', 'Optimism',
-    'Avalanche', 'Solana', 'Base', 'Fantom', 'Cronos',
-    'zkSync Era', 'Linea', 'Scroll', 'Starknet', 'Aptos',
-    'Sui', 'Near', 'Cosmos', 'Polkadot', 'Tron',
-    'Bitcoin (wrapped)', 'Litecoin (wrapped)', 'TON', '... and 213+ more',
+    'Ethereum',
+    'BNB Smart Chain',
+    'Polygon',
+    'Arbitrum',
+    'Optimism',
+    'Avalanche',
+    'Solana',
+    'Base',
+    'Fantom',
+    'Cronos',
+    'zkSync Era',
+    'Linea',
+    'Scroll',
+    'Starknet',
+    'Aptos',
+    'Sui',
+    'Near',
+    'Cosmos',
+    'Polkadot',
+    'Tron',
+    'Bitcoin (wrapped)',
+    'Litecoin (wrapped)',
+    'TON',
+    '... and 213+ more',
   ];
 
   BotCommandProcessor({
     required IWalletBridge walletBridge,
+    String priceApiBase = _defaultPriceApiBase,
+    String? authToken,
+    bool useProxyEndpoint = false,
     Dio? dio,
-  })  : _walletBridge = walletBridge,
-        _dio = dio ??
-            Dio(BaseOptions(
-              connectTimeout: const Duration(seconds: 5),
-              receiveTimeout: const Duration(seconds: 5),
-            ));
+  }) : _walletBridge = walletBridge,
+       _priceApiBase = priceApiBase.endsWith('/')
+           ? priceApiBase.substring(0, priceApiBase.length - 1)
+           : priceApiBase,
+       _authToken = authToken,
+       _useProxyEndpoint = useProxyEndpoint,
+       _dio =
+           dio ??
+           Dio(
+             BaseOptions(
+               connectTimeout: const Duration(seconds: 5),
+               receiveTimeout: const Duration(seconds: 5),
+             ),
+           );
 
   /// 解析命令字符串并执行
   ///
@@ -92,7 +125,9 @@ class BotCommandProcessor {
       buffer.writeln('/${cmd.usage.replaceFirst('/', '')}$adminTag');
       buffer.writeln('  ${cmd.description}\n');
     }
-    buffer.writeln('💡 N42 supports ${_chainCount}+ chains — more than any other chat platform.');
+    buffer.writeln(
+      '💡 N42 supports $_chainCount+ chains — more than any other chat platform.',
+    );
     return BotCommandResult.showPanel(
       title: '🤖 Bot Commands',
       content: buffer.toString(),
@@ -101,7 +136,9 @@ class BotCommandProcessor {
 
   Future<BotCommandResult> _handlePrice(List<String> args) async {
     if (args.isEmpty) {
-      return const BotCommandResult.error('Usage: /price <token>\nExample: /price bitcoin');
+      return const BotCommandResult.error(
+        'Usage: /price <token>\nExample: /price bitcoin',
+      );
     }
 
     final symbol = args.first.toLowerCase();
@@ -110,14 +147,25 @@ class BotCommandProcessor {
     final coinId = _symbolToId(symbol);
 
     try {
+      final url = _useProxyEndpoint
+          ? '$_priceApiBase/simple_price'
+          : '$_priceApiBase/simple/price';
       final response = await _dio.get<Map<String, dynamic>>(
-        '$_priceApiBase/simple/price',
+        url,
         queryParameters: {
           'ids': coinId,
           'vs_currencies': 'usd',
           'include_24hr_change': true,
           'include_market_cap': true,
         },
+        options: Options(
+          headers: {
+            if (_useProxyEndpoint &&
+                _authToken != null &&
+                _authToken.isNotEmpty)
+              'Authorization': 'Bearer $_authToken',
+          },
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -131,8 +179,8 @@ class BotCommandProcessor {
           if (price != null) {
             final changeStr = change != null
                 ? (change >= 0
-                    ? '📈 +${change.toStringAsFixed(2)}%'
-                    : '📉 ${change.toStringAsFixed(2)}%')
+                      ? '📈 +${change.toStringAsFixed(2)}%'
+                      : '📉 ${change.toStringAsFixed(2)}%')
                 : '';
 
             final formattedPrice = price >= 1
@@ -142,22 +190,29 @@ class BotCommandProcessor {
             final mcapStr = mcap != null
                 ? '\nMarket Cap: \$${_formatLargeNumber(mcap.toDouble())}'
                 : '';
+            final attribution = _useProxyEndpoint
+                ? 'Powered by CoinGecko via N42 Proxy'
+                : 'Powered by CoinGecko';
 
             return BotCommandResult.showPanel(
               title: '💰 ${symbol.toUpperCase()} Price',
               content:
-                  'Price: $formattedPrice\n24h Change: $changeStr$mcapStr\n\nPowered by CoinGecko',
+                  'Price: $formattedPrice\n24h Change: $changeStr$mcapStr\n\n$attribution',
             );
           }
         }
-        return BotCommandResult.error('Token "$symbol" not found.\nTry using the full name (e.g., /price bitcoin)');
+        return BotCommandResult.error(
+          'Token "$symbol" not found.\nTry using the full name (e.g., /price bitcoin)',
+        );
       }
     } catch (e) {
       debugLog('BotCommandProcessor price error: $e');
-      return BotCommandResult.error('Failed to fetch price. Please try again.');
+      return const BotCommandResult.error(
+        'Failed to fetch price. Please try again.',
+      );
     }
 
-    return BotCommandResult.error('Could not retrieve price data.');
+    return const BotCommandResult.error('Could not retrieve price data.');
   }
 
   BotCommandResult _handleBalance() {
@@ -168,10 +223,11 @@ class BotCommandProcessor {
       );
     }
 
-    final shortAddr = '${address.substring(0, 6)}...${address.substring(address.length - 4)}';
+    final shortAddr = _formatWalletAddress(address);
     return BotCommandResult.showPanel(
       title: '👛 Wallet',
-      content: 'Address: $shortAddr\n\nOpen N42 Wallet to view full balances across ${_chainCount}+ chains.',
+      content:
+          'Address: $shortAddr\n\nOpen N42 Wallet to view full balances across $_chainCount+ chains.',
     );
   }
 
@@ -231,7 +287,9 @@ class BotCommandProcessor {
 
   String _formatNumber(double value) {
     if (value >= 1000) {
-      return value.toStringAsFixed(2).replaceAllMapped(
+      return value
+          .toStringAsFixed(2)
+          .replaceAllMapped(
             RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
             (m) => '${m[1]},',
           );
@@ -244,5 +302,13 @@ class BotCommandProcessor {
     if (value >= 1e9) return '${(value / 1e9).toStringAsFixed(2)}B';
     if (value >= 1e6) return '${(value / 1e6).toStringAsFixed(2)}M';
     return value.toStringAsFixed(0);
+  }
+
+  String _formatWalletAddress(String address) {
+    if (address.length <= 10) {
+      return address;
+    }
+
+    return '${address.substring(0, 6)}...${address.substring(address.length - 4)}';
   }
 }

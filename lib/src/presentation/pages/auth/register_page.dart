@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
@@ -26,7 +27,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _homeserverController = TextEditingController(
-    text: N42Chat.config?.defaultHomeserver ?? 'https://m.si46.world',
+    text: N42Chat.config?.defaultHomeserver ?? AppConstants.defaultHomeserver,
   );
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -251,7 +252,8 @@ class _RegisterPageState extends State<RegisterPage> {
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.authServerAddressHint ??
-                (N42Chat.config?.defaultHomeserver ?? 'https://m.si46.world'),
+                (N42Chat.config?.defaultHomeserver ??
+                    AppConstants.defaultHomeserver),
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,

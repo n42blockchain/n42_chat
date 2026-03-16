@@ -10,7 +10,6 @@ import 'package:http/http.dart' as http;
 import 'package:saver_gallery/saver_gallery.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
@@ -148,7 +147,8 @@ class _ChatPageState extends State<ChatPage> {
   final Map<String, GlobalKey> _messageKeys = {};
 
   // ChatInputBar 的 GlobalKey，用于调用取消录音方法
-  final GlobalKey<ChatInputBarState> _inputBarKey = GlobalKey<ChatInputBarState>();
+  final GlobalKey<ChatInputBarState> _inputBarKey =
+      GlobalKey<ChatInputBarState>();
 
   // 撤回的消息ID，用于显示"重新编辑"
   final Set<String> _recalledMessageIds = {};
@@ -233,7 +233,9 @@ class _ChatPageState extends State<ChatPage> {
     _inputFocusNode.addListener(_onInputFocusChanged);
 
     // 监听备注更新
-    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
+    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((
+      event,
+    ) {
       // 如果是当前会话的联系人备注更新，刷新界面
       final targetUserId = _otherUserId ?? widget.conversation.id;
       if (event.userId == targetUserId && mounted) {
@@ -252,7 +254,9 @@ class _ChatPageState extends State<ChatPage> {
     _loadDraft();
 
     // 设置当前聊天房间（应用内通知过滤）
-    InAppNotificationService.instance.setCurrentChatRoom(widget.conversation.id);
+    InAppNotificationService.instance.setCurrentChatRoom(
+      widget.conversation.id,
+    );
 
     // 设置通话错误回调
     N42Chat.callManager?.onError = _handleCallError;
@@ -267,7 +271,9 @@ class _ChatPageState extends State<ChatPage> {
 
     switch (errorCode) {
       case 'call_not_initialized':
-        message = l10n?.chatCallServiceNotInitialized ?? 'Call service not initialized';
+        message =
+            l10n?.chatCallServiceNotInitialized ??
+            'Call service not initialized';
         break;
       case 'already_in_call':
         message = l10n?.chatAlreadyInCall ?? 'Already in a call';
@@ -302,7 +308,9 @@ class _ChatPageState extends State<ChatPage> {
 
     // 直接使用 conversation.directUserId
     _otherUserId = widget.conversation.directUserId;
-    debugLog('ChatPage: directUserId=$_otherUserId for room ${widget.conversation.id}');
+    debugLog(
+      'ChatPage: directUserId=$_otherUserId for room ${widget.conversation.id}',
+    );
   }
 
   void _onInputFocusChanged() {
@@ -481,24 +489,27 @@ class _ChatPageState extends State<ChatPage> {
 
     if (editingMsg != null) {
       final actionBloc = getIt<MessageActionBloc>();
-      actionBloc.add(action_event.EditMessage(
-        widget.conversation.id,
-        editingMsg.id,
-        text,
-      ));
+      actionBloc.add(
+        action_event.EditMessage(widget.conversation.id, editingMsg.id, text),
+      );
       chatBloc.add(const SetEditTarget(null));
     } else {
-      chatBloc.add(SendTextMessage(
-        text,
-        selfDestructAfter: _selfDestructAfter,
-      ));
+      chatBloc.add(
+        SendTextMessage(text, selfDestructAfter: _selfDestructAfter),
+      );
     }
     _inputController.clear();
   }
 
   /// 处理 Bot 斜杠命令
   Future<void> _processBotCommand(String text) async {
-    final processor = BotCommandProcessor(walletBridge: getIt<IWalletBridge>());
+    final config = N42Chat.config;
+    final processor = BotCommandProcessor(
+      walletBridge: getIt<IWalletBridge>(),
+      priceApiBase: config?.marketBaseUrl ?? 'https://api.coingecko.com/api/v3',
+      authToken: config?.proxyAuthToken,
+      useProxyEndpoint: config?.marketUseProxyEndpoint ?? false,
+    );
     final result = await processor.processRaw(text);
 
     if (!mounted) return;
@@ -562,7 +573,8 @@ class _ChatPageState extends State<ChatPage> {
 
     if (lastAtIndex >= 0) {
       // 检查 @ 前面是否是空格或行首（确保是新的 @ 提醒）
-      final isValidTrigger = lastAtIndex == 0 ||
+      final isValidTrigger =
+          lastAtIndex == 0 ||
           textBeforeCursor[lastAtIndex - 1] == ' ' ||
           textBeforeCursor[lastAtIndex - 1] == '\n';
 
@@ -606,7 +618,9 @@ class _ChatPageState extends State<ChatPage> {
 
     // 替换 @搜索词 为 @成员名
     final beforeAt = text.substring(0, _mentionTriggerPosition);
-    final afterCursor = cursorPos <= text.length ? text.substring(cursorPos) : '';
+    final afterCursor = cursorPos <= text.length
+        ? text.substring(cursorPos)
+        : '';
 
     final mention = '@$memberName ';
     final newText = beforeAt + mention + afterCursor;
@@ -655,11 +669,13 @@ class _ChatPageState extends State<ChatPage> {
 
       if (index != -1) {
         // 使用估算位置滚动
-        unawaited(_scrollController.animateTo(
-          index * 80.0, // 估算每条消息高度
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        ));
+        unawaited(
+          _scrollController.animateTo(
+            index * 80.0, // 估算每条消息高度
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          ),
+        );
         // 滚动后延迟设置高亮
         Future.delayed(const Duration(milliseconds: 350), () {
           if (mounted) {
@@ -704,7 +720,8 @@ class _ChatPageState extends State<ChatPage> {
       final client = MatrixClientManager.instance.client;
       if (client == null) return null;
 
-      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      final homeserver =
+          client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) return null;
 
       final uri = Uri.parse(mxcUrl);
@@ -744,7 +761,10 @@ class _ChatPageState extends State<ChatPage> {
       final name = widget.conversation.name;
       // 如果群名为空或为默认值，显示成员数
       if (name.isEmpty || name == 'Empty Chat' || name == 'empty chat') {
-        return S.of(context)?.chatGroupChatCount(widget.conversation.memberCount) ?? 'Group Chat(${widget.conversation.memberCount})';
+        return S
+                .of(context)
+                ?.chatGroupChatCount(widget.conversation.memberCount) ??
+            'Group Chat(${widget.conversation.memberCount})';
       }
       return name;
     }
@@ -752,7 +772,10 @@ class _ChatPageState extends State<ChatPage> {
     // 私聊：直接使用 conversation.directUserId 获取备注名
     final otherUserId = widget.conversation.directUserId;
     if (otherUserId != null) {
-      return RemarkService.instance.getDisplayName(otherUserId, widget.conversation.name);
+      return RemarkService.instance.getDisplayName(
+        otherUserId,
+        widget.conversation.name,
+      );
     }
 
     // 如果名称为空或为默认值，返回简化的用户ID或默认文本
@@ -773,8 +796,14 @@ class _ChatPageState extends State<ChatPage> {
           final shouldOpen = await showDialog<bool>(
             context: context,
             builder: (ctx) => AlertDialog(
-              title: Text(S.of(context)?.chatLocationServiceNotEnabled ?? 'Location service is not enabled'),
-              content: Text(S.of(context)?.chatEnableLocationService ?? 'Please enable location service to use this feature'),
+              title: Text(
+                S.of(context)?.chatLocationServiceNotEnabled ??
+                    'Location service is not enabled',
+              ),
+              content: Text(
+                S.of(context)?.chatEnableLocationService ??
+                    'Please enable location service to use this feature',
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
@@ -782,7 +811,9 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, true),
-                  child: Text(S.of(context)?.chatGoToSettings ?? 'Go to Settings'),
+                  child: Text(
+                    S.of(context)?.chatGoToSettings ?? 'Go to Settings',
+                  ),
                 ),
               ],
             ),
@@ -802,7 +833,10 @@ class _ChatPageState extends State<ChatPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.chatLocationPermissionRequired ?? 'Location permission is required for this feature'),
+                content: Text(
+                  S.of(context)?.chatLocationPermissionRequired ??
+                      'Location permission is required for this feature',
+                ),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -815,7 +849,10 @@ class _ChatPageState extends State<ChatPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.chatLocationPermissionDeniedPermanent ?? 'Location permission has been permanently denied. Please enable it in settings.'),
+              content: Text(
+                S.of(context)?.chatLocationPermissionDeniedPermanent ??
+                    'Location permission has been permanently denied. Please enable it in settings.',
+              ),
               backgroundColor: AppColors.error,
             ),
           );
@@ -834,13 +871,19 @@ class _ChatPageState extends State<ChatPage> {
   Future<List<Map<String, String>>> _loadGroupMembers() async {
     try {
       final groupRepository = getIt<IGroupRepository>();
-      final members = await groupRepository.getGroupMembers(widget.conversation.id);
+      final members = await groupRepository.getGroupMembers(
+        widget.conversation.id,
+      );
 
-      return members.map((m) => {
-        'id': m.userId,
-        'name': m.displayName.isNotEmpty ? m.displayName : m.userId,
-        'avatarUrl': m.avatarUrl ?? '',
-      }).toList();
+      return members
+          .map(
+            (m) => {
+              'id': m.userId,
+              'name': m.displayName.isNotEmpty ? m.displayName : m.userId,
+              'avatarUrl': m.avatarUrl ?? '',
+            },
+          )
+          .toList();
     } catch (e) {
       debugLog('Error loading group members: $e');
       return [];
@@ -874,11 +917,13 @@ class _ChatPageState extends State<ChatPage> {
       builder: (ctx) => const PollCreateSheet(),
     ).then((result) {
       if (result != null && mounted) {
-        context.read<ChatBloc>().add(SendPollMessage(
-          question: result['question'] as String,
-          options: List<String>.from(result['options'] as List),
-          maxSelections: result['maxSelections'] as int? ?? 1,
-        ));
+        context.read<ChatBloc>().add(
+          SendPollMessage(
+            question: result['question'] as String,
+            options: List<String>.from(result['options'] as List),
+            maxSelections: result['maxSelections'] as int? ?? 1,
+          ),
+        );
       }
     });
   }
@@ -911,7 +956,9 @@ class _ChatPageState extends State<ChatPage> {
     final Widget content = Stack(
       children: [
         Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          backgroundColor: isDark
+              ? AppColors.backgroundDark
+              : AppColors.background,
           appBar: _buildAppBar(isDark),
           body: Column(
             children: [
@@ -956,18 +1003,20 @@ class _ChatPageState extends State<ChatPage> {
               if (!_isMultiSelectMode) _buildEditPreview(),
 
               // @ 提醒成员选择器（群聊时）
-              if (_showMentionPicker && !_isMultiSelectMode) _buildMentionPicker(),
+              if (_showMentionPicker && !_isMultiSelectMode)
+                _buildMentionPicker(),
 
               // AI 改写栏
-              if (_showRewriteBar && !_isMultiSelectMode)
-                _buildAiRewriteBar(),
+              if (_showRewriteBar && !_isMultiSelectMode) _buildAiRewriteBar(),
 
               // View Once 提示条
               if (_isViewOnce && !_isMultiSelectMode && !_showSearchBar)
                 _buildViewOnceIndicator(),
 
               // 阅后即焚定时器提示条
-              if (_selfDestructAfter != null && !_isMultiSelectMode && !_showSearchBar)
+              if (_selfDestructAfter != null &&
+                  !_isMultiSelectMode &&
+                  !_showSearchBar)
                 _buildSelfDestructTimerBar(),
 
               // 多选模式下显示操作栏，否则显示输入栏
@@ -980,7 +1029,8 @@ class _ChatPageState extends State<ChatPage> {
               if (_showEmojiPicker && !_isMultiSelectMode) _buildEmojiPicker(),
 
               // 贴纸选择器
-              if (_showStickerPicker && !_isMultiSelectMode) _buildStickerPicker(),
+              if (_showStickerPicker && !_isMultiSelectMode)
+                _buildStickerPicker(),
 
               // 更多功能面板（仅在非多选模式下）
               if (_showMorePanel && !_isMultiSelectMode) _buildMorePanel(),
@@ -1022,10 +1072,7 @@ class _ChatPageState extends State<ChatPage> {
       );
     }
 
-    return MultiBlocListener(
-      listeners: listeners,
-      child: content,
-    );
+    return MultiBlocListener(listeners: listeners, child: content);
   }
 }
 

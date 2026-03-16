@@ -1,9 +1,11 @@
 #!/usr/bin/env dart
+// ignore_for_file: avoid_print
 
 import 'dart:io';
 import 'dart:math';
 
 import 'package:matrix/matrix.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// Matrix服务器集成测试脚本
 ///
@@ -35,7 +37,14 @@ void main() async {
   print('═══════════════════════════════════════════════════════════════');
   print('');
 
-  final client = Client('N42ChatCLITest');
+  sqfliteFfiInit();
+  final sqfliteDb = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+  final database = await MatrixSdkDatabase.init(
+    'N42ChatCLITest',
+    database: sqfliteDb,
+    sqfliteFactory: databaseFactoryFfi,
+  );
+  final client = Client('N42ChatCLITest', database: database);
 
   int passed = 0;
   int failed = 0;
@@ -93,7 +102,6 @@ void main() async {
     });
 
     // 5. 注册用户
-    bool registered = false;
     if (usernameAvailable) {
       await runTest('注册新用户', () async {
         try {
@@ -106,7 +114,6 @@ void main() async {
             ),
           );
           print('\n   用户ID: ${result.userId}');
-          registered = true;
         } catch (e) {
           if (e.toString().contains('Registration') ||
               e.toString().contains('flows') ||
@@ -143,8 +150,13 @@ void main() async {
 
       // 8. 更新用户资料
       await runTest('更新用户资料', () async {
-        final newName = 'N42 Test ${DateTime.now().millisecondsSinceEpoch % 1000}';
-        await client.setDisplayName(client.userID!, newName);
+        final newName =
+            'N42 Test ${DateTime.now().millisecondsSinceEpoch % 1000}';
+        await client.request(
+          RequestType.PUT,
+          '/client/v3/profile/${Uri.encodeComponent(client.userID!)}/displayname',
+          data: <String, Object?>{'displayname': newName},
+        );
         print('\n   新名称: $newName');
       });
 

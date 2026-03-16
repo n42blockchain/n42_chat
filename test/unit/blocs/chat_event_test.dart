@@ -11,14 +11,14 @@ import 'package:n42_chat/src/presentation/blocs/chat/chat_event.dart';
 
 // Helper: minimal MessageEntity for SetReplyTarget / SetEditTarget / MessagesUpdated
 MessageEntity _msg(String id) => MessageEntity(
-      id: id,
-      roomId: 'room1',
-      senderId: '@user:server',
-      senderName: 'User',
-      content: 'Hello',
-      type: MessageType.text,
-      timestamp: DateTime.utc(2024, 1, 1),
-    );
+  id: id,
+  roomId: 'room1',
+  senderId: '@user:server',
+  senderName: 'User',
+  content: 'Hello',
+  type: MessageType.text,
+  timestamp: DateTime.utc(2024, 1, 1),
+);
 
 void main() {
   // ─────────────────────────────────────────────────
@@ -60,7 +60,10 @@ void main() {
     });
 
     test('different roomId → not equal', () {
-      expect(const InitializeChat('r1'), isNot(equals(const InitializeChat('r2'))));
+      expect(
+        const InitializeChat('r1'),
+        isNot(equals(const InitializeChat('r2'))),
+      );
     });
   });
 
@@ -83,7 +86,10 @@ void main() {
     });
 
     test('same fields → equal', () {
-      expect(const LoadMessages('r', limit: 50), equals(const LoadMessages('r', limit: 50)));
+      expect(
+        const LoadMessages('r', limit: 50),
+        equals(const LoadMessages('r', limit: 50)),
+      );
     });
 
     test('different limit → not equal', () {
@@ -135,7 +141,10 @@ void main() {
     });
 
     test('different text → not equal', () {
-      expect(const SendTextMessage('A'), isNot(equals(const SendTextMessage('B'))));
+      expect(
+        const SendTextMessage('A'),
+        isNot(equals(const SendTextMessage('B'))),
+      );
     });
   });
 
@@ -151,7 +160,10 @@ void main() {
     });
 
     test('stores filename', () {
-      final e = SendImageMessage(imageBytes: Uint8List(0), filename: 'photo.jpg');
+      final e = SendImageMessage(
+        imageBytes: Uint8List(0),
+        filename: 'photo.jpg',
+      );
       expect(e.filename, 'photo.jpg');
     });
 
@@ -167,14 +179,22 @@ void main() {
 
     test('stores mimeType when provided', () {
       final e = SendImageMessage(
-        imageBytes: Uint8List(0), filename: 'x.png', mimeType: 'image/png',
+        imageBytes: Uint8List(0),
+        filename: 'x.png',
+        mimeType: 'image/png',
       );
       expect(e.mimeType, 'image/png');
     });
 
     test('same-content bytes → equal', () {
-      final a = SendImageMessage(imageBytes: Uint8List.fromList([10, 20]), filename: 'f.png');
-      final b = SendImageMessage(imageBytes: Uint8List.fromList([10, 20]), filename: 'f.png');
+      final a = SendImageMessage(
+        imageBytes: Uint8List.fromList([10, 20]),
+        filename: 'f.png',
+      );
+      final b = SendImageMessage(
+        imageBytes: Uint8List.fromList([10, 20]),
+        filename: 'f.png',
+      );
       expect(a, equals(b));
     });
   });
@@ -182,14 +202,22 @@ void main() {
   group('SendVoiceMessage', () {
     test('stores audioBytes, filename, duration', () {
       final bytes = Uint8List.fromList([0xFF, 0xFE]);
-      final e = SendVoiceMessage(audioBytes: bytes, filename: 'voice.ogg', duration: 10);
+      final e = SendVoiceMessage(
+        audioBytes: bytes,
+        filename: 'voice.ogg',
+        duration: 10,
+      );
       expect(e.audioBytes, bytes);
       expect(e.filename, 'voice.ogg');
       expect(e.duration, 10);
     });
 
     test('mimeType defaults to null', () {
-      final e = SendVoiceMessage(audioBytes: Uint8List(0), filename: 'v.ogg', duration: 5);
+      final e = SendVoiceMessage(
+        audioBytes: Uint8List(0),
+        filename: 'v.ogg',
+        duration: 5,
+      );
       expect(e.mimeType, isNull);
     });
   });
@@ -229,7 +257,9 @@ void main() {
     test('stores thumbnailBytes when provided', () {
       final thumb = Uint8List.fromList([9, 8, 7]);
       final e = SendVideoMessage(
-        videoBytes: Uint8List(0), filename: 'v.mp4', thumbnailBytes: thumb,
+        videoBytes: Uint8List(0),
+        filename: 'v.mp4',
+        thumbnailBytes: thumb,
       );
       expect(e.thumbnailBytes, thumb);
     });
@@ -247,11 +277,18 @@ void main() {
     });
 
     test('description defaults to null', () {
-      expect(const SendLocationMessage(latitude: 0, longitude: 0).description, isNull);
+      expect(
+        const SendLocationMessage(latitude: 0, longitude: 0).description,
+        isNull,
+      );
     });
 
     test('stores description when provided', () {
-      const e = SendLocationMessage(latitude: 0, longitude: 0, description: 'HQ');
+      const e = SendLocationMessage(
+        latitude: 0,
+        longitude: 0,
+        description: 'HQ',
+      );
       expect(e.description, 'HQ');
     });
 
@@ -284,7 +321,10 @@ void main() {
     });
 
     test('different id → not equal', () {
-      expect(const ResendMessage('m1'), isNot(equals(const ResendMessage('m2'))));
+      expect(
+        const ResendMessage('m1'),
+        isNot(equals(const ResendMessage('m2'))),
+      );
     });
   });
 
@@ -343,7 +383,10 @@ void main() {
       expect(const DeleteFailedMessage('m').messageId, 'm');
     });
     test('same → equal', () {
-      expect(const DeleteFailedMessage('x'), equals(const DeleteFailedMessage('x')));
+      expect(
+        const DeleteFailedMessage('x'),
+        equals(const DeleteFailedMessage('x')),
+      );
     });
   });
 
@@ -352,6 +395,19 @@ void main() {
       const e = ReplyToMessage(replyToMessageId: 'origin', text: 'Yes!');
       expect(e.replyToMessageId, 'origin');
       expect(e.text, 'Yes!');
+    });
+
+    test('stores optional metadata', () {
+      const e = ReplyToMessage(
+        replyToMessageId: 'origin',
+        text: 'Yes!',
+        selfDestructAfter: 30,
+        mentionedUserIds: ['@bob:server'],
+        mentionsRoom: true,
+      );
+      expect(e.selfDestructAfter, 30);
+      expect(e.mentionedUserIds, ['@bob:server']);
+      expect(e.mentionsRoom, isTrue);
     });
 
     test('same fields → equal', () {
@@ -485,21 +541,38 @@ void main() {
     });
 
     test('pokerPokeText defaults to null', () {
-      const e = SendPokeMessage(pokerName: 'A', targetUserId: '@b:s', targetName: 'B');
+      const e = SendPokeMessage(
+        pokerName: 'A',
+        targetUserId: '@b:s',
+        targetName: 'B',
+      );
       expect(e.pokerPokeText, isNull);
     });
 
     test('stores pokerPokeText when provided', () {
       const e = SendPokeMessage(
-        pokerName: 'A', targetUserId: '@b:s', targetName: 'B', pokerPokeText: 'poke',
+        pokerName: 'A',
+        targetUserId: '@b:s',
+        targetName: 'B',
+        pokerPokeText: 'poke',
       );
       expect(e.pokerPokeText, 'poke');
     });
 
     test('same fields → equal', () {
       expect(
-        const SendPokeMessage(pokerName: 'A', targetUserId: '@b:s', targetName: 'B'),
-        equals(const SendPokeMessage(pokerName: 'A', targetUserId: '@b:s', targetName: 'B')),
+        const SendPokeMessage(
+          pokerName: 'A',
+          targetUserId: '@b:s',
+          targetName: 'B',
+        ),
+        equals(
+          const SendPokeMessage(
+            pokerName: 'A',
+            targetUserId: '@b:s',
+            targetName: 'B',
+          ),
+        ),
       );
     });
   });
@@ -510,18 +583,29 @@ void main() {
 
   group('SendPollMessage', () {
     test('stores question and options', () {
-      const e = SendPollMessage(question: 'Favourite?', options: ['A', 'B', 'C']);
+      const e = SendPollMessage(
+        question: 'Favourite?',
+        options: ['A', 'B', 'C'],
+      );
       expect(e.question, 'Favourite?');
       expect(e.options, ['A', 'B', 'C']);
     });
 
     test('maxSelections defaults to 1', () {
-      expect(const SendPollMessage(question: 'Q', options: ['A']).maxSelections, 1);
+      expect(
+        const SendPollMessage(question: 'Q', options: ['A']).maxSelections,
+        1,
+      );
     });
 
     test('stores custom maxSelections', () {
       expect(
-        const SendPollMessage(question: 'Q', options: ['A'], maxSelections: 0).maxSelections, 0,
+        const SendPollMessage(
+          question: 'Q',
+          options: ['A'],
+          maxSelections: 0,
+        ).maxSelections,
+        0,
       );
     });
 
@@ -564,7 +648,10 @@ void main() {
 
     test('isCurrentUser=false stored correctly', () {
       const e = PollResponseReceived(
-        pollEventId: 'p', selectedOptionIds: [], senderId: '@u:s', isCurrentUser: false,
+        pollEventId: 'p',
+        selectedOptionIds: [],
+        senderId: '@u:s',
+        isCurrentUser: false,
       );
       expect(e.isCurrentUser, isFalse);
     });
@@ -575,7 +662,10 @@ void main() {
       expect(const EndPoll(pollEventId: 'p1').pollEventId, 'p1');
     });
     test('same → equal', () {
-      expect(const EndPoll(pollEventId: 'p'), equals(const EndPoll(pollEventId: 'p')));
+      expect(
+        const EndPoll(pollEventId: 'p'),
+        equals(const EndPoll(pollEventId: 'p')),
+      );
     });
   });
 
@@ -611,7 +701,11 @@ void main() {
     test('different type → not equal', () {
       expect(
         const SendCustomMessage(content: 'c', type: MessageType.text),
-        isNot(equals(const SendCustomMessage(content: 'c', type: MessageType.transfer))),
+        isNot(
+          equals(
+            const SendCustomMessage(content: 'c', type: MessageType.transfer),
+          ),
+        ),
       );
     });
   });
@@ -656,12 +750,18 @@ void main() {
     });
 
     test('selfDestructAfter defaults to null', () {
-      final e = SendScheduledMessage(text: 'x', scheduledAt: DateTime.utc(2024, 1, 1));
+      final e = SendScheduledMessage(
+        text: 'x',
+        scheduledAt: DateTime.utc(2024, 1, 1),
+      );
       expect(e.selfDestructAfter, isNull);
     });
 
     test('mentionsRoom defaults to false', () {
-      final e = SendScheduledMessage(text: 'x', scheduledAt: DateTime.utc(2024, 1, 1));
+      final e = SendScheduledMessage(
+        text: 'x',
+        scheduledAt: DateTime.utc(2024, 1, 1),
+      );
       expect(e.mentionsRoom, isFalse);
     });
 
@@ -692,9 +792,7 @@ void main() {
 
   group('TranscribeVoiceMessage', () {
     test('stores messageId', () {
-      expect(
-        const TranscribeVoiceMessage(messageId: 'm').messageId, 'm',
-      );
+      expect(const TranscribeVoiceMessage(messageId: 'm').messageId, 'm');
     });
 
     test('language defaults to zh-CN', () {
@@ -711,7 +809,10 @@ void main() {
     });
 
     test('stores audioPath', () {
-      const e = TranscribeVoiceMessage(messageId: 'm', audioPath: '/tmp/voice.ogg');
+      const e = TranscribeVoiceMessage(
+        messageId: 'm',
+        audioPath: '/tmp/voice.ogg',
+      );
       expect(e.audioPath, '/tmp/voice.ogg');
     });
   });
@@ -724,12 +825,20 @@ void main() {
     });
 
     test('transcription defaults to null', () {
-      expect(const VoiceTranscriptionCompleted(messageId: 'm', success: true).transcription, isNull);
+      expect(
+        const VoiceTranscriptionCompleted(
+          messageId: 'm',
+          success: true,
+        ).transcription,
+        isNull,
+      );
     });
 
     test('stores transcription', () {
       const e = VoiceTranscriptionCompleted(
-        messageId: 'm', transcription: 'Hello world', success: true,
+        messageId: 'm',
+        transcription: 'Hello world',
+        success: true,
       );
       expect(e.transcription, 'Hello world');
     });
@@ -746,7 +855,10 @@ void main() {
 
   group('SendGifMessage', () {
     test('stores gifUrl', () {
-      expect(const SendGifMessage(gifUrl: 'https://g.com/1.gif').gifUrl, 'https://g.com/1.gif');
+      expect(
+        const SendGifMessage(gifUrl: 'https://g.com/1.gif').gifUrl,
+        'https://g.com/1.gif',
+      );
     });
 
     test('optional fields default to null', () {
@@ -759,7 +871,11 @@ void main() {
 
     test('stores all optional fields', () {
       const e = SendGifMessage(
-        gifUrl: 'url', previewUrl: 'prev', width: 400, height: 300, title: 'Funny',
+        gifUrl: 'url',
+        previewUrl: 'prev',
+        width: 400,
+        height: 300,
+        title: 'Funny',
       );
       expect(e.previewUrl, 'prev');
       expect(e.width, 400);
@@ -777,7 +893,11 @@ void main() {
 
   group('SendStickerMessage', () {
     test('stores required fields', () {
-      const e = SendStickerMessage(stickerId: 's1', packId: 'p1', url: 'mxc://s/1');
+      const e = SendStickerMessage(
+        stickerId: 's1',
+        packId: 'p1',
+        url: 'mxc://s/1',
+      );
       expect(e.stickerId, 's1');
       expect(e.packId, 'p1');
       expect(e.url, 'mxc://s/1');
@@ -796,9 +916,16 @@ void main() {
 
     test('stores all optional fields', () {
       const e = SendStickerMessage(
-        stickerId: 's', packId: 'p', url: 'u',
-        httpUrl: 'https://s.com/s.webp', name: 'Wave', emoji: '👋',
-        width: 512, height: 512, mimeType: 'image/webp', size: 20480,
+        stickerId: 's',
+        packId: 'p',
+        url: 'u',
+        httpUrl: 'https://s.com/s.webp',
+        name: 'Wave',
+        emoji: '👋',
+        width: 512,
+        height: 512,
+        mimeType: 'image/webp',
+        size: 20480,
       );
       expect(e.httpUrl, 'https://s.com/s.webp');
       expect(e.name, 'Wave');
@@ -817,7 +944,11 @@ void main() {
     test('different packId → not equal', () {
       expect(
         const SendStickerMessage(stickerId: 's', packId: 'p1', url: 'u'),
-        isNot(equals(const SendStickerMessage(stickerId: 's', packId: 'p2', url: 'u'))),
+        isNot(
+          equals(
+            const SendStickerMessage(stickerId: 's', packId: 'p2', url: 'u'),
+          ),
+        ),
       );
     });
   });
@@ -851,7 +982,10 @@ void main() {
     });
 
     test('same delta → equal', () {
-      expect(const NavigatePinnedMessage(1), equals(const NavigatePinnedMessage(1)));
+      expect(
+        const NavigatePinnedMessage(1),
+        equals(const NavigatePinnedMessage(1)),
+      );
     });
 
     test('different delta → not equal', () {
@@ -908,7 +1042,11 @@ void main() {
     });
 
     test('failure with error message', () {
-      const e = TranslationCompleted(messageId: 'm', success: false, error: 'Timeout');
+      const e = TranslationCompleted(
+        messageId: 'm',
+        success: false,
+        error: 'Timeout',
+      );
       expect(e.success, isFalse);
       expect(e.error, 'Timeout');
     });
@@ -958,7 +1096,9 @@ void main() {
 
     test('stores avatarUrl when provided', () {
       const e = SendContactCardMessage(
-        userId: '@u:s', displayName: 'Alice', avatarUrl: 'mxc://s/a',
+        userId: '@u:s',
+        displayName: 'Alice',
+        avatarUrl: 'mxc://s/a',
       );
       expect(e.avatarUrl, 'mxc://s/a');
     });

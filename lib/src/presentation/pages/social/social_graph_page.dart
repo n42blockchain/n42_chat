@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/social/social_profile.dart';
+import '../../../domain/entities/social/social_recommendation.dart';
 import '../../blocs/social/social_graph_bloc.dart';
 import '../../blocs/social/social_graph_event.dart';
 import '../../blocs/social/social_graph_state.dart';
 import '../../widgets/social/similarity_card.dart';
 import '../../widgets/social/social_graph_visualization.dart';
+import 'user_similarity_page.dart';
 
 /// Full-screen page showing the on-chain social graph.
 ///
@@ -84,8 +86,16 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
     SocialGraphState state,
     bool isDark,
   ) {
-    if (state.status == SocialGraphStatus.error) {
-      return _buildErrorState(state.errorMessage ?? 'Unknown error', isDark);
+    if (state.profile == null &&
+        state.recommendations.isEmpty &&
+        state.hasProfileError &&
+        state.hasRecommendationsError) {
+      return _buildErrorState(
+        state.recommendationsErrorMessage ??
+            state.profileErrorMessage ??
+            'Unknown error',
+        isDark,
+      );
     }
 
     return CustomScrollView(
@@ -108,10 +118,17 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
         ),
 
         // Content
-        if (state.isLoading && state.recommendations.isEmpty)
+        if (state.isRecommendationsLoading && state.recommendations.isEmpty)
           const SliverFillRemaining(
             child: Center(
               child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+          )
+        else if (state.hasRecommendationsError && state.recommendations.isEmpty)
+          SliverFillRemaining(
+            child: _buildErrorState(
+              state.recommendationsErrorMessage ?? 'Unknown error',
+              isDark,
             ),
           )
         else if (state.recommendations.isEmpty)
@@ -464,16 +481,17 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
     );
   }
 
-  void _onRecommendationTapped(dynamic rec) {
-    // Navigate to similarity detail page — caller can override via routing
+  void _onRecommendationTapped(SocialRecommendation rec) {
     Navigator.push(
       context,
       MaterialPageRoute<void>(
         builder: (_) => BlocProvider.value(
           value: context.read<SocialGraphBloc>(),
-          child: UserSimilarityPageStub(
+          child: UserSimilarityPage(
             addressA: widget.address,
-            addressB: rec.profile.address as String,
+            addressB: rec.profile.address,
+            displayNameA: _shortenAddress(widget.address),
+            displayNameB: rec.profile.displayName,
           ),
         ),
       ),
@@ -489,29 +507,5 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
     if (value >= 1e6) return '${(value / 1e6).toStringAsFixed(1)}M';
     if (value >= 1e3) return '${(value / 1e3).toStringAsFixed(1)}K';
     return value.toStringAsFixed(2);
-  }
-}
-
-/// Stub for navigating to the user similarity page.
-///
-/// In production, replace this with a proper [UserSimilarityPage] import.
-/// This avoids a circular import between the two page files.
-class UserSimilarityPageStub extends StatelessWidget {
-  final String addressA;
-  final String addressB;
-
-  const UserSimilarityPageStub({
-    super.key,
-    required this.addressA,
-    required this.addressB,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // This will be replaced by a go_router route in production.
-    // For now, import the real page:
-    return const Scaffold(
-      body: Center(child: Text('Navigate to UserSimilarityPage')),
-    );
   }
 }
