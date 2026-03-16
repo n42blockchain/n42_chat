@@ -56,6 +56,17 @@ void main() {
         );
         expect(ds.isAvailable, isFalse);
       });
+
+      test('should allow proxy endpoint mode without apiKey', () {
+        final ds = AiDatasource(
+          baseUrl: 'https://api.n42.ai/proxy/v1/ai/chat',
+          apiKey: '',
+          useProxyEndpoint: true,
+          dio: mockDio,
+        );
+
+        expect(ds.isAvailable, isTrue);
+      });
     });
 
     group('completion', () {
@@ -431,6 +442,44 @@ void main() {
 
         verify(() => mockDio.post<Map<String, dynamic>>(
               any(),
+              data: any(named: 'data'),
+              options: any(named: 'options'),
+            )).called(1);
+      });
+
+      test('should post directly to proxy endpoint in proxy mode', () async {
+        final ds = AiDatasource(
+          baseUrl: 'https://api.n42.ai/proxy/v1/ai/chat',
+          apiKey: '',
+          useProxyEndpoint: true,
+          dio: mockDio,
+        );
+
+        when(() => mockDio.post<Map<String, dynamic>>(
+              any(),
+              data: any(named: 'data'),
+              options: any(named: 'options'),
+            )).thenAnswer((_) async => Response<Map<String, dynamic>>(
+              data: {
+                'choices': [
+                  {
+                    'message': {'role': 'assistant', 'content': 'proxy-ok'},
+                  },
+                ],
+                'usage': {'prompt_tokens': 0, 'completion_tokens': 0},
+                'model': 'proxy-model',
+              },
+              statusCode: 200,
+              requestOptions: RequestOptions(path: 'https://api.n42.ai/proxy/v1/ai/chat'),
+            ));
+
+        final result = await ds.completion(
+          [const AiMessage(role: AiRole.user, content: 'Hi')],
+        );
+
+        expect(result.text, 'proxy-ok');
+        verify(() => mockDio.post<Map<String, dynamic>>(
+              'https://api.n42.ai/proxy/v1/ai/chat',
               data: any(named: 'data'),
               options: any(named: 'options'),
             )).called(1);

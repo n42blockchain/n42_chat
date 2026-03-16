@@ -294,6 +294,11 @@ class N42ChatConfig {
   /// 默认使用的 AI 模型名称
   final String aiModel;
 
+  /// 是否将 [aiBaseUrl] 视为已经可直接 POST 的代理端点。
+  ///
+  /// 为 `true` 时，AI 数据源不会再自动拼接 `/v1/chat/completions`。
+  final bool aiUseProxyEndpoint;
+
   /// 存储管理配置
   final StorageManagementConfig storageManagement;
 
@@ -406,6 +411,7 @@ class N42ChatConfig {
     this.aiApiKey,
     this.aiBaseUrl = 'https://api.openai.com',
     this.aiModel = 'gpt-4o-mini',
+    this.aiUseProxyEndpoint = false,
     this.storageManagement = const StorageManagementConfig(),
     this.pushProtocol,
     this.shareE2eeKeysWithAllDevices = true,
@@ -465,6 +471,7 @@ class N42ChatConfig {
     String? aiApiKey,
     String? aiBaseUrl,
     String? aiModel,
+    bool? aiUseProxyEndpoint,
     StorageManagementConfig? storageManagement,
     PushProtocolConfig? pushProtocol,
     bool? shareE2eeKeysWithAllDevices,
@@ -524,6 +531,7 @@ class N42ChatConfig {
       aiApiKey: aiApiKey ?? this.aiApiKey,
       aiBaseUrl: aiBaseUrl ?? this.aiBaseUrl,
       aiModel: aiModel ?? this.aiModel,
+      aiUseProxyEndpoint: aiUseProxyEndpoint ?? this.aiUseProxyEndpoint,
       storageManagement: storageManagement ?? this.storageManagement,
       pushProtocol: pushProtocol ?? this.pushProtocol,
       shareE2eeKeysWithAllDevices:
