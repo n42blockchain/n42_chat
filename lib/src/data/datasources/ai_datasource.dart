@@ -15,27 +15,34 @@ class AiDatasource implements AiService {
   final String _baseUrl;
   final String _apiKey;
   final String _defaultModel;
+  final bool _useProxyEndpoint;
 
   AiDatasource({
     required String baseUrl,
     required String apiKey,
     String defaultModel = 'gpt-4o-mini',
+    bool useProxyEndpoint = false,
     Dio? dio,
   })  : _baseUrl = baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl,
         _apiKey = apiKey,
         _defaultModel = defaultModel,
+        _useProxyEndpoint = useProxyEndpoint,
         _dio = dio ?? Dio() {
     _dio.options.baseUrl = _baseUrl;
     _dio.options.headers = {
-      'Authorization': 'Bearer $_apiKey',
       'Content-Type': 'application/json',
+      if (_apiKey.isNotEmpty) 'Authorization': 'Bearer $_apiKey',
     };
     _dio.options.connectTimeout = const Duration(seconds: 30);
     _dio.options.receiveTimeout = const Duration(minutes: 3);
   }
 
   @override
-  bool get isAvailable => _apiKey.isNotEmpty && _baseUrl.isNotEmpty;
+  bool get isAvailable =>
+      _baseUrl.isNotEmpty && (_apiKey.isNotEmpty || _useProxyEndpoint);
+
+  String get _chatCompletionsUrl =>
+      _useProxyEndpoint ? _baseUrl : '/v1/chat/completions';
 
   /// 消息总字符数上限（约 ~32k tokens）
   static const int _maxTotalCharacters = 128000;
@@ -71,7 +78,7 @@ class AiDatasource implements AiService {
 
     try {
       final response = await _dio.post<ResponseBody>(
-        '/v1/chat/completions',
+        _chatCompletionsUrl,
         data: {
           'model': model ?? _defaultModel,
           'messages': allMessages,
@@ -148,7 +155,7 @@ class AiDatasource implements AiService {
 
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        '/v1/chat/completions',
+        _chatCompletionsUrl,
         data: {
           'model': model ?? _defaultModel,
           'messages': allMessages,

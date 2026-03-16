@@ -108,6 +108,10 @@ void main() {
       expect(config.aiModel, isNotEmpty);
     });
 
+    test('aiUseProxyEndpoint defaults to false', () {
+      expect(config.aiUseProxyEndpoint, isFalse);
+    });
+
     test('customTheme defaults to null', () {
       expect(config.customTheme, isNull);
     });
@@ -153,6 +157,10 @@ void main() {
 
     test('replaces aiModel', () {
       expect(base.copyWith(aiModel: 'claude-3').aiModel, 'claude-3');
+    });
+
+    test('replaces aiUseProxyEndpoint', () {
+      expect(base.copyWith(aiUseProxyEndpoint: true).aiUseProxyEndpoint, isTrue);
     });
 
     test('replaces giphyApiKey', () {

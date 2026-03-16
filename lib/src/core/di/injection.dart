@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -233,7 +232,7 @@ Future<void> _registerServices(N42ChatConfig config) async {
 
   // 翻译服务 fallback chain:
   // 1. Google Translate（有 API key 时）
-  // 2. AI Translation（有 AI key 时）
+  // 2. AI Translation（有 AI key 或代理端点时）
   // 3. MyMemory（免费 fallback，无需任何 key）
   getIt.registerLazySingleton<ITranslationService>(() {
     final hasGoogleKey = config.googleTranslateApiKey != null &&
@@ -244,7 +243,8 @@ Future<void> _registerServices(N42ChatConfig config) async {
         storageDataSource: getIt<PreferencesDataSource>(),
       );
     }
-    if (config.aiApiKey != null && config.aiApiKey!.isNotEmpty) {
+    if ((config.aiApiKey != null && config.aiApiKey!.isNotEmpty) ||
+        config.aiUseProxyEndpoint) {
       return AiTranslationService(
         aiService: getIt<AiService>(),
         storageDataSource: getIt<PreferencesDataSource>(),
@@ -380,13 +380,15 @@ Future<void> _registerServices(N42ChatConfig config) async {
     ),
   );
 
-  // AI 服务（仅当配置了 API Key 时注册）
-  if (config.aiApiKey != null && config.aiApiKey!.isNotEmpty) {
+  // AI 服务（配置了 API Key 或代理端点时注册）
+  if ((config.aiApiKey != null && config.aiApiKey!.isNotEmpty) ||
+      config.aiUseProxyEndpoint) {
     getIt.registerLazySingleton<AiService>(
       () => AiDatasource(
-        apiKey: config.aiApiKey!,
+        apiKey: config.aiApiKey ?? '',
         baseUrl: config.aiBaseUrl,
         defaultModel: config.aiModel,
+        useProxyEndpoint: config.aiUseProxyEndpoint,
       ),
     );
   }
