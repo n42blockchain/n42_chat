@@ -45,13 +45,13 @@ abstract class IPushNotificationService {
 /// 推送通知服务实现
 class PushNotificationService implements IPushNotificationService {
   final matrix.Client _client;
-  
+
   /// 推送网关URL（用于注册推送）
   final String? pushGatewayUrl;
-  
+
   /// 应用标识符
   final String appId;
-  
+
   /// 推送器类型
   final String pushkeyType;
 
@@ -123,7 +123,9 @@ class PushNotificationService implements IPushNotificationService {
     // 检查房间是否静音
     if (room.pushRuleState == matrix.PushRuleState.dontNotify) return;
 
-    final senderName = room.unsafeGetUserFromMemoryOrFallback(event.senderId).calcDisplayname();
+    final senderName = room
+        .unsafeGetUserFromMemoryOrFallback(event.senderId)
+        .calcDisplayname();
     final roomName = room.getLocalizedDisplayname();
     final body = _getNotificationBody(event);
 
@@ -175,7 +177,7 @@ class PushNotificationService implements IPushNotificationService {
           appId: appId,
           appDisplayName: 'N42 Chat',
           deviceDisplayName: _client.deviceName ?? 'Unknown Device',
-          lang: 'zh-CN',
+          lang: 'zh-TW',
           data: matrix.PusherData(
             url: Uri.parse(pushGatewayUrl!),
             format: 'event_id_only',
@@ -200,7 +202,7 @@ class PushNotificationService implements IPushNotificationService {
           appId: appId,
           appDisplayName: 'N42 Chat',
           deviceDisplayName: _client.deviceName ?? 'Unknown Device',
-          lang: 'zh-CN',
+          lang: 'zh-TW',
           data: matrix.PusherData(),
         ),
       );
@@ -231,7 +233,7 @@ class PushNotificationService implements IPushNotificationService {
   }) async {
     // 注：实际实现需要使用 flutter_local_notifications 包
     // 这里只提供接口定义
-    
+
     debugLog('Showing notification: $title - $body');
   }
 
@@ -271,10 +273,13 @@ class PushNotificationService implements IPushNotificationService {
 enum NotificationPermissionStatus {
   /// 已授权
   granted,
+
   /// 已拒绝
   denied,
+
   /// 未确定
   notDetermined,
+
   /// 受限
   restricted,
 }

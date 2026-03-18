@@ -56,8 +56,9 @@ class TranslatedMessageWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
-        crossAxisAlignment:
-            isFromMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: isFromMe
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
           // 翻译内容
           Text(
@@ -81,8 +82,8 @@ class TranslatedMessageWidget extends StatelessWidget {
                 color: isOriginalDisplay
                     ? (isDark ? Colors.white38 : Colors.black38)
                     : (isDark
-                        ? const Color(0xFF66BB6A)
-                        : const Color(0xFF43A047)),
+                          ? const Color(0xFF66BB6A)
+                          : const Color(0xFF43A047)),
               ),
               const SizedBox(width: 4),
               Text(
@@ -144,23 +145,35 @@ class TranslatedMessageWidget extends StatelessWidget {
 
   static String _getLanguageName(String code) {
     const languageNames = {
-      'zh': 'Chinese',
-      'zh-CN': 'Chinese',
-      'zh-TW': 'Chinese',
-      'en': 'English',
-      'ja': 'Japanese',
-      'ko': 'Korean',
-      'fr': 'French',
-      'de': 'German',
-      'es': 'Spanish',
-      'pt': 'Portuguese',
-      'ru': 'Russian',
       'ar': 'Arabic',
-      'vi': 'Vietnamese',
-      'tr': 'Turkish',
+      'bn': 'Bengali',
+      'cs': 'Czech',
+      'de': 'German',
+      'en': 'English',
+      'es': 'Spanish',
+      'fr': 'French',
+      'hi': 'Hindi',
       'id': 'Indonesian',
       'it': 'Italian',
+      'ja': 'Japanese',
+      'ko': 'Korean',
+      'mr': 'Marathi',
       'pl': 'Polish',
+      'pt': 'Portuguese',
+      'pt-BR': 'Portuguese (Brazil)',
+      'pt_BR': 'Portuguese (Brazil)',
+      'ru': 'Russian',
+      'sw': 'Swahili',
+      'ta': 'Tamil',
+      'te': 'Telugu',
+      'tr': 'Turkish',
+      'uk': 'Ukrainian',
+      'ur': 'Urdu',
+      'vi': 'Vietnamese',
+      'zh': 'Chinese',
+      'zh-CN': 'Chinese',
+      'zh-TW': 'Traditional Chinese',
+      'zh_TW': 'Traditional Chinese',
     };
     return languageNames[code] ?? code;
   }

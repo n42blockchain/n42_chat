@@ -21,22 +21,126 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
 
   Locale _currentLocale = N42Chat.locale;
 
+  static String _localeToCode(Locale locale) {
+    if (locale.languageCode.toLowerCase() == 'zh') {
+      return 'zh_TW';
+    }
+    final countryCode = locale.countryCode;
+    if (countryCode == null || countryCode.isEmpty) {
+      return locale.languageCode.toLowerCase();
+    }
+    return '${locale.languageCode.toLowerCase()}_${countryCode.toUpperCase()}';
+  }
+
+  static Locale _codeToLocale(String code) {
+    final normalized = code.trim().replaceAll('-', '_');
+    final parts = normalized.split('_');
+    if (parts.first.toLowerCase() == 'zh') {
+      return const Locale('zh', 'TW');
+    }
+    if (parts.length > 1 && parts[1].isNotEmpty) {
+      return Locale(parts[0].toLowerCase(), parts[1].toUpperCase());
+    }
+    return Locale(parts[0].toLowerCase());
+  }
+
+  static bool _sameLocale(Locale a, Locale b) {
+    return _localeToCode(a) == _localeToCode(b);
+  }
+
+  static LanguageOption _resolveLanguageOption(Locale locale) {
+    final exactCode = _localeToCode(locale);
+    for (final language in _languages) {
+      if (_localeToCode(language.locale) == exactCode) {
+        return language;
+      }
+    }
+
+    final baseCode = locale.languageCode.toLowerCase();
+    for (final language in _languages) {
+      if (language.locale.languageCode.toLowerCase() == baseCode) {
+        return language;
+      }
+    }
+
+    return _languages.first;
+  }
+
   /// 支持的语言列表及其显示名称
   static const List<LanguageOption> _languages = [
-    LanguageOption(locale: Locale('zh'), name: '简体中文', nativeName: '简体中文'),
-    LanguageOption(locale: Locale('en'), name: 'English', nativeName: 'English'),
+    LanguageOption(
+      locale: Locale('zh', 'TW'),
+      name: 'Traditional Chinese',
+      nativeName: '繁體中文',
+    ),
+    LanguageOption(
+      locale: Locale('en'),
+      name: 'English',
+      nativeName: 'English',
+    ),
+    LanguageOption(locale: Locale('ar'), name: 'Arabic', nativeName: 'العربية'),
+    LanguageOption(locale: Locale('bn'), name: 'Bengali', nativeName: 'বাংলা'),
+    LanguageOption(locale: Locale('cs'), name: 'Czech', nativeName: 'Čeština'),
+    LanguageOption(locale: Locale('de'), name: 'German', nativeName: 'Deutsch'),
+    LanguageOption(
+      locale: Locale('es', 'ES'),
+      name: 'Spanish',
+      nativeName: 'Español',
+    ),
+    LanguageOption(
+      locale: Locale('fr'),
+      name: 'French',
+      nativeName: 'Français',
+    ),
+    LanguageOption(locale: Locale('hi'), name: 'Hindi', nativeName: 'हिन्दी'),
+    LanguageOption(
+      locale: Locale('id'),
+      name: 'Indonesian',
+      nativeName: 'Bahasa Indonesia',
+    ),
+    LanguageOption(
+      locale: Locale('it'),
+      name: 'Italian',
+      nativeName: 'Italiano',
+    ),
     LanguageOption(locale: Locale('ja'), name: 'Japanese', nativeName: '日本語'),
     LanguageOption(locale: Locale('ko'), name: 'Korean', nativeName: '한국어'),
-    LanguageOption(locale: Locale('fr'), name: 'French', nativeName: 'Français'),
-    LanguageOption(locale: Locale('de'), name: 'German', nativeName: 'Deutsch'),
-    LanguageOption(locale: Locale('es'), name: 'Spanish', nativeName: 'Español'),
-    LanguageOption(locale: Locale('pt'), name: 'Portuguese', nativeName: 'Português'),
-    LanguageOption(locale: Locale('it'), name: 'Italian', nativeName: 'Italiano'),
-    LanguageOption(locale: Locale('ru'), name: 'Russian', nativeName: 'Русский'),
-    LanguageOption(locale: Locale('tr'), name: 'Turkish', nativeName: 'Türkçe'),
-    LanguageOption(locale: Locale('vi'), name: 'Vietnamese', nativeName: 'Tiếng Việt'),
-    LanguageOption(locale: Locale('id'), name: 'Indonesian', nativeName: 'Bahasa Indonesia'),
+    LanguageOption(locale: Locale('mr'), name: 'Marathi', nativeName: 'मराठी'),
+    LanguageOption(
+      locale: Locale('ru'),
+      name: 'Russian',
+      nativeName: 'Русский',
+    ),
     LanguageOption(locale: Locale('pl'), name: 'Polish', nativeName: 'Polski'),
+    LanguageOption(
+      locale: Locale('pt'),
+      name: 'Portuguese',
+      nativeName: 'Português',
+    ),
+    LanguageOption(
+      locale: Locale('pt', 'BR'),
+      name: 'Portuguese (Brazil)',
+      nativeName: 'Português (Brasil)',
+    ),
+    LanguageOption(
+      locale: Locale('sw'),
+      name: 'Swahili',
+      nativeName: 'Kiswahili',
+    ),
+    LanguageOption(locale: Locale('ta'), name: 'Tamil', nativeName: 'தமிழ்'),
+    LanguageOption(locale: Locale('te'), name: 'Telugu', nativeName: 'తెలుగు'),
+    LanguageOption(locale: Locale('tr'), name: 'Turkish', nativeName: 'Türkçe'),
+    LanguageOption(
+      locale: Locale('uk'),
+      name: 'Ukrainian',
+      nativeName: 'Українська',
+    ),
+    LanguageOption(locale: Locale('ur'), name: 'Urdu', nativeName: 'اردو'),
+    LanguageOption(
+      locale: Locale('vi'),
+      name: 'Vietnamese',
+      nativeName: 'Tiếng Việt',
+    ),
   ];
 
   @override
@@ -50,13 +154,17 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
     final savedLanguage = await storage.getSetting(_languageSettingKey);
     if (savedLanguage != null && mounted) {
       setState(() {
-        _currentLocale = Locale(savedLanguage);
+        _currentLocale = _resolveLanguageOption(
+          _codeToLocale(savedLanguage),
+        ).locale;
       });
     }
   }
 
   Future<void> _setLanguage(Locale locale) async {
-    if (_currentLocale == locale) return;
+    if (_sameLocale(_resolveLanguageOption(_currentLocale).locale, locale)) {
+      return;
+    }
 
     setState(() {
       _currentLocale = locale;
@@ -64,7 +172,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
 
     // 保存到本地存储
     final storage = getIt<PreferencesDataSource>();
-    await storage.saveSetting(_languageSettingKey, locale.languageCode);
+    await storage.saveSetting(_languageSettingKey, _localeToCode(locale));
 
     // 更新 N42Chat 的语言设置
     N42Chat.setLocale(locale);
@@ -72,7 +180,9 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.settingsLanguageChanged ?? 'Language changed'),
+          content: Text(
+            S.of(context)?.settingsLanguageChanged ?? 'Language changed',
+          ),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 2),
         ),
@@ -84,6 +194,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final resolvedCurrentLocale = _resolveLanguageOption(_currentLocale).locale;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -97,7 +208,10 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
         itemCount: _languages.length,
         itemBuilder: (context, index) {
           final language = _languages[index];
-          final isSelected = _currentLocale.languageCode == language.locale.languageCode;
+          final isSelected = _sameLocale(
+            resolvedCurrentLocale,
+            language.locale,
+          );
 
           return _LanguageItem(
             language: language,
@@ -141,8 +255,12 @@ class _LanguageItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final subtitleColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -169,7 +287,9 @@ class _LanguageItem extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primary.withValues(alpha: 0.1)
-                        : (isDark ? AppColors.backgroundDark : AppColors.background),
+                        : (isDark
+                              ? AppColors.backgroundDark
+                              : AppColors.background),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
@@ -193,17 +313,16 @@ class _LanguageItem extends StatelessWidget {
                         language.nativeName,
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                           color: isSelected ? AppColors.primary : textColor,
                         ),
                       ),
                       if (language.name != language.nativeName)
                         Text(
                           language.name,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: subtitleColor,
-                          ),
+                          style: TextStyle(fontSize: 13, color: subtitleColor),
                         ),
                     ],
                   ),

@@ -75,7 +75,8 @@ extension ChatBlocSendHandlers on ChatBloc {
         state.detectedRecipientLanguage != null) {
       final recipientLang = state.detectedRecipientLanguage!;
       final userLang = getDeviceLanguageCode();
-      if (recipientLang != userLang) {
+      if (translationLanguageBaseCode(recipientLang) !=
+          translationLanguageBaseCode(userLang)) {
         try {
           final result = await _translationService.translate(
             text: event.text,

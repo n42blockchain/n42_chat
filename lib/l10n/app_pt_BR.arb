@@ -1,5 +1,5 @@
 {
-  "@@locale": "pt",
+  "@@locale": "pt_BR",
   "commonRetry": "Tentar novamente",
   "commonUnknownUser": "Usuário desconhecido",
   "transferWalletNotConnected": "Carteira não conectada",
