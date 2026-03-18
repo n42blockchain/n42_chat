@@ -120,8 +120,10 @@ class GoogleTranslationService implements ITranslationService {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'q': text,
-          'target': targetLanguage,
-          'source': ?sourceLanguage,
+          'target': translationApiLanguageCode(targetLanguage),
+          'source': sourceLanguage == null
+              ? null
+              : translationApiLanguageCode(sourceLanguage),
         }),
       );
 
@@ -149,7 +151,9 @@ class GoogleTranslationService implements ITranslationService {
         }
       }
 
-      return TranslationResult.error('Translation failed: ${response.statusCode}');
+      return TranslationResult.error(
+        'Translation failed: ${response.statusCode}',
+      );
     } catch (e) {
       debugLog('Translation error: $e');
       return TranslationResult.error('Translation failed: $e');
@@ -165,7 +169,9 @@ class GoogleTranslationService implements ITranslationService {
   Future<String?> detectLanguage(String text) async {
     // 简单的语言检测
     final containsChinese = RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
-    final containsJapanese = RegExp(r'[\u3040-\u309f\u30a0-\u30ff]').hasMatch(text);
+    final containsJapanese = RegExp(
+      r'[\u3040-\u309f\u30a0-\u30ff]',
+    ).hasMatch(text);
     final containsKorean = RegExp(r'[\uac00-\ud7af]').hasMatch(text);
 
     if (containsChinese) return 'zh';
@@ -179,16 +185,74 @@ class GoogleTranslationService implements ITranslationService {
   @override
   List<TranslationLanguage> getSupportedLanguages() {
     return const [
-      TranslationLanguage(code: 'zh', name: 'Chinese', localizedName: '中文'),
-      TranslationLanguage(code: 'en', name: 'English', localizedName: 'English'),
+      TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
+      TranslationLanguage(code: 'bn', name: 'Bengali', localizedName: 'বাংলা'),
+      TranslationLanguage(code: 'cs', name: 'Czech', localizedName: 'Čeština'),
+      TranslationLanguage(code: 'de', name: 'German', localizedName: 'Deutsch'),
+      TranslationLanguage(
+        code: 'en',
+        name: 'English',
+        localizedName: 'English',
+      ),
+      TranslationLanguage(
+        code: 'es',
+        name: 'Spanish',
+        localizedName: 'Español',
+      ),
+      TranslationLanguage(
+        code: 'fr',
+        name: 'French',
+        localizedName: 'Français',
+      ),
+      TranslationLanguage(code: 'hi', name: 'Hindi', localizedName: 'हिन्दी'),
+      TranslationLanguage(
+        code: 'id',
+        name: 'Indonesian',
+        localizedName: 'Bahasa Indonesia',
+      ),
+      TranslationLanguage(
+        code: 'it',
+        name: 'Italian',
+        localizedName: 'Italiano',
+      ),
       TranslationLanguage(code: 'ja', name: 'Japanese', localizedName: '日本語'),
       TranslationLanguage(code: 'ko', name: 'Korean', localizedName: '한국어'),
-      TranslationLanguage(code: 'fr', name: 'French', localizedName: 'Français'),
-      TranslationLanguage(code: 'de', name: 'German', localizedName: 'Deutsch'),
-      TranslationLanguage(code: 'es', name: 'Spanish', localizedName: 'Español'),
-      TranslationLanguage(code: 'pt', name: 'Portuguese', localizedName: 'Português'),
-      TranslationLanguage(code: 'ru', name: 'Russian', localizedName: 'Русский'),
-      TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
+      TranslationLanguage(code: 'mr', name: 'Marathi', localizedName: 'मराठी'),
+      TranslationLanguage(code: 'pl', name: 'Polish', localizedName: 'Polski'),
+      TranslationLanguage(
+        code: 'pt',
+        name: 'Portuguese',
+        localizedName: 'Português',
+      ),
+      TranslationLanguage(
+        code: 'ru',
+        name: 'Russian',
+        localizedName: 'Русский',
+      ),
+      TranslationLanguage(
+        code: 'sw',
+        name: 'Swahili',
+        localizedName: 'Kiswahili',
+      ),
+      TranslationLanguage(code: 'ta', name: 'Tamil', localizedName: 'தமிழ்'),
+      TranslationLanguage(code: 'te', name: 'Telugu', localizedName: 'తెలుగు'),
+      TranslationLanguage(code: 'tr', name: 'Turkish', localizedName: 'Türkçe'),
+      TranslationLanguage(
+        code: 'uk',
+        name: 'Ukrainian',
+        localizedName: 'Українська',
+      ),
+      TranslationLanguage(code: 'ur', name: 'Urdu', localizedName: 'اردو'),
+      TranslationLanguage(
+        code: 'vi',
+        name: 'Vietnamese',
+        localizedName: 'Tiếng Việt',
+      ),
+      TranslationLanguage(
+        code: 'zh_TW',
+        name: 'Traditional Chinese',
+        localizedName: '繁體中文',
+      ),
     ];
   }
 }
@@ -201,21 +265,36 @@ class AiTranslationService implements ITranslationService {
   AiTranslationService({
     required AiService aiService,
     required PreferencesDataSource storageDataSource,
-  })  : _aiService = aiService,
-        _storageDataSource = storageDataSource;
+  }) : _aiService = aiService,
+       _storageDataSource = storageDataSource;
 
   /// 语言代码到自然语言名称的映射（AI 需要 "Chinese" 而非 "zh"）
   static const _languageNames = {
-    'zh': 'Chinese',
+    'ar': 'Arabic',
+    'bn': 'Bengali',
+    'cs': 'Czech',
+    'de': 'German',
     'en': 'English',
+    'es': 'Spanish',
+    'fr': 'French',
+    'hi': 'Hindi',
+    'id': 'Indonesian',
+    'it': 'Italian',
     'ja': 'Japanese',
     'ko': 'Korean',
-    'fr': 'French',
-    'de': 'German',
-    'es': 'Spanish',
+    'mr': 'Marathi',
+    'pl': 'Polish',
     'pt': 'Portuguese',
     'ru': 'Russian',
-    'ar': 'Arabic',
+    'sw': 'Swahili',
+    'ta': 'Tamil',
+    'te': 'Telugu',
+    'tr': 'Turkish',
+    'uk': 'Ukrainian',
+    'ur': 'Urdu',
+    'vi': 'Vietnamese',
+    'zh': 'Chinese',
+    'zh_TW': 'Traditional Chinese',
   };
 
   @override
@@ -240,7 +319,10 @@ class AiTranslationService implements ITranslationService {
 
     try {
       final targetName = _languageNames[targetLanguage] ?? targetLanguage;
-      final translatedText = await _aiService.translateMessage(text, targetName);
+      final translatedText = await _aiService.translateMessage(
+        text,
+        targetName,
+      );
 
       // 保存到缓存
       await _storageDataSource.saveTranslationCache(
@@ -269,8 +351,9 @@ class AiTranslationService implements ITranslationService {
   @override
   Future<String?> detectLanguage(String text) async {
     final containsChinese = RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
-    final containsJapanese =
-        RegExp(r'[\u3040-\u309f\u30a0-\u30ff]').hasMatch(text);
+    final containsJapanese = RegExp(
+      r'[\u3040-\u309f\u30a0-\u30ff]',
+    ).hasMatch(text);
     final containsKorean = RegExp(r'[\uac00-\ud7af]').hasMatch(text);
 
     if (containsChinese) return 'zh';
@@ -282,33 +365,108 @@ class AiTranslationService implements ITranslationService {
   @override
   List<TranslationLanguage> getSupportedLanguages() {
     return const [
-      TranslationLanguage(code: 'zh', name: 'Chinese', localizedName: '中文'),
+      TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
+      TranslationLanguage(code: 'bn', name: 'Bengali', localizedName: 'বাংলা'),
+      TranslationLanguage(code: 'cs', name: 'Czech', localizedName: 'Čeština'),
+      TranslationLanguage(code: 'de', name: 'German', localizedName: 'Deutsch'),
       TranslationLanguage(
-          code: 'en', name: 'English', localizedName: 'English'),
+        code: 'en',
+        name: 'English',
+        localizedName: 'English',
+      ),
       TranslationLanguage(
-          code: 'ja', name: 'Japanese', localizedName: '日本語'),
+        code: 'es',
+        name: 'Spanish',
+        localizedName: 'Español',
+      ),
       TranslationLanguage(
-          code: 'ko', name: 'Korean', localizedName: '한국어'),
+        code: 'fr',
+        name: 'French',
+        localizedName: 'Français',
+      ),
+      TranslationLanguage(code: 'hi', name: 'Hindi', localizedName: 'हिन्दी'),
       TranslationLanguage(
-          code: 'fr', name: 'French', localizedName: 'Français'),
+        code: 'id',
+        name: 'Indonesian',
+        localizedName: 'Bahasa Indonesia',
+      ),
       TranslationLanguage(
-          code: 'de', name: 'German', localizedName: 'Deutsch'),
+        code: 'it',
+        name: 'Italian',
+        localizedName: 'Italiano',
+      ),
+      TranslationLanguage(code: 'ja', name: 'Japanese', localizedName: '日本語'),
+      TranslationLanguage(code: 'ko', name: 'Korean', localizedName: '한국어'),
+      TranslationLanguage(code: 'mr', name: 'Marathi', localizedName: 'मराठी'),
+      TranslationLanguage(code: 'pl', name: 'Polish', localizedName: 'Polski'),
       TranslationLanguage(
-          code: 'es', name: 'Spanish', localizedName: 'Español'),
+        code: 'pt',
+        name: 'Portuguese',
+        localizedName: 'Português',
+      ),
       TranslationLanguage(
-          code: 'pt', name: 'Portuguese', localizedName: 'Português'),
+        code: 'ru',
+        name: 'Russian',
+        localizedName: 'Русский',
+      ),
       TranslationLanguage(
-          code: 'ru', name: 'Russian', localizedName: 'Русский'),
+        code: 'sw',
+        name: 'Swahili',
+        localizedName: 'Kiswahili',
+      ),
+      TranslationLanguage(code: 'ta', name: 'Tamil', localizedName: 'தமிழ்'),
+      TranslationLanguage(code: 'te', name: 'Telugu', localizedName: 'తెలుగు'),
+      TranslationLanguage(code: 'tr', name: 'Turkish', localizedName: 'Türkçe'),
       TranslationLanguage(
-          code: 'ar', name: 'Arabic', localizedName: 'العربية'),
+        code: 'uk',
+        name: 'Ukrainian',
+        localizedName: 'Українська',
+      ),
+      TranslationLanguage(code: 'ur', name: 'Urdu', localizedName: 'اردو'),
+      TranslationLanguage(
+        code: 'vi',
+        name: 'Vietnamese',
+        localizedName: 'Tiếng Việt',
+      ),
+      TranslationLanguage(
+        code: 'zh_TW',
+        name: 'Traditional Chinese',
+        localizedName: '繁體中文',
+      ),
     ];
   }
+}
+
+String normalizeTranslationLanguageCode(String code) {
+  final trimmed = code.trim();
+  if (trimmed.isEmpty) return 'en';
+
+  final normalized = trimmed.replaceAll('-', '_');
+  final parts = normalized.split('_');
+  final languageCode = parts.first.toLowerCase();
+  if (languageCode == 'zh') {
+    return 'zh_TW';
+  }
+  if (parts.length == 1 || parts[1].isEmpty) {
+    return languageCode;
+  }
+  return '${languageCode}_${parts[1].toUpperCase()}';
+}
+
+String translationLanguageBaseCode(String code) {
+  return normalizeTranslationLanguageCode(code).split('_').first;
+}
+
+String translationApiLanguageCode(String code) {
+  return normalizeTranslationLanguageCode(code).replaceAll('_', '-');
 }
 
 /// 获取设备语言代码
 String getDeviceLanguageCode() {
   final locale = PlatformDispatcher.instance.locale;
-  return locale.languageCode;
+  return normalizeTranslationLanguageCode(
+    locale.languageCode == 'zh' ? 'zh_TW' : locale.languageCode,
+  );
 }
 
 /// 获取翻译目标语言（基于设备语言）
@@ -316,8 +474,10 @@ String getTargetLanguage(String? sourceLanguage) {
   final deviceLang = getDeviceLanguageCode();
 
   // 如果源语言和设备语言相同，翻译成英文
-  if (sourceLanguage == deviceLang) {
-    return deviceLang == 'en' ? 'zh' : 'en';
+  if (sourceLanguage != null &&
+      translationLanguageBaseCode(sourceLanguage) ==
+          translationLanguageBaseCode(deviceLang)) {
+    return deviceLang == 'en' ? 'zh_TW' : 'en';
   }
 
   return deviceLang;

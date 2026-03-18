@@ -8,6 +8,10 @@
   "chatCallBack": "다시 전화",
   "chatMissedVideoCall": "부재중 영상통화",
   "chatMissedVoiceCall": "부재중 음성통화",
+  "chatCallNotAnswered": "응답 없음",
+  "chatCallDurationLabel": "통화 시간",
+  "chatVoiceCallCancelled": "음성 통화 취소됨",
+  "chatVideoCallCancelled": "영상 통화 취소됨",
   "commonImage": "[이미지]",
   "chatVideo": "[동영상]",
   "chatVoice": "[음성]",
@@ -40,6 +44,7 @@
   "chatCopied": "복사됨",
   "storySendMessageHint": "메시지 보내기",
   "commonMicrophonePermissionRequired": "마이크 권한을 허용해주세요",
+  "chatMicrophonePermissionDeniedPermanent": "마이크 권한이 거부되었습니다. 음성 메시지를 사용하려면 시스템 설정에서 활성화하세요.",
   "commonStartRecordingFailed": "녹음 시작 실패: {error}",
   "commonRecordingTooShort": "녹음이 너무 짧습니다",
   "commonStopRecordingFailed": "녹음 중지 실패: {error}",
@@ -99,12 +104,13 @@
   "commonN42RedPacket": "N42 레드패킷",
   "commonClaimed": "수령 완료",
   "commonAllClaimed": "모두 수령됨",
+  "chatReadAloud": "소리내어 읽기",
   "chatReply": "답장",
   "commonEdit": "편집",
   "chatSelectForwardTarget": "받는 사람 선택",
   "commonSendCount": "전송 ({count})",
   "contactN42Id": "N42 ID: {id}",
-  "profileN42IdTitle": "N42 ID",
+  "profileN42IdTitle": "N42 아이디",
   "profileN42Bean": "N42 빈",
   "contactFriendInfo": "친구 정보",
   "contactFriendInfoDesc": "친구의 별명, 전화번호, 태그, 메모, 사진을 추가하고 권한을 설정하세요.",
@@ -196,7 +202,7 @@
   "contactTryOtherKeywords": "다른 키워드로 시도하거나 전체 검색을 이용하세요",
   "contactSearchResults": "검색 결과",
   "contactNewFriends": "새 친구",
-  "contactChatOnlyFriends": "Chat-only Friends",
+  "contactChatOnlyFriends": "채팅 전용 친구",
   "contactOfficialAccounts": "공식 계정",
   "contactServiceAccounts": "서비스 계정",
   "contactEnterpriseContacts": "기업 연락처",
@@ -255,7 +261,6 @@
   "groupQrCode": "그룹 QR 코드",
   "commonSearchChatHistory": "채팅 기록 검색",
   "groupIdCopied": "그룹 ID 복사됨",
-  "commonFeatureInDevelopment": "기능 개발 중...",
   "transferEnterOrPasteAddress": "지갑 주소 입력 또는 붙여넣기",
   "transferSelectToken": "토큰 선택",
   "commonTransferAmount": "송금 금액",
@@ -392,6 +397,7 @@
   "chatCalling": "전화 중...",
   "chatRinging": "벨소리 울리는 중...",
   "chatInCall": "통화 중",
+  "commonFeatureInDevelopment": "기능 개발 중...",
   "chatCollectMessages": "{count}개 메시지 수집됨",
   "commonMemberCount": "멤버 {count}명",
   "groupDone": "완료({count})",
@@ -560,22 +566,6 @@
   "chatSaving": "저장 중...",
   "commonShare": "공유",
   "chatSaveToGallery": "갤러리에 저장",
-  "chatDownloadFailed": "다운로드 실패: {code}",
-  "@chatDownloadFailed": {
-    "placeholders": {
-      "code": {
-        "type": "String"
-      }
-    }
-  },
-  "commonShareFailed": "공유 실패: {error}",
-  "@commonShareFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "chatFailedToLoadImage": "이미지 로드 실패",
   "chatVideoRecordingFailed": "동영상 녹화 실패. 다시 시도해주세요.",
   "profileRedPacket": "레드패킷",
@@ -795,7 +785,6 @@
   "chatMultiChoice": "복수",
   "chatEnded": "종료됨",
   "chatEndPollButton": "투표 종료",
-  "chatEnterPollQuestionHint": "투표 질문을 입력해주세요",
   "chatPollHint": "투표가 채팅에 표시됩니다. 그룹 멤버가 투표할 수 있습니다.",
   "chatSearchSongOrArtist": "곡 또는 아티스트 검색",
   "chatNoSongsFound": "곡을 찾을 수 없습니다",
@@ -846,8 +835,9 @@
   },
   "searchAllResults": "전체",
   "searchInChat": "채팅에서 검색",
-  "searchGroupLabel": "그룹",
   "searchContactLabel": "연락처",
+  "searchGroupLabel": "그룹",
+  "searchConversationLabel": "대화",
   "searchMessageLabel": "메시지",
   "settingsSecurityTitle": "보안",
   "settingsKeyBackup": "키 백업",
@@ -917,6 +907,21 @@
   "settingsResetEncryptionTitle": "암호화 재설정",
   "settingsResetEncryptionWarning": "경고: 이 작업은 모든 암호화 키를 삭제합니다. 이전의 암호화된 메시지를 복호화할 수 없게 됩니다. 이 작업은 취소할 수 없습니다.",
   "settingsReset": "재설정",
+  "settingsBackupSuccess": "키가 성공적으로 백업되었습니다.",
+  "settingsBackupFailed": "백업 실패",
+  "settingsRecoveryKey": "복구 키",
+  "settingsRecoveryKeySaveWarning": "이 복구 키를 안전한 곳에 보관하십시오. 새 장치에서 암호화된 메시지를 복원하려면 이 정보가 필요합니다.",
+  "settingsRecoveryKeySaved": "나는 그것을 저장했다",
+  "settingsRestoreSuccess": "키가 성공적으로 복원되었습니다.",
+  "settingsRestoreFailed": "복원 실패",
+  "settingsPassword": "비밀번호",
+  "settingsEnterRecoveryKey": "복구 키 입력",
+  "settingsEnterPassword": "비밀번호를 입력하세요",
+  "settingsExportSuccess": "키를 서버 백업으로 내보냈습니다.",
+  "settingsExportNeedBackupFirst": "먼저 키 백업을 생성하세요.",
+  "settingsExportFailed": "내보내기 실패",
+  "settingsResetSuccess": "암호화 재설정 성공",
+  "settingsResetFailed": "재설정 실패",
   "callLeaveMeetingConfirm": "정말 회의를 나가시겠습니까?",
   "chatPokedSomeone": "{name}님을 찔렀어요{suffix}",
   "@chatPokedSomeone": {
@@ -1099,6 +1104,7 @@
   "chatCreatePollTitle": "투표 만들기",
   "chatSubmitPoll": "제출",
   "chatPollQuestionLabel": "투표 질문",
+  "chatEnterPollQuestionHint": "투표 질문을 입력해주세요",
   "chatPollOptionsLabel": "투표 옵션",
   "chatOptionHintWithIndex": "옵션 {index}",
   "@chatOptionHintWithIndex": {
@@ -1276,7 +1282,22 @@
       }
     }
   },
+  "@chatSelectFileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatNoMediaUrlAvailable": "미디어 URL을 사용할 수 없습니다",
+  "chatDownloadFailed": "다운로드 실패: {code}",
+  "@chatDownloadFailed": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "chatErrorWithMessage": "오류: {message}",
   "@chatErrorWithMessage": {
     "placeholders": {
@@ -1287,6 +1308,14 @@
   },
   "chatMusicLinkLabel": "음악 링크",
   "chatRedPacketTransferCannotForward": "홍바오와 송금은 전달할 수 없습니다",
+  "commonShareFailed": "공유 실패: {error}",
+  "@commonShareFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "commonTapToRetry": "탭하여 다시 시도",
   "chatDefaultRedPacketGreeting": "부자 되세요, 행운을 빕니다",
   "groupAllowOthersToSearchAndJoin": "다른 사용자가 검색하고 참여하도록 허용",
@@ -1297,30 +1326,52 @@
   "groupEnterGroupAnnouncement": "그룹 공지를 입력하세요",
   "groupMemberCountClickToCopy": "{count}명, 클릭하여 그룹 ID 복사",
   "groupNoPermissionToEditGroupName": "그룹 이름을 수정할 권한이 없습니다",
-  "commonAppleLogin": "Apple로 로그인",
-  "settingsChangeEmailFailed": "이메일 변경 실패",
-  "settingsChangePassword": "비밀번호 변경",
-  "settingsChangePasswordFailed": "비밀번호 변경 실패",
-  "settingsChangePasswordInfo": "비밀번호를 변경하면 로그아웃되며 새 비밀번호로 로그인해야 합니다.",
-  "settingsCodeSentTo": "인증 코드 전송됨",
-  "commonConfirmNewPassword": "새 비밀번호 확인",
-  "searchConversationLabel": "대화",
-  "settingsCurrentBoundEmail": "현재 연결된 이메일",
-  "settingsCurrentPassword": "현재 비밀번호",
-  "settingsDidNotReceiveCode": "코드를 받지 못하셨나요?",
   "authEmailAddress": "이메일 주소",
-  "settingsEmailChangedSuccess": "이메일이 성공적으로 변경되었습니다",
-  "authEmailRecoveryHint": "비밀번호 복구에 사용됩니다",
-  "settingsEmailSecurityNote": "이메일은 비밀번호 복구에 사용됩니다. 안전하게 보관하세요.",
-  "settingsEnterCurrentPassword": "현재 비밀번호 입력",
   "commonEnterEmailAddress": "이메일 주소 입력",
-  "settingsEnterNewEmail": "새 이메일 주소 입력",
-  "settingsEnterNewPassword": "새 비밀번호 입력",
-  "authEnterRegisteredEmail": "등록한 이메일 주소를 입력하세요",
-  "authEnterResetCode": "재설정 코드 입력",
-  "commonGoogleLogin": "Google로 로그인",
-  "commonWechat": "WeChat",
+  "authEmailRecoveryHint": "비밀번호 복구에 사용됩니다",
   "commonInvalidEmailFormat": "유효한 이메일 주소를 입력하세요",
+  "authOptional": "선택 사항",
+  "authResetPassword": "비밀번호 재설정",
+  "authEnterRegisteredEmail": "등록한 이메일 주소를 입력하세요",
+  "authSendResetCode": "재설정 코드 전송",
+  "authResetCodeSent": "재설정 코드가 {email}로 전송되었습니다",
+  "@authResetCodeSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authEnterResetCode": "재설정 코드 입력",
+  "authSetNewPassword": "새 비밀번호 설정",
+  "commonConfirmNewPassword": "새 비밀번호 확인",
+  "commonNewPassword": "새 비밀번호",
+  "authPasswordResetSuccess": "비밀번호가 성공적으로 재설정되었습니다. 새 비밀번호로 로그인하세요.",
+  "authResetPasswordFailed": "비밀번호 재설정 실패",
+  "settingsChangePassword": "비밀번호 변경",
+  "settingsCurrentPassword": "현재 비밀번호",
+  "settingsEnterCurrentPassword": "현재 비밀번호 입력",
+  "settingsEnterNewPassword": "새 비밀번호 입력",
+  "settingsPasswordChanged": "비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인하세요.",
+  "settingsChangePasswordFailed": "비밀번호 변경 실패",
+  "settingsNewPasswordMustBeDifferent": "새 비밀번호는 현재 비밀번호와 달라야 합니다",
+  "settingsChangePasswordInfo": "비밀번호를 변경하면 로그아웃되며 새 비밀번호로 로그인해야 합니다.",
+  "settingsPasswordRequirements": "비밀번호 요구 사항:",
+  "settingsSecurityNote": "보안을 위해 비밀번호 변경 후 모든 기기에서 다시 로그인해야 합니다.",
+  "settingsSecurity": "보안",
+  "settingsCurrentBoundEmail": "현재 연결된 이메일",
+  "settingsNewEmailAddress": "새 이메일 주소",
+  "settingsEnterNewEmail": "새 이메일 주소 입력",
+  "settingsVerificationCode": "인증 코드",
+  "settingsVerificationCodeSent": "인증 코드가 전송되었습니다",
+  "settingsCodeSentTo": "인증 코드 전송됨",
+  "settingsDidNotReceiveCode": "코드를 받지 못하셨나요?",
+  "settingsEmailChangedSuccess": "이메일이 성공적으로 변경되었습니다",
+  "settingsChangeEmailFailed": "이메일 변경 실패",
+  "settingsEmailSecurityNote": "이메일은 비밀번호 복구에 사용됩니다. 안전하게 보관하세요.",
+  "commonGoogleLogin": "Google로 로그인",
+  "commonAppleLogin": "Apple로 로그인",
+  "commonWechat": "위챗",
   "settingsLanguage": "언어",
   "settingsLanguageChanged": "언어가 변경되었습니다",
   "settingsTranslation": "번역",
@@ -1328,28 +1379,64 @@
   "settingsTranslateDescription": "메시지를 번역할 언어를 선택하세요.",
   "settingsAutoTranslate": "수신 메시지 자동 번역",
   "settingsAutoTranslateDescription": "채팅에서 수신한 메시지를 선택한 언어로 자동 번역합니다.",
-  "settingsNewEmailAddress": "새 이메일 주소",
-  "commonNewPassword": "새 비밀번호",
-  "settingsNewPasswordMustBeDifferent": "새 비밀번호는 현재 비밀번호와 달라야 합니다",
-  "authOptional": "선택 사항",
-  "settingsPasswordChanged": "비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인하세요.",
-  "settingsPasswordRequirements": "비밀번호 요구 사항:",
-  "authPasswordResetSuccess": "비밀번호가 성공적으로 재설정되었습니다. 새 비밀번호로 로그인하세요.",
-  "authResetCodeSent": "재설정 코드가 {email}로 전송되었습니다",
-  "authResetPassword": "비밀번호 재설정",
-  "authResetPasswordFailed": "비밀번호 재설정 실패",
-  "settingsSecurity": "보안",
-  "settingsSecurityNote": "보안을 위해 비밀번호 변경 후 모든 기기에서 다시 로그인해야 합니다.",
-  "authSendResetCode": "재설정 코드 전송",
-  "authSetNewPassword": "새 비밀번호 설정",
-  "settingsVerificationCode": "인증 코드",
-  "settingsVerificationCodeSent": "인증 코드가 전송되었습니다",
+  "settingsBiometricLogin": "생체 인식 로그인",
+  "authLoginWithBiometric": "{type}으로 로그인",
+  "@authLoginWithBiometric": {
+    "placeholders": {
+      "type": {
+        "type": "Object"
+      }
+    }
+  },
+  "settingsBiometricLoginEnabled": "생체 인식 로그인이 활성화되었습니다",
+  "settingsBiometricLoginDisabled": "생체 인식 로그인이 비활성화되었습니다",
+  "settingsEnableBiometricLogin": "생체 인식 로그인 활성화",
+  "settingsBiometricEnabled": "활성화됨 - 생체 인식으로 로그인",
+  "settingsBiometricDisabled": "비활성화됨 - 탭하여 활성화",
+  "settingsBiometricNeedRelogin": "생체 인식 로그인을 활성화하려면 로그아웃 후 다시 로그인하세요",
+  "authOr": "또는",
   "qrcodeCameraPermissionRestricted": "이 기기에서 카메라 접근이 제한되어 있습니다",
-  "contactCreateTag": "Create Tag",
-  "contactEnterTagName": "Enter tag name",
-  "contactEditTag": "Edit Tag",
-  "contactDeleteTag": "Delete Tag",
-  "contactDeleteTagConfirm": "Are you sure you want to delete the tag \"{tagName}\"?",
+  "authPasskeyLabel": "패스키",
+  "authGoogleLabel": "구글",
+  "authAppleLabel": "사과",
+  "authSsoLabel": "SSO",
+  "transferAmountHintZero": "0.00",
+  "commonMatrixIdHint": "@username:server.com",
+  "authServerAddressHint": "https://m.si46.world",
+  "authEmailExampleHint": "example@email.com",
+  "authVerificationCodePlaceholder": "------",
+  "profileEnterPokeSuffixHint": "쿡 찌르기 접미사를 입력하세요, 예: 어깨를",
+  "groupAlbum": "그룹 앨범",
+  "groupFiles": "그룹 파일",
+  "groupImages": "이미지",
+  "groupVideos": "동영상",
+  "groupTotal": "전체",
+  "groupSize": "크기",
+  "groupNoMedia": "미디어 없음",
+  "groupNoMediaDescription": "이 그룹에 아직 사진이나 동영상이 없습니다",
+  "groupDocuments": "문서",
+  "groupNoFiles": "파일 없음",
+  "groupNoFilesDescription": "이 그룹에 아직 파일이 없습니다",
+  "groupDownloadStarted": "{filename} 다운로드 중...",
+  "@groupDownloadStarted": {
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      }
+    }
+  },
+  "contactNoCommonGroups": "공통 그룹 없음",
+  "contactNoCommonGroupsDescription": "공통으로 가입한 그룹이 없습니다",
+  "chatVoiceMessage": "음성",
+  "chatMessage": "메시지",
+  "conversationHideChat": "숨기기",
+  "settingsQuickReply": "빠른 답장",
+  "commonTranslate": "번역",
+  "contactCreateTag": "태그 생성",
+  "contactEnterTagName": "태그 이름을 입력하세요.",
+  "contactEditTag": "태그 편집",
+  "contactDeleteTag": "태그 삭제",
+  "contactDeleteTagConfirm": "\"{tagName}\" 태그를 삭제하시겠습니까?",
   "@contactDeleteTagConfirm": {
     "placeholders": {
       "tagName": {
@@ -1357,39 +1444,39 @@
       }
     }
   },
-  "contactNoTags": "No tags yet",
-  "contactFriendPermissions": "Friend Permissions",
-  "contactSetChatOnly": "Set as Chat-only",
-  "contactChatOnlyDesc": "Can only chat with you, other content will be hidden",
-  "contactHideMyMoments": "Hide My Moments",
-  "contactHideMyMomentsDesc": "This friend cannot see my Moments",
-  "contactHideTheirMoments": "Hide Their Moments",
-  "contactHideTheirMomentsDesc": "Don't see this friend's Moments",
-  "contactHideMyStatus": "Hide My Status",
-  "contactHideMyStatusDesc": "This friend cannot see my status updates",
-  "contactNoChatOnlyFriends": "No chat-only friends",
-  "contactNoOfficialAccounts": "No official accounts",
-  "contactFollowOfficialAccountsDesc": "Follow official accounts to get the latest updates",
-  "contactNoServiceAccounts": "No service accounts",
-  "contactSubscribeServiceAccountsDesc": "Subscribe to service accounts for convenient services",
-  "contactNoEnterpriseContacts": "No enterprise contacts",
-  "contactEnterpriseContactsDesc": "Enterprise contacts will be displayed here",
-  "profileCardPack": "Card Pack",
-  "profileOrders": "Orders",
-  "profileNoOrders": "No orders",
-  "profileOrdersDesc": "Your orders will be displayed here",
-  "profileNoCards": "No cards",
-  "profileCardsDesc": "Your cards will be displayed here",
-  "favoriteEnterTagsHint": "Enter tags separated by commas",
-  "favoriteTagsUpdated": "Tags updated",
-  "favoriteForwardedContent": "Content forwarded",
-  "favoriteEnterNoteContent": "Enter note content",
-  "favoriteNoteAdded": "Note added",
-  "favoriteLinkTitle": "Link title",
+  "contactNoTags": "아직 태그가 없습니다.",
+  "contactFriendPermissions": "친구 권한",
+  "contactSetChatOnly": "채팅 전용으로 설정",
+  "contactChatOnlyDesc": "나와만 채팅할 수 있으며 다른 콘텐츠는 숨겨집니다.",
+  "contactHideMyMoments": "나의 순간 숨기기",
+  "contactHideMyMomentsDesc": "이 친구는 내 순간을 볼 수 없습니다.",
+  "contactHideTheirMoments": "그들의 순간을 숨기세요",
+  "contactHideTheirMomentsDesc": "이 친구의 순간을 보지 마세요.",
+  "contactHideMyStatus": "내 상태 숨기기",
+  "contactHideMyStatusDesc": "이 친구는 내 상태 업데이트를 볼 수 없습니다",
+  "contactNoChatOnlyFriends": "채팅 전용 친구 없음",
+  "contactNoOfficialAccounts": "공식 계정 없음",
+  "contactFollowOfficialAccountsDesc": "최신 업데이트를 받으려면 공식 계정을 팔로우하세요.",
+  "contactNoServiceAccounts": "서비스 계정 없음",
+  "contactSubscribeServiceAccountsDesc": "편리한 서비스를 위해 서비스 계정을 구독하세요",
+  "contactNoEnterpriseContacts": "기업 연락처 없음",
+  "contactEnterpriseContactsDesc": "기업 연락처가 여기에 표시됩니다.",
+  "profileCardPack": "카드팩",
+  "profileOrders": "주문",
+  "profileNoOrders": "주문 없음",
+  "profileOrdersDesc": "귀하의 주문이 여기에 표시됩니다",
+  "profileNoCards": "카드 없음",
+  "profileCardsDesc": "귀하의 카드가 여기에 표시됩니다",
+  "favoriteEnterTagsHint": "쉼표로 구분하여 태그를 입력하세요.",
+  "favoriteTagsUpdated": "태그가 업데이트되었습니다.",
+  "favoriteForwardedContent": "전달된 콘텐츠",
+  "favoriteEnterNoteContent": "메모 내용 입력",
+  "favoriteNoteAdded": "메모가 추가됨",
+  "favoriteLinkTitle": "링크 제목",
   "favoriteLinkUrl": "https://",
-  "favoriteLinkAdded": "Link added",
-  "contactPhotoAdded": "Photo added",
-  "contactEnterPhone": "Enter phone number",
+  "favoriteLinkAdded": "링크가 추가됨",
+  "contactPhotoAdded": "사진이 추가됨",
+  "contactEnterPhone": "전화번호를 입력하세요",
   "commonConversationWithId": "대화: {roomId}",
   "commonContactWithId": "연락처: {userId}",
   "commonDiscover": "발견",
@@ -1408,8 +1495,15 @@
   "settingsDoNotDisturbDescription": "지정된 시간 동안 알림을 받지 않습니다",
   "settingsStartTime": "시작 시간",
   "settingsEndTime": "종료 시간",
+  "settingsDeleteQuickReply": "빠른 답장 삭제",
+  "settingsEditQuickReply": "빠른 답장 편집",
+  "settingsAddQuickReply": "빠른 답장 추가",
+  "settingsManageQuickReplies": "빠른 답장 관리",
+  "settingsNoQuickReplies": "빠른 답장 없음",
+  "settingsDefaultQuickReplies": "기본 빠른 답장이 표시됩니다",
   "settingsWhoCanSee": "볼 수 있는 사람",
   "settingsLastSeen": "마지막 접속",
+  "settingsHiddenChats": "숨겨진 채팅",
   "settingsMessagesLabel": "메시지",
   "settingsAllowStrangerMessages": "모르는 사람의 메시지 허용",
   "settingsReceiveMessagesFromNonContacts": "연락처에 없는 사람의 메시지 받기",
@@ -1440,6 +1534,9 @@
   "settingsOpenSourceLicenses": "오픈소스 라이선스",
   "settingsFeedbackAndSuggestions": "피드백 및 제안",
   "settingsBuiltOnMatrix": "Matrix 프로토콜 기반",
+  "settingsNoHiddenChats": "숨겨진 채팅 없음",
+  "settingsNoHiddenChatsDescription": "숨긴 채팅이 여기에 표시됩니다",
+  "settingsUnhideChat": "숨기기 해제",
   "settingsDarkMode": "다크 모드",
   "settingsFontSize": "글꼴 크기",
   "settingsBubbleStyle": "말풍선 스타일",
@@ -1506,6 +1603,10 @@
   "chatLongitude": "경도",
   "groupDescriptionUpdated": "그룹 설명이 업데이트되었습니다",
   "groupAvatarUpdated": "그룹 아바타가 업데이트되었습니다",
+  "groupVisibilityUpdated": "그룹 공개 상태가 업데이트되었습니다.",
+  "groupChannelCreated": "채널이 생성되었습니다",
+  "groupChannelUpdated": "채널이 업데이트되었습니다.",
+  "groupChannelDeleted": "채널이 삭제되었습니다.",
   "callDecline": "거절",
   "callAnswer": "응답",
   "callIncomingVideoCall": "영상 통화 수신",
@@ -1614,8 +1715,22 @@
       }
     }
   },
+  "storyViewers": "조회자",
+  "storyNoViewers": "아직 조회자 없음",
+  "storyReplyToStory": "스토리에 답장...",
   "commonCopiedToClipboard": "클립보드에 복사됨",
   "commonMore": "더보기",
+  "commonTranslating": "번역 중...",
+  "commonTranslatedFrom": "{language}에서 번역됨",
+  "@commonTranslatedFrom": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "commonTranslation": "번역",
+  "commonTranslationFailed": "번역 실패",
   "commonAllRead": "모두 읽음",
   "commonReadCount": "{count}명 읽음",
   "commonYouRecalledMessage": "메시지를 취소했습니다",
@@ -1646,135 +1761,568 @@
       }
     }
   },
-  "authAppleLabel": "Apple",
-  "authEmailExampleHint": "example@email.com",
-  "authGoogleLabel": "Google",
-  "authLoginWithBiometric": "{type}으로 로그인",
-  "@authLoginWithBiometric": {
+  "securityDeviceIdRequired": "장치 ID가 필요합니다",
+  "securityVerificationStartFailed": "확인 시작 실패: {error}",
+  "@securityVerificationStartFailed": {
     "placeholders": {
-      "type": {
-        "type": "Object"
-      }
-    }
-  },
-  "authOr": "또는",
-  "authPasskeyLabel": "패스키",
-  "authServerAddressHint": "https://m.si46.world",
-  "authSsoLabel": "SSO",
-  "authVerificationCodePlaceholder": "------",
-  "chatCallDurationLabel": "통화 시간",
-  "chatCallNotAnswered": "응답 없음",
-  "chatMessage": "메시지",
-  "chatVideoCallCancelled": "영상 통화 취소됨",
-  "chatVoiceCallCancelled": "음성 통화 취소됨",
-  "chatVoiceMessage": "음성",
-  "commonMatrixIdHint": "@username:server.com",
-  "commonTranslate": "번역",
-  "commonTranslatedFrom": "{language}에서 번역됨",
-  "@commonTranslatedFrom": {
-    "placeholders": {
-      "language": {
+      "error": {
         "type": "String"
       }
     }
   },
-  "commonTranslating": "번역 중...",
-  "commonTranslation": "번역",
-  "commonTranslationFailed": "번역 실패",
-  "contactNoCommonGroups": "공통 그룹 없음",
-  "contactNoCommonGroupsDescription": "공통으로 가입한 그룹이 없습니다",
-  "conversationHideChat": "숨기기",
-  "groupAlbum": "그룹 앨범",
-  "groupDocuments": "문서",
-  "groupDownloadStarted": "{filename} 다운로드 중...",
-  "@groupDownloadStarted": {
+  "securityVerificationFailed": "확인 실패",
+  "securityVerificationFailedWithReason": "확인 실패: {reason}",
+  "@securityVerificationFailedWithReason": {
     "placeholders": {
-      "filename": {
+      "reason": {
         "type": "String"
       }
     }
   },
-  "groupFiles": "그룹 파일",
-  "groupImages": "이미지",
-  "groupNoFiles": "파일 없음",
-  "groupNoFilesDescription": "이 그룹에 아직 파일이 없습니다",
-  "groupNoMedia": "미디어 없음",
-  "groupNoMediaDescription": "이 그룹에 아직 사진이나 동영상이 없습니다",
-  "groupSize": "크기",
-  "groupTotal": "전체",
-  "groupVideos": "동영상",
-  "profileEnterPokeSuffixHint": "쿡 찌르기 접미사를 입력하세요, 예: 어깨를",
-  "settingsAddQuickReply": "빠른 답장 추가",
-  "settingsBiometricDisabled": "비활성화됨 - 탭하여 활성화",
-  "settingsBiometricEnabled": "활성화됨 - 생체 인식으로 로그인",
-  "settingsBiometricLogin": "생체 인식 로그인",
-  "settingsBiometricLoginDisabled": "생체 인식 로그인이 비활성화되었습니다",
-  "settingsBiometricLoginEnabled": "생체 인식 로그인이 활성화되었습니다",
-  "settingsBiometricNeedRelogin": "생체 인식 로그인을 활성화하려면 로그아웃 후 다시 로그인하세요",
-  "settingsDefaultQuickReplies": "기본 빠른 답장이 표시됩니다",
-  "settingsDeleteQuickReply": "빠른 답장 삭제",
-  "settingsEditQuickReply": "빠른 답장 편집",
-  "settingsEnableBiometricLogin": "생체 인식 로그인 활성화",
-  "settingsHiddenChats": "숨겨진 채팅",
-  "settingsManageQuickReplies": "빠른 답장 관리",
-  "settingsNoHiddenChats": "숨겨진 채팅 없음",
-  "settingsNoHiddenChatsDescription": "숨긴 채팅이 여기에 표시됩니다",
-  "settingsNoQuickReplies": "빠른 답장 없음",
-  "settingsQuickReply": "빠른 답장",
-  "settingsUnhideChat": "숨기기 해제",
-  "storyNoViewers": "아직 조회자 없음",
-  "storyReplyToStory": "스토리에 답장...",
-  "storyViewers": "조회자",
-  "transferAmountHintZero": "0.00",
-  "liveLocation": "Live Location",
-  "stopLiveLocation": "Stop Sharing",
-  "startLiveLocation": "Start Sharing",
-  "selectDuration": "Select Duration",
-  "groupChatFiles": "Chat Files",
-  "groupLinks": "Links",
-  "groupNoLinks": "No links yet",
-  "chatBackground": "Chat Background",
-  "solidColors": "Solid Colors",
-  "gradients": "Gradients",
-  "defaultBackground": "Default",
-  "settingsFontSizeSlider": "Font Size",
-  "autoDownload": "Auto-Download",
-  "images": "Images",
-  "voice": "Voice",
-  "video": "Video",
-  "files": "Files",
-  "mobileData": "Mobile Data",
-  "roaming": "Roaming",
-  "storageManagement": "Storage",
-  "totalUsage": "Total Usage",
-  "cache": "Cache",
-  "other": "Other",
-  "clearCache": "Clear Cache",
-  "cacheCleared": "Cache cleared",
-  "clearCacheFailed": "Failed to clear cache",
-  "confirmClearCache": "Clear all cache data?",
-  "mapView": "Map View",
-  "liveLocationSharingCount": "{count} people sharing location",
-  "minutes15": "15 minutes",
-  "minutes30": "30 minutes",
-  "hour1": "1 hour",
-  "hours8": "8 hours",
-  "personalCard": "Personal Card",
-  "downloadFailed": "Download failed",
-  "locationExpired": "Expired",
-  "secondsRemaining": "{count}s",
-  "minutesRemaining": "{count}min",
-  "hoursMinutesRemaining": "{hours}h {minutes}min",
-  "favoriteMessages": "Favorites",
-  "linksCopied": "Link copied",
-  "noLinksFound": "No links found",
-  "roomStorageRanking": "Room Storage Ranking",
-  "downloadComplete": "Download complete",
-  "downloading": "Downloading...",
-  "draftSaved": "Draft saved",
-  "voiceRecording": "Voice Recording",
-  "searchLocation": "Search Location",
-  "tapToSearch": "Tap to search",
+  "securityEmojiMismatchRejected": "확인 거부됨 - 그림 이모티콘이 일치하지 않음",
+  "securityWaitingForDeviceAccept": "다른 기기가 수락할 때까지 기다리는 중...",
+  "securityVerifyDevice": "이 장치를 확인하세요",
+  "securityConfirmEmojiMatch": "아래 이모티콘이 두 기기에 동일한 순서로 표시되는지 확인하세요.",
+  "securityEmojiDontMatch": "일치하지 않습니다",
+  "securityEmojiMatch": "일치합니다",
+  "securityWaitingForDeviceConfirm": "다른 기기의 확인을 기다리는 중...",
+  "securityVerificationSuccess": "확인에 성공했습니다.",
+  "securityDeviceVerifiedTrusted": "이제 이 기기는 인증되었으며 신뢰할 수 있습니다.",
+  "securityCompareEmoji": "두 기기의 이모티콘을 비교해보세요",
+  "securityCompareNumbers": "두 장치의 숫자를 비교하십시오",
+  "commonTryAgain": "다시 시도",
+  "commonDone": "완료",
+  "chatExportTitle": "채팅 내보내기",
+  "chatExportSuccess": "내보내기 성공",
+  "chatExportFailed": "내보내기 실패: {error}",
+  "@chatExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chatExportFormat": "내보내기 형식",
+  "chatExportHtmlDesc": "스타일이 지정된 레이아웃으로 모든 브라우저에서 읽을 수 있음",
+  "chatExportJsonDesc": "기계가 읽을 수 있는 구조화된 데이터 형식",
+  "chatExportDateRange": "기간",
+  "chatExportAll": "모든 메시지",
+  "chatExportLastWeek": "지난 7일",
+  "chatExportLastMonth": "지난달",
+  "chatExportLast3Months": "지난 3개월",
+  "chatExportMessageCount": "내보낼 메시지",
+  "chatExportButton": "내보내기 및 공유",
+  "chatMediaGallery": "미디어 갤러리",
+  "chatExportHistory": "채팅 기록 내보내기",
+  "pdfLoadFailed": "PDF를 로드하지 못했습니다.",
+  "pdfPageIndicator": "{current} / {total}",
+  "@pdfPageIndicator": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mediaAll": "모두",
+  "mediaImages": "이미지",
+  "mediaVideos": "비디오",
+  "mediaFiles": "파일",
+  "mediaAudio": "오디오",
+  "mediaItemsCount": "{count} 항목",
+  "@mediaItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mediaNoMediaFound": "미디어를 찾을 수 없습니다.",
+  "spacesTitle": "커뮤니티",
+  "spacesCreate": "커뮤니티 만들기",
+  "spacesJoined": "가입됨",
+  "spacesDiscover": "발견하다",
+  "spacesNoJoined": "아직 가입한 커뮤니티가 없습니다.",
+  "spacesExplore": "커뮤니티 탐색",
+  "spacesNoPublic": "공개 커뮤니티를 찾을 수 없습니다.",
+  "spacesJoin": "가입",
+  "spacesSubSpaces": "하위 커뮤니티",
+  "spacesChannels": "채널",
+  "spacesMembersCount": "{count} 회원들",
+  "@spacesMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spacesPublic": "공개",
+  "spacesPrivate": "비공개",
+  "spacesSuggested": "제안",
+  "spacesChannelsCount": "{count} 채널",
+  "@spacesChannelsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "callInCallChat": "통화 중 채팅",
+  "callMessagesCount": "{count} 메시지",
+  "@callMessagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "callNoMessagesYet": "아직 메시지가 없습니다.\n시작하려면 메시지를 보내세요.",
+  "callTypeMessage": "메시지를 입력하세요...",
+  "callYouSender": "당신",
+  "callChatLabel": "채팅",
+  "chatEdited": "편집됨",
+  "chatEditHistory": "편집 기록",
+  "chatOriginalMessage": "원본",
+  "chatEditedAt": "{time}에서 편집됨",
+  "@chatEditedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "chatViewOnce": "한 번 보기",
+  "chatViewOncePhoto": "한 번 사진 보기",
+  "chatViewOnceVideo": "동영상 한 번 보기",
+  "chatViewOnceViewed": "본",
+  "chatViewOnceExpired": "만료됨",
+  "chatViewOnceTap": "보려면 탭하세요.",
+  "chatAutoFaceBlur": "자동 얼굴 흐림",
+  "chatAutoFaceBlurDesc": "사진을 보낼 때 얼굴을 자동으로 흐리게 처리",
+  "threadReplyInThread": "스레드로 답장하기",
+  "threadReplies": "{count} 답글",
+  "@threadReplies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "threadReply": "답글 1개",
+  "threadLatestReply": "최신: {preview}",
+  "@threadLatestReply": {
+    "placeholders": {
+      "preview": {
+        "type": "String"
+      }
+    }
+  },
+  "threadTitle": "스레드",
+  "threadReplyPlaceholder": "스레드로 답장하세요...",
+  "threadParticipants": "{count} 참가자",
+  "@threadParticipants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "voiceRoomTitle": "보이스룸",
+  "voiceRoomCreate": "보이스룸 생성",
+  "voiceRoomJoin": "가입",
+  "voiceRoomLeave": "휴가",
+  "voiceRoomEnd": "엔드룸",
+  "voiceRoomRaiseHand": "손 들기",
+  "voiceRoomLowerHand": "낮은 손",
+  "voiceRoomMute": "음소거",
+  "voiceRoomUnmute": "음소거 해제",
+  "voiceRoomHost": "호스트",
+  "voiceRoomSpeakers": "스피커",
+  "voiceRoomListeners": "청취자",
+  "voiceRoomLive": "라이브",
+  "voiceRoomEnded": "종료됨",
+  "voiceRoomScheduled": "예정됨",
+  "voiceRoomApprove": "승인하다",
+  "voiceRoomDemote": "리스너로 이동",
+  "voiceRoomHandRaised": "{name}가 손을 들었습니다.",
+  "@voiceRoomHandRaised": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceRoomName": "객실명",
+  "voiceRoomTopic": "주제(선택사항)",
+  "voiceRoomNoActive": "활성 음성 회의실이 없습니다.",
+  "voiceRoomConnecting": "연결 중...",
+  "usernameTitle": "사용자 이름",
+  "usernameSet": "사용자 이름 설정",
+  "usernameChange": "사용자 이름 변경",
+  "usernamePlaceholder": "사용자 이름을 입력하세요",
+  "usernameAvailable": "사용 가능한 사용자 이름",
+  "usernameUnavailable": "이미 사용 중인 사용자 이름",
+  "usernameInvalid": "3~30자, 소문자, 숫자, 밑줄. 문자로 시작해야 합니다.",
+  "usernameReserved": "이 사용자 이름은 예약되어 있습니다.",
+  "usernameSaved": "사용자 이름이 저장되었습니다",
+  "usernameSearchHint": "@사용자 이름으로 검색",
+  "ensName": "ENS 이름",
+  "ensLinked": "ENS에 연결됨",
+  "ensResolving": "ENS 해결 중...",
+  "ensNotFound": "ENS 이름을 찾을 수 없습니다.",
+  "tokenGateTitle": "토큰 게이트",
+  "tokenGateEnable": "토큰 게이트 활성화",
+  "tokenGateDisable": "토큰 게이트 비활성화",
+  "tokenGateAddRule": "규칙 추가",
+  "tokenGateRemoveRule": "규칙 제거",
+  "tokenGateContractAddress": "계약 주소",
+  "tokenGateMinBalance": "최소 잔액",
+  "tokenGateTokenId": "토큰 ID(ERC-1155)",
+  "tokenGateChainId": "체인 ID",
+  "tokenGateVerifying": "토큰 보유 확인 중...",
+  "tokenGateVerified": "확인 통과",
+  "tokenGateDenied": "토큰 요구 사항을 충족하지 않습니다.",
+  "tokenGateOperatorAnd": "모든 규칙을 충족해야 함",
+  "tokenGateOperatorOr": "모든 규칙을 충족해야 합니다.",
+  "tokenGateRuleErc20": "ERC-20 토큰",
+  "tokenGateRuleErc721": "NFT(ERC-721)",
+  "tokenGateRuleErc1155": "멀티 토큰(ERC-1155)",
+  "tokenGateRuleNative": "네이티브 토큰",
+  "tokenGateSaved": "토큰 게이트가 저장되었습니다.",
+  "tokenGateEnableDescription": "회원이 가입하려면 토큰을 보유해야 합니다.",
+  "tokenGateOperator": "규칙 논리",
+  "tokenGateRules": "규칙",
+  "tokenGateSymbol": "기호(선택사항)",
+  "tokenGateChain": "체인",
+  "tokenGateTokenStandard": "토큰 표준",
+  "tokenGateDenialMessage": "거부 메시지",
+  "tokenGateDenialMessageHint": "인증 실패 시 표시되는 메시지",
+  "tokenGateVerifyTitle": "토큰 검증",
+  "tokenGateVerifyPassed": "확인 통과",
+  "tokenGateVerifyFailed": "확인 실패",
+  "tokenGateRetryVerify": "재시도",
+  "tokenGateRequired": "필수",
+  "tokenGateYourBalance": "귀하의 잔액",
+  "tokenGateRulesActive": "규칙 활성",
+  "tokenGateDisabled": "장애인",
+  "ensNotBound": "구속되지 않음",
+  "liveLocation": "실시간 위치",
+  "stopLiveLocation": "공유 중지",
+  "startLiveLocation": "공유 시작",
+  "selectDuration": "기간 선택",
+  "groupChatFiles": "채팅 파일",
+  "groupLinks": "링크",
+  "groupNoLinks": "아직 링크가 없습니다.",
+  "chatBackground": "채팅 배경",
+  "solidColors": "단색",
+  "gradients": "그라데이션",
+  "defaultBackground": "기본값",
+  "settingsFontSizeSlider": "글꼴 크기",
+  "autoDownload": "자동 다운로드",
+  "images": "이미지",
+  "voice": "음성",
+  "video": "비디오",
+  "files": "파일",
+  "mobileData": "모바일 데이터",
+  "roaming": "로밍",
+  "storageManagement": "저장",
+  "totalUsage": "총 사용량",
+  "cache": "캐시",
+  "other": "기타",
+  "clearCache": "캐시 지우기",
+  "cacheCleared": "캐시가 삭제되었습니다.",
+  "clearCacheFailed": "캐시를 지우지 못했습니다.",
+  "confirmClearCache": "모든 캐시 데이터를 삭제하시겠습니까?",
+  "mapView": "지도 보기",
+  "liveLocationSharingCount": "{count} 사람들이 위치를 공유하고 있습니다.",
+  "@liveLocationSharingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutes15": "15분",
+  "minutes30": "30분",
+  "hour1": "1시간",
+  "hours8": "8시간",
+  "personalCard": "개인카드",
+  "downloadFailed": "다운로드 실패",
+  "locationExpired": "만료됨",
+  "secondsRemaining": "{count}",
+  "@secondsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesRemaining": "{count}분",
+  "@minutesRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursMinutesRemaining": "{hours}시간 {minutes}분",
+  "@hoursMinutesRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "favoriteMessages": "즐겨찾기",
+  "linksCopied": "링크가 복사되었습니다",
+  "noLinksFound": "링크를 찾을 수 없습니다",
+  "roomStorageRanking": "객실 수납 순위",
+  "downloadComplete": "다운로드 완료",
+  "downloading": "다운로드 중...",
+  "draftSaved": "초안이 저장되었습니다.",
+  "voiceRecording": "음성 녹음",
+  "searchLocation": "위치 검색",
+  "tapToSearch": "검색하려면 탭하세요.",
+  "settingsThisDevice": "이 장치",
+  "settingsJustNow": "방금",
+  "settingsDeviceId": "장치 ID",
+  "settingsStatus": "상태",
+  "settingsLastActive": "마지막 활동",
+  "settingsIpAddress": "IP 주소",
+  "settingsRenameDevice": "장치 이름 바꾸기",
+  "settingsDeviceNameHint": "장치 이름을 입력하세요",
+  "settingsDeviceRenamed": "장치 이름이 변경됨",
+  "settingsRenameFailed": "이름 바꾸기 실패",
+  "settingsRemoteLogout": "원격 로그아웃",
+  "settingsRemoteLogoutConfirm": "\"{deviceName}\"에서 로그아웃하시겠습니까? 이 작업은 취소할 수 없습니다.",
+  "@settingsRemoteLogoutConfirm": {
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsDeviceLoggedOut": "기기가 로그아웃되었습니다.",
+  "settingsLogoutFailed": "로그아웃 실패",
+  "settingsLogout": "로그아웃",
+  "settingsVerifyIdentity": "신원 확인",
+  "settingsEnterPasswordToConfirm": "이 작업을 확인하려면 비밀번호를 입력하세요.",
+  "scheduledSendTitle": "메시지 예약",
+  "scheduledSendInOneHour": "1시간 후",
+  "scheduledSendTonight": "오늘 밤(오후 8시)",
+  "scheduledSendTomorrowMorning": "내일 아침 (오전 9시)",
+  "scheduledSendCustom": "날짜 및 시간 선택",
+  "scheduledMessageLabel": "예정됨",
+  "scheduledMessageCancel": "예약된 메시지 취소",
+  "chatLockTitle": "채팅 잠금",
+  "chatLockEnable": "이 채팅을 잠그세요",
+  "chatLockDisable": "이 채팅 잠금 해제",
+  "chatLockDescription": "잠긴 채팅을 열려면 생체 인식 또는 PIN 인증이 필요합니다.",
+  "chatLockVerifyTitle": "채팅이 잠겼습니다.",
+  "chatLockVerifySubtitle": "이 채팅에 액세스하려면 인증하세요",
+  "chatLockVerifyFailed": "확인 실패",
+  "chatLockEnabled": "채팅이 잠겼습니다.",
+  "chatLockDisabled": "채팅 잠금 해제됨",
+  "chatLockPinTitle": "PIN 입력",
+  "chatLockPinSetTitle": "PIN 설정",
+  "chatLockPinConfirmTitle": "PIN 확인",
+  "chatLockPinMismatch": "PIN이 일치하지 않습니다",
+  "chatLockUseBiometric": "생체 인식 사용",
+  "chatLockUsePin": "PIN 사용",
+  "mediaEditorUndo": "실행 취소",
+  "mediaEditorRedo": "다시 실행",
+  "mediaEditorCrop": "자르기",
+  "mediaEditorFilter": "필터",
+  "mediaEditorDraw": "무승부",
+  "mediaEditorText": "텍스트",
+  "aiAssistant": "AI 어시스턴트",
+  "aiAssistantWelcome": "안녕하세요! 저는 N42 AI 도우미입니다. 어떻게 도와드릴까요?",
+  "aiAssistantNotConfigured": "AI 서비스가 구성되지 않았습니다.",
+  "aiAssistantSettings": "AI 설정",
+  "aiAssistantClearHistory": "채팅 기록 지우기",
+  "aiAssistantClearHistoryConfirm": "AI 채팅 기록을 모두 삭제하시겠습니까?",
+  "aiAssistantStopGenerating": "생성 중지",
+  "aiAssistantModel": "모델",
+  "aiAssistantTemperature": "온도",
+  "aiAssistantMaxTokens": "최대 토큰",
+  "aiAssistantContextWindow": "컨텍스트 창",
+  "aiAssistantServiceStatus": "서비스 상태",
+  "aiAssistantAvailable": "가능",
+  "aiAssistantUnavailable": "이용 불가",
+  "aiSummarize": "AI 요약",
+  "aiSummarizeUnread": "{count} 읽지 않은 메시지 요약",
+  "@aiSummarizeUnread": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummarizeLoading": "요약...",
+  "aiSummarizeError": "요약하지 못했습니다.",
+  "aiRewrite": "AI 재작성",
+  "aiRewriteFormal": "정장",
+  "aiRewriteCasual": "캐주얼",
+  "aiRewritePlayful": "놀기 좋아하는",
+  "aiRewriteProfessional": "전문가",
+  "aiRewriteAccept": "사용",
+  "aiRewriteCancel": "취소",
+  "aiRewriteLoading": "재작성 중...",
+  "aiLinkSummary": "AI 요약",
+  "aiLinkSummaryAnalyzing": "분석 중...",
+  "chatFolderManagement": "폴더 관리",
+  "chatFolderSystem": "시스템 폴더",
+  "chatFolderCustom": "사용자 정의 폴더",
+  "chatFolderEmpty": "아직 맞춤 폴더가 없습니다.",
+  "chatFolderCreate": "폴더 생성",
+  "chatFolderEdit": "폴더 편집",
+  "chatFolderNameHint": "폴더 이름",
+  "chatFolderAll": "모두",
+  "chatFolderUnread": "읽지 않음",
+  "chatFolderPersonal": "개인",
+  "chatFolderGroups": "그룹",
+  "chatFolderChannels": "채널",
+  "chatFolderMuted": "음소거됨",
+  "storyAddMusic": "음악 추가",
+  "storyChangeMusic": "음악 변경",
+  "storyBackgroundMusic": "배경음악",
+  "storyMusicPreview": "미리보기(최대 15초)",
+  "storyChooseFromDevice": "장치에서 선택",
+  "storyUseThisMusic": "이 음악을 사용하세요",
+  "authPasskeyNotSupported": "이 기기에서는 패스키가 지원되지 않습니다.",
+  "authPasskeyRegister": "패스키 등록",
+  "authPasskeyNoRegistered": "등록된 비밀번호가 없습니다.",
+  "authPasskeyRegisterHint": "이 계정에 대한 암호 키를 등록하세요. 독립형 암호 키 로그인은 나중에 활성화됩니다.",
+  "authPasskeyNameYours": "패스키 이름 지정",
+  "authPasskeyRegistered": "이 계정에 비밀번호가 저장되었습니다.",
+  "authPasskeyDeleted": "이 계정에서 비밀번호가 삭제되었습니다.",
+  "authPasskeyDeleteConfirm": "암호키 '{name}'를 삭제하시겠습니까? 나중에 암호키 로그인을 사용하기 전에 다시 등록해야 합니다.",
+  "@authPasskeyDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "momentVisibilityPublic": "공개",
+  "momentVisibilityPrivate": "비공개",
+  "momentVisibilityPartial": "선택된 친구",
+  "momentVisibilityExcluded": "일부 친구 제외",
+  "momentUserMoments": "{userName}의 순간",
+  "@momentUserMoments": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "momentForwardTo": "다음으로 전달",
+  "momentForwardSuccess": "성공적으로 전달되었습니다",
+  "momentSelectFriends": "친구 선택",
+  "momentSelectTags": "태그로 선택",
+  "momentSelectedCount": "선택됨({count})",
+  "@momentSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentNoMomentsYet": "아직 활동 시간이 없습니다.",
+  "momentForwardMoment": "앞으로 순간",
+  "momentAddComment": "댓글 추가...",
+  "momentForwardContent": "[순간] {content}",
+  "@momentForwardContent": {
+    "placeholders": {
+      "content": {
+        "type": "String"
+      }
+    }
+  },
+  "momentDeleteMoment": "순간 삭제",
+  "momentDeleteConfirm": "이 순간을 삭제하시겠습니까?",
+  "momentComment": "코멘트",
+  "momentWriteComment": "댓글을 쓰세요...",
+  "momentLike": "좋아요",
+  "momentUnlike": "달리",
+  "momentForward": "앞으로",
+  "momentDelete": "삭제",
+  "momentReply": "답장하다",
+  "momentMoment": "순간",
+  "momentLikesCount": "{count}가 좋아합니다",
+  "@momentLikesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentCommentsCount": "{count} 댓글",
+  "@momentCommentsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentNoComments": "아직 댓글이 없습니다",
+  "momentFailedToLoad": "이미지를 로드하지 못했습니다.",
+  "momentReplyTo": "{userName}에 답장하다...",
+  "@momentReplyTo": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "momentNoConversations": "대화 없음",
+  "momentJustNow": "지금 막",
+  "momentMinutesAgo": "{count}분 전",
+  "@momentMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentHoursAgo": "{count}h 전",
+  "@momentHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentDaysAgo": "{count}일 전",
+  "@momentDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatGroupAnnouncementHint": "그룹 공지사항 입력",
+  "chatGroupAnnouncementEmpty": "발표 없음",
+  "chatEditNickname": "닉네임 수정",
+  "chatNicknameHint": "이 그룹의 닉네임을 입력하세요",
+  "contactAddPhoneHint": "전화번호를 입력하세요",
+  "contactNotesHint": "이 연락처에 대한 메모 추가",
+  "reportTitle": "신고",
+  "reportReasonSpam": "스팸",
+  "reportReasonHarassment": "괴롭힘",
+  "reportReasonFraud": "사기",
+  "reportReasonOther": "기타",
+  "reportSubmitted": "보고서가 제출되었습니다.",
+  "reportDescription": "추가 설명(선택사항)",
+  "qrcodeSaved": "앨범에 저장된 QR 코드",
+  "chatSendRedPacketInChat": "채팅으로 레드패킷 보내주세요",
+  "commonSaveFailed": "저장 실패",
+  "reportSelectReason": "이유를 선택해주세요.",
   "gameCenter": "게임",
   "gameHighScore": "최고",
   "gameScore": "점수",
@@ -1785,7 +2333,7 @@
   "gameResume": "탭하여 재개",
   "gameConfirmExit": "게임을 종료하시겠습니까?",
   "gameNoScores": "기록 없음",
-  "game2048": "2048",
+  "game2048": "2048년",
   "game2048Desc": "타일을 합쳐 2048을 만드세요",
   "gameBlockDrop": "블록 드롭",
   "gameBlockDropDesc": "블록을 떨어뜨려 줄을 지우세요",
@@ -1802,6 +2350,244 @@
   "gameBestTime": "최고 기록",
   "gameNewRecord": "신기록!",
   "gameLines": "라인",
+  "storyMyStory": "나의 이야기",
+  "storageSmartCleanup": "스마트 정리",
+  "storageOldMediaFiles": "오래된 미디어 파일",
+  "storageLargeFiles": "대용량 파일",
+  "storageAppCache": "앱 캐시",
+  "storageSettings": "저장소 설정",
+  "storageAutoCleanup": "자동 정리",
+  "storageAutoCleanupDesc": "{days}일보다 오래된 파일을 자동으로 정리합니다.",
+  "@storageAutoCleanupDesc": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "storageCleanupPeriod": "정리기간",
+  "storagePreserveThumbnails": "축소판 보존",
+  "storagePreserveThumbnailsDesc": "정리하는 동안 이미지 축소판 유지",
+  "storageWarningHigh": "저장소 사용량이 높습니다. 오래된 파일을 정리하는 것이 좋습니다.",
+  "storageWarningCritical": "저장 공간이 매우 부족합니다. 여유 공간을 정리해주세요.",
+  "storageFreed": "해제된 {size}({count} 파일)",
+  "@storageFreed": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "storageDays": "{days}일",
+  "@storageDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "storageViewAllRooms": "{count} 객실 모두 보기",
+  "@storageViewAllRooms": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "storageNoFiles": "파일을 찾을 수 없습니다",
+  "storageFilePinned": "고정됨",
+  "storageDeleteSelected": "{count} 선택한 파일을 삭제하시겠습니까? 서버에서 다시 다운로드할 수 있습니다.",
+  "@storageDeleteSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestore": "백업 및 복원",
+  "backupCreate": "백업 생성",
+  "backupCreateDesc": "설정과 암호화 키를 백업하세요. 다시 로그인하면 메시지가 서버에서 복원됩니다.",
+  "backupIncludeKeys": "암호화 키 포함",
+  "backupIncludeKeysDesc": "암호화된 메시지를 읽는 데 필요합니다.",
+  "backupPasswordProtect": "비밀번호로 보호",
+  "backupEnterPassword": "백업 비밀번호를 입력하세요",
+  "backupHistory": "백업 기록",
+  "backupNoBackups": "아직 백업이 없습니다.",
+  "backupRestore2": "복원",
+  "backupDelete": "삭제",
+  "backupDeleteConfirm": "이 백업을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+  "backupRestoreFromFile": "파일에서 복원",
+  "backupRestoreFromFileDesc": "다른 장치나 이전 백업에서 .n42backup 파일을 가져옵니다.",
+  "backupChooseFile": "백업 파일 선택",
+  "backupRestoring": "복원 중...",
+  "backupCreated": "생성된 백업: {rooms} 회의실, {messages} 메시지",
+  "@backupCreated": {
+    "placeholders": {
+      "rooms": {
+        "type": "int"
+      },
+      "messages": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestored": "{rooms} 회의실에서 {settings} 설정을 복원했습니다.",
+  "@backupRestored": {
+    "placeholders": {
+      "settings": {
+        "type": "int"
+      },
+      "rooms": {
+        "type": "int"
+      }
+    }
+  },
+  "backupFailed": "백업 실패: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPasswordRequired": "이 백업은 비밀번호로 보호되어 있습니다.",
+  "blocGroupNotFound": "그룹을 찾을 수 없습니다",
+  "blocGroupMembersInvited": "초대된 {count} 회원",
+  "@blocGroupMembersInvited": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "blocGroupMemberRemoved": "회원이 삭제되었습니다.",
+  "blocGroupAdminRemoved": "관리자가 삭제됨",
+  "blocGroupLeft": "그룹을 탈퇴했습니다",
+  "blocGroupDisbanded": "그룹해체",
+  "blocGroupJoined": "그룹에 가입했습니다",
+  "blocGroupInviteDeclined": "초대가 거부되었습니다.",
+  "blocGroupTokenGateUpdated": "토큰 게이트 업데이트됨",
+  "blocTransferProcessing": "이전 처리 중...",
+  "blocTransferCancelled": "이전이 취소되었습니다.",
+  "blocTransferFailed": "전송 실패",
+  "blocPaymentProcessing": "결제 처리 중...",
+  "blocPaymentFailed": "결제 실패",
+  "groupMaxMembers": "회원 한도",
+  "groupMaxMembersUnlimited": "무제한",
+  "groupMaxMembersHint": "한도를 입력하세요. (무제한을 원하시면 비워두세요)",
+  "groupMaxMembersUpdated": "회원 한도가 업데이트되었습니다.",
+  "groupFull": "그룹이 용량에 도달했습니다.",
+  "groupChannels": "주제 채널",
+  "groupChannelsEmpty": "아직 채널이 없습니다",
+  "groupChannelsCount": "채널",
+  "groupChannelCreate": "새 채널",
+  "groupChannelName": "채널 이름",
+  "groupChannelTopic": "채널 주제(선택사항)",
+  "groupChannelDelete": "채널 삭제",
+  "groupChannelDeleteConfirm": "이 채널을 삭제하시겠습니까? 모든 메시지가 손실됩니다.",
+  "groupBotSettings": "봇 설정",
+  "groupBotEnabled": "봇 활성화",
+  "groupBotWelcomeMessage": "환영 메시지 템플릿",
+  "groupBotWelcomeHint": "새 회원 이름의 자리 표시자로 '이름'을 사용하세요.",
+  "groupBotConfigUpdated": "봇 설정이 업데이트되었습니다.",
+  "groupContentFilter": "콘텐츠 필터",
+  "groupContentFilterEnabled": "키워드 필터 활성화",
+  "groupContentFilterReplace": "***로 교체",
+  "groupContentFilterHide": "메시지 숨기기",
+  "groupContentFilterAddWord": "키워드 추가",
+  "groupContentFilterUpdated": "콘텐츠 필터가 업데이트되었습니다.",
+  "chatSlashCommands": "명령",
+  "chatCommandPoll": "/poll — 설문 조사 만들기",
+  "chatCommandAnnounce": "/announce - 공지사항 보내기",
+  "chatCommandWelcome": "/welcome — 환영 메시지 설정",
+  "chatReportMessage": "신고",
+  "chatReportReason": "신고 사유",
+  "chatReportSpam": "스팸",
+  "chatReportHarassment": "괴롭힘",
+  "chatReportInappropriate": "부적절한 콘텐츠",
+  "chatReportOther": "기타",
+  "chatReportSuccess": "보고서가 제출되었습니다.",
+  "spacesName": "커뮤니티 이름",
+  "spacesNameHint": "예를 들어 암호화폐 거래자",
+  "spacesNameRequired": "이름은 필수입니다",
+  "spacesDescription": "설명",
+  "spacesDescriptionHint": "이 커뮤니티는 무엇에 관한 것인가요?",
+  "spacesType": "커뮤니티 유형",
+  "spacesPublicDesc": "누구나 발견하고 참여할 수 있습니다.",
+  "spacesPrivateDesc": "초대받은 회원만 참여할 수 있습니다.",
+  "spacesNotFound": "커뮤니티를 찾을 수 없습니다",
+  "spacesSearch": "커뮤니티 검색...",
+  "spacesMembers": "회원",
+  "spacesNoChannels": "아직 채널이 없습니다",
+  "spacesLeave": "커뮤니티 탈퇴",
+  "spacesLeaveConfirm": "정말로 \"{name}\"에서 나가시겠습니까?",
+  "@spacesLeaveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesDelete": "커뮤니티 삭제",
+  "spacesDeleteConfirm": "이렇게 하면 '{name}' 및 모든 채널이 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다.",
+  "@spacesDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesCreateChannel": "채널 추가",
+  "spacesChannelName": "채널 이름",
+  "spacesChannelTopic": "주제(선택사항)",
+  "spacesDeleteChannel": "채널 삭제",
+  "spacesDeleteChannelConfirm": "정말로 \"#{name}\"을 삭제하시겠습니까?",
+  "@spacesDeleteChannelConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesEditName": "이름 수정",
+  "spacesEditDescription": "설명 편집",
+  "spacesViewAllMembers": "{count} 회원 모두 보기",
+  "@spacesViewAllMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spacesKickMemberTitle": "{name} 킥",
+  "@spacesKickMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesBanMemberTitle": "{name} 금지",
+  "@spacesBanMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesPromoteAdmin": "관리자로 승격",
+  "spacesDemoteAdmin": "관리자 제거",
+  "spacesInviteMember": "회원 초대",
+  "spacesInviteMemberUserId": "사용자 ID(예: @user:server.com)",
+  "spacesSave": "저장",
+  "settingsScreenshotProtection": "스크린샷 보호",
+  "settingsScreenshotProtectionDesc": "스크린샷 및 화면 녹화 방지",
+  "chatSelfDestructTimer": "자폭",
+  "chatTimerPickerTitle": "자폭 타이머",
+  "chatTimerOff": "끄기",
   "onChainNotificationsTitle": "온체인 이벤트",
   "onChainMarkAllRead": "모두 읽음",
   "onChainNoNotifications": "아직 온체인 이벤트 없음",
@@ -1864,24 +2650,24 @@
     }
   },
   "web3NoN42AccountTitle": "N42 계정 없음",
+  "web3NoN42AccountDesc": "이 지갑 주소에는 아직 N42 계정이 없습니다. 시작하려면 N42 초대 링크를 공유할 수 있습니다.",
   "web3ShareInvite": "초대 공유",
   "nftPickerTitle": "NFT 아바타 선택",
   "nftPickerTabPopular": "인기",
   "nftPickerTabCustom": "커스텀",
+  "nftPickerChain": "체인",
+  "nftPickerContract": "계약 주소",
+  "nftPickerTokenId": "토큰 ID",
   "nftPickerVerifyOwnership": "소유권 확인 및 미리보기",
   "nftPickerUseAsAvatar": "아바타로 사용",
+  "nftPickerPreview": "미리보기",
   "nftPickerNotOwned": "이 NFT를 소유하고 있지 않습니다",
+  "nftPickerInvalidTokenId": "잘못된 토큰 ID",
+  "nftPickerEnterBoth": "계약 주소와 토큰 ID를 입력하세요.",
   "nftPickerInfoTitle": "NFT 아바타 — 온체인 인증",
+  "nftPickerInfoDesc": "소유한 NFT를 아바타로 바인딩하세요. 누구나 온체인에서 소유권을 확인할 수 있습니다. N42에 걸쳐 금반지로 표시됩니다.",
   "nftPickerPopularCollections": "인기 콜렉션",
   "nftPickerWalletHint": "N42 지갑을 연결하여 236개 이상의 체인에서 NFT를 자동으로 검색하세요.",
-  "web3NoN42AccountDesc": "This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.",
-  "nftPickerChain": "Chain",
-  "nftPickerContract": "Contract Address",
-  "nftPickerTokenId": "Token ID",
-  "nftPickerPreview": "Preview",
-  "nftPickerInvalidTokenId": "Invalid token ID",
-  "nftPickerEnterBoth": "Enter contract address and token ID",
-  "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.",
   "profileBindNftAvatar": "NFT 아바타 연결",
   "profileChangeAvatar": "아바타 변경",
   "groupTopics": "주제",
@@ -1901,8 +2687,22 @@
   "redPacketClaimed": "수령됨",
   "redPacketInsufficientBalance": "잔액 부족",
   "selfDestructCountdown": "{time} 후 삭제",
+  "@selfDestructCountdown": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "messageDestroyed": "메시지가 삭제되었습니다",
   "miniAppPermissionDenied": "권한 부족: {permission}",
+  "@miniAppPermissionDenied": {
+    "placeholders": {
+      "permission": {
+        "type": "String"
+      }
+    }
+  },
   "aiSuggestionGasFee": "가스비란?",
   "aiSuggestionDefi": "DeFi 입문",
   "aiSuggestionSecurity": "컨트랙트 보안 확인 방법",
@@ -1913,8 +2713,35 @@
   "channelJoined": "가입됨",
   "channelCategory": "카테고리",
   "slowModeCooldown": "슬로우 모드: {seconds}초 대기",
+  "@slowModeCooldown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "addressCopyAction": "주소 복사",
   "addressSendMessage": "메시지 보내기",
   "addressViewProfile": "프로필 보기",
-  "sendToAddress": "지갑 주소로 메시지 보내기"
+  "sendToAddress": "지갑 주소로 메시지 보내기",
+  "blocAuthSendVerificationCodeFailed": "인증코드 전송 실패",
+  "blocAuthServerNoEmailPasswordReset": "이 서버는 이메일 비밀번호 재설정을 지원하지 않습니다.",
+  "blocAuthResetPasswordFailed": "비밀번호를 재설정하지 못했습니다.",
+  "blocAuthChangePasswordFailed": "비밀번호를 변경하지 못했습니다.",
+  "blocAuthOldPasswordWrong": "잘못된 현재 비밀번호",
+  "blocAuthLoginCancelled": "로그인이 취소되었습니다.",
+  "blocAuthGoogleLoginFailed": "구글 로그인 실패",
+  "blocAuthAppleLoginFailed": "애플 로그인 실패",
+  "blocAuthSsoLoginFailed": "SSO 로그인 실패",
+  "blocAuthFacebookLoginFailed": "페이스북 로그인 실패",
+  "blocAuthTwitterLoginFailed": "트위터 로그인 실패",
+  "blocAuthWeChatLoginFailed": "위챗 로그인 실패",
+  "blocAuthWeChatNotConfigured": "WeChat 로그인이 구성되지 않았습니다.",
+  "blocAuthWeChatNotInstalled": "먼저 위챗을 설치해주세요",
+  "blocAuthPasswordWrong": "잘못된 비밀번호",
+  "blocAuthEmailAlreadyBound": "이 이메일은 이미 다른 계정에 연결되어 있습니다.",
+  "blocAuthChangeEmailFailed": "이메일을 변경하지 못했습니다.",
+  "blocAuthVerificationCodeInvalid": "인증 코드가 올바르지 않거나 만료되었습니다.",
+  "blocAuthSessionExpired": "세션이 만료되었습니다. 다시 로그인하세요.",
+  "blocAuthSessionIncomplete": "세션 데이터가 불완전합니다. 다시 로그인하세요."
 }

@@ -50,7 +50,7 @@ class SVi extends S {
   String get commonImage => '[Hinh anh]';
 
   @override
-  String get chatVideo => '[Video]';
+  String get chatVideo => '[Băng hình]';
 
   @override
   String get chatVoice => '[Tin nhan thoai]';
@@ -147,7 +147,7 @@ class SVi extends S {
 
   @override
   String get chatMicrophonePermissionDeniedPermanent =>
-      '麦克风权限已被拒绝，请在系统设置中开启以使用语音消息功能。';
+      'Quyền sử dụng micrô đã bị từ chối. Vui lòng kích hoạt nó trong cài đặt hệ thống để sử dụng tin nhắn thoại.';
 
   @override
   String commonStartRecordingFailed(String error) {
@@ -257,7 +257,7 @@ class SVi extends S {
   String get commonAllClaimed => 'Da nhan het';
 
   @override
-  String get chatReadAloud => '朗读';
+  String get chatReadAloud => 'Đọc to';
 
   @override
   String get chatReply => 'Tra loi';
@@ -275,14 +275,14 @@ class SVi extends S {
 
   @override
   String contactN42Id(String id) {
-    return 'N42 ID: $id';
+    return 'Mã N42: $id';
   }
 
   @override
-  String get profileN42IdTitle => 'N42 ID';
+  String get profileN42IdTitle => 'Mã số N42';
 
   @override
-  String get profileN42Bean => 'N42 Bean';
+  String get profileN42Bean => 'Đậu N42';
 
   @override
   String get contactFriendInfo => 'Thong tin ban be';
@@ -568,7 +568,7 @@ class SVi extends S {
   String get contactNewFriends => 'Ban moi';
 
   @override
-  String get contactChatOnlyFriends => 'Chat-only Friends';
+  String get contactChatOnlyFriends => 'Bạn bè chỉ trò chuyện';
 
   @override
   String get contactOfficialAccounts => 'Tai khoan chinh thuc';
@@ -1641,7 +1641,7 @@ class SVi extends S {
 
   @override
   String profileN42IdLabel(String id) {
-    return 'N42 ID: $id';
+    return 'Mã N42: $id';
   }
 
   @override
@@ -1739,7 +1739,7 @@ class SVi extends S {
   String get profileEnterYourStatus => 'Nhap trang thai...';
 
   @override
-  String get profileOk => 'OK';
+  String get profileOk => 'được rồi';
 
   @override
   String get qrcodeCameraPermissionRequired => 'Can quyen camera de quet ma QR';
@@ -2111,50 +2111,52 @@ class SVi extends S {
   String get settingsReset => 'Dat lai';
 
   @override
-  String get settingsBackupSuccess => '密钥备份成功';
+  String get settingsBackupSuccess => 'Đã sao lưu khóa thành công';
 
   @override
-  String get settingsBackupFailed => '备份失败';
+  String get settingsBackupFailed => 'Sao lưu không thành công';
 
   @override
-  String get settingsRecoveryKey => '恢复密钥';
+  String get settingsRecoveryKey => 'Khóa khôi phục';
 
   @override
   String get settingsRecoveryKeySaveWarning =>
-      '请将此恢复密钥保存在安全的地方。您需要它在新设备上恢复加密消息。';
+      'Vui lòng lưu khóa khôi phục này ở nơi an toàn. Bạn sẽ cần nó để khôi phục tin nhắn được mã hóa của mình trên thiết bị mới.';
 
   @override
-  String get settingsRecoveryKeySaved => '我已保存';
+  String get settingsRecoveryKeySaved => 'Tôi đã lưu nó';
 
   @override
-  String get settingsRestoreSuccess => '密钥恢复成功';
+  String get settingsRestoreSuccess => 'Đã khôi phục khóa thành công';
 
   @override
-  String get settingsRestoreFailed => '恢复失败';
+  String get settingsRestoreFailed => 'Khôi phục không thành công';
 
   @override
-  String get settingsPassword => '密码';
+  String get settingsPassword => 'Mật khẩu';
 
   @override
-  String get settingsEnterRecoveryKey => '输入恢复密钥';
+  String get settingsEnterRecoveryKey => 'Nhập khóa khôi phục';
 
   @override
-  String get settingsEnterPassword => '输入密码';
+  String get settingsEnterPassword => 'Nhập mật khẩu';
 
   @override
-  String get settingsExportSuccess => '密钥已成功导出到服务端备份';
+  String get settingsExportSuccess =>
+      'Đã xuất khóa sang bản sao lưu máy chủ thành công';
 
   @override
-  String get settingsExportNeedBackupFirst => '请先创建密钥备份';
+  String get settingsExportNeedBackupFirst =>
+      'Vui lòng tạo bản sao lưu khóa trước';
 
   @override
-  String get settingsExportFailed => '导出失败';
+  String get settingsExportFailed => 'Xuất không thành công';
 
   @override
-  String get settingsResetSuccess => '加密重置成功';
+  String get settingsResetSuccess => 'Đặt lại mã hóa thành công';
 
   @override
-  String get settingsResetFailed => '重置失败';
+  String get settingsResetFailed => 'Đặt lại không thành công';
 
   @override
   String get callLeaveMeetingConfirm => 'Ban co chac muon roi cuoc hop?';
@@ -2392,7 +2394,7 @@ class SVi extends S {
   String get chatSearchContactsOrGroups => 'Tim lien he hoac nhom';
 
   @override
-  String get chatVideoTitle => 'Video';
+  String get chatVideoTitle => 'Băng hình';
 
   @override
   String get chatLoadingText => 'Dang tai...';
@@ -2791,19 +2793,21 @@ class SVi extends S {
   String get settingsLanguageChanged => 'Ngôn ngữ đã thay đổi';
 
   @override
-  String get settingsTranslation => '翻译';
+  String get settingsTranslation => 'Dịch thuật';
 
   @override
-  String get settingsTranslateTextTo => '将文字翻译为';
+  String get settingsTranslateTextTo => 'Dịch văn bản sang';
 
   @override
-  String get settingsTranslateDescription => '选择你希望将消息翻译成的语言。';
+  String get settingsTranslateDescription =>
+      'Chọn ngôn ngữ bạn muốn dịch tin nhắn sang.';
 
   @override
-  String get settingsAutoTranslate => '自动翻译聊天中收到的消息';
+  String get settingsAutoTranslate => 'Tự động dịch tin nhắn đã nhận';
 
   @override
-  String get settingsAutoTranslateDescription => '自动将聊天中收到的消息翻译为你选择的语言。';
+  String get settingsAutoTranslateDescription =>
+      'Tự động dịch tin nhắn nhận được trong cuộc trò chuyện sang ngôn ngữ bạn đã chọn.';
 
   @override
   String get settingsBiometricLogin => 'Đăng nhập sinh trắc học';
@@ -2841,19 +2845,19 @@ class SVi extends S {
       'Quyền truy cập camera bị hạn chế trên thiết bị này';
 
   @override
-  String get authPasskeyLabel => 'Passkey';
+  String get authPasskeyLabel => 'Mật khẩu';
 
   @override
   String get authGoogleLabel => 'Google';
 
   @override
-  String get authAppleLabel => 'Apple';
+  String get authAppleLabel => 'táo';
 
   @override
   String get authSsoLabel => 'SSO';
 
   @override
-  String get transferAmountHintZero => '0.00';
+  String get transferAmountHintZero => '0,00';
 
   @override
   String get commonMatrixIdHint => '@username:server.com';
@@ -2932,125 +2936,128 @@ class SVi extends S {
   String get commonTranslate => 'Dịch';
 
   @override
-  String get contactCreateTag => 'Create Tag';
+  String get contactCreateTag => 'Tạo thẻ';
 
   @override
-  String get contactEnterTagName => 'Enter tag name';
+  String get contactEnterTagName => 'Nhập tên thẻ';
 
   @override
-  String get contactEditTag => 'Edit Tag';
+  String get contactEditTag => 'Chỉnh sửa thẻ';
 
   @override
-  String get contactDeleteTag => 'Delete Tag';
+  String get contactDeleteTag => 'Xóa thẻ';
 
   @override
   String contactDeleteTagConfirm(String tagName) {
-    return 'Are you sure you want to delete the tag \"$tagName\"?';
+    return 'Bạn có chắc chắn muốn xóa thẻ \"$tagName\" không?';
   }
 
   @override
-  String get contactNoTags => 'No tags yet';
+  String get contactNoTags => 'Chưa có thẻ nào';
 
   @override
-  String get contactFriendPermissions => 'Friend Permissions';
+  String get contactFriendPermissions => 'Quyền của bạn bè';
 
   @override
-  String get contactSetChatOnly => 'Set as Chat-only';
+  String get contactSetChatOnly => 'Đặt ở chế độ chỉ trò chuyện';
 
   @override
   String get contactChatOnlyDesc =>
-      'Can only chat with you, other content will be hidden';
+      'Chỉ có thể trò chuyện với bạn, nội dung khác sẽ bị ẩn';
 
   @override
-  String get contactHideMyMoments => 'Hide My Moments';
+  String get contactHideMyMoments => 'Ẩn khoảnh khắc của tôi';
 
   @override
-  String get contactHideMyMomentsDesc => 'This friend cannot see my Moments';
+  String get contactHideMyMomentsDesc =>
+      'Người bạn này không thể nhìn thấy Khoảnh khắc của tôi';
 
   @override
-  String get contactHideTheirMoments => 'Hide Their Moments';
+  String get contactHideTheirMoments => 'Giấu khoảnh khắc của họ';
 
   @override
-  String get contactHideTheirMomentsDesc => 'Don\'t see this friend\'s Moments';
+  String get contactHideTheirMomentsDesc =>
+      'Không xem được Khoảnh khắc của người bạn này';
 
   @override
-  String get contactHideMyStatus => 'Hide My Status';
+  String get contactHideMyStatus => 'Ẩn trạng thái của tôi';
 
   @override
   String get contactHideMyStatusDesc =>
-      'This friend cannot see my status updates';
+      'Người bạn này không thể xem cập nhật trạng thái của tôi';
 
   @override
-  String get contactNoChatOnlyFriends => 'No chat-only friends';
+  String get contactNoChatOnlyFriends => 'Không có bạn bè chỉ trò chuyện';
 
   @override
-  String get contactNoOfficialAccounts => 'No official accounts';
+  String get contactNoOfficialAccounts => 'Không có tài khoản chính thức';
 
   @override
   String get contactFollowOfficialAccountsDesc =>
-      'Follow official accounts to get the latest updates';
+      'Theo dõi các tài khoản chính thức để nhận được thông tin cập nhật mới nhất';
 
   @override
-  String get contactNoServiceAccounts => 'No service accounts';
+  String get contactNoServiceAccounts => 'Không có tài khoản dịch vụ';
 
   @override
   String get contactSubscribeServiceAccountsDesc =>
-      'Subscribe to service accounts for convenient services';
+      'Đăng ký tài khoản dịch vụ để được sử dụng các dịch vụ tiện lợi';
 
   @override
-  String get contactNoEnterpriseContacts => 'No enterprise contacts';
+  String get contactNoEnterpriseContacts => 'Không có liên hệ doanh nghiệp';
 
   @override
   String get contactEnterpriseContactsDesc =>
-      'Enterprise contacts will be displayed here';
+      'Địa chỉ liên hệ doanh nghiệp sẽ được hiển thị ở đây';
 
   @override
-  String get profileCardPack => 'Card Pack';
+  String get profileCardPack => 'Gói thẻ';
 
   @override
-  String get profileOrders => 'Orders';
+  String get profileOrders => 'Đơn đặt hàng';
 
   @override
-  String get profileNoOrders => 'No orders';
+  String get profileNoOrders => 'Không có đơn đặt hàng';
 
   @override
-  String get profileOrdersDesc => 'Your orders will be displayed here';
+  String get profileOrdersDesc => 'Đơn đặt hàng của bạn sẽ được hiển thị ở đây';
 
   @override
-  String get profileNoCards => 'No cards';
+  String get profileNoCards => 'Không có thẻ';
 
   @override
-  String get profileCardsDesc => 'Your cards will be displayed here';
+  String get profileCardsDesc => 'Thẻ của bạn sẽ được hiển thị ở đây';
 
   @override
-  String get favoriteEnterTagsHint => 'Enter tags separated by commas';
+  String get favoriteEnterTagsHint =>
+      'Nhập các thẻ được phân tách bằng dấu phẩy';
 
   @override
-  String get favoriteTagsUpdated => 'Tags updated';
+  String get favoriteTagsUpdated => 'Đã cập nhật thẻ';
 
   @override
-  String get favoriteForwardedContent => 'Content forwarded';
+  String get favoriteForwardedContent => 'Nội dung được chuyển tiếp';
 
   @override
-  String get favoriteEnterNoteContent => 'Enter note content';
+  String get favoriteEnterNoteContent => 'Nhập nội dung ghi chú';
 
   @override
-  String get favoriteNoteAdded => 'Note added';
+  String get favoriteNoteAdded => 'Đã thêm ghi chú';
 
   @override
-  String get favoriteLinkTitle => 'Link title';
+  String get favoriteLinkTitle => 'Tiêu đề liên kết';
 
   @override
   String get favoriteLinkUrl => 'https://';
 
   @override
-  String get favoriteLinkAdded => 'Link added';
+  String get favoriteLinkAdded => 'Đã thêm liên kết';
 
   @override
-  String get contactPhotoAdded => 'Photo added';
+  String get contactPhotoAdded => 'Đã thêm ảnh';
 
   @override
-  String get contactEnterPhone => 'Enter phone number';
+  String get contactEnterPhone => 'Nhập số điện thoại';
 
   @override
   String commonConversationWithId(String roomId) {
@@ -3351,16 +3358,16 @@ class SVi extends S {
   String get groupAvatarUpdated => 'Đã cập nhật ảnh đại diện nhóm';
 
   @override
-  String get groupVisibilityUpdated => '群可见性已更新';
+  String get groupVisibilityUpdated => 'Đã cập nhật chế độ hiển thị nhóm';
 
   @override
-  String get groupChannelCreated => '频道已创建';
+  String get groupChannelCreated => 'Đã tạo kênh';
 
   @override
-  String get groupChannelUpdated => '频道已更新';
+  String get groupChannelUpdated => 'Đã cập nhật kênh';
 
   @override
-  String get groupChannelDeleted => '频道已删除';
+  String get groupChannelDeleted => 'Đã xóa kênh';
 
   @override
   String get callDecline => 'Tu choi';
@@ -3403,7 +3410,7 @@ class SVi extends S {
   }
 
   @override
-  String get profileN42BeanTitle => 'N42 Bean';
+  String get profileN42BeanTitle => 'Đậu N42';
 
   @override
   String get profileNoN42Bean => 'Không có N42 Bean';
@@ -3771,109 +3778,118 @@ class SVi extends S {
   }
 
   @override
-  String get securityDeviceIdRequired => '需要设备 ID';
+  String get securityDeviceIdRequired => 'ID thiết bị là bắt buộc';
 
   @override
   String securityVerificationStartFailed(String error) {
-    return '启动验证失败: $error';
+    return 'Không thể bắt đầu xác minh: $error';
   }
 
   @override
-  String get securityVerificationFailed => '验证失败';
+  String get securityVerificationFailed => 'Xác minh không thành công';
 
   @override
   String securityVerificationFailedWithReason(String reason) {
-    return '验证失败: $reason';
+    return 'Xác minh không thành công: $reason';
   }
 
   @override
-  String get securityEmojiMismatchRejected => '验证被拒绝 - 表情不匹配';
+  String get securityEmojiMismatchRejected =>
+      'Xác minh bị từ chối - biểu tượng cảm xúc không khớp';
 
   @override
-  String get securityWaitingForDeviceAccept => '等待另一台设备接受...';
+  String get securityWaitingForDeviceAccept =>
+      'Đang chờ thiết bị kia chấp nhận...';
 
   @override
-  String get securityVerifyDevice => '验证此设备';
+  String get securityVerifyDevice => 'Xác minh thiết bị này';
 
   @override
-  String get securityConfirmEmojiMatch => '确认以下表情符号在两台设备上以相同顺序显示';
+  String get securityConfirmEmojiMatch =>
+      'Xác nhận biểu tượng cảm xúc bên dưới được hiển thị trên cả hai thiết bị, theo cùng một thứ tự';
 
   @override
-  String get securityEmojiDontMatch => '不匹配';
+  String get securityEmojiDontMatch => 'Họ không phù hợp';
 
   @override
-  String get securityEmojiMatch => '匹配';
+  String get securityEmojiMatch => 'Họ hợp nhau';
 
   @override
-  String get securityWaitingForDeviceConfirm => '等待另一台设备确认...';
+  String get securityWaitingForDeviceConfirm =>
+      'Đang chờ thiết bị kia xác nhận...';
 
   @override
-  String get securityVerificationSuccess => '验证成功！';
+  String get securityVerificationSuccess => 'Xác minh thành công!';
 
   @override
-  String get securityDeviceVerifiedTrusted => '此设备已验证并可信任。';
+  String get securityDeviceVerifiedTrusted =>
+      'Thiết bị này hiện đã được xác minh và tin cậy.';
 
   @override
-  String get securityCompareEmoji => '比较两台设备上的表情符号';
+  String get securityCompareEmoji =>
+      'So sánh biểu tượng cảm xúc trên cả hai thiết bị';
 
   @override
-  String get securityCompareNumbers => '比较两台设备上的数字';
+  String get securityCompareNumbers =>
+      'So sánh các con số trên cả hai thiết bị';
 
   @override
-  String get commonTryAgain => '重试';
+  String get commonTryAgain => 'Thử lại';
 
   @override
-  String get commonDone => '完成';
+  String get commonDone => 'Xong';
 
   @override
-  String get chatExportTitle => '导出聊天记录';
+  String get chatExportTitle => 'Xuất trò chuyện';
 
   @override
-  String get chatExportSuccess => '导出成功';
+  String get chatExportSuccess => 'Xuất thành công';
 
   @override
   String chatExportFailed(String error) {
-    return '导出失败: $error';
+    return 'Xuất không thành công: $error';
   }
 
   @override
-  String get chatExportFormat => '导出格式';
+  String get chatExportFormat => 'Định dạng xuất';
 
   @override
-  String get chatExportHtmlDesc => '可在任何浏览器中打开的精美排版';
+  String get chatExportHtmlDesc =>
+      'Có thể đọc được trong bất kỳ trình duyệt nào có bố cục theo kiểu';
 
   @override
-  String get chatExportJsonDesc => '机器可读的结构化数据格式';
+  String get chatExportJsonDesc =>
+      'Định dạng dữ liệu có cấu trúc có thể đọc được bằng máy';
 
   @override
-  String get chatExportDateRange => '日期范围';
+  String get chatExportDateRange => 'Phạm vi ngày';
 
   @override
-  String get chatExportAll => '全部消息';
+  String get chatExportAll => 'Tất cả tin nhắn';
 
   @override
-  String get chatExportLastWeek => '最近7天';
+  String get chatExportLastWeek => '7 ngày qua';
 
   @override
-  String get chatExportLastMonth => '最近一个月';
+  String get chatExportLastMonth => 'Tháng trước';
 
   @override
-  String get chatExportLast3Months => '最近三个月';
+  String get chatExportLast3Months => '3 tháng qua';
 
   @override
-  String get chatExportMessageCount => '待导出消息';
+  String get chatExportMessageCount => 'Tin nhắn để xuất';
 
   @override
-  String get chatExportButton => '导出并分享';
+  String get chatExportButton => 'Xuất & Chia sẻ';
 
   @override
-  String get chatMediaGallery => '媒体文件';
+  String get chatMediaGallery => 'Thư viện phương tiện';
 
   @override
-  String get chatExportHistory => '导出聊天记录';
+  String get chatExportHistory => 'Xuất lịch sử trò chuyện';
 
   @override
-  String get pdfLoadFailed => '加载 PDF 失败';
+  String get pdfLoadFailed => 'Không tải được PDF';
 
   @override
   String pdfPageIndicator(int current, int total) {
@@ -3881,1011 +3897,1024 @@ class SVi extends S {
   }
 
   @override
-  String get mediaAll => '全部';
+  String get mediaAll => 'Tất cả';
 
   @override
-  String get mediaImages => '图片';
+  String get mediaImages => 'Hình ảnh';
 
   @override
-  String get mediaVideos => '视频';
+  String get mediaVideos => 'Video';
 
   @override
-  String get mediaFiles => '文件';
+  String get mediaFiles => 'Tập tin';
 
   @override
-  String get mediaAudio => '音频';
+  String get mediaAudio => 'Âm thanh';
 
   @override
   String mediaItemsCount(int count) {
-    return '$count 项';
+    return 'Vật phẩm $count';
   }
 
   @override
-  String get mediaNoMediaFound => '暂无媒体文件';
+  String get mediaNoMediaFound => 'Không tìm thấy phương tiện nào';
 
   @override
-  String get spacesTitle => '社区';
+  String get spacesTitle => 'Cộng đồng';
 
   @override
-  String get spacesCreate => '创建社区';
+  String get spacesCreate => 'Tạo cộng đồng';
 
   @override
-  String get spacesJoined => '已加入';
+  String get spacesJoined => 'Đã tham gia';
 
   @override
-  String get spacesDiscover => '发现';
+  String get spacesDiscover => 'Khám phá';
 
   @override
-  String get spacesNoJoined => '还没有加入任何社区';
+  String get spacesNoJoined => 'Chưa có cộng đồng nào tham gia';
 
   @override
-  String get spacesExplore => '探索社区';
+  String get spacesExplore => 'Khám phá cộng đồng';
 
   @override
-  String get spacesNoPublic => '没有找到公共社区';
+  String get spacesNoPublic => 'Không tìm thấy cộng đồng công cộng nào';
 
   @override
-  String get spacesJoin => '加入';
+  String get spacesJoin => 'Tham gia';
 
   @override
-  String get spacesSubSpaces => '子社区';
+  String get spacesSubSpaces => 'Tiểu cộng đồng';
 
   @override
-  String get spacesChannels => '频道';
+  String get spacesChannels => 'Kênh';
 
   @override
   String spacesMembersCount(int count) {
-    return '$count 位成员';
+    return 'Thành viên $count';
   }
 
   @override
-  String get spacesPublic => '公开';
+  String get spacesPublic => 'công cộng';
 
   @override
-  String get spacesPrivate => '私密';
+  String get spacesPrivate => 'Riêng tư';
 
   @override
-  String get spacesSuggested => '推荐';
+  String get spacesSuggested => 'được đề xuất';
 
   @override
   String spacesChannelsCount(int count) {
-    return '$count 个频道';
+    return 'Các kênh $count';
   }
 
   @override
-  String get callInCallChat => '通话中聊天';
+  String get callInCallChat => 'Trò chuyện trong cuộc gọi';
 
   @override
   String callMessagesCount(int count) {
-    return '$count 条消息';
+    return 'Tin nhắn $count';
   }
 
   @override
-  String get callNoMessagesYet => '暂无消息\n发送一条消息开始聊天';
+  String get callNoMessagesYet =>
+      'Chưa có tin nhắn nào.\nGửi tin nhắn để bắt đầu.';
 
   @override
-  String get callTypeMessage => '输入消息...';
+  String get callTypeMessage => 'Nhập tin nhắn...';
 
   @override
-  String get callYouSender => '我';
+  String get callYouSender => 'bạn';
 
   @override
-  String get callChatLabel => '聊天';
+  String get callChatLabel => 'Trò chuyện';
 
   @override
-  String get chatEdited => '已编辑';
+  String get chatEdited => 'Đã chỉnh sửa';
 
   @override
-  String get chatEditHistory => '编辑历史';
+  String get chatEditHistory => 'Chỉnh sửa lịch sử';
 
   @override
-  String get chatOriginalMessage => '原始消息';
+  String get chatOriginalMessage => 'Bản gốc';
 
   @override
   String chatEditedAt(String time) {
-    return '编辑于 $time';
+    return 'Đã chỉnh sửa tại $time';
   }
 
   @override
-  String get chatViewOnce => '阅后即焚';
+  String get chatViewOnce => 'Xem một lần';
 
   @override
-  String get chatViewOncePhoto => '阅后即焚照片';
+  String get chatViewOncePhoto => 'Xem ảnh một lần';
 
   @override
-  String get chatViewOnceVideo => '阅后即焚视频';
+  String get chatViewOnceVideo => 'Xem một lần video';
 
   @override
-  String get chatViewOnceViewed => '已查看';
+  String get chatViewOnceViewed => 'Đã xem';
 
   @override
-  String get chatViewOnceExpired => '已过期';
+  String get chatViewOnceExpired => 'Đã hết hạn';
 
   @override
-  String get chatViewOnceTap => '点击查看';
+  String get chatViewOnceTap => 'Nhấn để xem';
 
   @override
-  String get chatAutoFaceBlur => '自动模糊人脸';
+  String get chatAutoFaceBlur => 'Tự động làm mờ khuôn mặt';
 
   @override
-  String get chatAutoFaceBlurDesc => '发送照片时自动模糊人脸';
+  String get chatAutoFaceBlurDesc => 'Tự động làm mờ khuôn mặt khi gửi ảnh';
 
   @override
-  String get threadReplyInThread => '在线程中回复';
+  String get threadReplyInThread => 'Trả lời trong chủ đề';
 
   @override
   String threadReplies(int count) {
-    return '$count 条回复';
+    return '$count trả lời';
   }
 
   @override
-  String get threadReply => '1 条回复';
+  String get threadReply => '1 câu trả lời';
 
   @override
   String threadLatestReply(String preview) {
-    return '最新: $preview';
+    return 'Mới nhất: $preview';
   }
 
   @override
-  String get threadTitle => '消息线程';
+  String get threadTitle => 'chủ đề';
 
   @override
-  String get threadReplyPlaceholder => '在线程中回复...';
+  String get threadReplyPlaceholder => 'Trả lời trong chủ đề...';
 
   @override
   String threadParticipants(int count) {
-    return '$count 位参与者';
+    return 'Người tham gia $count';
   }
 
   @override
-  String get voiceRoomTitle => '语音聊天室';
+  String get voiceRoomTitle => 'Phòng thoại';
 
   @override
-  String get voiceRoomCreate => '创建语音房间';
+  String get voiceRoomCreate => 'Tạo phòng thoại';
 
   @override
-  String get voiceRoomJoin => '加入';
+  String get voiceRoomJoin => 'Tham gia';
 
   @override
-  String get voiceRoomLeave => '离开';
+  String get voiceRoomLeave => 'Rời khỏi';
 
   @override
-  String get voiceRoomEnd => '结束房间';
+  String get voiceRoomEnd => 'Phòng cuối';
 
   @override
-  String get voiceRoomRaiseHand => '举手';
+  String get voiceRoomRaiseHand => 'Giơ tay';
 
   @override
-  String get voiceRoomLowerHand => '放下手';
+  String get voiceRoomLowerHand => 'Hạ tay';
 
   @override
-  String get voiceRoomMute => '静音';
+  String get voiceRoomMute => 'Tắt tiếng';
 
   @override
-  String get voiceRoomUnmute => '取消静音';
+  String get voiceRoomUnmute => 'Bật tiếng';
 
   @override
-  String get voiceRoomHost => '主持人';
+  String get voiceRoomHost => 'Máy chủ';
 
   @override
-  String get voiceRoomSpeakers => '发言者';
+  String get voiceRoomSpeakers => 'Loa';
 
   @override
-  String get voiceRoomListeners => '听众';
+  String get voiceRoomListeners => 'Người nghe';
 
   @override
-  String get voiceRoomLive => '直播中';
+  String get voiceRoomLive => 'TRỰC TIẾP';
 
   @override
-  String get voiceRoomEnded => '已结束';
+  String get voiceRoomEnded => 'Đã kết thúc';
 
   @override
-  String get voiceRoomScheduled => '已预约';
+  String get voiceRoomScheduled => 'Đã lên lịch';
 
   @override
-  String get voiceRoomApprove => '批准发言';
+  String get voiceRoomApprove => 'Phê duyệt';
 
   @override
-  String get voiceRoomDemote => '移至听众';
+  String get voiceRoomDemote => 'Di chuyển đến Trình nghe';
 
   @override
   String voiceRoomHandRaised(String name) {
-    return '$name 举手了';
+    return '$name giơ tay';
   }
 
   @override
-  String get voiceRoomName => '房间名称';
+  String get voiceRoomName => 'Tên phòng';
 
   @override
-  String get voiceRoomTopic => '话题（可选）';
+  String get voiceRoomTopic => 'Chủ đề (tùy chọn)';
 
   @override
-  String get voiceRoomNoActive => '暂无活跃的语音房间';
+  String get voiceRoomNoActive => 'Không có phòng thoại đang hoạt động';
 
   @override
-  String get voiceRoomConnecting => '连接中...';
+  String get voiceRoomConnecting => 'Đang kết nối...';
 
   @override
-  String get usernameTitle => '用户名';
+  String get usernameTitle => 'Tên người dùng';
 
   @override
-  String get usernameSet => '设置用户名';
+  String get usernameSet => 'Đặt tên người dùng';
 
   @override
-  String get usernameChange => '修改用户名';
+  String get usernameChange => 'Thay đổi tên người dùng';
 
   @override
-  String get usernamePlaceholder => '输入用户名';
+  String get usernamePlaceholder => 'Nhập tên người dùng';
 
   @override
-  String get usernameAvailable => '用户名可用';
+  String get usernameAvailable => 'Tên người dùng có sẵn';
 
   @override
-  String get usernameUnavailable => '用户名已被占用';
+  String get usernameUnavailable => 'Tên người dùng đã được sử dụng';
 
   @override
-  String get usernameInvalid => '3-30个字符，小写字母、数字、下划线，必须以字母开头';
+  String get usernameInvalid =>
+      '3-30 ký tự, chữ thường, số, dấu gạch dưới. Phải bắt đầu bằng một chữ cái.';
 
   @override
-  String get usernameReserved => '此用户名为保留名称';
+  String get usernameReserved => 'Tên người dùng này được bảo lưu';
 
   @override
-  String get usernameSaved => '用户名已保存';
+  String get usernameSaved => 'Đã lưu tên người dùng';
 
   @override
-  String get usernameSearchHint => '通过 @用户名 搜索';
+  String get usernameSearchHint => 'Tìm kiếm theo @tên người dùng';
 
   @override
-  String get ensName => 'ENS 域名';
+  String get ensName => 'Tên ENS';
 
   @override
-  String get ensLinked => '已关联 ENS';
+  String get ensLinked => 'Đã liên kết với ENS';
 
   @override
-  String get ensResolving => '正在解析 ENS...';
+  String get ensResolving => 'Giải quyết ENS...';
 
   @override
-  String get ensNotFound => '未找到 ENS 域名';
+  String get ensNotFound => 'Không tìm thấy tên ENS';
 
   @override
-  String get tokenGateTitle => '代币门控';
+  String get tokenGateTitle => 'Cổng mã thông báo';
 
   @override
-  String get tokenGateEnable => '启用代币门控';
+  String get tokenGateEnable => 'Kích hoạt Cổng Token';
 
   @override
-  String get tokenGateDisable => '禁用代币门控';
+  String get tokenGateDisable => 'Tắt cổng mã thông báo';
 
   @override
-  String get tokenGateAddRule => '添加规则';
+  String get tokenGateAddRule => 'Thêm quy tắc';
 
   @override
-  String get tokenGateRemoveRule => '删除规则';
+  String get tokenGateRemoveRule => 'Xóa quy tắc';
 
   @override
-  String get tokenGateContractAddress => '合约地址';
+  String get tokenGateContractAddress => 'Địa chỉ hợp đồng';
 
   @override
-  String get tokenGateMinBalance => '最低余额';
+  String get tokenGateMinBalance => 'Số dư tối thiểu';
 
   @override
-  String get tokenGateTokenId => 'Token ID (ERC-1155)';
+  String get tokenGateTokenId => 'ID mã thông báo (ERC-1155)';
 
   @override
-  String get tokenGateChainId => '链 ID';
+  String get tokenGateChainId => 'ID chuỗi';
 
   @override
-  String get tokenGateVerifying => '正在验证代币持有...';
+  String get tokenGateVerifying => 'Đang xác minh việc nắm giữ mã thông báo...';
 
   @override
-  String get tokenGateVerified => '验证通过';
+  String get tokenGateVerified => 'Xác minh đã được thông qua';
 
   @override
-  String get tokenGateDenied => '您未满足代币要求';
+  String get tokenGateDenied => 'Bạn không đáp ứng các yêu cầu về mã thông báo';
 
   @override
-  String get tokenGateOperatorAnd => '需满足所有规则';
+  String get tokenGateOperatorAnd => 'Phải đáp ứng TẤT CẢ các quy tắc';
 
   @override
-  String get tokenGateOperatorOr => '满足任一规则即可';
+  String get tokenGateOperatorOr => 'Phải đáp ứng BẤT KỲ quy tắc nào';
 
   @override
-  String get tokenGateRuleErc20 => 'ERC-20 代币';
+  String get tokenGateRuleErc20 => 'Mã thông báo ERC-20';
 
   @override
   String get tokenGateRuleErc721 => 'NFT (ERC-721)';
 
   @override
-  String get tokenGateRuleErc1155 => '多代币 (ERC-1155)';
+  String get tokenGateRuleErc1155 => 'Mã thông báo đa năng (ERC-1155)';
 
   @override
-  String get tokenGateRuleNative => '原生代币';
+  String get tokenGateRuleNative => 'Mã thông báo gốc';
 
   @override
-  String get tokenGateSaved => '代币门控已保存';
+  String get tokenGateSaved => 'Đã lưu cổng mã thông báo';
 
   @override
-  String get tokenGateEnableDescription => '要求成员持有指定代币才能加入';
+  String get tokenGateEnableDescription =>
+      'Yêu cầu thành viên phải giữ token để tham gia';
 
   @override
-  String get tokenGateOperator => '规则逻辑';
+  String get tokenGateOperator => 'Quy tắc logic';
 
   @override
-  String get tokenGateRules => '规则列表';
+  String get tokenGateRules => 'Quy tắc';
 
   @override
-  String get tokenGateSymbol => '代币符号（可选）';
+  String get tokenGateSymbol => 'Biểu tượng (tùy chọn)';
 
   @override
-  String get tokenGateChain => '区块链';
+  String get tokenGateChain => 'Chuỗi';
 
   @override
-  String get tokenGateTokenStandard => '代币标准';
+  String get tokenGateTokenStandard => 'Tiêu chuẩn mã thông báo';
 
   @override
-  String get tokenGateDenialMessage => '拒绝消息';
+  String get tokenGateDenialMessage => 'Tin nhắn từ chối';
 
   @override
-  String get tokenGateDenialMessageHint => '验证失败时显示的消息';
+  String get tokenGateDenialMessageHint =>
+      'Thông báo hiển thị khi xác minh không thành công';
 
   @override
-  String get tokenGateVerifyTitle => '代币验证';
+  String get tokenGateVerifyTitle => 'Xác minh mã thông báo';
 
   @override
-  String get tokenGateVerifyPassed => '验证通过';
+  String get tokenGateVerifyPassed => 'Xác minh đã thông qua';
 
   @override
-  String get tokenGateVerifyFailed => '验证未通过';
+  String get tokenGateVerifyFailed => 'Xác minh không thành công';
 
   @override
-  String get tokenGateRetryVerify => '重新验证';
+  String get tokenGateRetryVerify => 'Thử lại';
 
   @override
-  String get tokenGateRequired => '要求';
+  String get tokenGateRequired => 'Bắt buộc';
 
   @override
-  String get tokenGateYourBalance => '你的余额';
+  String get tokenGateYourBalance => 'Số dư của bạn';
 
   @override
-  String get tokenGateRulesActive => '条规则生效';
+  String get tokenGateRulesActive => 'quy tắc hoạt động';
 
   @override
-  String get tokenGateDisabled => '未启用';
+  String get tokenGateDisabled => 'Đã tắt';
 
   @override
-  String get ensNotBound => '未绑定';
+  String get ensNotBound => 'Không bị ràng buộc';
 
   @override
-  String get liveLocation => 'Live Location';
+  String get liveLocation => 'Vị trí trực tiếp';
 
   @override
-  String get stopLiveLocation => 'Stop Sharing';
+  String get stopLiveLocation => 'Dừng chia sẻ';
 
   @override
-  String get startLiveLocation => 'Start Sharing';
+  String get startLiveLocation => 'Bắt đầu chia sẻ';
 
   @override
-  String get selectDuration => 'Select Duration';
+  String get selectDuration => 'Chọn thời lượng';
 
   @override
-  String get groupChatFiles => 'Chat Files';
+  String get groupChatFiles => 'Tệp trò chuyện';
 
   @override
-  String get groupLinks => 'Links';
+  String get groupLinks => 'Liên kết';
 
   @override
-  String get groupNoLinks => 'No links yet';
+  String get groupNoLinks => 'Chưa có liên kết nào';
 
   @override
-  String get chatBackground => 'Chat Background';
+  String get chatBackground => 'Nền trò chuyện';
 
   @override
-  String get solidColors => 'Solid Colors';
+  String get solidColors => 'Màu sắc đồng nhất';
 
   @override
-  String get gradients => 'Gradients';
+  String get gradients => 'Độ dốc';
 
   @override
-  String get defaultBackground => 'Default';
+  String get defaultBackground => 'Mặc định';
 
   @override
-  String get settingsFontSizeSlider => 'Font Size';
+  String get settingsFontSizeSlider => 'Cỡ chữ';
 
   @override
-  String get autoDownload => 'Auto-Download';
+  String get autoDownload => 'Tự động tải xuống';
 
   @override
-  String get images => 'Images';
+  String get images => 'Hình ảnh';
 
   @override
-  String get voice => 'Voice';
+  String get voice => 'Giọng nói';
 
   @override
-  String get video => 'Video';
+  String get video => 'Băng hình';
 
   @override
-  String get files => 'Files';
+  String get files => 'Tập tin';
 
   @override
-  String get mobileData => 'Mobile Data';
+  String get mobileData => 'Dữ liệu di động';
 
   @override
-  String get roaming => 'Roaming';
+  String get roaming => 'Chuyển vùng';
 
   @override
-  String get storageManagement => 'Storage';
+  String get storageManagement => 'Lưu trữ';
 
   @override
-  String get totalUsage => 'Total Usage';
+  String get totalUsage => 'Tổng mức sử dụng';
 
   @override
-  String get cache => 'Cache';
+  String get cache => 'Bộ nhớ đệm';
 
   @override
-  String get other => 'Other';
+  String get other => 'Khác';
 
   @override
-  String get clearCache => 'Clear Cache';
+  String get clearCache => 'Xóa bộ nhớ đệm';
 
   @override
-  String get cacheCleared => 'Cache cleared';
+  String get cacheCleared => 'Đã xóa bộ nhớ đệm';
 
   @override
-  String get clearCacheFailed => 'Failed to clear cache';
+  String get clearCacheFailed => 'Không xóa được bộ nhớ đệm';
 
   @override
-  String get confirmClearCache => 'Clear all cache data?';
+  String get confirmClearCache => 'Xóa tất cả dữ liệu bộ nhớ đệm?';
 
   @override
-  String get mapView => 'Map View';
+  String get mapView => 'Xem bản đồ';
 
   @override
   String liveLocationSharingCount(int count) {
-    return '$count people sharing location';
+    return '$count người chia sẻ vị trí';
   }
 
   @override
-  String get minutes15 => '15 minutes';
+  String get minutes15 => '15 phút';
 
   @override
-  String get minutes30 => '30 minutes';
+  String get minutes30 => '30 phút';
 
   @override
-  String get hour1 => '1 hour';
+  String get hour1 => '1 giờ';
 
   @override
-  String get hours8 => '8 hours';
+  String get hours8 => '8 giờ';
 
   @override
-  String get personalCard => 'Personal Card';
+  String get personalCard => 'Thẻ cá nhân';
 
   @override
-  String get downloadFailed => 'Download failed';
+  String get downloadFailed => 'Tải xuống không thành công';
 
   @override
-  String get locationExpired => 'Expired';
+  String get locationExpired => 'Đã hết hạn';
 
   @override
   String secondsRemaining(int count) {
-    return '${count}s';
+    return '$count';
   }
 
   @override
   String minutesRemaining(int count) {
-    return '${count}min';
+    return '$count phút';
   }
 
   @override
   String hoursMinutesRemaining(int hours, int minutes) {
-    return '${hours}h ${minutes}min';
+    return '$hours giờ $minutes phút';
   }
 
   @override
-  String get favoriteMessages => 'Favorites';
+  String get favoriteMessages => 'Yêu thích';
 
   @override
-  String get linksCopied => 'Link copied';
+  String get linksCopied => 'Đã sao chép liên kết';
 
   @override
-  String get noLinksFound => 'No links found';
+  String get noLinksFound => 'Không tìm thấy liên kết nào';
 
   @override
-  String get roomStorageRanking => 'Room Storage Ranking';
+  String get roomStorageRanking => 'Xếp hạng lưu trữ phòng';
 
   @override
-  String get downloadComplete => 'Download complete';
+  String get downloadComplete => 'Tải xuống hoàn tất';
 
   @override
-  String get downloading => 'Downloading...';
+  String get downloading => 'Đang tải xuống...';
 
   @override
-  String get draftSaved => 'Draft saved';
+  String get draftSaved => 'Đã lưu bản nháp';
 
   @override
-  String get voiceRecording => 'Voice Recording';
+  String get voiceRecording => 'Ghi âm giọng nói';
 
   @override
-  String get searchLocation => 'Search Location';
+  String get searchLocation => 'Tìm kiếm vị trí';
 
   @override
-  String get tapToSearch => 'Tap to search';
+  String get tapToSearch => 'Nhấn để tìm kiếm';
 
   @override
-  String get settingsThisDevice => '本设备';
+  String get settingsThisDevice => 'Thiết bị này';
 
   @override
-  String get settingsJustNow => '刚刚';
+  String get settingsJustNow => 'Vừa rồi';
 
   @override
-  String get settingsDeviceId => '设备 ID';
+  String get settingsDeviceId => 'ID thiết bị';
 
   @override
-  String get settingsStatus => '状态';
+  String get settingsStatus => 'Trạng thái';
 
   @override
-  String get settingsLastActive => '最后活跃';
+  String get settingsLastActive => 'Hoạt động lần cuối';
 
   @override
-  String get settingsIpAddress => 'IP 地址';
+  String get settingsIpAddress => 'địa chỉ IP';
 
   @override
-  String get settingsRenameDevice => '重命名设备';
+  String get settingsRenameDevice => 'Đổi tên thiết bị';
 
   @override
-  String get settingsDeviceNameHint => '输入设备名称';
+  String get settingsDeviceNameHint => 'Nhập tên thiết bị';
 
   @override
-  String get settingsDeviceRenamed => '设备已重命名';
+  String get settingsDeviceRenamed => 'Đã đổi tên thiết bị';
 
   @override
-  String get settingsRenameFailed => '重命名失败';
+  String get settingsRenameFailed => 'Đổi tên không thành công';
 
   @override
-  String get settingsRemoteLogout => '远程登出';
+  String get settingsRemoteLogout => 'Đăng xuất từ xa';
 
   @override
   String settingsRemoteLogoutConfirm(String deviceName) {
-    return '确定要登出「$deviceName」吗？此操作无法撤销。';
+    return 'Bạn có chắc chắn muốn đăng xuất \"$deviceName\" không? Không thể hoàn tác hành động này.';
   }
 
   @override
-  String get settingsDeviceLoggedOut => '设备已登出';
+  String get settingsDeviceLoggedOut => 'Thiết bị đã đăng xuất';
 
   @override
-  String get settingsLogoutFailed => '登出失败';
+  String get settingsLogoutFailed => 'Đăng xuất không thành công';
 
   @override
-  String get settingsLogout => '登出';
+  String get settingsLogout => 'Đăng xuất';
 
   @override
-  String get settingsVerifyIdentity => '验证身份';
+  String get settingsVerifyIdentity => 'Xác minh danh tính';
 
   @override
-  String get settingsEnterPasswordToConfirm => '请输入密码以确认此操作。';
+  String get settingsEnterPasswordToConfirm =>
+      'Nhập mật khẩu của bạn để xác nhận hành động này.';
 
   @override
-  String get scheduledSendTitle => '定时发送';
+  String get scheduledSendTitle => 'Lên lịch nhắn tin';
 
   @override
-  String get scheduledSendInOneHour => '1小时后';
+  String get scheduledSendInOneHour => 'trong 1 giờ';
 
   @override
-  String get scheduledSendTonight => '今晚 (20:00)';
+  String get scheduledSendTonight => 'Tối nay (8 giờ tối)';
 
   @override
-  String get scheduledSendTomorrowMorning => '明早 (9:00)';
+  String get scheduledSendTomorrowMorning => 'Sáng mai (9 giờ sáng)';
 
   @override
-  String get scheduledSendCustom => '自定义时间';
+  String get scheduledSendCustom => 'Chọn ngày và giờ';
 
   @override
-  String get scheduledMessageLabel => '定时发送';
+  String get scheduledMessageLabel => 'Đã lên lịch';
 
   @override
-  String get scheduledMessageCancel => '取消定时发送';
+  String get scheduledMessageCancel => 'Hủy tin nhắn đã lên lịch';
 
   @override
-  String get chatLockTitle => '聊天锁';
+  String get chatLockTitle => 'Khóa trò chuyện';
 
   @override
-  String get chatLockEnable => '锁定此聊天';
+  String get chatLockEnable => 'Khóa cuộc trò chuyện này';
 
   @override
-  String get chatLockDisable => '解锁此聊天';
+  String get chatLockDisable => 'Mở khóa cuộc trò chuyện này';
 
   @override
-  String get chatLockDescription => '锁定的聊天需要通过生物识别或 PIN 码验证才能打开';
+  String get chatLockDescription =>
+      'Các cuộc trò chuyện bị khóa yêu cầu xác minh sinh trắc học hoặc mã PIN để mở';
 
   @override
-  String get chatLockVerifyTitle => '聊天已锁定';
+  String get chatLockVerifyTitle => 'Đã khóa cuộc trò chuyện';
 
   @override
-  String get chatLockVerifySubtitle => '验证后访问此聊天';
+  String get chatLockVerifySubtitle =>
+      'Xác minh để truy cập cuộc trò chuyện này';
 
   @override
-  String get chatLockVerifyFailed => '验证失败';
+  String get chatLockVerifyFailed => 'Xác minh không thành công';
 
   @override
-  String get chatLockEnabled => '聊天已锁定';
+  String get chatLockEnabled => 'Đã khóa cuộc trò chuyện';
 
   @override
-  String get chatLockDisabled => '聊天已解锁';
+  String get chatLockDisabled => 'Đã mở khóa trò chuyện';
 
   @override
-  String get chatLockPinTitle => '输入 PIN 码';
+  String get chatLockPinTitle => 'Nhập mã PIN';
 
   @override
-  String get chatLockPinSetTitle => '设置 PIN 码';
+  String get chatLockPinSetTitle => 'Đặt mã PIN';
 
   @override
-  String get chatLockPinConfirmTitle => '确认 PIN 码';
+  String get chatLockPinConfirmTitle => 'Xác nhận mã PIN';
 
   @override
-  String get chatLockPinMismatch => 'PIN 码不一致';
+  String get chatLockPinMismatch => 'Mã PIN không khớp';
 
   @override
-  String get chatLockUseBiometric => '使用生物识别';
+  String get chatLockUseBiometric => 'Sử dụng sinh trắc học';
 
   @override
-  String get chatLockUsePin => '使用 PIN 码';
+  String get chatLockUsePin => 'Sử dụng mã PIN';
 
   @override
-  String get mediaEditorUndo => '撤销';
+  String get mediaEditorUndo => 'Hoàn tác';
 
   @override
-  String get mediaEditorRedo => '重做';
+  String get mediaEditorRedo => 'Làm lại';
 
   @override
-  String get mediaEditorCrop => '裁剪';
+  String get mediaEditorCrop => 'Cắt';
 
   @override
-  String get mediaEditorFilter => '滤镜';
+  String get mediaEditorFilter => 'Lọc';
 
   @override
-  String get mediaEditorDraw => '涂鸦';
+  String get mediaEditorDraw => 'Vẽ';
 
   @override
-  String get mediaEditorText => '文字';
+  String get mediaEditorText => 'văn bản';
 
   @override
-  String get aiAssistant => 'AI 助手';
+  String get aiAssistant => 'Trợ lý AI';
 
   @override
-  String get aiAssistantWelcome => '你好！我是 N42 AI 助手，有什么可以帮你的吗？';
+  String get aiAssistantWelcome =>
+      'Xin chào! Tôi là Trợ lý AI N42. Tôi có thể giúp gì cho bạn?';
 
   @override
-  String get aiAssistantNotConfigured => 'AI 服务未配置';
+  String get aiAssistantNotConfigured => 'Dịch vụ AI chưa được định cấu hình';
 
   @override
-  String get aiAssistantSettings => 'AI 设置';
+  String get aiAssistantSettings => 'Cài đặt AI';
 
   @override
-  String get aiAssistantClearHistory => '清空对话历史';
+  String get aiAssistantClearHistory => 'Xóa lịch sử trò chuyện';
 
   @override
-  String get aiAssistantClearHistoryConfirm => '确定清空所有 AI 对话历史？';
+  String get aiAssistantClearHistoryConfirm =>
+      'Bạn có chắc chắn muốn xóa tất cả lịch sử trò chuyện AI không?';
 
   @override
-  String get aiAssistantStopGenerating => '停止生成';
+  String get aiAssistantStopGenerating => 'Dừng tạo';
 
   @override
-  String get aiAssistantModel => '模型';
+  String get aiAssistantModel => 'người mẫu';
 
   @override
-  String get aiAssistantTemperature => '温度';
+  String get aiAssistantTemperature => 'Nhiệt độ';
 
   @override
-  String get aiAssistantMaxTokens => '最大令牌数';
+  String get aiAssistantMaxTokens => 'Mã thông báo tối đa';
 
   @override
-  String get aiAssistantContextWindow => '上下文窗口';
+  String get aiAssistantContextWindow => 'Cửa sổ ngữ cảnh';
 
   @override
-  String get aiAssistantServiceStatus => '服务状态';
+  String get aiAssistantServiceStatus => 'Trạng thái dịch vụ';
 
   @override
-  String get aiAssistantAvailable => '可用';
+  String get aiAssistantAvailable => 'Có sẵn';
 
   @override
-  String get aiAssistantUnavailable => '不可用';
+  String get aiAssistantUnavailable => 'Không có sẵn';
 
   @override
-  String get aiSummarize => 'AI 总结';
+  String get aiSummarize => 'Tóm tắt AI';
 
   @override
   String aiSummarizeUnread(int count) {
-    return 'AI 总结 $count 条未读消息';
+    return 'Tổng hợp $count tin nhắn chưa đọc';
   }
 
   @override
-  String get aiSummarizeLoading => '正在总结...';
+  String get aiSummarizeLoading => 'Tóm tắt...';
 
   @override
-  String get aiSummarizeError => '总结失败';
+  String get aiSummarizeError => 'Không thể tóm tắt';
 
   @override
-  String get aiRewrite => 'AI 改写';
+  String get aiRewrite => 'Viết lại AI';
 
   @override
-  String get aiRewriteFormal => '正式';
+  String get aiRewriteFormal => 'chính thức';
 
   @override
-  String get aiRewriteCasual => '轻松';
+  String get aiRewriteCasual => 'Bình thường';
 
   @override
-  String get aiRewritePlayful => '俏皮';
+  String get aiRewritePlayful => 'vui tươi';
 
   @override
-  String get aiRewriteProfessional => '专业';
+  String get aiRewriteProfessional => 'chuyên nghiệp';
 
   @override
-  String get aiRewriteAccept => '使用';
+  String get aiRewriteAccept => 'sử dụng';
 
   @override
-  String get aiRewriteCancel => '取消';
+  String get aiRewriteCancel => 'Hủy bỏ';
 
   @override
-  String get aiRewriteLoading => '正在改写...';
+  String get aiRewriteLoading => 'Viết lại...';
 
   @override
-  String get aiLinkSummary => 'AI 摘要';
+  String get aiLinkSummary => 'Tóm tắt AI';
 
   @override
-  String get aiLinkSummaryAnalyzing => '正在分析...';
+  String get aiLinkSummaryAnalyzing => 'Đang phân tích...';
 
   @override
-  String get chatFolderManagement => '管理文件夹';
+  String get chatFolderManagement => 'Quản lý thư mục';
 
   @override
-  String get chatFolderSystem => '系统文件夹';
+  String get chatFolderSystem => 'Thư mục hệ thống';
 
   @override
-  String get chatFolderCustom => '自定义文件夹';
+  String get chatFolderCustom => 'Thư mục tùy chỉnh';
 
   @override
-  String get chatFolderEmpty => '暂无自定义文件夹';
+  String get chatFolderEmpty => 'Chưa có thư mục tùy chỉnh nào';
 
   @override
-  String get chatFolderCreate => '创建文件夹';
+  String get chatFolderCreate => 'Tạo thư mục';
 
   @override
-  String get chatFolderEdit => '编辑文件夹';
+  String get chatFolderEdit => 'Chỉnh sửa thư mục';
 
   @override
-  String get chatFolderNameHint => '文件夹名称';
+  String get chatFolderNameHint => 'Tên thư mục';
 
   @override
-  String get chatFolderAll => '全部';
+  String get chatFolderAll => 'Tất cả';
 
   @override
-  String get chatFolderUnread => '未读';
+  String get chatFolderUnread => 'Chưa đọc';
 
   @override
-  String get chatFolderPersonal => '私聊';
+  String get chatFolderPersonal => 'cá nhân';
 
   @override
-  String get chatFolderGroups => '群组';
+  String get chatFolderGroups => 'Nhóm';
 
   @override
-  String get chatFolderChannels => '频道';
+  String get chatFolderChannels => 'Kênh';
 
   @override
-  String get chatFolderMuted => '已静音';
+  String get chatFolderMuted => 'Đã tắt tiếng';
 
   @override
-  String get storyAddMusic => '添加音乐';
+  String get storyAddMusic => 'Thêm nhạc';
 
   @override
-  String get storyChangeMusic => '更换音乐';
+  String get storyChangeMusic => 'Thay đổi âm nhạc';
 
   @override
-  String get storyBackgroundMusic => '背景音乐';
+  String get storyBackgroundMusic => 'Nhạc nền';
 
   @override
-  String get storyMusicPreview => '预览 (最长15秒)';
+  String get storyMusicPreview => 'Xem trước (tối đa 15 giây)';
 
   @override
-  String get storyChooseFromDevice => '从设备选择';
+  String get storyChooseFromDevice => 'Chọn từ thiết bị';
 
   @override
-  String get storyUseThisMusic => '使用此音乐';
+  String get storyUseThisMusic => 'Sử dụng nhạc này';
 
   @override
-  String get authPasskeyNotSupported => '此设备不支持 Passkey';
+  String get authPasskeyNotSupported =>
+      'Mật mã không được hỗ trợ trên thiết bị này';
 
   @override
-  String get authPasskeyRegister => '注册 Passkey';
+  String get authPasskeyRegister => 'Đăng ký mật khẩu';
 
   @override
-  String get authPasskeyNoRegistered => '未注册 Passkey';
+  String get authPasskeyNoRegistered => 'Không có mật mã nào được đăng ký';
 
   @override
-  String get authPasskeyRegisterHint => '为当前账号注册 Passkey，独立 Passkey 登录入口后续开放。';
+  String get authPasskeyRegisterHint =>
+      'Đăng ký mật mã cho tài khoản này. Đăng nhập bằng mật mã độc lập sẽ được kích hoạt sau.';
 
   @override
-  String get authPasskeyNameYours => '为 Passkey 命名';
+  String get authPasskeyNameYours => 'Đặt tên cho mật mã của bạn';
 
   @override
-  String get authPasskeyRegistered => 'Passkey 已保存到当前账号';
+  String get authPasskeyRegistered => 'Đã lưu mật mã vào tài khoản này';
 
   @override
-  String get authPasskeyDeleted => 'Passkey 已从当前账号移除';
+  String get authPasskeyDeleted => 'Mật mã đã bị xóa khỏi tài khoản này';
 
   @override
   String authPasskeyDeleteConfirm(String name) {
-    return '删除 Passkey \"$name\"？如需后续使用 Passkey 登录，需要重新注册。';
+    return 'Xóa mật mã \"$name\"? Bạn sẽ cần phải đăng ký lại trước khi sử dụng mật mã đăng nhập sau này.';
   }
 
   @override
-  String get momentVisibilityPublic => '公开';
+  String get momentVisibilityPublic => 'công cộng';
 
   @override
-  String get momentVisibilityPrivate => '私密';
+  String get momentVisibilityPrivate => 'Riêng tư';
 
   @override
-  String get momentVisibilityPartial => '部分可见';
+  String get momentVisibilityPartial => 'Bạn bè đã chọn';
 
   @override
-  String get momentVisibilityExcluded => '不给谁看';
+  String get momentVisibilityExcluded => 'Loại trừ một số bạn bè';
 
   @override
   String momentUserMoments(String userName) {
-    return '$userName的朋友圈';
+    return 'Những khoảnh khắc của $userName';
   }
 
   @override
-  String get momentForwardTo => '转发给';
+  String get momentForwardTo => 'Chuyển tiếp tới';
 
   @override
-  String get momentForwardSuccess => '转发成功';
+  String get momentForwardSuccess => 'Đã chuyển tiếp thành công';
 
   @override
-  String get momentSelectFriends => '选择好友';
+  String get momentSelectFriends => 'Chọn bạn bè';
 
   @override
-  String get momentSelectTags => '按标签选择';
+  String get momentSelectTags => 'Chọn theo Thẻ';
 
   @override
   String momentSelectedCount(int count) {
-    return '已选择 ($count)';
+    return 'Đã chọn ($count)';
   }
 
   @override
-  String get momentNoMomentsYet => '暂无动态';
+  String get momentNoMomentsYet => 'Chưa có khoảnh khắc nào';
 
   @override
-  String get momentForwardMoment => '转发动态';
+  String get momentForwardMoment => 'Khoảnh khắc chuyển tiếp';
 
   @override
-  String get momentAddComment => '写评论...';
+  String get momentAddComment => 'Thêm một bình luận...';
 
   @override
   String momentForwardContent(String content) {
-    return '[朋友圈] $content';
+    return '[Khoảnh khắc] $content';
   }
 
   @override
-  String get momentDeleteMoment => '删除动态';
+  String get momentDeleteMoment => 'Xóa khoảnh khắc';
 
   @override
-  String get momentDeleteConfirm => '确定要删除这条动态吗？';
+  String get momentDeleteConfirm =>
+      'Bạn có chắc chắn muốn xóa khoảnh khắc này?';
 
   @override
-  String get momentComment => '评论';
+  String get momentComment => 'Bình luận';
 
   @override
-  String get momentWriteComment => '写评论...';
+  String get momentWriteComment => 'Viết bình luận...';
 
   @override
-  String get momentLike => '赞';
+  String get momentLike => 'thích';
 
   @override
-  String get momentUnlike => '取消';
+  String get momentUnlike => 'Không giống';
 
   @override
-  String get momentForward => '转发';
+  String get momentForward => 'Chuyển tiếp';
 
   @override
-  String get momentDelete => '删除';
+  String get momentDelete => 'Xóa';
 
   @override
-  String get momentReply => '回复';
+  String get momentReply => 'trả lời';
 
   @override
-  String get momentMoment => '动态';
+  String get momentMoment => 'Khoảnh khắc';
 
   @override
   String momentLikesCount(int count) {
-    return '$count 个赞';
+    return '$count lượt thích';
   }
 
   @override
   String momentCommentsCount(int count) {
-    return '$count 条评论';
+    return '$count bình luận';
   }
 
   @override
-  String get momentNoComments => '暂无评论';
+  String get momentNoComments => 'Chưa có bình luận nào';
 
   @override
-  String get momentFailedToLoad => '图片加载失败';
+  String get momentFailedToLoad => 'Không thể tải hình ảnh';
 
   @override
   String momentReplyTo(String userName) {
-    return '回复 $userName...';
+    return 'Trả lời $userName...';
   }
 
   @override
-  String get momentNoConversations => '暂无会话';
+  String get momentNoConversations => 'Không có cuộc trò chuyện nào';
 
   @override
-  String get momentJustNow => '刚刚';
+  String get momentJustNow => 'ngay bây giờ';
 
   @override
   String momentMinutesAgo(int count) {
-    return '$count分钟前';
+    return '${count}m trước đây';
   }
 
   @override
   String momentHoursAgo(int count) {
-    return '$count小时前';
+    return '${count}h trước';
   }
 
   @override
   String momentDaysAgo(int count) {
-    return '$count天前';
+    return '${count}d trước';
   }
 
   @override
-  String get chatGroupAnnouncementHint => '输入群公告';
+  String get chatGroupAnnouncementHint => 'Nhập thông báo nhóm';
 
   @override
-  String get chatGroupAnnouncementEmpty => '暂无群公告';
+  String get chatGroupAnnouncementEmpty => 'Không có thông báo';
 
   @override
-  String get chatEditNickname => '编辑群昵称';
+  String get chatEditNickname => 'Chỉnh sửa biệt hiệu';
 
   @override
-  String get chatNicknameHint => '输入你在群里的昵称';
+  String get chatNicknameHint => 'Nhập biệt hiệu của bạn vào nhóm này';
 
   @override
-  String get contactAddPhoneHint => '输入电话号码';
+  String get contactAddPhoneHint => 'Nhập số điện thoại';
 
   @override
-  String get contactNotesHint => '添加联系人备忘';
+  String get contactNotesHint => 'Thêm ghi chú về liên hệ này';
 
   @override
-  String get reportTitle => '投诉';
+  String get reportTitle => 'Báo cáo';
 
   @override
-  String get reportReasonSpam => '垃圾信息';
+  String get reportReasonSpam => 'Thư rác';
 
   @override
-  String get reportReasonHarassment => '骚扰';
+  String get reportReasonHarassment => 'Quấy rối';
 
   @override
-  String get reportReasonFraud => '欺诈';
+  String get reportReasonFraud => 'Lừa đảo';
 
   @override
-  String get reportReasonOther => '其他';
+  String get reportReasonOther => 'Khác';
 
   @override
-  String get reportSubmitted => '投诉已提交';
+  String get reportSubmitted => 'Đã gửi báo cáo';
 
   @override
-  String get reportDescription => '补充说明（选填）';
+  String get reportDescription => 'Mô tả bổ sung (tùy chọn)';
 
   @override
-  String get qrcodeSaved => '二维码已保存到相册';
+  String get qrcodeSaved => 'Đã lưu mã QR vào album';
 
   @override
-  String get chatSendRedPacketInChat => '请在聊天中发送红包';
+  String get chatSendRedPacketInChat =>
+      'Vui lòng gửi gói màu đỏ trong trò chuyện';
 
   @override
-  String get commonSaveFailed => '保存失败';
+  String get commonSaveFailed => 'Lưu không thành công';
 
   @override
-  String get reportSelectReason => '请选择投诉原因';
+  String get reportSelectReason => 'Vui lòng chọn một lý do';
 
   @override
   String get gameCenter => 'Trò chơi';
@@ -4924,7 +4953,7 @@ class SVi extends S {
   String get game2048Desc => 'Ghép ô để đạt 2048';
 
   @override
-  String get gameBlockDrop => 'Block Drop';
+  String get gameBlockDrop => 'Khối thả';
 
   @override
   String get gameBlockDropDesc => 'Thả và xóa các hàng';
@@ -4936,7 +4965,7 @@ class SVi extends S {
   String get gameMinesweeperDesc => 'Tìm tất cả ô an toàn';
 
   @override
-  String get gameMatch3 => 'Match 3';
+  String get gameMatch3 => 'Trận đấu 3';
 
   @override
   String get gameMatch3Desc => 'Nối 3 viên đá quý trở lên';
@@ -4969,406 +4998,419 @@ class SVi extends S {
   String get gameLines => 'Hàng';
 
   @override
-  String get storyMyStory => '我的动态';
+  String get storyMyStory => 'Câu chuyện của tôi';
 
   @override
-  String get storageSmartCleanup => '智能清理';
+  String get storageSmartCleanup => 'Dọn dẹp thông minh';
 
   @override
-  String get storageOldMediaFiles => '旧媒体文件';
+  String get storageOldMediaFiles => 'Tệp phương tiện cũ';
 
   @override
-  String get storageLargeFiles => '大文件';
+  String get storageLargeFiles => 'Tệp lớn';
 
   @override
-  String get storageAppCache => '应用缓存';
+  String get storageAppCache => 'Bộ đệm ứng dụng';
 
   @override
-  String get storageSettings => '存储设置';
+  String get storageSettings => 'Cài đặt lưu trữ';
 
   @override
-  String get storageAutoCleanup => '自动清理';
+  String get storageAutoCleanup => 'Tự động dọn dẹp';
 
   @override
   String storageAutoCleanupDesc(int days) {
-    return '自动清理 $days 天以上未访问的文件';
+    return 'Tự động xóa các tệp cũ hơn $days ngày';
   }
 
   @override
-  String get storageCleanupPeriod => '清理周期';
+  String get storageCleanupPeriod => 'Thời gian dọn dẹp';
 
   @override
-  String get storagePreserveThumbnails => '保留缩略图';
+  String get storagePreserveThumbnails => 'Giữ nguyên hình thu nhỏ';
 
   @override
-  String get storagePreserveThumbnailsDesc => '清理时保留图片缩略图';
+  String get storagePreserveThumbnailsDesc =>
+      'Giữ hình thu nhỏ của hình ảnh trong quá trình dọn dẹp';
 
   @override
-  String get storageWarningHigh => '存储空间较高，建议清理旧文件。';
+  String get storageWarningHigh =>
+      'Mức sử dụng bộ nhớ cao. Hãy cân nhắc việc dọn dẹp các tập tin cũ.';
 
   @override
-  String get storageWarningCritical => '存储空间严重不足，请立即清理。';
+  String get storageWarningCritical =>
+      'Dung lượng lưu trữ cực kỳ thấp. Hãy dọn dẹp để có không gian trống.';
 
   @override
   String storageFreed(String size, int count) {
-    return '已释放 $size（$count 个文件）';
+    return 'Đã giải phóng $size (tệp $count)';
   }
 
   @override
   String storageDays(int days) {
-    return '$days 天';
+    return '$days ngày';
   }
 
   @override
   String storageViewAllRooms(int count) {
-    return '查看全部 $count 个房间';
+    return 'Xem tất cả các phòng $count';
   }
 
   @override
-  String get storageNoFiles => '暂无文件';
+  String get storageNoFiles => 'Không tìm thấy tập tin nào';
 
   @override
-  String get storageFilePinned => '已保留';
+  String get storageFilePinned => 'Đã ghim';
 
   @override
   String storageDeleteSelected(int count) {
-    return '删除 $count 个选中文件？文件可从服务器重新下载。';
+    return 'Xóa các tập tin đã chọn $count? Chúng có thể được tải xuống lại từ máy chủ.';
   }
 
   @override
-  String get backupRestore => '备份与恢复';
+  String get backupRestore => 'Sao lưu & Khôi phục';
 
   @override
-  String get backupCreate => '创建备份';
+  String get backupCreate => 'Tạo bản sao lưu';
 
   @override
-  String get backupCreateDesc => '备份设置和加密密钥。消息将在重新登录后从服务器恢复。';
+  String get backupCreateDesc =>
+      'Sao lưu cài đặt và khóa mã hóa của bạn. Tin nhắn sẽ được khôi phục từ máy chủ sau khi đăng nhập lại.';
 
   @override
-  String get backupIncludeKeys => '包含加密密钥';
+  String get backupIncludeKeys => 'Bao gồm các khóa mã hóa';
 
   @override
-  String get backupIncludeKeysDesc => '读取加密消息所必需';
+  String get backupIncludeKeysDesc => 'Cần thiết để đọc tin nhắn được mã hóa';
 
   @override
-  String get backupPasswordProtect => '密码保护';
+  String get backupPasswordProtect => 'Bảo vệ bằng mật khẩu';
 
   @override
-  String get backupEnterPassword => '输入备份密码';
+  String get backupEnterPassword => 'Nhập mật khẩu dự phòng';
 
   @override
-  String get backupHistory => '备份历史';
+  String get backupHistory => 'Lịch sử sao lưu';
 
   @override
-  String get backupNoBackups => '暂无备份';
+  String get backupNoBackups => 'Chưa có bản sao lưu nào';
 
   @override
-  String get backupRestore2 => '恢复';
+  String get backupRestore2 => 'Khôi phục';
 
   @override
-  String get backupDelete => '删除';
+  String get backupDelete => 'Xóa';
 
   @override
-  String get backupDeleteConfirm => '确定删除此备份？此操作不可撤销。';
+  String get backupDeleteConfirm =>
+      'Bạn có chắc chắn muốn xóa bản sao lưu này không? Điều này không thể hoàn tác được.';
 
   @override
-  String get backupRestoreFromFile => '从文件恢复';
+  String get backupRestoreFromFile => 'Khôi phục từ tệp';
 
   @override
-  String get backupRestoreFromFileDesc => '导入来自其他设备或之前备份的 .n42backup 文件。';
+  String get backupRestoreFromFileDesc =>
+      'Nhập tệp .n42backup từ thiết bị khác hoặc bản sao lưu trước đó.';
 
   @override
-  String get backupChooseFile => '选择备份文件';
+  String get backupChooseFile => 'Chọn tập tin sao lưu';
 
   @override
-  String get backupRestoring => '恢复中...';
+  String get backupRestoring => 'Đang khôi phục...';
 
   @override
   String backupCreated(int rooms, int messages) {
-    return '备份已创建：$rooms 个房间，$messages 条消息';
+    return 'Đã tạo bản sao lưu: phòng $rooms, tin nhắn $messages';
   }
 
   @override
   String backupRestored(int settings, int rooms) {
-    return '已恢复 $settings 项设置（来自 $rooms 个房间）';
+    return 'Đã khôi phục cài đặt $settings từ các phòng $rooms';
   }
 
   @override
   String backupFailed(String error) {
-    return '备份失败：$error';
+    return 'Sao lưu không thành công: $error';
   }
 
   @override
-  String get backupPasswordRequired => '此备份需要密码';
+  String get backupPasswordRequired =>
+      'Bản sao lưu này được bảo vệ bằng mật khẩu';
 
   @override
-  String get blocGroupNotFound => '群组未找到';
+  String get blocGroupNotFound => 'Không tìm thấy nhóm';
 
   @override
   String blocGroupMembersInvited(int count) {
-    return '已邀请$count位成员';
+    return 'Đã mời (các) thành viên $count';
   }
 
   @override
-  String get blocGroupMemberRemoved => '成员已移除';
+  String get blocGroupMemberRemoved => 'Thành viên đã bị xóa';
 
   @override
-  String get blocGroupAdminRemoved => '已取消管理员';
+  String get blocGroupAdminRemoved => 'Quản trị viên đã xóa';
 
   @override
-  String get blocGroupLeft => '已退出群聊';
+  String get blocGroupLeft => 'Đã rời nhóm';
 
   @override
-  String get blocGroupDisbanded => '群聊已解散';
+  String get blocGroupDisbanded => 'Nhóm đã tan rã';
 
   @override
-  String get blocGroupJoined => '已加入群聊';
+  String get blocGroupJoined => 'Đã tham gia nhóm';
 
   @override
-  String get blocGroupInviteDeclined => '已拒绝邀请';
+  String get blocGroupInviteDeclined => 'Lời mời đã bị từ chối';
 
   @override
-  String get blocGroupTokenGateUpdated => 'Token 门槛已更新';
+  String get blocGroupTokenGateUpdated => 'Cổng mã thông báo đã được cập nhật';
 
   @override
-  String get blocTransferProcessing => '转账处理中...';
+  String get blocTransferProcessing => 'Đang xử lý chuyển...';
 
   @override
-  String get blocTransferCancelled => '转账已取消';
+  String get blocTransferCancelled => 'Đã hủy chuyển khoản';
 
   @override
-  String get blocTransferFailed => '转账失败';
+  String get blocTransferFailed => 'Chuyển không thành công';
 
   @override
-  String get blocPaymentProcessing => '支付处理中...';
+  String get blocPaymentProcessing => 'Đang xử lý thanh toán...';
 
   @override
-  String get blocPaymentFailed => '支付失败';
+  String get blocPaymentFailed => 'Thanh toán không thành công';
 
   @override
-  String get groupMaxMembers => '群人数上限';
+  String get groupMaxMembers => 'Giới hạn thành viên';
 
   @override
-  String get groupMaxMembersUnlimited => '不限';
+  String get groupMaxMembersUnlimited => 'Không giới hạn';
 
   @override
-  String get groupMaxMembersHint => '输入上限（留空表示不限）';
+  String get groupMaxMembersHint =>
+      'Nhập giới hạn (để trống nếu không giới hạn)';
 
   @override
-  String get groupMaxMembersUpdated => '群人数上限已更新';
+  String get groupMaxMembersUpdated => 'Đã cập nhật giới hạn thành viên';
 
   @override
-  String get groupFull => '群已满员';
+  String get groupFull => 'Nhóm đã đạt công suất';
 
   @override
-  String get groupChannels => '话题频道';
+  String get groupChannels => 'Kênh chủ đề';
 
   @override
-  String get groupChannelsEmpty => '暂无话题频道';
+  String get groupChannelsEmpty => 'Chưa có kênh nào';
 
   @override
-  String get groupChannelsCount => '个频道';
+  String get groupChannelsCount => 'kênh';
 
   @override
-  String get groupChannelCreate => '新建频道';
+  String get groupChannelCreate => 'Kênh mới';
 
   @override
-  String get groupChannelName => '频道名称';
+  String get groupChannelName => 'Tên kênh';
 
   @override
-  String get groupChannelTopic => '频道话题（可选）';
+  String get groupChannelTopic => 'Chủ đề kênh (tùy chọn)';
 
   @override
-  String get groupChannelDelete => '删除频道';
+  String get groupChannelDelete => 'Xóa kênh';
 
   @override
-  String get groupChannelDeleteConfirm => '确认删除此频道？消息不可恢复。';
+  String get groupChannelDeleteConfirm =>
+      'Xóa kênh này? Tất cả tin nhắn sẽ bị mất.';
 
   @override
-  String get groupBotSettings => 'Bot 设置';
+  String get groupBotSettings => 'Cài đặt bot';
 
   @override
-  String get groupBotEnabled => '启用 Bot';
+  String get groupBotEnabled => 'Kích hoạt Bot';
 
   @override
-  String get groupBotWelcomeMessage => '欢迎语模板';
+  String get groupBotWelcomeMessage => 'Mẫu tin nhắn chào mừng';
 
   @override
-  String get groupBotWelcomeHint => '用 \'name\' 作为新成员名字占位符';
+  String get groupBotWelcomeHint =>
+      'Sử dụng \'tên\' làm trình giữ chỗ cho tên thành viên mới';
 
   @override
-  String get groupBotConfigUpdated => 'Bot 设置已更新';
+  String get groupBotConfigUpdated => 'Đã cập nhật cài đặt bot';
 
   @override
-  String get groupContentFilter => '关键词过滤';
+  String get groupContentFilter => 'Bộ lọc nội dung';
 
   @override
-  String get groupContentFilterEnabled => '启用关键词过滤';
+  String get groupContentFilterEnabled => 'Bật bộ lọc từ khóa';
 
   @override
-  String get groupContentFilterReplace => '替换为 ***';
+  String get groupContentFilterReplace => 'Thay thế bằng ***';
 
   @override
-  String get groupContentFilterHide => '隐藏消息';
+  String get groupContentFilterHide => 'Ẩn tin nhắn';
 
   @override
-  String get groupContentFilterAddWord => '添加关键词';
+  String get groupContentFilterAddWord => 'Thêm từ khóa';
 
   @override
-  String get groupContentFilterUpdated => '内容过滤设置已更新';
+  String get groupContentFilterUpdated => 'Đã cập nhật bộ lọc nội dung';
 
   @override
-  String get chatSlashCommands => '指令';
+  String get chatSlashCommands => 'Lệnh';
 
   @override
-  String get chatCommandPoll => '/poll — 创建投票';
+  String get chatCommandPoll => '/polll - Tạo một cuộc thăm dò';
 
   @override
-  String get chatCommandAnnounce => '/announce — 发布公告';
+  String get chatCommandAnnounce => '/ thông báo - Gửi thông báo';
 
   @override
-  String get chatCommandWelcome => '/welcome — 设置欢迎语';
+  String get chatCommandWelcome => '/Chào mừng - Đặt tin nhắn chào mừng';
 
   @override
-  String get chatReportMessage => '举报';
+  String get chatReportMessage => 'Báo cáo';
 
   @override
-  String get chatReportReason => '举报原因';
+  String get chatReportReason => 'Lý do báo cáo';
 
   @override
-  String get chatReportSpam => '垃圾信息';
+  String get chatReportSpam => 'Thư rác';
 
   @override
-  String get chatReportHarassment => '骚扰';
+  String get chatReportHarassment => 'Quấy rối';
 
   @override
-  String get chatReportInappropriate => '违规内容';
+  String get chatReportInappropriate => 'Nội dung không phù hợp';
 
   @override
-  String get chatReportOther => '其他';
+  String get chatReportOther => 'Khác';
 
   @override
-  String get chatReportSuccess => '举报已提交';
+  String get chatReportSuccess => 'Đã gửi báo cáo';
 
   @override
-  String get spacesName => '社区名称';
+  String get spacesName => 'Tên cộng đồng';
 
   @override
-  String get spacesNameHint => '例如：加密交易者';
+  String get spacesNameHint => 'ví dụ: Nhà giao dịch tiền điện tử';
 
   @override
-  String get spacesNameRequired => '请输入社区名称';
+  String get spacesNameRequired => 'Tên là bắt buộc';
 
   @override
-  String get spacesDescription => '简介';
+  String get spacesDescription => 'Mô tả';
 
   @override
-  String get spacesDescriptionHint => '介绍一下这个社区';
+  String get spacesDescriptionHint => 'Cộng đồng này nói về cái gì?';
 
   @override
-  String get spacesType => '社区类型';
+  String get spacesType => 'Loại cộng đồng';
 
   @override
-  String get spacesPublicDesc => '任何人均可发现并加入';
+  String get spacesPublicDesc => 'Bất cứ ai cũng có thể khám phá và tham gia';
 
   @override
-  String get spacesPrivateDesc => '仅受邀成员可加入';
+  String get spacesPrivateDesc =>
+      'Chỉ những thành viên được mời mới có thể tham gia';
 
   @override
-  String get spacesNotFound => '社区不存在';
+  String get spacesNotFound => 'Không tìm thấy cộng đồng';
 
   @override
-  String get spacesSearch => '搜索社区...';
+  String get spacesSearch => 'Tìm kiếm cộng đồng...';
 
   @override
-  String get spacesMembers => '成员';
+  String get spacesMembers => 'Thành viên';
 
   @override
-  String get spacesNoChannels => '暂无频道';
+  String get spacesNoChannels => 'Chưa có kênh nào';
 
   @override
-  String get spacesLeave => '退出社区';
+  String get spacesLeave => 'Rời khỏi cộng đồng';
 
   @override
   String spacesLeaveConfirm(String name) {
-    return '确定要退出「$name」吗？';
+    return 'Bạn có chắc chắn muốn rời khỏi \"$name\" không?';
   }
 
   @override
-  String get spacesDelete => '解散社区';
+  String get spacesDelete => 'Xóa cộng đồng';
 
   @override
   String spacesDeleteConfirm(String name) {
-    return '此操作将永久删除「$name」及其所有频道，且不可撤销。';
+    return 'Thao tác này sẽ xóa vĩnh viễn \"$name\" và tất cả các kênh của nó. Không thể hoàn tác hành động này.';
   }
 
   @override
-  String get spacesCreateChannel => '创建频道';
+  String get spacesCreateChannel => 'Thêm kênh';
 
   @override
-  String get spacesChannelName => '频道名称';
+  String get spacesChannelName => 'Tên kênh';
 
   @override
-  String get spacesChannelTopic => '话题（可选）';
+  String get spacesChannelTopic => 'Chủ đề (tùy chọn)';
 
   @override
-  String get spacesDeleteChannel => '删除频道';
+  String get spacesDeleteChannel => 'Xóa kênh';
 
   @override
   String spacesDeleteChannelConfirm(String name) {
-    return '确定要删除频道「#$name」吗？';
+    return 'Bạn có chắc chắn muốn xóa \"#$name\" không?';
   }
 
   @override
-  String get spacesEditName => '修改名称';
+  String get spacesEditName => 'Chỉnh sửa tên';
 
   @override
-  String get spacesEditDescription => '修改简介';
+  String get spacesEditDescription => 'Chỉnh sửa mô tả';
 
   @override
   String spacesViewAllMembers(int count) {
-    return '查看全部 $count 位成员';
+    return 'Xem tất cả thành viên $count';
   }
 
   @override
   String spacesKickMemberTitle(String name) {
-    return '踢出 $name';
+    return 'Đá $name';
   }
 
   @override
   String spacesBanMemberTitle(String name) {
-    return '封禁 $name';
+    return 'Cấm $name';
   }
 
   @override
-  String get spacesPromoteAdmin => '设为管理员';
+  String get spacesPromoteAdmin => 'Thăng cấp lên quản trị viên';
 
   @override
-  String get spacesDemoteAdmin => '撤销管理员';
+  String get spacesDemoteAdmin => 'Xóa quản trị viên';
 
   @override
-  String get spacesInviteMember => '邀请成员';
+  String get spacesInviteMember => 'Mời thành viên';
 
   @override
-  String get spacesInviteMemberUserId => '用户 ID（如 @user:server.com）';
+  String get spacesInviteMemberUserId =>
+      'ID người dùng (ví dụ: @user:server.com)';
 
   @override
-  String get spacesSave => '保存';
+  String get spacesSave => 'Lưu';
 
   @override
-  String get settingsScreenshotProtection => '截图防护';
+  String get settingsScreenshotProtection => 'Bảo vệ ảnh chụp màn hình';
 
   @override
-  String get settingsScreenshotProtectionDesc => '防止截图和屏幕录制';
+  String get settingsScreenshotProtectionDesc =>
+      'Ngăn chặn ảnh chụp màn hình và ghi màn hình';
 
   @override
-  String get chatSelfDestructTimer => '阅后即焚';
+  String get chatSelfDestructTimer => 'Tự hủy';
 
   @override
-  String get chatTimerPickerTitle => '设置阅后即焚时间';
+  String get chatTimerPickerTitle => 'Hẹn giờ tự hủy';
 
   @override
-  String get chatTimerOff => '关闭';
+  String get chatTimerOff => 'Tắt';
 
   @override
   String get onChainNotificationsTitle => 'Sự kiện On-chain';
@@ -5420,13 +5462,13 @@ class SVi extends S {
   String get miniAppNoResults => 'Không tìm thấy ứng dụng';
 
   @override
-  String get slideToPayLabel => '→→→  Slide to confirm';
+  String get slideToPayLabel => '→→→ Trượt để xác nhận';
 
   @override
-  String get slideToPayConfirming => 'Confirming...';
+  String get slideToPayConfirming => 'Đang xác nhận...';
 
   @override
-  String get redPacketBestLuck => 'Best Luck';
+  String get redPacketBestLuck => 'May mắn nhất';
 
   @override
   String get redPacketBestLuckCongrats => 'You got the best luck! 👑';
@@ -5445,270 +5487,278 @@ class SVi extends S {
   }
 
   @override
-  String get web3SearchHint => '@matrix:id  •  0x wallet address  •  name.eth';
+  String get web3SearchHint => '@matrix:id • Địa chỉ ví 0x • name.eth';
 
   @override
-  String get web3SearchPlaceholder => 'Search by ID, wallet, or ENS...';
+  String get web3SearchPlaceholder => 'Tìm kiếm theo ID, ví hoặc ENS...';
 
   @override
-  String get web3WalletAddress => 'Wallet Address';
+  String get web3WalletAddress => 'Địa chỉ ví';
 
   @override
-  String get web3AddressCopied => 'Address copied';
+  String get web3AddressCopied => 'Đã sao chép địa chỉ';
 
   @override
-  String get web3Copy => 'Copy';
+  String get web3Copy => 'Sao chép';
 
   @override
-  String get web3SendMessage => 'Send Message';
+  String get web3SendMessage => 'Gửi tin nhắn';
 
   @override
-  String get web3SendToWallet => 'Message Wallet';
+  String get web3SendToWallet => 'Ví tin nhắn';
 
   @override
   String get web3WalletOnlyHint =>
-      'This address has no N42 account yet. Message will be delivered when they join.';
+      'Địa chỉ này chưa có tài khoản N42. Tin nhắn sẽ được gửi khi họ tham gia.';
 
   @override
-  String get web3NftAvatar => 'NFT Avatar';
+  String get web3NftAvatar => 'Hình đại diện NFT';
 
   @override
-  String get web3ResolveFailed => 'Failed to resolve identity';
+  String get web3ResolveFailed => 'Không thể giải quyết danh tính';
 
   @override
   String web3EnsNotFound(String name) {
-    return 'ENS name \"$name\" not found';
+    return 'Không tìm thấy tên ENS \"$name\"';
   }
 
   @override
-  String get web3NoN42AccountTitle => 'No N42 Account';
+  String get web3NoN42AccountTitle => 'Không có tài khoản N42';
 
   @override
   String get web3NoN42AccountDesc =>
-      'This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.';
+      'Địa chỉ ví này chưa có tài khoản N42. Bạn có thể chia sẻ liên kết mời N42 của mình với họ để bắt đầu.';
 
   @override
-  String get web3ShareInvite => 'Share Invite';
+  String get web3ShareInvite => 'Chia sẻ Mời';
 
   @override
-  String get nftPickerTitle => 'Select NFT Avatar';
+  String get nftPickerTitle => 'Chọn Hình đại diện NFT';
 
   @override
-  String get nftPickerTabPopular => 'Popular';
+  String get nftPickerTabPopular => 'phổ biến';
 
   @override
-  String get nftPickerTabCustom => 'Custom';
+  String get nftPickerTabCustom => 'tùy chỉnh';
 
   @override
-  String get nftPickerChain => 'Chain';
+  String get nftPickerChain => 'Chuỗi';
 
   @override
-  String get nftPickerContract => 'Contract Address';
+  String get nftPickerContract => 'Địa chỉ hợp đồng';
 
   @override
-  String get nftPickerTokenId => 'Token ID';
+  String get nftPickerTokenId => 'ID mã thông báo';
 
   @override
-  String get nftPickerVerifyOwnership => 'Verify Ownership & Preview';
+  String get nftPickerVerifyOwnership => 'Xác minh quyền sở hữu và xem trước';
 
   @override
-  String get nftPickerUseAsAvatar => 'Use as Avatar';
+  String get nftPickerUseAsAvatar => 'Sử dụng làm Hình đại diện';
 
   @override
-  String get nftPickerPreview => 'Preview';
+  String get nftPickerPreview => 'Xem trước';
 
   @override
-  String get nftPickerNotOwned => 'You do not own this NFT';
+  String get nftPickerNotOwned => 'Bạn không sở hữu NFT này';
 
   @override
-  String get nftPickerInvalidTokenId => 'Invalid token ID';
+  String get nftPickerInvalidTokenId => 'ID mã thông báo không hợp lệ';
 
   @override
-  String get nftPickerEnterBoth => 'Enter contract address and token ID';
+  String get nftPickerEnterBoth => 'Nhập địa chỉ hợp đồng và ID mã thông báo';
 
   @override
-  String get nftPickerInfoTitle => 'NFT Avatar — Verified On-Chain';
+  String get nftPickerInfoTitle => 'Avatar NFT — Đã được xác minh trên chuỗi';
 
   @override
   String get nftPickerInfoDesc =>
-      'Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.';
+      'Liên kết NFT mà bạn sở hữu làm hình đại diện của mình. Bất cứ ai cũng có thể xác minh quyền sở hữu trên chuỗi. Được trưng bày với một chiếc nhẫn vàng trên N42.';
 
   @override
-  String get nftPickerPopularCollections => 'Popular Collections';
+  String get nftPickerPopularCollections => 'Bộ sưu tập phổ biến';
 
   @override
   String get nftPickerWalletHint =>
-      'Connect your N42 wallet to automatically discover your NFTs across 236+ chains.';
+      'Kết nối ví N42 của bạn để tự động khám phá NFT của bạn trên hơn 236 chuỗi.';
 
   @override
-  String get profileBindNftAvatar => 'Bind NFT Avatar';
+  String get profileBindNftAvatar => 'Liên kết hình đại diện NFT';
 
   @override
-  String get profileChangeAvatar => 'Change Avatar';
+  String get profileChangeAvatar => 'Thay đổi hình đại diện';
 
   @override
-  String get groupTopics => 'Topics';
+  String get groupTopics => 'chủ đề';
 
   @override
-  String get groupTopicsEmpty => 'No topics yet';
+  String get groupTopicsEmpty => 'Chưa có chủ đề nào';
 
   @override
-  String get syncInProgress => 'Syncing message history...';
+  String get syncInProgress => 'Đang đồng bộ hóa lịch sử tin nhắn...';
 
   @override
-  String get recoveryKeyReminderTitle => 'Protect your messages';
+  String get recoveryKeyReminderTitle => 'Bảo vệ tin nhắn của bạn';
 
   @override
   String get recoveryKeyReminderDesc =>
-      'Create a recovery key to securely sync encrypted messages across devices';
+      'Tạo khóa khôi phục để đồng bộ hóa an toàn các tin nhắn được mã hóa trên các thiết bị';
 
   @override
-  String get recoveryKeySetupNow => 'Set up now';
+  String get recoveryKeySetupNow => 'Thiết lập ngay bây giờ';
 
   @override
-  String get recoveryKeyRemindLater => 'Remind me later';
+  String get recoveryKeyRemindLater => 'Nhắc tôi sau';
 
   @override
-  String get channelReadOnly => '仅管理员可在此频道发言';
+  String get channelReadOnly =>
+      'Chỉ quản trị viên mới có thể đăng bài trên kênh này';
 
   @override
-  String get channelSubscribers => '订阅者';
+  String get channelSubscribers => 'người đăng ký';
 
   @override
-  String get channelVerified => '已认证频道';
+  String get channelVerified => 'Kênh đã được xác minh';
 
   @override
-  String get redPacketHistory => '红包记录';
+  String get redPacketHistory => 'Lịch sử gói màu đỏ';
 
   @override
-  String get redPacketSent => '已发出';
+  String get redPacketSent => 'Đã gửi';
 
   @override
-  String get redPacketReceived => '已收到';
+  String get redPacketReceived => 'Đã nhận';
 
   @override
-  String get redPacketExpired => '已过期';
+  String get redPacketExpired => 'Đã hết hạn';
 
   @override
-  String get redPacketClaimed => '已领取';
+  String get redPacketClaimed => 'Đã xác nhận quyền sở hữu';
 
   @override
-  String get redPacketInsufficientBalance => '余额不足';
+  String get redPacketInsufficientBalance => 'Số dư không đủ';
 
   @override
   String selfDestructCountdown(String time) {
-    return '$time 后销毁';
+    return 'Tự hủy trong $time';
   }
 
   @override
-  String get messageDestroyed => '消息已销毁';
+  String get messageDestroyed => 'Tin nhắn bị hủy';
 
   @override
   String miniAppPermissionDenied(String permission) {
-    return '权限不足：$permission';
+    return 'Quyền bị từ chối: $permission';
   }
 
   @override
-  String get aiSuggestionGasFee => '什么是 Gas 费？';
+  String get aiSuggestionGasFee => 'Phí gas là gì?';
 
   @override
-  String get aiSuggestionDefi => 'DeFi 入门';
+  String get aiSuggestionDefi => 'Hướng dẫn cho người mới bắt đầu DeFi';
 
   @override
-  String get aiSuggestionSecurity => '如何检查合约安全';
+  String get aiSuggestionSecurity => 'Cách kiểm tra bảo mật hợp đồng';
 
   @override
-  String get aiSuggestionBridge => '跨链桥接';
+  String get aiSuggestionBridge => 'Cầu nối chuỗi chéo';
 
   @override
-  String get channelDiscoverTitle => '发现频道';
+  String get channelDiscoverTitle => 'Khám phá kênh';
 
   @override
-  String get channelDiscoverSearch => '搜索频道...';
+  String get channelDiscoverSearch => 'Tìm kiếm kênh...';
 
   @override
-  String get channelJoin => '加入';
+  String get channelJoin => 'Tham gia';
 
   @override
-  String get channelJoined => '已加入';
+  String get channelJoined => 'Đã tham gia';
 
   @override
-  String get channelCategory => '分类';
+  String get channelCategory => 'Danh mục';
 
   @override
   String slowModeCooldown(int seconds) {
-    return '慢速模式：请等待 $seconds 秒';
+    return 'Chế độ chậm: chờ ${seconds}s';
   }
 
   @override
-  String get addressCopyAction => '复制地址';
+  String get addressCopyAction => 'Sao chép địa chỉ';
 
   @override
-  String get addressSendMessage => '发消息';
+  String get addressSendMessage => 'Gửi tin nhắn';
 
   @override
-  String get addressViewProfile => '查看资料';
+  String get addressViewProfile => 'Xem hồ sơ';
 
   @override
-  String get sendToAddress => '通过钱包地址发消息';
+  String get sendToAddress => 'Gửi đến địa chỉ ví';
 
   @override
-  String get blocAuthSendVerificationCodeFailed => '发送验证码失败';
+  String get blocAuthSendVerificationCodeFailed => 'Không gửi được mã xác minh';
 
   @override
-  String get blocAuthServerNoEmailPasswordReset => '该服务器不支持通过邮箱重置密码';
+  String get blocAuthServerNoEmailPasswordReset =>
+      'Máy chủ này không hỗ trợ đặt lại mật khẩu email';
 
   @override
-  String get blocAuthResetPasswordFailed => '重置密码失败';
+  String get blocAuthResetPasswordFailed => 'Không thể đặt lại mật khẩu';
 
   @override
-  String get blocAuthChangePasswordFailed => '修改密码失败';
+  String get blocAuthChangePasswordFailed => 'Không thể thay đổi mật khẩu';
 
   @override
-  String get blocAuthOldPasswordWrong => '原密码错误';
+  String get blocAuthOldPasswordWrong => 'Mật khẩu hiện tại không chính xác';
 
   @override
-  String get blocAuthLoginCancelled => '登录已取消';
+  String get blocAuthLoginCancelled => 'Đăng nhập bị hủy';
 
   @override
-  String get blocAuthGoogleLoginFailed => 'Google 登录失败';
+  String get blocAuthGoogleLoginFailed => 'Đăng nhập Google không thành công';
 
   @override
-  String get blocAuthAppleLoginFailed => 'Apple 登录失败';
+  String get blocAuthAppleLoginFailed => 'Đăng nhập Apple không thành công';
 
   @override
-  String get blocAuthSsoLoginFailed => 'SSO 登录失败';
+  String get blocAuthSsoLoginFailed => 'Đăng nhập SSO không thành công';
 
   @override
-  String get blocAuthFacebookLoginFailed => 'Facebook 登录失败';
+  String get blocAuthFacebookLoginFailed =>
+      'Đăng nhập Facebook không thành công';
 
   @override
-  String get blocAuthTwitterLoginFailed => 'Twitter 登录失败';
+  String get blocAuthTwitterLoginFailed => 'Đăng nhập Twitter không thành công';
 
   @override
-  String get blocAuthWeChatLoginFailed => '微信登录失败';
+  String get blocAuthWeChatLoginFailed => 'Đăng nhập WeChat không thành công';
 
   @override
-  String get blocAuthWeChatNotConfigured => '微信登录未配置';
+  String get blocAuthWeChatNotConfigured =>
+      'Đăng nhập WeChat không được định cấu hình';
 
   @override
-  String get blocAuthWeChatNotInstalled => '请先安装微信';
+  String get blocAuthWeChatNotInstalled => 'Vui lòng cài đặt WeChat trước';
 
   @override
-  String get blocAuthPasswordWrong => '密码错误';
+  String get blocAuthPasswordWrong => 'Mật khẩu không chính xác';
 
   @override
-  String get blocAuthEmailAlreadyBound => '该邮箱已被其他账号绑定';
+  String get blocAuthEmailAlreadyBound =>
+      'Email này đã được liên kết với một tài khoản khác';
 
   @override
-  String get blocAuthChangeEmailFailed => '修改邮箱失败';
+  String get blocAuthChangeEmailFailed => 'Không thể thay đổi email';
 
   @override
-  String get blocAuthVerificationCodeInvalid => '验证码错误或已过期';
+  String get blocAuthVerificationCodeInvalid =>
+      'Mã xác minh không chính xác hoặc đã hết hạn';
 
   @override
-  String get blocAuthSessionExpired => '会话已失效，请重新登录';
+  String get blocAuthSessionExpired =>
+      'Phiên đã hết hạn, vui lòng đăng nhập lại';
 
   @override
-  String get blocAuthSessionIncomplete => '会话数据不完整，请重新登录';
+  String get blocAuthSessionIncomplete =>
+      'Dữ liệu phiên không đầy đủ, vui lòng đăng nhập lại';
 }

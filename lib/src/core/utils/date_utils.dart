@@ -57,27 +57,27 @@ class DateLocaleStrings {
   /// Chinese locale strings
   static const DateLocaleStrings chinese = DateLocaleStrings(
     yesterday: '昨天',
-    justNow: '刚刚',
+    justNow: '剛剛',
     minutesAgo: _chineseMinutesAgo,
     hoursAgo: _chineseHoursAgo,
     daysAgo: _chineseDaysAgo,
-    online: '在线',
-    offline: '离线',
+    online: '在線',
+    offline: '離線',
     minutesAgoOnline: _chineseMinutesAgoOnline,
     hoursAgoOnline: _chineseHoursAgoOnline,
     daysAgoOnline: _chineseDaysAgoOnline,
-    weekdays: ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+    weekdays: ['', '週一', '週二', '週三', '週四', '週五', '週六', '週日'],
     localeCode: 'zh',
     monthDay: _chineseMonthDay,
     yearMonthDay: _chineseYearMonthDay,
   );
 
-  static String _chineseMinutesAgo(int count) => '$count分钟前';
-  static String _chineseHoursAgo(int count) => '$count小时前';
+  static String _chineseMinutesAgo(int count) => '$count分鐘前';
+  static String _chineseHoursAgo(int count) => '$count小時前';
   static String _chineseDaysAgo(int count) => '$count天前';
-  static String _chineseMinutesAgoOnline(int count) => '$count分钟前在线';
-  static String _chineseHoursAgoOnline(int count) => '$count小时前在线';
-  static String _chineseDaysAgoOnline(int count) => '$count天前在线';
+  static String _chineseMinutesAgoOnline(int count) => '$count分鐘前在線';
+  static String _chineseHoursAgoOnline(int count) => '$count小時前在線';
+  static String _chineseDaysAgoOnline(int count) => '$count天前在線';
   static String _chineseMonthDay(int month, int day) => '$month月$day日';
   static String _chineseYearMonthDay(int year, int month, int day) =>
       '$year年$month月$day日';

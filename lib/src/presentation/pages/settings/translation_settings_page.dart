@@ -12,7 +12,12 @@ import '../../../core/utils/debug_log.dart';
 /// WeChat 风格翻译设置页面
 class TranslationSettingsPage extends StatefulWidget {
   /// 翻译设置变化回调（通知 ChatBloc）
-  final void Function(bool autoTranslate, String targetLanguage, bool smartReplyTranslate)? onSettingsChanged;
+  final void Function(
+    bool autoTranslate,
+    String targetLanguage,
+    bool smartReplyTranslate,
+  )?
+  onSettingsChanged;
 
   const TranslationSettingsPage({super.key, this.onSettingsChanged});
 
@@ -28,17 +33,59 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
   bool _isLoading = true;
 
   static const _supportedLanguages = [
-    TranslationLanguage(code: 'zh', name: 'Chinese', localizedName: '中文'),
+    TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
+    TranslationLanguage(code: 'bn', name: 'Bengali', localizedName: 'বাংলা'),
+    TranslationLanguage(code: 'cs', name: 'Czech', localizedName: 'Čeština'),
+    TranslationLanguage(code: 'de', name: 'German', localizedName: 'Deutsch'),
     TranslationLanguage(code: 'en', name: 'English', localizedName: 'English'),
+    TranslationLanguage(code: 'es', name: 'Spanish', localizedName: 'Español'),
+    TranslationLanguage(code: 'fr', name: 'French', localizedName: 'Français'),
+    TranslationLanguage(code: 'hi', name: 'Hindi', localizedName: 'हिन्दी'),
+    TranslationLanguage(
+      code: 'id',
+      name: 'Indonesian',
+      localizedName: 'Bahasa Indonesia',
+    ),
+    TranslationLanguage(code: 'it', name: 'Italian', localizedName: 'Italiano'),
     TranslationLanguage(code: 'ja', name: 'Japanese', localizedName: '日本語'),
     TranslationLanguage(code: 'ko', name: 'Korean', localizedName: '한국어'),
-    TranslationLanguage(code: 'fr', name: 'French', localizedName: 'Français'),
-    TranslationLanguage(code: 'de', name: 'German', localizedName: 'Deutsch'),
-    TranslationLanguage(code: 'es', name: 'Spanish', localizedName: 'Español'),
-    TranslationLanguage(code: 'pt', name: 'Portuguese', localizedName: 'Português'),
+    TranslationLanguage(code: 'mr', name: 'Marathi', localizedName: 'मराठी'),
+    TranslationLanguage(code: 'pl', name: 'Polish', localizedName: 'Polski'),
+    TranslationLanguage(
+      code: 'pt',
+      name: 'Portuguese',
+      localizedName: 'Português',
+    ),
     TranslationLanguage(code: 'ru', name: 'Russian', localizedName: 'Русский'),
-    TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
+    TranslationLanguage(
+      code: 'sw',
+      name: 'Swahili',
+      localizedName: 'Kiswahili',
+    ),
+    TranslationLanguage(code: 'ta', name: 'Tamil', localizedName: 'தமிழ்'),
+    TranslationLanguage(code: 'te', name: 'Telugu', localizedName: 'తెలుగు'),
+    TranslationLanguage(code: 'tr', name: 'Turkish', localizedName: 'Türkçe'),
+    TranslationLanguage(
+      code: 'uk',
+      name: 'Ukrainian',
+      localizedName: 'Українська',
+    ),
+    TranslationLanguage(code: 'ur', name: 'Urdu', localizedName: 'اردو'),
+    TranslationLanguage(
+      code: 'vi',
+      name: 'Vietnamese',
+      localizedName: 'Tiếng Việt',
+    ),
+    TranslationLanguage(
+      code: 'zh_TW',
+      name: 'Traditional Chinese',
+      localizedName: '繁體中文',
+    ),
   ];
+
+  static String _normalizeTargetLanguage(String code) {
+    return normalizeTranslationLanguageCode(code);
+  }
 
   @override
   void initState() {
@@ -53,9 +100,12 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
       if (mounted) {
         setState(() {
           _autoTranslate = settings?['autoTranslate'] as bool? ?? false;
-          _targetLanguage = settings?['defaultTargetLanguage'] as String? ??
-              getDeviceLanguageCode();
-          _smartReplyTranslate = settings?['smartReplyTranslate'] as bool? ?? false;
+          _targetLanguage = _normalizeTargetLanguage(
+            settings?['defaultTargetLanguage'] as String? ??
+                getDeviceLanguageCode(),
+          );
+          _smartReplyTranslate =
+              settings?['smartReplyTranslate'] as bool? ?? false;
           _isLoading = false;
         });
       }
@@ -69,10 +119,14 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
       final storage = getIt<PreferencesDataSource>();
       await storage.saveTranslationSettings(
         autoTranslate: _autoTranslate,
-        defaultTargetLanguage: _targetLanguage,
+        defaultTargetLanguage: _normalizeTargetLanguage(_targetLanguage),
         smartReplyTranslate: _smartReplyTranslate,
       );
-      widget.onSettingsChanged?.call(_autoTranslate, _targetLanguage, _smartReplyTranslate);
+      widget.onSettingsChanged?.call(
+        _autoTranslate,
+        _targetLanguage,
+        _smartReplyTranslate,
+      );
     } catch (e) {
       debugLog('TranslationSettingsPage: Failed to save: $e');
     }
@@ -86,8 +140,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
       builder: (ctx) => Container(
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(16)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
           child: Column(
@@ -105,8 +158,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  S.of(context)?.settingsTranslateTextTo ??
-                      'Translate text to',
+                  S.of(context)?.settingsTranslateTextTo ?? 'Translate text to',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -141,8 +193,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                         ),
                       ),
                       trailing: isSelected
-                          ? const Icon(Icons.check,
-                              color: AppColors.primary)
+                          ? const Icon(Icons.check, color: AppColors.primary)
                           : null,
                       onTap: () {
                         Navigator.pop(ctx);
@@ -163,7 +214,9 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
   String _getLanguageDisplayName(String code) {
     for (final lang in _supportedLanguages) {
-      if (lang.code == code) return lang.localizedName;
+      if (lang.code == _normalizeTargetLanguage(code)) {
+        return lang.localizedName;
+      }
     }
     return code;
   }
@@ -175,8 +228,9 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
     if (_isLoading) {
       return Scaffold(
-        backgroundColor:
-            isDark ? AppColors.backgroundDark : AppColors.background,
+        backgroundColor: isDark
+            ? AppColors.backgroundDark
+            : AppColors.background,
         appBar: N42AppBar(
           title: l10n?.settingsTranslation ?? 'Translation',
           showBackButton: true,
@@ -187,8 +241,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
     }
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
         title: l10n?.settingsTranslation ?? 'Translation',
         showBackButton: true,
@@ -207,11 +260,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                 color: Colors.teal.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(
-                Icons.translate,
-                size: 36,
-                color: Colors.teal,
-              ),
+              child: const Icon(Icons.translate, size: 36, color: Colors.teal),
             ),
           ),
 
@@ -226,13 +275,14 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                 onTap: _showLanguagePicker,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
                         child: Text(
-                          l10n?.settingsTranslateTextTo ??
-                              'Translate text to',
+                          l10n?.settingsTranslateTextTo ?? 'Translate text to',
                           style: TextStyle(
                             fontSize: 16,
                             color: isDark
@@ -266,8 +316,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
           // 说明文字
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
               l10n?.settingsTranslateDescription ??
                   'Select the language you want messages to be translated into.',
@@ -286,8 +335,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
           Container(
             color: isDark ? AppColors.surfaceDark : AppColors.surface,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               child: Row(
                 children: [
                   Expanded(
@@ -296,9 +344,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                           'Auto-translate received messages',
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDark
-                            ? Colors.white
-                            : AppColors.textPrimary,
+                        color: isDark ? Colors.white : AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -317,8 +363,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
           // 说明文字
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
               l10n?.settingsAutoTranslateDescription ??
                   'Automatically translate messages received in chat to your selected language.',
@@ -337,8 +382,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
           Container(
             color: isDark ? AppColors.surfaceDark : AppColors.surface,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               child: Row(
                 children: [
                   Expanded(
@@ -346,9 +390,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                       'Smart reply translation',
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDark
-                            ? Colors.white
-                            : AppColors.textPrimary,
+                        color: isDark ? Colors.white : AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -367,8 +409,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
           // 说明文字
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
               'Automatically translate your messages to match the recipient\'s language before sending.',
               style: TextStyle(

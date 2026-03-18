@@ -519,7 +519,7 @@ class TranscribeVoiceMessage extends ChatEvent {
   const TranscribeVoiceMessage({
     required this.messageId,
     this.audioPath,
-    this.language = 'zh-CN',
+    this.language = 'zh-TW',
   });
 
   @override

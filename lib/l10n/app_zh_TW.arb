@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh",
+  "@@locale": "zh_TW",
   "commonRetry": "重試",
   "commonUnknownUser": "未知用戶",
   "transferWalletNotConnected": "錢包未連接",

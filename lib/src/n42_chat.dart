@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import 'core/extensions/context_extension.dart';
 import 'core/notifications/firebase_push_service.dart';
+import 'data/datasources/local/preferences_datasource.dart';
 import 'data/datasources/local/secure_storage_datasource.dart';
 import 'data/datasources/matrix/matrix_client_manager.dart';
 import 'data/datasources/matrix/matrix_moment_datasource.dart';
@@ -22,6 +23,7 @@ import 'core/di/injection.dart';
 import 'core/utils/date_utils.dart';
 import 'domain/entities/conversation_entity.dart';
 import 'domain/entities/user_entity.dart';
+import 'domain/entities/user_profile_entity.dart';
 import 'core/router/app_router.dart';
 import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/conversation_repository.dart';
@@ -182,6 +184,19 @@ class N42Chat {
   /// 获取当前语言设置
   static Locale get locale => _locale;
 
+  static Locale _normalizeLocale(Locale locale) {
+    final languageCode = locale.languageCode.toLowerCase();
+    if (languageCode == 'zh') {
+      return const Locale('zh', 'TW');
+    }
+
+    final countryCode = locale.countryCode;
+    if (countryCode == null || countryCode.isEmpty) {
+      return Locale(languageCode);
+    }
+    return Locale(languageCode, countryCode.toUpperCase());
+  }
+
   /// 设置语言
   ///
   /// 用于与主应用同步语言设置
@@ -195,17 +210,18 @@ class N42Chat {
   /// });
   /// ```
   static void setLocale(Locale locale) {
-    if (_locale != locale) {
-      _locale = locale;
+    final normalizedLocale = _normalizeLocale(locale);
+    if (_locale != normalizedLocale) {
+      _locale = normalizedLocale;
       // 更新日期工具类的本地化
       N42DateUtils.setLocale(
-        DateLocaleStrings.fromLocaleCode(locale.languageCode),
+        DateLocaleStrings.fromLocaleCode(normalizedLocale.languageCode),
       );
       // 通知所有监听器
       for (final listener in _localeListeners) {
-        listener(locale);
+        listener(normalizedLocale);
       }
-      debugLog('N42Chat: Locale changed to $locale');
+      debugLog('N42Chat: Locale changed to $normalizedLocale');
     }
   }
 
@@ -935,7 +951,7 @@ class N42Chat {
   static Widget chatWidget() {
     // 如果未初始化，显示错误页面而不是抛出异常
     if (!_initialized) {
-      return const _NotInitializedPage();
+      return const _N42ChatBootstrapWidget();
     }
     return const _N42ChatEntryWidget();
   }
@@ -957,7 +973,7 @@ class N42Chat {
   static Widget profileWidget({bool showAppBar = true}) {
     // 如果未初始化，显示错误页面
     if (!_initialized) {
-      return const _NotInitializedPage();
+      return _N42ProfileBootstrapWidget(showAppBar: showAppBar);
     }
     return _N42ProfileEntryWidget(showAppBar: showAppBar);
   }
@@ -1441,15 +1457,30 @@ class _N42ChatEntryWidget extends StatefulWidget {
 
 class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
   Locale _currentLocale = N42Chat._locale;
+  FontSize _fontSize = FontSize.medium;
 
   void _onLocaleChanged(Locale locale) {
     if (mounted) setState(() => _currentLocale = locale);
+  }
+
+  Future<void> _loadAppearanceSettings() async {
+    try {
+      final appearanceSettings = await PreferencesDataSource()
+          .getAppearanceSettings();
+      if (!mounted) return;
+      setState(() {
+        _fontSize = _parseStoredFontSize(appearanceSettings?['fontSize']);
+      });
+    } catch (e) {
+      debugLog('N42Chat: Failed to load appearance settings: $e');
+    }
   }
 
   @override
   void initState() {
     super.initState();
     N42Chat.addLocaleListener(_onLocaleChanged);
+    unawaited(_loadAppearanceSettings());
     // 检查当前登录状态
     N42Chat.authBloc.add(const AuthCheckRequested());
   }
@@ -1491,10 +1522,10 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Localizations.override(
-      context: context,
+    return _wrapChatPresentation(
+      context,
       locale: _currentLocale,
-      delegates: S.localizationsDelegates,
+      fontSize: _fontSize,
       child: BlocProvider.value(
         value: N42Chat.authBloc,
         child: BlocBuilder<AuthBloc, AuthState>(
@@ -1585,6 +1616,85 @@ class _LoadingPage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _N42ChatBootstrapWidget extends StatefulWidget {
+  const _N42ChatBootstrapWidget();
+
+  @override
+  State<_N42ChatBootstrapWidget> createState() =>
+      _N42ChatBootstrapWidgetState();
+}
+
+class _N42ChatBootstrapWidgetState extends State<_N42ChatBootstrapWidget> {
+  @override
+  void initState() {
+    super.initState();
+    _waitForInitialization();
+  }
+
+  Future<void> _waitForInitialization() async {
+    final pendingInitialization = N42Chat._initCompleter;
+    if (pendingInitialization == null) return;
+    try {
+      await pendingInitialization.future;
+    } catch (_) {}
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (N42Chat.isInitialized) {
+      return const _N42ChatEntryWidget();
+    }
+    if (N42Chat._initCompleter != null) {
+      return const _LoadingPage();
+    }
+    return const _NotInitializedPage();
+  }
+}
+
+class _N42ProfileBootstrapWidget extends StatefulWidget {
+  final bool showAppBar;
+
+  const _N42ProfileBootstrapWidget({required this.showAppBar});
+
+  @override
+  State<_N42ProfileBootstrapWidget> createState() =>
+      _N42ProfileBootstrapWidgetState();
+}
+
+class _N42ProfileBootstrapWidgetState
+    extends State<_N42ProfileBootstrapWidget> {
+  @override
+  void initState() {
+    super.initState();
+    _waitForInitialization();
+  }
+
+  Future<void> _waitForInitialization() async {
+    final pendingInitialization = N42Chat._initCompleter;
+    if (pendingInitialization == null) return;
+    try {
+      await pendingInitialization.future;
+    } catch (_) {}
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (N42Chat.isInitialized) {
+      return _N42ProfileEntryWidget(showAppBar: widget.showAppBar);
+    }
+    if (N42Chat._initCompleter != null) {
+      return const _LoadingPage();
+    }
+    return const _NotInitializedPage();
   }
 }
 
@@ -1735,11 +1845,39 @@ class _N42ProfileEntryWidget extends StatefulWidget {
 }
 
 class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
+  Locale _currentLocale = N42Chat._locale;
+  FontSize _fontSize = FontSize.medium;
+
   @override
   void initState() {
     super.initState();
+    N42Chat.addLocaleListener(_onLocaleChanged);
+    unawaited(_loadAppearanceSettings());
     // 检查当前登录状态
     N42Chat.authBloc.add(const AuthCheckRequested());
+  }
+
+  void _onLocaleChanged(Locale locale) {
+    if (mounted) setState(() => _currentLocale = locale);
+  }
+
+  Future<void> _loadAppearanceSettings() async {
+    try {
+      final appearanceSettings = await PreferencesDataSource()
+          .getAppearanceSettings();
+      if (!mounted) return;
+      setState(() {
+        _fontSize = _parseStoredFontSize(appearanceSettings?['fontSize']);
+      });
+    } catch (e) {
+      debugLog('N42Chat: Failed to load appearance settings: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    N42Chat._localeListeners.remove(_onLocaleChanged);
+    super.dispose();
   }
 
   void _navigateToLogin(BuildContext context) {
@@ -1773,33 +1911,39 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: N42Chat.authBloc,
-      child: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, state) {
-          // 检查中或初始状态 - 显示加载
-          if (state.status == AuthStatus.initial ||
-              state.status == AuthStatus.checking) {
-            return const _LoadingPage();
-          }
+    return _wrapChatPresentation(
+      context,
+      locale: _currentLocale,
+      fontSize: _fontSize,
+      child: BlocProvider.value(
+        value: N42Chat.authBloc,
+        child: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            // 检查中或初始状态 - 显示加载
+            if (state.status == AuthStatus.initial ||
+                state.status == AuthStatus.checking) {
+              return const _LoadingPage();
+            }
 
-          // 已登录 - 显示个人资料页
-          if (state.isAuthenticated) {
-            return ProfilePage(showAppBar: widget.showAppBar);
-          }
+            // 已登录 - 显示个人资料页
+            if (state.isAuthenticated) {
+              return ProfilePage(showAppBar: widget.showAppBar);
+            }
 
-          // 未登录 - 显示欢迎页面
-          return WelcomePage(
-            onLogin: () => _navigateToLogin(context),
-            onRegister: () => _navigateToRegister(context),
-            onTermsOfService: () => _launchUrl(
-              N42Chat._config?.termsOfServiceUrl ?? 'https://n42.world/terms',
-            ),
-            onPrivacyPolicy: () => _launchUrl(
-              N42Chat._config?.privacyPolicyUrl ?? 'https://n42.world/privacy',
-            ),
-          );
-        },
+            // 未登录 - 显示欢迎页面
+            return WelcomePage(
+              onLogin: () => _navigateToLogin(context),
+              onRegister: () => _navigateToRegister(context),
+              onTermsOfService: () => _launchUrl(
+                N42Chat._config?.termsOfServiceUrl ?? 'https://n42.world/terms',
+              ),
+              onPrivacyPolicy: () => _launchUrl(
+                N42Chat._config?.privacyPolicyUrl ??
+                    'https://n42.world/privacy',
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -1815,4 +1959,191 @@ class N42ChatException implements Exception {
 
   @override
   String toString() => 'N42ChatException: $message (code: $code)';
+}
+
+FontSize _parseStoredFontSize(String? rawValue) {
+  switch (rawValue?.trim().toLowerCase()) {
+    case 'small':
+      return FontSize.small;
+    case 'large':
+      return FontSize.large;
+    case 'extralarge':
+    case 'extra_large':
+    case 'extra-large':
+      return FontSize.extraLarge;
+    case 'medium':
+    default:
+      return FontSize.medium;
+  }
+}
+
+double _fontPreferenceScale(FontSize fontSize) {
+  switch (fontSize) {
+    case FontSize.small:
+      return 0.94;
+    case FontSize.medium:
+      return 1.0;
+    case FontSize.large:
+      return 1.06;
+    case FontSize.extraLarge:
+      return 1.12;
+  }
+}
+
+double _chatBaseTextScale(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  return screenWidth >= 600 ? 0.97 : 0.94;
+}
+
+double _chatTextScale(BuildContext context, FontSize fontSize) {
+  final mediaQuery = MediaQuery.of(context);
+  final inheritedScale = mediaQuery.textScaler.scale(16) / 16;
+  final adjustedScale =
+      inheritedScale *
+      _chatBaseTextScale(context) *
+      _fontPreferenceScale(fontSize);
+  return adjustedScale.clamp(0.88, 1.18);
+}
+
+ThemeData _buildChatScopedTheme(ThemeData baseTheme) {
+  final isDark = baseTheme.brightness == Brightness.dark;
+  final textTheme = baseTheme.textTheme;
+  final chromeColor = isDark
+      ? const Color(0xFF161A22)
+      : const Color(0xFFF6F8FB);
+  final cardColor = isDark ? const Color(0xFF1C212B) : Colors.white;
+  final dividerColor = isDark
+      ? const Color(0xFF2B3140)
+      : const Color(0xFFE6EBF2);
+  final appBarTitleStyle =
+      (baseTheme.appBarTheme.titleTextStyle ?? textTheme.titleLarge)?.copyWith(
+        fontWeight: FontWeight.w600,
+        height: 1.2,
+        letterSpacing: -0.2,
+      );
+
+  return baseTheme.copyWith(
+    scaffoldBackgroundColor: chromeColor,
+    cardColor: cardColor,
+    appBarTheme: baseTheme.appBarTheme.copyWith(
+      centerTitle: true,
+      backgroundColor: chromeColor,
+      foregroundColor: isDark ? Colors.white : const Color(0xFF141B24),
+      surfaceTintColor: Colors.transparent,
+      titleTextStyle: appBarTitleStyle,
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: cardColor,
+      surfaceTintColor: Colors.transparent,
+      elevation: isDark ? 6 : 10,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      textStyle: textTheme.bodyMedium?.copyWith(height: 1.25),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: cardColor,
+      modalBackgroundColor: cardColor,
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: cardColor,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+    ),
+    inputDecorationTheme: baseTheme.inputDecorationTheme.copyWith(
+      filled: true,
+      fillColor: isDark ? const Color(0xFF232938) : const Color(0xFFF3F6FA),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(
+          color: baseTheme.colorScheme.primary.withValues(alpha: 0.35),
+        ),
+      ),
+    ),
+    listTileTheme: baseTheme.listTileTheme.copyWith(
+      tileColor: cardColor,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      minVerticalPadding: 8,
+    ),
+    dividerTheme: baseTheme.dividerTheme.copyWith(
+      color: dividerColor,
+      thickness: 0.6,
+      space: 0,
+    ),
+    textTheme: textTheme.copyWith(
+      titleLarge: textTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+        height: 1.2,
+        letterSpacing: -0.2,
+      ),
+      titleMedium: textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.w600,
+        height: 1.24,
+        letterSpacing: -0.15,
+      ),
+      titleSmall: textTheme.titleSmall?.copyWith(
+        fontWeight: FontWeight.w600,
+        height: 1.24,
+        letterSpacing: -0.1,
+      ),
+      bodyLarge: textTheme.bodyLarge?.copyWith(
+        height: 1.34,
+        letterSpacing: -0.05,
+      ),
+      bodyMedium: textTheme.bodyMedium?.copyWith(
+        height: 1.34,
+        letterSpacing: -0.05,
+      ),
+      bodySmall: textTheme.bodySmall?.copyWith(
+        height: 1.3,
+        letterSpacing: -0.02,
+      ),
+      labelLarge: textTheme.labelLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+        height: 1.2,
+        letterSpacing: -0.05,
+      ),
+    ),
+  );
+}
+
+Widget _wrapChatPresentation(
+  BuildContext context, {
+  required Widget child,
+  required FontSize fontSize,
+  Locale? locale,
+}) {
+  final mediaQuery = MediaQuery.of(context);
+  final scopedTheme = _buildChatScopedTheme(Theme.of(context));
+  Widget wrappedChild = Theme(
+    data: scopedTheme,
+    child: MediaQuery(
+      data: mediaQuery.copyWith(
+        textScaler: TextScaler.linear(_chatTextScale(context, fontSize)),
+      ),
+      child: child,
+    ),
+  );
+
+  if (locale != null) {
+    wrappedChild = Localizations.override(
+      context: context,
+      locale: locale,
+      delegates: S.localizationsDelegates,
+      child: wrappedChild,
+    );
+  }
+
+  return wrappedChild;
 }

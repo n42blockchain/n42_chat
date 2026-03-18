@@ -15,12 +15,10 @@ import '../utils/debug_log.dart';
 class MyMemoryTranslationService implements ITranslationService {
   final PreferencesDataSource _storageDataSource;
 
-  static const String _baseUrl =
-      'https://api.mymemory.translated.net/get';
+  static const String _baseUrl = 'https://api.mymemory.translated.net/get';
 
-  MyMemoryTranslationService({
-    required PreferencesDataSource storageDataSource,
-  }) : _storageDataSource = storageDataSource;
+  MyMemoryTranslationService({required PreferencesDataSource storageDataSource})
+    : _storageDataSource = storageDataSource;
 
   @override
   Future<TranslationResult> translate({
@@ -44,20 +42,24 @@ class MyMemoryTranslationService implements ITranslationService {
 
     try {
       final source = sourceLanguage ?? (await detectLanguage(text)) ?? 'en';
-      final uri = Uri.parse(_baseUrl).replace(queryParameters: {
-        'q': text,
-        'langpair': '$source|$targetLanguage',
-      });
+      final uri = Uri.parse(_baseUrl).replace(
+        queryParameters: {
+          'q': text,
+          'langpair':
+              '${translationApiLanguageCode(source)}|'
+              '${translationApiLanguageCode(targetLanguage)}',
+        },
+      );
 
-      final response = await http.get(uri).timeout(
+      final response = await http
+          .get(uri)
+          .timeout(
             const Duration(seconds: 8),
             onTimeout: () => http.Response('', 408),
           );
 
       if (response.statusCode != 200) {
-        return TranslationResult.error(
-          'MyMemory: HTTP ${response.statusCode}',
-        );
+        return TranslationResult.error('MyMemory: HTTP ${response.statusCode}');
       }
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -66,8 +68,7 @@ class MyMemoryTranslationService implements ITranslationService {
         return TranslationResult.error('MyMemory: invalid response');
       }
 
-      final translatedText =
-          responseData['translatedText']?.toString() ?? '';
+      final translatedText = responseData['translatedText']?.toString() ?? '';
       if (translatedText.isEmpty) {
         return TranslationResult.error('MyMemory: empty translation');
       }
@@ -100,8 +101,9 @@ class MyMemoryTranslationService implements ITranslationService {
   @override
   Future<String?> detectLanguage(String text) async {
     final containsChinese = RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
-    final containsJapanese =
-        RegExp(r'[\u3040-\u309f\u30a0-\u30ff]').hasMatch(text);
+    final containsJapanese = RegExp(
+      r'[\u3040-\u309f\u30a0-\u30ff]',
+    ).hasMatch(text);
     final containsKorean = RegExp(r'[\uac00-\ud7af]').hasMatch(text);
 
     if (containsChinese) return 'zh';
@@ -113,25 +115,74 @@ class MyMemoryTranslationService implements ITranslationService {
   @override
   List<TranslationLanguage> getSupportedLanguages() {
     return const [
-      TranslationLanguage(code: 'zh', name: 'Chinese', localizedName: '中文'),
+      TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
+      TranslationLanguage(code: 'bn', name: 'Bengali', localizedName: 'বাংলা'),
+      TranslationLanguage(code: 'cs', name: 'Czech', localizedName: 'Čeština'),
+      TranslationLanguage(code: 'de', name: 'German', localizedName: 'Deutsch'),
       TranslationLanguage(
-          code: 'en', name: 'English', localizedName: 'English'),
+        code: 'en',
+        name: 'English',
+        localizedName: 'English',
+      ),
       TranslationLanguage(
-          code: 'ja', name: 'Japanese', localizedName: '日本語'),
+        code: 'es',
+        name: 'Spanish',
+        localizedName: 'Español',
+      ),
       TranslationLanguage(
-          code: 'ko', name: 'Korean', localizedName: '한국어'),
+        code: 'fr',
+        name: 'French',
+        localizedName: 'Français',
+      ),
+      TranslationLanguage(code: 'hi', name: 'Hindi', localizedName: 'हिन्दी'),
       TranslationLanguage(
-          code: 'fr', name: 'French', localizedName: 'Français'),
+        code: 'id',
+        name: 'Indonesian',
+        localizedName: 'Bahasa Indonesia',
+      ),
       TranslationLanguage(
-          code: 'de', name: 'German', localizedName: 'Deutsch'),
+        code: 'it',
+        name: 'Italian',
+        localizedName: 'Italiano',
+      ),
+      TranslationLanguage(code: 'ja', name: 'Japanese', localizedName: '日本語'),
+      TranslationLanguage(code: 'ko', name: 'Korean', localizedName: '한국어'),
+      TranslationLanguage(code: 'mr', name: 'Marathi', localizedName: 'मराठी'),
+      TranslationLanguage(code: 'pl', name: 'Polish', localizedName: 'Polski'),
       TranslationLanguage(
-          code: 'es', name: 'Spanish', localizedName: 'Español'),
+        code: 'pt',
+        name: 'Portuguese',
+        localizedName: 'Português',
+      ),
       TranslationLanguage(
-          code: 'pt', name: 'Portuguese', localizedName: 'Português'),
+        code: 'ru',
+        name: 'Russian',
+        localizedName: 'Русский',
+      ),
       TranslationLanguage(
-          code: 'ru', name: 'Russian', localizedName: 'Русский'),
+        code: 'sw',
+        name: 'Swahili',
+        localizedName: 'Kiswahili',
+      ),
+      TranslationLanguage(code: 'ta', name: 'Tamil', localizedName: 'தமிழ்'),
+      TranslationLanguage(code: 'te', name: 'Telugu', localizedName: 'తెలుగు'),
+      TranslationLanguage(code: 'tr', name: 'Turkish', localizedName: 'Türkçe'),
       TranslationLanguage(
-          code: 'ar', name: 'Arabic', localizedName: 'العربية'),
+        code: 'uk',
+        name: 'Ukrainian',
+        localizedName: 'Українська',
+      ),
+      TranslationLanguage(code: 'ur', name: 'Urdu', localizedName: 'اردو'),
+      TranslationLanguage(
+        code: 'vi',
+        name: 'Vietnamese',
+        localizedName: 'Tiếng Việt',
+      ),
+      TranslationLanguage(
+        code: 'zh_TW',
+        name: 'Traditional Chinese',
+        localizedName: '繁體中文',
+      ),
     ];
   }
 }

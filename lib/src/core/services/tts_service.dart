@@ -4,11 +4,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../utils/debug_log.dart';
 
 /// TTS 播放状态
-enum TtsState {
-  stopped,
-  playing,
-  paused,
-}
+enum TtsState { stopped, playing, paused }
 
 /// 文字转语音服务
 ///
@@ -88,7 +84,7 @@ class TtsService {
   ///
   /// [text] 要朗读的文本
   /// [messageId] 消息 ID（用于跟踪当前朗读的消息）
-  /// [language] 可选的语言代码（如 'en-US', 'zh-CN'）
+  /// [language] 可选的语言代码（如 'en-US', 'zh-TW'）
   Future<void> speak(String text, {String? messageId, String? language}) async {
     if (text.trim().isEmpty) return;
     await _ensureInitialized();
@@ -166,7 +162,7 @@ class TtsService {
       if (koreanCount > chineseCount) {
         return 'ko-KR';
       }
-      return 'zh-CN';
+      return 'zh-TW';
     }
 
     return 'en-US';
