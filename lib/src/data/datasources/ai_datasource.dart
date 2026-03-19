@@ -23,11 +23,13 @@ class AiDatasource implements AiService {
     String defaultModel = 'gpt-4o-mini',
     bool useProxyEndpoint = false,
     Dio? dio,
-  })  : _baseUrl = baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl,
-        _apiKey = apiKey,
-        _defaultModel = defaultModel,
-        _useProxyEndpoint = useProxyEndpoint,
-        _dio = dio ?? Dio() {
+  }) : _baseUrl = baseUrl.endsWith('/')
+           ? baseUrl.substring(0, baseUrl.length - 1)
+           : baseUrl,
+       _apiKey = apiKey,
+       _defaultModel = defaultModel,
+       _useProxyEndpoint = useProxyEndpoint,
+       _dio = dio ?? Dio() {
     _dio.options.baseUrl = _baseUrl;
     _dio.options.headers = {
       'Content-Type': 'application/json',
@@ -42,7 +44,7 @@ class AiDatasource implements AiService {
       _baseUrl.isNotEmpty && (_apiKey.isNotEmpty || _useProxyEndpoint);
 
   String get _chatCompletionsUrl =>
-      _useProxyEndpoint ? _baseUrl : '/v1/chat/completions';
+      _useProxyEndpoint ? _baseUrl : _buildChatCompletionsUrl();
 
   /// 消息总字符数上限（约 ~32k tokens）
   static const int _maxTotalCharacters = 128000;
@@ -122,7 +124,8 @@ class AiDatasource implements AiService {
         if (choices == null || choices.isEmpty) continue;
 
         final delta = choices[0]['delta'] as Map<String, dynamic>?;
-        final content = _extractMessageText(delta?['content']) ??
+        final content =
+            _extractMessageText(delta?['content']) ??
             _extractMessageText(delta?['text']);
         if (content != null && content.isNotEmpty) {
           yield content;
@@ -176,7 +179,8 @@ class AiDatasource implements AiService {
         throw const AiServiceException('No choices in response');
       }
       final message = choices[0]['message'] as Map<String, dynamic>?;
-      final content = _extractMessageText(message?['content']) ??
+      final content =
+          _extractMessageText(message?['content']) ??
           _extractMessageText(message?['text']) ??
           '';
       final usage = data['usage'] as Map<String, dynamic>?;
@@ -353,6 +357,25 @@ class AiDatasource implements AiService {
     }
 
     return null;
+  }
+
+  String _buildChatCompletionsUrl() {
+    final baseUri = Uri.tryParse(_baseUrl);
+    if (baseUri == null) return '$_baseUrl/v1/chat/completions';
+
+    final normalizedPath = baseUri.path.replaceFirst(RegExp(r'/$'), '');
+    final endpointPath = switch (normalizedPath) {
+      '' => '/v1/chat/completions',
+      '/v1' => '/v1/chat/completions',
+      '/chat/completions' => '/v1/chat/completions',
+      final String path when path.endsWith('/v1/chat/completions') => path,
+      final String path when path.endsWith('/v1') => '$path/chat/completions',
+      final String path => '$path/v1/chat/completions',
+    };
+
+    return baseUri
+        .replace(path: endpointPath, queryParameters: null)
+        .toString();
   }
 
   @override

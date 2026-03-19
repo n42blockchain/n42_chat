@@ -291,6 +291,23 @@ class N42ChatConfig {
   /// 如果不设置，将使用模拟翻译（仅用于开发测试）
   final String? googleTranslateApiKey;
 
+  /// Google Speech API Key
+  ///
+  /// 用于直连 Google Speech-to-Text。
+  /// 若启用代理模式，可留空并改由 [proxyAuthToken] 访问服务端代理。
+  final String? googleSpeechApiKey;
+
+  /// Azure Speech API Key
+  ///
+  /// 用于直连 Azure Speech Service。
+  /// 若启用代理模式，可留空并改由 [proxyAuthToken] 访问服务端代理。
+  final String? azureSpeechApiKey;
+
+  /// Azure Speech 区域
+  ///
+  /// 仅在直连 Azure Speech 时使用。
+  final String azureSpeechRegion;
+
   /// 代理服务访问令牌
   ///
   /// 用于访问受保护的 N42 proxy 路由，不是第三方服务自己的 API key。
@@ -466,6 +483,9 @@ class N42ChatConfig {
     this.giphyBaseUrl = 'https://api.giphy.com/v1/gifs',
     this.giphyUseProxyEndpoint = false,
     this.googleTranslateApiKey,
+    this.googleSpeechApiKey,
+    this.azureSpeechApiKey,
+    this.azureSpeechRegion = 'eastus',
     this.proxyAuthToken,
     this.aiApiKey,
     this.aiBaseUrl = 'https://api.openai.com',
@@ -538,6 +558,9 @@ class N42ChatConfig {
     String? giphyBaseUrl,
     bool? giphyUseProxyEndpoint,
     Object? googleTranslateApiKey = _copyWithUndefined,
+    Object? googleSpeechApiKey = _copyWithUndefined,
+    Object? azureSpeechApiKey = _copyWithUndefined,
+    String? azureSpeechRegion,
     Object? proxyAuthToken = _copyWithUndefined,
     Object? aiApiKey = _copyWithUndefined,
     String? aiBaseUrl,
@@ -666,6 +689,15 @@ class N42ChatConfig {
         googleTranslateApiKey,
         this.googleTranslateApiKey,
       ),
+      googleSpeechApiKey: _nullableCopyWithValue<String>(
+        googleSpeechApiKey,
+        this.googleSpeechApiKey,
+      ),
+      azureSpeechApiKey: _nullableCopyWithValue<String>(
+        azureSpeechApiKey,
+        this.azureSpeechApiKey,
+      ),
+      azureSpeechRegion: azureSpeechRegion ?? this.azureSpeechRegion,
       proxyAuthToken: _nullableCopyWithValue<String>(
         proxyAuthToken,
         this.proxyAuthToken,

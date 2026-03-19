@@ -106,6 +106,18 @@ void main() {
       expect(config.googleTranslateApiKey, isNull);
     });
 
+    test('googleSpeechApiKey defaults to null', () {
+      expect(config.googleSpeechApiKey, isNull);
+    });
+
+    test('azureSpeechApiKey defaults to null', () {
+      expect(config.azureSpeechApiKey, isNull);
+    });
+
+    test('azureSpeechRegion defaults to eastus', () {
+      expect(config.azureSpeechRegion, 'eastus');
+    });
+
     test('aiApiKey defaults to null', () {
       expect(config.aiApiKey, isNull);
     });
@@ -227,6 +239,27 @@ void main() {
       expect(
         base.copyWith(proxyAuthToken: 'proxy-token').proxyAuthToken,
         'proxy-token',
+      );
+    });
+
+    test('replaces googleSpeechApiKey', () {
+      expect(
+        base.copyWith(googleSpeechApiKey: 'google-speech').googleSpeechApiKey,
+        'google-speech',
+      );
+    });
+
+    test('replaces azureSpeechApiKey', () {
+      expect(
+        base.copyWith(azureSpeechApiKey: 'azure-speech').azureSpeechApiKey,
+        'azure-speech',
+      );
+    });
+
+    test('replaces azureSpeechRegion', () {
+      expect(
+        base.copyWith(azureSpeechRegion: 'westus').azureSpeechRegion,
+        'westus',
       );
     });
 

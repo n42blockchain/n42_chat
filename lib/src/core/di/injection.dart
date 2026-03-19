@@ -217,7 +217,19 @@ Future<void> _registerServices(N42ChatConfig config) async {
   );
 
   final speechService = SpeechToTextService()..resetConfiguration();
-  if (config.speechUseProxyEndpoint) {
+  final hasGoogleSpeechKey =
+      config.googleSpeechApiKey != null &&
+      config.googleSpeechApiKey!.isNotEmpty;
+  final hasAzureSpeechKey =
+      config.azureSpeechApiKey != null && config.azureSpeechApiKey!.isNotEmpty;
+  if (hasGoogleSpeechKey) {
+    speechService.configureGoogle(config.googleSpeechApiKey!);
+  } else if (hasAzureSpeechKey) {
+    speechService.configureAzure(
+      config.azureSpeechApiKey!,
+      config.azureSpeechRegion,
+    );
+  } else if (config.speechUseProxyEndpoint) {
     if (config.speechGoogleBaseUrl != null &&
         config.speechGoogleBaseUrl!.isNotEmpty) {
       speechService.configureGoogleProxy(
