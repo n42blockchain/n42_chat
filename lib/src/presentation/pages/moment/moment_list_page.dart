@@ -57,11 +57,7 @@ class _MomentListView extends StatefulWidget {
   final String? userName;
   final String? userAvatarUrl;
 
-  const _MomentListView({
-    this.userId,
-    this.userName,
-    this.userAvatarUrl,
-  });
+  const _MomentListView({this.userId, this.userName, this.userAvatarUrl});
 
   @override
   State<_MomentListView> createState() => _MomentListViewState();
@@ -71,6 +67,7 @@ class _MomentListViewState extends State<_MomentListView> {
   final ScrollController _scrollController = ScrollController();
   String? _myDisplayName;
   String? _myAvatarUrl;
+  bool _isActionMenuVisible = false;
 
   @override
   void initState() {
@@ -170,11 +167,10 @@ class _MomentListViewState extends State<_MomentListView> {
             ),
             title: Text(
               _isUserMode
-                  ? (s?.momentUserMoments(widget.userName ?? '') ?? '${widget.userName}\'s Moments')
+                  ? (s?.momentUserMoments(widget.userName ?? '') ??
+                        '${widget.userName}\'s Moments')
                   : (s?.commonMoments ?? 'Moments'),
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black,
-              ),
+              style: TextStyle(color: isDark ? Colors.white : Colors.black),
             ),
             actions: [
               if (!_isUserMode)
@@ -219,33 +215,40 @@ class _MomentListViewState extends State<_MomentListView> {
               }
 
               return SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    if (index >= state.moments.length) {
-                      if (state.isLoadingMore) {
-                        return const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                      }
-                      return const SizedBox.shrink();
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  if (index >= state.moments.length) {
+                    if (state.isLoadingMore) {
+                      return const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
                     }
+                    return const SizedBox.shrink();
+                  }
 
-                    return _MomentTile(
-                      moment: state.moments[index],
-                      isDark: isDark,
-                      friendIds: _getFriendIds(),
-                      currentUserId: _getCurrentUserId(),
-                    );
-                  },
-                  childCount: state.moments.length + (state.hasMore ? 1 : 0),
-                ),
+                  return _MomentTile(
+                    moment: state.moments[index],
+                    isDark: isDark,
+                    friendIds: _getFriendIds(),
+                    currentUserId: _getCurrentUserId(),
+                    onActionMenuVisibilityChanged: _isUserMode
+                        ? null
+                        : (visible) {
+                            if (!mounted || _isActionMenuVisible == visible) {
+                              return;
+                            }
+                            setState(() {
+                              _isActionMenuVisible = visible;
+                            });
+                          },
+                  );
+                }, childCount: state.moments.length + (state.hasMore ? 1 : 0)),
               );
             },
           ),
         ],
       ),
-      floatingActionButton: _isUserMode
+      floatingActionButton: _isUserMode || _isActionMenuVisible
           ? null
           : FloatingActionButton(
               onPressed: () => _openCreateMoment(context),
@@ -265,14 +268,8 @@ class _MomentListViewState extends State<_MomentListView> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: isDark
-                  ? [
-                      const Color(0xFF2C3E50),
-                      const Color(0xFF1A252F),
-                    ]
-                  : [
-                      const Color(0xFF667eea),
-                      const Color(0xFF764ba2),
-                    ],
+                  ? [const Color(0xFF2C3E50), const Color(0xFF1A252F)]
+                  : [const Color(0xFF667eea), const Color(0xFF764ba2)],
             ),
           ),
         ),
@@ -344,12 +341,14 @@ class _MomentTile extends StatelessWidget {
   final bool isDark;
   final Set<String> friendIds;
   final String currentUserId;
+  final ValueChanged<bool>? onActionMenuVisibilityChanged;
 
   const _MomentTile({
     required this.moment,
     required this.isDark,
     required this.friendIds,
     required this.currentUserId,
+    this.onActionMenuVisibilityChanged,
   });
 
   @override
@@ -592,17 +591,13 @@ class _MomentTile extends StatelessWidget {
           imageUrl: media.thumbnailUrl!,
           fit: BoxFit.cover,
           httpHeaders: _getAuthHeaders(),
-          placeholder: (_, _) => Container(
-            color: isDark ? Colors.grey[850] : Colors.grey[800],
-          ),
-          errorWidget: (_, _, _) => Container(
-            color: isDark ? Colors.grey[850] : Colors.grey[800],
-          ),
+          placeholder: (_, _) =>
+              Container(color: isDark ? Colors.grey[850] : Colors.grey[800]),
+          errorWidget: (_, _, _) =>
+              Container(color: isDark ? Colors.grey[850] : Colors.grey[800]),
         );
       }
-      return Container(
-        color: isDark ? Colors.grey[850] : Colors.grey[800],
-      );
+      return Container(color: isDark ? Colors.grey[850] : Colors.grey[800]);
     }
 
     if (media.httpUrl != null) {
@@ -610,9 +605,8 @@ class _MomentTile extends StatelessWidget {
         imageUrl: media.httpUrl!,
         fit: BoxFit.cover,
         httpHeaders: _getAuthHeaders(),
-        placeholder: (_, _) => Container(
-          color: isDark ? Colors.grey[800] : Colors.grey[200],
-        ),
+        placeholder: (_, _) =>
+            Container(color: isDark ? Colors.grey[800] : Colors.grey[200]),
         errorWidget: (_, _, _) => const Icon(Icons.image),
       );
     }
@@ -658,34 +652,102 @@ class _MomentTile extends StatelessWidget {
 
   /// 交互栏（微信风格：点击 "..." 弹出操作面板）
   Widget _buildInteractionBar(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _showActionPopup(context),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.grey[800] : Colors.grey[200],
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Icon(
-          Icons.more_horiz,
-          size: 18,
-          color: isDark ? Colors.grey[400] : Colors.grey[600],
+    return Builder(
+      builder: (buttonContext) => GestureDetector(
+        onTap: () => _showActionPopup(context, buttonContext),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey[800] : Colors.grey[200],
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Icon(
+            Icons.more_horiz,
+            size: 18,
+            color: isDark ? Colors.grey[400] : Colors.grey[600],
+          ),
         ),
       ),
     );
   }
 
+  List<_MomentActionItem> _buildActionItems(
+    BuildContext context,
+    BuildContext dialogContext,
+  ) {
+    final items = <_MomentActionItem>[
+      _MomentActionItem(
+        icon: moment.isLikedByMe ? Icons.thumb_up : Icons.thumb_up_outlined,
+        label: moment.isLikedByMe
+            ? (S.of(context)?.momentUnlike ?? 'Unlike')
+            : (S.of(context)?.momentLike ?? 'Like'),
+        onTap: () {
+          Navigator.pop(dialogContext);
+          if (moment.isLikedByMe) {
+            context.read<MomentBloc>().add(UnlikeMoment(moment.id));
+          } else {
+            context.read<MomentBloc>().add(LikeMoment(moment.id));
+          }
+        },
+      ),
+      _MomentActionItem(
+        icon: Icons.chat_bubble_outline,
+        label: S.of(context)?.momentComment ?? 'Comment',
+        onTap: () {
+          Navigator.pop(dialogContext);
+          _showCommentDialog(context);
+        },
+      ),
+      _MomentActionItem(
+        icon: Icons.share_outlined,
+        label: S.of(context)?.momentForward ?? 'Forward',
+        onTap: () {
+          Navigator.pop(dialogContext);
+          MomentForwardSheet.show(context, moment);
+        },
+      ),
+    ];
+
+    if (moment.isFromMe) {
+      items.add(
+        _MomentActionItem(
+          icon: Icons.delete_outline,
+          label: S.of(context)?.momentDelete ?? 'Delete',
+          onTap: () {
+            Navigator.pop(dialogContext);
+            _showDeleteConfirmation(context);
+          },
+        ),
+      );
+    }
+
+    return items;
+  }
+
   /// 微信风格的操作弹出栏
-  void _showActionPopup(BuildContext context) {
-    final renderObject = context.findRenderObject();
+  void _showActionPopup(BuildContext context, BuildContext anchorContext) {
+    final renderObject = anchorContext.findRenderObject();
     if (renderObject is! RenderBox || !renderObject.hasSize) return;
     final position = renderObject.localToGlobal(Offset.zero);
     final size = renderObject.size;
+    final screenSize = MediaQuery.of(context).size;
+    final topInset = MediaQuery.of(context).padding.top;
+    final top = (position.dy + (size.height / 2) - 22.0)
+        .clamp(topInset + 8.0, screenSize.height - 56.0)
+        .toDouble();
+    final right = (screenSize.width - position.dx - size.width)
+        .clamp(12.0, screenSize.width - 12.0)
+        .toDouble();
+    final maxPopupWidth = (position.dx + size.width - 12.0)
+        .clamp(180.0, screenSize.width - 24.0)
+        .toDouble();
 
+    onActionMenuVisibilityChanged?.call(true);
     showDialog<void>(
       context: context,
       barrierColor: Colors.transparent,
       builder: (ctx) {
+        final actions = _buildActionItems(context, ctx);
         return Stack(
           children: [
             // 点击空白区域关闭
@@ -697,76 +759,44 @@ class _MomentTile extends StatelessWidget {
             ),
             // 操作面板定位在 "..." 按钮左侧
             Positioned(
-              right: MediaQuery.of(ctx).size.width - position.dx - size.width,
-              top: position.dy - 8,
-              child: Material(
-                borderRadius: BorderRadius.circular(6),
-                color: isDark ? const Color(0xFF4A4A4A) : const Color(0xFF4C4C4C),
-                elevation: 4,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // 点赞/取消赞
-                    _buildPopupAction(
-                      ctx,
-                      icon: moment.isLikedByMe
-                          ? Icons.thumb_up
-                          : Icons.thumb_up_outlined,
-                      label: moment.isLikedByMe
-                          ? (S.of(context)?.momentUnlike ?? 'Unlike')
-                          : (S.of(context)?.momentLike ?? 'Like'),
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        if (moment.isLikedByMe) {
-                          context.read<MomentBloc>().add(UnlikeMoment(moment.id));
-                        } else {
-                          context.read<MomentBloc>().add(LikeMoment(moment.id));
-                        }
-                      },
-                    ),
-                    Container(width: 1, height: 24, color: Colors.white24),
-                    // 评论
-                    _buildPopupAction(
-                      ctx,
-                      icon: Icons.chat_bubble_outline,
-                      label: S.of(context)?.momentComment ?? 'Comment',
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        _showCommentDialog(context);
-                      },
-                    ),
-                    Container(width: 1, height: 24, color: Colors.white24),
-                    // 转发
-                    _buildPopupAction(
-                      ctx,
-                      icon: Icons.share_outlined,
-                      label: S.of(context)?.momentForward ?? 'Forward',
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        MomentForwardSheet.show(context, moment);
-                      },
-                    ),
-                    // 删除（仅自己的动态）
-                    if (moment.isFromMe) ...[
-                      Container(width: 1, height: 24, color: Colors.white24),
-                      _buildPopupAction(
-                        ctx,
-                        icon: Icons.delete_outline,
-                        label: S.of(context)?.momentDelete ?? 'Delete',
-                        onTap: () {
-                          Navigator.pop(ctx);
-                          _showDeleteConfirmation(context);
-                        },
-                      ),
+              right: right,
+              top: top,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: maxPopupWidth),
+                child: Material(
+                  borderRadius: BorderRadius.circular(6),
+                  color: isDark
+                      ? const Color(0xFF4A4A4A)
+                      : const Color(0xFF4C4C4C),
+                  elevation: 4,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var i = 0; i < actions.length; i++) ...[
+                        _buildPopupAction(
+                          ctx,
+                          icon: actions[i].icon,
+                          label: actions[i].label,
+                          onTap: actions[i].onTap,
+                        ),
+                        if (i != actions.length - 1)
+                          Container(
+                            width: 1,
+                            height: 24,
+                            color: Colors.white24,
+                          ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
           ],
         );
       },
-    );
+    ).whenComplete(() {
+      onActionMenuVisibilityChanged?.call(false);
+    });
   }
 
   Widget _buildPopupAction(
@@ -779,7 +809,7 @@ class _MomentTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(4),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -787,10 +817,7 @@ class _MomentTile extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 12),
             ),
           ],
         ),
@@ -852,37 +879,41 @@ class _MomentTile extends StatelessWidget {
           ],
 
           // 评论列表
-          ...visibleComments.map((comment) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: isDark ? Colors.white : Colors.black87,
+          ...visibleComments.map(
+            (comment) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: comment.userName,
+                      style: TextStyle(
+                        color: isDark ? Colors.blue[300] : Colors.blue[700],
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                    children: [
+                    if (comment.isReply) ...[
                       TextSpan(
-                        text: comment.userName,
+                        text: ' ${S.of(context)?.momentReply ?? 'reply'} ',
+                      ),
+                      TextSpan(
+                        text: comment.replyToUserName,
                         style: TextStyle(
                           color: isDark ? Colors.blue[300] : Colors.blue[700],
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      if (comment.isReply) ...[
-                        TextSpan(text: ' ${S.of(context)?.momentReply ?? 'reply'} '),
-                        TextSpan(
-                          text: comment.replyToUserName,
-                          style: TextStyle(
-                            color: isDark ? Colors.blue[300] : Colors.blue[700],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                      TextSpan(text: ': ${comment.content}'),
                     ],
-                  ),
+                    TextSpan(text: ': ${comment.content}'),
+                  ],
                 ),
-              )),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -939,18 +970,38 @@ class _MomentTile extends StatelessWidget {
   }
 
   void _showCommentDialog(BuildContext context) {
+    final momentBloc = context.read<MomentBloc>();
     showDialog<void>(
       context: context,
-      builder: (_) => _MomentCommentDialog(momentId: moment.id),
+      builder: (_) => BlocProvider<MomentBloc>.value(
+        value: momentBloc,
+        child: _MomentCommentDialog(momentId: moment.id),
+      ),
     );
   }
 
   void _showDeleteConfirmation(BuildContext context) {
+    final momentBloc = context.read<MomentBloc>();
     showDialog<void>(
       context: context,
-      builder: (_) => _MomentDeleteDialog(momentId: moment.id),
+      builder: (_) => BlocProvider<MomentBloc>.value(
+        value: momentBloc,
+        child: _MomentDeleteDialog(momentId: moment.id),
+      ),
     );
   }
+}
+
+class _MomentActionItem {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _MomentActionItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 }
 
 class _MomentCommentDialog extends StatefulWidget {
@@ -981,11 +1032,8 @@ class _MomentCommentDialogState extends State<_MomentCommentDialog> {
       _isSubmitting = true;
     });
     context.read<MomentBloc>().add(
-          CommentMoment(
-            momentId: widget.momentId,
-            content: text,
-          ),
-        );
+      CommentMoment(momentId: widget.momentId, content: text),
+    );
   }
 
   @override
@@ -1148,7 +1196,8 @@ class _MomentImageGalleryPage extends StatefulWidget {
   });
 
   @override
-  State<_MomentImageGalleryPage> createState() => _MomentImageGalleryPageState();
+  State<_MomentImageGalleryPage> createState() =>
+      _MomentImageGalleryPageState();
 }
 
 class _MomentImageGalleryPageState extends State<_MomentImageGalleryPage> {
@@ -1220,8 +1269,11 @@ class _MomentImageGalleryPageState extends State<_MomentImageGalleryPage> {
                       children: [
                         const Icon(Icons.error, color: Colors.red, size: 48),
                         const SizedBox(height: 16),
-                        Text(S.of(context)?.momentFailedToLoad ?? 'Failed to load image',
-                            style: const TextStyle(color: Colors.white)),
+                        Text(
+                          S.of(context)?.momentFailedToLoad ??
+                              'Failed to load image',
+                          style: const TextStyle(color: Colors.white),
+                        ),
                       ],
                     ),
                   ),
