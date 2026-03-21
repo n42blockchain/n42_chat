@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
@@ -15,6 +14,8 @@ import 'package:uuid/uuid.dart';
 
 import '../../services/voip/call_manager.dart';
 import '../../services/voip/incoming_call_ringtone_preference.dart';
+import '../../data/datasources/local/preferences_datasource.dart';
+import '../../domain/entities/user_profile_entity.dart' as profile_entity;
 import 'push_notification_service.dart';
 import '../utils/debug_log.dart';
 
@@ -55,15 +56,11 @@ class FirebasePushService implements IPushNotificationService {
   /// 本地通知插件
   static FlutterLocalNotificationsPlugin? _localNotifications;
 
-  /// Android 通知渠道
-  static const AndroidNotificationChannel _channel = AndroidNotificationChannel(
-    'n42_chat_messages',
-    'N42 Chat Messages',
-    description: 'N42 Chat message notifications',
-    importance: Importance.high,
-    playSound: true,
-    enableVibration: true,
-  );
+  /// Android 通知渠道基础定义
+  static const String _messageChannelBaseId = 'n42_chat_messages';
+  static const String _messageChannelName = 'N42 Chat Messages';
+  static const String _messageChannelDescription =
+      'N42 Chat message notifications';
 
   String? _fcmToken;
   String? _apnsToken;
@@ -112,6 +109,127 @@ class FirebasePushService implements IPushNotificationService {
     this.pushkeyType = 'http',
     this.onNotificationTap,
   });
+
+  static NotificationConfig _notificationConfigFromSettings(
+    profile_entity.NotificationSettings settings,
+  ) {
+    return NotificationConfig(
+      enabled: settings.enabled,
+      showPreview: settings.showPreview,
+      playSound: settings.playSound,
+      vibrate: settings.vibrate,
+      doNotDisturb: settings.doNotDisturb,
+      dndStartTime: _parseStoredTimeOfDay(settings.doNotDisturbStart),
+      dndEndTime: _parseStoredTimeOfDay(settings.doNotDisturbEnd),
+    );
+  }
+
+  static TimeOfDay? _parseStoredTimeOfDay(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return null;
+    }
+    final parts = value.split(':');
+    if (parts.length != 2) {
+      return null;
+    }
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) {
+      return null;
+    }
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+  static Future<NotificationConfig> _loadPersistedNotificationConfig() async {
+    final settings = await PreferencesDataSource()
+        .getNotificationSettingsModel();
+    return _notificationConfigFromSettings(settings);
+  }
+
+  static AndroidNotificationChannel _androidMessageChannelForConfig(
+    NotificationConfig config,
+  ) {
+    final suffix = switch ((config.playSound, config.vibrate)) {
+      (true, true) => 'default',
+      (true, false) => 'sound_only',
+      (false, true) => 'vibrate_only',
+      (false, false) => 'silent',
+    };
+    return AndroidNotificationChannel(
+      '$_messageChannelBaseId.$suffix',
+      _messageChannelName,
+      description: _messageChannelDescription,
+      importance: Importance.high,
+      playSound: config.playSound,
+      enableVibration: config.vibrate,
+    );
+  }
+
+  static AndroidNotificationDetails _androidMessageDetails(
+    NotificationConfig config, {
+    Importance importance = Importance.max,
+    Priority priority = Priority.max,
+    String? groupKey,
+    AndroidNotificationCategory? category,
+    bool fullScreenIntent = false,
+  }) {
+    final channel = _androidMessageChannelForConfig(config);
+    return AndroidNotificationDetails(
+      channel.id,
+      channel.name,
+      channelDescription: channel.description,
+      importance: importance,
+      priority: priority,
+      playSound: config.playSound,
+      enableVibration: config.vibrate,
+      groupKey: groupKey,
+      category: category,
+      fullScreenIntent: fullScreenIntent,
+    );
+  }
+
+  static DarwinNotificationDetails _iosMessageDetails(
+    NotificationConfig config,
+  ) {
+    return DarwinNotificationDetails(
+      presentAlert: config.enabled,
+      presentBadge: config.enabled,
+      presentSound: config.enabled && config.playSound,
+    );
+  }
+
+  static Future<void> _ensureAndroidMessageChannels() async {
+    if (!Platform.isAndroid || _localNotifications == null) {
+      return;
+    }
+    final plugin = _localNotifications!
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (plugin == null) {
+      return;
+    }
+    for (final channel in <AndroidNotificationChannel>[
+      _androidMessageChannelForConfig(const NotificationConfig()),
+      _androidMessageChannelForConfig(const NotificationConfig(vibrate: false)),
+      _androidMessageChannelForConfig(
+        const NotificationConfig(playSound: false),
+      ),
+      _androidMessageChannelForConfig(
+        const NotificationConfig(playSound: false, vibrate: false),
+      ),
+    ]) {
+      await plugin.createNotificationChannel(channel);
+    }
+  }
+
+  @visibleForTesting
+  static String androidMessageChannelIdForTest(NotificationConfig config) =>
+      _androidMessageChannelForConfig(config).id;
+
+  @visibleForTesting
+  static Future<NotificationConfig> loadPersistedNotificationConfigForTest() =>
+      _loadPersistedNotificationConfig();
 
   /// 设置通知配置
   void setNotificationConfig(NotificationConfig config) {
@@ -257,14 +375,7 @@ class FirebasePushService implements IPushNotificationService {
           _onBackgroundNotificationResponse,
     );
 
-    // 创建 Android 通知渠道
-    if (Platform.isAndroid) {
-      await _localNotifications!
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >()
-          ?.createNotificationChannel(_channel);
-    }
+    await _ensureAndroidMessageChannels();
   }
 
   Future<void> _initializeToken() async {
@@ -532,18 +643,18 @@ class FirebasePushService implements IPushNotificationService {
 
       await _localNotifications!.initialize(settings: initSettings);
 
-      // 创建 Android 通知渠道
-      if (Platform.isAndroid) {
-        await _localNotifications!
-            .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >()
-            ?.createNotificationChannel(_channel);
-      }
+      await _ensureAndroidMessageChannels();
     }
 
     // 如果没有 notification payload，手动显示通知
     if (message.notification == null) {
+      final config = await _loadPersistedNotificationConfig();
+      if (!config.enabled || config.isInDoNotDisturbPeriod()) {
+        debugLog(
+          'FirebasePushService: Skipping background local notification due to saved config',
+        );
+        return;
+      }
       final roomId = message.data['room_id'] as String?;
       final eventId = message.data['event_id'] as String?;
 
@@ -553,21 +664,13 @@ class FirebasePushService implements IPushNotificationService {
       // 使用原子计数器生成唯一通知 ID（避免时间戳在同一毫秒内碰撞）
       final notificationId = _nextNotificationId();
 
-      final androidDetails = AndroidNotificationDetails(
-        _channel.id,
-        _channel.name,
-        channelDescription: _channel.description,
+      final androidDetails = _androidMessageDetails(
+        config,
         importance: Importance.high,
         priority: Priority.high,
-        playSound: true,
-        enableVibration: true,
       );
 
-      const iosDetails = DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
-      );
+      final iosDetails = _iosMessageDetails(config);
 
       final details = NotificationDetails(
         android: androidDetails,
@@ -608,9 +711,7 @@ class FirebasePushService implements IPushNotificationService {
       android: buildIncomingCallAndroidParams(
         ringtonePreference: ringtonePreference,
       ),
-      ios: buildIncomingCallIOSParams(
-        ringtonePreference: ringtonePreference,
-      ),
+      ios: buildIncomingCallIOSParams(ringtonePreference: ringtonePreference),
     );
 
     await FlutterCallkitIncoming.showCallkitIncoming(params);
@@ -1109,25 +1210,15 @@ class FirebasePushService implements IPushNotificationService {
       }
 
       // Android 通知详情
-      final androidDetails = AndroidNotificationDetails(
-        _channel.id,
-        _channel.name,
-        channelDescription: _channel.description,
-        importance: Importance.max,
-        priority: Priority.max,
-        playSound: true,
-        enableVibration: true,
+      final androidDetails = _androidMessageDetails(
+        _notificationConfig,
         groupKey: 'n42_chat_messages',
         category: AndroidNotificationCategory.message,
         fullScreenIntent: true,
       );
 
       // iOS 通知详情
-      const iosDetails = DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
-      );
+      final iosDetails = _iosMessageDetails(_notificationConfig);
 
       final details = NotificationDetails(
         android: androidDetails,
