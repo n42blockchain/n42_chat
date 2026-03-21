@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import 'avatar_decoration_preset.dart';
+
 /// 用户实体
 ///
 /// 表示Matrix用户的基本信息
@@ -43,6 +45,9 @@ class UserEntity extends Equatable {
   /// ENS 域名
   final String? ensName;
 
+  /// 头像装饰样式
+  final AvatarDecorationPreset avatarDecorationPreset;
+
   const UserEntity({
     required this.userId,
     required this.displayName,
@@ -57,6 +62,7 @@ class UserEntity extends Equatable {
     this.n42Username,
     this.walletAddress,
     this.ensName,
+    this.avatarDecorationPreset = AvatarDecorationPreset.none,
   });
 
   /// 获取用户名部分 (@user:server.com -> user)
@@ -104,20 +110,21 @@ class UserEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        userId,
-        displayName,
-        avatarUrl,
-        statusMessage,
-        isCurrentUser,
-        gender,
-        region,
-        signature,
-        pokeText,
-        ringtone,
-        n42Username,
-        walletAddress,
-        ensName,
-      ];
+    userId,
+    displayName,
+    avatarUrl,
+    statusMessage,
+    isCurrentUser,
+    gender,
+    region,
+    signature,
+    pokeText,
+    ringtone,
+    n42Username,
+    walletAddress,
+    ensName,
+    avatarDecorationPreset,
+  ];
 
   UserEntity copyWith({
     String? userId,
@@ -133,6 +140,7 @@ class UserEntity extends Equatable {
     String? n42Username,
     String? walletAddress,
     String? ensName,
+    AvatarDecorationPreset? avatarDecorationPreset,
   }) {
     return UserEntity(
       userId: userId ?? this.userId,
@@ -148,7 +156,8 @@ class UserEntity extends Equatable {
       n42Username: n42Username ?? this.n42Username,
       walletAddress: walletAddress ?? this.walletAddress,
       ensName: ensName ?? this.ensName,
+      avatarDecorationPreset:
+          avatarDecorationPreset ?? this.avatarDecorationPreset,
     );
   }
 }
-

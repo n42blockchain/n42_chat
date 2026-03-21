@@ -97,7 +97,31 @@ class ConversationRepositoryImpl implements IConversationRepository {
 
   @override
   Future<void> setMuted(String conversationId, bool muted) async {
-    await _roomDataSource.setRoomMuted(conversationId, muted);
+    await setNotificationMode(
+      conversationId,
+      muted
+          ? ConversationNotificationMode.muted
+          : ConversationNotificationMode.allMessages,
+    );
+  }
+
+  @override
+  Future<void> setNotificationMode(
+    String conversationId,
+    ConversationNotificationMode mode,
+  ) async {
+    await _roomDataSource.setRoomNotificationMode(conversationId, mode);
+  }
+
+  @override
+  Future<ConversationNotificationMode> getNotificationMode(
+    String conversationId,
+  ) async {
+    final room = _roomDataSource.getRoomById(conversationId);
+    if (room == null) {
+      return ConversationNotificationMode.allMessages;
+    }
+    return _roomDataSource.getRoomNotificationMode(room);
   }
 
   @override

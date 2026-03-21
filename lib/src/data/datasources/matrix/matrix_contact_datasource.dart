@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../core/utils/timed_status_utils.dart';
 import '../../../core/utils/matrix_utils.dart';
 import 'matrix_client_manager.dart';
 
@@ -206,12 +207,51 @@ class MatrixContactDataSource {
 
   /// 设置当前用户的状态消息
   Future<void> setUserStatus(String? statusMessage) async {
+    await _setStatusMessage(statusMessage);
+  }
+
+  Future<void> setCurrentUserStatus(
+    String? statusMessage, {
+    DateTime? expiresAt,
+    bool preserveCurrentPresence = false,
+  }) async {
     if (_client == null) return;
-    await _client!.setPresence(
-      _client!.userID!,
-      matrix.PresenceType.online,
-      statusMsg: statusMessage,
+    await _setStatusMessage(
+      statusMessage,
+      preserveCurrentPresence: preserveCurrentPresence,
     );
+    await _client!.setAccountData(_client!.userID!, 'n42.user.status', {
+      ...TimedStatusMetadata(
+        message: statusMessage,
+        expiresAt: expiresAt,
+      ).toJson(),
+    });
+  }
+
+  Future<String?> getCurrentUserStatusMessage() async {
+    final client = _client;
+    if (client == null || client.userID == null) {
+      return null;
+    }
+
+    try {
+      final raw = await client.getAccountData(
+        client.userID!,
+        'n42.user.status',
+      );
+      final metadata = TimedStatusMetadata.fromJson(raw);
+      if (metadata.isExpired) {
+        await setCurrentUserStatus(null, preserveCurrentPresence: true);
+        return null;
+      }
+      if (metadata.hasMessage) {
+        return metadata.message;
+      }
+    } catch (_) {
+      // Fallback to presence status when account-data metadata is absent or invalid.
+    }
+
+    return await getUserStatusMessage(client.userID!);
   }
 
   /// 设置当前用户的在线状态
@@ -225,6 +265,26 @@ class MatrixContactDataSource {
       presenceType,
       statusMsg: statusMessage,
     );
+  }
+
+  Future<void> _setStatusMessage(
+    String? statusMessage, {
+    bool preserveCurrentPresence = false,
+  }) async {
+    final client = _client;
+    final userId = client?.userID;
+    if (client == null || userId == null) return;
+
+    var presenceType = matrix.PresenceType.online;
+    if (preserveCurrentPresence) {
+      try {
+        presenceType = (await client.fetchCurrentPresence(userId)).presence;
+      } catch (_) {
+        // Fall back to online when the current presence cannot be resolved.
+      }
+    }
+
+    await client.setPresence(userId, presenceType, statusMsg: statusMessage);
   }
 
   // ============================================

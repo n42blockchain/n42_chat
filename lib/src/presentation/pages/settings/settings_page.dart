@@ -322,6 +322,7 @@ class SettingsPage extends StatelessWidget {
                   imageUrl: profile!.avatarUrl,
                   name: profile!.effectiveDisplayName,
                   size: 64,
+                  decorationPreset: profile!.avatarDecorationPreset,
                 ),
                 const SizedBox(width: 16),
                 Expanded(

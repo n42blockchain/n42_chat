@@ -16,6 +16,7 @@ import '../../services/voip/call_manager.dart';
 import '../../services/voip/incoming_call_ringtone_preference.dart';
 import '../../data/datasources/local/preferences_datasource.dart';
 import '../../domain/entities/user_profile_entity.dart' as profile_entity;
+import '../utils/conversation_notification_utils.dart';
 import 'push_notification_service.dart';
 import '../utils/debug_log.dart';
 
@@ -121,6 +122,7 @@ class FirebasePushService implements IPushNotificationService {
       doNotDisturb: settings.doNotDisturb,
       dndStartTime: _parseStoredTimeOfDay(settings.doNotDisturbStart),
       dndEndTime: _parseStoredTimeOfDay(settings.doNotDisturbEnd),
+      privacyMode: settings.privacyMode,
     );
   }
 
@@ -231,18 +233,24 @@ class FirebasePushService implements IPushNotificationService {
   static Future<NotificationConfig> loadPersistedNotificationConfigForTest() =>
       _loadPersistedNotificationConfig();
 
+  void _applyIOSForegroundPresentationOptions(NotificationConfig config) {
+    if (!Platform.isIOS) {
+      return;
+    }
+    final allowNativePreview = config.allowsNativeForegroundPreview;
+    unawaited(
+      FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: allowNativePreview,
+        badge: config.enabled,
+        sound: allowNativePreview && config.playSound,
+      ),
+    );
+  }
+
   /// 设置通知配置
   void setNotificationConfig(NotificationConfig config) {
     _notificationConfig = config;
-    if (Platform.isIOS) {
-      unawaited(
-        FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-          alert: config.enabled,
-          badge: config.enabled,
-          sound: config.enabled && config.playSound,
-        ),
-      );
-    }
+    _applyIOSForegroundPresentationOptions(config);
   }
 
   /// 设置当前活跃房间（正在查看的房间不弹通知）
@@ -290,15 +298,9 @@ class FirebasePushService implements IPushNotificationService {
       // 主 app 的处理器会将 Matrix/Chat 消息委托给
       // FirebasePushService.handleBackgroundMessage()。
 
-      // iOS 前台通知展示选项（确保前台时也能显示系统推送横幅）
-      if (Platform.isIOS) {
-        await FirebaseMessaging.instance
-            .setForegroundNotificationPresentationOptions(
-              alert: true,
-              badge: true,
-              sound: true,
-            );
-      }
+      // 尽早加载持久化配置，避免 iOS 前台横幅先按默认值泄露通知内容。
+      _notificationConfig = await _loadPersistedNotificationConfig();
+      _applyIOSForegroundPresentationOptions(_notificationConfig);
 
       // 监听前台消息
       _foregroundSubscription = FirebaseMessaging.onMessage.listen(
@@ -677,10 +679,15 @@ class FirebasePushService implements IPushNotificationService {
         iOS: iosDetails,
       );
 
-      await _localNotifications!.show(
-        id: notificationId,
+      final presentation = config.presentMessage(
         title: 'N42 Chat',
         body: 'You have a new message',
+      );
+
+      await _localNotifications!.show(
+        id: notificationId,
+        title: presentation.title,
+        body: presentation.body,
         notificationDetails: details,
         payload: payload,
       );
@@ -846,7 +853,20 @@ class FirebasePushService implements IPushNotificationService {
 
     // 检查房间是否静音
     final room = _client.getRoomById(roomId);
-    if (room != null && room.pushRuleState == matrix.PushRuleState.dontNotify) {
+    if (room == null) {
+      return !_notificationConfig.isInDoNotDisturbPeriod();
+    }
+
+    final notificationMode = conversationNotificationModeFromPushRuleState(
+      room.pushRuleState,
+    );
+    if (!shouldNotifyForConversationMode(
+      mode: notificationMode,
+      event: event,
+      currentUserId: _client.userID,
+      client: _client,
+      room: room,
+    )) {
       return false;
     }
 
@@ -877,7 +897,7 @@ class FirebasePushService implements IPushNotificationService {
 
     showLocalNotification(
       title: title,
-      body: _notificationConfig.showPreview ? body : 'You have a new message',
+      body: body,
       roomId: roomId,
       eventId: event.eventId,
     );
@@ -1225,10 +1245,15 @@ class FirebasePushService implements IPushNotificationService {
         iOS: iosDetails,
       );
 
-      await _localNotifications!.show(
-        id: notificationId,
+      final presentation = _notificationConfig.presentMessage(
         title: title,
         body: body,
+      );
+
+      await _localNotifications!.show(
+        id: notificationId,
+        title: presentation.title,
+        body: presentation.body,
         notificationDetails: details,
         payload: payload,
       );

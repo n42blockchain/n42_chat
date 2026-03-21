@@ -4,14 +4,15 @@ import 'dart:async';
 import 'package:matrix/matrix.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../core/utils/debug_log.dart';
+import '../../core/utils/matrix_utils.dart';
+import '../../domain/entities/avatar_decoration_preset.dart';
 import '../../domain/entities/stored_account_entity.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/secure_storage_datasource.dart';
 import '../datasources/matrix/matrix_auth_datasource.dart';
 import '../datasources/remote/social_auth_api.dart';
-import '../../core/utils/debug_log.dart';
-import '../../core/utils/matrix_utils.dart';
 
 /// 认证仓库实现
 class AuthRepositoryImpl implements IAuthRepository {
@@ -75,6 +76,9 @@ class AuthRepositoryImpl implements IAuthRepository {
       signature: profileData['signature'] as String?,
       pokeText: profileData['pokeText'] as String?,
       ringtone: profileData['ringtone'] as String?,
+      avatarDecorationPreset: AvatarDecorationPresetX.fromStorageKey(
+        profileData['avatarDecorationPreset'] as String?,
+      ),
     );
   }
 
@@ -554,6 +558,9 @@ class AuthRepositoryImpl implements IAuthRepository {
         signature: profileData['signature'] as String?,
         pokeText: profileData['pokeText'] as String?,
         ringtone: profileData['ringtone'] as String?,
+        avatarDecorationPreset: AvatarDecorationPresetX.fromStorageKey(
+          profileData['avatarDecorationPreset'] as String?,
+        ),
       );
     } catch (e) {
       debugLog('AuthRepository: Get profile failed - $e');
@@ -611,6 +618,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     String? signature,
     String? pokeText,
     String? ringtone,
+    String? avatarDecorationPreset,
   }) async {
     if (!isLoggedIn) return false;
 
@@ -628,6 +636,9 @@ class AuthRepositoryImpl implements IAuthRepository {
       if (signature != null) newData['signature'] = signature;
       if (pokeText != null) newData['pokeText'] = pokeText;
       if (ringtone != null) newData['ringtone'] = ringtone;
+      if (avatarDecorationPreset != null) {
+        newData['avatarDecorationPreset'] = avatarDecorationPreset;
+      }
 
       // 保存到 Matrix 账户数据
       await client.setAccountData(client.userID!, 'n42.user.profile', newData);

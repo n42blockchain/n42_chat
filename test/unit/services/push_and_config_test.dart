@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:n42_chat/src/core/notifications/firebase_push_service.dart';
 import 'package:n42_chat/src/core/notifications/push_notification_service.dart';
+import 'package:n42_chat/src/domain/entities/user_profile_entity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MockMatrixClient extends Mock implements matrix.Client {}
@@ -144,7 +145,7 @@ void main() {
       () async {
         SharedPreferences.setMockInitialValues({
           'n42_chat_notification_settings':
-              '{"enabled":false,"showPreview":false,"playSound":false,"vibrate":true,"doNotDisturb":true,"doNotDisturbStart":"22:30","doNotDisturbEnd":"07:15"}',
+              '{"enabled":false,"showPreview":false,"playSound":false,"vibrate":true,"doNotDisturb":true,"doNotDisturbStart":"22:30","doNotDisturbEnd":"07:15","privacyMode":"hidden"}',
         });
 
         final config =
@@ -157,6 +158,7 @@ void main() {
         expect(config.doNotDisturb, isTrue);
         expect(config.dndStartTime, const TimeOfDay(hour: 22, minute: 30));
         expect(config.dndEndTime, const TimeOfDay(hour: 7, minute: 15));
+        expect(config.privacyMode, NotificationPrivacyMode.hidden);
       },
     );
   });
@@ -172,6 +174,7 @@ void main() {
       expect(config.doNotDisturb, isFalse);
       expect(config.dndStartTime, isNull);
       expect(config.dndEndTime, isNull);
+      expect(config.privacyMode, NotificationPrivacyMode.full);
     });
 
     test('default config should not be in do-not-disturb period', () {
@@ -222,6 +225,7 @@ void main() {
         doNotDisturb: true,
         dndStartTime: TimeOfDay(hour: 22, minute: 30),
         dndEndTime: TimeOfDay(hour: 7, minute: 0),
+        privacyMode: NotificationPrivacyMode.senderOnly,
       );
 
       final json = config.toJson();
@@ -233,6 +237,7 @@ void main() {
       expect(json['doNotDisturb'], isTrue);
       expect(json['dndStartTime'], equals('22:30'));
       expect(json['dndEndTime'], equals('7:0'));
+      expect(json['privacyMode'], equals('senderOnly'));
     });
 
     test('toJson with null DND times should produce null values', () {
@@ -252,6 +257,7 @@ void main() {
         'doNotDisturb': true,
         'dndStartTime': '23:15',
         'dndEndTime': '6:45',
+        'privacyMode': 'hidden',
       };
 
       final config = NotificationConfig.fromJson(json);
@@ -266,6 +272,7 @@ void main() {
         equals(const TimeOfDay(hour: 23, minute: 15)),
       );
       expect(config.dndEndTime, equals(const TimeOfDay(hour: 6, minute: 45)));
+      expect(config.privacyMode, NotificationPrivacyMode.hidden);
     });
 
     test('fromJson with missing keys should use defaults', () {
@@ -278,6 +285,7 @@ void main() {
       expect(config.doNotDisturb, isFalse);
       expect(config.dndStartTime, isNull);
       expect(config.dndEndTime, isNull);
+      expect(config.privacyMode, NotificationPrivacyMode.full);
     });
 
     test('fromJson with invalid time format should return null for times', () {
@@ -302,6 +310,7 @@ void main() {
         doNotDisturb: true,
         dndStartTime: TimeOfDay(hour: 1, minute: 30),
         dndEndTime: TimeOfDay(hour: 8, minute: 0),
+        privacyMode: NotificationPrivacyMode.hidden,
       );
 
       final restored = NotificationConfig.fromJson(original.toJson());
@@ -313,6 +322,46 @@ void main() {
       expect(restored.doNotDisturb, equals(original.doNotDisturb));
       expect(restored.dndStartTime, equals(original.dndStartTime));
       expect(restored.dndEndTime, equals(original.dndEndTime));
+      expect(restored.privacyMode, equals(original.privacyMode));
+    });
+
+    test('presentMessage hides message body in sender-only mode', () {
+      const config = NotificationConfig(
+        privacyMode: NotificationPrivacyMode.senderOnly,
+      );
+
+      final presentation = config.presentMessage(title: 'Alice', body: 'hello');
+
+      expect(presentation.title, 'Alice');
+      expect(presentation.body, 'You have a new message');
+    });
+
+    test('presentMessage hides sender and body in hidden mode', () {
+      const config = NotificationConfig(
+        privacyMode: NotificationPrivacyMode.hidden,
+      );
+
+      final presentation = config.presentMessage(title: 'Alice', body: 'hello');
+
+      expect(presentation.title, 'N42 Chat');
+      expect(presentation.body, 'You have a new message');
+    });
+
+    test('native foreground preview is disabled when preview is hidden', () {
+      const config = NotificationConfig(
+        showPreview: false,
+        privacyMode: NotificationPrivacyMode.full,
+      );
+
+      expect(config.allowsNativeForegroundPreview, isFalse);
+    });
+
+    test('native foreground preview is disabled in sender-only mode', () {
+      const config = NotificationConfig(
+        privacyMode: NotificationPrivacyMode.senderOnly,
+      );
+
+      expect(config.allowsNativeForegroundPreview, isFalse);
     });
   });
 

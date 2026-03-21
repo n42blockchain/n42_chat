@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart' show ThemeMode;
 
+import 'avatar_decoration_preset.dart';
+
 /// 用户资料实体
 class UserProfileEntity extends Equatable {
   /// 用户ID（Matrix格式：@user:server.com）
@@ -52,6 +54,9 @@ class UserProfileEntity extends Equatable {
   /// NFT 头像图片 URL（已解析的 HTTPS URL）
   final String? nftImageUrl;
 
+  /// 头像装饰样式
+  final AvatarDecorationPreset avatarDecorationPreset;
+
   /// 是否使用 NFT 头像
   bool get hasNftAvatar =>
       nftContractAddress != null && nftTokenId != null && nftImageUrl != null;
@@ -72,6 +77,7 @@ class UserProfileEntity extends Equatable {
     this.nftTokenId,
     this.nftChainId,
     this.nftImageUrl,
+    this.avatarDecorationPreset = AvatarDecorationPreset.none,
   });
 
   /// 获取有效显示名称
@@ -133,6 +139,7 @@ class UserProfileEntity extends Equatable {
     nftTokenId,
     nftChainId,
     nftImageUrl,
+    avatarDecorationPreset,
   ];
 
   UserProfileEntity copyWith({
@@ -151,6 +158,7 @@ class UserProfileEntity extends Equatable {
     int? nftTokenId,
     int? nftChainId,
     String? nftImageUrl,
+    AvatarDecorationPreset? avatarDecorationPreset,
   }) {
     return UserProfileEntity(
       userId: userId ?? this.userId,
@@ -168,6 +176,8 @@ class UserProfileEntity extends Equatable {
       nftTokenId: nftTokenId ?? this.nftTokenId,
       nftChainId: nftChainId ?? this.nftChainId,
       nftImageUrl: nftImageUrl ?? this.nftImageUrl,
+      avatarDecorationPreset:
+          avatarDecorationPreset ?? this.avatarDecorationPreset,
     );
   }
 }
@@ -212,6 +222,18 @@ class UserSettingsEntity extends Equatable {
 }
 
 /// 通知设置
+enum NotificationPrivacyMode {
+  /// 显示发件人与消息正文
+  full,
+
+  /// 仅显示发件人/会话名，不显示正文
+  senderOnly,
+
+  /// 不显示发件人与正文，只显示通用提示
+  hidden,
+}
+
+/// 通知设置
 class NotificationSettings extends Equatable {
   /// 是否启用通知
   final bool enabled;
@@ -234,6 +256,9 @@ class NotificationSettings extends Equatable {
   /// 免打扰结束时间
   final String? doNotDisturbEnd;
 
+  /// 通知隐私模式
+  final NotificationPrivacyMode privacyMode;
+
   const NotificationSettings({
     this.enabled = true,
     this.showPreview = true,
@@ -242,6 +267,7 @@ class NotificationSettings extends Equatable {
     this.doNotDisturb = false,
     this.doNotDisturbStart,
     this.doNotDisturbEnd,
+    this.privacyMode = NotificationPrivacyMode.full,
   });
 
   @override
@@ -253,6 +279,7 @@ class NotificationSettings extends Equatable {
     doNotDisturb,
     doNotDisturbStart,
     doNotDisturbEnd,
+    privacyMode,
   ];
 
   NotificationSettings copyWith({
@@ -263,6 +290,7 @@ class NotificationSettings extends Equatable {
     bool? doNotDisturb,
     String? doNotDisturbStart,
     String? doNotDisturbEnd,
+    NotificationPrivacyMode? privacyMode,
   }) {
     return NotificationSettings(
       enabled: enabled ?? this.enabled,
@@ -272,6 +300,7 @@ class NotificationSettings extends Equatable {
       doNotDisturb: doNotDisturb ?? this.doNotDisturb,
       doNotDisturbStart: doNotDisturbStart ?? this.doNotDisturbStart,
       doNotDisturbEnd: doNotDisturbEnd ?? this.doNotDisturbEnd,
+      privacyMode: privacyMode ?? this.privacyMode,
     );
   }
 }

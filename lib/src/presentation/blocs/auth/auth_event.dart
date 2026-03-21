@@ -165,6 +165,7 @@ class UpdateUserProfile extends AuthEvent {
   final String? region;
   final String? pokeText;
   final String? ringtone;
+  final String? avatarDecorationPreset;
 
   const UpdateUserProfile({
     this.displayName,
@@ -173,6 +174,7 @@ class UpdateUserProfile extends AuthEvent {
     this.region,
     this.pokeText,
     this.ringtone,
+    this.avatarDecorationPreset,
   });
 
   @override
@@ -183,6 +185,7 @@ class UpdateUserProfile extends AuthEvent {
     region,
     pokeText,
     ringtone,
+    avatarDecorationPreset,
   ];
 }
 
