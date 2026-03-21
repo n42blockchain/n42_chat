@@ -428,3 +428,82 @@ class PaymentRequestContent {
     };
   }
 }
+
+/// 收款请求完成确认事件内容
+class PaymentRequestFulfillmentContent {
+  /// 自定义事件类型，不直接展示为聊天消息
+  static const String eventType = 'n42.payment_request.fulfillment';
+
+  /// 收款请求 ID
+  final String requestId;
+
+  /// 对应的转账 ID
+  final String transferId;
+
+  /// 对应的转账消息事件 ID
+  final String? transferEventId;
+
+  /// 支付方地址
+  final String payerAddress;
+
+  /// 收款方地址
+  final String receiverAddress;
+
+  /// 金额
+  final String amount;
+
+  /// 代币符号
+  final String token;
+
+  /// 交易哈希
+  final String? transactionHash;
+
+  /// 完成时间
+  final DateTime fulfilledAt;
+
+  const PaymentRequestFulfillmentContent({
+    required this.requestId,
+    required this.transferId,
+    this.transferEventId,
+    required this.payerAddress,
+    required this.receiverAddress,
+    required this.amount,
+    required this.token,
+    this.transactionHash,
+    required this.fulfilledAt,
+  });
+
+  factory PaymentRequestFulfillmentContent.fromEventContent(
+    Map<String, dynamic> content,
+  ) {
+    return PaymentRequestFulfillmentContent(
+      requestId: content['request_id'] as String? ?? '',
+      transferId: content['transfer_id'] as String? ?? '',
+      transferEventId: content['transfer_event_id'] as String?,
+      payerAddress: content['payer_address'] as String? ?? '',
+      receiverAddress: content['receiver_address'] as String? ?? '',
+      amount: content['amount'] as String? ?? '0',
+      token: content['token'] as String? ?? '',
+      transactionHash: content['tx_hash'] as String?,
+      fulfilledAt: content['fulfilled_at'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              (content['fulfilled_at'] as num).toInt(),
+            )
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toEventContent() {
+    return {
+      'request_id': requestId,
+      'transfer_id': transferId,
+      'transfer_event_id': transferEventId,
+      'payer_address': payerAddress,
+      'receiver_address': receiverAddress,
+      'amount': amount,
+      'token': token,
+      'tx_hash': transactionHash,
+      'fulfilled_at': fulfilledAt.millisecondsSinceEpoch,
+    };
+  }
+}

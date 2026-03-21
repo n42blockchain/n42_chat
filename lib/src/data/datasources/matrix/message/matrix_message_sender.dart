@@ -373,6 +373,21 @@ class MatrixMessageSender {
     return eventId ?? '';
   }
 
+  /// 发送自定义房间事件（不展示在消息列表中）
+  Future<String> sendRoomEvent({
+    required String roomId,
+    required String type,
+    required Map<String, dynamic> content,
+  }) async {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) {
+      throw Exception('房间不存在');
+    }
+
+    final eventId = await room.sendEvent(content, type: type);
+    return eventId ?? '';
+  }
+
   /// 重发消息
   Future<bool> resendMessage(String roomId, String eventId) async {
     final room = _client?.getRoomById(roomId);

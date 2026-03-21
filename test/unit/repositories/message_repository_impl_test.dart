@@ -8,6 +8,7 @@ import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart'
 import 'package:n42_chat/src/data/datasources/matrix/matrix_message_datasource.dart';
 import 'package:n42_chat/src/data/repositories/message_repository_impl.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
+import 'package:n42_chat/src/domain/entities/transfer_entity.dart';
 
 class MockMatrixMessageDataSource extends Mock
     implements MatrixMessageDataSource {}
@@ -199,6 +200,129 @@ void main() {
         verify(
           () => mockMsgDS.mapEventToMessage(mockEvent, mockRoom),
         ).called(1);
+      },
+    );
+
+    test(
+      'emits payment request as paid when fulfillment ack exists in timeline',
+      () async {
+        final paymentEvent = MockEvent();
+        final ackEvent = MockEvent();
+        final mappedMessage = MessageEntity(
+          id: testEventId,
+          roomId: testRoomId,
+          senderId: '@alice:matrix.org',
+          senderName: 'Alice',
+          content: 'Pay me',
+          timestamp: DateTime(2026, 1, 1),
+          type: MessageType.paymentRequest,
+          status: MessageStatus.sent,
+          metadata: MessageMetadata(
+            paymentRequestId: 'req-42',
+            amount: '12.5',
+            token: 'USDT',
+            paymentRequestExpiresAt: DateTime(2030, 1, 1),
+          ),
+        );
+
+        when(() => paymentEvent.eventId).thenReturn(testEventId);
+        when(() => paymentEvent.type).thenReturn(matrix.EventTypes.Message);
+        when(
+          () => paymentEvent.content,
+        ).thenReturn({'msgtype': 'n42.payment_request'});
+
+        when(() => ackEvent.eventId).thenReturn('\$ack1');
+        when(
+          () => ackEvent.type,
+        ).thenReturn(PaymentRequestFulfillmentContent.eventType);
+        when(() => ackEvent.content).thenReturn(
+          PaymentRequestFulfillmentContent(
+            requestId: 'req-42',
+            transferId: 'tx-1',
+            transferEventId: '\$transfer1',
+            payerAddress: '0xpayer',
+            receiverAddress: '0xreceiver',
+            amount: '12.5',
+            token: 'USDT',
+            transactionHash: '0xtxhash',
+            fulfilledAt: DateTime(2026, 1, 1, 12, 5),
+          ).toEventContent(),
+        );
+
+        when(
+          () => mockTimeline.events,
+        ).thenReturn(<matrix.Event>[paymentEvent, ackEvent]);
+        when(
+          () => mockMsgDS.mapEventToMessage(paymentEvent, mockRoom),
+        ).thenReturn(mappedMessage);
+
+        final result = await repository
+            .watchMessage(testRoomId, testEventId)
+            .first;
+
+        expect(result, isNotNull);
+        expect(result!.metadata?.transferStatus, 'completed');
+      },
+    );
+  });
+
+  group('getMessages', () {
+    test(
+      'marks payment requests as paid when a fulfillment ack exists',
+      () async {
+        final paymentEvent = MockEvent();
+        final ackEvent = MockEvent();
+        final mappedMessage = MessageEntity(
+          id: testEventId,
+          roomId: testRoomId,
+          senderId: '@alice:matrix.org',
+          senderName: 'Alice',
+          content: 'Pay me',
+          timestamp: DateTime(2026, 1, 1),
+          type: MessageType.paymentRequest,
+          status: MessageStatus.sent,
+          metadata: MessageMetadata(
+            paymentRequestId: 'req-99',
+            amount: '8',
+            token: 'USDT',
+            paymentRequestExpiresAt: DateTime(2030, 1, 1),
+          ),
+        );
+
+        when(() => paymentEvent.eventId).thenReturn(testEventId);
+        when(() => paymentEvent.type).thenReturn(matrix.EventTypes.Message);
+        when(
+          () => paymentEvent.content,
+        ).thenReturn({'msgtype': 'n42.payment_request'});
+
+        when(() => ackEvent.eventId).thenReturn('\$ack2');
+        when(
+          () => ackEvent.type,
+        ).thenReturn(PaymentRequestFulfillmentContent.eventType);
+        when(() => ackEvent.content).thenReturn(
+          PaymentRequestFulfillmentContent(
+            requestId: 'req-99',
+            transferId: 'tx-99',
+            transferEventId: '\$transfer99',
+            payerAddress: '0xpayer',
+            receiverAddress: '0xreceiver',
+            amount: '8',
+            token: 'USDT',
+            fulfilledAt: DateTime(2026, 1, 1, 12, 10),
+          ).toEventContent(),
+        );
+
+        when(
+          () => mockTimeline.events,
+        ).thenReturn(<matrix.Event>[paymentEvent, ackEvent]);
+        when(
+          () => mockMsgDS.mapEventToMessage(paymentEvent, mockRoom),
+        ).thenReturn(mappedMessage);
+
+        final messages = await repository.getMessages(testRoomId, limit: 10);
+
+        expect(messages, hasLength(1));
+        expect(messages.single.metadata?.transferStatus, 'completed');
       },
     );
   });

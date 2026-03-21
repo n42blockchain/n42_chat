@@ -187,13 +187,39 @@ class TransferRepositoryImpl implements ITransferRepository {
     required String amount,
     required String token,
   }) async {
-    return await initiateTransfer(
+    final transfer = await initiateTransfer(
       roomId: roomId,
       receiverAddress: receiverAddress,
       amount: amount,
       token: token,
       memo: '支付请求: $requestId',
     );
+
+    if (transfer.isSuccess) {
+      try {
+        await _messageDataSource.sendRoomEvent(
+          roomId: roomId,
+          type: PaymentRequestFulfillmentContent.eventType,
+          content: PaymentRequestFulfillmentContent(
+            requestId: requestId,
+            transferId: transfer.id,
+            transferEventId: transfer.eventId,
+            payerAddress: transfer.senderAddress,
+            receiverAddress: transfer.receiverAddress,
+            amount: transfer.amount,
+            token: transfer.token,
+            transactionHash: transfer.transactionHash,
+            fulfilledAt: transfer.completedAt ?? DateTime.now(),
+          ).toEventContent(),
+        );
+      } catch (e) {
+        debugLog(
+          'TransferRepository: transfer succeeded but payment ack send failed: $e',
+        );
+      }
+    }
+
+    return transfer;
   }
 
   @override

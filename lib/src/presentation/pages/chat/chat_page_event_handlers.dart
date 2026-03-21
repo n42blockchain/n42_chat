@@ -189,7 +189,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     final receiverAddress = metadata?.paymentReceiverAddress;
     final amount = metadata?.amount;
     final token = metadata?.token;
-    final expiresAt = metadata?.paymentRequestExpiresAt;
+    final paymentStatus = resolvePaymentRequestStatus(metadata);
 
     if (requestId == null ||
         requestId.isEmpty ||
@@ -208,7 +208,14 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       return;
     }
 
-    if (expiresAt != null && DateTime.now().isAfter(expiresAt)) {
+    if (paymentStatus == PaymentRequestLifecycleStatus.paid) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Payment already sent')));
+      return;
+    }
+
+    if (paymentStatus == PaymentRequestLifecycleStatus.expired) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.commonExpired ?? 'Expired'),
@@ -264,7 +271,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       memo: message.content.isNotEmpty ? message.content : null,
       qrCodeData: receiverAddress,
       createdAt: message.timestamp,
-      expiresAt: expiresAt,
+      expiresAt: metadata?.paymentRequestExpiresAt,
     );
 
     if (!mounted) return;

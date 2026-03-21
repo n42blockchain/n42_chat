@@ -176,6 +176,71 @@ void main() {
     });
   });
 
+  group('fulfillPaymentRequest', () {
+    setUp(() {
+      when(() => mockWalletBridge.isWalletConnected).thenReturn(true);
+      when(() => mockWalletBridge.walletAddress).thenReturn('0xsender');
+    });
+
+    test(
+      'sends a durable fulfillment acknowledgement after successful payment',
+      () async {
+        when(
+          () => mockWalletBridge.requestTransfer(
+            toAddress: any(named: 'toAddress'),
+            amount: any(named: 'amount'),
+            token: any(named: 'token'),
+            memo: any(named: 'memo'),
+          ),
+        ).thenAnswer((_) async => TransferResult.success('0xpaidtx'));
+        when(
+          () => mockMessageDataSource.sendCustomMessage(
+            roomId: any(named: 'roomId'),
+            msgType: any(named: 'msgType'),
+            content: any(named: 'content'),
+          ),
+        ).thenAnswer((_) async => '\$transfer-event');
+        when(
+          () => mockMessageDataSource.sendRoomEvent(
+            roomId: any(named: 'roomId'),
+            type: any(named: 'type'),
+            content: any(named: 'content'),
+          ),
+        ).thenAnswer((_) async => '\$ack-event');
+
+        final transfer = await repository.fulfillPaymentRequest(
+          roomId: '!room-pay:server.com',
+          requestId: 'req-42',
+          receiverAddress: '0xreceiver',
+          amount: '12.5',
+          token: 'USDT',
+        );
+
+        expect(transfer.isSuccess, isTrue);
+
+        final captured = verify(
+          () => mockMessageDataSource.sendRoomEvent(
+            roomId: '!room-pay:server.com',
+            type: PaymentRequestFulfillmentContent.eventType,
+            content: captureAny(named: 'content'),
+          ),
+        ).captured;
+
+        expect(captured, hasLength(1));
+        final content = captured.single as Map<String, dynamic>;
+        expect(content['request_id'], 'req-42');
+        expect(content['transfer_id'], transfer.id);
+        expect(content['transfer_event_id'], '\$transfer-event');
+        expect(content['payer_address'], '0xsender');
+        expect(content['receiver_address'], '0xreceiver');
+        expect(content['amount'], '12.5');
+        expect(content['token'], 'USDT');
+        expect(content['tx_hash'], '0xpaidtx');
+        expect(content['fulfilled_at'], isA<int>());
+      },
+    );
+  });
+
   // ─────────────────────────────────────────────────
   // Empty-cache read operations
   // ─────────────────────────────────────────────────
