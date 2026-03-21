@@ -13,6 +13,7 @@ import 'package:flutter_callkit_incoming/entities/notification_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:uuid/uuid.dart';
 import '../../core/utils/debug_log.dart';
+import 'incoming_call_ringtone_preference.dart';
 
 /// 来电动作类型
 enum CallAction { accept, decline, timeout, callback }
@@ -173,6 +174,7 @@ class CallNotificationService {
   }) async {
     final callId = _uuid.v4();
     _currentCallId = callId;
+    final ringtonePreference = await IncomingCallRingtonePreference.load();
 
     final params = CallKitParams(
       id: callId,
@@ -198,33 +200,14 @@ class CallNotificationService {
       headers: <String, dynamic>{
         'platform': Platform.isIOS ? 'ios' : 'android',
       },
-      android: AndroidParams(
-        isCustomNotification: true,
-        isShowLogo: true,
-        ringtonePath: 'ringtone_default',
-        backgroundColor: '#0955fa',
-        backgroundUrl: callerAvatarUrl,
-        actionColor: '#4CAF50',
-        textColor: '#ffffff',
-        incomingCallNotificationChannelName: incomingCallChannelName,
-        missedCallNotificationChannelName: missedCallChannelName,
-        isShowCallID: false,
+      android: buildIncomingCallAndroidParams(
+        ringtonePreference: ringtonePreference,
+        avatarUrl: callerAvatarUrl,
+        incomingCallChannelName: incomingCallChannelName,
+        missedCallChannelName: missedCallChannelName,
       ),
-      ios: const IOSParams(
-        iconName: 'CallKitLogo',
-        handleType: 'generic',
-        supportsVideo: true,
-        maximumCallGroups: 1,
-        maximumCallsPerCallGroup: 1,
-        audioSessionMode: 'videoChat',
-        audioSessionActive: true,
-        audioSessionPreferredSampleRate: 44100.0,
-        audioSessionPreferredIOBufferDuration: 0.005,
-        supportsDTMF: false,
-        supportsHolding: false,
-        supportsGrouping: false,
-        supportsUngrouping: false,
-        ringtonePath: 'ringtone_default',
+      ios: buildIncomingCallIOSParams(
+        ringtonePreference: ringtonePreference,
       ),
     );
 

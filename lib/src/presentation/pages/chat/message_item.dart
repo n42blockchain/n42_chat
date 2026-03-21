@@ -15,7 +15,6 @@ import '../../widgets/chat/message_status_indicator.dart' as indicator;
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/contact_card_message_widget.dart';
 import '../../widgets/chat/url_preview_widget.dart';
-import '../../widgets/chat/ai_link_summary_card.dart';
 import '../../../core/services/ai_service.dart';
 import '../../widgets/chat/message_reaction_bar.dart';
 import '../../widgets/chat/edit_history_sheet.dart';
@@ -39,7 +38,7 @@ class MessageItem extends StatelessWidget {
 
   /// 头像点击回调
   final VoidCallback? onAvatarTap;
-  
+
   /// 头像双击回调（拍一拍）
   final VoidCallback? onAvatarDoubleTap;
 
@@ -51,7 +50,7 @@ class MessageItem extends StatelessWidget {
 
   /// 是否显示发送者名称
   final bool showSenderName;
-  
+
   /// 当前用户ID（用于表情回应高亮）
   final String? currentUserId;
 
@@ -59,7 +58,13 @@ class MessageItem extends StatelessWidget {
   final void Function(String emoji)? onReactionTap;
 
   /// 投票回调 (pollEventId, optionId, currentVotes, maxSelections)
-  final void Function(String pollEventId, String optionId, List<String> currentVotes, int maxSelections)? onPollVote;
+  final void Function(
+    String pollEventId,
+    String optionId,
+    List<String> currentVotes,
+    int maxSelections,
+  )?
+  onPollVote;
 
   /// 结束投票回调
   final void Function(String pollEventId)? onEndPoll;
@@ -68,7 +73,8 @@ class MessageItem extends StatelessWidget {
   final void Function(MessageEntity message)? onRedPacketTap;
 
   /// 名片点击回调
-  final void Function(String contactId, String contactName, String? avatarUrl)? onContactCardTap;
+  final void Function(String contactId, String contactName, String? avatarUrl)?
+  onContactCardTap;
 
   /// 回拨通话回调
   final void Function(MessageEntity message)? onCallBack;
@@ -138,7 +144,10 @@ class MessageItem extends StatelessWidget {
     }
 
     // 使用 RemarkService 获取备注名
-    return RemarkService.instance.getDisplayName(message.senderId, message.senderName);
+    return RemarkService.instance.getDisplayName(
+      message.senderId,
+      message.senderName,
+    );
   }
 
   Widget _buildMessageBubble(BuildContext context) {
@@ -147,17 +156,22 @@ class MessageItem extends StatelessWidget {
     final displayName = _getSenderDisplayName(context);
 
     // 是否显示发送者名称（群聊中非自己的消息）
-    final shouldShowSenderName = isGroupChat && !message.isFromMe && showSenderName;
+    final shouldShowSenderName =
+        isGroupChat && !message.isFromMe && showSenderName;
 
     // 图片、视频、红包、转账消息不需要气泡背景（微信风格）
-    final noBubbleMessage = message.type == MessageType.image || 
-                            message.type == MessageType.video ||
-                            message.type == MessageType.redPacket ||
-                            message.type == MessageType.transfer;
-    
+    final noBubbleMessage =
+        message.type == MessageType.image ||
+        message.type == MessageType.video ||
+        message.type == MessageType.redPacket ||
+        message.type == MessageType.transfer ||
+        message.type == MessageType.paymentRequest;
+
     // 红包和转账消息有自己的点击处理，不需要外层的 onTap
-    final hasOwnTapHandler = message.type == MessageType.redPacket ||
-                             message.type == MessageType.transfer;
+    final hasOwnTapHandler =
+        message.type == MessageType.redPacket ||
+        message.type == MessageType.transfer ||
+        message.type == MessageType.paymentRequest;
 
     Widget bubble = MessageBubble(
       isSelf: message.isFromMe,
@@ -190,13 +204,18 @@ class MessageItem extends StatelessWidget {
                   displayName,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark ? const Color(0xFF999999) : AppColors.textSecondary,
+                    color: isDark
+                        ? const Color(0xFF999999)
+                        : AppColors.textSecondary,
                   ),
                 ),
                 if (message.isBotMessage) ...[
                   const SizedBox(width: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 1,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4),
@@ -234,10 +253,7 @@ class MessageItem extends StatelessWidget {
     // 阅后即焚倒计时覆盖层
     if (message.isSelfDestructing) {
       if (message.isDestructionStarted) {
-        bubble = SelfDestructOverlay(
-          message: message,
-          child: bubble,
-        );
+        bubble = SelfDestructOverlay(message: message, child: bubble);
       } else {
         // 未开始倒计时的消息显示 timer 图标提示
         bubble = Column(
@@ -300,26 +316,20 @@ class MessageItem extends StatelessWidget {
         crossAxisAlignment: message.isFromMe
             ? CrossAxisAlignment.end
             : CrossAxisAlignment.start,
-        children: [
-          bubble,
-          _buildReactionBar(context),
-        ],
+        children: [bubble, _buildReactionBar(context)],
       );
     }
 
     return bubble;
   }
-  
+
   /// 构建表情回应栏
   Widget _buildReactionBar(BuildContext context) {
     // 转换 MessageReaction 到 MessageReactionEntity
     final reactionEntities = message.reactions.map((r) {
-      return MessageReactionEntity(
-        emoji: r.key,
-        userIds: r.userIds,
-      );
+      return MessageReactionEntity(emoji: r.key, userIds: r.userIds);
     }).toList();
-    
+
     return Padding(
       padding: EdgeInsets.only(
         left: message.isFromMe ? 0 : 56, // 头像宽度 + 间距
@@ -360,6 +370,9 @@ class MessageItem extends StatelessWidget {
       case MessageType.transfer:
         content = _buildTransferMessage();
         break;
+      case MessageType.paymentRequest:
+        content = _buildPaymentRequestMessage(context);
+        break;
       case MessageType.redPacket:
         content = _buildRedPacketMessage(context);
         break;
@@ -378,7 +391,7 @@ class MessageItem extends StatelessWidget {
       default:
         content = _buildTextMessage(isDark, context);
     }
-    
+
     // 如果有回复，添加回复引用块
     if (message.hasReply && message.replyToContent != null) {
       content = Column(
@@ -409,12 +422,14 @@ class MessageItem extends StatelessWidget {
 
     return content;
   }
-  
+
   /// 构建回复引用块
   Widget _buildReplyQuote(bool isDark) {
     final bgColor = message.isFromMe
         ? Colors.black.withValues(alpha: 0.1)
-        : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05));
+        : (isDark
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.05));
 
     final textColor = message.isFromMe
         ? AppColors.sentText(isDark).withValues(alpha: 0.8)
@@ -433,10 +448,7 @@ class MessageItem extends StatelessWidget {
           color: bgColor,
           borderRadius: BorderRadius.circular(4),
           border: const Border(
-            left: BorderSide(
-              color: AppColors.primary,
-              width: 2,
-            ),
+            left: BorderSide(color: AppColors.primary, width: 2),
           ),
         ),
         child: Column(
@@ -456,10 +468,7 @@ class MessageItem extends StatelessWidget {
               message.replyToContent ?? '',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13,
-                color: textColor,
-              ),
+              style: TextStyle(fontSize: 13, color: textColor),
             ),
           ],
         ),
@@ -476,7 +485,7 @@ class MessageItem extends StatelessWidget {
     // 微信中绿色气泡的文字是黑色，灰色气泡的文字也是黑色
     // 深色模式下，对方的灰色气泡文字是白色
     final textColor = message.isFromMe
-        ? AppColors.sentText(isDark)  // 黑色
+        ? AppColors.sentText(isDark) // 黑色
         : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
 
     final textWidget = _buildRichTextWithAddresses(
@@ -546,10 +555,8 @@ class MessageItem extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => EditHistorySheet(
-        roomId: message.roomId,
-        messageId: message.id,
-      ),
+      builder: (ctx) =>
+          EditHistorySheet(roomId: message.roomId, messageId: message.id),
     );
   }
 
@@ -560,9 +567,9 @@ class MessageItem extends StatelessWidget {
     if (content.startsWith('[')) {
       final firstLine = content.split('\n').first.toLowerCase();
       return firstLine.contains('名片') ||
-             firstLine.contains('contact') ||
-             firstLine.contains('card') ||
-             firstLine.contains('personal');
+          firstLine.contains('contact') ||
+          firstLine.contains('card') ||
+          firstLine.contains('personal');
     }
     return false;
   }
@@ -581,15 +588,24 @@ class MessageItem extends StatelessWidget {
         // 支持普通冒号 : 和全角冒号 ：
         // 新格式使用 "Name:" 前缀
         // 同时支持旧格式的 "联系人" 和 "Contact"
-        if (line.startsWith('Name:') || line.startsWith('Name：') ||
-            line.startsWith('联系人：') || line.startsWith('联系人:') ||
-            line.startsWith('Contact：') || line.startsWith('Contact:')) {
-          contactName = line.replaceFirst(RegExp(r'^(Name[：:]|联系人[：:]|Contact[：:])'), '').trim();
+        if (line.startsWith('Name:') ||
+            line.startsWith('Name：') ||
+            line.startsWith('联系人：') ||
+            line.startsWith('联系人:') ||
+            line.startsWith('Contact：') ||
+            line.startsWith('Contact:')) {
+          contactName = line
+              .replaceFirst(RegExp(r'^(Name[：:]|联系人[：:]|Contact[：:])'), '')
+              .trim();
         } else if (line.startsWith('ID：') || line.startsWith('ID:')) {
           contactId = line.replaceFirst(RegExp(r'^ID[：:]'), '').trim();
-        } else if (line.startsWith('头像：') || line.startsWith('头像:') ||
-                   line.startsWith('Avatar：') || line.startsWith('Avatar:')) {
-          contactAvatar = line.replaceFirst(RegExp(r'^(头像[：:]|Avatar[：:])'), '').trim();
+        } else if (line.startsWith('头像：') ||
+            line.startsWith('头像:') ||
+            line.startsWith('Avatar：') ||
+            line.startsWith('Avatar:')) {
+          contactAvatar = line
+              .replaceFirst(RegExp(r'^(头像[：:]|Avatar[：:])'), '')
+              .trim();
         }
       }
 
@@ -597,7 +613,8 @@ class MessageItem extends StatelessWidget {
         return {
           'name': contactName,
           'id': contactId,
-          if (contactAvatar != null && contactAvatar.isNotEmpty) 'avatar': contactAvatar,
+          if (contactAvatar != null && contactAvatar.isNotEmpty)
+            'avatar': contactAvatar,
         };
       }
     } catch (e) {
@@ -618,7 +635,9 @@ class MessageItem extends StatelessWidget {
 
     if (cardInfo != null) {
       contactId = cardInfo['id'] ?? '';
-      displayName = cardInfo['name'] ?? (S.of(context)?.chatUnknownContact ?? 'Unknown Contact');
+      displayName =
+          cardInfo['name'] ??
+          (S.of(context)?.chatUnknownContact ?? 'Unknown Contact');
       avatarUrl = cardInfo['avatar'];
     } else {
       // 从 body 格式 "[Contact Card] displayName" 中解析
@@ -632,7 +651,9 @@ class MessageItem extends StatelessWidget {
             ? body.substring(bracketEnd + 1).trim()
             : body;
       } else {
-        displayName = body.isNotEmpty ? body : (S.of(context)?.chatUnknownContact ?? 'Unknown Contact');
+        displayName = body.isNotEmpty
+            ? body
+            : (S.of(context)?.chatUnknownContact ?? 'Unknown Contact');
       }
       contactId = '';
       avatarUrl = null;
@@ -654,7 +675,9 @@ class MessageItem extends StatelessWidget {
   /// 构建名片消息（微信风格）
   Widget _buildContactCardMessage(bool isDark, BuildContext context) {
     final cardInfo = _parseContactCard(message.content);
-    final contactName = cardInfo?['name'] ?? (S.of(context)?.chatUnknownContact ?? 'Unknown Contact');
+    final contactName =
+        cardInfo?['name'] ??
+        (S.of(context)?.chatUnknownContact ?? 'Unknown Contact');
     final contactId = cardInfo?['id'] ?? '';
     final contactAvatar = cardInfo?['avatar'];
 
@@ -696,7 +719,9 @@ class MessageItem extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                             color: message.isFromMe
                                 ? AppColors.sentText(isDark)
-                                : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived),
+                                : (isDark
+                                      ? AppColors.textPrimaryDark
+                                      : AppColors.messageTextReceived),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -707,8 +732,12 @@ class MessageItem extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             color: message.isFromMe
-                                ? AppColors.sentText(isDark).withValues(alpha: 0.6)
-                                : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+                                ? AppColors.sentText(
+                                    isDark,
+                                  ).withValues(alpha: 0.6)
+                                : (isDark
+                                      ? AppColors.textSecondaryDark
+                                      : AppColors.textSecondary),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -728,7 +757,9 @@ class MessageItem extends StatelessWidget {
                   top: BorderSide(
                     color: message.isFromMe
                         ? Colors.black.withValues(alpha: 0.1)
-                        : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
+                        : (isDark
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.05)),
                     width: 0.5,
                   ),
                 ),
@@ -739,7 +770,9 @@ class MessageItem extends StatelessWidget {
                   fontSize: 11,
                   color: message.isFromMe
                       ? AppColors.sentText(isDark).withValues(alpha: 0.5)
-                      : (isDark ? AppColors.textSecondaryDark : AppColors.textTertiary),
+                      : (isDark
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textTertiary),
                 ),
               ),
             ),
@@ -908,10 +941,7 @@ class MessageItem extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Colors.grey[400]!,
-                  Colors.grey[600]!,
-                ],
+                colors: [Colors.grey[400]!, Colors.grey[600]!],
               ),
             ),
             child: Center(
@@ -964,10 +994,7 @@ class MessageItem extends StatelessWidget {
           children: [
             // 视频缩略图或占位图
             if (thumbnailUrl != null && thumbnailUrl.isNotEmpty)
-              ImageMessageWidget(
-                imageUrl: thumbnailUrl,
-                onTap: onTap,
-              )
+              ImageMessageWidget(imageUrl: thumbnailUrl, onTap: onTap)
             else
               // 无缩略图时显示渐变背景和视频图标
               Container(
@@ -977,10 +1004,7 @@ class MessageItem extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Colors.grey[800]!,
-                      Colors.grey[900]!,
-                    ],
+                    colors: [Colors.grey[800]!, Colors.grey[900]!],
                   ),
                 ),
                 child: Column(
@@ -1031,7 +1055,10 @@ class MessageItem extends StatelessWidget {
                 right: 8,
                 bottom: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(4),
@@ -1069,7 +1096,10 @@ class MessageItem extends StatelessWidget {
                 left: 8,
                 bottom: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(4),
@@ -1095,11 +1125,13 @@ class MessageItem extends StatelessWidget {
       ),
     );
   }
-  
+
   String _formatFileSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
@@ -1139,8 +1171,8 @@ class MessageItem extends StatelessWidget {
                     color: message.isFromMe
                         ? AppColors.sentText(isDark)
                         : (isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.messageTextReceived),
+                              ? AppColors.textPrimaryDark
+                              : AppColors.messageTextReceived),
                   ),
                 ),
                 if (size != null)
@@ -1196,7 +1228,11 @@ class MessageItem extends StatelessWidget {
                       _osmTileUrl(latitude, longitude, 15),
                       fit: BoxFit.cover,
                       errorBuilder: (_, e, st) => const Center(
-                        child: Icon(Icons.map, size: 32, color: Color(0xFFB0BEC5)),
+                        child: Icon(
+                          Icons.map,
+                          size: 32,
+                          color: Color(0xFFB0BEC5),
+                        ),
                       ),
                     ),
                   ),
@@ -1224,8 +1260,12 @@ class MessageItem extends StatelessWidget {
             decoration: BoxDecoration(
               color: message.isFromMe
                   ? AppColors.messageSent
-                  : (isDark ? AppColors.messageReceivedDark : AppColors.messageReceived),
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+                  : (isDark
+                        ? AppColors.messageReceivedDark
+                        : AppColors.messageReceived),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(8),
+              ),
             ),
             child: Row(
               children: [
@@ -1259,8 +1299,8 @@ class MessageItem extends StatelessWidget {
                           color: message.isFromMe
                               ? AppColors.sentText(isDark)
                               : (isDark
-                                  ? AppColors.textPrimaryDark
-                                  : AppColors.messageTextReceived),
+                                    ? AppColors.textPrimaryDark
+                                    : AppColors.messageTextReceived),
                         ),
                       ),
                       if (latitude != null && longitude != null)
@@ -1269,7 +1309,9 @@ class MessageItem extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11,
                             color: message.isFromMe
-                                ? AppColors.sentText(isDark).withValues(alpha: 0.7)
+                                ? AppColors.sentText(
+                                    isDark,
+                                  ).withValues(alpha: 0.7)
                                 : AppColors.textSecondary,
                           ),
                         ),
@@ -1290,19 +1332,24 @@ class MessageItem extends StatelessWidget {
     final currency = metadata?.token ?? 'ETH';
     final status = metadata?.transferStatus ?? 'pending';
 
-    TransferStatus transferStatus;
+    TransferMessageStatus transferStatus;
     switch (status) {
+      case 'completed':
       case 'received':
-        transferStatus = TransferStatus.received;
+        transferStatus = TransferMessageStatus.completed;
         break;
+      case 'failed':
+        transferStatus = TransferMessageStatus.failed;
+        break;
+      case 'cancelled':
       case 'refunded':
-        transferStatus = TransferStatus.refunded;
+        transferStatus = TransferMessageStatus.cancelled;
         break;
       case 'expired':
-        transferStatus = TransferStatus.expired;
+        transferStatus = TransferMessageStatus.expired;
         break;
       default:
-        transferStatus = TransferStatus.pending;
+        transferStatus = TransferMessageStatus.pending;
     }
 
     return TransferMessageWidget(
@@ -1314,11 +1361,35 @@ class MessageItem extends StatelessWidget {
       onTap: onTap,
     );
   }
-  
+
+  Widget _buildPaymentRequestMessage(BuildContext context) {
+    final metadata = message.metadata;
+    final amount = metadata?.amount ?? '0';
+    final currency = metadata?.token ?? 'ETH';
+    final isExpired =
+        metadata?.paymentRequestExpiresAt != null &&
+        DateTime.now().isAfter(metadata!.paymentRequestExpiresAt!);
+
+    final status = isExpired
+        ? PaymentRequestMessageStatus.expired
+        : (metadata?.transferStatus == 'completed'
+              ? PaymentRequestMessageStatus.paid
+              : PaymentRequestMessageStatus.pending);
+
+    return PaymentRequestMessageWidget(
+      amount: amount,
+      currency: currency,
+      status: status,
+      note: message.content,
+      isSelf: message.isFromMe,
+      onTap: onTap,
+    );
+  }
+
   Widget _buildRedPacketMessage(BuildContext context) {
     final metadata = message.metadata;
     final status = metadata?.transferStatus ?? 'pending';
-    
+
     RedPacketStatus redPacketStatus;
     switch (status) {
       case 'opened':
@@ -1333,9 +1404,11 @@ class MessageItem extends StatelessWidget {
       default:
         redPacketStatus = RedPacketStatus.pending;
     }
-    
+
     return RedPacketMessageWidget(
-      note: message.content.isNotEmpty ? message.content : (S.of(context)?.chatDefaultRedPacketGreeting ?? 'Best wishes'),
+      note: message.content.isNotEmpty
+          ? message.content
+          : (S.of(context)?.chatDefaultRedPacketGreeting ?? 'Best wishes'),
       status: redPacketStatus,
       isSelf: message.isFromMe,
       onTap: () => onRedPacketTap?.call(message),
@@ -1344,8 +1417,12 @@ class MessageItem extends StatelessWidget {
 
   Widget _buildMusicMessage(bool isDark, BuildContext context) {
     final metadata = message.metadata;
-    final title = metadata?.musicTitle ?? (S.of(context)?.chatUnknownSong ?? 'Unknown Song');
-    final artist = metadata?.musicArtist ?? (S.of(context)?.chatUnknownArtist ?? 'Unknown Artist');
+    final title =
+        metadata?.musicTitle ??
+        (S.of(context)?.chatUnknownSong ?? 'Unknown Song');
+    final artist =
+        metadata?.musicArtist ??
+        (S.of(context)?.chatUnknownArtist ?? 'Unknown Artist');
     final cover = metadata?.musicCover;
     final url = metadata?.musicUrl;
 
@@ -1361,7 +1438,9 @@ class MessageItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: message.isFromMe
               ? AppColors.messageSent
-              : (isDark ? AppColors.messageReceivedDark : AppColors.messageReceived),
+              : (isDark
+                    ? AppColors.messageReceivedDark
+                    : AppColors.messageReceived),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -1406,7 +1485,9 @@ class MessageItem extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                       color: message.isFromMe
                           ? AppColors.sentText(isDark)
-                          : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                          : (isDark
+                                ? AppColors.textPrimaryDark
+                                : AppColors.textPrimary),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1418,7 +1499,9 @@ class MessageItem extends StatelessWidget {
                       fontSize: 12,
                       color: message.isFromMe
                           ? AppColors.sentText(isDark).withValues(alpha: 0.7)
-                          : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+                          : (isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondary),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1448,14 +1531,16 @@ class MessageItem extends StatelessWidget {
     final totalVoters = metadata?.totalVoters ?? 0;
     final maxSelections = metadata?.maxSelections ?? 1;
     final pollEnded = metadata?.pollEnded ?? false;
-    
+
     return Container(
       width: 260,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: message.isFromMe
             ? AppColors.messageSent
-            : (isDark ? AppColors.messageReceivedDark : AppColors.messageReceived),
+            : (isDark
+                  ? AppColors.messageReceivedDark
+                  : AppColors.messageReceived),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -1473,11 +1558,7 @@ class MessageItem extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.poll,
-                      size: 12,
-                      color: AppColors.primary,
-                    ),
+                    const Icon(Icons.poll, size: 12, color: AppColors.primary),
                     const SizedBox(width: 4),
                     Text(
                       maxSelections == 1
@@ -1495,23 +1576,23 @@ class MessageItem extends StatelessWidget {
               if (pollEnded)
                 Container(
                   margin: const EdgeInsets.only(left: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.grey.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     S.of(context)?.chatEnded ?? 'Ended',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
                   ),
                 ),
             ],
           ),
           const SizedBox(height: 8),
-          
+
           // 问题
           Text(
             question,
@@ -1520,36 +1601,50 @@ class MessageItem extends StatelessWidget {
               fontWeight: FontWeight.w600,
               color: message.isFromMe
                   ? AppColors.sentText(isDark)
-                  : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived),
+                  : (isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.messageTextReceived),
             ),
           ),
           const SizedBox(height: 12),
-          
+
           // 选项
           ...List.generate(options.length, (index) {
             final optionText = options[index];
-            final optionId = index < optionIds.length ? optionIds[index] : '$index';
+            final optionId = index < optionIds.length
+                ? optionIds[index]
+                : '$index';
             final isSelected = myVotes.contains(optionId);
             final voteCount = voteCounts[optionId] ?? 0;
-            final percentage = totalVoters > 0 ? (voteCount / totalVoters * 100) : 0.0;
+            final percentage = totalVoters > 0
+                ? (voteCount / totalVoters * 100)
+                : 0.0;
 
             // 检查是否可以投票或更改投票
             // 1. 投票已结束，不能投票
             // 2. 单选时，可以点击其他选项更改投票
             // 3. 多选时，可以取消已选项或选择新选项（未达最大值时）
-            final canChangeVote = !pollEnded && (
-              isSelected ||  // 可以取消已选的
-              myVotes.length < maxSelections ||  // 可以添加新选择
-              (maxSelections == 1 && myVotes.isNotEmpty)  // 单选可以更改
-            );
+            final canChangeVote =
+                !pollEnded &&
+                (isSelected || // 可以取消已选的
+                    myVotes.length < maxSelections || // 可以添加新选择
+                    (maxSelections == 1 && myVotes.isNotEmpty) // 单选可以更改
+                    );
 
             return GestureDetector(
-              onTap: canChangeVote ? () => onPollVote?.call(message.id, optionId, myVotes, maxSelections) : null,
+              onTap: canChangeVote
+                  ? () => onPollVote?.call(
+                      message.id,
+                      optionId,
+                      myVotes,
+                      maxSelections,
+                    )
+                  : null,
               child: Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isSelected 
+                  color: isSelected
                       ? AppColors.primary.withValues(alpha: 0.1)
                       : (isDark ? Colors.grey[800] : Colors.grey[100]),
                   borderRadius: BorderRadius.circular(8),
@@ -1568,8 +1663,12 @@ class MessageItem extends StatelessWidget {
                             optionText,
                             style: TextStyle(
                               fontSize: 14,
-                              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                              color: isDark
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimary,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
                             ),
                           ),
                         ),
@@ -1588,7 +1687,9 @@ class MessageItem extends StatelessWidget {
                         borderRadius: BorderRadius.circular(2),
                         child: LinearProgressIndicator(
                           value: percentage / 100,
-                          backgroundColor: isDark ? Colors.grey[700] : Colors.grey[300],
+                          backgroundColor: isDark
+                              ? Colors.grey[700]
+                              : Colors.grey[300],
                           valueColor: AlwaysStoppedAnimation<Color>(
                             isSelected ? AppColors.primary : Colors.grey,
                           ),
@@ -1597,7 +1698,13 @@ class MessageItem extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        S.of(context)?.chatPollVotesFormat(voteCount, percentage.toStringAsFixed(0)) ?? '$voteCount votes (${percentage.toStringAsFixed(0)}%)',
+                        S
+                                .of(context)
+                                ?.chatPollVotesFormat(
+                                  voteCount,
+                                  percentage.toStringAsFixed(0),
+                                ) ??
+                            '$voteCount votes (${percentage.toStringAsFixed(0)}%)',
                         style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.textSecondary,
@@ -1609,14 +1716,15 @@ class MessageItem extends StatelessWidget {
               ),
             );
           }),
-          
+
           // 底部统计
           const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                S.of(context)?.chatPollParticipantsFormat(totalVoters) ?? '$totalVoters participants',
+                S.of(context)?.chatPollParticipantsFormat(totalVoters) ??
+                    '$totalVoters participants',
                 style: const TextStyle(
                   fontSize: 11,
                   color: AppColors.textSecondary,
@@ -1644,11 +1752,7 @@ class MessageItem extends StatelessWidget {
     return const Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          Icons.lock,
-          size: 16,
-          color: AppColors.textSecondary,
-        ),
+        Icon(Icons.lock, size: 16, color: AppColors.textSecondary),
         SizedBox(width: 4),
         Text(
           '[加密消息]',
@@ -1678,14 +1782,16 @@ class MessageItem extends StatelessWidget {
       callText = message.isFromMe
           ? (S.of(context)?.chatCallNotAnswered ?? '对方未接听')
           : (isVideo
-              ? (S.of(context)?.chatMissedVideoCall ?? '未接视频通话')
-              : (S.of(context)?.chatMissedVoiceCall ?? '未接语音通话'));
+                ? (S.of(context)?.chatMissedVideoCall ?? '未接视频通话')
+                : (S.of(context)?.chatMissedVoiceCall ?? '未接语音通话'));
     } else if (callDuration != null && callDuration > 0) {
       // 成功通话 - 微信风格："通话时长 00:55"
       final minutes = callDuration ~/ 60;
       final seconds = callDuration % 60;
-      final durationStr = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-      callText = '${S.of(context)?.chatCallDurationLabel ?? '通话时长'} $durationStr';
+      final durationStr =
+          '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+      callText =
+          '${S.of(context)?.chatCallDurationLabel ?? '通话时长'} $durationStr';
     } else {
       // 已取消
       callText = isVideo
@@ -1697,8 +1803,10 @@ class MessageItem extends StatelessWidget {
     final textColor = isMissed && !message.isFromMe
         ? AppColors.error
         : (message.isFromMe
-            ? AppColors.sentText(isDark)
-            : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived));
+              ? AppColors.sentText(isDark)
+              : (isDark
+                    ? AppColors.textPrimaryDark
+                    : AppColors.messageTextReceived));
 
     final iconColor = isMissed && !message.isFromMe
         ? AppColors.error
@@ -1727,10 +1835,7 @@ class MessageItem extends StatelessWidget {
           Flexible(
             child: Text(
               callText,
-              style: TextStyle(
-                fontSize: 15,
-                color: textColor,
-              ),
+              style: TextStyle(fontSize: 15, color: textColor),
             ),
           ),
           // 未接来电显示回拨按钮
@@ -1794,10 +1899,12 @@ class MessageItem extends StatelessWidget {
 
   String _formatScheduledTime(DateTime scheduledAt) {
     final now = DateTime.now();
-    final isToday = scheduledAt.year == now.year &&
+    final isToday =
+        scheduledAt.year == now.year &&
         scheduledAt.month == now.month &&
         scheduledAt.day == now.day;
-    final isTomorrow = scheduledAt.year == now.year &&
+    final isTomorrow =
+        scheduledAt.year == now.year &&
         scheduledAt.month == now.month &&
         scheduledAt.day == now.day + 1;
 
@@ -1813,7 +1920,11 @@ class MessageItem extends StatelessWidget {
   static String _osmTileUrl(double lat, double lng, int zoom) {
     final x = ((lng + 180) / 360 * (1 << zoom)).floor();
     final latRad = lat * math.pi / 180;
-    final y = ((1 - math.log(math.tan(latRad) + 1 / math.cos(latRad)) / math.pi) / 2 * (1 << zoom)).floor();
+    final y =
+        ((1 - math.log(math.tan(latRad) + 1 / math.cos(latRad)) / math.pi) /
+                2 *
+                (1 << zoom))
+            .floor();
     return 'https://tile.openstreetmap.org/$zoom/$x/$y.png';
   }
 
@@ -1850,39 +1961,37 @@ class MessageItem extends StatelessWidget {
     for (final match in matches) {
       // 添加匹配前的普通文本
       if (match.start > lastEnd) {
-        spans.add(TextSpan(
-          text: text.substring(lastEnd, match.start),
-        ));
+        spans.add(TextSpan(text: text.substring(lastEnd, match.start)));
       }
 
       // 添加可点击的地址 span
       final addr = match.group(0)!;
-      spans.add(WidgetSpan(
-        alignment: PlaceholderAlignment.baseline,
-        baseline: TextBaseline.alphabetic,
-        child: GestureDetector(
-          onTap: () => _showAddressActions(context, addr),
-          child: Text(
-            addr,
-            style: TextStyle(
-              fontSize: messageFontSize ?? 16,
-              color: AppColors.primary,
-              decoration: TextDecoration.underline,
-              decorationColor: AppColors.primary.withValues(alpha: 0.5),
-              height: 1.4,
+      spans.add(
+        WidgetSpan(
+          alignment: PlaceholderAlignment.baseline,
+          baseline: TextBaseline.alphabetic,
+          child: GestureDetector(
+            onTap: () => _showAddressActions(context, addr),
+            child: Text(
+              addr,
+              style: TextStyle(
+                fontSize: messageFontSize ?? 16,
+                color: AppColors.primary,
+                decoration: TextDecoration.underline,
+                decorationColor: AppColors.primary.withValues(alpha: 0.5),
+                height: 1.4,
+              ),
             ),
           ),
         ),
-      ));
+      );
 
       lastEnd = match.end;
     }
 
     // 添加最后一段普通文本
     if (lastEnd < text.length) {
-      spans.add(TextSpan(
-        text: text.substring(lastEnd),
-      ));
+      spans.add(TextSpan(text: text.substring(lastEnd)));
     }
 
     return Text.rich(
@@ -1954,4 +2063,3 @@ class MessageItem extends StatelessWidget {
     );
   }
 }
-

@@ -15,6 +15,8 @@ import '../datasources/matrix/matrix_group_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_message_datasource.dart';
 import '../../core/utils/debug_log.dart';
+import '../../core/utils/matrix_utils.dart';
+import '../../core/utils/room_metadata_utils.dart';
 
 /// 群聊仓库实现
 class GroupRepositoryImpl implements IGroupRepository {
@@ -30,8 +32,8 @@ class GroupRepositoryImpl implements IGroupRepository {
     this._clientManager, {
     IWalletBridge? walletBridge,
     MatrixMessageDataSource? messageDataSource,
-  })  : _walletBridge = walletBridge,
-        _messageDataSource = messageDataSource;
+  }) : _walletBridge = walletBridge,
+       _messageDataSource = messageDataSource;
 
   @override
   Future<List<GroupEntity>> getGroups() async {
@@ -121,7 +123,11 @@ class GroupRepositoryImpl implements IGroupRepository {
   }
 
   @override
-  Future<void> kickMember(String roomId, String userId, {String? reason}) async {
+  Future<void> kickMember(
+    String roomId,
+    String userId, {
+    String? reason,
+  }) async {
     await _groupDataSource.kickMember(roomId, userId, reason: reason);
   }
 
@@ -136,7 +142,11 @@ class GroupRepositoryImpl implements IGroupRepository {
   }
 
   @override
-  Future<void> setMemberPowerLevel(String roomId, String userId, int powerLevel) async {
+  Future<void> setMemberPowerLevel(
+    String roomId,
+    String userId,
+    int powerLevel,
+  ) async {
     await _groupDataSource.setUserPowerLevel(roomId, userId, powerLevel);
   }
 
@@ -158,6 +168,11 @@ class GroupRepositoryImpl implements IGroupRepository {
   @override
   Future<String> joinGroupByAlias(String alias) async {
     return await _groupDataSource.joinGroupByAlias(alias);
+  }
+
+  @override
+  Future<String> getGroupInviteLink(String roomId) async {
+    return _groupDataSource.getGroupInviteLink(roomId);
   }
 
   @override
@@ -257,8 +272,13 @@ class GroupRepositoryImpl implements IGroupRepository {
     String parentRoomId, {
     required String name,
     String? topic,
-  }) async =>
-      _groupDataSource.createChannel(parentRoomId, name: name, topic: topic);
+    String? category,
+  }) async => _groupDataSource.createChannel(
+    parentRoomId,
+    name: name,
+    topic: topic,
+    category: category,
+  );
 
   @override
   Future<void> updateChannel(
@@ -266,8 +286,14 @@ class GroupRepositoryImpl implements IGroupRepository {
     String channelRoomId, {
     String? name,
     String? topic,
-  }) async =>
-      _groupDataSource.updateChannel(parentRoomId, channelRoomId, name: name, topic: topic);
+    String? category,
+  }) async => _groupDataSource.updateChannel(
+    parentRoomId,
+    channelRoomId,
+    name: name,
+    topic: topic,
+    category: category,
+  );
 
   @override
   Future<void> deleteChannel(String parentRoomId, String channelRoomId) async =>
@@ -294,8 +320,10 @@ class GroupRepositoryImpl implements IGroupRepository {
       _groupDataSource.getContentFilter(roomId);
 
   @override
-  Future<void> setContentFilter(String roomId, ContentFilterConfig config) async =>
-      _groupDataSource.setContentFilter(roomId, config);
+  Future<void> setContentFilter(
+    String roomId,
+    ContentFilterConfig config,
+  ) async => _groupDataSource.setContentFilter(roomId, config);
 
   // ============================================
   // 代币门控
@@ -363,18 +391,22 @@ class GroupRepositoryImpl implements IGroupRepository {
             break;
         }
 
-        ruleResults.add(TokenGateRuleResult(
-          rule: rule,
-          passed: actualBalance >= rule.minBalance,
-          actualBalance: actualBalance,
-        ));
+        ruleResults.add(
+          TokenGateRuleResult(
+            rule: rule,
+            passed: actualBalance >= rule.minBalance,
+            actualBalance: actualBalance,
+          ),
+        );
       } catch (e) {
-        ruleResults.add(TokenGateRuleResult(
-          rule: rule,
-          passed: false,
-          actualBalance: BigInt.zero,
-          errorMessage: e.toString(),
-        ));
+        ruleResults.add(
+          TokenGateRuleResult(
+            rule: rule,
+            passed: false,
+            actualBalance: BigInt.zero,
+            errorMessage: e.toString(),
+          ),
+        );
       }
     }
 
@@ -404,16 +436,23 @@ class GroupRepositoryImpl implements IGroupRepository {
   // 辅助方法
   // ============================================
 
-  GroupEntity _mapRoomToGroupEntity(matrix.Room room, {List<matrix.User>? members}) {
+  GroupEntity _mapRoomToGroupEntity(
+    matrix.Room room, {
+    List<matrix.User>? members,
+  }) {
     final avatarUrlStr = _groupDataSource.getGroupAvatarUrl(room.id);
     final myUserId = _clientManager.client?.userID;
     final channelMeta = room.getState(_channelMetaEventType)?.content;
     final isChannel = channelMeta?['parent_room_id'] != null;
     final joinRule = _mapJoinRule(room.joinRules);
-    final powerLevels = room.getState(matrix.EventTypes.RoomPowerLevels)?.content;
+    final powerLevels = room
+        .getState(matrix.EventTypes.RoomPowerLevels)
+        ?.content;
     final eventLevels = powerLevels?['events'] as Map?;
     final messagePowerLevel =
-        _asInt(eventLevels?['m.room.message']) ?? _asInt(powerLevels?['events_default']) ?? 0;
+        _asInt(eventLevels?['m.room.message']) ??
+        _asInt(powerLevels?['events_default']) ??
+        0;
     final membersCanSpeak =
         channelMeta?['members_can_speak'] as bool? ?? messagePowerLevel <= 0;
     final showMemberList =
@@ -464,7 +503,8 @@ class GroupRepositoryImpl implements IGroupRepository {
       'n42.token_gate',
       fallbackMinPowerLevel: 50,
     );
-    final canChangeSettings = _groupDataSource.canChangeSettings(room.id) ||
+    final canChangeSettings =
+        _groupDataSource.canChangeSettings(room.id) ||
         canEditName ||
         canEditAvatar ||
         canEditDescription ||
@@ -500,16 +540,26 @@ class GroupRepositoryImpl implements IGroupRepository {
       debugLog('Error: $e');
     }
 
+    final maxMembers = _groupDataSource.getMaxMembers(room.id);
+    final memberCount = joinedCount + invitedCount;
+    final canonicalAliasLocalpart = extractAliasLocalpart(room.canonicalAlias);
+    final groupType = isChannel
+        ? GroupType.channel
+        : (memberCount > 1000 || (maxMembers ?? 0) > 1000)
+        ? GroupType.superGroup
+        : GroupType.group;
+
     return GroupEntity(
       roomId: room.id,
       name: room.getLocalizedDisplayname(),
       avatarUrl: avatarUrlStr,
       topic: room.topic,
-      announcement: room.topic,
+      announcement: _groupDataSource.getGroupAnnouncement(room.id),
       pinnedEventIds: pinnedEventIds,
-      memberCount: joinedCount + invitedCount,
-      maxMembers: _groupDataSource.getMaxMembers(room.id),
-      members: members?.map((u) => _mapUserToGroupMember(room.id, u)).toList() ?? [],
+      memberCount: memberCount,
+      maxMembers: maxMembers,
+      members:
+          members?.map((u) => _mapUserToGroupMember(room.id, u)).toList() ?? [],
       isEncrypted: room.encrypted,
       isPublic: room.joinRules == matrix.JoinRules.public,
       createdAt: null, // StrippedStateEvent doesn't have originServerTs
@@ -526,12 +576,13 @@ class GroupRepositoryImpl implements IGroupRepository {
       canManageContentFilter: canManageContentFilter,
       canManageMemberLimit: canManageMemberLimit,
       canManageTokenGate: canManageTokenGate,
-      groupType: isChannel ? GroupType.channel : GroupType.group,
-      subscriberCount: isChannel ? joinedCount + invitedCount : 0,
+      groupType: groupType,
+      subscriberCount: isChannel ? memberCount : 0,
       joinRule: joinRule,
       membersCanSpeak: membersCanSpeak,
       showMemberList: showMemberList,
       slowModeInterval: slowModeInterval,
+      channelUsername: canonicalAliasLocalpart,
       tokenGate: tokenGateConfig,
     );
   }
@@ -549,7 +600,11 @@ class GroupRepositoryImpl implements IGroupRepository {
     String? avatarUrl;
     final client = _clientManager.client;
     if (user.avatarUrl != null && client != null) {
-      avatarUrl = _buildAvatarHttpUrl(user.avatarUrl.toString(), client);
+      avatarUrl = MatrixUtils.getAvatarUrl(
+        user.avatarUrl,
+        client: client,
+        size: 96,
+      );
     }
 
     // 根据 Matrix 用户状态确定成员状态
@@ -565,28 +620,6 @@ class GroupRepositoryImpl implements IGroupRepository {
       powerLevel: powerLevel,
       membershipStatus: membershipStatus,
     );
-  }
-  
-  /// 构建头像 HTTP URL（不再在 URL 中添加 access_token，改用请求头认证）
-  String? _buildAvatarHttpUrl(String? mxcUrl, matrix.Client client) {
-    if (mxcUrl == null || mxcUrl.isEmpty) return null;
-    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-    
-    try {
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-      
-      if (serverName.isEmpty || mediaId.isEmpty) return null;
-      
-      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) return null;
-      
-      // 使用认证媒体 API (Matrix 1.11+)
-      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
-    } catch (e) {
-      return null;
-    }
   }
 
   JoinRule _mapJoinRule(matrix.JoinRules? joinRules) {

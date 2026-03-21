@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../core/utils/matrix_utils.dart';
 import '../../../domain/entities/moment_entity.dart';
 import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
@@ -56,14 +57,18 @@ class MatrixMomentDataSource {
       return _cachedMomentRoom;
     }
 
-    debugLog('MatrixMomentDataSource: Looking for moment room, '
-        'total rooms: ${_client!.rooms.length}');
+    debugLog(
+      'MatrixMomentDataSource: Looking for moment room, '
+      'total rooms: ${_client!.rooms.length}',
+    );
 
     // 查找现有的动态房间
     for (final room in _client!.rooms) {
       final tags = room.tags;
       if (tags.containsKey(momentRoomTag)) {
-        debugLog('MatrixMomentDataSource: Found existing moment room: ${room.id}');
+        debugLog(
+          'MatrixMomentDataSource: Found existing moment room: ${room.id}',
+        );
         _cachedMomentRoom = room;
         return room;
       }
@@ -73,23 +78,27 @@ class MatrixMomentDataSource {
     if (_client!.rooms.isEmpty) {
       debugLog('MatrixMomentDataSource: No rooms found, waiting for sync...');
       try {
-        await _client!.onSync.stream.first.timeout(
-          const Duration(seconds: 15),
+        await _client!.onSync.stream.first.timeout(const Duration(seconds: 15));
+        debugLog(
+          'MatrixMomentDataSource: Sync completed, '
+          'rooms: ${_client!.rooms.length}',
         );
-        debugLog('MatrixMomentDataSource: Sync completed, '
-            'rooms: ${_client!.rooms.length}');
 
         // 同步后再次查找
         for (final room in _client!.rooms) {
           final tags = room.tags;
           if (tags.containsKey(momentRoomTag)) {
-            debugLog('MatrixMomentDataSource: Found moment room after sync: ${room.id}');
+            debugLog(
+              'MatrixMomentDataSource: Found moment room after sync: ${room.id}',
+            );
             _cachedMomentRoom = room;
             return room;
           }
         }
       } on TimeoutException {
-        debugLog('MatrixMomentDataSource: Sync timeout, proceeding to create room');
+        debugLog(
+          'MatrixMomentDataSource: Sync timeout, proceeding to create room',
+        );
       }
     }
 
@@ -121,7 +130,9 @@ class MatrixMomentDataSource {
       matrix.Room? room = _client!.getRoomById(roomId);
 
       if (room == null) {
-        debugLog('MatrixMomentDataSource: Room not in local store yet, waiting...');
+        debugLog(
+          'MatrixMomentDataSource: Room not in local store yet, waiting...',
+        );
         // 等待同步将房间带入本地
         for (var i = 0; i < 10; i++) {
           await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -131,8 +142,10 @@ class MatrixMomentDataSource {
       }
 
       if (room == null) {
-        debugLog('MatrixMomentDataSource: Room still null after waiting, '
-            'trying sync...');
+        debugLog(
+          'MatrixMomentDataSource: Room still null after waiting, '
+          'trying sync...',
+        );
         try {
           await _client!.onSync.stream.first.timeout(
             const Duration(seconds: 10),
@@ -215,9 +228,11 @@ class MatrixMomentDataSource {
           contentType = 'image/jpeg';
         }
 
-        debugLog('MatrixMomentDataSource: Uploading media: '
-            '${m.filename}, type: $contentType, '
-            'size: ${m.bytes.length}, isVideo: ${m.isVideo}');
+        debugLog(
+          'MatrixMomentDataSource: Uploading media: '
+          '${m.filename}, type: $contentType, '
+          'size: ${m.bytes.length}, isVideo: ${m.isVideo}',
+        );
 
         final uri = await _client!.uploadContent(
           m.bytes,
@@ -235,9 +250,13 @@ class MatrixMomentDataSource {
               contentType: 'image/jpeg',
             );
             thumbnailMxcUrl = thumbUri.toString();
-            debugLog('MatrixMomentDataSource: Video thumbnail uploaded: $thumbnailMxcUrl');
+            debugLog(
+              'MatrixMomentDataSource: Video thumbnail uploaded: $thumbnailMxcUrl',
+            );
           } catch (e) {
-            debugLog('MatrixMomentDataSource: Failed to upload video thumbnail: $e');
+            debugLog(
+              'MatrixMomentDataSource: Failed to upload video thumbnail: $e',
+            );
           }
         }
 
@@ -453,7 +472,8 @@ class MatrixMomentDataSource {
 
           final eventContent = event.content;
           if (eventContent['moment_id'] == momentId) {
-            final commentId = 'comment_${DateTime.now().millisecondsSinceEpoch}';
+            final commentId =
+                'comment_${DateTime.now().millisecondsSinceEpoch}';
 
             await room.sendEvent({
               'moment_id': momentId,
@@ -515,12 +535,14 @@ class MatrixMomentDataSource {
           final content = event.content;
           if (content['moment_id'] == momentId) {
             final user = room.unsafeGetUserFromMemoryOrFallback(event.senderId);
-            likes.add(MomentLike(
-              userId: event.senderId,
-              userName: user.displayName ?? event.senderId,
-              userAvatarUrl: user.avatarUrl?.toString(),
-              timestamp: event.originServerTs,
-            ));
+            likes.add(
+              MomentLike(
+                userId: event.senderId,
+                userName: user.displayName ?? event.senderId,
+                userAvatarUrl: user.avatarUrl?.toString(),
+                timestamp: event.originServerTs,
+              ),
+            );
           }
         }
       } catch (e) {
@@ -555,17 +577,19 @@ class MatrixMomentDataSource {
               replyToUserName = replyToUser.displayName;
             }
 
-            comments.add(MomentComment(
-              id: content['comment_id'] as String,
-              userId: event.senderId,
-              userName: user.displayName ?? event.senderId,
-              userAvatarUrl: user.avatarUrl?.toString(),
-              content: content['content'] as String,
-              timestamp: event.originServerTs,
-              replyToCommentId: content['reply_to_comment_id'] as String?,
-              replyToUserId: content['reply_to_user_id'] as String?,
-              replyToUserName: replyToUserName,
-            ));
+            comments.add(
+              MomentComment(
+                id: content['comment_id'] as String,
+                userId: event.senderId,
+                userName: user.displayName ?? event.senderId,
+                userAvatarUrl: user.avatarUrl?.toString(),
+                content: content['content'] as String,
+                timestamp: event.originServerTs,
+                replyToCommentId: content['reply_to_comment_id'] as String?,
+                replyToUserId: content['reply_to_user_id'] as String?,
+                replyToUserName: replyToUserName,
+              ),
+            );
           }
         }
       } catch (e) {
@@ -608,19 +632,19 @@ class MatrixMomentDataSource {
               resolvedThumbnailUrl = _getHttpUrlFromMxc(storedThumbnailMxcUrl);
             }
 
-            mediaList.add(MomentMedia(
-              url: mxcUrl ?? '',
-              httpUrl: mxcUrl != null ? _getHttpUrlFromMxc(mxcUrl) : null,
-              thumbnailUrl: resolvedThumbnailUrl,
-              type: isVideo
-                  ? MomentMediaType.video
-                  : MomentMediaType.image,
-              width: m['width'] as int?,
-              height: m['height'] as int?,
-              duration: m['duration'] as int?,
-              mimeType: m['mimeType'] as String?,
-              size: m['size'] as int?,
-            ));
+            mediaList.add(
+              MomentMedia(
+                url: mxcUrl ?? '',
+                httpUrl: mxcUrl != null ? _getHttpUrlFromMxc(mxcUrl) : null,
+                thumbnailUrl: resolvedThumbnailUrl,
+                type: isVideo ? MomentMediaType.video : MomentMediaType.image,
+                width: m['width'] as int?,
+                height: m['height'] as int?,
+                duration: m['duration'] as int?,
+                mimeType: m['mimeType'] as String?,
+                size: m['size'] as int?,
+              ),
+            );
           }
         }
       }
@@ -657,9 +681,8 @@ class MatrixMomentDataSource {
         location: location,
         timestamp: event.originServerTs,
         visibility: visibility,
-        visibilityUserIds: (content['visibility_user_ids'] as List?)
-                ?.cast<String>() ??
-            [],
+        visibilityUserIds:
+            (content['visibility_user_ids'] as List?)?.cast<String>() ?? [],
         isDeleted: event.redacted,
         isFromMe: event.senderId == _currentUserId,
       );
@@ -670,19 +693,15 @@ class MatrixMomentDataSource {
 
   /// 获取 HTTP URL
   String? _getHttpUrlFromMxc(String mxcUrl) {
-    if (!mxcUrl.startsWith('mxc://')) return null;
-    if (_client?.homeserver == null) return null;
-
-    final uri = Uri.parse(mxcUrl);
-    final serverName = uri.host;
-    final mediaId = uri.path.startsWith('/') ? uri.path.substring(1) : uri.path;
-    final homeserver = _client!.homeserver.toString().replaceAll(RegExp(r'/+$'), '');
-    return '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
+    return MatrixUtils.getMediaDownloadUrl(mxcUrl, client: _client);
   }
 
   /// 上传文件
   Future<String> uploadMedia(
-      Uint8List bytes, String filename, String? mimeType) async {
+    Uint8List bytes,
+    String filename,
+    String? mimeType,
+  ) async {
     if (_client == null) throw Exception('Client not initialized');
 
     final uri = await _client!.uploadContent(
@@ -705,17 +724,21 @@ class MatrixMomentDataSource {
 
     final room = await _getOrCreateMomentRoom();
     if (room == null) {
-      debugLog('MatrixMomentDataSource: Cannot invite $userId - moment room is null');
+      debugLog(
+        'MatrixMomentDataSource: Cannot invite $userId - moment room is null',
+      );
       return;
     }
 
     // 检查用户是否已经在房间中
     try {
       final members = room.getParticipants();
-      final alreadyMember = members.any((m) =>
-          m.id == userId && m.membership == matrix.Membership.join);
-      final alreadyInvited = members.any((m) =>
-          m.id == userId && m.membership == matrix.Membership.invite);
+      final alreadyMember = members.any(
+        (m) => m.id == userId && m.membership == matrix.Membership.join,
+      );
+      final alreadyInvited = members.any(
+        (m) => m.id == userId && m.membership == matrix.Membership.invite,
+      );
 
       if (alreadyMember || alreadyInvited) {
         debugLog('MatrixMomentDataSource: $userId already in moment room');
@@ -727,7 +750,9 @@ class MatrixMomentDataSource {
     }
 
     try {
-      debugLog('MatrixMomentDataSource: Inviting $userId to moment room ${room.id}');
+      debugLog(
+        'MatrixMomentDataSource: Inviting $userId to moment room ${room.id}',
+      );
       await _client!.inviteUser(room.id, userId, reason: momentInviteReason);
       debugLog('MatrixMomentDataSource: Successfully invited $userId');
     } catch (e) {
@@ -748,7 +773,9 @@ class MatrixMomentDataSource {
       // 检查是否是 Moment 房间邀请
       if (!_isMomentRoomInvite(room)) continue;
 
-      debugLog('MatrixMomentDataSource: Auto-joining moment room invite: ${room.id}');
+      debugLog(
+        'MatrixMomentDataSource: Auto-joining moment room invite: ${room.id}',
+      );
 
       try {
         // 自动加入
@@ -777,7 +804,10 @@ class MatrixMomentDataSource {
     try {
       final myUserId = _client?.userID;
       if (myUserId != null) {
-        final memberEvent = room.getState(matrix.EventTypes.RoomMember, myUserId);
+        final memberEvent = room.getState(
+          matrix.EventTypes.RoomMember,
+          myUserId,
+        );
         if (memberEvent != null) {
           final reason = memberEvent.content['reason'] as String?;
           if (reason == momentInviteReason) {
@@ -820,8 +850,7 @@ class MatrixMomentDataSource {
     try {
       final members = room.getParticipants();
       for (final member in members) {
-        if (member.id != _client?.userID &&
-            member.powerLevel >= 50) {
+        if (member.id != _client?.userID && member.powerLevel >= 50) {
           return member.id;
         }
       }
@@ -851,6 +880,7 @@ class MomentMediaData {
   final int? width;
   final int? height;
   final int? duration;
+
   /// 视频缩略图字节（本地提取的帧，上传后存 thumbnail_url）
   final Uint8List? thumbnailBytes;
 

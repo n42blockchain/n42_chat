@@ -119,6 +119,7 @@ abstract class IGroupRepository {
     String parentRoomId, {
     required String name,
     String? topic,
+    String? category,
   });
 
   /// 更新子频道信息
@@ -127,6 +128,7 @@ abstract class IGroupRepository {
     String channelRoomId, {
     String? name,
     String? topic,
+    String? category,
   });
 
   /// 删除子频道
@@ -155,7 +157,11 @@ abstract class IGroupRepository {
   Future<void> unbanMember(String roomId, String userId);
 
   /// 设置成员权限级别
-  Future<void> setMemberPowerLevel(String roomId, String userId, int powerLevel);
+  Future<void> setMemberPowerLevel(
+    String roomId,
+    String userId,
+    int powerLevel,
+  );
 
   /// 设置成员为管理员
   Future<void> setAsAdmin(String roomId, String userId);
@@ -172,6 +178,9 @@ abstract class IGroupRepository {
 
   /// 通过别名加入群
   Future<String> joinGroupByAlias(String alias);
+
+  /// 获取群/频道的分享链接
+  Future<String> getGroupInviteLink(String roomId);
 
   /// 离开群
   Future<void> leaveGroup(String roomId);
@@ -215,4 +224,3 @@ abstract class IGroupRepository {
   /// 发送 Bot notice 消息
   Future<void> sendBotNotice(String roomId, String message);
 }
-

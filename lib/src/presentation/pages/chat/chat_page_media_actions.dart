@@ -3,14 +3,12 @@ part of 'chat_page.dart';
 
 /// 媒体操作相关方法（图片、视频、文件、语音的选择与发送）
 extension _ChatPageMediaActionsMethods on _ChatPageState {
+  static const int _maxEncryptedRoomFileBytes = 64 * 1024 * 1024;
+
   Future<void> _pickImage() async {
     try {
       final picker = ImagePicker();
-      final mediaFiles = await picker.pickMultipleMedia(
-        imageQuality: 85,
-        maxWidth: 1920,
-        maxHeight: 1920,
-      );
+      final mediaFiles = await picker.pickMultipleMedia();
 
       if (mediaFiles.isEmpty) return;
 
@@ -57,8 +55,14 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       // 用户取消编辑，不发送
       if (editedBytes == null || !mounted) return;
 
-      final filename = image.name.isNotEmpty ? image.name : 'edited_image.jpg';
-      final mimeType = lookupMimeType(filename) ?? 'image/jpeg';
+      var filename = image.name.isNotEmpty ? image.name : 'edited_image.jpg';
+      final mimeType = _resolveMimeType(
+        filename: filename,
+        sourcePath: image.path,
+        headerBytes: editedBytes,
+        fallbackMimeType: 'image/jpeg',
+      );
+      filename = _ensureFilenameMatchesMimeType(filename, mimeType);
 
       context.read<ChatBloc>().add(SendImageMessage(
         imageBytes: editedBytes,
@@ -112,12 +116,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       final picker = ImagePicker();
 
       if (choice == 'photo') {
-        final image = await picker.pickImage(
-          source: ImageSource.camera,
-          imageQuality: 85,
-          maxWidth: 1920,
-          maxHeight: 1920,
-        );
+        final image = await picker.pickImage(source: ImageSource.camera);
 
         if (image == null) return;
         await _editAndSendImage(image);
@@ -414,24 +413,25 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       }
 
       // 确定 MIME 类型
-      String mimeType = lookupMimeType(filename) ??
-                        lookupMimeType(image.path) ??
-                        'image/jpeg';
-
-      // 特殊处理 HEIC/HEIF（iOS Live Photo）
-      if (mimeType.contains('heic') || mimeType.contains('heif')) {
-        mimeType = 'image/jpeg';
-        if (!filename.toLowerCase().endsWith('.jpg') &&
-            !filename.toLowerCase().endsWith('.jpeg')) {
-          filename = filename.replaceAll(RegExp(r'\.(heic|heif)$', caseSensitive: false), '.jpg');
-        }
-      }
+      var mimeType = _resolveMimeType(
+        filename: filename,
+        sourcePath: image.path,
+        headerBytes: bytes,
+        fallbackMimeType: 'image/jpeg',
+      );
 
       // 自动检测人脸并模糊
       if (_autoFaceBlur && !kIsWeb) {
         debugLog('FaceBlur: Auto face blur enabled, processing image...');
         bytes = await FaceBlurUtil.blurFaces(bytes);
         debugLog('FaceBlur: Processing complete, image size: ${bytes.length} bytes');
+        mimeType = _resolveMimeType(
+          filename: filename,
+          sourcePath: image.path,
+          headerBytes: bytes,
+          fallbackMimeType: 'image/jpeg',
+        );
+        filename = _ensureFilenameMatchesMimeType(filename, mimeType);
       }
 
       debugLog('Final filename: $filename');
@@ -481,14 +481,16 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.any,
         allowMultiple: true,
-        withData: true,
+        withReadStream: true,
       );
 
       if (result == null || result.files.isEmpty) return;
 
       // 发送选中的文件
       for (final file in result.files) {
-        if (file.bytes == null || file.bytes!.isEmpty) {
+        if ((file.path == null || file.path!.isEmpty) &&
+            (file.readStream == null) &&
+            (file.bytes == null || file.bytes!.isEmpty)) {
           debugLog('File bytes is empty: ${file.name}');
           continue;
         }
@@ -510,37 +512,64 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
 
   Future<void> _sendFile(PlatformFile file) async {
     try {
-      final bytes = file.bytes;
-      if (bytes == null || bytes.isEmpty) {
-        debugLog('File bytes is null or empty');
-        return;
-      }
-
       final filename = file.name;
       final mimeType = lookupMimeType(filename) ?? 'application/octet-stream';
-      final fileSize = bytes.length;
-
-      // 检查文件大小（限制 50MB）
-      const maxSize = 50 * 1024 * 1024; // 50MB
-      if (fileSize > maxSize) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(S.of(context)?.chatFileSizeLimit ?? 'File size cannot exceed 50MB'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-        return;
-      }
+      final fileSize = file.size;
 
       debugLog('Sending file: $filename, size: $fileSize bytes, mimeType: $mimeType');
 
-      context.read<ChatBloc>().add(SendFileMessage(
-        fileBytes: bytes,
-        filename: filename,
-        mimeType: mimeType,
-      ));
+      final chatBloc = context.read<ChatBloc>();
+      if (widget.conversation.isEncrypted) {
+        if (fileSize > _maxEncryptedRoomFileBytes) {
+          throw Exception(
+            'Encrypted rooms currently support secure file uploads up to 64MB',
+          );
+        }
+
+        Uint8List? secureBytes = file.bytes;
+        if ((secureBytes == null || secureBytes.isEmpty) &&
+            file.path != null &&
+            file.path!.isNotEmpty) {
+          secureBytes = await File(file.path!).readAsBytes();
+        } else if ((secureBytes == null || secureBytes.isEmpty) &&
+            file.readStream != null) {
+          secureBytes = await _readAllBytes(file.readStream!);
+        }
+
+        if (secureBytes == null || secureBytes.isEmpty) {
+          throw Exception('No readable file source available');
+        }
+
+        chatBloc.add(SendFileMessage(
+          fileBytes: secureBytes,
+          filename: filename,
+          mimeType: mimeType,
+          fileSize: fileSize,
+        ));
+      } else if (file.path != null && file.path!.isNotEmpty) {
+        chatBloc.add(SendFileMessage(
+          filename: filename,
+          mimeType: mimeType,
+          filePath: file.path,
+          fileSize: fileSize,
+        ));
+      } else if (file.readStream != null) {
+        chatBloc.add(SendFileMessage(
+          filename: filename,
+          mimeType: mimeType,
+          fileStream: file.readStream,
+          fileSize: fileSize,
+        ));
+      } else if (file.bytes != null && file.bytes!.isNotEmpty) {
+        chatBloc.add(SendFileMessage(
+          fileBytes: file.bytes,
+          filename: filename,
+          mimeType: mimeType,
+          fileSize: fileSize,
+        ));
+      } else {
+        throw Exception('No readable file source available');
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -650,5 +679,54 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         );
       }
     }
+  }
+
+  Future<Uint8List> _readAllBytes(Stream<List<int>> stream) async {
+    final builder = BytesBuilder(copy: false);
+    await for (final chunk in stream) {
+      builder.add(chunk);
+    }
+    return builder.takeBytes();
+  }
+
+  String _resolveMimeType({
+    required String filename,
+    String? sourcePath,
+    Uint8List? headerBytes,
+    required String fallbackMimeType,
+  }) {
+    return lookupMimeType(
+          sourcePath ?? filename,
+          headerBytes: headerBytes,
+        ) ??
+        lookupMimeType(
+          filename,
+          headerBytes: headerBytes,
+        ) ??
+        (sourcePath != null ? lookupMimeType(sourcePath) : null) ??
+        fallbackMimeType;
+  }
+
+  String _ensureFilenameMatchesMimeType(String filename, String mimeType) {
+    final extension = switch (mimeType) {
+      'image/jpeg' => '.jpg',
+      'image/png' => '.png',
+      'image/gif' => '.gif',
+      'image/webp' => '.webp',
+      'image/heic' => '.heic',
+      'image/heif' => '.heif',
+      _ => '',
+    };
+    if (extension.isEmpty) {
+      return filename;
+    }
+    if (filename.toLowerCase().endsWith(extension)) {
+      return filename;
+    }
+    final dotIndex = filename.lastIndexOf('.');
+    if (dotIndex <= 0) {
+      return '$filename$extension';
+    }
+    return '${filename.substring(0, dotIndex)}$extension';
   }
 }

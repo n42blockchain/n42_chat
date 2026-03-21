@@ -6,20 +6,19 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/search_result_entity.dart';
 import '../../blocs/search/search_bloc.dart';
 import '../../blocs/search/search_event.dart';
 import '../../blocs/search/search_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import 'search_message_filter_sheet.dart';
 import '../../../n42_chat.dart';
 
 /// 房间内搜索页面
 class ChatSearchPage extends StatefulWidget {
   final String roomId;
 
-  const ChatSearchPage({
-    super.key,
-    required this.roomId,
-  });
+  const ChatSearchPage({super.key, required this.roomId});
 
   @override
   State<ChatSearchPage> createState() => _ChatSearchPageState();
@@ -28,6 +27,7 @@ class ChatSearchPage extends StatefulWidget {
 class _ChatSearchPageState extends State<ChatSearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  MessageSearchFilter? _messageFilter;
 
   @override
   void initState() {
@@ -47,7 +47,9 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
   }
 
   void _onSearchChanged(String query) {
-    context.read<SearchBloc>().add(SearchInChat(widget.roomId, query));
+    context.read<SearchBloc>().add(
+      SearchInChat(widget.roomId, query, filter: _messageFilter),
+    );
   }
 
   void _clearSearch() {
@@ -55,6 +57,21 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
     setState(() {});
     context.read<SearchBloc>().add(SearchInChat(widget.roomId, ''));
     _focusNode.requestFocus();
+  }
+
+  Future<void> _showFilters() async {
+    final nextFilter = await showMessageSearchFilterSheet(
+      context,
+      currentFilter: _messageFilter ?? const MessageSearchFilter(),
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(() => _messageFilter = nextFilter);
+    final query = _searchController.text.trim();
+    if (query.isNotEmpty) {
+      _onSearchChanged(query);
+    }
   }
 
   @override
@@ -113,8 +130,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                 controller: _searchController,
                 focusNode: _focusNode,
                 decoration: InputDecoration(
-                  hintText:
-                      S.of(context)?.chatSearchHint ?? 'Search messages',
+                  hintText: S.of(context)?.chatSearchHint ?? 'Search messages',
                   hintStyle: TextStyle(
                     fontSize: 14,
                     color: isDark
@@ -149,6 +165,33 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
             ),
           ),
           const SizedBox(width: 8),
+          IconButton(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  Icons.tune,
+                  color: _messageFilter == null
+                      ? (isDark ? Colors.white : AppColors.textPrimary)
+                      : AppColors.primary,
+                ),
+                if (_messageFilter != null)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            onPressed: _showFilters,
+          ),
         ],
       ),
     );
@@ -188,14 +231,31 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           color: isDark ? AppColors.surfaceDark : AppColors.surface,
-          child: Text(
-            '${results.totalCount} ${S.of(context)?.searchMessageLabel ?? 'messages'}',
-            style: TextStyle(
-              fontSize: 13,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${results.totalCount} ${S.of(context)?.searchMessageLabel ?? 'messages'}',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
+              ),
+              if (results.filter != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Filters active: ${results.filter!.activeCount}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
         Expanded(
@@ -241,7 +301,9 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
         children: [
           Expanded(
             child: Text(
-              message.senderName.isNotEmpty ? message.senderName : message.senderId,
+              message.senderName.isNotEmpty
+                  ? message.senderName
+                  : message.senderId,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(

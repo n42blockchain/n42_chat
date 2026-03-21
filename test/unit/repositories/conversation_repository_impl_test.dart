@@ -41,8 +41,12 @@ void main() {
       const roomId = '!abc123:matrix.org';
       final mockRoom = MockRoom();
 
-      when(() => mockRoomDS.createDirectChat(userId))
-          .thenAnswer((_) async => roomId);
+      when(
+        () => mockStorageDS.shouldDefaultEncryptNewChats(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRoomDS.createDirectChat(userId, encrypted: true),
+      ).thenAnswer((_) async => roomId);
       when(() => mockRoomDS.getRoomById(roomId)).thenReturn(mockRoom);
       when(() => mockRoom.id).thenReturn(roomId);
       when(() => mockRoom.isDirectChat).thenReturn(true);
@@ -61,19 +65,30 @@ void main() {
       when(() => mockRoomDS.getLastMessageTime(mockRoom)).thenReturn(null);
       when(() => mockRoomDS.getLastEvent(mockRoom)).thenReturn(null);
       when(() => mockRoomDS.getDirectChatPartner(mockRoom)).thenReturn(null);
-      when(() => mockStorageDS.getStrongReminderStatus(roomId))
-          .thenAnswer((_) async => false);
+      when(
+        () => mockStorageDS.getStrongReminderStatus(roomId),
+      ).thenAnswer((_) async => false);
 
       final result = await repository.createDirectChat(userId);
 
       expect(result, isNotNull);
       expect(result.id, roomId);
-      verify(() => mockRoomDS.createDirectChat(userId)).called(1);
+      verify(() => mockStorageDS.shouldDefaultEncryptNewChats()).called(1);
+      verify(
+        () => mockRoomDS.createDirectChat(userId, encrypted: true),
+      ).called(1);
     });
 
     test('throws when datasource throws', () async {
-      when(() => mockRoomDS.createDirectChat(any()))
-          .thenThrow(Exception('Network error'));
+      when(
+        () => mockStorageDS.shouldDefaultEncryptNewChats(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockRoomDS.createDirectChat(
+          any(),
+          encrypted: any(named: 'encrypted'),
+        ),
+      ).thenThrow(Exception('Network error'));
 
       expect(
         () => repository.createDirectChat('@bad:matrix.org'),
@@ -110,8 +125,7 @@ void main() {
   group('markAsRead', () {
     test('delegates to datasource', () async {
       const roomId = '!room1:matrix.org';
-      when(() => mockRoomDS.markRoomAsRead(roomId))
-          .thenAnswer((_) async {});
+      when(() => mockRoomDS.markRoomAsRead(roomId)).thenAnswer((_) async {});
 
       await repository.markAsRead(roomId);
 

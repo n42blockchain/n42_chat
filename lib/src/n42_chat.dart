@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import 'core/extensions/context_extension.dart';
 import 'core/notifications/firebase_push_service.dart';
+import 'core/notifications/push_notification_service.dart';
 import 'data/datasources/local/preferences_datasource.dart';
 import 'data/datasources/local/secure_storage_datasource.dart';
 import 'data/datasources/matrix/matrix_client_manager.dart';
@@ -75,8 +76,10 @@ class N42Chat {
   static N42ChatConfig? _config;
   static Completer<void>? _initCompleter;
   static ThemeMode _themeMode = ThemeMode.system;
+  static FontSize _fontSize = FontSize.medium;
   static Locale _locale = const Locale('en');
   static final List<void Function(ThemeMode)> _themeListeners = [];
+  static final List<void Function(FontSize)> _fontSizeListeners = [];
   static final List<void Function(Locale)> _localeListeners = [];
   static String? _pendingNotificationRoomId;
   static String? _pendingNotificationEventId;
@@ -148,6 +151,9 @@ class N42Chat {
   /// 获取当前主题模式
   static ThemeMode get themeMode => _themeMode;
 
+  /// 获取当前字体大小偏好
+  static FontSize get fontSize => _fontSize;
+
   /// 设置主题模式
   ///
   /// 用于与主应用同步主题设置
@@ -179,6 +185,25 @@ class N42Chat {
   /// 移除主题变化监听器
   static void removeThemeListener(void Function(ThemeMode) listener) {
     _themeListeners.remove(listener);
+  }
+
+  /// 设置字体大小
+  static void setFontSize(FontSize fontSize) {
+    if (_fontSize != fontSize) {
+      _fontSize = fontSize;
+      for (final listener in _fontSizeListeners) {
+        listener(fontSize);
+      }
+      debugLog('N42Chat: Font size changed to $fontSize');
+    }
+  }
+
+  static void addFontSizeListener(void Function(FontSize) listener) {
+    _fontSizeListeners.add(listener);
+  }
+
+  static void removeFontSizeListener(void Function(FontSize) listener) {
+    _fontSizeListeners.remove(listener);
   }
 
   /// 获取当前语言设置
@@ -247,6 +272,64 @@ class N42Chat {
       case ThemeMode.system:
         return MediaQuery.of(context).platformBrightness == Brightness.dark;
     }
+  }
+
+  static PreferencesDataSource _preferencesDataSource() {
+    if (getIt.isRegistered<PreferencesDataSource>()) {
+      return getIt<PreferencesDataSource>();
+    }
+    return PreferencesDataSource();
+  }
+
+  static Future<AppearanceSettings> getSavedAppearanceSettings() async {
+    return _preferencesDataSource().getAppearanceSettingsModel();
+  }
+
+  static Future<NotificationSettings> getSavedNotificationSettings() async {
+    return _preferencesDataSource().getNotificationSettingsModel();
+  }
+
+  static Future<void> applyAppearanceSettings(AppearanceSettings settings) async {
+    await _preferencesDataSource().saveAppearanceSettingsModel(settings);
+    setThemeMode(settings.themeMode);
+    setFontSize(settings.fontSize);
+  }
+
+  static Future<void> applyNotificationSettings(
+    NotificationSettings settings,
+  ) async {
+    await _preferencesDataSource().saveNotificationSettingsModel(settings);
+    _pushService?.setNotificationConfig(_notificationConfigFromSettings(settings));
+  }
+
+  static NotificationConfig _notificationConfigFromSettings(
+    NotificationSettings settings,
+  ) {
+    return NotificationConfig(
+      enabled: settings.enabled,
+      showPreview: settings.showPreview,
+      playSound: settings.playSound,
+      vibrate: settings.vibrate,
+      doNotDisturb: settings.doNotDisturb,
+      dndStartTime: _parseStoredTimeOfDay(settings.doNotDisturbStart),
+      dndEndTime: _parseStoredTimeOfDay(settings.doNotDisturbEnd),
+    );
+  }
+
+  static TimeOfDay? _parseStoredTimeOfDay(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return null;
+    }
+    final parts = value.split(':');
+    if (parts.length != 2) {
+      return null;
+    }
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) {
+      return null;
+    }
+    return TimeOfDay(hour: hour, minute: minute);
   }
 
   /// 初始化聊天模块
@@ -465,6 +548,10 @@ class N42Chat {
 
       // 初始化（包括获取 FCM Token）
       await _pushService!.initialize();
+      final savedNotificationSettings = await getSavedNotificationSettings();
+      _pushService!.setNotificationConfig(
+        _notificationConfigFromSettings(savedNotificationSettings),
+      );
       debugLog(
         '[PUSH_INIT] Push service initialized, isLogged=${client.isLogged()}',
       );
@@ -625,6 +712,9 @@ class N42Chat {
         return;
       }
 
+      _turnRefreshTimer?.cancel();
+      _turnRefreshTimer = null;
+      await _callManager?.dispose();
       _callManager = CallManager();
       await _callManager!.initialize(
         client: client,
@@ -1457,20 +1547,26 @@ class _N42ChatEntryWidget extends StatefulWidget {
 
 class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
   Locale _currentLocale = N42Chat._locale;
-  FontSize _fontSize = FontSize.medium;
+  FontSize _fontSize = N42Chat.fontSize;
 
   void _onLocaleChanged(Locale locale) {
     if (mounted) setState(() => _currentLocale = locale);
   }
 
+  void _onThemeChanged(ThemeMode _) {
+    if (mounted) setState(() {});
+  }
+
+  void _onFontSizeChanged(FontSize fontSize) {
+    if (mounted) setState(() => _fontSize = fontSize);
+  }
+
   Future<void> _loadAppearanceSettings() async {
     try {
-      final appearanceSettings = await PreferencesDataSource()
-          .getAppearanceSettings();
+      final appearanceSettings = await N42Chat.getSavedAppearanceSettings();
       if (!mounted) return;
-      setState(() {
-        _fontSize = _parseStoredFontSize(appearanceSettings?['fontSize']);
-      });
+      N42Chat.setThemeMode(appearanceSettings.themeMode);
+      N42Chat.setFontSize(appearanceSettings.fontSize);
     } catch (e) {
       debugLog('N42Chat: Failed to load appearance settings: $e');
     }
@@ -1480,6 +1576,8 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
   void initState() {
     super.initState();
     N42Chat.addLocaleListener(_onLocaleChanged);
+    N42Chat.addThemeListener(_onThemeChanged);
+    N42Chat.addFontSizeListener(_onFontSizeChanged);
     unawaited(_loadAppearanceSettings());
     // 检查当前登录状态
     N42Chat.authBloc.add(const AuthCheckRequested());
@@ -1487,7 +1585,9 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
 
   @override
   void dispose() {
-    N42Chat._localeListeners.remove(_onLocaleChanged);
+    N42Chat.removeLocaleListener(_onLocaleChanged);
+    N42Chat.removeThemeListener(_onThemeChanged);
+    N42Chat.removeFontSizeListener(_onFontSizeChanged);
     super.dispose();
   }
 
@@ -1846,12 +1946,14 @@ class _N42ProfileEntryWidget extends StatefulWidget {
 
 class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
   Locale _currentLocale = N42Chat._locale;
-  FontSize _fontSize = FontSize.medium;
+  FontSize _fontSize = N42Chat.fontSize;
 
   @override
   void initState() {
     super.initState();
     N42Chat.addLocaleListener(_onLocaleChanged);
+    N42Chat.addThemeListener(_onThemeChanged);
+    N42Chat.addFontSizeListener(_onFontSizeChanged);
     unawaited(_loadAppearanceSettings());
     // 检查当前登录状态
     N42Chat.authBloc.add(const AuthCheckRequested());
@@ -1861,14 +1963,20 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
     if (mounted) setState(() => _currentLocale = locale);
   }
 
+  void _onThemeChanged(ThemeMode _) {
+    if (mounted) setState(() {});
+  }
+
+  void _onFontSizeChanged(FontSize fontSize) {
+    if (mounted) setState(() => _fontSize = fontSize);
+  }
+
   Future<void> _loadAppearanceSettings() async {
     try {
-      final appearanceSettings = await PreferencesDataSource()
-          .getAppearanceSettings();
+      final appearanceSettings = await N42Chat.getSavedAppearanceSettings();
       if (!mounted) return;
-      setState(() {
-        _fontSize = _parseStoredFontSize(appearanceSettings?['fontSize']);
-      });
+      N42Chat.setThemeMode(appearanceSettings.themeMode);
+      N42Chat.setFontSize(appearanceSettings.fontSize);
     } catch (e) {
       debugLog('N42Chat: Failed to load appearance settings: $e');
     }
@@ -1876,7 +1984,9 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
 
   @override
   void dispose() {
-    N42Chat._localeListeners.remove(_onLocaleChanged);
+    N42Chat.removeLocaleListener(_onLocaleChanged);
+    N42Chat.removeThemeListener(_onThemeChanged);
+    N42Chat.removeFontSizeListener(_onFontSizeChanged);
     super.dispose();
   }
 
@@ -1959,22 +2069,6 @@ class N42ChatException implements Exception {
 
   @override
   String toString() => 'N42ChatException: $message (code: $code)';
-}
-
-FontSize _parseStoredFontSize(String? rawValue) {
-  switch (rawValue?.trim().toLowerCase()) {
-    case 'small':
-      return FontSize.small;
-    case 'large':
-      return FontSize.large;
-    case 'extralarge':
-    case 'extra_large':
-    case 'extra-large':
-      return FontSize.extraLarge;
-    case 'medium':
-    default:
-      return FontSize.medium;
-  }
 }
 
 double _fontPreferenceScale(FontSize fontSize) {
@@ -2125,7 +2219,25 @@ Widget _wrapChatPresentation(
   Locale? locale,
 }) {
   final mediaQuery = MediaQuery.of(context);
-  final scopedTheme = _buildChatScopedTheme(Theme.of(context));
+  final parentTheme = Theme.of(context);
+  final useDark = N42Chat.isDarkMode(context);
+  final fallbackTheme = useDark
+      ? ThemeData.dark(useMaterial3: true)
+      : ThemeData.light(useMaterial3: true);
+  final baseTheme =
+      parentTheme.brightness ==
+          (useDark ? Brightness.dark : Brightness.light)
+      ? parentTheme
+      : fallbackTheme.copyWith(
+          textTheme: parentTheme.textTheme,
+          primaryTextTheme: parentTheme.primaryTextTheme,
+          iconTheme: parentTheme.iconTheme,
+          platform: parentTheme.platform,
+          visualDensity: parentTheme.visualDensity,
+          materialTapTargetSize: parentTheme.materialTapTargetSize,
+          pageTransitionsTheme: parentTheme.pageTransitionsTheme,
+        );
+  final scopedTheme = _buildChatScopedTheme(baseTheme);
   Widget wrappedChild = Theme(
     data: scopedTheme,
     child: MediaQuery(

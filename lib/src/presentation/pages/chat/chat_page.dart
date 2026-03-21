@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -18,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/in_app_notification_service.dart';
+import '../../../core/services/screenshot_protection_service.dart';
 import '../../../core/services/self_destruct_service.dart';
 import '../../../core/utils/face_blur_util.dart';
 import '../../../core/theme/chat_background_presets.dart';
@@ -29,6 +31,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/download_service.dart';
 import '../../../core/services/red_packet_service.dart';
+import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../domain/entities/red_packet_entity.dart';
 import '../media/media_editor_page.dart';
 import '../../../core/services/remark_service.dart';
@@ -36,9 +39,12 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/transfer_entity.dart';
 import '../../../domain/repositories/auth_repository.dart';
+import '../../../domain/repositories/contact_repository.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
+import '../../../domain/repositories/transfer_repository.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/chat/chat_state.dart';
@@ -47,6 +53,7 @@ import '../../blocs/message_action/message_action_event.dart' as action_event;
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../blocs/search/search_bloc.dart';
+import '../../blocs/transfer/transfer_bloc.dart';
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/gif_picker.dart';
 import '../../widgets/chat/sticker_picker.dart';
@@ -72,10 +79,11 @@ import '../../widgets/chat/ai_summary_bubble.dart';
 import '../../../domain/repositories/ai_repository.dart';
 import '../../widgets/chat/ai_rewrite_bar.dart';
 import '../../widgets/chat/translated_message.dart';
+import 'viewers/image_viewer_page.dart';
 import 'viewers/pdf_viewer_page.dart';
-import 'image_viewer_page.dart';
+import 'viewers/text_document_preview_page.dart';
 import 'location_picker_page.dart';
-import 'video_player_page.dart';
+import 'viewers/video_player_page.dart';
 import '../../widgets/chat/chat_confirm_sheets.dart';
 import '../../widgets/chat/contact_card_select_sheet.dart';
 import '../../widgets/chat/contact_select_dialog.dart';
@@ -92,6 +100,7 @@ import '../../../integration/bridge/bridge_platform.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../group/group_topics_page.dart';
 import '../group/bot_settings_page.dart';
+import '../transfer/transfer_page.dart';
 import '../../../core/utils/debug_log.dart';
 
 part 'chat_page_app_bar.dart';
@@ -203,6 +212,7 @@ class _ChatPageState extends State<ChatPage> {
 
   // 消息字体大小
   double _messageFontSize = 16.0;
+  bool _sessionPrivacyShieldEnabled = false;
 
   @override
   void initState() {
@@ -253,6 +263,9 @@ class _ChatPageState extends State<ChatPage> {
     // 加载草稿
     _loadDraft();
 
+    // 根据私密聊天策略临时启用截图防护
+    unawaited(_applyPrivacySessionProtection());
+
     // 设置当前聊天房间（应用内通知过滤）
     InAppNotificationService.instance.setCurrentChatRoom(
       widget.conversation.id,
@@ -286,6 +299,21 @@ class _ChatPageState extends State<ChatPage> {
         break;
       case 'connection_failed':
         message = l10n?.commonConnectionFailed ?? 'Connection failed';
+        break;
+      case 'meeting_not_initialized':
+        message =
+            l10n?.chatCallServiceNotInitialized ??
+            'Call service not initialized';
+        break;
+      case 'livekit_not_configured':
+        message =
+            l10n?.callLivekitNotConfigured ??
+            'Group call service not configured';
+        break;
+      case 'livekit_token_fetch_failed':
+        message =
+            l10n?.callJoinMeetingFailed('token') ??
+            'Failed to prepare group call';
         break;
       case 'call_rejected':
         message = l10n?.chatCallRejected ?? 'Call rejected';
@@ -381,6 +409,26 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  Future<void> _applyPrivacySessionProtection() async {
+    try {
+      final storage = getIt<PreferencesDataSource>();
+      final privacySettings = await storage.getPrivacySettingsModel();
+      final shouldProtect =
+          privacySettings.privateChatMode &&
+          (widget.conversation.type == ConversationType.direct ||
+              widget.conversation.isEncrypted);
+      if (!shouldProtect) {
+        return;
+      }
+
+      await ScreenshotProtectionService.instance.initialize();
+      await ScreenshotProtectionService.instance.enableForSession();
+      _sessionPrivacyShieldEnabled = true;
+    } catch (e) {
+      debugLog('ChatPage: Failed to apply privacy session protection: $e');
+    }
+  }
+
   /// 保存草稿
   void _saveDraft() {
     final storage = getIt<PreferencesDataSource>();
@@ -440,6 +488,9 @@ class _ChatPageState extends State<ChatPage> {
     FaceBlurUtil.dispose();
 
     // 释放资源
+    if (_sessionPrivacyShieldEnabled) {
+      unawaited(ScreenshotProtectionService.instance.restoreDefault());
+    }
     _scrollController.dispose();
     _inputController.dispose();
     _inputFocusNode.dispose();
@@ -713,28 +764,10 @@ class _ChatPageState extends State<ChatPage> {
 
   /// 将 mxc:// URL 转换为 HTTP URL
   String? _convertMxcToHttpUrl(String? mxcUrl) {
-    if (mxcUrl == null || mxcUrl.isEmpty) return null;
-    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-
-    try {
-      final client = MatrixClientManager.instance.client;
-      if (client == null) return null;
-
-      final homeserver =
-          client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) return null;
-
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-
-      if (serverName.isEmpty || mediaId.isEmpty) return null;
-
-      return '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
-    } catch (e) {
-      debugLog('_convertMxcToHttpUrl error: $e');
-      return null;
-    }
+    return mx_utils.MatrixUtils.getMediaDownloadUrl(
+      mxcUrl,
+      client: MatrixClientManager.instance.client,
+    );
   }
 
   String _formatTime(DateTime time) {

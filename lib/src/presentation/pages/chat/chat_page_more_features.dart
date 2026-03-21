@@ -6,116 +6,139 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
   /// 显示位置选项菜单（微信风格）
   Future<void> _sendLocation() async {
     final isDark = context.isDarkMode;
-    unawaited(showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 发送位置
-              ListTile(
-                leading: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.location_on,
-                    color: AppColors.primary,
-                    size: 24,
-                  ),
-                ),
-                title: Text(
-                  S.of(context)?.chatSendLocation ?? 'Send Location',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                  ),
-                ),
-                subtitle: Text(
-                  S.of(context)?.chatSelectLocationAndSend ?? 'Select location and send',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _openLocationPicker();
-                },
-              ),
-              Divider(height: 1, color: isDark ? AppColors.dividerDark : AppColors.divider),
-              // 共享实时位置
-              ListTile(
-                leading: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.share_location,
-                    color: Colors.green,
-                    size: 24,
-                  ),
-                ),
-                title: Text(
-                  S.of(context)?.chatShareRealTimeLocation ?? 'Share Real-time Location',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                  ),
-                ),
-                subtitle: Text(
-                  S.of(context)?.chatShareLocationForOneHour ?? 'Share real-time location with friend for 1 hour',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _shareRealTimeLocation();
-                },
-              ),
-              const SizedBox(height: 8),
-              // 取消按钮
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: TextButton.styleFrom(
-                    backgroundColor: isDark ? AppColors.backgroundDark : Colors.grey[100],
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) => Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 发送位置
+                ListTile(
+                  leading: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    child: const Icon(
+                      Icons.location_on,
+                      color: AppColors.primary,
+                      size: 24,
+                    ),
                   ),
-                  child: Text(
-                    S.of(context)?.commonCancel ?? 'Cancel',
+                  title: Text(
+                    S.of(context)?.chatSendLocation ?? 'Send Location',
                     style: TextStyle(
-                      color: isDark ? AppColors.textPrimaryDark : Colors.black87,
                       fontSize: 16,
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                  subtitle: Text(
+                    S.of(context)?.chatSelectLocationAndSend ??
+                        'Select location and send',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _openLocationPicker();
+                  },
+                ),
+                Divider(
+                  height: 1,
+                  color: isDark ? AppColors.dividerDark : AppColors.divider,
+                ),
+                // 共享实时位置
+                ListTile(
+                  leading: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.share_location,
+                      color: Colors.green,
+                      size: 24,
+                    ),
+                  ),
+                  title: Text(
+                    S.of(context)?.chatShareRealTimeLocation ??
+                        'Share Real-time Location',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                  subtitle: Text(
+                    S.of(context)?.chatShareLocationForOneHour ??
+                        'Share real-time location with friend for 1 hour',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _shareRealTimeLocation();
+                  },
+                ),
+                const SizedBox(height: 8),
+                // 取消按钮
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      backgroundColor: isDark
+                          ? AppColors.backgroundDark
+                          : Colors.grey[100],
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      S.of(context)?.commonCancel ?? 'Cancel',
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.textPrimaryDark
+                            : Colors.black87,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-            ],
+                const SizedBox(height: 8),
+              ],
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   /// 打开位置选择页面
@@ -130,15 +153,19 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     if (result != null && mounted) {
       final latitude = result['latitude'] as double;
       final longitude = result['longitude'] as double;
-      final address = result['address'] as String? ?? (S.of(context)?.chatMyLocation ?? 'My location');
+      final address =
+          result['address'] as String? ??
+          (S.of(context)?.chatMyLocation ?? 'My location');
       final name = result['name'] as String?;
 
       // 发送位置消息
-      context.read<ChatBloc>().add(SendLocationMessage(
-        latitude: latitude,
-        longitude: longitude,
-        description: name ?? address,
-      ));
+      context.read<ChatBloc>().add(
+        SendLocationMessage(
+          latitude: latitude,
+          longitude: longitude,
+          description: name ?? address,
+        ),
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -159,9 +186,13 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.chatShareRealTimeLocation ?? 'Share Real-time Location'),
+        title: Text(
+          S.of(context)?.chatShareRealTimeLocation ??
+              'Share Real-time Location',
+        ),
         content: Text(
-          S.of(context)?.chatRealTimeLocationShareMessage ?? 'After sharing, the other party can see your real-time location for 1 hour.',
+          S.of(context)?.chatRealTimeLocationShareMessage ??
+              'After sharing, the other party can see your real-time location for 1 hour.',
         ),
         actions: [
           TextButton(
@@ -178,12 +209,14 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
 
     if (confirmed == true && mounted) {
       // 导航到实时位置共享页面
-      unawaited(Navigator.push<void>(
-        context,
-        MaterialPageRoute(
-          builder: (_) => LiveLocationPage(roomId: widget.conversation.id),
+      unawaited(
+        Navigator.push<void>(
+          context,
+          MaterialPageRoute(
+            builder: (_) => LiveLocationPage(roomId: widget.conversation.id),
+          ),
         ),
-      ));
+      );
     }
   }
 
@@ -201,7 +234,13 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     );
   }
 
-  Future<bool> _doSendRedPacket(String amount, String token, String greeting, int count, bool isLucky) async {
+  Future<bool> _doSendRedPacket(
+    String amount,
+    String token,
+    String greeting,
+    int count,
+    bool isLucky,
+  ) async {
     final l10n = S.of(context);
     final chatBloc = context.read<ChatBloc>();
     final roomId = chatBloc.state.roomId ?? '';
@@ -216,7 +255,9 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(l10n?.redPacketInsufficientBalance ?? 'Insufficient balance'),
+              content: Text(
+                l10n?.redPacketInsufficientBalance ?? 'Insufficient balance',
+              ),
               backgroundColor: Colors.red,
             ),
           );
@@ -231,7 +272,8 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     late final RedPacketEntity redPacket;
     try {
       final redPacketService = getIt<IRedPacketService>();
-      final currentUserId = await getIt<IMessageRepository>().getCurrentUserId() ?? '';
+      final currentUserId =
+          await getIt<IMessageRepository>().getCurrentUserId() ?? '';
       redPacket = await redPacketService.createRedPacket(
         roomId: roomId,
         totalAmount: double.tryParse(amount) ?? 0,
@@ -264,59 +306,70 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     );
 
     if (!mounted) return false;
-    chatBloc.add(SendCustomMessage(
-      content: greeting,
-      type: MessageType.redPacket,
-      metadata: metadata,
-    ));
+    chatBloc.add(
+      SendCustomMessage(
+        content: greeting,
+        type: MessageType.redPacket,
+        metadata: metadata,
+      ),
+    );
 
     // 显示发送成功提示
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(l10n?.chatRedPacketSent(amount, token) ?? 'Sent $amount $token red packet'),
+        content: Text(
+          l10n?.chatRedPacketSent(amount, token) ??
+              'Sent $amount $token red packet',
+        ),
         backgroundColor: AppColors.success,
       ),
     );
     return true;
   }
 
-  void _sendTransfer() {
-    showDialog<void>(
-      context: context,
-      builder: (context) => SendTransferDialog(
-        receiverName: _getDisplayName(),
-        receiverAvatar: widget.conversation.avatarUrl,
-        onSend: (amount, token, memo) async {
-          return _doSendTransfer(amount, token, memo);
-        },
+  Future<void> _sendTransfer() async {
+    String? recipientAddress;
+    String? recipientName;
+
+    if (widget.conversation.isDirect &&
+        widget.conversation.directUserId != null) {
+      try {
+        final contact = await getIt<IContactRepository>().getContactById(
+          widget.conversation.directUserId!,
+        );
+        recipientAddress = contact?.walletAddress;
+        recipientName = contact?.effectiveDisplayName;
+      } catch (e) {
+        debugLog('Transfer recipient lookup failed: $e');
+      }
+    }
+
+    if (!mounted) return;
+
+    final transfer = await Navigator.of(context).push<TransferEntity>(
+      MaterialPageRoute<TransferEntity>(
+        builder: (_) => BlocProvider(
+          create: (_) => getIt<TransferBloc>(),
+          child: TransferPage(
+            roomId: widget.conversation.id,
+            recipientAddress: recipientAddress,
+            recipientName: recipientName ?? _getDisplayName(),
+          ),
+        ),
       ),
     );
-  }
 
-  Future<bool> _doSendTransfer(String amount, String token, String? memo) async {
-    if (!mounted) return false;
+    if (!mounted || transfer == null || !transfer.isSuccess) return;
 
-    // 发送转账消息
-    final metadata = MessageMetadata(
-      amount: amount,
-      token: token,
-      transferStatus: 'pending',
-    );
-
-    context.read<ChatBloc>().add(SendCustomMessage(
-      content: memo ?? (S.of(context)?.chatTransferDefault ?? 'Transfer'),
-      type: MessageType.transfer,
-      metadata: metadata,
-    ));
-
-    // 显示发送成功提示
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.chatTransferSent(amount, token) ?? 'Sent $amount $token transfer'),
+        content: Text(
+          S.of(context)?.chatTransferSent(transfer.amount, transfer.token) ??
+              'Sent ${transfer.amount} ${transfer.token} transfer',
+        ),
         backgroundColor: AppColors.primary,
       ),
     );
-    return true;
   }
 
   /// 发送名片
@@ -326,8 +379,10 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     // 预先获取本地化字符串，确保使用正确的语言
     final l10n = S.of(context);
     final selectContactText = l10n?.chatSelectContact ?? 'Select Contact';
-    final searchContactHintText = l10n?.chatSearchContactHint ?? 'Search contacts';
-    final noContactsFoundText = l10n?.contactNoContactsFound ?? 'No contacts found';
+    final searchContactHintText =
+        l10n?.chatSearchContactHint ?? 'Search contacts';
+    final noContactsFoundText =
+        l10n?.contactNoContactsFound ?? 'No contacts found';
     final isDark = context.isDarkMode;
 
     // 显示联系人选择对话框
@@ -351,7 +406,8 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       // 发送名片消息（作为自定义消息类型）
       // 名片消息格式使用固定英文键名便于解析，显示时再本地化
       // Format: [Contact Card]\nName: xxx\nID: xxx\nAvatar: xxx
-      final cardContent = '''[Contact Card]
+      final cardContent =
+          '''[Contact Card]
 Name: $contactName
 ID: $contactId
 Avatar: ${contactAvatar ?? ''}''';
@@ -361,7 +417,10 @@ Avatar: ${contactAvatar ?? ''}''';
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.chatContactCardSent(contactName) ?? 'Sent $contactName\'s contact card'),
+          content: Text(
+            S.of(context)?.chatContactCardSent(contactName) ??
+                'Sent $contactName\'s contact card',
+          ),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 1),
         ),
@@ -387,7 +446,8 @@ Avatar: ${contactAvatar ?? ''}''';
         if (mounted) {
           WeChatToast.warning(
             context,
-            S.of(context)?.chatCallServiceNotInitialized ?? 'Call service not available',
+            S.of(context)?.chatCallServiceNotInitialized ??
+                'Call service not available',
           );
         }
         return;
@@ -427,11 +487,25 @@ Avatar: ${contactAvatar ?? ''}''';
         );
       }
     } else {
-      // 群组通话需要 LiveKit 支持
-      if (mounted) {
-        WeChatToast.info(
-          context,
-          S.of(context)?.commonFeatureComingSoon('Group Call') ?? 'Group calls coming soon',
+      final currentUser = N42Chat.currentUser;
+      final displayName = currentUser?.displayName.trim();
+      final participantName = displayName != null && displayName.isNotEmpty
+          ? displayName
+          : (currentUser?.userId ?? 'You');
+
+      if (isVideo) {
+        await N42Chat.callManager!.startGroupVideoCall(
+          conversationId: widget.conversation.id,
+          roomDisplayName: widget.conversation.name,
+          participantName: participantName,
+          participantAvatarUrl: currentUser?.avatarUrl,
+        );
+      } else {
+        await N42Chat.callManager!.startGroupVoiceCall(
+          conversationId: widget.conversation.id,
+          roomDisplayName: widget.conversation.name,
+          participantName: participantName,
+          participantAvatarUrl: currentUser?.avatarUrl,
         );
       }
     }
@@ -453,9 +527,7 @@ Avatar: ${contactAvatar ?? ''}''';
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => MusicSelectSheet(
-        isDark: context.isDarkMode,
-      ),
+      builder: (context) => MusicSelectSheet(isDark: context.isDarkMode),
     );
 
     if (result != null && mounted) {
@@ -476,47 +548,67 @@ Avatar: ${contactAvatar ?? ''}''';
 
             if (!mounted) return;
             // 先发送音频文件
-            context.read<ChatBloc>().add(SendFileMessage(
-              fileBytes: bytes,
-              filename: filename,
-              mimeType: mimeType,
-            ));
+            context.read<ChatBloc>().add(
+              SendFileMessage(
+                fileBytes: bytes,
+                filename: filename,
+                mimeType: mimeType,
+              ),
+            );
 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.chatSharedMusic(songName) ?? 'Shared $songName'),
+                content: Text(
+                  S.of(context)?.chatSharedMusic(songName) ??
+                      'Shared $songName',
+                ),
                 duration: const Duration(seconds: 1),
               ),
             );
           } else {
             if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(S.of(context)?.chatFileNotExist ?? 'File does not exist'), backgroundColor: Colors.red),
+              SnackBar(
+                content: Text(
+                  S.of(context)?.chatFileNotExist ?? 'File does not exist',
+                ),
+                backgroundColor: Colors.red,
+              ),
             );
           }
         } catch (e) {
           debugLog('Error sending local music: $e');
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context)?.chatSendFailed(e.toString()) ?? 'Send failed: $e'), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text(
+                S.of(context)?.chatSendFailed(e.toString()) ??
+                    'Send failed: $e',
+              ),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       } else {
         // 网络链接或推荐歌曲 - 发送音乐卡片消息
-        context.read<ChatBloc>().add(SendCustomMessage(
-          type: MessageType.music,
-          content: '🎵 $songName - $artist',
-          metadata: MessageMetadata(
-            musicTitle: songName,
-            musicArtist: artist,
-            musicUrl: url,
-            musicCover: cover,
+        context.read<ChatBloc>().add(
+          SendCustomMessage(
+            type: MessageType.music,
+            content: '🎵 $songName - $artist',
+            metadata: MessageMetadata(
+              musicTitle: songName,
+              musicArtist: artist,
+              musicUrl: url,
+              musicCover: cover,
+            ),
           ),
-        ));
+        );
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatSharedMusic(songName) ?? 'Shared $songName'),
+            content: Text(
+              S.of(context)?.chatSharedMusic(songName) ?? 'Shared $songName',
+            ),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -550,13 +642,17 @@ Avatar: ${contactAvatar ?? ''}''';
       final options = result['options'] as List<String>;
       final maxSelections = result['maxSelections'] as int? ?? 1;
 
-      debugLog('ChatPage: Creating poll - question: $question, options: $options, maxSelections: $maxSelections');
+      debugLog(
+        'ChatPage: Creating poll - question: $question, options: $options, maxSelections: $maxSelections',
+      );
 
-      context.read<ChatBloc>().add(SendPollMessage(
-        question: question,
-        options: options,
-        maxSelections: maxSelections,
-      ));
+      context.read<ChatBloc>().add(
+        SendPollMessage(
+          question: question,
+          options: options,
+          maxSelections: maxSelections,
+        ),
+      );
     }
   }
 
@@ -565,13 +661,15 @@ Avatar: ${contactAvatar ?? ''}''';
     final gif = await showGifPicker(context);
     if (gif != null && mounted) {
       debugLog('ChatPage: Sending GIF - ${gif.title}');
-      context.read<ChatBloc>().add(SendGifMessage(
-        gifUrl: gif.originalUrl,
-        previewUrl: gif.previewUrl,
-        width: gif.width,
-        height: gif.height,
-        title: gif.title,
-      ));
+      context.read<ChatBloc>().add(
+        SendGifMessage(
+          gifUrl: gif.originalUrl,
+          previewUrl: gif.previewUrl,
+          width: gif.width,
+          height: gif.height,
+          title: gif.title,
+        ),
+      );
     }
   }
 
@@ -590,18 +688,20 @@ Avatar: ${contactAvatar ?? ''}''';
   /// 发送贴纸消息
   void _onStickerSelected(Sticker sticker, String packId) {
     debugLog('ChatPage: Sending sticker ${sticker.id} from pack $packId');
-    context.read<ChatBloc>().add(SendStickerMessage(
-      stickerId: sticker.id,
-      packId: packId,
-      url: sticker.url,
-      httpUrl: sticker.httpUrl,
-      name: sticker.name,
-      emoji: sticker.emoji,
-      width: sticker.width,
-      height: sticker.height,
-      mimeType: sticker.mimeType,
-      size: sticker.size,
-    ));
+    context.read<ChatBloc>().add(
+      SendStickerMessage(
+        stickerId: sticker.id,
+        packId: packId,
+        url: sticker.url,
+        httpUrl: sticker.httpUrl,
+        name: sticker.name,
+        emoji: sticker.emoji,
+        width: sticker.width,
+        height: sticker.height,
+        mimeType: sticker.mimeType,
+        size: sticker.size,
+      ),
+    );
 
     // 发送后隐藏贴纸面板
     setState(() {
@@ -613,14 +713,17 @@ Avatar: ${contactAvatar ?? ''}''';
   void _openStickerStore() {
     Navigator.push(
       context,
-      MaterialPageRoute<void>(
-        builder: (context) => const StickerStorePage(),
-      ),
+      MaterialPageRoute<void>(builder: (context) => const StickerStorePage()),
     );
   }
 
   /// 投票选项点击
-  void _onPollVote(String pollEventId, String optionId, List<String> currentVotes, int maxSelections) {
+  void _onPollVote(
+    String pollEventId,
+    String optionId,
+    List<String> currentVotes,
+    int maxSelections,
+  ) {
     // 防止重复投票 - 如果正在处理投票，忽略新的点击
     if (_votingPollIds.contains(pollEventId)) {
       debugLog('ChatPage: Ignoring duplicate vote on poll $pollEventId');
@@ -653,10 +756,9 @@ Avatar: ${contactAvatar ?? ''}''';
       _votingPollIds.add(pollEventId);
     });
 
-    context.read<ChatBloc>().add(VoteOnPoll(
-      pollEventId: pollEventId,
-      selectedOptionIds: newVotes,
-    ));
+    context.read<ChatBloc>().add(
+      VoteOnPoll(pollEventId: pollEventId, selectedOptionIds: newVotes),
+    );
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -684,7 +786,10 @@ Avatar: ${contactAvatar ?? ''}''';
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.chatEndPollTitle ?? 'End Poll'),
-        content: Text(S.of(context)?.chatEndPollConfirmMessage ?? 'Are you sure you want to end this poll? Voting will be closed after ending.'),
+        content: Text(
+          S.of(context)?.chatEndPollConfirmMessage ??
+              'Are you sure you want to end this poll? Voting will be closed after ending.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -692,7 +797,10 @@ Avatar: ${contactAvatar ?? ''}''';
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(S.of(context)?.commonConfirm ?? 'Confirm', style: const TextStyle(color: Colors.red)),
+            child: Text(
+              S.of(context)?.commonConfirm ?? 'Confirm',
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -715,7 +823,10 @@ Avatar: ${contactAvatar ?? ''}''';
   void _showFeatureToast(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.chatFeatureInDev(feature) ?? '$feature feature in development...'),
+        content: Text(
+          S.of(context)?.chatFeatureInDev(feature) ??
+              '$feature feature in development...',
+        ),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
       ),

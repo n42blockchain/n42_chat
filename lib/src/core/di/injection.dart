@@ -27,6 +27,8 @@ import '../services/archive_integrity_service.dart';
 import '../services/archive_search_service.dart';
 import '../services/message_archive_service.dart';
 import '../services/download_service.dart';
+import '../services/auto_download_policy_service.dart';
+import '../services/bot_webhook_service.dart';
 import '../services/media_lifecycle_service.dart';
 import '../services/storage_cleanup_service.dart';
 import '../services/storage_monitor_service.dart';
@@ -152,11 +154,11 @@ Future<void> configureDependencies(
     config.apiHubBridge ?? MockApiHubBridge(),
   );
 
-  // 注册服务
-  await _registerServices(config);
-
   // 注册数据源
   await _registerDataSources();
+
+  // 注册服务
+  await _registerServices(config);
 
   // 注册仓库
   _registerRepositories();
@@ -194,7 +196,10 @@ Future<void> _registerServices(N42ChatConfig config) async {
   // 如果失败，允许后续在登录/注册时再次尝试
   if (!clientManager.isInitialized) {
     try {
-      await clientManager.initialize(config: config);
+      await clientManager.initialize(
+        config: config,
+        preferencesDataSource: getIt<PreferencesDataSource>(),
+      );
     } catch (e) {
       // 初始化失败时记录错误，但不阻塞依赖注入
       // 后续在登录/注册时会再次尝试初始化
@@ -310,7 +315,25 @@ Future<void> _registerServices(N42ChatConfig config) async {
   );
 
   // URL 预览服务
-  getIt.registerLazySingleton<UrlPreviewService>(() => UrlPreviewService());
+  getIt.registerLazySingleton<UrlPreviewService>(
+    () => UrlPreviewService(
+      preferencesDataSource: getIt<PreferencesDataSource>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<BotWebhookService>(
+    () => BotWebhookService(
+      preferencesDataSource: getIt<PreferencesDataSource>(),
+      secureStorageDataSource: getIt<SecureStorageDataSource>(),
+    ),
+  );
+
+  // 媒体自动下载策略
+  getIt.registerLazySingleton<AutoDownloadPolicyService>(
+    () => AutoDownloadPolicyService(
+      preferencesDataSource: getIt<PreferencesDataSource>(),
+    ),
+  );
 
   // 存储管理服务
   getIt.registerLazySingleton<StorageManagerService>(
@@ -822,7 +845,12 @@ void _registerBlocs() {
   );
 
   // 群聊BLoC
-  getIt.registerFactory<GroupBloc>(() => GroupBloc(getIt<IGroupRepository>()));
+  getIt.registerFactory<GroupBloc>(
+    () => GroupBloc(
+      getIt<IGroupRepository>(),
+      botWebhookService: getIt<BotWebhookService>(),
+    ),
+  );
 
   // 转账BLoC
   getIt.registerFactory<TransferBloc>(

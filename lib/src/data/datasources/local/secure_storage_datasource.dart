@@ -13,17 +13,20 @@ class SecureStorageDataSource {
   static const String _keyCredentials = 'n42_chat_credentials';
   static const String _keyAccounts = 'n42_chat_accounts';
   static const String _keyBiometricSettings = 'n42_chat_biometric_settings';
+  static const String _keyRoomBotWebhookSecretPrefix =
+      'n42_chat_room_bot_webhook_secret_';
 
   final FlutterSecureStorage _storage;
 
   SecureStorageDataSource({FlutterSecureStorage? storage})
-      : _storage = storage ??
-            const FlutterSecureStorage(
-              aOptions: AndroidOptions(encryptedSharedPreferences: true),
-              iOptions: IOSOptions(
-                accessibility: KeychainAccessibility.first_unlock_this_device,
-              ),
-            );
+    : _storage =
+          storage ??
+          const FlutterSecureStorage(
+            aOptions: AndroidOptions(),
+            iOptions: IOSOptions(
+              accessibility: KeychainAccessibility.first_unlock_this_device,
+            ),
+          );
 
   // ============================================
   // 会话管理
@@ -44,10 +47,7 @@ class SecureStorageDataSource {
       'savedAt': DateTime.now().toIso8601String(),
     };
 
-    await _storage.write(
-      key: _keySession,
-      value: jsonEncode(sessionData),
-    );
+    await _storage.write(key: _keySession, value: jsonEncode(sessionData));
 
     debugLog('SecureStorage: Session saved for $userId');
   }
@@ -73,9 +73,13 @@ class SecureStorageDataSource {
       final userId = json['userId'] as String?;
       final deviceId = json['deviceId'] as String?;
 
-      if (homeserver == null || accessToken == null ||
-          userId == null || deviceId == null) {
-        debugLog('SecureStorage: Session data incomplete (missing required fields), clearing');
+      if (homeserver == null ||
+          accessToken == null ||
+          userId == null ||
+          deviceId == null) {
+        debugLog(
+          'SecureStorage: Session data incomplete (missing required fields), clearing',
+        );
         await _storage.delete(key: _keySession);
         return null;
       }
@@ -123,15 +127,14 @@ class SecureStorageDataSource {
     debugLog('SecureStorage: Saving credentials for [user]...');
 
     try {
-      await _storage.write(
-        key: _keyCredentials,
-        value: jsonValue,
-      );
+      await _storage.write(key: _keyCredentials, value: jsonValue);
 
       // 验证保存是否成功 - 立即读取回来
       final verifyData = await _storage.read(key: _keyCredentials);
       if (verifyData == null) {
-        debugLog('SecureStorage: ERROR - Credentials verification failed, read returned null');
+        debugLog(
+          'SecureStorage: ERROR - Credentials verification failed, read returned null',
+        );
         return false;
       }
 
@@ -200,10 +203,7 @@ class SecureStorageDataSource {
       'addedAt': DateTime.now().toIso8601String(),
     };
 
-    await _storage.write(
-      key: _keyAccounts,
-      value: jsonEncode(accounts),
-    );
+    await _storage.write(key: _keyAccounts, value: jsonEncode(accounts));
 
     debugLog('SecureStorage: Account added - $userId');
   }
@@ -232,10 +232,7 @@ class SecureStorageDataSource {
     if (accounts.isEmpty) {
       await _storage.delete(key: _keyAccounts);
     } else {
-      await _storage.write(
-        key: _keyAccounts,
-        value: jsonEncode(accounts),
-      );
+      await _storage.write(key: _keyAccounts, value: jsonEncode(accounts));
     }
 
     debugLog('SecureStorage: Account removed - $userId');
@@ -264,10 +261,7 @@ class SecureStorageDataSource {
       'savedAt': DateTime.now().toIso8601String(),
     };
 
-    await _storage.write(
-      key: _keyBiometricSettings,
-      value: jsonEncode(data),
-    );
+    await _storage.write(key: _keyBiometricSettings, value: jsonEncode(data));
 
     debugLog('SecureStorage: Biometric settings saved - enabled: $enabled');
   }
@@ -320,6 +314,28 @@ class SecureStorageDataSource {
     final settings = await getBiometricSettings();
     return settings?['homeserver'] as String?;
   }
+
+  Future<void> saveRoomBotWebhookSecret(String roomId, String? secret) async {
+    final key = _roomBotWebhookSecretKey(roomId);
+    final normalized = secret?.trim();
+    if (normalized == null || normalized.isEmpty) {
+      await _storage.delete(key: key);
+      return;
+    }
+    await _storage.write(key: key, value: normalized);
+  }
+
+  Future<String?> getRoomBotWebhookSecret(String roomId) async {
+    final normalized = await read(_roomBotWebhookSecretKey(roomId));
+    final trimmed = normalized?.trim();
+    if (trimmed == null || trimmed.isEmpty) {
+      return null;
+    }
+    return trimmed;
+  }
+
+  String _roomBotWebhookSecretKey(String roomId) =>
+      '$_keyRoomBotWebhookSecretPrefix${Uri.encodeComponent(roomId)}';
 
   // ============================================
   // 通用键值存储

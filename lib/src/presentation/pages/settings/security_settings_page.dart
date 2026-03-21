@@ -9,8 +9,10 @@ import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/matrix_uia_utils.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../data/datasources/matrix/matrix_auth_datasource.dart';
+import '../../../n42_chat.dart';
 import '../../../services/auth/auth_methods_service.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../widgets/settings/recovery_key_display_dialog.dart';
@@ -888,9 +890,215 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             isDark: isDark,
             isDestructive: true,
           ),
+          _buildDivider(isDark),
+          _buildListItem(
+            icon: Icons.person_remove_outlined,
+            title: 'Delete Account',
+            subtitle: 'Deactivate this account and erase local encrypted data',
+            onTap: _showDeleteAccountConfirmation,
+            isDark: isDark,
+            isDestructive: true,
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _showDeleteAccountConfirmation() async {
+    final passwordController = TextEditingController();
+    var eraseLocalData = true;
+    var eraseRemoteData = false;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Delete Account'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'This permanently deactivates your Matrix account. If your homeserver requires password verification, you can provide it now or enter it after confirmation.',
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  hintText: 'Password (optional)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              CheckboxListTile(
+                value: eraseLocalData,
+                onChanged: (value) {
+                  setDialogState(() {
+                    eraseLocalData = value ?? true;
+                  });
+                },
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Also erase local chat data on this device'),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+              CheckboxListTile(
+                value: eraseRemoteData,
+                onChanged: (value) {
+                  setDialogState(() {
+                    eraseRemoteData = value ?? false;
+                  });
+                },
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Request homeserver data erasure'),
+                subtitle: const Text(
+                  'If supported, the server will purge account data after deactivation.',
+                ),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, false);
+              },
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, true);
+              },
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              child: Text(S.of(context)?.commonDelete ?? 'Delete'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed != true) {
+      passwordController.dispose();
+      return;
+    }
+
+    final password = passwordController.text.trim();
+    passwordController.dispose();
+
+    await _deactivateAccount(
+      password: password.isEmpty ? null : password,
+      eraseLocalData: eraseLocalData,
+      eraseRemoteData: eraseRemoteData,
+    );
+  }
+
+  Future<void> _deactivateAccount({
+    String? password,
+    required bool eraseLocalData,
+    required bool eraseRemoteData,
+  }) async {
+    setState(() => _isLoading = true);
+    try {
+      final authDataSource = MatrixAuthDataSource();
+      try {
+        await authDataSource.deactivateAccount(
+          password: password,
+          erase: eraseRemoteData,
+        );
+      } on MatrixException catch (e) {
+        if (password == null &&
+            e.response?.statusCode == 401 &&
+            matrixUiaSupportsPassword(e.response?.body)) {
+          if (mounted) {
+            setState(() => _isLoading = false);
+            await _showDeactivatePasswordDialog(
+              eraseLocalData: eraseLocalData,
+              eraseRemoteData: eraseRemoteData,
+            );
+          }
+          return;
+        }
+        rethrow;
+      }
+
+      try {
+        await N42Chat.logout();
+      } catch (_) {
+        // 账号已失效时继续清理本地状态即可。
+      }
+
+      if (eraseLocalData) {
+        await N42Chat.purgeLocalData();
+      }
+
+      if (!mounted) {
+        return;
+      }
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Delete account failed: $e')));
+      }
+      return;
+    }
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _showDeactivatePasswordDialog({
+    required bool eraseLocalData,
+    required bool eraseRemoteData,
+  }) async {
+    final passwordController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.settingsVerifyIdentity ?? 'Verify identity'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              S.of(context)?.settingsEnterPasswordToConfirm ??
+                  'Enter your password to confirm this action.',
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: S.of(context)?.settingsPassword ?? 'Password',
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
+          ),
+        ],
+      ),
+    );
+
+    final password = passwordController.text.trim();
+    passwordController.dispose();
+
+    if (confirmed == true && password.isNotEmpty) {
+      await _deactivateAccount(
+        password: password,
+        eraseLocalData: eraseLocalData,
+        eraseRemoteData: eraseRemoteData,
+      );
+    }
   }
 
   Widget _buildListItem({
@@ -1625,7 +1833,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       try {
         await authDataSource.deleteDevice(device.deviceId);
       } on MatrixException catch (e) {
-        if (e.response?.statusCode == 401) {
+        if (e.response?.statusCode == 401 &&
+            matrixUiaSupportsPassword(e.response?.body)) {
           // UIA required - show password dialog
           if (mounted) {
             setState(() => _isLoading = false);

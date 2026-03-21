@@ -6,6 +6,8 @@ import '../../../domain/entities/channel_entity.dart';
 import '../../../domain/entities/content_filter_entity.dart';
 import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/utils/matrix_utils.dart';
+import '../../../core/utils/room_metadata_utils.dart';
 
 /// Matrix群聊数据源
 ///
@@ -16,6 +18,7 @@ class MatrixGroupDataSource {
   static const String _channelMetaEventType = 'n42.room.channel_meta';
   static const String _channelsEventType = 'n42.room.channels';
   static const String _roomSettingsEventType = 'n42.room.settings';
+  static const String _announcementEventType = 'n42.room.announcement';
   static const String _contentFilterEventType = 'n42.room.content_filter';
   static const String _botConfigEventType = 'n42.room.bot_config';
   static const String _tokenGateEventType = 'n42.token_gate';
@@ -117,14 +120,17 @@ class MatrixGroupDataSource {
       preset: isPublic
           ? matrix.CreateRoomPreset.publicChat
           : matrix.CreateRoomPreset.privateChat,
-      visibility: isPublic ? matrix.Visibility.public : matrix.Visibility.private,
+      visibility: isPublic
+          ? matrix.Visibility.public
+          : matrix.Visibility.private,
       initialState: enableEncryption
           ? [
               matrix.StateEvent(
                 type: matrix.EventTypes.Encryption,
                 stateKey: '',
                 content: {
-                  'algorithm': matrix.Client.supportedGroupEncryptionAlgorithms.first,
+                  'algorithm':
+                      matrix.Client.supportedGroupEncryptionAlgorithms.first,
                 },
               ),
             ]
@@ -155,9 +161,11 @@ class MatrixGroupDataSource {
   /// 获取所有群聊
   List<matrix.Room> getAllGroups() {
     return _client?.rooms
-            .where((room) =>
-                !room.isDirectChat &&
-                room.membership == matrix.Membership.join)
+            .where(
+              (room) =>
+                  !room.isDirectChat &&
+                  room.membership == matrix.Membership.join,
+            )
             .toList() ??
         [];
   }
@@ -179,7 +187,9 @@ class MatrixGroupDataSource {
     final canChange = room.canSendEvent('m.room.name');
     final userId = _client?.userID;
     final powerLevel = userId != null ? room.getPowerLevelByUserId(userId) : 0;
-    debugLog('setGroupName: roomId=$roomId, name=$name, canSendEvent=$canChange, powerLevel=$powerLevel');
+    debugLog(
+      'setGroupName: roomId=$roomId, name=$name, canSendEvent=$canChange, powerLevel=$powerLevel',
+    );
 
     if (!canChange && powerLevel < 50) {
       throw Exception('You do not have permission to change the group name');
@@ -192,7 +202,9 @@ class MatrixGroupDataSource {
       debugLog('setGroupName error: $e');
       // 如果是权限错误，提供更友好的消息
       final errorStr = e.toString().toLowerCase();
-      if (errorStr.contains('forbidden') || errorStr.contains('permission') || errorStr.contains('403')) {
+      if (errorStr.contains('forbidden') ||
+          errorStr.contains('permission') ||
+          errorStr.contains('403')) {
         throw Exception('You do not have permission to change the group name');
       }
       rethrow;
@@ -216,33 +228,10 @@ class MatrixGroupDataSource {
     await room.setDescription(topic);
   }
 
-  /// 获取群头像URL（手动构建 HTTP URL）
+  /// 获取群头像URL
   String? getGroupAvatarUrl(String roomId, {int size = 96}) {
     final room = _client?.getRoomById(roomId);
-    final avatarMxc = room?.avatar?.toString();
-    return _buildAvatarHttpUrl(avatarMxc, size);
-  }
-  
-  /// 构建头像 HTTP URL（不再在 URL 中添加 access_token，改用请求头认证）
-  String? _buildAvatarHttpUrl(String? mxcUrl, int size) {
-    if (mxcUrl == null || mxcUrl.isEmpty || _client == null) return null;
-    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-    
-    try {
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-      
-      if (serverName.isEmpty || mediaId.isEmpty) return null;
-      
-      final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) return null;
-      
-      // 使用认证媒体 API (Matrix 1.11+)
-      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=$size&height=$size&method=crop';
-    } catch (e) {
-      return null;
-    }
+    return MatrixUtils.getAvatarUrl(room?.avatar, client: _client, size: size);
   }
 
   /// 设置群头像
@@ -320,7 +309,11 @@ class MatrixGroupDataSource {
   }
 
   /// 踢出成员
-  Future<void> kickMember(String roomId, String userId, {String? reason}) async {
+  Future<void> kickMember(
+    String roomId,
+    String userId, {
+    String? reason,
+  }) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) return;
     await room.kick(userId);
@@ -347,7 +340,11 @@ class MatrixGroupDataSource {
   }
 
   /// 设置用户权限级别
-  Future<void> setUserPowerLevel(String roomId, String userId, int powerLevel) async {
+  Future<void> setUserPowerLevel(
+    String roomId,
+    String userId,
+    int powerLevel,
+  ) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) return;
     await room.setPower(userId, powerLevel);
@@ -384,7 +381,9 @@ class MatrixGroupDataSource {
 
     // 检查是否可以发送 m.room.name 状态事件
     final canSendNameEvent = room.canSendEvent('m.room.name');
-    debugLog('canChangeSettings: roomId=$roomId, canSendEvent(m.room.name)=$canSendNameEvent');
+    debugLog(
+      'canChangeSettings: roomId=$roomId, canSendEvent(m.room.name)=$canSendNameEvent',
+    );
 
     // 如果 SDK 说可以，直接返回 true
     if (canSendNameEvent) return true;
@@ -479,9 +478,11 @@ class MatrixGroupDataSource {
   /// 获取邀请的群
   List<matrix.Room> getPendingGroupInvites() {
     return _client?.rooms
-            .where((room) =>
-                !room.isDirectChat &&
-                room.membership == matrix.Membership.invite)
+            .where(
+              (room) =>
+                  !room.isDirectChat &&
+                  room.membership == matrix.Membership.invite,
+            )
             .toList() ??
         [];
   }
@@ -504,12 +505,45 @@ class MatrixGroupDataSource {
 
   /// 获取群公告（使用 topic 作为公告）
   String? getGroupAnnouncement(String roomId) {
+    final room = _client?.getRoomById(roomId);
+    final state = room?.getState(_announcementEventType);
+    if (state != null) {
+      final text = state.content['text'];
+      if (text is String) {
+        final trimmed = text.trim();
+        return trimmed.isEmpty ? null : trimmed;
+      }
+      return null;
+    }
     return getGroupTopic(roomId);
   }
 
   /// 设置群公告
   Future<void> setGroupAnnouncement(String roomId, String announcement) async {
-    await setGroupTopic(roomId, announcement);
+    final room = _getRequiredRoom(roomId);
+    _ensureCanSendStateEvent(
+      room,
+      _announcementEventType,
+      action: 'change the group announcement',
+    );
+    await room.client.setRoomStateWithKey(
+      roomId,
+      _announcementEventType,
+      '',
+      announcement.trim().isEmpty
+          ? <String, Object?>{}
+          : {'text': announcement.trim()},
+    );
+  }
+
+  /// 获取房间/频道的分享链接
+  String getGroupInviteLink(String roomId) {
+    final room = _getRequiredRoom(roomId);
+    return buildMatrixToRoomLink(
+      roomId: room.id,
+      canonicalAlias: room.canonicalAlias,
+      via: extractViaServer(room.id),
+    );
   }
 
   // ============================================
@@ -552,12 +586,9 @@ class MatrixGroupDataSource {
     final newPinned = [...currentPinned, eventId];
 
     // 发送状态事件
-    await room.client.setRoomStateWithKey(
-      roomId,
-      'm.room.pinned_events',
-      '',
-      {'pinned': newPinned},
-    );
+    await room.client.setRoomStateWithKey(roomId, 'm.room.pinned_events', '', {
+      'pinned': newPinned,
+    });
   }
 
   /// 取消置顶消息
@@ -579,12 +610,9 @@ class MatrixGroupDataSource {
     final newPinned = currentPinned.where((id) => id != eventId).toList();
 
     // 发送状态事件
-    await room.client.setRoomStateWithKey(
-      roomId,
-      'm.room.pinned_events',
-      '',
-      {'pinned': newPinned},
-    );
+    await room.client.setRoomStateWithKey(roomId, 'm.room.pinned_events', '', {
+      'pinned': newPinned,
+    });
   }
 
   /// 设置置顶消息列表（替换现有的全部置顶）
@@ -595,12 +623,9 @@ class MatrixGroupDataSource {
     }
 
     // 发送状态事件
-    await room.client.setRoomStateWithKey(
-      roomId,
-      'm.room.pinned_events',
-      '',
-      {'pinned': eventIds},
-    );
+    await room.client.setRoomStateWithKey(roomId, 'm.room.pinned_events', '', {
+      'pinned': eventIds,
+    });
   }
 
   /// 检查当前用户是否可以置顶消息
@@ -640,7 +665,12 @@ class MatrixGroupDataSource {
     } else {
       current['max_members'] = maxMembers;
     }
-    await room.client.setRoomStateWithKey(roomId, _roomSettingsEventType, '', current);
+    await room.client.setRoomStateWithKey(
+      roomId,
+      _roomSettingsEventType,
+      '',
+      current,
+    );
   }
 
   // ============================================
@@ -661,7 +691,10 @@ class MatrixGroupDataSource {
   }
 
   /// 设置关键词过滤配置
-  Future<void> setContentFilter(String roomId, ContentFilterConfig config) async {
+  Future<void> setContentFilter(
+    String roomId,
+    ContentFilterConfig config,
+  ) async {
     final room = _getRequiredRoom(roomId);
     _ensureCanSendStateEvent(
       room,
@@ -692,6 +725,7 @@ class MatrixGroupDataSource {
         parentRoomId: parentRoomId,
         name: e['name'] as String? ?? '',
         topic: e['topic'] as String?,
+        category: normalizeChannelCategory(e['category'] as String?),
         order: e['order'] as int? ?? 0,
         unreadCount: channelRoom?.notificationCount ?? 0,
       );
@@ -705,6 +739,7 @@ class MatrixGroupDataSource {
     String parentRoomId, {
     required String name,
     String? topic,
+    String? category,
   }) async {
     if (_client == null) throw Exception('Matrix client not initialized');
     final parentRoom = _getRequiredRoom(parentRoomId);
@@ -761,15 +796,13 @@ class MatrixGroupDataSource {
         'room_id': channelRoomId,
         'name': name,
         'topic': topic,
+        'category': normalizeChannelCategory(category),
         'order': existing.length,
       },
     ];
-    await _client!.setRoomStateWithKey(
-      parentRoomId,
-      _channelsEventType,
-      '',
-      {'channels': updated},
-    );
+    await _client!.setRoomStateWithKey(parentRoomId, _channelsEventType, '', {
+      'channels': updated,
+    });
     return channelRoomId;
   }
 
@@ -779,6 +812,7 @@ class MatrixGroupDataSource {
     String channelRoomId, {
     String? name,
     String? topic,
+    String? category,
   }) async {
     if (_client == null) throw Exception('Matrix client not initialized');
     final parentRoom = _getRequiredRoom(parentRoomId);
@@ -788,7 +822,9 @@ class MatrixGroupDataSource {
       action: 'manage channels',
     );
     final existing = getChannels(parentRoomId);
-    final targetChannel = existing.where((c) => c.roomId == channelRoomId).firstOrNull;
+    final targetChannel = existing
+        .where((c) => c.roomId == channelRoomId)
+        .firstOrNull;
     if (targetChannel == null) {
       throw Exception('Channel not found: $channelRoomId');
     }
@@ -801,15 +837,13 @@ class MatrixGroupDataSource {
         if (topic != null) {
           channelData['topic'] = topic;
         }
+        channelData['category'] = normalizeChannelCategory(category);
       }
       return channelData;
     }).toList();
-    await _client!.setRoomStateWithKey(
-      parentRoomId,
-      _channelsEventType,
-      '',
-      {'channels': updated},
-    );
+    await _client!.setRoomStateWithKey(parentRoomId, _channelsEventType, '', {
+      'channels': updated,
+    });
 
     final channelRoom = _getRequiredRoom(channelRoomId);
     if (name != null && name.isNotEmpty && name != targetChannel.name) {
@@ -851,12 +885,9 @@ class MatrixGroupDataSource {
     for (var i = 0; i < updated.length; i++) {
       updated[i]['order'] = i;
     }
-    await _client!.setRoomStateWithKey(
-      parentRoomId,
-      _channelsEventType,
-      '',
-      {'channels': updated},
-    );
+    await _client!.setRoomStateWithKey(parentRoomId, _channelsEventType, '', {
+      'channels': updated,
+    });
     // 将频道房间标记为离开（非强制）
     try {
       await _client!.leaveRoom(channelRoomId);
@@ -864,11 +895,12 @@ class MatrixGroupDataSource {
   }
 
   Map<String, dynamic> _channelToMap(ChannelEntity c) => {
-        'room_id': c.roomId,
-        'name': c.name,
-        'topic': c.topic,
-        'order': c.order,
-      };
+    'room_id': c.roomId,
+    'name': c.name,
+    'topic': c.topic,
+    'category': normalizeChannelCategory(c.category),
+    'order': c.order,
+  };
 
   // ============================================
   // Bot 配置
@@ -922,7 +954,10 @@ class MatrixGroupDataSource {
   }
 
   /// 设置代币门控配置
-  Future<void> setTokenGateConfig(String roomId, Map<String, dynamic> config) async {
+  Future<void> setTokenGateConfig(
+    String roomId,
+    Map<String, dynamic> config,
+  ) async {
     final room = _getRequiredRoom(roomId);
     _ensureCanSendStateEvent(
       room,
@@ -930,12 +965,7 @@ class MatrixGroupDataSource {
       action: 'change the token gate',
     );
 
-    await _client!.setRoomStateWithKey(
-      roomId,
-      _tokenGateEventType,
-      '',
-      config,
-    );
+    await _client!.setRoomStateWithKey(roomId, _tokenGateEventType, '', config);
   }
 
   // ============================================
@@ -955,25 +985,25 @@ class MatrixGroupDataSource {
     return client.onSync.stream
         .where((sync) => sync.rooms?.join?.containsKey(roomId) == true)
         .expand((sync) {
-      final joinRoom = sync.rooms?.join?[roomId];
-      if (joinRoom == null) return <String>[];
-      final timeline = joinRoom.timeline?.events ?? [];
-      final joinEvents = <String>[];
-      for (final event in timeline) {
-        if (event.type == 'm.room.member' &&
-            event.content['membership'] == 'join') {
-          // 检查是否是新加入（之前不是 join 状态）
-          final prevMembership = event.prevContent?['membership'];
-          if (prevMembership != 'join') {
-            final joinedUserId = event.stateKey;
-            if (joinedUserId != null && joinedUserId != client.userID) {
-              joinEvents.add(joinedUserId);
+          final joinRoom = sync.rooms?.join?[roomId];
+          if (joinRoom == null) return <String>[];
+          final timeline = joinRoom.timeline?.events ?? [];
+          final joinEvents = <String>[];
+          for (final event in timeline) {
+            if (event.type == 'm.room.member' &&
+                event.content['membership'] == 'join') {
+              // 检查是否是新加入（之前不是 join 状态）
+              final prevMembership = event.prevContent?['membership'];
+              if (prevMembership != 'join') {
+                final joinedUserId = event.stateKey;
+                if (joinedUserId != null && joinedUserId != client.userID) {
+                  joinEvents.add(joinedUserId);
+                }
+              }
             }
           }
-        }
-      }
-      return joinEvents;
-    });
+          return joinEvents;
+        });
   }
 
   /// 发送 notice 消息（Bot 消息）

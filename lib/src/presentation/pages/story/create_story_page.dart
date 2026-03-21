@@ -10,6 +10,7 @@ import '../../../domain/entities/story_entity.dart';
 import '../../blocs/story/story_bloc.dart';
 import '../../blocs/story/story_event.dart';
 import '../../blocs/story/story_state.dart';
+import '../media/social_image_preparation.dart';
 import '../../widgets/story/story_music_picker.dart';
 
 /// Story creation mode
@@ -32,6 +33,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
   // Selected image data
   Uint8List? _imageBytes;
   String? _imageName;
+  String? _imageMimeType;
 
   // Color options for text story background
   static const List<_ColorOption> _colorOptions = [
@@ -523,10 +525,14 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
       );
 
       if (image != null) {
-        final bytes = await image.readAsBytes();
+        if (!mounted) return;
+        final prepared = await prepareSocialImage(context, image: image);
+        if (prepared == null || !mounted) return;
+
         setState(() {
-          _imageBytes = bytes;
-          _imageName = image.name;
+          _imageBytes = prepared.bytes;
+          _imageName = prepared.filename;
+          _imageMimeType = prepared.mimeType;
         });
       }
     } catch (e) {
@@ -549,7 +555,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           type: StoryMediaType.image,
           bytes: _imageBytes!,
           filename: _imageName!,
-          mimeType: _getMimeType(_imageName!),
+          mimeType: _imageMimeType ?? 'image/jpeg',
         ),
       );
     }
@@ -570,14 +576,6 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
             : null,
       ),
     );
-  }
-
-  String _getMimeType(String filename) {
-    final lower = filename.toLowerCase();
-    if (lower.endsWith('.png')) return 'image/png';
-    if (lower.endsWith('.webp')) return 'image/webp';
-    if (lower.endsWith('.gif')) return 'image/gif';
-    return 'image/jpeg';
   }
 
   Widget _buildMusicBar() {

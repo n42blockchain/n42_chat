@@ -18,7 +18,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     try {
       // 查找消息
-      final messageIndex = state.messages.indexWhere((m) => m.id == event.messageId);
+      final messageIndex = state.messages.indexWhere(
+        (m) => m.id == event.messageId,
+      );
       if (messageIndex == -1) return;
 
       final message = state.messages[messageIndex];
@@ -40,13 +42,17 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
       // 更新消息状态
       final updatedMessages = List<MessageEntity>.from(state.messages);
-      updatedMessages[messageIndex] = message.copyWith(destroyedAt: destroyedAt);
+      updatedMessages[messageIndex] = message.copyWith(
+        destroyedAt: destroyedAt,
+      );
 
       if (!isClosed) {
         emit(state.copyWith(messages: updatedMessages));
       }
 
-      debugLog('ChatBloc: Started destruction countdown for message ${event.messageId}, will destroy at $destroyedAt');
+      debugLog(
+        'ChatBloc: Started destruction countdown for message ${event.messageId}, will destroy at $destroyedAt',
+      );
     } catch (e) {
       debugLog('ChatBloc: Failed to start message destruction: $e');
     }
@@ -73,7 +79,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     if (expiredMessageIds.isEmpty) return;
 
-    debugLog('ChatBloc: Destroying ${expiredMessageIds.length} expired messages');
+    debugLog(
+      'ChatBloc: Destroying ${expiredMessageIds.length} expired messages',
+    );
 
     // 从本地列表中移除
     _locallyDeletedMessageIds.addAll(expiredMessageIds);
@@ -110,14 +118,18 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     UpdateDestructionCountdown event,
     Emitter<ChatState> emit,
   ) {
-    final messageIndex = state.messages.indexWhere((m) => m.id == event.messageId);
+    final messageIndex = state.messages.indexWhere(
+      (m) => m.id == event.messageId,
+    );
     if (messageIndex == -1) return;
 
     final message = state.messages[messageIndex];
     if (!message.isSelfDestructing) return;
 
     final updatedMessages = List<MessageEntity>.from(state.messages);
-    updatedMessages[messageIndex] = message.copyWith(destroyedAt: event.destroyedAt);
+    updatedMessages[messageIndex] = message.copyWith(
+      destroyedAt: event.destroyedAt,
+    );
 
     if (!isClosed) {
       emit(state.copyWith(messages: updatedMessages));
@@ -136,6 +148,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     if (_currentRoomId == null || event.text.trim().isEmpty) return;
 
     try {
+      final selfDestructAfter = await _resolveSelfDestructAfter(
+        event.selfDestructAfter,
+      );
       // 生成临时消息ID
       final tempId = 'scheduled_${DateTime.now().millisecondsSinceEpoch}';
 
@@ -148,7 +163,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         messageId: tempId,
         text: event.text,
         scheduledAt: event.scheduledAt,
-        selfDestructAfter: event.selfDestructAfter,
+        selfDestructAfter: selfDestructAfter,
         mentionedUserIds: event.mentionedUserIds,
         mentionsRoom: event.mentionsRoom,
       );
@@ -165,7 +180,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         status: MessageStatus.sending,
         isFromMe: true,
         scheduledAt: event.scheduledAt,
-        selfDestructAfter: event.selfDestructAfter,
+        selfDestructAfter: selfDestructAfter,
         mentionedUserIds: event.mentionedUserIds ?? [],
         mentionsRoom: event.mentionsRoom,
       );
@@ -175,7 +190,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         emit(state.copyWith(messages: [tempMessage, ...state.messages]));
       }
 
-      debugLog('ChatBloc: Scheduled message saved - $tempId for ${event.scheduledAt}');
+      debugLog(
+        'ChatBloc: Scheduled message saved - $tempId for ${event.scheduledAt}',
+      );
     } catch (e) {
       debugLog('ChatBloc: Failed to schedule message: $e');
       if (!isClosed) {
@@ -193,7 +210,10 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     try {
       // 从存储中删除
-      await _secureStorage.removeScheduledMessage(_currentRoomId!, event.messageId);
+      await _secureStorage.removeScheduledMessage(
+        _currentRoomId!,
+        event.messageId,
+      );
 
       // 从UI中移除
       final updatedMessages = state.messages
@@ -227,7 +247,8 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         final messageId = msg['messageId'] as String;
         final text = msg['text'] as String;
         final selfDestructAfter = msg['selfDestructAfter'] as int?;
-        final mentionedUserIds = (msg['mentionedUserIds'] as List<dynamic>?)?.cast<String>();
+        final mentionedUserIds = (msg['mentionedUserIds'] as List<dynamic>?)
+            ?.cast<String>();
         final mentionsRoom = msg['mentionsRoom'] as bool? ?? false;
 
         try {
@@ -274,16 +295,21 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     try {
       // 查找消息
-      final messageIndex = state.messages.indexWhere((m) => m.id == event.messageId);
+      final messageIndex = state.messages.indexWhere(
+        (m) => m.id == event.messageId,
+      );
       if (messageIndex == -1) {
-        debugLog('ChatBloc: Message not found for transcription: ${event.messageId}');
+        debugLog(
+          'ChatBloc: Message not found for transcription: ${event.messageId}',
+        );
         return;
       }
 
       final message = state.messages[messageIndex];
 
       // 检查是否是语音消息
-      if (message.type != MessageType.voice && message.type != MessageType.audio) {
+      if (message.type != MessageType.voice &&
+          message.type != MessageType.audio) {
         debugLog('ChatBloc: Message is not a voice message: ${message.type}');
         return;
       }
@@ -297,9 +323,10 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       // 更新状态为正在转录
       final updatedMessages = List<MessageEntity>.from(state.messages);
       updatedMessages[messageIndex] = message.copyWith(
-        metadata: (message.metadata ?? const MessageMetadata()).copyWithTranscription(
-          transcriptionStatus: TranscriptionStatus.transcribing,
-        ),
+        metadata: (message.metadata ?? const MessageMetadata())
+            .copyWithTranscription(
+              transcriptionStatus: TranscriptionStatus.transcribing,
+            ),
       );
 
       if (!isClosed) {
@@ -316,7 +343,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           if (bytes != null) {
             // 保存到临时文件
             final tempDir = Directory.systemTemp;
-            final tempFile = File('${tempDir.path}/voice_${event.messageId}.m4a');
+            final tempFile = File(
+              '${tempDir.path}/voice_${event.messageId}.m4a',
+            );
             await tempFile.writeAsBytes(bytes);
             audioPath = tempFile.path;
           }
@@ -327,10 +356,12 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
       if (audioPath == null) {
         debugLog('ChatBloc: No audio path available for transcription');
-        add(VoiceTranscriptionCompleted(
-          messageId: event.messageId,
-          success: false,
-        ));
+        add(
+          VoiceTranscriptionCompleted(
+            messageId: event.messageId,
+            success: false,
+          ),
+        );
         return;
       }
 
@@ -338,10 +369,12 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       final speechService = SpeechToTextService();
       if (!speechService.isConfigured) {
         debugLog('ChatBloc: Speech-to-text service not configured');
-        add(VoiceTranscriptionCompleted(
-          messageId: event.messageId,
-          success: false,
-        ));
+        add(
+          VoiceTranscriptionCompleted(
+            messageId: event.messageId,
+            success: false,
+          ),
+        );
         return;
       }
 
@@ -351,18 +384,18 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       );
 
       // 发送完成事件
-      add(VoiceTranscriptionCompleted(
-        messageId: event.messageId,
-        transcription: transcription,
-        success: transcription != null,
-      ));
-
+      add(
+        VoiceTranscriptionCompleted(
+          messageId: event.messageId,
+          transcription: transcription,
+          success: transcription != null,
+        ),
+      );
     } catch (e) {
       debugLog('ChatBloc: Failed to transcribe voice message: $e');
-      add(VoiceTranscriptionCompleted(
-        messageId: event.messageId,
-        success: false,
-      ));
+      add(
+        VoiceTranscriptionCompleted(messageId: event.messageId, success: false),
+      );
     }
   }
 
@@ -371,19 +404,22 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     VoiceTranscriptionCompleted event,
     Emitter<ChatState> emit,
   ) {
-    final messageIndex = state.messages.indexWhere((m) => m.id == event.messageId);
+    final messageIndex = state.messages.indexWhere(
+      (m) => m.id == event.messageId,
+    );
     if (messageIndex == -1) return;
 
     final message = state.messages[messageIndex];
     final updatedMessages = List<MessageEntity>.from(state.messages);
 
     updatedMessages[messageIndex] = message.copyWith(
-      metadata: (message.metadata ?? const MessageMetadata()).copyWithTranscription(
-        transcription: event.transcription,
-        transcriptionStatus: event.success
-            ? TranscriptionStatus.success
-            : TranscriptionStatus.failed,
-      ),
+      metadata: (message.metadata ?? const MessageMetadata())
+          .copyWithTranscription(
+            transcription: event.transcription,
+            transcriptionStatus: event.success
+                ? TranscriptionStatus.success
+                : TranscriptionStatus.failed,
+          ),
     );
 
     if (!isClosed) {
@@ -391,9 +427,13 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     }
 
     if (event.success) {
-      debugLog('ChatBloc: Voice transcription completed: ${event.transcription}');
+      debugLog(
+        'ChatBloc: Voice transcription completed: ${event.transcription}',
+      );
     } else {
-      debugLog('ChatBloc: Voice transcription failed for message ${event.messageId}');
+      debugLog(
+        'ChatBloc: Voice transcription failed for message ${event.messageId}',
+      );
     }
   }
 
@@ -409,7 +449,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     if (_currentRoomId == null || _groupRepository == null) return;
 
     try {
-      final pinnedEventIds = await _groupRepository.getPinnedEventIds(_currentRoomId!);
+      final pinnedEventIds = await _groupRepository.getPinnedEventIds(
+        _currentRoomId!,
+      );
       final canPin = _groupRepository.canPinMessages(_currentRoomId!);
 
       // 从当前消息列表中查找置顶消息（优先内存缓存，fallback 远程拉取）
@@ -422,29 +464,33 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           continue;
         }
         // 慢速路径：从服务器/本地 DB 获取（历史置顶消息尚未分页到内存）
-        final fetched = await _groupRepository.getMessageById(_currentRoomId!, eventId);
+        final fetched = await _groupRepository.getMessageById(
+          _currentRoomId!,
+          eventId,
+        );
         if (fetched != null) {
           pinnedMessages.add(fetched);
         }
       }
 
-      emit(state.copyWith(
-        pinnedMessages: pinnedMessages,
-        canPinMessages: canPin,
-        currentPinnedIndex: 0,
-      ));
+      emit(
+        state.copyWith(
+          pinnedMessages: pinnedMessages,
+          canPinMessages: canPin,
+          currentPinnedIndex: 0,
+        ),
+      );
 
-      debugLog('ChatBloc: Loaded ${pinnedMessages.length} pinned messages, canPin=$canPin');
+      debugLog(
+        'ChatBloc: Loaded ${pinnedMessages.length} pinned messages, canPin=$canPin',
+      );
     } catch (e) {
       debugLog('ChatBloc: Failed to load pinned messages: $e');
     }
   }
 
   /// 置顶消息
-  Future<void> onPinMessage(
-    PinMessage event,
-    Emitter<ChatState> emit,
-  ) async {
+  Future<void> onPinMessage(PinMessage event, Emitter<ChatState> emit) async {
     if (_currentRoomId == null || _groupRepository == null) return;
 
     try {
@@ -505,17 +551,21 @@ extension ChatBlocFeatureHandlers on ChatBloc {
   ) async {
     if (_translationService == null) {
       debugLog('ChatBloc: Translation service not available');
-      add(TranslationCompleted(
-        messageId: event.messageId,
-        success: false,
-        error: 'Translation service not configured',
-      ));
+      add(
+        TranslationCompleted(
+          messageId: event.messageId,
+          success: false,
+          error: 'Translation service not configured',
+        ),
+      );
       return;
     }
 
     // 检查是否已经在翻译中
     if (state.isTranslating(event.messageId)) {
-      debugLog('ChatBloc: Message ${event.messageId} is already being translated');
+      debugLog(
+        'ChatBloc: Message ${event.messageId} is already being translated',
+      );
       return;
     }
 
@@ -553,27 +603,33 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     emit(state.copyWith(translatingMessageIds: newTranslatingIds));
 
     try {
-      debugLog('ChatBloc: Translating message ${event.messageId} to ${event.targetLanguage}');
+      debugLog(
+        'ChatBloc: Translating message ${event.messageId} to ${event.targetLanguage}',
+      );
 
       final result = await _translationService.translate(
         text: message.content,
         targetLanguage: event.targetLanguage,
       );
 
-      add(TranslationCompleted(
-        messageId: event.messageId,
-        translatedText: result.translatedText,
-        detectedSourceLanguage: result.detectedSourceLanguage,
-        success: result.success,
-        error: result.error,
-      ));
+      add(
+        TranslationCompleted(
+          messageId: event.messageId,
+          translatedText: result.translatedText,
+          detectedSourceLanguage: result.detectedSourceLanguage,
+          success: result.success,
+          error: result.error,
+        ),
+      );
     } catch (e) {
       debugLog('ChatBloc: Translation error: $e');
-      add(TranslationCompleted(
-        messageId: event.messageId,
-        success: false,
-        error: e.toString(),
-      ));
+      add(
+        TranslationCompleted(
+          messageId: event.messageId,
+          success: false,
+          error: e.toString(),
+        ),
+      );
     }
   }
 
@@ -588,47 +644,59 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     if (event.success && event.translatedText != null) {
       // 保存翻译结果
-      final newTranslatedMessages = Map<String, String>.from(state.translatedMessages)
-        ..[event.messageId] = event.translatedText!;
+      final newTranslatedMessages = Map<String, String>.from(
+        state.translatedMessages,
+      )..[event.messageId] = event.translatedText!;
 
       // 保存检测到的源语言
-      final newDetectedLanguages = Map<String, String>.from(state.detectedSourceLanguages);
+      final newDetectedLanguages = Map<String, String>.from(
+        state.detectedSourceLanguages,
+      );
       if (event.detectedSourceLanguage != null) {
         newDetectedLanguages[event.messageId] = event.detectedSourceLanguage!;
       }
 
-      emit(state.copyWith(
-        translatingMessageIds: newTranslatingIds,
-        translatedMessages: newTranslatedMessages,
-        detectedSourceLanguages: newDetectedLanguages,
-      ));
+      emit(
+        state.copyWith(
+          translatingMessageIds: newTranslatingIds,
+          translatedMessages: newTranslatedMessages,
+          detectedSourceLanguages: newDetectedLanguages,
+        ),
+      );
 
-      debugLog('ChatBloc: Translation completed for message ${event.messageId}');
+      debugLog(
+        'ChatBloc: Translation completed for message ${event.messageId}',
+      );
     } else {
       // 翻译失败
-      emit(state.copyWith(
-        translatingMessageIds: newTranslatingIds,
-        error: event.error ?? 'Translation failed',
-      ));
+      emit(
+        state.copyWith(
+          translatingMessageIds: newTranslatingIds,
+          error: event.error ?? 'Translation failed',
+        ),
+      );
 
-      debugLog('ChatBloc: Translation failed for message ${event.messageId}: ${event.error}');
+      debugLog(
+        'ChatBloc: Translation failed for message ${event.messageId}: ${event.error}',
+      );
     }
   }
 
   /// 清除消息翻译
-  void onClearTranslation(
-    ClearTranslation event,
-    Emitter<ChatState> emit,
-  ) {
-    final newTranslatedMessages = Map<String, String>.from(state.translatedMessages)
-      ..remove(event.messageId);
-    final newDetectedLanguages = Map<String, String>.from(state.detectedSourceLanguages)
-      ..remove(event.messageId);
+  void onClearTranslation(ClearTranslation event, Emitter<ChatState> emit) {
+    final newTranslatedMessages = Map<String, String>.from(
+      state.translatedMessages,
+    )..remove(event.messageId);
+    final newDetectedLanguages = Map<String, String>.from(
+      state.detectedSourceLanguages,
+    )..remove(event.messageId);
 
-    emit(state.copyWith(
-      translatedMessages: newTranslatedMessages,
-      detectedSourceLanguages: newDetectedLanguages,
-    ));
+    emit(
+      state.copyWith(
+        translatedMessages: newTranslatedMessages,
+        detectedSourceLanguages: newDetectedLanguages,
+      ),
+    );
 
     debugLog('ChatBloc: Cleared translation for message ${event.messageId}');
   }
@@ -641,13 +709,16 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     final newAutoTranslate = event.autoTranslate ?? state.autoTranslate;
     final newTargetLang =
         event.defaultTargetLanguage ?? state.defaultTargetLanguage;
-    final newSmartReply = event.smartReplyTranslate ?? state.smartReplyTranslate;
+    final newSmartReply =
+        event.smartReplyTranslate ?? state.smartReplyTranslate;
 
-    emit(state.copyWith(
-      autoTranslate: newAutoTranslate,
-      defaultTargetLanguage: newTargetLang,
-      smartReplyTranslate: newSmartReply,
-    ));
+    emit(
+      state.copyWith(
+        autoTranslate: newAutoTranslate,
+        defaultTargetLanguage: newTargetLang,
+        smartReplyTranslate: newSmartReply,
+      ),
+    );
 
     // 持久化设置
     try {
@@ -676,11 +747,13 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     TranslationSettingsLoaded event,
     Emitter<ChatState> emit,
   ) {
-    emit(state.copyWith(
-      autoTranslate: event.autoTranslate,
-      defaultTargetLanguage: event.defaultTargetLanguage,
-      smartReplyTranslate: event.smartReplyTranslate,
-    ));
+    emit(
+      state.copyWith(
+        autoTranslate: event.autoTranslate,
+        defaultTargetLanguage: event.defaultTargetLanguage,
+        smartReplyTranslate: event.smartReplyTranslate,
+      ),
+    );
 
     if (event.autoTranslate) {
       _autoTranslateMessages(emit);
@@ -698,12 +771,14 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     final targetLang = state.defaultTargetLanguage;
     final messagesToTranslate = state.messages
-        .where((m) =>
-            !m.isFromMe &&
-            m.type == MessageType.text &&
-            m.content.trim().isNotEmpty &&
-            !state.translatedMessages.containsKey(m.id) &&
-            !state.translatingMessageIds.contains(m.id))
+        .where(
+          (m) =>
+              !m.isFromMe &&
+              m.type == MessageType.text &&
+              m.content.trim().isNotEmpty &&
+              !state.translatedMessages.containsKey(m.id) &&
+              !state.translatingMessageIds.contains(m.id),
+        )
         .take(5)
         .toList();
 
@@ -711,10 +786,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       // 检测消息语言，与目标语言相同则跳过
       _translationService.detectLanguage(msg.content).then((detected) {
         if (detected != targetLang && !isClosed) {
-          add(TranslateMessage(
-            messageId: msg.id,
-            targetLanguage: targetLang,
-          ));
+          add(TranslateMessage(messageId: msg.id, targetLanguage: targetLang));
         }
       });
     }
@@ -733,9 +805,14 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     if (_translationService == null) return;
 
     // 找最近一条非自己的文本消息
-    final recipientMsg = state.messages.where(
-      (m) => !m.isFromMe && m.type == MessageType.text && m.content.trim().isNotEmpty,
-    ).firstOrNull;
+    final recipientMsg = state.messages
+        .where(
+          (m) =>
+              !m.isFromMe &&
+              m.type == MessageType.text &&
+              m.content.trim().isNotEmpty,
+        )
+        .firstOrNull;
 
     if (recipientMsg == null) return;
 
@@ -744,14 +821,19 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     final blocEmit = this.emit;
 
     // detectLanguage 基于字符集正则，几乎即时完成
-    _translationService.detectLanguage(recipientMsg.content).then((detected) {
-      if (detected != null && !isClosed && state.detectedRecipientLanguage != detected) {
-        blocEmit(state.copyWith(detectedRecipientLanguage: detected));
-        debugLog('ChatBloc: Detected recipient language: $detected');
-      }
-    }).catchError((Object e) {
-      debugLog('ChatBloc: Failed to detect recipient language: $e');
-    });
+    _translationService
+        .detectLanguage(recipientMsg.content)
+        .then((detected) {
+          if (detected != null &&
+              !isClosed &&
+              state.detectedRecipientLanguage != detected) {
+            blocEmit(state.copyWith(detectedRecipientLanguage: detected));
+            debugLog('ChatBloc: Detected recipient language: $detected');
+          }
+        })
+        .catchError((Object e) {
+          debugLog('ChatBloc: Failed to detect recipient language: $e');
+        });
   }
 
   // ============================================
@@ -768,15 +850,15 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
         final isChannel = group.isChannel;
         // 频道中：如果 membersCanSpeak == false 且当前用户不是管理员，则不能发言
-        final canSend = !isChannel ||
-            group.membersCanSpeak ||
-            group.isAdmin;
+        final canSend = !isChannel || group.membersCanSpeak || group.isAdmin;
 
-        add(RoomInfoLoaded(
-          isChannel: isChannel,
-          canSendMessages: canSend,
-          slowModeInterval: group.slowModeInterval,
-        ));
+        add(
+          RoomInfoLoaded(
+            isChannel: isChannel,
+            canSendMessages: canSend,
+            slowModeInterval: group.slowModeInterval,
+          ),
+        );
       } catch (e) {
         debugLog('ChatBloc: Failed to load room info: $e');
       }
@@ -784,14 +866,13 @@ extension ChatBlocFeatureHandlers on ChatBloc {
   }
 
   /// 处理房间信息加载完成
-  void _onRoomInfoLoaded(
-    RoomInfoLoaded event,
-    Emitter<ChatState> emit,
-  ) {
-    emit(state.copyWith(
-      isChannel: event.isChannel,
-      canSendMessages: event.canSendMessages,
-      slowModeInterval: event.slowModeInterval,
-    ));
+  void _onRoomInfoLoaded(RoomInfoLoaded event, Emitter<ChatState> emit) {
+    emit(
+      state.copyWith(
+        isChannel: event.isChannel,
+        canSendMessages: event.canSendMessages,
+        slowModeInterval: event.slowModeInterval,
+      ),
+    );
   }
 }

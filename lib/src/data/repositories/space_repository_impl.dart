@@ -11,6 +11,9 @@ import '../datasources/matrix/matrix_space_datasource.dart';
 /// 将 MatrixSpaceDataSource 的底层操作转换为业务领域对象。
 /// 维护本地 Space 列表缓存，减少重复网络请求。
 class SpaceRepositoryImpl implements ISpaceRepository {
+  static const int _spaceHierarchyPageSize = 50;
+  static const int _maxHierarchyPages = 50;
+
   final MatrixSpaceDataSource _dataSource;
 
   /// 本地 Space 缓存（以 spaceId 为 key）
@@ -36,8 +39,8 @@ class SpaceRepositoryImpl implements ISpaceRepository {
   @override
   Stream<List<SpaceEntity>> watchJoinedSpaces() {
     return _dataSource.watchJoinedSpaces().map(
-          (rooms) => rooms.map((r) => _dataSource.roomToSpaceEntity(r)).toList(),
-        );
+      (rooms) => rooms.map((r) => _dataSource.roomToSpaceEntity(r)).toList(),
+    );
   }
 
   @override
@@ -69,6 +72,11 @@ class SpaceRepositoryImpl implements ISpaceRepository {
     return getSpaceDetail(spaceId);
   }
 
+  @override
+  Future<String> getSpaceInviteLink(String spaceId) async {
+    return _dataSource.getSpaceInviteLink(spaceId);
+  }
+
   // ============================================
   // Space 生命周期
   // ============================================
@@ -86,6 +94,7 @@ class SpaceRepositoryImpl implements ISpaceRepository {
       description: description,
       isPublic: type == SpaceType.public,
       avatar: avatar,
+      topics: topics,
     );
   }
 
@@ -120,8 +129,7 @@ class SpaceRepositoryImpl implements ISpaceRepository {
   @override
   Future<void> setSpaceDescription(String spaceId, String description) async {
     await _dataSource.setSpaceDescription(spaceId, description);
-    _invalidateCacheEntry(
-        spaceId, (s) => s.copyWith(description: description));
+    _invalidateCacheEntry(spaceId, (s) => s.copyWith(description: description));
   }
 
   @override
@@ -192,7 +200,10 @@ class SpaceRepositoryImpl implements ISpaceRepository {
 
   @override
   Future<void> setMemberPowerLevel(
-      String spaceId, String userId, int powerLevel) async {
+    String spaceId,
+    String userId,
+    int powerLevel,
+  ) async {
     await _dataSource.setMemberPowerLevel(spaceId, userId, powerLevel);
   }
 
@@ -202,18 +213,37 @@ class SpaceRepositoryImpl implements ISpaceRepository {
 
   /// 通过 Space hierarchy API 填充子房间列表
   Future<SpaceEntity> _enrichWithChildren(SpaceEntity base) async {
-    final hierarchy = await _dataSource.getSpaceHierarchy(
-      base.id,
-      maxDepth: 1,
-      limit: 50,
-    );
-    if (hierarchy == null) return base;
+    final childrenByRoomId = <String, SpaceChild>{};
+    String? nextBatch;
 
-    // hierarchy.rooms 的第一个元素是 Space 本身，其余是子房间
-    final childChunks = hierarchy.rooms.skip(1).toList();
-    final children = childChunks
-        .map(_dataSource.hierarchyRoomToChild)
-        .toList()
+    for (var page = 0; page < _maxHierarchyPages; page++) {
+      final hierarchy = await _dataSource.getSpaceHierarchy(
+        base.id,
+        maxDepth: 1,
+        limit: _spaceHierarchyPageSize,
+        from: nextBatch,
+      );
+      if (hierarchy == null) {
+        break;
+      }
+
+      for (final chunk in hierarchy.rooms) {
+        if (chunk.roomId == base.id) {
+          continue;
+        }
+        childrenByRoomId.putIfAbsent(
+          chunk.roomId,
+          () => _dataSource.hierarchyRoomToChild(chunk),
+        );
+      }
+
+      nextBatch = hierarchy.nextBatch;
+      if (nextBatch == null || nextBatch.isEmpty) {
+        break;
+      }
+    }
+
+    final children = childrenByRoomId.values.toList()
       ..sort((a, b) => a.order.compareTo(b.order));
 
     return base.copyWith(children: children);

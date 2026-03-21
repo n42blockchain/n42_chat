@@ -35,6 +35,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
+    on<AuthAnonymousRegisterRequested>(_onAnonymousRegisterRequested);
     on<AuthHomeserverCheckRequested>(_onHomeserverCheckRequested);
     on<AuthRestoreSessionRequested>(_onRestoreSessionRequested);
     on<UpdateAvatar>(_onUpdateAvatar);
@@ -58,6 +59,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthEnableBiometricLogin>(_onEnableBiometricLogin);
     on<AuthDisableBiometricLogin>(_onDisableBiometricLogin);
     on<AuthTokenLoginRequested>(_onTokenLogin);
+    on<AuthSwitchStoredAccountRequested>(_onSwitchStoredAccount);
     on<AuthLoginTokenLoginRequested>(_onLoginTokenLogin);
     on<AuthErrorCleared>(_onErrorCleared);
 
@@ -187,6 +189,32 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         state.copyWith(
           status: AuthStatus.error,
           errorMessage: result.errorMessage ?? 'Registration failed',
+          errorType: result.errorType,
+        ),
+      );
+    }
+  }
+
+  /// 匿名注册
+  Future<void> _onAnonymousRegisterRequested(
+    AuthAnonymousRegisterRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
+
+    final result = await _authRepository.registerAnonymously(
+      homeserver: event.homeserver,
+      password: event.password,
+      registrationToken: event.registrationToken,
+    );
+
+    if (result.success && result.user != null) {
+      await _completeAuthenticatedFlow(result.user!, emit);
+    } else {
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: result.errorMessage ?? 'Anonymous registration failed',
           errorType: result.errorType,
         ),
       );
@@ -1250,6 +1278,47 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         state.copyWith(
           status: AuthStatus.error,
           errorMessage: 'Token login failed: $e',
+        ),
+      );
+    }
+  }
+
+  Future<void> _onSwitchStoredAccount(
+    AuthSwitchStoredAccountRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    final previousUser = state.user;
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
+
+    try {
+      await _unregisterPushNotifications();
+
+      final result = await _authRepository.switchStoredAccount(event.userId);
+      if (result.success && result.user != null) {
+        await _completeAuthenticatedFlow(result.user!, emit);
+        return;
+      }
+
+      if (previousUser != null) {
+        unawaited(_registerPushNotifications());
+      }
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          user: previousUser,
+          errorMessage: result.errorMessage ?? 'Account switch failed',
+          errorType: result.errorType,
+        ),
+      );
+    } catch (e) {
+      if (previousUser != null) {
+        unawaited(_registerPushNotifications());
+      }
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          user: previousUser,
+          errorMessage: 'Account switch failed: $e',
         ),
       );
     }

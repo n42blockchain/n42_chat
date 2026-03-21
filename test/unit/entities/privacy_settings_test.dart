@@ -12,6 +12,13 @@ void main() {
       expect(settings.allowStrangerMessage, isTrue);
       expect(settings.showReadReceipts, isTrue);
       expect(settings.showTypingIndicator, isTrue);
+      expect(settings.hidePhoneNumber, isFalse);
+      expect(settings.defaultEncryptNewChats, isTrue);
+      expect(settings.privateChatMode, isFalse);
+      expect(settings.protectIpAddress, isFalse);
+      expect(settings.proxyEnabled, isFalse);
+      expect(settings.useTor, isFalse);
+      expect(settings.defaultSelfDestructSeconds, isNull);
     });
 
     test('should create with custom values', () {
@@ -22,6 +29,14 @@ void main() {
         allowStrangerMessage: false,
         showReadReceipts: false,
         showTypingIndicator: false,
+        hidePhoneNumber: true,
+        defaultEncryptNewChats: false,
+        privateChatMode: true,
+        protectIpAddress: true,
+        proxyEnabled: true,
+        proxyUrl: 'http://127.0.0.1:7890',
+        useTor: false,
+        defaultSelfDestructSeconds: 300,
       );
 
       expect(settings.avatarVisibility, VisibilityLevel.contacts);
@@ -30,6 +45,13 @@ void main() {
       expect(settings.allowStrangerMessage, isFalse);
       expect(settings.showReadReceipts, isFalse);
       expect(settings.showTypingIndicator, isFalse);
+      expect(settings.hidePhoneNumber, isTrue);
+      expect(settings.defaultEncryptNewChats, isFalse);
+      expect(settings.privateChatMode, isTrue);
+      expect(settings.protectIpAddress, isTrue);
+      expect(settings.proxyEnabled, isTrue);
+      expect(settings.proxyUrl, 'http://127.0.0.1:7890');
+      expect(settings.defaultSelfDestructSeconds, 300);
     });
 
     test('should support copyWith for partial updates', () {
@@ -93,12 +115,22 @@ void main() {
         allowStrangerMessage: false,
         showReadReceipts: false,
         showTypingIndicator: false,
+        hidePhoneNumber: true,
+        defaultEncryptNewChats: false,
+        privateChatMode: true,
+        protectIpAddress: true,
+        proxyEnabled: true,
+        proxyUrl: 'http://127.0.0.1:7890',
+        useTor: false,
+        defaultSelfDestructSeconds: 60,
       );
 
-      expect(settings.props.length, 6);
+      expect(settings.props.length, 14);
       expect(settings.props, contains(VisibilityLevel.contacts));
       expect(settings.props, contains(VisibilityLevel.nobody));
       expect(settings.props, contains(false));
+      expect(settings.props, contains('http://127.0.0.1:7890'));
+      expect(settings.props, contains(60));
     });
   });
 

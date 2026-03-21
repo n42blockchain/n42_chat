@@ -48,29 +48,39 @@ extension ChatBlocMessageHandlers on ChatBloc {
       }).toList();
 
       // 获取投票消息的聚合结果
-      mergedMessages = await _loadPollAggregations(event.roomId, mergedMessages);
+      mergedMessages = await _loadPollAggregations(
+        event.roomId,
+        mergedMessages,
+      );
 
       // 获取消息的反应聚合结果
-      mergedMessages = await _loadReactionAggregations(event.roomId, mergedMessages);
+      mergedMessages = await _loadReactionAggregations(
+        event.roomId,
+        mergedMessages,
+      );
 
       // 应用关键词过滤
       mergedMessages = _applyContentFilter(mergedMessages);
 
-      emit(state.copyWith(
-        messages: mergedMessages,
-        isLoading: false,
-        hasMore: messages.length >= event.limit,
-      ));
+      emit(
+        state.copyWith(
+          messages: mergedMessages,
+          isLoading: false,
+          hasMore: messages.length >= event.limit,
+        ),
+      );
 
       // 标记最新消息已读
       if (messages.isNotEmpty) {
         await _messageRepository.markAsRead(event.roomId, messages.first.id);
       }
     } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        error: 'Failed to load messages: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          error: 'Failed to load messages: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -79,7 +89,9 @@ extension ChatBlocMessageHandlers on ChatBloc {
     String roomId,
     List<MessageEntity> messages,
   ) async {
-    final pollMessages = messages.where((m) => m.type == MessageType.poll).toList();
+    final pollMessages = messages
+        .where((m) => m.type == MessageType.poll)
+        .toList();
     if (pollMessages.isEmpty) return messages;
 
     final updatedMessages = List<MessageEntity>.from(messages);
@@ -92,11 +104,13 @@ extension ChatBlocMessageHandlers on ChatBloc {
         );
 
         if (aggregations != null) {
-          final voteCounts = (aggregations['voteCounts'] as Map<String, dynamic>?)
-              ?.cast<String, int>() ?? {};
+          final voteCounts =
+              (aggregations['voteCounts'] as Map<String, dynamic>?)
+                  ?.cast<String, int>() ??
+              {};
           final totalVoters = aggregations['totalVoters'] as int? ?? 0;
-          final myVotes = (aggregations['myVotes'] as List<dynamic>?)
-              ?.cast<String>() ?? [];
+          final myVotes =
+              (aggregations['myVotes'] as List<dynamic>?)?.cast<String>() ?? [];
           final pollEnded = aggregations['pollEnded'] as bool? ?? false;
 
           final index = updatedMessages.indexWhere((m) => m.id == pollMsg.id);
@@ -112,7 +126,9 @@ extension ChatBlocMessageHandlers on ChatBloc {
           }
         }
       } catch (e) {
-        debugLog('ChatBloc: Failed to load poll aggregations for ${pollMsg.id}: $e');
+        debugLog(
+          'ChatBloc: Failed to load poll aggregations for ${pollMsg.id}: $e',
+        );
       }
     }
 
@@ -145,7 +161,9 @@ extension ChatBlocMessageHandlers on ChatBloc {
           );
           return (msg.id, aggregations);
         } catch (e) {
-          debugLog('ChatBloc: Failed to load reaction aggregations for ${msg.id}: $e');
+          debugLog(
+            'ChatBloc: Failed to load reaction aggregations for ${msg.id}: $e',
+          );
           return (msg.id, null);
         }
       });
@@ -155,7 +173,8 @@ extension ChatBlocMessageHandlers on ChatBloc {
       for (final (msgId, aggregations) in results) {
         if (aggregations == null) continue;
 
-        final reactionsData = aggregations['reactions'] as Map<String, dynamic>?;
+        final reactionsData =
+            aggregations['reactions'] as Map<String, dynamic>?;
         if (reactionsData == null || reactionsData.isEmpty) continue;
 
         final reactions = <MessageReaction>[];
@@ -165,11 +184,9 @@ extension ChatBlocMessageHandlers on ChatBloc {
           final userIds = (data['userIds'] as List<String>?) ?? [];
           final isMe = data['isMe'] as bool? ?? false;
 
-          reactions.add(MessageReaction(
-            key: emoji,
-            userIds: userIds,
-            isMe: isMe,
-          ));
+          reactions.add(
+            MessageReaction(key: emoji, userIds: userIds, isMe: isMe),
+          );
         }
 
         if (reactions.isNotEmpty) {
@@ -200,16 +217,20 @@ extension ChatBlocMessageHandlers on ChatBloc {
         limit: 50,
       );
 
-      emit(state.copyWith(
-        messages: moreMessages,
-        isLoadingMore: false,
-        hasMore: moreMessages.length > state.messages.length,
-      ));
+      emit(
+        state.copyWith(
+          messages: moreMessages,
+          isLoadingMore: false,
+          hasMore: moreMessages.length > state.messages.length,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoadingMore: false,
-        error: 'Failed to load more messages',
-      ));
+      emit(
+        state.copyWith(
+          isLoadingMore: false,
+          error: 'Failed to load more messages',
+        ),
+      );
     }
   }
 
@@ -225,16 +246,16 @@ extension ChatBlocMessageHandlers on ChatBloc {
     _messagesSubscription = _messageRepository
         .watchMessages(_currentRoomId!)
         .listen(
-      (messages) {
-        // 防止在 BLoC 关闭后添加事件
-        if (!isClosed) {
-          add(MessagesUpdated(messages));
-        }
-      },
-      onError: (Object error) {
-        debugLog('ChatBloc: Messages stream error: $error');
-      },
-    );
+          (messages) {
+            // 防止在 BLoC 关闭后添加事件
+            if (!isClosed) {
+              add(MessagesUpdated(messages));
+            }
+          },
+          onError: (Object error) {
+            debugLog('ChatBloc: Messages stream error: $error');
+          },
+        );
   }
 
   /// 取消订阅
@@ -247,10 +268,7 @@ extension ChatBlocMessageHandlers on ChatBloc {
   }
 
   /// 消息列表更新
-  void onMessagesUpdated(
-    MessagesUpdated event,
-    Emitter<ChatState> emit,
-  ) {
+  void onMessagesUpdated(MessagesUpdated event, Emitter<ChatState> emit) {
     // 过滤掉已本地删除的消息和线程内回复消息（线程回复只在线程详情页显示）
     final filteredMessages = event.messages
         .where((m) => !_locallyDeletedMessageIds.contains(m.id))
@@ -296,13 +314,15 @@ extension ChatBlocMessageHandlers on ChatBloc {
         }
         // 如果本地有我的投票但服务器返回的没有，保留本地数据
         else if ((currentMeta.myVotes?.isNotEmpty ?? false) &&
-                 (newMeta?.myVotes?.isEmpty ?? true)) {
+            (newMeta?.myVotes?.isEmpty ?? true)) {
           newMsg = newMsg.copyWith(
             metadata: MessageMetadata(
               pollQuestion: newMeta?.pollQuestion ?? currentMeta.pollQuestion,
               pollOptions: newMeta?.pollOptions ?? currentMeta.pollOptions,
-              pollOptionIds: newMeta?.pollOptionIds ?? currentMeta.pollOptionIds,
-              maxSelections: newMeta?.maxSelections ?? currentMeta.maxSelections,
+              pollOptionIds:
+                  newMeta?.pollOptionIds ?? currentMeta.pollOptionIds,
+              maxSelections:
+                  newMeta?.maxSelections ?? currentMeta.maxSelections,
               pollEnded: newMeta?.pollEnded ?? currentMeta.pollEnded,
               voteCounts: currentMeta.voteCounts,
               totalVoters: currentMeta.totalVoters,
@@ -355,26 +375,21 @@ extension ChatBlocMessageHandlers on ChatBloc {
   /// 应用关键词过滤
   List<MessageEntity> _applyContentFilter(List<MessageEntity> messages) {
     final filter = state.contentFilter;
-    if (filter == null || !filter.enabled || filter.forbiddenWords.isEmpty) {
+    if (filter == null || !filter.enabled) {
       return messages;
     }
-    final pattern = RegExp(
-      filter.forbiddenWords.map(RegExp.escape).join('|'),
-      caseSensitive: false,
-    );
     final filtered = <MessageEntity>[];
     for (final m in messages) {
       if (m.type != MessageType.text) {
         filtered.add(m);
         continue;
       }
-      final hasBadWord = pattern.hasMatch(m.content);
-      if (!hasBadWord) {
+      final decision = applyContentFilterToText(m.content, filter);
+      if (!decision.matched) {
         filtered.add(m);
-      } else if (filter.action == FilterAction.replace) {
-        filtered.add(m.copyWith(content: m.content.replaceAll(pattern, '***')));
+      } else if (!decision.shouldHide) {
+        filtered.add(m.copyWith(content: decision.content));
       }
-      // FilterAction.hide: 不加入列表，即隐藏
     }
     return filtered;
   }

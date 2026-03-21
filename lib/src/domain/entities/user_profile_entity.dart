@@ -54,9 +54,7 @@ class UserProfileEntity extends Equatable {
 
   /// 是否使用 NFT 头像
   bool get hasNftAvatar =>
-      nftContractAddress != null &&
-      nftTokenId != null &&
-      nftImageUrl != null;
+      nftContractAddress != null && nftTokenId != null && nftImageUrl != null;
 
   const UserProfileEntity({
     required this.userId,
@@ -120,22 +118,22 @@ class UserProfileEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        userId,
-        displayName,
-        avatarUrl,
-        statusMessage,
-        email,
-        phoneNumber,
-        createdAt,
-        lastActiveAt,
-        isOnline,
-        emailVerified,
-        phoneVerified,
-        nftContractAddress,
-        nftTokenId,
-        nftChainId,
-        nftImageUrl,
-      ];
+    userId,
+    displayName,
+    avatarUrl,
+    statusMessage,
+    email,
+    phoneNumber,
+    createdAt,
+    lastActiveAt,
+    isOnline,
+    emailVerified,
+    phoneVerified,
+    nftContractAddress,
+    nftTokenId,
+    nftChainId,
+    nftImageUrl,
+  ];
 
   UserProfileEntity copyWith({
     String? userId,
@@ -248,14 +246,14 @@ class NotificationSettings extends Equatable {
 
   @override
   List<Object?> get props => [
-        enabled,
-        showPreview,
-        playSound,
-        vibrate,
-        doNotDisturb,
-        doNotDisturbStart,
-        doNotDisturbEnd,
-      ];
+    enabled,
+    showPreview,
+    playSound,
+    vibrate,
+    doNotDisturb,
+    doNotDisturbStart,
+    doNotDisturbEnd,
+  ];
 
   NotificationSettings copyWith({
     bool? enabled,
@@ -298,6 +296,39 @@ class PrivacySettings extends Equatable {
   /// 是否显示输入状态
   final bool showTypingIndicator;
 
+  /// 是否在客户端隐藏手机号展示
+  final bool hidePhoneNumber;
+
+  /// 是否默认对新聊天开启端到端加密
+  final bool defaultEncryptNewChats;
+
+  /// 是否启用私密聊天模式
+  ///
+  /// 启用后会在私聊/加密聊天会话中临时开启截图防护。
+  final bool privateChatMode;
+
+  /// 是否启用 IP 地址保护
+  ///
+  /// 该选项会优先通过自定义 HTTP/HTTPS 代理或本地 Privoxy-compatible
+  /// Tor HTTP 代理发起网络请求。
+  final bool protectIpAddress;
+
+  /// 是否启用自定义代理
+  final bool proxyEnabled;
+
+  /// 自定义代理地址（例如 http://127.0.0.1:7890）
+  final String? proxyUrl;
+
+  /// 是否使用本地 Tor/Privoxy HTTP 代理
+  ///
+  /// 默认走 http://127.0.0.1:8118，不支持原生 SOCKS5 Tor 直连。
+  final bool useTor;
+
+  /// 新消息默认自毁时长（秒）
+  ///
+  /// `null` 表示关闭默认自毁。
+  final int? defaultSelfDestructSeconds;
+
   const PrivacySettings({
     this.avatarVisibility = VisibilityLevel.everyone,
     this.statusVisibility = VisibilityLevel.everyone,
@@ -305,17 +336,37 @@ class PrivacySettings extends Equatable {
     this.allowStrangerMessage = true,
     this.showReadReceipts = true,
     this.showTypingIndicator = true,
+    this.hidePhoneNumber = false,
+    this.defaultEncryptNewChats = true,
+    this.privateChatMode = false,
+    this.protectIpAddress = false,
+    this.proxyEnabled = false,
+    this.proxyUrl,
+    this.useTor = false,
+    this.defaultSelfDestructSeconds,
   });
+
+  bool get hasNetworkProxy =>
+      useTor ||
+      (proxyEnabled && proxyUrl != null && proxyUrl!.trim().isNotEmpty);
 
   @override
   List<Object?> get props => [
-        avatarVisibility,
-        statusVisibility,
-        lastSeenVisibility,
-        allowStrangerMessage,
-        showReadReceipts,
-        showTypingIndicator,
-      ];
+    avatarVisibility,
+    statusVisibility,
+    lastSeenVisibility,
+    allowStrangerMessage,
+    showReadReceipts,
+    showTypingIndicator,
+    hidePhoneNumber,
+    defaultEncryptNewChats,
+    privateChatMode,
+    protectIpAddress,
+    proxyEnabled,
+    proxyUrl,
+    useTor,
+    defaultSelfDestructSeconds,
+  ];
 
   PrivacySettings copyWith({
     VisibilityLevel? avatarVisibility,
@@ -324,6 +375,14 @@ class PrivacySettings extends Equatable {
     bool? allowStrangerMessage,
     bool? showReadReceipts,
     bool? showTypingIndicator,
+    bool? hidePhoneNumber,
+    bool? defaultEncryptNewChats,
+    bool? privateChatMode,
+    bool? protectIpAddress,
+    bool? proxyEnabled,
+    String? proxyUrl,
+    bool? useTor,
+    Object? defaultSelfDestructSeconds = _copyWithUndefined,
   }) {
     return PrivacySettings(
       avatarVisibility: avatarVisibility ?? this.avatarVisibility,
@@ -332,16 +391,32 @@ class PrivacySettings extends Equatable {
       allowStrangerMessage: allowStrangerMessage ?? this.allowStrangerMessage,
       showReadReceipts: showReadReceipts ?? this.showReadReceipts,
       showTypingIndicator: showTypingIndicator ?? this.showTypingIndicator,
+      hidePhoneNumber: hidePhoneNumber ?? this.hidePhoneNumber,
+      defaultEncryptNewChats:
+          defaultEncryptNewChats ?? this.defaultEncryptNewChats,
+      privateChatMode: privateChatMode ?? this.privateChatMode,
+      protectIpAddress: protectIpAddress ?? this.protectIpAddress,
+      proxyEnabled: proxyEnabled ?? this.proxyEnabled,
+      proxyUrl: proxyUrl ?? this.proxyUrl,
+      useTor: useTor ?? this.useTor,
+      defaultSelfDestructSeconds:
+          identical(defaultSelfDestructSeconds, _copyWithUndefined)
+          ? this.defaultSelfDestructSeconds
+          : defaultSelfDestructSeconds as int?,
     );
   }
 }
+
+const Object _copyWithUndefined = Object();
 
 /// 可见性级别
 enum VisibilityLevel {
   /// 所有人
   everyone,
+
   /// 仅联系人
   contacts,
+
   /// 无人
   nobody,
 }
@@ -390,19 +465,10 @@ class AppearanceSettings extends Equatable {
 /// 如需使用，请导入 'package:flutter/material.dart' 并使用 ThemeMode.system/light/dark
 
 /// 字体大小
-enum FontSize {
-  small,
-  medium,
-  large,
-  extraLarge,
-}
+enum FontSize { small, medium, large, extraLarge }
 
 /// 气泡样式
-enum BubbleStyle {
-  wechat,
-  modern,
-  classic,
-}
+enum BubbleStyle { wechat, modern, classic }
 
 /// 聊天设置
 class ChatSettings extends Equatable {
@@ -431,12 +497,12 @@ class ChatSettings extends Equatable {
 
   @override
   List<Object?> get props => [
-        autoDownloadImage,
-        autoDownloadVideo,
-        autoDownloadFile,
-        autoDownloadOnWifi,
-        sendMessageKey,
-      ];
+    autoDownloadImage,
+    autoDownloadVideo,
+    autoDownloadFile,
+    autoDownloadOnWifi,
+    sendMessageKey,
+  ];
 
   ChatSettings copyWith({
     bool? autoDownloadImage,
@@ -456,8 +522,4 @@ class ChatSettings extends Equatable {
 }
 
 /// 发送消息快捷键
-enum SendMessageKey {
-  enter,
-  ctrlEnter,
-}
-
+enum SendMessageKey { enter, ctrlEnter }

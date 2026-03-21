@@ -115,6 +115,30 @@ void main() {
     );
   });
 
+  group('ObserveLiveLocationRoom', () {
+    blocTest<LiveLocationBloc, LiveLocationState>(
+      'subscribes to live locations and syncs snapshot into state',
+      build: buildBloc,
+      setUp: () {
+        when(
+          () => mockDataSource.watchLiveLocations(any()),
+        ).thenAnswer((_) => Stream.value([_makeLocation()]));
+        when(() => mockDataSource.currentUserId).thenReturn('@alice:s');
+      },
+      act: (bloc) => bloc.add(const ObserveLiveLocationRoom(roomId: _kRoomId)),
+      expect: () => [
+        isA<LiveLocationState>()
+            .having((s) => s.currentRoomId, 'currentRoomId', _kRoomId),
+        isA<LiveLocationState>()
+            .having((s) => s.activeSharings.containsKey('@alice:s'), 'hasAlice', isTrue)
+            .having((s) => s.isSharing, 'isSharing', isTrue),
+      ],
+      verify: (_) {
+        verify(() => mockDataSource.watchLiveLocations(_kRoomId)).called(1);
+      },
+    );
+  });
+
   // ─────────────────────────────────────────────────
   // LiveLocationUpdated
   // ─────────────────────────────────────────────────

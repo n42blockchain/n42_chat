@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../core/di/injection.dart';
+import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -90,20 +91,15 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
     unawaited(_videoController?.dispose());
     _videoController = null;
 
-    // 获取 Matrix access token（图集页面没有传入 headers，需要自行获取）
-    String? accessToken;
-    try {
-      accessToken = getIt<MatrixClientManager>().client?.accessToken;
-    } catch (_) {}
-
-    final headers = <String, String>{
-      if (accessToken != null) 'Authorization': 'Bearer $accessToken',
-    };
+    final headers = mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+      url,
+      client: getIt<MatrixClientManager>().client,
+    );
 
     VideoPlayerController controller;
     // iOS：AVFoundation 在 HTTP 重定向时丢弃 Authorization header，
     // 需要先将视频流式下载至临时文件再播放。
-    if (Platform.isIOS && accessToken != null) {
+    if (Platform.isIOS && headers.isNotEmpty) {
       try {
         final request = http.Request('GET', Uri.parse(url));
         request.headers.addAll(headers);
@@ -111,7 +107,8 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
         if (streamResponse.statusCode == 200) {
           final dir = await getTemporaryDirectory();
           final file = File(
-              '${dir.path}/preview_${DateTime.now().millisecondsSinceEpoch}.mp4');
+            '${dir.path}/preview_${DateTime.now().millisecondsSinceEpoch}.mp4',
+          );
           final sink = file.openWrite();
           await streamResponse.stream.pipe(sink);
           await sink.close();
@@ -119,7 +116,8 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
           controller = VideoPlayerController.file(file);
         } else {
           debugLog(
-              'iOS video download returned ${streamResponse.statusCode}, falling back');
+            'iOS video download returned ${streamResponse.statusCode}, falling back',
+          );
           controller = VideoPlayerController.networkUrl(Uri.parse(url));
         }
       } catch (e) {
@@ -184,30 +182,18 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
               onPageChanged: _onPageChanged,
               itemBuilder: (context, index) {
                 final item = widget.items[index];
-                return item.isVideo
-                    ? _buildVideoView()
-                    : _buildImageView(item);
+                return item.isVideo ? _buildVideoView() : _buildImageView(item);
               },
             ),
           ),
 
           // 顶部工具栏
           if (_showToolbar)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: _buildTopBar(),
-            ),
+            Positioned(top: 0, left: 0, right: 0, child: _buildTopBar()),
 
           // 底部工具栏
           if (_showToolbar)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: _buildBottomBar(),
-            ),
+            Positioned(bottom: 0, left: 0, right: 0, child: _buildBottomBar()),
 
           // 页码指示器
           if (widget.items.length > 1)
@@ -218,10 +204,7 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
               child: Center(
                 child: Text(
                   '${_currentIndex + 1} / ${widget.items.length}',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ),
             ),
@@ -343,10 +326,7 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
                 if (item.sentAt != null)
                   Text(
                     _formatDate(item.sentAt!),
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
               ],
             ),

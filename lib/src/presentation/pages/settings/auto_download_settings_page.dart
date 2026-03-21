@@ -11,11 +11,13 @@ class AutoDownloadSettingsPage extends StatefulWidget {
   const AutoDownloadSettingsPage({super.key});
 
   @override
-  State<AutoDownloadSettingsPage> createState() => _AutoDownloadSettingsPageState();
+  State<AutoDownloadSettingsPage> createState() =>
+      _AutoDownloadSettingsPageState();
 }
 
 class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
-  final PreferencesDataSource _storage = GetIt.instance<PreferencesDataSource>();
+  final PreferencesDataSource _storage =
+      GetIt.instance<PreferencesDataSource>();
 
   // WiFi 设置
   bool _wifiImages = true;
@@ -28,12 +30,6 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
   bool _mobileVoice = true;
   bool _mobileVideo = false;
   bool _mobileFiles = false;
-
-  // 漫游设置
-  bool _roamingImages = false;
-  bool _roamingVoice = false;
-  bool _roamingVideo = false;
-  bool _roamingFiles = false;
 
   @override
   void initState() {
@@ -53,10 +49,6 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
         _mobileVoice = (settings['mobile_voice'] as bool?) ?? true;
         _mobileVideo = (settings['mobile_video'] as bool?) ?? false;
         _mobileFiles = (settings['mobile_files'] as bool?) ?? false;
-        _roamingImages = (settings['roaming_images'] as bool?) ?? false;
-        _roamingVoice = (settings['roaming_voice'] as bool?) ?? false;
-        _roamingVideo = (settings['roaming_video'] as bool?) ?? false;
-        _roamingFiles = (settings['roaming_files'] as bool?) ?? false;
       });
     }
   }
@@ -71,11 +63,12 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
       'mobile_voice': _mobileVoice,
       'mobile_video': _mobileVideo,
       'mobile_files': _mobileFiles,
-      'roaming_images': _roamingImages,
-      'roaming_voice': _roamingVoice,
-      'roaming_video': _roamingVideo,
-      'roaming_files': _roamingFiles,
     });
+  }
+
+  void _updateSetting(VoidCallback update) {
+    setState(update);
+    _saveSettings();
   }
 
   @override
@@ -96,8 +89,10 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -111,20 +106,16 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
             isDark: isDark,
             children: [
               _buildSwitch(S.of(context)?.images ?? 'Images', _wifiImages, (v) {
-                setState(() => _wifiImages = v);
-                _saveSettings();
+                _updateSetting(() => _wifiImages = v);
               }),
               _buildSwitch(S.of(context)?.voice ?? 'Voice', _wifiVoice, (v) {
-                setState(() => _wifiVoice = v);
-                _saveSettings();
+                _updateSetting(() => _wifiVoice = v);
               }),
               _buildSwitch(S.of(context)?.video ?? 'Video', _wifiVideo, (v) {
-                setState(() => _wifiVideo = v);
-                _saveSettings();
+                _updateSetting(() => _wifiVideo = v);
               }),
               _buildSwitch(S.of(context)?.files ?? 'Files', _wifiFiles, (v) {
-                setState(() => _wifiFiles = v);
-                _saveSettings();
+                _updateSetting(() => _wifiFiles = v);
               }),
             ],
           ),
@@ -138,51 +129,32 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
             icon: Icons.signal_cellular_alt,
             isDark: isDark,
             children: [
-              _buildSwitch(S.of(context)?.images ?? 'Images', _mobileImages, (v) {
-                setState(() => _mobileImages = v);
-                _saveSettings();
+              _buildSwitch(S.of(context)?.images ?? 'Images', _mobileImages, (
+                v,
+              ) {
+                _updateSetting(() => _mobileImages = v);
               }),
               _buildSwitch(S.of(context)?.voice ?? 'Voice', _mobileVoice, (v) {
-                setState(() => _mobileVoice = v);
-                _saveSettings();
+                _updateSetting(() => _mobileVoice = v);
               }),
               _buildSwitch(S.of(context)?.video ?? 'Video', _mobileVideo, (v) {
-                setState(() => _mobileVideo = v);
-                _saveSettings();
+                _updateSetting(() => _mobileVideo = v);
               }),
               _buildSwitch(S.of(context)?.files ?? 'Files', _mobileFiles, (v) {
-                setState(() => _mobileFiles = v);
-                _saveSettings();
+                _updateSetting(() => _mobileFiles = v);
               }),
             ],
           ),
 
           const SizedBox(height: 10),
 
-          // 漫游
-          _buildSection(
+          _buildInfoCard(
             context,
-            title: S.of(context)?.roaming ?? 'Roaming',
-            icon: Icons.public,
             isDark: isDark,
-            children: [
-              _buildSwitch(S.of(context)?.images ?? 'Images', _roamingImages, (v) {
-                setState(() => _roamingImages = v);
-                _saveSettings();
-              }),
-              _buildSwitch(S.of(context)?.voice ?? 'Voice', _roamingVoice, (v) {
-                setState(() => _roamingVoice = v);
-                _saveSettings();
-              }),
-              _buildSwitch(S.of(context)?.video ?? 'Video', _roamingVideo, (v) {
-                setState(() => _roamingVideo = v);
-                _saveSettings();
-              }),
-              _buildSwitch(S.of(context)?.files ?? 'Files', _roamingFiles, (v) {
-                setState(() => _roamingFiles = v);
-                _saveSettings();
-              }),
-            ],
+            icon: Icons.info_outline,
+            title: 'Roaming uses Mobile Data rules',
+            message:
+                'Dedicated roaming detection is not available yet, so roaming currently follows the Mobile Data auto-download settings.',
           ),
         ],
       ),
@@ -212,7 +184,9 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -231,6 +205,61 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
       onChanged: onChanged,
       activeThumbColor: AppColors.primary,
       dense: true,
+    );
+  }
+
+  Widget _buildInfoCard(
+    BuildContext context, {
+    required bool isDark,
+    required IconData icon,
+    required String title,
+    required String message,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.surfaceDark.withValues(alpha: 0.85)
+            : AppColors.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: AppColors.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

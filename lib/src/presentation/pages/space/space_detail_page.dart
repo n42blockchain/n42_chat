@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
@@ -10,6 +12,7 @@ import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/group_entity.dart' show GroupMember, GroupRole;
 import '../../../domain/entities/space_entity.dart';
+import '../../../domain/repositories/space_repository.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
@@ -18,10 +21,7 @@ import '../../blocs/space/space_event.dart';
 import '../../blocs/space/space_state.dart';
 import '../chat/chat_page.dart';
 
-enum _PendingSpaceNavigationAction {
-  leave,
-  delete,
-}
+enum _PendingSpaceNavigationAction { leave, delete }
 
 /// 社区详情页面
 ///
@@ -62,14 +62,16 @@ class _SpaceDetailPageState extends State<SpaceDetailPage> {
           _pendingNavigationAction = null;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(state.errorMessage!),
-                backgroundColor: Colors.red),
+              content: Text(state.errorMessage!),
+              backgroundColor: Colors.red,
+            ),
           );
           context.read<SpaceBloc>().add(const ClearSpaceError());
         }
         if (state.operationSuccess != null) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(state.operationSuccess!)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.operationSuccess!)));
           if (_pendingNavigationAction != null) {
             _pendingNavigationAction = null;
             Navigator.of(context).maybePop();
@@ -89,7 +91,9 @@ class _SpaceDetailPageState extends State<SpaceDetailPage> {
           return Scaffold(
             appBar: AppBar(),
             body: Center(
-              child: Text(S.of(context)?.spacesNotFound ?? 'Community not found'),
+              child: Text(
+                S.of(context)?.spacesNotFound ?? 'Community not found',
+              ),
             ),
           );
         }
@@ -141,28 +145,27 @@ class _SpaceDetailScaffold extends StatelessWidget {
   bool get _isAdmin {
     final myId = MatrixClientManager.instance.client?.userID;
     if (myId == null) return false;
-    return members.any((m) =>
-        m.userId == myId &&
-        (m.role == GroupRole.admin || m.role == GroupRole.owner));
+    return members.any(
+      (m) =>
+          m.userId == myId &&
+          (m.role == GroupRole.admin || m.role == GroupRole.owner),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
 
-    final channels = space.children
-        .where((c) => c.type == SpaceChildType.channel)
-        .toList()
-      ..sort((a, b) => a.order.compareTo(b.order));
+    final channels =
+        space.children.where((c) => c.type == SpaceChildType.channel).toList()
+          ..sort((a, b) => a.order.compareTo(b.order));
 
-    final subSpaces = space.children
-        .where((c) => c.type == SpaceChildType.subSpace)
-        .toList()
-      ..sort((a, b) => a.order.compareTo(b.order));
+    final subSpaces =
+        space.children.where((c) => c.type == SpaceChildType.subSpace).toList()
+          ..sort((a, b) => a.order.compareTo(b.order));
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: CustomScrollView(
         slivers: [
           _buildHeader(context, isDark),
@@ -190,23 +193,29 @@ class _SpaceDetailScaffold extends StatelessWidget {
           if (space.topics.isNotEmpty)
             SliverToBoxAdapter(
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 color: isDark ? AppColors.surfaceDark : AppColors.surface,
                 child: Wrap(
                   spacing: 8,
                   runSpacing: 4,
                   children: space.topics
-                      .map((topic) => Chip(
-                            label: Text(topic,
-                                style: const TextStyle(fontSize: 12)),
-                            padding: EdgeInsets.zero,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            backgroundColor: isDark
-                                ? AppColors.primary.withValues(alpha: 0.2)
-                                : AppColors.primary.withValues(alpha: 0.1),
-                          ))
+                      .map(
+                        (topic) => Chip(
+                          label: Text(
+                            topic,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          padding: EdgeInsets.zero,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          backgroundColor: isDark
+                              ? AppColors.primary.withValues(alpha: 0.2)
+                              : AppColors.primary.withValues(alpha: 0.1),
+                        ),
+                      )
                       .toList(),
                 ),
               ),
@@ -217,8 +226,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
           // 操作区（加入/离开按钮）
           SliverToBoxAdapter(
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: _buildActionRow(context),
             ),
           ),
@@ -277,8 +285,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 )
               : SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (ctx, i) =>
-                        _buildChannelItem(ctx, channels[i], isDark),
+                    (ctx, i) => _buildChannelItem(ctx, channels[i], isDark),
                     childCount: channels.length,
                   ),
                 ),
@@ -323,7 +330,8 @@ class _SpaceDetailScaffold extends StatelessWidget {
               PopupMenuItem(
                 value: 'edit_desc',
                 child: Text(
-                    S.of(context)?.spacesEditDescription ?? 'Edit Description'),
+                  S.of(context)?.spacesEditDescription ?? 'Edit Description',
+                ),
               ),
               const PopupMenuDivider(),
               PopupMenuItem(
@@ -337,8 +345,10 @@ class _SpaceDetailScaffold extends StatelessWidget {
           ),
       ],
       flexibleSpace: FlexibleSpaceBar(
-        title: Text(space.name,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          space.name,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         background: Stack(
           fit: StackFit.expand,
           children: [
@@ -382,18 +392,13 @@ class _SpaceDetailScaffold extends StatelessWidget {
                   const Icon(Icons.people, size: 16, color: Colors.white70),
                   const SizedBox(width: 4),
                   Text(
-                    S
-                            .of(context)
-                            ?.spacesMembersCount(space.memberCount) ??
+                    S.of(context)?.spacesMembersCount(space.memberCount) ??
                         '${space.memberCount} members',
-                    style:
-                        const TextStyle(color: Colors.white70, fontSize: 13),
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                   const SizedBox(width: 16),
                   Icon(
-                    space.type == SpaceType.public
-                        ? Icons.public
-                        : Icons.lock,
+                    space.type == SpaceType.public ? Icons.public : Icons.lock,
                     size: 16,
                     color: Colors.white70,
                   ),
@@ -402,8 +407,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                     space.type == SpaceType.public
                         ? (S.of(context)?.spacesPublic ?? 'Public')
                         : (S.of(context)?.spacesPrivate ?? 'Private'),
-                    style:
-                        const TextStyle(color: Colors.white70, fontSize: 13),
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                 ],
               ),
@@ -415,36 +419,122 @@ class _SpaceDetailScaffold extends StatelessWidget {
   }
 
   Widget _buildActionRow(BuildContext context) {
+    final shareButton = Expanded(
+      child: OutlinedButton.icon(
+        onPressed: () => _showSpaceLinkActions(context),
+        icon: const Icon(Icons.share_outlined),
+        label: const Text('Share'),
+      ),
+    );
+
     if (space.isJoined) {
-      return OutlinedButton.icon(
-        onPressed: isOperating
-            ? null
-            : () => _confirmLeave(context),
-        icon: isOperating
-            ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Icon(Icons.exit_to_app),
-        label: Text(S.of(context)?.spacesLeave ?? 'Leave Community'),
-        style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+      return Row(
+        children: [
+          shareButton,
+          const SizedBox(width: 12),
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: isOperating ? null : () => _confirmLeave(context),
+              icon: isOperating
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.exit_to_app),
+              label: Text(S.of(context)?.spacesLeave ?? 'Leave Community'),
+              style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+            ),
+          ),
+        ],
       );
     }
-    return FilledButton.icon(
-      onPressed: isOperating
-          ? null
-          : () =>
-              context.read<SpaceBloc>().add(JoinSpace(space.id)),
-      icon: isOperating
-          ? const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-            )
-          : const Icon(Icons.add),
-      label: Text(S.of(context)?.spacesJoin ?? 'Join Community'),
+    return Row(
+      children: [
+        shareButton,
+        const SizedBox(width: 12),
+        Expanded(
+          child: FilledButton.icon(
+            onPressed: isOperating
+                ? null
+                : () => context.read<SpaceBloc>().add(JoinSpace(space.id)),
+            icon: isOperating
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Icon(Icons.add),
+            label: Text(S.of(context)?.spacesJoin ?? 'Join Community'),
+          ),
+        ),
+      ],
     );
+  }
+
+  Future<void> _showSpaceLinkActions(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    try {
+      final link = await getIt<ISpaceRepository>().getSpaceInviteLink(space.id);
+      if (!context.mounted) {
+        return;
+      }
+
+      await showModalBottomSheet<void>(
+        context: context,
+        builder: (sheetContext) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('Community Link'),
+                subtitle: Text(
+                  link,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.copy_outlined),
+                title: const Text('Copy Link'),
+                onTap: () async {
+                  navigator.pop();
+                  await Clipboard.setData(ClipboardData(text: link));
+                  if (!context.mounted) {
+                    return;
+                  }
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Community link copied')),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.share_outlined),
+                title: const Text('Share Link'),
+                onTap: () async {
+                  navigator.pop();
+                  await SharePlus.instance.share(
+                    ShareParams(text: link, subject: space.name),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) {
+        return;
+      }
+      messenger.showSnackBar(
+        SnackBar(content: Text('Failed to load community link: $e')),
+      );
+    }
   }
 
   Widget _buildMembersPreview(BuildContext context, bool isDark) {
@@ -493,9 +583,11 @@ class _SpaceDetailScaffold extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
         child: Row(
           children: [
-            Icon(icon,
-                size: 18,
-                color: isDark ? Colors.white54 : AppColors.textSecondary),
+            Icon(
+              icon,
+              size: 18,
+              color: isDark ? Colors.white54 : AppColors.textSecondary,
+            ),
             const SizedBox(width: 8),
             Text(
               title,
@@ -522,7 +614,10 @@ class _SpaceDetailScaffold extends StatelessWidget {
   }
 
   Widget _buildChannelItem(
-      BuildContext context, SpaceChild child, bool isDark) {
+    BuildContext context,
+    SpaceChild child,
+    bool isDark,
+  ) {
     return Container(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       child: ListTile(
@@ -562,8 +657,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
           children: [
             if (child.isSuggested)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
@@ -593,7 +687,10 @@ class _SpaceDetailScaffold extends StatelessWidget {
   }
 
   Widget _buildSubSpaceItem(
-      BuildContext context, SpaceChild child, bool isDark) {
+    BuildContext context,
+    SpaceChild child,
+    bool isDark,
+  ) {
     return Container(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       child: ListTile(
@@ -604,8 +701,11 @@ class _SpaceDetailScaffold extends StatelessWidget {
             color: Colors.purple.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Icon(Icons.folder_outlined,
-              color: Colors.purple, size: 20),
+          child: const Icon(
+            Icons.folder_outlined,
+            color: Colors.purple,
+            size: 20,
+          ),
         ),
         title: Text(
           child.name,
@@ -629,10 +729,10 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 ),
               )
             : null,
-        trailing: Icon(Icons.chevron_right,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        ),
         onTap: () {
           // 进入子 Space 详情
           Navigator.push<void>(
@@ -689,13 +789,15 @@ class _SpaceDetailScaffold extends StatelessWidget {
             onPressed: () {
               final name = nameCtrl.text.trim();
               if (name.isEmpty) return;
-              context.read<SpaceBloc>().add(CreateChannel(
-                    spaceId: space.id,
-                    name: name,
-                    topic: topicCtrl.text.trim().isEmpty
-                        ? null
-                        : topicCtrl.text.trim(),
-                  ));
+              context.read<SpaceBloc>().add(
+                CreateChannel(
+                  spaceId: space.id,
+                  name: name,
+                  topic: topicCtrl.text.trim().isEmpty
+                      ? null
+                      : topicCtrl.text.trim(),
+                ),
+              );
               Navigator.pop(ctx);
             },
             child: Text(S.of(context)?.spacesCreate ?? 'Create'),
@@ -722,9 +824,9 @@ class _SpaceDetailScaffold extends StatelessWidget {
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
-              context
-                  .read<SpaceBloc>()
-                  .add(DeleteChannel(space.id, child.roomId));
+              context.read<SpaceBloc>().add(
+                DeleteChannel(space.id, child.roomId),
+              );
               Navigator.pop(ctx);
             },
             child: Text(S.of(context)?.commonDelete ?? 'Delete'),
@@ -768,9 +870,8 @@ class _SpaceDetailScaffold extends StatelessWidget {
           context,
           title: S.of(context)?.spacesEditName ?? 'Edit Name',
           initialValue: space.name,
-          onConfirm: (value) => context
-              .read<SpaceBloc>()
-              .add(UpdateSpaceName(space.id, value)),
+          onConfirm: (value) =>
+              context.read<SpaceBloc>().add(UpdateSpaceName(space.id, value)),
         );
       case 'edit_desc':
         _showEditTextDialog(
@@ -778,9 +879,9 @@ class _SpaceDetailScaffold extends StatelessWidget {
           title: S.of(context)?.spacesEditDescription ?? 'Edit Description',
           initialValue: space.description ?? '',
           multiline: true,
-          onConfirm: (value) => context
-              .read<SpaceBloc>()
-              .add(UpdateSpaceDescription(space.id, value)),
+          onConfirm: (value) => context.read<SpaceBloc>().add(
+            UpdateSpaceDescription(space.id, value),
+          ),
         );
       case 'delete':
         _confirmDelete(context);
@@ -886,8 +987,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
           providers: [
             BlocProvider(create: (_) => getIt<ChatBloc>()),
             BlocProvider(
-              create: (_) =>
-                  getIt<ContactBloc>()..add(const LoadContacts()),
+              create: (_) => getIt<ContactBloc>()..add(const LoadContacts()),
             ),
           ],
           child: ChatPage(
@@ -959,7 +1059,10 @@ class _MembersBottomSheet extends StatelessWidget {
   bool _canManageMember(GroupMember member) {
     final currentUser = _currentUser;
     final myId = currentUser?.userId;
-    if (!isAdmin || currentUser == null || member.userId == myId || member.isOwner) {
+    if (!isAdmin ||
+        currentUser == null ||
+        member.userId == myId ||
+        member.isOwner) {
       return false;
     }
 
@@ -991,8 +1094,7 @@ class _MembersBottomSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surface,
-        borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: Column(
         children: [
@@ -1012,7 +1114,9 @@ class _MembersBottomSheet extends StatelessWidget {
                 Text(
                   S.of(context)?.spacesMembers ?? 'Members',
                   style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 18),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -1038,8 +1142,9 @@ class _MembersBottomSheet extends StatelessWidget {
               itemCount: members.length,
               itemBuilder: (ctx, i) {
                 final m = members[i];
-                final name =
-                    m.displayName.isNotEmpty ? m.displayName : m.userId;
+                final name = m.displayName.isNotEmpty
+                    ? m.displayName
+                    : m.userId;
                 return ListTile(
                   leading: CircleAvatar(
                     backgroundColor: AppColorPalettes.getAvatarColor(name),
@@ -1052,16 +1157,19 @@ class _MembersBottomSheet extends StatelessWidget {
                   subtitle: Text(
                     m.userId,
                     style: TextStyle(
-                        fontSize: 12,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary),
+                      fontSize: 12,
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondary,
+                    ),
                   ),
                   trailing: _buildRoleBadge(m.role, isDark),
                   onLongPress:
-                      _canManageMember(m) || _canPromoteToAdmin(m) || _canDemoteAdmin(m)
-                          ? () => _showMemberActions(ctx, m)
-                          : null,
+                      _canManageMember(m) ||
+                          _canPromoteToAdmin(m) ||
+                          _canDemoteAdmin(m)
+                      ? () => _showMemberActions(ctx, m)
+                      : null,
                 );
               },
             ),
@@ -1090,8 +1198,7 @@ class _MembersBottomSheet extends StatelessWidget {
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(label,
-          style: TextStyle(fontSize: 11, color: color)),
+      child: Text(label, style: TextStyle(fontSize: 11, color: color)),
     );
   }
 
@@ -1107,10 +1214,12 @@ class _MembersBottomSheet extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.star_outline, color: Colors.blue),
                 title: Text(
-                    S.of(context)?.spacesPromoteAdmin ?? 'Promote to Admin'),
+                  S.of(context)?.spacesPromoteAdmin ?? 'Promote to Admin',
+                ),
                 onTap: () {
                   context.read<SpaceBloc>().add(
-                      SetMemberPowerLevel(spaceId, member.userId, 50));
+                    SetMemberPowerLevel(spaceId, member.userId, 50),
+                  );
                   Navigator.pop(context);
                   Navigator.pop(context);
                 },
@@ -1118,11 +1227,11 @@ class _MembersBottomSheet extends StatelessWidget {
             else if (_canDemoteAdmin(member))
               ListTile(
                 leading: const Icon(Icons.star, color: Colors.orange),
-                title: Text(
-                    S.of(context)?.spacesDemoteAdmin ?? 'Remove Admin'),
+                title: Text(S.of(context)?.spacesDemoteAdmin ?? 'Remove Admin'),
                 onTap: () {
                   context.read<SpaceBloc>().add(
-                      SetMemberPowerLevel(spaceId, member.userId, 0));
+                    SetMemberPowerLevel(spaceId, member.userId, 0),
+                  );
                   Navigator.pop(context);
                   Navigator.pop(context);
                 },
@@ -1130,19 +1239,24 @@ class _MembersBottomSheet extends StatelessWidget {
             // 踢出
             if (_canManageMember(member))
               ListTile(
-                leading: const Icon(Icons.person_remove_outlined,
-                    color: Colors.orange),
+                leading: const Icon(
+                  Icons.person_remove_outlined,
+                  color: Colors.orange,
+                ),
                 title: Text(
-                  S.of(context)?.spacesKickMemberTitle(
-                          member.displayName.isNotEmpty
-                              ? member.displayName
-                              : member.userId) ??
+                  S
+                          .of(context)
+                          ?.spacesKickMemberTitle(
+                            member.displayName.isNotEmpty
+                                ? member.displayName
+                                : member.userId,
+                          ) ??
                       'Kick ${member.displayName.isNotEmpty ? member.displayName : member.userId}',
                 ),
                 onTap: () {
-                  context
-                      .read<SpaceBloc>()
-                      .add(KickMember(spaceId, member.userId));
+                  context.read<SpaceBloc>().add(
+                    KickMember(spaceId, member.userId),
+                  );
                   Navigator.pop(context);
                   Navigator.pop(context);
                 },
@@ -1152,16 +1266,19 @@ class _MembersBottomSheet extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.block, color: Colors.red),
                 title: Text(
-                  S.of(context)?.spacesBanMemberTitle(
-                          member.displayName.isNotEmpty
-                              ? member.displayName
-                              : member.userId) ??
+                  S
+                          .of(context)
+                          ?.spacesBanMemberTitle(
+                            member.displayName.isNotEmpty
+                                ? member.displayName
+                                : member.userId,
+                          ) ??
                       'Ban ${member.displayName.isNotEmpty ? member.displayName : member.userId}',
                 ),
                 onTap: () {
-                  context
-                      .read<SpaceBloc>()
-                      .add(BanMember(spaceId, member.userId));
+                  context.read<SpaceBloc>().add(
+                    BanMember(spaceId, member.userId),
+                  );
                   Navigator.pop(context);
                   Navigator.pop(context);
                 },
@@ -1181,7 +1298,8 @@ class _MembersBottomSheet extends StatelessWidget {
         content: TextField(
           controller: ctrl,
           decoration: InputDecoration(
-            labelText: S.of(context)?.spacesInviteMemberUserId ??
+            labelText:
+                S.of(context)?.spacesInviteMemberUserId ??
                 'User ID (e.g. @user:server.com)',
           ),
         ),

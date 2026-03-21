@@ -147,11 +147,14 @@ extension ChatBlocActionHandlers on ChatBloc {
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
+      final selfDestructAfter = await _resolveSelfDestructAfter(
+        event.selfDestructAfter,
+      );
       await _messageRepository.replyToMessage(
         _currentRoomId!,
         event.replyToMessageId,
         event.text,
-        selfDestructAfter: event.selfDestructAfter,
+        selfDestructAfter: selfDestructAfter,
         mentionedUserIds: event.mentionedUserIds,
         mentionsRoom: event.mentionsRoom,
       );

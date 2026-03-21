@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import 'bot_command_registry.dart';
 import '../../domain/entities/bot_command_entity.dart';
 import '../../integration/wallet_bridge.dart';
 import '../utils/debug_log.dart';
@@ -11,6 +12,7 @@ import '../utils/debug_log.dart';
 class BotCommandProcessor {
   final IWalletBridge _walletBridge;
   final Dio _dio;
+  final BotCommandRegistry _registry;
   final String _priceApiBase;
   final String? _authToken;
   final bool _useProxyEndpoint;
@@ -55,7 +57,9 @@ class BotCommandProcessor {
     String? authToken,
     bool useProxyEndpoint = false,
     Dio? dio,
+    BotCommandRegistry? registry,
   }) : _walletBridge = walletBridge,
+       _registry = registry ?? BotCommandRegistry.instance,
        _priceApiBase = priceApiBase.endsWith('/')
            ? priceApiBase.substring(0, priceApiBase.length - 1)
            : priceApiBase,
@@ -81,13 +85,14 @@ class BotCommandProcessor {
     final command = parts.first.toLowerCase();
     final args = parts.skip(1).toList();
 
-    return process(command: command, args: args);
+    return process(command: command, args: args, rawText: trimmed);
   }
 
   /// 执行指定命令
   Future<BotCommandResult> process({
     required String command,
     List<String> args = const [],
+    String? rawText,
   }) async {
     switch (command) {
       case 'help':
@@ -101,6 +106,14 @@ class BotCommandProcessor {
       case 'announce':
         return _handleAnnounce(args);
       default:
+        final customResult = await _handleCustomCommand(
+          command,
+          args,
+          rawText ?? '/$command ${args.join(' ')}'.trim(),
+        );
+        if (customResult != null) {
+          return customResult;
+        }
         // 未知命令
         final known = BuiltInBotCommands.find(command);
         if (known != null) {
@@ -120,7 +133,9 @@ class BotCommandProcessor {
   BotCommandResult _handleHelp() {
     final buffer = StringBuffer();
     buffer.writeln('📋 Available Commands\n');
-    for (final cmd in BuiltInBotCommands.all) {
+    final allCommands = [...BuiltInBotCommands.all, ..._registry.definitions]
+      ..sort((a, b) => a.command.compareTo(b.command));
+    for (final cmd in allCommands) {
       final adminTag = cmd.adminOnly ? ' 🔒' : '';
       buffer.writeln('/${cmd.usage.replaceFirst('/', '')}$adminTag');
       buffer.writeln('  ${cmd.description}\n');
@@ -252,6 +267,29 @@ class BotCommandProcessor {
     }
     final message = args.join(' ');
     return BotCommandResult.sendMessage('📢 **Announcement**\n\n$message');
+  }
+
+  Future<BotCommandResult?> _handleCustomCommand(
+    String command,
+    List<String> args,
+    String rawText,
+  ) async {
+    final handler = _registry.findHandler(command);
+    if (handler == null) return null;
+    try {
+      return await handler.handle(
+        BotCommandRequest(
+          command: command,
+          args: args,
+          rawText: rawText,
+        ),
+      );
+    } catch (e) {
+      debugLog('BotCommandProcessor custom command error: $e');
+      return BotCommandResult.error(
+        'Command /$command failed. Please try again.',
+      );
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────

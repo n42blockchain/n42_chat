@@ -10,7 +10,10 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:n42_chat/src/core/utils/io_helper.dart' as io_helper;
 import 'package:n42_chat/src/n42_chat_config.dart';
+import '../../../core/services/privacy_http_client.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../domain/entities/user_profile_entity.dart';
+import '../local/preferences_datasource.dart';
 
 /// Matrix客户端管理器
 ///
@@ -26,6 +29,7 @@ class MatrixClientManager {
   static MatrixClientManager get instance => _instance;
 
   Client? _client;
+  http.Client? _managedHttpClient;
   bool _isInitialized = false;
   bool _vodozemacInitialized = false;
   Completer<void>? _initCompleter;
@@ -72,6 +76,7 @@ class MatrixClientManager {
     String? databasePath,
     bool forceReinit = false,
     N42ChatConfig? config,
+    PreferencesDataSource? preferencesDataSource,
   }) async {
     if (_isInitialized && !forceReinit) {
       debugLog('MatrixClientManager: Already initialized');
@@ -95,6 +100,8 @@ class MatrixClientManager {
       } catch (e) {
         debugLog('MatrixClientManager: Error disposing old client: $e');
       }
+      _managedHttpClient?.close();
+      _managedHttpClient = null;
       _client = null;
       _isInitialized = false;
     }
@@ -178,11 +185,18 @@ class MatrixClientManager {
           ephemeral: StateFilter(notTypes: ['m.typing', 'm.receipt']),
         ),
       );
+      final privacySettings =
+          await preferencesDataSource?.getPrivacySettingsModel() ??
+          const PrivacySettings();
+      _swapManagedHttpClient(
+        createPrivacyAwareHttpClient(settings: privacySettings),
+      );
 
       // 创建客户端（端到端加密由 flutter_vodozemac 自动支持）
       _client = Client(
         clientName,
         database: database,
+        httpClient: _managedHttpClient,
         supportedLoginTypes: {
           AuthenticationTypes.password,
           AuthenticationTypes.sso,
@@ -222,12 +236,25 @@ class MatrixClientManager {
         }
         _client = null;
       }
+      _managedHttpClient?.close();
+      _managedHttpClient = null;
       _isInitialized = false;
       _initCompleter!.completeError(e, stack);
       rethrow;
     } finally {
       _initCompleter = null;
     }
+  }
+
+  /// 动态更新网络隐私设置（代理/Tor/IP 保护）
+  Future<void> updateNetworkPrivacy(PrivacySettings settings) async {
+    final nextClient = createPrivacyAwareHttpClient(settings: settings);
+    _swapManagedHttpClient(nextClient, assignToMatrixClient: true);
+    debugLog(
+      'MatrixClientManager: Network privacy updated '
+      '(proxy=${settings.proxyEnabled}, tor=${settings.useTor}, '
+      'ipProtection=${settings.protectIpAddress})',
+    );
   }
 
   /// 获取默认数据库路径
@@ -467,11 +494,17 @@ class MatrixClientManager {
   }
 
   /// 创建私聊房间
-  Future<String> createDirectChat(String userId) async {
+  Future<String> createDirectChat(
+    String userId, {
+    bool encrypted = true,
+  }) async {
     _ensureInitialized();
     _ensureLoggedIn();
 
-    final roomId = await _client!.startDirectChat(userId);
+    final roomId = await _client!.startDirectChat(
+      userId,
+      enableEncryption: encrypted,
+    );
     return roomId;
   }
 
@@ -838,6 +871,8 @@ class MatrixClientManager {
       await _client!.dispose();
       _client = null;
     }
+    _managedHttpClient?.close();
+    _managedHttpClient = null;
 
     _isInitialized = false;
     debugLog('MatrixClientManager: Disposed');
@@ -860,5 +895,20 @@ class MatrixClientManager {
     if (!isLoggedIn) {
       throw StateError('Not logged in. Call login() first.');
     }
+  }
+
+  void _swapManagedHttpClient(
+    http.Client nextClient, {
+    bool assignToMatrixClient = false,
+  }) {
+    final previousClient = _managedHttpClient;
+    _managedHttpClient = nextClient;
+    if (assignToMatrixClient && _client != null) {
+      _client!.httpClient = FixedTimeoutHttpClient(
+        nextClient,
+        const Duration(seconds: 35),
+      );
+    }
+    previousClient?.close();
   }
 }

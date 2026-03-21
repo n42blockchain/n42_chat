@@ -14,11 +14,12 @@ abstract class SearchEvent extends Equatable {
 class PerformSearch extends SearchEvent {
   final String query;
   final SearchResultType? type;
+  final MessageSearchFilter? filter;
 
-  const PerformSearch(this.query, {this.type});
+  const PerformSearch(this.query, {this.type, this.filter});
 
   @override
-  List<Object?> get props => [query, type];
+  List<Object?> get props => [query, type, filter];
 }
 
 /// 搜索联系人
@@ -45,11 +46,12 @@ class SearchGroups extends SearchEvent {
 class SearchMessages extends SearchEvent {
   final String query;
   final String? roomId;
+  final MessageSearchFilter? filter;
 
-  const SearchMessages(this.query, {this.roomId});
+  const SearchMessages(this.query, {this.roomId, this.filter});
 
   @override
-  List<Object?> get props => [query, roomId];
+  List<Object?> get props => [query, roomId, filter];
 }
 
 /// 清除搜索
@@ -91,11 +93,12 @@ class ChangeSearchType extends SearchEvent {
 class SearchInChat extends SearchEvent {
   final String roomId;
   final String query;
+  final MessageSearchFilter? filter;
 
-  const SearchInChat(this.roomId, this.query);
+  const SearchInChat(this.roomId, this.query, {this.filter});
 
   @override
-  List<Object?> get props => [roomId, query];
+  List<Object?> get props => [roomId, query, filter];
 }
 
 /// 导航到下一个搜索结果
@@ -122,4 +125,3 @@ class NavigateToResultIndex extends SearchEvent {
 class LoadMoreChatResults extends SearchEvent {
   const LoadMoreChatResults();
 }
-

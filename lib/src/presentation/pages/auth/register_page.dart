@@ -42,6 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscureConfirmPassword = true;
   bool _agreeToTerms = false;
   bool _showInviteCode = false; // 控制是否显示邀请码输入框
+  bool _anonymousMode = false;
 
   @override
   void dispose() {
@@ -95,16 +96,26 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (_formKey.currentState?.validate() ?? false) {
       final inviteCode = _inviteCodeController.text.trim();
-      final email = _emailController.text.trim();
-      context.read<AuthBloc>().add(
-        AuthRegisterRequested(
-          homeserver: _homeserverController.text.trim(),
-          username: _usernameController.text.trim(),
-          password: _passwordController.text,
-          email: email.isNotEmpty ? email : null,
-          registrationToken: inviteCode.isNotEmpty ? inviteCode : null,
-        ),
-      );
+      if (_anonymousMode) {
+        context.read<AuthBloc>().add(
+          AuthAnonymousRegisterRequested(
+            homeserver: _homeserverController.text.trim(),
+            password: _passwordController.text,
+            registrationToken: inviteCode.isNotEmpty ? inviteCode : null,
+          ),
+        );
+      } else {
+        final email = _emailController.text.trim();
+        context.read<AuthBloc>().add(
+          AuthRegisterRequested(
+            homeserver: _homeserverController.text.trim(),
+            username: _usernameController.text.trim(),
+            password: _passwordController.text,
+            email: email.isNotEmpty ? email : null,
+            registrationToken: inviteCode.isNotEmpty ? inviteCode : null,
+          ),
+        );
+      }
     }
   }
 
@@ -176,15 +187,21 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   const SizedBox(height: 10),
 
-                  // 用户名输入
-                  _buildUsernameInput(isDarkMode),
+                  _buildAnonymousModeToggle(isDarkMode),
 
                   const SizedBox(height: 10),
 
-                  // 邮箱输入
-                  _buildEmailInput(isDarkMode),
-
-                  const SizedBox(height: 10),
+                  if (_anonymousMode) ...[
+                    _buildAnonymousInfoCard(isDarkMode),
+                    const SizedBox(height: 10),
+                  ] else ...[
+                    // 用户名输入
+                    _buildUsernameInput(isDarkMode),
+                    const SizedBox(height: 10),
+                    // 邮箱输入
+                    _buildEmailInput(isDarkMode),
+                    const SizedBox(height: 10),
+                  ],
 
                   // 密码输入
                   _buildPasswordInput(isDarkMode),
@@ -313,6 +330,87 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  Widget _buildAnonymousModeToggle(bool isDark) {
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final subtitleColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final cardColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: SwitchListTile(
+        value: _anonymousMode,
+        onChanged: (value) {
+          setState(() {
+            _anonymousMode = value;
+          });
+        },
+        activeThumbColor: AppColors.primary,
+        activeTrackColor: AppColors.primary.withValues(alpha: 0.35),
+        title: Text(
+          'Anonymous Registration',
+          style: TextStyle(
+            color: textColor,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Text(
+          'Create an account without binding phone or email. A username will be generated automatically.',
+          style: TextStyle(color: subtitleColor, fontSize: 12),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+      ),
+    );
+  }
+
+  Widget _buildAnonymousInfoCard(bool isDark) {
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final subtitleColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final cardColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Anonymous mode is on',
+            style: TextStyle(
+              color: textColor,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'The app will create a random Matrix username for you. You can still sign in later with your generated account and password.',
+            style: TextStyle(color: subtitleColor, fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildUsernameInput(bool isDark) {
     final labelColor = isDark
         ? AppColors.textSecondaryDark
@@ -359,6 +457,9 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           textInputAction: TextInputAction.next,
           validator: (value) {
+            if (_anonymousMode) {
+              return null;
+            }
             if (value == null || value.isEmpty) {
               return S.of(context)?.authEnterUsername ??
                   'Please enter username';
@@ -435,6 +536,9 @@ class _RegisterPageState extends State<RegisterPage> {
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           validator: (value) {
+            if (_anonymousMode) {
+              return null;
+            }
             // 邮箱是可选的，但如果填写了需要验证格式
             if (value != null && value.isNotEmpty) {
               final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');

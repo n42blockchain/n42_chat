@@ -304,9 +304,9 @@ class MatrixMessageOperations {
         'n42.live_location.update',
         _client!.userID!,
         {
-          'latitude': latitude,
-          'longitude': longitude,
-          'accuracy': ?accuracy,
+          'latitude': latitude.toStringAsFixed(6),
+          'longitude': longitude.toStringAsFixed(6),
+          'accuracy': ?accuracy?.toStringAsFixed(2),
           'updated_at': DateTime.now().toIso8601String(),
         },
       );

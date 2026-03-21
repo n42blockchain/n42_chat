@@ -764,6 +764,79 @@ void main() {
         },
       );
     });
+
+    group('suggestReplies', () {
+      test('should parse JSON array suggestions', () async {
+        when(
+          () => mockDio.post<Map<String, dynamic>>(
+            any(),
+            data: any(named: 'data'),
+            options: any(named: 'options'),
+          ),
+        ).thenAnswer(
+          (_) async => Response<Map<String, dynamic>>(
+            data: {
+              'choices': [
+                {
+                  'message': {
+                    'role': 'assistant',
+                    'content':
+                        '["Sounds good","I can do that","Let me check"]',
+                  },
+                },
+              ],
+              'usage': {'prompt_tokens': 10, 'completion_tokens': 8},
+              'model': 'gpt-4o-mini',
+            },
+            statusCode: 200,
+            requestOptions: RequestOptions(path: '/v1/chat/completions'),
+          ),
+        );
+
+        final result = await datasource.suggestReplies([
+          const AiMessage(
+            role: AiRole.assistant,
+            content: 'Can you review this?',
+          ),
+        ]);
+
+        expect(result, ['Sounds good', 'I can do that', 'Let me check']);
+      });
+
+      test('should fall back to newline parsing when model returns plain text',
+          () async {
+        when(
+          () => mockDio.post<Map<String, dynamic>>(
+            any(),
+            data: any(named: 'data'),
+            options: any(named: 'options'),
+          ),
+        ).thenAnswer(
+          (_) async => Response<Map<String, dynamic>>(
+            data: {
+              'choices': [
+                {
+                  'message': {
+                    'role': 'assistant',
+                    'content': '1. Sure\n2. Give me a minute\n3. Thanks!',
+                  },
+                },
+              ],
+              'usage': {'prompt_tokens': 10, 'completion_tokens': 8},
+              'model': 'gpt-4o-mini',
+            },
+            statusCode: 200,
+            requestOptions: RequestOptions(path: '/v1/chat/completions'),
+          ),
+        );
+
+        final result = await datasource.suggestReplies([
+          const AiMessage(role: AiRole.assistant, content: 'Need this today'),
+        ]);
+
+        expect(result, ['Sure', 'Give me a minute', 'Thanks!']);
+      });
+    });
   });
 
   group('AiServiceException', () {

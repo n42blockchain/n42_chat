@@ -17,11 +17,15 @@ class QuickReplySheet extends StatefulWidget {
   /// 安全存储数据源
   final PreferencesDataSource storageDataSource;
 
+  /// AI 智能回复建议加载器
+  final Future<List<String>> Function()? smartReplyLoader;
+
   const QuickReplySheet({
     super.key,
     required this.onSelect,
     this.onManage,
     required this.storageDataSource,
+    this.smartReplyLoader,
   });
 
   @override
@@ -30,12 +34,15 @@ class QuickReplySheet extends StatefulWidget {
 
 class _QuickReplySheetState extends State<QuickReplySheet> {
   List<QuickReplyEntity> _replies = [];
+  List<String> _smartReplies = [];
   bool _isLoading = true;
+  bool _isLoadingSmartReplies = false;
 
   @override
   void initState() {
     super.initState();
     _loadReplies();
+    _loadSmartReplies();
   }
 
   Future<void> _loadReplies() async {
@@ -64,6 +71,28 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
     }
   }
 
+  Future<void> _loadSmartReplies() async {
+    final loader = widget.smartReplyLoader;
+    if (loader == null) {
+      return;
+    }
+    setState(() => _isLoadingSmartReplies = true);
+    try {
+      final replies = await loader();
+      if (!mounted) return;
+      setState(() {
+        _smartReplies = replies
+            .map((reply) => reply.trim())
+            .where((reply) => reply.isNotEmpty)
+            .toList();
+        _isLoadingSmartReplies = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isLoadingSmartReplies = false);
+    }
+  }
+
   void _onSelectReply(QuickReplyEntity reply) {
     // 更新最后使用时间
     widget.storageDataSource.updateQuickReplyLastUsed(reply.id);
@@ -71,6 +100,11 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
     Navigator.pop(context);
     // 回调
     widget.onSelect(reply.content);
+  }
+
+  void _onSelectSmartReply(String reply) {
+    Navigator.pop(context);
+    widget.onSelect(reply);
   }
 
   @override
@@ -144,8 +178,8 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
                     ),
                   )
                 : _replies.isEmpty
-                    ? _buildEmptyState(isDark, l10n)
-                    : _buildReplyList(isDark),
+                    ? _buildSmartReplyAwareEmptyState(isDark, l10n)
+                    : _buildReplyList(isDark, l10n),
           ),
 
           // 底部安全区域
@@ -179,15 +213,69 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
     );
   }
 
-  Widget _buildReplyList(bool isDark) {
-    return ListView.builder(
+  Widget _buildReplyList(bool isDark, S? l10n) {
+    return ListView(
       shrinkWrap: true,
       padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: _replies.length,
-      itemBuilder: (context, index) {
-        final reply = _replies[index];
-        return _buildReplyItem(reply, isDark);
-      },
+      children: [
+        if (_isLoadingSmartReplies)
+          _buildSectionHeader(
+            isDark,
+            title: 'AI Suggestions',
+            trailing: const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          )
+        else if (_smartReplies.isNotEmpty) ...[
+          _buildSectionHeader(isDark, title: 'AI Suggestions'),
+          ..._smartReplies.map((reply) => _buildSmartReplyItem(reply, isDark)),
+        ],
+        if (_smartReplies.isNotEmpty && _replies.isNotEmpty)
+          const Divider(height: 16),
+        if (_replies.isNotEmpty) ...[
+          _buildSectionHeader(
+            isDark,
+            title: l10n?.settingsQuickReply ?? 'Quick Reply',
+          ),
+          ..._replies.map((reply) => _buildReplyItem(reply, isDark)),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildSmartReplyAwareEmptyState(bool isDark, S? l10n) {
+    if (_smartReplies.isNotEmpty || _isLoadingSmartReplies) {
+      return _buildReplyList(isDark, l10n);
+    }
+    return _buildEmptyState(isDark, l10n);
+  }
+
+  Widget _buildSectionHeader(
+    bool isDark, {
+    required String title,
+    Widget? trailing,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white54 : Colors.black45,
+            ),
+          ),
+          const Spacer(),
+          ...?switch (trailing) {
+            final widget? => [widget],
+            _ => null,
+          },
+        ],
+      ),
     );
   }
 
@@ -227,6 +315,34 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
       ),
     );
   }
+
+  Widget _buildSmartReplyItem(String reply, bool isDark) {
+    return InkWell(
+      onTap: () => _onSelectSmartReply(reply),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.auto_awesome,
+              size: 18,
+              color: AppColors.primary,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                reply,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 /// 显示快捷回复弹窗
@@ -235,6 +351,7 @@ Future<void> showQuickReplySheet({
   required void Function(String content) onSelect,
   VoidCallback? onManage,
   required PreferencesDataSource storageDataSource,
+  Future<List<String>> Function()? smartReplyLoader,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -244,6 +361,7 @@ Future<void> showQuickReplySheet({
       onSelect: onSelect,
       onManage: onManage,
       storageDataSource: storageDataSource,
+      smartReplyLoader: smartReplyLoader,
     ),
   );
 }

@@ -34,7 +34,9 @@ Widget buildTestWidget(Widget child, {MomentBloc? momentBloc}) {
 
 void main() {
   group('DiscoverPage', () {
-    testWidgets('renders 6 menu items including Channels', (tester) async {
+    testWidgets('renders 8 menu items including Voice Room and Mini Apps', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
@@ -43,6 +45,9 @@ void main() {
 
       // 验证有 Scan 菜单项
       expect(find.text('Scan'), findsOneWidget);
+
+      expect(find.text('Voice Room'), findsOneWidget);
+      expect(find.text('Mini Apps'), findsOneWidget);
 
       // 验证有 Search 菜单项（可能是 'Search' 或本地化的文本）
       final searchFinder = find.textContaining('Search');
@@ -55,18 +60,16 @@ void main() {
       expect(find.textContaining('Channel'), findsOneWidget);
     });
 
-    testWidgets('does not show still-hidden features (Live, Listen, etc.)', (
+    testWidgets('does not show still-hidden features (Listen, Watch, Nearby)', (
       tester,
     ) async {
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
       // 验证已隐藏的功能不显示
-      expect(find.text('Live'), findsNothing);
       expect(find.text('Listen'), findsNothing);
       expect(find.text('Watch'), findsNothing);
       expect(find.text('Nearby'), findsNothing);
-      expect(find.text('Mini Programs'), findsNothing);
     });
 
     testWidgets('shows AppBar with Discover title when showAppBar is true', (
@@ -138,15 +141,15 @@ void main() {
       expect(find.text('Moments'), findsOneWidget);
     });
 
-    testWidgets('has exactly 6 chevron_right icons for visible menu items', (
+    testWidgets('has exactly 8 chevron_right icons for visible menu items', (
       tester,
     ) async {
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
-      // 发现页当前显示 6 个入口（Moments、Scan、Search、Games、Communities、Channels）
+      // 发现页当前显示 8 个入口（Moments、Scan、Search、Voice Room、Mini Apps、Games、Communities、Channels）
       final chevronIcons = find.byIcon(Icons.chevron_right);
-      expect(chevronIcons, findsNWidgets(6));
+      expect(chevronIcons, findsNWidgets(8));
     });
   });
 }

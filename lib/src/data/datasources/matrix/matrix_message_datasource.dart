@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../domain/entities/group_album_entity.dart';
 import '../../../domain/entities/group_file_entity.dart';
+import '../../../domain/entities/live_location_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'matrix_client_manager.dart';
 import 'message/matrix_event_mapper.dart';
@@ -43,6 +45,7 @@ class MatrixMessageDataSource {
 
   /// 获取Matrix客户端
   matrix.Client? get _client => _clientManager.client;
+  String? get currentUserId => _client?.userID;
 
   // ============================================
   // 消息获取
@@ -100,6 +103,97 @@ class MatrixMessageDataSource {
     if (room == null) return null;
 
     return await room.getEventById(eventId);
+  }
+
+  List<LiveLocationEntity> getActiveLiveLocations(String roomId) {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return const [];
+
+    final shareStates = room.states['n42.live_location'];
+    if (shareStates == null || shareStates.isEmpty) {
+      return const [];
+    }
+
+    final updateStates = room.states['n42.live_location.update'] ?? const {};
+    final memberStates = room.states[matrix.EventTypes.RoomMember] ?? const {};
+    final now = DateTime.now();
+    final locations = <LiveLocationEntity>[];
+
+    for (final entry in shareStates.entries) {
+      final userId = entry.key;
+      final sharingEvent = entry.value;
+      final sharingContent = sharingEvent.content;
+      if (sharingContent['sharing'] != true) {
+        continue;
+      }
+
+      final expiresAt = DateTime.tryParse(
+            sharingContent['expires_at'] as String? ?? '',
+          ) ??
+          DateTime.tryParse(
+            sharingContent['started_at'] as String? ?? '',
+          ) ??
+          now;
+      if (!expiresAt.isAfter(now)) {
+        continue;
+      }
+
+      final updateEvent = updateStates[userId];
+      final updateContent = updateEvent?.content;
+      final latitude = _toDouble(updateContent?['latitude']);
+      final longitude = _toDouble(updateContent?['longitude']);
+      if (latitude == null || longitude == null) {
+        continue;
+      }
+
+      final updatedAt = DateTime.tryParse(
+            updateContent?['updated_at'] as String? ?? '',
+          ) ??
+          DateTime.tryParse(
+            sharingContent['started_at'] as String? ?? '',
+          ) ??
+          now;
+      final durationMinutes =
+          _toInt(sharingContent['duration_minutes']) ??
+          expiresAt.difference(updatedAt).inMinutes.clamp(1, 1440).toInt();
+
+      final memberEvent = memberStates[userId];
+      final memberContent = memberEvent?.content ?? const <String, dynamic>{};
+      final avatarUrl = memberContent['avatar_url'] as String?;
+      final httpAvatarUrl = avatarUrl != null && avatarUrl.startsWith('mxc://')
+          ? _eventMapper.getMediaUrl(avatarUrl)?.toString()
+          : avatarUrl;
+
+      locations.add(
+        LiveLocationEntity(
+          userId: userId,
+          displayName: memberContent['displayname'] as String? ?? userId,
+          avatarUrl: httpAvatarUrl,
+          latitude: latitude,
+          longitude: longitude,
+          accuracy: _toDouble(updateContent?['accuracy']),
+          updatedAt: updatedAt,
+          expiresAt: expiresAt,
+          durationMinutes: durationMinutes,
+        ),
+      );
+    }
+
+    locations.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return locations;
+  }
+
+  Stream<List<LiveLocationEntity>> watchLiveLocations(String roomId) async* {
+    yield getActiveLiveLocations(roomId);
+
+    final syncStream = _client?.onSync.stream;
+    if (syncStream == null) {
+      return;
+    }
+
+    await for (final _ in syncStream) {
+      yield getActiveLiveLocations(roomId);
+    }
   }
 
   // ============================================
@@ -173,16 +267,22 @@ class MatrixMessageDataSource {
   /// 发送文件消息
   Future<String?> sendFileMessage(
     String roomId, {
-    required Uint8List fileBytes,
+    Uint8List? fileBytes,
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+    int? fileSize,
   }) => _sender.sendFileMessage(
     roomId,
     fileBytes: fileBytes,
     filename: filename,
     mimeType: mimeType,
     selfDestructAfter: selfDestructAfter,
+    filePath: filePath,
+    fileStream: fileStream,
+    fileSize: fileSize,
   );
 
   /// 发送位置消息
@@ -501,6 +601,23 @@ class MatrixMessageDataSource {
   /// 停止实时位置共享
   Future<void> stopLiveLocation(String roomId) =>
       _operations.stopLiveLocation(roomId);
+
+  double? _toDouble(dynamic value) {
+    if (value is num) {
+      return value.toDouble();
+    }
+    return double.tryParse(value?.toString() ?? '');
+  }
+
+  int? _toInt(dynamic value) {
+    if (value is int) {
+      return value;
+    }
+    if (value is num) {
+      return value.toInt();
+    }
+    return int.tryParse(value?.toString() ?? '');
+  }
 
   // ============================================
   // 群相册媒体获取

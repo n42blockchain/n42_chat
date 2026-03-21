@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:matrix/matrix.dart' as matrix;
 
@@ -78,16 +79,22 @@ class MatrixMessageSender {
   /// 发送文件消息
   Future<String?> sendFileMessage(
     String roomId, {
-    required Uint8List fileBytes,
+    Uint8List? fileBytes,
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+    int? fileSize,
   }) => _mediaSender.sendFileMessage(
     roomId,
     fileBytes: fileBytes,
     filename: filename,
     mimeType: mimeType,
     selfDestructAfter: selfDestructAfter,
+    filePath: filePath,
+    fileStream: fileStream,
+    fileSize: fileSize,
   );
 
   // ============================================

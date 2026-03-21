@@ -1,5 +1,5 @@
 /// 多人视频会议页面
-/// 
+///
 /// 支持多人音视频会议，包含网格布局、屏幕共享、参与者管理等功能
 library;
 
@@ -7,8 +7,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:livekit_client/livekit_client.dart' show VideoTrack;
+import 'package:livekit_client/livekit_client.dart'
+    show VideoTrackRenderer, VideoViewFit;
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -17,41 +17,17 @@ import '../../../core/theme/app_colors.dart';
 import '../../widgets/chat/in_call_chat_panel.dart';
 import '../../widgets/common/n42_avatar.dart';
 
-// VideoTrackRenderer 存根实现
-// 由于 livekit_client 暂时禁用，使用占位符组件
-class VideoTrackRenderer extends StatelessWidget {
-  final VideoTrack videoTrack;
-  final RTCVideoViewObjectFit fit;
-
-  const VideoTrackRenderer(
-    this.videoTrack, {
-    super.key,
-    this.fit = RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // 存根实现 - 显示占位符
-    return Container(
-      color: Colors.black,
-      child: const Center(
-        child: Icon(Icons.videocam_off, color: Colors.white54, size: 48),
-      ),
-    );
-  }
-}
-
 /// 多人会议页面
 class GroupCallScreen extends StatefulWidget {
   final LiveKitService liveKitService;
   final String roomName;
-  
+
   const GroupCallScreen({
     super.key,
     required this.liveKitService,
     required this.roomName,
   });
-  
+
   @override
   State<GroupCallScreen> createState() => _GroupCallScreenState();
 }
@@ -60,40 +36,40 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   MeetingState _state = MeetingState.idle;
   List<MeetingParticipant> _participants = [];
   Duration _duration = Duration.zero;
-  
+
   bool _isMuted = false;
   bool _isVideoEnabled = true;
   bool _isScreenSharing = false;
   bool _showControls = true;
   bool _showParticipantsList = false;
-  
+
   // 当前焦点参与者（全屏显示）
   MeetingParticipant? _focusedParticipant;
-  
+
   Timer? _hideControlsTimer;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     WakelockPlus.enable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    
+
     // 监听状态
     widget.liveKitService.onStateChanged = _onStateChanged;
     widget.liveKitService.onParticipantsChanged = _onParticipantsChanged;
     widget.liveKitService.onDurationUpdate = _onDurationUpdate;
     widget.liveKitService.onError = _onError;
-    
+
     _state = widget.liveKitService.state;
     _participants = widget.liveKitService.participants;
     _isMuted = widget.liveKitService.isMuted;
     _isVideoEnabled = widget.liveKitService.isVideoEnabled;
     _isScreenSharing = widget.liveKitService.isScreenSharing;
-    
+
     _startHideControlsTimer();
   }
-  
+
   @override
   void dispose() {
     _hideControlsTimer?.cancel();
@@ -101,31 +77,31 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
-  
+
   void _onStateChanged(MeetingState state) {
     setState(() {
       _state = state;
     });
-    
+
     if (state == MeetingState.disconnected || state == MeetingState.failed) {
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) Navigator.of(context).pop();
       });
     }
   }
-  
+
   void _onParticipantsChanged(List<MeetingParticipant> participants) {
     setState(() {
       _participants = participants;
     });
   }
-  
+
   void _onDurationUpdate(Duration duration) {
     setState(() {
       _duration = duration;
     });
   }
-  
+
   void _onError(MeetingErrorType type, [String? details]) {
     if (mounted) {
       final s = S.of(context);
@@ -135,9 +111,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         case MeetingErrorType.serverNotConfigured:
           message = s?.callLivekitNotConfigured ?? 'LiveKit not configured';
         case MeetingErrorType.joinFailed:
-          message = s?.callJoinMeetingFailed(errorDetails) ?? 'Failed to join meeting';
+          message =
+              s?.callJoinMeetingFailed(errorDetails) ??
+              'Failed to join meeting';
         case MeetingErrorType.screenShareFailed:
-          message = s?.callScreenShareFailed(errorDetails) ?? 'Screen share failed';
+          message =
+              s?.callScreenShareFailed(errorDetails) ?? 'Screen share failed';
         case MeetingErrorType.connectionLost:
           message = s?.commonConnectionFailed ?? 'Connection failed';
         case MeetingErrorType.unknown:
@@ -148,7 +127,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       );
     }
   }
-  
+
   void _startHideControlsTimer() {
     _hideControlsTimer?.cancel();
     _hideControlsTimer = Timer(const Duration(seconds: 5), () {
@@ -159,7 +138,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       }
     });
   }
-  
+
   void _toggleControls() {
     setState(() {
       _showControls = !_showControls;
@@ -168,7 +147,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       _startHideControlsTimer();
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -179,27 +158,27 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           children: [
             // 参与者视频网格
             _buildVideoGrid(),
-            
+
             // 屏幕共享覆盖层
             if (_hasScreenShare) _buildScreenShareOverlay(),
-            
+
             // 顶部栏
             AnimatedOpacity(
               opacity: _showControls ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 200),
               child: _buildTopBar(),
             ),
-            
+
             // 底部控制栏
             AnimatedOpacity(
               opacity: _showControls ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 200),
               child: _buildBottomBar(),
             ),
-            
+
             // 参与者列表
             if (_showParticipantsList) _buildParticipantsList(),
-            
+
             // 连接中状态
             if (_state == MeetingState.connecting) _buildConnectingOverlay(),
           ],
@@ -207,36 +186,40 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
     );
   }
-  
+
   bool get _hasScreenShare {
     return _participants.any((p) => p.isScreenSharing);
   }
-  
+
   Widget _buildVideoGrid() {
-    final videoParticipants = _participants
-        .where((p) => p.isVideoEnabled || p.isLocal)
-        .toList();
-    
-    if (videoParticipants.isEmpty) {
+    final visibleParticipants = List<MeetingParticipant>.from(_participants);
+
+    if (visibleParticipants.isEmpty) {
       return Container(
         color: Colors.grey[900],
         child: Center(
           child: Text(
-            S.of(context)?.callWaitingForParticipants ?? 'Waiting for participants to join...',
+            S.of(context)?.callWaitingForParticipants ??
+                'Waiting for participants to join...',
             style: const TextStyle(color: Colors.white54, fontSize: 16),
           ),
         ),
       );
     }
-    
+
     // 焦点模式：一个大视频 + 小视频条
-    if (_focusedParticipant != null) {
-      return _buildFocusedLayout(videoParticipants);
+    final focusedParticipant =
+        _focusedParticipant != null &&
+            visibleParticipants.any((p) => p.id == _focusedParticipant!.id)
+        ? _focusedParticipant
+        : null;
+    if (focusedParticipant != null) {
+      return _buildFocusedLayout(visibleParticipants, focusedParticipant);
     }
-    
+
     // 网格布局
-    final crossAxisCount = _getGridColumns(videoParticipants.length);
-    
+    final crossAxisCount = _getGridColumns(visibleParticipants.length);
+
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -245,16 +228,21 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         crossAxisSpacing: 2,
         mainAxisSpacing: 2,
       ),
-      itemCount: videoParticipants.length,
+      itemCount: visibleParticipants.length,
       itemBuilder: (context, index) {
-        return _buildParticipantTile(videoParticipants[index]);
+        return _buildParticipantTile(visibleParticipants[index]);
       },
     );
   }
-  
-  Widget _buildFocusedLayout(List<MeetingParticipant> participants) {
-    final others = participants.where((p) => p.id != _focusedParticipant!.id).toList();
-    
+
+  Widget _buildFocusedLayout(
+    List<MeetingParticipant> participants,
+    MeetingParticipant focusedParticipant,
+  ) {
+    final others = participants
+        .where((p) => p.id != focusedParticipant.id)
+        .toList();
+
     return Column(
       children: [
         // 焦点视频
@@ -265,10 +253,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 _focusedParticipant = null;
               });
             },
-            child: _buildParticipantTile(_focusedParticipant!, showName: true),
+            child: _buildParticipantTile(focusedParticipant, showName: true),
           ),
         ),
-        
+
         // 其他参与者横向列表
         if (others.isNotEmpty)
           SizedBox(
@@ -287,7 +275,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ],
     );
   }
-  
+
   Widget _buildParticipantTile(
     MeetingParticipant participant, {
     bool showName = true,
@@ -314,7 +302,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               Positioned.fill(
                 child: VideoTrackRenderer(
                   participant.videoTrack!,
-                  fit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  fit: VideoViewFit.cover,
                 ),
               )
             else
@@ -332,7 +320,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   ),
                 ),
               ),
-            
+
             // 名称和状态
             if (showName)
               Positioned(
@@ -355,9 +343,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                           size: 14,
                         ),
                       ),
-                    
+
                     const SizedBox(width: 4),
-                    
+
                     // 名称
                     Expanded(
                       child: Container(
@@ -371,7 +359,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         ),
                         child: Text(
                           participant.isLocal
-                              ? (S.of(context)?.callParticipantMe(participant.name) ?? '${participant.name} (Me)')
+                              ? (S
+                                        .of(context)
+                                        ?.callParticipantMe(participant.name) ??
+                                    '${participant.name} (Me)')
                               : participant.name,
                           style: const TextStyle(
                             color: Colors.white,
@@ -385,14 +376,17 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   ],
                 ),
               ),
-            
+
             // 屏幕共享标识
             if (participant.isScreenSharing)
               Positioned(
                 top: 8,
                 right: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(4),
@@ -400,11 +394,18 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.screen_share, color: Colors.white, size: 14),
+                      const Icon(
+                        Icons.screen_share,
+                        color: Colors.white,
+                        size: 14,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         S.of(context)?.callSharingLabel ?? 'Sharing',
-                        style: const TextStyle(color: Colors.white, fontSize: 11),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                        ),
                       ),
                     ],
                   ),
@@ -415,13 +416,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
     );
   }
-  
+
   Widget _buildScreenShareOverlay() {
     final sharer = _participants.firstWhere(
       (p) => p.isScreenSharing,
       orElse: () => _participants.first,
     );
-    
+
     return Positioned.fill(
       child: Container(
         color: Colors.black,
@@ -432,33 +433,41 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               Positioned.fill(
                 child: VideoTrackRenderer(
                   sharer.screenTrack!,
-                  fit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                  fit: VideoViewFit.contain,
                 ),
               ),
-            
+
             // 共享者信息
             Positioned(
               top: MediaQuery.of(context).padding.top + 60,
               left: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black54,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.screen_share, color: AppColors.primary, size: 18),
+                    const Icon(
+                      Icons.screen_share,
+                      color: AppColors.primary,
+                      size: 18,
+                    ),
                     const SizedBox(width: 8),
                     Text(
-                      S.of(context)?.callScreenSharingBy(sharer.name) ?? '${sharer.name} is sharing screen',
+                      S.of(context)?.callScreenSharingBy(sharer.name) ??
+                          '${sharer.name} is sharing screen',
                       style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
                   ],
                 ),
               ),
             ),
-            
+
             // 小视频窗口（右下角）
             Positioned(
               bottom: 120,
@@ -474,7 +483,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
     );
   }
-  
+
   Widget _buildTopBar() {
     return Positioned(
       top: 0,
@@ -491,10 +500,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.black.withValues(alpha: 0.7),
-              Colors.transparent,
-            ],
+            colors: [Colors.black.withValues(alpha: 0.7), Colors.transparent],
           ),
         ),
         child: Row(
@@ -504,7 +510,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () => _showLeaveDialog(),
             ),
-            
+
             // 房间信息
             Expanded(
               child: Column(
@@ -524,7 +530,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   Row(
                     children: [
                       Text(
-                        S.of(context)?.callParticipantCount(_participants.length) ?? '${_participants.length} participants',
+                        S
+                                .of(context)
+                                ?.callParticipantCount(_participants.length) ??
+                            '${_participants.length} participants',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 12,
@@ -553,11 +562,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 ],
               ),
             ),
-            
+
             // 切换布局
             IconButton(
               icon: Icon(
-                _focusedParticipant != null ? Icons.grid_view : Icons.fullscreen,
+                _focusedParticipant != null
+                    ? Icons.grid_view
+                    : Icons.fullscreen,
                 color: Colors.white,
               ),
               onPressed: () {
@@ -570,7 +581,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 });
               },
             ),
-            
+
             // 参与者列表
             IconButton(
               icon: const Icon(Icons.people, color: Colors.white),
@@ -585,7 +596,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
     );
   }
-  
+
   Widget _buildBottomBar() {
     return Positioned(
       bottom: 0,
@@ -602,10 +613,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           gradient: LinearGradient(
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
-            colors: [
-              Colors.black.withValues(alpha: 0.8),
-              Colors.transparent,
-            ],
+            colors: [Colors.black.withValues(alpha: 0.8), Colors.transparent],
           ),
         ),
         child: Row(
@@ -670,7 +678,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
     );
   }
-  
+
   Widget _buildControlButton({
     required IconData icon,
     required String label,
@@ -689,12 +697,17 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             height: 50,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: backgroundColor ?? 
-                  (isActive ? (activeColor ?? Colors.white) : Colors.white.withValues(alpha: 0.2)),
+              color:
+                  backgroundColor ??
+                  (isActive
+                      ? (activeColor ?? Colors.white)
+                      : Colors.white.withValues(alpha: 0.2)),
             ),
             child: Icon(
               icon,
-              color: backgroundColor != null || isActive ? Colors.white : Colors.white,
+              color: backgroundColor != null || isActive
+                  ? Colors.white
+                  : Colors.white,
               size: 24,
             ),
           ),
@@ -710,7 +723,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
     );
   }
-  
+
   Widget _buildParticipantsList() {
     return Positioned(
       right: 0,
@@ -731,7 +744,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               ),
               decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                  bottom: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
                 ),
               ),
               child: Row(
@@ -746,7 +761,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
@@ -772,7 +790,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 ],
               ),
             ),
-            
+
             // 参与者列表
             Expanded(
               child: ListView.builder(
@@ -789,7 +807,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
     );
   }
-  
+
   Widget _buildParticipantListItem(MeetingParticipant participant) {
     return ListTile(
       leading: N42Avatar(
@@ -800,8 +818,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
       title: Text(
         participant.isLocal
-                              ? (S.of(context)?.callParticipantMe(participant.name) ?? '${participant.name} (Me)')
-                              : participant.name,
+            ? (S.of(context)?.callParticipantMe(participant.name) ??
+                  '${participant.name} (Me)')
+            : participant.name,
         style: const TextStyle(color: Colors.white, fontSize: 14),
       ),
       trailing: Row(
@@ -817,7 +836,11 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           if (participant.isScreenSharing)
             const Padding(
               padding: EdgeInsets.only(left: 8),
-              child: Icon(Icons.screen_share, color: AppColors.primary, size: 18),
+              child: Icon(
+                Icons.screen_share,
+                color: AppColors.primary,
+                size: 18,
+              ),
             ),
         ],
       ),
@@ -829,7 +852,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       },
     );
   }
-  
+
   Widget _buildConnectingOverlay() {
     return Positioned.fill(
       child: Container(
@@ -850,19 +873,19 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
     );
   }
-  
+
   int _getGridColumns(int count) {
     if (count <= 1) return 1;
     if (count <= 4) return 2;
     if (count <= 9) return 3;
     return 4;
   }
-  
+
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes % 60;
     final seconds = duration.inSeconds % 60;
-    
+
     if (hours > 0) {
       return '${hours.toString().padLeft(2, '0')}:'
           '${minutes.toString().padLeft(2, '0')}:'
@@ -871,49 +894,50 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     return '${minutes.toString().padLeft(2, '0')}:'
         '${seconds.toString().padLeft(2, '0')}';
   }
-  
+
   void _toggleMute() async {
     await widget.liveKitService.toggleMicrophone();
     setState(() {
       _isMuted = widget.liveKitService.isMuted;
     });
   }
-  
+
   void _toggleVideo() async {
     await widget.liveKitService.toggleCamera();
     setState(() {
       _isVideoEnabled = widget.liveKitService.isVideoEnabled;
     });
   }
-  
+
   void _toggleScreenShare() async {
     await widget.liveKitService.toggleScreenShare();
     setState(() {
       _isScreenSharing = widget.liveKitService.isScreenSharing;
     });
   }
-  
+
   void _openInCallChat() {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => InCallChatPanel(
-        liveKitService: widget.liveKitService,
-      ),
+      builder: (_) => InCallChatPanel(liveKitService: widget.liveKitService),
     );
   }
 
   void _switchCamera() {
     widget.liveKitService.switchCamera();
   }
-  
+
   void _showLeaveDialog() {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.callLeaveMeeting ?? 'Leave Meeting'),
-        content: Text(S.of(context)?.callLeaveMeetingConfirm ?? 'Are you sure you want to leave the meeting?'),
+        content: Text(
+          S.of(context)?.callLeaveMeetingConfirm ??
+              'Are you sure you want to leave the meeting?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -931,10 +955,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       ),
     );
   }
-  
+
   void _leaveMeeting() {
     widget.liveKitService.leaveMeeting();
     Navigator.of(context).pop();
   }
 }
-

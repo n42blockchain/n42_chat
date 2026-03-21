@@ -24,10 +24,14 @@ class MiniAppPage extends StatefulWidget {
   /// 当前聊天室 ID（用于聊天 bridge）
   final String roomId;
 
+  /// 可选的初始深链接 URL。若为空则回退到 app manifest URL。
+  final String? initialUrl;
+
   const MiniAppPage({
     super.key,
     required this.app,
     required this.roomId,
+    this.initialUrl,
   });
 
   @override
@@ -52,9 +56,11 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     // 通知 Mini App 即将销毁
-    unawaited(_runJavaScriptSafely(
-      'if(window.n42&&window.n42.lifecycle.onDestroy)window.n42.lifecycle.onDestroy();',
-    ));
+    unawaited(
+      _runJavaScriptSafely(
+        'if(window.n42&&window.n42.lifecycle.onDestroy)window.n42.lifecycle.onDestroy();',
+      ),
+    );
     super.dispose();
   }
 
@@ -62,20 +68,24 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.paused:
-        unawaited(_runJavaScriptSafely(
-          'if(window.n42&&window.n42.lifecycle.onPause)window.n42.lifecycle.onPause();',
-        ));
+        unawaited(
+          _runJavaScriptSafely(
+            'if(window.n42&&window.n42.lifecycle.onPause)window.n42.lifecycle.onPause();',
+          ),
+        );
       case AppLifecycleState.resumed:
-        unawaited(_runJavaScriptSafely(
-          'if(window.n42&&window.n42.lifecycle.onResume)window.n42.lifecycle.onResume();',
-        ));
+        unawaited(
+          _runJavaScriptSafely(
+            'if(window.n42&&window.n42.lifecycle.onResume)window.n42.lifecycle.onResume();',
+          ),
+        );
       default:
         break;
     }
   }
 
   void _initWebView() {
-    final initialUri = normalizeTrustedMiniAppUri(widget.app.url);
+    final initialUri = _resolveInitialUri();
     if (initialUri == null) {
       setState(() {
         _isLoading = false;
@@ -170,6 +180,21 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
     unawaited(_loadInitialUrl(initialUri));
   }
 
+  Uri? _resolveInitialUri() {
+    final launchUrl = widget.initialUrl ?? widget.app.url;
+    final initialUri = normalizeTrustedMiniAppUri(launchUrl);
+    if (initialUri == null) {
+      return null;
+    }
+    if (!isTrustedMiniAppNavigationUrl(
+      appUrl: widget.app.url,
+      candidateUrl: initialUri.toString(),
+    )) {
+      return null;
+    }
+    return initialUri;
+  }
+
   void _onBridgeSendMessage(String text) {
     // 通过 ChatBloc 发送消息到当前聊天室
     try {
@@ -226,11 +251,9 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: AppBar(
-        backgroundColor:
-            isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -246,11 +269,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
                 color: AppColors.primary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Icon(
-                Icons.apps,
-                size: 16,
-                color: AppColors.primary,
-              ),
+              child: const Icon(Icons.apps, size: 16, color: AppColors.primary),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -315,8 +334,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
     return Stack(
       children: [
         WebViewWidget(controller: controller),
-        if (_isLoading)
-          const Center(child: CircularProgressIndicator()),
+        if (_isLoading) const Center(child: CircularProgressIndicator()),
       ],
     );
   }

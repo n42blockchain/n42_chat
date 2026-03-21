@@ -650,6 +650,37 @@ extension _ChatPageInputMethods on _ChatPageState {
         );
       },
       storageDataSource: getIt<PreferencesDataSource>(),
+      smartReplyLoader:
+          getIt.isRegistered<AiService>() ? _loadAiSmartReplies : null,
     );
+  }
+
+  Future<List<String>> _loadAiSmartReplies() async {
+    if (!getIt.isRegistered<AiService>()) {
+      return const [];
+    }
+    final recentMessages = context.read<ChatBloc>().state.messages
+        .where((m) => m.type == MessageType.text && m.content.trim().isNotEmpty)
+        .take(6)
+        .toList()
+        .reversed
+        .toList();
+    if (recentMessages.isEmpty || recentMessages.every((m) => m.isFromMe)) {
+      return const [];
+    }
+
+    final contextMessages = recentMessages.map((message) {
+      final role = message.isFromMe ? AiRole.user : AiRole.assistant;
+      final prefix = message.isFromMe
+          ? 'Me'
+          : (message.senderName.trim().isEmpty ? 'Other' : message.senderName);
+      return AiMessage(role: role, content: '$prefix: ${message.content}');
+    }).toList();
+
+    try {
+      return await getIt<AiService>().suggestReplies(contextMessages);
+    } catch (_) {
+      return const [];
+    }
   }
 }

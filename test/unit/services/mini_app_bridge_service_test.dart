@@ -58,6 +58,23 @@ void main() {
   );
 
   test(
+    'initScript disables chat bridge methods when room context is empty',
+    () {
+      final service = MiniAppBridgeService(
+        walletBridge: MockWalletBridge(),
+        roomId: '',
+        app: buildApp(const [
+          MiniAppPermission.chatRead,
+          MiniAppPermission.chatSend,
+        ]),
+      );
+
+      expect(service.initScript, contains('var _canChatRead = false;'));
+      expect(service.initScript, contains('var _canChatSend = false;'));
+    },
+  );
+
+  test(
     'initScript defaults chat permissions to disabled when app metadata is missing',
     () {
       final service = MiniAppBridgeService(

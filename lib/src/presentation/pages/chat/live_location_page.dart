@@ -25,7 +25,8 @@ class LiveLocationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<LiveLocationBloc>(
-      create: (_) => GetIt.instance<LiveLocationBloc>(),
+      create: (_) => GetIt.instance<LiveLocationBloc>()
+        ..add(ObserveLiveLocationRoom(roomId: roomId)),
       child: BlocBuilder<LiveLocationBloc, LiveLocationState>(
         builder: (context, state) {
           return _LiveLocationView(

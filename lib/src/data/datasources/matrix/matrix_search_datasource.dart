@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/search_result_entity.dart';
 
 const _kSearchHistoryKey = 'n42_chat_search_history';
 const _kSearchHistoryLimit = 20;
@@ -135,6 +137,7 @@ class MatrixSearchDataSource {
   Future<List<matrix.Event>> searchMessagesInRoom(
     String roomId,
     String query, {
+    MessageSearchFilter? filter,
     int limit = 50,
   }) async {
     final room = _client?.getRoomById(roomId);
@@ -150,8 +153,7 @@ class MatrixSearchDataSource {
       for (final event in timeline.events) {
         if (!_isMessageEvent(event)) continue;
 
-        final body = event.body.toLowerCase();
-        if (body.contains(lowerQuery)) {
+        if (_matchesMessageSearch(event, lowerQuery, filter)) {
           results.add(event);
           if (results.length >= limit) break;
         }
@@ -165,8 +167,7 @@ class MatrixSearchDataSource {
           if (!_isMessageEvent(event)) continue;
           if (results.any((e) => e.eventId == event.eventId)) continue;
 
-          final body = event.body.toLowerCase();
-          if (body.contains(lowerQuery)) {
+          if (_matchesMessageSearch(event, lowerQuery, filter)) {
             results.add(event);
             if (results.length >= limit) break;
           }
@@ -183,6 +184,7 @@ class MatrixSearchDataSource {
   /// 全局搜索消息（所有房间）
   Future<List<MessageSearchResult>> searchMessagesGlobally(
     String query, {
+    MessageSearchFilter? filter,
     int limit = 50,
     int limitPerRoom = 10,
   }) async {
@@ -201,8 +203,7 @@ class MatrixSearchDataSource {
         for (final event in timeline.events) {
           if (!_isMessageEvent(event)) continue;
 
-          final body = event.body.toLowerCase();
-          if (body.contains(lowerQuery)) {
+          if (_matchesMessageSearch(event, lowerQuery, filter)) {
             results.add(MessageSearchResult(event: event, room: room));
             roomResultCount++;
 
@@ -231,6 +232,87 @@ class MatrixSearchDataSource {
   bool _isMessageEvent(matrix.Event event) {
     return event.type == matrix.EventTypes.Message &&
         event.status != matrix.EventStatus.error;
+  }
+
+  bool _matchesMessageSearch(
+    matrix.Event event,
+    String lowerQuery,
+    MessageSearchFilter? filter,
+  ) {
+    final body = event.body.toLowerCase();
+    if (!body.contains(lowerQuery)) {
+      return false;
+    }
+
+    if (filter == null || filter.isEmpty) {
+      return true;
+    }
+
+    final senderId = event.senderId;
+    if (filter.onlyFromMe && senderId != _client?.userID) {
+      return false;
+    }
+    if (filter.senderId != null &&
+        filter.senderId!.isNotEmpty &&
+        senderId != filter.senderId) {
+      return false;
+    }
+
+    final timestamp = event.originServerTs;
+    if (filter.sentAfter != null && timestamp.isBefore(filter.sentAfter!)) {
+      return false;
+    }
+    if (filter.sentBefore != null && timestamp.isAfter(filter.sentBefore!)) {
+      return false;
+    }
+
+    final messageType = _mapMatrixMessageType(event);
+    if (filter.messageType != null && messageType != filter.messageType) {
+      return false;
+    }
+    if (filter.hasMediaOnly && !_isMediaType(messageType)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  MessageType _mapMatrixMessageType(matrix.Event event) {
+    switch (event.messageType) {
+      case matrix.MessageTypes.Image:
+        return MessageType.image;
+      case matrix.MessageTypes.Video:
+        return MessageType.video;
+      case matrix.MessageTypes.Audio:
+        return MessageType.audio;
+      case matrix.MessageTypes.File:
+        return MessageType.file;
+      case matrix.MessageTypes.Location:
+        return MessageType.location;
+      case matrix.MessageTypes.Notice:
+        return MessageType.notice;
+      default:
+        final contentMsgType = event.content['msgtype'] as String?;
+        switch (contentMsgType) {
+          case 'org.matrix.msc1767.text':
+          case 'm.text':
+            return MessageType.text;
+          case 'n42.contact_card':
+            return MessageType.contactCard;
+          case 'org.matrix.msc3381.poll.start':
+            return MessageType.poll;
+          default:
+            return MessageType.text;
+        }
+    }
+  }
+
+  bool _isMediaType(MessageType type) {
+    return type == MessageType.image ||
+        type == MessageType.video ||
+        type == MessageType.audio ||
+        type == MessageType.voice ||
+        type == MessageType.file;
   }
 
   // ============================================

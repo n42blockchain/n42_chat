@@ -22,6 +22,7 @@ class DownloadTask {
   final String url;
   final String savePath;
   final String? fileName;
+  final Map<String, String>? headers;
   double progress;
   DownloadStatus status;
   int totalBytes;
@@ -37,6 +38,7 @@ class DownloadTask {
     required this.url,
     required this.savePath,
     this.fileName,
+    this.headers,
     this.progress = 0.0,
     this.status = DownloadStatus.pending,
     this.totalBytes = 0,
@@ -82,6 +84,7 @@ class DownloadService {
     required String url,
     required String savePath,
     String? fileName,
+    Map<String, String>? headers,
     Map<String, String>? metadata,
   }) async {
     final taskId = 'download_${_taskIdCounter++}';
@@ -90,6 +93,7 @@ class DownloadService {
       url: url,
       savePath: savePath,
       fileName: fileName,
+      headers: headers == null ? null : Map<String, String>.from(headers),
       metadata: metadata,
     );
 
@@ -103,6 +107,22 @@ class DownloadService {
   /// 监听下载任务进度
   Stream<DownloadTask> watchTask(String taskId) {
     return _taskControllers[taskId]?.stream ?? const Stream.empty();
+  }
+
+  /// 等待下载任务进入最终状态
+  Future<DownloadTask> waitForTaskCompletion(String taskId) async {
+    final task = _tasks[taskId];
+    if (task == null) {
+      throw StateError('Unknown download task: $taskId');
+    }
+
+    if (_isTerminalStatus(task.status)) {
+      return task;
+    }
+
+    return watchTask(taskId).firstWhere(
+      (updatedTask) => _isTerminalStatus(updatedTask.status),
+    );
   }
 
   /// 取消下载任务
@@ -155,6 +175,9 @@ class DownloadService {
 
     try {
       final request = http.Request('GET', Uri.parse(task.url));
+      if (task.headers != null && task.headers!.isNotEmpty) {
+        request.headers.addAll(task.headers!);
+      }
       final response = await client.send(request);
 
       if (response.statusCode != 200) {
@@ -240,6 +263,18 @@ class DownloadService {
 
   void _notifyTask(DownloadTask task) {
     _taskControllers[task.id]?.add(task);
+  }
+
+  bool _isTerminalStatus(DownloadStatus status) {
+    switch (status) {
+      case DownloadStatus.completed:
+      case DownloadStatus.failed:
+      case DownloadStatus.cancelled:
+        return true;
+      case DownloadStatus.pending:
+      case DownloadStatus.downloading:
+        return false;
+    }
   }
 
   /// 获取默认下载目录

@@ -7,9 +7,9 @@ import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
 
 import '../../../core/services/speech_to_text_service.dart';
 import '../../../core/services/translation_service.dart';
+import '../../../core/utils/content_filter_utils.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
-import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
@@ -165,6 +165,18 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // 房间信息（频道/权限）
     on<RoomInfoLoaded>(_onRoomInfoLoaded);
+  }
+
+  Future<int?> _resolveSelfDestructAfter(int? explicitValue) async {
+    if (explicitValue != null) {
+      return explicitValue > 0 ? explicitValue : null;
+    }
+
+    final defaultSeconds = await _secureStorage.getDefaultSelfDestructSeconds();
+    if (defaultSeconds == null || defaultSeconds <= 0) {
+      return null;
+    }
+    return defaultSeconds;
   }
 
   /// 处理销毁时间加载完成事件

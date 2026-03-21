@@ -18,7 +18,10 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
           Navigator.pop(ctx);
           context.read<ChatBloc>().add(SetReplyTarget(message));
         },
-        onForward: (message.type == MessageType.redPacket || message.type == MessageType.transfer)
+        onForward:
+            (message.type == MessageType.redPacket ||
+                message.type == MessageType.transfer ||
+                message.type == MessageType.paymentRequest)
             ? null
             : () {
                 Navigator.pop(ctx);
@@ -42,7 +45,8 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
     }
 
     // 获取消息气泡的位置和大小
-    final RenderBox? renderBox = messageKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? renderBox =
+        messageKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) {
       // fallback 到旧菜单
       _showMessageMenu(message);
@@ -80,8 +84,11 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
           debugLog('Copy clicked');
           _copyMessage(message);
         },
-        // 红包和转账消息不能转发
-        onForward: (message.type == MessageType.redPacket || message.type == MessageType.transfer)
+        // 红包、转账和收款请求消息不能转发
+        onForward:
+            (message.type == MessageType.redPacket ||
+                message.type == MessageType.transfer ||
+                message.type == MessageType.paymentRequest)
             ? null
             : () {
                 debugLog('Forward clicked');
@@ -135,18 +142,20 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
           debugLog('Unpin clicked');
           context.read<ChatBloc>().add(UnpinMessage(message.id));
         },
-        onViewEditHistory: message.isEdited ? () {
-          debugLog('View edit history clicked');
-          showModalBottomSheet<void>(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (ctx) => EditHistorySheet(
-              roomId: message.roomId,
-              messageId: message.id,
-            ),
-          );
-        } : null,
+        onViewEditHistory: message.isEdited
+            ? () {
+                debugLog('View edit history clicked');
+                showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (ctx) => EditHistorySheet(
+                    roomId: message.roomId,
+                    messageId: message.id,
+                  ),
+                );
+              }
+            : null,
         onReplyInThread: () {
           debugLog('Reply in thread clicked');
           _navigateToThread(message);
@@ -155,21 +164,30 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
           debugLog('Edit clicked');
           _enterEditMode(message);
         },
-        onTranslate: (getIt.isRegistered<ITranslationService>() && message.type == MessageType.text) ? () {
-          debugLog('Translate clicked');
-          final chatBloc = context.read<ChatBloc>();
-          final targetLang = chatBloc.state.defaultTargetLanguage.isNotEmpty
-              ? chatBloc.state.defaultTargetLanguage
-              : getTargetLanguage(null);
-          chatBloc.add(TranslateMessage(
-            messageId: message.id,
-            targetLanguage: targetLang,
-          ));
-        } : null,
-        onReport: message.isFromMe ? null : () {
-          debugLog('Report clicked');
-          _showReportDialog(message);
-        },
+        onTranslate:
+            (getIt.isRegistered<ITranslationService>() &&
+                message.type == MessageType.text)
+            ? () {
+                debugLog('Translate clicked');
+                final chatBloc = context.read<ChatBloc>();
+                final targetLang =
+                    chatBloc.state.defaultTargetLanguage.isNotEmpty
+                    ? chatBloc.state.defaultTargetLanguage
+                    : getTargetLanguage(null);
+                chatBloc.add(
+                  TranslateMessage(
+                    messageId: message.id,
+                    targetLanguage: targetLang,
+                  ),
+                );
+              }
+            : null,
+        onReport: message.isFromMe
+            ? null
+            : () {
+                debugLog('Report clicked');
+                _showReportDialog(message);
+              },
       ),
     );
 
@@ -212,8 +230,8 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
                   : () {
                       Navigator.pop(dialogContext);
                       context.read<ChatBloc>().add(
-                            ReportMessage(message.id, selectedReason!),
-                          );
+                        ReportMessage(message.id, selectedReason!),
+                      );
                     },
               child: Text(l10n?.commonConfirm ?? 'OK'),
             ),
@@ -228,7 +246,10 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
     if (message.type != MessageType.text || message.content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.chatOnlyTextSearchable ?? 'Only text messages can be searched'),
+          content: Text(
+            S.of(context)?.chatOnlyTextSearchable ??
+                'Only text messages can be searched',
+          ),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -267,7 +288,8 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  S.of(context)?.chatSearchFor(searchText) ?? 'Search "$searchText"',
+                  S.of(context)?.chatSearchFor(searchText) ??
+                      'Search "$searchText"',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -283,7 +305,9 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
                 title: S.of(context)?.chatBaiduSearch ?? 'Baidu Search',
                 onTap: () {
                   Navigator.pop(ctx);
-                  _openSearch('https://www.baidu.com/s?wd=${Uri.encodeComponent(searchText)}');
+                  _openSearch(
+                    'https://www.baidu.com/s?wd=${Uri.encodeComponent(searchText)}',
+                  );
                 },
                 isDark: isDark,
               ),
@@ -293,7 +317,9 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
                 title: S.of(context)?.chatGoogleSearch ?? 'Google Search',
                 onTap: () {
                   Navigator.pop(ctx);
-                  _openSearch('https://www.google.com/search?q=${Uri.encodeComponent(searchText)}');
+                  _openSearch(
+                    'https://www.google.com/search?q=${Uri.encodeComponent(searchText)}',
+                  );
                 },
                 isDark: isDark,
               ),
@@ -303,7 +329,9 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
                 title: S.of(context)?.chatBingSearch ?? 'Bing Search',
                 onTap: () {
                   Navigator.pop(ctx);
-                  _openSearch('https://www.bing.com/search?q=${Uri.encodeComponent(searchText)}');
+                  _openSearch(
+                    'https://www.bing.com/search?q=${Uri.encodeComponent(searchText)}',
+                  );
                 },
                 isDark: isDark,
               ),
@@ -339,7 +367,11 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.chatCannotOpenBrowser ?? 'Cannot open browser')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.chatCannotOpenBrowser ?? 'Cannot open browser',
+            ),
+          ),
         );
       }
     }

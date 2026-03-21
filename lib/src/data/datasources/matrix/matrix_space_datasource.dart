@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../core/utils/room_metadata_utils.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../../domain/entities/space_entity.dart';
 import 'matrix_client_manager.dart';
@@ -12,6 +13,7 @@ import 'matrix_client_manager.dart';
 /// Space 本质上是 creation_content 包含 {type: 'm.space'} 的 Matrix 房间。
 class MatrixSpaceDataSource {
   final MatrixClientManager _clientManager;
+  static const String _spaceMetaEventType = 'n42.space.meta';
 
   MatrixSpaceDataSource(this._clientManager);
 
@@ -34,15 +36,14 @@ class MatrixSpaceDataSource {
 
   /// 获取当前用户已加入的所有 Space
   List<matrix.Room> getJoinedSpaces() {
-    return (_client?.rooms ?? [])
-        .where(_isSpace)
-        .toList();
+    return (_client?.rooms ?? []).where(_isSpace).toList();
   }
 
   /// 监听 Space 列表变化（通过 sync 流触发）
   Stream<List<matrix.Room>> watchJoinedSpaces() {
-    return (_client?.onRoomState.stream ?? const Stream.empty())
-        .map((_) => getJoinedSpaces());
+    return (_client?.onRoomState.stream ?? const Stream.empty()).map(
+      (_) => getJoinedSpaces(),
+    );
   }
 
   /// 获取单个 Space 房间
@@ -53,6 +54,7 @@ class MatrixSpaceDataSource {
     String spaceId, {
     int? maxDepth,
     int? limit,
+    String? from,
   }) async {
     if (_client == null) return null;
     try {
@@ -60,6 +62,7 @@ class MatrixSpaceDataSource {
         spaceId,
         maxDepth: maxDepth,
         limit: limit,
+        from: from,
       );
     } catch (e) {
       return null;
@@ -80,9 +83,7 @@ class MatrixSpaceDataSource {
         limit: limit,
       );
       // 只返回 Space 类型的房间
-      return result.chunk
-          .where((r) => r.roomType == 'm.space')
-          .toList();
+      return result.chunk.where((r) => r.roomType == 'm.space').toList();
     } catch (e) {
       return [];
     }
@@ -98,8 +99,24 @@ class MatrixSpaceDataSource {
     String? description,
     bool isPublic = true,
     Uint8List? avatar,
+    List<String> topics = const [],
   }) async {
     if (_client == null) throw Exception('Matrix client not initialized');
+
+    final normalizedTopics = topics
+        .map((topic) => topic.trim())
+        .where((topic) => topic.isNotEmpty)
+        .toSet()
+        .toList();
+
+    final initialState = <matrix.StateEvent>[
+      if (normalizedTopics.isNotEmpty)
+        matrix.StateEvent(
+          type: _spaceMetaEventType,
+          stateKey: '',
+          content: {'topics': normalizedTopics},
+        ),
+    ];
 
     final roomId = await _client!.createRoom(
       name: name,
@@ -107,8 +124,9 @@ class MatrixSpaceDataSource {
       preset: isPublic
           ? matrix.CreateRoomPreset.publicChat
           : matrix.CreateRoomPreset.privateChat,
-      visibility:
-          isPublic ? matrix.Visibility.public : matrix.Visibility.private,
+      visibility: isPublic
+          ? matrix.Visibility.public
+          : matrix.Visibility.private,
       creationContent: {'type': 'm.space'},
       powerLevelContentOverride: {
         'events': {
@@ -120,6 +138,7 @@ class MatrixSpaceDataSource {
         'state_default': 50,
         'events_default': 0,
       },
+      initialState: initialState.isEmpty ? null : initialState,
     );
 
     // 如有头像，异步上传（不阻塞创建）
@@ -233,8 +252,9 @@ class MatrixSpaceDataSource {
       preset: isPublic
           ? matrix.CreateRoomPreset.publicChat
           : matrix.CreateRoomPreset.privateChat,
-      visibility:
-          isPublic ? matrix.Visibility.public : matrix.Visibility.private,
+      visibility: isPublic
+          ? matrix.Visibility.public
+          : matrix.Visibility.private,
       // 标记为受 Space 限制（Matrix Spaces 访问控制）
       initialState: [
         matrix.StateEvent(
@@ -243,10 +263,7 @@ class MatrixSpaceDataSource {
           content: {
             'join_rule': 'restricted',
             'allow': [
-              {
-                'type': 'm.room_membership',
-                'room_id': spaceId,
-              }
+              {'type': 'm.room_membership', 'room_id': spaceId},
             ],
           },
         ),
@@ -254,16 +271,11 @@ class MatrixSpaceDataSource {
     );
 
     // 2. 在 Space 中注册 m.space.child 事件
-    await _client!.setRoomStateWithKey(
-      spaceId,
-      'm.space.child',
-      channelId,
-      {
-        'via': [_client!.userID?.split(':').last ?? ''],
-        'suggested': true,
-        'auto_join': false,
-      },
-    );
+    await _client!.setRoomStateWithKey(spaceId, 'm.space.child', channelId, {
+      'via': [_client!.userID?.split(':').last ?? ''],
+      'suggested': true,
+      'auto_join': false,
+    });
 
     return channelId;
   }
@@ -279,12 +291,7 @@ class MatrixSpaceDataSource {
     );
 
     // 移除 Space 子关系（发送空内容 = 删除）
-    await _client!.setRoomStateWithKey(
-      spaceId,
-      'm.space.child',
-      channelId,
-      {},
-    );
+    await _client!.setRoomStateWithKey(spaceId, 'm.space.child', channelId, {});
 
     // 解散频道房间
     final room = _client!.getRoomById(channelId);
@@ -311,7 +318,11 @@ class MatrixSpaceDataSource {
   }
 
   /// 踢出成员
-  Future<void> kickMember(String spaceId, String userId, {String? reason}) async {
+  Future<void> kickMember(
+    String spaceId,
+    String userId, {
+    String? reason,
+  }) async {
     final room = _getRoom(spaceId);
     if (!room.canKick) {
       throw Exception('You do not have permission to remove members');
@@ -320,7 +331,11 @@ class MatrixSpaceDataSource {
   }
 
   /// 封禁成员
-  Future<void> banMember(String spaceId, String userId, {String? reason}) async {
+  Future<void> banMember(
+    String spaceId,
+    String userId, {
+    String? reason,
+  }) async {
     final room = _getRoom(spaceId);
     if (!room.canKick) {
       throw Exception('You do not have permission to ban members');
@@ -330,7 +345,10 @@ class MatrixSpaceDataSource {
 
   /// 设置成员权限等级（50 = 管理员，0 = 普通成员）
   Future<void> setMemberPowerLevel(
-      String spaceId, String userId, int powerLevel) async {
+    String spaceId,
+    String userId,
+    int powerLevel,
+  ) async {
     final room = _getRoom(spaceId);
     _ensureCanSendStateEvent(
       room,
@@ -338,6 +356,15 @@ class MatrixSpaceDataSource {
       action: 'change member roles',
     );
     await room.setPower(userId, powerLevel);
+  }
+
+  String getSpaceInviteLink(String spaceId) {
+    final room = _getRoom(spaceId);
+    return buildMatrixToRoomLink(
+      roomId: room.id,
+      canonicalAlias: room.canonicalAlias,
+      via: extractViaServer(room.id),
+    );
   }
 
   // ============================================
@@ -366,8 +393,10 @@ class MatrixSpaceDataSource {
   SpaceEntity roomToSpaceEntity(matrix.Room room, {bool isJoined = true}) {
     final createEvent = room.getState(matrix.EventTypes.RoomCreate);
     final creatorId = createEvent?.content['creator'] as String? ?? '';
-    final spaceType =
-        room.joinRules == matrix.JoinRules.public ? SpaceType.public : SpaceType.private;
+    final spaceType = room.joinRules == matrix.JoinRules.public
+        ? SpaceType.public
+        : SpaceType.private;
+    final storedTopics = _readSpaceTopics(room);
 
     return SpaceEntity(
       id: room.id,
@@ -376,16 +405,18 @@ class MatrixSpaceDataSource {
       avatarUrl: room.avatar?.toString(),
       type: spaceType,
       creatorId: creatorId,
-      memberCount: room.summary.mJoinedMemberCount ?? room.getParticipants().length,
+      memberCount:
+          room.summary.mJoinedMemberCount ?? room.getParticipants().length,
       children: const [],
       isJoined: isJoined,
-      topics: const [],
+      topics: storedTopics,
       createdAt: DateTime.now(), // Matrix SDK 不直接暴露房间创建时间
     );
   }
 
   /// 将公开搜索结果转换为 SpaceEntity
   SpaceEntity publicRoomToSpaceEntity(matrix.PublishedRoomsChunk chunk) {
+    final fallbackTopics = extractHashtagsFromTexts([chunk.name, chunk.topic]);
     return SpaceEntity(
       id: chunk.roomId,
       name: chunk.name ?? chunk.roomId,
@@ -396,7 +427,7 @@ class MatrixSpaceDataSource {
       memberCount: chunk.numJoinedMembers,
       children: const [],
       isJoined: false,
-      topics: const [],
+      topics: fallbackTopics,
       createdAt: DateTime.now(),
     );
   }
@@ -430,5 +461,20 @@ class MatrixSpaceDataSource {
     if (powerLevel >= 100) return GroupRole.owner;
     if (powerLevel >= 50) return GroupRole.admin;
     return GroupRole.member;
+  }
+
+  List<String> _readSpaceTopics(matrix.Room room) {
+    final meta = room.getState(_spaceMetaEventType)?.content['topics'];
+    if (meta is List) {
+      final topics = meta
+          .whereType<String>()
+          .map((topic) => topic.trim())
+          .where((topic) => topic.isNotEmpty)
+          .toList();
+      if (topics.isNotEmpty) {
+        return topics;
+      }
+    }
+    return extractHashtagsFromTexts([room.name, room.topic]);
   }
 }
