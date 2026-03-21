@@ -94,6 +94,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
+      _clearCachedUserProfile();
       // 登录
       final response = await _authDataSource.loginWithPassword(
         homeserver: homeserver,
@@ -179,6 +180,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
+      _clearCachedUserProfile();
       await _authDataSource.loginWithToken(
         homeserver: homeserver,
         accessToken: accessToken,
@@ -234,6 +236,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       // 快速路径：Matrix SDK 在 initialize() 时已从自身 SQLite DB 加载了会话
       // 这是"类似微信"的免密登录场景——同一台设备的二次及以后使用
       if (_authDataSource.isLoggedIn) {
+        _clearCachedUserProfile();
         final sdkUserId = _authDataSource.userId;
         debugLog(
           'AuthRepository: Matrix SDK already logged in as $sdkUserId, fast restore',
@@ -379,6 +382,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     String? registrationToken,
   }) async {
     try {
+      _clearCachedUserProfile();
       final response = await _authDataSource.register(
         homeserver: homeserver,
         username: username,
@@ -923,6 +927,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
+      _clearCachedUserProfile();
       final response = await _authDataSource.loginWithLoginToken(
         homeserver: homeserver,
         loginToken: loginToken,
@@ -1282,6 +1287,12 @@ class AuthRepositoryImpl implements IAuthRepository {
       displayName: _cachedDisplayName ?? userId.localpart,
       avatarUrl: _cachedAvatarUrl,
     );
+  }
+
+  void _clearCachedUserProfile() {
+    _cachedProfileData = null;
+    _cachedAvatarUrl = null;
+    _cachedDisplayName = null;
   }
 
   Future<void> _syncStoredAccountProfile() async {
